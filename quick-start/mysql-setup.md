@@ -1,8 +1,12 @@
 # MySQL setup
 
+{% method %}
 Each assembly in an Ensembl site is stored in a separate MySQL database. GenomeHubs sites host these databases in a MySQL Docker container.
 
+{% common %}
 #![](/assets/GenomeHubs MySQL setup.png) 
+{% endmethod %}
+
 
 ## Create a MySQL container
 
