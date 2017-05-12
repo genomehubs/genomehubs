@@ -10,7 +10,7 @@ See [docs.docker.com](https://docs.docker.com) for details on how to install Doc
 Install `docker.io` and `git`:
 
 {% common %}
-```bash
+```
 sudo apt install -y docker.io git
 ```
 {% endmethod %}
