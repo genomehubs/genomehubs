@@ -3,7 +3,7 @@
 {% method %}
 Each assembly in an Ensembl site is stored in a separate MySQL database. GenomeHubs sites host these databases in a MySQL Docker container. 
 
-The EasyMirror container is used to configure users and password in the MySQL container and to make local copies of Ensembl databases from SQL dumps on the [Ensembl](ftp://ftp.ensembl.org/pub)/[EnsemblGenomes](ftp://ftp.ensemblgenomes.org/pub) ftp sites ready to be hosted in a local mirror site.
+The EasyMirror container is used to configure users and password in the MySQL container and to mirror Ensembl databases from SQL dumps on the [Ensembl](ftp://ftp.ensembl.org/pub)/[EnsemblGenomes](ftp://ftp.ensemblgenomes.org/pub) ftp sites, making local copies ready to be hosted alongside newly imported data in a GenomeHubs site.
 
 {% common %}
 #![](/assets/GenomeHubs MySQL setup.png) 
