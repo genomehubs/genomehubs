@@ -13,9 +13,13 @@ $ cd ~
 $ git clone https://github.com/genomehubs/template genomehubs
 $ cd genomehubs
 ```
+{% endmethod %}
 
+
+{% method %}
 Create a `mysql/data` directory to allow the databases to be stored outside of the MySQL container:
 
+{% common %}
 ```bash
 $ mkdir -p mysql/data
 ```
