@@ -24,12 +24,12 @@ Create a MySQL Docker container to host the Ensembl Databases for your GenomeHub
 {% common %}
 ```bash
 $ docker run -d \
-           --name genomehubs-mysql \
-           -v ~/genomehubs/mysql/data:/var/lib/mysql \
-           -e MYSQL_ROOT_PASSWORD=CHANGEME \
-           -e MYSQL_ROOT_HOST='172.17.0.0/255.255.0.0' \
-           -p 3306:3306 \
-           mysql/mysql-server:5.5
+             --name genomehubs-mysql \
+             -v ~/genomehubs/mysql/data:/var/lib/mysql \
+             -e MYSQL_ROOT_PASSWORD=CHANGEME \
+             -e MYSQL_ROOT_HOST='172.17.0.0/255.255.0.0' \
+             -p 3306:3306 \
+             mysql/mysql-server:5.5
 ```
 {% endmethod %}
 
@@ -57,7 +57,7 @@ Edit the `database.ini` configuration file to set passwords for the database use
 
 {% common %}
 ```bash
-$ nano ~/genomehubs/v1/ensembl/data
+$ nano ~/genomehubs/v1/ensembl/conf/database.ini
 # (some lines omitted)
 [DATABASE]
   DB_SESSION_USER = ensrw
@@ -78,5 +78,18 @@ $ nano ~/genomehubs/v1/ensembl/data
 ```
 {% endmethod %}
 
+
+{% method %}
+Run the database setup script in a `genomehubs/easy-mirror` Docker to set up database users and import databases into your MySQL container based on the information in the `database.ini` configuration file:
+
+{% common %}
+```bash
+$ docker run --rm \
+             --name genomehubs-ensembl \
+             -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
+             --link genomehubs-mysql \
+             genomehubs/easy-mirror:latest /ensembl/scripts/database.sh /ensembl/conf/database.ini
+```
+{% endmethod %}
 
 
