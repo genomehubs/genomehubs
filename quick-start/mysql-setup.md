@@ -26,7 +26,7 @@ Create a MySQL Docker container to host the Ensembl Databases for your GenomeHub
 $ docker run -d \
            --name genomehubs-mysql \
            -v ~/genomehubs/mysql/data:/var/lib/mysql \
-           -e MYSQL_ROOT_PASSWORD=changethispassword \
+           -e MYSQL_ROOT_PASSWORD=CHANGEME \
            -e MYSQL_ROOT_HOST='172.17.0.0/255.255.0.0' \
            -p 3306:3306 \
            mysql/mysql-server:5.5
@@ -50,13 +50,31 @@ $ docker exec -it genomehubs-mysql bash
 {% method %}
 Edit the `database.ini` configuration file to set passwords for the database users:
 
-* the root user password should match the value of `MYSQL_ROOT_PASSWORD` in the `docker run` command above
+* the `DB_ROOT_PASSWORD` should match the value of `MYSQL_ROOT_PASSWORD` in the `docker run` command above
+* the `DB_HOST` must match the value of `--name` in the `docker run` command above
 * to mirror existing Ensembl databases in your GenomeHub, add the appropriate database names to `SPECIES_DBS` as a space-separated list (a corresponding database dump must be available at `SPECIES_DB_URL`)
 * even if you do not wish to mirror any existing databases, at least one database must be specified in `SPECIES_DBS` for use as a template when importing new data.
 
 {% common %}
 ```bash
 $ nano ~/genomehubs/v1/ensembl/data
+# (some lines omitted)
+[DATABASE]
+  DB_SESSION_USER = ensrw
+  DB_SESSION_PASS = CHANGEME
+
+  DB_IMPORT_USER = importer
+  DB_IMPORT_PASSWORD = CHANGEME
+
+  DB_ROOT_USER = root
+  DB_ROOT_PASSWORD = CHANGEME
+  DB_PORT = 3306
+  DB_HOST = genomehubs-mysql
+
+[DATA_SOURCE]
+  SPECIES_DB_URL = ftp://ftp.ensemblgenomes.org/pub/release-32/metazoa/mysql/
+  SPECIES_DBS = [ heliconius_melpomene_core_32_85_1 ]
+
 ```
 {% endmethod %}
 

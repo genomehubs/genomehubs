@@ -20,6 +20,9 @@ sudo apt install -y docker.io git
 ### Fetch configuration files
 
 Clone the example configuration files from the [genomehubs/template](https://github.com/genomehubs/template) repository:
+
+* naming the template directory `v1` is convenient for versioning of your site
+
 {% common %}
 ```bash
 $ mkdir ~/genomehubs && cd ~/genomehubs
