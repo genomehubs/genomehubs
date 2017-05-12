@@ -6,7 +6,7 @@
 
 ## Methods
 
-* [Defining Methods](methods.md)
+* [Quick start guide](/quick-start.md)
 
 
 
