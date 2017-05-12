@@ -9,7 +9,7 @@ Each assembly in an Ensembl site is stored in a separate MySQL database. GenomeH
 Create a `mysql/data` directory to allow the databases to be stored outside of the MySQL container:
 
 {% common %}
-```bash
+```
 $ mkdir -p ~/genomehubs/mysql/data
 ```
 
@@ -22,7 +22,7 @@ Create a MySQL Docker container to host the Ensembl Databases for your GenomeHub
 * See [hub.docker.com](https://hub.docker.com/r/mysql/mysql-server/) for more information on the MySQL Docker image.
 
 {% common %}
-```bash
+```
 $ docker run -d \
              --name genomehubs-mysql \
              -v ~/genomehubs/mysql/data:/var/lib/mysql \
@@ -37,7 +37,7 @@ $ docker run -d \
 Log in to MySQL inside the container to increase `max_allowed_packet` to allow import of large scaffolds:
 
 {% common %}
-```bash
+```
 $ docker exec -it genomehubs-mysql bash
 # mysql -u root -p
 > set global max_allowed_packet=100000000;
@@ -56,7 +56,7 @@ Edit the `database.ini` configuration file to set passwords for the database use
 * even if you do not wish to mirror any existing databases, at least one database must be specified in `SPECIES_DBS` for use as a template when importing new data.
 
 {% common %}
-```bash
+```
 $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 # (some lines omitted)
 [DATABASE]
@@ -83,7 +83,7 @@ $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 Run the database setup script in a `genomehubs/easy-mirror` Docker to set up database users and import databases into your MySQL container based on the information in the `database.ini` configuration file:
 
 {% common %}
-```bash
+```
 $ docker run --rm \
              --name genomehubs-ensembl \
              -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
