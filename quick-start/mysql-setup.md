@@ -80,7 +80,9 @@ $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 
 
 {% method %}
-Run the database setup script in a `genomehubs/easy-mirror` Docker to set up database users and import databases into your MySQL container based on the information in the `database.ini` configuration file:
+Run the `database.sh` script in a `genomehubs/easy-mirror` Docker container:
+
+* this script will set up database users and import databases into your MySQL container based on the information in the `database.ini` configuration file.
 
 {% common %}
 ```
