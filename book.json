@@ -4,13 +4,13 @@
         "theme-api": {
             "languages": [
                 {
-                    "lang": "js",
-                    "name": "JavaScript",
+                    "lang": "qsub",
+                    "name": "GridEngine",
                     "default": true
                 },
                 {
-                    "lang": "go",
-                    "name": "Go"
+                    "lang": "sh",
+                    "name": "Shell"
                 }
             ]
         }

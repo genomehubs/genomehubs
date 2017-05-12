@@ -7,6 +7,7 @@ Step-by-step instructions to set up a GenomeHubs site with your own data.
 
 Clone the [genomehubs/template](https://github.com/genomehubs/template) repository which contains example configuration files with sensible default values to allow you to get started quickly:
 
+{% common %}
 ```bash
 $ cd ~
 $ git clone https://github.com/genomehubs/template genomehubs
@@ -26,6 +27,7 @@ $ mkdir -p mysql/data
 
 Create a MySQL Docker container to host the Ensembl Databases for your GenomeHub.
 
+{% common %}
 ```bash
 $ docker run -d \
            --name genomehubs-mysql \
