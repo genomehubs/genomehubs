@@ -1,12 +1,11 @@
 # Summary
 
-## Overview
+## Introduction
 
-* [My Awesome API](/README.md)
+* [GenomeHubs](/README.md)
 
-## Methods
+## Quick Start
 
-* [Quick start guide](/quick-start.md)
-
-
+* [Preparation](/quick-start/preparation.md)
+* [MySQL setup](/quick-start/mysql-setup.md)
 
