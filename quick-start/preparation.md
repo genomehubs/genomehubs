@@ -5,6 +5,8 @@ Docker is the only prerequisite for running GenomeHubs, however, for convenience
 See [docs.docker.com](https://docs.docker.com) for details on how to install Docker on other operating systems.
 
 {% method %}
+### Install packages
+
 Install `docker.io` and `git`:
 
 {% common %}
@@ -15,6 +17,7 @@ sudo apt install -y docker.io git
 
 
 {% method %}
+### Fetch configuration files
 
 Clone the example configuration files from the [genomehubs/template](https://github.com/genomehubs/template) repository:
 {% common %}
