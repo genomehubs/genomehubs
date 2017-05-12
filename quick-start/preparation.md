@@ -1,18 +1,26 @@
 # Preparation
 
-Step-by-step instructions to set up a GenomeHubs site with your own data.
+Docker is the only prerequisite for running GenomeHubs, however, for convenience this quick-start guide assumes that you will be running all steps on Ubuntu 16.04 with git installed and files stored in your home directory.
 
-
-## 1. Create folders and configuration files
+See [docs.docker.com](https://docs.docker.com) for details on how to install Docker on other operating systems.
 
 {% method %}
-Clone the [genomehubs/template](https://github.com/genomehubs/template) repository which contains example configuration files with sensible default values to allow you to get started quickly:
+Install `docker.io` and `git`:
 
 {% common %}
 ```bash
-$ cd ~
-$ git clone https://github.com/genomehubs/template genomehubs
-$ cd genomehubs
+sudo apt install -y docker.io git
+```
+{% endmethod %}
+
+
+{% method %}
+
+Clone the example configuration files from the [genomehubs/template](https://github.com/genomehubs/template) repository:
+{% common %}
+```bash
+$ mkdir ~/genomehubs && cd ~/genomehubs
+$ git clone https://github.com/genomehubs/template v1
 ```
 {% endmethod %}
 
