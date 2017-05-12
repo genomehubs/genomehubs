@@ -24,7 +24,7 @@ Clone the example configuration files from the [genomehubs/template](https://git
 * naming the template directory `v1` is convenient for versioning of your site
 
 {% common %}
-```bash
+```
 $ mkdir ~/genomehubs && cd ~/genomehubs
 $ git clone https://github.com/genomehubs/template v1
 ```
