@@ -29,7 +29,7 @@ $ mkdir -p mysql/data
 ## 2. Create a MySQL container
 
 {% method %}
-Create a MySQL Docker container to host the Ensembl Databases for your GenomeHub.
+Create a MySQL Docker container to host the Ensembl Databases for your GenomeHub:
 
 {% common %}
 ```bash
@@ -42,3 +42,15 @@ $ docker run -d \
            mysql/mysql-server:5.5
 ```
 {% endmethod %}
+
+{% method %}
+Log in to mysql inside the container to increase `max_allowed_packet` to allow import of large scaffolds:
+
+{% common %}
+```bash
+$ docker exec -it genomehubs-mysql bash
+# mysql -u root -p
+> set global max_allowed_packet=100000000;
+```
+{% endmethod %}
+
