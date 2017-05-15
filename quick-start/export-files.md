@@ -1,17 +1,17 @@
 # Export files
 
 {% method %}
-Overview
+Standardised files can be exported from Ensembl databases for use in analyses and visualisations and to provide files for Bulk download.  
 
 {% common %}
 ![](/assets/GenomeHubs export.png)
 {% endmethod %}
 
 
-## Heading 2
+## Export sequences
 
 {% method %}
-Step 1
+Run the script:
 
 {% common %}
 ```

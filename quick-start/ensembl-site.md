@@ -1,21 +1,56 @@
-# Run analyses
+# Start Ensembl genome browser
 
 {% method %}
-Overview
+Ensembl genome browser.
 
 {% common %}
 ![](/assets/GenomeHubs Ensembl.png)
 {% endmethod %}
 
 
-## Heading 2
+## Edit files in conf directory
 
 {% method %}
-Step 1
+Edit setup.ini to change the passwords and database names:
 
 {% common %}
 ```
-code
+$ 
+```
+
+{% endmethod %}
+
+
+## Write a plugin to configure the Ensembl site
+
+{% method %}
+Fork the genomehubs/example-plugin repository:
+
+{% common %}
+```
+$ 
+```
+
+{% endmethod %}
+
+
+
+
+
+
+## Start the EasyMirror container
+
+{% method %}
+Start the EasyMirror Docker container:
+
+{% common %}
+```
+$ docker run -d \
+             --name genomehubs-ensembl \
+             -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
+             --link genomehubs-mysql \
+             -p 8081:8080 \
+             genomehubs/easy-mirror:latest
 ```
 
 {% endmethod %}

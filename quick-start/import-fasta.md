@@ -1,4 +1,4 @@
-# FASTA+GFF import
+# Import assembly and gene models
 
 {% method %}
 The first step in adding new data to a GenomeHubs Ensembl site is to import the assembled genome sequence and gene models from FASTA and GFF files into an Ensembl MySQL database using an EasyImport Docker container.

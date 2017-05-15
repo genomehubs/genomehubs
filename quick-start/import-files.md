@@ -1,17 +1,17 @@
 # Import analysis results
 
 {% method %}
-Overview
+The results of common analyses can be imported into an Ensembl database to provide functional annotations.  
 
 {% common %}
-![](/assets/GenomeHubs import-2.png)
+![](/assets/GenomeHubs export.png)
 {% endmethod %}
 
 
-## Heading 2
+## Import Blastp/InterProScan results
 
 {% method %}
-Step 1
+Run the import script:
 
 {% common %}
 ```
