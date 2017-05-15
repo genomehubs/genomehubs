@@ -6,7 +6,7 @@ The first step in adding new data to a GenomeHubs Ensembl site is to import the 
 Parameters for the import scripts within the EasyImport container are controlled in assembly-specific configuration files. These offer a wide range of options to set passwords and assembly-specific metadata as well as accommodating the diversity of real-world GFF files and allowing the files to be imported from any location on the local filesystem or accessible via http/ftp. In practice, only a small number of these parameters need to be altered for a given assembly import so many of the parameters can be set in a default configuration file that remains unchanged across all imported assemblies.
 
 {% common %}
-![](/assets/GenomeHubs FASTA import.png)
+![](/assets/GenomeHubs import.png)
 {% endmethod %}
 
 
