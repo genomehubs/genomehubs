@@ -16,7 +16,7 @@ The full set of GenomeHubs Docker containers also includes tools to export data 
 
 * RepeatMasker to identify repetitive elements
 
-* Cegma and Busco genome completeness assessment
+* Cegma and Busco genome completeness assessments
 
 GenomeHubs containers are linked by use of common file formats or through the Ensembl API so it is relatively straightforward to expand the feature set by creating new containers to host additional services.
 

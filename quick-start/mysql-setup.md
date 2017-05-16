@@ -27,6 +27,7 @@ $ mkdir -p ~/genomehubs/mysql/data
 Create a MySQL Docker container to host the Ensembl Databases for your GenomeHub:
 
 * See [hub.docker.com](https://hub.docker.com/r/mysql/mysql-server/) for more information on the MySQL Docker image.
+* Docker sets up its own network so setting `MYSQL_ROOT_HOST='172.17.0.0/255.255.0.0'` will allow other Docker containers on the same machine to connect 
 
 {% common %}
 ```

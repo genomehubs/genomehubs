@@ -9,11 +9,23 @@ Parameters for the import scripts within the EasyImport container are controlled
 ![](/assets/GenomeHubs import.png)
 {% endmethod %}
 
+## Choose a name for your new assembly database
+
+{% method %}
+Each imported assembly must be stored in a uniquely named database. GenomeHubs follows the Ensembl naming conventions with the addition of an assembly name to allow alternate assemblies for a single species to be hosted in a single site. Database names should be all lower case with no special characters other than letters, numbers and underscores. A subspecies/strain can optionally be included, so (for Ensembl release 32/85 which is currently supported by GenomeHubs) _Heliconius melpomene rosina_ assembly Hmel2 could be either of:
+
+{% common %}
+```
+heliconius_melpomene_hmel2_core_32_85_1
+heliconius_melpomene_rosina_hmel2_core_32_85_1
+```
+{% endmethod %}
+
 
 ## Set assembly metadata
 
 {% method %}
-Create and edit a `<database name>.ini` file in the `import/conf` directory to set assembly-specific metadata:
+Create and edit a `<database name>.ini` file in the `import/conf` directory to set assembly-specific metadata using the `genus_species_asm_core_32_85_1.ini` template file:
 
 {% common %}
 ```
