@@ -27,9 +27,36 @@ heliconius_melpomene_rosina_hmel2_core_32_85_1
 {% method %}
 Create and edit a `<database name>.ini` file in the `import/conf` directory to set assembly-specific metadata using the `genus_species_asm_core_32_85_1.ini` template file:
 
+* pay attention to the case fo the default values you are replacing and the use of spaces/underscores
+* the value for `ASSEMBLY.NAME` should show the assembly name as you would like it to be displayed and may contain dots but any dots should be omitted from the assembly name portion of `SPECIES.PRODUCTION_NAME` and `SPECIES.URL`
+
 {% common %}
 ```
-$ nano ~/genomehubs/import/conf/genus_species_assembly_core_32_85_1.ini
+$ cd ~/genomehubs/import/conf/
+$ cp genus_species_assembly_core_32_85_1.ini heliconius_melpomene_hmel2_core_32_85_1.ini
+$ nano heliconius_melpomene_hmel2_core_32_85_1.ini
+# update values to match your species/assembly name and other details
+[DATABASE_CORE]
+        NAME = genus_species_asm_core_32_85_1
+[META]
+        SPECIES.PRODUCTION_NAME = genus_species_asm
+        SPECIES.SCIENTIFIC_NAME = Genus species
+        SPECIES.COMMON_NAME = Common name
+        SPECIES.DISPLAY_NAME = Genus species
+        SPECIES.DIVISION = EnsemblMetazoa
+        SPECIES.URL = Genus_species_asm
+        SPECIES.TAXONOMY_ID = 1
+        SPECIES.ALIAS = [ ]                   
+        ASSEMBLY.NAME = Assembly.name
+        ASSEMBLY.DATE = 2017-05-10
+        ASSEMBLY.ACCESSION = 
+        ASSEMBLY.DEFAULT = Assembl.name
+        PROVIDER.NAME = Provider name
+        PROVIDER.URL = http://example.com      
+        GENEBUILD.ID = 1
+        GENEBUILD.START_DATE = 2017-05
+        GENEBUILD.VERSION = 1
+        GENEBUILD.METHOD = import
 
 ```
 
