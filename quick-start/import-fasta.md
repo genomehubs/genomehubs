@@ -151,11 +151,19 @@ $ nano operophtera_brumata_obru1_core_32_85_1.ini
 ## Import assembly and gene models
 
 {% method %}
-
+Run an EasyImport Docker container with flags to import sequences, prepare/ import gff and verify the imported sequences using the provided protein FASTA file:
 
 {% common %}
 ```
-
+$ docker run --rm \
+             -u $UID:$GROUPS \
+             --name easy-import-operophtera_brumata_v1_core_32_85_1 \
+             --link genomehubs-mysql \
+             -v ~/genomehubs/import/conf:/import/conf \
+             -v ~/genomehubs/import/data:/import/data \
+             -e DATABASE=operophtera_brumata_obru1_core_32_85_1 \
+             -e FLAGS="-s -p -g -v" \
+             genomehubs/easy-import:latest
 ```
 {% endmethod %}
 
