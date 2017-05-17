@@ -70,11 +70,11 @@ $ nano overwrite.ini
 ## Choose a name for your new assembly database
 
 {% method %}
-Each imported assembly must be stored in a uniquely named database. GenomeHubs follows the Ensembl naming conventions with the addition of an assembly name to allow alternate assemblies for a single species to be hosted in a single site. Database names should be all lower case with no special characters other than letters, numbers and underscores. A subspecies/strain can optionally be included. For Ensembl release 32/85 (which is currently the version supported by GenomeHubs) the dtaabase name for _Operophtera brumata_ assembly OpBru1 would be:
+Each imported assembly must be stored in a uniquely named database. GenomeHubs follows the Ensembl naming conventions with the addition of an assembly name to allow alternate assemblies for a single species to be hosted in a single site. Database names should be all lower case with no special characters other than letters, numbers and underscores. A subspecies/strain can optionally be included. For Ensembl release 32/85 (which is currently the version supported by GenomeHubs) the dtaabase name for _Operophtera brumata_ assembly Obru1 would be:
 
 {% common %}
 ```
-operophtera_brumata_opbru1_core_32_85_1
+operophtera_brumata_obru1_core_32_85_1
 ```
 {% endmethod %}
 
@@ -90,8 +90,8 @@ Create and edit a `<database name>.ini` file in the `import/conf` directory to s
 {% common %}
 ```
 $ cd ~/genomehubs/import/conf/
-$ cp genus_species_assembly_core_32_85_1.ini operophtera_brumata_opbru1_core_32_85_1.ini
-$ nano operophtera_brumata_opbru1_core_32_85_1.ini
+$ cp genus_species_assembly_core_32_85_1.ini operophtera_brumata_obru1_core_32_85_1.ini
+$ nano operophtera_brumata_obru1_core_32_85_1.ini
 # update values to match your species/assembly name and other details
 [DATABASE_CORE]
         NAME = genus_species_asm_core_32_85_1
@@ -124,11 +124,12 @@ $ nano operophtera_brumata_opbru1_core_32_85_1.ini
 Edit `<database name>.ini` to set paths to files to import, locations of identifiers in the files and settings to control the wat the gff file is processed:
 
 * files can be in any location accessible on the local filesystem or via ftp/http
+* names are provided in the gff file so stable IDs can be set using this attribute, commonly only ID is available and this would be used as the source of the stable IDs (see full documentation at [easy-import.readme.io](http://easy-import.readme.io))
 * this guide assumes you will be importing valid gff3, full details of the syntax to repair invalid gff files during import is available at [easy-import.readme.io](http://easy-import.readme.io)
 
 {% common %}
 ```
-$ nano operophtera_brumata_opbru1_core_32_85_1.ini
+$ nano operophtera_brumata_obru1_core_32_85_1.ini
 [FILES]
 	SCAFFOLD = [ fa http://download.lepbase.org/v4/provider/Obru1.fsa.gz ]
 	GFF = [ gff3 http://download.lepbase.org/v4/provider/Obru_genes.gff.gz ]
@@ -145,6 +146,26 @@ $ nano operophtera_brumata_opbru1_core_32_85_1.ini
 	TRUNCATE_GENE_TABLES = 1
 ```
 {% endmethod %}
+
+
+## Import assembly and gene models
+
+{% method %}
+
+
+{% common %}
+```
+
+```
+{% endmethod %}
+
+
+
+
+
+
+
+
 
 
 
