@@ -148,10 +148,10 @@ $ nano operophtera_brumata_obru1_core_32_85_1.ini
 {% endmethod %}
 
 
-## Import assembly and gene models
+## Run the import
 
 {% method %}
-Run an EasyImport Docker container with flags to import sequences, prepare/ import gff and verify the imported sequences using the provided protein FASTA file:
+Run an EasyImport Docker container with flags to import sequences (`-s`), prepare(`-p`)/import (`-g`) gff and verify (`-v`) the imported sequences using the provided protein FASTA file:
 
 {% common %}
 ```
@@ -166,19 +166,6 @@ $ docker run --rm \
              genomehubs/easy-import:latest
 ```
 {% endmethod %}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
