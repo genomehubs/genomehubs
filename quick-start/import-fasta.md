@@ -9,11 +9,13 @@ Parameters for the import scripts within the EasyImport container are controlled
 ![](/assets/GenomeHubs import.png)
 {% endmethod %}
 
-## set general import parameters
+## Set general import parameters
 
 {% method %}
 Create and edit a `default.ini` file to set database connection parameters that are likely to remain constant across all assembly imports: 
 
+* if the databases are hosted in a MySQL Docker container hosted on the same machine as the import will run then the `HOST` should be the name of the container, otherwise it should be the name/ip address of the host
+* values in this file can be overwritten by entries in an assembly-specific configuration file described below
 * this file also includes default GFF parsing parameters that are unlikely to need changing
 
 {% common %}
@@ -22,7 +24,45 @@ $ cd ~/genomehubs/import/conf/
 $ cp default.ini default.ini
 $ nano default.ini
 # update values to match your database connection details
+[DATABASE_CORE]
+	HOST = genomehubs-mysql
+	PORT = 3306
+	RO_USER = anonymous
+[DATABASE_SEARCH]
+	NAME = genomehubs_search_32_85
+	HOST = genomehubs-mysql
+	PORT = 3306
+	RO_USER = anonymous
+	RO_PASS =
+[DATABASE_TAXONOMY]
+	NAME = ncbi_taxonomy
+	HOST = genomehubs-mysql
+	PORT = 3306
+	RO_USER = anonymous
+[DATABASE_TEMPLATE]
+	NAME = melitaea_cinxia_core_32_85_1
+	HOST = genomehubs-mysql
+	PORT = 3306
+	RO_USER = anonymous
+```
+{% endmethod %}
 
+{% method %}
+Update the passwords in `overwrite.ini`:
+
+* values in this file will overwrite entries in `default.ini` and the assembly-specific file so it is a convenient way to keep passwords separate from the remaining configuration details 
+
+{% common %}
+```
+$ cp overwrite.ini overwrite.ini
+$ nano overwrite.ini
+# update values to match your database connection details
+[DATABASE_CORE]
+        RW_USER = importer
+        RW_PASS = CHANGEME
+[DATABASE_SEARCH]
+        RW_USER = importer
+        RW_PASS = CHANGEME
 ```
 {% endmethod %}
 
@@ -89,7 +129,20 @@ Edit `<database name>.ini` to set paths to files to import, locations of identif
 {% common %}
 ```
 $ nano operophtera_brumata_opbru1_core_32_85_1.ini
-
+[FILES]
+	SCAFFOLD = [ fa http://download.lepbase.org/v4/provider/Obru1.fsa.gz ]
+	GFF = [ gff3 http://download.lepbase.org/v4/provider/Obru_genes.gff.gz ]
+	PROTEIN = [ fa http://download.lepbase.org/v4/provider/ObruPep.fasta.gz ]
+[GENE_STABLE_IDS]
+	GFF = [ gene->Name /(.+)/ ]
+[TRANSCRIPT_STABLE_IDS]
+	GFF = [ SELF->Name /(.+)/ ]
+[TRANSLATION_STABLE_IDS]
+	GFF = [ SELF->Name /(.+)/ /-RA/-PA/ ]
+[MODIFY]
+	OVERWRITE_DB = 1
+	TRUNCATE_SEQUENCE_TABLES = 1
+	TRUNCATE_GENE_TABLES = 1
 ```
 {% endmethod %}
 
