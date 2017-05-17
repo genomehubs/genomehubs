@@ -9,6 +9,20 @@ Parameters for the import scripts within the EasyImport container are controlled
 ![](/assets/GenomeHubs import.png)
 {% endmethod %}
 
+## set general import parameters
+
+{% method %}
+Create and edit a `default.ini` file to set database connection parameters that are likely to remain constant across all assembly imports: 
+
+* this file also includes default GFF parsing parameters that are unlikely to need changing
+
+{% common %}
+```
+operophtera_brumata_opbru1_core_32_85_1
+```
+{% endmethod %}
+
+
 ## Choose a name for your new assembly database
 
 {% method %}
