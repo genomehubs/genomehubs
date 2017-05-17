@@ -81,7 +81,7 @@ $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 
 [DATA_SOURCE]
   SPECIES_DB_URL = ftp://ftp.ensemblgenomes.org/pub/release-32/metazoa/mysql/
-  SPECIES_DBS = [ heliconius_melpomene_core_32_85_1 ]
+  SPECIES_DBS = [ melitaea_cinxia_core_32_85_1 ]
 
 ```
 {% endmethod %}

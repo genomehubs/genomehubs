@@ -2,11 +2,11 @@
 
 ## Introduction
 
-* [GenomeHubs](/README.md)
+1. [GenomeHubs](/README.md)
 
 ## Quick Start
 
-* [Preparation](/quick-start/preparation.md)
+1. [Preparation](/quick-start/preparation.md)
 * [Setup MySQL database server](/quick-start/mysql-setup.md)
 * [Import assembly and gene models](/quick-start/import-fasta.md)
 * [Export files](/quick-start/export-files.md)

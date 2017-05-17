@@ -18,7 +18,11 @@ Create and edit a `default.ini` file to set database connection parameters that 
 
 {% common %}
 ```
-operophtera_brumata_opbru1_core_32_85_1
+$ cd ~/genomehubs/import/conf/
+$ cp default.ini default.ini
+$ nano default.ini
+# update values to match your database connection details
+
 ```
 {% endmethod %}
 
