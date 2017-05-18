@@ -39,6 +39,7 @@ $ docker run --rm \
 
 {% method %}
 Run blastp:
+* TODO: gzipped input is not currently supported by the container
 
 {% common %}
 ```
@@ -80,6 +81,8 @@ maxnumber.of.embedded.workers=16
 
 {% method %}
 Run InterProScan:
+* TODO: gzipped input is not currently supported by the container
+* TODO: container will fail if input sequences contain *s
 
 {% common %}
 ```
@@ -158,6 +161,75 @@ $ docker run --rm \
 ```
 {% endmethod %}
 
+
+# Run CEGMA
+
+{% method %}
+Run CEGMA:
+* TODO: allow use of multiple threads
+
+{% common %}
+```
+$ mkdir -p ~/genomehubs/v1/download/data/cegma
+$ docker run --rm \
+           -u $UID:$GROUPS \
+           --name Operophtera_brumata_Obru1-cegma \
+           -v ~/genomehubs/v1/download/data/sequence:/in \
+           -v ~/genomehubs/v1/download/data/cegma:/out \
+           -e ASSEMBLY=Operophtera_brumata_Obru1.scaffolds.fa.gz \
+           genomehubs/cegma:latest
+```
+{% endmethod %}
+
+# Run BUSCO
+
+{% method %}
+Clone the GenomeHubs BUSCO Docker repository:
+
+{% common %}
+```
+$ mkdir -p ~/genomehubs/external_files && cd ~/genomehubs/external_files
+git clone https://github.com/genomehubs/busco-docker.git
+cd busco-docker
+```
+{% endmethod %}
+
+
+{% method %}
+Fetch BUSCO lineages:
+
+{% common %}
+```
+$ wget http://busco.ezlab.org/v2/datasets/eukaryota_odb9.tar.gz
+```
+{% endmethod %}
+
+
+{% method %}
+Build the Docker image:
+
+{% common %}
+```
+$ docker build -t busco .
+```
+{% endmethod %}
+
+
+{% method %}
+Run BUSCO:
+
+{% common %}
+```
+$ mkdir -p ~/genomehubs/v1/download/data/busco
+$ docker run --rm \
+           -u $UID:$GROUPS \
+           --name Operophtera_brumata_Obru1-busco \
+           -v ~/genomehubs/v1/download/data/sequence:/in \
+           -v ~/genomehubs/v1/download/data/busco:/out \
+           -e ASSEMBLY=Operophtera_brumata_Obru1.scaffolds.fa.gz \
+           busco -l eukaryota_odb9 -m genome -c 16 -sp fly
+```
+{% endmethod %}
 
 
 
