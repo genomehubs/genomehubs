@@ -12,6 +12,7 @@
 * [Export files](/quick-start/export-files.md)
 * [Run analyses](/quick-start/run-analyses.md)
 * [Import analysis results](/quick-start/import-files.md)
+* [Update meta](/quick-start/update-meta.md)
 * [Start download site](/quick-start/downloads-site.md)
 * [Start BLAST server](/quick-start/blast-site.md)
 * [Start Ensembl browser](/quick-start/ensembl-site.md)
