@@ -42,7 +42,7 @@ Run the EasyImport Docker container with flags to export sequences (`-e`), gff/e
 * include the `-i` flag to index the database in addition to exporting files
 * files will be written to directories under `~/genomehubs/v1/download/data/`
 * files ready to format as BLAST databases will be written to `~/genomehubs/v1/blast/data/`
-* EMBL format export requires `ASSEMBLY.BIOPROJECT` and `ASSEMBLY.LOCUS_TAG` to be defined in the assembly metadata (see Update meta)
+* EMBL format export requires `ASSEMBLY.BIOPROJECT` and `ASSEMBLY.LOCUS_TAG` to be defined in the assembly metadata (see [Update meta](//quick-start/update-meta.md))
 
 
 {% common %}
