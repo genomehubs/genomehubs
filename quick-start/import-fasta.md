@@ -5,6 +5,8 @@ The first step in adding new data to a GenomeHubs Ensembl site is to import the 
 
 Parameters for the import scripts within the EasyImport container are controlled in assembly-specific configuration files. These offer a wide range of options to set passwords and assembly-specific metadata as well as accommodating the diversity of real-world GFF files and allowing the files to be imported from any location on the local filesystem or accessible via http/ftp. In practice, only a small number of these parameters need to be altered for a given assembly import so many of the parameters can be set in a default configuration file that remains unchanged across all imported assemblies.
 
+The complexity of running this step is largely determined by the validity of the input files - there are many ways in which GFF3 files in particular can differ from published standards and there are configuration options to accommodate much of the diversity of real-world GFF files (see [easy-import.readme.io](http://easy-import.readme.io)). If you prefer to ensure the validity of your files using external tools then, apart from accommodating conflicting definitions of phase, the default import settings should be sufficient.
+
 {% common %}
 ![](/assets/GenomeHubs import.png)
 {% endmethod %}
@@ -152,6 +154,7 @@ $ nano operophtera_brumata_obru1_core_32_85_1.ini
 
 {% method %}
 Run an EasyImport Docker container with flags to import sequences (`-s`), prepare(`-p`)/import (`-g`) gff and verify (`-v`) the imported sequences using the provided protein FASTA file:
+* verification compares imported gene models against an expected protein FASTA sequence, if you do not have a file with predicted protein sequences you may wish to export sequences from the database (replacing the `-v` flag with `-e`) to check the translations manually
 
 {% common %}
 ```
@@ -159,13 +162,39 @@ $ docker run --rm \
              -u $UID:$GROUPS \
              --name easy-import-operophtera_brumata_v1_core_32_85_1 \
              --link genomehubs-mysql \
-             -v ~/genomehubs/import/conf:/import/conf \
-             -v ~/genomehubs/import/data:/import/data \
+             -v ~/genomehubs/v1/import/conf:/import/conf \
+             -v ~/genomehubs/v1/import/data:/import/data \
              -e DATABASE=operophtera_brumata_obru1_core_32_85_1 \
              -e FLAGS="-s -p -g -v" \
              genomehubs/easy-import:latest
 ```
 {% endmethod %}
+
+## Check the import
+
+{% method %}
+Check the import and verification log files for errors:
+* local files for each assembly will be written to a `<database name>` directory 
+* there are likely to be a number of warnings, which can be ignored
+* if there are errors, update the configuration files and rerun the step above
+
+{% common %}
+```
+$ ls ~/genomehubs/import/data/operophtera_brumata_obru1_core_32_85_1
+
+$ ls ~/genomehubs/import/data/operophtera_brumata_obru1_core_32_85_1/logs
+
+$ ls ~/genomehubs/import/data/operophtera_brumata_obru1_core_32_85_1/summary
+
+```
+{% endmethod %}
+
+## Process exceptions
+
+If it is not possible to process all features in a GFF3 file with the current settings (e.g. if some features lack `Name` attributes), features not written to the prepared gff will be written to a `.exception.gff` file for processing in a second pass.  See [easy-import.readme.io](https://easy-import.readme.io/docs/processing-exceptions) for details.
+
+
+
 
 
 
