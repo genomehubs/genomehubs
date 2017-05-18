@@ -155,7 +155,6 @@ $ docker run --rm \
            -e NSLOTS=16 \
            -e SPECIES=arthropoda \
            repeatmasker
-
 ```
 {% endmethod %}
 
