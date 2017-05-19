@@ -33,9 +33,3 @@ Edit copyright and link details in the perl modules under `modules/EnsEMBL/Web/D
 Commit and push all changes
 
 
-
-
-
-
-
-{% endmethod %}
