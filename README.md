@@ -8,7 +8,7 @@
 
 * an [h5ai](https://larsjung.de/h5ai/) powered downloads server
 
-[1] Challis RJ, Kumar S, Stevens L & Blaxter M (2017) GenomeHubs: simple containerized setup of a custom Ensembl database and web server for any species. Database, 2017, bax039 for a full description [doi:10.1093/database/bax039](https://doi.org/10.1093/database/bax039).
+[1] Challis RJ, Kumar S, Stevens L & Blaxter M (2017) GenomeHubs: simple containerized setup of a custom Ensembl database and web server for any species. Database, 2017:bax039 [doi:10.1093/database/bax039](https://doi.org/10.1093/database/bax039).
 
 ![](/assets/GenomeHubs schematic overview.png)
 
