@@ -8,10 +8,10 @@ Ensembl genome browser.
 {% endmethod %}
 
 
-## Edit files in conf directory
+## Edit `setup.ini`
 
 {% method %}
-Edit setup.ini to change the passwords and database names:
+Set passwords:
 
 {% common %}
 ```
@@ -21,10 +21,8 @@ $
 {% endmethod %}
 
 
-## Write a plugin to configure the Ensembl site
-
 {% method %}
-Fork the genomehubs/example-plugin repository:
+Add details of your Ensembl plugin:
 
 {% common %}
 ```
@@ -34,7 +32,15 @@ $
 {% endmethod %}
 
 
+{% method %}
+Set database names to load:
 
+{% common %}
+```
+$ 
+```
+
+{% endmethod %}
 
 
 

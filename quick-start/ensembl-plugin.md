@@ -1,4 +1,4 @@
-# Write Ensembl plugin
+# Edit Ensembl plugin
 
 {% method %}
 Ensembl sites use a plugin architecture that allows any methods/settings to be overwritten by files that are loaded after the main webcode. GenomeHubs provides a plugin which customises some of the features of a standard Ensembl Site, however, in order to set links to the other site components (particlarly the downloads server which hosts data for the assembly statistic visualisations) it is necessary to write a plugin.
