@@ -47,9 +47,6 @@ $ nano links.rb
 {% endmethod %}
 
 
-
-
-
 ## Start SequenceServer BLAST container
 
 {% method %}

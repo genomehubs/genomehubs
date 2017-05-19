@@ -15,5 +15,5 @@
 * [Update meta](/quick-start/update-meta.md)
 * [Start download site](/quick-start/downloads-site.md)
 * [Start BLAST server](/quick-start/blast-site.md)
+* [Write Ensembl plugin](/quick-start/ensembl-plugin.md)
 * [Start Ensembl browser](/quick-start/ensembl-site.md)
-
