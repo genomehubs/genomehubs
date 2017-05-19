@@ -26,7 +26,7 @@ $ nano Masthead.html
 {% endmethod %}
 
 {% method %}
-Edit `_h5ai.headers.html` to change the meaaeeg that will be printed at the top of all directory listings:
+Edit `_h5ai.headers.html` to change the message that will be printed at the top of all directory listings:
 
 {% common %}
 ```
