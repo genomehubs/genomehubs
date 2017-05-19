@@ -28,6 +28,8 @@ $ nano ~/genomehubs/import/conf/operophtera_brumata_obru1_core_32_85_1.ini
         SAMPLE.TRANSCRIPT_TEXT   = OBRU01_00004-RA
         SAMPLE.SEARCH_TEXT       = OBRU01_00015-RA
 ```
+{% endmethod %}
+
 
 {% method %}
 Run an EasyImport Docker container with `-u` flag to update metadata:
