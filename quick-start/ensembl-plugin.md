@@ -37,6 +37,16 @@ Add descriptive text to appear on each assembly home page to `htdocs/ssi/species
 
 {% method %}
 Edit copyright and link details in the perl modules under `modules/EnsEMBL/Web/Document/Element`
+{% endmethod %}
+
+{% method %}
+Commit and push all changes
+{% endmethod %}
+
+
+
+
+
 
 
 {% endmethod %}
