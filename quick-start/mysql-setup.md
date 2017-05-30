@@ -18,6 +18,8 @@ Create a `mysql/data` directory to allow the databases to be stored outside of t
 {% common %}
 ```
 $ mkdir -p ~/genomehubs/mysql/data
+$ sudo chown -R 165536:165536 ~/genomehubs/mysql/data
+
 ```
 
 {% endmethod %}
@@ -48,7 +50,8 @@ Log in to MySQL inside the container to increase `max_allowed_packet` to allow i
 ```
 $ docker exec -it genomehubs-mysql bash
 # mysql -u root -p
-> set global max_allowed_packet=100000000;
+> set global max_allowed_packet=10000000000;
+> exit
 ```
 {% endmethod %}
 
