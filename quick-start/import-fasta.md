@@ -180,11 +180,11 @@ Check the import and verification log files for errors:
 
 {% common %}
 ```
-$ ls ~/genomehubs/import/data/operophtera_brumata_obru1_core_32_85_1
+$ ls ~/genomehubs/v1/import/data/operophtera_brumata_obru1_core_32_85_1
 
-$ ls ~/genomehubs/import/data/operophtera_brumata_obru1_core_32_85_1/logs
+$ ls ~/genomehubs/v1/import/data/operophtera_brumata_obru1_core_32_85_1/logs
 
-$ ls ~/genomehubs/import/data/operophtera_brumata_obru1_core_32_85_1/summary
+$ ls ~/genomehubs/v1/import/data/operophtera_brumata_obru1_core_32_85_1/summary
 
 ```
 {% endmethod %}
