@@ -23,7 +23,7 @@ Run the EasyImport Docker container using the `-e` flag to export sequences:
 $ mkdir -p ~/genomehubs/v1/download/data/blastp
 $ docker run --rm \
              -u $UID:$GROUPS \
-             --name easy-import-operophtera_brumata_v1_core_32_85_1 \
+             --name easy-import-operophtera_brumata_obru1_core_32_85_1 \
              --link genomehubs-mysql \
              -v ~/genomehubs/v1/import/conf:/import/conf \
              -v ~/genomehubs/v1/import/data:/import/data \

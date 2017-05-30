@@ -18,8 +18,6 @@ Create a `mysql/data` directory to allow the databases to be stored outside of t
 {% common %}
 ```
 $ mkdir -p ~/genomehubs/mysql/data
-$ sudo chown -R 165536:165536 ~/genomehubs/mysql/data
-
 ```
 
 {% endmethod %}
