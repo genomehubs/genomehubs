@@ -1,7 +1,7 @@
 # (optional) Test Ensembl browser
 
 {% method %}
-At this stage you may wish to start up a basic Ensembl mirror site using the local copy of the Ensembl core database(s) from the previous step.  
+At this stage you may wish to start up a basic Ensembl mirror site using the local copy of the Ensembl core database(s) from the previous step. This will lack many of the additional features of a complete GenomeHubs site but provides a useful opportunity to check that the basic components are working before continuing with the instructions to import your own data.
 
 {% common %}
 ![](/assets/GenomeHubs Ensembl.png)

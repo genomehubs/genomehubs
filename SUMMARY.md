@@ -18,3 +18,12 @@
 * [9. Start BLAST server](/quick-start/blast-site.md)
 * [10. Edit Ensembl plugin](/quick-start/ensembl-plugin.md)
 * [11. Start Ensembl browser](/quick-start/ensembl-site.md)
+
+## Next Steps
+
+* [Import additional assemblies](next-steps/import-assemblies.md)
+* [Run comparative analyses](/next-steps/run-compara.md)
+* [Import variation data](/next-steps/import-variation.md)
+* [Add track hubs](/next-steps/add-track-hubs.md)
+* [Connect using Perl API](/next-steps/perl-api.md)
+* [Set up REST API](/next-steps/rest-api.md)

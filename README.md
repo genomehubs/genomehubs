@@ -1,5 +1,7 @@
 # GenomeHubs
 
+*View this documentation at [genomehubs.gitbooks.io](https://genomehubs.gitbooks.io/genomehubs/content/)*
+
 [GenomeHubs](http://genomehubs.org)[1] provide a straightforward way to create a collection of web services to make annotated genome assemblies accessible to a wide community of users. GenomeHubs use [Docker](https://www.docker.com/) containers to package each of the component tools and their dependencies, simplifying the process of setting up and importing data from FASTA and GFF files into:
 
 * a custom [Ensembl](http://ensembl.org) genome browser

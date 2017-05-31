@@ -1,0 +1,3 @@
+# Import additional assemblies
+
+The Quick Start guide shows an example set up with one assembly mirrored from an existing Ensembl database and a second assembly imported directly from FASTA and GFF files. Further assemblies can be added from either of these sources to provide a consistent interface to multiple assemblies and to support [comparative analyses](//next-steps/run-compara.md) across a suite of related taxa.
