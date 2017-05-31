@@ -2,18 +2,19 @@
 
 ## Introduction
 
-1. [GenomeHubs](/README.md)
+* [GenomeHubs](/README.md)
 
 ## Quick Start
 
-1. [Preparation](/quick-start/preparation.md)
-* [Setup MySQL database server](/quick-start/mysql-setup.md)
-* [Import assembly and gene models](/quick-start/import-fasta.md)
-* [Export files](/quick-start/export-files.md)
-* [Run analyses](/quick-start/run-analyses.md)
-* [Import analysis results](/quick-start/import-files.md)
-* [Update meta](/quick-start/update-meta.md)
-* [Start download site](/quick-start/downloads-site.md)
-* [Start BLAST server](/quick-start/blast-site.md)
-* [Edit Ensembl plugin](/quick-start/ensembl-plugin.md)
-* [Start Ensembl browser](/quick-start/ensembl-site.md)
+* [1. Preparation](/quick-start/preparation.md)
+* [2. Setup MySQL database server](/quick-start/mysql-setup.md)
+* [(optional) Test Ensembl browser](/quick-start/optional-ensembl.md)
+* [3. Import assembly and gene models](/quick-start/import-fasta.md)
+* [4. Export files](/quick-start/export-files.md)
+* [5. Run analyses](/quick-start/run-analyses.md)
+* [6. Import analysis results](/quick-start/import-files.md)
+* [7. Update meta](/quick-start/update-meta.md)
+* [8. Start download site](/quick-start/downloads-site.md)
+* [9. Start BLAST server](/quick-start/blast-site.md)
+* [10. Edit Ensembl plugin](/quick-start/ensembl-plugin.md)
+* [11. Start Ensembl browser](/quick-start/ensembl-site.md)
