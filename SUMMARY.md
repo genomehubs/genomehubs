@@ -3,6 +3,7 @@
 ## Introduction
 
 * [GenomeHubs](/README.md)
+* [Demo](/demo.md)
 
 ## Quick Start
 
