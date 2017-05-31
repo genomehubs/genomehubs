@@ -21,7 +21,8 @@
 
 ## Next Steps
 
-* [Import additional assemblies](next-steps/import-assemblies.md)
+* [Setup with multiple hosts](/next-steps/separate-hosts.md)
+* [Import additional assemblies](/next-steps/import-assemblies.md)
 * [Run comparative analyses](/next-steps/run-compara.md)
 * [Import variation data](/next-steps/import-variation.md)
 * [Add track hubs](/next-steps/add-track-hubs.md)
