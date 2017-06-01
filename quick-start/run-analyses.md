@@ -32,14 +32,13 @@ $ docker run --rm \
              --name uniprot_sprot-makeblastdb \
              -v ~/genomehubs/external_files:/in \
              -v ~/genomehubs/external_files:/out \
-             blaxterlab/ncbi-blast:latest \
+             genomehubs/ncbi-blast:latest \
              makeblastdb -dbtype prot -in /in/uniprot_sprot.fasta -out /out/uniprot_sprot.fasta -parse_seqids -hash_index
 ```
 {% endmethod %}
 
 {% method %}
 Run blastp:
-* TODO: gzipped input is not currently supported by the container
 
 {% common %}
 ```
@@ -81,8 +80,6 @@ maxnumber.of.embedded.workers=16
 
 {% method %}
 Run InterProScan:
-* TODO: gzipped input is not currently supported by the container
-* TODO: container will fail if input sequences contain *s
 
 {% common %}
 ```
@@ -93,7 +90,7 @@ $ docker run --rm \
            -v ~/genomehubs/v1/download/data/interproscan:/dir \
            -v ~/genomehubs/v1/download/data/sequence:/in \
            -v ~/genomehubs/external_files/interproscan.properties:/interproscan-5.22-61.0/interproscan.properties \
-           blaxterlab/interproscan:latest \
+           genomehubs/interproscan:latest \
            interproscan.sh -i /in/Operophtera_brumata_Obru1.proteins.fa.gz \
                            -d /dir \
                            -appl PFAM,SignalP_EUK \
