@@ -3,7 +3,9 @@
 ## Introduction
 
 * [GenomeHubs](/README.md)
+* [Files and containers](files-and-containers.md)
 * [Demo](/demo.md)
+* [Files and containers](files-and-containers.md)
 
 ## Quick Start
 
@@ -23,6 +25,7 @@
 ## Next Steps
 
 * [Setup with multiple hosts](/next-steps/separate-hosts.md)
+* [Understand the GFF parser](/next-steps/understand-gff.md)
 * [Import additional assemblies](/next-steps/import-assemblies.md)
 * [Run comparative analyses](/next-steps/run-compara.md)
 * [Import variation data](/next-steps/import-variation.md)
