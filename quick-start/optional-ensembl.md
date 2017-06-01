@@ -48,7 +48,7 @@ Set database names to load:
 $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 [DATA_SOURCE]
   SPECIES_DBS = [ 
-    mellitaea_cinxia_core_32_85_1
+    melitaea_cinxia_core_32_85_1
 ]
 ```
 
@@ -63,7 +63,7 @@ Start the EasyMirror Docker container:
 
 {% common %}
 ```
-$ docker run -d \
+$ docker run -d --rm \
              --name genomehubs-ensembl \
              -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
              --link genomehubs-mysql \
