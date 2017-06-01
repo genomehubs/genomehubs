@@ -12,6 +12,7 @@ Install `docker.io` and `git`:
 {% common %}
 ```
 sudo apt install -y docker.io git
+sudo usermod -aG docker $USER
 ```
 {% endmethod %}
 
