@@ -19,25 +19,26 @@ container
 
 {% method %}
 The folders for each container can be nested inside a directory for the version that they relate to:
-- The MySQL data folder can be kept outside of the versioned directory to allow databases to be shared between versions
+- the MySQL data folder can be kept outside of the versioned directory to allow databases to be shared between versions
+- analysis containers are wrappers around specific bioinformatics software so they typically mount `download/data` subdirectories (see [Run Analyses](//quick-start/run-analyses.md) for details) to simplify the process of hosting the input and output files for bulk downloads
 
 {% common %}
 ```
 genomehubs
 ├── v1
-│   ├── blast
+│   ├── blast      # SequenceServer container
 │   │   ├── conf
 │   │   └── data
-│   ├── download
+│   ├── download   # h5ai container
 │   │   ├── conf
 │   │   └── data
-│   ├── ensembl
+│   ├── ensembl    # EasyMirror container
 │   │   ├── conf
 │   │   └── data
-│   ├── import
+│   ├── import     # EasyImport container
 │   │   ├── conf
 │   │   └── data
-└── mysql
+└── mysql          # MySQL container
     └── data
 
 ```
@@ -45,7 +46,53 @@ genomehubs
 {% endmethod %}
 
 
- 
+{% method %}
+An example of this directory structure with default configuration files is avalaible in the [genomehubs/template](https:github.com/genomehubs/template) github repository:
+- this template is used in the Quick Start guide, which contains more details of the roles of the individual configuration files
 
-Analysis containers are wrappers around specific bioinformatics software so they mount  
+
+{% common %}
+```
+template
+├── blast
+│   ├── conf
+│   │   ├── custom.css
+│   │   ├── links.rb
+│   │   ├── Masthead.html
+│   │   └── img
+│   │       ├── download-icon.png
+│   │       ├── genomehubs-icon.png
+│   │       ├── help-icon.png
+│   │       └── tools-icon.png
+│   └── data
+├── download
+│   ├── conf
+│   │   ├── _h5ai.headers.html
+│   │   ├── custom.css
+│   │   ├── Masthead.html
+│   │   └── img
+│   │       ├── genomehubs-icon.png
+│   │       ├── help-icon.png
+│   │       └── tools-icon.png
+│   └── data
+├── ensembl
+│   ├── conf
+│   │   ├── database.ini
+│   │   └── setup.ini
+│   └── data
+└── import
+    ├── conf
+    │   ├── default.ini
+    │   ├── genus_species_asm_core_32_85_1.ini
+    │   └── setup.ini
+    └── data
+```
+
+{% endmethod %}
+
+
+
+
+
+ 
 
