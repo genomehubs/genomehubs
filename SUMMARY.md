@@ -5,7 +5,6 @@
 * [GenomeHubs](/README.md)
 * [Files and containers](files-and-containers.md)
 * [Demo](/demo.md)
-* [Files and containers](files-and-containers.md)
 
 ## Quick Start
 
