@@ -27,7 +27,7 @@ $ docker run --rm \
              --link genomehubs-mysql \
              -v ~/genomehubs/v1/import/conf:/import/conf \
              -v ~/genomehubs/v1/import/data:/import/data \
-             -v ~/genomehubs/v1/download/data:/download/data \
+             -v ~/genomehubs/v1/download/data:/import/download \
              -e DATABASE=operophtera_brumata_obru1_core_32_85_1 \
              -e FLAGS="-e" \
              genomehubs/easy-import:latest
@@ -54,8 +54,8 @@ $ docker run --rm \
              --link genomehubs-mysql \
              -v ~/genomehubs/v1/import/conf:/import/conf \
              -v ~/genomehubs/v1/import/data:/import/data \
-             -v ~/genomehubs/v1/download/data:/download/data \
-             -v ~/genomehubs/v1/blast/data:/blast/data \
+             -v ~/genomehubs/v1/download/data:/import/download \
+             -v ~/genomehubs/v1/blast/data:/import/blast \
              -e DATABASE=operophtera_brumata_obru1_core_32_85_1 \
              -e FLAGS="-e -f -j -i" \
              genomehubs/easy-import:latest

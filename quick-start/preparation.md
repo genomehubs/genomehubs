@@ -49,6 +49,8 @@ One way to manage the local redirects is to install and configure lighttpd:
 ```
 $ sudo apt install -y lighttpd
 $ sudo nano /etc/lighttpd/lighttpd.conf
+
+# Append at end of file:
 $HTTP["host"] =~ "ensembl.example.com"{
   proxy.server = ("" => ("" => (
     "host" => "127.0.0.1",
@@ -70,6 +72,7 @@ $HTTP["host"] =~ "blast.example.com"{
     "fix-redirects" => 1
   )))
 }
+
 $ sudo service lighttpd restart
 ```
 {% endmethod %}
