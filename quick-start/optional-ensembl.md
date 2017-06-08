@@ -63,7 +63,7 @@ Start the EasyMirror Docker container:
 
 {% common %}
 ```
-$ docker run -d --rm \
+$ docker run -d \
              --name genomehubs-ensembl \
              -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
              --link genomehubs-mysql \

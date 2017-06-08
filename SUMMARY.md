@@ -8,9 +8,9 @@
 
 ## Quick Start
 
-* [1. Preparation](/quick-start/preparation.md)
+* [1. Prepare](/quick-start/preparation.md)
 * [2. Setup MySQL database server](/quick-start/mysql-setup.md)
-* [(optional) Test Ensembl browser](/quick-start/optional-ensembl.md)
+* [\(optional\) Test Ensembl browser](/quick-start/optional-ensembl.md)
 * [3. Import assembly and gene models](/quick-start/import-fasta.md)
 * [4. Export files](/quick-start/export-files.md)
 * [5. Run analyses](/quick-start/run-analyses.md)
@@ -31,3 +31,4 @@
 * [Add track hubs](/next-steps/add-track-hubs.md)
 * [Connect using Perl API](/next-steps/perl-api.md)
 * [Set up REST API](/next-steps/rest-api.md)
+

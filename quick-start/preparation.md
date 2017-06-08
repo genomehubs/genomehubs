@@ -1,4 +1,4 @@
-# Preparation
+# Prepare
 
 Docker is the only prerequisite for running GenomeHubs, however, for convenience this quick-start guide assumes that you will be running all steps on Ubuntu 16.04 with git installed and files stored in your home directory.
 
