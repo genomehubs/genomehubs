@@ -131,7 +131,7 @@ docker run --rm \
            -e VARIANTS=example_variants \
            genomehubs/variation:17.03
 ```
-{% sample lang="e85" %}
+{% sample lang="e89" %}
 ```
 docker run --rm \
            -d \
@@ -161,7 +161,7 @@ $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 {% method %}
 Restart your Ensembl site to load the newly created variation database:
 
-{% common %}
+{% sample lang="e85" %}
 ```
 $ docker rm -f genomehubs-ensembl
 $ docker run -d \
@@ -169,7 +169,17 @@ $ docker run -d \
              -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
              --link genomehubs-mysql \
              -p 8081:8080 \
-             genomehubs/easy-mirror:latest
+             genomehubs/easy-mirror:17.03
+```
+{% sample lang="e89" %}
+```
+$ docker rm -f genomehubs-ensembl
+$ docker run -d \
+             --name genomehubs-ensembl \
+             -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
+             --link genomehubs-mysql \
+             -p 8081:8080 \
+             genomehubs/easy-mirror:17.06
 ```
 
 {% endmethod %}
