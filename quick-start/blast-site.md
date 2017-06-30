@@ -30,7 +30,7 @@ Edit `links.rb` to ensure that links from BLAST results are directed to your Ens
 * keys in `taxa` should match your database name(s), values should match the corresponding `SPECIES.URL`
 * modify the `url = "http://ensembl.genomehubs.org/#{assembly}"` to match your domain name
 
-{% common %}
+{% sample lang="e85" %}
 ```
 $ nano links.rb
 ...
@@ -44,6 +44,21 @@ $ nano links.rb
 ...
 
 ```
+{% sample lang="e89" %}
+```
+$ nano links.rb
+...
+    def genomehubs
+      taxa = {}
+      taxa["operophtera_brumata_obru1_core_36_89_1"] = "Operophtera_brumata_Obru1"
+...
+      accession = encode accession
+      colon = ':'
+      url = "http://ensembl.genomehubs.org/#{assembly}"
+...
+
+```
+
 {% endmethod %}
 
 

@@ -15,9 +15,16 @@ If a single value is present in the database for a given key, it will be replace
 {% method %}
 Add suggested search terms:
 
-{% common %}
+{% sample lang="e85" %}
 ```
 $ nano ~/genomehubs/import/conf/operophtera_brumata_obru1_core_32_85_1.ini
+```
+{% sample lang="e89" %}
+```
+$ nano ~/genomehubs/import/conf/operophtera_brumata_obru1_core_36_89_1.ini
+```
+{% common %}
+```
 # existing entries not shown
 [META]
         SAMPLE.LOCATION_PARAM    = OBRU01_Sc00001:57580-69243
@@ -34,7 +41,7 @@ $ nano ~/genomehubs/import/conf/operophtera_brumata_obru1_core_32_85_1.ini
 {% method %}
 Run an EasyImport Docker container with `-u` flag to update metadata:
 
-{% common %}
+{% sample lang="e85" %}
 ```
 $ docker run --rm \
              -u $UID:$GROUPS \
@@ -44,8 +51,21 @@ $ docker run --rm \
              -v ~/genomehubs/v1/import/data:/import/data \
              -e DATABASE=operophtera_brumata_obru1_core_32_85_1 \
              -e FLAGS="-u" \
-             genomehubs/easy-import:latest
+             genomehubs/easy-import:17.03
 ```
+{% sample lang="e89" %}
+```
+$ docker run --rm \
+             -u $UID:$GROUPS \
+             --name easy-import-operophtera_brumata_v1_core_36_89_1 \
+             --link genomehubs-mysql \
+             -v ~/genomehubs/v1/import/conf:/import/conf \
+             -v ~/genomehubs/v1/import/data:/import/data \
+             -e DATABASE=operophtera_brumata_obru1_core_36_89_1 \
+             -e FLAGS="-u" \
+             genomehubs/easy-import:17.06
+```
+
 {% endmethod %}
 
 
