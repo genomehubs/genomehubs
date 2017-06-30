@@ -159,7 +159,7 @@ url = http://download.lepbase.org/v4/trackhub/rnaseq/hub.txt
 Restart your Ensembl site to add the track hub:
 - adding the trackhub to an assembly requires a restart, but subsequent changes to the data/configuration files will be picked up automatically
 
-{% common %}
+{% sample lang="e85" %}
 ```
 $ docker rm -f genomehubs-ensembl
 $ docker run -d \
@@ -167,8 +167,19 @@ $ docker run -d \
              -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
              --link genomehubs-mysql \
              -p 8081:8080 \
-             genomehubs/easy-mirror:latest
+             genomehubs/easy-mirror:17.03
 ```
+{% sample lang="e89" %}
+```
+$ docker rm -f genomehubs-ensembl
+$ docker run -d \
+             --name genomehubs-ensembl \
+             -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
+             --link genomehubs-mysql \
+             -p 8081:8080 \
+             genomehubs/easy-mirror:17.06
+```
+
 
 {% endmethod %}
 
