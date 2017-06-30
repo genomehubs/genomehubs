@@ -64,7 +64,7 @@ Edit the `database.ini` configuration file to set passwords for the database use
 * to mirror existing Ensembl databases in your GenomeHub, add the appropriate database names to `SPECIES_DBS` as a space-separated list (a corresponding database dump must be available at `SPECIES_DB_URL`)
 * even if you do not wish to mirror any existing databases, at least one database must be specified in `SPECIES_DBS` for use as a template when importing new data.
 
-{% 85 %}
+{% e85 %}
 ```
 $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 # (some lines omitted)
@@ -85,7 +85,7 @@ $ nano ~/genomehubs/v1/ensembl/conf/database.ini
   SPECIES_DBS = [ melitaea_cinxia_core_32_85_1 ]
 ```
 
-{% 89 %}
+{% e89 %}
 ```
 $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 # (some lines omitted)
