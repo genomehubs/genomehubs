@@ -4,13 +4,13 @@
         "theme-api": {
             "languages": [
                 {
-                    "lang": "qsub",
-                    "name": "GridEngine",
+                    "lang": "85",
+                    "name": "Ensembl-85",
                     "default": true
                 },
                 {
-                    "lang": "sh",
-                    "name": "Shell"
+                    "lang": "89",
+                    "name": "Ensembl-89"
                 }
             ]
         }

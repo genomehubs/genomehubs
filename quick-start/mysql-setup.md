@@ -64,7 +64,7 @@ Edit the `database.ini` configuration file to set passwords for the database use
 * to mirror existing Ensembl databases in your GenomeHub, add the appropriate database names to `SPECIES_DBS` as a space-separated list (a corresponding database dump must be available at `SPECIES_DB_URL`)
 * even if you do not wish to mirror any existing databases, at least one database must be specified in `SPECIES_DBS` for use as a template when importing new data.
 
-{% common %}
+{% 85 %}
 ```
 $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 # (some lines omitted)
@@ -83,7 +83,27 @@ $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 [DATA_SOURCE]
   SPECIES_DB_URL = ftp://ftp.ensemblgenomes.org/pub/release-32/metazoa/mysql/
   SPECIES_DBS = [ melitaea_cinxia_core_32_85_1 ]
+```
 
+{% 89 %}
+```
+$ nano ~/genomehubs/v1/ensembl/conf/database.ini
+# (some lines omitted)
+[DATABASE]
+  DB_SESSION_USER = ensrw
+  DB_SESSION_PASS = CHANGEME
+
+  DB_IMPORT_USER = importer
+  DB_IMPORT_PASSWORD = CHANGEME
+
+  DB_ROOT_USER = root
+  DB_ROOT_PASSWORD = CHANGEME
+  DB_PORT = 3306
+  DB_HOST = genomehubs-mysql
+
+[DATA_SOURCE]
+  SPECIES_DB_URL = ftp://ftp.ensemblgenomes.org/pub/release-36/metazoa/mysql/
+  SPECIES_DBS = [ melitaea_cinxia_core_36_89_1 ]
 ```
 {% endmethod %}
 
@@ -93,14 +113,23 @@ Run the `database.sh` script in a `genomehubs/easy-mirror` Docker container:
 
 * this script will set up database users and import databases into your MySQL container based on the information in the `database.ini` configuration file.
 
-{% common %}
+{% 85 %}
 ```
 $ docker run --rm \
              --name genomehubs-ensembl \
              -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
              --link genomehubs-mysql \
-             genomehubs/easy-mirror:latest /ensembl/scripts/database.sh /ensembl/conf/database.ini
+             genomehubs/easy-mirror:17.03 /ensembl/scripts/database.sh /ensembl/conf/database.ini
 ```
+{% 89 %}
+```
+$ docker run --rm \
+             --name genomehubs-ensembl \
+             -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
+             --link genomehubs-mysql \
+             genomehubs/easy-mirror:17.06 /ensembl/scripts/database.sh /ensembl/conf/database.ini
+```
+
 {% endmethod %}
 
 
