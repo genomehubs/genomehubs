@@ -43,7 +43,7 @@ $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 {% method %}
 Set database names to load:
 * Assemblies will be listed on your Ensembl site homepage in the order they are added to `SPECIES_DBS`
-{% common %}
+{% sample lang="e85" %}
 ```
 $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 [DATA_SOURCE]
@@ -51,6 +51,16 @@ $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
     melitaea_cinxia_core_32_85_1
 ]
 ```
+
+{% sample lang="e89" %}
+```
+$ nano ~/genomehubs/v1/ensembl/conf/setup.ini
+[DATA_SOURCE]
+  SPECIES_DBS = [ 
+    melitaea_cinxia_core_36_89_1
+]
+```
+
 
 {% endmethod %}
 
@@ -61,15 +71,26 @@ $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 {% method %}
 Start the EasyMirror Docker container:
 
-{% common %}
+{% sample lang="e85" %}
 ```
 $ docker run -d \
              --name genomehubs-ensembl \
              -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
              --link genomehubs-mysql \
              -p 8081:8080 \
-             genomehubs/easy-mirror:latest
+             genomehubs/easy-mirror:17.03
 ```
+
+{% sample lang="e89" %}
+```
+$ docker run -d \
+             --name genomehubs-ensembl \
+             -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
+             --link genomehubs-mysql \
+             -p 8081:8080 \
+             genomehubs/easy-mirror:17.06
+```
+
 
 {% endmethod %}
 
