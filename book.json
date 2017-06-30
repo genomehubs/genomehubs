@@ -4,12 +4,12 @@
         "theme-api": {
             "languages": [
                 {
-                    "lang": "85",
+                    "lang": "e85",
                     "name": "Ensembl-85",
                     "default": true
                 },
                 {
-                    "lang": "89",
+                    "lang": "e89",
                     "name": "Ensembl-89"
                 }
             ]
