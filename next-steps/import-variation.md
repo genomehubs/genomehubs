@@ -119,7 +119,7 @@ $ nano nano /path/to/conf/example_variants.ini
 Run the GenomeHubs variation container:
 - depending on the number of SNPs in your VCF file after filtering, is likely to take several hours to run
 
-{% common %}
+{% sample lang="e85" %}
 ```
 docker run --rm \
            -d \
@@ -129,7 +129,19 @@ docker run --rm \
            -v /path/to/data:/import/data \
            -e FLAGS="-i" \
            -e VARIANTS=example_variants \
-           genomehubs/variation
+           genomehubs/variation:17.03
+```
+{% sample lang="e85" %}
+```
+docker run --rm \
+           -d \
+           --name genomehubs-variation \
+           -u $UID:$GROUPS \
+           -v /path/to/conf:/import/conf \
+           -v /path/to/data:/import/data \
+           -e FLAGS="-i" \
+           -e VARIANTS=example_variants \
+           genomehubs/variation:17.06
 ```
 {% endmethod %}
 
