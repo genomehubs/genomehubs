@@ -42,7 +42,7 @@ Create and edit a description file to add a description for each sample:
 {% common %}
 
 ```
-$ nano nano /path/to/data/panel.tsv
+$ nano nano /path/to/data/description.tsv
 sample_1           description of sample 1
 sample_2           description of sample 2
 sample_3           description of sample 3
@@ -60,8 +60,7 @@ Create and edit a configuration file to set database and variant details:
 - when importing local files, specify the path to the file as mounted in the container
 - the `FILTER` will be passed to the bcftools view command with the `-i` flag, this is not needed if your SNP data are already filtered
 
-{% common %}
-
+{% sample lang="e85" %}
 ```
 $ nano nano /path/to/conf/example_variants.ini
 [DATABASE_CORE]
@@ -83,6 +82,35 @@ $ nano nano /path/to/conf/example_variants.ini
     SOURCE = Anonymous 2017
 [BCFTOOLS]
     FILTER = QUAL>=30 & FMT/DP>=10 & FMT/DP<=100 & SUM(FMT/DP)<=N_SAMPLES*100 & FMT/SB<200 & MIN(FMT/GQ)>=30
+```
+
+{% sample lang="e89" %}
+```
+$ nano nano /path/to/conf/example_variants.ini
+[DATABASE_CORE]
+    NAME = heliconius_erato_demophoon_v1_core_36_89_1
+    HOST = genomehubs-mysql
+    PORT = 3306
+    RW_USER = importer
+    RW_PASS = CHANGEME
+    RO_USER = anonymous
+[DATABASE_VARIATION]
+    NAME = genus_species_assembly_variation_36_89_1
+[META]
+    SPECIES.PRODUCTION_NAME = genus_species_assembly
+    SPECIES.SCIENTIFIC_NAME = Genus species
+    SPECIES.DIVISION = EnsemblMetazoa
+[FILES]
+    VCF = [ vcf /import/data/example_variants/variants.vcf.gz ]
+    PANEL = [ tsv /import/data/example_variants/panel.tsv ]
+    DESCRIPTION = [ tsv /import/data/example_variants/description.tsv ]
+[STUDY]
+    SOURCE = Anonymous 2017
+    DESCRIPTION = Anonymous 2017. Article title. Journal. Vol:pages
+[BCFTOOLS]
+    FILTER = QUAL>=30 & FMT/DP>=10 & FMT/DP<=100 & SUM(FMT/DP)<=N_SAMPLES*100 & FMT/SB<200 & MIN(FMT/GQ)>=30
+[MODIFY]
+    OVERWRITE_DB = 1
 ```
 {% endmethod %}
 
