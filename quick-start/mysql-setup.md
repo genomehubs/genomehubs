@@ -64,7 +64,7 @@ Edit the `database.ini` configuration file to set passwords for the database use
 * to mirror existing Ensembl databases in your GenomeHub, add the appropriate database names to `SPECIES_DBS` as a space-separated list (a corresponding database dump must be available at `SPECIES_DB_URL`)
 * even if you do not wish to mirror any existing databases, at least one database must be specified in `SPECIES_DBS` for use as a template when importing new data.
 
-{% e85 %}
+{% sample lang="e85" %}
 ```
 $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 # (some lines omitted)
@@ -85,7 +85,7 @@ $ nano ~/genomehubs/v1/ensembl/conf/database.ini
   SPECIES_DBS = [ melitaea_cinxia_core_32_85_1 ]
 ```
 
-{% e89 %}
+{% sample lang="e89" %}
 ```
 $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 # (some lines omitted)
@@ -113,7 +113,7 @@ Run the `database.sh` script in a `genomehubs/easy-mirror` Docker container:
 
 * this script will set up database users and import databases into your MySQL container based on the information in the `database.ini` configuration file.
 
-{% e85 %}
+{% sample lang="e85" %}
 ```
 $ docker run --rm \
              --name genomehubs-ensembl \
@@ -122,7 +122,7 @@ $ docker run --rm \
              genomehubs/easy-mirror:17.03 /ensembl/scripts/database.sh /ensembl/conf/database.ini
 ```
 
-{% e89 %}
+{% sample lang="e89" %}
 ```
 $ docker run --rm \
              --name genomehubs-ensembl \
