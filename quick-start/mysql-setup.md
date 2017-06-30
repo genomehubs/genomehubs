@@ -113,7 +113,7 @@ Run the `database.sh` script in a `genomehubs/easy-mirror` Docker container:
 
 * this script will set up database users and import databases into your MySQL container based on the information in the `database.ini` configuration file.
 
-{% 85 %}
+{% e85 %}
 ```
 $ docker run --rm \
              --name genomehubs-ensembl \
@@ -121,7 +121,8 @@ $ docker run --rm \
              --link genomehubs-mysql \
              genomehubs/easy-mirror:17.03 /ensembl/scripts/database.sh /ensembl/conf/database.ini
 ```
-{% 89 %}
+
+{% e89 %}
 ```
 $ docker run --rm \
              --name genomehubs-ensembl \
