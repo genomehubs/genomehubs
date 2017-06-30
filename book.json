@@ -5,12 +5,12 @@
             "languages": [
                 {
                     "lang": "e85",
-                    "name": "Ensembl-85",
-                    "default": true
+                    "name": "Ensembl-85"
                 },
                 {
                     "lang": "e89",
-                    "name": "Ensembl-89"
+                    "name": "Ensembl-89",
+                    "default": true
                 }
             ]
         }
