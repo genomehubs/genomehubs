@@ -24,10 +24,15 @@ Clone the example configuration files from the [genomehubs/template](https://git
 
 * naming the template directory `v1` is convenient for versioning of your site
 
-{% common %}
+{% sample lang="e85" %}
 ```
 $ mkdir ~/genomehubs && cd ~/genomehubs
-$ git clone https://github.com/genomehubs/template v1
+$ git clone https://github.com/genomehubs/template -b 17.03 v1
+```
+{% sample lang="e89" %}
+```
+$ mkdir ~/genomehubs && cd ~/genomehubs
+$ git clone https://github.com/genomehubs/template -b 17.06 v1
 ```
 {% endmethod %}
 
