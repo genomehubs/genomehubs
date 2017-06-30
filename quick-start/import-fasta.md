@@ -20,7 +20,7 @@ Create and edit a `default.ini` file to set database connection parameters that 
 * values in this file can be overwritten by entries in an assembly-specific configuration file described below
 * this file also includes default GFF parsing parameters that are unlikely to need changing
 
-{% common %}
+{% sample lang="e85" %}
 ```
 $ cd ~/genomehubs/v1/import/conf/
 $ cp default.ini default.ini.original
@@ -47,6 +47,36 @@ $ nano default.ini
 	PORT = 3306
 	RO_USER = anonymous
 ```
+
+{% sample lang="e89" %}
+```
+$ cd ~/genomehubs/v1/import/conf/
+$ cp default.ini default.ini.original
+$ nano default.ini
+# update values to match your database connection details
+[DATABASE_CORE]
+	HOST = genomehubs-mysql
+	PORT = 3306
+	RO_USER = anonymous
+[DATABASE_SEARCH]
+	NAME = genomehubs_search_36_89
+	HOST = genomehubs-mysql
+	PORT = 3306
+	RO_USER = anonymous
+	RO_PASS =
+[DATABASE_TAXONOMY]
+	NAME = ncbi_taxonomy
+	HOST = genomehubs-mysql
+	PORT = 3306
+	RO_USER = anonymous
+[DATABASE_TEMPLATE]
+	NAME = melitaea_cinxia_core_36_89_1
+	HOST = genomehubs-mysql
+	PORT = 3306
+	RO_USER = anonymous
+```
+
+
 {% endmethod %}
 
 {% method %}
@@ -74,22 +104,28 @@ $ nano overwrite.ini
 {% method %}
 Each imported assembly must be stored in a uniquely named database. GenomeHubs follows the Ensembl naming conventions with the addition of an assembly name to allow alternate assemblies for a single species to be hosted in a single site. Database names should be all lower case with no special characters other than letters, numbers and underscores. A subspecies/strain can optionally be included. For Ensembl release 32/85 (which is currently the version supported by GenomeHubs) the database name for _Operophtera brumata_ assembly Obru1 would be:
 
-{% common %}
+{% sample lang="e85" %}
 ```
 operophtera_brumata_obru1_core_32_85_1
 ```
+
+{% sample lang="e89" %}
+```
+operophtera_brumata_obru1_core_36_89_1
+```
+
 {% endmethod %}
 
 
 ## Set assembly metadata
 
 {% method %}
-Create and edit a `<database name>.ini` file in the `import/conf` directory to set assembly-specific metadata using the `genus_species_asm_core_32_85_1.ini` template file:
+Create and edit a `<database name>.ini` file in the `import/conf` directory to set assembly-specific metadata using the `genus_species_asm_core_xx_xx_1.ini` template file:
 
 * pay attention to the case fo the default values you are replacing and the use of spaces/underscores
 * the value for `ASSEMBLY.NAME` should show the assembly name as you would like it to be displayed and may contain dots but any dots should be omitted from the assembly name portion of `SPECIES.PRODUCTION_NAME` and `SPECIES.URL`
 
-{% common %}
+{% sample lang="e85" %}
 ```
 $ cd ~/genomehubs/v1/import/conf/
 $ cp genus_species_assembly_core_32_85_1.ini operophtera_brumata_obru1_core_32_85_1.ini
@@ -97,6 +133,35 @@ $ nano operophtera_brumata_obru1_core_32_85_1.ini
 # update values to match your species/assembly name and other details
 [DATABASE_CORE]
         NAME = operophtera_brumata_obru1_core_32_85_1
+[META]
+        SPECIES.PRODUCTION_NAME = operophtera_brumata_obru1
+        SPECIES.SCIENTIFIC_NAME = Operophtera brumata
+        SPECIES.COMMON_NAME = Winter moth 
+        SPECIES.DISPLAY_NAME = Operophtera brumata
+        SPECIES.DIVISION = EnsemblMetazoa
+        SPECIES.URL = Operophtera_brumata_obru1
+        SPECIES.TAXONOMY_ID = 104452
+        SPECIES.ALIAS = [ ]                   
+        ASSEMBLY.NAME = Obru1
+        ASSEMBLY.DATE = 2015-08-11
+        ASSEMBLY.ACCESSION = 
+        ASSEMBLY.DEFAULT = Obru1
+        PROVIDER.NAME = Wageningen University
+        PROVIDER.URL = http://www.bioinformatics.nl/wintermoth/portal/  
+        GENEBUILD.ID = 1
+        GENEBUILD.START_DATE = 2017-05
+        GENEBUILD.VERSION = 1
+        GENEBUILD.METHOD = import
+
+```
+{% sample lang="e89" %}
+```
+$ cd ~/genomehubs/v1/import/conf/
+$ cp genus_species_assembly_core_36_89_1.ini operophtera_brumata_obru1_core_36_89_1.ini
+$ nano operophtera_brumata_obru1_core_36_89_1.ini
+# update values to match your species/assembly name and other details
+[DATABASE_CORE]
+        NAME = operophtera_brumata_obru1_core_36_89_1
 [META]
         SPECIES.PRODUCTION_NAME = operophtera_brumata_obru1
         SPECIES.SCIENTIFIC_NAME = Operophtera brumata
@@ -129,9 +194,18 @@ Edit `<database name>.ini` to set paths to files to import, locations of identif
 * names are provided in the gff file so stable IDs can be set using this attribute, commonly only ID is available and this would be used as the source of the stable IDs (see full documentation at [easy-import.readme.io](http://easy-import.readme.io))
 * this guide assumes you will be importing valid gff3, full details of the syntax to repair invalid gff files during import is available at [easy-import.readme.io](http://easy-import.readme.io)
 
-{% common %}
+{% sample lang="e85" %}
 ```
 $ nano operophtera_brumata_obru1_core_32_85_1.ini
+```
+{% sample lang="e89" %}
+```
+$ nano operophtera_brumata_obru1_core_36_89_1.ini
+```
+
+
+{% common %}
+```
 [FILES]
 	SCAFFOLD = [ fa http://download.lepbase.org/v4/provider/Obru1.fsa.gz ]
 	GFF = [ gff3 http://download.lepbase.org/v4/provider/Obru_genes.gff.gz ]
@@ -156,7 +230,7 @@ $ nano operophtera_brumata_obru1_core_32_85_1.ini
 Run an EasyImport Docker container with flags to import sequences (`-s`), prepare (`-p`), import (`-g`) gff and verify (`-v`) the imported sequences using the provided protein FASTA file:
 * verification compares imported gene models against an expected protein FASTA sequence, if you do not have a file with predicted protein sequences you may wish to export sequences from the database (replacing the `-v` flag with `-e`) to check the translations manually
 
-{% common %}
+{% sample lang="e85" %}
 ```
 $ docker run --rm \
              -u $UID:$GROUPS \
@@ -166,8 +240,22 @@ $ docker run --rm \
              -v ~/genomehubs/v1/import/data:/import/data \
              -e DATABASE=operophtera_brumata_obru1_core_32_85_1 \
              -e FLAGS="-s -p -g -v" \
-             genomehubs/easy-import:latest
+             genomehubs/easy-import:17.03
 ```
+
+{% sample lang="e89" %}
+```
+$ docker run --rm \
+             -u $UID:$GROUPS \
+             --name easy-import-operophtera_brumata_v1_core_36_89_1 \
+             --link genomehubs-mysql \
+             -v ~/genomehubs/v1/import/conf:/import/conf \
+             -v ~/genomehubs/v1/import/data:/import/data \
+             -e DATABASE=operophtera_brumata_obru1_core_36_89_1 \
+             -e FLAGS="-s -p -g -v" \
+             genomehubs/easy-import:17.06
+```
+
 {% endmethod %}
 
 ## Check the import
@@ -178,7 +266,7 @@ Check the import and verification log files for errors:
 * there are likely to be a number of warnings, which can be ignored
 * if there are errors, update the configuration files and rerun the step above
 
-{% common %}
+{% sample lang="e85" %}
 ```
 $ ls ~/genomehubs/v1/import/data/operophtera_brumata_obru1_core_32_85_1
 
@@ -187,6 +275,16 @@ $ ls ~/genomehubs/v1/import/data/operophtera_brumata_obru1_core_32_85_1/logs
 $ ls ~/genomehubs/v1/import/data/operophtera_brumata_obru1_core_32_85_1/summary
 
 ```
+{% sample lang="e89" %}
+```
+$ ls ~/genomehubs/v1/import/data/operophtera_brumata_obru1_core_36_89_1
+
+$ ls ~/genomehubs/v1/import/data/operophtera_brumata_obru1_core_36_89_1/logs
+
+$ ls ~/genomehubs/v1/import/data/operophtera_brumata_obru1_core_36_89_1/summary
+
+```
+
 {% endmethod %}
 
 ## Process exceptions

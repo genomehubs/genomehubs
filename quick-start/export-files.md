@@ -18,7 +18,7 @@ Run the EasyImport Docker container using the `-e` flag to export sequences:
 * run this step before running analyses
 * sequence files will be written to `~/genomehubs/v1/download/data/sequence`
 
-{% common %}
+{% sample lang="e85" %}
 ```
 $ mkdir -p ~/genomehubs/v1/download/data/blastp
 $ docker run --rm \
@@ -30,8 +30,23 @@ $ docker run --rm \
              -v ~/genomehubs/v1/download/data:/import/download \
              -e DATABASE=operophtera_brumata_obru1_core_32_85_1 \
              -e FLAGS="-e" \
-             genomehubs/easy-import:latest
+             genomehubs/easy-import:17.03
 ```
+{% sample lang="e89" %}
+```
+$ mkdir -p ~/genomehubs/v1/download/data/blastp
+$ docker run --rm \
+             -u $UID:$GROUPS \
+             --name easy-import-operophtera_brumata_obru1_core_36_89_1 \
+             --link genomehubs-mysql \
+             -v ~/genomehubs/v1/import/conf:/import/conf \
+             -v ~/genomehubs/v1/import/data:/import/data \
+             -v ~/genomehubs/v1/download/data:/import/download \
+             -e DATABASE=operophtera_brumata_obru1_core_36_89_1 \
+             -e FLAGS="-e" \
+             genomehubs/easy-import:17.06
+```
+
 {% endmethod %}
 
 ## Export all files
@@ -46,7 +61,7 @@ Run the EasyImport Docker container with flags to export sequences (`-e`), gff/e
 * EMBL format export requires `ASSEMBLY.BIOPROJECT` and `ASSEMBLY.LOCUS_TAG` to be defined in the assembly metadata (see [Update meta](//quick-start/update-meta.md))
 
 
-{% common %}
+{% sample lang="e85" %}
 ```
 $ docker run --rm \
              -u $UID:$GROUPS \
@@ -58,7 +73,21 @@ $ docker run --rm \
              -v ~/genomehubs/v1/blast/data:/import/blast \
              -e DATABASE=operophtera_brumata_obru1_core_32_85_1 \
              -e FLAGS="-e -f -j -i" \
-             genomehubs/easy-import:latest
+             genomehubs/easy-import:17.03
+```
+{% sample lang="e89" %}
+```
+$ docker run --rm \
+             -u $UID:$GROUPS \
+             --name easy-import-operophtera_brumata_v1_core_36_89_1 \
+             --link genomehubs-mysql \
+             -v ~/genomehubs/v1/import/conf:/import/conf \
+             -v ~/genomehubs/v1/import/data:/import/data \
+             -v ~/genomehubs/v1/download/data:/import/download \
+             -v ~/genomehubs/v1/blast/data:/import/blast \
+             -e DATABASE=operophtera_brumata_obru1_core_36_89_1 \
+             -e FLAGS="-e -f -j -i" \
+             genomehubs/easy-import:17.06
 ```
 {% endmethod %}
 
