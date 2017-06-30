@@ -33,6 +33,26 @@ sample_4           population 2
 
 
 {% method %}
+Create and edit a description file to add a description for each sample:
+
+- this file has 2, tab-separated columns
+- sample names must match the sample names in the vcf file
+- html markup is supported and can be used to add a link to related SRA accession, if available
+
+{% common %}
+
+```
+$ nano nano /path/to/data/panel.tsv
+sample_1           description of sample 1
+sample_2           description of sample 2
+sample_3           description of sample 3
+sample_4           description of sample 4
+...
+```
+{% endmethod %}
+
+
+{% method %}
 Create and edit a configuration file to set database and variant details:
 - as with the core database import, common settings can be specified in a `default.ini` file and passwords can be set in an `overwrite.ini` file
 - if database connection settings are not set in a `[DATABASE_VARIATION]` section, values from `[DATABASE_CORE]` will be reused
