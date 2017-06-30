@@ -83,6 +83,9 @@ $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 [DATA_SOURCE]
   SPECIES_DB_URL = ftp://ftp.ensemblgenomes.org/pub/release-32/metazoa/mysql/
   SPECIES_DBS = [ melitaea_cinxia_core_32_85_1 ]
+
+  MISC_DB_URL = ftp://ftp.ensembl.org/pub/release-79/mysql/
+  MISC_DBS = [ ensembl_accounts ]
 ```
 
 {% sample lang="e89" %}
@@ -104,6 +107,9 @@ $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 [DATA_SOURCE]
   SPECIES_DB_URL = ftp://ftp.ensemblgenomes.org/pub/release-36/metazoa/mysql/
   SPECIES_DBS = [ melitaea_cinxia_core_36_89_1 ]
+  
+  MISC_DB_URL = ftp://ftp.ensembl.org/pub/release-89/mysql/
+  MISC_DBS = [ ensembl_accounts ]
 ```
 {% endmethod %}
 
