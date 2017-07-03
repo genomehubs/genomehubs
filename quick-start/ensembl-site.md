@@ -152,7 +152,7 @@ $ docker run -d \
 ```
 $ docker run -d \
              --name genomehubs-ensembl \
-             -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
+             -v ~/genomehubs/v1/ensembl/conf:/conf:ro \
              --link genomehubs-mysql \
              -p 8081:8080 \
              genomehubs/easy-mirror:17.06
