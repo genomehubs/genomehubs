@@ -5,7 +5,8 @@ If you already have a server running Docker, the quickest way to try out GenomeH
 ```
 cd
 git clone https://github.com/genomehubs/demo
-demo/import.sh
+cd demo
+import.sh
 ```
 
 This sets up a GenomeHub with an Ensembl browser, SequenceServer BLAST server and h5ai downloads server hosting data from one species mirrored from EnsemblGenomes and another imported from FASTA and GFF files in around an hour.
