@@ -86,7 +86,7 @@ Update the passwords in `overwrite.ini`:
 
 {% common %}
 ```
-$ cp overwrite.ini overwrite.ini
+$ cp overwrite.ini overwrite.ini.original
 $ nano overwrite.ini
 # update values to match your database connection details
 [DATABASE_CORE]
@@ -128,7 +128,7 @@ Create and edit a `<database name>.ini` file in the `import/conf` directory to s
 {% sample lang="e85" %}
 ```
 $ cd ~/genomehubs/v1/import/conf/
-$ cp genus_species_assembly_core_32_85_1.ini operophtera_brumata_obru1_core_32_85_1.ini
+$ cp genus_species_asm_core_32_85_1.ini operophtera_brumata_obru1_core_32_85_1.ini
 $ nano operophtera_brumata_obru1_core_32_85_1.ini
 # update values to match your species/assembly name and other details
 [DATABASE_CORE]
