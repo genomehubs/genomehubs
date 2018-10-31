@@ -45,18 +45,18 @@ Add details of your Ensembl plugin:
 * update `YOUR_PLUGIN_URL` to point to the git repository you created in  the previous step
 * these details should be added above the `GENOMEHUBS_PLUGIN_URL` so files in this plugin will overwrite those in the GenomeHubs plugin
 
-{% sample lang="e85" %}
+{% sample lang="e93" %}
 ```
 $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 [REPOSITORIES]
   ENSEMBL_URL = https://github.com/Ensembl
-  ENSEMBL_BRANCH = release/85
+  ENSEMBL_BRANCH = release/93
 
   BIOPERL_URL = https://github.com/bioperl
   BIOPERL_BRANCH = master
 
   API_PLUGIN_URL = https://github.com/EnsemblGenomes/ensemblgenomes-api
-  API_PLUGIN_BRANCH = release/eg/32
+  API_PLUGIN_BRANCH = release/eg/93
   API_PLUGIN_PACKAGE = EG::API
 
   YOUR_PLUGIN_URL = https://github.com/YOURACCOUNT/YOUR-PLUGIN-NAME
@@ -64,16 +64,17 @@ $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
   YOUR_PLUGIN_PACKAGE = EG::YourPlugin
 
   GENOMEHUBS_PLUGIN_URL = https://github.com/genomehubs/gh-ensembl-plugin
-  GENOMEHUBS_PLUGIN_BRANCH = 17.03
+  GENOMEHUBS_PLUGIN_BRANCH = 18.10
   GENOMEHUBS_PLUGIN_PACKAGE = EG::GenomeHubs
 
   EG_COMMON_PLUGIN_URL = https://github.com/EnsemblGenomes/eg-web-common
-  EG_COMMON_PLUGIN_BRANCH = release/eg/32
+  EG_COMMON_PLUGIN_BRANCH = release/eg/40
   EG_COMMON_PLUGIN_PACKAGE = EG::Common
 
   PUBLIC_PLUGINS = [ ]
 
 ```
+
 {% sample lang="e89" %}
 ```
 $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
@@ -104,19 +105,50 @@ $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 
 ```
 
+{% sample lang="e85" %}
+```
+$ nano ~/genomehubs/v1/ensembl/conf/setup.ini
+[REPOSITORIES]
+  ENSEMBL_URL = https://github.com/Ensembl
+  ENSEMBL_BRANCH = release/85
+
+  BIOPERL_URL = https://github.com/bioperl
+  BIOPERL_BRANCH = master
+
+  API_PLUGIN_URL = https://github.com/EnsemblGenomes/ensemblgenomes-api
+  API_PLUGIN_BRANCH = release/eg/32
+  API_PLUGIN_PACKAGE = EG::API
+
+  YOUR_PLUGIN_URL = https://github.com/YOURACCOUNT/YOUR-PLUGIN-NAME
+  YOUR_PLUGIN_BRANCH = master
+  YOUR_PLUGIN_PACKAGE = EG::YourPlugin
+
+  GENOMEHUBS_PLUGIN_URL = https://github.com/genomehubs/gh-ensembl-plugin
+  GENOMEHUBS_PLUGIN_BRANCH = 17.03
+  GENOMEHUBS_PLUGIN_PACKAGE = EG::GenomeHubs
+
+  EG_COMMON_PLUGIN_URL = https://github.com/EnsemblGenomes/eg-web-common
+  EG_COMMON_PLUGIN_BRANCH = release/eg/32
+  EG_COMMON_PLUGIN_PACKAGE = EG::Common
+
+  PUBLIC_PLUGINS = [ ]
+
+```
+
 {% endmethod %}
 
 
 {% method %}
 Set database names to load:
 * Assemblies will be listed on your Ensembl site homepage in the order they are added to `SPECIES_DBS`
-{% sample lang="e85" %}
+
+{% sample lang="e93" %}
 ```
 $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 [DATA_SOURCE]
   SPECIES_DBS = [ 
-    mellitaea_cinxia_core_32_85_1
-    operophtera_brumata_obru1_core_32_85_1
+    mellitaea_cinxia_core_40_93_1
+    operophtera_brumata_obru1_core_40_93_1
 ]
 ```
 {% sample lang="e89" %}
@@ -128,8 +160,15 @@ $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
     operophtera_brumata_obru1_core_36_89_1
 ]
 ```
-
-
+{% sample lang="e85" %}
+```
+$ nano ~/genomehubs/v1/ensembl/conf/setup.ini
+[DATA_SOURCE]
+  SPECIES_DBS = [ 
+    mellitaea_cinxia_core_32_85_1
+    operophtera_brumata_obru1_core_32_85_1
+]
+```
 {% endmethod %}
 
 
@@ -138,6 +177,26 @@ $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 
 {% method %}
 Start the EasyMirror Docker container:
+
+{% sample lang="e93" %}
+```
+$ docker run -d \
+             --name genomehubs-ensembl \
+             -v ~/genomehubs/v1/ensembl/conf:/conf:ro \
+             --network genomehubs-network \
+             -p 8881:8080 \
+             genomehubs/easy-mirror:18.10
+```
+
+{% sample lang="e89" %}
+```
+$ docker run -d \
+             --name genomehubs-ensembl \
+             -v ~/genomehubs/v1/ensembl/conf:/conf:ro \
+             --link genomehubs-mysql \
+             -p 8081:8080 \
+             genomehubs/easy-mirror:17.06
+```
 
 {% sample lang="e85" %}
 ```
@@ -148,15 +207,7 @@ $ docker run -d \
              -p 8081:8080 \
              genomehubs/easy-mirror:17.03
 ```
-{% sample lang="e89" %}
-```
-$ docker run -d \
-             --name genomehubs-ensembl \
-             -v ~/genomehubs/v1/ensembl/conf:/conf:ro \
-             --link genomehubs-mysql \
-             -p 8081:8080 \
-             genomehubs/easy-mirror:17.06
-```
+
 
 {% endmethod %}
 
