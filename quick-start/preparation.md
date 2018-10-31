@@ -16,6 +16,8 @@ sudo usermod -aG docker $USER
 ```
 {% endmethod %}
 
+
+{% method %}
 {%sample lang="e93" %}
 ### Setup a Docker bridge
 
@@ -25,8 +27,6 @@ To allow container-container communication, set up a Docker network bridge
 docker network create genomehubs-ensembl
 ```
 {% endmethod %}
-
-
 
 
 {% method %}
