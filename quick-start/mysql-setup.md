@@ -64,7 +64,7 @@ Edit the `database.ini` configuration file to set passwords for the database use
 * to mirror existing Ensembl databases in your GenomeHub, add the appropriate database names to `SPECIES_DBS` as a space-separated list (a corresponding database dump must be available at `SPECIES_DB_URL`)
 * even if you do not wish to mirror any existing databases, at least one database must be specified in `SPECIES_DBS` for use as a template when importing new data.
 
-{% sample lang="e85" %}
+{% sample lang="e93" %}
 ```
 $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 # (some lines omitted)
@@ -81,10 +81,10 @@ $ nano ~/genomehubs/v1/ensembl/conf/database.ini
   DB_HOST = genomehubs-mysql
 
 [DATA_SOURCE]
-  SPECIES_DB_URL = ftp://ftp.ensemblgenomes.org/pub/release-32/metazoa/mysql/
-  SPECIES_DBS = [ melitaea_cinxia_core_32_85_1 ]
+  SPECIES_DB_URL = ftp://ftp.ensemblgenomes.org/pub/release-40/metazoa/mysql/
+  SPECIES_DBS = [ melitaea_cinxia_core_40_93_1 ]
 
-  MISC_DB_URL = ftp://ftp.ensembl.org/pub/release-79/mysql/
+  MISC_DB_URL = ftp://ftp.ensembl.org/pub/release-93/mysql/
   MISC_DBS = [ ensembl_accounts ]
 ```
 
@@ -111,6 +111,30 @@ $ nano ~/genomehubs/v1/ensembl/conf/database.ini
   MISC_DB_URL = ftp://ftp.ensembl.org/pub/release-89/mysql/
   MISC_DBS = [ ensembl_accounts ]
 ```
+{% sample lang="e85" %}
+```
+$ nano ~/genomehubs/v1/ensembl/conf/database.ini
+# (some lines omitted)
+[DATABASE]
+  DB_SESSION_USER = ensrw
+  DB_SESSION_PASS = CHANGEME
+
+  DB_IMPORT_USER = importer
+  DB_IMPORT_PASSWORD = CHANGEME
+
+  DB_ROOT_USER = root
+  DB_ROOT_PASSWORD = CHANGEME
+  DB_PORT = 3306
+  DB_HOST = genomehubs-mysql
+
+[DATA_SOURCE]
+  SPECIES_DB_URL = ftp://ftp.ensemblgenomes.org/pub/release-32/metazoa/mysql/
+  SPECIES_DBS = [ melitaea_cinxia_core_32_85_1 ]
+
+  MISC_DB_URL = ftp://ftp.ensembl.org/pub/release-79/mysql/
+  MISC_DBS = [ ensembl_accounts ]
+```
+
 {% endmethod %}
 
 
@@ -119,13 +143,14 @@ Run the `database.sh` script in a `genomehubs/easy-mirror` Docker container:
 
 * this script will set up database users and import databases into your MySQL container based on the information in the `database.ini` configuration file.
 
-{% sample lang="e85" %}
+{% sample lang="e93" %}
 ```
 $ docker run --rm \
              --name genomehubs-ensembl \
+             --network genomehubs-network \
              -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
-             --link genomehubs-mysql \
-             genomehubs/easy-mirror:17.03 /ensembl/scripts/database.sh /ensembl/conf/database.ini
+             --network genomehubs-network \
+             genomehubs/easy-mirror:18.10 /ensembl/scripts/database.sh /ensembl/conf/database.ini
 ```
 
 {% sample lang="e89" %}
@@ -135,6 +160,15 @@ $ docker run --rm \
              -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
              --link genomehubs-mysql \
              genomehubs/easy-mirror:17.06 /ensembl/scripts/database.sh /ensembl/conf/database.ini
+```
+
+{% sample lang="e85" %}
+```
+$ docker run --rm \
+             --name genomehubs-ensembl \
+             -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
+             --link genomehubs-mysql \
+             genomehubs/easy-mirror:17.03 /ensembl/scripts/database.sh /ensembl/conf/database.ini
 ```
 
 {% endmethod %}
