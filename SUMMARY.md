@@ -20,6 +20,7 @@
 * [9. Start BLAST server](/quick-start/blast-site.md)
 * [10. Edit Ensembl plugin](/quick-start/ensembl-plugin.md)
 * [11. Start Ensembl browser](/quick-start/ensembl-site.md)
+  * 12. Start Search container
 
 ## Next Steps
 
