@@ -15,13 +15,17 @@ If a single value is present in the database for a given key, it will be replace
 {% method %}
 Add suggested search terms:
 
-{% sample lang="e85" %}
+{% sample lang="e93" %}
 ```
-$ nano ~/genomehubs/import/conf/operophtera_brumata_obru1_core_32_85_1.ini
+$ nano ~/genomehubs/import/conf/operophtera_brumata_obru1_core_40_93_1.ini
 ```
 {% sample lang="e89" %}
 ```
 $ nano ~/genomehubs/import/conf/operophtera_brumata_obru1_core_36_89_1.ini
+```
+{% sample lang="e85" %}
+```
+$ nano ~/genomehubs/import/conf/operophtera_brumata_obru1_core_32_85_1.ini
 ```
 {% common %}
 ```
@@ -41,18 +45,19 @@ $ nano ~/genomehubs/import/conf/operophtera_brumata_obru1_core_36_89_1.ini
 {% method %}
 Run an EasyImport Docker container with `-u` flag to update metadata:
 
-{% sample lang="e85" %}
+{% sample lang="e93" %}
 ```
 $ docker run --rm \
              -u $UID:$GROUPS \
-             --name easy-import-operophtera_brumata_v1_core_32_85_1 \
-             --link genomehubs-mysql \
+             --name easy-import-operophtera_brumata_v1_core_40_93_1 \
+             --network genomehubs-mysql \
              -v ~/genomehubs/v1/import/conf:/import/conf \
              -v ~/genomehubs/v1/import/data:/import/data \
-             -e DATABASE=operophtera_brumata_obru1_core_32_85_1 \
+             -e DATABASE=operophtera_brumata_obru1_core_40_93_1 \
              -e FLAGS="-u" \
-             genomehubs/easy-import:17.03
+             genomehubs/easy-import:18.10
 ```
+
 {% sample lang="e89" %}
 ```
 $ docker run --rm \
@@ -65,6 +70,20 @@ $ docker run --rm \
              -e FLAGS="-u" \
              genomehubs/easy-import:17.06
 ```
+
+{% sample lang="e85" %}
+```
+$ docker run --rm \
+             -u $UID:$GROUPS \
+             --name easy-import-operophtera_brumata_v1_core_32_85_1 \
+             --link genomehubs-mysql \
+             -v ~/genomehubs/v1/import/conf:/import/conf \
+             -v ~/genomehubs/v1/import/data:/import/data \
+             -e DATABASE=operophtera_brumata_obru1_core_32_85_1 \
+             -e FLAGS="-u" \
+             genomehubs/easy-import:17.03
+```
+
 
 {% endmethod %}
 
