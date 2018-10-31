@@ -4,13 +4,19 @@
         "theme-api": {
             "languages": [
                 {
-                    "lang": "e89",
-                    "name": "Ensembl-89",
+                    "lang": "e93",
+                    "name": "Ensembl-93",
                     "default": true
                 },
                 {
+                    "lang": "e89",
+                    "name": "Ensembl-89",
+                    "default": false
+                },
+                {
                     "lang": "e85",
-                    "name": "Ensembl-85"
+                    "name": "Ensembl-85",
+                    "default": false
                 }
             ]
         }
