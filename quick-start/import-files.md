@@ -16,18 +16,20 @@ Run the import script:
 * `-r` will import repeatmasker results
 * `-c` will import CEGMA and BUSCO results
 
-{% sample lang="e85" %}
+{% sample lang="e93" %}
+
+### N.B. This has not been fully tested following code update
 ```
 $ docker run --rm \
              -u $UID:$GROUPS \
-             --name easy-import-operophtera_brumata_v1_core_32_85_1 \
+             --name easy-import-operophtera_brumata_v1_core_40_93_1 \
              --link genomehubs-mysql \
              -v ~/genomehubs/v1/import/conf:/import/conf \
              -v ~/genomehubs/v1/import/data:/import/data \
              -v ~/genomehubs/v1/download/data:/download/data \
-             -e DATABASE=operophtera_brumata_obru1_core_32_85_1 \
+             -e DATABASE=operophtera_brumata_obru1_core_40_93_1 \
              -e FLAGS="-b -r -c" \
-             genomehubs/easy-import:17.06
+             genomehubs/easy-import:18.10
 ```
 
 {% sample lang="e89" %}
@@ -44,6 +46,19 @@ $ docker run --rm \
              genomehubs/easy-import:17.06
 ```
 
+{% sample lang="e85" %}
+```
+$ docker run --rm \
+             -u $UID:$GROUPS \
+             --name easy-import-operophtera_brumata_v1_core_32_85_1 \
+             --link genomehubs-mysql \
+             -v ~/genomehubs/v1/import/conf:/import/conf \
+             -v ~/genomehubs/v1/import/data:/import/data \
+             -v ~/genomehubs/v1/download/data:/download/data \
+             -e DATABASE=operophtera_brumata_obru1_core_32_85_1 \
+             -e FLAGS="-b -r -c" \
+             genomehubs/easy-import:17.06
+```
 {% endmethod %}
 
 
