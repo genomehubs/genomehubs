@@ -1,6 +1,6 @@
 # Prepare
 
-Docker is the only prerequisite for running GenomeHubs, however, for convenience this quick-start guide assumes that you will be running all steps on Ubuntu 16.04 with git installed and files stored in your home directory.
+Docker is the only prerequisite for running GenomeHubs, however, for convenience this quick-start guide assumes that you will be running all steps on Ubuntu 18.04 with git installed and files stored in your home directory.
 
 See [docs.docker.com](https://docs.docker.com) for details on how to install Docker on other operating systems.
 
@@ -24,17 +24,44 @@ Clone the example configuration files from the [genomehubs/template](https://git
 
 * naming the template directory `v1` is convenient for versioning of your site
 
-{% sample lang="e85" %}
+{% sample lang="e93" %}
 ```
 $ mkdir ~/genomehubs && cd ~/genomehubs
-$ git clone https://github.com/genomehubs/template -b 17.03 v1
+$ git clone https://github.com/genomehubs/template -b 18.10 v1
 ```
 {% sample lang="e89" %}
 ```
 $ mkdir ~/genomehubs && cd ~/genomehubs
 $ git clone https://github.com/genomehubs/template -b 17.06 v1
 ```
+{% sample lang="e85" %}
+```
+$ mkdir ~/genomehubs && cd ~/genomehubs
+$ git clone https://github.com/genomehubs/template -b 17.03 v1
+```
 {% endmethod %}
+
+
+### Quick setup with no public domain
+
+{% method %}
+If you are running GenomeHubs on a local machine, the default configuration should just work.
+
+To test on a remote server without configuring an external domain name you can map the required ports to localhost with an entry like this in a `.ssh/config` file:
+
+{% common %}
+```
+$ nano ~/.ssh/config
+Host dockerserver
+ HostName example.com
+ LocalForward 8881 127.0.0.1:8881
+ LocalForward 8882 127.0.0.1:8882
+ LocalForward 8883 127.0.0.1:8883
+ User username
+```
+{% endmethod %}
+
+
 
 
 ### Configure domain names and firewall
@@ -82,17 +109,6 @@ $ sudo service lighttpd restart
 ```
 {% endmethod %}
 
-{% method %}
-To test without configuring an external domain name you could add entries to `/etc/hosts` on your local machine (substitute the ip below for the ip address of your host server: 
-* remember to remove these entries if you later register the domain
-* if you are unsure what you are doing, ask your local sysadmin before editing this file
 
-{% common %}
-```
-192.168.122.1  ensembl.example.com
-192.168.122.1  download.example.com
-192.168.122.1  blast.example.com
-```
-{% endmethod %}
 
 
