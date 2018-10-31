@@ -149,7 +149,6 @@ $ docker run --rm \
              --name genomehubs-ensembl \
              --network genomehubs-network \
              -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
-             --network genomehubs-network \
              genomehubs/easy-mirror:18.10 /ensembl/scripts/database.sh /ensembl/conf/database.ini
 ```
 
