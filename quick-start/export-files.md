@@ -27,7 +27,7 @@ $ docker run --rm \
              --network genomehubs-network \
              -v ~/genomehubs/v1/import/conf:/import/conf \
              -v ~/genomehubs/v1/import/data:/import/data \
-             -v ~/genomehubs/v1/download/data:/import/download
+             -v ~/genomehubs/v1/download/data:/import/download \
              -v ~/genomehubs/v1/blast/data:/import/blast \
              -e DATABASE=operophtera_brumata_obru1_core_40_93_1 \
              -e FLAGS="-e" \

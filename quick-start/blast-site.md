@@ -27,20 +27,15 @@ $ nano Masthead.html
 
 {% method %}
 Edit `links.rb` to ensure that links from BLAST results are directed to your Ensembl site:
-* keys in `taxa` should match your database name(s), values should match the corresponding `SPECIES.URL`
-* modify the `url = "http://ensembl.genomehubs.org/#{assembly}"` to match your domain name
+* modify the `url = "http://localhost:8881/#{assembly}"` to match your domain name
 
 {% sample lang="e93" %}
 ```
 $ nano links.rb
 ...
     def genomehubs
-      taxa = {}
-      taxa["operophtera_brumata_obru1_core_40_93_1"] = "Operophtera_brumata_Obru1"
 ...
-      accession = encode accession
-      colon = ':'
-      url = "http://ensembl.genomehubs.org/#{assembly}"
+      url = "http://localhost:8881/#{assembly}"
 ...
 
 ```
@@ -84,8 +79,9 @@ Start the SequenceServer Docker container:
 ```
 $ docker run -d \
              --name genomehubs-sequenceserver \
+             --network genomehubs-network \
              -v ~/genomehubs/v1/blast/conf:/conf:ro \
-             -v ~/genomehubs/v1/blast/data:/dbs:ro \
+             -v ~/genomehubs/v1/blast/data:/dbs \
              -p 8883:4567 \
              genomehubs/sequenceserver:latest
 ```
