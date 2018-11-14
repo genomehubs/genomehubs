@@ -36,7 +36,7 @@ $ docker run -d \
              --network genomehubs-network \
              -v ~/genomehubs/mysql/data:/var/lib/mysql \
              -e MYSQL_ROOT_PASSWORD=CHANGEME \
-             -e MYSQL_ROOT_HOST='172.17.0.0/255.255.0.0' \
+             -e MYSQL_ROOT_HOST='172.16.0.0/255.240.0.0' \
              -p 3306:3306 \
              mysql/mysql-server:5.5
 ```
