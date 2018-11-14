@@ -22,10 +22,10 @@ sudo usermod -aG docker $USER
 
 ### Setup a Docker bridge
 
-To allow container-container communication, set up a Docker network bridge
+To allow container-container communication, set up a Docker network bridge (requires a fairly recent version of Docker)
 
 ```
-docker network create genomehubs-ensembl
+docker network create genomehubs-network
 ```
 {% endmethod %}
 

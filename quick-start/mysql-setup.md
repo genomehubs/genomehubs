@@ -27,7 +27,9 @@ $ mkdir -p ~/genomehubs/mysql/data
 Create a MySQL Docker container to host the Ensembl Databases for your GenomeHub:
 
 * See [hub.docker.com](https://hub.docker.com/r/mysql/mysql-server/) for more information on the MySQL Docker image.
-* Docker sets up its own network so setting `MYSQL_ROOT_HOST='172.17.0.0/255.255.0.0'` will allow other Docker containers on the same machine to connect 
+* Docker sets up a default network bridge, but to 
+ simplify connections between containers by using names rather than IP addresses, it is necessary to connect containers to the same named network bridge using `--network genomehubs-network`.
+* `MYSQL_ROOT_HOST='172.16.0.0/255.240.0.0'` will allow all other Docker containers on the same machine to connect to the mysql container as root, even if they are on a different Docker network. This is the simplest configuration as it does not matter which of the available subnets the Docker network has been created on, or which IP addresses are assigned to each of the containers. For more security you may wish to check the subnet of your bridge network and/or restrict access to the IP addresses of specific containers.
 
 {% common %}
 ```
