@@ -307,7 +307,7 @@ Run an EasyImport Docker container with flags to import sequences (`-s`), prepar
 $ docker run --rm \
              -u $UID:$GROUPS \
              --name easy-import-operophtera_brumata_v1_core_40_93_1 \
-             --link genomehubs-mysql \
+             --network genomehubs-network \
              -v ~/genomehubs/v1/import/conf:/import/conf \
              -v ~/genomehubs/v1/import/data:/import/data \
              -e DATABASE=operophtera_brumata_obru1_core_40_93_1 \
