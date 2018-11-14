@@ -99,21 +99,21 @@ $ sudo nano /etc/lighttpd/lighttpd.conf
 $HTTP["host"] =~ "ensembl.example.com"{
   proxy.server = ("" => ("" => (
     "host" => "127.0.0.1",
-    "port" => "8081",
+    "port" => "8881",
     "fix-redirects" => 1
   )))
 }
 $HTTP["host"] =~ "download.example.com"{
   proxy.server = ("" => ("" => (
     "host" => "127.0.0.1",
-    "port" => "8082",
+    "port" => "8882",
     "fix-redirects" => 1
   )))
 }
 $HTTP["host"] =~ "blast.example.com"{
   proxy.server = ("" => ("" => (
     "host" => "127.0.0.1",
-    "port" => "8083",
+    "port" => "8883",
     "fix-redirects" => 1
   )))
 }
