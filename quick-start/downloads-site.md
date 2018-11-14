@@ -44,11 +44,11 @@ Start the h5ai Docker container:
 {% common %}
 ```
 $ docker run -d \
-             --name genomehubs-h5ai \
+             --name genomehubs-download \
              -v ~/genomehubs/v1/download/conf:/conf:ro \
              -v ~/genomehubs/v1/download/data:/var/www/v1:ro \
              -p 8882:8080 \
-             genomehubs/h5ai:latest
+             genomehubs/h5ai:18.10
 ```
 {% endmethod %}
 
