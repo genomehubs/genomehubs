@@ -33,6 +33,7 @@ Create a MySQL Docker container to host the Ensembl Databases for your GenomeHub
 ```
 $ docker run -d \
              --name genomehubs-mysql \
+             --network genomehubs-network \
              -v ~/genomehubs/mysql/data:/var/lib/mysql \
              -e MYSQL_ROOT_PASSWORD=CHANGEME \
              -e MYSQL_ROOT_HOST='172.17.0.0/255.255.0.0' \
