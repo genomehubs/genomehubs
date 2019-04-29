@@ -132,11 +132,11 @@ $ nano overwrite.ini
 ## Choose a name for your new assembly database
 
 {% method %}
-Each imported assembly must be stored in a uniquely named database. GenomeHubs follows the Ensembl naming conventions with the addition of an assembly name to allow alternate assemblies for a single species to be hosted in a single site. Database names should be all lower case with no special characters other than letters, numbers and underscores. A subspecies/strain can optionally be included. For Ensembl release 32/85 (which is currently the version supported by GenomeHubs) the database name for _Operophtera brumata_ assembly Obru1 would be:
+Each imported assembly must be stored in a uniquely named database. GenomeHubs follows the Ensembl naming conventions with the addition of an assembly name to allow alternate assemblies for a single species to be hosted in a single site. Database names should be all lower case with no special characters other than letters, numbers and underscores. A subspecies/strain can optionally be included. For Ensembl release 40/93 (which is currently the version supported by GenomeHubs) the database name for _Operophtera brumata_ assembly Obru1 would be:
 
 {% sample lang="e93" %}
 ```
-operophtera_brumata_obru1_core_40_90_1
+operophtera_brumata_obru1_core_40_93_1
 ```
 
 {% sample lang="e89" %}
@@ -163,7 +163,7 @@ Create and edit a `<database name>.ini` file in the `import/conf` directory to s
 {% sample lang="e93" %}
 ```
 $ cd ~/genomehubs/v1/import/conf/
-$ cp genus_species_assembly_core_40_93_1.ini operophtera_brumata_obru1_core_40_93_1.ini
+$ cp genus_species_asm_core_40_93_1.ini operophtera_brumata_obru1_core_40_93_1.ini
 $ nano operophtera_brumata_obru1_core_40_93_1.ini
 # update values to match your species/assembly name and other details
 [DATABASE_CORE]
@@ -355,7 +355,7 @@ Check the import and verification log files for errors:
 ```
 $ ls ~/genomehubs/v1/import/data/operophtera_brumata_obru1_core_40_93_1
 
-$ ls ~/genomehubs/v1/import/data/operophtera_brumata_obru1_core_40_93_1/logs
+$ ls ~/genomehubs/v1/import/data/operophtera_brumata_obru1_core_40_93_1/log
 
 $ ls ~/genomehubs/v1/import/data/operophtera_brumata_obru1_core_40_93_1/summary
 
