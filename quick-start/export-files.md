@@ -20,7 +20,6 @@ Run the EasyImport Docker container using the `-e` flag to export sequences:
 
 {% sample lang="e93" %}
 ```
-$ mkdir -p ~/genomehubs/v1/download/data/blastp
 $ docker run --rm \
              -u $UID:$GROUPS \
              --name easy-import-operophtera_brumata_obru1_core_40_93_1 \
@@ -36,7 +35,6 @@ $ docker run --rm \
 
 {% sample lang="e89" %}
 ```
-$ mkdir -p ~/genomehubs/v1/download/data/blastp
 $ docker run --rm \
              -u $UID:$GROUPS \
              --name easy-import-operophtera_brumata_obru1_core_36_89_1 \
@@ -52,7 +50,6 @@ $ docker run --rm \
 
 {% sample lang="e85" %}
 ```
-$ mkdir -p ~/genomehubs/v1/download/data/blastp
 $ docker run --rm \
              -u $UID:$GROUPS \
              --name easy-import-operophtera_brumata_obru1_core_32_85_1 \
