@@ -30,7 +30,7 @@ $ docker run --rm \
              -v ~/genomehubs/v1/blast/data:/import/blast \
              -e DATABASE=operophtera_brumata_obru1_core_40_93_1 \
              -e FLAGS="-e" \
-             genomehubs/easy-import:18.10
+             genomehubs/easy-import:19.05
 ```
 
 {% sample lang="e89" %}
@@ -89,7 +89,7 @@ $ docker run --rm \
              -v ~/genomehubs/v1/blast/data:/import/blast \
              -e DATABASE=operophtera_brumata_obru1_core_40_93_1 \
              -e FLAGS="-e -f -j -i" \
-             genomehubs/easy-import:18.10
+             genomehubs/easy-import:19.05
 ```
 {% sample lang="e89" %}
 ```

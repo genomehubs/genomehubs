@@ -32,7 +32,7 @@ $ docker run --rm \
              --name uniprot_sprot-makeblastdb \
              -v ~/genomehubs/external_files:/in \
              -v ~/genomehubs/external_files:/out \
-             genomehubs/ncbi-blast:latest \
+             genomehubs/ncbi-blast:19.05 \
              makeblastdb -dbtype prot -in /in/uniprot_sprot.fasta -out /out/uniprot_sprot.fasta -parse_seqids -hash_index
 ```
 {% endmethod %}
@@ -42,14 +42,14 @@ Run blastp:
 
 {% common %}
 ```
-$ mkdir -p ~/genomehubs/v1/download/data/blastp
+$ mkdir -p ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/blastp
 $ docker run --rm \
              -u $UID:$GROUPS \
              --name Operophtera_brumata_Obru1-blastp \
-             -v ~/genomehubs/v1/download/data/sequence:/query \
-             -v ~/genomehubs/v1/download/data/blastp:/out \
+             -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/fasta/pep:/query \
+             -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/blastp:/out \
              -v ~/genomehubs/external_files:/db \
-             blaxterlab/ncbi-blast:latest \
+             genomehubs/ncbi-blast:19.05 \
              blastp -query /query/Operophtera_brumata_Obru1.proteins.fa.gz \
                     -db /db/uniprot_sprot.fasta \
                     -evalue 1e-10 \
@@ -83,14 +83,14 @@ Run InterProScan:
 
 {% common %}
 ```
-$ mkdir -p ~/genomehubs/v1/download/data/interproscan
+$ mkdir -p ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/interproscan
 $ docker run --rm \
            -u $UID:$GROUPS \
            --name Operophtera_brumata_Obru1-interproscan \
-           -v ~/genomehubs/v1/download/data/interproscan:/dir \
-           -v ~/genomehubs/v1/download/data/sequence:/in \
+           -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/interproscan:/dir \
+           -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/fasta/pep:/in \
            -v ~/genomehubs/external_files/interproscan.properties:/interproscan-5.22-61.0/interproscan.properties \
-           genomehubs/interproscan:latest \
+           genomehubs/interproscan:19.05 \
            interproscan.sh -i /in/Operophtera_brumata_Obru1.proteins.fa.gz \
                            -d /dir \
                            -appl PFAM,SignalP_EUK \

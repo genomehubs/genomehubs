@@ -152,7 +152,7 @@ $ docker run --rm \
              --name genomehubs-ensembl \
              --network genomehubs-network \
              -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
-             genomehubs/easy-mirror:18.10 /ensembl/scripts/database.sh /ensembl/conf/database.ini
+             genomehubs/easy-mirror:19.05 /ensembl/scripts/database.sh /ensembl/conf/database.ini
 ```
 
 {% sample lang="e89" %}

@@ -90,7 +90,7 @@ $ docker run -d \
              -v ~/genomehubs/v1/ensembl/conf:/conf:ro \
              --network genomehubs-network \
              -p 8881:8080 \
-             genomehubs/easy-mirror:18.10
+             genomehubs/easy-mirror:19.05
 ```
 
 

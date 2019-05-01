@@ -312,7 +312,7 @@ $ docker run --rm \
              -v ~/genomehubs/v1/import/data:/import/data \
              -e DATABASE=operophtera_brumata_obru1_core_40_93_1 \
              -e FLAGS="-s -p -g -v" \
-             genomehubs/easy-import:18.10
+             genomehubs/easy-import:19.05
 ```
 
 {% sample lang="e89" %}
