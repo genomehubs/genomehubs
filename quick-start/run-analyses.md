@@ -159,6 +159,30 @@ $ docker run --rm \
 {% endmethod %}
 
 
+# Run RepeatMasker with DFAM libraries
+
+{% method %}
+Run RepeatMasker:
+
+{% common %}
+```
+$ mkdir -p ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/repeatmasker
+$ docker run --rm \
+           -u $UID:$GROUPS \
+           --name Operophtera_brumata_Obru1-repeatmasker \
+           -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/fasta/dna:/in \
+           -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/repeatmasker:/out \
+           -e ASSEMBLY=Operophtera_brumata_Obru1.scaffolds.fa.gz \
+           -e NSLOTS=16 \
+           -e SPECIES=fly \
+           genomehubs/repeatmasker-dfam:19.05
+```
+{% endmethod %}
+
+
+
+
+
 # Run CEGMA
 
 {% method %}
