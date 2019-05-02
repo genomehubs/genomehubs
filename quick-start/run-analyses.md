@@ -172,7 +172,7 @@ $ docker run --rm \
            --name Operophtera_brumata_Obru1-cegma \
            -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/fasta/dna:/in \
            -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/cegma:/out \
-           -e ASSEMBLY=Operophtera_brumata_Obru1.scaffolds.fa.gz
+           -e ASSEMBLY=Operophtera_brumata_Obru1.scaffolds.fa.gz \
            -e THREADS=16 \
            genomehubs/cegma:19.05
 ```
@@ -186,8 +186,8 @@ Clone the GenomeHubs BUSCO Docker repository:
 {% common %}
 ```
 $ mkdir -p ~/genomehubs/external_files && cd ~/genomehubs/external_files
-git clone https://github.com/genomehubs/busco-docker.git
-cd busco-docker
+$ git clone https://github.com/genomehubs/busco-docker.git
+$ cd busco-docker
 ```
 {% endmethod %}
 
