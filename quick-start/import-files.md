@@ -26,7 +26,7 @@ $ docker run --rm \
              --network genomehubs-network \
              -v ~/genomehubs/v1/import/conf:/import/conf \
              -v ~/genomehubs/v1/import/data:/import/data \
-             -v ~/genomehubs/v1/download/data:/download/data \
+             -v ~/genomehubs/v1/download/data:/import/download \
              -e DATABASE=operophtera_brumata_obru1_core_40_93_1 \
              -e FLAGS="-b -r -c" \
              genomehubs/easy-import:19.05

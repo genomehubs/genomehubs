@@ -145,12 +145,12 @@ Run RepeatMasker:
 
 {% common %}
 ```
-$ mkdir -p ~/genomehubs/v1/download/data/repeatmasker
+$ mkdir -p ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/repeatmasker
 $ docker run --rm \
            -u $UID:$GROUPS \
            --name Operophtera_brumata_Obru1-repeatmasker \
-           -v ~/genomehubs/v1/download/data/sequence:/in \
-           -v ~/genomehubs/v1/download/data/repeatmasker:/out \
+           -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/fasta/dna:/in \
+           -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/repeatmasker:/out \
            -e ASSEMBLY=Operophtera_brumata_Obru1.scaffolds.fa.gz \
            -e NSLOTS=16 \
            -e SPECIES=arthropoda \
@@ -163,17 +163,17 @@ $ docker run --rm \
 
 {% method %}
 Run CEGMA:
-* TODO: allow use of multiple threads
 
 {% common %}
 ```
-$ mkdir -p ~/genomehubs/v1/download/data/cegma
+$ mkdir -p ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/cegma
 $ docker run --rm \
            -u $UID:$GROUPS \
            --name Operophtera_brumata_Obru1-cegma \
-           -v ~/genomehubs/v1/download/data/sequence:/in \
-           -v ~/genomehubs/v1/download/data/cegma:/out \
-           -e ASSEMBLY=Operophtera_brumata_Obru1.scaffolds.fa.gz \
+           -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/fasta/dna:/in \
+           -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/cegma:/out \
+           -e ASSEMBLY=Operophtera_brumata_Obru1.scaffolds.fa.gz
+           -e THREADS=16 \
            genomehubs/cegma:latest
 ```
 {% endmethod %}
@@ -217,12 +217,12 @@ Run BUSCO:
 
 {% common %}
 ```
-$ mkdir -p ~/genomehubs/v1/download/data/busco
+$ mkdir -p ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/busco
 $ docker run --rm \
            -u $UID:$GROUPS \
            --name Operophtera_brumata_Obru1-busco \
-           -v ~/genomehubs/v1/download/data/sequence:/in \
-           -v ~/genomehubs/v1/download/data/busco:/out \
+           -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/fasta/dna:/in \
+           -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/busco:/out \
            -e ASSEMBLY=Operophtera_brumata_Obru1.scaffolds.fa.gz \
            busco -l eukaryota_odb9 -m genome -c 16 -sp fly
 ```
