@@ -174,7 +174,7 @@ $ docker run --rm \
            -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/cegma:/out \
            -e ASSEMBLY=Operophtera_brumata_Obru1.scaffolds.fa.gz
            -e THREADS=16 \
-           genomehubs/cegma:latest
+           genomehubs/cegma:19.05
 ```
 {% endmethod %}
 
