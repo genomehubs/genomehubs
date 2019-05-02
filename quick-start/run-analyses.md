@@ -90,7 +90,7 @@ $ docker run --rm \
            -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/interproscan:/dir \
            -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/fasta/pep:/in \
            -v ~/genomehubs/external_files/interproscan.properties:/interproscan-5.22-61.0/interproscan.properties \
-           genomehubs/interproscan:19.05 \
+           genomehubs/interproscan:18.10 \
            interproscan.sh -i /in/Operophtera_brumata_Obru1.proteins.fa.gz \
                            -d /dir \
                            -appl PFAM,SignalP_EUK \
