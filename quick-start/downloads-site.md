@@ -48,7 +48,7 @@ $ docker run -d \
              -v ~/genomehubs/v1/download/conf:/conf:ro \
              -v ~/genomehubs/v1/download/data:/var/www/v1:ro \
              -p 8882:8080 \
-             genomehubs/h5ai:18.10
+             genomehubs/h5ai:19.05
 ```
 {% endmethod %}
 
