@@ -105,6 +105,10 @@ $ docker run --rm \
 
 ## Run RepeatMasker
 
+**_N.B. Running RepeatMasker with RepBase Libraries Requires a RepBase subscription. See below for an alternative repeat masking approach using Repeat Detector and redmask._**
+
+**_The latest version of RepeatMasker are compatible with the open source DFAM libraries, but DFAM currently has limited taxonomic scope and we are  yet to get this version running reliably in a docker container._**
+
 
 {% method %}
 Clone the GenomeHubs RepeatMasker Docker repository:
@@ -159,27 +163,26 @@ $ docker run --rm \
 {% endmethod %}
 
 
-# Run RepeatMasker with DFAM libraries
+### Run Repeat Detector using redmask
+
+**_This is provided as an alternative to RepeatMasker to generate a soft masked genome, but lacks repeat classification._**
+
 
 {% method %}
-Run RepeatMasker:
+Run redmask:
 
 {% common %}
 ```
-$ mkdir -p ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/repeatmasker
+$ mkdir -p ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/redmask
 $ docker run --rm \
-           -u $UID:$GROUPS \
-           --name Operophtera_brumata_Obru1-repeatmasker \
-           -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/fasta/dna:/in \
-           -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/repeatmasker:/out \
-           -e ASSEMBLY=Operophtera_brumata_Obru1.scaffolds.fa.gz \
-           -e NSLOTS=16 \
-           -e SPECIES=fly \
-           genomehubs/repeatmasker-dfam:19.05
+             -u $UID:$GROUPS \
+             --name Operophtera_brumata_Obru1-redmask \
+             -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/fasta/dna:/in \
+             -v ~/genomehubs/v1/download/data/Operophtera_brumata_Obru1/redmask:/out \
+             -e ASSEMBLY=Operophtera_brumata_Obru1.scaffolds.fa.gz \
+             genomehubs/redmask:19.05
 ```
 {% endmethod %}
-
-
 
 
 
