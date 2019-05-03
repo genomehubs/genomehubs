@@ -10,6 +10,8 @@ GenomeHubs supports importing the results of analyses such as InterProScan into 
 
 ## Blastp against SwissProt
 
+**_Hits to sequences in the SwissProt database can be imported into a GenomeHubs Ensembl database to provide functional annotation._**
+
 {% method %}
 Download and unzip the latest SwissProt database:
 
@@ -61,6 +63,8 @@ $ docker run --rm \
 
 
 ## Run InterProScan
+
+**_InterProScan provides functional domain annotations that can be displayed in a GenomeHubs Ensembl browser._**
 
 {% method %}
 Modify InterProScan configuration to suit your system:
@@ -188,6 +192,8 @@ $ docker run --rm \
 
 # Run CEGMA
 
+**_CEGMA is no longer supported and it's author suggests using BUSCO (see below) instead. But the tool still works and it provides an assessment of genome completeness against core eukaryotic genes that can be imported into a GenomeHubs Ensembl database._**
+
 {% method %}
 Run CEGMA:
 
@@ -207,6 +213,8 @@ $ docker run --rm \
 
 # Run BUSCO
 
+**_BUSCO is an actively maintained alternative to CEGMA using sets of single copy orthologues for various taxonomic groups identified in OrthoDB._**
+
 {% method %}
 Clone the GenomeHubs BUSCO Docker repository:
 
@@ -220,7 +228,7 @@ $ cd busco-docker
 
 
 {% method %}
-Fetch BUSCO lineages:
+Fetch BUSCO lineages - choose the lineage(s) most appropriate for the taxon you wish to analyse:
 
 {% common %}
 ```
