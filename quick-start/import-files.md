@@ -3,7 +3,7 @@
 {% method %}
 The results of common analyses can be imported into an Ensembl database to provide functional annotations. 
 
-Running the file export after this stage will add additional information to the exported FASTA headers and json files. Updating the index (with the `-i` flag) will index the descriptions imported from blastp, protein domains, etc.
+**_Running the file export after this stage will add additional information to the exported FASTA headers and json files. Updating the index (with the `-i` flag) will index the descriptions imported from blastp and interproscan results._**
 
 {% common %}
 ![](/assets/GenomeHubs import-2.png)
