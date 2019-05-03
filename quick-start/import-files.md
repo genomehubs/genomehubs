@@ -13,12 +13,11 @@ Running the file export after this stage will add additional information to the 
 {% method %}
 Run the import script:
 * `-b` will import blastp and InterProScan results
-* `-r` will import repeatmasker results
+* `-r` will import RepeatMasker results (omit this flag if you have used RepeatDetector in place of RepeatMasker as the results cannot be imported)
 * `-c` will import CEGMA and BUSCO results
 
 {% sample lang="e93" %}
 
-### N.B. This has not been fully tested following code update
 ```
 $ docker run --rm \
              -u $UID:$GROUPS \
