@@ -17,15 +17,15 @@ Add suggested search terms:
 
 {% sample lang="e93" %}
 ```
-$ nano ~/genomehubs/import/conf/operophtera_brumata_obru1_core_40_93_1.ini
+$ nano ~/genomehubs/v1/import/conf/operophtera_brumata_obru1_core_40_93_1.ini
 ```
 {% sample lang="e89" %}
 ```
-$ nano ~/genomehubs/import/conf/operophtera_brumata_obru1_core_36_89_1.ini
+$ nano ~/genomehubs/v1/import/conf/operophtera_brumata_obru1_core_36_89_1.ini
 ```
 {% sample lang="e85" %}
 ```
-$ nano ~/genomehubs/import/conf/operophtera_brumata_obru1_core_32_85_1.ini
+$ nano ~/genomehubs/v1/import/conf/operophtera_brumata_obru1_core_32_85_1.ini
 ```
 {% common %}
 ```
