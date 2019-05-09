@@ -11,8 +11,8 @@ Install `docker.io` and `git`:
 
 {% common %}
 ```
-sudo apt install -y docker.io git
-sudo usermod -aG docker $USER
+$ sudo apt install -y docker.io git
+$ sudo usermod -aG docker $USER
 ```
 {% endmethod %}
 
@@ -25,7 +25,7 @@ sudo usermod -aG docker $USER
 To allow container-container communication, set up a Docker network bridge (requires a fairly recent version of Docker)
 
 ```
-docker network create genomehubs-network
+$ docker network create genomehubs-network
 ```
 {% endmethod %}
 
@@ -40,7 +40,7 @@ Clone the example configuration files from the [genomehubs/template](https://git
 {% sample lang="e93" %}
 ```
 $ mkdir ~/genomehubs && cd ~/genomehubs
-$ git clone https://github.com/genomehubs/template -b 18.10 v1
+$ git clone https://github.com/genomehubs/template -b 19.05 v1
 ```
 {% sample lang="e89" %}
 ```
@@ -67,9 +67,11 @@ To test on a remote server without configuring an external domain name you can m
 $ nano ~/.ssh/config
 Host dockerserver
  HostName example.com
+ LocalForward 8880 127.0.0.1:8880
  LocalForward 8881 127.0.0.1:8881
  LocalForward 8882 127.0.0.1:8882
  LocalForward 8883 127.0.0.1:8883
+ LocalForward 8884 127.0.0.1:8884
  User username
 ```
 {% endmethod %}
