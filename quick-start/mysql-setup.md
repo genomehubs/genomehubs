@@ -49,8 +49,7 @@ Log in to MySQL inside the container to increase `max_allowed_packet` to allow i
 
 {% common %}
 ```
-$ docker exec -it genomehubs-mysql bash
-# mysql -u root -p
+$ docker exec -it genomehubs-mysql mysql -u root -p
 > set global max_allowed_packet=10000000000;
 > exit
 ```
