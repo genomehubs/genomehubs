@@ -18,7 +18,7 @@
 * [7. Update meta](/quick-start/update-meta.md)
 * [8. Start download site](/quick-start/downloads-site.md)
 * [9. Start BLAST server](/quick-start/blast-site.md)
-* [10. Start search container](/quick-start/create-search-container.md)
+* [10. Start search container](/quick-start/start-search-container.md)
 * [11. Edit Ensembl plugin](/quick-start/ensembl-plugin.md)
 * [12. Start Ensembl browser](/quick-start/ensembl-site.md)
 
