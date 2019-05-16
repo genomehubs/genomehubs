@@ -83,7 +83,7 @@ $ docker run -d \
              -v ~/genomehubs/v1/blast/conf:/conf:ro \
              -v ~/genomehubs/v1/blast/data:/dbs \
              -p 8883:4567 \
-             genomehubs/sequenceserver:18.10
+             genomehubs/sequenceserver:19.05
 ```
 
 {% endmethod %}
