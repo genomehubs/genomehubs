@@ -21,6 +21,8 @@ Edit `conf/ini-files/DEFAULTS.ini` to update urls, logos and styles:
 * ensure that the `ASSEMBLY_STATS_URL` path matches the version name of the directory mounted on the downloads server
 * update other logos and styles as required
 
+Edit the `SEARCH_HOST` variable in `htdocs/components/00_set_search_host.js`
+
 Add images for each species (if available) to `htdocs/i/species`:
 * name images to match the `SPECIES.URL` meta parameter
 * add a 64 pixel square image to the `64` subdirectory
