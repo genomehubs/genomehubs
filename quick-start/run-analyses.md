@@ -169,7 +169,7 @@ $ docker run --rm \
 {% endmethod %}
 
 
-### Run Repeat Detector using redmask
+## Run Repeat Detector using redmask
 
 **_This is provided as an alternative to RepeatMasker to generate a soft masked genome, but lacks repeat classification._**
 
@@ -192,7 +192,7 @@ $ docker run --rm \
 
 
 
-# Run CEGMA
+## Run CEGMA
 
 **_CEGMA is no longer supported and it's author suggests using BUSCO (see below) instead. But the tool still works and it provides an assessment of genome completeness against core eukaryotic genes that can be imported into a GenomeHubs Ensembl database._**
 
@@ -213,7 +213,7 @@ $ docker run --rm \
 ```
 {% endmethod %}
 
-# Run BUSCO
+## Run BUSCO
 
 **_BUSCO is an actively maintained alternative to CEGMA using sets of single copy orthologues for various taxonomic groups identified in OrthoDB._**
 
