@@ -66,6 +66,8 @@ $ docker run --rm \
 
 **_InterProScan provides functional domain annotations that can be displayed in a GenomeHubs Ensembl browser._**
 
+**_N.B. The InterProScan container has not been updated to the latest version, however result files should be compatible with all versions of GenomeHubs._**
+
 {% method %}
 Modify InterProScan configuration to suit your system:
 
@@ -111,7 +113,7 @@ $ docker run --rm \
 
 **_N.B. Running RepeatMasker with RepBase Libraries Requires a RepBase subscription. See below for an alternative repeat masking approach using Repeat Detector and redmask._**
 
-**_The latest version of RepeatMasker are compatible with the open source DFAM libraries, but DFAM currently has limited taxonomic scope and we are  yet to get this version running reliably in a docker container._**
+**_The latest version of RepeatMasker are compatible with the open source DFAM libraries, but DFAM currently has limited taxonomic scope and we are  yet to get this version running reliably in a docker container. Results from the version described below should be compatible with all versions of GenomeHubs._**
 
 
 {% method %}
