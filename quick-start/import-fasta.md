@@ -132,7 +132,7 @@ $ nano overwrite.ini
 ## Choose a name for your new assembly database
 
 {% method %}
-Each imported assembly must be stored in a uniquely named database. GenomeHubs follows the Ensembl naming conventions with the addition of an assembly name to allow alternate assemblies for a single species to be hosted in a single site. Database names should be all lower case with no special characters other than letters, numbers and underscores. A subspecies/strain can optionally be included. For Ensembl release 40/93 (which is currently the version supported by GenomeHubs) the database name for _Operophtera brumata_ assembly Obru1 would be:
+Each imported assembly must be stored in a uniquely named database. GenomeHubs follows the Ensembl naming conventions with the addition of an assembly name to allow alternate assemblies for a single species to be hosted in a single site. Database names should be all lower case with no special characters other than letters and numbers. Components of the database name should be separated by underscores. For Ensembl release 40/93 (which is currently the version supported by GenomeHubs) the database name for _Operophtera brumata_ assembly Obru1 would be:
 
 {% sample lang="e93" %}
 ```
@@ -150,6 +150,13 @@ operophtera_brumata_obru1_core_32_85_1
 ```
 
 {% endmethod %}
+
+* The first two words should match the genus and species name being imported
+* It is useful to include an assembly name that will be unique across all species in a given GenomeHub, e.g. `obru1` rather than `v1`
+* A subspecies/strain name can optionally be included before the assembly name
+* The word core must be present to denote the type of database
+* The first two numbers must match the Ensembl Genomes and Ensembl version
+* The final number can be used to denote the genebuild version, typically this should be '1'
 
 
 ## Set assembly metadata
