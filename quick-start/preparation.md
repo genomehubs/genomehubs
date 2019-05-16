@@ -119,6 +119,13 @@ $HTTP["host"] =~ "blast.example.com"{
     "fix-redirects" => 1
   )))
 }
+$HTTP["host"] =~ "search.example.com"{
+  proxy.server = ("" => ("" => (
+    "host" => "127.0.0.1",
+    "port" => "8884",
+    "fix-redirects" => 1
+  )))
+}
 
 $ sudo service lighttpd restart
 ```
