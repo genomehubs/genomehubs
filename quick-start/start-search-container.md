@@ -3,8 +3,6 @@
 {% method %}
 Starting with version 19.05 which runs Ensembl release 93, it is necessary to start an additional container to run searches against the Ensembl database.
 
-This container must be named `genomehubs-search` and be made available on the same docker network as the `genomehubs-ensembl` container for the search configuration to work.
-
 We anticipate adding functionality to search across additional GenomeHubs resources in future releases.
 
 {% sample lang="e93" %}
@@ -56,4 +54,12 @@ $ docker run -d \
              -p 8884:8080 \
              genomehubs/search:19.05
 ```
+
+## Troubleshooting
+
+- Earlier `19.05` container versions contained a search bug, if you are having trouble with search please pull the updated `easy-mirror` and `search` container images:
+  - `docker pull genomehubs/easy-mirror:19.05`
+  - `docker pull genomehubs/search:19.05`
+- This container must be named `genomehubs-search` and be made available on the same docker network as the `genomehubs-ensembl` container for the search configuration to work.
+
 
