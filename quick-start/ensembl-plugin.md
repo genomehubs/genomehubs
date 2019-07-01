@@ -24,7 +24,7 @@ Edit `conf/ini-files/DEFAULTS.ini` to update urls, logos and styles:
 Add images for each species (if available) to `htdocs/i/species`:
 * name images to match the `SPECIES.URL` meta parameter
 * add a 96 pixel square image to the `96` subdirectory
-* add a 96 pixel square image to the `64` subdirectory
+* add a 64 pixel square image to the `64` subdirectory
 * add a 48 pixel square image to the `48` subdirectory
 
 
