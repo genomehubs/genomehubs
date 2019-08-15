@@ -9,6 +9,10 @@ Create a config file with the same name as your Compara database in the `import/
 
 {% common %}
 ```
+nano ~/genomehubs/v1/import/conf/mealybug-compara_40_93.ini
+```
+
+```
 [ENSEMBL]
         LOCAL = /ensembl
 [DATABASE_COMPARA]
