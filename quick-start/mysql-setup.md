@@ -1,12 +1,12 @@
 # Setup MySQL database server
 
 {% method %}
-Each assembly in an Ensembl site is stored in a separate MySQL database. GenomeHubs sites host these databases in a MySQL Docker container. 
+Each assembly in an Ensembl site is stored in a separate MySQL database. GenomeHubs sites host these databases in a MySQL Docker container.
 
 The EasyMirror container is used to configure users and password in the MySQL container and to mirror Ensembl databases from SQL dumps on the [Ensembl](ftp://ftp.ensembl.org/pub)/[EnsemblGenomes](ftp://ftp.ensemblgenomes.org/pub) ftp sites, making local copies ready to be hosted alongside newly imported data in a GenomeHubs site.
 
 {% common %}
-#![](/assets/GenomeHubs MySQL.png) 
+#![](/assets/GenomeHubs MySQL.png)
 {% endmethod %}
 
 
@@ -27,7 +27,7 @@ $ mkdir -p ~/genomehubs/mysql/data
 Create a MySQL Docker container to host the Ensembl Databases for your GenomeHub:
 
 * See [hub.docker.com](https://hub.docker.com/r/mysql/mysql-server/) for more information on the MySQL Docker image.
-* Docker sets up a default network bridge, but to 
+* Docker sets up a default network bridge, but to
  simplify connections between containers by using names rather than IP addresses, it is necessary to connect containers to the same named network bridge using `--network genomehubs-network`.
 * `MYSQL_ROOT_HOST='172.16.0.0/255.240.0.0'` will allow all other Docker containers on the same machine to connect to the mysql container as root, even if they are on a different Docker network. This is the simplest configuration as it does not matter which of the available subnets the Docker network has been created on, or which IP addresses are assigned to each of the containers. For more security you may wish to check the subnet of your bridge network and/or restrict access to the IP addresses of specific containers.
 
@@ -50,7 +50,7 @@ Log in to MySQL inside the container to increase `max_allowed_packet` to allow i
 {% common %}
 ```
 $ docker exec -it genomehubs-mysql mysql -u root -p
-> set global max_allowed_packet=10000000000;
+> set global max_allowed_packet=1073741824;
 > exit
 ```
 {% endmethod %}
@@ -109,7 +109,7 @@ $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 [DATA_SOURCE]
   SPECIES_DB_URL = ftp://ftp.ensemblgenomes.org/pub/release-36/metazoa/mysql/
   SPECIES_DBS = [ melitaea_cinxia_core_36_89_1 ]
-  
+
   MISC_DB_URL = ftp://ftp.ensembl.org/pub/release-89/mysql/
   MISC_DBS = [ ensembl_accounts ]
 ```
@@ -173,5 +173,3 @@ $ docker run --rm \
 ```
 
 {% endmethod %}
-
-
