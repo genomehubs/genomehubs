@@ -150,3 +150,28 @@ docker run --rm \
 ```
 
 {% endmethod %}
+
+
+{% method %}
+
+To load the Compara analyses into your Ensembl site, add your database name to the Ensembl `setup.ini` file then remove and restart your Ensembl container.
+
+{% common %}
+```
+nano ~/genomehubs/v1/ensembl/conf/setup.ini
+
+...
+COMPARA_DBS = [ mealybug_compara_40_93 ensembl_compara_metazoa_40_93 ]
+
+docker rm -f genomehubs-ensembl
+
+docker run -d \
+             --name genomehubs-ensembl \
+             -v ~/genomehubs/v1/ensembl/conf:/conf:ro \
+             --network genomehubs-network \
+             -p 8881:8080 \
+             genomehubs/easy-mirror:19.05
+
+```
+
+{% endmethod %}
