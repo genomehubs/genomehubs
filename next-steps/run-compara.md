@@ -141,6 +141,7 @@ The remaining steps can all be run in a single step using the `genomehubs/compar
 docker run --rm \
            -u $UID:$GROUPS \
            --name compara-import \
+           --network genomehubs-network
            -v ~/genomehubs/v1/import/conf:/import/conf \
            -v ~/genomehubs/v1/import/data:/import/data \
            -e FLAGS="-e -o -m -s -i" \
