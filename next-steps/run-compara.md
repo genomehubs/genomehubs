@@ -2,8 +2,6 @@
 
 A powerful Ensembl feature supported by GenomeHubs is the ability to incorporate orthology information in the Compara database schema, which can be displayed in gene trees on the web site. GenomeHubs does not use the Ensembl Compara pipeline but provides an analysis containers and import scripts to populate a Compara database using an [OrthoFinder](https://github.com/davidemms/OrthoFinder)-based approach.
 
-**_The configuration has not yet been fully tested so following the formatting of the examples below as closely as possible is recommended. It is intended to support more flexibility when running OrthoFinder, but currently only the described methods have been tested._**
-
 {% method %}
 Create a config file with the same name as your Compara database in the `import/conf` directory. This will have the form `sitename_compara_40_93.ini`. The examples below are based on [mealybug.org](https://ensembl.mealybug.org) so substitute `mealybug` for your site name. The initial sections in this file are similar to the assembly config files described elsewhere:
 
