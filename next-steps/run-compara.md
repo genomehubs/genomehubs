@@ -129,7 +129,7 @@ A number of fields need to be defined in the `[METHOD_LINK]` section. This proba
 
 {% method %}
 
-The remaining steps can all be run in a single step using the `genomehubs/compara` container, however it may be useful to run the individual steps separately to debug any problems wioth the configuration. The steps to run are controlled by the `FLAGS`:
+The remaining steps can all be run in a single step using the `genomehubs/compara` container, however it may be useful to run the individual steps separately to debug any problems with the configuration. The steps to run are controlled by the `FLAGS`:
 - `-e` - Export sequence files from the core databases listed in the `[TAXA]` section. Three files are written for each assembly, representing a single, canonical transcript per gene in files of protein sequence, protein sequence showing exon boundaries and CDS sequence.
 - `-o` - Run OrthoFinder. The command to OrthoFinder is of the form `orthofinder -f $FASTA_DIR -M msa -S diamond -A mafft_and_trim -T raxml-ng -o $ORTHOFINDER_DIR -n $VERSION -t $THREADS`. `$VERSION` is determined based on the version number at the end of the `ORTHOFINDER_DIR` parameter. The handler scripts are not yet sophisticated to allow OrthoFinder to be resumed so the analysis needs to be run in a single step.
 - `-m` - Make orthogroup files. Processes the OrthoFinder output to generate a set of files per orthogroup fready for import into the Compara database.
@@ -149,6 +149,81 @@ docker run --rm \
            -e THREADS=16 \
            genomehubs/compara:19.05
 ```
+
+{% endmethod %}
+
+
+{% method %}
+
+Orthofinder can be configured further by setting environment variables to determine the similarity search (`SEARCH`), multiple sequence alignment (`ALIGN`) and tree reconstruction (`TREE`) options to use.
+
+{% common %}
+running with default settings is equivalent to specifying
+```
+  -e SEARCH=diamond
+  -e ALIGN=mafft_and_trim
+  -e TREE=fasttree
+```
+
+{% common %}
+alternate options can be selected from the default `config.json` file:
+```
+{
+
+    "muscle":{
+      "program_type": "msa",
+      "cmd_line": "muscle -in INPUT -out OUTPUT"
+    },
+
+    "raxml":{
+      "program_type": "tree",
+      "cmd_line": "raxmlHPC-AVX -m PROTGAMMALG -p 12345 -s INPUT -n IDENTIFIER -w PATH > /dev/null",
+      "ouput_filename": "PATH/RAxML_bestTree.IDENTIFIER"
+    },
+
+    "raxml-ng":{
+      "program_type": "tree",
+      "cmd_line": "raxml-ng --msa INPUT --model LG+G4 --seed 12345 --threads 1 --blopt nr_safe",
+      "ouput_filename": "INPUT.raxml.bestTree"
+    },
+
+    "iqtree":{
+      "program_type": "tree",
+      "cmd_line": "iqtree -s INPUT -pre PATH/IDENTIFIER > /dev/null",
+      "ouput_filename": "PATH/IDENTIFIER.treefile"
+    },
+
+    "fasttree_lg_gamma":{
+      "program_type": "tree",
+      "cmd_line": "fasttree -lg -gamma < INPUT > OUTPUT"
+    },
+
+    "diamond":{
+      "program_type": "search",
+      "db_cmd": "diamond makedb --in INPUT -d OUTPUT",
+      "search_cmd": "diamond blastp -d DATABASE -q INPUT -o OUTPUT --more-sensitive -p 1 --quiet -e 0.001 --compress 1"
+    },
+
+    "blast_gz":{
+      "program_type": "search",
+      "db_cmd": "makeblastdb -dbtype prot -in INPUT -out OUTPUT",
+      "search_cmd": "blastp -outfmt 6 -evalue 0.001 -query INPUT -db DATABASE | gzip > OUTPUT.gz"
+    },
+
+    "mmseqs":{
+      "program_type": "search",
+      "db_cmd": "mmseqs createdb INPUT OUTPUT.fa ; mmseqs createindex OUTPUT.fa /tmp",
+      "search_cmd": "mmseqs search PATH/mmseqsDBBASENAME DATABASE.fa OUTPUT.db /tmp/tmpBASEOUTNAME  --threads 1 ; mmseqs convertalis PATH/mmseqsDBBASENAME DATABASE.fa OUTPUT.db OUTPUT"
+    },
+
+    "mafft_and_trim":{
+       "program_type": "msa",
+       "cmd_line": "mafft --auto --anysymbol INPUT > /import/data/tmp/BASENAME_pre_trim 2> /dev/null; trimal -in /import/data/tmp/BASENAME_pre_trim -out OUTPUT -gappyout "
+    }
+
+}
+```
+
 
 {% endmethod %}
 
