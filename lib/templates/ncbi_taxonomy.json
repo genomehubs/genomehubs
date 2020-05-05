@@ -1,0 +1,54 @@
+{
+  "index_patterns": ["ncbi-taxonomy"],
+  "mappings": {
+    "properties": {
+      "taxid": {
+        "type": "keyword",
+        "ignore_above": 9,
+        "meta": { "description": "NCBI taxonomy taxid" }
+      },
+      "parent": {
+        "type": "keyword",
+        "ignore_above": 9,
+        "meta": { "description": "NCBI taxonomy taxid of parent taxon" }
+      },
+      "scientific_name": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "meta": { "description": "Scientific name" }
+      },
+      "unique_name": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "meta": { "description": "Unique version of scientific name" }
+      },
+      "rank": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "meta": { "description": "Taxonomic rank" }
+      },
+      "names": {
+        "type": "nested",
+        "properties": {
+          "name": { "type": "text",
+                    "meta": { "description": "Taxon name" } },
+          "unique": { "type": "text",
+                      "meta": { "description": "Unique version of taxon name" } },
+          "class": { "type": "text",
+                     "meta": { "description": "Name class (e.g. common name, synonym, etc.)" } }
+        }
+      },
+      "lineage": {
+        "type": "nested",
+        "properties": {
+          "taxid": { "type": "text",
+                     "meta": { "description": "NCBI taxonomy taxid of ancestral taxon" } },
+          "rank": { "type": "text",
+                    "meta": { "description": "Ancestral rank" } },
+          "scientific_name": { "type": "text",
+                               "meta": { "description": "Scientific name" } }
+        }
+      }
+    }
+  }
+}

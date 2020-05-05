@@ -1,0 +1,64 @@
+{
+  "index_patterns": ["interproscan-*"],
+  "version": 1,
+  "mappings": {
+    "properties": {
+      "query_seqid": {
+        "type": "keyword",
+        "ignore_above": 64
+      },
+      "md5": {
+        "type": "keyword",
+        "index": false
+      },
+      "query_length": {
+        "type": "integer",
+        "index": false
+      },
+      "analysis_name": {
+        "type": "keyword",
+        "ignore_above": 32
+      },
+      "subject_accession": {
+        "type": "keyword",
+        "ignore_above": 64
+      },
+      "subject_description": {
+        "type": "text",
+        "index": false
+      },
+      "query_start": {
+        "type": "integer"
+      },
+      "query_end": {
+        "type": "integer"
+      },
+      "score": {
+        "type": "float"
+      },
+      "status": {
+        "type": "keyword",
+        "index": false
+      },
+      "analysis_date": {
+        "type":   "keyword",
+        "index": false
+      },
+      "interpro_accession": {
+        "type": "keyword",
+        "ignore_above": 16
+      },
+      "interpro_description": {
+        "type": "text",
+        "index": false
+      },
+      "go_terms": {
+        "type": "nested",
+        "properties": {
+          "accession": { "type": "keyword",
+                         "ignore_above": 16 }
+        }
+      }
+    }
+  }
+}

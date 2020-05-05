@@ -1,0 +1,171 @@
+{
+  "index_patterns": ["btk-metadata"],
+  "version": 1,
+  "mappings": {
+    "properties": {
+      "dataset_id": {
+        "type": "keyword",
+        "ignore_above": 32
+      },
+      "assembly_name": {
+        "type": "keyword",
+        "ignore_above": 32
+      },
+      "gca_accession": {
+        "type": "keyword",
+        "ignore_above": 32
+      },
+      "alias": {
+        "type": "keyword",
+        "ignore_above": 64
+      },
+      "bioproject": {
+        "type": "keyword",
+        "ignore_above": 32
+      },
+      "biosample": {
+        "type": "keyword",
+        "ignore_above": 32
+      },
+      "assembly_level": {
+        "type": "keyword",
+        "ignore_above": 16
+      },
+      "assembly_prefix": {
+        "type": "keyword",
+        "ignore_above": 32
+      },
+      "scaffold_count": {
+        "type": "integer"
+      },
+      "span": {
+        "type": "long"
+      },
+      "taxid": {
+        "type": "integer"
+      },
+      "taxon_name": {
+        "type": "keyword",
+        "ignore_above": 128
+      },
+      "species": {
+        "type": "keyword",
+        "ignore_above": 128
+      },
+      "genus": {
+        "type": "keyword",
+        "ignore_above": 32
+      },
+      "family": {
+        "type": "keyword",
+        "ignore_above": 32
+      },
+      "order": {
+        "type": "keyword",
+        "ignore_above": 32
+      },
+      "class": {
+        "type": "keyword",
+        "ignore_above": 32
+      },
+      "phylum": {
+        "type": "keyword",
+        "ignore_above": 32
+      },
+      "kingdom": {
+        "type": "keyword",
+        "ignore_above": 32
+      },
+      "superkingdom": {
+        "type": "keyword",
+        "ignore_above": 32
+      },
+      "version": {
+        "type": "byte"
+      },
+      "revision": {
+        "type": "byte"
+      },
+      "read_stats": {
+        "type": "nested"
+      },
+      "target_name": {
+        "type": "keyword",
+        "ignore_above": 64
+      },
+      "target_rank": {
+        "type": "keyword",
+        "ignore_above": 64
+      },
+      "lineage": {
+        "type": "text"
+      },
+      "n50": {
+        "type": "integer"
+      },
+      "l50": {
+        "type": "integer"
+      },
+      "n90": {
+        "type": "integer"
+      },
+      "l90": {
+        "type": "integer"
+      },
+      "target_hit_proportion": {
+        "type": "half_float"
+      },
+      "no_hit_proportion": {
+        "type": "half_float"
+      },
+      "gc_proportion": {
+        "type": "half_float"
+      },
+      "n_proportion": {
+        "type": "half_float"
+      },
+      "mean_gc": {
+        "type": "half_float"
+      },
+      "median_gc": {
+        "type": "half_float"
+      },
+      "lower_gc": {
+        "type": "half_float"
+      },
+      "upper_gc": {
+        "type": "half_float"
+      },
+      "min_gc": {
+        "type": "half_float"
+      },
+      "max_gc": {
+        "type": "half_float"
+      },
+      "mean_cov": {
+        "type": "half_float"
+      },
+      "median_cov": {
+        "type": "half_float"
+      },
+      "lower_cov": {
+        "type": "half_float"
+      },
+      "upper_cov": {
+        "type": "half_float"
+      },
+      "min_cov": {
+        "type": "half_float"
+      },
+      "max_cov": {
+        "type": "half_float"
+      },
+      "hits": {
+        "type": "nested"
+      },
+      "busco": {
+        "type": "nested"
+      }
+    }
+  }
+}

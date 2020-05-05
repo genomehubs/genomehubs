@@ -1,0 +1,21 @@
+language: python
+python:
+  - "3.6"
+install:
+  - pip install -r requirements.txt
+  - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
+  - mkdir bin && tar -xzf geckodriver-v0.24.0-linux64.tar.gz -C bin
+  - export PATH=$(pwd)/bin:$PATH
+script:
+  - "pylint --version
+     pylint --rcfile=.pylintrc lib -f parseable -r n && \
+     pycodestyle lib --max-line-length=120 && \
+     pydocstyle lib && \
+     pylint --rcfile=.pylintrc_tests tests/unit_tests/* -f parseable -r n && \
+     pycodestyle tests/unit_tests/* --max-line-length=120 && \
+     py.test --cov-config .coveragerc --doctest-modules --cov=lib --cov-report term-missing"
+branches:
+  only:
+    - master
+after_success:
+  - coveralls

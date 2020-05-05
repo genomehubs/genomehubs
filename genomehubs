@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+
+"""
+GenomeHubs 2.0 - searchable genome repositories.
+
+usage: genomehubs [<command>] [<args>...] [-h|--help] [--version]
+
+commands:
+    index           index a file
+    init            initialise a new genomehub
+    launch          launch a web service
+    remove          remove one or more indices from a genomehub
+    run             run an analysis
+    search          search indexed files
+    -h, --help      show this
+    -v, --version   show version number
+See 'genomehubs <command> --help' for more information on a specific command.
+
+examples:
+    # 1. Run InterProScan on an assembly FASTA file:
+    ./genomehubs run --interproscan --dir /path/to/ASSEMBLY_DIR
+"""
+
+import os
+import signal
+from subprocess import Popen
+
+from docopt import docopt
+
+__version__ = "genomehubs v2.0"
+
+MAINDIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ''))
+LIBDIR = os.path.abspath(os.path.join(MAINDIR, 'lib/'))
+
+if __name__ == '__main__':
+    ARGS = docopt(__doc__,
+                  version=__version__,
+                  options_first=True)
+    ARGV = [ARGS['<command>']] + ARGS['<args>']
+    if ARGS['<command>'] == 'index':
+        PROC = Popen([LIBDIR + '/index.py'] + ARGV)
+    elif ARGS['<command>'] == 'init':
+        PROC = Popen([LIBDIR + '/init.py'] + ARGV)
+    elif ARGS['<command>'] == 'launch':
+        PROC = Popen([LIBDIR + '/launch.py'] + ARGV)
+    elif ARGS['<command>'] == 'remove':
+        PROC = Popen([LIBDIR + '/remove.py'] + ARGV)
+    elif ARGS['<command>'] == 'run':
+        PROC = Popen([LIBDIR + '/run.py'] + ARGV)
+    elif ARGS['<command>'] == 'search':
+        PROC = Popen([LIBDIR + '/search.py'] + ARGV)
+    else:
+        PROC = Popen([os.path.join(MAINDIR, './genomehubs'), '-h'])
+
+    try:
+        PROC.wait()
+    except KeyboardInterrupt:
+        PROC.send_signal(signal.SIGINT)

@@ -1,0 +1,148 @@
+{
+  "index_patterns": ["gff3-*"],
+  "version": 1,
+  "mappings": {
+    "properties": {
+      "assembly_name": {
+        "type": "keyword",
+        "ignore_above": 64
+      },
+      "query_seqid": {
+        "type": "keyword",
+        "ignore_above": 64
+      },
+      "source_tag": {
+        "type": "keyword",
+        "index": false
+      },
+      "query_start": {
+        "type": "integer"
+      },
+      "query_end": {
+        "type": "integer"
+      },
+      "length": {
+        "type": "integer"
+      },
+      "score": {
+        "type": "half_float"
+      },
+      "strand": {
+        "type": "keyword",
+        "ignore_above": 1
+      },
+      "gene_id": {
+        "type": "keyword",
+        "ignore_above": 64
+      },
+      "attributes": {
+        "type": "nested",
+        "properties": {
+          "key": { "type": "keyword",
+                   "ignore_above": 24 },
+          "value": { "type": "keyword",
+                     "ignore_above": 256 }
+        }
+      },
+      "transcripts": {
+        "type": "nested",
+        "properties": {
+          "primary_tag": { "type": "keyword",
+                           "ignore_above": 24 },
+          "query_start": { "type": "integer" },
+          "query_end": { "type": "integer" },
+          "score": { "type": "float" },
+          "length": { "type": "integer" },
+          "exon_length": { "type": "integer" },
+          "intron_length": { "type": "integer" },
+          "exon_count": { "type": "short" },
+          "cds_length": { "type": "integer" },
+          "canonical": { "type": "keyword",
+                        "ignore_above": 1 },
+          "transcript_id": {
+            "type": "keyword",
+            "ignore_above": 64
+          },
+          "translation_id": {
+            "type": "keyword",
+            "ignore_above": 64
+          },
+          "cds_id":{
+            "type": "keyword",
+            "ignore_above": 64
+          },
+          "attributes": {
+            "type": "nested",
+            "properties": {
+              "key": { "type": "keyword",
+                       "ignore_above": 24 },
+              "value": { "type": "keyword",
+                         "ignore_above": 256 }
+            }
+          },
+          "cds": {
+            "type": "nested",
+            "properties": {
+              "query_start": { "type": "integer" },
+              "query_end": { "type": "integer" },
+              "length": { "type": "integer" },
+              "frame": { "type": "byte" }
+            }
+          },
+          "exons": {
+            "type": "nested",
+            "properties": {
+              "exon_id": { "type": "keyword",
+                           "ignore_above": 64 },
+              "query_start": { "type": "integer" },
+              "query_end": { "type": "integer" },
+              "length": { "type": "integer" },
+              "index": { "type": "byte" },
+              "attributes": {
+                "type": "nested",
+                "properties": {
+                  "key": { "type": "keyword",
+                           "ignore_above": 24 },
+                  "value": { "type": "keyword",
+                             "ignore_above": 256 }
+                }
+              }
+            }
+          },
+          "introns": {
+            "type": "nested",
+            "properties": {
+              "intron_id": { "type": "keyword",
+                           "ignore_above": 64 },
+              "query_start": { "type": "integer" },
+              "query_end": { "type": "integer" },
+              "length": { "type": "integer" },
+              "index": { "type": "byte" }
+            }
+          },
+          "utr": {
+            "type": "nested",
+            "properties": {
+              "primary_tag": { "type": "keyword",
+                               "ignore_above": 24 },
+              "utr_id": { "type": "keyword",
+                          "ignore_above": 64 },
+              "query_start": { "type": "integer" },
+              "query_end": { "type": "integer" },
+              "length": { "type": "integer" },
+              "attributes": {
+                "type": "nested",
+                "properties": {
+                  "key": { "type": "keyword",
+                           "ignore_above": 24 },
+                  "value": { "type": "keyword",
+                             "ignore_above": 256 }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
