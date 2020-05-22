@@ -19,3 +19,8 @@ config/config.yaml
 __pycache__
 
 notes.md
+.gitignore
+__*
+
+gff3
+new_taxdump

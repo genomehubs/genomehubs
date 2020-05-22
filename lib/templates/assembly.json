@@ -1,0 +1,150 @@
+{
+  "index_patterns": ["assembly-*"],
+  "version": 1,
+  "mappings": {
+    "properties": {
+      "assembly_id": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Internal assembly identifier" }
+      },
+      "status": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Assembly status (draft, reference, deprecated)" }
+      },
+      "center_name": {
+        "type": "keyword",
+        "ignore_above": 128,
+        "meta": { "description": "Sequencing center name" }
+      },
+      "title": {
+        "type": "keyword",
+        "ignore_above": 128,
+        "meta": { "description": "Assembly title" }
+      },
+      "description": {
+        "type": "text",
+        "meta": { "description": "Assembly description" }
+      },
+      "identifiers": {
+        "type": "nested",
+        "properties": {
+          "id_type": { "type": "keyword",
+                       "ignore_above": 16,
+                       "meta": { "description": "Identifier type (GCA, WGS, bioproject, ...)" }
+          },
+          "identifier": { "type": "keyword",
+                          "ignore_above": 32,
+                          "meta": { "description": "Assembly identifier" }
+          }
+        }
+      },
+      "taxid": {
+        "type": "keyword",
+        "ignore_above": 9,
+        "meta": { "description": "NCBI taxonomy taxid" }
+      },
+      "scientific_name": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "meta": { "description": "Scientific name" }
+      },
+      "unique_name": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "meta": { "description": "Unique version of scientific name" }
+      },
+      "rank": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "meta": { "description": "Taxonomic rank" }
+      },
+      "taxon_names": {
+        "type": "nested",
+        "properties": {
+          "name": { "type": "text",
+                    "meta": { "description": "Taxon name" } },
+          "unique": { "type": "text",
+                      "meta": { "description": "Unique version of taxon name" } },
+          "class": { "type": "text",
+                     "meta": { "description": "Name class (e.g. common name, synonym, etc.)" } }
+        }
+      },
+      "lineage": {
+        "type": "nested",
+        "properties": {
+          "taxid": { "type": "text",
+                     "meta": { "description": "NCBI taxonomy taxid of ancestral taxon" } },
+          "rank": { "type": "text",
+                    "meta": { "description": "Ancestral rank" } },
+          "scientific_name": { "type": "text",
+                               "meta": { "description": "Scientific name" } }
+        }
+      },
+      "assembly_level": {
+        "type": "keyword",
+        "ignore_above": 16,
+        "meta": { "description": "Top assembly level (chromosome, scaffold, contig)" }
+      },
+      "statistics": {
+        "type": "nested",
+        "properties": {
+          "level": { "type": "keyword",
+                     "ignore_above": 16,
+                     "meta": { "description": "Assembly level (chromosome, scaffold, contig)" } },
+          "top_level": { "type": "keyword",
+                         "ignore_above": 1,
+                         "meta": { "description": "Treat as highest assembly level" } },
+          "n50": { "type": "integer",
+                   "meta": { "description": "N50 length" } },
+          "l50": { "type": "integer",
+                   "meta": { "description": "L50 count" } },
+          "n90": { "type": "integer",
+                   "meta": { "description": "N90 length" } },
+          "l90": { "type": "integer",
+                   "meta": { "description": "L90 count" } },
+          "gc_proportion": { "type": "half_float",
+                             "meta": { "description": "Proportion of GC bases (excluding Ns)" } },
+          "n_proportion": { "type": "half_float",
+                            "meta": { "description": "Proportion of Ns" } },
+          "mean_length": {"type": "float",
+                          "meta": { "description": "Mean length of sequences in assembly" } },
+          "median_length": {"type": "float",
+                            "meta": { "description": "Median length of sequences in assembly" } },
+          "max_length": {"type": "integer",
+                         "meta": { "description": "Length of longest sequence in assembly" } },
+          "min_length": {"type": "integer",
+                         "meta": { "description": "Length of shortest sequence in assembly" } },
+          "span": { "type": "long",
+                    "meta": { "description": "Total assembly span" } },
+          "count": { "type": "integer",
+                     "meta": { "description": "Total number of sequences in assembly" } }
+        }
+      },
+      "attributes": {
+        "type": "nested",
+        "properties": {
+          "key": { "type": "keyword",
+                   "ignore_above": 32 },
+          "value": { "type": "keyword",
+                     "ignore_above": 256 }
+        }
+      },
+      "analyses": {
+        "type": "nested",
+        "properties": {
+          "index_type": { "type": "keyword",
+                          "ignore_above": 32 },
+          "index": { "type": "keyword",
+                     "ignore_above": 128 },
+          "analysis_type": { "type": "keyword",
+                             "ignore_above": 32 },
+          "record_count": { "type": "integer"},
+          "description": { "type": "text" },
+          "timestamp": { "type": "date" },
+        }
+      }
+    }
+  }
+}

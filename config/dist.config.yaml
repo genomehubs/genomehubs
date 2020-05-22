@@ -1,7 +1,20 @@
 common:
+  directory: ~/genomehubs/demo
+  docker-network: genomehubs-network
   es-host: localhost
-  es-port: 9200
+  es-port: 9201
+  taxdump: ~/genomehubs/demo/taxdump
+  taxonomy-root: 7088
   version: v0.1
 index:
+  insdc-page-size: 1000
+  insdc-genome-representation: full
   skip-validation: false
+init:
+  es-container: genomehubs-elasticsearc
+  es-image: elasticsearch/elasticsearch-oss:7.6.2
+  es-repository: docker.elastic.co
+  es-startup-timeout: 30
+  taxdump-url: ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz
+  use-docker: true
 search: {}

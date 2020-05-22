@@ -32,21 +32,36 @@ def get_es_logger(debug=False):
     return logging.getLogger('elasticsearch')
 
 
-def test_connection(options):
+class DisableLogger():
+    """Logger context management."""
+
+    def __enter__(self):
+        logging.disable(logging.CRITICAL)
+
+    def __exit__(self, a, b, c):
+        logging.disable(logging.NOTSET)
+
+
+def test_connection(options, _continue=False):
     """Test connection to Elasticsearch."""
     connected = False
-    try:
-        es = Elasticsearch(hosts=[{'host': options['es-host'], 'port': options['es-port']}])
-        connected = es.info()
-    except Exception:  # pylint: disable=broad-except
-        pass
+    with DisableLogger():
+        try:
+            es = Elasticsearch(hosts=[{'host': options['es-host'], 'port': options['es-port']}])
+            connected = es.info()
+        except Exception:  # pylint: disable=broad-except
+            pass
     if not connected:
-        logger = get_es_logger()
-        logger.setLevel(logging.ERROR)
-        logger.error('Could not connect to Elasticsearch')
-        sys.exit(1)
-    logger = gh_logger.logger()
-    logger.info('Connected to Elasticsearch')
+        message = "Could not connect to Elasticsearch at '%s:%s'" % (options['es-host'], str(options['es-port']))
+        if not _continue:
+            logger = get_es_logger()
+            logger.setLevel(logging.ERROR)
+            logger.error(message)
+            sys.exit(1)
+        return False
+    if not _continue:
+        logger = gh_logger.logger()
+        logger.info('Connected to Elasticsearch')
     return es
 
 
@@ -108,21 +123,62 @@ def base_query(filters=None):
     return {'query': {'bool': {'filter': filters}}}
 
 
+def base_or(filter_list):
+    """Return basic OR query structure."""
+    filters = []
+    for obj in filter_list:
+        filters.append(base_query(obj['filters']))
+    return {'query': {'bool': {'should': filters}}}
+
+
 def nested_query(query_path, filters=None):
     """Return nested query structure."""
     return {'nested': {'path': query_path, **base_query(filters)}}
 
 
-def and_join(query_a, query_b):
+def nested_or(filter_list, _and_list=None):
+    """Return nested OR query structure."""
+    filters = []
+    for obj in filter_list:
+        if 'path' in obj:
+            query = nested_query(obj['path'], obj['filters'])
+            if _and_list:
+                query = base_query([query] + _and_list)
+                query = query['query']
+            filters.append(query)
+        else:
+            if _and_list:
+                query = base_query(obj['filters'] + _and_list)
+                query = query['query']
+                filters.append(query)
+            else:
+                filters += obj['filters']
+    return {'query': {'bool': {'should': filters}}}
+
+
+def and_join(query_a, query_b, shared):
     """Combine query terms with Boolean AND."""
-    print(query_a)
-    print(query_b)
+    query_a['query']['query']['bool']['filter'] += query_b['query']['query']['bool']['filter']
+    query_a['indices'] = shared
+    query_a['terms'] += query_b['terms']
 
 
-def or_join(query_a, query_b):
+def or_join(query_a, query_b, shared):
     """Combine query terms with Boolean OR."""
     print('should')
     print('minimum_should_match')
+
+
+def join_queries(full_term, existing_query, indices, query, join_func):
+    """Test for overlapping indices then join queries."""
+    logger = gh_logger.logger()
+    shared = existing_query['indices'].intersection(indices)
+    if not shared:
+        logger.error("Query '%s' is not compatible with '%s'",
+                     full_term,
+                     ', '.join(existing_query['terms']))
+        sys.exit(1)
+    join_func(existing_query, query, shared)
 
 
 def get_mapping(type_list):
@@ -142,9 +198,13 @@ def seq_pos_query(match, type_list, outer_filters=None):
     query_start = int(match[1])
     terms = set()
     if match[2]:
-        query_end = int(match[2])
+        if match[2] == '-':
+            query_end = 2147483647
+        else:
+            query_end = -int(match[2])
     else:
         query_end = query_start
+    print(query_end)
     outer_filters += [{'term': {'query_seqid': query_seqid}}]
     terms.add('query_seqid')
     if type_list:
@@ -161,6 +221,11 @@ def seq_pos_query(match, type_list, outer_filters=None):
             terms.add("%s.query_end" % query_path)
             inner_query = nested_query(query_path, inner_filters)
             outer_filters.append(inner_query)
+    else:
+        outer_filters += [{'range': {'query_start': {'lte': query_end}}},
+                          {'range': {'query_end': {'gte': query_start}}}]
+        terms.add('query_start')
+        terms.add('query_end')
     return base_query(outer_filters), terms
 
 
@@ -238,18 +303,75 @@ def list_allowed_indices(terms, paths, indices=None):
             indices = indices.intersection(paths[term])
     return indices
 
+def split_boolean_query(qqid, term):
+    """Split boolean queries into separate terms."""
+    if re.match(r'\(.+\)', term):
+        print({qqid: [term]})
+        return {qqid: [term]}
+    sub_terms = re.split(r'\s+(AND|NOT|OR)\s+', term)
+    split_terms = {}
+    stid = 0
+    operators = ['AND', 'NOT', 'OR']
+    negate = False
+    for index, sub_term in enumerate(sub_terms):
+        if sub_term in operators:
+            if sub_term == 'NOT':
+                negate = True
+            elif sub_term == 'OR':
+                stid += 1
+        else:
+            term_id = "%s___%d" % (qqid, stid)
+            if negate:
+                sub_term = "!%s" % sub_term
+                negate = False
+            if term_id in split_terms:
+                split_terms[term_id].append(sub_term)
+            else:
+                split_terms.update({term_id: [sub_term]})
+    return split_terms
 
-def split_boolean_queries(input_terms, query_id):
-    """Split Boolean queries into separate terms."""
+
+def split_nested_queries(input_terms):
+    """Split nested queries into separate terms."""
+    queries = {}
+    used_ids = set()
+    for term in input_terms:
+        try:
+            term, query_id = term.split('=')
+            tid = int(re.sub(r'[a-zA-Z_]+', '', query_id))
+            used_ids.add(tid)
+        except ValueError:
+            pass
+    if used_ids:
+        tid = max(used_ids) + 1
+    else:
+        tid = 1
     for term in input_terms:
         try:
             term, query_id = term.split('=')
         except ValueError:
-            pass
-        regex = r'([^\(\)]+)'
-        matches = re.sub(regex, r"\g<1>", term)
-        print(matches)
-    return input_terms
+            query_id = "Q%d" % tid
+            tid += 1
+        regex = r'\(([^\(^\)]+)\)'
+        qid = 0
+        match = re.search(regex, term)
+        while match:
+            match = list(match.groups())
+            for sub_term in match:
+                qqid = "%s__%d" % (query_id, qid)
+                sub_terms = split_boolean_query(qqid, sub_term)
+                queries.update(sub_terms)
+                term = term.replace("(%s)" % sub_term, qqid)
+                qid += 1
+            match = re.search(regex, term)
+        qqid = "%s__%d" % (query_id, qid)
+        sub_terms = split_boolean_query(qqid, term)
+        for sub_term_id, terms_list in sub_terms.items():
+            if sub_term_id in queries:
+                queries[sub_term_id] += terms_list
+            else:
+                queries.update({sub_term_id: terms_list})
+    return queries
 
 
 def build_search_query(options):
@@ -265,47 +387,80 @@ def build_search_query(options):
     logger = gh_logger.logger()
     search_paths, descriptions = parse_index_templates()
     patterns = [
-        {'pattern': r'(_*Q/d+)::(.+?):(\d+)-*(\d*)', 'function': asm_seq_pos_query},
-        {'pattern': r'(.+?)::(.+?):(\d+)-*(\d*)', 'function': asm_seq_pos_query},
-        {'pattern': r'(.+?):(\d+)-*(\d*)', 'function': seq_pos_query},
+        {'pattern': r'(_*Q/d+)::(.+?):(\d+)(-*\d*)', 'function': asm_seq_pos_query},
+        {'pattern': r'(.+?)::(.+?):(\d+)(-*\d*)', 'function': asm_seq_pos_query},
+        {'pattern': r'(.+?):(\d+)(-*\d*)', 'function': seq_pos_query},
         {'pattern': r'(.+?)::(.+?):(.+)', 'function': asm_feature_value_query},
         {'pattern': r'(.+?):(.+)', 'function': feature_value_query}
     ]
     query_list = {}
+    query_map = defaultdict(list)
     paths_list = []
     if 'term' in options['search']:
-        # # TODO: split boolean queries
-        terms = split_boolean_queries(options['search']['term'], '_Q1')
-        for full_term in terms:
-            query_id = '_Q1'
-            term = full_term
-            try:
-                term, query_id = term.split('=')
-            except ValueError:
-                pass
-            try:
-                parts = re.split(r'[\]\[]', term)
-                term = parts[0]
-                paths_list = parts[1].split(',')
-            except IndexError:
-                pass
-            except ValueError:
-                pass
-            for pattern in patterns:
-                match = re.match(pattern['pattern'], term)
-                if match:
-                    query, terms = pattern['function'](list(match.groups()), paths_list)
-                    indices = list_allowed_indices(terms, search_paths)
-                    if query_id in query_list:
-                        shared = query_list[query_id]['indices'].intersection(indices)
-                        if not shared:
-                            logger.error("Query '%s' is not compatible with '%s'",
-                                         full_term,
-                                         ', '.join(query_list[query_id]['terms']))
-                            sys.exit(1)
-                        and_join(query_list[query_id], query)
-                    else:
-                        query_list[query_id] = {'query': query, 'terms': [full_term], 'indices': indices}
-                    break
-    quit()
-    return query_list['Q1']
+        terms = split_nested_queries(options['search']['term'])
+        for long_id, terms_list in terms.items():
+            base_id, sub_id, part_id = re.split(r'_+', long_id)
+            query_id = "%s__%s" % (base_id, sub_id)
+            query_map[query_id].append(long_id)
+            query_map[base_id].append(long_id)
+            print(long_id)
+            print(terms_list)
+            for full_term in terms_list:
+                term = full_term
+                try:
+                    parts = re.split(r'[\]\[]', term)
+                    term = parts[0]
+                    paths_list = parts[1].split(',')
+                except IndexError:
+                    pass
+                except ValueError:
+                    pass
+                pattern_match = False
+                for pattern in patterns:
+                    match = re.match(pattern['pattern'], term)
+                    if match:
+                        pattern_match = True
+                        query, terms = pattern['function'](list(match.groups()), paths_list)
+                        indices = list_allowed_indices(terms, search_paths)
+                        query = {'query': query, 'terms': [full_term], 'indices': indices}
+                        if long_id in query_list:
+                            # AND join
+                            join_queries(full_term, query_list[long_id], indices, query, and_join)
+                        elif len(query_map[base_id]) > 1:
+                            # OR query
+                            join_queries(full_term, query_list[query_map[base_id][0]], indices, query, or_join)
+                        else:
+                            query_list[long_id] = query
+                        break
+                if not pattern_match:
+                    print('no match for term')
+                    print(term)
+        quit()
+    #     for full_term in terms:
+    #         term = full_term
+    #         try:
+    #             parts = re.split(r'[\]\[]', term)
+    #             term = parts[0]
+    #             paths_list = parts[1].split(',')
+    #         except IndexError:
+    #             pass
+    #         except ValueError:
+    #             pass
+    #         for pattern in patterns:
+    #             match = re.match(pattern['pattern'], term)
+    #             if match:
+    #                 query, terms = pattern['function'](list(match.groups()), paths_list)
+    #                 indices = list_allowed_indices(terms, search_paths)
+    #                 if query_id in query_list:
+    #                     shared = query_list[query_id]['indices'].intersection(indices)
+    #                     if not shared:
+    #                         logger.error("Query '%s' is not compatible with '%s'",
+    #                                      full_term,
+    #                                      ', '.join(query_list[query_id]['terms']))
+    #                         sys.exit(1)
+    #                     and_join(query_list[query_id], query)
+    #                 else:
+    #                     query_list[query_id] = {'query': query, 'terms': [full_term], 'indices': indices}
+    #                 break
+    # quit()
+    # return query_list['Q1']

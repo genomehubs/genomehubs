@@ -4,35 +4,49 @@
 Search for entries.
 
 Usage:
-    genomehubs search [--term STRING...] [--type STRING...]
-                      [--configfile YAML...]
+    genomehubs search [--assembly STRING...] [--feature STRING...]
+                      [--meta STRING...] [--overlap STRING...]
+                      [--return STRING...] [--taxon STRING...]
+                      [--configfile YAML...] [--taxonomy-root INT]
                       [--es-host HOSTNAME] [--es-port PORT]
 
 Options:
-    --term STRING         Simple or Boolean search string.
-    --type STRING         Types to search.
+    --assembly STRING     Assembly name or accession.
+    --feature STRING      Feature value to search.
+    --meta STRING         Metadata value to search.
+    --overlap STRING      Feature to overlap.
+    --return STRING       Formats to return
+    --taxon STRING        Taxon or clade name or taxid.
     --configfile YAML     YAML configuration file.
+    --taxonomy-root INT   Root taxid for taxonomy index.
     --es-host HOSTNAME    Elasticseach hostname/URL.
     --es-port PORT        Elasticseach port number.
 
 Examples:
-    # 1. Find all features of specified types in specified location on specific assembly
-    ./genomehubs search --term ASMID::SEQID:SSTART-SEND \
-                        --types gff3,blast,interproscan
+    # 1. All data for a clade
+        ./genomehubs search \
+            --taxon Nymphalidae \
+            --target RAW
 
-    # 2. Find all features of all types in specified location across all sequences
-    ./genomehubs search --term ASMID::SSTART-SEND
+    # 2. All butterfly genomes above contig N50 1M
+        ./genomehubs search \
+            --taxon Lepidoptera \
+            --meta 'assembly.contig_n50>1M' \
+            --return FASTA,GFF3
 
-    # 3. Find specific features by value
-    ./genomehubs search --term feature=VALUE
-    ./genomehubs search --term ASMID::feature=VALUE
-    ./genomehubs search --term ASMID::SEQID:feature=VALUE
-                        --types blast,interproscan
+    # 3. All genes with a given interpro domain
+        ./genomehubs search \
+            --assembly Hmel2.5 \
+            --feature interpro_accession=IPR123456 \
+            --overlap gene \
+            --return GFF3
 
-    # 4. Use Boolean operators
-    ./genomehubs search --term 'FEATURE=VALUE AND ASMID::SEQID:SSTART-SEND'
-    ./genomehubs search --term '(FEATURE_1=VALUE AND ASMID_1::SEQID:SSTART-SEND) OR ASMID_2::FEATURE_2=VALUE'
-
+    # 4. All genes in a clade which are single copy busco genes"
+        ./genomehubs search \
+            --taxon Lepidoptera \
+            --feature busco_status=Complete|Fragmented \
+            --overlap gene \
+            --return protein.FASTA
 """
 
 import logging
@@ -44,10 +58,12 @@ from pathlib import Path
 from docopt import docopt
 from elasticsearch import Elasticsearch, client, helpers
 
+import assembly
 # import busco
 # import fasta
 import gff3
 import gh_logger
+import taxonomy
 # import interproscan
 from config import config
 from es_functions import build_search_query, test_connection
@@ -65,6 +81,25 @@ def generate_index_patterns(options):
     return ['*']
 
 
+def generate_assembly_list(options, es):
+    """Generate list of assemblies to search."""
+    index = "assembly-%s-%s" % (str(options['index']['taxonomy-root']), options['search']['version'])
+    meta = []
+    if 'meta' in options['search'] and options['search']['meta']:
+        meta = options['search']['meta']
+    if 'assembly' in options['search'] and options['search']['assembly']:
+        assemblies = assembly.assemblies_from_assembly(options['search']['assembly'],
+                                                       meta,
+                                                       es,
+                                                       index)
+    elif 'taxon' in options['search'] and options['search']['taxon']:
+        assemblies = assembly.assemblies_from_taxon(options['search']['taxon'],
+                                                    meta,
+                                                    es,
+                                                    index)
+    return assemblies
+
+
 def main():
     """Entrypoint for genomehubs search."""
     args = docopt(__doc__)
@@ -77,16 +112,19 @@ def main():
 
     # Generate index pattern and query
     logger = gh_logger.logger()
-    index_patterns = generate_index_patterns(options)
-    search_query = build_search_query(options)
-    if search_query:
-        if 'suffix' in search_query and search_query['suffix']:
-            index_patterns = ["%s%s" % (pattern, search_query['suffix']) for pattern in index_patterns]
-            print(','.join(index_patterns))
-        res = es.search(index=','.join(index_patterns), body=search_query)
-        print(res)
-    else:
-        logger.info('No query to execute')
+
+    assemblies = generate_assembly_list(options, es)
+    print(len(assemblies))
+    # index_patterns = generate_index_patterns(options)
+    # search_query = build_search_query(options)
+    # if search_query:
+    #     if 'suffix' in search_query and search_query['suffix']:
+    #         index_patterns = ["%s%s" % (pattern, search_query['suffix']) for pattern in index_patterns]
+    #         print(','.join(index_patterns))
+    #     res = es.search(index=','.join(index_patterns), body=search_query)
+    #     print(res)
+    # else:
+    #     logger.info('No query to execute')
 
     # # Loop through file types
     # for type in TYPES:

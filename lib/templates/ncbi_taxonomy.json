@@ -1,5 +1,5 @@
 {
-  "index_patterns": ["ncbi-taxonomy"],
+  "index_patterns": ["taxonomy-*"],
   "mappings": {
     "properties": {
       "taxid": {

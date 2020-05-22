@@ -3,7 +3,7 @@
   "version": 1,
   "mappings": {
     "properties": {
-      "assembly_name": {
+      "assembly_id": {
         "type": "keyword",
         "ignore_above": 64
       },
@@ -11,9 +11,9 @@
         "type": "keyword",
         "ignore_above": 64
       },
-      "source_tag": {
+      "source": {
         "type": "keyword",
-        "index": false
+        "ignore_above": 64
       },
       "query_start": {
         "type": "integer"
@@ -34,6 +34,12 @@
       "gene_id": {
         "type": "keyword",
         "ignore_above": 64
+      },
+      "status": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "null_value": "predicted",
+        "meta": { "description": "Gene status (predicted, confirmed, deprecated)" }
       },
       "attributes": {
         "type": "nested",
@@ -58,7 +64,7 @@
           "exon_count": { "type": "short" },
           "cds_length": { "type": "integer" },
           "canonical": { "type": "keyword",
-                        "ignore_above": 1 },
+                         "ignore_above": 1 },
           "transcript_id": {
             "type": "keyword",
             "ignore_above": 64

@@ -46,23 +46,25 @@ def make_introns(feature, count):
     return count
 
 
-def parse(filename):
+def parse(options, _es):
     """Parse gff3 file."""
-    cols = ['query_seqid', 'source_tag', 'primary_tag', 'query_start', 'query_end',
+    cols = ['query_seqid', 'source', 'primary_tag', 'query_start', 'query_end',
             'score', 'strand', 'frame', '_attributes']
-    transcripts = ['mRNA']
+    transcripts = ['miRNA', 'mRNA', 'pre_miRNA', 'RNA', 'rRNA', 'snRNA', 'tRNA']
     utrs = ['five_prime_utr', 'three_prime_utr']
     gene = {}
     transcript = {}
     feature = {}
     reset = True
     intron_count = 0
+    filename = options['filename']
     with file_io.stream_file(filename) as fh:
         for line in fh:
             if line.startswith('#'):
                 continue
             line = line.rstrip()
             fields = {cols[index]: value for index, value in enumerate(line.split('\t'))}
+            fields.update({'assembly_id': options['assembly_id']})
             if fields['score'] == '.':
                 fields['score'] = 0
             fields['length'] = int(fields['query_end']) - int(fields['query_start']) + 1
@@ -145,6 +147,13 @@ def parse(filename):
                     if attributes:
                         utr['attributes'] = attributes
                     transcript['utrs'].append(utr)
+    max_length = 0
+    max_index = -1
+    for index, transcript in enumerate(feature['transcripts']):
+        if transcript['length'] > max_length:
+            max_length = transcript['length']
+            max_index = index
+    feature['transcripts'][max_index].update({'canonical': True})
     make_introns(feature, intron_count)
     yield "gene-%s" % feature['gene_id'], feature
 
