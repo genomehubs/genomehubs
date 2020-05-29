@@ -27,7 +27,11 @@ def load_config(options, file):
             for key, value in new_options['common'].items():
                 if key not in new_options[k]:
                     new_options[k][key] = value
-    options = update(options, new_options)
+    for k in new_options.keys():
+        if k not in options:
+            options[k] = {}
+        for key, value in new_options[k].items():
+            options[k][key] = value
     return options
 
 

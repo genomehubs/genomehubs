@@ -116,11 +116,11 @@ def generate_index_patterns(options):
     return ['*']
 
 
-def base_query(filters=None):
+def base_query(filters=None, filter_type='filter'):
     """Return basic query structure."""
     if filters is None:
         filters = []
-    return {'query': {'bool': {'filter': filters}}}
+    return {'query': {'bool': {filter_type: filters}}}
 
 
 def base_or(filter_list):

@@ -7,20 +7,24 @@ Usage:
     genomehubs search [--assembly STRING...] [--feature STRING...]
                       [--meta STRING...] [--overlap STRING...]
                       [--return STRING...] [--taxon STRING...]
+                      [--gene-tree-node STRING...]
+                      [--species-tree-node STRING...]
                       [--configfile YAML...] [--taxonomy-root INT]
                       [--es-host HOSTNAME] [--es-port PORT]
 
 Options:
-    --assembly STRING     Assembly name or accession.
-    --feature STRING      Feature value to search.
-    --meta STRING         Metadata value to search.
-    --overlap STRING      Feature to overlap.
-    --return STRING       Formats to return
-    --taxon STRING        Taxon or clade name or taxid.
-    --configfile YAML     YAML configuration file.
-    --taxonomy-root INT   Root taxid for taxonomy index.
-    --es-host HOSTNAME    Elasticseach hostname/URL.
-    --es-port PORT        Elasticseach port number.
+    --assembly STRING           Assembly name or accession.
+    --feature STRING            Feature value to search.
+    --meta STRING               Metadata value to search.
+    --overlap STRING            Feature to overlap.
+    --return STRING             Formats to return
+    --taxon STRING              Taxon or clade name or taxid.
+    --gene-tree-node STRING     Gene tree node name or ID.
+    --species-tree-node STRING  Tree name or ID.
+    --configfile YAML           YAML configuration file.
+    --taxonomy-root INT         Root taxid for taxonomy index.
+    --es-host HOSTNAME          Elasticseach hostname/URL.
+    --es-port PORT              Elasticseach port number.
 
 Examples:
     # 1. All data for a clade
@@ -64,6 +68,7 @@ import assembly
 import gff3
 import gh_logger
 import taxonomy
+import tree
 # import interproscan
 from config import config
 from es_functions import build_search_query, test_connection
@@ -84,19 +89,28 @@ def generate_index_patterns(options):
 def generate_assembly_list(options, es):
     """Generate list of assemblies to search."""
     index = "assembly-%s-%s" % (str(options['index']['taxonomy-root']), options['search']['version'])
+    options['assembly-index'] = index
     meta = []
     if 'meta' in options['search'] and options['search']['meta']:
         meta = options['search']['meta']
+    assemblies = []
     if 'assembly' in options['search'] and options['search']['assembly']:
         assemblies = assembly.assemblies_from_assembly(options['search']['assembly'],
                                                        meta,
                                                        es,
                                                        index)
-    elif 'taxon' in options['search'] and options['search']['taxon']:
-        assemblies = assembly.assemblies_from_taxon(options['search']['taxon'],
-                                                    meta,
-                                                    es,
-                                                    index)
+    if 'taxon' in options['search'] and options['search']['taxon']:
+        assemblies += assembly.assemblies_from_taxon(options['search']['taxon'],
+                                                     meta,
+                                                     es,
+                                                     index)
+    if 'species-tree-node' in options['search'] and options['search']['species-tree-node']:
+        options['analysis-type'] = 'species_tree'
+        options['tree-index'] = "tree-%s-%s" % (str(options['index']['taxonomy-root']), options['search']['version'])
+        assemblies += tree.assemblies_from_tree(options['search']['species-tree-node'],
+                                                meta,
+                                                es,
+                                                options)
     return assemblies
 
 

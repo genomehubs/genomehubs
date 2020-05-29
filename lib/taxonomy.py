@@ -110,3 +110,20 @@ def taxon_from_taxid(taxid, es, index):
     if res['hits']['total']['value'] > 0:
         return res['hits']['hits'][0]['_source']
     return None
+
+
+def lca_from_taxon(taxon_list, es, index):
+    """Find last common ancestor of a list of taxa."""
+    taxa = taxa_from_taxon(taxon_list, es, index)
+    lineages = [taxon['_source']['lineage'][::-1] for taxon in taxa]
+    lca = {}
+    for i in range(len(lineages[0])):
+        taxid = lineages[0][i]['taxid']
+        shared = True
+        for lineage in lineages:
+            if taxid != lineage[i]['taxid']:
+                shared = False
+        if not shared:
+            break
+        lca = lineages[0][i]
+    return lca

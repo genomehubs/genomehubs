@@ -4,7 +4,7 @@
 
 import re
 
-from es_functions import base_query, nested_or
+from es_functions import base_or, base_query, nested_or
 
 
 def template():
@@ -48,11 +48,9 @@ def assemblies_from_taxon(taxon_list, meta, es, index):
             query = assemblies_by_taxid(taxon, meta_filters)
         else:
             query = assemblies_by_taxon_name(taxon, meta_filters)
-        print(meta)
         res = es.search(index=index,
                         body=query,
                         size=10)
-        print(res['hits']['total']['value'])
         if res['hits']['total']['value'] > 0:
             assemblies += res['hits']['hits']
     return assemblies
@@ -111,16 +109,17 @@ def assemblies_from_assembly(assembly_list, meta, es, index):
     """Fetch assembly records for all assemblies matching assembly."""
     if not isinstance(assembly_list, list):
         assembly_list = [assembly_list]
-    assemblies = []
     meta_filters = meta_to_filters(meta)
+    filters = []
     for assembly_name in assembly_list:
         if assembly_name.startswith('GCA_'):
-            query = assemblies_by_assembly_id(assembly_name, meta_filters)
+            filters.append(assemblies_by_assembly_id(assembly_name, meta_filters)['query'])
         else:
-            query = assemblies_by_assembly_name(assembly_name, meta_filters)
-        res = es.search(index=index,
-                        body=query,
-                        size=1000)
-        if res['hits']['total']['value'] > 0:
-            assemblies += res['hits']['hits']
-    return assemblies
+            filters.append(assemblies_by_assembly_name(assembly_name, meta_filters)['query'])
+    query = base_query(filters, 'should')
+    res = es.search(index=index,
+                    body=query,
+                    size=1000)
+    if res['hits']['total']['value'] > 0:
+        return res['hits']['hits']
+    return []

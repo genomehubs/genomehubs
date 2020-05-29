@@ -103,7 +103,7 @@
               "query_start": { "type": "integer" },
               "query_end": { "type": "integer" },
               "length": { "type": "integer" },
-              "index": { "type": "byte" },
+              "index": { "type": "integer" },
               "attributes": {
                 "type": "nested",
                 "properties": {
@@ -123,7 +123,7 @@
               "query_start": { "type": "integer" },
               "query_end": { "type": "integer" },
               "length": { "type": "integer" },
-              "index": { "type": "byte" }
+              "index": { "type": "integer" }
             }
           },
           "utr": {

@@ -63,23 +63,45 @@
       "taxon_names": {
         "type": "nested",
         "properties": {
-          "name": { "type": "text",
+          "name": { "type": "keyword",
+                    "ignore_above": 64,
                     "meta": { "description": "Taxon name" } },
-          "unique": { "type": "text",
+          "unique": { "type": "keyword",
+                      "ignore_above": 64,
                       "meta": { "description": "Unique version of taxon name" } },
-          "class": { "type": "text",
+          "class": { "type": "keyword",
+                     "ignore_above": 64,
                      "meta": { "description": "Name class (e.g. common name, synonym, etc.)" } }
         }
       },
       "lineage": {
         "type": "nested",
         "properties": {
-          "taxid": { "type": "text",
+          "taxid": { "type": "keyword",
+                     "ignore_above": 16,
                      "meta": { "description": "NCBI taxonomy taxid of ancestral taxon" } },
-          "rank": { "type": "text",
-                    "meta": { "description": "Ancestral rank" } },
-          "scientific_name": { "type": "text",
+          "rank": { "type": "keyword",
+                     "ignore_above": 32,
+                     "meta": { "description": "Ancestral rank" } },
+          "scientific_name": { "type": "keyword",
+                               "ignore_above": 16,
                                "meta": { "description": "Scientific name" } }
+        }
+      },
+      "phylogeny": {
+        "type": "nested",
+        "properties": {
+          "tree_id": { "type": "keyword",
+                     "ignore_above": 16,
+                     "meta": { "description": "Unique tree identifier" } },
+          "nodes": {
+            "type": "nested",
+            "properties": {
+              "nodeid": { "type": "keyword",
+                         "ignore_above": 16,
+                         "meta": { "description": "Ancestral node identifier" } }
+            }
+          }
         }
       },
       "assembly_level": {

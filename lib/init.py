@@ -4,7 +4,7 @@
 Initialise a GenomeHub.
 
 Usage:
-    genomehubs init [--directory PATH] [--insdc ID]
+    genomehubs init [--directory PATH] [--insdc ID...]
                     [--taxonomy DIR] [--taxonomy-root INT] [--configfile YAML...]
                     [--es-container STRING] [--es-host HOSTNAME] [--es-image STRING]
                     [--es-port PORT] [--es-repository STRING] [--use-docker]
@@ -58,6 +58,8 @@ import assembly
 # import fasta
 import gff3
 import gh_logger
+import index
+import insdc
 import taxonomy
 # import interproscan
 from config import config
@@ -74,13 +76,62 @@ def setup_directory(options):
         options['init']['taxonomy'] = os.path.expanduser(options['init']['taxonomy'])
         taxdump_dir = Path(options['init']['taxonomy']).resolve().absolute()
         Path(taxdump_dir).mkdir(parents=True, exist_ok=True)
-    elif 'taxdump' in options['init'] and options['init']['taxdump'].startswith('~'):
-        options['init']['taxdump'] = os.path.expanduser(options['init']['taxdump'])
     hub_dir = Path(options['init']['directory']).resolve().absolute()
     Path(hub_dir).mkdir(parents=True, exist_ok=True)
     es_data = os.path.join(hub_dir, 'elasticsearch', 'data')
     Path(es_data).mkdir(parents=True, exist_ok=True)
     options['init'].update({'es-data': es_data})
+
+
+# def start_dejavu(options):
+#     """Start Dejavu."""
+#     if options['init']['dv-host'] in {'localhost', '127.0.0.1'}:
+#         # Start Dejavu
+#         if options['init']['use-docker']:
+#             docker_client = docker.from_env()
+#             docker_image = "%s" % options['init']['dv-image']
+#             LOGGER.info("Pulling Dejavu Docker image from '%s'", docker_image)
+#             try:
+#                 docker_client.images.pull(docker_image)
+#             except requests.exceptions.HTTPError:
+#                 LOGGER.error("Unable to pull Docker image '%s'",
+#                              options['init']['dv-image'])
+#                 sys.exit(1)
+#             try:
+#                 container = docker_client.containers.get(options['init']['dv-container'])
+#             except docker.errors.NotFound:
+#                 container = False
+#             if container:
+#                 LOGGER.info("A container with the name '%s' is already running", options['init']['dv-container'])
+#                 mapped_ports = ','.join([obj[0]['HostPort'] for key, obj in container.ports.items()])
+#                 LOGGER.info("Container with the same name running on port %s", mapped_ports)
+#                 return
+#             try:
+#                 container = docker_client.containers.run(
+#                     docker_image,
+#                     name=options['init']['dv-container'],
+#                     network=options['init']['docker-network'],
+#                     ports={'1358/tcp': int(options['init']['dv-port'])},
+#                     environment={'http.cors.enabled': 'true',
+#                                  'http.cors.allow-origin': "*",
+#                                  'http.cors.allow-headers':
+#                                      'X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization',
+#                                  'http.cors.allow-credentials': 'true'},
+#                     restart_policy={'Name': 'always'},
+#                     detach=True)
+#                 LOGGER.info('Starting Dejavu container')
+#             except docker.errors.APIError:
+#                 LOGGER.error("Could not start Dejavu container")
+#                 sys.exit(1)
+#         else:
+#             LOGGER.error('Unable to start Dejavu without Docker')
+#             LOGGER.info('Running Dejavu without Docker is not currently supported')
+#             LOGGER.info('specify use-docker or ensure Dejavu is running before executing this command')
+#             sys.exit(1)
+#     else:
+#         LOGGER.error('Unable to start Dejavu on remote host')
+#         LOGGER.info('Specify localhost or ensure Dejavu is running remotely before executing this command')
+#         sys.exit(1)
 
 
 def start_elasticsearch(options):
@@ -122,16 +173,21 @@ def start_elasticsearch(options):
                     LOGGER.info("Container with the same name running on port %s", mapped_ports)
                     sys.exit(1)
                 try:
-                    container = docker_client.containers.run(docker_image,
-                                                             name=options['init']['es-container'],
-                                                             network=options['init']['docker-network'],
-                                                             ports={'9200/tcp': int(options['init']['es-port'])},
-                                                             volumes={options['init']['es-data']:
-                                                                      {'bind': '/usr/share/elasticsearch/data',
-                                                                       'mode': 'rw'}},
-                                                             restart_policy={'Name': 'always'},
-                                                             environment={'discovery.type': 'single-node'},
-                                                             detach=True)
+                    container = docker_client.containers.run(
+                        docker_image,
+                        name=options['init']['es-container'],
+                        network=options['init']['docker-network'],
+                        ports={'9200/tcp': int(options['init']['es-port'])},
+                        volumes={options['init']['es-data']: {'bind': '/usr/share/elasticsearch/data',
+                                                              'mode': 'rw'}},
+                        restart_policy={'Name': 'always'},
+                        environment={'discovery.type': 'single-node',
+                                     'http.cors.enabled': 'true',
+                                     'http.cors.allow-origin': "*",
+                                     'http.cors.allow-headers':
+                                         'X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization',
+                                     'http.cors.allow-credentials': 'true'},
+                        detach=True)
                     LOGGER.info('Starting Elasticsearch container')
                     es = test_connection(options['init'], True)
                     pbar = tqdm(total=int(options['init']['es-startup-timeout']))
@@ -264,7 +320,7 @@ def reset_hub(options):
 
 def fetch_taxdump(options):
     """Fetch and extract NCBI taxdump files."""
-    dir_name = options['init']['taxonomy'] if 'taxonomy' in options['init'] else options['init']['taxdump']
+    dir_name = options['init']['taxonomy']
     if Path(os.path.join(dir_name, 'nodes.dmp')).is_file():
         LOGGER.info("Using existing NCBI taxdump at %s", dir_name)
         return
@@ -285,40 +341,25 @@ def index_taxonomy(es, options):
         es.indices.get(index_name)
         LOGGER.info("Using existing taxonomy index '%s'", index_name)
     except exceptions.NotFoundError:
+        template = taxonomy.template()
+        index.load_template(es, template)
         LOGGER.info("Initialising taxonomy index with root %s",
                     str(options['init']['taxonomy-root']))
-        taxdump = options['init']['taxonomy'] if 'taxonomy' in options['init'] else options['init']['taxdump']
-        proc = Popen([LIBDIR + '/index.py',
-                      'index',
-                      '--es-host', options['init']['es-host'],
-                      '--es-port', str(options['init']['es-port']),
-                      '--taxonomy', taxdump,
-                      '--taxonomy-root', str(options['init']['taxonomy-root'])])
-        try:
-            proc.wait()
-        except KeyboardInterrupt:
-            proc.send_signal(signal.SIGINT)
+        index.index_entries(es, index_name, taxonomy, {**options['index'], **options['init']})
 
 
 def index_insdc(es, options):
-    """Call genomehubs index --insdc unless index already exists"""
+    """Call genomehubs index --insdc unless index already exists."""
     try:
         index_name = "assembly-%s-%s" % (str(options['init']['taxonomy-root']), options['init']['version'])
         es.indices.get(index_name)
         LOGGER.info("Using existing assembly index '%s'", index_name)
     except exceptions.NotFoundError:
+        template = insdc.template()
+        index.load_template(es, template)
         LOGGER.info('Initialising assembly index with public INSDC assemblies matching %s',
                     str(options['init']['insdc']))
-        proc = Popen([LIBDIR + '/index.py',
-                      'index',
-                      '--es-host', options['init']['es-host'],
-                      '--es-port', str(options['init']['es-port']),
-                      '--insdc', str(options['init']['insdc']),
-                      '--taxonomy-root', str(options['init']['taxonomy-root'])])
-        try:
-            proc.wait()
-        except KeyboardInterrupt:
-            proc.send_signal(signal.SIGINT)
+        index.index_entries(es, index_name, insdc, {**options['index'], **options['init']})
 
 
 def main():
@@ -337,6 +378,9 @@ def main():
 
     # Start Elasticsearch
     es = start_elasticsearch(options)
+
+    # # Start dejavu
+    # start_dejavu(options)
 
     # Fetch NCBI taxdump
     fetch_taxdump(options)

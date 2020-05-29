@@ -1,0 +1,104 @@
+{
+  "index_patterns": ["tree-*"],
+  "version": 1,
+  "mappings": {
+    "properties": {
+      "tree_id": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "meta": { "description": "Unique tree identifier" }
+      },
+      "tree_type": {
+        "type": "keyword",
+        "ignore_above": 8,
+        "meta": { "description": "Species or gene tree" }
+      },
+      "is_root": {
+        "type": "keyword",
+        "ignore_above": 1,
+        "meta": { "description": "Is this node the root (T/F)" }
+      },
+      "is_leaf": {
+        "type": "keyword",
+        "ignore_above": 1,
+        "meta": { "description": "Is this a leaf node (T/F)" }
+      },
+      "taxid": {
+        "type": "keyword",
+        "ignore_above": 16,
+        "meta": { "description": "NCBI taxonomy taxid" }
+      },
+      "scientific_name": {
+        "type": "keyword",
+        "ignore_above": 128,
+        "meta": { "description": "Scientific name of taxon" }
+      },
+      "leaf_count": {
+        "type": "integer",
+        "null_value": 0,
+        "meta": { "description": "Total number of descendent leaves" }
+      },
+      "taxon_count": {
+        "type": "integer",
+        "null_value": 0,
+        "meta": { "description": "Total number of descendent taxa" }
+      },
+      "node_count": {
+        "type": "integer",
+        "null_value": 0,
+        "meta": { "description": "Total number of descendent nodes" }
+      },
+      "depth": {
+        "type": "float",
+        "meta": { "description": "Distance to furthest tip" }
+      },
+      "node_depth": {
+        "type": "float",
+        "meta": { "description": "Node distance to furthest tip" }
+      },
+      "distance_to_root": {
+        "type": "float",
+        "meta": { "description": "Distance to tree root" }
+      },
+      "branch_length": {
+        "type": "half_float",
+        "meta": { "description": "Distance to parent node" }
+      },
+      "support_value": {
+        "type": "half_float",
+        "meta": { "description": "Node support value" }
+      },
+      "ancestors": {
+        "type": "nested",
+        "properties": {
+          "node_id": { "type": "keyword",
+                       "ignore_above": 64 },
+          "taxid": { "type": "keyword",
+                       "ignore_above": 16 },
+          "is_root": { "type": "keyword",
+                       "ignore_above": 1 }
+        }
+      },
+      "descendants": {
+        "type": "nested",
+        "properties": {
+          "node_id": { "type": "keyword",
+                       "ignore_above": 64 },
+          "taxid": { "type": "keyword",
+                     "ignore_above": 16 },
+          "is_leaf": { "type": "keyword",
+                       "ignore_above": 1 }
+        }
+      },
+      "attributes": {
+        "type": "nested",
+        "properties": {
+          "key": { "type": "keyword",
+                   "ignore_above": 64 },
+          "value": { "type": "keyword",
+                     "ignore_above": 256 }
+        }
+      }
+    }
+  }
+}

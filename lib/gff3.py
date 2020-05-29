@@ -2,6 +2,7 @@
 
 """GFF3 methods."""
 
+from es_functions import base_query
 import file_io
 
 
@@ -50,8 +51,8 @@ def parse(options, _es):
     """Parse gff3 file."""
     cols = ['query_seqid', 'source', 'primary_tag', 'query_start', 'query_end',
             'score', 'strand', 'frame', '_attributes']
-    transcripts = ['miRNA', 'mRNA', 'pre_miRNA', 'RNA', 'rRNA', 'snRNA', 'tRNA']
-    utrs = ['five_prime_utr', 'three_prime_utr']
+    transcripts = ['mirna', 'mrna', 'pre_mirna', 'rna', 'rrna', 'snrna', 'trna']
+    utrs = ['utr', 'five_prime_utr', 'three_prime_utr']
     gene = {}
     transcript = {}
     feature = {}
@@ -94,7 +95,7 @@ def parse(options, _es):
                     reset = False
                     gene = {}
                     transcript = {}
-                if fields['primary_tag'] in transcripts:
+                if fields['primary_tag'].lower() in transcripts:
                     transcript = fields
                     del transcript['query_seqid']
                     del transcript['score']
@@ -136,7 +137,8 @@ def parse(options, _es):
                     if attributes:
                         exon['attributes'] = attributes
                     transcript['exons'].append(exon)
-                elif fields['primary_tag'] in utrs:
+                elif fields['primary_tag'].lower() in utrs:
+                    # TODO: assign 5 or 3 to generic utr
                     utr = {'utr_id': attributes['ID'],
                            'query_start': fields['query_start'],
                            'query_end': fields['query_end'],
@@ -161,3 +163,19 @@ def parse(options, _es):
 def template():
     """Set template names."""
     return {'name': 'gff3', 'filename': 'gff3.json'}
+
+
+def assemblies_from_genes(gene_list, es, index):
+    """Fetch assembly records for all assemblies containing gene."""
+    if not isinstance(gene_list, list):
+        gene_list = [gene_list]
+    assemblies = []
+    for gene_id in gene_list:
+        filters = [{'match': {'gene_id': gene_id}}]
+        query = base_query(filters)
+        res = es.search(index=index,
+                        body=query,
+                        size=2)
+        if res['hits']['total']['value'] > 0:
+            assemblies += res['hits']['hits']
+    return assemblies
