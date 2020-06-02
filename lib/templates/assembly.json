@@ -164,7 +164,7 @@
                              "ignore_above": 32 },
           "record_count": { "type": "integer"},
           "description": { "type": "text" },
-          "timestamp": { "type": "date" },
+          "timestamp": { "type": "date" }
         }
       }
     }

@@ -132,9 +132,31 @@ genomehubs index --gff3 /path/to/ASSEMBLY_NAME.gff3 \
                  --index-name gff3-ASSEMBLY_NAME
 ```
 
+Examples:
+```
+./genomehubs index --gff3 tests/files/gff3/ASM31383v2.gff --gff3 tests/files/gff3/ASM31383v2.gff --gff3 tests/files/gff3/ASM31383v2.gff --gff3 tests/files/gff3/ASM31383v2.gff --gff tests/files/gff3/MelCinx1.0.gff
+
+./genomehubs index --species-tree tests/files/trees/test_species_tree.newick
+
+./genomehubs index --gene-trees tests/files/trees/test_gene_trees
+```
+
 ### `genomehubs search`
 
 Find features in index.
+
+```
+./genomehubs search --taxon Lepidoptera --meta assembly.n50:gt:640000
+
+./genomehubs search --species-tree-node test_species_tree
+```
+
+Tree node queries will work once tree_ids are added to assembly analyses (currently returns all assemblies for taxon regardless of whether in tree or not)
+```
+./genomehubs search --species-tree-node test_species_tree.node_2
+./genomehubs search --species-tree-node test_species_tree.node_2
+
+```
 
 ### `genomehubs launch`
 

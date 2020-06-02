@@ -73,6 +73,7 @@ import tree
 from config import config
 from es_functions import build_search_query, test_connection
 
+LOGGER = gh_logger.logger()
 PARAMS = [{'flag': '--gff3', 'module': gff3}]
 
 
@@ -125,10 +126,9 @@ def main():
     es = test_connection(options['search'])
 
     # Generate index pattern and query
-    logger = gh_logger.logger()
 
     assemblies = generate_assembly_list(options, es)
-    print(len(assemblies))
+    LOGGER.info("%s assemblies matched the search criteria", len(assemblies))
     # index_patterns = generate_index_patterns(options)
     # search_query = build_search_query(options)
     # if search_query:

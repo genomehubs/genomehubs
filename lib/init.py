@@ -230,7 +230,7 @@ def start_elasticsearch(options):
     return es
 
 
-def query_yes_no(question, default="yes"):
+def query_yes_no(question, default='no'):
     """Ask a yes/no question via raw_input() and return their answer.
 
     "question" is a string that is presented to the user.

@@ -22,7 +22,6 @@ notes.md
 .gitignore
 __*
 
-gff3
+
 interpro
 new_taxdump
-trees

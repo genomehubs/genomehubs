@@ -2,7 +2,7 @@ common:
   directory: ~/genomehubs/demo
   docker-network: genomehubs-network
   es-host: localhost
-  es-port: 9201
+  es-port: 9200
   taxonomy: ~/genomehubs/demo/taxdump
   taxonomy-root: 7088
   version: v0.1
@@ -15,7 +15,7 @@ init:
   dv-host: localhost
   dv-image: appbaseio/dejavu:v3.4.6
   dv-port: 1358
-  es-container: genomehubs-elasticsearc
+  es-container: genomehubs-elasticsearch
   es-image: elasticsearch/elasticsearch-oss:7.6.2
   es-repository: docker.elastic.co
   es-startup-timeout: 30
