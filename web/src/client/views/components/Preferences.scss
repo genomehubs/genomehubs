@@ -1,0 +1,158 @@
+@import 'web-fonts';
+@import 'colors';
+@import 'themes';
+@import url(web-fonts-url('Open Sans', 'Comfortaa'));
+
+* {
+  @include themify($themes) {
+    $labelColor: themed('primary');
+    $toggleColor: themed('highlight');
+    $textColor: themed('secondary');
+
+
+    .preferenceOuter {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 220px;
+      min-height: 1.6em;
+      font-size: 1.25em;
+      background: rgba($labelColor, 0);
+
+      span.transparent {
+        background: rgba($labelColor, 0);
+      }
+
+      .preferenceLabel {
+        min-width: 6em;
+        display: inline-block;
+      }
+
+      .preferenceHeader {
+        color: $textColor;
+        background: rgba($labelColor, 0);
+        text-align: right;
+        height: 1.6em;
+        width: 100%;
+      }
+
+      .preferencePane {
+        padding: 1em;
+        border: 0.5px solid rgba($labelColor, 0.75);
+        border-top: none;
+        border-right: none;
+        background: rgba($labelColor, 0.5);
+
+      }
+    }
+
+    .toggleSwitch {
+      position: relative;
+      width: 85px;
+      display: inline-block;
+      vertical-align: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      text-align: left;
+      background-color: rgba($textColor, 0);
+      &Checkbox {
+        display: none;
+      }
+      &Label {
+        display: block;
+        overflow: hidden;
+        cursor: pointer;
+        border: 0 solid $labelColor;
+        border-radius: 20px;
+        margin: 0;
+      }
+      &Inner {
+        display: block;
+        width: 200%;
+        margin-left: -100%;
+        transition: margin 0.3s ease-in 0s;
+        &:before,
+        &:after {
+          display: block;
+          float: left;
+          width: 50%;
+          height: 34px;
+          padding: 0;
+          line-height: 34px;
+          font-size: 14px;
+          color: white;
+          font-weight: bold;
+          box-sizing: border-box;
+        }
+        &:before {
+          content: attr(data-yes);
+          text-transform: uppercase;
+          padding-left: 10px;
+          background-color: $toggleColor;
+          color: $textColor;
+        }
+      }
+      &Disabled {
+        background-color: $labelColor;
+        cursor: not-allowed;
+        &:before {
+          background-color: $labelColor;
+          cursor: not-allowed;
+        }
+      }
+      &Inner:after {
+        content: attr(data-no);
+        text-transform: uppercase;
+        padding-right: 10px;
+        background-color: $labelColor;
+        color: $textColor;
+        text-align: right;
+      }
+      &Switch {
+        display: block;
+        width: 24px;
+        margin: 5px;
+        background: $textColor;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 50px;
+        border: 0 solid $labelColor;
+        border-radius: 20px;
+      }
+      &InnerChecked {
+        margin-left: 0;
+      }
+      &SwitchChecked {
+        right: 0px;
+      }
+      &.smallSwitch {
+        width: 40px;
+        .toggleSwitchInner {
+          &:after,
+          &:before {
+            content: "";
+            height: 20px;
+            line-height: 20px;
+          }
+        }
+        .toggleSwitchSwitch {
+          width: 16px;
+          right: 20px;
+          margin: 2px;
+        }
+      }
+      @media screen and (max-width: 991px) {
+        transform: scale(0.9);
+      }
+      @media screen and (max-width: 767px) {
+        transform: scale(0.825);
+      }
+      @media screen and (max-width: 575px) {
+        transform: scale(0.75);
+      }
+    }
+
+  }
+}

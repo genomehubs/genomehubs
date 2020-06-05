@@ -135,9 +135,20 @@ export const colorScheme = handleAction(
 
 export const getColorScheme = state => state.colorScheme
 
+export const setTheme = createAction('SET_THEME')
+export const theme = handleAction(
+  'SET_THEME',
+  (state, action) => (
+    action.payload
+  ),
+  'Light'
+)
+export const getTheme = state => state.theme
+
 
 export const colorReducers = {
   palettes,
   selectedPalette,
-  colorScheme
+  colorScheme,
+  theme
 }

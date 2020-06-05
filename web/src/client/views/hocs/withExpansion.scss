@@ -1,0 +1,45 @@
+.appear {
+  max-height: 0;
+  overflow: hidden;
+}
+
+.appearActive {
+  max-height: 100px;
+  transition: max-height 1000ms;
+  overflow: hidden;
+}
+
+.appearDone {
+  max-height: 100px;
+}
+
+.enter {
+  max-height: 0;
+  overflow: hidden;
+}
+
+.enterActive {
+  max-height: 100px;
+  transition: max-height 1000ms;
+  overflow: hidden;
+}
+
+.enterDone {
+  max-height: 100px;
+}
+
+.exit {
+  max-height: 100px;
+  overflow: hidden;
+}
+
+.exitActive {
+  max-height: 0;
+  transition: max-height 1000ms;
+  overflow: hidden;
+}
+
+.exitDone {
+  max-height: 0;
+  overflow: hidden;
+}

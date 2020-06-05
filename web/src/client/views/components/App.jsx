@@ -1,25 +1,25 @@
-import React from 'react'
-// import Header from './Header';
-// import Main from './Main';
-import styles from './App.scss';
+import React from 'react';
+import { compose } from 'recompose';
+import classnames from 'classnames';
+import styles from './Styles.scss';
 import { CookiesProvider } from 'react-cookie';
 import { withCookies } from 'react-cookie';
+import withFadeInOut from '../hocs/withFadeInOut';
+import withTheme from '../hocs/withTheme';
+import Layout from './Layout';
 
+const App = ({theme, cookies}) => {
+  return (
+    <div className={classnames(`theme${theme}`, styles.app)}>
+      <CookiesProvider>
+        <Layout cookies={cookies}/>
+      </CookiesProvider>
+    </div>
+  );
+};
 
-const Main = () => (
-  <div><h1>Just a placeholder</h1></div>
-)
-
-class App extends React.Component {
-  render() {
-    return (
-      <div className={styles.app}>
-        <CookiesProvider>
-          <Main className={styles.main} cookies={this.props.cookies}/>
-        </CookiesProvider>
-      </div>
-    )
-  }
-}
-
-export default withCookies(App);
+export default compose(
+  withCookies,
+  withTheme,
+  withFadeInOut,
+)(App);

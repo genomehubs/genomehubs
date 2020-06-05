@@ -128,6 +128,10 @@ def main():
     # Generate index pattern and query
 
     assemblies = generate_assembly_list(options, es)
+    # for assembly in assemblies:
+    #     print(assembly['_source']['assembly_id'])
+    #     print(assembly['_source']['scientific_name'])
+    #     print(assembly['_source']['statistics'][0]['n50'])
     LOGGER.info("%s assemblies matched the search criteria", len(assemblies))
     # index_patterns = generate_index_patterns(options)
     # search_query = build_search_query(options)

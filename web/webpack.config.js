@@ -127,7 +127,7 @@ const config = {
         ],
         include: [
           /node_modules/,
-          path.resolve(__dirname, 'src/client/views/style/node_modules.css')
+          path.resolve(__dirname, 'src/client/views/components/style/node_modules.css')
         ]
       },
       {
