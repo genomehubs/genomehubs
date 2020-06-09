@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { choosePanes } from '../reducers/panes';
+import { getPanes } from '../reducers/panes';
 
 const withPanes = WrappedComponent => props => {
 
   const mapStateToProps = state => (
-    { panes: choosePanes(state, props.count, props.offset) }
+    { panes: getPanes(state) }
   )
 
   const Connected = connect(

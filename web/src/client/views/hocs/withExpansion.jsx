@@ -5,7 +5,6 @@ import styles from './withExpansion.scss';
 
 
 const withExpansion = (WrappedComponent) => props => {
-  console.log(props)
   return (
     <CSSTransition
       in={true}

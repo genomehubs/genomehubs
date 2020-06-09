@@ -11,16 +11,15 @@
 
 
     .preferenceOuter {
-      position: absolute;
+      float: right;
       top: 0;
       right: 0;
       width: 220px;
       min-height: 1.6em;
-      font-size: 1.25em;
-      background: rgba($labelColor, 0);
+      // background: rgba($labelColor, 0);
 
       span.transparent {
-        background: rgba($labelColor, 0);
+        // background: rgba($labelColor, 0);
       }
 
       .preferenceLabel {
@@ -29,19 +28,22 @@
       }
 
       .preferenceHeader {
-        color: $textColor;
-        background: rgba($labelColor, 0);
+        // color: $textColor;
+        // background: rgba($labelColor, 0);
         text-align: right;
-        height: 1.6em;
-        width: 100%;
+        line-height: 2em;
+        height: 2em;
+        padding-right: 0.5em;
       }
 
       .preferencePane {
+        font-size: 1.25em;
+        line-height: 1.6em;
         padding: 1em;
         border: 0.5px solid rgba($labelColor, 0.75);
         border-top: none;
         border-right: none;
-        background: rgba($labelColor, 0.5);
+        // background: rgba($labelColor, 0.5);
 
       }
     }

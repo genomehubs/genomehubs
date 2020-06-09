@@ -65,7 +65,8 @@ const config = {
       chunkFilename: 'css/[id].css'
     }),
     new webpack.DefinePlugin({
-      API_URL: JSON.stringify(main.apiUrl),
+      SITENAME: JSON.stringify(main.siteName),
+    	API_URL: JSON.stringify(main.apiUrl),
     	VERSION: JSON.stringify(main.version),
     	BASENAME: JSON.stringify(main.basename),
       HOME: JSON.stringify(protocol+'://'+main.hostname),

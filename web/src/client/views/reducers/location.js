@@ -21,8 +21,14 @@ export const getPathname = state => {
   return state.pathname
 }
 
-const options = ['search',
-                 'notfound'
+const options = ['about',
+                 'assemblies',
+                 'landing',
+                 'notfound',
+                 'search',
+                 'tools',
+                 'trees',
+                 'tutorials'
                 ]
 
 export const getViews = createSelector(
@@ -34,21 +40,14 @@ export const getViews = createSelector(
     let primary = undefined
     for (let i = 0; i < path.length; i++){
       if (options.includes(path[i])){
-        views[path[i]] = true
-        if (!primary && path[i] != 'search'){
+        // views[path[i]] = true
+        if (!primary){
           primary = path[i]
         }
         nextView = path[i]
       }
-      else if (nextView == 'dataset') {
-        views['dataset'] = path[i]
-        nextView = undefined
-      }
-      else if (path[i] !== 'undefined'){
-        views['search'] = path[i]
-      }
     }
-    views.primary = primary || 'search'
+    views.primary = primary || 'landing'
     return views
   }
 )
@@ -75,13 +74,19 @@ export const getSearchTerm = createSelector(
 
 export const viewsToPathname = views => {
   let pathname = ''
-  if (views['search']){
-    pathname += '/' + views['search']
-  }
+  // if (views['search']){
+  //   pathname += '/' + views['search']
+  // }
   options.forEach(view => {
     if (views[view]){
-      pathname += '/' + view
+      if (view == 'landing'){
+        pathname = '/'
+      }
+      else if (views[view]){
+        pathname = view
+      }
     }
+
   })
   return pathname
 }
@@ -96,7 +101,7 @@ export const updatePathname = (update = {},remove = {}) => {
     let views = getViews(state)
     let static_url = state.staticURL
     let newViews = {}
-    if (views.search) newViews.search = views.search
+    // if (views.search) newViews.search = views.search
     let primary = views.primary
     Object.keys(update).forEach(key=>{
       if (key == 'search'){
@@ -108,10 +113,10 @@ export const updatePathname = (update = {},remove = {}) => {
       delete newViews[key]
       if (key == primary) primary = false
     })
-    if (primary){
-      newViews[primary] = true
-      if (views.static && !remove.static) newViews.static = true
-    }
+    // if (primary){
+    //   newViews[primary] = true
+    //   if (views.static && !remove.static) newViews.static = true
+    // }
     let pathname = viewsToPathname(newViews)
     if (pathname != currentPathname){
       history.push({pathname,hash,search})

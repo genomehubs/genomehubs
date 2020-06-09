@@ -8,21 +8,41 @@ export const panes = handleAction(
     action.payload
   ),
   [
-    {id: 'assemblyPane', title: 'Browse Assemblies'},
-    {id: 'toolPane', title: 'Browse Tools'},
-    {id: 'searchPane', title: 'Advanced Search'},
-    {id: 'treePane', title: 'Browse Trees'},
-    {id: 'tutorialPane', title: 'View Tutorials'},
-    {id: 'aboutPane', title: 'About GenomeHubs'},
+    {id: 'assemblyPane',
+     title: 'Browse Assemblies',
+     short: 'assemblies',
+     view: 'assemblies',
+     image: 'assemblies.png',
+     text: 'Select assemblies by browsing and filtering metadata.'},
+    {id: 'toolPane',
+     title: 'Browse Tools',
+     short: 'tools',
+     view: 'tools',
+     text: 'Browse visualisation and analysis tools available in this GenomeHub.'},
+    {id: 'searchPane',
+     title: 'Advanced Search',
+     short: 'search',
+     view: 'search',
+     image: 'placeholderRed.png',
+     text: 'Access advanced search options.'},
+    {id: 'treePane',
+     title: 'Browse Trees',
+     short: 'trees',
+     view: 'trees',
+     text: 'Select assemblies by browsing gene and species tree nodes.'},
+    {id: 'tutorialPane',
+     title: 'View Tutorials',
+     short: 'help',
+     view: 'tutorials',
+     text: 'Find help and tutorials to learn how to use this GenomeHub.'},
+    {id: 'aboutPane',
+     title: 'About GenomeHubs',
+     short: 'about',
+     view: 'about',
+     text: 'Find out more about the GenomeHubs project.'},
   ]
 )
 export const getPanes = state => state.panes
-
-export const choosePanes = (state, count=3, offset=0) => {
-  let panes = getPanes(state)
-  let paneSet = panes.slice(offset,offset+count)
-  return paneSet
-}
 
 export const paneReducers = {
   panes
