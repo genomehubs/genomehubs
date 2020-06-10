@@ -9,11 +9,11 @@ import Tabs from './Tabs';
 const Header = () => {
   return (
     <header>
-      <SiteName/>
-      <Preferences/>
-      <Tabs/>
+      <SiteName />
+      <Preferences />
+      <Tabs />
     </header>
-  )
-}
+  );
+};
 
 export default Header;

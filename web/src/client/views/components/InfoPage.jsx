@@ -1,30 +1,26 @@
 import React from 'react';
 import { compose } from 'recompose';
 import classnames from 'classnames';
-import withLocation from '../hocs/withLocation';
 import styles from './Styles.scss';
-import SearchBox from './SearchBox';
+import withLocation from '../hocs/withLocation';
+import withPanes from '../hocs/withPanes';
 
 const InfoPage = (props) => {
-  // {paneWidth, title, image, text, fullText}
-
-  const handleClick = () => {
-    props.chooseView(props.view)
+  if (!props.views.primary) {
+    return null;
   }
-  let highlight = props.views.primary == props.view
-  let css = classnames(styles.flexCenter,
-                       styles.infoPane,
-                       styles.infoPaneDefault,
-                       {[styles.infoPaneHighlight]: highlight})
+  let page = props.panes.filter((obj) => obj.view == props.views.primary);
+  console.log(page);
+  page = page[0];
+  if (!page) {
+    return null;
+  }
   return (
-    <div className={css}
-         style={{width: `${props.paneWidth}px`}}
-         onClick={handleClick}>
-      <h2>{props.title}</h2>
+    <div className={styles.infoPage}>
+      <h1>{page.title}</h1>
+      <p>{page.text}</p>
     </div>
-  )
-}
+  );
+};
 
-export default compose(
-  withLocation
-)(InfoPage);
+export default compose(withLocation, withPanes)(InfoPage);

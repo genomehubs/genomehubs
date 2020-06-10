@@ -1,7 +1,6 @@
 @import 'web-fonts';
 @import 'colors';
 @import 'themes';
-@import url(web-fonts-url('Open Sans', 'Comfortaa'));
 
 * {
   @include themify($themes) {
@@ -12,147 +11,156 @@
 
     .preferenceOuter {
       float: right;
-      top: 0;
-      right: 0;
-      width: 220px;
       min-height: 1.6em;
+      right: 0;
+      top: 0;
+      width: 220px;
       // background: rgba($labelColor, 0);
 
-      span.transparent {
-        // background: rgba($labelColor, 0);
-      }
-
       .preferenceLabel {
-        min-width: 6em;
         display: inline-block;
+        min-width: 6em;
       }
 
       .preferenceHeader {
         // color: $textColor;
         // background: rgba($labelColor, 0);
-        text-align: right;
-        line-height: 2em;
+        cursor: pointer;
         height: 2em;
-        padding-right: 0.5em;
+        line-height: 2em;
+        padding-right: .5em;
+        text-align: right;
       }
 
       .preferencePane {
+        border: .5px solid rgba($labelColor, .75);
+        border-right: 0;
+        border-top: 0;
         font-size: 1.25em;
         line-height: 1.6em;
         padding: 1em;
-        border: 0.5px solid rgba($labelColor, 0.75);
-        border-top: none;
-        border-right: none;
-        // background: rgba($labelColor, 0.5);
-
       }
     }
 
     .toggleSwitch {
-      position: relative;
-      width: 85px;
-      display: inline-block;
-      vertical-align: middle;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      text-align: left;
       background-color: rgba($textColor, 0);
+      display: inline-block;
+      position: relative;
+      text-align: left;
+      user-select: none;
+      vertical-align: middle;
+      width: 85px;
+
       &Checkbox {
         display: none;
       }
+
       &Label {
-        display: block;
-        overflow: hidden;
-        cursor: pointer;
         border: 0 solid $labelColor;
         border-radius: 20px;
+        cursor: pointer;
+        display: block;
         margin: 0;
+        overflow: hidden;
       }
+
       &Inner {
         display: block;
-        width: 200%;
         margin-left: -100%;
-        transition: margin 0.3s ease-in 0s;
+        transition: margin .3s ease-in 0s;
+        width: 200%;
+
         &:before,
         &:after {
+          box-sizing: border-box;
+          color: white;
           display: block;
           float: left;
-          width: 50%;
-          height: 34px;
-          padding: 0;
-          line-height: 34px;
           font-size: 14px;
-          color: white;
           font-weight: bold;
-          box-sizing: border-box;
+          height: 34px;
+          line-height: 34px;
+          padding: 0;
+          width: 50%;
         }
+
         &:before {
-          content: attr(data-yes);
-          text-transform: uppercase;
-          padding-left: 10px;
           background-color: $toggleColor;
           color: $textColor;
+          content: attr(data-yes);
+          padding-left: 10px;
+          text-transform: uppercase;
         }
       }
+
       &Disabled {
         background-color: $labelColor;
         cursor: not-allowed;
+
         &:before {
           background-color: $labelColor;
           cursor: not-allowed;
         }
       }
-      &Inner:after {
-        content: attr(data-no);
-        text-transform: uppercase;
-        padding-right: 10px;
-        background-color: $labelColor;
-        color: $textColor;
-        text-align: right;
+
+      &Inner {
+        &:after {
+          background-color: $labelColor;
+          color: $textColor;
+          content: attr(data-no);
+          padding-right: 10px;
+          text-align: right;
+          text-transform: uppercase;
+        }
       }
+
       &Switch {
-        display: block;
-        width: 24px;
-        margin: 5px;
         background: $textColor;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        right: 50px;
         border: 0 solid $labelColor;
         border-radius: 20px;
+        bottom: 0;
+        display: block;
+        margin: 5px;
+        position: absolute;
+        right: 50px;
+        top: 0;
+        width: 24px;
       }
+
       &InnerChecked {
         margin-left: 0;
       }
+
       &SwitchChecked {
-        right: 0px;
+        right: 0;
       }
+
       &.smallSwitch {
         width: 40px;
+
         .toggleSwitchInner {
           &:after,
           &:before {
-            content: "";
+            content: '';
             height: 20px;
             line-height: 20px;
           }
         }
+
         .toggleSwitchSwitch {
-          width: 16px;
-          right: 20px;
           margin: 2px;
+          right: 20px;
+          width: 16px;
         }
       }
       @media screen and (max-width: 991px) {
-        transform: scale(0.9);
+        transform: scale(.9);
       }
       @media screen and (max-width: 767px) {
-        transform: scale(0.825);
+        transform: scale(.825);
       }
       @media screen and (max-width: 575px) {
-        transform: scale(0.75);
+        transform: scale(.75);
       }
     }
 

@@ -9,19 +9,32 @@ import SearchBox from './SearchBox';
 import InfoPanel from './InfoPanel';
 
 const Landing = (props) => {
-  let css = classnames(styles.landing, styles.flexCenter, styles.flexCenterHorizontal)
-  const componentRef = useRef()
-  const { width, height } = useResize(componentRef)
-  let firstPanel
+  let css = classnames(
+    styles.landing,
+    styles.flexCenter,
+    styles.flexCenterHorizontal
+  );
+  const componentRef = useRef();
+  const { width, height } = useResize(componentRef);
+  let firstPanel;
   let morePanels;
-  if (props.panes.length > 0){
-    let count = Math.min(Math.floor(width / 350),3);
-    if (count > 1){
-      morePanels = []
-      let paneWidth = width / (count+1)
-      firstPanel = <InfoPanel panes={props.panes.slice(0,count)} paneWidth={paneWidth}/>
-      for (let i = count; i < props.panes.length; i+=count){
-        morePanels.push(<InfoPanel key={i} panes={props.panes.slice(i,i+count)} paneWidth={paneWidth}/>)
+  if (props.panes.length > 0) {
+    let count = Math.min(Math.floor(width / 380), 3);
+    if (count > 1) {
+      morePanels = [];
+      // let paneWidth = width / (count + 1);
+      firstPanel = (
+        <InfoPanel panes={props.panes.slice(0, count)} cols={count} />
+      );
+      for (let i = count; i < props.panes.length; i += count) {
+        let cols = Math.min(props.panes.length - 1, count);
+        morePanels.push(
+          <InfoPanel
+            key={i}
+            panes={props.panes.slice(i, i + count)}
+            cols={cols}
+          />
+        );
       }
     }
   }
@@ -29,13 +42,10 @@ const Landing = (props) => {
   return (
     <div ref={componentRef} className={css}>
       {firstPanel}
-      <SearchBox/>
+      <SearchBox />
       {morePanels}
     </div>
-  )
-}
+  );
+};
 
-export default compose (
-  withLocation,
-  withPanes
-)(Landing);
+export default compose(withLocation, withPanes)(Landing);

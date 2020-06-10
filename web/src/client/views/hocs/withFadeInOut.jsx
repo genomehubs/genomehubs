@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { CSSTransition } from 'react-transition-group';
 import styles from './withFadeInOut.scss';
 
-const withFadeInOut = (WrappedComponent) => props => {
+const withFadeInOut = (WrappedComponent) => (props) => {
   const [visible, setVisible] = useState(true);
   return (
     <CSSTransition

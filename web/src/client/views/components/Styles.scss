@@ -1,46 +1,54 @@
 @import 'web-fonts';
 @import 'colors';
 @import 'themes';
-@import url(web-fonts-url('Open Sans', 'Signika'));
 
-@mixin placeholder-color($color) {
-  &::-webkit-input-placeholder { /* WebKit browsers */
-      color: $color;
-      transition: color 0.3s ease-in 0s;
+@mixin placeholderColor($color) {
+  &placeholder {
+    color: $color;
+    transition: color .3s ease-in 0s;
   }
-  &:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-      color: $color;
-      transition: color 0.3s ease-in 0s;
-  }
-  &::-moz-placeholder { /* Mozilla Firefox 19+ */
-      color: $color;
-      transition: color 0.3s ease-in 0s;
-  }
-  &:-ms-input-placeholder { /* Internet Explorer 10+ */
-      color: $color;
-      transition: color 0.3s ease-in 0s;
-  }
+}
+
+html,
+body,
+.app {
+  height: 100%;
+  min-width: 800px;
+  overflow: auto;
+  overscroll-behavior: none;
+  width: 100%;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
 }
 
 * {
   @include themify($themes) {
-    color: themed('primary');
     background: themed('secondary');
-    transition: all 0.3s ease-in 0s;
+    color: themed('primary');
+    font-family: themed('bodyFont');
+    font-size: themed('bodyFontSize');
+    transition: all .3s ease-in 0s;
 
     header {
       // background: mix(themed('primary'),themed('secondary'),50%);
       // color: themed('secondary');
       border-bottom: 1px solid themed('primary');
+      flex: none;
+      z-index: 1;
 
       .siteName {
-        font-family:'Signika', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        padding: 0;
-        margin: 0;
-        font-size: 120%;
-        margin-left: 0.5em;
-        line-height: 2em;
         cursor: pointer;
+        font-family: themed('titleFont');
+        font-size: 120%;
+        line-height: 2em;
+        margin: 0;
+        margin-left: .5em;
+        padding: 0;
       }
 
       .tabHolder {
@@ -49,218 +57,246 @@
       }
 
       .tab {
-        height: 2em;
-        padding: 0 0.5em;
-        line-height: 2em;
-        box-sizing: border-box;
-        display: inline-block;
         background-color: themed('secondary');
         border: 1px solid themed('primary');
-        margin-right:-1px;
-        border-top: none;
-        border-bottom: none;
+        border-bottom: 0;
+        border-top: 0;
+        box-sizing: border-box;
         cursor: pointer;
+        display: inline-block;
+        height: 2em;
+        line-height: 2em;
+        margin-right: -1px;
+        padding: 0 .5em;
 
-        &Highlight, &:hover {
+        &Highlight,
+        &:hover {
           background-color: themed('highlight');
           color: themed('secondary');
         }
       }
     }
 
-    .searchBox {
-      padding: 0.25em;
-      outline: none;
-      border: 2px solid mix(themed('primary'),themed('secondary'),15%);
-      background-color: mix(themed('primary'),themed('secondary'),5%);
-      @include placeholder-color(mix(themed('primary'),themed('secondary'),65%));
-      font-family:'Signika', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 2em;
-      border-radius: 0.5em;
-      border-radius: 0;
-      padding: 0.25em;
-      width: 600px;
-      max-width: 80%;
+    footer {
+      border-top: 1px solid themed('primary');
+      flex: none;
+      line-height: 2em;
+      min-height: 2em;
       text-align: center;
-      &:focus {
-        border-color: themed('primary');
-        background-color: themed('secondary');
-        @include placeholder-color(themed('secondary'));
-      }
-      &:hover {
-        border-color: themed('primary');
-        background-color: themed('secondary');
-        @include placeholder-color(mix(themed('primary'),themed('secondary'),35%));
+
+      .link {
+        text-decoration: underline;
       }
     }
 
-    .infoPane {
-      margin: 0 1em;
-      height: 9em;
-      // width: 16em;
-      border: 2px solid themed('secondary');
-      color: mix(themed('primary'),themed('secondary'),85%);
-      background: mix(themed('primary'),themed('secondary'),5%);
-      cursor: pointer;
+    .searchBox {
+      @include placeholderColor(mix(themed('primary'), themed('secondary'), 65%));
+      background-color: mix(themed('primary'), themed('secondary'), 5%);
+      border: 2px solid mix(themed('primary'), themed('secondary'), 15%);
+      font-family: themed('titleFont');
+      font-size: 2em;
+      margin: .5em;
+      max-width: 80%;
+      outline: none;
+      padding: .25em;
+      text-align: center;
+      width: 600px;
+
+      &:focus {
+        @include placeholderColor(themed('secondary'));
+        background-color: themed('secondary');
+        border-color: themed('primary');
+      }
 
       &:hover {
-        color: themed('primary');
+        @include placeholderColor(mix(themed('primary'), themed('secondary'), 35%));
+        background-color: themed('secondary');
         border-color: themed('primary');
+      }
+    }
+
+    .infoPanel {
+      background-color: transparent;
+      margin: 1em 0;
+      width: 80%;
+
+      &4Column {
+        .infoPane {
+          height: calc(calc(100vh - 17em) / 2);
+          width: calc(calc(100% - 6em) / 4);
+        }
+      }
+
+      &3Column {
+        .infoPane {
+          height: calc(calc(100vh - 17em) / 2);
+          min-height: 180px;
+          width: calc(calc(100% - 4em) / 3);
+        }
+      }
+
+      &2Column {
+        .infoPane {
+          height: calc(calc(100vh - 19em) / 3);
+          min-height: 180px;
+          width: calc(calc(100% - 2em) / 2);
+        }
+      }
+
+      &1Column {
+        .infoPane {
+          height: calc(calc(100vh - 17em) / 2);
+          width: 100%;
+        }
+      }
+
+    }
+    .infoPane {
+      background: mix(themed('primary'), themed('secondary'), 5%);
+      border: 2px solid themed('secondary');
+      color: mix(themed('primary'), themed('secondary'), 85%);
+      cursor: pointer;
+      margin: 0 1em;
+
+      &:hover {
         background: themed('secondary');
+        border-color: themed('primary');
+        color: themed('primary');
       }
 
       &Default {
-        height: calc( 100vh / 4 );
-        // width: calc( 100vw / 4 );
-        // min-width: 250px;
-        min-height: 141px;
-        max-height: 250px;
-        // max-width: 444px;
-
+        // height: calc(100vh / 4);
+        // max-height: 250px;
+        // min-height: 141px;
       }
 
       &Header {
-        flex: 0 1 auto;
-        width: 100%;
         background-color: transparent;
-        font-family:'Signika', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        flex: 0 1 auto;
+        font-family: themed('titleFont');
         font-size: 120%;
         padding: 1em 0 0 1.5em;
+        width: 100%;
       }
 
       &Content {
-        flex: 1 1 auto;
-        width: 100%;
         background-color: transparent;
         background-position: center;
         background-size: cover;
-
+        flex: 1 1 auto;
+        overflow: hidden;
+        width: 100%;
       }
 
       &Description {
-        padding: 1em;
-        opacity: 0;
-        background: rgba(themed('secondary'), 0.75);
+        background: rgba(themed('secondary'), .75);
         box-sizing: border-box;
+        opacity: 0;
+        padding: 1em;
       }
 
       &HoverReveal {
         opacity: 1;
-
       }
-
     }
 
-  }
-}
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: themed('titleFont');
+    }
+
+    h1 {
+      font-size: 2em;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    .fillParent {
+      height: 100%;
+      position: relative;
+      width: 100%;
+    }
+
+    .fullWidth {
+      position: relative;
+      width: 100%;
+    }
+
+    .flexCenter {
+      display: flex;
+      flex-direction: column;
+
+      &Horizontal,
+      &Both {
+        align-items: center;
+      }
+
+      &Vertical,
+      &Both {
+        justify-content: center;
+      }
+    }
+
+    .flexRow {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .landing {
+      min-height: calc(100% - 2em);
+      overflow: auto;
+      width: 100%;
+    }
+
+    .infoPage {
+      box-sizing: border-box;
+      min-height: calc(100% - 2em);
+      overflow: auto;
+      padding: 1em;
+      width: 100%;
+    }
 
 
-html,body,main {
-  height:100%;
-  width:100%;
-  overflow:auto;
-  overscroll-behavior: none;
-}
 
 
+    .floatRight {
+      float: right;
+    }
 
-.app {
-  position:absolute;
-  width:100%;
-  height:100%;
-  min-width:960px;
-  min-height:0;
-  font-family:'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size:10pt;
-  overscroll-behavior: none;
-  overflow:hidden;
+    // .solidBackground {
+    //   background-color: $darkColor
+    // }
 
-  h1,h2,h3,h4 {
-    font-family:'Signika', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  }
+    header {
+      font-family: themed('bodyFont');
+      height: 2em;
+      // left: 0;
+      min-width: 100%;
+      overflow: visible;
+      // position: absolute;
+      // top: 0;
+      width: 100%;
+    }
 
+    main {
+      flex: 1 1 auto;
+      padding-top: 1em;
+    }
 
-  a {
-    text-decoration: none;
-  }
-}
+    .searchBox {
+      font-family: themed('titleFont');
+      font-size: 2em;
+      padding: .25em;
 
-.fillParent {
-  position: relative;
-  width:100%;
-  height:100%;
-}
-
-.fullWidth {
-  position: relative;
-  width:100%;
-}
-
-.flexCenter {
-  display: flex;
-  flex-direction: column;
-
-  &Horizontal, &Both {
-    align-items: center;
-  }
-
-  &Vertical, &Both {
-    justify-content: center;
-  }
-}
-
-.flexRow {
-  display: flex;
-  flex-direction: row;
-}
-
-.landing {
-  margin-top: 2em;
-  width: 100%;
-}
-
-.infoPanel {
-  margin: 2em 0;
-  background-color: transparent;
-
-  &Minimised {
-    display: inline-block;
-    margin: 0;
-    padding: 0.5em 0;
-  }
-
-}
+      &::selection {
+        outline: none;
+      }
+    }
 
 
-.floatRight {
-  float: right;
-}
-
-// .solidBackground {
-//   background-color: $darkColor
-// }
-
-header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  min-width: 100%;
-  height: 2em;
-  overflow: visible;
-}
-
-main {
-  position: relative;
-}
-
-.searchBox {
-  font-family:'Signika', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 2em;
-  border-radius: 0.5em;
-  padding: 0.25em;
-
-  &::selection {
-    outline: none;
   }
 }

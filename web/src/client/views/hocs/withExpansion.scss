@@ -5,8 +5,8 @@
 
 .appearActive {
   max-height: 100px;
-  transition: max-height 1000ms;
   overflow: hidden;
+  transition: max-height 1000ms;
 }
 
 .appearDone {
@@ -20,8 +20,8 @@
 
 .enterActive {
   max-height: 100px;
-  transition: max-height 1000ms;
   overflow: hidden;
+  transition: max-height 1000ms;
 }
 
 .enterDone {
@@ -35,8 +35,8 @@
 
 .exitActive {
   max-height: 0;
-  transition: max-height 1000ms;
   overflow: hidden;
+  transition: max-height 1000ms;
 }
 
 .exitDone {

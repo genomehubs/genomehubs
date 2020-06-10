@@ -8,12 +8,12 @@ import Footer from './Footer';
 
 const Layout = () => {
   return (
-    <div className={styles.fillParent}>
-      <Main/>
-      <Header/>
-      <Footer/>
+    <div className={styles.layout}>
+      <Header />
+      <Main />
+      <Footer />
     </div>
-  )
-}
+  );
+};
 
 export default Layout;

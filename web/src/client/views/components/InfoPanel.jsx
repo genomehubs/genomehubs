@@ -6,21 +6,15 @@ import SearchBox from './SearchBox';
 import InfoPane from './InfoPane';
 
 const InfoPanel = (props) => {
-  let css = classnames(styles.flexRow,
-                       styles.infoPanel);
+  let css = classnames(
+    styles.flexRow,
+    styles.infoPanel,
+    styles[`infoPanel${props.cols}Column`]
+  );
   let infoPanes = props.panes.map((pane, i) => {
-    return (
-      <InfoPane id={pane.id}
-                key={pane.id}
-                paneWidth={props.paneWidth}
-                {...pane} />
-    )
+    return <InfoPane id={pane.id} key={pane.id} {...pane} />;
   });
-  return (
-    <div className={css}>
-      {infoPanes}
-    </div>
-  )
-}
+  return <div className={css}>{infoPanes}</div>;
+};
 
 export default InfoPanel;

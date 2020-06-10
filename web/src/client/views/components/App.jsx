@@ -8,18 +8,14 @@ import withFadeInOut from '../hocs/withFadeInOut';
 import withTheme from '../hocs/withTheme';
 import Layout from './Layout';
 
-const App = ({theme, cookies}) => {
+const App = ({ theme, cookies }) => {
   return (
     <div className={classnames(`theme${theme}`, styles.app)}>
       <CookiesProvider>
-        <Layout cookies={cookies}/>
+        <Layout cookies={cookies} />
       </CookiesProvider>
     </div>
   );
 };
 
-export default compose(
-  withCookies,
-  withTheme,
-  withFadeInOut,
-)(App);
+export default compose(withCookies, withTheme, withFadeInOut)(App);

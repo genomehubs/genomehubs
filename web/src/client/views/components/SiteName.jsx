@@ -4,20 +4,17 @@ import classnames from 'classnames';
 import withLocation from '../hocs/withLocation';
 import styles from './Styles.scss';
 
-const siteName = SITENAME || '/'
+const siteName = SITENAME || '/';
 
 const SiteName = (props) => {
   const handleClick = () => {
-    props.chooseView('landing')
-  }
+    props.chooseView('landing');
+  };
   return (
-    <span className={styles.siteName}
-          onClick={handleClick}>
+    <span className={styles.siteName} onClick={handleClick}>
       {siteName}
     </span>
-  )
-}
+  );
+};
 
-export default compose(
-  withLocation
-)(SiteName);
+export default compose(withLocation)(SiteName);
