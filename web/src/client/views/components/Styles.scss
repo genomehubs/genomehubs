@@ -151,12 +151,14 @@ body,
       }
 
     }
+
     .infoPane {
       background: mix(themed('primary'), themed('secondary'), 5%);
       border: 2px solid themed('secondary');
       color: mix(themed('primary'), themed('secondary'), 85%);
       cursor: pointer;
       margin: 0 1em;
+      transition: all 0s ease-in 0s;
 
       &:hover {
         background: themed('secondary');
@@ -172,10 +174,11 @@ body,
 
       &Header {
         background-color: transparent;
-        flex: 0 1 auto;
+        flex: 0 1 4em;
         font-family: themed('titleFont');
         font-size: 120%;
-        padding: 1em 0 0 1.5em;
+        line-height: 4em;
+        padding-left: 2em;
         width: 100%;
       }
 

@@ -39,6 +39,7 @@ export const panes = handleAction(
      title: 'About GenomeHubs',
      short: 'about',
      view: 'about',
+     image: 'about.jpg',
      text: 'Find out more about the GenomeHubs project.'},
   ]
 )

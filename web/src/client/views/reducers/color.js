@@ -1,26 +1,26 @@
-import { createAction, handleAction, handleActions } from 'redux-actions'
-import { createSelector, createSelectorCreator } from 'reselect'
-import { byIdSelectorCreator } from './selectorCreators'
+import { createAction, handleAction, handleActions } from 'redux-actions';
+import { createSelector, createSelectorCreator } from 'reselect';
 import immutableUpdate from 'immutable-update';
-import deep from 'deep-get-set'
-import shallow from 'shallowequal'
-import store from '../store'
-import { queryToStore, colorToRGB, qsDefault, userColors } from '../querySync'
-import { getQueryValue } from '../reducers/location'
+import deep from 'deep-get-set';
+import shallow from 'shallowequal';
+import store from '../store';
+import { byIdSelectorCreator } from './selectorCreators';
+import { queryToStore, colorToRGB, qsDefault, userColors } from '../querySync';
+import { getQueryValue } from '../reducers/location';
 
-export const addPalette = createAction('ADD_PALETTE')
-export const editPalette = createAction('EDIT_PALETTE')
+export const addPalette = createAction('ADD_PALETTE');
+export const editPalette = createAction('EDIT_PALETTE');
 
 const qsPalette = () => {
-  let colors = userColors.slice(0)
-  for (let i = 0; i < colors.length; i++){
-    let qsColor = qsDefault('color'+i)
-    if (qsColor){
-      colors[i] = colorToRGB(qsColor) || colors[i]
+  let colors = userColors.slice(0);
+  for (let i = 0; i < colors.length; i++) {
+    let qsColor = qsDefault('color' + i);
+    if (qsColor) {
+      colors[i] = colorToRGB(qsColor) || colors[i];
     }
   }
-  return colors
-}
+  return colors;
+};
 
 export const palettes = handleActions(
   {
