@@ -29,6 +29,7 @@ export const panes = handleAction(
      title: 'Browse Trees',
      short: 'trees',
      view: 'trees',
+     image: 'darwin-tree.png',
      text: 'Select assemblies by browsing gene and species tree nodes.'},
     {id: 'tutorialPane',
      title: 'View Tutorials',
