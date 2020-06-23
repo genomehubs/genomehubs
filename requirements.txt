@@ -1,3 +1,5 @@
+docker
+
 coveralls>=1.5
 docopt>=0.6.2
 elasticsearch==7.6.0

@@ -1,16 +1,10 @@
-import React from 'react'
-import { render } from 'react-dom'
-import { BrowserRouter } from 'react-router-dom'
-import { Provider } from 'react-redux'
-import store from './store'
+import React from 'react';
+import { render } from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import store from './store';
 import App from './components/App';
-import "core-js/stable";
-
-
-// render(
-//   <a>working</a>,
-//   document.getElementById('app')
-// )
+import 'core-js/stable';
 
 render(
   <BrowserRouter>
@@ -19,4 +13,4 @@ render(
     </Provider>
   </BrowserRouter>,
   document.getElementById('app')
-)
+);

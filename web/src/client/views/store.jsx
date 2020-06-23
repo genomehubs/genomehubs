@@ -1,17 +1,17 @@
-import { createLogger } from 'redux-logger'
-import { createStore, applyMiddleware } from 'redux'
-import thunkMiddleware from 'redux-thunk'
-import rootReducer from './reducers/root'
+import { createLogger } from 'redux-logger';
+import { createStore, applyMiddleware } from 'redux';
+import thunkMiddleware from 'redux-thunk';
+import rootReducer from './reducers/root';
 import { enableBatching } from 'redux-batched-actions';
 
-const loggerMiddleware = createLogger()
+const loggerMiddleware = createLogger();
 
 const store = createStore(
   enableBatching(rootReducer),
   applyMiddleware(
-    thunkMiddleware,
-    // loggerMiddleware
+    // loggerMiddleware,
+    thunkMiddleware
   )
-)
+);
 
 export default store;

@@ -166,10 +166,9 @@ def parse(options, es):
     version = options['version']
     taxonomy_index = "%s-%s-%s" % (taxonomy.template()['name'], str(options['taxonomy-root']), version)
     xml = ''
-    print(options)
-    if not isinstance(options['insdc'], list):
-        options['insdc'] = [options['insdc']]
-    for identifier in options['insdc']:
+    if not isinstance(options['insdc-root'], list):
+        options['insdc-root'] = [options['insdc-root']]
+    for identifier in options['insdc-root']:
         if str(identifier).isdecimal():
             found = count_taxon_assemblies(identifier)
             if found:

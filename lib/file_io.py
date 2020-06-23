@@ -88,7 +88,7 @@ def load_yaml(filename):
         return data
     if '.json' in filename:
         content = ujson.loads(data)
-    elif '.yaml' in filename:
+    elif '.yaml' in filename or '.yml' in filename:
         content = yaml.full_load(data)
     else:
         content = data
@@ -106,7 +106,7 @@ def write_file(filename, data, plain=False):  # pylint: disable=too-many-branche
     """
     if '.json' in filename:
         content = ujson.dumps(data, indent=1, escape_forward_slashes=False)
-    elif '.yaml' in filename:
+    elif '.yaml' in filename or '.yml' in filename:
         content = yaml.dump(data, indent=1)
     elif filename == 'STDOUT':
         sys.stdout.write(ujson.dumps(data, indent=1, escape_forward_slashes=False)+'\n')

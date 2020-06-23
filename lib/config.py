@@ -27,11 +27,23 @@ def load_config(options, file):
             for key, value in new_options['common'].items():
                 if key not in new_options[k]:
                     new_options[k][key] = value
+                elif isinstance(new_options[k][key], dict):
+                    for sub_key, sub_value in new_options['common'][key].items():
+                        if sub_key not in new_options[k][key]:
+                            new_options[k][key][sub_key] = sub_value
     for k in new_options.keys():
         if k not in options:
             options[k] = {}
         for key, value in new_options[k].items():
-            options[k][key] = value
+            if isinstance(new_options[k][key], dict):
+                for sub_key, sub_value in new_options[k][key].items():
+                    if isinstance(sub_value, str) and sub_value.startswith('~'):
+                        sub_value = os.path.expanduser(sub_value)
+                    options[k]["%s-%s" % (key, sub_key)] = sub_value
+            else:
+                if isinstance(value, str) and value.startswith('~'):
+                    value = os.path.expanduser(value)
+                options[k][key] = value
     return options
 
 
@@ -53,6 +65,8 @@ def config(group, **kwargs):
     for k, v in kwargs.items():
         if v:
             k = k.lstrip('--')
+            if isinstance(v, str) and v.startswith('~'):
+                v = os.path.expanduser(v)
             if k in options[group]:
                 options[group][k] = v
             elif not k == group:

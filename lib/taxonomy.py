@@ -36,7 +36,7 @@ def add_names_to_nodes(filename, nodes):
 
 def parse(options, _es):
     """Expand lineages from nodes dict."""
-    directory = options['taxonomy']
+    directory = options['taxonomy-taxdump']
     root = str(options['taxonomy-root'])
     nodes = parse_nodes("%s/nodes.dmp" % directory)
     add_names_to_nodes("%s/names.dmp" % directory, nodes)

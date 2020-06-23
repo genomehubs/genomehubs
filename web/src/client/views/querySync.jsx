@@ -1,133 +1,141 @@
-import { history } from './reducers/history'
-import { getQueryValue } from './reducers/location'
-import qs from 'qs'
-import convert from 'color-convert'
+import { history } from './reducers/history';
+import { getQueryValue } from './reducers/location';
+import qs from 'qs';
+import convert from 'color-convert';
 import { batchActions } from 'redux-batched-actions';
 
-export const userColors = ['rgb(166,206,227)','rgb(31,120,180)','rgb(178,223,138)','rgb(51,160,44)','rgb(251,154,153)','rgb(227,26,28)','rgb(253,191,111)','rgb(255,127,0)','rgb(202,178,214)','rgb(106,61,154)']
+export const userColors = [
+  'rgb(166,206,227)',
+  'rgb(31,120,180)',
+  'rgb(178,223,138)',
+  'rgb(51,160,44)',
+  'rgb(251,154,153)',
+  'rgb(227,26,28)',
+  'rgb(253,191,111)',
+  'rgb(255,127,0)',
+  'rgb(202,178,214)',
+  'rgb(106,61,154)',
+];
 
 export const colorToRGB = (color) => {
-  if (color.match('rgb')){
-    return color
+  if (color.match('rgb')) {
+    return color;
+  } else if (color.match('hsl')) {
+    color = color.replace('hsl(', '').replace(')', '').split(',');
+    color = convert.hsl.rgb(color);
+  } else if (color.match('#')) {
+    color = color.replace('#', '');
+    color = convert.hex.rgb(color);
+  } else if (color.match('hex')) {
+    color = color.replace('hex', '');
+    color = convert.hex.rgb(color);
+  } else {
+    color = convert.keyword.rgb(color);
   }
-  else if (color.match('hsl')){
-    color = color.replace('hsl(','').replace(')','').split(',')
-    color = convert.hsl.rgb(color)
+  if (color) {
+    color = 'rgb(' + color.join() + ')';
   }
-  else if (color.match('#')){
-    color = color.replace('#','')
-    color = convert.hex.rgb(color)
-  }
-  else if (color.match('hex')){
-    color = color.replace('hex','')
-    color = convert.hex.rgb(color)
-  }
-  else {
-    color = convert.keyword.rgb(color)
-  }
-  if (color){
-    color = 'rgb('+color.join()+')'
-  }
-  return color
-}
+  return color;
+};
 
 export const colorToHex = (color) => {
-  if (color.match('#')){
-    return color.replace('#','hex')
+  if (color.match('#')) {
+    return color.replace('#', 'hex');
+  } else if (color.match('hsl')) {
+    color = color.replace('hsl(', '').replace(')', '').split(',');
+    color = convert.hsl.hex(color);
+  } else if (color.match('rgba')) {
+    color = color.replace('rgba(', '').replace(')', '').split(',');
+    color = convert.rgb.hex(color.slice(0, 3));
+  } else if (color.match('rgb')) {
+    color = color.replace('rgb(', '').replace(')', '').split(',');
+    color = convert.rgb.hex(color);
+  } else {
+    color = convert.keyword.hex(color);
   }
-  else if (color.match('hsl')){
-    color = color.replace('hsl(','').replace(')','').split(',')
-    color = convert.hsl.hex(color)
+  if (color) {
+    color = 'hex' + color;
   }
-  else if (color.match('rgba')){
-    color = color.replace('rgba(','').replace(')','').split(',')
-    // let alpha = Math.round(color[3]*255).toString(16)
-    color = convert.rgb.hex(color.slice(0,3))
-    // color += alpha
-  }
-  else if (color.match('rgb')){
-    color = color.replace('rgb(','').replace(')','').split(',')
-    color = convert.rgb.hex(color)
-  }
-  else {
-    color = convert.keyword.hex(color)
-  }
-  if (color){
-    color = 'hex'+color
-  }
-  return color
-}
+  return color;
+};
 
-export const defaultTransform = { x:0, order:1, factor:0, intercept: 0, origin: {x: 0, y:0}, index: -1 }
+export const defaultTransform = {
+  x: 0,
+  order: 1,
+  factor: 0,
+  intercept: 0,
+  origin: { x: 0, y: 0 },
+  index: -1,
+};
 
-const keyed = (o,k) => Object.prototype.hasOwnProperty.call(o,k)
+const keyed = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 
-const mapDispatchToQuery = (
-  {
-    palette: {
-      type: 'SELECT_PALETTE',
-      payload: (k,v) => v,
-      default: 'default'
-    },
-    pngResolution: {
-      type: 'SET_PNG_RESOLUTION',
-      payload: (k,v) => v,
-      default: 2000
-    },
-    userColors: {
-      actions: (k,v) => ([
-        {
-          type: 'EDIT_PALETTE',
-          payload: (k,v) => {
-            let user = []
-            v.forEach(o=>{user[o.index] = colorToRGB(o.value)})
-            return {id:'user',user}
-          }
-        }
-      ])
-    },
-    color0: {
-      array: (k,v) => ({key:'userColors',index:0,value:v}),
-      default: userColors[0]
-    },
-    color1: {
-      array: (k,v) => ({key:'userColors',index:1,value:v}),
-      default: userColors[1]
-    },
-    color2: {
-      array: (k,v) => ({key:'userColors',index:2,value:v}),
-      default: userColors[2]
-    },
-    color3: {
-      array: (k,v) => ({key:'userColors',index:3,value:v}),
-      default: userColors[3]
-    },
-    color4: {
-      array: (k,v) => ({key:'userColors',index:4,value:v}),
-      default: userColors[4]
-    },
-    color5: {
-      array: (k,v) => ({key:'userColors',index:5,value:v}),
-      default: userColors[5]
-    },
-    color6: {
-      array: (k,v) => ({key:'userColors',index:6,value:v}),
-      default: userColors[6]
-    },
-    color7: {
-      array: (k,v) => ({key:'userColors',index:7,value:v}),
-      default: userColors[7]
-    },
-    color8: {
-      array: (k,v) => ({key:'userColors',index:8,value:v}),
-      default: userColors[8]
-    },
-    color9: {
-      array: (k,v) => ({key:'userColors',index:9,value:v}),
-      default: userColors[9]
-    }
+const mapDispatchToQuery = {
+  palette: {
+    type: 'SELECT_PALETTE',
+    payload: (k, v) => v,
+    default: 'default',
+  },
+  pngResolution: {
+    type: 'SET_PNG_RESOLUTION',
+    payload: (k, v) => v,
+    default: 2000,
+  },
+  userColors: {
+    actions: (k, v) => [
+      {
+        type: 'EDIT_PALETTE',
+        payload: (k, v) => {
+          let user = [];
+          v.forEach((o) => {
+            user[o.index] = colorToRGB(o.value);
+          });
+          return { id: 'user', user };
+        },
+      },
+    ],
+  },
+  color0: {
+    array: (k,v) => ({key:'userColors',index:0,value:v}),
+    default: userColors[0]
+  },
+  color1: {
+    array: (k,v) => ({key:'userColors',index:1,value:v}),
+    default: userColors[1]
+  },
+  color2: {
+    array: (k,v) => ({key:'userColors',index:2,value:v}),
+    default: userColors[2]
+  },
+  color3: {
+    array: (k,v) => ({key:'userColors',index:3,value:v}),
+    default: userColors[3]
+  },
+  color4: {
+    array: (k,v) => ({key:'userColors',index:4,value:v}),
+    default: userColors[4]
+  },
+  color5: {
+    array: (k,v) => ({key:'userColors',index:5,value:v}),
+    default: userColors[5]
+  },
+  color6: {
+    array: (k,v) => ({key:'userColors',index:6,value:v}),
+    default: userColors[6]
+  },
+  color7: {
+    array: (k,v) => ({key:'userColors',index:7,value:v}),
+    default: userColors[7]
+  },
+  color8: {
+    array: (k,v) => ({key:'userColors',index:8,value:v}),
+    default: userColors[8]
+  },
+  color9: {
+    array: (k,v) => ({key:'userColors',index:9,value:v}),
+    default: userColors[9]
   }
-)
+};
 
 export const defaultValue = param => mapDispatchToQuery[param].default || false
 
