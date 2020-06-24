@@ -4,12 +4,17 @@
 
 import re
 
-from es_functions import base_or, base_query, nested_or
+from es_functions import base_query, nested_or
+from gh_functions import template_helper
 
 
-def template():
+def template(*args):
     """Set template names."""
-    return {'name': 'assembly', 'filename': 'assembly.json'}
+    obj = {
+        'prefix': 'assembly',
+        'filename': 'assembly.json'
+    }
+    return template_helper(obj, *args)
 
 
 def assemblies_by_taxon_name(name, filters=None):
@@ -78,7 +83,7 @@ def assemblies_by_assembly_id(assembly_id, filters=None):
 
 
 def meta_to_filters(meta):
-    """convert metadata strings to list of filters."""
+    """Convert metadata strings to list of filters."""
     statistics = {'n50', 'l50', 'n90', 'l90',
                   'count', 'span',
                   'gc_proportion', 'n_proportion',

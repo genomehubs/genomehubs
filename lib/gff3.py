@@ -2,8 +2,10 @@
 
 """GFF3 methods."""
 
-from es_functions import base_query
 import file_io
+
+from es_functions import base_query
+from gh_functions import template_helper
 
 
 def make_introns(feature, count):
@@ -47,7 +49,7 @@ def make_introns(feature, count):
     return count
 
 
-def parse(options, _es):
+def parse(options, _es):  # pylint: disable=too-many-branches, too-many-locals, too-many-statements
     """Parse gff3 file."""
     cols = ['query_seqid', 'source', 'primary_tag', 'query_start', 'query_end',
             'score', 'strand', 'frame', '_attributes']
@@ -69,7 +71,7 @@ def parse(options, _es):
             if fields['score'] == '.':
                 fields['score'] = 0
             fields['length'] = int(fields['query_end']) - int(fields['query_start']) + 1
-            attributes = {key: value for key, value in [attr.split('=') for attr in fields['_attributes'].split(';')]}
+            attributes = dict([attr.split('=') for attr in fields['_attributes'].split(';')])
             del fields['_attributes']
             if fields['primary_tag'] == 'gene':
                 gene = fields
@@ -160,9 +162,16 @@ def parse(options, _es):
     yield "gene-%s" % feature['gene_id'], feature
 
 
-def template():
+def template(*args):
     """Set template names."""
-    return {'name': 'gff3', 'filename': 'gff3.json'}
+    obj = {
+        'prefix': 'gff3',
+        'filename': 'gff3.json',
+        'suffix': '.gff',
+        'index_type': 'gff3',
+        'analysis_type': 'gene_models'
+    }
+    return template_helper(obj, *args)
 
 
 def assemblies_from_genes(gene_list, es, index):

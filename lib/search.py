@@ -53,25 +53,17 @@ Examples:
             --return protein.FASTA
 """
 
-import logging
-import re
-import sys
-
-from pathlib import Path
-
 from docopt import docopt
-from elasticsearch import Elasticsearch, client, helpers
 
 import assembly
 # import busco
 # import fasta
 import gff3
 import gh_logger
-import taxonomy
 import tree
 # import interproscan
 from config import config
-from es_functions import build_search_query, test_connection
+from es_functions import test_connection
 
 LOGGER = gh_logger.logger()
 PARAMS = [{'flag': '--gff3', 'module': gff3}]
@@ -89,8 +81,7 @@ def generate_index_patterns(options):
 
 def generate_assembly_list(options, es):
     """Generate list of assemblies to search."""
-    index = "assembly-%s-%s" % (str(options['index']['taxonomy-root']), options['search']['version'])
-    options['assembly-index'] = index
+    index = assembly.template('name', options['search'])
     meta = []
     if 'meta' in options['search'] and options['search']['meta']:
         meta = options['search']['meta']
@@ -107,7 +98,6 @@ def generate_assembly_list(options, es):
                                                      index)
     if 'species-tree-node' in options['search'] and options['search']['species-tree-node']:
         options['analysis-type'] = 'species_tree'
-        options['tree-index'] = "tree-%s-%s" % (str(options['index']['taxonomy-root']), options['search']['version'])
         assemblies += tree.assemblies_from_tree(options['search']['species-tree-node'],
                                                 meta,
                                                 es,

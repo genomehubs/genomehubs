@@ -3,15 +3,15 @@
 """INSDC assembly methods."""
 
 import re
-import requests
 
 from collections import defaultdict
+
+import requests
+
 from defusedxml import ElementTree as ET
 
-import file_io
+import assembly
 import taxonomy
-
-from es_functions import nested_or
 
 
 def count_taxon_assemblies(root):
@@ -44,7 +44,7 @@ def list_taxon_assemblies(root, offset, count):
         if response.ok:
             return response.content
         return None
-    except:
+    except Exception:  # pylint: disable=broad-except
         result = list_taxon_assemblies(root, offset, count)
         return result
 
@@ -58,7 +58,7 @@ def assemblies_from_accession(accession):
         if response.ok:
             return response.content
         return None
-    except:
+    except Exception:  # pylint: disable=broad-except
         result = assemblies_from_accession(accession)
         return result
 
@@ -72,7 +72,7 @@ def deep_find_text(data, tags):
     for tag in tags:
         try:
             data = data.find(tag)
-        except:
+        except Exception:  # pylint: disable=broad-except
             return None
     return data.text
 
@@ -89,7 +89,7 @@ def add_assembly_identifier(asm, identifiers, id_type, xml_path):
     return None
 
 
-def assembly_meta(asm, options):
+def assembly_meta(asm, options):  # pylint: disable=too-many-locals
     """Return dict of metadata values for an assembly."""
     genome_representation = asm.find('GENOME_REPRESENTATION').text
     if genome_representation == options['insdc-genome-representation']:
@@ -163,12 +163,9 @@ def assembly_meta(asm, options):
 
 def parse(options, es):
     """Import assemblies from INSDC."""
-    version = options['version']
-    taxonomy_index = "%s-%s-%s" % (taxonomy.template()['name'], str(options['taxonomy-root']), version)
+    taxonomy_index = taxonomy.template('name', options)
     xml = ''
-    if not isinstance(options['insdc-root'], list):
-        options['insdc-root'] = [options['insdc-root']]
-    for identifier in options['insdc-root']:
+    for identifier in options['taxonomy-root']:
         if str(identifier).isdecimal():
             found = count_taxon_assemblies(identifier)
             if found:
@@ -181,21 +178,21 @@ def parse(options, es):
         else:
             # TODO: handle non GCA accessions
             xml = ''
-    assemblies = ET.fromstring(xml)
-    for assembly in assemblies:
-        meta = {}
-        meta = assembly_meta(assembly, options)
-        if meta:
-            taxon = taxonomy.taxon_from_taxid(meta['taxid'], es, taxonomy_index)
-            if taxon:
-                meta['scientific_name'] = taxon['scientific_name']
-                meta['unique_name'] = taxon['unique_name']
-                meta['rank'] = taxon['rank']
-                meta['taxon_names'] = taxon['names']
-                meta['lineage'] = taxon['lineage']
-            yield "assembly-%s" % meta['assembly_id'], meta
+        assemblies = ET.fromstring(xml)
+        for asm in assemblies:
+            meta = {}
+            meta = assembly_meta(asm, options)
+            if meta:
+                taxon = taxonomy.taxon_from_taxid(meta['taxid'], es, taxonomy_index)
+                if taxon:
+                    meta['scientific_name'] = taxon['scientific_name']
+                    meta['unique_name'] = taxon['unique_name']
+                    meta['rank'] = taxon['rank']
+                    meta['taxon_names'] = taxon['names']
+                    meta['lineage'] = taxon['lineage']
+                yield "assembly-%s" % meta['assembly_id'], meta
 
 
-def template():
+def template(*args):
     """Set template names."""
-    return {'name': 'assembly', 'filename': 'assembly.json'}
+    return assembly.template(*args)

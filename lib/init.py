@@ -4,15 +4,15 @@
 Initialise a GenomeHub.
 
 Usage:
-    genomehubs init [--directory PATH] [--insdc-root ID...]
-                    [--taxonomy-taxdump DIR] [--taxonomy-root INT] [--configfile YAML...]
+    genomehubs init [--directory PATH] [--insdc]
+                    [--taxonomy-taxdump DIR] [--taxonomy-root TAXID...] [--configfile YAML...]
                     [--es-container STRING] [--es-host HOSTNAME] [--es-image STRING]
                     [--es-port PORT] [--es-repository STRING] [--es-startup-timeout STRING] [--use-docker]
                     [--reset] [--force-reset]
 
 Options:
     --directory PATH          Root directory for new GenomeHub.
-    --insdc-root ID           Public INSDC assembly identifier or taxid.
+    --insdc                   Flag to index Public INSDC assemblies.
     --taxonomy-taxdump DIR    NCBI taxonomy taxdump directory.
     --taxonomy-root INT       Root taxid for taxonomy index.
     --configfile YAML         YAML configuration file.
@@ -31,14 +31,11 @@ Examples:
     ./genomehubs init
 
     # 2. New GenomeHub in specified directory, populated with Lepidoptera assemblies from INSDC
-    ./genomehubs init --directory /path/to/GenomeHub --insdc-root 7088
+    ./genomehubs init --directory /path/to/GenomeHub --taxonomy-root 7088 --insdc
 """
 
-import logging
 import os
 import platform
-import re
-import requests
 import shutil
 import signal
 import sys
@@ -50,24 +47,25 @@ from pathlib import Path
 from subprocess import Popen, PIPE
 
 import docker
+import psutil
+import requests
 
 from docopt import docopt
 from tqdm import tqdm
-from elasticsearch import Elasticsearch, client, exceptions, helpers
+from elasticsearch import exceptions
 
 import assembly
 # import busco
 # import fasta
 import file_io
-import gff3
+# import gff3
 import gh_logger
 import index
 import insdc
-import psutil
 import taxonomy
 # import interproscan
 from config import config
-from es_functions import build_search_query, test_connection
+from es_functions import test_connection
 
 LIBDIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ''))
 LOGGER = gh_logger.logger()
@@ -161,6 +159,55 @@ def start_elasticsearch_docker(options):
         sys.exit(1)
 
 
+def start_elasticsearch_binary(options):
+    """Use Elasticsearch binary."""
+    es_file = "%s-%s-%s.tar.gz" % (options['init']['es-image'].replace(':', '-'),
+                                   platform.system().lower(),
+                                   platform.machine())
+    url = "%s/%s" % (options['init']['es-url'], es_file)
+    gz_path = "%s/%s" % (options['init']['directory'], es_file)
+    local_path = "%s/%s" % (options['init']['directory'], 'elasticsearch')
+    es_dir = options['init']['es-image'].replace(':', '-').replace('-oss', '')
+    es_path = "%s/%s" % (options['init']['directory'], es_dir)
+    if not os.path.exists(es_path):
+        if not os.path.exists(gz_path):
+            LOGGER.info("Fetching Elasticsearch from '%s'", url)
+            download_with_progress(url, gz_path)
+        LOGGER.info("Extracting Elasticsearch to '%s'", es_path)
+        archive = tarfile.open(gz_path, "r:gz")
+        archive.extractall(local_path)
+        archive.close()
+    write_elastic_yaml("%s/config/elasticsearch.yml" % es_path, options)
+    LOGGER.info("Starting Elasticsearch on port %s", options['init']['es-port'])
+    process = Popen("%s/bin/elasticsearch" % es_path,
+                    stdout=PIPE,
+                    stderr=PIPE,
+                    encoding='ascii')
+    LOGGER.info("Starting Elasticsearch with pid %d", process.pid)
+    es = test_connection(options['init'], True)
+    pbar = tqdm(total=int(options['init']['es-startup-timeout']))
+    for _i in range(int(options['init']['es-startup-timeout'])):
+        pbar.update(1)
+        time.sleep(1)
+        es = test_connection(options['init'], True)
+        if es:
+            break
+    pbar.close()
+    if es:
+        LOGGER.info("Elasticsearch running on port %s",
+                    str(options['init']['es-port']))
+        return es
+    LOGGER.error("Unable to start Elasticsearch in %s seconds",
+                 str(options['init']['es-startup-timeout']))
+    LOGGER.info('Consider increasing es-startup-timeout')
+    LOGGER.info('Stopping Elasticsearch process')
+    try:
+        os.kill(process.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    sys.exit(1)
+
+
 def download_with_progress(url, file):
     """Display progress bar for file download."""
     res = requests.get(url, stream=True)
@@ -196,56 +243,13 @@ def start_elasticsearch(options):
             if options['init']['use-docker']:
                 es = start_elasticsearch_docker(options)
             else:
-                es_file = "%s-%s-%s.tar.gz" % (options['init']['es-image'].replace(':', '-'),
-                                               platform.system().lower(),
-                                               platform.machine())
-                url = "%s/%s" % (options['init']['es-url'], es_file)
-                gz_path = "%s/%s" % (options['init']['directory'], es_file)
-                local_path = "%s/%s" % (options['init']['directory'], 'elasticsearch')
-                es_dir = options['init']['es-image'].replace(':', '-').replace('-oss', '')
-                es_path = "%s/%s" % (options['init']['directory'], es_dir)
-                if not os.path.exists(es_path):
-                    if not os.path.exists(gz_path):
-                        LOGGER.info("Fetching Elasticsearch from '%s'", url)
-                        download_with_progress(url, gz_path)
-                    LOGGER.info("Extracting Elasticsearch to '%s'", es_path)
-                    archive = tarfile.open(gz_path, "r:gz")
-                    archive.extractall(local_path)
-                    archive.close()
-                write_elastic_yaml("%s/config/elasticsearch.yml" % es_path, options)
-                LOGGER.info("Starting Elasticsearch on port %s", options['init']['es-port'])
-                process = Popen("%s/bin/elasticsearch" % es_path,
-                                stdout=PIPE,
-                                stderr=PIPE,
-                                encoding='ascii')
-                LOGGER.info("Starting Elasticsearch with pid %d", process.pid)
-                es = test_connection(options['init'], True)
-                pbar = tqdm(total=int(options['init']['es-startup-timeout']))
-                for _i in range(int(options['init']['es-startup-timeout'])):
-                    pbar.update(1)
-                    time.sleep(1)
-                    es = test_connection(options['init'], True)
-                    if es:
-                        break
-                pbar.close()
-                if es:
-                    LOGGER.info("Elasticsearch running on port %s",
-                                str(options['init']['es-port']))
-                    return es
-                LOGGER.error("Unable to start Elasticsearch in %s seconds",
-                             str(options['init']['es-startup-timeout']))
-                LOGGER.info('Consider increasing es-startup-timeout')
-                LOGGER.info('Stopping Elasticsearch process')
-                try:
-                    os.kill(viewer.pid, signal.SIGTERM)
-                except ProcessLookupError:
-                    pass
+                es = start_elasticsearch_binary(options)
         else:
             LOGGER.error('Unable to start Elasticsearch on remote host')
             LOGGER.info('Specify localhost or ensure Elasticsearch is running remotely before executing this command')
             sys.exit(1)
-        # Check Elasticsearch is running
-        es = test_connection(options['init'])
+        # # Check Elasticsearch is running
+        # es = test_connection(options['init'])
         if not es:
             LOGGER.error('Unable to start Elasticsearch')
             sys.exit(1)
@@ -302,7 +306,7 @@ def human_readable_size(size, decimal_places=3):
     return f"{size:.{decimal_places}f}{unit}"
 
 
-def reset_hub(options):
+def reset_hub(options):  # pylint: disable=too-many-branches
     """Reset a GenomeHub by removing files and containers."""
     container = False
     elastic_process = False
@@ -327,7 +331,6 @@ def reset_hub(options):
         if 'force-reset' in options['init'] and options['init']['force-reset']:
             proceed = True
         else:
-            prefix = 'This will remove '
             if container:
                 LOGGER.warning("This will remove an existing container named '%s' ", options['init']['es-container'])
             elif elastic_process:
@@ -374,28 +377,25 @@ def fetch_taxdump(options):
 def index_taxonomy(es, options):
     """Call genomehubs index --taxonomy unless index already exists."""
     try:
-        index_name = "taxonomy-%s-%s" % (str(options['init']['taxonomy-root']), options['init']['version'])
+        index_name = taxonomy.template('name', options['init'])
         es.indices.get(index_name)
         LOGGER.info("Using existing taxonomy index '%s'", index_name)
     except exceptions.NotFoundError:
-        template = taxonomy.template()
-        index.load_template(es, template)
-        LOGGER.info("Initialising taxonomy index with root %s",
-                    str(options['init']['taxonomy-root']))
+        index.load_template(es, taxonomy.template())
+        LOGGER.info("Initialising taxonomy index '%s'", index_name)
         index.index_entries(es, index_name, taxonomy, {**options['index'], **options['init']})
 
 
 def index_insdc(es, options):
     """Call genomehubs index --insdc unless index already exists."""
     try:
-        index_name = "assembly-%s-%s" % (str(options['init']['taxonomy-root']), options['init']['version'])
+        index_name = assembly.template('name', options['init'])
         es.indices.get(index_name)
         LOGGER.info("Using existing assembly index '%s'", index_name)
     except exceptions.NotFoundError:
-        template = insdc.template()
-        index.load_template(es, template)
-        LOGGER.info('Initialising assembly index with public INSDC assemblies matching %s',
-                    str(options['init']['insdc-root']))
+        index.load_template(es, insdc.template())
+        LOGGER.info("Initialising assembly index '%s' with public INSDC assemblies",
+                    index_name)
         index.index_entries(es, index_name, insdc, {**options['index'], **options['init']})
 
 
@@ -424,7 +424,7 @@ def main():
         index_taxonomy(es, options)
 
     # Index INSDC
-    if 'insdc-root' in options['init'] and options['init']['insdc-root']:
+    if 'insdc' in options['init'] and options['init']['insdc']:
         index_insdc(es, options)
 
 

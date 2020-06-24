@@ -12,8 +12,9 @@ import assembly
 import gff3
 import taxonomy
 
-from es_functions import base_query, nested_or
+from es_functions import nested_or
 from file_io import read_file
+from gh_functions import template_helper
 
 
 def clade_depth(root):
@@ -29,14 +30,15 @@ def assemblies_from_tree_leaf(leaf_list, es, options):
     if not isinstance(leaf_list, list):
         leaf_list = [leaf_list]
     assemblies = []
+    assembly_index = assembly.template('name', options)
     if options['analysis-type'] == 'species_tree':
-        assemblies = assembly.assemblies_from_assembly(leaf_list, {}, es, options['assembly-index'])
+        assemblies = assembly.assemblies_from_assembly(leaf_list, {}, es, assembly_index)
         if not assemblies:
-            assemblies = assembly.assemblies_from_taxon(leaf_list, {}, es, options['assembly-index'])
+            assemblies = assembly.assemblies_from_taxon(leaf_list, {}, es, assembly_index)
     else:
-        genes = gff3.assemblies_from_genes(leaf_list, es, options['gene-index'])
+        genes = gff3.assemblies_from_genes(leaf_list, es, gff3.template('name', options))
         asms = [gene['_source']['assembly_id'] for gene in genes]
-        assemblies = assembly.assemblies_from_assembly(asms, {}, es, options['assembly-index'])
+        assemblies = assembly.assemblies_from_assembly(asms, {}, es, assembly_index)
     return assemblies
 
 
@@ -49,7 +51,7 @@ def set_leaf_taxids(nodes, tree, prefix, es, options):
         nodes["%s-%s" % (prefix, leaf.name)]['scientific_name'] = assemblies[0]['_source']['scientific_name']
 
 
-def parse_tree(filename, nodes, options, es):
+def parse_tree(filename, nodes, options, es):  # pylint: disable=too-many-locals
     """Parse tree file."""
     prefix = options['prefix']
     newick = read_file(filename)
@@ -102,7 +104,7 @@ def parse_tree(filename, nodes, options, es):
                 taxids.add(leaf_taxid)
                 nodes[doc_id]['descendants'].append(descendant)
             nodes[doc_id]['taxon_count'] = len(taxids)
-            lca = taxonomy.lca_from_taxon(list(taxids), es, options['taxonomy-index'])
+            lca = taxonomy.lca_from_taxon(list(taxids), es, taxonomy.template('name', options['index']))
             nodes[doc_id]['taxid'] = lca['taxid']
             nodes[doc_id]['scientific_name'] = lca['scientific_name']
 
@@ -126,12 +128,20 @@ def parse(options, es):
         yield "node-%s" % doc_id, node
 
 
-def template():
+def template(*args):
     """Set template names."""
-    return {'name': 'tree', 'filename': 'tree.json'}
+    obj = {
+        'prefix': 'tree',
+        'filename': 'tree.json',
+        'suffix': '.nhx|.nwk|.newick',
+        'assembly': 'multi',
+        'index_type': 'tree',
+        'analysis_type': 'gene_trees'
+    }
+    return template_helper(obj, *args)
 
 
-def assemblies_from_tree(node_list, meta, es, options):
+def assemblies_from_tree(node_list, _meta, es, options):  # pylint: disable=too-many-locals
     """Fetch assemblies by node ID."""
     if not isinstance(node_list, list):
         node_list = [node_list]
@@ -151,7 +161,7 @@ def assemblies_from_tree(node_list, meta, es, options):
             or_filters.append({'filters': [{'match': {'node_id': 'root'}}]})
             filters.append({'match': {'tree_id': tree_id}})
         query = nested_or(or_filters, filters)
-        res = es.search(index=options['tree-index'],
+        res = es.search(index=template('name', options),
                         body=query,
                         size=10)
         if res['hits']['total']['value'] > 0:

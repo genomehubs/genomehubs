@@ -19,10 +19,10 @@ def update(original, latest):
     return original
 
 
-def load_config(options, file):
+def load_config(options, file):  # pylint: disable=too-many-branches
     """Load configuration from file."""
     new_options = load_yaml(file)
-    if 'common' in new_options:
+    if 'common' in new_options:  # pylint: disable=too-many-nested-blocks
         for k in new_options.keys():
             for key, value in new_options['common'].items():
                 if key not in new_options[k]:
@@ -39,6 +39,8 @@ def load_config(options, file):
                 for sub_key, sub_value in new_options[k][key].items():
                     if isinstance(sub_value, str) and sub_value.startswith('~'):
                         sub_value = os.path.expanduser(sub_value)
+                    if key == 'taxonomy' and sub_key == 'root' and not isinstance(sub_value, list):
+                        sub_value = [int(sub_value)]
                     options[k]["%s-%s" % (key, sub_key)] = sub_value
             else:
                 if isinstance(value, str) and value.startswith('~'):
@@ -47,7 +49,7 @@ def load_config(options, file):
     return options
 
 
-def config(group, **kwargs):
+def config(group, **kwargs):  # pylint: disable=too-many-branches
     """Load configuration."""
     script_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     dist_file = os.path.join(script_dir, 'config', 'dist.config.yaml')
@@ -65,8 +67,9 @@ def config(group, **kwargs):
     for k, v in kwargs.items():
         if v:
             k = k.lstrip('--')
-            if isinstance(v, str) and v.startswith('~'):
-                v = os.path.expanduser(v)
+            if isinstance(v, str):
+                if v.startswith('~'):
+                    v = os.path.expanduser(v)
             if k in options[group]:
                 options[group][k] = v
             elif not k == group:

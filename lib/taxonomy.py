@@ -7,6 +7,7 @@ import re
 import file_io
 
 from es_functions import base_query, nested_or
+from gh_functions import template_helper
 
 
 def parse_nodes(filename):
@@ -37,14 +38,14 @@ def add_names_to_nodes(filename, nodes):
 def parse(options, _es):
     """Expand lineages from nodes dict."""
     directory = options['taxonomy-taxdump']
-    root = str(options['taxonomy-root'])
+    roots = list(map(int, options['taxonomy-root']))
     nodes = parse_nodes("%s/nodes.dmp" % directory)
     add_names_to_nodes("%s/names.dmp" % directory, nodes)
     for taxid, obj in nodes.items():
         lineage = obj.copy()
         lineage.update({'lineage': []})
         descendant = False
-        if taxid == root:
+        if int(taxid) in roots:
             descendant = True
         while 'parent' in obj and obj['parent'] in nodes:
             parent = obj['parent']
@@ -52,16 +53,21 @@ def parse(options, _es):
             lineage['lineage'].append({'taxid': obj['taxid'],
                                        'rank': obj['rank'],
                                        'scientific_name': obj['scientific_name']})
-            if obj['taxid'] == root:
+            if int(obj['taxid']) in roots:
                 descendant = True
                 break
         if descendant:
             yield "taxid-%s" % taxid, lineage
 
 
-def template():
+def template(*args):
     """Set template names."""
-    return {'name': 'taxonomy', 'filename': 'ncbi_taxonomy.json'}
+    obj = {
+        'prefix': 'taxonomy',
+        'filename': 'ncbi_taxonomy.json',
+        'exists': 'continue'
+    }
+    return template_helper(obj, *args)
 
 
 def taxa_by_name(name):
