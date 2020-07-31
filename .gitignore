@@ -5,3 +5,4 @@ htmlcov
 *.egg-info
 .tox
 build
+_version.py

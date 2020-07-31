@@ -25,15 +25,31 @@ If you are proposing a feature:
 
 * Explain in detail how it would work.
 * Keep the scope as narrow as possible, to make it easier to implement.
-* Remember that this is a volunteer-driven project, and that code contributions are welcome :)
+* Remember that code contributions are welcome
 
 Development
 ===========
 
+To install the development version of `genomehubs`:
+
+1. Clone the `genomehubs` repository::
+
+    git clone https://github.com/genomehubs/genomehubs
+
+2. Install the dependencies using pip::
+
+    cd genomehubs
+    pip install -r requirements.txt
+
+3. Build and install the `genomehubs` package::
+
+    python3 setup.py sdist bdist_wheel \
+    && echo y | pip uninstall genomehubs \
+    && pip install dist/genomehubs-2.0.0-py3-none-any.whl
+
 To set up `genomehubs` for local development:
 
-1. Fork `genomehubs <https://github.com/genomehubs/genomehubs>`_
-   (look for the "Fork" button).
+1. Fork `genomehubs <https://github.com/genomehubs/genomehubs>` - (look for the "Fork" button).
 2. Clone your fork locally::
 
     git clone git@github.com:USERNAME/genomehubs.git
@@ -80,6 +96,6 @@ To run a subset of tests::
 
     tox -e envname -- pytest -k test_myfeature
 
-To run all the test environments in *parallel* (you need to ``pip install detox``)::
+To run all the test environments in *parallel*:
 
-    detox
+    tox -p
