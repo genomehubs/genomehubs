@@ -13,7 +13,8 @@ Usage:
                [--unique-name STRING] [--es-host HOSTNAME] [--es-port PORT]
 
 Options:
-    --assembly_id ID        An assembly ID can be provided here or parsed from input filenames.
+    --assembly_id ID        An assembly ID can be provided here or parsed from input
+                            filenames.
     --busco TSV             BUSCO full_table.tsv output file.
     --fasta FASTA           FASTA sequence file.
     --gff3 GFF3             GFF3 file.

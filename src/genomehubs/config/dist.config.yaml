@@ -1,29 +1,33 @@
 common:
-  hubname: demo
-  directory: ~/genomehubs/demo
-  docker-network: genomehubs-network
+  docker:
+    network: genomehubs-demo-network
   es:
-    host: localhost
-    port: 9200
+    host:
+      - localhost:9200
+  hub:
+    name: demo
+    path: ~/genomehubs/demo
+    version: v0.1
   taxonomy:
     sources:
       - ncbi
-  version: v0.1
 index:
   insdc:
-    page-size: 1000
     genome-representation: full
+    page-size: 1000
   skip-validation: false
 init:
+  docker:
+    contain: []
+    es:
+      container: ghubs-es
+      image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.6.2"
+    timeout: 30
   es:
-    container: genomehubs-elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.6.2
-    startup-timeout: 30
-    url: https://artifacts.elastic.co/downloads
+    url: "https://artifacts.elastic.co/downloads"
   taxonomy:
-    path: ~/genomehubs/demo/taxdump
     ncbi:
       root: 1
-      url: ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz
-  use-docker: false
+      url: "ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz"
+    path: ~/genomehubs/demo/taxdump
 search: {}

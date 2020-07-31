@@ -76,7 +76,7 @@ def config(group, **kwargs):  # pylint: disable=too-many-branches
         print(dist_file)
     if os.path.exists(user_file):
         options = load_config(options, user_file)
-    for file in kwargs["--configfile"]:
+    for file in kwargs["--config-file"]:
         if os.path.exists(file):
             options = load_config(options, file)
     if group not in options:

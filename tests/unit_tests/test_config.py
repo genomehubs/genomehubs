@@ -3,14 +3,7 @@
 
 from pathlib import Path
 
-# import sys
-from unittest.mock import patch
-
-from tolkein import tofile
-
 from genomehubs.lib import config
-
-# import pytest
 
 
 def test_config_set_common_values():
@@ -80,13 +73,3 @@ def test_config_update_subsets_deep_nested():
     assert existing["taxonomy-ncbi-path"] == "%s/ncbi_path" % home
     assert existing["taxonomy-ncbi-root"] == [1]
     assert existing["taxonomy-alt-root"] == [4, 8]
-
-
-def test_config_load_config():
-    """Test updating config subsets."""
-    test_data = {
-        "common": {"es": {"host": "localhost"}},
-        "init": {"es": {"port": 9201}},
-    }
-    with patch.object(tofile, "load_yaml", test_data):
-        assert True
