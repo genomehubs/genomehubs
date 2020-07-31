@@ -11,8 +11,3 @@ addopts = "-ra -q"
 testpaths = [
     "tests",
 ]
-
-[tool.setuptools_scm]
-fallback_version = '2.0.0'
-local_scheme = 'dirty-tag'
-write_to = '_version.py'
