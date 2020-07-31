@@ -1,0 +1,49 @@
+{% set name = 'genomehubs' %}
+{% set version = '2.0.0' %}
+
+package:
+  name: {{ name }}
+  version: {{ version }}
+
+source:
+  git_rev: v{{ version }}
+  git_url: https://github.com/genomehubs/genomehubs.git
+
+build:
+  number: 0
+  entry_points:
+    - genomehubs = genomehubs:cli
+  script: "{{ PYTHON }} setup.py install --single-version-externally-managed --record=record.txt"
+
+requirements:
+  host:
+    - docopt>=0.6.2
+    - pip
+    - python
+    - pyyaml
+    - tolkein>=0.1.0
+    - ujson>=3.0.0
+  run:
+    - docopt>=0.6.2
+    - python
+    - pyyaml
+    - ujson>=3.0.0
+
+test:
+  imports:
+    - genomehubs
+  commands:
+    - genomehubs --help
+
+about:
+  home: "https://github.com/genomehubs/genomehubs"
+  license: MIT
+  license_family: MIT
+  license_file:
+  summary: "GenomeHubs"
+  doc_url: https://genomehubs.readthedocs.io/
+  dev_url:
+
+extra:
+  recipe-maintainers:
+    - rjchallis

@@ -1,0 +1,16 @@
+pycodestyle>=2.6.0
+pydocstyle>=5.0.2
+pylint>=2.5.3
+
+coverage>=5.1
+coveralls>=2.0.0
+mock>=4.0.2
+pytest-cov>=2.10.0
+pytest-isort>=1.1.0
+pytest-mock>=3.1.1
+pytest>=6.0.0
+
+docopt>=0.6.2
+pyyaml
+tolkein>=0.1.0
+ujson>=3.0.0
