@@ -9,7 +9,7 @@ common:
     path: ~/genomehubs/demo
     version: v0.1
   taxonomy:
-    sources:
+    source:
       - ncbi
 index:
   insdc:
@@ -29,5 +29,8 @@ init:
     ncbi:
       root: 1
       url: "ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz"
+      file:
+        - "nodes.dmp"
+        - "names.dmp"
     path: ~/genomehubs/demo/taxdump
 search: {}

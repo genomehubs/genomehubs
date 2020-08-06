@@ -7,7 +7,7 @@ Usage:
     genomehubs init [--hub-name STRING] [--hub-path PATH] [--hub-version PATH]
                     [--config-file PATH...] [--config-save PATH]
                     [--es-host URL...] [--es-url URL]
-                    [--insdc-meta] [--insdc-root INT...]
+                    [--insdc-metadata] [--insdc-root INT...]
                     [--taxonomy-path PATH] [--taxonomy-ncbi-root INT]
                     [--taxonomy-ncbi-url URL]
                     [--docker-contain STRING...] [--docker-network STRING]
@@ -24,7 +24,7 @@ Options:
     --config-save PATH            Path to write configuration options to YAML file.
     --es-host URL                 ElasticSearch hostname/URL and port.
     --es-url URL                  Remote URL to fetch ElasticSearch code.
-    --insdc-meta                  Flag to index metadata for public INSDC assemblies.
+    --insdc-metadata              Flag to index metadata for public INSDC assemblies.
     --insdc-root INT              Root taxid when indexing public INSDC assemblies.
     --taxonomy-path DIR           Path to directory containing raw taxonomies.
     --taxonomy-ncbi-root INT      Root taxid for NCBI taxonomy index.
@@ -51,55 +51,21 @@ Examples:
 """
 
 import sys
-import tarfile
-import urllib.request
-from pathlib import Path
 
 from docopt import docopt
+
 from tolkein import tolog
 
+from ..lib import assembly_metadata
+from ..lib import taxonomy
 from .config import config
 from .version import __version__
 
 LOGGER = tolog.logger(__name__)
 
 
-def fetch_taxdump(url, path, name=""):
-    """Fetch and extract taxdump files."""
-    LOGGER.info("Fetching %s taxdump from %s", name, url)
-    file_tmp = urllib.request.urlretrieve(url, filename=None)[0]
-    tar = tarfile.open(file_tmp)
-    LOGGER.info("Extracting taxdump to %s", path)
-    tar.extractall(path)
-    LOGGER.info("Finished extracting taxdump")
-
-
-def index_taxonomies(opts):
-    """Index all taxonomies in `taxonomy-sources`."""
-    taxdump_files = {"nodes.dmp", "names.dmp"}
-    for taxonomy_name in opts["taxonomy-sources"]:
-        taxonomy_path = Path("%s/%s" % (opts["taxonomy-path"], taxonomy_name))
-        if "taxonomy-%s-tree" % taxonomy_name in opts:
-            LOGGER.warning(
-                "Unable to import %s. Trees are not yet supported as a taxonomy type",
-                taxonomy_name,
-            )
-            continue
-        taxonomy_path.mkdir(parents=True, exist_ok=True)
-        for file_name in taxdump_files:
-            file_path = taxonomy_path / file_name
-            if not file_path.exists():
-                fetch_taxdump(
-                    url=opts["taxonomy-%s-url" % taxonomy_name],
-                    path=taxonomy_path,
-                    name=taxonomy_name,
-                )
-                break
-
-
 def main(args):
     """Initialise genomehubs."""
-    LOGGER.info("Loading configuration options")
     options = config("init", **args)
 
     # Reset an existing hub?
@@ -107,24 +73,25 @@ def main(args):
     #     reset_hub(options)
 
     # Create GenomeHubs directory
-    # setup_directory(options)
+    # setup_directory(options["init"])
 
     # Start Elasticsearch
-    # es = start_elasticsearch(options)
-
-    # Fetch NCBI taxdump
-    # fetch_taxdump(options)
+    # es = start_elasticsearch(options["init"])
 
     # Index taxonomies
-    LOGGER.info("Indexing taxonomies")
-    index_taxonomies(options["init"])
+    if "taxonomy-source" in options["init"]:
+        for taxonomy_name in options["init"]["taxonomy-source"]:
+            taxonomy.index(taxonomy_name, options["init"])
+    # index_taxonomies(options["init"])
     # if "taxonomy-root" in options["init"] and options["init"]["taxonomy-root"]:
     #     print()
     #     LOGGER.info(options["init"]["taxonomy-sources"])
     #     # index_taxonomy(es, options)
 
-    # # Index INSDC
-    # if "insdc" in options["init"] and options["init"]["insdc"]:
+    # Index INSDC
+    if "insdc-metadata" in options["init"]:
+        assembly_metadata.index("insdc", options["init"])
+
     #     LOGGER.info(options["init"]["taxonomy-sources"])
     #     # index_insdc(es, options)
 

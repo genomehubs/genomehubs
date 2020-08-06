@@ -5,6 +5,9 @@
 import os
 
 from tolkein import tofile
+from tolkein import tolog
+
+LOGGER = tolog.logger(__name__)
 
 
 def set_common_values(group_options, common_options):
@@ -66,6 +69,7 @@ def load_config(options, file):
 
 def config(group, **kwargs):  # pylint: disable=too-many-branches
     """Load configuration."""
+    LOGGER.info("Loading configuration options")
     script_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     dist_file = os.path.join(script_dir, "config", "dist.config.yaml")
     user_file = os.path.join(script_dir, "config", "config.yaml")

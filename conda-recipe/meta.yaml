@@ -21,7 +21,7 @@ requirements:
     - pip
     - python
     - pyyaml
-    - tolkein>=0.1.0
+    - tolkein>=0.2.0
     - ujson>=3.0.0
   run:
     - docopt>=0.6.2

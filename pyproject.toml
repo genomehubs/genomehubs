@@ -2,7 +2,6 @@
 requires = [
     'setuptools>=42',
     'wheel',
-    'setuptools_scm[toml]>=3.4',
 ]
 
 [tool.pytest.ini_options]
@@ -11,3 +10,17 @@ addopts = "-ra -q"
 testpaths = [
     "tests",
 ]
+
+[tool.black]
+line-length = 88
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.tox
+  | \.venv
+  | _build
+  | build
+  | dist
+)/
+'''

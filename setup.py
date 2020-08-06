@@ -99,7 +99,7 @@ setup(
     install_requires=[
         "docopt>=0.6.2",
         "pyyaml",
-        "tolkein>=0.1.0",
+        "tolkein>=0.2.0",
         "ujson>=3.0.0",
     ],  # Optional
     # List additional groups of dependencies here (e.g. development
