@@ -98,8 +98,9 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
         "docopt>=0.6.2",
+        "elasticsearch>=7.8.1",
         "pyyaml",
-        "tolkein>=0.2.0",
+        "tolkein>=0.2.1",
         "ujson>=3.0.0",
     ],  # Optional
     # List additional groups of dependencies here (e.g. development
@@ -111,7 +112,7 @@ setup(
     # Similar to `install_requires` above, these must be valid existing
     # projects.
     extras_require={  # Optional
-        "dev": ["pycodestyle>=2.6.0", "pydocstyle>=5.0.2", "pylint>=2.5.3",],
+        "dev": ["pycodestyle>=2.6.0", "pydocstyle>=5.0.2", "pylint>=2.5.3"],
         "test": [
             "coverage>=5.1",
             "coveralls>=2.0.0",
@@ -123,10 +124,7 @@ setup(
         ],
     },
     entry_points={
-        "console_scripts": [
-            "genomehubs = genomehubs:cli",
-            "genomehubs init = genomehubs.init:cli",
-        ],
+        "console_scripts": ["genomehubs = genomehubs:cli"],
         "genomehubs.subcmd": [
             "index = genomehubs.lib.index:cli",
             "init = genomehubs.lib.init:cli",

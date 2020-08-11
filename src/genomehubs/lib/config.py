@@ -67,7 +67,16 @@ def load_config(options, file):
     return options
 
 
-def config(group, **kwargs):  # pylint: disable=too-many-branches
+def enforce_lists(options):
+    """Ensure specified options are lists."""
+    keys = {"es-host"}
+    for key in keys:
+        if key in options:
+            if not isinstance(options[key], list):
+                options[key] = [options[key]]
+
+
+def config(group, **kwargs):
     """Load configuration."""
     LOGGER.info("Loading configuration options")
     script_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -95,4 +104,5 @@ def config(group, **kwargs):  # pylint: disable=too-many-branches
                 options[group][k] = v
             elif not k == group:
                 options[group][k] = v
+    enforce_lists(options)
     return options

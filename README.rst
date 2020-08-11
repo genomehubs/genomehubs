@@ -13,11 +13,11 @@ GenomeHubs
     :target: https://readthedocs.org/projects/genomehubs
     :alt: Documentation Status
 
-.. |travis| image:: https://api.travis-ci.org/genomehubs/genomehubs.svg?branch=master
+.. |travis| image:: https://api.travis-ci.org/genomehubs/genomehubs.svg?branch=main
     :alt: Travis-CI Build Status
     :target: https://travis-ci.org/genomehubs/genomehubs
 
-.. |coveralls| image:: https://coveralls.io/repos/genomehubs/genomehubs/badge.svg?branch=master&service=github
+.. |coveralls| image:: https://coveralls.io/repos/genomehubs/genomehubs/badge.svg?branch=main&service=github
     :alt: Coverage Status
     :target: https://coveralls.io/r/genomehubs/genomehubs
 
@@ -39,7 +39,7 @@ GenomeHubs
 
 .. |commits-since| image:: https://img.shields.io/github/commits-since/genomehubs/genomehubs/v2.0.0.svg
     :alt: Commits since latest release
-    :target: https://github.com/genomehubs/genomehubs/compare/v2.0.0...master
+    :target: https://github.com/genomehubs/genomehubs/compare/v2.0.0...main
 
 .. |license| image:: https://anaconda.org/genomehubs/genomehubs/badges/license.svg
     :alt: MIT License
@@ -62,7 +62,7 @@ or
 
 You can also install the in-development version with::
 
-    pip install https://github.com/genomehubs/genomehubs/archive/master.zip
+    pip install https://github.com/genomehubs/genomehubs/archive/main.zip
 
 
 Documentation

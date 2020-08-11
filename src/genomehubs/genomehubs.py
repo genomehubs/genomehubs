@@ -21,6 +21,7 @@ import sys
 from docopt import DocoptExit
 from docopt import docopt
 from pkg_resources import working_set
+
 from tolkein import tolog
 
 from .lib.version import __version__

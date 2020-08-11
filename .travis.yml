@@ -46,25 +46,25 @@ jobs:
   include:
     - stage: test
       script: scripts/tox_build.sh
-      python: '3.8'
+      python: "3.8"
       env:
         - TOXENV=check
     - env:
         - TOXENV=docs
-      python: '3.8'
+      python: "3.8"
     - env:
         - TOXENV=py36-cover,extension-coveralls,coveralls
-      python: '3.6'
+      python: "3.6"
     - env:
         - TOXENV=py37-cover,extension-coveralls,coveralls
-      python: '3.7'
+      python: "3.7"
     - env:
         - TOXENV=py38-cover,extension-coveralls,coveralls
-      python: '3.8'
+      python: "3.8"
     - stage: deploy
       env:
         - TOXENV=py38-cover
-      python: '3.8'
+      python: "3.8"
       script: scripts/tox_build.sh PyPI
       deploy:
         - provider: pypi

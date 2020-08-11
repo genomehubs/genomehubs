@@ -1,5 +1,5 @@
 genomehubs
-========
+==========
 
 .. testsetup::
 

@@ -8,7 +8,16 @@ from tolkein import tofetch
 from tolkein import tolog
 from tolkein import totax
 
+from .hub import index_templator
+
 LOGGER = tolog.logger(__name__)
+
+
+def index_template(name, opts):
+    """Index template (includes name, mapping and types)."""
+    parts = ["taxonomy", name, opts["hub-name"], opts["hub-version"]]
+    template = index_templator(parts, opts)
+    return template
 
 
 def files_exist(expected_files, path):
@@ -52,6 +61,7 @@ def index(taxonomy_name, opts):
     if not confirm_index_opts(taxonomy_name, opts):
         return
     LOGGER.info("Indexing %s", taxonomy_name)
+    template = index_template(taxonomy_name, opts)
     taxonomy_path = Path("%s/%s" % (opts["taxonomy-path"], taxonomy_name))
     file_key = "taxonomy-%s-file" % taxonomy_name
     if not files_exist(opts[file_key], taxonomy_path):
@@ -69,12 +79,5 @@ def index(taxonomy_name, opts):
         )
     root_key = "taxonomy-%s-root" % taxonomy_name
     root = opts.get(root_key, None)
-    print(root)
-    taxonomy = totax.parse_taxonomy(taxonomy_name, str(taxonomy_path), root)
-    print(taxonomy)
-    lineage = next(taxonomy)
-    print(lineage)
-    lineage = next(taxonomy)
-    print(lineage)
-    lineage = next(taxonomy)
-    print(lineage)
+    stream = totax.parse_taxonomy(taxonomy_name, str(taxonomy_path), root)
+    return template, stream

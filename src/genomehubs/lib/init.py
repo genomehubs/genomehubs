@@ -57,6 +57,8 @@ from docopt import docopt
 from tolkein import tolog
 
 from ..lib import assembly_metadata
+from ..lib import es_functions
+from ..lib import hub
 from ..lib import taxonomy
 from .config import config
 from .version import __version__
@@ -68,25 +70,19 @@ def main(args):
     """Initialise genomehubs."""
     options = config("init", **args)
 
-    # Reset an existing hub?
-    # if 'reset' in options['init'] and options['init']['reset']:
-    #     reset_hub(options)
-
-    # Create GenomeHubs directory
-    # setup_directory(options["init"])
+    # setup GenomeHubs directory
+    hub.setup(options["init"])
 
     # Start Elasticsearch
-    # es = start_elasticsearch(options["init"])
+    es = es_functions.launch_es(options["init"])
 
     # Index taxonomies
     if "taxonomy-source" in options["init"]:
         for taxonomy_name in options["init"]["taxonomy-source"]:
-            taxonomy.index(taxonomy_name, options["init"])
-    # index_taxonomies(options["init"])
-    # if "taxonomy-root" in options["init"] and options["init"]["taxonomy-root"]:
-    #     print()
-    #     LOGGER.info(options["init"]["taxonomy-sources"])
-    #     # index_taxonomy(es, options)
+            LOGGER.info(taxonomy_name)
+            template, stream = taxonomy.index(taxonomy_name, options["init"])
+            es_functions.load_mapping(es, template["name"], template["mapping"])
+            es_functions.index_stream(es, template["index_name"], stream)
 
     # Index INSDC
     if "insdc-metadata" in options["init"]:

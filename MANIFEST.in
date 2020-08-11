@@ -14,3 +14,4 @@ recursive-exclude conda-recipe *
 recursive-exclude ci *
 recursive-exclude tests *
 recursive-include src/genomehubs/config *.yaml
+recursive-include src/genomehubs/templates *.json
