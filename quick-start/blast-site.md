@@ -1,46 +1,42 @@
-# Start BLAST server
+# 9. Start BLAST server
 
-{% method %}
 A SequenceServer BLAST server container provides a user friendly BLAST interface to genomes hosted in a GenomeHub.
 
-{% common %}
-![](/assets/GenomeHubs BLAST.png)
-{% endmethod %}
-
+![](../.gitbook/assets/GenomeHubs%20BLAST.png)
 
 ## Edit files in conf directory
 
-{% method %}
 Edit `Masthead.html` to change the site name, logos and link urls:
+
 * add images to the `~/genomehubs/v1/blast/conf/img` directory if you wish to include them on your site
 * further changes to the appearance can be made by editing the styles in `custom.css`
 
-{% common %}
-```
+```text
 $ cd ~/genomehubs/v1/blast/conf
 # if you have a google analytics code to track usage
 $ sed 's/UA-00000000-0/your analytics code/' Masthead.html
 $ nano Masthead.html
 # replace references to example.com with your domain name
 ```
-{% endmethod %}
 
-{% method %}
 Edit `links.rb` to ensure that links from BLAST results are directed to your Ensembl site:
+
 * modify the `url = "http://localhost:8881/#{assembly}"` to match your domain name
 
-{% sample lang="e93" %}
-```
+{% tabs %}
+{% tab title="e93" %}
+```text
 $ nano links.rb
 ...
     def genomehubs
 ...
       url = "http://localhost:8881/#{assembly}"
 ...
+```
+{% endtab %}
 
-```
-{% sample lang="e89" %}
-```
+{% tab title="e89" %}
+```text
 $ nano links.rb
 ...
     def genomehubs
@@ -51,10 +47,11 @@ $ nano links.rb
       colon = ':'
       url = "http://ensembl.genomehubs.org/#{assembly}"
 ...
+```
+{% endtab %}
 
-```
-{% sample lang="e85" %}
-```
+{% tab title="e85" %}
+```text
 $ nano links.rb
 ...
     def genomehubs
@@ -65,18 +62,15 @@ $ nano links.rb
       colon = ':'
       url = "http://ensembl.genomehubs.org/#{assembly}"
 ...
-
 ```
-{% endmethod %}
-
+{% endtab %}
+{% endtabs %}
 
 ## Start SequenceServer BLAST container
 
-{% method %}
 Start the SequenceServer Docker container:
 
-{% common %}
-```
+```text
 $ docker run -d \
              --name genomehubs-sequenceserver \
              --network genomehubs-network \
@@ -85,7 +79,4 @@ $ docker run -d \
              -p 8883:4567 \
              genomehubs/sequenceserver:19.05
 ```
-
-{% endmethod %}
-
 

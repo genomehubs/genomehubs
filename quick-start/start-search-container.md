@@ -1,12 +1,10 @@
-# Start search container
+# 10. Start search container
 
-{% method %}
 Starting with version 19.05 which runs Ensembl release 93, it is necessary to start an additional container to run searches against the Ensembl database.
 
 We anticipate adding functionality to search across additional GenomeHubs resources in future releases.
 
-{% sample lang="e93" %}
-```
+```text
 $ docker run -d \
              --name genomehubs-search \
              --network genomehubs-network \
@@ -16,13 +14,14 @@ $ docker run -d \
 
 Optionally add a custom apache configuration file to override defaults
 
-```
+```text
 mkdir -p ~/genomehubs/v1/search/conf
 nano ~/genomehubs/v1/search/conf/search.genomehubs.org.conf
 ```
 
 ~/genomehubs/v1/search/conf/search.genomehubs.org.conf:
-```
+
+```text
 Listen 8080
 
 <VirtualHost *:8080>
@@ -43,10 +42,9 @@ Listen 8080
         SetHandler cgi-script
     </Directory>    
 </VirtualHost>
-
 ```
 
-```
+```text
 $ docker run -d \
              --name genomehubs-search \
              -v ~/genomehubs/v1/search/conf:/conf:ro \
@@ -57,9 +55,8 @@ $ docker run -d \
 
 ## Troubleshooting
 
-- Earlier `19.05` container versions contained a search bug, if you are having trouble with search please pull the updated `easy-mirror` and `search` container images:
-  - `docker pull genomehubs/easy-mirror:19.05`
-  - `docker pull genomehubs/search:19.05`
-- This container must be named `genomehubs-search` and be made available on the same docker network as the `genomehubs-ensembl` container for the search configuration to work.
-
+* Earlier `19.05` container versions contained a search bug, if you are having trouble with search please pull the updated `easy-mirror` and `search` container images:
+  * `docker pull genomehubs/easy-mirror:19.05`
+  * `docker pull genomehubs/search:19.05`
+* This container must be named `genomehubs-search` and be made available on the same docker network as the `genomehubs-ensembl` container for the search configuration to work.
 

@@ -1,38 +1,29 @@
-# Setup MySQL database server
+# 2. Setup MySQL database server
 
-{% method %}
 Each assembly in an Ensembl site is stored in a separate MySQL database. GenomeHubs sites host these databases in a MySQL Docker container.
 
 The EasyMirror container is used to configure users and password in the MySQL container and to mirror Ensembl databases from SQL dumps on the [Ensembl](ftp://ftp.ensembl.org/pub)/[EnsemblGenomes](ftp://ftp.ensemblgenomes.org/pub) ftp sites, making local copies ready to be hosted alongside newly imported data in a GenomeHubs site.
 
-{% common %}
-#![](/assets/GenomeHubs MySQL.png)
-{% endmethod %}
+## ![](../.gitbook/assets/GenomeHubs%20MySQL.png)
 
+### Create a MySQL container
 
-## Create a MySQL container
-
-{% method %}
 Create a `mysql/data` directory to allow the databases to be stored outside of the MySQL container:
 
-{% common %}
-```
+```text
 $ mkdir -p ~/genomehubs/mysql/data
 ```
 
-{% endmethod %}
-
-
-{% method %}
 Create a MySQL Docker container to host the Ensembl Databases for your GenomeHub:
 
 * See [hub.docker.com](https://hub.docker.com/r/mysql/mysql-server/) for more information on the MySQL Docker image.
 * Docker sets up a default network bridge, but to
- simplify connections between containers by using names rather than IP addresses, it is necessary to connect containers to the same named network bridge using `--network genomehubs-network`.
+
+  simplify connections between containers by using names rather than IP addresses, it is necessary to connect containers to the same named network bridge using `--network genomehubs-network`.
+
 * `MYSQL_ROOT_HOST='172.16.0.0/255.240.0.0'` will allow all other Docker containers on the same machine to connect to the mysql container as root, even if they are on a different Docker network. This is the simplest configuration as it does not matter which of the available subnets the Docker network has been created on, or which IP addresses are assigned to each of the containers. For more security you may wish to check the subnet of your bridge network and/or restrict access to the IP addresses of specific containers.
 
-{% common %}
-```
+```text
 $ docker run -d \
              --name genomehubs-mysql \
              --network genomehubs-network \
@@ -42,32 +33,27 @@ $ docker run -d \
              -p 3306:3306 \
              mysql/mysql-server:5.5
 ```
-{% endmethod %}
 
-{% method %}
 Log in to MySQL inside the container to increase `max_allowed_packet` to allow import of large scaffolds:
 
-{% common %}
-```
+```text
 $ docker exec -it genomehubs-mysql mysql -u root -p
 > set global max_allowed_packet=1073741824;
 > exit
 ```
-{% endmethod %}
 
+### Import Ensembl databases
 
-## Import Ensembl databases
-
-{% method %}
 Edit the `database.ini` configuration file to set passwords for the database users:
 
 * the `DB_ROOT_PASSWORD` should match the value of `MYSQL_ROOT_PASSWORD` in the `docker run` command above
 * the `DB_HOST` must match the value of `--name` in the `docker run` command above
-* to mirror existing Ensembl databases in your GenomeHub, add the appropriate database names to `SPECIES_DBS` as a space-separated list (a corresponding database dump must be available at `SPECIES_DB_URL`)
+* to mirror existing Ensembl databases in your GenomeHub, add the appropriate database names to `SPECIES_DBS` as a space-separated list \(a corresponding database dump must be available at `SPECIES_DB_URL`\)
 * even if you do not wish to mirror any existing databases, at least one database must be specified in `SPECIES_DBS` for use as a template when importing new data.
 
-{% sample lang="e93" %}
-```
+{% tabs %}
+{% tab title="e93" %}
+```text
 $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 # (some lines omitted)
 [DATABASE]
@@ -89,9 +75,10 @@ $ nano ~/genomehubs/v1/ensembl/conf/database.ini
   MISC_DB_URL = ftp://ftp.ensembl.org/pub/release-93/mysql/
   MISC_DBS = [ ensembl_accounts ]
 ```
+{% endtab %}
 
-{% sample lang="e89" %}
-```
+{% tab title="e89" %}
+```text
 $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 # (some lines omitted)
 [DATABASE]
@@ -113,8 +100,10 @@ $ nano ~/genomehubs/v1/ensembl/conf/database.ini
   MISC_DB_URL = ftp://ftp.ensembl.org/pub/release-89/mysql/
   MISC_DBS = [ ensembl_accounts ]
 ```
-{% sample lang="e85" %}
-```
+{% endtab %}
+
+{% tab title="e85" %}
+```text
 $ nano ~/genomehubs/v1/ensembl/conf/database.ini
 # (some lines omitted)
 [DATABASE]
@@ -136,40 +125,42 @@ $ nano ~/genomehubs/v1/ensembl/conf/database.ini
   MISC_DB_URL = ftp://ftp.ensembl.org/pub/release-79/mysql/
   MISC_DBS = [ ensembl_accounts ]
 ```
+{% endtab %}
+{% endtabs %}
 
-{% endmethod %}
-
-
-{% method %}
 Run the `database.sh` script in a `genomehubs/easy-mirror` Docker container:
 
 * this script will set up database users and import databases into your MySQL container based on the information in the `database.ini` configuration file.
 
-{% sample lang="e93" %}
-```
+{% tabs %}
+{% tab title="e93" %}
+```text
 $ docker run --rm \
              --name genomehubs-ensembl \
              --network genomehubs-network \
              -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
              genomehubs/easy-mirror:19.05 /ensembl/scripts/database.sh /ensembl/conf/database.ini
 ```
+{% endtab %}
 
-{% sample lang="e89" %}
-```
+{% tab title="e89" %}
+```text
 $ docker run --rm \
              --name genomehubs-ensembl \
              -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
              --link genomehubs-mysql \
              genomehubs/easy-mirror:17.06 /ensembl/scripts/database.sh /ensembl/conf/database.ini
 ```
+{% endtab %}
 
-{% sample lang="e85" %}
-```
+{% tab title="e85" %}
+```text
 $ docker run --rm \
              --name genomehubs-ensembl \
              -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
              --link genomehubs-mysql \
              genomehubs/easy-mirror:17.03 /ensembl/scripts/database.sh /ensembl/conf/database.ini
 ```
+{% endtab %}
+{% endtabs %}
 
-{% endmethod %}

@@ -1,34 +1,36 @@
-# Update metadata
+# 7. Update meta
 
-{% method %}
-Values in the `[META]` section of each `<database name>.ini` file are written to the `meta` table of the corresponding Ensembl database when it is created during the initial [assembly import](//quick-start/import-fasta.md) step. Often it is convenient to add to or amend these entries after the initial import, for example to set suggested search terms after importing blastp or InterProScan results, but note that values such as production name, species url and assembly name cannot be changed in this way after the initial import.
+Values in the `[META]` section of each `<database name>.ini` file are written to the `meta` table of the corresponding Ensembl database when it is created during the initial [assembly import](import-fasta.md) step. Often it is convenient to add to or amend these entries after the initial import, for example to set suggested search terms after importing blastp or InterProScan results, but note that values such as production name, species url and assembly name cannot be changed in this way after the initial import.
 
 If a single value is present in the database for a given key, it will be replaced. If multiple values are present, an additional value will be added.
 
-{% common %}
-![](/assets/GenomeHubs meta.png)
-{% endmethod %}
-
+![](../.gitbook/assets/GenomeHubs%20meta.png)
 
 ## Add/replace metadata values
 
-{% method %}
 Add suggested search terms:
 
-{% sample lang="e93" %}
-```
+{% tabs %}
+{% tab title="e93" %}
+```text
 $ nano ~/genomehubs/v1/import/conf/operophtera_brumata_obru1_core_40_93_1.ini
 ```
-{% sample lang="e89" %}
-```
+{% endtab %}
+
+{% tab title="e89" %}
+```text
 $ nano ~/genomehubs/v1/import/conf/operophtera_brumata_obru1_core_36_89_1.ini
 ```
-{% sample lang="e85" %}
-```
+{% endtab %}
+
+{% tab title="e85" %}
+```text
 $ nano ~/genomehubs/v1/import/conf/operophtera_brumata_obru1_core_32_85_1.ini
 ```
-{% common %}
-```
+{% endtab %}
+{% endtabs %}
+
+```text
 # existing entries not shown
 [META]
         SAMPLE.LOCATION_PARAM    = OBRU01_Sc00001:57580-69243
@@ -39,14 +41,12 @@ $ nano ~/genomehubs/v1/import/conf/operophtera_brumata_obru1_core_32_85_1.ini
         SAMPLE.TRANSCRIPT_TEXT   = OBRU01_00004-RA
         SAMPLE.SEARCH_TEXT       = OBRU01_00015-RA
 ```
-{% endmethod %}
 
-
-{% method %}
 Run an EasyImport Docker container with `-u` flag to update metadata:
 
-{% sample lang="e93" %}
-```
+{% tabs %}
+{% tab title="e93" %}
+```text
 $ docker run --rm \
              -u $UID:$GROUPS \
              --name easy-import-operophtera_brumata_v1_core_40_93_1 \
@@ -57,9 +57,10 @@ $ docker run --rm \
              -e FLAGS="-u" \
              genomehubs/easy-import:19.05
 ```
+{% endtab %}
 
-{% sample lang="e89" %}
-```
+{% tab title="e89" %}
+```text
 $ docker run --rm \
              -u $UID:$GROUPS \
              --name easy-import-operophtera_brumata_v1_core_36_89_1 \
@@ -70,9 +71,10 @@ $ docker run --rm \
              -e FLAGS="-u" \
              genomehubs/easy-import:17.06
 ```
+{% endtab %}
 
-{% sample lang="e85" %}
-```
+{% tab title="e85" %}
+```text
 $ docker run --rm \
              -u $UID:$GROUPS \
              --name easy-import-operophtera_brumata_v1_core_32_85_1 \
@@ -83,8 +85,6 @@ $ docker run --rm \
              -e FLAGS="-u" \
              genomehubs/easy-import:17.03
 ```
-
-
-{% endmethod %}
-
+{% endtab %}
+{% endtabs %}
 

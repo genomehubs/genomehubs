@@ -1,24 +1,18 @@
-# Start Ensembl genome browser
+# 12. Start Ensembl browser
 
-{% method %}
 Ensembl genome browser.
 
-{% common %}
-![](/assets/GenomeHubs Ensembl.png)
-{% endmethod %}
-
-
+![](../.gitbook/assets/GenomeHubs%20Ensembl.png)
 
 ## Edit `setup.ini`
 
-{% method %}
 Edit database settings:
+
 * for the default setup, only `DB_SESSION_PASS` should need changing
 * database hosts should match the name of your mysql container
-* `DB_FALLBACK_HOST` is used to allow additional databases to be loaded from a remote host (in this case EnsemblGenomes) so not all databases need to be hosted locally
+* `DB_FALLBACK_HOST` is used to allow additional databases to be loaded from a remote host \(in this case EnsemblGenomes\) so not all databases need to be hosted locally
 
-{% common %}
-```
+```text
 $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 [DATABASE]
   DB_HOST = genomehubs-mysql
@@ -35,19 +29,16 @@ $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
   DB_SESSION_PORT = 3306
   DB_SESSION_USER = ensrw
   DB_SESSION_PASS = CHANGEME
-
 ```
 
-{% endmethod %}
-
-
-{% method %}
 Add details of your Ensembl plugin:
+
 * update `YOUR_PLUGIN_URL` to point to the git repository you created in  the previous step
 * these details should be added above the `GENOMEHUBS_PLUGIN_URL` so files in this plugin will overwrite those in the GenomeHubs plugin
 
-{% sample lang="e93" %}
-```
+{% tabs %}
+{% tab title="e93" %}
+```text
 $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 [REPOSITORIES]
   ENSEMBL_URL = https://github.com/Ensembl
@@ -73,11 +64,11 @@ $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
   EG_COMMON_PLUGIN_PACKAGE = EG::Common
 
   PUBLIC_PLUGINS = [ ]
-
 ```
+{% endtab %}
 
-{% sample lang="e89" %}
-```
+{% tab title="e89" %}
+```text
 $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 [REPOSITORIES]
   ENSEMBL_URL = https://github.com/Ensembl
@@ -103,11 +94,11 @@ $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
   EG_COMMON_PLUGIN_PACKAGE = EG::Common
 
   PUBLIC_PLUGINS = [ ]
-
 ```
+{% endtab %}
 
-{% sample lang="e85" %}
-```
+{% tab title="e85" %}
+```text
 $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 [REPOSITORIES]
   ENSEMBL_URL = https://github.com/Ensembl
@@ -133,18 +124,17 @@ $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
   EG_COMMON_PLUGIN_PACKAGE = EG::Common
 
   PUBLIC_PLUGINS = [ ]
-
 ```
+{% endtab %}
+{% endtabs %}
 
-{% endmethod %}
-
-
-{% method %}
 Set database names to load:
+
 * Assemblies will be listed on your Ensembl site homepage in the order they are added to `SPECIES_DBS`
 
-{% sample lang="e93" %}
-```
+{% tabs %}
+{% tab title="e93" %}
+```text
 $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 [DATA_SOURCE]
   SPECIES_DBS = [ 
@@ -152,8 +142,10 @@ $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
     operophtera_brumata_obru1_core_40_93_1
 ]
 ```
-{% sample lang="e89" %}
-```
+{% endtab %}
+
+{% tab title="e89" %}
+```text
 $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 [DATA_SOURCE]
   SPECIES_DBS = [ 
@@ -161,8 +153,10 @@ $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
     operophtera_brumata_obru1_core_36_89_1
 ]
 ```
-{% sample lang="e85" %}
-```
+{% endtab %}
+
+{% tab title="e85" %}
+```text
 $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
 [DATA_SOURCE]
   SPECIES_DBS = [ 
@@ -170,17 +164,16 @@ $ nano ~/genomehubs/v1/ensembl/conf/setup.ini
     operophtera_brumata_obru1_core_32_85_1
 ]
 ```
-{% endmethod %}
-
-
+{% endtab %}
+{% endtabs %}
 
 ## Start the EasyMirror container
 
-{% method %}
 Start the EasyMirror Docker container:
 
-{% sample lang="e93" %}
-```
+{% tabs %}
+{% tab title="e93" %}
+```text
 $ docker run -d \
              --name genomehubs-ensembl \
              -v ~/genomehubs/v1/ensembl/conf:/conf:ro \
@@ -188,9 +181,10 @@ $ docker run -d \
              -p 8881:8080 \
              genomehubs/easy-mirror:19.05
 ```
+{% endtab %}
 
-{% sample lang="e89" %}
-```
+{% tab title="e89" %}
+```text
 $ docker run -d \
              --name genomehubs-ensembl \
              -v ~/genomehubs/v1/ensembl/conf:/conf:ro \
@@ -198,9 +192,10 @@ $ docker run -d \
              -p 8081:8080 \
              genomehubs/easy-mirror:17.06
 ```
+{% endtab %}
 
-{% sample lang="e85" %}
-```
+{% tab title="e85" %}
+```text
 $ docker run -d \
              --name genomehubs-ensembl \
              -v ~/genomehubs/v1/ensembl/conf:/ensembl/conf:ro \
@@ -208,8 +203,6 @@ $ docker run -d \
              -p 8081:8080 \
              genomehubs/easy-mirror:17.03
 ```
-
-
-{% endmethod %}
-
+{% endtab %}
+{% endtabs %}
 

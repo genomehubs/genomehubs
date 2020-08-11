@@ -1,4 +1,4 @@
-# Introduction
+# GenomeHubs
 
 _View this documentation at_ [_genomehubs.gitbooks.io_](https://genomehubs.gitbooks.io/genomehubs/content/)
 
@@ -10,7 +10,7 @@ _View this documentation at_ [_genomehubs.gitbooks.io_](https://genomehubs.gitbo
 
 \[1\] Challis RJ, Kumar S, Stevens L & Blaxter M \(2017\) GenomeHubs: simple containerized setup of a custom Ensembl database and web server for any species. Database, 2017:bax039 [doi:10.1093/database/bax039](https://doi.org/10.1093/database/bax039).
 
-![](.gitbook/assets/GenomeHubs%20schematic%20overview.png)
+![](../.gitbook/assets/GenomeHubs%20schematic%20overview.png)
 
 GenomeHubs Docker containers are shown in rounded boxes with a double outline and the hosted sites are shown in plain boxes.
 

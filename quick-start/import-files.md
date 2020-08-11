@@ -1,24 +1,20 @@
-# Import analysis results
+# 6. Import analysis results
 
-{% method %}
-The results of common analyses can be imported into an Ensembl database to provide functional annotations. 
+The results of common analyses can be imported into an Ensembl database to provide functional annotations.
 
-**_Running the file export after this stage will add additional information to the exported FASTA headers and json files. Updating the index (with the `-i` flag) will index the descriptions imported from blastp and interproscan results._**
+_**Running the file export after this stage will add additional information to the exported FASTA headers and json files. Updating the index \(with the `-i` flag\) will index the descriptions imported from blastp and interproscan results.**_
 
-{% common %}
-![](/assets/GenomeHubs import-2.png)
-{% endmethod %}
+![](../.gitbook/assets/GenomeHubs%20import-2.png)
 
-
-{% method %}
 Run the import script:
+
 * `-b` will import blastp and InterProScan results
-* `-r` will import RepeatMasker results (omit this flag if you have used RepeatDetector in place of RepeatMasker as the results cannot be imported)
+* `-r` will import RepeatMasker results \(omit this flag if you have used RepeatDetector in place of RepeatMasker as the results cannot be imported\)
 * `-c` will import CEGMA and BUSCO results
 
-{% sample lang="e93" %}
-
-```
+{% tabs %}
+{% tab title="e93" %}
+```text
 $ docker run --rm \
              -u $UID:$GROUPS \
              --name easy-import-operophtera_brumata_v1_core_40_93_1 \
@@ -30,9 +26,10 @@ $ docker run --rm \
              -e FLAGS="-b -r -c" \
              genomehubs/easy-import:19.05
 ```
+{% endtab %}
 
-{% sample lang="e89" %}
-```
+{% tab title="e89" %}
+```text
 $ docker run --rm \
              -u $UID:$GROUPS \
              --name easy-import-operophtera_brumata_v1_core_36_89_1 \
@@ -44,9 +41,10 @@ $ docker run --rm \
              -e FLAGS="-b -r -c" \
              genomehubs/easy-import:17.06
 ```
+{% endtab %}
 
-{% sample lang="e85" %}
-```
+{% tab title="e85" %}
+```text
 $ docker run --rm \
              -u $UID:$GROUPS \
              --name easy-import-operophtera_brumata_v1_core_32_85_1 \
@@ -58,6 +56,6 @@ $ docker run --rm \
              -e FLAGS="-b -r -c" \
              genomehubs/easy-import:17.06
 ```
-{% endmethod %}
-
+{% endtab %}
+{% endtabs %}
 

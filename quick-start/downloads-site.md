@@ -1,46 +1,34 @@
-# Start downloads server
+# 8. Start download site
 
-{% method %}
 GenomeHubs provides an h5ai container to host files for download. Any files in directories mounted in the container under `/var/www/html` will be available for download so additional files can be hosted alongside the files generated in previous steps.
 
-{% common %}
-![](/assets/GenomeHubs downloads.png)
-{% endmethod %}
-
+![](../.gitbook/assets/GenomeHubs%20downloads.png)
 
 ## Edit files in conf directory
 
-{% method %}
 Edit `Masthead.html` to change the site name, logos and link urls:
+
 * add images to the `~/genomehubs/v1/download/conf/img` directory if you wish to include them on your site
 * further changes to the appearance can be made by editing the styles in `custom.css`
 
-{% common %}
-```
+```text
 $ cd ~/genomehubs/v1/download/conf
 $ nano Masthead.html
 # replace references to example.com with your domain name
 ```
-{% endmethod %}
 
-{% method %}
 Edit `_h5ai.headers.html` to change the message that will be printed at the top of all directory listings:
 
-{% common %}
-```
+```text
 $ nano _h5ai.headers.html
 # replace with your own message
 ```
-{% endmethod %}
-
 
 ## Start h5ai downloads container
 
-{% method %}
 Start the h5ai Docker container:
 
-{% common %}
-```
+```text
 $ docker run -d \
              --name genomehubs-download \
              -v ~/genomehubs/v1/download/conf:/conf:ro \
@@ -48,6 +36,4 @@ $ docker run -d \
              -p 8882:8080 \
              genomehubs/h5ai:19.05
 ```
-{% endmethod %}
-
 
