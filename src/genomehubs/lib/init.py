@@ -53,12 +53,12 @@ Examples:
 import sys
 
 from docopt import docopt
-
 from tolkein import tolog
 
 from ..lib import assembly_metadata
 from ..lib import es_functions
 from ..lib import hub
+from ..lib import taxon
 from ..lib import taxonomy
 from .config import config
 from .version import __version__
@@ -83,6 +83,11 @@ def main(args):
             template, stream = taxonomy.index(taxonomy_name, options["init"])
             es_functions.load_mapping(es, template["name"], template["mapping"])
             es_functions.index_stream(es, template["index_name"], stream)
+
+    # Index taxa
+    template, stream = taxon.index(es, taxonomy_name, options["init"])
+    es_functions.load_mapping(es, template["name"], template["mapping"])
+    es_functions.index_stream(es, template["index_name"], stream)
 
     # Index INSDC
     if "insdc-metadata" in options["init"]:

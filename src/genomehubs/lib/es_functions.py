@@ -13,11 +13,10 @@ from subprocess import Popen
 from elasticsearch import Elasticsearch
 from elasticsearch import client
 from elasticsearch import helpers
-from tqdm import tqdm
-
 from tolkein import tofetch
 from tolkein import tofile
 from tolkein import tolog
+from tqdm import tqdm
 
 LOGGER = tolog.logger(__name__)
 
@@ -145,17 +144,90 @@ def load_mapping(es, mapping_name, mapping):
 def index_stream(es, index_name, stream):
     """Load bulk entries from stream into Elasticsearch index."""
     LOGGER.info("Indexing bulk entries to %s", index_name)
+    actions = (
+        {"_index": index_name, "_id": entry_id, "_source": entry, "_op_type": "index"}
+        for entry_id, entry in stream
+    )
     with tolog.DisableLogger():
-        actions = (
-            {
-                "_index": index_name,
-                "_id": entry_id,
-                "_source": entry,
-                "_op_type": "index",
-            }
-            for entry_id, entry in stream
-        )
-    success, failed = helpers.bulk(es, actions, stats_only=True)
+        try:
+            success, failed = helpers.bulk(es, actions, stats_only=True)
+        except Exception as err:
+            raise err
     if success and success > 0:
         LOGGER.info("Indexed %d entries", success)
     return success, failed
+
+
+class EsQueryBuilder:
+    """Class for building ElasticSearch queries."""
+
+    def __init__(self):
+        """Init EsQueryBuilder class."""
+        self.parts = []
+        self.query = {}
+        return None
+
+    def es_and(self):
+        """AND query."""
+        self.es_bool()
+        return self
+
+    def es_or(self):
+        """OR query."""
+        self.es_bool("should")
+        return self
+
+    def es_bool(self, bool_type="filter"):
+        """Bool query."""
+        obj = {"bool": {bool_type: self.parts[:]}}
+        self.parts = [obj]
+        return self
+
+    def es_nested(self, path, bool_type="filter"):
+        """Nested query."""
+        self.es_bool(bool_type)
+        obj = {"nested": {"path": path, "query": self.parts[0]}}
+        self.parts = [obj]
+        return self
+
+    def es_nested_or(self, path):
+        """Nested query."""
+        self.es_nested(path, bool_type="filter")
+        return self
+
+    def es_nested_and(self, path):
+        """Nested query."""
+        self.es_nested(path)
+        return self
+
+    def es_range(self, key, limits, *, inclusive=True):
+        """Range query."""
+        obj = {}
+        if isinstance(limits, list):
+            if limits[0] is not None:
+                if inclusive:
+                    obj.update({"gte": limits[0]})
+                else:
+                    obj.update({"gt": limits[0]})
+            if len(limits) > 1 and limits[1] is not None:
+                if inclusive:
+                    obj.update({"lte": limits[1]})
+                else:
+                    obj.update({"lt": limits[1]})
+        else:
+            obj.update({"gte": limits[0], "lte": limits[1]})
+        self.parts.append({"range": {key: obj}})
+        return self
+
+    def es_match(self, key, value):
+        """Match query."""
+        self.parts.append({"match": {key: str(value)}})
+        return self
+
+    def write(self):
+        """Return query."""
+        if self.parts:
+            if len(self.parts) > 1:
+                self.es_bool()
+            return {"query": self.parts[0]}
+        return None

@@ -1,0 +1,106 @@
+gca_accession:
+  type: keyword
+  constraint:
+    re: '^GCA_[\d\.]+$'
+    len: 16
+alias:
+  type: keyword
+  constraint:
+    len: 32
+center_name:
+  type: keyword
+  constraint:
+    len: 64
+assembly_name:
+  type: keyword
+  constraint:
+    len: 64
+biosample:
+  type: keyword
+  constraint:
+    len: 32
+bioproject:
+  type: keyword
+  constraint:
+    len: 32
+assembly_date:
+  type: keyword
+  constraint:
+    len: 10
+    re: '^\d{4}-\d{1,2}-\d{1,2}'
+assembly_span:
+  type: integer
+  constraint:
+    min: 0
+ungapped_span:
+  type: integer
+  constraint:
+    min: 0
+assembly_n50:
+  type: integer
+  constraint:
+    min: 0
+spanned_gaps:
+  type: integer
+  constraint:
+    min: 0
+unspanned_gaps:
+  type: integer
+  constraint:
+    min: 0
+scaffold_count:
+  type: integer
+  constraint:
+    min: 0
+contig_count:
+  type: integer
+  constraint:
+    min: 0
+contig_n50:
+  type: integer
+  constraint:
+    min: 0
+contig_l50:
+  type: integer
+  constraint:
+    min: 0
+contig_n75:
+  type: integer
+  constraint:
+    min: 0
+contig_n90:
+  type: integer
+  constraint:
+    min: 0
+scaffold_l50:
+  type: integer
+  constraint:
+    min: 0
+scaffold_n75:
+  type: integer
+  constraint:
+    min: 0
+scaffold_n90:
+  type: integer
+  constraint:
+    min: 0
+replicon_count:
+  type: integer
+  constraint:
+    min: 0
+non_chr_replicon_count:
+  type: integer
+  constraint:
+    min: 0
+alt_loci_unit_count:
+  type: integer
+  constraint:
+    min: 0
+region_count:
+  type: integer
+  constraint:
+    min: 0
+patch_count:
+  type: integer
+  constraint:
+    min: 0

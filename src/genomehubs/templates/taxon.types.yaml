@@ -1,0 +1,25 @@
+assembly_span:
+  type: integer
+  constraint:
+    min: 0
+c_value:
+  type: float
+  constraint:
+    min: 0
+    max: 100
+sex_determination_system:
+  type: keyword
+  translate:
+    XO: X0
+    N/A: NA
+  constraint:
+    enum:
+      - XY
+      - X0
+      - X-
+      - ZW
+      - NA
+to_be_implemented:
+  type: keyword
+  constraint:
+    ontology: sequence_ontology
