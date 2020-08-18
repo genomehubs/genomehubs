@@ -1,106 +1,147 @@
-gca_accession:
-  type: keyword
-  constraint:
-    re: '^GCA_[\d\.]+$'
-    len: 16
-alias:
-  type: keyword
-  constraint:
-    len: 32
-center_name:
-  type: keyword
-  constraint:
-    len: 64
-assembly_name:
-  type: keyword
-  constraint:
-    len: 64
-biosample:
-  type: keyword
-  constraint:
-    len: 32
-bioproject:
-  type: keyword
-  constraint:
-    len: 32
-assembly_date:
-  type: keyword
-  constraint:
-    len: 10
-    re: '^\d{4}-\d{1,2}-\d{1,2}'
-assembly_span:
-  type: integer
-  constraint:
-    min: 0
-ungapped_span:
-  type: integer
-  constraint:
-    min: 0
-assembly_n50:
-  type: integer
-  constraint:
-    min: 0
-spanned_gaps:
-  type: integer
-  constraint:
-    min: 0
-unspanned_gaps:
-  type: integer
-  constraint:
-    min: 0
-scaffold_count:
-  type: integer
-  constraint:
-    min: 0
-contig_count:
-  type: integer
-  constraint:
-    min: 0
-contig_n50:
-  type: integer
-  constraint:
-    min: 0
-contig_l50:
-  type: integer
-  constraint:
-    min: 0
-contig_n75:
-  type: integer
-  constraint:
-    min: 0
-contig_n90:
-  type: integer
-  constraint:
-    min: 0
-scaffold_l50:
-  type: integer
-  constraint:
-    min: 0
-scaffold_n75:
-  type: integer
-  constraint:
-    min: 0
-scaffold_n90:
-  type: integer
-  constraint:
-    min: 0
-replicon_count:
-  type: integer
-  constraint:
-    min: 0
-non_chr_replicon_count:
-  type: integer
-  constraint:
-    min: 0
-alt_loci_unit_count:
-  type: integer
-  constraint:
-    min: 0
-region_count:
-  type: integer
-  constraint:
-    min: 0
-patch_count:
-  type: integer
-  constraint:
-    min: 0
+attributes:
+  assembled_strain:
+    constraint:
+      len: 64
+    type: keyword
+  assembly_l50:
+    constraint:
+      min: 0
+    type: integer
+  assembly_level:
+    constraint:
+      enum:
+        - chromosome
+        - contig
+        - scaffold
+    type: keyword
+  assembly_n50:
+    constraint:
+      min: 0
+    type: integer
+  assembly_n90:
+    constraint:
+      min: 0
+    type: integer
+  assembly_span:
+    constraint:
+      min: 0
+    type: integer
+  assembly_title:
+    type: text
+  assembly_type:
+    constraint:
+      len: 64
+    type: keyword
+  assembly_version:
+    constraint:
+      min: 0
+    type: integer
+  center_name:
+    constraint:
+      len: 64
+    type: keyword
+  contig_count:
+    constraint:
+      min: 0
+    type: integer
+  contig_l50:
+    constraint:
+      min: 0
+    type: integer
+  contig_n50:
+    constraint:
+      min: 0
+    type: integer
+  contig_n90:
+    constraint:
+      min: 0
+    type: integer
+  genome_representation:
+    constraint:
+      enum:
+        - full
+        - partial
+    type: keyword
+  host_scientific_name:
+    constraint:
+      len: 64
+    type: keyword
+  last_updated:
+    type: date
+  non_chr_replicon_count:
+    constraint:
+      min: 0
+    type: integer
+  replicon_count:
+    constraint:
+      min: 0
+    type: integer
+  sample_location:
+    type: geo_point
+  sample_sex:
+    constraint:
+      enum:
+        - NA
+        - female
+        - hermaphrodite
+        - male
+        - pooled male and female
+    type: keyword
+  scaffold_count:
+    constraint:
+      min: 0
+    type: integer
+  scaffold_l50:
+    constraint:
+      min: 0
+    type: integer
+  scaffold_n90:
+    constraint:
+      min: 0
+    type: integer
+  study_description:
+    type: text
+  study_title:
+    type: text
+  wgs_first_public:
+    type: date
+  wgs_last_updated:
+    type: date
+identifiers:
+  alias:
+    constraint:
+      len: 32
+    type: keyword
+  assembly_id:
+    constraint:
+      len: 64
+    type: keyword
+  assembly_name:
+    constraint:
+      len: 64
+    type: keyword
+  gca_accession:
+    constraint:
+      len: 16
+      re: '^GCA_[\d\.]+$'
+    type: keyword
+  sample_accession:
+    constraint:
+      len: 32
+    type: keyword
+  secondary_sample_accession:
+    constraint:
+      len: 32
+    type: keyword
+  study_accession:
+    constraint:
+      len: 32
+    type: keyword
+  study_name:
+    constraint:
+      len: 64
+    type: keyword
+  wgs_accession:
+    constraint:
+      len: 64
+    type: keyword

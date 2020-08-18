@@ -4,12 +4,12 @@
     "properties": {
       "taxon_id": {
         "type": "keyword",
-        "ignore_above": 9,
+        "ignore_above": 16,
         "meta": { "description": "Taxonomy-specific taxon ID" }
       },
       "parent": {
         "type": "keyword",
-        "ignore_above": 9,
+        "ignore_above": 16,
         "meta": { "description": "Taxon ID of parent taxon" }
       },
       "branch_length": {
@@ -30,21 +30,24 @@
         "ignore_above": 64,
         "meta": { "description": "Unique version of scientific name" }
       },
-      "rank": {
+      "taxon_rank": {
         "type": "keyword",
         "ignore_above": 64,
         "meta": { "description": "Taxonomic rank" }
       },
-      "names": {
+      "taxon_names": {
         "type": "nested",
         "properties": {
-          "name": { "type": "text", "meta": { "description": "Taxon name" } },
+          "name": {
+            "type": "keyword",
+            "meta": { "description": "Taxon name" }
+          },
           "unique": {
-            "type": "text",
+            "type": "keyword",
             "meta": { "description": "Unique version of taxon name" }
           },
           "class": {
-            "type": "text",
+            "type": "keyword",
             "meta": {
               "description": "Name class (e.g. common name, synonym, etc.)"
             }
@@ -55,15 +58,15 @@
         "type": "nested",
         "properties": {
           "taxon_id": {
-            "type": "text",
+            "type": "keyword",
             "meta": { "description": "Taxon ID of ancestral taxon" }
           },
           "rank": {
-            "type": "text",
+            "type": "keyword",
             "meta": { "description": "Ancestral rank" }
           },
           "scientific_name": {
-            "type": "text",
+            "type": "keyword",
             "meta": { "description": "Scientific name" }
           },
           "node_depth": {

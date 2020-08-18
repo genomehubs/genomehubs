@@ -2,13 +2,14 @@ common:
   docker:
     network: genomehubs-demo-network
   es:
+    batch: 25
     host:
-      - localhost:9200
+      - "localhost:9200"
   hub:
     name: demo
     path: ~/genomehubs/demo
+    separator: "--"
     version: v0.1
-    separator: --
   taxonomy:
     source:
       - ncbi
@@ -26,15 +27,15 @@ init:
     timeout: 30
   es:
     path: ~/genomehubs/demo_resources/es
+    timeout: 30
     url: "https://artifacts.elastic.co/downloads/elasticsearch"
     version: elasticsearch-oss-7.8.1
-    timeout: 30
   taxonomy:
     ncbi:
+      file:
+        - nodes.dmp
+        - names.dmp
       root: 1
       url: "ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz"
-      file:
-        - "nodes.dmp"
-        - "names.dmp"
     path: ~/genomehubs/demo_resources/taxdump
 search: {}

@@ -10,6 +10,7 @@ from pathlib import Path
 from subprocess import PIPE
 from subprocess import Popen
 
+import ujson
 from elasticsearch import Elasticsearch
 from elasticsearch import client
 from elasticsearch import helpers
@@ -134,6 +135,13 @@ def launch_es(opts):
     return es
 
 
+def index_exists(es, index_name):
+    """Load index mapping template into Elasticsearch."""
+    es_client = client.IndicesClient(es)
+    res = es_client.exists(index_name)
+    return res
+
+
 def load_mapping(es, mapping_name, mapping):
     """Load index mapping template into Elasticsearch."""
     es_client = client.IndicesClient(es)
@@ -150,9 +158,18 @@ def index_stream(es, index_name, stream):
     )
     with tolog.DisableLogger():
         try:
-            success, failed = helpers.bulk(es, actions, stats_only=True)
+            iterator = helpers.streaming_bulk(es, actions)
+            iterator = tqdm(iterator, unit=" records", unit_scale=True)
+            success = 0
+            failed = 0
+            for ok, response in iterator:
+                if ok:
+                    success += 1
+                else:
+                    failed += 1
         except Exception as err:
             raise err
+
     if success and success > 0:
         LOGGER.info("Indexed %d entries", success)
     return success, failed
@@ -163,8 +180,10 @@ class EsQueryBuilder:
 
     def __init__(self):
         """Init EsQueryBuilder class."""
-        self.parts = []
-        self.query = {}
+        self._parts = []
+        self._includes = []
+        self._excludes = []
+        self._query = {}
         return None
 
     def es_and(self):
@@ -179,15 +198,15 @@ class EsQueryBuilder:
 
     def es_bool(self, bool_type="filter"):
         """Bool query."""
-        obj = {"bool": {bool_type: self.parts[:]}}
-        self.parts = [obj]
+        obj = {"bool": {bool_type: self._parts[:]}}
+        self._parts = [obj]
         return self
 
     def es_nested(self, path, bool_type="filter"):
         """Nested query."""
         self.es_bool(bool_type)
-        obj = {"nested": {"path": path, "query": self.parts[0]}}
-        self.parts = [obj]
+        obj = {"nested": {"path": path, "query": self._parts[0]}}
+        self._parts = [obj]
         return self
 
     def es_nested_or(self, path):
@@ -216,18 +235,48 @@ class EsQueryBuilder:
                     obj.update({"lt": limits[1]})
         else:
             obj.update({"gte": limits[0], "lte": limits[1]})
-        self.parts.append({"range": {key: obj}})
+        self._parts.append({"range": {key: obj}})
         return self
 
     def es_match(self, key, value):
         """Match query."""
-        self.parts.append({"match": {key: str(value)}})
+        self._parts.append({"match": {key: str(value)}})
+        return self
+
+    def es_include(self, keys):
+        """Add fields to include list."""
+        if not isinstance(keys, list):
+            keys = [keys]
+        for key in keys:
+            if key not in self._includes:
+                self._includes.append(key)
+        return self
+
+    def es_exclude(self, keys):
+        """Add fields to exclude list."""
+        if not isinstance(keys, list):
+            keys = [keys]
+        for key in keys:
+            if key not in self._excludes:
+                self._excludes.append(key)
         return self
 
     def write(self):
         """Return query."""
-        if self.parts:
-            if len(self.parts) > 1:
+        if self._parts:
+            if len(self._parts) > 1:
                 self.es_bool()
-            return {"query": self.parts[0]}
+            query = {"query": self._parts[0]}
+            source = {}
+            if self._includes:
+                source.update({"includes": self._includes})
+            if self._excludes:
+                source.update({"excludes": self._excludes})
+            if source:
+                query.update({"_source": source})
+            return query
         return None
+
+    def string(self):
+        """Return query as string."""
+        return ujson.dumps(self.write())

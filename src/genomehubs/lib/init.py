@@ -76,23 +76,29 @@ def main(args):
     # Start Elasticsearch
     es = es_functions.launch_es(options["init"])
 
+    # Post search scripts
+    hub.post_search_scripts(es)
+
     # Index taxonomies
     if "taxonomy-source" in options["init"]:
         for taxonomy_name in options["init"]["taxonomy-source"]:
-            LOGGER.info(taxonomy_name)
             template, stream = taxonomy.index(taxonomy_name, options["init"])
-            es_functions.load_mapping(es, template["name"], template["mapping"])
-            es_functions.index_stream(es, template["index_name"], stream)
+            # es_functions.load_mapping(es, template["name"], template["mapping"])
+            # es_functions.index_stream(es, template["index_name"], stream)
 
     # Index taxa
-    template, stream = taxon.index(es, taxonomy_name, options["init"])
-    es_functions.load_mapping(es, template["name"], template["mapping"])
-    es_functions.index_stream(es, template["index_name"], stream)
+    # template, stream = taxon.index(es, options["init"], taxonomy_name=taxonomy_name, )
+    # es_functions.load_mapping(es, template["name"], template["mapping"])
+    # es_functions.index_stream(es, template["index_name"], stream)
 
     # Index INSDC
     if "insdc-metadata" in options["init"]:
-        assembly_metadata.index("insdc", options["init"])
-
+        assembly_metadata.index(
+            es, options["init"], metadata_name="insdc", taxonomy_name=taxonomy_name
+        )
+        # lookup taxon/taxonomy
+        # create/update taxon
+    #    template, stream =
     #     LOGGER.info(options["init"]["taxonomy-sources"])
     #     # index_insdc(es, options)
 

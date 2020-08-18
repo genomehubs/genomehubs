@@ -1,0 +1,21 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": { "match": { "taxon_id": "{{value}}" } },
+      "_source": {
+        "includes": [
+          "taxon_id",
+          "branch_length",
+          "lineage.*",
+          "parent",
+          "support_value",
+          "scientific_name",
+          "taxon_names.*",
+          "taxon_rank",
+          "unique_name"
+        ]
+      }
+    }
+  }
+}

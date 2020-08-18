@@ -73,7 +73,7 @@ def parse_taxa(es, types, taxonomy_template):
         yield doc_id, doc
 
 
-def index(es, taxonomy_name, opts):
+def index(es, opts, *, taxonomy_name="ncbi"):
     """Index a set of taxa."""
     LOGGER.info("Indexing taxa using %s taxonomy", taxonomy_name)
     template = index_template(taxonomy_name, opts)
@@ -84,10 +84,17 @@ def index(es, taxonomy_name, opts):
     #     "taxon_id", 12345
     # ).es_or()
     # print(query.write())
-    # query = EsQueryBuilder()
-    # query.es_range("attributes.integer_value", [1000000, 3000000]).es_match(
-    #     "attributes.key", "assembly_span"
-    # ).es_nested_and("attributes").es_match("taxon_id", 12345).es_and()
-    # print(query.write())
+    query = EsQueryBuilder()
+    query.es_range("attributes.integer_value", [1000000, 3000000]).es_match(
+        "attributes.key", "assembly_span"
+    ).es_nested_and("attributes").es_include("taxon_id").es_include(
+        "attributes.*"
+    ).es_exclude(
+        ["lineage.*", "names.*"]
+    )
+    body = query.write()
+    print(body)
+    # res = es.search(index=template["index_name"], body=body)
+    # print(res)
     # quit()
     return template, stream

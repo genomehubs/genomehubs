@@ -38,6 +38,19 @@ def index_templator(parts, opts):
     return template
 
 
+def post_search_scripts(es):
+    """POST ElasticSearch search scripts."""
+    script_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    search_script_dir = os.path.join(script_dir, "templates", "scripts")
+    directory = os.fsencode(search_script_dir)
+    for script_file in os.listdir(directory):
+        filename = os.fsdecode(script_file)
+        if filename.endswith(".json"):
+            body = tofile.load_yaml(os.path.join(search_script_dir, filename))
+            script_id = filename.replace(".json", "")
+            es.put_script(id=script_id, body=body)
+
+
 def min_value_constraint(value, limit):
     """Test minimum value constraint."""
     if value >= limit:
@@ -73,7 +86,7 @@ def test_constraint(value, constraint):
     return True
 
 
-def add_attributes(entry, types, *, attributes=None):
+def add_attributes(entry, types, *, attributes=None, source=None):
     """Add attributes to a document."""
     if attributes is None:
         attributes = []
@@ -96,5 +109,7 @@ def add_attributes(entry, types, *, attributes=None):
                 valid = True
             if valid:
                 attribute = {"key": key, "%s_value" % key_type: value}
+                if source is not None:
+                    attribute.update({"source": source})
                 attributes.append(attribute)
     return attributes
