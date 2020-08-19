@@ -11,6 +11,7 @@ from tolkein import tolog
 
 from .es_functions import EsQueryBuilder
 from .es_functions import index_exists
+from .es_functions import index_stream
 from .hub import add_attributes
 from .hub import index_templator
 from .taxon import index_template as taxon_index_template
@@ -91,11 +92,12 @@ def query_value_template(es, template_name, values, index):
             body += "{}\n"
         body += ujson.dumps({"id": template_name, "params": {"value": value}})
         body += "\n"
-    if multisearch:
-        return es.msearch_template(body=body, index=index)
+    with tolog.DisableLogger():
+        if multisearch:
+            return es.msearch_template(body=body, index=index)
 
-    if multisearch:
-        return es.search_template(body=body, index=index)
+        if multisearch:
+            return es.search_template(body=body, index=index)
 
 
 def get_list_entries_by_dict_value(values, list_of_dicts, *, key="key"):
@@ -107,22 +109,96 @@ def get_list_entries_by_dict_value(values, list_of_dicts, *, key="key"):
     return entries
 
 
+def get_list_indices_by_dict_value(values, list_of_dicts, *, key="key"):
+    """Get indices from a list of dicts by key."""
+    indices = []
+    for idx, entry in enumerate(list_of_dicts):
+        if key in entry and entry[key] in values:
+            indices.append(idx)
+    return indices
+
+
+def add_assembly_attributes_to_taxon(
+    batch, asm_by_taxon_id, taxa, *, index_name, shared_attributes
+):
+    """Add assembly attributes to taxon."""
+    for taxon_id, assemblies in asm_by_taxon_id.items():
+        if taxon_id in taxa:
+            taxon_attributes = defaultdict(list)
+            if "attributes" not in taxa[taxon_id]:
+                taxa[taxon_id]["attributes"] = []
+            for idx in assemblies:
+                asm_meta = batch[idx]
+                attributes = get_list_entries_by_dict_value(
+                    shared_attributes, asm_meta["attributes"]
+                )
+                for attr in attributes:
+                    taxon_attr = {**attr}
+                    del taxon_attr["key"]
+                    taxon_attr["source_index"] = index_name
+                    taxon_attr["source_doc_id"] = (
+                        "assembly-%s" % asm_meta["assembly_id"]
+                    )
+                    taxon_attributes[attr["key"]].append(taxon_attr)
+            for key, values in taxon_attributes.items():
+                indices = get_list_indices_by_dict_value(
+                    {key}, taxa[taxon_id]["attributes"]
+                )
+                if len(indices) == 1:
+                    idx = indices[0]
+                    # TODO: test if values are already present
+                    taxa[taxon_id]["attributes"][idx]["values"] += values
+                else:
+                    taxa[taxon_id]["attributes"].append({"key": key, "values": values})
+
+
+def stream_taxa(taxa):
+    """Stream dict of taxa for indexing."""
+    for taxon_id, value in taxa.items():
+        yield "taxon-%s" % taxon_id, value
+
+
+def add_taxonomy_info_to_assembly(asm_meta, source):
+    """Add taxonomy information to an assembly."""
+    keys = {
+        "branch_length",
+        "lineage",
+        "parent",
+        "support_value",
+        "scientific_name",
+        "taxon_names",
+        "taxon_rank",
+        "unique_name",
+    }
+    for key in keys:
+        if key in source:
+            asm_meta[key] = source[key]
+
+
+def collate_unique_key_value_indices(key, list_of_dicts):
+    """Collate indices of unique key values in a list of dicts."""
+    unique_key_values = set()
+    entry_indices_by_key_value = defaultdict(list)
+    for idx, entry in enumerate(list_of_dicts):
+        if entry[key] not in unique_key_values:
+            unique_key_values.add(entry[key])
+        entry_indices_by_key_value[entry[key]].append(idx)
+    return list(unique_key_values), entry_indices_by_key_value
+
+
 def preprocess_batch(es, batch, opts, *, taxonomy_name="ncbi"):
     """Preprocess a batch of assembly metadata to add/update taxonomy information."""
     template = index_template(taxonomy_name, opts)
     taxon_template = taxon_index_template(taxonomy_name, opts)
     taxonomy_template = taxonomy_index_template(taxonomy_name, opts)
-    values = []
-    asm_by_taxon_id = defaultdict(list)
-    for idx, asm_meta in enumerate(batch):
-        if asm_meta["taxon_id"] not in asm_by_taxon_id:
-            values.append(asm_meta["taxon_id"])
-        asm_by_taxon_id[asm_meta["taxon_id"]].append(idx)
+    # TODO: find shared attributes programatically
+    shared_attributes = {"assembly_span"}
+    taxon_ids, asm_by_taxon_id = collate_unique_key_value_indices("taxon_id", batch)
     taxon_res = query_keyword_value_template(
         es,
         "attributes_by_keyword_value",
         "taxon_id",
-        values,
+        taxon_ids,
         taxon_template["index_name"],
     )
     taxa = {}
@@ -134,61 +210,82 @@ def preprocess_batch(es, batch, opts, *, taxonomy_name="ncbi"):
             ):
                 source = taxon_result["hits"]["hits"][0]["_source"]
                 taxa[source["taxon_id"]] = source
-    update_taxa = {}
-    values = []
+                for idx in asm_by_taxon_id[source["taxon_id"]]:
+                    add_taxonomy_info_to_assembly(batch[idx], source)
+    taxa_to_update = {}
+    taxon_ids = []
     for taxon_id, assemblies in asm_by_taxon_id.items():
         if taxon_id in taxa:
-            update_taxa[taxon_id] = taxa[taxon_id]
-            for asm_meta in assemblies:
-                update_taxa[taxon_id]["attributes"].append(
-                    {"key": "assembly_span", "integer_value": asm_meta["assembly_span"]}
-                )
+            taxa_to_update[taxon_id] = {}
+            if "attributes" in taxa[taxon_id]:
+                taxa_to_update[taxon_id]["attributes"] = taxa[taxon_id]["attributes"]
         else:
-            values.append(taxon_id)
-    taxonomy_res = query_value_template(
-        es, "taxonomy_node_by_taxon_id", values, taxonomy_template["index_name"],
+            taxon_ids.append(taxon_id)
+    add_assembly_attributes_to_taxon(
+        batch,
+        asm_by_taxon_id,
+        taxa_to_update,
+        index_name=template["index_name"],
+        shared_attributes=shared_attributes,
     )
-    if taxonomy_res is None:
-        LOGGER.error(
-            "Could not connect to taxonomy index '%s'", taxonomy_template["index_name"]
+    taxa_to_create = {}
+    if taxon_ids:
+        taxonomy_res = query_value_template(
+            es, "taxonomy_node_by_taxon_id", taxon_ids, taxonomy_template["index_name"],
         )
-        sys.exit(1)
-    create_taxa = {}
-    for taxonomy_result in taxonomy_res["responses"]:
-        if taxonomy_result["hits"]["total"]["value"] == 1:
-            source = taxonomy_result["hits"]["hits"][0]["_source"]
-            create_taxa[source["taxon_id"]] = source
-    for taxon_id, assemblies in asm_by_taxon_id.items():
-        if taxon_id in create_taxa:
-            create_taxa[taxon_id]["attributes"] = []
-            taxon_attributes = defaultdict(list)
-            shared_attributes = {"assembly_span"}
-            for idx in assemblies:
-                asm_meta = batch[idx]
-                attributes = get_list_entries_by_dict_value(
-                    shared_attributes, asm_meta["attributes"]
-                )
-                for attr in attributes:
-                    taxon_attr = {**attr}
-                    del taxon_attr["key"]
-                    taxon_attr["source_index"] = template["index_name"]
-                    taxon_attr["source_doc_id"] = (
-                        "assembly-%s" % asm_meta["assembly_id"]
-                    )
-                    taxon_attributes[attr["key"]].append(taxon_attr)
-            for key, values in taxon_attributes.items():
-                create_taxa[taxon_id]["attributes"].append(
-                    {"key": key, "values": values}
-                )
-        else:
+        if taxonomy_res is None:
             LOGGER.error(
-                "Could not find taxon_id '%s' in taxonomy index '%s'",
-                taxon_id,
+                "Could not connect to taxonomy index '%s'",
                 taxonomy_template["index_name"],
             )
-    LOGGER.info(update_taxa)
-    LOGGER.info(create_taxa)
-    # LOGGER.info(len(asm_by_taxon_id.keys()))
+            sys.exit(1)
+        ancestors = set()
+        for taxonomy_result in taxonomy_res["responses"]:
+            if taxonomy_result["hits"]["total"]["value"] == 1:
+                source = taxonomy_result["hits"]["hits"][0]["_source"]
+                taxa_to_create[source["taxon_id"]] = source
+                for ancestor in source["lineage"]:
+                    ancestors.add(ancestor["taxon_id"])
+                for idx in asm_by_taxon_id[source["taxon_id"]]:
+                    add_taxonomy_info_to_assembly(batch[idx], source)
+        add_assembly_attributes_to_taxon(
+            batch,
+            asm_by_taxon_id,
+            taxa_to_create,
+            index_name=template["index_name"],
+            shared_attributes=shared_attributes,
+        )
+        taxonomy_res = query_value_template(
+            es,
+            "taxonomy_node_by_taxon_id",
+            list(ancestors),
+            taxonomy_template["index_name"],
+        )
+        for taxonomy_result in taxonomy_res["responses"]:
+            if taxonomy_result["hits"]["total"]["value"] == 1:
+                source = taxonomy_result["hits"]["hits"][0]["_source"]
+                taxa_to_create[source["taxon_id"]] = source
+    to_create = len(taxa_to_create.keys())
+    to_update = len(taxa_to_update.keys())
+    LOGGER.info(
+        "%d taxa to create, %d to update", to_create, to_update,
+    )
+    if to_create > 0:
+        index_stream(es, taxon_template["index_name"], stream_taxa(taxa_to_create))
+    if to_update > 0:
+        index_stream(
+            es,
+            taxon_template["index_name"],
+            stream_taxa(taxa_to_update),
+            _op_type="update",
+        )
+    return to_create, to_update
+
+
+def stream_assemblies(assemblies):
+    """Stream list of assemblies for indexing."""
+    for asm in assemblies:
+        yield "assembly-%s" % asm["assembly_id"], asm
 
 
 def index(es, opts, *, metadata_name="insdc", taxonomy_name="ncbi"):
@@ -205,6 +302,7 @@ def index(es, opts, *, metadata_name="insdc", taxonomy_name="ncbi"):
     stream = parser(opts)
     batch = []
     while True:
+        stop = False
         try:
             raw_meta = next(stream)
             attributes = add_attributes(
@@ -213,15 +311,31 @@ def index(es, opts, *, metadata_name="insdc", taxonomy_name="ncbi"):
                 attributes=[],
                 source=sources.get(metadata_name, metadata_name),
             )
-            asm_meta = {**raw_meta, "attributes": attributes}
+            identifiers = add_attributes(
+                raw_meta,
+                template["types"]["identifiers"],
+                attributes=[],
+                source=sources.get(metadata_name, metadata_name),
+            )
+            asm_meta = {
+                **raw_meta,
+                "attributes": attributes,
+                "identifiers": identifiers,
+            }
             batch.append(asm_meta)
         except TypeError:
             break
         except StopIteration:
-            break
-        if len(batch) == opts["es-batch"]:
+            stop = True
+        if len(batch) == opts["es-batch"] or stop:
             # TODO: set attributes
-            preprocess_batch(es, batch, opts, taxonomy_name=taxonomy_name)
+            created, updated = preprocess_batch(
+                es, batch, opts, taxonomy_name=taxonomy_name
+            )
+            LOGGER.info("Indexing %d assemblies", len(batch))
+            assembly_stream = stream_assemblies(batch)
+            index_stream(es, template["index_name"], assembly_stream)
             batch = []
+        if stop:
             break
     return

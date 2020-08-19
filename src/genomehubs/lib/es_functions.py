@@ -138,7 +138,8 @@ def launch_es(opts):
 def index_exists(es, index_name):
     """Load index mapping template into Elasticsearch."""
     es_client = client.IndicesClient(es)
-    res = es_client.exists(index_name)
+    with tolog.DisableLogger():
+        res = es_client.exists(index_name)
     return res
 
 
@@ -149,13 +150,24 @@ def load_mapping(es, mapping_name, mapping):
     return res
 
 
-def index_stream(es, index_name, stream):
+def index_stream(es, index_name, stream, *, _op_type="index"):
     """Load bulk entries from stream into Elasticsearch index."""
-    LOGGER.info("Indexing bulk entries to %s", index_name)
-    actions = (
-        {"_index": index_name, "_id": entry_id, "_source": entry, "_op_type": "index"}
-        for entry_id, entry in stream
-    )
+    # LOGGER.info("Indexing bulk entries to %s", index_name)
+    if _op_type == "index":
+        actions = (
+            {
+                "_index": index_name,
+                "_id": entry_id,
+                "_source": entry,
+                "_op_type": _op_type,
+            }
+            for entry_id, entry in stream
+        )
+    elif _op_type == "update":
+        actions = (
+            {"_index": index_name, "_id": entry_id, "doc": entry, "_op_type": _op_type}
+            for entry_id, entry in stream
+        )
     with tolog.DisableLogger():
         try:
             iterator = helpers.streaming_bulk(es, actions)
@@ -170,8 +182,8 @@ def index_stream(es, index_name, stream):
         except Exception as err:
             raise err
 
-    if success and success > 0:
-        LOGGER.info("Indexed %d entries", success)
+    # if success and success > 0:
+    #     LOGGER.info("Indexed %d entries", success)
     return success, failed
 
 

@@ -2,7 +2,7 @@ common:
   docker:
     network: genomehubs-demo-network
   es:
-    batch: 25
+    batch: 500
     host:
       - "localhost:9200"
   hub:
