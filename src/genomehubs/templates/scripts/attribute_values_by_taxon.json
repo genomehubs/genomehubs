@@ -2,6 +2,8 @@
   "script": {
     "lang": "mustache",
     "source": {
+      "from": "{{from}}{{^from}}0{{/from}}",
+      "size": "{{size}}{{^size}}10{{/size}}",
       "query": {
         "bool": {
           "filter": [
