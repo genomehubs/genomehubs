@@ -35,7 +35,6 @@ init:
       file:
         - nodes.dmp
         - names.dmp
-      root: 1
       url: "ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz"
     path: ~/genomehubs/demo_resources/taxdump
 search: {}

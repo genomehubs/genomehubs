@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 """Hub functions."""
 
+import numbers
 import os
+import re
 from pathlib import Path
 
 from tolkein import tofile
 from tolkein import tolog
+
+LOGGER = tolog.logger(__name__)
+MIN_INTEGER = -(2 ** 31)
+MAX_INTEGER = 2 ** 31 - 1
 
 
 def setup(opts):
@@ -51,6 +57,27 @@ def post_search_scripts(es):
             es.put_script(id=script_id, body=body)
 
 
+def byte_type_constraint(value):
+    """Test byte_type constraint."""
+    if value >= -128 and value <= 128:
+        return True
+    return False
+
+
+def integer_type_constraint(value):
+    """Test integer_type constraint."""
+    if value >= MIN_INTEGER and value <= MAX_INTEGER:
+        return True
+    return False
+
+
+def short_type_constraint(value):
+    """Test short_type constraint."""
+    if value >= -32768 and value <= 32767:
+        return True
+    return False
+
+
 def min_value_constraint(value, limit):
     """Test minimum value constraint."""
     if value >= limit:
@@ -75,6 +102,9 @@ def enum_constraint(value, enum):
 def test_constraint(value, constraint):
     """Test value against constraint."""
     constraints = {
+        "byte": byte_type_constraint,
+        "integer": integer_type_constraint,
+        "short": short_type_constraint,
         "min": min_value_constraint,
         "max": max_value_constraint,
         "enum": enum_constraint,
@@ -86,6 +116,51 @@ def test_constraint(value, constraint):
     return True
 
 
+def convert_lat_lon(location):
+    """Convert lat and lon to array notation."""
+    if isinstance(location, list):
+        return ",".join(location)
+    if location.endswith(("E", "W")):
+        sign = {"N": "", "E": "", "S": "-", "W": "-"}
+        parts = re.split(r"\s*([NESW])\s*", location)
+        string = "%s%s,%s%s" % (sign[parts[1]], parts[0], sign[parts[3]], parts[2])
+        return string
+    if location:
+        return None
+    return ""
+
+
+def convert_to_type(key, value, to_type):
+    """Convert values to type."""
+    if to_type in {"byte", "integer", "long", "short"}:
+        try:
+            value = int(value)
+        except ValueError:
+            value = None
+    elif to_type in {
+        "double",
+        "float",
+        "half_float",
+        "1dp",
+        "2dp",
+        "3dp",
+        "4dp",
+    }:
+        try:
+            value = float(value)
+        except ValueError:
+            value = None
+    elif to_type == "geo_point":
+        value = convert_lat_lon(value)
+    else:
+        value = str(value)
+    if value is None:
+        LOGGER.warning(
+            "%s value %s is not a valid %s", key, str(value), to_type,
+        )
+    return value
+
+
 def add_attributes(entry, types, *, attributes=None, source=None):
     """Add attributes to a document."""
     if attributes is None:
@@ -93,18 +168,20 @@ def add_attributes(entry, types, *, attributes=None, source=None):
     for key, value in entry.items():
         if key in types:
             key_type = types[key]["type"]
-            if key_type == "integer":
-                value = int(value)
-            elif key_type == "float":
-                value = float(value)
-            else:
-                value = str(value)
+            value = convert_to_type(key, value, key_type)
+            if value is None:
+                continue
+            if isinstance(value, str):
+                if not value:
+                    continue
                 try:
                     value = types[key]["translate"][value]
                 except KeyError:
                     pass
             try:
-                valid = test_constraint(value, types[key]["constraint"])
+                valid = test_constraint(value, key_type)
+                if valid:
+                    valid = test_constraint(value, types[key]["constraint"])
             except KeyError:
                 valid = True
             if valid:
@@ -112,4 +189,6 @@ def add_attributes(entry, types, *, attributes=None, source=None):
                 if source is not None:
                     attribute.update({"source": source})
                 attributes.append(attribute)
+            elif value:
+                LOGGER.warning("%s is not a valid %s value", str(value), key)
     return attributes

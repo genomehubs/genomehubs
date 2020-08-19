@@ -100,13 +100,65 @@
             "type": "text",
             "meta": { "description": "Value of type text" }
           },
+          "geo_point_value": {
+            "type": "geo_point",
+            "meta": { "description": "Value of type geo_point" }
+          },
+          "date_value": {
+            "type": "date",
+            "meta": { "description": "Value of type date" }
+          },
+          "bool_value": {
+            "type": "boolean",
+            "meta": { "description": "Value can be true or false" }
+          },
+          "long_value": {
+            "type": "long",
+            "meta": { "description": "Value of type long" }
+          },
           "integer_value": {
             "type": "integer",
             "meta": { "description": "Value of type integer" }
           },
+          "short_value": {
+            "type": "short",
+            "meta": { "description": "Value of type short" }
+          },
+          "byte_value": {
+            "type": "byte",
+            "meta": { "description": "Value of type byte" }
+          },
+          "double_value": {
+            "type": "double",
+            "meta": { "description": "Value of type double" }
+          },
           "float_value": {
             "type": "float",
             "meta": { "description": "Value of type float" }
+          },
+          "half_float_value": {
+            "type": "half_float",
+            "meta": { "description": "Value of type half_float" }
+          },
+          "1dp_value": {
+            "scaling_factor": 10,
+            "type": "scaled_float",
+            "meta": { "description": "Value to 1 dp" }
+          },
+          "2dp_value": {
+            "scaling_factor": 100,
+            "type": "scaled_float",
+            "meta": { "description": "Value to 2 dp" }
+          },
+          "3dp_value": {
+            "scaling_factor": 1000,
+            "type": "scaled_float",
+            "meta": { "description": "Value to 3 dp" }
+          },
+          "4dp_value": {
+            "scaling_factor": 10000,
+            "type": "scaled_float",
+            "meta": { "description": "Value to 4 dp" }
           },
           "ontology_id": {
             "type": "keyword",
@@ -140,23 +192,23 @@
             "meta": { "description": "Count of individual values" }
           },
           "min": {
-            "type": "float",
+            "type": "double",
             "meta": { "description": "Minimum value (numeric types only)" }
           },
           "max": {
-            "type": "float",
+            "type": "double",
             "meta": { "description": "Maximum value (numeric types only)" }
           },
           "mean": {
-            "type": "float",
+            "type": "double",
             "meta": { "description": "Mean value (numeric types only)" }
           },
           "median": {
-            "type": "float",
+            "type": "double",
             "meta": { "description": "Median value (numeric types only)" }
           },
           "mode": {
-            "type": "float",
+            "type": "double",
             "meta": { "description": "Modal value (keyword and numeric types)" }
           },
           "stdev": {
@@ -182,13 +234,65 @@
                 "type": "text",
                 "meta": { "description": "Value of type text" }
               },
+              "geo_point_value": {
+                "type": "geo_point",
+                "meta": { "description": "Value of type geo_point" }
+              },
+              "date_value": {
+                "type": "date",
+                "meta": { "description": "Value of type date" }
+              },
+              "bool_value": {
+                "type": "boolean",
+                "meta": { "description": "Value can be true or false" }
+              },
+              "long_value": {
+                "type": "long",
+                "meta": { "description": "Value of type long" }
+              },
               "integer_value": {
                 "type": "integer",
                 "meta": { "description": "Value of type integer" }
               },
+              "short_value": {
+                "type": "short",
+                "meta": { "description": "Value of type short" }
+              },
+              "byte_value": {
+                "type": "byte",
+                "meta": { "description": "Value of type byte" }
+              },
+              "double_value": {
+                "type": "double",
+                "meta": { "description": "Value of type double" }
+              },
               "float_value": {
                 "type": "float",
                 "meta": { "description": "Value of type float" }
+              },
+              "half_float_value": {
+                "type": "half_float",
+                "meta": { "description": "Value of type half_float" }
+              },
+              "1dp_value": {
+                "scaling_factor": 10,
+                "type": "scaled_float",
+                "meta": { "description": "Value to 1 dp" }
+              },
+              "2dp_value": {
+                "scaling_factor": 100,
+                "type": "scaled_float",
+                "meta": { "description": "Value to 2 dp" }
+              },
+              "3dp_value": {
+                "scaling_factor": 1000,
+                "type": "scaled_float",
+                "meta": { "description": "Value to 3 dp" }
+              },
+              "4dp_value": {
+                "scaling_factor": 10000,
+                "type": "scaled_float",
+                "meta": { "description": "Value to 4 dp" }
               },
               "ontology_id": {
                 "type": "keyword",

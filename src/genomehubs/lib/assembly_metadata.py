@@ -192,7 +192,12 @@ def preprocess_batch(es, batch, opts, *, taxonomy_name="ncbi"):
     taxon_template = taxon_index_template(taxonomy_name, opts)
     taxonomy_template = taxonomy_index_template(taxonomy_name, opts)
     # TODO: find shared attributes programatically
-    shared_attributes = {"assembly_span"}
+    shared_attributes = {
+        "assembly_span",
+        "host_scientific_name",
+        "sample_location",
+        "sample_sex",
+    }
     taxon_ids, asm_by_taxon_id = collate_unique_key_value_indices("taxon_id", batch)
     taxon_res = query_keyword_value_template(
         es,
@@ -301,6 +306,7 @@ def index(es, opts, *, metadata_name="insdc", taxonomy_name="ncbi"):
 
     stream = parser(opts)
     batch = []
+    iteration = 1
     while True:
         stop = False
         try:
@@ -323,12 +329,12 @@ def index(es, opts, *, metadata_name="insdc", taxonomy_name="ncbi"):
                 "identifiers": identifiers,
             }
             batch.append(asm_meta)
-        except TypeError:
-            break
         except StopIteration:
             stop = True
         if len(batch) == opts["es-batch"] or stop:
             # TODO: set attributes
+            LOGGER.info("Processing batch %d with %d assemblies", iteration, len(batch))
+
             created, updated = preprocess_batch(
                 es, batch, opts, taxonomy_name=taxonomy_name
             )
@@ -336,6 +342,7 @@ def index(es, opts, *, metadata_name="insdc", taxonomy_name="ncbi"):
             assembly_stream = stream_assemblies(batch)
             index_stream(es, template["index_name"], assembly_stream)
             batch = []
+            iteration += 1
         if stop:
             break
     return

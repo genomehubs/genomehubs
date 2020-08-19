@@ -10,6 +10,7 @@ attributes:
   assembly_level:
     constraint:
       enum:
+        - complete genome
         - chromosome
         - contig
         - scaffold
@@ -25,7 +26,7 @@ attributes:
   assembly_span:
     constraint:
       min: 0
-    type: integer
+    type: long
   assembly_title:
     type: text
   assembly_type:
@@ -35,7 +36,7 @@ attributes:
   assembly_version:
     constraint:
       min: 0
-    type: integer
+    type: short
   center_name:
     constraint:
       len: 64
