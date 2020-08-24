@@ -1,0 +1,44 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "suggest": {
+        "text": "{{term}}",
+        "simple_phrase": {
+          "phrase": {
+            "field": "taxon_names.name.trigram",
+            "size": 3,
+            "gram_size": 3,
+            "max_errors": 3,
+            "direct_generator": [
+              {
+                "field": "taxon_names.name.trigram",
+                "suggest_mode": "always"
+              },
+              {
+                "field": "taxon_names.name.reverse",
+                "suggest_mode": "always",
+                "pre_filter": "reverse",
+                "post_filter": "reverse"
+              }
+            ],
+            "highlight": {
+              "pre_tag": "<em>",
+              "post_tag": "</em>"
+            },
+            "collate": {
+              "query": {
+                "source": {
+                  "match_phrase": {
+                    "taxon_names.name": "{{=|| ||=}}{{suggestion}}||={{ }}=||"
+                  }
+                }
+              },
+              "prune": true
+            }
+          }
+        }
+      }
+    }
+  }
+}

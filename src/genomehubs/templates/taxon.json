@@ -23,6 +23,11 @@
       "scientific_name": {
         "type": "keyword",
         "ignore_above": 64,
+        "fields": {
+          "live": {
+            "type": "search_as_you_type"
+          }
+        },
         "meta": { "description": "Scientific name" }
       },
       "unique_name": {
@@ -39,7 +44,20 @@
         "type": "nested",
         "properties": {
           "name": {
-            "type": "keyword",
+            "type": "text",
+            "fields": {
+              "raw": {
+                "type": "keyword"
+              },
+              "trigram": {
+                "type": "text",
+                "analyzer": "trigram"
+              },
+              "reverse": {
+                "type": "text",
+                "analyzer": "reverse"
+              }
+            },
             "meta": { "description": "Taxon name" }
           },
           "unique": {
@@ -317,6 +335,32 @@
                 "meta": { "description": "Document ID containing source value" }
               }
             }
+          }
+        }
+      }
+    }
+  },
+  "settings": {
+    "index": {
+      "number_of_shards": 1,
+      "analysis": {
+        "analyzer": {
+          "trigram": {
+            "type": "custom",
+            "tokenizer": "standard",
+            "filter": ["lowercase", "shingle"]
+          },
+          "reverse": {
+            "type": "custom",
+            "tokenizer": "standard",
+            "filter": ["lowercase", "reverse"]
+          }
+        },
+        "filter": {
+          "shingle": {
+            "type": "shingle",
+            "min_shingle_size": 2,
+            "max_shingle_size": 3
           }
         }
       }

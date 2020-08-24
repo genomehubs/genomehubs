@@ -1,0 +1,19 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": {
+        "multi_match": {
+          "query": "{{term}}",
+          "type": "bool_prefix",
+          "fields": [
+            "scientific_name.live",
+            "scientific_name.live._2gram",
+            "scientific_name.live._3gram"
+          ]
+        }
+      },
+      "_source": ["taxon_id", "scientific_name", "unique_name"]
+    }
+  }
+}
