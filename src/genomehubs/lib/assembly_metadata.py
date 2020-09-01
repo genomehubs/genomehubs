@@ -155,7 +155,7 @@ def add_assembly_attributes_to_taxon(
 def stream_taxa(taxa):
     """Stream dict of taxa for indexing."""
     for taxon_id, value in taxa.items():
-        yield "taxon-%s" % taxon_id, value
+        yield "taxon_id-%s" % taxon_id, value
 
 
 def add_taxonomy_info_to_assembly(asm_meta, source):

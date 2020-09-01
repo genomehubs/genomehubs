@@ -84,16 +84,15 @@ def index(es, opts, *, taxonomy_name="ncbi"):
     #     "taxon_id", 12345
     # ).es_or()
     # print(query.write())
-    query = EsQueryBuilder()
-    query.es_range("attributes.integer_value", [1000000, 3000000]).es_match(
-        "attributes.key", "assembly_span"
-    ).es_nested_and("attributes").es_include("taxon_id").es_include(
-        "attributes.*"
-    ).es_exclude(
-        ["lineage.*", "names.*"]
-    )
-    body = query.write()
-    print(body)
+    # query = EsQueryBuilder()
+    # query.es_range("attributes.integer_value", [1000000, 3000000]).es_match(
+    #     "attributes.key", "assembly_span"
+    # ).es_nested_and("attributes").es_include("taxon_id").es_include(
+    #     "attributes.*"
+    # ).es_exclude(
+    #     ["lineage.*", "names.*"]
+    # )
+    # body = query.write()
     # res = es.search(index=template["index_name"], body=body)
     # print(res)
     # quit()

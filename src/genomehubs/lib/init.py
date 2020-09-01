@@ -87,26 +87,25 @@ def main(args):
                 es_functions.load_mapping(es, template["name"], template["mapping"])
                 es_functions.index_stream(es, template["index_name"], stream)
 
-    # Index taxa
-    template, stream = taxon.index(es, options["init"], taxonomy_name=taxonomy_name,)
-    es_functions.load_mapping(es, template["name"], template["mapping"])
-    # es_functions.index_stream(es, template["index_name"], stream)
+    # Prepare taxon index
+    taxon_template = taxon.index_template(taxonomy_name, options["init"])
+    es_functions.load_mapping(es, taxon_template["name"], taxon_template["mapping"])
+    body = {
+        "source": {"index": template["index_name"]},
+        "dest": {"index": taxon_template["index_name"]},
+    }
+    es.reindex(body=body)
 
     # Index INSDC
     if "insdc-metadata" in options["init"]:
         assembly_metadata.index(
             es, options["init"], metadata_name="insdc", taxonomy_name=taxonomy_name
         )
-        # lookup taxon/taxonomy
-        # create/update taxon
-    #    template, stream =
-    #     LOGGER.info(options["init"]["taxonomy-sources"])
-    #     # index_insdc(es, options)
 
 
 def cli():
     """Entry point."""
-    if len(sys.argv) == sys.argv.index("init") + 1:
+    if len(sys.argv) == sys.argv.index(__name__.split(".")[-1]) + 1:
         args = docopt(__doc__, argv=[])
     else:
         args = docopt(__doc__, version=__version__)

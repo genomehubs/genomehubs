@@ -13,6 +13,9 @@ common:
   taxonomy:
     source:
       - ncbi
+fill:
+  traverse:
+    weight: branch-length
 index:
   insdc:
     genome-representation: full

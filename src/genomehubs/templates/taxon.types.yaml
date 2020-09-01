@@ -2,17 +2,35 @@ attributes:
   assembly_span:
     constraint:
       min: 0
+    description: Genome assembly span
+    summary:
+      - median_high
+      - max
+      - min
+      - mean
+    traverse: median_high
     type: long
+    units: bp
   c_value:
     constraint:
       max: 100
       min: 0
+    description: 1C value
+    summary:
+      - mean
+      - median
+      - max
+      - min
+    traverse: mean
     type: half_float
+    units: pgDNA
   host_scientific_name:
     constraint:
       len: 64
+    traverse: false
     type: keyword
   sample_location:
+    traverse: false
     type: geo_point
   sample_sex:
     constraint:
@@ -22,6 +40,7 @@ attributes:
         - hermaphrodite
         - male
         - pooled male and female
+    traverse: false
     type: keyword
   sex_determination_system:
     constraint:
@@ -31,6 +50,10 @@ attributes:
         - X-
         - ZW
         - NA
+    summary:
+      - list
+      - most_common
+    traverse: list
     translate:
       N/A: NA
       XO: X0
@@ -38,4 +61,5 @@ attributes:
   to_be_implemented:
     constraint:
       ontology: sequence_ontology
+    traverse: false
     type: keyword

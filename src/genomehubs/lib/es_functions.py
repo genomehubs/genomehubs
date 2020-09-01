@@ -28,7 +28,9 @@ def test_connection(opts, *, log=False):
     hosts = opts["es-host"]
     with tolog.DisableLogger():
         try:
-            es = Elasticsearch(hosts=hosts)
+            es = Elasticsearch(
+                hosts=hosts, timeout=30, max_retries=10, retry_on_timeout=True
+            )
             connected = es.info()
         except Exception:
             pass

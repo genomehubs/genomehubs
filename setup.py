@@ -126,6 +126,7 @@ setup(
     entry_points={
         "console_scripts": ["genomehubs = genomehubs:cli"],
         "genomehubs.subcmd": [
+            "fill = genomehubs.lib.fill:cli",
             "index = genomehubs.lib.index:cli",
             "init = genomehubs.lib.init:cli",
             "run = genomehubs.lib.run:cli",
