@@ -6,7 +6,7 @@
         "bool": {
           "should": [
             {
-              "match": { "taxon_id": "{{term}}" }
+              "match": { "taxon_id": "{{searchTerm}}" }
             },
             {
               "nested": {
@@ -14,8 +14,8 @@
                 "query": {
                   "match_phrase_prefix": {
                     "taxon_names.name": {
-                      "query": "{{term}}",
-                      "max_expansions": 10
+                      "query": "{{searchTerm}}",
+                      "max_expansions": "{{size}}{{^size}}10{{/size}}"
                     }
                   }
                 },

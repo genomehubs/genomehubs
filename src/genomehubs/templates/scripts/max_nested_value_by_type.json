@@ -1,0 +1,38 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "size": 0,
+      "aggs": {
+        "outer": {
+          "nested": {
+            "path": "{{path}}"
+          },
+          "aggs": {
+            "inner": {
+              "filter": {
+                "term": { "{{path}}.key": "{{field}}" }
+              },
+              "aggs": {
+                "values": {
+                  "nested": {
+                    "path": "{{path}}.values"
+                  },
+                  "aggs": {
+                    "max_{{field}}": {
+                      "histogram": {
+                        "field": "{{path}}.values.{{type}}",
+                        "script": "Math.log10(_value)",
+                        "interval": 0.5
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

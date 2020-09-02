@@ -26,6 +26,9 @@
         "fields": {
           "live": {
             "type": "search_as_you_type"
+          },
+          "text": {
+            "type": "text"
           }
         },
         "meta": { "description": "Scientific name" }

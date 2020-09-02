@@ -1,0 +1,42 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "size": "{{size}}{{^size}}10{{/size}}",
+      "query": {
+        "bool": {
+          "should": [
+            {
+              "prefix": {
+                "scientific_name": {
+                  "value": "{{searchTerm}}",
+                  "boost": 3.0
+                }
+              }
+            },
+            {
+              "match_phrase_prefix": {
+                "scientific_name.text": {
+                  "query": "{{searchTerm}}",
+                  "boost": 2.0
+                }
+              }
+            },
+            {
+              "multi_match": {
+                "query": "{{searchTerm}}",
+                "type": "phrase_prefix",
+                "fields": [
+                  "scientific_name.live",
+                  "scientific_name.live._2gram",
+                  "scientific_name.live._3gram"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "_source": ["taxon_id", "scientific_name", "unique_name"]
+    }
+  }
+}

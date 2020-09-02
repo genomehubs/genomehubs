@@ -3,13 +3,14 @@
     "lang": "mustache",
     "source": {
       "suggest": {
-        "text": "{{term}}",
+        "text": "{{searchTerm}}",
         "simple_phrase": {
           "phrase": {
             "field": "taxon_names.name.trigram",
-            "size": 3,
-            "gram_size": 3,
-            "max_errors": 3,
+            "size": "{{suggestSize}}{{^suggestSize}}3{{/suggestSize}}",
+            "gram_size": "{{gramSize}}{{^gramSize}}3{{/gramSize}}",
+            "confidence": "{{confidence}}{{^confidence}}1{{/confidence}}",
+            "max_errors": "{{maxErrors}}{{^maxErrors}}3{{/maxErrors}}",
             "direct_generator": [
               {
                 "field": "taxon_names.name.trigram",
@@ -23,8 +24,8 @@
               }
             ],
             "highlight": {
-              "pre_tag": "<em>",
-              "post_tag": "</em>"
+              "pre_tag": "{{preTag}}{{^preTag}}<em>{{/preTag}}",
+              "post_tag": "{{postTag}}{{^postTag}}</em>{{/postTag}}"
             },
             "collate": {
               "query": {

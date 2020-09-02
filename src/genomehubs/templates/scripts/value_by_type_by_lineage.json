@@ -1,0 +1,44 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "size": 0,
+      "query": {
+        "nested": {
+          "path": "lineage",
+          "query": {
+            "bool": {
+              "should": [
+                { "match": { "lineage.taxon_id": "{{lineage}}" } },
+                { "match": { "lineage.scientific_name": "{{lineage}}" } }
+              ]
+            }
+          }
+        }
+      },
+      "aggs": {
+        "outer": {
+          "nested": {
+            "path": "{{path}}"
+          },
+          "aggs": {
+            "inner": {
+              "filter": {
+                "term": { "{{path}}.key": "{{field}}" }
+              },
+              "aggs": {
+                "max_{{field}}": {
+                  "histogram": {
+                    "field": "{{path}}.{{type}}",
+                    "script": "Math.log10(_value)",
+                    "interval": 0.5
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
