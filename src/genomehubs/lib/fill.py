@@ -150,21 +150,25 @@ def summarise_attribute_values(attribute, meta, *, values=None):
     }
     if "summary" in meta:
         value_type = "%s_value" % meta["type"]
-        if values is None:
-            values = [value[value_type] for value in attribute["values"]]
-        else:
-            values += [value[value_type] for value in attribute["values"]]
+        if "values" in attribute:
+            if values is None:
+                values = [value[value_type] for value in attribute["values"]]
+            else:
+                values += [value[value_type] for value in attribute["values"]]
         if not values:
             return None
         idx = 0
         traverse = meta.get("traverse", False)
         traverse_value = None
-        for summary in list(meta["summary"]):
+        if not isinstance(meta["summary"], list):
+            meta["summary"] = [meta["summary"]]
+        for summary in meta["summary"]:
             value = summaries[summary](values)
             if idx == 0:
                 attribute[value_type] = value
                 attribute["count"] = len(values)
                 attribute["aggregation_method"] = summary
+                attribute["aggregation_source"] = "direct"
             if traverse and summary == traverse:
                 traverse_value = value
             if summary != "list":
@@ -205,13 +209,13 @@ def set_values_from_descendants(
         try:
             attribute = next(entry for entry in attributes if entry["key"] == key)
         except StopIteration:
-            attribute = {"key": key, "values": []}
+            attribute = {"key": key}
             attributes.append(attribute)
         summary_value = summarise_attribute_values(
             attribute, meta[key], values=descendant_values[key],
         )
         if summary_value is not None:
-            attribute["aggregation_method"] += " of direct descendants"
+            attribute["aggregation_source"] = "descendant"
             changed = True
             if parent is not None:
                 if isinstance(summary_value, list):
@@ -305,9 +309,8 @@ def stream_missing_attributes_at_level(es, *, nodes, attrs, template, level=1):
             for key, anc_attribute in anc_attributes.items():
                 if key not in skip_attrs:
                     desc_attribute = copy_attribute_summary(anc_attribute, meta[key])
-                    desc_attribute["aggregation_method"] = (
-                        "%s from ancestral node" % meta[key]["traverse"]
-                    )
+                    desc_attribute["aggregation_method"] = meta[key]["traverse"]
+                    desc_attribute["aggregation_source"] = "ancestor"
                     desc_node["_source"]["attributes"].append(desc_attribute)
             yield desc_node["_id"], desc_node["_source"]
 

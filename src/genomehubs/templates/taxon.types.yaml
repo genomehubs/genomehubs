@@ -30,6 +30,7 @@ attributes:
     traverse: false
     type: keyword
   sample_location:
+    summary: list
     traverse: false
     type: geo_point
   sample_sex:
@@ -40,6 +41,7 @@ attributes:
         - hermaphrodite
         - male
         - pooled male and female
+    summary: list
     traverse: false
     type: keyword
   sex_determination_system:

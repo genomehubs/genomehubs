@@ -240,6 +240,13 @@
             "ignore_above": 64,
             "meta": { "description": "Method used to generate summary value" }
           },
+          "aggregation_source": {
+            "type": "keyword",
+            "ignore_above": 16,
+            "meta": {
+              "description": "Summary source (direct, ancestor, descendant)"
+            }
+          },
           "values": {
             "type": "nested",
             "properties": {
