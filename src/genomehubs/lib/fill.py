@@ -88,7 +88,7 @@ def stream_template_search_results(es, *, index, body, size=10):
     """Stream results of a template search."""
     body["params"].update({"size": size})
     res = es.search_template(
-        index=index, body=body, rest_total_hits_as_int=True, scroll="1m"
+        index=index, body=body, rest_total_hits_as_int=True, scroll="10m"
     )
     scroll_id = res["_scroll_id"]
     count = res["hits"]["total"]
@@ -96,7 +96,7 @@ def stream_template_search_results(es, *, index, body, size=10):
         yield hit
     offset = size
     while offset < count:
-        res = es.scroll(rest_total_hits_as_int=True, scroll="1m", scroll_id=scroll_id)
+        res = es.scroll(rest_total_hits_as_int=True, scroll="10m", scroll_id=scroll_id)
         for hit in res["hits"]["hits"]:
             yield hit
         offset += size
