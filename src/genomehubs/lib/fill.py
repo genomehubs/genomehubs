@@ -64,6 +64,7 @@ def get_max_depth(es, *, index):
     }
     res = es.search_template(index=index, body=body)
     max_depth = res["aggregations"]["depths"]["max_depth"]["value"]
+    print(max_depth)
     return max_depth
 
 

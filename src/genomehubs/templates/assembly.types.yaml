@@ -25,7 +25,7 @@ attributes:
     type: integer
   assembly_span:
     constraint:
-      min: 0
+      min: 100000
     type: long
   assembly_title:
     type: text
@@ -86,6 +86,7 @@ attributes:
         - female
         - hermaphrodite
         - male
+        - mixed sex
         - pooled male and female
     type: keyword
   scaffold_count:

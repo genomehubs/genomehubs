@@ -29,7 +29,7 @@ def test_connection(opts, *, log=False):
     with tolog.DisableLogger():
         try:
             es = Elasticsearch(
-                hosts=hosts, timeout=30, max_retries=10, retry_on_timeout=True
+                hosts=hosts, timeout=1800, max_retries=10, retry_on_timeout=True
             )
             connected = es.info()
         except Exception:
@@ -121,7 +121,7 @@ def launch_es(opts):
     if not es:
         if any(host.startswith(("localhost", "127.0.0.1")) for host in opts["es-host"]):
             # Start Elasticsearch
-            if "es" in opts["docker-contain"]:
+            if "docker-contain" in opts and "es" in opts["docker-contain"]:
                 es = start_es_docker(opts)
             else:
                 es = start_es_binary(opts)

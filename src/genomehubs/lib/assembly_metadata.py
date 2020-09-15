@@ -87,6 +87,8 @@ def query_value_template(es, template_name, values, index):
         multisearch = True
     else:
         values = [values]
+    if not values:
+        return None
     for value in values:
         if multisearch:
             body += "{}\n"
@@ -186,11 +188,63 @@ def collate_unique_key_value_indices(key, list_of_dicts):
     return list(unique_key_values), entry_indices_by_key_value
 
 
+def get_taxa_to_create(
+    es,
+    batch,
+    opts,
+    *,
+    taxonomy_name="ncbi",
+    taxon_ids=None,
+    asm_by_taxon_id=None,
+    template=None,
+    shared_attributes=None
+):
+    """Create a dict of taxa to create."""
+    taxa_to_create = {}
+    taxonomy_template = taxonomy_index_template(taxonomy_name, opts)
+    if taxon_ids is not None:
+        taxonomy_res = query_value_template(
+            es, "taxonomy_node_by_taxon_id", taxon_ids, taxonomy_template["index_name"],
+        )
+        if taxonomy_res is None:
+            LOGGER.error(
+                "Could not connect to taxonomy index '%s'",
+                taxonomy_template["index_name"],
+            )
+            sys.exit(1)
+        ancestors = set()
+        for taxonomy_result in taxonomy_res["responses"]:
+            if taxonomy_result["hits"]["total"]["value"] == 1:
+                source = taxonomy_result["hits"]["hits"][0]["_source"]
+                taxa_to_create[source["taxon_id"]] = source
+                for ancestor in source["lineage"]:
+                    ancestors.add(ancestor["taxon_id"])
+                for idx in asm_by_taxon_id[source["taxon_id"]]:
+                    add_taxonomy_info_to_assembly(batch[idx], source)
+        add_assembly_attributes_to_taxon(
+            batch,
+            asm_by_taxon_id,
+            taxa_to_create,
+            index_name=template["index_name"],
+            shared_attributes=shared_attributes,
+        )
+        taxonomy_res = query_value_template(
+            es,
+            "taxonomy_node_by_taxon_id",
+            list(ancestors),
+            taxonomy_template["index_name"],
+        )
+        if taxonomy_res and "responses" in taxonomy_res:
+            for taxonomy_result in taxonomy_res["responses"]:
+                if taxonomy_result["hits"]["total"]["value"] == 1:
+                    source = taxonomy_result["hits"]["hits"][0]["_source"]
+                    taxa_to_create[source["taxon_id"]] = source
+
+
 def preprocess_batch(es, batch, opts, *, taxonomy_name="ncbi"):
     """Preprocess a batch of assembly metadata to add/update taxonomy information."""
     template = index_template(taxonomy_name, opts)
     taxon_template = taxon_index_template(taxonomy_name, opts)
-    taxonomy_template = taxonomy_index_template(taxonomy_name, opts)
     # TODO: find shared attributes programatically
     shared_attributes = {
         "assembly_span",
@@ -233,43 +287,16 @@ def preprocess_batch(es, batch, opts, *, taxonomy_name="ncbi"):
         index_name=template["index_name"],
         shared_attributes=shared_attributes,
     )
-    taxa_to_create = {}
-    if taxon_ids:
-        taxonomy_res = query_value_template(
-            es, "taxonomy_node_by_taxon_id", taxon_ids, taxonomy_template["index_name"],
-        )
-        if taxonomy_res is None:
-            LOGGER.error(
-                "Could not connect to taxonomy index '%s'",
-                taxonomy_template["index_name"],
-            )
-            sys.exit(1)
-        ancestors = set()
-        for taxonomy_result in taxonomy_res["responses"]:
-            if taxonomy_result["hits"]["total"]["value"] == 1:
-                source = taxonomy_result["hits"]["hits"][0]["_source"]
-                taxa_to_create[source["taxon_id"]] = source
-                for ancestor in source["lineage"]:
-                    ancestors.add(ancestor["taxon_id"])
-                for idx in asm_by_taxon_id[source["taxon_id"]]:
-                    add_taxonomy_info_to_assembly(batch[idx], source)
-        add_assembly_attributes_to_taxon(
-            batch,
-            asm_by_taxon_id,
-            taxa_to_create,
-            index_name=template["index_name"],
-            shared_attributes=shared_attributes,
-        )
-        taxonomy_res = query_value_template(
-            es,
-            "taxonomy_node_by_taxon_id",
-            list(ancestors),
-            taxonomy_template["index_name"],
-        )
-        for taxonomy_result in taxonomy_res["responses"]:
-            if taxonomy_result["hits"]["total"]["value"] == 1:
-                source = taxonomy_result["hits"]["hits"][0]["_source"]
-                taxa_to_create[source["taxon_id"]] = source
+    taxa_to_create = get_taxa_to_create(
+        es,
+        batch,
+        opts,
+        taxonomy_name=taxonomy_name,
+        taxon_ids=taxon_ids,
+        asm_by_taxon_id=asm_by_taxon_id,
+        template=template,
+        shared_attributes=shared_attributes,
+    )
     to_create = len(taxa_to_create.keys())
     to_update = len(taxa_to_update.keys())
     LOGGER.info(
