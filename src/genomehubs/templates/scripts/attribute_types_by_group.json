@@ -1,0 +1,8 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": { "match": { "group": "{{group}}" } }
+    }
+  }
+}

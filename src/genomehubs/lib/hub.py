@@ -24,16 +24,20 @@ def index_templator(parts, opts):
     """Index template helper function."""
     script_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     mapping_file = os.path.join(script_dir, "templates", parts[0] + ".json")
-    types_file = os.path.join(script_dir, "templates", parts[0] + ".types.yaml")
-    types = tofile.load_yaml(types_file)
+    types = None
     try:
-        for key, value in types.items():
-            try:
-                enum = set(value["constraint"]["enum"])
-                value["constraint"]["enum"] = enum
-            except KeyError:
-                pass
-    except AttributeError:
+        types_file = os.path.join(script_dir, "templates", parts[0] + ".types.yaml")
+        types = tofile.load_yaml(types_file)
+        try:
+            for key, value in types.items():
+                try:
+                    enum = set(value["constraint"]["enum"])
+                    value["constraint"]["enum"] = enum
+                except KeyError:
+                    pass
+        except AttributeError:
+            pass
+    except Exception:
         pass
     template = {
         "name": parts[0],
@@ -161,34 +165,77 @@ def convert_to_type(key, value, to_type):
     return value
 
 
+def calculator(value, operation):
+    """Template-based calculator."""
+    value1, operator, value2 = operation.split(" ")
+    if value1 == "{}":
+        value1 = float(value)
+        value2 = float(value2)
+    elif value2 == "{}":
+        value2 = float(value)
+        value1 = float(value1)
+    if operator == "+":
+        return value1 + value2
+    elif operator == "-":
+        return value1 - value2
+    elif operator == "*":
+        return value1 * value2
+    elif operator == "/":
+        try:
+            return value1 / value2
+        except ZeroDivisionError:
+            return None
+    elif operator == "%":
+        if operator == "%":
+            return value1 % value2
+    else:
+        return None
+
+
+def validate_values(values, key, types):
+    """Validate values."""
+    validated = []
+    key_type = types[key]["type"]
+    for value in values:
+        if "function" in types[key]:
+            value = calculator(value, types[key]["function"])
+        value = convert_to_type(key, value, key_type)
+        if value is None:
+            continue
+        if isinstance(value, str):
+            if not value:
+                continue
+            try:
+                value = types[key]["translate"][value]
+            except KeyError:
+                pass
+        try:
+            valid = test_constraint(value, key_type)
+            if valid:
+                valid = test_constraint(value, types[key]["constraint"])
+        except KeyError:
+            valid = True
+        if valid:
+            validated.append(value)
+        elif value:
+            LOGGER.warning("%s is not a valid %s value", str(value), key)
+    return validated
+
+
 def add_attributes(entry, types, *, attributes=None, source=None):
     """Add attributes to a document."""
     if attributes is None:
         attributes = []
-    for key, value in entry.items():
+    for key, values in entry.items():
         if key in types:
-            key_type = types[key]["type"]
-            value = convert_to_type(key, value, key_type)
-            if value is None:
-                continue
-            if isinstance(value, str):
-                if not value:
-                    continue
-                try:
-                    value = types[key]["translate"][value]
-                except KeyError:
-                    pass
-            try:
-                valid = test_constraint(value, key_type)
-                if valid:
-                    valid = test_constraint(value, types[key]["constraint"])
-            except KeyError:
-                valid = True
-            if valid:
-                attribute = {"key": key, "%s_value" % key_type: value}
+            if not isinstance(values, list):
+                values = [values]
+            validated = validate_values(values, key, types)
+            if validated:
+                if len(validated) == 1:
+                    validated = validated[0]
+                attribute = {"key": key, "%s_value" % types[key]["type"]: validated}
                 if source is not None:
                     attribute.update({"source": source})
                 attributes.append(attribute)
-            elif value:
-                LOGGER.warning("%s is not a valid %s value", str(value), key)
     return attributes

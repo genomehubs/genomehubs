@@ -1,0 +1,59 @@
+{
+  "index_patterns": ["attributes-*"],
+  "mappings": {
+    "properties": {
+      "group": {
+        "type": "keyword",
+        "ignore_above": 16,
+        "meta": { "description": "Index group (e.g. assembly or taxon)" }
+      },
+      "name": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Attribute name" }
+      },
+      "constraint": {
+        "type": "object"
+      },
+      "description": {
+        "type": "text",
+        "meta": { "description": "Attribute description" }
+      },
+      "display_level": {
+        "type": "byte",
+        "meta": { "description": "Display priority" }
+      },
+      "index": {
+        "type": "short",
+        "meta": { "description": "Column index of value in original file" }
+      },
+      "separator": {
+        "type": "text",
+        "meta": { "description": "Value separator" }
+      },
+      "summary": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Summary function(s) to apply to raw values" }
+      },
+      "translate": {
+        "type": "object"
+      },
+      "traverse": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Summary function to use in tree traversal" }
+      },
+      "type": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Data type" }
+      },
+      "units": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Units for values" }
+      }
+    }
+  }
+}

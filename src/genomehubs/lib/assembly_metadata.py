@@ -12,6 +12,8 @@ from tolkein import tolog
 from .es_functions import EsQueryBuilder
 from .es_functions import index_exists
 from .es_functions import index_stream
+from .es_functions import query_keyword_value_template
+from .es_functions import query_value_template
 from .hub import add_attributes
 from .hub import index_templator
 from .taxon import index_template as taxon_index_template
@@ -51,55 +53,6 @@ def parse_insdc_metadata(opts):
             for assembly in assemblies:
                 assembly["assembly_id"] = assembly["gca_accession"]
                 yield assembly
-
-
-def query_keyword_value_template(es, template_name, keyword, values, index):
-    """Run query using a by_keyword_value template."""
-    if not index_exists(es, index):
-        return None
-    multisearch = False
-    body = ""
-    if isinstance(values, list):
-        multisearch = True
-    else:
-        values = [values]
-    for value in values:
-        if multisearch:
-            body += "{}\n"
-        body += ujson.dumps(
-            {"id": template_name, "params": {"keyword": keyword, "value": value}}
-        )
-        body += "\n"
-    if multisearch:
-        return es.msearch_template(body=body, index=index)
-
-    if multisearch:
-        return es.search_template(body=body, index=index)
-
-
-def query_value_template(es, template_name, values, index):
-    """Run query using a by_value template."""
-    if not index_exists(es, index):
-        return None
-    multisearch = False
-    body = ""
-    if isinstance(values, list):
-        multisearch = True
-    else:
-        values = [values]
-    if not values:
-        return None
-    for value in values:
-        if multisearch:
-            body += "{}\n"
-        body += ujson.dumps({"id": template_name, "params": {"value": value}})
-        body += "\n"
-    with tolog.DisableLogger():
-        if multisearch:
-            return es.msearch_template(body=body, index=index)
-
-        if multisearch:
-            return es.search_template(body=body, index=index)
 
 
 def get_list_entries_by_dict_value(values, list_of_dicts, *, key="key"):

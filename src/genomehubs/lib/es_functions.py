@@ -189,6 +189,70 @@ def index_stream(es, index_name, stream, *, _op_type="index"):
     return success, failed
 
 
+def stream_template_search_results(es, *, index, body, size=10):
+    """Stream results of a template search."""
+    body["params"].update({"size": size})
+    res = es.search_template(
+        index=index, body=body, rest_total_hits_as_int=True, scroll="10m"
+    )
+    scroll_id = res["_scroll_id"]
+    count = res["hits"]["total"]
+    for hit in res["hits"]["hits"]:
+        yield hit
+    offset = size
+    while offset < count:
+        res = es.scroll(rest_total_hits_as_int=True, scroll="10m", scroll_id=scroll_id)
+        for hit in res["hits"]["hits"]:
+            yield hit
+        offset += size
+    es.clear_scroll(scroll_id=scroll_id)
+
+
+def query_keyword_value_template(es, template_name, keyword, values, index):
+    """Run query using a by_keyword_value template."""
+    if not index_exists(es, index):
+        return None
+    multisearch = False
+    body = ""
+    if isinstance(values, list):
+        multisearch = True
+    else:
+        values = [values]
+    for value in values:
+        if multisearch:
+            body += "{}\n"
+        body += ujson.dumps(
+            {"id": template_name, "params": {"keyword": keyword, "value": value}}
+        )
+        body += "\n"
+    if multisearch:
+        return es.msearch_template(body=body, index=index)
+    return es.search_template(body=body, index=index)
+
+
+def query_value_template(es, template_name, values, index):
+    """Run query using a by_value template."""
+    if not index_exists(es, index):
+        return None
+    multisearch = False
+    body = ""
+    if isinstance(values, list):
+        multisearch = True
+    else:
+        values = [values]
+    if not values:
+        return None
+    for value in values:
+        if multisearch:
+            body += "{}\n"
+        body += ujson.dumps({"id": template_name, "params": {"value": value}})
+        body += "\n"
+    with tolog.DisableLogger():
+        if multisearch:
+            return es.msearch_template(body=body, index=index)
+        return es.search_template(body=body, index=index)
+
+
 class EsQueryBuilder:
     """Class for building ElasticSearch queries."""
 

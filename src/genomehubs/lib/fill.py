@@ -6,7 +6,7 @@ Fill attribute values.
 Usage:
     genomehubs fill [--hub-name STRING] [--hub-path PATH] [--hub-version PATH]
                     [--config-file PATH...] [--config-save PATH]
-                    [--es-host URL...] [--es-url URL]
+                    [--es-host URL...]
                     [--traverse-infer-ancestors] [--traverse-infer-descendants]
                     [--traverse-infer-both]
                     [--traverse-root STRING] [--traverse-weight STRING]
@@ -19,7 +19,6 @@ Options:
     --config-file PATH            Path to YAML file containing configuration options.
     --config-save PATH            Path to write configuration options to YAML file.
     --es-host URL                 ElasticSearch hostname/URL and port.
-    --es-url URL                  Remote URL to fetch ElasticSearch code.
     --traverse-infer-ancestors    Flag to enable tree traversal from tips to root.
     --traverse-infer-descendants  Flag to enable tree traversal from root to tips.
     --traverse-infer-both         Flag to enable tree traversal from tips to root and
@@ -47,10 +46,13 @@ from statistics import mode
 from docopt import docopt
 from tolkein import tolog
 
-from ..lib import es_functions
 from ..lib import hub
 from ..lib import taxon
+from .attributes import fetch_types
 from .config import config
+from .es_functions import index_stream
+from .es_functions import launch_es
+from .es_functions import stream_template_search_results
 from .version import __version__
 
 LOGGER = tolog.logger(__name__)
@@ -64,7 +66,6 @@ def get_max_depth(es, *, index):
     }
     res = es.search_template(index=index, body=body)
     max_depth = res["aggregations"]["depths"]["max_depth"]["value"]
-    print(max_depth)
     return max_depth
 
 
@@ -82,25 +83,6 @@ def get_max_depth_by_lineage(es, *, index, root):
     res = es.search_template(index=index, body=body)
     max_depth = res["aggregations"]["depths"]["root"]["max_depth"]["value"]
     return max_depth
-
-
-def stream_template_search_results(es, *, index, body, size=10):
-    """Stream results of a template search."""
-    body["params"].update({"size": size})
-    res = es.search_template(
-        index=index, body=body, rest_total_hits_as_int=True, scroll="10m"
-    )
-    scroll_id = res["_scroll_id"]
-    count = res["hits"]["total"]
-    for hit in res["hits"]["hits"]:
-        yield hit
-    offset = size
-    while offset < count:
-        res = es.scroll(rest_total_hits_as_int=True, scroll="10m", scroll_id=scroll_id)
-        for hit in res["hits"]["hits"]:
-            yield hit
-        offset += size
-    es.clear_scroll(scroll_id=scroll_id)
 
 
 def stream_nodes_by_root_depth(es, *, index, root, depth, size=10):
@@ -338,7 +320,7 @@ def traverse_from_root(es, opts, *, template):
         desc_nodes = stream_missing_attributes_at_level(
             es, nodes=nodes, attrs=attrs, template=template
         )
-        es_functions.index_stream(
+        index_stream(
             es, template["index_name"], desc_nodes, _op_type="update",
         )
         root_depth -= 1
@@ -352,20 +334,24 @@ def main(args):
         options["fill"]["traverse-infer-descendants"] = True
 
     # Start Elasticsearch
-    es = es_functions.launch_es(options["fill"])
+    es = launch_es(options["fill"])
 
     # Post search scripts
     hub.post_search_scripts(es)
 
     LOGGER.info("Filling values")
 
+    types = fetch_types(es, "taxon", options["fill"])
+
     if "taxonomy-source" in options["fill"]:
         for taxonomy_name in options["fill"]["taxonomy-source"]:
             template = taxon.index_template(taxonomy_name, options["fill"])
+            if types:
+                template["types"]["attributes"] = types
             if "traverse-root" in options["fill"]:
                 if "traverse-infer-ancestors" in options["fill"]:
                     LOGGER.info("Inferring ancestral values")
-                    es_functions.index_stream(
+                    index_stream(
                         es,
                         template["index_name"],
                         traverse_from_tips(es, options["fill"], template=template),

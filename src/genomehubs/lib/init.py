@@ -56,6 +56,7 @@ from docopt import docopt
 from tolkein import tolog
 
 from ..lib import assembly_metadata
+from ..lib import attributes
 from ..lib import es_functions
 from ..lib import hub
 from ..lib import taxon
@@ -90,6 +91,9 @@ def main(args):
     # Prepare taxon index
     taxon_template = taxon.index_template(taxonomy_name, options["init"])
     es_functions.load_mapping(es, taxon_template["name"], taxon_template["mapping"])
+    attributes.index_types(
+        es, taxon_template["name"], taxon_template["types"], options["init"]
+    )
     body = {
         "source": {"index": template["index_name"]},
         "dest": {"index": taxon_template["index_name"]},
@@ -97,6 +101,11 @@ def main(args):
     es.reindex(body=body)
 
     # Index INSDC
+    assembly_template = assembly_metadata.index_template(taxonomy_name, options["init"])
+    attributes.index_types(
+        es, assembly_template["name"], assembly_template["types"], options["init"]
+    )
+
     if "insdc-metadata" in options["init"]:
         assembly_metadata.index(
             es, options["init"], metadata_name="insdc", taxonomy_name=taxonomy_name
