@@ -146,7 +146,13 @@ def summarise_attribute_values(attribute, meta, *, values=None):
         if not isinstance(meta["summary"], list):
             meta["summary"] = [meta["summary"]]
         for summary in meta["summary"]:
-            value = summaries[summary](values)
+            flattened = []
+            for v in values:
+                if isinstance(v, list):
+                    flattened += v
+                else:
+                    flattened.append(v)
+            value = summaries[summary](flattened)
             if idx == 0:
                 attribute[value_type] = value
                 attribute["count"] = len(values)

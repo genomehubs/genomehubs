@@ -36,7 +36,13 @@
           ]
         }
       },
-      "_source": ["taxon_id", "scientific_name", "unique_name", "taxon_rank"]
+      "_source": [
+        "taxon_id",
+        "scientific_name",
+        "unique_name",
+        "taxon_rank",
+        "taxon_names.*"
+      ]
     }
   }
 }

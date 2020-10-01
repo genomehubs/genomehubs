@@ -41,7 +41,14 @@
           ]
         }
       },
-      "_source": { "includes": ["taxon_id", "taxon_rank", "scientific_name"] }
+      "_source": {
+        "includes": [
+          "taxon_id",
+          "taxon_rank",
+          "scientific_name",
+          "taxon_names.*"
+        ]
+      }
     }
   }
 }
