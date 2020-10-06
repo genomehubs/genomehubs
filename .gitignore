@@ -5,3 +5,4 @@ htmlcov
 .tox
 build
 .coverage
+.DS_Store

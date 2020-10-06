@@ -115,10 +115,8 @@ def stream_descendant_nodes_missing_attributes(es, *, index, attributes, root, s
                 yield result
 
 
-def summarise_attribute_values(attribute, meta, *, values=None):
-    """Calculate a single summary value for an attribute."""
-    if values is None and "values" not in attribute:
-        return
+def apply_summary(summary, values, *, max_value=None, min_value=None):
+    """Apply summary statistic functions."""
     summaries = {
         "count": len,
         "max": max,
@@ -131,6 +129,30 @@ def summarise_attribute_values(attribute, meta, *, values=None):
         "most_common": mode,
         "list": list,
     }
+    flattened = []
+    for v in values:
+        if isinstance(v, list):
+            flattened += v
+        else:
+            flattened.append(v)
+    value = summaries[summary](flattened)
+    if summary == "max":
+        if max_value is not None:
+            value = max(value, max_value)
+        max_value = value
+    if summary == "min":
+        if min_value is not None:
+            value = min(value, min_value)
+        min_value = value
+    return value, max_value, min_value
+
+
+def summarise_attribute_values(
+    attribute, meta, *, values=None, max_value=None, min_value=None
+):
+    """Calculate a single summary value for an attribute."""
+    if values is None and "values" not in attribute:
+        return None, None, None
     if "summary" in meta:
         value_type = "%s_value" % meta["type"]
         if "values" in attribute:
@@ -139,20 +161,16 @@ def summarise_attribute_values(attribute, meta, *, values=None):
             else:
                 values += [value[value_type] for value in attribute["values"]]
         if not values:
-            return None
+            return None, None, None
         idx = 0
         traverse = meta.get("traverse", False)
         traverse_value = None
         if not isinstance(meta["summary"], list):
             meta["summary"] = [meta["summary"]]
         for summary in meta["summary"]:
-            flattened = []
-            for v in values:
-                if isinstance(v, list):
-                    flattened += v
-                else:
-                    flattened.append(v)
-            value = summaries[summary](flattened)
+            value, max_value, min_value = apply_summary(
+                summary, values, max_value=max_value, min_value=min_value
+            )
             if idx == 0:
                 attribute[value_type] = value
                 attribute["count"] = len(values)
@@ -167,8 +185,8 @@ def summarise_attribute_values(attribute, meta, *, values=None):
             elif traverse_value:
                 traverse_value = list(set(traverse_value))
             idx += 1
-        return traverse_value
-    return None
+        return traverse_value, max_value, min_value
+    return None, None, None
 
 
 def summarise_attributes(*, attributes, attrs, meta, parent, parents):
@@ -176,16 +194,31 @@ def summarise_attributes(*, attributes, attrs, meta, parent, parents):
     changed = False
     for node_attribute in attributes:
         if node_attribute["key"] in attrs:
-            summary_value = summarise_attribute_values(
+            summary_value, max_value, min_value = summarise_attribute_values(
                 node_attribute, meta[node_attribute["key"]]
             )
             if summary_value is not None:
                 changed = True
                 if parent is not None:
+                    # print(node_attribute["key"])
+                    # print(parents[parent][node_attribute["key"]]["values"])
+                    # print(summary_value)
                     if isinstance(summary_value, list):
-                        parents[parent][node_attribute["key"]] += summary_value
+                        parents[parent][node_attribute["key"]][
+                            "values"
+                        ] += summary_value
                     else:
-                        parents[parent][node_attribute["key"]].append(summary_value)
+                        parents[parent][node_attribute["key"]]["values"].append(
+                            summary_value
+                        )
+                    if max_value is not None:
+                        parents[parent][node_attribute["key"]]["max"] = max(
+                            parents[parent][node_attribute["key"]]["max"], max_value
+                        )
+                    if min_value is not None:
+                        parents[parent][node_attribute["key"]]["min"] = min(
+                            parents[parent][node_attribute["key"]]["min"], min_value
+                        )
     return changed
 
 
@@ -194,23 +227,35 @@ def set_values_from_descendants(
 ):
     """Set attribute summary values from descendant values."""
     changed = False
-    for key, values in descendant_values.items():
+    for key, obj in descendant_values.items():
         try:
             attribute = next(entry for entry in attributes if entry["key"] == key)
         except StopIteration:
             attribute = {"key": key}
             attributes.append(attribute)
-        summary_value = summarise_attribute_values(
-            attribute, meta[key], values=descendant_values[key],
+        summary_value, max_value, min_value = summarise_attribute_values(
+            attribute,
+            meta[key],
+            values=obj["values"],
+            max_value=obj["max"],
+            min_value=obj["min"],
         )
         if summary_value is not None:
             attribute["aggregation_source"] = "descendant"
             changed = True
             if parent is not None:
                 if isinstance(summary_value, list):
-                    parents[parent][key] += summary_value
+                    parents[parent][key]["values"] += summary_value
                 else:
-                    parents[parent][key].append(summary_value)
+                    parents[parent][key]["values"].append(summary_value)
+                if max_value is not None:
+                    parents[parent][key]["max"] = max(
+                        parents[parent][key]["max"], max_value
+                    )
+                if min_value is not None:
+                    parents[parent][key]["min"] = min(
+                        parents[parent][key]["min"], min_value
+                    )
     return changed
 
 
@@ -221,7 +266,11 @@ def traverse_from_tips(es, opts, *, template):
     root_depth = max_depth
     meta = template["types"]["attributes"]
     attrs = set(meta.keys())
-    parents = defaultdict(lambda: defaultdict(list))
+    parents = defaultdict(
+        lambda: defaultdict(
+            lambda: {"max": float("-inf"), "min": float("inf"), "values": []}
+        )
+    )
     while root_depth >= 0:
         nodes = stream_nodes_by_root_depth(
             es, index=template["index_name"], root=root, depth=root_depth, size=50,
