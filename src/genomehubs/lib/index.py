@@ -365,7 +365,6 @@ def index_file(es, types, data, opts):
                 )
     if without_ids:
         # TODO: support multiple taxonomies
-        # TODO: improve performance
         LOGGER.info("Found taxon IDs in %d entries", len(with_ids.keys()))
         LOGGER.info("Looking up %d missing taxon IDs", len(without_ids.keys()))
         with_ids, without_ids = lookup_missing_taxon_ids(
@@ -403,7 +402,6 @@ def main(args):
             types, data = validate_types_file(types_file, dir_path)
             LOGGER.info("Indexing %s" % types["file"]["name"])
             index_types(es, "taxon", types, options["index"])
-            quit()
             index_file(es, types, data, options["index"])
 
 
