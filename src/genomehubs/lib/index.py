@@ -219,7 +219,6 @@ def add_names_and_attributes_to_taxa(es, data, opts, *, template, blanks=set(["N
                     ):
                         doc["_source"]["attributes"] = []
                     add_attribute_values(doc["_source"]["attributes"], attributes)
-                    print(doc["_source"])
                     yield doc["_id"], doc["_source"]
 
 
@@ -282,8 +281,6 @@ def lookup_missing_taxon_ids(
     found_keys = []
     pbar = tqdm(total=len(without_ids.keys()))
     for key, arr in without_ids.items():
-        if len(found_keys) == 100:
-            break
         pbar.update(1)
         for obj in arr:
             if "taxonomy" not in obj:
