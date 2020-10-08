@@ -148,7 +148,8 @@ def index_exists(es, index_name):
 def load_mapping(es, mapping_name, mapping):
     """Load index mapping template into Elasticsearch."""
     es_client = client.IndicesClient(es)
-    res = es_client.put_template(name=mapping_name, body=mapping)
+    with tolog.DisableLogger():
+        res = es_client.put_template(name=mapping_name, body=mapping)
     return res
 
 
@@ -192,16 +193,20 @@ def index_stream(es, index_name, stream, *, _op_type="index"):
 def stream_template_search_results(es, *, index, body, size=10):
     """Stream results of a template search."""
     body["params"].update({"size": size})
-    res = es.search_template(
-        index=index, body=body, rest_total_hits_as_int=True, scroll="30m"
-    )
+    with tolog.DisableLogger():
+        res = es.search_template(
+            index=index, body=body, rest_total_hits_as_int=True, scroll="30m"
+        )
     scroll_id = res["_scroll_id"]
     count = res["hits"]["total"]
     for hit in res["hits"]["hits"]:
         yield hit
     offset = size
     while offset < count:
-        res = es.scroll(rest_total_hits_as_int=True, scroll="30m", scroll_id=scroll_id)
+        with tolog.DisableLogger():
+            res = es.scroll(
+                rest_total_hits_as_int=True, scroll="30m", scroll_id=scroll_id
+            )
         for hit in res["hits"]["hits"]:
             yield hit
         offset += size
@@ -225,9 +230,14 @@ def query_keyword_value_template(es, template_name, keyword, values, index):
             {"id": template_name, "params": {"keyword": keyword, "value": value}}
         )
         body += "\n"
+    res = None
     if multisearch:
-        return es.msearch_template(body=body, index=index)
-    return es.search_template(body=body, index=index)
+        with tolog.DisableLogger():
+            res = es.msearch_template(body=body, index=index)
+    else:
+        with tolog.DisableLogger():
+            res = es.search_template(body=body, index=index)
+    return res
 
 
 def query_value_template(es, template_name, values, index):
@@ -247,10 +257,14 @@ def query_value_template(es, template_name, values, index):
             body += "{}\n"
         body += ujson.dumps({"id": template_name, "params": {"value": value}})
         body += "\n"
-    with tolog.DisableLogger():
-        if multisearch:
-            return es.msearch_template(body=body, index=index)
-        return es.search_template(body=body, index=index)
+    res = None
+    if multisearch:
+        with tolog.DisableLogger():
+            res = es.msearch_template(body=body, index=index)
+    else:
+        with tolog.DisableLogger():
+            res = es.search_template(body=body, index=index)
+    return res
 
 
 class EsQueryBuilder:

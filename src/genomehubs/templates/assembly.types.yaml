@@ -25,7 +25,7 @@ attributes:
     type: integer
   assembly_span:
     constraint:
-      min: 100000
+      min: 1000000
     type: long
   assembly_title:
     type: text

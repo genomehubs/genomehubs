@@ -1,7 +1,7 @@
 attributes:
   assembly_span:
     constraint:
-      min: 0
+      min: 1000000
     description: Genome assembly span
     display_level: 1
     bins:

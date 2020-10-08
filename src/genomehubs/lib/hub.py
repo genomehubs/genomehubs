@@ -198,7 +198,10 @@ def validate_values(values, key, types):
     key_type = types[key]["type"]
     for value in values:
         if "function" in types[key]:
-            value = calculator(value, types[key]["function"])
+            try:
+                value = calculator(value, types[key]["function"])
+            except ValueError:
+                continue
         value = convert_to_type(key, value, key_type)
         if value is None:
             continue
