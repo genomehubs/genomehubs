@@ -102,6 +102,9 @@ def main(args):
 
     # Index INSDC
     assembly_template = assembly_metadata.index_template(taxonomy_name, options["init"])
+    es_functions.load_mapping(
+        es, assembly_template["name"], assembly_template["mapping"]
+    )
     attributes.index_types(
         es, assembly_template["name"], assembly_template["types"], options["init"]
     )

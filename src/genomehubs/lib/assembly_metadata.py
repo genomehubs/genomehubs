@@ -51,7 +51,12 @@ def parse_insdc_metadata(opts):
             LOGGER.info("Indexing metadata for %d assemblies", count)
             assemblies = toinsdc.stream_taxon_assembly_meta(root)
             for assembly in assemblies:
-                assembly["assembly_id"] = assembly["gca_accession"]
+                if assembly["genome_representation"] != "full":
+                    continue
+                assembly["assembly_id"] = "%s.%s" % (
+                    assembly["gca_accession"],
+                    assembly["assembly_version"],
+                )
                 yield assembly
 
 
@@ -115,16 +120,7 @@ def stream_taxa(taxa):
 
 def add_taxonomy_info_to_assembly(asm_meta, source):
     """Add taxonomy information to an assembly."""
-    keys = {
-        "branch_length",
-        "lineage",
-        "parent",
-        "support_value",
-        "scientific_name",
-        "taxon_names",
-        "taxon_rank",
-        "unique_name",
-    }
+    keys = {"lineage", "parent", "scientific_name", "taxon_names", "taxon_rank"}
     for key in keys:
         if key in source:
             asm_meta[key] = source[key]
@@ -274,6 +270,15 @@ def stream_assemblies(assemblies):
         yield "assembly-%s" % asm["assembly_id"], asm
 
 
+def set_top_level_meta(raw_meta):
+    """Set top level assembly metadata."""
+    top_level = {
+        "assembly_id": raw_meta["assembly_id"],
+        "taxon_id": raw_meta["taxon_id"],
+    }
+    return top_level
+
+
 def index(es, opts, *, metadata_name="insdc", taxonomy_name="ncbi"):
     """Index all assemblies descended from root."""
     parsers = {"insdc": parse_insdc_metadata}
@@ -303,9 +308,11 @@ def index(es, opts, *, metadata_name="insdc", taxonomy_name="ncbi"):
                 template["types"]["identifiers"],
                 attributes=[],
                 source=sources.get(metadata_name, metadata_name),
+                attr_type="identifiers",
             )
+            top_level = set_top_level_meta(raw_meta)
             asm_meta = {
-                **raw_meta,
+                **top_level,
                 "attributes": attributes,
                 "identifiers": identifiers,
             }

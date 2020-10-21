@@ -1,6 +1,7 @@
 {
   "index_patterns": ["assembly-*"],
   "mappings": {
+    "dynamic": false,
     "properties": {
       "assembly_id": {
         "type": "keyword",
@@ -11,13 +12,32 @@
         "type": "nested",
         "properties": {
           "identifier": {
-            "type": "keyword",
+            "type": "text",
+            "fields": {
+              "raw": {
+                "type": "keyword"
+              },
+              "trigram": {
+                "type": "text",
+                "analyzer": "trigram"
+              },
+              "reverse": {
+                "type": "text",
+                "analyzer": "reverse"
+              }
+            },
             "meta": { "description": "Assembly identifier" }
           },
           "class": {
             "type": "keyword",
             "meta": {
-              "description": "Identifier class (e.g. bioproject, biosample, etc.)"
+              "description": "Identifier class (e.g. bioproject, biosample, ...)"
+            }
+          },
+          "source": {
+            "type": "keyword",
+            "meta": {
+              "description": "Source of identifier"
             }
           }
         }
@@ -344,6 +364,32 @@
                 "meta": { "description": "Document ID containing source value" }
               }
             }
+          }
+        }
+      }
+    }
+  },
+  "settings": {
+    "index": {
+      "number_of_shards": 1,
+      "analysis": {
+        "analyzer": {
+          "trigram": {
+            "type": "custom",
+            "tokenizer": "standard",
+            "filter": ["lowercase", "shingle"]
+          },
+          "reverse": {
+            "type": "custom",
+            "tokenizer": "standard",
+            "filter": ["lowercase", "reverse"]
+          }
+        },
+        "filter": {
+          "shingle": {
+            "type": "shingle",
+            "min_shingle_size": 2,
+            "max_shingle_size": 3
           }
         }
       }

@@ -3,7 +3,17 @@
     "lang": "mustache",
     "source": {
       "query": { "match": { "{{keyword}}": "{{value}}" } },
-      "_source": { "includes": ["{{keyword}}", "attributes.*"] }
+      "_source": {
+        "includes": [
+          "{{keyword}}",
+          "attributes.*",
+          "lineage.*",
+          "parent",
+          "scientific_name",
+          "taxon_names.*",
+          "taxon_rank"
+        ]
+      }
     }
   }
 }

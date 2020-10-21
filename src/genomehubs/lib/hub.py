@@ -225,7 +225,9 @@ def validate_values(values, key, types):
     return validated
 
 
-def add_attributes(entry, types, *, attributes=None, source=None):
+def add_attributes(
+    entry, types, *, attributes=None, source=None, attr_type="attributes"
+):
     """Add attributes to a document."""
     if attributes is None:
         attributes = []
@@ -237,7 +239,10 @@ def add_attributes(entry, types, *, attributes=None, source=None):
             if validated:
                 if len(validated) == 1:
                     validated = validated[0]
-                attribute = {"key": key, "%s_value" % types[key]["type"]: validated}
+                if attr_type == "identifiers":
+                    attribute = {"identifier": validated, "class": key}
+                else:
+                    attribute = {"key": key, "%s_value" % types[key]["type"]: validated}
                 if source is not None:
                     attribute.update({"source": source})
                 attributes.append(attribute)
