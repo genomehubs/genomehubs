@@ -7,6 +7,7 @@ Usage:
     genomehubs index [--hub-name STRING] [--hub-path PATH] [--hub-version PATH]
                      [--config-file PATH...] [--config-save PATH]
                      [--es-host URL...]
+                     [--assembly-dir PATH...] [--assembly-repo URL...]
                      [--taxon-dir PATH...] [--taxon-repo URL...]
                      [-h|--help] [-v|--version]
 
@@ -17,6 +18,9 @@ Options:
     --config-file PATH      Path to YAML file containing configuration options.
     --config-save PATH      Path to write configuration options to YAML file.
     --es-host URL           ElasticSearch hostname/URL and port.
+    --assembly-dir PATH     Path to directory containing assembly-level data.
+    --assembly-repo URL     Remote git repository containing assembly-level data.
+                            Optionally include `~branch-name` suffix.
     --taxon-dir PATH        Path to directory containing taxon-level data.
     --taxon-repo URL        Remote git repository containing taxon-level data.
                             Optionally include `~branch-name` suffix.
@@ -27,48 +31,6 @@ Examples:
     # 1. Index all files in a remote repository
     ./genomehubs index --taxon-repo https://github.com/example/repo=main
 """
-
-# """
-# Index a file, directory or repository.
-
-# Usage:
-#     genomehubs index [--assembly_id ID...] [--insdc]
-#                [--busco TSV...] [--fasta FASTA...] [--gff3 GFF3...]
-#                [--interproscan TSV...]
-#                [--taxonomy] [--taxonomy-taxdump DIR] [--taxonomy-root INT...]
-#                [--species-tree NWK...] [--gene-trees DIR...]
-#                [--configfile YAML...] [--skip-validation]
-#                [--unique-name STRING] [--es-host HOSTNAME] [--es-port PORT]
-
-# Options:
-#     --assembly_id ID        An assembly ID can be provided here or parsed from input
-#                             filenames.
-#     --busco TSV             BUSCO full_table.tsv output file.
-#     --fasta FASTA           FASTA sequence file.
-#     --gff3 GFF3             GFF3 file.
-#     --insdc                 Flag to index public INSDC assemblies.
-#     --interproscan TSV      InterProScan output file.
-#     --taxonomy              Flag to index taxonomy.
-#     --taxonomy-taxdump DIR  NCBI taxonomy taxdump directory.
-#     --taxonomy-root INT     Root taxid for taxonomy index.
-#     --species-tree NWK      Newick or NHX format species tree file.
-#     --gene-trees DIR        Directory containing Newick or NHX format gene tree files.
-#     --configfile YAML       YAML configuration file.
-#     --skip-validation       Don't validate input files.
-#     --unique-name STRING    Unique name to use in Elasticseach index.
-#     --es-host HOSTNAME      Elasticseach hostname/URL.
-#     --es-port PORT          Elasticseach port number.
-#     -h, --help              Show this
-#     -v, --version           Show version number
-
-# Examples:
-#     # 1. Index NCBI taxdump
-#     ./genomehubs index --taxonomy-taxdump /path/to/taxdump
-
-#     # 2. Index a GFF3 file
-#     ./genomehubs index --gff3 Assembly_name.gff3
-
-# """
 
 import csv
 import re
@@ -81,6 +43,7 @@ from tolkein import tofile
 from tolkein import tolog
 from tqdm import tqdm
 
+from ..lib import assembly
 from ..lib import es_functions
 from ..lib import hub
 from ..lib import taxon
@@ -110,7 +73,14 @@ def validate_types_file(types_file, dir_path):
 
 def process_row(types, row):
     """Process a row of data."""
-    data = {"attributes": {}, "taxon_names": {}, "taxonomy": {}}
+    data = {
+        "attributes": {},
+        "identifiers": {},
+        "metadata": {},
+        "taxon_names": {},
+        "taxonomy": {},
+    }
+    print(row)
     for group in data.keys():
         if group in types:
             for key, meta in types[group].items():
@@ -136,9 +106,8 @@ def process_row(types, row):
                     raise err
                     return None
     if data["attributes"]:
-        source = types["file"].get("source", None)
         data["attributes"] = hub.add_attributes(
-            data["attributes"], types["attributes"], source=source
+            data["attributes"], types["attributes"], meta=data["metadata"],
         )
     else:
         data["attributes"] = []
@@ -367,17 +336,36 @@ def index_file(es, types, data, opts):
         with_ids, without_ids = lookup_missing_taxon_ids(
             es, without_ids, opts, with_ids=with_ids, blanks=blanks
         )
-    # TODO: create new taxon IDs
-    # if "taxon_names" in types and "public_name" in types["taxon_names"]:
-    #     # need to lookup lineage, assign new taxid and create taxon for entries in without_ids
-    #     quit()
+        # create new taxon IDs
+        # if "taxon_names" in types and "tol_name" in types["taxon_names"]:
+        # need to lookup lineage, assign new taxid and create taxon for entries in without_ids
+        # quit()
     if with_ids:
         LOGGER.info("Indexing %d entries", len(with_ids.keys()))
         for taxonomy_name in opts["taxonomy-source"]:
-            template = taxon.index_template(taxonomy_name, opts)
-            docs = add_names_and_attributes_to_taxa(
-                es, with_ids, opts, template=template, blanks=blanks
-            )
+            if opts["index"] == "taxon":
+                template = taxon.index_template(taxonomy_name, opts)
+                docs = add_names_and_attributes_to_taxa(
+                    es, with_ids, opts, template=template, blanks=blanks
+                )
+            elif opts["index"] == "assembly":
+                template = assembly.index_template(taxonomy_name, opts)
+                print(with_ids)
+                attributes = hub.add_attributes(
+                    with_ids,
+                    opts["index_types"],
+                    attributes=[],
+                    source=opts["index_types"]["file"]["name"],
+                )
+                print(attributes)
+                quit()
+            # identifiers = add_attributes(
+            #     raw_meta,
+            #     template["types"]["identifiers"],
+            #     attributes=[],
+            #     source=sources.get(metadata_name, metadata_name),
+            #     attr_type="identifiers",
+            # )
             index_stream(
                 es, template["index_name"], docs, _op_type="update",
             )
@@ -394,12 +382,24 @@ def main(args):
     with tolog.DisableLogger():
         hub.post_search_scripts(es)
 
-    for dir_path in options["index"]["taxon-dir"]:
-        for types_file in sorted(Path(dir_path).glob("*.types.yaml")):
-            types, data = validate_types_file(types_file, dir_path)
-            LOGGER.info("Indexing %s" % types["file"]["name"])
-            index_types(es, "taxon", types, options["index"])
-            index_file(es, types, data, options["index"])
+    for index in list(["taxon", "assembly"]):
+        data_dir = "%s-dir" % index
+        if data_dir in options["index"]:
+            for dir_path in options["index"][data_dir]:
+                for types_file in sorted(Path(dir_path).glob("*.types.yaml")):
+                    types, data = validate_types_file(types_file, dir_path)
+                    LOGGER.info("Indexing %s" % types["file"]["name"])
+                    index_types(es, index, types, options["index"])
+                    index_file(
+                        es,
+                        types,
+                        data,
+                        {
+                            **options["index"],
+                            "index": index,
+                            "index_types": index_types,
+                        },
+                    )
 
 
 def cli():

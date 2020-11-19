@@ -1,0 +1,91 @@
+file:
+  display_group: misc
+  source_url_stub: https://www.ncbi.nlm.nih.gov/nuccore/
+  source_name: NCBI Organelle Genome Resources
+attributes:
+  assembly_span:
+    display_group: metrics
+    display_level: 1
+    constraint:
+      min: 1
+    index: 9
+    type: long
+    taxon_display_group: {{organelle}}_assembly
+    taxon_display_name: {{organelle}}_span
+    taxon_display_level: 2
+  gc_percent:
+    display_group: metrics
+    display_level: 1
+    constraint:
+      min: 0
+      max: 100
+    index: 10
+    type: 2dp
+    taxon_display_group: {{organelle}}_assembly
+    taxon_display_name: {{organelle}}_gc_percent
+    taxon_display_level: 2
+  n_percent:
+    display_group: metrics
+    display_level: 1
+    constraint:
+      min: 0
+      max: 100
+    index: 11
+    type: 2dp
+  last_updated:
+    display_level: 2
+    index: 12
+    type: date
+  sample_location:
+    display_level: 2
+    index: 13
+    type: geo_point
+    taxon_display_group: {{organelle}}_assembly
+    taxon_display_name: {{organelle}}_sample_location
+    taxon_display_level: 2
+identifiers:
+  assembly_id:
+    constraint:
+      len: 32
+    index: 4
+    type: keyword
+  genbank_accession:
+    constraint:
+      len: 32
+    index: 5
+    type: keyword
+  refseq_accession:
+    constraint:
+      len: 32
+    index: 4
+    type: keyword
+  bioproject_id:
+    constraint:
+      len: 32
+    index: 6
+    type: keyword
+  biosample_id:
+    constraint:
+      len: 32
+    index: 7
+    type: keyword
+metadata:
+  organelle:
+    index: 8
+  source_author:
+    index: 14
+  source_year:
+    index: 15
+  source_title:
+    index: 16
+  source_pubmed_id:
+    index: 17
+  source_slug:
+    index: 4
+taxonomy:
+  taxon:
+    index: 1
+  taxon_id:
+    index: 2
+  lineage:
+    index: 3

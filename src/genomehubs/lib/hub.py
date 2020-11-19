@@ -20,13 +20,12 @@ def setup(opts):
     return True
 
 
-def index_templator(parts, opts):
-    """Index template helper function."""
+def load_types(name):
+    """Read a types file from the templates directory."""
     script_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    mapping_file = os.path.join(script_dir, "templates", parts[0] + ".json")
     types = None
     try:
-        types_file = os.path.join(script_dir, "templates", parts[0] + ".types.yaml")
+        types_file = os.path.join(script_dir, "templates", name + ".types.yaml")
         types = tofile.load_yaml(types_file)
         try:
             for key, value in types.items():
@@ -39,6 +38,19 @@ def index_templator(parts, opts):
             pass
     except Exception:
         pass
+    if types and "file" in types and "attributes" in types:
+        for key, value in types["file"].items():
+            for attr in types["attributes"].values():
+                if key not in attr:
+                    attr[key] = value
+    return types
+
+
+def index_templator(parts, opts):
+    """Index template helper function."""
+    script_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    mapping_file = os.path.join(script_dir, "templates", parts[0] + ".json")
+    types = load_types(parts[0])
     template = {
         "name": parts[0],
         "index_name": opts["hub-separator"].join(parts),
@@ -46,6 +58,29 @@ def index_templator(parts, opts):
         "types": types,
     }
     return template
+
+
+def order_parsed_fields(parsed, name):
+    """Order parsed fields using a template file."""
+    types = load_types(name)
+    columns = {}
+    fields = {}
+    for group, entries in types.items():
+        for field, attrs in entries.items():
+            try:
+                for key, value in attrs.items():
+                    if key == "index":
+                        if value not in columns:
+                            columns.update({value: field})
+                            fields.update({field: value})
+            except AttributeError:
+                pass
+    order = [x[0] for x in sorted(fields.items(), key=lambda x: x[1])]
+    data = []
+    for entry in parsed:
+        row = [entry.get(field, "None") for field in order]
+        data.append(row)
+    return data
 
 
 def post_search_scripts(es):
@@ -158,10 +193,10 @@ def convert_to_type(key, value, to_type):
         value = convert_lat_lon(value)
     else:
         value = str(value)
-    if value is None:
-        LOGGER.warning(
-            "%s value %s is not a valid %s", key, str(value), to_type,
-        )
+    # if value is None:
+    #     LOGGER.warning(
+    #         "%s value %s is not a valid %s", key, str(value), to_type,
+    #     )
     return value
 
 
@@ -226,11 +261,13 @@ def validate_values(values, key, types):
 
 
 def add_attributes(
-    entry, types, *, attributes=None, source=None, attr_type="attributes"
+    entry, types, *, attributes=None, source=None, attr_type="attributes", meta=None
 ):
     """Add attributes to a document."""
     if attributes is None:
         attributes = []
+    if meta is None:
+        meta = {}
     for key, values in entry.items():
         if key in types:
             if not isinstance(values, list):
@@ -243,7 +280,10 @@ def add_attributes(
                     attribute = {"identifier": validated, "class": key}
                 else:
                     attribute = {"key": key, "%s_value" % types[key]["type"]: validated}
+                attribute.update(meta)
                 if source is not None:
                     attribute.update({"source": source})
                 attributes.append(attribute)
+    print(attributes)
+    quit()
     return attributes

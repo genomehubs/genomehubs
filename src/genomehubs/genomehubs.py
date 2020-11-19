@@ -8,6 +8,7 @@ Commands:
     index           index a file
     init            initialise a new genomehub
     launch          launch a web service
+    parse           parse a local or remote data source
     remove          remove one or more indices from a genomehub
     run             run an analysis
     search          search indexed files
@@ -21,7 +22,6 @@ import sys
 from docopt import DocoptExit
 from docopt import docopt
 from pkg_resources import working_set
-
 from tolkein import tolog
 
 from .lib.version import __version__

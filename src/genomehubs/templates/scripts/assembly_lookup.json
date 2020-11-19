@@ -13,7 +13,7 @@
                 "path": "identifiers",
                 "query": {
                   "prefix": {
-                    "identifiers.identifier.raw": {
+                    "identifiers.identifier": {
                       "value": "{{searchTerm}}"
                     }
                   }

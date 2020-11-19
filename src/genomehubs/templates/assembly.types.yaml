@@ -1,13 +1,8 @@
+file:
+  display_group: misc
 attributes:
-  assembled_strain:
-    constraint:
-      len: 64
-    type: keyword
-  assembly_l50:
-    constraint:
-      min: 0
-    type: integer
   assembly_level:
+    display_group: metadata
     constraint:
       enum:
         - complete genome
@@ -16,18 +11,22 @@ attributes:
         - scaffold
     type: keyword
   assembly_n50:
+    display_group: metrics
     constraint:
       min: 0
     type: integer
   assembly_n90:
+    display_group: metrics
     constraint:
       min: 0
     type: integer
   assembly_span:
+    display_group: metrics
     constraint:
       min: 1000000
     type: long
   assembly_title:
+    display_group: description
     type: text
   assembly_type:
     constraint:

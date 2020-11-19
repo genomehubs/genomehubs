@@ -359,13 +359,14 @@ def traverse_from_root(es, opts, *, template):
     max_depth = get_max_depth_by_lineage(es, index=template["index_name"], root=root,)
     root_depth = max_depth - 1
     meta = template["types"]["attributes"]
-    attrs = set(
-        {
-            key
-            for key, value in meta.items()
-            if "traverse" in value and value["traverse"]
-        }
-    )
+    attrs = set({})
+    for key, value in meta.items():
+        if "traverse" in value and value["traverse"]:
+            if (
+                "traverse_direction" not in value
+                or value["traverse_direction"] != "ancestor"
+            ):
+                attrs.add(key)
     # parents = defaultdict(lambda: defaultdict(list))
     while root_depth >= 0:
         LOGGER.info("Filling values at root depth %d" % root_depth)

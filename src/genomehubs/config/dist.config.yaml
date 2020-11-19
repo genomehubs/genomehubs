@@ -49,4 +49,5 @@ init:
         - names.dmp
       url: "ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz"
     path: ~/genomehubs/demo_resources/taxdump
+parse: {}
 search: {}

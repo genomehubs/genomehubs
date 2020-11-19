@@ -6,16 +6,36 @@
       "assembly_id": {
         "type": "keyword",
         "ignore_above": 32,
+        "normalizer": "lowercase",
+        "fields": {
+          "live": {
+            "type": "search_as_you_type"
+          },
+          "text": {
+            "type": "text"
+          }
+        },
         "meta": { "description": "Unique assembly ID" }
+      },
+      "organelle": {
+        "type": "keyword",
+        "ignore_above": 16,
+        "normalizer": "lowercase",
+        "meta": { "description": "Nucleus, mitochondrion or plastid" }
       },
       "identifiers": {
         "type": "nested",
         "properties": {
           "identifier": {
-            "type": "text",
+            "type": "keyword",
+            "normalizer": "lowercase",
             "fields": {
-              "raw": {
-                "type": "keyword"
+              "text": {
+                "type": "text"
+              },
+              "raw": { "type": "keyword" },
+              "live": {
+                "type": "search_as_you_type"
               },
               "trigram": {
                 "type": "text",
@@ -30,12 +50,14 @@
           },
           "class": {
             "type": "keyword",
+            "normalizer": "lowercase",
             "meta": {
               "description": "Identifier class (e.g. bioproject, biosample, ...)"
             }
           },
           "source": {
             "type": "keyword",
+            "normalizer": "lowercase",
             "meta": {
               "description": "Source of identifier"
             }
@@ -45,6 +67,7 @@
       "taxon_id": {
         "type": "keyword",
         "ignore_above": 16,
+        "normalizer": "lowercase",
         "meta": { "description": "Taxonomy-specific taxon ID" }
       },
       "parent": {
@@ -63,6 +86,7 @@
       "scientific_name": {
         "type": "keyword",
         "ignore_above": 64,
+        "normalizer": "lowercase",
         "meta": { "description": "Scientific name" }
       },
       "unique_name": {
@@ -73,6 +97,7 @@
       "taxon_rank": {
         "type": "keyword",
         "ignore_above": 64,
+        "normalizer": "lowercase",
         "meta": { "description": "Taxonomic rank" }
       },
       "taxon_names": {
@@ -80,6 +105,7 @@
         "properties": {
           "name": {
             "type": "keyword",
+            "normalizer": "lowercase",
             "meta": { "description": "Taxon name" }
           },
           "unique": {
@@ -88,6 +114,7 @@
           },
           "class": {
             "type": "keyword",
+            "normalizer": "lowercase",
             "meta": {
               "description": "Name class (e.g. common name, synonym, etc.)"
             }
@@ -99,14 +126,17 @@
         "properties": {
           "taxon_id": {
             "type": "keyword",
+            "normalizer": "lowercase",
             "meta": { "description": "Taxon ID of ancestral taxon" }
           },
           "rank": {
             "type": "keyword",
+            "normalizer": "lowercase",
             "meta": { "description": "Ancestral rank" }
           },
           "scientific_name": {
             "type": "keyword",
+            "normalizer": "lowercase",
             "meta": { "description": "Scientific name" }
           },
           "node_depth": {
@@ -126,11 +156,13 @@
         "properties": {
           "key": {
             "type": "keyword",
+            "normalizer": "lowercase",
             "ignore_above": 64,
             "meta": { "description": "Attribute key" }
           },
           "keyword_value": {
             "type": "keyword",
+            "normalizer": "lowercase",
             "ignore_above": 64,
             "meta": {
               "description": "Value of type keyword (including ontology terms)"
@@ -203,6 +235,7 @@
           "ontology_id": {
             "type": "keyword",
             "ignore_above": 64,
+            "normalizer": "lowercase",
             "meta": {
               "description": "Ontology ID (with matching term in keyword_value)"
             }
@@ -212,11 +245,13 @@
             "properties": {
               "ontology_term": {
                 "type": "keyword",
+                "normalizer": "lowercase",
                 "ignore_above": 64,
                 "meta": { "description": "Ontology term" }
               },
               "ontology_id": {
                 "type": "keyword",
+                "normalizer": "lowercase",
                 "ignore_above": 64,
                 "meta": { "description": "Ontology ID" }
               }
@@ -225,6 +260,7 @@
           "source": {
             "type": "keyword",
             "ignore_above": 64,
+            "normalizer": "lowercase",
             "meta": { "description": "Source of attribute value" }
           },
           "count": {
@@ -258,11 +294,13 @@
           "aggregation_method": {
             "type": "keyword",
             "ignore_above": 64,
+            "normalizer": "lowercase",
             "meta": { "description": "Method used to generate summary value" }
           },
           "aggregation_source": {
             "type": "keyword",
             "ignore_above": 16,
+            "normalizer": "lowercase",
             "meta": {
               "description": "Summary source (direct, ancestor, descendant)"
             }
@@ -273,6 +311,7 @@
               "keyword_value": {
                 "type": "keyword",
                 "ignore_above": 64,
+                "normalizer": "lowercase",
                 "meta": {
                   "description": "Value of type keyword (including ontology terms)"
                 }
@@ -344,6 +383,7 @@
               "ontology_id": {
                 "type": "keyword",
                 "ignore_above": 64,
+                "normalizer": "lowercase",
                 "meta": {
                   "description": "Ontology ID (with matching term in keyword_value)"
                 }
@@ -351,16 +391,19 @@
               "source": {
                 "type": "keyword",
                 "ignore_above": 64,
+                "normalizer": "lowercase",
                 "meta": { "description": "Source of nested value" }
               },
               "source_index": {
                 "type": "keyword",
                 "ignore_above": 128,
+                "normalizer": "lowercase",
                 "meta": { "description": "Index containing source value" }
               },
               "source_doc_id": {
                 "type": "keyword",
                 "ignore_above": 64,
+                "normalizer": "lowercase",
                 "meta": { "description": "Document ID containing source value" }
               }
             }

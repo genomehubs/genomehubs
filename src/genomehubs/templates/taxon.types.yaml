@@ -1,9 +1,12 @@
+file:
+  display_group: misc
 attributes:
   assembly_span:
     constraint:
       min: 1000000
     description: Genome assembly span
     display_level: 1
+    display_group: assembly
     bins:
       min: 6
       max: 11
@@ -17,14 +20,9 @@ attributes:
     traverse: median_high
     type: long
     units: bp
-  host_scientific_name:
-    constraint:
-      len: 64
-    display_level: 2
-    traverse: false
-    type: keyword
   sample_location:
     display_level: 2
+    display_group: assembly
     summary: list
     traverse: false
     type: geo_point
@@ -37,6 +35,7 @@ attributes:
         - male
         - pooled male and female
     display_level: 2
+    display_group: assembly
     summary: list
     traverse: false
     type: keyword

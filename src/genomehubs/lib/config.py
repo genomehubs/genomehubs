@@ -89,9 +89,10 @@ def config(group, **kwargs):
         print(dist_file)
     if os.path.exists(user_file):
         options = load_config(options, user_file)
-    for file in kwargs["--config-file"]:
-        if os.path.exists(file):
-            options = load_config(options, file)
+    if "--config-file" in kwargs:
+        for file in kwargs["--config-file"]:
+            if os.path.exists(file):
+                options = load_config(options, file)
     if group not in options:
         options[group] = {}
     for k, v in kwargs.items():

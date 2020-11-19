@@ -85,8 +85,8 @@ def main(args):
         for taxonomy_name in options["init"]["taxonomy-source"]:
             if "taxonomy-%s-root" % taxonomy_name in options["init"]:
                 template, stream = taxonomy.index(taxonomy_name, options["init"])
-                es_functions.load_mapping(es, template["name"], template["mapping"])
-                es_functions.index_stream(es, template["index_name"], stream)
+                # es_functions.load_mapping(es, template["name"], template["mapping"])
+                # es_functions.index_stream(es, template["index_name"], stream)
 
     # Prepare taxon index
     taxon_template = taxon.index_template(taxonomy_name, options["init"])
