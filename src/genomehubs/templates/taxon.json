@@ -270,6 +270,10 @@
               "description": "Summary source (direct, ancestor, descendant)"
             }
           },
+          "comment": {
+            "type": "text",
+            "index": false
+          },
           "deprecated": {
             "type": "boolean",
             "meta": {
@@ -355,6 +359,9 @@
                 "type": "scaled_float",
                 "meta": { "description": "Value to 4 dp" }
               },
+              "is_primary_value": {
+                "type": "boolean"
+              },
               "ontology_id": {
                 "type": "keyword",
                 "ignore_above": 64,
@@ -410,6 +417,10 @@
                 "ignore_above": 64,
                 "normalizer": "lowercase",
                 "meta": { "description": "Source url slug" }
+              },
+              "comment": {
+                "type": "text",
+                "index": false
               },
               "deprecated": {
                 "type": "boolean",

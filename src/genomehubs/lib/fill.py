@@ -176,13 +176,13 @@ def summarise_attribute_values(
                 attribute["count"] = len(values)
                 attribute["aggregation_method"] = summary
                 attribute["aggregation_source"] = "direct"
-            if traverse and summary == traverse:
+                traverse_value = value
+            elif traverse and summary == traverse:
                 traverse_value = value
             if summary != "list":
                 if summary.startswith("median"):
                     summary = "median"
-                attribute[summary] = value
-            elif traverse_value:
+            else:
                 traverse_value = list(set(traverse_value))
             idx += 1
         return traverse_value, max_value, min_value
@@ -266,6 +266,7 @@ def traverse_from_tips(es, opts, *, template):
     root_depth = max_depth
     meta = template["types"]["attributes"]
     attrs = set(meta.keys())
+    print(attrs)
     parents = defaultdict(
         lambda: defaultdict(
             lambda: {"max": float("-inf"), "min": float("inf"), "values": []}
@@ -305,10 +306,11 @@ def traverse_from_tips(es, opts, *, template):
 def copy_attribute_summary(source, meta):
     """Copy an attribute summary, removing values."""
     dest = {}
+    print(source)
     for key in meta["summary"]:
-        if key.startswith("median"):
+        if key.startswith("median") and "median" in source:
             dest["median"] = source["median"]
-        elif key != "list":
+        elif key != "list" and key in source:
             dest[key] = source[key]
     dest["%s_value" % meta["type"]] = source["%s_value" % meta["type"]]
     dest["count"] = source["count"]

@@ -25,6 +25,8 @@ def stream_attributes(group, attributes):
     """Stream attributes for indexing."""
     for name, obj in attributes.items():
         obj.update({"group": group, "name": name})
+        print(name)
+        print(obj)
         yield "attribute-%s-%s" % (group, name), obj
 
 
@@ -40,6 +42,9 @@ def index_types(es, types_name, types, opts):
     """Index types into Elasticsearch."""
     if "attributes" not in types:
         return
+    for key, value in types["attributes"].items():
+        value = {**types["defaults"]["attributes"], **value}
+        types["attributes"][key] = value
     template, stream = index(es, types_name, types["attributes"], opts)
     load_mapping(es, template["name"], template["mapping"])
     index_stream(es, template["index_name"], stream)

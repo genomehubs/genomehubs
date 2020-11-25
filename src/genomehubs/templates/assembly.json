@@ -21,7 +21,8 @@
         "type": "keyword",
         "ignore_above": 16,
         "normalizer": "lowercase",
-        "meta": { "description": "Nucleus, mitochondrion or plastid" }
+        "null_value": "nucleus",
+        "meta": { "description": "Primarily nucleus, mitochondrion or plastid" }
       },
       "identifiers": {
         "type": "nested",
@@ -305,6 +306,10 @@
               "description": "Summary source (direct, ancestor, descendant)"
             }
           },
+          "comment": {
+            "type": "text",
+            "index": false
+          },
           "values": {
             "type": "nested",
             "properties": {
@@ -380,6 +385,9 @@
                 "type": "scaled_float",
                 "meta": { "description": "Value to 4 dp" }
               },
+              "is_primary_value": {
+                "type": "boolean"
+              },
               "ontology_id": {
                 "type": "keyword",
                 "ignore_above": 64,
@@ -405,6 +413,10 @@
                 "ignore_above": 64,
                 "normalizer": "lowercase",
                 "meta": { "description": "Document ID containing source value" }
+              },
+              "comment": {
+                "type": "text",
+                "index": false
               }
             }
           }

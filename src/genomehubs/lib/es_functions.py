@@ -138,10 +138,20 @@ def launch_es(opts):
 
 
 def index_exists(es, index_name):
-    """Load index mapping template into Elasticsearch."""
+    """Test if Elasticsearch index exists."""
     es_client = client.IndicesClient(es)
     with tolog.DisableLogger():
         res = es_client.exists(index_name)
+    return res
+
+
+def index_create(es, index_name):
+    """Create an Elasticsearch index if it does not already exist."""
+    es_client = client.IndicesClient(es)
+    res = index_exists(es, index_name)
+    if not res:
+        with tolog.DisableLogger():
+            res = es_client.create(index_name)
     return res
 
 

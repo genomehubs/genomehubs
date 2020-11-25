@@ -284,6 +284,4 @@ def add_attributes(
                 if source is not None:
                     attribute.update({"source": source})
                 attributes.append(attribute)
-    print(attributes)
-    quit()
     return attributes

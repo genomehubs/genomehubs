@@ -85,34 +85,40 @@ def main(args):
         for taxonomy_name in options["init"]["taxonomy-source"]:
             if "taxonomy-%s-root" % taxonomy_name in options["init"]:
                 template, stream = taxonomy.index(taxonomy_name, options["init"])
-                # es_functions.load_mapping(es, template["name"], template["mapping"])
-                # es_functions.index_stream(es, template["index_name"], stream)
+                es_functions.load_mapping(es, template["name"], template["mapping"])
+                es_functions.index_stream(es, template["index_name"], stream)
 
-    # Prepare taxon index
-    taxon_template = taxon.index_template(taxonomy_name, options["init"])
-    es_functions.load_mapping(es, taxon_template["name"], taxon_template["mapping"])
-    attributes.index_types(
-        es, taxon_template["name"], taxon_template["types"], options["init"]
-    )
-    body = {
-        "source": {"index": template["index_name"]},
-        "dest": {"index": taxon_template["index_name"]},
-    }
-    es.reindex(body=body)
+            # Prepare taxon index
+            taxon_template = taxon.index_template(taxonomy_name, options["init"])
+            es_functions.load_mapping(
+                es, taxon_template["name"], taxon_template["mapping"]
+            )
+            # attributes.index_types(
+            #     es, taxon_template["name"], taxon_template["types"], options["init"]
+            # )
+            es_functions.index_create(es, taxon_template["index_name"])
+            # body = {
+            #     "source": {"index": template["index_name"]},
+            #     "dest": {"index": taxon_template["index_name"]},
+            # }
+            # es.reindex(body=body)
 
-    # Index INSDC
-    assembly_template = assembly_metadata.index_template(taxonomy_name, options["init"])
-    es_functions.load_mapping(
-        es, assembly_template["name"], assembly_template["mapping"]
-    )
-    attributes.index_types(
-        es, assembly_template["name"], assembly_template["types"], options["init"]
-    )
+            # Prepare assembly index
+            assembly_template = assembly_metadata.index_template(
+                taxonomy_name, options["init"]
+            )
+            es_functions.load_mapping(
+                es, assembly_template["name"], assembly_template["mapping"]
+            )
+            es_functions.index_create(es, assembly_template["index_name"])
+            # attributes.index_types(
+            #     es, assembly_template["name"], assembly_template["types"], options["init"]
+            # )
 
-    if "insdc-metadata" in options["init"]:
-        assembly_metadata.index(
-            es, options["init"], metadata_name="insdc", taxonomy_name=taxonomy_name
-        )
+            # if "insdc-metadata" in options["init"]:
+            #     assembly_metadata.index(
+            #         es, options["init"], metadata_name="insdc", taxonomy_name=taxonomy_name
+            #     )
 
 
 def cli():
