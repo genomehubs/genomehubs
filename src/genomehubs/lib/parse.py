@@ -20,7 +20,9 @@ Options:
     -v, --version               Show version number
 """
 
+import re
 import sys
+from pathlib import Path
 
 from docopt import docopt
 from tolkein import tofetch
@@ -28,6 +30,7 @@ from tolkein import tofile
 from tolkein import tolog
 
 from .config import config
+from .hub import load_types
 from .hub import order_parsed_fields
 from .ncbi import refseq_organelle_parser
 from .version import __version__
@@ -62,8 +65,18 @@ def main(args):
             parsed = PARSERS[option]["func"](
                 PARSERS[option]["params"], options["parse"]
             )
+            types = load_types(PARSERS[option]["types"])
             data = order_parsed_fields(parsed, PARSERS[option]["types"])
             tofile.write_file(options["parse"][option], data)
+            filepath = Path(options["parse"][option])
+            types["file"]["name"] = filepath.name
+            outdir = filepath.parent
+            suff = re.compile(r"\.[^\.]+$")
+            if filepath.name.endswith(".gz"):
+                stem = re.sub(suff, "", filepath.stem)
+            else:
+                stem = filepath.stem
+            tofile.write_file("%s/%s.types.yaml" % (outdir, stem), types)
 
 
 def cli():

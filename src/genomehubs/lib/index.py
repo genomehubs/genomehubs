@@ -96,6 +96,7 @@ def process_row(types, row):
         "metadata": {},
         "taxon_names": {},
         "taxonomy": {},
+        "taxon_attributes": {},
         **types["defaults"],
     }
     for group in data.keys():
@@ -122,9 +123,15 @@ def process_row(types, row):
                     LOGGER.warning("Cannot parse row")
                     raise err
                     return None
+    taxon_data = {}
+    taxon_types = {}
     for attr_type in list(["attributes", "identifiers"]):
         if data[attr_type]:
-            data[attr_type] = hub.add_attributes(
+            (
+                data[attr_type],
+                taxon_data[attr_type],
+                taxon_types[attr_type],
+            ) = hub.add_attributes(
                 data[attr_type],
                 types[attr_type],
                 attr_type=attr_type,
@@ -132,7 +139,7 @@ def process_row(types, row):
             )
         else:
             data[attr_type] = []
-    return data
+    return data, taxon_data, taxon_types.get("attributes", {})
 
 
 def chunks(arr, n):
@@ -547,7 +554,15 @@ def lookup_taxon_within_lineage(
             "anc_rank": anc_rank,
         },
     }
-    index = template["index_name"].replace("taxon", "tax*")
+    with tolog.DisableLogger():
+        res = es.search_template(
+            body=body, index=template["index_name"], rest_total_hits_as_int=True
+        )
+    if "hits" in res and res["hits"]["total"] > 0:
+        if return_type == "taxon_id":
+            return [hit["_source"]["taxon_id"] for hit in res["hits"]["hits"]]
+        return [hit for hit in res["hits"]["hits"]]
+    index = template["index_name"].replace("taxon", "taxonomy")
     with tolog.DisableLogger():
         res = es.search_template(body=body, index=index, rest_total_hits_as_int=True)
     if "hits" in res and res["hits"]["total"] > 0:
@@ -565,11 +580,24 @@ def lookup_taxon_id(es, name, opts, *, rank=None):
         "id": "taxon_by_name",
         "params": {"taxon": name, "rank": rank},
     }
-    index = template["index_name"].replace("taxon", "tax*")
+    index = template["index_name"]
     with tolog.DisableLogger():
         res = es.search_template(body=body, index=index, rest_total_hits_as_int=True)
     if "hits" in res and res["hits"]["total"] > 0:
         taxon_ids = [hit["_source"]["taxon_id"] for hit in res["hits"]["hits"]]
+    else:
+        template = taxonomy_index_template(opts["taxonomy-source"][0], opts)
+        body = {
+            "id": "taxon_by_name",
+            "params": {"taxon": name, "rank": rank},
+        }
+        index = template["index_name"]
+        with tolog.DisableLogger():
+            res = es.search_template(
+                body=body, index=index, rest_total_hits_as_int=True
+            )
+        if "hits" in res and res["hits"]["total"] > 0:
+            taxon_ids = [hit["_source"]["taxon_id"] for hit in res["hits"]["hits"]]
     return taxon_ids
 
 
@@ -717,7 +745,7 @@ def fix_missing_ids(
                 "Writing %d records to exceptions file '%s", len(data) - 1, outfile
             )
             tofile.write_file(outfile, data)
-    return with_ids
+    return with_ids, without_ids
 
 
 def index_file(es, types, data, opts):
@@ -730,47 +758,63 @@ def index_file(es, types, data, opts):
     if types["file"].get("header", False):
         header = next(rows)
     with_ids = defaultdict(list)
+    taxon_asm_data = defaultdict(list)
     without_ids = defaultdict(list)
     failed_rows = defaultdict(list)
     blanks = set(["", "NA", "N/A", "None"])
+    taxon_types = {}
     for taxonomy_name in opts["taxonomy-source"]:
         taxon_template = taxon.index_template(taxonomy_name, opts)
         LOGGER.info("Processing rows")
         for row in tqdm(rows):
-            processed_data = process_row(types, row)
+            processed_data, taxon_data, new_taxon_types = process_row(types, row)
+            # TODO: do something with taxon data
             # TODO: store row for output if unmatchable or if unimportable
+            taxon_types.update(new_taxon_types)
             if (
                 "taxon_id" in processed_data["taxonomy"]
                 and processed_data["taxonomy"]["taxon_id"] not in blanks
             ):
                 with_ids[processed_data["taxonomy"]["taxon_id"]].append(processed_data)
+                taxon_asm_data[processed_data["taxonomy"]["taxon_id"]].append(
+                    taxon_data
+                )
             else:
                 if "taxonomy" in types and "alt_taxon_id" in types["taxonomy"]:
                     without_ids[processed_data["taxonomy"]["alt_taxon_id"]].append(
                         processed_data
+                    )
+                    taxon_asm_data[processed_data["taxonomy"]["alt_taxon_id"]].append(
+                        taxon_data
                     )
                     failed_rows[processed_data["taxonomy"]["alt_taxon_id"]].append(row)
                 elif "subspecies" in processed_data["taxonomy"]:
                     without_ids[processed_data["taxonomy"]["subspecies"]].append(
                         processed_data
                     )
+                    taxon_asm_data[processed_data["taxonomy"]["subspecies"]].append(
+                        taxon_data
+                    )
                     failed_rows[processed_data["taxonomy"]["subspecies"]].append(row)
                 elif "species" in processed_data["taxonomy"]:
                     without_ids[processed_data["taxonomy"]["species"]].append(
                         processed_data
                     )
+                    taxon_asm_data[processed_data["taxonomy"]["species"]].append(
+                        taxon_data
+                    )
                     failed_rows[processed_data["taxonomy"]["species"]].append(row)
                 else:
                     failed_rows["None"].append(row)
         LOGGER.info("Found taxon IDs in %d entries", len(with_ids.keys()))
-        with_ids = fix_missing_ids(
+        with_ids, without_ids = fix_missing_ids(
             es,
             opts,
             without_ids,
             types=types,
             taxon_template=taxon_template,
             failed_rows=failed_rows,
-            with_ids=None,
+            with_ids=with_ids,
             blanks=blanks,
             header=header,
         )
@@ -793,13 +837,20 @@ def index_file(es, types, data, opts):
                     taxon_template=taxon_template,
                     blanks=blanks,
                 )
-                # TODO: index assemblies and add assembly info to taxon index
-                # taxon_docs = add_assembly_attributes_to_taxa
-                for doc in docs:
-                    print(doc)
-                    quit()
-                print("no docs")
-                quit()
+                index_stream(es, assembly_template["index_name"], docs)
+                # index taxon-level attributes
+                index_types(
+                    es, "taxon", {**types, "attributes": taxon_types}, opts,
+                )
+                taxon_asm_with_ids = {
+                    taxon_id: taxon_asm_data[taxon_id] for taxon_id in with_ids.keys()
+                }
+                taxon_docs = add_names_and_attributes_to_taxa(
+                    es, taxon_asm_with_ids, opts, template=taxon_template, blanks=blanks
+                )
+                index_stream(
+                    es, taxon_template["index_name"], taxon_docs, _op_type="update",
+                )
 
 
 def main(args):
@@ -821,7 +872,6 @@ def main(args):
                 types, data = validate_types_file(types_file, dir_path)
                 LOGGER.info("Indexing %s" % types["file"]["name"])
                 index_types(es, index, types, options["index"])
-                continue
                 index_file(
                     es,
                     types,

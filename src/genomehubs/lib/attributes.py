@@ -25,8 +25,6 @@ def stream_attributes(group, attributes):
     """Stream attributes for indexing."""
     for name, obj in attributes.items():
         obj.update({"group": group, "name": name})
-        print(name)
-        print(obj)
         yield "attribute-%s-%s" % (group, name), obj
 
 

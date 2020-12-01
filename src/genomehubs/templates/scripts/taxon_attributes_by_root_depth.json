@@ -30,7 +30,13 @@
           ]
         }
       },
-      "_source": ["taxon_id", "scientific_name", "parent", "attributes.*"]
+      "_source": [
+        "taxon_id",
+        "taxon_rank",
+        "scientific_name",
+        "parent",
+        "attributes.*"
+      ]
     }
   }
 }

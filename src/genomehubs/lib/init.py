@@ -7,9 +7,9 @@ Usage:
     genomehubs init [--hub-name STRING] [--hub-path PATH] [--hub-version PATH]
                     [--config-file PATH...] [--config-save PATH]
                     [--es-host URL...] [--es-url URL]
-                    [--insdc-metadata] [--insdc-root INT...]
+                    [--insdc-metadata] [--insdc-root INT...] [--restore-indices]
                     [--taxonomy-path PATH] [--taxonomy-ncbi-root INT]
-                    [--taxonomy-ncbi-url URL]
+                    [--taxonomy-ncbi-url URL] [--taxon-preload]
                     [--docker-contain STRING...] [--docker-network STRING]
                     [--docker-timeout INT] [--docker-es-container STRING]
                     [--docker-es-image URL]
@@ -26,9 +26,11 @@ Options:
     --es-url URL                  Remote URL to fetch ElasticSearch code.
     --insdc-metadata              Flag to index metadata for public INSDC assemblies.
     --insdc-root INT              Root taxid when indexing public INSDC assemblies.
+    --restore-indices             Flag to restore taxon and assembly indices.
     --taxonomy-path DIR           Path to directory containing raw taxonomies.
     --taxonomy-ncbi-root INT      Root taxid for NCBI taxonomy index.
     --taxonomy-ncbi-url URL       Remote URL to fetch NCBI taxonomy.
+    --taxon-preload               Flag to preload all taxa in taxonomy into taxon index.
     --docker-contain STRING       GenomeHubs component to run in Docker.
     --docker-network STRING       Docker network name.
     --docker-timeout STRING       Time in seconds to wait for a component to start in
@@ -97,11 +99,13 @@ def main(args):
             #     es, taxon_template["name"], taxon_template["types"], options["init"]
             # )
             es_functions.index_create(es, taxon_template["index_name"])
-            # body = {
-            #     "source": {"index": template["index_name"]},
-            #     "dest": {"index": taxon_template["index_name"]},
-            # }
-            # es.reindex(body=body)
+            if options["init"].get("taxon-preload", False):
+                LOGGER.info("Loading all taxa from taxonomy into taxon index")
+                body = {
+                    "source": {"index": template["index_name"]},
+                    "dest": {"index": taxon_template["index_name"]},
+                }
+                es.reindex(body=body)
 
             # Prepare assembly index
             assembly_template = assembly_metadata.index_template(

@@ -44,6 +44,21 @@
         "ignore_above": 32,
         "meta": { "description": "Summary function to use in tree traversal" }
       },
+      "traverse_direction": {
+        "type": "keyword",
+        "ignore_above": 4,
+        "meta": { "description": "Restrict tree traversal direction" }
+      },
+      "traverse_up_limit": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Rank to stop upward tree traversal" }
+      },
+      "traverse_down_limit": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Rank to stop downward tree traversal" }
+      },
       "type": {
         "type": "keyword",
         "ignore_above": 32,

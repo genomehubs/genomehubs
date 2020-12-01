@@ -200,9 +200,6 @@ def summarise_attributes(*, attributes, attrs, meta, parent, parents):
             if summary_value is not None:
                 changed = True
                 if parent is not None:
-                    # print(node_attribute["key"])
-                    # print(parents[parent][node_attribute["key"]]["values"])
-                    # print(summary_value)
                     if isinstance(summary_value, list):
                         parents[parent][node_attribute["key"]][
                             "values"
@@ -223,11 +220,21 @@ def summarise_attributes(*, attributes, attrs, meta, parent, parents):
 
 
 def set_values_from_descendants(
-    *, attributes, descendant_values, meta, parent, parents
+    *, attributes, descendant_values, meta, parent, taxon_rank, parents
 ):
     """Set attribute summary values from descendant values."""
     changed = False
     for key, obj in descendant_values.items():
+        traverseable = meta[key].get("traverse", False)
+        if (
+            traverseable
+            and "traverse_direction" in meta[key]
+            and meta[key]["traverse_direction"] == "down"
+        ):
+            traverseable = False
+        if not traverseable:
+            continue
+        traverse_limit = meta[key].get("traverse_limit", None)
         try:
             attribute = next(entry for entry in attributes if entry["key"] == key)
         except StopIteration:
@@ -243,6 +250,8 @@ def set_values_from_descendants(
         if summary_value is not None:
             attribute["aggregation_source"] = "descendant"
             changed = True
+            if traverse_limit and taxon_rank == traverse_limit:
+                continue
             if parent is not None:
                 if isinstance(summary_value, list):
                     parents[parent][key]["values"] += summary_value
@@ -266,7 +275,6 @@ def traverse_from_tips(es, opts, *, template):
     root_depth = max_depth
     meta = template["types"]["attributes"]
     attrs = set(meta.keys())
-    print(attrs)
     parents = defaultdict(
         lambda: defaultdict(
             lambda: {"max": float("-inf"), "min": float("inf"), "values": []}
@@ -297,6 +305,7 @@ def traverse_from_tips(es, opts, *, template):
                     meta=meta,
                     parent=node["_source"].get("parent", None),
                     parents=parents,
+                    taxon_rank=node["_source"]["taxon_rank"],
                 )
             if changed:
                 yield node["_id"], node["_source"]
@@ -306,7 +315,6 @@ def traverse_from_tips(es, opts, *, template):
 def copy_attribute_summary(source, meta):
     """Copy an attribute summary, removing values."""
     dest = {}
-    print(source)
     for key in meta["summary"]:
         if key.startswith("median") and "median" in source:
             dest["median"] = source["median"]
@@ -364,10 +372,7 @@ def traverse_from_root(es, opts, *, template):
     attrs = set({})
     for key, value in meta.items():
         if "traverse" in value and value["traverse"]:
-            if (
-                "traverse_direction" not in value
-                or value["traverse_direction"] != "ancestor"
-            ):
+            if "traverse_direction" not in value or value["traverse_direction"] != "up":
                 attrs.add(key)
     # parents = defaultdict(lambda: defaultdict(list))
     while root_depth >= 0:
@@ -409,6 +414,7 @@ def main(args):
             if "traverse-root" in options["fill"]:
                 if "traverse-infer-ancestors" in options["fill"]:
                     LOGGER.info("Inferring ancestral values")
+                    traverse_from_tips(es, options["fill"], template=template)
                     index_stream(
                         es,
                         template["index_name"],

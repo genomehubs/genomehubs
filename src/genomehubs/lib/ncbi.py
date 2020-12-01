@@ -92,6 +92,26 @@ def parse_features(entry, fields):
     return fields
 
 
+def reformat_date(string):
+    """Change date string format."""
+    months = {
+        "JAN": "01",
+        "FEB": "02",
+        "MAR": "03",
+        "APR": "04",
+        "MAY": "05",
+        "JUN": "06",
+        "JUL": "07",
+        "AUG": "08",
+        "SEP": "09",
+        "OCT": "10",
+        "NOV": "11",
+        "DEC": "12",
+    }
+    parts = re.split(r"[\:\-]", string)
+    return "%s-%s-%s" % (parts[2], months[parts[1]], parts[0].zfill(2))
+
+
 def parse_flatfile(flatfile, organelle, opts):
     """Parse a GenBank flatfile."""
     data = []
@@ -101,7 +121,6 @@ def parse_flatfile(flatfile, organelle, opts):
     )
     with gzip.open(flatfile, "rt") as fh:
         gb = SeqIO.parse(fh, "gb")
-        # ctr = 0
         for entry in tqdm(gb):
             if (
                 "refseq-root" in opts
@@ -120,7 +139,7 @@ def parse_flatfile(flatfile, organelle, opts):
             fields["lineage"] = "; ".join(entry.annotations["taxonomy"])
             fields["assembly_id"] = entry.id
             fields["refseq_accession"] = entry.id
-            fields["last_updated"] = entry.annotations["date"]
+            fields["last_updated"] = reformat_date(entry.annotations["date"])
             parse_xrefs(entry, fields)
             seqstr = str(entry.seq.upper())
             counter = Counter(seqstr)
@@ -134,9 +153,6 @@ def parse_flatfile(flatfile, organelle, opts):
             )
             fields["assembly_span"] = length
             data.append(fields)
-            # ctr += 1
-            # if ctr == 20:
-            #     break
     return data
 
 
@@ -161,7 +177,4 @@ def refseq_organelle_parser(collections, opts):
     else:
         listing = refseq_listing(collections)
         parsed += parse_listing(listing, collections, opts)
-    # flatfile = "/Users/rchallis/Downloads/mitochondrion.2.genomic.gbff.gz"
-    # collection = "mitochondrion"
-    # parsed = parse_flatfile(flatfile, collection, opts)
     return parsed

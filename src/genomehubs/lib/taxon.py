@@ -67,7 +67,7 @@ def parse_taxa(es, types, taxonomy_template):
                 taxonomy_template["index_name"],
                 taxon_id,
             )
-        attributes = add_attributes(entry, types, attributes=[])
+        attributes = add_attributes(entry, types, attributes=[])[0]
         doc.update({"taxon_id": taxon_id, "attributes": attributes})
         doc_id = "taxon_id-%s" % taxon_id
         yield doc_id, doc

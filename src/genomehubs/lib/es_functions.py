@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Elasticsearch functions."""
 
+import logging
 import os
 import platform
 import signal
@@ -181,19 +182,21 @@ def index_stream(es, index_name, stream, *, _op_type="index"):
             {"_index": index_name, "_id": entry_id, "doc": entry, "_op_type": _op_type}
             for entry_id, entry in stream
         )
-    with tolog.DisableLogger():
-        try:
-            iterator = helpers.streaming_bulk(es, actions)
-            iterator = tqdm(iterator, unit=" records", unit_scale=True)
-            success = 0
-            failed = 0
-            for ok, response in iterator:
-                if ok:
-                    success += 1
-                else:
-                    failed += 1
-        except Exception as err:
-            raise err
+
+    try:
+        tracer = logging.getLogger("elasticsearch")
+        tracer.setLevel(logging.ERROR)
+        iterator = helpers.streaming_bulk(es, actions)
+        iterator = tqdm(iterator, unit=" records", unit_scale=True)
+        success = 0
+        failed = 0
+        for ok, response in iterator:
+            if ok:
+                success += 1
+            else:
+                failed += 1
+    except Exception as err:
+        raise err
 
     # if success and success > 0:
     #     LOGGER.info("Indexed %d entries", success)
@@ -220,7 +223,8 @@ def stream_template_search_results(es, *, index, body, size=10):
         for hit in res["hits"]["hits"]:
             yield hit
         offset += size
-    es.clear_scroll(scroll_id=scroll_id)
+    with tolog.DisableLogger():
+        es.clear_scroll(scroll_id=scroll_id)
 
 
 def query_keyword_value_template(es, template_name, keyword, values, index):
