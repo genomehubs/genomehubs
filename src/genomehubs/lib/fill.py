@@ -254,7 +254,9 @@ def set_values_from_descendants(
                 continue
             if parent is not None:
                 if isinstance(summary_value, list):
-                    parents[parent][key]["values"] += summary_value
+                    parents[parent][key]["values"] = list(
+                        set(parents[parent][key]["values"] + summary_value)
+                    )
                 else:
                     parents[parent][key]["values"].append(summary_value)
                 if max_value is not None:
