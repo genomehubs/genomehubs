@@ -18,7 +18,6 @@ attributes:
     taxon_display_name: "{{organelle}} span"
     taxon_summary: median
     taxon_traverse: median
-    taxon_traverse_direction: both
     taxon_traverse_limit: phylum
     taxon_display_level: 2
     taxon_bins:
@@ -41,8 +40,7 @@ attributes:
     taxon_key: "{{organelle}}_gc_percent"
     taxon_summary: median
     taxon_traverse: median
-    taxon_traverse_direction: up
-    taxon_traverse_limit: family
+    taxon_traverse_limit: phylum
     taxon_display_level: 2
     taxon_bins:
       min: 0
