@@ -5,6 +5,7 @@ import gzip
 import re
 from collections import Counter
 
+import ujson
 from Bio import SeqIO
 from tolkein import tofetch
 from tolkein import tofile
@@ -178,3 +179,59 @@ def refseq_organelle_parser(collections, opts):
         listing = refseq_listing(collections)
         parsed += parse_listing(listing, collections, opts)
     return parsed
+
+
+def parse_ncbi_datasets_record(record, parsed):
+    """Parse a single NCBI datasets record."""
+    obj = {}
+    for key in ("taxId", "speciesName", "commonName", "isolate", "sex"):
+        obj[key] = record.get(key, None)
+    assemblyInfo = record.get("assemblyInfo", {})
+    for key in (
+        "assemblyLevel",
+        "assemblyName",
+        "assemblyType",
+        "biosampleAcc",
+        "genbankAssmAcc",
+        "refseqAssmAcc",
+        "refseqCategory",
+        "submissionDate",
+        "submitter",
+    ):
+        obj[key] = assemblyInfo.get(key, None)
+    annotationInfo = record.get("annotationInfo", {})
+    if annotationInfo:
+        annot = {}
+        for key in ("name", "releaseDate", "reportUrl", "source"):
+            annot["annotation%s" % key.capitalize()] = annotationInfo.get(key, None)
+        if annot and "stats" in annotationInfo:
+            geneCounts = annotationInfo["stats"].get("geneCounts", None)
+            for key in ("nonCoding", "proteinCoding", "pseudogene", "total"):
+                annot["geneCount%s" % key.capitalize()] = geneCounts.get(key, None)
+            if obj["genbankAssmAcc"] in parsed:
+                parsed[obj["genbankAssmAcc"]].update(annot)
+                return
+            obj.update(annot)
+    bioprojects = []
+    for lineage in assemblyInfo["bioprojectLineages"]:
+        for bioproject in lineage["bioprojects"]:
+            bioprojects.append(bioproject["accession"])
+    obj["bioProjectAcc"] = ";".join(bioprojects) if bioprojects else None
+    assemblyStats = record.get("assemblyStats", {})
+    obj.update(assemblyStats)
+    wgsInfo = record.get("wgsInfo", {})
+    for key in ("masterWgsUrl", "wgsContigsUrl", "wgsProjectAccession"):
+        obj[key] = wgsInfo.get(key, None)
+    parsed[obj["genbankAssmAcc"]] = obj
+
+
+def ncbi_genome_parser(directory, opts):
+    """Parse NCBI Datasets genome report."""
+    parsed = {}
+    with tofile.open_file_handle(
+        "%s/ncbi_dataset/data/assembly_data_report.jsonl" % directory
+    ) as report:
+        for line in report:
+            record = ujson.loads(line)
+            parse_ncbi_datasets_record(record, parsed)
+    return [value for value in parsed.values()]

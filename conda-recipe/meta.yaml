@@ -17,6 +17,7 @@ build:
 
 requirements:
   host:
+    - biopython>=1.78
     - docopt>=0.6.2
     - pip
     - python
@@ -24,6 +25,7 @@ requirements:
     - tolkein>=0.2.1
     - ujson>=3.0.0
   run:
+    - biopython>=1.78
     - docopt>=0.6.2
     - python
     - pyyaml

@@ -65,18 +65,26 @@ def order_parsed_fields(parsed, name):
     types = load_types(name)
     columns = {}
     fields = {}
+    ctr = 0
     for group, entries in types.items():
         for field, attrs in entries.items():
+            header = False
             try:
                 for key, value in attrs.items():
                     if key == "index":
                         if value not in columns:
                             columns.update({value: field})
                             fields.update({field: value})
+                    elif key == "header":
+                        header = value
+                if header and value not in columns:
+                    columns.update({ctr: header})
+                    fields.update({header: ctr})
+                    ctr += 1
             except AttributeError:
                 pass
     order = [x[0] for x in sorted(fields.items(), key=lambda x: x[1])]
-    data = []
+    data = [order]
     for entry in parsed:
         row = [entry.get(field, "None") for field in order]
         data.append(row)

@@ -97,6 +97,7 @@ setup(
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
+        "biopython>=1.78",
         "docopt>=0.6.2",
         "elasticsearch>=7.8.1",
         "pyyaml",

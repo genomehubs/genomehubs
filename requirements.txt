@@ -10,6 +10,7 @@ pytest-isort>=1.1.0
 pytest-mock>=3.1.1
 pytest>=6.0.0
 
+biopython>=1.78
 docopt>=0.6.2
 elasticsearch>=7.8.1
 pyyaml

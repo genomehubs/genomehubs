@@ -34,6 +34,7 @@ Examples:
     ./genomehubs index --taxon-repo https://github.com/example/repo~main
 """
 
+import copy
 import csv
 import os
 import re
@@ -488,8 +489,8 @@ def add_identifiers_and_attributes_to_assemblies(
             if "hits" in response and response["hits"]["total"]["value"] == 1:
                 doc = response["hits"]["hits"][0]
             assembly_data = all_assemblies[doc["_source"]["assembly_id"]]
-            identifiers = doc["_source"]["identifiers"]
-            attributes = doc["_source"]["attributes"]
+            identifiers = copy.deepcopy(doc["_source"]["identifiers"])
+            attributes = copy.deepcopy(doc["_source"]["attributes"])
             if "attributes" in assembly_data:
                 attributes = attributes + assembly_data["attributes"]
             if "identifiers" in assembly_data:
@@ -501,11 +502,16 @@ def add_identifiers_and_attributes_to_assemblies(
                 doc["_source"]["attributes"] = []
             add_attribute_values(doc["_source"]["attributes"], attributes)
             doc["_source"]["taxon_id"] = assembly_data["taxon_id"]
-            # add_taxonomy_info_to_assembly
-            add_taxonomy_info_to_assembly(
-                doc["_source"], taxa[assembly_data["taxon_id"]]["_source"]
-            )
-            yield doc["_id"], doc["_source"]
+            try:
+                add_taxonomy_info_to_assembly(
+                    doc["_source"], taxa[assembly_data["taxon_id"]]["_source"]
+                )
+                yield doc["_id"], doc["_source"]
+            except KeyError:
+                LOGGER.warning(
+                    "Taxon ID %s was not found in the taxonomy"
+                    % assembly_data["taxon_id"]
+                )
 
 
 def add_names_and_attributes_to_taxa(es, data, opts, *, template, blanks=set(["NA"])):
@@ -748,6 +754,18 @@ def fix_missing_ids(
     return with_ids, without_ids
 
 
+def set_column_indices(types, header):
+    """Use header to set indices for named columns."""
+    headers = {title: index for index, title in enumerate(header)}
+    for section, entries in types.items():
+        for key, value in entries.items():
+            if isinstance(value, dict):
+                if "header" in value:
+                    index = headers.get(value["header"], None)
+                    if index is not None:
+                        value.update({"index": index})
+
+
 def index_file(es, types, data, opts):
     """Index a file."""
     delimiters = {"csv": ",", "tsv": "\t"}
@@ -757,6 +775,7 @@ def index_file(es, types, data, opts):
     header = None
     if types["file"].get("header", False):
         header = next(rows)
+        set_column_indices(types, header)
     with_ids = defaultdict(list)
     taxon_asm_data = defaultdict(list)
     without_ids = defaultdict(list)

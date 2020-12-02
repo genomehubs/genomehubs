@@ -1,0 +1,148 @@
+file:
+  display_group: misc
+attributes:
+  assembly_level:
+    display_group: metadata
+    constraint:
+      enum:
+        - complete genome
+        - chromosome
+        - contig
+        - scaffold
+    type: keyword
+  assembly_n50:
+    display_group: metrics
+    constraint:
+      min: 0
+    type: integer
+  assembly_n90:
+    display_group: metrics
+    constraint:
+      min: 0
+    type: integer
+  assembly_span:
+    display_group: metrics
+    constraint:
+      min: 1000000
+    type: long
+  assembly_title:
+    display_group: description
+    type: text
+  assembly_type:
+    constraint:
+      len: 64
+    type: keyword
+  assembly_version:
+    constraint:
+      min: 0
+    type: short
+  center_name:
+    constraint:
+      len: 64
+    type: keyword
+  contig_count:
+    constraint:
+      min: 0
+    type: integer
+  contig_l50:
+    constraint:
+      min: 0
+    type: integer
+  contig_n50:
+    constraint:
+      min: 0
+    type: integer
+  contig_n90:
+    constraint:
+      min: 0
+    type: integer
+  genome_representation:
+    constraint:
+      enum:
+        - full
+        - partial
+    type: keyword
+  host_scientific_name:
+    constraint:
+      len: 64
+    type: keyword
+  last_updated:
+    type: date
+  non_chr_replicon_count:
+    constraint:
+      min: 0
+    type: integer
+  replicon_count:
+    constraint:
+      min: 0
+    type: integer
+  sample_location:
+    type: geo_point
+  sample_sex:
+    constraint:
+      enum:
+        - NA
+        - female
+        - hermaphrodite
+        - male
+        - mixed sex
+        - pooled male and female
+    type: keyword
+  scaffold_count:
+    constraint:
+      min: 0
+    type: integer
+  scaffold_l50:
+    constraint:
+      min: 0
+    type: integer
+  scaffold_n90:
+    constraint:
+      min: 0
+    type: integer
+  study_description:
+    type: text
+  study_title:
+    type: text
+  wgs_first_public:
+    type: date
+  wgs_last_updated:
+    type: date
+identifiers:
+  alias:
+    constraint:
+      len: 32
+    type: keyword
+  assembly_id:
+    constraint:
+      len: 64
+    type: keyword
+  assembly_name:
+    constraint:
+      len: 64
+    type: keyword
+  gca_accession:
+    constraint:
+      len: 16
+      re: '^GCA_[\d\.]+$'
+    type: keyword
+  sample_accession:
+    constraint:
+      len: 32
+    type: keyword
+  secondary_sample_accession:
+    constraint:
+      len: 32
+    type: keyword
+  study_accession:
+    constraint:
+      len: 32
+    type: keyword
+  study_name:
+    constraint:
+      len: 64
+    type: keyword
+  wgs_accession:
+    constraint:
+      len: 64
+    type: keyword
