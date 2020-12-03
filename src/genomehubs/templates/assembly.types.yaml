@@ -4,7 +4,7 @@ file:
   header: true
   organelle: nucleus
   source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
-  source: NCBI Organelle Genome Resources
+  source: NCBI Datasets
 taxonomy:
   taxon_id:
     header: taxId
@@ -129,10 +129,10 @@ attributes:
     header: totalSequenceLength
     type: long
     units: bases
-    taxon_display_group: "assembly"
-    taxon_name: "assembly_span"
-    taxon_key: "assembly_span"
-    taxon_display_name: "Assembly span"
+    taxon_display_group: assembly
+    taxon_name: assembly_span
+    taxon_key: assembly_span
+    taxon_display_name: Assembly span
     taxon_summary: median
     taxon_traverse: median
     taxon_traverse_direction: both

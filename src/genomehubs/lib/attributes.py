@@ -40,9 +40,10 @@ def index_types(es, types_name, types, opts):
     """Index types into Elasticsearch."""
     if "attributes" not in types:
         return
-    for key, value in types["attributes"].items():
-        value = {**types["defaults"]["attributes"], **value}
-        types["attributes"][key] = value
+    if "defaults" in types:
+        for key, value in types["attributes"].items():
+            value = {**types["defaults"]["attributes"], **value}
+            types["attributes"][key] = value
     template, stream = index(es, types_name, types["attributes"], opts)
     load_mapping(es, template["name"], template["mapping"])
     index_stream(es, template["index_name"], stream)

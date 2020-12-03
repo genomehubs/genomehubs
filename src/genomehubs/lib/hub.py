@@ -269,10 +269,10 @@ def validate_values(values, key, types):
     return validated
 
 
-def apply_value_template(prop, value, attribute, *, taxon_attribute, has_taxon_data):
+def apply_value_template(prop, value, attribute, *, taxon_types, has_taxon_data):
     """Set value using template."""
     template = re.compile(r"^(.*?\{\{)(.+)(\}\}.*)$")
-    prop = prop.replace("taxon_", "")
+    new_prop = prop.replace("taxon_", "")
     match = template.match(str(value))
     if match:
         groups = match.groups()
@@ -283,10 +283,16 @@ def apply_value_template(prop, value, attribute, *, taxon_attribute, has_taxon_d
                 new_value = "%s%s" % (groups[0].replace("{{", ""), str(new_value),)
             if groups[2] != "}}":
                 new_value = "%s%s" % (str(new_value), groups[2].replace("}}", ""),)
-            taxon_attribute.update({prop: new_value})
+            taxon_types.update({new_prop: new_value})
+            taxon_types.update({"group": "taxon"})
+            if prop in taxon_types:
+                del taxon_types[prop]
     else:
         has_taxon_data = True
-        taxon_attribute.update({prop: value})
+        taxon_types.update({new_prop: value})
+        taxon_types.update({"group": "taxon"})
+        if prop in taxon_types:
+            del taxon_types[prop]
     return has_taxon_data
 
 
@@ -330,14 +336,14 @@ def add_attributes(
                         prop,
                         value,
                         attribute,
-                        taxon_attribute=taxon_attribute,
+                        taxon_types=taxon_attribute_types,
                         has_taxon_data=has_taxon_data,
                     )
-                    new_prop = prop.replace("taxon_", "")
-                    taxon_attribute_types[new_prop] = taxon_attribute[new_prop]
-                    del taxon_attribute_types[prop]
             if has_taxon_data:
-                # taxon_attribute.update({"group": "taxon"})
+                taxon_attribute.update({"key": taxon_attribute_types["name"]})
+                # taxon_attribute.update({"name": taxon_attribute_types["key"]})
                 taxon_attributes.append(taxon_attribute)
-                taxon_types.update({taxon_attribute["key"]: taxon_attribute_types})
+                taxon_types.update(
+                    {taxon_attribute_types["name"]: taxon_attribute_types}
+                )
     return attributes, taxon_attributes, taxon_types

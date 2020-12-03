@@ -613,6 +613,7 @@ def lookup_missing_taxon_ids(
     """Lookup taxon ID based on available taxonomic information."""
     if with_ids is None:
         with_ids = {}
+    # TODO: set this list from types file
     ranks = [
         "subspecies",
         "species",
@@ -859,7 +860,7 @@ def index_file(es, types, data, opts):
                 index_stream(es, assembly_template["index_name"], docs)
                 # index taxon-level attributes
                 index_types(
-                    es, "taxon", {**types, "attributes": taxon_types}, opts,
+                    es, "taxon", {"attributes": taxon_types}, opts,
                 )
                 taxon_asm_with_ids = {
                     taxon_id: taxon_asm_data[taxon_id] for taxon_id in with_ids.keys()
