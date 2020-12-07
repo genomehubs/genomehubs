@@ -299,13 +299,13 @@ def find_or_create_taxa(es, opts, *, taxon_ids, taxon_template, asm_by_taxon_id=
 
 def generate_ancestral_taxon_id(name, rank, *, alt_taxon_id=None, taxon_ids=None):
     """Generate an ancestral taxon ID."""
-    tol_name = re.compile(r"([A-Z])")
     if taxon_ids is None:
         taxon_ids = set({})
-    if rank == "genus" and alt_taxon_id:
-        parts = tol_name.split(alt_taxon_id)
-        if len(parts) == 5:
-            return "".join(parts[:3])
+    # tol_name = re.compile(r"([A-Z])")
+    # if rank == "genus" and alt_taxon_id:
+    #     parts = tol_name.split(alt_taxon_id)
+    #     if len(parts) == 5:
+    #         return "".join(parts[:3])
     increment = 0
     while True:
         # TODO: make robust to imports from separate files
