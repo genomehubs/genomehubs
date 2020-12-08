@@ -72,7 +72,7 @@ def main(args):
     for option in options["parse"]:
         if option in PARSERS:
             params = PARSERS[option]["params"]
-            if not isinstance(option, bool):
+            if params is None:
                 params = options["parse"][option]
             parsed = PARSERS[option]["func"](params, options["parse"])
             types = load_types(PARSERS[option]["types"])

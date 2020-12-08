@@ -17,27 +17,27 @@ identifiers:
   assembly_id:
     constraint:
       len: 32
-    header: genbankAssmAcc
+    header: genbankAssmAccession
     type: keyword
   genbank_accession:
     constraint:
       len: 32
-    header: genbankAssmAcc
+    header: genbankAssmAccession
     type: keyword
   refseq_accession:
     constraint:
       len: 32
-    header: refseqAssmAcc
+    header: refseqAssmAccession
     type: keyword
   bioproject_accession:
     constraint:
       len: 32
-    header: bioProjectAcc
+    header: bioProjectAccession
     type: keyword
   biosample_accession:
     constraint:
       len: 32
-    header: biosampleAcc
+    header: biosampleAccession
     separator:
       - ";"
     type: keyword
@@ -241,4 +241,4 @@ attributes:
     type: keyword
 metadata:
   source_slug:
-    header: genbankAssmAcc
+    header: genbankAssmAccession

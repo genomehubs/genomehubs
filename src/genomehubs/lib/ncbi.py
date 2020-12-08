@@ -191,14 +191,17 @@ def parse_ncbi_datasets_record(record, parsed):
         "assemblyLevel",
         "assemblyName",
         "assemblyType",
-        "biosampleAcc",
-        "genbankAssmAcc",
-        "refseqAssmAcc",
+        "biosampleAccession",
+        "genbankAssmAccession",
+        "refseqAssmAccession",
         "refseqCategory",
         "submissionDate",
         "submitter",
     ):
         obj[key] = assemblyInfo.get(key, None)
+    if obj["refseqAssmAccession"] == "na":
+        obj["refseqAssmAccession"] = None
+        obj["refseqCategory"] = None
     annotationInfo = record.get("annotationInfo", {})
     if annotationInfo:
         annot = {}
@@ -208,21 +211,21 @@ def parse_ncbi_datasets_record(record, parsed):
             geneCounts = annotationInfo["stats"].get("geneCounts", None)
             for key in ("nonCoding", "proteinCoding", "pseudogene", "total"):
                 annot["geneCount%s" % key.capitalize()] = geneCounts.get(key, None)
-            if obj["genbankAssmAcc"] in parsed:
-                parsed[obj["genbankAssmAcc"]].update(annot)
+            if obj["genbankAssmAccession"] in parsed:
+                parsed[obj["genbankAssmAccession"]].update(annot)
                 return
             obj.update(annot)
     bioprojects = []
-    for lineage in assemblyInfo["bioprojectLineages"]:
+    for lineage in assemblyInfo.get("bioprojectLineages", []):
         for bioproject in lineage["bioprojects"]:
             bioprojects.append(bioproject["accession"])
-    obj["bioProjectAcc"] = ";".join(bioprojects) if bioprojects else None
+    obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else None
     assemblyStats = record.get("assemblyStats", {})
     obj.update(assemblyStats)
     wgsInfo = record.get("wgsInfo", {})
     for key in ("masterWgsUrl", "wgsContigsUrl", "wgsProjectAccession"):
         obj[key] = wgsInfo.get(key, None)
-    parsed[obj["genbankAssmAcc"]] = obj
+    parsed[obj["genbankAssmAccession"]] = obj
 
 
 def ncbi_genome_parser(directory, opts):
