@@ -216,7 +216,7 @@ def parse_ncbi_datasets_record(record, parsed):
                 return
             obj.update(annot)
     bioprojects = []
-    for lineage in assemblyInfo.get("bioprojectLineages", []):
+    for lineage in assemblyInfo.get("bioprojectLineage", []):
         for bioproject in lineage["bioprojects"]:
             bioprojects.append(bioproject["accession"])
     obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else None

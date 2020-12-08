@@ -103,16 +103,16 @@ def process_row(types, row):
     for group in data.keys():
         if group in types:
             for key, meta in types[group].items():
-                if isinstance(meta["index"], list):
-                    char = meta.get("join", "")
-                    values = [row[i] for i in meta["index"]]
-                    if all(values):
-                        value = char.join(values)
-                    else:
-                        continue
-                else:
-                    value = row[meta["index"]]
                 try:
+                    if isinstance(meta["index"], list):
+                        char = meta.get("join", "")
+                        values = [row[i] for i in meta["index"]]
+                        if all(values):
+                            value = char.join(values)
+                        else:
+                            continue
+                    else:
+                        value = row[meta["index"]]
                     if "separator" in meta and any(
                         sep in value for sep in meta["separator"]
                     ):
@@ -120,9 +120,8 @@ def process_row(types, row):
                         data[group][key] = re.split(rf"\s*{separator}\s*", value)
                     else:
                         data[group][key] = value
-                except Exception as err:
-                    LOGGER.warning("Cannot parse row")
-                    raise err
+                except Exception:
+                    LOGGER.warning("Cannot parse row '%s'" % str(row))
                     return None
     taxon_data = {}
     taxon_types = {}
@@ -787,9 +786,11 @@ def index_file(es, types, data, opts):
         taxon_template = taxon.index_template(taxonomy_name, opts)
         LOGGER.info("Processing rows")
         for row in tqdm(rows):
-            processed_data, taxon_data, new_taxon_types = process_row(types, row)
-            # TODO: do something with taxon data
-            # TODO: store row for output if unmatchable or if unimportable
+            try:
+                processed_data, taxon_data, new_taxon_types = process_row(types, row)
+            except Exception:
+                failed_rows["None"].append(row)
+                continue
             taxon_types.update(new_taxon_types)
             if (
                 "taxon_id" in processed_data["taxonomy"]
