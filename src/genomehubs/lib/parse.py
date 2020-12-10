@@ -76,7 +76,7 @@ def main(args):
                 params = options["parse"][option]
             parsed = PARSERS[option]["func"](params, options["parse"])
             types = load_types(PARSERS[option]["types"])
-            data = order_parsed_fields(parsed, PARSERS[option]["types"])
+            data = order_parsed_fields(parsed, types)
             tofile.write_file(options["parse"]["outfile"], data)
             filepath = Path(options["parse"]["outfile"])
             types["file"]["name"] = filepath.name

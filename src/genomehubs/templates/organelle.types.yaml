@@ -87,12 +87,12 @@ identifiers:
       len: 32
     index: 3
     type: keyword
-  bioproject_id:
+  bioproject_accession:
     constraint:
       len: 32
     index: 5
     type: keyword
-  biosample_id:
+  biosample_accession:
     constraint:
       len: 32
     index: 6

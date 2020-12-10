@@ -41,7 +41,7 @@ def load_types(name):
     if types and "file" in types and "attributes" in types:
         for key, value in types["file"].items():
             for attr in types["attributes"].values():
-                if key not in attr:
+                if key not in ("format", "header", "name") and key not in attr:
                     attr[key] = value
     return types
 
@@ -60,9 +60,8 @@ def index_templator(parts, opts):
     return template
 
 
-def order_parsed_fields(parsed, name):
+def order_parsed_fields(parsed, types):
     """Order parsed fields using a template file."""
-    types = load_types(name)
     columns = {}
     fields = {}
     ctr = 0

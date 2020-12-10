@@ -72,9 +72,9 @@ def parse_xrefs(entry, fields=None):
             elif key == "BioSample":
                 biosamples.append(value)
         if bioprojects:
-            fields["bioproject"] = "; ".join(bioprojects)
+            fields["bioproject_accession"] = "; ".join(bioprojects)
         if biosamples:
-            fields["biosample"] = "; ".join(biosamples)
+            fields["biosample_accession"] = "; ".join(biosamples)
     return fields
 
 
@@ -178,6 +178,11 @@ def refseq_organelle_parser(collections, opts):
     else:
         listing = refseq_listing(collections)
         parsed += parse_listing(listing, collections, opts)
+    # parsed = parse_flatfile(
+    #     "mitochondrion.2.genomic.gbff.gz",
+    #     "mitochondrion",
+    #     opts,
+    # )
     return parsed
 
 
