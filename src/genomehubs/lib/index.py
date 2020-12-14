@@ -83,9 +83,6 @@ def validate_types_file(types_file, dir_path):
             defaults["attributes"].update({key: value})
         elif key.startswith("source"):
             defaults["metadata"].update({key: value})
-    # if "metadata" in types:
-    #     for key, value in types["metadata"].items():
-    #         value = {**value, **defaults["metadata"]}
     types.update({"defaults": defaults})
     data = tofile.open_file_handle(Path(dir_path) / types["file"]["name"])
     return types, data
@@ -302,11 +299,6 @@ def generate_ancestral_taxon_id(name, rank, *, alt_taxon_id=None, taxon_ids=None
     """Generate an ancestral taxon ID."""
     if taxon_ids is None:
         taxon_ids = set({})
-    # tol_name = re.compile(r"([A-Z])")
-    # if rank == "genus" and alt_taxon_id:
-    #     parts = tol_name.split(alt_taxon_id)
-    #     if len(parts) == 5:
-    #         return "".join(parts[:3])
     increment = 0
     while True:
         # TODO: make robust to imports from separate files
@@ -689,9 +681,11 @@ def lookup_missing_taxon_ids(
                         break
                 break
     pbar.close()
+    found_ids = {taxon_id: True for taxon_id in with_ids.keys()}
     for key in found_keys:
         without_ids.pop(key, None)
-    return with_ids, without_ids
+        found_ids[key] = True
+    return with_ids, without_ids, found_ids
 
 
 def fix_missing_ids(
@@ -712,7 +706,7 @@ def fix_missing_ids(
     if without_ids:
         # TODO: support multiple taxonomies
         LOGGER.info("Looking up %d missing taxon IDs", len(without_ids.keys()))
-        with_ids, without_ids = lookup_missing_taxon_ids(
+        with_ids, without_ids, found_ids = lookup_missing_taxon_ids(
             es, without_ids, opts, with_ids=with_ids, blanks=blanks
         )
         # create new taxon IDs
@@ -731,21 +725,12 @@ def fix_missing_ids(
             for created_id in created_ids:
                 if created_id in without_ids:
                     with_ids[created_id] = without_ids[created_id]
+                    found_ids[created_id] = True
                     del without_ids[created_id]
     if failed_rows:
-        for key, value in with_ids.items():
+        for key, value in found_ids.items():
             if key in failed_rows:
                 del failed_rows[key]
-            elif (
-                "subspecies" in value[0]["taxonomy"]
-                and value[0]["taxonomy"]["subspecies"] in failed_rows
-            ):
-                del failed_rows[value[0]["taxonomy"]["subspecies"]]
-            elif (
-                "species" in value[0]["taxonomy"]
-                and value[0]["taxonomy"]["species"] in failed_rows
-            ):
-                del failed_rows[value[0]["taxonomy"]["species"]]
         if failed_rows:
             LOGGER.info(
                 "Unable to associate %d records with taxon IDs", len(failed_rows)
