@@ -666,7 +666,7 @@ def lookup_missing_taxon_ids(
                             else:
                                 obj["attributes"] = [obj["attributes"]]
                                 with_ids[taxon_ids[0]] = [obj]
-                                LOGGER.info(
+                                LOGGER.debug(
                                     "Matched %s with taxon_id %s",
                                     obj["taxonomy"][rank],
                                     taxon_ids[0],
