@@ -9,6 +9,7 @@ Usage:
                      [--es-host URL...] [--assembly-dir PATH]
                      [--assembly-repo URL] [--assembly-exception PATH]
                      [--taxon-dir PATH] [--taxon-repo URL] [--taxon-exception PATH]
+                     [--taxon-lookup STRING]
                      [-h|--help] [-v|--version]
 
 Options:
@@ -22,6 +23,7 @@ Options:
     --assembly-repo URL        Remote git repository containing assembly-level data.
                                Optionally include `~branch-name` suffix.
     --assembly-exception PATH  Path to directory to write assembly data that failed to import.
+    --taxon-lookup STRING      Taxon name class to lookup (scientific|all). [Default: scientific]
     --taxon-dir PATH           Path to directory containing taxon-level data.
     --taxon-repo URL           Remote git repository containing taxon-level data.
                                Optionally include `~branch-name` suffix.
@@ -546,7 +548,15 @@ def add_names_and_attributes_to_taxa(es, data, opts, *, template, blanks=set(["N
 
 
 def lookup_taxon_within_lineage(
-    es, name, lineage, opts, *, rank=None, anc_rank=None, return_type="taxon"
+    es,
+    name,
+    lineage,
+    opts,
+    *,
+    rank=None,
+    anc_rank=None,
+    return_type="taxon",
+    name_class="scientific",
 ):
     """Lookup taxon ID in a specified lineage."""
     template = taxon.index_template(opts["taxonomy-source"][0], opts)
@@ -559,6 +569,8 @@ def lookup_taxon_within_lineage(
             "anc_rank": anc_rank,
         },
     }
+    if name_class == "any":
+        body.update({"id": "taxon_by_any_name_by_lineage"})
     with tolog.DisableLogger():
         res = es.search_template(
             body=body, index=template["index_name"], rest_total_hits_as_int=True
@@ -577,7 +589,7 @@ def lookup_taxon_within_lineage(
     return []
 
 
-def lookup_taxon_id(es, name, opts, *, rank=None):
+def lookup_taxon_id(es, name, opts, *, rank=None, name_class="scientific"):
     """Lookup taxon ID."""
     taxon_ids = []
     template = taxon.index_template(opts["taxonomy-source"][0], opts)
@@ -585,6 +597,8 @@ def lookup_taxon_id(es, name, opts, *, rank=None):
         "id": "taxon_by_name",
         "params": {"taxon": name, "rank": rank},
     }
+    if name_class == "any":
+        body.update({"id": "taxon_by_any_name"})
     index = template["index_name"]
     with tolog.DisableLogger():
         res = es.search_template(body=body, index=index, rest_total_hits_as_int=True)
@@ -592,10 +606,6 @@ def lookup_taxon_id(es, name, opts, *, rank=None):
         taxon_ids = [hit["_source"]["taxon_id"] for hit in res["hits"]["hits"]]
     else:
         template = taxonomy_index_template(opts["taxonomy-source"][0], opts)
-        body = {
-            "id": "taxon_by_name",
-            "params": {"taxon": name, "rank": rank},
-        }
         index = template["index_name"]
         with tolog.DisableLogger():
             res = es.search_template(
@@ -603,7 +613,11 @@ def lookup_taxon_id(es, name, opts, *, rank=None):
             )
         if "hits" in res and res["hits"]["total"] > 0:
             taxon_ids = [hit["_source"]["taxon_id"] for hit in res["hits"]["hits"]]
-    return taxon_ids
+    if not taxon_ids and opts["taxon-lookup"] == "any" and name_class != "any":
+        taxon_ids, name_class = lookup_taxon_id(
+            es, name, opts, rank=rank, name_class="any"
+        )
+    return taxon_ids, name_class
 
 
 def lookup_missing_taxon_ids(
@@ -632,7 +646,9 @@ def lookup_missing_taxon_ids(
             for index, rank in enumerate(ranks):
                 if rank not in obj["taxonomy"] or obj["taxonomy"][rank] in blanks:
                     continue
-                taxon_ids = lookup_taxon_id(es, obj["taxonomy"][rank], opts, rank=rank)
+                taxon_ids, name_class = lookup_taxon_id(
+                    es, obj["taxonomy"][rank], opts, rank=rank
+                )
                 if not taxon_ids:
                     break
                 for anc_rank in ranks[(index + 1) :]:
@@ -649,6 +665,7 @@ def lookup_missing_taxon_ids(
                         rank=rank,
                         anc_rank=anc_rank,
                         return_type="taxon_id",
+                        name_class=name_class,
                     )
                     if taxon_ids:
                         if len(taxon_ids) == 1:

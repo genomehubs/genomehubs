@@ -1,0 +1,37 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": {
+        "bool": {
+          "filter": [
+            {
+              "bool": {
+                "should": [
+                  {
+                    "multi_match": {
+                      "query": "{{taxon}}",
+                      "fields": ["taxon_id", "scientific_name"]
+                    }
+                  },
+                  {
+                    "nested": {
+                      "path": "taxon_names",
+                      "query": {
+                        "match": {
+                          "taxon_names.name": "{{taxon}}"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            { "match": { "taxon_rank": "{{rank}}" } }
+          ]
+        }
+      },
+      "_source": { "includes": ["taxon_id", "taxon_rank", "scientific_name"] }
+    }
+  }
+}
