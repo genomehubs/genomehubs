@@ -330,15 +330,16 @@ def create_descendant_taxon(taxon_id, rank, name, closest_taxon):
             "scientific_name": closest_taxon["_source"]["scientific_name"],
         }
     ]
-    for ancestor in closest_taxon["_source"]["lineage"]:
-        lineage.append(
-            {
-                "taxon_id": ancestor["taxon_id"],
-                "taxon_rank": ancestor["taxon_rank"],
-                "scientific_name": ancestor["scientific_name"],
-                "node_depth": ancestor["node_depth"] + 1,
-            }
-        )
+    if "lineage" in closest_taxon["_source"]:
+        for ancestor in closest_taxon["_source"]["lineage"]:
+            lineage.append(
+                {
+                    "taxon_id": ancestor["taxon_id"],
+                    "taxon_rank": ancestor["taxon_rank"],
+                    "scientific_name": ancestor["scientific_name"],
+                    "node_depth": ancestor["node_depth"] + 1,
+                }
+            )
     desc_taxon["_source"]["lineage"] = lineage
     return desc_taxon
 
@@ -353,6 +354,8 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA"])):
         "subphylum",
         "phylum",
     ]
+    max_index = len(ranks) - 1
+    max_rank = ranks[max_index]
     ancestors = {}
     matches = defaultdict(dict)
     pbar = tqdm(total=len(data.keys()))
@@ -366,9 +369,10 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA"])):
         lineage = []
         closest_rank = None
         closest_taxon = None
-        for index, rank in enumerate(ranks):
+        for index, rank in enumerate(ranks[: (max_index - 1)]):
             if rank not in obj["taxonomy"] or obj["taxonomy"][rank] in blanks:
                 continue
+            intermediates = 0
             for anc_rank in ranks[(index + 1) :]:
                 if (
                     anc_rank not in obj["taxonomy"]
@@ -397,11 +401,27 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA"])):
                         ancestors.update({alt_taxon_id: taxa[0]})
                         matches[obj["taxonomy"][rank]][obj["taxonomy"][anc_rank]] = taxa
                         break
+                elif anc_rank == max_rank and intermediates == 0:
+                    taxa, name_class = lookup_taxon(
+                        es,
+                        obj["taxonomy"][anc_rank],
+                        opts,
+                        rank=anc_rank,
+                        return_type="taxon",
+                    )
+                    if taxa and len(taxa) == 1:
+                        ancestors.update({alt_taxon_id: taxa[0]})
+                        matches[obj["taxonomy"][anc_rank]] = taxa
+                        break
+                intermediates += 1
             if alt_taxon_id in ancestors:
                 closest_rank = rank
-                closest_taxon = matches[obj["taxonomy"][rank]][
-                    obj["taxonomy"][anc_rank]
-                ][0]
+                if obj["taxonomy"][rank] in matches:
+                    closest_taxon = matches[obj["taxonomy"][rank]][
+                        obj["taxonomy"][anc_rank]
+                    ][0]
+                else:
+                    closest_taxon = matches[obj["taxonomy"][anc_rank]][0]
                 break
             lineage.append({"rank": rank, "name": obj["taxonomy"][rank]})
         if closest_taxon is not None:
@@ -423,6 +443,7 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA"])):
                 closest_taxon = new_taxon
             ancestors[alt_taxon_id] = closest_taxon
             if alt_taxon_id not in new_taxa:
+                print(closest_taxon)
                 new_taxon = create_descendant_taxon(
                     alt_taxon_id, "species", obj["taxonomy"]["species"], closest_taxon
                 )
@@ -581,9 +602,11 @@ def lookup_taxon_within_lineage(
     return []
 
 
-def lookup_taxon_id(es, name, opts, *, rank=None, name_class="scientific"):
+def lookup_taxon(
+    es, name, opts, *, rank=None, name_class="scientific", return_type="taxon_id"
+):
     """Lookup taxon ID."""
-    taxon_ids = []
+    taxa = []
     template = taxon.index_template(opts["taxonomy-source"][0], opts)
     body = {
         "id": "taxon_by_name",
@@ -595,7 +618,9 @@ def lookup_taxon_id(es, name, opts, *, rank=None, name_class="scientific"):
     with tolog.DisableLogger():
         res = es.search_template(body=body, index=index, rest_total_hits_as_int=True)
     if "hits" in res and res["hits"]["total"] > 0:
-        taxon_ids = [hit["_source"]["taxon_id"] for hit in res["hits"]["hits"]]
+        if return_type == "taxon_id":
+            taxa = [hit["_source"]["taxon_id"] for hit in res["hits"]["hits"]]
+        taxa = [hit for hit in res["hits"]["hits"]]
     else:
         template = taxonomy_index_template(opts["taxonomy-source"][0], opts)
         index = template["index_name"]
@@ -604,12 +629,14 @@ def lookup_taxon_id(es, name, opts, *, rank=None, name_class="scientific"):
                 body=body, index=index, rest_total_hits_as_int=True
             )
         if "hits" in res and res["hits"]["total"] > 0:
-            taxon_ids = [hit["_source"]["taxon_id"] for hit in res["hits"]["hits"]]
-    if not taxon_ids and opts["taxon-lookup"] == "any" and name_class != "any":
-        taxon_ids, name_class = lookup_taxon_id(
-            es, name, opts, rank=rank, name_class="any"
+            if return_type == "taxon_id":
+                taxa = [hit["_source"]["taxon_id"] for hit in res["hits"]["hits"]]
+            taxa = [hit for hit in res["hits"]["hits"]]
+    if not taxa and opts["taxon-lookup"] == "any" and name_class != "any":
+        taxa, name_class = lookup_taxon(
+            es, name, opts, rank=rank, name_class="any", return_type=return_type
         )
-    return taxon_ids, name_class
+    return taxa, name_class
 
 
 def lookup_missing_taxon_ids(
@@ -622,6 +649,7 @@ def lookup_missing_taxon_ids(
     ranks = [
         "subspecies",
         "species",
+        "genus",
         "family",
         "order",
         "class",
@@ -638,12 +666,12 @@ def lookup_missing_taxon_ids(
             for index, rank in enumerate(ranks):
                 if rank not in obj["taxonomy"] or obj["taxonomy"][rank] in blanks:
                     continue
-                taxon_ids, name_class = lookup_taxon_id(
+                taxon_ids, name_class = lookup_taxon(
                     es, obj["taxonomy"][rank], opts, rank=rank
                 )
-                if not taxon_ids:
+                if index == 1 and not taxon_ids:
                     break
-                for anc_rank in ranks[(index + 1) :]:
+                for anc_rank in ranks[2:]:
                     if (
                         anc_rank not in obj["taxonomy"]
                         or obj["taxonomy"][anc_rank] in blanks

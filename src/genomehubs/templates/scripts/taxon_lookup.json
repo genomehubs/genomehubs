@@ -46,7 +46,8 @@
           "taxon_id",
           "taxon_rank",
           "scientific_name",
-          "taxon_names.*"
+          "taxon_names.*",
+          "lineage.*"
         ]
       }
     }
