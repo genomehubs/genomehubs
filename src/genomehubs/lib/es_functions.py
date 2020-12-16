@@ -208,7 +208,7 @@ def stream_template_search_results(es, *, index, body, size=10):
     body["params"].update({"size": size})
     with tolog.DisableLogger():
         res = es.search_template(
-            index=index, body=body, rest_total_hits_as_int=True, scroll="30m"
+            index=index, body=body, rest_total_hits_as_int=True, scroll="90m"
         )
     scroll_id = res["_scroll_id"]
     count = res["hits"]["total"]
@@ -218,7 +218,7 @@ def stream_template_search_results(es, *, index, body, size=10):
     while offset < count:
         with tolog.DisableLogger():
             res = es.scroll(
-                rest_total_hits_as_int=True, scroll="30m", scroll_id=scroll_id
+                rest_total_hits_as_int=True, scroll="90m", scroll_id=scroll_id
             )
         for hit in res["hits"]["hits"]:
             yield hit

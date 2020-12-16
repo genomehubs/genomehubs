@@ -443,7 +443,6 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA"])):
                 closest_taxon = new_taxon
             ancestors[alt_taxon_id] = closest_taxon
             if alt_taxon_id not in new_taxa:
-                print(closest_taxon)
                 new_taxon = create_descendant_taxon(
                     alt_taxon_id, "species", obj["taxonomy"]["species"], closest_taxon
                 )
