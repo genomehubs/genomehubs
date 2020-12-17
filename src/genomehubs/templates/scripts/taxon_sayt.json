@@ -7,6 +7,22 @@
         "bool": {
           "should": [
             {
+              "match": {
+                "scientific_name": {
+                  "query": "{{searchTerm}}",
+                  "boost": 100
+                }
+              }
+            },
+            {
+              "match": {
+                "taxon_id": {
+                  "query": "{{searchTerm}}",
+                  "boost": 100
+                }
+              }
+            },
+            {
               "prefix": {
                 "scientific_name": {
                   "value": "{{searchTerm}}",
@@ -18,7 +34,7 @@
               "wildcard": {
                 "scientific_name": {
                   "value": "{{wildcardTerm}}",
-                  "boost": 5
+                  "boost": 10
                 }
               }
             },
