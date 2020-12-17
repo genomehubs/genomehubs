@@ -15,6 +15,14 @@
               }
             },
             {
+              "wildcard": {
+                "scientific_name": {
+                  "value": "{{wildcardTerm}}",
+                  "boost": 5
+                }
+              }
+            },
+            {
               "match_phrase_prefix": {
                 "scientific_name.text": {
                   "query": "{{searchTerm}}",
