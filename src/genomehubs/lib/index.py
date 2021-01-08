@@ -344,9 +344,21 @@ def create_descendant_taxon(taxon_id, rank, name, closest_taxon):
     return desc_taxon
 
 
+def add_new_taxon(alt_taxon_id, new_taxa, obj, closest_taxon):
+    """Add a new taxon with alt_taxon_id to list of taxa."""
+    if alt_taxon_id not in new_taxa:
+        alt_rank = "species"
+        if "subspecies" in obj["taxonomy"] and obj["taxonomy"]["subspecies"]:
+            alt_rank = "subspecies"
+        new_taxon = create_descendant_taxon(
+            alt_taxon_id, alt_rank, obj["taxonomy"][alt_rank], closest_taxon
+        )
+        new_taxa.update({new_taxon["_source"]["taxon_id"]: new_taxon["_source"]})
+
+
 def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA"])):
     """Create new taxa using alternate taxon IDs."""
-    ranks = [
+    default_ranks = [
         "genus",
         "family",
         "order",
@@ -354,8 +366,6 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA"])):
         "subphylum",
         "phylum",
     ]
-    max_index = len(ranks) - 1
-    max_rank = ranks[max_index]
     ancestors = {}
     matches = defaultdict(dict)
     pbar = tqdm(total=len(data.keys()))
@@ -369,6 +379,12 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA"])):
         lineage = []
         closest_rank = None
         closest_taxon = None
+        if "subspecies" in obj["taxonomy"]:
+            ranks = ["species"] + default_ranks
+        else:
+            ranks = default_ranks
+        max_index = len(ranks) - 1
+        max_rank = ranks[max_index]
         for index, rank in enumerate(ranks[: (max_index - 1)]):
             if rank not in obj["taxonomy"] or obj["taxonomy"][rank] in blanks:
                 continue
@@ -442,14 +458,7 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA"])):
                 closest_rank = intermediate["rank"]
                 closest_taxon = new_taxon
             ancestors[alt_taxon_id] = closest_taxon
-            if alt_taxon_id not in new_taxa:
-                new_taxon = create_descendant_taxon(
-                    alt_taxon_id, "species", obj["taxonomy"]["species"], closest_taxon
-                )
-                new_taxa.update(
-                    {new_taxon["_source"]["taxon_id"]: new_taxon["_source"]}
-                )
-
+            add_new_taxon(alt_taxon_id, new_taxa, obj, closest_taxon)
     pbar.close()
     index_stream(
         es, taxon_template["index_name"], stream_taxa(new_taxa),
