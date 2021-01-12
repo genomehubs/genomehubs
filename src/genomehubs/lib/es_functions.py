@@ -81,8 +81,6 @@ def start_es_binary(opts):
     if not es_bin_path.exists():
         es_url = "%s/%s" % (opts["es-url"], es_tarfile)
         LOGGER.info("Fetching ElasticSearch from '%s'", es_url)
-        members = tofetch.fetch_tar(es_url, opts["es-path"])
-        print(members)
     LOGGER.info("Writing ElasticSearch config")
     port = write_elastic_yaml("%s/config/elasticsearch.yml" % opts["es-path"], opts)
     LOGGER.info("Starting ElasticSearch on port %d", port)

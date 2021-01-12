@@ -319,6 +319,7 @@ def create_descendant_taxon(taxon_id, rank, name, closest_taxon):
             "taxon_id": taxon_id,
             "taxon_rank": rank,
             "scientific_name": name,
+            "parent": closest_taxon["_source"]["taxon_id"],
             "taxon_names": [{"class": "temporary taxon id", "name": taxon_id}],
         },
     }
@@ -881,7 +882,7 @@ def index_file(es, types, data, opts):
             LOGGER.info("Indexing %d entries", len(with_ids.keys()))
             if opts["index"] == "taxon":
                 docs = add_names_and_attributes_to_taxa(
-                    es, with_ids, opts, template=taxon_template, blanks=blanks
+                    es, dict(with_ids), opts, template=taxon_template, blanks=blanks
                 )
                 index_stream(
                     es, taxon_template["index_name"], docs, _op_type="update",

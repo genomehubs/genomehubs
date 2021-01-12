@@ -290,7 +290,7 @@ def traverse_from_tips(es, opts, *, template):
         for node in nodes:
             ctr += 1
             changed = False
-            if "attributes" in node["_source"]:
+            if "attributes" in node["_source"] and node["_source"]["attributes"]:
                 changed = summarise_attributes(
                     attributes=node["_source"]["attributes"],
                     attrs=attrs,

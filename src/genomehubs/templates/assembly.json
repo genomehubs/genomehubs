@@ -67,13 +67,13 @@
       },
       "taxon_id": {
         "type": "keyword",
-        "ignore_above": 16,
+        "ignore_above": 32,
         "normalizer": "lowercase",
         "meta": { "description": "Taxonomy-specific taxon ID" }
       },
       "parent": {
         "type": "keyword",
-        "ignore_above": 16,
+        "ignore_above": 32,
         "meta": { "description": "Taxon ID of parent taxon" }
       },
       "branch_length": {
