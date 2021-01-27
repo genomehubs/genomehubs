@@ -13,6 +13,7 @@ from subprocess import Popen
 
 import ujson
 from elasticsearch import Elasticsearch
+from elasticsearch import NotFoundError
 from elasticsearch import client
 from elasticsearch import helpers
 from tolkein import tofetch
@@ -276,6 +277,37 @@ def query_value_template(es, template_name, values, index):
     else:
         with tolog.DisableLogger():
             res = es.search_template(body=body, index=index)
+    return res
+
+
+def document_by_id(es, ids, index):
+    """Get indexed documents by ID."""
+    if not index_exists(es, index):
+        return None
+    multisearch = False
+    if not ids:
+        return None
+    if isinstance(ids, list):
+        multisearch = True
+    res = None
+    try:
+        if multisearch:
+            with tolog.DisableLogger():
+                res = es.mget(body={"ids": ids}, index=index)
+                ret = {}
+                for result in res["docs"]:
+                    if "found" in result and result["found"]:
+                        ret.update({result["_id"]: result["_source"]})
+                res = ret
+        else:
+            with tolog.DisableLogger():
+                res = es.get(id=ids, index=index)
+                if "found" in res and res["found"]:
+                    res = {res["_id"]: res["_source"]}
+                else:
+                    res = None
+    except NotFoundError:
+        res = None
     return res
 
 

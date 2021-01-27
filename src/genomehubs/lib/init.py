@@ -57,9 +57,11 @@ import sys
 from docopt import docopt
 from tolkein import tolog
 
+from ..lib import analysis
 from ..lib import assembly_metadata
 from ..lib import attributes
 from ..lib import es_functions
+from ..lib import files
 from ..lib import hub
 from ..lib import taxon
 from ..lib import taxonomy
@@ -123,6 +125,19 @@ def main(args):
             #     assembly_metadata.index(
             #         es, options["init"], metadata_name="insdc", taxonomy_name=taxonomy_name
             #     )
+            # Prepare analysis index
+            analysis_template = analysis.index_template(taxonomy_name, options["init"])
+            es_functions.load_mapping(
+                es, analysis_template["name"], analysis_template["mapping"]
+            )
+            es_functions.index_create(es, analysis_template["index_name"])
+
+            # Prepare file index
+            file_template = files.index_template(taxonomy_name, options["init"])
+            es_functions.load_mapping(
+                es, file_template["name"], file_template["mapping"]
+            )
+            es_functions.index_create(es, file_template["index_name"])
 
 
 def cli():

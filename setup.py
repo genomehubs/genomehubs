@@ -100,6 +100,8 @@ setup(
         "biopython>=1.78",
         "docopt>=0.6.2",
         "elasticsearch>=7.8.1",
+        "filetype>=1.0.7",
+        "Pillow>=8.0",
         "pyyaml",
         "tolkein>=0.2.1",
         "ujson>=3.0.0",

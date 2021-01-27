@@ -9,7 +9,10 @@ Usage:
                      [--es-host URL...] [--assembly-dir PATH]
                      [--assembly-repo URL] [--assembly-exception PATH]
                      [--taxon-dir PATH] [--taxon-repo URL] [--taxon-exception PATH]
-                     [--taxon-lookup STRING]
+                     [--taxon-lookup STRING] [--file PATH...] [file-dir PATH...]
+                     [--remote-file URL...] [--remote-file-dir URL...]
+                     [--taxon-id STRING] [--assembly-id STRING] [--analysis-id STRING]
+                     [--file-title STRING] [--file-description STRING] [--file-metadata PATH]
                      [-h|--help] [-v|--version]
 
 Options:
@@ -28,6 +31,16 @@ Options:
     --taxon-repo URL           Remote git repository containing taxon-level data.
                                Optionally include `~branch-name` suffix.
     --taxon-exception PATH     Path to directory to write taxon data that failed to import.
+    --file PATH                Path to file for generic file import.
+    --file-dir PATH            Path to directory containing generic files to import.
+    --remote-file URL          Location of remote file for generic file import.
+    --remote-file-dir URL      Location of remote directory containing generic files to import.
+    --taxon-id STRING          Taxon ID to index files against.
+    --assembly-id STRING       Assembly ID to index files against.
+    --analysis-id STRING       Analysis ID to index files against.
+    --file-title STRING        Default title for indexed files.
+    --file-description STRING  Default description for all indexed files.
+    --file-metadata PATH       CSV, TSV, YAML or JSON file metadata with one entry per file to be indexed.
     -h, --help                 Show this
     -v, --version              Show version number
 
@@ -53,6 +66,7 @@ from ..lib import assembly
 from ..lib import es_functions
 from ..lib import hub
 from ..lib import taxon
+from .analysis import index_template as analysis_index_template
 from .assembly import add_taxonomy_info_to_assembly
 from .assembly import stream_taxa
 from .attributes import index_types
@@ -60,6 +74,9 @@ from .config import config
 from .es_functions import index_stream
 from .es_functions import query_keyword_value_template
 from .es_functions import query_value_template
+from .files import index_files
+from .files import index_metadata
+from .files import index_template as file_index_template
 from .taxonomy import index_template as taxonomy_index_template
 from .version import __version__
 
@@ -181,7 +198,7 @@ def add_identifiers_to_list(existing, new, *, blanks=set({"NA"})):
             identifiers[id_class][identifier] = True
 
 
-def add_attribute_values(existing, new):
+def add_attribute_values(existing, new, *, raw=True):
     """Add attribute values to records."""
     indices = {}
     for index, entry in enumerate(existing):
@@ -191,15 +208,25 @@ def add_attribute_values(existing, new):
         if not isinstance(group, list):
             group = [group]
         for entry in group:
-            arr = []
-            if indices and entry["key"] in indices:
-                arr = existing[indices[entry["key"]]]["values"]
+            if raw:
+                arr = []
+                if indices and entry["key"] in indices:
+                    arr = existing[indices[entry["key"]]]["values"]
+                else:
+                    existing.append({"key": entry["key"], "values": arr})
+                    indices[entry["key"]] = index
+                    index += 1
+                del entry["key"]
+                arr.append(entry)
             else:
-                existing.append({"key": entry["key"], "values": arr})
-                indices[entry["key"]] = index
-                index += 1
-            del entry["key"]
-            arr.append(entry)
+                existing.append(
+                    {
+                        **entry,
+                        "count": 1,
+                        "aggregation_method": "unique",
+                        "aggregation_source": "direct",
+                    }
+                )
 
 
 def lookup_taxa_by_taxon_id(es, values, template, *, return_type="list"):
@@ -320,7 +347,10 @@ def create_descendant_taxon(taxon_id, rank, name, closest_taxon):
             "taxon_rank": rank,
             "scientific_name": name,
             "parent": closest_taxon["_source"]["taxon_id"],
-            "taxon_names": [{"class": "temporary taxon id", "name": taxon_id}],
+            "taxon_names": [
+                {"class": "temporary taxon id", "name": taxon_id},
+                {"class": "scientific name", "name": name},
+            ],
         },
     }
     lineage = [
@@ -523,7 +553,7 @@ def add_identifiers_and_attributes_to_assemblies(
             )
             if "attributes" not in doc["_source"] or not doc["_source"]["attributes"]:
                 doc["_source"]["attributes"] = []
-            add_attribute_values(doc["_source"]["attributes"], attributes)
+            add_attribute_values(doc["_source"]["attributes"], attributes, raw=False)
             doc["_source"]["taxon_id"] = assembly_data["taxon_id"]
             try:
                 add_taxonomy_info_to_assembly(
@@ -938,6 +968,14 @@ def main(args):
                     data,
                     {**options["index"], "index": index, "index_types": index_types},
                 )
+    # TODO: #29 Implement alternate backbone taxonomies
+    taxonomy_name = options["index"]["taxonomy-source"][0]
+    if "file" in options["index"]:
+        index_files(es, options["index"]["file"], taxonomy_name, options["index"])
+    elif "file-metadata" in options["index"]:
+        index_metadata(
+            es, options["index"]["file-metadata"], taxonomy_name, options["index"]
+        )
 
 
 def cli():

@@ -36,8 +36,17 @@
         "index": false,
         "meta": { "description": "Additional comment (not indexed)" }
       },
+      "date_created": {
+        "type": "date",
+        "meta": { "description": "Date of file creation" }
+      },
+      "date_accessed": {
+        "type": "date",
+        "meta": { "description": "Date remote file was accessed" }
+      },
       "version": {
-        "type": "version",
+        "type": "keyword",
+        "ignore_above": 16,
         "meta": { "description": "File version" }
       },
       "checksum": {

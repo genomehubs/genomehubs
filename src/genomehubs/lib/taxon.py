@@ -79,21 +79,4 @@ def index(es, opts, *, taxonomy_name="ncbi"):
     template = index_template(taxonomy_name, opts)
     taxonomy_template = taxonomy_index_template(taxonomy_name, opts)
     stream = parse_taxa(es, template["types"], taxonomy_template)
-    # query = EsQueryBuilder()
-    # query.es_range("assembly_span", [1000000, 3000000]).es_match(
-    #     "taxon_id", 12345
-    # ).es_or()
-    # print(query.write())
-    # query = EsQueryBuilder()
-    # query.es_range("attributes.integer_value", [1000000, 3000000]).es_match(
-    #     "attributes.key", "assembly_span"
-    # ).es_nested_and("attributes").es_include("taxon_id").es_include(
-    #     "attributes.*"
-    # ).es_exclude(
-    #     ["lineage.*", "names.*"]
-    # )
-    # body = query.write()
-    # res = es.search(index=template["index_name"], body=body)
-    # print(res)
-    # quit()
     return template, stream
