@@ -320,7 +320,10 @@ def create_descendant_taxon(taxon_id, rank, name, closest_taxon):
             "taxon_rank": rank,
             "scientific_name": name,
             "parent": closest_taxon["_source"]["taxon_id"],
-            "taxon_names": [{"class": "temporary taxon id", "name": taxon_id}],
+            "taxon_names": [
+                {"class": "temporary taxon id", "name": taxon_id},
+                {"class": "scientific name", "name": name},
+            ],
         },
     }
     lineage = [
