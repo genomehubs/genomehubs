@@ -12,10 +12,10 @@
         "ignore_above": 32,
         "meta": { "description": "Unique assembly ID" }
       },
-      "thumbnail_id": {
+      "preview_name": {
         "type": "keyword",
         "ignore_above": 32,
-        "meta": { "description": "Unique thumbnail ID (for image files only)" }
+        "meta": { "description": "Preview file name" }
       },
       "name": {
         "type": "keyword",
@@ -94,6 +94,12 @@
         "ignore_above": 32,
         "index": false,
         "meta": { "description": "File MIME type" }
+      },
+      "preview_mime_type": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "index": false,
+        "meta": { "description": "File preview MIME type" }
       }
     }
   }

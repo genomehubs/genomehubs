@@ -1,0 +1,26 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": {
+        "bool": {
+          "should": [
+            {
+              "match": { "analysis_id": "{{searchTerm}}" }
+            },
+            {
+              "prefix": {
+                "analysis_id": {
+                  "value": "{{searchTerm}}"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "_source": {
+        "includes": ["analysis_id", "assembly_id", "taxon_id"]
+      }
+    }
+  }
+}

@@ -56,7 +56,8 @@ def process_image_file(infile, filename, opts, *, dest_dir="./", attrs=None):
     with Image.open(infile) as im:
         attrs.update(
             {
-                "thumb_name": thumbname,
+                "preview_name": thumbname,
+                "preview_mime_type": attrs["mime_type"],
                 "format": im.format,
                 "size_pixels": "%sx%s" % (im.width, im.height),
             }
@@ -127,6 +128,7 @@ def process_file(
         attrs.update({"extension": kind.extension, "mime_type": kind.mime})
         if filetype.is_image(infile):
             process_image_file(infile, filename, opts, dest_dir=dest_dir, attrs=attrs)
+        # TODO: #32 Generate text file previews
     else:
         attrs.update({"extension": filepath.suffix.replace(".", "")})
         attrs.update({"mime_type": guess_type(filepath)[0]})
@@ -180,7 +182,7 @@ def index_files(es, files, taxonomy_name, opts):
 
 def update_analysis_attributes(es, analyses, analysis_attrs, analysis_template):
     """Update analysis attributes ready for reindexing."""
-    analysis_id = "analysis_id-%s" % analysis_attrs["analysis_id"]
+    analysis_id = "analysis-%s" % analysis_attrs["analysis_id"]
     action = "index"
     if analysis_id not in analyses:
         res = document_by_id(es, analysis_id, analysis_template["index_name"],)
@@ -222,7 +224,7 @@ def update_analysis_attributes(es, analyses, analysis_attrs, analysis_template):
 
 def update_file_attributes(es, files, file_attrs, analyses, file_template):
     """Update file attributes ready for reindexing."""
-    file_id = "file_id-%s" % file_attrs["file_id"]
+    file_id = "file-%s" % file_attrs["file_id"]
     action = "index"
     if file_id not in files:
         res = document_by_id(es, file_id, file_template["index_name"],)
@@ -251,7 +253,7 @@ def update_file_attributes(es, files, file_attrs, analyses, file_template):
         for key, value in file_attrs.items():
             if value != "":
                 files[file_id].update({key: value})
-        analyses["analysis_id-%s" % file_attrs["analysis_id"]]["file_count"] += 1
+        analyses["analysis-%s" % file_attrs["analysis_id"]]["file_count"] += 1
     return action
 
 
@@ -314,23 +316,24 @@ def index_metadata(es, file, taxonomy_name, opts):
             local=local,
         )
         # TODO: #30 check taxon_id(s) and assembly_id(s) exist in database
+        # TODO: #33 include lineage summary in analysis index
         # Fetch existing analysis entry if available
         action = update_analysis_attributes(
             es, analyses, analysis_attrs, analysis_template
         )
         if not action:
             continue
-        analysis_id = "analysis_id-%s" % analysis_attrs["analysis_id"]
+        analysis_id = "analysis-%s" % analysis_attrs["analysis_id"]
         if analysis_id in analysis_docs["index"]:
             action = "index"
         analysis_docs[action].update({analysis_id: analyses[analysis_id]})
-        # preparare files for indexing (include check for dupes and increment analysis file count)
+        # prepare files for indexing (include check for dupes and increment analysis file count)
         file_action = update_file_attributes(
             es, files, file_attrs, analyses, file_template
         )
         if not file_action:
             continue
-        file_id = "file_id-%s" % file_attrs["file_id"]
+        file_id = "file-%s" % file_attrs["file_id"]
         if analysis_id in analysis_docs["index"]:
             action = "index"
         file_docs[file_action].update({file_id: files[file_id]})
