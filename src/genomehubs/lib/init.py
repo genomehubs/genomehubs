@@ -58,8 +58,7 @@ from docopt import docopt
 from tolkein import tolog
 
 from ..lib import analysis
-from ..lib import assembly_metadata
-from ..lib import attributes
+from ..lib import assembly
 from ..lib import es_functions
 from ..lib import files
 from ..lib import hub
@@ -110,9 +109,7 @@ def main(args):
                 es.reindex(body=body)
 
             # Prepare assembly index
-            assembly_template = assembly_metadata.index_template(
-                taxonomy_name, options["init"]
-            )
+            assembly_template = assembly.index_template(taxonomy_name, options["init"])
             es_functions.load_mapping(
                 es, assembly_template["name"], assembly_template["mapping"]
             )

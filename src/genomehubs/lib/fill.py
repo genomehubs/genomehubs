@@ -34,7 +34,6 @@ Examples:
     ./genomehubs fill --traverse-root 7088
 """
 
-import math
 import sys
 from collections import defaultdict
 from statistics import mean

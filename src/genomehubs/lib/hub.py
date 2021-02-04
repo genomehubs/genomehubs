@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Hub functions."""
 
-import numbers
 import os
 import re
+import sys
 from pathlib import Path
 
 from tolkein import tofile
@@ -346,3 +346,127 @@ def add_attributes(
                     {taxon_attribute_types["name"]: taxon_attribute_types}
                 )
     return attributes, taxon_attributes, taxon_types
+
+
+def chunks(arr, n):
+    """Yield successive n-sized chunks from arr."""
+    for i in range(0, len(arr), n):
+        yield arr[i : i + n]
+
+
+def add_attribute_values(existing, new, *, raw=True):
+    """Add attribute values to records."""
+    indices = {}
+    for index, entry in enumerate(existing):
+        indices[entry["key"]] = index
+    index = len(existing)
+    for group in new:
+        if not isinstance(group, list):
+            group = [group]
+        for entry in group:
+            if raw:
+                arr = []
+                if indices and entry["key"] in indices:
+                    arr = existing[indices[entry["key"]]]["values"]
+                else:
+                    existing.append({"key": entry["key"], "values": arr})
+                    indices[entry["key"]] = index
+                    index += 1
+                del entry["key"]
+                arr.append(entry)
+            else:
+                existing.append(
+                    {
+                        **entry,
+                        "count": 1,
+                        "aggregation_method": "unique",
+                        "aggregation_source": "direct",
+                    }
+                )
+
+
+def validate_types_file(types_file, dir_path):
+    """Validate types file."""
+    try:
+        types = tofile.load_yaml(str(types_file.resolve()))
+    except Exception:
+        LOGGER.error("Unable to open types file %s", str(types_file.resolve()))
+        sys.exit(1)
+    if "taxonomy" not in types:
+        LOGGER.error("Types file contains no taxonomy information")
+    if "file" not in types or "name" not in types["file"]:
+        LOGGER.error("No data file name in types file")
+    defaults = {"attributes": {}, "metadata": {}}
+    for key, value in types["file"].items():
+        if key.startswith("display") or key.startswith("taxon"):
+            defaults["attributes"].update({key: value})
+        elif key.startswith("source"):
+            defaults["metadata"].update({key: value})
+    types.update({"defaults": defaults})
+    data = tofile.open_file_handle(Path(dir_path) / types["file"]["name"])
+    return types, data
+
+
+def process_row(types, row):
+    """Process a row of data."""
+    data = {
+        "attributes": {},
+        "identifiers": {},
+        "metadata": {},
+        "taxon_names": {},
+        "taxonomy": {},
+        "taxon_attributes": {},
+        **types["defaults"],
+    }
+    for group in data.keys():
+        if group in types:
+            for key, meta in types[group].items():
+                try:
+                    if isinstance(meta["index"], list):
+                        char = meta.get("join", "")
+                        values = [row[i] for i in meta["index"]]
+                        if all(values):
+                            value = char.join(values)
+                        else:
+                            continue
+                    else:
+                        value = row[meta["index"]]
+                    if "separator" in meta and any(
+                        sep in value for sep in meta["separator"]
+                    ):
+                        separator = "|".join(meta["separator"])
+                        data[group][key] = re.split(rf"\s*{separator}\s*", value)
+                    else:
+                        data[group][key] = value
+                except Exception:
+                    LOGGER.warning("Cannot parse row '%s'" % str(row))
+                    return None
+    taxon_data = {}
+    taxon_types = {}
+    for attr_type in list(["attributes", "identifiers"]):
+        if data[attr_type]:
+            (
+                data[attr_type],
+                taxon_data[attr_type],
+                taxon_types[attr_type],
+            ) = add_attributes(
+                data[attr_type],
+                types[attr_type],
+                attr_type=attr_type,
+                meta=data["metadata"],
+            )
+        else:
+            data[attr_type] = []
+    return data, taxon_data, taxon_types.get("attributes", {})
+
+
+def set_column_indices(types, header):
+    """Use header to set indices for named columns."""
+    headers = {title: index for index, title in enumerate(header)}
+    for section, entries in types.items():
+        for key, value in entries.items():
+            if isinstance(value, dict):
+                if "header" in value:
+                    index = headers.get(value["header"], None)
+                    if index is not None:
+                        value.update({"index": index})

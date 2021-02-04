@@ -16,7 +16,6 @@ from elasticsearch import Elasticsearch
 from elasticsearch import NotFoundError
 from elasticsearch import client
 from elasticsearch import helpers
-from tolkein import tofetch
 from tolkein import tofile
 from tolkein import tolog
 from tqdm import tqdm
