@@ -28,7 +28,6 @@ import sys
 from pathlib import Path
 
 from docopt import docopt
-from tolkein import tofetch
 from tolkein import tofile
 from tolkein import tolog
 

@@ -16,9 +16,14 @@ from tolkein import tofile
 from tolkein import tolog
 
 from .analysis import index_template as analysis_index_template
+from .assembly import index_template as assembly_index_template
+from .assembly import lookup_assemblies_by_assembly_id
 from .es_functions import document_by_id
 from .es_functions import index_stream
 from .hub import index_templator
+from .taxon import find_or_create_taxa
+from .taxon import index_template as taxon_index_template
+from .taxon import list_ancestors
 
 LOGGER = tolog.logger(__name__)
 
@@ -88,6 +93,29 @@ def set_file_meta_defaults(opts):
     return defaults
 
 
+def make_local_copy(infile, filepath, filename, attrs, opts, local):
+    """Link or copy file to local directory."""
+    try:
+        dest_dir = str(filepath.parent.relative_to(opts["hub-path"]))
+    except ValueError:
+        dest_dir = "files"
+        try:
+            dest_dir += "/taxon-" + attrs.get("taxon_id", "NA")
+        except TypeError:
+            dest_dir += "/taxon-MULTI"
+        try:
+            dest_dir += "/assembly-" + attrs.get("assembly_id", "NA")
+        except TypeError:
+            dest_dir += "/assembly-MULTI"
+        dest_dir += "/analysis-" + attrs.get("analysis_id", "all")
+        localname = "%s/%s/%s" % (opts["hub-path"], dest_dir, filename)
+        if local == "symlink":
+            force_copy(infile, localname)
+        elif local == "copy":
+            force_copy(infile, localname, False)
+    return dest_dir
+
+
 def process_file(
     infile,
     opts,
@@ -110,18 +138,7 @@ def process_file(
         **set_file_meta_defaults(opts),
         **meta,
     }
-    try:
-        dest_dir = str(filepath.parent.relative_to(opts["hub-path"]))
-    except ValueError:
-        dest_dir = "files"
-        dest_dir += "/taxon-" + attrs.get("taxon_id", "all")
-        dest_dir += "/assembly-" + attrs.get("assembly_id", "all")
-        dest_dir += "/analysis-" + attrs.get("analysis_id", "all")
-        localname = "%s/%s/%s" % (opts["hub-path"], dest_dir, filename)
-        if local == "symlink":
-            force_copy(infile, localname)
-        elif local == "copy":
-            force_copy(infile, localname, False)
+    dest_dir = make_local_copy(infile, filepath, filename, attrs, opts, local)
     attrs.update({"location": dest_dir})
     kind = filetype.guess(infile)
     if kind is not None:
@@ -185,7 +202,7 @@ def update_analysis_attributes(es, analyses, analysis_attrs, analysis_template):
     analysis_id = "analysis-%s" % analysis_attrs["analysis_id"]
     action = "index"
     if analysis_id not in analyses:
-        res = document_by_id(es, analysis_id, analysis_template["index_name"],)
+        res = document_by_id(es, analysis_id, analysis_template["index_name"])
         if res is not None and analysis_id in res:
             analyses.update({analysis_id: res[analysis_id]})
     if analysis_id in analyses:
@@ -193,19 +210,27 @@ def update_analysis_attributes(es, analyses, analysis_attrs, analysis_template):
         taxon_id = analysis_attrs.get("taxon_id", None)
         assembly_id = analysis_attrs.get("assembly_id", None)
         if (
-            analyses[analysis_id].get("taxon_id", taxon_id) != taxon_id
-            or analyses[analysis_id].get("assembly_id", assembly_id) != assembly_id
+            taxon_id
+            and taxon_id is not None
+            and analyses[analysis_id].get("taxon_id", taxon_id) != taxon_id
         ):
+            action = "mismatch"
+        elif (
+            assembly_id
+            and assembly_id is not None
+            and analyses[analysis_id].get("assembly_id", assembly_id) != assembly_id
+        ):
+            action = "mismatch"
+        if action == "mismatch":
             LOGGER.warning(
-                "taxon/assembly ID mismatch for %s, unable to import %s",
+                "taxon/assembly ID mismatch for %s, unable to import associated files",
                 analysis_id,
-                analysis_attrs.get("name", None),
             )
             return False
         LOGGER.info("Updating %s", analysis_id)
         # update analysis
         for key, value in analysis_attrs.items():
-            if value != "":
+            if value != "" and value != []:
                 if key not in analyses[analysis_id]:
                     analyses[analysis_id].update({key: value})
                 elif value != analyses[analysis_id][key]:
@@ -273,6 +298,48 @@ def index_docs(es, doc_collection, template):
             )
 
 
+def check_taxa_exist(es, attrs, taxonomy_name, opts):
+    """Check that the specified taxon_id(s) exist in the taxon index."""
+    taxon_template = taxon_index_template(taxonomy_name, opts)
+    taxon_ids = attrs.get("taxon_id", False)
+    if not taxon_ids:
+        return {}
+    if not isinstance(taxon_ids, list):
+        taxon_ids = [taxon_ids]
+    taxa = {}
+    if taxon_ids:
+        taxa = find_or_create_taxa(
+            es, opts, taxon_ids=taxon_ids, taxon_template=taxon_template
+        )
+    if len(taxon_ids) > len(taxa.keys()):
+        found = taxa.keys()
+        missing = ", ".join(
+            [taxon_id for taxon_id in taxon_ids if taxon_id not in found]
+        )
+        LOGGER.warn("Taxon ID(s) '%s' not found in the specified taxonomy.", missing)
+        LOGGER.warn("Unable to import analysis '%s'.", attrs["analysis_id"])
+        return None
+    return taxa
+
+
+def check_assemblies_exist(es, attrs, taxonomy_name, opts):
+    """Check that the specified taxon_id(s) exist in the taxon index."""
+    # similar to check_taxa_exist but for assemblies
+    assembly_template = assembly_index_template(taxonomy_name, opts)
+    assembly_ids = attrs.get("assembly_id", False)
+    if not isinstance(assembly_ids, list):
+        assembly_ids = [assembly_ids]
+    assemblies = {}
+    if assembly_ids:
+        assemblies = lookup_assemblies_by_assembly_id(
+            es,
+            ["assembly-%s" % assembly_id for assembly_id in assembly_ids],
+            assembly_template,
+            return_type="dict",
+        )
+    return assemblies
+
+
 def index_metadata(es, file, taxonomy_name, opts):
     """Index file metadata."""
     data = tofile.load_yaml(file)
@@ -315,13 +382,30 @@ def index_metadata(es, file, taxonomy_name, opts):
             meta=meta,
             local=local,
         )
+        if "analysis_id" not in analysis_attrs:
+            file_name = file_attrs.get("name", file_attrs["file_id"])
+            LOGGER.warn("Unable to import %s: analysis_id must be specified", file_name)
+            continue
         # TODO: #30 check taxon_id(s) and assembly_id(s) exist in database
+        assemblies = check_assemblies_exist(es, analysis_attrs, taxonomy_name, opts)
+        if assemblies is None:
+            continue
+        if "taxon_id" in analysis_attrs and analysis_attrs["taxon_id"]:
+            taxa = check_taxa_exist(es, analysis_attrs, taxonomy_name, opts)
+        else:
+            # set taxa from assembly index
+            taxa = {assembly["taxon_id"]: assembly for assembly in assemblies.values()}
+            analysis_attrs["taxon_id"] = list(taxa.keys())
+        if taxa is None:
+            continue
         # TODO: #33 include lineage summary in analysis index
+        analysis_attrs["ancestors"] = list_ancestors(taxa)
         # Fetch existing analysis entry if available
         action = update_analysis_attributes(
             es, analyses, analysis_attrs, analysis_template
         )
         if not action:
+            # TODO: remove analysis and files with shared analysis name
             continue
         analysis_id = "analysis-%s" % analysis_attrs["analysis_id"]
         if analysis_id in analysis_docs["index"]:

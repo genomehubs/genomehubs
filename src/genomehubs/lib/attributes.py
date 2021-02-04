@@ -2,8 +2,6 @@
 
 """Taxon methods."""
 
-from pathlib import Path
-
 from tolkein import tolog
 
 from .es_functions import index_stream

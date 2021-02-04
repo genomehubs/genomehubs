@@ -5,17 +5,15 @@
 import sys
 from collections import defaultdict
 
-import ujson
 from tolkein import toinsdc
 from tolkein import tolog
 
-from .es_functions import EsQueryBuilder
-from .es_functions import index_exists
 from .es_functions import index_stream
 from .es_functions import query_keyword_value_template
 from .es_functions import query_value_template
 from .hub import add_attributes
 from .hub import index_templator
+from .taxon import add_taxonomy_info_to_meta
 from .taxon import index_template as taxon_index_template
 from .taxonomy import index_template as taxonomy_index_template
 
@@ -118,14 +116,6 @@ def stream_taxa(taxa):
         yield "taxon_id-%s" % taxon_id, value
 
 
-def add_taxonomy_info_to_assembly(asm_meta, source):
-    """Add taxonomy information to an assembly."""
-    keys = {"lineage", "parent", "scientific_name", "taxon_names", "taxon_rank"}
-    for key in keys:
-        if key in source:
-            asm_meta[key] = source[key]
-
-
 def collate_unique_key_value_indices(key, list_of_dicts):
     """Collate indices of unique key values in a list of dicts."""
     unique_key_values = set()
@@ -169,7 +159,7 @@ def get_taxa_to_create(
             for ancestor in source["lineage"]:
                 ancestors.add(ancestor["taxon_id"])
             for idx in asm_by_taxon_id[source["taxon_id"]]:
-                add_taxonomy_info_to_assembly(batch[idx], source)
+                add_taxonomy_info_to_meta(batch[idx], source)
     add_assembly_attributes_to_taxon(
         batch,
         asm_by_taxon_id,
@@ -220,7 +210,7 @@ def preprocess_batch(es, batch, opts, *, taxonomy_name="ncbi"):
                 source = taxon_result["hits"]["hits"][0]["_source"]
                 taxa[source["taxon_id"]] = source
                 for idx in asm_by_taxon_id[source["taxon_id"]]:
-                    add_taxonomy_info_to_assembly(batch[idx], source)
+                    add_taxonomy_info_to_meta(batch[idx], source)
     taxa_to_update = {}
     taxon_ids = []
     for taxon_id, assemblies in asm_by_taxon_id.items():

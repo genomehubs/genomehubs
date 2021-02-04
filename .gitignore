@@ -6,3 +6,4 @@ htmlcov
 build
 .coverage
 .DS_Store
+.vscode/.ropeproject
