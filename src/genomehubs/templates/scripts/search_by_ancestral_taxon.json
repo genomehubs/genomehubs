@@ -1,0 +1,38 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": {
+        "bool": {
+          "filter": {},
+          "should": [
+            {
+              "match": { "taxon_id": "{{searchTerm}}" }
+            },
+            {
+              "nested": {
+                "path": "taxon_names",
+                "query": {
+                  "match": {
+                    "taxon_names.name": "{{searchTerm}}"
+                  }
+                }
+              }
+            },
+            {
+              "nested": {
+                "path": "lineage",
+                "query": {
+                  "multi_match": {
+                    "query": "{{searchTerm}}",
+                    "fields": ["lineage.taxon_id", "lineage.scientific_name"]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

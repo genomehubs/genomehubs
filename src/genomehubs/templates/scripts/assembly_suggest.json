@@ -1,0 +1,45 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "suggest": {
+        "text": "{{searchTerm}}",
+        "simple_phrase": {
+          "phrase": {
+            "field": "identifiers.identifier.trigram",
+            "size": "{{suggestSize}}{{^suggestSize}}3{{/suggestSize}}",
+            "gram_size": "{{gramSize}}{{^gramSize}}3{{/gramSize}}",
+            "confidence": "{{confidence}}{{^confidence}}1{{/confidence}}",
+            "max_errors": "{{maxErrors}}{{^maxErrors}}2{{/maxErrors}}",
+            "direct_generator": [
+              {
+                "field": "identifiers.identifier.trigram",
+                "suggest_mode": "always"
+              },
+              {
+                "field": "identifiers.identifier.reverse",
+                "suggest_mode": "always",
+                "pre_filter": "reverse",
+                "post_filter": "reverse"
+              }
+            ],
+            "highlight": {
+              "pre_tag": "{{preTag}}{{^preTag}}<em>{{/preTag}}",
+              "post_tag": "{{postTag}}{{^postTag}}</em>{{/postTag}}"
+            },
+            "collate": {
+              "query": {
+                "source": {
+                  "match_phrase": {
+                    "identifiers.identifier": "{{=|| ||=}}{{suggestion}}||={{ }}=||"
+                  }
+                }
+              },
+              "prune": true
+            }
+          }
+        }
+      }
+    }
+  }
+}

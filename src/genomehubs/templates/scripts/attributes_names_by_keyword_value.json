@@ -1,0 +1,19 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": { "match": { "{{keyword}}": "{{value}}" } },
+      "_source": {
+        "includes": [
+          "{{keyword}}",
+          "attributes.*",
+          "taxon_names.*",
+          "lineage.*",
+          "parent",
+          "scientific_name",
+          "taxon_rank"
+        ]
+      }
+    }
+  }
+}

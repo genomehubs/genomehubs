@@ -1,0 +1,49 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": {
+        "bool": {
+          "should": [
+            {
+              "match": { "assembly_id": "{{searchTerm}}" }
+            },
+            {
+              "nested": {
+                "path": "identifiers",
+                "query": {
+                  "prefix": {
+                    "identifiers.identifier": {
+                      "value": "{{searchTerm}}"
+                    }
+                  }
+                },
+                "inner_hits": {
+                  "_source": false,
+                  "docvalue_fields": [
+                    {
+                      "field": "identifiers.identifier.raw",
+                      "format": "use_field_mapping"
+                    },
+                    {
+                      "field": "identifiers.class",
+                      "format": "use_field_mapping"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "_source": {
+        "includes": [
+          "assembly_id",
+          "taxon_id",
+          "scientific_name",
+          "identifiers.*"
+        ]
+      }
+    }
+  }
+}

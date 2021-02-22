@@ -1,0 +1,58 @@
+file:
+  display_group: misc
+attributes:
+  assembly_span:
+    constraint:
+      min: 1000000
+    description: Genome assembly span
+    display_level: 1
+    display_group: assembly
+    bins:
+      min: 6
+      max: 11
+      count: 10
+      scale: log10
+    summary:
+      - median_high
+      - max
+      - min
+      - mean
+    traverse: median_high
+    type: long
+    units: bp
+  sample_location:
+    display_level: 2
+    display_group: assembly
+    summary: list
+    traverse: false
+    type: geo_point
+  sample_sex:
+    constraint:
+      enum:
+        - NA
+        - female
+        - hermaphrodite
+        - male
+        - pooled male and female
+    display_level: 2
+    display_group: assembly
+    summary: list
+    traverse: false
+    type: keyword
+  sex_determination_system:
+    constraint:
+      enum:
+        - XY
+        - X0
+        - X-
+        - ZW
+        - NA
+    display_level: 1
+    summary:
+      - list
+      - most_common
+    traverse: list
+    translate:
+      N/A: NA
+      XO: X0
+    type: keyword

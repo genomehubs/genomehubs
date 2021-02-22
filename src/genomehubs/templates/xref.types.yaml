@@ -1,0 +1,38 @@
+file:
+  display_group: xref
+  format: tsv
+  header: true
+attributes:
+  xref:
+    description: External database references
+    display_group: xrefs
+    display_level: 1
+    display_name: DB xrefs
+    header: xref
+    summary: list
+    traverse: false
+    type: keyword
+metadata:
+  source:
+    header: source
+  source_slug:
+    header: sourceSlug
+  source_url_stub:
+    header: sourceStub
+taxonomy:
+  taxon_id:
+    header: taxonId
+  phylum:
+    header: phylum
+  class:
+    header: class
+  order:
+    header: order
+  family:
+    header: family
+  genus:
+    header: genus
+  species:
+    header: species
+  subspecies:
+    header: subspecies

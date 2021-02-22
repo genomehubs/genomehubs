@@ -1,0 +1,64 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "nested": {
+                "path": "lineage",
+                "query": {
+                  "multi_match": {
+                    "query": "{{lineage}}",
+                    "fields": ["lineage.taxon_id", "lineage.scientific_name"]
+                  }
+                }
+              }
+            },
+            {
+              "bool": {
+                "should": [
+                  {
+                    "match": { "taxon_id": "{{searchTerm}}" }
+                  },
+                  {
+                    "nested": {
+                      "path": "taxon_names",
+                      "query": {
+                        "match_phrase_prefix": {
+                          "taxon_names.name": {
+                            "query": "{{searchTerm}}",
+                            "max_expansions": "{{size}}{{^size}}10{{/size}}"
+                          }
+                        }
+                      },
+                      "inner_hits": {
+                        "_source": false,
+                        "docvalue_fields": [
+                          {
+                            "field": "taxon_names.name.raw",
+                            "format": "use_field_mapping"
+                          },
+                          {
+                            "field": "taxon_names.unique",
+                            "format": "use_field_mapping"
+                          },
+                          {
+                            "field": "taxon_names.class",
+                            "format": "use_field_mapping"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "_source": { "includes": ["taxon_id", "taxon_rank", "scientific_name"] }
+    }
+  }
+}

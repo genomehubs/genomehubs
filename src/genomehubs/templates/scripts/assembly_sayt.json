@@ -1,0 +1,81 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "size": "{{size}}{{^size}}10{{/size}}",
+      "query": {
+        "bool": {
+          "should": [
+            {
+              "prefix": {
+                "assembly_id": {
+                  "value": "{{searchTerm}}",
+                  "boost": 10
+                }
+              }
+            },
+            {
+              "match_phrase_prefix": {
+                "assembly_id.text": {
+                  "query": "{{searchTerm}}",
+                  "boost": 5
+                }
+              }
+            },
+            {
+              "multi_match": {
+                "query": "{{searchTerm}}",
+                "type": "phrase_prefix",
+                "boost": 2,
+                "fields": [
+                  "assembly_id.live",
+                  "assembly_id.live._2gram",
+                  "assembly_id.live._3gram"
+                ]
+              }
+            },
+            {
+              "nested": {
+                "path": "identifiers",
+                "query": {
+                  "bool": {
+                    "must": {
+                      "multi_match": {
+                        "query": "{{searchTerm}}",
+                        "type": "phrase_prefix",
+                        "boost": 1.0,
+                        "fields": [
+                          "identifiers.identifier.live",
+                          "identifiers.identifier.live._2gram",
+                          "identifiers.identifier.live._3gram"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "inner_hits": {
+                  "_source": false,
+                  "docvalue_fields": [
+                    {
+                      "field": "identifiers.identifier.raw",
+                      "format": "use_field_mapping"
+                    },
+                    {
+                      "field": "identifiers.source",
+                      "format": "use_field_mapping"
+                    },
+                    {
+                      "field": "identifiers.class",
+                      "format": "use_field_mapping"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "_source": ["assembly_id", "taxon_id", "scientific_name", "identifiers.*"]
+    }
+  }
+}

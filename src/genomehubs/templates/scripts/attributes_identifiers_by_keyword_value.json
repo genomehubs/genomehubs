@@ -1,0 +1,11 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": { "match": { "{{keyword}}": "{{value}}" } },
+      "_source": {
+        "includes": ["{{keyword}}", "attributes.*", "identifiers.*"]
+      }
+    }
+  }
+}

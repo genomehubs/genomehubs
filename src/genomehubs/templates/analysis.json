@@ -1,0 +1,109 @@
+{
+  "index_patterns": ["analysis-*"],
+  "mappings": {
+    "properties": {
+      "analysis_id": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Unique analysis ID" }
+      },
+      "assembly_id": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Related assembly ID(s)" }
+      },
+      "taxon_id": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Related taxon ID(s)" }
+      },
+      "assembly_count": {
+        "type": "short",
+        "meta": { "description": "Count of associated assembly_ids" }
+      },
+      "taxon_count": {
+        "type": "short",
+        "meta": { "description": "Count of associated taxon_ids" }
+      },
+      "file_count": {
+        "type": "short",
+        "meta": { "description": "Count of associated file_ids" }
+      },
+      "feature_count": {
+        "type": "short",
+        "meta": { "description": "Count of associated feature_ids" }
+      },
+      "tree_count": {
+        "type": "short",
+        "meta": { "description": "Count of associated tree_ids" }
+      },
+      "name": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "meta": { "description": "Analysis name" }
+      },
+      "description": {
+        "type": "text",
+        "meta": { "description": "File description" }
+      },
+      "comment": {
+        "type": "text",
+        "index": false,
+        "meta": { "description": "File description" }
+      },
+      "ancestors": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Taxon IDs of ancestral taxa" }
+      },
+      "source": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "normalizer": "lowercase",
+        "meta": { "description": "Source of nested value" }
+      },
+      "source_index": {
+        "type": "keyword",
+        "ignore_above": 128,
+        "normalizer": "lowercase",
+        "meta": { "description": "Index containing source value" }
+      },
+      "source_doc_id": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "normalizer": "lowercase",
+        "meta": { "description": "Document ID containing source value" }
+      },
+      "source_author": {
+        "type": "text",
+        "meta": { "description": "Source publication author" }
+      },
+      "source_year": {
+        "type": "short",
+        "meta": { "description": "Source publication year" }
+      },
+      "source_title": {
+        "type": "text",
+        "meta": { "description": "Source publication title" }
+      },
+      "source_doi": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "normalizer": "lowercase",
+        "meta": { "description": "Source publication DOI" }
+      },
+      "source_pubmed_id": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "normalizer": "lowercase",
+        "meta": { "description": "Source publication pubmed ID" }
+      },
+      "source_slug": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "normalizer": "lowercase",
+        "meta": { "description": "Source url slug" }
+      }
+    }
+  }
+}

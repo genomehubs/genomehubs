@@ -1,0 +1,53 @@
+[
+  {
+    "name": "aboot.jpg",
+    "path": "/Users/rchallis/projects/tolkit/goat-ui/src/client/views/components/img/about.jpg",
+    "analysis_id": "image_import",
+    "assembly_id": ["GCA_000002315.3", "GCA_000146605.4"],
+    "description": "a random image file",
+    "title": "random image"
+  },
+  {
+    "path": "/Users/rchallis/projects/tolkit/goat-ui/src/client/views/components/img/about.jpg",
+    "analysis_id": "image_import",
+    "description": "an example image file",
+    "title": "example image"
+  },
+  {
+    "name": "cumulative.png",
+    "url": "https://blobtoolkit.genomehubs.org/api/v1/image/CBMN01/cumulative?format=png&width=2000",
+    "analysis_id": "btk-CBMN01",
+    "assembly_id": "GCA_000002315.3",
+    "description": "a cumulative plot from BTK",
+    "title": "cumulative plot CBMN01",
+    "local": "copy"
+  },
+  {
+    "name": "snail.png",
+    "url": "https://blobtoolkit.genomehubs.org/api/v1/image/CBMN01/snail?format=png&width=2000",
+    "link": "https://blobtoolkit.genomehubs.org/view/CBMN01/dataset/CBMN01/snail",
+    "analysis_id": "btk-CBMN01",
+    "description": "a snail plot from BTK",
+    "comment": "more information on the plot",
+    "title": "snail plot CBMN01",
+    "command": "interactive",
+    "command_version": "v1",
+    "date_created": "2020-03-17",
+    "analysis": {
+      "name": "BlobToolKit",
+      "title": "BlobToolKit analysis of GCA_000582825.1",
+      "description": "Analysis of public datasets using BTK",
+      "comment": "even more information about the analyis"
+    }
+  },
+  {
+    "name": "temp_file.gz",
+    "path": "/tmp/temp_file.gz",
+    "analysis_id": "test-data",
+    "taxon_id": "112521",
+    "assembly_id": "GCA_000582825.1",
+    "description": "a test of large file processing",
+    "title": "a large test file",
+    "command": "gzip -c ~/genomehubs/demo_resources/taxdump/ncbi/nodes.dmp > /tmp/temp_file.gz"
+  }
+]

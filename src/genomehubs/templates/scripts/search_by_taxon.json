@@ -1,0 +1,26 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": {
+        "bool": {
+          "should": [
+            {
+              "match": { "taxon_id": "{{searchTerm}}" }
+            },
+            {
+              "nested": {
+                "path": "taxon_names",
+                "query": {
+                  "match": {
+                    "taxon_names.name": "{{searchTerm}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

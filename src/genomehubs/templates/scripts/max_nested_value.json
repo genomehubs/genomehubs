@@ -1,0 +1,18 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "size": 0,
+      "aggs": {
+        "depths": {
+          "nested": {
+            "path": "{{path}}"
+          },
+          "aggs": {
+            "max_depth": { "max": { "field": "{{path}}.{{field}}" } }
+          }
+        }
+      }
+    }
+  }
+}

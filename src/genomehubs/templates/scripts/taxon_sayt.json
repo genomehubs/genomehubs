@@ -1,0 +1,115 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "size": "{{size}}{{^size}}10{{/size}}",
+      "query": {
+        "bool": {
+          "should": [
+            {
+              "match": {
+                "scientific_name": {
+                  "query": "{{searchTerm}}",
+                  "boost": 100
+                }
+              }
+            },
+            {
+              "match": {
+                "taxon_id": {
+                  "query": "{{searchTerm}}",
+                  "boost": 100
+                }
+              }
+            },
+            {
+              "prefix": {
+                "scientific_name": {
+                  "value": "{{searchTerm}}",
+                  "boost": 10
+                }
+              }
+            },
+            {
+              "wildcard": {
+                "scientific_name": {
+                  "value": "{{wildcardTerm}}",
+                  "boost": 10
+                }
+              }
+            },
+            {
+              "match_phrase_prefix": {
+                "scientific_name.text": {
+                  "query": "{{searchTerm}}",
+                  "max_expansions": "{{size}}{{^size}}10{{/size}}",
+                  "boost": 5
+                }
+              }
+            },
+            {
+              "multi_match": {
+                "query": "{{searchTerm}}",
+                "type": "phrase_prefix",
+                "boost": 2,
+                "fields": [
+                  "scientific_name.live",
+                  "scientific_name.live._2gram",
+                  "scientific_name.live._3gram"
+                ]
+              }
+            },
+            {
+              "nested": {
+                "path": "taxon_names",
+                "query": {
+                  "bool": {
+                    "must": {
+                      "multi_match": {
+                        "query": "{{searchTerm}}",
+                        "type": "phrase_prefix",
+                        "boost": 1.0,
+                        "fields": [
+                          "taxon_names.name.live",
+                          "taxon_names.name.live._2gram",
+                          "taxon_names.name.live._3gram"
+                        ]
+                      }
+                    },
+                    "must_not": {
+                      "match": { "taxon_names.class": "authority" }
+                    }
+                  }
+                },
+                "inner_hits": {
+                  "_source": false,
+                  "docvalue_fields": [
+                    {
+                      "field": "taxon_names.name.raw",
+                      "format": "use_field_mapping"
+                    },
+                    {
+                      "field": "taxon_names.unique",
+                      "format": "use_field_mapping"
+                    },
+                    {
+                      "field": "taxon_names.class",
+                      "format": "use_field_mapping"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "_source": [
+        "taxon_id",
+        "scientific_name",
+        "unique_name",
+        "taxon_rank",
+        "taxon_names.*"
+      ]
+    }
+  }
+}

@@ -1,0 +1,244 @@
+file:
+  display_group: misc
+  format: tsv
+  header: true
+  organelle: nucleus
+  source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  source: NCBI Datasets
+taxonomy:
+  taxon_id:
+    header: taxId
+  species:
+    header: speciesName
+names:
+  common_name:
+    header: commonName
+identifiers:
+  assembly_id:
+    constraint:
+      len: 32
+    header: genbankAssmAccession
+    type: keyword
+  genbank_accession:
+    constraint:
+      len: 32
+    header: genbankAssmAccession
+    type: keyword
+  refseq_accession:
+    constraint:
+      len: 32
+    header: refseqAssmAccession
+    type: keyword
+  bioproject_accession:
+    constraint:
+      len: 32
+    header: bioProjectAccession
+    type: keyword
+  biosample_accession:
+    constraint:
+      len: 32
+    header: biosampleAccession
+    separator:
+      - ";"
+    type: keyword
+  wgs_accession:
+    constraint:
+      len: 16
+    header: wgsProjectAccession
+    type: keyword
+  assembly_name:
+    constraint:
+      len: 64
+    header: assemblyName
+    type: keyword
+attributes:
+  gene_count:
+    display_group: annotation
+    display_level: 1
+    display_name: Gene count
+    constraint:
+      min: 1
+    header: geneCountTotal
+    type: integer
+    taxon_display_group: assembly
+    taxon_name: gene_count
+    taxon_key: gene_count
+    taxon_summary: median
+    taxon_display_level: 2
+    taxon_bins:
+      min: 0
+      max: 5
+      count: 10
+      scale: log10
+  protein_count:
+    display_group: annotation
+    display_level: 2
+    display_name: Protein count
+    constraint:
+      min: 1
+    header: geneCountProteincoding
+    type: integer
+  pseudogene_count:
+    display_group: annotation
+    display_level: 2
+    display_name: Pseudogene count
+    constraint:
+      min: 1
+    header: geneCountPseudogene
+    type: integer
+  noncoding_gene_count:
+    display_group: annotation
+    display_level: 2
+    display_name: Non-coding gene count
+    constraint:
+      min: 1
+    header: geneCountNoncoding
+    type: integer
+  sample_sex:
+    display_level: 2
+    display_name: Sample sex
+    header: sex
+    type: keyword
+    taxon_display_group: assembly
+    taxon_name: sample_sex
+    taxon_key: sample_sex
+    taxon_display_name: Sample sex
+    taxon_summary: list
+    taxon_display_level: 2
+  isolate:
+    display_level: 2
+    header: isolate
+    display_name: Isolate
+    type: keyword
+  assembly_level:
+    display_level: 1
+    header: assemblyLevel
+    display_name: Assembly level
+    type: keyword
+  assembly_type:
+    display_level: 2
+    header: assemblyType
+    display_name: Assembly type
+    type: keyword
+  assembly_span:
+    display_group: metrics
+    display_level: 1
+    display_name: Assembly span
+    constraint:
+      min: 1
+    header: totalSequenceLength
+    type: long
+    units: bases
+    taxon_display_group: assembly
+    taxon_name: assembly_span
+    taxon_key: assembly_span
+    taxon_display_name: Assembly span
+    taxon_summary: median
+    taxon_traverse: median
+    taxon_traverse_direction: both
+    taxon_traverse_limit: superkingdom
+    taxon_display_level: 1
+    taxon_bins:
+      min: 6
+      max: 11
+      count: 10
+      scale: log10
+  ungapped_span:
+    display_group: metrics
+    display_level: 2
+    display_name: Ungapped span
+    constraint:
+      min: 1
+    header: totalUngappedLength
+    type: long
+    units: bases
+  contig_n50:
+    display_group: metrics
+    display_level: 1
+    display_name: Contig N50
+    constraint:
+      min: 1
+    header: contigN50
+    type: long
+    units: bases
+  contig_l50:
+    display_group: metrics
+    display_level: 2
+    display_name: Contig L50
+    constraint:
+      min: 1
+    header: contigL50
+    type: long
+    units: bases
+  scaffold_n50:
+    display_group: metrics
+    display_level: 1
+    display_name: Scaffold N50
+    constraint:
+      min: 1
+    header: scaffoldN50
+    type: long
+    units: bases
+  scaffold_l50:
+    display_group: metrics
+    display_level: 2
+    display_name: Scaffold L50
+    constraint:
+      min: 1
+    header: scaffoldL50
+    type: long
+    units: bases
+  contig_count:
+    display_group: metrics
+    display_level: 1
+    display_name: Contig count
+    constraint:
+      min: 1
+    header: numberOfContigs
+    type: long
+    units: bases
+  scaffold_count:
+    display_group: metrics
+    display_level: 1
+    display_name: Scaffold count
+    constraint:
+      min: 1
+    header: numberOfScaffolds
+    type: long
+    units: bases
+  chromosome_count:
+    display_group: metrics
+    display_level: 1
+    display_name: Chromosome count
+    constraint:
+      min: 1
+    header: totalNumberOfChromosomes
+    type: long
+    units: bases
+  sequence_count:
+    display_group: metrics
+    display_level: 2
+    display_name: Sequence count
+    constraint:
+      min: 1
+    header: numberOfComponentSequences
+    type: long
+    units: bases
+  last_updated:
+    display_level: 2
+    display_name: Last updated
+    header: submissionDate
+    type: date
+  refseq_category:
+    display_level: 2
+    header: refseqCategory
+    display_name: RefSeq category
+    type: keyword
+  submitter:
+    display_level: 2
+    header: submitter
+    display_name: Submitter
+    type: keyword
+metadata:
+  source_slug:
+    header: genbankAssmAccession

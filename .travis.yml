@@ -1,0 +1,82 @@
+language: python
+dist: xenial
+cache: false
+env:
+  global:
+    - LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
+    - SEGFAULT_SIGNALS=all
+    - LANG=en_US.UTF-8
+    - TWINE_USERNAME=__token__
+before_install:
+  - python --version
+  - uname -a
+  - lsb_release -a || true
+  - |
+    if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+      [[ $TOXENV =~ py3 ]] && brew upgrade python
+      [[ $TOXENV =~ py2 ]] && brew install python@2
+      export PATH="/usr/local/opt/python/libexec/bin:${PATH}"
+    fi
+install:
+  - python -mpip install --progress-bar=off twine tox-wheel -rci/requirements.txt
+  - virtualenv --version
+  - easy_install --version
+  - pip --version
+  - tox --version
+script:
+  - |
+    (
+    set -eux
+    if [[ -n ${WHEEL_MANYLINUX1:-} ]]; then
+      docker run --rm --user $UID -itv $(pwd):/code ionelmc/manylinux $WHEEL_MANYLINUX1
+      tox --installpkg $WHEEL_PATH/*.whl -v
+    else
+      tox -v
+    fi
+    )
+after_failure:
+  - more .tox/log/* | cat
+  - more .tox/*/log/* | cat
+notifications:
+  email:
+    on_success: never
+    on_failure: always
+
+jobs:
+  include:
+    - stage: test
+      script: scripts/tox_build.sh
+      python: "3.8"
+      env:
+        - TOXENV=check
+    - env:
+        - TOXENV=docs
+      python: "3.8"
+    - env:
+        - TOXENV=py36-cover,extension-coveralls,coveralls
+      python: "3.6"
+    - env:
+        - TOXENV=py37-cover,extension-coveralls,coveralls
+      python: "3.7"
+    - env:
+        - TOXENV=py38-cover,extension-coveralls,coveralls
+      python: "3.8"
+    - stage: deploy
+      env:
+        - TOXENV=py38-cover
+      python: "3.8"
+      script: scripts/tox_build.sh PyPI
+      deploy:
+        - provider: pypi
+          username: "__token__"
+          password:
+            secure: iQ9tJBM9VcMm5VHeQeLgFoV4TuwV/ntMOfbJsclfqY4B2lnydc4hWNYJPoYUAXs+2cXOSK+yuQx/pR16m32YxDjjEnxLBes/xJdh3lniQWTralIHeO+Pd/8buDyQN7g60d9Kl8ik5tXrFA3A1jYLDIFoGCe4HSlbdyKd92xHIF8qp+zCUTYg5dLFH47PomSCGA3Hnz0kFNl+X8LW9gVgzpDMTfEmMfhig+l59RbFmU8POVU+mU7P2uPY0tTDGSy0MrPvFDdb9oRNE2uu3bkYpEXHF64mZSnp9/92ZF6ffyPFhKIhomaPcE+8hmLwG0hMqjM6TeeFir47KoV+CgDeQ7h+4Y/QRYtJyj7RJHDAtaDyOzd4nfCUBNMIFZh6yHIqgYIOfJKOdPXOt3APbqDimI/vFCtMfyqstXYoGD4P8MB9U2gj6r9dnlSQ/s3/Nd9hb5/jAbn8u30BMAQlawXCL8kNQNTMlJiXshwWP7x8Ot9NTR0KIuaFZB55vnpO8GOcD5pEKiOC6n7oLkDIMGByxWlPHcXj0HLGvOks/3fw/MqKBiMkLPcP7Rhsv8ba8PgxTKU0G24O+NPVSn6LRn4T5ylsj8IbMCzTkoelOgreYpNL8mXHATtQBsWNdXesXffsWRTwHky/NFbyGyhh87OMu/3ENVgB7dd03dl/4hQ2f+M=
+          on:
+            tags: true
+            branch: master
+        - provider: releases
+          api_key: $GITHUB_OAUTH_TOKEN
+          cleanup: false
+          on:
+            tags: true
+            branch: master

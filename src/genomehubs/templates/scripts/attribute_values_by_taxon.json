@@ -1,0 +1,80 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "from": "{{from}}{{^from}}0{{/from}}",
+      "size": "{{size}}{{^size}}10{{/size}}",
+      "query": {
+        "bool": {
+          "filter": [
+            {
+              "bool": {
+                "should": [
+                  { "match": { "taxon_id": "{{taxon_id}}" } },
+                  {
+                    "nested": {
+                      "path": "lineage",
+                      "query": {
+                        "match": { "lineage.taxon_id": "{{taxon_id}}" }
+                      },
+                      "inner_hits": {
+                        "_source": false,
+                        "docvalue_fields": [
+                          {
+                            "field": "lineage.taxon_id",
+                            "format": "use_field_mapping"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "nested": {
+                "path": "attributes",
+                "query": {
+                  "bool": {
+                    "filter": [
+                      { "match": { "attributes.key": "{{attribute}}" } },
+                      {
+                        "nested": {
+                          "path": "attributes.values",
+                          "query": {
+                            "exists": {
+                              "field": "attributes.values.{{value_type}}"
+                            }
+                          },
+                          "inner_hits": {
+                            "_source": false,
+                            "docvalue_fields": [
+                              {
+                                "field": "attributes.values.{{value_type}}",
+                                "format": "use_field_mapping"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "inner_hits": {
+                  "_source": false,
+                  "docvalue_fields": [
+                    {
+                      "field": "attributes.key",
+                      "format": "use_field_mapping"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "_source": "taxon_id"
+    }
+  }
+}

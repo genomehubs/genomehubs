@@ -1,0 +1,119 @@
+file:
+  display_group: misc
+  format: tsv
+  header: true
+  source_url_stub: https://www.ncbi.nlm.nih.gov/nuccore/
+  source: NCBI Organelle Genome Resources
+attributes:
+  assembly_span:
+    display_group: metrics
+    display_level: 1
+    constraint:
+      min: 1
+    index: 8
+    type: long
+    units: bases
+    taxon_display_group: "{{organelle}}_assembly"
+    taxon_name: "{{organelle}}_assembly_span"
+    taxon_key: "{{organelle}}_assembly_span"
+    taxon_display_name: "{{organelle}} span"
+    taxon_summary: median
+    taxon_traverse: median
+    taxon_traverse_limit: phylum
+    taxon_display_level: 2
+    taxon_bins:
+      min: 3
+      max: 8
+      count: 10
+      scale: log10
+  gc_percent:
+    display_group: metrics
+    display_level: 1
+    constraint:
+      min: 0
+      max: 100
+    index: 9
+    type: 2dp
+    units: "%"
+    taxon_display_group: "{{organelle}}_assembly"
+    taxon_display_name: "{{organelle}} GC%"
+    taxon_name: "{{organelle}}_gc_percent"
+    taxon_key: "{{organelle}}_gc_percent"
+    taxon_summary: median
+    taxon_traverse: median
+    taxon_traverse_limit: phylum
+    taxon_display_level: 2
+    taxon_bins:
+      min: 0
+      max: 100
+      count: 10
+      scale: linear
+  n_percent:
+    display_group: metrics
+    display_level: 1
+    constraint:
+      min: 0
+      max: 100
+    index: 10
+    type: 2dp
+    units: "%"
+  last_updated:
+    display_level: 2
+    index: 11
+    type: date
+  sample_location:
+    display_level: 2
+    index: 12
+    type: geo_point
+    taxon_display_group: "{{organelle}}_assembly"
+    taxon_name: "{{organelle}}_sample_location"
+    taxon_key: "{{organelle}}_sample_location"
+    taxon_display_name: "{{organelle}} sample location"
+    taxon_summary: list
+    taxon_display_level: 2
+identifiers:
+  assembly_id:
+    constraint:
+      len: 32
+    index: 3
+    type: keyword
+  genbank_accession:
+    constraint:
+      len: 32
+    index: 4
+    type: keyword
+  refseq_accession:
+    constraint:
+      len: 32
+    index: 3
+    type: keyword
+  bioproject_accession:
+    constraint:
+      len: 32
+    index: 5
+    type: keyword
+  biosample_accession:
+    constraint:
+      len: 32
+    index: 6
+    type: keyword
+metadata:
+  organelle:
+    index: 7
+  source_author:
+    index: 13
+  source_year:
+    index: 14
+  source_title:
+    index: 15
+  source_pubmed_id:
+    index: 16
+  source_slug:
+    index: 3
+taxonomy:
+  taxon:
+    index: 0
+  taxon_id:
+    index: 1
+  lineage:
+    index: 2
