@@ -597,7 +597,10 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA", "None"
                 intermediates += 1
             if alt_taxon_id in ancestors:
                 closest_rank = rank
-                if obj["taxonomy"][rank] in matches:
+                if (
+                    obj["taxonomy"][rank] in matches
+                    and obj["taxonomy"][anc_rank] in matches[obj["taxonomy"][rank]]
+                ):
                     closest_taxon = matches[obj["taxonomy"][rank]][
                         obj["taxonomy"][anc_rank]
                     ][0]
