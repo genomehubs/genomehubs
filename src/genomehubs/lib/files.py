@@ -70,8 +70,10 @@ def process_image_file(infile, filename, opts, *, dest_dir="./", attrs=None):
         if filename != thumbname:
             try:
                 im.thumbnail(dimensions)
+                os.makedirs("%s/%s" % (opts["hub-path"], dest_dir), exist_ok=True)
                 im.save("%s/%s/%s" % (opts["hub-path"], dest_dir, thumbname))
-            except OSError:
+            except OSError as err:
+                print(err)
                 LOGGER.warn("Cannot create thumbnail for '%s'", infile)
         attrs.update()
     return attrs

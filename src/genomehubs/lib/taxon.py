@@ -11,6 +11,7 @@ from tolkein import tolog
 from tqdm import tqdm
 
 from .es_functions import EsQueryBuilder
+from .es_functions import document_by_id
 from .es_functions import index_stream
 from .es_functions import query_keyword_value_template
 from .es_functions import query_value_template
@@ -46,29 +47,39 @@ def lookup_taxa_by_taxon_id(es, values, template, *, return_type="list"):
     taxa = []
     if return_type == "dict":
         taxa = {}
-    taxon_res = query_keyword_value_template(
-        es,
-        "attributes_names_by_keyword_value",
-        "taxon_id",
-        values,
-        index=template["index_name"],
+    res = document_by_id(
+        es, ["taxon_id-%s" % value for value in values], template["index_name"]
     )
-    if taxon_res is not None:
-        for response in taxon_res["responses"]:
-            if "hits" in response and response["hits"]["total"]["value"] == 1:
-                if return_type == "list":
-                    taxa.append(response["hits"]["hits"][0])
-                else:
-                    taxa[response["hits"]["hits"][0]["_source"]["taxon_id"]] = response[
-                        "hits"
-                    ]["hits"][0]
-            elif return_type == "list":
-                taxa.append(None)
+    if res is not None:
+        if return_type == "list":
+            taxa = [key.replace("taxon_id-", "") for key in res.keys()]
+        else:
+            for key, source in res.items():
+                taxon_id = key.replace("taxon_id-", "")
+                taxa.update({taxon_id: {"_id": key, "_source": source}})
+    # taxon_res = query_keyword_value_template(
+    #     es,
+    #     "attributes_names_by_keyword_value",
+    #     "taxon_id",
+    #     values,
+    #     index=template["index_name"],
+    # )
+    # if taxon_res is not None:
+    #     for response in taxon_res["responses"]:
+    #         if "hits" in response and response["hits"]["total"]["value"] == 1:
+    #             if return_type == "list":
+    #                 taxa.append(response["hits"]["hits"][0])
+    #             else:
+    #                 taxa[response["hits"]["hits"][0]["_source"]["taxon_id"]] = response[
+    #                     "hits"
+    #                 ]["hits"][0]
+    #         elif return_type == "list":
+    #             taxa.append(None)
     return taxa
 
 
 def lookup_missing_taxon_ids(
-    es, without_ids, opts, *, with_ids=None, blanks=set(["NA"])
+    es, without_ids, opts, *, with_ids=None, blanks=set(["NA", "None"])
 ):
     """Lookup taxon ID based on available taxonomic information."""
     if with_ids is None:
@@ -99,7 +110,10 @@ def lookup_missing_taxon_ids(
                 )
                 if index == 1 and not taxon_ids:
                     break
-                for anc_rank in ranks[2:]:
+                # TODO: Allow lookup for higher taxa
+                # if not taxon_ids:
+                #     continue
+                for anc_rank in ranks[(index + 1) :]:
                     if (
                         anc_rank not in obj["taxonomy"]
                         or obj["taxonomy"][anc_rank] in blanks
@@ -153,7 +167,7 @@ def fix_missing_ids(
     taxon_template,
     failed_rows,
     with_ids=None,
-    blanks=set(["NA"]),
+    blanks=set(["NA", "None"]),
     header=None,
 ):
     """Find or create taxon IDs for rows without."""
@@ -183,7 +197,7 @@ def fix_missing_ids(
                     with_ids[created_id] = without_ids[created_id]
                     found_ids[created_id] = True
                     del without_ids[created_id]
-    if failed_rows:
+    if without_ids and failed_rows:
         for key, value in found_ids.items():
             if key in failed_rows:
                 del failed_rows[key]
@@ -306,7 +320,7 @@ def list_ancestors(taxa):
     return list(ancestors)
 
 
-def add_names_to_list(existing, new, *, blanks=set({"NA"})):
+def add_names_to_list(existing, new, *, blanks=set({"NA", "None"})):
     """Add names to a list if they do not already exist."""
     names = defaultdict(dict)
     for entry in existing:
@@ -322,14 +336,19 @@ def add_names_to_list(existing, new, *, blanks=set({"NA"})):
             names[name_class][name] = True
 
 
-def add_names_and_attributes_to_taxa(es, data, opts, *, template, blanks=set(["NA"])):
+def add_names_and_attributes_to_taxa(
+    es, data, opts, *, template, blanks=set(["NA", "None"])
+):
     """Add names and attributes to taxa."""
     for values in chunks(list(data.keys()), 500):
         # taxa = lookup_taxa_by_taxon_id(es, values, template, return_type="list")
         all_taxa = find_or_create_taxa(
             es, opts, taxon_ids=values, taxon_template=template,
         )
-        taxa = [all_taxa[taxon_id] for taxon_id in values if taxon_id in all_taxa]
+        taxa = []
+        for taxon_id in values:
+            if taxon_id in all_taxa:
+                taxa.append(all_taxa[taxon_id])
         for doc in taxa:
             if doc is not None:
                 taxon_data = data[doc["_source"]["taxon_id"]]
@@ -458,10 +477,7 @@ def create_descendant_taxon(taxon_id, rank, name, closest_taxon):
             "taxon_rank": rank,
             "scientific_name": name,
             "parent": closest_taxon["_source"]["taxon_id"],
-            "taxon_names": [
-                {"class": "temporary taxon id", "name": taxon_id},
-                {"class": "scientific name", "name": name},
-            ],
+            "taxon_names": [{"class": "scientific name", "name": name}],
         },
     }
     lineage = [
@@ -486,19 +502,25 @@ def create_descendant_taxon(taxon_id, rank, name, closest_taxon):
     return desc_taxon
 
 
-def add_new_taxon(alt_taxon_id, new_taxa, obj, closest_taxon):
+def add_new_taxon(alt_taxon_id, new_taxa, obj, closest_taxon, *, blanks={"NA", "None"}):
     """Add a new taxon with alt_taxon_id to list of taxa."""
+    # TODO: Allow creation of new higher taxa
     if alt_taxon_id not in new_taxa:
         alt_rank = "species"
-        if "subspecies" in obj["taxonomy"] and obj["taxonomy"]["subspecies"]:
+        if (
+            "subspecies" in obj["taxonomy"]
+            and obj["taxonomy"]["subspecies"]
+            and obj["taxonomy"]["subspecies"] not in blanks
+        ):
             alt_rank = "subspecies"
         new_taxon = create_descendant_taxon(
             alt_taxon_id, alt_rank, obj["taxonomy"][alt_rank], closest_taxon
         )
         new_taxa.update({new_taxon["_source"]["taxon_id"]: new_taxon["_source"]})
+    return new_taxon
 
 
-def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA"])):
+def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA", "None"])):
     """Create new taxa using alternate taxon IDs."""
     default_ranks = [
         "genus",
@@ -526,7 +548,7 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA"])):
         else:
             ranks = default_ranks
         max_index = len(ranks) - 1
-        max_rank = ranks[max_index]
+        # max_rank = ranks[max_index]
         for index, rank in enumerate(ranks[: (max_index - 1)]):
             if rank not in obj["taxonomy"] or obj["taxonomy"][rank] in blanks:
                 continue
@@ -559,7 +581,8 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA"])):
                         ancestors.update({alt_taxon_id: taxa[0]})
                         matches[obj["taxonomy"][rank]][obj["taxonomy"][anc_rank]] = taxa
                         break
-                elif anc_rank == max_rank and intermediates == 0:
+                # elif anc_rank == max_rank and intermediates == 0:
+                elif intermediates == 0:
                     taxa, name_class = lookup_taxon(
                         es,
                         obj["taxonomy"][anc_rank],
@@ -600,7 +623,10 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA"])):
                 closest_rank = intermediate["rank"]
                 closest_taxon = new_taxon
             ancestors[alt_taxon_id] = closest_taxon
-            add_new_taxon(alt_taxon_id, new_taxa, obj, closest_taxon)
+            added_taxon = add_new_taxon(alt_taxon_id, new_taxa, obj, closest_taxon)
+            matches[added_taxon["_source"]["scientific_name"]][
+                closest_taxon["_source"]["scientific_name"]
+            ] = [added_taxon]
     pbar.close()
     index_stream(
         es, taxon_template["index_name"], stream_taxa(new_taxa),
@@ -608,48 +634,48 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA"])):
     return new_taxa.keys()
 
 
-def parse_taxa(es, types, taxonomy_template):
-    """Test method to parse taxa."""
-    taxa = [
-        {
-            "taxon_id": 110368,
-            "assembly_span": 12344567,
-            "c_value": 2.5,
-            "sex_determination_system": "N/A",
-        },
-        {
-            "taxon_id": 13037,
-            "assembly_span": 2345678,
-            "c_value": 2.3,
-            "sex_determination_system": "XO",
-        },
-        {
-            "taxon_id": 113334,
-            "assembly_span": 45678912,
-            "c_value": 4.6,
-            "sex_determination_system": "XY",
-        },
-    ]
-    for entry in taxa:
-        # attributes = {}
-        taxon_id = str(entry["taxon_id"])
-        doc = lookup_taxon_by_taxid(es, taxon_id, taxonomy_template)
-        if doc is None:
-            LOGGER.warning(
-                "No %s taxonomy record for %s",
-                taxonomy_template["index_name"],
-                taxon_id,
-            )
-        attributes = add_attributes(entry, types, attributes=[])[0]
-        doc.update({"taxon_id": taxon_id, "attributes": attributes})
-        doc_id = "taxon_id-%s" % taxon_id
-        yield doc_id, doc
+# def parse_taxa(es, types, taxonomy_template):
+#     """Test method to parse taxa."""
+#     taxa = [
+#         {
+#             "taxon_id": 110368,
+#             "assembly_span": 12344567,
+#             "c_value": 2.5,
+#             "sex_determination_system": "N/A",
+#         },
+#         {
+#             "taxon_id": 13037,
+#             "assembly_span": 2345678,
+#             "c_value": 2.3,
+#             "sex_determination_system": "XO",
+#         },
+#         {
+#             "taxon_id": 113334,
+#             "assembly_span": 45678912,
+#             "c_value": 4.6,
+#             "sex_determination_system": "XY",
+#         },
+#     ]
+#     for entry in taxa:
+#         # attributes = {}
+#         taxon_id = str(entry["taxon_id"])
+#         doc = lookup_taxon_by_taxid(es, taxon_id, taxonomy_template)
+#         if doc is None:
+#             LOGGER.warning(
+#                 "No %s taxonomy record for %s",
+#                 taxonomy_template["index_name"],
+#                 taxon_id,
+#             )
+#         attributes = add_attributes(entry, types, attributes=[])[0]
+#         doc.update({"taxon_id": taxon_id, "attributes": attributes})
+#         doc_id = "taxon_id-%s" % taxon_id
+#         yield doc_id, doc
 
 
-def index(es, opts, *, taxonomy_name="ncbi"):
-    """Index a set of taxa."""
-    LOGGER.info("Indexing taxa using %s taxonomy", taxonomy_name)
-    template = index_template(taxonomy_name, opts)
-    taxonomy_template = taxonomy_index_template(taxonomy_name, opts)
-    stream = parse_taxa(es, template["types"], taxonomy_template)
-    return template, stream
+# def index(es, opts, *, taxonomy_name="ncbi"):
+#     """Index a set of taxa."""
+#     LOGGER.info("Indexing taxa using %s taxonomy", taxonomy_name)
+#     template = index_template(taxonomy_name, opts)
+#     taxonomy_template = taxonomy_index_template(taxonomy_name, opts)
+#     stream = parse_taxa(es, template["types"], taxonomy_template)
+#     return template, stream

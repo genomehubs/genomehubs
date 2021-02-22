@@ -103,6 +103,7 @@ setup(
         "filetype>=1.0.7",
         "Pillow>=8.0",
         "pyyaml",
+        "sparqlwrapper>=1.4.1",
         "tolkein>=0.2.1",
         "ujson>=3.0.0",
     ],  # Optional

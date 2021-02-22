@@ -234,6 +234,8 @@ def set_values_from_descendants(
         if not traverseable:
             continue
         traverse_limit = meta[key].get("traverse_limit", None)
+        if traverse_limit and taxon_rank == traverse_limit:
+            continue
         try:
             attribute = next(entry for entry in attributes if entry["key"] == key)
         except StopIteration:
@@ -300,7 +302,7 @@ def traverse_from_tips(es, opts, *, template):
             if node["_source"]["taxon_id"] in parents:
                 if "attributes" not in node["_source"]:
                     node["_source"]["attributes"] = []
-                changed = set_values_from_descendants(
+                modified = set_values_from_descendants(
                     attributes=node["_source"]["attributes"],
                     descendant_values=parents[node["_source"]["taxon_id"]],
                     meta=meta,
@@ -308,6 +310,8 @@ def traverse_from_tips(es, opts, *, template):
                     parents=parents,
                     taxon_rank=node["_source"]["taxon_rank"],
                 )
+                if not changed:
+                    changed = modified
             if changed:
                 yield node["_id"], node["_source"]
         root_depth -= 1
@@ -321,7 +325,12 @@ def copy_attribute_summary(source, meta):
             dest["median"] = source["median"]
         elif key != "list" and key in source:
             dest[key] = source[key]
-    dest["%s_value" % meta["type"]] = source["%s_value" % meta["type"]]
+    try:
+        dest["%s_value" % meta["type"]] = source["%s_value" % meta["type"]]
+    except KeyError as err:
+        print(source)
+        print(meta)
+        raise (err)
     dest["count"] = source["count"]
     dest["key"] = source["key"]
     return dest
@@ -415,7 +424,7 @@ def main(args):
             if "traverse-root" in options["fill"]:
                 if "traverse-infer-ancestors" in options["fill"]:
                     LOGGER.info("Inferring ancestral values")
-                    traverse_from_tips(es, options["fill"], template=template)
+                    # traverse_from_tips(es, options["fill"], template=template)
                     index_stream(
                         es,
                         template["index_name"],

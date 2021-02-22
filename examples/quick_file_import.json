@@ -1,0 +1,16 @@
+[
+  {
+    "name": "aboot.jpg",
+    "path": "/Users/rchallis/projects/tolkit/goat-ui/src/client/views/components/img/about.jpg",
+    "analysis_id": "image_import",
+    "assembly_id": ["GCA_000002315.3", "GCA_000146605.4"],
+    "description": "a random image file",
+    "title": "random image"
+  },
+  {
+    "path": "/Users/rchallis/projects/tolkit/goat-ui/src/client/views/components/img/about.jpg",
+    "analysis_id": "image_import",
+    "description": "an example image file",
+    "title": "example image"
+  }
+]

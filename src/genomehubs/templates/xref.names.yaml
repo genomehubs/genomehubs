@@ -1,0 +1,21 @@
+file:
+  format: tsv
+  header: true
+taxon_names:
+  wikidata_id:
+    header: wikidataTaxonId
+taxonomy:
+  taxon_id:
+    header: ncbiTaxonId
+  alt_taxon_id:
+    header: wikidataTaxonId
+  species:
+    header: species
+  subspecies:
+    header: subspecies
+  genus:
+    header: genus
+  family:
+    header: family
+  phylum:
+    header: phylum

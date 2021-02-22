@@ -4,12 +4,20 @@
 Parse a local or remote data source.
 
 Usage:
-    genomehubs parse [--ncbi-datasets-genome PATH] [--outfile PATH]
+    genomehubs parse [--wikidata] [--wikidata-root STRING...] [--wikidata-xref STRING...]
+                     [--gbif] [--gbif-root STRING...] [--gbif-xref STRING...]
+                     [--ncbi-datasets-genome PATH] [--outfile PATH]
                      [--refseq-mitochondria] [--refseq-organelles]
                      [--refseq-plastids] [--refseq-root NAME]
                      [-h|--help] [-v|--version]
 
 Options:
+    --gbif                       Parse taxa in GBIF
+    --gbif-root STRING           GBIF taxon ID of root taxon
+    --gbif-xref STRING           Include link to external reference from GBIF (e.g. NBN, BOLD)
+    --wikidata                   Parse taxa in WikiData
+    --wikidata-root STRING       WikiData taxon ID of root taxon
+    --wikidata-xref STRING       Include link to external reference from WikiData (e.g. NBN, BOLD)
     --ncbi-datasets-genome PATH  Parse NCBI Datasets genome directory
     --outfile PATH               Save parsed output to file
     --refseq-mitochondria        Parse mitochondrial genomes from the NCBI RefSeq
@@ -32,15 +40,18 @@ from tolkein import tofile
 from tolkein import tolog
 
 from .config import config
+from .gbif import gbif_parser
 from .hub import load_types
 from .hub import order_parsed_fields
 from .ncbi import ncbi_genome_parser
 from .ncbi import refseq_organelle_parser
 from .version import __version__
+from .wikidata import wikidata_parser
 
 LOGGER = tolog.logger(__name__)
 
 PARSERS = {
+    "gbif": {"func": gbif_parser, "params": None, "types": "xref"},
     "ncbi-datasets-genome": {
         "func": ncbi_genome_parser,
         "params": None,
@@ -61,6 +72,7 @@ PARSERS = {
         "params": ("plastid"),
         "types": "organelle",
     },
+    "wikidata": {"func": wikidata_parser, "params": None, "types": "xref"},
 }
 
 
@@ -75,10 +87,12 @@ def main(args):
                 params = options["parse"][option]
             parsed = PARSERS[option]["func"](params, options["parse"])
             types = load_types(PARSERS[option]["types"])
-            data = order_parsed_fields(parsed, types)
+            names = load_types(PARSERS[option]["types"], part="names")
+            data = order_parsed_fields(parsed, types, names)
             tofile.write_file(options["parse"]["outfile"], data)
             filepath = Path(options["parse"]["outfile"])
             types["file"]["name"] = filepath.name
+            names["file"]["name"] = filepath.name
             outdir = filepath.parent
             suff = re.compile(r"\.[^\.]+$")
             if filepath.name.endswith(".gz"):
@@ -86,6 +100,8 @@ def main(args):
             else:
                 stem = filepath.stem
             tofile.write_file("%s/%s.types.yaml" % (outdir, stem), types)
+            if names:
+                tofile.write_file("%s/%s.names.yaml" % (outdir, stem), names)
 
 
 def cli():

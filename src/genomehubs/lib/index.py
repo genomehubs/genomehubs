@@ -140,7 +140,7 @@ def index_file(es, types, data, opts):
                 else:
                     failed_rows["None"].append(row)
         LOGGER.info("Found taxon IDs in %d entries", len(with_ids.keys()))
-        with_ids, without_ids = fix_missing_ids(
+        create_ids, without_ids = fix_missing_ids(
             es,
             opts,
             without_ids,
@@ -151,7 +151,7 @@ def index_file(es, types, data, opts):
             blanks=blanks,
             header=header,
         )
-        if with_ids:
+        if with_ids or create_ids:
             LOGGER.info("Indexing %d entries", len(with_ids.keys()))
             if opts["index"] == "taxon":
                 docs = add_names_and_attributes_to_taxa(
@@ -201,6 +201,16 @@ def main(args):
         data_dir = "%s-dir" % index
         if data_dir in options["index"]:
             dir_path = options["index"][data_dir]
+            for types_file in sorted(Path(dir_path).glob("*.names.yaml")):
+                types, data = validate_types_file(types_file, dir_path)
+                LOGGER.info("Indexing %s" % types["file"]["name"])
+                index_types(es, index, types, options["index"])
+                index_file(
+                    es,
+                    types,
+                    data,
+                    {**options["index"], "index": index, "index_types": index_types},
+                )
             for types_file in sorted(Path(dir_path).glob("*.types.yaml")):
                 types, data = validate_types_file(types_file, dir_path)
                 LOGGER.info("Indexing %s" % types["file"]["name"])

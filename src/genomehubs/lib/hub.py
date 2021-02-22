@@ -4,6 +4,7 @@
 import os
 import re
 import sys
+from copy import deepcopy
 from pathlib import Path
 
 from tolkein import tofile
@@ -20,12 +21,12 @@ def setup(opts):
     return True
 
 
-def load_types(name):
+def load_types(name, *, part="types"):
     """Read a types file from the templates directory."""
     script_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     types = None
     try:
-        types_file = os.path.join(script_dir, "templates", name + ".types.yaml")
+        types_file = os.path.join(script_dir, "templates", "%s.%s.yaml" % (name, part))
         types = tofile.load_yaml(types_file)
         try:
             for key, value in types.items():
@@ -51,20 +52,34 @@ def index_templator(parts, opts):
     script_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     mapping_file = os.path.join(script_dir, "templates", parts[0] + ".json")
     types = load_types(parts[0])
+    names = load_types(parts[0], part="names")
     template = {
         "name": parts[0],
         "index_name": opts["hub-separator"].join(parts),
         "mapping": tofile.load_yaml(mapping_file),
         "types": types,
+        "names": names,
     }
     return template
 
 
-def order_parsed_fields(parsed, types):
+def order_parsed_fields(parsed, types, names=None):
     """Order parsed fields using a template file."""
     columns = {}
     fields = {}
     ctr = 0
+    types = deepcopy(types)
+    if names is not None:
+        for group, entries in names.items():
+            if group not in types:
+                types[group] = deepcopy(entries)
+            else:
+                for field, attrs in entries.items():
+                    if isinstance(attrs, dict):
+                        if field not in types[group]:
+                            types[group][field] = deepcopy(attrs)
+                        elif types[group][field]["header"] != attrs["header"]:
+                            types[group]["names_%s" % field] = deepcopy(attrs)
     for group, entries in types.items():
         for field, attrs in entries.items():
             header = False
@@ -387,6 +402,7 @@ def add_attribute_values(existing, new, *, raw=True):
 
 def validate_types_file(types_file, dir_path):
     """Validate types file."""
+    print(types_file)
     try:
         types = tofile.load_yaml(str(types_file.resolve()))
     except Exception:
@@ -416,8 +432,11 @@ def process_row(types, row):
         "taxon_names": {},
         "taxonomy": {},
         "taxon_attributes": {},
-        **types["defaults"],
     }
+    for key in types["defaults"].keys():
+        if key in types:
+            for entry in types[key].values():
+                entry = {**types["defaults"][key], **entry}
     for group in data.keys():
         if group in types:
             for key, meta in types[group].items():
@@ -438,9 +457,9 @@ def process_row(types, row):
                         data[group][key] = re.split(rf"\s*{separator}\s*", value)
                     else:
                         data[group][key] = value
-                except Exception:
+                except Exception as err:
                     LOGGER.warning("Cannot parse row '%s'" % str(row))
-                    return None
+                    raise err
     taxon_data = {}
     taxon_types = {}
     for attr_type in list(["attributes", "identifiers"]):
