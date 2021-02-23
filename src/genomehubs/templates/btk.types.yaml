@@ -1,0 +1,136 @@
+file:
+  display_group: btk
+  format: tsv
+  header: true
+attributes:
+  busco_completeness:
+    description: Busco completeness
+    display_group: busco
+    display_level: 1
+    display_name: BUSCO completeness
+    header: busco_complete
+    type: 1dp
+    units: "%"
+    taxon_display_group: assembly
+    taxon_name: BUSCO completeness
+    taxon_key: busco_completeness
+    taxon_summary: max
+    taxon_type: 1dp
+    taxon_traverse: false
+    taxon_display_level: 1
+    taxon_bins:
+      min: 50
+      max: 100
+      count: 10
+      scale: linear
+  busco_string:
+    description: Busco string
+    display_group: busco
+    display_level: 2
+    display_name: BUSCO string
+    header: busco_string
+    type: keyword
+  busco_lineage:
+    description: Busco lineage
+    display_group: busco
+    display_level: 2
+    display_name: BUSCO lineage
+    header: busco_lineage
+    type: keyword
+  nohit:
+    description: Sequences with no hits in the reference database
+    display_level: 2
+    display_name: No hit
+    header: nohit
+    type: 1dp
+    units: "%"
+  target:
+    description: Hits matching target
+    display_level: 2
+    display_name: Target
+    header: target
+    type: 1dp
+    units: "%"
+  at_percent:
+    description: AT percent
+    display_level: 2
+    display_name: AT percent
+    header: at_percent
+    type: 1dp
+    units: "%"
+  gc_percent:
+    description: GC percent
+    display_level: 2
+    display_name: GC percent
+    header: gc_percent
+    type: 1dp
+    units: "%"
+  n_percent:
+    description: N percent
+    display_level: 2
+    display_name: N percent
+    header: n_percent
+    type: 1dp
+    units: "%"
+  xref:
+    description: External database references
+    display_group: xrefs
+    display_level: 1
+    display_name: DB xrefs
+    header: xref
+    summary: list
+    taxon_display_group: xrefs
+    taxon_name: DB xrefs
+    taxon_key: xref
+    taxon_summary: list
+    taxon_traverse: false
+    taxon_display_level: 1
+    traverse: false
+    type: keyword
+identifiers:
+  assembly_id:
+    header: accession
+    type: keyword
+  assembly_alias:
+    header: alias
+    type: keyword
+  genbank_accession:
+    header: accession
+    type: keyword
+  bioproject_accession:
+    header: bioproject
+    type: keyword
+  biosample_accession:
+    header: biosample
+    type: keyword
+  blobtoolkit_accession:
+    header: id
+    type: keyword
+metadata:
+  source:
+    header: source
+  source_slug:
+    header: sourceSlug
+  source_url_stub:
+    header: sourceStub
+taxonomy:
+  taxon_id:
+    header: taxid
+  superkingdom:
+    header: superkingdom
+  kingdom:
+    header: kingdom
+  phylum:
+    header: phylum
+  class:
+    header: class
+  order:
+    header: order
+  family:
+    header: family
+  genus:
+    header: genus
+  species:
+    header: species
+  subspecies:
+    header: subspecies

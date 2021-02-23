@@ -91,7 +91,7 @@ def order_parsed_fields(parsed, types, names=None):
                             fields.update({field: value})
                     elif key == "header":
                         header = value
-                if header and value not in columns:
+                if header and header not in fields:
                     columns.update({ctr: header})
                     fields.update({header: ctr})
                     ctr += 1
@@ -344,6 +344,7 @@ def add_attributes(
             has_taxon_data = False
             taxon_attribute = {**attribute}
             taxon_attribute_types = {**types[attribute["key"]]}
+            # taxon_props = []
             for prop, value in types[attribute["key"]].items():
                 if prop.startswith("taxon_"):
                     has_taxon_data = apply_value_template(
@@ -353,6 +354,9 @@ def add_attributes(
                         taxon_types=taxon_attribute_types,
                         has_taxon_data=has_taxon_data,
                     )
+                    # taxon_props.append(prop)
+            # for prop in taxon_props:
+            #     del types[attribute["key"]][prop]
             if has_taxon_data:
                 taxon_attribute.update({"key": taxon_attribute_types["name"]})
                 # taxon_attribute.update({"name": taxon_attribute_types["key"]})
@@ -402,7 +406,6 @@ def add_attribute_values(existing, new, *, raw=True):
 
 def validate_types_file(types_file, dir_path):
     """Validate types file."""
-    print(types_file)
     try:
         types = tofile.load_yaml(str(types_file.resolve()))
     except Exception:
@@ -441,7 +444,7 @@ def process_row(types, row):
                     **entry,
                 }
         elif key == "metadata":
-            data["metadata"] = types["defaults"]["metadata"]
+            data["metadata"] = {**types["defaults"]["metadata"]}
     for group in data.keys():
         if group in types:
             for key, meta in types[group].items():

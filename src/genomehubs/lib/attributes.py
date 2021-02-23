@@ -22,8 +22,11 @@ def index_template(opts):
 def stream_attributes(group, attributes):
     """Stream attributes for indexing."""
     for name, obj in attributes.items():
-        obj.update({"group": group, "name": name})
-        yield "attribute-%s-%s" % (group, name), obj
+        ret = {"group": group, "name": name}
+        for prop, value in obj.items():
+            if not prop.startswith("taxon_"):
+                ret.update({prop: value})
+        yield "attribute-%s-%s" % (group, name), ret
 
 
 def index(es, group, attributes, opts):

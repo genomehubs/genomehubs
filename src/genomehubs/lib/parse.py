@@ -4,7 +4,8 @@
 Parse a local or remote data source.
 
 Usage:
-    genomehubs parse [--wikidata] [--wikidata-root STRING...] [--wikidata-xref STRING...]
+    genomehubs parse [--btk] [--btk-root STRING...]
+                     [--wikidata] [--wikidata-root STRING...] [--wikidata-xref STRING...]
                      [--gbif] [--gbif-root STRING...] [--gbif-xref STRING...]
                      [--ncbi-datasets-genome PATH] [--outfile PATH]
                      [--refseq-mitochondria] [--refseq-organelles]
@@ -12,6 +13,8 @@ Usage:
                      [-h|--help] [-v|--version]
 
 Options:
+    --btk                        Parse assemblies in BlobToolKit
+    --btk-root STRING            Scientific name of root taxon
     --gbif                       Parse taxa in GBIF
     --gbif-root STRING           GBIF taxon ID of root taxon
     --gbif-xref STRING           Include link to external reference from GBIF (e.g. NBN, BOLD)
@@ -39,6 +42,7 @@ from docopt import docopt
 from tolkein import tofile
 from tolkein import tolog
 
+from .btk import btk_parser
 from .config import config
 from .gbif import gbif_parser
 from .hub import load_types
@@ -51,6 +55,7 @@ from .wikidata import wikidata_parser
 LOGGER = tolog.logger(__name__)
 
 PARSERS = {
+    "btk": {"func": btk_parser, "params": None, "types": "btk"},
     "gbif": {"func": gbif_parser, "params": None, "types": "xref"},
     "ncbi-datasets-genome": {
         "func": ncbi_genome_parser,
@@ -86,13 +91,15 @@ def main(args):
             if params is None:
                 params = options["parse"][option]
             parsed = PARSERS[option]["func"](params, options["parse"])
+            files = []
+            if isinstance(parsed, tuple):
+                parsed, files = parsed
             types = load_types(PARSERS[option]["types"])
             names = load_types(PARSERS[option]["types"], part="names")
             data = order_parsed_fields(parsed, types, names)
             tofile.write_file(options["parse"]["outfile"], data)
             filepath = Path(options["parse"]["outfile"])
             types["file"]["name"] = filepath.name
-            names["file"]["name"] = filepath.name
             outdir = filepath.parent
             suff = re.compile(r"\.[^\.]+$")
             if filepath.name.endswith(".gz"):
@@ -101,7 +108,10 @@ def main(args):
                 stem = filepath.stem
             tofile.write_file("%s/%s.types.yaml" % (outdir, stem), types)
             if names:
+                names["file"]["name"] = filepath.name
                 tofile.write_file("%s/%s.names.yaml" % (outdir, stem), names)
+            if files:
+                tofile.write_file("%s/%s.files.yaml" % (outdir, stem), files)
 
 
 def cli():
