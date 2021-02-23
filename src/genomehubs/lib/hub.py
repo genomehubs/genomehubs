@@ -436,7 +436,12 @@ def process_row(types, row):
     for key in types["defaults"].keys():
         if key in types:
             for entry in types[key].values():
-                entry = {**types["defaults"][key], **entry}
+                entry = {
+                    **types["defaults"][key],
+                    **entry,
+                }
+        elif key == "metadata":
+            data["metadata"] = types["defaults"]["metadata"]
     for group in data.keys():
         if group in types:
             for key, meta in types[group].items():
