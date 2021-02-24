@@ -74,9 +74,13 @@ def describe_btk_files(meta):
         plots.append("blob")
     files = []
     for plot in plots:
+        if plot == "blob":
+            url = "%s/image/%s/%s/circle?format=png" % (BTK_API, meta["id"], plot)
+        else:
+            url = "%s/image/%s/%s?format=png" % (BTK_API, meta["id"], plot)
         obj = {
             "name": "%s.png" % plot,
-            "url": "%s/image/%s/%s?format=png&width=2000" % (BTK_API, meta["id"], plot),
+            "url": url,
             "link": "%s/%s/dataset/%s/%s" % (BTK_VIEW, meta["id"], meta["id"], plot),
             "analysis_id": "btk-%s" % meta["id"],
             "description": "a %s plot from BlobToolKit analysis %s"
