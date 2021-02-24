@@ -4,6 +4,7 @@
 
 import hashlib
 import os
+import urllib
 from datetime import date
 from mimetypes import guess_type
 from pathlib import Path
@@ -363,8 +364,12 @@ def index_metadata(es, file, taxonomy_name, opts):
                 infile = meta["path"]
             del meta["path"]
         elif "url" in meta:
-            infile = tofetch.fetch_tmp_file(meta["url"])
-            local = None
+            try:
+                infile = tofetch.fetch_tmp_file(meta["url"])
+                local = None
+            except urllib.error.HTTPError as err:
+                LOGGER.warn("Got %s error for %s" % (str(err.code), meta["url"]))
+                continue
         elif "name" in meta:
             infile = meta["name"]
         else:
