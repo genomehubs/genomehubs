@@ -5,7 +5,7 @@ Parse a local or remote data source.
 
 Usage:
     genomehubs parse [--btk] [--btk-root STRING...]
-                     [--wikidata] [--wikidata-root STRING...] [--wikidata-xref STRING...]
+                     [--wikidata PATH] [--wikidata-root STRING...] [--wikidata-xref STRING...]
                      [--gbif] [--gbif-root STRING...] [--gbif-xref STRING...]
                      [--ncbi-datasets-genome PATH] [--outfile PATH]
                      [--refseq-mitochondria] [--refseq-organelles]
@@ -18,7 +18,7 @@ Options:
     --gbif                       Parse taxa in GBIF
     --gbif-root STRING           GBIF taxon ID of root taxon
     --gbif-xref STRING           Include link to external reference from GBIF (e.g. NBN, BOLD)
-    --wikidata                   Parse taxa in WikiData
+    --wikidata PATH              Parse taxa in WikiData dump
     --wikidata-root STRING       WikiData taxon ID of root taxon
     --wikidata-xref STRING       Include link to external reference from WikiData (e.g. NBN, BOLD)
     --ncbi-datasets-genome PATH  Parse NCBI Datasets genome directory
@@ -90,6 +90,7 @@ def main(args):
             params = PARSERS[option]["params"]
             if params is None:
                 params = options["parse"][option]
+            LOGGER.info("Parsing %s" % option)
             parsed = PARSERS[option]["func"](params, options["parse"])
             files = []
             if isinstance(parsed, tuple):
