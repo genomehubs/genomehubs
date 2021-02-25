@@ -72,21 +72,6 @@ attributes:
     header: n_percent
     type: 1dp
     units: "%"
-  xref:
-    description: External database references
-    display_group: xrefs
-    display_level: 1
-    display_name: DB xrefs
-    header: xref
-    summary: list
-    taxon_display_group: xrefs
-    taxon_name: DB xrefs
-    taxon_key: xref
-    taxon_summary: list
-    taxon_traverse: false
-    taxon_display_level: 1
-    traverse: false
-    type: keyword
 identifiers:
   assembly_id:
     header: accession

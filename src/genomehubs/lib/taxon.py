@@ -110,6 +110,19 @@ def lookup_missing_taxon_ids(
                 )
                 if index == 1 and not taxon_ids:
                     break
+                if len(taxon_ids) == 1:
+                    if taxon_ids[0] in with_ids:
+                        with_ids[taxon_ids[0]].append(obj)
+                    else:
+                        obj["attributes"] = [obj["attributes"]]
+                        with_ids[taxon_ids[0]] = [obj]
+                        LOGGER.debug(
+                            "Matched %s with taxon_id %s",
+                            obj["taxonomy"][rank],
+                            taxon_ids[0],
+                        )
+                    found_keys.append(key)
+                break
                 # TODO: Allow lookup for higher taxa
                 # if not taxon_ids:
                 #     continue
@@ -433,7 +446,8 @@ def lookup_taxon(
     if "hits" in res and res["hits"]["total"] > 0:
         if return_type == "taxon_id":
             taxa = [hit["_source"]["taxon_id"] for hit in res["hits"]["hits"]]
-        taxa = [hit for hit in res["hits"]["hits"]]
+        else:
+            taxa = [hit for hit in res["hits"]["hits"]]
     else:
         template = taxonomy_index_template(opts["taxonomy-source"][0], opts)
         index = template["index_name"]
@@ -444,7 +458,8 @@ def lookup_taxon(
         if "hits" in res and res["hits"]["total"] > 0:
             if return_type == "taxon_id":
                 taxa = [hit["_source"]["taxon_id"] for hit in res["hits"]["hits"]]
-            taxa = [hit for hit in res["hits"]["hits"]]
+            else:
+                taxa = [hit for hit in res["hits"]["hits"]]
     if not taxa and opts["taxon-lookup"] == "any" and name_class != "any":
         taxa, name_class = lookup_taxon(
             es, name, opts, rank=rank, name_class="any", return_type=return_type
@@ -592,7 +607,7 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA", "None"
                     )
                     if taxa and len(taxa) == 1:
                         ancestors.update({alt_taxon_id: taxa[0]})
-                        matches[obj["taxonomy"][anc_rank]] = taxa
+                        matches[obj["taxonomy"][anc_rank]]["all"] = taxa
                         break
                 intermediates += 1
             if alt_taxon_id in ancestors:
@@ -605,7 +620,7 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA", "None"
                         obj["taxonomy"][anc_rank]
                     ][0]
                 else:
-                    closest_taxon = matches[obj["taxonomy"][anc_rank]][0]
+                    closest_taxon = matches[obj["taxonomy"][anc_rank]]["all"][0]
                 break
             lineage.append({"rank": rank, "name": obj["taxonomy"][rank]})
         if closest_taxon is not None:
