@@ -8,8 +8,9 @@ Usage:
                     [--config-file PATH...] [--config-save PATH]
                     [--es-host URL...]
                     [--traverse-infer-ancestors] [--traverse-infer-descendants]
-                    [--traverse-infer-both]
-                    [--traverse-root STRING] [--traverse-weight STRING]
+                    [--traverse-infer-both] [--traverse-threads INT]
+                    [--traverse-depth INT] [--traverse-root STRING]
+                    [--traverse-weight STRING]
                     [-h|--help] [-v|--version]
 
 Options:
@@ -19,11 +20,13 @@ Options:
     --config-file PATH            Path to YAML file containing configuration options.
     --config-save PATH            Path to write configuration options to YAML file.
     --es-host URL                 ElasticSearch hostname/URL and port.
+    --traverse-depth INT          Maximum depth for tree traversal relative to root taxon.
     --traverse-infer-ancestors    Flag to enable tree traversal from tips to root.
     --traverse-infer-descendants  Flag to enable tree traversal from root to tips.
     --traverse-infer-both         Flag to enable tree traversal from tips to root and
                                   back to tips.
     --traverse-root ID            Root taxon id for tree traversal.
+    --traverse-threads INT        Number of threads to use for tree traversal. [Default: 1]
     --traverse-weight STRING      Weighting scheme for setting values during tree
                                   traversal.
     -h, --help                    Show this
@@ -34,16 +37,21 @@ Examples:
     ./genomehubs fill --traverse-root 7088
 """
 
+import platform
 import sys
+import time
 from collections import defaultdict
+from multiprocessing import Pool
 from statistics import mean
 from statistics import median
 from statistics import median_high
 from statistics import median_low
 from statistics import mode
+from subprocess import call
 
 from docopt import docopt
 from tolkein import tolog
+from tqdm import tqdm
 
 from ..lib import hub
 from ..lib import taxon
@@ -53,6 +61,11 @@ from .es_functions import index_stream
 from .es_functions import launch_es
 from .es_functions import stream_template_search_results
 from .version import __version__
+
+# if platform.system() != "Linux":
+#     from multiprocessing import set_start_method
+
+#     set_start_method("fork")
 
 LOGGER = tolog.logger(__name__)
 
@@ -271,10 +284,14 @@ def set_values_from_descendants(
     return changed
 
 
-def traverse_from_tips(es, opts, *, template):
+def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
     """Traverse a tree, filling in values."""
-    root = opts["traverse-root"]
-    max_depth = get_max_depth_by_lineage(es, index=template["index_name"], root=root,)
+    if root is None:
+        root = opts["traverse-root"]
+    if max_depth is None:
+        max_depth = get_max_depth_by_lineage(
+            es, index=template["index_name"], root=root,
+        )
     root_depth = max_depth
     meta = template["types"]["attributes"]
     attrs = set(meta.keys())
@@ -373,10 +390,14 @@ def stream_missing_attributes_at_level(es, *, nodes, attrs, template, level=1):
             yield desc_node["_id"], desc_node["_source"]
 
 
-def traverse_from_root(es, opts, *, template):
+def traverse_from_root(es, opts, *, template, root=None, max_depth=None, log=True):
     """Traverse a tree, filling in values."""
-    root = opts["traverse-root"]
-    max_depth = get_max_depth_by_lineage(es, index=template["index_name"], root=root,)
+    if root is None:
+        root = opts["traverse-root"]
+    if max_depth is None:
+        max_depth = get_max_depth_by_lineage(
+            es, index=template["index_name"], root=root,
+        )
     root_depth = max_depth - 1
     meta = template["types"]["attributes"]
     attrs = set({})
@@ -384,19 +405,79 @@ def traverse_from_root(es, opts, *, template):
         if "traverse" in value and value["traverse"]:
             if "traverse_direction" not in value or value["traverse_direction"] != "up":
                 attrs.add(key)
-    # parents = defaultdict(lambda: defaultdict(list))
     while root_depth >= 0:
-        LOGGER.info("Filling values at root depth %d" % root_depth)
+        if log:
+            LOGGER.info("Filling values at root depth %d" % root_depth)
         nodes = stream_nodes_by_root_depth(
             es, index=template["index_name"], root=root, depth=root_depth, size=50,
         )
         desc_nodes = stream_missing_attributes_at_level(
             es, nodes=nodes, attrs=attrs, template=template
         )
-        index_stream(
-            es, template["index_name"], desc_nodes, _op_type="update",
-        )
+        index_stream(es, template["index_name"], desc_nodes, _op_type="update", log=log)
         root_depth -= 1
+
+
+def traverse_tree(es, opts, template, root, max_depth):
+    """Propagate values by tree traversal."""
+    log = True
+    if es is None:
+        log = False
+        es = launch_es(opts, log=log)
+    if "traverse-infer-ancestors" in opts:
+        if log:
+            LOGGER.info("Inferring ancestral values for root taxon %s", root)
+        _success, _failed = index_stream(
+            es,
+            template["index_name"],
+            traverse_from_tips(
+                es, opts, template=template, root=root, max_depth=max_depth
+            ),
+            _op_type="update",
+            log=log,
+        )
+    if "traverse-infer-descendants" in opts:
+        if log:
+            LOGGER.info("Inferring descendant values for root taxon %s", root)
+        traverse_from_root(
+            es, opts, template=template, root=root, max_depth=max_depth, log=log
+        )
+
+
+def traverse_helper(params):
+    """Wrap traverse_tree for multithreaded traversal."""
+    with tolog.DisableLogger():
+        traverse_tree(*params)
+    return params[3]
+
+
+def traverse_handler(es, opts, template):
+    """Handle single or multi-threaded tree traversal."""
+    root = opts["traverse-root"]
+    threads = int(opts["traverse-threads"])
+    max_depth = get_max_depth_by_lineage(es, index=template["index_name"], root=root)
+    subtree_depth = int(opts.get("traverse-depth", 0))
+    if threads > 1 and subtree_depth == 0:
+        subtree_depth = int(max_depth / 2)
+    if threads == 1:
+        traverse_tree(es, opts, template, root, max_depth)
+        return
+
+    max_depth -= subtree_depth
+
+    nodes = stream_nodes_by_root_depth(
+        es, index=template["index_name"], root=root, depth=subtree_depth
+    )
+    roots = [
+        (None, opts, template, node["_source"]["taxon_id"], max_depth) for node in nodes
+    ]
+    LOGGER.info("Filling values in subtrees")
+    with Pool(processes=threads) as p:
+        with tqdm(total=len(roots), unit=" subtrees") as pbar:
+            for root in p.imap_unordered(traverse_helper, roots):
+                pbar.update()
+    LOGGER.info("Connecting subtrees")
+    traverse_tree(es, opts, template, opts["traverse-root"], subtree_depth)
 
 
 def main(args):
@@ -422,18 +503,7 @@ def main(args):
             if types:
                 template["types"]["attributes"] = types
             if "traverse-root" in options["fill"]:
-                if "traverse-infer-ancestors" in options["fill"]:
-                    LOGGER.info("Inferring ancestral values")
-                    # traverse_from_tips(es, options["fill"], template=template)
-                    index_stream(
-                        es,
-                        template["index_name"],
-                        traverse_from_tips(es, options["fill"], template=template),
-                        _op_type="update",
-                    )
-                if "traverse-infer-descendants" in options["fill"]:
-                    LOGGER.info("Inferring descendant values")
-                    traverse_from_root(es, options["fill"], template=template)
+                traverse_handler(es, options["fill"], template)
 
 
 def cli():
