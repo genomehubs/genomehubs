@@ -112,11 +112,12 @@ def start_es_binary(opts):
     sys.exit(1)
 
 
-def launch_es(opts):
+def launch_es(opts, log=True):
     """Launch ElasticSearch."""
     es = test_connection(opts)
     if es:
-        LOGGER.info("ElasticSearch is already running")
+        if log:
+            LOGGER.info("ElasticSearch is already running")
     if not es:
         if any(host.startswith(("localhost", "127.0.0.1")) for host in opts["es-host"]):
             # Start Elasticsearch
@@ -162,7 +163,7 @@ def load_mapping(es, mapping_name, mapping):
     return res
 
 
-def index_stream(es, index_name, stream, *, _op_type="index"):
+def index_stream(es, index_name, stream, *, _op_type="index", log=True):
     """Load bulk entries from stream into Elasticsearch index."""
     # LOGGER.info("Indexing bulk entries to %s", index_name)
     if _op_type == "index":
@@ -180,14 +181,14 @@ def index_stream(es, index_name, stream, *, _op_type="index"):
             {"_index": index_name, "_id": entry_id, "doc": entry, "_op_type": _op_type}
             for entry_id, entry in stream
         )
-
     try:
         tracer = logging.getLogger("elasticsearch")
         tracer.setLevel(logging.ERROR)
         iterator = helpers.streaming_bulk(es, actions)
-        iterator = tqdm(iterator, unit=" records", unit_scale=True)
         success = 0
         failed = 0
+        if log:
+            iterator = tqdm(iterator, unit=" records", unit_scale=True)
         for ok, response in iterator:
             if ok:
                 success += 1
@@ -196,8 +197,6 @@ def index_stream(es, index_name, stream, *, _op_type="index"):
     except Exception as err:
         raise err
 
-    # if success and success > 0:
-    #     LOGGER.info("Indexed %d entries", success)
     return success, failed
 
 
