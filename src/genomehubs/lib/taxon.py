@@ -252,7 +252,12 @@ def stream_taxa(taxa):
 
 
 def get_taxa_to_create(
-    es, opts, *, taxonomy_name="ncbi", taxon_ids=None, asm_by_taxon_id=None,
+    es,
+    opts,
+    *,
+    taxonomy_name="ncbi",
+    taxon_ids=None,
+    asm_by_taxon_id=None,
 ):
     """Create a dict of taxa to create."""
     taxa_to_create = {}
@@ -262,11 +267,15 @@ def get_taxa_to_create(
         asm_by_taxon_id = {}
     taxonomy_template = taxonomy_index_template(taxonomy_name, opts)
     taxonomy_res = query_value_template(
-        es, "taxonomy_node_by_taxon_id", taxon_ids, taxonomy_template["index_name"],
+        es,
+        "taxonomy_node_by_taxon_id",
+        taxon_ids,
+        taxonomy_template["index_name"],
     )
     if taxonomy_res is None:
         LOGGER.error(
-            "Could not connect to taxonomy index '%s'", taxonomy_template["index_name"],
+            "Could not connect to taxonomy index '%s'",
+            taxonomy_template["index_name"],
         )
         sys.exit(1)
     ancestors = set()
@@ -307,7 +316,9 @@ def find_or_create_taxa(es, opts, *, taxon_ids, taxon_template, asm_by_taxon_id=
         asm_by_taxon_id=asm_by_taxon_id,
     )
     index_stream(
-        es, taxon_template["index_name"], stream_taxa(to_create),
+        es,
+        taxon_template["index_name"],
+        stream_taxa(to_create),
     )
     taxa.update(
         {
@@ -354,7 +365,10 @@ def add_names_and_attributes_to_taxa(
     for values in chunks(list(data.keys()), 500):
         # taxa = lookup_taxa_by_taxon_id(es, values, template, return_type="list")
         all_taxa = find_or_create_taxa(
-            es, opts, taxon_ids=values, taxon_template=template,
+            es,
+            opts,
+            taxon_ids=values,
+            taxon_template=template,
         )
         taxa = []
         for taxon_id in values:
@@ -645,7 +659,9 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA", "None"
             ] = [added_taxon]
     pbar.close()
     index_stream(
-        es, taxon_template["index_name"], stream_taxa(new_taxa),
+        es,
+        taxon_template["index_name"],
+        stream_taxa(new_taxa),
     )
     return new_taxa.keys()
 

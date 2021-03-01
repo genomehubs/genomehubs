@@ -294,9 +294,15 @@ def apply_value_template(prop, value, attribute, *, taxon_types, has_taxon_data)
             has_taxon_data = True
             new_value = attribute[groups[1]]
             if groups[0] != "{{":
-                new_value = "%s%s" % (groups[0].replace("{{", ""), str(new_value),)
+                new_value = "%s%s" % (
+                    groups[0].replace("{{", ""),
+                    str(new_value),
+                )
             if groups[2] != "}}":
-                new_value = "%s%s" % (str(new_value), groups[2].replace("}}", ""),)
+                new_value = "%s%s" % (
+                    str(new_value),
+                    groups[2].replace("}}", ""),
+                )
             taxon_types.update({new_prop: new_value})
             taxon_types.update({"group": "taxon"})
             if prop in taxon_types:

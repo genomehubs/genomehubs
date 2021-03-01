@@ -287,7 +287,9 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
         root = opts["traverse-root"]
     if max_depth is None:
         max_depth = get_max_depth_by_lineage(
-            es, index=template["index_name"], root=root,
+            es,
+            index=template["index_name"],
+            root=root,
         )
     root_depth = max_depth
     meta = template["types"]["attributes"]
@@ -299,7 +301,11 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
     )
     while root_depth >= 0:
         nodes = stream_nodes_by_root_depth(
-            es, index=template["index_name"], root=root, depth=root_depth, size=50,
+            es,
+            index=template["index_name"],
+            root=root,
+            depth=root_depth,
+            size=50,
         )
         ctr = 0
         for node in nodes:
@@ -393,7 +399,9 @@ def traverse_from_root(es, opts, *, template, root=None, max_depth=None, log=Tru
         root = opts["traverse-root"]
     if max_depth is None:
         max_depth = get_max_depth_by_lineage(
-            es, index=template["index_name"], root=root,
+            es,
+            index=template["index_name"],
+            root=root,
         )
     root_depth = max_depth - 1
     meta = template["types"]["attributes"]
@@ -406,7 +414,11 @@ def traverse_from_root(es, opts, *, template, root=None, max_depth=None, log=Tru
         if log:
             LOGGER.info("Filling values at root depth %d" % root_depth)
         nodes = stream_nodes_by_root_depth(
-            es, index=template["index_name"], root=root, depth=root_depth, size=50,
+            es,
+            index=template["index_name"],
+            root=root,
+            depth=root_depth,
+            size=50,
         )
         desc_nodes = stream_missing_attributes_at_level(
             es, nodes=nodes, attrs=attrs, template=template

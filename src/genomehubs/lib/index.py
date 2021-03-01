@@ -158,7 +158,10 @@ def index_file(es, types, data, opts):
                     es, dict(with_ids), opts, template=taxon_template, blanks=blanks
                 )
                 index_stream(
-                    es, taxon_template["index_name"], docs, _op_type="update",
+                    es,
+                    taxon_template["index_name"],
+                    docs,
+                    _op_type="update",
                 )
             elif opts["index"] == "assembly":
                 assembly_template = assembly.index_template(taxonomy_name, opts)
@@ -173,7 +176,10 @@ def index_file(es, types, data, opts):
                 index_stream(es, assembly_template["index_name"], docs)
                 # index taxon-level attributes
                 index_types(
-                    es, "taxon", {"attributes": taxon_types}, opts,
+                    es,
+                    "taxon",
+                    {"attributes": taxon_types},
+                    opts,
                 )
                 taxon_asm_with_ids = {
                     taxon_id: taxon_asm_data[taxon_id] for taxon_id in with_ids.keys()
@@ -182,7 +188,10 @@ def index_file(es, types, data, opts):
                     es, taxon_asm_with_ids, opts, template=taxon_template, blanks=blanks
                 )
                 index_stream(
-                    es, taxon_template["index_name"], taxon_docs, _op_type="update",
+                    es,
+                    taxon_template["index_name"],
+                    taxon_docs,
+                    _op_type="update",
                 )
 
 
