@@ -13,10 +13,8 @@ from tqdm import tqdm
 from .es_functions import EsQueryBuilder
 from .es_functions import document_by_id
 from .es_functions import index_stream
-from .es_functions import query_keyword_value_template
 from .es_functions import query_value_template
 from .hub import add_attribute_values
-from .hub import add_attributes
 from .hub import chunks
 from .hub import index_templator
 from .taxonomy import index_template as taxonomy_index_template

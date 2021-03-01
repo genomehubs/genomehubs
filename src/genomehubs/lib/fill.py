@@ -37,9 +37,7 @@ Examples:
     ./genomehubs fill --traverse-root 7088
 """
 
-import platform
 import sys
-import time
 from collections import defaultdict
 from multiprocessing import Pool
 from statistics import mean
@@ -47,7 +45,6 @@ from statistics import median
 from statistics import median_high
 from statistics import median_low
 from statistics import mode
-from subprocess import call
 
 from docopt import docopt
 from tolkein import tolog
