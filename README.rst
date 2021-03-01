@@ -42,9 +42,9 @@ GenomeHubs
     :alt: Conda platforms
     :target: https://anaconda.org/tolkit/genomehubs
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/genomehubs/genomehubs/v2.0.3.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/genomehubs/genomehubs/v2.0.4.svg
     :alt: Commits since latest release
-    :target: https://github.com/genomehubs/genomehubs/compare/v2.0.3...main
+    :target: https://github.com/genomehubs/genomehubs/compare/v2.0.4...main
 
 .. |license| image:: https://anaconda.org/tolkit/genomehubs/badges/license.svg
     :alt: MIT License
