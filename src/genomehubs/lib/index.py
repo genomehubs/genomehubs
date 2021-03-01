@@ -46,7 +46,7 @@ Options:
 
 Examples:
     # 1. Index all files in a remote repository
-    ./genomehubs index --taxon-repo https://github.com/example/repo~main
+    ./genomehubs index --taxon-repo https://github.com/genomehubs/goat-data
 """
 
 import csv

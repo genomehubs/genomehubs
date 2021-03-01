@@ -23,13 +23,13 @@ eval "$(conda shell.bash hook)"
 for PYTHON in 3.6 3.7 3.8; do
   conda build --python $PYTHON conda-recipe &&
   PYTHON=$(echo $PYTHON | sed "s:3\.:py3:") &&
-  if [ "$OS_NAME" != "linux"]; then
+  if [ "$OS_NAME" != "linux" ]; then
     conda convert --platform linux-64 $CONDA_DIR/genomehubs-${VERSION}-${PYTHON}_0.tar.bz2 -o dist/conda
   fi &&
-  if [ "$OS_NAME" != "osx"]; then
+  if [ "$OS_NAME" != "osx" ]; then
     conda convert --platform osx-64 $CONDA_DIR/genomehubs-${VERSION}-${PYTHON}_0.tar.bz2 -o dist/conda
   fi &&
-  if [ "$OS_NAME" != "win"]; then
+  if [ "$OS_NAME" != "win" ]; then
     conda convert --platform win-64 $CONDA_DIR/genomehubs-${VERSION}-${PYTHON}_0.tar.bz2 -o dist/conda
   fi &&
   mkdir -p dist/conda/${OS_NAME}-64 &&
