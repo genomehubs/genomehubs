@@ -19,6 +19,7 @@ requirements:
   host:
     - biopython>=1.78
     - docopt>=0.6.2
+    - elasticsearch>=7.8.1
     - filetype>=1.0.7
     - pip
     - Pillow>=8.0
@@ -30,6 +31,7 @@ requirements:
   run:
     - biopython>=1.78
     - docopt>=0.6.2
+    - elasticsearch>=7.8.1
     - filetype>=1.0.7
     - Pillow>=8.0
     - python
@@ -41,8 +43,6 @@ requirements:
 test:
   imports:
     - genomehubs
-  commands:
-    - genomehubs --help
 
 about:
   home: "https://github.com/genomehubs/genomehubs"
