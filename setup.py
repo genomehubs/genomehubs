@@ -104,7 +104,7 @@ setup(
         "Pillow>=8.0",
         "pyyaml",
         "sparqlwrapper>=1.4.1",
-        "tolkein>=0.2.1",
+        "tolkein>=0.2.3",
         "ujson>=3.0.0",
     ],  # Optional
     # List additional groups of dependencies here (e.g. development

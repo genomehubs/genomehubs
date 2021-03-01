@@ -80,11 +80,9 @@ jobs:
           password:
             secure: iQ9tJBM9VcMm5VHeQeLgFoV4TuwV/ntMOfbJsclfqY4B2lnydc4hWNYJPoYUAXs+2cXOSK+yuQx/pR16m32YxDjjEnxLBes/xJdh3lniQWTralIHeO+Pd/8buDyQN7g60d9Kl8ik5tXrFA3A1jYLDIFoGCe4HSlbdyKd92xHIF8qp+zCUTYg5dLFH47PomSCGA3Hnz0kFNl+X8LW9gVgzpDMTfEmMfhig+l59RbFmU8POVU+mU7P2uPY0tTDGSy0MrPvFDdb9oRNE2uu3bkYpEXHF64mZSnp9/92ZF6ffyPFhKIhomaPcE+8hmLwG0hMqjM6TeeFir47KoV+CgDeQ7h+4Y/QRYtJyj7RJHDAtaDyOzd4nfCUBNMIFZh6yHIqgYIOfJKOdPXOt3APbqDimI/vFCtMfyqstXYoGD4P8MB9U2gj6r9dnlSQ/s3/Nd9hb5/jAbn8u30BMAQlawXCL8kNQNTMlJiXshwWP7x8Ot9NTR0KIuaFZB55vnpO8GOcD5pEKiOC6n7oLkDIMGByxWlPHcXj0HLGvOks/3fw/MqKBiMkLPcP7Rhsv8ba8PgxTKU0G24O+NPVSn6LRn4T5ylsj8IbMCzTkoelOgreYpNL8mXHATtQBsWNdXesXffsWRTwHky/NFbyGyhh87OMu/3ENVgB7dd03dl/4hQ2f+M=
           on:
-            tags: true
             branch: main
         - provider: releases
           api_key: $GITHUB_OAUTH_TOKEN
           cleanup: false
           on:
-            tags: true
             branch: main
