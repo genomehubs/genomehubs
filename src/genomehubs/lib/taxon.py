@@ -2,11 +2,9 @@
 
 """Taxon methods."""
 
-import os
 import sys
 from collections import defaultdict
 
-from tolkein import tofile
 from tolkein import tolog
 from tqdm import tqdm
 
@@ -17,6 +15,7 @@ from .es_functions import query_value_template
 from .hub import add_attribute_values
 from .hub import chunks
 from .hub import index_templator
+from .hub import write_imported_rows
 from .taxonomy import index_template as taxonomy_index_template
 
 LOGGER = tolog.logger(__name__)
@@ -177,6 +176,7 @@ def fix_missing_ids(
     types,
     taxon_template,
     failed_rows,
+    imported_rows,
     with_ids=None,
     blanks=set(["NA", "None"]),
     header=None,
@@ -211,29 +211,15 @@ def fix_missing_ids(
     if without_ids and failed_rows:
         for key, value in found_ids.items():
             if key in failed_rows:
+                imported_rows += failed_rows[key]
                 del failed_rows[key]
         if failed_rows:
             LOGGER.info(
                 "Unable to associate %d records with taxon IDs", len(failed_rows)
             )
-            data = []
-            exception_key = "%s-exception" % opts["index"]
-            dir_key = "%s-dir" % opts["index"]
-            if exception_key in opts and opts[exception_key]:
-                outdir = opts[exception_key]
-            else:
-                outdir = "%s/exceptions" % opts[dir_key]
-            os.makedirs(outdir, exist_ok=True)
-            outfile = "%s/%s" % (outdir, types["file"]["name"])
-            if header:
-                data.append(header)
-            for rows in failed_rows.values():
-                for row in rows:
-                    data.append(row)
-            LOGGER.info(
-                "Writing %d records to exceptions file '%s", len(data) - 1, outfile
+            write_imported_rows(
+                failed_rows, opts, types=types, header=header, label="exceptions"
             )
-            tofile.write_file(outfile, data)
     return with_ids, without_ids
 
 
