@@ -71,6 +71,7 @@ from .files import index_metadata
 from .hub import process_row
 from .hub import set_column_indices
 from .hub import validate_types_file
+from .hub import write_imported_rows
 from .taxon import add_names_and_attributes_to_taxa
 from .taxon import fix_missing_ids
 from .version import __version__
@@ -84,14 +85,16 @@ def index_file(es, types, data, opts):
     rows = csv.reader(
         data, delimiter=delimiters[types["file"]["format"]], quotechar='"'
     )
-    header = None
-    if types["file"].get("header", False):
+    if "header" in types["file"] and types["file"]["header"]:
         header = next(rows)
         set_column_indices(types, header)
+    else:
+        header = None
     with_ids = defaultdict(list)
     taxon_asm_data = defaultdict(list)
     without_ids = defaultdict(list)
     failed_rows = defaultdict(list)
+    imported_rows = []
     blanks = set(["", "NA", "N/A", "None"])
     taxon_types = {}
     for taxonomy_name in opts["taxonomy-source"]:
@@ -112,6 +115,7 @@ def index_file(es, types, data, opts):
                 taxon_asm_data[processed_data["taxonomy"]["taxon_id"]].append(
                     taxon_data
                 )
+                imported_rows.append(row)
             else:
                 if "taxonomy" in types and "alt_taxon_id" in types["taxonomy"]:
                     without_ids[processed_data["taxonomy"]["alt_taxon_id"]].append(
@@ -147,11 +151,15 @@ def index_file(es, types, data, opts):
             types=types,
             taxon_template=taxon_template,
             failed_rows=failed_rows,
+            imported_rows=imported_rows,
             with_ids=with_ids,
             blanks=blanks,
             header=header,
         )
         if with_ids or create_ids:
+            write_imported_rows(
+                imported_rows, opts, types=types, header=header, label="imported"
+            )
             LOGGER.info("Indexing %d entries", len(with_ids.keys()))
             if opts["index"] == "taxon":
                 docs = add_names_and_attributes_to_taxa(
@@ -164,6 +172,7 @@ def index_file(es, types, data, opts):
                     _op_type="update",
                 )
             elif opts["index"] == "assembly":
+                # TODO: keep track of taxon_id not found exceptions
                 assembly_template = assembly.index_template(taxonomy_name, opts)
                 docs = add_identifiers_and_attributes_to_assemblies(
                     es,
