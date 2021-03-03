@@ -7,6 +7,7 @@ Usage:
     genomehubs parse [--btk] [--btk-root STRING...]
                      [--wikidata PATH] [--wikidata-root STRING...] [--wikidata-xref STRING...]
                      [--gbif] [--gbif-root STRING...] [--gbif-xref STRING...]
+                     [--ncbi-datasets-summary INT]
                      [--ncbi-datasets-genome PATH] [--outfile PATH]
                      [--refseq-mitochondria] [--refseq-organelles]
                      [--refseq-plastids] [--refseq-root NAME]
@@ -21,6 +22,7 @@ Options:
     --wikidata PATH              Parse taxa in WikiData dump
     --wikidata-root STRING       WikiData taxon ID of root taxon
     --wikidata-xref STRING       Include link to external reference from WikiData (e.g. NBN, BOLD)
+    --ncbi-datasets-summary INT  Fetch and parse NCBI Datasets summary for a root taxId
     --ncbi-datasets-genome PATH  Parse NCBI Datasets genome directory
     --outfile PATH               Save parsed output to file
     --refseq-mitochondria        Parse mitochondrial genomes from the NCBI RefSeq
@@ -47,6 +49,7 @@ from .config import config
 from .gbif import gbif_parser
 from .hub import load_types
 from .hub import order_parsed_fields
+from .ncbi import ncbi_datasets_summary_parser
 from .ncbi import ncbi_genome_parser
 from .ncbi import refseq_organelle_parser
 from .version import __version__
@@ -59,6 +62,11 @@ PARSERS = {
     "gbif": {"func": gbif_parser, "params": None, "types": "xref"},
     "ncbi-datasets-genome": {
         "func": ncbi_genome_parser,
+        "params": None,
+        "types": "assembly",
+    },
+    "ncbi-datasets-summary": {
+        "func": ncbi_datasets_summary_parser,
         "params": None,
         "types": "assembly",
     },
