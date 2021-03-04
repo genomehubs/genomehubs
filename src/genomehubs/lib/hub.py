@@ -454,6 +454,8 @@ def process_row(types, row):
     for group in data.keys():
         if group in types:
             for key, meta in types[group].items():
+                if "index" not in meta:
+                    continue
                 try:
                     if isinstance(meta["index"], list):
                         char = meta.get("join", "")

@@ -79,6 +79,11 @@ from .version import __version__
 LOGGER = tolog.logger(__name__)
 
 
+def not_blank(key, obj, blanks):
+    """Test value is not blank."""
+    return key in obj and obj[key] and obj[key] not in blanks
+
+
 def index_file(es, types, data, opts):
     """Index a file."""
     delimiters = {"csv": ",", "tsv": "\t"}
@@ -107,17 +112,16 @@ def index_file(es, types, data, opts):
                 failed_rows["None"].append(row)
                 continue
             taxon_types.update(new_taxon_types)
-            if (
-                "taxon_id" in processed_data["taxonomy"]
-                and processed_data["taxonomy"]["taxon_id"] not in blanks
-            ):
+            if not_blank("taxon_id", processed_data["taxonomy"], blanks):
                 with_ids[processed_data["taxonomy"]["taxon_id"]].append(processed_data)
                 taxon_asm_data[processed_data["taxonomy"]["taxon_id"]].append(
                     taxon_data
                 )
                 imported_rows.append(row)
             else:
-                if "taxonomy" in types and "alt_taxon_id" in types["taxonomy"]:
+                if "taxonomy" in types and not_blank(
+                    "alt_taxon_id", processed_data["taxonomy"], blanks
+                ):
                     without_ids[processed_data["taxonomy"]["alt_taxon_id"]].append(
                         processed_data
                     )
@@ -125,7 +129,7 @@ def index_file(es, types, data, opts):
                         taxon_data
                     )
                     failed_rows[processed_data["taxonomy"]["alt_taxon_id"]].append(row)
-                elif "subspecies" in processed_data["taxonomy"]:
+                elif not_blank("subspecies", processed_data["taxonomy"], blanks):
                     without_ids[processed_data["taxonomy"]["subspecies"]].append(
                         processed_data
                     )
@@ -133,7 +137,7 @@ def index_file(es, types, data, opts):
                         taxon_data
                     )
                     failed_rows[processed_data["taxonomy"]["subspecies"]].append(row)
-                elif "species" in processed_data["taxonomy"]:
+                elif not_blank("species", processed_data["taxonomy"], blanks):
                     without_ids[processed_data["taxonomy"]["species"]].append(
                         processed_data
                     )
