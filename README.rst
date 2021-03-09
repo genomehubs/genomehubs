@@ -4,10 +4,15 @@ GenomeHubs
 
 .. start-badges
 
-|supported-versions| |travis| |coveralls|
-|docs|
-|version| |conda| |platforms| |commits-since|
+|travis| |coveralls|
+|docs| |code-style|
+|version| |conda| |commits-since|
 |license|
+
+
+.. |code-style| image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+    :alt: Code Style Black
 
 .. |docs| image:: https://readthedocs.org/projects/genomehubs/badge/?style=flat
     :target: https://readthedocs.org/projects/genomehubs
@@ -29,21 +34,21 @@ GenomeHubs
     :alt: Supported versions
     :target: https://pypi.org/project/genomehubs
 
-.. |conda| image:: https://anaconda.org/genomehubs/genomehubs/badges/installer/conda.svg
+.. |conda| image:: https://anaconda.org/tolkit/genomehubs/badges/installer/conda.svg
     :alt: Install with Conda
-    :target: https://anaconda.org/genomehubs/genomehubs
+    :target: https://anaconda.org/tolkit/genomehubs
 
-.. |platforms| image:: https://anaconda.org/genomehubs/genomehubs/badges/platforms.svg
+.. |platforms| image:: https://anaconda.org/tolkit/genomehubs/badges/platforms.svg
     :alt: Conda platforms
-    :target: https://anaconda.org/genomehubs/genomehubs
+    :target: https://anaconda.org/tolkit/genomehubs
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/genomehubs/genomehubs/v2.0.0.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/genomehubs/genomehubs/2.0.7.svg
     :alt: Commits since latest release
-    :target: https://github.com/genomehubs/genomehubs/compare/v2.0.0...main
+    :target: https://github.com/genomehubs/genomehubs/compare/2.0.7...main
 
-.. |license| image:: https://anaconda.org/genomehubs/genomehubs/badges/license.svg
+.. |license| image:: https://anaconda.org/tolkit/genomehubs/badges/license.svg
     :alt: MIT License
-    :target: https://anaconda.org/genomehubs/genomehubs
+    :target: https://anaconda.org/tolkit/genomehubs
 
 .. end-badges
 
@@ -54,7 +59,7 @@ Installation
 
 ::
 
-    conda install -c genomehubs genomehubs
+    conda install -c tolkit genomehubs
 
 or 
 

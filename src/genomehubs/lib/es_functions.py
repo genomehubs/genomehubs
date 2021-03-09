@@ -101,7 +101,8 @@ def start_es_binary(opts):
         LOGGER.info("ElasticSearch running on port %d", port)
         return es
     LOGGER.error(
-        "Unable to start ElasticSearch in %d seconds", int(opts["es-timeout"]),
+        "Unable to start ElasticSearch in %d seconds",
+        int(opts["es-timeout"]),
     )
     LOGGER.info("Consider increasing es-timeout")
     LOGGER.info("Stopping ElasticSearch process")

@@ -46,7 +46,7 @@ Options:
 
 Examples:
     # 1. Index all files in a remote repository
-    ./genomehubs index --taxon-repo https://github.com/example/repo~main
+    ./genomehubs index --taxon-repo https://github.com/genomehubs/goat-data
 """
 
 import csv
@@ -71,11 +71,17 @@ from .files import index_metadata
 from .hub import process_row
 from .hub import set_column_indices
 from .hub import validate_types_file
+from .hub import write_imported_rows
 from .taxon import add_names_and_attributes_to_taxa
 from .taxon import fix_missing_ids
 from .version import __version__
 
 LOGGER = tolog.logger(__name__)
+
+
+def not_blank(key, obj, blanks):
+    """Test value is not blank."""
+    return key in obj and obj[key] and obj[key] not in blanks
 
 
 def index_file(es, types, data, opts):
@@ -84,14 +90,16 @@ def index_file(es, types, data, opts):
     rows = csv.reader(
         data, delimiter=delimiters[types["file"]["format"]], quotechar='"'
     )
-    header = None
-    if types["file"].get("header", False):
+    if "header" in types["file"] and types["file"]["header"]:
         header = next(rows)
         set_column_indices(types, header)
+    else:
+        header = None
     with_ids = defaultdict(list)
     taxon_asm_data = defaultdict(list)
     without_ids = defaultdict(list)
     failed_rows = defaultdict(list)
+    imported_rows = []
     blanks = set(["", "NA", "N/A", "None"])
     taxon_types = {}
     for taxonomy_name in opts["taxonomy-source"]:
@@ -104,16 +112,16 @@ def index_file(es, types, data, opts):
                 failed_rows["None"].append(row)
                 continue
             taxon_types.update(new_taxon_types)
-            if (
-                "taxon_id" in processed_data["taxonomy"]
-                and processed_data["taxonomy"]["taxon_id"] not in blanks
-            ):
+            if not_blank("taxon_id", processed_data["taxonomy"], blanks):
                 with_ids[processed_data["taxonomy"]["taxon_id"]].append(processed_data)
                 taxon_asm_data[processed_data["taxonomy"]["taxon_id"]].append(
                     taxon_data
                 )
+                imported_rows.append(row)
             else:
-                if "taxonomy" in types and "alt_taxon_id" in types["taxonomy"]:
+                if "taxonomy" in types and not_blank(
+                    "alt_taxon_id", processed_data["taxonomy"], blanks
+                ):
                     without_ids[processed_data["taxonomy"]["alt_taxon_id"]].append(
                         processed_data
                     )
@@ -121,7 +129,7 @@ def index_file(es, types, data, opts):
                         taxon_data
                     )
                     failed_rows[processed_data["taxonomy"]["alt_taxon_id"]].append(row)
-                elif "subspecies" in processed_data["taxonomy"]:
+                elif not_blank("subspecies", processed_data["taxonomy"], blanks):
                     without_ids[processed_data["taxonomy"]["subspecies"]].append(
                         processed_data
                     )
@@ -129,7 +137,7 @@ def index_file(es, types, data, opts):
                         taxon_data
                     )
                     failed_rows[processed_data["taxonomy"]["subspecies"]].append(row)
-                elif "species" in processed_data["taxonomy"]:
+                elif not_blank("species", processed_data["taxonomy"], blanks):
                     without_ids[processed_data["taxonomy"]["species"]].append(
                         processed_data
                     )
@@ -147,20 +155,28 @@ def index_file(es, types, data, opts):
             types=types,
             taxon_template=taxon_template,
             failed_rows=failed_rows,
+            imported_rows=imported_rows,
             with_ids=with_ids,
             blanks=blanks,
             header=header,
         )
         if with_ids or create_ids:
+            write_imported_rows(
+                imported_rows, opts, types=types, header=header, label="imported"
+            )
             LOGGER.info("Indexing %d entries", len(with_ids.keys()))
             if opts["index"] == "taxon":
                 docs = add_names_and_attributes_to_taxa(
                     es, dict(with_ids), opts, template=taxon_template, blanks=blanks
                 )
                 index_stream(
-                    es, taxon_template["index_name"], docs, _op_type="update",
+                    es,
+                    taxon_template["index_name"],
+                    docs,
+                    _op_type="update",
                 )
             elif opts["index"] == "assembly":
+                # TODO: keep track of taxon_id not found exceptions
                 assembly_template = assembly.index_template(taxonomy_name, opts)
                 docs = add_identifiers_and_attributes_to_assemblies(
                     es,
@@ -173,7 +189,10 @@ def index_file(es, types, data, opts):
                 index_stream(es, assembly_template["index_name"], docs)
                 # index taxon-level attributes
                 index_types(
-                    es, "taxon", {"attributes": taxon_types}, opts,
+                    es,
+                    "taxon",
+                    {"attributes": taxon_types},
+                    opts,
                 )
                 taxon_asm_with_ids = {
                     taxon_id: taxon_asm_data[taxon_id] for taxon_id in with_ids.keys()
@@ -182,7 +201,10 @@ def index_file(es, types, data, opts):
                     es, taxon_asm_with_ids, opts, template=taxon_template, blanks=blanks
                 )
                 index_stream(
-                    es, taxon_template["index_name"], taxon_docs, _op_type="update",
+                    es,
+                    taxon_template["index_name"],
+                    taxon_docs,
+                    _op_type="update",
                 )
 
 

@@ -2,23 +2,20 @@
 
 """Taxon methods."""
 
-import os
 import sys
 from collections import defaultdict
 
-from tolkein import tofile
 from tolkein import tolog
 from tqdm import tqdm
 
 from .es_functions import EsQueryBuilder
 from .es_functions import document_by_id
 from .es_functions import index_stream
-from .es_functions import query_keyword_value_template
 from .es_functions import query_value_template
 from .hub import add_attribute_values
-from .hub import add_attributes
 from .hub import chunks
 from .hub import index_templator
+from .hub import write_imported_rows
 from .taxonomy import index_template as taxonomy_index_template
 
 LOGGER = tolog.logger(__name__)
@@ -179,6 +176,7 @@ def fix_missing_ids(
     types,
     taxon_template,
     failed_rows,
+    imported_rows,
     with_ids=None,
     blanks=set(["NA", "None"]),
     header=None,
@@ -213,29 +211,15 @@ def fix_missing_ids(
     if without_ids and failed_rows:
         for key, value in found_ids.items():
             if key in failed_rows:
+                imported_rows += failed_rows[key]
                 del failed_rows[key]
         if failed_rows:
             LOGGER.info(
                 "Unable to associate %d records with taxon IDs", len(failed_rows)
             )
-            data = []
-            exception_key = "%s-exception" % opts["index"]
-            dir_key = "%s-dir" % opts["index"]
-            if exception_key in opts and opts[exception_key]:
-                outdir = opts[exception_key]
-            else:
-                outdir = "%s/exceptions" % opts[dir_key]
-            os.makedirs(outdir, exist_ok=True)
-            outfile = "%s/%s" % (outdir, types["file"]["name"])
-            if header:
-                data.append(header)
-            for rows in failed_rows.values():
-                for row in rows:
-                    data.append(row)
-            LOGGER.info(
-                "Writing %d records to exceptions file '%s", len(data) - 1, outfile
+            write_imported_rows(
+                failed_rows, opts, types=types, header=header, label="exceptions"
             )
-            tofile.write_file(outfile, data)
     return with_ids, without_ids
 
 
@@ -254,7 +238,12 @@ def stream_taxa(taxa):
 
 
 def get_taxa_to_create(
-    es, opts, *, taxonomy_name="ncbi", taxon_ids=None, asm_by_taxon_id=None,
+    es,
+    opts,
+    *,
+    taxonomy_name="ncbi",
+    taxon_ids=None,
+    asm_by_taxon_id=None,
 ):
     """Create a dict of taxa to create."""
     taxa_to_create = {}
@@ -264,11 +253,15 @@ def get_taxa_to_create(
         asm_by_taxon_id = {}
     taxonomy_template = taxonomy_index_template(taxonomy_name, opts)
     taxonomy_res = query_value_template(
-        es, "taxonomy_node_by_taxon_id", taxon_ids, taxonomy_template["index_name"],
+        es,
+        "taxonomy_node_by_taxon_id",
+        taxon_ids,
+        taxonomy_template["index_name"],
     )
     if taxonomy_res is None:
         LOGGER.error(
-            "Could not connect to taxonomy index '%s'", taxonomy_template["index_name"],
+            "Could not connect to taxonomy index '%s'",
+            taxonomy_template["index_name"],
         )
         sys.exit(1)
     ancestors = set()
@@ -309,7 +302,9 @@ def find_or_create_taxa(es, opts, *, taxon_ids, taxon_template, asm_by_taxon_id=
         asm_by_taxon_id=asm_by_taxon_id,
     )
     index_stream(
-        es, taxon_template["index_name"], stream_taxa(to_create),
+        es,
+        taxon_template["index_name"],
+        stream_taxa(to_create),
     )
     taxa.update(
         {
@@ -356,7 +351,10 @@ def add_names_and_attributes_to_taxa(
     for values in chunks(list(data.keys()), 500):
         # taxa = lookup_taxa_by_taxon_id(es, values, template, return_type="list")
         all_taxa = find_or_create_taxa(
-            es, opts, taxon_ids=values, taxon_template=template,
+            es,
+            opts,
+            taxon_ids=values,
+            taxon_template=template,
         )
         taxa = []
         for taxon_id in values:
@@ -647,7 +645,9 @@ def create_taxa(es, opts, *, taxon_template, data=None, blanks=set(["NA", "None"
             ] = [added_taxon]
     pbar.close()
     index_stream(
-        es, taxon_template["index_name"], stream_taxa(new_taxa),
+        es,
+        taxon_template["index_name"],
+        stream_taxa(new_taxa),
     )
     return new_taxa.keys()
 

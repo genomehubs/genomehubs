@@ -1,22 +1,9 @@
 #!/usr/bin/env python3
 """Wikidata functions."""
 
-import gzip
-import re
-import sys
-import time
-from collections import Counter
-from datetime import datetime
-from datetime import timedelta
-
 import ujson
-from Bio import SeqIO
-from SPARQLWrapper import JSON
-from SPARQLWrapper import SPARQLWrapper
 from tolkein import tofetch
-from tolkein import tofile
 from tolkein import tolog
-from tqdm import tqdm
 
 LOGGER = tolog.logger(__name__)
 

@@ -144,11 +144,15 @@ def get_taxa_to_create(
         return {}
     taxonomy_template = taxonomy_index_template(taxonomy_name, opts)
     taxonomy_res = query_value_template(
-        es, "taxonomy_node_by_taxon_id", taxon_ids, taxonomy_template["index_name"],
+        es,
+        "taxonomy_node_by_taxon_id",
+        taxon_ids,
+        taxonomy_template["index_name"],
     )
     if taxonomy_res is None:
         LOGGER.error(
-            "Could not connect to taxonomy index '%s'", taxonomy_template["index_name"],
+            "Could not connect to taxonomy index '%s'",
+            taxonomy_template["index_name"],
         )
         sys.exit(1)
     ancestors = set()
@@ -240,7 +244,9 @@ def preprocess_batch(es, batch, opts, *, taxonomy_name="ncbi"):
     to_create = len(taxa_to_create.keys())
     to_update = len(taxa_to_update.keys())
     LOGGER.info(
-        "%d taxa to create, %d to update", to_create, to_update,
+        "%d taxa to create, %d to update",
+        to_create,
+        to_update,
     )
     if to_create > 0:
         index_stream(es, taxon_template["index_name"], stream_taxa(taxa_to_create))

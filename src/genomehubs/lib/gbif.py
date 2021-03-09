@@ -1,16 +1,9 @@
 #!/usr/bin/env python3
 """NCBI functions."""
 
-import gzip
-import re
-from collections import Counter
-
 import ujson
-from Bio import SeqIO
 from tolkein import tofetch
-from tolkein import tofile
 from tolkein import tolog
-from tqdm import tqdm
 
 LOGGER = tolog.logger(__name__)
 

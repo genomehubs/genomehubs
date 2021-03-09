@@ -255,7 +255,11 @@ def update_file_attributes(es, files, file_attrs, analyses, file_template):
     file_id = "file-%s" % file_attrs["file_id"]
     action = "index"
     if file_id not in files:
-        res = document_by_id(es, file_id, file_template["index_name"],)
+        res = document_by_id(
+            es,
+            file_id,
+            file_template["index_name"],
+        )
         if res is not None and file_id in res:
             files.update({file_id: res[file_id]})
     if file_id in files:
@@ -297,7 +301,10 @@ def index_docs(es, doc_collection, template):
         if doc_dict:
             docs = stream_docs(doc_dict)
             index_stream(
-                es, template["index_name"], docs, _op_type=op_type,
+                es,
+                template["index_name"],
+                docs,
+                _op_type=op_type,
             )
 
 

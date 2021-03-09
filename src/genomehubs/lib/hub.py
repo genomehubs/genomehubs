@@ -294,9 +294,15 @@ def apply_value_template(prop, value, attribute, *, taxon_types, has_taxon_data)
             has_taxon_data = True
             new_value = attribute[groups[1]]
             if groups[0] != "{{":
-                new_value = "%s%s" % (groups[0].replace("{{", ""), str(new_value),)
+                new_value = "%s%s" % (
+                    groups[0].replace("{{", ""),
+                    str(new_value),
+                )
             if groups[2] != "}}":
-                new_value = "%s%s" % (str(new_value), groups[2].replace("}}", ""),)
+                new_value = "%s%s" % (
+                    str(new_value),
+                    groups[2].replace("}}", ""),
+                )
             taxon_types.update({new_prop: new_value})
             taxon_types.update({"group": "taxon"})
             if prop in taxon_types:
@@ -448,6 +454,8 @@ def process_row(types, row):
     for group in data.keys():
         if group in types:
             for key, meta in types[group].items():
+                if "index" not in meta:
+                    continue
                 try:
                     if isinstance(meta["index"], list):
                         char = meta.get("join", "")
@@ -497,3 +505,31 @@ def set_column_indices(types, header):
                     index = headers.get(value["header"], None)
                     if index is not None:
                         value.update({"index": index})
+
+
+def write_imported_rows(rows, opts, *, types, header=None, label="imported"):
+    """Write imported rows to processed file."""
+    file_key = "%s-exception" % opts["index"]
+    dir_key = "%s-dir" % opts["index"]
+    if file_key in opts and opts[file_key]:
+        outdir = opts[file_key]
+    else:
+        outdir = "%s/%s" % (opts[dir_key], label)
+    os.makedirs(outdir, exist_ok=True)
+    outfile = "%s/%s" % (outdir, types["file"]["name"])
+    data = []
+    header_len = 0
+    if header is not None:
+        data.append(header)
+        header_len = 1
+    if isinstance(rows, dict):
+        for row_set in rows.values():
+            for row in row_set:
+                data.append(row)
+    else:
+        for row in rows:
+            data.append(row)
+    LOGGER.info(
+        "Writing %d records to %s file '%s", len(data) - header_len, label, outfile
+    )
+    tofile.write_file(outfile, data)

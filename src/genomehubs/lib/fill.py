@@ -37,9 +37,7 @@ Examples:
     ./genomehubs fill --traverse-root 7088
 """
 
-import platform
 import sys
-import time
 from collections import defaultdict
 from multiprocessing import Pool
 from statistics import mean
@@ -47,7 +45,6 @@ from statistics import median
 from statistics import median_high
 from statistics import median_low
 from statistics import mode
-from subprocess import call
 
 from docopt import docopt
 from tolkein import tolog
@@ -61,11 +58,6 @@ from .es_functions import index_stream
 from .es_functions import launch_es
 from .es_functions import stream_template_search_results
 from .version import __version__
-
-# if platform.system() != "Linux":
-#     from multiprocessing import set_start_method
-
-#     set_start_method("fork")
 
 LOGGER = tolog.logger(__name__)
 
@@ -204,8 +196,10 @@ def summarise_attribute_values(
 def summarise_attributes(*, attributes, attrs, meta, parent, parents):
     """Set attribute summary values."""
     changed = False
+    attr_dict = {}
     for node_attribute in attributes:
         if node_attribute["key"] in attrs:
+            attr_dict[node_attribute["key"]] = node_attribute
             summary_value, max_value, min_value = summarise_attribute_values(
                 node_attribute, meta[node_attribute["key"]]
             )
@@ -228,14 +222,25 @@ def summarise_attributes(*, attributes, attrs, meta, parent, parents):
                         parents[parent][node_attribute["key"]]["min"] = min(
                             parents[parent][node_attribute["key"]]["min"], min_value
                         )
-    return changed
+    return changed, attr_dict
 
 
 def set_values_from_descendants(
-    *, attributes, descendant_values, meta, parent, taxon_rank, parents
+    *,
+    attributes,
+    descendant_values,
+    meta,
+    taxon_id,
+    parent,
+    taxon_rank,
+    parents,
+    attr_dict=None,
+    limits=None
 ):
     """Set attribute summary values from descendant values."""
     changed = False
+    if attr_dict is None:
+        attr_dict = {}
     for key, obj in descendant_values.items():
         traverseable = meta[key].get("traverse", False)
         if (
@@ -246,9 +251,11 @@ def set_values_from_descendants(
             traverseable = False
         if not traverseable:
             continue
+        if taxon_id in limits[key]:
+            continue
         traverse_limit = meta[key].get("traverse_limit", None)
         if traverse_limit and taxon_rank == traverse_limit:
-            continue
+            limits[key].add(parent)
         try:
             attribute = next(entry for entry in attributes if entry["key"] == key)
         except StopIteration:
@@ -264,8 +271,7 @@ def set_values_from_descendants(
         if summary_value is not None:
             attribute["aggregation_source"] = "descendant"
             changed = True
-            if traverse_limit and taxon_rank == traverse_limit:
-                continue
+            attr_dict.update({key: attribute})
             if parent is not None:
                 if isinstance(summary_value, list):
                     parents[parent][key]["values"] = list(
@@ -281,7 +287,60 @@ def set_values_from_descendants(
                     parents[parent][key]["min"] = min(
                         parents[parent][key]["min"], min_value
                     )
-    return changed
+    return changed, attr_dict
+
+
+def set_attributes_to_descend(meta):
+    """Set which attributes should have values inferred from ancestral taxa."""
+    desc_attrs = set()
+    desc_attr_limits = {}
+    for key, value in meta.items():
+        if "traverse" in value and value["traverse"]:
+            if "traverse_direction" not in value or value["traverse_direction"] in (
+                "down",
+                "both",
+            ):
+                desc_attrs.add(key)
+                if "traverse_limit" in value:
+                    desc_attr_limits.update({key: value["traverse_limit"]})
+    return desc_attrs, desc_attr_limits
+
+
+def track_missing_attribute_values(
+    node, missing_attributes, attr_dict, desc_attrs, desc_attr_limits
+):
+    """Keep track of missing attribute values for in memory traversal."""
+    missing_from_descendants = {}
+    if (
+        node["_source"]["taxon_id"] in missing_attributes
+        and missing_attributes[node["_source"]["taxon_id"]]
+    ):
+        for child_id, obj in missing_attributes[node["_source"]["taxon_id"]].items():
+            for key, attribute in attr_dict.items():
+                if key in obj["keys"]:
+                    # update aggregation source here
+                    # TODO: #51 include ancestral rank in aggregation source
+                    obj["attributes"].append(
+                        {**attribute, "aggregation_source": "ancestor"}
+                    )
+                    obj["keys"].remove(key)
+            if obj["keys"]:
+                missing_from_descendants.update({child_id: obj})
+            else:
+                # yield when all values filled or removed
+                yield obj["node"]["_id"], obj["node"]["_source"]
+        del missing_attributes[node["_source"]["taxon_id"]]
+    if "parent" in node["_source"]:
+        missing_attributes[node["_source"]["parent"]].update(missing_from_descendants)
+        missing_attributes[node["_source"]["parent"]].update(
+            {
+                node["_source"]["taxon_id"]: {
+                    "keys": set({key for key in desc_attrs if key not in attr_dict}),
+                    "attributes": node["_source"]["attributes"],
+                    "node": node,
+                }
+            }
+        )
 
 
 def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
@@ -290,7 +349,9 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
         root = opts["traverse-root"]
     if max_depth is None:
         max_depth = get_max_depth_by_lineage(
-            es, index=template["index_name"], root=root,
+            es,
+            index=template["index_name"],
+            root=root,
         )
     root_depth = max_depth
     meta = template["types"]["attributes"]
@@ -300,38 +361,61 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
             lambda: {"max": float("-inf"), "min": float("inf"), "values": []}
         )
     )
+    limits = defaultdict(set)
+    if "traverse-infer-both" in opts and opts["traverse-infer-both"]:
+        desc_attrs, desc_attr_limits = set_attributes_to_descend(meta)
+        missing_attributes = defaultdict(dict)
+    else:
+        desc_attrs = {}
     while root_depth >= 0:
         nodes = stream_nodes_by_root_depth(
-            es, index=template["index_name"], root=root, depth=root_depth, size=50,
+            es,
+            index=template["index_name"],
+            root=root,
+            depth=root_depth,
+            size=50,
         )
         ctr = 0
         for node in nodes:
+            # TODO: break into sub functions
             ctr += 1
             changed = False
+            attr_dict = {}
             if "attributes" in node["_source"] and node["_source"]["attributes"]:
-                changed = summarise_attributes(
+                changed, attr_dict = summarise_attributes(
                     attributes=node["_source"]["attributes"],
                     attrs=attrs,
                     meta=meta,
                     parent=node["_source"].get("parent", None),
                     parents=parents,
                 )
+            else:
+                node["_source"]["attributes"] = []
             if node["_source"]["taxon_id"] in parents:
-                if "attributes" not in node["_source"]:
-                    node["_source"]["attributes"] = []
-                modified = set_values_from_descendants(
+                modified, attr_dict = set_values_from_descendants(
                     attributes=node["_source"]["attributes"],
                     descendant_values=parents[node["_source"]["taxon_id"]],
                     meta=meta,
+                    taxon_id=node["_source"]["taxon_id"],
                     parent=node["_source"].get("parent", None),
                     parents=parents,
                     taxon_rank=node["_source"]["taxon_rank"],
+                    attr_dict=attr_dict,
+                    limits=limits,
                 )
                 if not changed:
                     changed = modified
+            if desc_attrs:
+                yield from track_missing_attribute_values(
+                    node, missing_attributes, attr_dict, desc_attrs, desc_attr_limits
+                )
             if changed:
                 yield node["_id"], node["_source"]
         root_depth -= 1
+    if desc_attrs:
+        for incomplete in missing_attributes.values():
+            for obj in incomplete.values():
+                yield obj["node"]["_id"], obj["node"]["_source"]
 
 
 def copy_attribute_summary(source, meta):
@@ -396,7 +480,7 @@ def traverse_from_root(es, opts, *, template, root=None, max_depth=None, log=Tru
         root = opts["traverse-root"]
     if max_depth is None:
         max_depth = get_max_depth_by_lineage(
-            es, index=template["index_name"], root=root,
+            es, index=template["index_name"], root=root
         )
     root_depth = max_depth - 1
     meta = template["types"]["attributes"]
@@ -409,7 +493,7 @@ def traverse_from_root(es, opts, *, template, root=None, max_depth=None, log=Tru
         if log:
             LOGGER.info("Filling values at root depth %d" % root_depth)
         nodes = stream_nodes_by_root_depth(
-            es, index=template["index_name"], root=root, depth=root_depth, size=50,
+            es, index=template["index_name"], root=root, depth=root_depth, size=50
         )
         desc_nodes = stream_missing_attributes_at_level(
             es, nodes=nodes, attrs=attrs, template=template
@@ -485,7 +569,6 @@ def main(args):
     options = config("fill", **args)
     if "traverse-infer-both" in options["fill"]:
         options["fill"]["traverse-infer-ancestors"] = True
-        options["fill"]["traverse-infer-descendants"] = True
 
     # Start Elasticsearch
     es = launch_es(options["fill"])
