@@ -432,6 +432,22 @@ def validate_types_file(types_file, dir_path):
     return types, data
 
 
+def set_xrefs(taxon_names, types, row, *, meta=None):
+    """Set xrefs for taxon_names."""
+    if meta is None:
+        meta = {}
+    names = []
+    for name_class, value in taxon_names.items():
+        taxon = {"name": value, "class": name_class}
+        if "xref" in types[name_class] and types[name_class]["xref"]:
+            if "source" in meta:
+                taxon.update({"source": meta["source"]})
+            if "source_stub" in meta:
+                taxon.update({"source_stub": meta["source_stub"]})
+        names.append(taxon)
+    return names
+
+
 def process_row(types, row):
     """Process a row of data."""
     data = {
@@ -479,7 +495,7 @@ def process_row(types, row):
     taxon_data = {}
     taxon_types = {}
     for attr_type in list(["attributes", "identifiers"]):
-        if data[attr_type]:
+        if attr_type in data and data[attr_type]:
             (
                 data[attr_type],
                 taxon_data[attr_type],
@@ -492,6 +508,10 @@ def process_row(types, row):
             )
         else:
             data[attr_type] = []
+    if "taxon_names" in data and data["taxon_names"]:
+        data["taxon_names"] = set_xrefs(
+            data["taxon_names"], types["taxon_names"], row, meta=data["metadata"]
+        )
     return data, taxon_data, taxon_types.get("attributes", {})
 
 

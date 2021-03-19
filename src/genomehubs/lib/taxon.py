@@ -333,15 +333,15 @@ def add_names_to_list(existing, new, *, blanks=set({"NA", "None"})):
     names = defaultdict(dict)
     for entry in existing:
         names[entry["class"]][entry["name"]] = True
-    for name_class, name in new.items():
-        name_class = name_class.replace("_", " ")
+    for entry in new:
+        entry["class"] = entry["class"].lower()  # .replace("_", " ")
         if (
-            name not in blanks
-            and name_class not in names
-            and name not in names[name_class]
+            entry["name"] not in blanks
+            and entry["class"] not in names
+            and entry["name"] not in names[entry["class"]]
         ):
-            existing.append({"name": name, "class": name_class})
-            names[name_class][name] = True
+            existing.append(entry)
+            names[entry["class"]][entry["name"]] = True
 
 
 def add_names_and_attributes_to_taxa(
@@ -363,13 +363,13 @@ def add_names_and_attributes_to_taxa(
         for doc in taxa:
             if doc is not None:
                 taxon_data = data[doc["_source"]["taxon_id"]]
-                taxon_names = {}
+                taxon_names = []
                 attributes = []
                 for entry in taxon_data:
                     if "attributes" in entry:
                         attributes = attributes + entry["attributes"]
                     if "taxon_names" in entry:
-                        taxon_names.update(entry["taxon_names"])
+                        taxon_names += entry["taxon_names"]
                 if "taxon_names" not in doc["_source"]:
                     doc["_source"]["taxon_names"] = []
                 add_names_to_list(

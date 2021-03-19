@@ -108,7 +108,8 @@ def index_file(es, types, data, opts):
         for row in tqdm(rows):
             try:
                 processed_data, taxon_data, new_taxon_types = process_row(types, row)
-            except Exception:
+            except Exception as err:
+                print(err)
                 failed_rows["None"].append(row)
                 continue
             taxon_types.update(new_taxon_types)

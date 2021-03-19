@@ -254,6 +254,7 @@ def set_values_from_descendants(
         if taxon_id in limits[key]:
             continue
         traverse_limit = meta[key].get("traverse_limit", None)
+        # TODO: #53 catch traverse limits when limit rank is missing
         if traverse_limit and taxon_rank == traverse_limit:
             limits[key].add(parent)
         try:

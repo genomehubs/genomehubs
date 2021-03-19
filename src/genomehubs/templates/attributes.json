@@ -12,6 +12,11 @@
         "ignore_above": 32,
         "meta": { "description": "Attribute name" }
       },
+      "display_name": {
+        "type": "keyword",
+        "index": false,
+        "meta": { "description": "Attribute display name" }
+      },
       "constraint": {
         "type": "object"
       },

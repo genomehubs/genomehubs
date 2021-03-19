@@ -80,6 +80,17 @@
             "meta": {
               "description": "Name class (e.g. common name, synonym, etc.)"
             }
+          },
+          "source": {
+            "type": "keyword",
+            "ignore_above": 64,
+            "normalizer": "lowercase",
+            "meta": { "description": "Source DB for taxon name" }
+          },
+          "source_url_stub": {
+            "type": "keyword",
+            "index": false,
+            "meta": { "description": "URL slug for taxon name xref" }
           }
         }
       },
