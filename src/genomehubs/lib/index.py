@@ -84,11 +84,24 @@ def not_blank(key, obj, blanks):
     return key in obj and obj[key] and obj[key] not in blanks
 
 
+def strip_comments(data, types):
+    """Strip comment lines from a file stream."""
+    comment_chars = {"#"}
+    if "file" in types and "comment" in types["file"]:
+        comment_chars.update(set(types["file"]["comment"]))
+    for row in data:
+        if row[0] in comment_chars:
+            continue
+        yield row
+
+
 def index_file(es, types, data, opts):
     """Index a file."""
     delimiters = {"csv": ",", "tsv": "\t"}
     rows = csv.reader(
-        data, delimiter=delimiters[types["file"]["format"]], quotechar='"'
+        strip_comments(data, types),
+        delimiter=delimiters[types["file"]["format"]],
+        quotechar='"',
     )
     if "header" in types["file"] and types["file"]["header"]:
         header = next(rows)
