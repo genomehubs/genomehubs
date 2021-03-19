@@ -1,9 +1,11 @@
 file:
   format: tsv
   header: true
-taxon_names:
-  wikidata_id:
-    header: wikidataTaxonId
+metadata:
+  source:
+    header: source
+  source_stub:
+    header: sourceStub
 taxonomy:
   taxon_id:
     header: ncbiTaxonId

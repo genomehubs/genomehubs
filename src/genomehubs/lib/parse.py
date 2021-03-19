@@ -44,7 +44,6 @@ from tolkein import tolog
 
 from .btk import btk_parser
 from .config import config
-from .gbif import gbif_parser
 from .hub import load_types
 from .hub import order_parsed_fields
 from .ncbi import ncbi_genome_parser
@@ -56,7 +55,6 @@ LOGGER = tolog.logger(__name__)
 
 PARSERS = {
     "btk": {"func": btk_parser, "params": None, "types": "btk"},
-    "gbif": {"func": gbif_parser, "params": None, "types": "xref"},
     "ncbi-datasets-genome": {
         "func": ncbi_genome_parser,
         "params": None,
@@ -77,7 +75,7 @@ PARSERS = {
         "params": ("plastid"),
         "types": "organelle",
     },
-    "wikidata": {"func": wikidata_parser, "params": None, "types": "xref"},
+    "wikidata": {"func": wikidata_parser, "params": None, "types": "wikidata"},
 }
 
 
@@ -91,23 +89,26 @@ def main(args):
             if params is None:
                 params = options["parse"][option]
             LOGGER.info("Parsing %s" % option)
-            parsed = PARSERS[option]["func"](params, options["parse"])
+            types = load_types(PARSERS[option]["types"])
+            names = load_types(PARSERS[option]["types"], part="names")
+            parsed = PARSERS[option]["func"](
+                params, options["parse"], types=types, names=names
+            )
             files = []
             if isinstance(parsed, tuple):
                 parsed, files = parsed
-            types = load_types(PARSERS[option]["types"])
-            names = load_types(PARSERS[option]["types"], part="names")
             data = order_parsed_fields(parsed, types, names)
             tofile.write_file(options["parse"]["outfile"], data)
             filepath = Path(options["parse"]["outfile"])
-            types["file"]["name"] = filepath.name
             outdir = filepath.parent
             suff = re.compile(r"\.[^\.]+$")
             if filepath.name.endswith(".gz"):
                 stem = re.sub(suff, "", filepath.stem)
             else:
                 stem = filepath.stem
-            tofile.write_file("%s/%s.types.yaml" % (outdir, stem), types)
+            if types:
+                types["file"]["name"] = filepath.name
+                tofile.write_file("%s/%s.types.yaml" % (outdir, stem), types)
             if names:
                 names["file"]["name"] = filepath.name
                 tofile.write_file("%s/%s.names.yaml" % (outdir, stem), names)

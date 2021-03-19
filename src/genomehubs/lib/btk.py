@@ -87,7 +87,7 @@ def describe_btk_files(meta):
     return files
 
 
-def btk_parser(_params, opts):
+def btk_parser(_params, opts, *args, **kwargs):
     """Parse BlobToolKit assemblies."""
     parsed = []
     analyses = []
