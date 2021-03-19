@@ -46,28 +46,34 @@ RANKS = [
 # }
 
 SOURCES = {
-    "BOLD": {
+    "bold": {
         "property": "P3606",
-        "source": "BOLD Systems taxon ID",
+        "source": "BOLD",
+        "display_name": "BOLD Systems taxon ID",
         "stub": "http://www.boldsystems.org/index.php/TaxBrowser_TaxonPage?taxid=",
     },
-    "GBIF": {
+    "gbif": {
         "property": "P846",
-        "source": "GBIF taxonKey",
+        "source": "GBIF",
+        "display_name": "GBIF taxonKey",
         "stub": "https://www.gbif.org/species/",
     },
-    "NBN": {
+    "nbn": {
         "property": "P3240",
-        "source": "NBN System Key",
+        "source": "NBN",
+        "display_name": "NBN System Key",
         "stub": "https://data.nbn.org.uk/Taxa/",
     },
-    "NCBI": {
+    "ncbi": {
         "property": "P685",
-        "source": "NCBI taxonomy ID",
+        "source": "NCBI",
+        "display_name": "NCBI taxonomy ID",
         "stub": "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=",
     },
-    "WIKIDATA": {
-        "source": "Wikidata entity",
+    "wikidata": {
+        "property": None,
+        "source": "Wikidata",
+        "display_name": "Wikidata entity",
         "stub": "https://www.wikidata.org/wiki/",
     },
 }
@@ -189,17 +195,18 @@ def prepare_xref_rows(key, meta, entities):
         "subphylum",
         "phylum",
     ]
-    dbs = ["NCBI", "GBIF", "BOLD", "NBN"]
     lineage = meta["lineage"]
     rows = []
     common = {}
+    for db in SOURCES.keys():
+        common.update({db: "None"})
     entity = key.replace(WD, "")
     for rank in ranks:
         if rank in lineage:
             common.update({rank: lineage[rank]})
-    if SOURCES["NCBI"]["property"] in meta:
-        common.update({"ncbiTaxonId": meta[SOURCES["NCBI"]["property"]]})
-        common.update({"taxonId": meta[SOURCES["NCBI"]["property"]]})
+    if SOURCES["ncbi"]["property"] in meta:
+        common.update({"ncbiTaxonId": meta[SOURCES["ncbi"]["property"]]})
+        common.update({"taxonId": meta[SOURCES["ncbi"]["property"]]})
     else:
         common.update({"taxonId": entity})
     if "P225" in meta:
@@ -209,33 +216,36 @@ def prepare_xref_rows(key, meta, entities):
             common.update({rank: name})
     common.update({"wikidataTaxonId": entity})
     row = {**common}
-    row.update(
-        {
-            "xref": "%s:%s" % ("WIKIDATA", entity),
-            "source": SOURCES["WIKIDATA"]["source"],
-            "sourceStub": SOURCES["WIKIDATA"]["stub"],
-            "sourceSlug": entity,
-        }
-    )
-    rows.append(row)
-    for db in dbs:
-        if SOURCES[db]["property"] in meta:
+    for db in SOURCES.keys():
+        if SOURCES[db]["property"] is None or SOURCES[db]["property"] in meta:
             row = {**common}
-            slug = str(meta[SOURCES[db]["property"]])
+            if SOURCES[db]["property"] is None:
+                slug = entity
+            else:
+                slug = str(meta[SOURCES[db]["property"]])
             row.update(
                 {
-                    "xref": "%s:%s" % (db, slug),
+                    db: slug,
                     "source": SOURCES[db]["source"],
                     "sourceStub": SOURCES[db]["stub"],
-                    "sourceSlug": slug,
                 }
             )
             rows.append(row)
     return rows
 
 
-def wikidata_parser(_params, opts):
+def wikidata_parser(_params, opts, *, types=None, names=None):
     """Parse WikiData taxa and identifiers."""
+    if names is None:
+        names = {}
+    if "taxon_names" not in names:
+        names["taxon_names"] = {}
+    for db, values in SOURCES.items():
+        names["taxon_names"][db] = {
+            "display_name": values["display_name"],
+            "header": db,
+            "xref": True,
+        }
     parsed = []
     entities, ranks = fetch_wikidata_rank_entities()
     roots = opts.get("wikidata-root", None)

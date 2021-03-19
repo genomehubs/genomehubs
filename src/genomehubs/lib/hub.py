@@ -63,13 +63,16 @@ def index_templator(parts, opts):
     return template
 
 
-def order_parsed_fields(parsed, types, names=None):
-    """Order parsed fields using a template file."""
-    columns = {}
-    fields = {}
-    ctr = 0
-    types = deepcopy(types)
-    if names is not None:
+def add_names_to_types(names, types):
+    """Add names field meta to type field meta."""
+    sources = 0
+    if types is not None:
+        types = deepcopy(types)
+        sources += 1
+    elif names is not None:
+        types = deepcopy(names)
+        sources += 1
+    if sources == 2:
         for group, entries in names.items():
             if group not in types:
                 types[group] = deepcopy(entries)
@@ -80,6 +83,15 @@ def order_parsed_fields(parsed, types, names=None):
                             types[group][field] = deepcopy(attrs)
                         elif types[group][field]["header"] != attrs["header"]:
                             types[group]["names_%s" % field] = deepcopy(attrs)
+    return types
+
+
+def order_parsed_fields(parsed, types, names=None):
+    """Order parsed fields using a template file."""
+    columns = {}
+    fields = {}
+    ctr = 0
+    types = add_names_to_types(names, types)
     for group, entries in types.items():
         for field, attrs in entries.items():
             header = False
