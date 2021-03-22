@@ -9,7 +9,8 @@ Usage:
                      [--es-host URL...] [--assembly-dir PATH]
                      [--assembly-repo URL] [--assembly-exception PATH]
                      [--taxon-dir PATH] [--taxon-repo URL] [--taxon-exception PATH]
-                     [--taxon-lookup STRING] [--file PATH...] [file-dir PATH...]
+                     [--taxon-lookup STRING] [--taxon-spellcheck]
+                     [--file PATH...] [file-dir PATH...]
                      [--remote-file URL...] [--remote-file-dir URL...]
                      [--taxon-id STRING] [--assembly-id STRING] [--analysis-id STRING]
                      [--file-title STRING] [--file-description STRING] [--file-metadata PATH]
@@ -26,7 +27,8 @@ Options:
     --assembly-repo URL        Remote git repository containing assembly-level data.
                                Optionally include `~branch-name` suffix.
     --assembly-exception PATH  Path to directory to write assembly data that failed to import.
-    --taxon-lookup STRING      Taxon name class to lookup (scientific|all). [Default: scientific]
+    --taxon-lookup STRING      Taxon name class to lookup (scientific|any). [Default: scientific]
+    --taxon-spellcheck         Flag to use fuzzy matching to match taxon names.
     --taxon-dir PATH           Path to directory containing taxon-level data.
     --taxon-repo URL           Remote git repository containing taxon-level data.
                                Optionally include `~branch-name` suffix.
@@ -72,6 +74,7 @@ from .hub import process_row
 from .hub import set_column_indices
 from .hub import validate_types_file
 from .hub import write_imported_rows
+from .hub import write_spellchecked_taxa
 from .taxon import add_names_and_attributes_to_taxa
 from .taxon import fix_missing_ids
 from .version import __version__
@@ -162,6 +165,7 @@ def index_file(es, types, data, opts):
                 else:
                     failed_rows["None"].append(row)
         LOGGER.info("Found taxon IDs in %d entries", len(with_ids.keys()))
+        spellings = {}
         create_ids, without_ids = fix_missing_ids(
             es,
             opts,
@@ -173,7 +177,9 @@ def index_file(es, types, data, opts):
             with_ids=with_ids,
             blanks=blanks,
             header=header,
+            spellings=spellings,
         )
+        write_spellchecked_taxa(spellings, opts, types=types, header=header)
         if with_ids or create_ids:
             write_imported_rows(
                 imported_rows, opts, types=types, header=header, label="imported"
