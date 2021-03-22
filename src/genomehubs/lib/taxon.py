@@ -645,11 +645,17 @@ def set_ranks(taxonomy):
         "subphylum",
         "phylum",
     ]
+    taxon_rank = None
     if "subspecies" in taxonomy:
         ranks = ["species"] + default_ranks
+        taxon_rank = "subspecies"
     else:
         ranks = default_ranks
-    return ranks
+        for rank in ["species"] + default_ranks:
+            if rank in taxonomy:
+                taxon_rank = rank
+                break
+    return ranks, taxon_rank
 
 
 def create_taxa(
@@ -672,13 +678,13 @@ def create_taxa(
         lineage = []
         closest_rank = None
         closest_taxon = None
-        ranks = set_ranks(obj["taxonomy"])
+        ranks, taxon_rank = set_ranks(obj["taxonomy"])
         max_index = len(ranks) - 1
         # max_rank = ranks[max_index]
         for index, rank in enumerate(ranks[: (max_index - 1)]):
             if rank not in obj["taxonomy"] or obj["taxonomy"][rank] in blanks:
                 continue
-            if obj["taxonomy"][rank] in spellings:
+            if obj["taxonomy"][taxon_rank] in spellings:
                 break
             intermediates = 0
             for anc_rank in ranks[(index + 1) :]:
@@ -765,50 +771,3 @@ def create_taxa(
         stream_taxa(new_taxa),
     )
     return new_taxa.keys()
-
-
-# def parse_taxa(es, types, taxonomy_template):
-#     """Test method to parse taxa."""
-#     taxa = [
-#         {
-#             "taxon_id": 110368,
-#             "assembly_span": 12344567,
-#             "c_value": 2.5,
-#             "sex_determination_system": "N/A",
-#         },
-#         {
-#             "taxon_id": 13037,
-#             "assembly_span": 2345678,
-#             "c_value": 2.3,
-#             "sex_determination_system": "XO",
-#         },
-#         {
-#             "taxon_id": 113334,
-#             "assembly_span": 45678912,
-#             "c_value": 4.6,
-#             "sex_determination_system": "XY",
-#         },
-#     ]
-#     for entry in taxa:
-#         # attributes = {}
-#         taxon_id = str(entry["taxon_id"])
-#         doc = lookup_taxon_by_taxid(es, taxon_id, taxonomy_template)
-#         if doc is None:
-#             LOGGER.warning(
-#                 "No %s taxonomy record for %s",
-#                 taxonomy_template["index_name"],
-#                 taxon_id,
-#             )
-#         attributes = add_attributes(entry, types, attributes=[])[0]
-#         doc.update({"taxon_id": taxon_id, "attributes": attributes})
-#         doc_id = "taxon_id-%s" % taxon_id
-#         yield doc_id, doc
-
-
-# def index(es, opts, *, taxonomy_name="ncbi"):
-#     """Index a set of taxa."""
-#     LOGGER.info("Indexing taxa using %s taxonomy", taxonomy_name)
-#     template = index_template(taxonomy_name, opts)
-#     taxonomy_template = taxonomy_index_template(taxonomy_name, opts)
-#     stream = parse_taxa(es, template["types"], taxonomy_template)
-#     return template, stream
