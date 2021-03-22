@@ -255,7 +255,7 @@ def set_values_from_descendants(
             continue
         traverse_limit = meta[key].get("traverse_limit", None)
         # TODO: #53 catch traverse limits when limit rank is missing
-        if traverse_limit and taxon_rank == traverse_limit:
+        if traverse_limit and taxon_rank in traverse_limit:
             limits[key].add(parent)
         try:
             attribute = next(entry for entry in attributes if entry["key"] == key)
@@ -356,6 +356,11 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
         )
     root_depth = max_depth
     meta = template["types"]["attributes"]
+    for key, value in meta.items():
+        if "traverse_limit" in value:
+            if not isinstance(value["traverse_limit"], list):
+                value["traverse_limit"] = [value["traverse_limit"]]
+            value["traverse_limit"] = set(value["traverse_limit"])
     attrs = set(meta.keys())
     parents = defaultdict(
         lambda: defaultdict(
