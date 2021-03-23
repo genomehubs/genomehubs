@@ -323,10 +323,14 @@ def track_missing_attribute_values(
         for child_id, obj in missing_attributes[node["_source"]["taxon_id"]].items():
             for key, attribute in attr_dict.items():
                 if key in obj["keys"]:
-                    # update aggregation source here
-                    # TODO: #51 include ancestral rank in aggregation source
+                    # update aggregation source to include ancestral rank
                     obj["attributes"].append(
-                        {**attribute, "aggregation_source": "ancestor"}
+                        {
+                            **attribute,
+                            "aggregation_source": "ancestor",
+                            "aggregation_rank": node["_source"]["taxon_rank"],
+                            "aggregation_taxon_id": node["_source"]["taxon_id"],
+                        }
                     )
                     obj["keys"].remove(key)
             if obj["keys"]:
