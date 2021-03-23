@@ -234,6 +234,7 @@ def set_values_from_descendants(
     parent,
     taxon_rank,
     parents,
+    descendant_ranks=None,
     attr_dict=None,
     limits=None
 ):
@@ -249,14 +250,17 @@ def set_values_from_descendants(
             and meta[key]["traverse_direction"] == "down"
         ):
             traverseable = False
-        if not traverseable:
-            continue
-        if taxon_id in limits[key]:
+        if not traverseable or taxon_id in limits[key]:
             continue
         traverse_limit = meta[key].get("traverse_limit", None)
-        # TODO: #53 catch traverse limits when limit rank is missing
-        if traverse_limit and taxon_rank in traverse_limit:
-            limits[key].add(parent)
+        if traverse_limit:
+            if (
+                descendant_ranks is not None
+                and traverse_limit in descendant_ranks[taxon_id]
+            ):
+                continue
+            if taxon_rank == traverse_limit:
+                limits[key].add(parent)
         try:
             attribute = next(entry for entry in attributes if entry["key"] == key)
         except StopIteration:
@@ -344,6 +348,12 @@ def track_missing_attribute_values(
         )
 
 
+def track_descendant_ranks(node, descendant_ranks):
+    """Keep track of descendant ranks."""
+    if "parent" in node["_source"]:
+        descendant_ranks[node["_source"]["parent"]].add(node["_source"]["taxon_rank"])
+
+
 def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
     """Traverse a tree, filling in values."""
     if root is None:
@@ -356,11 +366,11 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
         )
     root_depth = max_depth
     meta = template["types"]["attributes"]
-    for key, value in meta.items():
-        if "traverse_limit" in value:
-            if not isinstance(value["traverse_limit"], list):
-                value["traverse_limit"] = [value["traverse_limit"]]
-            value["traverse_limit"] = set(value["traverse_limit"])
+    # for key, value in meta.items():
+    #     if "traverse_limit" in value:
+    #         if not isinstance(value["traverse_limit"], list):
+    #             value["traverse_limit"] = [value["traverse_limit"]]
+    #         value["traverse_limit"] = set(value["traverse_limit"])
     attrs = set(meta.keys())
     parents = defaultdict(
         lambda: defaultdict(
@@ -371,6 +381,7 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
     if "traverse-infer-both" in opts and opts["traverse-infer-both"]:
         desc_attrs, desc_attr_limits = set_attributes_to_descend(meta)
         missing_attributes = defaultdict(dict)
+        descendant_ranks = defaultdict(set)
     else:
         desc_attrs = {}
     while root_depth >= 0:
@@ -384,6 +395,7 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
         ctr = 0
         for node in nodes:
             # TODO: break into sub functions
+            track_descendant_ranks(node, descendant_ranks)
             ctr += 1
             changed = False
             attr_dict = {}
@@ -405,6 +417,7 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
                     taxon_id=node["_source"]["taxon_id"],
                     parent=node["_source"].get("parent", None),
                     parents=parents,
+                    descendant_ranks=descendant_ranks,
                     taxon_rank=node["_source"]["taxon_rank"],
                     attr_dict=attr_dict,
                     limits=limits,
