@@ -280,6 +280,22 @@
               "description": "Summary source (direct, ancestor, descendant)"
             }
           },
+          "aggregation_rank": {
+            "type": "keyword",
+            "ignore_above": 16,
+            "normalizer": "lowercase",
+            "meta": {
+              "description": "Source rank for ancestor derived values"
+            }
+          },
+          "aggregation_taxon_id": {
+            "type": "keyword",
+            "ignore_above": 16,
+            "normalizer": "lowercase",
+            "meta": {
+              "description": "Source taxon_id for ancestor derived values"
+            }
+          },
           "comment": {
             "type": "text",
             "index": false
