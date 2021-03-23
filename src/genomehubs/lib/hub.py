@@ -506,6 +506,10 @@ def process_row(types, row):
                     raise err
     taxon_data = {}
     taxon_types = {}
+    if "is_primary_value" in data["metadata"]:
+        data["metadata"]["is_primary_value"] = bool(
+            int(data["metadata"]["is_primary_value"])
+        )
     for attr_type in list(["attributes", "identifiers"]):
         if attr_type in data and data[attr_type]:
             (
