@@ -430,8 +430,6 @@ def copy_attribute_summary(source, meta):
     try:
         dest["%s_value" % meta["type"]] = source["%s_value" % meta["type"]]
     except KeyError as err:
-        print(source)
-        print(meta)
         raise (err)
     dest["count"] = source["count"]
     dest["key"] = source["key"]

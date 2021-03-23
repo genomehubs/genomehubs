@@ -562,6 +562,53 @@ def write_imported_rows(rows, opts, *, types, header=None, label="imported"):
         for row in rows:
             data.append(row)
     LOGGER.info(
-        "Writing %d records to %s file '%s", len(data) - header_len, label, outfile
+        "Writing %d records to %s file '%s'", len(data) - header_len, label, outfile
     )
     tofile.write_file(outfile, data)
+
+
+def write_spellchecked_taxa(spellings, opts, *, types, header=None):
+    """Write spellchecked taxa to file."""
+    imported = []
+    exceptions = []
+    file_key = "%s-exception" % opts["index"]
+    dir_key = "%s-dir" % opts["index"]
+    filepath = Path(types["file"]["name"])
+    extensions = "".join(filepath.suffixes)
+    file_basename = str(filepath).replace(extensions, "")
+    for name, matches in spellings.items():
+        # enable test condition below if importing spellchecked taxa:
+        # if len(matches) == 1:
+        #     imported.append([name, matches[0]])
+        # else:
+        exceptions.append([name] + matches)
+    if imported:
+        label = "imported"
+        if file_key in opts and opts[file_key]:
+            outdir = opts[file_key]
+        else:
+            outdir = "%s/%s" % (opts[dir_key], label)
+        os.makedirs(outdir, exist_ok=True)
+        outfile = "%s/%s" % (outdir, "%s.spellcheck.tsv" % file_basename)
+        LOGGER.info(
+            "Writing %d spelling corrections to %s file '%s'",
+            len(imported),
+            label,
+            outfile,
+        )
+        tofile.write_file(outfile, [["input", "corrected"]] + imported)
+    if exceptions:
+        label = "exceptions"
+        if file_key in opts and opts[file_key]:
+            outdir = opts[file_key]
+        else:
+            outdir = "%s/%s" % (opts[dir_key], label)
+        os.makedirs(outdir, exist_ok=True)
+        outfile = "%s/%s" % (outdir, "%s.spellcheck.tsv" % file_basename)
+        LOGGER.info(
+            "Writing %d spelling suggestions to %s file '%s'",
+            len(exceptions),
+            label,
+            outfile,
+        )
+        tofile.write_file(outfile, [["input", "suggested"]] + exceptions)
