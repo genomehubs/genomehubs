@@ -119,7 +119,15 @@ def stream_descendant_nodes_missing_attributes(es, *, index, attributes, root, s
                 yield result
 
 
-def apply_summary(summary, values, *, max_value=None, min_value=None):
+def apply_summary(
+    summary,
+    values,
+    *,
+    primary_values=None,
+    summary_types=None,
+    max_value=None,
+    min_value=None
+):
     """Apply summary statistic functions."""
     summaries = {
         "count": len,
@@ -134,6 +142,10 @@ def apply_summary(summary, values, *, max_value=None, min_value=None):
         "list": list,
     }
     flattened = []
+    if summary == "primary":
+        if primary_values:
+            values = primary_values
+        summary = summary_types[0]
     for v in values:
         if isinstance(v, list):
             flattened += v
@@ -159,9 +171,14 @@ def summarise_attribute_values(
         return None, None, None
     if "summary" in meta:
         value_type = "%s_value" % meta["type"]
+        primary_values = []
         if "values" in attribute:
             if values is None:
-                values = [value[value_type] for value in attribute["values"]]
+                values = []
+                for value in attribute["values"]:
+                    values.append(value[value_type])
+                    if "is_primary_value" in value and value["is_primary_value"]:
+                        primary_values.append(value[value_type])
             else:
                 values += [value[value_type] for value in attribute["values"]]
         if not values:
@@ -171,16 +188,23 @@ def summarise_attribute_values(
         traverse_value = None
         if not isinstance(meta["summary"], list):
             meta["summary"] = [meta["summary"]]
-        for summary in meta["summary"]:
+        for index, summary in enumerate(meta["summary"]):
             value, max_value, min_value = apply_summary(
-                summary, values, max_value=max_value, min_value=min_value
+                summary,
+                values,
+                primary_values=primary_values,
+                summary_types=meta["summary"][index + 1 :] + ["median"],
+                max_value=max_value,
+                min_value=min_value,
             )
             if idx == 0:
-                attribute[value_type] = value
-                attribute["count"] = len(values)
-                attribute["aggregation_method"] = summary
-                attribute["aggregation_source"] = "direct"
-                traverse_value = value
+                if value is not None:
+                    attribute[value_type] = value
+                    attribute["count"] = len(values)
+                    attribute["aggregation_method"] = summary
+                    attribute["aggregation_source"] = "direct"
+                    traverse_value = value
+                idx += 1
             elif traverse and summary == traverse:
                 traverse_value = value
             if summary != "list":
@@ -188,7 +212,6 @@ def summarise_attribute_values(
                     summary = "median"
             else:
                 traverse_value = list(set(traverse_value))
-            idx += 1
         return traverse_value, max_value, min_value
     return None, None, None
 
