@@ -212,6 +212,9 @@ def summarise_attribute_values(
                     summary = "median"
             else:
                 traverse_value = list(set(traverse_value))
+        if isinstance(max_value, float) or isinstance(max_value, int):
+            attribute["max"] = max_value
+            attribute["min"] = min_value
         return traverse_value, max_value, min_value
     return None, None, None
 
@@ -238,13 +241,19 @@ def summarise_attributes(*, attributes, attrs, meta, parent, parents):
                             summary_value
                         )
                     if max_value is not None:
-                        parents[parent][node_attribute["key"]]["max"] = max(
-                            parents[parent][node_attribute["key"]]["max"], max_value
-                        )
+                        if parents[parent][node_attribute["key"]]["max"] is not None:
+                            parents[parent][node_attribute["key"]]["max"] = max(
+                                parents[parent][node_attribute["key"]]["max"], max_value
+                            )
+                        else:
+                            parents[parent][node_attribute["key"]]["max"] = max_value
                     if min_value is not None:
-                        parents[parent][node_attribute["key"]]["min"] = min(
-                            parents[parent][node_attribute["key"]]["min"], min_value
-                        )
+                        if parents[parent][node_attribute["key"]]["min"] is not None:
+                            parents[parent][node_attribute["key"]]["min"] = min(
+                                parents[parent][node_attribute["key"]]["min"], min_value
+                            )
+                        else:
+                            parents[parent][node_attribute["key"]]["min"] = min_value
     return changed, attr_dict
 
 
@@ -308,13 +317,19 @@ def set_values_from_descendants(
                 else:
                     parents[parent][key]["values"].append(summary_value)
                 if max_value is not None:
-                    parents[parent][key]["max"] = max(
-                        parents[parent][key]["max"], max_value
-                    )
+                    if parents[parent][key]["max"] is not None:
+                        parents[parent][key]["max"] = max(
+                            parents[parent][key]["max"], max_value
+                        )
+                    else:
+                        parents[parent][key]["max"] = max_value
                 if min_value is not None:
-                    parents[parent][key]["min"] = min(
-                        parents[parent][key]["min"], min_value
-                    )
+                    if parents[parent][key]["min"] is not None:
+                        parents[parent][key]["min"] = min(
+                            parents[parent][key]["min"], min_value
+                        )
+                    else:
+                        parents[parent][key]["min"] = min_value
     return changed, attr_dict
 
 
@@ -400,9 +415,7 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
     #         value["traverse_limit"] = set(value["traverse_limit"])
     attrs = set(meta.keys())
     parents = defaultdict(
-        lambda: defaultdict(
-            lambda: {"max": float("-inf"), "min": float("inf"), "values": []}
-        )
+        lambda: defaultdict(lambda: {"max": None, "min": None, "values": []})
     )
     limits = defaultdict(set)
     if "traverse-infer-both" in opts and opts["traverse-infer-both"]:
