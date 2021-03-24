@@ -214,7 +214,7 @@ def fix_missing_ids(
                     with_ids[created_id] = without_ids[created_id]
                     found_ids[created_id] = True
                     del without_ids[created_id]
-    if without_ids and failed_rows:
+    if failed_rows:
         for key, value in found_ids.items():
             if key in failed_rows:
                 imported_rows += failed_rows[key]
@@ -670,11 +670,16 @@ def create_taxa(
     pbar = tqdm(total=len(data.keys()))
     taxon_ids = set({})
     new_taxa = {}
-    for alt_taxon_id, rows in data.items():
+    for rows in data.values():
         obj = rows[0]
         pbar.update(1)
-        if "taxonomy" not in obj:
+        if (
+            "taxonomy" not in obj
+            or "alt_taxon_id" not in obj["taxonomy"]
+            or obj["taxonomy"]["alt_taxon_id"] in blanks
+        ):
             continue
+        alt_taxon_id = obj["taxonomy"]["alt_taxon_id"]
         lineage = []
         closest_rank = None
         closest_taxon = None
@@ -684,7 +689,7 @@ def create_taxa(
         for index, rank in enumerate(ranks[: (max_index - 1)]):
             if rank not in obj["taxonomy"] or obj["taxonomy"][rank] in blanks:
                 continue
-            if obj["taxonomy"][taxon_rank] in spellings:
+            if obj["taxonomy"][rank] in spellings:
                 break
             intermediates = 0
             for anc_rank in ranks[(index + 1) :]:
