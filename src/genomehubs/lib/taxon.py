@@ -658,6 +658,41 @@ def set_ranks(taxonomy):
     return ranks, taxon_rank
 
 
+def create_new_taxon(
+    alt_taxon_id,
+    closest_taxon,
+    closest_rank,
+    lineage,
+    new_taxa,
+    taxon_ids,
+    obj,
+    matches,
+    taxa,
+    ancestors,
+):
+    """Create a new taxon with new ancestral taxa as required."""
+    if closest_taxon is not None:
+        for intermediate in reversed(lineage):
+            taxon_id = generate_ancestral_taxon_id(
+                intermediate["name"],
+                intermediate["rank"],
+                alt_taxon_id=alt_taxon_id,
+                taxon_ids=taxon_ids,
+            )
+            new_taxon = create_descendant_taxon(
+                taxon_id, intermediate["rank"], intermediate["name"], closest_taxon
+            )
+            new_taxa.update({new_taxon["_source"]["taxon_id"]: new_taxon["_source"]})
+            matches[intermediate["name"]][obj["taxonomy"][closest_rank]] = taxa
+            closest_rank = intermediate["rank"]
+            closest_taxon = new_taxon
+        ancestors[alt_taxon_id] = closest_taxon
+        added_taxon = add_new_taxon(alt_taxon_id, new_taxa, obj, closest_taxon)
+        matches[added_taxon["_source"]["scientific_name"]][
+            closest_taxon["_source"]["scientific_name"]
+        ] = [added_taxon]
+
+
 def create_taxa(
     es, opts, *, taxon_template, data=None, blanks=set(["NA", "None"]), spellings=None
 ):
@@ -678,34 +713,49 @@ def create_taxa(
             or "alt_taxon_id" not in obj["taxonomy"]
             or obj["taxonomy"]["alt_taxon_id"] in blanks
         ):
+            # row has no alt_taxon_id
             continue
         alt_taxon_id = obj["taxonomy"]["alt_taxon_id"]
         lineage = []
         closest_rank = None
         closest_taxon = None
+        # fetch ancestral ranks and current taxon rank
         ranks, taxon_rank = set_ranks(obj["taxonomy"])
+        if (
+            taxon_rank not in obj["taxonomy"]
+            or obj["taxonomy"][taxon_rank] in blanks
+            or obj["taxonomy"][taxon_rank] in spellings
+        ):
+            # taxon name is missing or may be mis-spelled
+            continue
         max_index = len(ranks) - 1
-        # max_rank = ranks[max_index]
+        # loop through lineage to find existing ancestral taxa
         for index, rank in enumerate(ranks[: (max_index - 1)]):
             if rank not in obj["taxonomy"] or obj["taxonomy"][rank] in blanks:
+                # row has no name at this rank
                 continue
             if obj["taxonomy"][rank] in spellings:
+                # ancestral taxon name is missing or may be mis-spelled
                 break
             intermediates = 0
+            # loop through higher ranks to disambiguate name clashes
             for anc_rank in ranks[(index + 1) :]:
                 if (
                     anc_rank not in obj["taxonomy"]
                     or obj["taxonomy"][anc_rank] in blanks
                 ):
+                    # row has no name at this rank
                     continue
                 if (
                     obj["taxonomy"][rank] in matches
                     and obj["taxonomy"][anc_rank] in matches[obj["taxonomy"][rank]]
                 ):
+                    # this taxon has been seen before
                     taxa = matches[obj["taxonomy"][rank]][obj["taxonomy"][anc_rank]]
                     ancestors.update({alt_taxon_id: taxa[0]})
                     break
                 else:
+                    #  find existing ancestral taxa within a lineage
                     taxa = lookup_taxon_within_lineage(
                         es,
                         obj["taxonomy"][rank],
@@ -717,10 +767,10 @@ def create_taxa(
                     )
                 if taxa:
                     if len(taxa) == 1:
+                        #  unambiguous match to a single existing taxon
                         ancestors.update({alt_taxon_id: taxa[0]})
                         matches[obj["taxonomy"][rank]][obj["taxonomy"][anc_rank]] = taxa
                         break
-                # elif anc_rank == max_rank and intermediates == 0:
                 elif intermediates == 0:
                     taxa, name_class = lookup_taxon(
                         es,
@@ -747,32 +797,25 @@ def create_taxa(
                     closest_taxon = matches[obj["taxonomy"][anc_rank]]["all"][0]
                 break
             lineage.append({"rank": rank, "name": obj["taxonomy"][rank]})
-        if closest_taxon is not None:
-            for intermediate in reversed(lineage):
-                taxon_id = generate_ancestral_taxon_id(
-                    intermediate["name"],
-                    intermediate["rank"],
-                    alt_taxon_id=alt_taxon_id,
-                    taxon_ids=taxon_ids,
-                )
-                new_taxon = create_descendant_taxon(
-                    taxon_id, intermediate["rank"], intermediate["name"], closest_taxon
-                )
-                new_taxa.update(
-                    {new_taxon["_source"]["taxon_id"]: new_taxon["_source"]}
-                )
-                matches[intermediate["name"]][obj["taxonomy"][closest_rank]] = taxa
-                closest_rank = intermediate["rank"]
-                closest_taxon = new_taxon
-            ancestors[alt_taxon_id] = closest_taxon
-            added_taxon = add_new_taxon(alt_taxon_id, new_taxa, obj, closest_taxon)
-            matches[added_taxon["_source"]["scientific_name"]][
-                closest_taxon["_source"]["scientific_name"]
-            ] = [added_taxon]
+        # create a new taxon if a closest ancestral taxon could be found
+        create_new_taxon(
+            alt_taxon_id,
+            closest_taxon,
+            closest_rank,
+            lineage,
+            new_taxa,
+            taxon_ids,
+            obj,
+            matches,
+            taxa,
+            ancestors,
+        )
     pbar.close()
+    # add new taxa to the index
     index_stream(
         es,
         taxon_template["index_name"],
         stream_taxa(new_taxa),
     )
+    # return a list of alt_taxon_ids for the created taxa
     return new_taxa.keys()
