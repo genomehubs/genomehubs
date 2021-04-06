@@ -6,7 +6,7 @@ Fill attribute values.
 Usage:
     genomehubs fill [--hub-name STRING] [--hub-path PATH] [--hub-version PATH]
                     [--config-file PATH...] [--config-save PATH]
-                    [--es-host URL...]
+                    [--es-host URL...] [--traverse-limit STRING]
                     [--traverse-infer-ancestors] [--traverse-infer-descendants]
                     [--traverse-infer-both] [--traverse-threads INT]
                     [--traverse-depth INT] [--traverse-root STRING]
@@ -25,6 +25,7 @@ Options:
     --traverse-infer-descendants  Flag to enable tree traversal from root to tips.
     --traverse-infer-both         Flag to enable tree traversal from tips to root and
                                   back to tips.
+    --traverse-limit STRING       Maximum rank to ascend to during traversal. [Default: class]
     --traverse-root ID            Root taxon id for tree traversal.
     --traverse-threads INT        Number of threads to use for tree traversal. [Default: 1]
     --traverse-weight STRING      Weighting scheme for setting values during tree
@@ -265,6 +266,7 @@ def set_values_from_descendants(
     taxon_id,
     parent,
     taxon_rank,
+    traverse_limit,
     parents,
     descendant_ranks=None,
     attr_dict=None,
@@ -284,7 +286,7 @@ def set_values_from_descendants(
             traverseable = False
         if not traverseable or taxon_id in limits[key]:
             continue
-        traverse_limit = meta[key].get("traverse_limit", None)
+        traverse_limit = meta[key].get("traverse_limit", traverse_limit)
         if traverse_limit:
             if (
                 descendant_ranks is not None
@@ -333,7 +335,7 @@ def set_values_from_descendants(
     return changed, attr_dict
 
 
-def set_attributes_to_descend(meta):
+def set_attributes_to_descend(meta, traverse_limit):
     """Set which attributes should have values inferred from ancestral taxa."""
     desc_attrs = set()
     desc_attr_limits = {}
@@ -346,6 +348,8 @@ def set_attributes_to_descend(meta):
                 desc_attrs.add(key)
                 if "traverse_limit" in value:
                     desc_attr_limits.update({key: value["traverse_limit"]})
+                else:
+                    desc_attr_limits.update({key: traverse_limit})
     return desc_attrs, desc_attr_limits
 
 
@@ -408,18 +412,15 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
         )
     root_depth = max_depth
     meta = template["types"]["attributes"]
-    # for key, value in meta.items():
-    #     if "traverse_limit" in value:
-    #         if not isinstance(value["traverse_limit"], list):
-    #             value["traverse_limit"] = [value["traverse_limit"]]
-    #         value["traverse_limit"] = set(value["traverse_limit"])
     attrs = set(meta.keys())
     parents = defaultdict(
         lambda: defaultdict(lambda: {"max": None, "min": None, "values": []})
     )
     limits = defaultdict(set)
     if "traverse-infer-both" in opts and opts["traverse-infer-both"]:
-        desc_attrs, desc_attr_limits = set_attributes_to_descend(meta)
+        desc_attrs, desc_attr_limits = set_attributes_to_descend(
+            meta, opts["traverse-limit"]
+        )
         missing_attributes = defaultdict(dict)
         descendant_ranks = defaultdict(set)
     else:
@@ -459,6 +460,7 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
                     parents=parents,
                     descendant_ranks=descendant_ranks,
                     taxon_rank=node["_source"]["taxon_rank"],
+                    traverse_limit=opts["traverse-limit"],
                     attr_dict=attr_dict,
                     limits=limits,
                 )
