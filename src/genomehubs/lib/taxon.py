@@ -451,10 +451,11 @@ def spellcheck_taxon(es, name, index, rank, taxonomy_index_template, opts, retur
                 if option.get("collate_match", False)
             ]
         except KeyError:
-            return None
+            return None, rank, None
         except ValueError:
-            return None
-    if matches and len(matches) > 1:
+            return None, rank, None
+    taxon_id = None
+    if matches:
         taxon_matches = {}
         scientific_name = None
         for match in matches:
@@ -466,14 +467,15 @@ def spellcheck_taxon(es, name, index, rank, taxonomy_index_template, opts, retur
                 es, body, index, taxonomy_index_template, opts, return_type="taxon"
             )
             if len(taxa) > 1:
-                return matches
+                return None, rank, matches
             for taxon in taxa:
                 source = taxon["_source"]
-                taxon_matches[source["taxon_id"]] = source["scientific_name"]
+                taxon_id = source["taxon_id"]
+                taxon_matches[taxon_id] = source["scientific_name"]
                 scientific_name = source["scientific_name"]
         if len(taxon_matches.keys()) == 1:
-            return [scientific_name]
-    return matches
+            return taxon_id, rank, [scientific_name]
+    return None, rank, matches
 
 
 def taxon_lookup(es, body, index, taxonomy_index_template, opts, return_type):
@@ -523,11 +525,13 @@ def lookup_taxon(
     if name_class in {"any", "spellcheck"}:
         body.update({"id": "taxon_by_any_name"})
     if name_class == "spellcheck":
-        matches = spellcheck_taxon(
+        taxon_id, rank, matches = spellcheck_taxon(
             es, name, index, rank, taxonomy_index_template, opts, return_type
         )
         if matches:
-            spellings.update({name: matches})
+            spellings.update(
+                {name: {"matches": matches, "taxon_id": taxon_id, "rank": rank}}
+            )
         return [], name_class
         # Uncomment code blow to use suggestion in current import
         # if matches and len(matches) == 1:
