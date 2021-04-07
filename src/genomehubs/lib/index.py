@@ -72,8 +72,10 @@ from .files import index_files
 from .files import index_metadata
 from .hub import process_row
 from .hub import set_column_indices
+from .hub import strip_comments
 from .hub import validate_types_file
 from .hub import write_imported_rows
+from .hub import write_imported_taxa
 from .hub import write_spellchecked_taxa
 from .taxon import add_names_and_attributes_to_taxa
 from .taxon import fix_missing_ids
@@ -87,18 +89,19 @@ def not_blank(key, obj, blanks):
     return key in obj and obj[key] and obj[key] not in blanks
 
 
-def strip_comments(data, types):
-    """Strip comment lines from a file stream."""
-    comment_chars = {"#"}
-    if "file" in types and "comment" in types["file"]:
-        comment_chars.update(set(types["file"]["comment"]))
-    for row in data:
-        if row[0] in comment_chars:
-            continue
-        yield row
+def summarise_imported_taxa(docs, imported_taxa):
+    """Summarise taxon imformation from a stram of taxon docs."""
+    for entry_id, entry in docs:
+        imported_taxa[entry["scientific_name"]].append(
+            {
+                "taxon_id": entry["taxon_id"],
+                "rank": entry["taxon_rank"],
+            }
+        )
+        yield entry_id, entry
 
 
-def index_file(es, types, data, opts):
+def index_file(es, types, names, data, opts):
     """Index a file."""
     delimiters = {"csv": ",", "tsv": "\t"}
     rows = csv.reader(
@@ -123,7 +126,9 @@ def index_file(es, types, data, opts):
         LOGGER.info("Processing rows")
         for row in tqdm(rows):
             try:
-                processed_data, taxon_data, new_taxon_types = process_row(types, row)
+                processed_data, taxon_data, new_taxon_types = process_row(
+                    types, names, row
+                )
             except Exception as err:
                 print(err)
                 failed_rows["None"].append(row)
@@ -179,7 +184,7 @@ def index_file(es, types, data, opts):
             header=header,
             spellings=spellings,
         )
-        write_spellchecked_taxa(spellings, opts, types=types, header=header)
+        write_spellchecked_taxa(spellings, opts, types=types)
         if with_ids or create_ids:
             write_imported_rows(
                 imported_rows, opts, types=types, header=header, label="imported"
@@ -189,12 +194,14 @@ def index_file(es, types, data, opts):
                 docs = add_names_and_attributes_to_taxa(
                     es, dict(with_ids), opts, template=taxon_template, blanks=blanks
                 )
+                imported_taxa = defaultdict(list)
                 index_stream(
                     es,
                     taxon_template["index_name"],
-                    docs,
+                    summarise_imported_taxa(docs, imported_taxa),
                     _op_type="update",
                 )
+                write_imported_taxa(imported_taxa, opts, types=types)
             elif opts["index"] == "assembly":
                 # TODO: keep track of taxon_id not found exceptions
                 assembly_template = assembly.index_template(taxonomy_name, opts)
@@ -244,22 +251,24 @@ def main(args):
         if data_dir in options["index"]:
             dir_path = options["index"][data_dir]
             for types_file in sorted(Path(dir_path).glob("*.names.yaml")):
-                types, data = validate_types_file(types_file, dir_path)
+                types, data, names = validate_types_file(types_file, dir_path)
                 LOGGER.info("Indexing %s" % types["file"]["name"])
                 index_types(es, index, types, options["index"])
                 index_file(
                     es,
                     types,
+                    names,
                     data,
                     {**options["index"], "index": index, "index_types": index_types},
                 )
             for types_file in sorted(Path(dir_path).glob("*.types.yaml")):
-                types, data = validate_types_file(types_file, dir_path)
+                types, data, names = validate_types_file(types_file, dir_path)
                 LOGGER.info("Indexing %s" % types["file"]["name"])
                 index_types(es, index, types, options["index"])
                 index_file(
                     es,
                     types,
+                    names,
                     data,
                     {**options["index"], "index": index, "index_types": index_types},
                 )

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Hub functions."""
 
+import csv
 import os
 import re
 import sys
+from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
 
@@ -422,6 +424,36 @@ def add_attribute_values(existing, new, *, raw=True):
                 )
 
 
+def strip_comments(data, types):
+    """Strip comment lines from a file stream."""
+    comment_chars = {"#"}
+    if "file" in types and "comment" in types["file"]:
+        comment_chars.update(set(types["file"]["comment"]))
+    for row in data:
+        if row[0] in comment_chars:
+            continue
+        yield row
+
+
+def process_names_file(types, names_file):
+    """Process a taxon names file."""
+    data = tofile.open_file_handle(names_file)
+    names = defaultdict(dict)
+    if data is None:
+        return names
+    delimiters = {"csv": ",", "tsv": "\t"}
+    rows = csv.reader(
+        strip_comments(data, types),
+        delimiter=delimiters[types["file"]["format"]],
+        quotechar='"',
+    )
+    next(rows)
+    for row in rows:
+        name = row[3] if len(row) > 3 else row[1]
+        names[row[2]][row[1]] = {"name": name, "taxon_id": row[0]}
+    return names
+
+
 def validate_types_file(types_file, dir_path):
     """Validate types file."""
     try:
@@ -441,7 +473,8 @@ def validate_types_file(types_file, dir_path):
             defaults["metadata"].update({key: value})
     types.update({"defaults": defaults})
     data = tofile.open_file_handle(Path(dir_path) / types["file"]["name"])
-    return types, data
+    names = process_names_file(types, Path(dir_path) / "names" / types["file"]["name"])
+    return types, data, names
 
 
 def set_xrefs(taxon_names, types, row, *, meta=None):
@@ -460,16 +493,8 @@ def set_xrefs(taxon_names, types, row, *, meta=None):
     return names
 
 
-def process_row(types, row):
-    """Process a row of data."""
-    data = {
-        "attributes": {},
-        "identifiers": {},
-        "metadata": {},
-        "taxon_names": {},
-        "taxonomy": {},
-        "taxon_attributes": {},
-    }
+def set_row_defaults(types, data):
+    """Set default values for a row."""
     for key in types["defaults"].keys():
         if key in types:
             for entry in types[key].values():
@@ -479,6 +504,10 @@ def process_row(types, row):
                 }
         elif key == "metadata":
             data["metadata"] = {**types["defaults"]["metadata"]}
+
+
+def process_row_values(row, types, data):
+    """Process row values."""
     for group in data.keys():
         if group in types:
             for key, meta in types[group].items():
@@ -504,6 +533,20 @@ def process_row(types, row):
                 except Exception as err:
                     LOGGER.warning("Cannot parse row '%s'" % str(row))
                     raise err
+
+
+def process_row(types, names, row):
+    """Process a row of data."""
+    data = {
+        "attributes": {},
+        "identifiers": {},
+        "metadata": {},
+        "taxon_names": {},
+        "taxonomy": {},
+        "taxon_attributes": {},
+    }
+    set_row_defaults(types, data)
+    process_row_values(row, types, data)
     taxon_data = {}
     taxon_types = {}
     if "is_primary_value" in data["metadata"]:
@@ -524,10 +567,18 @@ def process_row(types, row):
             )
         else:
             data[attr_type] = []
-    if "taxon_names" in data and data["taxon_names"]:
+    if data["taxon_names"]:
         data["taxon_names"] = set_xrefs(
             data["taxon_names"], types["taxon_names"], row, meta=data["metadata"]
         )
+    if data["taxonomy"] and names:
+        for key in names.keys():
+            if key in data["taxonomy"]:
+                if data["taxonomy"][key] in names[key]:
+                    data["taxonomy"]["taxon_id"] = names[key][data["taxonomy"][key]][
+                        "taxon_id"
+                    ]
+                    data["taxonomy"][key] = names[key][data["taxonomy"][key]]["name"]
     return data, taxon_data, taxon_types.get("attributes", {})
 
 
@@ -571,36 +622,16 @@ def write_imported_rows(rows, opts, *, types, header=None, label="imported"):
     tofile.write_file(outfile, data)
 
 
-def write_spellchecked_taxa(spellings, opts, *, types, header=None):
+def write_spellchecked_taxa(spellings, opts, *, types):
     """Write spellchecked taxa to file."""
-    imported = []
     exceptions = []
     file_key = "%s-exception" % opts["index"]
     dir_key = "%s-dir" % opts["index"]
     filepath = Path(types["file"]["name"])
     extensions = "".join(filepath.suffixes)
     file_basename = str(filepath).replace(extensions, "")
-    for name, matches in spellings.items():
-        # enable test condition below if importing spellchecked taxa:
-        # if len(matches) == 1:
-        #     imported.append([name, matches[0]])
-        # else:
-        exceptions.append([name] + matches)
-    if imported:
-        label = "imported"
-        if file_key in opts and opts[file_key]:
-            outdir = opts[file_key]
-        else:
-            outdir = "%s/%s" % (opts[dir_key], label)
-        os.makedirs(outdir, exist_ok=True)
-        outfile = "%s/%s" % (outdir, "%s.spellcheck.tsv" % file_basename)
-        LOGGER.info(
-            "Writing %d spelling corrections to %s file '%s'",
-            len(imported),
-            label,
-            outfile,
-        )
-        tofile.write_file(outfile, [["input", "corrected"]] + imported)
+    for name, obj in spellings.items():
+        exceptions.append([obj["taxon_id"], name, obj["rank"]] + obj["matches"])
     if exceptions:
         label = "exceptions"
         if file_key in opts and opts[file_key]:
@@ -615,4 +646,35 @@ def write_spellchecked_taxa(spellings, opts, *, types, header=None):
             label,
             outfile,
         )
-        tofile.write_file(outfile, [["input", "suggested"]] + exceptions)
+        tofile.write_file(
+            outfile, [["taxon_id", "input", "rank", "suggested"]] + exceptions
+        )
+
+
+def write_imported_taxa(taxa, opts, *, types):
+    """Write imported taxa to file."""
+    imported = []
+    file_key = "%s-exception" % opts["index"]
+    dir_key = "%s-dir" % opts["index"]
+    filepath = Path(types["file"]["name"])
+    extensions = "".join(filepath.suffixes)
+    file_basename = str(filepath).replace(extensions, "")
+    for name, arr in taxa.items():
+        prefix = "#" if len(arr) > 1 else ""
+        for obj in arr:
+            imported.append(
+                ["%s%s" % (prefix, str(obj["taxon_id"])), name, obj["rank"]]
+            )
+    if imported:
+        if file_key in opts and opts[file_key]:
+            outdir = opts[file_key]
+        else:
+            outdir = "%s/imported" % opts[dir_key]
+        os.makedirs(outdir, exist_ok=True)
+        outfile = "%s/%s" % (outdir, "%s.taxon_ids.tsv" % file_basename)
+        LOGGER.info(
+            "Writing %d taxon_ids to imported file '%s'",
+            len(imported),
+            outfile,
+        )
+        tofile.write_file(outfile, [["taxon_id", "input", "rank"]] + imported)
