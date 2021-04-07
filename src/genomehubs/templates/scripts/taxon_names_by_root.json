@@ -1,0 +1,26 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": {
+        "nested": {
+          "path": "lineage",
+          "query": {
+            "multi_match": {
+              "query": "{{root}}",
+              "fields": ["lineage.taxon_id", "lineage.scientific_name"]
+            }
+          }
+        }
+      },
+      "_source": [
+        "taxon_id",
+        "taxon_rank",
+        "scientific_name",
+        "lineage.*",
+        "taxon_names.*",
+        "attributes"
+      ]
+    }
+  }
+}

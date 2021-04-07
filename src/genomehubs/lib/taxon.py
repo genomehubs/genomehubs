@@ -12,6 +12,7 @@ from .es_functions import EsQueryBuilder
 from .es_functions import document_by_id
 from .es_functions import index_stream
 from .es_functions import query_value_template
+from .es_functions import stream_template_search_results
 from .hub import add_attribute_values
 from .hub import chunks
 from .hub import index_templator
@@ -76,13 +77,20 @@ def lookup_taxa_by_taxon_id(es, values, template, *, return_type="list"):
 
 
 def lookup_missing_taxon_ids(
-    es, without_ids, opts, *, with_ids=None, blanks=set(["NA", "None"]), spellings=None
+    es,
+    without_ids,
+    opts,
+    *,
+    with_ids=None,
+    blanks=set(["NA", "None"]),
+    spellings=None,
+    taxon_table=None,
 ):
     """Lookup taxon ID based on available taxonomic information."""
     if with_ids is None:
         with_ids = {}
     if spellings is None:
-        spellings = {}
+        spellings = {"spellcheck": {}, "synonym": {}}
     # TODO: set this list from types file
     ranks = [
         "subspecies",
@@ -104,21 +112,39 @@ def lookup_missing_taxon_ids(
             for index, rank in enumerate(ranks):
                 if rank not in obj["taxonomy"] or obj["taxonomy"][rank] in blanks:
                     continue
-                taxon_ids, name_class = lookup_taxon(
-                    es, obj["taxonomy"][rank], opts, rank=rank, spellings=spellings
+                taxa, name_class = lookup_taxon(
+                    es,
+                    obj["taxonomy"][rank],
+                    opts,
+                    rank=rank,
+                    return_type="taxon",
+                    spellings=spellings,
+                    taxon_table=taxon_table,
                 )
-                if index == 1 and not taxon_ids:
+                if index == 1 and not taxa:
                     break
-                if len(taxon_ids) == 1:
-                    if taxon_ids[0] in with_ids:
-                        with_ids[taxon_ids[0]].append(obj)
+                if len(taxa) == 1:
+                    obj.update({"input_name": obj["taxonomy"][rank]})
+                    taxon = taxa[0]["_source"]
+                    if obj["taxonomy"][rank] != taxon["scientific_name"]:
+                        spellings["synonym"].update(
+                            {
+                                obj["taxonomy"][rank]: {
+                                    "matches": [taxon["scientific_name"]],
+                                    "taxon_id": taxon["taxon_id"],
+                                    "rank": rank,
+                                }
+                            }
+                        )
+                    if taxon["taxon_id"] in with_ids:
+                        with_ids[taxon["taxon_id"]].append(obj)
                     else:
                         obj["attributes"] = [obj["attributes"]]
-                        with_ids[taxon_ids[0]] = [obj]
+                        with_ids[taxon["taxon_id"]] = [obj]
                         LOGGER.debug(
                             "Matched %s with taxon_id %s",
                             obj["taxonomy"][rank],
-                            taxon_ids[0],
+                            taxon["taxon_id"],
                         )
                     found_keys.append(key)
                 break
@@ -170,6 +196,58 @@ def lookup_missing_taxon_ids(
     return with_ids, without_ids, found_ids
 
 
+def stream_taxon_names(es, *, index, root=None, size=1000):
+    """Get entries by depth of root taxon."""
+    if root is not None:
+        body = {
+            "id": "taxon_names_by_root",
+            "params": {"root": root},
+        }
+        return stream_template_search_results(es, index=index, body=body, size=size)
+    body = {
+        "id": "taxon_names",
+        "params": {},
+    }
+    return stream_template_search_results(es, index=index, body=body)
+
+
+def load_taxon_table(es, opts, taxonomy_name, taxon_table):
+    """Load all taxa into memory for taxon name lookup and spellcheck."""
+    LOGGER.info("Loading taxa into memory for taxon name lookup")
+    taxon_template = index_template(taxonomy_name, opts)
+    root = None
+    if "taxon-lookup-root" in opts:
+        root = opts["taxon-lookup-root"]
+    for node in tqdm(
+        stream_taxon_names(es, index=taxon_template["index_name"], root=root)
+    ):
+        lineage = {}
+        node_names = set()
+        try:
+            if "attributes" in node["_source"]:
+                attributes = node["_source"]["attributes"]
+            else:
+                attributes = []
+            for anc in node["_source"]["lineage"]:
+                lineage.update({anc["taxon_rank"]: anc["scientific_name"]})
+            taxon = {
+                "taxon_id": node["_source"]["taxon_id"],
+                "taxon_rank": node["_source"]["taxon_rank"],
+                "scientific_name": node["_source"]["scientific_name"],
+                "lineage": lineage,
+                "attributes": attributes,
+            }
+            taxon_table["scientific"][node["_source"]["scientific_name"]].append(taxon)
+            taxon_table["any"][node["_source"]["scientific_name"]].append(taxon)
+            node_names.add(node["_source"]["scientific_name"])
+            for obj in node["_source"]["taxon_names"]:
+                if obj["name"] not in node_names:
+                    node_names.add(obj["name"])
+                    taxon_table["any"][obj["name"]].append(taxon)
+        except KeyError:
+            pass
+
+
 def fix_missing_ids(
     es,
     opts,
@@ -183,17 +261,24 @@ def fix_missing_ids(
     blanks=set(["NA", "None"]),
     header=None,
     spellings=None,
+    taxon_table=None,
 ):
     """Find or create taxon IDs for rows without."""
     if with_ids is None:
         with_ids = {}
     if spellings is None:
-        spellings = {}
+        spellings = {"spellcheck": {}, "synonym": {}}
     if without_ids:
         # TODO: support multiple taxonomies
         LOGGER.info("Looking up %d missing taxon IDs", len(without_ids.keys()))
         with_ids, without_ids, found_ids = lookup_missing_taxon_ids(
-            es, without_ids, opts, with_ids=with_ids, blanks=blanks, spellings=spellings
+            es,
+            without_ids,
+            opts,
+            with_ids=with_ids,
+            blanks=blanks,
+            spellings=spellings,
+            taxon_table=taxon_table,
         )
         # create new taxon IDs
         if "taxonomy" in types and "alt_taxon_id" in types["taxonomy"]:
@@ -436,7 +521,7 @@ def spellcheck_taxon(es, name, index, rank, taxonomy_index_template, opts, retur
     """Look up taxon name with fuzzy matching."""
     taxon_suggest = {
         "id": "taxon_suggest",
-        "params": {"searchTerm": name, "max_errors": 3},
+        "params": {"searchTerm": name},
     }
     matches = None
     with tolog.DisableLogger():
@@ -503,19 +588,17 @@ def taxon_lookup(es, body, index, taxonomy_index_template, opts, return_type):
     return taxa
 
 
-def lookup_taxon(
+def lookup_taxon_in_index(
     es,
     name,
     opts,
     *,
-    rank=None,
-    name_class="scientific",
-    return_type="taxon_id",
-    spellings=None,
+    rank,
+    name_class,
+    return_type,
+    spellings,
 ):
-    """Lookup taxon ID."""
-    if spellings is None:
-        spellings = {}
+    """Lookup taxon in Elasticsearch index."""
     template = index_template(opts["taxonomy-source"][0], opts)
     index = template["index_name"]
     body = {
@@ -529,16 +612,63 @@ def lookup_taxon(
             es, name, index, rank, taxonomy_index_template, opts, return_type
         )
         if matches:
-            spellings.update(
+            spellings["spellcheck"].update(
                 {name: {"matches": matches, "taxon_id": taxon_id, "rank": rank}}
             )
         return [], name_class
-        # Uncomment code blow to use suggestion in current import
-        # if matches and len(matches) == 1:
-        #     body["params"].update({"taxon": matches[0]})
-        # else:
-        #     return [], name_class
     taxa = taxon_lookup(es, body, index, taxonomy_index_template, opts, return_type)
+    return taxa
+
+
+def lookup_taxon_in_memory(
+    name, opts, *, rank, name_class, return_type, spellings, taxon_table
+):
+    """Lookup taxon in memory."""
+    taxa = []
+    if name_class in taxon_table:
+        if name in taxon_table[name_class]:
+            for obj in taxon_table[name_class][name]:
+                if return_type == "taxon_id":
+                    taxa.append(obj["taxon_id"])
+                else:
+                    taxa.append({"_source": {**obj}})
+    return taxa
+
+
+def lookup_taxon(
+    es,
+    name,
+    opts,
+    *,
+    rank=None,
+    name_class="scientific",
+    return_type="taxon_id",
+    spellings=None,
+    taxon_table=None,
+):
+    """Lookup taxon ID."""
+    if spellings is None:
+        spellings = {"spellcheck": {}, "synonym": {}}
+    if taxon_table is None or name_class == "spellcheck":
+        taxa = lookup_taxon_in_index(
+            es,
+            name,
+            opts,
+            rank=rank,
+            name_class=name_class,
+            return_type=return_type,
+            spellings=spellings,
+        )
+    else:
+        taxa = lookup_taxon_in_memory(
+            name,
+            opts,
+            rank=rank,
+            name_class=name_class,
+            return_type=return_type,
+            spellings=spellings,
+            taxon_table=taxon_table,
+        )
     if (
         not taxa
         and opts["taxon-lookup"] == "any"
@@ -552,6 +682,7 @@ def lookup_taxon(
             name_class="any",
             return_type=return_type,
             spellings=spellings,
+            taxon_table=taxon_table,
         )
     if (
         not taxa
@@ -567,6 +698,7 @@ def lookup_taxon(
             name_class="spellcheck",
             return_type=return_type,
             spellings=spellings,
+            taxon_table=taxon_table,
         )
     return taxa, name_class
 
@@ -702,8 +834,7 @@ def create_taxa(
 ):
     """Create new taxa using alternate taxon IDs."""
     if spellings is None:
-        spellings = {}
-
+        spellings = {"spellcheck": {}, "synonym": {}}
     ancestors = {}
     matches = defaultdict(dict)
     pbar = tqdm(total=len(data.keys()))
@@ -759,7 +890,8 @@ def create_taxa(
                     ancestors.update({alt_taxon_id: taxa[0]})
                     break
                 else:
-                    #  find existing ancestral taxa within a lineage
+                    # find existing ancestral taxa within a lineage
+                    # TODO: make an in memory version of this lookup
                     taxa = lookup_taxon_within_lineage(
                         es,
                         obj["taxonomy"][rank],
