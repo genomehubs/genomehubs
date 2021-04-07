@@ -1,0 +1,18 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": {
+        "match_all": {}
+      },
+      "_source": [
+        "taxon_id",
+        "taxon_rank",
+        "scientific_name",
+        "lineage.*",
+        "taxon_names.*",
+        "attributes"
+      ]
+    }
+  }
+}

@@ -624,31 +624,31 @@ def write_imported_rows(rows, opts, *, types, header=None, label="imported"):
 
 def write_spellchecked_taxa(spellings, opts, *, types):
     """Write spellchecked taxa to file."""
-    exceptions = []
-    file_key = "%s-exception" % opts["index"]
     dir_key = "%s-dir" % opts["index"]
     filepath = Path(types["file"]["name"])
     extensions = "".join(filepath.suffixes)
     file_basename = str(filepath).replace(extensions, "")
-    for name, obj in spellings.items():
-        exceptions.append([obj["taxon_id"], name, obj["rank"]] + obj["matches"])
-    if exceptions:
-        label = "exceptions"
-        if file_key in opts and opts[file_key]:
-            outdir = opts[file_key]
-        else:
-            outdir = "%s/%s" % (opts[dir_key], label)
-        os.makedirs(outdir, exist_ok=True)
-        outfile = "%s/%s" % (outdir, "%s.spellcheck.tsv" % file_basename)
-        LOGGER.info(
-            "Writing %d spelling suggestions to %s file '%s'",
-            len(exceptions),
-            label,
-            outfile,
-        )
-        tofile.write_file(
-            outfile, [["taxon_id", "input", "rank", "suggested"]] + exceptions
-        )
+    dirs = {
+        "spellcheck": "exceptions",
+        "synonym": "imported",
+    }
+    for group in dirs.keys():
+        taxa = []
+        for name, obj in spellings[group].items():
+            taxa.append([obj["taxon_id"], name, obj["rank"]] + obj["matches"])
+        if taxa:
+            outdir = "%s/%s" % (opts[dir_key], dirs[group])
+            os.makedirs(outdir, exist_ok=True)
+            outfile = "%s/%s" % (outdir, "%s.spellcheck.tsv" % file_basename)
+            LOGGER.info(
+                "Writing %d %s suggestions to spellcheck file '%s'",
+                len(taxa),
+                group,
+                outfile,
+            )
+            tofile.write_file(
+                outfile, [["taxon_id", "input", "rank", "suggested"]] + taxa
+            )
 
 
 def write_imported_taxa(taxa, opts, *, types):
