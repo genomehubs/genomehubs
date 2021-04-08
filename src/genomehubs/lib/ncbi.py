@@ -168,7 +168,7 @@ def parse_listing(listing, collection, opts):
     return parsed
 
 
-def refseq_organelle_parser(collections, opts, *args, **kwargs):
+def refseq_organelle_parser(collections, opts):
     """Fetch and parse RefSeq organelle collections."""
     parsed = []
     if isinstance(collections, tuple):
@@ -190,7 +190,7 @@ def parse_ncbi_datasets_record(record, parsed):
     """Parse a single NCBI datasets record."""
     obj = {}
     for key in ("taxId", "organismName", "commonName", "isolate", "sex"):
-        obj[key] = record.get(key, None)
+        obj[key] = record.get(key, "None")
     assemblyInfo = record.get("assemblyInfo", {})
     for key in (
         "assemblyLevel",
@@ -204,9 +204,15 @@ def parse_ncbi_datasets_record(record, parsed):
         "submitter",
     ):
         obj[key] = assemblyInfo.get(key, None)
+        if key == "refseqCategory":
+            if obj[key] == "representative genome":
+                obj["primaryValue"] = 1
+            else:
+                obj["primaryValue"] = None
     if obj["refseqAssmAccession"] == "na":
         obj["refseqAssmAccession"] = None
         obj["refseqCategory"] = None
+        obj["primaryValue"] = None
     annotationInfo = record.get("annotationInfo", {})
     if annotationInfo:
         annot = {}
@@ -233,11 +239,11 @@ def parse_ncbi_datasets_record(record, parsed):
     parsed[obj["genbankAssmAccession"]] = obj
 
 
-def ncbi_genome_parser(directory, opts, *args, **kwargs):
+def ncbi_genome_parser(_params, opts, *, types=None, names=None):
     """Parse NCBI Datasets genome report."""
     parsed = {}
     with tofile.open_file_handle(
-        "%s/ncbi_dataset/data/assembly_data_report.jsonl" % directory
+        "%s/ncbi_dataset/data/assembly_data_report.jsonl" % opts["ncbi-datasets-genome"]
     ) as report:
         for line in report:
             record = ujson.loads(line)

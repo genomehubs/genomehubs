@@ -134,6 +134,7 @@ attributes:
     taxon_key: assembly_span
     taxon_display_name: Assembly span
     taxon_summary:
+      - primary
       - median
       - min
       - max
@@ -167,6 +168,7 @@ attributes:
     taxon_name: contig_n50
     taxon_key: contig_n50
     taxon_summary:
+      - primary
       - median
       - min
       - max
@@ -200,6 +202,7 @@ attributes:
     taxon_name: scaffold_n50
     taxon_key: scaffold_n50
     taxon_summary:
+      - primary
       - median
       - min
       - max
@@ -274,3 +277,5 @@ attributes:
 metadata:
   source_slug:
     header: genbankAssmAccession
+  is_primary_value:
+    header: primaryValue
