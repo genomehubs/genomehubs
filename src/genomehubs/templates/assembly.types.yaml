@@ -8,8 +8,8 @@ file:
 taxonomy:
   taxon_id:
     header: taxId
-  species:
-    header: speciesName
+  taxon:
+    header: organismName
 names:
   common_name:
     header: commonName
@@ -133,10 +133,12 @@ attributes:
     taxon_name: assembly_span
     taxon_key: assembly_span
     taxon_display_name: Assembly span
-    taxon_summary: median
+    taxon_summary:
+      - median
+      - min
+      - max
     taxon_traverse: median
     taxon_traverse_direction: both
-    taxon_traverse_limit: superkingdom
     taxon_display_level: 1
     taxon_bins:
       min: 6
@@ -161,6 +163,21 @@ attributes:
     header: contigN50
     type: long
     units: bases
+    taxon_display_group: assembly
+    taxon_name: contig_n50
+    taxon_key: contig_n50
+    taxon_summary:
+      - median
+      - min
+      - max
+    taxon_traverse: median
+    taxon_traverse_direction: both
+    taxon_display_level: 2
+    taxon_bins:
+      min: 4
+      max: 9
+      count: 10
+      scale: log10
   contig_l50:
     display_group: metrics
     display_level: 2
@@ -179,6 +196,21 @@ attributes:
     header: scaffoldN50
     type: long
     units: bases
+    taxon_display_group: assembly
+    taxon_name: scaffold_n50
+    taxon_key: scaffold_n50
+    taxon_summary:
+      - median
+      - min
+      - max
+    taxon_traverse: median
+    taxon_traverse_direction: both
+    taxon_display_level: 2
+    taxon_bins:
+      min: 4
+      max: 9
+      count: 10
+      scale: log10
   scaffold_l50:
     display_group: metrics
     display_level: 2
