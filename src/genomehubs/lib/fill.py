@@ -6,7 +6,7 @@ Fill attribute values.
 Usage:
     genomehubs fill [--hub-name STRING] [--hub-path PATH] [--hub-version PATH]
                     [--config-file PATH...] [--config-save PATH]
-                    [--es-host URL...]
+                    [--es-host URL...] [--traverse-limit STRING]
                     [--traverse-infer-ancestors] [--traverse-infer-descendants]
                     [--traverse-infer-both] [--traverse-threads INT]
                     [--traverse-depth INT] [--traverse-root STRING]
@@ -25,6 +25,7 @@ Options:
     --traverse-infer-descendants  Flag to enable tree traversal from root to tips.
     --traverse-infer-both         Flag to enable tree traversal from tips to root and
                                   back to tips.
+    --traverse-limit STRING       Maximum rank to ascend to during traversal. [Default: class]
     --traverse-root ID            Root taxon id for tree traversal.
     --traverse-threads INT        Number of threads to use for tree traversal. [Default: 1]
     --traverse-weight STRING      Weighting scheme for setting values during tree
@@ -58,11 +59,6 @@ from .es_functions import index_stream
 from .es_functions import launch_es
 from .es_functions import stream_template_search_results
 from .version import __version__
-
-# if platform.system() != "Linux":
-#     from multiprocessing import set_start_method
-
-#     set_start_method("fork")
 
 LOGGER = tolog.logger(__name__)
 
@@ -124,7 +120,15 @@ def stream_descendant_nodes_missing_attributes(es, *, index, attributes, root, s
                 yield result
 
 
-def apply_summary(summary, values, *, max_value=None, min_value=None):
+def apply_summary(
+    summary,
+    values,
+    *,
+    primary_values=None,
+    summary_types=None,
+    max_value=None,
+    min_value=None
+):
     """Apply summary statistic functions."""
     summaries = {
         "count": len,
@@ -139,6 +143,10 @@ def apply_summary(summary, values, *, max_value=None, min_value=None):
         "list": list,
     }
     flattened = []
+    if summary == "primary":
+        if primary_values:
+            values = primary_values
+        summary = summary_types[0]
     for v in values:
         if isinstance(v, list):
             flattened += v
@@ -164,9 +172,14 @@ def summarise_attribute_values(
         return None, None, None
     if "summary" in meta:
         value_type = "%s_value" % meta["type"]
+        primary_values = []
         if "values" in attribute:
             if values is None:
-                values = [value[value_type] for value in attribute["values"]]
+                values = []
+                for value in attribute["values"]:
+                    values.append(value[value_type])
+                    if "is_primary_value" in value and value["is_primary_value"]:
+                        primary_values.append(value[value_type])
             else:
                 values += [value[value_type] for value in attribute["values"]]
         if not values:
@@ -176,16 +189,23 @@ def summarise_attribute_values(
         traverse_value = None
         if not isinstance(meta["summary"], list):
             meta["summary"] = [meta["summary"]]
-        for summary in meta["summary"]:
+        for index, summary in enumerate(meta["summary"]):
             value, max_value, min_value = apply_summary(
-                summary, values, max_value=max_value, min_value=min_value
+                summary,
+                values,
+                primary_values=primary_values,
+                summary_types=meta["summary"][index + 1 :] + ["median"],
+                max_value=max_value,
+                min_value=min_value,
             )
             if idx == 0:
-                attribute[value_type] = value
-                attribute["count"] = len(values)
-                attribute["aggregation_method"] = summary
-                attribute["aggregation_source"] = "direct"
-                traverse_value = value
+                if value is not None:
+                    attribute[value_type] = value
+                    attribute["count"] = len(values)
+                    attribute["aggregation_method"] = summary
+                    attribute["aggregation_source"] = "direct"
+                    traverse_value = value
+                idx += 1
             elif traverse and summary == traverse:
                 traverse_value = value
             if summary != "list":
@@ -193,7 +213,9 @@ def summarise_attribute_values(
                     summary = "median"
             else:
                 traverse_value = list(set(traverse_value))
-            idx += 1
+        if isinstance(max_value, float) or isinstance(max_value, int):
+            attribute["max"] = max_value
+            attribute["min"] = min_value
         return traverse_value, max_value, min_value
     return None, None, None
 
@@ -201,8 +223,10 @@ def summarise_attribute_values(
 def summarise_attributes(*, attributes, attrs, meta, parent, parents):
     """Set attribute summary values."""
     changed = False
+    attr_dict = {}
     for node_attribute in attributes:
         if node_attribute["key"] in attrs:
+            attr_dict[node_attribute["key"]] = node_attribute
             summary_value, max_value, min_value = summarise_attribute_values(
                 node_attribute, meta[node_attribute["key"]]
             )
@@ -218,21 +242,40 @@ def summarise_attributes(*, attributes, attrs, meta, parent, parents):
                             summary_value
                         )
                     if max_value is not None:
-                        parents[parent][node_attribute["key"]]["max"] = max(
-                            parents[parent][node_attribute["key"]]["max"], max_value
-                        )
+                        if parents[parent][node_attribute["key"]]["max"] is not None:
+                            parents[parent][node_attribute["key"]]["max"] = max(
+                                parents[parent][node_attribute["key"]]["max"], max_value
+                            )
+                        else:
+                            parents[parent][node_attribute["key"]]["max"] = max_value
                     if min_value is not None:
-                        parents[parent][node_attribute["key"]]["min"] = min(
-                            parents[parent][node_attribute["key"]]["min"], min_value
-                        )
-    return changed
+                        if parents[parent][node_attribute["key"]]["min"] is not None:
+                            parents[parent][node_attribute["key"]]["min"] = min(
+                                parents[parent][node_attribute["key"]]["min"], min_value
+                            )
+                        else:
+                            parents[parent][node_attribute["key"]]["min"] = min_value
+    return changed, attr_dict
 
 
 def set_values_from_descendants(
-    *, attributes, descendant_values, meta, parent, taxon_rank, parents
+    *,
+    attributes,
+    descendant_values,
+    meta,
+    taxon_id,
+    parent,
+    taxon_rank,
+    traverse_limit,
+    parents,
+    descendant_ranks=None,
+    attr_dict=None,
+    limits=None
 ):
     """Set attribute summary values from descendant values."""
     changed = False
+    if attr_dict is None:
+        attr_dict = {}
     for key, obj in descendant_values.items():
         traverseable = meta[key].get("traverse", False)
         if (
@@ -241,11 +284,17 @@ def set_values_from_descendants(
             and meta[key]["traverse_direction"] == "down"
         ):
             traverseable = False
-        if not traverseable:
+        if not traverseable or taxon_id in limits[key]:
             continue
-        traverse_limit = meta[key].get("traverse_limit", None)
-        if traverse_limit and taxon_rank == traverse_limit:
-            continue
+        traverse_limit = meta[key].get("traverse_limit", traverse_limit)
+        if traverse_limit:
+            if (
+                descendant_ranks is not None
+                and traverse_limit in descendant_ranks[taxon_id]
+            ):
+                continue
+            if taxon_rank == traverse_limit:
+                limits[key].add(parent)
         try:
             attribute = next(entry for entry in attributes if entry["key"] == key)
         except StopIteration:
@@ -261,8 +310,7 @@ def set_values_from_descendants(
         if summary_value is not None:
             attribute["aggregation_source"] = "descendant"
             changed = True
-            if traverse_limit and taxon_rank == traverse_limit:
-                continue
+            attr_dict.update({key: attribute})
             if parent is not None:
                 if isinstance(summary_value, list):
                     parents[parent][key]["values"] = list(
@@ -271,14 +319,85 @@ def set_values_from_descendants(
                 else:
                     parents[parent][key]["values"].append(summary_value)
                 if max_value is not None:
-                    parents[parent][key]["max"] = max(
-                        parents[parent][key]["max"], max_value
-                    )
+                    if parents[parent][key]["max"] is not None:
+                        parents[parent][key]["max"] = max(
+                            parents[parent][key]["max"], max_value
+                        )
+                    else:
+                        parents[parent][key]["max"] = max_value
                 if min_value is not None:
-                    parents[parent][key]["min"] = min(
-                        parents[parent][key]["min"], min_value
+                    if parents[parent][key]["min"] is not None:
+                        parents[parent][key]["min"] = min(
+                            parents[parent][key]["min"], min_value
+                        )
+                    else:
+                        parents[parent][key]["min"] = min_value
+    return changed, attr_dict
+
+
+def set_attributes_to_descend(meta, traverse_limit):
+    """Set which attributes should have values inferred from ancestral taxa."""
+    desc_attrs = set()
+    desc_attr_limits = {}
+    for key, value in meta.items():
+        if "traverse" in value and value["traverse"]:
+            if "traverse_direction" not in value or value["traverse_direction"] in (
+                "down",
+                "both",
+            ):
+                desc_attrs.add(key)
+                if "traverse_limit" in value:
+                    desc_attr_limits.update({key: value["traverse_limit"]})
+                else:
+                    desc_attr_limits.update({key: traverse_limit})
+    return desc_attrs, desc_attr_limits
+
+
+def track_missing_attribute_values(
+    node, missing_attributes, attr_dict, desc_attrs, desc_attr_limits
+):
+    """Keep track of missing attribute values for in memory traversal."""
+    missing_from_descendants = {}
+    if (
+        node["_source"]["taxon_id"] in missing_attributes
+        and missing_attributes[node["_source"]["taxon_id"]]
+    ):
+        for child_id, obj in missing_attributes[node["_source"]["taxon_id"]].items():
+            for key, attribute in attr_dict.items():
+                if key in obj["keys"]:
+                    # update aggregation source to include ancestral rank
+                    obj["attributes"].append(
+                        {
+                            **attribute,
+                            "aggregation_source": "ancestor",
+                            "aggregation_rank": node["_source"]["taxon_rank"],
+                            "aggregation_taxon_id": node["_source"]["taxon_id"],
+                        }
                     )
-    return changed
+                    obj["keys"].remove(key)
+            if obj["keys"]:
+                missing_from_descendants.update({child_id: obj})
+            else:
+                # yield when all values filled or removed
+                yield obj["node"]["_id"], obj["node"]["_source"]
+        del missing_attributes[node["_source"]["taxon_id"]]
+    if "parent" in node["_source"]:
+        missing_attributes[node["_source"]["parent"]].update(missing_from_descendants)
+        missing_attributes[node["_source"]["parent"]].update(
+            {
+                node["_source"]["taxon_id"]: {
+                    "keys": set({key for key in desc_attrs if key not in attr_dict}),
+                    "attributes": node["_source"]["attributes"],
+                    "node": node,
+                }
+            }
+        )
+
+
+def track_descendant_ranks(node, descendant_ranks):
+    """Keep track of descendant ranks."""
+    if "parent" in node["_source"]:
+        descendant_ranks[node["_source"]["parent"]].add(node["_source"]["taxon_rank"])
 
 
 def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
@@ -295,10 +414,17 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
     meta = template["types"]["attributes"]
     attrs = set(meta.keys())
     parents = defaultdict(
-        lambda: defaultdict(
-            lambda: {"max": float("-inf"), "min": float("inf"), "values": []}
-        )
+        lambda: defaultdict(lambda: {"max": None, "min": None, "values": []})
     )
+    limits = defaultdict(set)
+    if "traverse-infer-both" in opts and opts["traverse-infer-both"]:
+        desc_attrs, desc_attr_limits = set_attributes_to_descend(
+            meta, opts["traverse-limit"]
+        )
+        missing_attributes = defaultdict(dict)
+        descendant_ranks = defaultdict(set)
+    else:
+        desc_attrs = {}
     while root_depth >= 0:
         nodes = stream_nodes_by_root_depth(
             es,
@@ -309,32 +435,48 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
         )
         ctr = 0
         for node in nodes:
+            # TODO: break into sub functions
+            track_descendant_ranks(node, descendant_ranks)
             ctr += 1
             changed = False
+            attr_dict = {}
             if "attributes" in node["_source"] and node["_source"]["attributes"]:
-                changed = summarise_attributes(
+                changed, attr_dict = summarise_attributes(
                     attributes=node["_source"]["attributes"],
                     attrs=attrs,
                     meta=meta,
                     parent=node["_source"].get("parent", None),
                     parents=parents,
                 )
+            else:
+                node["_source"]["attributes"] = []
             if node["_source"]["taxon_id"] in parents:
-                if "attributes" not in node["_source"]:
-                    node["_source"]["attributes"] = []
-                modified = set_values_from_descendants(
+                modified, attr_dict = set_values_from_descendants(
                     attributes=node["_source"]["attributes"],
                     descendant_values=parents[node["_source"]["taxon_id"]],
                     meta=meta,
+                    taxon_id=node["_source"]["taxon_id"],
                     parent=node["_source"].get("parent", None),
                     parents=parents,
+                    descendant_ranks=descendant_ranks,
                     taxon_rank=node["_source"]["taxon_rank"],
+                    traverse_limit=opts["traverse-limit"],
+                    attr_dict=attr_dict,
+                    limits=limits,
                 )
                 if not changed:
                     changed = modified
+            if desc_attrs:
+                yield from track_missing_attribute_values(
+                    node, missing_attributes, attr_dict, desc_attrs, desc_attr_limits
+                )
             if changed:
                 yield node["_id"], node["_source"]
         root_depth -= 1
+    if desc_attrs:
+        for incomplete in missing_attributes.values():
+            for obj in incomplete.values():
+                yield obj["node"]["_id"], obj["node"]["_source"]
 
 
 def copy_attribute_summary(source, meta):
@@ -348,8 +490,6 @@ def copy_attribute_summary(source, meta):
     try:
         dest["%s_value" % meta["type"]] = source["%s_value" % meta["type"]]
     except KeyError as err:
-        print(source)
-        print(meta)
         raise (err)
     dest["count"] = source["count"]
     dest["key"] = source["key"]
@@ -399,9 +539,7 @@ def traverse_from_root(es, opts, *, template, root=None, max_depth=None, log=Tru
         root = opts["traverse-root"]
     if max_depth is None:
         max_depth = get_max_depth_by_lineage(
-            es,
-            index=template["index_name"],
-            root=root,
+            es, index=template["index_name"], root=root
         )
     root_depth = max_depth - 1
     meta = template["types"]["attributes"]
@@ -414,11 +552,7 @@ def traverse_from_root(es, opts, *, template, root=None, max_depth=None, log=Tru
         if log:
             LOGGER.info("Filling values at root depth %d" % root_depth)
         nodes = stream_nodes_by_root_depth(
-            es,
-            index=template["index_name"],
-            root=root,
-            depth=root_depth,
-            size=50,
+            es, index=template["index_name"], root=root, depth=root_depth, size=50
         )
         desc_nodes = stream_missing_attributes_at_level(
             es, nodes=nodes, attrs=attrs, template=template
@@ -494,7 +628,6 @@ def main(args):
     options = config("fill", **args)
     if "traverse-infer-both" in options["fill"]:
         options["fill"]["traverse-infer-ancestors"] = True
-        options["fill"]["traverse-infer-descendants"] = True
 
     # Start Elasticsearch
     es = launch_es(options["fill"])

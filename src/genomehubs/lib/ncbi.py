@@ -168,7 +168,7 @@ def parse_listing(listing, collection, opts):
     return parsed
 
 
-def refseq_organelle_parser(collections, opts):
+def refseq_organelle_parser(collections, opts, *args, **kwargs):
     """Fetch and parse RefSeq organelle collections."""
     parsed = []
     if isinstance(collections, tuple):
@@ -233,7 +233,7 @@ def parse_ncbi_datasets_record(record, parsed):
     parsed[obj["genbankAssmAccession"]] = obj
 
 
-def ncbi_genome_parser(directory, opts):
+def ncbi_genome_parser(directory, opts, *args, **kwargs):
     """Parse NCBI Datasets genome report."""
     parsed = {}
     with tofile.open_file_handle(

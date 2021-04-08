@@ -1,0 +1,38 @@
+{
+  "index_patterns": ["identifiers-*"],
+  "mappings": {
+    "properties": {
+      "group": {
+        "type": "keyword",
+        "ignore_above": 16,
+        "meta": { "description": "Index group (e.g. assembly or taxon)" }
+      },
+      "name_class": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Name class" }
+      },
+      "display_name": {
+        "type": "keyword",
+        "index": false,
+        "meta": { "description": "Display name" }
+      },
+      "display_group": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "null_value": "names",
+        "meta": { "description": "Display name" }
+      },
+      "source": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Source name" }
+      },
+      "source_url_stub": {
+        "type": "keyword",
+        "index": false,
+        "meta": { "description": "URL stub for xref" }
+      }
+    }
+  }
+}

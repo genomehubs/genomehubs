@@ -87,7 +87,7 @@ def fetch_gbif_identifiers(taxon, *, xrefs=None):
     return identifiers
 
 
-def gbif_parser(_params, opts):
+def gbif_parser(_params, opts, *args, **kwargs):
     """Parse GBIF taxa and identifiers."""
     parsed = []
     for root in opts["gbif-root"]:

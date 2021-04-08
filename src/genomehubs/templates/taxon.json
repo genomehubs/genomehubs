@@ -80,6 +80,17 @@
             "meta": {
               "description": "Name class (e.g. common name, synonym, etc.)"
             }
+          },
+          "source": {
+            "type": "keyword",
+            "ignore_above": 64,
+            "normalizer": "lowercase",
+            "meta": { "description": "Source DB for taxon name" }
+          },
+          "source_url_stub": {
+            "type": "keyword",
+            "index": false,
+            "meta": { "description": "URL slug for taxon name xref" }
           }
         }
       },
@@ -267,6 +278,22 @@
             "normalizer": "lowercase",
             "meta": {
               "description": "Summary source (direct, ancestor, descendant)"
+            }
+          },
+          "aggregation_rank": {
+            "type": "keyword",
+            "ignore_above": 16,
+            "normalizer": "lowercase",
+            "meta": {
+              "description": "Source rank for ancestor derived values"
+            }
+          },
+          "aggregation_taxon_id": {
+            "type": "keyword",
+            "ignore_above": 16,
+            "normalizer": "lowercase",
+            "meta": {
+              "description": "Source taxon_id for ancestor derived values"
             }
           },
           "comment": {
