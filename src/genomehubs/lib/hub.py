@@ -356,7 +356,9 @@ def add_attributes(
                 else:
                     attribute = {"identifier": validated, "class": key}
                 attribute.update(meta)
-                if source is not None:
+                if "source" in types[key]:
+                    attribute.update({"source": types[key]["source"]})
+                elif source is not None:
                     attribute.update({"source": source})
                 attributes.append(attribute)
     if attribute_values:
@@ -470,6 +472,7 @@ def validate_types_file(types_file, dir_path):
         if key.startswith("display") or key.startswith("taxon"):
             defaults["attributes"].update({key: value})
         elif key.startswith("source"):
+            defaults["attributes"].update({key: value})
             defaults["metadata"].update({key: value})
     types.update({"defaults": defaults})
     data = tofile.open_file_handle(Path(dir_path) / types["file"]["name"])
@@ -550,9 +553,12 @@ def process_row(types, names, row):
     taxon_data = {}
     taxon_types = {}
     if "is_primary_value" in data["metadata"]:
-        data["metadata"]["is_primary_value"] = bool(
-            int(data["metadata"]["is_primary_value"])
-        )
+        try:
+            data["metadata"]["is_primary_value"] = bool(
+                int(data["metadata"]["is_primary_value"])
+            )
+        except ValueError:
+            data["metadata"]["is_primary_value"] = False
     for attr_type in list(["attributes", "identifiers"]):
         if attr_type in data and data[attr_type]:
             (

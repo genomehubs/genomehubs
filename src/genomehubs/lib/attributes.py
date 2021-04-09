@@ -37,18 +37,63 @@ def index(es, group, attributes, opts, *, index_type="attribute"):
     return template, stream
 
 
+# def fetch_types(es, opts):
+#     """Fetch all existing types."""
+#     template = index_template(opts, index_type="attribute")
+#     body = {
+#         "id": "attribute_types",
+#         "params": {},
+#     }
+#     entries = stream_template_search_results(
+#         es, index=template["index_name"], body=body
+#     )
+#     return {entry["key"]: entry for entry in entries}
+
+
+def add_attribute_sources(name, obj, attributes):
+    """Generate a list of attribute sources."""
+    for key, value in attributes[name].items():
+        if key.startswith("source"):
+            if key in obj:
+                if not isinstance(obj[key], list):
+                    obj[key] = [obj[key]]
+                obj[key].append(value)
+            else:
+                obj[key] = value
+
+
 def index_types(es, types_name, types, opts):
     """Index types into Elasticsearch."""
+    # TODO: fetch existing types to allow new sources to add, not overwrite
+    try:
+        attributes = fetch_types(es, types_name, opts)
+    except Exception:
+        attributes = {}
     if "attributes" in types:
-        if "defaults" in types and "attributes" in types["defaults"]:
-            for key, value in types["attributes"].items():
+        new_attributes = {}
+        existing_attributes = {}
+        for key, value in types["attributes"].items():
+            if "defaults" in types and "attributes" in types["defaults"]:
                 value = {**types["defaults"]["attributes"], **value}
-                types["attributes"][key] = value
+                # types["attributes"][key] = value
+            if key in attributes:
+                existing_attributes[key] = value
+                add_attribute_sources(key, value, attributes)
+            else:
+                new_attributes[key] = value
         template, stream = index(
-            es, types_name, types["attributes"], opts, index_type="attribute"
+            es, types_name, new_attributes, opts, index_type="attribute"
+        )
+        template, update_stream = index(
+            es,
+            types_name,
+            existing_attributes,
+            opts,
+            index_type="attribute",
         )
         load_mapping(es, template["name"], template["mapping"])
         index_stream(es, template["index_name"], stream)
+        index_stream(es, template["index_name"], update_stream, _op_type="update")
     if "taxon_names" in types:
         if "defaults" in types and "taxon_names" in types["defaults"]:
             for key, value in types["names"].items():

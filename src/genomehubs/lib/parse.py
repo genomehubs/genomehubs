@@ -46,6 +46,8 @@ from .btk import btk_parser
 from .config import config
 from .hub import load_types
 from .hub import order_parsed_fields
+
+# from .ncbi import ncbi_datasets_summary_parser
 from .ncbi import ncbi_genome_parser
 from .ncbi import refseq_organelle_parser
 from .version import __version__
@@ -60,6 +62,11 @@ PARSERS = {
         "params": None,
         "types": "assembly",
     },
+    # "ncbi-datasets-summary": {
+    #     "func": ncbi_datasets_summary_parser,
+    #     "params": None,
+    #     "types": "assembly",
+    # },
     "refseq-mitochondria": {
         "func": refseq_organelle_parser,
         "params": ("mitochondrion"),
