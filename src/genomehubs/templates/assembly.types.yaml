@@ -63,7 +63,11 @@ attributes:
     taxon_display_group: assembly
     taxon_name: gene_count
     taxon_key: gene_count
-    taxon_summary: median
+    taxon_summary:
+      - primary
+      - median
+      - min
+      - max
     taxon_display_level: 2
     taxon_bins:
       min: 0
@@ -103,7 +107,9 @@ attributes:
     taxon_name: sample_sex
     taxon_key: sample_sex
     taxon_display_name: Sample sex
-    taxon_summary: list
+    taxon_summary:
+      - primary
+      - list
     taxon_display_level: 2
   isolate:
     display_level: 2
@@ -115,6 +121,14 @@ attributes:
     header: assemblyLevel
     display_name: Assembly level
     type: keyword
+    taxon_display_group: assembly
+    taxon_name: assembly_level
+    taxon_key: assembly_level
+    taxon_display_name: Assembly level
+    taxon_summary:
+      - primary
+      - list
+    taxon_display_level: 2
   assembly_type:
     display_level: 2
     header: assemblyType
