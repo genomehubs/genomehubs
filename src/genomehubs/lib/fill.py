@@ -25,7 +25,7 @@ Options:
     --traverse-infer-descendants  Flag to enable tree traversal from root to tips.
     --traverse-infer-both         Flag to enable tree traversal from tips to root and
                                   back to tips.
-    --traverse-limit STRING       Maximum rank to ascend to during traversal. [Default: class]
+    --traverse-limit STRING       Maximum rank to ascend to during traversal. [Default: superkingdom]
     --traverse-root ID            Root taxon id for tree traversal.
     --traverse-threads INT        Number of threads to use for tree traversal. [Default: 1]
     --traverse-weight STRING      Weighting scheme for setting values during tree
