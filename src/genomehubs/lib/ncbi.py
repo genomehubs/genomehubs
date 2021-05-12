@@ -168,7 +168,7 @@ def parse_listing(listing, collection, opts):
     return parsed
 
 
-def refseq_organelle_parser(collections, opts):
+def refseq_organelle_parser(collections, opts, *, types=None, names=None):
     """Fetch and parse RefSeq organelle collections."""
     parsed = []
     if isinstance(collections, tuple):
