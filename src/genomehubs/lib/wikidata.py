@@ -195,7 +195,11 @@ def prepare_xref_rows(key, meta, entities):
         "subphylum",
         "phylum",
     ]
-    lineage = meta["lineage"]
+    try:
+        lineage = meta["lineage"]
+    except KeyError:
+        lineage = {}
+
     rows = []
     common = {}
     for db in SOURCES.keys():

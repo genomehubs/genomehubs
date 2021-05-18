@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Wikidata functions."""
+"""BlobToolKit functions."""
 
 import ujson
 from tolkein import tofetch
@@ -12,7 +12,7 @@ BTK_VIEW = "https://blobtoolkit.genomehubs.org/view"
 
 
 def fetch_btk_datasets(params):
-    """Fetch wikidata taxon entries."""
+    """Fetch BlobToolKit taxon entries."""
     root = params.get("root", "Eukaryota")
     url = "%s/search/%s" % (BTK_API, root)
     page = tofetch.fetch_url(url)
@@ -21,7 +21,7 @@ def fetch_btk_datasets(params):
 
 
 def stream_btk_datasets(root=None):
-    """Stream wikidata taxon entries."""
+    """Stream BlobToolKit taxon entries."""
     params = {"root": root}
     datasets = fetch_btk_datasets(params)
     if datasets:
@@ -44,14 +44,19 @@ def extract_btk_stats(meta):
             break
     if "stats" in summaryStats:
         meta["nohit"] = summaryStats["stats"]["noHit"] * 100
-        meta["target"] = summaryStats["stats"]["target"] * 100
+        try:
+            meta["target"] = summaryStats["stats"]["target"] * 100
+        except KeyError:
+            pass
     if "baseComposition" in summaryStats:
         meta["at_percent"] = summaryStats["baseComposition"]["at"] * 100
         meta["gc_percent"] = summaryStats["baseComposition"]["gc"] * 100
         meta["n_percent"] = summaryStats["baseComposition"]["n"] * 100
-    if len(meta["taxon_name"]) > len(meta["species"]):
-        meta["subspecies"] = meta["taxon_name"]
-
+    try:
+        if len(meta["taxon_name"]) > len(meta["species"]):
+            meta["subspecies"] = meta["taxon_name"]
+    except KeyError:
+        meta["species"] = meta["taxon_name"]
 
 def describe_btk_files(meta):
     """Generate analysis descriptions and links for BlobToolKit."""
