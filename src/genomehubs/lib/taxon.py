@@ -856,12 +856,8 @@ def create_taxa(
         closest_taxon = None
         # fetch ancestral ranks and current taxon rank
         ranks, taxon_rank = set_ranks(obj["taxonomy"])
-        if (
-            taxon_rank not in obj["taxonomy"]
-            or obj["taxonomy"][taxon_rank] in blanks
-            or obj["taxonomy"][taxon_rank] in spellings
-        ):
-            # taxon name is missing or may be mis-spelled
+        if taxon_rank in obj["taxonomy"] and obj["taxonomy"][taxon_rank] in spellings:
+            # taxon name may be mis-spelled
             continue
         max_index = len(ranks) - 1
         # loop through lineage to find existing ancestral taxa
