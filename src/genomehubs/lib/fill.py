@@ -120,6 +120,21 @@ def stream_descendant_nodes_missing_attributes(es, *, index, attributes, root, s
                 yield result
 
 
+def enum(tup):
+    """Use list index to prioritise values."""
+    order = {str(k).lower(): i for i, k in enumerate(tup[0])}
+    lowest = len(tup[0]) + 1
+    result = None
+    for value in tup[1]:
+        lc_value = str(value).lower()
+        if lc_value in order and order[lc_value] < lowest:
+            result = value
+            lowest = order[lc_value]
+            if lowest == 0:
+                break
+    return result
+
+
 def apply_summary(
     summary,
     values,
@@ -127,11 +142,13 @@ def apply_summary(
     primary_values=None,
     summary_types=None,
     max_value=None,
-    min_value=None
+    min_value=None,
+    order=None
 ):
     """Apply summary statistic functions."""
     summaries = {
         "count": len,
+        "enum": enum,
         "max": max,
         "min": min,
         "mean": mean,
@@ -152,7 +169,10 @@ def apply_summary(
             flattened += v
         else:
             flattened.append(v)
-    value = summaries[summary](flattened)
+    if summary == "enum":
+        value = summaries[summary]((order, flattened))
+    else:
+        value = summaries[summary](flattened)
     if summary == "max":
         if max_value is not None:
             value = max(value, max_value)
@@ -189,6 +209,7 @@ def summarise_attribute_values(
         traverse_value = None
         if not isinstance(meta["summary"], list):
             meta["summary"] = [meta["summary"]]
+        order = meta.get("constraint", {}).get("enum", [])
         for index, summary in enumerate(meta["summary"]):
             value, max_value, min_value = apply_summary(
                 summary,
@@ -197,6 +218,7 @@ def summarise_attribute_values(
                 summary_types=meta["summary"][index + 1 :] + ["median"],
                 max_value=max_value,
                 min_value=min_value,
+                order=order,
             )
             if idx == 0:
                 if value is not None:

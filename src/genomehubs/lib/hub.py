@@ -33,7 +33,9 @@ def load_types(name, *, part="types"):
         try:
             for key, value in types.items():
                 try:
-                    enum = set(value["constraint"]["enum"])
+                    enum = set(
+                        [str(option).lower() for option in value["constraint"]["enum"]]
+                    )
                     value["constraint"]["enum"] = enum
                 except KeyError:
                     pass
@@ -170,7 +172,7 @@ def max_value_constraint(value, limit):
 
 def enum_constraint(value, enum):
     """Test value in predefined set constraint."""
-    if value in enum:
+    if str(value).lower() in enum:
         return True
     return False
 
