@@ -158,7 +158,6 @@ def add_assembly_attributes_to_taxon(
     """Add assembly attributes to taxon."""
     for taxon_id, assemblies in asm_by_taxon_id.items():
         if taxon_id in taxa:
-            print(taxon_id)
             taxon_attributes = defaultdict(list)
             if "attributes" not in taxa[taxon_id]:
                 taxa[taxon_id]["attributes"] = []

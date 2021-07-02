@@ -210,12 +210,15 @@ def summarise_attribute_values(
         if not isinstance(meta["summary"], list):
             meta["summary"] = [meta["summary"]]
         order = meta.get("constraint", {}).get("enum", [])
+        default_summary = "median"
+        if meta["type"] == "keyword":
+            default_summary = "mode"
         for index, summary in enumerate(meta["summary"]):
             value, max_value, min_value = apply_summary(
                 summary,
                 values,
                 primary_values=primary_values,
-                summary_types=meta["summary"][index + 1 :] + ["median"],
+                summary_types=meta["summary"][index + 1 :] + [default_summary],
                 max_value=max_value,
                 min_value=min_value,
                 order=order,

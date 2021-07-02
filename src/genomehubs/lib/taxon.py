@@ -756,18 +756,31 @@ def create_descendant_taxon(taxon_id, rank, name, closest_taxon):
 def add_new_taxon(alt_taxon_id, new_taxa, obj, closest_taxon, *, blanks={"NA", "None"}):
     """Add a new taxon with alt_taxon_id to list of taxa."""
     # TODO: Allow creation of new higher taxa
+    ranks = [
+        "subspecies",
+        "species",
+        "genus",
+        "family",
+        "order",
+        "class",
+        "subphylum",
+        "phylum",
+    ]
     if alt_taxon_id not in new_taxa:
-        alt_rank = "species"
-        if (
-            "subspecies" in obj["taxonomy"]
-            and obj["taxonomy"]["subspecies"]
-            and obj["taxonomy"]["subspecies"] not in blanks
-        ):
-            alt_rank = "subspecies"
-        new_taxon = create_descendant_taxon(
-            alt_taxon_id, alt_rank, obj["taxonomy"][alt_rank], closest_taxon
-        )
-        new_taxa.update({new_taxon["_source"]["taxon_id"]: new_taxon["_source"]})
+        alt_rank = None
+        for rank in ranks:
+            if (
+                rank in obj["taxonomy"]
+                and obj["taxonomy"][rank]
+                and obj["taxonomy"][rank] not in blanks
+            ):
+                alt_rank = rank
+                break
+        if alt_rank is not None:
+            new_taxon = create_descendant_taxon(
+                alt_taxon_id, alt_rank, obj["taxonomy"][alt_rank], closest_taxon
+            )
+            new_taxa.update({new_taxon["_source"]["taxon_id"]: new_taxon["_source"]})
     return new_taxon
 
 

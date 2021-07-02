@@ -68,6 +68,7 @@ attributes:
       - median
       - min
       - max
+      - count
     taxon_display_level: 2
     taxon_bins:
       min: 0
@@ -110,6 +111,7 @@ attributes:
     taxon_summary:
       - primary
       - list
+      - count
     taxon_display_level: 2
   isolate:
     display_level: 2
@@ -127,8 +129,15 @@ attributes:
     taxon_display_name: Assembly level
     taxon_summary:
       - primary
-      - list
-    taxon_display_level: 2
+      - enum
+    constraint:
+      enum:
+        - chromosome
+        - scaffold
+        - contig
+    taxon_traverse: enum
+    taxon_traverse_direction: up
+    taxon_display_level: 1
   assembly_type:
     display_level: 2
     header: assemblyType
@@ -152,6 +161,7 @@ attributes:
       - median
       - min
       - max
+      - count
     taxon_traverse: median
     taxon_traverse_direction: both
     taxon_display_level: 1
@@ -183,11 +193,12 @@ attributes:
     taxon_key: contig_n50
     taxon_summary:
       - primary
+      - max
       - median
       - min
-      - max
+      - count
+    taxon_traverse_direction: up
     taxon_traverse: median
-    taxon_traverse_direction: both
     taxon_display_level: 2
     taxon_bins:
       min: 4
@@ -217,11 +228,12 @@ attributes:
     taxon_key: scaffold_n50
     taxon_summary:
       - primary
+      - max
       - median
       - min
-      - max
+      - count
+    taxon_traverse_direction: up
     taxon_traverse: median
-    taxon_traverse_direction: both
     taxon_display_level: 2
     taxon_bins:
       min: 4
