@@ -366,7 +366,7 @@ def add_attributes(
     if attribute_values:
         for attribute in attributes:
             has_taxon_data = False
-            taxon_attribute = {**attribute}
+            taxon_attribute = {**attribute, "source_index": "assembly"}
             taxon_attribute_types = {**types[attribute["key"]]}
             # taxon_props = []
             for prop, value in types[attribute["key"]].items():
@@ -561,6 +561,14 @@ def process_row(types, names, row):
             )
         except ValueError:
             data["metadata"]["is_primary_value"] = False
+    assembly_id = None
+    if (
+        "identifiers" in data
+        and data["identifiers"]
+        and "assembly_id" in data["identifiers"]
+        and data["identifiers"]["assembly_id"]
+    ):
+        assembly_id = data["identifiers"]["assembly_id"]
     for attr_type in list(["attributes", "identifiers"]):
         if attr_type in data and data[attr_type]:
             (
@@ -575,6 +583,15 @@ def process_row(types, names, row):
             )
         else:
             data[attr_type] = []
+    if assembly_id is not None:
+        if "attributes" in taxon_data and taxon_data["attributes"]:
+            for attr in taxon_data["attributes"]:
+                attr.update(
+                    {
+                        "source_index": "assembly",
+                        "source_id": assembly_id,
+                    }
+                )
     if data["taxon_names"]:
         data["taxon_names"] = set_xrefs(
             data["taxon_names"], types["taxon_names"], row, meta=data["metadata"]

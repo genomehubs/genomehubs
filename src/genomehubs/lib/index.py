@@ -224,8 +224,13 @@ def index_file(es, types, names, data, opts, *, taxon_table=None):
             taxon_asm_with_ids = {
                 taxon_id: taxon_asm_data[taxon_id] for taxon_id in with_ids.keys()
             }
+            # print(taxon_asm_with_ids)
             taxon_docs = add_names_and_attributes_to_taxa(
-                es, taxon_asm_with_ids, opts, template=taxon_template, blanks=blanks
+                es,
+                taxon_asm_with_ids,
+                opts,
+                template=taxon_template,
+                blanks=blanks,
             )
             index_stream(
                 es,

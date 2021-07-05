@@ -260,12 +260,7 @@ def preprocess_batch(es, batch, opts, *, taxonomy_name="ncbi"):
     template = index_template(taxonomy_name, opts)
     taxon_template = taxon_index_template(taxonomy_name, opts)
     # TODO: find shared attributes programatically
-    shared_attributes = {
-        "assembly_span",
-        "host_scientific_name",
-        "sample_location",
-        "sample_sex",
-    }
+    shared_attributes = {}
     taxon_ids, asm_by_taxon_id = collate_unique_key_value_indices("taxon_id", batch)
     taxon_res = query_keyword_value_template(
         es,
@@ -287,13 +282,14 @@ def preprocess_batch(es, batch, opts, *, taxonomy_name="ncbi"):
                     add_taxonomy_info_to_meta(batch[idx], source)
     taxa_to_update = {}
     taxon_ids = []
-    for taxon_id, assemblies in asm_by_taxon_id.items():
+    for taxon_id in asm_by_taxon_id.keys():
         if taxon_id in taxa:
             taxa_to_update[taxon_id] = {}
             if "attributes" in taxa[taxon_id]:
                 taxa_to_update[taxon_id]["attributes"] = taxa[taxon_id]["attributes"]
         else:
             taxon_ids.append(taxon_id)
+    print(asm_by_taxon_id)
     add_assembly_attributes_to_taxon(
         batch,
         asm_by_taxon_id,

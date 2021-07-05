@@ -471,6 +471,7 @@ def add_names_and_attributes_to_taxa(
                     or not doc["_source"]["attributes"]
                 ):
                     doc["_source"]["attributes"] = []
+                print(attributes)
                 add_attribute_values(doc["_source"]["attributes"], attributes)
                 yield doc["_id"], doc["_source"]
 
