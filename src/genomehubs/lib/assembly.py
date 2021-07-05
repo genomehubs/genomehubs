@@ -289,7 +289,6 @@ def preprocess_batch(es, batch, opts, *, taxonomy_name="ncbi"):
                 taxa_to_update[taxon_id]["attributes"] = taxa[taxon_id]["attributes"]
         else:
             taxon_ids.append(taxon_id)
-    print(asm_by_taxon_id)
     add_assembly_attributes_to_taxon(
         batch,
         asm_by_taxon_id,
