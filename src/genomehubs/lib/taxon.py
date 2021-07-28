@@ -428,7 +428,6 @@ def add_names_to_list(existing, new, *, blanks=set({"NA", "None"})):
         entry["class"] = entry["class"].lower()  # .replace("_", " ")
         if (
             entry["name"] not in blanks
-            and entry["class"] not in names
             and entry["name"] not in names[entry["class"]]
         ):
             existing.append(entry)
