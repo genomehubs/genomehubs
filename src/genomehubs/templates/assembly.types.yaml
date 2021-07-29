@@ -132,6 +132,7 @@ attributes:
       - enum
     constraint:
       enum:
+        - complete genome
         - chromosome
         - scaffold
         - contig
