@@ -41,10 +41,6 @@
                             "format": "use_field_mapping"
                           },
                           {
-                            "field": "taxon_names.unique",
-                            "format": "use_field_mapping"
-                          },
-                          {
                             "field": "taxon_names.class",
                             "format": "use_field_mapping"
                           }

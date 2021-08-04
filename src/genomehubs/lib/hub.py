@@ -600,7 +600,7 @@ def process_row(types, names, row):
         for key in names.keys():
             if key in data["taxonomy"]:
                 if data["taxonomy"][key] in names[key]:
-                    data["taxonomy"]["taxon_id"] = names[key][data["taxonomy"][key]][
+                    data["taxonomy"]["_taxon_id"] = names[key][data["taxonomy"][key]][
                         "taxon_id"
                     ]
                     data["taxonomy"][key] = names[key][data["taxonomy"][key]]["name"]

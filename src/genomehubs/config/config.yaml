@@ -4,4 +4,19 @@ common:
     port: 9200
 index:
   skip-validation: false
+init:
+  taxonomy:
+    ncbi:
+      file:
+        - nodes.dmp
+        - names.dmp
+      # root: 2759
+      url: "ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz"
+    ott:
+      file:
+        - taxonomy.tsv
+        - synonyms.tsv
+      # root: 304358
+      url: "https://files.opentreeoflife.org/ott/ott3.2/ott3.2.tgz"
+    path: ~/genomehubs/demo_resources/taxdump
 search: {}

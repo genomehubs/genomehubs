@@ -90,11 +90,6 @@
         "normalizer": "lowercase",
         "meta": { "description": "Scientific name" }
       },
-      "unique_name": {
-        "type": "keyword",
-        "ignore_above": 64,
-        "meta": { "description": "Unique version of scientific name" }
-      },
       "taxon_rank": {
         "type": "keyword",
         "ignore_above": 64,
@@ -108,10 +103,6 @@
             "type": "keyword",
             "normalizer": "lowercase",
             "meta": { "description": "Taxon name" }
-          },
-          "unique": {
-            "type": "keyword",
-            "meta": { "description": "Unique version of taxon name" }
           },
           "class": {
             "type": "keyword",

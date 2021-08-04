@@ -8,8 +8,10 @@ Usage:
                     [--config-file PATH...] [--config-save PATH]
                     [--es-host URL...] [--es-url URL]
                     [--insdc-metadata] [--insdc-root INT...] [--restore-indices]
-                    [--taxonomy-path PATH] [--taxonomy-ncbi-root INT]
-                    [--taxonomy-ncbi-url URL] [--taxon-preload]
+                    [--taxonomy-path PATH] [--taxonomy-source STRING...]
+                    [--taxonomy-ncbi-root INT] [--taxonomy-ncbi-url URL]
+                    [--taxonomy-ott-root INT] [--taxonomy-ott-url URL]
+                    [--taxon-preload]
                     [--docker-contain STRING...] [--docker-network STRING]
                     [--docker-timeout INT] [--docker-es-container STRING]
                     [--docker-es-image URL]
@@ -28,8 +30,11 @@ Options:
     --insdc-root INT              Root taxid when indexing public INSDC assemblies.
     --restore-indices             Flag to restore taxon and assembly indices.
     --taxonomy-path DIR           Path to directory containing raw taxonomies.
+    --taxonomy-source STRING      Name of taxonomy to use (ncbi or ott).
     --taxonomy-ncbi-root INT      Root taxid for NCBI taxonomy index.
     --taxonomy-ncbi-url URL       Remote URL to fetch NCBI taxonomy.
+    --taxonomy-ott-root INT       Root taxid for Open Tree of Life taxonomy index.
+    --taxonomy-ott-url URL        Remote URL to fetch Open Tree of Life taxonomy.
     --taxon-preload               Flag to preload all taxa in taxonomy into taxon index.
     --docker-contain STRING       GenomeHubs component to run in Docker.
     --docker-network STRING       Docker network name.
@@ -85,7 +90,8 @@ def main(args):
 
     # Index taxonomies
     if "taxonomy-source" in options["init"]:
-        for taxonomy_name in options["init"]["taxonomy-source"]:
+        for idx, taxonomy_name in enumerate(options["init"]["taxonomy-source"]):
+            taxonomy_name = taxonomy_name.lower()
             template, stream = taxonomy.index(taxonomy_name, options["init"])
             if "taxonomy-%s-root" % taxonomy_name in options["init"]:
                 es_functions.load_mapping(es, template["name"], template["mapping"])
@@ -96,11 +102,8 @@ def main(args):
             es_functions.load_mapping(
                 es, taxon_template["name"], taxon_template["mapping"]
             )
-            # attributes.index_types(
-            #     es, taxon_template["name"], taxon_template["types"], options["init"]
-            # )
             es_functions.index_create(es, taxon_template["index_name"])
-            if options["init"].get("taxon-preload", False):
+            if idx == 0 and options["init"].get("taxon-preload", False):
                 LOGGER.info("Loading all taxa from taxonomy into taxon index")
                 body = {
                     "source": {"index": template["index_name"]},
@@ -114,14 +117,7 @@ def main(args):
                 es, assembly_template["name"], assembly_template["mapping"]
             )
             es_functions.index_create(es, assembly_template["index_name"])
-            # attributes.index_types(
-            #     es, assembly_template["name"], assembly_template["types"], options["init"]
-            # )
 
-            # if "insdc-metadata" in options["init"]:
-            #     assembly_metadata.index(
-            #         es, options["init"], metadata_name="insdc", taxonomy_name=taxonomy_name
-            #     )
             # Prepare analysis index
             analysis_template = analysis.index_template(taxonomy_name, options["init"])
             es_functions.load_mapping(

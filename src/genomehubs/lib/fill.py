@@ -6,7 +6,8 @@ Fill attribute values.
 Usage:
     genomehubs fill [--hub-name STRING] [--hub-path PATH] [--hub-version PATH]
                     [--config-file PATH...] [--config-save PATH]
-                    [--es-host URL...] [--traverse-limit STRING]
+                    [--es-host URL...]  [--taxonomy-source STRING]
+                    [--traverse-limit STRING]
                     [--traverse-infer-ancestors] [--traverse-infer-descendants]
                     [--traverse-infer-both] [--traverse-threads INT]
                     [--traverse-depth INT] [--traverse-root STRING]
@@ -20,6 +21,7 @@ Options:
     --config-file PATH            Path to YAML file containing configuration options.
     --config-save PATH            Path to write configuration options to YAML file.
     --es-host URL                 ElasticSearch hostname/URL and port.
+    --taxonomy-source STRING      Name of taxonomy to use (ncbi or ott).
     --traverse-depth INT          Maximum depth for tree traversal relative to root taxon.
     --traverse-infer-ancestors    Flag to enable tree traversal from tips to root.
     --traverse-infer-descendants  Flag to enable tree traversal from root to tips.
@@ -665,12 +667,12 @@ def main(args):
     types = fetch_types(es, "taxon", options["fill"])
 
     if "taxonomy-source" in options["fill"]:
-        for taxonomy_name in options["fill"]["taxonomy-source"]:
-            template = taxon.index_template(taxonomy_name, options["fill"])
-            if types:
-                template["types"]["attributes"] = types
-            if "traverse-root" in options["fill"]:
-                traverse_handler(es, options["fill"], template)
+        taxonomy_name = options["fill"]["taxonomy-source"]
+        template = taxon.index_template(taxonomy_name, options["fill"])
+        if types:
+            template["types"]["attributes"] = types
+        if "traverse-root" in options["fill"]:
+            traverse_handler(es, options["fill"], template)
 
 
 def cli():

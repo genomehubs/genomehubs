@@ -12,8 +12,7 @@
           "support_value",
           "scientific_name",
           "taxon_names.*",
-          "taxon_rank",
-          "unique_name"
+          "taxon_rank"
         ]
       }
     }

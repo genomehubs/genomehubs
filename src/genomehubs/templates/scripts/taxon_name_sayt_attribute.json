@@ -51,7 +51,7 @@
           ]
         }
       },
-      "_source": ["taxon_id", "scientific_name", "unique_name"]
+      "_source": ["taxon_id", "scientific_name"]
     }
   }
 }
