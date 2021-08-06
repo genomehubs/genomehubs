@@ -10,8 +10,8 @@ Usage:
                      [--assembly-repo URL] [--assembly-exception PATH]
                      [--taxon-dir PATH] [--taxon-repo URL] [--taxon-exception PATH]
                      [--taxon-lookup STRING] [--taxon-lookup-root STRING]
-                     [--taxon-lookup-in-memory]
-                     [--taxon-spellcheck]
+                     [--taxon-lookup-in-memory] [--taxon-id-as-xref STRING]
+                     [--taxon-spellcheck] [--taxonomy-source STRING...]
                      [--file PATH...] [file-dir PATH...]
                      [--remote-file URL...] [--remote-file-dir URL...]
                      [--taxon-id STRING] [--assembly-id STRING] [--analysis-id STRING]
@@ -32,11 +32,13 @@ Options:
     --taxon-lookup-root STRING Root taxon Id for in-memory lookup.
     --taxon-lookup STRING      Taxon name class to lookup (scientific|any). [Default: scientific]
     --taxon-lookup-in-memory   Flag to use in-memory taxon name lookup.
+    --taxon-id-as-xref STRING  Set source DB name to treat taxon_id in file as xref.
     --taxon-spellcheck         Flag to use fuzzy matching to match taxon names.
     --taxon-dir PATH           Path to directory containing taxon-level data.
     --taxon-repo URL           Remote git repository containing taxon-level data.
                                Optionally include `~branch-name` suffix.
     --taxon-exception PATH     Path to directory to write taxon data that failed to import.
+    --taxonomy-source STRING   Name of taxonomy to use (ncbi or ott).
     --file PATH                Path to file for generic file import.
     --file-dir PATH            Path to directory containing generic files to import.
     --remote-file URL          Location of remote file for generic file import.
@@ -84,6 +86,7 @@ from .hub import write_spellchecked_taxa
 from .taxon import add_names_and_attributes_to_taxa
 from .taxon import fix_missing_ids
 from .taxon import load_taxon_table
+from .taxon import translate_xrefs
 from .version import __version__
 
 LOGGER = tolog.logger(__name__)
@@ -104,6 +107,53 @@ def summarise_imported_taxa(docs, imported_taxa):
             }
         )
         yield entry_id, entry
+
+
+def group_rows(
+    taxon_id,
+    rows,
+    with_ids,
+    without_ids,
+    taxon_asm_data,
+    imported_rows,
+    types,
+    failed_rows,
+    blanks,
+):
+    """Group processed rows by available taxon info for import."""
+    ranks = ["subspecies", "species", "family", "order", "class"]
+    for processed_data, taxon_data, row in rows:
+        if taxon_id != "other":
+            with_ids[taxon_id].append(processed_data)
+            taxon_asm_data[taxon_id].append(taxon_data)
+            imported_rows.append(row)
+
+        else:
+            if "taxonomy" in types and not_blank(
+                "alt_taxon_id", processed_data["taxonomy"], blanks
+            ):
+                without_ids[processed_data["taxonomy"]["alt_taxon_id"]].append(
+                    processed_data
+                )
+                taxon_asm_data[processed_data["taxonomy"]["alt_taxon_id"]].append(
+                    taxon_data
+                )
+                failed_rows[processed_data["taxonomy"]["alt_taxon_id"]].append(row)
+            else:
+                row_rank = None
+                for rank in ranks:
+                    if not_blank(rank, processed_data["taxonomy"], blanks):
+                        row_rank = rank
+                        without_ids[processed_data["taxonomy"][rank]].append(
+                            processed_data
+                        )
+                        taxon_asm_data[processed_data["taxonomy"][rank]].append(
+                            taxon_data
+                        )
+                        failed_rows[processed_data["taxonomy"][rank]].append(row)
+                        break
+                if row_rank is None:
+                    failed_rows["None"].append(row)
 
 
 def index_file(es, types, names, data, opts, *, taxon_table=None):
@@ -129,6 +179,7 @@ def index_file(es, types, names, data, opts, *, taxon_table=None):
     taxonomy_name = opts["taxonomy-source"][0]
     taxon_template = taxon.index_template(taxonomy_name, opts)
     LOGGER.info("Processing rows")
+    processed_rows = defaultdict(list)
     for row in tqdm(rows):
         try:
             processed_data, taxon_data, new_taxon_types = process_row(types, names, row)
@@ -137,37 +188,46 @@ def index_file(es, types, names, data, opts, *, taxon_table=None):
             failed_rows["None"].append(row)
             continue
         taxon_types.update(new_taxon_types)
-        if not_blank("taxon_id", processed_data["taxonomy"], blanks):
-            with_ids[processed_data["taxonomy"]["taxon_id"]].append(processed_data)
-            taxon_asm_data[processed_data["taxonomy"]["taxon_id"]].append(taxon_data)
+        if not_blank("_taxon_id", processed_data["taxonomy"], blanks):
+            # if opts["taxon-id-as-xref"]:
+            with_ids[processed_data["taxonomy"]["_taxon_id"]].append(processed_data)
+            taxon_asm_data[processed_data["taxonomy"]["_taxon_id"]].append(taxon_data)
             imported_rows.append(row)
         else:
-            if "taxonomy" in types and not_blank(
-                "alt_taxon_id", processed_data["taxonomy"], blanks
-            ):
-                without_ids[processed_data["taxonomy"]["alt_taxon_id"]].append(
-                    processed_data
-                )
-                taxon_asm_data[processed_data["taxonomy"]["alt_taxon_id"]].append(
-                    taxon_data
-                )
-                failed_rows[processed_data["taxonomy"]["alt_taxon_id"]].append(row)
-            elif not_blank("subspecies", processed_data["taxonomy"], blanks):
-                without_ids[processed_data["taxonomy"]["subspecies"]].append(
-                    processed_data
-                )
-                taxon_asm_data[processed_data["taxonomy"]["subspecies"]].append(
-                    taxon_data
-                )
-                failed_rows[processed_data["taxonomy"]["subspecies"]].append(row)
-            elif not_blank("species", processed_data["taxonomy"], blanks):
-                without_ids[processed_data["taxonomy"]["species"]].append(
-                    processed_data
-                )
-                taxon_asm_data[processed_data["taxonomy"]["species"]].append(taxon_data)
-                failed_rows[processed_data["taxonomy"]["species"]].append(row)
-            else:
-                failed_rows["None"].append(row)
+            tmp_taxon_id = "other"
+            if not_blank("taxon_id", processed_data["taxonomy"], blanks):
+                tmp_taxon_id = processed_data["taxonomy"]["taxon_id"]
+            processed_rows[tmp_taxon_id].append((processed_data, taxon_data, row))
+    # check for taxon-id-as-xref here and do lookup if required
+    if "taxon-id-as-xref" in opts:
+        id_map = translate_xrefs(
+            es,
+            index=taxon_template["index_name"],
+            xrefs=list(processed_rows.keys()),
+            source=opts["taxon-id-as-xref"],
+        )
+        updated_rows = defaultdict(list)
+        for xref, taxon_id in id_map.items():
+            updated_rows[taxon_id] = processed_rows[xref]
+            del processed_rows[xref]
+        unmatched = list(processed_rows.keys())
+        for xref in unmatched:
+            updated_rows["other"] += processed_rows[xref]
+            del processed_rows[xref]
+    else:
+        updated_rows = processed_rows
+    for taxon_id, rows in updated_rows.items():
+        group_rows(
+            taxon_id,
+            rows,
+            with_ids,
+            without_ids,
+            taxon_asm_data,
+            imported_rows,
+            types,
+            failed_rows,
+            blanks,
+        )
     LOGGER.info("Found taxon IDs in %d entries", len(with_ids.keys()))
     spellings = {"spellcheck": {}, "synonym": {}}
     create_ids, without_ids = fix_missing_ids(

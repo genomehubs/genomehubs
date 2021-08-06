@@ -11,6 +11,7 @@ from tqdm import tqdm
 from .es_functions import EsQueryBuilder
 from .es_functions import document_by_id
 from .es_functions import index_stream
+from .es_functions import query_keyword_value_template
 from .es_functions import query_value_template
 from .es_functions import stream_template_search_results
 from .hub import add_attribute_values
@@ -211,6 +212,31 @@ def stream_taxon_names(es, *, index, root=None, size=1000):
     return stream_template_search_results(es, index=index, body=body)
 
 
+def chunker(seq, size):
+    """Loop through array in chunks."""
+    return (seq[pos : pos + size] for pos in range(0, len(seq), size))
+
+
+def translate_xrefs(es, *, index, xrefs, source):
+    """Translate a list of xrefs into taxon_ids."""
+    id_map = {}
+    for refs in chunker(xrefs, 20):
+        responses = query_keyword_value_template(
+            es,
+            "taxon_by_specific_name",
+            source,
+            refs,
+            index,
+            opts={"keyword": "source", "value": "name"},
+        )
+        for idx, res in enumerate(responses["responses"]):
+            if "hits" in res and "hits" in res["hits"]:
+                hits = res["hits"]["hits"]
+                if len(hits) == 1:
+                    id_map[refs[idx]] = hits[0]["_source"]["taxon_id"]
+    return id_map
+
+
 def load_taxon_table(es, opts, taxonomy_name, taxon_table):
     """Load all taxa into memory for taxon name lookup and spellcheck."""
     LOGGER.info("Loading taxa into memory for taxon name lookup")
@@ -268,6 +294,7 @@ def fix_missing_ids(
         with_ids = {}
     if spellings is None:
         spellings = {"spellcheck": {}, "synonym": {}}
+    found_ids = {}
     if without_ids:
         # TODO: support multiple taxonomies
         LOGGER.info("Looking up %d missing taxon IDs", len(without_ids.keys()))

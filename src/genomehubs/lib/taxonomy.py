@@ -73,6 +73,9 @@ def index(taxonomy_name, opts):
         tofetch.fetch_tar(
             url=opts["taxonomy-%s-url" % taxonomy_name], path=str(taxonomy_path)
         )
+        for file in opts[file_key]:
+            for p in taxonomy_path.rglob(file):
+                p.rename(taxonomy_path / p.name)
     else:
         LOGGER.info(
             "Using existing %s taxdump at %s", taxonomy_name, str(taxonomy_path)

@@ -225,10 +225,12 @@ def stream_template_search_results(es, *, index, body, size=10):
         es.clear_scroll(scroll_id=scroll_id)
 
 
-def query_keyword_value_template(es, template_name, keyword, values, index):
+def query_keyword_value_template(es, template_name, keyword, values, index, opts=None):
     """Run query using a by_keyword_value template."""
     if not index_exists(es, index):
         return None
+    if opts is None:
+        opts = {"keyword": "keyword", "value": "value"}
     multisearch = False
     body = ""
     if isinstance(values, list):
@@ -239,7 +241,10 @@ def query_keyword_value_template(es, template_name, keyword, values, index):
         if multisearch:
             body += "{}\n"
         body += ujson.dumps(
-            {"id": template_name, "params": {"keyword": keyword, "value": value}}
+            {
+                "id": template_name,
+                "params": {opts["keyword"]: keyword, opts["value"]: value},
+            }
         )
         body += "\n"
     res = None
