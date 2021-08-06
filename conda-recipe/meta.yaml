@@ -26,7 +26,7 @@ requirements:
     - python
     - pyyaml
     - sparqlwrapper>=1.4.1
-    - tolkein>=0.2.3
+    - tolkein>=0.3.0
     - ujson>=3.0.0
   run:
     - biopython>=1.78
@@ -37,7 +37,7 @@ requirements:
     - python
     - pyyaml
     - sparqlwrapper>=1.4.1
-    - tolkein>=0.2.3
+    - tolkein>=0.3.0
     - ujson>=3.0.0
 
 test:
