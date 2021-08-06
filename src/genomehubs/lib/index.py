@@ -199,7 +199,7 @@ def index_file(es, types, names, data, opts, *, taxon_table=None):
                 tmp_taxon_id = processed_data["taxonomy"]["taxon_id"]
             processed_rows[tmp_taxon_id].append((processed_data, taxon_data, row))
     # check for taxon-id-as-xref here and do lookup if required
-    if opts["taxon-id-as-xref"]:
+    if "taxon-id-as-xref" in opts:
         id_map = translate_xrefs(
             es,
             index=taxon_template["index_name"],
@@ -214,6 +214,8 @@ def index_file(es, types, names, data, opts, *, taxon_table=None):
         for xref in unmatched:
             updated_rows["other"] += processed_rows[xref]
             del processed_rows[xref]
+    else:
+        updated_rows = processed_rows
     for taxon_id, rows in updated_rows.items():
         group_rows(
             taxon_id,
