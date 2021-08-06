@@ -469,6 +469,11 @@ def validate_types_file(types_file, dir_path):
         LOGGER.error("Types file contains no taxonomy information")
     if "file" not in types or "name" not in types["file"]:
         LOGGER.error("No data file name in types file")
+    if "attributes" in types:
+        for entry in types["attributes"].values():
+            enum = entry.get("constraint", {}).get("enum", [])
+            if enum:
+                entry["constraint"]["enum"] = [value.lower() for value in enum]
     defaults = {"attributes": {}, "metadata": {}}
     for key, value in types["file"].items():
         if key.startswith("display") or key.startswith("taxon"):
