@@ -453,10 +453,7 @@ def add_names_to_list(existing, new, *, blanks=set({"NA", "None"})):
         names[entry["class"]][entry["name"]] = True
     for entry in new:
         entry["class"] = entry["class"].lower()  # .replace("_", " ")
-        if (
-            entry["name"] not in blanks
-            and entry["name"] not in names[entry["class"]]
-        ):
+        if entry["name"] not in blanks and entry["name"] not in names[entry["class"]]:
             existing.append(entry)
             names[entry["class"]][entry["name"]] = True
 
@@ -868,6 +865,78 @@ def create_new_taxon(
         ] = [added_taxon]
 
 
+def find_ancestor(
+    ranks,
+    index,
+    obj,
+    taxon,
+    matches,
+    ancestors,
+    alt_taxon_id,
+    es,
+    opts,
+    rank,
+    lookup_name_class,
+    intermediates,
+    blanks,
+):
+    """Loop through ancestral ranks to link new taxon to an ancestor."""
+    for anc_rank in ranks[(index + 1) :]:
+        if anc_rank not in obj["taxonomy"] or obj["taxonomy"][anc_rank] in blanks:
+            # row has no name at this rank
+            continue
+        if taxon in matches and obj["taxonomy"][anc_rank] in matches[taxon]:
+            # this taxon has been seen before
+            taxa = matches[taxon][obj["taxonomy"][anc_rank]]
+            ancestors.update({alt_taxon_id: taxa[0]})
+            break
+        else:
+            # find existing ancestral taxa within a lineage
+            # TODO: make an in memory version of this lookup
+            taxa = lookup_taxon_within_lineage(
+                es,
+                taxon,
+                obj["taxonomy"][anc_rank],
+                opts,
+                rank=rank,
+                anc_rank=anc_rank,
+                return_type="taxon",
+                name_class=lookup_name_class,
+            )
+        if taxa:
+            if len(taxa) == 1:
+                #  unambiguous match to a single existing taxon
+                ancestors.update({alt_taxon_id: taxa[0]})
+                matches[taxon][obj["taxonomy"][anc_rank]] = taxa
+                break
+        elif intermediates == 0:
+            taxa, name_class = lookup_taxon(
+                es,
+                obj["taxonomy"][anc_rank],
+                opts,
+                rank=anc_rank,
+                return_type="taxon",
+                name_class="any",
+            )
+            if taxa and len(taxa) == 1:
+                taxa = lookup_taxon_within_lineage(
+                    es,
+                    taxon,
+                    taxa[0]["_source"]["scientific_name"],
+                    opts,
+                    rank=rank,
+                    anc_rank=anc_rank,
+                    return_type="taxon",
+                    name_class=lookup_name_class,
+                )
+                if taxa and len(taxa) == 1:
+                    ancestors.update({alt_taxon_id: taxa[0]})
+                    matches[taxon][obj["taxonomy"][anc_rank]] = taxa
+                    break
+        intermediates += 1
+    return anc_rank, taxa
+
+
 def create_taxa(
     es, opts, *, taxon_template, data=None, blanks=set(["NA", "None"]), spellings=None
 ):
@@ -899,6 +968,7 @@ def create_taxa(
             # taxon name may be mis-spelled
             continue
         max_index = len(ranks) - 1
+        lookup_name_class = "any" if opts["taxon-lookup"] == "any" else "scientific"
         # loop through lineage to find existing ancestral taxa
         for index, rank in enumerate(ranks[: (max_index - 1)]):
             if rank not in obj["taxonomy"] or obj["taxonomy"][rank] in blanks:
@@ -908,66 +978,31 @@ def create_taxa(
                 # ancestral taxon name is missing or may be mis-spelled
                 break
             intermediates = 0
+            taxon = obj["taxonomy"][rank]
             # loop through higher ranks to disambiguate name clashes
-            for anc_rank in ranks[(index + 1) :]:
-                if (
-                    anc_rank not in obj["taxonomy"]
-                    or obj["taxonomy"][anc_rank] in blanks
-                ):
-                    # row has no name at this rank
-                    continue
-                if (
-                    obj["taxonomy"][rank] in matches
-                    and obj["taxonomy"][anc_rank] in matches[obj["taxonomy"][rank]]
-                ):
-                    # this taxon has been seen before
-                    taxa = matches[obj["taxonomy"][rank]][obj["taxonomy"][anc_rank]]
-                    ancestors.update({alt_taxon_id: taxa[0]})
-                    break
-                else:
-                    # find existing ancestral taxa within a lineage
-                    # TODO: make an in memory version of this lookup
-                    taxa = lookup_taxon_within_lineage(
-                        es,
-                        obj["taxonomy"][rank],
-                        obj["taxonomy"][anc_rank],
-                        opts,
-                        rank=rank,
-                        anc_rank=anc_rank,
-                        return_type="taxon",
-                    )
-                if taxa:
-                    if len(taxa) == 1:
-                        #  unambiguous match to a single existing taxon
-                        ancestors.update({alt_taxon_id: taxa[0]})
-                        matches[obj["taxonomy"][rank]][obj["taxonomy"][anc_rank]] = taxa
-                        break
-                elif intermediates == 0:
-                    taxa, name_class = lookup_taxon(
-                        es,
-                        obj["taxonomy"][anc_rank],
-                        opts,
-                        rank=anc_rank,
-                        return_type="taxon",
-                    )
-                    if taxa and len(taxa) == 1:
-                        ancestors.update({alt_taxon_id: taxa[0]})
-                        matches[obj["taxonomy"][anc_rank]]["all"] = taxa
-                        break
-                intermediates += 1
+            anc_rank, taxa = find_ancestor(
+                ranks,
+                index,
+                obj,
+                taxon,
+                matches,
+                ancestors,
+                alt_taxon_id,
+                es,
+                opts,
+                rank,
+                lookup_name_class,
+                intermediates,
+                blanks,
+            )
             if alt_taxon_id in ancestors:
                 closest_rank = rank
-                if (
-                    obj["taxonomy"][rank] in matches
-                    and obj["taxonomy"][anc_rank] in matches[obj["taxonomy"][rank]]
-                ):
-                    closest_taxon = matches[obj["taxonomy"][rank]][
-                        obj["taxonomy"][anc_rank]
-                    ][0]
+                if taxon in matches and obj["taxonomy"][anc_rank] in matches[taxon]:
+                    closest_taxon = matches[taxon][obj["taxonomy"][anc_rank]][0]
                 else:
                     closest_taxon = matches[obj["taxonomy"][anc_rank]]["all"][0]
                 break
-            lineage.append({"rank": rank, "name": obj["taxonomy"][rank]})
+            lineage.append({"rank": rank, "name": taxon})
         # create a new taxon if a closest ancestral taxon could be found
         create_new_taxon(
             alt_taxon_id,
