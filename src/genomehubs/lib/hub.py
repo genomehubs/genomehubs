@@ -410,7 +410,14 @@ def add_attribute_values(existing, new, *, raw=True):
             if raw:
                 arr = []
                 if indices and entry["key"] in indices:
-                    arr = existing[indices[entry["key"]]]["values"]
+                    try:
+                        arr = existing[indices[entry["key"]]]["values"]
+                    except KeyError:
+                        LOGGER.error(
+                            "Unable to import values to an attribute (%s) that has already been filled",
+                            entry["key"],
+                        )
+                        exit(1)
                 else:
                     existing.append({"key": entry["key"], "values": arr})
                     indices[entry["key"]] = index
