@@ -510,7 +510,7 @@ def lookup_taxon_within_lineage(
     name_class="scientific",
 ):
     """Lookup taxon ID in a specified lineage."""
-    template = index_template(opts["taxonomy-source"][0], opts)
+    template = index_template(opts["taxonomy-source"].lower(), opts)
     body = {
         "id": "taxon_by_lineage",
         "params": {
@@ -597,7 +597,7 @@ def taxon_lookup(es, body, index, taxonomy_index_template, opts, return_type):
         else:
             taxa = [hit for hit in res["hits"]["hits"]]
     else:
-        template = taxonomy_index_template(opts["taxonomy-source"][0], opts)
+        template = taxonomy_index_template(opts["taxonomy-source"].lower(), opts)
         index = template["index_name"]
         with tolog.DisableLogger():
             res = es.search_template(
@@ -622,7 +622,7 @@ def lookup_taxon_in_index(
     spellings,
 ):
     """Lookup taxon in Elasticsearch index."""
-    template = index_template(opts["taxonomy-source"][0], opts)
+    template = index_template(opts["taxonomy-source"].lower(), opts)
     index = template["index_name"]
     body = {
         "id": "taxon_by_name",

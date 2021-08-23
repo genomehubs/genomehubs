@@ -20,8 +20,7 @@ common:
     separator: "--"
     version: v0.1
   taxonomy:
-    source:
-      - ncbi
+    source: ncbi
 fill:
   traverse:
     weight: branch-length

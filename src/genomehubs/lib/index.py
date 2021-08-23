@@ -11,7 +11,7 @@ Usage:
                      [--taxon-dir PATH] [--taxon-repo URL] [--taxon-exception PATH]
                      [--taxon-lookup STRING] [--taxon-lookup-root STRING]
                      [--taxon-lookup-in-memory] [--taxon-id-as-xref STRING]
-                     [--taxon-spellcheck] [--taxonomy-source STRING...]
+                     [--taxon-spellcheck] [--taxonomy-source STRING]
                      [--file PATH...] [file-dir PATH...]
                      [--remote-file URL...] [--remote-file-dir URL...]
                      [--taxon-id STRING] [--assembly-id STRING] [--analysis-id STRING]
@@ -176,7 +176,7 @@ def index_file(es, types, names, data, opts, *, taxon_table=None):
     imported_rows = []
     blanks = set(["", "NA", "N/A", "None"])
     taxon_types = {}
-    taxonomy_name = opts["taxonomy-source"][0]
+    taxonomy_name = opts["taxonomy-source"].lower()
     taxon_template = taxon.index_template(taxonomy_name, opts)
     LOGGER.info("Processing rows")
     processed_rows = defaultdict(list)
@@ -311,7 +311,7 @@ def main(args):
     with tolog.DisableLogger():
         hub.post_search_scripts(es)
 
-    taxonomy_name = options["index"]["taxonomy-source"][0]
+    taxonomy_name = options["index"]["taxonomy-source"].lower()
     taxon_table = None
     if taxon_table is None and "taxon-lookup-in-memory" in options["index"]:
         taxon_table = {
@@ -332,7 +332,11 @@ def main(args):
                     types,
                     names,
                     data,
-                    {**options["index"], "index": index, "index_types": index_types},
+                    {
+                        **options["index"],
+                        "index": index,
+                        "index_types": index_types,
+                    },
                     taxon_table=taxon_table,
                 )
             for types_file in sorted(Path(dir_path).glob("*.types.yaml")):
@@ -344,7 +348,11 @@ def main(args):
                     types,
                     names,
                     data,
-                    {**options["index"], "index": index, "index_types": index_types},
+                    {
+                        **options["index"],
+                        "index": index,
+                        "index_types": index_types,
+                    },
                     taxon_table=taxon_table,
                 )
     # TODO: #29 Implement alternate backbone taxonomies

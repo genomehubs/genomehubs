@@ -467,6 +467,7 @@ def process_names_file(types, names_file):
 
 def validate_types_file(types_file, dir_path):
     """Validate types file."""
+    LOGGER.info("Validating YAML file %s", types_file)
     try:
         types = tofile.load_yaml(str(types_file.resolve()))
     except Exception:
@@ -474,8 +475,10 @@ def validate_types_file(types_file, dir_path):
         sys.exit(1)
     if "taxonomy" not in types:
         LOGGER.error("Types file contains no taxonomy information")
+        sys.exit(1)
     if "file" not in types or "name" not in types["file"]:
         LOGGER.error("No data file name in types file")
+        sys.exit(1)
     if "attributes" in types:
         for entry in types["attributes"].values():
             enum = entry.get("constraint", {}).get("enum", [])
@@ -489,7 +492,11 @@ def validate_types_file(types_file, dir_path):
             defaults["attributes"].update({key: value})
             defaults["metadata"].update({key: value})
     types.update({"defaults": defaults})
-    data = tofile.open_file_handle(Path(dir_path) / types["file"]["name"])
+    datafile = Path(dir_path) / types["file"]["name"]
+    data = tofile.open_file_handle(datafile)
+    if data is None:
+        LOGGER.error("Data file '%s' could not de opened for reading", datafile)
+        sys.exit(1)
     names = process_names_file(types, Path(dir_path) / "names" / types["file"]["name"])
     return types, data, names
 

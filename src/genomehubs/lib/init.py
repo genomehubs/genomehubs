@@ -8,7 +8,7 @@ Usage:
                     [--config-file PATH...] [--config-save PATH]
                     [--es-host URL...] [--es-url URL]
                     [--insdc-metadata] [--insdc-root INT...] [--restore-indices]
-                    [--taxonomy-path PATH] [--taxonomy-source STRING...]
+                    [--taxonomy-path PATH] [--taxonomy-source STRING]
                     [--taxonomy-ncbi-root INT] [--taxonomy-ncbi-url URL]
                     [--taxonomy-ott-root INT] [--taxonomy-ott-url URL]
                     [--taxon-preload]
@@ -90,47 +90,42 @@ def main(args):
 
     # Index taxonomies
     if "taxonomy-source" in options["init"]:
-        for idx, taxonomy_name in enumerate(options["init"]["taxonomy-source"]):
-            taxonomy_name = taxonomy_name.lower()
-            template, stream = taxonomy.index(taxonomy_name, options["init"])
-            if "taxonomy-%s-root" % taxonomy_name in options["init"]:
-                es_functions.load_mapping(es, template["name"], template["mapping"])
-                es_functions.index_stream(es, template["index_name"], stream)
+        taxonomy_name = options["init"]["taxonomy-source"].lower()
+        template, stream = taxonomy.index(taxonomy_name, options["init"])
+        if "taxonomy-%s-root" % taxonomy_name in options["init"]:
+            es_functions.load_mapping(es, template["name"], template["mapping"])
+            es_functions.index_stream(es, template["index_name"], stream)
 
-            # Prepare taxon index
-            taxon_template = taxon.index_template(taxonomy_name, options["init"])
-            es_functions.load_mapping(
-                es, taxon_template["name"], taxon_template["mapping"]
-            )
-            es_functions.index_create(es, taxon_template["index_name"])
-            if idx == 0 and options["init"].get("taxon-preload", False):
-                LOGGER.info("Loading all taxa from taxonomy into taxon index")
-                body = {
-                    "source": {"index": template["index_name"]},
-                    "dest": {"index": taxon_template["index_name"]},
-                }
-                es.reindex(body=body)
+        # Prepare taxon index
+        taxon_template = taxon.index_template(taxonomy_name, options["init"])
+        es_functions.load_mapping(es, taxon_template["name"], taxon_template["mapping"])
+        es_functions.index_create(es, taxon_template["index_name"])
+        if options["init"].get("taxon-preload", False):
+            LOGGER.info("Loading all taxa from taxonomy into taxon index")
+            body = {
+                "source": {"index": template["index_name"]},
+                "dest": {"index": taxon_template["index_name"]},
+            }
+            es.reindex(body=body)
 
-            # Prepare assembly index
-            assembly_template = assembly.index_template(taxonomy_name, options["init"])
-            es_functions.load_mapping(
-                es, assembly_template["name"], assembly_template["mapping"]
-            )
-            es_functions.index_create(es, assembly_template["index_name"])
+        # Prepare assembly index
+        assembly_template = assembly.index_template(taxonomy_name, options["init"])
+        es_functions.load_mapping(
+            es, assembly_template["name"], assembly_template["mapping"]
+        )
+        es_functions.index_create(es, assembly_template["index_name"])
 
-            # Prepare analysis index
-            analysis_template = analysis.index_template(taxonomy_name, options["init"])
-            es_functions.load_mapping(
-                es, analysis_template["name"], analysis_template["mapping"]
-            )
-            es_functions.index_create(es, analysis_template["index_name"])
+        # Prepare analysis index
+        analysis_template = analysis.index_template(taxonomy_name, options["init"])
+        es_functions.load_mapping(
+            es, analysis_template["name"], analysis_template["mapping"]
+        )
+        es_functions.index_create(es, analysis_template["index_name"])
 
-            # Prepare file index
-            file_template = files.index_template(taxonomy_name, options["init"])
-            es_functions.load_mapping(
-                es, file_template["name"], file_template["mapping"]
-            )
-            es_functions.index_create(es, file_template["index_name"])
+        # Prepare file index
+        file_template = files.index_template(taxonomy_name, options["init"])
+        es_functions.load_mapping(es, file_template["name"], file_template["mapping"])
+        es_functions.index_create(es, file_template["index_name"])
 
 
 def cli():

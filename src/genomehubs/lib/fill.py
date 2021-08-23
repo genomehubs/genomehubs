@@ -667,7 +667,7 @@ def main(args):
     types = fetch_types(es, "taxon", options["fill"])
 
     if "taxonomy-source" in options["fill"]:
-        taxonomy_name = options["fill"]["taxonomy-source"]
+        taxonomy_name = options["fill"]["taxonomy-source"].lower()
         template = taxon.index_template(taxonomy_name, options["fill"])
         if types:
             template["types"]["attributes"] = types
