@@ -57,7 +57,10 @@ def add_attribute_sources(name, obj, attributes):
             if key in obj:
                 if not isinstance(obj[key], list):
                     obj[key] = [obj[key]]
-                obj[key].append(value)
+                if isinstance(value, list):
+                    obj[key] += value
+                else:
+                    obj[key].append(value)
             else:
                 obj[key] = value
 
