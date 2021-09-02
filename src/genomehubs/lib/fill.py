@@ -42,6 +42,7 @@ Examples:
 
 import sys
 from collections import defaultdict
+from datetime import datetime
 from multiprocessing import Pool
 from statistics import mean
 from statistics import median
@@ -137,6 +138,18 @@ def enum(tup):
     return result
 
 
+def earliest(arr):
+    """Select earliest date from a list."""
+    date_arr = [datetime.strptime(date, "%Y-%m-%d") for date in arr]
+    return datetime.strftime(min(date_arr), "%Y-%m-%d")
+
+
+def latest(arr):
+    """Select earliest date from a list."""
+    date_arr = [datetime.strptime(date, "%Y-%m-%d") for date in arr]
+    return datetime.strftime(max(date_arr), "%Y-%m-%d")
+
+
 def apply_summary(
     summary,
     values,
@@ -150,7 +163,9 @@ def apply_summary(
     """Apply summary statistic functions."""
     summaries = {
         "count": len,
+        "earliest": earliest,
         "enum": enum,
+        "latest": latest,
         "max": max,
         "min": min,
         "mean": mean,
@@ -179,15 +194,63 @@ def apply_summary(
         if max_value is not None:
             value = max(value, max_value)
         max_value = value
-    if summary == "min":
+    elif summary == "min":
         if min_value is not None:
             value = min(value, min_value)
         min_value = value
     return value, max_value, min_value
 
 
+def set_traverse_values(
+    summaries,
+    values,
+    primary_values,
+    max_value,
+    min_value,
+    meta,
+    attribute,
+    value_type,
+    traverse,
+    source,
+):
+    """Set values  use for tree traversal."""
+    idx = 0
+    order = meta.get("constraint", {}).get("enum", [])
+    default_summary = "median"
+    if meta["type"] == "keyword":
+        default_summary = "mode"
+    elif meta["type"] == "date":
+        default_summary = "latest"
+    for index, summary in enumerate(summaries):
+        value, max_value, min_value = apply_summary(
+            summary,
+            values,
+            primary_values=primary_values,
+            summary_types=meta["summary"][index + 1 :] + [default_summary],
+            max_value=max_value,
+            min_value=min_value,
+            order=order,
+        )
+        if idx == 0:
+            if value is not None:
+                attribute[value_type] = value
+                attribute["count"] = len(values)
+                attribute["aggregation_method"] = summary
+                attribute["aggregation_source"] = "direct"
+                traverse_value = value
+            idx += 1
+        if traverse and source == "descendant" and summary == traverse:
+            traverse_value = value
+        if summary != "list":
+            if summary.startswith("median"):
+                summary = "median"
+        else:
+            traverse_value = list(set(traverse_value))
+    return traverse_value, max_value, min_value
+
+
 def summarise_attribute_values(
-    attribute, meta, *, values=None, max_value=None, min_value=None
+    attribute, meta, *, values=None, max_value=None, min_value=None, source="direct"
 ):
     """Calculate a single summary value for an attribute."""
     if values is None and "values" not in attribute:
@@ -206,40 +269,28 @@ def summarise_attribute_values(
                 values += [value[value_type] for value in attribute["values"]]
         if not values:
             return None, None, None
-        idx = 0
         traverse = meta.get("traverse", False)
         traverse_value = None
         if not isinstance(meta["summary"], list):
             meta["summary"] = [meta["summary"]]
-        order = meta.get("constraint", {}).get("enum", [])
-        default_summary = "median"
-        if meta["type"] == "keyword":
-            default_summary = "mode"
-        for index, summary in enumerate(meta["summary"]):
-            value, max_value, min_value = apply_summary(
-                summary,
-                values,
-                primary_values=primary_values,
-                summary_types=meta["summary"][index + 1 :] + [default_summary],
-                max_value=max_value,
-                min_value=min_value,
-                order=order,
-            )
-            if idx == 0:
-                if value is not None:
-                    attribute[value_type] = value
-                    attribute["count"] = len(values)
-                    attribute["aggregation_method"] = summary
-                    attribute["aggregation_source"] = "direct"
-                    traverse_value = value
-                idx += 1
-            elif traverse and summary == traverse:
-                traverse_value = value
-            if summary != "list":
-                if summary.startswith("median"):
-                    summary = "median"
-            else:
-                traverse_value = list(set(traverse_value))
+        summaries = meta["summary"][:]
+        if traverse and source == "descendant":
+            if summaries[0] != traverse:
+                summaries = [traverse] + summaries
+                if primary_values:
+                    values = primary_values
+        traverse_value, max_value, min_value = set_traverse_values(
+            summaries,
+            values,
+            primary_values,
+            max_value,
+            min_value,
+            meta,
+            attribute,
+            value_type,
+            traverse,
+            source,
+        )
         if isinstance(max_value, float) or isinstance(max_value, int):
             attribute["max"] = max_value
             attribute["min"] = min_value
@@ -333,6 +384,7 @@ def set_values_from_descendants(
             values=obj["values"],
             max_value=obj["max"],
             min_value=obj["min"],
+            source="descendant",
         )
         if summary_value is not None:
             attribute["aggregation_source"] = "descendant"
