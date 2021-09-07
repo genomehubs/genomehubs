@@ -40,6 +40,7 @@ Examples:
     ./genomehubs fill --traverse-root 7088
 """
 
+import re
 import sys
 from collections import defaultdict
 from datetime import datetime
@@ -138,16 +139,31 @@ def enum(tup):
     return result
 
 
-def earliest(arr):
+def earliest(arr, *args):
     """Select earliest date from a list."""
-    date_arr = [datetime.strptime(date, "%Y-%m-%d") for date in arr]
-    return datetime.strftime(min(date_arr), "%Y-%m-%d")
+    if not isinstance(arr, list):
+        arr = [arr]
+    if arr:
+        if isinstance(arr[0], str):
+            date_arr = [datetime.strptime(date, "%Y-%m-%d") for date in arr]
+            return datetime.strftime(min(date_arr), "%Y-%m-%d")
+    return min(arr + list(args))
 
 
-def latest(arr):
+def latest(arr, *args):
     """Select earliest date from a list."""
-    date_arr = [datetime.strptime(date, "%Y-%m-%d") for date in arr]
-    return datetime.strftime(max(date_arr), "%Y-%m-%d")
+    if not isinstance(arr, list):
+        arr = [arr]
+    if isinstance(arr[0], str):
+        if re.match(r"\d{4}-\d{2}-\d{2}", arr[0]):
+            date_arr = [datetime.strptime(date, "%Y-%m-%d") for date in arr]
+            return datetime.strftime(max(date_arr), "%Y-%m-%d")
+    return max(arr + list(args))
+
+
+def deduped_list(arr):
+    """Remove duplicate values from a list."""
+    return list(set(arr))
 
 
 def apply_summary(
@@ -166,15 +182,15 @@ def apply_summary(
         "earliest": earliest,
         "enum": enum,
         "latest": latest,
-        "max": max,
-        "min": min,
+        "max": latest,
+        "min": earliest,
         "mean": mean,
         "median": median,
         "median_high": median_high,
         "median_low": median_low,
         "mode": mode,
         "most_common": mode,
-        "list": list,
+        "list": deduped_list,
     }
     flattened = []
     if summary == "primary":
@@ -192,11 +208,11 @@ def apply_summary(
         value = summaries[summary](flattened)
     if summary == "max":
         if max_value is not None:
-            value = max(value, max_value)
+            value = latest(value, max_value)
         max_value = value
     elif summary == "min":
         if min_value is not None:
-            value = min(value, min_value)
+            value = earliest(value, min_value)
         min_value = value
     return value, max_value, min_value
 
@@ -294,6 +310,9 @@ def summarise_attribute_values(
         if isinstance(max_value, float) or isinstance(max_value, int):
             attribute["max"] = max_value
             attribute["min"] = min_value
+        elif meta["type"] == "date" and max_value and min_value:
+            attribute["from"] = min_value
+            attribute["to"] = max_value
         return traverse_value, max_value, min_value
     return None, None, None
 
@@ -321,14 +340,14 @@ def summarise_attributes(*, attributes, attrs, meta, parent, parents):
                         )
                     if max_value is not None:
                         if parents[parent][node_attribute["key"]]["max"] is not None:
-                            parents[parent][node_attribute["key"]]["max"] = max(
+                            parents[parent][node_attribute["key"]]["max"] = latest(
                                 parents[parent][node_attribute["key"]]["max"], max_value
                             )
                         else:
                             parents[parent][node_attribute["key"]]["max"] = max_value
                     if min_value is not None:
                         if parents[parent][node_attribute["key"]]["min"] is not None:
-                            parents[parent][node_attribute["key"]]["min"] = min(
+                            parents[parent][node_attribute["key"]]["min"] = earliest(
                                 parents[parent][node_attribute["key"]]["min"], min_value
                             )
                         else:
@@ -399,14 +418,14 @@ def set_values_from_descendants(
                     parents[parent][key]["values"].append(summary_value)
                 if max_value is not None:
                     if parents[parent][key]["max"] is not None:
-                        parents[parent][key]["max"] = max(
+                        parents[parent][key]["max"] = latest(
                             parents[parent][key]["max"], max_value
                         )
                     else:
                         parents[parent][key]["max"] = max_value
                 if min_value is not None:
                     if parents[parent][key]["min"] is not None:
-                        parents[parent][key]["min"] = min(
+                        parents[parent][key]["min"] = earliest(
                             parents[parent][key]["min"], min_value
                         )
                     else:
