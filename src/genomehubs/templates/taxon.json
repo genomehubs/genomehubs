@@ -237,6 +237,14 @@
             "type": "double",
             "meta": { "description": "Maximum value (numeric types only)" }
           },
+          "from": {
+            "type": "date",
+            "meta": { "description": "Minimum value (date types only)" }
+          },
+          "to": {
+            "type": "date",
+            "meta": { "description": "Maximum value (date types only)" }
+          },
           "mean": {
             "type": "double",
             "meta": { "description": "Mean value (numeric types only)" }
