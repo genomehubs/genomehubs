@@ -65,14 +65,28 @@
                 "query": {
                   "bool": {
                     "must": {
-                      "multi_match": {
-                        "query": "{{searchTerm}}",
-                        "type": "phrase_prefix",
-                        "boost": 1.0,
-                        "fields": [
-                          "taxon_names.name.live",
-                          "taxon_names.name.live._2gram",
-                          "taxon_names.name.live._3gram"
+                      "bool": {
+                        "should": [
+                          {
+                            "match": {
+                              "taxon_names.name": {
+                                "query": "{{searchTerm}}",
+                                "boost": 2.0
+                              }
+                            }
+                          },
+                          {
+                            "multi_match": {
+                              "query": "{{searchTerm}}",
+                              "type": "phrase_prefix",
+                              "boost": 1.0,
+                              "fields": [
+                                "taxon_names.name.live",
+                                "taxon_names.name.live._2gram",
+                                "taxon_names.name.live._3gram"
+                              ]
+                            }
+                          }
                         ]
                       }
                     },
