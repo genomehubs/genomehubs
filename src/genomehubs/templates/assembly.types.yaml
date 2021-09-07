@@ -290,6 +290,15 @@ attributes:
     display_level: 2
     display_name: Last updated
     header: submissionDate
+    taxon_display_group: assembly
+    taxon_key: assembly_date
+    taxon_name: assembly_date
+    taxon_summary:
+      - primary
+      - max
+      - min
+    taxon_traverse: min
+    taxon_traverse_direction: up
     type: date
   refseq_category:
     display_level: 2
