@@ -65,7 +65,7 @@ def add_attribute_sources(name, obj, attributes):
                 obj[key] = value
 
 
-def index_types(es, types_name, types, opts):
+def index_types(es, types_name, types, opts, *, dry_run=False):
     """Index types into Elasticsearch."""
     # TODO: fetch existing types to allow new sources to add, not overwrite
     try:
@@ -95,8 +95,14 @@ def index_types(es, types_name, types, opts):
             index_type="attribute",
         )
         load_mapping(es, template["name"], template["mapping"])
-        index_stream(es, template["index_name"], stream)
-        index_stream(es, template["index_name"], update_stream, _op_type="update")
+        index_stream(es, template["index_name"], stream, dry_run=dry_run)
+        index_stream(
+            es,
+            template["index_name"],
+            update_stream,
+            _op_type="update",
+            dry_run=dry_run,
+        )
     if "taxon_names" in types:
         if "defaults" in types and "taxon_names" in types["defaults"]:
             for key, value in types["names"].items():
@@ -109,7 +115,7 @@ def index_types(es, types_name, types, opts):
             es, types_name, types["taxon_names"], opts, index_type="identifier"
         )
         load_mapping(es, template["name"], template["mapping"])
-        index_stream(es, template["index_name"], stream)
+        index_stream(es, template["index_name"], stream, dry_run=dry_run)
 
 
 def fetch_types(es, types_name, opts):

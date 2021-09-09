@@ -350,7 +350,7 @@ def check_assemblies_exist(es, attrs, taxonomy_name, opts):
     return assemblies
 
 
-def index_metadata(es, file, taxonomy_name, opts):
+def index_metadata(es, file, taxonomy_name, opts, *, dry_run=False):
     """Index file metadata."""
     data = tofile.load_yaml(file)
     file_template = index_template(taxonomy_name, opts)
@@ -437,6 +437,6 @@ def index_metadata(es, file, taxonomy_name, opts):
         file_docs[file_action].update({file_id: files[file_id]})
     # Create/update index entry according to returned action
     LOGGER.info("Indexing analyses")
-    index_docs(es, analysis_docs, analysis_template)
+    index_docs(es, analysis_docs, analysis_template, dry_run=dry_run)
     LOGGER.info("Indexing files")
-    index_docs(es, file_docs, file_template)
+    index_docs(es, file_docs, file_template, dry_run=dry_run)
