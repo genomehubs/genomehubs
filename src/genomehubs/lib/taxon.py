@@ -423,6 +423,7 @@ def find_or_create_taxa(es, opts, *, taxon_ids, taxon_template, asm_by_taxon_id=
         es,
         taxon_template["index_name"],
         stream_taxa(to_create),
+        dry_run=opts.get("dry-run", False),
     )
     taxa.update(
         {
@@ -1022,6 +1023,7 @@ def create_taxa(
         es,
         taxon_template["index_name"],
         stream_taxa(new_taxa),
+        dry_run=opts.get("dry-run", False),
     )
     # return a list of alt_taxon_ids for the created taxa
     return new_taxa.keys()

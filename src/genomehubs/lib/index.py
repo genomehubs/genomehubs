@@ -16,6 +16,7 @@ Usage:
                      [--remote-file URL...] [--remote-file-dir URL...]
                      [--taxon-id STRING] [--assembly-id STRING] [--analysis-id STRING]
                      [--file-title STRING] [--file-description STRING] [--file-metadata PATH]
+                     [--dry-run]
                      [-h|--help] [-v|--version]
 
 Options:
@@ -49,6 +50,7 @@ Options:
     --file-title STRING        Default title for indexed files.
     --file-description STRING  Default description for all indexed files.
     --file-metadata PATH       CSV, TSV, YAML or JSON file metadata with one entry per file to be indexed.
+    --dry-run                  Flag to run without loading data into the elasticsearch index.
     -h, --help                 Show this
     -v, --version              Show version number
 
@@ -260,6 +262,7 @@ def index_file(es, types, names, data, opts, *, taxon_table=None):
                 taxon_template["index_name"],
                 summarise_imported_taxa(docs, imported_taxa),
                 _op_type="update",
+                dry_run=opts.get("dry-run", False),
             )
             write_imported_taxa(imported_taxa, opts, types=types)
         elif opts["index"] == "assembly":
@@ -273,13 +276,19 @@ def index_file(es, types, names, data, opts, *, taxon_table=None):
                 taxon_template=taxon_template,
                 blanks=blanks,
             )
-            index_stream(es, assembly_template["index_name"], docs)
+            index_stream(
+                es,
+                assembly_template["index_name"],
+                docs,
+                dry_run=opts.get("dry-run", False),
+            )
             # index taxon-level attributes
             index_types(
                 es,
                 "taxon",
                 {"attributes": taxon_types},
                 opts,
+                dry_run=opts.get("dry-run", False),
             )
             taxon_asm_with_ids = {
                 taxon_id: taxon_asm_data[taxon_id] for taxon_id in with_ids.keys()
@@ -297,6 +306,7 @@ def index_file(es, types, names, data, opts, *, taxon_table=None):
                 taxon_template["index_name"],
                 taxon_docs,
                 _op_type="update",
+                dry_run=opts.get("dry-run", False),
             )
 
 
@@ -319,6 +329,7 @@ def main(args):
             "any": defaultdict(list),
         }
         load_taxon_table(es, options["index"], taxonomy_name, taxon_table)
+    dry_run = options["index"].get("dry-run", False)
     for index in list(["taxon", "assembly"]):
         data_dir = "%s-dir" % index
         if data_dir in options["index"]:
@@ -326,7 +337,7 @@ def main(args):
             for types_file in sorted(Path(dir_path).glob("*.names.yaml")):
                 types, data, names = validate_types_file(types_file, dir_path)
                 LOGGER.info("Indexing %s" % types["file"]["name"])
-                index_types(es, index, types, options["index"])
+                index_types(es, index, types, options["index"], dry_run=dry_run)
                 index_file(
                     es,
                     types,
@@ -342,7 +353,7 @@ def main(args):
             for types_file in sorted(Path(dir_path).glob("*.types.yaml")):
                 types, data, names = validate_types_file(types_file, dir_path)
                 LOGGER.info("Indexing %s" % types["file"]["name"])
-                index_types(es, index, types, options["index"])
+                index_types(es, index, types, options["index"], dry_run=dry_run)
                 index_file(
                     es,
                     types,
@@ -360,7 +371,11 @@ def main(args):
         index_files(es, options["index"]["file"], taxonomy_name, options["index"])
     elif "file-metadata" in options["index"]:
         index_metadata(
-            es, options["index"]["file-metadata"], taxonomy_name, options["index"]
+            es,
+            options["index"]["file-metadata"],
+            taxonomy_name,
+            options["index"],
+            dry_run=dry_run,
         )
 
 
