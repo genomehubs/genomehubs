@@ -190,6 +190,7 @@ def apply_summary(
         "median_low": median_low,
         "mode": mode,
         "most_common": mode,
+        "sum": sum,
         "list": deduped_list,
     }
     flattened = []
