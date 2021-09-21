@@ -254,10 +254,10 @@ def set_traverse_values(
                 attribute["count"] = len(values)
                 attribute["aggregation_method"] = summary
                 attribute["aggregation_source"] = "direct"
-                traverse_value = value
+                traverse_value = value if value else []
             idx += 1
         if traverse and source == "descendant" and summary == traverse:
-            traverse_value = value
+            traverse_value = value if value else []
         if summary != "list":
             if summary.startswith("median"):
                 summary = "median"
