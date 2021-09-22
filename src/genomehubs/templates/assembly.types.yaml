@@ -320,6 +320,19 @@ attributes:
     taxon_traverse: min
     taxon_traverse_direction: up
     type: date
+  ebp_metric_date:
+    display_level: 2
+    display_name: EBP metric date
+    header: ebpMetricDate
+    taxon_display_group: assembly
+    taxon_key: ebp_metric_date
+    taxon_name: ebp_metric_date
+    taxon_summary:
+      - min
+      - max
+    taxon_traverse: min
+    taxon_traverse_direction: up
+    type: date
   refseq_category:
     display_level: 2
     header: refseqCategory

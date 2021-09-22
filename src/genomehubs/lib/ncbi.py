@@ -186,6 +186,15 @@ def refseq_organelle_parser(collections, opts, *, types=None, names=None):
     return parsed
 
 
+def metricDates(obj):
+    """Add date fields for assemblies with sufficient metrics."""
+    if "contigN50" in obj and "scaffoldN50" in obj:
+        contig_n50 = obj.get("contigN50", 0)
+        scaffold_n50 = obj.get("scaffoldN50", 0)
+        if contig_n50 > 1000000 and scaffold_n50 > 10000000:
+            obj["ebpMetricDate"] = obj["submissionDate"]
+
+
 def parse_ncbi_datasets_record(record, parsed):
     """Parse a single NCBI datasets record."""
     obj = {}
@@ -233,6 +242,7 @@ def parse_ncbi_datasets_record(record, parsed):
     obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else None
     assemblyStats = record.get("assemblyStats", {})
     obj.update(assemblyStats)
+    metricDates(obj)
     wgsInfo = record.get("wgsInfo", {})
     for key in ("masterWgsUrl", "wgsContigsUrl", "wgsProjectAccession"):
         obj[key] = wgsInfo.get(key, None)

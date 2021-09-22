@@ -552,7 +552,7 @@ def process_row_values(row, types, data):
                     ):
                         separator = "|".join(meta["separator"])
                         data[group][key] = re.split(rf"\s*{separator}\s*", value)
-                    else:
+                    elif value is not None and value != "None":
                         data[group][key] = value
                 except Exception as err:
                     LOGGER.warning("Cannot parse row '%s'" % str(row))
