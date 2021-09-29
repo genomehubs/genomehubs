@@ -295,16 +295,13 @@ def stream_docs(doc_dict):
         yield doc_id, doc
 
 
-def index_docs(es, doc_collection, template):
+def index_docs(es, doc_collection, template, *, dry_run=False):
     """Index a collection of docs."""
     for op_type, doc_dict in doc_collection.items():
         if doc_dict:
             docs = stream_docs(doc_dict)
             index_stream(
-                es,
-                template["index_name"],
-                docs,
-                _op_type=op_type,
+                es, template["index_name"], docs, _op_type=op_type, dry_run=dry_run
             )
 
 

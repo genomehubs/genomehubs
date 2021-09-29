@@ -58,6 +58,7 @@ def extract_btk_stats(meta):
     except KeyError:
         meta["species"] = meta["taxon_name"]
 
+
 def describe_btk_files(meta):
     """Generate analysis descriptions and links for BlobToolKit."""
     plots = ["cumulative", "snail"]
