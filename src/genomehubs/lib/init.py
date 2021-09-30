@@ -103,7 +103,7 @@ def add_jsonl_to_taxonomy(stream, jsonl):
         if entry["lineage"]:
             lineage = extend_lineage(entry)
             lineages[entry["scientific_name"]].append(lineage)
-        # yield doc_id, entry
+        yield doc_id, entry
     with tofile.open_file_handle(jsonl) as fh:
         for line in fh:
             data = ujson.decode(line)
