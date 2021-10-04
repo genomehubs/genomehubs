@@ -93,7 +93,7 @@
             "normalizer": "lowercase",
             "meta": { "description": "Taxon ID of ancestral taxon" }
           },
-          "rank": {
+          "taxon_rank": {
             "type": "keyword",
             "normalizer": "lowercase",
             "meta": { "description": "Ancestral rank" }
