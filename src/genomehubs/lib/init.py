@@ -11,7 +11,7 @@ Usage:
                     [--taxonomy-path PATH] [--taxonomy-source STRING]
                     [--taxonomy-ncbi-root INT] [--taxonomy-ncbi-url URL]
                     [--taxonomy-ott-root INT] [--taxonomy-ott-url URL]
-                    [--taxon-preload]
+                    [--taxonomy-jsonl PATH] [--taxon-preload]
                     [--docker-contain STRING...] [--docker-network STRING]
                     [--docker-timeout INT] [--docker-es-container STRING]
                     [--docker-es-image URL]
@@ -35,6 +35,7 @@ Options:
     --taxonomy-ncbi-url URL       Remote URL to fetch NCBI taxonomy.
     --taxonomy-ott-root INT       Root taxid for Open Tree of Life taxonomy index.
     --taxonomy-ott-url URL        Remote URL to fetch Open Tree of Life taxonomy.
+    --taxonomy-jsonl PATH         Path to JSON Lines format taxonomy file of additional taxa.
     --taxon-preload               Flag to preload all taxa in taxonomy into taxon index.
     --docker-contain STRING       GenomeHubs component to run in Docker.
     --docker-network STRING       Docker network name.
@@ -58,8 +59,11 @@ Examples:
 """
 
 import sys
+from collections import defaultdict
 
+import ujson
 from docopt import docopt
+from tolkein import tofile
 from tolkein import tolog
 
 from ..lib import analysis
@@ -73,6 +77,65 @@ from .config import config
 from .version import __version__
 
 LOGGER = tolog.logger(__name__)
+
+
+def extend_lineage(entry):
+    """Add current taxon to beginning of lineage."""
+    new_lineage = [
+        {
+            "node_depth": 1,
+            "taxon_id": entry["taxon_id"],
+            "taxon_rank": entry["taxon_rank"],
+            "scientific_name": entry["scientific_name"],
+        }
+    ]
+    for obj in entry["lineage"]:
+        new_obj = {**obj}
+        new_obj["node_depth"] += 1
+        new_lineage.append(new_obj)
+    return new_lineage
+
+
+def add_jsonl_to_taxonomy(stream, jsonl):
+    """Add entries from JSON Lines format file to taxonomy stream."""
+    lineages = defaultdict(list)
+    for doc_id, entry in stream:
+        if entry["lineage"]:
+            lineage = extend_lineage(entry)
+            lineages[entry["scientific_name"]].append(lineage)
+        yield doc_id, entry
+    with tofile.open_file_handle(jsonl) as fh:
+        for line in fh:
+            data = ujson.decode(line)
+            entry = {
+                "taxon_id": data["taxId"],
+                "taxon_rank": data["rank"],
+                "scientific_name": data["scientificName"],
+            }
+            ancestors = data["lineage"].split("; ")
+            ancestors.pop()
+            parent = ancestors[-1]
+            lineage = None
+            if parent in lineages:
+                if len(lineages[parent]) == 1:
+                    lineage = lineages[parent][0]
+                else:
+                    anc_set = set(ancestors)
+                    for candidate_lineage in lineages[parent]:
+                        if anc_set <= set(
+                            [obj["scientific_name"] for obj in candidate_lineage]
+                        ):
+                            lineage = candidate_lineage
+                            break
+            if lineage is None:
+                LOGGER.warn(
+                    "Unable to add taxon ID %s to the taxonomy", str(data["taxId"])
+                )
+                continue
+            entry["lineage"] = lineage
+            entry["parent"] = lineage[0]["taxon_id"]
+            lineages[entry["scientific_name"]].append(extend_lineage(entry))
+            yield "taxon_id-%s" % str(entry["taxon_id"]), entry
 
 
 def main(args):
@@ -92,6 +155,9 @@ def main(args):
     if "taxonomy-source" in options["init"]:
         taxonomy_name = options["init"]["taxonomy-source"].lower()
         template, stream = taxonomy.index(taxonomy_name, options["init"])
+        # TODO: #83 add new taxa from ena api before indexing
+        if "taxonomy-jsonl" in options["init"]:
+            stream = add_jsonl_to_taxonomy(stream, options["init"]["taxonomy-jsonl"])
         if "taxonomy-%s-root" % taxonomy_name in options["init"]:
             es_functions.load_mapping(es, template["name"], template["mapping"])
             es_functions.index_stream(es, template["index_name"], stream)

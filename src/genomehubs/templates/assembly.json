@@ -102,6 +102,9 @@
           "name": {
             "type": "keyword",
             "normalizer": "lowercase",
+            "fields": {
+              "raw": { "type": "keyword" }
+            },
             "meta": { "description": "Taxon name" }
           },
           "class": {
@@ -119,9 +122,12 @@
           "taxon_id": {
             "type": "keyword",
             "normalizer": "lowercase",
+            "fields": {
+              "raw": { "type": "keyword" }
+            },
             "meta": { "description": "Taxon ID of ancestral taxon" }
           },
-          "rank": {
+          "taxon_rank": {
             "type": "keyword",
             "normalizer": "lowercase",
             "meta": { "description": "Ancestral rank" }
@@ -155,6 +161,9 @@
           "keyword_value": {
             "type": "keyword",
             "normalizer": "lowercase",
+            "fields": {
+              "raw": { "type": "keyword" }
+            },
             "ignore_above": 64,
             "meta": {
               "description": "Value of type keyword (including ontology terms)"
@@ -253,6 +262,9 @@
             "type": "keyword",
             "ignore_above": 64,
             "normalizer": "lowercase",
+            "fields": {
+              "raw": { "type": "keyword" }
+            },
             "meta": { "description": "Source of attribute value" }
           },
           "count": {
@@ -308,6 +320,9 @@
                 "type": "keyword",
                 "ignore_above": 64,
                 "normalizer": "lowercase",
+                "fields": {
+                  "raw": { "type": "keyword" }
+                },
                 "meta": {
                   "description": "Value of type keyword (including ontology terms)"
                 }
