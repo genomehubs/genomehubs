@@ -107,6 +107,9 @@ def add_jsonl_to_taxonomy(stream, jsonl):
     with tofile.open_file_handle(jsonl) as fh:
         for line in fh:
             data = ujson.decode(line)
+            # skip subspecies as lineage information is incomplete
+            if data["rank"] == "subspecies":
+                continue
             entry = {
                 "taxon_id": data["taxId"],
                 "taxon_rank": data["rank"],
