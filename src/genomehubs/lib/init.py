@@ -111,6 +111,9 @@ def add_jsonl_to_taxonomy(stream, jsonl):
                 "taxon_id": data["taxId"],
                 "taxon_rank": data["rank"],
                 "scientific_name": data["scientificName"],
+                "taxon_names": [
+                    {"name": data["scientificName"], "class": "scientifc name"}
+                ],
             }
             ancestors = data["lineage"].split("; ")
             ancestors.pop()
