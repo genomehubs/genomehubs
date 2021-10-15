@@ -129,11 +129,8 @@ def add_jsonl_to_taxonomy(stream, jsonl):
             # ancestors.pop()
             ancestors = ancestors[ancestors.index(root) : -1]
             parent = ancestors[-1]
-            print(ancestors)
-            print(parent)
             lineage = None
             if parent in lineages:
-                print(lineages[parent])
                 if len(lineages[parent]) == 1:
                     lineage = lineages[parent][0]
                 else:
