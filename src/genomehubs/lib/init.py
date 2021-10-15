@@ -83,7 +83,7 @@ def extend_lineage(entry):
     """Add current taxon to beginning of lineage."""
     new_lineage = [
         {
-            "node_depth": 1,
+            "node_depth": 0,
             "taxon_id": entry["taxon_id"],
             "taxon_rank": entry["taxon_rank"],
             "scientific_name": entry["scientific_name"],
@@ -99,16 +99,23 @@ def extend_lineage(entry):
 def add_jsonl_to_taxonomy(stream, jsonl):
     """Add entries from JSON Lines format file to taxonomy stream."""
     lineages = defaultdict(list)
+    root = None
     for doc_id, entry in stream:
         if entry["lineage"]:
-            lineage = extend_lineage(entry)
-            lineages[entry["scientific_name"]].append(lineage)
+            root = entry["lineage"][-1]["scientific_name"]
+            # lineage = extend_lineage(entry)
+            lineages[entry["scientific_name"]].append(entry["lineage"])
         yield doc_id, entry
     with tofile.open_file_handle(jsonl) as fh:
         for line in fh:
             data = ujson.decode(line)
             # skip subspecies as lineage information is incomplete
             if data["rank"] == "subspecies":
+                LOGGER.warn(
+                    "Skipping subspecies %s (%s)",
+                    data["scientificName"],
+                    str(data["taxId"]),
+                )
                 continue
             entry = {
                 "taxon_id": data["taxId"],
@@ -119,10 +126,14 @@ def add_jsonl_to_taxonomy(stream, jsonl):
                 ],
             }
             ancestors = data["lineage"].split("; ")
-            ancestors.pop()
+            # ancestors.pop()
+            ancestors = ancestors[ancestors.index(root) : -1]
             parent = ancestors[-1]
+            print(ancestors)
+            print(parent)
             lineage = None
             if parent in lineages:
+                print(lineages[parent])
                 if len(lineages[parent]) == 1:
                     lineage = lineages[parent][0]
                 else:
@@ -139,7 +150,7 @@ def add_jsonl_to_taxonomy(stream, jsonl):
                 )
                 continue
             entry["lineage"] = lineage
-            entry["parent"] = lineage[0]["taxon_id"]
+            entry["parent"] = lineage[1]["taxon_id"]
             lineages[entry["scientific_name"]].append(extend_lineage(entry))
             yield "taxon_id-%s" % str(entry["taxon_id"]), entry
 
