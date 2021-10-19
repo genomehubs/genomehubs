@@ -126,8 +126,10 @@ def add_jsonl_to_taxonomy(stream, jsonl):
                 ],
             }
             ancestors = data["lineage"].split("; ")
-            # ancestors.pop()
-            ancestors = ancestors[ancestors.index(root) : -1]
+            try:
+                ancestors = ancestors[ancestors.index(root) : -1]
+            except ValueError:
+                ancestors = ancestors[:-1]
             parent = ancestors[-1]
             lineage = None
             if parent in lineages:
@@ -146,9 +148,9 @@ def add_jsonl_to_taxonomy(stream, jsonl):
                     "Unable to add taxon ID %s to the taxonomy", str(data["taxId"])
                 )
                 continue
-            entry["lineage"] = lineage
-            entry["parent"] = lineage[1]["taxon_id"]
-            lineages[entry["scientific_name"]].append(extend_lineage(entry))
+            entry["lineage"] = extend_lineage({**entry, "lineage": lineage})
+            entry["parent"] = lineage[0]["taxon_id"]
+            lineages[entry["scientific_name"]].append(entry["lineage"])
             yield "taxon_id-%s" % str(entry["taxon_id"]), entry
 
 
