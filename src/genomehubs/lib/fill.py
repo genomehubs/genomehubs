@@ -27,7 +27,7 @@ Options:
     --traverse-infer-descendants  Flag to enable tree traversal from root to tips.
     --traverse-infer-both         Flag to enable tree traversal from tips to root and
                                   back to tips.
-    --traverse-limit STRING       Maximum rank to ascend to during traversal. [Default: root]
+    --traverse-limit STRING       Maximum rank to ascend to during traversal. [Default: null]
     --traverse-root ID            Root taxon id for tree traversal.
     --traverse-threads INT        Number of threads to use for tree traversal. [Default: 1]
     --traverse-weight STRING      Weighting scheme for setting values during tree
@@ -447,7 +447,7 @@ def set_attributes_to_descend(meta, traverse_limit):
                 desc_attrs.add(key)
                 if "traverse_limit" in value:
                     desc_attr_limits.update({key: value["traverse_limit"]})
-                else:
+                elif traverse_limit != "null":
                     desc_attr_limits.update({key: traverse_limit})
     return desc_attrs, desc_attr_limits
 
