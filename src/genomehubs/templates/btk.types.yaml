@@ -12,7 +12,7 @@ attributes:
     type: 1dp
     units: "%"
     taxon_display_group: assembly
-    taxon_name: BUSCO completeness
+    taxon_name: busco_completeness
     taxon_key: busco_completeness
     taxon_summary: max
     taxon_type: 1dp
