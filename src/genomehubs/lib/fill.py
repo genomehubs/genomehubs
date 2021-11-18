@@ -161,6 +161,11 @@ def latest(arr, *args):
     return max(arr + list(args))
 
 
+def range(arr):
+    """Calculate difference between max and min values."""
+    return latest(arr) - earliest(arr)
+
+
 def deduped_list(arr):
     """Remove duplicate values from a list."""
     return list(set(arr))
@@ -190,6 +195,7 @@ def apply_summary(
         "median_low": median_low,
         "mode": mode,
         "most_common": mode,
+        "range": range,
         "sum": sum,
         "list": deduped_list,
     }
@@ -258,11 +264,14 @@ def set_traverse_values(
             idx += 1
         if traverse and source == "descendant" and summary == traverse:
             traverse_value = value if value else []
-        if summary != "list":
+        elif summary != "list":
             if summary.startswith("median"):
                 summary = "median"
         else:
             traverse_value = list(set(traverse_value))
+        if summary == "range":
+            attribute[summary] = value
+            traverse_value = [min_value, max_value]
     return traverse_value, max_value, min_value
 
 

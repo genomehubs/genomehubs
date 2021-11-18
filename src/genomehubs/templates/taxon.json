@@ -246,6 +246,14 @@
             "type": "double",
             "meta": { "description": "Maximum value (numeric types only)" }
           },
+          "range": {
+            "type": "double",
+            "meta": { "description": "Range of values (numeric types only)" }
+          },
+          "total": {
+            "type": "double",
+            "meta": { "description": "Total count of individual values" }
+          },
           "from": {
             "type": "date",
             "meta": { "description": "Minimum value (date types only)" }
