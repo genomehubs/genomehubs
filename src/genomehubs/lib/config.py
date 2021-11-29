@@ -3,6 +3,7 @@
 """Load configuration from file(s)."""
 
 import os
+import sys
 
 from tolkein import tofile
 from tolkein import tolog
@@ -92,7 +93,17 @@ def config(group, **kwargs):
     if "--config-file" in kwargs:
         for file in kwargs["--config-file"]:
             if os.path.exists(file):
-                options = load_config(options, file)
+                try:
+                    options = load_config(options, file)
+                except AttributeError:
+                    LOGGER.error("Unable to parse config file %s", file)
+                    sys.exit(1)
+                except TypeError:
+                    LOGGER.error("Unable to parse config file %s", file)
+                    sys.exit(1)
+            else:
+                LOGGER.error("Config file %s could not be found", file)
+                sys.exit(1)
     if group not in options:
         options[group] = {}
     for k, v in kwargs.items():
