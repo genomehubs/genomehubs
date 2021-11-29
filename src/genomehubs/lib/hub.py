@@ -4,6 +4,7 @@
 import csv
 import os
 import re
+import sys
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
@@ -14,6 +15,7 @@ from tolkein import tolog
 LOGGER = tolog.logger(__name__)
 MIN_INTEGER = -(2 ** 31)
 MAX_INTEGER = 2 ** 31 - 1
+DATE = re.compile(r"^[12]\d{3}-[01]\d-[0123]\d$")
 
 
 def setup(opts):
@@ -176,6 +178,13 @@ def enum_constraint(value, enum):
     return False
 
 
+def date_constraint(value, enum):
+    """Test date constraint."""
+    if DATE.match(value):
+        return True
+    return False
+
+
 def test_constraint(value, constraint):
     """Test value against constraint."""
     constraints = {
@@ -185,6 +194,7 @@ def test_constraint(value, constraint):
         "min": min_value_constraint,
         "max": max_value_constraint,
         "enum": enum_constraint,
+        "date": date_constraint,
     }
     for key in constraint:
         if key in constraints:
@@ -592,13 +602,18 @@ def process_row(types, names, row):
 def set_column_indices(types, header):
     """Use header to set indices for named columns."""
     headers = {title: index for index, title in enumerate(header)}
-    for section, entries in types.items():
-        for key, value in entries.items():
+    for entries in types.values():
+        for value in entries.values():
             if isinstance(value, dict):
                 if "header" in value:
                     index = headers.get(value["header"], None)
                     if index is not None:
                         value.update({"index": index})
+                    else:
+                        LOGGER.error(
+                            "Unable to find %s in file headers", value["header"]
+                        )
+                        sys.exit(1)
 
 
 def write_imported_rows(rows, opts, *, types, header=None, label="imported"):
