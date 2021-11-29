@@ -81,7 +81,6 @@ from .files import index_metadata
 from .hub import process_row
 from .hub import set_column_indices
 from .hub import strip_comments
-from .hub import validate_types_file
 from .hub import write_imported_rows
 from .hub import write_imported_taxa
 from .hub import write_spellchecked_taxa
@@ -89,6 +88,7 @@ from .taxon import add_names_and_attributes_to_taxa
 from .taxon import fix_missing_ids
 from .taxon import load_taxon_table
 from .taxon import translate_xrefs
+from .validate import validate_types_file
 from .version import __version__
 
 LOGGER = tolog.logger(__name__)
@@ -335,7 +335,9 @@ def main(args):
         if data_dir in options["index"]:
             dir_path = options["index"][data_dir]
             for types_file in sorted(Path(dir_path).glob("*.names.yaml")):
-                types, data, names = validate_types_file(types_file, dir_path)
+                types, data, names = validate_types_file(
+                    types_file, dir_path, es, index, options["index"]
+                )
                 LOGGER.info("Indexing %s" % types["file"]["name"])
                 index_types(es, index, types, options["index"], dry_run=dry_run)
                 index_file(
@@ -351,21 +353,25 @@ def main(args):
                     taxon_table=taxon_table,
                 )
             for types_file in sorted(Path(dir_path).glob("*.types.yaml")):
-                types, data, names = validate_types_file(types_file, dir_path)
-                LOGGER.info("Indexing %s" % types["file"]["name"])
-                index_types(es, index, types, options["index"], dry_run=dry_run)
-                index_file(
-                    es,
-                    types,
-                    names,
-                    data,
-                    {
-                        **options["index"],
-                        "index": index,
-                        "index_types": index_types,
-                    },
-                    taxon_table=taxon_table,
+                types, data, names = validate_types_file(
+                    types_file, dir_path, es, index, options["index"]
                 )
+                LOGGER.info("Indexing types")
+                index_types(es, index, types, options["index"], dry_run=dry_run)
+                if "file" in types and "name" in types["file"]:
+                    LOGGER.info("Indexing %s" % types["file"]["name"])
+                    index_file(
+                        es,
+                        types,
+                        names,
+                        data,
+                        {
+                            **options["index"],
+                            "index": index,
+                            "index_types": index_types,
+                        },
+                        taxon_table=taxon_table,
+                    )
     # TODO: #29 Implement alternate backbone taxonomies
     if "file" in options["index"]:
         index_files(es, options["index"]["file"], taxonomy_name, options["index"])
