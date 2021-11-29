@@ -4,7 +4,6 @@
 import csv
 import os
 import re
-import sys
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
@@ -463,42 +462,6 @@ def process_names_file(types, names_file):
         name = row[3] if len(row) > 3 else row[1]
         names[row[2]][row[1]] = {"name": name, "taxon_id": row[0]}
     return names
-
-
-def validate_types_file(types_file, dir_path):
-    """Validate types file."""
-    LOGGER.info("Validating YAML file %s", types_file)
-    try:
-        types = tofile.load_yaml(str(types_file.resolve()))
-    except Exception:
-        LOGGER.error("Unable to open types file %s", str(types_file.resolve()))
-        sys.exit(1)
-    if "taxonomy" not in types:
-        LOGGER.error("Types file contains no taxonomy information")
-        sys.exit(1)
-    if "file" not in types or "name" not in types["file"]:
-        LOGGER.error("No data file name in types file")
-        sys.exit(1)
-    if "attributes" in types:
-        for entry in types["attributes"].values():
-            enum = entry.get("constraint", {}).get("enum", [])
-            if enum:
-                entry["constraint"]["enum"] = [value.lower() for value in enum]
-    defaults = {"attributes": {}, "metadata": {}}
-    for key, value in types["file"].items():
-        if key.startswith("display") or key.startswith("taxon"):
-            defaults["attributes"].update({key: value})
-        elif key.startswith("source"):
-            defaults["attributes"].update({key: value})
-            defaults["metadata"].update({key: value})
-    types.update({"defaults": defaults})
-    datafile = Path(dir_path) / types["file"]["name"]
-    data = tofile.open_file_handle(datafile)
-    if data is None:
-        LOGGER.error("Data file '%s' could not de opened for reading", datafile)
-        sys.exit(1)
-    names = process_names_file(types, Path(dir_path) / "names" / types["file"]["name"])
-    return types, data, names
 
 
 def set_xrefs(taxon_names, types, row, *, meta=None):

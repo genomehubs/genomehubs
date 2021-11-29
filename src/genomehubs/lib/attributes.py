@@ -2,6 +2,8 @@
 
 """Taxon methods."""
 
+from time import sleep
+
 from tolkein import tolog
 
 from .es_functions import index_stream
@@ -74,35 +76,25 @@ def index_types(es, types_name, types, opts, *, dry_run=False):
         attributes = {}
     if "attributes" in types:
         new_attributes = {}
-        existing_attributes = {}
         for key, value in types["attributes"].items():
-            if "defaults" in types and "attributes" in types["defaults"]:
-                value = {**types["defaults"]["attributes"], **value}
-                # types["attributes"][key] = value
             if key in attributes:
-                existing_attributes[key] = value
-                add_attribute_sources(key, value, attributes)
+                types["attributes"][key] = {
+                    **attributes[key],
+                    **types["defaults"]["attributes"],
+                    **value,
+                }
             else:
+                if "defaults" in types and "attributes" in types["defaults"]:
+                    value = {**types["defaults"]["attributes"], **value}
                 new_attributes[key] = value
         template, stream = index(
             es, types_name, new_attributes, opts, index_type="attribute"
         )
-        template, update_stream = index(
-            es,
-            types_name,
-            existing_attributes,
-            opts,
-            index_type="attribute",
-        )
         load_mapping(es, template["name"], template["mapping"])
         index_stream(es, template["index_name"], stream, dry_run=dry_run)
-        index_stream(
-            es,
-            template["index_name"],
-            update_stream,
-            _op_type="update",
-            dry_run=dry_run,
-        )
+        if new_attributes:
+            # Delay to ensure index is updated before loading next file
+            sleep(5)
     if "taxon_names" in types:
         if "defaults" in types and "taxon_names" in types["defaults"]:
             for key, value in types["names"].items():
@@ -116,6 +108,7 @@ def index_types(es, types_name, types, opts, *, dry_run=False):
         )
         load_mapping(es, template["name"], template["mapping"])
         index_stream(es, template["index_name"], stream, dry_run=dry_run)
+    return types
 
 
 def fetch_types(es, types_name, opts):
