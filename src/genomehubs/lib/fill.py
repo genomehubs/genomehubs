@@ -292,6 +292,7 @@ def summarise_attribute_values(
                     if "is_primary_value" in value and value["is_primary_value"]:
                         primary_values.append(value[value_type])
             else:
+                # TODO: handle existing value here
                 values += [value[value_type] for value in attribute["values"]]
         if not values:
             return None, None, None
@@ -416,7 +417,8 @@ def set_values_from_descendants(
             source="descendant",
         )
         if summary_value is not None:
-            attribute["aggregation_source"] = "descendant"
+            if "aggregation_source" not in attribute:
+                attribute["aggregation_source"] = "descendant"
             changed = True
             attr_dict.update({key: attribute})
             if parent is not None:
@@ -543,7 +545,6 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
         )
         ctr = 0
         for node in nodes:
-            # TODO: break into sub functions
             track_descendant_ranks(node, descendant_ranks)
             ctr += 1
             changed = False
