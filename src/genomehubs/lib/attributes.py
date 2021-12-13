@@ -77,6 +77,8 @@ def index_types(es, types_name, types, opts, *, dry_run=False):
     if "attributes" in types:
         new_attributes = {}
         for key, value in types["attributes"].items():
+            value.pop("header", None)
+            value.pop("index", None)
             if key in attributes:
                 types["attributes"][key] = {
                     **attributes[key],
