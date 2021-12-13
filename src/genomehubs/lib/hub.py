@@ -601,6 +601,12 @@ def process_row(types, names, row):
 
 def set_column_indices(types, header):
     """Use header to set indices for named columns."""
+    headers = {}
+    duplicate_headers = defaultdict(set)
+    for index, title in enumerate(header):
+        if title in headers:
+            duplicate_headers[title].update([headers[title], index])
+        headers.update({title: index})
     headers = {title: index for index, title in enumerate(header)}
     for entries in types.values():
         for value in entries.values():
@@ -608,6 +614,18 @@ def set_column_indices(types, header):
                 if "header" in value:
                     index = headers.get(value["header"], None)
                     if index is not None:
+                        if value["header"] in duplicate_headers:
+                            LOGGER.error(
+                                "Duplicate header '%s' in columns %s",
+                                value["header"],
+                                " and ".join(
+                                    [
+                                        str(idx)
+                                        for idx in duplicate_headers[value["header"]]
+                                    ]
+                                ),
+                            )
+                            sys.exit(1)
                         value.update({"index": index})
                     else:
                         LOGGER.error(
