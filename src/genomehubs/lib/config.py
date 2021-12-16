@@ -77,6 +77,48 @@ def enforce_lists(options):
                 options[key] = [options[key]]
 
 
+def set_taxonomy(options, group):
+    """Convert taxonomy options to match allowed command line flags."""
+    tax_opts = {
+        "source": None,
+        "format": None,
+        "root": None,
+        "file": None,
+        "url": None,
+        "path": None,
+        "jsonl": None,
+    }
+    redundant_options = []
+    source = options[group].get("taxonomy-source", None)
+    for key, value in options[group].items():
+        if key.startswith("taxonomy"):
+            parts = key.split("-")
+            if len(parts) == 3:
+                redundant_options.append(key)
+                if source is not None and parts[1] != source:
+                    continue
+                tax_opts.update({"format": parts[1], "source": parts[1]})
+                if parts[2] in tax_opts:
+                    tax_opts.update({parts[2]: value})
+                else:
+                    LOGGER.error("%s is not a valid option", key)
+                    sys.exit(1)
+            elif len(parts) == 2:
+                if parts[1] in tax_opts:
+                    tax_opts.update({parts[1]: value})
+                else:
+                    LOGGER.error("%s is not a valid option", key)
+                    sys.exit(1)
+            else:
+                LOGGER.error("%s is not a valid option", key)
+                sys.exit(1)
+    for key, value in tax_opts.items():
+        if value is not None:
+            options[group].update({"taxonomy-%s" % key: value})
+    for key in redundant_options:
+        del options[group][key]
+
+
 def config(group, **kwargs):
     """Load configuration."""
     LOGGER.info("Loading configuration options")
@@ -117,4 +159,5 @@ def config(group, **kwargs):
             elif not k == group:
                 options[group][k] = v
     enforce_lists(options)
+    set_taxonomy(options, group)
     return options
