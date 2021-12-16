@@ -2,6 +2,7 @@
 
 """Taxon methods."""
 
+import sys
 from time import sleep
 
 from tolkein import tolog
@@ -16,7 +17,16 @@ LOGGER = tolog.logger(__name__)
 
 def index_template(opts, *, index_type="attribute"):
     """Index template (includes name, mapping and types)."""
-    parts = ["%ss" % index_type, opts["hub-name"], opts["hub-version"]]
+    taxonomy_source = opts.get("taxonomy-source", None)
+    if taxonomy_source is None:
+        LOGGER.error("taxonomy-source is not defined")
+        sys.exit(1)
+    parts = [
+        "%ss" % index_type,
+        taxonomy_source,
+        opts["hub-name"],
+        opts["hub-version"],
+    ]
     template = index_templator(parts, opts)
     return template
 
