@@ -11,7 +11,9 @@ Usage:
                     [--taxonomy-path PATH] [--taxonomy-source STRING]
                     [--taxonomy-ncbi-root INT] [--taxonomy-ncbi-url URL]
                     [--taxonomy-ott-root INT] [--taxonomy-ott-url URL]
-                    [--taxonomy-jsonl PATH] [--taxon-preload]
+                    [--taxonomy-jsonl PATH] [--taxonomy-format STRING]
+                    [--taxonomy-root STRING] [--taxonomy-url URL]
+                    [--taxonomy-file PATH...] [--taxon-preload]
                     [--docker-contain STRING...] [--docker-network STRING]
                     [--docker-timeout INT] [--docker-es-container STRING]
                     [--docker-es-image URL]
@@ -35,6 +37,10 @@ Options:
     --taxonomy-ncbi-url URL       Remote URL to fetch NCBI taxonomy.
     --taxonomy-ott-root INT       Root taxid for Open Tree of Life taxonomy index.
     --taxonomy-ott-url URL        Remote URL to fetch Open Tree of Life taxonomy.
+    --taxonomy-format STRING      Format of taxonomy (ncbi, ott). Newick support is planned.
+    --taxonomy-root STRING        Root taxid.
+    --taxonomy-file PATH          Taxonomy file names.
+    --taxonomy-url URL            Remote URL to fetch taxonomy.
     --taxonomy-jsonl PATH         Path to JSON Lines format taxonomy file of additional taxa.
     --taxon-preload               Flag to preload all taxa in taxonomy into taxon index.
     --docker-contain STRING       GenomeHubs component to run in Docker.
@@ -171,10 +177,9 @@ def main(args):
     if "taxonomy-source" in options["init"]:
         taxonomy_name = options["init"]["taxonomy-source"].lower()
         template, stream = taxonomy.index(taxonomy_name, options["init"])
-        # TODO: #83 add new taxa from ena api before indexing
         if "taxonomy-jsonl" in options["init"]:
             stream = add_jsonl_to_taxonomy(stream, options["init"]["taxonomy-jsonl"])
-        if "taxonomy-%s-root" % taxonomy_name in options["init"]:
+        if "taxonomy-root" in options["init"]:
             es_functions.load_mapping(es, template["name"], template["mapping"])
             es_functions.index_stream(es, template["index_name"], stream)
 
