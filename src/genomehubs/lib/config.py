@@ -112,11 +112,20 @@ def set_taxonomy(options, group):
             else:
                 LOGGER.error("%s is not a valid option", key)
                 sys.exit(1)
-    for key, value in tax_opts.items():
-        if value is not None:
-            options[group].update({"taxonomy-%s" % key: value})
-    for key in redundant_options:
-        del options[group][key]
+    for opts in options.values():
+        redundant_opts = redundant_options[:]
+        for key in opts.keys():
+            if (
+                key.startswith("taxonomy")
+                and len(key.split("-")) == 3
+                and key not in redundant_opts
+            ):
+                redundant_opts.append(key)
+        for key, value in tax_opts.items():
+            if value is not None:
+                opts.update({"taxonomy-%s" % key: value})
+        for key in redundant_opts:
+            opts.pop(key, None)
 
 
 def config(group, **kwargs):

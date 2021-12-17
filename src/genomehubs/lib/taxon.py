@@ -359,7 +359,7 @@ def get_taxa_to_create(
     es,
     opts,
     *,
-    taxonomy_name="ncbi",
+    taxonomy_name,
     taxon_ids=None,
     asm_by_taxon_id=None,
 ):
@@ -415,7 +415,7 @@ def find_or_create_taxa(es, opts, *, taxon_ids, taxon_template, asm_by_taxon_id=
     to_create = get_taxa_to_create(
         es,
         opts,
-        taxonomy_name="ncbi",
+        taxonomy_name=opts["taxonomy-source"],
         taxon_ids=missing_taxa,
         asm_by_taxon_id=asm_by_taxon_id,
     )
