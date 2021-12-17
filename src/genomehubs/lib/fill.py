@@ -417,8 +417,10 @@ def set_values_from_descendants(
             source="descendant",
         )
         if summary_value is not None:
-            if "aggregation_source" not in attribute:
-                attribute["aggregation_source"] = "descendant"
+            # TODO: revisit issue #93
+            # if "aggregation_source" not in attribute:
+            #     attribute["aggregation_source"] = "descendant"
+            attribute["aggregation_source"] = "descendant"
             changed = True
             attr_dict.update({key: attribute})
             if parent is not None:
