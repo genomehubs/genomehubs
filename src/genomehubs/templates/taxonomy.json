@@ -4,11 +4,13 @@
     "properties": {
       "taxon_id": {
         "type": "keyword",
+        "normalizer": "lowercase",
         "ignore_above": 16,
         "meta": { "description": "Taxonomy-specific taxon ID" }
       },
       "parent": {
         "type": "keyword",
+        "normalizer": "lowercase",
         "ignore_above": 16,
         "meta": { "description": "Taxon ID of parent taxon" }
       },
@@ -22,11 +24,13 @@
       },
       "scientific_name": {
         "type": "keyword",
+        "normalizer": "lowercase",
         "ignore_above": 64,
         "meta": { "description": "Scientific name" }
       },
       "taxon_rank": {
         "type": "keyword",
+        "normalizer": "lowercase",
         "ignore_above": 64,
         "meta": { "description": "Taxonomic rank" }
       },
@@ -35,10 +39,12 @@
         "properties": {
           "name": {
             "type": "keyword",
+            "normalizer": "lowercase",
             "meta": { "description": "Taxon name" }
           },
           "class": {
             "type": "keyword",
+            "normalizer": "lowercase",
             "meta": {
               "description": "Name class (e.g. common name, synonym, etc.)"
             }
@@ -61,14 +67,17 @@
         "properties": {
           "taxon_id": {
             "type": "keyword",
+            "normalizer": "lowercase",
             "meta": { "description": "Taxon ID of ancestral taxon" }
           },
           "rank": {
             "type": "keyword",
+            "normalizer": "lowercase",
             "meta": { "description": "Ancestral rank" }
           },
           "scientific_name": {
             "type": "keyword",
+            "normalizer": "lowercase",
             "meta": { "description": "Scientific name" }
           },
           "node_depth": {
