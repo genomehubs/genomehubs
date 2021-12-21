@@ -4,11 +4,13 @@
     "properties": {
       "taxon_id": {
         "type": "keyword",
+        "normalizer": "lowercase",
         "ignore_above": 32,
         "meta": { "description": "Taxonomy-specific taxon ID" }
       },
       "parent": {
         "type": "keyword",
+        "normalizer": "lowercase",
         "ignore_above": 32,
         "meta": { "description": "Taxon ID of parent taxon" }
       },
