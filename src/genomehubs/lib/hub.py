@@ -44,11 +44,16 @@ def load_types(name, *, part="types"):
             pass
     except Exception:
         pass
-    if types and "file" in types and "attributes" in types:
+    if types and "file" in types:
         for key, value in types["file"].items():
-            for attr in types["attributes"].values():
-                if key not in ("format", "header", "name") and key not in attr:
-                    attr[key] = value
+            if "attributes" in types:
+                for attr in types["attributes"].values():
+                    if key not in ("format", "header", "name") and key not in attr:
+                        attr[key] = value
+            if "taxon_names" in types:
+                for attr in types["taxon_names"].values():
+                    if key not in ("format", "header", "name") and key not in attr:
+                        attr[key] = value
     return types
 
 
@@ -356,7 +361,10 @@ def add_attributes(
         if key in types:
             if not isinstance(values, list):
                 values = [values]
-            validated = validate_values(values, key, types)
+            if attr_type == "taxon_names":
+                validated = values
+            else:
+                validated = validate_values(values, key, types)
             # TODO: handle invalid values
             if validated:
                 if len(validated) == 1:
@@ -364,13 +372,17 @@ def add_attributes(
                 if attr_type == "attributes":
                     attribute = {"key": key, "%s_value" % types[key]["type"]: validated}
                     attribute_values.update({key: attribute})
+                elif attr_type == "taxon_names":
+                    attribute = {"name": validated, "class": key}
                 else:
                     attribute = {"identifier": validated, "class": key}
-                attribute.update(meta)
                 if "source" in types[key]:
-                    attribute.update({"source": types[key]["source"]})
-                elif source is not None:
-                    attribute.update({"source": source})
+                    attribute.update({k: v for k, v in meta.items() if not k.startswith("source")})
+                    attribute.update({k: v for k, v in types[key].items() if k.startswith("source")})
+                else:
+                    attribute.update(meta)
+                    if "source" not in attribute and source is not None:
+                        attribute.update({"source": source})
                 attributes.append(attribute)
     if attribute_values:
         for attribute in attributes:
@@ -479,13 +491,12 @@ def set_xrefs(taxon_names, types, row, *, meta=None):
     if meta is None:
         meta = {}
     names = []
-    for name_class, value in taxon_names.items():
-        taxon = {"name": value, "class": name_class}
-        if "xref" in types[name_class] and types[name_class]["xref"]:
+    for taxon in taxon_names:
+        if "xref" in types[taxon["class"]] and types[taxon["class"]]["xref"]:
             if "source" in meta:
                 taxon.update({"source": meta["source"]})
-            if "source_stub" in meta:
-                taxon.update({"source_stub": meta["source_stub"]})
+            if "source_url_stub" in meta:
+                taxon.update({"source_url_stub": meta["source_url_stub"]})
         names.append(taxon)
     return names
 
@@ -561,7 +572,7 @@ def process_row(types, names, row):
         and data["identifiers"]["assembly_id"]
     ):
         assembly_id = data["identifiers"]["assembly_id"]
-    for attr_type in list(["attributes", "identifiers"]):
+    for attr_type in list(["attributes", "identifiers", "taxon_names"]):
         if attr_type in data and data[attr_type]:
             (
                 data[attr_type],
