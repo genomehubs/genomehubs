@@ -176,12 +176,15 @@ def main(args):
     # Index taxonomies
     if "taxonomy-source" in options["init"]:
         taxonomy_name = options["init"]["taxonomy-source"].lower()
-        template, stream = taxonomy.index(taxonomy_name, options["init"])
-        if "taxonomy-jsonl" in options["init"]:
-            stream = add_jsonl_to_taxonomy(stream, options["init"]["taxonomy-jsonl"])
-        if "taxonomy-root" in options["init"]:
-            es_functions.load_mapping(es, template["name"], template["mapping"])
-            es_functions.index_stream(es, template["index_name"], stream)
+        if "taxonomy-format" in options["init"]:
+            template, stream = taxonomy.index(taxonomy_name, options["init"])
+            if "taxonomy-jsonl" in options["init"]:
+                stream = add_jsonl_to_taxonomy(
+                    stream, options["init"]["taxonomy-jsonl"]
+                )
+            if "taxonomy-root" in options["init"]:
+                es_functions.load_mapping(es, template["name"], template["mapping"])
+                es_functions.index_stream(es, template["index_name"], stream)
 
         # Prepare taxon index
         taxon_template = taxon.index_template(taxonomy_name, options["init"])

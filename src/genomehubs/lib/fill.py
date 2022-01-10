@@ -394,14 +394,14 @@ def set_values_from_descendants(
             traverseable = False
         if not traverseable or taxon_id in limits[key]:
             continue
-        traverse_limit = meta[key].get("traverse_limit", traverse_limit)
-        if traverse_limit:
+        local_limit = meta[key].get("traverse_limit", traverse_limit)
+        if local_limit:
             if (
                 descendant_ranks is not None
-                and traverse_limit in descendant_ranks[taxon_id]
+                and local_limit in descendant_ranks[taxon_id]
             ):
                 continue
-            if taxon_rank == traverse_limit:
+            if taxon_rank == local_limit:
                 limits[key].add(parent)
         try:
             attribute = next(entry for entry in attributes if entry["key"] == key)
