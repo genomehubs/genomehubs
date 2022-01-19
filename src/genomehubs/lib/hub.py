@@ -377,8 +377,14 @@ def add_attributes(
                 else:
                     attribute = {"identifier": validated, "class": key}
                 if "source" in types[key]:
-                    attribute.update({k: v for k, v in meta.items() if not k.startswith("source")})
-                    attribute.update({k: v for k, v in types[key].items() if k.startswith("source")})
+                    attribute.update(meta)
+                    attribute.update(
+                        {
+                            k: v
+                            for k, v in types[key].items()
+                            if k.startswith("source") and k not in attribute
+                        }
+                    )
                 else:
                     attribute.update(meta)
                     if "source" not in attribute and source is not None:
