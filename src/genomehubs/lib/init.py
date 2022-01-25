@@ -64,6 +64,7 @@ Examples:
     ./genomehubs init --hub-path /path/to/GenomeHub --insdc-root 7088 --insdc-meta
 """
 
+import re
 import sys
 from collections import defaultdict
 
@@ -102,6 +103,25 @@ def extend_lineage(entry):
     return new_lineage
 
 
+def process_subspecies(data):
+    """Find species name from subspecies and add to lineage."""
+    qualifiers = {"subsp.", "ssp.", "var", "var."}
+    parts = data["scientificName"].split(" ")
+    species = None
+    if len(parts) == 3:
+        species = parts[:2]
+    elif len(parts) >= 4 and parts[2] in qualifiers:
+        species = parts[:2]
+    if species is None:
+        return False
+    species = " ".join(species)
+    ancestors = re.split(r";\s*", data["lineage"])
+    if species not in ancestors:
+        ancestors.append(species)
+        data["lineage"] = "; ".join(ancestors) + "; "
+    return True
+
+
 def add_jsonl_to_taxonomy(stream, jsonl):
     """Add entries from JSON Lines format file to taxonomy stream."""
     lineages = defaultdict(list)
@@ -115,14 +135,14 @@ def add_jsonl_to_taxonomy(stream, jsonl):
     with tofile.open_file_handle(jsonl) as fh:
         for line in fh:
             data = ujson.decode(line)
-            # skip subspecies as lineage information is incomplete
             if data["rank"] == "subspecies":
-                LOGGER.warn(
-                    "Skipping subspecies %s (%s)",
-                    data["scientificName"],
-                    str(data["taxId"]),
-                )
-                continue
+                if not process_subspecies(data):
+                    LOGGER.warn(
+                        "Skipping subspecies %s (%s)",
+                        data["scientificName"],
+                        str(data["taxId"]),
+                    )
+                    continue
             entry = {
                 "taxon_id": data["taxId"],
                 "taxon_rank": data["rank"],
@@ -131,7 +151,7 @@ def add_jsonl_to_taxonomy(stream, jsonl):
                     {"name": data["scientificName"], "class": "scientifc name"}
                 ],
             }
-            ancestors = data["lineage"].split("; ")
+            ancestors = re.split(r";\s*", data["lineage"])
             try:
                 ancestors = ancestors[ancestors.index(root) : -1]
             except ValueError:
