@@ -256,10 +256,14 @@ def set_traverse_values(
         )
         if idx == 0:
             if value is not None:
-                attribute[value_type] = value
-                attribute["count"] = len(values)
-                attribute["aggregation_method"] = summary
-                attribute["aggregation_source"] = "direct"
+                if (
+                    value_type not in attribute
+                    or attribute["aggregation_method"] != "primary"
+                ):
+                    attribute[value_type] = value
+                    attribute["count"] = len(values)
+                    attribute["aggregation_method"] = summary
+                    attribute["aggregation_source"] = source
                 traverse_value = value if value else []
             idx += 1
         if traverse and source == "descendant" and summary == traverse:
@@ -275,6 +279,21 @@ def set_traverse_values(
     return traverse_value, max_value, min_value
 
 
+# def iterate_values(attribute, meta):
+#     """Iterate through values adding prefixed values if appropriate."""
+#     prefixed_values = None
+#     if meta["type"] == "keyword":
+#         prefixed_values = attribute.get("prefixed_value", [])
+#     value_type = "%s_value" % meta["type"]
+#     for value in attribute["values"]:
+#         if prefixed_values is not None and "source_prefix" in value:
+#             prefixed_values.append(
+#                 "%s:%s" % (value["source_prefix"], value[value_type])
+#             )
+#     if prefixed_values:
+#         attribute["prefixed_values"] = prefixed_values
+
+
 def summarise_attribute_values(
     attribute, meta, *, values=None, max_value=None, min_value=None, source="direct"
 ):
@@ -285,6 +304,7 @@ def summarise_attribute_values(
         value_type = "%s_value" % meta["type"]
         primary_values = []
         if "values" in attribute:
+            # iterate_values(attribute, meta)
             if values is None:
                 values = []
                 for value in attribute["values"]:
@@ -301,11 +321,12 @@ def summarise_attribute_values(
         if not isinstance(meta["summary"], list):
             meta["summary"] = [meta["summary"]]
         summaries = meta["summary"][:]
-        if traverse and source == "descendant":
+        if traverse and source != "ancestor":
             if summaries[0] != traverse:
-                summaries = [traverse] + summaries
-                if primary_values:
-                    values = primary_values
+                if summaries[0] != "primary":
+                    summaries = [traverse] + summaries
+                elif summaries[1] != "primary":
+                    summaries.insert(1, traverse)
         traverse_value, max_value, min_value = set_traverse_values(
             summaries,
             values,
@@ -408,22 +429,31 @@ def set_values_from_descendants(
         except StopIteration:
             attribute = {"key": key}
             attributes.append(attribute)
+
         summary_value, max_value, min_value = summarise_attribute_values(
             attribute,
             meta[key],
             values=obj["values"],
             max_value=obj["max"],
             min_value=obj["min"],
-            source="descendant",
+            source="descendant" if "aggregation_source" not in attribute else "direct",
         )
+        if "aggregation_source" not in attribute:
+            attribute["aggregation_source"] = "descendant"
+        else:
+            attribute["aggregation_source"] = ["direct", "descendant"]
+
         if summary_value is not None:
             # TODO: revisit issue #93
-            # if "aggregation_source" not in attribute:
-            #     attribute["aggregation_source"] = "descendant"
-            attribute["aggregation_source"] = "descendant"
             changed = True
             attr_dict.update({key: attribute})
             if parent is not None:
+                # parents[parent][key]["prefixed_values"] = list(
+                #     set(
+                #         parents[parent][key]["prefixed_values"]
+                #         + attribute.get("prefixed_values", [])
+                #     )
+                # )
                 if isinstance(summary_value, list):
                     parents[parent][key]["values"] = list(
                         set(parents[parent][key]["values"] + summary_value)
@@ -526,7 +556,9 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
     meta = template["types"]["attributes"]
     attrs = set(meta.keys())
     parents = defaultdict(
-        lambda: defaultdict(lambda: {"max": None, "min": None, "values": []})
+        lambda: defaultdict(
+            lambda: {"max": None, "min": None, "values": [], "prefixed_values": []}
+        )
     )
     limits = defaultdict(set)
     if "traverse-infer-both" in opts and opts["traverse-infer-both"]:

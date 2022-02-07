@@ -140,6 +140,14 @@
               "description": "Value of type keyword (including ontology terms)"
             }
           },
+          "prefixed_value": {
+            "type": "keyword",
+            "ignore_above": 96,
+            "normalizer": "lowercase",
+            "meta": {
+              "description": "Value of type keyword with source prefix"
+            }
+          },
           "text_value": {
             "type": "text",
             "meta": { "description": "Value of type text" }
@@ -464,6 +472,14 @@
                 "ignore_above": 64,
                 "normalizer": "lowercase",
                 "meta": { "description": "Source url slug" }
+              },
+              "source_prefix": {
+                "type": "keyword",
+                "ignore_above": 32,
+                "normalizer": "lowercase",
+                "meta": {
+                  "description": "Source prefix, i.e xref in xref:value queries"
+                }
               },
               "comment": {
                 "type": "text",
