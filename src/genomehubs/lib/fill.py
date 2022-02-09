@@ -166,9 +166,20 @@ def range(arr):
     return latest(arr) - earliest(arr)
 
 
+def flatten_list(arr):
+    """Flatten a list by expanding any nested lists."""
+    flattened = []
+    for v in arr:
+        if isinstance(v, list):
+            flattened += v
+        else:
+            flattened.append(v)
+    return flattened
+
+
 def deduped_list(arr):
     """Remove duplicate values from a list."""
-    return list(set(arr))
+    return list(set(flatten_list(arr)))
 
 
 def deduped_list_length(arr):
@@ -205,16 +216,11 @@ def apply_summary(
         "list": deduped_list,
         "length": deduped_list_length,
     }
-    flattened = []
     if summary == "primary":
         if primary_values:
             values = primary_values
         summary = summary_types[0]
-    for v in values:
-        if isinstance(v, list):
-            flattened += v
-        else:
-            flattened.append(v)
+    flattened = flatten_list(values)
     if summary == "enum":
         value = summaries[summary]((order, flattened))
     else:
