@@ -401,6 +401,20 @@ def summarise_attributes(*, attributes, attrs, meta, parent, parents):
     return changed, attr_dict
 
 
+def set_aggregation_source(attribute, source=None):
+    """Set attribute aggregation source."""
+    if "aggregation_source" not in attribute:
+        return_value = "descendant"
+    else:
+        return_value = attribute["aggregation_source"]
+    if source is not None:
+        if "aggregation_source" not in attribute:
+            attribute["aggregation_source"] = source
+        elif attribute["aggregation_source"] == "direct":
+            attribute["aggregation_source"] = ["direct", source]
+    return return_value
+
+
 def set_values_from_descendants(
     *,
     attributes,
@@ -443,22 +457,17 @@ def set_values_from_descendants(
         except StopIteration:
             attribute = {"key": key}
             attributes.append(attribute)
-
         summary_value, max_value, min_value = summarise_attribute_values(
             attribute,
             meta[key],
             values=obj["values"],
             max_value=obj["max"],
             min_value=obj["min"],
-            source="descendant" if "aggregation_source" not in attribute else "direct",
+            source=set_aggregation_source(attribute),
         )
-        if "aggregation_source" not in attribute:
-            attribute["aggregation_source"] = "descendant"
-        else:
-            attribute["aggregation_source"] = ["direct", "descendant"]
+        set_aggregation_source(attribute, "descendant")
 
         if summary_value is not None:
-            # TODO: revisit issue #93
             changed = True
             attr_dict.update({key: attribute})
             if parent is not None:
