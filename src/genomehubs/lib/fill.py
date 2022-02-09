@@ -171,6 +171,11 @@ def deduped_list(arr):
     return list(set(arr))
 
 
+def deduped_list_length(arr):
+    """Find number of unique values in a list."""
+    return len(deduped_list(arr))
+
+
 def apply_summary(
     summary,
     values,
@@ -198,6 +203,7 @@ def apply_summary(
         "range": range,
         "sum": sum,
         "list": deduped_list,
+        "length": deduped_list_length,
     }
     flattened = []
     if summary == "primary":
@@ -262,6 +268,8 @@ def set_traverse_values(
                 ):
                     attribute[value_type] = value
                     attribute["count"] = len(values)
+                    if summary == "list":
+                        attribute["length"] = deduped_list_length(values)
                     attribute["aggregation_method"] = summary
                     attribute["aggregation_source"] = source
                 traverse_value = value if value else []
