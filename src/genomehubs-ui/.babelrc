@@ -1,0 +1,74 @@
+{
+  "presets": [
+    "@babel/preset-react",
+    [
+      "@babel/preset-env",
+      {
+        "useBuiltIns": "usage",
+        "corejs": 3
+      }
+    ]
+  ],
+  "plugins": [
+    "@babel/plugin-syntax-dynamic-import",
+    "@babel/plugin-transform-runtime",
+    "@loadable/babel-plugin",
+    [
+      "transform-imports",
+      {
+        "lodash": {
+          "transform": "lodash/${member}",
+          "preventFullImport": true
+        },
+        "@material-ui/core": {
+          "transform": "@material-ui/core/esm/${member}",
+          "preventFullImport": true
+        },
+        "@material-ui/lab": {
+          "transform": "@material-ui/lab/esm/${member}",
+          "preventFullImport": true
+        },
+        "@material-ui/icons": {
+          "transform": "@material-ui/icons/esm/${member}",
+          "preventFullImport": true
+        }
+      }
+    ],
+    [
+      "import",
+      {
+        "libraryName": "lodash",
+        "libraryDirectory": "",
+        "camel2DashComponentName": false
+      },
+      "lodash"
+    ],
+    [
+      "import",
+      {
+        "libraryName": "@material-ui/core",
+        "libraryDirectory": "components",
+        "camel2DashComponentName": false
+      },
+      "mui-core"
+    ],
+    [
+      "import",
+      {
+        "libraryName": "@material-ui/lab",
+        "libraryDirectory": "components",
+        "camel2DashComponentName": false
+      },
+      "mui-lab"
+    ],
+    [
+      "import",
+      {
+        "libraryName": "@material-ui/icons",
+        "libraryDirectory": "components",
+        "camel2DashComponentName": false
+      },
+      "mui-icons"
+    ]
+  ]
+}

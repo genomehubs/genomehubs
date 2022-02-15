@@ -1,0 +1,55 @@
+{
+  "name": "genomehubs-api",
+  "version": "2.3.0",
+  "description": "GenomeHubs API",
+  "scripts": {
+    "api": "node --max-old-space-size=8192 src/index.js",
+    "start": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "./package.sh"
+  },
+  "main": "src/index.js",
+  "bin": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/genomehubs/genomehubs-api.git"
+  },
+  "author": "Tolkit",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/genomehubs/genomehubs-api/issues"
+  },
+  "homepage": "https://github.com/genomehubs/genomehubs-api#readme",
+  "dependencies": {
+    "@elastic/elasticsearch": "^7.9.1",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "d3-format": "^2.0.0",
+    "d3-scale": "^3.3.0",
+    "dotenv": "^16.0.0",
+    "esm": "^3.2.25",
+    "express": "^4.17.2",
+    "express-easy-zip": "^1.1.5",
+    "express-openapi-validator": "^4.13.5",
+    "json2csv": "^5.0.6",
+    "memcached": "^2.2.2",
+    "memcached-promise": "^1.0.1",
+    "qs": "^6.10.3",
+    "swagger-ui-express": "^4.3.0",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "pkg": {
+    "assets": [
+      "src/**/*",
+      "src/app.mjs",
+      "src/api-v2.yaml",
+      "../node_modules/swagger-ui-dist/**/*",
+      "../node_modules/swagger-ui-express/**/*"
+    ],
+    "outputPath": "dist"
+  }
+}

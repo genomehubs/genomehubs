@@ -1,0 +1,62 @@
+@import "~@fontsource/open-sans/index.css";
+@import "~@fontsource/open-sans/700.css";
+@import "~@fontsource/open-sans/400-italic.css";
+@import "~@fontsource/open-sans/700-italic.css";
+@import "~@fontsource/signika/index.css";
+@import "~@fontsource/signika/700.css";
+@import "~@fontsource/roboto-mono/index.css";
+@import "~@fontsource/roboto-mono/700.css";
+@import "~@fontsource/roboto-mono/400-italic.css";
+@import "~@fontsource/roboto-mono/700-italic.css";
+
+$titleFontFamily: "Signika", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$bodyFontFamily: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$codeFontFamily: "Roboto Mono", "Courier New", Courier, monospace;
+$bodyFontSize: 10pt;
+
+$themes: (
+  Light: (
+    primary: $darkColor,
+    secondary: $lightColor,
+    highlight: $highlightColor,
+    faintHighlight: $faintHighlightColor,
+    titleFont: $titleFontFamily,
+    bodyFont: $bodyFontFamily,
+    codeFont: $codeFontFamily,
+    bodyFontSize: $bodyFontSize,
+  ),
+  Dark: (
+    primary: $lightColor,
+    secondary: $darkColor,
+    highlight: $highlightColor,
+    faintHighlight: $faintHighlightColor,
+    titleFont: $titleFontFamily,
+    bodyFont: $bodyFontFamily,
+    codeFont: $codeFontFamily,
+    bodyFontSize: $bodyFontSize,
+  ),
+);
+
+@function themed($key) {
+  @return map-get($themeMap, $key);
+}
+
+@mixin themify($themes: $themes) {
+  @each $theme, $map in $themes {
+    :global(.theme#{$theme}) & {
+      $themeMap: () !global;
+      @each $key, $submap in $map {
+        $value: map-get(map-get($themes, $theme), "#{$key}");
+        $themeMap: map-merge(
+          $themeMap,
+          (
+            $key: $value,
+          )
+        ) !global;
+      }
+
+      @content;
+      $themeMap: null !global;
+    }
+  }
+}

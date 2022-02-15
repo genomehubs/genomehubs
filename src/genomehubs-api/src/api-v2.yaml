@@ -1,0 +1,888 @@
+---
+components:
+  parameters:
+    catParam:
+      description: Category value source
+      in: query
+      name: cat
+      required: false
+      schema:
+        type: string
+    collapseMonotypicParam:
+      description: "Collapse monotypic tree nodes [default: false]"
+      in: query
+      name: collapseMonotypic
+      schema:
+        type: boolean
+    confidenceParam:
+      description: "Threshold for candidate suggestions relative to input phrase [default: 1]"
+      explode: false
+      in: query
+      name: confidence
+      required: false
+      schema:
+        maximum: 2
+        minimum: 0
+        type: number
+      style: form
+    excludeAncestralParam:
+      description: "Exclude values estimated from ancestors from results [default: false]"
+      explode: true
+      in: query
+      name: excludeAncestral
+      required: false
+      schema:
+        items:
+          type: string
+        type: array
+      style: form
+    excludeDescendantParam:
+      description: "Exclude values estimated from descendants from results [default: false]"
+      explode: true
+      in: query
+      name: excludeDescendant
+      required: false
+      schema:
+        items:
+          type: string
+        type: array
+      style: form
+    excludeDirectParam:
+      description: "Exclude directly measured values from results [default: false]"
+      explode: true
+      in: query
+      name: excludeDirect
+      required: false
+      schema:
+        items:
+          type: string
+        type: array
+      style: form
+    excludeMissingParam:
+      description: "Exclude missing values from results [default: false]"
+      explode: true
+      in: query
+      name: excludeMissing
+      required: false
+      schema:
+        items:
+          type: string
+        type: array
+      style: form
+    fieldsParam:
+      description: "Comma separated list of fields to return [default: all]"
+      in: query
+      name: fields
+      required: false
+      schema:
+        type: string
+    filenameParam:
+      description: Specify a filename to download
+      in: query
+      name: filename
+      schema:
+        type: string
+    gramSizeParam:
+      description: "Size of N-grams used by tokeniser [default: 3]"
+      explode: false
+      in: query
+      name: gramSize
+      required: false
+      schema:
+        maximum: 4
+        minimum: 2
+        type: integer
+      style: form
+    includeEstimatesParam:
+      description: "Include estimated values in search results [default: false]"
+      in: query
+      name: includeEstimates
+      schema:
+        type: boolean
+    includeRawValuesParam:
+      description: "Include raw values in search results [default: false]"
+      in: query
+      name: includeRawValues
+      schema:
+        type: boolean
+    indentParam:
+      description: "Format output with indented lines [default: 0]"
+      explode: false
+      in: query
+      name: indent
+      required: false
+      schema:
+        maximum: 8
+        minimum: 0
+        type: integer
+      style: form
+    lineageParam:
+      description: Lineage (name or taxon ID) to restrict search to
+      in: query
+      name: lineage
+      required: false
+      schema:
+        type: string
+    maxErrorsParam:
+      description: "Maximumum error percentage when matching terms [default: 3]"
+      explode: false
+      in: query
+      name: maxErrors
+      required: false
+      schema:
+        maximum: 10
+        minimum: 0
+        type: integer
+      style: form
+    namesParam:
+      description: Comma separated list of taxon name classes to return
+      in: query
+      name: names
+      required: false
+      schema:
+        type: string
+    offsetParam:
+      description: "Offset when returning a page of results [default: 0]"
+      explode: false
+      in: query
+      name: offset
+      required: false
+      schema:
+        maximum: 1000
+        minimum: 0
+        type: integer
+      style: form
+    postTagParam:
+      description: 'Tag to place after matching portion of query term [default: \</em\>]'
+      explode: false
+      in: query
+      name: postTag
+      required: false
+      schema:
+        type: string
+      style: form
+    preTagParam:
+      description: 'Tag to place before matching portion of query term [default: \<em\>]'
+      explode: false
+      in: query
+      name: preTag
+      required: false
+      schema:
+        type: string
+      style: form
+    prefixQueryParam:
+      description: "Treat search term as a prefix [default: false]"
+      in: query
+      name: prefixQuery
+      schema:
+        type: boolean
+    previewParam:
+      description: "Return a file preview [default: false]"
+      in: query
+      name: preview
+      schema:
+        type: boolean
+    queryIdParam:
+      description: User specified query ID
+      in: query
+      name: queryId
+      schema:
+        type: string
+    queryParam:
+      description: Search query
+      in: query
+      name: query
+      required: true
+      schema:
+        type: string
+    rankParam:
+      description: Rank to report at
+      in: query
+      name: rank
+      required: false
+      schema:
+        type: string
+    ranksParam:
+      description: Comma separated list of ancestral ranks to return
+      in: query
+      name: ranks
+      required: false
+      schema:
+        type: string
+    recordIdParam:
+      description: Record identifier
+      explode: false
+      in: query
+      name: recordId
+      required: true
+      schema:
+        items:
+          type: string
+        type: array
+      style: form
+    releaseParam:
+      description: "GenomeHub release number [default: latest]"
+      in: query
+      name: release
+      required: false
+      schema:
+        enum:
+          - latest
+          - v2.1
+        type: string
+    reportParam:
+      description: Method to summarise multiple values for sorting
+      in: query
+      name: report
+      required: false
+      schema:
+        enum:
+          - histogram
+          - scatter
+          - sources
+          - tree
+          - types
+          - xInY
+          - xPerRank
+        type: string
+    resultParam:
+      description: The result type (data set) to search against
+      in: query
+      name: result
+      required: true
+      schema:
+        default: multi
+        enum:
+          - analysis
+          - assembly
+          - file
+          - taxon
+          - multi
+        type: string
+    scatterThresholdParam:
+      description: "Maximum number of results to plot as points [default: 100]"
+      in: query
+      name: scatterThreshold
+      required: false
+      schema:
+        maximum: 10000
+        minimum: -1
+        type: integer
+      style: form
+    treeThresholdParam:
+      description: "Maximum number of results to draw as tree [default: 10000]"
+      in: query
+      name: treeThreshold
+      required: false
+      schema:
+        maximum: 100000
+        minimum: -1
+        type: integer
+      style: form
+    searchRawValuesParam:
+      description: "Apply search filters to raw values [default: false]"
+      in: query
+      name: searchRawValues
+      schema:
+        type: boolean
+    searchTermParam:
+      description: Search term
+      in: query
+      name: searchTerm
+      required: true
+      schema:
+        type: string
+    sizeParam:
+      description: "Maximum number of results to return [default: 10]"
+      explode: false
+      in: query
+      name: size
+      required: false
+      schema:
+        maximum: 10000000
+        minimum: 0
+        type: integer
+      style: form
+    sortByParam:
+      description: Field name to sort by
+      in: query
+      name: sortBy
+      required: false
+      schema:
+        type: string
+    sortModeParam:
+      description: Method to summarise multiple values for sorting
+      in: query
+      name: sortMode
+      required: false
+      schema:
+        enum:
+          - avg
+          - max
+          - min
+        type: string
+    sortOrderParam:
+      description: "Sort order [default: asc]"
+      in: query
+      name: sortOrder
+      required: false
+      schema:
+        enum:
+          - asc
+          - desc
+        type: string
+    streamFileParam:
+      description: "Stream file rather than download [default: false]"
+      in: query
+      name: streamFile
+      schema:
+        type: boolean
+    suggestParam:
+      description: "Number of valid terms to suggest [default: 0]"
+      explode: false
+      in: query
+      name: suggest
+      required: false
+      schema:
+        minimum: 0
+        type: integer
+      style: form
+    suggestSizeParam:
+      description: "Number of similar terms to suggest [default: 3]"
+      explode: false
+      in: query
+      name: suggestSize
+      required: false
+      schema:
+        maximum: 10
+        minimum: 0
+        type: integer
+      style: form
+    summaryParam:
+      description: The summary type to return
+      explode: false
+      in: query
+      name: summary
+      required: true
+      schema:
+        items:
+          enum:
+            - histogram
+            - terms
+          type: string
+        type: array
+      style: form
+    summaryValuesParam:
+      description: Summary values to return
+      explode: true
+      in: query
+      name: summaryValues
+      required: false
+      schema:
+        items:
+          enum:
+            - count
+            - mean
+            - median
+            - mode
+            - max
+            - min
+          type: string
+        type: array
+      style: form
+    taxonomyParam:
+      description: "The taxonomy to search against"
+      in: query
+      name: taxonomy
+      required: false
+      schema:
+        type: string
+    tidyDataParam:
+      description: "Format delimited text output as Tidy Data [default: false]"
+      in: query
+      name: tidyData
+      schema:
+        type: boolean
+    xOptsParam:
+      description: X axis options (min,max,tickCount)
+      in: query
+      name: xOpts
+      required: false
+      schema:
+        type: string
+    xParam:
+      description: X value source
+      in: query
+      name: x
+      required: false
+      schema:
+        type: string
+    yOptsParam:
+      description: Y axis options (min,max,tickCount)
+      in: query
+      name: yOpts
+      required: false
+      schema:
+        type: string
+    yParam:
+      description: Y value source
+      in: query
+      name: "y"
+      required: false
+      schema:
+        type: string
+    zParam:
+      description: Z value source
+      in: query
+      name: z
+      required: false
+      schema:
+        type: string
+  schemas:
+    Count:
+      description: Number of records matching query
+      type: integer
+    Fields:
+      properties:
+        group:
+          type: string
+        name:
+          type: string
+      type: object
+    Records:
+      items:
+        properties:
+          found:
+            type: boolean
+          id:
+            type: string
+          index:
+            type: string
+          record:
+            type: object
+        type: object
+      type: array
+    Results:
+      items:
+        properties:
+          reason:
+            items:
+              properties:
+                fields:
+                  type: object
+                score:
+                  type: number
+              type: object
+            type: array
+          result:
+            type: object
+          score:
+            type: number
+        type: object
+      type: array
+    Status:
+      properties:
+        error:
+          type: string
+        hits:
+          type: integer
+        success:
+          type: boolean
+        took:
+          description: Time (ms) taken to execute query
+          type: integer
+      type: object
+    Suggestions:
+      items:
+        properties:
+          suggestion:
+            properties:
+              collate_match:
+                type: boolean
+              highlighted:
+                type: string
+              score:
+                type: number
+              text:
+                type: string
+            type: object
+          text:
+            type: string
+        type: object
+      type: array
+    Summaries:
+      items:
+        properties:
+          field:
+            type: string
+          name:
+            type: string
+          summary:
+            type: object
+        type: object
+      type: array
+    Taxonomies:
+      items:
+        type: string
+      type: array
+info:
+  contact:
+    email: goat@genomehubs.org
+    name: GoaT
+  description: Genomes on a Tree OpenAPI test.
+  license:
+    name: MIT License
+  title: GoaT
+  version: 2.3.0
+openapi: 3.0.0
+paths:
+  /count:
+    get:
+      description: Returns count of records matching a query
+      operationId: getSearchResultCount
+      parameters:
+        - $ref: "#/components/parameters/queryParam"
+        - $ref: "#/components/parameters/fieldsParam"
+        - $ref: "#/components/parameters/ranksParam"
+        - $ref: "#/components/parameters/namesParam"
+        - $ref: "#/components/parameters/includeEstimatesParam"
+        - $ref: "#/components/parameters/searchRawValuesParam"
+        - $ref: "#/components/parameters/summaryValuesParam"
+        - $ref: "#/components/parameters/excludeAncestralParam"
+        - $ref: "#/components/parameters/excludeDescendantParam"
+        - $ref: "#/components/parameters/excludeDirectParam"
+        - $ref: "#/components/parameters/excludeMissingParam"
+        - $ref: "#/components/parameters/resultParam"
+        - $ref: "#/components/parameters/taxonomyParam"
+        - $ref: "#/components/parameters/releaseParam"
+        - $ref: "#/components/parameters/indentParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: "#/components/schemas/Status"
+                    status: null
+                  - $ref: "#/components/schemas/Count"
+                    count: null
+          description: successful operation
+        "400":
+          description: Invalid query
+      summary: Count records
+      tags:
+        - GoaT API
+      x-eov-operation-handler: api/v2/routes/count
+  /download:
+    get:
+      description: Returns indexed files
+      operationId: getFile
+      parameters:
+        - $ref: "#/components/parameters/recordIdParam"
+        - $ref: "#/components/parameters/filenameParam"
+        - $ref: "#/components/parameters/previewParam"
+        - $ref: "#/components/parameters/streamFileParam"
+      responses:
+        "200":
+          content:
+            application/*:
+              schema:
+                format: binary
+            application/json:
+              schema:
+                type: string
+            image/*:
+              schema:
+                format: binary
+            text/*:
+              schema:
+                type: string
+          description: successful operation
+        "400":
+          description: Invalid query
+        "404":
+          description: Not Found
+      summary: Download file
+      tags:
+        - GoaT API
+      x-eov-operation-handler: api/v2/routes/download
+  /lookup:
+    get:
+      description: Returns suggestions/identifiers matching a searchTerm
+      operationId: getIdentifiers
+      parameters:
+        - $ref: "#/components/parameters/searchTermParam"
+        - $ref: "#/components/parameters/resultParam"
+        - $ref: "#/components/parameters/prefixQueryParam"
+        - $ref: "#/components/parameters/sizeParam"
+        - $ref: "#/components/parameters/lineageParam"
+        - $ref: "#/components/parameters/taxonomyParam"
+        - $ref: "#/components/parameters/releaseParam"
+        - $ref: "#/components/parameters/suggestSizeParam"
+        - $ref: "#/components/parameters/gramSizeParam"
+        - $ref: "#/components/parameters/maxErrorsParam"
+        - $ref: "#/components/parameters/confidenceParam"
+        - $ref: "#/components/parameters/preTagParam"
+        - $ref: "#/components/parameters/postTagParam"
+        - $ref: "#/components/parameters/indentParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: "#/components/schemas/Status"
+                    status: null
+                  - $ref: "#/components/schemas/Results"
+                    results: null
+                  - $ref: "#/components/schemas/Suggestions"
+                    suggestions: null
+          description: successful operation
+        "400":
+          description: Invalid queryTerm
+      summary: Lookup
+      tags:
+        - GoaT API
+      x-eov-operation-handler: api/v2/routes/lookup
+  /progress:
+    get:
+      description: Returns progress of a long-running search or report query
+      operationId: getProgress
+      parameters:
+        - $ref: "#/components/parameters/queryIdParam"
+        - $ref: "#/components/parameters/indentParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: "#/components/schemas/Status"
+                    status: null
+                  - $ref: "#/components/schemas/Records"
+                    results: null
+          description: successful operation
+        "400":
+          description: Invalid queryId
+      summary: Returns query progress
+      tags:
+        - GoaT API
+      x-eov-operation-handler: api/v2/routes/progress
+  /record:
+    get:
+      description: Returns records matching a record identifier
+      operationId: getRecords
+      parameters:
+        - $ref: "#/components/parameters/recordIdParam"
+        - $ref: "#/components/parameters/resultParam"
+        - $ref: "#/components/parameters/sizeParam"
+        - $ref: "#/components/parameters/taxonomyParam"
+        - $ref: "#/components/parameters/releaseParam"
+        - $ref: "#/components/parameters/indentParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: "#/components/schemas/Status"
+                    status: null
+                  - $ref: "#/components/schemas/Records"
+                    results: null
+          description: successful operation
+        "400":
+          description: Invalid recordId
+      summary: Returns individual records
+      tags:
+        - GoaT API
+      x-eov-operation-handler: api/v2/routes/record
+  /report:
+    get:
+      description: Generates reports on records and sets of records
+      operationId: getReport
+      parameters:
+        - $ref: "#/components/parameters/resultParam"
+        - $ref: "#/components/parameters/reportParam"
+        - $ref: "#/components/parameters/fieldsParam"
+        - $ref: "#/components/parameters/xParam"
+        - $ref: "#/components/parameters/yParam"
+        - $ref: "#/components/parameters/zParam"
+        - $ref: "#/components/parameters/catParam"
+        - $ref: "#/components/parameters/rankParam"
+        - $ref: "#/components/parameters/includeEstimatesParam"
+        - $ref: "#/components/parameters/collapseMonotypicParam"
+        - $ref: "#/components/parameters/ranksParam"
+        - $ref: "#/components/parameters/namesParam"
+        - $ref: "#/components/parameters/excludeAncestralParam"
+        - $ref: "#/components/parameters/excludeDescendantParam"
+        - $ref: "#/components/parameters/excludeDirectParam"
+        - $ref: "#/components/parameters/excludeMissingParam"
+        - $ref: "#/components/parameters/taxonomyParam"
+        - $ref: "#/components/parameters/xOptsParam"
+        - $ref: "#/components/parameters/yOptsParam"
+        - $ref: "#/components/parameters/scatterThresholdParam"
+        - $ref: "#/components/parameters/treeThresholdParam"
+        - $ref: "#/components/parameters/queryIdParam"
+        - $ref: "#/components/parameters/releaseParam"
+        - $ref: "#/components/parameters/indentParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: "#/components/schemas/Status"
+                    status: null
+                  - $ref: "#/components/schemas/Summaries"
+                    results: null
+            text/x-nh:
+              schema:
+                type: string
+            application/xml:
+              schema:
+                type: string
+            application/zip:
+              schema:
+                type: string
+                format: octal
+          description: successful operation
+        "400":
+          description: Invalid query
+        "404":
+          description: Not Found
+      summary: Generate a report
+      tags:
+        - GoaT API
+      x-eov-operation-handler: api/v2/routes/report
+  /resultFields:
+    get:
+      description: Returns available fields for a given result type
+      operationId: getResultFields
+      parameters:
+        - $ref: "#/components/parameters/resultParam"
+        - $ref: "#/components/parameters/releaseParam"
+        - $ref: "#/components/parameters/taxonomyParam"
+        - $ref: "#/components/parameters/indentParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: "#/components/schemas/Status"
+                    status: null
+                  - $ref: "#/components/schemas/Fields"
+                    results: null
+          description: successful operation
+        "400":
+          description: Invalid recordId
+      summary: Returns available fields
+      tags:
+        - GoaT API
+      x-eov-operation-handler: api/v2/routes/resultFields
+  /search:
+    get:
+      description: Returns records matching a query
+      operationId: getSearchResults
+      parameters:
+        - $ref: "#/components/parameters/queryParam"
+        - $ref: "#/components/parameters/fieldsParam"
+        - $ref: "#/components/parameters/ranksParam"
+        - $ref: "#/components/parameters/namesParam"
+        - $ref: "#/components/parameters/includeEstimatesParam"
+        - $ref: "#/components/parameters/includeRawValuesParam"
+        - $ref: "#/components/parameters/searchRawValuesParam"
+        - $ref: "#/components/parameters/summaryValuesParam"
+        - $ref: "#/components/parameters/excludeAncestralParam"
+        - $ref: "#/components/parameters/excludeDescendantParam"
+        - $ref: "#/components/parameters/excludeDirectParam"
+        - $ref: "#/components/parameters/excludeMissingParam"
+        - $ref: "#/components/parameters/resultParam"
+        - $ref: "#/components/parameters/sizeParam"
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/sortByParam"
+        - $ref: "#/components/parameters/sortOrderParam"
+        - $ref: "#/components/parameters/sortModeParam"
+        - $ref: "#/components/parameters/taxonomyParam"
+        - $ref: "#/components/parameters/releaseParam"
+        - $ref: "#/components/parameters/queryIdParam"
+        - $ref: "#/components/parameters/indentParam"
+        - $ref: "#/components/parameters/tidyDataParam"
+        - $ref: "#/components/parameters/filenameParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: "#/components/schemas/Status"
+                    status: null
+                  - $ref: "#/components/schemas/Records"
+                    results: null
+            text/csv:
+              schema:
+                type: string
+            text/tab-separated-values:
+              schema:
+                type: string
+          description: successful operation
+        "400":
+          description: Invalid query
+      summary: Search for records
+      tags:
+        - GoaT API
+      x-eov-operation-handler: api/v2/routes/search
+  /summary:
+    get:
+      description: Returns a summary of raw field values
+      operationId: getFieldSummary
+      parameters:
+        - $ref: "#/components/parameters/recordIdParam"
+        - $ref: "#/components/parameters/summaryParam"
+        - $ref: "#/components/parameters/resultParam"
+        - $ref: "#/components/parameters/fieldsParam"
+        - $ref: "#/components/parameters/taxonomyParam"
+        - $ref: "#/components/parameters/releaseParam"
+        - $ref: "#/components/parameters/indentParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: "#/components/schemas/Status"
+                    status: null
+                  - $ref: "#/components/schemas/Summaries"
+                    results: null
+          description: successful operation
+        "400":
+          description: Invalid query
+      summary: Field value summary
+      tags:
+        - GoaT API
+      x-eov-operation-handler: api/v2/routes/summary
+  /taxonomies:
+    get:
+      description: Returns a list of available taxonomies
+      operationId: getTaxonomies
+      parameters:
+        - $ref: "#/components/parameters/releaseParam"
+        - $ref: "#/components/parameters/indentParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Taxonomies"
+          description: successful operation
+        "400":
+          description: Invalid query
+      summary: List of taxonomies
+      tags:
+        - GoaT API
+      x-eov-operation-handler: api/v2/routes/taxonomies
+servers:
+  - url: http://localhost:3000/api/v2
+tags:
+  - description: Query Genomes on a Tree
+    name: GoaT API
