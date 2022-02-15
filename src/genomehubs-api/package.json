@@ -3,12 +3,12 @@
   "version": "2.3.0",
   "description": "GenomeHubs API",
   "scripts": {
-    "api": "node --max-old-space-size=8192 src/index.js",
-    "start": "nodemon src/index.js",
+    "api": "node --max-old-space-size=8192 -r esm src/app.js",
+    "start": "nodemon -r esm src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "package": "./package.sh"
   },
-  "main": "src/index.js",
+  "main": "src/app.js",
   "bin": "src/index.js",
   "repository": {
     "type": "git",
