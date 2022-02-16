@@ -616,6 +616,23 @@ def process_row(types, names, row):
     return data, taxon_data, taxon_types.get("attributes", {})
 
 
+def find_index_for_header(header, headers, duplicate_headers):
+    """Lookup column index for a single header."""
+    index = headers.get(header, None)
+    if index is not None:
+        if header in duplicate_headers:
+            LOGGER.error(
+                "Duplicate header '%s' in columns %s",
+                header,
+                " and ".join([str(idx) for idx in duplicate_headers[header]]),
+            )
+            sys.exit(1)
+        return index
+    else:
+        LOGGER.error("Unable to find %s in file headers", header)
+        sys.exit(1)
+
+
 def set_column_indices(types, header):
     """Use header to set indices for named columns."""
     headers = {}
@@ -629,26 +646,26 @@ def set_column_indices(types, header):
         for value in entries.values():
             if isinstance(value, dict):
                 if "header" in value:
-                    index = headers.get(value["header"], None)
-                    if index is not None:
-                        if value["header"] in duplicate_headers:
-                            LOGGER.error(
-                                "Duplicate header '%s' in columns %s",
-                                value["header"],
-                                " and ".join(
-                                    [
-                                        str(idx)
-                                        for idx in duplicate_headers[value["header"]]
-                                    ]
-                                ),
-                            )
-                            sys.exit(1)
-                        value.update({"index": index})
-                    else:
-                        LOGGER.error(
-                            "Unable to find %s in file headers", value["header"]
+                    if isinstance(value["header"], list):
+                        # convert list of headers to list of indices
+                        value.update(
+                            {
+                                "index": [
+                                    find_index_for_header(
+                                        head, headers, duplicate_headers
+                                    )
+                                    for head in value["header"]
+                                ]
+                            }
                         )
-                        sys.exit(1)
+                    else:
+                        value.update(
+                            {
+                                "index": find_index_for_header(
+                                    value["header"], headers, duplicate_headers
+                                )
+                            }
+                        )
 
 
 def write_imported_rows(rows, opts, *, types, header=None, label="imported"):
