@@ -16,10 +16,6 @@ const ENV = {
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 
-console.log(path.resolve(__dirname, "public"));
-
-console.log(path.resolve(__dirname, "views"));
-
 // serve static assets normally
 app.use(express.static(path.resolve(__dirname, "public")));
 app.use(
