@@ -27,7 +27,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
-      - run: npm install -g pkg
+      - run: npm install -g pkg @babel/core @babel/cli @babel/plugin-transform-modules-commonjs
       - run: ./package-api.sh
       - uses: actions/upload-artifact@v2
         with:

@@ -6,6 +6,10 @@ cd ../genomehubs-ui &&
 
 cp .env.dist .env &&
 
+echo "Installing dependencies" &&
+
+npm install &&
+
 echo "Bundling javascript" &&
 
 npm run build &&
@@ -36,6 +40,10 @@ TEMPLATE="<% if (variables) { %> \
 sed 's:<!---->:'"$TEMPLATE"':' src/public/index.html > src/views/index.ejs &&
 
 rm src/public/index.html &&
+
+echo "Installing package dependencies" &&
+
+npm install &&
 
 echo "Creating package" &&
 

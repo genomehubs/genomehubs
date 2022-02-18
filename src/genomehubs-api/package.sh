@@ -2,13 +2,18 @@
 
 echo "Packaging genomehubs-api" &&
 
+echo "Installing dependencies" &&
+
+npm install &&
+
+echo "Transpiling esm files to cjs" &&
+
 mkdir -p build &&
 
 rm -rf build/* &&
 
 FILES=$(find src/api -name "*.js") &&
 
-echo "Transpiling esm files to cjs" &&
 for FILE in $FILES; do
   OUTFILE=${FILE/src/build} &&
   echo " - transpiling $FILE to $OUTFILE" &&

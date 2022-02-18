@@ -2,8 +2,6 @@
 
 cd ./src/packaged-ui &&
 
-npm install &&
-
 ./package.sh &&
 
 cd - &&

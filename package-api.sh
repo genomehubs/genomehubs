@@ -2,8 +2,6 @@
 
 cd ./src/genomehubs-api &&
 
-npm install &&
-
 ./package.sh &&
 
 cd - &&
