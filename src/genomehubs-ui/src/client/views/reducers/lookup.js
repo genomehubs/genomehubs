@@ -1,10 +1,9 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 
+import { apiUrl } from "./api";
 import immutableUpdate from "immutable-update";
 import qs from "qs";
 import { setApiStatus } from "./api";
-
-const apiUrl = API_URL || "/api/v1";
 
 const requestLookup = createAction("REQUEST_LOOKUP");
 const receiveLookup = createAction(

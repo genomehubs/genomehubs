@@ -39,20 +39,18 @@ const locateFile = async (params) => {
   }
 };
 
-module.exports = {
-  getFile: async (req, res) => {
-    let response = {};
-    response = await locateFile(req.query);
-    if (response && response != {}) {
-      if (response.redirect) {
-        return res.redirect(response.redirect);
-      }
-      res.setHeader("content-type", response.mime);
-      if (!req.query.streamFile) {
-        res.attachment(response.fileName);
-      }
-      return response.fileStream.pipe(res);
+export const getFile = async (req, res) => {
+  let response = {};
+  response = await locateFile(req.query);
+  if (response && response != {}) {
+    if (response.redirect) {
+      return res.redirect(response.redirect);
     }
-    return res.status(404).send();
-  },
+    res.setHeader("content-type", response.mime);
+    if (!req.query.streamFile) {
+      res.attachment(response.fileName);
+    }
+    return response.fileStream.pipe(res);
+  }
+  return res.status(404).send();
 };

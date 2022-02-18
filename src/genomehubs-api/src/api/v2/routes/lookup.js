@@ -153,24 +153,22 @@ const suggest = async (params, iter = 0) => {
   return { status, suggestions };
 };
 
-module.exports = {
-  getIdentifiers: async (req, res) => {
-    let response = {};
-    response = await sayt(req.query);
-    if (
-      !response.status ||
-      !response.status.success ||
-      response.status.hits == 0
-    ) {
-      response = await lookup(req.query);
-    }
-    if (
-      !response.status ||
-      !response.status.success ||
-      response.status.hits == 0
-    ) {
-      response = await suggest(req.query);
-    }
-    return res.status(200).send(formatJson(response, req.query.indent));
-  },
+export const getIdentifiers = async (req, res) => {
+  let response = {};
+  response = await sayt(req.query);
+  if (
+    !response.status ||
+    !response.status.success ||
+    response.status.hits == 0
+  ) {
+    response = await lookup(req.query);
+  }
+  if (
+    !response.status ||
+    !response.status.success ||
+    response.status.hits == 0
+  ) {
+    response = await suggest(req.query);
+  }
+  return res.status(200).send(formatJson(response, req.query.indent));
 };

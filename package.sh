@@ -1,36 +1,25 @@
 #!/bin/bash
 
-echo "Packaging viewer"
+cd ./src/genomehubs-api &&
 
-TEMPLATE="<% if (variables) { %> \
-<script> \
-<%- variables %> \
-</script> \
-<% } %> \
-"
-
-# cp .env.dist .env &&
-
-cd ./src/genomehubs-ui &&
-
-npm run build &&
+./package.sh &&
 
 cd - &&
 
-rm -rf ./src/packaged-ui/src/public &&
-
-tar -C ./src/genomehubs-ui/dist -czf ./src/genomehubs-ui/dist/blobtoolkit-viewer.tgz public &&
-
-mv ./src/genomehubs-ui/dist/public ./src/packaged-ui/src/ &&
-
-mkdir -p ./src/packaged-ui/src/views &&
-
-rm -rf ./src/packaged-ui/src/views/* &&
-
-sed 's:<!---->:'"$TEMPLATE"':' ./src/packaged-ui/src/public/index.html > ./src/packaged-ui/src/views/index.ejs &&
-
 cd ./src/packaged-ui &&
 
-pkg --compress GZip package.json &&
+./package.sh &&
 
-cd -
+cd - &&
+
+mkdir -p dist &&
+
+rm -rf dist/* &&
+
+mv ./src/genomehubs-api/dist/genomehubs-api ./dist/genomehubs-api &&
+
+mv ./src/packaged-ui/dist/genomehubs-ui ./dist/genomehubs-ui &&
+
+chmod 755 ./dist/genomehubs-* &&
+
+mv ./src/genomehubs-ui/dist/genomehubs-ui.tgz ./dist/genomehubs-ui.tgz 

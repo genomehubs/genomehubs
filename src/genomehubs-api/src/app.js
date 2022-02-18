@@ -49,6 +49,9 @@ app.get("/api-spec", function (req, res) {
   res.header("Content-Type", "text/yaml");
   res.send(YAML.stringify(swaggerDocument, 8, 4));
 });
+if (process.pkg) {
+  app.use(express.static(path.join(__dirname, "api-docs")));
+}
 app.use(
   "/api-docs",
   swaggerUi.serve,
@@ -86,12 +89,12 @@ if (config.https) {
     cert: fs.readFileSync(config.certFile),
   };
   https.createServer(options, app).listen(port, () => {
-    console.log(`Listening on https port ${port}`);
+    console.log(`genomehubs-api started on https port ${port}`);
   });
 } else {
   const http = require("http");
   http.createServer(app).listen(port, () => {
-    console.log(`Listening on http port ${port}`);
+    console.log(`genomehubs-api started on http port ${port}`);
   });
 }
 

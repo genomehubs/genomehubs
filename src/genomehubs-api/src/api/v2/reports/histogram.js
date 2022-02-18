@@ -1,14 +1,15 @@
-import { getResults, parseFields, setExclusions } from "../routes/search";
-
 import { aInB } from "../functions/aInB";
 import { attrTypes } from "../functions/attrTypes";
 import { checkResponse } from "../functions/checkResponse";
 import { combineQueries } from "../functions/combineQueries";
 import { formatJson } from "../functions/formatJson";
 import { getBounds } from "./getBounds";
+import { getResults } from "../functions/getResults";
+import { parseFields } from "../functions/parseFields";
 import { queryParams } from "./queryParams";
 import { scaleBuckets } from "./scaleBuckets";
 import { setAggs } from "./setAggs";
+import { setExclusions } from "../functions/setExclusions";
 import { valueTypes } from "./valueTypes";
 
 const getYValues = ({ obj, yField, typesMap }) => {

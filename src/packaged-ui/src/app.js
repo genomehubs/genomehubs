@@ -1,25 +1,27 @@
 const express = require("express");
 const path = require("path");
-const PORT = process.env.BTK_PORT || process.env.BTK_CLIENT_PORT || "8080";
-const BTK_API_PORT = process.env.BTK_API_PORT || "8000";
-const BTK_API_URL =
-  process.env.BTK_API_URL || `http://localhost:${BTK_API_PORT}/api/v1`;
-const BTK_GA_ID = process.env.BTK_GA_ID || "UA-000000-01";
-const BTK_GDPR_URL = process.env.BTK_GDPR_URL || undefined;
+const PORT = process.env.GH_PORT || process.env.GH_CLIENT_PORT || "8880";
+const GH_API_PORT = process.env.GH_API_PORT || "3000";
+const GH_API_VERSION = process.env.GH_API_VERSION || "v2";
+const GH_API_URL =
+  process.env.GH_API_URL ||
+  `http://localhost:${GH_API_PORT}/api/${GH_API_VERSION}`;
 const app = express();
 
 const ENV = {
-  BTK_API_URL,
-  BTK_GA_ID,
-  BTK_GDPR_URL,
+  GH_API_URL,
 };
 
 // set the view engine to ejs
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 
+console.log(path.resolve(__dirname, "public"));
+
+console.log(path.resolve(__dirname, "views"));
+
 // serve static assets normally
-app.use("/", express.static(path.resolve(__dirname, "public")));
+app.use(express.static(path.resolve(__dirname, "public")));
 app.use(
   "/manifest.json",
   express.static(path.resolve(__dirname, "public/manifest.json"))
@@ -35,4 +37,4 @@ app.get("*", function (req, res) {
 });
 
 app.listen(PORT);
-console.log("server started on port " + PORT);
+console.log("genomehubs-ui started http on port " + PORT);

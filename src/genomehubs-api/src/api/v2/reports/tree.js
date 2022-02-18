@@ -1,12 +1,14 @@
 import { getProgress, setProgress } from "../functions/progress";
-import { getResults, parseFields, setExclusions } from "../routes/search";
 
 import { aInB } from "../functions/aInB";
 import { attrTypes } from "../functions/attrTypes";
 import { combineQueries } from "../functions/combineQueries";
 import { config } from "../functions/config";
 import { getBounds } from "./getBounds";
+import { getResults } from "../functions/getResults";
+import { parseFields } from "../functions/parseFields";
 import { queryParams } from "./queryParams";
+import { setExclusions } from "../functions/setExclusions";
 
 const valueTypes = {
   long: "integer",
