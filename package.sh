@@ -16,9 +16,9 @@ mkdir -p dist &&
 
 rm -rf dist/* &&
 
-mv ./src/genomehubs-api/dist/genomehubs-api ./dist/genomehubs-api &&
+mv ./src/genomehubs-api/dist/genomehubs-api* ./dist/ &&
 
-mv ./src/packaged-ui/dist/genomehubs-ui ./dist/genomehubs-ui &&
+mv ./src/packaged-ui/dist/genomehubs-ui* ./dist/ &&
 
 chmod 755 ./dist/genomehubs-* &&
 
