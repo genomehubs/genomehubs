@@ -102,8 +102,8 @@ jobs:
           mv dist/artifact/* dist/
           rm -r dist/artifact
           rm dist/*.whl
-          chmod 755 dist/genomehubs-api*
-          chmod 755 dist/genomehubs-ui*
+          chmod 755 dist/genomehubs-*-macos
+          chmod 755 dist/genomehubs-*-linux
       - name: create release
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
         with:
