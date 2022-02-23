@@ -1,4 +1,4 @@
-name: package-genomehubs
+name: package-genomehubs-selfhosted
 
 on:
   [push]
