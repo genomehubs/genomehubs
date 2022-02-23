@@ -1,7 +1,7 @@
 common:
   es:
     host:
-      - "localhost:9200"
+      - "localhost:9201"
   hub:
     name: test_instance
     path: tests/resources
