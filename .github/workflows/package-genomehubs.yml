@@ -63,14 +63,26 @@ jobs:
         with:
           stack-version: 7.10.2
 
-  start-elasticsearch-service:
+  # start-elasticsearch-service:
+  container-job:
+    # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
+    # Docker Hub image that `container-job` executes in
     container: node:10.18-jessie
+
+    # Service containers to run with `container-job`
     services:
-      elasticsearch:
-        image: elasticsearch/elasticsearch-oss:7.10.2
-        ports:
-          - 9200:9200
+      # Label used to access the service container
+      redis:
+        # Docker Hub image
+        image: redis
+    # runs-on: ubuntu-latest
+    # container: node:10.18-jessie
+    # services:
+    #   elasticsearch:
+    #     image: elasticsearch/elasticsearch-oss:7.10.2
+    #     ports:
+    #       - 9200:9200
 
   test-elasticsearch-service:
     runs-on: ubuntu-latest
@@ -78,7 +90,7 @@ jobs:
       - name: Wait for elasticsearch
         uses: nev7n/wait_for_response@v1.0.1
         with:
-          url: 'http://localhost:${{job.services.elasticsearch.ports[9200]}}'
+          url: "http://localhost:${{job.services.elasticsearch.ports[9200]}}"
           responseCode: 200
           timeout: 2000
           interval: 500
