@@ -69,13 +69,14 @@ jobs:
     runs-on: ubuntu-latest
     # Docker Hub image that `container-job` executes in
     container: node:10.18-jessie
-
     # Service containers to run with `container-job`
     services:
       # Label used to access the service container
       redis:
         # Docker Hub image
         image: redis
+    steps:
+      - uses: actions/checkout@v2
     # runs-on: ubuntu-latest
     # container: node:10.18-jessie
     # services:
@@ -87,6 +88,7 @@ jobs:
   test-elasticsearch-service:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Wait for elasticsearch
         uses: nev7n/wait_for_response@v1.0.1
         with:
