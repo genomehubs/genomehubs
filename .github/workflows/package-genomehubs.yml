@@ -63,7 +63,7 @@ jobs:
   #       with:
   #         stack-version: 7.10.2
 
-  start-elasticsearch-service:
+  run-test-fill:
     runs-on: ubuntu-latest
     needs: package-genomehubs-linux
     # container: node:10.18-jessie
@@ -75,7 +75,7 @@ jobs:
         env:
           discovery.type: single-node
     steps:
-      - run: sleep 15
+      - uses: actions/checkout@v2
       - name: Wait for Elasticsearch
         uses: nev7n/wait_for_response@v1
         with:
