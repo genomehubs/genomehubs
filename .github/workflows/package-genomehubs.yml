@@ -65,7 +65,7 @@ jobs:
 
   start-elasticsearch-service:
     runs-on: ubuntu-latest
-    container: node:10.18-jessie
+    # container: node:10.18-jessie
     services:
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
@@ -74,12 +74,16 @@ jobs:
         env:
           discovery.type: single-node
     steps:
+      - run: sleep 15
+      - name: Check connection
+        run: |
+          curl -I "http://localhost:9200" || exit 0
       - name: Check health
         run: |
-          curl -s "http://localhost:${{job.services.elasticsearch.ports[9200]}}/_cat/health"
+          curl -s "http://localhost:9200/_cat/health" || exit 0
       - name: List indices
         run: |
-          curl -s "http://localhost:${{job.services.elasticsearch.ports[9200]}}/_cat/indices"
+          curl -s "http://localhost:9200/_cat/indices"
 
   # package-genomehubs-macos:
   #   runs-on: macos-11
