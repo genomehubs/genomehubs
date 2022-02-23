@@ -1,0 +1,19 @@
+file:
+  format: tsv
+  header: true
+  name: uk_bats_2020-11-24.tsv
+  source: UK Bats
+  description: UK Bats from Nicola Chapman, Sanger
+  source_url: https://www.bats.org.uk/about-bats/what-are-bats/uk-bats
+attributes:
+  country_list:
+    header: uk_bats
+    type: keyword
+taxon_names:
+  common_name:
+    header: common_name
+taxonomy:
+  species:
+    header: scientific_name
+  order:
+    header: order

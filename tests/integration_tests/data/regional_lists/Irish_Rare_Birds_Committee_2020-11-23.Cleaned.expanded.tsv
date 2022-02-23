@@ -1,0 +1,557 @@
+scientific_name	category	common_name	class	IRBC
+Branta bernicla	A	Brent Goose	Aves	IE
+Branta ruficollis	A/D1	Red-breasted Goose	Aves	IE
+Branta canadensis	A/C1	Canada Goose	Aves	IE
+Branta leucopsis	A/C1	Barnacle Goose	Aves	IE
+Branta hutchinsii	A	Cackling Goose	Aves	IE
+Anser caerulescens	A/D1	Snow Goose	Aves	IE
+Anser anser	A/C1	Greylag Goose	Aves	IE
+Anser fabalis	A	Taiga Bean Goose	Aves	IE
+Anser brachyrhynchus	A	Pink-footed Goose	Aves	IE
+Anser serrirostris	A	Tundra Bean Goose	Aves	IE
+Anser albifrons	A	Greater White-fronted Goose	Aves	IE
+Anser erythropus	A	Lesser White-fronted Goose	Aves	IE
+Cygnus olor	A/C1	Mute Swan	Aves	IE
+Cygnus columbianus	A	Bewick's Swan	Aves	IE
+Cygnus cygnus	A	Whooper Swan	Aves	IE
+Tadorna tadorna	A	Common Shelduck	Aves	IE
+Tadorna ferruginea	B/D1	Ruddy Shelduck	Aves	IE
+Aix galericulata	C1	Mandarin Duck	Aves	IE
+Sibirionetta formosa	A/D1	Baikal Teal	Aves	IE
+Spatula querquedula	A	Garganey	Aves	IE
+Spatula discors	A	Blue-winged Teal	Aves	IE
+Spatula clypeata	A	Northern Shoveler	Aves	IE
+Mareca strepera	A	Gadwall	Aves	IE
+Mareca penelope	A	Eurasian Wigeon	Aves	IE
+Mareca americana	A	American Wigeon	Aves	IE
+Anas platyrhynchos	A/C1	Mallard	Aves	IE
+Anas rubripes	A	American Black Duck	Aves	IE
+Anas acuta	A	Northern Pintail	Aves	IE
+Anas crecca	A	Eurasian Teal	Aves	IE
+Anas carolinensis	A	Green-winged Teal	Aves	IE
+Netta rufina	A	Red-crested Pochard	Aves	IE
+Aythya americana	A	Redhead	Aves	IE
+Aythya ferina	A	Common Pochard	Aves	IE
+Aythya nyroca	A	Ferruginous Duck	Aves	IE
+Aythya collaris	A	Ring-necked Duck	Aves	IE
+Aythya fuligula	A	Tufted Duck	Aves	IE
+Aythya marila	A	Greater Scaup	Aves	IE
+Aythya affinis	A	Lesser Scaup	Aves	IE
+Somateria spectabilis	A	King Eider	Aves	IE
+Somateria mollissima	A	Common Eider	Aves	IE
+Melanitta perspicillata	A	Surf Scoter	Aves	IE
+Melanitta fusca	A	Velvet Scoter	Aves	IE
+Melanitta deglandi	A	White-winged Scoter	Aves	IE
+Melanitta nigra	A	Common Scoter	Aves	IE
+Melanitta americana	A	Black Scoter	Aves	IE
+Clangula hyemalis	A	Long-tailed Duck	Aves	IE
+Bucephala albeola	A	Bufflehead	Aves	IE
+Bucephala clangula	A	Common Goldeneye	Aves	IE
+Bucephala islandica	A	Barrow's Goldeneye	Aves	IE
+Mergellus albellus	A	Smew	Aves	IE
+Lophodytes cucullatus	A/D1	Hooded Merganser	Aves	IE
+Mergus merganser	A	Goosander	Aves	IE
+Mergus serrator	A	Red-breasted Merganser	Aves	IE
+Oxyura jamaicensis	C1/C2	Ruddy Duck	Aves	IE
+Tetrao urogallus	B	Western Capercaillie	Aves	IE
+Lagopus lagopus	A/C1	Red Grouse	Aves	IE
+Perdix perdix	A/C1	Grey Partridge	Aves	IE
+Coturnix coturnix	A	Common Quail	Aves	IE
+Phasianus colchicus	C1	Common Pheasant	Aves	IE
+Gavia stellata	A	Red-throated Diver	Aves	IE
+Gavia arctica	A	Black-throated Diver	Aves	IE
+Gavia pacifica	A	Pacific Diver	Aves	IE
+Gavia immer	A	Great Northern Diver	Aves	IE
+Gavia adamsii	A	White-billed Diver	Aves	IE
+Oceanites oceanicus	A	Wilson's Storm Petrel	Aves	IE
+Thalassarche melanophris	A	Black-browed Albatross	Aves	IE
+Hydrobates pelagicus	A	European Storm Petrel	Aves	IE
+Oceanodroma castro	B	Band-rumped Storm Petrel	Aves	IE
+Oceanodroma monteiroi	B	Monteiro's Storm Petrel	Aves	IE
+Oceanodroma jabejabe	B	Cape Verde Storm Petrel	Aves	IE
+Oceanodroma monorhis	A	Swinhoe's Storm Petrel	Aves	IE
+Oceanodroma leucorhoa	A	Leach's Storm Petrel	Aves	IE
+Fulmarus glacialis	A	Northern Fulmar	Aves	IE
+Pterodroma madeira	A	Zino's Petrel	Aves	IE
+Pterodrom feae	A	Fea's Petrel	Aves	IE
+Pterodroma deserta	A	Desertas Petrel	Aves	IE
+Calonectris borealis	A	Cory's Shearwater	Aves	IE
+Ardenna grisea	A	Sooty Shearwater	Aves	IE
+Ardenna gravis	A	Great Shearwater	Aves	IE
+Puffinus puffinus	A	Manx Shearwater	Aves	IE
+Puffinus mauretanicus	A	Balearic Shearwater	Aves	IE
+Puffinus baroli	A	Barolo Shearwater	Aves	IE
+Bulweria bulwerii	A	Bulwer's Petrel	Aves	IE
+Tachybaptus ruficollis	A	Little Grebe	Aves	IE
+Podilymbus podiceps	A	Pied-billed Grebe	Aves	IE
+Podiceps grisegena	A	Red-necked Grebe	Aves	IE
+Podiceps cristatus	A	Great Crested Grebe	Aves	IE
+Podiceps auritus	A	Slavonian Grebe	Aves	IE
+Podiceps nigricollis	A	Black-necked Grebe	Aves	IE
+Ciconia nigra	A	Black Stork	Aves	IE
+Ciconia ciconia	A	White Stork	Aves	IE
+Plegadis falcinellus	A	Glossy Ibis	Aves	IE
+Platalea leucorodia	A	Eurasian Spoonbill	Aves	IE
+Botaurus stellaris	A	Eurasian Bittern	Aves	IE
+Botaurus lentiginosus	A	American Bittern	Aves	IE
+Ixobrychus minutus	A	Little Bittern	Aves	IE
+Nycticorax nycticorax	A	Black-crowned Night Heron	Aves	IE
+Butorides virescens	A	Green Heron	Aves	IE
+Ardeola ralloides	A	Squacco Heron	Aves	IE
+Bubulcus ibis	A	Western Cattle Egret	Aves	IE
+Ardea cinerea	A	Grey Heron	Aves	IE
+Ardea purpurea	A	Purple Heron	Aves	IE
+Ardea alba	A	Great Egret	Aves	IE
+Egretta caerulea	A	Little Blue Heron	Aves	IE
+Egretta garzetta	A	Little Egret	Aves	IE
+Fregata sp.	A	Frigatebird sp.	Aves	IE
+Morus bassanus	A	Northern Gannet	Aves	IE
+Sula leucogaster	A	Brown Booby	Aves	IE
+Phalacrocorax auritus	A	Double-crested Cormorant	Aves	IE
+Phalacrocorax aristotelis	A	European Shag	Aves	IE
+Phalacrocorax carbo	A	Great Cormorant	Aves	IE
+Pandion haliaetus	A	Western Osprey	Aves	IE
+Pernis apivorus	A	European Honey Buzzard	Aves	IE
+Gyps fulvus	B	Griffon Vulture	Aves	IE
+Clanga clanga	B	Greater Spotted Eagle	Aves	IE
+Aquila chrysaetos	A/D4	Golden Eagle	Aves	IE
+Accipiter nisus	A	Eurasian Sparrowhawk	Aves	IE
+Accipiter gentilis	A	Northern Goshawk	Aves	IE
+Circus aeruginosus	A	Western Marsh Harrier	Aves	IE
+Circus cyaneus	A	Hen Harrier	Aves	IE
+Circus hudsonius	A	Northern Harrier	Aves	IE
+Circus macrourus	A	Pallid Harrier	Aves	IE
+Circus pygargus	A	Montagu's Harrier	Aves	IE
+Milvus milvus	A/C2/D4	Red Kite	Aves	IE
+Milvus migrans	A	Black Kite	Aves	IE
+Haliaeetus albicilla	A/C2/D4	White-tailed Eagle	Aves	IE
+Haliaeetus leucocephalus	A	Bald Eagle	Aves	IE
+Buteo lagopus	A	Rough-legged Buzzard	Aves	IE
+Buteo buteo	A	Common Buzzard	Aves	IE
+Otis tarda	B	Great Bustard	Aves	IE
+Tetrax tetrax	B	Little Bustard	Aves	IE
+Rallus aquaticus	A	Water Rail	Aves	IE
+Crex crex	A	Corn Crake	Aves	IE
+Porzana parva	B	Little Crake	Aves	IE
+Porzana pusilla	A	Baillon's Crake	Aves	IE
+Porzana porzana	A	Spotted Crake	Aves	IE
+Porzana carolina	A	Sora	Aves	IE
+Porphyrio martinica	A	Purple Gallinule	Aves	IE
+Gallinula chloropus	A	Common Moorhen	Aves	IE
+Fulica atra	A	Eurasian Coot	Aves	IE
+Fulica americana	A	American Coot	Aves	IE
+Antigone canadensis	B	Sandhill Crane	Aves	IE
+Grus grus	A	Common Crane	Aves	IE
+Burhinus oedicnemus	A	Eurasian Stone-curlew	Aves	IE
+Haematopus ostralegus	A	Eurasian Oystercatcher	Aves	IE
+Himantopus himantopus	A	Black-winged Stilt	Aves	IE
+Recurvirostra avosetta	A	Pied Avocet	Aves	IE
+Vanellus vanellus	A	Northern Lapwing	Aves	IE
+Vanellus gregarius	A	Sociable Lapwing	Aves	IE
+Pluvialis apricaria	A	European Golden Plover	Aves	IE
+Pluvialis fulva	A	Pacific Golden Plover	Aves	IE
+Pluvialis dominica	A	American Golden Plover	Aves	IE
+Pluvialis squatarola	A	Grey Plover	Aves	IE
+Charadrius hiaticula	A	Common Ringed Plover	Aves	IE
+Charadrius semipalmatus	A	Semipalmated Plover	Aves	IE
+Charadrius dubius	A	Little Ringed Plover	Aves	IE
+Charadrius vociferus	A	Killdeer	Aves	IE
+Charadrius alexandrinus	A/E	Kentish Plover	Aves	IE
+Charadrius mongolus	A	Lesser Sand Plover	Aves	IE
+Charadrius leschenaultii	A	Greater Sand Plover	Aves	IE
+Charadrius morinellus	A	Eurasian Dotterel	Aves	IE
+Bartramia longicauda	A	Upland Sandpiper	Aves	IE
+Numenius phaeopus	A	Whimbrel	Aves	IE
+Numenius borealis	B	Eskimo Curlew	Aves	IE
+Numenius arquata	A	Eurasian Curlew	Aves	IE
+Limosa lapponica	A	Bar-tailed Godwit	Aves	IE
+Limosa limosa	A	Black-tailed Godwit	Aves	IE
+Limosa haemastica	A	Hudsonian Godwit	Aves	IE
+Arenaria interpres	A	Ruddy Turnstone	Aves	IE
+Calidris tenuirostris	A	Great Knot	Aves	IE
+Calidris canutus	A	Red Knot	Aves	IE
+Calidris pugnax	A	Ruff	Aves	IE
+Calidris falcinellus	A	Broad-billed Sandpiper	Aves	IE
+Calidris acuminata	A	Sharp-tailed Sandpiper	Aves	IE
+Calidris himantopus	A	Stilt Sandpiper	Aves	IE
+Calidris ferruginea	A	Curlew Sandpiper	Aves	IE
+Calidris temminckii	A	Temminck's Stint	Aves	IE
+Calidris subminuta	A	Long-toed Stint	Aves	IE
+Calidris ruficollis	A	Red-necked Stint	Aves	IE
+Calidris alba	A	Sanderling	Aves	IE
+Calidris alpina	A	Dunlin	Aves	IE
+Calidris maritima	A	Purple Sandpiper	Aves	IE
+Calidris bairdii	A	Baird's Sandpiper	Aves	IE
+Calidris minuta	A	Little Stint	Aves	IE
+Calidris minutilla	A	Least Sandpiper	Aves	IE
+Calidris fuscicollis	A	White-rumped Sandpiper	Aves	IE
+Calidris subruficollis	A	Buff-breasted Sandpiper	Aves	IE
+Calidris melanotos	A	Pectoral Sandpiper	Aves	IE
+Calidris pusilla	A	Semipalmated Sandpiper	Aves	IE
+Calidris mauri	A	Western Sandpiper	Aves	IE
+Limnodromus scolopaceus	A	Long-billed Dowitcher	Aves	IE
+Limnodromus griseus	A	Short-billed Dowitcher	Aves	IE
+Scolopax rusticola	A	Eurasian Woodcock	Aves	IE
+Lymnocryptes minimus	A	Jack Snipe	Aves	IE
+Gallinago media	A	Great Snipe	Aves	IE
+Gallinago gallinago	A	Common Snipe	Aves	IE
+Gallinago delicata	A	Wilson's Snipe	Aves	IE
+Xenus cinereus	A	Terek Sandpiper	Aves	IE
+Phalaropus tricolor	A	Wilson's Phalarope	Aves	IE
+Phalaropus lobatus	A	Red-necked Phalarope	Aves	IE
+Phalaropus fulicarius	A	Grey Phalarope	Aves	IE
+Actitis hypoleucos	A	Common Sandpiper	Aves	IE
+Actitis macularius	A	Spotted Sandpiper	Aves	IE
+Tringa ochropus	A	Green Sandpiper	Aves	IE
+Tringa solitaria	A	Solitary Sandpiper	Aves	IE
+Tringa flavipes	A	Lesser Yellowlegs	Aves	IE
+Tringa totanus	A	Common Redshank	Aves	IE
+Tringa stagnatilis	A	Marsh Sandpiper	Aves	IE
+Tringa glareola	A	Wood Sandpiper	Aves	IE
+Tringa erythropus	A	Spotted Redshank	Aves	IE
+Tringa nebularia	A	Common Greenshank	Aves	IE
+Tringa melanoleuca	A	Greater Yellowlegs	Aves	IE
+Cursorius cursor	A	Cream-coloured Courser	Aves	IE
+Glareola pratincola	A	Collared Pratincole	Aves	IE
+Glareola nordmanni	A	Black-winged Pratincole	Aves	IE
+Rissa tridactyla	A	Black-legged Kittiwake	Aves	IE
+Pagophila eburnea	A	Ivory Gull	Aves	IE
+Xema sabini	A	Sabine's Gull	Aves	IE
+Chroicocephalus philadelphia	A	Bonaparte's Gull	Aves	IE
+Chroicocephalus ridibundus	A	Black-headed Gull	Aves	IE
+Hydrocoloeus minutus	A	Little Gull	Aves	IE
+Rhodostethia rosea	A	Ross's Gull	Aves	IE
+Leucophaeus atricilla	A	Laughing Gull	Aves	IE
+Leucophaeus pipixcan	A	Franklin's Gull	Aves	IE
+Ichthyaetus melanocephalus	A	Mediterranean Gull	Aves	IE
+Larus canus	A	Common Gull	Aves	IE
+Larus delawarensis	A	Ring-billed Gull	Aves	IE
+Larus marinus	A	Great Black-backed Gull	Aves	IE
+Larus glaucescens	A	Glaucous-winged Gull	Aves	IE
+Larus hyperboreus	A	Glaucous Gull	Aves	IE
+Larus glaucoides	A	Iceland Gull	Aves	IE
+Larus argentatus	A	European Herring Gull	Aves	IE
+Larus smithsonianus	A	American Herring Gull	Aves	IE
+Larus vegae	A	Vega Gull	Aves	IE
+Larus cachinnans	A	Caspian Gull	Aves	IE
+Larus michahellis	A	Yellow-legged Gull	Aves	IE
+Larus schistisagus	A	Slaty-backed Gull	Aves	IE
+Larus fuscus	A	Lesser Black-backed Gull	Aves	IE
+Gelochelidon nilotica	A	Gull-billed Tern	Aves	IE
+Hydroprogne caspia	A	Caspian Tern	Aves	IE
+Thalasseus maximus	A/D3	Royal Tern	Aves	IE
+Thalasseus bengalensis	A	Lesser Crested Tern	Aves	IE
+Thalasseus sandvicensis	A	Sandwich Tern	Aves	IE
+Thalasseus elegans	A	Elegant Tern	Aves	IE
+Sternula albifrons	A	Little Tern	Aves	IE
+Onychoprion fuscatus	A	Sooty Tern	Aves	IE
+Sterna dougallii	A	Roseate Tern	Aves	IE
+Sterna hirundo	A	Common Tern	Aves	IE
+Sterna paradisaea	A	Arctic Tern	Aves	IE
+Sterna forsteri	A	Forster's Tern	Aves	IE
+Chlidonias hybrida	A	Whiskered Tern	Aves	IE
+Chlidonias leucopterus	A	White-winged Tern	Aves	IE
+Chlidonias niger	A	Black Tern	Aves	IE
+Stercorarius skua	A	Great Skua	Aves	IE
+Stercorarius pomarinus	A	Pomarine Skua	Aves	IE
+Stercorarius parasiticus	A	Arctic Skua	Aves	IE
+Stercorarius longicaudus	A	Long-tailed Skua	Aves	IE
+Alle alle	A	Little Auk	Aves	IE
+Uria lomvia	A	Bru_nnich's Guillemot	Aves	IE
+Uria aalge	A	Common Guillemot	Aves	IE
+Alca torda	A	Razorbill	Aves	IE
+Pinguinus impennis	B	Great Auk	Aves	IE
+Cepphus grylle	A	Black Guillemot	Aves	IE
+Fratercula arctica	A	Atlantic Puffin	Aves	IE
+Syrrhaptes paradoxus	A	Pallas's Sandgrouse	Aves	IE
+Columba livia	A	Rock Dove	Aves	IE
+Columba oenas	A	Stock Dove	Aves	IE
+Columba palumbus	A	Common Wood Pigeon	Aves	IE
+Streptopelia turtur	A	European Turtle Dove	Aves	IE
+Streptopelia decaocto	A	Eurasian Collared Dove	Aves	IE
+Zenaida macroura	A	Mourning Dove	Aves	IE
+Clamator glandarius	A	Great Spotted Cuckoo	Aves	IE
+Coccyzus americanus	A	Yellow-billed Cuckoo	Aves	IE
+Coccyzus erythropthalmus	B	Black-billed Cuckoo	Aves	IE
+Cuculus canorus	A	Common Cuckoo	Aves	IE
+Tyto alba	A	Western Barn Owl	Aves	IE
+Otus scops	A	Eurasian Scops Owl	Aves	IE
+Bubo scandiacus	A	Snowy Owl	Aves	IE
+Athene noctua	A/C2	Little Owl	Aves	IE
+Asio otus	A	Long-eared Owl	Aves	IE
+Asio flammeus	A	Short-eared Owl	Aves	IE
+Chordeiles minor	A	Common Nighthawk	Aves	IE
+Caprimulgus europaeus	A	European Nightjar	Aves	IE
+Hirundapus caudacutus	A	White-throated Needletail	Aves	IE
+Chaetura pelagica	A	Chimney Swift	Aves	IE
+Tachymarptis melba	A	Alpine Swift	Aves	IE
+Apus apus	A	Common Swift	Aves	IE
+Apus pallidus	A	Pallid Swift	Aves	IE
+Apus affinis	A	Little Swift	Aves	IE
+Coracias garrulus	A	European Roller	Aves	IE
+Alcedo atthis	A	Common Kingfisher	Aves	IE
+Megaceryle alcyon	A	Belted Kingfisher	Aves	IE
+Merops apiaster	A	European Bee-eater	Aves	IE
+Upupa epops	A	Eurasian Hoopoe	Aves	IE
+Jynx torquilla	A	Eurasian Wryneck	Aves	IE
+Sphyrapicus varius	A	Yellow-bellied Sapsucker	Aves	IE
+Dendrocopos major	A	Great Spotted Woodpecker	Aves	IE
+Picus viridis	B	European Green Woodpecker	Aves	IE
+Falco naumanni	B	Lesser Kestrel	Aves	IE
+Falco tinnunculus	A	Common Kestrel	Aves	IE
+Falco vespertinus	A	Red-footed Falcon	Aves	IE
+Falco columbarius	A	Merlin	Aves	IE
+Falco subbuteo	A	Eurasian Hobby	Aves	IE
+Falco rusticolus	A	Gyrfalcon	Aves	IE
+Falco peregrinus	A	Peregrine Falcon	Aves	IE
+Tyrannus tyrannus	A	Eastern Kingbird	Aves	IE
+Lanius cristatus	A	Brown Shrike	Aves	IE
+Lanius collurio	A	Red-backed Shrike	Aves	IE
+Lanius isabellinus	A	Isabelline Shrike	Aves	IE
+Lanius minor	A	Lesser Grey Shrike	Aves	IE
+Lanius excubitor	A	Great Grey Shrike	Aves	IE
+Lanius senator	A	Woodchat Shrike	Aves	IE
+Vireo philadelphicus	A	Philadelphia Vireo	Aves	IE
+Vireo olivaceus	A	Red-eyed Vireo	Aves	IE
+Oriolus oriolus	A	Eurasian Golden Oriole	Aves	IE
+Garrulus glandarius	A	Eurasian Jay	Aves	IE
+Pica pica	A	Eurasian Magpie	Aves	IE
+Pyrrhocorax pyrrhocorax	A	Red-billed Chough	Aves	IE
+Coloeus monedula	A	Western Jackdaw	Aves	IE
+Corvus frugilegus	A	Rook	Aves	IE
+Corvus corone	A	Carrion Crow	Aves	IE
+Corvus cornix	A	Hooded Crow	Aves	IE
+Corvus corax	A	Northern Raven	Aves	IE
+Bombycilla garrulus	A	Bohemian Waxwing	Aves	IE
+Bombycilla cedrorum	A	Cedar Waxwing	Aves	IE
+Periparus ater	A	Coal Tit	Aves	IE
+Poecile palustris	A	Marsh Tit	Aves	IE
+Cyanistes caeruleus	A	Eurasian Blue Tit	Aves	IE
+Parus major	A	Great Tit	Aves	IE
+Panurus biarmicus	A	Bearded Reedling	Aves	IE
+Lullula arborea	A	Woodlark	Aves	IE
+Alauda arvensis	A	Eurasian Skylark	Aves	IE
+Eremophila alpestris	A	Shore Lark	Aves	IE
+Calandrella brachydactyla	A	Greater Short-toed Lark	Aves	IE
+Riparia riparia	A	Sand Martin	Aves	IE
+Hirundo rustica	A	Barn Swallow	Aves	IE
+Delichon urbicum	A	Common House Martin	Aves	IE
+Cecropis daurica	A	Red-rumped Swallow	Aves	IE
+Petrochelidon pyrrhonota	A	American Cliff Swallow	Aves	IE
+Cettia cetti	A	Cetti's Warbler	Aves	IE
+Aegithalos caudatus	A	Long-tailed Tit	Aves	IE
+Phylloscopus sibilatrix	A	Wood Warbler	Aves	IE
+Phylloscopus bonelli	A	Western Bonelli's Warbler	Aves	IE
+Phylloscopus humei	A	Hume's Leaf Warbler	Aves	IE
+Phylloscopus inornatus	A	Yellow-browed Warbler	Aves	IE
+Phylloscopus proregulus	A	Pallas's Leaf Warbler	Aves	IE
+Phylloscopus schwarzi	A	Radde's Warbler	Aves	IE
+Phylloscopus fuscatus	A	Dusky Warbler	Aves	IE
+Phylloscopus trochilus	A	Willow Warbler	Aves	IE
+Phylloscopus collybita	A	Common Chiffchaff	Aves	IE
+Phylloscopus ibericus	A	Iberian Chiffchaff	Aves	IE
+Phylloscopus trochiloides	A	Greenish Warbler	Aves	IE
+Phylloscopus borealis	A	Arctic Warbler	Aves	IE
+Acrocephalus arundinaceus	A	Great Reed Warbler	Aves	IE
+Acrocephalus paludicola	A	Aquatic Warbler	Aves	IE
+Acrocephalus schoenobaenus	A	Sedge Warbler	Aves	IE
+Acrocephalus agricola	A	Paddyfield Warbler	Aves	IE
+Acrocephalus dumetorum	A	Blyth's Reed Warbler	Aves	IE
+Acrocephalus scirpaceus	A	Eurasian Reed Warbler	Aves	IE
+Acrocephalus palustris	A	Marsh Warbler	Aves	IE
+Iduna caligata	A	Booted Warbler	Aves	IE
+Iduna rama	A	Sykes's Warbler	Aves	IE
+Iduna pallida	A	Eastern Olivaceous Warbler	Aves	IE
+Hippolais polyglotta	A	Melodious Warbler	Aves	IE
+Hippolais icterina	A	Icterine Warbler	Aves	IE
+Helopsaltes certhiola	A	Pallas's Grasshopper Warbler	Aves	IE
+Locustella naevia	A	Common Grasshopper Warbler	Aves	IE
+Locustella luscinioides	A	Savi's Warbler	Aves	IE
+Cisticola juncidis	A	Zitting Cisticola	Aves	IE
+Sylvia atricapilla	A	Eurasian Blackcap	Aves	IE
+Sylvia borin	A	Garden Warbler	Aves	IE
+Sylvia nisoria	A	Barred Warbler	Aves	IE
+Sylvia curruca	A	Lesser Whitethroat	Aves	IE
+Sylvia communis	A	Common Whitethroat	Aves	IE
+Sylvia undata	A	Dartford Warbler	Aves	IE
+Sylvia cantillans	A	Subalpine Warbler	Aves	IE
+Sylvia melanocephala	A	Sardinian Warbler	Aves	IE
+Regulus ignicapilla	A	Common Firecrest	Aves	IE
+Regulus regulus	A	Goldcrest	Aves	IE
+Regulus calendula	A	Ruby-crowned Kinglet	Aves	IE
+Troglodytes troglodytes	A	Eurasian Wren	Aves	IE
+Certhia familiaris	A	Eurasian Treecreeper	Aves	IE
+Dumetella carolinensis	A	Grey Catbird	Aves	IE
+Pastor roseus	A	Rosy Starling	Aves	IE
+Sturnus vulgaris	A	Common Starling	Aves	IE
+Geokichla sibirica	A	Siberian Thrush	Aves	IE
+Zoothera aurea	A	White's Thrush	Aves	IE
+Catharus fuscescens	A	Veery	Aves	IE
+Catharus minimus	A	Grey-cheeked Thrush	Aves	IE
+Catharus ustulatus	A	Swainson's Thrush	Aves	IE
+Catharus guttatus	A	Hermit Thrush	Aves	IE
+Turdus torquatus	A	Ring Ouzel	Aves	IE
+Turdus merula	A	Common Blackbird	Aves	IE
+Turdus pilaris	A	Fieldfare	Aves	IE
+Turdus iliacus	A	Redwing	Aves	IE
+Turdus philomelos	A	Song Thrush	Aves	IE
+Turdus viscivorus	A	Mistle Thrush	Aves	IE
+Turdus migratorius	A	American Robin	Aves	IE
+Cercotrichas galactotes	A	Rufous-tailed Scrub Robin	Aves	IE
+Muscicapa striata	A	Spotted Flycatcher	Aves	IE
+Erithacus rubecula	A	European Robin	Aves	IE
+Luscinia svecica	A	Bluethroat	Aves	IE
+Luscinia luscinia	A	Thrush Nightingale	Aves	IE
+Luscinia megarhynchos	A	Common Nightingale	Aves	IE
+Tarsiger cyanurus	A	Red-flanked Bluetail	Aves	IE
+Ficedula hypoleuca	A	European Pied Flycatcher	Aves	IE
+Ficedula albicollis	A	Collared Flycatcher	Aves	IE
+Ficedula parva	A	Red-breasted Flycatcher	Aves	IE
+Ficedula albicilla	A	Taiga Flycatcher	Aves	IE
+Phoenicurus ochruros	A	Black Redstart	Aves	IE
+Phoenicurus phoenicurus	A	Common Redstart	Aves	IE
+Monticola saxatilis	A	Common Rock Thrush	Aves	IE
+Saxicola rubetra	A	Whinchat	Aves	IE
+Saxicola rubicola	A	European Stonechat	Aves	IE
+Saxicola maurus	A	Siberian Stonechat	Aves	IE
+Oenanthe oenanthe	A	Northern Wheatear	Aves	IE
+Oenanthe isabellina	A	Isabelline Wheatear	Aves	IE
+Oenanthe deserti	A	Desert Wheatear	Aves	IE
+Oenanthe hispanica	A	Black-eared Wheatear	Aves	IE
+Oenanthe pleschanka	A	Pied Wheatear	Aves	IE
+Oenanthe leucura	A	Black-crowned Wheatear	Aves	IE
+Oenanthe leucopyga	A	White-crowned Wheatear	Aves	IE
+Cinclus cinclus	A	White-throated Dipper	Aves	IE
+Passer domesticus	A	House Sparrow	Aves	IE
+Passer montanus	A	Eurasian Tree Sparrow	Aves	IE
+Prunella modularis	A	Dunnock	Aves	IE
+Motacilla flava	A	Western Yellow Wagtail	Aves	IE
+Motacilla tschutschensis	A	Eastern Yellow Wagtail	Aves	IE
+Motacilla citreola	A	Citrine Wagtail	Aves	IE
+Motacilla cinerea	A	Grey Wagtail	Aves	IE
+Motacilla alba	A	Pied Wagtail	Aves	IE
+Anthus richardi	A	Richard's Pipit	Aves	IE
+Anthus campestris	A	Tawny Pipit	Aves	IE
+Anthus pratensis	A	Meadow Pipit	Aves	IE
+Anthus trivialis	A	Tree Pipit	Aves	IE
+Anthus hodgsoni	A	Olive-backed Pipit	Aves	IE
+Anthus gustavi	A	Pechora Pipit	Aves	IE
+Anthus cervinus	A	Red-throated Pipit	Aves	IE
+Anthus rubescens	A	Buff-bellied Pipit	Aves	IE
+Anthus spinoletta	A	Water Pipit	Aves	IE
+Anthus petrosus	A	Eurasian Rock Pipit	Aves	IE
+Fringilla coelebs	A	Common Chaffinch	Aves	IE
+Fringilla montifringilla	A	Brambling	Aves	IE
+Coccothraustes coccothraustes	A	Hawfinch	Aves	IE
+Pyrrhula pyrrhula	A	Eurasian Bullfinch	Aves	IE
+Carpodacus erythrinus	A	Common Rosefinch	Aves	IE
+Chloris chloris	A	European Greenfinch	Aves	IE
+Linaria flavirostris	A	Twite	Aves	IE
+Linaria cannabina	A	Common Linnet	Aves	IE
+Acanthis flammea	A	Common Redpoll	Aves	IE
+Acanthis cabaret	A	Lesser Redpoll	Aves	IE
+Acanthis hornemanni	A	Arctic Redpoll	Aves	IE
+Loxia curvirostra	A	Crossbill	Aves	IE
+Loxia leucoptera	A	Two-barred Crossbill	Aves	IE
+Carduelis carduelis	A	European Goldfinch	Aves	IE
+Serinus serinus	A	European Serin	Aves	IE
+Spinus spinus	A	Eurasian Siskin	Aves	IE
+Calcarius lapponicus	A	Lapland Bunting	Aves	IE
+Plectrophenax nivalis	A	Snow Bunting	Aves	IE
+Emberiza calandra	A	Corn Bunting	Aves	IE
+Emberiza citrinella	A	Yellowhammer	Aves	IE
+Emberiza leucocephalos	A	Pine Bunting	Aves	IE
+Emberiza hortulana	A	Ortolan Bunting	Aves	IE
+Emberiza cirlus	A	Cirl Bunting	Aves	IE
+Emberiza pusilla	A	Little Bunting	Aves	IE
+Emberiza rustica	A	Rustic Bunting	Aves	IE
+Emberiza aureola	A	Yellow-breasted Bunting	Aves	IE
+Emberiza melanocephala	A	Black-headed Bunting	Aves	IE
+Emberiza schoeniclus	A	Common Reed Bunting	Aves	IE
+Passerella iliaca	A	Red Fox Sparrow	Aves	IE
+Zonotrichia leucophrys	A	White-crowned Sparrow	Aves	IE
+Zonotrichia albicollis	A	White-throated Sparrow	Aves	IE
+Junco hyemalis	A	Dark-eyed Junco	Aves	IE
+Dolichonyx oryzivorus	A	Bobolink	Aves	IE
+Icterus galbula	A	Baltimore Oriole	Aves	IE
+Seiurus aurocapilla	A	Ovenbird	Aves	IE
+Parkesia noveboracensis	A	Northern Waterthrush	Aves	IE
+Vermivora cyanoptera	A	Blue-winged Warbler	Aves	IE
+Mniotilta varia	A	Black-and-white Warbler	Aves	IE
+Geothlypis trichas	A	Common Yellowthroat	Aves	IE
+Setophaga ruticilla	A	American Redstart	Aves	IE
+Setophaga americana	A	Northern Parula	Aves	IE
+Setophaga aestiva	A	American Yellow Warbler	Aves	IE
+Setophaga striata	A	Blackpoll Warbler	Aves	IE
+Setophaga coronata	A	Myrtle Warbler	Aves	IE
+Cardellina canadensis	A	Canada Warbler	Aves	IE
+Cardellina pusilla	A	Wilson's Warbler	Aves	IE
+Piranga olivacea	A	Scarlet Tanager	Aves	IE
+Pheucticus ludovicianus	A	Rose-breasted Grosbeak	Aves	IE
+Passerina cyanea	A	Indigo Bunting	Aves	IE
+Aix sponsa	D1	Wood Duck	Aves	IE
+Mareca falcata	D1	Falcated Duck	Aves	IE
+Alectoris rufa	D4	Red-legged Partridge	Aves	IE
+Phoenicopterus roseus	D1	Greater Flamingo	Aves	IE
+Hieraaetus pennatus	D1	Booted Eagle	Aves	IE
+Onychoprion anaethetus	D3	Bridled Tern	Aves	IE
+Colaptes auratus	D2	Northern Flicker	Aves	IE
+Corvus splendens	D2	House Crow	Aves	IE
+Progne subis	D1	Purple Martin	Aves	IE
+Serinus tristis	D1	American Goldfinch	Aves	IE
+Emberiza bruniceps	D1	Red-headed Bunting	Aves	IE
+Pterodroma cahow	At Sea	Bermuda Petrel	Aves	IE
+Phaethon aethereus	At Sea	Red-billed Tropicbird	Aves	IE
+Ficedula albicilla	Since 2000	Taiga Flycatcher	Aves	IE
+Catharus fuscescens	Since 2000	Veery	Aves	IE
+Sula leucogaster	Since 2000	Brown Booby	Aves	IE
+Charadrius leschenaultii	Since 2000	Greater Sand Plover	Aves	IE
+Larus vegae	Since 2000	Vega Gull	Aves	IE
+Larus glaucescens	Since 2000	Glaucous-winged Gull	Aves	IE
+Limosa haemastica	Since 2000	Hudsonian Godwit	Aves	IE
+Melanitta americana	Since 2000	Black Scoter	Aves	IE
+Larus schistisagus	Since 2000	Slaty-backed Gull	Aves	IE
+Porphyrio martinicus	Since 2000	American Purple Gallinule	Aves	IE
+Regulus calendula	Since 2000	Ruby-crowned Kinglet	Aves	IE
+Motacilla tschutschensis	Since 2000	Eastern Yellow Wagtail	Aves	IE
+Cardellina pusilla	Since 2000	Wilson's Warbler	Aves	IE
+Bulweria bulwerii	Since 2000	Bulwer's Petrel	Aves	IE
+Charadrius mongolus	Since 2000	Lesser Sand Plover	Aves	IE
+Tyrannus tyrannus	Since 2000	Eastern Kingbird	Aves	IE
+Ficedula albicollis	Since 2000	Collared Flycatcher	Aves	IE
+Circus macrourus	Since 2000	Pallid Harrier	Aves	IE
+Melanitta deglandi	Since 2000	White-winged Scoter	Aves	IE
+Sylvia curruca halimodendri	Since 2000	Central Asian Lesser Whitethroat	Aves	IE
+Circus hudsonius	Since 2000	Northern Harrier	Aves	IE
+Phylloscopus ibericus	Since 2000	Iberian Chiffchaff	Aves	IE
+acanthis hornemanni 	Since 2000	Coue's Arctic Redpoll	Aves	IE
+Sibirionetta formosa	Since 2000	Baikal Teal	Aves	IE
+Somateria mollissima dresseri	Since 2000	Dresser's Eider	Aves	IE
+Tarsiger cyanurus	Since 2000	Red-flanked Bluetail	Aves	IE
+Bombycilla cedrorum	Since 2000	Cedar Waxwing	Aves	IE
+Thalasseus maximus	Since 2000	Royal Tern	Aves	IE
+Gavia pacifica	Since 2000	Pacific Diver	Aves	IE
+Egretta caerulea	Since 2000	Little Blue Heron	Aves	IE
+Zenaida macroura	Since 2000	Mourning Dove	Aves	IE
+Sylvia cantillans albistriata	Since 2000	Eastern Subalpine Warbler	Aves	IE
+Motacilla feldegg	Since 2000	Black-headed Wagtail	Aves	IE
+Acrocephalus dumetorum	Since 2000	Blyth's Reed Warbler	Aves	IE
+Cardellina canadensis	Since 2000	Canada Warbler	Aves	IE
+Emberiza cirlus	Since 2000	Cirl Bunting	Aves	IE
+Bucephala islandica	Since 2000	Barrow's Goldeneye	Aves	IE
+Buteo lagopus	Since 2000	Rough-legged Hawk	Aves	IE
+Butorides virescens	Since 2000	Green Heron	Aves	IE
+Calidris tenuirostris	Since 2000	Great Knot	Aves	IE
+Phylloscopus humei	Since 2000	Hume's Leaf Warbler	Aves	IE
+Charadrius semipalmatus	Since 2000	Semipalmated Plover	Aves	IE
+Geothlypis trichas	Since 2000	Common Yellowthroat	Aves	IE
+Iduna caligata	Since 2000	Booted Warbler	Aves	IE
+Aythya americana	Since 2000	Redhead	Aves	IE
+Zonotrichia leucophrys	Since 2000	White-crowned Sparrow	Aves	IE
+Onychoprion fuscatus	Since 2000	Sooty Tern	Aves	IE
+Lanius senator badius	Since 2000	Balearic Woodchat Shrike	Aves	IE
+Icterus galbula	Since 2000	Baltimore Oriole	Aves	IE
+Cettia cetti	Since 2000	Cetti's Warbler	Aves	IE
+Lanius isabellinus	Since 2000	Isabelline Shrike	Aves	IE
+Vermivora cyanoptera	Since 2000	Blue-winged Warbler	Aves	IE
+Falco columbarius columbarius	Since 2000	Taiga Merlin	Aves	IE

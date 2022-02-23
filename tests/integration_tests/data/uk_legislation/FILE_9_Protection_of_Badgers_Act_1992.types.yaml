@@ -1,0 +1,18 @@
+file:
+  format: tsv
+  header: true
+  name: 9_Protection_of_Badgers_Act_1992.tsv
+  source: Protection of Badgers Act 1992
+  source_url: https://www.legislation.gov.uk/ukpga/1992/51/contents
+attributes:
+  protection_of_badgers_act_1992:
+    header: protection_of_badgers_act_1992
+    type: keyword
+taxon_names:
+  common_name:
+    header: common_name
+taxonomy:
+  species:
+    header: scientific_name
+  order:
+    header: order

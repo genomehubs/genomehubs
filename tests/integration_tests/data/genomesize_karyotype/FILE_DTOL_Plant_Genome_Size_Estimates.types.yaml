@@ -1,0 +1,22 @@
+file:
+  format: tsv
+  header: true
+  name: DTOL_Plant_Genome_Size_Estimates.tsv
+  source: DTOL Plant Genome Estimates Kew
+attributes:
+  genome_size:
+    type: long
+    function: "{} * 978000000"
+    header: gs_pg_1c
+  c_value:
+    header: gs_pg_1c
+    type: half_float
+taxonomy:
+  species:
+    index: [5, 6]
+    join: " "
+  family:
+    header: "higher_group"
+metadata:
+  is_primary_value:
+    header: primary

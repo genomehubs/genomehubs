@@ -1,0 +1,25 @@
+file:
+  format: tsv
+  header: false
+  comment: "#"
+  name: DTOL_Plants_20210817_expanded.tsv
+  source: Peter Hollingsworth RBGE
+  source_date: 2021-02-07
+attributes:
+  long_list:
+    index: 3
+    type: keyword
+  other_priority:
+    index: 4
+    type: keyword
+  family_representative:
+    index: 5
+    type: keyword
+taxonomy:
+  genus:
+    index: 0
+  species:
+    index: [0, 1]
+    join: " "
+  family:
+    index: 2

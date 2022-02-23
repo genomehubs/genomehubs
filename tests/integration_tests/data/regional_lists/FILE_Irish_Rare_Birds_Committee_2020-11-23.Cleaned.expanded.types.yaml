@@ -1,0 +1,19 @@
+file:
+  format: tsv
+  header: true
+  name: Irish_Rare_Birds_Committee_2020-11-23.Cleaned.expanded.tsv
+  source: Irish Rare Birds Committee
+  description: Irish List covering the whole of Ireland on 31st Dec 2019 (IOC 9.1 sequence and scientific nomenclature)
+  source_url: http://www.irbc.ie/topbar/IrishList/IRBC_IrishList(31122018).pdf
+attributes:
+  country_list:
+    header: IRBC
+    type: keyword
+taxon_names:
+  common_name:
+    header: common_name
+taxonomy:
+  species:
+    header: scientific_name
+  class:
+    header: class

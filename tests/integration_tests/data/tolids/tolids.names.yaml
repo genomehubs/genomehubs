@@ -1,0 +1,28 @@
+file:
+  format: tsv
+  header: false
+  name: tolids.tsv.gz
+  source: dToL sample naming
+  source_url: https://gitlab.com/wtsi-grit/darwin-tree-of-life-sample-naming
+taxon_names:
+  tol_id:
+    index: 0
+  common_name:
+    index: 3
+taxonomy:
+  taxon_id:
+    index: 2
+  alt_taxon_id:
+    index: 0
+  species:
+    index: 1
+  genus:
+    index: 4
+  family:
+    index: 5
+  order:
+    index: 6
+  class:
+    index: 7
+  phylum:
+    index: 8

@@ -1,0 +1,38 @@
+file:
+  format: tsv
+  header: true
+  comment: "#"
+  name: sts_2022-02-15_3036.tsv
+  source: DTOL STS
+  source_date: 2022-02-15
+  source_url: https://sts.tol.sanger.ac.uk/api/v1/swagger
+attributes:
+  family_representative:
+    header: family_representative
+    type: keyword
+  sequencing_status:
+    header: sequencing_status_simple
+    type: keyword
+  sample_collected:
+    header: sample_collected
+    type: keyword
+  sample_acquired:
+    header: sample_acquired
+    type: keyword
+  in_progress:
+    header: in_progress
+    type: keyword
+  sample_collected_by:
+    translate:
+      MARINE BIOLOGICAL ASSOCIATION: MBA
+      NATURAL HISTORY MUSEUM: NHM
+      ROYAL BOTANIC GARDEN EDINBURGH: RBGE
+      ROYAL BOTANIC GARDENS KEW: KEW
+      SANGER INSTITUTE: SAN
+      UNIVERSITY OF OXFORD: OXF
+    header: submitted_gals
+    separator: ","
+    type: keyword
+taxonomy:
+  taxon_id:
+    header: taxon_id

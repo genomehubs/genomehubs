@@ -1,0 +1,25 @@
+file:
+  format: tsv
+  header: true
+  name: 1_Council_Directive_92_43_EEC_1992_ANNEX_IVb_Plants.tsv
+  source: Council Directive 92/43/EEC 1992 Annex IVb Plants
+  description: List of protected plant species under Annex IVb of the Council Directive 92/43/EEC of 21 May 1992 on the conservation of natural habitats and of wild fauna and flora 
+  url: https://www.legislation.gov.uk/eudr/1992/43/annex/IV
+attributes:
+  echabs92:
+    header: echabs92
+    separator:
+      - ","
+    type: keyword
+taxonomy:
+  species:
+    header: scientific_name
+  subspecies:
+    header: subspecies
+  phylum:
+    header: phylum
+  synonym:
+    header: synonym
+metadata:
+  comment:
+    header: comment

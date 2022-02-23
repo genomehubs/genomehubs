@@ -1,0 +1,38 @@
+number_ncbi_taxon_id	genus	species	family	target_list_status	sequencing_status	synonym	long_list	other_priority	family_representative	sample_collected	sample_acquired	in_progress	insdc_open	published
+7726	Styela	plicata	Styelidae	cbp	in_assembly	NA	cbp			cbp	cbp	cbp		
+7740	Branchiostoma	lanceolatum	Branchiostomidae	cbp	in_assembly	NA	cbp			cbp	cbp	cbp		
+8959	Aegypius	monachus	Accipitridae	cbp_other_priority	sample_acquired	NA	cbp	cbp		cbp	cbp			
+27890	Dugesia	subtentaculata	Dugesiidae	cbp	sample_acquired	NA	cbp			cbp	cbp			
+28930	Fagus	sylvatica	Fagaceae	cbp	in_assembly	NA	cbp			cbp	cbp	cbp		
+33608	Neophron	percnopterus	Accipitridae	cbp_other_priority	sample_acquired	NA	cbp	cbp		cbp	cbp			
+33610	Gypaetus	barbatus	Accipitridae	cbp_other_priority	in_assembly	NA	cbp	cbp		cbp	cbp	cbp		
+34765	Oikopleura	dioica	Oikopleuridae	cbp	in_assembly	NA	cbp			cbp	cbp	cbp		
+48681	Puffinus	mauretanicus	Procellariidae	cbp_other_priority	insdc_submitted	NA	cbp	cbp		cbp	cbp	cbp		
+48815	Ramonda	myconi	Gesneriaceae	cbp_other_priority	NA	NA	cbp	cbp						
+48915	Diplodus	puntazzo	Sparidae	cbp	in_assembly	NA	cbp			cbp	cbp	cbp		
+61904	Belisarius	xambeui	Chactidae	cbp	in_assembly	NA	cbp			cbp	cbp	cbp		
+64176	Podarcis	muralis	Lacertidae	cbp	sample_acquired	NA	cbp			cbp	cbp			
+74358	Podarcis	lilfordi	Lacertidae	cbp_other_priority	in_assembly	NA	cbp	cbp		cbp	cbp	cbp		
+89891	Derocheilocaris	remanei	Derocheilocarididae	cbp_family_representative	sample_acquired	NA	cbp	cbp	cbp	cbp	cbp			
+133233	Achillea	ptarmica subsp.pyrenaica	Asteraceae	cbp	Sample located	NA	cbp			cbp				
+142104	Corallium	rubrum	Coralliidae	cbp_other_priority	sample_acquired	NA	cbp	cbp		cbp	cbp			
+172826	Amastigomonas	sp.	Apusomonadidae	cbp	data_generation	NA	cbp			cbp	cbp	cbp		
+242261	Coenonympha	glycerion Borkhausen	Nymphalidae	cbp	sample_acquired	NA	cbp			cbp	cbp			
+246179	Vipera	latastei	Viperidae	cbp	in_assembly	NA	cbp			cbp	cbp	cbp		
+317549	Paramuricea	clavata	Plexauridae	cbp_other_priority	insdc_submitted	NA	cbp	cbp		cbp	cbp	cbp		
+342570	Calotriton	arnoldi	Salamandridae	cbp_other_priority	data_generation	NA	cbp	cbp		cbp	cbp	cbp		
+390489	Dugastella	valentina	Atyidae	cbp_other_priority	data_generation	NA	cbp	cbp		cbp	cbp	cbp		
+595358	Cyclops	abyssorum	Cyclopidae	cbp	data_generation	NA	cbp			cbp	cbp	cbp		
+627345	Emberiza	schoeniclus witherbyi	Emberizidae	cbp_other_priority	data_generation	NA	cbp	cbp		cbp	cbp	cbp		
+1504802	Cyperus	esculentus var. sativus	Cyperaceae	cbp	sample_acquired	NA	cbp			cbp	cbp			
+2766786	Mediocremonas	mediterraneus	Developayellaceae	cbp_other_priority	sample_acquired	NA	cbp	cbp		cbp	cbp			
+2795559	Lycaena	helle	Lycaenidae	cbp	sample_acquired	NA	cbp			cbp	cbp			
+398063	Capra	pyrenaica	Bovidae	cbp	sample_acquired	NA	cbp			cbp	cbp			
+NA	Xatardia	scabra	Apiaceae	cbp	NA	NA	cbp							
+NA	Sensonator	valentiensis	Sensonatoridae	cbp_family_representative	in_assembly	NA	cbp	cbp	cbp	cbp	cbp	cbp		
+NA	Dysdera	catalonica	Dysderidae	cbp	assembly	NA	cbp			cbp	cbp	cbp		
+NA	Eukoenenia	zariquieyi	Eukoeneniidae	cbp_family_representative	sample_acquired	NA	cbp	cbp	cbp	cbp	cbp			
+NA	Dendrodoris	n. sp.	Dendrodorididae	cbp	in_assembly	NA	cbp			cbp	cbp	cbp		
+NA	Norana	najaformis	Hormogastridae	cbp	data_generation	NA	cbp			cbp	cbp	cbp		
+NA	Heterotanais	oerstedii	Leptocheliidae	cbp_family_representative	data_generation	NA	cbp	cbp	cbp	cbp	cbp	cbp		
+593788	Cystoseira	mediterranea	Sargassaceae	cbp_other_priority	sample_acquired	Ericaria mediterranea	cbp	cbp		cbp	cbp			

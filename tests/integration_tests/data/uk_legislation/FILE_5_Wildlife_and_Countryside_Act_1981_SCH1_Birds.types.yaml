@@ -1,0 +1,24 @@
+file:
+  format: tsv
+  header: true
+  name: 5_Wildlife_and_Countryside_Act_1981_SCH1_Birds.tsv
+  source: Wildlife and Countryside Act 1981 Schedule 1 Birds
+  description: List of protected bird species under the Wildlife and Countryside Act 1981 Schedule 1 Part 1
+  source_url: https://www.legislation.gov.uk/ukpga/1981/69/schedule/1
+attributes:
+  waca_1981:
+    header: waca_1981
+    type: keyword
+taxon_names:
+  common_name:
+    header: common_name
+taxonomy:
+  species:
+    header: scientific_name
+  class:
+    header: class
+  subspecies:
+    header: subspecies
+metadata:
+  comment:
+    header: comment

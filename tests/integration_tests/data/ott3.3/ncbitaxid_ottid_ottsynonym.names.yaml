@@ -1,0 +1,10 @@
+file:
+  format: tsv
+  header: true
+  name: ncbitaxid_ottid_ottsynonym.tsv.gz
+taxonomy:
+  taxon_id:
+    header: ncbitaxid
+taxon_names:
+  synonym:
+    header: synonym

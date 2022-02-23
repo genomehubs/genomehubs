@@ -1,0 +1,261 @@
+attributes:
+  c_value:
+    bins:
+      min: -2.5
+      max: 2.5
+      count: 10
+      scale: log10
+    constraint:
+      max: 200
+      min: 0
+    description: 1C value
+    display_level: 1
+    display_name: C value
+    display_group: genome_size
+    summary:
+    - primary
+    - median
+    - min
+    - max
+    traverse: mean
+    traverse_direction: both
+    type: half_float
+    units: pgDNA
+  c_value_method:
+    constraint:
+      enum:
+        - Biochemical Analysis
+        - Bulk Fluorometric Assay
+        - Complete Genome Sequencing
+        - Feulgen Densitometry
+        - Feulgen Image Analysis Densitometry
+        - Flow Cytometry
+        - Flow karyotyping
+        - Fluorescence Fading Analysis
+        - Gallocyanin Chrom Alum Densitometry
+        - Methyl Green Densitometry
+        - Not Specified
+        - Static Cell Fluorometry
+        - Ultraviolet Microscopy
+        - Unknown
+        - biochemical analysis
+        - feulgen image analysis densitometry
+        - flow cytometry 
+        - feulgen densitometry
+        - feulgen densitometry & flow cytometry
+        - microdensitometry
+        - pulse field gel electrophoresis
+        - reassociation kinetics
+        - whole genome sequencing
+    description: C value estimation method
+    display_level: 2
+    display_name: C value method
+    display_group: genome_size
+    summary: list
+    translate:
+      BCA: Biochemical Analysis
+      BFA: Bulk Fluorometric Assay
+      CS: Complete Genome Sequencing
+      FD: Feulgen Densitometry
+      FIA: Feulgen Image Analysis Densitometry
+      FCM: Flow Cytometry
+      FK: Flow karyotyping
+      FFA: Fluorescence Fading Analysis
+      GCD: Gallocyanin Chrom Alum Densitometry
+      MGD: Methyl Green Densitometry
+      NS: Not Specified
+      SCF: Static Cell Fluorometry
+      UVM: Ultraviolet Microscopy
+      UN: Unknown
+      Ch: Biochemical Analysis
+      CIA: Feulgen Image Analysis Densitometry
+      FC:?: Flow Cytometry
+      FC:DAPI: Flow Cytometry
+      FC:EB: Flow Cytometry
+      FC:EB & O: Flow Cytometry
+      FC:Hoechst: Flow Cytometry
+      FC:MI: Flow Cytometry
+      FC:PI: Flow Cytometry
+      FC:PI & EB: Flow Cytometry
+      FC:SYBR: Flow Cytometry
+      Fe: Feulgen Densitometry
+      Fe & FC:EB: Feulgen Densitometry & Flow Cytometry
+      Fe & FC:PI: Feulgen Densitometry & Flow Cytometry
+      M:DAPI: Microdensitometry
+      M:H: Microdensitometry
+      M:PI: Microdensitometry
+      PFGE: Pulse field gel electrophoresis
+      RK: Reassociation kinetics
+      WGS: Whole genome sequencing
+    traverse: false
+    type: keyword
+  c_value_cell_type:
+    constraint:
+      enum:
+        - Antennae
+        - Antennal gland
+        - Blood cells
+        - Brain
+        - Buccal epithelium
+        - Coelomocytes
+        - Corneal epithelium
+        - Digestive gland
+        - Dorsal fin clip
+        - Egg
+        - Embyro
+        - Epidermis
+        - Exopodite
+        - Fibroblasts
+        - Fin clips
+        - Germarium
+        - Gills
+        - Haemocytes
+        - Heart cells
+        - Individual chromosomes
+        - Intestine
+        - Kidney cells
+        - Legs
+        - Leukocytes
+        - Liver
+        - Lung (culture)
+        - Mantle
+        - Midgut
+        - Muscle cells
+        - NE
+        - Not specified
+        - Oocytes
+        - Ovaries
+        - Pancreas
+        - Pharynx
+        - Polypide cells in suspension
+        - Red blood cells
+        - Retinal cells
+        - Salivary gland
+        - Somatic cells
+        - Sperm
+        - Spleen
+        - Tentacles
+        - Testes
+        - Thymus
+        - Tissue Culture
+        - Various
+        - Ventral hypodermal chord
+        - Whole body
+        - Whole body squash
+    description: Cell type
+    display_level: 2
+    display_name: C value cell type
+    display_group: genome_size
+    summary: list
+    translate:
+      AN: Antennae
+      AG: Antennal gland
+      BL: Blood cells
+      BR: Brain
+      BE: Buccal epithelium
+      C: Coelomocytes
+      CE: Corneal epithelium
+      DG: Digestive gland
+      FC: Dorsal fin clip
+      E: Egg
+      EM: Embyro
+      EP: Epidermis
+      EXP: Exopodite
+      FB: Fibroblasts
+      FC: Fin clips
+      GM: Germarium
+      G: Gills
+      HE: Haemocytes
+      HC: Heart cells
+      IC: Individual chromosomes
+      INT: Intestine
+      KC: Kidney cells
+      L: Legs
+      LK: Leukocytes
+      LV: Liver
+      LG: Lung (culture)
+      MT: Mantle
+      MG: Midgut
+      MC: Muscle cells
+      Neurons: NE
+      NS: Not specified
+      OC: Oocytes
+      OV: Ovaries
+      P: Pancreas
+      PH: Pharynx
+      PPC: Polypide cells in suspension
+      RBC: Red blood cells
+      RC: Retinal cells
+      SG: Salivary gland
+      SC: Somatic cells
+      S: Sperm
+      SP: Spleen
+      TN: Tentacles
+      TS: Testes
+      TH: Thymus
+      TC: Tissue Culture
+      V: Various
+      VHC: Ventral hypodermal chord
+      WB: Whole body
+      SQ: Whole body squash
+    traverse: false
+    type: keyword
+  genome_size:
+    bins:
+      min: 6
+      max: 11
+      count: 10
+      scale: log10
+    constraint:
+      min: 0
+    description: Genome size
+    display_name: Genome size
+    display_level: 1
+    display_group: genome_size
+    summary:
+    - primary
+    - median
+    - min
+    - max
+    traverse: median
+    traverse_direction: both
+    type: long
+    units: bases
+  genome_size_kmer:
+    bins:
+      min: 6
+      max: 11
+      count: 10
+      scale: log10
+    constraint:
+      min: 0
+    description: Genome size estimate from kmers
+    display_level: 1
+    display_name: Genome size kmer
+    display_group: genome_size
+    summary:
+    - primary
+    - median
+    - min
+    - max
+    type: long
+    units: bases
+  genome_size_draft:
+    bins:
+      min: 6
+      max: 11
+      count: 10
+      scale: log10
+    constraint:
+      min: 0
+    description: Genome size estimate from draft assembly
+    display_level: 1
+    display_name: Genome size draft
+    display_group: genome_size
+    summary:
+    - primary
+    - median
+    - min
+    - max
+    type: long
+    units: bases

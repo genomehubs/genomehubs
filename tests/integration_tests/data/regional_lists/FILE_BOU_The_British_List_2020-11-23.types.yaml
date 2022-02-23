@@ -1,0 +1,19 @@
+file:
+  format: tsv
+  header: true
+  name: BOU_The_British_List_2020-11-23.tsv
+  source: British Ornithologists' Union, The British List
+  description: This list includes all species (619 as at 1 January 2020) recorded in a wild (or apparently wild) state in Britain, as recognised by the British Ornithologists' Union; see their latest (9th) Checklist. The Irish Rare Birds Committee maintains a separate list for species occurring in Ireland. In addition to the common and scientific names, the table indicates its status in Britain and BTO 2 letter and 5 letter codes. Population size is given for the breeding season (unless this is small, or the species only occurs in winter, in which case the winter or, where appropriate, passage population is given); all estimates are per year, except those where the total number of Records (since 1950) is indicated. Clicking on the species name will take you through to the relevant BirdFacts species page for more information on the species. View more information on the order of species used, and why it changes.  Chapter 17 Chapter 17 (PDF, 287.30 KB)  of the book Silent Summer discusses some of the factors affecting our bird populations.
+  source_url: https://www.bto.org/understanding-birds/birdfacts/british-list
+attributes:
+  country_list:
+    header: bou_the_british_list
+    type: keyword
+taxon_names:
+  common_name:
+    header: common_name
+taxonomy:
+  species:
+    header: scientific_name
+  class:
+    header: class

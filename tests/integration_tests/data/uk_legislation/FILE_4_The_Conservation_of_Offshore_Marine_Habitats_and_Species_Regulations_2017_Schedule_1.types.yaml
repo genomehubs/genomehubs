@@ -1,0 +1,19 @@
+file:
+  format: tsv
+  header: true
+  name: 4_The_Conservation_of_Offshore_Marine_Habitats_and_Species_Regulations_2017_Schedule_1.tsv
+  source: The Conservation of Offshore Marine Habitats and Species Regulations 2017 Schedule 1
+  description: List of protected marine species under The Conservation of Offshore Marine Habitats and Species Regulations 2017 Schedule 1
+  source_url: https://www.legislation.gov.uk/uksi/2017/1013/schedule/1
+attributes:
+  marhabreg-2017:
+    header: marhabreg-2017
+    type: keyword
+taxon_names:
+  common_name:
+    header: common_name
+taxonomy:
+  species:
+    header: scientific_name
+  phylum:
+    header: phylum

@@ -1,0 +1,26 @@
+file:
+  format: tsv
+  header: true
+  name: 2_The_Conservation_of_Habitats_and_Species_Regulations_2017_Schedule_2_Animals.tsv
+  source: The Conservation of Habitats and Species Regulations 2017 Schedule 2
+  description: List of protected animal species under The Conservation of Habitats and Species Regulations 2017 Schedule 2
+  source_url: https://www.legislation.gov.uk/uksi/2017/1012/schedule/2
+attributes:
+  habreg_2017:
+    header: habreg_2017
+    type: keyword
+taxon_names:
+  common_name:
+    header: common_name
+taxonomy:
+  species:
+    header: scientific_name
+  phylum:
+    header: phylum
+  subspecies:
+    header: subspecies
+  alt_taxon_id:
+    header: alt_taxon_id
+metadata:
+  comment:
+    header: comment

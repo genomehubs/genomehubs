@@ -1,0 +1,621 @@
+common_name	scientific_name	type	population	two_letter_code	five_letter_code	class	bou_the_british_list
+Capercaillie	Tetrao urogallus	Re-introduced Breeder	"1,000 - 10,000 Adults"	CP	CAPER	Aves	GB
+Black Grouse	Lyrurus tetrix	Resident Breeder	"1,000 - 10,000 Males"	BK	BLAGR	Aves	GB
+Ptarmigan	Lagopus muta	Resident Breeder	"1,000 - 10,000 Pairs"	PM	PTARM	Aves	GB
+Red Grouse	Lagopus lagopus	Resident Breeder	"100,000 - 500,000 Pairs"	RG	REDGR	Aves	GB
+Red-legged Partridge	Alectoris rufa	Introduced Breeder	"10,000 - 100,000 Territories"	RL	RELPA	Aves	GB
+Grey Partridge	Perdix perdix	Resident/Introduced Breeder	"10,000 - 100,000 Territories"	P.	GREPA	Aves	GB
+Quail	Coturnix coturnix	Migrant Breeder	500 - 1000 Males	Q.	QUAIL	Aves	GB
+Pheasant	Phasianus colchicus	Introduced Breeder	4 million Birds	PH	PHEAS	Aves	GB
+Golden Pheasant	Chrysolophus pictus	Introduced Breeder	100-500 Pairs	GF	GOLPH	Aves	GB
+Lady Amherst's Pheasant	Chrysolophus amherstiae	Introduced Breeder	1-10 Males	LM	LAAPH	Aves	GB
+Brent Goose	Branta bernicla	Winter Visitor	"100,000 - 500,000 Birds"	BG	BREGO	Aves	GB
+Red-breasted Goose	Branta ruficollis	Accidental	10 - 100 Records	EB	REBGO	Aves	GB
+Canada Goose	Branta canadensis	"Introduced Breeder, Accidental"	"10,000 - 100,000 Pairs"	CG	CANGO	Aves	GB
+Cackling Goose	Branta hutchinsii	Accidental	10 - 100 Records	LQ		Aves	GB
+Barnacle Goose	Branta leucopsis	"Escaped Breeder, Winter Visitor"	"100,000 - 500,000 Birds"	BY	BARGO	Aves	GB
+Snow Goose	Anser caerulescens	Scarce Visitor	10 - 100 Birds	SJ	SNOGO	Aves	GB
+Greylag Goose	Anser anser	"Introduced/Resident Breeder, Winter Migrant"	"10,000 - 100,000 Pairs"	GJ	GREGO	Aves	GB
+Taiga Bean Goose	Anser fabalis	Winter Migrant	100-500 Birds	XF		Aves	GB
+Tundra Bean Goose	Anser serrirostris	Winter Migrant	100-500 Birds	XR		Aves	GB
+Pink-footed Goose	Anser brachyrhynchus	Winter Migrant	"500,000 - 1 million Birds"	PG	PIFGO	Aves	GB
+White-fronted Goose	Anser albifrons	Winter Migrant	"10,000 - 100,000 Birds"	WG	WHFGO	Aves	GB
+Lesser White-fronted Goose	Anser erythropus	Accidental	100-500 Records	LC	LWFGO	Aves	GB
+Mute Swan	Cygnus olor	Resident/Introduced Breeder	"1,000 - 10,000 Pairs"	MS	MUTSW	Aves	GB
+Bewick's Swan	Cygnus columbianus	Winter Migrant	"1,000 - 10,000 Birds"	BS	BEWSW	Aves	GB
+Whooper Swan	Cygnus cygnus	"Scarce Breeder, Winter Migrant"	"10,000 - 100,000 Birds"	WS	WHOSW	Aves	GB
+Egyptian Goose	Alopochen aegyptiaca	Introduced Breeder	"1,000 - 10,000 Pairs"	EG	EGYGO	Aves	GB
+Shelduck	Tadorna tadorna	"Migrant/Resident Breeder, Winter Visitor"	"10,000 - 100,000 Pairs"	SU	SHELD	Aves	GB
+Ruddy Shelduck	Tadorna ferruginea	"Escaped, Former Visitor (Last Record 1946)"	1-10 Records	UD	RUDSH	Aves	GB
+Mandarin Duck	Aix galericulata	Introduced Breeder	"1,000 - 10,000 Pairs"	MN	MANDA	Aves	GB
+Baikal Teal	Sibirionetta formosa	Accidental	1-10 Records	IK	BAITE	Aves	GB
+Garganey	Spatula querquedula	"Migrant Breeder, Passage Visitor"	100-500 Pairs	GY	GARGA	Aves	GB
+Blue-winged Teal	Spatula discors	Scarce Visitor	100-500 Records	TB	BLWTE	Aves	GB
+Shoveler	Spatula clypeata	"Migrant Breeder, Passage/Winter Visitor"	500 - 1000 Pairs	SV	SHOVE	Aves	GB
+Gadwall	Mareca strepera	"Migrant/Resident Breeder, Winter Visitor"	"1,000 - 10,000 Pairs"	GA	GADWA	Aves	GB
+Falcated Duck	Mareca falcata	Accidental	1-10 Records			Aves	GB
+Wigeon	Mareca penelope	"Resident Breeder, Winter Visitor"	"100,000 - 500,000 Birds"	WN	WIGEO	Aves	GB
+American Wigeon	Mareca americana	Scarce Visitor	10 - 100 Birds	AW	AMEWI	Aves	GB
+Mallard	Anas platyrhynchos	"Introduced/Resident Breeder, Winter Visitor"	"100,000 - 500,000 Pairs"	MA	MALLA	Aves	GB
+American Black Duck	Anas rubripes	Accidental	10 - 100 Records	BD	BLADU	Aves	GB
+Pintail	Anas acuta	"Resident/Migrant Breeder, Winter Visitor"	"10,000 - 100,000 Birds"	PT	PINTA	Aves	GB
+Teal	Anas crecca	"Resident Breeder, Passage/Winter Visitor"	"1,000 - 10,000 Pairs"	T.	TEAL.	Aves	GB
+Green-winged Teal	Anas carolinensis	Scarce Visitor	10 - 100 Birds	TA	GRWTE	Aves	GB
+Red-crested Pochard	Netta rufina	"Escaped Breeder, Scarce Visitor"	500 - 1000 Birds	RQ	RECPO	Aves	GB
+Canvasback	Aythya valisineria	Accidental	1-10 Records	VB		Aves	GB
+Redhead	Aythya americana	Accidental	1-10 Records	AZ		Aves	GB
+Pochard	Aythya ferina	"Migrant/Resident Breeder, Passage/Winter Visitor"	"10,000 - 100,000 Birds"	PO	POCHA	Aves	GB
+Ferruginous Duck	Aythya nyroca	Accidental	1-10 Birds	FD	FERDU	Aves	GB
+Ring-necked Duck	Aythya collaris	Scarce Visitor	10 - 100 Birds	NG	RINDU	Aves	GB
+Tufted Duck	Aythya fuligula	"Resident Breeder, Passage/Winter Visitor"	"10,000 - 100,000 Pairs"	TU	TUFDU	Aves	GB
+Scaup	Aythya marila	"Scarce Breeder, Passage/Winter Visitor"	"1,000 - 10,000 Birds"	SP	SCAUP	Aves	GB
+Lesser Scaup	Aythya affinis	Scarce Visitor	1-10 Birds	AY		Aves	GB
+Steller's Eider	Polysticta stelleri	Accidental	10 - 100 Records	ES	STEEI	Aves	GB
+King Eider	Somateria spectabilis	Accidental	100-500 Records	KE	KINEI	Aves	GB
+Eider	Somateria mollissima	"Resident Breeder, Winter Visitor"	"10,000 - 100,000 Pairs"	E.	EIDER	Aves	GB
+Harlequin Duck	Histrionicus histrionicus	Accidental	10 - 100 Records	HQ	HARDU	Aves	GB
+Surf Scoter	Melanitta perspicillata	Scarce Visitor	10 - 100 Birds	FS	SURSC	Aves	GB
+Velvet Scoter	Melanitta fusca	Passage/Winter Visitor	"1,000 - 10,000 Birds"	VS	VELSC	Aves	GB
+White-winged Scoter	Melanitta deglandi	Accidental	1-10 Records			Aves	GB
+Common Scoter	Melanitta nigra	"Resident/Migrant Breeder, Passage/Winter Visitor"	"100,000 - 500,000 Birds"	CX	COMSC	Aves	GB
+Black Scoter	Melanitta americana	Accidental	10 - 100 Records	DX	BLASC	Aves	GB
+Long-tailed Duck	Clangula hyemalis	"Scarce Breeder, Winter Visitor"	"10,000 - 100,000 Birds"	LN	LOTDU	Aves	GB
+Bufflehead	Bucephala albeola	Accidental	10 - 100 Records	VH	BUFFL	Aves	GB
+Goldeneye	Bucephala clangula	"Resident Breeder, Passage/Winter Visitor"	100-500 Females	GN	GOLDE	Aves	GB
+Barrow's Goldeneye	Bucephala islandica	Accidental	1-10 Records	VG	BRWGO	Aves	GB
+Smew	Mergellus albellus	Winter Visitor	100-500 Birds	SY	SMEW.	Aves	GB
+Hooded Merganser	Lophodytes cucullatus	Accidental	1-10 Records			Aves	GB
+Goosander	Mergus merganser	"Resident Breeder, Winter Visitor"	"1,000 - 10,000 Pairs"	GD	GOOSA	Aves	GB
+Red-breasted Merganser	Mergus serrator	"Resident Breeder, Winter Visitor"	"1,000 - 10,000 Pairs"	RM	REBME	Aves	GB
+Ruddy Duck	Oxyura jamaicensis	Introduced Breeder	10 - 100 Birds	RY	RUDDU	Aves	GB
+Common Nighthawk	Chordeiles minor	Accidental	10 - 100 Records		COMNI	Aves	GB
+Red-necked Nightjar	Caprimulgus ruficollis	Not Recorded since 1856			RENNI	Aves	GB
+Nightjar	Caprimulgus europaeus	"Migrant Breeder, Passage Visitor"	"1,000 - 10,000 Males"	NJ	NIJAR	Aves	GB
+Egyptian Nightjar	Caprimulgus aegyptius	Accidental	1-10 Records		EGYNI	Aves	GB
+White-throated Needletail	Hirundapus caudacutus	Accidental	1-10 Records	NI	NETSW	Aves	GB
+Chimney Swift	Chaetura pelagica	Accidental	10 - 100 Records		CHISW	Aves	GB
+Alpine Swift	Tachymarptis melba	Scarce Visitor	10 - 100 Birds	AI	ALPSW	Aves	GB
+Swift	Apus apus	"Migrant Breeder, Passage Visitor"	"10,000 - 100,000 Pairs"	SI	SWIFT	Aves	GB
+Pallid Swift	Apus pallidus	Accidental	10 - 100 Records	II	PALSW	Aves	GB
+Pacific Swift	Apus pacificus	Accidental	1-10 Records		PACSW	Aves	GB
+Little Swift	Apus affinis	Accidental	10 - 100 Records		LITSW	Aves	GB
+White-rumped Swift	Apus caffer	Accidental	1-10 Records			Aves	GB
+Great Bustard	Otis tarda	"Re-introduced Breeder, Accidental"	10 - 100 Records	US	GREBU	Aves	GB
+Macqueen's Bustard	Chlamydotis macqueenii	Accidental	1-10 Records			Aves	GB
+Little Bustard	Tetrax tetrax	Accidental	10 - 100 Records		LITBS	Aves	GB
+Great Spotted Cuckoo	Clamator glandarius	Accidental	10 - 100 Records	UK	GRSCU	Aves	GB
+Yellow-billed Cuckoo	Coccyzus americanus	Accidental	10 - 100 Records		YEBCU	Aves	GB
+Black-billed Cuckoo	Coccyzus erythropthalmus	Accidental	10 - 100 Records		BLBCU	Aves	GB
+Cuckoo	Cuculus canorus	"Migrant Breeder, Passage Visitor"	"10,000 - 100,000 Pairs"	CK	CUCKO	Aves	GB
+Pallas's Sandgrouse	Syrrhaptes paradoxus	"Accidental, Has Bred"	1-10 Records		PALSA	Aves	GB
+Rock Dove	Columba livia	Resident Breeder	"500,000 - 1 million Pairs"	DV	ROCDO	Aves	GB
+Stock Dove	Columba oenas	"Resident Breeder, Passage/Winter Visitor"	"100,000 - 500,000 Territories"	SD	STODO	Aves	GB
+Woodpigeon	Columba palumbus	"Resident Breeder, Winter Visitor"	5.3 million Pairs	WP	WOODP	Aves	GB
+Turtle Dove	Streptopelia turtur	"Migrant Breeder, Passage Visitor"	"10,000 - 100,000 Territories"	TD	TURDO	Aves	GB
+Oriental Turtle Dove	Streptopelia orientalis	Accidental	10 - 100 Records		RUTDO	Aves	GB
+Collared Dove	Streptopelia decaocto	Resident Breeder	"500,000 - 1 million Pairs"	CD	COLDO	Aves	GB
+Mourning Dove	Zenaida macroura	Accidental	1-10 Records			Aves	GB
+Water Rail	Rallus aquaticus	"Resident Breeder, Passage/Winter Visitor"	"1,000 - 10,000 Territories"	WA	WATRA	Aves	GB
+Corncrake	Crex crex	"Migrant Breeder, Passage Visitor"	"1,000 - 10,000 Males"	CE	CORNC	Aves	GB
+Little Crake	Porzana parva	Accidental	10 - 100 Records	JC	LITCR	Aves	GB
+Baillon's Crake	Porzana pusilla	"Occasional Breeder, Accidental"	10 - 100 Records	VC	BAICR	Aves	GB
+Spotted Crake	Porzana porzana	"Scarce Breeder, Passage Visitor"	10 - 100 Males	AK	SPOCR	Aves	GB
+Sora	Porzana carolina	Accidental	10 - 100 Records	JR	SORA.	Aves	GB
+Western Swamphen	Porphyrio porphyrio	Accidental	1-10 Records		PURSW	Aves	GB
+Allen's Gallinule	Porphyrio alleni	Accidental	1-10 Records		ALLGA	Aves	GB
+American Purple Gallinule	Porphyrio martinica	Accidental	1-10 Records		AMPGA	Aves	GB
+Moorhen	Gallinula chloropus	"Resident Breeder, Winter Visitor"	"100,000 - 500,000 Territories"	MH	MOORH	Aves	GB
+Coot	Fulica atra	"Resident Breeder, Winter Visitor"	"10,000 - 100,000 Pairs"	CO	COOT.	Aves	GB
+American Coot	Fulica americana	Accidental	1-10 Records	AO	AMECO	Aves	GB
+Sandhill Crane	Antigone canadensis	Accidental	1-10 Records		SANCR	Aves	GB
+Crane	Grus grus	"Resident/Re-introduced Breeder, Passage Visitor"	10 - 100 Pairs	AN	CRANE	Aves	GB
+Little Grebe	Tachybaptus ruficollis	"Migrant/Resident Breeder, Winter Visitor"	"1,000 - 10,000 Pairs"	LG	LITGR	Aves	GB
+Pied-billed Grebe	Podilymbus podiceps	Accidental	10 - 100 Records	PJ	PIBGR	Aves	GB
+Red-necked Grebe	Podiceps grisegena	"Scarce Breeder, Winter Visitor"	10 - 100 Birds	RX	RENGR	Aves	GB
+Great Crested Grebe	Podiceps cristatus	"Resident Breeder, Winter Visitor"	"1,000 - 10,000 Pairs"	GG	GRCGR	Aves	GB
+Slavonian Grebe	Podiceps auritus	"Resident Breeder, Winter Visitor"	10 - 100 Pairs	SZ	SLAGR	Aves	GB
+Black-necked Grebe	Podiceps nigricollis	"Migrant/Resident Breeder, Passage/Winter Visitor"	10 - 100 Pairs	BN	BLNGR	Aves	GB
+Stone-curlew	Burhinus oedicnemus	Migrant Breeder	100-500 Pairs	TN	STOCU	Aves	GB
+Oystercatcher	Haematopus ostralegus	"Migrant/Resident Breeder, Passage/Winter Visitor"	"100,000 - 500,000 Pairs"	OC	OYSTE	Aves	GB
+Black-winged Stilt	Himantopus himantopus	"Scarce Visitor, Has Bred"	100-500 Records	IT	BLWST	Aves	GB
+Avocet	Recurvirostra avosetta	"Migrant/Resident Breeder, Passage/Winter Visitor"	"1,000 - 10,000 Pairs"	AV	AVOCE	Aves	GB
+Lapwing	Vanellus vanellus	"Migrant/Resident Breeder, Passage/Winter Visitor"	"100,000 - 500,000 Pairs"	L.	LAPWI	Aves	GB
+Sociable Lapwing	Vanellus gregarius	Accidental	10 - 100 Records	IP	SOCPL	Aves	GB
+White-tailed Lapwing	Vanellus leucurus	Accidental	1-10 Records		WHTPL	Aves	GB
+Golden Plover	Pluvialis apricaria	"Migrant/Resident Breeder, Passage/Winter Visitor"	"10,000 - 100,000 Pairs"	GP	GOLPL	Aves	GB
+Pacific Golden Plover	Pluvialis fulva	Accidental	10 - 100 Records	IF	PAGPL	Aves	GB
+American Golden Plover	Pluvialis dominica	Scarce Visitor	10 - 100 Birds	ID	AMGPL	Aves	GB
+Grey Plover	Pluvialis squatarola	Passage/Winter Visitor	"10,000 - 100,000 Birds"	GV	GREPL	Aves	GB
+Ringed Plover	Charadrius hiaticula	"Migrant/Resident Breeder, Passage/Winter Visitor"	"1,000 - 10,000 Pairs"	RP	RINPL	Aves	GB
+Semipalmated Plover	Charadrius semipalmatus	Accidental	1-10 Records	TV	SEMPL	Aves	GB
+Little Ringed Plover	Charadrius dubius	"Migrant Breeder, Passage Visitor"	"1,000 - 10,000 Pairs"	LP	LIRPL	Aves	GB
+Killdeer	Charadrius vociferus	Accidental	10 - 100 Records	KL	KILLD	Aves	GB
+Kentish Plover	Charadrius alexandrinus	"Former Breeder, Scarce Visitor"	10 - 100 Birds	KP	KENPL	Aves	GB
+Lesser Sand Plover	Charadrius mongolus	Accidental	1-10 Records	DQ		Aves	GB
+Greater Sand Plover	Charadrius leschenaultii	Accidental	10 - 100 Records	DP	GRSPL	Aves	GB
+Caspian Plover	Charadrius asiaticus	Accidental	1-10 Records		CASPL	Aves	GB
+Dotterel	Charadrius morinellus	"Migrant Breeder, Passage Visitor"	500 - 1000 Males	DO	DOTTE	Aves	GB
+Upland Sandpiper	Bartramia longicauda	Accidental	10 - 100 Records	UP	UPLSA	Aves	GB
+Whimbrel	Numenius phaeopus	"Migrant Breeder, Passage Visitor"	500 - 1000 Pairs	WM	WHIMB	Aves	GB
+Little Curlew	Numenius minutus	Accidental	1-10 Records		LITWH	Aves	GB
+Eskimo Curlew	Numenius borealis	"Extinct (1963), Last Record 1887"			ESKCU	Aves	GB
+Curlew	Numenius arquata	"Migrant/Resident Breeder, Passage/Winter Visitor"	"10,000 - 100,000 Pairs"	CU	CURLE	Aves	GB
+Bar-tailed Godwit	Limosa lapponica	Passage/Winter Visitor	"10,000 - 100,000 Birds"	BA	BATGO	Aves	GB
+Black-tailed Godwit	Limosa limosa	"Migrant Breeder, Passage/Winter Visitor"	100-500 Pairs	BW	BLTGO	Aves	GB
+Hudsonian Godwit	Limosa haemastica	Accidental	1-10 Records	HU	HUDGO	Aves	GB
+Turnstone	Arenaria interpres	"Scarce Breeder, Passage/Winter Visitor"	"10,000 - 100,000 Birds"	TT	TURNS	Aves	GB
+Great Knot	Calidris tenuirostris	Accidental	1-10 Records	KO		Aves	GB
+Knot	Calidris canutus	Passage/Winter Visitor	"100,000 - 500,000 Birds"	KN	KNOT.	Aves	GB
+Ruff	Calidris pugnax	"Scarce Breeder, Passage/Winter Visitor"	500 - 1000 Birds	RU	RUFF.	Aves	GB
+Broad-billed Sandpiper	Calidris falcinellus	Accidental	100-500 Records	OA	BRBSA	Aves	GB
+Sharp-tailed Sandpiper	Calidris acuminata	Accidental	10 - 100 Records	VV	SHTSA	Aves	GB
+Stilt Sandpiper	Calidris himantopus	Accidental	10 - 100 Records	MI	STISA	Aves	GB
+Curlew Sandpiper	Calidris ferruginea	Passage Visitor	500 - 1000 Birds	CV	CURSA	Aves	GB
+Temminck's Stint	Calidris temminckii	"Scarce Breeder, Passage Visitor"	100-500 Birds	TK	TEMST	Aves	GB
+Long-toed Stint	Calidris subminuta	Accidental	1-10 Records		LOTST	Aves	GB
+Red-necked Stint	Calidris ruficollis	Accidental	1-10 Records			Aves	GB
+Sanderling	Calidris alba	Passage/Winter Visitor	"10,000 - 100,000 Birds"	SS	SANDE	Aves	GB
+Dunlin	Calidris alpina	"Migrant Breeder, Passage/Winter Visitor"	"1,000 - 10,000 Pairs"	DN	DUNLI	Aves	GB
+Purple Sandpiper	Calidris maritima	"Scarce Breeder, Passage/Winter Visitor"	"1,000 - 10,000 Birds"	PS	PURSA	Aves	GB
+Baird's Sandpiper	Calidris bairdii	Accidental	100-500 Records	BP	BAISA	Aves	GB
+Little Stint	Calidris minuta	Passage Visitor	500 - 1000 Birds	LX	LITST	Aves	GB
+Least Sandpiper	Calidris minutilla	Accidental	10 - 100 Records	EP	LEASA	Aves	GB
+White-rumped Sandpiper	Calidris fuscicollis	Scarce Visitor	10 - 100 Birds	WU	WHRSA	Aves	GB
+Buff-breasted Sandpiper	Calidris subruficollis	Scarce Visitor	10 - 100 Birds	BQ	BUBSA	Aves	GB
+Pectoral Sandpiper	Calidris melanotos	"Scarce Visitor, Has probably bred"	100-500 Birds	PP	PECSA	Aves	GB
+Semipalmated Sandpiper	Calidris pusilla	Scarce Visitor	100-500 Records	PZ	SEMSA	Aves	GB
+Western Sandpiper	Calidris mauri	Accidental	1-10 Records	ER	WESSA	Aves	GB
+Long-billed Dowitcher	Limnodromus scolopaceus	Accidental	100-500 Records	LD	LOBDO	Aves	GB
+Short-billed Dowitcher	Limnodromus griseus	Accidental	1-10 Records		SHBDO	Aves	GB
+Woodcock	Scolopax rusticola	"Migrant/Resident Breeder, Passage/Winter Visitor"	"10,000 - 100,000 Males"	WK	WOODC	Aves	GB
+Jack Snipe	Lymnocryptes minimus	Passage/Winter Visitor	"100,000 - 500,000 Birds"	JS	JACSN	Aves	GB
+Great Snipe	Gallinago media	Accidental	100-500 Records	DS	GRESN	Aves	GB
+Snipe	Gallinago gallinago	"Migrant/Resident Breeder, Passage/Winter Visitor"	"10,000 - 100,000 Pairs"	SN	SNIPE	Aves	GB
+Wilson's Snipe	Gallinago delicata	Accidental	1-10 Records			Aves	GB
+Terek Sandpiper	Xenus cinereus	Accidental	10 - 100 Records	TR	TERSA	Aves	GB
+Wilson's Phalarope	Phalaropus tricolor	Accidental	100-500 Records	WF	WILPH	Aves	GB
+Red-necked Phalarope	Phalaropus lobatus	"Migrant Breeder, Passage Visitor"	10 - 100 Males	NK	RENPH	Aves	GB
+Grey Phalarope	Phalaropus fulicarius	Passage Visitor	100-500 Birds	PL	GREPH	Aves	GB
+Common Sandpiper	Actitis hypoleucos	"Migrant Breeder, Passage/Winter Visitor"	"10,000 - 100,000 Pairs"	CS	COMSA	Aves	GB
+Spotted Sandpiper	Actitis macularius	"Accidental, Has Bred"	100-500 Records	PQ	SPOSA	Aves	GB
+Green Sandpiper	Tringa ochropus	"Scarce Breeder, Passage/Winter Visitor"		GE	GRESA	Aves	GB
+Solitary Sandpiper	Tringa solitaria	Accidental	10 - 100 Records	I.	SOLSA	Aves	GB
+Grey-tailed Tattler	Tringa brevipes	Accidental	1-10 Records	YT		Aves	GB
+Lesser Yellowlegs	Tringa flavipes	Accidental	100-500 Records	LY	LESYE	Aves	GB
+Redshank	Tringa totanus	"Migrant/Resident Breeder, Passage/Winter Visitor"	"10,000 - 100,000 Pairs"	RK	REDSH	Aves	GB
+Marsh Sandpiper	Tringa stagnatilis	Accidental	100-500 Records	MD	MARSA	Aves	GB
+Wood Sandpiper	Tringa glareola	"Scarce Breeder, Passage Visitor"		OD	WOOSA	Aves	GB
+Spotted Redshank	Tringa erythropus	Passage/Winter Visitor	100-500 Birds	DR	SPORE	Aves	GB
+Greenshank	Tringa nebularia	"Migrant/Resident Breeder, Passage/Winter Visitor"	"1,000 - 10,000 Pairs"	GK	GRESH	Aves	GB
+Greater Yellowlegs	Tringa melanoleuca	Accidental	10 - 100 Records	LZ	GREYE	Aves	GB
+Cream-coloured Courser	Cursorius cursor	Accidental	1-10 Records		CRCCO	Aves	GB
+Collared Pratincole	Glareola pratincola	Scarce Visitor	10 - 100 Records	KM	COLPR	Aves	GB
+Oriental Pratincole	Glareola maldivarum	Accidental	1-10 Records	GM		Aves	GB
+Black-winged Pratincole	Glareola nordmanni	Accidental	10 - 100 Records	KW	BLWPR	Aves	GB
+Kittiwake	Rissa tridactyla	"Migrant/Resident Breeder, Passage/Winter Visitor"	"100,000 - 500,000 Pairs"	KI	KITTI	Aves	GB
+Ivory Gull	Pagophila eburnea	Accidental	10 - 100 Records	IV	IVOGU	Aves	GB
+Sabine's Gull	Xema sabini	Passage Visitor	100-500 Birds	AB	SABGU	Aves	GB
+Slender-billed Gull	Chroicocephalus genei	Accidental	10 - 100 Records	EI	SLEGU	Aves	GB
+Bonaparte's Gull	Chroicocephalus philadelphia	Accidental	100-500 Records	ON	BONGU	Aves	GB
+Black-headed Gull	Chroicocephalus ridibundus	"Migrant/Resident Breeder, Passage/Winter Visitor"	"100,000 - 500,000 Pairs"	BH	BLHGU	Aves	GB
+Little Gull	Hydrocoloeus minutus	"Scarce Breeder, Passage/Winter Visitor"		LU	LITGU	Aves	GB
+Ross's Gull	Rhodostethia rosea	Accidental	10 - 100 Records	QG	ROSGU	Aves	GB
+Laughing Gull	Leucophaeus atricilla	Accidental	100-500 Records	LF	LAUGU	Aves	GB
+Franklin's Gull	Leucophaeus pipixcan	Accidental	10 - 100 Records	FG	FRAGU	Aves	GB
+Audouin's Gull	Ichthyaetus audouinii	Accidental	1-10 Records			Aves	GB
+Mediterranean Gull	Ichthyaetus melanocephalus	"Migrant/Resident Breeder, Passage/Winter Visitor"	500 - 1000 Pairs	MU	MEDGU	Aves	GB
+Great Black-headed Gull	Ichthyaetus ichthyaetus	Not Recorded since 1859			GBHGU	Aves	GB
+Common Gull	Larus canus	"Migrant/Resident Breeder, Passage/Winter Visitor"	"10,000 - 100,000 Pairs"	CM	COMGU	Aves	GB
+Ring-billed Gull	Larus delawarensis	Scarce Visitor	10 - 100 Birds	IN	RIBGU	Aves	GB
+Great Black-backed Gull	Larus marinus	"Resident Breeder, Winter Visitor"	"10,000 - 100,000 Pairs"	GB	GBBGU	Aves	GB
+Glaucous-winged Gull	Larus glaucescens	Accidental	1-10 Records		GLWGU	Aves	GB
+Glaucous Gull	Larus hyperboreus	Winter Visitor	100-500 Birds	GZ	GLAGU	Aves	GB
+Iceland Gull	Larus glaucoides	Winter Visitor	100-500 Birds	IG	ICEGU	Aves	GB
+Herring Gull	Larus argentatus	"Resident Breeder, Passage/Winter Visitor"	"100,000 - 500,000 Pairs"	HG	HERGU	Aves	GB
+American Herring Gull	Larus smithsonianus	Accidental	10 - 100 Records			Aves	GB
+Caspian Gull	Larus cachinnans	Scarce Visitor	100-500 Birds	YC	CASGU	Aves	GB
+Yellow-legged Gull	Larus michahellis	"Scarce Breeder, Passage/Winter Visitor"	500 - 1000 Birds	YG	YELGU	Aves	GB
+Slaty-backed Gull	Larus schistisagus	Accidental	1-10 Records			Aves	GB
+Lesser Black-backed Gull	Larus fuscus	"Migrant/Resident Breeder, Passage Visitor"	"100,000 - 500,000 Pairs"	LB	LBBGU	Aves	GB
+Gull-billed Tern	Gelochelidon nilotica	"Scarce Visitor, Has Bred"	100-500 Records	TG	GUBTE	Aves	GB
+Caspian Tern	Hydroprogne caspia	Accidental	100-500 Records	CJ	CASTE	Aves	GB
+Royal Tern	Thalasseus maximus	Accidental	1-10 Records	QT	ROYTE	Aves	GB
+Lesser Crested Tern	Thalasseus bengalensis	Accidental	1-10 Records	TF	LECTE	Aves	GB
+Sandwich Tern	Thalasseus sandvicensis	"Migrant Breeder, Passage Visitor"	"10,000 - 100,000 Pairs"	TE	SANTE	Aves	GB
+Cabot's Tern	Thalasseus acuflavidus	Accidental	1-10 Records			Aves	GB
+Elegant Tern	Thalasseus elegans	Accidental	1-10 Records		ELETE	Aves	GB
+Little Tern	Sternula albifrons	"Migrant Breeder, Passage Visitor"	"1,000 - 10,000 Pairs"	AF	LITTE	Aves	GB
+Least Tern	Sternula antillarum	Accidental	1-10 Records			Aves	GB
+Aleutian Tern	Onychoprion aleuticus	Accidental	1-10 Records		ALETE	Aves	GB
+Bridled Tern	Onychoprion anaethetus	Accidental	10 - 100 Records		BRITE	Aves	GB
+Sooty Tern	Onychoprion fuscatus	Accidental	10 - 100 Records		SOOTE	Aves	GB
+Roseate Tern	Sterna dougallii	"Migrant Breeder, Passage Visitor"	10 - 100 Pairs	RS	ROSTE	Aves	GB
+Common Tern	Sterna hirundo	"Migrant Breeder, Passage Visitor"	"10,000 - 100,000 Pairs"	CN	COMTE	Aves	GB
+Arctic Tern	Sterna paradisaea	"Migrant Breeder, Passage Visitor"	"10,000 - 100,000 Pairs"	AE	ARCTE	Aves	GB
+Forster's Tern	Sterna forsteri	Accidental	10 - 100 Records	FO	FORTE	Aves	GB
+Whiskered Tern	Chlidonias hybrida	Accidental	100-500 Records	WD	WHKTE	Aves	GB
+White-winged Black Tern	Chlidonias leucopterus	Scarce Visitor	10 - 100 Birds	WJ	WWBTE	Aves	GB
+Black Tern	Chlidonias niger	"Former Breeder, Passage Visitor"		BJ	BLATE	Aves	GB
+Great Skua	Stercorarius skua	"Migrant Breeder, Passage Visitor"	"1,000 - 10,000 Pairs"	NX	GRESK	Aves	GB
+Pomarine Skua	Stercorarius pomarinus	Passage Visitor		PK	POMSK	Aves	GB
+Arctic Skua	Stercorarius parasiticus	"Migrant Breeder, Passage Visitor"	"1,000 - 10,000 Pairs"	AC	ARCSK	Aves	GB
+Long-tailed Skua	Stercorarius longicaudus	"Passage Visitor, Has Bred"		OG	LOTSK	Aves	GB
+Little Auk	Alle alle	Passage/Winter Visitor		LK	LITAU	Aves	GB
+Brünnich's Guillemot	Uria lomvia	Accidental	10 - 100 Records	TZ	BRUGU	Aves	GB
+Guillemot	Uria aalge	"Migrant/Resident Breeder, Winter Visitor"	"500,000 - 1 million Pairs"	GU	GUILL	Aves	GB
+Razorbill	Alca torda	"Migrant/Resident Breeder, Winter Visitor"	"100,000 - 500,000 Pairs"	RA	RAZOR	Aves	GB
+Great Auk	Pinguinus impennis	"Extinct (1844) Former Breeder, Last recorded 1840"				Aves	GB
+Black Guillemot	Cepphus grylle	Resident Breeder	"10,000 - 100,000 Pairs"	TY	BLAGU	Aves	GB
+Long-billed Murrelet	Brachyramphus perdix	Accidental	1-10 Records			Aves	GB
+Ancient Murrelet	Synthliboramphus antiquus	Accidental	1-10 Records			Aves	GB
+Puffin	Fratercula arctica	"Migrant/Resident Breeder, Passage/Winter Visitor"	"500,000 - 1 million Pairs"	PU	PUFFI	Aves	GB
+Tufted Puffin	Fratercula cirrhata	Accidental	1-10 Records			Aves	GB
+Red-billed Tropicbird	Phaethon aethereus	Accidental	1-10 Records			Aves	GB
+Ascension Frigatebird	Fregata aquila	Accidental	1-10 Records			Aves	GB
+Red-throated Diver	Gavia stellata	"Migrant/Resident Breeder, Passage/Winter Visitor"	"1,000 - 10,000 Pairs"	RH	RETDI	Aves	GB
+Black-throated Diver	Gavia arctica	"Migrant/Resident Breeder, Winter Visitor"	100-500 Pairs	BV	BLTDI	Aves	GB
+Pacific Diver	Gavia pacifica	Accidental	1-10 Records	KD		Aves	GB
+Great Northern Diver	Gavia immer	"Scarce Breeder, Winter Visitor"	"1,000 - 10,000 Birds"	ND	GRNDI	Aves	GB
+White-billed Diver	Gavia adamsii	Scarce Visitor	10 - 100 Birds	WV	WHBDI	Aves	GB
+Wilson's Storm Petrel	Oceanites oceanicus	Scarce Visitor	10 - 100 Birds		WILPE	Aves	GB
+White-faced Storm Petrel	Pelagodroma marina	Not Recorded since 1897			WHFPE	Aves	GB
+Black-browed Albatross	Thalassarche melanophris	Accidental	10 - 100 Records	AA	BLBAL	Aves	GB
+Atlantic Yellow-nosed Albatross	Thalassarche chlororhynchos	Accidental	1-10 Records		YENAL	Aves	GB
+Storm Petrel	Hydrobates pelagicus	Migrant Breeder	"10,000 - 100,000 Nests"	TM	STOPE	Aves	GB
+Swinhoe's Storm Petrel	Oceanodroma monorhis	Accidental	1-10 Records		SWSPE	Aves	GB
+Leach's Petrel	Oceanodroma leucorhoa	"Migrant Breeder, Passage Visitor"	"10,000 - 100,000 Pairs"	TL	LEAPE	Aves	GB
+Fulmar	Fulmarus glacialis	"Migrant/Resident Breeder, Passage Visitor"	"500,000 - 1 million Pairs"	F.	FULMA	Aves	GB
+Black-capped Petrel	Pterodroma hasitata	Accidental	1-10 Records		BLCPE	Aves	GB
+Scopoli's Shearwater	Calonectris diomedea	Accidental	1-10 Records			Aves	GB
+Cory's Shearwater	Calonectris borealis	Scarce Migrant	500 - 1000 Birds	CQ	CORSH	Aves	GB
+Sooty Shearwater	Ardenna grisea	Passage Visitor		OT	SOOSH	Aves	GB
+Great Shearwater	Ardenna gravis	Scarce Migrant		GQ	GRTSH	Aves	GB
+Manx Shearwater	Puffinus puffinus	Migrant Breeder	"100,000 - 500,000 Pairs"	MX	MANSH	Aves	GB
+Yelkouan Shearwater	Puffinus yelkouan	Accidental	1-10 Records			Aves	GB
+Balearic Shearwater	Puffinus mauretanicus	Passage Visitor	"1,000 - 10,000 Birds"	YQ	BALSH	Aves	GB
+Barolo Shearwater	Puffinus baroli	Accidental	10 - 100 Records	MV	LITSH	Aves	GB
+Black Stork	Ciconia nigra	Accidental	100-500 Records	OS	BLAST	Aves	GB
+White Stork	Ciconia ciconia	"Former Breeder, Scarce Visitor"	10 - 100 Birds	OR	WHIST	Aves	GB
+Magnificent Frigatebird	Fregata magnificens	Accidental	1-10 Records			Aves	GB
+Gannet	Morus bassanus	"Migrant/Resident Breeder, Passage Visitor"	"100,000 - 500,000 Nests"	GX	GANNE	Aves	GB
+Red-footed Booby	Sula sula	Accidental	1-10 Records			Aves	GB
+Double-crested Cormorant	Phalacrocorax auritus	Accidental	1-10 Records			Aves	GB
+Shag	Phalacrocorax aristotelis	Resident Breeder	"10,000 - 100,000 Pairs"	SA	SHAG.	Aves	GB
+Cormorant	Phalacrocorax carbo	"Migrant/Resident Breeder, Passage/Winter Visitor"	"1,000 - 10,000 Pairs"	CA	CORMO	Aves	GB
+Glossy Ibis	Plegadis falcinellus	Scarce Visitor	10 - 100 Birds	IB	GLOIB	Aves	GB
+Spoonbill	Platalea leucorodia	"Former, but now Scarce, Breeder, Scarce Visitor"	10 - 100 Birds	NB	SPOON	Aves	GB
+Bittern	Botaurus stellaris	"Resident Breeder, Winter Visitor"	10 - 100 Males	BI	BITTE	Aves	GB
+American Bittern	Botaurus lentiginosus	Accidental	1-10 Records	AM	AMEBI	Aves	GB
+Little Bittern	Ixobrychus minutus	"Accidental, Has Bred"	100-500 Records	LL	LITBI	Aves	GB
+Night Heron	Nycticorax nycticorax	"Escaped Breeder, Scarce Visitor"	10 - 100 Birds	NT	NIGHE	Aves	GB
+Green Heron	Butorides virescens	Accidental	1-10 Records	HR	GRBHE	Aves	GB
+Squacco Heron	Ardeola ralloides	Accidental	10 - 100 Records	QH	SQUHE	Aves	GB
+Chinese Pond Heron	Ardeola bacchus	Accidental	1-10 Records			Aves	GB
+Cattle Egret	Bubulcus ibis	"Scarce Visitor, Has Bred"	10 - 100 Birds	EC	CATEG	Aves	GB
+Grey Heron	Ardea cinerea	"Resident Breeder, Winter Visitor"	"10,000 - 100,000 Pairs"	H.	GREHE	Aves	GB
+Great Blue Heron	Ardea herodias	Accidental	1-10 Records			Aves	GB
+Purple Heron	Ardea purpurea	"Scarce Visitor, Has Bred"	10 - 100 Birds	UR	PURHE	Aves	GB
+Great White Egret	Ardea alba	"Scarce Visitor, Has Bred"	10 - 100 Birds	HW	GRWEG	Aves	GB
+Snowy Egret	Egretta thula	Accidental	1-10 Records	NY		Aves	GB
+Little Egret	Egretta garzetta	"Resident Breeder, Passage Visitor"	500 - 1000 Pairs	ET	LITEG	Aves	GB
+Dalmatian Pelican	Pelecanus crispus	Accidental	1-10 Records			Aves	GB
+Osprey	Pandion haliaetus	"Migrant Breeder, Passage Visitor"	100-500 Pairs	OP	OSPRE	Aves	GB
+Egyptian Vulture	Neophron percnopterus	Not Recorded since 1868			EGYVU	Aves	GB
+Honey-buzzard	Pernis apivorus	"Migrant Breeder, Passage Visitor"	100-500 Pairs	HZ	HONBU	Aves	GB
+Short-toed Eagle	Circaetus gallicus	Accidental	1-10 Records		SHTEA	Aves	GB
+Spotted Eagle	Clanga clanga	Not Recorded since 1915			SPOEA	Aves	GB
+Golden Eagle	Aquila chrysaetos	Resident Breeder	100-500 Pairs	EA	GOLEA	Aves	GB
+Sparrowhawk	Accipiter nisus	"Resident Breeder, Passage/Winter Visitor"	"10,000 - 100,000 Pairs"	SH	SPARR	Aves	GB
+Goshawk	Accipiter gentilis	Re-introduced Breeder	100-500 Pairs	GI	GOSHA	Aves	GB
+Marsh Harrier	Circus aeruginosus	"Migrant/Resident Breeder, Passage Visitor"	100-500 Pairs	MR	MARHA	Aves	GB
+Hen Harrier	Circus cyaneus	"Migrant/Resident Breeder, Passage/Winter Visitor"	500 - 1000 Pairs	HH	HENHA	Aves	GB
+Northern Harrier	Circus hudsonius	Accidental	1-10 Records			Aves	GB
+Pallid Harrier	Circus macrourus	Accidental	10 - 100 Records	HI	PALHA	Aves	GB
+Montagu's Harrier	Circus pygargus	"Migrant Breeder, Passage Visitor"	10 - 100 Pairs	MO	MONHA	Aves	GB
+Red Kite	Milvus milvus	"Resident/Introduced Breeder, Passage Visitor"	"1,000 - 10,000 Pairs"	KT	REDKI	Aves	GB
+Black Kite	Milvus migrans	Scarce Visitor	10 - 100 Birds	KB	BLAKI	Aves	GB
+White-tailed Eagle	Haliaeetus albicilla	"Re-introduced Breeder, Accidental"	10 - 100 Pairs	WE	WHTEA	Aves	GB
+Rough-legged Buzzard	Buteo lagopus	Passage/Winter Visitor	10 - 100 Birds	RF	ROLBU	Aves	GB
+Buzzard	Buteo buteo	"Resident Breeder, Passage/Winter Visitor"	"10,000 - 100,000 Pairs"	BZ	BUZZA	Aves	GB
+Barn Owl	Tyto alba	Resident Breeder	"1,000 - 10,000 Pairs"	BO	BAROW	Aves	GB
+Scops Owl	Otus scops	Accidental	10 - 100 Records	IQ	SCOOW	Aves	GB
+Snowy Owl	Bubo scandiacus	"Accidental, Former Breeder"	100-500 Records	SO	SNOOW	Aves	GB
+Eurasian Eagle-Owl	Bubo bubo	Escaped (?) Breeder		EO	EAGOW	Aves	GB
+Tawny Owl	Strix aluco	Resident Breeder	"10,000 - 100,000 Pairs"	TO	TAWOW	Aves	GB
+Hawk Owl	Surnia ulula	Accidental	1-10 Records		HAWOW	Aves	GB
+Little Owl	Athene noctua	Introduced Breeder	"1,000 - 10,000 Pairs"	LO	LITOW	Aves	GB
+Tengmalm's Owl	Aegolius funereus	Accidental	1-10 Records		TENOW	Aves	GB
+Long-eared Owl	Asio otus	"Resident Breeder, Passage/Winter Visitor"	"1,000 - 10,000 Pairs"	LE	LOEOW	Aves	GB
+Short-eared Owl	Asio flammeus	"Migrant/Resident Breeder, Passage/Winter Visitor"	"1,000 - 10,000 Pairs"	SE	SHEOW	Aves	GB
+Hoopoe	Upupa epops	"Scarce Visitor, Has Bred"	100-500 Birds	HP	HOOPO	Aves	GB
+Roller	Coracias garrulus	Accidental	100-500 Records		ROLLE	Aves	GB
+Kingfisher	Alcedo atthis	Migrant/Resident Breeder	"1,000 - 10,000 Pairs"	KF	KINGF	Aves	GB
+Belted Kingfisher	Megaceryle alcyon	Accidental	1-10 Records		BELKI	Aves	GB
+Blue-cheeked Bee-eater	Merops persicus	Accidental	1-10 Records		BLCBE	Aves	GB
+Bee-eater	Merops apiaster	"Scarce Visitor, Has Bred"	10 - 100 Birds	MZ	BEEEA	Aves	GB
+Wryneck	Jynx torquilla	"Former Breeder, Scarce Visitor"	100-500 Birds	WY	WRYNE	Aves	GB
+Yellow-bellied Sapsucker	Sphyrapicus varius	Accidental	1-10 Records		YEBSA	Aves	GB
+Lesser Spotted Woodpecker	Dryobates minor	Resident Breeder	"1,000 - 10,000 Pairs"	LS	LESWO	Aves	GB
+Great Spotted Woodpecker	Dendrocopos major	"Resident Breeder, Scarce Visitor"	"100,000 - 500,000 Pairs"	GS	GRSWO	Aves	GB
+Green Woodpecker	Picus viridis	Resident Breeder	"10,000 - 100,000 Pairs"	G.	GREWO	Aves	GB
+Lesser Kestrel	Falco naumanni	Accidental	10 - 100 Records		LESKE	Aves	GB
+Kestrel	Falco tinnunculus	"Migrant/Resident Breeder, Passage/Winter Visitor"	"10,000 - 100,000 Pairs"	K.	KESTR	Aves	GB
+American Kestrel	Falco sparverius	Accidental	1-10 Records		AMEKE	Aves	GB
+Red-footed Falcon	Falco vespertinus	Scarce Visitor	10 - 100 Birds	FV	REFFA	Aves	GB
+Amur Falcon	Falco amurensis	Accidental	1-10 Records			Aves	GB
+Eleonora's Falcon	Falco eleonorae	Accidental	1-10 Records		ELEFA	Aves	GB
+Merlin	Falco columbarius	"Migrant/Resident Breeder, Passage/Winter Visitor"	"1,000 - 10,000 Pairs"	ML	MERLI	Aves	GB
+Hobby	Falco subbuteo	"Migrant Breeder, Passage Visitor"	"1,000 - 10,000 Pairs"	HY	HOBBY	Aves	GB
+Gyrfalcon	Falco rusticolus	Accidental	100-500 Records	YF	GYRFA	Aves	GB
+Peregrine	Falco peregrinus	"Resident Breeder, Passage/Winter Visitor"	"1,000 - 10,000 Pairs"	PE	PEREG	Aves	GB
+Ring-necked Parakeet	Psittacula krameri	Introduced Breeder	"1,000 - 10,000 Pairs"	RI	RINPA	Aves	GB
+Eastern Phoebe	Sayornis phoebe	Accidental	1-10 Records			Aves	GB
+Acadian Flycatcher	Empidonax virescens	Accidental	1-10 Records			Aves	GB
+Alder Flycatcher	Empidonax alnorum	Accidental	1-10 Records			Aves	GB
+Eastern Kingbird	Tyrannus tyrannus	Accidental	1-10 Records			Aves	GB
+Brown Shrike	Lanius cristatus	Accidental	10 - 100 Records			Aves	GB
+Red-backed Shrike	Lanius collurio	"Former Breeder, Scarce Visitor"	100-500 Birds	ED	REBSH	Aves	GB
+Daurian Shrike	Lanius isabellinus	Accidental	100-500 Records	IL	ISASH	Aves	GB
+Turkestan Shrike	Lanius phoenicuroides	Accidental	1-10 Records			Aves	GB
+Long-tailed Shrike	Lanius schach	Accidental	1-10 Records			Aves	GB
+Lesser Grey Shrike	Lanius minor	Accidental	100-500 Records		LEGSH	Aves	GB
+Great Grey Shrike	Lanius excubitor	Passage/Winter Visitor	10 - 100 Birds	SR	GRGSH	Aves	GB
+Woodchat Shrike	Lanius senator	Scarce Visitor	10 - 100 Birds	OO	WOOSH	Aves	GB
+Masked Shrike	Lanius nubicus	Accidental	1-10 Records		MASSH	Aves	GB
+Yellow-throated Vireo	Vireo flavifrons	Accidental	1-10 Records			Aves	GB
+Philadelphia Vireo	Vireo philadelphicus	Accidental	1-10 Records		PHIVI	Aves	GB
+Red-eyed Vireo	Vireo olivaceus	Accidental	100-500 Records	EV	REEVI	Aves	GB
+Golden Oriole	Oriolus oriolus	"Scarce Breeder, Passage Visitor"	1-10 Pairs	OL	GOLOR	Aves	GB
+Jay	Garrulus glandarius	Resident Breeder	"100,000 - 500,000 Territories"	J.	JAY..	Aves	GB
+Magpie	Pica pica	Resident Breeder	"500,000 - 1 million Territories"	MG	MAGPI	Aves	GB
+Nutcracker	Nucifraga caryocatactes	Accidental		NC	NUTCR	Aves	GB
+Chough	Pyrrhocorax pyrrhocorax	Resident Breeder	100-500 Pairs	CF	CHOUG	Aves	GB
+Jackdaw	Coloeus monedula	"Resident Breeder, Winter Visitor"	1.3 million Pairs	JD	JACKD	Aves	GB
+Rook	Corvus frugilegus	"Resident Breeder, Winter Visitor"	"500,000 - 1 million Pairs"	RO	ROOK.	Aves	GB
+Carrion Crow	Corvus corone	"Resident Breeder, Winter Visitor"	1 million Territories	C.	CARCR	Aves	GB
+Hooded Crow	Corvus cornix	"Resident Breeder, Winter Visitor"	"100,000 - 500,000 Territories"	HC	HOOCR	Aves	GB
+Raven	Corvus corax	Resident Breeder	"1,000 - 10,000 Pairs"	RN	RAVEN	Aves	GB
+Waxwing	Bombycilla garrulus	Winter Visitor	"10,000 - 100,000 Birds"	WX	WAXWI	Aves	GB
+Cedar Waxwing	Bombycilla cedrorum	Accidental	1-10 Records			Aves	GB
+Coal Tit	Periparus ater	Resident Breeder	"500,000 - 1 million Territories"	CT	COATI	Aves	GB
+Crested Tit	Lophophanes cristatus	Resident Breeder	"1,000 - 10,000 Pairs"	CI	CRETI	Aves	GB
+Marsh Tit	Poecile palustris	Resident Breeder	"10,000 - 100,000 Territories"	MT	MARTI	Aves	GB
+Willow Tit	Poecile montanus	Resident Breeder	"1,000 - 10,000 Pairs"	WT	WILTI	Aves	GB
+Blue Tit	Cyanistes caeruleus	"Resident Breeder, Winter Visitor"	3.4 million Territories	BT	BLUTI	Aves	GB
+Great Tit	Parus major	"Resident Breeder, Winter Visitor"	2.5 million Territories	GT	GRETI	Aves	GB
+Penduline Tit	Remiz pendulinus	Scarce Visitor	10 - 100 Birds	DT	PENTI	Aves	GB
+Bearded Tit	Panurus biarmicus	"Resident Breeder, Passage/Winter Visitor"	500 - 1000 Pairs	BR	BEATI	Aves	GB
+Woodlark	Lullula arborea	"Resident/Migrant Breeder, Passage Visitor"	"1,000 - 10,000 Pairs"	WL	WOODL	Aves	GB
+White-winged Lark	Alauda leucoptera	Accidental	1-10 Records		WHWLA	Aves	GB
+Skylark	Alauda arvensis	"Resident Breeder, Passage/Winter Visitor"	1.4 million Territories	S.	SKYLA	Aves	GB
+Crested Lark	Galerida cristata	Accidental	10 - 100 Records		CRELA	Aves	GB
+Shore Lark	Eremophila alpestris	"Scarce Breeder, Winter Visitor"	10 - 100 Birds	SX	SHOLA	Aves	GB
+Short-toed Lark	Calandrella brachydactyla	Scarce Visitor	10 - 100 Birds	VL	SHTLA	Aves	GB
+Bimaculated Lark	Melanocorypha bimaculata	Accidental	1-10 Records		BIMLA	Aves	GB
+Calandra Lark	Melanocorypha calandra	Accidental	10 - 100 Records		CALLA	Aves	GB
+Black Lark	Melanocorypha yeltoniensis	Accidental	1-10 Records			Aves	GB
+Lesser Short-toed Lark	Alaudala rufescens	Accidental	1-10 Records		LSTLA	Aves	GB
+Sand Martin	Riparia riparia	"Migrant Breeder, Passage Visitor"	"100,000 - 500,000 Nests"	SM	SANMA	Aves	GB
+Tree Swallow	Tachycineta bicolor	Accidental	1-10 Records			Aves	GB
+Purple Martin	Progne subis	Accidental	1-10 Records			Aves	GB
+Swallow	Hirundo rustica	"Migrant Breeder, Passage Visitor"	"500,000 - 1 million Territories"	SL	SWALL	Aves	GB
+Crag Martin	Ptyonoprogne rupestris	Accidental	10 - 100 Records		CRAMA	Aves	GB
+House Martin	Delichon urbicum	"Migrant Breeder, Passage Visitor"	"500,000 - 1 million Pairs"	HM	HOUMA	Aves	GB
+Red-rumped Swallow	Cecropis daurica	Scarce Visitor	10 - 100 Birds	VR	RERSW	Aves	GB
+American Cliff Swallow	Petrochelidon pyrrhonota	Accidental	1-10 Records		CLISW	Aves	GB
+Cetti's Warbler	Cettia cetti	"Resident Breeder, Passage Visitor"	"1,000 - 10,000 Males"	CW	CETWA	Aves	GB
+Long-tailed Tit	Aegithalos caudatus	Resident Breeder	"100,000 - 500,000 Territories"	LT	LOTTI	Aves	GB
+Wood Warbler	Phylloscopus sibilatrix	"Migrant Breeder, Passage Visitor"	"1,000 - 10,000 Males"	WO	WOOWA	Aves	GB
+Western Bonelli's Warbler	Phylloscopus bonelli	Accidental	100-500 Records	IW	BONWA	Aves	GB
+Eastern Bonelli's Warbler	Phylloscopus orientalis	Accidental	1-10 Records		EABWA	Aves	GB
+Hume's Warbler	Phylloscopus humei	Accidental	100-500 Records		HULWA	Aves	GB
+Yellow-browed Warbler	Phylloscopus inornatus	Passage/Winter Visitor	"1,000 - 10,000 Birds"	YB	YEBWA	Aves	GB
+Pallas's Warbler	Phylloscopus proregulus	Scarce Visitor	10 - 100 Birds	PA	PALWA	Aves	GB
+Radde's Warbler	Phylloscopus schwarzi	Scarce Visitor	10 - 100 Birds		RADWA	Aves	GB
+Dusky Warbler	Phylloscopus fuscatus	Scarce Visitor	10 - 100 Birds	UY	DUSWA	Aves	GB
+Willow Warbler	Phylloscopus trochilus	"Migrant Breeder, Passage Visitor"	2.2 million Territories	WW	WILWA	Aves	GB
+Chiffchaff	Phylloscopus collybita	"Migrant Breeder, Passage/Winter Visitor"	1.1 million Territories	CC	CHIFF	Aves	GB
+Iberian Chiffchaff	Phylloscopus ibericus	"Accidental, Has Bred"	10 - 100 Records	IR	IBECH	Aves	GB
+Eastern Crowned Warbler	Phylloscopus coronatus	Accidental	1-10 Records			Aves	GB
+Green Warbler	Phylloscopus nitidus	Accidental	1-10 Records		GRNWA	Aves	GB
+Two-barred Greenish Warbler	Phylloscopus plumbeitarsus	Accidental	1-10 Records			Aves	GB
+Greenish Warbler	Phylloscopus trochiloides	Scarce Visitor	10 - 100 Birds		GSHWA	Aves	GB
+Pale-legged Leaf Warbler	Phylloscopus tenellipes	Accidental	1-10 Records			Aves	GB
+Arctic Warbler	Phylloscopus borealis	Scarce Visitor	100-500 Records	AP	ARCWA	Aves	GB
+Great Reed Warbler	Acrocephalus arundinaceus	Accidental	100-500 Records	QW	GRRWA	Aves	GB
+Aquatic Warbler	Acrocephalus paludicola	Passage Visitor	10 - 100 Birds	AQ	AQUWA	Aves	GB
+Sedge Warbler	Acrocephalus schoenobaenus	"Migrant Breeder, Passage Visitor"	"100,000 - 500,000 Territories"	SW	SEDWA	Aves	GB
+Paddyfield Warbler	Acrocephalus agricola	Accidental	100-500 Records	PY	PADWA	Aves	GB
+Blyth's Reed Warbler	Acrocephalus dumetorum	Scarce Visitor	10 - 100 Birds	DU	BLRWA	Aves	GB
+Reed Warbler	Acrocephalus scirpaceus	"Migrant Breeder, Passage Visitor"	"100,000 - 500,000 Pairs"	RW	REEWA	Aves	GB
+Marsh Warbler	Acrocephalus palustris	"Scarce Visitor, Scarce Breeder"	10 - 100 Birds	MW	MARWA	Aves	GB
+Thick-billed Warbler	Arundinax aedon	Accidental	1-10 Records		THBWA	Aves	GB
+Booted Warbler	Iduna caligata	Accidental	100-500 Records	DM	BOOWA	Aves	GB
+Sykes's Warbler	Iduna rama	Accidental	10 - 100 Records		SYKWA	Aves	GB
+Eastern Olivaceous Warbler	Iduna pallida	Accidental	10 - 100 Records		EAOWA	Aves	GB
+Olive-tree Warbler	Hippolais olivetorum	Accidental	1-10 Records			Aves	GB
+Melodious Warbler	Hippolais polyglotta	Scarce Visitor	10 - 100 Birds	ME	MELWA	Aves	GB
+Icterine Warbler	Hippolais icterina	"Scarce Visitor, Scarce Breeder"	10 - 100 Birds	IC	ICTWA	Aves	GB
+Pallas's Grasshopper Warbler	Helopsaltes certhiola	Accidental	10 - 100 Records		PAGWA	Aves	GB
+Lanceolated Warbler	Locustella lanceolata	Accidental	100-500 Records		LANWA	Aves	GB
+Grasshopper Warbler	Locustella naevia	"Migrant Breeder, Passage Visitor"	"10,000 - 100,000 Territories"	GH	GRAWA	Aves	GB
+River Warbler	Locustella fluviatilis	Accidental	10 - 100 Records	VW	RIVWA	Aves	GB
+Savi's Warbler	Locustella luscinioides	"Scarce Visitor, Scarce Breeder"	500 - 1000 Records	VI	SAVWA	Aves	GB
+Zitting Cisticola	Cisticola juncidis	Accidental	1-10 Records	FZ	FATWA	Aves	GB
+Blackcap	Sylvia atricapilla	"Migrant Breeder, Passage/Winter Visitor"	1.1 million Territories	BC	BLACA	Aves	GB
+Garden Warbler	Sylvia borin	"Migrant Breeder, Passage Visitor"	"100,000 - 500,000 Territories"	GW	GARWA	Aves	GB
+Barred Warbler	Sylvia nisoria	Scarce Visitor	100-500 Birds	RR	BARWA	Aves	GB
+Lesser Whitethroat	Sylvia curruca	"Migrant Breeder, Passage Visitor"	"10,000 - 100,000 Territories"	LW	LESWH	Aves	GB
+Western Orphean Warbler	Sylvia hortensis	Accidental	1-10 Records		ORPWA	Aves	GB
+Eastern Orphean Warbler	Sylvia crassirostris	Accidental	1-10 Records			Aves	GB
+Asian Desert Warbler	Sylvia nana	Accidental	10 - 100 Records	DA	DESWA	Aves	GB
+Whitethroat	Sylvia communis	"Migrant Breeder, Passage Visitor"	1.1 million Territories	WH	WHITE	Aves	GB
+Dartford Warbler	Sylvia undata	Resident Breeder	"1,000 - 10,000 Pairs"	DW	DARWA	Aves	GB
+Marmora's Warbler	Sylvia sarda	Accidental	1-10 Records		MAMWA	Aves	GB
+Spectacled Warbler	Sylvia conspicillata	Accidental	1-10 Records	VY	SPEWA	Aves	GB
+Subalpine Warbler	Sylvia cantillans	Scarce Visitor	10 - 100 Birds	VZ	SUBWA	Aves	GB
+Moltoni's Subalpine Warbler	Sylvia subalpina	Accidental	1-10 Records			Aves	GB
+Sardinian Warbler	Sylvia melanocephala	Accidental	10 - 100 Records	VX	SARWA	Aves	GB
+Rüppell's Warbler	Sylvia ruppeli	Accidental	1-10 Records		RUPWA	Aves	GB
+Firecrest	Regulus ignicapilla	"Migrant/Resident Breeder, Passage/Winter Visitor"	500 - 1000 Territories	FC	FIREC	Aves	GB
+Goldcrest	Regulus regulus	"Resident Breeder, Passage/Winter Visitor"	"500,000 - 1 million Territories"	GC	GOLDC	Aves	GB
+Wren	Troglodytes troglodytes	"Resident Breeder, Passage/Winter Visitor"	7.7 million Territories	WR	WREN.	Aves	GB
+Nuthatch	Sitta europaea	Resident Breeder	"100,000 - 500,000 Territories"	NH	NUTHA	Aves	GB
+Red-breasted Nuthatch	Sitta canadensis	Accidental	1-10 Records			Aves	GB
+Wallcreeper	Tichodroma muraria	Accidental	1-10 Records		WALLC	Aves	GB
+Treecreeper	Certhia familiaris	Resident Breeder	"100,000 - 500,000 Territories"	TC	TREEC	Aves	GB
+Short-toed Treecreeper	Certhia brachydactyla	Accidental	10 - 100 Records	TH	SHTTR	Aves	GB
+Grey Catbird	Dumetella carolinensis	Accidental	1-10 Records			Aves	GB
+Northern Mockingbird	Mimus polyglottos	Accidental	1-10 Records			Aves	GB
+Brown Thrasher	Toxostoma rufum	Accidental	1-10 Records		BROTH	Aves	GB
+Rose-coloured Starling	Pastor roseus	Scarce Visitor	10 - 100 Birds	OE	ROCST	Aves	GB
+Starling	Sturnus vulgaris	"Resident Breeder, Passage/Winter Visitor"	1.8 million Pairs	SG	STARL	Aves	GB
+Siberian Thrush	Geokichla sibirica	Accidental	10 - 100 Records		SIBTH	Aves	GB
+White's Thrush	Zoothera aurea	Accidental	10 - 100 Records		WHITH	Aves	GB
+Varied Thrush	Ixoreus naevius	Accidental	1-10 Records	VT		Aves	GB
+Veery	Catharus fuscescens	Accidental	10 - 100 Records		VEERY	Aves	GB
+Grey-cheeked Thrush	Catharus minimus	Accidental	10 - 100 Records		GRATH	Aves	GB
+Swainson's Thrush	Catharus ustulatus	Accidental	10 - 100 Records		SWATH	Aves	GB
+Hermit Thrush	Catharus guttatus	Accidental	10 - 100 Records		HERTH	Aves	GB
+Wood Thrush	Hylocichla mustelina	Accidental	1-10 Records			Aves	GB
+Ring Ouzel	Turdus torquatus	"Migrant Breeder, Passage Visitor"	"1,000 - 10,000 Territories"	RZ	RINOU	Aves	GB
+Blackbird	Turdus merula	"Migrant/Resident Breeder, Passage/Winter Visitor"	4.9 million Pairs	B.	BLABI	Aves	GB
+Eyebrowed Thrush	Turdus obscurus	Accidental	10 - 100 Records		EYBTH	Aves	GB
+Black-throated Thrush	Turdus atrogularis	Accidental	10 - 100 Records	XC	BLTTH	Aves	GB
+Red-throated Thrush	Turdus ruficollis	Accidental	1-10 Records		RETTH	Aves	GB
+Naumann's Thrush	Turdus naumanni	Accidental	1-10 Records			Aves	GB
+Dusky Thrush	Turdus eunomus	Accidental	10 - 100 Records		DUSTH	Aves	GB
+Fieldfare	Turdus pilaris	"Scarce Breeder, Passage/Winter Visitor"	"500,000 - 1 million Birds"	FF	FIELD	Aves	GB
+Redwing	Turdus iliacus	"Migrant/Resident Breeder, Passage/Winter Visitor"	"500,000 - 1 million Birds"	RE	REDWI	Aves	GB
+Song Thrush	Turdus philomelos	"Migrant/Resident Breeder, Passage/Winter Visitor"	1.1 million Territories	ST	SONTH	Aves	GB
+Mistle Thrush	Turdus viscivorus	"Migrant/Resident Breeder, Passage/Winter Visitor"	"100,000 - 500,000 Territories"	M.	MISTH	Aves	GB
+American Robin	Turdus migratorius	Accidental	10 - 100 Records	AR	AMERO	Aves	GB
+Rufous-tailed Scrub Robin	Cercotrichas galactotes	Accidental	1-10 Records		RUBRO	Aves	GB
+Spotted Flycatcher	Muscicapa striata	"Migrant Breeder, Passage Visitor"	"10,000 - 100,000 Territories"	SF	SPOFL	Aves	GB
+Asian Brown Flycatcher	Muscicapa dauurica	Accidental	1-10 Records			Aves	GB
+Robin	Erithacus rubecula	"Migrant/Resident Breeder, Passage/Winter Visitor"	6 million Territories	R.	ROBIN	Aves	GB
+Siberian Blue Robin	Larvivora cyane	Accidental	1-10 Records			Aves	GB
+Rufous-tailed Robin	Larvivora sibilans	Accidental	1-10 Records		RUTRO	Aves	GB
+Bluethroat	Luscinia svecica	"Scarce Breeder, Passage Visitor"	10 - 100 Birds	BU	BLUTH	Aves	GB
+Thrush Nightingale	Luscinia luscinia	Accidental	100-500 Records	FN	THRNI	Aves	GB
+Nightingale	Luscinia megarhynchos	"Migrant Breeder, Passage Visitor"	"1,000 - 10,000 Males"	N.	NIGAL	Aves	GB
+White-throated Robin	Irania gutturalis	Accidental	1-10 Records		WHTRO	Aves	GB
+Siberian Rubythroat	Calliope calliope	Accidental	10 - 100 Records		SIBRU	Aves	GB
+Red-flanked Bluetail	Tarsiger cyanurus	Scarce Visitor	100-500 Records		REFBL	Aves	GB
+Pied Flycatcher	Ficedula hypoleuca	"Migrant Breeder, Passage Visitor"	"10,000 - 100,000 Pairs"	PF	PIEFL	Aves	GB
+Collared Flycatcher	Ficedula albicollis	Accidental	10 - 100 Records		COLFL	Aves	GB
+Red-breasted Flycatcher	Ficedula parva	Scarce Visitor	100-500 Birds	FY	REBFL	Aves	GB
+Taiga Flycatcher	Ficedula albicilla	Accidental	1-10 Records		TAIFL	Aves	GB
+Black Redstart	Phoenicurus ochruros	"Migrant/Resident Breeder, Passage/Winter Visitor"	10 - 100 Pairs	BX	BLARE	Aves	GB
+Redstart	Phoenicurus phoenicurus	"Migrant Breeder, Passage Visitor"	"100,000 - 500,000 Pairs"	RT	REDST	Aves	GB
+Moussier's Redstart	Phoenicurus moussieri	Accidental	1-10 Records		MOURE	Aves	GB
+Rock Thrush	Monticola saxatilis	Accidental	10 - 100 Records	OH	ROCTH	Aves	GB
+Blue Rock Thrush	Monticola solitarius	Accidental	1-10 Records		BLRTH	Aves	GB
+Whinchat	Saxicola rubetra	"Migrant Breeder, Passage Visitor"	"10,000 - 100,000 Pairs"	WC	WHINC	Aves	GB
+Stonechat	Saxicola rubicola	Migrant/Resident Breeder	"10,000 - 100,000 Pairs"	SC	STOCH	Aves	GB
+Siberian Stonechat	Saxicola maurus	Accidental	100-500 Records			Aves	GB
+Stejneger's Stonechat	Saxicola stejnegeri	Accidental	1-10 Records			Aves	GB
+Wheatear	Oenanthe oenanthe	"Migrant Breeder, Passage Visitor"	"100,000 - 500,000 Pairs"	W.	WHEAT	Aves	GB
+Isabelline Wheatear	Oenanthe isabellina	Accidental	10 - 100 Records		ISAWH	Aves	GB
+Desert Wheatear	Oenanthe deserti	Accidental	100-500 Records		DESWH	Aves	GB
+Black-eared Wheatear	Oenanthe hispanica	Scarce Visitor	10 - 100 Records		BLEWH	Aves	GB
+Pied Wheatear	Oenanthe pleschanka	Accidental	10 - 100 Records	PI	PIEWH	Aves	GB
+White-crowned Black Wheatear	Oenanthe leucopyga	Accidental	1-10 Records		WHCBL	Aves	GB
+Dipper	Cinclus cinclus	Resident Breeder	"10,000 - 100,000 Pairs"	DI	DIPPE	Aves	GB
+House Sparrow	Passer domesticus	Resident Breeder	5.1 million Pairs	HS	HOUSP	Aves	GB
+Spanish Sparrow	Passer hispaniolensis	Accidental	10 - 100 Records		SPASP	Aves	GB
+Tree Sparrow	Passer montanus	"Resident Breeder, Passage Visitor"	"100,000 - 500,000 Territories"	TS	TRESP	Aves	GB
+Rock Sparrow	Petronia petronia	Accidental	1-10 Records		ROCSP	Aves	GB
+Alpine Accentor	Prunella collaris	Accidental	10 - 100 Records		ALPAC	Aves	GB
+Siberian Accentor	Prunella montanella	Accidental	10 - 100 Records			Aves	GB
+Dunnock	Prunella modularis	"Resident Breeder, Passage/Winter Visitor"	2.3 million Territories	D.	DUNNO	Aves	GB
+Yellow Wagtail	Motacilla flava	"Migrant Breeder, Passage Visitor"	"10,000 - 100,000 Territories"	YW	YELWA	Aves	GB
+Eastern Yellow Wagtail	Motacilla tschutschensis	Accidental	1-10 Records			Aves	GB
+Citrine Wagtail	Motacilla citreola	Scarce Visitor	10 - 100 Birds	IZ	CITWA	Aves	GB
+Grey Wagtail	Motacilla cinerea	"Resident Breeder, Passage Visitor"	"10,000 - 100,000 Pairs"	GL	GREWA	Aves	GB
+Pied Wagtail	Motacilla alba	"Migrant/Resident Breeder, Passage Visitor"	"100,000 - 500,000 Pairs"	PW	PIEWA	Aves	GB
+Richard's Pipit	Anthus richardi	Scarce Visitor	100-500 Birds	PR	RICPI	Aves	GB
+Blyth's Pipit	Anthus godlewskii	Accidental	10 - 100 Records		BLYPI	Aves	GB
+Tawny Pipit	Anthus campestris	Accidental	10 - 100 Birds	TI	TAWPI	Aves	GB
+Meadow Pipit	Anthus pratensis	"Migrant/Resident Breeder, Passage/Winter Visitor"	1.9 million Pairs	MP	MEAPI	Aves	GB
+Tree Pipit	Anthus trivialis	"Migrant Breeder, Passage Visitor"	"10,000 - 100,000 Pairs"	TP	TREPI	Aves	GB
+Olive-backed Pipit	Anthus hodgsoni	Scarce Visitor	10 - 100 Birds	OV	OLBPI	Aves	GB
+Pechora Pipit	Anthus gustavi	Scarce Visitor	100-500 Records		PECPI	Aves	GB
+Red-throated Pipit	Anthus cervinus	Accidental	500 - 1000 Records	VP	RETPI	Aves	GB
+Buff-bellied Pipit	Anthus rubescens	Accidental	10 - 100 Records		AMEPI	Aves	GB
+Water Pipit	Anthus spinoletta	Passage/Winter Visitor	100-500 Birds	WI	WATPI	Aves	GB
+Rock Pipit	Anthus petrosus	"Resident Breeder, Passage/Winter Visitor"	"10,000 - 100,000 Pairs"	RC	ROCPI	Aves	GB
+Chaffinch	Fringilla coelebs	"Resident Breeder, Passage/Winter Visitor"	5.8 million Territories	CH	CHAFF	Aves	GB
+Brambling	Fringilla montifringilla	"Scarce Breeder, Passage/Winter Visitor"	"100,000 - 500,000 Birds"	BL	BRAMB	Aves	GB
+Evening Grosbeak	Hesperiphona vespertina	Accidental	1-10 Records		EVEGR	Aves	GB
+Hawfinch	Coccothraustes coccothraustes	"Resident Breeder, Passage Visitor"	500 - 1000 Pairs	HF	HAWFI	Aves	GB
+Pine Grosbeak	Pinicola enucleator	Accidental	1-10 Records		PINGR	Aves	GB
+Bullfinch	Pyrrhula pyrrhula	"Resident Breeder, Scarce Visitor"	"100,000 - 500,000 Territories"	BF	BULLF	Aves	GB
+Trumpeter Finch	Bucanetes githagineus	Accidental	10 - 100 Records		TRUFI	Aves	GB
+Common Rosefinch	Carpodacus erythrinus	"Scarce Breeder, Passage Visitor"	100-500 Birds	SQ	SCARO	Aves	GB
+Greenfinch	Chloris chloris	"Resident Breeder, Winter Visitor"	1.7 million Pairs	GR	GREFI	Aves	GB
+Twite	Linaria flavirostris	"Migrant/Resident Breeder, Winter Visitor"	"1,000 - 10,000 Pairs"	TW	TWITE	Aves	GB
+Linnet	Linaria cannabina	"Migrant/Resident Breeder, Passage/Winter Visitor"	"100,000 - 500,000 Territories"	LI	LINNE	Aves	GB
+Common Redpoll	Acanthis flammea	"Scarce Breeder, Passage/Winter Visitor"	100-500 Birds	FR	COMRE	Aves	GB
+Lesser Redpoll	Acanthis cabaret	Migrant/Resident Breeder	"100,000 - 500,000 Pairs"	LR	LESRE	Aves	GB
+Arctic Redpoll	Acanthis hornemanni	Scarce Visitor	10 - 100 Birds	AL	ARCRE	Aves	GB
+Parrot Crossbill	Loxia pytyopsittacus	"Scarce Visitor, Occasional Breeder"	100-500 Records	PC	PARCR	Aves	GB
+Scottish Crossbill	Loxia scotica	Endemic Breeder	"1,000 - 10,000 Pairs"	CY	SCOCR	Aves	GB
+Common Crossbill	Loxia curvirostra	"Migrant/Resident Breeder, Passage/Winter Visitor"	"10,000 - 100,000 Pairs"	CR	CROSS	Aves	GB
+Two-barred Crossbill	Loxia leucoptera	Scarce Visitor	100-500 Records	PD	TWBCR	Aves	GB
+Goldfinch	Carduelis carduelis	Migrant/Resident Breeder	1.2 million Pairs	GO	GOLDF	Aves	GB
+Citril Finch	Carduelis citrinella	Accidental	1-10 Records		CITFI	Aves	GB
+Serin	Serinus serinus	"Scarce Visitor, Has bred"	10 - 100 Birds	NS	SERIN	Aves	GB
+Siskin	Spinus spinus	"Resident Breeder, Passage/Winter Visitor"	"100,000 - 500,000 Pairs"	SK	SISKI	Aves	GB
+Lapland Bunting	Calcarius lapponicus	"Scarce Breeder, Passage/Winter Visitor"	500 - 1000 Birds	LA	LAPBU	Aves	GB
+Snow Bunting	Plectrophenax nivalis	"Resident Breeder, Passage/Winter Visitor"	10 - 100 Pairs	SB	SNOBU	Aves	GB
+Corn Bunting	Emberiza calandra	"Resident Breeder, Passage Visitor"	"10,000 - 100,000 Territories"	CB	CORBU	Aves	GB
+Yellowhammer	Emberiza citrinella	"Resident Breeder, Passage/Winter Visitor"	"500,000 - 1 million Territories"	Y.	YELHA	Aves	GB
+Pine Bunting	Emberiza leucocephalos	Accidental	10 - 100 Records	EL	PINBU	Aves	GB
+Rock Bunting	Emberiza cia	Accidental	1-10 Records		ROCBU	Aves	GB
+Ortolan Bunting	Emberiza hortulana	Scarce Visitor	10 - 100 Birds	OB	ORTBU	Aves	GB
+Cretzschmar's Bunting	Emberiza caesia	Accidental	1-10 Records		CREBU	Aves	GB
+Cirl Bunting	Emberiza cirlus	Resident Breeder	"1,000 - 10,000 Territories"	CL	CIRBU	Aves	GB
+Chestnut-eared Bunting	Emberiza fucata	Accidental	1-10 Records		CHABU	Aves	GB
+Little Bunting	Emberiza pusilla	Scarce Visitor	10 - 100 Birds	LJ	LITBU	Aves	GB
+Yellow-browed Bunting	Emberiza chrysophrys	Accidental	1-10 Records		YEBBU	Aves	GB
+Rustic Bunting	Emberiza rustica	Accidental	500 - 1000 Records		RUSBU	Aves	GB
+Yellow-breasted Bunting	Emberiza aureola	Accidental	100-500 Records	YO	YBSBU	Aves	GB
+Chestnut Bunting	Emberiza rutila	Accidental	1-10 Records			Aves	GB
+Black-headed Bunting	Emberiza melanocephala	Accidental	100-500 Records		BLHBU	Aves	GB
+Black-faced Bunting	Emberiza spodocephala	Accidental	1-10 Records			Aves	GB
+Pallas's Reed Bunting	Emberiza pallasi	Accidental	1-10 Records		PARBU	Aves	GB
+Reed Bunting	Emberiza schoeniclus	"Resident Breeder, Passage/Winter Visitor"	"100,000 - 500,000 Territories"	RB	REEBU	Aves	GB
+Song Sparrow	Melospiza melodia	Accidental	1-10 Records		SONSP	Aves	GB
+White-crowned Sparrow	Zonotrichia leucophrys	Accidental	1-10 Records		WHCSP	Aves	GB
+White-throated Sparrow	Zonotrichia albicollis	Accidental	10 - 100 Records		WHTSP	Aves	GB
+Dark-eyed Junco	Junco hyemalis	Accidental	10 - 100 Records	JU	DAEJU	Aves	GB
+Savannah Sparrow	Passerculus sandwichensis	Accidental	1-10 Records		SAVSP	Aves	GB
+Lark Sparrow	Chondestes grammacus	Accidental	1-10 Records		LARSP	Aves	GB
+Eastern Towhee	Pipilo erythrophthalmus	Accidental	1-10 Records		RUSTO	Aves	GB
+Bobolink	Dolichonyx oryzivorus	Accidental	10 - 100 Records		BOBOL	Aves	GB
+Baltimore Oriole	Icterus galbula	Accidental	10 - 100 Records		NOROR	Aves	GB
+Red-winged Blackbird	Agelaius phoeniceus	Accidental	1-10 Records			Aves	GB
+Brown-headed Cowbird	Molothrus ater	Accidental	1-10 Records			Aves	GB
+Ovenbird	Seiurus aurocapilla	Accidental	1-10 Records		OVENB	Aves	GB
+Northern Waterthrush	Parkesia noveboracensis	Accidental	1-10 Records		NORWA	Aves	GB
+Golden-winged Warbler	Vermivora chrysoptera	Accidental	1-10 Records			Aves	GB
+Black-and-white Warbler	Mniotilta varia	Accidental	10 - 100 Records		BAWWA	Aves	GB
+Tennessee Warbler	Leiothlypis peregrina	Accidental	1-10 Records		TENWA	Aves	GB
+Common Yellowthroat	Geothlypis trichas	Accidental	10 - 100 Records		COMYE	Aves	GB
+Hooded Warbler	Setophaga citrina	Accidental	1-10 Records		HOOWA	Aves	GB
+American Redstart	Setophaga ruticilla	Accidental	1-10 Records	AD	AMERE	Aves	GB
+Cape May Warbler	Setophaga tigrina	Accidental	1-10 Records		CAMWA	Aves	GB
+Northern Parula	Setophaga americana	Accidental	10 - 100 Records		NORPA	Aves	GB
+Magnolia Warbler	Setophaga magnolia	Accidental	1-10 Records		MAGWA	Aves	GB
+Bay-breasted Warbler	Setophaga castanea	Accidental	1-10 Records			Aves	GB
+Blackburnian Warbler	Setophaga fusca	Accidental	1-10 Records			Aves	GB
+Yellow Warbler	Setophaga aestiva	Accidental	1-10 Records		YLWWA	Aves	GB
+Chestnut-sided Warbler	Setophaga pensylvanica	Accidental	1-10 Records			Aves	GB
+Blackpoll Warbler	Setophaga striata	Accidental	10 - 100 Records		BLAWA	Aves	GB
+Yellow-rumped Warbler	Setophaga coronata	Accidental	10 - 100 Records		YERWA	Aves	GB
+Wilson's Warbler	Cardellina pusilla	Accidental	1-10 Records			Aves	GB
+Summer Tanager	Piranga rubra	Accidental	1-10 Records		SUMTA	Aves	GB
+Scarlet Tanager	Piranga olivacea	Accidental	1-10 Records		SCATA	Aves	GB
+Rose-breasted Grosbeak	Pheucticus ludovicianus	Accidental	10 - 100 Records		ROBGR	Aves	GB
+Indigo Bunting	Passerina cyanea	Accidental	1-10 Records		INDBU	Aves	GB

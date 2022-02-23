@@ -1,0 +1,433 @@
+attributes:
+  assembly_level:
+    constraint:
+      enum:
+      - complete genome
+      - chromosome
+      - scaffold
+      - contig
+    display_group: misc
+    display_level: 1
+    display_name: Assembly level
+    header: assemblyLevel
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    taxon_display_group: assembly
+    taxon_display_level: 1
+    taxon_display_name: Assembly level
+    taxon_key: assembly_level
+    taxon_name: assembly_level
+    taxon_summary:
+    - primary
+    - enum
+    taxon_traverse: enum
+    taxon_traverse_direction: up
+    type: keyword
+  assembly_span:
+    constraint:
+      min: 1
+    display_group: metrics
+    display_level: 1
+    display_name: Assembly span
+    header: totalSequenceLength
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    taxon_bins:
+      count: 10
+      max: 11
+      min: 6
+      scale: log10
+    taxon_display_group: assembly
+    taxon_display_level: 1
+    taxon_display_name: Assembly span
+    taxon_key: assembly_span
+    taxon_name: assembly_span
+    taxon_summary:
+    - primary
+    - median
+    - min
+    - max
+    - count
+    taxon_traverse: median
+    taxon_traverse_direction: both
+    type: long
+    units: bases
+  assembly_type:
+    display_group: misc
+    display_level: 2
+    display_name: Assembly type
+    header: assemblyType
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: keyword
+  bioproject_accession:
+    constraint:
+      len: 32
+    display_group: misc
+    header: bioProjectAccession
+    organelle: nucleus
+    separator:
+    - ;
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    taxon_display_group: assembly
+    taxon_display_level: 2
+    taxon_display_name: Bioproject
+    taxon_key: bioproject
+    taxon_name: bioproject
+    taxon_summary:
+    - list
+    taxon_traverse: list
+    taxon_traverse_direction: up
+    type: keyword
+  biosample_accession:
+    constraint:
+      len: 32
+    display_group: misc
+    header: biosampleAccession
+    organelle: nucleus
+    separator:
+    - ;
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    taxon_display_group: assembly
+    taxon_display_level: 2
+    taxon_display_name: Biosample
+    taxon_key: biosample
+    taxon_name: biosample
+    taxon_summary:
+    - list
+    taxon_traverse: list
+    taxon_traverse_direction: up
+    type: keyword
+  chromosome_count:
+    constraint:
+      min: 1
+    display_group: metrics
+    display_level: 1
+    display_name: Chromosome count
+    header: totalNumberOfChromosomes
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: long
+    units: bases
+  contig_count:
+    constraint:
+      min: 1
+    display_group: metrics
+    display_level: 1
+    display_name: Contig count
+    header: numberOfContigs
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: long
+    units: bases
+  contig_l50:
+    constraint:
+      min: 1
+    display_group: metrics
+    display_level: 2
+    display_name: Contig L50
+    header: contigL50
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: long
+    units: bases
+  contig_n50:
+    constraint:
+      min: 1
+    display_group: metrics
+    display_level: 1
+    display_name: Contig N50
+    header: contigN50
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    taxon_bins:
+      count: 10
+      max: 9
+      min: 4
+      scale: log10
+    taxon_display_group: assembly
+    taxon_display_level: 2
+    taxon_key: contig_n50
+    taxon_name: contig_n50
+    taxon_summary:
+    - primary
+    - max
+    - median
+    - min
+    - count
+    taxon_traverse: median
+    taxon_traverse_direction: up
+    type: long
+    units: bases
+  ebp_metric_date:
+    display_group: misc
+    display_level: 2
+    display_name: EBP metric date
+    header: ebpMetricDate
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    taxon_display_group: assembly
+    taxon_key: ebp_metric_date
+    taxon_name: ebp_metric_date
+    taxon_summary:
+    - min
+    - max
+    taxon_traverse: min
+    taxon_traverse_direction: up
+    type: date
+  gene_count:
+    constraint:
+      min: 1
+    display_group: annotation
+    display_level: 1
+    display_name: Gene count
+    header: geneCountTotal
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    taxon_bins:
+      count: 10
+      max: 5
+      min: 0
+      scale: log10
+    taxon_display_group: assembly
+    taxon_display_level: 2
+    taxon_key: gene_count
+    taxon_name: gene_count
+    taxon_summary:
+    - primary
+    - median
+    - min
+    - max
+    - count
+    type: integer
+  isolate:
+    display_group: misc
+    display_level: 2
+    display_name: Isolate
+    header: isolate
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: keyword
+  last_updated:
+    display_group: misc
+    display_level: 2
+    display_name: Last updated
+    header: submissionDate
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    taxon_display_group: assembly
+    taxon_key: assembly_date
+    taxon_name: assembly_date
+    taxon_summary:
+    - primary
+    - max
+    - min
+    taxon_traverse: min
+    taxon_traverse_direction: up
+    type: date
+  noncoding_gene_count:
+    constraint:
+      min: 1
+    display_group: annotation
+    display_level: 2
+    display_name: Non-coding gene count
+    header: geneCountNoncoding
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: integer
+  protein_count:
+    constraint:
+      min: 1
+    display_group: annotation
+    display_level: 2
+    display_name: Protein count
+    header: geneCountProteincoding
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: integer
+  pseudogene_count:
+    constraint:
+      min: 1
+    display_group: annotation
+    display_level: 2
+    display_name: Pseudogene count
+    header: geneCountPseudogene
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: integer
+  refseq_category:
+    display_group: misc
+    display_level: 2
+    display_name: RefSeq category
+    header: refseqCategory
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: keyword
+  sample_sex:
+    display_group: misc
+    display_level: 2
+    display_name: Sample sex
+    header: sex
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    taxon_display_group: assembly
+    taxon_display_level: 2
+    taxon_display_name: Sample sex
+    taxon_key: sample_sex
+    taxon_name: sample_sex
+    taxon_summary:
+    - primary
+    - list
+    - count
+    type: keyword
+  scaffold_count:
+    constraint:
+      min: 1
+    display_group: metrics
+    display_level: 1
+    display_name: Scaffold count
+    header: numberOfScaffolds
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: long
+    units: bases
+  scaffold_l50:
+    constraint:
+      min: 1
+    display_group: metrics
+    display_level: 2
+    display_name: Scaffold L50
+    header: scaffoldL50
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: long
+    units: bases
+  scaffold_n50:
+    constraint:
+      min: 1
+    display_group: metrics
+    display_level: 1
+    display_name: Scaffold N50
+    header: scaffoldN50
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    taxon_bins:
+      count: 10
+      max: 9
+      min: 4
+      scale: log10
+    taxon_display_group: assembly
+    taxon_display_level: 2
+    taxon_key: scaffold_n50
+    taxon_name: scaffold_n50
+    taxon_summary:
+    - primary
+    - max
+    - median
+    - min
+    - count
+    taxon_traverse: median
+    taxon_traverse_direction: up
+    type: long
+    units: bases
+  sequence_count:
+    constraint:
+      min: 1
+    display_group: metrics
+    display_level: 2
+    display_name: Sequence count
+    header: numberOfComponentSequences
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: long
+    units: bases
+  submitter:
+    display_group: misc
+    display_level: 2
+    display_name: Submitter
+    header: submitter
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: keyword
+  ungapped_span:
+    constraint:
+      min: 1
+    display_group: metrics
+    display_level: 2
+    display_name: Ungapped span
+    header: totalUngappedLength
+    organelle: nucleus
+    source: NCBI Datasets
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: long
+    units: bases
+file:
+  display_group: misc
+  format: tsv
+  header: true
+  name: ncbi_datasets_eukaryota.tsv.gz
+  organelle: nucleus
+  source: NCBI Datasets
+  source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+identifiers:
+  assembly_id:
+    constraint:
+      len: 32
+    header: genbankAssmAccession
+    type: keyword
+  assembly_name:
+    constraint:
+      len: 64
+    header: assemblyName
+    type: keyword
+  genbank_accession:
+    constraint:
+      len: 32
+    header: genbankAssmAccession
+    type: keyword
+  refseq_accession:
+    constraint:
+      len: 32
+    header: refseqAssmAccession
+    type: keyword
+  wgs_accession:
+    constraint:
+      len: 16
+    header: wgsProjectAccession
+    type: keyword
+metadata:
+  is_primary_value:
+    header: primaryValue
+  source_slug:
+    header: genbankAssmAccession
+names:
+  common_name:
+    header: commonName
+taxonomy:
+  taxon:
+    header: organismName
+  taxon_id:
+    header: taxId

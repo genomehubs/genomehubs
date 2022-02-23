@@ -1,0 +1,22 @@
+file:
+  format: tsv
+  header: true
+  name: DTOL_assembly_informatics_status_kmer_draft.tsv
+  source: Darwin Tree of Life Assembly Team
+  source_url: https://qc.tol.sanger.ac.uk/
+attributes:
+  genome_size_kmer:
+    header: est_size_mb
+    function: "{} * 1000000"
+    separator:
+      - "(?<!e)-"
+    type: long
+  genome_size_draft:
+    header: length_mb
+    function: "{} * 1000000"
+    separator:
+      - "(?<!e)-"
+    type: long
+taxonomy:
+  taxon_id:
+    header: taxon

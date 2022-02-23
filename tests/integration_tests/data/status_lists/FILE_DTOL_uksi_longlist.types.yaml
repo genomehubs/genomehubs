@@ -1,0 +1,25 @@
+file:
+  format: csv
+  header: true
+  comment: "#"
+  name: DTOL_uksi_longlist.csv
+  source: UKSI_2021-12-21
+  source_date: 2021-12-21
+  source_url: https://registry.nbnatlas.org/UKSI/UKSI_DwCA.zip
+attributes:
+  long_list:
+    header: long_list
+    type: keyword
+taxonomy:
+  species:
+    header: scientificName
+  genus:
+    header: genus
+  family:
+    header: family
+  order:
+    header: order
+  class:
+    header: class
+  phylum:
+    header: phylum

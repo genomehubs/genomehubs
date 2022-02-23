@@ -1,0 +1,73 @@
+attributes:
+  chromosome_number:
+    display_group: karyotype
+    bins:
+      min: 0
+      max: 10
+      count: 10
+      scale: log2
+    constraint:
+      max: 2000
+      min: 0
+    description: Chromosome number
+    display_level: 1
+    display_name: Chromosome number
+    summary:
+      - median_high
+      - mode
+      - max
+      - min
+    traverse: median_high
+    traverse_direction: both
+    type: short
+  haploid_number:
+    display_group: karyotype
+    bins:
+      min: 0
+      max: 10
+      count: 10
+      scale: log2
+    constraint:
+      max: 2000
+      min: 0
+    description: Haploid number
+    display_level: 1
+    display_name: Haploid number
+    summary:
+      - median_high
+      - mode
+      - max
+      - min
+    traverse: median_high
+    traverse_direction: both
+    type: short
+  sex_determination:
+    display_group: karyotype
+    description: Sex determination mechanism
+    display_level: 2
+    display_name: Sex Determination
+    summary: list
+    traverse: list
+    traverse_direction: up
+    type: keyword
+  ploidy:
+    display_group: karyotype
+    bins:
+      min: 0
+      max: 10
+      count: 10
+      scale: linear
+    constraint:
+      max: 200
+      min: 0
+    description: Ploidy
+    display_level: 2
+    display_name: Ploidy
+    summary:
+      - median_high
+      - mode
+      - max
+      - min
+    traverse: median_high
+    traverse_direction: both
+    type: short

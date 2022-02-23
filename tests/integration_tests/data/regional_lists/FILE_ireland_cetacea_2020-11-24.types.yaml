@@ -1,0 +1,20 @@
+file:
+  format: tsv
+  header: true
+  name: ireland_cetacea_2020-11-24.tsv
+  source: Ireland Cetacea
+  description: Ireland Cetacea from Nicola Chapman, Sanger
+attributes:
+  country_list:
+    header: ireland_cetacea
+    type: keyword
+taxon_names:
+  common_name:
+    header: common_name
+taxonomy:
+  species:
+    header: scientific_name
+  infraorder:
+    header: infraorder
+  order:
+    header: order

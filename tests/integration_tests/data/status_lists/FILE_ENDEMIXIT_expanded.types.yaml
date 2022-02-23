@@ -1,0 +1,42 @@
+file:
+  format: tsv
+  header: true
+  comment: "#"
+  name: ENDEMIXIT_expanded_2022-02-07.tsv
+  source: Giorgio Bertorelle - Department of Life Sciences and Biotechnology, University of Ferrara
+  source_date: 2022-02-07
+attributes:
+  long_list:
+    header: long_list
+    type: keyword
+  other_priority:
+    header: family_representative
+    type: keyword
+  family_representative:
+    header: family_representative
+    type: keyword
+  sequencing_status:
+    header: sequencing_status
+    translate:
+      data_generation: in_progress
+      in_assembly: in_progress
+    type: keyword
+  sample_collected:
+    header: sample_acquired
+    type: keyword
+  sample_acquired:
+    header: sample_acquired
+    type: keyword
+  in_progress:
+    header: data_generation
+    type: keyword
+taxonomy:
+  genus:
+    header: Genus
+  species:
+    index: [2, 3]
+    join: " "
+  family:
+    header: family
+  taxon_id:
+    header: NCBI_taxon_id

@@ -1,0 +1,18 @@
+file:
+  format: tsv
+  header: true
+  name: uk_cetacea_2020-11-24.tsv
+  source: UK Cetacea
+  description: UK Cetacea from Nicola Chapman, Sanger. List provided by Peter evans email 19/11/2020
+attributes:
+  country_list:
+    header: uk_cetacea
+    type: keyword
+taxon_names:
+  common_name:
+    header: common_name
+taxonomy:
+  species:
+    header: scientific_name
+  order:
+    header: order

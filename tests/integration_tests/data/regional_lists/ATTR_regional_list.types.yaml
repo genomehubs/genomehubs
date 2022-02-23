@@ -1,0 +1,14 @@
+attributes:
+  country_list:
+    constraint:
+      enum:
+        - gb
+        - ie
+    description: List of countries where taxon is found
+    display_group: regional_lists
+    display_level: 2
+    display_name: Country list
+    summary: list
+    traverse: list
+    traverse_direction: up
+    type: keyword

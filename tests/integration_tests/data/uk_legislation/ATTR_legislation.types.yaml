@@ -1,0 +1,78 @@
+attributes:
+  echabs92:
+    constraint:
+      enum:
+        - echabs92_annex_iib
+        - echabs92_annex_ivb
+        - echabs92_annex_iva
+    description: Section in which species is listed
+    display_group: uk_legislation
+    display_level: 2
+    display_name: EC Habitats Directive 1992
+    summary: list
+    traverse: list
+    traverse_direction: up
+    type: keyword
+  habreg_2017:
+    constraint:
+      enum:
+        - habreg-sch2
+        - habreg-sch5
+    description: Section in which species is listed
+    display_group: uk_legislation
+    display_level: 2
+    display_name: Conservation of Habitats and Species Regulations 2017
+    summary: list
+    traverse: list
+    traverse_direction: up
+    type: keyword
+  marhabreg-2017:
+    constraint:
+      enum:
+        - marhabreg-sch1
+    description: Section in which species is listed
+    display_group: uk_legislation
+    display_level: 2
+    display_name: Conservation of Offshore Marine Habitats and Species Regulations 2017
+    summary: list
+    traverse: list
+    traverse_direction: up
+    type: keyword
+  waca_1981:
+    constraint:
+      enum:
+        - waca-sch1
+        - waca-sch5
+    description: Section in which species is listed
+    display_group: uk_legislation
+    display_level: 2
+    display_name: Wildlife and Countryside Act 1981
+    summary: list
+    traverse: list
+    traverse_direction: up
+    type: keyword
+  isb_wildlife_act_1976:
+    constraint:
+      enum:
+        - iwa-nsch3
+        - iwa-sch5
+    description: Section in which species is listed
+    display_group: uk_legislation
+    display_level: 2
+    display_name: Irish Statute Book Wildlife Act, 1976
+    summary: list
+    traverse: list
+    traverse_direction: up
+    type: keyword
+  protection_of_badgers_act_1992:
+    constraint:
+      enum:
+        - badgers92
+    description: Section in which species is listed
+    display_group: uk_legislation
+    display_level: 2
+    display_name: Protection of Badgers Act 1992
+    summary: list
+    traverse: list
+    traverse_direction: up
+    type: keyword

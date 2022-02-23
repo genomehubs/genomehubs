@@ -1,0 +1,40 @@
+file:
+  format: csv
+  header: true
+  name: kewplantcvalues_tblCoreFields.csv.gz
+  source: Kew Plant DNA C-values Database
+  source_url: https://cvalues.science.kew.org
+attributes:
+  c_value:
+    type: half_float
+    header: 1Cpg
+    separator:
+      - ","
+      - "(?<!e)-"
+  c_value_method:
+    type: keyword
+    header: EstimationMethodId
+  chromosome_number:
+    type: short
+    header: AcceptedChromosomeNumber
+    separator:
+      - ","
+      - "-"
+  genome_size:
+    type: long
+    function: "{} * 978000000"
+    header: 1Cpg
+    separator:
+      - ","
+      - "(?<!e)-"
+taxonomy:
+  genus:
+    header: Genus
+  species:
+    index: [5, 7]
+    join: " "
+  family:
+    header: Family
+  subspecies:
+    index: [5, 7, 8]
+    join: " "

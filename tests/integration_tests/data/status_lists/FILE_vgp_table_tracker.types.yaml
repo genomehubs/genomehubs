@@ -1,0 +1,43 @@
+file:
+  format: tsv
+  header: true
+  comment: "#"
+  name: vgp_table_tracker_2022-02-14.tsv
+  source: VGP Project tracker
+  source_date: 2021-12-17
+  source_url: https://github.com/vgl-hub/genome-portal/blob/master/_data/table_tracker.yml
+attributes:
+  sequencing_status:
+    translate:
+      0-data_queued: sample_acquired
+      1-DNA_isolation: in_progress
+      2-data_progress: in_progress
+      3-data_done: in_progress
+      4-asm_progress: in_progress
+      5-asm_done: in_progress
+      6-asm_curation: in_progress
+      7-asm_curated: in_progress
+      8-NCBI: insdc_open
+    header: status
+    type: keyword
+  long_list:
+    header: sample_collected
+    type: keyword
+  sample_collected:
+    header: sample_collected
+    type: keyword
+  sample_acquired:
+    header: sample_acquired
+    type: keyword
+  in_progress:
+    header: in_progress
+    type: keyword
+  insdc_open:
+    header: insdc_open
+    type: keyword
+  published:
+    header: published
+    type: keyword
+taxonomy:
+  taxon_id:
+    header: taxon_id

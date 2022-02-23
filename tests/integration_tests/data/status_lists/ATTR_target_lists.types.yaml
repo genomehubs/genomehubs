@@ -1,0 +1,67 @@
+attributes:
+  long_list:
+    display_group: target_lists
+    display_level: 2
+    constraint:
+      enum:
+        - asg
+        - cbp
+        - ebpn
+        - cfgp
+        - dtol
+        - ebpn
+        - endemixit
+        - erga
+        - eurofish
+        - gaga
+        - squalomix
+        - vgp
+    header: long_list
+    summary: list
+    traverse: list
+    traverse_direction: up
+    type: keyword
+  other_priority:
+    display_group: target_lists
+    display_level: 2
+    constraint:
+      enum:
+        - asg
+        - cbp
+        - ebpn
+        - cfgp
+        - dtol
+        - ebpn
+        - endemixit
+        - erga
+        - eurofish
+        - gaga
+        - squalomix
+        - vgp
+    header: long_list
+    summary: list
+    traverse: list
+    traverse_direction: up
+    type: keyword
+  family_representative:
+    display_group: target_lists
+    display_level: 2
+    constraint:
+      enum:
+        - asg
+        - cbp
+        - ebpn
+        - cfgp
+        - dtol
+        - ebpn
+        - endemixit
+        - erga
+        - eurofish
+        - gaga
+        - squalomix
+        - vgp
+    header: long_list
+    summary: list
+    traverse: list
+    traverse_direction: up
+    type: keyword

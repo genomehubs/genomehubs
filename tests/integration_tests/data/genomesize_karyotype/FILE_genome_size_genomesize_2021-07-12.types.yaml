@@ -1,0 +1,52 @@
+file:
+  format: tsv
+  header: true
+  name: genomesize_2021-07-12.tsv
+  source: Animal Genome Size Database
+  source_url: http://genomesize.com
+attributes:
+  c_value:
+    type: half_float
+    header: c_value
+    separator:
+      - ","
+      - "-"
+  c_value_method:
+    type: keyword
+    header: c_value_method
+  c_value_cell_type:
+    type: keyword
+    header: cell_type
+    separator:
+      - ","
+  chromosome_number:
+    type: short
+    header: "chromosome_number"
+    separator:
+      - ","
+      - "-"
+  genome_size:
+    type: long
+    header: c_value
+    separator:
+      - ","
+      - "-"
+    function: "{} * 978000000"
+taxon_names:
+  common_name:
+    header: common_name
+taxonomy:
+  taxon_id:
+    header: ncbi_taxid
+  species:
+    header: genus_species
+  family:
+    header: family
+  order:
+    header: order
+  class:
+    header: class
+  subphylum:
+    header: subphylum
+  phylum:
+    header: phylum

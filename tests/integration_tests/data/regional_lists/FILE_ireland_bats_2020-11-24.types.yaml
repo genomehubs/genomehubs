@@ -1,0 +1,18 @@
+file:
+  format: tsv
+  header: true
+  name: ireland_bats_2020-11-24.tsv
+  source: Ireland Bats
+  description: Ireland Bats from Nicola Chapman, Sanger
+attributes:
+  country_list:
+    header: ireland_bats
+    type: keyword
+taxon_names:
+  common_name:
+    header: common_name
+taxonomy:
+  species:
+    header: scientifc_name
+  order:
+    header: order

@@ -1,0 +1,19 @@
+file:
+  format: tsv
+  header: true
+  name: 8_IrishStatuteBook_Wildlife_Act_1976_5th_Schedule_Animal.tsv
+  source: Irish Statute Book Wildlife Act, 1976 Fifth Schedule
+  source_description: List of protected animal species under Irish Statute Book Wildlife Act, 1976 Fifth Schedule - Animals referred to in Section 23
+  source_url: http://www.irishstatutebook.ie/eli/1976/act/39/schedule/5/enacted/en/html
+attributes:
+  isb_wildlife_act_1976:
+    header: isb_wildlife_act_1976
+    type: keyword
+taxon_names:
+  common_name:
+    header: common_name
+taxonomy:
+  species:
+    header: scientific_name
+  order:
+    header: order

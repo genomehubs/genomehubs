@@ -1,0 +1,19 @@
+file:
+  format: tsv
+  header: true
+  name: 3_The_Conservation_of_Habitats_and_Species_Regulations_2017_Schedule_5_Plants.tsv
+  source: The Conservation of Habitats and Species Regulations 2017 Schedule 5
+  description: List of protected plant species under The Conservation of Habitats and Species Regulations 2017 Schedule 5
+  source_url: https://www.legislation.gov.uk/uksi/2017/1012/schedule/5
+attributes:
+  habreg_2017:
+    header: habreg_2017
+    type: keyword
+taxon_names:
+  common_name:
+    header: common_name
+taxonomy:
+  species:
+    header: scientific_name
+  phylum:
+    header: phylum

@@ -1,0 +1,33 @@
+file:
+  format: csv
+  header: true
+  name: ACC_DB_Download_2021-07-12.csv
+  source: Animal Chromosome Counts Database
+  source_url: https://cromanpa94.github.io/ACC/
+  source_date: 2021-07-12
+attributes:
+  chromosome_number:
+    header: 2N
+    separator:
+      - ","
+      - "-"
+    type: short
+  haploid_number:
+    header: N
+    separator:
+      - ","
+      - "-"
+    type: short
+taxonomy:
+  phylum:
+    header: Phylum
+  class:
+    header: Class
+  order:
+    header: Order
+  family:
+    header: Family
+  genus:
+    header: Genus
+  species:
+    header: Species
