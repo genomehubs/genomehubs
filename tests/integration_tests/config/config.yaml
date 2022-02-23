@@ -1,7 +1,7 @@
 common:
   es:
-    host: localhost
-    port: 9200
+    hosts:
+      - http://localhost:9200
   hub:
     name: test_instance
     path: tests/resources
