@@ -90,13 +90,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: sleep 30
-      - name: Wait for elasticsearch
-        uses: nev7n/wait_for_response@v1.0.1
-        with:
-          url: "http://localhost:${{job.services.elasticsearch.ports[9200]}}"
-          responseCode: 200
-          timeout: 2000
-          interval: 500
+      # - name: Wait for elasticsearch
+      #   uses: nev7n/wait_for_response@v1.0.1
+      #   with:
+      #     url: "http://localhost:${{job.services.elasticsearch.ports[9200]}}"
+      #     responseCode: 200
+      #     timeout: 2000
+      #     interval: 500
       - name: Check health
         run: |
           curl -s "http://localhost:${{job.services.elasticsearch.ports[9200]}}/_cat/health"
