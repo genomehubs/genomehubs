@@ -76,16 +76,11 @@ jobs:
           discovery.type: single-node
     steps:
       - uses: actions/checkout@v2
-      - name: Wait for Elasticsearch
-        uses: nev7n/wait_for_response@v1
-        with:
-          url: "http://localhost:9200/"
-          responseCode: 200
-          timeout: 30000
-          interval: 500
+      - run: sleep 15
       - name: Check health
         run: |
-          curl -s "http://localhost:9200/_cat/health"
+          curl -s "http://localhost:9200/_cat/health" ||
+          sleep 15 && curl -s "http://localhost:9200/_cat/health"
       - name: Collect artifacts
         uses: actions/download-artifact@v2
         with:
