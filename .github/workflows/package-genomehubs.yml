@@ -131,7 +131,7 @@ jobs:
               --config-file tests/integration_tests/config/config.yaml \
               --taxonomy-source ncbi \
               --taxon-dir tests/integration_tests/data/uk_legislation \
-              --taxon-lookup any 
+              --taxon-lookup any \
               --taxon-spellcheck
           genomehubs index \
               --config-file tests/integration_tests/config/config.yaml \
@@ -147,7 +147,7 @@ jobs:
         run: |
           genomehubs fill \
               --config-file tests/integration_tests/config/config.yaml \
-              --taxonomy-source ncbi 
+              --taxonomy-source ncbi \
               --traverse-root 2759 \
               --traverse-infer-both
       - name: Index BTK files
