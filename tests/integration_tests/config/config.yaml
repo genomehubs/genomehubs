@@ -1,7 +1,7 @@
 common:
   es:
     host:
-      - "elastic:changeme@localhost:9200"
+      - "localhost:9200"
   hub:
     name: test_instance
     path: tests/resources
