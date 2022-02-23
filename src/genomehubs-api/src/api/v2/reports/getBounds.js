@@ -1,7 +1,7 @@
 import { attrTypes } from "../functions/attrTypes";
 import { fmt } from "./fmt";
 import { getCatLabels } from "./getCatLabels";
-import { getResults } from "../routes/search";
+import { getResults } from "../functions/getResults";
 import { incrementDate } from "./incrementDate";
 import { scales } from "./scales";
 import { setAggs } from "./setAggs";

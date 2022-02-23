@@ -182,7 +182,7 @@ const config = {
           ),
         ],
         use: [
-          MiniCssExtractPlugin.loader,
+          devMode ? MiniCssExtractPlugin.loader : "style-loader",
           {
             loader: "css-loader",
             options: {
@@ -211,14 +211,16 @@ const config = {
       },
       {
         test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-        use: [
-          {
-            loader: "file-loader",
-            options: {
-              name: "fonts/[contenthash].[ext]",
-            },
-          },
-        ],
+        // use: [
+        //   {
+        //     loader: "file-loader",
+        //     options: {
+        //       name: "fonts/[contenthash].[ext]",
+        //       publicPath: main.mode == "production" ? main.basename + "/" : "/",
+        //     },
+        //   },
+        // ],
+        type: "asset/resource",
       },
     ],
   },

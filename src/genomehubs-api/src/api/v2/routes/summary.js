@@ -55,10 +55,8 @@ const getSummary = async (params) => {
   return { status, summaries };
 };
 
-module.exports = {
-  getFieldSummary: async (req, res) => {
-    let response = {};
-    response = await getSummary(req.query);
-    return res.status(200).send(formatJson(response, req.query.indent));
-  },
+export const getFieldSummary = async (req, res) => {
+  let response = {};
+  response = await getSummary(req.query);
+  return res.status(200).send(formatJson(response, req.query.indent));
 };

@@ -1,32 +1,43 @@
 #!/bin/bash
 
-echo "Packaging GenomeHubs API"
+echo "Packaging genomehubs-api" &&
 
-# TEMPLATE="<% if (variables) { %> \
-# <script> \
-# <%- variables %> \
-# </script> \
-# <% } %> \
-# "
+echo "Installing dependencies" &&
 
-# cp .env.dist .env &&
+npm install &&
 
-# npm run build &&
+echo "Transpiling esm files to cjs" &&
 
-# rm -rf ./ui/src/public &&
+mkdir -p build &&
 
-# tar -C ./dist -czf ./dist/blobtoolkit-viewer.tgz public &&
+rm -rf build/* &&
 
-# mv ./dist/public ./ui/src/ &&
+FILES=$(find src/api -name "*.js") &&
 
-# mkdir -p ./ui/src/views &&
+for FILE in $FILES; do
+  OUTFILE=${FILE/src/build} &&
+  echo " - transpiling $FILE to $OUTFILE" &&
+  mkdir -p $(dirname $OUTFILE) &&
+  npx babel --plugins @babel/plugin-transform-modules-commonjs $FILE > $OUTFILE
+done &&
 
-# rm -rf ./ui/src/views/* &&
+echo " - transpiling src/app.js to build/app.js" &&
+npx babel --plugins @babel/plugin-transform-modules-commonjs src/app.js > build/app.js &&
 
-# sed 's:<!---->:'"$TEMPLATE"':' ./ui/src/public/index.html > ./ui/src/views/index.ejs &&
+echo "Copying files" &&
 
-# pkg --compress GZip ui/package.json &&
+mkdir -p build/api-docs &&
 
-# cp ./api/.env.dist ./api/.env &&
+cp src/api-v2.yaml build/ &&
 
-pkg --compress GZip -t node16-macos -d package.json
+cp node_modules/swagger-ui-dist/* build/api-docs/ &&
+
+cp node_modules/swagger-ui-express/* build/api-docs/ &&
+
+cp .env.dist .env &&
+
+# nexe -t mac-x64-14.15.3 build/app.js &&
+
+echo "Creating package" &&
+
+pkg --compress GZip package.json

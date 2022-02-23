@@ -9,7 +9,7 @@
     "package": "./package.sh"
   },
   "main": "src/app.js",
-  "bin": "src/index.js",
+  "bin": "build/app.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/genomehubs/genomehubs-api.git"
@@ -40,15 +40,18 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.17.3",
+    "@babel/core": "^7.17.5",
+    "@babel/plugin-transform-modules-commonjs": "^7.16.8",
     "nodemon": "^2.0.15"
   },
   "pkg": {
     "assets": [
-      "src/**/*",
-      "src/app.mjs",
-      "src/api-v2.yaml",
-      "../node_modules/swagger-ui-dist/**/*",
-      "../node_modules/swagger-ui-express/**/*"
+      "build/**/*"
+    ],
+    "targets": [
+      "node16-linux-x64",
+      "node16-macos-x64"
     ],
     "outputPath": "dist"
   }

@@ -1,12 +1,11 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 
+import { apiUrl } from "./api";
 import { createSelector } from "reselect";
 import { getCurrentTaxonomy } from "../reducers/taxonomy";
 import immutableUpdate from "immutable-update";
 import { setApiStatus } from "./api";
 import store from "../store";
-
-const apiUrl = API_URL || "/api/v1";
 
 const requestRecord = createAction("REQUEST_RECORD");
 const receiveRecord = createAction(
