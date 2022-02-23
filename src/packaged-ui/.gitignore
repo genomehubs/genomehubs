@@ -1,0 +1,4 @@
+public
+views
+*.ejs
+node_modules

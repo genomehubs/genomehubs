@@ -1,0 +1,13 @@
+__pycache__
+dist
+htmlcov
+*.egg-info
+.tox
+build
+.coverage
+.DS_Store
+.vscode/.ropeproject
+.git
+node_modules
+.env
+.env.local
