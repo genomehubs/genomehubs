@@ -75,28 +75,6 @@ jobs:
           discovery.type: single-node
           xpack.security.enabled: false
     steps:
-      - uses: actions/checkout@v2
-      - run: sleep 90
-    # runs-on: ubuntu-latest
-    # container: node:10.18-jessie
-    # services:
-    #   elasticsearch:
-    #     image: elasticsearch/elasticsearch-oss:7.10.2
-    #     ports:
-    #       - 9200:9200
-
-  test-elasticsearch-service:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - run: sleep 30
-      # - name: Wait for elasticsearch
-      #   uses: nev7n/wait_for_response@v1.0.1
-      #   with:
-      #     url: "http://localhost:${{job.services.elasticsearch.ports[9200]}}"
-      #     responseCode: 200
-      #     timeout: 2000
-      #     interval: 500
       - name: Check health
         run: |
           curl -s "http://localhost:${{job.services.elasticsearch.ports[9200]}}/_cat/health"
