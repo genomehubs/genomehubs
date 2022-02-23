@@ -73,6 +73,7 @@ jobs:
           - 9200:9200
         env:
           discovery.type: single-node
+    steps:
       - name: Check health
         run: |
           curl -s "http://localhost:${{job.services.elasticsearch.ports[9200]}}/_cat/health"
