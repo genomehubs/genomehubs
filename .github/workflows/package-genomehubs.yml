@@ -77,10 +77,10 @@ jobs:
     steps:
       - name: Check health
         run: |
-          curl -s "http://localhost:${{job.services.elasticsearch.ports[9200]}}/_cat/health"
+          curl -s "elasticsearch:${{job.services.elasticsearch.ports[9200]}}/_cat/health"
       - name: List indices
         run: |
-          curl -s "http://localhost:${{job.services.elasticsearch.ports[9200]}}/_cat/indices"
+          curl -s "elasticsearch:${{job.services.elasticsearch.ports[9200]}}/_cat/indices"
 
   # package-genomehubs-macos:
   #   runs-on: macos-11
