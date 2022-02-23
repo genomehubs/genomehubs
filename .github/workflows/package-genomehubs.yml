@@ -71,8 +71,12 @@ jobs:
         image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
         ports:
           - 9200:9200
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: false
     steps:
       - uses: actions/checkout@v2
+      - run: sleep 60
     # runs-on: ubuntu-latest
     # container: node:10.18-jessie
     # services:
