@@ -63,7 +63,7 @@ jobs:
   #       with:
   #         stack-version: 7.10.2
 
-  start-elasticsearch-service:
+  run-test-fill:
     runs-on: ubuntu-latest
     needs: package-genomehubs-linux
     # container: node:10.18-jessie
@@ -75,17 +75,12 @@ jobs:
         env:
           discovery.type: single-node
     steps:
+      - uses: actions/checkout@v2
       - run: sleep 15
-      - name: Wait for Elasticsearch
-        uses: nev7n/wait_for_response@v1
-        with:
-          url: "http://localhost:9200/"
-          responseCode: 200
-          timeout: 30000
-          interval: 500
       - name: Check health
         run: |
-          curl -s "http://localhost:9200/_cat/health"
+          curl -s "http://localhost:9200/_cat/health" ||
+          sleep 15 && curl -s "http://localhost:9200/_cat/health"
       - name: Collect artifacts
         uses: actions/download-artifact@v2
         with:
@@ -95,6 +90,75 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install dist/artifact/*linux*.whl
           genomehubs -v
+      - name: Run genomehubs init
+        run: |
+          curl -X DELETE "http://localhost:9200/*"
+          genomehubs init \
+              --config-file tests/integration_tests/config/config.yaml \
+              --taxonomy-source ncbi \
+              --taxonomy-root 2759 \
+              --taxonomy-jsonl tests/integration_tests/ena-taxonomy.extra.jsonl \
+              --taxon-preload
+      - name: Run genomehubs index
+        run: |
+          genomehubs index \
+              --config-file tests/integration_tests/config/config.yaml \
+              --taxonomy-source ncbi \
+              --assembly-dir tests/integration_tests/data/assembly-data
+          genomehubs index \
+              --config-file tests/integration_tests/config/config.yaml \
+              --taxonomy-source ncbi \
+              --taxon-dir tests/integration_tests/data/ott3.3
+          genomehubs index \
+              --config-file tests/integration_tests/config/config.yaml \
+              --taxonomy-source ncbi \
+              --taxon-dir tests/integration_tests/data/tolids \
+              --taxon-lookup any \
+              --taxon-spellcheck
+          genomehubs index \
+              --config-file tests/integration_tests/config/config.yaml \
+              --taxonomy-source ncbi \
+              --taxon-dir tests/integration_tests/data/genomesize_karyotype \
+              --taxon-lookup any \
+              --taxon-spellcheck
+          genomehubs index \
+              --config-file tests/integration_tests/config/config.yaml \
+              --taxonomy-source ncbi \
+              --taxon-dir tests/integration_tests/data/regional_lists \
+              --taxon-lookup any \
+              --taxon-spellcheck
+          genomehubs index \
+              --config-file tests/integration_tests/config/config.yaml \
+              --taxonomy-source ncbi \
+              --taxon-dir tests/integration_tests/data/uk_legislation \
+              --taxon-lookup any 
+              --taxon-spellcheck
+          genomehubs index \
+              --config-file tests/integration_tests/config/config.yaml \
+              --taxonomy-source ncbi \
+              --assembly-dir tests/integration_tests/data/btk
+          genomehubs index \
+              --config-file tests/integration_tests/config/config.yaml \
+              --taxonomy-source ncbi \
+              --taxon-dir tests/integration_tests/data/status_lists \
+              --taxon-lookup any \
+              --taxon-spellcheck
+      - name: Run genomehubs fill
+        run: |
+          genomehubs fill \
+              --config-file tests/integration_tests/config/config.yaml \
+              --taxonomy-source ncbi 
+              --traverse-root 2759 \
+              --traverse-infer-both
+      - name: Index BTK files
+        run: |
+          genomehubs index \
+              --config-file tests/integration_tests/config/config.yaml \
+              --taxonomy-source ncbi \
+              --file-metadata tests/integration_tests/data/btk/btk.files.yaml
+      - name: Check indices
+        run: |
+          curl -s "http://localhost:9200/_cat/indices"
 
   # package-genomehubs-macos:
   #   runs-on: macos-11

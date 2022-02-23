@@ -99,7 +99,7 @@ setup(
     install_requires=[
         "biopython>=1.78",
         "docopt>=0.6.2",
-        "elasticsearch>=7.8.1",
+        "elasticsearch>=7.8.1,<7.14.0",
         "filetype>=1.0.7",
         "Pillow>=8.0",
         "pyyaml",
