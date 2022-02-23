@@ -1,3 +1,15 @@
+1	|	all	|		|	synonym	|
+1	|	root	|		|	scientific name	|
+2759	|	Eucarya	|		|	synonym	|
+2759	|	Eucaryotae	|		|	synonym	|
+2759	|	eucaryotes	|		|	genbank common name	|
+2759	|	Eukarya	|		|	synonym	|
+2759	|	Eukaryotae	|		|	synonym	|
+2759	|	Eukaryota	|		|	scientific name	|
+2759	|	eukaryotes	|	eukaryotes <blast name>	|	blast name	|
+2759	|	eukaryotes	|	eukaryotes <common name>	|	common name	|
+131567	|	biota	|		|	synonym	|
+131567	|	cellular organisms	|		|	scientific name	|
 1000415	|	Amelanchier ovalis Medik.	|		|	authority	|
 1000415	|	Amelanchier ovalis	|		|	scientific name	|
 1000428	|	Hedlundia mougeotii	|		|	scientific name	|
@@ -4772,14 +4784,6 @@
 2748631	|	TFA:HDA-000256; HDA-000257; HDA-000258	|	TFA:HDA-000256; HDA-000257; HDA-000258 <isotype>	|	type material	|
 2748631	|	TNS:1284055	|	TNS:1284055 <isotype>	|	type material	|
 2749335	|	Prunus sp. SBK0022	|		|	scientific name	|
-2759	|	Eucarya	|		|	synonym	|
-2759	|	Eucaryotae	|		|	synonym	|
-2759	|	eucaryotes	|		|	genbank common name	|
-2759	|	Eukarya	|		|	synonym	|
-2759	|	Eukaryotae	|		|	synonym	|
-2759	|	Eukaryota	|		|	scientific name	|
-2759	|	eukaryotes	|	eukaryotes <blast name>	|	blast name	|
-2759	|	eukaryotes	|	eukaryotes <common name>	|	common name	|
 2759162	|	Geum atlanticum Desf., 1798	|		|	authority	|
 2759162	|	Geum atlanticum	|		|	scientific name	|
 2759163	|	Geum hispidum Fr., 1818	|		|	authority	|
