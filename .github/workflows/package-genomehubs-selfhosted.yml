@@ -28,7 +28,7 @@ jobs:
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
         ports:
-          - 9201:9201
+          - 9200:9200
         env:
           discovery.type: single-node
     steps:
@@ -36,8 +36,8 @@ jobs:
       - run: sleep 15
       - name: Check health
         run: |
-          curl -s "http://localhost:9201/_cat/health" ||
-          sleep 15 && curl -s "http://localhost:9201/_cat/health"
+          curl -s "http://localhost:9200/_cat/health" ||
+          sleep 15 && curl -s "http://localhost:9200/_cat/health"
       - name: Collect artifacts
         uses: actions/download-artifact@v2
         with:
@@ -49,7 +49,7 @@ jobs:
           genomehubs -v
       - name: Run genomehubs init
         run: |
-          curl -X DELETE "http://localhost:9201/*"
+          curl -X DELETE "http://localhost:9200/*"
           genomehubs init \
               --config-file tests/integration_tests/config/config.yaml \
               --taxonomy-source ncbi \
@@ -115,4 +115,4 @@ jobs:
               --file-metadata tests/integration_tests/data/btk/btk.files.yaml
       - name: Check indices
         run: |
-          curl -s "http://localhost:9201/_cat/indices"
+          curl -s "http://localhost:9200/_cat/indices"
