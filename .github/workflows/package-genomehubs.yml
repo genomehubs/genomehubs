@@ -65,6 +65,7 @@ jobs:
 
   start-elasticsearch-service:
     runs-on: ubuntu-latest
+    container: node:10.18-jessie
     services:
       elasticsearch:
         image: elasticsearch/elasticsearch-oss:7.10.2
