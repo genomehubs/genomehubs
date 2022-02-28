@@ -4,6 +4,137 @@ import { getRecordsByTaxon } from "./getRecordsByTaxon";
 import { parseFields } from "./parseFields";
 import { summaries } from "./summaries";
 
+const fail = (error) => {
+  return {
+    success: false,
+    error,
+  };
+};
+
+const validateValue = (term, value, meta, types) => {
+  let type = meta.type;
+  let attrEnum;
+  if (types && types[meta.attribute]) {
+    if (type == "value") {
+      type = types[meta.attribute].type;
+    }
+  }
+  if (meta.attribute == "taxonomy") {
+    if (["tax_name", "tax_rank", "tax_eq"]) {
+      type = "keyword";
+    }
+  }
+  if (type == "keyword") {
+    if (types && types[meta.attribute]) {
+      let summary = types[meta.attribute].summary;
+      if (
+        summary == "enum" ||
+        (Array.isArray(summary) && summary.includes("enum"))
+      ) {
+        attrEnum = new Set(types[meta.attribute].constraint.enum);
+      }
+    }
+  }
+
+  let values = value.split(/\s*,\s*/);
+  for (let v of values) {
+    if (type == "keyword") {
+      if (attrEnum) {
+        if (!attrEnum.has(v.replace(/^!/, ""))) {
+          return fail(`invalid value for ${meta.attribute} in ${term}`);
+        }
+      }
+      if (meta.attribute == "taxonomy") {
+        if ((meta.type = "tax_rank")) {
+          // TODO: check rank is valid
+        }
+      }
+      continue;
+    }
+    if (isNaN(v.replace(/^!/, ""))) {
+      if (summaries.includes(type)) {
+        return fail(`invalid value for ${type} in ${term}`);
+      }
+      return fail(`invalid value for ${meta.attribute} in ${term}`);
+    }
+  }
+  return { success: true };
+};
+
+const validateOperator = (term, types, meta) => {
+  const operators = new Set(["!=", "<", "<=", "=", "==", ">=", ">"]);
+  if (term.match(/[<>=]/)) {
+    let parts = term.split(/\s*([!]*[<>=]=*)\s*/);
+    if (parts.length > 3 || !operators.has(parts[1])) {
+      return fail(`invalid operator in ${term}`);
+    }
+    if (!meta) {
+      parts[0] = parts[0].toLowerCase();
+      if (!types[parts[0]]) {
+        return fail(`invalid field name in ${term}`);
+      }
+      meta = {
+        attribute: parts[0],
+        type: types[parts[0]].type,
+      };
+    }
+    return validateValue(term, parts[2], meta, types);
+  }
+};
+
+const validateTerm = (term, types) => {
+  if (!term.match(/^[a-z0-9<>=,!:_\s\/\(\)]+$/)) {
+    return fail(`invalid character in ${term}`);
+  }
+  term = term.trim();
+  term = term.replace(/\(\s+/, "(");
+  term = term.replace(/\s+\)/, ")");
+  if (term.match(/\(/)) {
+    if (!term.match(/^[^\(]+\([^\(\)]+\)[^\(]*$/)) {
+      return fail(`invalid parentheses in ${term}`);
+    }
+    let parts = term.split(/\s*[\(\)]\s*/);
+    parts[0] = parts[0].toLowerCase();
+    if (parts[0].startsWith("tax")) {
+      if (!parts[0].match(/tax_(tree|name|eq|rank|depth)$/)) {
+        return fail(`invalid taxonomy term in ${term}`);
+      }
+      if (parts[2]) {
+        return fail(`taxonomy term must not have operator in ${term}`);
+      }
+      return validateValue(term, parts[1], {
+        attribute: "taxonomy",
+        type: parts[0],
+      });
+    }
+    if (!summaries.includes(parts[0])) {
+      return fail(`invalid summary in ${term}`);
+    }
+    parts[1] = parts[1].toLowerCase();
+    if (!types[parts[1]]) {
+      return fail(`invalid attribute name in ${term}`);
+    }
+    let typeSummary = types[parts[1]].summary;
+    if (!Array.isArray(typeSummary)) {
+      typeSummary = [typeSummary];
+    }
+    if (typeSummary.includes("list")) {
+      typeSummary.push("length");
+    }
+    if (!typeSummary.includes(parts[0])) {
+      return fail(`invalid summary for ${parts[1]} in ${term}`);
+    }
+    return validateOperator(term, types, {
+      attribute: parts[1],
+      type: parts[0],
+    });
+  }
+  if (term.match(/[<>=]/)) {
+    return validateOperator(term, types);
+  }
+  return { success: true };
+};
+
 export const generateQuery = async ({
   query,
   result,
@@ -60,7 +191,16 @@ export const generateQuery = async ({
     if (result != "file") {
       query = query.toLowerCase();
     }
-    query.split(/\s+and\s+/).forEach((term) => {
+    for (let term of query.split(/\s+and\s+/)) {
+      let validation = validateTerm(term, typesMap[result]);
+      if (!validation.success) {
+        return {
+          func: () => ({
+            status: validation,
+          }),
+          params: {},
+        };
+      }
       let taxQuery = term.match(/tax_(tree|name|eq|rank|depth)\(\s*(.+?)\s*\)/);
       if (taxQuery) {
         if (taxQuery[1] == "rank") {
@@ -113,7 +253,7 @@ export const generateQuery = async ({
           }
         }
       }
-    });
+    }
   }
 
   if (status) {

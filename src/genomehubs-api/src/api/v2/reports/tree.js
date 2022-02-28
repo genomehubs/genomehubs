@@ -78,6 +78,9 @@ const getLCA = async ({
     maxDepth: 100,
     lca: { maxDepth: 100 },
   });
+  if (!res.status.success) {
+    return {};
+  }
 
   let buckets;
   try {
@@ -97,6 +100,9 @@ const getLCA = async ({
         maxDepth: 100,
         lca: { maxDepth: 100 },
       });
+      if (!res.status.success) {
+        return {};
+      }
       if (!res.aggs) {
         return {};
       }
@@ -301,6 +307,9 @@ const addXResultsToTree = async ({
       let newQuery = { ...xQuery, taxonomy, query: mapped.join(" AND ") };
       // TODO: review newQuery options
       let newRes = await getResults(newQuery);
+      if (!newRes.status.success) {
+        return { status: newRes.status };
+      }
       await addXResultsToTree({
         xRes: newRes,
         treeNodes,
@@ -426,6 +435,9 @@ const getTree = async ({
     setProgress(queryId, { total: lca.count });
   }
   let xRes = await getResults({ ...xQuery, taxonomy, req, update: "x" });
+  if (!xRes.status.success) {
+    return { status: xRes.status };
+  }
 
   let yRes;
   if (y) {
@@ -447,6 +459,9 @@ const getTree = async ({
       req,
       update: "y",
     });
+    if (!yRes.status.success) {
+      return { status: yRes.status };
+    }
   }
   let treeNodes = {};
   await addXResultsToTree({
@@ -623,13 +638,13 @@ export const tree = async ({
         req,
         taxonomy,
       });
-
   if (tree && tree.status && tree.status.success == false) {
-    status = tree.status;
+    status = { ...tree.status };
+    tree = {};
   }
 
   return {
-    status: { success: true },
+    status: status || { success: true },
     report: {
       status,
       tree,

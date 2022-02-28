@@ -14,6 +14,7 @@ import IconButton from "@material-ui/core/IconButton";
 import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
 import LinkButton from "./LinkButton";
 import MuiTableCell from "@material-ui/core/TableCell";
+import ReportError from "./ReportError";
 import SearchPagination from "./SearchPagination";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Table from "@material-ui/core/Table";
@@ -142,7 +143,8 @@ const SortableCell = ({
             })
           }
         >
-          {name.replaceAll("_", " ")}
+          {/* {name} */}
+          {name.split("_").join(`_\u200b`)}
           {sortBy === name ? (
             <span className={classes.visuallyHidden}>
               {sortOrder === "desc" ? "sorted descending" : "sorted ascending"}
@@ -235,6 +237,11 @@ const ResultTable = ({
   taxonomy,
 }) => {
   if (!searchResults.status || !searchResults.status.hasOwnProperty("hits")) {
+    if (searchResults && searchResults.status.error) {
+      return (
+        <ReportError report={"search"} error={searchResults.status.error} />
+      );
+    }
     return null;
   }
   const location = useLocation();

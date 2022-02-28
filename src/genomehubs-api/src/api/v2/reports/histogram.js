@@ -75,6 +75,9 @@ const getHistogram = async ({
     exclusions,
     ...(raw && cat && !typesMap[cat] && { ranks: cat }),
   });
+  if (!res.status.success) {
+    return { status: res.status };
+  }
   let xSumm, ySumm;
   const dateSummary = {
     min: "from",
