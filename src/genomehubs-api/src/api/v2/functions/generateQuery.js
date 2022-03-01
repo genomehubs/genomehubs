@@ -195,7 +195,12 @@ export const generateQuery = async ({
       query = query.toLowerCase();
     }
     for (let term of query.split(/\s+and\s+/)) {
-      let validation = validateTerm(term, typesMap[result]);
+      let validation;
+      try {
+        validation = validateTerm(term, typesMap[result]);
+      } catch {
+        validation = fail(`unable to validate query term ${term}`);
+      }
       if (!validation.success) {
         return {
           func: () => ({
