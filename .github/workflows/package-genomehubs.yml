@@ -6,31 +6,31 @@ on:
       - "*"
 
 jobs:
-  # package-ui:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v2
-  #       with:
-  #         node-version: "16"
-  #     - run: npm install -g pkg
-  #     - run: ./package-ui.sh
-  #     - uses: actions/upload-artifact@v2
-  #       with:
-  #         path: ./dist/*
+  package-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - run: npm install -g pkg
+      - run: ./package-ui.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./dist/*
 
-  # package-api:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v2
-  #       with:
-  #         node-version: "16"
-  #     - run: npm install -g pkg
-  #     - run: ./package-api.sh
-  #     - uses: actions/upload-artifact@v2
-  #       with:
-  #         path: ./dist/*
+  package-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - run: npm install -g pkg
+      - run: ./package-api.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./dist/*
 
   package-genomehubs-linux:
     runs-on: ubuntu-latest
@@ -47,178 +47,66 @@ jobs:
         with:
           path: ./dist/*
 
-  # start-elasticsearch-service:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     # - name: Configure sysctl limits
-  #     #   run: |
-  #     #     sudo swapoff -a
-  #     #     sudo sysctl -w vm.swappiness=1
-  #     #     sudo sysctl -w fs.file-max=262144
-  #     #     sudo sysctl -w vm.max_map_count=262144
-
-  #     - name: Runs Elasticsearch
-  #       uses: elastic/elastic-github-actions/elasticsearch@master
-  #       with:
-  #         stack-version: 7.10.2
-
-  run-test-fill:
-    runs-on: ubuntu-latest
-    needs: package-genomehubs-linux
-    # container: node:10.18-jessie
-    services:
-      elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
-        ports:
-          - 9200:9200
-        env:
-          discovery.type: single-node
+  package-genomehubs-macos:
+    runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
-      - run: sleep 15
-      - name: Check health
-        run: |
-          curl -s "http://localhost:9200/_cat/health" ||
-          sleep 15 && curl -s "http://localhost:9200/_cat/health"
-      - name: Collect artifacts
-        uses: actions/download-artifact@v2
-        with:
-          path: ./dist
-      - name: Pip install genomehubs
+      - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
-          pip install dist/artifact/*linux*.whl
-          genomehubs -v
-      - name: Run genomehubs init
+          pip install requests setuptools wheel twine
+      - name: Build and publish
         run: |
-          curl -X DELETE "http://localhost:9200/*"
-          genomehubs init \
-              --config-file tests/integration_tests/config/config.yaml \
-              --taxonomy-source ncbi \
-              --taxonomy-root 2759 \
-              --taxonomy-jsonl tests/integration_tests/ena-taxonomy.extra.jsonl \
-              --taxon-preload
-      - name: Run genomehubs index
-        run: |
-          genomehubs index \
-              --config-file tests/integration_tests/config/config.yaml \
-              --taxonomy-source ncbi \
-              --assembly-dir tests/integration_tests/data/assembly-data
-          genomehubs index \
-              --config-file tests/integration_tests/config/config.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/ott3.3
-          genomehubs index \
-              --config-file tests/integration_tests/config/config.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/tolids \
-              --taxon-lookup any \
-              --taxon-spellcheck
-          genomehubs index \
-              --config-file tests/integration_tests/config/config.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/genomesize_karyotype \
-              --taxon-lookup any \
-              --taxon-spellcheck
-          genomehubs index \
-              --config-file tests/integration_tests/config/config.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/regional_lists \
-              --taxon-lookup any \
-              --taxon-spellcheck
-          genomehubs index \
-              --config-file tests/integration_tests/config/config.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/uk_legislation \
-              --taxon-lookup any \
-              --taxon-spellcheck
-          genomehubs index \
-              --config-file tests/integration_tests/config/config.yaml \
-              --taxonomy-source ncbi \
-              --assembly-dir tests/integration_tests/data/btk
-          genomehubs index \
-              --config-file tests/integration_tests/config/config.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/status_lists \
-              --taxon-lookup any \
-              --taxon-spellcheck
-      - name: Run genomehubs fill
-        run: |
-          genomehubs fill \
-              --config-file tests/integration_tests/config/config.yaml \
-              --taxonomy-source ncbi \
-              --traverse-root 2759 \
-              --traverse-infer-both
-      - name: Index BTK files
-        run: |
-          genomehubs index \
-              --config-file tests/integration_tests/config/config.yaml \
-              --taxonomy-source ncbi \
-              --file-metadata tests/integration_tests/data/btk/btk.files.yaml
-      - name: Check indices
-        run: |
-          curl -s "http://localhost:9200/_cat/indices"
+          ./pip_install_latest.sh macosx_11_0_x86_64
+          python3 setup.py sdist bdist_wheel --python-tag py3 --plat-name macosx_10_9_x86_64
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./dist/*.whl
 
-  # package-genomehubs-macos:
-  #   runs-on: macos-11
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Install dependencies
-  #       run: |
-  #         python3 -m pip install --upgrade pip
-  #         pip install requests setuptools wheel twine
-  #     - name: Build and publish
-  #       run: |
-  #         ./pip_install_latest.sh macosx_11_0_x86_64
-  #         python3 setup.py sdist bdist_wheel --python-tag py3 --plat-name macosx_10_9_x86_64
-  #     - uses: actions/upload-artifact@v2
-  #       with:
-  #         path: ./dist/*.whl
+  create-github-release:
+    runs-on: ubuntu-latest
+    needs:
+      - package-api
+      - package-ui
+      - package-genomehubs-linux
+      - package-genomehubs-macos
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          path: ./dist
+      - run: |
+          mv dist/artifact/* dist/
+          rm -r dist/artifact
+          rm dist/*.whl
+          chmod 755 dist/genomehubs-*-macos
+          chmod 755 dist/genomehubs-*-linux
+      - name: create release
+        uses: "marvinpinto/action-automatic-releases@v1.2.1"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          draft: false
+          prerelease: false
+          title: "v${{github.ref_name}}"
+          files: |
+            dist/*
 
-  # upload-to-pypi:
-  #   runs-on: ubuntu-latest
-  #   needs:
-  #     - package-genomehubs-linux
-  #     - package-genomehubs-macos
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/download-artifact@v2
-  #       with:
-  #         path: ./dist
-  #     - run: |
-  #         mv dist/artifact/* dist/
-  #         rm -r dist/artifact
-  #         rm -rf dist/genomehubs-ui*
-  #         rm -rf dist/genomehubs-api*
-  #     - name: Publish package to PyPI
-  #       uses: pypa/gh-action-pypi-publish@v1.5.0
-  #       with:
-  #         user: __token__
-  #         password: ${{ secrets.PYPI_API_TOKEN }}
-  #         repository_url: https://upload.pypi.org/legacy/
-
-  # create-github-release:
-  #   runs-on: ubuntu-latest
-  #   needs:
-  #     - package-api
-  #     - package-ui
-  #     - upload-to-pypi
-  #   steps:
-  #     - uses: actions/download-artifact@v2
-  #       with:
-  #         path: ./dist
-  #     - run: |
-  #         mv dist/artifact/* dist/
-  #         rm -r dist/artifact
-  #         rm dist/*.whl
-  #         chmod 755 dist/genomehubs-*-macos
-  #         chmod 755 dist/genomehubs-*-linux
-  #     - name: create release
-  #       uses: "marvinpinto/action-automatic-releases@v1.2.1"
-  #       with:
-  #         repo_token: "${{ secrets.GITHUB_TOKEN }}"
-  #         draft: false
-  #         prerelease: false
-  #         title: "v${{github.ref_name}}"
-  #         files: |
-  #           dist/*
+  upload-to-pypi:
+    runs-on: ubuntu-latest
+    needs:
+      - create-github-release
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          path: ./dist
+      - run: |
+          mv dist/artifact/* dist/
+          rm -r dist/artifact
+          rm -rf dist/genomehubs-ui*
+          rm -rf dist/genomehubs-api*
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@v1.5.0
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          repository_url: https://upload.pypi.org/legacy/

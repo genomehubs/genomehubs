@@ -1,12 +1,36 @@
-name: package-genomehubs-selfhosted
+name: package-genomehubs
 
-on:
-  [push]
+on: [push]
 
 jobs:
+  # package-ui:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-node@v2
+  #       with:
+  #         node-version: "16"
+  #     - run: npm install -g pkg
+  #     - run: ./package-ui.sh
+  #     - uses: actions/upload-artifact@v2
+  #       with:
+  #         path: ./dist/*
+
+  # package-api:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-node@v2
+  #       with:
+  #         node-version: "16"
+  #     - run: npm install -g pkg
+  #     - run: ./package-api.sh
+  #     - uses: actions/upload-artifact@v2
+  #       with:
+  #         path: ./dist/*
 
   package-genomehubs-linux:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
@@ -21,9 +45,8 @@ jobs:
           path: ./dist/*
 
   run-test-fill:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: package-genomehubs-linux
-    # container: node:10.18-jessie
     services:
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
