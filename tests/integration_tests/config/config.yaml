@@ -1,0 +1,13 @@
+common:
+  es:
+    host:
+      - "localhost:9200"
+  hub:
+    name: test_instance
+    path: tests/resources
+    version: 2022.02.23
+  taxonomy:
+    path: tests/integration_tests/taxdump
+fill: {}
+index: {}
+init: {}
