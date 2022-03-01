@@ -201,7 +201,6 @@ export const generateQuery = async ({
       } catch {
         validation = fail(`unable to validate query term ${term}`);
       }
-      console.log(validation);
       if (!validation.success) {
         return {
           func: () => ({
