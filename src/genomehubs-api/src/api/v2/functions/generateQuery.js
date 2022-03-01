@@ -86,7 +86,7 @@ const validateOperator = (term, types, meta) => {
 };
 
 const validateTerm = (term, types) => {
-  if (!term.match(/^[a-z0-9<>=,!:_\s\/\(\)]+$/)) {
+  if (!term.match(/^[a-z0-9<>=,!:_\s\.-~\/\(\)]+$/)) {
     return fail(`invalid character in ${term}`);
   }
   term = term.trim();
@@ -201,6 +201,7 @@ export const generateQuery = async ({
       } catch {
         validation = fail(`unable to validate query term ${term}`);
       }
+      console.log(validation);
       if (!validation.success) {
         return {
           func: () => ({
