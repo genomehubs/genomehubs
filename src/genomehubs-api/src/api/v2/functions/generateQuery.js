@@ -68,6 +68,9 @@ const validateOperator = (term, types, meta) => {
     if (parts.length > 3 || !operators.has(parts[1])) {
       return fail(`invalid operator in ${term}`);
     }
+    if (!types) {
+      return { success: true };
+    }
     if (!meta) {
       parts[0] = parts[0].toLowerCase();
       if (!types[parts[0]]) {
