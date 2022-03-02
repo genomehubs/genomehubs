@@ -85,57 +85,107 @@ const validateOperator = (term, types, meta) => {
   }
 };
 
-const validateTerm = (term, types) => {
-  if (!term.match(/^[a-z0-9<>=,!:_\s\.-~\/\(\)]+$/)) {
-    return fail(`invalid character in ${term}`);
+const splitTerm = (term) => {
+  let parts;
+  let validation = { success: true };
+  // if (term.match(/"/)) {
+  // TODO: test for even number of quotes
+  let patterns = [];
+  let segments = term.split(/"/);
+  if (segments.length % 2 == 0) {
+    return { validation: fail(`Unmatched double quotes in ${term}`) };
   }
+  let subbedTerm = segments
+    .map((segment, i) => {
+      if (i % 2 == 0) {
+        return segment;
+      }
+      let pattern = `__-${i}-__`;
+      patterns.push([i, pattern]);
+      return pattern;
+    })
+    .join("");
+  parts = subbedTerm.match(/(.*?)\((.*)\)([^\)]*)/);
+  if (!parts) {
+    parts = subbedTerm.match(/()(.*?)\s*([!><=]+[^\)]*)/) || [subbedTerm];
+  }
+  for (let i = 0; i < 3; i++) {
+    if (parts[i]) {
+      for (let pattern of patterns) {
+        parts[i] = parts[i].replace(pattern[1], segments[pattern[0]]);
+      }
+    }
+  }
+  return { parts, validation };
+};
+
+const validateTerm = (term, types) => {
+  // if (!term.match(/^[a-z0-9<>=,!:_\s\.-~\/\(\)"]+$/)) {
+  //   return fail(`invalid character in ${term}`);
+  // }
   term = term.trim();
   term = term.replace(/\(\s+/, "(");
   term = term.replace(/\s+\)/, ")");
-  if (term.match(/\(/)) {
-    if (!term.match(/^[^\(]+\([^\(\)]+\)[^\(]*$/)) {
-      return fail(`invalid parentheses in ${term}`);
-    }
-    let parts = term.split(/\s*[\(\)]\s*/);
-    parts[0] = parts[0].toLowerCase();
-    if (parts[0].startsWith("tax")) {
-      if (!parts[0].match(/tax_(tree|name|eq|rank|depth)$/)) {
-        return fail(`invalid taxonomy term in ${term}`);
-      }
-      if (parts[2]) {
-        return fail(`taxonomy term must not have operator in ${term}`);
-      }
-      return validateValue(term, parts[1], {
-        attribute: "taxonomy",
-        type: parts[0],
-      });
-    }
-    if (!summaries.includes(parts[0])) {
-      return fail(`invalid summary in ${term}`);
-    }
+  let { parts, validation } = splitTerm(term);
+  // if (term.match(/\(/)) {
+  if (!validation.success) {
+    return { validation };
+  }
+  if (parts[1] && parts[1].length > 0) {
     parts[1] = parts[1].toLowerCase();
-    if (!types[parts[1]]) {
-      return fail(`invalid attribute name in ${term}`);
+    if (parts[1].startsWith("tax")) {
+      if (!parts[1].match(/tax_(tree|name|eq|rank|depth)$/)) {
+        return { validation: fail(`invalid taxonomy term in ${term}`) };
+      }
+      if (parts[3]) {
+        return {
+          validation: fail(`taxonomy term must not have operator in ${term}`),
+        };
+      }
+      return {
+        parts,
+        validation: validateValue(term, parts[2], {
+          attribute: "taxonomy",
+          type: parts[0],
+        }),
+      };
     }
-    let typeSummary = types[parts[1]].summary;
-    if (!Array.isArray(typeSummary)) {
-      typeSummary = [typeSummary];
+    if (!summaries.includes(parts[1])) {
+      return { validation: fail(`invalid summary in ${term}`) };
     }
-    if (typeSummary.includes("list")) {
-      typeSummary.push("length");
-    }
-    if (!typeSummary.includes(parts[0])) {
-      return fail(`invalid summary for ${parts[1]} in ${term}`);
-    }
-    return validateOperator(term, types, {
-      attribute: parts[1],
-      type: parts[0],
-    });
   }
-  if (term.match(/[<>=]/)) {
-    return validateOperator(term, types);
+  if (parts[2] && parts[2].length > 0) {
+    parts[2] = parts[2].toLowerCase();
+    if (types) {
+      if (!types[parts[2]]) {
+        return { validation: fail(`invalid attribute name in ${term}`) };
+      }
+      let typeSummary = types[parts[2]].summary;
+      if (!Array.isArray(typeSummary)) {
+        typeSummary = [typeSummary];
+      }
+      if (typeSummary.includes("list")) {
+        typeSummary.push("length");
+      }
+      if (parts[1] && parts[1].length > 0 && !typeSummary.includes(parts[1])) {
+        return {
+          validation: fail(`invalid summary for ${parts[2]} in ${term}`),
+        };
+      }
+    }
+
+    return {
+      parts,
+      validation: validateOperator(term, types, {
+        attribute: parts[2],
+        type: parts[1],
+      }),
+    };
   }
-  return { success: true };
+  if (parts[0].match(/[<>=]/)) {
+    return { parts, validation: validateOperator(term, types) };
+  }
+  return { parts, validation: { success: true } };
 };
 
 export const generateQuery = async ({
@@ -195,11 +245,12 @@ export const generateQuery = async ({
       query = query.toLowerCase();
     }
     for (let term of query.split(/\s+and\s+/)) {
-      let validation;
+      let parts, validation;
       try {
-        validation = validateTerm(term, typesMap[result]);
-      } catch {
+        ({ parts, validation } = validateTerm(term, typesMap[result]));
+      } catch (err) {
         validation = fail(`unable to validate query term ${term}`);
+        console.warn(err);
       }
       if (!validation.success) {
         return {
@@ -209,49 +260,67 @@ export const generateQuery = async ({
           params: {},
         };
       }
-      let taxQuery = term.match(/tax_(tree|name|eq|rank|depth)\(\s*(.+?)\s*\)/);
-      if (taxQuery) {
-        if (taxQuery[1] == "rank") {
-          rank = taxQuery[2];
-        } else if (taxQuery[1] == "depth") {
-          depth = taxQuery[2];
+
+      if (parts[1] && parts[1].startsWith("tax_")) {
+        if (parts[1] == "tax_rank") {
+          rank = parts[2];
+        } else if (parts[1] == "depth") {
+          depth = parts[2];
         } else {
-          taxTerm = taxQuery;
+          parts[1] = parts[1].replace(/tax_/, "");
+          taxTerm = parts;
         }
       } else {
-        if (typesMap[result] && typesMap[result][term]) {
-          let bins = typesMap[result][term].bins;
-          if (bins && bins.scale && bins.scale.startsWith("log")) {
-            term += " > 0";
+        if (parts.length > 1) {
+          if (typesMap[result] && typesMap[result][term]) {
+            let bins = typesMap[result][term].bins;
+            if (bins && bins.scale && bins.scale.startsWith("log")) {
+              if (!parts[3] || parts[3].length > 0) {
+                parts[3] = ">0";
+              }
+            }
           }
-        }
-        let summary, field;
-        if (term.match(/(\w+)\s*\(/)) {
-          [summary, field] = term.split(/\s*[\(\)]\s*/);
-          if (!summaries.includes(summary)) {
-            status = { success: false, error: `Invalid option in '${term}'` };
+          let summary;
+          if (parts[1] && parts[1].length > 0) {
+            summary = parts[1];
           }
-        }
-        if (term.match(/[\>\<=]/)) {
-          let parts = term.split(/\s*([\>\<=]+)\s*/);
-          if (parts[0].endsWith("!")) {
-            parts[0] = parts[0].replace("!", "");
-            parts[1] = `!${parts[1]}`;
-          }
-          if (!field) field = parts[0];
-          if (typesMap[result]) {
-            if (!typesMap[result][field]) {
-              status = { success: false, error: `Invalid field in '${term}'` };
+          // if (term.match(/(\w+)\s*\(/)) {
+          //   [summary, field] = term.split(/\s*[\(\)]\s*/);
+          //   if (!summaries.includes(summary)) {
+          //     status = { success: false, error: `Invalid option in '${term}'` };
+          //   }
+          // }
+          if (parts[3].match(/[\>\<=]/)) {
+            let condition = parts[3].split(/\s*([\>\<=]+)\s*/);
+            if (condition[0].endsWith("!")) {
+              condition[1] = `!${condition[1]}`;
+            }
+            // if (!parts[2]) parts[2] = condition[0];
+            parts[3] = condition[1];
+            parts[4] = condition[2];
+            if (typesMap[result]) {
+              if (!typesMap[result][parts[2]]) {
+                status = {
+                  success: false,
+                  error: `Invalid field in '${term}'`,
+                };
+              } else {
+                filters = addCondition(
+                  filters,
+                  parts,
+                  typesMap[result][parts[2]].type,
+                  summary
+                );
+              }
             } else {
-              filters = addCondition(
-                filters,
-                parts,
-                typesMap[result][field].type,
-                summary
-              );
+              properties = addCondition(properties, parts, "keyword");
             }
           } else {
-            properties = addCondition(properties, parts, "keyword");
+            if (typesMap[result][term]) {
+              fields.push(term);
+            } else {
+              idTerm = term;
+            }
           }
         } else {
           if (typesMap[result][term]) {
