@@ -1,27 +1,25 @@
-tests:
-  - endpoint: record
-    querystring: recordId=9612&result=taxon&taxonomy=ncbi
-    accept-encoding: application/json
-    assert:
-      status:
-        success: true
-        hits: 1
-      records:
-        - id: taxon_id-9612
-          record:
-            parent: "9611"
-            taxon_rank: species
-            attributes:
-              assembly_level:
-                aggregation_source: direct
-                has_descendants: true
-                values:
-                  - value: Chromosome
-                    source_slug: GCA_905319855.2
-                    is_primary: true
-                  - value: Scaffold
-                    source_slug: GCA_905319845.1
-                    is_primary: false
-              assembly_span:
-                aggregation_source: direct
-                has_descendants: true
+endpoint: record
+querystring: recordId=9612&result=taxon&taxonomy=ncbi
+assert:
+  status:
+    success: true
+    hits: 1
+  records:
+    - id: taxon_id-9612
+      record:
+        parent: "9611"
+        taxon_rank: species
+        attributes:
+          assembly_level:
+            aggregation_source: direct
+            has_descendants: true
+            values:
+              - value: Chromosome
+                source_slug: GCA_905319855.2
+                is_primary: true
+              - value: Scaffold
+                source_slug: GCA_905319845.1
+                is_primary: false
+          assembly_span:
+            aggregation_source: direct
+            has_descendants: true

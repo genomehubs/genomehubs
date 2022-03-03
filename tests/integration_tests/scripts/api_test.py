@@ -28,17 +28,23 @@ def is_subset(a, b, path=None):
                     path[x] = False
                     yield False
             else:
-                if isinstance(a[x], list):
-                    path[x] = [{} for y in a[x]]
-                    yield all(
-                        [
-                            any([is_subset(y, z, path[x][i]) for z in b[x]])
-                            for i, y in enumerate(a[x])
-                        ]
-                    )
+                if x in b and isinstance(a[x], list):
+                    path[x] = []
+                    matches = []
+                    for i, y in enumerate(a[x]):
+                        possible_path = {}
+                        path[x].append(possible_path)
+                        has_match = False
+                        for z in b[x]:
+                            path[x][i] = possible_path
+                            if is_subset(y, z, path[x][i]):
+                                has_match = True
+                                break
+                        matches.append(has_match)
+                    yield all(matches)
                 else:
                     status = (x in b) and (a[x] == b[x])
-                    path[x] = status
+                    path[x] = "PASS" if status else "FAIL"
                     yield status
 
     return all(recursive_check_subset(a, b, path))
@@ -48,15 +54,14 @@ def main():
     """Entry point."""
     with open(sys.argv[1], "r") as stream:
         try:
-            tests = yaml.safe_load(stream)
+            test = yaml.safe_load(stream)
         except yaml.YAMLError as err:
             print(err)
             exit(1)
-    for test in tests["tests"]:
         url = "%s/%s?%s" % (BASE_URL, test["endpoint"], test["querystring"])
         req = Request(url)
 
-        req.add_header("accept", test.get("encoding", "application/json"))
+        req.add_header("accept", "application/json")
         content = urlopen(req).read()
         data = json.loads(content)
         template = test["assert"]
@@ -64,7 +69,7 @@ def main():
         try:
             assert is_subset(template, data, path)
         except AssertionError:
-            print(path)
+            print(yaml.dump(path))
 
 
 if __name__ == "__main__":
