@@ -25,7 +25,9 @@ jobs:
           node-version: "16"
       - run: npm install -g pkg
       - run: ./package-api.sh
-      - run: ./dist/genomehubs-api-linux > /dev/null 2>&1 &
+      - run: |
+          ./dist/genomehubs-api-linux &
+          sleep 5
       - uses: actions/upload-artifact@v2
         with:
           path: ./dist/*
@@ -133,19 +135,20 @@ jobs:
               --taxonomy-source ncbi \
               --traverse-root 2759 \
               --traverse-infer-both
-      - name: Index BTK files
-        run: |
-          genomehubs index \
-              --config-file tests/integration_tests/config/config.yaml \
-              --taxonomy-source ncbi \
-              --file-metadata tests/integration_tests/data/btk/btk.files.yaml
+      # - name: Index BTK files
+      #   run: |
+      #     genomehubs index \
+      #         --config-file tests/integration_tests/config/config.yaml \
+      #         --taxonomy-source ncbi \
+      #         --file-metadata tests/integration_tests/data/btk/btk.files.yaml
       - name: Check indices
         run: |
           curl -s "http://localhost:9200/_cat/indices"
       - name: Start API
         run: |
           chmod 755 dist/artifact/genomehubs-api-linux
-          ./dist/artifact/genomehubs-api-linux > /dev/null 2>&1 &
+          ./dist/artifact/genomehubs-api-linux &
+          sleep 5
       - name: Run API tests
         run: |
           ./tests/integration_tests/scripts/test_api_responses.py \
