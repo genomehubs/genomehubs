@@ -1,4 +1,4 @@
-name: package-genomehubs
+name: test-genomehubs
 
 on: [push]
 

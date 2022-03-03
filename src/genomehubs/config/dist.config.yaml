@@ -19,8 +19,6 @@ common:
     path: ~/genomehubs/demo
     separator: "--"
     version: v0.1
-  taxonomy:
-    source: ncbi
 fill: {}
 index: {}
 init: {}

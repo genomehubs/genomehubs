@@ -1,17 +1,22 @@
 common:
   es:
+    batch: 500
     host:
       - "localhost:9200"
+    timeout: 30
   hub:
     name: test_hub
     path: tests/resources
+    separator: --
     version: 2022.02.23
   taxonomy:
+    format: ncbi
+    file:
+      - names.dmp
+      - nodes.dmp
     path: tests/integration_tests/taxdump
 fill: {}
 index:
-  insdc:
-    genome-representation: full
-    page-size: 1000
-  skip-validation: false
+  taxonomy:
+    source: ncbi
 init: {}
