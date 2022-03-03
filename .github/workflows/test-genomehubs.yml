@@ -25,6 +25,7 @@ jobs:
           node-version: "16"
       - run: npm install -g pkg
       - run: ./package-api.sh
+      - run: ./dist/genomehubs-api-linux > /dev/null 2>&1 &
       - uses: actions/upload-artifact@v2
         with:
           path: ./dist/*
@@ -144,7 +145,7 @@ jobs:
       - name: Start API
         run: |
           chmod 755 dist/artifact/genomehubs-api-linux
-          ./dist/artifact/genomehubs-api-linux
+          ./dist/artifact/genomehubs-api-linux > /dev/null 2>&1 &
       - name: Run API tests
         run: |
           ./tests/integration_tests/scripts/test_api_responses.py \
