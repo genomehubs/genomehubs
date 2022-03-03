@@ -7,7 +7,7 @@ Usage:
     test_api_responses.py [--base-url URL] --json-test-dir DIR...
 
 Options:
-    --base-url URL       GenomeHubs API base url. [Default: http://localhost:3000/api/v0.0.1]
+    --base-url URL       GenomeHubs API base url. [Default: http://localhost:3000/api/v2]
     --json-test-dir DIR  Directory containing templates for json response tests.
 """
 
