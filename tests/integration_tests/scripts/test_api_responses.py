@@ -81,6 +81,7 @@ def json_response_tests(base_url, template_dir):
                 req.add_header("accept", "application/json")
                 content = urlopen(req).read()
                 data = json.loads(content)
+                print(data)
                 template = test["assert"]
                 path = {}
                 try:
