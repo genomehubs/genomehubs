@@ -21,9 +21,7 @@ common:
     version: v0.1
   taxonomy:
     source: ncbi
-fill:
-  traverse:
-    weight: branch-length
+fill: {}
 index:
   insdc:
     genome-representation: full
