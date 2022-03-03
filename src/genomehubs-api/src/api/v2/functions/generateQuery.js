@@ -15,7 +15,7 @@ const validateValue = (term, value, meta, types) => {
   let type = meta.type;
   let attrEnum;
   if (types && types[meta.attribute]) {
-    if (type == "value") {
+    if (!type || type == "value") {
       type = types[meta.attribute].type;
     }
   }
@@ -83,6 +83,7 @@ const validateOperator = (term, types, meta) => {
     }
     return validateValue(term, parts[2], meta, types);
   }
+  return { success: true };
 };
 
 const splitTerm = (term) => {
@@ -316,10 +317,10 @@ export const generateQuery = async ({
               properties = addCondition(properties, parts, "keyword");
             }
           } else {
-            if (typesMap[result][term]) {
-              fields.push(term);
+            if (typesMap[result][parts[2]]) {
+              fields.push(parts[2]);
             } else {
-              idTerm = term;
+              idTerm = parts[2];
             }
           }
         } else {
