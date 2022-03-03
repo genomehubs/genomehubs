@@ -16,18 +16,18 @@ jobs:
   #       with:
   #         path: ./dist/*
 
-  # package-api:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v2
-  #       with:
-  #         node-version: "16"
-  #     - run: npm install -g pkg
-  #     - run: ./package-api.sh
-  #     - uses: actions/upload-artifact@v2
-  #       with:
-  #         path: ./dist/*
+  package-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - run: npm install -g pkg
+      - run: ./package-api.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./dist/*
 
   package-genomehubs-linux:
     runs-on: ubuntu-latest
@@ -139,3 +139,11 @@ jobs:
       - name: Check indices
         run: |
           curl -s "http://localhost:9200/_cat/indices"
+      - name: Start API
+        run: |
+          chmod 755 dist/artifact/genomehubs-api-linux
+          ./dist/artifact/genomehubs-api-linux
+      - name: Run API tests
+        run: |
+          ./tests/integration_tests/scripts/test_api_responses.py \
+              --json-test-dir tests/integration_tests/templates/api/json

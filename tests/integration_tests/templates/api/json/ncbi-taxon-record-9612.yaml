@@ -7,7 +7,7 @@ assert:
   records:
     - id: taxon_id-9612
       record:
-        parent: "9611"
+        parent: "9612"
         taxon_rank: species
         attributes:
           assembly_level:
