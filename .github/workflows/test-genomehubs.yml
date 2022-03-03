@@ -46,6 +46,7 @@ jobs:
 
   run-test-fill:
     runs-on: ubuntu-latest
+    needs: package-api
     needs: package-genomehubs-linux
     services:
       elasticsearch:
