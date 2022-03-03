@@ -3,7 +3,7 @@ common:
     host:
       - "localhost:9200"
   hub:
-    name: test_instance
+    name: test_hub
     path: tests/resources
     version: 2022.02.23
   taxonomy:
