@@ -9,5 +9,9 @@ common:
   taxonomy:
     path: tests/integration_tests/taxdump
 fill: {}
-index: {}
+index:
+  insdc:
+    genome-representation: full
+    page-size: 1000
+  skip-validation: false
 init: {}
