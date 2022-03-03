@@ -25,9 +25,6 @@ jobs:
           node-version: "16"
       - run: npm install -g pkg
       - run: ./package-api.sh
-      - run: |
-          ./dist/genomehubs-api-linux &
-          sleep 5
       - uses: actions/upload-artifact@v2
         with:
           path: ./dist/*
@@ -61,7 +58,6 @@ jobs:
           discovery.type: single-node
     steps:
       - uses: actions/checkout@v2
-      - run: sleep 15
       - name: Check health
         run: |
           curl -s "http://localhost:9200/_cat/health" ||
@@ -160,7 +156,7 @@ jobs:
       - name: Start API
         run: |
           chmod 755 dist/artifact/genomehubs-api-linux
-          ./dist/artifact/genomehubs-api-linux &
+          GH_RELEASE=2022.02.23 GH_HUBNAME=test_instance ./dist/artifact/genomehubs-api-linux &
           sleep 5
       - name: Run API tests
         run: |
