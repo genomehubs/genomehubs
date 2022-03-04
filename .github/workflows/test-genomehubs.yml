@@ -89,6 +89,8 @@ jobs:
               --assembly-dir tests/integration_tests/data/assembly-data
           # curl localhost:9200/_refresh
           curl localhost:9200/taxon--ncbi--test_hub--2022.02.23/_doc/taxon_id-9612
+          sleep 5
+          curl localhost:9200/taxon--ncbi--test_hub--2022.02.23/_doc/taxon_id-9612
           genomehubs index \
               --config-file tests/integration_tests/config/config.yaml \
               --taxonomy-source ncbi \
