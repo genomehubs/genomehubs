@@ -31,6 +31,7 @@ const ReportItem = ({
   reportId,
   report,
   disableModal,
+  embedded,
   queryString,
   fetchReport,
   reportById,
@@ -183,6 +184,7 @@ const ReportItem = ({
             chartRef={chartRef}
             containerRef={containerRef}
             ratio={ratio}
+            embedded={embedded}
             stacked={stacked}
             cumulative={cumulative}
             xOpts={xOpts}
@@ -200,6 +202,7 @@ const ReportItem = ({
             scatter={reportById}
             chartRef={chartRef}
             containerRef={containerRef}
+            embedded={embedded}
             ratio={ratio}
             xOpts={xOpts}
             yOpts={yOpts}
@@ -218,6 +221,7 @@ const ReportItem = ({
           <ReportSources
             sources={reportById.report.sources}
             chartRef={chartRef}
+            embedded={embedded}
             containerRef={containerRef}
             minDim={minDim}
             setMinDim={setMinDim}
@@ -237,6 +241,7 @@ const ReportItem = ({
             reportId={reportId}
             topLevel={topLevel}
             permaLink={permaLink}
+            embedded={embedded}
             ratio={ratio}
             tree={reportById}
             chartRef={chartRef}
@@ -262,6 +267,7 @@ const ReportItem = ({
           <ReportXPerRank
             perRank={reportById}
             chartRef={chartRef}
+            embedded={embedded}
             containerRef={containerRef}
             ratio={ratio}
             minDim={minDim}
@@ -274,6 +280,7 @@ const ReportItem = ({
           <ReportXInY
             xInY={reportById}
             chartRef={chartRef}
+            embedded={embedded}
             containerRef={targetRef}
             ratio={ratio}
             minDim={minDim}
@@ -286,7 +293,9 @@ const ReportItem = ({
     }
   }
 
-  heading = heading || headings[report];
+  if (!embedded) {
+    heading = heading || headings[report];
+  }
   if (caption) {
     if (
       caption === true ||

@@ -16,6 +16,7 @@ import withReportById from "../hocs/withReportById";
 const ReportTree = ({
   reportId,
   tree,
+  embedded,
   chartRef,
   containerRef,
   reportRef,
@@ -107,6 +108,9 @@ const ReportTree = ({
   // };
 
   const handleSearch = ({ root, name, depth, rank }) => {
+    if (embedded) {
+      return;
+    }
     let { options, y, report, x, fields, ...moreOptions } = updateQuery({
       root,
       name,
@@ -141,6 +145,9 @@ const ReportTree = ({
   };
 
   const handleNavigation = ({ root, name, depth, rank }) => {
+    if (embedded) {
+      return;
+    }
     if (name == "parent") {
       handleSearch({ root, name, depth, rank });
       return;

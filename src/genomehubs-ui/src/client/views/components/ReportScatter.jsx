@@ -139,14 +139,17 @@ const CustomShape = (props, chartProps) => {
           width={w}
           x={props.cx}
           y={props.cy - h}
-          style={{ cursor: "pointer" }}
+          style={chartProps.embedded ? {} : { cursor: "pointer" }}
           fill={"rgba(255,255,255,0)"}
-          onClick={() =>
-            searchByCell({
-              ...chartProps,
-              xBounds: [props.payload.x, props.payload.xBound],
-              yBounds: [props.payload.y, props.payload.yBound],
-            })
+          onClick={
+            chartProps.embedded
+              ? () => {}
+              : () =>
+                  searchByCell({
+                    ...chartProps,
+                    xBounds: [props.payload.x, props.payload.xBound],
+                    yBounds: [props.payload.y, props.payload.yBound],
+                  })
           }
         />
       </Tooltip>
@@ -426,6 +429,7 @@ const ReportScatter = ({
   scatter,
   chartRef,
   containerRef,
+  embedded,
   ratio,
   zScale = "linear",
   setMessage,
@@ -541,6 +545,7 @@ const ReportScatter = ({
           valueType,
           yValueType,
           hasRawData,
+          embedded,
           navigate,
           location,
         }}

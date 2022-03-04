@@ -72,6 +72,7 @@ const Report = ({
       options: { ...props, ...queryProps },
     });
   }
+  reportProps.embedded = props.embedded;
   reportProps.inModal = props.inModal;
   reportProps.permaLink = props.permaLink;
   reportProps.handleUpdate = props.handleUpdate;

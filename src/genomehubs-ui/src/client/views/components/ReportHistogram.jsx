@@ -165,16 +165,20 @@ const CustomBackground = ({ chartProps, ...props }) => {
           width={w}
           x={props.background.x}
           y={props.background.y}
-          style={{ cursor: "pointer" }}
+          style={chartProps.embedded ? {} : { cursor: "pointer" }}
           fill={"rgba(255,255,255,0)"}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            searchByCell({
-              ...chartProps,
-              xBounds,
-            });
-          }}
+          onClick={
+            chartProps.embedded
+              ? () => {}
+              : (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  searchByCell({
+                    ...chartProps,
+                    xBounds,
+                  });
+                }
+          }
         />
       </Tooltip>
     </>
@@ -310,6 +314,7 @@ const ReportHistogram = ({
   histogram,
   chartRef,
   containerRef,
+  embedded,
   ratio,
   stacked,
   cumulative,
@@ -423,6 +428,7 @@ const ReportHistogram = ({
           ranks: histograms.ranks,
           buckets: histograms.buckets,
           xFormat: (value) => formats(value, valueType),
+          embedded,
           navigate,
           location,
         }}

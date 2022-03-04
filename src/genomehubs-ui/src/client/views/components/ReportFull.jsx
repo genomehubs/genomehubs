@@ -74,47 +74,78 @@ export const ReportFull = ({
       gridRef={gridRef}
       topLevel={topLevel}
       permaLink={permaLink}
-      handleUpdate={handleUpdate}
+      embedded={location.pathname == "/reporturl"}
+      handleUpdate={location.pathname == "/reporturl" ? () => {} : handleUpdate}
     />
   );
 
-  let content = (
-    <Grid
-      container
-      direction="row"
-      style={{
-        ...(modal && { ...modalStyle }),
-        height,
-        width,
-        flexGrow: 1,
-        maxHeight: "100%",
-      }}
-      className={classnames(classes.paper, styles.markdown)}
-      ref={gridRef}
-    >
-      <Grid item xs={1} />
+  let content;
+  if (location.pathname == "/reporturl") {
+    content = (
       <Grid
-        item
-        // xs={edit || query || info || download ? 5 : 10}
-        xs={10}
-        align="center"
-        ref={containerRef}
-        style={{ width: "100%", height: "100%" }}
+        container
+        direction="row"
+        style={{
+          ...(modal && { ...modalStyle }),
+          height,
+          width,
+          flexGrow: 1,
+          maxHeight: "100%",
+        }}
+        className={classnames(classes.paper, styles.markdown)}
+        ref={gridRef}
       >
-        {reportComponent}
+        <Grid
+          item
+          xs={12}
+          align="center"
+          ref={containerRef}
+          style={{ width: "100%", height: "100%" }}
+        >
+          {reportComponent}
+        </Grid>
       </Grid>
+    );
+  } else {
+    content = (
+      <Grid
+        container
+        direction="row"
+        style={{
+          ...(modal && { ...modalStyle }),
+          height,
+          width,
+          flexGrow: 1,
+          maxHeight: "100%",
+        }}
+        className={classnames(classes.paper, styles.markdown)}
+        ref={gridRef}
+      >
+        <Grid item xs={1} />
+        <Grid
+          item
+          // xs={edit || query || info || download ? 5 : 10}
+          xs={10}
+          align="center"
+          ref={containerRef}
+          style={{ width: "100%", height: "100%" }}
+        >
+          {reportComponent}
+        </Grid>
 
-      <Grid item xs={1}>
-        <ReportTools
-          queryString={queryString}
-          reportId={reportId}
-          report={report}
-          topLevel={topLevel}
-          chartRef={chartRef}
-        />
+        <Grid item xs={1}>
+          <ReportTools
+            queryString={queryString}
+            reportId={reportId}
+            report={report}
+            topLevel={topLevel}
+            chartRef={chartRef}
+          />
+        </Grid>
       </Grid>
-    </Grid>
-  );
+    );
+  }
+
   return (
     <div
       style={{ marginLeft, height, width, maxHeight: "100%" }}
