@@ -265,7 +265,7 @@ export const generateQuery = async ({
       if (parts[1] && parts[1].startsWith("tax_")) {
         if (parts[1] == "tax_rank") {
           rank = parts[2];
-        } else if (parts[1] == "depth") {
+        } else if (parts[1] == "tax_depth") {
           depth = parts[2];
         } else {
           parts[1] = parts[1].replace(/tax_/, "");
