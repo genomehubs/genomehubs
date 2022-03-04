@@ -1,5 +1,8 @@
 name: test-genomehubs
 
+volumes:
+  data:
+
 on: [push]
 
 jobs:
@@ -46,12 +49,15 @@ jobs:
 
   run-test-fill:
     runs-on: ubuntu-latest
+    volumes:
+      - data:/volumes/data
     needs:
       - package-api
       - package-genomehubs-linux
     services:
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+        options: -v /volumes/data:/usr/share/elasticsearch/data
         ports:
           - 9200:9200
         env:
@@ -88,9 +94,9 @@ jobs:
               --taxonomy-source ncbi \
               --assembly-dir tests/integration_tests/data/assembly-data
           # curl localhost:9200/_refresh
-          curl localhost:9200/taxon--ncbi--test_hub--2022.02.23/_doc/taxon_id-9612
-          sleep 5
-          curl localhost:9200/taxon--ncbi--test_hub--2022.02.23/_doc/taxon_id-9612
+          # curl localhost:9200/taxon--ncbi--test_hub--2022.02.23/_doc/taxon_id-9612
+          # sleep 5
+          # curl localhost:9200/taxon--ncbi--test_hub--2022.02.23/_doc/taxon_id-9612
           genomehubs index \
               --config-file tests/integration_tests/config/config.yaml \
               --taxonomy-source ncbi \
@@ -136,7 +142,7 @@ jobs:
               --taxon-lookup any \
               --taxon-spellcheck
           # curl localhost:9200/_refresh
-          curl localhost:9200/taxon--ncbi--test_hub--2022.02.23/_doc/taxon_id-9612
+          # curl localhost:9200/taxon--ncbi--test_hub--2022.02.23/_doc/taxon_id-9612
       - name: Run genomehubs fill
         run: |
           genomehubs fill \
