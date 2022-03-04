@@ -87,38 +87,45 @@ jobs:
               --config-file tests/integration_tests/config/config.yaml \
               --taxonomy-source ncbi \
               --assembly-dir tests/integration_tests/data/assembly-data
+          curl localhost:9200/refresh
           genomehubs index \
               --config-file tests/integration_tests/config/config.yaml \
               --taxonomy-source ncbi \
               --taxon-dir tests/integration_tests/data/ott3.3
+          curl localhost:9200/refresh
           genomehubs index \
               --config-file tests/integration_tests/config/config.yaml \
               --taxonomy-source ncbi \
               --taxon-dir tests/integration_tests/data/tolids \
               --taxon-lookup any \
               --taxon-spellcheck
+          curl localhost:9200/refresh
           genomehubs index \
               --config-file tests/integration_tests/config/config.yaml \
               --taxonomy-source ncbi \
               --taxon-dir tests/integration_tests/data/genomesize_karyotype \
               --taxon-lookup any \
               --taxon-spellcheck
+          curl localhost:9200/refresh
           genomehubs index \
               --config-file tests/integration_tests/config/config.yaml \
               --taxonomy-source ncbi \
               --taxon-dir tests/integration_tests/data/regional_lists \
               --taxon-lookup any \
               --taxon-spellcheck
+          curl localhost:9200/refresh
           genomehubs index \
               --config-file tests/integration_tests/config/config.yaml \
               --taxonomy-source ncbi \
               --taxon-dir tests/integration_tests/data/uk_legislation \
               --taxon-lookup any \
               --taxon-spellcheck
+          curl localhost:9200/refresh
           genomehubs index \
               --config-file tests/integration_tests/config/config.yaml \
               --taxonomy-source ncbi \
               --assembly-dir tests/integration_tests/data/btk
+          curl localhost:9200/refresh
           genomehubs index \
               --config-file tests/integration_tests/config/config.yaml \
               --taxonomy-source ncbi \
