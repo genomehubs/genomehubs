@@ -1,8 +1,5 @@
 name: test-genomehubs
 
-volumes:
-  data:
-
 on: [push]
 
 jobs:
