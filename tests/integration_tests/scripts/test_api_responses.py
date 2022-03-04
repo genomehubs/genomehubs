@@ -14,6 +14,8 @@ Options:
 import json
 import os
 from textwrap import indent
+from urllib.parse import quote
+from urllib.parse import unquote
 from urllib.request import Request
 from urllib.request import urlopen
 
@@ -76,7 +78,14 @@ def json_response_tests(base_url, template_dir):
                 print(err)
                 exit(1)
             if required_headers.issubset(set(test.keys())):
-                url = "%s/%s?%s" % (base_url, test["endpoint"], test["querystring"])
+                qs = {
+                    unquote(entry.split("=")[0]): unquote(entry.split("=")[1])
+                    for entry in test["querystring"].split("&")
+                }
+                querystring = "&".join(
+                    ["%s=%s" % (quote(key), quote(value)) for key, value in qs.items()]
+                )
+                url = "%s/%s?%s" % (base_url, test["endpoint"], querystring)
                 req = Request(url)
                 req.add_header("accept", "application/json")
                 content = urlopen(req).read()
@@ -91,6 +100,7 @@ def json_response_tests(base_url, template_dir):
                     success = False
                     print("      Test output:")
                     print(indent(yaml.dump(path), "          "))
+                    print(data)
     return success
 
 

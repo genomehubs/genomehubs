@@ -1,3 +1,5 @@
+description: |
+  check values in full record for taxon ID 9612
 endpoint: record
 querystring: recordId=9612&result=taxon&taxonomy=ncbi
 assert:

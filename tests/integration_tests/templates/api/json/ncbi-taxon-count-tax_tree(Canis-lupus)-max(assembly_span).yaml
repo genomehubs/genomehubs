@@ -1,0 +1,9 @@
+description: |
+  Count all descendants of taxon ID 9612 using tax_tree() query
+  with includeEstimates=true and max(assembly_span)
+endpoint: count
+querystring: query=tax_tree(Canis lupus) AND max(assembly_span)&result=taxon&fields=&includeEstimates=true&summaryValues=count&taxonomy=ncbi
+assert:
+  status:
+    success: true
+  count: 22

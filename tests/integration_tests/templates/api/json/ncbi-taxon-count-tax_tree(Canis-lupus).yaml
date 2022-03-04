@@ -1,0 +1,9 @@
+description: |
+  Count all descendants of Canis lupus using tax_tree() query
+  with includeEstimates=true
+endpoint: count
+querystring: query=tax_tree(Canis lupus)&result=taxon&fields=&includeEstimates=true&summaryValues=count&taxonomy=ncbi
+assert:
+  status:
+    success: true
+  count: 22

@@ -1,0 +1,7 @@
+description: invalid attribute error
+endpoint: count
+querystring: query=max(assembly_spann)&result=taxon&taxonomy=ncbi
+assert:
+  status:
+    success: false
+    error: invalid attribute name in max(assembly_spann)
