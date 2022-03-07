@@ -135,7 +135,7 @@ setup(
             "init = genomehubs.lib.init:cli",
             "parse = genomehubs.lib.parse:cli",
             "run = genomehubs.lib.run:cli",
-            "search = genomehubs.lib.search:cli",
+            "test = genomehubs.lib.test:cli",
         ],
     },
     project_urls={

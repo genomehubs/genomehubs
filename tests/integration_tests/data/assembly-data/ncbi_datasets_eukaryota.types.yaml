@@ -2,10 +2,10 @@ attributes:
   assembly_level:
     constraint:
       enum:
-      - complete genome
-      - chromosome
-      - scaffold
-      - contig
+        - complete genome
+        - chromosome
+        - scaffold
+        - contig
     display_group: misc
     display_level: 1
     display_name: Assembly level
@@ -19,8 +19,8 @@ attributes:
     taxon_key: assembly_level
     taxon_name: assembly_level
     taxon_summary:
-    - primary
-    - enum
+      - primary
+      - enum
     taxon_traverse: enum
     taxon_traverse_direction: up
     type: keyword
@@ -45,11 +45,11 @@ attributes:
     taxon_key: assembly_span
     taxon_name: assembly_span
     taxon_summary:
-    - primary
-    - median
-    - min
-    - max
-    - count
+      - primary
+      - median
+      - min
+      - max
+      - count
     taxon_traverse: median
     taxon_traverse_direction: both
     type: long
@@ -70,7 +70,7 @@ attributes:
     header: bioProjectAccession
     organelle: nucleus
     separator:
-    - ;
+      - ;
     source: NCBI Datasets
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
     taxon_display_group: assembly
@@ -79,7 +79,7 @@ attributes:
     taxon_key: bioproject
     taxon_name: bioproject
     taxon_summary:
-    - list
+      - list
     taxon_traverse: list
     taxon_traverse_direction: up
     type: keyword
@@ -90,7 +90,7 @@ attributes:
     header: biosampleAccession
     organelle: nucleus
     separator:
-    - ;
+      - ;
     source: NCBI Datasets
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
     taxon_display_group: assembly
@@ -99,7 +99,7 @@ attributes:
     taxon_key: biosample
     taxon_name: biosample
     taxon_summary:
-    - list
+      - list
     taxon_traverse: list
     taxon_traverse_direction: up
     type: keyword
@@ -159,11 +159,11 @@ attributes:
     taxon_key: contig_n50
     taxon_name: contig_n50
     taxon_summary:
-    - primary
-    - max
-    - median
-    - min
-    - count
+      - primary
+      - max
+      - median
+      - min
+      - count
     taxon_traverse: median
     taxon_traverse_direction: up
     type: long
@@ -180,8 +180,8 @@ attributes:
     taxon_key: ebp_metric_date
     taxon_name: ebp_metric_date
     taxon_summary:
-    - min
-    - max
+      - min
+      - max
     taxon_traverse: min
     taxon_traverse_direction: up
     type: date
@@ -205,11 +205,11 @@ attributes:
     taxon_key: gene_count
     taxon_name: gene_count
     taxon_summary:
-    - primary
-    - median
-    - min
-    - max
-    - count
+      - primary
+      - median
+      - min
+      - max
+      - count
     type: integer
   isolate:
     display_group: misc
@@ -232,9 +232,9 @@ attributes:
     taxon_key: assembly_date
     taxon_name: assembly_date
     taxon_summary:
-    - primary
-    - max
-    - min
+      - primary
+      - max
+      - min
     taxon_traverse: min
     taxon_traverse_direction: up
     type: date
@@ -294,9 +294,9 @@ attributes:
     taxon_key: sample_sex
     taxon_name: sample_sex
     taxon_summary:
-    - primary
-    - list
-    - count
+      - primary
+      - list
+      - count
     type: keyword
   scaffold_count:
     constraint:
@@ -342,11 +342,11 @@ attributes:
     taxon_key: scaffold_n50
     taxon_name: scaffold_n50
     taxon_summary:
-    - primary
-    - max
-    - median
-    - min
-    - count
+      - primary
+      - max
+      - median
+      - min
+      - count
     taxon_traverse: median
     taxon_traverse_direction: up
     type: long
@@ -392,6 +392,7 @@ file:
   organelle: nucleus
   source: NCBI Datasets
   source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  tests: ncbi_datasets_tests
 identifiers:
   assembly_id:
     constraint:

@@ -5,7 +5,7 @@ common:
       - "localhost:9200"
     timeout: 30
   hub:
-    name: test_hub
+    name: test_instance
     path: tests/resources
     separator: --
     version: 2022.02.23
@@ -20,3 +20,6 @@ index:
   taxonomy:
     source: ncbi
 init: {}
+test:
+  taxonomy:
+    source: ncbi
