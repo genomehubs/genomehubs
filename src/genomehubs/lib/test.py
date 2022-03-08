@@ -29,6 +29,7 @@ from urllib.request import urlopen
 
 import yaml
 from docopt import docopt
+from fastjsonschema import validate
 
 from .config import config
 from .version import __version__
@@ -41,7 +42,15 @@ def is_subset(a, b, path=None):
 
     def recursive_check_subset(a, b, path):
         for x in a:
-            if isinstance(a[x], dict):
+            if x == "jsonSchema":
+                try:
+                    validate(a[x], b)
+                    path[x] = "PASS"
+                    yield True
+                except Exception:
+                    path[x] = "FAIL"
+                    yield False
+            elif isinstance(a[x], dict):
                 if x in b:
                     path[x] = {}
                     yield all(recursive_check_subset(a[x], b[x], path[x]))

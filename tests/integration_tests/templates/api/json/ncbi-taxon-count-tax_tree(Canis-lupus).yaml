@@ -6,4 +6,6 @@ querystring: query=tax_tree(Canis lupus)&result=taxon&fields=&includeEstimates=t
 assert:
   status:
     success: true
-  count: 22
+  count:
+    jsonSchema:
+      minimum: 20
