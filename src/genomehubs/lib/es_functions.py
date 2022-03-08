@@ -206,7 +206,8 @@ def index_stream(es, index_name, stream, *, _op_type="index", log=True, dry_run=
                 failed += 1
     except Exception as err:
         raise err
-
+    es_client = client.IndicesClient(es)
+    es_client.refresh(index=index_name)
     return success, failed
 
 

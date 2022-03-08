@@ -3,7 +3,6 @@
 """Taxon methods."""
 
 import sys
-from time import sleep
 
 from tolkein import tolog
 
@@ -11,6 +10,9 @@ from .es_functions import index_stream
 from .es_functions import load_mapping
 from .es_functions import stream_template_search_results
 from .hub import index_templator
+
+# from time import sleep
+
 
 LOGGER = tolog.logger(__name__)
 
@@ -104,9 +106,9 @@ def index_types(es, types_name, types, opts, *, dry_run=False):
         )
         load_mapping(es, template["name"], template["mapping"])
         index_stream(es, template["index_name"], stream, dry_run=dry_run)
-        if new_attributes:
-            # Delay to ensure index is updated before loading next file
-            sleep(5)
+        # if new_attributes:
+        #     # Delay to ensure index is updated before loading next file
+        #     sleep(5)
     if "taxon_names" in types:
         if "defaults" in types and "taxon_names" in types["defaults"]:
             for key, value in types["names"].items():

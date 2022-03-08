@@ -21,6 +21,7 @@ import os
 import re
 import sys
 from textwrap import indent
+from urllib.error import HTTPError
 from urllib.parse import quote
 from urllib.parse import unquote
 from urllib.request import Request
@@ -79,7 +80,7 @@ def placeholder_substitution(string, config):
             try:
                 replaced.append(config[part])
             except KeyError:
-                print("ERROR: no value for \{\{%s\}\} in configuration" % part)
+                print("ERROR: no value for {{%s}} in configuration" % part)
         else:
             replaced.append(part)
     return "".join(replaced)
@@ -119,8 +120,14 @@ def json_response_tests(base_url, template_dir, opts):
                 url = "%s/%s?%s" % (base_url, endpoint, querystring)
                 req = Request(url)
                 req.add_header("accept", "application/json")
-                content = urlopen(req).read()
-                data = json.loads(content)
+                try:
+                    content = urlopen(req).read()
+                    data = json.loads(content)
+                except HTTPError:
+                    success = False
+                    print("    - %s: FAIL" % file)
+                    print("      Unable to open %s" % url)
+                    continue
                 template = test["assert"]
                 path = {}
                 try:
