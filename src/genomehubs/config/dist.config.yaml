@@ -1,11 +1,11 @@
 common:
-  docker:
-    contain: []
-    es:
-      container: ghubs-es
-      image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.8.1"
-    network: genomehubs-demo-network
-    timeout: 30
+  # docker:
+  #   contain: []
+  #   es:
+  #     container: ghubs-es
+  #     image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.8.1"
+  #   network: genomehubs-demo-network
+  #   timeout: 30
   es:
     batch: 500
     host:
@@ -19,34 +19,26 @@ common:
     path: ~/genomehubs/demo
     separator: "--"
     version: v0.1
-  taxonomy:
-    source: ncbi
-fill:
-  traverse:
-    weight: branch-length
-index:
-  insdc:
-    genome-representation: full
-    page-size: 1000
-  skip-validation: false
-init:
-  docker:
-    contain: []
-    es:
-      container: ghubs-es
-      image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.8.1"
-    timeout: 30
-  es:
-    path: ~/genomehubs/demo_resources/es
-    timeout: 30
-    url: "https://artifacts.elastic.co/downloads/elasticsearch"
-    version: elasticsearch-oss-7.8.1
-  taxonomy:
-    ncbi:
-      file:
-        - nodes.dmp
-        - names.dmp
-      url: "ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz"
-    path: ~/genomehubs/demo_resources/taxdump
+fill: {}
+index: {}
+init: {}
+# docker:
+#   contain: []
+#   es:
+#     container: ghubs-es
+#     image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.8.1"
+#   timeout: 30
+# es:
+#   path: ~/genomehubs/demo_resources/es
+#   timeout: 30
+#   url: "https://artifacts.elastic.co/downloads/elasticsearch"
+#   version: elasticsearch-oss-7.8.1
+# taxonomy:
+#   ncbi:
+#     file:
+#       - nodes.dmp
+#       - names.dmp
+#     url: "ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz"
+#   path: ~/genomehubs/demo_resources/taxdump
 parse: {}
-search: {}
+test: {}

@@ -1,0 +1,6 @@
+description: valid attribute
+endpoint: count
+querystring: query=max(assembly_span)&result=taxon&taxonomy=ncbi
+assert:
+  status:
+    success: true

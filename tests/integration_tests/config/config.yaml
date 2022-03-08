@@ -1,13 +1,25 @@
 common:
   es:
+    batch: 500
     host:
       - "localhost:9200"
+    timeout: 30
   hub:
     name: test_instance
     path: tests/resources
+    separator: --
     version: 2022.02.23
   taxonomy:
+    format: ncbi
+    file:
+      - names.dmp
+      - nodes.dmp
     path: tests/integration_tests/taxdump
 fill: {}
-index: {}
+index:
+  taxonomy:
+    source: ncbi
 init: {}
+test:
+  taxonomy:
+    source: ncbi

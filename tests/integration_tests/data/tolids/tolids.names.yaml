@@ -1,9 +1,10 @@
 file:
   format: tsv
   header: false
-  name: tolids.tsv.gz
+  name: tolid_list.tsv.gz
   source: dToL sample naming
   source_url: https://gitlab.com/wtsi-grit/darwin-tree-of-life-sample-naming
+  tests: tests
 taxon_names:
   tol_id:
     index: 0

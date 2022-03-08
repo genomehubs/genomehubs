@@ -61,6 +61,8 @@ Examples:
 
 import csv
 import sys
+
+# import time
 from collections import defaultdict
 from pathlib import Path
 
@@ -88,6 +90,7 @@ from .taxon import add_names_and_attributes_to_taxa
 from .taxon import fix_missing_ids
 from .taxon import load_taxon_table
 from .taxon import translate_xrefs
+from .test import test_json_dir
 from .validate import validate_types_file
 from .version import __version__
 
@@ -338,20 +341,31 @@ def main(args):
                 types, data, names = validate_types_file(
                     types_file, dir_path, es, index, options["index"]
                 )
-                LOGGER.info("Indexing %s" % types["file"]["name"])
-                index_types(es, index, types, options["index"], dry_run=dry_run)
-                index_file(
-                    es,
-                    types,
-                    names,
-                    data,
-                    {
-                        **options["index"],
-                        "index": index,
-                        "index_types": index_types,
-                    },
-                    taxon_table=taxon_table,
-                )
+                if "file" in types and "name" in types["file"]:
+                    LOGGER.info("Indexing %s" % types["file"]["name"])
+                    index_types(es, index, types, options["index"], dry_run=dry_run)
+                    index_file(
+                        es,
+                        types,
+                        names,
+                        data,
+                        {
+                            **options["index"],
+                            "index": index,
+                            "index_types": index_types,
+                        },
+                        taxon_table=taxon_table,
+                    )
+                    if "tests" in types["file"]:
+                        result = test_json_dir(
+                            "%s/%s" % (dir_path, types["file"]["tests"]),
+                            options["index"]["es-host"][0],
+                            options["index"],
+                        )
+                        if result is False:
+                            LOGGER.error("Failed tests")
+                            exit(1)
+                    # time.sleep(5)
             for types_file in sorted(Path(dir_path).glob("*.types.yaml")):
                 types, data, names = validate_types_file(
                     types_file, dir_path, es, index, options["index"]
@@ -372,6 +386,16 @@ def main(args):
                         },
                         taxon_table=taxon_table,
                     )
+                    if "tests" in types["file"]:
+                        result = test_json_dir(
+                            "%s/%s" % (dir_path, types["file"]["tests"]),
+                            options["index"]["es-host"][0],
+                            options["index"],
+                        )
+                        if result is False:
+                            LOGGER.error("Failed tests")
+                            exit(1)
+                    # time.sleep(5)
     # TODO: #29 Implement alternate backbone taxonomies
     if "file" in options["index"]:
         index_files(es, options["index"]["file"], taxonomy_name, options["index"])

@@ -1,4 +1,4 @@
-name: package-genomehubs
+name: test-genomehubs
 
 on: [push]
 
@@ -16,18 +16,18 @@ jobs:
   #       with:
   #         path: ./dist/*
 
-  # package-api:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v2
-  #       with:
-  #         node-version: "16"
-  #     - run: npm install -g pkg
-  #     - run: ./package-api.sh
-  #     - uses: actions/upload-artifact@v2
-  #       with:
-  #         path: ./dist/*
+  package-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - run: npm install -g pkg
+      - run: ./package-api.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./dist/*
 
   package-genomehubs-linux:
     runs-on: ubuntu-latest
@@ -46,17 +46,19 @@ jobs:
 
   run-test-fill:
     runs-on: ubuntu-latest
-    needs: package-genomehubs-linux
+    needs:
+      - package-api
+      - package-genomehubs-linux
     services:
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+        options: -v es-data:/usr/share/elasticsearch/data
         ports:
           - 9200:9200
         env:
           discovery.type: single-node
     steps:
       - uses: actions/checkout@v2
-      - run: sleep 15
       - name: Check health
         run: |
           curl -s "http://localhost:9200/_cat/health" ||
@@ -72,7 +74,7 @@ jobs:
           genomehubs -v
       - name: Run genomehubs init
         run: |
-          curl -X DELETE "http://localhost:9200/*"
+          curl -X DELETE "http://localhost:9200/*--test_instance--*"
           genomehubs init \
               --config-file tests/integration_tests/config/config.yaml \
               --taxonomy-source ncbi \
@@ -130,12 +132,23 @@ jobs:
               --taxonomy-source ncbi \
               --traverse-root 2759 \
               --traverse-infer-both
-      - name: Index BTK files
-        run: |
-          genomehubs index \
-              --config-file tests/integration_tests/config/config.yaml \
-              --taxonomy-source ncbi \
-              --file-metadata tests/integration_tests/data/btk/btk.files.yaml
+          curl localhost:9200/_refresh
+      # - name: Index BTK files
+      #   run: |
+      #     genomehubs index \
+      #         --config-file tests/integration_tests/config/config.yaml \
+      #         --taxonomy-source ncbi \
+      #         --file-metadata tests/integration_tests/data/btk/btk.files.yaml
       - name: Check indices
         run: |
           curl -s "http://localhost:9200/_cat/indices"
+      - name: Start API
+        run: |
+          chmod 755 dist/artifact/genomehubs-api-linux
+          GH_RELEASE=2022.02.23 GH_HUBNAME=test_instance ./dist/artifact/genomehubs-api-linux &
+          sleep 5
+      - name: Run API tests
+        run: |
+          genomehubs test \
+              --base-url http://localhost:3000/api/v2 \
+              --json-test-dir tests/integration_tests/templates/api/json

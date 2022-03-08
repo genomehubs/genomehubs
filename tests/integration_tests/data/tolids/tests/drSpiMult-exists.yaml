@@ -1,0 +1,11 @@
+description: check taxon drSpiMult has been created
+endpoint: taxon--{{taxonomy-source}}--{{hub-name}}--{{hub-version}}/_doc/taxon_id-drSpiMult
+querystring:
+assert:
+  _id: taxon_id-drSpiMult
+  found: True
+  _source:
+    taxon_id: drSpiMult
+    parent: "23224"
+    taxon_rank: species
+    scientific_name: Spiraea multiflora
