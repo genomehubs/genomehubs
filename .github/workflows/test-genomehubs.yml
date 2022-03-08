@@ -150,5 +150,5 @@ jobs:
       - name: Run API tests
         run: |
           genomehubs test \
-              --base-url http://localhost:3000/api/v2
+              --base-url http://localhost:3000/api/v2 \
               --json-test-dir tests/integration_tests/templates/api/json
