@@ -258,7 +258,15 @@ const AttributeTableRow = ({
     let source;
     let aggSource;
     let colSpan = 2;
-    fieldValues.push(<TableCell key={"attribute"}>{attributeId}</TableCell>);
+    let label = <span>{attributeId}</span>;
+    if (types[attributeId].description) {
+      label = (
+        <Tooltip title={types[attributeId].description} arrow placement={"top"}>
+          {label}
+        </Tooltip>
+      );
+    }
+    fieldValues.push(<TableCell key={"attribute"}>{label}</TableCell>);
     let range;
     if (meta.max > meta.min) {
       range = ` (${formatter(meta.min)}-${formatter(meta.max)})`;

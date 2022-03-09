@@ -92,6 +92,7 @@ const StyledCheckbox = ({ color, ...props }) => {
 
 const SortableCell = ({
   name,
+  description,
   classes,
   sortBy,
   sortOrder,
@@ -119,6 +120,24 @@ const SortableCell = ({
     }
   }
 
+  let title = `Sort by ${name}`;
+  if (description) {
+    title = (
+      <div style={{ whiteSpace: "pre-line", maxWidth: "14em" }}>
+        <div>{title}</div>
+        <div
+          style={{
+            width: "100%",
+            marginTop: "0.5em",
+            borderTop: "solid white 1px",
+          }}
+        >
+          {description}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <TableCell
       key={name}
@@ -132,7 +151,7 @@ const SortableCell = ({
       }}
       sortDirection={sortDirection}
     >
-      <Tooltip key={name} title={`Sort by ${name.replaceAll("_", " ")}`} arrow>
+      <Tooltip key={name} title={title} arrow>
         <TableSortLabel
           active={sortBy === name}
           direction={sortOrder}
@@ -610,6 +629,7 @@ const ResultTable = ({
         <SortableCell
           key={type.name}
           name={type.name}
+          description={type.description}
           classes={classes}
           sortBy={sortBy}
           sortOrder={sortOrder}

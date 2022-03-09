@@ -21,6 +21,7 @@ import Select from "@material-ui/core/Select";
 import SettingsButton from "./SettingsButton";
 import Switch from "@material-ui/core/Switch";
 import TextField from "@material-ui/core/TextField";
+import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import { compose } from "recompose";
 import { makeStyles } from "@material-ui/core/styles";
@@ -226,6 +227,14 @@ const SearchSettings = ({
     totals[key] = 0;
     Object.keys(group).forEach((id) => {
       totals[key]++;
+      let label = <div>{id}</div>;
+      if (group[id].description) {
+        label = (
+          <Tooltip title={group[id].description} arrow placement={"top"}>
+            {label}
+          </Tooltip>
+        );
+      }
       content.push(
         <Grid container alignItems="center" direction="row" key={id}>
           <Grid item>
@@ -236,7 +245,7 @@ const SearchSettings = ({
               control={
                 <Checkbox color="default" name={id} checked={state[id]} />
               }
-              label={`${id}`}
+              label={label}
             />
           </Grid>
         </Grid>
