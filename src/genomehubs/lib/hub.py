@@ -736,6 +736,8 @@ def write_imported_taxa(taxa, opts, *, types):
     for name, arr in taxa.items():
         prefix = "#" if len(arr) > 1 else ""
         for obj in arr:
+            if obj.get("additional_taxon", False):
+                prefix = "#"
             imported.append(
                 ["%s%s" % (prefix, str(obj["taxon_id"])), name, obj["rank"]]
             )

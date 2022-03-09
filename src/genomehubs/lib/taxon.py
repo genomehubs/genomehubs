@@ -751,6 +751,7 @@ def create_descendant_taxon(taxon_id, rank, name, closest_taxon):
             "taxon_id": taxon_id,
             "taxon_rank": rank,
             "scientific_name": name,
+            "additional_taxon": True,
             "parent": closest_taxon["_source"]["taxon_id"],
             "taxon_names": [{"class": "scientific name", "name": name}],
         },

@@ -8,6 +8,12 @@
         "ignore_above": 32,
         "meta": { "description": "Taxonomy-specific taxon ID" }
       },
+      "additional_taxon": {
+        "type": "boolean",
+        "meta": {
+          "description": "Is taxon an addition to the source taxonomy?"
+        }
+      },
       "parent": {
         "type": "keyword",
         "normalizer": "lowercase",

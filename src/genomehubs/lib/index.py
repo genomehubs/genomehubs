@@ -109,6 +109,7 @@ def summarise_imported_taxa(docs, imported_taxa):
             {
                 "taxon_id": entry["taxon_id"],
                 "rank": entry["taxon_rank"],
+                "additional_taxon": entry.get("additional_taxon", False),
             }
         )
         yield entry_id, entry
