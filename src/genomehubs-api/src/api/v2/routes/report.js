@@ -441,8 +441,21 @@ export const getSources = async (params) => {
   const binned = await getRawSources(params);
   let counts = {};
   let fields = {};
+  let urls = {};
+  let dates = {};
   if (binned.status.success) {
     binned.fields.buckets.forEach(({ key: field, summary }) => {
+      let minDate = summary.terms.buckets[0].min_date.value_as_string;
+      let maxDate = summary.terms.buckets[0].max_date.value_as_string;
+      let dateRange;
+      let url;
+      if (minDate) {
+        dateRange = [minDate, maxDate];
+      }
+      let urlBuckets = summary.terms.buckets[0].url.buckets;
+      if (urlBuckets && urlBuckets.length > 0) {
+        url = urlBuckets[0].key;
+      }
       summary.terms.buckets.forEach(({ key: source, doc_count: count }) => {
         if (!counts[source]) {
           counts[source] = 0;
@@ -452,6 +465,19 @@ export const getSources = async (params) => {
         }
         counts[source] += count;
         fields[source].push(field);
+        if (dateRange) {
+          if (dates[source]) {
+            dates[source] = [
+              dateRange[0] < dates[source][0] ? dateRange[0] : dates[source][0],
+              dateRange[1] > dates[source][1] ? dateRange[1] : dates[source][1],
+            ];
+          } else {
+            dates[source] = dateRange;
+          }
+        }
+        if (url) {
+          urls[source] = url;
+        }
       });
     });
   }
@@ -460,6 +486,7 @@ export const getSources = async (params) => {
     let source = meta.source || [];
     let source_url = meta.source_url || [];
     let source_url_stub = meta.source_url_stub || [];
+    let source_date = meta.source_date || [];
     if (!Array.isArray(source)) {
       source = [source];
     }
@@ -469,28 +496,40 @@ export const getSources = async (params) => {
     if (!Array.isArray(source_url_stub)) {
       source_url_stub = [source_url_stub];
     }
+    if (!Array.isArray(source_date)) {
+      source_date = [source_date];
+    }
     source.forEach((src, i) => {
       if (src && typeof src === "string") {
-        let lcSrc = src.toLowerCase();
-        if (counts[lcSrc] && !sources.hasOwnProperty(lcSrc)) {
-          sources[lcSrc] = {
+        // let lcSrc = src.toLowerCase();
+        if (counts[src] && !sources.hasOwnProperty(src)) {
+          let date = source_date[i];
+          sources[src] = {
             url: source_url[i] || source_url_stub[i],
+            date,
             attributes: [],
           };
-          if (counts[lcSrc]) {
-            sources[lcSrc].count = counts[lcSrc];
-            sources[lcSrc].attributes.push(...fields[lcSrc]);
+          if (counts[src]) {
+            sources[src].count = counts[src];
+            sources[src].attributes.push(...fields[src]);
           }
         }
       }
     });
   });
   Object.keys(counts).forEach((src) => {
+    // let lcSrc = src.toLowerCase();
     if (!sources.hasOwnProperty(src)) {
       sources[src] = {};
     }
     sources[src].count = counts[src];
     sources[src].attributes = fields[src];
+    if (dates[src]) {
+      sources[src].date = dates[src];
+    }
+    if (urls[src]) {
+      sources[src].url = urls[src];
+    }
   });
   return { report: { sources: sources } };
 };

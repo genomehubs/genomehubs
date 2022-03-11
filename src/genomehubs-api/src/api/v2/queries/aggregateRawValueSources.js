@@ -1,7 +1,7 @@
 const termsAgg = async () => {
   return {
     terms: {
-      field: "attributes.values.source",
+      field: "attributes.values.source.raw",
       size: 200,
     },
   };
@@ -34,8 +34,28 @@ export const aggregateRawValueSources = async ({}) => {
                 aggs: {
                   terms: {
                     terms: {
-                      field: "attributes.values.source",
+                      field: "attributes.values.source.raw",
                       size: 200,
+                    },
+                    aggs: {
+                      min_date: {
+                        min: {
+                          field: "attributes.values.source_date",
+                          format: "yyyy-MM-dd",
+                        },
+                      },
+                      max_date: {
+                        max: {
+                          field: "attributes.values.source_date",
+                          format: "yyyy-MM-dd",
+                        },
+                      },
+                      url: {
+                        terms: {
+                          field: "attributes.values.source_url",
+                          size: 1,
+                        },
+                      },
                     },
                   },
                 },

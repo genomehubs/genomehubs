@@ -435,6 +435,9 @@
                 "type": "keyword",
                 "ignore_above": 64,
                 "normalizer": "lowercase",
+                "fields": {
+                  "raw": { "type": "keyword" }
+                },
                 "meta": { "description": "Source of nested value" }
               },
               "source_index": {
@@ -442,6 +445,15 @@
                 "ignore_above": 128,
                 "normalizer": "lowercase",
                 "meta": { "description": "Index containing source value" }
+              },
+              "source_url": {
+                "type": "keyword",
+                "ignore_above": 128,
+                "meta": { "description": "Source URL" }
+              },
+              "source_date": {
+                "type": "date",
+                "meta": { "description": "Date source last updated" }
               },
               "source_doc_id": {
                 "type": "keyword",
@@ -464,25 +476,21 @@
               "source_doi": {
                 "type": "keyword",
                 "ignore_above": 64,
-                "normalizer": "lowercase",
                 "meta": { "description": "Source publication DOI" }
               },
               "source_pubmed_id": {
                 "type": "keyword",
                 "ignore_above": 64,
-                "normalizer": "lowercase",
                 "meta": { "description": "Source publication pubmed ID" }
               },
               "source_slug": {
                 "type": "keyword",
                 "ignore_above": 64,
-                "normalizer": "lowercase",
                 "meta": { "description": "Source url slug" }
               },
               "source_prefix": {
                 "type": "keyword",
                 "ignore_above": 32,
-                "normalizer": "lowercase",
                 "meta": {
                   "description": "Source prefix, i.e xref in xref:value queries"
                 }

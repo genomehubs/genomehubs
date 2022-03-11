@@ -261,7 +261,6 @@
           "source": {
             "type": "keyword",
             "ignore_above": 64,
-            "normalizer": "lowercase",
             "fields": {
               "raw": { "type": "keyword" }
             },
@@ -413,19 +412,16 @@
               "source": {
                 "type": "keyword",
                 "ignore_above": 64,
-                "normalizer": "lowercase",
                 "meta": { "description": "Source of nested value" }
               },
               "source_index": {
                 "type": "keyword",
                 "ignore_above": 128,
-                "normalizer": "lowercase",
                 "meta": { "description": "Index containing source value" }
               },
               "source_doc_id": {
                 "type": "keyword",
                 "ignore_above": 64,
-                "normalizer": "lowercase",
                 "meta": { "description": "Document ID containing source value" }
               },
               "comment": {

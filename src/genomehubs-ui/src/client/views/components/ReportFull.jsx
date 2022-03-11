@@ -80,7 +80,7 @@ export const ReportFull = ({
   );
 
   let content;
-  if (location.pathname == "/reporturl") {
+  if (report == "sources" || location.pathname == "/reporturl") {
     content = (
       <Grid
         container

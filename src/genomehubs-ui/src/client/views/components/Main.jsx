@@ -7,6 +7,7 @@ import RecordPage from "./RecordPage";
 import ReportPage from "./ReportPage";
 import { Router } from "@reach/router";
 import SearchPage from "./SearchPage";
+import SourcesPage from "./SourcesPage";
 import classnames from "classnames";
 import { compose } from "recompose";
 import loadable from "@loadable/component";
@@ -27,6 +28,7 @@ const Main = ({ routes }) => {
     <SearchPage path="/search" key="/search" />,
     <ExplorePage path="/explore" key="/explore" />,
     <RecordPage path="/records" key="/records" />,
+    <SourcesPage path="/sources" key="/sources" />,
     <ReportPage path="/report" key="/report" />,
   ];
   routes.allIds.forEach((routeName) => {
