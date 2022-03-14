@@ -25,7 +25,6 @@ const Tabs = () => {
       <Markdown pageId={"tabs.md"} components={components} siteStyles={true} />
     );
   }, []);
-  console.log(content);
   return content;
 };
 

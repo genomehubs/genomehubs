@@ -139,10 +139,16 @@ const NestedTable = ({
               if (row.is_primary) {
                 comment = `Primary value. ${comment}`;
               }
+              let value = row.value;
+              if (Array.isArray(value)) {
+                value = [...new Set(value)]
+                  .sort((a, b) => `${a}`.localeCompare(b))
+                  .join(", ");
+              }
               return (
                 <TableRow key={i}>
                   <TableCell component="th" scope="row">
-                    {row.value}
+                    {value}
                   </TableCell>
                   {hubCell}
                   <Tooltip
@@ -271,7 +277,7 @@ const AttributeTableRow = ({
     if (meta.max > meta.min) {
       range = ` (${formatter(meta.min)}-${formatter(meta.max)})`;
     }
-    if (meta.from && meta.to) {
+    if (meta.from && meta.to && meta.to > meta.from) {
       range = ` (${formatter(meta.from)} to ${formatter(meta.to)})`;
     }
     fieldValues.push(
