@@ -8,5 +8,8 @@ export const setScale = ({ field, typesMap, opts }) => {
   if (typesMap[field] && typesMap[field].bins && typesMap[field].bins.scale) {
     return typesMap[field].bins.scale.toLowerCase();
   }
+  if (typesMap[field] && typesMap[field].type == "keyword") {
+    return "ordinal";
+  }
   return "linear";
 };

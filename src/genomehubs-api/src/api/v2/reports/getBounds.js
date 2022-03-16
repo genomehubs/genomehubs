@@ -9,6 +9,28 @@ import { setScale } from "./setScale";
 import { setTerms } from "./setTerms";
 import { valueTypes } from "./valueTypes";
 
+export const getCatsBy = async ({
+  terms,
+  field,
+  result,
+  taxonomy,
+  apiParams,
+}) => {
+  let cats, by;
+  if (terms.by_lineage) {
+    cats = terms.by_lineage.at_rank.taxa.buckets;
+    cats = await getCatLabels({ field, result, cats, taxonomy, apiParams });
+    by = "lineage";
+  } else {
+    cats = terms.by_attribute.by_cat.cats.buckets;
+    cats.forEach((obj) => {
+      obj.label = obj.key;
+    });
+    by = "attribute";
+  }
+  return { cats, by };
+};
+
 export const getBounds = async ({
   params,
   fields,
@@ -50,7 +72,8 @@ export const getBounds = async ({
     summary,
     result,
     taxonomy,
-    stats: true,
+    ...(typesMap[field].type != "keyword" && { stats: true }),
+    ...(typesMap[field].type == "keyword" && { keywords: field }),
     terms: extraTerms,
     size: definedTerms.size,
   });
@@ -154,23 +177,31 @@ export const getBounds = async ({
     }
     domain = [min, max];
   } else {
-    stats = { count: res.status.hits };
+    let keywords = aggs.keywords;
+    if (keywords) {
+      let { cats, by } = await getCatsBy({
+        terms: keywords,
+        field,
+        result,
+        taxonomy,
+        apiParams,
+      });
+      stats = { cats, by, count: res.status.hits };
+    } else {
+      stats = { count: res.status.hits };
+    }
   }
   let terms = aggs.terms;
   let cats;
   let by;
   if (terms) {
-    if (terms.by_lineage) {
-      cats = terms.by_lineage.at_rank.taxa.buckets;
-      cats = await getCatLabels({ cat, result, cats, taxonomy, apiParams });
-      by = "lineage";
-    } else {
-      cats = terms.by_attribute.by_cat.cats.buckets;
-      cats.forEach((obj) => {
-        obj.label = obj.key;
-      });
-      by = "attribute";
-    }
+    ({ cats, by } = await getCatsBy({
+      terms,
+      field: cat,
+      result,
+      taxonomy,
+      apiParams,
+    }));
   }
   if (definedTerms && definedTerms.terms) {
     let definedCats = [...definedTerms.terms];

@@ -57,6 +57,7 @@ const getHistogram = async ({
     fields = [...new Set(fields.concat(yFields))];
   }
   let valueType = valueTypes[typesMap[field].type] || "float";
+  console.log(bounds);
   params.aggs = await setAggs({
     field,
     summary,
@@ -143,6 +144,10 @@ const getHistogram = async ({
   }
 
   let hist = res.aggs.aggregations[field].histogram;
+  // TODO: support lineage category histogram
+  if (hist.by_attribute) {
+    hist = hist.by_attribute.by_cat.cats;
+  }
   if (!hist) {
     return;
   }
@@ -196,14 +201,14 @@ const getHistogram = async ({
   });
   if (typesMap[field].type == "date") {
     buckets = scaleBuckets(buckets, "date", bounds);
-  } else {
+  } else if (typesMap[field].type != "keyword") {
     buckets = scaleBuckets(buckets, bounds.scale, bounds);
   }
 
   if (yBuckets) {
     if (typesMap[yField].type == "date") {
       yBuckets = scaleBuckets(yBuckets, "date", yBounds);
-    } else {
+    } else if (typesMap[yField].type != "keyword") {
       yBuckets = scaleBuckets(yBuckets, yBounds.scale, yBounds);
     }
   }
@@ -231,6 +236,7 @@ const getHistogram = async ({
     Object.entries(catBuckets).forEach(([key, obj]) => {
       byCat[key] = [];
       catObjs[key].doc_count = 0;
+      // TODO: support categories here too
       obj.histogram.by_attribute[field].histogram.buckets.forEach((bin, i) => {
         byCat[key][i] = bin.doc_count;
         catObjs[key].doc_count += bin.doc_count;
@@ -343,16 +349,21 @@ export const histogram = async ({
   }
   // fields = [...new Set(fields.concat(searchFields))];
   // exclude.push(fields[0]);
-  let yTerm = combineQueries(x, y);
-  let {
-    params: yParams,
-    fields: yFields,
-    summaries: ySummaries,
-  } = queryParams({
-    term: yTerm,
-    result,
-    rank,
-  });
+  let yTerm, yFields, ySummaries;
+  let yParams = {};
+  if (y) {
+    yTerm = combineQueries(x, y);
+    ({
+      params: yParams,
+      fields: yFields,
+      summaries: ySummaries,
+    } = queryParams({
+      term: yTerm,
+      result,
+      rank,
+    }));
+  }
+
   let xQuery = { ...params };
 
   if (!aInB(fields, Object.keys(typesMap))) {
@@ -363,11 +374,21 @@ export const histogram = async ({
       },
     };
   }
-  if (fields.length == 0 || typesMap[fields[0]].type == "keyword") {
+  // if (fields.length == 0 || typesMap[fields[0]].type == "keyword") {
+  //   return {
+  //     status: {
+  //       success: false,
+  //       error: `no numeric or date field in '${x ? `x = ${x}` : "x"}'\ntry ${
+  //         x ? "adding ' AND " : "'"
+  //       }assembly_span'`,
+  //     },
+  //   };
+  // }
+  if (fields.length == 0) {
     return {
       status: {
         success: false,
-        error: `no numeric or date field in '${x ? `x = ${x}` : "x"}'\ntry ${
+        error: `no field in '${x ? `x = ${x}` : "x"}'\ntry ${
           x ? "adding ' AND " : "'"
         }assembly_span'`,
       },
@@ -384,14 +405,24 @@ export const histogram = async ({
       };
     }
   }
-  if (
-    (report == "scatter" && (!y || yFields.length == 0)) ||
-    (yFields[0] && typesMap[yFields[0]].type == "keyword")
-  ) {
+  // if (
+  //   (report == "scatter" && (!y || yFields.length == 0)) ||
+  //   (yFields[0] && typesMap[yFields[0]].type == "keyword")
+  // ) {
+  //   return {
+  //     status: {
+  //       success: false,
+  //       error: `no numeric or date field in '${y ? `y = ${y}` : "y"}'\ntry ${
+  //         y ? "adding ' AND " : "'"
+  //       }c_value'`,
+  //     },
+  //   };
+  // }
+  if (report == "scatter" && (!y || yFields.length == 0)) {
     return {
       status: {
         success: false,
-        error: `no numeric or date field in '${y ? `y = ${y}` : "y"}'\ntry ${
+        error: `no field in '${y ? `y = ${y}` : "y"}'\ntry ${
           y ? "adding ' AND " : "'"
         }c_value'`,
       },
@@ -423,7 +454,9 @@ export const histogram = async ({
   yParams.excludeAncestral = apiParams.excludeAncestral || [];
   yParams.excludeMissing = apiParams.excludeMissing || [];
 
-  fields = fields.concat(yFields);
+  if (yFields) {
+    fields = fields.concat(yFields);
+  }
   fields = [...new Set(fields)];
   exclusions = setExclusions(params);
   let bounds = await getBounds({

@@ -751,6 +751,7 @@ export const getReport = async (req, res) => {
         report = await reportFunc(reportParams);
         cacheStore(req, report);
       } catch (message) {
+        console.log(message);
         const timestamp = new Date();
         const error = `unexpected error at ${timestamp.toLocaleString()}`;
         let status = {

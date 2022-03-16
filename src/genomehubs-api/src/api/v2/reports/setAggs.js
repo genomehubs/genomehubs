@@ -212,6 +212,19 @@ const lineageCategory = ({ cats, field, histogram }) => {
   };
 };
 
+const termsAgg = ({ field, typesMap, size }) => {
+  if (!field) {
+    return;
+  }
+  if (typesMap[field]) {
+    if (typesMap[field].type == "keyword") {
+      return attributeTerms({ terms: field, size });
+    }
+  } else {
+    return lineageTerms({ terms: field, size });
+  }
+};
+
 export const setAggs = async ({
   field,
   summary,
@@ -219,6 +232,7 @@ export const setAggs = async ({
   histogram,
   tree,
   stats,
+  keywords,
   terms,
   size = 5,
   bounds,
@@ -277,6 +291,8 @@ export const setAggs = async ({
       return;
     }
   }
+  // TODO: use terms aggregation in place of yHistogram
+
   let yHistogram, yHistograms, categoryHistograms;
   if (histogram && yField) {
     yHistogram = await histogramAgg({
@@ -292,14 +308,18 @@ export const setAggs = async ({
     });
   }
   if (histogram) {
-    histogram = await histogramAgg({
-      field,
-      summary,
-      result,
-      bounds,
-      yHistograms,
-      taxonomy,
-    });
+    if (bounds.stats.by) {
+      histogram = termsAgg({ field, typesMap, size });
+    } else {
+      histogram = await histogramAgg({
+        field,
+        summary,
+        result,
+        bounds,
+        yHistograms,
+        taxonomy,
+      });
+    }
   }
   if (bounds && bounds.cats) {
     if (bounds.by == "attribute") {
@@ -325,15 +345,9 @@ export const setAggs = async ({
       },
     };
   }
-  if (terms) {
-    if (typesMap[terms]) {
-      if (typesMap[terms].type == "keyword") {
-        terms = attributeTerms({ terms, size });
-      }
-    } else {
-      terms = lineageTerms({ terms, size });
-    }
-  }
+  terms = termsAgg({ field: terms, typesMap, size });
+  keywords = termsAgg({ field: keywords, typesMap, size });
+
   if (tree) {
     tree = await treeAgg({
       field,
@@ -355,6 +369,7 @@ export const setAggs = async ({
           aggs: {
             histogram,
             stats,
+            keywords,
             terms,
             categoryHistograms,
             tree,
