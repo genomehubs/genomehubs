@@ -228,6 +228,24 @@ const HighlightShape = (props, chartProps) => {
   );
 };
 
+const CustomizedAxisTick = (props) => {
+  const { x, y, stroke, payload } = props;
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={16}
+        textAnchor="end"
+        fill="#666"
+        transform="rotate(-35)"
+      >
+        {payload.value}
+      </text>
+    </g>
+  );
+};
+
 const Heatmap = ({
   data,
   pointData,
@@ -246,17 +264,29 @@ const Heatmap = ({
   highlight,
   colors,
 }) => {
+  let xScale =
+    chartProps.bounds.scale == "ordinal" ? "linear" : chartProps.bounds.scale;
+  let yScale =
+    chartProps.yBounds.scale == "ordinal" ? "linear" : chartProps.yBounds.scale;
   let axes = [
     <CartesianGrid key={"grid"} strokeDasharray="3 3" />,
     <XAxis
       type="number"
       dataKey="x"
       key={"x"}
-      scale={axisScales[chartProps.bounds.scale]()}
+      scale={axisScales[xScale]()}
       angle={buckets.length > 15 ? -90 : 0}
-      domain={[buckets[0], buckets[buckets.length - 1]]}
-      range={[buckets[0], buckets[buckets.length - 1]]}
-      ticks={buckets}
+      domain={
+        isNaN(buckets[0])
+          ? [0, buckets.length - 1]
+          : [buckets[0], buckets[buckets.length - 1]]
+      }
+      range={
+        isNaN(buckets[0])
+          ? [0, buckets.length - 1]
+          : [buckets[0], buckets[buckets.length - 1]]
+      }
+      ticks={isNaN(buckets[0]) ? buckets.map((x, i) => i) : buckets}
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
       interval={0}
       style={{ textAnchor: buckets.length > 15 ? "end" : "auto" }}
@@ -272,10 +302,21 @@ const Heatmap = ({
       type="number"
       dataKey="y"
       key={"y"}
-      scale={axisScales[chartProps.yBounds.scale]()}
-      ticks={yBuckets}
-      domain={[yBuckets[0], yBuckets[yBuckets.length - 1]]}
-      range={[yBuckets[0], yBuckets[yBuckets.length - 1]]}
+      scale={axisScales[yScale]()}
+      ticks={isNaN(yBuckets[0]) ? yBuckets.map((y, i) => i) : yBuckets}
+      tick={CustomizedAxisTick}
+      domain={
+        isNaN(yBuckets[0])
+          ? [0, yBuckets.length - 1]
+          : [yBuckets[0], yBuckets[yBuckets.length - 1]]
+      }
+      // domain={["auto", "auto"]}
+      // range={["auto", "auto"]}
+      range={
+        isNaN(yBuckets[0])
+          ? [0, yBuckets.length - 1]
+          : [yBuckets[0], yBuckets[yBuckets.length - 1]]
+      }
       tickFormatter={chartProps.showYTickLabels ? chartProps.yFormat : () => ""}
       interval={0}
     >

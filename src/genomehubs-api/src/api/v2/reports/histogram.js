@@ -12,18 +12,47 @@ import { setAggs } from "./setAggs";
 import { setExclusions } from "../functions/setExclusions";
 import { valueTypes } from "./valueTypes";
 
-const getYValues = ({ obj, yField, typesMap }) => {
-  let yBuckets, yValues, yValueType;
-  let yHist = obj.yHistograms.by_attribute[yField].histogram;
-  yHist.buckets.forEach((yObj, j) => {
-    if (j == 0) {
-      yBuckets = [];
-      yValues = [];
-      yValueType = valueTypes[typesMap[yField].type] || "float";
+const getHistAggResults = (aggs) => {
+  let hist = aggs.histogram;
+  if (!hist) {
+    return;
+  }
+  if (hist.by_attribute) {
+    hist = hist.by_attribute.by_cat.cats;
+  } else if (hist.by_lineage) {
+    // TODO: support lineage category histogram
+    console.log(hist);
+  }
+  return hist;
+};
+
+const getYValues = ({ obj, yField, typesMap, stats }) => {
+  let yBuckets = [];
+  let yValues = [];
+  let yValueType = valueTypes[typesMap[yField].type] || "float";
+  // console.log(obj);
+  let yHist = getHistAggResults(obj.yHistograms.by_attribute[yField]);
+  if (yValueType == "keyword") {
+    let bucketMap = {};
+    stats.cats.forEach((obj, i) => {
+      yBuckets.push(obj.key);
+      bucketMap[obj.key] = i;
+      yValues.push(0);
+    });
+    yBuckets.push(undefined);
+    if (yHist) {
+      yHist.buckets.forEach((yObj) => {
+        yValues[bucketMap[yObj.key]] = yObj.doc_count;
+      });
     }
-    yBuckets.push(yObj.key);
-    yValues.push(yObj.doc_count);
-  });
+  } else {
+    yHist.buckets.forEach((yObj, j) => {
+      yBuckets.push(yObj.key);
+      yValues.push(yObj.doc_count);
+    });
+  }
+  if (yHist) {
+  }
   return { yValues, yBuckets, yValueType };
 };
 
@@ -57,7 +86,6 @@ const getHistogram = async ({
     fields = [...new Set(fields.concat(yFields))];
   }
   let valueType = valueTypes[typesMap[field].type] || "float";
-  console.log(bounds);
   params.aggs = await setAggs({
     field,
     summary,
@@ -98,7 +126,7 @@ const getHistogram = async ({
     }
     if (yFields.length > 0 && raw) {
       pointData = {};
-      res.results.forEach((result) => {
+      for (let result of res.results) {
         let cat;
         if (bounds.cat) {
           if (bounds.by == "attribute") {
@@ -124,6 +152,9 @@ const getHistogram = async ({
         if (!pointData[cat]) {
           pointData[cat] = [];
         }
+        if (!result.result.fields[field] || !result.result.fields[yField]) {
+          continue;
+        }
         let x = result.result.fields[field][xSumm];
         let y = result.result.fields[yField][ySumm];
         if (valueType == "date") {
@@ -139,15 +170,11 @@ const getHistogram = async ({
           y,
           cat,
         });
-      });
+      }
     }
   }
 
-  let hist = res.aggs.aggregations[field].histogram;
-  // TODO: support lineage category histogram
-  if (hist.by_attribute) {
-    hist = hist.by_attribute.by_cat.cats;
-  }
+  let hist = getHistAggResults(res.aggs.aggregations[field]);
   if (!hist) {
     return;
   }
@@ -164,6 +191,7 @@ const getHistogram = async ({
   let zDomain = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
   let other = [];
   let allOther = [];
+  // let allYBuckets = [];
 
   hist.buckets.forEach((obj, i) => {
     buckets.push(obj.key);
@@ -172,6 +200,7 @@ const getHistogram = async ({
     if (bounds.showOther) {
       other.push(obj.doc_count);
     }
+
     if (obj.yHistograms) {
       if (i == 0) {
         allYValues = [];
@@ -181,7 +210,9 @@ const getHistogram = async ({
         obj,
         yField,
         typesMap,
+        stats: yBounds.stats,
       }));
+      // allYBuckets = [...new Set(allYBuckets.concat(yBuckets))];
       if (obj.doc_count > 0) {
         let min = Math.min(...yValues);
         let max = Math.max(...yValues);
@@ -201,11 +232,14 @@ const getHistogram = async ({
   });
   if (typesMap[field].type == "date") {
     buckets = scaleBuckets(buckets, "date", bounds);
-  } else if (typesMap[field].type != "keyword") {
+  } else if (typesMap[field].type == "keyword") {
+    buckets.push(undefined);
+  } else {
     buckets = scaleBuckets(buckets, bounds.scale, bounds);
   }
 
   if (yBuckets) {
+    // yBuckets = allYBuckets;
     if (typesMap[yField].type == "date") {
       yBuckets = scaleBuckets(yBuckets, "date", yBounds);
     } else if (typesMap[yField].type != "keyword") {
@@ -237,7 +271,8 @@ const getHistogram = async ({
       byCat[key] = [];
       catObjs[key].doc_count = 0;
       // TODO: support categories here too
-      obj.histogram.by_attribute[field].histogram.buckets.forEach((bin, i) => {
+      let nestedHist = getHistAggResults(obj.histogram.by_attribute[field]);
+      nestedHist.buckets.forEach((bin, i) => {
         byCat[key][i] = bin.doc_count;
         catObjs[key].doc_count += bin.doc_count;
         if (byCat.other) {
@@ -254,6 +289,7 @@ const getHistogram = async ({
             obj: bin,
             yField,
             typesMap,
+            stats: yBounds.stats,
           });
           if (yValuesByCat.other) {
             yValues.forEach((count, j) => {

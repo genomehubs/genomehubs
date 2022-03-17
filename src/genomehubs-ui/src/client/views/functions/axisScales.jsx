@@ -1,4 +1,4 @@
-import { scaleLinear, scaleLog, scaleSqrt } from "d3-scale";
+import { scaleLinear, scaleLog, scaleOrdinal, scaleSqrt } from "d3-scale";
 
 export const axisScales = {
   linear: scaleLinear,
@@ -7,6 +7,7 @@ export const axisScales = {
   log: scaleLog,
   sqrt: scaleSqrt,
   proportion: scaleLinear,
+  ordinal: scaleOrdinal,
 };
 
 export default axisScales;

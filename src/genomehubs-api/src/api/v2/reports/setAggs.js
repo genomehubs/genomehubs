@@ -1,7 +1,7 @@
 import { attrTypes } from "../functions/attrTypes";
 import { histogramAgg } from "../queries/histogramAgg";
 
-const attributeTerms = ({ terms, size }) => {
+const attributeTerms = ({ terms, size, yHistograms }) => {
   let attribute = terms;
   return {
     reverse_nested: {},
@@ -16,7 +16,14 @@ const attributeTerms = ({ terms, size }) => {
               term: { "attributes.key": attribute },
             },
             aggs: {
-              cats: { terms: { field: "attributes.keyword_value", size } },
+              cats: {
+                terms: { field: "attributes.keyword_value", size },
+                ...(yHistograms && {
+                  aggs: {
+                    yHistograms,
+                  },
+                }),
+              },
             },
           },
         },
@@ -212,13 +219,13 @@ const lineageCategory = ({ cats, field, histogram }) => {
   };
 };
 
-const termsAgg = ({ field, typesMap, size }) => {
+const termsAgg = ({ field, typesMap, size, yHistograms }) => {
   if (!field) {
     return;
   }
   if (typesMap[field]) {
     if (typesMap[field].type == "keyword") {
-      return attributeTerms({ terms: field, size });
+      return attributeTerms({ terms: field, size, yHistograms });
     }
   } else {
     return lineageTerms({ terms: field, size });
@@ -291,17 +298,20 @@ export const setAggs = async ({
       return;
     }
   }
-  // TODO: use terms aggregation in place of yHistogram
 
   let yHistogram, yHistograms, categoryHistograms;
   if (histogram && yField) {
-    yHistogram = await histogramAgg({
-      field: yField,
-      summary: ySummary,
-      result,
-      bounds: yBounds,
-      taxonomy,
-    });
+    if (yBounds.stats.by) {
+      yHistogram = termsAgg({ field: yField, typesMap, size });
+    } else {
+      yHistogram = await histogramAgg({
+        field: yField,
+        summary: ySummary,
+        result,
+        bounds: yBounds,
+        taxonomy,
+      });
+    }
     yHistograms = nestedHistograms({
       field: yField,
       histogram: yHistogram,
@@ -309,7 +319,7 @@ export const setAggs = async ({
   }
   if (histogram) {
     if (bounds.stats.by) {
-      histogram = termsAgg({ field, typesMap, size });
+      histogram = termsAgg({ field, typesMap, size, yHistograms });
     } else {
       histogram = await histogramAgg({
         field,
