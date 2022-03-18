@@ -35,8 +35,13 @@ const renderXTick = (tickProps) => {
     chartWidth,
     visibleTicksCount,
     showTickLabels,
+    scale,
   } = tickProps;
-  const { value, offset } = payload;
+  let { value, offset } = payload;
+  let textOffset = 0;
+  if (scale == "ordinal") {
+    textOffset = chartWidth / visibleTicksCount / 2;
+  }
   // if (month % 3 === 1) {
   //   return <text x={x} y={y - 4} textAnchor="middle">{`Q${quarterNo}`}</text>;
   // }
@@ -51,7 +56,12 @@ const renderXTick = (tickProps) => {
     endTick = (
       <>
         {showTickLabels && (
-          <text x={pathX} y={y + 14} textAnchor="middle" fill="#666">
+          <text
+            x={pathX + textOffset}
+            y={y + 14}
+            textAnchor="middle"
+            fill="#666"
+          >
             {endLabel}
           </text>
         )}
@@ -71,7 +81,7 @@ const renderXTick = (tickProps) => {
   return (
     <g>
       {showTickLabel && (
-        <text x={pathX} y={y + 14} textAnchor="middle" fill="#666">
+        <text x={pathX + textOffset} y={y + 14} textAnchor="middle" fill="#666">
           {value}
         </text>
       )}
@@ -87,6 +97,7 @@ const searchByCell = ({
   xQuery,
   xLabel,
   xBounds,
+  bounds,
   location,
   navigate,
   fields,
@@ -105,13 +116,34 @@ const searchByCell = ({
     )
     .replaceAll(/\s+/g, " ")
     .replace(/\s+$/, "");
-  query += ` AND ${xLabel} >= ${xBounds[0]} AND ${xLabel} < ${xBounds[1]}`;
-  // let fields = `${xLabel},${yLabel}`;
+  if (bounds.scale == "ordinal") {
+    query += ` AND ${xLabel} = ${xBounds[0]}`;
+  } else {
+    query += ` AND ${xLabel} >= ${xBounds[0]} AND ${xLabel} < ${xBounds[1]}`;
+  }
+
+  let options = qs.parse(location.search.replace(/^\?/, ""));
+  if (options.sortBy && !fields.includes(options.sortBy)) {
+    delete options.sortBy;
+    delete options.sortOrder;
+  }
+  options.offset = 0;
   fields = fields.join(",");
   if (ranks) {
     ranks = ranks.join(",");
+  } else {
+    ranks = "";
   }
-  let options = qs.parse(location.search);
+  for (let key of [
+    "excludeAncestral",
+    "excludeDescendant",
+    "excludeDirect",
+    "excludeMissing",
+  ]) {
+    if (xQuery[key]) {
+      delete xQuery[key];
+    }
+  }
 
   let queryString = qs.stringify({
     ...xQuery,
@@ -137,9 +169,14 @@ const CustomBackground = ({ chartProps, ...props }) => {
     chartProps.buckets[props.index],
     chartProps.buckets[props.index + 1],
   ];
-  let xRange = `${chartProps.xFormat(xBounds[0])}-${chartProps.xFormat(
-    xBounds[1]
-  )}`;
+  let xRange;
+  if (chartProps.bounds.scale == "ordinal") {
+    xRange = xBounds[0];
+  } else {
+    xRange = `${chartProps.xFormat(xBounds[0])}-${chartProps.xFormat(
+      xBounds[1]
+    )}`;
+  }
 
   let { x, ...counts } = props.payload;
   let count = 0;
@@ -215,6 +252,7 @@ const Histogram = ({
           endLabel,
           lastIndex: lastIndex,
           chartWidth: width,
+          scale: chartProps.bounds.scale,
           showTickLabels: chartProps.showTickLabels,
         })
       }

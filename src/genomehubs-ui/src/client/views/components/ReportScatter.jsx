@@ -35,7 +35,9 @@ const searchByCell = ({
   yQuery,
   xLabel,
   yLabel,
-  xBounds,
+  xRange,
+  yRange,
+  bounds,
   yBounds,
   navigate,
   location,
@@ -58,26 +60,47 @@ const searchByCell = ({
     .replaceAll(/\s+/g, " ")
     .replace(/\s+$/, "");
   if (valueType == "date") {
-    query += ` AND ${xLabel} >= ${new Date(
-      xBounds[0]
-    ).toISOString()} AND ${xLabel} < ${new Date(xBounds[1]).toISOString()}`;
+    query += ` AND ${xLabel} >= ${
+      new Date(xRange[0]).toISOString().split(/t/i)[0]
+    } AND ${xLabel} < ${new Date(xRange[1]).toISOString().split(/t/i)[0]}`;
+  } else if (valueType == "keyword") {
+    query += ` AND ${xLabel} = ${bounds.stats.cats[xRange[0]].key}`;
   } else {
-    query += ` AND ${xLabel} >= ${xBounds[0]} AND ${xLabel} < ${xBounds[1]}`;
+    query += ` AND ${xLabel} >= ${xRange[0]} AND ${xLabel} < ${xRange[1]}`;
   }
   if (yValueType == "date") {
-    query += ` AND ${yLabel} >= ${new Date(
-      yBounds[0]
-    ).toISOString()} AND ${yLabel} < ${new Date(yBounds[1]).toISOString()}`;
+    query += ` AND ${yLabel} >= ${
+      new Date(yRange[0]).toISOString().split(/t/i)[0]
+    } AND ${yLabel} < ${new Date(yRange[1]).toISOString().split(/t/i)[0]}`;
+  } else if (yValueType == "keyword") {
+    query += ` AND ${yLabel} = ${yBounds.stats.cats[yRange[0]].key}`;
   } else {
-    query += ` AND ${yLabel} >= ${yBounds[0]} AND ${yLabel} < ${yBounds[1]}`;
+    query += ` AND ${yLabel} >= ${yRange[0]} AND ${yLabel} < ${yRange[1]}`;
   }
 
   // let fields = `${xLabel},${yLabel}`;
+  let options = qs.parse(location.search.replace(/^\?/, ""));
+  if (options.sortBy && !fields.includes(options.sortBy)) {
+    delete options.sortBy;
+    delete options.sortOrder;
+  }
+  options.offset = 0;
   fields = fields.join(",");
   if (ranks) {
     ranks = ranks.join(",");
+  } else {
+    ranks = "";
   }
-  let options = qs.parse(location.search);
+  for (let key of [
+    "excludeAncestral",
+    "excludeDescendant",
+    "excludeDirect",
+    "excludeMissing",
+  ]) {
+    if (xQuery[key]) {
+      delete xQuery[key];
+    }
+  }
   let queryString = qs.stringify({
     ...xQuery,
     ...options,
@@ -87,6 +110,7 @@ const searchByCell = ({
     report: "scatter",
     ranks,
   });
+
   // let hash = encodeURIComponent(query);
   navigate(
     `/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(query)}`
@@ -122,12 +146,29 @@ const CustomShape = (props, chartProps) => {
       props.xAxis.scale(props.payload.x);
   }
   let heatRect;
-  let xRange = `${chartProps.xFormat(props.payload.x)}-${chartProps.xFormat(
-    props.payload.xBound
-  )}`;
-  let yRange = `${chartProps.yFormat(props.payload.y)}-${chartProps.yFormat(
-    props.payload.yBound
-  )}`;
+  let xRange, yRange;
+  if (chartProps.bounds.scale == "ordinal") {
+    try {
+      xRange = `${chartProps.bounds.stats.cats[props.payload.x].key}`;
+    } catch {
+      xRange = "other";
+    }
+  } else {
+    xRange = `${chartProps.xFormat(props.payload.x)}-${chartProps.xFormat(
+      props.payload.xBound
+    )}`;
+  }
+  if (chartProps.yBounds.scale == "ordinal") {
+    try {
+      yRange = `${chartProps.yBounds.stats.cats[props.payload.y].key}`;
+    } catch {
+      yRange = "other";
+    }
+  } else {
+    yRange = `${chartProps.yFormat(props.payload.y)}-${chartProps.yFormat(
+      props.payload.yBound
+    )}`;
+  }
   let bgRect = (
     <>
       <Tooltip
@@ -147,8 +188,8 @@ const CustomShape = (props, chartProps) => {
               : () =>
                   searchByCell({
                     ...chartProps,
-                    xBounds: [props.payload.x, props.payload.xBound],
-                    yBounds: [props.payload.y, props.payload.yBound],
+                    xRange: [props.payload.x, props.payload.xBound],
+                    yRange: [props.payload.y, props.payload.yBound],
                   })
           }
         />
@@ -228,6 +269,51 @@ const HighlightShape = (props, chartProps) => {
   );
 };
 
+const CustomizedYAxisTick = (props, buckets, fmt) => {
+  const { x, y, fill, index, height, payload } = props;
+  let value = payload.value;
+  let offset = 0;
+  if (buckets[index] != payload.value) {
+    value = buckets[index] || "";
+    offset = height / (buckets.length - 1) / 2;
+  } else {
+    value = fmt(value);
+  }
+  return (
+    <g transform={`translate(${x - 16},${y - offset})`}>
+      <text
+        x={0}
+        y={0}
+        dy={16}
+        textAnchor="middle"
+        fill={fill}
+        transform={"rotate(-90)"}
+      >
+        {value}
+      </text>
+    </g>
+  );
+};
+
+const CustomizedXAxisTick = (props, buckets, fmt) => {
+  const { x, y, fill, index, width, payload } = props;
+  let value = payload.value;
+  let offset = 0;
+  if (buckets[index] != payload.value) {
+    value = buckets[index] || "";
+    offset = width / (buckets.length - 1) / 2;
+  } else {
+    value = fmt(value);
+  }
+  return (
+    <g transform={`translate(${x + offset},${y})`}>
+      <text x={0} y={0} dy={10} textAnchor="middle" fill={fill}>
+        {value}
+      </text>
+    </g>
+  );
+};
+
 const Heatmap = ({
   data,
   pointData,
@@ -246,17 +332,30 @@ const Heatmap = ({
   highlight,
   colors,
 }) => {
+  let xScale =
+    chartProps.bounds.scale == "ordinal" ? "linear" : chartProps.bounds.scale;
+  let yScale =
+    chartProps.yBounds.scale == "ordinal" ? "linear" : chartProps.yBounds.scale;
   let axes = [
     <CartesianGrid key={"grid"} strokeDasharray="3 3" />,
     <XAxis
       type="number"
       dataKey="x"
       key={"x"}
-      scale={axisScales[chartProps.bounds.scale]()}
+      scale={axisScales[xScale]()}
       angle={buckets.length > 15 ? -90 : 0}
-      domain={[buckets[0], buckets[buckets.length - 1]]}
-      range={[buckets[0], buckets[buckets.length - 1]]}
-      ticks={buckets}
+      domain={
+        isNaN(buckets[0])
+          ? [0, buckets.length - 1]
+          : [buckets[0], buckets[buckets.length - 1]]
+      }
+      range={
+        isNaN(buckets[0])
+          ? [0, buckets.length - 1]
+          : [buckets[0], buckets[buckets.length - 1]]
+      }
+      ticks={isNaN(buckets[0]) ? buckets.map((x, i) => i) : buckets}
+      tick={(props) => CustomizedXAxisTick(props, buckets, chartProps.xFormat)}
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
       interval={0}
       style={{ textAnchor: buckets.length > 15 ? "end" : "auto" }}
@@ -272,10 +371,21 @@ const Heatmap = ({
       type="number"
       dataKey="y"
       key={"y"}
-      scale={axisScales[chartProps.yBounds.scale]()}
-      ticks={yBuckets}
-      domain={[yBuckets[0], yBuckets[yBuckets.length - 1]]}
-      range={[yBuckets[0], yBuckets[yBuckets.length - 1]]}
+      scale={axisScales[yScale]()}
+      ticks={isNaN(yBuckets[0]) ? yBuckets.map((y, i) => i) : yBuckets}
+      tick={(props) => CustomizedYAxisTick(props, yBuckets, chartProps.yFormat)}
+      domain={
+        isNaN(yBuckets[0])
+          ? [0, yBuckets.length - 1]
+          : [yBuckets[0], yBuckets[yBuckets.length - 1]]
+      }
+      // domain={["auto", "auto"]}
+      // range={["auto", "auto"]}
+      range={
+        isNaN(yBuckets[0])
+          ? [0, yBuckets.length - 1]
+          : [yBuckets[0], yBuckets[yBuckets.length - 1]]
+      }
       tickFormatter={chartProps.showYTickLabels ? chartProps.yFormat : () => ""}
       interval={0}
     >

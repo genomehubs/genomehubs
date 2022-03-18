@@ -1,7 +1,7 @@
 import { attrTypes } from "../functions/attrTypes";
 import { histogramAgg } from "../queries/histogramAgg";
 
-const attributeTerms = ({ terms, size }) => {
+const attributeTerms = ({ terms, size, yHistograms }) => {
   let attribute = terms;
   return {
     reverse_nested: {},
@@ -16,7 +16,14 @@ const attributeTerms = ({ terms, size }) => {
               term: { "attributes.key": attribute },
             },
             aggs: {
-              cats: { terms: { field: "attributes.keyword_value", size } },
+              cats: {
+                terms: { field: "attributes.keyword_value", size },
+                ...(yHistograms && {
+                  aggs: {
+                    yHistograms,
+                  },
+                }),
+              },
             },
           },
         },
@@ -212,6 +219,19 @@ const lineageCategory = ({ cats, field, histogram }) => {
   };
 };
 
+const termsAgg = ({ field, typesMap, size, yHistograms }) => {
+  if (!field) {
+    return;
+  }
+  if (typesMap[field]) {
+    if (typesMap[field].type == "keyword") {
+      return attributeTerms({ terms: field, size, yHistograms });
+    }
+  } else {
+    return lineageTerms({ terms: field, size });
+  }
+};
+
 export const setAggs = async ({
   field,
   summary,
@@ -219,6 +239,7 @@ export const setAggs = async ({
   histogram,
   tree,
   stats,
+  keywords,
   terms,
   size = 5,
   bounds,
@@ -277,29 +298,38 @@ export const setAggs = async ({
       return;
     }
   }
+
   let yHistogram, yHistograms, categoryHistograms;
   if (histogram && yField) {
-    yHistogram = await histogramAgg({
-      field: yField,
-      summary: ySummary,
-      result,
-      bounds: yBounds,
-      taxonomy,
-    });
+    if (yBounds.stats.by) {
+      yHistogram = termsAgg({ field: yField, typesMap, size });
+    } else {
+      yHistogram = await histogramAgg({
+        field: yField,
+        summary: ySummary,
+        result,
+        bounds: yBounds,
+        taxonomy,
+      });
+    }
     yHistograms = nestedHistograms({
       field: yField,
       histogram: yHistogram,
     });
   }
   if (histogram) {
-    histogram = await histogramAgg({
-      field,
-      summary,
-      result,
-      bounds,
-      yHistograms,
-      taxonomy,
-    });
+    if (bounds.stats.by) {
+      histogram = termsAgg({ field, typesMap, size, yHistograms });
+    } else {
+      histogram = await histogramAgg({
+        field,
+        summary,
+        result,
+        bounds,
+        yHistograms,
+        taxonomy,
+      });
+    }
   }
   if (bounds && bounds.cats) {
     if (bounds.by == "attribute") {
@@ -325,15 +355,9 @@ export const setAggs = async ({
       },
     };
   }
-  if (terms) {
-    if (typesMap[terms]) {
-      if (typesMap[terms].type == "keyword") {
-        terms = attributeTerms({ terms, size });
-      }
-    } else {
-      terms = lineageTerms({ terms, size });
-    }
-  }
+  terms = termsAgg({ field: terms, typesMap, size });
+  keywords = termsAgg({ field: keywords, typesMap, size });
+
   if (tree) {
     tree = await treeAgg({
       field,
@@ -355,6 +379,7 @@ export const setAggs = async ({
           aggs: {
             histogram,
             stats,
+            keywords,
             terms,
             categoryHistograms,
             tree,
