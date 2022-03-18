@@ -11,6 +11,10 @@ const fail = (error) => {
   };
 };
 
+const isDate = (date) => {
+  return new Date(date) !== "Invalid Date" && !isNaN(new Date(date));
+};
+
 const validateValue = (term, value, meta, types) => {
   let type = meta.type;
   let attrEnum;
@@ -45,17 +49,25 @@ const validateValue = (term, value, meta, types) => {
         }
       }
       if (meta.attribute == "taxonomy") {
-        if ((meta.type = "tax_rank")) {
+        if (meta.type == "tax_rank") {
           // TODO: check rank is valid
         }
       }
       continue;
-    }
-    if (isNaN(v.replace(/^!/, ""))) {
-      if (summaries.includes(type)) {
-        return fail(`invalid value for ${type} in ${term}`);
+    } else if (type == "date") {
+      if (!isDate(v.replace(/^!/, ""))) {
+        if (summaries.includes(type)) {
+          return fail(`invalid date value for ${type} in ${term}`);
+        }
+        return fail(`invalid date value for ${meta.attribute} in ${term}`);
       }
-      return fail(`invalid value for ${meta.attribute} in ${term}`);
+    } else {
+      if (isNaN(v.replace(/^!/, ""))) {
+        if (summaries.includes(type)) {
+          return fail(`invalid value for ${type} in ${term}`);
+        }
+        return fail(`invalid value for ${meta.attribute} in ${term}`);
+      }
     }
   }
   return { success: true };

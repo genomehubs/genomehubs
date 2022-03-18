@@ -17,9 +17,9 @@ export const queryParams = ({
     if (result == "taxon" && rank) {
       params.query += ` AND tax_rank(${rank})`;
     }
-    params.includeEstimates = true;
-    params.excludeAncestral = [];
-    params.excludeMissing = [];
+    // params.includeEstimates = true;
+    // params.excludeAncestral = [];
+    // params.excludeMissing = [];
 
     term.split(/\s+(?:and|AND)\s+/).forEach((subterm) => {
       if (!subterm.match("tax_")) {
@@ -28,8 +28,8 @@ export const queryParams = ({
         if (field.match(/\(/)) {
           [summary, field] = field.split(/[\(\)]/);
         }
-        params.excludeAncestral.push(field);
-        params.excludeMissing.push(field);
+        // params.excludeAncestral.push(field);
+        // params.excludeMissing.push(field);
         fields.push(field);
         summaries.push(summary);
       }
