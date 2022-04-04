@@ -276,8 +276,14 @@ const processScatter = (scatter) => {
               heatmaps.yValuesByCat[cat.key][i]
             ) {
               let z = heatmaps.yValuesByCat[cat.key][i][j];
+              let count;
+              try {
+                count = heatmaps.allYValues[i][j];
+              } catch (err) {
+                count = 0;
+                // ignore
+              }
               if (z > 0) {
-                console.log({ bucket, yBucket });
                 catData.push({
                   h,
                   w,
@@ -292,7 +298,7 @@ const processScatter = (scatter) => {
                       ? yScale(yBucket) + 1
                       : yScale(heatmaps.yBuckets[j + 1]),
                   z,
-                  count: heatmaps.allYValues[i][j],
+                  count,
                 });
                 catSums[cat.label] += z;
               }
@@ -381,7 +387,13 @@ const processScatter = (scatter) => {
             yBucket = yBucket.toLowerCase();
           }
           if (j < heatmaps.yBuckets.length - 1) {
-            let z = heatmaps.allYValues[i][j];
+            let z;
+            try {
+              z = heatmaps.allYValues[i][j];
+            } catch (err) {
+              z = 0;
+              // ignore
+            }
             if (z > 0) {
               catData.push({
                 h,
