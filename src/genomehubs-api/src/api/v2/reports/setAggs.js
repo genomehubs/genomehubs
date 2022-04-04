@@ -9,7 +9,6 @@ const attributeTerms = ({ cat, terms, size, yHistograms }) => {
     attribute = terms.cat || cat;
     terms = terms.terms;
   }
-  // console.log(terms);
   if (Array.isArray(terms)) {
     if (terms.length > 0) {
       filters = {};

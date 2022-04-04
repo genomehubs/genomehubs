@@ -262,7 +262,6 @@ export const getBounds = async ({
   let cats;
   let by;
   if (terms) {
-    console.log({ cat });
     ({ cats, by } = await getCatsBy({
       terms,
       field: cat,
