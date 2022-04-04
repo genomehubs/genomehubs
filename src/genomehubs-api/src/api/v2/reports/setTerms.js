@@ -80,6 +80,7 @@ export const setTerms = async ({
     cats.forEach((obj) => {
       terms.push({ key: obj.label, label: obj.key });
     });
+    console.log({ cat: field, terms, by, size, other });
   }
   return { cat: field, terms, by, size, other };
 };

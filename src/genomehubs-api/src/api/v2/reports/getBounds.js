@@ -20,7 +20,13 @@ export const getCatsBy = async ({
   let cats, by;
   if (terms.by_lineage) {
     cats = terms.by_lineage.at_rank.taxa.buckets;
-    cats = await getCatLabels({ field, result, cats, taxonomy, apiParams });
+    cats = await getCatLabels({
+      cat: field,
+      result,
+      cats,
+      taxonomy,
+      apiParams,
+    });
     by = "lineage";
   } else {
     if (
@@ -119,8 +125,10 @@ export const getBounds = async ({
     summary,
     result,
     taxonomy,
-    ...(typesMap[field].type != "keyword" && { stats: true }),
-    ...(typesMap[field].type == "keyword" && { keywords: field }),
+    ...(typesMap[field] &&
+      typesMap[field].type != "keyword" && { stats: true }),
+    ...(typesMap[field] &&
+      typesMap[field].type == "keyword" && { keywords: field }),
     fixedTerms,
     terms: extraTerms,
     size: definedTerms.size,
@@ -146,7 +154,7 @@ export const getBounds = async ({
     if (opts) {
       opts = opts.split(/\s*;\s*/);
       if (opts.length == 1) {
-        opts = opts.split(/\s*,\s*/);
+        opts = opts[0].split(/\s*,\s*/);
       }
       if (opts[0] && opts[0] > "") {
         min = opts[0];
@@ -254,6 +262,7 @@ export const getBounds = async ({
   let cats;
   let by;
   if (terms) {
+    console.log({ cat });
     ({ cats, by } = await getCatsBy({
       terms,
       field: cat,

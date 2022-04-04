@@ -222,7 +222,7 @@ const lineageTerms = ({ terms, size }) => {
   };
 };
 
-const lineageCategory = ({ cats, field, histogram }) => {
+const lineageCategory = ({ cats, field, histogram, other }) => {
   let filters = {};
   cats.forEach((obj, i) => {
     filters[obj.key] = { term: { "lineage.taxon_id": obj.key } };
@@ -238,6 +238,7 @@ const lineageCategory = ({ cats, field, histogram }) => {
           at_rank: {
             filters: {
               filters,
+              ...(other && { other_bucket_key: "other" }),
             },
             aggs: {
               histogram: {
