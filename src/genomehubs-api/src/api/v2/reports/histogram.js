@@ -12,13 +12,41 @@ import { setAggs } from "./setAggs";
 import { setExclusions } from "../functions/setExclusions";
 import { valueTypes } from "./valueTypes";
 
-const getHistAggResults = (aggs) => {
+const getHistAggResults = (aggs, stats) => {
   let hist = aggs.histogram;
   if (!hist) {
     return;
   }
   if (hist.by_attribute) {
-    hist = hist.by_attribute.by_cat.cats;
+    if (hist.by_attribute.by_cat.by_value.cats) {
+      hist = hist.by_attribute.by_cat.by_value.cats;
+    } else if (stats && stats.cats) {
+      let cats = [...stats.cats];
+      if (stats.showOther) {
+        cats.push({ key: "other" });
+      }
+      let buckets = [];
+      cats.forEach(({ key }) => {
+        let doc_count = 0;
+        if (hist.by_attribute.by_cat.by_value.buckets[key]) {
+          doc_count = hist.by_attribute.by_cat.by_value.buckets[key].doc_count;
+        }
+        let yHistograms;
+        if (doc_count) {
+          yHistograms =
+            hist.by_attribute.by_cat.by_value.buckets[key].cats.buckets[0]
+              .yHistograms;
+        }
+        buckets.push({ key, doc_count, yHistograms });
+      });
+      hist = { buckets };
+    } else {
+      hist = {
+        buckets: Object.entries(hist.by_attribute.by_cat.by_value.buckets).map(
+          ([key, obj]) => ({ key, doc_count: obj.doc_count })
+        ),
+      };
+    }
   } else if (hist.by_lineage) {
     // TODO: support lineage category histogram
     console.log(hist);
@@ -30,8 +58,8 @@ const getYValues = ({ obj, yField, typesMap, stats }) => {
   let yBuckets = [];
   let yValues = [];
   let yValueType = valueTypes[typesMap[yField].type] || "float";
-  // console.log(obj);
-  let yHist = getHistAggResults(obj.yHistograms.by_attribute[yField]);
+  // TODO: use stats here
+  let yHist = getHistAggResults(obj.yHistograms.by_attribute[yField], stats);
   if (yValueType == "keyword") {
     let bucketMap = {};
     stats.cats.forEach((obj, i) => {
@@ -39,6 +67,11 @@ const getYValues = ({ obj, yField, typesMap, stats }) => {
       bucketMap[obj.key] = i;
       yValues.push(0);
     });
+    if (stats.showOther) {
+      yBuckets.push("other");
+      bucketMap["other"] = stats.cats.length;
+      yValues.push(0);
+    }
     yBuckets.push(undefined);
     if (yHist) {
       yHist.buckets.forEach((yObj) => {
@@ -174,7 +207,7 @@ const getHistogram = async ({
     }
   }
 
-  let hist = getHistAggResults(res.aggs.aggregations[field]);
+  let hist = getHistAggResults(res.aggs.aggregations[field], bounds.stats);
   if (!hist) {
     return;
   }
@@ -191,8 +224,6 @@ const getHistogram = async ({
   let zDomain = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
   let other = [];
   let allOther = [];
-  // let allYBuckets = [];
-
   hist.buckets.forEach((obj, i) => {
     buckets.push(obj.key);
     allValues.push(obj.doc_count);
@@ -201,27 +232,32 @@ const getHistogram = async ({
       other.push(obj.doc_count);
     }
 
-    if (obj.yHistograms) {
-      if (i == 0) {
+    if (yField) {
+      if (!allYValues) {
         allYValues = [];
       }
-      let yValues;
-      ({ yValues, yBuckets, yValueType } = getYValues({
-        obj,
-        yField,
-        typesMap,
-        stats: yBounds.stats,
-      }));
-      // allYBuckets = [...new Set(allYBuckets.concat(yBuckets))];
-      if (obj.doc_count > 0) {
-        let min = Math.min(...yValues);
-        let max = Math.max(...yValues);
-        zDomain[0] = Math.min(zDomain[0], min);
-        zDomain[1] = Math.max(zDomain[1], max);
-      }
-      allYValues.push(yValues);
-      if (bounds.showOther) {
-        allOther.push([...yValues]);
+      if (obj.yHistograms) {
+        let yValues;
+        ({ yValues, yBuckets, yValueType } = getYValues({
+          obj,
+          yField,
+          typesMap,
+          stats: yBounds.stats,
+          other: yBounds.showOther,
+        }));
+        // allYBuckets = [...new Set(allYBuckets.concat(yBuckets))];
+        if (obj.doc_count > 0) {
+          let min = Math.min(...yValues);
+          let max = Math.max(...yValues);
+          zDomain[0] = Math.min(zDomain[0], min);
+          zDomain[1] = Math.max(zDomain[1], max);
+        }
+        allYValues.push(yValues);
+        if (bounds.showOther) {
+          allOther.push([...yValues]);
+        }
+      } else {
+        allYValues.push([]);
       }
     } else {
       if (obj.doc_count > 0) {
@@ -254,50 +290,63 @@ const getHistogram = async ({
     if (bounds.by == "attribute") {
       fields.push(bounds.cat);
       fields = [...new Set(fields)];
-      catBuckets = catHists.by_attribute.by_cat.buckets;
+      catBuckets = catHists.by_attribute.by_cat.by_value.buckets;
     } else {
-      if (bounds.showOther) {
-        byCat.other = other;
-        yValuesByCat = { other: allOther };
-      }
+      // if (bounds.showOther) {
+      //   byCat.other = other;
+      //   yValuesByCat = { other: allOther };
+      // }
       ranks = [bounds.cat];
       catBuckets = catHists.by_lineage.at_rank.buckets;
     }
     let catObjs = {};
+    if (bounds.showOther) {
+      bounds.cats.push({
+        key: "other",
+        label: "other",
+      });
+    }
     bounds.cats.forEach((obj) => {
       catObjs[obj.key] = obj;
     });
+
     Object.entries(catBuckets).forEach(([key, obj]) => {
       byCat[key] = [];
       catObjs[key].doc_count = 0;
       // TODO: support categories here too
-      let nestedHist = getHistAggResults(obj.histogram.by_attribute[field]);
+      let nestedHist = getHistAggResults(
+        obj.histogram.by_attribute[field],
+        bounds.stats
+      );
       nestedHist.buckets.forEach((bin, i) => {
         byCat[key][i] = bin.doc_count;
         catObjs[key].doc_count += bin.doc_count;
-        if (byCat.other) {
-          byCat.other[i] -= bin.doc_count;
-        }
-        if (bin.yHistograms) {
-          if (i == 0) {
-            if (!yValuesByCat) {
-              yValuesByCat = {};
-            }
+        // if (byCat.other) {
+        //   byCat.other[i] -= bin.doc_count;
+        // }
+        if (yField) {
+          if (!yValuesByCat) {
+            yValuesByCat = {};
+          }
+          if (!yValuesByCat[key]) {
             yValuesByCat[key] = [];
           }
-          let { yValues } = getYValues({
-            obj: bin,
-            yField,
-            typesMap,
-            stats: yBounds.stats,
-          });
-          if (yValuesByCat.other) {
-            yValues.forEach((count, j) => {
-              yValuesByCat.other[i][j] -= count;
+          if (bin.yHistograms) {
+            let { yValues } = getYValues({
+              obj: bin,
+              yField,
+              typesMap,
+              stats: yBounds.stats,
             });
+            // if (yValuesByCat.other) {
+            //   yValues.forEach((count, j) => {
+            //     yValuesByCat.other[i][j] -= count;
+            //   });
+            // }
+            yValuesByCat[key].push(yValues);
+          } else {
+            yValuesByCat[key].push([]);
           }
-
-          yValuesByCat[key].push(yValues);
         }
       });
       if (pointData) {
@@ -305,12 +354,12 @@ const getHistogram = async ({
         delete pointData[key];
       }
     });
-    if (byCat.other && byCat.other.reduce((a, b) => a + b, 0) == 0) {
-      delete byCat.other;
-      delete yValuesByCat.other;
-    } else if (pointData) {
-      rawData.other = Object.values(pointData).flat();
-    }
+    // if (byCat.other && byCat.other.reduce((a, b) => a + b, 0) == 0) {
+    //   delete byCat.other;
+    //   delete yValuesByCat.other;
+    // } else if (pointData) {
+    //   rawData.other = Object.values(pointData).flat();
+    // }
   } else if (pointData) {
     rawData = Object.values(pointData).flat();
   }
@@ -555,13 +604,13 @@ export const histogram = async ({
       taxonomy,
       raw: bounds.stats.count < threshold ? threshold : 0,
     });
-    if (histograms.byCat && histograms.byCat.other) {
-      bounds.cats.push({
-        key: "other",
-        label: "other",
-        doc_count: histograms.byCat.other.reduce((a, b) => a + b, 0),
-      });
-    }
+    // if (histograms.byCat && histograms.byCat.other) {
+    //   bounds.cats.push({
+    //     key: "other",
+    //     label: "other",
+    //     doc_count: histograms.byCat.other.reduce((a, b) => a + b, 0),
+    //   });
+    // }
   }
 
   // "aggs": {

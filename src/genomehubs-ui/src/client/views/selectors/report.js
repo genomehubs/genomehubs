@@ -208,13 +208,54 @@ export function fetchReport({ reportId, reload, report, hideMessage }) {
   };
 }
 
-const applyJitter = (x, i) => {
-  let step = 0.05;
-  let offset = i * step;
-  if (i % 2 > 0) {
-    offset *= 1;
+const gaussianRand = () => {
+  let rand = 0;
+  for (var i = 0; i < 6; i += 1) {
+    rand += Math.random();
   }
-  return x + offset;
+  return rand / 6;
+};
+
+const gaussianRandom = (start, end) => {
+  return Math.floor(start + gaussianRand() * (end - start + 1));
+};
+
+const applyJitter = (x, i) => {
+  if (i < 1) {
+    i *= 100;
+    let rand = (gaussianRandom(0, i) - i / 2) / 100;
+    return x + rand;
+  }
+  return x + gaussianRandom(0, i) - i / 2;
+};
+
+const expandValues = (obj, arr, buckets, yBuckets) => {
+  if (Array.isArray(obj.x) || Array.isArray(obj.y)) {
+    // handle arrays of ordinal values
+    if (Array.isArray(obj.x)) {
+      for (let x of obj.x) {
+        if (buckets.includes(x.toLowerCase())) {
+          if (Array.isArray(obj.y)) {
+            for (let y of obj.y) {
+              if (yBuckets.includes(y.toLowerCase())) {
+                arr.push({ ...obj, x, y });
+              }
+            }
+          } else {
+            arr.push({ ...obj, x });
+          }
+        }
+      }
+    } else {
+      for (let y of obj.y) {
+        if (yBuckets.includes(y.toLowerCase())) {
+          arr.push({ ...obj, y });
+        }
+      }
+    }
+    return true;
+  }
+  return false;
 };
 
 const processScatter = (scatter) => {
@@ -276,8 +317,14 @@ const processScatter = (scatter) => {
               heatmaps.yValuesByCat[cat.key][i]
             ) {
               let z = heatmaps.yValuesByCat[cat.key][i][j];
+              let count;
+              try {
+                count = heatmaps.allYValues[i][j];
+              } catch (err) {
+                count = 0;
+                // ignore
+              }
               if (z > 0) {
-                console.log({ bucket, yBucket });
                 catData.push({
                   h,
                   w,
@@ -292,7 +339,7 @@ const processScatter = (scatter) => {
                       ? yScale(yBucket) + 1
                       : yScale(heatmaps.yBuckets[j + 1]),
                   z,
-                  count: heatmaps.allYValues[i][j],
+                  count,
                 });
                 catSums[cat.label] += z;
               }
@@ -309,36 +356,28 @@ const processScatter = (scatter) => {
         heatmaps.rawData[cat.key]
       ) {
         let points = [];
-        let indices = { x: {}, y: {} };
         for (let obj of heatmaps.rawData[cat.key]) {
-          if (Array.isArray(obj.x) || Array.isArray(obj.y)) {
-            // TODO: handle arrays of ordinal values
+          if (
+            expandValues(
+              obj,
+              heatmaps.rawData[cat.key],
+              heatmaps.buckets,
+              heatmaps.yBuckets
+            )
+          ) {
             continue;
           }
           let x;
           let y;
-          // TODO: move to function
           if (scatter.bounds.scale == "ordinal") {
             x = xScale(obj.x.toLowerCase());
-            x += 0.5;
-            if (indices.x[x]) {
-              x = applyJitter(x, indices.x[x]);
-            } else {
-              indices.x[x] = 0;
-            }
-            indices.x[x] += 1;
+            x = applyJitter(x + 0.5, 0.95);
           } else {
             x = xScale(obj.x);
           }
           if (scatter.yBounds.scale == "ordinal") {
             y = yScale(obj.y.toLowerCase());
-            y += 0.5;
-            if (indices.y[y]) {
-              y = applyJitter(y, indices.y[y]);
-            } else {
-              indices.y[y] = 0;
-            }
-            indices.y[y] += 1;
+            y = applyJitter(y + 0.5, 0.95);
           } else {
             y = yScale(obj.y);
           }
@@ -381,7 +420,13 @@ const processScatter = (scatter) => {
             yBucket = yBucket.toLowerCase();
           }
           if (j < heatmaps.yBuckets.length - 1) {
-            let z = heatmaps.allYValues[i][j];
+            let z;
+            try {
+              z = heatmaps.allYValues[i][j];
+            } catch (err) {
+              z = 0;
+              // ignore
+            }
             if (z > 0) {
               catData.push({
                 h,
@@ -407,35 +452,34 @@ const processScatter = (scatter) => {
     chartData.push(catData);
     if (hasRawData) {
       let points = [];
-      let indices = { x: {}, y: {} };
       for (let obj of heatmaps.rawData) {
-        if (Array.isArray(obj.x) || Array.isArray(obj.y)) {
-          // TODO: handle arrays of ordinal values
+        if (
+          expandValues(
+            obj,
+            heatmaps.rawData,
+            heatmaps.buckets,
+            heatmaps.yBuckets
+          )
+        ) {
           continue;
         }
         let x;
         let y;
         if (scatter.bounds.scale == "ordinal") {
-          x = xScale(obj.x.toLowerCase());
-          x += 0.5;
-          if (indices.x[x]) {
-            x = applyJitter(x, indices.x[x]);
-          } else {
-            indices.x[x] = 0;
+          if (!heatmaps.buckets.includes(obj.x.toLowerCase())) {
+            continue;
           }
-          indices.x[x] += 1;
+          x = xScale(obj.x.toLowerCase());
+          x = applyJitter(x + 0.5, 0.95);
         } else {
           x = xScale(obj.x);
         }
         if (scatter.yBounds.scale == "ordinal") {
-          y = yScale(obj.y.toLowerCase());
-          y += 0.5;
-          if (indices.y[y]) {
-            y = applyJitter(y, indices.y[y]);
-          } else {
-            indices.y[y] = 0;
+          if (!heatmaps.yBuckets.includes(obj.y.toLowerCase())) {
+            continue;
           }
-          indices.y[y] += 1;
+          y = yScale(obj.y.toLowerCase());
+          y = applyJitter(y + 0.5, 0.95);
         } else {
           y = yScale(obj.y);
         }

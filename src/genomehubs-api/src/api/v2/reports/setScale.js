@@ -1,6 +1,9 @@
 export const setScale = ({ field, typesMap, opts }) => {
   if (opts) {
-    let parts = opts.split(/\s*,\s*/);
+    let parts = opts.split(/\s*;\s*/);
+    if (parts.length == 1) {
+      parts = opts.split(/\s*,\s*/);
+    }
     if (parts[3]) {
       return parts[3].toLowerCase();
     }

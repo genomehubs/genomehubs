@@ -370,12 +370,13 @@ export const xPerRank = async ({
   result = "taxon",
   taxonomy,
   rank,
+  includeEstimates,
   queryString,
 }) => {
   // Return counts at a list of ranks
   let ranks = setRanks(rank);
   let perRank = [];
-  let includeEstimates = x ? false : true;
+  // let includeEstimates = x ? false : true;
   for (rank of ranks) {
     let { params, fields } = queryParams({
       term: x,

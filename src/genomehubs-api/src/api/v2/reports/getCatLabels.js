@@ -2,7 +2,6 @@ import { client } from "../functions/connection";
 import { indexName } from "../functions/indexName";
 
 export const getCatLabels = async ({
-  result,
   cat,
   cats,
   apiParams,

@@ -1,8 +1,47 @@
 import { attrTypes } from "../functions/attrTypes";
 import { histogramAgg } from "../queries/histogramAgg";
 
-const attributeTerms = ({ terms, size, yHistograms }) => {
-  let attribute = terms;
+const attributeTerms = ({ cat, terms, size, yHistograms }) => {
+  let filter;
+  let filters;
+  let attribute;
+  if (typeof terms === "object") {
+    attribute = terms.cat || cat;
+    terms = terms.terms;
+  }
+  if (Array.isArray(terms)) {
+    if (terms.length > 0) {
+      filters = {};
+      let i = 0;
+      for (let obj of terms) {
+        i += 1;
+        if (i > size) {
+          break;
+        }
+        filters[obj.key] = { term: { "attributes.keyword_value": obj.key } };
+      }
+      filters = { other_bucket_key: "other", filters: { ...filters } };
+    }
+  } else {
+    attribute = terms;
+  }
+  let by_value;
+  if (filters) {
+    by_value = {
+      filters,
+      aggs: {
+        cats: {
+          terms: { field: "attributes.keyword_value", size },
+          ...(yHistograms && {
+            aggs: {
+              yHistograms,
+            },
+          }),
+        },
+      },
+    };
+  }
+
   return {
     reverse_nested: {},
     aggs: {
@@ -16,7 +55,8 @@ const attributeTerms = ({ terms, size, yHistograms }) => {
               term: { "attributes.key": attribute },
             },
             aggs: {
-              cats: {
+              by_value,
+              more_values: {
                 terms: { field: "attributes.keyword_value", size },
                 ...(yHistograms && {
                   aggs: {
@@ -32,7 +72,7 @@ const attributeTerms = ({ terms, size, yHistograms }) => {
   };
 };
 
-const attributeCategory = ({ cats, field, histogram }) => {
+const attributeCategory = ({ cat, cats, field, histogram, other }) => {
   let filters = {};
   cats.forEach((obj, i) => {
     filters[obj.key] = { term: { "attributes.keyword_value": obj.key } };
@@ -46,24 +86,32 @@ const attributeCategory = ({ cats, field, histogram }) => {
         },
         aggs: {
           by_cat: {
-            filters: {
-              filters,
+            filter: {
+              term: { "attributes.key": cat },
             },
             aggs: {
-              histogram: {
-                reverse_nested: {},
+              by_value: {
+                filters: {
+                  filters,
+                  ...(other && { other_bucket_key: "other" }),
+                },
                 aggs: {
-                  by_attribute: {
-                    nested: {
-                      path: "attributes",
-                    },
+                  histogram: {
+                    reverse_nested: {},
                     aggs: {
-                      [field]: {
-                        filter: {
-                          term: { "attributes.key": field },
+                      by_attribute: {
+                        nested: {
+                          path: "attributes",
                         },
                         aggs: {
-                          histogram,
+                          [field]: {
+                            filter: {
+                              term: { "attributes.key": field },
+                            },
+                            aggs: {
+                              histogram,
+                            },
+                          },
                         },
                       },
                     },
@@ -173,7 +221,7 @@ const lineageTerms = ({ terms, size }) => {
   };
 };
 
-const lineageCategory = ({ cats, field, histogram }) => {
+const lineageCategory = ({ cats, field, histogram, other }) => {
   let filters = {};
   cats.forEach((obj, i) => {
     filters[obj.key] = { term: { "lineage.taxon_id": obj.key } };
@@ -189,6 +237,7 @@ const lineageCategory = ({ cats, field, histogram }) => {
           at_rank: {
             filters: {
               filters,
+              ...(other && { other_bucket_key: "other" }),
             },
             aggs: {
               histogram: {
@@ -219,13 +268,18 @@ const lineageCategory = ({ cats, field, histogram }) => {
   };
 };
 
-const termsAgg = ({ field, typesMap, size, yHistograms }) => {
+const termsAgg = ({ field, fixedTerms, typesMap, size, yHistograms }) => {
   if (!field) {
     return;
   }
   if (typesMap[field]) {
     if (typesMap[field].type == "keyword") {
-      return attributeTerms({ terms: field, size, yHistograms });
+      return attributeTerms({
+        cat: field,
+        terms: fixedTerms || field,
+        size,
+        yHistograms,
+      });
     }
   } else {
     return lineageTerms({ terms: field, size });
@@ -243,6 +297,7 @@ export const setAggs = async ({
   terms,
   size = 5,
   bounds,
+  fixedTerms,
   yField,
   ySummary,
   yBounds,
@@ -302,7 +357,13 @@ export const setAggs = async ({
   let yHistogram, yHistograms, categoryHistograms;
   if (histogram && yField) {
     if (yBounds.stats.by) {
-      yHistogram = termsAgg({ field: yField, typesMap, size });
+      let boundsTerms = { terms: yBounds.stats.cats };
+      yHistogram = termsAgg({
+        field: yField,
+        fixedTerms: boundsTerms,
+        typesMap,
+        size: yBounds.stats.size,
+      });
     } else {
       yHistogram = await histogramAgg({
         field: yField,
@@ -318,8 +379,23 @@ export const setAggs = async ({
     });
   }
   if (histogram) {
-    if (bounds.stats.by) {
-      histogram = termsAgg({ field, typesMap, size, yHistograms });
+    if (fixedTerms && fixedTerms.terms) {
+      histogram = termsAgg({
+        field,
+        fixedTerms: fixedTerms,
+        typesMap,
+        size: bounds.stats.size,
+        yHistograms,
+      });
+    } else if (bounds.stats.by) {
+      let boundsTerms = { terms: bounds.stats.cats };
+      histogram = termsAgg({
+        field,
+        fixedTerms: boundsTerms,
+        typesMap,
+        size: bounds.stats.size,
+        yHistograms,
+      });
     } else {
       histogram = await histogramAgg({
         field,
@@ -334,17 +410,21 @@ export const setAggs = async ({
   if (bounds && bounds.cats) {
     if (bounds.by == "attribute") {
       categoryHistograms = attributeCategory({
+        cat: bounds.cat,
         cats: bounds.cats,
         field,
         summary,
         histogram,
+        other: bounds.showOther,
       });
     } else {
       categoryHistograms = lineageCategory({
+        cat: bounds.cat,
         cats: bounds.cats,
         field,
         summary,
         histogram,
+        other: bounds.showOther,
       });
     }
   }
@@ -356,7 +436,12 @@ export const setAggs = async ({
     };
   }
   terms = termsAgg({ field: terms, typesMap, size });
-  keywords = termsAgg({ field: keywords, typesMap, size });
+  keywords = termsAgg({
+    field: keywords,
+    fixedTerms: fixedTerms ? fixedTerms : undefined,
+    typesMap,
+    size: fixedTerms ? fixedTerms.size : 5,
+  });
 
   if (tree) {
     tree = await treeAgg({

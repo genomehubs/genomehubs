@@ -11,6 +11,7 @@ import { valueTypes } from "./valueTypes";
 
 export const getCatsBy = async ({
   terms,
+  fixedTerms,
   field,
   result,
   taxonomy,
@@ -19,13 +20,58 @@ export const getCatsBy = async ({
   let cats, by;
   if (terms.by_lineage) {
     cats = terms.by_lineage.at_rank.taxa.buckets;
-    cats = await getCatLabels({ field, result, cats, taxonomy, apiParams });
+    cats = await getCatLabels({
+      cat: field,
+      result,
+      cats,
+      taxonomy,
+      apiParams,
+    });
     by = "lineage";
   } else {
-    cats = terms.by_attribute.by_cat.cats.buckets;
-    cats.forEach((obj) => {
-      obj.label = obj.key;
-    });
+    if (
+      terms.by_attribute.by_cat.by_value &&
+      terms.by_attribute.by_cat.by_value.cats
+    ) {
+      cats = terms.by_attribute.by_cat.by_value.cats.buckets;
+      cats.forEach((obj) => {
+        obj.label = obj.key;
+      });
+    } else if (fixedTerms) {
+      let usedTerms = new Set();
+      cats = [];
+      let i = 0;
+      for (let { key } of fixedTerms.terms) {
+        i++;
+        if (i > fixedTerms.size) {
+          break;
+        }
+        usedTerms.add(key);
+        cats.push({ key, label: key });
+      }
+      if (i < fixedTerms.size) {
+        for (let obj of terms.by_attribute.by_cat.more_values.buckets) {
+          if (!usedTerms.has(obj.key)) {
+            i++;
+            usedTerms.add(obj.key);
+            cats.push({ key: obj.key, label: obj.key });
+          }
+          if (i >= fixedTerms.size) {
+            break;
+          }
+        }
+      }
+    } else {
+      // TODO: include defined terms in cat bounds
+      cats = terms.by_attribute.by_cat.more_values.buckets.map(
+        // cats = Object.keys(terms.by_attribute.by_cat.by_value.buckets).map(
+        (obj) => ({
+          key: obj.key,
+          label: obj.key,
+        })
+      );
+    }
+
     by = "attribute";
   }
   return { cats, by };
@@ -41,7 +87,7 @@ export const getBounds = async ({
   tickCount = 10,
   taxonomy,
   apiParams,
-  opts,
+  opts = ";;",
 }) => {
   let typesMap = await attrTypes({ result, taxonomy });
   params.size = 0;
@@ -49,6 +95,13 @@ export const getBounds = async ({
   let field = fields[0];
   let summary = summaries[0];
   let scaleType = setScale({ field, typesMap, opts });
+  let fixedTerms = await setTerms({
+    cat: field,
+    opts,
+    typesMap,
+    taxonomy,
+    apiParams,
+  });
   let definedTerms = await setTerms({ cat, typesMap, taxonomy, apiParams });
   cat = definedTerms.cat;
   let extraTerms;
@@ -72,11 +125,15 @@ export const getBounds = async ({
     summary,
     result,
     taxonomy,
-    ...(typesMap[field].type != "keyword" && { stats: true }),
-    ...(typesMap[field].type == "keyword" && { keywords: field }),
+    ...(typesMap[field] &&
+      typesMap[field].type != "keyword" && { stats: true }),
+    ...(typesMap[field] &&
+      typesMap[field].type == "keyword" && { keywords: field }),
+    fixedTerms,
     terms: extraTerms,
     size: definedTerms.size,
   });
+
   let res = await getResults({
     ...params,
     taxonomy,
@@ -95,7 +152,10 @@ export const getBounds = async ({
     // Set domain to nice numbers
     let min, max;
     if (opts) {
-      opts = opts.split(",");
+      opts = opts.split(/\s*;\s*/);
+      if (opts.length == 1) {
+        opts = opts[0].split(/\s*,\s*/);
+      }
       if (opts[0] && opts[0] > "") {
         min = opts[0];
       }
@@ -181,12 +241,19 @@ export const getBounds = async ({
     if (keywords) {
       let { cats, by } = await getCatsBy({
         terms: keywords,
+        fixedTerms,
         field,
         result,
         taxonomy,
         apiParams,
       });
-      stats = { cats, by, count: res.status.hits };
+      stats = {
+        cats,
+        by,
+        count: res.status.hits,
+        size: fixedTerms.size,
+        showOther: fixedTerms.other,
+      };
     } else {
       stats = { count: res.status.hits };
     }
