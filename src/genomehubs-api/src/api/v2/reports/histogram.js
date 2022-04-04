@@ -130,7 +130,6 @@ const getHistogram = async ({
     yBounds,
     ySummary,
   });
-  // console.log(JSON.stringify(params.aggs, null, 4));
   let res = await getResults({
     ...params,
     taxonomy,
@@ -225,9 +224,6 @@ const getHistogram = async ({
   let zDomain = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
   let other = [];
   let allOther = [];
-  // let allYBuckets = [];
-  // console.log(215);
-  // console.log(hist);
   hist.buckets.forEach((obj, i) => {
     buckets.push(obj.key);
     allValues.push(obj.doc_count);
@@ -570,7 +566,6 @@ export const histogram = async ({
     };
   }
   if (cat && (!bounds.cats || bounds.cats.length == 0)) {
-    console.log(bounds);
     return {
       status: {
         success: false,

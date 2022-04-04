@@ -451,9 +451,6 @@ export const setAggs = async ({
       summary,
     });
   }
-  // if (histogram) {
-  //   console.log(histogram.aggs.by_attribute.aggs.by_cat.aggs);
-  // }
 
   return {
     aggregations: {

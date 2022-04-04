@@ -8,7 +8,6 @@ export const getCatLabels = async ({
   taxonomy,
   key = "scientific_name",
 }) => {
-  console.log({ cat, cats });
   let index = indexName({ ...apiParams, taxonomy });
   let qBody = [];
   let labels = [];
@@ -33,7 +32,6 @@ export const getCatLabels = async ({
       }
     });
   }
-  console.log(labels);
 
   return labels;
 };
