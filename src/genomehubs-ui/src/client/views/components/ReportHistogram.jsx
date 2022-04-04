@@ -105,21 +105,21 @@ const searchByCell = ({
 }) => {
   let query = xQuery.query;
   query = query
-    .replaceAll(new RegExp("AND\\s+" + xLabel + "\\s+AND", "gi"), "AND")
+    .replaceAll(new RegExp("AND\\s+" + bounds.field + "\\s+AND", "gi"), "AND")
     .replaceAll(
-      new RegExp("AND\\s+" + xLabel + "\\s+>=\\s*[\\w\\d_]+", "gi"),
+      new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_]+", "gi"),
       ""
     )
     .replaceAll(
-      new RegExp("AND\\s+" + xLabel + "\\s+<\\s*[\\w\\d_]+", "gi"),
+      new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_]+", "gi"),
       ""
     )
     .replaceAll(/\s+/g, " ")
     .replace(/\s+$/, "");
   if (bounds.scale == "ordinal") {
-    query += ` AND ${xLabel} = ${xBounds[0]}`;
+    query += ` AND ${bounds.field} = ${xBounds[0]}`;
   } else {
-    query += ` AND ${xLabel} >= ${xBounds[0]} AND ${xLabel} < ${xBounds[1]}`;
+    query += ` AND ${bounds.field} >= ${xBounds[0]} AND ${bounds.field} < ${xBounds[1]}`;
   }
 
   let options = qs.parse(location.search.replace(/^\?/, ""));

@@ -48,34 +48,38 @@ const searchByCell = ({
 }) => {
   let query = xQuery.query;
   query = query
-    .replaceAll(new RegExp("AND\\s+" + xLabel + "\\s+AND", "gi"), "AND")
+    .replaceAll(new RegExp("AND\\s+" + bounds.field + "\\s+AND", "gi"), "AND")
     .replaceAll(
-      new RegExp("AND\\s+" + xLabel + "\\s+>=\\s*[\\w\\d_]+", "gi"),
+      new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_]+", "gi"),
       ""
     )
     .replaceAll(
-      new RegExp("AND\\s+" + xLabel + "\\s+<\\s*[\\w\\d_]+", "gi"),
+      new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_]+", "gi"),
       ""
     )
     .replaceAll(/\s+/g, " ")
     .replace(/\s+$/, "");
   if (valueType == "date") {
-    query += ` AND ${xLabel} >= ${
+    query += ` AND ${bounds.field} >= ${
       new Date(xRange[0]).toISOString().split(/t/i)[0]
-    } AND ${xLabel} < ${new Date(xRange[1]).toISOString().split(/t/i)[0]}`;
+    } AND ${bounds.field} < ${
+      new Date(xRange[1]).toISOString().split(/t/i)[0]
+    }`;
   } else if (valueType == "keyword") {
-    query += ` AND ${xLabel} = ${bounds.stats.cats[xRange[0]].key}`;
+    query += ` AND ${bounds.field} = ${bounds.stats.cats[xRange[0]].key}`;
   } else {
-    query += ` AND ${xLabel} >= ${xRange[0]} AND ${xLabel} < ${xRange[1]}`;
+    query += ` AND ${bounds.field} >= ${xRange[0]} AND ${bounds.field} < ${xRange[1]}`;
   }
   if (yValueType == "date") {
-    query += ` AND ${yLabel} >= ${
+    query += ` AND ${yBounds.field} >= ${
       new Date(yRange[0]).toISOString().split(/t/i)[0]
-    } AND ${yLabel} < ${new Date(yRange[1]).toISOString().split(/t/i)[0]}`;
+    } AND ${yBounds.field} < ${
+      new Date(yRange[1]).toISOString().split(/t/i)[0]
+    }`;
   } else if (yValueType == "keyword") {
-    query += ` AND ${yLabel} = ${yBounds.stats.cats[yRange[0]].key}`;
+    query += ` AND ${yBounds.field} = ${yBounds.stats.cats[yRange[0]].key}`;
   } else {
-    query += ` AND ${yLabel} >= ${yRange[0]} AND ${yLabel} < ${yRange[1]}`;
+    query += ` AND ${yBounds.field} >= ${yRange[0]} AND ${yBounds.field} < ${yRange[1]}`;
   }
 
   // let fields = `${xLabel},${yLabel}`;
