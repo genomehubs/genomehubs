@@ -18,7 +18,10 @@ RUN mkdir -p /genomehubs
 RUN useradd -m genomehubs \
     && chown -R genomehubs:genomehubs /genomehubs
 
-RUN pip install genomehubs==${VERSION}
+COPY genomehubs-${VERSION}-py3-none-manylinux2014_x86_64.whl /genomehubs/
+
+RUN pip install genomehubs-${VERSION}-py3-none-manylinux2014_x86_64.whl \
+    && rm genomehubs-${VERSION}-py3-none-manylinux2014_x86_64.whl
 
 USER genomehubs
 

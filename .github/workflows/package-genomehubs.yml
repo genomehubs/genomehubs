@@ -129,6 +129,11 @@ jobs:
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
           images: genomehubs/genomehubs
+      - uses: actions/download-artifact@v2
+        with:
+          path: ./dist
+      - name: Add pip wheel to context
+        run: mv dist/artifact/*manylinux2014_x86_64.whl src/docker
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
