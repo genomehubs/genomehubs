@@ -17,6 +17,7 @@ app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 
 // serve static assets normally
+app.use(express.static("/genomehubs/local"));
 app.use(express.static(path.resolve(__dirname, "public")));
 app.use(
   "/manifest.json",

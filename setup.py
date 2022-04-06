@@ -25,7 +25,7 @@ def read(*names, **kwargs):
 
 setup(
     name="genomehubs",  # Required
-    version="2.3.0",
+    version="2.3.5",
     description="GenomeHubs",  # Optional
     long_description="%s\n%s"
     % (
