@@ -85,7 +85,7 @@
     "immutable-update": "^1.0.0",
     "konva": "^3.4.1",
     "leaflet": "^1.7.1",
-    "nanoid": "^3.1.30",
+    "nanoid": "^3.1.31",
     "pixi.js": "^5.3.11",
     "pixi.js-legacy": "^5.3.11",
     "preact": "^10.6.2",
