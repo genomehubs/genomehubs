@@ -30,10 +30,47 @@ const formatMillisecond = timeFormat(".%L"),
   formatHour = timeFormat("%I %p"),
   formatDay = timeFormat("%a %d"),
   formatWeek = timeFormat("%b %d"),
-  formatMonth = timeFormat("%B"),
+  formatMonth = timeFormat("%b"),
+  formatMonthDecimal = timeFormat("%m"),
+  formatMonthYear = timeFormat("%b %Y"),
   formatYear = timeFormat("%Y");
 
-function multiFormat(date) {
+const timeFormats = {
+  second: formatSecond,
+  minute: formatMinute,
+  hour: formatHour,
+  day: formatDay,
+  week: formatWeek,
+  month: (date) =>
+    formatMonthDecimal(date) == "01"
+      ? formatMonthYear(date)
+      : formatMonth(date),
+  year: formatYear,
+};
+
+export const setInterval = (diff, bins) => {
+  let interval = diff / bins;
+  return interval < 1000
+    ? "millisecond"
+    : interval < 60000
+    ? "second"
+    : interval < 3600000
+    ? "minute"
+    : interval < 86400000
+    ? "hour"
+    : interval < 604800000
+    ? "day"
+    : interval < 2628000000
+    ? "week"
+    : interval < 31535965000
+    ? "month"
+    : "year";
+};
+
+function multiFormat(date, interval) {
+  if (interval) {
+    return timeFormats[interval](date);
+  }
   return (
     timeSecond(date) < date
       ? formatMillisecond
@@ -53,11 +90,11 @@ function multiFormat(date) {
   )(date);
 }
 
-export const formats = (value, valueType) => {
+export const formats = (value, valueType, interval) => {
   if (valueType == "integer") {
     return sciInt(value);
   } else if (valueType == "date") {
-    return multiFormat(value);
+    return multiFormat(value, interval);
   } else if (valueType == "keyword") {
     return value;
   }

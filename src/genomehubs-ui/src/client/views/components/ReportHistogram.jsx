@@ -10,6 +10,7 @@ import {
   YAxis,
 } from "recharts";
 import React, { Fragment, useEffect, useRef } from "react";
+import formats, { setInterval } from "../functions/formats";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
@@ -18,7 +19,6 @@ import Tooltip from "@material-ui/core/Tooltip";
 import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
-import formats from "../functions/formats";
 import qs from "qs";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
@@ -391,7 +391,18 @@ const ReportHistogram = ({
     }
     let cats;
     let lastIndex = histograms.buckets.length - 2;
-    let endLabel = formats(histograms.buckets[lastIndex + 1], valueType);
+    let interval;
+    if (valueType == "date") {
+      let start = histograms.buckets[0];
+      let end = histograms.buckets[lastIndex + 1];
+      let diff = end - start;
+      interval = setInterval(diff, lastIndex);
+    }
+    let endLabel = formats(
+      histograms.buckets[lastIndex + 1],
+      valueType,
+      interval
+    );
     if (histograms.byCat) {
       cats = histogram.report.histogram.cats.map((cat) => cat.label);
       let sums = {};
@@ -414,7 +425,7 @@ const ReportHistogram = ({
             );
           });
           chartData.push({
-            x: formats(bucket, valueType),
+            x: formats(bucket, valueType, interval),
             ...series,
           });
         }
