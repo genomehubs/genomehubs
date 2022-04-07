@@ -60,6 +60,8 @@ export const matchAttributes = (
                       "attributes.count",
                       "attributes.max",
                       "attributes.min",
+                      "attributes.from",
+                      "attributes.to",
                       "attributes.range",
                       "attributes.length",
                       "attributes.aggregation_method",
