@@ -142,7 +142,11 @@ def parse_flatfile(flatfile, organelle, opts):
             fields["refseq_accession"] = entry.id
             fields["last_updated"] = reformat_date(entry.annotations["date"])
             parse_xrefs(entry, fields)
-            seqstr = str(entry.seq.upper())
+            try:
+                seqstr = str(entry.seq.upper())
+            except Exception:
+                LOGGER.warn("Unable to read sequence for %s", entry.id)
+                continue
             counter = Counter(seqstr)
             length = len(seqstr)
             fields["n_percent"] = float("%.2f" % (counter["N"] / length * 100))

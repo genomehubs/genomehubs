@@ -13,6 +13,7 @@ import {
   ZAxis,
 } from "recharts";
 import React, { useEffect, useRef, useState } from "react";
+import formats, { setInterval } from "../functions/formats";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
@@ -22,7 +23,6 @@ import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
 import { format } from "d3-format";
-import formats from "../functions/formats";
 // import { point } from "leaflet";
 import qs from "qs";
 import styles from "./Styles.scss";
@@ -612,7 +612,26 @@ const ReportScatter = ({
     let valueType = heatmaps.valueType;
     let yValueType = heatmaps.yValueType || "integer";
     let lastIndex = heatmaps.buckets.length - 2;
-    let endLabel = formats(heatmaps.buckets[lastIndex + 1], valueType);
+    let interval;
+    if (valueType == "date") {
+      let start = heatmaps.buckets[0];
+      let end = heatmaps.buckets[lastIndex + 1];
+      let diff = end - start;
+      interval = setInterval(diff, lastIndex);
+    }
+    let yInterval;
+    if (yValueType == "date") {
+      let start = heatmaps.yBuckets[0];
+      let end = heatmaps.yBuckets[heatmaps.yBuckets.length - 1];
+      let diff = end - start;
+      yInterval = setInterval(diff, heatmaps.yBuckets.length - 1);
+    }
+
+    let endLabel = formats(
+      heatmaps.buckets[lastIndex + 1],
+      valueType,
+      interval
+    );
     chart = (
       <Heatmap
         data={chartData}
@@ -650,8 +669,8 @@ const ReportScatter = ({
               ? true
               : false
             : true,
-          xFormat: (value) => formats(value, valueType),
-          yFormat: (value) => formats(value, yValueType),
+          xFormat: (value) => formats(value, valueType, interval),
+          yFormat: (value) => formats(value, yValueType, yInterval),
           fields: heatmaps.fields,
           ranks: heatmaps.ranks,
           bounds,

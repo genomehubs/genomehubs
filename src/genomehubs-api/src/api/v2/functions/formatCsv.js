@@ -22,6 +22,9 @@ export const formatCsv = async (response, opts) => {
   let usedFields = {};
   let allFields = {};
   let data = [];
+  if (!response.results) {
+    return "NO RESULTS";
+  }
   response.results.forEach((fullResult) => {
     let datum = {};
     fields.forEach((key) => {
