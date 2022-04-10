@@ -319,7 +319,7 @@ def main(args):
     options = config("index", **args)
 
     # Start Elasticsearch
-    es = es_functions.launch_es(options["fill"])
+    es = es_functions.launch_es(options["index"])
 
     # Post search scripts
     with tolog.DisableLogger():
