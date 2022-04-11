@@ -51,6 +51,31 @@
         "index": false,
         "meta": { "description": "File description" }
       },
+      "analysis_group": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "meta": { "description": "Analysis group" }
+      },
+      "versions": {
+        "type": "nested",
+        "properties": {
+          "name": {
+            "type": "keyword",
+            "ignore_above": 32,
+            "meta": { "description": "Name of software or database" }
+          },
+          "version": {
+            "type": "keyword",
+            "ignore_above": 32,
+            "meta": { "description": "Software/database version" }
+          },
+          "command": {
+            "type": "text",
+            "index": false,
+            "meta": { "description": "Command used" }
+          }
+        }
+      },
       "ancestors": {
         "type": "keyword",
         "ignore_above": 32,
@@ -97,6 +122,16 @@
         "ignore_above": 64,
         "normalizer": "lowercase",
         "meta": { "description": "Source publication pubmed ID" }
+      },
+      "source_url": {
+        "type": "keyword",
+        "ignore_above": 128,
+        "meta": { "description": "Source URL" }
+      },
+      "source_url_stub": {
+        "type": "keyword",
+        "index": false,
+        "meta": { "description": "URL stub" }
       },
       "source_slug": {
         "type": "keyword",
