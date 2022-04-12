@@ -9,6 +9,7 @@ import { formatJson } from "../functions/formatJson";
 import { getResultCount } from "../functions/getResultCount";
 import { histogram } from "../reports/histogram";
 import { indexName } from "../functions/indexName";
+import logger from "../functions/logger";
 import qs from "qs";
 import { queryParams } from "../reports/queryParams";
 import { setRanks } from "../functions/setRanks";
@@ -518,6 +519,11 @@ export const getSources = async (params) => {
       }
     });
   });
+  try {
+    let test = sources.invalid.path.to.variable;
+  } catch (err) {
+    logger.error({ error: err });
+  }
   Object.keys(counts).forEach((src) => {
     // let lcSrc = src.toLowerCase();
     if (!sources.hasOwnProperty(src)) {
