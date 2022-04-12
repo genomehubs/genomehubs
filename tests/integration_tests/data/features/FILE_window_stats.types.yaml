@@ -1,0 +1,32 @@
+file:
+  format: tsv
+  header: true
+  name: CAJNRB02.window_stats.tsv
+  source: tbc
+  source_url: http://example.com
+# analysis:
+#   assembly_id: GCA_905319855.2
+#   taxon_id: 9612
+#   description: Analysis of public assembly GCA_905319855.2 using BlobToolKit
+#   name: BlobToolKit
+#   title: BlobToolKit analysis of GCA_905319855.2
+attributes:
+  seq_length:
+    header: end
+  seq_proportion:
+    header: end
+    function: "{} / 2447447219"
+  gc:
+    header: gc
+  seq_level:
+    default: top
+feature:
+  feature_id:
+    header: sequence
+  feature_type:
+    default: sequence
+coordinates:
+  start:
+    header: start
+  end:
+    header: end

@@ -13,10 +13,8 @@ Usage:
                      [-h|--help] [-v|--version]
 
 Options:
-    --assembly-fasta PATH        Parse assembly fasta file
     --btk                        Parse assemblies in BlobToolKit
     --btk-root STRING            Scientific name of root taxon
-    --busco DIR                  Parse BUSCO results
     --gbif                       Parse taxa in GBIF
     --gbif-root STRING           GBIF taxon ID of root taxon
     --gbif-xref STRING           Include link to external reference from GBIF (e.g. NBN, BOLD)

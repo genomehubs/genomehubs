@@ -1,0 +1,56 @@
+attributes:
+  seq_length:
+    bins:
+      min: 1
+      max: 11
+      count: 10
+      scale: log10
+    constraint:
+      min: 0
+    description: Sequence length
+    display_level: 1
+    display_name: Sequence length
+    display_group: stats
+    type: long
+    units: bp
+  seq_proportion:
+    bins:
+      min: 0
+      max: 1
+      count: 10
+      scale: linear
+    constraint:
+      max: 1
+      min: 0
+    description: Proportional sequence length relative to full assembly span
+    display_level: 1
+    display_name: Proportional length
+    display_group: stats
+    type: float
+  gc:
+    bins:
+      min: 0
+      max: 1
+      count: 10
+      scale: linear
+    constraint:
+      max: 1
+      min: 0
+    description: Proportional sequence GC content = GC/ATGC
+    display_level: 1
+    display_name: GC content
+    display_group: stats
+    type: 3dp
+  seq_level:
+    constraint:
+      enum:
+        - top
+        - chromosome
+        - scaffold
+        - contig
+        - read
+    description: Sequence level
+    display_level: 2
+    display_name: Sequence level
+    display_group: stats
+    type: keyword

@@ -8,6 +8,7 @@ Usage:
                      [--config-file PATH...] [--config-save PATH]
                      [--es-host URL...] [--assembly-dir PATH]
                      [--assembly-repo URL] [--assembly-exception PATH]
+                     [--feature-dir PATH]
                      [--taxon-dir PATH] [--taxon-repo URL] [--taxon-exception PATH]
                      [--taxon-lookup STRING] [--taxon-lookup-root STRING]
                      [--taxon-lookup-in-memory] [--taxon-id-as-xref STRING]
@@ -30,6 +31,7 @@ Options:
     --assembly-repo URL        Remote git repository containing assembly-level data.
                                Optionally include `~branch-name` suffix.
     --assembly-exception PATH  Path to directory to write assembly data that failed to import.
+    --feature-dir PATH         Path to directory containing feature-level data.
     --taxon-lookup-root STRING Root taxon Id for in-memory lookup.
     --taxon-lookup STRING      Taxon name class to lookup (scientific|any). [Default: scientific]
     --taxon-lookup-in-memory   Flag to use in-memory taxon name lookup.
@@ -314,6 +316,91 @@ def index_file(es, types, names, data, opts, *, taxon_table=None):
             )
 
 
+def index_taxon_assembly(es, opts, index="taxon", *, dry_run=False, taxonomy_name):
+    """Call taxon- or assembly-specific indexing functions."""
+    taxon_table = None
+    if taxon_table is None and "taxon-lookup-in-memory" in opts:
+        taxon_table = {
+            "scientific": defaultdict(list),
+            "any": defaultdict(list),
+        }
+        load_taxon_table(es, opts, taxonomy_name, taxon_table)
+    data_dir = "%s-dir" % index
+    if data_dir in opts:
+        dir_path = opts[data_dir]
+        for types_file in sorted(Path(dir_path).glob("*.names.yaml")):
+            types, data, names = validate_types_file(
+                types_file, dir_path, es, index, opts
+            )
+            if "file" in types and "name" in types["file"]:
+                LOGGER.info("Indexing %s" % types["file"]["name"])
+                index_types(es, index, types, opts, dry_run=dry_run)
+                index_file(
+                    es,
+                    types,
+                    names,
+                    data,
+                    {
+                        **opts,
+                        "index": index,
+                        "index_types": index_types,
+                    },
+                    taxon_table=taxon_table,
+                )
+                if "tests" in types["file"]:
+                    result = test_json_dir(
+                        "%s/%s" % (dir_path, types["file"]["tests"]),
+                        opts["es-host"][0],
+                        opts,
+                    )
+                    if result is False:
+                        LOGGER.error("Failed tests")
+                        exit(1)
+                # time.sleep(5)
+        for types_file in sorted(Path(dir_path).glob("*.types.yaml")):
+            types, data, names = validate_types_file(
+                types_file, dir_path, es, index, opts
+            )
+            LOGGER.info("Indexing types")
+            index_types(es, index, types, opts, dry_run=dry_run)
+            if "file" in types and "name" in types["file"]:
+                LOGGER.info("Indexing %s" % types["file"]["name"])
+                index_file(
+                    es,
+                    types,
+                    names,
+                    data,
+                    {
+                        **opts,
+                        "index": index,
+                        "index_types": index_types,
+                    },
+                    taxon_table=taxon_table,
+                )
+                if "tests" in types["file"]:
+                    result = test_json_dir(
+                        "%s/%s" % (dir_path, types["file"]["tests"]),
+                        opts["es-host"][0],
+                        opts,
+                    )
+                    if result is False:
+                        LOGGER.error("Failed tests")
+                        exit(1)
+                # time.sleep(5)
+
+
+def index_features(es, opts, *, dry_run=False, taxonomy_name):
+    """Index assembly features."""
+    index = "feature"
+    data_dir = "%s-dir" % index
+    if data_dir in opts:
+        dir_path = opts[data_dir]
+    for types_file in sorted(Path(dir_path).glob("*.types.yaml")):
+        types, data, names = validate_types_file(types_file, dir_path, es, index, opts)
+        LOGGER.info("Indexing types")
+        index_types(es, index, types, opts, dry_run=True)
+
+
 def main(args):
     """Index files."""
     options = config("index", **args)
@@ -326,78 +413,21 @@ def main(args):
         hub.post_search_scripts(es)
 
     taxonomy_name = options["index"]["taxonomy-source"].lower()
-    taxon_table = None
-    if taxon_table is None and "taxon-lookup-in-memory" in options["index"]:
-        taxon_table = {
-            "scientific": defaultdict(list),
-            "any": defaultdict(list),
-        }
-        load_taxon_table(es, options["index"], taxonomy_name, taxon_table)
     dry_run = options["index"].get("dry-run", False)
     for index in list(["taxon", "assembly"]):
-        data_dir = "%s-dir" % index
-        if data_dir in options["index"]:
-            dir_path = options["index"][data_dir]
-            for types_file in sorted(Path(dir_path).glob("*.names.yaml")):
-                types, data, names = validate_types_file(
-                    types_file, dir_path, es, index, options["index"]
-                )
-                if "file" in types and "name" in types["file"]:
-                    LOGGER.info("Indexing %s" % types["file"]["name"])
-                    index_types(es, index, types, options["index"], dry_run=dry_run)
-                    index_file(
-                        es,
-                        types,
-                        names,
-                        data,
-                        {
-                            **options["index"],
-                            "index": index,
-                            "index_types": index_types,
-                        },
-                        taxon_table=taxon_table,
-                    )
-                    if "tests" in types["file"]:
-                        result = test_json_dir(
-                            "%s/%s" % (dir_path, types["file"]["tests"]),
-                            options["index"]["es-host"][0],
-                            options["index"],
-                        )
-                        if result is False:
-                            LOGGER.error("Failed tests")
-                            exit(1)
-                    # time.sleep(5)
-            for types_file in sorted(Path(dir_path).glob("*.types.yaml")):
-                types, data, names = validate_types_file(
-                    types_file, dir_path, es, index, options["index"]
-                )
-                LOGGER.info("Indexing types")
-                index_types(es, index, types, options["index"], dry_run=dry_run)
-                if "file" in types and "name" in types["file"]:
-                    LOGGER.info("Indexing %s" % types["file"]["name"])
-                    index_file(
-                        es,
-                        types,
-                        names,
-                        data,
-                        {
-                            **options["index"],
-                            "index": index,
-                            "index_types": index_types,
-                        },
-                        taxon_table=taxon_table,
-                    )
-                    if "tests" in types["file"]:
-                        result = test_json_dir(
-                            "%s/%s" % (dir_path, types["file"]["tests"]),
-                            options["index"]["es-host"][0],
-                            options["index"],
-                        )
-                        if result is False:
-                            LOGGER.error("Failed tests")
-                            exit(1)
-                    # time.sleep(5)
-    # TODO: #29 Implement alternate backbone taxonomies
+        index_taxon_assembly(
+            es,
+            options["index"],
+            index=index,
+            dry_run=dry_run,
+            taxonomy_name=taxonomy_name,
+        )
+
+    if "feature-dir" in options["index"]:
+        index_features(
+            es, options["index"], dry_run=dry_run, taxonomy_name=taxonomy_name
+        )
+
     if "file" in options["index"]:
         index_files(es, options["index"]["file"], taxonomy_name, options["index"])
     elif "file-metadata" in options["index"]:
