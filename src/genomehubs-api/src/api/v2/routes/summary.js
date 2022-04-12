@@ -14,11 +14,9 @@ const getSummary = async (params) => {
   if (params.result == "taxon") {
     ids = ids.map((id) => id.replace(/^taxon_id-/, ""));
   }
-  let fields = [];
+  let fields = (params.fields || "").split(/\s*,\s*/);
   if (!fields || fields == "all") {
     fields = Object.keys(typesMap);
-  } else {
-    fields = params.fields.split(/\s*,\s*/);
   }
   fields.filter((field) => Object.keys(typesMap).includes(field));
   const query = await aggregateRawValuesByTaxon({
