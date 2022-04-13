@@ -12,6 +12,7 @@ import TextField from "@material-ui/core/TextField";
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import { compose } from "recompose";
+import { getSuggestedTerm } from "../reducers/search";
 import { makeStyles } from "@material-ui/core/styles";
 import qs from "qs";
 import styles from "./Styles.scss";
@@ -113,7 +114,7 @@ const AutoCompleteOption = ({ option }) => {
 
 const siteName = SITENAME || "GenomeHub";
 
-const suggestedTerm = SUGGESTED_TERM || undefined;
+const suggestedTerm = getSuggestedTerm();
 
 const SearchBox = ({
   lookupTerm,

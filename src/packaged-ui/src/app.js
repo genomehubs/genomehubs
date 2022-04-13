@@ -2,14 +2,17 @@ const express = require("express");
 const path = require("path");
 const PORT = process.env.GH_PORT || process.env.GH_CLIENT_PORT || "8880";
 const GH_API_PORT = process.env.GH_API_PORT || "3000";
+const GH_API_HOST = process.env.GH_API_HOST || "localhost";
+const GH_SUGGESTED_TERM = process.env.GH_SUGGESTED_TERM || "Nematoda";
 const GH_API_VERSION = process.env.GH_API_VERSION || "v2";
 const GH_API_URL =
   process.env.GH_API_URL ||
-  `http://localhost:${GH_API_PORT}/api/${GH_API_VERSION}`;
+  `http://${GH_API_HOST}:${GH_API_PORT}/api/${GH_API_VERSION}`;
 const app = express();
 
 const ENV = {
   GH_API_URL,
+  GH_SUGGESTED_TERM,
 };
 
 // set the view engine to ejs

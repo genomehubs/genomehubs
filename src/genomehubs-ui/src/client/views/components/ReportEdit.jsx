@@ -15,12 +15,13 @@ import Switch from "@material-ui/core/Switch";
 import TextField from "@material-ui/core/TextField";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
+import { getSuggestedTerm } from "../reducers/search";
 import { makeStyles } from "@material-ui/core/styles";
 import qs from "qs";
 import withReportById from "../hocs/withReportById";
 import withTaxonomy from "../hocs/withTaxonomy";
 
-const suggestedTerm = SUGGESTED_TERM || undefined;
+const suggestedTerm = getSuggestedTerm();
 
 const xSettings = {
   prop: "x",
