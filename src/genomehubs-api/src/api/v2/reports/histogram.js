@@ -49,7 +49,7 @@ const getHistAggResults = (aggs, stats) => {
     }
   } else if (hist.by_lineage) {
     // TODO: support lineage category histogram
-    console.log(hist);
+    // console.log(hist);
   }
   return hist;
 };

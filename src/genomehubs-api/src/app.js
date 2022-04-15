@@ -6,6 +6,7 @@ import compression from "compression";
 import { config } from "./api/v2/functions/config.js";
 import cookieParser from "cookie-parser";
 import express from "express";
+import { logError } from "./api/v2/functions/logger.js";
 import path from "path";
 import swaggerUi from "swagger-ui-express";
 import zip from "express-easy-zip";
@@ -58,8 +59,6 @@ app.use(
   swaggerUi.setup(swaggerDocument, swaggerOptions)
 );
 
-// app.use(cache);
-
 app.use(
   OpenApiValidator.middleware({
     apiSpec: swaggerDocument,
@@ -78,7 +77,7 @@ app.use((err, req, res, next) => {
     errors: err.errors,
   };
   res.status(err.status || 500).json(error);
-  console.log(error);
+  logError({ ...error, req });
 });
 
 if (config.https) {

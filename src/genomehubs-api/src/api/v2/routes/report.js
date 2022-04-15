@@ -9,7 +9,7 @@ import { formatJson } from "../functions/formatJson";
 import { getResultCount } from "../functions/getResultCount";
 import { histogram } from "../reports/histogram";
 import { indexName } from "../functions/indexName";
-import logger from "../functions/logger";
+import { logError } from "../functions/logger";
 import qs from "qs";
 import { queryParams } from "../reports/queryParams";
 import { setRanks } from "../functions/setRanks";
@@ -519,11 +519,7 @@ export const getSources = async (params) => {
       }
     });
   });
-  try {
-    let test = sources.invalid.path.to.variable;
-  } catch (err) {
-    logger.error({ error: err });
-  }
+
   Object.keys(counts).forEach((src) => {
     // let lcSrc = src.toLowerCase();
     if (!sources.hasOwnProperty(src)) {
@@ -709,8 +705,12 @@ export const getTypes = async (params) => {
 };
 
 export const getReport = async (req, res) => {
-  req.url = req.url.replace(/&queryId=[\w\d-_]+/, "");
-  let report = await cacheFetch(req);
+  let report;
+  try {
+    report = await cacheFetch(req);
+  } catch (message) {
+    logError({ req, message });
+  }
   if (!report) {
     report = {};
     let queryString = qs.stringify(req.query);
@@ -758,7 +758,7 @@ export const getReport = async (req, res) => {
         report = await reportFunc(reportParams);
         cacheStore(req, report);
       } catch (message) {
-        console.log(message);
+        logError({ message, req });
         const timestamp = new Date();
         const error = `unexpected error at ${timestamp.toLocaleString()}`;
         let status = {
@@ -780,136 +780,115 @@ export const getReport = async (req, res) => {
     }
   }
   if (report && report != {}) {
-    report.name = req.query.report;
-    let typesMap;
-    if (report.name == "tree") {
-      typesMap = await attrTypes({ ...req.query });
+    try {
+      report.name = req.query.report;
+      let typesMap;
+      if (report.name == "tree") {
+        typesMap = await attrTypes({ ...req.query });
+      }
+      return res.format({
+        json: () => {
+          let response = formatJson(
+            { status: { success: true }, report },
+            req.query.indent
+          );
+          res.status(200).send(response);
+        },
+        "text/html": () => {
+          let response = formatJson(
+            { status: { success: true }, report },
+            req.query.indent
+          );
+          res.status(200).send(response);
+        },
+        ...(report.name == "tree" && {
+          "text/x-nh": () => {
+            let { lca, treeNodes } = report.report.tree.tree;
+            let rootNode;
+            if (lca) {
+              rootNode = lca.taxon_id;
+            }
+            let response = getNewickString({ treeNodes, rootNode });
+            res.status(200).send(response);
+          },
+          "application/xml": () => {
+            let { lca, treeNodes } = report.report.tree.tree;
+            let rootNode;
+            if (lca) {
+              rootNode = lca.taxon_id;
+            }
+            let { phyloXml } = getPhyloXml({ treeNodes, rootNode });
+            res.status(200).send(phyloXml);
+          },
+          "application/zip": () => {
+            let { lca, treeNodes } = report.report.tree.tree;
+            let rootNode;
+            if (lca) {
+              rootNode = lca.taxon_id;
+            }
+            let fields = report.report.tree.xQuery.fields.split(",");
+            let newick = getNewickString({ treeNodes, rootNode });
+            let { phyloXml, data } = getPhyloXml({
+              treeNodes,
+              rootNode,
+              fields,
+            });
+            let dataFiles = [];
+            if (data) {
+              let flat = "";
+              for (let arr of data.flat) {
+                flat += arr.join("\t") + "\n";
+              }
+              let tidy = "";
+              for (let arr of data.tidy) {
+                tidy += arr.join("\t") + "\n";
+              }
+              dataFiles = [
+                {
+                  content: flat,
+                  name: "tree.data.tsv",
+                  mode: "0644",
+                  comment: "TSV format data associated with tree nodes",
+                  date: new Date(),
+                  type: "file",
+                },
+                {
+                  content: tidy,
+                  name: "tree.tidyData.tsv",
+                  mode: "0644",
+                  comment: "TidyData format data associated with tree nodes",
+                  date: new Date(),
+                  type: "file",
+                },
+              ];
+            }
+            res.status(200).zip({
+              files: [
+                {
+                  content: newick,
+                  name: "tree.nwk",
+                  mode: "0644",
+                  comment: "Newick format tree file",
+                  date: new Date(),
+                  type: "file",
+                },
+                {
+                  content: phyloXml,
+                  name: "tree.xml",
+                  mode: "0644",
+                  comment: "PhyloXML format tree file",
+                  date: new Date(),
+                  type: "file",
+                },
+              ].concat(dataFiles),
+              filename: "tree.zip",
+            });
+          },
+        }),
+      });
+    } catch (message) {
+      logError({ req, message });
     }
-
-    return res.format({
-      json: () => {
-        res
-          .status(200)
-          .send(
-            formatJson({ status: { success: true }, report }, req.query.indent)
-          );
-      },
-      "text/html": () => {
-        res
-          .status(200)
-          .send(
-            formatJson({ status: { success: true }, report }, req.query.indent)
-          );
-      },
-      ...(report.name == "tree" && {
-        "text/x-nh": () => {
-          let { lca, treeNodes } = report.report.tree.tree;
-          let rootNode;
-          if (lca) {
-            rootNode = lca.taxon_id;
-          }
-          res.status(200).send(getNewickString({ treeNodes, rootNode }));
-        },
-        "application/xml": () => {
-          let { lca, treeNodes } = report.report.tree.tree;
-          let rootNode;
-          if (lca) {
-            rootNode = lca.taxon_id;
-          }
-
-          // let fields = report.report.tree.xQuery.fields;
-          // let meta;
-          // let field;
-          // if (fields) {
-          //   if (Array.isArray(fields)) {
-          //     field = fields[0];
-          //     meta = typesMap[fields[0]];
-          //   } else {
-          //     field = fields.replace(/,.+/, "");
-          //     meta = typesMap[field];
-          //   }
-          // }
-          let { phyloXml } = getPhyloXml({ treeNodes, rootNode });
-          res.status(200).send(phyloXml);
-        },
-        "application/zip": () => {
-          let { lca, treeNodes } = report.report.tree.tree;
-          let rootNode;
-          if (lca) {
-            rootNode = lca.taxon_id;
-          }
-
-          let fields = report.report.tree.xQuery.fields.split(",");
-          // let meta;
-          // let field;
-          // if (fields) {
-          //   if (Array.isArray(fields)) {
-          //     field = fields[0];
-          //     meta = typesMap[fields[0]];
-          //   } else {
-          //     field = fields.replace(/,.+/, "");
-          //     meta = typesMap[field];
-          //   }
-          // }
-          let newick = getNewickString({ treeNodes, rootNode });
-          let { phyloXml, data } = getPhyloXml({
-            treeNodes,
-            rootNode,
-            fields,
-          });
-          let dataFiles = [];
-          if (data) {
-            let flat = "";
-            for (let arr of data.flat) {
-              flat += arr.join("\t") + "\n";
-            }
-            let tidy = "";
-            for (let arr of data.tidy) {
-              tidy += arr.join("\t") + "\n";
-            }
-            dataFiles = [
-              {
-                content: flat,
-                name: "tree.data.tsv",
-                mode: "0644",
-                comment: "TSV format data associated with tree nodes",
-                date: new Date(),
-                type: "file",
-              },
-              {
-                content: tidy,
-                name: "tree.tidyData.tsv",
-                mode: "0644",
-                comment: "TidyData format data associated with tree nodes",
-                date: new Date(),
-                type: "file",
-              },
-            ];
-          }
-          res.status(200).zip({
-            files: [
-              {
-                content: newick,
-                name: "tree.nwk",
-                mode: "0644",
-                comment: "Newick format tree file",
-                date: new Date(),
-                type: "file",
-              },
-              {
-                content: phyloXml,
-                name: "tree.xml",
-                mode: "0644",
-                comment: "PhyloXML format tree file",
-                date: new Date(),
-                type: "file",
-              },
-            ].concat(dataFiles),
-            filename: "tree.zip",
-          });
-        },
-      }),
-    });
   }
-  return res.status(404).send({ status: "error" });
+  return res.status(400).send({ status: "error" });
 };

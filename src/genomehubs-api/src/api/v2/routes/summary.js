@@ -4,7 +4,7 @@ import { checkResponse } from "../functions/checkResponse";
 import { client } from "../functions/connection";
 import { formatJson } from "../functions/formatJson";
 import { indexName } from "../functions/indexName";
-import logger from "../functions/logger";
+import { logError } from "../functions/logger";
 
 const getSummary = async (params) => {
   let typesMap = await attrTypes({ ...params });
@@ -55,11 +55,12 @@ const getSummary = async (params) => {
 };
 
 export const getFieldSummary = async (req, res) => {
-  let response = {};
   try {
+    let response = {};
     response = await getSummary(req.query);
-  } catch (err) {
-    logger.error(err);
+    return res.status(200).send(formatJson(response, req.query.indent));
+  } catch (message) {
+    logError({ req, message });
+    return res.status(400).send({ status: "error" });
   }
-  return res.status(200).send(formatJson(response, req.query.indent));
 };

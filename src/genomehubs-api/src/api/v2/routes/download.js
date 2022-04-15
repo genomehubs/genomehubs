@@ -2,6 +2,7 @@ import { createReadStream, promises as fs } from "fs";
 
 import { config } from "../functions/config.js";
 import { getRecordsById } from "../functions/getRecordsById";
+import { logError } from "../functions/logger";
 
 const locateFile = async (params) => {
   let response = await getRecordsById({ ...params, result: "file" });
@@ -40,17 +41,22 @@ const locateFile = async (params) => {
 };
 
 export const getFile = async (req, res) => {
-  let response = {};
-  response = await locateFile(req.query);
-  if (response && response != {}) {
-    if (response.redirect) {
-      return res.redirect(response.redirect);
+  try {
+    let response = {};
+    response = await locateFile(req.query);
+    if (response && response != {}) {
+      if (response.redirect) {
+        return res.redirect(response.redirect);
+      }
+      res.setHeader("content-type", response.mime);
+      if (!req.query.streamFile) {
+        res.attachment(response.fileName);
+      }
+      return response.fileStream.pipe(res);
     }
-    res.setHeader("content-type", response.mime);
-    if (!req.query.streamFile) {
-      res.attachment(response.fileName);
-    }
-    return response.fileStream.pipe(res);
+    return res.status(404).send();
+  } catch (message) {
+    logError({ req, message });
+    return res.status(400).send({ status: "error" });
   }
-  return res.status(404).send();
 };

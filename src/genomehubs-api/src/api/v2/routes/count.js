@@ -1,10 +1,14 @@
-import { checkDocResponse } from "../functions/checkDocResponse";
-import { client } from "../functions/connection";
 import { formatJson } from "../functions/formatJson";
 import { getResultCount } from "../functions/getResultCount";
+import { logError } from "../functions/logger";
 
 export const getSearchResultCount = async (req, res) => {
-  let response = {};
-  response = await getResultCount(req.query);
-  return res.status(200).send(formatJson(response, req.query.indent));
+  try {
+    let response = {};
+    response = await getResultCount(req.query);
+    return res.status(200).send(formatJson(response, req.query.indent));
+  } catch (message) {
+    logError({ req, message });
+    return res.status(400).send({ status: "error" });
+  }
 };

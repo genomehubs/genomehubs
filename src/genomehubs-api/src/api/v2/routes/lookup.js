@@ -2,6 +2,7 @@ import { checkResponse } from "../functions/checkResponse";
 import { client } from "../functions/connection";
 import { formatJson } from "../functions/formatJson";
 import { indexName } from "../functions/indexName";
+import { logError } from "../functions/logger";
 import { processHits } from "../functions/processHits";
 
 const indices = {
@@ -154,21 +155,26 @@ const suggest = async (params, iter = 0) => {
 };
 
 export const getIdentifiers = async (req, res) => {
-  let response = {};
-  response = await sayt(req.query);
-  if (
-    !response.status ||
-    !response.status.success ||
-    response.status.hits == 0
-  ) {
-    response = await lookup(req.query);
+  try {
+    let response = {};
+    response = await sayt(req.query);
+    if (
+      !response.status ||
+      !response.status.success ||
+      response.status.hits == 0
+    ) {
+      response = await lookup(req.query);
+    }
+    if (
+      !response.status ||
+      !response.status.success ||
+      response.status.hits == 0
+    ) {
+      response = await suggest(req.query);
+    }
+    return res.status(200).send(formatJson(response, req.query.indent));
+  } catch (message) {
+    logError({ req, message });
+    return res.status(400).send({ status: "error" });
   }
-  if (
-    !response.status ||
-    !response.status.success ||
-    response.status.hits == 0
-  ) {
-    response = await suggest(req.query);
-  }
-  return res.status(200).send(formatJson(response, req.query.indent));
 };
