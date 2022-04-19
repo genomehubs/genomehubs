@@ -14,5 +14,5 @@
       "source.organizeImports.python": true
     }
   },
-  "esbonio.sphinx.confDir": ""
+  "esbonio.sphinx.confDir": "${workspaceFolder}/docs"
 }

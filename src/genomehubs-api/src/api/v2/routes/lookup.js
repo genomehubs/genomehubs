@@ -3,13 +3,16 @@ import { client } from "../functions/connection";
 import { formatJson } from "../functions/formatJson";
 import { indexName } from "../functions/indexName";
 import { logError } from "../functions/logger";
+import { lookupQuery } from "../queries/lookupQuery";
 import { processHits } from "../functions/processHits";
+import { saytQuery } from "../queries/saytQuery";
+import { suggestQuery } from "../queries/suggestQuery";
 
 const indices = {
   taxon: "taxon_id",
   assembly: "assembly",
   analysis: "analysis",
-  file: "file",
+  // file: "file",
 };
 
 const setResult = (iter) => {
@@ -47,12 +50,14 @@ const sayt = async (params, iter = 0) => {
         newParams.wildcardTerm = `${parts.join(" * ")}*`;
       }
     }
+  } else if (params.searchTerm.match(/\*/)) {
+    newParams.wildcardTerm = params.searchTerm;
   }
   let index = indexName(newParams);
   const { body } = await client
-    .searchTemplate({
+    .search({
       index,
-      body: { id: `${result}_sayt`, params: newParams },
+      body: saytQuery({ ...newParams }),
       rest_total_hits_as_int: true,
     })
     .catch((err) => {
@@ -87,14 +92,10 @@ const lookup = async (params, iter = 0) => {
   }
   let newParams = { ...params, result };
   let index = indexName(newParams);
-  let id = `${result}_lookup`;
-  if (params.lineage) {
-    id = `${id}_by_lineage`;
-  }
   const { body } = await client
-    .searchTemplate({
+    .search({
       index,
-      body: { id, params: newParams },
+      body: lookupQuery({ ...newParams }),
       rest_total_hits_as_int: true,
     })
     .catch((err) => {
@@ -123,9 +124,9 @@ const suggest = async (params, iter = 0) => {
   let newParams = { ...params, result };
   let index = indexName(newParams);
   const { body } = await client
-    .searchTemplate({
+    .search({
       index,
-      body: { id: `${result}_suggest`, params: newParams },
+      body: suggestQuery({ ...newParams }),
       rest_total_hits_as_int: true,
     })
     .catch((err) => {
