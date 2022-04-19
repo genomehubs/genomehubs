@@ -109,7 +109,10 @@ export const getRecordsByTaxon = async (props) => {
         rest_total_hits_as_int: true,
       })
       .catch((err) => {
-        logError({ message: err.meta.body.error, req: props.req });
+        logError({
+          message: err.meta.body.error,
+          ...(props.req && { req: props.req }),
+        });
         return err.meta;
       }));
   }
