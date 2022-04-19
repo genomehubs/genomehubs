@@ -1,4 +1,5 @@
 import { attrTypes } from "./attrTypes";
+import { logError } from "./logger";
 
 export const parseFields = async ({ result, fields, taxonomy }) => {
   let typesMap = await attrTypes({ result, taxonomy });
@@ -18,8 +19,8 @@ export const parseFields = async ({ result, fields, taxonomy }) => {
       fields = (fields || "").split(/\s*,\s*/);
     }
     return fields.map((key) => key.toLowerCase());
-  } catch (error) {
-    console.log(error);
+  } catch (message) {
+    logError({ req, message });
     return typesMap ? Object.keys(typesMap) : [];
   }
 };

@@ -26,6 +26,8 @@ export const config = {
   taxonomy: process.env.GH_TAXONOMY || "ncbi",
   release: process.env.GH_RELEASE || "v0.1",
   source: process.env.GH_SOURCE || undefined,
+  accessLog: process.env.GH_ACCESS_LOG || "./logs/access.log",
+  errorLog: process.env.GH_ERROR_LOG || "./logs/error.log",
   port: GH_API_PORT,
   cors: GH_ORIGINS,
   https: GH_HTTPS,

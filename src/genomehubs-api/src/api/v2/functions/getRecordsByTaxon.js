@@ -3,6 +3,7 @@ import { clearProgress, setProgress } from "./progress";
 import { checkResponse } from "./checkResponse";
 import { client } from "./connection";
 import { config } from "./config";
+import { logError } from "./logger";
 import { processHits } from "./processHits";
 import { searchByTaxon } from "../queries/searchByTaxon";
 
@@ -108,7 +109,7 @@ export const getRecordsByTaxon = async (props) => {
         rest_total_hits_as_int: true,
       })
       .catch((err) => {
-        console.log(err.meta.body.error);
+        logError({ message: err.meta.body.error, req: props.req });
         return err.meta;
       }));
   }

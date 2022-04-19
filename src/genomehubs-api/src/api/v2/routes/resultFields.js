@@ -1,6 +1,7 @@
 import { attrTypes } from "../functions/attrTypes";
 import { config } from "../functions/config";
 import { formatJson } from "../functions/formatJson";
+import { logError } from "../functions/logger";
 
 export const getResultFields = async (req, res) => {
   let fields = {};
@@ -13,7 +14,8 @@ export const getResultFields = async (req, res) => {
     fields = await attrTypes({ ...req.query });
     identifiers = await attrTypes({ ...req.query, indexType: "identifiers" });
     status = { success: true };
-  } catch {
+  } catch (message) {
+    logError({ req, message });
     status = { success: false, error: "Unable to fetch fields" };
   }
   let response = { status, fields, identifiers, hub, release, source };
