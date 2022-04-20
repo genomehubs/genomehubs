@@ -15,6 +15,7 @@ import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
 import Grid from "@material-ui/core/Grid";
+import MultiCatLegend from "./MultiCatLegend";
 import Tooltip from "@material-ui/core/Tooltip";
 import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
@@ -160,8 +161,15 @@ const searchByCell = ({
 };
 
 const CustomBackground = ({ chartProps, ...props }) => {
+  let legendGroup = null;
+  if (props.index == 0) {
+    legendGroup = MultiCatLegend({
+      ...chartProps,
+      // stats,
+    });
+  }
   if (chartProps.i > 0) {
-    return null;
+    return legendGroup;
   }
   let h = props.background.height;
   let w = props.width * chartProps.n;
@@ -191,6 +199,7 @@ const CustomBackground = ({ chartProps, ...props }) => {
       );
     }
   });
+
   return (
     <>
       <Tooltip
@@ -218,6 +227,7 @@ const CustomBackground = ({ chartProps, ...props }) => {
           }
         />
       </Tooltip>
+      {legendGroup}
     </>
   );
 };
@@ -288,11 +298,12 @@ const Histogram = ({
       )}
     </YAxis>,
   ];
-  if (width > 300) {
-    axes.push(
-      <Legend key={"legend"} verticalAlign="top" offset={28} height={28} />
-    );
-  }
+  // if (width > 300) {
+  //   axes.push(
+  //     <Legend key={"legend"} verticalAlign="top" offset={28} height={28} />
+  //   );
+  // }
+  let legendRows = Math.ceil((chartProps.n * 150) / (width - 50));
   return (
     <BarChart
       width={width}
@@ -301,7 +312,7 @@ const Histogram = ({
       barCategoryGap={0}
       data={data}
       margin={{
-        top: 5,
+        top: legendRows ? legendRows * 35 + 5 : 5,
         right: 30,
         left: 20,
         bottom: width > 300 ? 25 : 5,
@@ -319,7 +330,12 @@ const Histogram = ({
             <CustomBackground
               chartProps={{
                 ...chartProps,
+                width: width - 45,
+                x: 10,
+                name: cat,
+                fill: colors[i],
                 i,
+                stats: chartProps.stats[cat],
               }}
             />
           }
@@ -403,6 +419,7 @@ const ReportHistogram = ({
       valueType,
       interval
     );
+    let stats = {};
     if (histograms.byCat) {
       cats = histogram.report.histogram.cats.map((cat) => cat.label);
       let sums = {};
@@ -410,7 +427,19 @@ const ReportHistogram = ({
         if (i < histograms.buckets.length - 1) {
           let series = {};
           histogram.report.histogram.cats.forEach((cat) => {
+            if (!stats[cat.label]) {
+              stats[cat.label] = {
+                sum: 0,
+                min: Number.POSITIVE_INFINITY,
+                max: Number.NEGATIVE_INFINITY,
+              };
+            }
             let value = histograms.byCat[cat.key][i];
+            if (value > 0) {
+              stats[cat.label].sum += value;
+              stats[cat.label].min = Math.min(stats[cat.label].min, value);
+              stats[cat.label].max = Math.max(stats[cat.label].max, value);
+            }
             if (cumulative) {
               if (!sums[cat.key]) {
                 sums[cat.key] = 0;
@@ -432,10 +461,21 @@ const ReportHistogram = ({
       });
     } else {
       cats = ["all taxa"];
+      stats["all taxa"] = {
+        sum: 0,
+        min: Number.POSITIVE_INFINITY,
+        max: Number.NEGATIVE_INFINITY,
+      };
       let sum = 0;
       histograms.buckets.forEach((bucket, i) => {
         if (i < histograms.buckets.length - 1) {
           let value = histograms.allValues[i];
+          if (value > 0) {
+            stats["all taxa"].sum += value;
+            stats["all taxa"].min = Math.min(stats["all taxa"].min, value);
+            stats["all taxa"].max = Math.max(stats["all taxa"].max, value);
+          }
+
           if (cumulative) {
             value += sum;
             sum = value;
@@ -475,6 +515,7 @@ const ReportHistogram = ({
               : false
             : true,
           ranks: histograms.ranks,
+          stats,
           buckets: histograms.buckets,
           xFormat: (value) => formats(value, valueType),
           embedded,

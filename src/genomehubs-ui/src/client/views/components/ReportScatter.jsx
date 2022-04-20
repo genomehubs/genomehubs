@@ -30,6 +30,7 @@ import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";
+import { zLegend } from "./zLegend";
 
 const searchByCell = ({
   xQuery,
@@ -136,43 +137,89 @@ const CustomDot = (props, chartProps) => {
   );
 };
 
-const zLegend = ({ props, chartProps, scale, domain }) => {
-  let { width, x } = props.xAxis;
-  let { height, y } = props.yAxis;
+// const zLegendOrig = ({ props, chartProps, scale, domain }) => {
+//   let { width, x } = props.xAxis;
+//   let { height, y } = props.yAxis;
+//   let cells = [];
+//   let count = 10;
+//   let range = domain[1] - domain[0];
+//   let step = range / (count - 1);
+//   while (range < count) {
+//     count--;
+//   }
+//   let yScale = scaleLinear()
+//     .domain([0, count])
+//     .range([height + y, height * 0.7 + y]);
+//   let cellHeight = yScale(2) - yScale(1);
+//   for (let i = 0; i < count; i++) {
+//     let zValue = Math.ceil(domain[0] + i * step);
+//     cells.push(
+//       <g key={`cell-${i}`} transform={`translate(10,${yScale(i)})`}>
+//         <Rectangle
+//           key={`cell-${i}`}
+//           height={cellHeight}
+//           width={10}
+//           fill={props.fill}
+//           x={0} // {props.cx + (w - width) / 2}
+//           y={0}
+//           fillOpacity={scale(zValue)}
+//           style={{ pointerEvents: "none" }}
+//         />
+//         {(i == 0 || i == count - 1) && (
+//           <Text
+//             x={12}
+//             y={cellHeight / 2}
+//             fill={"black"}
+//             dominantBaseline={"central"}
+//             textAnchor={"start"}
+//           >
+//             {formats(zValue, "integer")}
+//           </Text>
+//         )}
+//       </g>
+//     );
+//   }
+
+//   return <g transform={`translate(${width + x})`}>{cells}</g>;
+// };
+
+const singleCatLegend = ({ range, domain, scale, width, x, y, fill }) => {
   let cells = [];
   let count = 10;
-  let range = domain[1] - domain[0];
   let step = range / (count - 1);
+  let cellSize = 15;
   while (range < count) {
     count--;
   }
-  let yScale = scaleLinear()
+  let xScale = scaleLinear()
     .domain([0, count])
-    .range([height + y, height * 0.7 + y]);
-  let cellHeight = yScale(2) - yScale(1);
-  console.log(yScale(0));
+    .range([0, cellSize * count]);
+  let legendWidth = cellSize * count;
+
   for (let i = 0; i < count; i++) {
     let zValue = Math.ceil(domain[0] + i * step);
-    console.log({ y: yScale(i), z: zValue });
     cells.push(
-      <g key={`cell-${i}`} transform={`translate(10,${yScale(i)})`}>
+      <g
+        key={`cell-${i}`}
+        transform={`translate(${xScale(i)},${y - cellSize * 1.5})`}
+      >
         <Rectangle
           key={`cell-${i}`}
-          height={cellHeight}
-          width={10}
-          fill={props.fill}
+          height={cellSize * 2}
+          width={cellSize}
+          fill={fill}
           x={0} // {props.cx + (w - width) / 2}
-          y={0}
+          y={-cellSize}
           fillOpacity={scale(zValue)}
           style={{ pointerEvents: "none" }}
         />
         {(i == 0 || i == count - 1) && (
           <Text
-            x={12}
-            y={cellHeight / 2}
-            fill={"black"}
+            x={i == 0 ? -5 : cellSize + 5}
+            y={0}
+            fill={"rgb(102, 102, 102)"}
             dominantBaseline={"central"}
-            textAnchor={"start"}
+            textAnchor={i == 0 ? "end" : "start"}
           >
             {formats(zValue, "integer")}
           </Text>
@@ -181,7 +228,7 @@ const zLegend = ({ props, chartProps, scale, domain }) => {
     );
   }
 
-  return <g transform={`translate(${width + x})`}>{cells}</g>;
+  return <g transform={`translate(${x + width - legendWidth})`}>{cells}</g>;
 };
 
 const CustomShape = (props, chartProps) => {
@@ -258,7 +305,7 @@ const CustomShape = (props, chartProps) => {
       scale.range([0.1, 1]);
     } else if (chartProps.zScale == "proportion") {
       scale.domain([0, 1]).range([0, w]);
-      z /= chartProps.catSums[props.name];
+      z /= chartProps.catSums[props.name].sum;
     }
     let width = scale(z);
     heatRect = (
@@ -278,7 +325,8 @@ const CustomShape = (props, chartProps) => {
       />
     );
     if (props.key == "symbol-0") {
-      legendGroup = zLegend({ props, chartProps, scale, domain });
+      legendGroup = zLegend({ props, chartProps });
+      // legendGroupOrig = zLegendOrig({ props, chartProps, scale, domain });
     }
   }
 
@@ -287,6 +335,7 @@ const CustomShape = (props, chartProps) => {
       {bgRect}
       {heatRect}
       {legendGroup}
+      {/* {legendGroupOrig} */}
     </>
   );
 };
@@ -493,11 +542,11 @@ const Heatmap = ({
     ></ZAxis>,
     // <Tooltip />,
   ];
-  if (width > 300) {
-    axes.push(
-      <Legend key={"legend"} verticalAlign="top" offset={28} height={28} />
-    );
-  }
+  // if (width > 300) {
+  //   axes.push(
+  //     <Legend key={"legend"} verticalAlign="top" offset={28} height={28} />
+  //   );
+  // }
   // axes.push(<Legend content={(props) => renderLegend(props, chartProps)} />);
 
   // let stripe = 4;
@@ -564,30 +613,35 @@ const Heatmap = ({
     }
   }
 
+  let legendRows = Math.ceil((chartProps.n * 150) / (width - 50));
   return (
     <ScatterChart
       width={width}
       height={height}
       data={data}
       margin={{
-        top: 5,
-        right: 1 ? 60 : 30,
+        top: legendRows ? legendRows * 35 + 5 : 5,
+        right: 30,
         left: 20,
         bottom: width > 300 ? (buckets.length > 15 ? 35 : 25) : 5,
       }}
     >
       {/* {patterns} */}
       {axes}
-      {cats.map((cat, i) => (
-        <Scatter
-          name={cat}
-          key={cat}
-          data={data[i]}
-          fill={colors[i]}
-          shape={(props) => CustomShape(props, { ...chartProps, i })}
-          isAnimationActive={false}
-        />
-      ))}
+      {cats.map((cat, i) => {
+        let range = [Math.max()];
+
+        return (
+          <Scatter
+            name={cat}
+            key={cat}
+            data={data[i]}
+            fill={colors[i]}
+            shape={(props) => CustomShape(props, { ...chartProps, i })}
+            isAnimationActive={false}
+          />
+        );
+      })}
       {pointData &&
         cats.map((cat, i) => (
           <Scatter
