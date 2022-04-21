@@ -49,10 +49,14 @@ const MultiCatLegend = ({ width, x, fill, i, n = 1, name, stats }) => {
           dominantBaseline={"central"}
           textAnchor={"end"}
         >
-          {`n=${formats(stats.sum, "integer")} [${formats(
-            stats.min,
-            "integer"
-          )}-${formats(stats.max, "integer")}]`}
+          {`n=${formats(stats.sum, "integer")}${
+            stats.sum > 0 && stats.max > stats.min
+              ? ` [${formats(stats.min, "integer")}-${formats(
+                  stats.max,
+                  "integer"
+                )}]`
+              : ""
+          }`}
         </Text>
       )}
       <Rectangle
