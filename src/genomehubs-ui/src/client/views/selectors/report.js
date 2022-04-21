@@ -300,7 +300,11 @@ const processScatter = (scatter) => {
     catSums = {};
     cats = scatter.cats.map((cat) => cat.label);
     scatter.cats.forEach((cat) => {
-      catSums[cat.label] = 0;
+      catSums[cat.label] = {
+        sum: 0,
+        min: Number.POSITIVE_INFINITY,
+        max: Number.NEGATIVE_INFINITY,
+      };
       let catData = [];
       heatmaps.buckets.forEach((bucket, i) => {
         if (bucket && scatter.bounds.scale == "ordinal") {
@@ -341,7 +345,9 @@ const processScatter = (scatter) => {
                   z,
                   count,
                 });
-                catSums[cat.label] += z;
+                catSums[cat.label].sum += z;
+                catSums[cat.label].min = Math.min(catSums[cat.label].min, z);
+                catSums[cat.label].max = Math.max(catSums[cat.label].max, z);
               }
             }
           });
@@ -409,6 +415,12 @@ const processScatter = (scatter) => {
     });
   } else {
     cats = ["all taxa"];
+    catSums = {};
+    catSums["all taxa"] = {
+      sum: 0,
+      min: Number.POSITIVE_INFINITY,
+      max: Number.NEGATIVE_INFINITY,
+    };
     let catData = [];
     heatmaps.buckets.forEach((bucket, i) => {
       if (bucket && scatter.bounds.scale == "ordinal") {
@@ -444,6 +456,9 @@ const processScatter = (scatter) => {
                 z,
                 count: z,
               });
+              catSums["all taxa"].sum += z;
+              catSums["all taxa"].min = Math.min(catSums["all taxa"].min, z);
+              catSums["all taxa"].max = Math.max(catSums["all taxa"].max, z);
             }
           }
         });

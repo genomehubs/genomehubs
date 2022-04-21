@@ -426,7 +426,12 @@ export const histogram = async ({
     fields: apiParams.fields,
     taxonomy,
   });
-  let { params, fields, summaries } = queryParams({ term: x, result, rank });
+  let xTerm = combineQueries(y, x);
+  let { params, fields, summaries } = queryParams({
+    term: xTerm,
+    result,
+    rank,
+  });
   // let exclude = [];
   if (cat && typesMap[cat]) {
     searchFields.push(cat);
@@ -524,6 +529,7 @@ export const histogram = async ({
   // params.excludeMissing = [
   //   ...new Set((apiParams.excludeMissing || []).concat(exclude)),
   // ];
+  console.log(params.excludeMissing);
 
   params.includeEstimates = apiParams.hasOwnProperty("includeEstimates")
     ? apiParams.includeEstimates
@@ -532,18 +538,36 @@ export const histogram = async ({
   params.excludeDirect = apiParams.excludeDirect || [];
   params.excludeDescendant = apiParams.excludeDescendant || [];
   params.excludeAncestral = apiParams.excludeAncestral || [];
-  params.excludeMissing = apiParams.excludeMissing || [];
+  if (params.excludeMissing && params.excludeMissing.length > 0) {
+    if (apiParams.excludeMissing) {
+      params.excludeMissing = params.excludeMissing.concat(
+        apiParams.excludeMissing
+      );
+    }
+  } else {
+    params.excludeMissing = apiParams.excludeMissing || [];
+  }
 
   yParams.excludeDirect = apiParams.excludeDirect || [];
   yParams.excludeDescendant = apiParams.excludeDescendant || [];
   yParams.excludeAncestral = apiParams.excludeAncestral || [];
-  yParams.excludeMissing = apiParams.excludeMissing || [];
+  if (yParams.excludeMissing && yParams.excludeMissing.length > 0) {
+    if (apiParams.excludeMissing) {
+      yParams.excludeMissing = yParams.excludeMissing.concat(
+        apiParams.excludeMissing
+      );
+    }
+  } else {
+    yParams.excludeMissing = apiParams.excludeMissing || [];
+  }
 
   if (yFields) {
     fields = fields.concat(yFields);
   }
   fields = [...new Set(fields)];
+  console.log(params.excludeMissing);
   exclusions = setExclusions(params);
+  console.log(exclusions);
   let bounds = await getBounds({
     params: { ...params },
     fields,
