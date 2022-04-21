@@ -324,10 +324,9 @@ const CustomShape = (props, chartProps) => {
         style={{ pointerEvents: "none" }}
       />
     );
-    if (props.key == "symbol-0") {
-      legendGroup = zLegend({ props, chartProps });
-      // legendGroupOrig = zLegendOrig({ props, chartProps, scale, domain });
-    }
+  }
+  if (props.key == "symbol-0") {
+    legendGroup = zLegend({ props, chartProps });
   }
 
   return (
