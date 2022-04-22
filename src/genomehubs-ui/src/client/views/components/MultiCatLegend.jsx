@@ -33,7 +33,6 @@ const MultiCatLegend = ({
 
   let value;
   if (stats) {
-    console.log(stats);
     if (stats.sum) {
       value = (
         <Text
@@ -54,7 +53,6 @@ const MultiCatLegend = ({
         </Text>
       );
     } else if (stats.count) {
-      console.log(stats.count);
       value = (
         <text
           x={-5}
@@ -97,7 +95,7 @@ const MultiCatLegend = ({
         width={cellSize / 2}
         fill={fill || "rgb(102, 102, 102)"}
         x={0} // {props.cx + (w - width) / 2}
-        y={-cellSize * 0.75}
+        y={-cellSize / 2}
         style={{ pointerEvents: "none" }}
       />
     </g>
