@@ -138,7 +138,6 @@ const PieComponent = ({ data, height, width, colors }) => {
 
 const RadialBarComponent = ({ data, height, width, colors }) => {
   const renderRadialBarLabel = (props) => {
-    console.log(props);
     const { cx, cy, index, viewBox, fill, value, data, background, width, n } =
       props;
     const fontSize = (viewBox.outerRadius - viewBox.innerRadius) / 2;
