@@ -8,7 +8,7 @@ ENV CONTAINER_VERSION=$VERSION
 
 RUN apk add --no-cache curl gcompat libstdc++ libgcc
 
-RUN mkdir -p /genomehubs
+RUN mkdir -p /genomehubs/logs
 
 RUN addgroup -S genomehubs \
     && adduser -S genomehubs -G genomehubs \
