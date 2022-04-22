@@ -385,14 +385,14 @@ const CustomizedYAxisTick = (props, buckets, fmt) => {
     value = fmt(value);
   }
   return (
-    <g transform={`translate(${x - 16},${y - offset})`}>
+    <g transform={`translate(${x - 2},${y - offset})`}>
       <text
         x={0}
         y={0}
-        dy={16}
-        textAnchor="middle"
+        dy={5}
+        textAnchor="end"
         fill={fill}
-        transform={"rotate(-90)"}
+        // transform={"rotate(-90)"}
       >
         {value}
       </text>
@@ -612,7 +612,8 @@ const Heatmap = ({
     }
   }
 
-  let legendRows = Math.ceil((chartProps.n * 150) / (width - 50));
+  let rowWidth = Math.floor((width - 50) / 150);
+  let legendRows = Math.ceil(chartProps.n / rowWidth);
   return (
     <ScatterChart
       width={width}
@@ -635,7 +636,7 @@ const Heatmap = ({
             name={cat}
             key={cat}
             data={data[i]}
-            fill={colors[i]}
+            fill={colors[i] || "rgb(102, 102, 102)"}
             shape={(props) => CustomShape(props, { ...chartProps, i })}
             isAnimationActive={false}
           />
@@ -648,7 +649,7 @@ const Heatmap = ({
             legendType="none"
             key={i}
             data={pointData[i]}
-            fill={colors[i]}
+            fill={colors[i] || "rgb(102, 102, 102)"}
             shape={"circle"}
             zAxisId={1}
             isAnimationActive={false}

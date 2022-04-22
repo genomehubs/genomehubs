@@ -12,10 +12,13 @@ import { format } from "d3-format";
 import { timeFormat } from "d3-time-format";
 
 const sci = (v) => {
-  if (v < 1000) {
+  if (v < 1000 && v >= 0.001) {
+    if (v < 10) {
+      return format(".3r")(v).replace(/0*$/, "");
+    }
     return format(".3r")(v);
   }
-  format(".3s")(v);
+  return format(".3s")(v);
 };
 const sciInt = (v) => {
   if (v < 1000) {

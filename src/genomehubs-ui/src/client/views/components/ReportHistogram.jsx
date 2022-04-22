@@ -303,7 +303,8 @@ const Histogram = ({
   //     <Legend key={"legend"} verticalAlign="top" offset={28} height={28} />
   //   );
   // }
-  let legendRows = Math.ceil((chartProps.n * 150) / (width - 50));
+  let rowWidth = Math.floor((width - 50) / 150);
+  let legendRows = Math.ceil(chartProps.n / rowWidth);
   return (
     <BarChart
       width={width}
@@ -333,7 +334,7 @@ const Histogram = ({
                 width: width - 45,
                 x: 10,
                 name: cat,
-                fill: colors[i],
+                fill: colors[i] || "rgb(102, 102, 102)",
                 i,
                 stats: chartProps.stats[cat],
               }}
@@ -346,7 +347,7 @@ const Histogram = ({
           dataKey={cat}
           key={i}
           stackId={stacked ? 1 : false}
-          fill={colors[i]}
+          fill={colors[i] || "rgb(102, 102, 102)"}
           isAnimationActive={false}
           style={{ pointerEvents: "none" }}
         />

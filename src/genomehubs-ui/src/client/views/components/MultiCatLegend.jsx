@@ -19,7 +19,7 @@ const MultiCatLegend = ({ width, x, fill, i, n = 1, name, stats }) => {
   }
   if (row >= n) {
     row = n - 1;
-  } else if (j > 1 && j * row > n) {
+  } else if (j > 1 && j * (row + 1) > n) {
     i += j * (row + 1) - n;
   }
   let xPos = x + width - legendWidth * (row - i);
@@ -34,7 +34,7 @@ const MultiCatLegend = ({ width, x, fill, i, n = 1, name, stats }) => {
       <Text
         x={-5}
         y={0}
-        fill={fill}
+        fill={fill || "rgb(102, 102, 102)"}
         dominantBaseline={"central"}
         textAnchor={"end"}
         fontWeight={"bold"}
@@ -63,7 +63,7 @@ const MultiCatLegend = ({ width, x, fill, i, n = 1, name, stats }) => {
         key={`cell-${i}`}
         height={cellSize * 2}
         width={cellSize / 2}
-        fill={fill}
+        fill={fill || "rgb(102, 102, 102)"}
         x={0} // {props.cx + (w - width) / 2}
         y={-cellSize / 2}
         style={{ pointerEvents: "none" }}
@@ -72,7 +72,7 @@ const MultiCatLegend = ({ width, x, fill, i, n = 1, name, stats }) => {
   );
 
   return (
-    <g transform={`translate(${x + width - legendWidth * (row - i)})`}>
+    <g transform={`translate(${x + width - legendWidth * (row - i)}, 5)`}>
       {text}
     </g>
   );
