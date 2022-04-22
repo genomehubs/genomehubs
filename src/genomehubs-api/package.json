@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/genomehubs/genomehubs-api#readme",
   "dependencies": {
-    "@elastic/elasticsearch": "^7.9.1",
+    "@elastic/elasticsearch": "7.11",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

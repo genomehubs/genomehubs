@@ -44,6 +44,4 @@ export const config = {
   scrollDuration: process.env.GH_SCROLL_DURATION || "30s",
 };
 
-console.log(config.url);
-
 export default config;

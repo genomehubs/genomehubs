@@ -529,7 +529,6 @@ export const histogram = async ({
   // params.excludeMissing = [
   //   ...new Set((apiParams.excludeMissing || []).concat(exclude)),
   // ];
-  console.log(params.excludeMissing);
 
   params.includeEstimates = apiParams.hasOwnProperty("includeEstimates")
     ? apiParams.includeEstimates
@@ -565,9 +564,7 @@ export const histogram = async ({
     fields = fields.concat(yFields);
   }
   fields = [...new Set(fields)];
-  console.log(params.excludeMissing);
   exclusions = setExclusions(params);
-  console.log(exclusions);
   let bounds = await getBounds({
     params: { ...params },
     fields,
