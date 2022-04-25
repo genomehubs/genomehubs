@@ -4,6 +4,7 @@ htmlcov
 *.egg-info
 .tox
 build
+_build
 .coverage
 .DS_Store
 .vscode/.ropeproject
