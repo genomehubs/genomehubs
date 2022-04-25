@@ -25,10 +25,12 @@ import dispatchMessage from "../hocs/dispatchMessage";
 import { format } from "d3-format";
 // import { point } from "leaflet";
 import qs from "qs";
+import { scaleLinear } from "d3-scale";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";
+import { zLegend } from "./zLegend";
 
 const searchByCell = ({
   xQuery,
@@ -135,6 +137,100 @@ const CustomDot = (props, chartProps) => {
   );
 };
 
+// const zLegendOrig = ({ props, chartProps, scale, domain }) => {
+//   let { width, x } = props.xAxis;
+//   let { height, y } = props.yAxis;
+//   let cells = [];
+//   let count = 10;
+//   let range = domain[1] - domain[0];
+//   let step = range / (count - 1);
+//   while (range < count) {
+//     count--;
+//   }
+//   let yScale = scaleLinear()
+//     .domain([0, count])
+//     .range([height + y, height * 0.7 + y]);
+//   let cellHeight = yScale(2) - yScale(1);
+//   for (let i = 0; i < count; i++) {
+//     let zValue = Math.ceil(domain[0] + i * step);
+//     cells.push(
+//       <g key={`cell-${i}`} transform={`translate(10,${yScale(i)})`}>
+//         <Rectangle
+//           key={`cell-${i}`}
+//           height={cellHeight}
+//           width={10}
+//           fill={props.fill}
+//           x={0} // {props.cx + (w - width) / 2}
+//           y={0}
+//           fillOpacity={scale(zValue)}
+//           style={{ pointerEvents: "none" }}
+//         />
+//         {(i == 0 || i == count - 1) && (
+//           <Text
+//             x={12}
+//             y={cellHeight / 2}
+//             fill={"black"}
+//             dominantBaseline={"central"}
+//             textAnchor={"start"}
+//           >
+//             {formats(zValue, "integer")}
+//           </Text>
+//         )}
+//       </g>
+//     );
+//   }
+
+//   return <g transform={`translate(${width + x})`}>{cells}</g>;
+// };
+
+const singleCatLegend = ({ range, domain, scale, width, x, y, fill }) => {
+  let cells = [];
+  let count = 10;
+  let step = range / (count - 1);
+  let cellSize = 15;
+  while (range < count) {
+    count--;
+  }
+  let xScale = scaleLinear()
+    .domain([0, count])
+    .range([0, cellSize * count]);
+  let legendWidth = cellSize * count;
+
+  for (let i = 0; i < count; i++) {
+    let zValue = Math.ceil(domain[0] + i * step);
+    cells.push(
+      <g
+        key={`cell-${i}`}
+        transform={`translate(${xScale(i)},${y - cellSize * 1.5})`}
+      >
+        <Rectangle
+          key={`cell-${i}`}
+          height={cellSize * 2}
+          width={cellSize}
+          fill={fill}
+          x={0} // {props.cx + (w - width) / 2}
+          y={-cellSize}
+          fillOpacity={scale(zValue)}
+          style={{ pointerEvents: "none" }}
+        />
+        {(i == 0 || i == count - 1) && (
+          <Text
+            x={i == 0 ? -5 : cellSize + 5}
+            y={0}
+            fill={"rgb(102, 102, 102)"}
+            dominantBaseline={"central"}
+            textAnchor={i == 0 ? "end" : "start"}
+          >
+            {formats(zValue, "integer")}
+          </Text>
+        )}
+      </g>
+    );
+  }
+
+  return <g transform={`translate(${x + width - legendWidth})`}>{cells}</g>;
+};
+
 const CustomShape = (props, chartProps) => {
   let h = props.yAxis.height / chartProps.yLength;
   if (chartProps.yValueType == "date") {
@@ -149,7 +245,7 @@ const CustomShape = (props, chartProps) => {
       props.xAxis.scale(props.payload.xBound) -
       props.xAxis.scale(props.payload.x);
   }
-  let heatRect;
+  let heatRect, legendGroup;
   let xRange, yRange;
   if (chartProps.bounds.scale == "ordinal") {
     try {
@@ -209,7 +305,7 @@ const CustomShape = (props, chartProps) => {
       scale.range([0.1, 1]);
     } else if (chartProps.zScale == "proportion") {
       scale.domain([0, 1]).range([0, w]);
-      z /= chartProps.catSums[props.name];
+      z /= chartProps.catSums[props.name].sum;
     }
     let width = scale(z);
     heatRect = (
@@ -229,11 +325,16 @@ const CustomShape = (props, chartProps) => {
       />
     );
   }
+  if (props.key == "symbol-0") {
+    legendGroup = zLegend({ props, chartProps });
+  }
 
   return (
     <>
       {bgRect}
       {heatRect}
+      {legendGroup}
+      {/* {legendGroupOrig} */}
     </>
   );
 };
@@ -284,14 +385,14 @@ const CustomizedYAxisTick = (props, buckets, fmt) => {
     value = fmt(value);
   }
   return (
-    <g transform={`translate(${x - 16},${y - offset})`}>
+    <g transform={`translate(${x - 2},${y - offset})`}>
       <text
         x={0}
         y={0}
-        dy={16}
-        textAnchor="middle"
+        dy={5}
+        textAnchor="end"
         fill={fill}
-        transform={"rotate(-90)"}
+        // transform={"rotate(-90)"}
       >
         {value}
       </text>
@@ -317,6 +418,33 @@ const CustomizedXAxisTick = (props, buckets, fmt) => {
     </g>
   );
 };
+
+// const renderLegend = (props, chartProps) => {
+//   console.log(props);
+//   const { payload } = props;
+//   if (payload.length == 1) {
+//     console.log(chartProps);
+//   }
+
+//   // let html = <div class="recharts-legend-wrapper" style="position: absolute; width: 1013px; height: 28px; left: 20px; top: 5px;"><ul class="recharts-default-legend" style="padding: 0px; margin: 0px; text-align: center;"><li class="recharts-legend-item legend-item-0" style="display: inline-block; margin-right: 10px;"><svg class="recharts-surface" width="14" height="14" viewBox="0 0 32 32" version="1.1" style="display: inline-block; vertical-align: middle; margin-right: 4px;"><path fill="#1f78b4" cx="16" cy="16" type="circle" class="recharts-symbols" transform="translate(16, 16)" d="M16,0A16,16,0,1,1,-16,0A16,16,0,1,1,16,0"></path></svg><span class="recharts-legend-item-text" style="color: rgb(31, 120, 180);">all taxa</span></li></ul></div>
+
+//   return (
+//     <ul
+//       className={"recharts-default-legend"}
+//       style={{ padding: "0px", margin: "0px", textAlign: "center" }}
+//     >
+//       {payload.map((entry, index) => (
+//         <li
+//           className={"recharts-legend-item legend-item-0"}
+//           key={`item-${index}`}
+//           style={{ display: "inline-block", marginRight: "10px" }}
+//         >
+//           tis {entry.value}
+//         </li>
+//       ))}
+//     </ul>
+//   );
+// };
 
 const Heatmap = ({
   data,
@@ -413,11 +541,12 @@ const Heatmap = ({
     ></ZAxis>,
     // <Tooltip />,
   ];
-  if (width > 300) {
-    axes.push(
-      <Legend key={"legend"} verticalAlign="top" offset={28} height={28} />
-    );
-  }
+  // if (width > 300) {
+  //   axes.push(
+  //     <Legend key={"legend"} verticalAlign="top" offset={28} height={28} />
+  //   );
+  // }
+  // axes.push(<Legend content={(props) => renderLegend(props, chartProps)} />);
 
   // let stripe = 4;
   // let angle = 90;
@@ -483,13 +612,15 @@ const Heatmap = ({
     }
   }
 
+  let rowWidth = Math.floor((width - 50) / 150);
+  let legendRows = Math.ceil(chartProps.n / rowWidth);
   return (
     <ScatterChart
       width={width}
       height={height}
       data={data}
       margin={{
-        top: 5,
+        top: legendRows ? legendRows * 35 + 5 : 5,
         right: 30,
         left: 20,
         bottom: width > 300 ? (buckets.length > 15 ? 35 : 25) : 5,
@@ -497,16 +628,20 @@ const Heatmap = ({
     >
       {/* {patterns} */}
       {axes}
-      {cats.map((cat, i) => (
-        <Scatter
-          name={cat}
-          key={cat}
-          data={data[i]}
-          fill={colors[i]}
-          shape={(props) => CustomShape(props, { ...chartProps, i })}
-          isAnimationActive={false}
-        />
-      ))}
+      {cats.map((cat, i) => {
+        let range = [Math.max()];
+
+        return (
+          <Scatter
+            name={cat}
+            key={cat}
+            data={data[i]}
+            fill={colors[i] || "rgb(102, 102, 102)"}
+            shape={(props) => CustomShape(props, { ...chartProps, i })}
+            isAnimationActive={false}
+          />
+        );
+      })}
       {pointData &&
         cats.map((cat, i) => (
           <Scatter
@@ -514,7 +649,7 @@ const Heatmap = ({
             legendType="none"
             key={i}
             data={pointData[i]}
-            fill={colors[i]}
+            fill={colors[i] || "rgb(102, 102, 102)"}
             shape={"circle"}
             zAxisId={1}
             isAnimationActive={false}

@@ -6,6 +6,7 @@ import compression from "compression";
 import { config } from "./api/v2/functions/config.js";
 import cookieParser from "cookie-parser";
 import express from "express";
+import { logError } from "./api/v2/functions/logger.js";
 import path from "path";
 import swaggerUi from "swagger-ui-express";
 import zip from "express-easy-zip";
@@ -51,14 +52,23 @@ app.get("/api-spec", function (req, res) {
 });
 if (process.pkg) {
   app.use(express.static(path.join(__dirname, "api-docs")));
+  // serve swagger-ui.css directly as static path above only works for js
+  app.get("/api-docs/swagger-ui.css", function (req, res) {
+    res.header("Content-Type", "text/css");
+    res.sendFile(path.join(__dirname, "api-docs", "swagger-ui.css"));
+  });
 }
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerDocument, swaggerOptions)
-);
 
-// app.use(cache);
+// Modify swagger setup to prevent petstore being served in production
+// app.use(
+//   "/api-docs",
+//   swaggerUi.serve,
+//   swaggerUi.setup(swaggerDocument, swaggerOptions)
+// );
+const swaggerSetup = swaggerUi.setup(swaggerDocument, swaggerOptions);
+app.get("/api-docs/index.html", swaggerSetup);
+app.use("/api-docs", swaggerUi.serve);
+app.get("/api-docs", swaggerSetup);
 
 app.use(
   OpenApiValidator.middleware({
@@ -78,7 +88,7 @@ app.use((err, req, res, next) => {
     errors: err.errors,
   };
   res.status(err.status || 500).json(error);
-  console.log(error);
+  logError({ ...error, req });
 });
 
 if (config.https) {

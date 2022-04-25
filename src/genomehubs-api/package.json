@@ -1,6 +1,6 @@
 {
   "name": "genomehubs-api",
-  "version": "2.4.2",
+  "version": "2.4.4",
   "description": "GenomeHubs API",
   "scripts": {
     "api": "node --max-old-space-size=8192 -r esm src/app.js",
@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/genomehubs/genomehubs-api#readme",
   "dependencies": {
-    "@elastic/elasticsearch": "^7.9.1",
+    "@elastic/elasticsearch": "7.11",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -37,6 +37,8 @@
     "memcached-promise": "^1.0.1",
     "qs": "^6.10.3",
     "swagger-ui-express": "^4.3.0",
+    "winston": "^3.7.2",
+    "winston-daily-rotate-file": "^4.6.1",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {

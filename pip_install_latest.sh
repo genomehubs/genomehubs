@@ -15,5 +15,6 @@ GHUBS_VERSION=$(
     | awk '{print $3}')
 
 python3 setup.py sdist bdist_wheel --python-tag py3 --plat-name=$PLATFORM &&
+echo y | pip uninstall genomehubs &&
 pip install dist/genomehubs-${GHUBS_VERSION}-py3-none-$PLATFORM.whl &&
 genomehubs -v

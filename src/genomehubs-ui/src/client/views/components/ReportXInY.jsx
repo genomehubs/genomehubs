@@ -15,6 +15,7 @@ import {
 import React, { Fragment, useEffect, useRef, useState } from "react";
 
 import Grid from "@material-ui/core/Grid";
+import MultiCatLegend from "./MultiCatLegend";
 import { compose } from "recompose";
 import { format } from "d3-format";
 import styles from "./Styles.scss";
@@ -137,39 +138,58 @@ const PieComponent = ({ data, height, width, colors }) => {
 
 const RadialBarComponent = ({ data, height, width, colors }) => {
   const renderRadialBarLabel = (props) => {
-    const { cx, cy, index, viewBox, fill, value, data, background } = props;
+    const { cx, cy, index, viewBox, fill, value, data, background, width, n } =
+      props;
     const fontSize = (viewBox.outerRadius - viewBox.innerRadius) / 2;
     return (
-      <g
-        fill={fill}
-        style={{ fontSize, fontFamily: "sans-serif" }}
-        transform="translate(0,2)"
-      >
-        <text
-          x={cx}
-          y={cy - viewBox.innerRadius - fontSize + 2}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          alignmentBaseline="middle"
-        >
-          {pct1(value)}
-        </text>
+      <g>
         <g
-          transform={`translate(0,${cy + (data.index + 1) * fontSize})`}
-          fill={background}
-          style={{ fontSize: fontSize, fontFamily: "sans-serif" }}
-          dominantBaseline="hanging"
-          alignmentBaseline="hanging"
+          fill={fill}
+          style={{ fontSize, fontFamily: "sans-serif" }}
+          transform="translate(0,2)"
         >
-          <text x={cx - viewBox.outerRadius} textAnchor="left" fill={data.fill}>
-            {data.xValue}
+          <text
+            x={cx}
+            y={cy - viewBox.innerRadius - fontSize + 2}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            alignmentBaseline="middle"
+          >
+            {pct1(value)}
           </text>
-          <text x={cx} textAnchor="middle">
-            {"/"}
-          </text>
-          <text x={cx + viewBox.outerRadius} textAnchor="end">
-            {data.yValue}
-          </text>
+          {/* <g
+            transform={`translate(0,${cy + (data.index + 1) * fontSize})`}
+            fill={background}
+            style={{ fontSize: fontSize, fontFamily: "sans-serif" }}
+            dominantBaseline="hanging"
+            alignmentBaseline="hanging"
+          >
+            <text
+              x={cx - viewBox.outerRadius}
+              textAnchor="left"
+              fill={data.fill}
+            >
+              {data.xValue}
+            </text>
+            <text x={cx} textAnchor="middle">
+              {"/"}
+            </text>
+            <text x={cx + viewBox.outerRadius} textAnchor="end">
+              {data.yValue}
+            </text>
+          </g> */}
+        </g>
+        <g transform={`translate(0,${cy + fontSize})`}>
+          {MultiCatLegend({
+            width: width * 0.96,
+            x: 0,
+            fill: data.fill,
+            i: data.index,
+            n,
+            name: data.name,
+            stats: { count: data.xValue, total: data.yValue },
+            legendWidth: 100,
+          })}
         </g>
       </g>
     );
@@ -201,6 +221,8 @@ const RadialBarComponent = ({ data, height, width, colors }) => {
               ...props,
               data: data[props.index],
               background,
+              width,
+              n: data.length,
             }),
         }}
         background={{ fill: background }}
@@ -208,12 +230,12 @@ const RadialBarComponent = ({ data, height, width, colors }) => {
         dataKey="xPortion"
         isAnimationActive={false}
       />
-      <Legend
+      {/* <Legend
         iconSize={width / 20}
         height={height / 8}
         verticalAlign="bottom"
         align="right"
-      />
+      /> */}
     </RadialBarChart>
   );
 };

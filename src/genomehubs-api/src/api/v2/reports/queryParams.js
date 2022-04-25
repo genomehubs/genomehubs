@@ -19,7 +19,7 @@ export const queryParams = ({
     }
     // params.includeEstimates = true;
     // params.excludeAncestral = [];
-    // params.excludeMissing = [];
+    params.excludeMissing = [];
 
     term.split(/\s+(?:and|AND)\s+/).forEach((subterm) => {
       if (!subterm.match("tax_")) {
@@ -29,7 +29,7 @@ export const queryParams = ({
           [summary, field] = field.split(/[\(\)]/);
         }
         // params.excludeAncestral.push(field);
-        // params.excludeMissing.push(field);
+        params.excludeMissing.push(field);
         fields.push(field);
         summaries.push(summary);
       }

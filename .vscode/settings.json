@@ -1,6 +1,5 @@
 {
   "git.ignoreLimitWarning": true,
-  "restructuredtext.confPath": "${workspaceFolder}/docs",
   "python.linting.pylintEnabled": false,
   "python.linting.pydocstyleEnabled": true,
   "python.linting.flake8Enabled": true,
@@ -14,5 +13,5 @@
       "source.organizeImports.python": true
     }
   },
-  "esbonio.sphinx.confDir": ""
+  "esbonio.sphinx.confDir": "${workspaceFolder}/docs"
 }

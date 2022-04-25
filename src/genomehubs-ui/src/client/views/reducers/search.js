@@ -180,6 +180,18 @@ export const suggestedTerms = handleActions(
 );
 export const getSuggestedTerms = (state) => state.suggestedTerms;
 
+export const getSuggestedTerm = () => {
+  if (
+    window &&
+    window.process &&
+    window.process.ENV &&
+    window.process.ENV.GH_SUGGESTED_TERM
+  ) {
+    return window.process.ENV.GH_SUGGESTED_TERM;
+  }
+  return SUGGESTED_TERM || "Lepidoptera";
+};
+
 export const searchReducers = {
   searchTerm,
   searchIndex,

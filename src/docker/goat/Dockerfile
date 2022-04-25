@@ -1,4 +1,4 @@
-FROM genomehubs/genomehubs-ui:2.4.2
+FROM genomehubs/genomehubs-ui:2.4.4
 LABEL maintainer="contact@genomehubs.org"
 LABEL license="MIT"
 
