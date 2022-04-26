@@ -1,5 +1,54 @@
 attributes:
-  seq_length:
+  start:
+    bins:
+      min: 1
+      max: 11
+      count: 10
+      scale: log10
+    constraint:
+      min: 1
+    description: Feature start position (1-indexed)
+    display_level: 1
+    display_name: Start
+    display_group: coordinates
+    type: long
+  end:
+    bins:
+      min: 1
+      max: 11
+      count: 10
+      scale: log10
+    constraint:
+      min: 1
+    description: Feature end position (1-indexed)
+    display_level: 1
+    display_name: End
+    display_group: coordinates
+    type: long
+  strand:
+    bins:
+      min: -1
+      max: 1
+      count: 3
+      scale: linear
+    constraint:
+      min: -1
+      min: 1
+    description: Strand
+    display_level: 1
+    display_name: Strand
+    display_group: coordinates
+    type: byte
+  feature_type:
+    constraint:
+      enum:
+        - sequence
+    description: Feature type
+    display_level: 1
+    display_name: Feature type
+    display_group: coordinates
+    type: keyword
+  length:
     bins:
       min: 1
       max: 11
@@ -7,9 +56,9 @@ attributes:
       scale: log10
     constraint:
       min: 0
-    description: Sequence length
+    description: Feature length
     display_level: 1
-    display_name: Sequence length
+    display_name: Feature length
     display_group: stats
     type: long
     units: bp

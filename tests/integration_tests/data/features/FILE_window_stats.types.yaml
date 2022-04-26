@@ -12,24 +12,24 @@ analysis:
   name: Assembly
   title: Public assembly GCA_905319855.2
 attributes:
-  seq_length:
-    header: end
-  seq_proportion:
-    header: end
-    function: "{} / 2447447219"
-  gc:
-    header: gc
-  seq_level:
-    default: top
-features:
-  assembly_id: GCA_905319855.2
-  feature_id:
-    header: sequence
   feature_type: "sequence"
   start:
     header: start
     function: "{} + 1"
   end:
     header: end
+  strand: 1
+  length:
+    header: end
+  seq_proportion:
+    header: end
+    function: "{} / 2447447219"
+  gc:
+    header: gc
+  seq_level: top
+features:
+  assembly_id: GCA_905319855.2
+  feature_id:
+    header: sequence
 taxonomy:
   taxon_id: "9612"

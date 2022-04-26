@@ -30,8 +30,8 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
         except Exception:
             pass
         for key, entry in types["attributes"].items():
-            if isinstance(entry, str):
-                entry = {"default": entry, "type": "keyword"}
+            if not isinstance(entry, dict):
+                entry = {"default": entry}
             if key in attributes:
                 entry = {**attributes[key], **entry}
             types["attributes"][key] = entry

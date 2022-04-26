@@ -518,8 +518,8 @@ def set_row_defaults(types, data):
     for key in types["defaults"].keys():
         if key in types:
             for entry in types[key].values():
-                if isinstance(entry, str):
-                    entry = {"default": entry, "type": "keyword"}
+                if not isinstance(entry, dict):
+                    entry = {"default": entry}
                 entry = {
                     **types["defaults"][key],
                     **entry,

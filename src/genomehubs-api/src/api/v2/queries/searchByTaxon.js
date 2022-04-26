@@ -45,6 +45,7 @@ export const searchByTaxon = async ({
     indexType: "identifiers",
     taxonomy,
   });
+  console.log(typesMap);
   let attr_fields = fields.filter((field) => typesMap[field] !== undefined);
   let non_attr_fields = fields.filter((field) => typesMap[field] === undefined);
   let types = attr_fields.map((field) => typesMap[field]);

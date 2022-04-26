@@ -480,13 +480,10 @@ def set_feature_types(types):
         "assembly_id": "keyword",
         "taxon_id": "keyword",
         "sequence_id": "keyword",
-        "start": "integer",
-        "end": "integer",
-        "strand": "byte",
     }
     for key, value in defaults.items():
         if key in types["features"]:
-            if isinstance(types["features"][key], str):
+            if not isinstance(types["features"][key], dict):
                 types["features"][key] = {"default": types["features"][key]}
             types["features"][key]["type"] = value
 
@@ -507,6 +504,7 @@ def index_features(es, opts, *, dry_run=False, taxonomy_name):
             LOGGER.info("Indexing %s" % types["file"]["name"])
             if "features" in types:
                 set_feature_types(types)
+            index_types(es, index, types, opts, dry_run=dry_run)
             index_file(
                 es,
                 types,
