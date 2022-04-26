@@ -283,7 +283,10 @@ def calculator(value, operation):
 def validate_values(values, key, types):
     """Validate values."""
     validated = []
-    key_type = types[key]["type"]
+    if isinstance(types[key], str):
+        key_type = "keyword"
+    else:
+        key_type = types[key]["type"]
     for value in values:
         if "function" in types[key]:
             try:
@@ -291,6 +294,9 @@ def validate_values(values, key, types):
             except ValueError:
                 continue
         value = convert_to_type(key, value, key_type)
+        if isinstance(types[key], str):
+            validated.append(value)
+            continue
         if value is None:
             continue
         if isinstance(value, str):
@@ -512,6 +518,8 @@ def set_row_defaults(types, data):
     for key in types["defaults"].keys():
         if key in types:
             for entry in types[key].values():
+                if isinstance(entry, str):
+                    entry = {"default": entry, "type": "keyword"}
                 entry = {
                     **types["defaults"][key],
                     **entry,
@@ -525,7 +533,12 @@ def process_row_values(row, types, data):
     for group in data.keys():
         if group in types:
             for key, meta in types[group].items():
+                if isinstance(meta, str):
+                    data[group][key] = meta
+                    continue
                 if "index" not in meta:
+                    if "default" in meta:
+                        data[group][key] = meta["default"]
                     continue
                 try:
                     if isinstance(meta["index"], list):
@@ -549,10 +562,35 @@ def process_row_values(row, types, data):
                     raise err
 
 
+def process_taxon_names(data, types, row, names):
+    """Process taxon names."""
+    if data["taxon_names"]:
+        data["taxon_names"] = set_xrefs(
+            data["taxon_names"], types["taxon_names"], row, meta=data["metadata"]
+        )
+    if data["taxonomy"] and names:
+        for key in names.keys():
+            if key in data["taxonomy"]:
+                if data["taxonomy"][key] in names[key]:
+                    data["taxonomy"]["_taxon_id"] = names[key][data["taxonomy"][key]][
+                        "taxon_id"
+                    ]
+                    data["taxonomy"][key] = names[key][data["taxonomy"][key]]["name"]
+
+
+def process_features(data):
+    """Move feature properties to top level."""
+    if data["features"]:
+        for entry in data["features"]:
+            data[entry["class"]] = entry["identifier"]
+        del data["features"]
+
+
 def process_row(types, names, row):
     """Process a row of data."""
     data = {
         "attributes": {},
+        "features": {},
         "identifiers": {},
         "metadata": {},
         "taxon_names": {},
@@ -578,7 +616,7 @@ def process_row(types, names, row):
         and data["identifiers"]["assembly_id"]
     ):
         assembly_id = data["identifiers"]["assembly_id"]
-    for attr_type in list(["attributes", "identifiers", "taxon_names"]):
+    for attr_type in list(["attributes", "features", "identifiers", "taxon_names"]):
         if attr_type in data and data[attr_type]:
             (
                 data[attr_type],
@@ -601,18 +639,8 @@ def process_row(types, names, row):
                         "source_id": assembly_id,
                     }
                 )
-    if data["taxon_names"]:
-        data["taxon_names"] = set_xrefs(
-            data["taxon_names"], types["taxon_names"], row, meta=data["metadata"]
-        )
-    if data["taxonomy"] and names:
-        for key in names.keys():
-            if key in data["taxonomy"]:
-                if data["taxonomy"][key] in names[key]:
-                    data["taxonomy"]["_taxon_id"] = names[key][data["taxonomy"][key]][
-                        "taxon_id"
-                    ]
-                    data["taxonomy"][key] = names[key][data["taxonomy"][key]]["name"]
+    process_taxon_names(data, types, row, names)
+    process_features(data)
     return data, taxon_data, taxon_types.get("attributes", {})
 
 

@@ -89,15 +89,14 @@ def index_types(es, types_name, types, opts, *, dry_run=False):
     if "attributes" in types:
         new_attributes = {}
         for key, value in types["attributes"].items():
+            if "defaults" in types and "attributes" in types["defaults"]:
+                value = {**types["defaults"]["attributes"], **value}
             if key in attributes:
                 types["attributes"][key] = {
                     **attributes[key],
-                    **types["defaults"]["attributes"],
                     **value,
                 }
             else:
-                if "defaults" in types and "attributes" in types["defaults"]:
-                    value = {**types["defaults"]["attributes"], **value}
                 new_attributes[key] = {**value}
                 new_attributes[key].pop("header", None)
                 new_attributes[key].pop("index", None)

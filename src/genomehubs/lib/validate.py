@@ -13,7 +13,7 @@ from .hub import process_names_file
 LOGGER = tolog.logger(__name__)
 
 
-def validate_types_file(types_file, dir_path, es, types_name, opts):
+def validate_types_file(types_file, dir_path, es, types_name, opts, *, attributes=None):
     """Validate types file."""
     LOGGER.info("Validating YAML file %s", types_file)
     try:
@@ -22,22 +22,31 @@ def validate_types_file(types_file, dir_path, es, types_name, opts):
         LOGGER.error("Unable to open types file %s", str(types_file.resolve()))
         sys.exit(1)
     if "attributes" in types:
-        try:
-            attributes = fetch_types(es, types_name, opts)
-        except Exception:
+        if attributes is None:
             attributes = {}
+        try:
+            stored_attributes = fetch_types(es, types_name, opts)
+            attributes = {**stored_attributes, **attributes}
+        except Exception:
+            pass
         for key, entry in types["attributes"].items():
+            if isinstance(entry, str):
+                entry = {"default": entry, "type": "keyword"}
             if key in attributes:
                 entry = {**attributes[key], **entry}
+            types["attributes"][key] = entry
             enum = entry.get("constraint", {}).get("enum", [])
             if enum:
                 entry["constraint"]["enum"] = [value.lower() for value in enum]
-
     names = None
     data = None
     if "file" in types:
         if "name" in types["file"]:
-            if "taxonomy" not in types:
+            if (
+                "taxonomy" not in types
+                and "features" not in types
+                and "taxon_id" not in types["features"]
+            ):
                 LOGGER.error("Types file contains no taxonomy information")
                 sys.exit(1)
             datafile = Path(dir_path) / types["file"]["name"]

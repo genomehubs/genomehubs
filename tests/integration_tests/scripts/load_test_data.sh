@@ -53,8 +53,8 @@ genomehubs fill \
     --config-file tests/integration_tests/config/config.yaml \
     --taxonomy-source ncbi \
     --traverse-root 2759 \
-    --traverse-infer-both
-# genomehubs index \
-#     --config-file tests/integration_tests/config/config.yaml \
-#     --taxonomy-source ncbi \
-#     --feature-dir tests/integration_tests/data/features &&
+    --traverse-infer-both &&
+genomehubs index \
+    --config-file tests/integration_tests/config/config.yaml \
+    --taxonomy-source ncbi \
+    --feature-dir tests/integration_tests/data/features

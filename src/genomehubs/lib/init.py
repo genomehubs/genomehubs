@@ -76,6 +76,7 @@ from tolkein import tolog
 from ..lib import analysis
 from ..lib import assembly
 from ..lib import es_functions
+from ..lib import feature
 from ..lib import files
 from ..lib import hub
 from ..lib import taxon
@@ -224,6 +225,13 @@ def main(args):
             es, assembly_template["name"], assembly_template["mapping"]
         )
         es_functions.index_create(es, assembly_template["index_name"])
+
+        # Prepare feature index
+        feature_template = feature.index_template(taxonomy_name, options["init"])
+        es_functions.load_mapping(
+            es, feature_template["name"], feature_template["mapping"]
+        )
+        es_functions.index_create(es, feature_template["index_name"])
 
         # Prepare analysis index
         analysis_template = analysis.index_template(taxonomy_name, options["init"])

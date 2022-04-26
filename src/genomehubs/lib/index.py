@@ -67,6 +67,7 @@ import sys
 # import time
 from collections import defaultdict
 from pathlib import Path
+from traceback import format_exc
 
 from docopt import docopt
 from tolkein import tolog
@@ -74,6 +75,7 @@ from tqdm import tqdm
 
 from ..lib import assembly
 from ..lib import es_functions
+from ..lib import feature
 from ..lib import hub
 from ..lib import taxon
 from .assembly import add_identifiers_and_attributes_to_assemblies
@@ -164,49 +166,89 @@ def group_rows(
                     failed_rows["None"].append(row)
 
 
-def index_file(es, types, names, data, opts, *, taxon_table=None):
-    """Index a file."""
-    delimiters = {"csv": ",", "tsv": "\t"}
-    rows = csv.reader(
-        strip_comments(data, types),
-        delimiter=delimiters[types["file"]["format"]],
-        quotechar='"',
-    )
-    if "header" in types["file"] and types["file"]["header"]:
-        header = next(rows)
-        set_column_indices(types, header)
-    else:
-        header = None
-    with_ids = defaultdict(list)
-    taxon_asm_data = defaultdict(list)
-    without_ids = defaultdict(list)
-    failed_rows = defaultdict(list)
-    imported_rows = []
-    blanks = set(["", "NA", "N/A", "None"])
-    taxon_types = {}
-    taxonomy_name = opts["taxonomy-source"].lower()
+def index_taxon_records(es, taxonomy_name, opts, with_ids, blanks, types):
+    """Index a taxon records."""
     taxon_template = taxon.index_template(taxonomy_name, opts)
-    LOGGER.info("Processing rows")
-    processed_rows = defaultdict(list)
-    for row in tqdm(rows):
-        try:
-            processed_data, taxon_data, new_taxon_types = process_row(types, names, row)
-        except Exception as err:
-            print(err)
-            failed_rows["None"].append(row)
-            continue
-        taxon_types.update(new_taxon_types)
-        if not_blank("_taxon_id", processed_data["taxonomy"], blanks):
-            # if opts["taxon-id-as-xref"]:
-            with_ids[processed_data["taxonomy"]["_taxon_id"]].append(processed_data)
-            taxon_asm_data[processed_data["taxonomy"]["_taxon_id"]].append(taxon_data)
-            imported_rows.append(row)
-        else:
-            tmp_taxon_id = "other"
-            if not_blank("taxon_id", processed_data["taxonomy"], blanks):
-                tmp_taxon_id = processed_data["taxonomy"]["taxon_id"]
-            processed_rows[tmp_taxon_id].append((processed_data, taxon_data, row))
-    # check for taxon-id-as-xref here and do lookup if required
+    docs = add_names_and_attributes_to_taxa(
+        es, dict(with_ids), opts, template=taxon_template, blanks=blanks
+    )
+    imported_taxa = defaultdict(list)
+    index_stream(
+        es,
+        taxon_template["index_name"],
+        summarise_imported_taxa(docs, imported_taxa),
+        _op_type="update",
+        dry_run=opts.get("dry-run", False),
+    )
+    write_imported_taxa(imported_taxa, opts, types=types)
+
+
+def index_assembly_records(
+    es, taxonomy_name, opts, with_ids, blanks, taxon_types, taxon_asm_data
+):
+    """Index an assembly records."""
+    assembly_template = assembly.index_template(taxonomy_name, opts)
+    taxon_template = taxon.index_template(taxonomy_name, opts)
+    docs = add_identifiers_and_attributes_to_assemblies(
+        es,
+        with_ids,
+        opts,
+        template=assembly_template,
+        taxon_template=taxon_template,
+        blanks=blanks,
+    )
+    index_stream(
+        es,
+        assembly_template["index_name"],
+        docs,
+        dry_run=opts.get("dry-run", False),
+    )
+    # index taxon-level attributes
+    index_types(
+        es,
+        "taxon",
+        {"attributes": taxon_types},
+        opts,
+        dry_run=opts.get("dry-run", False),
+    )
+    taxon_asm_with_ids = {
+        taxon_id: taxon_asm_data[taxon_id] for taxon_id in with_ids.keys()
+    }
+    # print(taxon_asm_with_ids)
+    taxon_docs = add_names_and_attributes_to_taxa(
+        es,
+        taxon_asm_with_ids,
+        opts,
+        template=taxon_template,
+        blanks=blanks,
+    )
+    index_stream(
+        es,
+        taxon_template["index_name"],
+        taxon_docs,
+        _op_type="update",
+        dry_run=opts.get("dry-run", False),
+    )
+
+
+def process_taxon_assembly_records(
+    es,
+    taxonomy_name,
+    opts,
+    processed_rows,
+    with_ids,
+    blanks,
+    taxon_asm_data,
+    imported_rows,
+    types,
+    failed_rows,
+    header,
+    taxon_table,
+    taxon_types,
+):
+    """Process taxon and assembly records."""
+    taxon_template = taxon.index_template(taxonomy_name, opts)
+    without_ids = defaultdict(list)
     if "taxon-id-as-xref" in opts:
         id_map = translate_xrefs(
             es,
@@ -259,61 +301,101 @@ def index_file(es, types, names, data, opts, *, taxon_table=None):
         )
         LOGGER.info("Indexing %d entries", len(with_ids.keys()))
         if opts["index"] == "taxon":
-            docs = add_names_and_attributes_to_taxa(
-                es, dict(with_ids), opts, template=taxon_template, blanks=blanks
-            )
-            imported_taxa = defaultdict(list)
-            index_stream(
-                es,
-                taxon_template["index_name"],
-                summarise_imported_taxa(docs, imported_taxa),
-                _op_type="update",
-                dry_run=opts.get("dry-run", False),
-            )
-            write_imported_taxa(imported_taxa, opts, types=types)
+            index_taxon_records(es, taxonomy_name, opts, with_ids, blanks, types)
         elif opts["index"] == "assembly":
             # TODO: keep track of taxon_id not found exceptions
-            assembly_template = assembly.index_template(taxonomy_name, opts)
-            docs = add_identifiers_and_attributes_to_assemblies(
-                es,
-                with_ids,
-                opts,
-                template=assembly_template,
-                taxon_template=taxon_template,
-                blanks=blanks,
+            index_assembly_records(
+                es, taxonomy_name, opts, with_ids, blanks, taxon_types, taxon_asm_data
             )
-            index_stream(
-                es,
-                assembly_template["index_name"],
-                docs,
-                dry_run=opts.get("dry-run", False),
-            )
-            # index taxon-level attributes
-            index_types(
-                es,
-                "taxon",
-                {"attributes": taxon_types},
-                opts,
-                dry_run=opts.get("dry-run", False),
-            )
-            taxon_asm_with_ids = {
-                taxon_id: taxon_asm_data[taxon_id] for taxon_id in with_ids.keys()
-            }
-            # print(taxon_asm_with_ids)
-            taxon_docs = add_names_and_attributes_to_taxa(
-                es,
-                taxon_asm_with_ids,
-                opts,
-                template=taxon_template,
-                blanks=blanks,
-            )
-            index_stream(
-                es,
-                taxon_template["index_name"],
-                taxon_docs,
-                _op_type="update",
-                dry_run=opts.get("dry-run", False),
-            )
+
+
+def convert_features_to_docs(with_ids):
+    """Convert features to docs."""
+    for taxon_id, entries in with_ids.items():
+        for entry in entries:
+            entry["taxon_id"] = taxon_id
+            del entry["taxon_names"]
+            del entry["taxonomy"]
+            del entry["taxon_attributes"]
+            yield ("feature-%s" % entry["feature_id"], entry)
+
+
+def index_feature_records(es, opts, taxonomy_name, with_ids, blanks):
+    """Index a feature records."""
+    feature_template = feature.index_template(taxonomy_name, opts)
+    # TODO: allow for adding attributes to existing features
+    # TODO: allow for elevating summary attributes to assembly/taxon
+    docs = convert_features_to_docs(dict(with_ids))
+    index_stream(
+        es,
+        feature_template["index_name"],
+        docs,
+        dry_run=opts.get("dry-run", False),
+    )
+
+
+def index_file(es, types, names, data, opts, *, taxon_table=None):
+    """Index a file."""
+    delimiters = {"csv": ",", "tsv": "\t"}
+    rows = csv.reader(
+        strip_comments(data, types),
+        delimiter=delimiters[types["file"]["format"]],
+        quotechar='"',
+    )
+    if "header" in types["file"] and types["file"]["header"]:
+        header = next(rows)
+        set_column_indices(types, header)
+    else:
+        header = None
+    with_ids = defaultdict(list)
+    taxon_asm_data = defaultdict(list)
+    failed_rows = defaultdict(list)
+    imported_rows = []
+    blanks = set(["", "NA", "N/A", "None"])
+    taxon_types = {}
+    taxonomy_name = opts["taxonomy-source"].lower()
+    LOGGER.info("Processing rows")
+    processed_rows = defaultdict(list)
+    for row in tqdm(rows):
+        try:
+            processed_data, taxon_data, new_taxon_types = process_row(types, names, row)
+        except Exception:
+            print(format_exc())
+            failed_rows["None"].append(row)
+            continue
+        taxon_types.update(new_taxon_types)
+        if opts["index"] == "feature" and not_blank(
+            "taxon_id", processed_data["taxonomy"], blanks
+        ):
+            with_ids[processed_data["taxonomy"]["taxon_id"]].append(processed_data)
+        elif not_blank("_taxon_id", processed_data["taxonomy"], blanks):
+            # if opts["taxon-id-as-xref"]:
+            with_ids[processed_data["taxonomy"]["_taxon_id"]].append(processed_data)
+            taxon_asm_data[processed_data["taxonomy"]["_taxon_id"]].append(taxon_data)
+            imported_rows.append(row)
+        else:
+            tmp_taxon_id = "other"
+            if not_blank("taxon_id", processed_data["taxonomy"], blanks):
+                tmp_taxon_id = processed_data["taxonomy"]["taxon_id"]
+            processed_rows[tmp_taxon_id].append((processed_data, taxon_data, row))
+    if opts["index"] in ["taxon", "assembly"]:
+        process_taxon_assembly_records(
+            es,
+            taxonomy_name,
+            opts,
+            processed_rows,
+            with_ids,
+            blanks,
+            taxon_asm_data,
+            imported_rows,
+            types,
+            failed_rows,
+            header,
+            taxon_table,
+            taxon_types,
+        )
+    elif opts["index"] == "feature":
+        index_feature_records(es, opts, taxonomy_name, with_ids, blanks)
 
 
 def index_taxon_assembly(es, opts, index="taxon", *, dry_run=False, taxonomy_name):
@@ -389,16 +471,51 @@ def index_taxon_assembly(es, opts, index="taxon", *, dry_run=False, taxonomy_nam
                 # time.sleep(5)
 
 
+def set_feature_types(types):
+    """Set types for feature properties."""
+    if "features" not in types:
+        return
+    defaults = {
+        "feature_id": "keyword",
+        "assembly_id": "keyword",
+        "taxon_id": "keyword",
+        "sequence_id": "keyword",
+        "start": "integer",
+        "end": "integer",
+        "strand": "byte",
+    }
+    for key, value in defaults.items():
+        if key in types["features"]:
+            if isinstance(types["features"][key], str):
+                types["features"][key] = {"default": types["features"][key]}
+            types["features"][key]["type"] = value
+
+
 def index_features(es, opts, *, dry_run=False, taxonomy_name):
     """Index assembly features."""
     index = "feature"
     data_dir = "%s-dir" % index
     if data_dir in opts:
         dir_path = opts[data_dir]
+    stored_attributes = {}
     for types_file in sorted(Path(dir_path).glob("*.types.yaml")):
-        types, data, names = validate_types_file(types_file, dir_path, es, index, opts)
+        types, data, names = validate_types_file(
+            types_file, dir_path, es, index, opts, attributes=stored_attributes
+        )
         LOGGER.info("Indexing types")
-        index_types(es, index, types, opts, dry_run=True)
+        if "file" in types and "name" in types["file"]:
+            LOGGER.info("Indexing %s" % types["file"]["name"])
+            if "features" in types:
+                set_feature_types(types)
+            index_file(
+                es,
+                types,
+                names,
+                data,
+                {**opts, "index": index, "index_types": index_types},
+            )
+        elif "attributes" in types:
+            stored_attributes = {**stored_attributes, **types["attributes"]}
 
 
 def main(args):

@@ -4,12 +4,13 @@ file:
   name: CAJNRB02.window_stats.tsv
   source: tbc
   source_url: http://example.com
-# analysis:
-#   assembly_id: GCA_905319855.2
-#   taxon_id: 9612
-#   description: Analysis of public assembly GCA_905319855.2 using BlobToolKit
-#   name: BlobToolKit
-#   title: BlobToolKit analysis of GCA_905319855.2
+analysis:
+  analysis_id: assembly-GCA_905319855.2
+  assembly_id: GCA_905319855.2
+  taxon_id: 9612
+  description: Public assembly GCA_905319855.2
+  name: Assembly
+  title: Public assembly GCA_905319855.2
 attributes:
   seq_length:
     header: end
@@ -20,13 +21,15 @@ attributes:
     header: gc
   seq_level:
     default: top
-feature:
+features:
+  assembly_id: GCA_905319855.2
   feature_id:
     header: sequence
-  feature_type:
-    default: sequence
-coordinates:
+  feature_type: "sequence"
   start:
     header: start
+    function: "{} + 1"
   end:
     header: end
+taxonomy:
+  taxon_id: "9612"
