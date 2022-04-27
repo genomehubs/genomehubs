@@ -28,6 +28,9 @@ attributes:
   seq_proportion:
     header: end
     function: "{} / 2447447219"
+  midpoint:
+    header: end
+    function: "({} - {start} + 1) / 2"
   gc:
     header: gc
   masked:

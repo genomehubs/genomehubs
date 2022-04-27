@@ -68,6 +68,20 @@ attributes:
     display_group: stats
     type: long
     units: bp
+  midpoint:
+    bins:
+      min: 1
+      max: 11
+      count: 10
+      scale: log10
+    constraint:
+      min: 0
+    description: Feature midpoint
+    display_level: 1
+    display_name: Feature midpoint
+    display_group: stats
+    type: long
+    units: bp
   seq_proportion:
     bins:
       min: 0

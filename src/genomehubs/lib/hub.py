@@ -7,6 +7,12 @@ import re
 import sys
 from collections import defaultdict
 from copy import deepcopy
+from operator import add
+from operator import mod
+from operator import mul
+from operator import pow
+from operator import sub
+from operator import truediv
 from pathlib import Path
 
 from tolkein import tofile
@@ -253,34 +259,76 @@ def convert_to_type(key, value, to_type):
     return value
 
 
-def calculator(value, operation):
+# def calculator():
+#     """Template-based calculator."""
+#     value1, operator, value2 = operation.split(" ")
+#     if value1 == "{}":
+#         value1 = float(value)
+#         value2 = float(value2)
+#     elif value2 == "{}":
+#         value2 = float(value)
+#         value1 = float(value1)
+#     if operator == "+":
+#         return value1 + value2
+#     elif operator == "-":
+#         return value1 - value2
+#     elif operator == "*":
+#         return value1 * value2
+#     elif operator == "/":
+#         try:
+#             return value1 / value2
+#         except ZeroDivisionError:
+#             return None
+#     elif operator == "%":
+#         if operator == "%":
+#             return value1 % value2
+#     else:
+#         return None
+
+
+def calculate(string):
+    """Recursively apply operations to a string."""
+    operators = {
+        "+": add,
+        "-": sub,
+        "%": mod,
+        "*": mul,
+        "/": truediv,
+        "**": pow,
+    }
+    string = string.replace(" ", "")
+    try:
+        return float(string)
+    except ValueError:
+        pass
+    parts = re.split(r"(\(.+\))", string)
+    if len(parts) > 1:
+        for index, part in enumerate(parts):
+            if part.startswith("("):
+                part = part[1:-1]
+                parts[index] = str(calculate(part))
+        string = "".join(parts)
+    for function in operators.keys():
+        left, operator, right = string.partition(function)
+        if operator in operators:
+            return operators[operator](calculate(left), calculate(right))
+
+
+def calculator(value, operation, row_values):
     """Template-based calculator."""
-    value1, operator, value2 = operation.split(" ")
-    if value1 == "{}":
-        value1 = float(value)
-        value2 = float(value2)
-    elif value2 == "{}":
-        value2 = float(value)
-        value1 = float(value1)
-    if operator == "+":
-        return value1 + value2
-    elif operator == "-":
-        return value1 - value2
-    elif operator == "*":
-        return value1 * value2
-    elif operator == "/":
-        try:
-            return value1 / value2
-        except ZeroDivisionError:
-            return None
-    elif operator == "%":
-        if operator == "%":
-            return value1 % value2
-    else:
-        return None
+    parts = re.split(r"(\{.*?\})", operation)
+    for index, part in enumerate(parts):
+        if part.startswith("{"):
+            part = part[1:-1]
+            if not part:
+                parts[index] = value
+            elif part in row_values:
+                parts[index] = str(row_values[part])
+    operation = "".join(parts)
+    return calculate(operation)
 
 
-def validate_values(values, key, types):
+def validate_values(values, key, types, row_values):
     """Validate values."""
     validated = []
     if isinstance(types[key], str) or "type" not in types[key]:
@@ -290,7 +338,7 @@ def validate_values(values, key, types):
     for value in values:
         if "function" in types[key]:
             try:
-                value = calculator(value, types[key]["function"])
+                value = calculator(value, types[key]["function"], row_values)
             except ValueError:
                 continue
         value = convert_to_type(key, value, key_type)
@@ -363,6 +411,7 @@ def add_attributes(
     if meta is None:
         meta = {}
     attribute_values = {}
+    row_values = {}
     for key, values in entry.items():
         if key in types:
             if not isinstance(values, list):
@@ -370,11 +419,12 @@ def add_attributes(
             if attr_type == "taxon_names":
                 validated = values
             else:
-                validated = validate_values(values, key, types)
+                validated = validate_values(values, key, types, row_values)
             # TODO: handle invalid values
             if validated:
                 if len(validated) == 1:
                     validated = validated[0]
+                row_values[key] = validated
                 if attr_type == "attributes":
                     attribute = {"key": key, "%s_value" % types[key]["type"]: validated}
                     attribute_values.update({key: attribute})
