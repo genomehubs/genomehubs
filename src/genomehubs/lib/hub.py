@@ -283,7 +283,7 @@ def calculator(value, operation):
 def validate_values(values, key, types):
     """Validate values."""
     validated = []
-    if isinstance(types[key], str):
+    if isinstance(types[key], str) or "type" not in types[key]:
         key_type = "keyword"
     else:
         key_type = types[key]["type"]
@@ -533,7 +533,7 @@ def process_row_values(row, types, data):
     for group in data.keys():
         if group in types:
             for key, meta in types[group].items():
-                if isinstance(meta, str):
+                if not isinstance(meta, dict):
                     data[group][key] = meta
                     continue
                 if "index" not in meta:

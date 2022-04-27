@@ -20,17 +20,11 @@
         "normalizer": "lowercase",
         "meta": { "description": "Unique feature ID of parent feature" }
       },
-      "feature_type": {
+      "primary_type": {
         "type": "keyword",
         "ignore_above": 64,
         "normalizer": "lowercase",
         "meta": { "description": "Type of feature" }
-      },
-      "feature_group": {
-        "type": "keyword",
-        "ignore_above": 64,
-        "normalizer": "lowercase",
-        "meta": { "description": "Alternate types for feature" }
       },
       "assembly_id": {
         "type": "keyword",

@@ -63,7 +63,6 @@ Examples:
 
 import csv
 import sys
-
 # import time
 from collections import defaultdict
 from pathlib import Path
@@ -480,6 +479,7 @@ def set_feature_types(types):
         "assembly_id": "keyword",
         "taxon_id": "keyword",
         "sequence_id": "keyword",
+        "primary_type": "keyword",
     }
     for key, value in defaults.items():
         if key in types["features"]:

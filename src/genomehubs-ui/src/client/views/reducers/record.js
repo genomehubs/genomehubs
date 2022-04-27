@@ -84,6 +84,9 @@ export function fetchRecord(recordId, result, taxonomy, callback) {
       if (result == "assembly") {
         fetchedRecordId = json.records[0].record.assembly_id;
         fetchedTitle = fetchedRecordId;
+      } else if (result == "feature") {
+        fetchedRecordId = json.records[0].record.feature_id;
+        fetchedTitle = fetchedRecordId;
       }
       if (fetchedRecordId == recordId) {
         dispatch(receiveRecord(json));
