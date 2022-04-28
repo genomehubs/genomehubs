@@ -235,6 +235,20 @@ def stream_template_search_results(es, *, index, body, size=10):
         es.clear_scroll(scroll_id=scroll_id)
 
 
+def query_flexible_template(es, template_name, index, opts=None):
+    """Run query using a flexible template."""
+    if not index_exists(es, index):
+        return None
+    if opts is None:
+        return None
+    body = ujson.dumps({"id": template_name, "params": opts})
+    body += "\n"
+    res = None
+    with tolog.DisableLogger():
+        res = es.search_template(body=body, index=index)
+    return res
+
+
 def query_keyword_value_template(es, template_name, keyword, values, index, opts=None):
     """Run query using a by_keyword_value template."""
     if not index_exists(es, index):

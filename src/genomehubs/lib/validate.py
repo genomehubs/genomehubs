@@ -17,9 +17,11 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
     """Validate types file."""
     LOGGER.info("Validating YAML file %s", types_file)
     try:
-        types = tofile.load_yaml(str(types_file.resolve()))
+        if not isinstance(types_file, str):
+            types_file = str(types_file.resolve())
+        types = tofile.load_yaml(types_file)
     except Exception:
-        LOGGER.error("Unable to open types file %s", str(types_file.resolve()))
+        LOGGER.error("Unable to open types file %s", types_file)
         sys.exit(1)
     if "attributes" in types:
         if attributes is None:

@@ -82,6 +82,20 @@ attributes:
     display_group: stats
     type: long
     units: bp
+  midpoint_proportion:
+    bins:
+      min: 0
+      max: 1
+      count: 10
+      scale: linear
+    constraint:
+      max: 1
+      min: 0
+    description: Proportional position of feature midpoint
+    display_level: 1
+    display_name: Midpoint proportion
+    display_group: stats
+    type: float
   seq_proportion:
     bins:
       min: 0

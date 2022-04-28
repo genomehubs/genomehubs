@@ -18,6 +18,8 @@ from pathlib import Path
 from tolkein import tofile
 from tolkein import tolog
 
+from .es_functions import query_flexible_template
+
 LOGGER = tolog.logger(__name__)
 MIN_INTEGER = -(2 ** 31)
 MAX_INTEGER = 2 ** 31 - 1
@@ -28,6 +30,50 @@ def setup(opts):
     """Set up directory for this GenomeHubs instance and handle reset."""
     Path(opts["hub-path"]).mkdir(parents=True, exist_ok=True)
     return True
+
+
+def dep(arg):
+    """Dependency resolver."""
+    # from https://code.activestate.com/recipes/576570-dependency-resolver/
+    # © 2008 Louis Riviere (MIT)
+    d = dict((k, set(arg[k])) for k in arg)
+    r = []
+    c = 0
+    while d and c < 10:
+        # values not in keys (items without dep)
+        t = set(i for v in d.values() for i in v) - set(d.keys())
+        # and keys without value (items without dep)
+        t.update(k for k, v in d.items() if not v)
+        # can be done right away
+        r.append(t)
+        # and cleaned up
+        d = dict(((k, v - t) for k, v in d.items() if v))
+        c += 1
+    if d:
+        LOGGER.error("Unable to resolve dependency tree")
+        sys.exit(1)
+    return r
+
+
+def list_files(dir_path, pattern):
+    """List files and sort by dependencies."""
+    LOGGER.info("Finding files in %s matching %s", dir_path, pattern)
+    deps = {}
+    file_list = []
+    yaml_files = sorted(Path(dir_path).glob(pattern))
+    for yaml_file in yaml_files:
+        yaml_dir = yaml_file.parent
+        yaml_file = str(yaml_file)
+        data = tofile.load_yaml(yaml_file)
+        if "file" in data and "needs" in data["file"]:
+            needs = data["file"]["needs"]
+            if not isinstance(needs, list):
+                needs = [needs]
+            deps[yaml_file] = ["%s/%s" % (yaml_dir, needed) for needed in needs]
+        else:
+            deps[yaml_file] = []
+    file_list = [item for sublist in dep(deps) for item in sublist]
+    return file_list
 
 
 def load_types(name, *, part="types"):
@@ -314,8 +360,34 @@ def calculate(string):
             return operators[operator](calculate(left), calculate(right))
 
 
-def calculator(value, operation, row_values):
-    """Template-based calculator."""
+def lookup_attribute_value(identifier, attribute, shared_values):
+    """Lookup an indexed attribute value."""
+    value_type = shared_values["_types"]["attributes"][attribute]["type"]
+    opts = {
+        "id_field": "%s_id" % shared_values["_index_type"],
+        "primary_id": identifier,
+        "attribute": attribute,
+        "value_type": value_type,
+    }
+    res = query_flexible_template(
+        shared_values["_es"],
+        "attribute_value_by_primary_id",
+        shared_values["_index"],
+        opts,
+    )
+    hits = res["hits"]["hits"]
+    if len(hits) == 1:
+        inner_hits = hits[0]["inner_hits"]["%s_values" % attribute]["hits"]["hits"]
+        if len(inner_hits) == 1:
+            field_values = inner_hits[0]["fields"]["attributes.%s_value" % value_type]
+            if len(field_values) == 1:
+                shared_values[identifier][attribute] = field_values[0]
+                return field_values[0]
+    return None
+
+
+def apply_template(value, operation, row_values, shared_values):
+    """Apply template to a function description."""
     parts = re.split(r"(\{.*?\})", operation)
     for index, part in enumerate(parts):
         if part.startswith("{"):
@@ -324,21 +396,42 @@ def calculator(value, operation, row_values):
                 parts[index] = value
             elif part in row_values:
                 parts[index] = str(row_values[part])
-    operation = "".join(parts)
+            elif part.startswith("."):
+                part = part[1:]
+                if value in shared_values and part in shared_values[value]:
+                    parts[index] = str(shared_values[value][part])
+                else:
+                    parts[index] = str(
+                        lookup_attribute_value(value, part, shared_values)
+                    )
+                if parts[index] is None:
+                    LOGGER.error("%s has no value for attribute %s", value, part)
+                    sys.exit()
+            else:
+                LOGGER.error("function template '%s' is not supported", operation)
+                sys.exit(1)
+    return "".join(parts)
+
+
+def calculator(value, operation, row_values, shared_values):
+    """Template-based calculator."""
+    # print(dict(shared_values))
+    operation = apply_template(value, operation, row_values, shared_values)
     return calculate(operation)
 
 
-def validate_values(values, key, types, row_values):
+def validate_values(values, key, types, row_values, shared_values):
     """Validate values."""
     validated = []
     if isinstance(types[key], str) or "type" not in types[key]:
-        key_type = "keyword"
-    else:
-        key_type = types[key]["type"]
+        types[key]["type"] = "keyword"
+    key_type = types[key]["type"]
     for value in values:
         if "function" in types[key]:
             try:
-                value = calculator(value, types[key]["function"], row_values)
+                value = calculator(
+                    value, types[key]["function"], row_values, shared_values
+                )
             except ValueError:
                 continue
         value = convert_to_type(key, value, key_type)
@@ -401,7 +494,14 @@ def apply_value_template(prop, value, attribute, *, taxon_types, has_taxon_data)
 
 
 def add_attributes(
-    entry, types, *, attributes=None, source=None, attr_type="attributes", meta=None
+    entry,
+    types,
+    *,
+    attributes=None,
+    source=None,
+    attr_type="attributes",
+    meta=None,
+    shared_values=None,
 ):
     """Add attributes to a document."""
     if attributes is None:
@@ -419,7 +519,9 @@ def add_attributes(
             if attr_type == "taxon_names":
                 validated = values
             else:
-                validated = validate_values(values, key, types, row_values)
+                validated = validate_values(
+                    values, key, types, row_values, shared_values
+                )
             # TODO: handle invalid values
             if validated:
                 if len(validated) == 1:
@@ -636,7 +738,7 @@ def process_features(data):
         del data["features"]
 
 
-def process_row(types, names, row):
+def process_row(types, names, row, shared_values):
     """Process a row of data."""
     data = {
         "attributes": {},
@@ -677,6 +779,7 @@ def process_row(types, names, row):
                 types[attr_type],
                 attr_type=attr_type,
                 meta=data["metadata"],
+                shared_values=shared_values,
             )
         else:
             data[attr_type] = []

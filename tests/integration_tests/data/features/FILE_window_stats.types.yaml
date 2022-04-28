@@ -2,6 +2,7 @@ file:
   format: tsv
   header: true
   name: CAJNRB02.window_stats.tsv
+  # needs: FILE2.types.yaml
   source: tbc
   source_url: http://example.com
 analysis:

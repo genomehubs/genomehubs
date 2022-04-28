@@ -63,6 +63,7 @@ Examples:
 
 import csv
 import sys
+
 # import time
 from collections import defaultdict
 from pathlib import Path
@@ -83,6 +84,7 @@ from .config import config
 from .es_functions import index_stream
 from .files import index_files
 from .files import index_metadata
+from .hub import list_files
 from .hub import process_row
 from .hub import set_column_indices
 from .hub import strip_comments
@@ -333,7 +335,7 @@ def index_feature_records(es, opts, taxonomy_name, with_ids, blanks):
     )
 
 
-def index_file(es, types, names, data, opts, *, taxon_table=None):
+def index_file(es, types, names, data, opts, *, taxon_table=None, shared_values=None):
     """Index a file."""
     delimiters = {"csv": ",", "tsv": "\t"}
     rows = csv.reader(
@@ -357,7 +359,9 @@ def index_file(es, types, names, data, opts, *, taxon_table=None):
     processed_rows = defaultdict(list)
     for row in tqdm(rows):
         try:
-            processed_data, taxon_data, new_taxon_types = process_row(types, names, row)
+            processed_data, taxon_data, new_taxon_types = process_row(
+                types, names, row, shared_values
+            )
         except Exception:
             print(format_exc())
             failed_rows["None"].append(row)
@@ -488,14 +492,21 @@ def set_feature_types(types):
             types["features"][key]["type"] = value
 
 
-def index_features(es, opts, *, dry_run=False, taxonomy_name):
+def index_features(es, opts, *, dry_run=False):
     """Index assembly features."""
     index = "feature"
     data_dir = "%s-dir" % index
     if data_dir in opts:
         dir_path = opts[data_dir]
     stored_attributes = {}
-    for types_file in sorted(Path(dir_path).glob("*.types.yaml")):
+    file_list = list_files(dir_path, "*.types.yaml")
+    shared_values = defaultdict(dict)
+    shared_values["_es"] = es
+    shared_values["_opts"] = opts
+    template = feature.index_template(opts["taxonomy-source"].lower(), opts)
+    shared_values["_index"] = template["index_name"]
+    shared_values["_index_type"] = index
+    for types_file in file_list:
         types, data, names = validate_types_file(
             types_file, dir_path, es, index, opts, attributes=stored_attributes
         )
@@ -505,12 +516,14 @@ def index_features(es, opts, *, dry_run=False, taxonomy_name):
             if "features" in types:
                 set_feature_types(types)
             index_types(es, index, types, opts, dry_run=dry_run)
+            shared_values["_types"] = types
             index_file(
                 es,
                 types,
                 names,
                 data,
                 {**opts, "index": index, "index_types": index_types},
+                shared_values=shared_values,
             )
         elif "attributes" in types:
             stored_attributes = {**stored_attributes, **types["attributes"]}
@@ -539,9 +552,7 @@ def main(args):
         )
 
     if "feature-dir" in options["index"]:
-        index_features(
-            es, options["index"], dry_run=dry_run, taxonomy_name=taxonomy_name
-        )
+        index_features(es, options["index"], dry_run=dry_run)
 
     if "file" in options["index"]:
         index_files(es, options["index"]["file"], taxonomy_name, options["index"])
