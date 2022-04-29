@@ -376,13 +376,19 @@ def lookup_attribute_value(identifier, attribute, shared_values):
         opts,
     )
     hits = res["hits"]["hits"]
-    if len(hits) == 1:
-        inner_hits = hits[0]["inner_hits"]["%s_values" % attribute]["hits"]["hits"]
-        if len(inner_hits) == 1:
-            field_values = inner_hits[0]["fields"]["attributes.%s_value" % value_type]
-            if len(field_values) == 1:
-                shared_values[identifier][attribute] = field_values[0]
-                return field_values[0]
+    try:
+        if len(hits) == 1:
+            inner_hits = hits[0]["inner_hits"]["%s_values" % attribute]["hits"]["hits"]
+            if len(inner_hits) == 1:
+                field_values = inner_hits[0]["fields"][
+                    "attributes.%s_value" % value_type
+                ]
+                if len(field_values) == 1:
+                    shared_values[identifier][attribute] = field_values[0]
+                    return field_values[0]
+    except KeyError:
+        print(inner_hits)
+        sys.exit(1)
     return None
 
 

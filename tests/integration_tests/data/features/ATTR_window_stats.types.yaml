@@ -54,6 +54,12 @@ attributes:
     display_name: Feature type
     display_group: coordinates
     type: keyword
+  sequence_name:
+    description: Sequence name
+    display_level: 1
+    display_name: Sequence name
+    display_group: coordinates
+    type: keyword
   length:
     bins:
       min: 1
