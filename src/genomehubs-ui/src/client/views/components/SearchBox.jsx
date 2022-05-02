@@ -373,6 +373,9 @@ const SearchBox = ({
     });
   }
   let searchText = `Type to search ${siteName}`;
+  if (searchIndex) {
+    searchText += ` ${searchIndex} index`;
+  }
   if (suggestedTerm) {
     searchText += ` (e.g. ${suggestedTerm})`;
   }
