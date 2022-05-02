@@ -20,40 +20,47 @@ export const aggregateRawValueSources = async ({}) => {
           path: "attributes",
         },
         aggs: {
-          fields: {
-            terms: {
-              field: "attributes.key",
-              size: 200,
+          direct: {
+            filter: {
+              match: { ["attributes.aggregation_source"]: "direct" },
             },
-
             aggs: {
-              summary: {
-                nested: {
-                  path: "attributes.values",
+              fields: {
+                terms: {
+                  field: "attributes.key",
+                  size: 200,
                 },
+
                 aggs: {
-                  terms: {
-                    terms: {
-                      field: "attributes.values.source.raw",
-                      size: 200,
+                  summary: {
+                    nested: {
+                      path: "attributes.values",
                     },
                     aggs: {
-                      min_date: {
-                        min: {
-                          field: "attributes.values.source_date",
-                          format: "yyyy-MM-dd",
-                        },
-                      },
-                      max_date: {
-                        max: {
-                          field: "attributes.values.source_date",
-                          format: "yyyy-MM-dd",
-                        },
-                      },
-                      url: {
+                      terms: {
                         terms: {
-                          field: "attributes.values.source_url",
-                          size: 1,
+                          field: "attributes.values.source.raw",
+                          size: 200,
+                        },
+                        aggs: {
+                          min_date: {
+                            min: {
+                              field: "attributes.values.source_date",
+                              format: "yyyy-MM-dd",
+                            },
+                          },
+                          max_date: {
+                            max: {
+                              field: "attributes.values.source_date",
+                              format: "yyyy-MM-dd",
+                            },
+                          },
+                          url: {
+                            terms: {
+                              field: "attributes.values.source_url",
+                              size: 1,
+                            },
+                          },
                         },
                       },
                     },
