@@ -63,10 +63,10 @@ Examples:
 
 import csv
 import sys
-
 # import time
 from collections import defaultdict
 from pathlib import Path
+from time import sleep
 from traceback import format_exc
 
 from docopt import docopt
@@ -516,6 +516,7 @@ def index_features(es, opts, *, dry_run=False):
             if "features" in types:
                 set_feature_types(types)
             index_types(es, index, types, opts, dry_run=dry_run)
+            sleep(1)
             shared_values["_types"] = types
             index_file(
                 es,

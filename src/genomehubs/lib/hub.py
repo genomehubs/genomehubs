@@ -620,8 +620,8 @@ def add_attribute_values(existing, new, *, raw=True):
                     {
                         **entry,
                         "count": 1,
-                        "aggregation_method": "unique",
-                        "aggregation_source": "direct",
+                        # "aggregation_method": "unique",
+                        # "aggregation_source": "direct",
                     }
                 )
 
