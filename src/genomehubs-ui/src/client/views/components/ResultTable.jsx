@@ -544,7 +544,7 @@ const ResultTable = ({
           if (Array.isArray(value)) {
             value = value[0];
           }
-          value = isNaN(value) ? value : formatter(value);
+          value = isNaN(value) ? value : formatter(value, searchIndex);
           if (Array.isArray(field.value) && field.count > 1) {
             value = `${value} ...`;
             let list = field.value.slice(0, 3).join(", ");

@@ -275,14 +275,17 @@ const AttributeTableRow = ({
     fieldValues.push(<TableCell key={"attribute"}>{label}</TableCell>);
     let range;
     if (meta.max > meta.min) {
-      range = ` (${formatter(meta.min)}-${formatter(meta.max)})`;
+      range = ` (${formatter(meta.min, currentResult)}-${formatter(
+        meta.max,
+        currentResult
+      )})`;
     }
     if (meta.from && meta.to && meta.to > meta.from) {
       range = ` (${formatter(meta.from)} to ${formatter(meta.to)})`;
     }
     fieldValues.push(
       <TableCell key={"value"}>
-        <Fragment>{formatter(meta.value)}</Fragment>
+        <Fragment>{formatter(meta.value, currentResult)}</Fragment>
         {range}
       </TableCell>
     );

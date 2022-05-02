@@ -70,7 +70,9 @@ export function fetchRecord(recordId, result, taxonomy, callback) {
       taxonomy = getCurrentTaxonomy(state);
     }
     dispatch(requestRecord());
-    let url = `${apiUrl}/record?recordId=${recordId}&result=${result}&taxonomy=${taxonomy}`;
+    let url = `${apiUrl}/record?recordId=${encodeURIComponent(
+      recordId
+    )}&result=${result}&taxonomy=${taxonomy}`;
     try {
       let json;
       try {
