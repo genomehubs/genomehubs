@@ -17,12 +17,12 @@ const analysisLookupQuery = ({ searchTerm }) => {
   };
 };
 
-const assemblyLookupQuery = ({ searchTerm }) => {
+const identifiersLookupQuery = ({ idKey, searchTerm }) => {
   return {
     bool: {
       should: [
         {
-          match: { assembly_id: searchTerm },
+          match: { [idKey]: searchTerm },
         },
         {
           nested: {
@@ -53,6 +53,12 @@ const assemblyLookupQuery = ({ searchTerm }) => {
     },
   };
 };
+
+const assemblyLookupQuery = ({ searchTerm }) =>
+  identifiersLookupQuery({ idKey: "assembly_id", searchTerm });
+
+const featureLookupQuery = ({ searchTerm }) =>
+  identifiersLookupQuery({ idKey: "feature_id", searchTerm });
 
 const taxonLookupQuery = ({ searchTerm, lineage, size }) => {
   let query = {
@@ -122,6 +128,15 @@ export const lookupQuery = ({ result, searchTerm, lineage, size = 10 }) => {
   } else if (result == "assembly") {
     query = assemblyLookupQuery({ searchTerm });
     _source = ["assembly_id", "taxon_id", "scientific_name", "identifiers.*"];
+  } else if (result == "feature") {
+    query = featureLookupQuery({ searchTerm });
+    _source = [
+      "assembly_id",
+      "taxon_id",
+      "feature_id",
+      "primary_type",
+      "identifiers.*",
+    ];
   } else if (result == "taxon") {
     query = taxonLookupQuery({ searchTerm, lineage, size });
     _source = [

@@ -12,6 +12,7 @@ const indices = {
   taxon: "taxon_id",
   assembly: "assembly",
   analysis: "analysis",
+  feature: "feature",
   // file: "file",
 };
 

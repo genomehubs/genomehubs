@@ -9,12 +9,12 @@ import TextPanel from "./TextPanel";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
-import dispatchSearchDefaults from "../hocs/dispatchSearchDefaults";
 import equal from "deep-equal";
 import qs from "qs";
 import shallow from "shallowequal";
 import styles from "./Styles.scss";
 import withSearch from "../hocs/withSearch";
+import withSearchDefaults from "../hocs/dispatchSearchDefaults";
 
 const SearchPage = ({
   searchResults,
@@ -93,7 +93,7 @@ const SearchPage = ({
       } else if (searchTerm.query && !options.query) {
         setPreviousSearchTerm({});
         setSearchTerm({});
-        setSearchIndex("taxon");
+        // setSearchIndex("taxon");
         fetchSearchResults({});
       }
     }
@@ -131,6 +131,6 @@ const SearchPage = ({
 export default compose(
   memo,
   dispatchLookup,
-  dispatchSearchDefaults,
+  withSearchDefaults,
   withSearch
 )(SearchPage);

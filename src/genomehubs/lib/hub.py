@@ -7,10 +7,18 @@ import re
 import sys
 from collections import defaultdict
 from copy import deepcopy
+from operator import add
+from operator import mod
+from operator import mul
+from operator import pow
+from operator import sub
+from operator import truediv
 from pathlib import Path
 
 from tolkein import tofile
 from tolkein import tolog
+
+from .es_functions import query_flexible_template
 
 LOGGER = tolog.logger(__name__)
 MIN_INTEGER = -(2 ** 31)
@@ -22,6 +30,50 @@ def setup(opts):
     """Set up directory for this GenomeHubs instance and handle reset."""
     Path(opts["hub-path"]).mkdir(parents=True, exist_ok=True)
     return True
+
+
+def dep(arg):
+    """Dependency resolver."""
+    # from https://code.activestate.com/recipes/576570-dependency-resolver/
+    # © 2008 Louis Riviere (MIT)
+    d = dict((k, set(arg[k])) for k in arg)
+    r = []
+    c = 0
+    while d and c < 10:
+        # values not in keys (items without dep)
+        t = set(i for v in d.values() for i in v) - set(d.keys())
+        # and keys without value (items without dep)
+        t.update(k for k, v in d.items() if not v)
+        # can be done right away
+        r.append(t)
+        # and cleaned up
+        d = dict(((k, v - t) for k, v in d.items() if v))
+        c += 1
+    if d:
+        LOGGER.error("Unable to resolve dependency tree")
+        sys.exit(1)
+    return r
+
+
+def list_files(dir_path, pattern):
+    """List files and sort by dependencies."""
+    LOGGER.info("Finding files in %s matching %s", dir_path, pattern)
+    deps = {}
+    file_list = []
+    yaml_files = sorted(Path(dir_path).glob(pattern))
+    for yaml_file in yaml_files:
+        yaml_dir = yaml_file.parent
+        yaml_file = str(yaml_file)
+        data = tofile.load_yaml(yaml_file)
+        if "file" in data and "needs" in data["file"]:
+            needs = data["file"]["needs"]
+            if not isinstance(needs, list):
+                needs = [needs]
+            deps[yaml_file] = ["%s/%s" % (yaml_dir, needed) for needed in needs]
+        else:
+            deps[yaml_file] = []
+    file_list = [item for sublist in dep(deps) for item in sublist]
+    return file_list
 
 
 def load_types(name, *, part="types"):
@@ -253,44 +305,149 @@ def convert_to_type(key, value, to_type):
     return value
 
 
-def calculator(value, operation):
+# def calculator():
+#     """Template-based calculator."""
+#     value1, operator, value2 = operation.split(" ")
+#     if value1 == "{}":
+#         value1 = float(value)
+#         value2 = float(value2)
+#     elif value2 == "{}":
+#         value2 = float(value)
+#         value1 = float(value1)
+#     if operator == "+":
+#         return value1 + value2
+#     elif operator == "-":
+#         return value1 - value2
+#     elif operator == "*":
+#         return value1 * value2
+#     elif operator == "/":
+#         try:
+#             return value1 / value2
+#         except ZeroDivisionError:
+#             return None
+#     elif operator == "%":
+#         if operator == "%":
+#             return value1 % value2
+#     else:
+#         return None
+
+
+def calculate(string):
+    """Recursively apply operations to a string."""
+    operators = {
+        "+": add,
+        "-": sub,
+        "%": mod,
+        "*": mul,
+        "/": truediv,
+        "**": pow,
+    }
+    string = string.replace(" ", "")
+    try:
+        return float(string)
+    except ValueError:
+        pass
+    parts = re.split(r"(\(.+\))", string)
+    if len(parts) > 1:
+        for index, part in enumerate(parts):
+            if part.startswith("("):
+                part = part[1:-1]
+                parts[index] = str(calculate(part))
+        string = "".join(parts)
+    for function in operators.keys():
+        left, operator, right = string.partition(function)
+        if operator in operators:
+            return operators[operator](calculate(left), calculate(right))
+
+
+def lookup_attribute_value(identifier, attribute, shared_values):
+    """Lookup an indexed attribute value."""
+    value_type = shared_values["_types"]["attributes"][attribute]["type"]
+    opts = {
+        "id_field": "%s_id" % shared_values["_index_type"],
+        "primary_id": identifier,
+        "attribute": attribute,
+        "value_type": value_type,
+    }
+    res = query_flexible_template(
+        shared_values["_es"],
+        "attribute_value_by_primary_id",
+        shared_values["_index"],
+        opts,
+    )
+    hits = res["hits"]["hits"]
+    try:
+        if len(hits) == 1:
+            inner_hits = hits[0]["inner_hits"]["%s_values" % attribute]["hits"]["hits"]
+            if len(inner_hits) == 1:
+                field_values = inner_hits[0]["fields"][
+                    "attributes.%s_value" % value_type
+                ]
+                if len(field_values) == 1:
+                    shared_values[identifier][attribute] = field_values[0]
+                    return field_values[0]
+    except KeyError:
+        print(inner_hits)
+        sys.exit(1)
+    return None
+
+
+def apply_template(value, operation, row_values, shared_values):
+    """Apply template to a function description."""
+    parts = re.split(r"(\{.*?\})", operation)
+    for index, part in enumerate(parts):
+        if part.startswith("{"):
+            part = part[1:-1]
+            if not part:
+                parts[index] = value
+            elif part in row_values:
+                parts[index] = str(row_values[part])
+            elif part.startswith("."):
+                part = part[1:]
+                if value in shared_values and part in shared_values[value]:
+                    parts[index] = str(shared_values[value][part])
+                else:
+                    parts[index] = str(
+                        lookup_attribute_value(value, part, shared_values)
+                    )
+                if parts[index] is None:
+                    LOGGER.error("%s has no value for attribute %s", value, part)
+                    sys.exit()
+            else:
+                print(row_values)
+                LOGGER.error("function template '%s' is not supported", operation)
+                sys.exit(1)
+    return "".join(parts)
+
+
+def calculator(value, operation, row_values, shared_values, template_type):
     """Template-based calculator."""
-    value1, operator, value2 = operation.split(" ")
-    if value1 == "{}":
-        value1 = float(value)
-        value2 = float(value2)
-    elif value2 == "{}":
-        value2 = float(value)
-        value1 = float(value1)
-    if operator == "+":
-        return value1 + value2
-    elif operator == "-":
-        return value1 - value2
-    elif operator == "*":
-        return value1 * value2
-    elif operator == "/":
-        try:
-            return value1 / value2
-        except ZeroDivisionError:
-            return None
-    elif operator == "%":
-        if operator == "%":
-            return value1 % value2
-    else:
-        return None
+    # print(dict(shared_values))
+    operation = apply_template(value, operation, row_values, shared_values)
+    if template_type == "template":
+        return operation
+    return calculate(operation)
 
 
-def validate_values(values, key, types):
+def validate_values(values, key, types, row_values, shared_values):
     """Validate values."""
     validated = []
+    if isinstance(types[key], str) or "type" not in types[key]:
+        types[key]["type"] = "keyword"
     key_type = types[key]["type"]
     for value in values:
-        if "function" in types[key]:
+        if "function" in types[key] or "template" in types[key]:
             try:
-                value = calculator(value, types[key]["function"])
+                template_type = "function" if "function" in types[key] else "template"
+                value = calculator(
+                    value, types[key][template_type], row_values, shared_values, template_type
+                )
             except ValueError:
                 continue
         value = convert_to_type(key, value, key_type)
+        if isinstance(types[key], str):
+            validated.append(value)
+            continue
         if value is None:
             continue
         if isinstance(value, str):
@@ -347,7 +504,15 @@ def apply_value_template(prop, value, attribute, *, taxon_types, has_taxon_data)
 
 
 def add_attributes(
-    entry, types, *, attributes=None, source=None, attr_type="attributes", meta=None
+    entry,
+    types,
+    *,
+    attributes=None,
+    source=None,
+    attr_type="attributes",
+    meta=None,
+    shared_values=None,
+    row_values=None
 ):
     """Add attributes to a document."""
     if attributes is None:
@@ -357,6 +522,8 @@ def add_attributes(
     if meta is None:
         meta = {}
     attribute_values = {}
+    if row_values is None:
+        row_values = {}
     for key, values in entry.items():
         if key in types:
             if not isinstance(values, list):
@@ -364,11 +531,14 @@ def add_attributes(
             if attr_type == "taxon_names":
                 validated = values
             else:
-                validated = validate_values(values, key, types)
+                validated = validate_values(
+                    values, key, types, row_values, shared_values
+                )
             # TODO: handle invalid values
             if validated:
                 if len(validated) == 1:
                     validated = validated[0]
+                row_values[key] = validated
                 if attr_type == "attributes":
                     attribute = {"key": key, "%s_value" % types[key]["type"]: validated}
                     attribute_values.update({key: attribute})
@@ -456,8 +626,8 @@ def add_attribute_values(existing, new, *, raw=True):
                     {
                         **entry,
                         "count": 1,
-                        "aggregation_method": "unique",
-                        "aggregation_source": "direct",
+                        # "aggregation_method": "unique",
+                        # "aggregation_source": "direct",
                     }
                 )
 
@@ -512,6 +682,8 @@ def set_row_defaults(types, data):
     for key in types["defaults"].keys():
         if key in types:
             for entry in types[key].values():
+                if not isinstance(entry, dict):
+                    entry = {"default": entry}
                 entry = {
                     **types["defaults"][key],
                     **entry,
@@ -525,7 +697,12 @@ def process_row_values(row, types, data):
     for group in data.keys():
         if group in types:
             for key, meta in types[group].items():
+                if not isinstance(meta, dict):
+                    data[group][key] = meta
+                    continue
                 if "index" not in meta:
+                    if "default" in meta:
+                        data[group][key] = meta["default"]
                     continue
                 try:
                     if isinstance(meta["index"], list):
@@ -549,10 +726,35 @@ def process_row_values(row, types, data):
                     raise err
 
 
-def process_row(types, names, row):
+def process_taxon_names(data, types, row, names):
+    """Process taxon names."""
+    if data["taxon_names"]:
+        data["taxon_names"] = set_xrefs(
+            data["taxon_names"], types["taxon_names"], row, meta=data["metadata"]
+        )
+    if data["taxonomy"] and names:
+        for key in names.keys():
+            if key in data["taxonomy"]:
+                if data["taxonomy"][key] in names[key]:
+                    data["taxonomy"]["_taxon_id"] = names[key][data["taxonomy"][key]][
+                        "taxon_id"
+                    ]
+                    data["taxonomy"][key] = names[key][data["taxonomy"][key]]["name"]
+
+
+def process_features(data):
+    """Move feature properties to top level."""
+    if data["features"]:
+        for entry in data["features"]:
+            data[entry["class"]] = entry["identifier"]
+        del data["features"]
+
+
+def process_row(types, names, row, shared_values):
     """Process a row of data."""
     data = {
         "attributes": {},
+        "features": {},
         "identifiers": {},
         "metadata": {},
         "taxon_names": {},
@@ -578,7 +780,8 @@ def process_row(types, names, row):
         and data["identifiers"]["assembly_id"]
     ):
         assembly_id = data["identifiers"]["assembly_id"]
-    for attr_type in list(["attributes", "identifiers", "taxon_names"]):
+    row_values = {}
+    for attr_type in list(["attributes", "features", "identifiers", "taxon_names"]):
         if attr_type in data and data[attr_type]:
             (
                 data[attr_type],
@@ -589,6 +792,8 @@ def process_row(types, names, row):
                 types[attr_type],
                 attr_type=attr_type,
                 meta=data["metadata"],
+                shared_values=shared_values,
+                row_values=row_values,
             )
         else:
             data[attr_type] = []
@@ -601,18 +806,8 @@ def process_row(types, names, row):
                         "source_id": assembly_id,
                     }
                 )
-    if data["taxon_names"]:
-        data["taxon_names"] = set_xrefs(
-            data["taxon_names"], types["taxon_names"], row, meta=data["metadata"]
-        )
-    if data["taxonomy"] and names:
-        for key in names.keys():
-            if key in data["taxonomy"]:
-                if data["taxonomy"][key] in names[key]:
-                    data["taxonomy"]["_taxon_id"] = names[key][data["taxonomy"][key]][
-                        "taxon_id"
-                    ]
-                    data["taxonomy"][key] = names[key][data["taxonomy"][key]]["name"]
+    process_taxon_names(data, types, row, names)
+    process_features(data)
     return data, taxon_data, taxon_types.get("attributes", {})
 
 

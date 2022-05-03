@@ -3,7 +3,7 @@ file:
   format: tsv
   header: true
   source_url_stub: https://www.ncbi.nlm.nih.gov/nuccore/
-  source: NCBI Organelle Genome Resources
+  source: NCBI
 attributes:
   assembly_span:
     display_group: metrics

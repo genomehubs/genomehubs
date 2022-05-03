@@ -15,6 +15,13 @@ export const setIncludes = ({
       include.push("assembly_id");
     }
   }
+  if (result == "feature") {
+    include = include
+      .concat(["taxon_id", "assembly_id", "feature_id", "primary_type"])
+      .concat(
+        summaryValues ? summaryValues.map((key) => `attributes.${key}`) : []
+      );
+  }
   if (non_attr_fields && non_attr_fields.length > 0) {
     include = include.concat(non_attr_fields);
   }

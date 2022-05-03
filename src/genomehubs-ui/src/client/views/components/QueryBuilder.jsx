@@ -15,8 +15,10 @@ import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import VariableFilter from "./VariableFilter";
 import { compose } from "recompose";
+import dispatchLookup from "../hocs/dispatchLookup";
 import { makeStyles } from "@material-ui/core/styles";
 import qs from "qs";
+import { setSearchTerm } from "../reducers/search";
 import { useNavigate } from "@reach/router";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
@@ -47,7 +49,9 @@ export const useStyles = makeStyles((theme) => ({
 const QueryBuilder = ({
   searchTerm,
   searchIndex,
+  setSearchIndex,
   setSearchDefaults,
+  setLookupTerm,
   setPreferSearchTerm,
   taxonomy,
   types,
@@ -107,8 +111,29 @@ const QueryBuilder = ({
   }, []);
 
   const handleIndexChange = (e) => {
+    let options = qs.parse(location.search.replace(/^\?/, ""));
     e.stopPropagation();
-    setIndex(e.target.value);
+    setSearchIndex(e.target.value);
+    // setLookupTerm("");
+    setSearchDefaults({
+      includeEstimates: false,
+      includeDescendant: false,
+    });
+    // setPreferSearchTerm(true);
+    // setSearchTerm({
+    //   taxonomy: options.taxonomy,
+    //   query: options.query,
+    //   result: e.target.value,
+    // });
+    // setTimeout(() => {
+    navigate(
+      `/search?${qs.stringify({
+        taxonomy: options.taxonomy,
+        query: "",
+        result: e.target.value,
+      })}`
+    );
+    // }, 500);
   };
 
   const buildQuery = () => {
@@ -344,7 +369,11 @@ const QueryBuilder = ({
               id={"search-index-select"}
               handleChange={handleIndexChange}
               helperText={"search index"}
-              values={{ Taxon: "taxon", Assembly: "assembly" }}
+              values={{
+                Taxon: "taxon",
+                Assembly: "assembly",
+                Feature: "feature",
+              }}
             />
           </Grid>
         </Grid>
@@ -468,6 +497,7 @@ const QueryBuilder = ({
 };
 
 export default compose(
+  dispatchLookup,
   withTypes,
   withTaxonomy,
   withSearch,

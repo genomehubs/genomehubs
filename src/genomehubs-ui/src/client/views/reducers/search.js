@@ -92,7 +92,9 @@ export const getSearchTerm = (state) => state.searchTerm;
 export const setSearchIndex = createAction("SET_SEARCH_INDEX");
 export const searchIndex = handleAction(
   "SET_SEARCH_INDEX",
-  (state, action) => action.payload,
+  (state, action) => {
+    return action.payload;
+  },
   "taxon"
 );
 export const getSearchIndex = (state) => state.searchIndex;

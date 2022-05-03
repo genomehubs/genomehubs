@@ -387,6 +387,7 @@ const processScatter = (scatter) => {
           } else {
             y = yScale(obj.y);
           }
+          // TODO: Handle features with no scientific name
           locations[obj.scientific_name.toLowerCase()] = {
             x,
             y,
@@ -498,6 +499,7 @@ const processScatter = (scatter) => {
         } else {
           y = yScale(obj.y);
         }
+        // TODO: Handle features with no scientific name
         locations[obj.scientific_name.toLowerCase()] = {
           x,
           y,

@@ -255,6 +255,7 @@ components:
         enum:
           - analysis
           - assembly
+          - feature
           - file
           - taxon
           - multi

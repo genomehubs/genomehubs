@@ -70,7 +70,9 @@ export function fetchRecord(recordId, result, taxonomy, callback) {
       taxonomy = getCurrentTaxonomy(state);
     }
     dispatch(requestRecord());
-    let url = `${apiUrl}/record?recordId=${recordId}&result=${result}&taxonomy=${taxonomy}`;
+    let url = `${apiUrl}/record?recordId=${encodeURIComponent(
+      recordId
+    )}&result=${result}&taxonomy=${taxonomy}`;
     try {
       let json;
       try {
@@ -83,6 +85,9 @@ export function fetchRecord(recordId, result, taxonomy, callback) {
       let fetchedTitle = json.records[0].record.scientific_name;
       if (result == "assembly") {
         fetchedRecordId = json.records[0].record.assembly_id;
+        fetchedTitle = fetchedRecordId;
+      } else if (result == "feature") {
+        fetchedRecordId = json.records[0].record.feature_id;
         fetchedTitle = fetchedRecordId;
       }
       if (fetchedRecordId == recordId) {

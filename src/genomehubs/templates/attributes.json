@@ -17,6 +17,11 @@
         "index": false,
         "meta": { "description": "Attribute display name" }
       },
+      "sequence": {
+        "type": "integer",
+        "null_value": 0,
+        "meta": { "description": "Attribute display name" }
+      },
       "constraint": {
         "type": "object"
       },

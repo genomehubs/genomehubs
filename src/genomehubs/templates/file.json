@@ -100,6 +100,22 @@
         "ignore_above": 32,
         "index": false,
         "meta": { "description": "File preview MIME type" }
+      },
+      "source_url": {
+        "type": "keyword",
+        "ignore_above": 128,
+        "meta": { "description": "Source URL" }
+      },
+      "source_url_stub": {
+        "type": "keyword",
+        "index": false,
+        "meta": { "description": "URL stub" }
+      },
+      "source_slug": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "normalizer": "lowercase",
+        "meta": { "description": "Source url slug" }
       }
     }
   }

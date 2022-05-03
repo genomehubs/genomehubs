@@ -17,13 +17,13 @@ const analysisSaytQuery = ({ searchTerm }) => {
   };
 };
 
-const assemblySaytQuery = ({ searchTerm }) => {
+const identifiersSaytQuery = ({ idKey, searchTerm }) => {
   return {
     bool: {
       should: [
         {
           prefix: {
-            assembly_id: {
+            [idKey]: {
               value: searchTerm,
               boost: 10,
             },
@@ -31,7 +31,7 @@ const assemblySaytQuery = ({ searchTerm }) => {
         },
         {
           match_phrase_prefix: {
-            ["assembly_id.text"]: {
+            [`${idKey}.text`]: {
               query: searchTerm,
               boost: 5,
             },
@@ -43,9 +43,9 @@ const assemblySaytQuery = ({ searchTerm }) => {
             type: "phrase_prefix",
             boost: 2,
             fields: [
-              "assembly_id.live",
-              "assembly_id.live._2gram",
-              "assembly_id.live._3gram",
+              `${idKey}.live`,
+              `${idKey}.live._2gram`,
+              `${idKey}.live._3gram`,
             ],
           },
         },
@@ -91,6 +91,12 @@ const assemblySaytQuery = ({ searchTerm }) => {
     },
   };
 };
+
+const assemblySaytQuery = ({ searchTerm }) =>
+  identifiersSaytQuery({ idKey: "assembly_id", searchTerm });
+
+const featureSaytQuery = ({ searchTerm }) =>
+  identifiersSaytQuery({ idKey: "feature_id", searchTerm });
 
 const taxonSaytQuery = ({ searchTerm, wildcardTerm = "", size }) => {
   return {
@@ -214,6 +220,15 @@ export const saytQuery = ({ result, searchTerm, wildcardTerm, size = 10 }) => {
   } else if (result == "assembly") {
     query = assemblySaytQuery({ searchTerm });
     _source = ["assembly_id", "taxon_id", "scientific_name", "identifiers.*"];
+  } else if (result == "feature") {
+    query = featureSaytQuery({ searchTerm });
+    _source = [
+      "assembly_id",
+      "taxon_id",
+      "feature_id",
+      "primary_type",
+      "identifiers.*",
+    ];
   } else if (result == "taxon") {
     query = taxonSaytQuery({ searchTerm, wildcardTerm, size });
     _source = ["taxon_id", "scientific_name", "taxon_rank", "taxon_names.*"];

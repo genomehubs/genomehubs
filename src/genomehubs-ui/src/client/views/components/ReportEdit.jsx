@@ -28,7 +28,12 @@ const xSettings = {
   label: `tax_tree(${suggestedTerm}) AND assembly_span`,
   required: true,
 };
-const rankSettings = { prop: "rank", label: "family", required: true };
+const rankSettings = {
+  prop: "rank",
+  label: "family",
+  required: true,
+  except: ["feature"],
+};
 const catSettings = { prop: "cat", label: "assembly_level" };
 
 export const queryPropList = {
@@ -98,6 +103,7 @@ export const ReportEdit = ({
   if (query.report == "tree" && !query.treeStyle) {
     query.treeStyle = "rect";
   }
+  let result = query.result;
 
   const defaultState = () => {
     let obj = {};
@@ -215,15 +221,17 @@ export const ReportEdit = ({
 
   let toggles = [];
 
-  queryPropList[report].forEach((queryProp) => {
-    let input;
-    let required;
-    let label;
+  for (let queryProp of queryPropList[report]) {
+    let except, input, label, required;
     if (Array.isArray(queryProp)) {
       required = true;
       queryProp = queryProp[0];
     } else if (typeof queryProp === "object" && queryProp !== null) {
-      ({ prop: queryProp, label, required } = queryProp);
+      ({ prop: queryProp, label, required, except } = queryProp);
+    }
+
+    if (except && except.includes(result)) {
+      continue;
     }
 
     if (queryProp == "report") {
@@ -362,7 +370,7 @@ export const ReportEdit = ({
         </Grid>
       );
     }
-  });
+  }
   if (toggles.length > 0) {
     fields.push(
       <Grid item align="left" key={"toggles"}>

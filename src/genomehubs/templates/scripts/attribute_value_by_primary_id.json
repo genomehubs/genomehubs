@@ -1,0 +1,35 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": {
+        "bool": {
+          "filter": [
+            { "match": { "{{id_field}}": "{{primary_id}}" } },
+            {
+              "nested": {
+                "path": "attributes",
+                "query": {
+                  "bool": {
+                    "filter": [
+                      { "match": { "attributes.key": "{{attribute}}" } }
+                    ]
+                  }
+                },
+                "inner_hits": {
+                  "_source": false,
+                  "name": "{{attribute}}_values",
+                  "docvalue_fields": [
+                    "attributes.key",
+                    "attributes.{{value_type}}_value"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "_source": false
+    }
+  }
+}

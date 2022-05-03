@@ -18,7 +18,7 @@ attributes:
     taxon_traverse: false
     taxon_type: 1dp
     type: 1dp
-    units: '%'
+    units: "%"
   busco_lineage:
     description: Busco lineage
     display_group: busco
@@ -52,7 +52,7 @@ attributes:
     display_name: GC percent
     header: gc_percent
     type: 1dp
-    units: '%'
+    units: "%"
     taxon_bins:
       count: 10
       max: 100
@@ -73,7 +73,7 @@ attributes:
     display_name: N percent
     header: n_percent
     type: 1dp
-    units: '%'
+    units: "%"
     taxon_bins:
       count: 10
       max: 100
@@ -92,7 +92,7 @@ attributes:
     display_name: No hit
     header: nohit
     type: 1dp
-    units: '%'
+    units: "%"
     taxon_bins:
       count: 10
       max: 100
@@ -112,7 +112,7 @@ attributes:
     display_name: Target
     header: target
     type: 1dp
-    units: '%'
+    units: "%"
     taxon_bins:
       count: 10
       max: 100
@@ -130,6 +130,8 @@ file:
   format: tsv
   header: true
   name: btk.tsv.gz
+  source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
+  source: BlobToolKit
 identifiers:
   assembly_alias:
     header: alias

@@ -411,7 +411,7 @@ export const histogram = async ({
   report,
   apiParams,
 }) => {
-  if (!rank) {
+  if (result == "taxon" && !rank) {
     return {
       status: {
         success: false,

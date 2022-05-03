@@ -279,6 +279,9 @@ const ResultTable = ({
     if (searchIndex == "assembly") {
       recordId = record.assembly_id;
       searchText = record.assembly_id;
+    } else if (searchIndex == "feature") {
+      recordId = record.feature_id;
+      searchText = record.feature_id;
     } else {
       recordId = record.taxon_id;
       searchText = record.scientific_name;
@@ -497,6 +500,29 @@ const ResultTable = ({
         </Tooltip>
       );
     }
+    if (searchIndex == "feature") {
+      cells = [];
+      cells.push(
+        <Tooltip title={"Click to view assembly"} arrow key={"assembly_id"}>
+          <TableCell
+            style={{ cursor: "pointer" }}
+            onClick={() => handleRecordClick(result.result)}
+          >
+            {result.result.assembly_id}
+          </TableCell>
+        </Tooltip>
+      );
+      cells.push(
+        <Tooltip title={"Click to view feature"} arrow key={"feature_id"}>
+          <TableCell
+            style={{ cursor: "pointer" }}
+            onClick={() => handleRecordClick(result.result)}
+          >
+            {result.result.feature_id}
+          </TableCell>
+        </Tooltip>
+      );
+    }
     displayTypes.forEach((type) => {
       if (type.name != "sex_determination_system") {
         if (
@@ -508,7 +534,7 @@ const ResultTable = ({
           if (Array.isArray(value)) {
             value = value[0];
           }
-          value = isNaN(value) ? value : formatter(value);
+          value = isNaN(value) ? value : formatter(value, searchIndex);
           if (Array.isArray(field.value) && field.count > 1) {
             value = `${value} ...`;
             let list = field.value.slice(0, 3).join(", ");
@@ -530,12 +556,14 @@ const ResultTable = ({
                 spacing={1}
                 alignItems={"center"}
               >
-                <Grid item>
-                  <AggregationIcon
-                    method={field.aggregation_source}
-                    hasDescendants={field.has_descendants}
-                  />
-                </Grid>
+                {field.aggregation_source && (
+                  <Grid item>
+                    <AggregationIcon
+                      method={field.aggregation_source}
+                      hasDescendants={field.has_descendants}
+                    />
+                  </Grid>
+                )}
 
                 <Grid item style={{ whiteSpace: "nowrap" }}>
                   {value}
@@ -609,7 +637,7 @@ const ResultTable = ({
       />
     );
   });
-  if (searchIndex == "assembly") {
+  if (searchIndex == "assembly" || searchIndex == "feature") {
     heads.push(
       <SortableCell
         name={"assembly_id"}
@@ -618,6 +646,20 @@ const ResultTable = ({
         sortBy={sortBy}
         sortOrder={sortOrder}
         sortDirection={sortBy === "assembly_id" ? sortOrder : false}
+        handleTableSort={handleTableSort}
+      />
+    );
+  }
+  if (searchIndex == "feature") {
+    heads = [heads.pop()];
+    heads.push(
+      <SortableCell
+        name={"feature_id"}
+        key={"feature_id"}
+        classes={classes}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        sortDirection={sortBy === "feature_id" ? sortOrder : false}
         handleTableSort={handleTableSort}
       />
     );

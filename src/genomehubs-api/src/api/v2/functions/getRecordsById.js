@@ -15,6 +15,8 @@ const convertIdsToDocIds = (recordId, result) => {
     ids = ids.map((id) => (id.match(/^taxon_id-/) ? id : `taxon_id-${id}`));
   } else if (result == "assembly") {
     ids = ids.map((id) => (id.match(/^assembly-/) ? id : `assembly-${id}`));
+  } else if (result == "feature") {
+    ids = ids.map((id) => (id.match(/^feature-/) ? id : `feature-${id}`));
   } else if (result == "analysis") {
     ids = ids.map((id) => (id.match(/^analysis-/) ? id : `analysis-${id}`));
   } else if (result == "file") {

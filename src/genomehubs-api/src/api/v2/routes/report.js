@@ -429,7 +429,7 @@ export const getRawSources = async (params) => {
   let fields = [];
   let status = checkResponse({ body });
   if (status.hits) {
-    fields = body.aggregations.attributes.fields;
+    fields = body.aggregations.attributes.direct.fields;
   }
   return { status, fields };
 };
@@ -458,6 +458,8 @@ export const getSources = async (params) => {
       if (urlBuckets && urlBuckets.length > 0) {
         url = urlBuckets[0].key;
       }
+      if (field == "c_value") {
+      }
       summary.terms.buckets.forEach(({ key: source, doc_count: count }) => {
         if (!counts[source]) {
           counts[source] = 0;
@@ -466,6 +468,8 @@ export const getSources = async (params) => {
           fields[source] = [];
         }
         counts[source] += count;
+        if (field == "c_value") {
+        }
         fields[source].push(field);
         if (dateRange) {
           if (dates[source]) {

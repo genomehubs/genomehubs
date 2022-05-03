@@ -87,11 +87,19 @@ const AutoCompleteOption = ({ option }) => {
       </Typography>
     );
   } else if (option.identifier_class) {
-    secondaryText = (
-      <Typography variant="body2" color="textSecondary">
-        {option.scientific_name}
-      </Typography>
-    );
+    if (option.result == "assembly") {
+      secondaryText = (
+        <Typography variant="body2" color="textSecondary">
+          {option.scientific_name}
+        </Typography>
+      );
+    } else {
+      secondaryText = (
+        <Typography variant="body2" color="textSecondary">
+          {option.feature_id}
+        </Typography>
+      );
+    }
   }
 
   return (
@@ -322,6 +330,31 @@ const SearchBox = ({
             >{`\u2014 ${result.result.scientific_name}`}</div>
           </div>
         );
+      } else if (lookupTerms.status.result == "feature") {
+        if (result.reason) {
+          value = result.reason[0].fields["identifiers.identifier.raw"][0];
+        } else {
+          value = result.result.feature_id;
+        }
+        options.push({
+          title: value,
+          result: "feature",
+          unique_term: result.result.feature_id,
+          taxon_id: result.result.taxon_id,
+          assembly_id: result.result.assembly_id,
+          feature_id: result.result.feature_id,
+          identifier_class: result.reason
+            ? result.reason[0].fields["identifiers.class"]
+            : "feature ID",
+        });
+        terms.push(
+          <div key={i} className={styles.term}>
+            <span className={styles.value}>{value}</span>
+            <div
+              className={styles.extra}
+            >{`\u2014 ${result.result.primary_type}`}</div>
+          </div>
+        );
       }
     });
   }
@@ -340,6 +373,9 @@ const SearchBox = ({
     });
   }
   let searchText = `Type to search ${siteName}`;
+  if (searchIndex) {
+    searchText += ` ${searchIndex} index`;
+  }
   if (suggestedTerm) {
     searchText += ` (e.g. ${suggestedTerm})`;
   }

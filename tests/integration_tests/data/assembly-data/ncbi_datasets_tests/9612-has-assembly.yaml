@@ -13,6 +13,6 @@ assert:
       - key: assembly_level
         values:
           - keyword_value: Chromosome
-            source: NCBI Datasets
+            source: INSDC
             source_id: GCA_905319855.2
             is_primary_value: true

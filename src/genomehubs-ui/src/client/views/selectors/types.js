@@ -177,7 +177,7 @@ export const getDisplayTypes = createSelector(
         displayTypes.push(types[key]);
       }
     });
-    return displayTypes;
+    return displayTypes.sort((a, b) => b.sequence < a.sequence);
   }
 );
 
