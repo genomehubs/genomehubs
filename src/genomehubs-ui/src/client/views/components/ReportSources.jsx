@@ -17,13 +17,40 @@ const ReportSources = ({ sources, minDim, types }) => {
     (a, b) => parseInt(b[1].count || 0) - parseInt(a[1].count || 0)
   );
   sorted.forEach(([key, source], index) => {
-    let sourceName = source.url ? (
-      <a href={source.url} target="_blank">
-        {key} <LaunchIcon fontSize="inherit" />
-      </a>
-    ) : (
-      key
-    );
+    let sourceName;
+    if (key == "INSDC") {
+      sourceName = (
+        <span>
+          INSDC (
+          <a
+            style={{ whiteSpace: "nowrap" }}
+            href={"https://www.ebi.ac.uk/ena/browser/home"}
+            target="_blank"
+          >
+            {"ENA"}
+            <LaunchIcon fontSize="inherit" />
+          </a>{" "}
+          <a
+            style={{ whiteSpace: "nowrap" }}
+            href={"https://www.ncbi.nlm.nih.gov"}
+            target="_blank"
+          >
+            {"NCBI"}
+            <LaunchIcon fontSize="inherit" />
+          </a>
+          )
+        </span>
+      );
+    } else {
+      sourceName = source.url ? (
+        <a href={source.url} target="_blank">
+          {key}
+          <LaunchIcon fontSize="inherit" />
+        </a>
+      ) : (
+        key
+      );
+    }
     if (source.date) {
       let displayDate;
       if (!Array.isArray(source.date)) {

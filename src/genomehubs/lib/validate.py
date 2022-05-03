@@ -35,7 +35,6 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
             sequence = max(int(d['sequence']) for d in attributes.values()) + 1
         else:
             sequence = 0
-    
         for key, entry in types["attributes"].items():
             if not isinstance(entry, dict):
                 entry = {"default": entry}

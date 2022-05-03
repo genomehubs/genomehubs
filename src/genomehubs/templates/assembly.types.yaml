@@ -4,7 +4,7 @@ file:
   header: true
   organelle: nucleus
   source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
-  source: NCBI Datasets
+  source: INSDC
 taxonomy:
   taxon_id:
     header: taxId

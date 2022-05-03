@@ -43,8 +43,12 @@ const AttributePanel = ({ attributes, result, taxonId }) => {
           <TableRow>
             <TableCell>Attribute</TableCell>
             <TableCell>Value</TableCell>
-            <TableCell>Count</TableCell>
-            <TableCell>Summary</TableCell>
+            {result == "taxon" && (
+              <>
+                <TableCell>Count</TableCell>
+                <TableCell>Summary</TableCell>
+              </>
+            )}
             <TableCell>Source</TableCell>
           </TableRow>
         </TableHead>

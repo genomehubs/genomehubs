@@ -22,7 +22,6 @@ const convertIdsToDocIds = (recordId, result) => {
   } else if (result == "file") {
     ids = ids.map((id) => (id.match(/^file-/) ? id : `file-${id}`));
   }
-  console.log(ids);
   return ids;
 };
 

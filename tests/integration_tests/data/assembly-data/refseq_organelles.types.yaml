@@ -5,18 +5,18 @@ attributes:
     display_group: metrics
     display_level: 1
     index: 8
-    source: NCBI Organelle Genome Resources
+    source: NCBI
     source_url_stub: https://www.ncbi.nlm.nih.gov/nuccore/
     taxon_bins:
       count: 10
       max: 8
       min: 3
       scale: log10
-    taxon_display_group: '{{organelle}}_assembly'
+    taxon_display_group: "{{organelle}}_assembly"
     taxon_display_level: 2
-    taxon_display_name: '{{organelle}} span'
-    taxon_key: '{{organelle}}_assembly_span'
-    taxon_name: '{{organelle}}_assembly_span'
+    taxon_display_name: "{{organelle}} span"
+    taxon_key: "{{organelle}}_assembly_span"
+    taxon_name: "{{organelle}}_assembly_span"
     taxon_summary: median
     taxon_traverse: median
     taxon_traverse_limit: phylum
@@ -29,28 +29,28 @@ attributes:
     display_group: metrics
     display_level: 1
     index: 9
-    source: NCBI Organelle Genome Resources
+    source: NCBI
     source_url_stub: https://www.ncbi.nlm.nih.gov/nuccore/
     taxon_bins:
       count: 10
       max: 100
       min: 0
       scale: linear
-    taxon_display_group: '{{organelle}}_assembly'
+    taxon_display_group: "{{organelle}}_assembly"
     taxon_display_level: 2
-    taxon_display_name: '{{organelle}} GC%'
-    taxon_key: '{{organelle}}_gc_percent'
-    taxon_name: '{{organelle}}_gc_percent'
+    taxon_display_name: "{{organelle}} GC%"
+    taxon_key: "{{organelle}}_gc_percent"
+    taxon_name: "{{organelle}}_gc_percent"
     taxon_summary: median
     taxon_traverse: median
     taxon_traverse_limit: phylum
     type: 2dp
-    units: '%'
+    units: "%"
   last_updated:
     display_group: misc
     display_level: 2
     index: 11
-    source: NCBI Organelle Genome Resources
+    source: NCBI
     source_url_stub: https://www.ncbi.nlm.nih.gov/nuccore/
     type: date
   n_percent:
@@ -60,21 +60,21 @@ attributes:
     display_group: metrics
     display_level: 1
     index: 10
-    source: NCBI Organelle Genome Resources
+    source: NCBI
     source_url_stub: https://www.ncbi.nlm.nih.gov/nuccore/
     type: 2dp
-    units: '%'
+    units: "%"
   sample_location:
     display_group: misc
     display_level: 2
     index: 12
-    source: NCBI Organelle Genome Resources
+    source: NCBI
     source_url_stub: https://www.ncbi.nlm.nih.gov/nuccore/
-    taxon_display_group: '{{organelle}}_assembly'
+    taxon_display_group: "{{organelle}}_assembly"
     taxon_display_level: 2
-    taxon_display_name: '{{organelle}} sample location'
-    taxon_key: '{{organelle}}_sample_location'
-    taxon_name: '{{organelle}}_sample_location'
+    taxon_display_name: "{{organelle}} sample location"
+    taxon_key: "{{organelle}}_sample_location"
+    taxon_name: "{{organelle}}_sample_location"
     taxon_summary: list
     type: geo_point
 file:
@@ -82,7 +82,7 @@ file:
   format: tsv
   header: true
   name: refseq_organelles.tsv.gz
-  source: NCBI Organelle Genome Resources
+  source: NCBI
   source_url_stub: https://www.ncbi.nlm.nih.gov/nuccore/
 identifiers:
   assembly_id:

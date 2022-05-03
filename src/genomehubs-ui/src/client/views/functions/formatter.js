@@ -6,7 +6,7 @@ export const formatter = (value, searchIndex) => {
     if (Array.isArray(value)) {
       const values = sortByFrequency(value);
       return values
-        .map((arr) => `${arr[0]} (${arr[1]})`)
+        .map((arr) => `${arr[0]}${arr[1] > 1 ? ` (${arr[1]})` : ""}`)
         .slice(0, 5)
         .join("; ");
     }

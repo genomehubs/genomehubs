@@ -41,6 +41,48 @@ const useRowStyles = makeStyles({
   },
 });
 
+const ExternalLink = ({ url, link }) => {
+  return (
+    <a href={url} target="_blank">
+      {link}
+      <LaunchIcon fontSize="inherit" />
+    </a>
+  );
+};
+
+const SourceLink = ({ row, types, format = "short" }) => {
+  let link, link_url;
+  link = row.source || types.source;
+  let url_stub = row.source_url_stub || types.source_url_stub;
+  let url = row.source_url || types.source_url || types.url;
+  let slug;
+  if (url_stub) {
+    if (row.source_slug) {
+      slug = row.source_slug;
+      link_url = `${url_stub}${row.source_slug}`;
+      if (format == "long") {
+        link = `${link} [${row.source_slug}]`;
+      }
+    } else {
+      link_url = url ? url : url_stub;
+    }
+  } else if (url && !Array.isArray(url)) {
+    link_url = url;
+  }
+  if (link.toLowerCase() == "insdc" && slug && slug.startsWith("GCA_")) {
+    return (
+      <>
+        <ExternalLink
+          url={`https://www.ebi.ac.uk/ena/browser/view/${slug}`}
+          link={"ENA"}
+        />{" "}
+        <ExternalLink url={link_url} link={"NCBI"} />
+      </>
+    );
+  }
+  return link_url ? <ExternalLink url={link_url} link={link} /> : link;
+};
+
 const NestedTable = ({
   values,
   types,
@@ -87,29 +129,9 @@ const NestedTable = ({
           {values
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             .map((row, i) => {
-              let link, link_url;
-              link = row.source || types.source;
-              let url_stub = row.source_url_stub || types.source_url_stub;
-              let url = row.source_url || types.source_url || types.url;
-              if (url_stub) {
-                if (row.source_slug) {
-                  link_url = `${url_stub}${row.source_slug}`;
-                  link = `${link} [${row.source_slug}]`;
-                } else {
-                  link_url = url ? url : url_stub;
-                }
-              } else if (url && !Array.isArray(url)) {
-                link_url = url;
-              }
               let linkCell = (
                 <TableCell>
-                  {link_url ? (
-                    <a href={link_url} target="_blank">
-                      {link} <LaunchIcon fontSize="inherit" />
-                    </a>
-                  ) : (
-                    link
-                  )}
+                  <SourceLink row={row} types={types} format={"short"} />
                 </TableCell>
               );
               let hubCell;
@@ -153,9 +175,7 @@ const NestedTable = ({
                   {hubCell}
                   <Tooltip
                     title={
-                      row.source_description || link_url
-                        ? "open external source"
-                        : "no external link"
+                      row.source ? "open external source" : "no external link"
                     }
                     arrow
                     placement={"top"}
@@ -289,123 +309,134 @@ const AttributeTableRow = ({
         {range}
       </TableCell>
     );
-    fieldValues.push(<TableCell key={"count"}>{meta.count}</TableCell>);
-    fieldValues.push(
-      <TableCell key={"method"}>{meta.aggregation_method}</TableCell>
-    );
-
-    if (meta.aggregation_source) {
-      let css;
-      let icons = [];
-
-      source = meta["aggregation_source"];
-      css = classnames(
-        styles.underscore,
-        styles[`underscore${confidence[source]}`]
+    if (currentResult == "taxon") {
+      fieldValues.push(<TableCell key={"count"}>{meta.count}</TableCell>);
+      fieldValues.push(
+        <TableCell key={"method"}>{meta.aggregation_method}</TableCell>
       );
-      aggSource = formatter(source);
-      let altCss = classnames(
-        styles.underscore,
-        styles[`underscore${confidence["descendant"]}`]
-      );
-      let altAggSource = formatter("descendant");
-      if (source == "direct") {
-        icons.push(
-          <span key="direct" className={styles.disableTheme}>
-            <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={() => setOpen(!open)}
-            >
-              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            </IconButton>
-          </span>
+
+      if (meta.aggregation_source) {
+        let css;
+        let icons = [];
+
+        source = meta["aggregation_source"];
+        css = classnames(
+          styles.underscore,
+          styles[`underscore${confidence[source]}`]
         );
+        aggSource = formatter(source);
+        let altCss = classnames(
+          styles.underscore,
+          styles[`underscore${confidence["descendant"]}`]
+        );
+        let altAggSource = formatter("descendant");
+        if (source == "direct") {
+          icons.push(
+            <span key="direct" className={styles.disableTheme}>
+              <IconButton
+                aria-label="expand row"
+                size="small"
+                onClick={() => setOpen(!open)}
+              >
+                {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
+            </span>
+          );
+        }
+        if (source == "descendant" || meta.has_descendants) {
+          icons.push(
+            <span key="descendant" className={styles.disableTheme}>
+              <IconButton
+                aria-label="show descendant values"
+                size="small"
+                onClick={() => handleDescendantClick(attributeId)}
+              >
+                <KeyboardArrowRightIcon />
+              </IconButton>
+            </span>
+          );
+        } else if (source == "ancestor") {
+          icons.push(
+            <span key="ancestor" className={styles.disableTheme}>
+              <IconButton
+                aria-label="show ancestral values"
+                size="small"
+                onClick={() =>
+                  handleAncestorClick(attributeId, meta.aggregation_taxon_id)
+                }
+              >
+                <KeyboardArrowRightIcon />
+              </IconButton>
+            </span>
+          );
+          if (meta.aggregation_rank) {
+            aggSource = (
+              <Tooltip
+                title={`source rank: ${meta.aggregation_rank}`}
+                arrow
+                placement={"top"}
+              >
+                <span>{aggSource}</span>
+              </Tooltip>
+            );
+          }
+        }
+
+        fieldValues.push(
+          <TableCell
+            key={"aggregation_source"}
+            style={{ whiteSpace: "nowrap" }}
+          >
+            <span className={css}>{aggSource}</span>
+            {icons[0]}
+            {icons[1] && (
+              <>
+                <span className={altCss}>{altAggSource}</span> {icons[1]}
+              </>
+            )}
+          </TableCell>
+        );
+        colSpan++;
       }
-      if (source == "descendant" || meta.has_descendants) {
-        icons.push(
-          <span key="descendant" className={styles.disableTheme}>
-            <IconButton
-              aria-label="show descendant values"
-              size="small"
-              onClick={() => handleDescendantClick(attributeId)}
-            >
-              <KeyboardArrowRightIcon />
-            </IconButton>
-          </span>
-        );
-      } else if (source == "ancestor") {
-        icons.push(
-          <span key="ancestor" className={styles.disableTheme}>
-            <IconButton
-              aria-label="show ancestral values"
-              size="small"
-              onClick={() =>
-                handleAncestorClick(attributeId, meta.aggregation_taxon_id)
-              }
-            >
-              <KeyboardArrowRightIcon />
-            </IconButton>
-          </span>
-        );
-        if (meta.aggregation_rank) {
-          aggSource = (
-            <Tooltip
-              title={`source rank: ${meta.aggregation_rank}`}
-              arrow
-              placement={"top"}
-            >
-              <span>{aggSource}</span>
-            </Tooltip>
+
+      if (source == "direct") {
+        let values = [];
+        if (meta.values) {
+          values = meta.values;
+        } else if (
+          meta.aggregation_method &&
+          meta.aggregation_method == "unique"
+        ) {
+          values = [meta];
+        }
+        if (values.length > 0) {
+          raw = (
+            <TableRow>
+              <TableCell></TableCell>
+              <TableCell
+                style={{ paddingBottom: 0, paddingTop: 0 }}
+                colSpan={colSpan}
+              >
+                <Collapse in={open.toString()} timeout="auto">
+                  <NestedTable
+                    types={types[attributeId]}
+                    values={values}
+                    setPreferSearchTerm={setPreferSearchTerm}
+                    taxonomy={taxonomy}
+                    siteName={siteName}
+                  />
+                </Collapse>
+              </TableCell>
+            </TableRow>
           );
         }
       }
-
+    } else if (meta.source) {
       fieldValues.push(
-        <TableCell key={"aggregation_source"} style={{ whiteSpace: "nowrap" }}>
-          <span className={css}>{aggSource}</span>
-          {icons[0]}
-          {icons[1] && (
-            <>
-              <span className={altCss}>{altAggSource}</span> {icons[1]}
-            </>
-          )}
+        <TableCell key={"source"} style={{ whiteSpace: "nowrap" }}>
+          <SourceLink row={meta} types={types} />
         </TableCell>
       );
-      colSpan++;
-    }
-
-    if (source == "direct") {
-      let values = [];
-      if (meta.values) {
-        values = meta.values;
-      } else if (
-        meta.aggregation_method &&
-        meta.aggregation_method == "unique"
-      ) {
-        values = [meta];
-      }
-      if (values.length > 0) {
-        raw = (
-          <TableRow>
-            <TableCell></TableCell>
-            <TableCell
-              style={{ paddingBottom: 0, paddingTop: 0 }}
-              colSpan={colSpan}
-            >
-              <Collapse in={open.toString()} timeout="auto">
-                <NestedTable
-                  types={types[attributeId]}
-                  values={values}
-                  setPreferSearchTerm={setPreferSearchTerm}
-                  taxonomy={taxonomy}
-                  siteName={siteName}
-                />
-              </Collapse>
-            </TableCell>
-          </TableRow>
-        );
-      }
     }
   }
   let header = (

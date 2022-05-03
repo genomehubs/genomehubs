@@ -29,6 +29,5 @@ export const setIncludes = ({
   if (includeRawValues) {
     include.push("attributes.*");
   }
-  console.log(include);
   return include;
 };
