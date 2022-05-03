@@ -2,7 +2,7 @@ file:
   format: tsv
   header: true
   name: CAJNRB02.window_stats.tsv
-  # needs: FILE2.types.yaml
+  needs: ATTR_window_stats.types.yaml
   source: tbc
   source_url: http://example.com
 analysis:
@@ -13,6 +13,8 @@ analysis:
   name: Assembly
   title: Public assembly GCA_905319855.2
 attributes:
+  sequence_id:
+    header: sequence
   feature_type:
     default:
       - chromosome
@@ -31,7 +33,7 @@ attributes:
     function: "{} / 2447447219"
   midpoint:
     header: end
-    function: "({} - {start} + 1) / 2"
+    function: "{length} / 2"
   gc:
     header: gc
   masked:
@@ -43,8 +45,6 @@ attributes:
     function: "{} + 0.01"
 features:
   assembly_id: GCA_905319855.2
-  sequence_id:
-    header: sequence
   feature_id:
     header: sequence
   primary_type: chromosome

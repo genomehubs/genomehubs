@@ -513,16 +513,6 @@ const ResultTable = ({
         </Tooltip>
       );
       cells.push(
-        <Tooltip title={"Click to view sequence"} arrow key={"sequence_id"}>
-          <TableCell
-            style={{ cursor: "pointer" }}
-            onClick={() => handleRecordClick(result.result)}
-          >
-            {result.result.sequence_id}
-          </TableCell>
-        </Tooltip>
-      );
-      cells.push(
         <Tooltip title={"Click to view feature"} arrow key={"feature_id"}>
           <TableCell
             style={{ cursor: "pointer" }}
@@ -662,17 +652,6 @@ const ResultTable = ({
   }
   if (searchIndex == "feature") {
     heads = [heads.pop()];
-    heads.push(
-      <SortableCell
-        name={"sequence_id"}
-        key={"sequence_id"}
-        classes={classes}
-        sortBy={sortBy}
-        sortOrder={sortOrder}
-        sortDirection={sortBy === "sequence_id" ? sortOrder : false}
-        handleTableSort={handleTableSort}
-      />
-    );
     heads.push(
       <SortableCell
         name={"feature_id"}

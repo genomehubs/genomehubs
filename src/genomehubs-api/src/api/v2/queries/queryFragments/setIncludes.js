@@ -17,16 +17,7 @@ export const setIncludes = ({
   }
   if (result == "feature") {
     include = include
-      .concat([
-        "taxon_id",
-        "assembly_id",
-        "sequence_id",
-        "feature_id",
-        "feature_type",
-        "start",
-        "end",
-        "strand",
-      ])
+      .concat(["taxon_id", "assembly_id", "feature_id", "primary_type"])
       .concat(
         summaryValues ? summaryValues.map((key) => `attributes.${key}`) : []
       );

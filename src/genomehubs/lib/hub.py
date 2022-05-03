@@ -414,15 +414,18 @@ def apply_template(value, operation, row_values, shared_values):
                     LOGGER.error("%s has no value for attribute %s", value, part)
                     sys.exit()
             else:
+                print(row_values)
                 LOGGER.error("function template '%s' is not supported", operation)
                 sys.exit(1)
     return "".join(parts)
 
 
-def calculator(value, operation, row_values, shared_values):
+def calculator(value, operation, row_values, shared_values, template_type):
     """Template-based calculator."""
     # print(dict(shared_values))
     operation = apply_template(value, operation, row_values, shared_values)
+    if template_type == "template":
+        return operation
     return calculate(operation)
 
 
@@ -433,10 +436,11 @@ def validate_values(values, key, types, row_values, shared_values):
         types[key]["type"] = "keyword"
     key_type = types[key]["type"]
     for value in values:
-        if "function" in types[key]:
+        if "function" in types[key] or "template" in types[key]:
             try:
+                template_type = "function" if "function" in types[key] else "template"
                 value = calculator(
-                    value, types[key]["function"], row_values, shared_values
+                    value, types[key][template_type], row_values, shared_values, template_type
                 )
             except ValueError:
                 continue
@@ -508,6 +512,7 @@ def add_attributes(
     attr_type="attributes",
     meta=None,
     shared_values=None,
+    row_values=None
 ):
     """Add attributes to a document."""
     if attributes is None:
@@ -517,7 +522,8 @@ def add_attributes(
     if meta is None:
         meta = {}
     attribute_values = {}
-    row_values = {}
+    if row_values is None:
+        row_values = {}
     for key, values in entry.items():
         if key in types:
             if not isinstance(values, list):
@@ -774,6 +780,7 @@ def process_row(types, names, row, shared_values):
         and data["identifiers"]["assembly_id"]
     ):
         assembly_id = data["identifiers"]["assembly_id"]
+    row_values = {}
     for attr_type in list(["attributes", "features", "identifiers", "taxon_names"]):
         if attr_type in data and data[attr_type]:
             (
@@ -786,6 +793,7 @@ def process_row(types, names, row, shared_values):
                 attr_type=attr_type,
                 meta=data["metadata"],
                 shared_values=shared_values,
+                row_values=row_values,
             )
         else:
             data[attr_type] = []

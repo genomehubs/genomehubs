@@ -31,11 +31,19 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
             attributes = {**stored_attributes, **attributes}
         except Exception:
             pass
+        if attributes:
+            sequence = max(int(d['sequence']) for d in attributes.values()) + 1
+        else:
+            sequence = 0
+    
         for key, entry in types["attributes"].items():
             if not isinstance(entry, dict):
                 entry = {"default": entry}
             if key in attributes:
                 entry = {**attributes[key], **entry}
+            if "sequence" not in entry:
+                entry["sequence"] = sequence
+                sequence += 1
             types["attributes"][key] = entry
             enum = entry.get("constraint", {}).get("enum", [])
             if enum:

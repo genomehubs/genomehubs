@@ -227,7 +227,6 @@ export const saytQuery = ({ result, searchTerm, wildcardTerm, size = 10 }) => {
       "taxon_id",
       "feature_id",
       "primary_type",
-      "sequence_id",
       "identifiers.*",
     ];
   } else if (result == "taxon") {

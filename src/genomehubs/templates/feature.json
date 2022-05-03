@@ -64,29 +64,6 @@
         "ignore_above": 32,
         "meta": { "description": "Unique assembly ID" }
       },
-      "sequence_id": {
-        "type": "keyword",
-        "ignore_above": 32,
-        "normalizer": "lowercase",
-        "fields": {
-          "text": {
-            "type": "text"
-          }
-        },
-        "meta": { "description": "Unique sequence ID" }
-      },
-      "start": {
-        "type": "integer",
-        "meta": { "description": "1-based start position" }
-      },
-      "end": {
-        "type": "integer",
-        "meta": { "description": "1-based end position" }
-      },
-      "strand": {
-        "type": "byte",
-        "meta": { "description": "sequence strand (1 or -1)" }
-      },
       "ancestors": {
         "type": "keyword",
         "ignore_above": 32,

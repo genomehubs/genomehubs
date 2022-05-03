@@ -482,7 +482,6 @@ def set_feature_types(types):
         "feature_id": "keyword",
         "assembly_id": "keyword",
         "taxon_id": "keyword",
-        "sequence_id": "keyword",
         "primary_type": "keyword",
     }
     for key, value in defaults.items():

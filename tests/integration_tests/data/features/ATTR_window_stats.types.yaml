@@ -1,4 +1,10 @@
 attributes:
+  sequence_id:
+    description: Sequence ID
+    display_level: 1
+    display_name: Sequence ID
+    display_group: coordinates
+    type: keyword
   start:
     bins:
       min: 1
@@ -52,12 +58,6 @@ attributes:
     description: Feature type
     display_level: 1
     display_name: Feature type
-    display_group: coordinates
-    type: keyword
-  sequence_name:
-    description: Sequence name
-    display_level: 1
-    display_name: Sequence name
     display_group: coordinates
     type: keyword
   length:
@@ -158,8 +158,13 @@ attributes:
     display_group: stats
     type: 2dp
   carnivora_odb10_count:
-    constraint:
+    bins:
       min: 0
+      max: 1000
+      count: 10
+      scale: linear
+    constraint:
+      min: 1
     description: Count of BUSCO carnivora genes
     display_level: 1
     display_name: Carnivora BUSCO Count
