@@ -11,6 +11,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const devMode = process.env.NODE_ENV !== "production";
 
 const BUILD_DIR = path.resolve(__dirname, "dist/public");
+// const STATIC_DIR = path.resolve(__dirname, "dist/public/static/[fullhash]");
 const STATIC_DIR = path.resolve(__dirname, "dist/public/static");
 const APP_DIR = path.resolve(__dirname, "src/client/views");
 
@@ -116,7 +117,12 @@ const config = {
               },
               {
                 from: main.pagesPath,
-                to: STATIC_DIR,
+                to({ context, absoluteFilename }) {
+                  return path.join(
+                    STATIC_DIR,
+                    path.relative(context, absoluteFilename)
+                  );
+                },
               },
             ],
           }),

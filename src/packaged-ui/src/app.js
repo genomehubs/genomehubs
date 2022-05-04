@@ -1,4 +1,5 @@
 const express = require("express");
+const fs = require("fs");
 const path = require("path");
 const PORT = process.env.GH_PORT || process.env.GH_CLIENT_PORT || "8880";
 const GH_API_PORT = process.env.GH_API_PORT || "3000";
@@ -20,7 +21,18 @@ app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 
 // serve static assets normally
+// get hash value from directory name
+// const getDirectories = (srcPath) => {
+//   return fs
+//     .readdirSync(srcPath)
+//     .filter((file) => fs.statSync(path.join(srcPath, file)).isDirectory());
+// };
+
+// let directories = getDirectories(path.resolve(__dirname, "public", "static"));
+
+// app.use(`static/${directories[0]}`, express.static("/genomehubs/local/static"));
 app.use(express.static("/genomehubs/local"));
+app.use(express.static("/Users/rchallis/projects/genomehubs/goat-ui"));
 app.use(express.static(path.resolve(__dirname, "public")));
 app.use(
   "/manifest.json",
