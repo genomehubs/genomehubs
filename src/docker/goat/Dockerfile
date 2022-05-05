@@ -2,20 +2,9 @@ FROM genomehubs/genomehubs-ui:2.4.7
 LABEL maintainer="contact@genomehubs.org"
 LABEL license="MIT"
 
-USER root
+COPY genomehubs-ui-linux ./genomehubs-ui
 
-RUN apk add --no-cache git
-
-USER genomehubs
-
-WORKDIR /genomehubs
-
-RUN git clone https://github.com/genomehubs/goat-ui
-
-RUN mv goat-ui/static ./local/ \
-    && rm -rf goat-ui
-
-ENV PATH /genomehubs:$PATH
+RUN chmod 755 genomehubs-ui
 
 COPY .env /genomehubs/
 
