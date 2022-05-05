@@ -1,4 +1,4 @@
-name: package-genomehubs
+name: test-package-genomehubs
 env:
   VERSION: 2.4.7
 
@@ -8,8 +8,6 @@ on:
 jobs:
   package-goat-ui:
     runs-on: ubuntu-latest
-    needs:
-      - create-github-release
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
