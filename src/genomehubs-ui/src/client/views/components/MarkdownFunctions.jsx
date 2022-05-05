@@ -62,11 +62,9 @@ export const RehypeComponentsList = {
   a: (props) => <NavLink {...processProps(props)} />,
   grid: (props) => {
     let { toggle, expand, title, ...gridProps } = props;
-    console.log(toggle);
     if (toggle && toggle !== true && toggle !== "true") {
       toggle = false;
     }
-    console.log(toggle);
     if (props.hasOwnProperty("toggle")) {
       return (
         <Toggle {...processProps({ toggle, expand, title })}>
