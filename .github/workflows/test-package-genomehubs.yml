@@ -15,7 +15,7 @@ jobs:
           node-version: "16"
       - run: npm install -g pkg
       - run: |
-          git checkout goat-ui
+          git checkout https://github.com/genomehubs/goat-ui
           mv goat-ui/static src/client/static
           rm -r goat-ui
       - run: ./package-ui.sh
