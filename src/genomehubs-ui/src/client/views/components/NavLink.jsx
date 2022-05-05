@@ -14,8 +14,14 @@ const NavLink = ({ to, tab, url, ...props }) => {
   } else if (props.href) {
     if (props.href.match(/\:\/\//)) {
       return (
-        <a href={props.href} target="_blank">
-          {props.children} <LaunchIcon fontSize="inherit" />
+        <a
+          href={props.href}
+          // target="_blank"
+          // rel="noopener noreferrer"
+          onClick={() => console.log(props.href)}
+        >
+          {props.children}
+          <LaunchIcon fontSize="inherit" />
         </a>
       );
     }
