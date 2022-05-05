@@ -35,6 +35,9 @@ jobs:
           name: goat-ui
           path: ./dist
       - run: |
+          ls -l
+          ls -l dist
+          ls -l dist/*
           mv dist/goat-ui/* src/docker/goat/
           rm -r dist/goat-ui
           ls src/docker/goat
