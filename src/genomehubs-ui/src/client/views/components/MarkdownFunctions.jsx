@@ -6,6 +6,7 @@ import Highlight from "./Highlight";
 import MarkdownInclude from "./MarkdownInclude";
 import NavLink from "./NavLink";
 import Report from "./Report";
+import Toggle from "./Toggle";
 import Tooltip from "@material-ui/core/Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
@@ -30,7 +31,9 @@ const webpackHash = COMMIT_HASH;
 
 export const processProps = (props, newProps = {}) => {
   for (const [key, value] of Object.entries(props)) {
-    if (value == "") {
+    if (value === false) {
+      newProps[key] = value;
+    } else if (value == "") {
       newProps[key] = true;
     } else if (key == "className") {
       newProps["className"] = styles[value];
@@ -57,7 +60,21 @@ export const processProps = (props, newProps = {}) => {
 
 export const RehypeComponentsList = {
   a: (props) => <NavLink {...processProps(props)} />,
-  grid: (props) => <Grid {...processProps(props)} />,
+  grid: (props) => {
+    let { toggle, expand, title, ...gridProps } = props;
+    if (toggle && toggle !== true && toggle !== "true") {
+      toggle = false;
+    }
+    if (props.hasOwnProperty("toggle")) {
+      return (
+        <Toggle {...processProps({ toggle, expand, title })}>
+          <Grid {...processProps(gridProps)} />
+        </Toggle>
+      );
+    } else {
+      return <Grid {...processProps(props)} />;
+    }
+  },
   hub: (props) => <span {...processProps(props)}>{siteName}</span>,
   img: (props) => (
     <div className={styles.centerContent}>

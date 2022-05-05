@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 
 import Grid from "@material-ui/core/Grid";
 import LaunchIcon from "@material-ui/icons/Launch";
+import NavLink from "./NavLink";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -22,31 +23,24 @@ const ReportSources = ({ sources, minDim, types }) => {
       sourceName = (
         <span>
           INSDC (
-          <a
+          <NavLink
             style={{ whiteSpace: "nowrap" }}
             href={"https://www.ebi.ac.uk/ena/browser/home"}
-            target="_blank"
           >
             {"ENA"}
-            <LaunchIcon fontSize="inherit" />
-          </a>{" "}
-          <a
+          </NavLink>{" "}
+          <NavLink
             style={{ whiteSpace: "nowrap" }}
             href={"https://www.ncbi.nlm.nih.gov"}
-            target="_blank"
           >
             {"NCBI"}
-            <LaunchIcon fontSize="inherit" />
-          </a>
+          </NavLink>
           )
         </span>
       );
     } else {
       sourceName = source.url ? (
-        <a href={source.url} target="_blank">
-          {key}
-          <LaunchIcon fontSize="inherit" />
-        </a>
+        <NavLink href={source.url}>{key}</NavLink>
       ) : (
         key
       );

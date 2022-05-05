@@ -447,44 +447,46 @@ export const getSources = async (params) => {
   let dates = {};
   if (binned.status.success) {
     binned.fields.buckets.forEach(({ key: field, summary }) => {
-      let minDate = summary.terms.buckets[0].min_date.value_as_string;
-      let maxDate = summary.terms.buckets[0].max_date.value_as_string;
-      let dateRange;
-      let url;
-      if (minDate) {
-        dateRange = [minDate, maxDate];
-      }
-      let urlBuckets = summary.terms.buckets[0].url.buckets;
-      if (urlBuckets && urlBuckets.length > 0) {
-        url = urlBuckets[0].key;
-      }
-      if (field == "c_value") {
-      }
-      summary.terms.buckets.forEach(({ key: source, doc_count: count }) => {
-        if (!counts[source]) {
-          counts[source] = 0;
-        }
-        if (!fields[source]) {
-          fields[source] = [];
-        }
-        counts[source] += count;
-        if (field == "c_value") {
-        }
-        fields[source].push(field);
-        if (dateRange) {
-          if (dates[source]) {
-            dates[source] = [
-              dateRange[0] < dates[source][0] ? dateRange[0] : dates[source][0],
-              dateRange[1] > dates[source][1] ? dateRange[1] : dates[source][1],
-            ];
-          } else {
-            dates[source] = dateRange;
+      summary.terms.buckets.forEach(
+        ({ key: source, doc_count: count, minDate, maxDate, url: urlAgg }) => {
+          minDate = (minDate || {}).value_as_string;
+          maxDate = (maxDate || {}).value_as_string;
+          let dateRange;
+          let url;
+          if (minDate) {
+            dateRange = [minDate, maxDate];
+          }
+          let urlBuckets = urlAgg.buckets;
+          if (urlBuckets && urlBuckets.length > 0) {
+            url = urlBuckets[0].key;
+          }
+          if (!counts[source]) {
+            counts[source] = 0;
+          }
+          if (!fields[source]) {
+            fields[source] = [];
+          }
+          counts[source] += count;
+          fields[source].push(field);
+          if (dateRange) {
+            if (dates[source]) {
+              dates[source] = [
+                dateRange[0] < dates[source][0]
+                  ? dateRange[0]
+                  : dates[source][0],
+                dateRange[1] > dates[source][1]
+                  ? dateRange[1]
+                  : dates[source][1],
+              ];
+            } else {
+              dates[source] = dateRange;
+            }
+          }
+          if (url) {
+            urls[source] = url;
           }
         }
-        if (url) {
-          urls[source] = url;
-        }
-      });
+      );
     });
   }
   let sources = {};
