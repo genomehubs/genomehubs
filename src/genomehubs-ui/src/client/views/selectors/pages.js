@@ -15,8 +15,8 @@ export const webpackHash = __webpack_hash__ || COMMIT_HASH;
 export function fetchPages(pageId) {
   return async function (dispatch) {
     dispatch(requestPages());
-    // let url = `${pagesUrl}/${webpackHash}/${pageId}`;
-    let url = `${pagesUrl}/${pageId}`;
+    let url = `${pagesUrl}/${webpackHash}/${pageId}`;
+    // let url = `${pagesUrl}/${pageId}`;
     try {
       let markdown;
       try {

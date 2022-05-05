@@ -13,6 +13,8 @@ import store from "./store";
 
 const rootElement = document.getElementById("app");
 
+const buildDate = "latest";
+
 if (rootElement.hasChildNodes()) {
   hydrate(
     <BrowserRouter>

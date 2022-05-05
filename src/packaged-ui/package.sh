@@ -10,9 +10,15 @@ echo "Installing dependencies" &&
 
 npm install &&
 
+echo "Setting build date" &&
+
+sed -i.bak 's|'"$(grep 'const buildDate' src/client/views/index.jsx)"'|const buildDate = "'"$(date)"'";|' src/client/views/index.jsx &&
+
+rm src/client/views/index.jsx.bak
+
 echo "Bundling javascript" &&
 
-npm run build &&
+GH_PAGES_PATH=$1 npm run build &&
 
 echo "Archiving build"
 
