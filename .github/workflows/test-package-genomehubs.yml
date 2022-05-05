@@ -16,7 +16,7 @@ jobs:
       - run: npm install -g pkg
       - run: |
           git clone https://github.com/genomehubs/goat-ui
-          mv goat-ui/static src/client/static
+          mv goat-ui/static src/genomehubs-ui/src/client/static
           rm -r goat-ui
       - run: ./package-ui.sh
       - uses: actions/upload-artifact@v2
