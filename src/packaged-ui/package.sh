@@ -10,11 +10,15 @@ echo "Installing dependencies" &&
 
 npm install &&
 
-echo "Setting build date" &&
+if [ ! -z "$1" ]; then
+  echo "Setting pages version" &&
 
-sed -i.bak 's|'"$(grep 'const buildDate' src/client/views/index.jsx)"'|const buildDate = "'"$(date)"'";|' src/client/views/index.jsx &&
+  PAGES_VERSION=$(cd $1 && git rev-parse --short HEAD)
 
-rm src/client/views/index.jsx.bak
+  sed -i.bak 's|'"$(grep 'const pagesVersion' src/client/views/index.jsx)"'|const pagesVersion = "'"${PAGES_VERSION}"'";|' src/client/views/index.jsx &&
+
+  rm src/client/views/index.jsx.bak
+fi
 
 echo "Bundling javascript" &&
 

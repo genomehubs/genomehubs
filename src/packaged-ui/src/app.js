@@ -1,7 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-const nocache = require("nocache");
+// const nocache = require("nocache");
 
 const PORT = process.env.GH_PORT || process.env.GH_CLIENT_PORT || "8880";
 const GH_API_PORT = process.env.GH_API_PORT || "3000";
@@ -19,8 +19,8 @@ const ENV = {
 };
 
 // disable browser caching
-app.use(nocache());
-app.set("etag", false);
+// app.use(nocache());
+// app.set("etag", false);
 
 // set the view engine to ejs
 app.set("views", __dirname + "/views");

@@ -13,7 +13,7 @@ import store from "./store";
 
 const rootElement = document.getElementById("app");
 
-const buildDate = "latest";
+const pagesVersion = "latest";
 
 if (rootElement.hasChildNodes()) {
   hydrate(
