@@ -50,7 +50,7 @@ const ReportTree = ({
   if (!tree.report) return null;
   let maxDepth = tree.report.tree.maxDepth;
   let queryObj = qs.parse(tree.report.queryString);
-  const updateQuery = ({ root, name, depth, rank }) => {
+  const updateQuery = ({ root, name, depth, rank, rootRank }) => {
     let { query, x, ...options } = tree.report.xQuery;
     if (query && !x) {
       x = query;
@@ -76,13 +76,21 @@ const ReportTree = ({
       let taxRank = x.match(/tax_rank\((\w+)\)/);
       if (taxRank) {
         taxRank = taxRank[1].toLowerCase();
+        let newRank = taxRank;
         let ranks = levels.toLowerCase().split(/(?:,\s*)/);
         let index = ranks.indexOf(taxRank);
-        let newRank = taxRank;
-        if (index >= 0) {
-          if (depth < 0 && index < ranks.length - 1) {
+        if (depth < 0) {
+          let rootIndex = ranks.indexOf(rootRank);
+          if (
+            rootIndex > 0 &&
+            index > 0 &&
+            index < ranks.length - 1 &&
+            newRank != rootRank
+          ) {
             newRank = ranks[index + 1];
-          } else if (depth > 0 && index > 0) {
+          }
+        } else {
+          if (index > 0) {
             newRank = ranks[index - 1];
           }
         }
@@ -107,7 +115,7 @@ const ReportTree = ({
   //   }
   // };
 
-  const handleSearch = ({ root, name, depth, rank }) => {
+  const handleSearch = ({ root, name, depth, rank, rootRank }) => {
     if (embedded) {
       return;
     }
@@ -116,6 +124,7 @@ const ReportTree = ({
       name,
       depth,
       rank,
+      rootRank,
     });
     let query;
     let hash;
@@ -144,12 +153,12 @@ const ReportTree = ({
     );
   };
 
-  const handleNavigation = ({ root, name, depth, rank }) => {
+  const handleNavigation = ({ root, name, depth, rank, rootRank }) => {
     if (embedded) {
       return;
     }
     if (name == "parent") {
-      handleSearch({ root, name, depth, rank });
+      handleSearch({ root, name, depth, rank, rootRank });
       return;
     }
     let { result, taxonomy } = queryObj;

@@ -40,6 +40,9 @@ const ReportTreeRings = ({
   height,
   plotHeight,
 }) => {
+  if (!arcs || arcs.length == 0) {
+    return null;
+  }
   const location = useLocation();
   const navigate = useNavigate();
   // const [highlightParams, setHighlightParams] = useState(treeHighlight);
@@ -100,6 +103,12 @@ const ReportTreeRings = ({
 
   let paths = [];
   if (arcs) {
+    let rootRank;
+    if (arcs.length >= 2) {
+      rootRank = arcs[arcs.length - 2].taxon_rank;
+    } else {
+      rootRank = arcs[0].taxon_rank;
+    }
     arcs.forEach((segment) => {
       const longPressCallback = useCallback((e) => {
         e.preventDefault();
@@ -108,6 +117,7 @@ const ReportTreeRings = ({
           name: segment.scientific_name,
           depth: segment.depth,
           rank: segment.taxon_rank,
+          rootRank,
         });
       }, []);
 
@@ -120,6 +130,7 @@ const ReportTreeRings = ({
             name: segment.scientific_name,
             depth: segment.depth,
             rank: segment.taxon_rank,
+            rootRank,
           });
         },
         captureEvent: true,
