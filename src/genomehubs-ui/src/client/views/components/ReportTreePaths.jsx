@@ -34,6 +34,12 @@ const ReportTreePaths = ({
   if (!lines || lines.length == 0) {
     return null;
   }
+  let rootRank;
+  if (lines.length >= 2) {
+    rootRank = lines[lines.length - 2].taxon_rank;
+  } else {
+    rootRank = lines[0].taxon_rank;
+  }
 
   let divHeight = height;
   let divWidth = width;
@@ -168,7 +174,7 @@ const ReportTreePaths = ({
     if (name != "parent") {
       setReportTerm(name.toLowerCase());
     }
-    handleNavigation({ root, name, depth, rank });
+    handleNavigation({ root, name, depth, rank, rootRank });
   };
 
   const handleGlobalClick = ({ evt, target }) => {
@@ -296,6 +302,7 @@ const ReportTreePaths = ({
       } else {
         let lowerY = portionHeight * portion - portionOverlap;
         let upperY = portionHeight * (portion + 1) + portionOverlap;
+
         for (let segment of lines) {
           if (
             overview.length == 0 &&
@@ -439,6 +446,7 @@ const ReportTreePaths = ({
                     name: segment.scientific_name,
                     depth: segment.depth,
                     rank: segment.taxon_rank,
+                    rootRank,
                   });
                 }, 500);
               }}
@@ -449,6 +457,7 @@ const ReportTreePaths = ({
                   name: segment.scientific_name,
                   depth: segment.depth,
                   rank: segment.taxon_rank,
+                  rootRank,
                 });
               }}
             />
@@ -536,7 +545,8 @@ const ReportTreePaths = ({
                   <Rect
                     key={`val-${segment.taxon_id}`}
                     x={0}
-                    y={segment.yMin}
+                    // y={segment.yMin}
+                    y={segment.yStart - charHeight / 2}
                     width={segment.bar[0] + 1}
                     height={charHeight}
                     fill={segment.color}

@@ -118,7 +118,6 @@ const getLCA = async ({
     let taxon_id = bucket.key;
     let parent;
 
-    // if (taxon) {
     let child;
     let depthChange = 0;
     for (let ancestor of res.results[0].result.lineage) {
@@ -126,19 +125,23 @@ const getLCA = async ({
       if (ancestor.taxon_id == taxon_id) {
         depthChange = 0;
       }
-      if (
-        taxon &&
-        (ancestor.taxon_id == taxon || ancestor.scientific_name == taxon)
-      ) {
-        minDepth += depthChange;
-        maxDepth += depthChange;
-        taxon_id = ancestor.taxon_id;
-        child = taxon_id;
-      } else if (child) {
-        parent = ancestor.taxon_id;
-        break;
-      } else if (taxon_id == ancestor.taxon_id) {
-        child = taxon_id;
+      if (taxon) {
+        if (ancestor.taxon_id == taxon || ancestor.scientific_name == taxon) {
+          minDepth += depthChange;
+          maxDepth += depthChange;
+          taxon_id = ancestor.taxon_id;
+          child = taxon_id;
+        } else if (child) {
+          parent = ancestor.taxon_id;
+          break;
+        }
+      } else {
+        if (child) {
+          parent = ancestor.taxon_id;
+          break;
+        } else if (taxon_id == ancestor.taxon_id) {
+          child = taxon_id;
+        }
       }
     }
     // }
