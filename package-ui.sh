@@ -2,7 +2,7 @@
 
 cd ./src/packaged-ui &&
 
-./package.sh &&
+./package.sh $1 &&
 
 cd - &&
 

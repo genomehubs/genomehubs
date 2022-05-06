@@ -15,12 +15,11 @@ export const webpackHash = __webpack_hash__ || COMMIT_HASH;
 export function fetchPages(pageId) {
   return async function (dispatch) {
     dispatch(requestPages());
-    let url = `${pagesUrl}/${pageId}?${webpackHash}`;
+    let url = `${pagesUrl}/${webpackHash}/${pageId}`.replaceAll("//", "/");
+    // let url = `${pagesUrl}/${pageId}`;
     try {
       let markdown;
       try {
-        // .then(response => response.text())
-        // .then(result => document.getElementById('content').innerHTML = marked(result));
         const response = await fetch(url);
         markdown = await response.text();
       } catch (error) {

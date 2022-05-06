@@ -1,0 +1,55 @@
+name: package-genomehubs-latest
+env:
+  VERSION: 2.4.7
+
+on: workflow_dispatch
+
+jobs:
+  package-goat-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - run: npm install -g pkg
+      - run: |
+          git clone https://github.com/genomehubs/goat-ui
+          mv goat-ui/static/* src/genomehubs-ui/src/client/static/
+          rm -r goat-ui
+      - run: ./package-ui.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          name: goat-ui
+          path: ./dist/*
+
+  build-and-push-goat-ui:
+    runs-on: ubuntu-latest
+    needs: package-goat-ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: goat-ui
+          path: ./dist
+      - run: |
+          mv dist/genomehubs-ui-linux src/docker/goat/
+          rm -r dist/*
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: genomehubs/goat
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: src/docker/goat
+          push: true
+          tags: genomehubs/goat:latest
+          labels: ${{ steps.meta.outputs.labels }}

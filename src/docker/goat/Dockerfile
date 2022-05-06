@@ -4,18 +4,12 @@ LABEL license="MIT"
 
 USER root
 
-RUN apk add --no-cache git
+COPY genomehubs-ui-linux ./genomehubs-ui
+
+RUN chmod 755 genomehubs-ui \
+    && chown genomehubs:genomehubs genomehubs-ui
 
 USER genomehubs
-
-WORKDIR /genomehubs
-
-RUN git clone https://github.com/genomehubs/goat-ui
-
-RUN mv goat-ui/static ./local/ \
-    && rm -rf goat-ui
-
-ENV PATH /genomehubs:$PATH
 
 COPY .env /genomehubs/
 

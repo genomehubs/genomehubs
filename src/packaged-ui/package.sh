@@ -10,9 +10,19 @@ echo "Installing dependencies" &&
 
 npm install &&
 
+if [ ! -z "$1" ]; then
+  echo "Setting pages version" &&
+
+  PAGES_VERSION=$(cd $1 && git rev-parse --short HEAD)
+
+  sed -i.bak 's|'"$(grep 'const pagesVersion' src/client/views/index.jsx)"'|const pagesVersion = "'"${PAGES_VERSION}"'";|' src/client/views/index.jsx &&
+
+  rm src/client/views/index.jsx.bak
+fi
+
 echo "Bundling javascript" &&
 
-npm run build &&
+GH_PAGES_PATH=$1 npm run build &&
 
 echo "Archiving build"
 
