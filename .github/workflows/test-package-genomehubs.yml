@@ -1,9 +1,9 @@
-name: test-package-genomehubs
+name: package-genomehubs-latest
 env:
   VERSION: 2.4.7
 
 on:
-  push:
+  workflow-dispatch:
 
 jobs:
   package-goat-ui:
@@ -52,5 +52,5 @@ jobs:
         with:
           context: src/docker/goat
           push: true
-          tags: genomehubs/goat:${{ env.VERSION }}, genomehubs/goat:latest
+          tags: genomehubs/goat:latest
           labels: ${{ steps.meta.outputs.labels }}
