@@ -2,8 +2,7 @@ name: package-genomehubs-latest
 env:
   VERSION: 2.4.7
 
-on:
-  workflow-dispatch:
+on: workflow_dispatch
 
 jobs:
   package-goat-ui:
