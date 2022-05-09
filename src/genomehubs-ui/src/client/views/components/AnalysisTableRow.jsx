@@ -5,6 +5,7 @@ import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
+import NavLink from "./NavLink";
 import TableCell from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -164,6 +165,13 @@ const AnalysisTableRow = ({
     result: "taxon",
   });
   analysisCells.push(<TableCell key={"taxa"}>{taxContent}</TableCell>);
+  if (meta.source_url) {
+    analysisCells.push(
+      <TableCell key={"source"}>
+        {<NavLink href={meta.source_url}>{meta.source || meta.name}</NavLink>}
+      </TableCell>
+    );
+  }
   return (
     <Fragment key={analysisId}>
       <TableRow className={classes.root}>{analysisCells}</TableRow>
@@ -171,7 +179,7 @@ const AnalysisTableRow = ({
         <TableRow>
           <TableCell></TableCell>
           <TableCell colSpan={4}>
-            <FileTable analysisId={analysisId} />
+            <FileTable analysisId={analysisId} analysisMeta={meta} />
           </TableCell>
         </TableRow>
       )}

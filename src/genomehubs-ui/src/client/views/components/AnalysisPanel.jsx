@@ -66,6 +66,7 @@ const AnalysisPanel = ({
             <TableCell>Files</TableCell>
             <TableCell>Assemblies</TableCell>
             <TableCell>Taxa</TableCell>
+            <TableCell>Source</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>{tableRows}</TableBody>

@@ -101,7 +101,7 @@ const modalContent = ({
   }
 };
 
-export const FileModal = ({ meta, apiUrl, children }) => {
+export const FileModal = ({ meta, apiUrl, link, children }) => {
   const classes = useStyles();
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [modalStyle] = React.useState(getModalStyle);
@@ -113,7 +113,9 @@ export const FileModal = ({ meta, apiUrl, children }) => {
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleClose = (event, reason) => {
+    event.preventDefault();
+    event.stopPropagation();
     setOpen(false);
   };
 
@@ -144,8 +146,9 @@ export const FileModal = ({ meta, apiUrl, children }) => {
               aria-label="close-modal"
               color="default"
               style={{ padding: 0 }}
+              onClick={handleClose}
             >
-              <CloseIcon style={{ cursor: "pointer" }} onClick={handleClose} />
+              <CloseIcon style={{ cursor: "pointer" }} />
             </IconButton>
           </Grid>
         </Grid>
@@ -167,7 +170,7 @@ export const FileModal = ({ meta, apiUrl, children }) => {
           style={{ overflowY: "auto", width: previewDimensions.width }}
         >
           <Typography id="file-modal-description" variant="body1" gutterBottom>
-            {meta.description}
+            {meta.description} {link}
           </Typography>
         </Grid>
       )}

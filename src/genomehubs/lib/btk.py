@@ -74,7 +74,7 @@ def describe_btk_files(meta):
         obj = {
             "name": "%s.png" % plot,
             "url": url,
-            "link": "%s/%s/dataset/%s/%s" % (BTK_VIEW, meta["id"], meta["id"], plot),
+            "source_url": "%s/%s/dataset/%s/%s" % (BTK_VIEW, meta["id"], meta["id"], plot),
             "analysis_id": "btk-%s" % meta["id"],
             "description": "a %s plot from BlobToolKit analysis %s"
             % (plot, meta["id"]),
@@ -87,6 +87,8 @@ def describe_btk_files(meta):
                 "title": "BlobToolKit analysis of %s" % meta["accession"],
                 "description": "Analysis of public assembly %s using BlobToolKit"
                 % meta["accession"],
+                "source": "BlobToolKit",
+                "source_url": "https://blobtoolkit.genomehubs.org/view/dataset/%s" % meta["id"]
             },
         }
         files.append(obj)
@@ -102,13 +104,5 @@ def btk_parser(_params, opts, *args, **kwargs):
             files = describe_btk_files(meta)
             analyses += files
             extract_btk_stats(meta)
-            # TODO: set xref
-            # TODO: add to file/analysis index
-            # print(lineage)
-            # print(
-            #     "%s: %s (%s)" % (key, meta["name"]["value"], meta["rankLabel"]["value"])
-            # )
-            # identifiers = fetch_gbif_identifiers(key, xrefs=opts["gbif-xref"])
-            # parsed += prepare_xref_rows(key, meta, lineage)
             parsed.append(meta)
     return (parsed, analyses)

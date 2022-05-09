@@ -58,3 +58,7 @@ genomehubs index \
     --config-file tests/integration_tests/config/config.yaml \
     --taxonomy-source ncbi \
     --feature-dir tests/integration_tests/data/features
+genomehubs index \
+    --config-file tests/integration_tests/config/config.yaml \
+    --taxonomy-source ncbi \
+    --file-metadata tests/integration_tests/data/btk/btk.files.yaml
