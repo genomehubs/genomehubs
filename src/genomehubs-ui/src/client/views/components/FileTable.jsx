@@ -6,6 +6,7 @@ import IconButton from "@material-ui/core/IconButton";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import LaunchIcon from "@material-ui/icons/Launch";
+import NavLink from "./NavLink";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -40,6 +41,7 @@ const useStyles = makeStyles((theme) => ({
 
 const FileTable = ({
   analysisId,
+  analysisMeta,
   apiUrl,
   files,
   filesByAnalysisId,
@@ -62,13 +64,27 @@ const FileTable = ({
   let tableRows;
   if (filesByAnalysisId) {
     tableRows = filesByAnalysisId.map((meta) => {
+      let externalLink;
+      if (meta.source_url) {
+        externalLink = (
+          <NavLink href={meta.source_url}>
+            {meta.source || analysisMeta.source || analysisMeta.name}
+          </NavLink>
+        );
+      } else if (analysisMeta.source_url) {
+        externalLink = (
+          <NavLink href={analysisMeta.source_url}>
+            {analysisMeta.source || analysisMeta.name}
+          </NavLink>
+        );
+      }
       let previewLink = `${apiUrl}/download?recordId=${meta.file_id}&preview=true&streamFile=true`;
       let downloadLink = `${apiUrl}/download?recordId=${meta.file_id}&filename=${meta.name}`;
       return (
         <TableRow key={meta.title} className={classes.tableRow}>
           <TableCell>{meta.title}</TableCell>
           <TableCell>
-            <FileModal meta={meta}>
+            <FileModal meta={meta} link={externalLink}>
               <img style={{ cursor: "pointer" }} src={previewLink} />
             </FileModal>
           </TableCell>
@@ -91,6 +107,12 @@ const FileTable = ({
                 <span className={classes.pale}>description: </span>
                 {meta.description}
               </Grid>
+              {externalLink && (
+                <Grid item xs>
+                  <span className={classes.pale}>source: </span>
+                  {externalLink}
+                </Grid>
+              )}
             </Grid>
           </TableCell>
         </TableRow>

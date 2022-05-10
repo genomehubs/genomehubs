@@ -360,7 +360,7 @@ def index_file(es, types, names, data, opts, *, taxon_table=None, shared_values=
     for row in tqdm(rows):
         try:
             processed_data, taxon_data, new_taxon_types = process_row(
-                types, names, row, shared_values
+                types, names, row, shared_values, blanks
             )
         except Exception:
             print(format_exc())

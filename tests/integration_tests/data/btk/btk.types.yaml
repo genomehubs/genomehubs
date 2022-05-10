@@ -5,6 +5,8 @@ attributes:
     display_level: 1
     display_name: BUSCO completeness
     header: busco_complete
+    source: BlobToolKit
+    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
     taxon_bins:
       count: 10
       max: 100
@@ -25,6 +27,8 @@ attributes:
     display_level: 2
     display_name: BUSCO lineage
     header: busco_lineage
+    source: BlobToolKit
+    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
     taxon_display_group: assembly
     taxon_display_level: 2
     taxon_key: busco_lineage
@@ -38,6 +42,8 @@ attributes:
     display_level: 2
     display_name: BUSCO string
     header: busco_string
+    source: BlobToolKit
+    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
     taxon_display_group: assembly
     taxon_display_level: 2
     taxon_key: busco_lineage
@@ -51,6 +57,8 @@ attributes:
     display_level: 2
     display_name: GC percent
     header: gc_percent
+    source: BlobToolKit
+    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
     taxon_bins:
       count: 10
       max: 100
@@ -72,6 +80,8 @@ attributes:
     display_level: 2
     display_name: N percent
     header: n_percent
+    source: BlobToolKit
+    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
     taxon_bins:
       count: 10
       max: 100
@@ -91,6 +101,8 @@ attributes:
     display_level: 2
     display_name: No hit
     header: nohit
+    source: BlobToolKit
+    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
     taxon_bins:
       count: 10
       max: 100
@@ -111,6 +123,8 @@ attributes:
     display_level: 2
     display_name: Target
     header: target
+    source: BlobToolKit
+    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
     taxon_bins:
       count: 10
       max: 100
@@ -129,7 +143,9 @@ file:
   display_group: btk
   format: tsv
   header: true
-  name: btk.tsv.gz
+  name: btk.tsv
+  source: BlobToolKit
+  source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
 identifiers:
   assembly_alias:
     header: alias

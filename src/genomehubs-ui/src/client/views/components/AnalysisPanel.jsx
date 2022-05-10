@@ -5,23 +5,18 @@ import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
-import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import classnames from "classnames";
 import { compose } from "recompose";
-import { format } from "d3-format";
-import { options } from "preact";
 import qs from "qs";
 import styles from "./Styles.scss";
-import { useNavigate } from "@reach/router";
 import withAnalysesByAnyId from "../hocs/withAnalysesByAnyId";
 import withAnalysis from "../hocs/withAnalysis";
 
 const AnalysisPanel = ({
   recordId,
   result,
-  analysisId,
-  analysis,
+  analyses,
   analysesByAssemblyId,
   analysesByTaxonId,
   analysisQueries,
@@ -41,7 +36,7 @@ const AnalysisPanel = ({
   useEffect(() => {
     let query = `${result}_id==${recordId}`;
     let options = { query, result: "analysis", taxonomy };
-    if (!analysisQueries[qs.stringify(options)]) {
+    if (!analyses.isFetching && !analysisQueries[qs.stringify(options)]) {
       fetchAnalyses(options);
     }
   }, [recordId, analysisQueries]);
@@ -66,6 +61,7 @@ const AnalysisPanel = ({
             <TableCell>Files</TableCell>
             <TableCell>Assemblies</TableCell>
             <TableCell>Taxa</TableCell>
+            <TableCell>Source</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>{tableRows}</TableBody>
