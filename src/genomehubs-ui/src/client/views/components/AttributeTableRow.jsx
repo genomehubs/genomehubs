@@ -285,7 +285,7 @@ const AttributeTableRow = ({
     let aggSource;
     let colSpan = 2;
     let label = <span>{attributeId}</span>;
-    if (types[attributeId].description) {
+    if (types[attributeId]?.description) {
       label = (
         <Tooltip title={types[attributeId].description} arrow placement={"top"}>
           {label}

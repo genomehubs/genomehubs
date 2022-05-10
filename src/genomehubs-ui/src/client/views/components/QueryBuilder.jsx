@@ -114,18 +114,10 @@ const QueryBuilder = ({
     let options = qs.parse(location.search.replace(/^\?/, ""));
     e.stopPropagation();
     setSearchIndex(e.target.value);
-    // setLookupTerm("");
     setSearchDefaults({
       includeEstimates: false,
       includeDescendant: false,
     });
-    // setPreferSearchTerm(true);
-    // setSearchTerm({
-    //   taxonomy: options.taxonomy,
-    //   query: options.query,
-    //   result: e.target.value,
-    // });
-    // setTimeout(() => {
     navigate(
       `/search?${qs.stringify({
         taxonomy: options.taxonomy,
@@ -133,7 +125,6 @@ const QueryBuilder = ({
         result: e.target.value,
       })}`
     );
-    // }, 500);
   };
 
   const buildQuery = () => {

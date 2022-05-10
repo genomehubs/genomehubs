@@ -49,14 +49,14 @@ const AnalysisTableRow = ({
   const [asmOpen, setAsmOpen] = useState(false);
   const [taxOpen, setTaxOpen] = useState(false);
 
-  useEffect(() => {
-    if (analysisId) {
-      if (!meta) {
-        let query = `analysis_id==${analysisId}`;
-        let result = "analysis";
-      }
-    }
-  }, [analysisId]);
+  // useEffect(() => {
+  //   if (analysisId) {
+  //     if (!meta) {
+  //       let query = `analysis_id==${analysisId}`;
+  //       let result = "analysis";
+  //     }
+  //   }
+  // }, [analysisId]);
 
   const expandIcon = ({ condition = true, open, setOpen }) => {
     if (condition) {
