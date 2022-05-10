@@ -1,6 +1,7 @@
 import { addCondition } from "./addCondition";
 import { attrTypes } from "./attrTypes";
 import { getRecordsByTaxon } from "./getRecordsByTaxon";
+import { getResults } from "../functions/getResults";
 import { parseFields } from "./parseFields";
 import { summaries } from "./summaries";
 
@@ -24,7 +25,7 @@ const validateValue = (term, value, meta, types) => {
     }
   }
   if (meta.attribute == "taxonomy") {
-    if (["tax_name", "tax_rank", "tax_eq"]) {
+    if (["tax_name", "tax_rank", "tax_eq", "tax_lineage"]) {
       type = "keyword";
     }
   }
@@ -147,7 +148,7 @@ const validateTerm = (term, types) => {
   if (parts[1] && parts[1].length > 0) {
     parts[1] = parts[1].toLowerCase();
     if (parts[1].startsWith("tax")) {
-      if (!parts[1].match(/tax_(tree|name|eq|rank|depth)$/)) {
+      if (!parts[1].match(/tax_(tree|name|eq|rank|depth|lineage)$/)) {
         return { validation: fail(`invalid taxonomy term in ${term}`) };
       }
       if (parts[3]) {
@@ -383,6 +384,33 @@ export const generateQuery = async ({
     taxonomy,
   };
   if (taxTerm) {
+    if (taxTerm[1] == "lineage") {
+      // convert search term to list of tax names
+      // set ordered parameter to keep order
+      let res = await getResults({
+        ...params,
+        taxonomy,
+        fields: ["lineage"],
+        query: `tax_name(${taxTerm[2]})`,
+        exclusions: [],
+        size: 100,
+        offset: 0,
+      });
+      if (!res.status.success) {
+        return {};
+      }
+      let taxIds = [];
+      for (let rslt of res.results) {
+        let line = rslt.result.lineage;
+        if (line) {
+          for (let anc of line) {
+            taxIds.push(anc.taxon_id);
+          }
+        }
+      }
+      taxTerm[1] = "eq";
+      taxTerm[2] = [...new Set(taxIds)].join(",");
+    }
     if (taxTerm[1] == "eq") {
       return {
         func: getRecordsByTaxon,

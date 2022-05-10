@@ -1,5 +1,5 @@
 export const combineQueries = (x = "", y = "") => {
-  if (y.match(/tax_(:?tree|eq|name|depth|rank)\(/)) {
+  if (y.match(/tax_(:?tree|eq|name|lineage|depth|rank)\(/)) {
     let xParts = x.split(/\s+and\s+/i);
     let yParts = y.split(/\s+and\s+/i);
     for (let yTerm of yParts) {
