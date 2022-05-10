@@ -101,7 +101,7 @@ export const searchByTaxon = async ({
       let taxFilter = [];
       let notTaxFilter = [];
       let boolOperator = "should";
-      searchTerm.split(",").forEach((taxon) => {
+      searchTerm.split(/\s*,\s*/).forEach((taxon) => {
         if ((taxon || "").startsWith("!")) {
           taxon = taxon.replace("!", "");
           boolOperator = "must_not";
@@ -145,7 +145,7 @@ export const searchByTaxon = async ({
   let rankRestriction;
   if (rank && rank.match(",")) {
     let rankFilter = [];
-    rank.split(",").forEach((r) => {
+    rank.split(/\s*,\s*/).forEach((r) => {
       rankFilter = rankFilter.concat(restrictToRank(r));
     });
     rankRestriction = [{ bool: { should: rankFilter } }];
