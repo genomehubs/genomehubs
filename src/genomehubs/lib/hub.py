@@ -357,7 +357,10 @@ def calculate(string):
     for function in operators.keys():
         left, operator, right = string.partition(function)
         if operator in operators:
-            return operators[operator](calculate(left), calculate(right))
+            try:
+                return operators[operator](calculate(left), calculate(right))
+            except TypeError:
+                return None
 
 
 def lookup_attribute_value(identifier, attribute, shared_values):
@@ -429,14 +432,19 @@ def calculator(value, operation, row_values, shared_values, template_type):
     return calculate(operation)
 
 
-def validate_values(values, key, types, row_values, shared_values):
+def validate_values(values, key, types, row_values, shared_values, blanks):
     """Validate values."""
     validated = []
     if isinstance(types[key], str) or "type" not in types[key]:
         types[key]["type"] = "keyword"
     key_type = types[key]["type"]
     for value in values:
+        if value in blanks:
+            continue
         if "function" in types[key] or "template" in types[key]:
+            print({"key": key, "value": value})
+            if re.match(r"^\d+\.\d+e[\+-]\d+$", value):
+                value = str(float(value))
             try:
                 template_type = "function" if "function" in types[key] else "template"
                 value = calculator(
@@ -512,7 +520,8 @@ def add_attributes(
     attr_type="attributes",
     meta=None,
     shared_values=None,
-    row_values=None
+    row_values=None,
+    blanks=None
 ):
     """Add attributes to a document."""
     if attributes is None:
@@ -532,7 +541,7 @@ def add_attributes(
                 validated = values
             else:
                 validated = validate_values(
-                    values, key, types, row_values, shared_values
+                    values, key, types, row_values, shared_values, blanks
                 )
             # TODO: handle invalid values
             if validated:
@@ -750,7 +759,7 @@ def process_features(data):
         del data["features"]
 
 
-def process_row(types, names, row, shared_values):
+def process_row(types, names, row, shared_values, blanks):
     """Process a row of data."""
     data = {
         "attributes": {},
@@ -794,6 +803,7 @@ def process_row(types, names, row, shared_values):
                 meta=data["metadata"],
                 shared_values=shared_values,
                 row_values=row_values,
+                blanks=blanks
             )
         else:
             data[attr_type] = []

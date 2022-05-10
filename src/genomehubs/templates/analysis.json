@@ -5,16 +5,19 @@
       "analysis_id": {
         "type": "keyword",
         "ignore_above": 32,
+        "normalizer": "lowercase",
         "meta": { "description": "Unique analysis ID" }
       },
       "assembly_id": {
         "type": "keyword",
         "ignore_above": 32,
+        "normalizer": "lowercase",
         "meta": { "description": "Related assembly ID(s)" }
       },
       "taxon_id": {
         "type": "keyword",
         "ignore_above": 32,
+        "normalizer": "lowercase",
         "meta": { "description": "Related taxon ID(s)" }
       },
       "assembly_count": {
@@ -40,6 +43,7 @@
       "name": {
         "type": "keyword",
         "ignore_above": 64,
+        "normalizer": "lowercase",
         "meta": { "description": "Analysis name" }
       },
       "description": {
@@ -54,6 +58,7 @@
       "analysis_group": {
         "type": "keyword",
         "ignore_above": 64,
+        "normalizer": "lowercase",
         "meta": { "description": "Analysis group" }
       },
       "versions": {
@@ -62,11 +67,13 @@
           "name": {
             "type": "keyword",
             "ignore_above": 32,
+            "normalizer": "lowercase",
             "meta": { "description": "Name of software or database" }
           },
           "version": {
             "type": "keyword",
             "ignore_above": 32,
+            "normalizer": "lowercase",
             "meta": { "description": "Software/database version" }
           },
           "command": {
@@ -79,6 +86,7 @@
       "ancestors": {
         "type": "keyword",
         "ignore_above": 32,
+        "normalizer": "lowercase",
         "meta": { "description": "Taxon IDs of ancestral taxa" }
       },
       "source": {
