@@ -2,7 +2,7 @@
     description: Analysis of public assembly GCA_905319855.2 using BlobToolKit
     name: BlobToolKit
     source: BlobToolKit
-    source_url: https://blobtoolkit.genomehubs.org/dataset/CAJNRB02
+    source_url: https://blobtoolkit.genomehubs.org/view/dataset/CAJNRB02
     title: BlobToolKit analysis of GCA_905319855.2
   analysis_id: btk-CAJNRB02
   assembly_id: GCA_905319855.2
@@ -17,7 +17,7 @@
     description: Analysis of public assembly GCA_905319855.2 using BlobToolKit
     name: BlobToolKit
     source: BlobToolKit
-    source_url: https://blobtoolkit.genomehubs.org/dataset/CAJNRB02
+    source_url: https://blobtoolkit.genomehubs.org/view/dataset/CAJNRB02
     title: BlobToolKit analysis of GCA_905319855.2
   analysis_id: btk-CAJNRB02
   assembly_id: GCA_905319855.2
@@ -32,7 +32,7 @@
     description: Analysis of public assembly GCA_905319855.2 using BlobToolKit
     name: BlobToolKit
     source: BlobToolKit
-    source_url: https://blobtoolkit.genomehubs.org/dataset/CAJNRB02
+    source_url: https://blobtoolkit.genomehubs.org/view/dataset/CAJNRB02
     title: BlobToolKit analysis of GCA_905319855.2
   analysis_id: btk-CAJNRB02
   assembly_id: GCA_905319855.2
@@ -47,7 +47,7 @@
     description: Analysis of public assembly GCA_017311455.1 using BlobToolKit
     name: BlobToolKit
     source: BlobToolKit
-    source_url: https://blobtoolkit.genomehubs.org/dataset/JAEUCK01
+    source_url: https://blobtoolkit.genomehubs.org/view/dataset/JAEUCK01
     title: BlobToolKit analysis of GCA_017311455.1
   analysis_id: btk-JAEUCK01
   assembly_id: GCA_017311455.1
@@ -62,7 +62,7 @@
     description: Analysis of public assembly GCA_017311455.1 using BlobToolKit
     name: BlobToolKit
     source: BlobToolKit
-    source_url: https://blobtoolkit.genomehubs.org/dataset/JAEUCK01
+    source_url: https://blobtoolkit.genomehubs.org/view/dataset/JAEUCK01
     title: BlobToolKit analysis of GCA_017311455.1
   analysis_id: btk-JAEUCK01
   assembly_id: GCA_017311455.1
@@ -77,7 +77,7 @@
     description: Analysis of public assembly GCA_017311455.1 using BlobToolKit
     name: BlobToolKit
     source: BlobToolKit
-    source_url: https://blobtoolkit.genomehubs.org/dataset/JAEUCK01
+    source_url: https://blobtoolkit.genomehubs.org/view/dataset/JAEUCK01
     title: BlobToolKit analysis of GCA_017311455.1
   analysis_id: btk-JAEUCK01
   assembly_id: GCA_017311455.1
