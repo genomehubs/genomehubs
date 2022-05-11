@@ -4,6 +4,7 @@ file:
   name: genomesize_2021-07-12.tsv
   source: Animal Genome Size Database
   source_url: http://genomesize.com
+  tests: genomesizedotcom_tests
 attributes:
   c_value:
     type: half_float

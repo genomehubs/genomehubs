@@ -1,0 +1,24 @@
+description: check taxon 1431472 (Prunus kotschyi) has no valueses
+endpoint: taxon--{{taxonomy-source}}--{{hub-name}}--{{hub-version}}/_doc/taxon_id-1431472
+querystring:
+assert:
+  _id: taxon_id-1431472
+  found: True
+  _source:
+    taxon_id: "1431472"
+    parent: "3754"
+    taxon_rank: species
+    scientific_name: Prunus kotschyi
+    anyOf:
+      - not: attributes
+      - attributes:
+          jsonSchema:
+            type: array
+            minItems: 1
+            not:
+              contains:
+                type: object
+                properties:
+                  key:
+                    type: string
+                    pattern: chromosome_number

@@ -442,7 +442,6 @@ def validate_values(values, key, types, row_values, shared_values, blanks):
         if value in blanks:
             continue
         if "function" in types[key] or "template" in types[key]:
-            print({"key": key, "value": value})
             if re.match(r"^\d+\.\d+e[\+-]\d+$", value):
                 value = str(float(value))
             try:
