@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: ${{github.ref}}
+          ref: ${GITHUB_REF##*/}
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: ${{github.ref}}
+          ref: ${GITHUB_REF##*/}
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: ${{github.ref}}
+          ref: ${GITHUB_REF##*/}
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
@@ -58,7 +58,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: ${{github.ref}}
+          ref: ${GITHUB_REF##*/}
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
@@ -101,7 +101,7 @@ jobs:
         with:
           context: src/docker
           push: true
-          tags: genomehubs/genomehubs:${{github.ref}}
+          tags: genomehubs/genomehubs:${GITHUB_REF##*/}
           labels: ${{ steps.meta.outputs.labels }}
 
   build-and-push-api:
@@ -132,7 +132,7 @@ jobs:
         with:
           context: src/docker/api
           push: true
-          tags: genomehubs/genomehubs-api:${{github.ref}}
+          tags: genomehubs/genomehubs-api:${GITHUB_REF##*/}
           labels: ${{ steps.meta.outputs.labels }}
 
   build-and-push-ui:
@@ -163,7 +163,7 @@ jobs:
         with:
           context: src/docker/ui
           push: true
-          tags: genomehubs/genomehubs-ui:${{github.ref}}
+          tags: genomehubs/genomehubs-ui:${GITHUB_REF##*/}
           labels: ${{ steps.meta.outputs.labels }}
 
   build-and-push-goat-ui:
@@ -173,7 +173,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: ${{github.ref}}
+          ref: ${GITHUB_REF##*/}
       - uses: actions/download-artifact@v2
         with:
           name: goat-ui
@@ -196,5 +196,5 @@ jobs:
         with:
           context: src/docker/goat
           push: true
-          tags: genomehubs/goat:${{github.ref}}
+          tags: genomehubs/goat:${GITHUB_REF##*/}
           labels: ${{ steps.meta.outputs.labels }}
