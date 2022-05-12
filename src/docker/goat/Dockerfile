@@ -1,15 +1,26 @@
-FROM genomehubs/genomehubs-ui:2.4.9
+FROM alpine:3.15
 LABEL maintainer="contact@genomehubs.org"
 LABEL license="MIT"
+ARG VERSION=2.4.9
+LABEL version=$VERSION
 
-USER root
+ENV CONTAINER_VERSION=$VERSION
 
-COPY genomehubs-ui-linux ./genomehubs-ui
+RUN apk add --no-cache curl gcompat libstdc++ libgcc
 
-RUN chmod 755 genomehubs-ui \
-    && chown genomehubs:genomehubs genomehubs-ui
+RUN mkdir -p /genomehubs/local
+
+COPY genomehubs-ui-linux /genomehubs/genomehubs-ui
+
+RUN addgroup -S genomehubs \
+    && adduser -S genomehubs -G genomehubs \
+    && chown -R genomehubs:genomehubs /genomehubs
 
 USER genomehubs
+
+RUN chmod 755 genomehubs-ui
+
+ENV PATH /genomehubs:$PATH
 
 COPY .env /genomehubs/
 

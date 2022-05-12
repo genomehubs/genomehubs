@@ -10,6 +10,8 @@ RUN apk add --no-cache curl gcompat libstdc++ libgcc
 
 RUN mkdir -p /genomehubs/logs
 
+COPY genomehubs-api-linux /genomehubs/genomehubs-api
+
 RUN addgroup -S genomehubs \
     && adduser -S genomehubs -G genomehubs \
     && chown -R genomehubs:genomehubs /genomehubs
@@ -18,8 +20,7 @@ USER genomehubs
 
 WORKDIR /genomehubs
 
-RUN curl -Ls https://github.com/genomehubs/genomehubs/releases/download/${VERSION}/genomehubs-api-linux > genomehubs-api \
-    && chmod 755 genomehubs-api
+RUN chmod 755 genomehubs-api
 
 ENV PATH /genomehubs:$PATH
 
