@@ -18,6 +18,8 @@ RUN addgroup -S genomehubs \
 
 USER genomehubs
 
+WORKDIR /genomehubs
+
 RUN chmod 755 genomehubs-ui
 
 ENV PATH /genomehubs:$PATH
