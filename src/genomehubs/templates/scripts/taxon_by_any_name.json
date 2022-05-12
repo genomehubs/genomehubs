@@ -32,7 +32,14 @@
         }
       },
       "_source": {
-        "includes": ["taxon_id", "taxon_rank", "scientific_name", "lineage.*"]
+        "includes": [
+          "taxon_id",
+          "taxon_rank",
+          "scientific_name",
+          "parent",
+          "taxon_names",
+          "lineage.*"
+        ]
       }
     }
   }

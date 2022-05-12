@@ -116,12 +116,12 @@ def lookup_missing_taxon_ids(
                 taxa, name_class = lookup_taxon(
                     es,
                     obj["taxonomy"][rank],
-                    obj["taxonomy"],
                     opts,
                     rank=rank,
                     return_type="taxon",
                     spellings=spellings,
                     taxon_table=taxon_table,
+                    taxonomy=obj["taxonomy"]
                 )
                 if index == 1 and not taxa:
                     break
@@ -663,7 +663,6 @@ def lookup_taxon_in_memory(
 def lookup_taxon(
     es,
     name,
-    taxonomy,
     opts,
     *,
     rank=None,
@@ -671,6 +670,7 @@ def lookup_taxon(
     return_type="taxon_id",
     spellings=None,
     taxon_table=None,
+    taxonomy=None
 ):
     """Lookup taxon ID."""
     if spellings is None:
@@ -703,13 +703,13 @@ def lookup_taxon(
         taxa, name_class = lookup_taxon(
             es,
             name,
-            taxonomy,
             opts,
             rank=rank,
             name_class="any",
             return_type=return_type,
             spellings=spellings,
             taxon_table=taxon_table,
+            taxonomy=taxonomy
         )
     if (
         not taxa
@@ -720,23 +720,55 @@ def lookup_taxon(
         taxa, name_class = lookup_taxon(
             es,
             name,
-            taxonomy,
             opts,
             rank=rank,
             name_class="spellcheck",
             return_type=return_type,
             spellings=spellings,
             taxon_table=taxon_table,
+            taxonomy=taxonomy
         )
+    if taxonomy is None:
+        return taxa, name_class
     # filter taxa to ensure lineage matches
+    # TODO: include lineage spellcheck
     filtered_taxa = []
     for taxon in taxa:
+        compatible_count = 0
         compatible = True
-        for ancestor in taxon["_source"]["lineage"]:
+        for anc_index, ancestor in enumerate(taxon["_source"]["lineage"]):
             if not ancestor["taxon_rank"].endswith("species"):
                 if ancestor["taxon_rank"] in taxonomy:
                     if ancestor["scientific_name"].lower() != taxonomy[ancestor["taxon_rank"]].lower():
-                        compatible = False
+                        # TODO: add higher taxon lookup here
+                        print(taxonomy[ancestor["taxon_rank"]])
+                        anc_taxa, anc_name_class = lookup_taxon(
+                            es,
+                            taxonomy[ancestor["taxon_rank"]],
+                            opts,
+                            rank=ancestor["taxon_rank"],
+                            name_class="any",  # TODO: add option to use spellcheck
+                            return_type=return_type,
+                            spellings=spellings,
+                            taxon_table=taxon_table,
+                            # taxonomy=taxonomy
+                        )
+                        if anc_taxa:
+                            compatible_anc = False
+                            for anc_taxon in anc_taxa:
+                                if anc_taxon["_source"]["parent"] == taxon["_source"]["lineage"][anc_index + 1]["taxon_id"]:
+                                    print("%s is the ancestor" % taxon["_source"]["lineage"][anc_index + 1]["scientific_name"])
+                                    compatible_anc = True
+                                    break
+                        else:
+                            compatible = False
+                        if not compatible or not compatible_anc:
+                            compatible = False
+                            print("cannot find %s" % name)
+                            break
+                    else:
+                        compatible_count += 1
+                    if compatible_count == 2:
                         break
         if compatible:
             filtered_taxa.append(taxon)
