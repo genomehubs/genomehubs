@@ -3,7 +3,7 @@ name: package-genomehubs-latest
 on: push
 
 jobs:
-package-ui:
+  package-ui:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
