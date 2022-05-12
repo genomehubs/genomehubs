@@ -384,6 +384,7 @@ export const generateQuery = async ({
     taxonomy,
   };
   if (taxTerm) {
+    let function_score;
     if (taxTerm[1] == "lineage") {
       // convert search term to list of tax names
       // set ordered parameter to keep order
@@ -409,13 +410,25 @@ export const generateQuery = async ({
         }
       }
       taxTerm[1] = "eq";
-      taxTerm[2] = [...new Set(taxIds)].join(",");
+      taxIds = [...new Set(taxIds)];
+      taxTerm[2] = taxIds.join(",");
+      function_score = {
+        query: { match_all: {} },
+        boost: 5,
+        functions: taxIds.reverse().map((taxId, index) => ({
+          filter: { match: { taxon_id: taxId } },
+          weight: (index + 1) * 2,
+        })),
+        score_mode: "max",
+        boost_mode: "replace",
+      };
     }
     if (taxTerm[1] == "eq") {
       return {
         func: getRecordsByTaxon,
         params: {
           ...params,
+          function_score,
           searchTerm: taxTerm[2],
           includeEstimates: true,
         },

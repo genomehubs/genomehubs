@@ -73,7 +73,7 @@ export const histogramAgg = async ({
     calendar_interval = duration(max - min);
   } else {
     histKey = "histogram";
-    ({ scale, min, max, count } = typesMap[field].bins);
+    ({ scale, min, max, count } = typesMap[field].bins || {});
     if (bounds) {
       if (!isNaN(bounds.domain[0])) {
         scale = bounds.scale;

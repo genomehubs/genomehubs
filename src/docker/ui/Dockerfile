@@ -1,7 +1,7 @@
 FROM alpine:3.15
 LABEL maintainer="contact@genomehubs.org"
 LABEL license="MIT"
-ARG VERSION=2.4.9
+ARG VERSION=2.4.10
 LABEL version=$VERSION
 
 ENV CONTAINER_VERSION=$VERSION
@@ -9,6 +9,8 @@ ENV CONTAINER_VERSION=$VERSION
 RUN apk add --no-cache curl gcompat libstdc++ libgcc
 
 RUN mkdir -p /genomehubs/local
+
+COPY genomehubs-ui-linux /genomehubs/genomehubs-ui
 
 RUN addgroup -S genomehubs \
     && adduser -S genomehubs -G genomehubs \
@@ -18,8 +20,7 @@ USER genomehubs
 
 WORKDIR /genomehubs
 
-RUN curl -Ls https://github.com/genomehubs/genomehubs/releases/download/${VERSION}/genomehubs-ui-linux > genomehubs-ui \
-    && chmod 755 genomehubs-ui
+RUN chmod 755 genomehubs-ui
 
 ENV PATH /genomehubs:$PATH
 

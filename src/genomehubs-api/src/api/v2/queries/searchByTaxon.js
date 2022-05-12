@@ -36,6 +36,7 @@ export const searchByTaxon = async ({
   size,
   offset,
   sortBy,
+  function_score,
   taxonomy,
   aggs = {},
 }) => {
@@ -160,24 +161,29 @@ export const searchByTaxon = async ({
   });
   let exclude = []; // includeRawValues ? [] : ["attributes.values*"];
   let sort = setSortOrder(sortBy, typesMap, namesMap);
+  let query = {
+    bool: {
+      must_not: excludedSources,
+      filter: attributesExist
+        .concat(namesExist)
+        .concat(attributeValues)
+        .concat(propertyValues)
+        .concat(taxonFilter)
+        .concat(rankRestriction)
+        .concat(lineageRanks)
+        .concat(assemblyFilter),
+      ...(optionalAttributesExist && { should: optionalAttributesExist }),
+    },
+  };
+  if (function_score) {
+    function_score.query = query;
+    query = { function_score };
+  }
 
   return {
     size,
     from: offset,
-    query: {
-      bool: {
-        must_not: excludedSources,
-        filter: attributesExist
-          .concat(namesExist)
-          .concat(attributeValues)
-          .concat(propertyValues)
-          .concat(taxonFilter)
-          .concat(rankRestriction)
-          .concat(lineageRanks)
-          .concat(assemblyFilter),
-        ...(optionalAttributesExist && { should: optionalAttributesExist }),
-      },
-    },
+    query,
     _source: {
       include,
       exclude,
