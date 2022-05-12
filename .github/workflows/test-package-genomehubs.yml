@@ -101,7 +101,7 @@ jobs:
         with:
           context: src/docker
           push: true
-          tags: genomehubs/genomehubs:${{github.ref}}
+          tags: genomehubs/genomehubs:${{github.ref}##*/}
           labels: ${{ steps.meta.outputs.labels }}
 
   build-and-push-api:
@@ -132,7 +132,7 @@ jobs:
         with:
           context: src/docker/api
           push: true
-          tags: genomehubs/genomehubs-api:${{github.ref}}
+          tags: genomehubs/genomehubs-api:${{github.ref}##*/}
           labels: ${{ steps.meta.outputs.labels }}
 
   build-and-push-ui:
@@ -163,7 +163,7 @@ jobs:
         with:
           context: src/docker/ui
           push: true
-          tags: genomehubs/genomehubs-ui:${{github.ref}}
+          tags: genomehubs/genomehubs-ui:${{github.ref}##*/}
           labels: ${{ steps.meta.outputs.labels }}
 
   build-and-push-goat-ui:
@@ -196,5 +196,5 @@ jobs:
         with:
           context: src/docker/goat
           push: true
-          tags: genomehubs/goat:${{github.ref}}
+          tags: genomehubs/goat:${{github.ref}##*/}
           labels: ${{ steps.meta.outputs.labels }}
