@@ -1,6 +1,6 @@
 name: package-genomehubs-latest
 
-on: workflow_dispatch
+on: push
 
 jobs:
 package-ui:
