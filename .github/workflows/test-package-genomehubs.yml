@@ -1,14 +1,61 @@
 name: package-genomehubs-latest
-env:
-  VERSION: 2.4.7
 
 on: workflow_dispatch
 
 jobs:
+package-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{github.ref}}
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - run: npm install -g pkg
+      - run: ./package-ui.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./dist/*
+
+  package-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{github.ref}}
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - run: npm install -g pkg
+      - run: ./package-api.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./dist/*
+
+  package-genomehubs-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{github.ref}}
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install setuptools wheel twine
+      - name: Build and publish
+        run: |
+          ./pip_install_latest.sh manylinux2014_x86_64
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./dist/*
+
   package-goat-ui:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{github.ref}}
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
@@ -23,12 +70,91 @@ jobs:
           name: goat-ui
           path: ./dist/*
 
+  build-and-push-genomehubs:
+    runs-on: ubuntu-latest
+    needs: upload-to-pypi
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: genomehubs/genomehubs
+      - uses: actions/download-artifact@v2
+        with:
+          path: ./dist
+      - name: Add pip wheel to context
+        run: mv dist/artifact/*manylinux2014_x86_64.whl src/docker
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: src/docker
+          push: true
+          tags: genomehubs/genomehubs:${{github.ref}}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-and-push-api:
+    runs-on: ubuntu-latest
+    needs: upload-to-pypi
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: genomehubs/genomehubs-api
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: src/docker/api
+          push: true
+          tags: genomehubs/genomehubs-api:${{github.ref}}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-and-push-ui:
+    runs-on: ubuntu-latest
+    needs: upload-to-pypi
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: genomehubs/genomehubs-ui
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: src/docker/ui
+          push: true
+          tags: genomehubs/genomehubs-ui:${{github.ref}}
+          labels: ${{ steps.meta.outputs.labels }}
+
   build-and-push-goat-ui:
     runs-on: ubuntu-latest
     needs: package-goat-ui
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: ${{github.ref}}
       - uses: actions/download-artifact@v2
         with:
           name: goat-ui
@@ -51,5 +177,5 @@ jobs:
         with:
           context: src/docker/goat
           push: true
-          tags: genomehubs/goat:latest
+          tags: genomehubs/goat:${{github.ref}}
           labels: ${{ steps.meta.outputs.labels }}
