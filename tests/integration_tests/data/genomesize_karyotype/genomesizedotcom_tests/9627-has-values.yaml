@@ -1,0 +1,15 @@
+description: check taxon 9627 (Vulpes vulpes) has no valueses
+endpoint: taxon--{{taxonomy-source}}--{{hub-name}}--{{hub-version}}/_doc/taxon_id-9627
+querystring:
+assert:
+  _id: taxon_id-9627
+  found: True
+  _source:
+    taxon_id: "9627"
+    parent: "9625"
+    taxon_rank: species
+    scientific_name: Vulpes vulpes
+    attributes:
+      - key: c_value
+        values:
+          - half_float_value: 1.25

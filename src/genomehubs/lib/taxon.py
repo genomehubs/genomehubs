@@ -728,20 +728,17 @@ def lookup_taxon(
             taxon_table=taxon_table,
             taxonomy=taxonomy
         )
-    if taxonomy is None:
+    if taxonomy is None or int(opts["taxon-matching-ranks"]) == 0:
         return taxa, name_class
     # filter taxa to ensure lineage matches
-    # TODO: include lineage spellcheck
     filtered_taxa = []
     for taxon in taxa:
         compatible_count = 0
         compatible = True
         for anc_index, ancestor in enumerate(taxon["_source"]["lineage"]):
             if not ancestor["taxon_rank"].endswith("species"):
-                if ancestor["taxon_rank"] in taxonomy:
+                if ancestor["taxon_rank"] in taxonomy and taxonomy[ancestor["taxon_rank"]]:
                     if ancestor["scientific_name"].lower() != taxonomy[ancestor["taxon_rank"]].lower():
-                        # TODO: add higher taxon lookup here
-                        print(taxonomy[ancestor["taxon_rank"]])
                         anc_taxa, anc_name_class = lookup_taxon(
                             es,
                             taxonomy[ancestor["taxon_rank"]],
@@ -757,18 +754,17 @@ def lookup_taxon(
                             compatible_anc = False
                             for anc_taxon in anc_taxa:
                                 if anc_taxon["_source"]["parent"] == taxon["_source"]["lineage"][anc_index + 1]["taxon_id"]:
-                                    print("%s is the ancestor" % taxon["_source"]["lineage"][anc_index + 1]["scientific_name"])
                                     compatible_anc = True
+                                    compatible_count += 1
                                     break
                         else:
                             compatible = False
                         if not compatible or not compatible_anc:
                             compatible = False
-                            print("cannot find %s" % name)
                             break
                     else:
                         compatible_count += 1
-                    if compatible_count == 2:
+                    if compatible_count == int(opts["taxon-matching-ranks"]):
                         break
         if compatible:
             filtered_taxa.append(taxon)
