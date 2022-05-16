@@ -6,8 +6,8 @@ assert:
     assembly_id: "GCA_905319855.2"
     taxon_id: "9612"
     attributes:
-      - key: assembly_level
-        keyword_value: Chromosome
+      # - key: assembly_level
+      #   keyword_value: Chromosome
       - key: busco_completeness
         1dp_value:
           jsonSchema:

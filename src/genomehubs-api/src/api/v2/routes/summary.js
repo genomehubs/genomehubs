@@ -7,7 +7,7 @@ import { indexName } from "../functions/indexName";
 import { logError } from "../functions/logger";
 
 const getSummary = async (params) => {
-  let typesMap = await attrTypes({ ...params });
+  let { typesMap, lookupTypes } = await attrTypes({ ...params });
   let index = indexName({ ...params });
   let ids = Array.isArray(params.recordId)
     ? params.recordId

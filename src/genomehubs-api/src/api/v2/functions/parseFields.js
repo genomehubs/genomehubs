@@ -2,7 +2,7 @@ import { attrTypes } from "./attrTypes";
 import { logError } from "./logger";
 
 export const parseFields = async ({ result, fields, taxonomy }) => {
-  let typesMap = await attrTypes({ result, taxonomy });
+  let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
   try {
     if (!typesMap) {
       return [];

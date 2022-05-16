@@ -89,7 +89,7 @@ export const getBounds = async ({
   apiParams,
   opts = ";;",
 }) => {
-  let typesMap = await attrTypes({ result, taxonomy });
+  let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
   params.size = 0;
   // find max and min plus most frequent categories
   let field = fields[0];

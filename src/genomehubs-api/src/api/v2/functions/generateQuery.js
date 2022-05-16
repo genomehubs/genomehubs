@@ -19,9 +19,9 @@ const isDate = (date) => {
 const validateValue = (term, value, meta, types) => {
   let type = meta.type;
   let attrEnum;
-  if (types && types[meta.attribute]) {
+  if (types && types(meta.attribute)) {
     if (!type || type == "value") {
-      type = types[meta.attribute].type;
+      type = types(meta.attribute).type;
     }
   }
   if (meta.attribute == "taxonomy") {
@@ -30,13 +30,13 @@ const validateValue = (term, value, meta, types) => {
     }
   }
   if (type == "keyword") {
-    if (types && types[meta.attribute]) {
-      let summary = types[meta.attribute].summary;
+    if (types && types(meta.attribute)) {
+      let summary = types(meta.attribute).summary;
       if (
         summary == "enum" ||
         (Array.isArray(summary) && summary.includes("enum"))
       ) {
-        attrEnum = new Set(types[meta.attribute].constraint.enum);
+        attrEnum = new Set(types(meta.attribute).constraint.enum);
       }
     }
   }
@@ -86,12 +86,13 @@ const validateOperator = (term, types, meta) => {
     }
     if (!meta) {
       parts[0] = parts[0].toLowerCase();
-      if (!types[parts[0]]) {
+      let fullMeta = types(parts[0]);
+      if (!fullMeta) {
         return fail(`invalid field name in ${term}`);
       }
       meta = {
-        attribute: parts[0],
-        type: types[parts[0]].type,
+        attribute: fullMeta.name,
+        type: fullMeta.type,
       };
     }
     return validateValue(term, parts[2], meta, types);
@@ -171,10 +172,12 @@ const validateTerm = (term, types) => {
   if (parts[2] && parts[2].length > 0) {
     parts[2] = parts[2].toLowerCase();
     if (types) {
-      if (!types[parts[2]]) {
+      let meta = types(parts[2]);
+      if (!meta) {
         return { validation: fail(`invalid attribute name in ${term}`) };
       }
-      let typeSummary = types[parts[2]].summary;
+      parts[2] = meta.name;
+      let typeSummary = meta.summary;
       if (!Array.isArray(typeSummary)) {
         typeSummary = [typeSummary];
       }
@@ -224,7 +227,7 @@ export const generateQuery = async ({
   req,
   update,
 }) => {
-  let typesMap = await attrTypes({ ...query, taxonomy });
+  let { lookupTypes } = await attrTypes({ ...query, taxonomy });
   fields = await parseFields({ result, fields, taxonomy });
   optionalFields = optionalFields
     ? await parseFields({ result, fields: optionalFields, taxonomy })
@@ -261,7 +264,7 @@ export const generateQuery = async ({
     for (let term of query.split(/\s+and\s+/)) {
       let parts, validation;
       try {
-        ({ parts, validation } = validateTerm(term, typesMap[result]));
+        ({ parts, validation } = validateTerm(term, lookupTypes[result]));
       } catch (err) {
         validation = fail(`unable to validate query term ${term}`);
         console.warn(err);
@@ -286,13 +289,15 @@ export const generateQuery = async ({
         }
       } else {
         if (parts.length > 1) {
-          if (typesMap[result] && typesMap[result][term]) {
-            let bins = typesMap[result][term].bins;
+          let meta = lookupTypes[result](term);
+          if (meta) {
+            let bins = meta.bins;
             if (bins && bins.scale && bins.scale.startsWith("log")) {
               if (!parts[3] || parts[3].length > 0) {
                 parts[3] = ">0";
               }
             }
+            term = meta.name;
           }
           let summary;
           if (parts[1] && parts[1].length > 0) {
@@ -312,32 +317,33 @@ export const generateQuery = async ({
             // if (!parts[2]) parts[2] = condition[0];
             parts[3] = condition[1];
             parts[4] = condition[2];
-            if (typesMap[result]) {
-              if (!typesMap[result][parts[2]]) {
+            if (lookupTypes[result]) {
+              let meta = lookupTypes[result](parts[2]);
+              if (!meta) {
                 status = {
                   success: false,
                   error: `Invalid field in '${term}'`,
                 };
               } else {
-                filters = addCondition(
-                  filters,
-                  parts,
-                  typesMap[result][parts[2]].type,
-                  summary
-                );
+                parts[2] = meta.name;
+                filters = addCondition(filters, parts, meta.type, summary);
               }
             } else {
               properties = addCondition(properties, parts, "keyword");
             }
           } else {
-            if (typesMap[result][parts[2]]) {
+            let meta = lookupTypes[result](parts[2]);
+            if (meta) {
+              parts[2] = meta.name;
               fields.push(parts[2]);
             } else {
               idTerm = parts[2];
             }
           }
         } else {
-          if (typesMap[result][term]) {
+          let meta = lookupTypes[result](term);
+          if (meta) {
+            term = meta.name;
             fields.push(term);
           } else {
             idTerm = term;

@@ -303,7 +303,7 @@ export const setAggs = async ({
   yBounds,
   taxonomy,
 }) => {
-  let typesMap = await attrTypes({ result, taxonomy });
+  let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
   if (!typesMap[field]) {
     if (terms) {
       if (typesMap[terms]) {

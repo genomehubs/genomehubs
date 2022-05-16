@@ -40,8 +40,8 @@ export const searchByTaxon = async ({
   taxonomy,
   aggs = {},
 }) => {
-  let typesMap = await attrTypes({ result, taxonomy });
-  let namesMap = await attrTypes({
+  let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
+  let { typesMap: namesMap, lookupTypes: lookupNames } = await attrTypes({
     result,
     indexType: "identifiers",
     taxonomy,

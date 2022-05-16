@@ -50,15 +50,16 @@ export const histogramAgg = async ({
     return [ticks[0], ticks[ticks.length - 1]];
   };
 
-  let typesMap = await attrTypes({ result, taxonomy });
-  if (!typesMap[field]) {
+  let { lookupTypes } = await attrTypes({ result, taxonomy });
+  let meta = lookupTypes[field];
+  if (!meta) {
     return;
   }
 
   let scale, min, max, count, offset;
   let interval, calendar_interval, histKey;
 
-  if (typesMap[field].type == "date") {
+  if (meta.type == "date") {
     histKey = "date_histogram";
     [min, max] = timeLimits(bounds.stats.min, bounds.stats.max);
     min = bounds.domain[0];
@@ -73,7 +74,7 @@ export const histogramAgg = async ({
     calendar_interval = duration(max - min);
   } else {
     histKey = "histogram";
-    ({ scale, min, max, count } = typesMap[field].bins || {});
+    ({ scale, min, max, count } = meta.bins || {});
     if (bounds) {
       if (!isNaN(bounds.domain[0])) {
         scale = bounds.scale;
@@ -94,10 +95,10 @@ export const histogramAgg = async ({
   }
   let fieldKey = `attributes${rawValues ? ".values" : ""}.`;
   if (!summary || summary == "value") {
-    fieldKey += `${typesMap[field].type}_value`;
+    fieldKey += `${meta.type}_value`;
   } else {
-    if (typesMap[field].type == "date") {
-      fieldKey += dateSummary[summary] || `${typesMap[field].type}_value`;
+    if (meta.type == "date") {
+      fieldKey += dateSummary[summary] || `${meta.type}_value`;
     } else {
       fieldKey += summary;
     }

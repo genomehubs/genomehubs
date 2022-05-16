@@ -380,7 +380,7 @@ const getTree = async ({
   req,
 }) => {
   cat = undefined;
-  let typesMap = await attrTypes({ result, taxonomy });
+  let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
   let field = yFields[0] || fields[0];
   let exclusions;
   params.excludeUnclassified = true;
@@ -503,7 +503,7 @@ export const tree = async ({
   apiParams,
   req,
 }) => {
-  let typesMap = await attrTypes({ result, taxonomy });
+  let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
   let searchFields = await parseFields({
     result,
     fields: apiParams.fields,
