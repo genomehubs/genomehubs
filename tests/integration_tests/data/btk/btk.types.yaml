@@ -20,7 +20,7 @@ attributes:
     taxon_traverse: false
     taxon_type: 1dp
     type: 1dp
-    units: '%'
+    units: "%"
   busco_lineage:
     description: Busco lineage
     display_group: busco
@@ -73,7 +73,7 @@ attributes:
     taxon_traverse_direction: both
     taxon_type: 1dp
     type: 1dp
-    units: '%'
+    units: "%"
   n_percent:
     description: N percent
     display_group: btk
@@ -94,7 +94,7 @@ attributes:
     taxon_traverse: false
     taxon_type: 1dp
     type: 1dp
-    units: '%'
+    units: "%"
   nohit:
     description: Sequences with no hits in the reference database
     display_group: btk
@@ -116,7 +116,7 @@ attributes:
     taxon_traverse: median
     taxon_type: 1dp
     type: 1dp
-    units: '%'
+    units: "%"
   target:
     description: Hits matching target
     display_group: btk
@@ -138,7 +138,7 @@ attributes:
     taxon_traverse: median
     taxon_type: 1dp
     type: 1dp
-    units: '%'
+    units: "%"
 file:
   display_group: btk
   format: tsv
@@ -146,6 +146,7 @@ file:
   name: btk.tsv
   source: BlobToolKit
   source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
+  tests: btk_tests
 identifiers:
   assembly_alias:
     header: alias
