@@ -128,9 +128,9 @@ def add_identifiers_and_attributes_to_assemblies(
                 doc = response["hits"]["hits"][0]
             assembly_data = all_assemblies[doc["_source"]["assembly_id"]]
             identifiers = copy.deepcopy(doc["_source"]["identifiers"])
-            attributes = copy.deepcopy(doc["_source"]["attributes"])
-            if "attributes" in assembly_data:
-                attributes = attributes + assembly_data["attributes"]
+            # attributes = copy.deepcopy(doc["_source"]["attributes"])
+            # if "attributes" in assembly_data:
+            #     attributes = attributes + assembly_data["attributes"]
             if "identifiers" in assembly_data:
                 identifiers = identifiers + assembly_data["identifiers"]
             add_identifiers_to_list(
@@ -138,7 +138,8 @@ def add_identifiers_and_attributes_to_assemblies(
             )
             if "attributes" not in doc["_source"] or not doc["_source"]["attributes"]:
                 doc["_source"]["attributes"] = []
-            add_attribute_values(doc["_source"]["attributes"], attributes, raw=False)
+            if "attributes" in assembly_data:
+                add_attribute_values(doc["_source"]["attributes"], assembly_data["attributes"], raw=False)
             doc["_source"]["taxon_id"] = assembly_data["taxon_id"]
             try:
                 add_taxonomy_info_to_meta(

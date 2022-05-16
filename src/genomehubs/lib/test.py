@@ -40,6 +40,15 @@ def is_subset(a, b, path=None):
     if path is None:
         path = {}
 
+    def deep_unique(arr):
+        """Test all items in b for uniqueness."""
+        if isinstance(arr, list) and len(arr) > 1:
+            for index, x in enumerate(arr[:-1]):
+                for y in arr[index + 1:]:
+                    if x == y:
+                        return False
+        return True
+
     def recursive_check_subset(a, b, path, *, invert=False):
         if isinstance(a, str):
             if a in b:
@@ -54,6 +63,14 @@ def is_subset(a, b, path=None):
                 path[x] = {}
                 subset = next(recursive_check_subset(a[x], b, path[x], invert=True))
                 yield not subset
+            if x == "uniqueItems":
+                if a[x] is True:
+                    path[x] = {}
+                    unique = deep_unique(b)
+                    if invert:
+                        unique = not unique
+                    path[x] = "PASS" if unique else "FAIL"
+                yield unique
             elif x == "jsonSchema":
                 try:
                     validate(a[x], b)
