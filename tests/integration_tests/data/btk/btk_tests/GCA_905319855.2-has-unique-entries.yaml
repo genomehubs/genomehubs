@@ -7,7 +7,3 @@ assert:
     taxon_id: "9612"
     attributes:
       uniqueItems: true
-      - key: assembly_level
-        keyword_value: Chromosome
-      - key: busco_completeness
-        1dp_value: 95.5
