@@ -16,4 +16,5 @@ row_number	ncbi_taxid	phylum	subphylum	class	order	family	genus_species	common_n
 5211	192959	Chordata	Vertebrata	Mammalia	Carnivora	Canidae	Nyctereutes procyonoides procyonoides	Chinese raccoon dog	3.27	54	FCM	EP	"HS, GD"	566
 5212	476259	Chordata	Vertebrata	Mammalia	Carnivora	Canidae	Nyctereutes procyonoides viverrinus	Japanese raccoon dog	3.19	38	FCM	EP	"HS, GD"	566
 5213	55040	Chordata	Vertebrata	Mammalia	Carnivora	Canidae	Urocyon cinereoargenteus	Gray fox	3.07	66	FCM	EP	"HS, GD"	566
-5214	9627	Chordata	Vertebrata	Mammalia	Carnivora	Canidae	Vulpes vulpes	Red fox	2.85	34	FCM	EP	"HS, GD"	566
+5214			test_value	mammals	carnivores		Vulpes vulpes	Red fox	1.25	34	FCM	EP	"HS, GD"	566
+5214		Chordata	Vertebrata	Mammalia	Carnivora	Canidae	Prunus kotschyi	Non-canid entry	2.87	34	FCM	EP	"HS, GD"	566

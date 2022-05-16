@@ -40,15 +40,27 @@ def is_subset(a, b, path=None):
     if path is None:
         path = {}
 
-    def recursive_check_subset(a, b, path):
+    def recursive_check_subset(a, b, path, *, invert=False):
+        if isinstance(a, str):
+            if a in b:
+                path[a] = "FAIL" if invert else "PASS"
+                yield True
+            else:
+                path[a] = "PASS" if invert else "FAIL"
+                yield False
+            return
         for x in a:
-            if x == "jsonSchema":
+            if x == "not":
+                path[x] = {}
+                subset = next(recursive_check_subset(a[x], b, path[x], invert=True))
+                yield not subset
+            elif x == "jsonSchema":
                 try:
                     validate(a[x], b)
-                    path[x] = "PASS"
+                    path[x] = "FAIL" if invert else "PASS"
                     yield True
                 except Exception:
-                    path[x] = "FAIL"
+                    path[x] = "PASS" if invert else "FAIL"
                     yield False
             elif isinstance(a[x], dict):
                 if x in b:
@@ -56,7 +68,7 @@ def is_subset(a, b, path=None):
                     yield all(recursive_check_subset(a[x], b[x], path[x]))
                 else:
                     path[x] = False
-                    yield False
+                    yield path[x]
             else:
                 if x in b and isinstance(a[x], list):
                     path[x] = []
@@ -72,9 +84,15 @@ def is_subset(a, b, path=None):
                                 break
                         matches.append(has_match)
                     yield all(matches)
+                elif x == "anyOf":
+                    path[x] = {}
+                    yield any([is_subset(entry, b, path[x]) for entry in a[x]])
                 else:
                     status = (x in b) and (a[x] == b[x])
-                    path[x] = "PASS" if status else "FAIL"
+                    if invert:
+                        path[x] = "FAIL" if status else "PASS"
+                    else:
+                        path[x] = "PASS" if status else "FAIL"
                     yield status
 
     return all(recursive_check_subset(a, b, path))
