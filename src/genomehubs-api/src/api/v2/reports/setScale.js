@@ -1,4 +1,4 @@
-export const setScale = ({ field, typesMap, opts }) => {
+export const setScale = ({ field, lookupTypes, opts }) => {
   if (opts) {
     let parts = opts.split(/\s*;\s*/);
     if (parts.length == 1) {
@@ -8,10 +8,11 @@ export const setScale = ({ field, typesMap, opts }) => {
       return parts[3].toLowerCase();
     }
   }
-  if (typesMap[field] && typesMap[field].bins && typesMap[field].bins.scale) {
-    return typesMap[field].bins.scale.toLowerCase();
+  let meta = lookupTypes(field);
+  if (meta && meta.bins && meta.bins.scale) {
+    return meta.bins.scale.toLowerCase();
   }
-  if (typesMap[field] && typesMap[field].type == "keyword") {
+  if (meta && meta.type == "keyword") {
     return "ordinal";
   }
   return "linear";

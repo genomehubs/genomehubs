@@ -46,8 +46,12 @@ export const searchByTaxon = async ({
     indexType: "identifiers",
     taxonomy,
   });
-  let attr_fields = fields.filter((field) => typesMap[field] !== undefined);
-  let non_attr_fields = fields.filter((field) => typesMap[field] === undefined);
+  let attr_fields = fields
+    .filter((field) => lookupTypes(field) !== undefined)
+    .map((field) => lookupTypes(field).name);
+  let non_attr_fields = fields.filter(
+    (field) => lookupTypes(field) === undefined
+  );
   let types = attr_fields.map((field) => typesMap[field]);
   types = [...new Set(types.map((type) => type.type))];
   if (attr_fields.length > 0) {
@@ -60,7 +64,7 @@ export const searchByTaxon = async ({
   let excludedSources = excludeSources(exclusions, fields);
   let attributesExist = matchAttributes(
     fields,
-    typesMap,
+    lookupTypes,
     aggregation_source,
     searchRawValues
   );
@@ -68,7 +72,7 @@ export const searchByTaxon = async ({
   if (optionalFields) {
     optionalAttributesExist = matchAttributes(
       optionalFields,
-      typesMap,
+      lookupTypes,
       aggregation_source,
       searchRawValues,
       "optionalAttributes"
@@ -78,7 +82,7 @@ export const searchByTaxon = async ({
   let lineageRanks = matchRanks(ranks, maxDepth);
   let attributeValues = filterAttributes(
     filters,
-    typesMap,
+    lookupTypes,
     aggregation_source,
     searchRawValues
   );
@@ -160,7 +164,7 @@ export const searchByTaxon = async ({
     includeRawValues,
   });
   let exclude = []; // includeRawValues ? [] : ["attributes.values*"];
-  let sort = setSortOrder(sortBy, typesMap, namesMap);
+  let sort = setSortOrder(sortBy, lookupNames, lookupTypes);
   let query = {
     bool: {
       must_not: excludedSources,

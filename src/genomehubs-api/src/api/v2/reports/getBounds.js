@@ -89,20 +89,30 @@ export const getBounds = async ({
   apiParams,
   opts = ";;",
 }) => {
-  let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
+  let { lookupTypes } = await attrTypes({ result, taxonomy });
   params.size = 0;
   // find max and min plus most frequent categories
-  let field = fields[0];
+  let fieldMeta = lookupTypes(fields[0]);
+  let field = fieldMeta.name;
+  let catMeta = lookupTypes(cat);
+  if (catMeta) {
+    cat = catMeta.name;
+  }
   let summary = summaries[0];
-  let scaleType = setScale({ field, typesMap, opts });
+  let scaleType = setScale({ field, lookupTypes, opts });
   let fixedTerms = await setTerms({
     cat: field,
     opts,
-    typesMap,
+    lookupTypes,
     taxonomy,
     apiParams,
   });
-  let definedTerms = await setTerms({ cat, typesMap, taxonomy, apiParams });
+  let definedTerms = await setTerms({
+    cat,
+    lookupTypes,
+    taxonomy,
+    apiParams,
+  });
   cat = definedTerms.cat;
   let extraTerms;
   if (definedTerms.terms) {
@@ -113,11 +123,12 @@ export const getBounds = async ({
     extraTerms = cat;
   }
   let term = field;
-  if (cat && typesMap[cat]) {
+  catMeta = lookupTypes(cat);
+  if (catMeta) {
     if (fields.length > 0) {
-      fields.push(cat);
+      fields.push(catMeta.name);
     } else {
-      term = cat;
+      term = catMeta.name;
     }
   }
   params.aggs = await setAggs({
@@ -125,10 +136,8 @@ export const getBounds = async ({
     summary,
     result,
     taxonomy,
-    ...(typesMap[field] &&
-      typesMap[field].type != "keyword" && { stats: true }),
-    ...(typesMap[field] &&
-      typesMap[field].type == "keyword" && { keywords: field }),
+    ...(fieldMeta && fieldMeta.type != "keyword" && { stats: true }),
+    ...(fieldMeta && fieldMeta.type == "keyword" && { keywords: field }),
     fixedTerms,
     terms: extraTerms,
     size: definedTerms.size,
@@ -167,7 +176,7 @@ export const getBounds = async ({
       }
     }
     if (!min || !max) {
-      let valueType = valueTypes[typesMap[field].type] || "float";
+      let valueType = valueTypes[fieldMeta.type] || "float";
       if (stats.min == stats.max) {
         tickCount = 2;
         if (valueType == "date") {
@@ -206,7 +215,7 @@ export const getBounds = async ({
             max += `e${exp}`;
           }
         }
-      } else if (typesMap[field].type == "date") {
+      } else if (fieldMeta.type == "date") {
         min = stats.min;
         max = stats.max;
         if (max > min + 31536000000) {

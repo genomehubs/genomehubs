@@ -435,7 +435,7 @@ export const getRawSources = async (params) => {
 };
 
 export const getSources = async (params) => {
-  const { typesMap, lookupTypes } = await attrTypes({
+  const { typesMap } = await attrTypes({
     result: params.result,
     indexType: "attributes",
     taxonomy: params.taxonomy,
@@ -691,7 +691,7 @@ ${tree}
 };
 
 export const getTypes = async (params) => {
-  const { typesMap, lookupTypes } = await attrTypes({
+  const { typesMap } = await attrTypes({
     result: params.result,
     indexType: "attributes",
     taxonomy: params.taxonomy,
@@ -788,10 +788,10 @@ export const getReport = async (req, res) => {
   if (report && report != {}) {
     try {
       report.name = req.query.report;
-      let typesMap, lookupTypes;
-      if (report.name == "tree") {
-        ({ typesMap, lookupTypes } = await attrTypes({ ...req.query }));
-      }
+      // let typesMap, lookupTypes;
+      // if (report.name == "tree") {
+      //   ({ typesMap, lookupTypes } = await attrTypes({ ...req.query }));
+      // }
       return res.format({
         json: () => {
           let response = formatJson(

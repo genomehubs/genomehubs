@@ -18,7 +18,16 @@ export const parseFields = async ({ result, fields, taxonomy }) => {
     } else if (!Array.isArray(fields)) {
       fields = (fields || "").split(/\s*,\s*/);
     }
-    return fields.map((key) => key.toLowerCase());
+    let fieldList = new Set();
+    for (let field of fields) {
+      let meta = lookupTypes(field);
+      if (meta) {
+        fieldList.add(meta.name);
+      }
+    }
+    fields = [...fieldList];
+    return fields;
+    // return fields.map((key) => key.toLowerCase());
   } catch (message) {
     logError({ req, message });
     return typesMap ? Object.keys(typesMap) : [];

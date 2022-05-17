@@ -62,3 +62,4 @@ genomehubs index \
     --config-file tests/integration_tests/config/config.yaml \
     --taxonomy-source ncbi \
     --file-metadata tests/integration_tests/data/btk/btk.files.yaml
+echo done

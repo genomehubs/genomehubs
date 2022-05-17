@@ -51,7 +51,7 @@ export const histogramAgg = async ({
   };
 
   let { lookupTypes } = await attrTypes({ result, taxonomy });
-  let meta = lookupTypes[field];
+  let meta = lookupTypes(field);
   if (!meta) {
     return;
   }

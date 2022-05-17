@@ -54,10 +54,10 @@ const getHistAggResults = (aggs, stats) => {
   return hist;
 };
 
-const getYValues = ({ obj, yField, typesMap, stats }) => {
+const getYValues = ({ obj, yField, lookupTypes, stats }) => {
   let yBuckets = [];
   let yValues = [];
-  let yValueType = valueTypes[typesMap[yField].type] || "float";
+  let yValueType = valueTypes[lookupTypes(yField).type] || "float";
   // TODO: use stats here
   let yHist = getHistAggResults(obj.yHistograms.by_attribute[yField], stats);
   if (yValueType == "keyword") {
@@ -104,21 +104,24 @@ const getHistogram = async ({
   raw,
   taxonomy,
 }) => {
-  let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
+  let { lookupTypes } = await attrTypes({ result, taxonomy });
   params.size = raw;
   // find max and min plus most frequent categories
-  let field = fields[0];
+  let fieldMeta = lookupTypes(fields[0]);
+  let field = fieldMeta.name;
   let summary = summaries[0];
   let yField;
+  let yFieldMeta;
   let ySummary;
   let rawData;
   let pointData;
   if (yFields && yFields.length > 0) {
-    yField = yFields[0];
+    yFieldMeta = lookupTypes(yFields[0]);
+    yField = yFieldMeta.name;
     ySummary = ySummaries[0];
     fields = [...new Set(fields.concat(yFields))];
   }
-  let valueType = valueTypes[typesMap[field].type] || "float";
+  let valueType = valueTypes[fieldMeta.type] || "float";
   params.aggs = await setAggs({
     field,
     summary,
@@ -130,12 +133,13 @@ const getHistogram = async ({
     yBounds,
     ySummary,
   });
+  let catMeta = lookupTypes(cat);
   let res = await getResults({
     ...params,
     taxonomy,
     fields,
     exclusions,
-    ...(raw && cat && !typesMap[cat] && { ranks: cat }),
+    ...(raw && cat && !catMeta && { ranks: cat }),
   });
   if (!res.status.success) {
     return { status: res.status };
@@ -151,7 +155,7 @@ const getHistogram = async ({
     xSumm = summary || "value";
   }
   if (yField && yFields) {
-    let yValueType = valueTypes[typesMap[yField].type] || "float";
+    let yValueType = valueTypes[yFieldMeta.type] || "float";
     if (yValueType == "date") {
       ySumm = dateSummary[ySummary] || "value";
     } else {
@@ -241,7 +245,7 @@ const getHistogram = async ({
         ({ yValues, yBuckets, yValueType } = getYValues({
           obj,
           yField,
-          typesMap,
+          lookupTypes,
           stats: yBounds.stats,
           other: yBounds.showOther,
         }));
@@ -266,9 +270,9 @@ const getHistogram = async ({
       }
     }
   });
-  if (typesMap[field].type == "date") {
+  if (fieldMeta.type == "date") {
     buckets = scaleBuckets(buckets, "date", bounds);
-  } else if (typesMap[field].type == "keyword") {
+  } else if (fieldMeta.type == "keyword") {
     buckets.push(undefined);
   } else {
     buckets = scaleBuckets(buckets, bounds.scale, bounds);
@@ -276,9 +280,9 @@ const getHistogram = async ({
 
   if (yBuckets) {
     // yBuckets = allYBuckets;
-    if (typesMap[yField].type == "date") {
+    if (yFieldMeta.type == "date") {
       yBuckets = scaleBuckets(yBuckets, "date", yBounds);
-    } else if (typesMap[yField].type != "keyword") {
+    } else if (yFieldMeta.type != "keyword") {
       yBuckets = scaleBuckets(yBuckets, yBounds.scale, yBounds);
     }
   }
@@ -335,7 +339,7 @@ const getHistogram = async ({
             let { yValues } = getYValues({
               obj: bin,
               yField,
-              typesMap,
+              lookupTypes,
               stats: yBounds.stats,
             });
             // if (yValuesByCat.other) {
@@ -427,17 +431,19 @@ export const histogram = async ({
     taxonomy,
   });
   let xTerm = combineQueries(y, x);
-  let { params, fields, summaries } = queryParams({
+  let { params, fields, summaries } = await queryParams({
     term: xTerm,
     result,
     rank,
+    taxonomy,
   });
   // let exclude = [];
-  if (cat && typesMap[cat]) {
-    searchFields.push(cat);
+  let catMeta = lookupTypes(cat);
+  if (catMeta) {
+    searchFields.push(catMeta.name);
     // exclude.push(cat);
   }
-  // fields = [...new Set(fields.concat(searchFields))];
+  fields = [...new Set(fields.concat(searchFields))];
   // exclude.push(fields[0]);
   let yTerm, yFields, ySummaries;
   let yParams = {};
@@ -447,10 +453,11 @@ export const histogram = async ({
       params: yParams,
       fields: yFields,
       summaries: ySummaries,
-    } = queryParams({
+    } = await queryParams({
       term: yTerm,
       result,
       rank,
+      taxonomy,
     }));
   }
 
@@ -464,16 +471,7 @@ export const histogram = async ({
       },
     };
   }
-  // if (fields.length == 0 || typesMap[fields[0]].type == "keyword") {
-  //   return {
-  //     status: {
-  //       success: false,
-  //       error: `no numeric or date field in '${x ? `x = ${x}` : "x"}'\ntry ${
-  //         x ? "adding ' AND " : "'"
-  //       }assembly_span'`,
-  //     },
-  //   };
-  // }
+
   if (fields.length == 0) {
     return {
       status: {
@@ -495,19 +493,7 @@ export const histogram = async ({
       };
     }
   }
-  // if (
-  //   (report == "scatter" && (!y || yFields.length == 0)) ||
-  //   (yFields[0] && typesMap[yFields[0]].type == "keyword")
-  // ) {
-  //   return {
-  //     status: {
-  //       success: false,
-  //       error: `no numeric or date field in '${y ? `y = ${y}` : "y"}'\ntry ${
-  //         y ? "adding ' AND " : "'"
-  //       }c_value'`,
-  //     },
-  //   };
-  // }
+
   if (report == "scatter" && (!y || yFields.length == 0)) {
     return {
       status: {
@@ -519,16 +505,6 @@ export const histogram = async ({
     };
   }
   let exclusions;
-
-  // params.includeEstimates = apiParams.hasOwnProperty("includeEstimates")
-  //   ? apiParams.includeEstimates
-  //   : false;
-  // params.excludeDirect = apiParams.excludeDirect || [];
-  // params.excludeDescendant = apiParams.excludeDescendant || [];
-  // params.excludeAncestral = apiParams.excludeAncestral || [];
-  // params.excludeMissing = [
-  //   ...new Set((apiParams.excludeMissing || []).concat(exclude)),
-  // ];
 
   params.includeEstimates = apiParams.hasOwnProperty("includeEstimates")
     ? apiParams.includeEstimates
@@ -625,32 +601,10 @@ export const histogram = async ({
       taxonomy,
       raw: bounds.stats.count < threshold ? threshold : 0,
     });
-    // if (histograms.byCat && histograms.byCat.other) {
-    //   bounds.cats.push({
-    //     key: "other",
-    //     label: "other",
-    //     doc_count: histograms.byCat.other.reduce((a, b) => a + b, 0),
-    //   });
-    // }
   }
 
-  // "aggs": {
-  //   "aggregations": {
-  //     "doc_count": 5708,
-  //     "c_value": {
-  //       "doc_count": 697,
-  //       "stats": {
-  //         "count": 697,
-  //         "min": 1.009765625,
-  //         "max": 2.16015625,
-  //         "avg": 1.362065100430416,
-  //         "sum": 949.359375
-  //       }
-  //     }
-  //   }
-  // },
   let ranks = [rank].flat();
-  if (cat && !typesMap[cat]) {
+  if (cat && !catMeta) {
     ranks.push(cat);
   }
 
@@ -669,8 +623,10 @@ export const histogram = async ({
       x: histograms ? histograms.allValues.reduce((a, b) => a + b, 0) : 0,
     },
     xQuery,
-    ...(y && { yQuery: { query: y } }),
+    ...(y && {
+      yQuery: { query: y },
+      yLabel: histograms ? histograms.yLabel : yFields[0],
+    }),
     xLabel: histograms ? histograms.xLabel : fields[0],
-    yLabel: histograms ? histograms.yLabel : yFields[0],
   };
 };

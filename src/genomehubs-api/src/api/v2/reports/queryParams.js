@@ -1,10 +1,13 @@
-export const queryParams = ({
+import { attrTypes } from "../functions/attrTypes";
+
+export const queryParams = async ({
   term,
   result,
   rank,
   taxonomy,
   includeEstimates = false,
 }) => {
+  let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
   let params = {
     result,
     query: term,
@@ -14,7 +17,7 @@ export const queryParams = ({
   let fields = [];
   let summaries = [];
   if (params.query) {
-    if (result == "taxon" && rank) {
+    if ((result == "taxon" || result == "assembly") && rank) {
       params.query += ` AND tax_rank(${rank})`;
     }
     // params.includeEstimates = true;
@@ -23,11 +26,13 @@ export const queryParams = ({
 
     term.split(/\s+(?:and|AND)\s+/).forEach((subterm) => {
       if (!subterm.match("tax_")) {
-        let field = subterm.replace(/[^\w_\(\)].+$/, "").toLowerCase();
+        let field = subterm.replace(/[^\w_\(\)-].+$/, "").toLowerCase();
         let summary = "value";
         if (field.match(/\(/)) {
           [summary, field] = field.split(/[\(\)]/);
         }
+        let fieldMeta = lookupTypes(field);
+        field = fieldMeta.name;
         // params.excludeAncestral.push(field);
         params.excludeMissing.push(field);
         fields.push(field);
@@ -40,6 +45,14 @@ export const queryParams = ({
       params.query = `tax_rank(${rank})`;
     }
   }
+  let fieldList = new Set();
+  for (let field of fields) {
+    let meta = lookupTypes(field);
+    if (meta) {
+      fieldList.add(meta.name);
+    }
+  }
+  fields = [...fieldList];
   params.excludeMissing = [...new Set(params.excludeMissing)];
   params.excludeAncestral = [...new Set(params.excludeAncestral)];
   params.excludeDirect = [...new Set(params.excludeDirect)];

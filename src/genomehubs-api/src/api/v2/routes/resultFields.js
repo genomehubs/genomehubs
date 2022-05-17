@@ -13,11 +13,13 @@ export const getResultFields = async (req, res) => {
   let hub = config.hub;
   let source = config.source;
   try {
-    ({ typesMap: fields, lookupTypes: lookupFields } = await attrTypes({
+    ({ typesMap: fields } = await attrTypes({
       ...req.query,
     }));
-    ({ typesMap: identifiers, lookupTypes: lookupIdentifiers } =
-      await attrTypes({ ...req.query, indexType: "identifiers" }));
+    ({ typesMap: identifiers } = await attrTypes({
+      ...req.query,
+      indexType: "identifiers",
+    }));
     status = { success: true };
   } catch (message) {
     logError({ req, message });

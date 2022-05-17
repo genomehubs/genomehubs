@@ -161,11 +161,7 @@ const nestedHistograms = ({ field, histogram }) => {
   };
 };
 
-const treeAgg = ({ field, types, summary }) => {
-  let key =
-    summary == "value"
-      ? `attributes.${types.type}_value`
-      : `attributes.${summary}`;
+const treeAgg = () => {
   return {
     reverse_nested: {},
     aggs: {
@@ -174,25 +170,6 @@ const treeAgg = ({ field, types, summary }) => {
           field: "parent",
         },
       },
-      // by_attribute: {
-      //   nested: {
-      //     path: "lineage",
-      //   },
-      //   aggs: {
-      //     layer: {
-      //       filter: {
-      //         range: { ["lineage.depth"]: { lte: 1 } },
-      //       },
-      //       aggs: {
-      //         taxa: {
-      //           terms: {
-      //             field: "lineage.taxon_id",
-      //           },
-      //         },
-      //       },
-      //     },
-      //   },
-      // },
     },
   };
 };
@@ -268,21 +245,22 @@ const lineageCategory = ({ cats, field, histogram, other }) => {
   };
 };
 
-const termsAgg = ({ field, fixedTerms, typesMap, size, yHistograms }) => {
+const termsAgg = ({ field, fixedTerms, lookupTypes, size, yHistograms }) => {
   if (!field) {
     return;
   }
-  if (typesMap[field]) {
-    if (typesMap[field].type == "keyword") {
+  let fieldMeta = lookupTypes(field);
+  if (fieldMeta) {
+    if (fieldMeta.type == "keyword") {
       return attributeTerms({
-        cat: field,
-        terms: fixedTerms || field,
+        cat: fieldMeta.name,
+        terms: fixedTerms || fieldMeta.name,
         size,
         yHistograms,
       });
     }
   } else {
-    return lineageTerms({ terms: field, size });
+    return lineageTerms({ terms: fieldMeta.name, size });
   }
 };
 
@@ -303,12 +281,14 @@ export const setAggs = async ({
   yBounds,
   taxonomy,
 }) => {
-  let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
-  if (!typesMap[field]) {
+  let { lookupTypes } = await attrTypes({ result, taxonomy });
+  let fieldMeta = lookupTypes(field);
+  if (!fieldMeta) {
     if (terms) {
-      if (typesMap[terms]) {
-        field = terms;
-        if (typesMap[terms].type == "keyword") {
+      fieldMeta = lookupTypes(terms);
+      field = fieldMeta.name;
+      if (fieldMeta) {
+        if (fieldMeta.type == "keyword") {
           terms = attributeTerms({ terms, size });
           return {
             aggregations: {
@@ -361,7 +341,7 @@ export const setAggs = async ({
       yHistogram = termsAgg({
         field: yField,
         fixedTerms: boundsTerms,
-        typesMap,
+        lookupTypes,
         size: yBounds.stats.size,
       });
     } else {
@@ -383,7 +363,7 @@ export const setAggs = async ({
       histogram = termsAgg({
         field,
         fixedTerms: fixedTerms,
-        typesMap,
+        lookupTypes,
         size: bounds.stats.size,
         yHistograms,
       });
@@ -392,7 +372,7 @@ export const setAggs = async ({
       histogram = termsAgg({
         field,
         fixedTerms: boundsTerms,
-        typesMap,
+        lookupTypes,
         size: bounds.stats.size,
         yHistograms,
       });
@@ -431,24 +411,20 @@ export const setAggs = async ({
   if (stats) {
     stats = {
       stats: {
-        field: `attributes.${typesMap[field].type}_value`,
+        field: `attributes.${fieldMeta.type}_value`,
       },
     };
   }
-  terms = termsAgg({ field: terms, typesMap, size });
+  terms = termsAgg({ field: terms, lookupTypes, size });
   keywords = termsAgg({
     field: keywords,
     fixedTerms: fixedTerms ? fixedTerms : undefined,
-    typesMap,
+    lookupTypes,
     size: fixedTerms ? fixedTerms.size : 5,
   });
 
   if (tree) {
-    tree = await treeAgg({
-      field,
-      types: typesMap[field],
-      summary,
-    });
+    tree = treeAgg();
   }
 
   return {
