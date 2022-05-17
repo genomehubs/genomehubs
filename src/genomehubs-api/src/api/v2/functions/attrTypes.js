@@ -47,6 +47,9 @@ const fetchTypes = async ({ result, taxonomy, hub, release, indexType }) => {
         for (let synonym of hit._source.synonyms) {
           synonyms[hit._source.group][synonym] = hit._source.name;
         }
+      } else if (hit._source.name.match("_")) {
+        synonyms[hit._source.group][hit._source.name.replace(/_/g, "-")] =
+          hit._source.name;
       }
     });
   }
@@ -73,6 +76,9 @@ export const attrTypes = async ({
   if (result == "multi") {
     Object.keys(typesMap).forEach((key) => {
       lookupTypes[key] = (name) => {
+        if (!name) {
+          return false;
+        }
         if (synonyms[key][name]) {
           name = synonyms[key][name];
         }
@@ -84,6 +90,9 @@ export const attrTypes = async ({
     });
   } else {
     lookupTypes = (name) => {
+      if (!name) {
+        return false;
+      }
       if (synonyms[name]) {
         name = synonyms[name];
       }

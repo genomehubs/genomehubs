@@ -2,6 +2,7 @@ import {
   fetchTypes,
   getDisplayTypes,
   getGroupedTypes,
+  getSynonyms,
   getTypesMap,
 } from "../selectors/types";
 
@@ -12,6 +13,7 @@ import { resetTypes } from "../reducers/types";
 const withTypes = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
     types: getTypesMap(state),
+    synonyms: getSynonyms(state),
     displayTypes: getDisplayTypes(state),
     groupedTypes: getGroupedTypes(state),
   });

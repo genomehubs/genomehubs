@@ -29,6 +29,23 @@ export const getTypesMap = createSelector(
   }
 );
 
+export const getSynonyms = createSelector(getTypesMap, (types) => {
+  let synonyms = {};
+  for (let [field, meta] of Object.entries(types)) {
+    if (meta.synonyms) {
+      for (let synonym of meta.synonyms) {
+        if (synonym != field) {
+          synonyms[synonym] = field;
+        }
+      }
+    }
+    if (field.match("_")) {
+      synonyms[field.replace(/_/g, "-")] = field;
+    }
+  }
+  return synonyms;
+});
+
 export const getVersion = createSelector(
   getHub,
   getRelease,
