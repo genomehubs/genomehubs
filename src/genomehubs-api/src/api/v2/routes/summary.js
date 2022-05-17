@@ -7,7 +7,7 @@ import { indexName } from "../functions/indexName";
 import { logError } from "../functions/logger";
 
 const getSummary = async (params) => {
-  let typesMap = await attrTypes({ ...params });
+  let { typesMap, lookupTypes } = await attrTypes({ ...params });
   let index = indexName({ ...params });
   let ids = Array.isArray(params.recordId)
     ? params.recordId
@@ -17,9 +17,20 @@ const getSummary = async (params) => {
   }
   let fields = (params.fields || "").split(/\s*,\s*/);
   if (!fields || fields == "all") {
-    fields = Object.keys(typesMap);
+    // TODO: standardise handling of fields == "all"
+    fields = Object.values(typesMap)
+      .filter((meta) => meta.display_level == 1)
+      .map((meta) => meta.name);
+  } else {
+    let fieldList = new Set();
+    for (let field of fields) {
+      let meta = lookupTypes(field);
+      if (meta) {
+        fieldList.add(meta.name);
+      }
+    }
+    fields = [...fieldList];
   }
-  fields.filter((field) => Object.keys(typesMap).includes(field));
   const query = await aggregateRawValuesByTaxon({
     lineage: ids[0],
     result: params.result,

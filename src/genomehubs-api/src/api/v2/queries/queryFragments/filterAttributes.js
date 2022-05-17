@@ -1,6 +1,6 @@
 export const filterAttributes = (
   filters,
-  typesMap,
+  lookupTypes,
   aggregation_source,
   searchRawValues
 ) => {
@@ -17,7 +17,7 @@ export const filterAttributes = (
             path: "attributes.values",
             query: {
               range: {
-                [`attributes.values.${typesMap[field].type}_value`]:
+                [`attributes.values.${lookupTypes(field).type}_value`]:
                   filters[stat][field],
               },
             },
@@ -27,7 +27,7 @@ export const filterAttributes = (
     };
   } else {
     rangeQuery = (field, stat) => {
-      if (!typesMap[field]) {
+      if (!lookupTypes(field)) {
         return [
           {
             match: { "attributes.key": field },
@@ -73,7 +73,7 @@ export const filterAttributes = (
       //   stat = filter.stat;
       //   delete filter.stat;
       // }
-      let meta = typesMap[field];
+      let meta = lookupTypes(field);
       if (
         meta.type == "keyword" &&
         meta.summary &&

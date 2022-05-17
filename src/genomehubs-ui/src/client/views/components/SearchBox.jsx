@@ -138,6 +138,7 @@ const SearchBox = ({
   setPreferSearchTerm,
   taxonomy,
   types,
+  synonyms,
 }) => {
   const classes = useStyles();
   const navigate = useNavigate();
@@ -180,7 +181,7 @@ const SearchBox = ({
 
   const wrap_term = ({ term, taxWrap, result }) => {
     if (result && result == "taxon" && !term.match(/[\(\)<>=]/)) {
-      if (!types[term]) {
+      if (!types[term] && !synonyms[term]) {
         term = `${taxWrap}(${term})`;
       }
     }

@@ -1,6 +1,6 @@
 export const matchAttributes = (
   fields,
-  typesMap,
+  lookupTypes,
   aggregation_source,
   searchRawValues,
   name = "attributes"
@@ -18,14 +18,16 @@ export const matchAttributes = (
                   query: {
                     bool: {
                       should: fields
-                        .filter((field) => typesMap[field])
+                        .filter((field) => lookupTypes(field))
                         .map((field) => ({
                           bool: {
                             filter: [
                               { match: { "attributes.key": field } },
                               {
                                 exists: {
-                                  field: `attributes.${typesMap[field].type}_value`,
+                                  field: `attributes.${
+                                    lookupTypes(field).type
+                                  }_value`,
                                 },
                               },
                             ].concat(aggregation_source),

@@ -7,6 +7,10 @@ attributes:
     header: busco_complete
     source: BlobToolKit
     source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
+    synonyms:
+      - busco-completeness
+      - busco_score
+      - busco-score
     taxon_bins:
       count: 10
       max: 100

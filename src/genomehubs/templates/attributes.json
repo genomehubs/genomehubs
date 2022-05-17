@@ -12,6 +12,11 @@
         "ignore_above": 32,
         "meta": { "description": "Attribute name" }
       },
+      "synonyms": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Attribute synonyms" }
+      },
       "display_name": {
         "type": "keyword",
         "index": false,

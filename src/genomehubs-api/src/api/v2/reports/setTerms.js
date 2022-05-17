@@ -3,7 +3,7 @@ import { getCatLabels } from "./getCatLabels";
 export const setTerms = async ({
   cat,
   opts,
-  typesMap,
+  lookupTypes,
   taxonomy,
   apiParams,
 }) => {
@@ -63,7 +63,7 @@ export const setTerms = async ({
       terms.push({ key: value });
     }
   });
-  if (typesMap[field]) {
+  if (lookupTypes(field)) {
     by = "attribute";
   } else {
     by = "lineage";

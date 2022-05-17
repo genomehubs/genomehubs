@@ -25,10 +25,6 @@ export const excludeSources = (exclusions = {}, fields) => {
   let excluded = [];
   Object.keys(exclusions).forEach((source) => {
     if (source == "unclassified") {
-      // excluded.push({ prefix: { scientific_name: { value: "unclassified" } } });
-      // excluded.push({
-      //   prefix: { scientific_name: { value: "environmental" } },
-      // });
       excluded.push({
         nested: {
           path: "lineage",
@@ -46,14 +42,6 @@ export const excludeSources = (exclusions = {}, fields) => {
         },
       });
 
-      // excluded.push({
-      //   bool: {
-      //     must_not: [
-      //       { prefix: { scientific_name: { value: "unclassified" } } },
-      //       { prefix: { scientific_name: { value: "environmental" } } },
-      //     ],
-      //   },
-      // });
       return;
     }
 

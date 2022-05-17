@@ -73,6 +73,8 @@ attributes:
       - ;
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    synonyms:
+      - bioproject
     taxon_display_group: assembly
     taxon_display_level: 2
     taxon_display_name: Bioproject
@@ -93,6 +95,8 @@ attributes:
       - ;
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    synonyms:
+      - biosample
     taxon_display_group: assembly
     taxon_display_level: 2
     taxon_display_name: Biosample

@@ -435,7 +435,7 @@ export const getRawSources = async (params) => {
 };
 
 export const getSources = async (params) => {
-  const types = await attrTypes({
+  const { typesMap } = await attrTypes({
     result: params.result,
     indexType: "attributes",
     taxonomy: params.taxonomy,
@@ -490,7 +490,7 @@ export const getSources = async (params) => {
     });
   }
   let sources = {};
-  Object.values(types).forEach((meta) => {
+  Object.values(typesMap).forEach((meta) => {
     let source = meta.source || [];
     let source_url = meta.source_url || [];
     let source_url_stub = meta.source_url_stub || [];
@@ -691,14 +691,14 @@ ${tree}
 };
 
 export const getTypes = async (params) => {
-  const types = await attrTypes({
+  const { typesMap } = await attrTypes({
     result: params.result,
     indexType: "attributes",
     taxonomy: params.taxonomy,
   });
   let byGroup = {};
-  Object.keys(types).forEach((key) => {
-    let group = types[key].display_group;
+  Object.keys(typesMap).forEach((key) => {
+    let group = typesMap[key].display_group;
     if (!byGroup[group]) {
       byGroup[group] = [];
     }
@@ -788,10 +788,10 @@ export const getReport = async (req, res) => {
   if (report && report != {}) {
     try {
       report.name = req.query.report;
-      let typesMap;
-      if (report.name == "tree") {
-        typesMap = await attrTypes({ ...req.query });
-      }
+      // let typesMap, lookupTypes;
+      // if (report.name == "tree") {
+      //   ({ typesMap, lookupTypes } = await attrTypes({ ...req.query }));
+      // }
       return res.format({
         json: () => {
           let response = formatJson(

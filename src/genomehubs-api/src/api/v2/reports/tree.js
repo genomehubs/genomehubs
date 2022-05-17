@@ -380,8 +380,8 @@ const getTree = async ({
   req,
 }) => {
   cat = undefined;
-  let typesMap = await attrTypes({ result, taxonomy });
-  let field = yFields[0] || fields[0];
+  let { lookupTypes } = await attrTypes({ result, taxonomy });
+  // let field = yFields[0] || fields[0];
   let exclusions;
   params.excludeUnclassified = true;
   exclusions = setExclusions(params);
@@ -445,8 +445,9 @@ const getTree = async ({
   let yRes;
   if (y) {
     yParams.excludeMissing.push(...yFields);
-    if (cat && typesMap[cat]) {
-      yParams.excludeMissing.push(cat);
+    let catMeta = lookupTypes(cat);
+    if (catMeta) {
+      yParams.excludeMissing.push(catMeta.name);
     }
     yParams.excludeMissing = [...new Set(yParams.excludeMissing)];
     yParams.excludeUnclassified = true;
@@ -503,7 +504,7 @@ export const tree = async ({
   apiParams,
   req,
 }) => {
-  let typesMap = await attrTypes({ result, taxonomy });
+  let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
   let searchFields = await parseFields({
     result,
     fields: apiParams.fields,
@@ -513,17 +514,19 @@ export const tree = async ({
     params,
     fields: xFields,
     summaries,
-  } = queryParams({
+  } = await queryParams({
     term: x,
     result,
+    taxonomy,
   });
   let fields;
   let catRank;
   if (cat) {
     let catField;
-    catField = cat.replace(/[^\w].+$/, "");
-    if (typesMap[catField]) {
-      fields = [...new Set(searchFields.concat([catField]))];
+    catField = cat.replace(/[^\w_-].+$/, "");
+    let catMeta = lookupTypes(catField);
+    if (catMeta) {
+      fields = [...new Set(searchFields.concat([catMeta.name]))];
     } else {
       catRank = catField;
       fields = [...new Set(searchFields)];
@@ -544,9 +547,10 @@ export const tree = async ({
     params: yParams,
     fields: yFields,
     summaries: ySummaries,
-  } = queryParams({
+  } = await queryParams({
     term: yTerm,
     result,
+    taxonomy,
   });
   if (y && !aInB(yFields, Object.keys(typesMap))) {
     status = {
@@ -595,7 +599,9 @@ export const tree = async ({
     params: { ...params },
     fields: xFields
       .concat(yFields)
-      .filter((field) => typesMap[field] && typesMap[field].type != "keyword"),
+      .filter(
+        (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
+      ),
     summaries,
     cat,
     result,
@@ -609,7 +615,7 @@ export const tree = async ({
     yBounds = await getBounds({
       params: { ...params },
       fields: yFields.filter(
-        (field) => typesMap[field] && typesMap[field].type != "keyword"
+        (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
       ),
       summaries,
       cat,
