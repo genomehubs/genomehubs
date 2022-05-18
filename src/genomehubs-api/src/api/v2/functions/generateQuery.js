@@ -250,6 +250,7 @@ export const generateQuery = async ({
   let filters = {};
   let properties = {};
   let status;
+  let excludeMissing = new Set();
   if (query && query.match(/\n/)) {
     multiTerm = query
       .toLowerCase()
@@ -303,18 +304,11 @@ export const generateQuery = async ({
           if (parts[1] && parts[1].length > 0) {
             summary = parts[1];
           }
-          // if (term.match(/(\w+)\s*\(/)) {
-          //   [summary, field] = term.split(/\s*[\(\)]\s*/);
-          //   if (!summaries.includes(summary)) {
-          //     status = { success: false, error: `Invalid option in '${term}'` };
-          //   }
-          // }
           if (parts[3].match(/[\>\<=]/)) {
             let condition = parts[3].split(/\s*([\>\<=]+)\s*/);
             if (condition[0].endsWith("!")) {
               condition[1] = `!${condition[1]}`;
             }
-            // if (!parts[2]) parts[2] = condition[0];
             parts[3] = condition[1];
             parts[4] = condition[2];
             if (lookupTypes[result]) {
@@ -344,6 +338,7 @@ export const generateQuery = async ({
           let meta = lookupTypes[result](term);
           if (meta) {
             term = meta.name;
+            excludeMissing.add(meta.name);
             fields.push(term);
           } else {
             idTerm = term;
@@ -360,6 +355,13 @@ export const generateQuery = async ({
       }),
       params: {},
     };
+  }
+
+  if (excludeMissing) {
+    if (exclusions.missing) {
+      exclusions.missing.forEach(excludeMissing.add, excludeMissing);
+    }
+    exclusions.missing = [...excludeMissing];
   }
 
   let params = {

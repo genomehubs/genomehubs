@@ -7,7 +7,7 @@ export const queryParams = async ({
   taxonomy,
   includeEstimates = false,
 }) => {
-  let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
+  let { lookupTypes } = await attrTypes({ result, taxonomy });
   let params = {
     result,
     query: term,
@@ -33,7 +33,6 @@ export const queryParams = async ({
         }
         let fieldMeta = lookupTypes(field);
         field = fieldMeta.name;
-        // params.excludeAncestral.push(field);
         params.excludeMissing.push(field);
         fields.push(field);
         summaries.push(summary);

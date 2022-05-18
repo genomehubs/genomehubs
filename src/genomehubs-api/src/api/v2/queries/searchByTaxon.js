@@ -83,7 +83,7 @@ export const searchByTaxon = async ({
   let attributeValues = filterAttributes(
     filters,
     lookupTypes,
-    aggregation_source,
+    // aggregation_source,
     searchRawValues
   );
   let propertyValues = filterProperties(properties);
