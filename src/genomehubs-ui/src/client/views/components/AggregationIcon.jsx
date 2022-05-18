@@ -51,7 +51,7 @@ const AggregationIcon = ({ method, hasDescendants }) => {
   };
   return (
     <Tooltip title={tooltips[method] || ""} arrow placement={"top"}>
-      <span>
+      <span style={{ whiteSpace: "nowrap" }}>
         {column(method)}
         {hasDescendants && column("descendant")}
       </span>
