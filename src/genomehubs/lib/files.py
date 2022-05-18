@@ -9,6 +9,7 @@ from datetime import date
 from mimetypes import guess_type
 from pathlib import Path
 from shutil import copyfile
+from traceback import format_exc
 
 import filetype
 from PIL import Image
@@ -360,78 +361,86 @@ def index_metadata(es, file, taxonomy_name, opts, *, dry_run=False):
     analysis_docs = {"index": {}, "update": {}}
     file_docs = {"index": {}, "update": {}}
     for meta in data:
-        local = "symlink"
-        if "path" in meta:
-            if meta["path"].startswith("~"):
-                infile = os.path.expanduser(meta["path"])
+        try:
+            local = "symlink"
+            if "path" in meta:
+                if meta["path"].startswith("~"):
+                    infile = os.path.expanduser(meta["path"])
+                else:
+                    infile = meta["path"]
+                del meta["path"]
+            elif "url" in meta:
+                try:
+                    infile = tofetch.fetch_tmp_file(meta["url"])
+                    local = None
+                except urllib.error.HTTPError as err:
+                    LOGGER.warn("Got %s error for %s" % (str(err.code), meta["url"]))
+                    continue
+                except ConnectionResetError:
+                    LOGGER.warn("Got ConnectionResetError for %s" % meta["url"])
+                    continue
+            elif "name" in meta:
+                infile = meta["name"]
             else:
-                infile = meta["path"]
-            del meta["path"]
-        elif "url" in meta:
-            try:
-                infile = tofetch.fetch_tmp_file(meta["url"])
-                local = None
-            except urllib.error.HTTPError as err:
-                LOGGER.warn("Got %s error for %s" % (str(err.code), meta["url"]))
+                LOGGER.warn("Found a record with no associated file in '%s'" % file)
+            if "name" in meta:
+                filename = meta["name"]
+                del meta["name"]
+            else:
+                filename = None
+            local = meta.pop("local", local)
+            file_attrs, analysis_attrs = process_file(
+                infile,
+                opts,
+                file_template=file_template,
+                analysis_template=analysis_template,
+                filename=filename,
+                meta=meta,
+                local=local,
+            )
+            if "analysis_id" not in analysis_attrs:
+                file_name = file_attrs.get("name", file_attrs["file_id"])
+                LOGGER.warn("Unable to import %s: analysis_id must be specified", file_name)
                 continue
-        elif "name" in meta:
-            infile = meta["name"]
-        else:
-            LOGGER.warn("Found a record with no associated file in '%s'" % file)
-        if "name" in meta:
-            filename = meta["name"]
-            del meta["name"]
-        else:
-            filename = None
-        local = meta.pop("local", local)
-        file_attrs, analysis_attrs = process_file(
-            infile,
-            opts,
-            file_template=file_template,
-            analysis_template=analysis_template,
-            filename=filename,
-            meta=meta,
-            local=local,
-        )
-        if "analysis_id" not in analysis_attrs:
-            file_name = file_attrs.get("name", file_attrs["file_id"])
-            LOGGER.warn("Unable to import %s: analysis_id must be specified", file_name)
-            continue
-        # TODO: #30 check taxon_id(s) and assembly_id(s) exist in database
-        assemblies = check_assemblies_exist(es, analysis_attrs, taxonomy_name, opts)
-        if assemblies is None:
-            continue
-        if "taxon_id" in analysis_attrs and analysis_attrs["taxon_id"]:
-            taxa = check_taxa_exist(es, analysis_attrs, taxonomy_name, opts)
-        else:
-            # set taxa from assembly index
-            taxa = {assembly["taxon_id"]: assembly for assembly in assemblies.values()}
-            analysis_attrs["taxon_id"] = list(taxa.keys())
-        if taxa is None:
-            continue
-        # TODO: #33 include lineage summary in analysis index
-        analysis_attrs["ancestors"] = list_ancestors(taxa)
-        # Fetch existing analysis entry if available
-        action = update_analysis_attributes(
-            es, analyses, analysis_attrs, analysis_template
-        )
-        if not action:
-            # TODO: remove analysis and files with shared analysis name
-            continue
-        analysis_id = "analysis-%s" % analysis_attrs["analysis_id"]
-        if analysis_id in analysis_docs["index"]:
-            action = "index"
-        analysis_docs[action].update({analysis_id: analyses[analysis_id]})
-        # prepare files for indexing (include check for dupes and increment analysis file count)
-        file_action = update_file_attributes(
-            es, files, file_attrs, analyses, file_template
-        )
-        if not file_action:
-            continue
-        file_id = "file-%s" % file_attrs["file_id"]
-        if analysis_id in analysis_docs["index"]:
-            action = "index"
-        file_docs[file_action].update({file_id: files[file_id]})
+            # TODO: #30 check taxon_id(s) and assembly_id(s) exist in database
+            assemblies = check_assemblies_exist(es, analysis_attrs, taxonomy_name, opts)
+            if assemblies is None:
+                continue
+            if "taxon_id" in analysis_attrs and analysis_attrs["taxon_id"]:
+                taxa = check_taxa_exist(es, analysis_attrs, taxonomy_name, opts)
+            else:
+                # set taxa from assembly index
+                taxa = {assembly["taxon_id"]: assembly for assembly in assemblies.values()}
+                analysis_attrs["taxon_id"] = list(taxa.keys())
+            if taxa is None:
+                continue
+            # TODO: #33 include lineage summary in analysis index
+            analysis_attrs["ancestors"] = list_ancestors(taxa)
+            # Fetch existing analysis entry if available
+            action = update_analysis_attributes(
+                es, analyses, analysis_attrs, analysis_template
+            )
+            if not action:
+                # TODO: remove analysis and files with shared analysis name
+                continue
+            analysis_id = "analysis-%s" % analysis_attrs["analysis_id"]
+            if analysis_id in analysis_docs["index"]:
+                action = "index"
+            analysis_docs[action].update({analysis_id: analyses[analysis_id]})
+            # prepare files for indexing (include check for dupes and increment analysis file count)
+            file_action = update_file_attributes(
+                es, files, file_attrs, analyses, file_template
+            )
+            if not file_action:
+                continue
+            file_id = "file-%s" % file_attrs["file_id"]
+            if analysis_id in analysis_docs["index"]:
+                action = "index"
+            file_docs[file_action].update({file_id: files[file_id]})
+        except Exception:
+            LOGGER.warn("Caught unexpected error")
+            print(format_exc())
+            pass
     # Create/update index entry according to returned action
     LOGGER.info("Indexing analyses")
     index_docs(es, analysis_docs, analysis_template, dry_run=dry_run)
