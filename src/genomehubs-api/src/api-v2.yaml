@@ -26,7 +26,23 @@ components:
         type: number
       style: form
     excludeAncestralParam:
-      description: "Exclude values estimated from ancestors from results [default: false]"
+      description: |
+          List of attributes for which to exclude records with ancestrally derived estimated values from results.
+
+          A list of available attributes is available from **/resultFields**. This parameter only affects searches with `result=taxon`.
+      examples:
+        none:
+          value: []
+          summary: Do not exclude ancestral estimates for any attribute
+        genome_size:
+          value:
+            - genome_size
+          summary: Exclude ancestral estimates for genome size
+        assembly_span_and_c_value:
+          value:
+            - assembly_span
+            - c_value
+          summary: Exclude ancestral estimates for assembly span and c value
       explode: true
       in: query
       name: excludeAncestral
@@ -37,7 +53,23 @@ components:
         type: array
       style: form
     excludeDescendantParam:
-      description: "Exclude values estimated from descendants from results [default: false]"
+      description: |
+          List of attributes for which to exclude records with values estimated from descendant taxa from results.
+
+          A list of available attributes is available from **/resultFields**. This parameter only affects searches with `result=taxon`.
+      examples:
+        none:
+          value: []
+          summary: Do not exclude descendant estimates for any attribute
+        genome_size:
+          value:
+            - genome_size
+          summary: Exclude descendant estimates for genome size
+        assembly_span_and_c_value:
+          value:
+            - assembly_span
+            - c_value
+          summary: Exclude descendant estimates for assembly span and c value
       explode: true
       in: query
       name: excludeDescendant
@@ -48,7 +80,23 @@ components:
         type: array
       style: form
     excludeDirectParam:
-      description: "Exclude directly measured values from results [default: false]"
+      description: |
+          List of attributes for which to exclude records with directly estimated values from results.
+
+          A list of available attributes is available from **/resultFields**. This parameter only affects searches with `result=taxon`.
+      examples:
+        none:
+          value: []
+          summary: Do not exclude direct estimates for any attribute
+        genome_size:
+          value:
+            - genome_size
+          summary: Exclude direct estimates for genome size
+        assembly_span_and_c_value:
+          value:
+            - assembly_span
+            - c_value
+          summary: Exclude direct estimates for assembly span and c value
       explode: true
       in: query
       name: excludeDirect
@@ -59,7 +107,23 @@ components:
         type: array
       style: form
     excludeMissingParam:
-      description: "Exclude missing values from results [default: false]"
+      description: |
+          List of attributes for which to exclude records with missing values from results.
+
+          A list of available attributes is available from **/resultFields**.
+      examples:
+        none:
+          value: []
+          summary: Do not exclude missing values for any attribute
+        assembly_level:
+          value:
+            - assembly_level
+          summary: Exclude missing values for assembly level
+        assembly_span_and_c_value:
+          value:
+            - assembly_level
+            - busco_completeness
+          summary: Exclude missing values for assembly level and busco completeness
       explode: true
       in: query
       name: excludeMissing
@@ -70,7 +134,20 @@ components:
         type: array
       style: form
     fieldsParam:
-      description: "Comma separated list of fields to return [default: all]"
+      description: |
+          Comma separated list of attribute fields to return.
+
+          The list of fields selected can affect the result count if `includeEstimates=false`
+      examples:
+        all:
+          value: all
+          summary: all top level attribute fields
+        none:
+          value: none
+          summary: no attribute fields
+        assembly_attributes:
+          value: assembly_level,assembly_span
+          summary: assembly_level, assembly_span and bioproject
       in: query
       name: fields
       required: false
@@ -94,11 +171,22 @@ components:
         type: integer
       style: form
     includeEstimatesParam:
-      description: "Include estimated values in search results [default: false]"
+      description: |
+          Flag to indicate whether search results should include records for which all attribute fields are based on estimated values.
+
+          Default `false` requires at least one of the returned fields to have a directly assigned value. This parameter only affects searches with `result=taxon`.
+      examples:
+        false:
+          value: false
+          summary: false - exclude records with no direct values
+        true:
+          value: true
+          summary: true - include records with no direct values
       in: query
       name: includeEstimates
       schema:
         type: boolean
+        default: false
     includeRawValuesParam:
       description: "Include raw values in search results [default: false]"
       in: query
@@ -106,7 +194,17 @@ components:
       schema:
         type: boolean
     indentParam:
-      description: "Format output with indented lines [default: 0]"
+      description: |
+        Format output with indented lines.
+
+        Only applies to JSON responses.
+      examples:
+        zero:
+          value: 0
+          summary: Do not indent JSON output
+        four:
+          value: 4
+          summary: Indent JSON output with 4 spaces
       explode: false
       in: query
       name: indent
@@ -135,7 +233,12 @@ components:
         type: integer
       style: form
     namesParam:
-      description: Comma separated list of taxon name classes to return
+      description: |
+          Comma separated list of taxon name classes to return
+      examples:
+        tolid, synonym:
+          value: tol_id,synonym
+          summary: ToL ID and synonym
       in: query
       name: names
       required: false
@@ -215,7 +318,12 @@ components:
       schema:
         type: string
     ranksParam:
-      description: Comma separated list of ancestral ranks to return
+      description: |
+          Comma separated list of ancestral ranks to return
+      examples:
+        order_family_genus:
+          value: order,family,genus
+          summary: order, family and genus
       in: query
       name: ranks
       required: false
@@ -233,14 +341,14 @@ components:
         type: array
       style: form
     releaseParam:
-      description: "GenomeHub release number [default: latest]"
+      description: |
+          **Not in use:** GenomeHub release number
       in: query
       name: release
       required: false
       schema:
         enum:
           - latest
-          - v2.1
         type: string
     reportParam:
       description: Method to summarise multiple values for sorting
@@ -258,12 +366,13 @@ components:
           - xPerRank
         type: string
     resultParam:
-      description: The result type (data set) to search against
+      description: |
+          The result type (dataset) to search against
       in: query
       name: result
       required: true
       schema:
-        default: multi
+        default: taxon
         enum:
           - analysis
           - assembly
@@ -282,22 +391,23 @@ components:
         minimum: -1
         type: integer
       style: form
-    treeThresholdParam:
-      description: "Maximum number of results to draw as tree [default: 10000]"
-      in: query
-      name: treeThreshold
-      required: false
-      schema:
-        maximum: 100000
-        minimum: -1
-        type: integer
-      style: form
     searchRawValuesParam:
-      description: "Apply search filters to raw values [default: false]"
+      description: |
+          Flag to indicate whether search filters should be applied to raw values.
+
+          Default `false` applies filters to aggregated values. This parameter only affects searches with `result=taxon`.
+      examples:
+        false:
+          value: false
+          summary: false - apply filters to aggregated values
+        true:
+          value: true
+          summary: true - apply filters to raw values
       in: query
       name: searchRawValues
       schema:
         type: boolean
+        default: false
     searchTermParam:
       description: Search term
       in: query
@@ -386,7 +496,19 @@ components:
         type: array
       style: form
     summaryValuesParam:
-      description: Summary values to return
+      description: |
+          Summary values to return.
+
+          Available values vary according to attribute type. This parameter only applies to searches with `result=taxon`. 
+      examples:
+        count:
+          value:
+            - count
+          summary: count - number of immediate descendant values aggregated
+        length:
+          value:
+            - length
+          summary: length - number of unique values in a list
       explode: true
       in: query
       name: summaryValues
@@ -395,16 +517,25 @@ components:
         items:
           enum:
             - count
+            - length
             - mean
             - median
             - mode
             - max
             - min
+            - range
           type: string
         type: array
       style: form
     taxonomyParam:
-      description: "The taxonomy to search against"
+      description: |
+          The backbone taxonomy to search against.
+
+          A list of available taxonomies is available from **/taxonomies**.
+      examples:
+        ncbi:
+          value: ncbi
+          summary: Use the NCBI taxonomy
       in: query
       name: taxonomy
       required: false
@@ -416,6 +547,16 @@ components:
       name: tidyData
       schema:
         type: boolean
+    treeThresholdParam:
+      description: "Maximum number of results to draw as tree [default: 10000]"
+      in: query
+      name: treeThreshold
+      required: false
+      schema:
+        maximum: 100000
+        minimum: -1
+        type: integer
+      style: form
     xOptsParam:
       description: X axis options (min,max,tickCount)
       in: query
@@ -565,11 +706,8 @@ paths:
         - $ref: "#/components/parameters/queryParam"
         - $ref: "#/components/parameters/resultParam"
         - $ref: "#/components/parameters/fieldsParam"
-        - $ref: "#/components/parameters/ranksParam"
-        - $ref: "#/components/parameters/namesParam"
         - $ref: "#/components/parameters/includeEstimatesParam"
         - $ref: "#/components/parameters/searchRawValuesParam"
-        - $ref: "#/components/parameters/summaryValuesParam"
         - $ref: "#/components/parameters/excludeAncestralParam"
         - $ref: "#/components/parameters/excludeDescendantParam"
         - $ref: "#/components/parameters/excludeDirectParam"
@@ -592,7 +730,7 @@ paths:
           description: Invalid query
       summary: Count of records matching a search query
       tags:
-        - GoaT API
+        - Data
       x-eov-operation-handler: api/v2/routes/count
   /download:
     get:
@@ -625,7 +763,7 @@ paths:
           description: Not Found
       summary: Download file
       tags:
-        - GoaT API
+        - Tools
       x-eov-operation-handler: api/v2/routes/download
   /lookup:
     get:
@@ -663,7 +801,7 @@ paths:
           description: Invalid queryTerm
       summary: Lookup
       tags:
-        - GoaT API
+        - Data
       x-eov-operation-handler: api/v2/routes/lookup
   /progress:
     get:
@@ -687,7 +825,7 @@ paths:
           description: Invalid queryId
       summary: Returns query progress
       tags:
-        - GoaT API
+        - Tools
       x-eov-operation-handler: api/v2/routes/progress
   /record:
     get:
@@ -715,7 +853,7 @@ paths:
           description: Invalid recordId
       summary: Returns individual records
       tags:
-        - GoaT API
+        - Data
       x-eov-operation-handler: api/v2/routes/record
   /report:
     get:
@@ -773,7 +911,7 @@ paths:
           description: Not Found
       summary: Generate a report
       tags:
-        - GoaT API
+        - Data
       x-eov-operation-handler: api/v2/routes/report
   /resultFields:
     get:
@@ -799,7 +937,7 @@ paths:
           description: Invalid recordId
       summary: Returns available fields
       tags:
-        - GoaT API
+        - Metadata
       x-eov-operation-handler: api/v2/routes/resultFields
   /search:
     get:
@@ -851,7 +989,7 @@ paths:
           description: Invalid query
       summary: Search for records
       tags:
-        - GoaT API
+        - Data
       x-eov-operation-handler: api/v2/routes/search
   /summary:
     get:
@@ -880,7 +1018,7 @@ paths:
           description: Invalid query
       summary: Field value summary
       tags:
-        - GoaT API
+        - Data
       x-eov-operation-handler: api/v2/routes/summary
   /taxonomies:
     get:
@@ -900,10 +1038,14 @@ paths:
           description: Invalid query
       summary: List of taxonomies
       tags:
-        - GoaT API
+        - Metadata
       x-eov-operation-handler: api/v2/routes/taxonomies
 servers:
   - url: http://localhost:3000/api/v2
 tags:
-  - description: Query Genomes on a Tree
-    name: GoaT API
+  - description: Retrieve search results, records and reports
+    name: Data
+  - description: List available terms and properties
+    name: Metadata
+  - description: Download files and check query progress
+    name: Tools
