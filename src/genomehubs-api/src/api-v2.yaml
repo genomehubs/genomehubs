@@ -189,7 +189,19 @@ components:
       schema:
         type: string
     queryParam:
-      description: Search query
+      description: |
+          A search query string using taxonomic and attribute filters.
+
+          A list of available attributes is available from **/resultFields**.
+
+      # TODO: #157 create an API endpoint to describe available values and valid operators
+      examples: 
+        taxon:
+          value: tax_tree(Chiroptera) AND assembly_level >= scaffold
+          summary: Chiroptera with scaffold-level or better assemblies
+        assembly:
+          value: tax_name(9615) AND scaffold_n50 > 100000
+          summary: Domestic dog assemblies with scaffold N50 better than 100 kb
       in: query
       name: query
       required: true
@@ -530,19 +542,28 @@ info:
   contact:
     email: goat@genomehubs.org
     name: GoaT
-  description: Genomes on a Tree OpenAPI test.
+    url: https://goat.genomehubs.org
+  description: |
+      Genomes on a Tree Application Programming Interface (GoaT API).
+
+      Provides a low-level API to retrieve records, lookup, search and generate reports across all taxon and assembly data in GoaT.
   license:
     name: MIT License
-  title: GoaT
+    url: https://github.com/genomehubs/genomehubs/blob/main/LICENSE
+  title: GoaT API
   version: 2.3.0
 openapi: 3.0.0
 paths:
   /count:
     get:
-      description: Returns count of records matching a query
+      description: |
+          Fetch the record count for a search query without including any of the results. 
+          
+          **/count** supports all relevant **/search** parameters to allow a record count to be obtained for a query prior to a full search.
       operationId: getSearchResultCount
       parameters:
         - $ref: "#/components/parameters/queryParam"
+        - $ref: "#/components/parameters/resultParam"
         - $ref: "#/components/parameters/fieldsParam"
         - $ref: "#/components/parameters/ranksParam"
         - $ref: "#/components/parameters/namesParam"
@@ -553,7 +574,6 @@ paths:
         - $ref: "#/components/parameters/excludeDescendantParam"
         - $ref: "#/components/parameters/excludeDirectParam"
         - $ref: "#/components/parameters/excludeMissingParam"
-        - $ref: "#/components/parameters/resultParam"
         - $ref: "#/components/parameters/taxonomyParam"
         - $ref: "#/components/parameters/releaseParam"
         - $ref: "#/components/parameters/indentParam"
@@ -570,7 +590,7 @@ paths:
           description: successful operation
         "400":
           description: Invalid query
-      summary: Count records
+      summary: Count of records matching a search query
       tags:
         - GoaT API
       x-eov-operation-handler: api/v2/routes/count
@@ -787,6 +807,7 @@ paths:
       operationId: getSearchResults
       parameters:
         - $ref: "#/components/parameters/queryParam"
+        - $ref: "#/components/parameters/resultParam"
         - $ref: "#/components/parameters/fieldsParam"
         - $ref: "#/components/parameters/ranksParam"
         - $ref: "#/components/parameters/namesParam"
@@ -798,7 +819,6 @@ paths:
         - $ref: "#/components/parameters/excludeDescendantParam"
         - $ref: "#/components/parameters/excludeDirectParam"
         - $ref: "#/components/parameters/excludeMissingParam"
-        - $ref: "#/components/parameters/resultParam"
         - $ref: "#/components/parameters/sizeParam"
         - $ref: "#/components/parameters/offsetParam"
         - $ref: "#/components/parameters/sortByParam"
