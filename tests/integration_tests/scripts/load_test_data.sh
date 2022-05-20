@@ -61,5 +61,8 @@ genomehubs fill \
 genomehubs index \
     --config-file tests/integration_tests/config/config.yaml \
     --taxonomy-source ncbi \
-    --file-metadata tests/integration_tests/data/btk/btk.files.yaml
+    --file-metadata tests/integration_tests/data/btk/btk.files.yaml &&
+genomehubs test \
+    --base-url http://localhost:3000/api/v2 \
+    --json-test-dir tests/integration_tests/templates/api/json
 echo done

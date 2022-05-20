@@ -13,5 +13,8 @@
       "source.organizeImports.python": true
     }
   },
-  "esbonio.sphinx.confDir": "${workspaceFolder}/docs"
+  "esbonio.sphinx.confDir": "${workspaceFolder}/docs",
+  "yaml.schemas": {
+    "swaggerviewer:openapi": "file:///Users/rchallis/projects/genomehubs/genomehubs/src/genomehubs-api/src/api-v2.yaml"
+  }
 }
