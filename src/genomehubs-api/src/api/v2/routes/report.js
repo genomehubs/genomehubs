@@ -245,7 +245,12 @@ export const xInY = async ({
       },
     };
   }
-  let { params, fields } = queryParams({ term: y, result, taxonomy, rank });
+  let { params, fields } = await queryParams({
+    term: y,
+    result,
+    taxonomy,
+    rank,
+  });
   params.includeEstimates = apiParams.hasOwnProperty("includeEstimates")
     ? apiParams.includeEstimates
     : false;
@@ -379,7 +384,7 @@ export const xPerRank = async ({
   let perRank = [];
   // let includeEstimates = x ? false : true;
   for (rank of ranks) {
-    let { params, fields } = queryParams({
+    let { params, fields } = await queryParams({
       term: x,
       result,
       rank,

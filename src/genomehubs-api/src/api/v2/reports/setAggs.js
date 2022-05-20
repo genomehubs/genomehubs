@@ -260,7 +260,8 @@ const termsAgg = ({ field, fixedTerms, lookupTypes, size, yHistograms }) => {
       });
     }
   } else {
-    return lineageTerms({ terms: fieldMeta.name, size });
+    // TODO: check this is a valid rank
+    return lineageTerms({ terms: field, size });
   }
 };
 
