@@ -38,7 +38,7 @@ const ResultPanel = ({
   const handleTaxonClick = () => {
     setPreferSearchTerm(false);
     navigate(
-      `/records?record_id=${taxon_id}&result=taxon&taxonomy=${
+      `/record?recordId=${taxon_id}&result=taxon&taxonomy=${
         options.taxonomy || taxonomy
       }#${encodeURIComponent(scientific_name)}`
     );
@@ -169,7 +169,7 @@ const ResultPanel = ({
           </span>
         </div>
       </Tooltip>
-      {location.pathname != "/records" && (
+      {location.pathname != "/record" && (
         <div style={{ right: "0", top: "2em" }} onClick={handleTaxonClick}>
           <Tooltip title={"Click to view record"} arrow>
             <i

@@ -15,7 +15,7 @@ const dispatchSetRecord = (WrappedComponent) => (props) => {
         dispatch(setPreferSearchTerm(false));
         if (navigate) {
           navigate(
-            `?record_id=${id}&result=${result}&taxonomy=${taxonomy}#${encodeURIComponent(
+            `?recordId=${id}&result=${result}&taxonomy=${taxonomy}#${encodeURIComponent(
               name || id
             )}`
           );

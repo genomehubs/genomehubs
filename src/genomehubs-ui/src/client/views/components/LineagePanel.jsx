@@ -28,7 +28,7 @@ const LineagePanel = ({
       fetchSearchResults({ query: `tax_eq(${taxon})`, result: "taxon" });
       setPreferSearchTerm(false);
       navigate(
-        `?record_id=${taxon}&result=taxon&taxonomy=${taxonomy}#${encodeURIComponent(
+        `?recordId=${taxon}&result=taxon&taxonomy=${taxonomy}#${encodeURIComponent(
           name
         )}`
       );

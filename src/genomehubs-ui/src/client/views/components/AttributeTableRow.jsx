@@ -97,11 +97,11 @@ const NestedTable = ({
     setPage(newPage);
   };
 
-  const handleSourceClick = (record_id, result) => {
+  const handleSourceClick = (recordId, result) => {
     setPreferSearchTerm(false);
     navigate(
-      `/records?record_id=${record_id}&result=${result}&taxonomy=${taxonomy}#${encodeURIComponent(
-        record_id
+      `/record?recordId=${recordId}&result=${result}&taxonomy=${taxonomy}#${encodeURIComponent(
+        recordId
       )}`
     );
   };

@@ -4,6 +4,7 @@ import ExplorePage from "./ExplorePage";
 import GenericPage from "./GenericPage";
 import Landing from "./Landing";
 import RecordPage from "./RecordPage";
+import Redirect from "./Redirect";
 import ReportPage from "./ReportPage";
 import { Router } from "@reach/router";
 import SearchPage from "./SearchPage";
@@ -27,7 +28,13 @@ const Main = ({ routes }) => {
     <Landing path="/" key="/" />,
     <SearchPage path="/search" key="/search" />,
     <ExplorePage path="/explore" key="/explore" />,
-    <RecordPage path="/records" key="/records" />,
+    <Redirect
+      path="/records"
+      key="/records"
+      to="/record"
+      replace={{ record_id: "recordId" }}
+    />,
+    <RecordPage path="/record" key="/record" />,
     <SourcesPage path="/sources" key="/sources" />,
     <ReportPage path="/report" key="/report" />,
   ];

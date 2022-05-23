@@ -45,7 +45,7 @@ const RecordPage = ({
       hash = location.hash || "";
     }
     navigate(
-      `?record_id=${recordId}&result=${result}&taxonomy=${taxonomy}${hash}`,
+      `?recordId=${recordId}&result=${result}&taxonomy=${taxonomy}${hash}`,
       { replace: true }
     );
   };
@@ -58,8 +58,8 @@ const RecordPage = ({
     if (options.result != searchIndex) {
       setSearchIndex(options.result);
     }
-    if (options.record_id && options.record_id != recordId) {
-      setRecordId(options.record_id);
+    if (options.recordId && options.recordId != recordId) {
+      setRecordId(options.recordId);
       let searchTerm = {
         result: options.result,
         includeEstimates: true,
@@ -67,7 +67,7 @@ const RecordPage = ({
         fields: "all",
       };
       if (options.result == "taxon") {
-        searchTerm.query = `tax_eq(${options.record_id})`;
+        searchTerm.query = `tax_eq(${options.recordId})`;
       } else {
         searchTerm.query = "";
       }

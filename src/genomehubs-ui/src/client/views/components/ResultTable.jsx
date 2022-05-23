@@ -287,7 +287,7 @@ const ResultTable = ({
       searchText = record.scientific_name;
     }
     navigate(
-      `/records?record_id=${recordId}&result=${searchIndex}&taxonomy=${taxonomy}#${encodeURIComponent(
+      `/record?recordId=${recordId}&result=${searchIndex}&taxonomy=${taxonomy}#${encodeURIComponent(
         searchText
       )}`
     );
@@ -342,19 +342,6 @@ const ResultTable = ({
       }
     });
     navigate(`/search?${qs.stringify(options)}${location.hash || ""}`);
-    // let recordId, searchText;
-    // if (searchIndex == "assembly") {
-    //   recordId = record.assembly_id;
-    //   searchText = record.assembly_id;
-    // } else {
-    //   recordId = record.taxon_id;
-    //   searchText = record.scientific_name;
-    // }
-    // navigate(
-    //   `/sarch?record_id=${recordId}&result=${searchIndex}&taxonomy=${taxonomy}#${encodeURIComponent(
-    //     searchText
-    //   )}`
-    // );
   };
   const arrToObj = (arr) => {
     let obj = {};

@@ -164,8 +164,8 @@ const ReportTree = ({
     let { result, taxonomy } = queryObj;
 
     navigate(
-      `/records?${qs.stringify({
-        record_id: root,
+      `/record?${qs.stringify({
+        recordId: root,
         taxonomy,
         result,
       })}#${encodeURIComponent(name)}`
