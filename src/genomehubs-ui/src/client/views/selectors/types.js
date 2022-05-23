@@ -15,6 +15,7 @@ import {
   getSearchRanks,
 } from "../reducers/search";
 
+import TrieSearch from "trie-search";
 import { apiUrl } from "../reducers/api";
 import { createSelector } from "reselect";
 import { setApiStatus } from "../reducers/api";
@@ -160,6 +161,12 @@ export const getNamesMap = createSelector(
     return types[index];
   }
 );
+
+export const getAttributeTrie = createSelector(getTypesMap, (types) => {
+  const trie = new TrieSearch("name", { splitOnRegEx: false });
+  trie.addFromObject(types);
+  return trie;
+});
 
 export const getActiveNameClasses = createSelector(
   getNamesMap,

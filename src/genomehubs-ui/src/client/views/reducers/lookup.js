@@ -1,9 +1,11 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 
 import { apiUrl } from "./api";
+import { getAttributeTrie } from "../selectors/types";
 import immutableUpdate from "immutable-update";
 import qs from "qs";
 import { setApiStatus } from "./api";
+import store from "../store";
 
 const requestLookup = createAction("REQUEST_LOOKUP");
 const receiveLookup = createAction(
@@ -44,6 +46,11 @@ export function fetchLookup({ lookupTerm, result = "multi", taxonomy }) {
   return function (dispatch) {
     if (!lookupTerm) dispatch(receiveLookup(defaultState));
     if (lookupTerm.match(/[\(\)<>=]/)) return;
+
+    let state = store.getState();
+    let trie = getAttributeTrie(state);
+    let terms = trie.search(lookupTerm);
+
     dispatch(requestLookup());
     let options = {
       searchTerm: lookupTerm,
@@ -58,7 +65,18 @@ export function fetchLookup({ lookupTerm, result = "multi", taxonomy }) {
         (error) => console.log("An error occured.", error)
       )
       .then((json) => {
-        dispatch(receiveLookup(json));
+        dispatch(
+          receiveLookup({
+            status: json.status,
+            results: [
+              ...terms.map((obj) => ({
+                id: obj.value.key || obj.value.name,
+                result: obj.value,
+              })),
+              ...(json.results && json.results),
+            ],
+          })
+        );
       })
       .catch((err) => dispatch(setApiStatus(false)));
   };
