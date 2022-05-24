@@ -164,6 +164,7 @@ const SearchBox = ({
   let [open, setOpen] = useState(false);
   let [prefix, setPrefix] = useState("");
   let [suffix, setSuffix] = useState("");
+  let [subTerm, setSubTerm] = useState("");
   let [multiline, setMultiline] = useState(() => {
     if (searchTerm && searchTerm.query && searchTerm.query.match(/[\r\n]/)) {
       return true;
@@ -190,6 +191,8 @@ const SearchBox = ({
           name: result.result.display_name,
           type: result.result.type,
           title: `${prefix}${value}${suffix}`,
+          prefix,
+          subTerm,
           result: result.result.group,
           unique_term: value,
         });
@@ -209,6 +212,8 @@ const SearchBox = ({
           options.push({
             value,
             title: `${prefix}${value}${suffix}`,
+            prefix,
+            subTerm,
             result: "taxon",
             unique_term: result.result.taxon_id,
             taxon_id: result.result.taxon_id,
@@ -240,6 +245,8 @@ const SearchBox = ({
           options.push({
             value,
             title: `${prefix}${value}${suffix}`,
+            prefix,
+            subTerm,
             result: "assembly",
             unique_term: result.result.assembly_id,
             taxon_id: result.result.taxon_id,
@@ -266,6 +273,8 @@ const SearchBox = ({
           options.push({
             value,
             title: `${prefix}${value}${suffix}`,
+            prefix,
+            subTerm,
             result: "feature",
             unique_term: result.result.feature_id,
             taxon_id: result.result.taxon_id,
@@ -287,6 +296,7 @@ const SearchBox = ({
       }
     });
   }
+  console.log(options);
   if (
     lookupTerms.status &&
     lookupTerms.status.success &&
@@ -301,9 +311,6 @@ const SearchBox = ({
       });
     });
   }
-  // }, [lookupTerms]);
-  // let [showOptions, setShowOptions] = useState(false);
-  // let [showSettings, setShowSettings] = useState(false);
   let [result, setResult] = useState(searchIndex);
   let fields = searchTerm.fields || searchDefaults.fields;
   let ranks = searchTerm.ranks || searchDefaults.ranks;
@@ -343,8 +350,6 @@ const SearchBox = ({
     let taxWrap = "tax_name";
     if (searchDefaults.includeDescendants) {
       taxWrap = "tax_tree";
-      // options.query = query.startsWith("tax_") ? query : `tax_tree(${query})`;
-      // term = term.startsWith("tax_") ? term : `tax_tree(${term})`;
     }
     if (!queryString.match("\n")) {
       let query = queryString
@@ -361,45 +366,118 @@ const SearchBox = ({
     dispatchSearch({ query: queryString, result, fields }, hashTerm);
     resetLookup();
   };
-  const updateTerm = (value, index) => {
+
+  const setLastType = (value, lastType, types) => {
+    value = value.replace(/\s*$/, "");
+    value = value.replace(/^\s*/, "");
+    if (value.length == 0) {
+      return lastType;
+    }
+    if (value.match(/(\)|and|AND)/)) {
+      return {};
+    } else if (value.match(/tax_(eq|lineage|name|tree)/)) {
+      return { type: "taxon" };
+    } else if (value.match(/tax_rank/)) {
+      return { type: "rank" };
+    } else if (lastType.name && value.match(/(<|<=|=|!=|>=|>)/)) {
+      lastType.operator = value;
+      return lastType;
+    } else if (types[value]) {
+      return types[value];
+    }
+    return lastType;
+  };
+
+  const updateTerm = (value, index, types) => {
     setLookupTerm(value);
-    let parts = value.split(/(\s*(?:[\(\)]|and|AND)\s*)/);
+    let parts = value.split(/(\s{0,1}(?:<=|!=|>=|[\(\),!<=>]|and|AND)\s{0,1})/);
     let section = 0;
     let newPrefix = "";
     let newSuffix = "";
+    let lastType = {};
     if (parts.length > 1) {
       let length = 0;
       for (let i = 0; i < parts.length; i++) {
         let end = length + parts[i].length;
-        if (index > end) {
-          length = end;
-          newPrefix += parts[i];
-        } else if (index < length) {
-          length = end;
+        if (index == end && end == length) {
           newSuffix += parts[i];
-        } else {
           section = i;
+        } else if (index >= end) {
+          lastType = setLastType(parts[i], lastType, types);
+          if (index == end) {
+            section = i;
+          } else {
+            newPrefix += parts[i];
+          }
+        } else if (index > length) {
+          lastType = setLastType(parts[i], lastType, types);
+          section = i;
+        } else {
+          newSuffix += parts[i];
         }
+        length = end;
       }
     }
     if (!newSuffix && newPrefix.match(/\(\s*$/)) {
       newSuffix = ")";
     }
-    if (parts[section].match(/([\(\)]|and|AND)/)) {
+    if (parts[section].match(/(<|<=|=|!=|>=|>|[\(\),!]|and|AND)/)) {
       section += 1;
+    }
+    if (parts[section].match(/\s$/) && !lastType.operator) {
+      let bits = parts[section].split(/(\s+)/);
+      if (bits.length <= 3 && types[bits[0]]) {
+        let bit = bits.shift();
+        if (types[bit]) {
+          lastType = setLastType(bit, lastType, types);
+          newPrefix += bit + bits[0];
+          parts[section] = bits.join("");
+        }
+      }
     }
     setPrefix(newPrefix);
     setSuffix(newSuffix);
-    fetchLookup({ lookupTerm: parts[section], taxonomy, prefix, suffix });
+    setSubTerm(parts[section]);
+    fetchLookup({
+      lookupTerm: parts[section],
+      taxonomy,
+      prefix,
+      suffix,
+      lastType,
+    });
+  };
+
+  const highlightRange = (text) => {
+    let length = text ? text.length : searchInputRef.current.value.length;
+    let end = length;
+    end = length - suffix.length;
+    console.log({ prefix, suffix });
+    return [prefix.length, end];
+  };
+  const handlePopperClose = (e, reason) => {
+    if (e) {
+      let range = highlightRange();
+      setTimeout(() => {
+        searchInputRef.current.setSelectionRange(...range);
+      }, 100);
+    }
+  };
+  const handleHighlightChange = (e, option, reason) => {
+    if (e && option) {
+      let range = highlightRange(option.title);
+      setTimeout(() => {
+        searchInputRef.current.setSelectionRange(...range);
+      }, 100);
+    }
   };
   const handleChange = (e, newValue) => {
     if (newValue != lookupTerm) {
       if (!newValue.match(/[\r\n]/)) {
         setMultiline(false);
-        updateTerm(newValue, e.target.selectionStart);
+        updateTerm(newValue, e.target.selectionStart, types);
         setOpen(true);
       } else if (!multiline) {
-        updateTerm(newValue, e.target.selectionStart);
+        updateTerm(newValue, e.target.selectionStart, types);
         setOpen(true);
       }
     }
@@ -454,18 +532,7 @@ const SearchBox = ({
     searchText += ` (e.g. ${suggestedTerm})`;
   }
   return (
-    <Grid
-      container
-      alignItems="center"
-      direction="column"
-      // justify="center"
-      // alignItems="center"
-      // style={{
-      //   minHeight: "6em",
-      //   minWidth: "600px",
-      //   zIndex: 10,
-      // }}
-    >
+    <Grid container alignItems="center" direction="column">
       <Grid item>
         <form
           onSubmit={handleSubmit}
@@ -493,7 +560,9 @@ const SearchBox = ({
                   value={lookupTerm}
                   open={open}
                   onChange={handleKeyDown}
+                  onClose={handlePopperClose}
                   onInputChange={handleChange}
+                  onHighlightChange={handleHighlightChange}
                   PopperComponent={PlacedPopper}
                   renderInput={(params) => (
                     <TextField
@@ -502,6 +571,10 @@ const SearchBox = ({
                       inputRef={searchInputRef}
                       label={searchText}
                       variant="outlined"
+                      // onFocus={(e) => {
+                      //   console.log(e.target.value);
+                      //   e.target.setSelectionRange(range.start, range.end);
+                      // }}
                       fullWidth
                       multiline
                       maxRows={5}

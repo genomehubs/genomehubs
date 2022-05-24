@@ -42,14 +42,127 @@ const lookupTerms = handleActions(
 
 export const getLookupTerms = (state) => state.lookupTerms;
 
-export function fetchLookup({ lookupTerm, result = "multi", taxonomy }) {
+export function fetchLookup({
+  lookupTerm,
+  result = "multi",
+  taxonomy,
+  lastType,
+}) {
   return function (dispatch) {
-    if (!lookupTerm) dispatch(receiveLookup(defaultState));
-    if (lookupTerm.match(/[\(\)<>=]/)) return;
+    let terms = [];
+    if (lastType.name && !lastType.operator) {
+      let group = lastType.group;
+      terms = [
+        {
+          key: "and",
+          value: {
+            display_name: "boolean AND",
+            group,
+            key: "AND",
+            type: "operator",
+          },
+        },
+        {
+          key: "lt",
+          value: {
+            display_name: "less than",
+            group,
+            key: "<",
+            type: "operator",
+          },
+        },
+        {
+          key: "lte",
+          value: {
+            display_name: "less than or equal to",
+            group,
+            key: "<=",
+            type: "operator",
+          },
+        },
+        {
+          key: "eq",
+          value: {
+            display_name: "equal to",
+            group,
+            key: "=",
+            type: "operator",
+          },
+        },
+        {
+          key: "ne",
+          value: {
+            display_name: "not equal to",
+            group,
+            key: "!=",
+            type: "operator",
+          },
+        },
+        {
+          key: "gte",
+          value: {
+            display_name: "greater than or equal to",
+            group,
+            key: ">=",
+            type: "operator",
+          },
+        },
+        {
+          key: "gt",
+          value: {
+            display_name: "greater than",
+            group,
+            key: ">",
+            type: "operator",
+          },
+        },
+      ];
+      return dispatch(
+        receiveLookup({
+          status: { success: true },
+          results: [
+            ...terms.map((obj) => ({
+              id: obj.value.key || obj.value.name,
+              result: obj.value,
+            })),
+          ],
+        })
+      );
+    }
+
+    if (lastType.name && lastType.summary.includes("enum")) {
+      let group = lastType.group;
+      terms = lastType.constraint.enum.map((key) => ({
+        key,
+        value: {
+          display_name: key,
+          group,
+          key,
+          type: "value",
+        },
+      }));
+      return dispatch(
+        receiveLookup({
+          status: { success: true },
+          results: [
+            ...terms.map((obj) => ({
+              id: obj.value.key || obj.value.name,
+              result: obj.value,
+            })),
+          ],
+        })
+      );
+    }
+    //if (!lookupTerm) dispatch(receiveLookup(defaultState));
+    // if (lookupTerm.match(/[\(\)<>=]/)) return;
+
+    console.log(lastType);
 
     let state = store.getState();
     let trie = getAttributeTrie(state);
-    let terms = trie.search(lookupTerm);
+    if (lastType.type != "taxon" && !lastType.name) {
+      terms = trie.search(lookupTerm);
+    }
 
     dispatch(requestLookup());
     let options = {
