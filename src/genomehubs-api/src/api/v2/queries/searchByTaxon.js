@@ -164,7 +164,7 @@ export const searchByTaxon = async ({
     includeRawValues,
   });
   let exclude = []; // includeRawValues ? [] : ["attributes.values*"];
-  let sort = setSortOrder(sortBy, lookupNames, lookupTypes);
+  let sort = setSortOrder(sortBy, lookupTypes, lookupNames);
   let query = {
     bool: {
       must_not: excludedSources,
