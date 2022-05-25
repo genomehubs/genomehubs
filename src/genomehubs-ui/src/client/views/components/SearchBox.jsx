@@ -165,6 +165,7 @@ const SearchBox = ({
   let [prefix, setPrefix] = useState("");
   let [suffix, setSuffix] = useState("");
   let [subTerm, setSubTerm] = useState("");
+  let [activeLookup, setActiveLookup] = useState(null);
   let [multiline, setMultiline] = useState(() => {
     if (searchTerm && searchTerm.query && searchTerm.query.match(/[\r\n]/)) {
       return true;
@@ -410,6 +411,7 @@ const SearchBox = ({
 
   const updateTerm = (value, index, types) => {
     setLookupTerm(value);
+    clearTimeout(activeLookup);
     // let parts = value.split(/(\s{0,1}(?:<=|!=|>=|[\(\),!<=>]|and|AND)\s{0,1})/);
     let parts = value.split(/(\s(?:<=|!=|>=|<|=|>|and)\s|[\(\),!])/i);
     let section = 0;
@@ -470,13 +472,17 @@ const SearchBox = ({
     setPrefix(newPrefix);
     setSuffix(newSuffix);
     setSubTerm(parts[section]);
-    fetchLookup({
-      lookupTerm: parts[section].replace(/^\s+/, ""),
-      taxonomy,
-      prefix,
-      suffix,
-      lastType,
-    });
+    setActiveLookup(
+      setTimeout(() => {
+        fetchLookup({
+          lookupTerm: parts[section].replace(/^\s+/, ""),
+          taxonomy,
+          prefix,
+          suffix,
+          lastType,
+        });
+      }, 200)
+    );
   };
 
   const highlightRange = (text) => {
