@@ -285,25 +285,57 @@ export const getTaxTrie = createSelector(getTypesMap, (types) => {
       synonym: "tax_eq",
       key: "tax_name(",
       group: "taxon",
-      type: "summary",
+      type: "operator",
     },
     {
       display_name: "taxon tree",
       key: "tax_tree(",
       group: "taxon",
-      type: "summary",
+      type: "operator",
     },
     {
       display_name: "taxon rank",
       key: "tax_rank(",
       group: "taxon",
-      type: "summary",
+      type: "operator",
     },
     {
       display_name: "taxon lineage",
       key: "tax_lineage(",
       group: "taxon",
-      type: "summary",
+      type: "operator",
+    },
+  ];
+  const trie = new TrieSearch(["display_name", "key"]);
+  trie.addAll(values);
+  return trie;
+});
+
+export const getSummaryTrie = createSelector(getTypesMap, (types) => {
+  const values = [
+    {
+      display_name: "maximum value",
+      key: "max(",
+      group: "summary",
+      type: "operator",
+    },
+    {
+      display_name: "minimum value",
+      key: "min(",
+      group: "summary",
+      type: "operator",
+    },
+    {
+      display_name: "range of values",
+      key: "range(",
+      group: "summary",
+      type: "operator",
+    },
+    {
+      display_name: "list length",
+      key: "length(",
+      group: "summary",
+      type: "operator",
     },
   ];
   const trie = new TrieSearch(["display_name", "key"]);

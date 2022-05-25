@@ -3,6 +3,7 @@ import {
   getAttributeTrie,
   getOperatorTrie,
   getRankTrie,
+  getSummaryTrie,
   getTaxTrie,
   getValueTrie,
 } from "../selectors/types";
@@ -66,7 +67,7 @@ export function fetchLookup({
         trie = getOperatorTrie(state);
       }
       if (!trie) {
-        return [];
+        return dispatch(resetLookup());
       }
       terms = trie.search(lookupTerm || "*");
       return dispatch(
@@ -84,7 +85,7 @@ export function fetchLookup({
       trie = getRankTrie(state);
 
       if (!trie) {
-        return [];
+        return dispatch(resetLookup());
       }
       terms = trie.search(lookupTerm || "*");
       return dispatch(
@@ -101,9 +102,11 @@ export function fetchLookup({
     }
 
     if (!lastType.type && lastType.type != "taxon" && !lastType.name) {
-      trie = getAttributeTrie(state);
-      terms = trie.search(lookupTerm);
       trie = getTaxTrie(state);
+      terms = trie.search(lookupTerm);
+      trie = getSummaryTrie(state);
+      terms = terms.concat(trie.search(lookupTerm));
+      trie = getAttributeTrie(state);
       terms = terms.concat(trie.search(lookupTerm));
     }
     if (lookupTerm.length <= 3) {

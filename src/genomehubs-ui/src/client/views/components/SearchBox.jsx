@@ -310,6 +310,22 @@ const SearchBox = ({
       });
     });
   }
+  // if (
+  //   lookupTerm.length > 5 &&
+  //   options.length == 0 &&
+  //   (subTerm.match(/^\s*(a|an|and)\s*$/i) || subTerm.match(/^\s*$/i))
+  // ) {
+  //   let value = "AND";
+  //   options.push({
+  //     value,
+  //     name: "boolean AND",
+  //     type: "operator",
+  //     title: `${prefix}${value}${suffix}`,
+  //     prefix,
+  //     subTerm,
+  //     unique_term: value,
+  //   });
+  // }
   let [result, setResult] = useState(searchIndex);
   let fields = searchTerm.fields || searchDefaults.fields;
   let ranks = searchTerm.ranks || searchDefaults.ranks;
@@ -381,12 +397,10 @@ const SearchBox = ({
       return { type: "rank" };
     }
     if (lastType.name && value.match(/\s*(<|<=|=|!=|>=|>)\s*/i)) {
-      lastType.operator = value;
-      return lastType;
+      return { ...lastType, operator: value };
     }
     if (lastType.name && lastType.operator) {
-      lastType.value = value;
-      return lastType;
+      return { ...lastType, value };
     }
     if (types[value]) {
       return types[value];
@@ -457,7 +471,7 @@ const SearchBox = ({
     setSuffix(newSuffix);
     setSubTerm(parts[section]);
     fetchLookup({
-      lookupTerm: parts[section].replace(/^\s+/, "").replace(/\s+$/, ""),
+      lookupTerm: parts[section].replace(/^\s+/, ""),
       taxonomy,
       prefix,
       suffix,
@@ -481,6 +495,16 @@ const SearchBox = ({
           // Ignore
         }
       }, 100);
+      setTimeout(() => {
+        try {
+          let end = searchInputRef.current.selectionEnd;
+          if (end > searchInputRef.current.selectionStart) {
+            searchInputRef.current.setSelectionRange(end, end);
+          }
+        } catch (err) {
+          // Ignore
+        }
+      }, 1000);
     }
   };
   const handleHighlightChange = (e, option, reason) => {
