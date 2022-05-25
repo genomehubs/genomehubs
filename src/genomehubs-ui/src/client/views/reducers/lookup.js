@@ -1,7 +1,13 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
+import {
+  getAttributeTrie,
+  getOperatorTrie,
+  getRankTrie,
+  getTaxTrie,
+  getValueTrie,
+} from "../selectors/types";
 
 import { apiUrl } from "./api";
-import { getAttributeTrie } from "../selectors/types";
 import immutableUpdate from "immutable-update";
 import qs from "qs";
 import { setApiStatus } from "./api";
@@ -50,120 +56,72 @@ export function fetchLookup({
 }) {
   return function (dispatch) {
     let terms = [];
-    if (lastType.name && !lastType.operator) {
-      let group = lastType.group;
-      terms = [
-        {
-          key: "and",
-          value: {
-            display_name: "boolean AND",
-            group,
-            key: "AND",
-            type: "operator",
-          },
-        },
-        {
-          key: "lt",
-          value: {
-            display_name: "less than",
-            group,
-            key: "<",
-            type: "operator",
-          },
-        },
-        {
-          key: "lte",
-          value: {
-            display_name: "less than or equal to",
-            group,
-            key: "<=",
-            type: "operator",
-          },
-        },
-        {
-          key: "eq",
-          value: {
-            display_name: "equal to",
-            group,
-            key: "=",
-            type: "operator",
-          },
-        },
-        {
-          key: "ne",
-          value: {
-            display_name: "not equal to",
-            group,
-            key: "!=",
-            type: "operator",
-          },
-        },
-        {
-          key: "gte",
-          value: {
-            display_name: "greater than or equal to",
-            group,
-            key: ">=",
-            type: "operator",
-          },
-        },
-        {
-          key: "gt",
-          value: {
-            display_name: "greater than",
-            group,
-            key: ">",
-            type: "operator",
-          },
-        },
-      ];
-      return dispatch(
-        receiveLookup({
-          status: { success: true },
-          results: [
-            ...terms.map((obj) => ({
-              id: obj.value.key || obj.value.name,
-              result: obj.value,
-            })),
-          ],
-        })
-      );
-    }
-
-    if (lastType.name && lastType.summary.includes("enum")) {
-      let group = lastType.group;
-      terms = lastType.constraint.enum.map((key) => ({
-        key,
-        value: {
-          display_name: key,
-          group,
-          key,
-          type: "value",
-        },
-      }));
-      return dispatch(
-        receiveLookup({
-          status: { success: true },
-          results: [
-            ...terms.map((obj) => ({
-              id: obj.value.key || obj.value.name,
-              result: obj.value,
-            })),
-          ],
-        })
-      );
-    }
-    //if (!lookupTerm) dispatch(receiveLookup(defaultState));
-    // if (lookupTerm.match(/[\(\)<>=]/)) return;
-
-    console.log(lastType);
-
     let state = store.getState();
-    let trie = getAttributeTrie(state);
-    if (lastType.type != "taxon" && !lastType.name) {
-      terms = trie.search(lookupTerm);
+    let group = lastType.group || lastType.type;
+    let trie;
+    if (lastType.name) {
+      if (lastType.operator) {
+        trie = getValueTrie(state, lastType.name);
+      } else {
+        trie = getOperatorTrie(state);
+      }
+      if (!trie) {
+        return [];
+      }
+      terms = trie.search(lookupTerm || "*");
+      return dispatch(
+        receiveLookup({
+          status: { success: true },
+          results: [
+            ...terms.map((obj) => ({
+              id: obj.key || obj.name,
+              result: { ...obj, group, type: "operator" },
+            })),
+          ],
+        })
+      );
+    } else if (lastType.type && lastType.type == "rank") {
+      trie = getRankTrie(state);
+
+      if (!trie) {
+        return [];
+      }
+      terms = trie.search(lookupTerm || "*");
+      return dispatch(
+        receiveLookup({
+          status: { success: true },
+          results: [
+            ...terms.map((obj) => ({
+              id: obj.key || obj.name,
+              result: { ...obj, group, type: "rank" },
+            })),
+          ],
+        })
+      );
     }
 
+    if (!lastType.type && lastType.type != "taxon" && !lastType.name) {
+      trie = getAttributeTrie(state);
+      terms = trie.search(lookupTerm);
+      trie = getTaxTrie(state);
+      terms = terms.concat(trie.search(lookupTerm));
+    }
+    if (lookupTerm.length <= 3) {
+      if (terms.length == 0) {
+        return dispatch(resetLookup());
+      }
+      return dispatch(
+        receiveLookup({
+          status: { success: true },
+          results: [
+            ...terms.map((obj) => ({
+              id: obj.value?.key || obj.value?.name || obj.key,
+              result: obj.value ? { ...obj.value, group } : { ...obj, group },
+            })),
+          ],
+        })
+      );
+    }
     dispatch(requestLookup());
     let options = {
       searchTerm: lookupTerm,
@@ -178,20 +136,32 @@ export function fetchLookup({
         (error) => console.log("An error occured.", error)
       )
       .then((json) => {
-        dispatch(
-          receiveLookup({
-            status: json.status,
-            results: [
-              ...terms.map((obj) => ({
-                id: obj.value.key || obj.value.name,
-                result: obj.value,
-              })),
-              ...(json.results && json.results),
-            ],
-          })
-        );
+        let processed = {
+          status: { ...json.status, hits: json.status.hits + terms.length },
+          results: [
+            ...terms.map((obj) => ({
+              id: obj.value.key || obj.value.name || obj.key,
+              result: obj.value || obj,
+            })),
+            ...(json.results && json.results),
+          ],
+          ...(json.suggestions && { suggestions: json.suggestions }),
+        };
+        dispatch(receiveLookup(processed));
       })
-      .catch((err) => dispatch(setApiStatus(false)));
+      .catch((err) => {
+        let processed = {
+          status: { success: true, hits: terms.length },
+          results: [
+            ...terms.map((obj) => ({
+              id: obj.value?.key || obj.value?.name || obj.key,
+              result: obj.value || obj,
+            })),
+          ],
+        };
+        dispatch(receiveLookup(processed));
+      });
+    // .catch((err) => dispatch(setApiStatus(false)));
   };
 }
 
