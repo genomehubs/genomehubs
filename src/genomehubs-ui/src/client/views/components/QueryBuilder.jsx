@@ -72,7 +72,7 @@ const QueryBuilder = ({
   };
   let taxFilters = {
     taxon: null,
-    filter: false,
+    filter: "tax_name",
     rank: "",
     level: null,
   };
