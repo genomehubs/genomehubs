@@ -146,7 +146,7 @@ export function fetchLookup({
               id: obj.value.key || obj.value.name || obj.key,
               result: obj.value || obj,
             })),
-            ...(json.results && json.results),
+            ...(json.results ? json.results : []),
           ],
           ...(json.suggestions && { suggestions: json.suggestions }),
         };

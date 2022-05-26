@@ -111,7 +111,7 @@ const AutoCompleteOption = ({ option }) => {
     }
   } else if (option.type) {
     optionIcon = <CategoryIcon className={classes.icon} />;
-    primaryText = option.unique_term;
+    primaryText = option.display_value || option.unique_term;
     secondaryText = (
       <Typography variant="body2" color="textSecondary">
         {option.type}
@@ -186,14 +186,20 @@ const SearchBox = ({
     lookupTerms.results.forEach((result, i) => {
       let value;
       if (result.result.type) {
-        let value = result.result.name || result.result.key;
+        let display_value = result.result.name || result.result.key;
+        let value = display_value;
+        if (result.result.after && !suffix.startsWith(result.result.after)) {
+          value += result.result.after;
+        }
         options.push({
           value,
+          display_value,
           name: result.result.display_name,
           type: result.result.type,
           title: `${prefix}${value}${suffix}`,
           prefix,
           subTerm,
+          suffix,
           result: result.result.group,
           unique_term: value,
         });
@@ -215,6 +221,7 @@ const SearchBox = ({
             title: `${prefix}${value}${suffix}`,
             prefix,
             subTerm,
+            suffix,
             result: "taxon",
             unique_term: result.result.taxon_id,
             taxon_id: result.result.taxon_id,
@@ -248,6 +255,7 @@ const SearchBox = ({
             title: `${prefix}${value}${suffix}`,
             prefix,
             subTerm,
+            suffix,
             result: "assembly",
             unique_term: result.result.assembly_id,
             taxon_id: result.result.taxon_id,
@@ -276,6 +284,7 @@ const SearchBox = ({
             title: `${prefix}${value}${suffix}`,
             prefix,
             subTerm,
+            suffix,
             result: "feature",
             unique_term: result.result.feature_id,
             taxon_id: result.result.taxon_id,
@@ -305,28 +314,18 @@ const SearchBox = ({
     !/[\(\)<>=]/.test(lookupTerm)
   ) {
     lookupTerms.suggestions.forEach((suggestion, i) => {
+      let value = suggestion.suggestion.text;
       options.push({
-        title: suggestion.suggestion.text,
+        value,
+        title: `${prefix}${value}${suffix}`,
+        prefix,
+        subTerm,
+        suffix,
+        unique_term: value,
         highlighted: suggestion.suggestion.highlighted,
       });
     });
   }
-  // if (
-  //   lookupTerm.length > 5 &&
-  //   options.length == 0 &&
-  //   (subTerm.match(/^\s*(a|an|and)\s*$/i) || subTerm.match(/^\s*$/i))
-  // ) {
-  //   let value = "AND";
-  //   options.push({
-  //     value,
-  //     name: "boolean AND",
-  //     type: "operator",
-  //     title: `${prefix}${value}${suffix}`,
-  //     prefix,
-  //     subTerm,
-  //     unique_term: value,
-  //   });
-  // }
   let [result, setResult] = useState(searchIndex);
   let fields = searchTerm.fields || searchDefaults.fields;
   let ranks = searchTerm.ranks || searchDefaults.ranks;
