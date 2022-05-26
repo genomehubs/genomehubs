@@ -23,6 +23,8 @@ export const parseFields = async ({ result, fields, taxonomy }) => {
       let meta = lookupTypes(field);
       if (meta) {
         fieldList.add(meta.name);
+      } else {
+        fieldList.add(field);
       }
     }
     fields = [...fieldList];
