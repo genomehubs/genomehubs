@@ -47,11 +47,9 @@ export const searchByTaxon = async ({
     taxonomy,
   });
   let attr_fields = fields
-    .filter((field) => lookupTypes(field) !== undefined)
+    .filter((field) => lookupTypes(field))
     .map((field) => lookupTypes(field).name);
-  let non_attr_fields = fields.filter(
-    (field) => lookupTypes(field) === undefined
-  );
+  let non_attr_fields = fields.filter((field) => !lookupTypes(field));
   let types = attr_fields.map((field) => typesMap[field]);
   types = [...new Set(types.map((type) => type.type))];
   if (attr_fields.length > 0) {

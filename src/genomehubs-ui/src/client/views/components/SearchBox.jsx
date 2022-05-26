@@ -1,6 +1,9 @@
-import React, { memo, useRef, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import CategoryIcon from "@material-ui/icons/Category";
+import EmojiNatureIcon from "@material-ui/icons/EmojiNature";
+import ExtensionIcon from "@material-ui/icons/Extension";
 import FormControl from "@material-ui/core/FormControl";
 import Grid from "@material-ui/core/Grid";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
@@ -40,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const PlacedPopper = (props) => {
-  return <Popper {...props} placement="top" />;
+  return <Popper {...props} placement="bottom" />;
 };
 
 const AutoCompleteSuggestion = ({ option }) => {
@@ -54,7 +57,7 @@ const AutoCompleteSuggestion = ({ option }) => {
         <Typography variant="body2" color="textSecondary">
           Did you mean
         </Typography>
-        <div>{option.title}</div>
+        <div>{option.value}</div>
       </Grid>
     </Grid>
   );
@@ -63,6 +66,12 @@ const AutoCompleteSuggestion = ({ option }) => {
 const AutoCompleteOption = ({ option }) => {
   const classes = useStyles();
   let primaryText, secondaryText;
+  let optionIcon = <SearchIcon className={classes.icon} />;
+  if (option.result == "taxon") {
+    optionIcon = <EmojiNatureIcon className={classes.icon} />;
+  } else if (option.result == "assembly") {
+    optionIcon = <ExtensionIcon className={classes.icon} />;
+  }
   if (option.name_class) {
     primaryText = (
       <>
@@ -74,7 +83,7 @@ const AutoCompleteOption = ({ option }) => {
           </div>
         )}
         {option.xref && " "}
-        {option.title}
+        {option.value}
       </>
     );
     secondaryText = (
@@ -100,18 +109,26 @@ const AutoCompleteOption = ({ option }) => {
         </Typography>
       );
     }
+  } else if (option.type) {
+    optionIcon = <CategoryIcon className={classes.icon} />;
+    primaryText = option.display_value || option.unique_term;
+    secondaryText = (
+      <Typography variant="body2" color="textSecondary">
+        {option.type}
+      </Typography>
+    );
   }
 
   return (
     <Grid container alignItems="center">
-      <Grid item>
-        <SearchIcon className={classes.icon} />
-      </Grid>
+      <Grid item>{optionIcon}</Grid>
       <Grid item xs>
         <div>{primaryText}</div>
         <span style={{ float: "right" }}>
           <Typography variant="body2" color="textSecondary">
-            {(option.name_class && option.taxon_id) || option.assembly_id}
+            {(option.name_class && option.taxon_id) ||
+              option.assembly_id ||
+              option.name}
           </Typography>
         </span>
         {secondaryText}
@@ -145,14 +162,170 @@ const SearchBox = ({
   const searchBoxRef = useRef(null);
   const searchInputRef = useRef(null);
   let [open, setOpen] = useState(false);
+  let [prefix, setPrefix] = useState("");
+  let [suffix, setSuffix] = useState("");
+  let [subTerm, setSubTerm] = useState("");
+  let [activeLookup, setActiveLookup] = useState(null);
   let [multiline, setMultiline] = useState(() => {
     if (searchTerm && searchTerm.query && searchTerm.query.match(/[\r\n]/)) {
       return true;
     }
     return false;
   });
-  // let [showOptions, setShowOptions] = useState(false);
-  // let [showSettings, setShowSettings] = useState(false);
+
+  let terms;
+  let options = [];
+  // useEffect(() => {
+  if (
+    lookupTerms.status &&
+    lookupTerms.status.success &&
+    lookupTerms.results &&
+    lookupTerms.results.length > 0
+  ) {
+    terms = [];
+    lookupTerms.results.forEach((result, i) => {
+      let value;
+      if (result.result.type) {
+        let display_value = result.result.name || result.result.key;
+        let value = display_value;
+        if (result.result.after && !suffix.startsWith(result.result.after)) {
+          value += result.result.after;
+        }
+        options.push({
+          value,
+          display_value,
+          name: result.result.display_name,
+          type: result.result.type,
+          title: `${prefix}${value}${suffix}`,
+          prefix,
+          subTerm,
+          suffix,
+          result: result.result.group,
+          unique_term: value,
+        });
+        terms.push(
+          <div key={i} className={styles.term}>
+            <span className={styles.value}>{result.key}</span>
+            <div className={styles.extra}>{`\u2014 ${result.type}`}</div>
+          </div>
+        );
+      } else {
+        if (lookupTerms.status.result == "taxon") {
+          if (result.reason) {
+            value = result.reason[0].fields["taxon_names.name.raw"][0];
+          } else {
+            value = result.result.scientific_name;
+          }
+          options.push({
+            value,
+            title: `${prefix}${value}${suffix}`,
+            prefix,
+            subTerm,
+            suffix,
+            result: "taxon",
+            unique_term: result.result.taxon_id,
+            taxon_id: result.result.taxon_id,
+            taxon_rank: result.result.taxon_rank,
+            scientific_name: result.result.scientific_name,
+            name_class: result.reason
+              ? result.reason[0].fields["taxon_names.class"]
+              : "taxon ID",
+            xref: Boolean(
+              result.reason &&
+                result.reason[0].fields["taxon_names.class"] &&
+                !result.reason[0].fields["taxon_names.class"][0].match(" name")
+            ),
+          });
+          terms.push(
+            <div key={i} className={styles.term}>
+              <span className={styles.value}>{value}</span>
+              <div
+                className={styles.extra}
+              >{`\u2014 ${result.result.taxon_rank}`}</div>
+            </div>
+          );
+        } else if (lookupTerms.status.result == "assembly") {
+          if (result.reason) {
+            value = result.reason[0].fields["identifiers.identifier.raw"][0];
+          } else {
+            value = result.result.assembly_id;
+          }
+          options.push({
+            value,
+            title: `${prefix}${value}${suffix}`,
+            prefix,
+            subTerm,
+            suffix,
+            result: "assembly",
+            unique_term: result.result.assembly_id,
+            taxon_id: result.result.taxon_id,
+            scientific_name: result.result.scientific_name,
+            assembly_id: result.result.assembly_id,
+            identifier_class: result.reason
+              ? result.reason[0].fields["identifiers.class"]
+              : "assembly ID",
+          });
+          terms.push(
+            <div key={i} className={styles.term}>
+              <span className={styles.value}>{value}</span>
+              <div
+                className={styles.extra}
+              >{`\u2014 ${result.result.scientific_name}`}</div>
+            </div>
+          );
+        } else if (lookupTerms.status.result == "feature") {
+          if (result.reason) {
+            value = result.reason[0].fields["identifiers.identifier.raw"][0];
+          } else {
+            value = result.result.feature_id;
+          }
+          options.push({
+            value,
+            title: `${prefix}${value}${suffix}`,
+            prefix,
+            subTerm,
+            suffix,
+            result: "feature",
+            unique_term: result.result.feature_id,
+            taxon_id: result.result.taxon_id,
+            assembly_id: result.result.assembly_id,
+            feature_id: result.result.feature_id,
+            identifier_class: result.reason
+              ? result.reason[0].fields["identifiers.class"]
+              : "feature ID",
+          });
+          terms.push(
+            <div key={i} className={styles.term}>
+              <span className={styles.value}>{value}</span>
+              <div
+                className={styles.extra}
+              >{`\u2014 ${result.result.primary_type}`}</div>
+            </div>
+          );
+        }
+      }
+    });
+  }
+  if (
+    lookupTerms.status &&
+    lookupTerms.status.success &&
+    lookupTerms.suggestions &&
+    lookupTerms.suggestions.length > 0 &&
+    !/[\(\)<>=]/.test(lookupTerm)
+  ) {
+    lookupTerms.suggestions.forEach((suggestion, i) => {
+      let value = suggestion.suggestion.text;
+      options.push({
+        value,
+        title: `${prefix}${value}${suffix}`,
+        prefix,
+        subTerm,
+        suffix,
+        unique_term: value,
+        highlighted: suggestion.suggestion.highlighted,
+      });
+    });
+  }
   let [result, setResult] = useState(searchIndex);
   let fields = searchTerm.fields || searchDefaults.fields;
   let ranks = searchTerm.ranks || searchDefaults.ranks;
@@ -192,8 +365,6 @@ const SearchBox = ({
     let taxWrap = "tax_name";
     if (searchDefaults.includeDescendants) {
       taxWrap = "tax_tree";
-      // options.query = query.startsWith("tax_") ? query : `tax_tree(${query})`;
-      // term = term.startsWith("tax_") ? term : `tax_tree(${term})`;
     }
     if (!queryString.match("\n")) {
       let query = queryString
@@ -210,18 +381,153 @@ const SearchBox = ({
     dispatchSearch({ query: queryString, result, fields }, hashTerm);
     resetLookup();
   };
-  const updateTerm = (value) => {
+
+  const setLastType = (value, lastType, types) => {
+    if (value.match(/(\)|\sAND\s)/i)) {
+      return {};
+    }
+    value = value.replace(/^\s*/, "").replace(/\s*$/, "");
+    if (value.length == 0) {
+      return lastType;
+    }
+    if (value.match(/tax_(eq|lineage|name|tree)/)) {
+      return { type: "taxon" };
+    }
+    if (value.match(/tax_rank/)) {
+      return { type: "rank" };
+    }
+    if (lastType.name && value.match(/\s*(<|<=|=|!=|>=|>)\s*/i)) {
+      return { ...lastType, operator: value };
+    }
+    if (lastType.name && lastType.operator) {
+      return { ...lastType, value };
+    }
+    if (types[value]) {
+      return types[value];
+    }
+    return lastType;
+  };
+
+  const updateTerm = (value, index, types) => {
     setLookupTerm(value);
-    fetchLookup({ lookupTerm: value, taxonomy });
+    clearTimeout(activeLookup);
+    // let parts = value.split(/(\s{0,1}(?:<=|!=|>=|[\(\),!<=>]|and|AND)\s{0,1})/);
+    let parts = value.split(/(\s(?:<=|!=|>=|<|=|>|and)\s|[\(\),!])/i);
+    let section = 0;
+    let newPrefix = "";
+    let newSuffix = "";
+    let lastType = {};
+    if (parts.length > 1) {
+      let length = 0;
+      for (let i = 0; i < parts.length; i++) {
+        let end = length + parts[i].length;
+        if (index == end && end == length) {
+          newPrefix += parts[i];
+          section = i;
+        } else if (index >= end) {
+          lastType = setLastType(parts[i], lastType, types);
+          if (index == end) {
+            if (i % 2 == 1) {
+              newPrefix += parts[i];
+            }
+            section = i;
+          } else {
+            newPrefix += parts[i];
+          }
+        } else if (index > length) {
+          lastType = setLastType(parts[i], lastType, types);
+          section = i;
+        } else {
+          newSuffix += parts[i];
+        }
+        length = end;
+      }
+    }
+    if (!newSuffix && newPrefix.match(/\(\s*$/)) {
+      newSuffix = ")";
+    }
+    if (
+      parts[section].match(
+        /(\s(?:<=|!=|>=|<|=|>|and)\s|(?:\s{0,1}[\(\),!]\s{0,1})|^and\s)/i
+      )
+    ) {
+      newPrefix += parts[section];
+      section += 1;
+    }
+    if (section == parts.length) {
+      parts.push("");
+    }
+    if (parts[section].match(/\s/) && !lastType.operator) {
+      let bits = parts[section].split(/(\s+)/);
+      if (types[bits[0]]) {
+        let bit = bits.shift();
+        if (types[bit]) {
+          lastType = setLastType(bit, lastType, types);
+          newPrefix += bit + bits[0];
+          parts[section] = bits.join("");
+        }
+      }
+    }
+    setPrefix(newPrefix);
+    setSuffix(newSuffix);
+    setSubTerm(parts[section]);
+    setActiveLookup(
+      setTimeout(() => {
+        fetchLookup({
+          lookupTerm: parts[section].replace(/^\s+/, ""),
+          taxonomy,
+          prefix,
+          suffix,
+          lastType,
+        });
+      }, 200)
+    );
+  };
+
+  const highlightRange = (text) => {
+    let length = text ? text.length : searchInputRef.current.value.length;
+    let end = length;
+    end = length - suffix.length;
+    return [prefix.length, end];
+  };
+  const handlePopperClose = (e, reason) => {
+    if (e) {
+      let range = highlightRange();
+      setTimeout(() => {
+        try {
+          searchInputRef.current.setSelectionRange(...range);
+        } catch (err) {
+          // Ignore
+        }
+      }, 100);
+      setTimeout(() => {
+        try {
+          let end = searchInputRef.current.selectionEnd;
+          if (end > searchInputRef.current.selectionStart) {
+            searchInputRef.current.setSelectionRange(end, end);
+          }
+        } catch (err) {
+          // Ignore
+        }
+      }, 1000);
+    }
+  };
+  const handleHighlightChange = (e, option, reason) => {
+    if (e && option) {
+      let range = highlightRange(option.title);
+      setTimeout(() => {
+        searchInputRef.current.setSelectionRange(...range);
+      }, 100);
+    }
   };
   const handleChange = (e, newValue) => {
     if (newValue != lookupTerm) {
       if (!newValue.match(/[\r\n]/)) {
         setMultiline(false);
-        updateTerm(newValue);
+        updateTerm(newValue, e.target.selectionStart, types);
         setOpen(true);
       } else if (!multiline) {
-        updateTerm(newValue);
+        updateTerm(newValue, e.target.selectionStart, types);
         setOpen(true);
       }
     }
@@ -245,12 +551,16 @@ const SearchBox = ({
         setOpen(true);
       } else {
         setOpen(false);
-        setResult(newValue.result);
-        doSearch(
-          newValue.unique_term || e.target.value,
-          newValue.result || "taxon",
-          newValue.title || e.target.value
-        );
+        if (newValue.type || prefix || suffix) {
+          setLookupTerm(newValue.title);
+        } else {
+          setResult(newValue.result);
+          doSearch(
+            newValue.unique_term || e.target.value,
+            newValue.result || "taxon",
+            newValue.title || e.target.value
+          );
+        }
       }
     } else {
       resetLookup();
@@ -264,115 +574,6 @@ const SearchBox = ({
     doSearch(term, result, term);
   };
 
-  let terms;
-  let options = [];
-  if (
-    lookupTerms.status &&
-    lookupTerms.status.success &&
-    lookupTerms.results &&
-    lookupTerms.results.length > 0 &&
-    !/[\(\)<>=]/.test(lookupTerm)
-  ) {
-    terms = [];
-    lookupTerms.results.forEach((result, i) => {
-      let value;
-      if (lookupTerms.status.result == "taxon") {
-        if (result.reason) {
-          value = result.reason[0].fields["taxon_names.name.raw"][0];
-        } else {
-          value = result.result.scientific_name;
-        }
-        options.push({
-          title: value,
-          result: "taxon",
-          unique_term: result.result.taxon_id,
-          taxon_id: result.result.taxon_id,
-          taxon_rank: result.result.taxon_rank,
-          scientific_name: result.result.scientific_name,
-          name_class: result.reason
-            ? result.reason[0].fields["taxon_names.class"]
-            : "taxon ID",
-          xref: Boolean(
-            result.reason &&
-              result.reason[0].fields["taxon_names.class"] &&
-              !result.reason[0].fields["taxon_names.class"][0].match(" name")
-          ),
-        });
-        terms.push(
-          <div key={i} className={styles.term}>
-            <span className={styles.value}>{value}</span>
-            <div
-              className={styles.extra}
-            >{`\u2014 ${result.result.taxon_rank}`}</div>
-          </div>
-        );
-      } else if (lookupTerms.status.result == "assembly") {
-        if (result.reason) {
-          value = result.reason[0].fields["identifiers.identifier.raw"][0];
-        } else {
-          value = result.result.assembly_id;
-        }
-        options.push({
-          title: value,
-          result: "assembly",
-          unique_term: result.result.assembly_id,
-          taxon_id: result.result.taxon_id,
-          scientific_name: result.result.scientific_name,
-          assembly_id: result.result.assembly_id,
-          identifier_class: result.reason
-            ? result.reason[0].fields["identifiers.class"]
-            : "assembly ID",
-        });
-        terms.push(
-          <div key={i} className={styles.term}>
-            <span className={styles.value}>{value}</span>
-            <div
-              className={styles.extra}
-            >{`\u2014 ${result.result.scientific_name}`}</div>
-          </div>
-        );
-      } else if (lookupTerms.status.result == "feature") {
-        if (result.reason) {
-          value = result.reason[0].fields["identifiers.identifier.raw"][0];
-        } else {
-          value = result.result.feature_id;
-        }
-        options.push({
-          title: value,
-          result: "feature",
-          unique_term: result.result.feature_id,
-          taxon_id: result.result.taxon_id,
-          assembly_id: result.result.assembly_id,
-          feature_id: result.result.feature_id,
-          identifier_class: result.reason
-            ? result.reason[0].fields["identifiers.class"]
-            : "feature ID",
-        });
-        terms.push(
-          <div key={i} className={styles.term}>
-            <span className={styles.value}>{value}</span>
-            <div
-              className={styles.extra}
-            >{`\u2014 ${result.result.primary_type}`}</div>
-          </div>
-        );
-      }
-    });
-  }
-  if (
-    lookupTerms.status &&
-    lookupTerms.status.success &&
-    lookupTerms.suggestions &&
-    lookupTerms.suggestions.length > 0 &&
-    !/[\(\)<>=]/.test(lookupTerm)
-  ) {
-    lookupTerms.suggestions.forEach((suggestion, i) => {
-      options.push({
-        title: suggestion.suggestion.text,
-        highlighted: suggestion.suggestion.highlighted,
-      });
-    });
-  }
   let searchText = `Type to search ${siteName}`;
   if (searchIndex) {
     searchText += ` ${searchIndex} index`;
@@ -381,18 +582,7 @@ const SearchBox = ({
     searchText += ` (e.g. ${suggestedTerm})`;
   }
   return (
-    <Grid
-      container
-      alignItems="center"
-      direction="column"
-      // justify="center"
-      // alignItems="center"
-      // style={{
-      //   minHeight: "6em",
-      //   minWidth: "600px",
-      //   zIndex: 10,
-      // }}
-    >
+    <Grid container alignItems="center" direction="column">
       <Grid item>
         <form
           onSubmit={handleSubmit}
@@ -420,7 +610,9 @@ const SearchBox = ({
                   value={lookupTerm}
                   open={open}
                   onChange={handleKeyDown}
+                  onClose={handlePopperClose}
                   onInputChange={handleChange}
+                  onHighlightChange={handleHighlightChange}
                   PopperComponent={PlacedPopper}
                   renderInput={(params) => (
                     <TextField
@@ -441,16 +633,6 @@ const SearchBox = ({
                     return <AutoCompleteOption option={option} />;
                   }}
                 />
-                {/* <FormHelperText
-                  labelPlacement="end"
-                  onClick={() => {
-                    setShowOptions(!showOptions);
-                    setShowSettings(false);
-                  }}
-                  style={{ textAlign: "right", cursor: "pointer" }}
-                >
-                  {showOptions ? "Hide" : "Show"} search options...
-                </FormHelperText> */}
               </FormControl>
             </Grid>
             <Grid item xs={2}>
@@ -474,13 +656,6 @@ const SearchBox = ({
         </Grid>
         <Grid item xs={2}></Grid>
       </Grid>
-      {/* <Grid container direction="row" alignItems="center">
-        <Grid item xs={2}></Grid>
-        <Grid item xs={8}>
-          <ChipInputAutoSuggest data={suggestions} />
-        </Grid>
-        <Grid item xs={2}></Grid>
-      </Grid> */}
     </Grid>
   );
 };

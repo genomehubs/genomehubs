@@ -174,6 +174,9 @@ export const getIdentifiers = async (req, res) => {
     ) {
       response = await suggest(req.query);
     }
+    if (!response.status) {
+      response = { status: { success: true, hits: 0 }, results: [] };
+    }
     return res.status(200).send(formatJson(response, req.query.indent));
   } catch (message) {
     logError({ req, message });

@@ -15,7 +15,9 @@ import {
   getSearchRanks,
 } from "../reducers/search";
 
+import TrieSearch from "trie-search";
 import { apiUrl } from "../reducers/api";
+import { createCachedSelector } from "re-reselect";
 import { createSelector } from "reselect";
 import { setApiStatus } from "../reducers/api";
 import store from "../store";
@@ -160,6 +162,230 @@ export const getNamesMap = createSelector(
     return types[index];
   }
 );
+
+export const getAttributeTrie = createSelector(getTypesMap, (types) => {
+  const trie = new TrieSearch("name", { splitOnRegEx: false });
+  trie.addFromObject(types);
+  return trie;
+});
+
+export const getOperatorTrie = createSelector(getTypesMap, (types) => {
+  const operators = [
+    {
+      display_name: "boolean AND",
+      synonym: "and",
+      key: "AND",
+      wildcard: "*",
+    },
+    {
+      display_name: "less than",
+      synonym: "lt",
+      key: "<",
+      wildcard: "*",
+    },
+    {
+      display_name: "less than or equal to",
+      synonym: "lte",
+      key: "<=",
+      wildcard: "*",
+    },
+    {
+      display_name: "equal to",
+      synonym: "eq",
+      key: "=",
+      wildcard: "*",
+    },
+    {
+      display_name: "not equal to",
+      synonym: "ne",
+      key: "!=",
+      wildcard: "*",
+    },
+    {
+      display_name: "greater than or equal to",
+      synonym: "gte",
+      key: ">=",
+      wildcard: "*",
+    },
+    {
+      display_name: "greater than",
+      synonym: "gt",
+      key: ">",
+      wildcard: "*",
+    },
+  ];
+
+  const trie = new TrieSearch(["display_name", "key", "synonym", "wildcard"]);
+  trie.addAll(operators);
+  return trie;
+});
+
+export const getRankTrie = createSelector(getTypesMap, (types) => {
+  let ranks = [
+    "subspecies",
+    "species",
+    "genus",
+    "family",
+    "class",
+    "order",
+    "phylum",
+    "superkingdom",
+  ];
+  let otherRanks = [
+    "biotype",
+    "clade",
+    "cohort",
+    "forma",
+    "forma specialis",
+    "genotype",
+    "infraclass",
+    "infraorder",
+    "isolate",
+    "kingdom",
+    "morph",
+    "no rank",
+    "parvorder",
+    "pathogroup",
+    "section",
+    "series",
+    "serogroup",
+    "serotype",
+    "species group",
+    "species subgroup",
+    "strain",
+    "subclass",
+    "subcohort",
+    "subfamily",
+    "subgenus",
+    "subkingdom",
+    "suborder",
+    "subphylum",
+    "subsection",
+    "subtribe",
+    "superclass",
+    "superfamily",
+    "superorder",
+    "superphylum",
+    "tribe",
+    "varietas",
+  ];
+  const trie = new TrieSearch(["display_name", "key", "wildcard"]);
+  trie.addAll(
+    ranks
+      .map((key) => ({ key, display_name: key, wildcard: "*" }))
+      .concat(otherRanks.map((key) => ({ key, display_name: key })))
+  );
+  return trie;
+});
+
+export const getTaxTrie = createSelector(getTypesMap, (types) => {
+  const values = [
+    {
+      display_name: "taxon name",
+      synonym: "tax_eq",
+      key: "tax_name",
+      after: "(",
+      group: "taxon",
+      type: "operator",
+    },
+    {
+      display_name: "taxon tree",
+      key: "tax_tree",
+      after: "(",
+      group: "taxon",
+      type: "operator",
+    },
+    {
+      display_name: "taxon rank",
+      key: "tax_rank",
+      after: "(",
+      group: "taxon",
+      type: "operator",
+    },
+    {
+      display_name: "taxon lineage",
+      key: "tax_lineage",
+      after: "(",
+      group: "taxon",
+      type: "operator",
+    },
+  ];
+  const trie = new TrieSearch(["display_name", "key"]);
+  trie.addAll(values);
+  return trie;
+});
+
+export const getSummaryTrie = createSelector(getTypesMap, (types) => {
+  const values = [
+    {
+      display_name: "maximum value",
+      key: "max",
+      after: "(",
+      group: "summary",
+      type: "operator",
+    },
+    {
+      display_name: "minimum value",
+      key: "min",
+      after: "(",
+      group: "summary",
+      type: "operator",
+    },
+    {
+      display_name: "range of values",
+      key: "range",
+      after: "(",
+      group: "summary",
+      type: "operator",
+    },
+    {
+      display_name: "list length",
+      key: "length",
+      after: "(",
+      group: "summary",
+      type: "operator",
+    },
+  ];
+  const trie = new TrieSearch(["display_name", "key"]);
+  trie.addAll(values);
+  return trie;
+});
+
+const processValueTrie = (types, key) => {
+  if (!types) {
+    return;
+  }
+  let meta = types[key] || {};
+  if (meta.type != "keyword") {
+    return;
+  }
+  if (meta.constraint && meta.constraint.enum) {
+    let lookup = {};
+    if (meta.translate) {
+      for (let [from, to] of Object.entries(meta.translate)) {
+        lookup[to] = from;
+      }
+    }
+    let values = meta.constraint.enum.map((key) => ({
+      display_name: lookup[key] || key,
+      key,
+      synonym: lookup[key],
+      wildcard: "*",
+    }));
+    const trie = new TrieSearch(["display_name", "key", "synonym", "wildcard"]);
+    trie.addAll(values);
+    return trie;
+  }
+  return;
+};
+
+export const getValueTrie = createCachedSelector(
+  getTypesMap,
+  (_state, key) => key,
+  (types, key) => {
+    return processValueTrie(types, key);
+  }
+)((_state, key) => key);
 
 export const getActiveNameClasses = createSelector(
   getNamesMap,

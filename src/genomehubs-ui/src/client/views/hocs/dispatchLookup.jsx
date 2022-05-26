@@ -7,12 +7,8 @@ const dispatchLookup = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({});
 
   const mapDispatchToProps = (dispatch) => ({
-    fetchLookup: ({ lookupTerm, result, taxonomy }) => {
-      if (lookupTerm.length > 3) {
-        dispatch(fetchLookup({ lookupTerm, result, taxonomy }));
-      } else {
-        dispatch(resetLookup());
-      }
+    fetchLookup: ({ lookupTerm, result, taxonomy, lastType }) => {
+      dispatch(fetchLookup({ lookupTerm, result, taxonomy, lastType }));
     },
     setLookupTerm: (lookupTerm) =>
       dispatch(setLookupTerm(decodeURIComponent(lookupTerm))),

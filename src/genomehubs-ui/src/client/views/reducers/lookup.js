@@ -1,9 +1,18 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
+import {
+  getAttributeTrie,
+  getOperatorTrie,
+  getRankTrie,
+  getSummaryTrie,
+  getTaxTrie,
+  getValueTrie,
+} from "../selectors/types";
 
 import { apiUrl } from "./api";
 import immutableUpdate from "immutable-update";
 import qs from "qs";
 import { setApiStatus } from "./api";
+import store from "../store";
 
 const requestLookup = createAction("REQUEST_LOOKUP");
 const receiveLookup = createAction(
@@ -40,10 +49,82 @@ const lookupTerms = handleActions(
 
 export const getLookupTerms = (state) => state.lookupTerms;
 
-export function fetchLookup({ lookupTerm, result = "multi", taxonomy }) {
+export function fetchLookup({
+  lookupTerm,
+  result = "multi",
+  taxonomy,
+  lastType,
+}) {
   return function (dispatch) {
-    if (!lookupTerm) dispatch(receiveLookup(defaultState));
-    if (lookupTerm.match(/[\(\)<>=]/)) return;
+    let terms = [];
+    let state = store.getState();
+    let group = lastType.group || lastType.type;
+    let trie;
+    if (lastType.name) {
+      if (lastType.operator) {
+        trie = getValueTrie(state, lastType.name);
+      } else {
+        trie = getOperatorTrie(state);
+      }
+      if (!trie) {
+        return dispatch(resetLookup());
+      }
+      terms = trie.search(lookupTerm || "*");
+      return dispatch(
+        receiveLookup({
+          status: { success: true },
+          results: [
+            ...terms.map((obj) => ({
+              id: obj.key || obj.name,
+              result: { ...obj, group, type: "operator" },
+            })),
+          ],
+        })
+      );
+    } else if (lastType.type && lastType.type == "rank") {
+      trie = getRankTrie(state);
+
+      if (!trie) {
+        return dispatch(resetLookup());
+      }
+      terms = trie.search(lookupTerm || "*");
+      return dispatch(
+        receiveLookup({
+          status: { success: true },
+          results: [
+            ...terms.map((obj) => ({
+              id: obj.key || obj.name,
+              result: { ...obj, group, type: "rank" },
+            })),
+          ],
+        })
+      );
+    }
+
+    if (!lastType.type && lastType.type != "taxon" && !lastType.name) {
+      trie = getTaxTrie(state);
+      terms = trie.search(lookupTerm);
+      trie = getSummaryTrie(state);
+      terms = terms.concat(trie.search(lookupTerm));
+      trie = getAttributeTrie(state);
+      terms = terms.concat(trie.search(lookupTerm));
+    }
+    if (lookupTerm.length <= 3) {
+      if (terms.length == 0) {
+        return dispatch(resetLookup());
+      }
+      return dispatch(
+        receiveLookup({
+          status: { success: true },
+          results: [
+            ...terms.map((obj) => ({
+              id: obj.value?.key || obj.value?.name || obj.key,
+              result: obj.value ? { ...obj.value, group } : { ...obj, group },
+            })),
+          ],
+        })
+      );
+    }
     dispatch(requestLookup());
     let options = {
       searchTerm: lookupTerm,
@@ -58,9 +139,32 @@ export function fetchLookup({ lookupTerm, result = "multi", taxonomy }) {
         (error) => console.log("An error occured.", error)
       )
       .then((json) => {
-        dispatch(receiveLookup(json));
+        let processed = {
+          status: { ...json.status, hits: json.status.hits + terms.length },
+          results: [
+            ...terms.map((obj) => ({
+              id: obj.value.key || obj.value.name || obj.key,
+              result: obj.value || obj,
+            })),
+            ...(json.results ? json.results : []),
+          ],
+          ...(json.suggestions && { suggestions: json.suggestions }),
+        };
+        dispatch(receiveLookup(processed));
       })
-      .catch((err) => dispatch(setApiStatus(false)));
+      .catch((err) => {
+        let processed = {
+          status: { success: true, hits: terms.length },
+          results: [
+            ...terms.map((obj) => ({
+              id: obj.value?.key || obj.value?.name || obj.key,
+              result: obj.value || obj,
+            })),
+          ],
+        };
+        dispatch(receiveLookup(processed));
+      });
+    // .catch((err) => dispatch(setApiStatus(false)));
   };
 }
 

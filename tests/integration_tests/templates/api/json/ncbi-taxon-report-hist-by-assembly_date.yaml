@@ -1,0 +1,9 @@
+description: Check histogram success
+endpoint: report
+querystring: report=histogram&x=assembly_date&rank=species&cat=assembly_level&includeEstimates=true&excludeAncestral%5B0%5D=assembly_span&excludeMissing%5B0%5D=assembly_span&caption=Progress%20of%20genome%20assemblies%20published%20on%20INSDC%20over%20time%2C%20by%20assembly%20level&taxonomy=ncbi&result=taxon&queryId=-yTBgtSsLr
+assert:
+  status:
+    success: true
+  report:
+    status:
+      success: true

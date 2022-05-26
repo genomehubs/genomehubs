@@ -94,7 +94,7 @@ const SearchToggles = ({
                       setSearchDefaults({
                         includeDescendants,
                       });
-                      let query = options.query;
+                      let query = options.query || "";
                       let hash = location.hash || "";
                       if (includeDescendants) {
                         query = query.replaceAll(
