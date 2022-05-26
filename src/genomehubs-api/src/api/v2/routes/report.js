@@ -179,6 +179,7 @@ export const histPerRank = async ({
       rank,
       result: apiParams.result,
       taxonomy,
+      scatterThreshold: 0,
       apiParams,
     });
     if (res.status.success == false) {
