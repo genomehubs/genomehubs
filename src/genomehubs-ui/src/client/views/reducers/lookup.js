@@ -81,20 +81,33 @@ export function fetchLookup({
           ],
         })
       );
-    } else if (lastType.type && lastType.type == "rank") {
+    } else if (
+      lastType.type &&
+      (lastType.type == "rank" || lastType.type == "cat")
+    ) {
       trie = getRankTrie(state);
 
       if (!trie) {
         return dispatch(resetLookup());
       }
-      terms = trie.search(lookupTerm || "*");
+      terms = trie.search(lookupTerm || (lastType.type == "rank" && "*"));
+      if (lastType.type == "cat") {
+        trie = getAttributeTrie(state);
+        terms = terms.concat(trie.search(lookupTerm));
+      }
       return dispatch(
         receiveLookup({
           status: { success: true },
           results: [
+            // ...terms.map((obj) => ({
+            //   id: obj.key || obj.name,
+            //   result: { ...obj, group, type: "rank" },
+            // })),
             ...terms.map((obj) => ({
-              id: obj.key || obj.name,
-              result: { ...obj, group, type: "rank" },
+              id: obj.value?.key || obj.value?.name || obj.key || obj.name,
+              result: obj.value
+                ? { ...obj.value, group }
+                : { ...obj, group, type: "rank" },
             })),
           ],
         })
