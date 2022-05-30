@@ -1,0 +1,12 @@
+description: |
+  Analysis index query should return results for taxon 9612
+endpoint: search
+querystring: query=taxon_id%3D%3D9612&result=analysis&taxonomy=ncbi
+assert:
+  status:
+    success: true
+    hits: 1
+  results:
+    - id: analysis-btk-CAJNRB02
+      result:
+        file_count: 3

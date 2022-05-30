@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
+import AutoCompleteInput from "./AutoCompleteInput";
 import Box from "@material-ui/core/Box";
 import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -77,6 +78,13 @@ export const queryPropList = {
   xPerRank: ["report", "x", rankSettings, "includeEstimates"],
 };
 
+const autoCompleteTypes = {
+  x: false,
+  y: false,
+  rank: { type: "rank" },
+  cat: { type: "cat" },
+};
+
 const reportTypes = ["histogram", "scatter", "tree", "xInY", "xPerRank"];
 
 export const useStyles = makeStyles((theme) => ({
@@ -99,6 +107,7 @@ export const ReportEdit = ({
   const classes = useStyles();
   const formRef = useRef();
   const [values, setValues] = useState({});
+  const [refs, setRefs] = useState({});
   let query = qs.parse(reportById.report?.queryString);
   if (query.report == "tree" && !query.treeStyle) {
     query.treeStyle = "rect";
@@ -139,9 +148,17 @@ export const ReportEdit = ({
   }
 
   const handleChange = (e, queryProp) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setValues({ ...values, [queryProp]: e.target.value });
+    let value = "";
+    if (e && e.preventDefault) {
+      e.preventDefault();
+      e.stopPropagation();
+      value = e.target.value;
+    }
+    setValues({ ...values, [queryProp]: value });
+  };
+
+  const setInputValue = (value, queryProp) => {
+    setValues({ ...values, [queryProp]: value });
   };
 
   const toggleSwitch = (e, queryProp) => {
@@ -161,7 +178,9 @@ export const ReportEdit = ({
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
     setReportEdit(false);
     if (!formRef.current.reportValidity()) {
       return;
@@ -350,18 +369,41 @@ export const ReportEdit = ({
       } else {
         label = queryProp;
       }
-      input = (
-        <TextField
-          id={queryProp + Math.random()}
-          label={label}
-          value={values[queryProp]}
-          required={required}
-          error={required && !values[queryProp]}
-          style={{ width: "95%" }}
-          onChange={(e) => handleChange(e, queryProp)}
-          onKeyPress={handleKeyPress}
-        />
-      );
+
+      if (autoCompleteTypes.hasOwnProperty(queryProp)) {
+        input = (
+          <AutoCompleteInput
+            id={queryProp + Math.random()}
+            required={required}
+            error={required && !values[queryProp]}
+            inputValue={values[queryProp]}
+            setInputValue={(value) => setInputValue(value, queryProp)}
+            inputLabel={label}
+            inputRef={refs[queryProp]}
+            multiline={false}
+            setMultiline={() => {}}
+            handleSubmit={(e) => handleChange(e, queryProp)}
+            size={"small"}
+            multipart={queryProp == "x"}
+            maxRows={queryProp == "x" ? 5 : 1}
+            fixedType={autoCompleteTypes[queryProp]}
+            // doSearch={doSearch}
+          />
+        );
+      } else {
+        input = (
+          <TextField
+            id={queryProp + Math.random()}
+            label={label}
+            value={values[queryProp]}
+            required={required}
+            error={required && !values[queryProp]}
+            style={{ width: "95%" }}
+            onChange={(e) => handleChange(e, queryProp)}
+            onKeyPress={handleKeyPress}
+          />
+        );
+      }
     }
     if (input) {
       fields.push(

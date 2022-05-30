@@ -133,12 +133,12 @@ jobs:
               --traverse-root 2759 \
               --traverse-infer-both
           curl localhost:9200/_refresh
-      # - name: Index BTK files
-      #   run: |
-      #     genomehubs index \
-      #         --config-file tests/integration_tests/config/config.yaml \
-      #         --taxonomy-source ncbi \
-      #         --file-metadata tests/integration_tests/data/btk/btk.files.yaml
+      - name: Index BTK files
+        run: |
+          genomehubs index \
+              --config-file tests/integration_tests/config/config.yaml \
+              --taxonomy-source ncbi \
+              --file-metadata tests/integration_tests/data/btk/btk.files.yaml
       - name: Check indices
         run: |
           curl -s "http://localhost:9200/_cat/indices"
