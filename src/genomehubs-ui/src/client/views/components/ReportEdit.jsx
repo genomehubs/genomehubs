@@ -384,6 +384,7 @@ export const ReportEdit = ({
             setMultiline={() => {}}
             handleSubmit={(e) => handleChange(e, queryProp)}
             size={"small"}
+            multipart={queryProp == "x"}
             maxRows={queryProp == "x" ? 5 : 1}
             fixedType={autoCompleteTypes[queryProp]}
             // doSearch={doSearch}

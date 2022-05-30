@@ -1,3 +1,4 @@
+import AutoCompleteInput from "./AutoCompleteInput";
 import AutorenewIcon from "@material-ui/icons/Autorenew";
 import BasicSelect from "./BasicSelect";
 import BasicTextField from "./BasicTextField";
@@ -35,17 +36,17 @@ const allowedOperators = ({ field, types, summary }) => {
   let operators = ["=", "==", "!="];
   let numeric = [">", ">=", "<", "<="];
   let type = types[field]?.type || "keyword";
-  if (type == "keyword" && summary == "value") {
-    let summary = types[field]?.summary || "list";
-    if (Array.isArray(summary)) {
-      summary = summary[0];
-    }
-    if (summary == "enum") {
-      operators = numeric.concat(operators);
-    }
-  } else {
-    operators = numeric.concat(operators);
-  }
+  // if (type == "keyword" && summary == "value") {
+  //   let summary = types[field]?.summary || "list";
+  //   if (Array.isArray(summary)) {
+  //     summary = summary[0];
+  //   }
+  //   if (summary == "enum") {
+  //     operators = numeric.concat(operators);
+  //   }
+  // } else {
+  operators = numeric.concat(operators);
+  // }
   return ["", ...operators].map((value, i) => (
     <MenuItem key={i} value={value}>
       {value}
@@ -74,6 +75,7 @@ const VariableFilter = ({
   field = field == "undefined" ? "" : field;
   summary = summary == "undefined" ? "" : summary;
   value = value == "undefined" ? "" : value;
+  let type = types[field]?.type || "keyword";
   return (
     <Grid container alignItems="center" direction="row" spacing={2}>
       {bool && (
@@ -110,13 +112,26 @@ const VariableFilter = ({
           values={allowedOperators({ field, types, summary })}
         />
       </Grid>
-      <Grid item>
-        <BasicTextField
-          id={`variable-${field}-value-input`}
-          handleChange={handleValueChange}
-          helperText={"value"}
-          value={value}
-        />
+      <Grid item xs={3}>
+        {type == "keyword" && operator ? (
+          <AutoCompleteInput
+            id={`variable-${field}-value-input`}
+            inputValue={value}
+            setInputValue={() => {}}
+            inputLabel={"value"}
+            handleSubmit={handleValueChange}
+            size={"small"}
+            maxRows={1}
+            fixedType={{ name: field, operator }}
+          />
+        ) : (
+          <BasicTextField
+            id={`variable-${field}-value-input`}
+            handleChange={handleValueChange}
+            helperText={"value"}
+            value={value}
+          />
+        )}
       </Grid>
       {handleDismiss && (
         <Grid item style={{ marginLeft: "auto" }}>

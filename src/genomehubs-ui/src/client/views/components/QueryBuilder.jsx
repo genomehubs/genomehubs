@@ -1,6 +1,7 @@
 import { ListSubheader, MenuItem } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 
+import AutoCompleteInput from "./AutoCompleteInput";
 import BasicSelect from "./BasicSelect";
 import BasicTextField from "./BasicTextField";
 import Button from "@material-ui/core/Button";
@@ -88,7 +89,7 @@ const QueryBuilder = ({
         let taxQuery = term.match(/tax_(\w+)\((.+?)\)/);
         if (taxQuery) {
           if (taxQuery[1] == "rank") {
-            taxFilters.rank = taxQuery[2];
+            taxFilters.rank = taxQuery[2] || "";
             bool = "AND";
           } else if (taxQuery[1] == "depth") {
             taxFilters.depth = taxQuery[2];
@@ -160,8 +161,9 @@ const QueryBuilder = ({
     return query;
   };
 
-  const handleChange = (e, i, action) => {
-    if (!e.target.value) {
+  const handleChange = (e, i, action, value) => {
+    value = value || e.target.value;
+    if (!value) {
       return;
     }
     let attributes = [...attrFilters];
@@ -170,22 +172,22 @@ const QueryBuilder = ({
       attribute[0] = attribute[0]
         .replace(/\w+\s*\(\s*/, "")
         .replace(/\s*\)\s*$/, "");
-      if (e.target.value != "value") {
-        attribute[0] = `${e.target.value}(${attribute[0]})`;
+      if (value != "value") {
+        attribute[0] = `${value}(${attribute[0]})`;
       }
     } else if (action == "variable") {
       let [summary, attr] = attribute[0].split(/\s*[\(\)]\s*/);
       // if (attr) {
       //   attribute[0] = `${summary}(${attribute[0]})`;
       // } else {
-      attribute[0] = e.target.value;
+      attribute[0] = value;
       attribute[1] = "";
       attribute[2] = "";
       // }
     } else if (action == "operator") {
-      attribute[1] = e.target.value;
+      attribute[1] = value;
     } else if (action == "value") {
-      attribute[2] = e.target.value;
+      attribute[2] = value;
     }
     if (action == "dismiss") {
       delete attributes[i];
@@ -268,7 +270,9 @@ const QueryBuilder = ({
           handleVariableChange={(e) => handleChange(e, i, "variable")}
           handleSummaryChange={(e) => handleChange(e, i, "summary")}
           handleOperatorChange={(e) => handleChange(e, i, "operator")}
-          handleValueChange={(e) => handleChange(e, i, "value")}
+          handleValueChange={(e, { id, value }) =>
+            handleChange(e, i, "value", value)
+          }
           handleDismiss={(e) => handleChange(e, i, "dismiss")}
         />
       );
@@ -305,10 +309,14 @@ const QueryBuilder = ({
     return opts;
   });
 
-  const handleTaxonFilterChange = (e) => {
-    e.stopPropagation();
-    let id = e.target.id ? e.target.id.replace("taxon-filter-", "") : "rank";
-    let value = e.target.value;
+  const handleTaxonFilterChange = (e, { id, value }) => {
+    if (!id) {
+      e.stopPropagation();
+      id = e.target.id ? e.target.id.replace("taxon-filter-", "") : "rank";
+      value = e.target.value;
+    } else {
+      id = id.replace("taxon-filter-", "");
+    }
     if (id == "estimates") {
       setMoreOptions({
         ...moreOptions,
@@ -370,12 +378,26 @@ const QueryBuilder = ({
         </Grid>
         <Grid container alignItems="center" direction="row" spacing={2}>
           <Tooltip title="Taxon ID or scientific name" arrow placement={"top"}>
-            <Grid item>
-              <BasicTextField
+            <Grid item xs={3}>
+              {/* <BasicTextField
                 id={"taxon-filter-taxon"}
                 handleChange={handleTaxonFilterChange}
                 helperText={"taxon"}
                 value={taxFilter.taxon}
+              />
+               */}
+              <AutoCompleteInput
+                id={"taxon-filter-taxon"}
+                inputValue={taxFilter.taxon}
+                setInputValue={() => {}}
+                inputLabel={"taxon"}
+                // inputRef={refs[queryProp]}
+                handleSubmit={handleTaxonFilterChange}
+                size={"small"}
+                maxRows={1}
+                result={"taxon"}
+                fixedType={{ type: "taxon" }}
+                // doSearch={doSearch}
               />
             </Grid>
           </Tooltip>

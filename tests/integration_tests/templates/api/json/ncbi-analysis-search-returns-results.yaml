@@ -9,4 +9,4 @@ assert:
   results:
     - id: analysis-btk-CAJNRB02
       result:
-        file_count: 1
+        file_count: 3

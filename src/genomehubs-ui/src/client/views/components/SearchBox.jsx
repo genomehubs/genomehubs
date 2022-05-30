@@ -104,6 +104,7 @@ const SearchBox = ({
   };
 
   const doSearch = (queryString, result, hashTerm) => {
+    setLookupTerm(queryString);
     let taxWrap = "tax_name";
     if (searchDefaults.includeDescendants) {
       taxWrap = "tax_tree";

@@ -20,7 +20,7 @@ export const AutoCompleteInput = ({
   inputRef,
   inputLabel,
   multiline,
-  setMultiline,
+  setMultiline = () => {},
   autocompleteTerms,
   fetchAutocomplete,
   resetAutocomplete,
@@ -31,6 +31,7 @@ export const AutoCompleteInput = ({
   maxRows = 5,
   types,
   taxonomy,
+  result,
   fixedType,
   multipart,
 }) => {
@@ -200,6 +201,9 @@ export const AutoCompleteInput = ({
       });
     });
   }
+  if (options.length == 1 && options[0].value == options[0].subTerm) {
+    options = [];
+  }
 
   const setLastType = (value, lastType, types) => {
     if (value.match(/(\)|\sAND\s)/i)) {
@@ -230,6 +234,12 @@ export const AutoCompleteInput = ({
   const updateTerm = (value, index, types) => {
     setInValue(value);
     clearTimeout(activeLookup);
+    if (index < 1) {
+      return;
+    }
+    if (inputRef.current.selectionEnd > inputRef.current.selectionStart) {
+      return;
+    }
     // let parts = value.split(/(\s{0,1}(?:<=|!=|>=|[\(\),!<=>]|and|AND)\s{0,1})/);
     let parts = value.split(/(\s(?:<=|!=|>=|<|=|>|and)\s|[\(\),!])/i);
     let section = 0;
@@ -290,15 +300,12 @@ export const AutoCompleteInput = ({
     setPrefix(newPrefix);
     setSuffix(newSuffix);
     setSubTerm(parts[section]);
-    console.log(parts);
-    console.log(parts[section]);
     setActiveLookup(
       setTimeout(() => {
         fetchAutocomplete({
           lookupTerm: parts[section].replace(/^\s+/, ""),
           taxonomy,
-          prefix,
-          suffix,
+          result,
           lastType: fixedType || lastType,
         });
       }, 200)
@@ -375,8 +382,8 @@ export const AutoCompleteInput = ({
         setMultiline(true);
         setInValue(`${inputRef.current.value}\n`);
       } else if (!multiline) {
-        handleSubmit(e);
-        setInputValue(inputRef.current.value);
+        handleSubmit(e, { id, value: inputRef.current.value });
+        // setInputValue(inputRef.current.value);
       }
       resetAutocomplete();
     }
@@ -392,6 +399,11 @@ export const AutoCompleteInput = ({
     if (reason == "select-option") {
       updateValue(newValue.title);
       resetAutocomplete();
+      if (multipart) {
+        setInValue(newValue.title);
+      } else {
+        handleSubmit(e, { id, value: newValue.title });
+      }
       outerRef.current.blur();
       return;
     }
@@ -423,7 +435,7 @@ export const AutoCompleteInput = ({
     }
   };
   const handleBlur = (e) => {
-    updateValue(e.target.value);
+    setInputValue(e.target.value);
   };
   return (
     <Autocomplete
@@ -458,6 +470,9 @@ export const AutoCompleteInput = ({
           fullWidth
           multiline={maxRows == 1 ? false : true}
           maxRows={maxRows}
+          onClick={() => {
+            resetAutocomplete();
+          }}
         />
       )}
       renderOption={(option) => {
