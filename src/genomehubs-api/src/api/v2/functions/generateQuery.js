@@ -290,15 +290,17 @@ export const generateQuery = async ({
         }
       } else {
         if (parts.length > 1) {
-          let meta = lookupTypes[result](term);
-          if (meta) {
-            let bins = meta.bins;
-            if (bins && bins.scale && bins.scale.startsWith("log")) {
-              if (!parts[3] || parts[3].length > 0) {
-                parts[3] = ">0";
+          if (lookupTypes[result]) {
+            let meta = lookupTypes[result](term);
+            if (meta) {
+              let bins = meta.bins;
+              if (bins && bins.scale && bins.scale.startsWith("log")) {
+                if (!parts[3] || parts[3].length > 0) {
+                  parts[3] = ">0";
+                }
               }
+              term = meta.name;
             }
-            term = meta.name;
           }
           let summary;
           if (parts[1] && parts[1].length > 0) {

@@ -157,9 +157,9 @@ export const ReportEdit = ({
     setValues({ ...values, [queryProp]: value });
   };
 
-  // const setInputValue = (value, queryProp) => {
-  //   setValues({ ...values, [queryProp]: value });
-  // };
+  const setInputValue = (value, queryProp) => {
+    setValues({ ...values, [queryProp]: value });
+  };
 
   const toggleSwitch = (e, queryProp) => {
     e.preventDefault();
@@ -377,7 +377,7 @@ export const ReportEdit = ({
             required={required}
             error={required && !values[queryProp]}
             inputValue={values[queryProp]}
-            // setInputValue={(value) => setInputValue(value, queryProp)}
+            setInputValue={(value) => setInputValue(value, queryProp)}
             inputLabel={label}
             inputRef={refs[queryProp]}
             multiline={false}

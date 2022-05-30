@@ -1,5 +1,6 @@
 import { analysisReducers } from "./analysis";
 import { apiReducers } from "./api";
+import { autocompleteReducers } from "./autocomplete";
 import { colorReducers } from "./color";
 import { combineReducers } from "redux";
 import { exploreReducers } from "./explore";
@@ -21,6 +22,7 @@ const allReducers = Object.assign(
   {},
   analysisReducers,
   apiReducers,
+  autocompleteReducers,
   colorReducers,
   exploreReducers,
   fileReducers,

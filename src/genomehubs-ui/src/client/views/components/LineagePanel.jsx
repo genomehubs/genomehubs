@@ -17,7 +17,6 @@ const LineagePanel = ({
   fetchSearchResults,
   setPreferSearchTerm,
   setLookupTerm,
-  resetLookup,
   taxonomy,
 }) => {
   const navigate = useNavigate();

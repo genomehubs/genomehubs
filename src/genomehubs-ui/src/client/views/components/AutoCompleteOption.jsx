@@ -1,9 +1,13 @@
 import CategoryIcon from "@material-ui/icons/Category";
 import EmojiNatureIcon from "@material-ui/icons/EmojiNature";
 import ExtensionIcon from "@material-ui/icons/Extension";
+import FunctionsIcon from "@material-ui/icons/Functions";
 import Grid from "@material-ui/core/Grid";
+import LineStyleIcon from "@material-ui/icons/LineStyle";
+import LooksOneIcon from "@material-ui/icons/LooksOne";
 import React from "react";
 import SearchIcon from "@material-ui/icons/Search";
+import TodayIcon from "@material-ui/icons/Today";
 import Typography from "@material-ui/core/Typography";
 import { useStyles } from "./SearchBox";
 
@@ -54,7 +58,22 @@ export const AutoCompleteOption = ({ option }) => {
       );
     }
   } else if (option.type) {
-    optionIcon = <CategoryIcon className={classes.icon} />;
+    if (option.type == "rank") {
+      optionIcon = (
+        <LineStyleIcon
+          className={classes.icon}
+          style={{ transform: "rotate(-90deg)" }}
+        />
+      );
+    } else if (option.type == "date") {
+      optionIcon = <TodayIcon className={classes.icon} />;
+    } else if (option.type == "keyword") {
+      optionIcon = <CategoryIcon className={classes.icon} />;
+    } else if (option.type == "operator") {
+      optionIcon = <FunctionsIcon className={classes.icon} />;
+    } else {
+      optionIcon = <LooksOneIcon className={classes.icon} />;
+    }
     primaryText = option.display_value || option.unique_term;
     secondaryText = (
       <Typography variant="body2" color="textSecondary">

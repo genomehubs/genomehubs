@@ -7,7 +7,7 @@ import qs from "qs";
 import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import useVisible from "../hooks/useVisible";
-import withLookup from "../hocs/withLookup";
+// import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
 import withSummary from "../hocs/withSummary";
 import withSummaryById from "../hocs/withSummaryById";
@@ -22,7 +22,7 @@ const WordCloud = ({
   searchIndex,
   fetchSearchResults,
   setPreferSearchTerm,
-  resetLookup,
+  // resetLookup,
   taxonomy,
 }) => {
   const navigate = useNavigate();
@@ -53,7 +53,7 @@ const WordCloud = ({
     navigate(
       `/search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`
     );
-    resetLookup();
+    // resetLookup();
   };
   let buckets = [];
   if (summaryById && summaryById.buckets) {
@@ -104,7 +104,7 @@ const WordCloud = ({
 
 export default compose(
   withTaxonomy,
-  withLookup,
+  // withLookup,
   withSearch,
   withSummary,
   withSummaryById

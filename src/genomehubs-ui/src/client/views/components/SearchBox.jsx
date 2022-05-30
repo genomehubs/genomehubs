@@ -46,9 +46,7 @@ const suggestedTerm = getSuggestedTerm();
 const SearchBox = ({
   lookupTerm,
   setLookupTerm,
-  resetLookup,
-  lookupTerms,
-  fetchLookup,
+  // resetLookup,
   fetchSearchResults,
   setSearchIndex,
   searchDefaults,
@@ -123,7 +121,7 @@ const SearchBox = ({
 
     setSearchIndex(result);
     dispatchSearch({ query: queryString, result, fields }, hashTerm);
-    resetLookup();
+    // resetLookup();
   };
 
   const handleSubmit = (e) => {
@@ -162,6 +160,8 @@ const SearchBox = ({
                   setMultiline={setMultiline}
                   handleSubmit={handleSubmit}
                   doSearch={doSearch}
+                  setResult={setResult}
+                  multipart={true}
                 />
               </FormControl>
             </Grid>

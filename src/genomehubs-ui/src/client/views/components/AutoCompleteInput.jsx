@@ -7,7 +7,7 @@ import { PlacedPopper } from "./SearchBox";
 import TextField from "@material-ui/core/TextField";
 import { compose } from "recompose";
 import styles from "./Styles.scss";
-import withLookup from "../hocs/withLookup";
+import withAutocomplete from "../hocs/withAutocomplete";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -21,16 +21,18 @@ export const AutoCompleteInput = ({
   inputLabel,
   multiline,
   setMultiline,
-  lookupTerms,
-  fetchLookup,
-  resetLookup,
+  autocompleteTerms,
+  fetchAutocomplete,
+  resetAutocomplete,
   handleSubmit = () => {},
   doSearch = () => {},
+  setResult = () => {},
   size = "medium",
   maxRows = 5,
   types,
   taxonomy,
   fixedType,
+  multipart,
 }) => {
   let [open, setOpen] = useState(false);
   let [prefix, setPrefix] = useState("");
@@ -44,19 +46,18 @@ export const AutoCompleteInput = ({
     inputRef = useRef(null);
   }
   const outerRef = useRef(null);
-  let inValue = inputValue;
-  if (!setInputValue) {
-    [inValue, setInputValue] = useState(inputValue);
-  }
-  // useEffect(() => {
+  // let inValue = inputValue;
+  // if (!setInputValue) {
+  const [inValue, setInValue] = useState(inputValue);
+  // }
   if (
-    lookupTerms.status &&
-    lookupTerms.status.success &&
-    lookupTerms.results &&
-    lookupTerms.results.length > 0
+    autocompleteTerms.status &&
+    autocompleteTerms.status.success &&
+    autocompleteTerms.results &&
+    autocompleteTerms.results.length > 0
   ) {
     terms = [];
-    lookupTerms.results.forEach((result, i) => {
+    autocompleteTerms.results.forEach((result, i) => {
       let value;
       if (result.result.type) {
         let display_value = result.result.name || result.result.key;
@@ -83,7 +84,7 @@ export const AutoCompleteInput = ({
           </div>
         );
       } else {
-        if (lookupTerms.status.result == "taxon") {
+        if (autocompleteTerms.status.result == "taxon") {
           if (result.reason) {
             value = result.reason[0].fields["taxon_names.name.raw"][0];
           } else {
@@ -117,7 +118,7 @@ export const AutoCompleteInput = ({
               >{`\u2014 ${result.result.taxon_rank}`}</div>
             </div>
           );
-        } else if (lookupTerms.status.result == "assembly") {
+        } else if (autocompleteTerms.status.result == "assembly") {
           if (result.reason) {
             value = result.reason[0].fields["identifiers.identifier.raw"][0];
           } else {
@@ -146,7 +147,7 @@ export const AutoCompleteInput = ({
               >{`\u2014 ${result.result.scientific_name}`}</div>
             </div>
           );
-        } else if (lookupTerms.status.result == "feature") {
+        } else if (autocompleteTerms.status.result == "feature") {
           if (result.reason) {
             value = result.reason[0].fields["identifiers.identifier.raw"][0];
           } else {
@@ -180,13 +181,13 @@ export const AutoCompleteInput = ({
     });
   }
   if (
-    lookupTerms.status &&
-    lookupTerms.status.success &&
-    lookupTerms.suggestions &&
-    lookupTerms.suggestions.length > 0 &&
+    autocompleteTerms.status &&
+    autocompleteTerms.status.success &&
+    autocompleteTerms.suggestions &&
+    autocompleteTerms.suggestions.length > 0 &&
     !/[\(\)<>=]/.test(inputValue)
   ) {
-    lookupTerms.suggestions.forEach((suggestion, i) => {
+    autocompleteTerms.suggestions.forEach((suggestion, i) => {
       let value = suggestion.suggestion.text;
       options.push({
         value,
@@ -227,7 +228,7 @@ export const AutoCompleteInput = ({
   };
 
   const updateTerm = (value, index, types) => {
-    setInputValue(value);
+    setInValue(value);
     clearTimeout(activeLookup);
     // let parts = value.split(/(\s{0,1}(?:<=|!=|>=|[\(\),!<=>]|and|AND)\s{0,1})/);
     let parts = value.split(/(\s(?:<=|!=|>=|<|=|>|and)\s|[\(\),!])/i);
@@ -289,9 +290,11 @@ export const AutoCompleteInput = ({
     setPrefix(newPrefix);
     setSuffix(newSuffix);
     setSubTerm(parts[section]);
+    console.log(parts);
+    console.log(parts[section]);
     setActiveLookup(
       setTimeout(() => {
-        fetchLookup({
+        fetchAutocomplete({
           lookupTerm: parts[section].replace(/^\s+/, ""),
           taxonomy,
           prefix,
@@ -338,6 +341,18 @@ export const AutoCompleteInput = ({
       }, 100);
     }
   };
+  const updateValue = (value) => {
+    if (multipart) {
+      return;
+    }
+    if (typeof value !== "string") {
+      return;
+    }
+    setInValue(value);
+    if (setInputValue) {
+      setInputValue(value);
+    }
+  };
   const handleChange = (e, newValue) => {
     if (newValue != inputValue) {
       if (!newValue.match(/[\r\n]/)) {
@@ -348,6 +363,9 @@ export const AutoCompleteInput = ({
         updateTerm(newValue, e.target.selectionStart, types);
         setOpen(true);
       }
+      if (e && e.key && e.key == "Enter") {
+        updateValue(newValue);
+      }
     }
   };
   const handleKeyPress = (e) => {
@@ -355,15 +373,27 @@ export const AutoCompleteInput = ({
       if (e.shiftKey) {
         e.preventDefault();
         setMultiline(true);
-        setInputValue(`${inputRef.current.value}\n`);
+        setInValue(`${inputRef.current.value}\n`);
       } else if (!multiline) {
         handleSubmit(e);
+        setInputValue(inputRef.current.value);
       }
+      resetAutocomplete();
     }
   };
+
   const handleKeyDown = (e, newValue, reason) => {
     if (reason == "clear") {
+      updateValue("");
       outerRef.current.blur();
+      resetAutocomplete();
+      return;
+    }
+    if (reason == "select-option") {
+      updateValue(newValue.title);
+      resetAutocomplete();
+      outerRef.current.blur();
+      return;
     }
     if (e.shiftKey) {
       handleKeyPress(e);
@@ -373,7 +403,11 @@ export const AutoCompleteInput = ({
       } else {
         setOpen(false);
         if (newValue.type || prefix || suffix) {
-          setInputValue(newValue.title);
+          setInValue(newValue.title);
+          // if (e.key === "Enter") {
+          //   console.log(newValue);
+          //   updateValue(newValue.title);
+          // }
         } else {
           setResult(newValue.result);
           doSearch(
@@ -384,9 +418,12 @@ export const AutoCompleteInput = ({
         }
       }
     } else {
-      resetLookup();
+      resetAutocomplete();
       setMultiline(false);
     }
+  };
+  const handleBlur = (e) => {
+    updateValue(e.target.value);
   };
   return (
     <Autocomplete
@@ -405,6 +442,7 @@ export const AutoCompleteInput = ({
       ref={outerRef}
       clearOnBlur={true}
       onChange={handleKeyDown}
+      onBlur={handleBlur}
       onClose={handlePopperClose}
       onInputChange={handleChange}
       onHighlightChange={handleHighlightChange}
@@ -436,5 +474,5 @@ export default compose(
   memo,
   withTaxonomy,
   withTypes,
-  withLookup
+  withAutocomplete
 )(AutoCompleteInput);

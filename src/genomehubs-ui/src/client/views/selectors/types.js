@@ -169,6 +169,15 @@ export const getAttributeTrie = createSelector(getTypesMap, (types) => {
   return trie;
 });
 
+export const getKeywordTrie = createSelector(getTypesMap, (types) => {
+  const trie = new TrieSearch("name", { splitOnRegEx: false });
+  let filteredTypes = Object.entries(types)
+    .filter(([key, obj]) => obj.type && obj.type == "keyword")
+    .reduce((r, [key, obj]) => ({ ...r, [key]: obj }), {});
+  trie.addFromObject(filteredTypes);
+  return trie;
+});
+
 export const getOperatorTrie = createSelector(getTypesMap, (types) => {
   const operators = [
     {
