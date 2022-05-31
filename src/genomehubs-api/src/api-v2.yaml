@@ -3,11 +3,11 @@ components:
   parameters:
     catParam:
       description: |
-          Query to provide category values.
-          
-          Can be any attribute listed at **/resultFields** or a valid taxonomic rank.
+        Query to provide category values.
 
-          The number of categories can be specified by placing a number in squere brackets, and a `+` sign may be used to include an `other` category for additional results (see examples).
+        Can be any attribute listed at **/resultFields** or a valid taxonomic rank.
+
+        The number of categories can be specified by placing a number in square brackets, and a `+` sign may be used to include an `other` category for additional results (see examples).
 
       # TODO: #160 Add an API endpoint to list valid taxonomic ranks
       examples:
@@ -30,9 +30,9 @@ components:
         type: string
     collapseMonotypicParam:
       description: |
-          Collapse monotypic tree nodes.
+        Collapse monotypic tree nodes.
 
-          This parameter only affects searches with `report=tree`.
+        This parameter only affects searches with `report=tree`.
       examples:
         false:
           value:
@@ -60,9 +60,9 @@ components:
       style: form
     excludeAncestralParam:
       description: |
-          List of attributes for which to exclude records with ancestrally derived estimated values from results.
+        List of attributes for which to exclude records with ancestrally derived estimated values from results.
 
-          A list of available attributes is available from **/resultFields**. This parameter only affects searches with `result=taxon`.
+        A list of available attributes is available from **/resultFields**. This parameter only affects searches with `result=taxon`.
       examples:
         none:
           value:
@@ -87,9 +87,9 @@ components:
       style: form
     excludeDescendantParam:
       description: |
-          List of attributes for which to exclude records with values estimated from descendant taxa from results.
+        List of attributes for which to exclude records with values estimated from descendant taxa from results.
 
-          A list of available attributes is available from **/resultFields**. This parameter only affects searches with `result=taxon`.
+        A list of available attributes is available from **/resultFields**. This parameter only affects searches with `result=taxon`.
       examples:
         none:
           value:
@@ -114,9 +114,9 @@ components:
       style: form
     excludeDirectParam:
       description: |
-          List of attributes for which to exclude records with directly estimated values from results.
+        List of attributes for which to exclude records with directly estimated values from results.
 
-          A list of available attributes is available from **/resultFields**. This parameter only affects searches with `result=taxon`.
+        A list of available attributes is available from **/resultFields**. This parameter only affects searches with `result=taxon`.
       examples:
         none:
           value:
@@ -141,9 +141,9 @@ components:
       style: form
     excludeMissingParam:
       description: |
-          List of attributes for which to exclude records with missing values from results.
+        List of attributes for which to exclude records with missing values from results.
 
-          A list of available attributes is available from **/resultFields**.
+        A list of available attributes is available from **/resultFields**.
       examples:
         none:
           value:
@@ -168,9 +168,9 @@ components:
       style: form
     fieldsParam:
       description: |
-          Comma separated list of attribute fields to return.
+        Comma separated list of attribute fields to return.
 
-          The list of fields selected can affect the result count if `includeEstimates=false`
+        The list of fields selected can affect the result count if `includeEstimates=false`
       examples:
         null:
           value:
@@ -182,7 +182,7 @@ components:
           value: none
           summary: no attribute fields
         assembly_attributes:
-          value: assembly_level,assembly_span
+          value: assembly_level,assembly_span,bioproject
           summary: assembly_level, assembly_span and bioproject
       in: query
       name: fields
@@ -191,7 +191,7 @@ components:
         type: string
     filenameParam:
       description: |
-          Specify a filename when downloading a file
+        Specify a filename when downloading a file
       in: query
       name: filename
       schema:
@@ -199,7 +199,7 @@ components:
     gramSizeParam:
       deprecated: true
       description: |
-          Size of N-grams used by tokeniser
+        Size of N-grams used by tokeniser
       explode: false
       in: query
       name: gramSize
@@ -212,9 +212,9 @@ components:
       style: form
     includeEstimatesParam:
       description: |
-          Flag to indicate whether search results should include records for which all attribute fields are based on estimated values.
+        Flag to indicate whether search results should include records for which all attribute fields are based on estimated values.
 
-          Default `false` requires at least one of the returned fields to have a directly assigned value. This parameter only affects searches with `result=taxon`.
+        Default `false` requires at least one of the returned fields to have a directly assigned value. This parameter only affects searches with `result=taxon`.
       examples:
         false:
           value:
@@ -228,9 +228,9 @@ components:
         type: boolean
     includeRawValuesParam:
       description: |
-          Include raw values in search results.
+        Include raw values in search results.
 
-          This parameter only applies to searches with `result=taxon`.
+        This parameter only applies to searches with `result=taxon`.
       examples:
         false:
           value:
@@ -286,7 +286,7 @@ components:
     maxErrorsParam:
       deprecated: true
       description: |
-          Maximumum error percentage when matching terms
+        Maximumum error percentage when matching terms
       explode: false
       in: query
       name: maxErrors
@@ -299,7 +299,7 @@ components:
       style: form
     namesParam:
       description: |
-          Comma separated list of taxon name classes to return
+        Comma separated list of taxon name classes to return
       examples:
         null:
           value:
@@ -314,7 +314,7 @@ components:
         type: string
     offsetParam:
       description: |
-          Offset when returning a page of results
+        Offset when returning a page of results
       examples:
         zero:
           value:
@@ -337,7 +337,7 @@ components:
     postTagParam:
       deprecated: true
       description: |
-          Tag to place after matching portion of query term
+        Tag to place after matching portion of query term
       explode: false
       in: query
       name: postTag
@@ -348,7 +348,7 @@ components:
     preTagParam:
       deprecated: true
       description: |
-          Tag to place before matching portion of query term
+        Tag to place before matching portion of query term
       explode: false
       in: query
       name: preTag
@@ -365,7 +365,7 @@ components:
     #     type: boolean
     previewParam:
       description: |
-          Return a preview in place of the full file, e.g. an image thumbnail.
+        Return a preview in place of the full file, e.g. an image thumbnail.
       examples:
         false:
           value:
@@ -379,9 +379,9 @@ components:
         type: boolean
     queryIdParam:
       description: |
-          User specified query ID.
+        User specified query ID.
 
-          If provided for a query or report that returns over 1000 results, the **/progress** endpoint may be used to track query progress.
+        If provided for a query or report that returns over 1000 results, the **/progress** endpoint may be used to track query progress.
       examples:
         null:
           value:
@@ -395,12 +395,12 @@ components:
         type: string
     queryParam:
       description: |
-          A search query string using taxonomic and attribute filters.
+        A search query string using taxonomic and attribute filters.
 
-          A list of available attributes is available from **/resultFields**.
+        A list of available attributes is available from **/resultFields**.
 
       # TODO: #157 create an API endpoint to describe available values and valid operators
-      examples: 
+      examples:
         taxon:
           value: tax_tree(Chiroptera) AND assembly_level >= scaffold
           summary: Chiroptera with scaffold-level or better assemblies
@@ -414,9 +414,9 @@ components:
         type: string
     rankParam:
       description: |
-          Taxonomic to report values formats.
+        Taxonomic to report values formats.
 
-          Used by histogram, scatter and xInY reports when `result=` `taxon` or `assembly`.
+        Used by histogram, scatter and xInY reports when `result=` `taxon` or `assembly`.
       examples:
         null:
           value:
@@ -434,7 +434,7 @@ components:
         type: string
     ranksParam:
       description: |
-          Comma separated list of ancestral ranks to return
+        Comma separated list of ancestral ranks to return
       examples:
         null:
           value:
@@ -449,9 +449,8 @@ components:
         type: string
     recordIdParam:
       description: |
-          Unique record identifier.
-
-          May be optionally be prefixed with the index name.
+        Unique record identifier.
+      # May be optionally be prefixed with the index name.
       examples:
         canis_lupus:
           value: "9612"
@@ -466,11 +465,10 @@ components:
       schema:
         items:
           type: string
-        type: array
       style: form
     releaseParam:
       description: |
-          **Not in use:** GenomeHub release number
+        **Not in use:** GenomeHub release number
       in: query
       name: release
       required: false
@@ -480,7 +478,7 @@ components:
         type: string
     reportParam:
       description: |
-          Type of report to generate
+        Type of report to generate
       in: query
       name: report
       required: true
@@ -496,7 +494,7 @@ components:
         type: string
     resultParam:
       description: |
-          The result type (index) to search against
+        The result type (index) to search against
       examples:
         analysis:
           value: analysis
@@ -515,7 +513,7 @@ components:
           summary: Search against the taxon index
         multi:
           value: multi
-          summary: Search across all inidces (/lookup endpoint only)
+          summary: Search across all indices (/lookup endpoint only)
       in: query
       name: result
       required: true
@@ -531,9 +529,9 @@ components:
         type: string
     scatterThresholdParam:
       description: |
-          Maximum number of results to return as points when `report=scatter`.
+        Maximum number of results to return as points when `report=scatter`.
 
-          If a query returns more results the values will be binned as a 2-dimensional histogram/heatmap.
+        If a query returns more results the values will be binned as a 2-dimensional histogram/heatmap.
       examples:
         null:
           value:
@@ -557,9 +555,9 @@ components:
       style: form
     searchRawValuesParam:
       description: |
-          Flag to indicate whether search filters should be applied to raw values.
+        Flag to indicate whether search filters should be applied to raw values.
 
-          Default `false` applies filters to aggregated values. This parameter only affects searches with `result=taxon`.
+        Default `false` applies filters to aggregated values. This parameter only affects searches with `result=taxon`.
       examples:
         false:
           value:
@@ -573,9 +571,9 @@ components:
         type: boolean
     searchTermParam:
       description: |
-          Term to identify matching record IDs for.
+        Term to identify matching record IDs for.
 
-          May be a complete or partial, exact or fuzzy match to any record ID, name, synonym or identifier
+        May be a complete or partial, exact or fuzzy match to any record ID, name, synonym or identifier
       examples:
         canis_lupus:
           value: Canis lupus
@@ -593,7 +591,7 @@ components:
         type: string
     sizeParam:
       description: |
-          Maximum number of results to return
+        Maximum number of results to return
       examples:
         zero:
           value: 0
@@ -616,7 +614,7 @@ components:
       style: form
     sortByParam:
       description: |
-          Field name to sort results by
+        Field name to sort results by
       examples:
         null:
           value:
@@ -634,7 +632,7 @@ components:
         type: string
     sortModeParam:
       description: |
-          Method to summarise multiple values for sorting fields with lists of values
+        Method to summarise multiple values for sorting fields with lists of values
       examples:
         null:
           value:
@@ -667,9 +665,9 @@ components:
         type: string
     sortOrderParam:
       description: |
-          Sort order to use when returning results.
+        Sort order to use when returning results.
 
-          Only applicable when `sortBy` is defined.
+        Only applicable when `sortBy` is defined.
       examples:
         null:
           value:
@@ -690,7 +688,7 @@ components:
         type: string
     streamFileParam:
       description: |
-          Stream a file instead of downloading
+        Stream a file instead of downloading
       examples:
         false:
           value:
@@ -714,7 +712,7 @@ components:
       style: form
     suggestSizeParam:
       description: |
-          Number of similar terms to suggest for a fuzzy match
+        Number of similar terms to suggest for a fuzzy match
       examples:
         one:
           value: 1
@@ -751,9 +749,9 @@ components:
       style: form
     summaryValuesParam:
       description: |
-          Summary values to return.
+        Summary values to return.
 
-          Available values vary according to attribute type. This parameter only applies to searches with `result=taxon`.
+        Available values vary according to attribute type. This parameter only applies to searches with `result=taxon`.
       examples:
         null:
           value:
@@ -786,9 +784,9 @@ components:
       style: form
     taxonomyParam:
       description: |
-          The backbone taxonomy to search against.
+        The backbone taxonomy to search against.
 
-          A list of available taxonomies is available from **/taxonomies**.
+        A list of available taxonomies is available from **/taxonomies**.
       examples:
         ncbi:
           value: ncbi
@@ -800,9 +798,9 @@ components:
         type: string
     tidyDataParam:
       description: |
-          Format delimited text output as Tidy Data.
+        Format delimited text output as Tidy Data.
 
-          This parameter only applies to CSV and TSV response formats.
+        This parameter only applies to CSV and TSV response formats. To try it out, in the **Responses** section below, change _Media type_ to _text/csv_ or _text/tab-separated-values_.
       examples:
         false:
           value:
@@ -816,9 +814,9 @@ components:
         type: boolean
     treeThresholdParam:
       description: |
-          Maximum number of results to return when `report=tree`.
+        Maximum number of results to return when `report=tree`.
 
-          If a query returns more results a warning is given to increase this threshold.
+        If a query returns more results a warning is given to increase this threshold.
       examples:
         null:
           value:
@@ -839,17 +837,17 @@ components:
       style: form
     xOptsParam:
       description: |
-          *x*-axis options.
+        *x*-axis options.
 
-          A comma or semicolon separated string of options in the order:
+        A comma or semicolon separated string of options in the order:
 
-          1. minimum value
-          2. maximum value
-          3. tick count
-          4. scale
-          5. axis title
+        1. minimum value
+        2. maximum value
+        3. tick count
+        4. scale
+        5. axis title
 
-          For category axes, the minimum value can be a comma separated list to define the category order, in which case semicolons must be used as the primary separator. Tick count may be used to specify the number of categories and a `+` sign to indicate that an `other` category should be included.
+        For category axes, the minimum value can be a comma separated list to define the category order, in which case semicolons must be used as the primary separator. Tick count may be used to specify the number of categories and a `+` sign to indicate that an `other` category should be included.
       examples:
         null:
           value:
@@ -870,10 +868,10 @@ components:
         type: string
     xParam:
       description: |
-          Query to provide *x* values.
-          
-          This should be a full query as used in the `query` field of **/search** and can be modified by search options such as `includeEstimates` and `exclude*`. For reports without an *x*-axis, this is the primary query.
-      examples: 
+        Query to provide *x* values.
+
+        This should be a full query as used in the `query` field of **/search** and can be modified by search options such as `includeEstimates` and `exclude*`. For reports without an *x*-axis, this is the primary query.
+      examples:
         taxon:
           value: tax_tree(Chiroptera) AND assembly_level >= scaffold
           summary: Chiroptera with scaffold-level or better assemblies
@@ -887,9 +885,9 @@ components:
         type: string
     yOptsParam:
       description: |
-          *y*-axis options.
+        *y*-axis options.
 
-          A comma or semicolon separated string of options as described for `xOpts`.
+        A comma or semicolon separated string of options as described for `xOpts`.
       examples:
         null:
           value:
@@ -910,9 +908,9 @@ components:
         type: string
     yParam:
       description: |
-          Query to provide *y* values.
-          
-          Values added here will be combined with the value in `x` to generate the full query. For reports without an *y*-axis, this is the secondary query, except for `xInY` reports where this should be a full query.
+        Query to provide *y* values.
+
+        Values added here will be combined with the value in `x` to generate the full query. For reports without an *y*-axis, this is the secondary query, except for `xInY` reports where this should be a full query.
       examples:
         assembly_span:
           value: assembly_span>1000000000
@@ -924,7 +922,7 @@ components:
         type: string
     zParam:
       description: |
-          **Not in use:** Query to provide *z* values
+        **Not in use:** Query to provide *z* values
       in: query
       name: z
       required: false
@@ -1023,9 +1021,9 @@ info:
     name: GoaT
     url: https://goat.genomehubs.org
   description: |
-      Genomes on a Tree Application Programming Interface (GoaT API).
+    Genomes on a Tree Application Programming Interface (GoaT API).
 
-      Provides a low-level API to retrieve records, lookup, search and generate reports across all taxon and assembly data in GoaT.
+    Provides a low-level API to retrieve records, lookup, search and generate reports across all taxon and assembly data in GoaT.
   license:
     name: MIT License
     url: https://github.com/genomehubs/genomehubs/blob/main/LICENSE
@@ -1036,9 +1034,9 @@ paths:
   /count:
     get:
       description: |
-          Fetch the record count for a search query without including any of the results. 
-          
-          **/count** supports all relevant **/search** parameters to allow a record count to be obtained for a query prior to a full search.
+        Fetch the record count for a search query without including any of the results.
+
+        **/count** supports all relevant **/search** parameters to allow a record count to be obtained for a query prior to a full search.
       operationId: getSearchResultCount
       parameters:
         - $ref: "#/components/parameters/queryParam"
@@ -1106,9 +1104,9 @@ paths:
   /lookup:
     get:
       description: |
-          Find record IDs matching a search term based on full or partial matches to a record ID, name, snyonym or other identifier.
+        Find record IDs matching a search term based on full or partial matches to a record ID, name, snyonym or other identifier.
 
-          If no exact matches are found, suggestions my be returned based on fuzzy matches.
+        If no exact matches are found, suggestions my be returned based on fuzzy matches.
       operationId: getIdentifiers
       parameters:
         - $ref: "#/components/parameters/searchTermParam"
@@ -1199,20 +1197,20 @@ paths:
   /report:
     get:
       description: |
-          Generate reports based on search queries. 
-          
-          General parameters `result`, `report` and `taxonomy` are required for all reports. Additional required and optional parameters vary according to report type:
+        Generate reports based on search queries. 
 
-          | Report        | Required          | Optional       |
-          | ------------- | ----------------- | -------------- |
-          | **Histogram** | `x`, `rank`       | `cat`, `xOpts` |
-          | **Scatter**   | `x`, `y`, `rank`  | `cat`, `xOpts`, `yOpts`, `scatterThreshold` |
-          | **Sources**   | -                 | -              |
-          | **Tree**      | `x`               | `y`, `cat`, `xOpts`, `yOpts`, `collapseMonotypic`, `treeThreshold` |
-          | **xInY**      | `x`, `rank`       | `y`            |
-          | **xPerRank**  | `x`               | `ranks`        |
+        General parameters `result`, `report` and `taxonomy` are required for all reports. Additional required and optional parameters vary according to report type:
 
-          Search related parameters `fields`, `includeEstimates`, `exclude*` and `queryId` are optional for all reports (except `sources` where they have no effect).
+        | Report        | Required          | Optional       |
+        | ------------- | ----------------- | -------------- |
+        | **Histogram** | `x`, `rank`       | `cat`, `xOpts` |
+        | **Scatter**   | `x`, `y`, `rank`  | `cat`, `xOpts`, `yOpts`, `scatterThreshold` |
+        | **Sources**   | -                 | -              |
+        | **Tree**      | `x`               | `y`, `cat`, `xOpts`, `yOpts`, `collapseMonotypic`, `treeThreshold` |
+        | **xInY**      | `x`, `rank`       | `y`            |
+        | **xPerRank**  | `x`               | `ranks`        |
+
+        Search related parameters `fields`, `includeEstimates`, `exclude*` and `queryId` are optional for all reports (except `sources` where they have no effect).
       operationId: getReport
       parameters:
         - $ref: "#/components/parameters/resultParam"
