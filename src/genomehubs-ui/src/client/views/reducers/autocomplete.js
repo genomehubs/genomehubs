@@ -84,7 +84,11 @@ export function fetchAutocomplete({
           results: [
             ...terms.map((obj) => ({
               id: obj.key || obj.name,
-              result: { ...obj, group, type: "operator" },
+              result: {
+                ...obj,
+                group,
+                type: lastType.operator ? "value" : "operator",
+              },
             })),
           ],
         })

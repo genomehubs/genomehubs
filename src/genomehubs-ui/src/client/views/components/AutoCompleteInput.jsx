@@ -69,6 +69,7 @@ export const AutoCompleteInput = ({
         options.push({
           value,
           display_value,
+          description: result.result.description,
           name: result.result.display_name,
           type: result.result.type,
           title: `${prefix}${value}${suffix}`,
@@ -327,7 +328,7 @@ export const AutoCompleteInput = ({
         } catch (err) {
           // Ignore
         }
-      }, 100);
+      }, 20);
       setTimeout(() => {
         try {
           let end = inputRef.current.selectionEnd;
@@ -337,7 +338,7 @@ export const AutoCompleteInput = ({
         } catch (err) {
           // Ignore
         }
-      }, 1000);
+      }, 750);
     }
   };
   const handleHighlightChange = (e, option, reason) => {
@@ -345,7 +346,7 @@ export const AutoCompleteInput = ({
       let range = highlightRange(option.title);
       setTimeout(() => {
         inputRef.current.setSelectionRange(...range);
-      }, 100);
+      }, 20);
     }
   };
   const updateValue = (value) => {

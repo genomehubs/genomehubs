@@ -8,6 +8,7 @@ import LooksOneIcon from "@material-ui/icons/LooksOne";
 import React from "react";
 import SearchIcon from "@material-ui/icons/Search";
 import TodayIcon from "@material-ui/icons/Today";
+import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import { useStyles } from "./SearchBox";
 
@@ -82,20 +83,25 @@ export const AutoCompleteOption = ({ option }) => {
     );
   }
 
+  let item = (
+    <Grid item xs>
+      <div>{primaryText}</div>
+      <span style={{ float: "right" }}>
+        <Typography variant="body2" color="textSecondary">
+          {(option.name_class && option.taxon_id) ||
+            option.assembly_id ||
+            option.description ||
+            option.name}
+        </Typography>
+      </span>
+      {secondaryText}
+    </Grid>
+  );
+
   return (
     <Grid container alignItems="center">
       <Grid item>{optionIcon}</Grid>
-      <Grid item xs>
-        <div>{primaryText}</div>
-        <span style={{ float: "right" }}>
-          <Typography variant="body2" color="textSecondary">
-            {(option.name_class && option.taxon_id) ||
-              option.assembly_id ||
-              option.name}
-          </Typography>
-        </span>
-        {secondaryText}
-      </Grid>
+      {item}
     </Grid>
   );
 };
