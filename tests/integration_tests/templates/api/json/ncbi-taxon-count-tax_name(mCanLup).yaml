@@ -1,0 +1,8 @@
+description: |
+  Check one result is returned when searching by ToLID Prefix
+endpoint: count
+querystring: query=tax_tree%28mCanLup%29&result=taxon&includeEstimates=false&summaryValues=count&taxonomy=ncbi
+assert:
+  status:
+    success: true
+  count: 1

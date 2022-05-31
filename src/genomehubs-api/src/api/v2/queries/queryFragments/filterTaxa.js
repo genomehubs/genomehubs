@@ -42,12 +42,12 @@ export const filterTaxa = ({
                   },
                 },
               ];
-            } else {
-              must_not = {
-                exists: {
-                  field: "taxon_names.source",
-                },
-              };
+              // } else {
+              //   must_not = {
+              //     exists: {
+              //       field: "taxon_names.source",
+              //     },
+              //   };
             }
             if (term && term > "*") {
               if (term.match(/\*/)) {
