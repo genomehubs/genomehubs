@@ -305,7 +305,12 @@ export const AutoCompleteInput = ({
         fetchAutocomplete({
           lookupTerm: parts[section].replace(/^\s+/, ""),
           taxonomy,
-          result: lastType?.type == "taxon" ? "taxon" : "assembly",
+          result:
+            lastType?.type == "taxon"
+              ? "taxon"
+              : newPrefix
+              ? result
+              : undefined,
           lastType: fixedType || lastType,
         });
       }, 200)
