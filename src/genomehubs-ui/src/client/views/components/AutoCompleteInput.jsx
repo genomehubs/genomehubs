@@ -26,7 +26,6 @@ export const AutoCompleteInput = ({
   resetAutocomplete,
   handleSubmit = () => {},
   doSearch = () => {},
-  setResult = () => {},
   size = "medium",
   maxRows = 5,
   types,
@@ -306,7 +305,12 @@ export const AutoCompleteInput = ({
         fetchAutocomplete({
           lookupTerm: parts[section].replace(/^\s+/, ""),
           taxonomy,
-          result,
+          result:
+            lastType?.type == "taxon"
+              ? "taxon"
+              : newPrefix
+              ? result
+              : undefined,
           lastType: fixedType || lastType,
         });
       }, 200)
@@ -422,10 +426,9 @@ export const AutoCompleteInput = ({
           //   updateValue(newValue.title);
           // }
         } else {
-          setResult(newValue.result);
           doSearch(
             newValue.unique_term || e.target.value,
-            newValue.result || "taxon",
+            newValue.result || result || "taxon",
             newValue.title || e.target.value
           );
         }

@@ -161,7 +161,7 @@ const SearchBox = ({
                   setMultiline={setMultiline}
                   handleSubmit={handleSubmit}
                   doSearch={doSearch}
-                  setResult={setResult}
+                  result={result}
                   multipart={true}
                 />
               </FormControl>
