@@ -12,6 +12,10 @@ assert:
         parent: "9611"
         taxon_rank: species
         attributes:
+          insdc_open:
+            value:
+              - DTOL
+              - VGP
           sequencing_status_dtol:
             values:
               - value: insdc_open
