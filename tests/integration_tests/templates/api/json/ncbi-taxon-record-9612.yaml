@@ -15,10 +15,6 @@ assert:
           sequencing_status_dtol:
             values:
               - value: insdc_open
-          insdc_open:
-            value:
-              - DTOL
-              - VGP
           assembly_level:
             aggregation_source: direct
             has_descendants: true
