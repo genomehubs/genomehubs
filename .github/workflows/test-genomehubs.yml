@@ -90,10 +90,6 @@ jobs:
           genomehubs index \
               --config-file tests/integration_tests/config/config.yaml \
               --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/assembly-data-taxon
-          genomehubs index \
-              --config-file tests/integration_tests/config/config.yaml \
-              --taxonomy-source ncbi \
               --taxon-dir tests/integration_tests/data/ott3.3
           genomehubs index \
               --config-file tests/integration_tests/config/config.yaml \
@@ -129,6 +125,10 @@ jobs:
               --taxon-dir tests/integration_tests/data/status_lists \
               --taxon-lookup any \
               --taxon-spellcheck
+          genomehubs index \
+              --config-file tests/integration_tests/config/config.yaml \
+              --taxonomy-source ncbi \
+              --taxon-dir tests/integration_tests/data/assembly-data-taxon
       - name: Run genomehubs fill
         run: |
           genomehubs fill \
