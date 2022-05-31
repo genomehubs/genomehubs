@@ -63,7 +63,7 @@ attributes:
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
     type: keyword
-  bioproject_accession:
+  bioproject:
     constraint:
       len: 32
     display_group: misc
@@ -74,7 +74,7 @@ attributes:
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
     synonyms:
-      - bioproject
+      - bioproject_accession
     taxon_display_group: assembly
     taxon_display_level: 2
     taxon_display_name: Bioproject
@@ -85,7 +85,7 @@ attributes:
     taxon_traverse: list
     taxon_traverse_direction: up
     type: keyword
-  biosample_accession:
+  biosample:
     constraint:
       len: 32
     display_group: misc
@@ -96,7 +96,7 @@ attributes:
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
     synonyms:
-      - biosample
+      - biosample_accession
     taxon_display_group: assembly
     taxon_display_level: 2
     taxon_display_name: Biosample
