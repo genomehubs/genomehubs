@@ -16,9 +16,9 @@ assert:
             values:
               - value: insdc_open
           insdc_open:
-            values:
-              - value: VGP
-              - value: DTOL
+            value:
+              - DTOL
+              - VGP
           assembly_level:
             aggregation_source: direct
             has_descendants: true
