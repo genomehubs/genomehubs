@@ -1,0 +1,98 @@
+attributes:
+  sequencing_status:
+    display_group: sequencing_status
+    header: assemblyLevel
+    translate:
+      contig: insdc_open
+      scaffold: insdc_open
+      chromosome: insdc_open
+      complete: insdc_open
+  insdc_open:
+    display_group: sequencing_status
+    header: bioProjectAccession
+    separator:
+      - ;
+    translate:
+      PRJNA533106: EBP
+      PRJEB43743: ASG
+      PRJNA545868: B10K
+      PRJEB49670: CBP
+      PRJEB40665: DTOL
+      PRJNA712951: ENDEMIXIT
+      PRJEB47820: ERGA
+      PRJNA393850: EUROFISH
+      PRJNA758215: METAINVERT
+      PRJNA707598: SQUALOMIX
+      PRJNA489243: VGP
+  sequencing_status_vgp:
+    display_group: sequencing_status
+    constraint:
+      enum:
+        - insdc_open
+        - in_progress
+        - sample_acquired
+        - sample_collected
+    header: bioProjectAccession
+    separator:
+      - ;
+    translate:
+      PRJNA489243: insdc_open
+  sequencing_status_dtol:
+    display_group: sequencing_status
+    constraint:
+      enum:
+        - insdc_open
+        - in_progress
+        - sample_acquired
+        - sample_collected
+    header: bioProjectAccession
+    separator:
+      - ;
+    translate:
+      PRJEB40665: insdc_open
+file:
+  format: tsv
+  header: true
+  name: ncbi_datasets_eukaryota.tsv.gz
+  organelle: nucleus
+  source: INSDC
+  source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+identifiers:
+  assembly_id:
+    constraint:
+      len: 32
+    header: genbankAssmAccession
+    type: keyword
+  assembly_name:
+    constraint:
+      len: 64
+    header: assemblyName
+    type: keyword
+  genbank_accession:
+    constraint:
+      len: 32
+    header: genbankAssmAccession
+    type: keyword
+  refseq_accession:
+    constraint:
+      len: 32
+    header: refseqAssmAccession
+    type: keyword
+  wgs_accession:
+    constraint:
+      len: 16
+    header: wgsProjectAccession
+    type: keyword
+metadata:
+  is_primary_value:
+    header: primaryValue
+  source_slug:
+    header: genbankAssmAccession
+names:
+  common_name:
+    header: commonName
+taxonomy:
+  taxon:
+    header: organismName
+  taxon_id:
+    header: taxId
