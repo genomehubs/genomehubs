@@ -54,7 +54,8 @@ const fetchTypes = async ({ result, taxonomy, hub, release, indexType }) => {
     });
   }
   if (result != "multi") {
-    return { typesMap: typesMap[result], synonyms: synonyms[result] };
+    console.log(synonyms);
+    return { typesMap: typesMap[result], synonyms: synonyms[result] || {} };
   }
   return { typesMap, synonyms };
 };
@@ -65,7 +66,7 @@ export const attrTypes = async ({
   indexType = "attributes",
   taxonomy = config.taxonomy,
 }) => {
-  const { typesMap, synonyms } = await fetchTypes({
+  const { typesMap = {}, synonyms = {} } = await fetchTypes({
     result,
     taxonomy,
     hub: config.hub,
