@@ -33,7 +33,7 @@ const rankSettings = {
   prop: "rank",
   label: "family",
   required: true,
-  except: ["feature"],
+  except: ["feature", "assembly"],
 };
 const catSettings = { prop: "cat", label: "assembly_level" };
 
@@ -147,12 +147,15 @@ export const ReportEdit = ({
     return null;
   }
 
-  const handleChange = (e, queryProp) => {
-    let value = "";
-    if (e && e.preventDefault) {
+  const handleChange = (e, queryProp, value) => {
+    if (value) {
+      // use given value
+    } else if (e && e.preventDefault) {
       e.preventDefault();
       e.stopPropagation();
       value = e.target.value;
+    } else {
+      value = "";
     }
     setValues({ ...values, [queryProp]: value });
   };
@@ -379,10 +382,10 @@ export const ReportEdit = ({
             inputValue={values[queryProp]}
             setInputValue={(value) => setInputValue(value, queryProp)}
             inputLabel={label}
-            inputRef={refs[queryProp]}
+            inputRef={false}
             multiline={false}
             setMultiline={() => {}}
-            handleSubmit={(e) => handleChange(e, queryProp)}
+            handleSubmit={(e, { value }) => handleChange(e, queryProp, value)}
             size={"small"}
             multipart={queryProp == "x"}
             maxRows={queryProp == "x" ? 5 : 1}

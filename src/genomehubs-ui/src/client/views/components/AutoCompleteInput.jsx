@@ -326,18 +326,19 @@ export const AutoCompleteInput = ({
   const handlePopperClose = (e, reason) => {
     if (e) {
       let range = highlightRange();
+      let current = inputRef.current;
       setTimeout(() => {
         try {
-          inputRef.current.setSelectionRange(...range);
+          current.setSelectionRange(...range);
         } catch (err) {
           // Ignore
         }
       }, 20);
       setTimeout(() => {
         try {
-          let end = inputRef.current.selectionEnd;
-          if (end > inputRef.current.selectionStart) {
-            inputRef.current.setSelectionRange(end, end);
+          let end = current.selectionEnd;
+          if (end > current.selectionStart) {
+            current.setSelectionRange(end, end);
           }
         } catch (err) {
           // Ignore
@@ -403,12 +404,15 @@ export const AutoCompleteInput = ({
     }
     if (reason == "select-option") {
       updateValue(newValue.title);
+      // setTimeout(() => {
       resetAutocomplete();
       if (multipart) {
         setInValue(newValue.title);
       } else {
         handleSubmit(e, { id, value: newValue.title });
       }
+      // }, 2000);
+
       outerRef.current.blur();
       return;
     }
