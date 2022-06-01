@@ -189,6 +189,21 @@ components:
       required: false
       schema:
         type: string
+    fieldsParamSummary:
+      description: |
+        Attribute field to summarise.
+      examples:
+        c_value:
+          value: c_value
+          summary: 1C value
+        long_list:
+          value: long_list
+          summary: Sequencing project long list
+      in: query
+      name: fields
+      required: true
+      schema:
+        type: string
     filenameParam:
       description: |
         Specify a filename when downloading a file
@@ -458,6 +473,25 @@ components:
         GCA_905319855-2:
           value: GCA_905319855.2
           summary: Assembly record ID for Canis lupus assembly GCA_905319855.2
+      explode: false
+      in: query
+      name: recordId
+      required: true
+      schema:
+        items:
+          type: string
+      style: form
+    recordIdParamDownload:
+      description: |
+        Unique record identifier.
+      # May be optionally be prefixed with the index name.
+      examples:
+        snail_plot:
+          value: 13c8b378f620c197b90443feee45c8f2
+          summary: A snail plot file ID
+        blob_plot:
+          value: f7a6cc9cd00e76f8d3af8c7a9a0ba09f
+          summary: A blob plot file ID
       explode: false
       in: query
       name: recordId
@@ -1073,7 +1107,7 @@ paths:
       description: Returns indexed files
       operationId: getFile
       parameters:
-        - $ref: "#/components/parameters/recordIdParam"
+        - $ref: "#/components/parameters/recordIdParamDownload"
         - $ref: "#/components/parameters/filenameParam"
         - $ref: "#/components/parameters/previewParam"
         - $ref: "#/components/parameters/streamFileParam"
@@ -1352,7 +1386,7 @@ paths:
         - $ref: "#/components/parameters/recordIdParam"
         - $ref: "#/components/parameters/summaryParam"
         - $ref: "#/components/parameters/resultParam"
-        - $ref: "#/components/parameters/fieldsParam"
+        - $ref: "#/components/parameters/fieldsParamSummary"
         - $ref: "#/components/parameters/taxonomyParam"
         - $ref: "#/components/parameters/releaseParam"
         - $ref: "#/components/parameters/indentParam"
