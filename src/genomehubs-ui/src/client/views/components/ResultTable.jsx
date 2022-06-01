@@ -1,18 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
+import AttributeModal from "./AttributeModal";
 import Box from "@material-ui/core/TableContainer";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import Checkbox from "@material-ui/core/Checkbox";
+import DialogContent from "@material-ui/core/DialogContent";
 import DownloadButton from "./DownloadButton";
 import Grid from "@material-ui/core/Grid";
 import Grow from "@material-ui/core/Grow";
 import IconButton from "@material-ui/core/IconButton";
 import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
 import LinkButton from "./LinkButton";
+import Modal from "@material-ui/core/Modal";
 import MuiTableCell from "@material-ui/core/TableCell";
 import ReportError from "./ReportError";
 import SearchPagination from "./SearchPagination";
@@ -66,6 +69,23 @@ const useStyles = makeStyles((theme) => ({
     top: 20,
     width: 1,
   },
+  modal: {
+    display: "flex",
+    padding: theme.spacing(1),
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  paper: {
+    width: 400,
+    maxWidth: "75vw",
+    maxHeight: "75vh",
+    backgroundColor: theme.palette.background.paper,
+    border: "2px solid #000",
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+    cursor: "default",
+    outline: 0,
+  },
 }));
 
 const TableCell = withStyles((theme) => ({
@@ -73,6 +93,37 @@ const TableCell = withStyles((theme) => ({
     padding: "1px 6px",
   },
 }))(MuiTableCell);
+
+const ModalControl = ({
+  currentRecordId,
+  attributeId,
+  showAttribute,
+  setShowAttribute,
+  rootRef,
+}) => {
+  const classes = useStyles();
+  return (
+    <Modal
+      open={showAttribute}
+      onClose={(event, reason) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setShowAttribute(false);
+      }}
+      aria-labelledby="search-options-modal-title"
+      aria-describedby="search-options-modal-description"
+      className={classes.modal}
+      container={() => rootRef.current}
+    >
+      <DialogContent className={classes.paper}>
+        <AttributeModal
+          attributeId={attributeId}
+          currentRecordId={currentRecordId}
+        />
+      </DialogContent>
+    </Modal>
+  );
+};
 
 const StyledCheckbox = ({ color, ...props }) => {
   return (
@@ -255,6 +306,10 @@ const ResultTable = ({
   setPreferSearchTerm,
   taxonomy,
 }) => {
+  const [showAttribute, setShowAttribute] = useState(false);
+  const [attribute, setAttribute] = useState(null);
+  const [recordId, setRecordId] = useState(null);
+  const rootRef = useRef(null);
   if (!searchResults.status || !searchResults.status.hasOwnProperty("hits")) {
     if (searchResults && searchResults.status.error) {
       return (
@@ -420,6 +475,7 @@ const ResultTable = ({
   };
   let rows = searchResults.results.map((result) => {
     let name = result.result.scientific_name;
+    let currentRecordId = result.result.taxon_id;
     if (
       result.result.taxon_rank == "species" ||
       result.result.taxon_rank == "subspecies"
@@ -476,6 +532,7 @@ const ResultTable = ({
       }
     });
     if (searchIndex == "assembly") {
+      currentRecordId = result.result.assembly_id;
       cells.push(
         <Tooltip title={"Click to view record"} arrow key={"assembly_id"}>
           <TableCell
@@ -488,6 +545,7 @@ const ResultTable = ({
       );
     }
     if (searchIndex == "feature") {
+      currentRecordId = result.result.feature_id;
       cells = [];
       cells.push(
         <Tooltip title={"Click to view assembly"} arrow key={"assembly_id"}>
@@ -542,6 +600,13 @@ const ResultTable = ({
                 wrap="nowrap"
                 spacing={1}
                 alignItems={"center"}
+                ref={rootRef}
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setShowAttribute(true);
+                  setAttribute(type.name);
+                  setRecordId(currentRecordId);
+                }}
               >
                 {field.aggregation_source && (
                   <Grid item>
@@ -696,6 +761,13 @@ const ResultTable = ({
             <TableBody>{rows}</TableBody>
           </Table>
         </TableContainer>
+        <ModalControl
+          currentRecordId={recordId}
+          attributeId={attribute}
+          showAttribute={showAttribute}
+          setShowAttribute={setShowAttribute}
+          rootRef={rootRef}
+        />
         {/* )} */}
       </Grid>
 
