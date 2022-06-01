@@ -397,7 +397,10 @@ const ReportHistogram = ({
     if (!histograms) {
       return null;
     }
-    let xOptions = (xOpts || "").split(",");
+    let xOptions = (xOpts || "").split(";");
+    if (xOptions.length == 1) {
+      xOptions = xOptions.split(",");
+    }
     let xLabel = xOptions[4] || histogram.report.xLabel;
     let yLabel = histogram.report.yLabel;
     let valueType = histograms.valueType;
@@ -488,7 +491,6 @@ const ReportHistogram = ({
         }
       });
     }
-
     chart = (
       <Histogram
         data={chartData}
