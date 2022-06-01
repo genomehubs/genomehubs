@@ -15,14 +15,15 @@ const port = config.port;
 const apiSpec = path.join(__dirname, "api-v2.yaml");
 
 let swaggerDocument = YAML.load(apiSpec);
-swaggerDocument.info.description = config.description;
-swaggerDocument.info.title = config.title;
-swaggerDocument.info.version = config.url.replace(/.+\//, "");
-swaggerDocument.info.contact.name = config.contactName;
-swaggerDocument.info.contact.email = config.contactEmail;
+// TODO: restore customisation options
+// swaggerDocument.info.description = config.description;
+// swaggerDocument.info.title = config.title;
+// swaggerDocument.info.version = config.url.replace(/.+\//, "");
+// swaggerDocument.info.contact.name = config.contactName;
+// swaggerDocument.info.contact.email = config.contactEmail;
+swaggerDocument.info.version = "v2";
 swaggerDocument.components.parameters.taxonomyParam.schema.default =
   config.taxonomy;
-swaggerDocument.components.parameters.taxonomyParam.description += ` [default: ${config.taxonomy}]`;
 swaggerDocument.servers[0].url = config.url;
 // Temporarily redirect old API requests to v2
 swaggerDocument.servers[1] = { ...swaggerDocument.servers[0] };

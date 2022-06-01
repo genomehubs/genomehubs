@@ -2,31 +2,80 @@
 components:
   parameters:
     catParam:
-      description: Category value source
+      description: |
+        Query to provide category values.
+
+        Can be any attribute listed at **/resultFields** or a valid taxonomic rank.
+
+        The number of categories can be specified by placing a number in square brackets, and a `+` sign may be used to include an `other` category for additional results (see examples).
+
+      # TODO: #160 Add an API endpoint to list valid taxonomic ranks
+      examples:
+        assembly_level:
+          value: assembly_level
+          summary: Group results by assembly level
+        family:
+          value: family[4]
+          summary: Show results for the top 4 families - family[4]
+        bioproject:
+          value: bioproject[3]+
+          summary: Show results for the top 3 bioprojects plus other - bioproject[3]+
+        assembly_level_order:
+          value: assembly_level=complete genome,chromosome,scaffold,contig
+          summary: Group results by assembly level and specify the order of categories
       in: query
       name: cat
       required: false
       schema:
         type: string
     collapseMonotypicParam:
-      description: "Collapse monotypic tree nodes [default: false]"
+      description: |
+        Collapse monotypic tree nodes.
+
+        This parameter only affects searches with `report=tree`.
+      examples:
+        false:
+          value:
+          summary: false - Do not collapse monotypic tree nodes
+        true:
+          value: true
+          summary: true - Collapse monotypic tree nodes
       in: query
       name: collapseMonotypic
       schema:
         type: boolean
     confidenceParam:
-      description: "Threshold for candidate suggestions relative to input phrase [default: 1]"
+      deprecated: true
+      description: |
+        Threshold for candidate suggestions relative to input phrase
       explode: false
       in: query
       name: confidence
       required: false
       schema:
+        default: 1
         maximum: 2
         minimum: 0
         type: number
       style: form
     excludeAncestralParam:
-      description: "Exclude values estimated from ancestors from results [default: false]"
+      description: |
+        List of attributes for which to exclude records with ancestrally derived estimated values from results.
+
+        A list of available attributes is available from **/resultFields**. This parameter only affects searches with `result=taxon`.
+      examples:
+        none:
+          value:
+          summary: Do not exclude ancestral estimates for any attribute
+        genome_size:
+          value:
+            - genome_size
+          summary: Exclude ancestral estimates for genome size
+        assembly_span_and_c_value:
+          value:
+            - assembly_span
+            - c_value
+          summary: Exclude ancestral estimates for assembly span and c value
       explode: true
       in: query
       name: excludeAncestral
@@ -37,7 +86,23 @@ components:
         type: array
       style: form
     excludeDescendantParam:
-      description: "Exclude values estimated from descendants from results [default: false]"
+      description: |
+        List of attributes for which to exclude records with values estimated from descendant taxa from results.
+
+        A list of available attributes is available from **/resultFields**. This parameter only affects searches with `result=taxon`.
+      examples:
+        none:
+          value:
+          summary: Do not exclude descendant estimates for any attribute
+        genome_size:
+          value:
+            - genome_size
+          summary: Exclude descendant estimates for genome size
+        assembly_span_and_c_value:
+          value:
+            - assembly_span
+            - c_value
+          summary: Exclude descendant estimates for assembly span and c value
       explode: true
       in: query
       name: excludeDescendant
@@ -48,7 +113,23 @@ components:
         type: array
       style: form
     excludeDirectParam:
-      description: "Exclude directly measured values from results [default: false]"
+      description: |
+        List of attributes for which to exclude records with directly estimated values from results.
+
+        A list of available attributes is available from **/resultFields**. This parameter only affects searches with `result=taxon`.
+      examples:
+        none:
+          value:
+          summary: Do not exclude direct estimates for any attribute
+        genome_size:
+          value:
+            - genome_size
+          summary: Exclude direct estimates for genome size
+        assembly_span_and_c_value:
+          value:
+            - assembly_span
+            - c_value
+          summary: Exclude direct estimates for assembly span and c value
       explode: true
       in: query
       name: excludeDirect
@@ -59,7 +140,23 @@ components:
         type: array
       style: form
     excludeMissingParam:
-      description: "Exclude missing values from results [default: false]"
+      description: |
+        List of attributes for which to exclude records with missing values from results.
+
+        A list of available attributes is available from **/resultFields**.
+      examples:
+        none:
+          value:
+          summary: Do not exclude missing values for any attribute
+        assembly_level:
+          value:
+            - assembly_level
+          summary: Exclude missing values for assembly level
+        assembly_span_and_c_value:
+          value:
+            - assembly_level
+            - busco_completeness
+          summary: Exclude missing values for assembly level and busco completeness
       explode: true
       in: query
       name: excludeMissing
@@ -70,43 +167,108 @@ components:
         type: array
       style: form
     fieldsParam:
-      description: "Comma separated list of fields to return [default: all]"
+      description: |
+        Comma separated list of attribute fields to return.
+
+        The list of fields selected can affect the result count if `includeEstimates=false`
+      examples:
+        null:
+          value:
+          summary: return values for default set of fields
+        all:
+          value: all
+          summary: all top level attribute fields
+        none:
+          value: none
+          summary: no attribute fields
+        assembly_attributes:
+          value: assembly_level,assembly_span,bioproject
+          summary: assembly_level, assembly_span and bioproject
       in: query
       name: fields
       required: false
       schema:
         type: string
+    fieldsParamSummary:
+      description: |
+        Attribute field to summarise.
+      examples:
+        c_value:
+          value: c_value
+          summary: 1C value
+        long_list:
+          value: long_list
+          summary: Sequencing project long list
+      in: query
+      name: fields
+      required: true
+      schema:
+        type: string
     filenameParam:
-      description: Specify a filename to download
+      description: |
+        Specify a filename when downloading a file
       in: query
       name: filename
       schema:
         type: string
     gramSizeParam:
-      description: "Size of N-grams used by tokeniser [default: 3]"
+      deprecated: true
+      description: |
+        Size of N-grams used by tokeniser
       explode: false
       in: query
       name: gramSize
       required: false
       schema:
+        default: 3
         maximum: 4
         minimum: 2
         type: integer
       style: form
     includeEstimatesParam:
-      description: "Include estimated values in search results [default: false]"
+      description: |
+        Flag to indicate whether search results should include records for which all attribute fields are based on estimated values.
+
+        Default `false` requires at least one of the returned fields to have a directly assigned value. This parameter only affects searches with `result=taxon`.
+      examples:
+        false:
+          value:
+          summary: false - exclude records with no direct values
+        true:
+          value: true
+          summary: true - include records with no direct values
       in: query
       name: includeEstimates
       schema:
         type: boolean
     includeRawValuesParam:
-      description: "Include raw values in search results [default: false]"
+      description: |
+        Include raw values in search results.
+
+        This parameter only applies to searches with `result=taxon`.
+      examples:
+        false:
+          value:
+          summary: false - do not include raw values
+        true:
+          value: true
+          summary: true - include raw values
       in: query
       name: includeRawValues
       schema:
         type: boolean
     indentParam:
-      description: "Format output with indented lines [default: 0]"
+      description: |
+        Format output with indented lines.
+
+        Only applies to JSON responses.
+      examples:
+        zero:
+          value:
+          summary: Do not indent JSON output
+        four:
+          value: 4
+          summary: Indent JSON output with 4 spaces
       explode: false
       in: query
       name: indent
@@ -117,43 +279,80 @@ components:
         type: integer
       style: form
     lineageParam:
-      description: Lineage (name or taxon ID) to restrict search to
+      description: |
+        Taxonomic lineage to restrict search to.
+
+        A taxon ID, scientific or other name may be used. If a name has multiple matches, results from all matching lineages will be returned.
+      examples:
+        null:
+          value:
+          summary: Do not restrict results to a lineage
+        canidae:
+          value: Canidae
+          summary: Restrict lookup to family Canidae
+        metazoa:
+          value: "33208"
+          summary: Restrict lookup to taxon ID 33208 (Metazoa)
       in: query
       name: lineage
       required: false
       schema:
         type: string
     maxErrorsParam:
-      description: "Maximumum error percentage when matching terms [default: 3]"
+      deprecated: true
+      description: |
+        Maximumum error percentage when matching terms
       explode: false
       in: query
       name: maxErrors
       required: false
       schema:
+        default: 3
         maximum: 10
         minimum: 0
         type: integer
       style: form
     namesParam:
-      description: Comma separated list of taxon name classes to return
+      description: |
+        Comma separated list of taxon name classes to return
+      examples:
+        null:
+          value:
+          summary: Do not return names
+        tolid_synonym:
+          value: tol_id,synonym
+          summary: ToL ID and synonym
       in: query
       name: names
       required: false
       schema:
         type: string
     offsetParam:
-      description: "Offset when returning a page of results [default: 0]"
+      description: |
+        Offset when returning a page of results
+      examples:
+        zero:
+          value:
+          summary: No offset
+        ten:
+          value: 10
+          summary: Skip the first 10 results
+        hundred:
+          value: 100
+          summary: Skip the first 100 results
       explode: false
       in: query
       name: offset
       required: false
       schema:
-        maximum: 1000
+        maximum: 9990
         minimum: 0
         type: integer
       style: form
     postTagParam:
-      description: 'Tag to place after matching portion of query term [default: \</em\>]'
+      deprecated: true
+      description: |
+        Tag to place after matching portion of query term
       explode: false
       in: query
       name: postTag
@@ -162,7 +361,9 @@ components:
         type: string
       style: form
     preTagParam:
-      description: 'Tag to place before matching portion of query term [default: \<em\>]'
+      deprecated: true
+      description: |
+        Tag to place before matching portion of query term
       explode: false
       in: query
       name: preTag
@@ -170,47 +371,108 @@ components:
       schema:
         type: string
       style: form
-    prefixQueryParam:
-      description: "Treat search term as a prefix [default: false]"
-      in: query
-      name: prefixQuery
-      schema:
-        type: boolean
+    # prefixQueryParam:
+    #   deprecated: true  # unused so can be removed immediately
+    #   description: "Treat search term as a prefix [default: false]"
+    #   in: query
+    #   name: prefixQuery
+    #   schema:
+    #     type: boolean
     previewParam:
-      description: "Return a file preview [default: false]"
+      description: |
+        Return a preview in place of the full file, e.g. an image thumbnail.
+      examples:
+        false:
+          value:
+          summary: false - Return the full file
+        true:
+          value: true
+          summary: true - Return a preview
       in: query
       name: preview
       schema:
         type: boolean
     queryIdParam:
-      description: User specified query ID
+      description: |
+        User specified query ID.
+
+        If provided for a query or report that returns over 1000 results, the **/progress** endpoint may be used to track query progress.
+      examples:
+        null:
+          value:
+          summary: without query ID
+        not_null:
+          value: query-ac54f1
+          summary: with query ID
       in: query
       name: queryId
       schema:
         type: string
     queryParam:
-      description: Search query
+      description: |
+        A search query string using taxonomic and attribute filters.
+
+        A list of available attributes is available from **/resultFields**.
+
+      # TODO: #157 create an API endpoint to describe available values and valid operators
+      examples:
+        taxon:
+          value: tax_tree(Chiroptera) AND assembly_level >= scaffold
+          summary: Chiroptera with scaffold-level or better assemblies
+        assembly:
+          value: tax_name(9615) AND scaffold_n50 > 100000
+          summary: Domestic dog assemblies with scaffold N50 better than 100 kb
       in: query
       name: query
       required: true
       schema:
         type: string
     rankParam:
-      description: Rank to report at
+      description: |
+        Taxonomic to report values formats.
+
+        Used by histogram, scatter and xInY reports when `result=` `taxon` or `assembly`.
+      examples:
+        null:
+          value:
+          summary: Do not specify a rank
+        species:
+          value: species
+          summary: Report results for species
+        family:
+          value: family
+          summary: Report results for families
       in: query
       name: rank
       required: false
       schema:
         type: string
     ranksParam:
-      description: Comma separated list of ancestral ranks to return
+      description: |
+        Comma separated list of ancestral ranks to return
+      examples:
+        null:
+          value:
+          summary: no ranks
+        order_family_genus:
+          value: order,family,genus
+          summary: order, family and genus
       in: query
       name: ranks
       required: false
       schema:
         type: string
     recordIdParam:
-      description: Record identifier
+      description: |
+        Unique record identifier.
+      # May be optionally be prefixed with the index name.
+      examples:
+        canis_lupus:
+          value: "9612"
+          summary: Taxon record ID for Canis lupus
+        GCA_905319855-2:
+          value: GCA_905319855.2
+          summary: Assembly record ID for Canis lupus assembly GCA_905319855.2
       explode: false
       in: query
       name: recordId
@@ -218,23 +480,42 @@ components:
       schema:
         items:
           type: string
-        type: array
+      style: form
+    recordIdParamDownload:
+      description: |
+        Unique record identifier.
+      # May be optionally be prefixed with the index name.
+      examples:
+        snail_plot:
+          value: 13c8b378f620c197b90443feee45c8f2
+          summary: A snail plot file ID
+        blob_plot:
+          value: f7a6cc9cd00e76f8d3af8c7a9a0ba09f
+          summary: A blob plot file ID
+      explode: false
+      in: query
+      name: recordId
+      required: true
+      schema:
+        items:
+          type: string
       style: form
     releaseParam:
-      description: "GenomeHub release number [default: latest]"
+      description: |
+        **Not in use:** GenomeHub release number
       in: query
       name: release
       required: false
       schema:
         enum:
           - latest
-          - v2.1
         type: string
     reportParam:
-      description: Method to summarise multiple values for sorting
+      description: |
+        Type of report to generate
       in: query
       name: report
-      required: false
+      required: true
       schema:
         enum:
           - histogram
@@ -246,12 +527,32 @@ components:
           - xPerRank
         type: string
     resultParam:
-      description: The result type (data set) to search against
+      description: |
+        The result type (index) to search against
+      examples:
+        analysis:
+          value: analysis
+          summary: Search against the analysis index
+        assembly:
+          value: assembly
+          summary: Search against the assembly index
+        feature:
+          value: feature
+          summary: Search against the feature index
+        file:
+          value: file
+          summary: Search against the file index
+        taxon:
+          value: taxon
+          summary: Search against the taxon index
+        multi:
+          value: multi
+          summary: Search across all indices (/lookup endpoint only)
       in: query
       name: result
       required: true
       schema:
-        default: multi
+        default: taxon
         enum:
           - analysis
           - assembly
@@ -261,7 +562,23 @@ components:
           - multi
         type: string
     scatterThresholdParam:
-      description: "Maximum number of results to plot as points [default: 100]"
+      description: |
+        Maximum number of results to return as points when `report=scatter`.
+
+        If a query returns more results the values will be binned as a 2-dimensional histogram/heatmap.
+      examples:
+        null:
+          value:
+          summary: Use default value (100)
+        zero:
+          value: 0
+          summary: Force heatmap response
+        thousand:
+          value: 1000
+          summary: Set threshold to 1000
+        minus:
+          value: -1
+          summary: Specify no limit (maximum bound applies)
       in: query
       name: scatterThreshold
       required: false
@@ -270,49 +587,105 @@ components:
         minimum: -1
         type: integer
       style: form
-    treeThresholdParam:
-      description: "Maximum number of results to draw as tree [default: 10000]"
-      in: query
-      name: treeThreshold
-      required: false
-      schema:
-        maximum: 100000
-        minimum: -1
-        type: integer
-      style: form
     searchRawValuesParam:
-      description: "Apply search filters to raw values [default: false]"
+      description: |
+        Flag to indicate whether search filters should be applied to raw values.
+
+        Default `false` applies filters to aggregated values. This parameter only affects searches with `result=taxon`.
+      examples:
+        false:
+          value:
+          summary: false - apply filters to aggregated values
+        true:
+          value: true
+          summary: true - apply filters to raw values
       in: query
       name: searchRawValues
       schema:
         type: boolean
     searchTermParam:
-      description: Search term
+      description: |
+        Term to identify matching record IDs for.
+
+        May be a complete or partial, exact or fuzzy match to any record ID, name, synonym or identifier
+      examples:
+        canis_lupus:
+          value: Canis lupus
+          summary: Look up an exact match
+        canus_lupis:
+          value: Canus lupis
+          summary: Look up with spelling mistakes
+        canis_lup:
+          value: Canis lup
+          summary: Look up using a prefix
       in: query
       name: searchTerm
       required: true
       schema:
         type: string
     sizeParam:
-      description: "Maximum number of results to return [default: 10]"
+      description: |
+        Maximum number of results to return
+      examples:
+        zero:
+          value: 0
+          summary: return no results (hit count only)
+        ten:
+          value: 10
+          summary: return 10 results
+        hundred:
+          value: 100
+          summary: return 100 results
       explode: false
       in: query
       name: size
       required: false
       schema:
+        default: 10
         maximum: 10000000
         minimum: 0
         type: integer
       style: form
     sortByParam:
-      description: Field name to sort by
+      description: |
+        Field name to sort results by
+      examples:
+        null:
+          value:
+          summary: Do not sort results
+        c_value:
+          value: c_value
+          summary: Sort results by C value
+        assembly_level:
+          value: assembly_level
+          summary: Sort results by assembly level
       in: query
       name: sortBy
       required: false
       schema:
         type: string
     sortModeParam:
-      description: Method to summarise multiple values for sorting
+      description: |
+        Method to summarise multiple values for sorting fields with lists of values
+      examples:
+        null:
+          value:
+          summary: Use default method
+        min:
+          value: min
+          summary: Use minimum value
+        max:
+          value: max
+          summary: Use maximum value
+        avg:
+          value: avg
+          summary: Use mean value (numeric fields only)
+        median:
+          value: median
+          summary: Use median value (numeric fields only)
+        sum:
+          value: sum
+          summary: Use sum of values (numeric fields only)
       in: query
       name: sortMode
       required: false
@@ -320,10 +693,25 @@ components:
         enum:
           - avg
           - max
+          - median
           - min
+          - sum
         type: string
     sortOrderParam:
-      description: "Sort order [default: asc]"
+      description: |
+        Sort order to use when returning results.
+
+        Only applicable when `sortBy` is defined.
+      examples:
+        null:
+          value:
+          summary: Do not sort values
+        asc:
+          value: asc
+          summary: Sort values in ascending order
+        desc:
+          value: desc
+          summary: Sort values in descending order
       in: query
       name: sortOrder
       required: false
@@ -333,7 +721,15 @@ components:
           - desc
         type: string
     streamFileParam:
-      description: "Stream file rather than download [default: false]"
+      description: |
+        Stream a file instead of downloading
+      examples:
+        false:
+          value:
+          summary: false - Download file
+        true:
+          value: true
+          summary: true - Stream file
       in: query
       name: streamFile
       schema:
@@ -349,12 +745,24 @@ components:
         type: integer
       style: form
     suggestSizeParam:
-      description: "Number of similar terms to suggest [default: 3]"
+      description: |
+        Number of similar terms to suggest for a fuzzy match
+      examples:
+        one:
+          value: 1
+          summary: Return 1 similar term
+        three:
+          value: 3
+          summary: Return up to 3 similar terms
+        ten:
+          value: 10
+          summary: Return up to 10 similar terms
       explode: false
       in: query
       name: suggestSize
       required: false
       schema:
+        default: 3
         maximum: 10
         minimum: 0
         type: integer
@@ -374,7 +782,22 @@ components:
         type: array
       style: form
     summaryValuesParam:
-      description: Summary values to return
+      description: |
+        Summary values to return.
+
+        Available values vary according to attribute type. This parameter only applies to searches with `result=taxon`.
+      examples:
+        null:
+          value:
+          summary: Do not return summary values
+        count:
+          value:
+            - count
+          summary: count - number of immediate descendant values aggregated
+        length:
+          value:
+            - length
+          summary: length - number of unique values in a list
       explode: true
       in: query
       name: summaryValues
@@ -383,57 +806,157 @@ components:
         items:
           enum:
             - count
+            - length
             - mean
             - median
             - mode
             - max
             - min
+            - range
           type: string
         type: array
       style: form
     taxonomyParam:
-      description: "The taxonomy to search against"
+      description: |
+        The backbone taxonomy to search against.
+
+        A list of available taxonomies is available from **/taxonomies**.
+      examples:
+        ncbi:
+          value: ncbi
+          summary: Use the NCBI taxonomy
       in: query
       name: taxonomy
       required: false
       schema:
         type: string
     tidyDataParam:
-      description: "Format delimited text output as Tidy Data [default: false]"
+      description: |
+        Format delimited text output as Tidy Data.
+
+        This parameter only applies to CSV and TSV response formats. To try it out, in the **Responses** section below, change _Media type_ to _text/csv_ or _text/tab-separated-values_.
+      examples:
+        false:
+          value:
+          summary: false - format as one row per record
+        true:
+          value: true
+          summary: true - format as Tidy Data
       in: query
       name: tidyData
       schema:
         type: boolean
+    treeThresholdParam:
+      description: |
+        Maximum number of results to return when `report=tree`.
+
+        If a query returns more results a warning is given to increase this threshold.
+      examples:
+        null:
+          value:
+          summary: Use default value (10000)
+        thousand:
+          value: 20000
+          summary: Set threshold to 20000
+        minus:
+          value: -1
+          summary: Specify no limit (maximum bound applies)
+      in: query
+      name: treeThreshold
+      required: false
+      schema:
+        maximum: 100000
+        minimum: -1
+        type: integer
+      style: form
     xOptsParam:
-      description: X axis options (min,max,tickCount)
+      description: |
+        *x*-axis options.
+
+        A comma or semicolon separated string of options in the order:
+
+        1. minimum value
+        2. maximum value
+        3. tick count
+        4. scale
+        5. axis title
+
+        For category axes, the minimum value can be a comma separated list to define the category order, in which case semicolons must be used as the primary separator. Tick count may be used to specify the number of categories and a `+` sign to indicate that an `other` category should be included.
+      examples:
+        null:
+          value:
+          summary: Do not specify xOpts
+        assembly_span:
+          value: 10000000,10000000000,5
+          summary: Values between 10M and 10G with 4 ticks
+        scale_only:
+          value: ",,,linear"
+          summary: Use a linear scale
+        category_axis:
+          value: "chromosome,scaffold,,2+"
+          summary: Show values for chromosome and scaffold plus other
       in: query
       name: xOpts
       required: false
       schema:
         type: string
     xParam:
-      description: X value source
+      description: |
+        Query to provide *x* values.
+
+        This should be a full query as used in the `query` field of **/search** and can be modified by search options such as `includeEstimates` and `exclude*`. For reports without an *x*-axis, this is the primary query.
+      examples:
+        taxon:
+          value: tax_tree(Chiroptera) AND assembly_level >= scaffold
+          summary: Chiroptera with scaffold-level or better assemblies
+        assembly:
+          value: tax_name(9615) AND scaffold_n50 > 100000
+          summary: Domestic dog assemblies with scaffold N50 better than 100 kb
       in: query
       name: x
       required: false
       schema:
         type: string
     yOptsParam:
-      description: Y axis options (min,max,tickCount)
+      description: |
+        *y*-axis options.
+
+        A comma or semicolon separated string of options as described for `xOpts`.
+      examples:
+        null:
+          value:
+          summary: Do not specify yOpts
+        assembly_span:
+          value: 10000000,10000000000,5
+          summary: Values between 10M and 10G with 4 ticks
+        scale_only:
+          value: ",,,linear"
+          summary: Use a linear scale
+        category_axis:
+          value: "chromosome,scaffold;;2+"
+          summary: Show values for chromosome and scaffold plus other
       in: query
       name: yOpts
       required: false
       schema:
         type: string
     yParam:
-      description: Y value source
+      description: |
+        Query to provide *y* values.
+
+        Values added here will be combined with the value in `x` to generate the full query. For reports without an *y*-axis, this is the secondary query, except for `xInY` reports where this should be a full query.
+      examples:
+        assembly_span:
+          value: assembly_span>1000000000
+          summary: Assembly span greater than 1 Gb
       in: query
       name: "y"
       required: false
       schema:
         type: string
     zParam:
-      description: Z value source
+      description: |
+        **Not in use:** Query to provide *z* values
       in: query
       name: z
       required: false
@@ -530,30 +1053,35 @@ info:
   contact:
     email: goat@genomehubs.org
     name: GoaT
-  description: Genomes on a Tree OpenAPI test.
+    url: https://goat.genomehubs.org
+  description: |
+    Genomes on a Tree Application Programming Interface (GoaT API).
+
+    Provides a low-level API to retrieve records, lookup, search and generate reports across all taxon and assembly data in GoaT.
   license:
     name: MIT License
-  title: GoaT
+    url: https://github.com/genomehubs/genomehubs/blob/main/LICENSE
+  title: GoaT API
   version: 2.3.0
 openapi: 3.0.0
 paths:
   /count:
     get:
-      description: Returns count of records matching a query
+      description: |
+        Fetch the record count for a search query without including any of the results.
+
+        **/count** supports all relevant **/search** parameters to allow a record count to be obtained for a query prior to a full search.
       operationId: getSearchResultCount
       parameters:
         - $ref: "#/components/parameters/queryParam"
+        - $ref: "#/components/parameters/resultParam"
         - $ref: "#/components/parameters/fieldsParam"
-        - $ref: "#/components/parameters/ranksParam"
-        - $ref: "#/components/parameters/namesParam"
         - $ref: "#/components/parameters/includeEstimatesParam"
         - $ref: "#/components/parameters/searchRawValuesParam"
-        - $ref: "#/components/parameters/summaryValuesParam"
         - $ref: "#/components/parameters/excludeAncestralParam"
         - $ref: "#/components/parameters/excludeDescendantParam"
         - $ref: "#/components/parameters/excludeDirectParam"
         - $ref: "#/components/parameters/excludeMissingParam"
-        - $ref: "#/components/parameters/resultParam"
         - $ref: "#/components/parameters/taxonomyParam"
         - $ref: "#/components/parameters/releaseParam"
         - $ref: "#/components/parameters/indentParam"
@@ -570,16 +1098,16 @@ paths:
           description: successful operation
         "400":
           description: Invalid query
-      summary: Count records
+      summary: Count of records matching a search query
       tags:
-        - GoaT API
+        - Data
       x-eov-operation-handler: api/v2/routes/count
   /download:
     get:
       description: Returns indexed files
       operationId: getFile
       parameters:
-        - $ref: "#/components/parameters/recordIdParam"
+        - $ref: "#/components/parameters/recordIdParamDownload"
         - $ref: "#/components/parameters/filenameParam"
         - $ref: "#/components/parameters/previewParam"
         - $ref: "#/components/parameters/streamFileParam"
@@ -605,16 +1133,19 @@ paths:
           description: Not Found
       summary: Download file
       tags:
-        - GoaT API
+        - Tools
       x-eov-operation-handler: api/v2/routes/download
   /lookup:
     get:
-      description: Returns suggestions/identifiers matching a searchTerm
+      description: |
+        Find record IDs matching a search term based on full or partial matches to a record ID, name, snyonym or other identifier.
+
+        If no exact matches are found, suggestions my be returned based on fuzzy matches.
       operationId: getIdentifiers
       parameters:
         - $ref: "#/components/parameters/searchTermParam"
         - $ref: "#/components/parameters/resultParam"
-        - $ref: "#/components/parameters/prefixQueryParam"
+        # - $ref: "#/components/parameters/prefixQueryParam"
         - $ref: "#/components/parameters/sizeParam"
         - $ref: "#/components/parameters/lineageParam"
         - $ref: "#/components/parameters/taxonomyParam"
@@ -641,9 +1172,9 @@ paths:
           description: successful operation
         "400":
           description: Invalid queryTerm
-      summary: Lookup
+      summary: Lookup record IDs based on exact, partial or fuzzy matching
       tags:
-        - GoaT API
+        - Data
       x-eov-operation-handler: api/v2/routes/lookup
   /progress:
     get:
@@ -667,11 +1198,11 @@ paths:
           description: Invalid queryId
       summary: Returns query progress
       tags:
-        - GoaT API
+        - Tools
       x-eov-operation-handler: api/v2/routes/progress
   /record:
     get:
-      description: Returns records matching a record identifier
+      description: Fetch records matching a record identifier to obtain all information for a single taxon or assembly.
       operationId: getRecords
       parameters:
         - $ref: "#/components/parameters/recordIdParam"
@@ -693,13 +1224,27 @@ paths:
           description: successful operation
         "400":
           description: Invalid recordId
-      summary: Returns individual records
+      summary: Fetch records matching a record identifier
       tags:
-        - GoaT API
+        - Data
       x-eov-operation-handler: api/v2/routes/record
   /report:
     get:
-      description: Generates reports on records and sets of records
+      description: |
+        Generate reports based on search queries. 
+
+        General parameters `result`, `report` and `taxonomy` are required for all reports. Additional required and optional parameters vary according to report type:
+
+        | Report        | Required          | Optional       |
+        | ------------- | ----------------- | -------------- |
+        | **Histogram** | `x`, `rank`       | `cat`, `xOpts` |
+        | **Scatter**   | `x`, `y`, `rank`  | `cat`, `xOpts`, `yOpts`, `scatterThreshold` |
+        | **Sources**   | -                 | -              |
+        | **Tree**      | `x`               | `y`, `cat`, `xOpts`, `yOpts`, `collapseMonotypic`, `treeThreshold` |
+        | **xInY**      | `x`, `rank`       | `y`            |
+        | **xPerRank**  | `x`               | `ranks`        |
+
+        Search related parameters `fields`, `includeEstimates`, `exclude*` and `queryId` are optional for all reports (except `sources` where they have no effect).
       operationId: getReport
       parameters:
         - $ref: "#/components/parameters/resultParam"
@@ -707,7 +1252,7 @@ paths:
         - $ref: "#/components/parameters/fieldsParam"
         - $ref: "#/components/parameters/xParam"
         - $ref: "#/components/parameters/yParam"
-        - $ref: "#/components/parameters/zParam"
+        # - $ref: "#/components/parameters/zParam"
         - $ref: "#/components/parameters/catParam"
         - $ref: "#/components/parameters/rankParam"
         - $ref: "#/components/parameters/includeEstimatesParam"
@@ -753,7 +1298,7 @@ paths:
           description: Not Found
       summary: Generate a report
       tags:
-        - GoaT API
+        - Data
       x-eov-operation-handler: api/v2/routes/report
   /resultFields:
     get:
@@ -779,7 +1324,7 @@ paths:
           description: Invalid recordId
       summary: Returns available fields
       tags:
-        - GoaT API
+        - Metadata
       x-eov-operation-handler: api/v2/routes/resultFields
   /search:
     get:
@@ -787,6 +1332,7 @@ paths:
       operationId: getSearchResults
       parameters:
         - $ref: "#/components/parameters/queryParam"
+        - $ref: "#/components/parameters/resultParam"
         - $ref: "#/components/parameters/fieldsParam"
         - $ref: "#/components/parameters/ranksParam"
         - $ref: "#/components/parameters/namesParam"
@@ -798,7 +1344,6 @@ paths:
         - $ref: "#/components/parameters/excludeDescendantParam"
         - $ref: "#/components/parameters/excludeDirectParam"
         - $ref: "#/components/parameters/excludeMissingParam"
-        - $ref: "#/components/parameters/resultParam"
         - $ref: "#/components/parameters/sizeParam"
         - $ref: "#/components/parameters/offsetParam"
         - $ref: "#/components/parameters/sortByParam"
@@ -829,9 +1374,9 @@ paths:
           description: successful operation
         "400":
           description: Invalid query
-      summary: Search for records
+      summary: Fetch field values for records matching a search query
       tags:
-        - GoaT API
+        - Data
       x-eov-operation-handler: api/v2/routes/search
   /summary:
     get:
@@ -841,7 +1386,7 @@ paths:
         - $ref: "#/components/parameters/recordIdParam"
         - $ref: "#/components/parameters/summaryParam"
         - $ref: "#/components/parameters/resultParam"
-        - $ref: "#/components/parameters/fieldsParam"
+        - $ref: "#/components/parameters/fieldsParamSummary"
         - $ref: "#/components/parameters/taxonomyParam"
         - $ref: "#/components/parameters/releaseParam"
         - $ref: "#/components/parameters/indentParam"
@@ -860,7 +1405,7 @@ paths:
           description: Invalid query
       summary: Field value summary
       tags:
-        - GoaT API
+        - Data
       x-eov-operation-handler: api/v2/routes/summary
   /taxonomies:
     get:
@@ -880,10 +1425,14 @@ paths:
           description: Invalid query
       summary: List of taxonomies
       tags:
-        - GoaT API
+        - Metadata
       x-eov-operation-handler: api/v2/routes/taxonomies
 servers:
   - url: http://localhost:3000/api/v2
 tags:
-  - description: Query Genomes on a Tree
-    name: GoaT API
+  - description: Retrieve search results, records and reports
+    name: Data
+  - description: List available terms and properties
+    name: Metadata
+  - description: Download files and check query progress
+    name: Tools
