@@ -8,6 +8,7 @@ import { compose } from "recompose";
 import { makeStyles } from "@material-ui/core/styles";
 import qs from "qs";
 import styles from "./Styles.scss";
+import { useLocalStorage } from "usehooks-ts";
 import withSearch from "../hocs/withSearch";
 
 const useStyles = makeStyles((theme) => ({
@@ -23,6 +24,7 @@ const SearchPagination = ({
   searchResults,
   setSearchTerm,
   setPreferSearchTerm,
+  searchIndex,
 }) => {
   if (!searchResults.status || !searchResults.status.hits) {
     return null;
@@ -35,6 +37,11 @@ const SearchPagination = ({
   let count = Math.ceil(resultCount / pageSize);
   let page = offset / pageSize;
   let options = { ...searchTerm };
+  let index = searchIndex || "taxon";
+  const [savedOptions, setSavedOptions] = useLocalStorage(
+    `${index}Options`,
+    {}
+  );
   const handleChange = (event, newPage) => {
     options.offset = newPage * pageSize;
     // setPreferSearchTerm(true);
@@ -48,6 +55,7 @@ const SearchPagination = ({
     options.size = parseInt(event.target.value, 10);
     // setPreferSearchTerm(true);
     // setSearchTerm(options);
+    setSavedOptions({ ...savedOptions, size: options.size });
     navigate(
       `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`
     );
