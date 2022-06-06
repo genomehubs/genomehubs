@@ -27,6 +27,7 @@ const Report = ({
   taxonomyIsFetching,
   fetchTaxonomies,
   setTaxonomy,
+  id,
   ...props
 }) => {
   const location = useLocation();
@@ -101,6 +102,7 @@ const Report = ({
   reportProps.levels = props.levels;
   reportProps.caption =
     props.caption || qs.parse(reportProps.queryString).caption;
+  reportProps.id = props.id || queryProps.report;
 
   const componentRef = useRef();
   const { width, height } = useResize(componentRef);
@@ -112,7 +114,12 @@ const Report = ({
   }
 
   return (
-    <ReportItem {...reportProps} componentRef={componentRef} height={minDim} />
+    <ReportItem
+      id={reportProps.id}
+      {...reportProps}
+      componentRef={componentRef}
+      height={minDim}
+    />
   );
 };
 

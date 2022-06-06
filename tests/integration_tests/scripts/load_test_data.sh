@@ -49,6 +49,10 @@ genomehubs index \
     --taxon-dir tests/integration_tests/data/status_lists \
     --taxon-lookup any \
     --taxon-spellcheck &&
+genomehubs index \
+    --config-file tests/integration_tests/config/config.yaml \
+    --taxonomy-source ncbi \
+    --taxon-dir tests/integration_tests/data/assembly-data-taxon &&
 genomehubs fill \
     --config-file tests/integration_tests/config/config.yaml \
     --taxonomy-source ncbi \
@@ -65,4 +69,6 @@ genomehubs index \
 genomehubs test \
     --base-url http://localhost:3000/api/v2 \
     --json-test-dir tests/integration_tests/templates/api/json
-echo done
+python run_ui_tests.py &&
+echo done ||
+echo failed

@@ -125,17 +125,22 @@ export function htmlDirectives() {
   return transform;
 
   function transform(tree) {
+    let index = { i: 0 };
     visit(
       tree,
       ["textDirective", "leafDirective", "containerDirective"],
-      ondirective
+      (node) => ondirective(node, index)
     );
   }
 
-  function ondirective(node) {
-    var data = node.data || (node.data = {});
-    var hast = h(node.name, node.attributes);
+  function ondirective(node, index) {
+    let data = node.data || (node.data = {});
+    let hast = h(node.name, node.attributes);
     data.hName = hast.tagName;
     data.hProperties = hast.properties;
+    if (data.hName == "report") {
+      data.hProperties.id = `report-${data.hProperties.report}-${index.i}`;
+      index.i += 1;
+    }
   }
 }

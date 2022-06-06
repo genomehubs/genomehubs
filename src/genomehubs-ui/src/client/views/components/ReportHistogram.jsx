@@ -399,7 +399,7 @@ const ReportHistogram = ({
     }
     let xOptions = (xOpts || "").split(";");
     if (xOptions.length == 1) {
-      xOptions = xOptions.split(",");
+      xOptions = xOptions[0].split(",");
     }
     let xLabel = xOptions[4] || histogram.report.xLabel;
     let yLabel = histogram.report.yLabel;

@@ -742,11 +742,11 @@ const ReportScatter = ({
     let hasRawData = pointData && pointData.length > 0;
     let xOptions = (xOpts || "").split(";");
     if (xOptions.length == 1) {
-      xOptions = xOptions.split(",");
+      xOptions = xOptions[0].split(",");
     }
     let yOptions = (yOpts || "").split(";");
     if (yOptions.length == 1) {
-      yOptions = yOptions.split(",");
+      yOptions = yOptions[0].split(",");
     }
     let xLabel = xOptions[4] || scatter.report.xLabel;
     let yLabel = yOptions[4] || scatter.report.yLabel;
