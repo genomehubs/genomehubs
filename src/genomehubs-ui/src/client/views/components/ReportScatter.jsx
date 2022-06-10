@@ -348,13 +348,7 @@ const HighlightShape = (props, chartProps) => {
   let color = "black";
   if (label) {
     text = (
-      <Text
-        x={cx + width}
-        y={y > yAxis.domain[0] ? cy + 2 : cy + height - 2}
-        fill={color}
-        dominantBaseline={y > yAxis.domain[0] ? "hanging" : "auto"}
-        textAnchor={"end"}
-      >
+      <Text x={cx + width - 4} y={cy - 6} fill={color} textAnchor={"end"}>
         {label}
       </Text>
     );
