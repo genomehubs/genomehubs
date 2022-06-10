@@ -8,7 +8,7 @@ cp .env.dist .env &&
 
 echo "Installing dependencies" &&
 
-npm install &&
+npm install --legacy-peer-deps &&
 
 if [ ! -z "$1" ]; then
   echo "Setting pages version" &&
@@ -53,7 +53,7 @@ rm src/public/index.html &&
 
 echo "Installing package dependencies" &&
 
-npm install &&
+npm install --legacy-peer-deps &&
 
 echo "Creating package" &&
 

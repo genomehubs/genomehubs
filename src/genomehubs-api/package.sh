@@ -4,7 +4,7 @@ echo "Packaging genomehubs-api" &&
 
 echo "Installing dependencies" &&
 
-npm install &&
+npm install --legacy-peer-deps &&
 
 echo "Transpiling esm files to cjs" &&
 

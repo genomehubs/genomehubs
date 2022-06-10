@@ -17,7 +17,7 @@ Install the Node modules (must be run with the `ghubs_web_env` activated)
 
 ```
 cd genomehubs-ui
-npm install
+npm install --legacy-peer-deps
 ```
 
 Start GenomeHubs UI at http://localhost:8880
