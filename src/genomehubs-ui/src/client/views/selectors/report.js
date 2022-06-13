@@ -362,6 +362,8 @@ const processScatter = (scatter) => {
         heatmaps.rawData[cat.key]
       ) {
         let points = [];
+        let buckets = new Set(heatmaps.buckets);
+        let yBuckets = new Set(heatmaps.yBuckets);
         for (let obj of heatmaps.rawData[cat.key]) {
           if (
             expandValues(
@@ -376,13 +378,21 @@ const processScatter = (scatter) => {
           let x;
           let y;
           if (scatter.bounds.scale == "ordinal") {
-            x = xScale(obj.x.toLowerCase());
+            let name = obj.x.toLowerCase();
+            if (!buckets.has(name)) {
+              name = "other";
+            }
+            x = xScale(name);
             x = applyJitter(x + 0.5, 0.95);
           } else {
             x = xScale(obj.x);
           }
           if (scatter.yBounds.scale == "ordinal") {
-            y = yScale(obj.y.toLowerCase());
+            let name = obj.y.toLowerCase();
+            if (!yBuckets.has(name)) {
+              name = "other";
+            }
+            y = yScale(name);
             y = applyJitter(y + 0.5, 0.95);
           } else {
             y = yScale(obj.y);

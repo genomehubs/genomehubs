@@ -358,6 +358,14 @@ const getHistogram = async ({
         delete pointData[key];
       }
     });
+    if (pointData && byCat.other) {
+      rawData.other = Object.values(pointData)
+        .flat()
+        .map((obj) => {
+          obj.cat = "other";
+          return obj;
+        });
+    }
     // if (byCat.other && byCat.other.reduce((a, b) => a + b, 0) == 0) {
     //   delete byCat.other;
     //   delete yValuesByCat.other;
@@ -606,6 +614,12 @@ export const histogram = async ({
   let ranks = [rank].flat();
   if (cat && !catMeta) {
     ranks.push(cat);
+  }
+  if (bounds && bounds.stats && bounds.stats.showOther) {
+    bounds.stats.cats.push({ key: "other", label: "other" });
+  }
+  if (yBounds && yBounds.stats && yBounds.stats.showOther) {
+    yBounds.stats.cats.push({ key: "other", label: "other" });
   }
 
   return {
