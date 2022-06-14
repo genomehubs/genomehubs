@@ -68,7 +68,18 @@ const searchByCell = ({
       new Date(xRange[1]).toISOString().split(/t/i)[0]
     }`;
   } else if (valueType == "keyword") {
-    query += ` AND ${bounds.field} = ${bounds.stats.cats[xRange[0]].key}`;
+    let val = bounds.stats.cats[xRange[0]].key;
+    if (val == "other") {
+      let list = [];
+      for (let obj of bounds.stats.cats) {
+        if (obj.key != "other") {
+          list.push(obj.key);
+        }
+      }
+      query += ` AND ${bounds.field} != ${list.join(",")}`;
+    } else {
+      query += ` AND ${bounds.field} = ${val}`;
+    }
   } else {
     query += ` AND ${bounds.field} >= ${xRange[0]} AND ${bounds.field} < ${xRange[1]}`;
   }
@@ -79,7 +90,18 @@ const searchByCell = ({
       new Date(yRange[1]).toISOString().split(/t/i)[0]
     }`;
   } else if (yValueType == "keyword") {
-    query += ` AND ${yBounds.field} = ${yBounds.stats.cats[yRange[0]].key}`;
+    let val = yBounds.stats.cats[yRange[0]].key;
+    if (val == "other") {
+      let list = [];
+      for (let obj of yBounds.stats.cats) {
+        if (obj.key != "other") {
+          list.push(obj.key);
+        }
+      }
+      query += ` AND ${yBounds.field} != ${list.join(",")}`;
+    } else {
+      query += ` AND ${yBounds.field} = ${val}`;
+    }
   } else {
     query += ` AND ${yBounds.field} >= ${yRange[0]} AND ${yBounds.field} < ${yRange[1]}`;
   }
@@ -348,13 +370,7 @@ const HighlightShape = (props, chartProps) => {
   let color = "black";
   if (label) {
     text = (
-      <Text
-        x={cx + width}
-        y={y > yAxis.domain[0] ? cy + 2 : cy + height - 2}
-        fill={color}
-        dominantBaseline={y > yAxis.domain[0] ? "hanging" : "auto"}
-        textAnchor={"end"}
-      >
+      <Text x={cx + width - 4} y={cy - 6} fill={color} textAnchor={"end"}>
         {label}
       </Text>
     );

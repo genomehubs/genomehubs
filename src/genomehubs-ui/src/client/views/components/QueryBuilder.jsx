@@ -475,7 +475,7 @@ const QueryBuilder = ({
             </Grid>
           </Tooltip>
           <Tooltip
-            title="Limit search to a given taxonomic depth"
+            title="Limit search to a given number of levels from the root taxon"
             arrow
             placement={"top"}
           >

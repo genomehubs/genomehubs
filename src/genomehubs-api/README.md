@@ -12,7 +12,7 @@ conda activate ghubs_web_env
 ```
 git clone https://github.com/genomehubs/genomehubs-api
 cd genomehubs-api
-npm install
+npm install --legacy-peer-deps
 npm start
 ```
 
