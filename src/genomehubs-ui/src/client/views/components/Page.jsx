@@ -1,10 +1,19 @@
+import React, { useRef, useState } from "react";
+
+import DialogContent from "@material-ui/core/DialogContent";
 import Grid from "@material-ui/core/Grid";
-import React from "react";
+import IconButton from "@material-ui/core/IconButton";
+import Modal from "@material-ui/core/Modal";
+import SaveSettingsModal from "./SaveSettingsModal";
 import SearchBox from "./SearchBox";
+import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
+import Tooltip from "@material-ui/core/Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
 import { makeStyles } from "@material-ui/core/styles";
 import styles from "./Styles.scss";
+import { useReadLocalStorage } from "usehooks-ts";
+import withSearchIndex from "../hocs/withSearchIndex";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -14,6 +23,12 @@ const useStyles = makeStyles((theme) => ({
   },
   item: { minWidth: "900px", maxWidth: "80%", align: "center" },
   itemFull: { width: "100%", align: "center" },
+  saveSearchOptions: {
+    fontSize: "2em",
+    marginLeft: theme.spacing(1),
+    backgroundColor: "inherit",
+    padding: 0,
+  },
 }));
 
 const Page = ({
@@ -21,6 +36,7 @@ const Page = ({
   panels,
   text,
   topLevel,
+  searchIndex,
   pageRef,
   recordId,
   fieldId,
@@ -28,6 +44,9 @@ const Page = ({
   result,
 }) => {
   const classes = useStyles();
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef(null);
+  const savedOptions = useReadLocalStorage(`${searchIndex}Options`);
   const itemCss = topLevel ? classes.itemFull : classes.item;
   let items = [];
   if (panels && panels.length > 0) {
@@ -46,12 +65,24 @@ const Page = ({
     });
   }
   let title;
+  let button;
   if (recordId && result) {
     title = `${result} record ${recordId}`;
   } else if (fieldId) {
     title = `${fieldId} summary`;
   } else if (resultCount >= 0) {
     title = `${resultCount} ${resultCount == 1 ? "hit" : "hits"}`;
+    button = (
+      <Tooltip title="Save search settings" arrow placement={"top"}>
+        <IconButton
+          className={classes.saveSearchOptions}
+          aria-label="save search settings"
+          onClick={() => setOpen(!open)}
+        >
+          <SettingsApplicationsIcon />
+        </IconButton>
+      </Tooltip>
+    );
   } else if (resultCount < 0) {
     title = `updating search results...`;
   }
@@ -75,8 +106,34 @@ const Page = ({
           item
           className={classnames(styles.pageTitle, itemCss)}
           style={{ marginBottom: "0.5em" }}
+          container
+          direction="row"
+          ref={rootRef}
         >
-          {title}
+          <Grid item xs={11}>
+            {title}
+          </Grid>
+          {button && (
+            <Grid item xs={1} style={{ textAlign: "end" }}>
+              {button}
+              <Modal
+                open={open}
+                onClose={(event, reason) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setOpen(false);
+                }}
+                aria-labelledby="save-settings-modal-title"
+                aria-describedby="save-settings-modal-description"
+                className={classes.modal}
+                container={() => rootRef.current}
+              >
+                <DialogContent className={classes.paper}>
+                  <SaveSettingsModal handleClose={() => setOpen(false)} />
+                </DialogContent>
+              </Modal>
+            </Grid>
+          )}
         </Grid>
       )}
       {items}
@@ -89,4 +146,4 @@ const Page = ({
   );
 };
 
-export default Page;
+export default compose(withSearchIndex)(Page);

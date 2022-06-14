@@ -71,7 +71,6 @@ const SearchBox = ({
   });
 
   let [result, setResult] = useState(searchIndex);
-  console.log(savedOptions);
   let fields =
     searchTerm.fields ||
     savedOptions?.fields?.join(",") ||
@@ -101,6 +100,21 @@ const SearchBox = ({
     if (!options.size && savedOptions?.size) {
       options.size = savedOptions.size;
     }
+    if (savedOptions) {
+      if (savedOptions.sortBy && !options.sortBy) {
+        options.sortBy = savedOptions.sortBy;
+        options.sortOrder = savedOptions.sortOrder || "asc";
+      }
+      ["Ancestral", "Descendant", "Direct", "Missing"].forEach((key) => {
+        let keyName = `exclude${key}`;
+        if (
+          savedOptions.hasOwnProperty(keyName) &&
+          !options.hasOwnProperty(keyName)
+        )
+          options[keyName] = savedOptions[keyName];
+      });
+    }
+
     fetchSearchResults(options);
     setPreferSearchTerm(false);
     navigate(`/search?${qs.stringify(options)}#${encodeURIComponent(term)}`);

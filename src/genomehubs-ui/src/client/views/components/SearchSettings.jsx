@@ -186,13 +186,6 @@ const SearchSettings = ({
       taxonomy: state.taxonomy,
     };
     setPreferSearchTerm(false);
-    setSavedOptions({
-      result: index,
-      fields,
-      names,
-      ranks,
-      taxonomy: state.taxonomy,
-    });
     navigate(`/search?${qs.stringify(options)}${location.hash || ""}`);
   };
 
