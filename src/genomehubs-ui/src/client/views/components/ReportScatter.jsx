@@ -52,11 +52,11 @@ const searchByCell = ({
   query = query
     .replaceAll(new RegExp("AND\\s+" + bounds.field + "\\s+AND", "gi"), "AND")
     .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_]+", "gi"),
+      new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_\\.]+", "gi"),
       ""
     )
     .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_]+", "gi"),
+      new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_\\.]+", "gi"),
       ""
     )
     .replaceAll(/\s+/g, " ")
@@ -107,7 +107,9 @@ const searchByCell = ({
   }
 
   // let fields = `${xLabel},${yLabel}`;
-  let options = qs.parse(location.search.replace(/^\?/, ""));
+  let { xOpts, yOpts, highlightArea, ...options } = qs.parse(
+    location.search.replace(/^\?/, "")
+  );
   if (options.sortBy && !fields.includes(options.sortBy)) {
     delete options.sortBy;
     delete options.sortOrder;
