@@ -240,6 +240,7 @@ def set_traverse_values(
     summaries,
     values,
     primary_values,
+    count,
     max_value,
     min_value,
     meta,
@@ -273,7 +274,10 @@ def set_traverse_values(
                     or attribute["aggregation_method"] != "primary"
                 ):
                     attribute[value_type] = value
-                    attribute["count"] = len(values)
+                    if count:
+                        attribute["count"] = count
+                    else:
+                        attribute["count"] = len(values)
                     if summary == "list":
                         attribute["length"] = deduped_list_length(values)
                     attribute["aggregation_method"] = summary
@@ -309,7 +313,7 @@ def set_traverse_values(
 
 
 def summarise_attribute_values(
-    attribute, meta, *, values=None, max_value=None, min_value=None, source="direct"
+    attribute, meta, *, values=None, count=0, max_value=None, min_value=None, source="direct"
 ):
     """Calculate a single summary value for an attribute."""
     if values is None and "values" not in attribute:
@@ -345,6 +349,7 @@ def summarise_attribute_values(
             summaries,
             values,
             primary_values,
+            count,
             max_value,
             min_value,
             meta,
@@ -376,6 +381,7 @@ def summarise_attributes(*, attributes, attrs, meta, parent, parents):
             if summary_value is not None:
                 changed = True
                 if parent is not None:
+                    parents[parent][node_attribute["key"]]["count"] += 1
                     if isinstance(summary_value, list):
                         parents[parent][node_attribute["key"]][
                             "values"
@@ -461,6 +467,7 @@ def set_values_from_descendants(
             attribute,
             meta[key],
             values=obj["values"],
+            count=obj["count"],
             max_value=obj["max"],
             min_value=obj["min"],
             source=set_aggregation_source(attribute),
@@ -471,6 +478,7 @@ def set_values_from_descendants(
             changed = True
             attr_dict.update({key: attribute})
             if parent is not None:
+                parents[parent][key]["count"] += 1
                 # parents[parent][key]["prefixed_values"] = list(
                 #     set(
                 #         parents[parent][key]["prefixed_values"]
@@ -580,7 +588,7 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
     attrs = set(meta.keys())
     parents = defaultdict(
         lambda: defaultdict(
-            lambda: {"max": None, "min": None, "values": [], "prefixed_values": []}
+            lambda: {"max": None, "min": None, "values": [], "prefixed_values": [], "count": 0}
         )
     )
     limits = defaultdict(set)
