@@ -13,6 +13,7 @@ import { getSuggestedTerm } from "../reducers/search";
 import { makeStyles } from "@material-ui/core/styles";
 import qs from "qs";
 import { useNavigate } from "@reach/router";
+import { useReadLocalStorage } from "usehooks-ts";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
@@ -61,6 +62,7 @@ const SearchBox = ({
   const navigate = useNavigate();
   const searchBoxRef = useRef(null);
   const searchInputRef = useRef(null);
+  const savedOptions = useReadLocalStorage(`${searchIndex}Options`);
   let [multiline, setMultiline] = useState(() => {
     if (searchTerm && searchTerm.query && searchTerm.query.match(/[\r\n]/)) {
       return true;
@@ -69,9 +71,15 @@ const SearchBox = ({
   });
 
   let [result, setResult] = useState(searchIndex);
-  let fields = searchTerm.fields || searchDefaults.fields;
-  let ranks = searchTerm.ranks || searchDefaults.ranks;
-  let names = searchTerm.names || searchDefaults.names;
+  let fields =
+    searchTerm.fields ||
+    savedOptions?.fields?.join(",") ||
+    searchDefaults.fields;
+  let ranks =
+    searchTerm.ranks || savedOptions?.ranks?.join(",") || searchDefaults.ranks;
+  let names =
+    searchTerm.names || savedOptions?.names?.join(",") || searchDefaults.names;
+
   const dispatchSearch = (options, term) => {
     if (!options.hasOwnProperty("includeEstimates")) {
       options.includeEstimates = searchDefaults.includeEstimates;
@@ -89,6 +97,24 @@ const SearchBox = ({
       options.names = names;
     }
     options.taxonomy = taxonomy;
+    if (!options.size && savedOptions?.size) {
+      options.size = savedOptions.size;
+    }
+    if (savedOptions) {
+      if (savedOptions.sortBy && !options.sortBy) {
+        options.sortBy = savedOptions.sortBy;
+        options.sortOrder = savedOptions.sortOrder || "asc";
+      }
+      ["Ancestral", "Descendant", "Direct", "Missing"].forEach((key) => {
+        let keyName = `exclude${key}`;
+        if (
+          savedOptions.hasOwnProperty(keyName) &&
+          !options.hasOwnProperty(keyName)
+        )
+          options[keyName] = savedOptions[keyName];
+      });
+    }
+
     fetchSearchResults(options);
     setPreferSearchTerm(false);
     navigate(`/search?${qs.stringify(options)}#${encodeURIComponent(term)}`);

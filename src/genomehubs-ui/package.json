@@ -128,6 +128,7 @@
     "unfetch": "^4.2.0",
     "unified": "^9.2.2",
     "unist-util-visit": "^3.1.0",
-    "use-long-press": "^1.1.1"
+    "use-long-press": "^1.1.1",
+    "usehooks-ts": "^2.5.4"
   }
 }

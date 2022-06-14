@@ -1,32 +1,20 @@
 import React, { memo, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import AutorenewIcon from "@material-ui/icons/Autorenew";
-import BasicSelect from "./BasicSelect";
-import Button from "@material-ui/core/Button";
 import Checkbox from "@material-ui/core/Checkbox";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import Grid from "@material-ui/core/Grid";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
 import MuiAccordion from "@material-ui/core/Accordion";
 import MuiAccordionDetails from "@material-ui/core/AccordionDetails";
 import MuiAccordionSummary from "@material-ui/core/AccordionSummary";
 import Paper from "@material-ui/core/Paper";
-import ReplayIcon from "@material-ui/icons/Replay";
-import Select from "@material-ui/core/Select";
 import SettingsButton from "./SettingsButton";
-import Switch from "@material-ui/core/Switch";
-import TextField from "@material-ui/core/TextField";
 import Tooltip from "@material-ui/core/Tooltip";
-import Typography from "@material-ui/core/Typography";
 import { compose } from "recompose";
 import { makeStyles } from "@material-ui/core/styles";
 import qs from "qs";
-import styles from "./Styles.scss";
+import { useLocalStorage } from "usehooks-ts";
 import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";
 import withSearch from "../hocs/withSearch";
@@ -130,6 +118,11 @@ const SearchSettings = ({
   });
   let index = searchIndex;
 
+  const [savedOptions, setSavedOptions] = useLocalStorage(
+    `${searchIndex}Options`,
+    {}
+  );
+
   const handleTaxonomyChange = (e) => {
     e.stopPropagation();
     setState({
@@ -166,7 +159,6 @@ const SearchSettings = ({
   const classes = useStyles();
   const navigate = useNavigate();
   const location = useLocation();
-  let options = { ...searchTerm };
 
   const handleClick = () => {
     let fields = [];
@@ -183,6 +175,7 @@ const SearchSettings = ({
         }
       }
     });
+
     let options = {
       ...searchTerm,
       result: index,
@@ -192,10 +185,6 @@ const SearchSettings = ({
       ranks: ranks.join(","),
       taxonomy: state.taxonomy,
     };
-    // delete options.excludeAncestral;
-    // delete options.excludeDescendant;
-    // delete options.excludeDirect;
-    // delete options.excludeMissing;
     setPreferSearchTerm(false);
     navigate(`/search?${qs.stringify(options)}${location.hash || ""}`);
   };
@@ -216,6 +205,7 @@ const SearchSettings = ({
     delete options.excludeDirect;
     delete options.excludeMissing;
     setPreferSearchTerm(false);
+    setSavedOptions({});
     navigate(`/search?${qs.stringify(options)}${location.hash || ""}`);
   };
 
@@ -294,17 +284,7 @@ const SearchSettings = ({
   return (
     <Paper className={classes.paper}>
       <Grid container alignItems="center" direction="column">
-        <Grid container alignItems="center" direction="row" spacing={2}>
-          {/* <Grid item>
-            <BasicSelect
-              current={state.taxonomy}
-              id={"search-index-select"}
-              handleChange={handleTaxonomyChange}
-              helperText={"taxonomy"}
-              values={taxonomyValues}
-            />
-          </Grid> */}
-        </Grid>
+        <Grid container alignItems="center" direction="row" spacing={2}></Grid>
         <Grid container alignItems="flex-start" direction="row" spacing={2}>
           {groups}
         </Grid>
