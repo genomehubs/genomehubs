@@ -219,7 +219,7 @@ const AttributeTableRow = ({
 
   const [open, setOpen] = useState(false);
 
-  const handleAncestorClick = (fieldId, ancTaxonId) => {
+  const handleAncestorClick = (fieldId, ancTaxonId, depth) => {
     // setSummaryField(fieldId);
     // setPreferSearchTerm(false);
     // navigate(
@@ -233,12 +233,17 @@ const AttributeTableRow = ({
       summaryValues: "count",
       taxonomy,
     };
+    if (depth) {
+      options.query += ` AND tax_depth(${depth})`;
+      options.includeEstimates = true;
+      options.excludeAncestral = [fieldId];
+    }
     navigate(
       `/search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`
     );
   };
 
-  const handleDescendantClick = (fieldId) => {
+  const handleDescendantClick = (fieldId, depth) => {
     let options = {
       query: `tax_tree(${taxonId})`,
       result: currentResult,
@@ -247,6 +252,11 @@ const AttributeTableRow = ({
       summaryValues: "count",
       taxonomy,
     };
+    if (depth) {
+      options.query += ` AND tax_depth(${depth})`;
+      options.includeEstimates = true;
+      options.excludeAncestral = [fieldId];
+    }
     navigate(
       `/search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`
     );
@@ -310,7 +320,25 @@ const AttributeTableRow = ({
       </TableCell>
     );
     if (currentResult == "taxon") {
-      fieldValues.push(<TableCell key={"count"}>{meta.count}</TableCell>);
+      let source = meta.aggregation_source;
+      let handleClick = () => {};
+      if (source == "ancestor") {
+        handleClick = () =>
+          handleAncestorClick(attributeId, meta.aggregation_taxon_id, 1);
+      } else if (source == "descendant") {
+        handleClick = () => handleDescendantClick(attributeId, 1);
+      } else if (source == "direct") {
+        handleClick = () => setOpen(!open);
+      }
+      fieldValues.push(
+        <TableCell
+          key={"count"}
+          onClick={handleClick}
+          style={{ cursor: "pointer" }}
+        >
+          {meta.count}
+        </TableCell>
+      );
       fieldValues.push(
         <TableCell key={"method"}>{meta.aggregation_method}</TableCell>
       );
