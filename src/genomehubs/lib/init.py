@@ -74,13 +74,13 @@ from tolkein import tofile
 from tolkein import tolog
 
 from ..lib import analysis
-from ..lib import assembly
 from ..lib import es_functions
 from ..lib import feature
 from ..lib import files
 from ..lib import hub
 from ..lib import taxon
 from ..lib import taxonomy
+from . import sample
 from .config import config
 from .version import __version__
 
@@ -220,7 +220,7 @@ def main(args):
             es.reindex(body=body)
 
         # Prepare assembly index
-        assembly_template = assembly.index_template(taxonomy_name, options["init"])
+        assembly_template = sample.index_template(taxonomy_name, options["init"], index_type="assembly")
         es_functions.load_mapping(
             es, assembly_template["name"], assembly_template["mapping"]
         )

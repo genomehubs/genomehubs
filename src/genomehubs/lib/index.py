@@ -7,8 +7,7 @@ Usage:
     genomehubs index [--hub-name STRING] [--hub-path PATH] [--hub-version PATH]
                      [--config-file PATH...] [--config-save PATH]
                      [--es-host URL...] [--assembly-dir PATH]
-                     [--assembly-repo URL] [--assembly-exception PATH]
-                     [--feature-dir PATH]
+                     [--feature-dir PATH] [--sample-dir PATH]
                      [--taxon-dir PATH] [--taxon-repo URL] [--taxon-exception PATH]
                      [--taxon-lookup STRING] [--taxon-lookup-root STRING]
                      [--taxon-lookup-in-memory] [--taxon-id-as-xref STRING]
@@ -29,9 +28,7 @@ Options:
     --config-save PATH         Path to write configuration options to YAML file.
     --es-host URL              ElasticSearch hostname/URL and port.
     --assembly-dir PATH        Path to directory containing assembly-level data.
-    --assembly-repo URL        Remote git repository containing assembly-level data.
-                               Optionally include `~branch-name` suffix.
-    --assembly-exception PATH  Path to directory to write assembly data that failed to import.
+    --sample-dir PATH          Path to directory containing sample-level data.
     --feature-dir PATH         Path to directory containing feature-level data.
     --taxon-lookup-root STRING Root taxon Id for in-memory lookup.
     --taxon-lookup STRING      Taxon name class to lookup (scientific|any). [Default: scientific]
@@ -50,6 +47,7 @@ Options:
     --remote-file URL          Location of remote file for generic file import.
     --remote-file-dir URL      Location of remote directory containing generic files to import.
     --taxon-id STRING          Taxon ID to index files against.
+    --sample-id STRING         Sample ID to index files against.
     --assembly-id STRING       Assembly ID to index files against.
     --analysis-id STRING       Analysis ID to index files against.
     --file-title STRING        Default title for indexed files.
@@ -76,12 +74,11 @@ from docopt import docopt
 from tolkein import tolog
 from tqdm import tqdm
 
-from ..lib import assembly
 from ..lib import es_functions
 from ..lib import feature
 from ..lib import hub
 from ..lib import taxon
-from .assembly import add_identifiers_and_attributes_to_assemblies
+from . import sample
 from .attributes import index_types
 from .config import config
 from .es_functions import index_stream
@@ -94,6 +91,7 @@ from .hub import strip_comments
 from .hub import write_imported_rows
 from .hub import write_imported_taxa
 from .hub import write_spellchecked_taxa
+from .sample import add_identifiers_and_attributes_to_entries
 from .taxon import add_names_and_attributes_to_taxa
 from .taxon import fix_missing_ids
 from .taxon import load_taxon_table
@@ -191,15 +189,16 @@ def index_assembly_records(
     es, taxonomy_name, opts, with_ids, blanks, taxon_types, taxon_asm_data
 ):
     """Index an assembly records."""
-    assembly_template = assembly.index_template(taxonomy_name, opts)
+    assembly_template = sample.index_template(taxonomy_name, opts, index_type="assembly")
     taxon_template = taxon.index_template(taxonomy_name, opts)
-    docs = add_identifiers_and_attributes_to_assemblies(
+    docs = add_identifiers_and_attributes_to_entries(
         es,
         with_ids,
         opts,
         template=assembly_template,
         taxon_template=taxon_template,
         blanks=blanks,
+        index_type="assembly",
     )
     index_stream(
         es,
