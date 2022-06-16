@@ -15,7 +15,8 @@ Usage:
                      [--taxon-spellcheck] [--taxonomy-source STRING]
                      [--file PATH...] [file-dir PATH...]
                      [--remote-file URL...] [--remote-file-dir URL...]
-                     [--taxon-id STRING] [--assembly-id STRING] [--analysis-id STRING]
+                     [--taxon-id STRING] [--assembly-id STRING]
+                     [--sample-id STRING] [--analysis-id STRING]
                      [--file-title STRING] [--file-description STRING] [--file-metadata PATH]
                      [--dry-run]
                      [-h|--help] [-v|--version]
@@ -185,24 +186,24 @@ def index_taxon_records(es, taxonomy_name, opts, with_ids, blanks, types):
     write_imported_taxa(imported_taxa, opts, types=types)
 
 
-def index_assembly_records(
-    es, taxonomy_name, opts, with_ids, blanks, taxon_types, taxon_asm_data
+def index_sample_records(
+    es, taxonomy_name, opts, with_ids, blanks, taxon_types, taxon_asm_data, index_type="sample"
 ):
-    """Index an assembly records."""
-    assembly_template = sample.index_template(taxonomy_name, opts, index_type="assembly")
+    """Index sample records."""
+    sample_template = sample.index_template(taxonomy_name, opts, index_type=index_type)
     taxon_template = taxon.index_template(taxonomy_name, opts)
     docs = add_identifiers_and_attributes_to_entries(
         es,
         with_ids,
         opts,
-        template=assembly_template,
+        template=sample_template,
         taxon_template=taxon_template,
         blanks=blanks,
-        index_type="assembly",
+        index_type=index_type,
     )
     index_stream(
         es,
-        assembly_template["index_name"],
+        sample_template["index_name"],
         docs,
         dry_run=opts.get("dry-run", False),
     )
@@ -234,7 +235,7 @@ def index_assembly_records(
     )
 
 
-def process_taxon_assembly_records(
+def process_taxon_sample_records(
     es,
     taxonomy_name,
     opts,
@@ -249,7 +250,7 @@ def process_taxon_assembly_records(
     taxon_table,
     taxon_types,
 ):
-    """Process taxon and assembly records."""
+    """Process taxon and sample records."""
     taxon_template = taxon.index_template(taxonomy_name, opts)
     without_ids = defaultdict(list)
     if "taxon-id-as-xref" in opts:
@@ -307,8 +308,13 @@ def process_taxon_assembly_records(
             index_taxon_records(es, taxonomy_name, opts, with_ids, blanks, types)
         elif opts["index"] == "assembly":
             # TODO: keep track of taxon_id not found exceptions
-            index_assembly_records(
-                es, taxonomy_name, opts, with_ids, blanks, taxon_types, taxon_asm_data
+            index_sample_records(
+                es, taxonomy_name, opts, with_ids, blanks, taxon_types, taxon_asm_data, index_type="assembly"
+            )
+        elif opts["index"] == "sample":
+            # TODO: keep track of taxon_id not found exceptions
+            index_sample_records(
+                es, taxonomy_name, opts, with_ids, blanks, taxon_types, taxon_asm_data, index_type="sample"
             )
 
 
@@ -383,8 +389,8 @@ def index_file(es, types, names, data, opts, *, taxon_table=None, shared_values=
             if not_blank("taxon_id", processed_data["taxonomy"], blanks):
                 tmp_taxon_id = processed_data["taxonomy"]["taxon_id"]
             processed_rows[tmp_taxon_id].append((processed_data, taxon_data, row))
-    if opts["index"] in ["taxon", "assembly"]:
-        process_taxon_assembly_records(
+    if opts["index"] in ["taxon", "sample", "assembly"]:
+        process_taxon_sample_records(
             es,
             taxonomy_name,
             opts,
@@ -403,8 +409,8 @@ def index_file(es, types, names, data, opts, *, taxon_table=None, shared_values=
         index_feature_records(es, opts, taxonomy_name, with_ids, blanks)
 
 
-def index_taxon_assembly(es, opts, index="taxon", *, dry_run=False, taxonomy_name):
-    """Call taxon- or assembly-specific indexing functions."""
+def index_taxon_sample(es, opts, index="taxon", *, dry_run=False, taxonomy_name):
+    """Call taxon- or sample-specific indexing functions."""
     taxon_table = None
     if taxon_table is None and "taxon-lookup-in-memory" in opts:
         taxon_table = {
@@ -473,7 +479,6 @@ def index_taxon_assembly(es, opts, index="taxon", *, dry_run=False, taxonomy_nam
                     if result is False:
                         LOGGER.error("Failed tests")
                         exit(1)
-                # time.sleep(5)
 
 
 def set_feature_types(types):
@@ -483,6 +488,7 @@ def set_feature_types(types):
     defaults = {
         "feature_id": "keyword",
         "assembly_id": "keyword",
+        "sample_id": "keyword",
         "taxon_id": "keyword",
         "primary_type": "keyword",
     }
@@ -544,8 +550,8 @@ def main(args):
 
     taxonomy_name = options["index"]["taxonomy-source"].lower()
     dry_run = options["index"].get("dry-run", False)
-    for index in list(["taxon", "assembly"]):
-        index_taxon_assembly(
+    for index in list(["taxon", "sample", "assembly"]):
+        index_taxon_sample(
             es,
             options["index"],
             index=index,
