@@ -354,55 +354,52 @@ const processScatter = (scatter) => {
         }
       });
       chartData.push(catData);
-      if (
-        hasRawData &&
-        pointData &&
-        heatmaps &&
-        heatmaps.rawData &&
-        heatmaps.rawData[cat.key]
-      ) {
+      if (hasRawData && pointData && heatmaps && heatmaps.rawData) {
         let points = [];
-        let buckets = new Set(heatmaps.buckets);
-        let yBuckets = new Set(heatmaps.yBuckets);
-        for (let obj of heatmaps.rawData[cat.key]) {
-          if (
-            expandValues(
-              obj,
-              heatmaps.rawData[cat.key],
-              heatmaps.buckets,
-              heatmaps.yBuckets
-            )
-          ) {
-            continue;
-          }
-          let x;
-          let y;
-          if (scatter.bounds.scale == "ordinal") {
-            let name = obj.x.toLowerCase();
-            if (!buckets.has(name)) {
-              name = "other";
+        if (heatmaps.rawData[cat.key]) {
+          let buckets = new Set(heatmaps.buckets);
+          let yBuckets = new Set(heatmaps.yBuckets);
+          console.log(cat.key);
+          for (let obj of heatmaps.rawData[cat.key]) {
+            if (
+              expandValues(
+                obj,
+                heatmaps.rawData[cat.key],
+                heatmaps.buckets,
+                heatmaps.yBuckets
+              )
+            ) {
+              continue;
             }
-            x = xScale(name);
-            x = applyJitter(x + 0.5, 0.95);
-          } else {
-            x = xScale(obj.x);
-          }
-          if (scatter.yBounds.scale == "ordinal") {
-            let name = obj.y.toLowerCase();
-            if (!yBuckets.has(name)) {
-              name = "other";
+            let x;
+            let y;
+            if (scatter.bounds.scale == "ordinal") {
+              let name = obj.x.toLowerCase();
+              if (!buckets.has(name)) {
+                name = "other";
+              }
+              x = xScale(name);
+              x = applyJitter(x + 0.5, 0.95);
+            } else {
+              x = xScale(obj.x);
             }
-            y = yScale(name);
-            y = applyJitter(y + 0.5, 0.95);
-          } else {
-            y = yScale(obj.y);
+            if (scatter.yBounds.scale == "ordinal") {
+              let name = obj.y.toLowerCase();
+              if (!yBuckets.has(name)) {
+                name = "other";
+              }
+              y = yScale(name);
+              y = applyJitter(y + 0.5, 0.95);
+            } else {
+              y = yScale(obj.y);
+            }
+            // TODO: Handle features with no scientific name
+            locations[obj.scientific_name.toLowerCase()] = {
+              x,
+              y,
+            };
+            points.push({ ...obj, x, y });
           }
-          // TODO: Handle features with no scientific name
-          locations[obj.scientific_name.toLowerCase()] = {
-            x,
-            y,
-          };
-          points.push({ ...obj, x, y });
         }
         pointData.push(points);
         // pointData.push(heatmaps.rawData[cat.key]);
