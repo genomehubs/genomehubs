@@ -56,6 +56,42 @@ attributes:
     header: isolate
     display_name: Isolate
     type: keyword
+  estimated_genome_size:
+    display_level: 2
+    header: estimated_size
+    display_name: Estimated genome size
+    type: keyword
+  location_name:
+    display_level: 2
+    header: geo_loc_name
+    display_name: Location name
+    type: keyword
+  num_replicons:
+    display_level: 2
+    header: num_replicons
+    display_name: Number of replicons
+    type: short
+  ploidy:
+    display_level: 1
+    header: ploidy
+    display_name: Ploidy
+    type: keyword
+  latitude:
+    display_level: 1
+    header: latitude
+    display_name: latitude
+    type: 4dp
+  longitude:
+    display_level: 1
+    header: longitude
+    display_name: longitude
+    type: 4dp
+  elevation:
+    display_level: 2
+    header: elevation
+    display_name: Elevation
+    type: short
+    unit: "m"
   assembly_level:
     display_level: 1
     header: assemblyLevel

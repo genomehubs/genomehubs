@@ -253,77 +253,66 @@ def parse_ncbi_datasets_record(record, parsed):
     parsed[obj["genbankAssmAccession"]] = obj
 
 
-def ncbi_genome_parser(_params, opts, *, types=None, names=None):
+def convert_lat_lon_deg_to_dec(lat_lon):
+    """Convert latitude or longitude string to decimal."""
+    if lat_lon is None:
+        return None
+    try:
+        lat_lon = str(lat_lon)
+        multiplier = -1 if lat_lon[-1] in ["S", "W"] else 1
+        lat_lon = re.sub(r"[NESW]", "", lat_lon)
+        parts = re.split(r"[°ʹ″]", lat_lon)
+        if len(parts) >= 3:
+            return multiplier * sum(float(x) / 60 ** n for n, x in enumerate(parts[:3]))
+        return multiplier * float(lat_lon)
+    except Exception:
+        return None
+
+
+def parse_ncbi_datasets_sample(record, parsed):
+    """Parse sample information from a single NCBI datasets record."""
+    obj = {}
+    for key in ("taxId", "isolate", "sex"):
+        obj[key] = record.get(key, "None")
+    assemblyInfo = record.get("assemblyInfo", {})
+    for key in (
+        "assemblyLevel",
+        "biosampleAccession",
+        "genbankAssmAccession",
+        "refseqAssmAccession",
+        "refseqCategory",
+        "submitter",
+    ):
+        obj[key] = assemblyInfo.get(key, None)
+        if key == "refseqCategory":
+            if obj[key] == "representative genome":
+                obj["primaryValue"] = 1
+            else:
+                obj["primaryValue"] = None
+    attributes = {entry["name"]: entry["value"] for entry in assemblyInfo.get("biosample", {}).get("attributes", [])}
+    for key in ("estimated_size", "geo_loc_name", "num_replicons", "ploidy"):
+        obj[key] = attributes.get(key, None)
+    obj["latitude"] = convert_lat_lon_deg_to_dec(attributes.get("geographic location (latitude)", None))
+    obj["longitude"] = convert_lat_lon_deg_to_dec(attributes.get("geographic location (longitude)", None))
+    obj["elevation"] = attributes.get("geographic location (elevation)", None)
+    bioprojects = []
+    for lineage in assemblyInfo.get("bioprojectLineage", []):
+        for bioproject in lineage["bioprojects"]:
+            bioprojects.append(bioproject["accession"])
+    obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else None
+    parsed[obj["biosampleAccession"]] = obj
+
+
+def ncbi_genome_parser(params, opts, *, types=None, names=None):
     """Parse NCBI Datasets genome report."""
     parsed = {}
     with tofile.open_file_handle(
-        "%s/ncbi_dataset/data/assembly_data_report.jsonl" % opts["ncbi-datasets-genome"]
+        "%s/ncbi_dataset/data/assembly_data_report.jsonl" % opts["ncbi-datasets-%s" % params]
     ) as report:
         for line in report:
             record = ujson.loads(line)
-            parse_ncbi_datasets_record(record, parsed)
+            if params == "sample":
+                parse_ncbi_datasets_sample(record, parsed)
+            else:
+                parse_ncbi_datasets_record(record, parsed)
     return [value for value in parsed.values()]
-
-
-# def parse_ncbi_datasets_summary(record, parsed):
-#     """Parse a single NCBI datasets summary."""
-#     obj = {}
-#     return
-#     for key in ("taxId", "speciesName", "commonName", "isolate", "sex"):
-#         obj[key] = record.get(key, None)
-#     assemblyInfo = record.get("assemblyInfo", {})
-#     for key in ("assembly_category", "assembly_level"):
-#         obj[key] = assemblyInfo.get(key, None)
-#     # "assembly_accession": "GCF_900239965.1",
-#     if obj["refseqAssmAccession"] == "na":
-#         obj["refseqAssmAccession"] = None
-#         obj["refseqCategory"] = None
-#     annotationInfo = record.get("annotationInfo", {})
-#     if annotationInfo:
-#         annot = {}
-#         for key in ("name", "releaseDate", "reportUrl", "source"):
-#             annot["annotation%s" % key.capitalize()] = annotationInfo.get(key, None)
-#         if annot and "stats" in annotationInfo:
-#             geneCounts = annotationInfo["stats"].get("geneCounts", None)
-#             for key in ("nonCoding", "proteinCoding", "pseudogene", "total"):
-#                 annot["geneCount%s" % key.capitalize()] = geneCounts.get(key, None)
-#             if obj["genbankAssmAccession"] in parsed:
-#                 parsed[obj["genbankAssmAccession"]].update(annot)
-#                 return
-#             obj.update(annot)
-#     bioprojects = []
-#     for lineage in assemblyInfo.get("bioprojectLineage", []):
-#         for bioproject in lineage["bioprojects"]:
-#             bioprojects.append(bioproject["accession"])
-#     obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else None
-#     assemblyStats = record.get("assemblyStats", {})
-#     obj.update(assemblyStats)
-#     wgsInfo = record.get("wgsInfo", {})
-#     for key in ("masterWgsUrl", "wgsContigsUrl", "wgsProjectAccession"):
-#         obj[key] = wgsInfo.get(key, None)
-#     parsed[obj["genbankAssmAccession"]] = obj
-
-
-# def ncbi_datasets_summary_parser(_params, opts):
-#     """Fetch and parse NCBI Datasets summary."""
-#     parsed = {}
-#     datasets = check_output(
-#         ["datasets", "summary", "genome", "taxon", opts["ncbi-datasets-summary"]]
-#     )
-#     data = ujson.loads(datasets)
-#     if "assemblies" not in data:
-#         LOGGER.error("unable to fetch assemblies for %s", opts["ncbi-datasets-summary"])
-#         print(data)
-#         sys.exit(1)
-#     for record in data["assemblies"]:
-#         parse_ncbi_datasets_summary(record, parsed)
-#     print(parsed)
-#     quit()
-#     # parsed = {}
-#     # with tofile.open_file_handle(
-#     #     "%s/ncbi_dataset/data/assembly_data_report.jsonl" % directory
-#     # ) as report:
-#     #     for line in report:
-#     #         record = ujson.loads(line)
-#     #         parse_ncbi_datasets_record(record, parsed)
-#     return [value for value in parsed.values()]

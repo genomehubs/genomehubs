@@ -1,0 +1,98 @@
+taxId	organismName	genbankAssmAccession	biosampleAccession	refseqAssmAccession	wgsProjectAccession	assemblyName	sex	isolate	estimated_size	geo_loc_name	num_replicons	ploidy	latitude	longitude	elevation	assemblyLevel	assemblyType	submitter
+3750	None	GCA_000148765.2	SAMN02981243	GCF_000148765.1	None	None	None	None								Chromosome	None	IASMA research center
+101020	None	GCA_000184155.1	SAMN00120060	GCF_000184155.1	None	None	None	None								Chromosome	None	Virginia Bioinformatics Institute
+3760	None	GCA_000218175.1	SAMN00115266		None	None	None	None								Scaffold	None	UC Davis Genome Center Bioinformatics Core
+3760	None	GCA_000218195.1	SAMN00115268		None	None	None	None								Scaffold	None	UC Davis Genome Center Bioinformatics Core
+3760	None	GCA_000218215.1	SAMN00115267		None	None	None	None								Scaffold	None	UC Davis Genome Center Bioinformatics Core
+225117	None	GCA_000315295.1	SAMN01797448	GCF_000315295.1	None	None	None	None								Scaffold	None	Nanjing Agricultural University
+3760	None	GCA_000346465.2	SAMN02981429	GCF_000346465.2	None	None	None	None								Chromosome	None	PGF
+102107	None	GCA_000346735.1	SAMN02981503	GCF_000346735.1	None	None	None	4		China: Tongmai, Bomi County, Tibet						Chromosome	None	BGI
+3747	None	GCA_000511835.1			None	None	None	None								Scaffold	None	Kazusa DNA Research Institute
+64939	None	GCA_000511975.1	SAMD00010918		None	None	None	None								Scaffold	None	Kazusa DNA Research Institute
+60188	None	GCA_000511995.1	SAMD00010927		None	None	None	None								Scaffold	None	Kazusa DNA Research Institute
+101012	None	GCA_000512025.1	SAMD00010925		None	None	None	None								Scaffold	None	Kazusa DNA Research Institute
+101013	None	GCA_000517285.1	SAMD00010919		None	None	None	None								Scaffold	None	Kazusa DNA Research Institute
+3765	None	GCA_001662545.1	SAMN05017599		None	None	None	None		Bulgaria						Scaffold	None	BIO-FD&C CO.,LTD
+3750	None	GCA_002114115.1	SAMN05603590	GCF_002114115.1	None	None	None	X9273 #13		France: Angers						Chromosome	None	IRHS
+42229	None	GCA_002207925.1	SAMD00052827	GCF_002207925.1	None	None	None	None	380 Mb	Japan:Yamagata	missing	diploid				Scaffold	None	Kazusa DNA Research Institute
+74647	None	GCA_002564525.1	SAMD00050899		None	None	None	None	750 Mb	Japan: Osaka	missing	diploid				Scaffold	None	Kazusa DNA Research Institute
+2094558	None	GCA_002966975.2	SAMN06706664		None	None	None	None		South Korea: Jeju island						Scaffold	None	Plant Molecular Genetics Lab
+74649	None	GCA_002994745.2	SAMN07737764	GCF_002994745.2	None	None	None	None	520Mb	not applicable	missing	diploid				Chromosome	None	INRA/CNRS
+48231	None	GCA_003254865.1	SAMN08442485		None	None	None	NF-2018-8		not collected						Scaffold	None	BGI
+32243	None	GCA_003254885.1	SAMN08442488		None	None	None	NF-2018-11		not collected						Scaffold	None	BGI
+42229	None	GCA_003946875.1	SAMN09976372		None	None	None	None	282M	China	missing	diploid				Contig	None	Hunan Agricultural University
+3750	None	GCA_004115385.1	SAMN09744170		None	None	None	None		China:Xingcheng						Chromosome	None	nextomics
+3759	None	GCA_005406145.1	SAMD00162631		None	None	None	None	690 Mb	missing	missing	diploid				Contig	None	Kazusa DNA Research Institute
+106549	None	GCA_006547085.1	SAMN08323692		None	None	None	None		China: Shanxi						Scaffold	None	Northwest A&F University
+74648	None	GCA_006954505.1	SAMN10395143		None	None	None	None		Unknown						Scaffold	None	Research Institute for Agriculture, Fisheries and Food (ILVO)
+436086	None	GCA_007844245.1	SAMN11264821		None	None	None	None		China:Xingcheng						Chromosome	None	Research Institute of Pomology, Chinese Academy of Agricultural Sciences
+3755	None	GCA_008632915.2	SAMD00145063		None	None	None	None	250 Mbp	not applicable	1514	diploid				Contig	None	Sequentia Biotech SL
+2448454	None	GCA_008932095.1	SAMN10188208		None	None	None	S2		China						Chromosome	None	Research Institute of Pomology Chinese Academy of Agricultural Sciences
+64939	None	GCA_009720345.1	SAMN11855975		None	None	None	FII-19-9		Japan: Hokkaido						Chromosome	None	School of Agriculture, Yunnan University
+64941	None	GCA_010134655.1	SAMN13430080		None	None	None	YN2017-HM1		China:Yunnan						Chromosome	None	Shenyang Agricultural University
+42229	None	GCA_012349055.1	SAMN10373441		None	None	None	None		China: Shandong						Scaffold	None	Shandong Institute of Pomology
+42229	None	GCA_013416215.1	SAMN08056384		None	None	None	None		missing						Chromosome	None	Universita' degli Studi di Udine
+42229	None	GCA_014155035.1	SAMN13640536		None	None	None	None		China: Shandong						Chromosome	None	Shandong Institute of Pomology
+88123	None	GCA_014863905.1	SAMN12842679		None	None	None	YHH-2019		China:Guangdong						Chromosome	None	South China Agricultural University
+36610	None	GCA_015708375.1	SAMN16704925		None	None	None	None		Turkey						Contig	None	Necmettin Erbakan University
+3760	None	GCA_015730445.1	SAMN16120604		None	None	None	None		China:Beijing						Chromosome	None	Beijing Academy of Agriculture and Forestry Sciences
+3767	None	GCA_016587475.1	SAMD00260485		None	None	None	None	537 Mb	missing	missing	Diploid				Contig	None	Kazusa DNA Research Institute
+141003	None	GCA_018257905.1	SAMN16480607		None	None	None	NNPM170011		New Zealand: South Island, Balclutha						Chromosome	None	The New Zealand Institute for Plant and Food Research Limited
+3760	None	GCA_018340835.1	SAMN18202189		None	None	None	None		China: Shanghai						Chromosome	None	Beijing Academy of Agriculture and Forestry Sciences
+36596	None	GCA_018524995.1	SAMN16451429		None	None	None	None		China: Shandong						Chromosome	None	Shandong Institute of Pomology, Shandong Academy of Agricultural Sciences
+151433	None	GCA_018703695.1	SAMN19005823		None	None	None	JH20200508		Hungary: Budapest, Harmashatarhegy						Chromosome	None	Julius Kuehn Institut
+3747	None	GCA_019022445.1	SAMN16094694		None	None	None	None		South Korea						Chromosome	None	National Institute of Horticultural and Herbal Science
+3760	None	GCA_019209885.1	SAMN19992624		None	None	None	None		Iran: East Azerbaijan, Shabestar						Contig	None	Tabriz University, Tabriz, Iran
+88123	None	GCA_019277915.1	SAMN15693630		None	None	None	None		China: Fuzhou						Chromosome	None	Fruit research institute
+225117	None	GCA_019419815.1	SAMN12751541	GCF_019419815.1	None	None	None	None		China:Zhengzhou						Contig	None	Zhengzhou Fruit Research Institution
+3747	None	GCA_019650335.1	SAMD00151138		None	None	None	None	800 Mb	missing	missing	Polyploid				Scaffold	None	Kazusa DNA Research Institute
+151430	None	GCA_020226225.1	SAMN15733324		None	None	None	None		China: Tai-an,Shandong						Chromosome	None	Shandong Agricultural University
+151332	None	GCA_020226265.1	SAMN15733323		None	None	None	None		China: Tai-an,Shandong						Chromosome	None	Shandong Agricultural University
+36596	None	GCA_020226305.1	SAMN15733322		None	None	None	None		China: Tai-an,Shandong						Chromosome	None	Shandong Agricultural University
+3760	None	GCA_020226405.1	SAMN15733321		None	None	None	None		China: Tai-an,Shandong						Scaffold	None	Shandong Agricultural University
+88123	None	GCA_020226455.1	SAMN15733320		None	None	None	None		China: Tai-an,Shandong						Chromosome	None	Shandong Agricultural University
+36596	None	GCA_020424065.1	SAMN13017833		None	None	None	None		China: Liaoning						Chromosome	None	Liaoning Institute of Pomology
+1813533	None	GCA_020521435.1	SAMD00396512		None	None	None	None	700 Mb	missing	missing	Diploid				Contig	None	Kazusa DNA Research Institute
+1813533	None	GCA_020521455.1	SAMD00396513		None	None	None	None	700 Mb	missing	missing	Diploid				Contig	None	Kazusa DNA Research Institute
+106567	None	GCA_020795835.1	SAMN19613259		None	None	None	YPGW		China:Xinjiang, Yili						Chromosome	None	Xinjiang Institute of Ecology and Geography , Chinese Academy of Sciences
+3755	None	GCA_021292205.1	SAMN22169165		None	None	None	None		USA: California, Davis						Chromosome	None	Ohio State University
+3760	None	GCA_022343065.2	SAMN19967399		None	None	None	None		Russia: Crimea						Chromosome	None	National Research Center Kurchatov Institute
+3750	None	GCA_022606005.1	SAMN16283546		None	None	None	RGTH1		China:Xincheng						Chromosome	None	The New Zealand Institute for Plant & Food Research Ltd
+57919	None	GCA_900236755.1	SAMEA104363642		None	None	None	None	1.6Gb	United Kingdom	21	hexaploid	50.972255555555556	0.3121277777777778		Scaffold	None	University of Edinburgh
+2094558	None	GCA_900382725.1	SAMEA4609968		None	None	None	None								Scaffold	None	Department of Bioscience and Bioinformatics, Myongji University
+3755	None	GCA_902201215.1	SAMEA5704668	GCF_902201215.1	None	None	None	None		Spain			41.1921839	1.2064499		Chromosome	None	CNAG
+36596	None	GCA_903112645.1	SAMEA6812185		None	None	None	pruArmRojPasFocal								Contig	None	Max Planck Institute Plant Breeding
+36596	None	GCA_903114435.1	SAMEA6818161		None	None	None	pruArmRojPasFocal								Contig	None	Max Planck Institute Plant Breeding
+3750	None	GCA_916050505.1	SAMEA9197673		None	None	None	None		United Kingdom			51.309788	-0.47617		Chromosome	None	WELLCOME SANGER INSTITUTE
+3752	None	GCA_916049865.1	SAMEA9197672		None	None	None	None		United Kingdom			56.343794	-4.7078054		Contig	None	WELLCOME SANGER INSTITUTE
+3750	None	GCA_916614045.1	SAMEA9197674		None	None	None	None		United Kingdom			51.309788	-0.47617		Scaffold	None	WELLCOME SANGER INSTITUTE
+3750	None	GCA_916615275.2	SAMEA9239977		None	None	None	None		United Kingdom			52.8107	0.632		Chromosome	None	WELLCOME SANGER INSTITUTE
+3750	None	GCA_916615385.1	SAMEA8717325		None	None	None	None		United Kingdom			51.48273	-0.2903	11	Chromosome	None	WELLCOME SANGER INSTITUTE
+57926	None	GCA_933775445.1	SAMEA7522052		None	None	None	None		United Kingdom			51.4224	-0.3057	4	Chromosome	None	WELLCOME SANGER INSTITUTE
+9615	None	GCA_000002285.4	SAMN02953603	GCF_000002285.5	None	None	female	Tasha								Chromosome	None	Dog Genome Sequencing Consortium
+9615	None	GCA_000181415.1	SAMN03004377		None	None	None	None								Contig	None	TIGR
+9615	None	GCA_000331495.1	SAMN01737209		None	None	female	None								Contig	None	GlaxoSmithKline
+9622	None	GCA_001883655.1	SAMN04312209		None	None	female	Kenya WGF20		Kenya						Chromosome	None	Smithsonian Institution
+9622	None	GCA_001887905.1	SAMN04312208		None	None	male	South Africa Ananku		South Africa						Chromosome	None	Smithsonian Institution
+9615	None	GCA_002087435.1	SAMN04320964		None	None	male	Yoclon								Scaffold	None	CAAS
+9627	None	GCA_003160815.1	SAMN06553695	GCF_003160815.1	None	None	male	None								Scaffold	None	University of Illinois at Urbana-Champaign
+286419	None	GCA_003254725.2	SAMN09397198		None	None	female	Sandy								Chromosome	None	James Cook University
+494514	None	GCA_004023825.1	SAMN07678118		None	None	None	US066								Scaffold	None	Broad Institute
+9615	None	GCA_004027395.1	SAMN07678141		None	None	None	BS72								Scaffold	None	Broad Institute
+9622	None	GCA_004216515.1	SAMN09917439		None	None	female	Sister 1								Scaffold	None	Stanford University
+9615	None	GCA_004886185.2	SAMN10749847		None	None	male	MU ID 185726								Chromosome	None	University of Missouri
+9615	None	GCA_005446665.1	SAMN04851098		None	None	female	Zoey								Contig	None	University of Michigan
+9612	None	GCA_007922845.1	SAMN03366711		None	None	female	RKW13451		USA: San Diego Zoo, CA						Scaffold	None	The University of Melbourne
+9615	None	GCA_008641055.3	SAMN12574852		None	None	female	Nala								Chromosome	None	James Cook University
+9615	None	GCA_011100685.1	SAMN13230619	GCF_011100685.1	None	None	female	Mischka								Chromosome	None	Uppsala University
+9615	None	GCA_011327655.1	SAMN10180181		None	None	male	None		Thailand						Scaffold	None	Faculty of Medicine Siriraj Hospital, Mahidol University
+9615	None	GCA_011634725.1	SAMN10180180		None	None	male	chi-156		Thailand						Scaffold	None	Faculty of Medicine Siriraj Hospital, Mahidol University
+286419	None	GCA_012295265.1	SAMN14395261	GCF_012295265.1	None	None	female	COOINDA								Chromosome	None	University of New South Wales
+9615	None	GCA_013276365.2	SAMN14380863		None	None	female	UNSW-BAS-2019								Chromosome	None	University of New South Wales
+9615	None	GCA_014441545.1	SAMN14478636	GCF_014441545.1	None	None	male	SID07034								Chromosome	None	The Roslin Institute
+2793302	None	GCA_017311455.1	SAMN16929439		None	None	female	TS305		South Africa: Petrusburg						Scaffold	None	CNRS
+494514	None	GCA_018345385.1	SAMN16815335	GCF_018345385.1	None	None	female	None								Chromosome	None	Hebei Normal University of Science and Technology
+494514	None	GCA_018835635.1	SAMN18056818		None	None	pooled male and female	20195025_20145004								Scaffold	None	Swedish Museum of Natural History
+68741	None	GCA_023170115.1	SAMD00222918		None	None	male	1598	2300M	Japan:Kyoto	missing	Diploid				Scaffold	None	Center for Research and Education of Wildlife, Kyoto City Zoo
+34880	None	GCA_905146905.1	SAMEA7690874		None	None	None	TBG_1078		Germany						Scaffold	None	Senckenber Biodiversity and Climate Research Centre Frankfurt
+9612	None	GCA_905319855.2	SAMEA7532739		None	None	None	None		Greenland			77.785278	-70.631389		Chromosome	None	WELLCOME SANGER INSTITUTE

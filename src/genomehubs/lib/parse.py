@@ -7,9 +7,10 @@ Usage:
     genomehubs parse [--btk] [--btk-root STRING...]
                      [--wikidata PATH] [--wikidata-root STRING...] [--wikidata-xref STRING...]
                      [--gbif] [--gbif-root STRING...] [--gbif-xref STRING...]
-                     [--ncbi-datasets-genome PATH] [--outfile PATH]
+                     [--ncbi-datasets-genome PATH] [--ncbi-datasets-sample PATH]
                      [--refseq-mitochondria] [--refseq-organelles]
                      [--refseq-plastids] [--refseq-root NAME]
+                     [--outfile PATH]
                      [-h|--help] [-v|--version]
 
 Options:
@@ -23,6 +24,7 @@ Options:
     --wikidata-root STRING       WikiData taxon ID of root taxon
     --wikidata-xref STRING       Include link to external reference from WikiData (e.g. NBN, BOLD)
     --ncbi-datasets-genome PATH  Parse NCBI Datasets genome directory
+    --ncbi-datasets-sample PATH  Parse sample data from NCBI Datasets genome directory
     --outfile PATH               Save parsed output to file
     --refseq-mitochondria        Parse mitochondrial genomes from the NCBI RefSeq
                                  organelle collection
@@ -47,7 +49,6 @@ from .btk import btk_parser
 from .config import config
 from .hub import load_types
 from .hub import order_parsed_fields
-
 # from .ncbi import ncbi_datasets_summary_parser
 from .ncbi import ncbi_genome_parser
 from .ncbi import refseq_organelle_parser
@@ -60,8 +61,13 @@ PARSERS = {
     "btk": {"func": btk_parser, "params": None, "types": "btk"},
     "ncbi-datasets-genome": {
         "func": ncbi_genome_parser,
-        "params": None,
+        "params": ("genome"),
         "types": "assembly",
+    },
+    "ncbi-datasets-sample": {
+        "func": ncbi_genome_parser,
+        "params": ("sample"),
+        "types": "sample",
     },
     # "ncbi-datasets-summary": {
     #     "func": ncbi_datasets_summary_parser,

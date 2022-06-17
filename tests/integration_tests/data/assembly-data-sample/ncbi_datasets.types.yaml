@@ -1,0 +1,177 @@
+attributes:
+  assembly_level:
+    constraint:
+      enum:
+      - complete genome
+      - chromosome
+      - scaffold
+      - contig
+    display_group: sample
+    display_level: 1
+    display_name: Assembly level
+    header: assemblyLevel
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    taxon_display_group: assembly
+    taxon_display_level: 1
+    taxon_display_name: Assembly level
+    taxon_key: assembly_level
+    taxon_name: assembly_level
+    taxon_summary:
+    - primary
+    - enum
+    taxon_traverse: enum
+    taxon_traverse_direction: up
+    type: keyword
+  assembly_type:
+    display_group: sample
+    display_level: 2
+    display_name: Assembly type
+    header: assemblyType
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: keyword
+  elevation:
+    display_group: sample
+    display_level: 2
+    display_name: Elevation
+    header: elevation
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: short
+    unit: m
+  estimated_genome_size:
+    display_group: sample
+    display_level: 2
+    display_name: Estimated genome size
+    header: estimated_size
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: keyword
+  isolate:
+    display_group: sample
+    display_level: 2
+    display_name: Isolate
+    header: isolate
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: keyword
+  latitude:
+    display_group: sample
+    display_level: 1
+    display_name: latitude
+    header: latitude
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: 4dp
+  location_name:
+    display_group: sample
+    display_level: 2
+    display_name: Location name
+    header: geo_loc_name
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: keyword
+  longitude:
+    display_group: sample
+    display_level: 1
+    display_name: longitude
+    header: longitude
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: 4dp
+  num_replicons:
+    display_group: sample
+    display_level: 2
+    display_name: Number of replicons
+    header: num_replicons
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: short
+  ploidy:
+    display_group: sample
+    display_level: 1
+    display_name: Ploidy
+    header: ploidy
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: keyword
+  sample_sex:
+    display_group: sample
+    display_level: 2
+    display_name: Sample sex
+    header: sex
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    taxon_display_group: assembly
+    taxon_display_level: 2
+    taxon_display_name: Sample sex
+    taxon_key: sample_sex
+    taxon_name: sample_sex
+    taxon_summary:
+    - primary
+    - list
+    - count
+    type: keyword
+  submitter:
+    display_group: sample
+    display_level: 2
+    display_name: Submitter
+    header: submitter
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    type: keyword
+file:
+  display_group: sample
+  format: tsv
+  header: true
+  name: ncbi_datasets.tsv
+  organelle: nucleus
+  source: INSDC
+  source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+identifiers:
+  assembly_id:
+    constraint:
+      len: 32
+    header: genbankAssmAccession
+    type: keyword
+  assembly_name:
+    constraint:
+      len: 64
+    header: assemblyName
+    type: keyword
+  refseq_accession:
+    constraint:
+      len: 32
+    header: refseqAssmAccession
+    type: keyword
+  sample_id:
+    constraint:
+      len: 32
+    header: biosampleAccession
+    type: keyword
+  wgs_accession:
+    constraint:
+      len: 16
+    header: wgsProjectAccession
+    type: keyword
+metadata:
+  source_slug:
+    header: genbankAssmAccession
+taxonomy:
+  taxon:
+    header: organismName
+  taxon_id:
+    header: taxId
