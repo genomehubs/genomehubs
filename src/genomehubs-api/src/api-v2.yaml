@@ -558,6 +558,7 @@ components:
           - assembly
           - feature
           - file
+          - sample
           - taxon
           - multi
         type: string

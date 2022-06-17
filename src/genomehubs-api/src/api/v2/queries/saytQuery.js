@@ -98,6 +98,9 @@ const assemblySaytQuery = ({ searchTerm }) =>
 const featureSaytQuery = ({ searchTerm }) =>
   identifiersSaytQuery({ idKey: "feature_id", searchTerm });
 
+const sampleSaytQuery = ({ searchTerm }) =>
+  identifiersSaytQuery({ idKey: "sample_id", searchTerm });
+
 const taxonSaytQuery = ({ searchTerm, wildcardTerm = "", size }) => {
   return {
     bool: {
@@ -220,6 +223,9 @@ export const saytQuery = ({ result, searchTerm, wildcardTerm, size = 10 }) => {
   } else if (result == "assembly") {
     query = assemblySaytQuery({ searchTerm });
     _source = ["assembly_id", "taxon_id", "scientific_name", "identifiers.*"];
+  } else if (result == "sample") {
+    query = sampleSaytQuery({ searchTerm });
+    _source = ["sample_id", "taxon_id", "scientific_name", "identifiers.*"];
   } else if (result == "feature") {
     query = featureSaytQuery({ searchTerm });
     _source = [

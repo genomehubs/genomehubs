@@ -86,10 +86,15 @@ export const searchByTaxon = async ({
   );
   let propertyValues = filterProperties(properties);
   let assemblyFilter = [];
+  let sampleFilter = [];
   let taxonFilter = [];
-  if (result == "taxon" || result == "assembly") {
+  if (result == "taxon" || result == "assembly" || result == "sample") {
     if (result == "assembly") {
       assemblyFilter = filterAssemblies(searchTerm, multiTerm, idTerm);
+    }
+    if (result == "sample") {
+      // TODO: create filterSamples() function
+      // sampleFilter = filterSamples(searchTerm, multiTerm, idTerm);
     }
     if (result == "taxon" && Object.keys(aggs).length == 0) {
       if (!searchTerm && (rank || depth || maxDepth)) {

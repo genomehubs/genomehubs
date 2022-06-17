@@ -17,7 +17,10 @@ export const queryParams = async ({
   let fields = [];
   let summaries = [];
   if (params.query) {
-    if ((result == "taxon" || result == "assembly") && rank) {
+    if (
+      (result == "taxon" || result == "assembly" || result == "sample") &&
+      rank
+    ) {
       params.query += ` AND tax_rank(${rank})`;
     }
     // params.includeEstimates = true;
