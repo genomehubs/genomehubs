@@ -5,6 +5,7 @@ import FunctionsIcon from "@material-ui/icons/Functions";
 import Grid from "@material-ui/core/Grid";
 import LineStyleIcon from "@material-ui/icons/LineStyle";
 import LooksOneIcon from "@material-ui/icons/LooksOne";
+import PersonPinCircleIcon from "@material-ui/icons/PersonPinCircle";
 import React from "react";
 import SearchIcon from "@material-ui/icons/Search";
 import TodayIcon from "@material-ui/icons/Today";
@@ -20,6 +21,8 @@ export const AutoCompleteOption = ({ option }) => {
     optionIcon = <EmojiNatureIcon className={classes.icon} />;
   } else if (option.result == "assembly") {
     optionIcon = <ExtensionIcon className={classes.icon} />;
+  } else if (option.result == "sample") {
+    optionIcon = <PersonPinCircleIcon className={classes.icon} />;
   }
   if (option.name_class) {
     primaryText = (
@@ -45,7 +48,7 @@ export const AutoCompleteOption = ({ option }) => {
       </Typography>
     );
   } else if (option.identifier_class) {
-    if (option.result == "assembly") {
+    if (option.result == "assembly" || option.result == "sample") {
       secondaryText = (
         <Typography variant="body2" color="textSecondary">
           {option.scientific_name}

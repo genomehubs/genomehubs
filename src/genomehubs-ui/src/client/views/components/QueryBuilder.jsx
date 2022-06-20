@@ -370,6 +370,7 @@ const QueryBuilder = ({
               helperText={"search index"}
               values={{
                 Taxon: "taxon",
+                Sample: "sample",
                 Assembly: "assembly",
                 Feature: "feature",
               }}

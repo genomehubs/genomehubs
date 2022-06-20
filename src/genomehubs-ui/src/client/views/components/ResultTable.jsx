@@ -333,6 +333,9 @@ const ResultTable = ({
     if (searchIndex == "assembly") {
       recordId = record.assembly_id;
       searchText = record.assembly_id;
+    } else if (searchIndex == "sample") {
+      recordId = record.sample_id;
+      searchText = record.sample_id;
     } else if (searchIndex == "feature") {
       recordId = record.feature_id;
       searchText = record.feature_id;
@@ -543,6 +546,19 @@ const ResultTable = ({
         </Tooltip>
       );
     }
+    if (searchIndex == "sample") {
+      currentRecordId = result.result.sample_id;
+      cells.push(
+        <Tooltip title={"Click to view record"} arrow key={"sample_id"}>
+          <TableCell
+            style={{ cursor: "pointer" }}
+            onClick={() => handleRecordClick(result.result)}
+          >
+            {result.result.sample_id}
+          </TableCell>
+        </Tooltip>
+      );
+    }
     if (searchIndex == "feature") {
       currentRecordId = result.result.feature_id;
       cells = [];
@@ -697,6 +713,20 @@ const ResultTable = ({
         sortBy={sortBy}
         sortOrder={sortOrder}
         sortDirection={sortBy === "assembly_id" ? sortOrder : false}
+        handleTableSort={handleTableSort}
+      />
+    );
+  }
+  if (searchIndex == "sample") {
+    heads = [heads.pop()];
+    heads.push(
+      <SortableCell
+        name={"sample_id"}
+        key={"sample_id"}
+        classes={classes}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        sortDirection={sortBy === "sample_id" ? sortOrder : false}
         handleTableSort={handleTableSort}
       />
     );

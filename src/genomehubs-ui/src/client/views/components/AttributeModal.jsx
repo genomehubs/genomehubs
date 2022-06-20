@@ -61,6 +61,13 @@ const AttributeModal = ({
           fetchRecord(recordId, "assembly", taxonomy);
         }
       } else if (
+        options.result == "sample" &&
+        (!record.record || recordId != record.record.sample_id)
+      ) {
+        if (!recordIsFetching) {
+          fetchRecord(recordId, "sample", taxonomy);
+        }
+      } else if (
         options.result == "feature" &&
         (!record.record || recordId != record.record.feature_id)
       ) {

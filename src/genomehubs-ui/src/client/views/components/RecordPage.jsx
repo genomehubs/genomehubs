@@ -107,6 +107,21 @@ const RecordPage = ({
           setLookupTerm(hashTerm);
         }
       } else if (
+        options.result == "sample" &&
+        (!record.record || recordId != record.record.sample_id)
+      ) {
+        if (!recordIsFetching) {
+          fetchRecord(
+            recordId,
+            options.result,
+            options.taxonomy,
+            changeRecordUrl
+          );
+        }
+        if (hashTerm) {
+          setLookupTerm(hashTerm);
+        }
+      } else if (
         options.result == "feature" &&
         (!record.record || recordId != record.record.feature_id)
       ) {
