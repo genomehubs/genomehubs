@@ -3,6 +3,7 @@ import { excludeSources } from "./queryFragments/excludeSources";
 import { filterAssemblies } from "./queryFragments/filterAssemblies";
 import { filterAttributes } from "./queryFragments/filterAttributes";
 import { filterProperties } from "./queryFragments/filterProperties";
+import { filterSamples } from "./queryFragments/filterSamples";
 import { filterTaxId } from "./queryFragments/filterTaxId";
 import { filterTaxa } from "./queryFragments/filterTaxa";
 import { matchAttributes } from "./queryFragments/matchAttributes";
@@ -93,8 +94,7 @@ export const searchByTaxon = async ({
       assemblyFilter = filterAssemblies(searchTerm, multiTerm, idTerm);
     }
     if (result == "sample") {
-      // TODO: create filterSamples() function
-      // sampleFilter = filterSamples(searchTerm, multiTerm, idTerm);
+      sampleFilter = filterSamples(searchTerm, multiTerm, idTerm);
     }
     if (result == "taxon" && Object.keys(aggs).length == 0) {
       if (!searchTerm && (rank || depth || maxDepth)) {
@@ -178,7 +178,8 @@ export const searchByTaxon = async ({
         .concat(taxonFilter)
         .concat(rankRestriction)
         .concat(lineageRanks)
-        .concat(assemblyFilter),
+        .concat(assemblyFilter)
+        .concat(sampleFilter),
       ...(optionalAttributesExist && { should: optionalAttributesExist }),
     },
   };

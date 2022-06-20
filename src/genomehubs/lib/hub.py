@@ -165,10 +165,14 @@ def order_parsed_fields(parsed, types, names=None):
                             fields.update({field: value})
                     elif key == "header":
                         header = value
-                if header and header not in fields:
-                    columns.update({ctr: header})
-                    fields.update({header: ctr})
-                    ctr += 1
+                if header:
+                    if not isinstance(header, list):
+                        header = [header]
+                    for head in header:
+                        if head not in fields:
+                            columns.update({ctr: head})
+                            fields.update({head: ctr})
+                            ctr += 1
             except AttributeError:
                 pass
     order = [x[0] for x in sorted(fields.items(), key=lambda x: x[1])]
@@ -269,6 +273,8 @@ def convert_lat_lon(location):
         parts = re.split(r"\s*([NESW])\s*", location)
         string = "%s%s,%s%s" % (sign[parts[1]], parts[0], sign[parts[3]], parts[2])
         return string
+    if re.match(r"-*\d+\.*\d*,-*\d+\.*\d*", location):
+        return location
     if location:
         return None
     return ""
@@ -587,6 +593,8 @@ def add_attributes(
             # for prop in taxon_props:
             #     del types[attribute["key"]][prop]
             if has_taxon_data:
+                if "name" not in taxon_attribute_types:
+                    taxon_attribute_types["name"] = attribute["key"]
                 taxon_attribute.update({"key": taxon_attribute_types["name"]})
                 # taxon_attribute.update({"name": taxon_attribute_types["key"]})
                 taxon_attributes.append(taxon_attribute)

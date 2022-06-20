@@ -93,6 +93,23 @@ PARSERS = {
 }
 
 
+def remove_temporary_types(types):
+    """Remove any keys labelled temporary from a types file."""
+    new_types = {}
+    for section, obj in types.items():
+        if isinstance(obj, dict):
+            new_section = {}
+            for key, meta in obj.items():
+                if isinstance(meta, dict):
+                    if "temporary" in meta and meta["temporary"]:
+                        continue
+                new_section[key] = meta
+        else:
+            new_section = section
+        new_types[section] = new_section
+    return new_types
+
+
 def main(args):
     """Parse data sources."""
     options = config("parse", **args)
@@ -122,10 +139,10 @@ def main(args):
                 stem = filepath.stem
             if types:
                 types["file"]["name"] = filepath.name
-                tofile.write_file("%s/%s.types.yaml" % (outdir, stem), types)
+                tofile.write_file("%s/%s.types.yaml" % (outdir, stem), remove_temporary_types(types))
             if names:
                 names["file"]["name"] = filepath.name
-                tofile.write_file("%s/%s.names.yaml" % (outdir, stem), names)
+                tofile.write_file("%s/%s.names.yaml" % (outdir, stem), remove_temporary_types(names))
             if files:
                 tofile.write_file("%s/%s.files.yaml" % (outdir, stem), files)
 

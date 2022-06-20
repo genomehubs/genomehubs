@@ -12,6 +12,8 @@ from tolkein import tofile
 from tolkein import tolog
 from tqdm import tqdm
 
+from .geo import degrees_to_decimal
+
 LOGGER = tolog.logger(__name__)
 
 REFSEQ_FTP = "https://ftp.ncbi.nlm.nih.gov/refseq/release"
@@ -253,22 +255,6 @@ def parse_ncbi_datasets_record(record, parsed):
     parsed[obj["genbankAssmAccession"]] = obj
 
 
-def convert_lat_lon_deg_to_dec(lat_lon):
-    """Convert latitude or longitude string to decimal."""
-    if lat_lon is None:
-        return None
-    try:
-        lat_lon = str(lat_lon)
-        multiplier = -1 if lat_lon[-1] in ["S", "W"] else 1
-        lat_lon = re.sub(r"[NESW]", "", lat_lon)
-        parts = re.split(r"[°ʹ″]", lat_lon)
-        if len(parts) >= 3:
-            return multiplier * sum(float(x) / 60 ** n for n, x in enumerate(parts[:3]))
-        return multiplier * float(lat_lon)
-    except Exception:
-        return None
-
-
 def parse_ncbi_datasets_sample(record, parsed):
     """Parse sample information from a single NCBI datasets record."""
     obj = {}
@@ -292,8 +278,8 @@ def parse_ncbi_datasets_sample(record, parsed):
     attributes = {entry["name"]: entry["value"] for entry in assemblyInfo.get("biosample", {}).get("attributes", [])}
     for key in ("estimated_size", "geo_loc_name", "num_replicons", "ploidy"):
         obj[key] = attributes.get(key, None)
-    obj["latitude"] = convert_lat_lon_deg_to_dec(attributes.get("geographic location (latitude)", None))
-    obj["longitude"] = convert_lat_lon_deg_to_dec(attributes.get("geographic location (longitude)", None))
+    obj["latitude"] = degrees_to_decimal(attributes.get("geographic location (latitude)", None))
+    obj["longitude"] = degrees_to_decimal(attributes.get("geographic location (longitude)", None))
     obj["elevation"] = attributes.get("geographic location (elevation)", None)
     bioprojects = []
     for lineage in assemblyInfo.get("bioprojectLineage", []):

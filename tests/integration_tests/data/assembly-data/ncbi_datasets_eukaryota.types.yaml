@@ -14,10 +14,10 @@ attributes:
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
     taxon_display_group: assembly
-    taxon_display_level: 1
-    taxon_display_name: Assembly level
-    taxon_key: assembly_level
-    taxon_name: assembly_level
+    # taxon_display_level: 1
+    # taxon_display_name: Assembly level
+    # taxon_key: assembly_level
+    # taxon_name: assembly_level
     taxon_summary:
       - primary
       - enum
@@ -34,16 +34,16 @@ attributes:
     organelle: nucleus
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
-    taxon_bins:
+    bins:
       count: 10
       max: 11
       min: 6
       scale: log10
     taxon_display_group: assembly
-    taxon_display_level: 1
-    taxon_display_name: Assembly span
-    taxon_key: assembly_span
-    taxon_name: assembly_span
+    # taxon_display_level: 1
+    # taxon_display_name: Assembly span
+    # taxon_key: assembly_span
+    # taxon_name: assembly_span
     taxon_summary:
       - primary
       - median
@@ -77,9 +77,9 @@ attributes:
       - bioproject_accession
     taxon_display_group: assembly
     taxon_display_level: 2
-    taxon_display_name: Bioproject
-    taxon_key: bioproject
-    taxon_name: bioproject
+    # taxon_display_name: Bioproject
+    # taxon_key: bioproject
+    # taxon_name: bioproject
     taxon_summary:
       - list
     taxon_traverse: list
@@ -99,9 +99,9 @@ attributes:
       - biosample_accession
     taxon_display_group: assembly
     taxon_display_level: 2
-    taxon_display_name: Biosample
-    taxon_key: biosample
-    taxon_name: biosample
+    # taxon_display_name: Biosample
+    # taxon_key: biosample
+    # taxon_name: biosample
     taxon_summary:
       - list
     taxon_traverse: list
@@ -153,15 +153,15 @@ attributes:
     organelle: nucleus
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
-    taxon_bins:
+    bins:
       count: 10
       max: 9
       min: 4
       scale: log10
     taxon_display_group: assembly
     taxon_display_level: 2
-    taxon_key: contig_n50
-    taxon_name: contig_n50
+    # taxon_key: contig_n50
+    # taxon_name: contig_n50
     taxon_summary:
       - primary
       - max
@@ -181,8 +181,8 @@ attributes:
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
     taxon_display_group: assembly
-    taxon_key: ebp_metric_date
-    taxon_name: ebp_metric_date
+    # taxon_key: ebp_metric_date
+    # taxon_name: ebp_metric_date
     taxon_summary:
       - min
       - max
@@ -199,15 +199,15 @@ attributes:
     organelle: nucleus
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
-    taxon_bins:
+    bins:
       count: 10
       max: 5
       min: 0
       scale: log10
     taxon_display_group: assembly
     taxon_display_level: 2
-    taxon_key: gene_count
-    taxon_name: gene_count
+    # taxon_key: gene_count
+    # taxon_name: gene_count
     taxon_summary:
       - primary
       - median
@@ -233,7 +233,7 @@ attributes:
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
     taxon_display_group: assembly
-    taxon_key: assembly_date
+    # taxon_key: assembly_date
     taxon_name: assembly_date
     taxon_summary:
       - primary
@@ -293,10 +293,10 @@ attributes:
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
     taxon_display_group: assembly
-    taxon_display_level: 2
-    taxon_display_name: Sample sex
-    taxon_key: sample_sex
-    taxon_name: sample_sex
+    # taxon_display_level: 2
+    # taxon_display_name: Sample sex
+    # taxon_key: sample_sex
+    # taxon_name: sample_sex
     taxon_summary:
       - primary
       - list
@@ -336,15 +336,15 @@ attributes:
     organelle: nucleus
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
-    taxon_bins:
+    bins:
       count: 10
       max: 9
       min: 4
       scale: log10
     taxon_display_group: assembly
     taxon_display_level: 2
-    taxon_key: scaffold_n50
-    taxon_name: scaffold_n50
+    # taxon_key: scaffold_n50
+    # taxon_name: scaffold_n50
     taxon_summary:
       - primary
       - max

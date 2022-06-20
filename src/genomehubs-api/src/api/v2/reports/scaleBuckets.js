@@ -19,7 +19,9 @@ export const scaleBuckets = (buckets, scaleType = "Linear", bounds) => {
     let scale = scales[scaleType]()
       .domain(bounds.domain)
       .range([buckets[0], buckets[buckets.length - 1]]);
-    buckets = buckets.map((value) => 1 * fmt(scale.invert(value)));
+    buckets = buckets.map(
+      (value) => 1 * fmt(scale.invert(value)).replace("−", "-")
+    );
   }
   return buckets;
 };

@@ -226,6 +226,13 @@ def main(args):
         )
         es_functions.index_create(es, assembly_template["index_name"])
 
+        # Prepare sample index
+        sample_template = sample.index_template(taxonomy_name, options["init"], index_type="sample")
+        es_functions.load_mapping(
+            es, sample_template["name"], sample_template["mapping"]
+        )
+        es_functions.index_create(es, sample_template["index_name"])
+
         # Prepare feature index
         feature_template = feature.index_template(taxonomy_name, options["init"])
         es_functions.load_mapping(

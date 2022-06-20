@@ -134,6 +134,27 @@
           }
         }
       },
+      "geography": {
+        "type": "nested",
+        "properties": {
+          "hash": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "Geo cell hash" }
+          },
+          "resolution": {
+            "type": "byte",
+            "meta": {
+              "description": "Geo cell resolution"
+            }
+          },
+          "system": {
+            "type": "keyword",
+            "ignore_above": 8,
+            "meta": { "description": "Hashed coordinate system (e.g. h3)" }
+          }
+        }
+      },
       "attributes": {
         "type": "nested",
         "properties": {

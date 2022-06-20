@@ -718,7 +718,6 @@ const ResultTable = ({
     );
   }
   if (searchIndex == "sample") {
-    heads = [heads.pop()];
     heads.push(
       <SortableCell
         name={"sample_id"}
