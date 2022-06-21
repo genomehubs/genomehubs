@@ -1,0 +1,12 @@
+description: check taxon 6231 (Nematoda) has odb10_lineage
+endpoint: taxon--{{taxonomy-source}}--{{hub-name}}--{{hub-version}}/_doc/taxon_id-6231
+querystring:
+assert:
+  _id: taxon_id-6231
+  found: True
+  _source:
+    taxon_id: "6231"
+    attributes:
+      - key: odb10_lineage
+        values:
+          - keyword_value: nematoda_odb10
