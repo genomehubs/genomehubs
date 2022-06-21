@@ -12,9 +12,12 @@ const convertIdsToDocIds = (recordId, result) => {
    */
   let ids = Array.isArray(recordId) ? recordId : [recordId];
   if (result == "taxon") {
+    // TODO: #186 standardise doc id prefixes
     ids = ids.map((id) => (id.match(/^taxon_id-/) ? id : `taxon_id-${id}`));
   } else if (result == "assembly") {
     ids = ids.map((id) => (id.match(/^assembly-/) ? id : `assembly-${id}`));
+  } else if (result == "sample") {
+    ids = ids.map((id) => (id.match(/^sample-/) ? id : `sample-${id}`));
   } else if (result == "feature") {
     ids = ids.map((id) => (id.match(/^feature-/) ? id : `feature-${id}`));
   } else if (result == "analysis") {

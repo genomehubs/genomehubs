@@ -119,11 +119,14 @@ export const AutoCompleteInput = ({
               >{`\u2014 ${result.result.taxon_rank}`}</div>
             </div>
           );
-        } else if (autocompleteTerms.status.result == "assembly") {
+        } else if (
+          autocompleteTerms.status.result == "assembly" ||
+          autocompleteTerms.status.result == "sample"
+        ) {
           if (result.reason) {
             value = result.reason[0].fields["identifiers.identifier.raw"][0];
           } else {
-            value = result.result.assembly_id;
+            value = result.result[`${autocompleteTerms.status.result}_id`];
           }
           options.push({
             value,
@@ -131,14 +134,15 @@ export const AutoCompleteInput = ({
             prefix,
             subTerm,
             suffix,
-            result: "assembly",
-            unique_term: result.result.assembly_id,
+            result: autocompleteTerms.status.result,
+            unique_term: result.result[`${autocompleteTerms.status.result}_id`],
             taxon_id: result.result.taxon_id,
             scientific_name: result.result.scientific_name,
-            assembly_id: result.result.assembly_id,
+            [`${autocompleteTerms.status.result}_id`]:
+              result.result[`${autocompleteTerms.status.result}_id`],
             identifier_class: result.reason
               ? result.reason[0].fields["identifiers.class"]
-              : "assembly ID",
+              : `${autocompleteTerms.status.result} ID`,
           });
           terms.push(
             <div key={i} className={styles.term}>

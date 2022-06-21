@@ -1,6 +1,7 @@
 import React, { memo, useEffect } from "react";
 
 import AnalysisPanel from "./AnalysisPanel";
+import AssembliesPanel from "./AssembliesPanel";
 import AttributePanel from "./AttributePanel";
 import LineagePanel from "./LineagePanel";
 import NamesPanel from "./NamesPanel";
@@ -107,6 +108,21 @@ const RecordPage = ({
           setLookupTerm(hashTerm);
         }
       } else if (
+        options.result == "sample" &&
+        (!record.record || recordId != record.record.sample_id)
+      ) {
+        if (!recordIsFetching) {
+          fetchRecord(
+            recordId,
+            options.result,
+            options.taxonomy,
+            changeRecordUrl
+          );
+        }
+        if (hashTerm) {
+          setLookupTerm(hashTerm);
+        }
+      } else if (
         options.result == "feature" &&
         (!record.record || recordId != record.record.feature_id)
       ) {
@@ -153,15 +169,25 @@ const RecordPage = ({
         );
       }
     }
-
-    results.push(
-      <AnalysisPanel
-        key={"analysis"}
-        recordId={record.record.record_id}
-        result={options.result}
-        taxonomy={options.taxonomy}
-      />
-    );
+    if (options.result == "sample") {
+      results.push(
+        <AssembliesPanel
+          key={"assemblies"}
+          recordId={record.record.record_id}
+          result={options.result}
+          taxonomy={options.taxonomy}
+        />
+      );
+    } else {
+      results.push(
+        <AnalysisPanel
+          key={"analysis"}
+          recordId={record.record.record_id}
+          result={options.result}
+          taxonomy={options.taxonomy}
+        />
+      );
+    }
 
     if (record.record.attributes) {
       results.push(

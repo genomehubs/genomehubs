@@ -18,11 +18,11 @@ from tolkein import tofile
 from tolkein import tolog
 
 from .analysis import index_template as analysis_index_template
-from .assembly import index_template as assembly_index_template
-from .assembly import lookup_assemblies_by_assembly_id
 from .es_functions import document_by_id
 from .es_functions import index_stream
 from .hub import index_templator
+from .sample import index_template as entry_index_template
+from .sample import lookup_docs_by_doc_id
 from .taxon import find_or_create_taxa
 from .taxon import index_template as taxon_index_template
 from .taxon import list_ancestors
@@ -330,22 +330,23 @@ def check_taxa_exist(es, attrs, taxonomy_name, opts):
     return taxa
 
 
-def check_assemblies_exist(es, attrs, taxonomy_name, opts):
-    """Check that the specified taxon_id(s) exist in the taxon index."""
+def check_entries_exist(es, attrs, taxonomy_name, opts, *, index_type="assembly"):
+    """Check that the specified doc_id(s) exist in the {index_type} index."""
     # similar to check_taxa_exist but for assemblies
-    assembly_template = assembly_index_template(taxonomy_name, opts)
-    assembly_ids = attrs.get("assembly_id", False)
-    if not isinstance(assembly_ids, list):
-        assembly_ids = [assembly_ids]
-    assemblies = {}
-    if assembly_ids:
-        assemblies = lookup_assemblies_by_assembly_id(
+    entry_template = entry_index_template(taxonomy_name, opts, index_type=index_type)
+    entry_ids = attrs.get(f"{index_type}_id", False)
+    if not isinstance(entry_ids, list):
+        entry_ids = [entry_ids]
+    entries = {}
+    if entry_ids:
+        entries = lookup_docs_by_doc_id(
             es,
-            ["assembly-%s" % assembly_id for assembly_id in assembly_ids],
-            assembly_template,
+            [f"{index_type}-{entry_id}" for entry_id in entry_ids],
+            entry_template,
             return_type="dict",
+            index_type="assembly"
         )
-    return assemblies
+    return entries
 
 
 def index_metadata(es, file, taxonomy_name, opts, *, dry_run=False):
@@ -403,7 +404,7 @@ def index_metadata(es, file, taxonomy_name, opts, *, dry_run=False):
                 LOGGER.warn("Unable to import %s: analysis_id must be specified", file_name)
                 continue
             # TODO: #30 check taxon_id(s) and assembly_id(s) exist in database
-            assemblies = check_assemblies_exist(es, analysis_attrs, taxonomy_name, opts)
+            assemblies = check_entries_exist(es, analysis_attrs, taxonomy_name, opts, index_type="assembly")
             if assemblies is None:
                 continue
             if "taxon_id" in analysis_attrs and analysis_attrs["taxon_id"]:

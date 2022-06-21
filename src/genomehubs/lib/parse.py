@@ -7,9 +7,10 @@ Usage:
     genomehubs parse [--btk] [--btk-root STRING...]
                      [--wikidata PATH] [--wikidata-root STRING...] [--wikidata-xref STRING...]
                      [--gbif] [--gbif-root STRING...] [--gbif-xref STRING...]
-                     [--ncbi-datasets-genome PATH] [--outfile PATH]
+                     [--ncbi-datasets-genome PATH] [--ncbi-datasets-sample PATH]
                      [--refseq-mitochondria] [--refseq-organelles]
                      [--refseq-plastids] [--refseq-root NAME]
+                     [--outfile PATH]
                      [-h|--help] [-v|--version]
 
 Options:
@@ -23,6 +24,7 @@ Options:
     --wikidata-root STRING       WikiData taxon ID of root taxon
     --wikidata-xref STRING       Include link to external reference from WikiData (e.g. NBN, BOLD)
     --ncbi-datasets-genome PATH  Parse NCBI Datasets genome directory
+    --ncbi-datasets-sample PATH  Parse sample data from NCBI Datasets genome directory
     --outfile PATH               Save parsed output to file
     --refseq-mitochondria        Parse mitochondrial genomes from the NCBI RefSeq
                                  organelle collection
@@ -47,7 +49,6 @@ from .btk import btk_parser
 from .config import config
 from .hub import load_types
 from .hub import order_parsed_fields
-
 # from .ncbi import ncbi_datasets_summary_parser
 from .ncbi import ncbi_genome_parser
 from .ncbi import refseq_organelle_parser
@@ -60,8 +61,13 @@ PARSERS = {
     "btk": {"func": btk_parser, "params": None, "types": "btk"},
     "ncbi-datasets-genome": {
         "func": ncbi_genome_parser,
-        "params": None,
+        "params": ("genome"),
         "types": "assembly",
+    },
+    "ncbi-datasets-sample": {
+        "func": ncbi_genome_parser,
+        "params": ("sample"),
+        "types": "sample",
     },
     # "ncbi-datasets-summary": {
     #     "func": ncbi_datasets_summary_parser,
@@ -85,6 +91,23 @@ PARSERS = {
     },
     "wikidata": {"func": wikidata_parser, "params": None, "types": "wikidata"},
 }
+
+
+def remove_temporary_types(types):
+    """Remove any keys labelled temporary from a types file."""
+    new_types = {}
+    for section, obj in types.items():
+        if isinstance(obj, dict):
+            new_section = {}
+            for key, meta in obj.items():
+                if isinstance(meta, dict):
+                    if "temporary" in meta and meta["temporary"]:
+                        continue
+                new_section[key] = meta
+        else:
+            new_section = section
+        new_types[section] = new_section
+    return new_types
 
 
 def main(args):
@@ -116,10 +139,10 @@ def main(args):
                 stem = filepath.stem
             if types:
                 types["file"]["name"] = filepath.name
-                tofile.write_file("%s/%s.types.yaml" % (outdir, stem), types)
+                tofile.write_file("%s/%s.types.yaml" % (outdir, stem), remove_temporary_types(types))
             if names:
                 names["file"]["name"] = filepath.name
-                tofile.write_file("%s/%s.names.yaml" % (outdir, stem), names)
+                tofile.write_file("%s/%s.names.yaml" % (outdir, stem), remove_temporary_types(names))
             if files:
                 tofile.write_file("%s/%s.files.yaml" % (outdir, stem), files)
 

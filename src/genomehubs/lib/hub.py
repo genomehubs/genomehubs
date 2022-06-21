@@ -165,10 +165,14 @@ def order_parsed_fields(parsed, types, names=None):
                             fields.update({field: value})
                     elif key == "header":
                         header = value
-                if header and header not in fields:
-                    columns.update({ctr: header})
-                    fields.update({header: ctr})
-                    ctr += 1
+                if header:
+                    if not isinstance(header, list):
+                        header = [header]
+                    for head in header:
+                        if head not in fields:
+                            columns.update({ctr: head})
+                            fields.update({head: ctr})
+                            ctr += 1
             except AttributeError:
                 pass
     order = [x[0] for x in sorted(fields.items(), key=lambda x: x[1])]
@@ -269,6 +273,8 @@ def convert_lat_lon(location):
         parts = re.split(r"\s*([NESW])\s*", location)
         string = "%s%s,%s%s" % (sign[parts[1]], parts[0], sign[parts[3]], parts[2])
         return string
+    if re.match(r"-*\d+\.*\d*,-*\d+\.*\d*", location):
+        return location
     if location:
         return None
     return ""
@@ -587,6 +593,8 @@ def add_attributes(
             # for prop in taxon_props:
             #     del types[attribute["key"]][prop]
             if has_taxon_data:
+                if "name" not in taxon_attribute_types:
+                    taxon_attribute_types["name"] = attribute["key"]
                 taxon_attribute.update({"key": taxon_attribute_types["name"]})
                 # taxon_attribute.update({"name": taxon_attribute_types["key"]})
                 taxon_attributes.append(taxon_attribute)
@@ -758,7 +766,7 @@ def process_features(data):
         del data["features"]
 
 
-def process_row(types, names, row, shared_values, blanks):
+def process_row(types, names, row, shared_values, blanks, index_type="assembly"):
     """Process a row of data."""
     data = {
         "attributes": {},
@@ -780,14 +788,14 @@ def process_row(types, names, row, shared_values, blanks):
             )
         except ValueError:
             data["metadata"]["is_primary_value"] = False
-    assembly_id = None
+    row_id = None
     if (
         "identifiers" in data
         and data["identifiers"]
-        and "assembly_id" in data["identifiers"]
-        and data["identifiers"]["assembly_id"]
+        and f"{index_type}_id" in data["identifiers"]
+        and data["identifiers"][f"{index_type}_id"]
     ):
-        assembly_id = data["identifiers"]["assembly_id"]
+        row_id = data["identifiers"][f"{index_type}_id"]
     row_values = {}
     for attr_type in list(["attributes", "features", "identifiers", "taxon_names"]):
         if attr_type in data and data[attr_type]:
@@ -806,13 +814,13 @@ def process_row(types, names, row, shared_values, blanks):
             )
         else:
             data[attr_type] = []
-    if assembly_id is not None:
+    if row_id is not None:
         if "attributes" in taxon_data and taxon_data["attributes"]:
             for attr in taxon_data["attributes"]:
                 attr.update(
                     {
-                        "source_index": "assembly",
-                        "source_id": assembly_id,
+                        "source_index": index_type,
+                        "source_id": row_id,
                     }
                 )
     process_taxon_names(data, types, row, names)

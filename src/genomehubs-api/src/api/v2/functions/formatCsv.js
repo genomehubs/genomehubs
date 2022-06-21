@@ -5,6 +5,9 @@ export const formatCsv = async (response, opts) => {
   if (opts.result == "assembly") {
     fields.push("assembly_id");
   }
+  if (opts.result == "sample") {
+    fields.push("sample_id");
+  }
   let names = [];
   if (opts.names) {
     opts.names.forEach((nameClass) => {

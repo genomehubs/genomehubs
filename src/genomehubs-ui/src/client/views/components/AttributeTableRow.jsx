@@ -271,7 +271,11 @@ const AttributeTableRow = ({
 
   if (attributeId) {
     if (attributeId == "sample_location") {
-      geoPoints = meta.value;
+      if (!Array.isArray(meta.value)) {
+        geoPoints = [meta.value];
+      } else {
+        geoPoints = meta.value;
+      }
       zoom = 10;
     }
 
@@ -486,9 +490,11 @@ const AttributeTableRow = ({
       {open && raw}
 
       {zoom && (
-        <Fragment>
-          <LocationMap geoPoints={geoPoints} zoom={zoom} />
-        </Fragment>
+        <TableRow>
+          <TableCell colSpan={5}>
+            <LocationMap geoPoints={geoPoints} zoom={zoom} meta={meta} />
+          </TableCell>
+        </TableRow>
       )}
     </Fragment>
   );

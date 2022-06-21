@@ -1,0 +1,345 @@
+{
+  "index_patterns": ["sample-*"],
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "sample_id": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "normalizer": "lowercase",
+        "fields": {
+          "live": {
+            "type": "search_as_you_type"
+          },
+          "text": {
+            "type": "text"
+          }
+        },
+        "meta": { "description": "Unique sample ID" }
+      },
+      "identifiers": {
+        "type": "nested",
+        "properties": {
+          "identifier": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "fields": {
+              "text": {
+                "type": "text"
+              },
+              "raw": { "type": "keyword" },
+              "live": {
+                "type": "search_as_you_type"
+              },
+              "trigram": {
+                "type": "text",
+                "analyzer": "trigram"
+              },
+              "reverse": {
+                "type": "text",
+                "analyzer": "reverse"
+              }
+            },
+            "meta": { "description": "Assembly identifier" }
+          },
+          "class": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": {
+              "description": "Identifier class (e.g. bioproject, biosample, ...)"
+            }
+          },
+          "source": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": {
+              "description": "Source of identifier"
+            }
+          }
+        }
+      },
+      "taxon_id": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "normalizer": "lowercase",
+        "meta": { "description": "Taxonomy-specific taxon ID" }
+      },
+      "parent": {
+        "type": "keyword",
+        "ignore_above": 32,
+        "meta": { "description": "Taxon ID of parent taxon" }
+      },
+      "scientific_name": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "normalizer": "lowercase",
+        "meta": { "description": "Scientific name" }
+      },
+      "taxon_rank": {
+        "type": "keyword",
+        "ignore_above": 64,
+        "normalizer": "lowercase",
+        "meta": { "description": "Taxonomic rank" }
+      },
+      "taxon_names": {
+        "type": "nested",
+        "properties": {
+          "name": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "fields": {
+              "raw": { "type": "keyword" }
+            },
+            "meta": { "description": "Taxon name" }
+          },
+          "class": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": {
+              "description": "Name class (e.g. common name, synonym, etc.)"
+            }
+          }
+        }
+      },
+      "lineage": {
+        "type": "nested",
+        "properties": {
+          "taxon_id": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "fields": {
+              "raw": { "type": "keyword" }
+            },
+            "meta": { "description": "Taxon ID of ancestral taxon" }
+          },
+          "taxon_rank": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "Ancestral rank" }
+          },
+          "scientific_name": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "Scientific name" }
+          },
+          "node_depth": {
+            "type": "float",
+            "meta": {
+              "description": "Cumulative branch length to ancestral taxon"
+            }
+          },
+          "support_value": {
+            "type": "float",
+            "meta": { "description": "Support value for node" }
+          }
+        }
+      },
+      "geography": {
+        "type": "nested",
+        "properties": {
+          "hash": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "Geo cell hash" }
+          },
+          "resolution": {
+            "type": "byte",
+            "meta": {
+              "description": "Geo cell resolution"
+            }
+          },
+          "system": {
+            "type": "keyword",
+            "ignore_above": 8,
+            "meta": { "description": "Hashed coordinate system (e.g. h3)" }
+          }
+        }
+      },
+      "attributes": {
+        "type": "nested",
+        "properties": {
+          "key": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "ignore_above": 64,
+            "meta": { "description": "Attribute key" }
+          },
+          "keyword_value": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "fields": {
+              "raw": { "type": "keyword" }
+            },
+            "ignore_above": 64,
+            "meta": {
+              "description": "Value of type keyword (including ontology terms)"
+            }
+          },
+          "text_value": {
+            "type": "text",
+            "meta": { "description": "Value of type text" }
+          },
+          "geo_point_value": {
+            "type": "geo_point",
+            "meta": { "description": "Value of type geo_point" }
+          },
+          "date_value": {
+            "type": "date",
+            "meta": { "description": "Value of type date" }
+          },
+          "bool_value": {
+            "type": "boolean",
+            "meta": { "description": "Value can be true or false" }
+          },
+          "long_value": {
+            "type": "long",
+            "meta": { "description": "Value of type long" }
+          },
+          "integer_value": {
+            "type": "integer",
+            "meta": { "description": "Value of type integer" }
+          },
+          "short_value": {
+            "type": "short",
+            "meta": { "description": "Value of type short" }
+          },
+          "byte_value": {
+            "type": "byte",
+            "meta": { "description": "Value of type byte" }
+          },
+          "double_value": {
+            "type": "double",
+            "meta": { "description": "Value of type double" }
+          },
+          "float_value": {
+            "type": "float",
+            "meta": { "description": "Value of type float" }
+          },
+          "half_float_value": {
+            "type": "half_float",
+            "meta": { "description": "Value of type half_float" }
+          },
+          "1dp_value": {
+            "scaling_factor": 10,
+            "type": "scaled_float",
+            "meta": { "description": "Value to 1 dp" }
+          },
+          "2dp_value": {
+            "scaling_factor": 100,
+            "type": "scaled_float",
+            "meta": { "description": "Value to 2 dp" }
+          },
+          "3dp_value": {
+            "scaling_factor": 1000,
+            "type": "scaled_float",
+            "meta": { "description": "Value to 3 dp" }
+          },
+          "4dp_value": {
+            "scaling_factor": 10000,
+            "type": "scaled_float",
+            "meta": { "description": "Value to 4 dp" }
+          },
+          "ontology_id": {
+            "type": "keyword",
+            "ignore_above": 64,
+            "normalizer": "lowercase",
+            "meta": {
+              "description": "Ontology ID (with matching term in keyword_value)"
+            }
+          },
+          "ontology": {
+            "type": "nested",
+            "properties": {
+              "ontology_term": {
+                "type": "keyword",
+                "normalizer": "lowercase",
+                "ignore_above": 64,
+                "meta": { "description": "Ontology term" }
+              },
+              "ontology_id": {
+                "type": "keyword",
+                "normalizer": "lowercase",
+                "ignore_above": 64,
+                "meta": { "description": "Ontology ID" }
+              }
+            }
+          },
+          "source": {
+            "type": "keyword",
+            "ignore_above": 64,
+            "fields": {
+              "raw": { "type": "keyword" }
+            },
+            "meta": { "description": "Source of attribute value" }
+          },
+          "count": {
+            "type": "integer",
+            "meta": { "description": "Count of individual values" }
+          },
+          "min": {
+            "type": "double",
+            "meta": { "description": "Minimum value (numeric types only)" }
+          },
+          "max": {
+            "type": "double",
+            "meta": { "description": "Maximum value (numeric types only)" }
+          },
+          "range": {
+            "type": "double",
+            "meta": { "description": "Range of values (numeric types only)" }
+          },
+          "total": {
+            "type": "double",
+            "meta": { "description": "Total count of individual values" }
+          },
+          "mean": {
+            "type": "double",
+            "meta": { "description": "Mean value (numeric types only)" }
+          },
+          "median": {
+            "type": "double",
+            "meta": { "description": "Median value (numeric types only)" }
+          },
+          "mode": {
+            "type": "double",
+            "meta": { "description": "Modal value (keyword and numeric types)" }
+          },
+          "stdev": {
+            "type": "float",
+            "meta": { "description": "Standard deviation (numeric types only)" }
+          },
+          "comment": {
+            "type": "text",
+            "index": false
+          }
+        }
+      }
+    }
+  },
+  "settings": {
+    "index": {
+      "number_of_shards": 1,
+      "analysis": {
+        "analyzer": {
+          "trigram": {
+            "type": "custom",
+            "tokenizer": "standard",
+            "filter": ["lowercase", "shingle"]
+          },
+          "reverse": {
+            "type": "custom",
+            "tokenizer": "standard",
+            "filter": ["lowercase", "reverse"]
+          }
+        },
+        "filter": {
+          "shingle": {
+            "type": "shingle",
+            "min_shingle_size": 2,
+            "max_shingle_size": 3
+          }
+        }
+      }
+    }
+  }
+}

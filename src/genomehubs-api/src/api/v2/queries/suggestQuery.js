@@ -145,7 +145,7 @@ const genericSuggestQuery = ({
 
 export const suggestQuery = ({ result, ...params }) => {
   let suggest = {};
-  if (result == "assembly" || result == "feature") {
+  if (result == "assembly" || result == "feature" || result == "sample") {
     suggest = genericSuggestQuery({
       ...params,
       field: "identifiers.identifier",

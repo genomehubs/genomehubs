@@ -5,7 +5,7 @@ export const setIncludes = ({
   includeRawValues,
 }) => {
   let include = [];
-  if (result == "taxon" || result == "assembly") {
+  if (result == "taxon" || result == "assembly" || result == "sample") {
     include = include
       .concat(["taxon_id", "scientific_name", "taxon_rank", "parent"])
       .concat(
@@ -13,6 +13,9 @@ export const setIncludes = ({
       );
     if (result == "assembly") {
       include.push("assembly_id");
+    }
+    if (result == "sample") {
+      include.push("sample_id");
     }
   }
   if (result == "feature") {

@@ -60,6 +60,9 @@ const assemblyLookupQuery = ({ searchTerm }) =>
 const featureLookupQuery = ({ searchTerm }) =>
   identifiersLookupQuery({ idKey: "feature_id", searchTerm });
 
+const sampleLookupQuery = ({ searchTerm }) =>
+  identifiersLookupQuery({ idKey: "sample_id", searchTerm });
+
 const taxonLookupQuery = ({ searchTerm, lineage, size }) => {
   let query = {
     bool: {
@@ -128,6 +131,9 @@ export const lookupQuery = ({ result, searchTerm, lineage, size = 10 }) => {
   } else if (result == "assembly") {
     query = assemblyLookupQuery({ searchTerm });
     _source = ["assembly_id", "taxon_id", "scientific_name", "identifiers.*"];
+  } else if (result == "sample") {
+    query = sampleLookupQuery({ searchTerm });
+    _source = ["sample_id", "taxon_id", "scientific_name", "identifiers.*"];
   } else if (result == "feature") {
     query = featureLookupQuery({ searchTerm });
     _source = [

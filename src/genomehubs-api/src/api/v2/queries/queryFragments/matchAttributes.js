@@ -72,6 +72,7 @@ export const matchAttributes = (
                       "attributes.aggregation_taxon_id",
                       "attributes.keyword_value.raw",
                       "attributes.date_value",
+                      "attributes.geo_point_value",
                       "attributes.long_value",
                       "attributes.integer_value",
                       "attributes.short_value",

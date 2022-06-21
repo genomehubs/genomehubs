@@ -49,9 +49,9 @@ attributes:
     synonyms:
       - bioproject_accession
     taxon_display_group: assembly
-    taxon_name: bioproject
-    taxon_key: bioproject
-    taxon_display_name: Bioproject
+    # taxon_name: bioproject
+    # taxon_key: bioproject
+    # taxon_display_name: Bioproject
     taxon_summary:
       - list
     taxon_traverse: list
@@ -67,9 +67,9 @@ attributes:
     synonyms:
       - biosample_accession
     taxon_display_group: assembly
-    taxon_name: biosample
-    taxon_key: biosample
-    taxon_display_name: Biosample
+    # taxon_name: biosample
+    # taxon_key: biosample
+    # taxon_display_name: Biosample
     taxon_summary:
       - list
     taxon_traverse: list
@@ -85,8 +85,8 @@ attributes:
     header: geneCountTotal
     type: integer
     taxon_display_group: assembly
-    taxon_name: gene_count
-    taxon_key: gene_count
+    # taxon_name: gene_count
+    # taxon_key: gene_count
     taxon_summary:
       - primary
       - median
@@ -94,7 +94,7 @@ attributes:
       - max
       - count
     taxon_display_level: 2
-    taxon_bins:
+    bins:
       min: 0
       max: 5
       count: 10
@@ -128,15 +128,15 @@ attributes:
     display_name: Sample sex
     header: sex
     type: keyword
-    taxon_display_group: assembly
-    taxon_name: sample_sex
-    taxon_key: sample_sex
-    taxon_display_name: Sample sex
-    taxon_summary:
-      - primary
-      - list
-      - count
-    taxon_display_level: 2
+    # taxon_display_group: assembly
+    # taxon_name: sample_sex
+    # taxon_key: sample_sex
+    # taxon_display_name: Sample sex
+    # taxon_summary:
+    #   - primary
+    #   - list
+    #   - count
+    # taxon_display_level: 2
   isolate:
     display_level: 2
     header: isolate
@@ -148,9 +148,9 @@ attributes:
     display_name: Assembly level
     type: keyword
     taxon_display_group: assembly
-    taxon_name: assembly_level
-    taxon_key: assembly_level
-    taxon_display_name: Assembly level
+    # taxon_name: assembly_level
+    # taxon_key: assembly_level
+    # taxon_display_name: Assembly level
     taxon_summary:
       - primary
       - enum
@@ -162,7 +162,7 @@ attributes:
         - contig
     taxon_traverse: enum
     taxon_traverse_direction: up
-    taxon_display_level: 1
+    # taxon_display_level: 1
   assembly_type:
     display_level: 2
     header: assemblyType
@@ -178,9 +178,9 @@ attributes:
     type: long
     units: bases
     taxon_display_group: assembly
-    taxon_name: assembly_span
-    taxon_key: assembly_span
-    taxon_display_name: Assembly span
+    # taxon_name: assembly_span
+    # taxon_key: assembly_span
+    # taxon_display_name: Assembly span
     taxon_summary:
       - primary
       - median
@@ -189,8 +189,8 @@ attributes:
       - count
     taxon_traverse: median
     taxon_traverse_direction: both
-    taxon_display_level: 1
-    taxon_bins:
+    # taxon_display_level: 1
+    bins:
       min: 6
       max: 11
       count: 10
@@ -214,8 +214,8 @@ attributes:
     type: long
     units: bases
     taxon_display_group: assembly
-    taxon_name: contig_n50
-    taxon_key: contig_n50
+    # taxon_name: contig_n50
+    # taxon_key: contig_n50
     taxon_summary:
       - primary
       - max
@@ -225,7 +225,7 @@ attributes:
     taxon_traverse_direction: up
     taxon_traverse: median
     taxon_display_level: 2
-    taxon_bins:
+    bins:
       min: 4
       max: 9
       count: 10
@@ -249,8 +249,8 @@ attributes:
     type: long
     units: bases
     taxon_display_group: assembly
-    taxon_name: scaffold_n50
-    taxon_key: scaffold_n50
+    # taxon_name: scaffold_n50
+    # taxon_key: scaffold_n50
     taxon_summary:
       - primary
       - max
@@ -260,7 +260,7 @@ attributes:
     taxon_traverse_direction: up
     taxon_traverse: median
     taxon_display_level: 2
-    taxon_bins:
+    bins:
       min: 4
       max: 9
       count: 10
@@ -315,7 +315,7 @@ attributes:
     display_name: Last updated
     header: submissionDate
     taxon_display_group: assembly
-    taxon_key: assembly_date
+    # taxon_key: assembly_date
     taxon_name: assembly_date
     taxon_summary:
       - primary
@@ -329,8 +329,8 @@ attributes:
     display_name: EBP metric date
     header: ebpMetricDate
     taxon_display_group: assembly
-    taxon_key: ebp_metric_date
-    taxon_name: ebp_metric_date
+    # taxon_key: ebp_metric_date
+    # taxon_name: ebp_metric_date
     taxon_summary:
       - min
       - max

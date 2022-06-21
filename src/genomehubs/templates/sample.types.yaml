@@ -1,0 +1,136 @@
+file:
+  display_group: sample
+  format: tsv
+  header: true
+  organelle: nucleus
+  source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  source: INSDC
+taxonomy:
+  taxon_id:
+    header: taxId
+  taxon:
+    header: organismName
+identifiers:
+  assembly_id:
+    constraint:
+      len: 32
+    header: genbankAssmAccession
+    type: keyword
+  sample_id:
+    constraint:
+      len: 32
+    header: biosampleAccession
+    type: keyword
+  refseq_accession:
+    constraint:
+      len: 32
+    header: refseqAssmAccession
+    type: keyword
+  wgs_accession:
+    constraint:
+      len: 16
+    header: wgsProjectAccession
+    type: keyword
+  assembly_name:
+    constraint:
+      len: 64
+    header: assemblyName
+    type: keyword
+attributes:
+  sample_sex:
+    display_level: 2
+    display_name: Sample sex
+    header: sex
+    type: keyword
+    taxon_display_group: sample
+    # taxon_name: sample_sex
+    # taxon_key: sample_sex
+    # taxon_display_name: Sample sex
+    taxon_summary:
+      - primary
+      - list
+      - count
+    taxon_display_level: 2
+  isolate:
+    display_level: 2
+    header: isolate
+    display_name: Isolate
+    type: keyword
+  estimated_genome_size:
+    display_level: 2
+    header: estimated_size
+    display_name: Estimated genome size
+    type: keyword
+  location_name:
+    display_level: 2
+    header: geo_loc_name
+    display_name: Location name
+    type: keyword
+  num_replicons:
+    display_level: 2
+    header: num_replicons
+    display_name: Number of replicons
+    type: short
+  ploidy:
+    display_level: 1
+    header: ploidy
+    display_name: Ploidy
+    type: keyword
+  elevation:
+    display_level: 2
+    header: elevation
+    display_name: Elevation
+    type: short
+    unit: "m"
+  assembly_level:
+    display_level: 1
+    header: assemblyLevel
+    display_name: Assembly level
+    type: keyword
+    # taxon_display_group: assembly
+    # taxon_name: assembly_level
+    # taxon_key: assembly_level
+    # taxon_display_name: Assembly level
+    # taxon_summary:
+    #   - primary
+    #   - enum
+    constraint:
+      enum:
+        - complete genome
+        - chromosome
+        - scaffold
+        - contig
+    # taxon_traverse: enum
+    # taxon_traverse_direction: up
+    # taxon_display_level: 1
+  assembly_type:
+    display_level: 2
+    header: assemblyType
+    display_name: Assembly type
+    type: keyword
+  submitter:
+    display_level: 2
+    header: submitter
+    display_name: Submitter
+    type: keyword
+  sample_location:
+    h3res: 5
+    display_level: 1
+    header:
+      - latitude
+      - longitude
+    join: ","
+    display_name: location
+    type: geo_point
+    taxon_display_group: sample
+    # taxon_name: sample_location
+    # taxon_key: sample_location
+    # taxon_display_name: Sample location
+    taxon_summary:
+      - list
+    taxon_traverse: list
+    taxon_traverse_direction: up
+    taxon_display_level: 2
+metadata:
+  source_slug:
+    header: genbankAssmAccession

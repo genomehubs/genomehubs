@@ -33,7 +33,7 @@ const rankSettings = {
   prop: "rank",
   label: "family",
   required: true,
-  except: ["feature", "assembly"],
+  except: ["feature", "assembly", "sample"],
 };
 const catSettings = { prop: "cat", label: "assembly_level" };
 
