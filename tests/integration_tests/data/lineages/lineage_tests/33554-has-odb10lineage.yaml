@@ -1,0 +1,12 @@
+description: check taxon 33554 (Carnivora) has odb10_lineage
+endpoint: taxon--{{taxonomy-source}}--{{hub-name}}--{{hub-version}}/_doc/taxon_id-33554
+querystring:
+assert:
+  _id: taxon_id-33554
+  found: True
+  _source:
+    taxon_id: "33554"
+    attributes:
+      - key: odb10_lineage
+        values:
+          - keyword_value: carnivora_odb10
