@@ -1,9 +1,9 @@
 #!/bin/bash
 
 curl -X DELETE "http://localhost:9200/*"
-genomehubs parse \
-    --ncbi-datasets-sample tests/integration_tests/data/assembly-data-sample/eukaryota \
-    --outfile tests/integration_tests/data/assembly-data-sample/ncbi_datasets.tsv
+# genomehubs parse \
+#     --ncbi-datasets-sample tests/integration_tests/data/assembly-data-sample/eukaryota \
+#     --outfile tests/integration_tests/data/assembly-data-sample/ncbi_datasets.tsv
 genomehubs init \
     --config-file tests/integration_tests/config/config.yaml \
     --taxonomy-source ncbi \

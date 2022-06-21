@@ -10,6 +10,10 @@ export const formatter = (value, searchIndex) => {
         .slice(0, 5)
         .join("; ");
     }
+    let parts = value.split(",");
+    if (parts.length == 2 && !isNaN(parts[0] && !isNaN(parts[1]))) {
+      value = parts.map((p) => format(".2f")(p, searchIndex)).join(",");
+    }
     return value;
   }
   if (searchIndex == "feature") {

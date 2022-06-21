@@ -766,7 +766,7 @@ def process_features(data):
         del data["features"]
 
 
-def process_row(types, names, row, shared_values, blanks):
+def process_row(types, names, row, shared_values, blanks, index_type="assembly"):
     """Process a row of data."""
     data = {
         "attributes": {},
@@ -788,14 +788,14 @@ def process_row(types, names, row, shared_values, blanks):
             )
         except ValueError:
             data["metadata"]["is_primary_value"] = False
-    assembly_id = None
+    row_id = None
     if (
         "identifiers" in data
         and data["identifiers"]
-        and "assembly_id" in data["identifiers"]
-        and data["identifiers"]["assembly_id"]
+        and f"{index_type}_id" in data["identifiers"]
+        and data["identifiers"][f"{index_type}_id"]
     ):
-        assembly_id = data["identifiers"]["assembly_id"]
+        row_id = data["identifiers"][f"{index_type}_id"]
     row_values = {}
     for attr_type in list(["attributes", "features", "identifiers", "taxon_names"]):
         if attr_type in data and data[attr_type]:
@@ -814,13 +814,13 @@ def process_row(types, names, row, shared_values, blanks):
             )
         else:
             data[attr_type] = []
-    if assembly_id is not None:
+    if row_id is not None:
         if "attributes" in taxon_data and taxon_data["attributes"]:
             for attr in taxon_data["attributes"]:
                 attr.update(
                     {
-                        "source_index": "assembly",
-                        "source_id": assembly_id,
+                        "source_index": index_type,
+                        "source_id": row_id,
                     }
                 )
     process_taxon_names(data, types, row, names)

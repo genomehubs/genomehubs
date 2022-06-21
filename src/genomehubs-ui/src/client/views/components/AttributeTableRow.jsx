@@ -491,8 +491,8 @@ const AttributeTableRow = ({
 
       {zoom && (
         <TableRow>
-          <TableCell colSpan={4}>
-            <LocationMap geoPoints={geoPoints} zoom={zoom} />
+          <TableCell colSpan={5}>
+            <LocationMap geoPoints={geoPoints} zoom={zoom} meta={meta} />
           </TableCell>
         </TableRow>
       )}
