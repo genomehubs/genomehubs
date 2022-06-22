@@ -50,6 +50,7 @@ from statistics import median
 from statistics import median_high
 from statistics import median_low
 from statistics import mode
+from traceback import format_exc
 
 from docopt import docopt
 from tolkein import tolog
@@ -338,26 +339,31 @@ def summarise_attribute_values(
         traverse_value = None
         if not isinstance(meta["summary"], list):
             meta["summary"] = [meta["summary"]]
-        summaries = meta["summary"][:]
-        if traverse and source != "ancestor":
-            if summaries[0] != traverse:
-                if summaries[0] != "primary":
-                    summaries = [traverse] + summaries
-                elif summaries[1] != "primary":
-                    summaries.insert(1, traverse)
-        traverse_value, max_value, min_value = set_traverse_values(
-            summaries,
-            values,
-            primary_values,
-            count,
-            max_value,
-            min_value,
-            meta,
-            attribute,
-            value_type,
-            traverse,
-            source,
-        )
+        try:
+            summaries = meta["summary"][:]
+            if traverse and source != "ancestor":
+                if summaries[0] != traverse:
+                    if summaries[0] != "primary":
+                        summaries = [traverse] + summaries
+                    elif summaries[1] != "primary":
+                        summaries.insert(1, traverse)
+            traverse_value, max_value, min_value = set_traverse_values(
+                summaries,
+                values,
+                primary_values,
+                count,
+                max_value,
+                min_value,
+                meta,
+                attribute,
+                value_type,
+                traverse,
+                source,
+            )
+        except Exception:
+            print(format_exc())
+            LOGGER.error(f"Unable to generate summary values for attribute {meta['key']}")
+            sys.exit(1)
         if isinstance(max_value, float) or isinstance(max_value, int):
             attribute["max"] = max_value
             attribute["min"] = min_value
