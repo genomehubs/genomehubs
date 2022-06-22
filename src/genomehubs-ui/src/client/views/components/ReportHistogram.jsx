@@ -37,6 +37,7 @@ const renderXTick = (tickProps) => {
     visibleTicksCount,
     showTickLabels,
     scale,
+    translations,
   } = tickProps;
   let { value, offset } = payload;
   let textOffset = 0;
@@ -83,7 +84,7 @@ const renderXTick = (tickProps) => {
     <g>
       {showTickLabel && (
         <text x={pathX + textOffset} y={y + 14} textAnchor="middle" fill="#666">
-          {value}
+          {translations[value] || value}
         </text>
       )}
       <path d={`M${pathX},${y - 8}v${6}`} stroke="#666" />
@@ -264,6 +265,7 @@ const Histogram = ({
           chartWidth: width,
           scale: chartProps.bounds.scale,
           showTickLabels: chartProps.showTickLabels,
+          translations: chartProps.translations,
         })
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
@@ -491,6 +493,12 @@ const ReportHistogram = ({
         }
       });
     }
+    let translations = {};
+    if (bounds.stats.cats) {
+      for (let cat of bounds.stats.cats) {
+        translations[cat.key] = cat.label;
+      }
+    }
     chart = (
       <Histogram
         data={chartData}
@@ -520,6 +528,7 @@ const ReportHistogram = ({
           ranks: histograms.ranks,
           stats,
           buckets: histograms.buckets,
+          translations,
           xFormat: (value) => formats(value, valueType),
           embedded,
           navigate,

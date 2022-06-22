@@ -47,7 +47,7 @@ export const getCatsBy = async ({
           break;
         }
         usedTerms.add(key);
-        cats.push({ key, label: key });
+        cats.push({ key, label: fixedTerms.translations[key] });
       }
       if (i < fixedTerms.size) {
         for (let obj of terms.by_attribute.by_cat.more_values.buckets) {
@@ -98,6 +98,7 @@ export const getBounds = async ({
   if (catMeta) {
     cat = catMeta.name;
   }
+  console.log({ opts, cat, catMeta });
   let summary = summaries[0];
   let scaleType = setScale({ field, lookupTypes, opts });
   let fixedTerms = await setTerms({
@@ -302,6 +303,8 @@ export const getBounds = async ({
     cats = definedCats;
     by = definedTerms.by;
   }
+  console.log(fixedTerms);
+  console.log(stats);
   return {
     field,
     scale: scaleType,
