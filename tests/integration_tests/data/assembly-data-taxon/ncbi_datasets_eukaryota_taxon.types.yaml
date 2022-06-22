@@ -1,5 +1,11 @@
 attributes:
   sequencing_status:
+    constraint:
+      enum:
+        - insdc_open
+        - in_progress
+        - sample_acquired
+        - sample_collected
     display_group: sequencing_status
     header: assemblyLevel
     translate:

@@ -13,10 +13,10 @@ attributes:
     display_name: C value
     display_group: genome_size
     summary:
-    - primary
-    - median
-    - min
-    - max
+      - primary
+      - median
+      - min
+      - max
     traverse: mean
     traverse_direction: both
     type: half_float
@@ -40,7 +40,7 @@ attributes:
         - Unknown
         - biochemical analysis
         - feulgen image analysis densitometry
-        - flow cytometry 
+        - flow cytometry
         - feulgen densitometry
         - feulgen densitometry & flow cytometry
         - microdensitometry
@@ -156,7 +156,6 @@ attributes:
       C: Coelomocytes
       CE: Corneal epithelium
       DG: Digestive gland
-      FC: Dorsal fin clip
       E: Egg
       EM: Embyro
       EP: Epidermis
@@ -213,10 +212,10 @@ attributes:
     display_level: 1
     display_group: genome_size
     summary:
-    - primary
-    - median
-    - min
-    - max
+      - primary
+      - median
+      - min
+      - max
     traverse: median
     traverse_direction: both
     type: long
@@ -234,10 +233,10 @@ attributes:
     display_name: Genome size kmer
     display_group: genome_size
     summary:
-    - primary
-    - median
-    - min
-    - max
+      - primary
+      - median
+      - min
+      - max
     type: long
     units: bases
   genome_size_draft:
@@ -253,9 +252,9 @@ attributes:
     display_name: Genome size draft
     display_group: genome_size
     summary:
-    - primary
-    - median
-    - min
-    - max
+      - primary
+      - median
+      - min
+      - max
     type: long
     units: bases

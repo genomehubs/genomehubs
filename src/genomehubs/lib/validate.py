@@ -47,6 +47,9 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
             enum = entry.get("constraint", {}).get("enum", [])
             if enum:
                 entry["constraint"]["enum"] = [value.lower() for value in enum]
+            translate = entry.get("translate", {})
+            if translate:
+                entry["translate"] = {key.lower(): value for key, value in translate.items()}
     names = None
     data = None
     if "file" in types:
