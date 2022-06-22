@@ -83,17 +83,18 @@ def load_types(name, *, part="types"):
     try:
         types_file = os.path.join(script_dir, "templates", "%s.%s.yaml" % (name, part))
         types = tofile.load_yaml(types_file)
-        # try:
-        #     for key, value in types.items():
-        #         try:
-        #             enum = set(
-        #                 [str(option).lower() for option in value["constraint"]["enum"]]
-        #             )
-        #             value["constraint"]["enum"] = enum
-        #         except KeyError:
-        #             pass
-        # except AttributeError:
-        #     pass
+        # TODO: check if this code is redundant
+        try:
+            for key, value in types.items():
+                try:
+                    enum = set(
+                        [str(option).lower() for option in value["constraint"]["enum"]]
+                    )
+                    value["constraint"]["enum"] = enum
+                except KeyError:
+                    pass
+        except AttributeError:
+            pass
     except Exception:
         pass
     if types and "file" in types:
