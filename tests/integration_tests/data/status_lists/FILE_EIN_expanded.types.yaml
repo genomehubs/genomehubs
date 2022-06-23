@@ -1,0 +1,25 @@
+file:
+  format: tsv
+  header: true
+  comment: "#"
+  name: EIN_expanded.tsv
+  source: ThankGod Ebenezer, European Bioinformatics Institute (EMBL-EBI), Hinxton, UK
+  source_date: 2022-06-22
+attributes:
+  long_list:
+    header: long_list
+    type: keyword
+  family_representative:
+    header: family_representative
+    type: keyword
+  other_priority:
+    header: other_priority
+    type: keyword
+taxonomy:
+  species:
+    header: Species_name
+  synonym:
+    header: Verified_name
+  family:
+    header: Family
+

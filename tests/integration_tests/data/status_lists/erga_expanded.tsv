@@ -1,0 +1,94 @@
+species	TOLiD	NCBI_taxon_id	Long Read 	Proximity Ligation (HiC/OmniC	RNA Sequencing 	long_list	other_priority	family_representative	sequencing_status	in_progress	sample_collected	published	insdc_open	sample_acquired
+Gyrodactylus teuchis	hmGyrTeuc	103805				ERGA	ERGA							
+Cladonia norvegica	glClaNorv	2873768				ERGA	ERGA							
+Solea solea	fSolSol	90069		in_progress		ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Niphargus schellenbergi	qmNipSche	467509	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Theodoxus fluviatilis	xgTheFluv	120472	in_progress		sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Zostera noltei	laZosNolt	55326	in_progress	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Mullus barbatus	fMulBar	37007	in_progress	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Ramonda myconi (L.) Rchb.	daRamMyco	48815	in_progress			ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Mediocremonas mediterraneus	uoMedMedi	2766786				ERGA	ERGA							
+Dugastella valentina	qmDugVale	390489	in_progress			ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Monolistra pretneri	qmMonPret	638675	sample_collected	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Parastalita stygia	qqParStyg, qqParStyg	2721265	in_progress	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Troglohyphantes excavatus	qqTroExca	1977180	in_progress	in_progress		ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Acanthodactylus schreiberi	rAcaSch	714888	in_progress	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Spongipellis delectans	gfSpoDele	83244	in_progress	sample_collected	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Alburnus alburnus	fAlbAlb	54556	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Spinachia spinachia	fSpiSpi	206126	in_progress	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Canis aureus [HOLD]	mCanAur	68724				ERGA	ERGA							
+Pteromys volans [waiting on fresh sample]	mPteVol	55152				ERGA	ERGA							
+Ammodytes marinus	fAmmMar	146480	sample_collected			ERGA	ERGA		sample_collected		ERGA			
+Argentina silus	fArgSil	446415	sample_collected			ERGA	ERGA		sample_collected		ERGA			
+Mytilus edulis	xbMytEdul	6550	sample_collected			ERGA	ERGA		sample_collected		ERGA			
+Bombus lapponicus | Bombus monticola | Bombus pyrrhopygus | Bombus balteatus | Bombus hyperboreus	iyBomLapp	85664	in_progress	sample_collected	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Aglaophenia octodonta	jhAglOcto	401953				ERGA	ERGA							
+Mustela lutreola	mMusLut	9666	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Phaeosaccion multiseriatum	uoPhaMult	2797544	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Pollachius pollachius	fPolPol	185739				ERGA	ERGA							
+Prunus brigantina	drPruBrig	151428	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Acrobeloides nanus	nxAcrNanu	290746	in_progress			ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Poikilolaimus oxycerca	nxPoiOxyc	96659	in_progress			ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Megalothorax minimus	qeMegMini	438500	in_progress			ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Camptopoeum friesei	iyCamFrie	2918745	in_progress	in_progress		ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Rhogostoma pseudocylindrica	pcRhoPscy	2691107	in_progress			ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Zygaena transalpina	ilZygTras	287399	in_progress			ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Podarcis cretensis	rPodCre, rPodCre	1330250	sample_collected	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Silurus aristotelis	fSilAri	933932	sample_collected	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Spermophilus citellus	mSpeCit, mSpeCit	9997	sample_collected	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Vipera ursinii rakosiensis	rVipUrs	103942	sample_collected	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Buccinum undatum	xgBucUnda	37541				ERGA	ERGA							
+Haliaeetus albicilla	bHalAlb	8969	sample_collected			ERGA	ERGA		sample_collected		ERGA			
+Vulpes lagopus	mVulLag	494514	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Salvelinus alpinus	fSalAlp	8036	in_progress	sample_collected	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Trifolium Dubium	drTriDubi	97021	in_progress	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Acanthodactylus beershebensis	rAcaBee	1091104	in_progress			ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Bombus monticola	iyBomMont	103936	sample_collected			ERGA	ERGA		sample_collected		ERGA			
+Cryptocephalus barii	icCryBari	1091357	sample_collected	in_progress		ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Primula glaucescens	ddPriGlau	184182	sample_collected	in_progress		ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Zygaena transalpina	ilZygTras	287399	in_progress	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Xylocopa violacea	iyXylViol	135666	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Thunnus thynnus	fThuThy	8237				ERGA	ERGA							
+Emplectonema gracile	tnEmpGrac	6230	in_progress	in_progress		ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Astraeus hygrometricus	gfAstHygr	150782	sample_collected			ERGA	ERGA		sample_collected		ERGA			
+Anaecypris hispanica	fAnaHis	71183	in_progress	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Corema album	ddCorAlbu	199168	sample_collected	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Laurus azorica	dmLauAzor	136121	sample_collected	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Oenanthe leucura	bOenLec	391703	sample_collected		sample_collected	ERGA	ERGA		sample_collected		ERGA			
+Trechus terceiranus	icTreTerc	2870711	sample_collected	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Lepus granatensis	mLepGra	100182	sample_collected	sample_collected	sample_collected	ERGA	ERGA		sample_collected		ERGA			
+Nepa anophthalma	ihNepAnop	2873937	in_progress	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Niphargus dancaui	qmNipDanc	1813177	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Merodon euri	idMerEuri	2218654	in_progress		sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Otis tarda	bOtiTar, bOtiTar	73107				ERGA	ERGA							
+Merodon desuturinus	idMerDesu	372778	sample_collected	in_progress		ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Palingenia longicauda	iePalLong	650627	in_progress	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Tetrao urogallus	bTetUro	100830				ERGA	ERGA							
+Chionomys nivalis	mChiNiv	269649		in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Leptodirus hochenwartii	icLepHoch	1457097		in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Tuber petrophilum	gpTubPetr	1453361				ERGA	ERGA							
+Knipowitschia panizzae	fKniPan	85422	sample_collected	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Tripterygion tripteronotum	fTriTrp	152555	in_progress	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Gordius albopunctatus	tfGorAlbo	57293	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Phakellia ventilabrum	odPhaVent	942649	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Venerupis corrugata	xbVenCorr	1028563	in_progress	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Andrena vaga	iyAndVaga	124134	in_progress	sample_collected	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Bufotes viridis	aBufVir	30338	in_progress	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Parnassius mnemosyne	ilParMnem	213953	in_progress	sample_collected	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Stylops ater	ivStyAter	2793624	in_progress	sample_collected	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Mesoplodon bidens	mMesBid	48745				ERGA	ERGA							
+"Perca sp. ""yellow fin Alpine"""	fPerYfa	2874917	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Zingel asper	fZinAsp	880251	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Hottonia palustris	ddHotPalu	175037	in_progress	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Andrena humilis	iyAndHumi,iyAndHumi,iyAndHumi	1542565	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Carabus intricatus	icCarIntr,icCarIntr	49289	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Carabus granulatus	icCarGran,icCarGran	118799	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Osmia cornuta	iyOsmCorn,iyOsmCorn	185587	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Epeorus assimilis	ieEpeAssi,ieEpeAssi	1566317	in_progress	in_progress	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Alopecurus aequalis	lpAloAequ	114194	in_progress	sample_collected	in_progress	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Lasius platythorax	iyLasPlat	488582	in_progress	in_progress		ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Asellus aquaticus	qmAseAqua	92525	in_progress	in_progress	sample_collected	ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Botryllus gaiae	kaBotGaia	2040467	in_progress			ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Coenonympha glycerion	ilCoeGlyc	242261	in_progress	in_progress		ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Helleia helle	ilHelHell	2795559	in_progress	in_progress		ERGA	ERGA		in_progress	ERGA	ERGA			ERGA
+Androsace saussurei		2890055				ERGA	ERGA							

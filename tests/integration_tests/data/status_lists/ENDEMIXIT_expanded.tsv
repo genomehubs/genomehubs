@@ -1,0 +1,6 @@
+	NCBI_taxon_id	Genus	species	family	target_list_status	sequencing_status	long_list	family_representative	other_priority	in_progress	sample_collected	sample_acquired	insdc_submitted	insdc_open	published
+0	563924	Ursus	arctos	Ursidae	endemixit_family_representative	in_progress	ENDEMIXIT	ENDEMIXIT		ENDEMIXIT	ENDEMIXIT	ENDEMIXIT			
+1	65483	Podarcis	raffonei	Lacertidae	endemixit_family_representative	in_progress	ENDEMIXIT	ENDEMIXIT		ENDEMIXIT	ENDEMIXIT	ENDEMIXIT			
+2	260370	Bombina	pachypus	Bombinatoridae	endemixit_family_representative	in_progress	ENDEMIXIT	ENDEMIXIT		ENDEMIXIT	ENDEMIXIT	ENDEMIXIT			
+3	42330	Acipenser	naccarii	Acipenseridae	endemixit_family_representative	in_progress	ENDEMIXIT	ENDEMIXIT		ENDEMIXIT	ENDEMIXIT	ENDEMIXIT			
+4	2599364	Hipparchia	sbordonii	Nymphalidae	endemixit_family_representative	in_progress	ENDEMIXIT	ENDEMIXIT		ENDEMIXIT	ENDEMIXIT	ENDEMIXIT			

@@ -1,0 +1,45 @@
+file:
+  format: tsv
+  header: true
+  comment: "#"
+  name: DTOL_Arthropoda_family_reps_expanded.tsv
+  source: DTOL Arthropod Samples Working Group and NHM
+  source_date: 2022-06-22
+attributes:
+  long_list:
+    header: long_list
+    type: keyword
+  family_representative:
+    header: family_representative
+    type: keyword
+  sequencing_status:
+    header: sample_collected
+    translate:
+      DTOL: sample_collected
+    type: keyword
+  sequencing_status_dtol:
+    header: sample_collected
+    translate:
+      DTOL: sample_collected
+    type: keyword
+  sample_collected:
+    header: sample_collected
+    type: keyword
+  sample_collected_by:
+    index: [6, 7, 8]
+    join: ","
+    translate:
+      NOT COLLECTED: ""
+      WW: OXF
+      WYTHAM: OXF
+      TOL_SCOTLAND: Sanger
+    separator:
+      - ","
+    type: keyword
+taxonomy:
+  species:
+    header: SPECIES
+  family:
+    header: FAMILY
+  order:
+    header: ORDER
