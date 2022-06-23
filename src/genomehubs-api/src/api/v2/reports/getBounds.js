@@ -98,7 +98,6 @@ export const getBounds = async ({
   if (catMeta) {
     cat = catMeta.name;
   }
-  console.log({ opts, cat, catMeta });
   let summary = summaries[0];
   let scaleType = setScale({ field, lookupTypes, opts });
   let fixedTerms = await setTerms({
@@ -286,7 +285,7 @@ export const getBounds = async ({
     definedCats.forEach((obj) => {
       catKeys[obj.key] = true;
       if (!obj.label) {
-        obj.label = obj.key;
+        obj.label = definedTerms.translations[obj.key] || obj.key;
       }
     });
     if (cats) {
@@ -303,8 +302,6 @@ export const getBounds = async ({
     cats = definedCats;
     by = definedTerms.by;
   }
-  console.log(fixedTerms);
-  console.log(stats);
   return {
     field,
     scale: scaleType,

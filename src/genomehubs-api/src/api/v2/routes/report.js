@@ -65,7 +65,7 @@ export const getTree = async ({
   if (report) {
     caption = `Tree of ${x}${report.y ? ` highlighting ${y}` : ""}`;
     if (cat) {
-      caption += ` by ${cat}`;
+      caption += ` by ${cat.replace(/=.+$/, "")}`;
     }
     if (apiParams.includeEstimates && report.xQuery.fields > "") {
       caption += ` including ancestrally derived estimates`;
@@ -137,7 +137,7 @@ export const scatterPerRank = async ({
   let report = perRank.length == 1 ? perRank[0] : perRank;
   let caption = `Distribution of ${y} with ${x}`;
   if (cat) {
-    caption += ` by ${cat}`;
+    caption += ` by ${cat.replace(/=.+$/, "")}`;
   }
   if (apiParams.includeEstimates) {
     caption += ` including ancestrally derived estimates`;
@@ -202,7 +202,7 @@ export const histPerRank = async ({
     caption += ` with ${x}`;
   }
   if (cat) {
-    caption += ` by ${cat}`;
+    caption += ` by ${cat.replace(/=.+$/, "")}`;
   }
   if (apiParams.includeEstimates) {
     caption += ` including ancestrally derived estimates`;

@@ -499,6 +499,12 @@ const ReportHistogram = ({
         translations[cat.key] = cat.label;
       }
     }
+    let catTranslations = {};
+    if (bounds.cats) {
+      for (let cat of bounds.cats) {
+        catTranslations[cat.key] = cat.label;
+      }
+    }
     chart = (
       <Histogram
         data={chartData}
@@ -529,6 +535,7 @@ const ReportHistogram = ({
           stats,
           buckets: histograms.buckets,
           translations,
+          catTranslations,
           xFormat: (value) => formats(value, valueType),
           embedded,
           navigate,
