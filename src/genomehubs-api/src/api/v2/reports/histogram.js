@@ -412,7 +412,7 @@ const getHistogram = async ({
 const updateQuery = ({ params, fields, opts, lookupTypes }) => {
   let meta = lookupTypes(fields[0]);
   let field = meta.name;
-  if (!meta || meta.type == "keyword") {
+  if (!meta || !opts || meta.type == "keyword") {
     return;
   }
   let queryArr = (params.query || "").split(
