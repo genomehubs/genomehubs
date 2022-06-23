@@ -9,13 +9,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
 import React, { Fragment, useEffect, useRef } from "react";
 import formats, { setInterval } from "../functions/formats";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
 import Grid from "@material-ui/core/Grid";
-import MultiCatLegend from "./MultiCatLegend";
 import Tooltip from "@material-ui/core/Tooltip";
 import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
@@ -163,10 +163,15 @@ const searchByCell = ({
 
 const CustomBackground = ({ chartProps, ...props }) => {
   let legendGroup = null;
+  let offset, row;
+  if (chartProps.catOffsets[chartProps.name]) {
+    ({ offset, row } = chartProps.catOffsets[chartProps.name]);
+  }
   if (props.index == 0) {
     legendGroup = MultiCatLegend({
       ...chartProps,
-      // stats,
+      offset,
+      row,
     });
   }
   if (chartProps.i > 0) {
@@ -246,6 +251,7 @@ const Histogram = ({
   cumulative,
   chartProps,
   colors,
+  legendRows,
 }) => {
   let buckets = chartProps.buckets;
   let axes = [
@@ -300,13 +306,7 @@ const Histogram = ({
       )}
     </YAxis>,
   ];
-  // if (width > 300) {
-  //   axes.push(
-  //     <Legend key={"legend"} verticalAlign="top" offset={28} height={28} />
-  //   );
-  // }
-  let rowWidth = Math.floor((width - 50) / 150);
-  let legendRows = Math.ceil(chartProps.n / rowWidth);
+
   return (
     <BarChart
       width={width}
@@ -493,18 +493,8 @@ const ReportHistogram = ({
         }
       });
     }
-    let translations = {};
-    if (bounds.stats.cats) {
-      for (let cat of bounds.stats.cats) {
-        translations[cat.key] = cat.label;
-      }
-    }
-    let catTranslations = {};
-    if (bounds.cats) {
-      for (let cat of bounds.cats) {
-        catTranslations[cat.key] = cat.label;
-      }
-    }
+    const { translations, catTranslations, catOffsets, legendRows } =
+      processLegendData({ bounds, width });
     chart = (
       <Histogram
         data={chartData}
@@ -517,6 +507,7 @@ const ReportHistogram = ({
         lastIndex={lastIndex}
         stacked={stacked}
         colors={colors}
+        legendRows={legendRows}
         chartProps={{
           zDomain: histograms.zDomain,
           xLength: histograms.buckets.length - 1,
@@ -536,6 +527,7 @@ const ReportHistogram = ({
           buckets: histograms.buckets,
           translations,
           catTranslations,
+          catOffsets,
           xFormat: (value) => formats(value, valueType),
           embedded,
           navigate,

@@ -3,6 +3,68 @@ import { Rectangle, Text } from "recharts";
 import React from "react";
 import formats from "../functions/formats";
 
+export const processLegendData = ({ bounds, yBounds, width }) => {
+  let translations = {};
+  let catTranslations = {};
+  let catOffsets = {};
+  let legendRows = 0;
+  let yTranslations = {};
+
+  if (bounds?.stats?.cats) {
+    for (let cat of bounds.stats.cats) {
+      translations[cat.key] = cat.label;
+    }
+  }
+  if (yBounds?.stats?.cats) {
+    for (let cat of yBounds.stats.cats) {
+      yTranslations[cat.key] = cat.label;
+    }
+  }
+  if (bounds?.cats) {
+    let catOffset = 0;
+    let len = bounds.cats.length;
+    let row = 1;
+    let charWidth = 8;
+    let minWidth = 150;
+    let previousCats = [];
+    for (let i = 0; i < len; i++) {
+      let cat = bounds.cats[i];
+      let labelWidth = Math.max((cat.label.length + 2) * charWidth, minWidth);
+      if (labelWidth + catOffset < width - 50) {
+        catOffsets[cat.label] = { offset: 0, row };
+        for (let prevCat of previousCats) {
+          catOffsets[prevCat].offset += labelWidth;
+        }
+        previousCats.push(cat.label);
+        catOffset += labelWidth;
+      } else {
+        if (catOffset > 0) {
+          row++;
+        }
+        catOffsets[cat.label] = { offset: 0, row };
+        if (labelWidth > width - 50) {
+          catOffset = 0;
+          row++;
+        } else {
+          catOffset = labelWidth;
+        }
+        previousCats = [cat.label];
+      }
+    }
+    for (let cat of bounds.cats) {
+      catTranslations[cat.key] = cat.label;
+    }
+    legendRows = row;
+  }
+  return {
+    translations,
+    catTranslations,
+    catOffsets,
+    legendRows,
+    yTranslations,
+  };
+};
+
 const MultiCatLegend = ({
   width,
   x,
@@ -12,24 +74,32 @@ const MultiCatLegend = ({
   name,
   stats,
   legendWidth = 150,
+  offset,
+  row,
 }) => {
   let cellSize = 15;
-  let row = Math.floor((width - 100) / legendWidth);
+  let xPos;
   let j = 1;
-  if (i > row) {
-    while (j * (row + 1) < i + 1) {
-      j++;
-    }
-    i %= row + 1;
+  if (offset || offset === 0) {
+    xPos = x + width - offset;
+    j = row;
   } else {
-    // i += 1;
+    row = Math.floor((width - 50) / legendWidth);
+    if (i > row) {
+      while (j * (row + 1) < i + 1) {
+        j++;
+      }
+      i %= row + 1;
+    } else {
+      // i += 1;
+    }
+    if (row >= n) {
+      row = n - 1;
+    } else if (j > 1 && j * (row + 1) > n) {
+      i += j * (row + 1) - n;
+    }
+    xPos = x + width - legendWidth * (row - i);
   }
-  if (row >= n) {
-    row = n - 1;
-  } else if (j > 1 && j * (row + 1) > n) {
-    i += j * (row + 1) - n;
-  }
-  let xPos = x + width - legendWidth * (row - i);
 
   let value;
   if (stats) {
@@ -101,11 +171,7 @@ const MultiCatLegend = ({
     </g>
   );
 
-  return (
-    <g transform={`translate(${x + width - legendWidth * (row - i)}, 5)`}>
-      {text}
-    </g>
-  );
+  return <g transform={`translate(${xPos}, 5)`}>{text}</g>;
 };
 
 export default MultiCatLegend;

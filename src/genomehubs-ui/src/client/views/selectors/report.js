@@ -359,7 +359,6 @@ const processScatter = (scatter) => {
         if (heatmaps.rawData[cat.key]) {
           let buckets = new Set(heatmaps.buckets);
           let yBuckets = new Set(heatmaps.yBuckets);
-          console.log(cat.key);
           for (let obj of heatmaps.rawData[cat.key]) {
             if (
               expandValues(
