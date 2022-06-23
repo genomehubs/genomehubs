@@ -1,24 +1,18 @@
-// import { RadialChart } from "react-vis";
 import {
   Cell,
   Label,
-  LabelList,
-  Legend,
   Pie,
   PieChart,
   PolarAngleAxis,
   RadialBar,
   RadialBarChart,
-  ResponsiveContainer,
-  Sector,
 } from "recharts";
-import React, { Fragment, useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 
 import Grid from "@material-ui/core/Grid";
 import MultiCatLegend from "./MultiCatLegend";
 import { compose } from "recompose";
 import { format } from "d3-format";
-import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
 
@@ -34,7 +28,6 @@ const PieComponent = ({ data, height, width, colors }) => {
     innerRadius,
     outerRadius,
     percent,
-    index,
   }) => {
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -95,7 +88,6 @@ const PieComponent = ({ data, height, width, colors }) => {
   const ratio = pct1(xValue / (xValue + yValue));
 
   return (
-    // <ResponsiveContainer width={width} height={height}>
     <PieChart width={width} height={height} fontFamily={"sans-serif"}>
       <Pie
         data={data}
@@ -126,13 +118,7 @@ const PieComponent = ({ data, height, width, colors }) => {
           }
         ></Label>
       </Pie>
-
-      {/* <text x="50%" y="50%" dy={8} textAnchor="middle" fill={"blue"}>
-        {pct(data[0].value / data[1].value)}
-      </text> */}
     </PieChart>
-
-    // </ResponsiveContainer>
   );
 };
 
@@ -157,27 +143,6 @@ const RadialBarComponent = ({ data, height, width, colors }) => {
           >
             {pct1(value)}
           </text>
-          {/* <g
-            transform={`translate(0,${cy + (data.index + 1) * fontSize})`}
-            fill={background}
-            style={{ fontSize: fontSize, fontFamily: "sans-serif" }}
-            dominantBaseline="hanging"
-            alignmentBaseline="hanging"
-          >
-            <text
-              x={cx - viewBox.outerRadius}
-              textAnchor="left"
-              fill={data.fill}
-            >
-              {data.xValue}
-            </text>
-            <text x={cx} textAnchor="middle">
-              {"/"}
-            </text>
-            <text x={cx + viewBox.outerRadius} textAnchor="end">
-              {data.yValue}
-            </text>
-          </g> */}
         </g>
         <g transform={`translate(0,${cy + fontSize})`}>
           {MultiCatLegend({
@@ -230,41 +195,15 @@ const RadialBarComponent = ({ data, height, width, colors }) => {
         dataKey="xPortion"
         isAnimationActive={false}
       />
-      {/* <Legend
-        iconSize={width / 20}
-        height={height / 8}
-        verticalAlign="bottom"
-        align="right"
-      /> */}
     </RadialBarChart>
   );
 };
 
-const ReportXInY = ({
-  xInY,
-  chartRef,
-  containerRef,
-  ratio,
-  colors,
-  minDim,
-  setMinDim,
-}) => {
+const ReportXInY = ({ xInY, chartRef, containerRef, colors, minDim }) => {
   const componentRef = chartRef ? chartRef : useRef();
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
-
-  // useEffect(() => {
-  //   let newMinDim;
-  //   if (height) {
-  //     newMinDim = Math.floor(Math.min(width, height));
-  //   } else if (width) {
-  //     newMinDim = Math.floor(width) / ratio;
-  //   }
-  //   if (newMinDim) {
-  //     setMinDim(newMinDim);
-  //   }
-  // }, [width, height]);
 
   if (xInY && xInY.status) {
     let chartData = [];
@@ -282,6 +221,7 @@ const ReportXInY = ({
         });
       });
       chartData = chartData.reverse();
+      // TODO: set legend item widths dynamically
       chart = (
         <RadialBarComponent
           data={chartData}

@@ -23,6 +23,7 @@ import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
 import { format } from "d3-format";
+import { processLegendData } from "./MultiCatLegend";
 // import { point } from "leaflet";
 import qs from "qs";
 import { scaleLinear } from "d3-scale";
@@ -159,100 +160,6 @@ const CustomDot = (props, chartProps) => {
       strokeWidth={r / 2}
     />
   );
-};
-
-// const zLegendOrig = ({ props, chartProps, scale, domain }) => {
-//   let { width, x } = props.xAxis;
-//   let { height, y } = props.yAxis;
-//   let cells = [];
-//   let count = 10;
-//   let range = domain[1] - domain[0];
-//   let step = range / (count - 1);
-//   while (range < count) {
-//     count--;
-//   }
-//   let yScale = scaleLinear()
-//     .domain([0, count])
-//     .range([height + y, height * 0.7 + y]);
-//   let cellHeight = yScale(2) - yScale(1);
-//   for (let i = 0; i < count; i++) {
-//     let zValue = Math.ceil(domain[0] + i * step);
-//     cells.push(
-//       <g key={`cell-${i}`} transform={`translate(10,${yScale(i)})`}>
-//         <Rectangle
-//           key={`cell-${i}`}
-//           height={cellHeight}
-//           width={10}
-//           fill={props.fill}
-//           x={0} // {props.cx + (w - width) / 2}
-//           y={0}
-//           fillOpacity={scale(zValue)}
-//           style={{ pointerEvents: "none" }}
-//         />
-//         {(i == 0 || i == count - 1) && (
-//           <Text
-//             x={12}
-//             y={cellHeight / 2}
-//             fill={"black"}
-//             dominantBaseline={"central"}
-//             textAnchor={"start"}
-//           >
-//             {formats(zValue, "integer")}
-//           </Text>
-//         )}
-//       </g>
-//     );
-//   }
-
-//   return <g transform={`translate(${width + x})`}>{cells}</g>;
-// };
-
-const singleCatLegend = ({ range, domain, scale, width, x, y, fill }) => {
-  let cells = [];
-  let count = 10;
-  let step = range / (count - 1);
-  let cellSize = 15;
-  while (range < count) {
-    count--;
-  }
-  let xScale = scaleLinear()
-    .domain([0, count])
-    .range([0, cellSize * count]);
-  let legendWidth = cellSize * count;
-
-  for (let i = 0; i < count; i++) {
-    let zValue = Math.ceil(domain[0] + i * step);
-    cells.push(
-      <g
-        key={`cell-${i}`}
-        transform={`translate(${xScale(i)},${y - cellSize * 1.5})`}
-      >
-        <Rectangle
-          key={`cell-${i}`}
-          height={cellSize * 2}
-          width={cellSize}
-          fill={fill}
-          x={0} // {props.cx + (w - width) / 2}
-          y={-cellSize}
-          fillOpacity={scale(zValue)}
-          style={{ pointerEvents: "none" }}
-        />
-        {(i == 0 || i == count - 1) && (
-          <Text
-            x={i == 0 ? -5 : cellSize + 5}
-            y={0}
-            fill={"rgb(102, 102, 102)"}
-            dominantBaseline={"central"}
-            textAnchor={i == 0 ? "end" : "start"}
-          >
-            {formats(zValue, "integer")}
-          </Text>
-        )}
-      </g>
-    );
-  }
-
-  return <g transform={`translate(${x + width - legendWidth})`}>{cells}</g>;
 };
 
 const CustomShape = (props, chartProps) => {
@@ -437,33 +344,6 @@ const CustomizedXAxisTick = (props, buckets, fmt, translations) => {
   );
 };
 
-// const renderLegend = (props, chartProps) => {
-//   console.log(props);
-//   const { payload } = props;
-//   if (payload.length == 1) {
-//     console.log(chartProps);
-//   }
-
-//   // let html = <div class="recharts-legend-wrapper" style="position: absolute; width: 1013px; height: 28px; left: 20px; top: 5px;"><ul class="recharts-default-legend" style="padding: 0px; margin: 0px; text-align: center;"><li class="recharts-legend-item legend-item-0" style="display: inline-block; margin-right: 10px;"><svg class="recharts-surface" width="14" height="14" viewBox="0 0 32 32" version="1.1" style="display: inline-block; vertical-align: middle; margin-right: 4px;"><path fill="#1f78b4" cx="16" cy="16" type="circle" class="recharts-symbols" transform="translate(16, 16)" d="M16,0A16,16,0,1,1,-16,0A16,16,0,1,1,16,0"></path></svg><span class="recharts-legend-item-text" style="color: rgb(31, 120, 180);">all taxa</span></li></ul></div>
-
-//   return (
-//     <ul
-//       className={"recharts-default-legend"}
-//       style={{ padding: "0px", margin: "0px", textAlign: "center" }}
-//     >
-//       {payload.map((entry, index) => (
-//         <li
-//           className={"recharts-legend-item legend-item-0"}
-//           key={`item-${index}`}
-//           style={{ display: "inline-block", marginRight: "10px" }}
-//         >
-//           tis {entry.value}
-//         </li>
-//       ))}
-//     </ul>
-//   );
-// };
-
 const Heatmap = ({
   data,
   pointData,
@@ -481,6 +361,7 @@ const Heatmap = ({
   stacked,
   highlight,
   colors,
+  legendRows,
 }) => {
   let xScale =
     chartProps.bounds.scale == "ordinal" ? "linear" : chartProps.bounds.scale;
@@ -571,52 +452,7 @@ const Heatmap = ({
       range={[0.1, 1]}
       scale="sqrt"
     ></ZAxis>,
-    // <Tooltip />,
   ];
-  // if (width > 300) {
-  //   axes.push(
-  //     <Legend key={"legend"} verticalAlign="top" offset={28} height={28} />
-  //   );
-  // }
-  // axes.push(<Legend content={(props) => renderLegend(props, chartProps)} />);
-
-  // let stripe = 4;
-  // let angle = 90;
-  // const patterns = (
-  //   <defs>
-  //     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-  //       <>
-  //         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((j) => (
-  //           <>
-  //             <pattern
-  //               id={`pattern-stripe-${i}-${j}`}
-  //               width={i * stripe}
-  //               height={i * stripe}
-  //               patternUnits="userSpaceOnUse"
-  //               patternTransform={`rotate(${angle}) translate(${stripe * j})`}
-  //             >
-  //               <rect
-  //                 width={stripe}
-  //                 height={i * stripe}
-  //                 transform="translate(0,0)"
-  //                 fill="white"
-  //               ></rect>
-  //             </pattern>
-  //             <mask id={`mask-stripe-${i}-${j}`}>
-  //               <rect
-  //                 x="0"
-  //                 y="0"
-  //                 width="100%"
-  //                 height="100%"
-  //                 fill={`url(#pattern-stripe-${i}-${j})`}
-  //               />
-  //             </mask>
-  //           </>
-  //         ))}
-  //       </>
-  //     ))}
-  //   </defs>
-  // );
 
   let highlightRect;
   if (highlightArea) {
@@ -644,8 +480,6 @@ const Heatmap = ({
     }
   }
 
-  let rowWidth = Math.floor((width - 50) / 150);
-  let legendRows = Math.ceil(chartProps.n / rowWidth);
   return (
     <ScatterChart
       width={width}
@@ -729,17 +563,6 @@ const ReportScatter = ({
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
-  // useEffect(() => {
-  //   let newMinDim;
-  //   if (height) {
-  //     newMinDim = Math.floor(Math.min(width, height));
-  //   } else if (width) {
-  //     newMinDim = Math.floor(width) / ratio;
-  //   }
-  //   if (newMinDim) {
-  //     setMinDim(newMinDim);
-  //   }
-  // }, [width, height]);
   useEffect(() => {
     if (scatter && scatter.status) {
       setMessage(null);
@@ -805,24 +628,15 @@ const ReportScatter = ({
       valueType,
       interval
     );
-    let translations = {};
-    if (bounds.stats.cats) {
-      for (let cat of bounds.stats.cats) {
-        translations[cat.key] = cat.label;
-      }
-    }
-    let yTranslations = {};
-    if (yBounds.stats.cats) {
-      for (let cat of yBounds.stats.cats) {
-        yTranslations[cat.key] = cat.label;
-      }
-    }
-    let catTranslations = {};
-    if (bounds.cats) {
-      for (let cat of bounds.cats) {
-        catTranslations[cat.key] = cat.label;
-      }
-    }
+
+    const {
+      translations,
+      catTranslations,
+      catOffsets,
+      legendRows,
+      yTranslations,
+    } = processLegendData({ bounds, yBounds, width });
+
     chart = (
       <Heatmap
         data={chartData}
@@ -839,6 +653,7 @@ const ReportScatter = ({
         highlight={highlight}
         highlightArea={highlightArea}
         colors={colors}
+        legendRows={legendRows}
         chartProps={{
           zDomain: heatmaps.zDomain,
           yLength: heatmaps.yBuckets.length - 1,
@@ -869,6 +684,7 @@ const ReportScatter = ({
           translations,
           yTranslations,
           catTranslations,
+          catOffsets,
           valueType,
           yValueType,
           hasRawData,
