@@ -409,6 +409,58 @@ const getHistogram = async ({
   };
 };
 
+const updateQuery = ({ params, fields, opts, lookupTypes }) => {
+  let meta = lookupTypes(fields[0]);
+  let field = meta.name;
+  if (!meta || !opts || meta.type == "keyword") {
+    return;
+  }
+  let queryArr = (params.query || "").split(
+    /(\s*[<>=]+\s*|\s+AND\s+|\s+and\s+)/
+  );
+  let options = opts.split(";");
+  if (options.length == 1) {
+    options = options[0].split(",");
+  }
+  let min, max;
+  if (!typeof options[0] !== "undefined") {
+    min = options[0];
+  }
+  if (!typeof options[1] !== "undefined") {
+    max = options[1];
+  }
+  for (let i = 0; i < queryArr.length; i++) {
+    let qMeta = lookupTypes(queryArr[i].toLowerCase());
+    if (qMeta && qMeta.name == field) {
+      i++;
+      if (min && queryArr[i] && queryArr[i].match(/</)) {
+        i++;
+        if (queryArr[i] && !isNaN(queryArr[i])) {
+          if (min > queryArr[i]) {
+            queryArr[i] = min;
+            min = undefined;
+          }
+        }
+      } else if (max && queryArr[i] && queryArr[i].match(/>/)) {
+        i++;
+        if (queryArr[i] && !isNaN(queryArr[i])) {
+          if (max < queryArr[i]) {
+            queryArr[i] = max;
+            max = undefined;
+          }
+        }
+      }
+    }
+  }
+  if (min) {
+    queryArr = queryArr.concat([" AND ", field, " >= ", min]);
+  }
+  if (max) {
+    queryArr = queryArr.concat([" AND ", field, " <= ", max]);
+  }
+  params.query = queryArr.join("");
+};
+
 export const histogram = async ({
   x,
   y,
@@ -446,6 +498,7 @@ export const histogram = async ({
     rank,
     taxonomy,
   });
+  updateQuery({ params, fields, opts: xOpts, lookupTypes });
   // let exclude = [];
   let catMeta = lookupTypes(cat);
   if (catMeta) {
@@ -457,7 +510,7 @@ export const histogram = async ({
   let yTerm, yFields, ySummaries;
   let yParams = {};
   if (y) {
-    yTerm = combineQueries(x, y);
+    yTerm = combineQueries(params.query, y);
     ({
       params: yParams,
       fields: yFields,
@@ -468,6 +521,8 @@ export const histogram = async ({
       rank,
       taxonomy,
     }));
+    updateQuery({ params: yParams, fields: yFields, opts: yOpts, lookupTypes });
+    updateQuery({ params: params, fields: yFields, opts: yOpts, lookupTypes });
   }
 
   let xQuery = { ...params };
