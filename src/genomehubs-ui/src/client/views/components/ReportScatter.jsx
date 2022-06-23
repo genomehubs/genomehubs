@@ -392,7 +392,7 @@ const HighlightShape = (props, chartProps) => {
   );
 };
 
-const CustomizedYAxisTick = (props, buckets, fmt) => {
+const CustomizedYAxisTick = (props, buckets, fmt, translations) => {
   const { x, y, fill, index, height, payload } = props;
   let value = payload.value;
   let offset = 0;
@@ -412,13 +412,13 @@ const CustomizedYAxisTick = (props, buckets, fmt) => {
         fill={fill}
         // transform={"rotate(-90)"}
       >
-        {value}
+        {translations[value] || value}
       </text>
     </g>
   );
 };
 
-const CustomizedXAxisTick = (props, buckets, fmt) => {
+const CustomizedXAxisTick = (props, buckets, fmt, translations) => {
   const { x, y, fill, index, width, payload } = props;
   let value = payload.value;
   let offset = 0;
@@ -431,7 +431,7 @@ const CustomizedXAxisTick = (props, buckets, fmt) => {
   return (
     <g transform={`translate(${x + offset},${y})`}>
       <text x={0} y={0} dy={10} textAnchor="middle" fill={fill}>
-        {value}
+        {translations[value] || value}
       </text>
     </g>
   );
@@ -505,7 +505,14 @@ const Heatmap = ({
           : [buckets[0], buckets[buckets.length - 1]]
       }
       ticks={isNaN(buckets[0]) ? buckets.map((x, i) => i) : buckets}
-      tick={(props) => CustomizedXAxisTick(props, buckets, chartProps.xFormat)}
+      tick={(props) =>
+        CustomizedXAxisTick(
+          props,
+          buckets,
+          chartProps.xFormat,
+          chartProps.translations
+        )
+      }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
       interval={0}
       style={{ textAnchor: buckets.length > 15 ? "end" : "auto" }}
@@ -523,7 +530,14 @@ const Heatmap = ({
       key={"y"}
       scale={axisScales[yScale]()}
       ticks={isNaN(yBuckets[0]) ? yBuckets.map((y, i) => i) : yBuckets}
-      tick={(props) => CustomizedYAxisTick(props, yBuckets, chartProps.yFormat)}
+      tick={(props) =>
+        CustomizedYAxisTick(
+          props,
+          yBuckets,
+          chartProps.yFormat,
+          chartProps.yTranslations
+        )
+      }
       domain={
         isNaN(yBuckets[0])
           ? [0, yBuckets.length - 1]
@@ -791,6 +805,24 @@ const ReportScatter = ({
       valueType,
       interval
     );
+    let translations = {};
+    if (bounds.stats.cats) {
+      for (let cat of bounds.stats.cats) {
+        translations[cat.key] = cat.label;
+      }
+    }
+    let yTranslations = {};
+    if (yBounds.stats.cats) {
+      for (let cat of yBounds.stats.cats) {
+        yTranslations[cat.key] = cat.label;
+      }
+    }
+    let catTranslations = {};
+    if (bounds.cats) {
+      for (let cat of bounds.cats) {
+        catTranslations[cat.key] = cat.label;
+      }
+    }
     chart = (
       <Heatmap
         data={chartData}
@@ -834,6 +866,9 @@ const ReportScatter = ({
           ranks: heatmaps.ranks,
           bounds,
           yBounds,
+          translations,
+          yTranslations,
+          catTranslations,
           valueType,
           yValueType,
           hasRawData,

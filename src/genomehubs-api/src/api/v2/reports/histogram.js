@@ -228,6 +228,7 @@ const getHistogram = async ({
   let zDomain = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
   let other = [];
   let allOther = [];
+  let translations = {};
   hist.buckets.forEach((obj, i) => {
     buckets.push(obj.key);
     allValues.push(obj.doc_count);

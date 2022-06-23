@@ -47,7 +47,7 @@ export const getCatsBy = async ({
           break;
         }
         usedTerms.add(key);
-        cats.push({ key, label: key });
+        cats.push({ key, label: fixedTerms.translations[key] });
       }
       if (i < fixedTerms.size) {
         for (let obj of terms.by_attribute.by_cat.more_values.buckets) {
@@ -285,7 +285,7 @@ export const getBounds = async ({
     definedCats.forEach((obj) => {
       catKeys[obj.key] = true;
       if (!obj.label) {
-        obj.label = obj.key;
+        obj.label = definedTerms.translations[obj.key] || obj.key;
       }
     });
     if (cats) {

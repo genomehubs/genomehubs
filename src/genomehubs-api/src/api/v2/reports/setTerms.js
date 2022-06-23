@@ -49,6 +49,7 @@ export const setTerms = async ({
 
   let parts = cat.split(",");
   let terms = [];
+  let translations = {};
   let by;
   parts.forEach((part, i) => {
     let bits = part.split("=");
@@ -60,7 +61,9 @@ export const setTerms = async ({
       value = bits[0];
     }
     if (value) {
-      terms.push({ key: value });
+      let [val, translation] = value.split(/@/);
+      terms.push({ key: val });
+      translations[val] = translation || val;
     }
   });
   if (lookupTypes(field)) {
@@ -81,5 +84,5 @@ export const setTerms = async ({
       terms.push({ key: obj.label, label: obj.key });
     });
   }
-  return { cat: field, terms, by, size, other };
+  return { cat: field, terms, translations, by, size, other };
 };
