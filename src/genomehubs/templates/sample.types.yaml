@@ -37,6 +37,24 @@ identifiers:
     header: assemblyName
     type: keyword
 attributes:
+  bioproject:
+    constraint:
+      len: 32
+    header: bioProjectAccession
+    separator:
+      - ;
+    synonyms:
+      - bioproject_accession
+    type: keyword
+  biosample:
+    constraint:
+      len: 32
+    header: biosampleAccession
+    separator:
+      - ";"
+    synonyms:
+      - biosample_accession
+    type: keyword
   sample_sex:
     display_level: 2
     display_name: Sample sex

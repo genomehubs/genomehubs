@@ -23,6 +23,32 @@ attributes:
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
     type: keyword
+  bioproject:
+    constraint:
+      len: 32
+    display_group: sample
+    header: bioProjectAccession
+    organelle: nucleus
+    separator:
+    - ;
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    synonyms:
+    - bioproject_accession
+    type: keyword
+  biosample:
+    constraint:
+      len: 32
+    display_group: sample
+    header: biosampleAccession
+    organelle: nucleus
+    separator:
+    - ;
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    synonyms:
+    - biosample_accession
+    type: keyword
   elevation:
     constraint:
       max: 8500
