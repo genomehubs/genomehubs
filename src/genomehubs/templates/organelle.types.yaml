@@ -87,15 +87,19 @@ identifiers:
       len: 32
     index: 3
     type: keyword
-  bioproject_accession:
+  bioproject:
     constraint:
       len: 32
     index: 5
+    synonyms:
+      - bioproject_accession
     type: keyword
-  biosample_accession:
+  biosample:
     constraint:
       len: 32
     index: 6
+    synonyms:
+      - biosample_accession
     type: keyword
 metadata:
   organelle:

@@ -24,6 +24,8 @@ attributes:
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
     type: keyword
   elevation:
+    constraint:
+      max: 8500
     display_group: sample
     display_level: 2
     display_name: Elevation
@@ -61,6 +63,8 @@ attributes:
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
     type: keyword
   num_replicons:
+    constraint:
+      max: 32767
     display_group: sample
     display_level: 2
     display_name: Number of replicons

@@ -67,6 +67,8 @@ attributes:
     display_name: Location name
     type: keyword
   num_replicons:
+    constraint:
+      max: 32767
     display_level: 2
     header: num_replicons
     display_name: Number of replicons
@@ -77,6 +79,8 @@ attributes:
     display_name: Ploidy
     type: keyword
   elevation:
+    constraint:
+      max: 8500
     display_level: 2
     header: elevation
     display_name: Elevation

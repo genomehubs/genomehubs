@@ -144,14 +144,20 @@ identifiers:
   assembly_id:
     header: accession
     type: keyword
-  bioproject_accession:
+  bioproject:
     header: bioproject
+    synonyms:
+      - bioproject_accession
     type: keyword
-  biosample_accession:
+  biosample:
     header: biosample
+    synonyms:
+      - biosample_accession
     type: keyword
-  blobtoolkit_accession:
+  blobtoolkit_id:
     header: id
+    synonyms:
+      - blobtoolkit_accession
     type: keyword
   genbank_accession:
     header: accession

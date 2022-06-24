@@ -74,9 +74,9 @@ def parse_xrefs(entry, fields=None):
             elif key == "BioSample":
                 biosamples.append(value)
         if bioprojects:
-            fields["bioproject_accession"] = "; ".join(bioprojects)
+            fields["bioproject"] = "; ".join(bioprojects)
         if biosamples:
-            fields["biosample_accession"] = "; ".join(biosamples)
+            fields["biosample"] = "; ".join(biosamples)
     return fields
 
 
@@ -275,7 +275,7 @@ def parse_ncbi_datasets_sample(record, parsed):
                 obj["primaryValue"] = 1
             else:
                 obj["primaryValue"] = None
-    attributes = {entry["name"]: entry["value"] for entry in assemblyInfo.get("biosample", {}).get("attributes", [])}
+    attributes = {entry["name"]: entry.get("value", None) for entry in assemblyInfo.get("biosample", {}).get("attributes", [])}
     for key in ("estimated_size", "geo_loc_name", "num_replicons", "ploidy"):
         obj[key] = attributes.get(key, None)
     obj["latitude"] = degrees_to_decimal(attributes.get("geographic location (latitude)", None))

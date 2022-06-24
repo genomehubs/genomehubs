@@ -13,24 +13,6 @@ import qs from "qs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { useLocation } from "@reach/router";
 
-let customMarkerIcon = Leaflet.icon({
-  iconUrl: MarkerIcon,
-  iconRetinaUrl: MarkerIconRetina,
-  shadowUrl: MarkerShadow,
-
-  iconSize: [25, 41], // size of the icon
-  shadowSize: [41, 41], // size of the shadow
-  iconAnchor: [12, 40], // point of the icon which will correspond to marker's location
-  shadowAnchor: [12, 40], // the same for the shadow
-  popupAnchor: [0, -40], // point from which the popup should open relative to the iconAnchor
-});
-// const iconMarkup = renderToStaticMarkup(
-//   <PersonPinCircleTwoToneIcon color={"primary"} fontSize="large" />
-// );
-// const customMarkerIcon = divIcon({
-//   html: iconMarkup,
-// });
-
 const LocationMap = ({ geoPoints = [], zoom = 10, meta = {} }) => {
   const location = useLocation();
   let threshold = 500;
@@ -38,6 +20,18 @@ const LocationMap = ({ geoPoints = [], zoom = 10, meta = {} }) => {
     // TODO: bin samples when a large number of points are returned
     return null;
   }
+  let scale = 4;
+  const customMarkerIcon = Leaflet.icon({
+    iconUrl: MarkerIcon,
+    iconRetinaUrl: MarkerIconRetina,
+    shadowUrl: MarkerShadow,
+
+    iconSize: [5 * scale, 8 * scale + 1], // size of the icon
+    shadowSize: [8 * scale + 1, 8 * scale + 1], // size of the shadow
+    iconAnchor: [Math.floor(2.5 * scale), 8 * scale], // point of the icon which will correspond to marker's location
+    shadowAnchor: [Math.floor(2.5 * scale), 8 * scale], // the same for the shadow
+    popupAnchor: [0, -8 * scale], // point from which the popup should open relative to the iconAnchor
+  });
   let options = qs.parse(location.search.replace(/^\?/, ""));
   let positions = [];
   let bounds = [
@@ -90,6 +84,7 @@ const LocationMap = ({ geoPoints = [], zoom = 10, meta = {} }) => {
     <MapContainer
       bounds={bounds}
       scrollWheelZoom={false}
+      tap={false}
       style={{
         marginTop: "1em",
         width: "800",
