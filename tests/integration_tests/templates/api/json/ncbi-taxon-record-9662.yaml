@@ -1,0 +1,20 @@
+description: |
+  check values in full record for taxon ID 9662
+endpoint: record
+querystring: recordId=9662&result=taxon&taxonomy=ncbi
+assert:
+  status:
+    success: true
+    hits: 1
+  records:
+    - id: taxon_id-9662
+      record:
+        parent: "9661"
+        taxon_rank: species
+        attributes:
+          sample_collected:
+            values:
+              - value: DTOL
+          sample_acquired:
+            values:
+              - value: DTOL

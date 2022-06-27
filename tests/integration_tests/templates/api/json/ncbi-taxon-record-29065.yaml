@@ -1,0 +1,16 @@
+description: |
+  check values in full record for taxon ID 29065
+endpoint: record
+querystring: recordId=29065&result=taxon&taxonomy=ncbi
+assert:
+  status:
+    success: true
+    hits: 1
+  records:
+    - id: taxon_id-29065
+      record:
+        taxon_rank: species
+        attributes:
+          sample_acquired:
+            values:
+              - value: DTOL

@@ -2,26 +2,75 @@ file:
   format: tsv
   header: true
   comment: "#"
-  name: sts_2022-02-15_3036.tsv
+  name: sts.tsv
   source: DTOL STS
-  source_date: 2022-02-15
+  source_date: 2022-06-27
   source_url: https://sts.tol.sanger.ac.uk/api/v1/swagger
 attributes:
   family_representative:
     header: family_representative
-    type: keyword
+    separator:
+      - ","
   sequencing_status:
     header: sequencing_status_simple
-    type: keyword
+    separator:
+      - ","
+  sequencing_status_asg:
+    header: sequencing_status_asg
+    separator:
+      - ","
+  sequencing_status_berri:
+    header: sequencing_status_berri
+    separator:
+      - ","
+  sequencing_status_blax:
+    header: sequencing_status_blax
+    separator:
+      - ","
+  sequencing_status_dtol:
+    header: sequencing_status_dtol
+    separator:
+      - ","
+  sequencing_status_durb:
+    header: sequencing_status_durb
+    separator:
+      - ","
+  sequencing_status_ergapi:
+    header: sequencing_status_ergapi
+    separator:
+      - ","
+  sequencing_status_lawn:
+    header: sequencing_status_lawn
+    separator:
+      - ","
+  sequencing_status_meier:
+    header: sequencing_status_meier
+    separator:
+      - ","
+  sequencing_status_misk:
+    header: sequencing_status_misk
+    separator:
+      - ","
+  sequencing_status_rnd:
+    header: sequencing_status_rnd
+    separator:
+      - ","
+  sequencing_status_vgp:
+    header: sequencing_status_vgp
+    separator:
+      - ","
   sample_collected:
     header: sample_collected
-    type: keyword
+    separator:
+      - ","
   sample_acquired:
     header: sample_acquired
-    type: keyword
+    separator:
+      - ","
   in_progress:
     header: in_progress
-    type: keyword
+    separator:
+      - ","
   sample_collected_by:
     translate:
       MARINE BIOLOGICAL ASSOCIATION: MBA
@@ -32,7 +81,6 @@ attributes:
       UNIVERSITY OF OXFORD: OXF
     header: submitted_gals
     separator: ","
-    type: keyword
 taxonomy:
   taxon_id:
     header: taxon_id
