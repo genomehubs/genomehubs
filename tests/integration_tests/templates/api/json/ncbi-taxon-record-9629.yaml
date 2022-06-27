@@ -1,0 +1,24 @@
+description: |
+  check values in full record for taxon ID 9629
+endpoint: record
+querystring: recordId=9629&result=taxon&taxonomy=ncbi
+assert:
+  status:
+    success: true
+    hits: 1
+  records:
+    - id: taxon_id-9629
+      record:
+        taxon_rank: species
+        attributes:
+          sample_collected:
+            values:
+              - value: DURB
+              - value: BLAX
+          sample_acquired:
+            values:
+              - value: DURB
+              - value: BLAX
+          sequencing_status:
+            values:
+              - value: sample_acquired

@@ -1,20 +1,20 @@
 description: |
-  check values in full record for taxon ID 9662
+  check values in full record for taxon ID 68722
 endpoint: record
-querystring: recordId=9662&result=taxon&taxonomy=ncbi
+querystring: recordId=68722&result=taxon&taxonomy=ncbi
 assert:
   status:
     success: true
     hits: 1
   records:
-    - id: taxon_id-9662
+    - id: taxon_id-68722
       record:
-        parent: "9661"
         taxon_rank: species
         attributes:
           sample_collected:
             values:
               - value: DTOL
-          sample_acquired:
+              - value: ASG
+          sequencing_status:
             values:
-              - value: DTOL
+              - value: sample_collected
