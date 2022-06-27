@@ -12,13 +12,13 @@ assert:
         taxon_rank: species
         attributes:
           sample_collected:
-            values:
-              - value: DURB
-              - value: BLAX
+            value:
+              - DURB
+              - BLAX
           sample_acquired:
-            values:
-              - value: DURB
-              - value: BLAX
+            value:
+              - DURB
+              - BLAX
           sequencing_status:
             values:
               - value: sample_acquired

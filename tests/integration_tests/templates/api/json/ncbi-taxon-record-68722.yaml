@@ -12,9 +12,8 @@ assert:
         taxon_rank: species
         attributes:
           sample_collected:
-            values:
-              - value: DTOL
-              - value: ASG
+            value:
+              - ASG
           sequencing_status:
             values:
               - value: sample_collected
