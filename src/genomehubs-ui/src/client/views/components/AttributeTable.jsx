@@ -28,7 +28,7 @@ const AttributeTable = ({ attributes, result, taxonId }) => {
             <TableCell>Value</TableCell>
             {result == "taxon" && (
               <>
-                <TableCell>Count</TableCell>
+                {/* <TableCell>Count</TableCell> */}
                 <TableCell>Summary</TableCell>
               </>
             )}

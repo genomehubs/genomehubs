@@ -147,6 +147,17 @@ export const filterAttributes = (
           boolOperator = "must_not";
           delete flt.ne;
         }
+        if (stat.startsWith("geo_")) {
+          return {
+            bool: {
+              [boolOperator]: {
+                geo_bounding_box: {
+                  [`attributes.${stat}`]: flt,
+                },
+              },
+            },
+          };
+        }
         return {
           bool: {
             [boolOperator]: {

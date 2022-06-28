@@ -21,6 +21,18 @@ attributes:
     traverse: list
     traverse_direction: up
     type: keyword
+    value_metadata:
+      default:
+        description: Click to view GoaT project page
+        link: /projects/{}
+      asg:
+        description: Aquatic Symbiosis Genomics
+      dtol:
+        description: Darwin Tree of Life
+      erga:
+        description: European Reference Genome Atlas
+      vgp:
+        description: Vertebrate Genomes Project
   other_priority:
     display_group: target_lists
     display_level: 2

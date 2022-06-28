@@ -41,7 +41,12 @@ const validateValue = (term, value, meta, types) => {
     }
   }
 
-  let values = value.split(/\s*,\s*/);
+  let values;
+  if (type == "geo_point") {
+    values = [value];
+  } else {
+    values = value.split(/\s*,\s*/);
+  }
   for (let v of values) {
     if (type == "keyword") {
       if (attrEnum) {
@@ -62,8 +67,13 @@ const validateValue = (term, value, meta, types) => {
         }
         return fail(`invalid date value for ${meta.attribute} in ${term}`);
       }
+    } else if (type == "geo_point") {
+      let [lat, lon] = v.replaceAll("−", "-").split(",");
+      if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
+        return fail(`invalid value for ${meta.attribute} in ${term}`);
+      }
     } else {
-      if (isNaN(v.replace(/^!/, ""))) {
+      if (isNaN(v.replace(/^!/, "").replaceAll("−", "-"))) {
         if (summaries.includes(type)) {
           return fail(`invalid value for ${type} in ${term}`);
         }

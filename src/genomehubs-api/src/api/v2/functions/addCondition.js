@@ -47,6 +47,18 @@ export const addCondition = (conditions, parts, type, summary = "value") => {
         conditions[stat][parts[2]].push(parts[4]);
       }
     }
+  } else if (stat == "geo_point_value") {
+    let [lat, lon] = parts[4].replaceAll("−", "-").split(",");
+    conditions[stat][parts[2]] = {
+      top_left: {
+        lat: 1 * lat + 0.005,
+        lon: lon - 0.005,
+      },
+      bottom_right: {
+        lat: lat - 0.005,
+        lon: 1 * lon + 0.005,
+      },
+    };
   } else {
     if (parts[3] == "==") {
       parts[3] = "=";
@@ -56,7 +68,7 @@ export const addCondition = (conditions, parts, type, summary = "value") => {
       parts[3] = `!${parts[3]}`;
     }
     operations(parts[3]).forEach((operator) => {
-      conditions[stat][parts[2]][operator] = parts[4];
+      conditions[stat][parts[2]][operator] = parts[4].replace("−", "-");
     });
   }
   return conditions;

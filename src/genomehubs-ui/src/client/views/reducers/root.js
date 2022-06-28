@@ -5,6 +5,7 @@ import { colorReducers } from "./color";
 import { combineReducers } from "redux";
 import { exploreReducers } from "./explore";
 import { fileReducers } from "./file";
+import { geographyReducers } from "./geography";
 import { lookupReducers } from "./lookup";
 import { messageReducers } from "./message";
 import { pageReducers } from "./pages";
@@ -26,6 +27,7 @@ const allReducers = Object.assign(
   colorReducers,
   exploreReducers,
   fileReducers,
+  geographyReducers,
   lookupReducers,
   messageReducers,
   pageReducers,
