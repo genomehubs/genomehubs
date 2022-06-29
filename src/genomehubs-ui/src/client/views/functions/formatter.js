@@ -16,12 +16,14 @@ export const formatter = (value, searchIndex, returnType) => {
       if (!returnType) {
         values = values.slice(0, 5);
       }
-      let formatted = values.map(
-        (arr) => `${arr[0]}${arr[1] > 1 ? ` (${arr[1]})` : ""}`
-      );
+      let formatted;
       if (returnType == "array") {
+        formatted = values.map((arr) => `${arr[0]}`);
         return { values, formatted, extra };
       }
+      formatted = values.map(
+        (arr) => `${arr[0]}${arr[1] > 1 ? ` (${arr[1]})` : ""}`
+      );
       return `${formatted.join("; ")}${extra ? "; ..." : ""}`;
     }
     let parts = value.split(",");
