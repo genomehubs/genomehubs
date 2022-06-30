@@ -259,11 +259,12 @@ def set_traverse_values(
     elif meta["type"] == "date":
         default_summary = "latest"
     for index, summary in enumerate(summaries):
+        summary_types = meta["summary"][index + 1 :] + [default_summary]
         value, max_value, min_value = apply_summary(
             summary,
             values,
             primary_values=primary_values,
-            summary_types=meta["summary"][index + 1 :] + [default_summary],
+            summary_types=summary_types,
             max_value=max_value,
             min_value=min_value,
             order=order,
@@ -274,6 +275,8 @@ def set_traverse_values(
                     value_type not in attribute
                     or attribute["aggregation_method"] != "primary"
                 ):
+                    if summary == "primary" and "values" not in attribute:
+                        summary = summary_types[0]
                     attribute[value_type] = value
                     if count:
                         attribute["count"] = count
