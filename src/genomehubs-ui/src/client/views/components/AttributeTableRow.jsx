@@ -263,7 +263,7 @@ const ValueCell = ({
         <span key={i}>
           {entry}
           {valueCount > 1 ? ` (${valueCount})` : ""}
-          {i < 4 ? "; " : open ? "; " : ""}
+          {i < 4 ? (i < values.length - 1 ? "; " : "") : open ? "; " : ""}
         </span>
       );
       if (desc) {
