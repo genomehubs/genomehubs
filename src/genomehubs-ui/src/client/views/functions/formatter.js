@@ -5,7 +5,7 @@ const toReturnType = (value, formatted, returnType) => {
   if (returnType == "array") {
     return { values: [[value, 1]], formatted: [formatted] };
   }
-  return value;
+  return formatted;
 };
 
 export const formatter = (value, searchIndex, returnType) => {
