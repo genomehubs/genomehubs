@@ -69,7 +69,7 @@ const ResultPanel = ({
       if (Array.isArray(value)) {
         value = value[0];
       }
-      value = isNaN(value) ? value : formatter(value);
+      value = formatter(value);
       if (Array.isArray(field.value) && field.count > 1) {
         value = `${value} ...`;
       }
