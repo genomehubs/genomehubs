@@ -1,6 +1,6 @@
 name: package-genomehubs
 env:
-  VERSION: 2.4.22
+  VERSION: 2.4.23
 
 on:
   push:
