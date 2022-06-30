@@ -61,7 +61,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     stacked: { in: new Set(["histogram"]), ui: true },
     cumulative: { in: new Set(["histogram"]), ui: true },
     treeThreshold: { in: new Set(["tree"]) },
-    queryId: { in: new Set(["histogram", "scatter", "tree", "xInY"]) },
+    queryId: { in: new Set(["histogram", "map", "scatter", "tree", "xInY"]) },
     release: true,
     indent: false,
   };
@@ -601,6 +601,15 @@ export const getReportFields = createSelector(
 
 const reportOptions = {
   histogram: {
+    x: {
+      default: "query",
+      fieldType: "value",
+    },
+    rank: {
+      default: "query:tax_rank",
+    },
+  },
+  map: {
     x: {
       default: "query",
       fieldType: "value",

@@ -49,6 +49,7 @@ export const queryPropList = {
     "stacked",
     "cumulative",
   ],
+  map: ["report", xSettings, rankSettings, catSettings, "includeEstimates"],
   scatter: [
     "report",
     xSettings,

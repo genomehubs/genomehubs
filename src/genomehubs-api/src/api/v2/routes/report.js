@@ -10,6 +10,7 @@ import { getResultCount } from "../functions/getResultCount";
 import { histogram } from "../reports/histogram";
 import { indexName } from "../functions/indexName";
 import { logError } from "../functions/logger";
+import { map } from "../reports/map";
 import qs from "qs";
 import { queryParams } from "../reports/queryParams";
 import { setRanks } from "../functions/setRanks";
@@ -26,6 +27,62 @@ const plurals = (singular) => {
     superkingdom: "superkingdoms",
   };
   return ranks[singular.toLowerCase()] || singular;
+};
+
+export const getMap = async ({
+  x,
+  y,
+  cat,
+  rank,
+  taxonomy,
+  queryString,
+  req,
+  ...apiParams
+}) => {
+  // Return map of results
+  let status;
+  let res = await map({
+    x,
+    y,
+    cat,
+    rank,
+    result: apiParams.result,
+    taxonomy,
+    req,
+    apiParams,
+  });
+  if (res.status.success == false) {
+    if (!status) {
+      status = res.status;
+    }
+  } else {
+    status = { success: true };
+  }
+  let report = res.report;
+  let xQuery = res.xQuery;
+  let yQuery = res.yQuery;
+  let xLabel = res.xLabel;
+  let caption;
+  if (report) {
+    caption = `Map of ${x}${report.y ? ` highlighting ${y}` : ""}`;
+    if (cat) {
+      caption += ` by ${cat.replace(/=.+$/, "")}`;
+    }
+    if (apiParams.includeEstimates && report.xQuery.fields > "") {
+      caption += ` including ancestrally derived estimates`;
+    }
+  }
+  return {
+    status,
+    report: {
+      tree: report,
+      xQuery,
+      yQuery,
+      xLabel,
+      queryString,
+      caption,
+    },
+  };
 };
 
 export const getTree = async ({
@@ -732,6 +789,10 @@ export const getReport = async (req, res) => {
       case "histogram": {
         reportFunc = histPerRank;
         // report = await histPerRank({ ...req.query, queryString, req });
+        break;
+      }
+      case "map": {
+        reportFunc = getMap;
         break;
       }
       case "scatter": {

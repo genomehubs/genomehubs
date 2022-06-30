@@ -5,6 +5,7 @@ import ReportEmpty from "./ReportEmpty";
 import ReportError from "./ReportError";
 import ReportHistogram from "./ReportHistogram";
 import ReportLoading from "./ReportLoading";
+import ReportMap from "./ReportMap";
 import ReportModal from "./ReportModal";
 import ReportScatter from "./ReportScatter";
 import ReportSources from "./ReportSources";
@@ -190,6 +191,21 @@ const ReportItem = ({
             xOpts={xOpts}
             includeEstimates={includeEstimates}
             // yScale={yScale}
+            {...qs.parse(queryString)}
+            minDim={minDim}
+            setMinDim={setMinDim}
+          />
+        );
+        break;
+      case "map":
+        component = (
+          <ReportMap
+            map={reportById}
+            chartRef={chartRef}
+            containerRef={containerRef}
+            ratio={ratio}
+            embedded={embedded}
+            includeEstimates={includeEstimates}
             {...qs.parse(queryString)}
             minDim={minDim}
             setMinDim={setMinDim}
