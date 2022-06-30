@@ -1,5 +1,7 @@
 import { cacheFetch, cacheStore } from "../functions/cache";
 
+import { aggregateNameClasses } from "../queries/aggregateNameClasses";
+import { aggregateRanks } from "../queries/aggregateRanks";
 import { aggregateRawValueSources } from "../queries/aggregateRawValueSources";
 import { attrTypes } from "../functions/attrTypes";
 import { checkResponse } from "../functions/checkResponse";
@@ -713,6 +715,49 @@ export const getTypes = async (params) => {
   Object.values(byGroup).forEach((values) => {
     values = values.sort((a, b) => a.localeCompare(b));
   });
+  // search ranks
+  let index = indexName({ ...params });
+  let query = await aggregateRanks({});
+  let { body } = await client
+    .search({
+      index,
+      body: query,
+      rest_total_hits_as_int: true,
+    })
+    .catch((err) => {
+      return err.meta;
+    });
+  let status = checkResponse({ body });
+  if (status.hits) {
+    try {
+      byGroup.ranks = Object.values(body.aggregations.lineage.ranks.buckets)
+        .map(({ key }) => key)
+        .sort((a, b) => a.localeCompare(b));
+    } catch (err) {
+      // pass
+    }
+  }
+  // search names
+  query = await aggregateNameClasses({});
+  ({ body } = await client
+    .search({
+      index,
+      body: query,
+      rest_total_hits_as_int: true,
+    })
+    .catch((err) => {
+      return err.meta;
+    }));
+  status = checkResponse({ body });
+  if (status.hits) {
+    try {
+      byGroup.names = Object.values(body.aggregations.taxon_names.class.buckets)
+        .map(({ key }) => key)
+        .sort((a, b) => a.localeCompare(b));
+    } catch (err) {
+      // pass
+    }
+  }
   return byGroup;
 };
 
