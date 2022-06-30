@@ -13,6 +13,7 @@ import {
 } from "react-leaflet";
 import Leaflet, { FeatureGroup } from "leaflet";
 import React, { useEffect, useRef, useState } from "react";
+import { globalHistory, useLocation } from "@reach/router";
 
 import LocationMapHighlightIcon from "./LocationMapHighlightIcon";
 import MarkerIcon from "leaflet/dist/images/marker-icon.png";
@@ -25,7 +26,6 @@ import { compose } from "recompose";
 import dispatchGeography from "../hocs/dispatchGeography";
 import qs from "qs";
 import { renderToStaticMarkup } from "react-dom/server";
-import { useLocation } from "@reach/router";
 
 const generateCustomMarkerIcon = ({ scale }) =>
   Leaflet.icon({
@@ -147,6 +147,7 @@ const LocationMap = ({
   meta = {},
   taxonId,
   setHighlightPointLocation,
+  setZoomPointLocation,
 }) => {
   const location = useLocation();
   let threshold = 500;
@@ -154,6 +155,14 @@ const LocationMap = ({
     // TODO: bin samples when a large number of points are returned
     return null;
   }
+  useEffect(() => {
+    return globalHistory.listen(({ action, location }) => {
+      if (action === "PUSH" || action === "POP") {
+        setZoomPointLocation(false);
+        setHighlightPointLocation(false);
+      }
+    });
+  }, []);
   let scale = 4;
   const customMarkerIcon = generateCustomMarkerIcon({ scale });
   const customHighlightIcon = generateCustomMarkerIcon({ scale: 6 });
