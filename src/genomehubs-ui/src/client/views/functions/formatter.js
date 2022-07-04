@@ -26,7 +26,7 @@ export const formatter = (value, searchIndex, returnType) => {
       );
       return `${formatted.join("; ")}${extra ? "; ..." : ""}`;
     }
-    let parts = value.split(/\s*,\s*/);
+    let parts = (value || "").split(/\s*,\s*/);
     if (parts.length == 2 && !isNaN(parts[0] && !isNaN(parts[1]))) {
       value = parts.map((p) => format(".2f")(p, searchIndex)).join(",");
     }
