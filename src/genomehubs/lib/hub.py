@@ -739,9 +739,13 @@ def process_row_values(row, types, data):
                         data[group][key] = re.split(rf"\s*{separator}\s*", value)
                     elif value is not None and value != "None":
                         data[group][key] = value
+                except IndexError:
+                    LOGGER.warning("Missing fields in row '%s'" % str(row))
+                    return None
                 except Exception as err:
                     LOGGER.warning("Cannot parse row '%s'" % str(row))
                     raise err
+    return True
 
 
 def process_taxon_names(data, types, row, names):
@@ -780,7 +784,8 @@ def process_row(types, names, row, shared_values, blanks, index_type="assembly")
         "taxon_attributes": {},
     }
     set_row_defaults(types, data)
-    process_row_values(row, types, data)
+    if process_row_values(row, types, data) is None:
+        return None, None, None
     taxon_data = {}
     taxon_types = {}
     if "is_primary_value" in data["metadata"]:

@@ -374,6 +374,8 @@ def index_file(es, types, names, data, opts, *, taxon_table=None, shared_values=
             print(format_exc())
             failed_rows["None"].append(row)
             continue
+        if processed_data is None:
+            continue
         taxon_types.update(new_taxon_types)
         if opts["index"] == "feature" and not_blank(
             "taxon_id", processed_data["taxonomy"], blanks

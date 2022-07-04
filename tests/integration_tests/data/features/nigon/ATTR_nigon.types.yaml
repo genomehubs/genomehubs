@@ -1,0 +1,17 @@
+attributes:
+  # uses https://github.com/pgonzale60/vis_ALG/blob/main/data/gene2Nigon_busco20200927.tsv.gz
+  nigon_unit:
+    constraint:
+      enum:
+        - a
+        - b
+        - c
+        - d
+        - e
+        - x
+        - n
+    description: Nigon unit
+    display_level: 2
+    display_name: Nigon unit
+    display_group: nigon
+    type: keyword

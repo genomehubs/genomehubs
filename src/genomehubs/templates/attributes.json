@@ -52,7 +52,8 @@
         "meta": { "description": "Summary function(s) to apply to raw values" }
       },
       "translate": {
-        "type": "object"
+        "type": "object",
+        "enabled": false
       },
       "traverse": {
         "type": "keyword",
