@@ -133,7 +133,7 @@ const getHistogram = async ({
     yBounds,
     ySummary,
   });
-  let catMeta = lookupTypes(cat);
+  let catMeta = lookupTypes(cat.replace(/[\+\[=].*/, ""));
   let res = await getResults({
     ...params,
     taxonomy,
@@ -170,7 +170,7 @@ const getHistogram = async ({
             if (!result.result.fields[bounds.cat]) {
               cat = "missing";
             } else {
-              cat = result.result.fields[bounds.cat].value;
+              cat = result.result.fields[bounds.cat].value.toLowerCase();
               if (Array.isArray(cat)) {
                 cat = cat[0].toLowerCase();
               } else {
@@ -200,10 +200,11 @@ const getHistogram = async ({
         if (yValueType == "date") {
           y = Date.parse(y);
         }
-        // console.log({ cat, x, y });
         pointData[cat].push({
-          scientific_name: result.result.scientific_name,
-          taxonId: result.result.taxon_id,
+          ...(result.result.scientific_name && {
+            scientific_name: result.result.scientific_name,
+          }),
+          ...(result.result.taxon_id && { taxonId: result.result.taxon_id }),
           x,
           y,
           cat,
@@ -360,8 +361,8 @@ const getHistogram = async ({
         }
       });
       if (pointData) {
-        rawData[key] = pointData[key];
-        delete pointData[key];
+        rawData[key] = pointData[key.toLowerCase()];
+        delete pointData[key.toLowerCase()];
       }
     }
     if (pointData && byCat.other) {

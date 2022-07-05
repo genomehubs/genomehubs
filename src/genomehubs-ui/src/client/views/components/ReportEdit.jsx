@@ -60,6 +60,7 @@ export const queryPropList = {
     "xOpts",
     "yOpts",
     "highlightArea",
+    "stacked",
     "scatterThreshold",
   ],
   tree: [

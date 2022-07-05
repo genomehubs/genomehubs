@@ -181,7 +181,7 @@ export const filterAttributes = (
         query: {
           bool: {
             filter: [{ match: { "attributes.key": field } }]
-              .concat(aggregation_source)
+              .concat(aggregation_source || [])
               .concat(rangeQuery(field, stat)),
           },
         },
