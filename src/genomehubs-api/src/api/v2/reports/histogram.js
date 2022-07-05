@@ -133,7 +133,7 @@ const getHistogram = async ({
     yBounds,
     ySummary,
   });
-  let catMeta = lookupTypes(cat.replace(/[\+\[=].*/, ""));
+  let catMeta = lookupTypes((cat || "").replace(/[\+\[=].*/, ""));
   let res = await getResults({
     ...params,
     taxonomy,
@@ -497,7 +497,7 @@ export const histogram = async ({
     fields: apiParams.fields,
     taxonomy,
   });
-  let catMeta = lookupTypes(cat.replace(/[\+\[=].*/, ""));
+  let catMeta = lookupTypes((cat || "").replace(/[\+\[=].*/, ""));
   if (catMeta && !x.match(catMeta.name)) {
     searchFields.push(catMeta.name);
     x += ` AND ${catMeta.name}`;
