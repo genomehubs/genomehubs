@@ -206,7 +206,7 @@ export const histPerRank = async ({
   if (cat) {
     caption += ` by ${cat.replace(/[\+\[=].*/, "")}`;
   }
-  if (apiParams.includeEstimates) {
+  if (apiParams.includeEstimates && apiParams.result == "taxon") {
     caption += ` including ancestrally derived estimates`;
   }
   return {
