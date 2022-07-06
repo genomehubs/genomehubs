@@ -122,7 +122,7 @@ const QueryBuilder = ({
     navigate(
       `/search?${qs.stringify({
         taxonomy: options.taxonomy,
-        query: "",
+        query: "null",
         result: e.target.value,
       })}`
     );
