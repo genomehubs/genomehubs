@@ -109,11 +109,11 @@ const searchByCell = ({
   query = query
     .replaceAll(new RegExp("AND\\s+" + bounds.field + "\\s+AND", "gi"), "AND")
     .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
+      new RegExp("AND\\s+" + bounds.field + "\\s+>=*\\s*[\\w\\d_\\.-]+", "gi"),
       ""
     )
     .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
+      new RegExp("AND\\s+" + bounds.field + "\\s+<=*\\s*[\\w\\d_\\.-]+", "gi"),
       ""
     )
     .replaceAll(/\s+/g, " ")
@@ -146,10 +146,20 @@ const searchByCell = ({
       delete xQuery[key];
     }
   }
+  let xOpts = (options.xOpts || "").split(";");
+  if (xOpts.length == 1) {
+    xOpts = xOpts[0].split(",");
+  }
+  if (xOpts.length > 1) {
+    xOpts[0] = "";
+    xOpts[1] = "";
+  }
+  xOpts = xOpts.join(";");
 
   let queryString = qs.stringify({
     ...xQuery,
     ...options,
+    xOpts,
     query,
     fields,
     report: "histogram",
