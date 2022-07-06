@@ -216,7 +216,7 @@ export const histPerRank = async ({
       valueType: report.valueType,
       xQuery,
       xLabel,
-      yLabel: `Count of ${ranks[0]}`,
+      yLabel: `Count${ranks[0] ? ` of ${ranks[0]}` : ""}`,
       queryString,
       caption,
     },
