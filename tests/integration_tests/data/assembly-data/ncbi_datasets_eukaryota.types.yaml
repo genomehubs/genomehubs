@@ -390,6 +390,11 @@ attributes:
     units: bases
 file:
   display_group: misc
+  exclusions:
+    identifiers:
+      - assembly_id
+    taxonomy:
+      - taxon_id
   format: tsv
   header: true
   name: ncbi_datasets_eukaryota.tsv.gz

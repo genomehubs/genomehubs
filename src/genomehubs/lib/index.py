@@ -343,7 +343,7 @@ def index_feature_records(es, opts, taxonomy_name, with_ids, blanks):
     )
 
 
-def index_file(es, types, names, data, opts, *, taxon_table=None, shared_values=None):
+def index_file(es, types, names, data, opts, *, taxon_table=None, shared_values=None, exclusions=None):
     """Index a file."""
     delimiters = {"csv": ",", "tsv": "\t"}
     rows = csv.reader(
@@ -368,7 +368,7 @@ def index_file(es, types, names, data, opts, *, taxon_table=None, shared_values=
     for row in tqdm(rows):
         try:
             processed_data, taxon_data, new_taxon_types = process_row(
-                types, names, row, shared_values, blanks, index_type=opts["index"]
+                types, names, row, shared_values, blanks, index_type=opts["index"], exclusions=exclusions,
             )
         except Exception:
             print(format_exc())
@@ -424,7 +424,7 @@ def index_taxon_sample(es, opts, index="taxon", *, dry_run=False, taxonomy_name)
     if data_dir in opts:
         dir_path = opts[data_dir]
         for types_file in sorted(Path(dir_path).glob("*.names.yaml")):
-            types, data, names = validate_types_file(
+            types, data, names, exclusions = validate_types_file(
                 types_file, dir_path, es, index, opts
             )
             if "file" in types and "name" in types["file"]:
@@ -453,7 +453,7 @@ def index_taxon_sample(es, opts, index="taxon", *, dry_run=False, taxonomy_name)
                         exit(1)
                 # time.sleep(5)
         for types_file in sorted(Path(dir_path).glob("*.types.yaml")):
-            types, data, names = validate_types_file(
+            types, data, names, exclusions = validate_types_file(
                 types_file, dir_path, es, index, opts
             )
             LOGGER.info("Indexing types")
@@ -471,6 +471,7 @@ def index_taxon_sample(es, opts, index="taxon", *, dry_run=False, taxonomy_name)
                         "index_types": index_types,
                     },
                     taxon_table=taxon_table,
+                    exclusions=exclusions
                 )
                 if "tests" in types["file"]:
                     result = test_json_dir(
@@ -516,7 +517,7 @@ def index_features(es, opts, *, dry_run=False):
     shared_values["_index"] = template["index_name"]
     shared_values["_index_type"] = index
     for types_file in file_list:
-        types, data, names = validate_types_file(
+        types, data, names, exclusions = validate_types_file(
             types_file, dir_path, es, index, opts, attributes=stored_attributes
         )
         LOGGER.info("Indexing types")
