@@ -42,7 +42,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     ranks: { in: new Set(["tree"]) },
     levels: { in: new Set(["tree"]), ui: true },
     names: { in: new Set(["tree"]) },
-    fields: { in: new Set(["tree"]) },
+    fields: { in: new Set(["histogram", "scatter", "tree"]) },
     collapseMonotypic: { in: new Set(["tree"]) },
     includeEstimates: true,
     excludeAncestral: true,
