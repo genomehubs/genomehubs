@@ -53,6 +53,7 @@ const ReportItem = ({
   xOpts,
   yOpts,
   highlightArea,
+  mapThreshold,
   scatterThreshold,
   yScale,
   zScale,
@@ -79,6 +80,7 @@ const ReportItem = ({
     yOpts,
     scatterThreshold,
     treeThreshold,
+    mapThreshold,
     ...qs.parse(queryString),
   });
   const navigate = useNavigate();
@@ -209,6 +211,7 @@ const ReportItem = ({
             {...qs.parse(queryString)}
             minDim={minDim}
             setMinDim={setMinDim}
+            mapThreshold={mapThreshold}
           />
         );
         break;

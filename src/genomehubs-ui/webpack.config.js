@@ -92,6 +92,7 @@ const config = {
       VERSION: JSON.stringify(PACKAGE.version),
       SUGGESTED_TERM: JSON.stringify(main.suggestedTerm),
       TREE_THRESHOLD: JSON.stringify(main.treeThreshold),
+      MAP_THRESHOLD: JSON.stringify(main.mapThreshold),
     }),
     new HtmlWebpackPlugin({
       hash: true,

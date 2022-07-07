@@ -38,6 +38,7 @@ export const getMap = async ({
   rank,
   taxonomy,
   queryString,
+  fields,
   req,
   ...apiParams
 }) => {
@@ -50,6 +51,7 @@ export const getMap = async ({
     rank,
     result: apiParams.result,
     taxonomy,
+    fields,
     req,
     apiParams,
   });
@@ -70,16 +72,13 @@ export const getMap = async ({
     if (cat) {
       caption += ` by ${cat.replace(/=.+$/, "")}`;
     }
-    if (apiParams.includeEstimates && report.xQuery.fields > "") {
-      caption += ` including ancestrally derived estimates`;
-    }
   }
   return {
     status,
     report: {
-      tree: report,
+      map: report,
       xQuery,
-      yQuery,
+      // yQuery,
       xLabel,
       queryString,
       caption,

@@ -49,7 +49,14 @@ export const queryPropList = {
     "stacked",
     "cumulative",
   ],
-  map: ["report", xSettings, rankSettings, catSettings, "includeEstimates"],
+  map: [
+    "report",
+    xSettings,
+    rankSettings,
+    catSettings,
+    "includeEstimates",
+    "mapThreshold",
+  ],
   scatter: [
     "report",
     xSettings,
@@ -87,7 +94,7 @@ const autoCompleteTypes = {
   cat: { type: "cat" },
 };
 
-const reportTypes = ["histogram", "scatter", "tree", "xInY", "xPerRank"];
+const reportTypes = ["histogram", "map", "scatter", "tree", "xInY", "xPerRank"];
 
 export const useStyles = makeStyles((theme) => ({
   label: {

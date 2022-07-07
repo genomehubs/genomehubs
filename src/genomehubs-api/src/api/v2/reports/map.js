@@ -5,6 +5,7 @@ import { attrTypes } from "../functions/attrTypes";
 import { combineQueries } from "../functions/combineQueries";
 import { config } from "../functions/config";
 import { getBounds } from "./getBounds";
+import { getResultCount } from "../functions/getResultCount";
 import { getResults } from "../functions/getResults";
 import { parseFields } from "../functions/parseFields";
 import { queryParams } from "./queryParams";
@@ -22,21 +23,21 @@ const valueTypes = {
 const getMap = async ({
   params,
   x,
+  field = "sample_location",
   y,
   yParams,
   fields,
   yFields,
   cat,
+  bounds,
+  yBounds,
   result,
   queryId,
   catRank,
-  mapThreshold = config.mapThreshold || 1000,
+  mapThreshold = 1000,
   taxonomy,
   req,
 }) => {
-  console.log(0);
-  cat = undefined;
-  console.log(x);
   let { lookupTypes } = await attrTypes({ result, taxonomy });
   // let field = yFields[0] || fields[0];
   let exclusions;
@@ -45,77 +46,111 @@ const getMap = async ({
   let xQuery = {
     ...params,
     query: x,
-    size: mapThreshold, // lca.count,
     fields,
     exclusions,
   };
+  if (bounds.cat) {
+    if (bounds.by == "attribute") {
+      xQuery.query += ` AND ${bounds.cat}=${bounds.cats
+        .map(({ key }) => key)
+        .join(",")}`;
+      xQuery.fields = [...new Set([...xQuery.fields, bounds.cat])];
+    } else {
+      xQuery.ranks = bounds.cat;
+    }
+  }
+  let countRes = await getResultCount(xQuery);
+  if (!countRes.status.success) {
+    return { status: countRes.status };
+  }
+  let count = countRes.count;
+  if (mapThreshold > -1 && count > mapThreshold) {
+    return {
+      status: {
+        success: false,
+        error: `Maps currently limited to ${mapThreshold} results (x query returns ${count}).\nPlease specify additional filters to continue.`,
+      },
+    };
+  }
   // if (queryId) {
   //   setProgress(queryId, { total: lca.count });
   // }
-  let xRes = await getResults({ ...xQuery, taxonomy, req, update: "x" });
+  let xRes = await getResults({
+    ...xQuery,
+    size: count,
+    taxonomy,
+    req,
+    // update: "x",
+  });
   if (!xRes.status.success) {
     return { status: xRes.status };
   }
 
-  console.log(xRes);
+  let cats;
+  if (bounds.cats) {
+    cats = new Set(bounds.cats.map(({ key }) => key));
+  }
+  let rawData = {};
+  for (let result of xRes.results) {
+    let cat;
+    if (bounds.cat) {
+      if (bounds.by == "attribute") {
+        cat = result.result.fields[bounds.cat].value.toLowerCase();
+        if (Array.isArray(cat)) {
+          cat = cat[0].toLowerCase();
+        } else {
+          cat = result.result.fields[bounds.cat].value.toLowerCase();
+        }
+      } else if (result.result.ranks) {
+        cat = result.result.ranks[bounds.cat];
+        if (cat) {
+          cat = cat.taxon_id;
+        }
+      }
+      if (!cat || !cats.has(cat)) {
+        cat == "other";
+      }
+    }
+    if (!rawData[cat]) {
+      rawData[cat] = [];
+    }
+    if (!result.result.fields[field]) {
+      continue;
+    }
+    let coords = result.result.fields[field].value;
+    let aggregation_source = result.result.fields[field].aggregation_source;
+    rawData[cat].push({
+      ...(result.result.scientific_name && {
+        scientific_name: result.result.scientific_name,
+      }),
+      ...(result.result.taxon_id && { taxonId: result.result.taxon_id }),
+      ...(result.result.assembly_id && {
+        assemblyId: result.result.assembly_id,
+      }),
+      ...(result.result.sample_id && { taxonId: result.result.sampleId }),
+      coords,
+      aggregation_source,
+      cat,
+    });
+  }
 
-  // let yRes;
-  // if (y) {
-  //   yParams.excludeMissing.push(...yFields);
-  //   let catMeta = lookupTypes(cat);
-  //   if (catMeta) {
-  //     yParams.excludeMissing.push(catMeta.name);
-  //   }
-  //   yParams.excludeMissing = [...new Set(yParams.excludeMissing)];
-  //   yParams.excludeUnclassified = true;
-  //   exclusions = setExclusions(yParams);
-  //   yRes = await getResults({
-  //     ...yParams,
-  //     taxonomy,
-  //     query: yMapped.join(" AND "),
-  //     size: treeThreshold, // lca.count,
-  //     maxDepth,
-  //     fields: yFields,
-  //     exclusions,
-  //     req,
-  //     update: "y",
-  //   });
-  //   if (!yRes.status.success) {
-  //     return { status: yRes.status };
-  //   }
-  // }
-  // let treeNodes = {};
-  // await addXResultsToTree({
-  //   xRes,
-  //   treeNodes,
-  //   optionalFields,
-  //   lca,
-  //   xQuery,
-  //   yRes,
-  //   queryId,
-  //   taxonomy,
-  //   catRank,
-  // });
-
-  // if (
-  //   lca.taxon_id &&
-  //   !treeNodes[lca.taxon_id] &&
-  //   treeNodes[lca.taxon_id.toUpperCase()]
-  // ) {
-  //   lca.taxon_id = lca.taxon_id.toUpperCase();
-  // }
-  // if (collapseMonotypic) {
-  //   maxDepth = collapseNodes({ taxonId: lca.taxon_id, treeNodes });
-  // }
-
-  return {};
+  return { rawData };
 };
 
-export const map = async ({ x, y, cat, result, taxonomy, apiParams, req }) => {
+export const map = async ({
+  x,
+  y,
+  cat,
+  result,
+  taxonomy,
+  apiParams,
+  fields,
+  req,
+}) => {
   let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
   let searchFields = await parseFields({
     result,
-    fields: apiParams.fields,
+    fields,
     taxonomy,
   });
   let {
@@ -127,7 +162,6 @@ export const map = async ({ x, y, cat, result, taxonomy, apiParams, req }) => {
     result,
     taxonomy,
   });
-  let fields;
   let catRank;
   if (cat) {
     let catField;
@@ -198,9 +232,9 @@ export const map = async ({ x, y, cat, result, taxonomy, apiParams, req }) => {
   }
   optionalFields = [...new Set([...optionalFields])];
 
-  let treeThreshold = `${apiParams.treeThreshold}` || config.treeThreshold;
-  if (treeThreshold < 0) {
-    treeThreshold = 100000;
+  let mapThreshold = apiParams.mapThreshold || config.mapThreshold;
+  if (mapThreshold < 0) {
+    mapThreshold = 1000;
   }
   let bounds;
   let exclusions = setExclusions(params);
@@ -235,8 +269,6 @@ export const map = async ({ x, y, cat, result, taxonomy, apiParams, req }) => {
       opts: yOpts,
     });
   }
-  console.log(params.query);
-  console.log(status);
   let map = status
     ? {}
     : await getMap({
@@ -245,17 +277,19 @@ export const map = async ({ x, y, cat, result, taxonomy, apiParams, req }) => {
         catRank,
         summaries,
         cat,
+        bounds,
+        yBounds,
         x,
         y,
         yParams,
         yFields,
         ySummaries,
         result,
+        mapThreshold,
         queryId: apiParams.queryId,
         req,
         taxonomy,
       });
-  console.log(1);
   if (map && map.status && map.status.success == false) {
     status = { ...map.status };
     map = {};

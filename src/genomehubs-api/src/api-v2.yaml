@@ -298,6 +298,29 @@ components:
       required: false
       schema:
         type: string
+    mapThresholdParam:
+      description: |
+        Maximum number of results to return when `report=map`.
+
+        If a query returns more results a warning is given to increase this threshold.
+      examples:
+        null:
+          value:
+          summary: Use default value (10000)
+        thousand:
+          value: 20000
+          summary: Set threshold to 20000
+        minus:
+          value: -1
+          summary: Specify no limit (maximum bound applies)
+      in: query
+      name: mapThreshold
+      required: false
+      schema:
+        maximum: 100000
+        minimum: -1
+        type: integer
+      style: form
     maxErrorsParam:
       deprecated: true
       description: |
@@ -1269,6 +1292,7 @@ paths:
         - $ref: "#/components/parameters/taxonomyParam"
         - $ref: "#/components/parameters/xOptsParam"
         - $ref: "#/components/parameters/yOptsParam"
+        - $ref: "#/components/parameters/mapThresholdParam"
         - $ref: "#/components/parameters/scatterThresholdParam"
         - $ref: "#/components/parameters/treeThresholdParam"
         - $ref: "#/components/parameters/queryIdParam"

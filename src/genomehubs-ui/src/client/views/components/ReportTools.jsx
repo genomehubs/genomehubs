@@ -110,7 +110,14 @@ export const ReportTools = ({
   }
 
   return (
-    <div style={{ height: "100%", width: "100%", position: "relative" }}>
+    <div
+      style={{
+        height: "100%",
+        width: "100%",
+        position: "relative",
+        zIndex: 10000,
+      }}
+    >
       <div
         style={{
           height: "100%",
