@@ -661,7 +661,7 @@ def strip_comments(data, types):
         yield row
 
 
-def process_names_file(types, names_file):
+def process_names_file(types, names_file, *, value_path=None):
     """Process a taxon names file."""
     data = tofile.open_file_handle(names_file)
     names = defaultdict(dict)
@@ -673,10 +673,21 @@ def process_names_file(types, names_file):
         delimiter=delimiters[types["file"]["format"]],
         quotechar='"',
     )
-    next(rows)
-    for row in rows:
-        name = row[3] if len(row) > 3 else row[1]
-        names[row[2]][row[1]] = {"name": name, "taxon_id": row[0]}
+    if value_path and isinstance(value_path, dict):
+        for row in rows:
+            for group, keys in value_path.items():
+                if not isinstance(keys, list):
+                    keys = [keys]
+                for key in keys:
+                    if key not in names[group]:
+                        names[group][key] = {row[0]: row[1]}
+                    else:
+                        names[group][key][row[0]] = row[1]
+    else:
+        next(rows)
+        for row in rows:
+            name = row[3] if len(row) > 3 else row[1]
+            names[row[2]][row[1]] = {"name": name, "taxon_id": row[0]}
     return names
 
 
@@ -739,9 +750,13 @@ def process_row_values(row, types, data):
                         data[group][key] = re.split(rf"\s*{separator}\s*", value)
                     elif value is not None and value != "None":
                         data[group][key] = value
+                except IndexError:
+                    LOGGER.warning("Missing fields in row '%s'" % str(row))
+                    return None
                 except Exception as err:
                     LOGGER.warning("Cannot parse row '%s'" % str(row))
                     raise err
+    return True
 
 
 def process_taxon_names(data, types, row, names):
@@ -768,7 +783,15 @@ def process_features(data):
         del data["features"]
 
 
-def process_row(types, names, row, shared_values, blanks, index_type="assembly"):
+def contains_excluded_value(data, exclusions):
+    """Check whether row data matches an excluded value."""
+    for key in exclusions.keys():
+        for subkey in exclusions[key].keys():
+            if str(data.get(key, {}).get(subkey, "")) in exclusions[key][subkey]:
+                return True
+
+
+def process_row(types, names, row, shared_values, blanks, *, index_type="assembly", exclusions=None):
     """Process a row of data."""
     data = {
         "attributes": {},
@@ -780,7 +803,12 @@ def process_row(types, names, row, shared_values, blanks, index_type="assembly")
         "taxon_attributes": {},
     }
     set_row_defaults(types, data)
-    process_row_values(row, types, data)
+    if process_row_values(row, types, data) is None:
+        return None, None, None
+    if exclusions is None:
+        exclusions = defaultdict(dict)
+    if contains_excluded_value(data, exclusions):
+        return None, None, None
     taxon_data = {}
     taxon_types = {}
     if "is_primary_value" in data["metadata"]:

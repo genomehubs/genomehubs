@@ -100,14 +100,12 @@ def index_types(es, types_name, types, opts, *, dry_run=False):
                 new_attributes[key] = {**value}
                 new_attributes[key].pop("header", None)
                 new_attributes[key].pop("index", None)
-        template, stream = index(
-            es, types_name, new_attributes, opts, index_type="attribute"
-        )
-        load_mapping(es, template["name"], template["mapping"])
-        index_stream(es, template["index_name"], stream, dry_run=dry_run)
-        # if new_attributes:
-        #     # Delay to ensure index is updated before loading next file
-        #     sleep(5)
+        if new_attributes:
+            template, stream = index(
+                es, types_name, new_attributes, opts, index_type="attribute"
+            )
+            load_mapping(es, template["name"], template["mapping"])
+            index_stream(es, template["index_name"], stream, dry_run=dry_run)
     if "taxon_names" in types:
         if "defaults" in types and "taxon_names" in types["defaults"]:
             for key, value in types["names"].items():

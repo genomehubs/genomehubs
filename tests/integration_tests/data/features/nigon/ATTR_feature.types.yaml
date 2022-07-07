@@ -53,6 +53,8 @@ attributes:
         - scaffold
         - sequence
         - toplevel
+        - gene
+        - busco-gene
         - window
         - 1kb-window
     description: Feature type
@@ -116,57 +118,3 @@ attributes:
     display_name: Proportional length
     display_group: stats
     type: float
-  gc:
-    bins:
-      min: 0
-      max: 1
-      count: 10
-      scale: linear
-    constraint:
-      max: 1
-      min: 0
-    description: Proportional sequence GC content = GC/ATGC
-    display_level: 1
-    display_name: GC content
-    display_group: stats
-    type: 3dp
-  masked:
-    bins:
-      min: 0
-      max: 1
-      count: 10
-      scale: linear
-    constraint:
-      max: 1
-      min: 0
-    description: Proportional masked seqence acgtn/acgtn+ACGTN
-    display_level: 1
-    display_name: Masked proportion
-    display_group: stats
-    type: 3dp
-  coverage:
-    bins:
-      min: 0
-      max: 7
-      count: 7
-      scale: log10
-    constraint:
-      min: 0.01
-    description: Sequencing coverage
-    display_level: 1
-    display_name: Coverage
-    display_group: stats
-    type: 2dp
-  carnivora_odb10_count:
-    bins:
-      min: 0
-      max: 1000
-      count: 10
-      scale: linear
-    constraint:
-      min: 1
-    description: Count of BUSCO carnivora genes
-    display_level: 1
-    display_name: Carnivora BUSCO Count
-    display_group: stats
-    type: integer

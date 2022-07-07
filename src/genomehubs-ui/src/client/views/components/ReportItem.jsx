@@ -223,6 +223,7 @@ const ReportItem = ({
             xOpts={xOpts}
             yOpts={yOpts}
             highlightArea={highlightArea}
+            stacked={stacked}
             zScale={zScale}
             scatterThreshold={scatterThreshold}
             includeEstimates={includeEstimates}

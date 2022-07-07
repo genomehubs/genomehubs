@@ -36,6 +36,7 @@ export const getCatsBy = async ({
       cats = terms.by_attribute.by_cat.by_value.cats.buckets;
       cats.forEach((obj) => {
         obj.label = obj.key;
+        obj.key = obj.key.toLowerCase();
       });
     } else if (fixedTerms) {
       let usedTerms = new Set();
@@ -46,15 +47,18 @@ export const getCatsBy = async ({
         if (i > fixedTerms.size) {
           break;
         }
-        usedTerms.add(key);
-        cats.push({ key, label: fixedTerms.translations[key] });
+        usedTerms.add(key.toLowerCase());
+        cats.push({
+          key: key.toLowerCase(),
+          label: fixedTerms.translations[key],
+        });
       }
       if (i < fixedTerms.size) {
         for (let obj of terms.by_attribute.by_cat.more_values.buckets) {
-          if (!usedTerms.has(obj.key)) {
+          if (!usedTerms.has(obj.key.toLowerCase())) {
             i++;
-            usedTerms.add(obj.key);
-            cats.push({ key: obj.key, label: obj.key });
+            usedTerms.add(obj.key.toLowerCase());
+            cats.push({ key: obj.key.toLowerCase(), label: obj.key });
           }
           if (i >= fixedTerms.size) {
             break;
@@ -66,7 +70,7 @@ export const getCatsBy = async ({
       cats = terms.by_attribute.by_cat.more_values.buckets.map(
         // cats = Object.keys(terms.by_attribute.by_cat.by_value.buckets).map(
         (obj) => ({
-          key: obj.key,
+          key: obj.key.toLowerCase(),
           label: obj.key,
         })
       );

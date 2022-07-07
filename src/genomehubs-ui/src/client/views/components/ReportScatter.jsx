@@ -53,11 +53,11 @@ const searchByCell = ({
   query = query
     .replaceAll(new RegExp("AND\\s+" + bounds.field + "\\s+AND", "gi"), "AND")
     .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_\\.]+", "gi"),
+      new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
       ""
     )
     .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_\\.]+", "gi"),
+      new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
       ""
     )
     .replaceAll(/\s+/g, " ")
@@ -162,6 +162,50 @@ const CustomDot = (props, chartProps) => {
   );
 };
 
+const drawHeatRect = ({ props, chartProps, h, w }) => {
+  let { z, offset } = props.payload;
+  let scale = axisScales[chartProps.zScale]();
+  let domain = [0, chartProps.zDomain[1]];
+  scale.domain(domain).range([2, w]);
+  if (chartProps.n == 1) {
+    scale.range([0.1, 1]);
+  } else if (chartProps.zScale == "proportion") {
+    scale.domain([0, 1]).range([0, w]);
+    z /= chartProps.catSums[props.name].sum;
+    offset /= chartProps.catSums[props.name].sum;
+  }
+  let width = w;
+  let height = h;
+  let x = props.cx;
+  let y = props.cy - h;
+  let opacity = 1;
+  if (chartProps.n == 1) {
+    opacity = scale(z);
+  } else if (chartProps.stacked) {
+    scale.range([scale.domain()[0], h]);
+    height = scale(z + offset) - scale(offset);
+    y += h - height - scale(offset);
+  } else {
+    width = scale(z);
+    height /= chartProps.n;
+    y += height * chartProps.i;
+  }
+  return (
+    <Rectangle
+      {...props}
+      height={height}
+      width={width}
+      // mask={`url(#mask-stripe-${chartProps.n}-${chartProps.i})`}
+      fill={props.fill}
+      x={x} // {props.cx + (w - width) / 2}
+      y={y}
+      // fillOpacity={chartProps.n > 1 ? 1 : props.zAxis.scale(props.payload.z)}
+      fillOpacity={chartProps.n > 1 ? 1 : scale(props.payload.z)}
+      style={{ pointerEvents: "none" }}
+    />
+  );
+};
+
 const CustomShape = (props, chartProps) => {
   let h = props.yAxis.height / chartProps.yLength;
   if (chartProps.yValueType == "date") {
@@ -169,7 +213,6 @@ const CustomShape = (props, chartProps) => {
       props.yAxis.scale(props.payload.y) -
       props.yAxis.scale(props.payload.yBound);
   }
-  let height = h / chartProps.n;
   let w = props.xAxis.width / chartProps.xLength;
   if (chartProps.valueType == "date") {
     w =
@@ -228,33 +271,7 @@ const CustomShape = (props, chartProps) => {
     </>
   );
   if (!chartProps.hasRawData) {
-    let z = props.payload.z;
-    let scale = axisScales[chartProps.zScale]();
-    let domain = [1, chartProps.zDomain[1]];
-    scale.domain(domain).range([2, w]);
-    if (chartProps.n == 1) {
-      scale.range([0.1, 1]);
-    } else if (chartProps.zScale == "proportion") {
-      scale.domain([0, 1]).range([0, w]);
-      z /= chartProps.catSums[props.name].sum;
-    }
-    let width = scale(z);
-    heatRect = (
-      <Rectangle
-        {...props}
-        height={chartProps.n > 1 ? height : h}
-        width={chartProps.n > 1 ? width : w}
-        // mask={`url(#mask-stripe-${chartProps.n}-${chartProps.i})`}
-        fill={props.fill}
-        x={props.cx} // {props.cx + (w - width) / 2}
-        y={
-          chartProps.n > 1 ? props.cy - h + height * chartProps.i : props.cy - h
-        }
-        // fillOpacity={chartProps.n > 1 ? 1 : props.zAxis.scale(props.payload.z)}
-        fillOpacity={chartProps.n > 1 ? 1 : scale(props.payload.z)}
-        style={{ pointerEvents: "none" }}
-      />
-    );
+    heatRect = drawHeatRect({ props, chartProps, h, w });
   }
   if (props.key == "symbol-0") {
     legendGroup = zLegend({ props, chartProps });
@@ -328,15 +345,26 @@ const CustomizedYAxisTick = (props, buckets, fmt, translations) => {
 const CustomizedXAxisTick = (props, buckets, fmt, translations) => {
   const { x, y, fill, index, width, payload } = props;
   let value = payload.value;
+  let yPos = y;
   let offset = 0;
+  let bucketWidth = width / (buckets.length - 1);
   if (buckets[index] != payload.value) {
     value = buckets[index] || "";
-    offset = width / (buckets.length - 1) / 2;
+    offset = bucketWidth / 2;
+    if (index % 2 == 1 && value.length * 8 > bucketWidth) {
+      yPos += 12;
+    }
   } else {
     value = fmt(value);
+    if (index % 2 == 1 && value.length * 8 > bucketWidth) {
+      return null;
+    }
+    if (index % 4 != 0 && value.length * 8 > bucketWidth * 2) {
+      return null;
+    }
   }
   return (
-    <g transform={`translate(${x + offset},${y})`}>
+    <g transform={`translate(${x + offset},${yPos})`}>
       <text x={0} y={0} dy={10} textAnchor="middle" fill={fill}>
         {translations[value] || value}
       </text>
@@ -479,7 +507,6 @@ const Heatmap = ({
       );
     }
   }
-
   return (
     <ScatterChart
       width={width}
@@ -554,6 +581,7 @@ const ReportScatter = ({
   setMinDim,
   xOpts,
   yOpts,
+  stacked,
   highlightArea,
 }) => {
   const navigate = useNavigate();
@@ -687,6 +715,7 @@ const ReportScatter = ({
           catOffsets,
           valueType,
           yValueType,
+          stacked,
           hasRawData,
           embedded,
           navigate,

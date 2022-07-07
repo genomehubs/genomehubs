@@ -34,11 +34,11 @@ export const AutoCompleteInput = ({
   fixedType,
   multipart,
 }) => {
-  let [open, setOpen] = useState(false);
-  let [prefix, setPrefix] = useState("");
-  let [suffix, setSuffix] = useState("");
-  let [subTerm, setSubTerm] = useState("");
-  let [activeLookup, setActiveLookup] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [prefix, setPrefix] = useState("");
+  const [suffix, setSuffix] = useState("");
+  const [subTerm, setSubTerm] = useState("");
+  const [activeLookup, setActiveLookup] = useState(null);
   let terms;
   let options = [];
 
@@ -392,7 +392,10 @@ export const AutoCompleteInput = ({
         setMultiline(true);
         setInValue(`${inputRef.current.value}\n`);
       } else if (!multiline) {
-        handleSubmit(e, { id, value: inputRef.current.value });
+        handleSubmit(e, {
+          id,
+          value: inputRef.current.value,
+        });
         // setInputValue(inputRef.current.value);
       }
       resetAutocomplete();
@@ -411,7 +414,19 @@ export const AutoCompleteInput = ({
       // setTimeout(() => {
       resetAutocomplete();
       if (multipart) {
-        setInValue(newValue.title);
+        if (
+          newValue.result == "assembly" ||
+          newValue.result == "feature" ||
+          newValue.result == "sample"
+        ) {
+          handleSubmit(e, {
+            id,
+            value: newValue.title,
+            index: newValue.result,
+          });
+        } else {
+          setInValue(newValue.title);
+        }
       } else {
         handleSubmit(e, { id, value: newValue.title });
       }

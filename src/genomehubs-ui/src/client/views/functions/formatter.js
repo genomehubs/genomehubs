@@ -5,7 +5,7 @@ const toReturnType = (value, formatted, returnType) => {
   if (returnType == "array") {
     return { values: [[value, 1]], formatted: [formatted] };
   }
-  return value;
+  return formatted;
 };
 
 export const formatter = (value, searchIndex, returnType) => {
@@ -26,11 +26,11 @@ export const formatter = (value, searchIndex, returnType) => {
       );
       return `${formatted.join("; ")}${extra ? "; ..." : ""}`;
     }
-    let parts = value.split(",");
-    let formatted = value;
+    let parts = (value || "").split(/\s*,\s*/);
     if (parts.length == 2 && !isNaN(parts[0] && !isNaN(parts[1]))) {
       value = parts.map((p) => format(".2f")(p, searchIndex)).join(",");
     }
+    let formatted = value;
     return toReturnType(value, formatted, returnType);
   }
   if (searchIndex == "feature") {

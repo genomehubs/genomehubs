@@ -51,6 +51,7 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
             if translate:
                 entry["translate"] = {key.lower(): value for key, value in translate.items()}
     names = None
+    exclusions = None
     data = None
     if "file" in types:
         if "name" in types["file"]:
@@ -78,4 +79,8 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
             names = process_names_file(
                 types, Path(dir_path) / "names" / types["file"]["name"]
             )
-    return types, data, names
+            if "exclusions" in types["file"]:
+                exclusions = process_names_file(
+                    types, Path(dir_path) / "exclusions" / types["file"]["name"], value_path=types["file"]["exclusions"]
+                )
+    return types, data, names, exclusions

@@ -1,12 +1,17 @@
+import {
+  setHighlightPointLocation,
+  setZoomPointLocation,
+} from "../reducers/geography";
+
 import React from "react";
 import { connect } from "react-redux";
-import { setHighlightPointLocation } from "../reducers/geography";
 
 const dispatchGeography = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({});
   const mapDispatchToProps = (dispatch) => ({
     setHighlightPointLocation: (coords) =>
       dispatch(setHighlightPointLocation(coords)),
+    setZoomPointLocation: (coords) => dispatch(setZoomPointLocation(coords)),
   });
 
   const Connected = connect(

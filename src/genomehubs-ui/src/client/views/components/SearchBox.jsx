@@ -60,6 +60,7 @@ const SearchBox = ({
 }) => {
   const classes = useStyles();
   const navigate = useNavigate();
+  const formRef = useRef(null);
   const searchBoxRef = useRef(null);
   const searchInputRef = useRef(null);
   const savedOptions = useReadLocalStorage(`${searchIndex}Options`);
@@ -151,10 +152,11 @@ const SearchBox = ({
     // resetLookup();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e, props = {}) => {
     e.preventDefault();
+    const { index } = props;
     let term = searchInputRef.current.value;
-    doSearch(term, result, term);
+    doSearch(term, index || result, term);
   };
 
   let searchText = `Type to search ${siteName}`;
@@ -169,6 +171,7 @@ const SearchBox = ({
       <Grid item>
         <form
           onSubmit={handleSubmit}
+          ref={formRef}
           style={{
             minWidth: "900px",
             width: "100%",
@@ -197,7 +200,11 @@ const SearchBox = ({
                 <IconButton
                   className={classes.search}
                   aria-label="submit search"
-                  type="submit"
+                  onClick={(e) =>
+                    formRef.current.dispatchEvent(
+                      new Event("submit", { cancelable: true, bubbles: true })
+                    )
+                  }
                 >
                   <SearchIcon />
                 </IconButton>

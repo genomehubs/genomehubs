@@ -109,11 +109,11 @@ const searchByCell = ({
   query = query
     .replaceAll(new RegExp("AND\\s+" + bounds.field + "\\s+AND", "gi"), "AND")
     .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_\\.]+", "gi"),
+      new RegExp("AND\\s+" + bounds.field + "\\s+>=*\\s*[\\w\\d_\\.-]+", "gi"),
       ""
     )
     .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_\\.]+", "gi"),
+      new RegExp("AND\\s+" + bounds.field + "\\s+<=*\\s*[\\w\\d_\\.-]+", "gi"),
       ""
     )
     .replaceAll(/\s+/g, " ")
@@ -146,10 +146,20 @@ const searchByCell = ({
       delete xQuery[key];
     }
   }
+  let xOpts = (options.xOpts || "").split(";");
+  if (xOpts.length == 1) {
+    xOpts = xOpts[0].split(",");
+  }
+  if (xOpts.length > 1) {
+    xOpts[0] = "";
+    xOpts[1] = "";
+  }
+  xOpts = xOpts.join(";");
 
   let queryString = qs.stringify({
     ...xQuery,
     ...options,
+    xOpts,
     query,
     fields,
     report: "histogram",
@@ -183,6 +193,7 @@ const CustomBackground = ({ chartProps, ...props }) => {
     chartProps.buckets[props.index],
     chartProps.buckets[props.index + 1],
   ];
+
   let xRange;
   if (chartProps.bounds.scale == "ordinal") {
     xRange = xBounds[0];
@@ -190,6 +201,14 @@ const CustomBackground = ({ chartProps, ...props }) => {
     xRange = `${chartProps.xFormat(xBounds[0])}-${chartProps.xFormat(
       xBounds[1]
     )}`;
+  }
+  if (chartProps.valueType == "date") {
+    xBounds = xBounds.map((bound) =>
+      new Date(bound)
+        .toISOString()
+        .substring(0, 10)
+        .replaceAll(/(-01-01|-01)$/g, "")
+    );
   }
 
   let { x, ...counts } = props.payload;
@@ -529,6 +548,7 @@ const ReportHistogram = ({
           catTranslations,
           catOffsets,
           xFormat: (value) => formats(value, valueType),
+          valueType,
           embedded,
           navigate,
           location,

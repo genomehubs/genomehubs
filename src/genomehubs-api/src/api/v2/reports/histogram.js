@@ -133,13 +133,13 @@ const getHistogram = async ({
     yBounds,
     ySummary,
   });
-  let catMeta = lookupTypes(cat);
+  let catMeta = lookupTypes((cat || "").replace(/[\+\[=].*/, ""));
   let res = await getResults({
     ...params,
     taxonomy,
     fields,
     exclusions,
-    ...(raw && cat && !catMeta && { ranks: cat }),
+    ...(raw && cat && !catMeta && { ranks: cat.replace(/[\+\[=].*/, "") }),
   });
   if (!res.status.success) {
     return { status: res.status };
@@ -170,7 +170,7 @@ const getHistogram = async ({
             if (!result.result.fields[bounds.cat]) {
               cat = "missing";
             } else {
-              cat = result.result.fields[bounds.cat].value;
+              cat = result.result.fields[bounds.cat].value.toLowerCase();
               if (Array.isArray(cat)) {
                 cat = cat[0].toLowerCase();
               } else {
@@ -201,8 +201,10 @@ const getHistogram = async ({
           y = Date.parse(y);
         }
         pointData[cat].push({
-          scientific_name: result.result.scientific_name,
-          taxonId: result.result.taxon_id,
+          ...(result.result.scientific_name && {
+            scientific_name: result.result.scientific_name,
+          }),
+          ...(result.result.taxon_id && { taxonId: result.result.taxon_id }),
           x,
           y,
           cat,
@@ -297,13 +299,14 @@ const getHistogram = async ({
       fields = [...new Set(fields)];
       catBuckets = catHists.by_attribute.by_cat.by_value.buckets;
     } else {
-      // if (bounds.showOther) {
-      //   byCat.other = other;
-      //   yValuesByCat = { other: allOther };
-      // }
       ranks = [bounds.cat];
       catBuckets = catHists.by_lineage.at_rank.buckets;
     }
+    if (bounds.showOther) {
+      byCat.other = other;
+      yValuesByCat = { other: allOther };
+    }
+
     let catObjs = {};
     if (bounds.showOther) {
       bounds.cats.push({
@@ -315,7 +318,10 @@ const getHistogram = async ({
       catObjs[obj.key] = obj;
     });
 
-    Object.entries(catBuckets).forEach(([key, obj]) => {
+    for (let [key, obj] of Object.entries(catBuckets)) {
+      if (key == "other") {
+        continue;
+      }
       byCat[key] = [];
       catObjs[key].doc_count = 0;
       // TODO: support categories here too
@@ -326,9 +332,9 @@ const getHistogram = async ({
       nestedHist.buckets.forEach((bin, i) => {
         byCat[key][i] = bin.doc_count;
         catObjs[key].doc_count += bin.doc_count;
-        // if (byCat.other) {
-        //   byCat.other[i] -= bin.doc_count;
-        // }
+        if (byCat.other) {
+          byCat.other[i] -= bin.doc_count;
+        }
         if (yField) {
           if (!yValuesByCat) {
             yValuesByCat = {};
@@ -343,11 +349,11 @@ const getHistogram = async ({
               lookupTypes,
               stats: yBounds.stats,
             });
-            // if (yValuesByCat.other) {
-            //   yValues.forEach((count, j) => {
-            //     yValuesByCat.other[i][j] -= count;
-            //   });
-            // }
+            if (yValuesByCat.other) {
+              yValues.forEach((count, j) => {
+                yValuesByCat.other[i][j] -= count;
+              });
+            }
             yValuesByCat[key].push(yValues);
           } else {
             yValuesByCat[key].push([]);
@@ -355,10 +361,10 @@ const getHistogram = async ({
         }
       });
       if (pointData) {
-        rawData[key] = pointData[key];
-        delete pointData[key];
+        rawData[key] = pointData[key.toLowerCase()];
+        delete pointData[key.toLowerCase()];
       }
-    });
+    }
     if (pointData && byCat.other) {
       rawData.other = Object.values(pointData)
         .flat()
@@ -491,6 +497,12 @@ export const histogram = async ({
     fields: apiParams.fields,
     taxonomy,
   });
+  let catMeta = lookupTypes((cat || "").replace(/[\+\[=].*/, ""));
+  if (catMeta && !x.match(catMeta.name)) {
+    searchFields.push(catMeta.name);
+    x += ` AND ${catMeta.name}`;
+    // exclude.push(cat);
+  }
   let xTerm = combineQueries(y, x);
   let { params, fields, summaries } = await queryParams({
     term: xTerm,
@@ -500,11 +512,7 @@ export const histogram = async ({
   });
   updateQuery({ params, fields, opts: xOpts, lookupTypes });
   // let exclude = [];
-  let catMeta = lookupTypes(cat);
-  if (catMeta) {
-    searchFields.push(catMeta.name);
-    // exclude.push(cat);
-  }
+
   fields = [...new Set(fields.concat(searchFields))];
   // exclude.push(fields[0]);
   let yTerm, yFields, ySummaries;

@@ -42,7 +42,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     ranks: { in: new Set(["tree"]) },
     levels: { in: new Set(["tree"]), ui: true },
     names: { in: new Set(["tree"]) },
-    fields: { in: new Set(["tree"]) },
+    fields: { in: new Set(["histogram", "scatter", "tree"]) },
     collapseMonotypic: { in: new Set(["tree"]) },
     includeEstimates: true,
     excludeAncestral: true,
@@ -58,7 +58,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     treeStyle: { in: new Set(["tree"]), ui: true },
     yScale: { in: new Set(["histogram"]), ui: true },
     zScale: { in: new Set(["scatter"]), ui: true },
-    stacked: { in: new Set(["histogram"]), ui: true },
+    stacked: { in: new Set(["histogram", "scatter"]), ui: true },
     cumulative: { in: new Set(["histogram"]), ui: true },
     treeThreshold: { in: new Set(["tree"]) },
     queryId: { in: new Set(["histogram", "map", "scatter", "tree", "xInY"]) },
@@ -299,6 +299,7 @@ const processScatter = (scatter) => {
   if (heatmaps.byCat) {
     catSums = {};
     cats = scatter.cats.map((cat) => cat.label);
+    let offsets = [];
     scatter.cats.forEach((cat) => {
       catSums[cat.label] = {
         sum: 0,
@@ -307,11 +308,17 @@ const processScatter = (scatter) => {
       };
       let catData = [];
       heatmaps.buckets.forEach((bucket, i) => {
+        if (typeof offsets[i] === "undefined") {
+          offsets[i] = [];
+        }
         if (bucket && scatter.bounds.scale == "ordinal") {
           bucket = bucket.toLowerCase();
         }
         if (i < heatmaps.buckets.length - 1) {
           heatmaps.yBuckets.forEach((yBucket, j) => {
+            if (typeof offsets[i][j] === "undefined") {
+              offsets[i][j] = 0;
+            }
             if (yBucket && scatter.yBounds.scale == "ordinal") {
               yBucket = yBucket.toLowerCase();
             }
@@ -344,10 +351,12 @@ const processScatter = (scatter) => {
                       : yScale(heatmaps.yBuckets[j + 1]),
                   z,
                   count,
+                  offset: offsets[i][j],
                 });
                 catSums[cat.label].sum += z;
                 catSums[cat.label].min = Math.min(catSums[cat.label].min, z);
                 catSums[cat.label].max = Math.max(catSums[cat.label].max, z);
+                offsets[i][j] += z;
               }
             }
           });
@@ -392,11 +401,14 @@ const processScatter = (scatter) => {
             } else {
               y = yScale(obj.y);
             }
-            // TODO: Handle features with no scientific name
-            locations[obj.scientific_name.toLowerCase()] = {
-              x,
-              y,
-            };
+            // TODO: Handle feature highlight with no scientific name
+            if (obj.scientific_name) {
+              locations[obj.scientific_name.toLowerCase()] = {
+                x,
+                y,
+              };
+            }
+
             points.push({ ...obj, x, y });
           }
         }
