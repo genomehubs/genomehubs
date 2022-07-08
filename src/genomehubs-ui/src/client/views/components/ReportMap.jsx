@@ -2,13 +2,14 @@ import "leaflet/dist/leaflet.css";
 
 import {
   CircleMarker,
+  LayerGroup,
   MapContainer,
   Pane,
   Popup,
   TileLayer,
 } from "react-leaflet";
 import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 import Grid from "@material-ui/core/Grid";
@@ -45,14 +46,15 @@ const SingleMarker = ({
 };
 
 const MarkerComponent = ({
-  geoPoints,
+  geoPoints = [],
   color,
   meta,
   options,
   taxonId,
   setHighlightPointLocation = () => {},
 }) => {
-  let positions = [];
+  let markers = [];
+  let i = 0;
   for (let obj of geoPoints) {
     let coords = obj.coords;
     if (!Array.isArray(coords)) {
@@ -60,52 +62,90 @@ const MarkerComponent = ({
     }
     for (let latLon of coords) {
       let arr = latLon.split(",");
-      positions.push(arr);
+      let message = obj.scientific_name ? `${obj.scientific_name} - ` : "";
+      let link;
+      if (obj.sampleId) {
+        link = (
+          <NavLink
+            url={`/record?recordId=${obj.sampleId}&result=sample&taxonomy=${options.taxonomy}`}
+          >
+            {obj.sampleId}
+          </NavLink>
+        );
+      } else if (obj.taxonId) {
+        let newOptions = {};
+        // if (options.recordId) {
+        newOptions = {
+          query: `tax_tree(${obj.taxonId}) AND sample_location=${latLon}`,
+          result: "sample",
+          taxonomy: options.taxonomy,
+        };
+
+        let url = `/search?${qs.stringify(newOptions)}`;
+        link = (
+          <NavLink url={url}>click to view samples from this location</NavLink>
+        );
+      }
+      // TODO: handle assemblyId
+      message = (
+        <>
+          {message} {link}
+        </>
+      );
+      markers.push(
+        <SingleMarker
+          key={i}
+          position={arr}
+          color={color}
+          setHighlightPointLocation={setHighlightPointLocation}
+        >
+          <Popup>{message}</Popup>
+        </SingleMarker>
+      );
+      i++;
     }
   }
-  let markers = positions.map((position, i) => {
-    // TODO: add lookup to link pins to samples
-    let message;
-    // if (meta.values && meta.values.length == positions.length) {
-    //   let link = (
-    //     <NavLink
-    //       url={`/record?recordId=${meta.values[i].source_id}&result=${meta.values[i].source_index}&taxonomy=${options.taxonomy}`}
-    //     >
-    //       {meta.values[i].source_id}
-    //     </NavLink>
-    //   );
-    //   message = (
-    //     <>
-    //       click to view full record for {meta.values[i].source_index}: {link}
-    //     </>
-    //   );
-    // } else if (taxonId) {
-    //   let newOptions = {};
-    //   // if (options.recordId) {
-    //   newOptions = {
-    //     query: `tax_tree(${taxonId}) AND sample_location=${position.join(",")}`,
-    //     result: "sample",
-    //     taxonomy: options.taxonomy,
-    //   };
 
-    //   let url = `/search?${qs.stringify(newOptions)}`;
-    //   let link = (
-    //     <NavLink url={url}>click to view samples from this location</NavLink>
-    //   );
-    //   message = link;
-    // }
-    return (
-      <SingleMarker
-        key={i}
-        position={position}
-        color={color}
-        setHighlightPointLocation={setHighlightPointLocation}
-      >
-        <Popup>{message}</Popup>
-      </SingleMarker>
-    );
-  });
-  return <Pane key={color}>{markers}</Pane>;
+  // if (meta.values && meta.values.length == positions.length) {
+  //   let link = (
+  //     <NavLink
+  //       url={`/record?recordId=${meta.values[i].source_id}&result=${meta.values[i].source_index}&taxonomy=${options.taxonomy}`}
+  //     >
+  //       {meta.values[i].source_id}
+  //     </NavLink>
+  //   );
+  //   message = (
+  //     <>
+  //       click to view full record for {meta.values[i].source_index}: {link}
+  //     </>
+  //   );
+  // } else if (taxonId) {
+  //   let newOptions = {};
+  //   // if (options.recordId) {
+  //   newOptions = {
+  //     query: `tax_tree(${taxonId}) AND sample_location=${position.join(",")}`,
+  //     result: "sample",
+  //     taxonomy: options.taxonomy,
+  //   };
+
+  //   let url = `/search?${qs.stringify(newOptions)}`;
+  //   let link = (
+  //     <NavLink url={url}>click to view samples from this location</NavLink>
+  //   );
+  //   message = link;
+  // }
+  //   return (
+  //     <SingleMarker
+  //       key={i}
+  //       position={position}
+  //       color={color}
+  //       setHighlightPointLocation={setHighlightPointLocation}
+  //     >
+  //       <Popup>{message}</Popup>
+  //     </SingleMarker>
+  //   );
+  // });
+  return markers;
 };
 
 const Map = ({
@@ -131,7 +171,6 @@ const Map = ({
   //     }
   //   });
   // }, []);
-  let options = qs.parse(location.search.replace(/^\?/, ""));
   // let { markers, bounds } = MarkerComponent({
   //   geoPoints,
   //   meta,
@@ -183,25 +222,50 @@ const ReportMap = ({
       setMessage(null);
     }
   }, [map]);
+
+  let options = qs.parse(location.search.replace(/^\?/, ""));
   if (map && map.status) {
     let bounds = map.report.map.bounds;
     let geoBounds = bounds.stats.geo.bounds;
     geoBounds = [
-      [geoBounds.top_left.lat, geoBounds.top_left.lon],
-      [geoBounds.bottom_right.lat, geoBounds.bottom_right.lon],
+      [geoBounds.top_left.lat + 1, geoBounds.top_left.lon - 1],
+      [geoBounds.bottom_right.lat - 1, geoBounds.bottom_right.lon + 1],
     ];
 
     let pointData = map.report.map.map.rawData;
     let markers = [];
-    bounds.cats.forEach((obj, i) => {
+    if (bounds.cats) {
+      bounds.cats.forEach((obj, i) => {
+        markers.push(
+          <MarkerComponent
+            key={i}
+            geoPoints={pointData[obj.key]}
+            color={colors[i]}
+            options={options}
+          />
+        );
+      });
+      if (bounds.showOther) {
+        let i = bounds.cats.length;
+        markers.push(
+          <MarkerComponent
+            key={i}
+            geoPoints={pointData["other"]}
+            color={colors[i]}
+            options={options}
+          />
+        );
+      }
+    } else {
       markers.push(
         <MarkerComponent
-          key={i}
-          geoPoints={pointData[obj.key]}
-          color={colors[i]}
+          key={0}
+          geoPoints={pointData["all taxa"]}
+          color={colors[0]}
+          options={options}
         />
       );
-    });
+    }
 
     return (
       <Grid item xs ref={componentRef} style={{ height: "100%" }}>

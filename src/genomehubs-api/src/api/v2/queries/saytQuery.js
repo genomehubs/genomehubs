@@ -225,7 +225,13 @@ export const saytQuery = ({ result, searchTerm, wildcardTerm, size = 10 }) => {
     _source = ["assembly_id", "taxon_id", "scientific_name", "identifiers.*"];
   } else if (result == "sample") {
     query = sampleSaytQuery({ searchTerm });
-    _source = ["sample_id", "taxon_id", "scientific_name", "identifiers.*"];
+    _source = [
+      "sample_id",
+      "assembly_id",
+      "taxon_id",
+      "scientific_name",
+      "identifiers.*",
+    ];
   } else if (result == "feature") {
     query = featureSaytQuery({ searchTerm });
     _source = [

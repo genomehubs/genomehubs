@@ -115,7 +115,7 @@ export const ReportTools = ({
         height: "100%",
         width: "100%",
         position: "relative",
-        zIndex: 10000,
+        zIndex: 500,
       }}
     >
       <div

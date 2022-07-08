@@ -133,7 +133,13 @@ export const lookupQuery = ({ result, searchTerm, lineage, size = 10 }) => {
     _source = ["assembly_id", "taxon_id", "scientific_name", "identifiers.*"];
   } else if (result == "sample") {
     query = sampleLookupQuery({ searchTerm });
-    _source = ["sample_id", "taxon_id", "scientific_name", "identifiers.*"];
+    _source = [
+      "sample_id",
+      "assembly_id",
+      "taxon_id",
+      "scientific_name",
+      "identifiers.*",
+    ];
   } else if (result == "feature") {
     query = featureLookupQuery({ searchTerm });
     _source = [

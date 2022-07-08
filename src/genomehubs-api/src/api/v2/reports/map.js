@@ -45,15 +45,17 @@ const getMap = async ({
 
   let xQuery = {
     ...params,
-    query: x,
+    // query: x,
     fields,
     exclusions,
   };
   if (bounds.cat) {
     if (bounds.by == "attribute") {
-      xQuery.query += ` AND ${bounds.cat}=${bounds.cats
-        .map(({ key }) => key)
-        .join(",")}`;
+      if (!bounds.showOther) {
+        xQuery.query += ` AND ${bounds.cat}=${bounds.cats
+          .map(({ key }) => key)
+          .join(",")}`;
+      }
       xQuery.fields = [...new Set([...xQuery.fields, bounds.cat])];
     } else {
       xQuery.ranks = bounds.cat;
@@ -108,8 +110,11 @@ const getMap = async ({
         }
       }
       if (!cat || !cats.has(cat)) {
-        cat == "other";
+        cat = "other";
       }
+    }
+    if (!cat) {
+      cat = "all taxa";
     }
     if (!rawData[cat]) {
       rawData[cat] = [];
@@ -127,7 +132,7 @@ const getMap = async ({
       ...(result.result.assembly_id && {
         assemblyId: result.result.assembly_id,
       }),
-      ...(result.result.sample_id && { taxonId: result.result.sampleId }),
+      ...(result.result.sample_id && { sampleId: result.result.sample_id }),
       coords,
       aggregation_source,
       cat,
@@ -141,6 +146,7 @@ export const map = async ({
   x,
   y,
   cat,
+  rank,
   result,
   taxonomy,
   apiParams,
@@ -160,6 +166,7 @@ export const map = async ({
   } = await queryParams({
     term: x,
     result,
+    rank,
     taxonomy,
   });
   let catRank;
@@ -193,6 +200,7 @@ export const map = async ({
   } = await queryParams({
     term: yTerm,
     result,
+    rank,
     taxonomy,
   });
   if (y && !aInB(yFields, Object.keys(typesMap))) {
