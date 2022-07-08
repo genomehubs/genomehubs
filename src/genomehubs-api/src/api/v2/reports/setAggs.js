@@ -272,6 +272,7 @@ export const setAggs = async ({
   histogram,
   tree,
   stats,
+  geo,
   keywords,
   terms,
   size = 5,
@@ -416,6 +417,14 @@ export const setAggs = async ({
       },
     };
   }
+  if (geo) {
+    geo = {
+      geo_bounds: {
+        field: `attributes.${fieldMeta.type}_value`,
+        wrap_longitude: true,
+      },
+    };
+  }
   terms = termsAgg({ field: terms, lookupTypes, size });
   keywords = termsAgg({
     field: keywords,
@@ -441,6 +450,7 @@ export const setAggs = async ({
           aggs: {
             histogram,
             stats,
+            geo,
             keywords,
             terms,
             categoryHistograms,

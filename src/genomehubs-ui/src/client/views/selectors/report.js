@@ -22,6 +22,7 @@ import { createCachedSelector } from "re-reselect";
 import { createSelector } from "reselect";
 // import { format } from "d3-format";
 import { getTypes } from "../reducers/types";
+import { mapThreshold } from "../reducers/map";
 import { nanoid } from "nanoid";
 import { processTree } from "./tree";
 import qs from "qs";
@@ -42,7 +43,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     ranks: { in: new Set(["tree"]) },
     levels: { in: new Set(["tree"]), ui: true },
     names: { in: new Set(["tree"]) },
-    fields: { in: new Set(["histogram", "scatter", "tree"]) },
+    fields: { in: new Set(["histogram", "map", "scatter", "tree"]) },
     collapseMonotypic: { in: new Set(["tree"]) },
     includeEstimates: true,
     excludeAncestral: true,
@@ -60,8 +61,9 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     zScale: { in: new Set(["scatter"]), ui: true },
     stacked: { in: new Set(["histogram", "scatter"]), ui: true },
     cumulative: { in: new Set(["histogram"]), ui: true },
+    mapThreshold: { in: new Set(["map"]) },
     treeThreshold: { in: new Set(["tree"]) },
-    queryId: { in: new Set(["histogram", "scatter", "tree", "xInY"]) },
+    queryId: { in: new Set(["histogram", "map", "scatter", "tree", "xInY"]) },
     release: true,
     indent: false,
   };
@@ -108,6 +110,9 @@ export function fetchReport({ reportId, reload, report, hideMessage }) {
       !queryString.match("treeThreshold")
     ) {
       queryString += `&treeThreshold=${treeThreshold}`;
+    }
+    if (queryString.match("report=map") && !queryString.match("mapThreshold")) {
+      queryString += `&mapThreshold=${mapThreshold}`;
     }
     let apiQueryString = sortReportQuery({ queryString, ui: false });
     const queryId = nanoid(10);
@@ -613,6 +618,15 @@ export const getReportFields = createSelector(
 
 const reportOptions = {
   histogram: {
+    x: {
+      default: "query",
+      fieldType: "value",
+    },
+    rank: {
+      default: "query:tax_rank",
+    },
+  },
+  map: {
     x: {
       default: "query",
       fieldType: "value",

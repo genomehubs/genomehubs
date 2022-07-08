@@ -16,6 +16,7 @@ import withReportDefaults from "../hocs/withReportDefaults";
 
 const reportTypes = {
   histogram: { name: "Histogram" },
+  map: { name: "Map" },
   scatter: { name: "Scatter" },
   tree: { name: "Tree" },
   xInY: { name: "xInY" },

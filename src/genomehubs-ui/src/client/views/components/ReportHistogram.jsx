@@ -555,15 +555,6 @@ const ReportHistogram = ({
         }}
       />
     );
-    //   { value: x, name: xTerm },
-    //   { value: y - x, name: yTerm },
-    // ];
-    // let { x, y, xTerm, yTerm } = xInY.report.xInY;
-    // chartData = [
-    //   { value: x, name: xTerm },
-    //   { value: y - x, name: yTerm },
-    // ];
-    // chart = <PieComponent data={chartData} width={minDim} height={minDim} />;
 
     return (
       <Grid item xs ref={componentRef} style={{ height: "100%" }}>
