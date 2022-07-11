@@ -8,7 +8,7 @@ import ReportTreeRings from "./ReportTreeRings";
 import Tooltip from "@material-ui/core/Tooltip";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
-import qs from "qs";
+import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withReportById from "../hocs/withReportById";

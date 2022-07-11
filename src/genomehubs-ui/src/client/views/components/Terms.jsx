@@ -8,7 +8,7 @@ import classnames from "classnames";
 import { compose } from "recompose";
 // import withPages from "../hocs/withPages";
 // import dispatchTerms from "../hocs/dispatchTerms";
-import qs from "qs";
+import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import withFadeInOut from "../hocs/withFadeInOut";
 

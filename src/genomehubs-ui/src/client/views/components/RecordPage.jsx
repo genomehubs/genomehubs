@@ -12,7 +12,7 @@ import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
 import { getRecordIsFetching } from "../reducers/record";
-import qs from "qs";
+import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import withRecord from "../hocs/withRecord";

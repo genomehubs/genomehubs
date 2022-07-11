@@ -6,7 +6,7 @@ import TextPanel from "./TextPanel";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
-import qs from "qs";
+import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";

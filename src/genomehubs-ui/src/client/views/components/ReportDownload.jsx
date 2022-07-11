@@ -8,7 +8,7 @@ import Grid from "@material-ui/core/Grid";
 import React from "react";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
-import qs from "qs";
+import qs from "../functions/qs";
 import withReportById from "../hocs/withReportById";
 
 export const ReportDownload = ({

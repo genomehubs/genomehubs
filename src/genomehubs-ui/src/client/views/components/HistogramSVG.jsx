@@ -4,7 +4,7 @@ import Skeleton from "@material-ui/lab/Skeleton";
 import Tooltip from "@material-ui/core/Tooltip";
 import { compose } from "recompose";
 import { formatter } from "../functions/formatter";
-import qs from "qs";
+import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import useVisible from "../hooks/useVisible";

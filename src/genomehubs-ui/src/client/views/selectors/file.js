@@ -7,8 +7,7 @@ import {
 } from "../reducers/file";
 
 import { createCachedSelector } from "re-reselect";
-import { createSelector } from "reselect";
-import qs from "qs";
+import qs from "../functions/qs";
 
 export function fetchFiles(options) {
   return async function (dispatch) {

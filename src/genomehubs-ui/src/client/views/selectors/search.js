@@ -19,7 +19,7 @@ import {
 import { checkProgress } from "./checkProgress";
 import { getCurrentTaxonomy } from "../reducers/taxonomy";
 import { nanoid } from "nanoid";
-import qs from "qs";
+import qs from "../functions/qs";
 import { setTreeQuery } from "../reducers/tree";
 import store from "../store";
 

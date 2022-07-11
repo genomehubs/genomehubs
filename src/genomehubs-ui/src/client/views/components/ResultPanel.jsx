@@ -9,7 +9,7 @@ import WordCloud from "./WordCloud";
 import classnames from "classnames";
 import { compose } from "recompose";
 import { formatter } from "../functions/formatter";
-import qs from "qs";
+import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";

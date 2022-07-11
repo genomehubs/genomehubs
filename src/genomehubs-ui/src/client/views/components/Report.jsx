@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useRef } from "react";
 
 import ReportItem from "./ReportItem";
 import { compose } from "recompose";
-import qs from "qs";
+import qs from "../functions/qs";
 import { sortReportQuery } from "../selectors/report";
 import { useLocation } from "@reach/router";
 import useResize from "../hooks/useResize";

@@ -25,7 +25,7 @@ import { getTypes } from "../reducers/types";
 import { mapThreshold } from "../reducers/map";
 import { nanoid } from "nanoid";
 import { processTree } from "./tree";
-import qs from "qs";
+import qs from "../functions/qs";
 import { scaleOrdinal } from "d3-scale";
 import store from "../store";
 import { treeThreshold } from "../reducers/tree";

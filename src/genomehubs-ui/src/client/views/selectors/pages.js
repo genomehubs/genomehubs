@@ -6,8 +6,6 @@ import {
 } from "../reducers/pages";
 
 import { createCachedSelector } from "re-reselect";
-import { createSelector } from "reselect";
-import qs from "qs";
 
 export const pagesUrl = PAGES_URL || false;
 export const webpackHash = __webpack_hash__ || COMMIT_HASH;

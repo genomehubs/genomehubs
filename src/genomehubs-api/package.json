@@ -36,6 +36,7 @@
     "memcached": "^2.2.2",
     "memcached-promise": "^1.0.1",
     "qs": "^6.10.3",
+    "reselect": "^4.1.6",
     "swagger-ui-express": "^4.3.0",
     "winston": "^3.7.2",
     "winston-daily-rotate-file": "^4.6.1",

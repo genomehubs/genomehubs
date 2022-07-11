@@ -9,7 +9,7 @@ import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
 import { formatter } from "../functions/formatter";
-import qs from "qs";
+import qs from "../functions/qs";
 import { sortReportQuery } from "../selectors/report";
 import styles from "./Styles.scss";
 import withReportDefaults from "../hocs/withReportDefaults";

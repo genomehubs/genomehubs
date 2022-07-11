@@ -30,7 +30,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
 import { formatter } from "../functions/formatter";
-import qs from "qs";
+import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";

@@ -9,7 +9,7 @@ import {
 
 import { createCachedSelector } from "re-reselect";
 import { createSelector } from "reselect";
-import qs from "qs";
+import qs from "../functions/qs";
 
 export function fetchAnalyses(options) {
   return async function (dispatch) {

@@ -6,7 +6,7 @@ import TablePagination from "@material-ui/core/TablePagination";
 import classnames from "classnames";
 import { compose } from "recompose";
 import { makeStyles } from "@material-ui/core/styles";
-import qs from "qs";
+import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
 import withSearch from "../hocs/withSearch";

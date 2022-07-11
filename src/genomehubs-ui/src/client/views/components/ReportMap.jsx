@@ -18,7 +18,7 @@ import NavLink from "./NavLink";
 import ZoomComponent from "./ZoomComponent";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
-import qs from "qs";
+import qs from "../functions/qs";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
 

@@ -15,7 +15,7 @@ import NavLink from "./NavLink";
 import ZoomComponent from "./ZoomComponent";
 import { compose } from "recompose";
 import dispatchGeography from "../hocs/dispatchGeography";
-import qs from "qs";
+import qs from "../functions/qs";
 
 const SingleMarker = ({ position, children, setHighlightPointLocation }) => {
   return (

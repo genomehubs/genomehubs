@@ -8,13 +8,15 @@ import { compose } from "recompose";
 import dispatchRecord from "../hocs/dispatchRecord";
 import dispatchTypes from "../hocs/dispatchTypes";
 import dtolLogo from "./img/dtol-logo.png";
-import qs from "qs";
+import qs from "../functions/qs";
 import sangerLogo from "./img/sanger-logo.png";
 import styles from "./Styles.scss";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withVersion from "../hocs/withVersion";
 
 const Footer = ({ version, fetchTypes, hidden, taxonomy }) => {
+  console.log(qs);
+  console.log(qs.parse);
   let options = qs.parse(location.search.replace(/^\?/, ""));
   useEffect(() => {
     fetchTypes("multi", options.taxonomy || taxonomy);

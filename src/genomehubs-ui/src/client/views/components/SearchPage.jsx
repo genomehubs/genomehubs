@@ -10,7 +10,7 @@ import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
 import equal from "deep-equal";
-import qs from "qs";
+import qs from "../functions/qs";
 import shallow from "shallowequal";
 import styles from "./Styles.scss";
 import withSearch from "../hocs/withSearch";
