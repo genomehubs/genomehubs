@@ -13,7 +13,15 @@ const convertIdsToDocIds = (recordId, result) => {
   let ids = Array.isArray(recordId) ? recordId : [recordId];
   if (result == "taxon") {
     // TODO: #186 standardise doc id prefixes
-    ids = ids.map((id) => (id.match(/^taxon_id-/) ? id : `taxon_id-${id}`));
+    console.log(ids);
+    ids = ids.map((id) =>
+      id.match(/^taxon-/)
+        ? id
+        : id.match(/^taxon_id-/)
+        ? id.replace(/^taxon_id/, "taxon")
+        : `taxon-${id}`
+    );
+    console.log(ids);
   } else if (result == "assembly") {
     ids = ids.map((id) => (id.match(/^assembly-/) ? id : `assembly-${id}`));
   } else if (result == "sample") {

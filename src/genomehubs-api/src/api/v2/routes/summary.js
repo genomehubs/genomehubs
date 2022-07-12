@@ -13,7 +13,7 @@ const getSummary = async (params) => {
     ? params.recordId
     : [params.recordId];
   if (params.result == "taxon") {
-    ids = ids.map((id) => id.replace(/^taxon_id-/, ""));
+    ids = ids.map((id) => id.replace(/^taxon-/, ""));
   }
   let fields = (params.fields || "").split(/\s*,\s*/);
   if (!fields || fields == "all") {

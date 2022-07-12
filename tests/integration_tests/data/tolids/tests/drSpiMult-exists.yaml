@@ -1,8 +1,8 @@
 description: check taxon drSpiMult has been created
-endpoint: taxon--{{taxonomy-source}}--{{hub-name}}--{{hub-version}}/_doc/taxon_id-drSpiMult
+endpoint: taxon--{{taxonomy-source}}--{{hub-name}}--{{hub-version}}/_doc/taxon-drSpiMult
 querystring:
 assert:
-  _id: taxon_id-drSpiMult
+  _id: taxon-drSpiMult
   found: True
   _source:
     taxon_id: drSpiMult

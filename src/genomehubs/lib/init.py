@@ -178,7 +178,7 @@ def add_jsonl_to_taxonomy(stream, jsonl):
             entry["lineage"] = extend_lineage({**entry, "lineage": lineage})
             entry["parent"] = lineage[0]["taxon_id"]
             lineages[entry["scientific_name"]].append(entry["lineage"])
-            yield "taxon_id-%s" % str(entry["taxon_id"]), entry
+            yield "taxon-%s" % str(entry["taxon_id"]), entry
 
 
 def main(args):
