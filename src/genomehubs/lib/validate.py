@@ -68,6 +68,9 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
                 LOGGER.error("Data file '%s' could not de opened for reading", datafile)
                 sys.exit(1)
         defaults = {"attributes": {}, "metadata": {}}
+        if "defaults" in types:
+            for key, value in types["defaults"]:
+                defaults[key] = value
         for key, value in types["file"].items():
             if key.startswith("display") or key.startswith("taxon"):
                 defaults["attributes"].update({key: value})
