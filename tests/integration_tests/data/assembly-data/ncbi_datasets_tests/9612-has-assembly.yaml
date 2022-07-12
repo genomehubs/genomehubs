@@ -1,8 +1,8 @@
 description: check taxon 9612 (Canis lupus) has assemblies
-endpoint: taxon--{{taxonomy-source}}--{{hub-name}}--{{hub-version}}/_doc/taxon_id-9612
+endpoint: taxon--{{taxonomy-source}}--{{hub-name}}--{{hub-version}}/_doc/taxon-9612
 querystring:
 assert:
-  _id: taxon_id-9612
+  _id: taxon-9612
   found: True
   _source:
     taxon_id: "9612"

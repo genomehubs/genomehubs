@@ -1,8 +1,8 @@
 description: check taxon 1431472 (Prunus kotschyi) has no valueses
-endpoint: taxon--{{taxonomy-source}}--{{hub-name}}--{{hub-version}}/_doc/taxon_id-1431472
+endpoint: taxon--{{taxonomy-source}}--{{hub-name}}--{{hub-version}}/_doc/taxon-1431472
 querystring:
 assert:
-  _id: taxon_id-1431472
+  _id: taxon-1431472
   found: True
   _source:
     taxon_id: "1431472"

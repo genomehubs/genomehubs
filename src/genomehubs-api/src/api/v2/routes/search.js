@@ -34,7 +34,7 @@ const replaceSearchIds = async (params) => {
       let altIds = await lookupAlternateIds({ recordId: ids, index });
       if (altIds.length == ids.length) {
         for (let i = 0; i < altIds.length; i++) {
-          let altId = altIds[i].replace("taxon_id-", "");
+          let altId = altIds[i].replace("taxon-", "");
           query = query.replace(`(${ids[i]})`, `(${altId})`);
         }
       }

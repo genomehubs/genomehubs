@@ -7,7 +7,7 @@ assert:
     success: true
     hits: 1
   records:
-    - id: taxon_id-9612
+    - id: taxon-9612
       record:
         parent: "9611"
         taxon_rank: species
