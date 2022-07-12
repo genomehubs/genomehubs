@@ -175,18 +175,19 @@ export const map = async ({
     catField = cat.replace(/[^\w_-].+$/, "");
     let catMeta = lookupTypes(catField);
     if (catMeta) {
-      fields = [...new Set(searchFields.concat([catMeta.name]))];
+      xFields = [...new Set(searchFields.concat([catMeta.name]))];
     } else {
       catRank = catField;
-      fields = [...new Set(searchFields)];
+      xFields = [...new Set(searchFields)];
     }
   } else {
-    fields = [...new Set(searchFields)];
+    xFields = [...new Set(searchFields)];
   }
-  fields = [...new Set(["sample_location", ...searchFields])];
+  xFields = [...new Set(["sample_location", ...searchFields])];
+  fields = xFields;
 
   let status;
-  if (!x || !aInB(fields, Object.keys(typesMap))) {
+  if (!x || !aInB(xFields, Object.keys(typesMap))) {
     status = {
       success: false,
       error: `unknown field in 'x = ${x}'`,
