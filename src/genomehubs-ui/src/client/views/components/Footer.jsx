@@ -15,8 +15,6 @@ import withTaxonomy from "../hocs/withTaxonomy";
 import withVersion from "../hocs/withVersion";
 
 const Footer = ({ version, fetchTypes, hidden, taxonomy }) => {
-  console.log(qs);
-  console.log(qs.parse);
   let options = qs.parse(location.search.replace(/^\?/, ""));
   useEffect(() => {
     fetchTypes("multi", options.taxonomy || taxonomy);

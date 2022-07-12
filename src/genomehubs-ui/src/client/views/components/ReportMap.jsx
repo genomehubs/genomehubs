@@ -226,7 +226,6 @@ const ReportMap = ({
   let options = qs.parse(location.search.replace(/^\?/, ""));
   if (map && map.status) {
     let bounds = map.report.map.bounds;
-    console.log(bounds);
     let geoBounds = bounds.stats.geo.bounds;
     geoBounds = [
       [geoBounds.top_left.lat + 1, geoBounds.top_left.lon - 1],

@@ -125,7 +125,7 @@ const taxonSaytQuery = ({ searchTerm, wildcardTerm = "", size }) => {
           prefix: {
             scientific_name: {
               value: searchTerm,
-              boost: 10,
+              boost: 50,
             },
           },
         },
@@ -133,7 +133,7 @@ const taxonSaytQuery = ({ searchTerm, wildcardTerm = "", size }) => {
           wildcard: {
             scientific_name: {
               value: wildcardTerm,
-              boost: 10,
+              boost: 50,
             },
           },
         },
@@ -186,6 +186,32 @@ const taxonSaytQuery = ({ searchTerm, wildcardTerm = "", size }) => {
                           ],
                         },
                       },
+                      {
+                        bool: {
+                          must: [
+                            {
+                              multi_match: {
+                                query: searchTerm,
+                                type: "phrase_prefix",
+                                boost: 2,
+                                fields: [
+                                  "taxon_names.name.live",
+                                  "taxon_names.name.live._2gram",
+                                  "taxon_names.name.live._3gram",
+                                ],
+                              },
+                            },
+                            {
+                              match: {
+                                ["taxon_names.class"]: {
+                                  query: "scientific name",
+                                  boost: 2,
+                                },
+                              },
+                            },
+                          ],
+                        },
+                      },
                     ],
                   },
                 },
@@ -217,6 +243,7 @@ const taxonSaytQuery = ({ searchTerm, wildcardTerm = "", size }) => {
 export const saytQuery = ({ result, searchTerm, wildcardTerm, size = 10 }) => {
   let query = {};
   let _source = [];
+  let sort;
   if (result == "analysis") {
     query = analysisSaytQuery({ searchTerm });
     _source = ["analysis_id", "assembly_id", "taxon_id"];
@@ -244,10 +271,26 @@ export const saytQuery = ({ result, searchTerm, wildcardTerm, size = 10 }) => {
   } else if (result == "taxon") {
     query = taxonSaytQuery({ searchTerm, wildcardTerm, size });
     _source = ["taxon_id", "scientific_name", "taxon_rank", "taxon_names.*"];
+    sort = [
+      {
+        _score: { order: "desc" },
+      },
+      {
+        _script: {
+          script: "doc['scientific_name'].value.length()",
+          type: "number",
+          order: "asc",
+        },
+      },
+      {
+        scientific_name: { order: "asc" },
+      },
+    ];
   }
   return {
     size,
     query,
+    sort,
     _source,
   };
 };
