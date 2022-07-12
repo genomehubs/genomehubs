@@ -115,6 +115,18 @@ const getHistogram = async ({
   let ySummary;
   let rawData;
   let pointData;
+  if (bounds.cat) {
+    if (bounds.by == "attribute") {
+      if (!bounds.showOther) {
+        let parts = params.query.split(/\s+AND\s+/i);
+        let filtered = parts.filter((part) => part != bounds.cat);
+        params.query = `${filtered.join(" AND ")} AND ${
+          bounds.cat
+        }=${bounds.cats.map(({ key }) => key).join(",")}`;
+      }
+      fields = [...new Set([...fields, bounds.cat])];
+    }
+  }
   if (yFields && yFields.length > 0) {
     yFieldMeta = lookupTypes(yFields[0]);
     yField = yFieldMeta.name;
