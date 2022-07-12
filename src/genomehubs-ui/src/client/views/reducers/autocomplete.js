@@ -11,8 +11,7 @@ import {
 
 import { apiUrl } from "./api";
 import immutableUpdate from "immutable-update";
-import qs from "qs";
-import { setApiStatus } from "./api";
+import qs from "../functions/qs";
 import store from "../store";
 
 const requestAutocomplete = createAction("REQUEST_AUTOCOMPLETE");

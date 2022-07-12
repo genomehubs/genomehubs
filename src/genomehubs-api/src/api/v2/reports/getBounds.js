@@ -140,8 +140,11 @@ export const getBounds = async ({
     summary,
     result,
     taxonomy,
-    ...(fieldMeta && fieldMeta.type != "keyword" && { stats: true }),
+    ...(fieldMeta &&
+      fieldMeta.type != "keyword" &&
+      fieldMeta.type != "geo_point" && { stats: true }),
     ...(fieldMeta && fieldMeta.type == "keyword" && { keywords: field }),
+    ...(fieldMeta && fieldMeta.type == "geo_point" && { geo: true }),
     fixedTerms,
     terms: extraTerms,
     size: definedTerms.size,
@@ -269,6 +272,11 @@ export const getBounds = async ({
       };
     } else {
       stats = { count: res.status.hits };
+    }
+    let geo = aggs.geo;
+    if (geo) {
+      stats = stats || {};
+      stats.geo = geo;
     }
   }
   let terms = aggs.terms;

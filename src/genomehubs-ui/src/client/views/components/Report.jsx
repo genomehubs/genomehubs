@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useRef } from "react";
 
 import ReportItem from "./ReportItem";
 import { compose } from "recompose";
-import qs from "qs";
+import qs from "../functions/qs";
 import { sortReportQuery } from "../selectors/report";
 import { useLocation } from "@reach/router";
 import useResize from "../hooks/useResize";
@@ -92,6 +92,7 @@ const Report = ({
   reportProps.treeStyle = props.treeStyle || "rect";
   reportProps.yOpts = props.yOpts;
   reportProps.highlightArea = props.highlightArea;
+  reportProps.mapThreshold = props.mapThreshold;
   reportProps.scatterThreshold = props.scatterThreshold;
   reportProps.treeThreshold = props.treeThreshold;
   reportProps.collapseMonotypic = props.collapseMonotypic;

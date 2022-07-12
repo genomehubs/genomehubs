@@ -25,7 +25,7 @@ def read(*names, **kwargs):
 
 setup(
     name="genomehubs",  # Required
-    version="2.4.25",
+    version="2.4.26",
     description="GenomeHubs",  # Optional
     long_description="%s\n%s"
     % (
@@ -106,7 +106,7 @@ setup(
         "Pillow>=8.0",
         "pyyaml",
         "sparqlwrapper>=1.4.1",
-        "tolkein>=0.4.0",
+        "tolkein>=0.5.0",
         "ujson>=3.0.0",
     ],  # Optional
     # List additional groups of dependencies here (e.g. development

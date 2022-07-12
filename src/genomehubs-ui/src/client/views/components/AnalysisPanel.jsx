@@ -8,7 +8,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import classnames from "classnames";
 import { compose } from "recompose";
-import qs from "qs";
+import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import withAnalysesByAnyId from "../hocs/withAnalysesByAnyId";
 import withAnalysis from "../hocs/withAnalysis";

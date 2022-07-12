@@ -47,14 +47,14 @@ def lookup_taxa_by_taxon_id(es, values, template, *, return_type="list"):
     if return_type == "dict":
         taxa = {}
     res = document_by_id(
-        es, ["taxon_id-%s" % value for value in values], template["index_name"]
+        es, ["taxon-%s" % value for value in values], template["index_name"]
     )
     if res is not None:
         if return_type == "list":
-            taxa = [key.replace("taxon_id-", "") for key in res.keys()]
+            taxa = [key.replace("taxon-", "") for key in res.keys()]
         else:
             for key, source in res.items():
-                taxon_id = key.replace("taxon_id-", "")
+                taxon_id = key.replace("taxon-", "")
                 taxa.update({taxon_id: {"_id": key, "_source": source}})
     # taxon_res = query_keyword_value_template(
     #     es,
@@ -353,7 +353,7 @@ def add_taxonomy_info_to_meta(meta, source):
 def stream_taxa(taxa):
     """Stream dict of taxa for indexing."""
     for taxon_id, value in taxa.items():
-        yield "taxon_id-%s" % taxon_id, value
+        yield "taxon-%s" % taxon_id, value
 
 
 def get_taxa_to_create(
@@ -428,7 +428,7 @@ def find_or_create_taxa(es, opts, *, taxon_ids, taxon_template, asm_by_taxon_id=
     )
     taxa.update(
         {
-            taxon_id: {"_id": "taxon_id-%s" % taxon_id, "_source": obj}
+            taxon_id: {"_id": "taxon-%s" % taxon_id, "_source": obj}
             for taxon_id, obj in to_create.items()
         }
     )
@@ -790,7 +790,7 @@ def generate_ancestral_taxon_id(name, rank, *, alt_taxon_id=None, taxon_ids=None
 def create_descendant_taxon(taxon_id, rank, name, closest_taxon):
     """Set taxon and lineage information for a descendant taxon."""
     desc_taxon = {
-        "_id": "taxon_id-%s" % taxon_id,
+        "_id": "taxon-%s" % taxon_id,
         "_source": {
             "taxon_id": taxon_id,
             "taxon_rank": rank,

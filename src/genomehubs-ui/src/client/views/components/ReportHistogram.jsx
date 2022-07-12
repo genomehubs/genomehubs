@@ -20,7 +20,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
-import qs from "qs";
+import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
@@ -555,15 +555,6 @@ const ReportHistogram = ({
         }}
       />
     );
-    //   { value: x, name: xTerm },
-    //   { value: y - x, name: yTerm },
-    // ];
-    // let { x, y, xTerm, yTerm } = xInY.report.xInY;
-    // chartData = [
-    //   { value: x, name: xTerm },
-    //   { value: y - x, name: yTerm },
-    // ];
-    // chart = <PieComponent data={chartData} width={minDim} height={minDim} />;
 
     return (
       <Grid item xs ref={componentRef} style={{ height: "100%" }}>

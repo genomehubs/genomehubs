@@ -18,7 +18,7 @@ import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
 import { getSuggestedTerm } from "../reducers/search";
 import { makeStyles } from "@material-ui/core/styles";
-import qs from "qs";
+import qs from "../functions/qs";
 import withReportById from "../hocs/withReportById";
 import withTaxonomy from "../hocs/withTaxonomy";
 
@@ -48,6 +48,14 @@ export const queryPropList = {
     "xOpts",
     "stacked",
     "cumulative",
+  ],
+  map: [
+    "report",
+    xSettings,
+    rankSettings,
+    catSettings,
+    "includeEstimates",
+    "mapThreshold",
   ],
   scatter: [
     "report",
@@ -86,7 +94,7 @@ const autoCompleteTypes = {
   cat: { type: "cat" },
 };
 
-const reportTypes = ["histogram", "scatter", "tree", "xInY", "xPerRank"];
+const reportTypes = ["histogram", "map", "scatter", "tree", "xInY", "xPerRank"];
 
 export const useStyles = makeStyles((theme) => ({
   label: {

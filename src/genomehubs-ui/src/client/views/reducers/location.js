@@ -1,11 +1,11 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 import { getAnalytics, trackPage } from "./tracking";
-import { qsDefault, queryToStore } from "../querySync";
 
 import { byIdSelectorCreator } from "./selectorCreators";
 import { createSelector } from "reselect";
 import history from "./history";
-import qs from "qs";
+import qs from "../functions/qs";
+import { queryToStore } from "../querySync";
 import store from "../store";
 
 const basename = BASENAME || "";

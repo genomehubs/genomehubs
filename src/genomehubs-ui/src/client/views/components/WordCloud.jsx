@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { TagCloud } from "react-tagcloud";
 import { compose } from "recompose";
-import qs from "qs";
+import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import useVisible from "../hooks/useVisible";

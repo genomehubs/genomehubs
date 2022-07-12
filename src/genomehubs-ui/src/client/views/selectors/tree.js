@@ -15,14 +15,12 @@ import {
   schemeGreens,
   schemeGreys,
   schemeOranges,
-  schemePaired,
   schemeReds,
 } from "d3-scale-chromatic";
 
 import { apiUrl } from "../reducers/api";
 import axisScales from "../functions/axisScales";
-import { createSelector } from "reselect";
-import qs from "qs";
+import qs from "../functions/qs";
 import store from "../store";
 
 const uriEncode = (str) => {

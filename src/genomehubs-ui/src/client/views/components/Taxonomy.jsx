@@ -3,7 +3,7 @@ import React, { memo, useEffect } from "react";
 import BasicMenu from "./BasicMenu";
 import { compose } from "recompose";
 import dispatchRecord from "../hocs/dispatchRecord";
-import qs from "qs";
+import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";
 import withTaxonomy from "../hocs/withTaxonomy";
 

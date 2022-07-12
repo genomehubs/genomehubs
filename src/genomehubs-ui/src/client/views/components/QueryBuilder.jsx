@@ -18,7 +18,7 @@ import VariableFilter from "./VariableFilter";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
 import { makeStyles } from "@material-ui/core/styles";
-import qs from "qs";
+import qs from "../functions/qs";
 import { setSearchTerm } from "../reducers/search";
 import { useNavigate } from "@reach/router";
 import withLookup from "../hocs/withLookup";

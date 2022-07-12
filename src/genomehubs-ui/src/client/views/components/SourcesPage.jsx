@@ -4,7 +4,7 @@ import Page from "./Page";
 import ReportFull from "./ReportFull";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
-import qs from "qs";
+import qs from "../functions/qs";
 import { sortReportQuery } from "../selectors/report";
 import withTaxonomy from "../hocs/withTaxonomy";
 

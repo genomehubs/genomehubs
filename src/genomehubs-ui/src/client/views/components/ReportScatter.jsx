@@ -25,7 +25,7 @@ import dispatchMessage from "../hocs/dispatchMessage";
 import { format } from "d3-format";
 import { processLegendData } from "./MultiCatLegend";
 // import { point } from "leaflet";
-import qs from "qs";
+import qs from "../functions/qs";
 import { scaleLinear } from "d3-scale";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";

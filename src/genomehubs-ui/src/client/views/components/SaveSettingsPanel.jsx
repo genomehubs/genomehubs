@@ -6,7 +6,7 @@ import IconButton from "@material-ui/core/IconButton";
 import SaveIcon from "@material-ui/icons/Save";
 import classnames from "classnames";
 import { compose } from "recompose";
-import qs from "qs";
+import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
 import withSearch from "../hocs/withSearch";

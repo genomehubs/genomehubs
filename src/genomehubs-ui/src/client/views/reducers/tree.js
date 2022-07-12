@@ -1,9 +1,6 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 
-import { createCachedSelector } from "re-reselect";
-import { createSelector } from "reselect";
 import immutableUpdate from "immutable-update";
-import qs from "qs";
 
 export const requestNodes = createAction("REQUEST_NODES");
 export const receiveNodes = createAction("RECEIVE_NODES");

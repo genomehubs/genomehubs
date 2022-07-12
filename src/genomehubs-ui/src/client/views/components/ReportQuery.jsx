@@ -6,7 +6,7 @@ import Grid from "@material-ui/core/Grid";
 import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
 import { compose } from "recompose";
-import qs from "qs";
+import qs from "../functions/qs";
 import { setSearchTerm } from "../reducers/search";
 import { useNavigate } from "@reach/router";
 import withReportById from "../hocs/withReportById";

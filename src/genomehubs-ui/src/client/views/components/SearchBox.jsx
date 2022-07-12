@@ -11,7 +11,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import { compose } from "recompose";
 import { getSuggestedTerm } from "../reducers/search";
 import { makeStyles } from "@material-ui/core/styles";
-import qs from "qs";
+import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";
 import { useReadLocalStorage } from "usehooks-ts";
 import withLookup from "../hocs/withLookup";

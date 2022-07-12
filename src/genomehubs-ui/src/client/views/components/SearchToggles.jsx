@@ -19,7 +19,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
 import { makeStyles } from "@material-ui/core/styles";
-import qs from "qs";
+import qs from "../functions/qs";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
 

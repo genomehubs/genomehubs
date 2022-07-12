@@ -23,7 +23,7 @@ import { compose } from "recompose";
 import { formatter } from "../functions/formatter";
 import loadable from "@loadable/component";
 import { makeStyles } from "@material-ui/core/styles";
-import qs from "qs";
+import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import withRecord from "../hocs/withRecord";

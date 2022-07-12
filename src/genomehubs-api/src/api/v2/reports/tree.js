@@ -555,7 +555,7 @@ export const tree = async ({
   if (y && !aInB(yFields, Object.keys(typesMap))) {
     status = {
       success: false,
-      error: `unknown field in 'x = ${y}'`,
+      error: `unknown field in 'y = ${y}'`,
     };
   }
   params.includeEstimates = apiParams.hasOwnProperty("includeEstimates")
