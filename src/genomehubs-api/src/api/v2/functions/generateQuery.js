@@ -130,7 +130,9 @@ const splitTerm = (term) => {
       return pattern;
     })
     .join("");
-  parts = subbedTerm.match(/(.*?)\((.*)\)([^\)]*)/);
+  if (subbedTerm.match(/^[^=><]+\(/)) {
+    parts = subbedTerm.match(/(.*?)\((.*)\)([^\)]*)/);
+  }
   if (!parts) {
     parts = subbedTerm.match(/()(.*?)\s*([!><=]+[^\)]*)/) || [subbedTerm];
   }
