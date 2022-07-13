@@ -42,8 +42,6 @@ export const processProps = (props, newProps = {}) => {
     } else if (key.startsWith("exclude")) {
       newProps[key] = value.split(",");
     } else if (key == "src") {
-      console.log(value);
-
       if (PAGES_URL.startsWith("http")) {
         newProps["src"] = `${pagesUrl}${value.replace(/^\/static/, "")}`;
       } else {
