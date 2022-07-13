@@ -25,7 +25,8 @@ const config = {
     main: ["@babel/polyfill", APP_DIR + "/index.jsx"],
   },
   output: {
-    publicPath: main.mode == "production" ? main.basename + "/" : "/",
+    publicPath:
+      main.mode == "production" ? main.basename + "/" : main.basename + "/",
     path: BUILD_DIR + "/",
     // filename: devMode ? "js/bundle.js" : "js/[name].[contenthash].js",
     filename: "js/[name].[contenthash].js",
@@ -81,7 +82,7 @@ const config = {
       BASENAME: JSON.stringify(main.basename),
       BRANCH: JSON.stringify(gitRevisionPlugin.branch()),
       COMMIT_HASH: JSON.stringify(gitRevisionPlugin.commithash()),
-      PAGES_URL: JSON.stringify(main.pagesUrl),
+      PAGES_URL: JSON.stringify(main.basename + main.pagesUrl),
       GA_ID: JSON.stringify(main.ga_id),
       GDPR_URL: JSON.stringify(main.gdpr_url),
       GIT_VERSION: JSON.stringify(gitRevisionPlugin.version()),
@@ -213,7 +214,10 @@ const config = {
         loader: "file-loader",
         options: {
           name: "img/[contenthash].[ext]",
-          publicPath: main.mode == "production" ? main.basename + "/" : "/",
+          publicPath:
+            main.mode == "production"
+              ? main.basename + "/"
+              : main.basename + "/",
         },
       },
       {

@@ -24,6 +24,7 @@ import { useNavigate } from "@reach/router";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
+import withSiteName from "../hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -56,6 +57,7 @@ const QueryBuilder = ({
   setPreferSearchTerm,
   taxonomy,
   types,
+  basename,
 }) => {
   const classes = useStyles();
   const navigate = useNavigate();
@@ -120,7 +122,7 @@ const QueryBuilder = ({
       includeDescendant: false,
     });
     navigate(
-      `/search?${qs.stringify({
+      `${basename}/search?${qs.stringify({
         taxonomy: options.taxonomy,
         query: "null",
         result: e.target.value,
@@ -355,7 +357,9 @@ const QueryBuilder = ({
     });
     setPreferSearchTerm(false);
     navigate(
-      `/search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`
+      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
+        options.query
+      )}`
     );
   };
   return (
@@ -511,6 +515,7 @@ const QueryBuilder = ({
 };
 
 export default compose(
+  withSiteName,
   dispatchLookup,
   withTypes,
   withTaxonomy,

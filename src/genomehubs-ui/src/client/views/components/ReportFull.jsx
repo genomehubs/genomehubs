@@ -10,6 +10,7 @@ import dispatchReport from "../hocs/dispatchReport";
 import styles from "./Styles.scss";
 import { useStyles } from "./ReportModal";
 import useWindowDimensions from "../hooks/useWindowDimensions";
+import withSiteName from "../hocs/withSiteName";
 
 export const ReportFull = ({
   reportId,
@@ -20,6 +21,7 @@ export const ReportFull = ({
   modalStyle = {},
   handleClose,
   error = false,
+  basename,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -50,7 +52,7 @@ export const ReportFull = ({
   const permaLink = (queryString, toggle) => {
     let path = topLevel ? "report" : toggle ? "reporturl" : "report";
     // TODO: include taxonomy
-    navigate(`/${path}?${queryString.replace(/^\?/, "")}`);
+    navigate(`${basename}/${path}?${queryString.replace(/^\?/, "")}`);
   };
 
   const handleUpdate = ({ queryString, hash }) => {
@@ -74,13 +76,15 @@ export const ReportFull = ({
       gridRef={gridRef}
       topLevel={topLevel}
       permaLink={permaLink}
-      embedded={location.pathname == "/reporturl"}
-      handleUpdate={location.pathname == "/reporturl" ? () => {} : handleUpdate}
+      embedded={location.pathname == basename + "/reporturl"}
+      handleUpdate={
+        location.pathname == basename + "/reporturl" ? () => {} : handleUpdate
+      }
     />
   );
 
   let content;
-  if (report == "sources" || location.pathname == "/reporturl") {
+  if (report == "sources" || location.pathname == basename + "/reporturl") {
     content = (
       <Grid
         container
@@ -160,4 +164,4 @@ export const ReportFull = ({
   );
 };
 
-export default compose(dispatchReport)(ReportFull);
+export default compose(withSiteName, dispatchReport)(ReportFull);

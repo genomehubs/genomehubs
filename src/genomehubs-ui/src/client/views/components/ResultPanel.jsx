@@ -13,6 +13,7 @@ import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
+import withSiteName from "../hocs/withSiteName";
 import withSummary from "../hocs/withSummary";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
@@ -31,6 +32,7 @@ const ResultPanel = ({
   summary,
   types,
   taxonomy,
+  basename,
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -38,7 +40,7 @@ const ResultPanel = ({
   const handleTaxonClick = () => {
     setPreferSearchTerm(false);
     navigate(
-      `/record?recordId=${taxon_id}&result=taxon&taxonomy=${
+      `${basename}/record?recordId=${taxon_id}&result=taxon&taxonomy=${
         options.taxonomy || taxonomy
       }#${encodeURIComponent(scientific_name)}`
     );
@@ -50,7 +52,7 @@ const ResultPanel = ({
     setSummaryField(fieldId);
     setPreferSearchTerm(false);
     navigate(
-      `/explore?taxon_id=${taxon_id}&result=${searchIndex}&taxonomy=${
+      `${basename}/explore?taxon_id=${taxon_id}&result=${searchIndex}&taxonomy=${
         options.taxonomy || taxonomy
       }&field_id=${fieldId}${location.hash}`
     );
@@ -74,7 +76,10 @@ const ResultPanel = ({
         value = `${value} ...`;
       }
       let highlight = null;
-      if (location.pathname == "/explore" && field.id == summaryField) {
+      if (
+        location.pathname == basename + "/explore" &&
+        field.id == summaryField
+      ) {
         highlight = styles["fieldNameHighlight"];
       }
       let newDiv = (
@@ -169,7 +174,7 @@ const ResultPanel = ({
           </span>
         </div>
       </Tooltip>
-      {location.pathname != "/record" && (
+      {location.pathname != basename + "/record" && (
         <div style={{ right: "0", top: "2em" }} onClick={handleTaxonClick}>
           <Tooltip title={"Click to view record"} arrow>
             <i
@@ -198,6 +203,7 @@ const ResultPanel = ({
 };
 
 export default compose(
+  withSiteName,
   withTaxonomy,
   withRecord,
   withSearch,

@@ -17,6 +17,7 @@ import { useReadLocalStorage } from "usehooks-ts";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
+import withSiteName from "../hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -57,6 +58,7 @@ const SearchBox = ({
   taxonomy,
   types,
   synonyms,
+  basename,
 }) => {
   const classes = useStyles();
   const navigate = useNavigate();
@@ -118,7 +120,9 @@ const SearchBox = ({
 
     fetchSearchResults(options);
     setPreferSearchTerm(false);
-    navigate(`/search?${qs.stringify(options)}#${encodeURIComponent(term)}`);
+    navigate(
+      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(term)}`
+    );
   };
 
   const wrap_term = ({ term, taxWrap, result }) => {
@@ -226,6 +230,7 @@ const SearchBox = ({
 
 export default compose(
   memo,
+  withSiteName,
   withTaxonomy,
   withTypes,
   withSearch,

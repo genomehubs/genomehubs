@@ -20,6 +20,7 @@ import { getSuggestedTerm } from "../reducers/search";
 import { makeStyles } from "@material-ui/core/styles";
 import qs from "../functions/qs";
 import withReportById from "../hocs/withReportById";
+import withSiteName from "../hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 
 const suggestedTerm = getSuggestedTerm();
@@ -112,6 +113,7 @@ export const ReportEdit = ({
   permaLink,
   handleUpdate,
   taxonomy,
+  basename,
 }) => {
   const classes = useStyles();
   const formRef = useRef();
@@ -218,7 +220,7 @@ export const ReportEdit = ({
     } else {
       queryObj.includeEstimates = true;
     }
-    if (!location.pathname.startsWith("/report")) {
+    if (!location.pathname.startsWith(basename + "/report")) {
       queryObj.query = queryObj.query || queryObj.x;
       if (queryObj.x) delete queryObj.x;
       if (queryObj.rank && !queryObj.query.match("tax_rank")) {
@@ -461,6 +463,7 @@ export const ReportEdit = ({
 };
 
 export default compose(
+  withSiteName,
   withTaxonomy,
   withReportById,
   dispatchReport

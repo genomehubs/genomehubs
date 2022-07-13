@@ -21,6 +21,7 @@ import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
 import useVisible from "../hooks/useVisible";
 import withReportById from "../hocs/withReportById";
+import withSiteName from "../hocs/withSiteName";
 
 const headings = {
   tree: "Tap tree nodes to browse taxa or long-press to search",
@@ -73,6 +74,8 @@ const ReportItem = ({
   saveReport,
   setReportEdit,
   setReportTerm,
+  siteName,
+  basename,
   ...gridProps
 }) => {
   queryString = qs.stringify({
@@ -253,7 +256,7 @@ const ReportItem = ({
           permaLink = (queryString, toggle) => {
             let path = "report";
             // TODO: include taxonomy
-            navigate(`/${path}?${queryString.replace(/^\?/, "")}`);
+            navigate(`${basename}/${path}?${queryString.replace(/^\?/, "")}`);
           };
         }
         component = (
@@ -414,6 +417,7 @@ const ReportItem = ({
 
 export default compose(
   memo,
+  withSiteName,
   dispatchMessage,
   dispatchReport,
   withReportById

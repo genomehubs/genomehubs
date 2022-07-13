@@ -16,6 +16,7 @@ import ZoomComponent from "./ZoomComponent";
 import { compose } from "recompose";
 import dispatchGeography from "../hocs/dispatchGeography";
 import qs from "../functions/qs";
+import withSiteName from "../hocs/withSiteName";
 
 const SingleMarker = ({ position, children, setHighlightPointLocation }) => {
   return (
@@ -38,6 +39,7 @@ const MarkerComponent = ({
   options,
   taxonId,
   setHighlightPointLocation,
+  basename,
 }) => {
   let positions = [];
   let bounds = [
@@ -68,7 +70,7 @@ const MarkerComponent = ({
     if (meta.values && meta.values.length == positions.length) {
       let link = (
         <NavLink
-          url={`/record?recordId=${meta.values[i].source_id}&result=${meta.values[i].source_index}&taxonomy=${options.taxonomy}`}
+          url={`${basename}/record?recordId=${meta.values[i].source_id}&result=${meta.values[i].source_index}&taxonomy=${options.taxonomy}`}
         >
           {meta.values[i].source_id}
         </NavLink>
@@ -87,7 +89,7 @@ const MarkerComponent = ({
         taxonomy: options.taxonomy,
       };
 
-      let url = `/search?${qs.stringify(newOptions)}`;
+      let url = `${basename}/search?${qs.stringify(newOptions)}`;
       let link = (
         <NavLink url={url}>click to view samples from this location</NavLink>
       );
@@ -113,6 +115,7 @@ const LocationMap = ({
   taxonId,
   setHighlightPointLocation,
   setZoomPointLocation,
+  basename,
 }) => {
   const location = useLocation();
   let threshold = 500;
@@ -135,6 +138,7 @@ const LocationMap = ({
     options,
     taxonId,
     setHighlightPointLocation,
+    basename,
   });
 
   return (
@@ -162,4 +166,4 @@ const LocationMap = ({
   );
 };
 
-export default compose(dispatchGeography)(LocationMap);
+export default compose(withSiteName, dispatchGeography)(LocationMap);

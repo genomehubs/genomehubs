@@ -22,9 +22,11 @@ import styles from "./Styles.scss";
 import unified from "unified";
 import { visit } from "unist-util-visit";
 import withPages from "../hocs/withPages";
+import withSiteName from "../hocs/withSiteName";
 import { withStyles } from "@material-ui/core/styles";
 
 const siteName = SITENAME;
+const basename = BASENAME;
 const pagesUrl = PAGES_URL;
 const webpackHash = __webpack_hash__ || COMMIT_HASH;
 // const webpackHash = COMMIT_HASH;
@@ -40,12 +42,14 @@ export const processProps = (props, newProps = {}) => {
     } else if (key.startsWith("exclude")) {
       newProps[key] = value.split(",");
     } else if (key == "src") {
+      console.log(value);
+
       if (PAGES_URL.startsWith("http")) {
         newProps["src"] = `${pagesUrl}${value.replace(/^\/static/, "")}`;
       } else {
         newProps["src"] = value.replace(
           /^\/static\//,
-          `/static/${webpackHash}/`
+          `${basename}/static/${webpackHash}/`
         );
       }
     } else if (key == "xs") {

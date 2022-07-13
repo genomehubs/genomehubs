@@ -10,6 +10,7 @@ import { useNavigate } from "@reach/router";
 import useVisible from "../hooks/useVisible";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
+import withSiteName from "../hocs/withSiteName";
 import withSummary from "../hocs/withSummary";
 import withSummaryById from "../hocs/withSummaryById";
 import withTaxonomy from "../hocs/withTaxonomy";
@@ -25,6 +26,7 @@ const HistogramSVG = ({
   taxonomy,
   setPreferSearchTerm,
   setLookupTerm,
+  basename,
 }) => {
   const navigate = useNavigate();
 
@@ -68,7 +70,7 @@ const HistogramSVG = ({
     let hashTerm = encodeURIComponent(options.query) || "";
     setPreferSearchTerm(false);
     setLookupTerm(hashTerm);
-    navigate(`/search?${qs.stringify(options)}#${hashTerm}`);
+    navigate(`${basename}/search?${qs.stringify(options)}#${hashTerm}`);
   };
   let buckets = [];
   let ticks = [];
@@ -206,6 +208,7 @@ const HistogramSVG = ({
 };
 
 export default compose(
+  withSiteName,
   withTaxonomy,
   withLookup,
   withSearch,

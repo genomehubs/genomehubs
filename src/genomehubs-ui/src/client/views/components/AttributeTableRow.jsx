@@ -91,6 +91,7 @@ const NestedTable = ({
   setPreferSearchTerm,
   taxonomy,
   siteName,
+  basename,
 }) => {
   const navigate = useNavigate();
   const [page, setPage] = React.useState(0);
@@ -102,7 +103,7 @@ const NestedTable = ({
   const handleSourceClick = (recordId, result) => {
     setPreferSearchTerm(false);
     navigate(
-      `/record?recordId=${recordId}&result=${result}&taxonomy=${taxonomy}#${encodeURIComponent(
+      `${basename}/record?recordId=${recordId}&result=${result}&taxonomy=${taxonomy}#${encodeURIComponent(
         recordId
       )}`
     );
@@ -310,6 +311,7 @@ const AttributeTableRow = ({
   setPreferSearchTerm,
   taxonomy,
   siteName,
+  basename,
 }) => {
   const navigate = useNavigate();
 
@@ -335,7 +337,9 @@ const AttributeTableRow = ({
       options.excludeAncestral = [fieldId];
     }
     navigate(
-      `/search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`
+      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
+        options.query
+      )}`
     );
   };
 
@@ -354,7 +358,9 @@ const AttributeTableRow = ({
       options.excludeAncestral = [fieldId];
     }
     navigate(
-      `/search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`
+      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
+        options.query
+      )}`
     );
   };
 
@@ -561,6 +567,7 @@ const AttributeTableRow = ({
                     setPreferSearchTerm={setPreferSearchTerm}
                     taxonomy={taxonomy}
                     siteName={siteName}
+                    basename={basename}
                   />
                 </Collapse>
               </TableCell>

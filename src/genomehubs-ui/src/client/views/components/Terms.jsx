@@ -10,9 +10,9 @@ import { compose } from "recompose";
 // import dispatchTerms from "../hocs/dispatchTerms";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
-import withFadeInOut from "../hocs/withFadeInOut";
+import withSiteName from "../hocs/withSiteName";
 
-const Terms = () => {
+const Terms = ({ basename }) => {
   const components = {
     ul: (props) => {
       return (
@@ -23,10 +23,10 @@ const Terms = () => {
     },
     li: (props) => {
       let [term, params] = props.children[0].replace(/\n$/, "").split("::");
-      let url = `/search?query=${term}&${params}#${term}`;
+      let url = `${basename}/search?query=${term}&${params}#${term}`;
       return (
         <Grid item>
-          <NavLink url={url} from={"/"}>
+          <NavLink url={url} from={basename + "/"}>
             {term}
           </NavLink>
         </Grid>
@@ -36,4 +36,4 @@ const Terms = () => {
   return <Markdown pageId={"terms.md"} components={components} />;
 };
 
-export default compose()(Terms);
+export default compose(withSiteName)(Terms);

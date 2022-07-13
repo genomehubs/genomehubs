@@ -66,7 +66,10 @@ const SearchPage = ({
         } else {
           if (Object.keys(previousSearchTerm).length > 0) {
             let hashedNav = (path) => {
-              path = path.replace(/\/search\b/, `${location.pathname}`);
+              path = path.replace(
+                /\/search\b/,
+                `${location.pathname.replace(basename, "")}`
+              );
               let to = path;
               let from = `${location.pathname}?${qs.stringify(
                 previousSearchTerm
@@ -81,7 +84,10 @@ const SearchPage = ({
           } else {
             let hashedNav = (path) => {
               // TODO: include taxonomy
-              path = path.replace(/\/search\b/, `${location.pathname}`);
+              path = path.replace(
+                /\/search\b/,
+                `${location.pathname.replace(basename, "")}`
+              );
               navigate(`${path}#${encodeURIComponent(hashTerm)}`);
             };
             setPreviousSearchTerm(options);
