@@ -405,6 +405,10 @@ export const generateQuery = async ({
   };
   if (taxTerm) {
     let function_score;
+    taxTerm[2] = taxTerm[2]
+      .split(",")
+      .map((part) => part.replace(/^(\w+)\[.*\]$/, "$1"))
+      .join(",");
     if (taxTerm[1] == "lineage") {
       // convert search term to list of tax names
       // set ordered parameter to keep order

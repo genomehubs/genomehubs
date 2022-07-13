@@ -19,6 +19,7 @@ export const AutoCompleteOption = ({ option }) => {
   let optionIcon = <SearchIcon className={classes.icon} />;
   if (option.result == "taxon") {
     optionIcon = <EmojiNatureIcon className={classes.icon} />;
+    option.string = `${option.taxon_id}[${option.scientific_name}]`;
   } else if (option.result == "assembly") {
     optionIcon = <ExtensionIcon className={classes.icon} />;
   } else if (option.result == "sample") {

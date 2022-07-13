@@ -187,7 +187,12 @@ export const map = async ({
   fields = xFields;
 
   let status;
-  if (!x || !aInB(xFields, Object.keys(typesMap))) {
+  if (!Object.keys(typesMap).includes("sample_location")) {
+    status = {
+      success: false,
+      error: `no sample_location data available`,
+    };
+  } else if (!x || !aInB(xFields, Object.keys(typesMap))) {
     status = {
       success: false,
       error: `unknown field in 'x = ${x}'`,

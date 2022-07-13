@@ -91,9 +91,10 @@ export const AutoCompleteInput = ({
           } else {
             value = result.result.scientific_name;
           }
+          let title = `${prefix}${result.result.taxon_id}[${value}]${suffix}`;
           options.push({
             value,
-            title: `${prefix}${value}${suffix}`,
+            title,
             prefix,
             subTerm,
             suffix,
@@ -322,7 +323,11 @@ export const AutoCompleteInput = ({
   };
 
   const highlightRange = (text) => {
-    let length = text ? text.length : inputRef.current.value.length;
+    let length = text
+      ? text.length
+      : inputRef.current.value
+      ? inputRef.current.value.length
+      : 0;
     let end = length;
     end = length - suffix.length;
     return [prefix.length, end];
@@ -332,6 +337,7 @@ export const AutoCompleteInput = ({
       let range = highlightRange();
       let current = inputRef.current;
       setTimeout(() => {
+        range = highlightRange();
         try {
           current.setSelectionRange(...range);
         } catch (err) {

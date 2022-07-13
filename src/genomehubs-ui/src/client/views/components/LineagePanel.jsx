@@ -28,7 +28,7 @@ const LineagePanel = ({
       setPreferSearchTerm(false);
       navigate(
         `?recordId=${taxon}&result=taxon&taxonomy=${taxonomy}#${encodeURIComponent(
-          name
+          `${taxon}[${name}]`
         )}`
       );
       setLookupTerm(name);
