@@ -13,11 +13,10 @@ import { compose } from "recompose";
 import loadable from "@loadable/component";
 import { makeStyles } from "@material-ui/core/styles";
 import styles from "./Styles.scss";
+import withSiteName from "../hocs/withSiteName";
 import withTypes from "../hocs/withTypes";
 
 // const ReportPage = loadable(() => import("./ReportPage"));
-
-const basename = BASENAME || "";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -76,7 +75,7 @@ const SearchLayout = (props) => {
   );
 };
 
-const Layout = ({ types }) => {
+const Layout = ({ types, basename }) => {
   const [paths, setPaths] = useState([]);
   let typeString = JSON.stringify(types);
   useEffect(() => {
@@ -95,4 +94,4 @@ const Layout = ({ types }) => {
   );
 };
 
-export default compose(memo, withTypes)(Layout);
+export default compose(memo, withSiteName, withTypes)(Layout);

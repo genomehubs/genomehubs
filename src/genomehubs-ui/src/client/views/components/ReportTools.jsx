@@ -17,6 +17,7 @@ import TocIcon from "@material-ui/icons/Toc";
 import { compose } from "recompose";
 import { useStyles } from "./ReportModal";
 import withReportTerm from "../hocs/withReportTerm";
+import withSiteName from "../hocs/withSiteName";
 
 export const ReportTools = ({
   reportEdit,
@@ -28,6 +29,7 @@ export const ReportTools = ({
   report,
   topLevel,
   chartRef,
+  basename,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,7 +42,7 @@ export const ReportTools = ({
   const permaLink = (queryString, toggle) => {
     let path = topLevel ? "report" : toggle ? "reporturl" : "report";
     // TODO: include taxonomy
-    navigate(`/${path}?${queryString.replace(/^\?/, "")}`);
+    navigate(`${basename}/${path}?${queryString.replace(/^\?/, "")}`);
   };
 
   const handleUpdate = ({ queryString, hash }) => {
@@ -233,16 +235,4 @@ export const ReportTools = ({
   );
 };
 
-export default compose(withReportTerm)(ReportTools);
-
-// if (code) {
-//   reportComponent = (
-//     <div style={{ height: "100%", width: "100%", overflow: "auto" }}>
-//       <ReportCode
-//         reportId={reportId}
-//         report={report}
-//         queryString={queryString}
-//       />
-//     </div>
-//   );
-// }
+export default compose(withSiteName, withReportTerm)(ReportTools);

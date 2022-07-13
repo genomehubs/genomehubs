@@ -35,6 +35,7 @@ import styles from "./Styles.scss";
 import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";
 import withSearch from "../hocs/withSearch";
+import withSiteName from "../hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -304,6 +305,7 @@ const ResultTable = ({
   searchIndex,
   setPreferSearchTerm,
   taxonomy,
+  basename,
 }) => {
   const [showAttribute, setShowAttribute] = useState(false);
   const [attribute, setAttribute] = useState(null);
@@ -344,7 +346,7 @@ const ResultTable = ({
       searchText = record.scientific_name;
     }
     navigate(
-      `/record?recordId=${recordId}&result=${searchIndex}&taxonomy=${taxonomy}#${encodeURIComponent(
+      `${basename}/record?recordId=${recordId}&result=${searchIndex}&taxonomy=${taxonomy}#${encodeURIComponent(
         searchText
       )}`
     );
@@ -398,7 +400,9 @@ const ResultTable = ({
         options.excludeMissing.push(key);
       }
     });
-    navigate(`/search?${qs.stringify(options)}${location.hash || ""}`);
+    navigate(
+      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`
+    );
   };
   const arrToObj = (arr) => {
     let obj = {};
@@ -425,52 +429,10 @@ const ResultTable = ({
       delete options.sortBy;
       delete options.sortOrder;
     }
-    // let ancestral = arrToObj(options.excludeAncestral);
-    // if (toggleAncestral) {
-    //   ancestral[toggleAncestral] = !ancestral[toggleAncestral];
-    // }
-    // options.excludeAncestral = [];
-    // Object.keys(ancestral).forEach((key) => {
-    //   if (ancestral[key]) {
-    //     options.excludeAncestral.push(key);
-    //   }
-    // });
-    // let descendant = arrToObj(options.excludeDescendant);
-    // if (toggleDescendant) {
-    //   descendant[toggleDescendant] = !descendant[toggleDescendant];
-    // }
-    // options.excludeDescendant = [];
-    // Object.keys(descendant).forEach((key) => {
-    //   if (descendant[key]) {
-    //     options.excludeDescendant.push(key);
-    //   }
-    // });
-    // let direct = arrToObj(options.excludeDirect);
-    // if (toggleDirect) {
-    //   direct[toggleDirect] = !direct[toggleDirect];
-    // }
-    // options.excludeDirect = [];
-    // Object.keys(direct).forEach((key) => {
-    //   if (direct[key]) {
-    //     options.excludeDirect.push(key);
-    //   }
-    // });
-    // let missing = arrToObj(options.excludeMissing);
-    // if (toggleMissing) {
-    //   missing[toggleMissing] = !missing[toggleMissing];
-    // }
-    // options.excludeMissing = [];
-    // Object.keys(missing).forEach((key) => {
-    //   if (missing[key]) {
-    //     options.excludeMissing.push(key);
-    //   }
-    // });
     if (location.search.match(/tax_tree%28/)) {
       options.query = options.query.replace("tax_name", "tax_tree");
     }
     options.offset = 0;
-    // setPreferSearchTerm(true);
-    // setSearchTerm(options);
     navigate(
       `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`
     );
@@ -835,6 +797,7 @@ const ResultTable = ({
 };
 
 export default compose(
+  withSiteName,
   withTypes,
   withTaxonomy,
   withSearch,

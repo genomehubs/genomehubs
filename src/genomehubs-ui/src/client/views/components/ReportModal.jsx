@@ -8,6 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { sortReportQuery } from "../selectors/report";
 import { useNavigate } from "@reach/router";
 import withApiUrl from "../hocs/withApiUrl";
+import withSiteName from "../hocs/withSiteName";
 
 function getModalStyle() {
   return {
@@ -37,6 +38,7 @@ export const ReportModal = ({
   report,
   disableModal,
   queryString,
+  basename,
   children,
 }) => {
   const navigate = useNavigate();
@@ -48,7 +50,7 @@ export const ReportModal = ({
   const handleOpen = () => {
     if (!disableModal) {
       //setOpen(true);
-      navigate(`/report?${reportId}`);
+      navigate(`${basename}/report?${reportId}`);
     }
   };
 
@@ -99,4 +101,4 @@ export const ReportModal = ({
   );
 };
 
-export default compose(withApiUrl)(ReportModal);
+export default compose(withSiteName, withApiUrl)(ReportModal);

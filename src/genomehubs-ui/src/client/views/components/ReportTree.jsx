@@ -12,6 +12,7 @@ import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withReportById from "../hocs/withReportById";
+import withSiteName from "../hocs/withSiteName";
 
 const ReportTree = ({
   reportId,
@@ -30,6 +31,7 @@ const ReportTree = ({
   levels,
   minDim,
   setMinDim,
+  basename,
 }) => {
   const navigate = useNavigate();
   const componentRef = chartRef ? chartRef : useRef();
@@ -128,20 +130,16 @@ const ReportTree = ({
     });
     let query;
     let hash;
-    // if (location.pathname == "/report") {
-    //   hash = x;
-    // } else {
     query = x;
     hash = query;
     x = undefined;
-    // }
 
     if (name != "parent") {
       hash = hash.replace(new RegExp("\\(" + root + "\\)"), `(${name})`);
     }
 
     navigate(
-      `/search?${qs.stringify({
+      `${basename}/search?${qs.stringify({
         ...options,
         ...moreOptions,
         query,
@@ -164,7 +162,7 @@ const ReportTree = ({
     let { result, taxonomy } = queryObj;
 
     navigate(
-      `/record?${qs.stringify({
+      `${basename}/record?${qs.stringify({
         recordId: root,
         taxonomy,
         result,
@@ -205,4 +203,8 @@ const ReportTree = ({
   );
 };
 
-export default compose(dispatchReport, withReportById)(ReportTree);
+export default compose(
+  withSiteName,
+  dispatchReport,
+  withReportById
+)(ReportTree);

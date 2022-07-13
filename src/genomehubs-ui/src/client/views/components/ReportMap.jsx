@@ -21,6 +21,7 @@ import dispatchMessage from "../hocs/dispatchMessage";
 import qs from "../functions/qs";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
+import withSiteName from "../hocs/withSiteName";
 
 const SingleMarker = ({
   position,
@@ -52,6 +53,7 @@ const MarkerComponent = ({
   options,
   taxonId,
   setHighlightPointLocation = () => {},
+  basename,
 }) => {
   let markers = [];
   let i = 0;
@@ -67,7 +69,7 @@ const MarkerComponent = ({
       if (obj.sampleId) {
         link = (
           <NavLink
-            url={`/record?recordId=${obj.sampleId}&result=sample&taxonomy=${options.taxonomy}`}
+            url={`${basename}/record?recordId=${obj.sampleId}&result=sample&taxonomy=${options.taxonomy}`}
           >
             {obj.sampleId}
           </NavLink>
@@ -81,7 +83,7 @@ const MarkerComponent = ({
           taxonomy: options.taxonomy,
         };
 
-        let url = `/search?${qs.stringify(newOptions)}`;
+        let url = `${basename}/search?${qs.stringify(newOptions)}`;
         link = (
           <NavLink url={url}>click to view samples from this location</NavLink>
         );
@@ -106,45 +108,6 @@ const MarkerComponent = ({
     }
   }
 
-  // if (meta.values && meta.values.length == positions.length) {
-  //   let link = (
-  //     <NavLink
-  //       url={`/record?recordId=${meta.values[i].source_id}&result=${meta.values[i].source_index}&taxonomy=${options.taxonomy}`}
-  //     >
-  //       {meta.values[i].source_id}
-  //     </NavLink>
-  //   );
-  //   message = (
-  //     <>
-  //       click to view full record for {meta.values[i].source_index}: {link}
-  //     </>
-  //   );
-  // } else if (taxonId) {
-  //   let newOptions = {};
-  //   // if (options.recordId) {
-  //   newOptions = {
-  //     query: `tax_tree(${taxonId}) AND sample_location=${position.join(",")}`,
-  //     result: "sample",
-  //     taxonomy: options.taxonomy,
-  //   };
-
-  //   let url = `/search?${qs.stringify(newOptions)}`;
-  //   let link = (
-  //     <NavLink url={url}>click to view samples from this location</NavLink>
-  //   );
-  //   message = link;
-  // }
-  //   return (
-  //     <SingleMarker
-  //       key={i}
-  //       position={position}
-  //       color={color}
-  //       setHighlightPointLocation={setHighlightPointLocation}
-  //     >
-  //       <Popup>{message}</Popup>
-  //     </SingleMarker>
-  //   );
-  // });
   return markers;
 };
 
@@ -211,6 +174,7 @@ const ReportMap = ({
   minDim,
   setMinDim,
   xOpts,
+  basename,
 }) => {
   const navigate = useNavigate();
   const componentRef = chartRef ? chartRef : useRef();
@@ -242,6 +206,7 @@ const ReportMap = ({
             geoPoints={pointData[obj.key]}
             color={colors[i]}
             options={options}
+            basename={basename}
           />
         );
       });
@@ -282,4 +247,4 @@ const ReportMap = ({
   }
 };
 
-export default compose(dispatchMessage, withColors)(ReportMap);
+export default compose(withSiteName, dispatchMessage, withColors)(ReportMap);

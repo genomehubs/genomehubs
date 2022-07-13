@@ -18,6 +18,7 @@ import { useLocalStorage } from "usehooks-ts";
 import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";
 import withSearch from "../hocs/withSearch";
+import withSiteName from "../hocs/withSiteName";
 import { withStyles } from "@material-ui/core/styles";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
@@ -100,6 +101,7 @@ const SearchSettings = ({
   taxonomyRanks,
   nameClasses,
   groupedTypes,
+  basename,
 }) => {
   const [state, setState] = React.useState(() => {
     let initialState = { taxonomy };
@@ -186,7 +188,9 @@ const SearchSettings = ({
       taxonomy: state.taxonomy,
     };
     setPreferSearchTerm(false);
-    navigate(`/search?${qs.stringify(options)}${location.hash || ""}`);
+    navigate(
+      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`
+    );
   };
 
   const handleResetClick = () => {
@@ -206,7 +210,9 @@ const SearchSettings = ({
     delete options.excludeMissing;
     setPreferSearchTerm(false);
     setSavedOptions({});
-    navigate(`/search?${qs.stringify(options)}${location.hash || ""}`);
+    navigate(
+      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`
+    );
   };
 
   let groups = [];
@@ -302,6 +308,7 @@ const SearchSettings = ({
 
 export default compose(
   memo,
+  withSiteName,
   withTypes,
   withTaxonomy,
   withSearch,

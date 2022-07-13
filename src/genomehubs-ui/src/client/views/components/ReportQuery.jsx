@@ -12,6 +12,7 @@ import { useNavigate } from "@reach/router";
 import withReportById from "../hocs/withReportById";
 import withReportTerm from "../hocs/withReportTerm";
 import withSearch from "../hocs/withSearch";
+import withSiteName from "../hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 
 export const ReportQuery = ({
@@ -21,6 +22,7 @@ export const ReportQuery = ({
   reportTerm,
   setReportTerm,
   taxonomy,
+  basename,
 }) => {
   const navigate = useNavigate();
   const [value, setValue] = useState(reportTerm || "");
@@ -41,7 +43,9 @@ export const ReportQuery = ({
       options.ranks = options.ranks.join(",");
     }
     navigate(
-      `/search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`
+      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
+        options.query
+      )}`
     );
   };
 
@@ -134,6 +138,7 @@ export const ReportQuery = ({
 };
 
 export default compose(
+  withSiteName,
   withTaxonomy,
   withSearch,
   withReportById,

@@ -9,6 +9,7 @@ import { useNavigate } from "@reach/router";
 import useVisible from "../hooks/useVisible";
 // import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
+import withSiteName from "../hocs/withSiteName";
 import withSummary from "../hocs/withSummary";
 import withSummaryById from "../hocs/withSummaryById";
 import withTaxonomy from "../hocs/withTaxonomy";
@@ -24,6 +25,7 @@ const WordCloud = ({
   setPreferSearchTerm,
   // resetLookup,
   taxonomy,
+  basename,
 }) => {
   const navigate = useNavigate();
   const height = 100;
@@ -51,7 +53,9 @@ const WordCloud = ({
     // fetchSearchResults(options);
     setPreferSearchTerm(false);
     navigate(
-      `/search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`
+      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
+        options.query
+      )}`
     );
     // resetLookup();
   };
@@ -103,8 +107,8 @@ const WordCloud = ({
 };
 
 export default compose(
+  withSiteName,
   withTaxonomy,
-  // withLookup,
   withSearch,
   withSummary,
   withSummaryById

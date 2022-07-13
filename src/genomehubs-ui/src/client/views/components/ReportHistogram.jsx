@@ -24,6 +24,7 @@ import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
+import withSiteName from "../hocs/withSiteName";
 
 const renderXTick = (tickProps) => {
   const {
@@ -104,6 +105,7 @@ const searchByCell = ({
   navigate,
   fields,
   ranks,
+  basename,
 }) => {
   let query = xQuery.query;
   query = query
@@ -167,7 +169,9 @@ const searchByCell = ({
   });
   // let hash = encodeURIComponent(query);
   navigate(
-    `/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(query)}`
+    `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
+      query
+    )}`
   );
 };
 
@@ -400,6 +404,7 @@ const ReportHistogram = ({
   minDim,
   setMinDim,
   xOpts,
+  basename,
 }) => {
   const navigate = useNavigate();
   const componentRef = chartRef ? chartRef : useRef();
@@ -552,6 +557,7 @@ const ReportHistogram = ({
           embedded,
           navigate,
           location,
+          basename,
         }}
       />
     );
@@ -566,4 +572,8 @@ const ReportHistogram = ({
   }
 };
 
-export default compose(dispatchMessage, withColors)(ReportHistogram);
+export default compose(
+  withSiteName,
+  dispatchMessage,
+  withColors
+)(ReportHistogram);

@@ -22,6 +22,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import qs from "../functions/qs";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
+import withSiteName from "../hocs/withSiteName";
 
 export const useStyles = makeStyles((theme) => ({
   modal: {
@@ -50,6 +51,7 @@ const SearchToggles = ({
   searchDefaults,
   setSearchDefaults,
   setLookupTerm,
+  basename,
 }) => {
   const classes = useStyles();
   const navigate = useNavigate();
@@ -62,7 +64,7 @@ const SearchToggles = ({
   const resetSearch = () => {
     setSearchDefaults({ includeEstimates: false, includeDescendant: false });
     setLookupTerm("");
-    navigate(`/search`);
+    navigate(`${basename}/search`);
   };
   return (
     <>
@@ -266,6 +268,7 @@ const SearchToggles = ({
 };
 
 export default compose(
+  withSiteName,
   dispatchLookup,
   withSearch,
   withSearchDefaults

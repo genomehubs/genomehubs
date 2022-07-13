@@ -16,6 +16,7 @@ import {
   setMessage,
 } from "../reducers/message";
 
+import { basename } from "../reducers/location";
 import { checkProgress } from "./checkProgress";
 import { getCurrentTaxonomy } from "../reducers/taxonomy";
 import { nanoid } from "nanoid";
@@ -97,12 +98,16 @@ export function fetchSearchResults(options, navigate) {
           dispatch(receiveSearch(json));
         }
       } else {
+        dispatch(receiveSearch(json));
+
         if (navigate) {
           let navOptions = { ...options };
           if (json.queryString) {
             navOptions.query = json.queryString;
           }
-          navigate(`/search?${qs.stringify(navOptions)}`, { replace: true });
+          navigate(`${basename}/search?${qs.stringify(navOptions)}`, {
+            replace: true,
+          });
         }
         dispatch(receiveSearch(json));
       }

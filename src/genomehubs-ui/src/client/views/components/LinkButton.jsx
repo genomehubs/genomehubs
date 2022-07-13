@@ -9,6 +9,8 @@ import MenuItem from "@material-ui/core/MenuItem";
 import MenuList from "@material-ui/core/MenuList";
 import Paper from "@material-ui/core/Paper";
 import React from "react";
+import { compose } from "recompose";
+import withSiteName from "../hocs/withSiteName";
 import { withStyles } from "@material-ui/core/styles";
 
 const ColorButton = withStyles((theme) => ({
@@ -22,7 +24,7 @@ const ColorButton = withStyles((theme) => ({
   },
 }))(Button);
 
-const LinkButton = ({ options }) => {
+const LinkButton = ({ options, basename }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -33,7 +35,7 @@ const LinkButton = ({ options }) => {
     } else {
       pathname = options[0];
     }
-    navigate(`/${pathname}${location.search}${location.hash}}`);
+    navigate(`${basename}/${pathname}${location.search}${location.hash}}`);
   };
 
   return (
@@ -51,4 +53,4 @@ const LinkButton = ({ options }) => {
   );
 };
 
-export default LinkButton;
+export default compose(withSiteName)(LinkButton);

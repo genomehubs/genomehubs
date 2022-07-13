@@ -14,12 +14,11 @@ import { compose } from "recompose";
 import loadable from "@loadable/component";
 import styles from "./Styles.scss";
 import withRoutes from "../hocs/withRoutes";
-
-const basename = BASENAME || "";
+import withSiteName from "../hocs/withSiteName";
 
 const fixedRoutes = { search: true, explore: true, records: true };
 
-const Main = ({ routes }) => {
+const Main = ({ routes, basename }) => {
   if (routes.allIds.length == 0) {
     return null;
   }
@@ -65,4 +64,4 @@ const Main = ({ routes }) => {
   );
 };
 
-export default compose(memo, withRoutes)(Main);
+export default compose(memo, withSiteName, withRoutes)(Main);

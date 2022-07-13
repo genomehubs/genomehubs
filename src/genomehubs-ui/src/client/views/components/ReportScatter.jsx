@@ -31,6 +31,7 @@ import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";
+import withSiteName from "../hocs/withSiteName";
 import { zLegend } from "./zLegend";
 
 const searchByCell = ({
@@ -48,6 +49,7 @@ const searchByCell = ({
   ranks,
   valueType,
   yValueType,
+  basename,
 }) => {
   let query = xQuery.query;
   query = query
@@ -144,7 +146,9 @@ const searchByCell = ({
 
   // let hash = encodeURIComponent(query);
   navigate(
-    `/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(query)}`
+    `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
+      query
+    )}`
   );
 };
 
@@ -583,6 +587,7 @@ const ReportScatter = ({
   yOpts,
   stacked,
   highlightArea,
+  basename,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -720,6 +725,7 @@ const ReportScatter = ({
           embedded,
           navigate,
           location,
+          basename,
         }}
       />
     );
@@ -734,6 +740,7 @@ const ReportScatter = ({
 };
 
 export default compose(
+  withSiteName,
   dispatchMessage,
   withColors,
   withReportTerm

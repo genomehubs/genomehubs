@@ -1,10 +1,12 @@
+import { basename, siteName } from "../reducers/location";
+
 import React from "react";
 import { connect } from "react-redux";
-import { siteName } from "../reducers/location";
 
 const withSiteName = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
     siteName,
+    basename,
   });
 
   const Connected = connect(mapStateToProps)(WrappedComponent);

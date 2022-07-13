@@ -8,7 +8,7 @@ import qs from "../functions/qs";
 import { queryToStore } from "../querySync";
 import store from "../store";
 
-const basename = BASENAME || "";
+export const basename = BASENAME || "";
 
 export const siteName = SITENAME || "";
 
