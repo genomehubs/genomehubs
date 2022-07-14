@@ -72,6 +72,18 @@ export const queryPropList = {
     "stacked",
     "scatterThreshold",
   ],
+  table: [
+    "report",
+    xSettings,
+    { prop: "y", label: `c_value` },
+    rankSettings,
+    catSettings,
+    "includeEstimates",
+    "xOpts",
+    "yOpts",
+    "cumulative",
+    "reversed",
+  ],
   tree: [
     "report",
     { ...xSettings, label: `tax_tree(${suggestedTerm})` },
@@ -95,7 +107,15 @@ const autoCompleteTypes = {
   cat: { type: "cat" },
 };
 
-const reportTypes = ["histogram", "map", "scatter", "tree", "xInY", "xPerRank"];
+const reportTypes = [
+  "histogram",
+  "map",
+  "scatter",
+  "table",
+  "tree",
+  "xInY",
+  "xPerRank",
+];
 
 export const useStyles = makeStyles((theme) => ({
   label: {
@@ -315,6 +335,7 @@ export const ReportEdit = ({
       queryProp == "includeEstimates" ||
       queryProp == "stacked" ||
       queryProp == "cumulative" ||
+      queryProp == "reversed" ||
       queryProp == "collapseMonotypic"
     ) {
       toggles.push(

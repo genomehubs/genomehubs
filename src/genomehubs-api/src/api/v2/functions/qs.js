@@ -37,6 +37,7 @@ const translations = {
       histogram: "h",
       map: "m",
       scatter: "s",
+      table: "ta",
       tree: "t",
       xiny: "p",
     },

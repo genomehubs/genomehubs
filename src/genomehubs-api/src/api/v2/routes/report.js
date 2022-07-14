@@ -152,6 +152,7 @@ export const scatterPerRank = async ({
   yOpts,
   scatterThreshold = 100,
   queryString,
+  table,
   ...apiParams
 }) => {
   // Return 2D histogram at a list of ranks
@@ -173,7 +174,7 @@ export const scatterPerRank = async ({
       xOpts,
       yOpts,
       scatterThreshold,
-      report: "scatter",
+      report: table ? "table" : "scatter",
       apiParams,
     });
     if (res.status.success == false) {
@@ -203,7 +204,7 @@ export const scatterPerRank = async ({
   return {
     status,
     report: {
-      scatter: report,
+      [apiParams.report]: report,
       xQuery,
       yQuery,
       xLabel,
@@ -268,7 +269,7 @@ export const histPerRank = async ({
   return {
     status,
     report: {
-      histogram: report,
+      [apiParams.report]: report,
       valueType: report.valueType,
       xQuery,
       xLabel,
@@ -277,6 +278,32 @@ export const histPerRank = async ({
       caption,
     },
   };
+};
+
+export const tablePerRank = async ({
+  x,
+  y,
+  cat,
+  rank,
+  taxonomy,
+  xOpts,
+  yOpts,
+  queryString,
+  ...apiParams
+}) => {
+  return scatterPerRank({
+    x,
+    y,
+    cat,
+    rank,
+    taxonomy,
+    xOpts,
+    yOpts,
+    scatterThreshold: 0,
+    queryString,
+    table: true,
+    ...apiParams,
+  });
 };
 
 export const xInY = async ({
@@ -817,6 +844,75 @@ export const getTypes = async (params) => {
   return byGroup;
 };
 
+const tableToCSV = ({
+  table,
+  xLabel,
+  yLabel,
+  separator = ",",
+  includeZeros,
+}) => {
+  let rows = [];
+  if (table.histograms) {
+    if (table.cats) {
+      if (table.histograms.yBuckets) {
+        rows.push([table.cat, xLabel, yLabel, "count"]);
+        for (let catObj of table.cats) {
+          let values = table.histograms.yValuesByCat[catObj.key];
+          table.histograms.buckets.forEach((bucket, i) => {
+            if (bucket) {
+              table.histograms.yBuckets.forEach((yBucket, j) => {
+                if (yBucket) {
+                  if (values[i][j] || includeZeros) {
+                    rows.push([
+                      catObj.label,
+                      bucket,
+                      yBucket,
+                      values[i][j] || 0,
+                    ]);
+                  }
+                }
+              });
+            }
+          });
+        }
+      } else {
+        rows.push([table.cat, xLabel, "count"]);
+        for (let catObj of table.cats) {
+          let values = table.histograms.byCat[catObj.key];
+          table.histograms.buckets.forEach((bucket, i) => {
+            if (bucket) {
+              rows.push([catObj.label, bucket, values[i]]);
+            }
+          });
+        }
+      }
+    } else {
+      rows.push([xLabel, "count"]);
+      table.histograms.buckets.forEach((bucket, i) => {
+        if (bucket) {
+          rows.push([bucket, table.histograms.allValues[i]]);
+        }
+      });
+    }
+  } else if (table.scatter) {
+    if (table.cats) {
+    } else {
+      rows.push([table.field, "count"]);
+      table.histograms.buckets.forEach((bucket, i) => {
+        if (bucket) {
+          rows.push([bucket, table.histograms.allValues[i]]);
+        }
+      });
+    }
+  }
+  let csv = rows
+    .map((arr) => {
+      return arr.join(separator);
+    })
+    .join("\n");
+  return `${csv}\n`;
+};
+
 export const getReport = async (req, res) => {
   let report;
   try {
@@ -832,7 +928,6 @@ export const getReport = async (req, res) => {
     switch (req.query.report) {
       case "histogram": {
         reportFunc = histPerRank;
-        // report = await histPerRank({ ...req.query, queryString, req });
         break;
       }
       case "map": {
@@ -841,32 +936,30 @@ export const getReport = async (req, res) => {
       }
       case "scatter": {
         reportFunc = scatterPerRank;
-        // report = await scatterPerRank({ ...req.query, queryString, req });
         break;
       }
       case "sources": {
         reportFunc = getSources;
-        // report = await getSources({ ...req.query, queryString });
+        break;
+      }
+      case "table": {
+        reportFunc = tablePerRank;
         break;
       }
       case "tree": {
         reportFunc = getTree;
-        // report = await getTree({ ...req.query, queryString, req });
         break;
       }
       case "types": {
         reportFunc = getTypes;
-        // report = await getTypes({ ...req.query, queryString });
         break;
       }
       case "xInY": {
         reportFunc = xInYPerRank;
-        // report = await xInYPerRank({ ...req.query, queryString });
         break;
       }
       case "xPerRank": {
         reportFunc = xPerRank;
-        // report = await xPerRank({ ...req.query, queryString });
         break;
       }
     }
@@ -918,6 +1011,21 @@ export const getReport = async (req, res) => {
           );
           res.status(200).send(response);
         },
+        ...(report.name == "table" && {
+          csv: () => {
+            let response = tableToCSV({
+              ...report.report,
+            });
+            res.status(200).send(response);
+          },
+          tsv: () => {
+            let response = tableToCSV({
+              ...report.report,
+              separator: "\t",
+            });
+            res.status(200).send(response);
+          },
+        }),
         ...(report.name == "tree" && {
           "text/x-nh": () => {
             let { lca, treeNodes } = report.report.tree.tree;

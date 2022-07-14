@@ -454,7 +454,7 @@ components:
       description: |
         Taxonomic to report values formats.
 
-        Used by histogram, map, scatter and xInY reports when `result=` `taxon` or `assembly`.
+        Used by histogram, map, scatter, table and xInY reports when `result=` `taxon` or `assembly`.
       examples:
         null:
           value:
@@ -545,6 +545,7 @@ components:
           - map
           - scatter
           - sources
+          - table
           - tree
           - types
           - xInY
@@ -1262,9 +1263,10 @@ paths:
 
         | Report        | Required          | Optional       |
         | ------------- | ----------------- | -------------- |
-        | **Histogram** | `x`, `rank`       | `cat`, `xOpts` |
-        | **Map**       | `x`, `rank`       | `cat`          |
+        | **Histogram** | `x`               | `cat`, `rank`, `xOpts` |
+        | **Map**       | `x`               | `cat`, `rank`          |
         | **Scatter**   | `x`, `y`, `rank`  | `cat`, `xOpts`, `yOpts`, `scatterThreshold` |
+        | **Table**     | `x`, `y`          | `cat`, `rank`, `xOpts`, `yOpts`, `scatterThreshold` |
         | **Sources**   | -                 | -              |
         | **Tree**      | `x`               | `y`, `cat`, `xOpts`, `yOpts`, `collapseMonotypic`, `treeThreshold` |
         | **xInY**      | `x`, `rank`       | `y`            |
