@@ -325,7 +325,7 @@ export const AutoCompleteInput = ({
   const highlightRange = (text) => {
     let length = text
       ? text.length
-      : inputRef.current.value
+      : inputRef.current?.value
       ? inputRef.current.value.length
       : 0;
     let end = length;

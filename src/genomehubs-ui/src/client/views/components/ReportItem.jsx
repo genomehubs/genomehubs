@@ -9,6 +9,7 @@ import ReportMap from "./ReportMap";
 import ReportModal from "./ReportModal";
 import ReportScatter from "./ReportScatter";
 import ReportSources from "./ReportSources";
+import ReportTable from "./ReportTable";
 import ReportTree from "./ReportTree";
 import ReportXInY from "./ReportXInY";
 import ReportXPerRank from "./ReportXPerRank";
@@ -51,6 +52,7 @@ const ReportItem = ({
   delay = 0,
   stacked,
   cumulative,
+  reversed,
   xOpts,
   yOpts,
   highlightArea,
@@ -232,6 +234,25 @@ const ReportItem = ({
             stacked={stacked}
             zScale={zScale}
             scatterThreshold={scatterThreshold}
+            includeEstimates={includeEstimates}
+            {...qs.parse(queryString)}
+            minDim={minDim}
+            setMinDim={setMinDim}
+          />
+        );
+        break;
+      case "table":
+        component = (
+          <ReportTable
+            table={reportById}
+            chartRef={chartRef}
+            containerRef={containerRef}
+            embedded={embedded}
+            ratio={ratio}
+            xOpts={xOpts}
+            yOpts={yOpts}
+            cumulative={cumulative}
+            reversed={reversed}
             includeEstimates={includeEstimates}
             {...qs.parse(queryString)}
             minDim={minDim}

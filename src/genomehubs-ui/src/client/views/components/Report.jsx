@@ -86,6 +86,7 @@ const Report = ({
   reportProps.ratio = props.ratio || 1;
   reportProps.stacked = props.stacked;
   reportProps.cumulative = props.cumulative;
+  reportProps.reversed = props.reversed;
   reportProps.yScale = props.yScale || "linear";
   reportProps.zScale = props.yScale || "linear";
   reportProps.xOpts = props.xOpts;

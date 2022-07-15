@@ -1,4 +1,5 @@
 import { apiUrl, setApiStatus } from "../reducers/api";
+import formats, { setInterval } from "../functions/formats";
 import {
   getController,
   resetController,
@@ -36,14 +37,14 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     report: true,
     query: { not: new Set(["sources"]), as: "x" },
     x: { not: new Set(["sources"]) },
-    y: { in: new Set(["scatter", "tree", "xInY"]) },
+    y: { in: new Set(["scatter", "table", "tree", "xInY"]) },
     z: { in: new Set(["scatter"]) },
     cat: { not: new Set(["sources", "xInY"]) },
     rank: { not: new Set(["sources", "tree"]) },
     ranks: { in: new Set(["tree"]) },
     levels: { in: new Set(["tree"]), ui: true },
     names: { in: new Set(["tree"]) },
-    fields: { in: new Set(["histogram", "map", "scatter", "tree"]) },
+    fields: { in: new Set(["histogram", "map", "scatter", "table", "tree"]) },
     collapseMonotypic: { in: new Set(["tree"]) },
     includeEstimates: true,
     excludeAncestral: true,
@@ -52,18 +53,21 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     excludeDirect: true,
     taxonomy: true,
     caption: true,
-    xOpts: { in: new Set(["histogram", "scatter"]) },
-    yOpts: { in: new Set(["scatter", "tree"]) },
+    xOpts: { in: new Set(["histogram", "scatter", "table"]) },
+    yOpts: { in: new Set(["scatter", "table", "tree"]) },
     highlightArea: { in: new Set(["scatter"]), ui: true },
     scatterThreshold: { in: new Set(["scatter"]) },
     treeStyle: { in: new Set(["tree"]), ui: true },
     yScale: { in: new Set(["histogram"]), ui: true },
     zScale: { in: new Set(["scatter"]), ui: true },
     stacked: { in: new Set(["histogram", "scatter"]), ui: true },
-    cumulative: { in: new Set(["histogram"]), ui: true },
+    cumulative: { in: new Set(["histogram", "table"]), ui: true },
+    // reversed: { in: new Set(["table"]), ui: true },
     mapThreshold: { in: new Set(["map"]) },
     treeThreshold: { in: new Set(["tree"]) },
-    queryId: { in: new Set(["histogram", "map", "scatter", "tree", "xInY"]) },
+    queryId: {
+      in: new Set(["histogram", "map", "scatter", "table", "tree", "xInY"]),
+    },
     release: true,
     indent: false,
   };
@@ -535,6 +539,89 @@ const processScatter = (scatter) => {
   return { chartData, pointData, cats, catSums, locations };
 };
 
+const oneDimensionTable = ({ report }) => {
+  let histograms = report.table.histograms;
+  let buckets = histograms.buckets.filter((bucket) => bucket && bucket !== 0);
+  let headers = buckets.map((bucket) => ({ key: bucket, label: bucket }));
+  let row = buckets.map((bucket, i) => ({
+    key: bucket,
+    count: histograms.allValues[i] || 0,
+  }));
+  return { headers, rows: [row] };
+};
+
+const twoDimensionTable = ({ report }) => {
+  let { table, xLabel, yLabel } = report;
+  let { histograms, cat, cats, bounds, yBounds } = table;
+  let buckets = histograms.buckets.filter((bucket) => bucket && bucket !== 0);
+  let headers = buckets.map((bucket) => ({ key: bucket, label: bucket }));
+  let rows = [];
+  if (cat) {
+    headers.unshift({ key: cat, label: cat });
+    for (let catObj of cats) {
+      let values = histograms.byCat[catObj.key];
+      let row = buckets.map((bucket, i) => {
+        let count = values[i] || 0;
+        return { key: bucket, count };
+      });
+      row.unshift({ key: cat, value: catObj.key, label: catObj.label });
+      rows.push(row);
+    }
+  } else if (yLabel) {
+    let defaultValue = 0;
+    let interval;
+    if (
+      valueType == "keyword" ||
+      valueType == "geo_point" ||
+      valueType == "date"
+    ) {
+      defaultValue = undefined;
+      if (valueType == "date") {
+        interval = setInterval(
+          yBuckets[yBuckets.length - 1] - yBuckets[0],
+          yBuckets.length - 1
+        );
+      }
+    }
+    let yBuckets = histograms.yBuckets.filter(
+      (bucket) => bucket && bucket !== 0
+    );
+    headers.unshift({ key: yLabel, label: yLabel });
+    let values = histograms.allYValues;
+    let valueType = yBounds.type;
+
+    yBuckets.forEach((yBucket, j) => {
+      let row = buckets.map((bucket, i) => {
+        let count = values[i][j] || defaultValue;
+        return { key: bucket, count };
+      });
+      row.unshift({
+        key: yBounds.field,
+        value: yBucket,
+        label: formats(yBucket, valueType, interval),
+      });
+      rows.push(row);
+    });
+  }
+  return { headers, rows };
+};
+
+const processTable = (report) => {
+  let { table, xLabel, yLabel } = report;
+  let { cat } = table;
+  let headers, rows;
+  if (cat && yLabel) {
+    ({ headers, rows } = twoDimensionTable({ report }));
+  } else if (cat || yLabel) {
+    ({ headers, rows } = twoDimensionTable({ report }));
+  } else if (xLabel) {
+    ({ headers, rows } = oneDimensionTable({ report }));
+  } else {
+    return {};
+  }
+  return { headers, rows };
+};
+
 const processReport = (report) => {
   if (!report || !report.name) return {};
   if (report.name == "tree") {
@@ -565,6 +652,18 @@ const processReport = (report) => {
         scatter: {
           ...report.report.scatter,
           ...processScatter(report.report.scatter),
+        },
+      },
+    };
+  } else if (report.name == "table") {
+    return {
+      ...report,
+      report: {
+        ...report.report,
+        table: {
+          ...report.report.histogram,
+          ...report.report.scatter,
+          ...processTable(report.report),
         },
       },
     };
@@ -636,6 +735,18 @@ const reportOptions = {
     },
   },
   scatter: {
+    x: {
+      default: "query",
+      fieldType: "value",
+    },
+    y: {
+      fieldType: "value",
+    },
+    rank: {
+      default: "query:tax_rank",
+    },
+  },
+  table: {
     x: {
       default: "query",
       fieldType: "value",

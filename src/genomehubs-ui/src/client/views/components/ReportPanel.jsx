@@ -18,6 +18,7 @@ const reportTypes = {
   histogram: { name: "Histogram" },
   map: { name: "Map" },
   scatter: { name: "Scatter" },
+  table: { name: "Table" },
   tree: { name: "Tree" },
   xInY: { name: "xInY" },
 };

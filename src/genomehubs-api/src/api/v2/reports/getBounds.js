@@ -98,6 +98,7 @@ export const getBounds = async ({
   // find max and min plus most frequent categories
   let fieldMeta = lookupTypes(fields[0]);
   let field = fieldMeta.name;
+  let type = fieldMeta.type;
   let catMeta = lookupTypes(cat);
   if (catMeta) {
     cat = catMeta.name;
@@ -318,6 +319,7 @@ export const getBounds = async ({
     field,
     scale: scaleType,
     stats,
+    type,
     domain,
     tickCount,
     cat,
