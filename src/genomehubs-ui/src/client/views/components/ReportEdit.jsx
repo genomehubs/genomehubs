@@ -82,7 +82,7 @@ export const queryPropList = {
     "xOpts",
     "yOpts",
     "cumulative",
-    "reversed",
+    // "reversed",
   ],
   tree: [
     "report",
