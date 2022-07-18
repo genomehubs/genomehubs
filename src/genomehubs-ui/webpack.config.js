@@ -10,8 +10,11 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const devMode = process.env.NODE_ENV !== "production";
 
-const BUILD_DIR = path.resolve(__dirname, "dist/public");
-const STATIC_DIR = path.resolve(__dirname, "dist/public/static/[fullhash]");
+const BUILD_DIR = path.resolve(__dirname, `dist/public/`);
+const STATIC_DIR = path.resolve(
+  __dirname,
+  `dist/public${main.basename}/static/[fullhash]`
+);
 // const STATIC_DIR = path.resolve(__dirname, "dist/public/static");
 const APP_DIR = path.resolve(__dirname, "src/client/views");
 
@@ -25,8 +28,7 @@ const config = {
     main: ["@babel/polyfill", APP_DIR + "/index.jsx"],
   },
   output: {
-    publicPath:
-      main.mode == "production" ? main.basename + "/" : main.basename + "/",
+    publicPath: main.mode == "production" ? main.basename + "/" : "/",
     path: BUILD_DIR + "/",
     // filename: devMode ? "js/bundle.js" : "js/[name].[contenthash].js",
     filename: "js/[name].[contenthash].js",
@@ -63,6 +65,7 @@ const config = {
     allowedHosts: "all",
     static: {
       directory: BUILD_DIR,
+      publicPath: main.basename,
     },
     compress: true,
     port: main.client_port,
@@ -79,6 +82,7 @@ const config = {
     }),
     new webpack.DefinePlugin({
       API_URL: JSON.stringify(main.apiUrl),
+      ARCHIVE: JSON.stringify(main.archive),
       BASENAME: JSON.stringify(main.basename),
       BRANCH: JSON.stringify(gitRevisionPlugin.branch()),
       COMMIT_HASH: JSON.stringify(gitRevisionPlugin.commithash()),
@@ -214,10 +218,7 @@ const config = {
         loader: "file-loader",
         options: {
           name: "img/[contenthash].[ext]",
-          publicPath:
-            main.mode == "production"
-              ? main.basename + "/"
-              : main.basename + "/",
+          publicPath: main.mode == "production" ? main.basename + "/" : "/",
         },
       },
       {

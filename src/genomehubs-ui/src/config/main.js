@@ -51,6 +51,8 @@ module.exports = {
   filePath: FILE_PATH,
   // version
   version: process.env.GH_VERSION || "v2.0",
+  // archive versions
+  archive: (process.env.GH_ARCHIVE || "").split(" "),
   // hostname
   hostname: GH_HOST,
   // default taxonomy
