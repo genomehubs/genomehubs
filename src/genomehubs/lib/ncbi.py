@@ -68,11 +68,14 @@ def parse_xrefs(entry, fields=None):
         bioprojects = []
         biosamples = []
         for dbxref in entry.dbxrefs:
-            key, value = dbxref.split(":")
-            if key == "BioProject":
-                bioprojects.append(value)
-            elif key == "BioSample":
-                biosamples.append(value)
+            try:
+                key, value = dbxref.split(":")
+                if key == "BioProject":
+                    bioprojects.append(value)
+                elif key == "BioSample":
+                    biosamples.append(value)
+            except ValueError:
+                pass
         if bioprojects:
             fields["bioproject"] = "; ".join(bioprojects)
         if biosamples:
