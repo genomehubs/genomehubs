@@ -263,7 +263,7 @@ export const generateQuery = async ({
   let properties = {};
   let status;
   let excludeMissing = new Set();
-  if (query && query.match(/\n/)) {
+  if (query && query.match(/\n/) && query.split(/\n/)[1] > "") {
     multiTerm = query
       .toLowerCase()
       .split(/\n/)
