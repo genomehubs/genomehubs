@@ -38,6 +38,7 @@ const SiteName = ({ siteName, basename, archive }) => {
   let version = basename ? basename.replace("/", "") : "latest";
   let versions;
   if (archive) {
+    console.log(archive);
     versions = archive
       .filter((v) => v != version && v > "")
       // .map((v) => <Typography className={classes.typography}>{v}</Typography>);
@@ -46,41 +47,43 @@ const SiteName = ({ siteName, basename, archive }) => {
           <Typography className={classes.typography}>{v}</Typography>
         </Link>
       ));
-    content = (
-      <span style={{ whiteSpace: "nowrap" }}>
-        {content}
-        {" - "}
-        <span
-          aria-describedby={id}
-          style={{
-            cursor: "pointer",
-            fontSize: "0.9em",
-            lineHeight: "1em",
-            color: "gray",
-          }}
-          onClick={handleClick}
-        >
-          {version}
-        </span>
+    if (versions && versions.length > 0) {
+      content = (
+        <span style={{ whiteSpace: "nowrap" }}>
+          {content}
+          {" - "}
+          <span
+            aria-describedby={id}
+            style={{
+              cursor: "pointer",
+              fontSize: "0.9em",
+              lineHeight: "1em",
+              color: "gray",
+            }}
+            onClick={handleClick}
+          >
+            {version}
+          </span>
 
-        <Popover
-          id={id}
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "center",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "center",
-          }}
-        >
-          {versions}
-        </Popover>
-      </span>
-    );
+          <Popover
+            id={id}
+            open={open}
+            anchorEl={anchorEl}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "center",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "center",
+            }}
+          >
+            {versions}
+          </Popover>
+        </span>
+      );
+    }
   }
   return content;
 };
