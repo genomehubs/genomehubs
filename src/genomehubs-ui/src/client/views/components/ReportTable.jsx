@@ -41,6 +41,9 @@ import { zLegend } from "./zLegend";
 
 const TableReport = ({ report, chartProps }) => {
   const { headers, rows } = report.table;
+  if (!headers) {
+    return null;
+  }
   let tableHeader = (
     <TableRow key={"header"}>
       {headers.map((header) => (
