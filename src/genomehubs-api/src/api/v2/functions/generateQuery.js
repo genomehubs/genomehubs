@@ -134,7 +134,8 @@ const splitTerm = (term) => {
     parts = subbedTerm.match(/(.*?)\((.*)\)([^\)]*)/);
   }
   if (!parts) {
-    parts = subbedTerm.match(/()(.*?)\s*([!><=]+[^\)]*)/) || [subbedTerm];
+    // parts = subbedTerm.match(/()(.*?)\s*([!><=]+[^\)]*)/) || [subbedTerm];
+    parts = subbedTerm.match(/()(.*?)\s*([!><=]+.*)/) || [subbedTerm];
   }
   for (let i = 0; i < 3; i++) {
     if (parts[i]) {
