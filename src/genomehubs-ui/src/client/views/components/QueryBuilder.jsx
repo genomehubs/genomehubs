@@ -272,9 +272,10 @@ const QueryBuilder = ({
           handleVariableChange={(e) => handleChange(e, i, "variable")}
           handleSummaryChange={(e) => handleChange(e, i, "summary")}
           handleOperatorChange={(e) => handleChange(e, i, "operator")}
-          handleValueChange={(e, { id, value }) =>
-            handleChange(e, i, "value", value)
-          }
+          handleValueChange={(e, obj = {}) => {
+            let { id, value } = obj;
+            return handleChange(e, i, "value", value);
+          }}
           handleDismiss={(e) => handleChange(e, i, "dismiss")}
         />
       );
