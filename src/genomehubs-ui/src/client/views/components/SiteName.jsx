@@ -38,7 +38,6 @@ const SiteName = ({ siteName, basename, archive }) => {
   let version = basename ? basename.replace("/", "") : "latest";
   let versions;
   if (archive) {
-    console.log(archive);
     versions = archive
       .filter((v) => v != version && v > "")
       // .map((v) => <Typography className={classes.typography}>{v}</Typography>);
