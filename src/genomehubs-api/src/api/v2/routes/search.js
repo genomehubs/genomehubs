@@ -57,6 +57,9 @@ export const getSearchResults = async (req, res) => {
       }
     }
     response = await getResults({ ...req.query, exclusions, sortBy, req });
+    if (!response.status.success) {
+      return res.status(200).send({ status: response.status });
+    }
     if (response.status.hits == 0) {
       let query = await replaceSearchIds(req.query);
       if (query != req.query.query) {

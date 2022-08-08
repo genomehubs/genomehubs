@@ -86,7 +86,7 @@ app.use(
     apiSpec: swaggerDocument,
     validateRequests: {
       allowUnknownQueryParameters: true,
-      removeAdditional: "all",
+      removeAdditional: "failing",
     },
     validateResponses: true,
     operationHandlers: path.join(__dirname),
