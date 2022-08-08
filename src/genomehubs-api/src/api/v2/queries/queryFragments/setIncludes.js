@@ -5,6 +5,9 @@ export const setIncludes = ({
   includeRawValues,
 }) => {
   let include = [];
+  if (summaryValues && !Array.isArray(summaryValues)) {
+    summaryValues = [summaryValues];
+  }
   if (result == "taxon" || result == "assembly" || result == "sample") {
     include = include
       .concat(["taxon_id", "scientific_name", "taxon_rank", "parent"])
