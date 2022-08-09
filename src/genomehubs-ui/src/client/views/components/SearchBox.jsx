@@ -6,9 +6,11 @@ import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import Popper from "@material-ui/core/Popper";
 import SearchIcon from "@material-ui/icons/Search";
+import SearchInputQueries from "./SearchInputQueries";
 import SearchToggles from "./SearchToggles";
 import Tooltip from "@material-ui/core/Tooltip";
 import { compose } from "recompose";
+import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
 import { getSuggestedTerm } from "../reducers/search";
 import { makeStyles } from "@material-ui/core/styles";
 import qs from "../functions/qs";
@@ -59,6 +61,7 @@ const SearchBox = ({
   types,
   synonyms,
   basename,
+  setLiveQuery,
 }) => {
   const classes = useStyles();
   const navigate = useNavigate();
@@ -117,7 +120,6 @@ const SearchBox = ({
           options[keyName] = savedOptions[keyName];
       });
     }
-
     fetchSearchResults(options);
     setPreferSearchTerm(false);
     navigate(
@@ -150,9 +152,24 @@ const SearchBox = ({
         .map((term) => wrap_term({ term, taxWrap, result }));
       hashTerm = hash.join(" AND ");
     }
-
     setSearchIndex(result);
-    dispatchSearch({ query: queryString, result, fields }, hashTerm);
+
+    let inputs = Array.from(
+      formRef.current.getElementsByClassName("inputQuery")
+    )
+      .map((el) => ({
+        name: el.children[1].children[0].name,
+        value: el.children[1].children[0].value,
+      }))
+      .filter((el) => el.name.match(/query[A-Z]+/) && el.value);
+    let inputQueries = inputs.reduce(
+      (a, el) => ({ ...a, [el.name]: el.value }),
+      {}
+    );
+    dispatchSearch(
+      { query: queryString, ...inputQueries, result, fields },
+      hashTerm
+    );
     // resetLookup();
   };
 
@@ -172,15 +189,16 @@ const SearchBox = ({
   }
   return (
     <Grid container alignItems="center" direction="column">
-      <Grid item>
-        <form
-          onSubmit={handleSubmit}
-          ref={formRef}
-          style={{
-            minWidth: "900px",
-            width: "100%",
-          }}
-        >
+      <form
+        onSubmit={handleSubmit}
+        ref={formRef}
+        style={{
+          minWidth: "900px",
+          width: "100%",
+        }}
+      >
+        <SearchInputQueries />
+        <Grid item>
           <Grid container direction="row" alignItems="center">
             <Grid item xs={2}></Grid>
             <Grid item ref={searchBoxRef} xs={"auto"}>
@@ -190,10 +208,12 @@ const SearchBox = ({
                   setInputValue={setLookupTerm}
                   inputRef={searchInputRef}
                   inputLabel={searchText}
+                  inputName={"query"}
                   multiline={multiline}
                   setMultiline={setMultiline}
                   handleSubmit={handleSubmit}
                   doSearch={doSearch}
+                  setLiveQuery={setLiveQuery}
                   result={result}
                   multipart={true}
                 />
@@ -215,8 +235,8 @@ const SearchBox = ({
               </Tooltip>
             </Grid>
           </Grid>
-        </form>
-      </Grid>
+        </Grid>
+      </form>
       <Grid container direction="row" alignItems="center">
         <Grid item xs={2}></Grid>
         <Grid item xs={8}>
@@ -235,5 +255,6 @@ export default compose(
   withTypes,
   withSearch,
   withSearchDefaults,
-  withLookup
+  withLookup,
+  dispatchLiveQuery
 )(SearchBox);

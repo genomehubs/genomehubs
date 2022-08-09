@@ -1,7 +1,8 @@
+import { chainQueries, getResults } from "../functions/getResults";
+
 import { attrTypes } from "../functions/attrTypes";
 import { fmt } from "./fmt";
 import { getCatLabels } from "./getCatLabels";
-import { getResults } from "../functions/getResults";
 import { incrementDate } from "./incrementDate";
 import { scales } from "./scales";
 import { setAggs } from "./setAggs";
@@ -95,6 +96,7 @@ export const getBounds = async ({
 }) => {
   let { lookupTypes } = await attrTypes({ result, taxonomy });
   params.size = 0;
+  params.query = await chainQueries(params);
   // find max and min plus most frequent categories
   let fieldMeta = lookupTypes(fields[0]);
   let field = fieldMeta.name;

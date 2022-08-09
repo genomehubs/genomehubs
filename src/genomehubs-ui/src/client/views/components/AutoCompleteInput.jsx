@@ -6,6 +6,7 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import { PlacedPopper } from "./SearchBox";
 import TextField from "@material-ui/core/TextField";
 import { compose } from "recompose";
+// import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
 import styles from "./Styles.scss";
 import withAutocomplete from "../hocs/withAutocomplete";
 import withTaxonomy from "../hocs/withTaxonomy";
@@ -19,6 +20,7 @@ export const AutoCompleteInput = ({
   setInputValue,
   inputRef,
   inputLabel,
+  inputName,
   multiline,
   setMultiline = () => {},
   autocompleteTerms,
@@ -33,6 +35,8 @@ export const AutoCompleteInput = ({
   result,
   fixedType,
   multipart,
+  setLiveQuery = () => {},
+  inputClassName = "autocompleteInput",
 }) => {
   const [open, setOpen] = useState(false);
   const [prefix, setPrefix] = useState("");
@@ -246,7 +250,13 @@ export const AutoCompleteInput = ({
       return;
     }
     // let parts = value.split(/(\s{0,1}(?:<=|!=|>=|[\(\),!<=>]|and|AND)\s{0,1})/);
-    let parts = value.split(/(\s(?:<=|!=|>=|<|=|>|and)\s|[\(\),!])/i);
+    let queryResult, separator;
+    [queryResult, separator, value] = (value || "").split(/(--)/);
+    if (!separator) {
+      value = queryResult;
+      queryResult = undefined;
+    }
+    let parts = (value || "").split(/(\s(?:<=|!=|>=|<|=|>|and)\s|[\(\),!])/i);
     let section = 0;
     let newPrefix = "";
     let newSuffix = "";
@@ -313,6 +323,8 @@ export const AutoCompleteInput = ({
           result:
             lastType?.type == "taxon"
               ? "taxon"
+              : queryResult
+              ? queryResult
               : newPrefix
               ? result
               : undefined,
@@ -386,8 +398,12 @@ export const AutoCompleteInput = ({
         updateTerm(newValue, e.target.selectionStart, types);
         setOpen(true);
       }
-      if (e && e.key && e.key == "Enter") {
-        updateValue(newValue);
+      if (e) {
+        if (e.key && e.key == "Enter") {
+          updateValue(newValue);
+        } else {
+          setLiveQuery(e.target.value || " ");
+        }
       }
     }
   };
@@ -499,6 +515,8 @@ export const AutoCompleteInput = ({
           required={required}
           inputRef={inputRef}
           label={inputLabel}
+          name={inputName}
+          className={inputClassName}
           variant={size == "small" ? "standard" : "outlined"}
           fullWidth
           multiline={maxRows == 1 ? false : true}
@@ -523,4 +541,5 @@ export default compose(
   withTaxonomy,
   withTypes,
   withAutocomplete
+  // dispatchLiveQuery
 )(AutoCompleteInput);

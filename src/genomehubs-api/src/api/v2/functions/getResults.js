@@ -2,7 +2,7 @@ import { generateQuery } from "./generateQuery";
 import { indexName } from "./indexName";
 import { logError } from "./logger";
 
-const chainQueries = async ({
+export const chainQueries = async ({
   query,
   result,
   chainThreshold = 500,
@@ -45,7 +45,7 @@ const chainQueries = async ({
       throw Error(`${match[1]} returns over ${chainThreshold} hits`);
     }
     let values = res.results.flatMap((obj) => {
-      if (obj.result.fields) {
+      if (obj.result.fields && obj.result.fields[fields]) {
         return obj.result.fields[fields][summary];
       } else {
         return obj.result[fields];
@@ -59,14 +59,14 @@ const chainQueries = async ({
 export const getResults = async (params) => {
   try {
     params.query = await chainQueries(params);
-  } catch (message) {
-    logError({ req: params.req, message });
+  } catch (error) {
+    logError({ req: params.req, message: error });
     return {
       func: () => ({
-        status: { success: false, message: message.message },
+        status: { success: false, error: error.message },
       }),
       params: {},
-      status: { success: false, message: message.message },
+      status: { success: false, error: error.message },
     };
   }
   let query = await generateQuery({ ...params });

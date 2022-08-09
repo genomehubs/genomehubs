@@ -625,8 +625,12 @@ export const histogram = async ({
   }
   fields = [...new Set(fields)];
   exclusions = setExclusions(params);
+  let inputQueries = Object.entries(apiParams)
+    .filter(([key, value]) => key.match(/query[A-Z]+/))
+    .reduce((a, [key, value]) => ({ ...a, [key]: value }), {});
+
   let bounds = await getBounds({
-    params: { ...params },
+    params: { ...params, ...inputQueries },
     fields,
     summaries,
     cat,
@@ -657,7 +661,7 @@ export const histogram = async ({
   let histograms, yBounds;
   if (yFields && yFields.length > 0) {
     yBounds = await getBounds({
-      params: { ...yParams },
+      params: { ...yParams, ...inputQueries },
       fields: yFields,
       summaries: ySummaries,
       cat,
@@ -671,7 +675,7 @@ export const histogram = async ({
   if (bounds && (!bounds.cats || bounds.cats.length > 0)) {
     let threshold = scatterThreshold >= 0 ? scatterThreshold : 10000;
     histograms = await getHistogram({
-      params,
+      params: { ...params, ...inputQueries },
       fields,
       rank,
       summaries,

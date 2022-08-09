@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { memo, useRef, useState } from "react";
 
 import DialogContent from "@material-ui/core/DialogContent";
 import Grid from "@material-ui/core/Grid";
@@ -146,4 +146,4 @@ const Page = ({
   );
 };
 
-export default compose(withSearchIndex)(Page);
+export default compose(memo, withSearchIndex)(Page);

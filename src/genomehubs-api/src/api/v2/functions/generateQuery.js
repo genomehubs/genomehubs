@@ -373,6 +373,9 @@ export const generateQuery = async ({
   }
 
   if (excludeMissing) {
+    if (!exclusions) {
+      exclusions = {};
+    }
     if (exclusions.missing) {
       exclusions.missing.forEach(excludeMissing.add, excludeMissing);
     }
