@@ -94,9 +94,11 @@ const validateOperator = (term, types, meta) => {
     if (!types) {
       return { success: true };
     }
+    let fullMeta = types(parts[0].toLowerCase());
+    if (fullMeta.processed_type == "keyword" && parts[1].match(/[<>]/)) {
+      return fail(`invalid operator for ${fullMeta.name} in ${term}`);
+    }
     if (!meta) {
-      parts[0] = parts[0].toLowerCase();
-      let fullMeta = types(parts[0]);
       if (!fullMeta) {
         return fail(`invalid field name in ${term}`);
       }

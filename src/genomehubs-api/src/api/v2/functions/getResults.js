@@ -45,10 +45,12 @@ export const chainQueries = async ({
       throw Error(`${match[1]} returns over ${chainThreshold} hits`);
     }
     let values = res.results.flatMap((obj) => {
-      if (obj.result.fields && obj.result.fields[fields]) {
+      if (obj.result.fields && obj.result.fields.hasOwnProperty(fields)) {
         return obj.result.fields[fields][summary];
-      } else {
+      } else if (obj.result.hasOwnProperty(fields)) {
         return obj.result[fields];
+      } else {
+        throw Error(`Could not find value for ${match[1]}.${fields}`);
       }
     });
     query = query.replace(match[0], values.join(","));

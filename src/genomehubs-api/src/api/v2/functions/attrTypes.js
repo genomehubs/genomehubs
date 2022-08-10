@@ -3,6 +3,38 @@ import { client } from "./connection";
 import { config } from "./config.js";
 import { indexName } from "./indexName";
 
+const setProcessedType = (meta) => {
+  if (
+    ["double", "float", "half_float", "scaled_float", "unsigned_long"].includes(
+      meta.type
+    ) ||
+    (meta.type || "").endsWith("dp")
+  ) {
+    return "float";
+  }
+  if (["long", "integer", "short", "byte"].includes(meta.type)) {
+    return "float";
+  }
+  if (meta.type == "keyword") {
+    if (meta.summary) {
+      if (Array.isArray(meta.summary)) {
+        if (
+          meta.summary[0] == "enum" ||
+          (meta.summary[0] == "primary" && meta.summary[1] == "enum")
+        ) {
+          return "ordered_keyword";
+        }
+      }
+      if (meta.summary == "enum") {
+        return "ordered_keyword";
+      }
+    }
+
+    return "keyword";
+  }
+  return meta.type;
+};
+
 const fetchTypes = async ({ result, taxonomy, hub, release, indexType }) => {
   let index = indexName({
     result: indexType,
@@ -43,6 +75,8 @@ const fetchTypes = async ({ result, taxonomy, hub, release, indexType }) => {
         synonyms[hit._source.group] = {};
       }
       typesMap[hit._source.group][hit._source.name] = hit._source;
+      typesMap[hit._source.group][hit._source.name].processed_type =
+        setProcessedType(hit._source);
       if (hit._source.synonyms) {
         for (let synonym of hit._source.synonyms) {
           synonyms[hit._source.group][synonym] = hit._source.name;
