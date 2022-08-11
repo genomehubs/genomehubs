@@ -401,10 +401,26 @@ const AttributeTableRow = ({
     let aggSource;
     let colSpan = 2;
     let label = <span>{attributeId}</span>;
-    if (types[attributeId]?.description) {
+    let desc = types[attributeId]?.description;
+    let status;
+    if (types[attributeId]?.status && types[attributeId].status != "stable") {
+      status = types[attributeId].status;
+    }
+    if (status) {
+      desc = (
+        <div>
+          {desc && <div>{desc}</div>}
+          <div>status: {status}</div>
+        </div>
+      );
+    }
+    if (desc) {
       label = (
-        <Tooltip title={types[attributeId].description} arrow placement={"top"}>
-          {label}
+        <Tooltip title={desc} arrow placement={"top"}>
+          <span>
+            {label}
+            {status && <sup>{`\u2020`}</sup>}
+          </span>
         </Tooltip>
       );
     }

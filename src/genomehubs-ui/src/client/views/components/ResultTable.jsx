@@ -144,6 +144,7 @@ const StyledCheckbox = ({ color, ...props }) => {
 const SortableCell = ({
   name,
   description,
+  status,
   classes,
   sortBy,
   sortOrder,
@@ -185,6 +186,17 @@ const SortableCell = ({
         >
           {description}
         </div>
+        {status && status != "stable" && (
+          <div
+            style={{
+              width: "100%",
+              marginTop: "0.5em",
+              textAlign: "right",
+            }}
+          >
+            status: {status}
+          </div>
+        )}
       </div>
     );
   }
@@ -215,6 +227,7 @@ const SortableCell = ({
         >
           {/* {name} */}
           {name.split("_").join(`_\u200b`)}
+          {status && status != "stable" && <sup>{`\u2020`}</sup>}
           {sortBy === name ? (
             <span className={classes.visuallyHidden}>
               {sortOrder === "desc" ? "sorted descending" : "sorted ascending"}
@@ -714,6 +727,7 @@ const ResultTable = ({
           key={type.name}
           name={type.name}
           description={type.description}
+          status={type.status}
           classes={classes}
           sortBy={sortBy}
           sortOrder={sortOrder}
