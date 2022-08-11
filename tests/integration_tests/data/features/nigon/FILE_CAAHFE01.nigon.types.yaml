@@ -1,20 +1,27 @@
 file:
   format: tsv
   header: false
-  name: full_table.tsv.gz
+  name: CAAHFE01.full_table.tsv.gz
   needs:
     - ATTR_busco.types.yaml
     - ATTR_nigon.types.yaml
-    - FILE_window_stats.types.yaml
+    - FILE_CAAHFE01.window_stats.types.yaml
   source: tbc
   source_url: http://example.com
+# analysis:
+#   analysis_id: busco5-nematoda-GCA_900883565.2
+#   assembly_id: GCA_900883565.2
+#   taxon_id: "2301259"
+#   description: BUSCO v5 analysis of GCA_900883565.2 using nematoda_odb10 lineage
+#   name: BUSCO Nematoda
+#   title: BUSCO v5 GCA_900883565.2 nematoda_odb10
 analysis:
-  analysis_id: busco5-nematoda-GCA_013425905.1
-  assembly_id: GCA_013425905.1
-  taxon_id: "141969"
-  description: BUSCO v5 analysis of GCA_013425905.1 using nematoda_odb10 lineage
+  analysis_id: busco5-nematoda-GCA_905319855.2
+  assembly_id: GCA_905319855.2
+  taxon_id: "9612"
+  description: BUSCO v5 analysis of GCA_905319855.2 using nematoda_odb10 lineage
   name: BUSCO Nematoda
-  title: BUSCO v5 GCA_013425905.1 nematoda_odb10
+  title: BUSCO v5 GCA_905319855.2 nematoda_odb10
 attributes:
   sequence_id:
     index: 2
@@ -2344,10 +2351,10 @@ attributes:
   busco_score:
     index: 5
 features:
-  assembly_id: GCA_013425905.1
+  assembly_id: GCA_905319855.2
   feature_id:
     index: 2
     template: "{}:{start}-{end}"
   primary_type: busco-gene
 taxonomy:
-  taxon_id: "141969"
+  taxon_id: "9612"

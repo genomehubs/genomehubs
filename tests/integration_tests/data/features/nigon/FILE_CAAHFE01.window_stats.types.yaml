@@ -1,0 +1,66 @@
+file:
+  format: tsv
+  header: true
+  name: CAAHFE01.window_stats.tsv
+  needs:
+    - ATTR_feature.types.yaml
+    - ATTR_window_stats.types.yaml
+  source: tbc
+  source_url: http://example.com
+# analysis:
+#   analysis_id: assembly-GCA_900883565.2
+#   assembly_id: GCA_900883565.2
+#   taxon_id: "2301259"
+#   description: Public assembly GCA_900883565.2
+#   name: Assembly
+#   title: Public assembly GCA_900883565.2
+analysis:
+  analysis_id: assembly-GCA_905319855.2
+  assembly_id: GCA_905319855.2
+  taxon_id: "9612"
+  description: Public assembly GCA_905319855.2
+  name: Assembly
+  title: Public assembly GCA_905319855.2
+attributes:
+  sequence_id:
+    header: sequence
+  feature_type:
+    default:
+      - chromosome
+      - toplevel
+      - sequence
+  start:
+    header: start
+    function: "{} + 1"
+  end:
+    header: end
+  strand: 1
+  length:
+    header: end
+  seq_proportion:
+    header: end
+    function: "{} / 79045575"
+  midpoint:
+    header: end
+    function: "{length} / 2"
+  gc:
+    header: gc
+  masked:
+    header: masked
+  nematoda_odb10_count:
+    header: nematoda_odb10_count
+  coverage:
+    header: ERR2740844_cov
+    function: "{} + 0.01"
+features:
+  assembly_id: GCA_905319855.2
+  feature_id:
+    header: sequence
+  primary_type: chromosome
+identifiers:
+  accession:
+    header: sequence
+    source: insdc
+    source_url_stub: https://www.ebi.ac.uk/ena/browser/view/
+taxonomy:
+  taxon_id: "9612"

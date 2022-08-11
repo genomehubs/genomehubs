@@ -7,13 +7,20 @@ file:
     - ATTR_window_stats.types.yaml
   source: tbc
   source_url: http://example.com
+# analysis:
+#   analysis_id: assembly-GCA_013425905.1
+#   assembly_id: GCA_013425905.1
+#   taxon_id: "141969"
+#   description: Public assembly GCA_013425905.1
+#   name: Assembly
+#   title: Public assembly GCA_013425905.1
 analysis:
-  analysis_id: assembly-GCA_013425905.1
-  assembly_id: GCA_013425905.1
-  taxon_id: "141969"
-  description: Public assembly GCA_013425905.1
+  analysis_id: assembly-GCA_003160815.1
+  assembly_id: GCA_003160815.1
+  taxon_id: "9627"
+  description: Public assembly GCA_003160815.1
   name: Assembly
-  title: Public assembly GCA_013425905.1
+  title: Public assembly GCA_003160815.1
 attributes:
   sequence_id:
     header: sequence
