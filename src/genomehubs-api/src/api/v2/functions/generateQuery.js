@@ -186,6 +186,11 @@ const validateTerm = (term, types) => {
   }
   if (parts[2] && parts[2].length > 0) {
     parts[2] = parts[2].toLowerCase();
+    if (parts[2].endsWith("_id")) {
+      // TODO: validate IDs
+      return { parts, validation: { success: true } };
+    }
+
     if (types) {
       let meta = types(parts[2]);
       if (!meta) {
@@ -261,7 +266,7 @@ export const generateQuery = async ({
       names[nameClass] = true;
     });
   }
-  let taxTerm, rank, depth, multiTerm, idTerm;
+  let taxTerm, identifierTerms, rank, depth, multiTerm, idTerm;
   let filters = {};
   let properties = {};
   let status;
@@ -303,6 +308,19 @@ export const generateQuery = async ({
           parts[1] = parts[1].replace(/tax_/, "");
           taxTerm = parts;
         }
+      } else if (parts[2] && parts[2].endsWith("_id")) {
+        if (!identifierTerms) {
+          identifierTerms = {};
+        }
+        if (parts[3].match(/[\>\<=]/)) {
+          let condition = parts[3].split(/\s*([\>\<=]+)\s*/);
+          if (condition[0].endsWith("!")) {
+            condition[1] = `!${condition[1]}`;
+          }
+          parts[3] = condition[1];
+          parts[4] = condition[2];
+        }
+        identifierTerms = addCondition(identifierTerms, parts, "keyword");
       } else {
         if (parts.length > 1) {
           if (lookupTypes[result]) {
@@ -386,6 +404,7 @@ export const generateQuery = async ({
 
   let params = {
     idTerm,
+    identifierTerms,
     result,
     fields,
     optionalFields,

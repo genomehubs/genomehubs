@@ -2,6 +2,7 @@ import { attrTypes } from "../functions/attrTypes";
 import { excludeSources } from "./queryFragments/excludeSources";
 import { filterAssemblies } from "./queryFragments/filterAssemblies";
 import { filterAttributes } from "./queryFragments/filterAttributes";
+import { filterIdentifiers } from "./queryFragments/filterIdentifiers";
 import { filterProperties } from "./queryFragments/filterProperties";
 import { filterSamples } from "./queryFragments/filterSamples";
 import { filterTaxId } from "./queryFragments/filterTaxId";
@@ -17,6 +18,7 @@ import { setSortOrder } from "./queryFragments/setSortOrder";
 export const searchByTaxon = async ({
   searchTerm,
   idTerm,
+  identifierTerms,
   multiTerm,
   result,
   ancestral,
@@ -76,6 +78,10 @@ export const searchByTaxon = async ({
       searchRawValues,
       "optionalAttributes"
     );
+  }
+  let identifiers;
+  if (identifierTerms) {
+    identifiers = filterIdentifiers(identifierTerms);
   }
   let namesExist = matchNames(names, namesMap);
   let lineageRanks = matchRanks(ranks, maxDepth);
@@ -172,6 +178,7 @@ export const searchByTaxon = async ({
     bool: {
       must_not: excludedSources,
       filter: attributesExist
+        .concat(identifiers)
         .concat(namesExist)
         .concat(attributeValues)
         .concat(propertyValues)
