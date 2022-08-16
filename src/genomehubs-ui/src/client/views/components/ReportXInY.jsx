@@ -122,7 +122,7 @@ const PieComponent = ({ data, height, width, colors }) => {
   );
 };
 
-const RadialBarComponent = ({ data, height, width, colors }) => {
+const RadialBarComponent = ({ data, height, width }) => {
   const renderRadialBarLabel = (props) => {
     const { cx, cy, index, viewBox, fill, value, data, background, width, n } =
       props;
@@ -199,7 +199,14 @@ const RadialBarComponent = ({ data, height, width, colors }) => {
   );
 };
 
-const ReportXInY = ({ xInY, chartRef, containerRef, colors, minDim }) => {
+const ReportXInY = ({
+  xInY,
+  chartRef,
+  containerRef,
+  colors,
+  levels,
+  minDim,
+}) => {
   const componentRef = chartRef ? chartRef : useRef();
   const { width, height } = containerRef
     ? useResize(containerRef)
@@ -210,6 +217,9 @@ const ReportXInY = ({ xInY, chartRef, containerRef, colors, minDim }) => {
     let chart;
     if (Array.isArray(xInY.report.xInY)) {
       xInY.report.xInY.forEach((report, i) => {
+        if (levels[xInY.report.xInY.length]) {
+          colors = levels[xInY.report.xInY.length];
+        }
         let { xiny, x, y, rank } = report;
         chartData.push({
           xValue: x,
@@ -227,7 +237,6 @@ const ReportXInY = ({ xInY, chartRef, containerRef, colors, minDim }) => {
           data={chartData}
           width={minDim}
           height={minDim - 50}
-          colors={colors}
         />
       );
     } else {
@@ -236,6 +245,9 @@ const ReportXInY = ({ xInY, chartRef, containerRef, colors, minDim }) => {
         { value: x, name: xTerm },
         { value: y - x, name: yTerm },
       ];
+      if (levels[2]) {
+        colors = levels[2];
+      }
       chart = (
         <PieComponent
           data={chartData}

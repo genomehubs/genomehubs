@@ -166,6 +166,20 @@ const CustomDot = (props, chartProps) => {
   );
 };
 
+const CustomCircle = (props, chartProps) => {
+  let { cx, cy, height: r, fill } = props;
+  return (
+    <Dot
+      cx={cx}
+      cy={cy}
+      r={r / 2}
+      stroke={"none"}
+      fill={fill}
+      // strokeWidth={r / 2}
+    />
+  );
+};
+
 const drawHeatRect = ({ props, chartProps, h, w }) => {
   let { z, offset } = props.payload;
   let scale = axisScales[chartProps.zScale]();
@@ -547,7 +561,7 @@ const Heatmap = ({
             key={i}
             data={pointData[i]}
             fill={colors[i] || "rgb(102, 102, 102)"}
-            shape={"circle"}
+            shape={(props) => CustomCircle(props, { ...chartProps })}
             zAxisId={1}
             isAnimationActive={false}
             style={{ pointerEvents: "none" }}
@@ -581,6 +595,7 @@ const ReportScatter = ({
   setMessage,
   reportTerm,
   colors,
+  levels,
   minDim,
   setMinDim,
   xOpts,
@@ -669,7 +684,9 @@ const ReportScatter = ({
       legendRows,
       yTranslations,
     } = processLegendData({ bounds, yBounds, width });
-
+    if (cats && cats.length > 1 && levels[cats.length]) {
+      colors = levels[cats.length];
+    }
     chart = (
       <Heatmap
         data={chartData}

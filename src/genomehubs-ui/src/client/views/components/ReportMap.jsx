@@ -171,6 +171,7 @@ const ReportMap = ({
   stacked,
   setMessage,
   colors,
+  levels,
   minDim,
   setMinDim,
   xOpts,
@@ -199,6 +200,9 @@ const ReportMap = ({
     let pointData = map.report.map.map.rawData;
     let markers = [];
     if (bounds.cats) {
+      if (levels[bounds.cats.length]) {
+        colors = levels[bounds.cats.length];
+      }
       bounds.cats.forEach((obj, i) => {
         markers.push(
           <MarkerComponent

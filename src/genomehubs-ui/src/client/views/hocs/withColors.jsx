@@ -1,5 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
+import { getDefaultPalette } from "../reducers/color";
 
 const COLORS = [
   "#1f78b4",
@@ -15,9 +16,9 @@ const COLORS = [
 ];
 
 const withColors = (WrappedComponent) => (props) => {
-  const mapStateToProps = (state) => ({
-    colors: COLORS,
-  });
+  const mapStateToProps = (state) => {
+    return getDefaultPalette(state);
+  };
 
   const Connected = connect(mapStateToProps)(WrappedComponent);
 

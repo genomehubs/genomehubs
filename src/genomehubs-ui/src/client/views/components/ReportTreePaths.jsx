@@ -30,6 +30,7 @@ const ReportTreePaths = ({
   reportTerm,
   setReportTerm,
   colors,
+  levels,
 }) => {
   if (!lines || lines.length == 0) {
     return null;
@@ -365,6 +366,9 @@ const ReportTreePaths = ({
             />
           );
           if (segment.cats) {
+            if (levels[segment.cats.length]) {
+              colors = levels[segment.cats.length];
+            }
             segment.cats.forEach((cat, i) => {
               let xPos = segment.xEnd - charHeight * (i / 2 + 0.5);
               newCats.push(

@@ -401,6 +401,7 @@ const ReportHistogram = ({
   yScale = "linear",
   setMessage,
   colors,
+  levels,
   minDim,
   setMinDim,
   xOpts,
@@ -519,6 +520,9 @@ const ReportHistogram = ({
     }
     const { translations, catTranslations, catOffsets, legendRows } =
       processLegendData({ bounds, width });
+    if (cats && cats.length > 1 && levels[cats.length]) {
+      colors = levels[cats.length];
+    }
     chart = (
       <Histogram
         data={chartData}

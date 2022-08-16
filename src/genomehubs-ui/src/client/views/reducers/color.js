@@ -1,11 +1,29 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
+import { createD3Palette, createPalette } from "./color/createPalette";
 import { createSelector, createSelectorCreator } from "reselect";
+import { interpolateCividis, interpolateViridis } from "d3-scale-chromatic";
 
+import batlow from "./color/batlow";
+import batlowS from "./color/batlowS";
 import immutableUpdate from "immutable-update";
+import paired12 from "./color/paired12";
 import store from "../store";
 
 export const addPalette = createAction("ADD_PALETTE");
 export const editPalette = createAction("EDIT_PALETTE");
+
+const brewerPalette = [
+  "rgb(31,120,180)",
+  "rgb(166,206,227)",
+  "rgb(51,160,44)",
+  "rgb(178,223,138)",
+  "rgb(227,26,28)",
+  "rgb(251,154,153)",
+  "rgb(255,127,0)",
+  "rgb(253,191,111)",
+  "rgb(106,61,154)",
+  "rgb(202,178,214)",
+];
 
 export const palettes = handleActions(
   {
@@ -29,18 +47,11 @@ export const palettes = handleActions(
   },
   {
     byId: {
-      default: [
-        "rgb(166,206,227)",
-        "rgb(31,120,180)",
-        "rgb(178,223,138)",
-        "rgb(51,160,44)",
-        "rgb(251,154,153)",
-        "rgb(227,26,28)",
-        "rgb(253,191,111)",
-        "rgb(255,127,0)",
-        "rgb(202,178,214)",
-        "rgb(106,61,154)",
-      ],
+      //default: createPalette(batlowS),
+      //default: createPalette(batlow, 50),
+      default: { id: "default", default: brewerPalette, levels: [] },
+      //default: createD3Palette(interpolateCividis, 50),
+      //default: createD3Palette(interpolateViridis, 50),
     },
     allIds: ["default"],
   }
@@ -89,8 +100,8 @@ export const getUserPalette = createSelector(getAllPalettes, (palettes) => {
 
 export const getDefaultPalette = createSelector(getAllPalettes, (palettes) => {
   let id = "default";
-  let colors = palettes ? palettes.byId[id] : [];
-  return { id, colors };
+  let levels = palettes ? palettes.byId[id] : {};
+  return { id, colors: levels.default, levels };
 });
 
 /* Coolors Exported Palette - coolors.co/d7cdcc-ffffff-59656f-9c528b-1d1e2c */
