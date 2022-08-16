@@ -374,17 +374,18 @@ body,
       }
 
       .field {
-        border: solid 0.5px rgba(themed("primary"), 0.25);
+        border: solid 0.5px rgba(themed("primary"), 0.8);
         box-sizing: border-box;
         margin: 0.25em;
         cursor: pointer;
 
         &Name {
-          background-color: rgba(themed("primary"), 0.25);
+          background-color: rgba(themed("primary"), 0.8);
           font-size: 0.8em;
           line-height: 1.25em;
           padding: 0.25em;
           text-align: center;
+          color: themed("secondary");
 
           &Highlight {
             background-color: themed("highlight");
@@ -548,7 +549,7 @@ body,
         border-bottom-color: themed("descendant");
       }
       &Low {
-        border-bottom-color: themed("direct");
+        border-bottom-color: themed("ancestral");
       }
     }
 
