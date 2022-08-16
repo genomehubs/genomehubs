@@ -542,13 +542,13 @@ body,
     .underscore {
       border-bottom: solid 0.2em themed("primary");
       &High {
-        border-bottom-color: #33a02c;
+        border-bottom-color: themed("direct");
       }
       &Medium {
-        border-bottom-color: #ff7f00;
+        border-bottom-color: themed("descendant");
       }
       &Low {
-        border-bottom-color: #e31a1c;
+        border-bottom-color: themed("direct");
       }
     }
 

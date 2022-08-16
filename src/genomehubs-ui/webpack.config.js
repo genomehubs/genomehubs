@@ -98,6 +98,11 @@ const config = {
       SUGGESTED_TERM: JSON.stringify(main.suggestedTerm),
       TREE_THRESHOLD: JSON.stringify(main.treeThreshold),
       MAP_THRESHOLD: JSON.stringify(main.mapThreshold),
+      DIRECT_COLOR: JSON.stringify(main.directColor),
+      DESCENDANT_COLOR: JSON.stringify(main.descendantColor),
+      ANCESTRAL_COLOR: JSON.stringify(main.ancestralColor),
+      DIRECT_HIGHLIGHT: JSON.stringify(main.directHighlight),
+      DESCENDANT_HIGHLIGHT: JSON.stringify(main.descendantHighlight),
     }),
     new HtmlWebpackPlugin({
       hash: true,
@@ -206,7 +211,14 @@ const config = {
             },
           },
           "postcss-loader",
-          "sass-loader",
+          {
+            loader: "sass-loader",
+            options: {
+              additionalData: `$directColor: ${main.directColor}; \
+$ancestralColor: ${main.ancestralColor};\
+$descendantColor: ${main.descendantColor};`,
+            },
+          },
         ],
       },
       {

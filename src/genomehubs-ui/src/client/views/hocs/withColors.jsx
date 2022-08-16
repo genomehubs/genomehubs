@@ -1,6 +1,14 @@
+import {
+  ancestralColor,
+  descendantColor,
+  descendantHighlight,
+  directColor,
+  directHighlight,
+  getDefaultPalette,
+} from "../reducers/color";
+
 import React from "react";
 import { connect } from "react-redux";
-import { getDefaultPalette } from "../reducers/color";
 
 const COLORS = [
   "#1f78b4",
@@ -17,7 +25,19 @@ const COLORS = [
 
 const withColors = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => {
-    return getDefaultPalette(state);
+    let { id, colors, levels } = getDefaultPalette(state);
+    return {
+      id,
+      colors,
+      levels,
+      statusColors: {
+        ancestral: ancestralColor,
+        descendant: descendantColor,
+        direct: directColor,
+        descendantHighlight,
+        directHighlight,
+      },
+    };
   };
 
   const Connected = connect(mapStateToProps)(WrappedComponent);

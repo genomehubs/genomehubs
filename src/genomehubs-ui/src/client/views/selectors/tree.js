@@ -1,3 +1,10 @@
+import {
+  ancestralColor,
+  descendantColor,
+  descendantHighlight,
+  directColor,
+  directHighlight,
+} from "../reducers/color";
 import { arc, line as d3line, lineRadial } from "d3-shape";
 import {
   cancelNodesRequest,
@@ -20,6 +27,7 @@ import {
 
 import { apiUrl } from "../reducers/api";
 import axisScales from "../functions/axisScales";
+import { getStatusPalette } from "../reducers/color";
 import qs from "../functions/qs";
 import store from "../store";
 
@@ -137,21 +145,26 @@ const setColor = ({ node, yQuery, recurse }) => {
       min = node.fields[field].min;
       max = node.fields[field].max;
     }
-    color = greys[baseTone + status];
+    // color = greys[baseTone + status];
+    color = ancestralColor;
     highlightColor = greys[baseTone + 1 + status];
 
     if (source == "direct") {
       if (status) {
-        color = greens[baseTone + 2 + status * 2];
-        highlightColor = greens[baseTone + 3 + status * 2];
+        // color = greens[baseTone + 2 + status * 2];
+        // highlightColor = greens[baseTone + 3 + status * 2];
+        color = directColor;
+        highlightColor = directHighlight;
       } else {
         color = greys[baseTone + 1];
         highlightColor = greys[baseTone + 1];
       }
     } else if (source == "descendant") {
       if (status) {
-        color = oranges[baseTone + status * 2];
+        // color = oranges[baseTone + status * 2];
         highlightColor = oranges[baseTone + 2 + status * 2];
+        color = descendantColor;
+        highlightColor = descendantHighlight;
       } else {
         color = greys[baseTone + 1];
         highlightColor = greys[baseTone + 2];

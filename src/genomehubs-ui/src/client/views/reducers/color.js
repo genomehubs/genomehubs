@@ -9,6 +9,12 @@ import immutableUpdate from "immutable-update";
 import paired12 from "./color/paired12";
 import store from "../store";
 
+export const ancestralColor = ANCESTRAL_COLOR || "red";
+export const descendantColor = DESCENDANT_COLOR || "orange";
+export const directColor = DIRECT_COLOR || "green";
+export const descendantHighlight = DESCENDANT_HIGHLIGHT || "orange";
+export const directHighlight = DIRECT_HIGHLIGHT || "green";
+
 export const addPalette = createAction("ADD_PALETTE");
 export const editPalette = createAction("EDIT_PALETTE");
 
@@ -49,9 +55,9 @@ export const palettes = handleActions(
     byId: {
       //default: createPalette(batlowS),
       //default: createPalette(batlow, 50),
-      default: { id: "default", default: brewerPalette, levels: [] },
+      //default: { id: "default", default: brewerPalette, levels: [] },
       //default: createD3Palette(interpolateCividis, 50),
-      //default: createD3Palette(interpolateViridis, 50),
+      default: createD3Palette(interpolateViridis, 50),
     },
     allIds: ["default"],
   }
