@@ -596,19 +596,19 @@ body,
             position: absolute;
             background-color: rgba(themed("primary"), 0.25);
             &High {
-              background-color: #33a02c;
+              background-color: themed("direct");
             }
           }
           .one,
           .two {
             &Medium {
-              background-color: #ff7f00;
+              background-color: themed("descendant");
             }
           }
           .one {
             bottom: 0;
             &Low {
-              background-color: #e31a1c;
+              background-color: themed("ancestral");
             }
           }
           .two {
@@ -660,6 +660,10 @@ body,
 
       .padded {
         margin-bottom: 4em;
+      }
+
+      .paragraph {
+        padding: 1em;
       }
 
       .reportHeading,
@@ -725,13 +729,13 @@ body,
       }
 
       .direct {
-        border-bottom: solid 0.2em #33a02c;
+        border-bottom: solid 0.2em themed("direct");
       }
       .descendant {
-        border-bottom: solid 0.2em #ff7f00;
+        border-bottom: solid 0.2em themed("descendant");
       }
       .ancestor {
-        border-bottom: solid 0.2em #e31a1c;
+        border-bottom: solid 0.2em themed("ancestral");
       }
 
       .square::before {

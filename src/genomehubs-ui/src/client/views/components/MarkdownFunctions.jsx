@@ -1,6 +1,7 @@
 import { Link, useLocation } from "@reach/router";
 import React, { Fragment, createElement, useEffect, useState } from "react";
 
+import AggregationIcon from "./AggregationIcon";
 import Grid from "@material-ui/core/Grid";
 import Highlight from "./Highlight";
 import MarkdownInclude from "./MarkdownInclude";
@@ -63,6 +64,7 @@ export const processProps = (props, newProps = {}) => {
 
 export const RehypeComponentsList = {
   a: (props) => <NavLink {...processProps(props)} />,
+  aggregation: (props) => <AggregationIcon method={props.method} />,
   grid: (props) => {
     let { toggle, expand, title, ...gridProps } = props;
     if (toggle && toggle !== true && toggle !== "true") {
