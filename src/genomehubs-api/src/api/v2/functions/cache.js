@@ -30,7 +30,7 @@ export const cacheStore = async (req, obj) => {
       const key = sortUrl(req.url);
       const value = JSON.stringify(obj);
       if (value.length <= 1024 * 1024 * 32) {
-        mc.set(key, JSON.stringify(obj));
+        await mc.set(key, JSON.stringify(obj));
       }
       return true;
     } catch {
