@@ -1,7 +1,22 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 import { createD3Palette, createPalette } from "./color/createPalette";
 import { createSelector, createSelectorCreator } from "reselect";
-import { interpolateCividis, interpolateViridis } from "d3-scale-chromatic";
+import {
+  interpolateCividis,
+  interpolateCool,
+  interpolateCubehelixDefault,
+  interpolateInferno,
+  interpolateMagma,
+  interpolatePlasma,
+  interpolateTurbo,
+  interpolateViridis,
+  interpolateWarm,
+  schemeAccent,
+  schemeCategory10,
+  schemeDark2,
+  schemePaired,
+  schemeTableau10,
+} from "d3-scale-chromatic";
 
 import batlow from "./color/batlow";
 import batlowS from "./color/batlowS";
@@ -53,13 +68,26 @@ export const palettes = handleActions(
   },
   {
     byId: {
-      //default: createPalette(batlowS),
-      //default: createPalette(batlow, 50),
-      //default: { id: "default", default: brewerPalette, levels: [] },
-      //default: createD3Palette(interpolateCividis, 50),
+      batlowS: createPalette(batlowS),
+      batlow: createPalette(batlow, 50),
+      cividis: createD3Palette(interpolateCividis, 50),
+      cubeHelix: createD3Palette(interpolateCubehelixDefault, 50),
+      cool: createD3Palette(interpolateCool, 50),
+      warm: createD3Palette(interpolateWarm, 50),
+      plasma: createD3Palette(interpolatePlasma, 50),
+      magma: createD3Palette(interpolateMagma, 50),
+      inferno: createD3Palette(interpolateInferno, 50),
+      turbo: createD3Palette(interpolateTurbo, 50),
+      viridis: createD3Palette(interpolateViridis, 50),
+      standard: { id: "default", default: brewerPalette, levels: [] },
+      paired: createD3Palette(schemePaired, 12),
+      category: createD3Palette(schemeCategory10, 10),
+      dark: createD3Palette(schemeDark2, 8),
+      accent: createD3Palette(schemeAccent, 8),
+      tableau: createD3Palette(schemeTableau10, 10),
       default: createD3Palette(interpolateViridis, 50),
     },
-    allIds: ["default"],
+    allIds: ["default", "batlow", "batlowS", "cividis", "paired", "viridis"],
   }
 );
 
@@ -104,11 +132,14 @@ export const getUserPalette = createSelector(getAllPalettes, (palettes) => {
   return { id, colors };
 });
 
-export const getDefaultPalette = createSelector(getAllPalettes, (palettes) => {
-  let id = "default";
-  let levels = palettes ? palettes.byId[id] : {};
-  return { id, colors: levels.default, levels };
-});
+export const getDefaultPalette = createSelector(
+  getSelectedPalette,
+  getAllPalettes,
+  (id, palettes) => {
+    let levels = palettes ? palettes.byId[id] : {};
+    return { id, colors: levels.default, levels };
+  }
+);
 
 /* Coolors Exported Palette - coolors.co/d7cdcc-ffffff-59656f-9c528b-1d1e2c */
 /* RGB */

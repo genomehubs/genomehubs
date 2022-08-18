@@ -12,7 +12,11 @@ export const createD3Palette = (interpolateFunc, n) => {
   for (let iter = 1; iter <= n; iter++) {
     let palette = [];
     for (let i = 0; i < iter; i++) {
-      palette.push(interpolateFunc(i / iter));
+      palette.push(
+        Array.isArray(interpolateFunc)
+          ? interpolateFunc[i]
+          : interpolateFunc(i / iter)
+      );
     }
     levels[iter] = palette;
     if (iter == n) {
@@ -54,7 +58,6 @@ export const createPalette = (raw, n) => {
       levels.default = palette;
     }
   }
-  console.log(levels);
   return levels;
 };
 
