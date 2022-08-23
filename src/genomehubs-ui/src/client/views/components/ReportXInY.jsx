@@ -57,7 +57,7 @@ const PieComponent = ({ data, height, width, colors }) => {
           fill={"#3d405c"}
           className="recharts-text recharts-label"
           textAnchor="middle"
-          dominantBaseline="central"
+          alignmentBaseline="central"
           fontSize={innerRadius / 2.5}
         >
           {value1}
@@ -139,7 +139,7 @@ const RadialBarComponent = ({ data, height, width }) => {
             y={cy - viewBox.innerRadius - fontSize + 2}
             textAnchor="middle"
             dominantBaseline="middle"
-            alignmentBaseline="middle"
+            alignmentBaseline="central"
           >
             {pct1(value)}
           </text>
