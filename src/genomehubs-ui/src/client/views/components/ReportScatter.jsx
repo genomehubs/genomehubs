@@ -168,11 +168,12 @@ const CustomDot = (props, chartProps) => {
 
 const CustomCircle = (props, chartProps) => {
   let { cx, cy, height: r, fill } = props;
+  let { pointSize } = chartProps;
   return (
     <Dot
       cx={cx}
       cy={cy}
-      r={r / 2}
+      r={pointSize / 2}
       stroke={"none"}
       fill={fill}
       // strokeWidth={r / 2}
@@ -334,7 +335,7 @@ const HighlightShape = (props, chartProps) => {
   );
 };
 
-const CustomizedYAxisTick = (props, buckets, fmt, translations) => {
+const CustomizedYAxisTick = (props, buckets, fmt, translations, pointSize) => {
   const { x, y, fill, index, height, payload } = props;
   let value = payload.value;
   let offset = 0;
@@ -352,6 +353,7 @@ const CustomizedYAxisTick = (props, buckets, fmt, translations) => {
         dy={5}
         textAnchor="end"
         fill={fill}
+        fontSize={pointSize}
         // transform={"rotate(-90)"}
       >
         {translations[value] || value}
@@ -360,7 +362,7 @@ const CustomizedYAxisTick = (props, buckets, fmt, translations) => {
   );
 };
 
-const CustomizedXAxisTick = (props, buckets, fmt, translations) => {
+const CustomizedXAxisTick = (props, buckets, fmt, translations, pointSize) => {
   const { x, y, fill, index, width, payload } = props;
   let value = payload.value;
   let yPos = y;
@@ -437,7 +439,8 @@ const Heatmap = ({
           props,
           buckets,
           chartProps.xFormat,
-          chartProps.translations
+          chartProps.translations,
+          chartProps.pointSize
         )
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
@@ -462,7 +465,8 @@ const Heatmap = ({
           props,
           yBuckets,
           chartProps.yFormat,
-          chartProps.yTranslations
+          chartProps.yTranslations,
+          chartProps.pointSize
         )
       }
       domain={
@@ -603,6 +607,7 @@ const ReportScatter = ({
   stacked,
   highlightArea,
   basename,
+  pointSize = 20,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -711,6 +716,7 @@ const ReportScatter = ({
           n: cats.length,
           zScale: zScale,
           catSums,
+          pointSize,
           xQuery: scatter.report.xQuery,
           yQuery: scatter.report.yQuery,
           xLabel: scatter.report.xLabel,
