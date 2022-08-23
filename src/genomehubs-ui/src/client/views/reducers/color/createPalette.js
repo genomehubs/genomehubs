@@ -15,7 +15,7 @@ export const createD3Palette = (interpolateFunc, n) => {
       palette.push(
         Array.isArray(interpolateFunc)
           ? interpolateFunc[i]
-          : interpolateFunc(i / iter)
+          : interpolateFunc(i / (iter > 4 ? iter - 1 : iter))
       );
     }
     levels[iter] = palette;
