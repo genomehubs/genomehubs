@@ -520,13 +520,22 @@ const Heatmap = ({
       );
     }
   }
+  let marginTop = 5;
+  if (legendRows) {
+    if (chartProps.compactLegend) {
+      marginTop += legendRows * (chartProps.pointSize + 10);
+    } else {
+      marginTop += legendRows * (2 * chartProps.pointSize + 15);
+    }
+  }
+
   return (
     <ScatterChart
       width={width}
       height={height}
       data={data}
       margin={{
-        top: legendRows ? legendRows * (2 * chartProps.pointSize + 15) + 5 : 5,
+        top: marginTop,
         right: marginRight,
         left: marginWidth,
         bottom: width > 300 ? marginHeight : 5,
@@ -672,6 +681,7 @@ const ReportScatter = ({
       valueType,
       interval
     );
+    let compactLegend = typeof embedded === "undefined";
 
     const {
       translations,
@@ -679,7 +689,13 @@ const ReportScatter = ({
       catOffsets,
       legendRows,
       yTranslations,
-    } = processLegendData({ bounds, yBounds, width, pointSize });
+    } = processLegendData({
+      bounds,
+      yBounds,
+      minWidth: compactLegend ? 50 : 150,
+      width,
+      pointSize,
+    });
     if (cats && cats.length > 1 && levels[cats.length]) {
       colors = levels[cats.length];
     }
@@ -762,6 +778,7 @@ const ReportScatter = ({
           navigate,
           location,
           basename,
+          compactLegend,
         }}
       />
     );

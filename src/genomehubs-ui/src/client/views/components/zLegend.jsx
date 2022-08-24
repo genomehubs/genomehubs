@@ -11,6 +11,7 @@ export const zLegend = ({ props, chartProps }) => {
     pointSize,
     catTranslations = {},
     catOffsets = {},
+    compactLegend,
   } = chartProps;
   let legendWidth = name.length * 10 + 15;
   legendWidth = Math.max(legendWidth, 50);
@@ -31,6 +32,7 @@ export const zLegend = ({ props, chartProps }) => {
       offset,
       row,
       pointSize,
+      compactLegend,
     });
   } else {
     return MultiCatLegend({
@@ -46,6 +48,7 @@ export const zLegend = ({ props, chartProps }) => {
       offset,
       row,
       pointSize,
+      compactLegend,
     });
   }
 };

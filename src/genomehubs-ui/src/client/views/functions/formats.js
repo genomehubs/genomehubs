@@ -44,10 +44,11 @@ const timeFormats = {
   hour: formatHour,
   day: formatDay,
   week: formatWeek,
-  month: (date) =>
-    formatMonthDecimal(date) == "01"
-      ? formatMonthYear(date)
-      : formatMonth(date),
+  month: formatMonth,
+  // month: (date) =>
+  //   formatMonthDecimal(date) == "01"
+  //     ? formatMonthYear(date)
+  //     : formatMonth(date),
   year: formatYear,
 };
 

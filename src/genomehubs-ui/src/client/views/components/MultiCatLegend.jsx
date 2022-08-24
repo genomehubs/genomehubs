@@ -4,7 +4,13 @@ import React from "react";
 import formats from "../functions/formats";
 import stringLength from "../functions/stringLength";
 
-export const processLegendData = ({ bounds, yBounds, width, pointSize }) => {
+export const processLegendData = ({
+  bounds,
+  yBounds,
+  minWidth = 50,
+  width,
+  pointSize,
+}) => {
   let translations = {};
   let catTranslations = {};
   let catOffsets = {};
@@ -25,11 +31,13 @@ export const processLegendData = ({ bounds, yBounds, width, pointSize }) => {
     let catOffset = 0;
     let len = bounds.cats.length;
     let row = 1;
-    let minWidth = 100;
     let previousCats = [];
     for (let i = 0; i < len; i++) {
       let cat = bounds.cats[i];
-      let labelWidth = Math.max(stringLength(cat.label) * pointSize, minWidth);
+      let labelWidth = Math.max(
+        stringLength(cat.label) * pointSize * 1.1,
+        minWidth
+      );
       if (labelWidth + catOffset < width - 10) {
         catOffsets[cat.label] = { offset: 0, row };
         for (let prevCat of previousCats) {
@@ -127,6 +135,7 @@ const MultiCatLegend = ({
   offset,
   row,
   pointSize,
+  compactLegend,
 }) => {
   let cellSize = pointSize + 5;
   let xPos;
@@ -152,13 +161,16 @@ const MultiCatLegend = ({
     xPos = x + width - legendWidth * (row - i);
   }
 
-  let { value } = valueString({ stats, cellSize, pointSize, fill });
+  let value;
+  if (!compactLegend) {
+    ({ value } = valueString({ stats, cellSize, pointSize, fill }));
+  }
 
   let text = (
     <g
       key={`cell-${i}`}
       transform={`translate(${-cellSize / 2},${
-        cellSize / 2 + (j - 1) * (2 * cellSize + 5)
+        cellSize / 2 + (j - 1) * ((compactLegend ? 1 : 2) * cellSize + 5)
       })`}
     >
       <Text
@@ -175,7 +187,7 @@ const MultiCatLegend = ({
       {value}
       <Rectangle
         key={`cell-${i}`}
-        height={cellSize * 2}
+        height={cellSize * (compactLegend ? 1 : 2)}
         width={cellSize / 2}
         fill={fill || "rgb(102, 102, 102)"}
         x={0} // {props.cx + (w - width) / 2}

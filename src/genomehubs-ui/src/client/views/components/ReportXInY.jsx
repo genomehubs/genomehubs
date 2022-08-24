@@ -126,7 +126,13 @@ const PieComponent = ({ data, height, width, colors }) => {
   );
 };
 
-const RadialBarComponent = ({ data, height, width, pointSize }) => {
+const RadialBarComponent = ({
+  data,
+  height,
+  width,
+  pointSize,
+  compactLegend,
+}) => {
   const renderRadialBarLabel = (props) => {
     const {
       cx,
@@ -163,7 +169,7 @@ const RadialBarComponent = ({ data, height, width, pointSize }) => {
             {pct1(value)}
           </text>
         </g>
-        <g transform={`translate(0,${cy + fontSize})`}>
+        <g transform={`translate(0,${cy + 5})`}>
           {MultiCatLegend({
             width: width * 0.96,
             x: 0,
@@ -176,6 +182,7 @@ const RadialBarComponent = ({ data, height, width, pointSize }) => {
             pointSize,
             offset: catOffsets[catTranslations[data.name]].offset,
             row: catOffsets[catTranslations[data.name]].row,
+            compactLegend,
           })}
         </g>
       </g>
@@ -189,10 +196,10 @@ const RadialBarComponent = ({ data, height, width, pointSize }) => {
     });
     let nameLen = stringLength(name);
     let strLen = stringLength(string);
-    if (strLen > nameLen) {
-      bounds.cats.unshift({ key: name, label: string });
-    } else {
+    if (compactLegend || strLen < nameLen) {
       bounds.cats.unshift({ key: name, label: name });
+    } else {
+      bounds.cats.unshift({ key: name, label: string });
     }
   }
   const { catOffsets, catTranslations, legendRows } = processLegendData({
@@ -200,15 +207,20 @@ const RadialBarComponent = ({ data, height, width, pointSize }) => {
     width,
     pointSize,
   });
-  let innerRadius = Math.floor(width * 0.1);
-  let outerRadius = Math.floor(width * 0.5);
+  let plotHeight = height - 5 - legendRows * (2 * pointSize + 15);
+  if (compactLegend) {
+    plotHeight = height - 5 - legendRows * (pointSize + 10);
+  }
+  let plotWidth = Math.min(width, 2 * plotHeight);
+  let innerRadius = Math.floor(plotWidth * 0.1);
+  let outerRadius = Math.floor(plotWidth * 0.5);
   let background = "#cccccc";
   return (
     <RadialBarChart
       width={width}
       height={height}
       cx="50%"
-      cy="60%"
+      cy={plotHeight}
       innerRadius={innerRadius}
       outerRadius={outerRadius}
       startAngle={180}
@@ -250,13 +262,13 @@ const ReportXInY = ({
   colors,
   levels,
   minDim,
+  embedded,
   pointSize = 15,
 }) => {
   const componentRef = chartRef ? chartRef : useRef();
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
-
   if (xInY && xInY.status) {
     let chartData = [];
     let chart;
@@ -277,12 +289,14 @@ const ReportXInY = ({
       });
       chartData = chartData.reverse();
       // TODO: set legend item widths dynamically
+      let compactLegend = typeof embedded === "undefined";
       chart = (
         <RadialBarComponent
           data={chartData}
-          width={minDim}
+          width={compactLegend ? minDim : width}
           height={minDim - 50}
           pointSize={pointSize}
+          compactLegend={compactLegend}
         />
       );
     } else {

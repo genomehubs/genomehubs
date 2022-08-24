@@ -290,6 +290,15 @@ const Histogram = ({
     </YAxis>,
   ];
 
+  let marginTop = 5;
+  if (legendRows) {
+    if (chartProps.compactLegend) {
+      marginTop += legendRows * (chartProps.pointSize + 10);
+    } else {
+      marginTop += legendRows * (2 * chartProps.pointSize + 15);
+    }
+  }
+
   return (
     <BarChart
       width={width}
@@ -304,7 +313,7 @@ const Histogram = ({
       //   bottom: width > 300 ? 25 : 5,
       // }}
       margin={{
-        top: legendRows ? legendRows * (2 * chartProps.pointSize + 15) + 5 : 5,
+        top: marginTop,
         right: marginRight,
         left: marginWidth,
         bottom: width > 300 ? marginHeight : 5,
@@ -485,8 +494,14 @@ const ReportHistogram = ({
         }
       });
     }
+    let compactLegend = typeof embedded === "undefined";
     const { translations, catTranslations, catOffsets, legendRows } =
-      processLegendData({ bounds, width, pointSize });
+      processLegendData({
+        bounds,
+        minWidth: compactLegend ? 50 : 150,
+        width,
+        pointSize,
+      });
     if (cats && cats.length > 1 && levels[cats.length]) {
       colors = levels[cats.length];
     }
@@ -552,6 +567,7 @@ const ReportHistogram = ({
           navigate,
           location,
           basename,
+          compactLegend,
         }}
       />
     );
