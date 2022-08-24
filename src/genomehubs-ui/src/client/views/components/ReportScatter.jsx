@@ -14,10 +14,12 @@ import {
 } from "recharts";
 import React, { useEffect, useRef, useState } from "react";
 import formats, { setInterval } from "../functions/formats";
+import stringLength, { maxStringLength } from "../functions/stringLength";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
 import Grid from "@material-ui/core/Grid";
+import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "@material-ui/core/Tooltip";
 import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
@@ -168,11 +170,12 @@ const CustomDot = (props, chartProps) => {
 
 const CustomCircle = (props, chartProps) => {
   let { cx, cy, height: r, fill } = props;
+  let { pointSize } = chartProps;
   return (
     <Dot
       cx={cx}
       cy={cy}
-      r={r / 2}
+      r={pointSize / 2}
       stroke={"none"}
       fill={fill}
       // strokeWidth={r / 2}
@@ -314,7 +317,13 @@ const HighlightShape = (props, chartProps) => {
   let color = "black";
   if (label) {
     text = (
-      <Text x={cx + width - 4} y={cy - 6} fill={color} textAnchor={"end"}>
+      <Text
+        x={cx + width - 4}
+        y={cy - 6}
+        fill={color}
+        textAnchor={"end"}
+        fontSize={chartProps.pointSize}
+      >
         {label}
       </Text>
     );
@@ -329,12 +338,13 @@ const HighlightShape = (props, chartProps) => {
         y={props.cy}
         fill={"none"}
         stroke={color}
+        strokeWidth={chartProps.pointSize / 10}
       />
     </>
   );
 };
 
-const CustomizedYAxisTick = (props, buckets, fmt, translations) => {
+const CustomizedYAxisTick = (props, buckets, fmt, translations, pointSize) => {
   const { x, y, fill, index, height, payload } = props;
   let value = payload.value;
   let offset = 0;
@@ -351,39 +361,11 @@ const CustomizedYAxisTick = (props, buckets, fmt, translations) => {
         y={0}
         dy={5}
         textAnchor="end"
+        dominantBaseline={"middle"}
         fill={fill}
+        fontSize={pointSize}
         // transform={"rotate(-90)"}
       >
-        {translations[value] || value}
-      </text>
-    </g>
-  );
-};
-
-const CustomizedXAxisTick = (props, buckets, fmt, translations) => {
-  const { x, y, fill, index, width, payload } = props;
-  let value = payload.value;
-  let yPos = y;
-  let offset = 0;
-  let bucketWidth = width / (buckets.length - 1);
-  if (buckets[index] != payload.value) {
-    value = buckets[index] || "";
-    offset = bucketWidth / 2;
-    if (index % 2 == 1 && value.length * 8 > bucketWidth) {
-      yPos += 12;
-    }
-  } else {
-    value = fmt(value);
-    if (index % 2 == 1 && value.length * 8 > bucketWidth) {
-      return null;
-    }
-    if (index % 4 != 0 && value.length * 8 > bucketWidth * 2) {
-      return null;
-    }
-  }
-  return (
-    <g transform={`translate(${x + offset},${yPos})`}>
-      <text x={0} y={0} dy={10} textAnchor="middle" fill={fill}>
         {translations[value] || value}
       </text>
     </g>
@@ -394,6 +376,9 @@ const Heatmap = ({
   data,
   pointData,
   width,
+  marginWidth,
+  marginHeight,
+  marginRight,
   height,
   cats,
   buckets,
@@ -433,11 +418,13 @@ const Heatmap = ({
       }
       ticks={isNaN(buckets[0]) ? buckets.map((x, i) => i) : buckets}
       tick={(props) =>
-        CustomizedXAxisTick(
+        ReportXAxisTick(
           props,
           buckets,
           chartProps.xFormat,
-          chartProps.translations
+          chartProps.translations,
+          chartProps.pointSize,
+          chartProps.orientation
         )
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
@@ -446,9 +433,14 @@ const Heatmap = ({
     >
       <Label
         value={xLabel}
-        offset={buckets.length > 15 ? 20 : 0}
+        // offset={buckets.length > 15 ? chartProps.pointSize + 10 : 10}
+        offset={marginHeight - chartProps.pointSize}
+        dy={0}
         position="bottom"
+        dominantBaseline={"text-after-edge"}
         fill="#666"
+        fontSize={chartProps.pointSize}
+        fontWeight="bold"
       />
     </XAxis>,
     <YAxis
@@ -462,7 +454,8 @@ const Heatmap = ({
           props,
           yBuckets,
           chartProps.yFormat,
-          chartProps.yTranslations
+          chartProps.yTranslations,
+          chartProps.pointSize
         )
       }
       domain={
@@ -482,11 +475,13 @@ const Heatmap = ({
     >
       <Label
         value={yLabel}
-        offset={0}
-        position="left"
+        offset={marginWidth + 60 - chartProps.pointSize}
+        position="insideRight"
         fill="#666"
         angle={-90}
         style={{ textAnchor: "middle" }}
+        fontSize={chartProps.pointSize}
+        fontWeight="bold"
       />
     </YAxis>,
     <ZAxis
@@ -525,16 +520,25 @@ const Heatmap = ({
       );
     }
   }
+  let marginTop = 5;
+  if (legendRows) {
+    if (chartProps.compactLegend) {
+      marginTop += legendRows * (chartProps.pointSize + 10);
+    } else {
+      marginTop += legendRows * (2 * chartProps.pointSize + 15);
+    }
+  }
+
   return (
     <ScatterChart
       width={width}
       height={height}
       data={data}
       margin={{
-        top: legendRows ? legendRows * 35 + 5 : 5,
-        right: 30,
-        left: 20,
-        bottom: width > 300 ? (buckets.length > 15 ? 35 : 25) : 5,
+        top: marginTop,
+        right: marginRight,
+        left: marginWidth,
+        bottom: width > 300 ? marginHeight : 5,
       }}
     >
       {/* {patterns} */}
@@ -603,6 +607,7 @@ const ReportScatter = ({
   stacked,
   highlightArea,
   basename,
+  pointSize = 15,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -676,6 +681,7 @@ const ReportScatter = ({
       valueType,
       interval
     );
+    let compactLegend = typeof embedded === "undefined";
 
     const {
       translations,
@@ -683,9 +689,33 @@ const ReportScatter = ({
       catOffsets,
       legendRows,
       yTranslations,
-    } = processLegendData({ bounds, yBounds, width });
+    } = processLegendData({
+      bounds,
+      yBounds,
+      minWidth: compactLegend ? 50 : 150,
+      width,
+      pointSize,
+    });
     if (cats && cats.length > 1 && levels[cats.length]) {
       colors = levels[cats.length];
+    }
+    const xFormat = (value) => formats(value, valueType, interval);
+    const yFormat = (value) => formats(value, yValueType, yInterval);
+
+    const maxYLabel = maxStringLength(heatmaps.yBuckets, yFormat, pointSize);
+    const marginWidth =
+      maxYLabel + pointSize > 60 ? maxYLabel + pointSize - 60 : 0;
+    const maxXLabel = maxStringLength(heatmaps.buckets, xFormat, pointSize);
+    let marginHeight = 2 * pointSize;
+    const marginRight = (stringLength(xFormat(endLabel)) * pointSize) / 2;
+    let orientation = 0;
+    if (
+      maxXLabel >
+      (width - marginWidth - marginRight) / heatmaps.buckets.length
+    ) {
+      orientation = -90;
+      marginHeight =
+        maxXLabel + pointSize > 20 ? maxXLabel + pointSize - 20 : 0;
     }
     chart = (
       <Heatmap
@@ -693,6 +723,9 @@ const ReportScatter = ({
         pointData={1 ? pointData : []}
         width={width}
         height={minDim - 50}
+        marginWidth={marginWidth}
+        marginHeight={marginHeight}
+        marginRight={marginRight}
         buckets={heatmaps.buckets}
         yBuckets={heatmaps.yBuckets}
         cats={cats}
@@ -711,6 +744,7 @@ const ReportScatter = ({
           n: cats.length,
           zScale: zScale,
           catSums,
+          pointSize,
           xQuery: scatter.report.xQuery,
           yQuery: scatter.report.yQuery,
           xLabel: scatter.report.xLabel,
@@ -725,8 +759,9 @@ const ReportScatter = ({
               ? true
               : false
             : true,
-          xFormat: (value) => formats(value, valueType, interval),
-          yFormat: (value) => formats(value, yValueType, yInterval),
+          xFormat,
+          yFormat,
+          orientation,
           fields: heatmaps.fields,
           ranks: heatmaps.ranks,
           bounds,
@@ -743,6 +778,7 @@ const ReportScatter = ({
           navigate,
           location,
           basename,
+          compactLegend,
         }}
       />
     );

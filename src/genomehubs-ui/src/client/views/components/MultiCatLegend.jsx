@@ -2,12 +2,19 @@ import { Rectangle, Text } from "recharts";
 
 import React from "react";
 import formats from "../functions/formats";
+import stringLength from "../functions/stringLength";
 
-export const processLegendData = ({ bounds, yBounds, width }) => {
+export const processLegendData = ({
+  bounds,
+  yBounds,
+  minWidth = 50,
+  width,
+  pointSize,
+}) => {
   let translations = {};
   let catTranslations = {};
   let catOffsets = {};
-  let legendRows = 0;
+  let legendRows = 1;
   let yTranslations = {};
 
   if (bounds?.stats?.cats) {
@@ -24,13 +31,14 @@ export const processLegendData = ({ bounds, yBounds, width }) => {
     let catOffset = 0;
     let len = bounds.cats.length;
     let row = 1;
-    let charWidth = 8;
-    let minWidth = 150;
     let previousCats = [];
     for (let i = 0; i < len; i++) {
       let cat = bounds.cats[i];
-      let labelWidth = Math.max((cat.label.length + 2) * charWidth, minWidth);
-      if (labelWidth + catOffset < width - 50) {
+      let labelWidth = Math.max(
+        stringLength(cat.label) * pointSize * 1.1,
+        minWidth
+      );
+      if (labelWidth + catOffset < width - 10) {
         catOffsets[cat.label] = { offset: 0, row };
         for (let prevCat of previousCats) {
           catOffsets[prevCat].offset += labelWidth;
@@ -65,6 +73,56 @@ export const processLegendData = ({ bounds, yBounds, width }) => {
   };
 };
 
+export const valueString = ({ stats, cellSize, pointSize, fill }) => {
+  let value, string;
+  if (stats) {
+    if (stats.sum) {
+      string = `n=${formats(stats.sum, "integer")}${
+        stats.sum > 0 && stats.max > stats.min
+          ? ` [${formats(stats.min, "integer")}-${formats(
+              stats.max,
+              "integer"
+            )}]`
+          : ""
+      }`;
+      value = (
+        <Text
+          x={-5}
+          y={cellSize}
+          fill={"rgb(102, 102, 102)"}
+          dominantBaseline={"central"}
+          textAnchor={"end"}
+          fontSize={pointSize}
+        >
+          {string}
+        </Text>
+      );
+    } else if (stats.count) {
+      let num = formats(stats.count, "integer");
+      let denom = formats(stats.total, "integer");
+      string = num;
+      if (denom) {
+        string += ` / ${denom}`;
+      }
+      value = (
+        <text
+          x={-5}
+          y={cellSize}
+          fill={"rgb(102, 102, 102)"}
+          dominantBaseline={"central"}
+          textAnchor={"end"}
+          fontSize={pointSize}
+        >
+          {/* <tspan>{"n="}</tspan> */}
+          <tspan fill={fill}>{num}</tspan>
+          {stats.total && <tspan>{` / ${denom}`}</tspan>}
+        </text>
+      );
+    }
+  }
+  return { value, string };
+};
+
 const MultiCatLegend = ({
   width,
   x,
@@ -76,8 +134,10 @@ const MultiCatLegend = ({
   legendWidth = 150,
   offset,
   row,
+  pointSize,
+  compactLegend,
 }) => {
-  let cellSize = 15;
+  let cellSize = pointSize + 5;
   let xPos;
   let j = 1;
   if (offset || offset === 0) {
@@ -102,50 +162,15 @@ const MultiCatLegend = ({
   }
 
   let value;
-  if (stats) {
-    if (stats.sum) {
-      value = (
-        <Text
-          x={-5}
-          y={cellSize}
-          fill={"rgb(102, 102, 102)"}
-          dominantBaseline={"central"}
-          textAnchor={"end"}
-        >
-          {`n=${formats(stats.sum, "integer")}${
-            stats.sum > 0 && stats.max > stats.min
-              ? ` [${formats(stats.min, "integer")}-${formats(
-                  stats.max,
-                  "integer"
-                )}]`
-              : ""
-          }`}
-        </Text>
-      );
-    } else if (stats.count) {
-      value = (
-        <text
-          x={-5}
-          y={cellSize}
-          fill={"rgb(102, 102, 102)"}
-          dominantBaseline={"central"}
-          textAnchor={"end"}
-        >
-          {/* <tspan>{"n="}</tspan> */}
-          <tspan fill={fill}>{formats(stats.count, "integer")}</tspan>
-          {stats.total && (
-            <tspan>{` / ${formats(stats.total, "integer")}`}</tspan>
-          )}
-        </text>
-      );
-    }
+  if (!compactLegend) {
+    ({ value } = valueString({ stats, cellSize, pointSize, fill }));
   }
 
   let text = (
     <g
       key={`cell-${i}`}
       transform={`translate(${-cellSize / 2},${
-        cellSize / 2 + (j - 1) * (2 * cellSize + 5)
+        cellSize / 2 + (j - 1) * ((compactLegend ? 1 : 2) * cellSize + 5)
       })`}
     >
       <Text
@@ -155,13 +180,14 @@ const MultiCatLegend = ({
         dominantBaseline={"central"}
         textAnchor={"end"}
         fontWeight={"bold"}
+        fontSize={pointSize}
       >
         {name}
       </Text>
       {value}
       <Rectangle
         key={`cell-${i}`}
-        height={cellSize * 2}
+        height={cellSize * (compactLegend ? 1 : 2)}
         width={cellSize / 2}
         fill={fill || "rgb(102, 102, 102)"}
         x={0} // {props.cx + (w - width) / 2}

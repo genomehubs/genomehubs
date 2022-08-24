@@ -177,6 +177,7 @@ const HistogramSVG = ({
         fill={"currentColor"}
         textAnchor={"middle"}
         alignmentBaseline={"hanging"}
+        dominantBaseline={"hanging"}
         opacity={0.75}
       >
         {tick.value}
