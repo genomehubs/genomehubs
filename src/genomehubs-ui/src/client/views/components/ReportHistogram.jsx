@@ -520,7 +520,7 @@ const ReportHistogram = ({
     ) {
       orientation = -90;
       marginHeight =
-        maxXLabel + pointSize > 40 ? maxXLabel + pointSize - 40 : 0;
+        maxXLabel + pointSize > 20 ? maxXLabel + pointSize - 20 : 0;
     }
     chart = (
       <Histogram

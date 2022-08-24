@@ -691,18 +691,18 @@ body,
         top: 15%;
         height: 70%;
         border-right: 0.2em solid
-          mix(themed("primary"), themed("secondary"), 50%);
+          mix(themed("primary"), themed("secondary"), 10%);
       }
 
-      .reportContainer:before {
-        content: "";
-        position: absolute;
-        bottom: 2px;
-        left: 15%;
-        width: 70%;
-        border-bottom: 0.2em solid
-          mix(themed("primary"), themed("secondary"), 50%);
-      }
+      // .reportContainer:before {
+      //   content: "";
+      //   position: absolute;
+      //   bottom: 2px;
+      //   left: 15%;
+      //   width: 70%;
+      //   border-bottom: 0.2em solid
+      //     mix(themed("primary"), themed("secondary"), 50%);
+      // }
 
       .centerContent {
         position: relative;
