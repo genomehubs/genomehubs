@@ -315,7 +315,13 @@ const HighlightShape = (props, chartProps) => {
   let color = "black";
   if (label) {
     text = (
-      <Text x={cx + width - 4} y={cy - 6} fill={color} textAnchor={"end"}>
+      <Text
+        x={cx + width - 4}
+        y={cy - 6}
+        fill={color}
+        textAnchor={"end"}
+        fontSize={chartProps.pointSize}
+      >
         {label}
       </Text>
     );
@@ -330,6 +336,7 @@ const HighlightShape = (props, chartProps) => {
         y={props.cy}
         fill={"none"}
         stroke={color}
+        strokeWidth={chartProps.pointSize / 10}
       />
     </>
   );
@@ -352,6 +359,7 @@ const CustomizedYAxisTick = (props, buckets, fmt, translations, pointSize) => {
         y={0}
         dy={5}
         textAnchor="end"
+        dominantBaseline={"middle"}
         fill={fill}
         fontSize={pointSize}
         // transform={"rotate(-90)"}
@@ -362,7 +370,14 @@ const CustomizedYAxisTick = (props, buckets, fmt, translations, pointSize) => {
   );
 };
 
-const CustomizedXAxisTick = (props, buckets, fmt, translations, pointSize) => {
+const CustomizedXAxisTick = (
+  props,
+  buckets,
+  fmt,
+  translations,
+  pointSize,
+  orientation
+) => {
   const { x, y, fill, index, width, payload } = props;
   let value = payload.value;
   let yPos = y;
@@ -371,31 +386,60 @@ const CustomizedXAxisTick = (props, buckets, fmt, translations, pointSize) => {
   if (buckets[index] != payload.value) {
     value = buckets[index] || "";
     offset = bucketWidth / 2;
-    if (index % 2 == 1 && value.length * 8 > bucketWidth) {
-      yPos += 12;
-    }
+    // if (index % 2 == 1 && value.length * pointSize * 0.6 > bucketWidth) {
+    //   yPos += 12;
+    // }
   } else {
     value = fmt(value);
-    if (index % 2 == 1 && value.length * 8 > bucketWidth) {
+    if (index % 2 == 1 && value.length * pointSize * 0.6 > bucketWidth) {
       return null;
     }
-    if (index % 4 != 0 && value.length * 8 > bucketWidth * 2) {
+    if (index % 4 != 0 && value.length * pointSize * 0.6 > bucketWidth * 2) {
       return null;
     }
   }
-  return (
-    <g transform={`translate(${x + offset},${yPos})`}>
-      <text x={0} y={0} dy={10} textAnchor="middle" fill={fill}>
+  let text;
+  if (orientation == 0) {
+    text = (
+      <text
+        x={0}
+        y={0}
+        dy={5}
+        textAnchor="middle"
+        dominantBaseline={"hanging"}
+        fill={fill}
+        fontSize={pointSize}
+      >
         {translations[value] || value}
       </text>
-    </g>
-  );
+    );
+  } else {
+    text = (
+      <text
+        x={0}
+        y={0}
+        dy={5}
+        textAnchor="end"
+        dominantBaseline={"middle"}
+        alignmentBaseline={"alphabetic"}
+        fill={fill}
+        fontSize={pointSize}
+        transform={`rotate(${orientation})`}
+      >
+        {translations[value] || value}
+      </text>
+    );
+  }
+  return <g transform={`translate(${x + offset},${yPos})`}>{text}</g>;
 };
 
 const Heatmap = ({
   data,
   pointData,
   width,
+  marginWidth,
+  marginHeight,
+  marginRight,
   height,
   cats,
   buckets,
@@ -440,7 +484,8 @@ const Heatmap = ({
           buckets,
           chartProps.xFormat,
           chartProps.translations,
-          chartProps.pointSize
+          chartProps.pointSize,
+          chartProps.orientation
         )
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
@@ -449,9 +494,14 @@ const Heatmap = ({
     >
       <Label
         value={xLabel}
-        offset={buckets.length > 15 ? 20 : 0}
+        // offset={buckets.length > 15 ? chartProps.pointSize + 10 : 10}
+        offset={marginHeight - chartProps.pointSize}
+        dy={0}
         position="bottom"
+        dominantBaseline={"text-after-edge"}
         fill="#666"
+        fontSize={chartProps.pointSize}
+        fontWeight="bold"
       />
     </XAxis>,
     <YAxis
@@ -486,11 +536,13 @@ const Heatmap = ({
     >
       <Label
         value={yLabel}
-        offset={0}
-        position="left"
+        offset={marginWidth + 60 - chartProps.pointSize}
+        position="insideRight"
         fill="#666"
         angle={-90}
         style={{ textAnchor: "middle" }}
+        fontSize={chartProps.pointSize}
+        fontWeight="bold"
       />
     </YAxis>,
     <ZAxis
@@ -535,10 +587,10 @@ const Heatmap = ({
       height={height}
       data={data}
       margin={{
-        top: legendRows ? legendRows * 35 + 5 : 5,
-        right: 30,
-        left: 20,
-        bottom: width > 300 ? (buckets.length > 15 ? 35 : 25) : 5,
+        top: legendRows ? legendRows * (2 * chartProps.pointSize + 15) + 5 : 5,
+        right: marginRight,
+        left: marginWidth,
+        bottom: width > 300 ? marginHeight : 5,
       }}
     >
       {/* {patterns} */}
@@ -607,7 +659,7 @@ const ReportScatter = ({
   stacked,
   highlightArea,
   basename,
-  pointSize = 20,
+  pointSize = 30,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -688,9 +740,80 @@ const ReportScatter = ({
       catOffsets,
       legendRows,
       yTranslations,
-    } = processLegendData({ bounds, yBounds, width });
+    } = processLegendData({ bounds, yBounds, width, pointSize });
     if (cats && cats.length > 1 && levels[cats.length]) {
       colors = levels[cats.length];
+    }
+    const xFormat = (value) => formats(value, valueType, interval);
+    const yFormat = (value) => formats(value, yValueType, yInterval);
+    const charWidth = (char, options = { factor: 0.7 }) => {
+      const { factor } = options;
+      const widths = {
+        dot: 2,
+        number: 7,
+        a: 5,
+        g: 7,
+        i: 4,
+        j: 4.5,
+        m: 8,
+        M: 10,
+      };
+      const chars = {};
+      [".", ",", ";", ":", "|", "!"].forEach((char) => {
+        chars[char] = widths.dot;
+      });
+      [...Array(10).keys()].forEach((char) => {
+        chars[char] = widths.number;
+      });
+      ["g"].forEach((char) => {
+        chars[char] = widths.g;
+      });
+      ["i", "l", 1].forEach((char) => {
+        chars[char] = widths.i;
+      });
+      ["j", "t", "-"].forEach((char) => {
+        chars[char] = widths.j;
+      });
+      ["m", "w"].forEach((char) => {
+        chars[char] = widths.m;
+      });
+      ["M", "W"].forEach((char) => {
+        chars[char] = widths.M;
+      });
+      let width = widths.a;
+      if (chars[char]) {
+        width = chars[char];
+      } else if (chars[char.toLowerCase()]) {
+        width = widths.m;
+      }
+      return (width / widths.a) * factor;
+    };
+    const stringLength = (str, options) => {
+      let length = `${isNaN(str) ? (str ? str : "") : str}`
+        .split("")
+        .reduce((a, b) => a + charWidth(b, options), 0);
+      return length;
+    };
+    const maxYLabel =
+      heatmaps.yBuckets
+        .map((value) => stringLength(yFormat(value)))
+        .reduce((a, b) => Math.max(a, b), 0) * pointSize;
+    const marginWidth =
+      maxYLabel + pointSize > 60 ? maxYLabel + pointSize - 60 : 0;
+    const maxXLabel =
+      heatmaps.buckets
+        .map((value) => stringLength(xFormat(value)))
+        .reduce((a, b) => Math.max(a, b), 0) * pointSize;
+    let marginHeight = 2 * pointSize;
+    const marginRight = (stringLength(xFormat(endLabel)) * pointSize) / 2;
+    let orientation = 0;
+    if (
+      maxXLabel >
+      (width - marginWidth - marginRight) / heatmaps.buckets.length
+    ) {
+      orientation = -90;
+      marginHeight =
+        maxXLabel + pointSize > 40 ? maxXLabel + pointSize - 40 : 0;
     }
     chart = (
       <Heatmap
@@ -698,6 +821,9 @@ const ReportScatter = ({
         pointData={1 ? pointData : []}
         width={width}
         height={minDim - 50}
+        marginWidth={marginWidth}
+        marginHeight={marginHeight}
+        marginRight={marginRight}
         buckets={heatmaps.buckets}
         yBuckets={heatmaps.yBuckets}
         cats={cats}
@@ -731,8 +857,9 @@ const ReportScatter = ({
               ? true
               : false
             : true,
-          xFormat: (value) => formats(value, valueType, interval),
-          yFormat: (value) => formats(value, yValueType, yInterval),
+          xFormat,
+          yFormat,
+          orientation,
           fields: heatmaps.fields,
           ranks: heatmaps.ranks,
           bounds,

@@ -3,11 +3,11 @@ import { Rectangle, Text } from "recharts";
 import React from "react";
 import formats from "../functions/formats";
 
-export const processLegendData = ({ bounds, yBounds, width }) => {
+export const processLegendData = ({ bounds, yBounds, width, pointSize }) => {
   let translations = {};
   let catTranslations = {};
   let catOffsets = {};
-  let legendRows = 0;
+  let legendRows = 1;
   let yTranslations = {};
 
   if (bounds?.stats?.cats) {
@@ -24,7 +24,7 @@ export const processLegendData = ({ bounds, yBounds, width }) => {
     let catOffset = 0;
     let len = bounds.cats.length;
     let row = 1;
-    let charWidth = 8;
+    let charWidth = pointSize * 0.8;
     let minWidth = 150;
     let previousCats = [];
     for (let i = 0; i < len; i++) {
@@ -76,8 +76,9 @@ const MultiCatLegend = ({
   legendWidth = 150,
   offset,
   row,
+  pointSize,
 }) => {
-  let cellSize = 15;
+  let cellSize = pointSize + 5;
   let xPos;
   let j = 1;
   if (offset || offset === 0) {
@@ -111,6 +112,7 @@ const MultiCatLegend = ({
           fill={"rgb(102, 102, 102)"}
           dominantBaseline={"central"}
           textAnchor={"end"}
+          fontSize={pointSize}
         >
           {`n=${formats(stats.sum, "integer")}${
             stats.sum > 0 && stats.max > stats.min
@@ -130,6 +132,7 @@ const MultiCatLegend = ({
           fill={"rgb(102, 102, 102)"}
           dominantBaseline={"central"}
           textAnchor={"end"}
+          fontSize={pointSize}
         >
           {/* <tspan>{"n="}</tspan> */}
           <tspan fill={fill}>{formats(stats.count, "integer")}</tspan>
@@ -155,6 +158,7 @@ const MultiCatLegend = ({
         dominantBaseline={"central"}
         textAnchor={"end"}
         fontWeight={"bold"}
+        fontSize={pointSize}
       >
         {name}
       </Text>
