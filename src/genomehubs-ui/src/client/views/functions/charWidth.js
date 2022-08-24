@@ -11,7 +11,7 @@ export const charWidth = (char, options = { factor: 0.7 }) => {
     M: 10,
   };
   const chars = {};
-  [".", ",", ";", ":", "|", "!"].forEach((char) => {
+  [".", ",", ";", ":", "|", "!", "\\", "/", " "].forEach((char) => {
     chars[char] = widths.dot;
   });
   [...Array(10).keys()].forEach((char) => {

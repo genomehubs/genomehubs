@@ -2,6 +2,7 @@ import { Rectangle, Text } from "recharts";
 
 import React from "react";
 import formats from "../functions/formats";
+import stringLength from "../functions/stringLength";
 
 export const processLegendData = ({ bounds, yBounds, width, pointSize }) => {
   let translations = {};
@@ -24,13 +25,12 @@ export const processLegendData = ({ bounds, yBounds, width, pointSize }) => {
     let catOffset = 0;
     let len = bounds.cats.length;
     let row = 1;
-    let charWidth = pointSize * 0.8;
-    let minWidth = 150;
+    let minWidth = 100;
     let previousCats = [];
     for (let i = 0; i < len; i++) {
       let cat = bounds.cats[i];
-      let labelWidth = Math.max((cat.label.length + 2) * charWidth, minWidth);
-      if (labelWidth + catOffset < width - 50) {
+      let labelWidth = Math.max(stringLength(cat.label) * pointSize, minWidth);
+      if (labelWidth + catOffset < width - 10) {
         catOffsets[cat.label] = { offset: 0, row };
         for (let prevCat of previousCats) {
           catOffsets[prevCat].offset += labelWidth;
@@ -63,6 +63,56 @@ export const processLegendData = ({ bounds, yBounds, width, pointSize }) => {
     legendRows,
     yTranslations,
   };
+};
+
+export const valueString = ({ stats, cellSize, pointSize, fill }) => {
+  let value, string;
+  if (stats) {
+    if (stats.sum) {
+      string = `n=${formats(stats.sum, "integer")}${
+        stats.sum > 0 && stats.max > stats.min
+          ? ` [${formats(stats.min, "integer")}-${formats(
+              stats.max,
+              "integer"
+            )}]`
+          : ""
+      }`;
+      value = (
+        <Text
+          x={-5}
+          y={cellSize}
+          fill={"rgb(102, 102, 102)"}
+          dominantBaseline={"central"}
+          textAnchor={"end"}
+          fontSize={pointSize}
+        >
+          {string}
+        </Text>
+      );
+    } else if (stats.count) {
+      let num = formats(stats.count, "integer");
+      let denom = formats(stats.total, "integer");
+      string = num;
+      if (denom) {
+        string += ` / ${denom}`;
+      }
+      value = (
+        <text
+          x={-5}
+          y={cellSize}
+          fill={"rgb(102, 102, 102)"}
+          dominantBaseline={"central"}
+          textAnchor={"end"}
+          fontSize={pointSize}
+        >
+          {/* <tspan>{"n="}</tspan> */}
+          <tspan fill={fill}>{num}</tspan>
+          {stats.total && <tspan>{` / ${denom}`}</tspan>}
+        </text>
+      );
+    }
+  }
+  return { value, string };
 };
 
 const MultiCatLegend = ({
@@ -102,47 +152,7 @@ const MultiCatLegend = ({
     xPos = x + width - legendWidth * (row - i);
   }
 
-  let value;
-  if (stats) {
-    if (stats.sum) {
-      value = (
-        <Text
-          x={-5}
-          y={cellSize}
-          fill={"rgb(102, 102, 102)"}
-          dominantBaseline={"central"}
-          textAnchor={"end"}
-          fontSize={pointSize}
-        >
-          {`n=${formats(stats.sum, "integer")}${
-            stats.sum > 0 && stats.max > stats.min
-              ? ` [${formats(stats.min, "integer")}-${formats(
-                  stats.max,
-                  "integer"
-                )}]`
-              : ""
-          }`}
-        </Text>
-      );
-    } else if (stats.count) {
-      value = (
-        <text
-          x={-5}
-          y={cellSize}
-          fill={"rgb(102, 102, 102)"}
-          dominantBaseline={"central"}
-          textAnchor={"end"}
-          fontSize={pointSize}
-        >
-          {/* <tspan>{"n="}</tspan> */}
-          <tspan fill={fill}>{formats(stats.count, "integer")}</tspan>
-          {stats.total && (
-            <tspan>{` / ${formats(stats.total, "integer")}`}</tspan>
-          )}
-        </text>
-      );
-    }
-  }
+  let { value } = valueString({ stats, cellSize, pointSize, fill });
 
   let text = (
     <g
