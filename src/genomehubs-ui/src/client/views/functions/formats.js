@@ -35,7 +35,7 @@ const formatMillisecond = timeFormat(".%L"),
   formatWeek = timeFormat("%b %d"),
   formatMonth = timeFormat("%b"),
   formatMonthDecimal = timeFormat("%m"),
-  formatMonthYear = timeFormat("%b %Y"),
+  formatMonthYear = timeFormat("%Y %b"),
   formatYear = timeFormat("%Y");
 
 const timeFormats = {

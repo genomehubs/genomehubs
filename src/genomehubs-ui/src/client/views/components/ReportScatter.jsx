@@ -14,10 +14,12 @@ import {
 } from "recharts";
 import React, { useEffect, useRef, useState } from "react";
 import formats, { setInterval } from "../functions/formats";
+import stringLength, { maxStringLength } from "../functions/stringLength";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
 import Grid from "@material-ui/core/Grid";
+import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "@material-ui/core/Tooltip";
 import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
@@ -370,69 +372,6 @@ const CustomizedYAxisTick = (props, buckets, fmt, translations, pointSize) => {
   );
 };
 
-const CustomizedXAxisTick = (
-  props,
-  buckets,
-  fmt,
-  translations,
-  pointSize,
-  orientation
-) => {
-  const { x, y, fill, index, width, payload } = props;
-  let value = payload.value;
-  let yPos = y;
-  let offset = 0;
-  let bucketWidth = width / (buckets.length - 1);
-  if (buckets[index] != payload.value) {
-    value = buckets[index] || "";
-    offset = bucketWidth / 2;
-    // if (index % 2 == 1 && value.length * pointSize * 0.6 > bucketWidth) {
-    //   yPos += 12;
-    // }
-  } else {
-    value = fmt(value);
-    if (index % 2 == 1 && value.length * pointSize * 0.6 > bucketWidth) {
-      return null;
-    }
-    if (index % 4 != 0 && value.length * pointSize * 0.6 > bucketWidth * 2) {
-      return null;
-    }
-  }
-  let text;
-  if (orientation == 0) {
-    text = (
-      <text
-        x={0}
-        y={0}
-        dy={5}
-        textAnchor="middle"
-        dominantBaseline={"hanging"}
-        fill={fill}
-        fontSize={pointSize}
-      >
-        {translations[value] || value}
-      </text>
-    );
-  } else {
-    text = (
-      <text
-        x={0}
-        y={0}
-        dy={5}
-        textAnchor="end"
-        dominantBaseline={"middle"}
-        alignmentBaseline={"alphabetic"}
-        fill={fill}
-        fontSize={pointSize}
-        transform={`rotate(${orientation})`}
-      >
-        {translations[value] || value}
-      </text>
-    );
-  }
-  return <g transform={`translate(${x + offset},${yPos})`}>{text}</g>;
-};
-
 const Heatmap = ({
   data,
   pointData,
@@ -479,7 +418,7 @@ const Heatmap = ({
       }
       ticks={isNaN(buckets[0]) ? buckets.map((x, i) => i) : buckets}
       tick={(props) =>
-        CustomizedXAxisTick(
+        ReportXAxisTick(
           props,
           buckets,
           chartProps.xFormat,
@@ -746,64 +685,11 @@ const ReportScatter = ({
     }
     const xFormat = (value) => formats(value, valueType, interval);
     const yFormat = (value) => formats(value, yValueType, yInterval);
-    const charWidth = (char, options = { factor: 0.7 }) => {
-      const { factor } = options;
-      const widths = {
-        dot: 2,
-        number: 7,
-        a: 5,
-        g: 7,
-        i: 4,
-        j: 4.5,
-        m: 8,
-        M: 10,
-      };
-      const chars = {};
-      [".", ",", ";", ":", "|", "!"].forEach((char) => {
-        chars[char] = widths.dot;
-      });
-      [...Array(10).keys()].forEach((char) => {
-        chars[char] = widths.number;
-      });
-      ["g"].forEach((char) => {
-        chars[char] = widths.g;
-      });
-      ["i", "l", 1].forEach((char) => {
-        chars[char] = widths.i;
-      });
-      ["j", "t", "-"].forEach((char) => {
-        chars[char] = widths.j;
-      });
-      ["m", "w"].forEach((char) => {
-        chars[char] = widths.m;
-      });
-      ["M", "W"].forEach((char) => {
-        chars[char] = widths.M;
-      });
-      let width = widths.a;
-      if (chars[char]) {
-        width = chars[char];
-      } else if (chars[char.toLowerCase()]) {
-        width = widths.m;
-      }
-      return (width / widths.a) * factor;
-    };
-    const stringLength = (str, options) => {
-      let length = `${isNaN(str) ? (str ? str : "") : str}`
-        .split("")
-        .reduce((a, b) => a + charWidth(b, options), 0);
-      return length;
-    };
-    const maxYLabel =
-      heatmaps.yBuckets
-        .map((value) => stringLength(yFormat(value)))
-        .reduce((a, b) => Math.max(a, b), 0) * pointSize;
+
+    const maxYLabel = maxStringLength(heatmaps.yBuckets, yFormat, pointSize);
     const marginWidth =
       maxYLabel + pointSize > 60 ? maxYLabel + pointSize - 60 : 0;
-    const maxXLabel =
-      heatmaps.buckets
-        .map((value) => stringLength(xFormat(value)))
-        .reduce((a, b) => Math.max(a, b), 0) * pointSize;
+    const maxXLabel = maxStringLength(heatmaps.buckets, xFormat, pointSize);
     let marginHeight = 2 * pointSize;
     const marginRight = (stringLength(xFormat(endLabel)) * pointSize) / 2;
     let orientation = 0;

@@ -12,10 +12,12 @@ import {
 import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
 import React, { Fragment, useEffect, useRef } from "react";
 import formats, { setInterval } from "../functions/formats";
+import stringLength, { maxStringLength } from "../functions/stringLength";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
 import Grid from "@material-ui/core/Grid";
+import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "@material-ui/core/Tooltip";
 import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
@@ -25,76 +27,6 @@ import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
 import withSiteName from "../hocs/withSiteName";
-
-const renderXTick = (tickProps) => {
-  const {
-    x,
-    y,
-    index,
-    endLabel,
-    lastIndex,
-    payload,
-    chartWidth,
-    visibleTicksCount,
-    showTickLabels,
-    scale,
-    translations,
-  } = tickProps;
-  let { value, offset } = payload;
-  let textOffset = 0;
-  if (scale == "ordinal") {
-    textOffset = chartWidth / visibleTicksCount / 2;
-  }
-  // if (month % 3 === 1) {
-  //   return <text x={x} y={y - 4} textAnchor="middle">{`Q${quarterNo}`}</text>;
-  // }
-
-  // const isLast = month === 11;
-
-  // if (month % 3 === 0 || isLast) {
-  let endTick;
-  let pathX;
-  if (index == lastIndex) {
-    pathX = Math.floor(x + offset) + 0.5;
-    endTick = (
-      <>
-        {showTickLabels && (
-          <text
-            x={pathX + textOffset}
-            y={y + 14}
-            textAnchor="middle"
-            fill="#666"
-          >
-            {endLabel}
-          </text>
-        )}
-        <path d={`M${pathX},${y - 8}v${6}`} stroke="#666" />
-      </>
-    );
-  }
-  pathX = Math.floor(x - offset) + 0.5;
-  let showTickLabel = showTickLabels;
-  if (chartWidth < 300 && index > 0) {
-    showTickLabel = false;
-  } else if (chartWidth / visibleTicksCount < 50) {
-    if (endTick || index % 2 != 0) {
-      showTickLabel = false;
-    }
-  }
-  return (
-    <g>
-      {showTickLabel && (
-        <text x={pathX + textOffset} y={y + 14} textAnchor="middle" fill="#666">
-          {translations[value] || value}
-        </text>
-      )}
-      <path d={`M${pathX},${y - 8}v${6}`} stroke="#666" />
-      {endTick}
-    </g>
-  );
-  // }
-  // return null;
-};
 
 const searchByCell = ({
   xQuery,
@@ -264,6 +196,9 @@ const CustomBackground = ({ chartProps, ...props }) => {
 const Histogram = ({
   data,
   width,
+  marginWidth,
+  marginHeight,
+  marginRight,
   height,
   cats,
   endLabel,
@@ -286,16 +221,27 @@ const Histogram = ({
       key={"x"}
       angle={buckets.length > 15 ? -90 : 0}
       tickLine={false}
+      // tick={(props) =>
+      //   renderXTick({
+      //     ...props,
+      //     endLabel,
+      //     lastIndex: lastIndex,
+      //     chartWidth: width,
+      //     scale: chartProps.bounds.scale,
+      //     showTickLabels: chartProps.showTickLabels,
+      //     translations: chartProps.translations,
+      //   })
+      // }
+      // ticks={isNaN(buckets[0]) ? buckets.map((x, i) => i) : buckets}
       tick={(props) =>
-        renderXTick({
-          ...props,
-          endLabel,
-          lastIndex: lastIndex,
-          chartWidth: width,
-          scale: chartProps.bounds.scale,
-          showTickLabels: chartProps.showTickLabels,
-          translations: chartProps.translations,
-        })
+        ReportXAxisTick(
+          props,
+          buckets,
+          chartProps.xFormat,
+          chartProps.translations,
+          chartProps.pointSize,
+          chartProps.orientation
+        )
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
       interval={0}
@@ -303,9 +249,14 @@ const Histogram = ({
     >
       <Label
         value={xLabel}
-        offset={buckets.length > 15 ? 10 : 0}
+        // offset={buckets.length > 15 ? chartProps.pointSize + 10 : 10}
+        offset={marginHeight - chartProps.pointSize}
+        dy={0}
         position="bottom"
+        dominantBaseline={"text-after-edge"}
         fill="#666"
+        fontSize={chartProps.pointSize}
+        fontWeight="bold"
       />
     </XAxis>,
     <XAxis
@@ -316,15 +267,24 @@ const Histogram = ({
       key={"hidden-x"}
       hide={true}
     ></XAxis>,
-    <YAxis allowDecimals={false} key={"y"}>
+    <YAxis
+      allowDecimals={false}
+      key={"y"}
+      style={{
+        fontSize: chartProps.pointSize,
+      }}
+      tickFormatter={chartProps.yFormat}
+    >
       {width > 300 && (
         <Label
           value={yLabel}
-          offset={-10}
-          position="left"
+          offset={marginWidth + 60 - chartProps.pointSize}
+          position="insideRight"
           fill="#666"
           angle={-90}
           style={{ textAnchor: "middle" }}
+          fontSize={chartProps.pointSize}
+          fontWeight="bold"
         />
       )}
     </YAxis>,
@@ -337,11 +297,17 @@ const Histogram = ({
       barGap={0}
       barCategoryGap={0}
       data={data}
+      // margin={{
+      //   top: legendRows ? legendRows * 35 + 5 : 5,
+      //   right: 30,
+      //   left: 20,
+      //   bottom: width > 300 ? 25 : 5,
+      // }}
       margin={{
-        top: legendRows ? legendRows * 35 + 5 : 5,
-        right: 30,
-        left: 20,
-        bottom: width > 300 ? 25 : 5,
+        top: legendRows ? legendRows * (2 * chartProps.pointSize + 15) + 5 : 5,
+        right: marginRight,
+        left: marginWidth,
+        bottom: width > 300 ? marginHeight : 5,
       }}
     >
       {axes}
@@ -406,6 +372,7 @@ const ReportHistogram = ({
   setMinDim,
   xOpts,
   basename,
+  pointSize = 15,
 }) => {
   const navigate = useNavigate();
   const componentRef = chartRef ? chartRef : useRef();
@@ -485,7 +452,7 @@ const ReportHistogram = ({
             );
           });
           chartData.push({
-            x: formats(bucket, valueType, interval),
+            x: bucket,
             ...series,
           });
         }
@@ -512,22 +479,42 @@ const ReportHistogram = ({
             sum = value;
           }
           chartData.push({
-            x: formats(bucket, valueType),
+            x: bucket,
             "all taxa": scales[yScale](value, histogram.report.histogram.x),
           });
         }
       });
     }
     const { translations, catTranslations, catOffsets, legendRows } =
-      processLegendData({ bounds, width });
+      processLegendData({ bounds, width, pointSize });
     if (cats && cats.length > 1 && levels[cats.length]) {
       colors = levels[cats.length];
+    }
+    const xFormat = (value) => formats(value, valueType, interval);
+    const yFormat = (value) => formats(value, "integer");
+    const maxYLabel = maxStringLength(histograms.zDomain, yFormat, pointSize);
+    const marginWidth =
+      maxYLabel + pointSize > 60 ? maxYLabel + pointSize - 60 : 0;
+    const maxXLabel = maxStringLength(histograms.buckets, xFormat, pointSize);
+    let marginHeight = 2 * pointSize;
+    const marginRight = (stringLength(xFormat(endLabel)) * pointSize) / 2;
+    let orientation = 0;
+    if (
+      maxXLabel >
+      (width - marginWidth - marginRight) / histograms.buckets.length
+    ) {
+      orientation = -90;
+      marginHeight =
+        maxXLabel + pointSize > 40 ? maxXLabel + pointSize - 40 : 0;
     }
     chart = (
       <Histogram
         data={chartData}
         width={width}
         height={minDim - 50}
+        marginWidth={marginWidth}
+        marginHeight={marginHeight}
+        marginRight={marginRight}
         cats={cats}
         xLabel={xLabel}
         yLabel={yLabel}
@@ -556,7 +543,10 @@ const ReportHistogram = ({
           translations,
           catTranslations,
           catOffsets,
-          xFormat: (value) => formats(value, valueType),
+          xFormat,
+          yFormat,
+          orientation,
+          pointSize,
           valueType,
           embedded,
           navigate,
