@@ -607,7 +607,7 @@ const ReportScatter = ({
   stacked,
   highlightArea,
   basename,
-  pointSize = 30,
+  pointSize = 15,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
