@@ -674,8 +674,10 @@ body,
       }
 
       .reportCaption {
+        display: inline-block;
         max-height: 50px;
-        overflow: auto;
+        // font-size: 200%;
+        overflow: visible;
       }
 
       .reportContainer {

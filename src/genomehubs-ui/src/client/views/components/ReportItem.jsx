@@ -1,6 +1,7 @@
 import React, { memo, useEffect, useRef, useState } from "react";
 
 import Grid from "@material-ui/core/Grid";
+import ReportCaption from "./ReportCaption";
 import ReportEmpty from "./ReportEmpty";
 import ReportError from "./ReportError";
 import ReportHistogram from "./ReportHistogram";
@@ -390,9 +391,7 @@ const ReportItem = ({
         {component}
       </Grid>
       {!loading && !error && caption && (
-        <Grid item xs style={{ textAlign: "center" }}>
-          <span className={styles.reportCaption}>{formattedCaption}</span>
-        </Grid>
+        <ReportCaption caption={caption} embedded={embedded} />
       )}
     </Grid>
   );
