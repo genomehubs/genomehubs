@@ -12,6 +12,7 @@ import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import Select from "@material-ui/core/Select";
 import SettingsButton from "./SettingsButton";
+import Slider from "@material-ui/core/Slider";
 import Switch from "@material-ui/core/Switch";
 import TextField from "@material-ui/core/TextField";
 import { compose } from "recompose";
@@ -37,6 +38,14 @@ const rankSettings = {
   except: ["feature", "assembly", "sample"],
 };
 const catSettings = { prop: "cat", label: "assembly_level" };
+const pointSizeSettings = {
+  prop: "pointSize",
+  label: "point size",
+  defaultValue: 15,
+  min: 10,
+  max: 25,
+  step: 5,
+};
 
 export const queryPropList = {
   histogram: [
@@ -49,6 +58,7 @@ export const queryPropList = {
     "xOpts",
     "stacked",
     "cumulative",
+    pointSizeSettings,
   ],
   map: [
     "report",
@@ -71,6 +81,7 @@ export const queryPropList = {
     "highlightArea",
     "stacked",
     "scatterThreshold",
+    pointSizeSettings,
   ],
   table: [
     "report",
@@ -96,7 +107,14 @@ export const queryPropList = {
     "treeStyle",
     "treeThreshold",
   ],
-  xInY: ["report", ["x"], "y", rankSettings, "includeEstimates"],
+  xInY: [
+    "report",
+    ["x"],
+    "y",
+    rankSettings,
+    "includeEstimates",
+    pointSizeSettings,
+  ],
   xPerRank: ["report", "x", rankSettings, "includeEstimates"],
 };
 
@@ -152,14 +170,15 @@ export const ReportEdit = ({
     }
     queryPropList[report].forEach((queryProp) => {
       let prop;
+      let defaultValue = "";
       if (Array.isArray(queryProp)) {
         prop = queryProp[0];
       } else if (typeof queryProp === "object" && queryProp !== null) {
-        ({ prop } = queryProp);
+        ({ prop, defaultValue } = queryProp);
       } else {
         prop = queryProp;
       }
-      obj[prop] = query.hasOwnProperty(prop) ? query[prop] : "";
+      obj[prop] = query.hasOwnProperty(prop) ? query[prop] : defaultValue;
     });
     return obj;
   };
@@ -275,12 +294,20 @@ export const ReportEdit = ({
   let toggles = [];
 
   for (let queryProp of queryPropList[report]) {
-    let except, input, label, required;
+    let except, input, label, required, min, max, step;
     if (Array.isArray(queryProp)) {
       required = true;
       queryProp = queryProp[0];
     } else if (typeof queryProp === "object" && queryProp !== null) {
-      ({ prop: queryProp, label, required, except } = queryProp);
+      ({
+        prop: queryProp,
+        label,
+        required,
+        except,
+        min,
+        max,
+        step,
+      } = queryProp);
     }
 
     if (except && except.includes(result)) {
@@ -405,7 +432,33 @@ export const ReportEdit = ({
         label = queryProp;
       }
 
-      if (autoCompleteTypes.hasOwnProperty(queryProp)) {
+      if (min) {
+        toggles.push(
+          <div
+            style={{ float: "left", paddingTop: "0.7em", marginRight: "2em" }}
+            key={queryProp}
+          >
+            <FormControl>
+              <Slider
+                id={queryProp + Math.random()}
+                value={values[queryProp] * 1}
+                valueLabelDisplay="auto"
+                label={label}
+                style={{ width: "95%" }}
+                required={required}
+                error={required && !values[queryProp]}
+                onChange={(e, value) => handleChange(e, queryProp, value)}
+                step={step}
+                marks
+                min={min}
+                max={max}
+                color={"default"}
+              />
+              <FormHelperText>{queryProp}</FormHelperText>
+            </FormControl>
+          </div>
+        );
+      } else if (autoCompleteTypes.hasOwnProperty(queryProp)) {
         input = (
           <AutoCompleteInput
             id={queryProp + Math.random()}

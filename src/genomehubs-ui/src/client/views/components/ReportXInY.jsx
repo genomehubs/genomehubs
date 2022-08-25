@@ -164,7 +164,7 @@ const RadialBarComponent = ({
             y={cy - viewBox.innerRadius - fontSize + 2}
             textAnchor="middle"
             dominantBaseline="middle"
-            alignmentBaseline="central"
+            alignmentBaseline="middle"
           >
             {pct1(value)}
           </text>
@@ -207,20 +207,27 @@ const RadialBarComponent = ({
     width,
     pointSize,
   });
-  let plotHeight = height - 5 - legendRows * (2 * pointSize + 15);
+  // let plotHeight = height - 5 - legendRows * (2 * pointSize + 15);
+  // if (compactLegend) {
+  //   plotHeight = height - 5 - legendRows * (pointSize + 10);
+  // }
+  let legendHeight = legendRows * (2 * pointSize + 15) + 5;
   if (compactLegend) {
-    plotHeight = height - 5 - legendRows * (pointSize + 10);
+    legendHeight = legendRows * (pointSize + 10) + 5;
   }
+  let plotHeight = height - legendHeight;
+
   let plotWidth = Math.min(width, 2 * plotHeight);
+  plotHeight = plotWidth / 2 + legendHeight;
   let innerRadius = Math.floor(plotWidth * 0.1);
   let outerRadius = Math.floor(plotWidth * 0.5);
   let background = "#cccccc";
   return (
     <RadialBarChart
       width={width}
-      height={height}
+      height={plotHeight}
       cx="50%"
-      cy={plotHeight}
+      cy={plotWidth / 2}
       innerRadius={innerRadius}
       outerRadius={outerRadius}
       startAngle={180}
@@ -263,7 +270,7 @@ const ReportXInY = ({
   levels,
   minDim,
   embedded,
-  pointSize = 15,
+  pointSize,
 }) => {
   const componentRef = chartRef ? chartRef : useRef();
   const { width, height } = containerRef

@@ -71,6 +71,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     yScale: { in: new Set(["histogram"]), ui: true },
     zScale: { in: new Set(["scatter"]), ui: true },
     stacked: { in: new Set(["histogram", "scatter"]), ui: true },
+    pointSize: { in: new Set(["histogram", "scatter", "xInY"]), ui: true },
     cumulative: { in: new Set(["histogram", "table"]), ui: true },
     // reversed: { in: new Set(["table"]), ui: true },
     mapThreshold: { in: new Set(["map"]) },

@@ -137,7 +137,7 @@ const MultiCatLegend = ({
   pointSize,
   compactLegend,
 }) => {
-  let cellSize = pointSize + 5;
+  let cellSize = pointSize * 1 + 5;
   let xPos;
   let j = 1;
   if (offset || offset === 0) {

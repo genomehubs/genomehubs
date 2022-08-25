@@ -509,7 +509,7 @@ const ReportHistogram = ({
     const yFormat = (value) => formats(value, "integer");
     const maxYLabel = maxStringLength(histograms.zDomain, yFormat, pointSize);
     const marginWidth =
-      maxYLabel + pointSize > 60 ? maxYLabel + pointSize - 60 : 0;
+      maxYLabel + pointSize > 40 ? maxYLabel + pointSize - 40 : 0;
     const maxXLabel = maxStringLength(histograms.buckets, xFormat, pointSize);
     let marginHeight = 2 * pointSize;
     const marginRight = (stringLength(xFormat(endLabel)) * pointSize) / 2;

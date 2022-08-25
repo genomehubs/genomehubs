@@ -61,6 +61,7 @@ const ReportItem = ({
   scatterThreshold,
   yScale,
   zScale,
+  pointSize,
   treeStyle,
   treeThreshold,
   levels,
@@ -95,6 +96,12 @@ const ReportItem = ({
   let visible = useVisible(targetRef);
   const [minDim, basicSetMinDim] = useState(0);
   let setMinDim;
+
+  if (typeof embedded === "undefined") {
+    pointSize = 15;
+  } else if (pointSize) {
+    pointSize *= 1;
+  }
 
   // const [hideMessage, sethideMessage] = useState(false);
 
@@ -198,6 +205,7 @@ const ReportItem = ({
             cumulative={cumulative}
             xOpts={xOpts}
             includeEstimates={includeEstimates}
+            pointSize={pointSize}
             // yScale={yScale}
             {...qs.parse(queryString)}
             minDim={minDim}
@@ -233,6 +241,7 @@ const ReportItem = ({
             yOpts={yOpts}
             highlightArea={highlightArea}
             stacked={stacked}
+            pointSize={pointSize}
             zScale={zScale}
             scatterThreshold={scatterThreshold}
             includeEstimates={includeEstimates}
@@ -328,6 +337,7 @@ const ReportItem = ({
             embedded={embedded}
             containerRef={targetRef}
             ratio={ratio}
+            pointSize={pointSize}
             minDim={minDim}
             setMinDim={setMinDim}
           />
@@ -353,27 +363,6 @@ const ReportItem = ({
   } else {
     caption = reportById?.report?.caption;
   }
-  const formatCaption = (caption) => {
-    if (caption && caption !== true) {
-      let captionArr = [];
-      let parts = (caption || "").split("**");
-      for (let i = 0; i < parts.length; i++) {
-        if (i % 2 == 0) {
-          captionArr.push(<span key={i}>{parts[i]}</span>);
-        } else {
-          captionArr.push(
-            <b key={i} style={{ color: "black" }}>
-              {parts[i]}
-            </b>
-          );
-        }
-      }
-      return <span>{captionArr}</span>;
-    }
-    return;
-  };
-
-  let formattedCaption = formatCaption(caption);
 
   let content = (
     <Grid

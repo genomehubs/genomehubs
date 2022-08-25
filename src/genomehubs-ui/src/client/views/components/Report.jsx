@@ -96,6 +96,10 @@ const Report = ({
   reportProps.mapThreshold = props.mapThreshold;
   reportProps.scatterThreshold = props.scatterThreshold;
   reportProps.treeThreshold = props.treeThreshold;
+  reportProps.pointSize =
+    props.pointSize * 1 ||
+    qs.parse(reportProps.queryString).pointSize * 1 ||
+    15;
   reportProps.collapseMonotypic = props.collapseMonotypic;
   reportProps.excludeAncestral = props.excludeAncestral;
   reportProps.excludeDescendant = props.excludeDescendant;
