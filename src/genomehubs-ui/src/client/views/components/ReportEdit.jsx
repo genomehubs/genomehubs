@@ -452,7 +452,6 @@ export const ReportEdit = ({
                 marks
                 min={min}
                 max={max}
-                color={"default"}
               />
               <FormHelperText>{queryProp}</FormHelperText>
             </FormControl>

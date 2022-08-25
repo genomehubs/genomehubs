@@ -186,7 +186,7 @@ const CustomCircle = (props, chartProps) => {
 const drawHeatRect = ({ props, chartProps, h, w }) => {
   let { z, offset } = props.payload;
   let scale = axisScales[chartProps.zScale]();
-  let domain = [0, chartProps.zDomain[1]];
+  let domain = [1, chartProps.zDomain[1]];
   scale.domain(domain).range([2, w]);
   if (chartProps.n == 1) {
     scale.range([0.1, 1]);
