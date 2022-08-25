@@ -211,6 +211,12 @@ const Histogram = ({
   colors,
   legendRows,
 }) => {
+  let yDomain = [0, "dataMax"];
+  if (chartProps.yScale == "proportion") {
+    yDomain = [0, 1];
+  } else if (chartProps.yScale.startsWith("log")) {
+    yDomain = [1, "dataMax"];
+  }
   let buckets = chartProps.buckets;
   let axes = [
     <CartesianGrid key={"grid"} strokeDasharray="3 3" vertical={false} />,
@@ -268,12 +274,15 @@ const Histogram = ({
       hide={true}
     ></XAxis>,
     <YAxis
-      allowDecimals={false}
+      allowDecimals={chartProps.yScale == "proportion"}
+      domain={yDomain}
       key={"y"}
       style={{
         fontSize: chartProps.pointSize,
       }}
-      tickFormatter={chartProps.yFormat}
+      tickFormatter={
+        chartProps.yScale == "proportion" ? (v) => v : chartProps.yFormat
+      }
     >
       {width > 300 && (
         <Label
@@ -514,6 +523,7 @@ const ReportHistogram = ({
     let marginHeight = 2 * pointSize;
     const marginRight = (stringLength(xFormat(endLabel)) * pointSize) / 2;
     let orientation = 0;
+
     if (
       maxXLabel >
       (width - marginWidth - marginRight) / histograms.buckets.length

@@ -8,7 +8,7 @@ import Switch from "@material-ui/core/Switch";
 import Tooltip from "@material-ui/core/Tooltip";
 
 const Toggle = ({ toggle, expand, title, children }) => {
-  const [showContent, setShowContent] = useState(expand);
+  const [showContent, setShowContent] = useState(Boolean(expand));
   return (
     <Grid
       container
