@@ -20,6 +20,7 @@ const ReportTreePaths = ({
   height,
   plotHeight,
   charHeight,
+  pointSize,
   locations,
   other,
   maxTip,
@@ -41,6 +42,7 @@ const ReportTreePaths = ({
   } else {
     rootRank = lines[0].taxon_rank;
   }
+  pointSize *= 1;
 
   let divHeight = height;
   let divWidth = width;
@@ -519,10 +521,10 @@ const ReportTreePaths = ({
               <Text
                 key={`t-${segment.taxon_id}`}
                 text={segment.label}
-                fontSize={10}
+                fontSize={pointSize * 1}
                 // x={segment.tip ? segment.xEnd + 10 : segment.xStart - 6}
                 x={segment.tip ? maxTip + 10 : segment.xStart - 6}
-                y={segment.tip ? segment.yMin : segment.yStart - 11}
+                y={segment.tip ? segment.yMin : segment.yStart - pointSize}
                 width={segment.tip ? segment.labelWidth : segment.width}
                 height={segment.height}
                 fill={segment.color}

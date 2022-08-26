@@ -71,7 +71,10 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     yScale: { in: new Set(["histogram"]), ui: true },
     zScale: { in: new Set(["scatter"]), ui: true },
     stacked: { in: new Set(["histogram", "scatter"]), ui: true },
-    pointSize: { in: new Set(["histogram", "scatter", "xInY"]), ui: true },
+    pointSize: {
+      in: new Set(["histogram", "scatter", "tree", "xInY"]),
+      ui: true,
+    },
     cumulative: { in: new Set(["histogram", "table"]), ui: true },
     // reversed: { in: new Set(["table"]), ui: true },
     mapThreshold: { in: new Set(["map"]) },
@@ -633,11 +636,14 @@ const processTable = (report) => {
   return { headers, rows };
 };
 
-const processReport = (report) => {
+const processReport = (report, { searchTerm = {} }) => {
   if (!report || !report.name) return {};
   if (report.name == "tree") {
     let { treeStyle } = qs.parse(report.report.queryString);
     let { tree, xQuery, yQuery, bounds, yBounds } = report.report.tree;
+    if (!searchTerm) {
+      searchTerm = qs.parse(window.location.search.replace(/^\?/, ""));
+    }
     return {
       ...report,
       report: {
@@ -651,6 +657,7 @@ const processReport = (report) => {
             xQuery,
             yQuery,
             treeStyle,
+            pointSize: 1 * (searchTerm.pointSize || 15),
           }),
         },
       },
@@ -705,9 +712,10 @@ export const cacheReportByReportId = createSelectorForReportId(
 
 export const getReportByReportId = createCachedSelector(
   (state, reportId) => getReport(state, reportId),
+  getSearchTerm,
   (_state, reportId) => reportId,
-  (report, reportId) => {
-    return processReport(report, reportId);
+  (report, searchTerm, reportId) => {
+    return processReport(report, { reportId, searchTerm });
   }
 )((_state, reportId) => reportId);
 

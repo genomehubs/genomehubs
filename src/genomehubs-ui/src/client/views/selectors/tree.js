@@ -177,7 +177,7 @@ const setColor = ({ node, yQuery, recurse }) => {
   return { color, highlightColor, source, value, min, max };
 };
 
-export const processTreeRings = ({ nodes, xQuery, yQuery }) => {
+export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
   if (!nodes) return undefined;
   let { treeNodes, lca } = nodes;
   if (!lca) return undefined;
@@ -194,8 +194,8 @@ export const processTreeRings = ({ nodes, xQuery, yQuery }) => {
   let arcs = [];
 
   let scaleFont = false;
-  let charLen = 8;
-  let charHeight = charLen * 1.3;
+  let charHeight = pointSize;
+  let charLen = charHeight / 1.3;
   var radialLine = lineRadial()
     .angle((d) => d.a)
     .radius((d) => d.r);
@@ -404,6 +404,7 @@ export const processTreePaths = ({
   yBounds = {},
   xQuery,
   yQuery,
+  pointSize,
 }) => {
   if (!nodes) return undefined;
   const { cat, cats: catArray, showOther } = bounds;
@@ -439,8 +440,8 @@ export const processTreePaths = ({
   if (!treeNodes || !rootNode) return undefined;
   let maxWidth = 0;
   let maxTip = 0;
-  let charLen = 6.5;
-  let charHeight = charLen * 2;
+  let charHeight = pointSize;
+  let charLen = charHeight / 1.8;
   let xScale = scaleLinear()
     .domain([-0.5, maxDepth + 2])
     .range([0, targetWidth]);
@@ -653,9 +654,24 @@ export const processTree = ({
   xQuery,
   yQuery,
   treeStyle = "rect",
+  pointSize = 15,
 }) => {
   if (treeStyle == "ring") {
-    return processTreeRings({ nodes, bounds, yBounds, xQuery, yQuery });
+    return processTreeRings({
+      nodes,
+      bounds,
+      yBounds,
+      xQuery,
+      yQuery,
+      pointSize,
+    });
   }
-  return processTreePaths({ nodes, bounds, yBounds, xQuery, yQuery });
+  return processTreePaths({
+    nodes,
+    bounds,
+    yBounds,
+    xQuery,
+    yQuery,
+    pointSize,
+  });
 };

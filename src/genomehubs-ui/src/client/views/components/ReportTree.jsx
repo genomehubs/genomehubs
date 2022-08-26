@@ -27,6 +27,7 @@ const ReportTree = ({
   fetchReport,
   topLevel,
   permaLink,
+  pointSize,
   treeStyle,
   levels,
   minDim,
@@ -60,7 +61,7 @@ const ReportTree = ({
     let y = queryObj.y;
     if (root) {
       if (x.match("tax_tree")) {
-        x = x.replace(/tax_tree\(\w+?\)/, `tax_tree(${root})`);
+        x = x.replace(/tax_tree\([\w\[\]]+?\)/, `tax_tree(${root})`);
       } else {
         x += ` AND tax_tree(${root})`;
       }
@@ -179,6 +180,7 @@ const ReportTree = ({
         {...tree.report.tree}
         handleNavigation={handleNavigation}
         handleSearch={handleSearch}
+        pointSize={pointSize}
       />
     );
   } else {
@@ -193,6 +195,7 @@ const ReportTree = ({
         reportRef={reportRef}
         gridRef={gridRef}
         hidePreview={hidePreview}
+        pointSize={pointSize}
       />
     );
   }

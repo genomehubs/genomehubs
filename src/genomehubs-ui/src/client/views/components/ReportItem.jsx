@@ -303,6 +303,7 @@ const ReportItem = ({
             reportRef={reportRef}
             gridRef={gridRef}
             treeStyle={treeStyle}
+            pointSize={pointSize}
             handleUpdate={handleUpdate}
             dispatch={dispatch}
             includeEstimates={includeEstimates}

@@ -106,6 +106,7 @@ export const queryPropList = {
     "yOpts",
     "treeStyle",
     "treeThreshold",
+    pointSizeSettings,
   ],
   xInY: [
     "report",
