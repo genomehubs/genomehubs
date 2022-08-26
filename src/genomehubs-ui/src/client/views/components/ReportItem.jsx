@@ -1,6 +1,7 @@
 import React, { memo, useEffect, useRef, useState } from "react";
 
 import Grid from "@material-ui/core/Grid";
+import ReportArc from "./ReportArc";
 import ReportCaption from "./ReportCaption";
 import ReportEmpty from "./ReportEmpty";
 import ReportError from "./ReportError";
@@ -12,7 +13,6 @@ import ReportScatter from "./ReportScatter";
 import ReportSources from "./ReportSources";
 import ReportTable from "./ReportTable";
 import ReportTree from "./ReportTree";
-import ReportXInY from "./ReportXInY";
 import ReportXPerRank from "./ReportXPerRank";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
@@ -193,6 +193,20 @@ const ReportItem = ({
     // };
   } else {
     switch (report) {
+      case "arc":
+        component = (
+          <ReportArc
+            arc={reportById}
+            chartRef={chartRef}
+            embedded={embedded}
+            containerRef={targetRef}
+            ratio={ratio}
+            pointSize={pointSize}
+            minDim={minDim}
+            setMinDim={setMinDim}
+          />
+        );
+        break;
       case "histogram":
         component = (
           <ReportHistogram
@@ -325,20 +339,6 @@ const ReportItem = ({
             embedded={embedded}
             containerRef={containerRef}
             ratio={ratio}
-            minDim={minDim}
-            setMinDim={setMinDim}
-          />
-        );
-        break;
-      case "xInY":
-        component = (
-          <ReportXInY
-            xInY={reportById}
-            chartRef={chartRef}
-            embedded={embedded}
-            containerRef={targetRef}
-            ratio={ratio}
-            pointSize={pointSize}
             minDim={minDim}
             setMinDim={setMinDim}
           />

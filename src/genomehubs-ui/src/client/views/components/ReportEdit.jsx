@@ -108,7 +108,7 @@ export const queryPropList = {
     "treeThreshold",
     pointSizeSettings,
   ],
-  xInY: [
+  arc: [
     "report",
     ["x"],
     "y",
@@ -132,7 +132,7 @@ const reportTypes = [
   "scatter",
   "table",
   "tree",
-  "xInY",
+  "arc",
   "xPerRank",
 ];
 

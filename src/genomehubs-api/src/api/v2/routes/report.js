@@ -306,7 +306,7 @@ export const tablePerRank = async ({
   });
 };
 
-export const xInY = async ({
+export const arc = async ({
   x,
   y,
   result,
@@ -379,7 +379,7 @@ export const xInY = async ({
     return {
       status: { success: true },
       report: {
-        xiny: xCount.count > 0 ? xCount.count / yCount.count : 0,
+        arc: xCount.count > 0 ? xCount.count / yCount.count : 0,
         x: xCount.count,
         y: yCount.count,
         xTerm: x,
@@ -393,7 +393,7 @@ export const xInY = async ({
   }
 };
 
-export const xInYPerRank = async ({
+export const arcPerRank = async ({
   x,
   y,
   result,
@@ -403,12 +403,12 @@ export const xInYPerRank = async ({
   req,
   ...apiParams
 }) => {
-  // Return xInY at a list of ranks
+  // Return arc at a list of ranks
   let ranks = rank ? setRanks(rank) : [undefined];
   let perRank = [];
   let status;
   for (rank of ranks) {
-    let res = await xInY({
+    let res = await arc({
       x,
       y,
       result,
@@ -450,7 +450,7 @@ export const xInYPerRank = async ({
   return {
     status,
     report: {
-      xInY: report,
+      arc: report,
       queryString,
       caption,
     },
@@ -954,8 +954,8 @@ export const getReport = async (req, res) => {
         reportFunc = getTypes;
         break;
       }
-      case "xInY": {
-        reportFunc = xInYPerRank;
+      case "arc": {
+        reportFunc = arcPerRank;
         break;
       }
       case "xPerRank": {

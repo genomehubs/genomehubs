@@ -454,7 +454,7 @@ components:
       description: |
         Taxonomic to report values formats.
 
-        Used by histogram, map, scatter, table and xInY reports when `result=` `taxon` or `assembly`.
+        Used by histogram, map, scatter, table and arc reports when `result=` `taxon` or `assembly`.
       examples:
         null:
           value:
@@ -549,7 +549,7 @@ components:
           - table
           - tree
           - types
-          - xInY
+          - arc
           - xPerRank
         type: string
     resultParam:
@@ -971,7 +971,7 @@ components:
       description: |
         Query to provide *y* values.
 
-        Values added here will be combined with the value in `x` to generate the full query. For reports without an *y*-axis, this is the secondary query, except for `xInY` reports where this should be a full query.
+        Values added here will be combined with the value in `x` to generate the full query. For reports without an *y*-axis, this is the secondary query, except for `arc` reports where this should be a full query.
       examples:
         assembly_span:
           value: assembly_span>1000000000
@@ -1271,7 +1271,7 @@ paths:
         | **Table**     | `x`, `y`          | `cat`, `rank`, `xOpts`, `yOpts`, `scatterThreshold` |
         | **Sources**   | -                 | -              |
         | **Tree**      | `x`               | `y`, `cat`, `xOpts`, `yOpts`, `collapseMonotypic`, `treeThreshold` |
-        | **xInY**      | `x`, `rank`       | `y`            |
+        | **arc**      | `x`, `rank`       | `y`            |
         | **xPerRank**  | `x`               | `ranks`        |
 
         Search related parameters `fields`, `includeEstimates`, `exclude*` and `queryId` are optional for all reports (except `sources` where they have no effect).

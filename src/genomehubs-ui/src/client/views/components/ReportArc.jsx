@@ -262,8 +262,8 @@ const RadialBarComponent = ({
   );
 };
 
-const ReportXInY = ({
-  xInY,
+const ReportArc = ({
+  arc,
   chartRef,
   containerRef,
   colors,
@@ -276,18 +276,18 @@ const ReportXInY = ({
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
-  if (xInY && xInY.status) {
+  if (arc && arc.status) {
     let chartData = [];
     let chart;
-    if (Array.isArray(xInY.report.xInY)) {
-      xInY.report.xInY.forEach((report, i) => {
-        if (levels[xInY.report.xInY.length]) {
-          colors = levels[xInY.report.xInY.length];
+    if (Array.isArray(arc.report.arc)) {
+      arc.report.arc.forEach((report, i) => {
+        if (levels[arc.report.arc.length]) {
+          colors = levels[arc.report.arc.length];
         }
-        let { xiny, x, y, rank } = report;
+        let { arc: currentArc, x, y, rank } = report;
         chartData.push({
           xValue: x,
-          xPortion: xiny,
+          xPortion: currentArc,
           yValue: y,
           index: i,
           name: rank,
@@ -307,7 +307,7 @@ const ReportXInY = ({
         />
       );
     } else {
-      let { x, y, xTerm, yTerm } = xInY.report.xInY;
+      let { x, y, xTerm, yTerm } = arc.report.arc;
       chartData = [
         { value: x, name: xTerm },
         { value: y - x, name: yTerm },
@@ -335,4 +335,4 @@ const ReportXInY = ({
   }
 };
 
-export default compose(withColors)(ReportXInY);
+export default compose(withColors)(ReportArc);

@@ -15,12 +15,12 @@ import styles from "./Styles.scss";
 import withReportDefaults from "../hocs/withReportDefaults";
 
 const reportTypes = {
+  arc: { name: "Arc" },
   histogram: { name: "Histogram" },
   map: { name: "Map" },
   scatter: { name: "Scatter" },
   table: { name: "Table" },
   tree: { name: "Tree" },
-  xInY: { name: "xInY" },
 };
 
 const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {

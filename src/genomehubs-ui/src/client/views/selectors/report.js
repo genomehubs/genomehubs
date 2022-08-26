@@ -37,9 +37,9 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     report: true,
     query: { not: new Set(["sources"]), as: "x" },
     x: { not: new Set(["sources"]) },
-    y: { in: new Set(["scatter", "table", "tree", "xInY"]) },
+    y: { in: new Set(["scatter", "table", "tree", "arc"]) },
     z: { in: new Set(["scatter"]) },
-    cat: { not: new Set(["sources", "xInY"]) },
+    cat: { not: new Set(["sources", "arc"]) },
     rank: { not: new Set(["sources", "tree"]) },
     ranks: { in: new Set(["tree"]) },
     levels: { in: new Set(["tree"]), ui: true },
@@ -72,7 +72,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     zScale: { in: new Set(["scatter"]), ui: true },
     stacked: { in: new Set(["histogram", "scatter"]), ui: true },
     pointSize: {
-      in: new Set(["histogram", "scatter", "tree", "xInY"]),
+      in: new Set(["histogram", "scatter", "tree", "arc"]),
       ui: true,
     },
     cumulative: { in: new Set(["histogram", "table"]), ui: true },
@@ -80,7 +80,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     mapThreshold: { in: new Set(["map"]) },
     treeThreshold: { in: new Set(["tree"]) },
     queryId: {
-      in: new Set(["histogram", "map", "scatter", "table", "tree", "xInY"]),
+      in: new Set(["histogram", "map", "scatter", "table", "tree", "arc"]),
     },
     release: true,
     indent: false,
@@ -790,7 +790,7 @@ const reportOptions = {
       value: "rect",
     },
   },
-  xInY: {
+  arc: {
     x: {
       default: "query",
       fieldType: "value",

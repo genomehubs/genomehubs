@@ -1,66 +1,75 @@
 import { createSelector } from "reselect";
 import qstr from "qs";
 
+// const translations = {
+//   caption: {
+//     key: "cp",
+//   },
+//   excludeAncestral: {
+//     key: "an",
+//     flatten: true,
+//   },
+//   excludeDescendant: {
+//     key: "de",
+//     flatten: true,
+//   },
+//   excludeDirect: {
+//     key: "di",
+//     flatten: true,
+//   },
+//   excludeMissing: {
+//     key: "mi",
+//     flatten: true,
+//   },
+//   includeEstimates: {
+//     // key: "o",
+//     values: {
+//       true: "E",
+//       false: "e",
+//     },
+//   },
+//   rank: {
+//     key: "r",
+//   },
+//   report: {
+//     key: "rp",
+//     values: {
+//       histogram: "h",
+//       map: "m",
+//       scatter: "s",
+//       table: "ta",
+//       tree: "t",
+//       arc: "p",
+//     },
+//   },
+//   result: {
+//     key: "i",
+//     values: {
+//       assembly: "a",
+//       analysis: "n",
+//       feature: "f",
+//       file: "i",
+//       taxon: "t",
+//     },
+//   },
+//   stacked: {
+//     // key: "o",
+//     values: {
+//       true: "S",
+//       false: "s",
+//     },
+//   },
+//   taxonomy: {
+//     key: "tx",
+//   },
+// };
+
 const translations = {
-  caption: {
-    key: "cp",
-  },
-  excludeAncestral: {
-    key: "an",
-    flatten: true,
-  },
-  excludeDescendant: {
-    key: "de",
-    flatten: true,
-  },
-  excludeDirect: {
-    key: "di",
-    flatten: true,
-  },
-  excludeMissing: {
-    key: "mi",
-    flatten: true,
-  },
-  includeEstimates: {
-    // key: "o",
-    values: {
-      true: "E",
-      false: "e",
-    },
-  },
-  rank: {
-    key: "r",
-  },
   report: {
-    key: "rp",
+    key: "report",
     values: {
-      histogram: "h",
-      map: "m",
-      scatter: "s",
-      table: "ta",
-      tree: "t",
-      xiny: "p",
+      arc: "xInY",
     },
-  },
-  result: {
-    key: "i",
-    values: {
-      assembly: "a",
-      analysis: "n",
-      feature: "f",
-      file: "i",
-      taxon: "t",
-    },
-  },
-  stacked: {
-    // key: "o",
-    values: {
-      true: "S",
-      false: "s",
-    },
-  },
-  taxonomy: {
-    key: "tx",
   },
 };
 

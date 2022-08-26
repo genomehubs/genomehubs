@@ -33,6 +33,7 @@ const Report = ({
   const location = useLocation();
   // const reportRef = useRef();
   let options = qs.parse(location.search.replace(/^\?/, ""));
+  props.report = props.report.replace("xInY", "arc");
   let reportProps = { ...props };
   let queryProps = {};
   if (options.taxonomy) {
