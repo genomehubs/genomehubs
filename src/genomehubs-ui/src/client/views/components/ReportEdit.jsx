@@ -464,7 +464,7 @@ export const ReportEdit = ({
             id={queryProp + Math.random()}
             required={required}
             error={required && !values[queryProp]}
-            inputValue={values[queryProp]}
+            inputValue={values[queryProp] || ""}
             setInputValue={(value) => setInputValue(value, queryProp)}
             inputLabel={label}
             inputRef={false}
