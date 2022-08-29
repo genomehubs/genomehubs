@@ -246,8 +246,13 @@ def parse_ncbi_datasets_record(record, parsed):
             obj.update(annot)
     bioprojects = []
     for lineage in assemblyInfo.get("bioprojectLineage", []):
-        for bioproject in lineage["bioprojects"]:
-            bioprojects.append(bioproject["accession"])
+        if "bioprojects" in lineage:
+            for bioproject in lineage["bioprojects"]:
+                bioprojects.append(bioproject["accession"])
+    if not bioprojects:
+        if "bioprojects" in assemblyInfo.get("biosample", {}):
+            for bioproject in assemblyInfo["biosample"]["bioprojects"]:
+                bioprojects.append(bioproject["accession"])
     obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else None
     assemblyStats = record.get("assemblyStats", {})
     obj.update(assemblyStats)
@@ -286,8 +291,13 @@ def parse_ncbi_datasets_sample(record, parsed):
     obj["elevation"] = attributes.get("geographic location (elevation)", None)
     bioprojects = []
     for lineage in assemblyInfo.get("bioprojectLineage", []):
-        for bioproject in lineage["bioprojects"]:
-            bioprojects.append(bioproject["accession"])
+        if "bioprojects" in lineage:
+            for bioproject in lineage["bioprojects"]:
+                bioprojects.append(bioproject["accession"])
+    if not bioprojects:
+        if "bioprojects" in assemblyInfo.get("biosample", {}):
+            for bioproject in assemblyInfo["biosample"]["bioprojects"]:
+                bioprojects.append(bioproject["accession"])
     obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else None
     parsed[obj["biosampleAccession"]] = obj
 
@@ -295,8 +305,11 @@ def parse_ncbi_datasets_sample(record, parsed):
 def ncbi_genome_parser(params, opts, *, types=None, names=None):
     """Parse NCBI Datasets genome report."""
     parsed = {}
+    jsonl = opts["ncbi-datasets-%s" % params]
+    if not jsonl.endswith(".jsonl"):
+        jsonl = "%s/ncbi_dataset/data/assembly_data_report.jsonl" % jsonl
     with tofile.open_file_handle(
-        "%s/ncbi_dataset/data/assembly_data_report.jsonl" % opts["ncbi-datasets-%s" % params]
+        jsonl
     ) as report:
         for line in report:
             record = ujson.loads(line)
