@@ -97,7 +97,7 @@ body,
     header {
       // background: mix(themed('primary'),themed('secondary'),50%);
       // color: themed('secondary');
-      border-bottom: 1px solid themed("primary");
+      border-bottom: 0.2em solid themed("primary");
       flex: none;
       z-index: 1;
 
@@ -109,6 +109,7 @@ body,
         margin: 0;
         margin-left: 0.5em;
         padding: 0;
+        color: themed("secondary")
       }
 
       .tabHolder {
@@ -116,36 +117,42 @@ body,
       }
 
       .tab {
-        background-color: themed("secondary");
+        color: themed("secondary");
         border-bottom: 0;
         border-top: 0;
         box-sizing: border-box;
         cursor: pointer;
         display: inline-block;
-        height: 2em;
+        height: 2.2em;
         line-height: 2em;
         margin-right: -1px;
+        margin-bottom: 0.2em;
         padding: 0 0.5em;
 
         &Highlight,
         &:hover {
-          background-color: themed("highlight");
           color: themed("secondary");
+          border-bottom: 0.2em solid themed("secondary");
+      
         }
       }
     }
 
     footer {
-      border-top: 1px solid themed("primary");
+      background-color: themed("primary");
+      color: themed("secondary");
+      border-top: 0.2em solid themed("primary");
       flex: none;
       font-family: themed("bodyFont");
-      font-size: themed("bodyFontSize");
+      font-size: 1em;
       line-height: 2em;
-      min-height: 2em;
+      min-height: 2.2em;
+      padding-top: 0.2em;
       text-align: center;
 
       .link {
         text-decoration: underline;
+        color: themed("secondary");
       }
 
       img {
@@ -480,8 +487,8 @@ body,
     // }
 
     header {
-      font-family: themed("bodyFont");
-      font-size: themed("bodyFontSize");
+      font-family: themed("titleFont");
+      font-size: 1.1em;
       height: 2em;
       // left: 0;
       min-width: 100%;
@@ -489,6 +496,8 @@ body,
       // position: absolute;
       // top: 0;
       width: 100%;
+      color: themed("secondary");
+      background-color: themed("primary");
     }
 
     main {
