@@ -86,7 +86,8 @@ const SearchBox = ({
   let names =
     searchTerm.names || savedOptions?.names?.join(",") || searchDefaults.names;
 
-  const dispatchSearch = (options, term) => {
+  const dispatchSearch = (searchOptions, term) => {
+    let options = { ...searchTerm, ...searchOptions };
     if (!options.hasOwnProperty("includeEstimates")) {
       options.includeEstimates = searchDefaults.includeEstimates;
     }
