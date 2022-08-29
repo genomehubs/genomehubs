@@ -152,7 +152,7 @@ const CustomBackground = ({ chartProps, ...props }) => {
   let series = [];
   Object.keys(counts).forEach((key, i) => {
     if (counts[key] > 0) {
-      count += counts[key];
+      count += counts[key] * 1;
       series.push(
         <div key={key}>
           {key}: {counts[key]}
@@ -218,6 +218,7 @@ const Histogram = ({
     yDomain = [1, "dataMax"];
   }
   let buckets = chartProps.buckets;
+
   let axes = [
     <CartesianGrid key={"grid"} strokeDasharray="3 3" vertical={false} />,
     <XAxis
@@ -351,16 +352,18 @@ const Histogram = ({
           }
         />
       ))}
-      {cats.map((cat, i) => (
-        <Bar
-          dataKey={cat}
-          key={i}
-          stackId={stacked ? 1 : false}
-          fill={colors[i] || "rgb(102, 102, 102)"}
-          isAnimationActive={false}
-          style={{ pointerEvents: "none" }}
-        />
-      ))}
+      {cats.map((cat, i) => {
+        return (
+          <Bar
+            dataKey={cat}
+            key={i}
+            stackId={stacked ? 1 : false}
+            fill={colors[i] || "rgb(102, 102, 102)"}
+            isAnimationActive={false}
+            style={{ pointerEvents: "none" }}
+          />
+        );
+      })}
     </BarChart>
   );
 };
@@ -392,6 +395,7 @@ const ReportHistogram = ({
   basename,
   pointSize = 15,
 }) => {
+  pointSize = 1 * pointSize;
   const navigate = useNavigate();
   const componentRef = chartRef ? chartRef : useRef();
   const { width, height } = containerRef
@@ -413,32 +417,41 @@ const ReportHistogram = ({
     if (xOptions.length == 1) {
       xOptions = xOptions[0].split(",");
     }
+    let buckets = histograms.buckets;
+    let valueType = histograms.valueType;
+    let compressX;
+    if (
+      histograms.byCat &&
+      buckets.length == 2 &&
+      stacked &&
+      yScale != "proportion"
+    ) {
+      buckets = histogram.report.histogram.cats.map((cat) => cat.label);
+      valueType = "keyword";
+      compressX = true;
+    }
     let xLabel = xOptions[4] || histogram.report.xLabel;
     let yLabel = histogram.report.yLabel;
-    let valueType = histograms.valueType;
     if (yScale == "log10") {
       yLabel = `Log10 ${yLabel}`;
     } else if (yScale == "proportion") {
       yLabel = `Proportional ${yLabel}`;
     }
     let cats;
-    let lastIndex = histograms.buckets.length - 2;
+    let lastIndex = buckets.length - 2;
     let interval;
     if (valueType == "date") {
-      let start = histograms.buckets[0];
-      let end = histograms.buckets[lastIndex + 1];
+      let start = buckets[0];
+      let end = buckets[lastIndex + 1];
       let diff = end - start;
       interval = setInterval(diff, lastIndex);
     }
-    let endLabel = formats(
-      histograms.buckets[lastIndex + 1],
-      valueType,
-      interval
-    );
+    let endLabel = formats(buckets[lastIndex + 1], valueType, interval);
     let stats = {};
     if (histograms.byCat) {
       cats = histogram.report.histogram.cats.map((cat) => cat.label);
       let sums = {};
+
       histograms.buckets.forEach((bucket, i) => {
         if (i < histograms.buckets.length - 1) {
           let series = {};
@@ -469,10 +482,19 @@ const ReportHistogram = ({
               stacked ? histogram.report.histogram.x : cat.doc_count
             );
           });
-          chartData.push({
-            x: bucket,
-            ...series,
-          });
+          if (compressX) {
+            for (let [key, value] of Object.entries(series)) {
+              chartData.push({
+                x: key,
+                [key]: value,
+              });
+            }
+          } else {
+            chartData.push({
+              x: bucket,
+              ...series,
+            });
+          }
         }
       });
     } else {
@@ -483,8 +505,8 @@ const ReportHistogram = ({
         max: Number.NEGATIVE_INFINITY,
       };
       let sum = 0;
-      histograms.buckets.forEach((bucket, i) => {
-        if (i < histograms.buckets.length - 1) {
+      buckets.forEach((bucket, i) => {
+        if (i < buckets.length - 1) {
           let value = histograms.allValues[i];
           if (value > 0) {
             stats["all taxa"].sum += value;
@@ -518,16 +540,13 @@ const ReportHistogram = ({
     const yFormat = (value) => formats(value, "integer");
     const maxYLabel = maxStringLength(histograms.zDomain, yFormat, pointSize);
     const marginWidth =
-      maxYLabel + pointSize > 40 ? maxYLabel + pointSize - 40 : 0;
+      maxYLabel * 1 + pointSize > 40 ? maxYLabel * 1 + pointSize - 40 : 0;
     const maxXLabel = maxStringLength(histograms.buckets, xFormat, pointSize);
     let marginHeight = 2 * pointSize;
     const marginRight = (stringLength(xFormat(endLabel)) * pointSize) / 2;
     let orientation = 0;
 
-    if (
-      maxXLabel >
-      (width - marginWidth - marginRight) / histograms.buckets.length
-    ) {
+    if (maxXLabel > (width - marginWidth - marginRight) / buckets.length) {
       orientation = -90;
       marginHeight =
         maxXLabel + pointSize > 20 ? maxXLabel + pointSize - 20 : 0;
@@ -557,14 +576,15 @@ const ReportHistogram = ({
           xLabel,
           bounds,
           fields: histograms.fields,
-          showTickLabels: xOptions[2]
-            ? xOptions[2] >= 0
-              ? true
-              : false
-            : true,
+          // showTickLabels: xOptions[2]
+          //   ? xOptions[2] >= 0
+          //     ? true
+          //     : false
+          //   : true,
+          showtickLabels: true,
           ranks: histograms.ranks,
           stats,
-          buckets: histograms.buckets,
+          buckets,
           translations,
           catTranslations,
           catOffsets,
