@@ -386,6 +386,14 @@ body,
         margin: 0.25em;
         cursor: pointer;
 
+        &Highlight,
+        &:hover {
+          border-color: themed("primary");
+          > .fieldName {
+            background-color: themed("primary");
+          }
+        }
+
         &Name {
           background-color: rgba(themed("primary"), 0.8);
           font-size: 0.8em;
@@ -395,7 +403,7 @@ body,
           color: themed("secondary");
 
           &Highlight {
-            background-color: themed("highlight");
+            background-color: themed("primary");
             color: themed("secondary");
           }
         }

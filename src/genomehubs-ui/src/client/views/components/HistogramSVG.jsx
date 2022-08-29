@@ -131,6 +131,7 @@ const HistogramSVG = ({
           width={bucket.width}
           height={height}
           fill={bucket.color}
+          fillOpacity={bucket.opacity}
           style={{ cursor: "pointer", pointerEvents: "auto" }}
           onClick={() => handleClick(bucket)}
         />

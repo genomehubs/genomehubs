@@ -110,7 +110,7 @@ const ExplorePage = ({
       searchBox
       panels={[{ panel: results }]}
       text={text}
-      fieldId={summaryField.replaceAll("_", " ")}
+      fieldId={summaryField}
     />
   );
 };

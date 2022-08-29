@@ -75,23 +75,23 @@ const ResultPanel = ({
       if (Array.isArray(field.value) && field.count > 1) {
         value = `${value} ...`;
       }
-      let highlight = null;
+      let highlight = [null, null];
       if (
         location.pathname == basename + "/explore" &&
         field.id == summaryField
       ) {
-        highlight = styles["fieldNameHighlight"];
+        highlight = [styles["fieldHighlight"], styles["fieldNameHighlight"]];
       }
       let newDiv = (
         <Tooltip key={field.id} title={"Click to view summary plot"} arrow>
           <Grid item>
             <div
               key={field.id}
-              className={styles.field}
+              className={classnames(styles.field, highlight[0])}
               onClick={() => handleFieldClick(field.id)}
               // style={{ minWidth: "150px" }}
             >
-              <div className={classnames(styles.fieldName, highlight)}>
+              <div className={classnames(styles.fieldName, highlight[1])}>
                 {field.id}
               </div>
               <div className={styles.fieldValue}>
