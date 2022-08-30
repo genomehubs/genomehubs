@@ -28,6 +28,7 @@ export const config = {
   source: process.env.GH_SOURCE || undefined,
   accessLog: process.env.GH_ACCESS_LOG || "./logs/access.log",
   errorLog: process.env.GH_ERROR_LOG || "./logs/error.log",
+  memcacheLog: process.env.GH_MEMCACHE_LOG || "./logs/memcache.log",
   port: GH_API_PORT,
   cors: GH_ORIGINS,
   https: GH_HTTPS,

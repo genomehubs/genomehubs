@@ -31,8 +31,17 @@ const accessTransport = new transports.DailyRotateFile({
   maxFiles: "14d",
 });
 
+const memcacheTransport = new transports.DailyRotateFile({
+  filename: config.memcacheLog,
+  format: combine(timestamp(), prettyPrint()),
+  datePattern: "YYYY-MM-DD",
+  zippedArchive: true,
+  maxSize: "20m",
+  maxFiles: "14d",
+});
+
 export const logger = createLogger({
-  transports: [errorTransport, accessTransport],
+  transports: [errorTransport, accessTransport, memcacheTransport],
 });
 
 // if (process.env.NODE_ENV !== "production") {
@@ -70,6 +79,12 @@ export const logAccess = function ({ req, code, size }) {
     referrer: undefined,
     userAgent: headers["user-agent"],
   });
+};
+
+export const logMemcache = function ({ key, action, success }) {
+  logger.info({ action, key, success });
+  //   `${timestamp()} ${action} - ${key} - ${success ? "TRUE" : "FALSE"}`
+  // );
 };
 
 export default logger;

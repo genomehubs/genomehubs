@@ -1,3 +1,4 @@
+import { logMemcache } from "./logger";
 import { mc } from "./memcached";
 import qs from "qs";
 
@@ -11,30 +12,36 @@ const sortUrl = (url) => {
 };
 
 export const cacheFetch = async (req) => {
+  let key;
+  let cachedData = false;
+  const action = "FETCH";
   if (mc) {
-    const key = sortUrl(req.url);
+    key = sortUrl(req.url);
     try {
-      let cachedData = await mc.get(key);
-      return JSON.parse(cachedData);
+      cachedData = JSON.parse(await mc.get(key));
+      logMemcache({ key, action, success: true });
     } catch {
-      return false;
+      logMemcache({ key, action, success: false });
     }
-  } else {
-    return false;
   }
+  return cachedData;
 };
 
 export const cacheStore = async (req, obj) => {
+  let key, success;
+  const action = "STORE";
   if (mc) {
     try {
-      const key = sortUrl(req.url);
+      key = sortUrl(req.url);
       const value = JSON.stringify(obj);
       if (value.length <= 1024 * 1024 * 32) {
-        await mc.set(key, JSON.stringify(obj));
+        success = await mc.set(key, JSON.stringify(obj), 3600);
       }
-      return true;
+      logMemcache({ key, action, success });
     } catch {
-      return false;
+      logMemcache({ key, action, success: false });
+      success = false;
     }
   }
+  return success;
 };
