@@ -10,7 +10,6 @@ import { logError } from "./api/v2/functions/logger.js";
 import path from "path";
 import qs from "./api/v2/functions/qs.js";
 import swaggerUi from "swagger-ui-express";
-import zip from "express-easy-zip";
 
 const port = config.port;
 const apiSpec = path.join(__dirname, "api-v2.yaml");
@@ -36,7 +35,6 @@ const swaggerOptions = {
 };
 
 const app = express();
-app.use(zip());
 app.use(compression());
 if (config.cors) {
   const cors = require("cors");

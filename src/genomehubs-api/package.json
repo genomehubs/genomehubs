@@ -22,6 +22,7 @@
   "homepage": "https://github.com/genomehubs/genomehubs-api#readme",
   "dependencies": {
     "@elastic/elasticsearch": "7.11",
+    "archiver": "^5.3.1",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -30,7 +31,6 @@
     "dotenv": "^16.0.0",
     "esm": "^3.2.25",
     "express": "^4.17.2",
-    "express-easy-zip": "^1.1.5",
     "express-openapi-validator": "^4.13.5",
     "json2csv": "^5.0.6",
     "memcached": "^2.2.2",

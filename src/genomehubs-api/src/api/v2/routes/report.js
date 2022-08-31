@@ -1,5 +1,6 @@
 import { cacheFetch, cacheStore } from "../functions/cache";
 
+import Archiver from "archiver";
 import { aggregateNameClasses } from "../queries/aggregateNameClasses";
 import { aggregateRanks } from "../queries/aggregateRanks";
 import { aggregateRawValueSources } from "../queries/aggregateRawValueSources";
@@ -1058,56 +1059,27 @@ export const getReport = async (req, res) => {
               rootNode,
               fields,
             });
-            let dataFiles = [];
+
+            res.attachment("tree.zip").type("zip");
+            const zip = Archiver("zip");
+            zip.pipe(res);
+
             if (data) {
               let flat = "";
               for (let arr of data.flat) {
                 flat += arr.join("\t") + "\n";
               }
+              zip.append(flat, { name: "tree.data.tsv" });
               let tidy = "";
               for (let arr of data.tidy) {
                 tidy += arr.join("\t") + "\n";
               }
-              dataFiles = [
-                {
-                  content: flat,
-                  name: "tree.data.tsv",
-                  mode: "0644",
-                  comment: "TSV format data associated with tree nodes",
-                  date: new Date(),
-                  type: "file",
-                },
-                {
-                  content: tidy,
-                  name: "tree.tidyData.tsv",
-                  mode: "0644",
-                  comment: "TidyData format data associated with tree nodes",
-                  date: new Date(),
-                  type: "file",
-                },
-              ];
+              zip.append(tidy, { name: "tree.tidyData.tsv" });
             }
-            res.status(200).zip({
-              files: [
-                {
-                  content: newick,
-                  name: "tree.nwk",
-                  mode: "0644",
-                  comment: "Newick format tree file",
-                  date: new Date(),
-                  type: "file",
-                },
-                {
-                  content: phyloXml,
-                  name: "tree.xml",
-                  mode: "0644",
-                  comment: "PhyloXML format tree file",
-                  date: new Date(),
-                  type: "file",
-                },
-              ].concat(dataFiles),
-              filename: "tree.zip",
-            });
+            zip
+              .append(newick, { name: "tree.nwk" })
+              .append(phyloXml, { name: "tree.xml" })
+              .finalize();
           },
         }),
       });
