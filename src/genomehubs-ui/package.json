@@ -85,6 +85,7 @@
     "immutable-update": "^1.0.0",
     "konva": "^3.4.1",
     "leaflet": "^1.7.1",
+    "merge-images": "^2.0.0",
     "nanoid": "^3.1.31",
     "pixi.js": "^5.3.11",
     "pixi.js-legacy": "^5.3.11",

@@ -8,6 +8,7 @@ import Grid from "@material-ui/core/Grid";
 import React from "react";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
+import mergeImages from "merge-images";
 import qs from "../functions/qs";
 import withReportById from "../hocs/withReportById";
 
@@ -34,15 +35,23 @@ export const ReportDownload = ({
     };
 
     let chartSVG;
+    let scrollContainer;
     let success = false;
     if (format == "png" || format == "svg") {
       if (chartRef.current && chartRef.current.children) {
         // chartSVG = chartRef.current.childNodes[0].childNodes[0];
         chartSVG = chartRef.current.childNodes[0];
         if (report == "tree" && !queryString.match("=ring")) {
-          chartSVG =
-            chartRef.current.childNodes[0].childNodes[1].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[0];
+          if (chartSVG.childNodes.length == 1) {
+            chartSVG =
+              chartSVG.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0];
+          } else {
+            scrollContainer = chartSVG.childNodes[1];
+            chartSVG =
+              chartSVG.childNodes[1].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0];
+          }
         }
       } else {
         return;
@@ -63,8 +72,38 @@ export const ReportDownload = ({
       };
       if (format == "png") {
         // await saveSvgAsPng(chartSVG, `${filename}.png`, opts);
-        let uri = await htmlToImage.toPng(chartSVG, opts);
-        await downloadLink(uri, `${filename}.png`);
+        // let uri = await htmlToImage.toPng(chartSVG, opts);
+        if (scrollContainer) {
+          let width = chartSVG.clientWidth * window.devicePixelRatio;
+          let height = chartSVG.clientHeight * window.devicePixelRatio;
+          let divHeight = scrollContainer.clientHeight;
+          let chartHeight = scrollContainer.childNodes[0].clientHeight;
+          let images = [];
+          let tops = [];
+          for (
+            let top = 500;
+            top <= chartHeight - divHeight;
+            top += divHeight
+          ) {
+            scrollContainer.scrollTop = top;
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            let src = await htmlToImage.toPng(chartSVG, opts);
+            images.push({
+              src,
+              x: 0,
+              y: top * window.devicePixelRatio - 500 * window.devicePixelRatio,
+            });
+          }
+
+          let b64 = await mergeImages(images, {
+            width,
+            height: chartHeight * window.devicePixelRatio,
+          });
+          await downloadLink(b64, `${filename}.png`);
+        } else {
+          let uri = await htmlToImage.toPng(chartSVG, opts);
+          await downloadLink(uri, `${filename}.png`);
+        }
         success = true;
       } else if (format == "svg") {
         // let uri = await svgAsDataUri(chartSVG, opts);
