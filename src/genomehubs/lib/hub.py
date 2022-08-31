@@ -281,11 +281,11 @@ def convert_lat_lon(location):
     return ""
 
 
-def convert_to_type(key, value, to_type):
+def convert_to_type(key, raw_value, to_type):
     """Convert values to type."""
     if to_type in {"byte", "integer", "long", "short"}:
         try:
-            value = int(value)
+            value = int(raw_value)
         except ValueError:
             value = None
     elif to_type in {
@@ -298,17 +298,17 @@ def convert_to_type(key, value, to_type):
         "4dp",
     }:
         try:
-            value = float(value)
+            value = float(raw_value)
         except ValueError:
             value = None
     elif to_type == "geo_point":
-        value = convert_lat_lon(value)
+        value = convert_lat_lon(raw_value)
     else:
-        value = str(value)
-    # if value is None:
-    #     LOGGER.warning(
-    #         "%s value %s is not a valid %s", key, str(value), to_type,
-    #     )
+        value = str(raw_value)
+    if value is None:
+        LOGGER.warning(
+            "%s value %s is not a valid %s", key, str(raw_value), to_type,
+        )
     return value
 
 
