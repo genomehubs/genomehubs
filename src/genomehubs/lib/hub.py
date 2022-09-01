@@ -746,7 +746,7 @@ def process_row_values(row, types, data):
                     if "separator" in meta and any(
                         sep in value for sep in meta["separator"]
                     ):
-                        separator = "|".join(meta["separator"])
+                        separator = "|".join([re.escape(sep) for sep in meta["separator"]])
                         data[group][key] = re.split(rf"\s*{separator}\s*", value)
                     elif value is not None and value != "None":
                         data[group][key] = value
