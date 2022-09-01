@@ -11,7 +11,7 @@ import { format } from "d3-format";
 const colors = {
   direct: { color: directColor, size: 3 },
   descendant: { color: descendantColor, size: 2 },
-  ancestor: { color: ancestralColor },
+  ancestor: { color: ancestralColor, size: 1 },
 };
 
 const sci = (v) => {

@@ -43,6 +43,7 @@ const ReportTreePaths = ({
     rootRank = lines[0].taxon_rank;
   }
   pointSize *= 1;
+  let strokeWidth = pointSize / 10 + 0.5;
 
   let divHeight = height;
   let divWidth = width;
@@ -363,6 +364,7 @@ const ReportTreePaths = ({
                 segment.xEnd,
                 segment.yStart,
               ]}
+              strokeWidth={strokeWidth}
               stroke={segment.color}
               // strokeScaleEnabled={false}
             />
@@ -410,6 +412,7 @@ const ReportTreePaths = ({
                   segment.xStart + 10,
                   segment.yMax,
                 ]}
+                strokeWidth={strokeWidth}
                 stroke={segment.color}
               />
             );
@@ -423,6 +426,7 @@ const ReportTreePaths = ({
                   segment.xEnd,
                   segment.yMax,
                 ]}
+                strokeWidth={strokeWidth}
                 stroke={segment.color}
                 strokeScaleEnabled={false}
               />
@@ -537,11 +541,12 @@ const ReportTreePaths = ({
                 <Line
                   key={`cl-${segment.taxon_id}`}
                   points={[
-                    segment.xEnd + 10,
-                    segment.yStart,
                     maxTip,
                     segment.yStart,
+                    segment.xEnd + 10,
+                    segment.yStart,
                   ]}
+                  strokeWidth={strokeWidth}
                   stroke={"#dddddd"}
                   dash={[2, 5]}
                 />
@@ -974,15 +979,17 @@ const ReportTreePaths = ({
                   fill={"white"}
                 />
               </Layer>
-              <Layer>{paths}</Layer>
+              <Layer>
+                <Group x={maxWidth}>{bars}</Group>
+                <Group x={maxWidth}>{errorBars}</Group>
+                {paths}
+              </Layer>
               <Layer>
                 <Group>{cats}</Group>
                 {highlight.main}
                 <Group>{labels}</Group>
                 <Group>{connectors}</Group>
                 <Group>{nodes}</Group>
-                <Group x={maxWidth}>{bars}</Group>
-                <Group x={maxWidth}>{errorBars}</Group>
               </Layer>
               <Layer>
                 <KonvaTooltip {...tooltip} scale={scale} />

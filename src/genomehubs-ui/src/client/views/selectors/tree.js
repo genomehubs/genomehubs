@@ -30,6 +30,7 @@ import axisScales from "../functions/axisScales";
 import { getStatusPalette } from "../reducers/color";
 import qs from "../functions/qs";
 import store from "../store";
+import stringLength from "../functions/stringLength";
 
 const uriEncode = (str) => {
   return encodeURIComponent(str).replaceAll(/[!'()*]/g, (c) => {
@@ -441,7 +442,7 @@ export const processTreePaths = ({
   let maxWidth = 0;
   let maxTip = 0;
   let charHeight = pointSize;
-  let charLen = charHeight / 1.8;
+  let charLen = charHeight / 1.6;
   let xScale = scaleLinear()
     .domain([-0.5, maxDepth + 2])
     .range([0, targetWidth]);
@@ -572,10 +573,7 @@ export const processTreePaths = ({
     let label;
     if (node.tip) {
       label = node.scientific_name;
-      maxWidth = Math.max(
-        maxWidth,
-        node.xEnd + 10 + node.scientific_name.length * charLen
-      );
+      maxWidth = Math.max(maxWidth, stringLength(label) * pointSize * 0.8);
       maxTip = Math.max(maxTip, node.xEnd + 10);
     } else if (node.scientific_name != "parent" && node.width > charLen * 5) {
       label = node.scientific_name;
@@ -594,15 +592,15 @@ export const processTreePaths = ({
         }
       }
     }
-
     locations[node.scientific_name.toLowerCase()] = {
       x: node.xStart,
       y: node.yStart,
       tip: node.tip ? node.width : false,
-      width: node.tip ? node.scientific_name.length * charLen : node.width,
+      width: node.tip
+        ? stringLength(node.scientific_name) * pointSize * 0.8
+        : node.width,
     };
     locations[node.taxon_id.toLowerCase()] = { x: node.xStart, y: node.yStart };
-
     lines.push({
       ...node,
       hLine: d3line()([
@@ -625,7 +623,7 @@ export const processTreePaths = ({
               ]),
             })),
       label,
-      labelWidth: label ? label.length * charLen : 0,
+      labelWidth: label ? stringLength(label) * pointSize * 0.8 : 0,
       color,
       highlightColor,
       source,
@@ -633,6 +631,7 @@ export const processTreePaths = ({
       bar,
     });
   });
+  maxWidth += maxTip + pointSize / 2;
   return {
     lines,
     maxDepth,
