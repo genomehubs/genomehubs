@@ -188,7 +188,7 @@ export const ReportDownload = ({
       let propString = queryPropList[options.report]
         .map((entry) => (typeof entry === "string" ? entry : entry.prop))
         .filter((key) => options.hasOwnProperty(key))
-        .map((key) => `${key}="${options[key]}`)
+        .map((key) => `${key}="${options[key]}"`)
         .join(" ");
       let text = [
         "# Report",
@@ -205,6 +205,7 @@ export const ReportDownload = ({
         "- control proportion with `ratio=`",
         "- set font/point size with with `pointSize=`",
       ];
+
       let imageUrl = await exportChart({
         options,
         format: "png",
