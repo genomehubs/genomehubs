@@ -2,6 +2,7 @@ import * as htmlToImage from "html-to-image";
 
 import { saveSvgAsPng, svgAsDataUri } from "save-svg-as-png";
 
+import { Buffer } from "buffer";
 import DownloadButton from "./DownloadButton";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import Grid from "@material-ui/core/Grid";
@@ -11,6 +12,8 @@ import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
 import mergeImages from "merge-images";
 import qs from "../functions/qs";
+import { queryPropList } from "./ReportEdit";
+import { useLocation } from "@reach/router";
 import withReportById from "../hocs/withReportById";
 
 const downloadLink = async (uri, filename) => {
@@ -115,7 +118,14 @@ export const ReportDownload = ({
     return null;
   }
 
-  const exportChart = async ({ options, format, filename = "report" }) => {
+  const location = useLocation();
+
+  const exportChart = async ({
+    options,
+    format,
+    filename = "report",
+    toUrl,
+  }) => {
     let chartSVG;
     let scrollContainer;
     let success = false;
@@ -156,6 +166,7 @@ export const ReportDownload = ({
         // await saveSvgAsPng(chartSVG, `${filename}.png`, opts);
         // let uri = await htmlToImage.toPng(chartSVG, opts);
         if (scrollContainer) {
+          if (toUrl) return;
           await scrollingDownload({
             chartSVG,
             scrollContainer,
@@ -163,6 +174,7 @@ export const ReportDownload = ({
           });
         } else {
           let uri = await htmlToImage.toPng(chartSVG, opts);
+          if (toUrl) return uri;
           await downloadLink(uri, `${filename}.png`);
         }
         success = true;
@@ -172,6 +184,47 @@ export const ReportDownload = ({
         await downloadLink(uri, `${filename}.svg`);
         success = true;
       }
+    } else if (format == "md") {
+      let propString = queryPropList[options.report]
+        .map((entry) => (typeof entry === "string" ? entry : entry.prop))
+        .filter((key) => options.hasOwnProperty(key))
+        .map((key) => `${key}="${options[key]}`)
+        .join(" ");
+      let text = [
+        "# Report",
+        "",
+        `Exported from [${location.origin}${location.pathname}](${location.href})`,
+        "",
+        "## Embed in UI",
+        "```",
+        `::report{${propString} xs=12}`,
+        "```",
+        "",
+        "Notes:",
+        "- adjust `xs=` if placing in a grid",
+        "- control proportion with `ratio=`",
+        "- set font/point size with with `pointSize=`",
+      ];
+      let imageUrl = await exportChart({
+        options,
+        format: "png",
+        toUrl: true,
+      });
+      if (imageUrl) {
+        text = text.concat([
+          "",
+          "## Preview",
+          "",
+          `![Report image](${imageUrl})`,
+        ]);
+      }
+      await downloadLink(
+        `data:text/markdown;charset=UTF-8;base64,${new Buffer(
+          text.join("\n")
+        ).toString("base64")}`,
+        `${filename}.md`
+      );
+      success = true;
     } else if (format) {
       success = await saveReport({ options, format });
     }
@@ -190,6 +243,7 @@ export const ReportDownload = ({
     PNG: { format: "png" },
     SVG: { format: "svg" },
     JSON: { format: "json" },
+    MD: { format: "md" },
     ...(report == "tree" && {
       Newick: { format: "nwk" },
       PhyloXML: { format: "xml" },
