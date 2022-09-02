@@ -23,6 +23,7 @@ import qs from "../functions/qs";
 import withReportById from "../hocs/withReportById";
 import withSiteName from "../hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
+import withTypes from "../hocs/withTypes";
 
 const suggestedTerm = getSuggestedTerm();
 
@@ -149,27 +150,27 @@ export const ReportEdit = ({
   setReportEdit,
   fetchReport,
   modal,
-  permaLink,
   handleUpdate,
-  taxonomy,
+  types,
   basename,
 }) => {
   const classes = useStyles();
   const formRef = useRef();
   const [values, setValues] = useState({});
-  const [refs, setRefs] = useState({});
   let query = qs.parse(reportById.report?.queryString);
   if (query.report == "tree" && !query.treeStyle) {
     query.treeStyle = "rect";
   }
   let result = query.result;
 
+  let props = queryPropList[report];
+
   const defaultState = () => {
     let obj = {};
     if (!query || !report || !queryPropList[report]) {
       return obj;
     }
-    queryPropList[report].forEach((queryProp) => {
+    for (let queryProp of queryPropList[report]) {
       let prop;
       let defaultValue = "";
       if (Array.isArray(queryProp)) {
@@ -179,13 +180,28 @@ export const ReportEdit = ({
       } else {
         prop = queryProp;
       }
+      if (prop == "xField") {
+        continue;
+      }
       obj[prop] = query.hasOwnProperty(prop) ? query[prop] : defaultValue;
-    });
+      if (prop == "x") {
+        obj.xField = "";
+        for (let part of obj[prop].split(/\s+/)) {
+          if (types.hasOwnProperty(part)) {
+            obj.xField = part;
+            break;
+          }
+        }
+      }
+    }
     return obj;
   };
   useEffect(() => {
     if (Object.keys(values).length == 0) {
       setValues(defaultState());
+    }
+    if (!props.includes("xField")) {
+      props.splice(2, 0, "xField");
     }
   }, [query, report, reportById]);
 
@@ -260,6 +276,19 @@ export const ReportEdit = ({
     } else {
       queryObj.includeEstimates = true;
     }
+    if (queryObj.xField && !queryObj.x.startsWith(`${queryObj.xField} AND`)) {
+      let currentX = "";
+      for (let part of queryObj.x.split(/\s+/)) {
+        if (types.hasOwnProperty(part)) {
+          currentX = part;
+          break;
+        }
+      }
+      if (queryObj.xField != currentX) {
+        queryObj.x = `${queryObj.xField} AND ${queryObj.x}`;
+      }
+      delete queryObj.xField;
+    }
     if (!location.pathname.startsWith(basename + "/report")) {
       queryObj.query = queryObj.query || queryObj.x;
       if (queryObj.x) delete queryObj.x;
@@ -294,7 +323,7 @@ export const ReportEdit = ({
 
   let toggles = [];
 
-  for (let queryProp of queryPropList[report]) {
+  for (let queryProp of props) {
     let except, input, label, required, min, max, step;
     if (Array.isArray(queryProp)) {
       required = true;
@@ -539,6 +568,7 @@ export const ReportEdit = ({
 export default compose(
   withSiteName,
   withTaxonomy,
+  withTypes,
   withReportById,
   dispatchReport
 )(ReportEdit);

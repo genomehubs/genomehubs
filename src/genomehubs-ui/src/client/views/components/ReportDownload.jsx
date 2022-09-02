@@ -197,13 +197,13 @@ export const ReportDownload = ({
         "",
         "## Embed in UI",
         "```",
-        `::report{${propString} xs=12}`,
+        `::report{${propString}}`,
         "```",
         "",
         "Notes:",
-        "- adjust `xs=` if placing in a grid",
-        "- control proportion with `ratio=`",
-        "- set font/point size with with `pointSize=`",
+        "- use `xs=` to control width if placing in a grid",
+        "- use `ratio=` to adjust width/height ratio",
+        "- use `pointSize=` to set font/point size",
       ];
 
       let imageUrl = await exportChart({
