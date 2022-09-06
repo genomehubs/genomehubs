@@ -183,6 +183,9 @@ export const ReportEdit = ({
       if (prop == "xField") {
         continue;
       }
+      if (prop == "report" && query[prop] == "xInY") {
+        query[prop] = "arc";
+      }
       obj[prop] = query.hasOwnProperty(prop) ? query[prop] : defaultValue;
       if (prop == "x") {
         obj.xField = "";
