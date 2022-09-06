@@ -1000,6 +1000,10 @@ components:
         name:
           type: string
       type: object
+    Indices:
+      items:
+        type: string
+      type: array
     Records:
       items:
         properties:
@@ -1162,6 +1166,26 @@ paths:
       tags:
         - Tools
       x-eov-operation-handler: api/v2/routes/download
+  /indices:
+    get:
+      description: Returns a list of available indices
+      operationId: getIndices
+      parameters:
+        - $ref: "#/components/parameters/releaseParam"
+        - $ref: "#/components/parameters/indentParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Indices"
+          description: successful operation
+        "400":
+          description: Invalid query
+      summary: List of indices
+      tags:
+        - Metadata
+      x-eov-operation-handler: api/v2/routes/indices
   /lookup:
     get:
       description: |

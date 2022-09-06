@@ -1,5 +1,6 @@
 import {
   getCurrentTaxonomy,
+  getIndices,
   getTaxonomies,
   getTaxonomiesFetching,
   setCurrentTaxonomy,
@@ -11,6 +12,7 @@ import { fetchTaxonomies } from "../selectors/taxonomy";
 
 const withTaxonomy = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
+    indices: getIndices(state),
     taxonomy: getCurrentTaxonomy(state),
     taxonomies: getTaxonomies(state),
     taxonomyIsFetching: getTaxonomiesFetching(state),

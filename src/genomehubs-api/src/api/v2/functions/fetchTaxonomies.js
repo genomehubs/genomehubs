@@ -19,18 +19,4 @@ export const fetchTaxonomies = async (release = config.release) => {
     ...taxonomies.filter((taxonomy) => taxonomy != config.taxonomy),
   ];
   return sorted;
-  // let status = checkResponse({ body });
-  // let types = {};
-  // if (status.hits) {
-  //   body.hits.hits.forEach((hit) => {
-  //     if (!types[hit._source.group]) {
-  //       types[hit._source.group] = {};
-  //     }
-  //     types[hit._source.group][hit._source.name] = hit._source;
-  //   });
-  // }
-  // if (result != "multi") {
-  //   return types[result];
-  // }
-  // return types;
 };
