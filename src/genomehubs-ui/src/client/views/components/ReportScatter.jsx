@@ -23,6 +23,7 @@ import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "@material-ui/core/Tooltip";
 import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
+import { line as d3Line } from "d3-shape";
 import dispatchMessage from "../hocs/dispatchMessage";
 import { format } from "d3-format";
 import { processLegendData } from "./MultiCatLegend";
@@ -308,12 +309,34 @@ const CustomShape = (props, chartProps) => {
   );
 };
 
+const eqnToLine = (eqn, { x: xMin, y: yMin, xBound, yBound, xAxis, yAxis }) => {
+  let points = [];
+  let xScale = scaleLinear().domain([0, 100]).range([xMin, xBound]);
+  let m = eqn[1] == "" ? 1 : isNaN(eqn[1]) ? 1 : eqn[1] * 1;
+  let pow = 1;
+  let c = 0;
+  if (eqn[2].match(/(\*\*|\^)/)) {
+    pow = eqn[3] * 1;
+  }
+  c = eqn[4] == "" ? 0 : isNaN(eqn[4]) ? 0 : eqn[4] * 1;
+  for (let i = 0; i <= 100; i++) {
+    let x = xScale(i);
+    let y = m * x ** pow + c;
+    if (y >= yMin && y <= yBound) {
+      points.push([xAxis.scale(x), yAxis.scale(y)]);
+    }
+  }
+  let line = d3Line().context(null);
+  return line(points);
+};
+
 const HighlightShape = (props, chartProps) => {
   let { cx, cy, xAxis, yAxis } = props;
   let { x, y, xBound, yBound, label } = props.payload;
+  let { eqn } = chartProps;
   let height = yAxis.scale(yBound) - cy;
   let width = xAxis.scale(xBound) - cx;
-  let text;
+  let text, rect, path;
   let color = "black";
   if (label) {
     text = (
@@ -328,9 +351,27 @@ const HighlightShape = (props, chartProps) => {
       </Text>
     );
   }
-  return (
-    <>
-      {text}
+  if (eqn) {
+    let d = eqnToLine(eqn, {
+      x: x,
+      y: y,
+      xBound: xBound,
+      yBound: yBound,
+      xAxis,
+      yAxis,
+    });
+    path = (
+      <path
+        d={d}
+        fill={"none"}
+        stroke={color}
+        strokeWidth={chartProps.pointSize / 10}
+        strokeDasharray={chartProps.pointSize}
+        strokeOpacity={0.5}
+      />
+    );
+  } else {
+    rect = (
       <Rectangle
         height={height}
         width={width}
@@ -340,6 +381,13 @@ const HighlightShape = (props, chartProps) => {
         stroke={color}
         strokeWidth={chartProps.pointSize / 10}
       />
+    );
+  }
+  return (
+    <>
+      {text}
+      {rect}
+      {path}
     </>
   );
 };
@@ -398,6 +446,12 @@ const Heatmap = ({
     chartProps.bounds.scale == "ordinal" ? "linear" : chartProps.bounds.scale;
   let yScale =
     chartProps.yBounds.scale == "ordinal" ? "linear" : chartProps.yBounds.scale;
+  let xDomain = isNaN(buckets[0])
+    ? [0, buckets.length - 1]
+    : [buckets[0], buckets[buckets.length - 1]];
+  let yDomain = isNaN(yBuckets[0])
+    ? [0, yBuckets.length - 1]
+    : [yBuckets[0], yBuckets[yBuckets.length - 1]];
   let axes = [
     <CartesianGrid key={"grid"} strokeDasharray="3 3" />,
     <XAxis
@@ -406,16 +460,8 @@ const Heatmap = ({
       key={"x"}
       scale={axisScales[xScale]()}
       angle={buckets.length > 15 ? -90 : 0}
-      domain={
-        isNaN(buckets[0])
-          ? [0, buckets.length - 1]
-          : [buckets[0], buckets[buckets.length - 1]]
-      }
-      range={
-        isNaN(buckets[0])
-          ? [0, buckets.length - 1]
-          : [buckets[0], buckets[buckets.length - 1]]
-      }
+      domain={xDomain}
+      range={xDomain}
       ticks={isNaN(buckets[0]) ? buckets.map((x, i) => i) : buckets}
       tick={(props) =>
         ReportXAxisTick(
@@ -458,18 +504,10 @@ const Heatmap = ({
           chartProps.pointSize
         )
       }
-      domain={
-        isNaN(yBuckets[0])
-          ? [0, yBuckets.length - 1]
-          : [yBuckets[0], yBuckets[yBuckets.length - 1]]
-      }
+      domain={yDomain}
       // domain={["auto", "auto"]}
       // range={["auto", "auto"]}
-      range={
-        isNaN(yBuckets[0])
-          ? [0, yBuckets.length - 1]
-          : [yBuckets[0], yBuckets[yBuckets.length - 1]]
-      }
+      range={yDomain}
       tickFormatter={chartProps.showYTickLabels ? chartProps.yFormat : () => ""}
       interval={0}
     >
@@ -498,8 +536,23 @@ const Heatmap = ({
   let highlightRect;
   if (highlightArea) {
     let parts = highlightArea.split(/(?:,\s*)/);
-    if (parts.length >= 4) {
-      let coords = {
+    let coords, eqn, label;
+    if (parts[0].startsWith("y=")) {
+      eqn = parts[0]
+        .replace("y=", "")
+        .match(/\s*([-\d\.]*)\s*x\s*([\*|\^]*)(-*[\d\.]*)\s*\+*\s*(-*[\d\.]*)/);
+      if (parts[1]) {
+        label = parts[1];
+      }
+      coords = {
+        x: xDomain[0],
+        y: yDomain[0],
+        xBound: xDomain[1],
+        yBound: yDomain[1],
+        label,
+      };
+    } else if (parts.length >= 4) {
+      coords = {
         x: parts[0] * 1,
         y: parts[1] * 1,
         xBound: parts[2] * 1,
@@ -508,12 +561,13 @@ const Heatmap = ({
       if (parts[4]) {
         coords.label = parts[4];
       }
-
+    }
+    if (coords) {
       highlightRect = (
         <Scatter
           key={"highlightArea"}
           data={[coords]}
-          shape={(props) => HighlightShape(props, { ...chartProps })}
+          shape={(props) => HighlightShape(props, { ...chartProps, eqn })}
           isAnimationActive={false}
           legendType="none"
         />
@@ -609,6 +663,7 @@ const ReportScatter = ({
   basename,
   pointSize = 15,
 }) => {
+  pointSize *= 1;
   const navigate = useNavigate();
   const location = useLocation();
   const [highlight, setHighlight] = useState([]);
