@@ -132,6 +132,8 @@ const expandOptions = (obj, opts) => {
       let v = tr.expand(param, value);
       if (typeof v === "object" && v.key) {
         expanded[v.key] = v.value;
+      } else if (value == "") {
+        expanded[p] = "";
       } else {
         expanded[p] = v;
       }

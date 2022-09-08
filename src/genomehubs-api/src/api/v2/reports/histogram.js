@@ -523,10 +523,7 @@ export const histogram = async ({
     taxonomy,
   });
   updateQuery({ params, fields, opts: xOpts, lookupTypes });
-  // let exclude = [];
-
   fields = [...new Set(fields.concat(searchFields))];
-  // exclude.push(fields[0]);
   let yTerm, yFields, ySummaries;
   let yParams = {};
   if (y) {

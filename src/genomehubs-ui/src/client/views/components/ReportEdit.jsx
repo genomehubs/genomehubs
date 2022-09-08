@@ -187,7 +187,7 @@ export const ReportEdit = ({
         query[prop] = "arc";
       }
       obj[prop] = query.hasOwnProperty(prop) ? query[prop] : defaultValue;
-      if (prop == "x") {
+      if (prop == "x" && obj[prop]) {
         obj.xField = "";
         for (let part of obj[prop].split(/\s+/)) {
           if (types.hasOwnProperty(part)) {
