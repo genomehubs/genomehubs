@@ -239,7 +239,7 @@ const Histogram = ({
       //     translations: chartProps.translations,
       //   })
       // }
-      // ticks={isNaN(buckets[0]) ? buckets.map((x, i) => i) : buckets}
+      ticks={isNaN(buckets[0]) ? null : buckets}
       tick={(props) =>
         ReportXAxisTick(
           props,
@@ -247,7 +247,9 @@ const Histogram = ({
           chartProps.xFormat,
           chartProps.translations,
           chartProps.pointSize,
-          chartProps.orientation
+          chartProps.orientation,
+          width - marginRight,
+          isNaN(buckets[0]) ? "catHistogram" : "histogram"
         )
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
@@ -395,7 +397,7 @@ const ReportHistogram = ({
   basename,
   pointSize = 15,
 }) => {
-  pointSize = 1 * pointSize;
+  pointSize *= 1;
   const navigate = useNavigate();
   const componentRef = chartRef ? chartRef : useRef();
   const { width, height } = containerRef

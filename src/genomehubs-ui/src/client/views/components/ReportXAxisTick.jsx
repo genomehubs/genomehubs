@@ -6,20 +6,43 @@ export const ReportXAxisTick = (
   fmt,
   translations,
   pointSize,
-  orientation
+  orientation,
+  lastPos,
+  report
 ) => {
-  const { x, y, fill, index, width, payload } = props;
+  let { x, y, fill, index, width, payload } = props;
   let value = payload.value;
   let yPos = y;
   let offset = 0;
   let bucketWidth = width / (buckets.length - 1);
-
+  let tickLine;
+  if (isNaN(x) && lastPos) {
+    x = lastPos;
+    if (report == "histogram") {
+      x += bucketWidth / 2;
+    }
+  }
+  if (report == "histogram") {
+    offset -= bucketWidth / 2;
+    tickLine = (
+      <line x1={0} x2={0} y1={-8} y2={-3} fill={"none"} stroke={fill} />
+    );
+  }
+  if (report == "catHistogram" && index < buckets.length - 2) {
+    tickLine = (
+      <line
+        x1={bucketWidth / 2}
+        x2={bucketWidth / 2}
+        y1={-8}
+        y2={-3}
+        fill={"none"}
+        stroke={fill}
+      />
+    );
+  }
   if (buckets[index] != payload.value) {
     value = buckets[index] || "";
-    offset = bucketWidth / 2;
-    // if (index % 2 == 1 && value.length * pointSize * 0.6 > bucketWidth) {
-    //   yPos += 12;
-    // }
+    offset += bucketWidth / 2;
   } else {
     value = fmt(value);
     if (!orientation) {
@@ -63,7 +86,12 @@ export const ReportXAxisTick = (
       </text>
     );
   }
-  return <g transform={`translate(${x + offset},${yPos})`}>{text}</g>;
+  return (
+    <g transform={`translate(${x + offset},${yPos})`}>
+      {text}
+      {tickLine}
+    </g>
+  );
 };
 
 export default ReportXAxisTick;
