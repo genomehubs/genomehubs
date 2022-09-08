@@ -431,6 +431,7 @@ export const processTreePaths = ({
   if (yBounds && yBounds.domain) {
     valueScale = axisScales[yBounds.scale]()
       .domain(yBounds.domain)
+      .nice()
       .range([0, 100]);
     dataWidth = 120;
     targetWidth -= 120;
@@ -449,7 +450,7 @@ export const processTreePaths = ({
   let yMax = treeNodes[rootNode] ? treeNodes[rootNode].count : 0;
   let yScale = scaleLinear()
     .domain([0, yMax])
-    .range([charHeight * (yMax + 2), 0]);
+    .range([charHeight * (yMax + 3), charHeight]);
   let lines = [];
   let visited = {};
 
@@ -638,8 +639,9 @@ export const processTreePaths = ({
     maxWidth,
     maxTip,
     yField,
+    valueScale,
     dataWidth,
-    plotHeight: yScale(0) - yScale(yMax) + charHeight / 2,
+    plotHeight: yScale(0) - yScale(yMax) + charHeight / 2 + charHeight,
     charHeight,
     locations,
     other,
