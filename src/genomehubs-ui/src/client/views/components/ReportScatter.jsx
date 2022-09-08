@@ -747,7 +747,7 @@ const ReportScatter = ({
     } = processLegendData({
       bounds,
       yBounds,
-      minWidth: compactLegend ? 50 : 150,
+      minWidth: compactLegend ? 50 : 10 * pointSize,
       width,
       pointSize,
     });

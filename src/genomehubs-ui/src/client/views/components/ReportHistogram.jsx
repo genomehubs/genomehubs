@@ -531,7 +531,7 @@ const ReportHistogram = ({
     const { translations, catTranslations, catOffsets, legendRows } =
       processLegendData({
         bounds,
-        minWidth: compactLegend ? 50 : 150,
+        minWidth: compactLegend ? 50 : 10 * pointSize,
         width,
         pointSize,
       });
