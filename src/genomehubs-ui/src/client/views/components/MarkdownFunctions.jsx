@@ -7,6 +7,7 @@ import Highlight from "./Highlight";
 import MarkdownInclude from "./MarkdownInclude";
 import NavLink from "./NavLink";
 import Report from "./Report";
+import Template from "./Template";
 import Toggle from "./Toggle";
 import Tooltip from "@material-ui/core/Tooltip";
 import classnames from "classnames";
@@ -94,6 +95,9 @@ export const RehypeComponentsList = {
     <Report {...processProps(props)} className={styles.reportContainer} />
   ),
   span: (props) => <span {...processProps(props)} />,
+  templat: (props) => (
+    <Template {...processProps(props)} className={styles.reportContainer} />
+  ),
   tooltip: (props) => {
     return (
       <Tooltip {...processProps(props, { placement: "top" })}>
