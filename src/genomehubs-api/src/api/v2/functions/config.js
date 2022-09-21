@@ -17,6 +17,7 @@ const GH_ORIGINS = process.env.GH_ORIGINS
       GH_HOST,
       (GH_HTTPS ? "https" : "http") + "://" + GH_HOST + ":" + GH_CLIENT_PORT,
     ];
+const release = process.env.GH_RELEASE || "v0.1";
 
 export const config = {
   hub: process.env.GH_HUBNAME || "demo",
@@ -24,7 +25,7 @@ export const config = {
   node: process.env.GH_NODE || "http://localhost:9200",
   separator: process.env.GH_SEPARATOR || "--",
   taxonomy: process.env.GH_TAXONOMY || "ncbi",
-  release: process.env.GH_RELEASE || "v0.1",
+  release,
   source: process.env.GH_SOURCE || undefined,
   accessLog: process.env.GH_ACCESS_LOG || "./logs/access.log",
   errorLog: process.env.GH_ERROR_LOG || "./logs/error.log",
@@ -40,6 +41,7 @@ export const config = {
   contactEmail: process.env.GH_CONTACTEMAIL || "goat@genomehubs.org",
   url: GH_API_URL,
   memcached: process.env.GH_MEMCACHED || undefined,
+  redis: `${process.env.GH_REDIS}/${release.slice(-1)}` || undefined,
   treeThreshold: process.env.GH_TREE_THRESHOLD || 10000,
   scrollThreshold: process.env.GH_SCROLL_THRESHOLD || 10000,
   scrollDuration: process.env.GH_SCROLL_DURATION || "30s",

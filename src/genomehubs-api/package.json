@@ -32,6 +32,7 @@
     "esm": "^3.2.25",
     "express": "^4.17.2",
     "express-openapi-validator": "^4.13.5",
+    "ioredis": "^5.2.3",
     "json2csv": "^5.0.6",
     "memcached": "^2.2.2",
     "memcached-promise": "^1.0.1",
