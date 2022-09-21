@@ -1,6 +1,6 @@
 {
   "name": "genomehubs-ui",
-  "version": "2.5.25",
+  "version": "2.5.26",
   "repository": "https://github.com/genomehubs/genomehubs",
   "description": "",
   "bin": "src/app.js",
