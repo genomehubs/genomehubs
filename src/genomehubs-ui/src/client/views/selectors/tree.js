@@ -428,7 +428,7 @@ export const processTreePaths = ({
   let valueScale;
   let targetWidth = 1000;
   let dataWidth = 0;
-  if (yBounds && yBounds.domain) {
+  if (yBounds && yBounds.domain && yBounds.type != "date") {
     valueScale = axisScales[yBounds.scale]()
       .domain(yBounds.domain)
       .nice()
