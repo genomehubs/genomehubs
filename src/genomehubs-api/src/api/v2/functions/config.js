@@ -41,7 +41,9 @@ export const config = {
   contactEmail: process.env.GH_CONTACTEMAIL || "goat@genomehubs.org",
   url: GH_API_URL,
   memcached: process.env.GH_MEMCACHED || undefined,
-  redis: `${process.env.GH_REDIS}/${release.slice(-1)}` || undefined,
+  redis: process.env.GH_REDIS
+    ? `${process.env.GH_REDIS}/${release.slice(-1)}`
+    : undefined,
   treeThreshold: process.env.GH_TREE_THRESHOLD || 10000,
   scrollThreshold: process.env.GH_SCROLL_THRESHOLD || 10000,
   scrollDuration: process.env.GH_SCROLL_DURATION || "30s",

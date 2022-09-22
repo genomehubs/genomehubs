@@ -1,3 +1,5 @@
+"""Landing page tests."""
+
 import pytest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -8,11 +10,15 @@ BASE_URL = "http://localhost:8880"
 
 @pytest.mark.usefixtures("setup")
 class TestLandingPage:
+    """Landing page tests."""
+
     def test_title(self):
+        """Check page title is set."""
         self.driver.get(BASE_URL)
         assert self.driver.title == "GoaT"
 
     def test_histogram(self):
+        """Check histogram loads."""
         self.driver.get(f"{BASE_URL}/report?report=histogram&x=assembly_date&rank=species&cat=assembly_level&stacked=true&includeEstimates=true&excludeAncestral%5B0%5D=assembly_span&excludeMissing%5B0%5D=assembly_span&caption=Progress%20of%20genome%20assemblies%20published%20on%20INSDC%20over%20time%2C%20by%20assembly%20level&taxonomy=ncbi&result=taxon")
         histogram = None
         try:
@@ -36,7 +42,3 @@ class TestLandingPage:
             pass
         assert bars is not None
         assert len(bars) == 6
-        
-    # def test_title_blog(self):
-    #     self.driver.get('https://www.delrayo.tech/blog')
-    #     print(self.driver.title)

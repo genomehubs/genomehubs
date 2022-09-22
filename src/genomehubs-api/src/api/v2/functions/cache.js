@@ -1,5 +1,4 @@
 import { logMemcache } from "./logger";
-// import { mc } from "./memcached";
 import qs from "qs";
 import { rd } from "./redis";
 
@@ -18,7 +17,7 @@ export const cacheFetch = async (req) => {
   let key;
   let cachedData = false;
   const action = "FETCH";
-  const store = rd || mc;
+  const store = rd;
   if (store) {
     let success = false;
     key = sortUrl(req.url);
@@ -38,7 +37,7 @@ export const cacheFetch = async (req) => {
 export const cacheStore = async (req, obj) => {
   let key, success;
   const action = "STORE";
-  const store = rd || mc;
+  const store = rd;
   if (store) {
     try {
       key = sortUrl(req.url);
