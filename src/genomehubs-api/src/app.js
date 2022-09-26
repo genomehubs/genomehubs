@@ -8,9 +8,8 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import { logError } from "./api/v2/functions/logger.js";
 import path from "path";
-// import qs from "./api/v2/functions/qs.js";
+import qs from "./api/v2/functions/qs.js";
 import swaggerUi from "swagger-ui-express";
-import zip from "express-easy-zip";
 
 const port = config.port;
 const apiSpec = path.join(__dirname, "api-v2.yaml");
@@ -36,7 +35,6 @@ const swaggerOptions = {
 };
 
 const app = express();
-app.use(zip());
 app.use(compression());
 if (config.cors) {
   const cors = require("cors");
@@ -69,6 +67,15 @@ if (process.pkg) {
 //   next();
 // };
 // app.use(expandQuery);
+
+// rename xInY to arc
+const expandQuery = function (req, res, next) {
+  if (req.query) {
+    req.query = qs.expand(req.query);
+  }
+  next();
+};
+app.use(expandQuery);
 
 // Modify swagger setup to prevent petstore being served in production
 // app.use(

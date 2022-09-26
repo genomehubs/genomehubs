@@ -86,7 +86,8 @@ const SearchBox = ({
   let names =
     searchTerm.names || savedOptions?.names?.join(",") || searchDefaults.names;
 
-  const dispatchSearch = (options, term) => {
+  const dispatchSearch = (searchOptions, term) => {
+    let options = { ...searchTerm, ...searchOptions };
     if (!options.hasOwnProperty("includeEstimates")) {
       options.includeEstimates = searchDefaults.includeEstimates;
     }
@@ -155,7 +156,9 @@ const SearchBox = ({
     setSearchIndex(result);
 
     let inputs = Array.from(
-      formRef.current.getElementsByClassName("inputQuery")
+      formRef.current
+        ? formRef.current.getElementsByClassName("inputQuery")
+        : []
     )
       .map((el) => ({
         name: el.children[1].children[0].name,
@@ -174,7 +177,7 @@ const SearchBox = ({
   };
 
   const handleSubmit = (e, props = {}) => {
-    e.preventDefault();
+    e && e.preventDefault();
     const { index } = props;
     let term = searchInputRef.current.value;
     doSearch(term, index || result, term);
@@ -224,11 +227,17 @@ const SearchBox = ({
                 <IconButton
                   className={classes.search}
                   aria-label="submit search"
-                  onClick={(e) =>
-                    formRef.current.dispatchEvent(
-                      new Event("submit", { cancelable: true, bubbles: true })
-                    )
-                  }
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setTimeout(() => {
+                      formRef.current.dispatchEvent(
+                        new Event("submit", {
+                          cancelable: false,
+                          bubbles: true,
+                        })
+                      );
+                    }, 20);
+                  }}
                 >
                   <SearchIcon />
                 </IconButton>

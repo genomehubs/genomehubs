@@ -1,6 +1,8 @@
 import React, { memo, useEffect, useRef, useState } from "react";
 
 import Grid from "@material-ui/core/Grid";
+import ReportArc from "./ReportArc";
+import ReportCaption from "./ReportCaption";
 import ReportEmpty from "./ReportEmpty";
 import ReportError from "./ReportError";
 import ReportHistogram from "./ReportHistogram";
@@ -11,7 +13,6 @@ import ReportScatter from "./ReportScatter";
 import ReportSources from "./ReportSources";
 import ReportTable from "./ReportTable";
 import ReportTree from "./ReportTree";
-import ReportXInY from "./ReportXInY";
 import ReportXPerRank from "./ReportXPerRank";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
@@ -60,6 +61,7 @@ const ReportItem = ({
   scatterThreshold,
   yScale,
   zScale,
+  pointSize,
   treeStyle,
   treeThreshold,
   levels,
@@ -94,6 +96,12 @@ const ReportItem = ({
   let visible = useVisible(targetRef);
   const [minDim, basicSetMinDim] = useState(0);
   let setMinDim;
+
+  if (typeof embedded === "undefined") {
+    pointSize = 15;
+  } else if (pointSize) {
+    pointSize *= 1;
+  }
 
   // const [hideMessage, sethideMessage] = useState(false);
 
@@ -185,6 +193,20 @@ const ReportItem = ({
     // };
   } else {
     switch (report) {
+      case "arc":
+        component = (
+          <ReportArc
+            arc={reportById}
+            chartRef={chartRef}
+            embedded={embedded}
+            containerRef={targetRef}
+            ratio={ratio}
+            pointSize={pointSize}
+            minDim={minDim}
+            setMinDim={setMinDim}
+          />
+        );
+        break;
       case "histogram":
         component = (
           <ReportHistogram
@@ -197,6 +219,7 @@ const ReportItem = ({
             cumulative={cumulative}
             xOpts={xOpts}
             includeEstimates={includeEstimates}
+            pointSize={pointSize}
             // yScale={yScale}
             {...qs.parse(queryString)}
             minDim={minDim}
@@ -232,6 +255,7 @@ const ReportItem = ({
             yOpts={yOpts}
             highlightArea={highlightArea}
             stacked={stacked}
+            pointSize={pointSize}
             zScale={zScale}
             scatterThreshold={scatterThreshold}
             includeEstimates={includeEstimates}
@@ -293,6 +317,7 @@ const ReportItem = ({
             reportRef={reportRef}
             gridRef={gridRef}
             treeStyle={treeStyle}
+            pointSize={pointSize}
             handleUpdate={handleUpdate}
             dispatch={dispatch}
             includeEstimates={includeEstimates}
@@ -319,19 +344,6 @@ const ReportItem = ({
           />
         );
         break;
-      case "xInY":
-        component = (
-          <ReportXInY
-            xInY={reportById}
-            chartRef={chartRef}
-            embedded={embedded}
-            containerRef={targetRef}
-            ratio={ratio}
-            minDim={minDim}
-            setMinDim={setMinDim}
-          />
-        );
-        break;
       default:
         break;
     }
@@ -352,27 +364,6 @@ const ReportItem = ({
   } else {
     caption = reportById?.report?.caption;
   }
-  const formatCaption = (caption) => {
-    if (caption && caption !== true) {
-      let captionArr = [];
-      let parts = (caption || "").split("**");
-      for (let i = 0; i < parts.length; i++) {
-        if (i % 2 == 0) {
-          captionArr.push(<span key={i}>{parts[i]}</span>);
-        } else {
-          captionArr.push(
-            <b key={i} style={{ color: "black" }}>
-              {parts[i]}
-            </b>
-          );
-        }
-      }
-      return <span>{captionArr}</span>;
-    }
-    return;
-  };
-
-  let formattedCaption = formatCaption(caption);
 
   let content = (
     <Grid
@@ -390,9 +381,7 @@ const ReportItem = ({
         {component}
       </Grid>
       {!loading && !error && caption && (
-        <Grid item xs style={{ textAlign: "center" }}>
-          <span className={styles.reportCaption}>{formattedCaption}</span>
-        </Grid>
+        <ReportCaption caption={caption} embedded={embedded} />
       )}
     </Grid>
   );

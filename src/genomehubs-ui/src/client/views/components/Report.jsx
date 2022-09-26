@@ -33,6 +33,7 @@ const Report = ({
   const location = useLocation();
   // const reportRef = useRef();
   let options = qs.parse(location.search.replace(/^\?/, ""));
+  props.report = props.report.replace("xInY", "arc");
   let reportProps = { ...props };
   let queryProps = {};
   if (options.taxonomy) {
@@ -88,7 +89,7 @@ const Report = ({
   reportProps.cumulative = props.cumulative;
   reportProps.reversed = props.reversed;
   reportProps.yScale = props.yScale || "linear";
-  reportProps.zScale = props.yScale || "linear";
+  reportProps.zScale = props.zScale || "linear";
   reportProps.xOpts = props.xOpts;
   reportProps.treeStyle = props.treeStyle || "rect";
   reportProps.yOpts = props.yOpts;
@@ -96,6 +97,10 @@ const Report = ({
   reportProps.mapThreshold = props.mapThreshold;
   reportProps.scatterThreshold = props.scatterThreshold;
   reportProps.treeThreshold = props.treeThreshold;
+  reportProps.pointSize =
+    props.pointSize * 1 ||
+    qs.parse(reportProps.queryString).pointSize * 1 ||
+    15;
   reportProps.collapseMonotypic = props.collapseMonotypic;
   reportProps.excludeAncestral = props.excludeAncestral;
   reportProps.excludeDescendant = props.excludeDescendant;

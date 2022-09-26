@@ -40,7 +40,7 @@ import qstr from "qs";
 //       map: "m",
 //       scatter: "s",
 //       tree: "t",
-//       xiny: "p",
+//       arc: "p",
 //     },
 //   },
 //   result: {

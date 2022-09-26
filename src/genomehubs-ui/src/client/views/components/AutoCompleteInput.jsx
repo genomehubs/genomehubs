@@ -211,7 +211,7 @@ export const AutoCompleteInput = ({
     });
   }
   if (options.length == 1 && options[0].value == options[0].subTerm) {
-    options = [];
+    // options = [];
   }
 
   const setLastType = (value, lastType, types) => {
@@ -345,7 +345,16 @@ export const AutoCompleteInput = ({
     return [prefix.length, end];
   };
   const handlePopperClose = (e, reason) => {
-    if (e) {
+    if (e && reason == "select-option" && !prefix && !suffix) {
+      setTimeout(() => {
+        if (inputRef.current) {
+          handleSubmit(null, {
+            id,
+            value: inputRef.current.value,
+          });
+        }
+      }, 75);
+    } else if (e) {
       let range = highlightRange();
       let current = inputRef.current;
       setTimeout(() => {
@@ -369,11 +378,13 @@ export const AutoCompleteInput = ({
     }
   };
   const handleHighlightChange = (e, option, reason) => {
-    if (e && option) {
-      let range = highlightRange(option.title);
-      setTimeout(() => {
-        inputRef.current.setSelectionRange(...range);
-      }, 20);
+    if (multipart) {
+      if (e && option) {
+        let range = highlightRange(option.title);
+        setTimeout(() => {
+          inputRef.current.setSelectionRange(...range);
+        }, 20);
+      }
     }
   };
   const updateValue = (value) => {

@@ -1,8 +1,8 @@
 import React, { memo, useEffect } from "react";
 
+import NavLink from "./NavLink";
 import { compose } from "recompose";
 import withRoutes from "../hocs/withRoutes";
-import NavLink from "./NavLink";
 
 const Tab = ({ routeName, pageId, setRoute, routesById }) => {
   useEffect(() => {

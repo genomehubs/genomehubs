@@ -55,6 +55,7 @@ const QueryBuilder = ({
   setSearchDefaults,
   setLookupTerm,
   setPreferSearchTerm,
+  indices,
   taxonomy,
   types,
   basename,
@@ -374,10 +375,10 @@ const QueryBuilder = ({
               handleChange={handleIndexChange}
               helperText={"search index"}
               values={{
-                Taxon: "taxon",
-                Sample: "sample",
-                Assembly: "assembly",
-                Feature: "feature",
+                ...(indices.includes("taxon") && { Taxon: "taxon" }),
+                ...(indices.includes("sample") && { Sample: "sample" }),
+                ...(indices.includes("assembly") && { Assembly: "assembly" }),
+                ...(indices.includes("feature") && { Feature: "feature" }),
               }}
             />
           </Grid>

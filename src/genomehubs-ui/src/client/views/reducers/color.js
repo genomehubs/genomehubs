@@ -1,11 +1,50 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
+import { createD3Palette, createPalette } from "./color/createPalette";
 import { createSelector, createSelectorCreator } from "reselect";
+import {
+  interpolateCividis,
+  interpolateCool,
+  interpolateCubehelixDefault,
+  interpolateInferno,
+  interpolateMagma,
+  interpolatePlasma,
+  interpolateTurbo,
+  interpolateViridis,
+  interpolateWarm,
+  schemeAccent,
+  schemeCategory10,
+  schemeDark2,
+  schemePaired,
+  schemeTableau10,
+} from "d3-scale-chromatic";
 
+import batlow from "./color/batlow";
+import batlowS from "./color/batlowS";
 import immutableUpdate from "immutable-update";
+import paired12 from "./color/paired12";
 import store from "../store";
+
+export const ancestralColor = ANCESTRAL_COLOR || "red";
+export const descendantColor = DESCENDANT_COLOR || "orange";
+export const directColor = DIRECT_COLOR || "green";
+export const descendantHighlight = DESCENDANT_HIGHLIGHT || "orange";
+export const directHighlight = DIRECT_HIGHLIGHT || "green";
 
 export const addPalette = createAction("ADD_PALETTE");
 export const editPalette = createAction("EDIT_PALETTE");
+
+const brewerPalette = [
+  "rgb(31,120,180)",
+  "rgb(166,206,227)",
+  "rgb(51,160,44)",
+  "rgb(178,223,138)",
+  "rgb(227,26,28)",
+  "rgb(251,154,153)",
+  "rgb(255,127,0)",
+  "rgb(253,191,111)",
+  "rgb(106,61,154)",
+  "rgb(202,178,214)",
+];
 
 export const palettes = handleActions(
   {
@@ -29,20 +68,26 @@ export const palettes = handleActions(
   },
   {
     byId: {
-      default: [
-        "rgb(166,206,227)",
-        "rgb(31,120,180)",
-        "rgb(178,223,138)",
-        "rgb(51,160,44)",
-        "rgb(251,154,153)",
-        "rgb(227,26,28)",
-        "rgb(253,191,111)",
-        "rgb(255,127,0)",
-        "rgb(202,178,214)",
-        "rgb(106,61,154)",
-      ],
+      batlowS: createPalette(batlowS),
+      batlow: createPalette(batlow, 50),
+      cividis: createD3Palette(interpolateCividis, 50),
+      cubeHelix: createD3Palette(interpolateCubehelixDefault, 50),
+      cool: createD3Palette(interpolateCool, 50),
+      warm: createD3Palette(interpolateWarm, 50),
+      plasma: createD3Palette(interpolatePlasma, 50),
+      magma: createD3Palette(interpolateMagma, 50),
+      inferno: createD3Palette(interpolateInferno, 50),
+      turbo: createD3Palette(interpolateTurbo, 50),
+      viridis: createD3Palette(interpolateViridis, 50),
+      standard: { id: "default", default: brewerPalette, levels: [] },
+      paired: createD3Palette(schemePaired, 12),
+      category: createD3Palette(schemeCategory10, 10),
+      dark: createD3Palette(schemeDark2, 8),
+      accent: createD3Palette(schemeAccent, 8),
+      tableau: createD3Palette(schemeTableau10, 10),
+      default: createD3Palette(interpolateViridis, 50),
     },
-    allIds: ["default"],
+    allIds: ["default", "batlow", "batlowS", "cividis", "paired", "viridis"],
   }
 );
 
@@ -87,11 +132,14 @@ export const getUserPalette = createSelector(getAllPalettes, (palettes) => {
   return { id, colors };
 });
 
-export const getDefaultPalette = createSelector(getAllPalettes, (palettes) => {
-  let id = "default";
-  let colors = palettes ? palettes.byId[id] : [];
-  return { id, colors };
-});
+export const getDefaultPalette = createSelector(
+  getSelectedPalette,
+  getAllPalettes,
+  (id, palettes) => {
+    let levels = palettes ? palettes.byId[id] : {};
+    return { id, colors: levels.default, levels };
+  }
+);
 
 /* Coolors Exported Palette - coolors.co/d7cdcc-ffffff-59656f-9c528b-1d1e2c */
 /* RGB */

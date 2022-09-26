@@ -1,5 +1,8 @@
-import { mc } from "./memcached";
+import { logMemcache } from "./logger";
 import qs from "qs";
+import { rd } from "./redis";
+
+const fourDays = 4 * 24 * 60 * 60;
 
 const sortUrl = (url) => {
   let [path, search] = url.split(/[\?#]/);
@@ -11,30 +14,39 @@ const sortUrl = (url) => {
 };
 
 export const cacheFetch = async (req) => {
-  if (mc) {
-    const key = sortUrl(req.url);
+  let key;
+  let cachedData = false;
+  const action = "FETCH";
+  const store = rd;
+  if (store) {
+    let success = false;
+    key = sortUrl(req.url);
     try {
-      let cachedData = await mc.get(key);
-      return JSON.parse(cachedData);
+      cachedData = JSON.parse(await store.get(key));
+      if (cachedData) {
+        success = true;
+      }
     } catch {
-      return false;
+      success = false;
     }
-  } else {
-    return false;
+    logMemcache({ key, action, success });
   }
+  return cachedData;
 };
 
 export const cacheStore = async (req, obj) => {
-  if (mc) {
+  let key, success;
+  const action = "STORE";
+  const store = rd;
+  if (store) {
     try {
-      const key = sortUrl(req.url);
-      const value = JSON.stringify(obj);
-      if (value.length <= 1024 * 1024 * 32) {
-        mc.set(key, JSON.stringify(obj));
-      }
-      return true;
+      key = sortUrl(req.url);
+      success = await store.set(key, JSON.stringify(obj), "ex", fourDays);
+      success = success == "OK";
     } catch {
-      return false;
+      success = false;
     }
+    logMemcache({ key, action, success });
   }
+  return success;
 };

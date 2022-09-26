@@ -1,3 +1,5 @@
+"""Test configuration."""
+
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -8,6 +10,7 @@ from webdriver_manager.core.utils import ChromeType
 
 @pytest.fixture()
 def setup(request):
+    """Set up driver."""
     chrome_service = Service(ChromeDriverManager(chrome_type=ChromeType.GOOGLE).install())
 
     chrome_options = Options()

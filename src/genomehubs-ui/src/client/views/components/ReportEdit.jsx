@@ -12,6 +12,7 @@ import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import Select from "@material-ui/core/Select";
 import SettingsButton from "./SettingsButton";
+import Slider from "@material-ui/core/Slider";
 import Switch from "@material-ui/core/Switch";
 import TextField from "@material-ui/core/TextField";
 import { compose } from "recompose";
@@ -22,6 +23,7 @@ import qs from "../functions/qs";
 import withReportById from "../hocs/withReportById";
 import withSiteName from "../hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
+import withTypes from "../hocs/withTypes";
 
 const suggestedTerm = getSuggestedTerm();
 
@@ -37,6 +39,14 @@ const rankSettings = {
   except: ["feature", "assembly", "sample"],
 };
 const catSettings = { prop: "cat", label: "assembly_level" };
+const pointSizeSettings = {
+  prop: "pointSize",
+  label: "point size",
+  defaultValue: 15,
+  min: 10,
+  max: 25,
+  step: 5,
+};
 
 export const queryPropList = {
   histogram: [
@@ -49,6 +59,7 @@ export const queryPropList = {
     "xOpts",
     "stacked",
     "cumulative",
+    pointSizeSettings,
   ],
   map: [
     "report",
@@ -71,6 +82,7 @@ export const queryPropList = {
     "highlightArea",
     "stacked",
     "scatterThreshold",
+    pointSizeSettings,
   ],
   table: [
     "report",
@@ -95,8 +107,16 @@ export const queryPropList = {
     "yOpts",
     "treeStyle",
     "treeThreshold",
+    pointSizeSettings,
   ],
-  xInY: ["report", ["x"], "y", rankSettings, "includeEstimates"],
+  arc: [
+    "report",
+    ["x"],
+    "y",
+    rankSettings,
+    "includeEstimates",
+    pointSizeSettings,
+  ],
   xPerRank: ["report", "x", rankSettings, "includeEstimates"],
 };
 
@@ -113,7 +133,7 @@ const reportTypes = [
   "scatter",
   "table",
   "tree",
-  "xInY",
+  "arc",
   "xPerRank",
 ];
 
@@ -130,42 +150,61 @@ export const ReportEdit = ({
   setReportEdit,
   fetchReport,
   modal,
-  permaLink,
   handleUpdate,
-  taxonomy,
+  types,
   basename,
 }) => {
   const classes = useStyles();
   const formRef = useRef();
   const [values, setValues] = useState({});
-  const [refs, setRefs] = useState({});
   let query = qs.parse(reportById.report?.queryString);
   if (query.report == "tree" && !query.treeStyle) {
     query.treeStyle = "rect";
   }
   let result = query.result;
 
+  let props = queryPropList[report];
+
   const defaultState = () => {
     let obj = {};
     if (!query || !report || !queryPropList[report]) {
       return obj;
     }
-    queryPropList[report].forEach((queryProp) => {
+    for (let queryProp of queryPropList[report]) {
       let prop;
+      let defaultValue = "";
       if (Array.isArray(queryProp)) {
         prop = queryProp[0];
       } else if (typeof queryProp === "object" && queryProp !== null) {
-        ({ prop } = queryProp);
+        ({ prop, defaultValue } = queryProp);
       } else {
         prop = queryProp;
       }
-      obj[prop] = query.hasOwnProperty(prop) ? query[prop] : "";
-    });
+      if (prop == "xField") {
+        continue;
+      }
+      if (prop == "report" && query[prop] == "xInY") {
+        query[prop] = "arc";
+      }
+      obj[prop] = query.hasOwnProperty(prop) ? query[prop] : defaultValue;
+      if (prop == "x" && obj[prop]) {
+        obj.xField = "";
+        for (let part of obj[prop].split(/\s+/)) {
+          if (types.hasOwnProperty(part)) {
+            obj.xField = part;
+            break;
+          }
+        }
+      }
+    }
     return obj;
   };
   useEffect(() => {
     if (Object.keys(values).length == 0) {
       setValues(defaultState());
+    }
+    if (!props.includes("xField")) {
+      props.splice(2, 0, "xField");
     }
   }, [query, report, reportById]);
 
@@ -240,6 +279,19 @@ export const ReportEdit = ({
     } else {
       queryObj.includeEstimates = true;
     }
+    if (queryObj.xField && !queryObj.x.startsWith(`${queryObj.xField} AND`)) {
+      let currentX = "";
+      for (let part of queryObj.x.split(/\s+/)) {
+        if (types.hasOwnProperty(part)) {
+          currentX = part;
+          break;
+        }
+      }
+      if (queryObj.xField != currentX) {
+        queryObj.x = `${queryObj.xField} AND ${queryObj.x}`;
+      }
+      delete queryObj.xField;
+    }
     if (!location.pathname.startsWith(basename + "/report")) {
       queryObj.query = queryObj.query || queryObj.x;
       if (queryObj.x) delete queryObj.x;
@@ -274,13 +326,21 @@ export const ReportEdit = ({
 
   let toggles = [];
 
-  for (let queryProp of queryPropList[report]) {
-    let except, input, label, required;
+  for (let queryProp of props) {
+    let except, input, label, required, min, max, step;
     if (Array.isArray(queryProp)) {
       required = true;
       queryProp = queryProp[0];
     } else if (typeof queryProp === "object" && queryProp !== null) {
-      ({ prop: queryProp, label, required, except } = queryProp);
+      ({
+        prop: queryProp,
+        label,
+        required,
+        except,
+        min,
+        max,
+        step,
+      } = queryProp);
     }
 
     if (except && except.includes(result)) {
@@ -405,13 +465,38 @@ export const ReportEdit = ({
         label = queryProp;
       }
 
-      if (autoCompleteTypes.hasOwnProperty(queryProp)) {
+      if (min) {
+        toggles.push(
+          <div
+            style={{ float: "left", paddingTop: "0.7em", marginRight: "2em" }}
+            key={queryProp}
+          >
+            <FormControl>
+              <Slider
+                id={queryProp + Math.random()}
+                value={values[queryProp] * 1}
+                valueLabelDisplay="auto"
+                label={label}
+                style={{ width: "95%" }}
+                required={required}
+                error={required && !values[queryProp]}
+                onChange={(e, value) => handleChange(e, queryProp, value)}
+                step={step}
+                marks
+                min={min}
+                max={max}
+              />
+              <FormHelperText>{queryProp}</FormHelperText>
+            </FormControl>
+          </div>
+        );
+      } else if (autoCompleteTypes.hasOwnProperty(queryProp)) {
         input = (
           <AutoCompleteInput
             id={queryProp + Math.random()}
             required={required}
             error={required && !values[queryProp]}
-            inputValue={values[queryProp]}
+            inputValue={values[queryProp] || ""}
             setInputValue={(value) => setInputValue(value, queryProp)}
             inputLabel={label}
             inputRef={false}
@@ -486,6 +571,7 @@ export const ReportEdit = ({
 export default compose(
   withSiteName,
   withTaxonomy,
+  withTypes,
   withReportById,
   dispatchReport
 )(ReportEdit);

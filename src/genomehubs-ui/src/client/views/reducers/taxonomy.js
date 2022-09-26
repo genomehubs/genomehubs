@@ -41,7 +41,34 @@ export const currentTaxonomy = handleAction(
 );
 export const getCurrentTaxonomy = (state) => state.currentTaxonomy;
 
+export const requestIndices = createAction("REQUEST_INDICES");
+export const receiveIndices = createAction(
+  "RECEIVE_INDICES",
+  (json) => json,
+  () => ({ receivedAt: Date.now() })
+);
+
+const indices = handleActions(
+  {
+    REQUEST_INDICES: (state, action) =>
+      immutableUpdate(state, {
+        isFetching: true,
+      }),
+    RECEIVE_INDICES: (state, action) =>
+      immutableUpdate(state, {
+        isFetching: false,
+        ids: action.payload,
+      }),
+  },
+  defaultState()
+);
+
+export const getIndices = (state) => state.indices.ids;
+
+export const getIndicesFetching = (state) => state.indices.isFetching;
+
 export const taxonomyReducers = {
+  indices,
   taxonomies,
   currentTaxonomy,
 };

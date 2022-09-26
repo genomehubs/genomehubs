@@ -5,7 +5,9 @@ import KonvaTooltip from "./KonvaTooltip";
 import Skeleton from "@material-ui/lab/Skeleton";
 import classnames from "classnames";
 import { compose } from "recompose";
+import formats from "../functions/formats";
 import { scaleLinear } from "d3-scale";
+import stringLength from "../functions/stringLength";
 import styles from "./Styles.scss";
 import { useScrollPosition } from "@n8tb1t/use-scroll-position";
 import withColors from "../hocs/withColors";
@@ -20,16 +22,19 @@ const ReportTreePaths = ({
   height,
   plotHeight,
   charHeight,
+  pointSize,
   locations,
   other,
   maxTip,
   yField,
+  valueScale,
   maxWidth,
   dataWidth,
   hidePreview,
   reportTerm,
   setReportTerm,
   colors,
+  levels,
 }) => {
   if (!lines || lines.length == 0) {
     return null;
@@ -40,6 +45,8 @@ const ReportTreePaths = ({
   } else {
     rootRank = lines[0].taxon_rank;
   }
+  pointSize *= 1;
+  let strokeWidth = pointSize / 10 + 0.5;
 
   let divHeight = height;
   let divWidth = width;
@@ -230,6 +237,7 @@ const ReportTreePaths = ({
   const [paths, setPaths] = useState([]);
   const [nodes, setNodes] = useState([]);
   const [labels, setLabels] = useState([]);
+  const [valueTicks, setValueTicks] = useState({});
   const [cats, setCats] = useState([]);
   const [regions, setRegions] = useState([]);
   const [connectors, setConnectors] = useState([]);
@@ -288,6 +296,60 @@ const ReportTreePaths = ({
       let newBars = [];
       let newErrorBars = [];
       let newCats = [];
+      if (valueScale) {
+        let ticks = valueScale.ticks();
+        let top = charHeight + charHeight / 1.8;
+        let tickLines = ticks.map((tick, i) => {
+          let end = i == 0 || i == ticks.length - 1;
+          return (
+            <Line
+              key={`t-${tick}`}
+              points={[
+                valueScale(tick),
+                top - (end ? 3 : 0),
+                valueScale(tick),
+                plotHeight,
+              ]}
+              stroke={"grey"}
+              strokeWidth={end ? 1 : 0.5}
+              opacity={end ? 1 : 0.5}
+            />
+          );
+        });
+        let tick = ticks[0];
+        let tickLabel = formats(tick);
+        let tickLabelLength = stringLength(tickLabel) * charHeight * 0.6;
+        tickLines.push(
+          <Text
+            key={`tx-${tick}`}
+            x={-tickLabelLength / 2}
+            y={top - charHeight}
+            width={tickLabelLength}
+            fill={"grey"}
+            fontSize={charHeight * 0.75}
+            textAlign={"center"}
+            textBaseline={"bottom"}
+            text={tickLabel}
+          />
+        );
+        tick = ticks[ticks.length - 1];
+        tickLabel = formats(tick);
+        tickLabelLength = stringLength(tickLabel) * charHeight * 0.6;
+        tickLines.push(
+          <Text
+            key={`tx-${tick}`}
+            x={valueScale(tick) - tickLabelLength / 2}
+            y={top - charHeight}
+            width={charHeight * 5}
+            fill={"grey"}
+            fontSize={charHeight * 0.75}
+            textAlign={"center"}
+            textBaseline={"bottom"}
+            text={tickLabel}
+          />
+        );
+        setValueTicks({ ticks, tickLines });
+      }
       if (portionCache[portion]) {
         ({
           newNodes,
@@ -360,11 +422,15 @@ const ReportTreePaths = ({
                 segment.xEnd,
                 segment.yStart,
               ]}
+              strokeWidth={strokeWidth}
               stroke={segment.color}
               // strokeScaleEnabled={false}
             />
           );
           if (segment.cats) {
+            if (levels[segment.cats.length]) {
+              colors = levels[segment.cats.length];
+            }
             segment.cats.forEach((cat, i) => {
               let xPos = segment.xEnd - charHeight * (i / 2 + 0.5);
               newCats.push(
@@ -404,6 +470,7 @@ const ReportTreePaths = ({
                   segment.xStart + 10,
                   segment.yMax,
                 ]}
+                strokeWidth={strokeWidth}
                 stroke={segment.color}
               />
             );
@@ -417,6 +484,7 @@ const ReportTreePaths = ({
                   segment.xEnd,
                   segment.yMax,
                 ]}
+                strokeWidth={strokeWidth}
                 stroke={segment.color}
                 strokeScaleEnabled={false}
               />
@@ -515,10 +583,10 @@ const ReportTreePaths = ({
               <Text
                 key={`t-${segment.taxon_id}`}
                 text={segment.label}
-                fontSize={10}
+                fontSize={pointSize * 1}
                 // x={segment.tip ? segment.xEnd + 10 : segment.xStart - 6}
                 x={segment.tip ? maxTip + 10 : segment.xStart - 6}
-                y={segment.tip ? segment.yMin : segment.yStart - 11}
+                y={segment.tip ? segment.yMin : segment.yStart - pointSize}
                 width={segment.tip ? segment.labelWidth : segment.width}
                 height={segment.height}
                 fill={segment.color}
@@ -531,11 +599,12 @@ const ReportTreePaths = ({
                 <Line
                   key={`cl-${segment.taxon_id}`}
                   points={[
-                    segment.xEnd + 10,
-                    segment.yStart,
                     maxTip,
                     segment.yStart,
+                    segment.xEnd + 10,
+                    segment.yStart,
                   ]}
+                  strokeWidth={strokeWidth}
                   stroke={"#dddddd"}
                   dash={[2, 5]}
                 />
@@ -968,15 +1037,18 @@ const ReportTreePaths = ({
                   fill={"white"}
                 />
               </Layer>
-              <Layer>{paths}</Layer>
+              <Layer>
+                <Group x={maxWidth}>{valueTicks.tickLines}</Group>
+                <Group x={maxWidth}>{bars}</Group>
+                <Group x={maxWidth}>{errorBars}</Group>
+                {paths}
+              </Layer>
               <Layer>
                 <Group>{cats}</Group>
                 {highlight.main}
                 <Group>{labels}</Group>
                 <Group>{connectors}</Group>
                 <Group>{nodes}</Group>
-                <Group x={maxWidth}>{bars}</Group>
-                <Group x={maxWidth}>{errorBars}</Group>
               </Layer>
               <Layer>
                 <KonvaTooltip {...tooltip} scale={scale} />

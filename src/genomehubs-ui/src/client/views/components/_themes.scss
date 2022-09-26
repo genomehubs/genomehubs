@@ -24,6 +24,9 @@ $themes: (
     bodyFont: $bodyFontFamily,
     codeFont: $codeFontFamily,
     bodyFontSize: $bodyFontSize,
+    direct: $directColor,
+    descendant: $descendantColor,
+    ancestral: $ancestralColor,
   ),
   Dark: (
     primary: $lightColor,
@@ -34,6 +37,9 @@ $themes: (
     bodyFont: $bodyFontFamily,
     codeFont: $codeFontFamily,
     bodyFontSize: $bodyFontSize,
+    direct: $directColor,
+    descendant: $descendantColor,
+    ancestral: $ancestralColor,
   ),
 );
 

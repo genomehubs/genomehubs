@@ -32,6 +32,7 @@ import { compose } from "recompose";
 import { formatter } from "../functions/formatter";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
+import withColors from "../hocs/withColors";
 import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";
 import withSearch from "../hocs/withSearch";
@@ -146,6 +147,7 @@ const SortableCell = ({
   description,
   status,
   classes,
+  statusColors = {},
   sortBy,
   sortOrder,
   sortDirection,
@@ -248,7 +250,7 @@ const SortableCell = ({
                 <StyledCheckbox
                   checked={!excludeDirect.hasOwnProperty(name)}
                   onChange={() => handleToggleExclusion({ toggleDirect: name })}
-                  color={"green"}
+                  color={statusColors.direct || "green"}
                   inputProps={{ "aria-label": "direct checkbox" }}
                 />
               </span>
@@ -266,7 +268,7 @@ const SortableCell = ({
                   onChange={() =>
                     handleToggleExclusion({ toggleDescendant: name })
                   }
-                  color={"orange"}
+                  color={statusColors.descendant || "orange"}
                   inputProps={{ "aria-label": "descendant checkbox" }}
                 />
               </span>
@@ -284,7 +286,7 @@ const SortableCell = ({
                   onChange={() =>
                     handleToggleExclusion({ toggleAncestral: name })
                   }
-                  color={"red"}
+                  color={statusColors.ancestral || "red"}
                   inputProps={{ "aria-label": "ancestral checkbox" }}
                 />
               </span>
@@ -317,6 +319,7 @@ const ResultTable = ({
   activeRanks,
   searchIndex,
   setPreferSearchTerm,
+  statusColors,
   taxonomy,
   basename,
 }) => {
@@ -729,6 +732,7 @@ const ResultTable = ({
           description={type.description}
           status={type.status}
           classes={classes}
+          statusColors={statusColors}
           sortBy={sortBy}
           sortOrder={sortOrder}
           sortDirection={sortDirection}
@@ -814,6 +818,7 @@ export default compose(
   withSiteName,
   withTypes,
   withTaxonomy,
+  withColors,
   withSearch,
   withRanks,
   withNames

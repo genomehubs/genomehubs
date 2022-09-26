@@ -30,6 +30,9 @@ export const ReportFull = ({
   const containerRef = useRef();
   const reportRef = useRef(null);
   const gridRef = useRef(null);
+  if (report == "xInY") {
+    report = "arc";
+  }
 
   const windowDimensions = useWindowDimensions();
   let height = windowDimensions.height;

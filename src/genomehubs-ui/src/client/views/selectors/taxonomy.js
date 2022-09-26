@@ -1,6 +1,7 @@
 import {
   getTaxonomies,
   getTaxonomiesFetching,
+  receiveIndices,
   receiveTaxonomies,
   requestTaxonomies,
   setCurrentTaxonomy,
@@ -33,6 +34,19 @@ export function fetchTaxonomies() {
       }
       dispatch(receiveTaxonomies(json));
       dispatch(setCurrentTaxonomy(json[0]));
+    } catch (err) {
+      return dispatch(setApiStatus(false));
+    }
+    url = `${apiUrl}/indices`;
+    try {
+      let json;
+      try {
+        const response = await fetch(url);
+        json = await response.json();
+      } catch (error) {
+        json = console.log("An error occured.", error);
+      }
+      dispatch(receiveIndices(json));
     } catch (err) {
       return dispatch(setApiStatus(false));
     }

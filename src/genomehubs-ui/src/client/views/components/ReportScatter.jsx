@@ -14,13 +14,16 @@ import {
 } from "recharts";
 import React, { useEffect, useRef, useState } from "react";
 import formats, { setInterval } from "../functions/formats";
+import stringLength, { maxStringLength } from "../functions/stringLength";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
 import Grid from "@material-ui/core/Grid";
+import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "@material-ui/core/Tooltip";
 import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
+import { line as d3Line } from "d3-shape";
 import dispatchMessage from "../hocs/dispatchMessage";
 import { format } from "d3-format";
 import { processLegendData } from "./MultiCatLegend";
@@ -166,10 +169,25 @@ const CustomDot = (props, chartProps) => {
   );
 };
 
+const CustomCircle = (props, chartProps) => {
+  let { cx, cy, height: r, fill } = props;
+  let { pointSize } = chartProps;
+  return (
+    <Dot
+      cx={cx}
+      cy={cy}
+      r={pointSize / 2}
+      stroke={"none"}
+      fill={fill}
+      // strokeWidth={r / 2}
+    />
+  );
+};
+
 const drawHeatRect = ({ props, chartProps, h, w }) => {
   let { z, offset } = props.payload;
   let scale = axisScales[chartProps.zScale]();
-  let domain = [0, chartProps.zDomain[1]];
+  let domain = [1, chartProps.zDomain[1]];
   scale.domain(domain).range([2, w]);
   if (chartProps.n == 1) {
     scale.range([0.1, 1]);
@@ -291,23 +309,69 @@ const CustomShape = (props, chartProps) => {
   );
 };
 
+const eqnToLine = (eqn, { x: xMin, y: yMin, xBound, yBound, xAxis, yAxis }) => {
+  let points = [];
+  let xScale = scaleLinear().domain([0, 100]).range([xMin, xBound]);
+  let m = eqn[1] == "" ? 1 : isNaN(eqn[1]) ? 1 : eqn[1] * 1;
+  let pow = 1;
+  let c = 0;
+  if (eqn[2].match(/(\*\*|\^)/)) {
+    pow = eqn[3] * 1;
+  }
+  c = eqn[4] == "" ? 0 : isNaN(eqn[4]) ? 0 : eqn[4] * 1;
+  for (let i = 0; i <= 100; i++) {
+    let x = xScale(i);
+    let y = m * x ** pow + c;
+    if (y >= yMin && y <= yBound) {
+      points.push([xAxis.scale(x), yAxis.scale(y)]);
+    }
+  }
+  let line = d3Line().context(null);
+  return line(points);
+};
+
 const HighlightShape = (props, chartProps) => {
   let { cx, cy, xAxis, yAxis } = props;
   let { x, y, xBound, yBound, label } = props.payload;
+  let { eqn } = chartProps;
   let height = yAxis.scale(yBound) - cy;
   let width = xAxis.scale(xBound) - cx;
-  let text;
+  let text, rect, path;
   let color = "black";
   if (label) {
     text = (
-      <Text x={cx + width - 4} y={cy - 6} fill={color} textAnchor={"end"}>
+      <Text
+        x={cx + width - 4}
+        y={cy - 6}
+        fill={color}
+        textAnchor={"end"}
+        fontSize={chartProps.pointSize}
+      >
         {label}
       </Text>
     );
   }
-  return (
-    <>
-      {text}
+  if (eqn) {
+    let d = eqnToLine(eqn, {
+      x: x,
+      y: y,
+      xBound: xBound,
+      yBound: yBound,
+      xAxis,
+      yAxis,
+    });
+    path = (
+      <path
+        d={d}
+        fill={"none"}
+        stroke={color}
+        strokeWidth={chartProps.pointSize / 10}
+        strokeDasharray={chartProps.pointSize}
+        strokeOpacity={0.5}
+      />
+    );
+  } else {
+    rect = (
       <Rectangle
         height={height}
         width={width}
@@ -315,12 +379,20 @@ const HighlightShape = (props, chartProps) => {
         y={props.cy}
         fill={"none"}
         stroke={color}
+        strokeWidth={chartProps.pointSize / 10}
       />
+    );
+  }
+  return (
+    <>
+      {text}
+      {rect}
+      {path}
     </>
   );
 };
 
-const CustomizedYAxisTick = (props, buckets, fmt, translations) => {
+const CustomizedYAxisTick = (props, buckets, fmt, translations, pointSize) => {
   const { x, y, fill, index, height, payload } = props;
   let value = payload.value;
   let offset = 0;
@@ -337,39 +409,11 @@ const CustomizedYAxisTick = (props, buckets, fmt, translations) => {
         y={0}
         dy={5}
         textAnchor="end"
+        dominantBaseline={"middle"}
         fill={fill}
+        fontSize={pointSize}
         // transform={"rotate(-90)"}
       >
-        {translations[value] || value}
-      </text>
-    </g>
-  );
-};
-
-const CustomizedXAxisTick = (props, buckets, fmt, translations) => {
-  const { x, y, fill, index, width, payload } = props;
-  let value = payload.value;
-  let yPos = y;
-  let offset = 0;
-  let bucketWidth = width / (buckets.length - 1);
-  if (buckets[index] != payload.value) {
-    value = buckets[index] || "";
-    offset = bucketWidth / 2;
-    if (index % 2 == 1 && value.length * 8 > bucketWidth) {
-      yPos += 12;
-    }
-  } else {
-    value = fmt(value);
-    if (index % 2 == 1 && value.length * 8 > bucketWidth) {
-      return null;
-    }
-    if (index % 4 != 0 && value.length * 8 > bucketWidth * 2) {
-      return null;
-    }
-  }
-  return (
-    <g transform={`translate(${x + offset},${yPos})`}>
-      <text x={0} y={0} dy={10} textAnchor="middle" fill={fill}>
         {translations[value] || value}
       </text>
     </g>
@@ -380,6 +424,9 @@ const Heatmap = ({
   data,
   pointData,
   width,
+  marginWidth,
+  marginHeight,
+  marginRight,
   height,
   cats,
   buckets,
@@ -399,6 +446,12 @@ const Heatmap = ({
     chartProps.bounds.scale == "ordinal" ? "linear" : chartProps.bounds.scale;
   let yScale =
     chartProps.yBounds.scale == "ordinal" ? "linear" : chartProps.yBounds.scale;
+  let xDomain = isNaN(buckets[0])
+    ? [0, buckets.length - 1]
+    : [buckets[0], buckets[buckets.length - 1]];
+  let yDomain = isNaN(yBuckets[0])
+    ? [0, yBuckets.length - 1]
+    : [yBuckets[0], yBuckets[yBuckets.length - 1]];
   let axes = [
     <CartesianGrid key={"grid"} strokeDasharray="3 3" />,
     <XAxis
@@ -407,23 +460,17 @@ const Heatmap = ({
       key={"x"}
       scale={axisScales[xScale]()}
       angle={buckets.length > 15 ? -90 : 0}
-      domain={
-        isNaN(buckets[0])
-          ? [0, buckets.length - 1]
-          : [buckets[0], buckets[buckets.length - 1]]
-      }
-      range={
-        isNaN(buckets[0])
-          ? [0, buckets.length - 1]
-          : [buckets[0], buckets[buckets.length - 1]]
-      }
+      domain={xDomain}
+      range={xDomain}
       ticks={isNaN(buckets[0]) ? buckets.map((x, i) => i) : buckets}
       tick={(props) =>
-        CustomizedXAxisTick(
+        ReportXAxisTick(
           props,
           buckets,
           chartProps.xFormat,
-          chartProps.translations
+          chartProps.translations,
+          chartProps.pointSize,
+          chartProps.orientation
         )
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
@@ -432,9 +479,14 @@ const Heatmap = ({
     >
       <Label
         value={xLabel}
-        offset={buckets.length > 15 ? 20 : 0}
+        // offset={buckets.length > 15 ? chartProps.pointSize + 10 : 10}
+        offset={marginHeight - chartProps.pointSize}
+        dy={0}
         position="bottom"
+        dominantBaseline={"text-after-edge"}
         fill="#666"
+        fontSize={chartProps.pointSize}
+        fontWeight="bold"
       />
     </XAxis>,
     <YAxis
@@ -448,31 +500,26 @@ const Heatmap = ({
           props,
           yBuckets,
           chartProps.yFormat,
-          chartProps.yTranslations
+          chartProps.yTranslations,
+          chartProps.pointSize
         )
       }
-      domain={
-        isNaN(yBuckets[0])
-          ? [0, yBuckets.length - 1]
-          : [yBuckets[0], yBuckets[yBuckets.length - 1]]
-      }
+      domain={yDomain}
       // domain={["auto", "auto"]}
       // range={["auto", "auto"]}
-      range={
-        isNaN(yBuckets[0])
-          ? [0, yBuckets.length - 1]
-          : [yBuckets[0], yBuckets[yBuckets.length - 1]]
-      }
+      range={yDomain}
       tickFormatter={chartProps.showYTickLabels ? chartProps.yFormat : () => ""}
       interval={0}
     >
       <Label
         value={yLabel}
-        offset={0}
-        position="left"
+        offset={marginWidth + 60 - chartProps.pointSize}
+        position="insideRight"
         fill="#666"
         angle={-90}
         style={{ textAnchor: "middle" }}
+        fontSize={chartProps.pointSize}
+        fontWeight="bold"
       />
     </YAxis>,
     <ZAxis
@@ -489,8 +536,23 @@ const Heatmap = ({
   let highlightRect;
   if (highlightArea) {
     let parts = highlightArea.split(/(?:,\s*)/);
-    if (parts.length >= 4) {
-      let coords = {
+    let coords, eqn, label;
+    if (parts[0].startsWith("y=")) {
+      eqn = parts[0]
+        .replace("y=", "")
+        .match(/\s*([-\d\.]*)\s*x\s*([\*|\^]*)(-*[\d\.]*)\s*\+*\s*(-*[\d\.]*)/);
+      if (parts[1]) {
+        label = parts[1];
+      }
+      coords = {
+        x: xDomain[0],
+        y: yDomain[0],
+        xBound: xDomain[1],
+        yBound: yDomain[1],
+        label,
+      };
+    } else if (parts.length >= 4) {
+      coords = {
         x: parts[0] * 1,
         y: parts[1] * 1,
         xBound: parts[2] * 1,
@@ -499,28 +561,38 @@ const Heatmap = ({
       if (parts[4]) {
         coords.label = parts[4];
       }
-
+    }
+    if (coords) {
       highlightRect = (
         <Scatter
           key={"highlightArea"}
           data={[coords]}
-          shape={(props) => HighlightShape(props, { ...chartProps })}
+          shape={(props) => HighlightShape(props, { ...chartProps, eqn })}
           isAnimationActive={false}
           legendType="none"
         />
       );
     }
   }
+  let marginTop = 5;
+  if (legendRows) {
+    if (chartProps.compactLegend) {
+      marginTop += legendRows * (chartProps.pointSize + 10);
+    } else {
+      marginTop += legendRows * (2 * chartProps.pointSize + 15);
+    }
+  }
+
   return (
     <ScatterChart
       width={width}
       height={height}
       data={data}
       margin={{
-        top: legendRows ? legendRows * 35 + 5 : 5,
-        right: 30,
-        left: 20,
-        bottom: width > 300 ? (buckets.length > 15 ? 35 : 25) : 5,
+        top: marginTop,
+        right: marginRight,
+        left: marginWidth,
+        bottom: width > 300 ? marginHeight : 5,
       }}
     >
       {/* {patterns} */}
@@ -547,7 +619,7 @@ const Heatmap = ({
             key={i}
             data={pointData[i]}
             fill={colors[i] || "rgb(102, 102, 102)"}
-            shape={"circle"}
+            shape={(props) => CustomCircle(props, { ...chartProps })}
             zAxisId={1}
             isAnimationActive={false}
             style={{ pointerEvents: "none" }}
@@ -581,6 +653,7 @@ const ReportScatter = ({
   setMessage,
   reportTerm,
   colors,
+  levels,
   minDim,
   setMinDim,
   xOpts,
@@ -588,7 +661,9 @@ const ReportScatter = ({
   stacked,
   highlightArea,
   basename,
+  pointSize = 15,
 }) => {
+  pointSize *= 1;
   const navigate = useNavigate();
   const location = useLocation();
   const [highlight, setHighlight] = useState([]);
@@ -661,6 +736,7 @@ const ReportScatter = ({
       valueType,
       interval
     );
+    let compactLegend = typeof embedded === "undefined";
 
     const {
       translations,
@@ -668,14 +744,43 @@ const ReportScatter = ({
       catOffsets,
       legendRows,
       yTranslations,
-    } = processLegendData({ bounds, yBounds, width });
+    } = processLegendData({
+      bounds,
+      yBounds,
+      minWidth: compactLegend ? 50 : 10 * pointSize,
+      width,
+      pointSize,
+    });
+    if (cats && cats.length > 1 && levels[cats.length]) {
+      colors = levels[cats.length];
+    }
+    const xFormat = (value) => formats(value, valueType, interval);
+    const yFormat = (value) => formats(value, yValueType, yInterval);
 
+    const maxYLabel = maxStringLength(heatmaps.yBuckets, yFormat, pointSize);
+    const marginWidth =
+      maxYLabel + pointSize > 40 ? maxYLabel + pointSize - 40 : 0;
+    const maxXLabel = maxStringLength(heatmaps.buckets, xFormat, pointSize);
+    let marginHeight = 2 * pointSize;
+    const marginRight = (stringLength(xFormat(endLabel)) * pointSize) / 2;
+    let orientation = 0;
+    if (
+      maxXLabel >
+      (width - marginWidth - marginRight) / heatmaps.buckets.length
+    ) {
+      orientation = -90;
+      marginHeight =
+        maxXLabel + pointSize > 20 ? maxXLabel + pointSize - 20 : 0;
+    }
     chart = (
       <Heatmap
         data={chartData}
         pointData={1 ? pointData : []}
         width={width}
         height={minDim - 50}
+        marginWidth={marginWidth}
+        marginHeight={marginHeight}
+        marginRight={marginRight}
         buckets={heatmaps.buckets}
         yBuckets={heatmaps.yBuckets}
         cats={cats}
@@ -694,6 +799,7 @@ const ReportScatter = ({
           n: cats.length,
           zScale: zScale,
           catSums,
+          pointSize,
           xQuery: scatter.report.xQuery,
           yQuery: scatter.report.yQuery,
           xLabel: scatter.report.xLabel,
@@ -708,8 +814,9 @@ const ReportScatter = ({
               ? true
               : false
             : true,
-          xFormat: (value) => formats(value, valueType, interval),
-          yFormat: (value) => formats(value, yValueType, yInterval),
+          xFormat,
+          yFormat,
+          orientation,
           fields: heatmaps.fields,
           ranks: heatmaps.ranks,
           bounds,
@@ -726,6 +833,7 @@ const ReportScatter = ({
           navigate,
           location,
           basename,
+          compactLegend,
         }}
       />
     );

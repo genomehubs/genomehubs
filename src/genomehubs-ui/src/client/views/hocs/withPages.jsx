@@ -1,8 +1,8 @@
 import { cancelPages, getPages } from "../reducers/pages";
+import { fetchPages, getPagesById } from "../selectors/pages";
 
 import React from "react";
 import { connect } from "react-redux";
-import { fetchPages, getPagesById } from "../selectors/pages";
 
 const withPages = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({

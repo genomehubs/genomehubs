@@ -4,7 +4,7 @@ import { compose } from "recompose";
 import withColors from "../hocs/withColors";
 import withReportById from "../hocs/withReportById";
 
-export const ReportLegend = ({ reportById, report, colors }) => {
+export const ReportLegend = ({ reportById, report, colors, levels }) => {
   if (!reportById.report || !reportById.report[report]) {
     return null;
   }
@@ -38,6 +38,9 @@ export const ReportLegend = ({ reportById, report, colors }) => {
   if (reportById.report[report].bounds) {
     let { cat, cats, stats, showOther } = reportById.report[report].bounds;
     if (cat) {
+      if (levels[cats.length]) {
+        colors = levels[cats.length];
+      }
       let other = [];
       if (showOther) {
         let otherCount =
@@ -51,7 +54,11 @@ export const ReportLegend = ({ reportById, report, colors }) => {
             key={"other"}
           />
         );
+        if (levels[cats.length + 1]) {
+          colors = levels[cats.length + 1];
+        }
       }
+
       legend = (
         <Grid container direction="column" spacing={2}>
           <Grid item>{cat}</Grid>

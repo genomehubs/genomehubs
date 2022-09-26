@@ -97,7 +97,7 @@ body,
     header {
       // background: mix(themed('primary'),themed('secondary'),50%);
       // color: themed('secondary');
-      border-bottom: 1px solid themed("primary");
+      border-bottom: 0.2em solid themed("primary");
       flex: none;
       z-index: 1;
 
@@ -109,6 +109,7 @@ body,
         margin: 0;
         margin-left: 0.5em;
         padding: 0;
+        color: themed("secondary")
       }
 
       .tabHolder {
@@ -116,36 +117,42 @@ body,
       }
 
       .tab {
-        background-color: themed("secondary");
+        color: themed("secondary");
         border-bottom: 0;
         border-top: 0;
         box-sizing: border-box;
         cursor: pointer;
         display: inline-block;
-        height: 2em;
+        height: 2.2em;
         line-height: 2em;
         margin-right: -1px;
+        margin-bottom: 0.2em;
         padding: 0 0.5em;
 
         &Highlight,
         &:hover {
-          background-color: themed("highlight");
           color: themed("secondary");
+          border-bottom: 0.2em solid themed("secondary");
+      
         }
       }
     }
 
     footer {
-      border-top: 1px solid themed("primary");
+      background-color: themed("primary");
+      color: themed("secondary");
+      border-top: 0.2em solid themed("primary");
       flex: none;
       font-family: themed("bodyFont");
-      font-size: themed("bodyFontSize");
+      font-size: 1em;
       line-height: 2em;
-      min-height: 2em;
+      min-height: 2.2em;
+      padding-top: 0.2em;
       text-align: center;
 
       .link {
         text-decoration: underline;
+        color: themed("secondary");
       }
 
       img {
@@ -374,20 +381,29 @@ body,
       }
 
       .field {
-        border: solid 0.5px rgba(themed("primary"), 0.25);
+        border: solid 0.5px rgba(themed("primary"), 0.8);
         box-sizing: border-box;
         margin: 0.25em;
         cursor: pointer;
 
+        &Highlight,
+        &:hover {
+          border-color: themed("primary");
+          > .fieldName {
+            background-color: themed("primary");
+          }
+        }
+
         &Name {
-          background-color: rgba(themed("primary"), 0.25);
+          background-color: rgba(themed("primary"), 0.8);
           font-size: 0.8em;
           line-height: 1.25em;
           padding: 0.25em;
           text-align: center;
+          color: themed("secondary");
 
           &Highlight {
-            background-color: themed("highlight");
+            background-color: themed("primary");
             color: themed("secondary");
           }
         }
@@ -479,8 +495,8 @@ body,
     // }
 
     header {
-      font-family: themed("bodyFont");
-      font-size: themed("bodyFontSize");
+      font-family: themed("titleFont");
+      font-size: 1.1em;
       height: 2em;
       // left: 0;
       min-width: 100%;
@@ -488,6 +504,8 @@ body,
       // position: absolute;
       // top: 0;
       width: 100%;
+      color: themed("secondary");
+      background-color: themed("primary");
     }
 
     main {
@@ -542,13 +560,13 @@ body,
     .underscore {
       border-bottom: solid 0.2em themed("primary");
       &High {
-        border-bottom-color: #33a02c;
+        border-bottom-color: themed("direct");
       }
       &Medium {
-        border-bottom-color: #ff7f00;
+        border-bottom-color: themed("descendant");
       }
       &Low {
-        border-bottom-color: #e31a1c;
+        border-bottom-color: themed("ancestral");
       }
     }
 
@@ -595,19 +613,19 @@ body,
             position: absolute;
             background-color: rgba(themed("primary"), 0.25);
             &High {
-              background-color: #33a02c;
+              background-color: themed("direct");
             }
           }
           .one,
           .two {
             &Medium {
-              background-color: #ff7f00;
+              background-color: themed("descendant");
             }
           }
           .one {
             bottom: 0;
             &Low {
-              background-color: #e31a1c;
+              background-color: themed("ancestral");
             }
           }
           .two {
@@ -661,6 +679,10 @@ body,
         margin-bottom: 4em;
       }
 
+      .paragraph {
+        padding: 1em;
+      }
+
       .reportHeading,
       .reportCaption,
       .caption {
@@ -669,8 +691,10 @@ body,
       }
 
       .reportCaption {
+        display: inline-block;
         max-height: 50px;
-        overflow: auto;
+        // font-size: 200%;
+        overflow: visible;
       }
 
       .reportContainer {
@@ -686,18 +710,18 @@ body,
         top: 15%;
         height: 70%;
         border-right: 0.2em solid
-          mix(themed("primary"), themed("secondary"), 50%);
+          mix(themed("primary"), themed("secondary"), 10%);
       }
 
-      .reportContainer:before {
-        content: "";
-        position: absolute;
-        bottom: 2px;
-        left: 15%;
-        width: 70%;
-        border-bottom: 0.2em solid
-          mix(themed("primary"), themed("secondary"), 50%);
-      }
+      // .reportContainer:before {
+      //   content: "";
+      //   position: absolute;
+      //   bottom: 2px;
+      //   left: 15%;
+      //   width: 70%;
+      //   border-bottom: 0.2em solid
+      //     mix(themed("primary"), themed("secondary"), 50%);
+      // }
 
       .centerContent {
         position: relative;
@@ -724,13 +748,13 @@ body,
       }
 
       .direct {
-        border-bottom: solid 0.2em #33a02c;
+        border-bottom: solid 0.2em themed("direct");
       }
       .descendant {
-        border-bottom: solid 0.2em #ff7f00;
+        border-bottom: solid 0.2em themed("descendant");
       }
       .ancestor {
-        border-bottom: solid 0.2em #e31a1c;
+        border-bottom: solid 0.2em themed("ancestral");
       }
 
       .square::before {

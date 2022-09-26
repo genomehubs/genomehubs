@@ -1,11 +1,13 @@
 import { Link, useLocation } from "@reach/router";
 import React, { Fragment, createElement, useEffect, useState } from "react";
 
+import AggregationIcon from "./AggregationIcon";
 import Grid from "@material-ui/core/Grid";
 import Highlight from "./Highlight";
 import MarkdownInclude from "./MarkdownInclude";
 import NavLink from "./NavLink";
 import Report from "./Report";
+import Template from "./Template";
 import Toggle from "./Toggle";
 import Tooltip from "@material-ui/core/Tooltip";
 import classnames from "classnames";
@@ -63,6 +65,7 @@ export const processProps = (props, newProps = {}) => {
 
 export const RehypeComponentsList = {
   a: (props) => <NavLink {...processProps(props)} />,
+  aggregation: (props) => <AggregationIcon method={props.method} />,
   grid: (props) => {
     let { toggle, expand, title, ...gridProps } = props;
     if (toggle && toggle !== true && toggle !== "true") {
@@ -92,6 +95,9 @@ export const RehypeComponentsList = {
     <Report {...processProps(props)} className={styles.reportContainer} />
   ),
   span: (props) => <span {...processProps(props)} />,
+  templat: (props) => (
+    <Template {...processProps(props)} className={styles.reportContainer} />
+  ),
   tooltip: (props) => {
     return (
       <Tooltip {...processProps(props, { placement: "top" })}>

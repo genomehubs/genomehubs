@@ -1,6 +1,6 @@
 {
   "name": "genomehubs-ui",
-  "version": "2.5.8",
+  "version": "2.5.28",
   "description": "Frontend for GenomeHubs",
   "main": "index.js",
   "scripts": {
@@ -70,6 +70,7 @@
     "@reach/router": "^1.3.4",
     "ajv": "^8.10.0",
     "autoprefixer": "^9.8.8",
+    "buffer": "^6.0.3",
     "classnames": "^2.3.1",
     "color-convert": "^2.0.1",
     "core-js": "^3.19.2",
@@ -83,8 +84,10 @@
     "highlight.js": "^11.3.1",
     "html-to-image": "^1.9.0",
     "immutable-update": "^1.0.0",
+    "jszip": "^3.10.1",
     "konva": "^3.4.1",
     "leaflet": "^1.7.1",
+    "merge-images": "^2.0.0",
     "nanoid": "^3.1.31",
     "pixi.js": "^5.3.11",
     "pixi.js-legacy": "^5.3.11",

@@ -1,3 +1,12 @@
+import {
+  ancestralColor,
+  descendantColor,
+  descendantHighlight,
+  directColor,
+  directHighlight,
+  getDefaultPalette,
+} from "../reducers/color";
+
 import React from "react";
 import { connect } from "react-redux";
 
@@ -15,9 +24,21 @@ const COLORS = [
 ];
 
 const withColors = (WrappedComponent) => (props) => {
-  const mapStateToProps = (state) => ({
-    colors: COLORS,
-  });
+  const mapStateToProps = (state) => {
+    let { id, colors, levels } = getDefaultPalette(state);
+    return {
+      id,
+      colors,
+      levels,
+      statusColors: {
+        ancestral: ancestralColor,
+        descendant: descendantColor,
+        direct: directColor,
+        descendantHighlight,
+        directHighlight,
+      },
+    };
+  };
 
   const Connected = connect(mapStateToProps)(WrappedComponent);
 

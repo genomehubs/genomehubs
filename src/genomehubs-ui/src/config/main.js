@@ -65,4 +65,10 @@ module.exports = {
   suggestedTerm: process.env.GH_SUGGESTED_TERM,
   treeThreshold: process.env.GH_TREE_THRESHOLD || 2000,
   mapThreshold: process.env.GH_MAP_THRESHOLD || 2000,
+  // https://www.visualisingdata.com/2019/08/five-ways-to-design-for-red-green-colour-blindness/
+  directColor: "#006164",
+  ancestralColor: "#db4325",
+  descendantColor: "#eda247",
+  directHighlight: "#57c4ad",
+  descendantHighlight: "#e6e1bc",
 };

@@ -454,7 +454,7 @@ components:
       description: |
         Taxonomic to report values formats.
 
-        Used by histogram, map, scatter, table and xInY reports when `result=` `taxon` or `assembly`.
+        Used by histogram, map, scatter, table and arc reports when `result=` `taxon` or `assembly`.
       examples:
         null:
           value:
@@ -541,6 +541,7 @@ components:
       required: true
       schema:
         enum:
+          - feature
           - histogram
           - map
           - scatter
@@ -548,7 +549,7 @@ components:
           - table
           - tree
           - types
-          - xInY
+          - arc
           - xPerRank
         type: string
     resultParam:
@@ -970,7 +971,7 @@ components:
       description: |
         Query to provide *y* values.
 
-        Values added here will be combined with the value in `x` to generate the full query. For reports without an *y*-axis, this is the secondary query, except for `xInY` reports where this should be a full query.
+        Values added here will be combined with the value in `x` to generate the full query. For reports without an *y*-axis, this is the secondary query, except for `arc` reports where this should be a full query.
       examples:
         assembly_span:
           value: assembly_span>1000000000
@@ -999,6 +1000,10 @@ components:
         name:
           type: string
       type: object
+    Indices:
+      items:
+        type: string
+      type: array
     Records:
       items:
         properties:
@@ -1161,6 +1166,26 @@ paths:
       tags:
         - Tools
       x-eov-operation-handler: api/v2/routes/download
+  /indices:
+    get:
+      description: Returns a list of available indices
+      operationId: getIndices
+      parameters:
+        - $ref: "#/components/parameters/releaseParam"
+        - $ref: "#/components/parameters/indentParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Indices"
+          description: successful operation
+        "400":
+          description: Invalid query
+      summary: List of indices
+      tags:
+        - Metadata
+      x-eov-operation-handler: api/v2/routes/indices
   /lookup:
     get:
       description: |
@@ -1263,13 +1288,14 @@ paths:
 
         | Report        | Required          | Optional       |
         | ------------- | ----------------- | -------------- |
+        | **Feature**   | `x`               | `cat`, `xOpts`, `yOpts` |
         | **Histogram** | `x`               | `cat`, `rank`, `xOpts` |
         | **Map**       | `x`               | `cat`, `rank`          |
         | **Scatter**   | `x`, `y`, `rank`  | `cat`, `xOpts`, `yOpts`, `scatterThreshold` |
         | **Table**     | `x`, `y`          | `cat`, `rank`, `xOpts`, `yOpts`, `scatterThreshold` |
         | **Sources**   | -                 | -              |
         | **Tree**      | `x`               | `y`, `cat`, `xOpts`, `yOpts`, `collapseMonotypic`, `treeThreshold` |
-        | **xInY**      | `x`, `rank`       | `y`            |
+        | **arc**      | `x`, `rank`       | `y`            |
         | **xPerRank**  | `x`               | `ranks`        |
 
         Search related parameters `fields`, `includeEstimates`, `exclude*` and `queryId` are optional for all reports (except `sources` where they have no effect).

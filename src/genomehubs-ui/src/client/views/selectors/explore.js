@@ -1,4 +1,5 @@
 import { apiUrl, setApiStatus } from "../reducers/api";
+import { directColor, getDefaultPalette } from "../reducers/color";
 import {
   getSummaries,
   getSummariesFetching,
@@ -46,6 +47,8 @@ const scales = {
   linear: scaleLinear,
 };
 const processHistogram = (summary) => {
+  const state = store.getState();
+  const palette = getDefaultPalette(state);
   let buckets = [];
   let ticks = [];
   const binMeta = summary.meta.bins;
@@ -111,7 +114,8 @@ const processHistogram = (summary) => {
   let seq = interpolateGreens;
   buckets.forEach((bucket) => {
     if (bucket.count) {
-      bucket.color = seq(lin(bucket.count));
+      bucket.color = palette.levels[1][0];
+      bucket.opacity = lin(bucket.count);
     } else {
       bucket.color = "none";
     }

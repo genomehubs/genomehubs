@@ -1,8 +1,8 @@
 import { cancelPages, getPages } from "../reducers/pages";
+import { getRoutes, setRoutes } from "../reducers/routes";
 
 import React from "react";
 import { connect } from "react-redux";
-import { getRoutes, setRoutes } from "../reducers/routes";
 import { getRoutesById } from "../selectors/routes";
 
 const withRoutes = (WrappedComponent) => (props) => {
@@ -13,7 +13,13 @@ const withRoutes = (WrappedComponent) => (props) => {
     }),
   });
   const mapDispatchToProps = (dispatch) => ({
-    setRoute: (routeName, pageId) => dispatch(setRoutes({ routeName, pageId })),
+    setRoute: (routeName, pageId) =>
+      dispatch(
+        setRoutes({
+          routeName,
+          pageId,
+        })
+      ),
   });
 
   const Connected = connect(

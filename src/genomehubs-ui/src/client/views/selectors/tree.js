@@ -1,3 +1,10 @@
+import {
+  ancestralColor,
+  descendantColor,
+  descendantHighlight,
+  directColor,
+  directHighlight,
+} from "../reducers/color";
 import { arc, line as d3line, lineRadial } from "d3-shape";
 import {
   cancelNodesRequest,
@@ -20,8 +27,10 @@ import {
 
 import { apiUrl } from "../reducers/api";
 import axisScales from "../functions/axisScales";
+import { getStatusPalette } from "../reducers/color";
 import qs from "../functions/qs";
 import store from "../store";
+import stringLength from "../functions/stringLength";
 
 const uriEncode = (str) => {
   return encodeURIComponent(str).replaceAll(/[!'()*]/g, (c) => {
@@ -137,21 +146,26 @@ const setColor = ({ node, yQuery, recurse }) => {
       min = node.fields[field].min;
       max = node.fields[field].max;
     }
-    color = greys[baseTone + status];
+    // color = greys[baseTone + status];
+    color = ancestralColor;
     highlightColor = greys[baseTone + 1 + status];
 
     if (source == "direct") {
       if (status) {
-        color = greens[baseTone + 2 + status * 2];
-        highlightColor = greens[baseTone + 3 + status * 2];
+        // color = greens[baseTone + 2 + status * 2];
+        // highlightColor = greens[baseTone + 3 + status * 2];
+        color = directColor;
+        highlightColor = directHighlight;
       } else {
         color = greys[baseTone + 1];
         highlightColor = greys[baseTone + 1];
       }
     } else if (source == "descendant") {
       if (status) {
-        color = oranges[baseTone + status * 2];
+        // color = oranges[baseTone + status * 2];
         highlightColor = oranges[baseTone + 2 + status * 2];
+        color = descendantColor;
+        highlightColor = descendantHighlight;
       } else {
         color = greys[baseTone + 1];
         highlightColor = greys[baseTone + 2];
@@ -164,7 +178,7 @@ const setColor = ({ node, yQuery, recurse }) => {
   return { color, highlightColor, source, value, min, max };
 };
 
-export const processTreeRings = ({ nodes, xQuery, yQuery }) => {
+export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
   if (!nodes) return undefined;
   let { treeNodes, lca } = nodes;
   if (!lca) return undefined;
@@ -181,8 +195,8 @@ export const processTreeRings = ({ nodes, xQuery, yQuery }) => {
   let arcs = [];
 
   let scaleFont = false;
-  let charLen = 8;
-  let charHeight = charLen * 1.3;
+  let charHeight = pointSize;
+  let charLen = charHeight / 1.3;
   var radialLine = lineRadial()
     .angle((d) => d.a)
     .radius((d) => d.r);
@@ -391,6 +405,7 @@ export const processTreePaths = ({
   yBounds = {},
   xQuery,
   yQuery,
+  pointSize,
 }) => {
   if (!nodes) return undefined;
   const { cat, cats: catArray, showOther } = bounds;
@@ -413,9 +428,10 @@ export const processTreePaths = ({
   let valueScale;
   let targetWidth = 1000;
   let dataWidth = 0;
-  if (yBounds && yBounds.domain) {
+  if (yBounds && yBounds.domain && yBounds.type != "date") {
     valueScale = axisScales[yBounds.scale]()
       .domain(yBounds.domain)
+      .nice()
       .range([0, 100]);
     dataWidth = 120;
     targetWidth -= 120;
@@ -426,15 +442,15 @@ export const processTreePaths = ({
   if (!treeNodes || !rootNode) return undefined;
   let maxWidth = 0;
   let maxTip = 0;
-  let charLen = 6.5;
-  let charHeight = charLen * 2;
+  let charHeight = pointSize;
+  let charLen = charHeight / 1.6;
   let xScale = scaleLinear()
     .domain([-0.5, maxDepth + 2])
     .range([0, targetWidth]);
   let yMax = treeNodes[rootNode] ? treeNodes[rootNode].count : 0;
   let yScale = scaleLinear()
     .domain([0, yMax])
-    .range([charHeight * (yMax + 2), 0]);
+    .range([charHeight * (yMax + 3), charHeight]);
   let lines = [];
   let visited = {};
 
@@ -558,10 +574,7 @@ export const processTreePaths = ({
     let label;
     if (node.tip) {
       label = node.scientific_name;
-      maxWidth = Math.max(
-        maxWidth,
-        node.xEnd + 10 + node.scientific_name.length * charLen
-      );
+      maxWidth = Math.max(maxWidth, stringLength(label) * pointSize * 0.8);
       maxTip = Math.max(maxTip, node.xEnd + 10);
     } else if (node.scientific_name != "parent" && node.width > charLen * 5) {
       label = node.scientific_name;
@@ -580,15 +593,15 @@ export const processTreePaths = ({
         }
       }
     }
-
     locations[node.scientific_name.toLowerCase()] = {
       x: node.xStart,
       y: node.yStart,
       tip: node.tip ? node.width : false,
-      width: node.tip ? node.scientific_name.length * charLen : node.width,
+      width: node.tip
+        ? stringLength(node.scientific_name) * pointSize * 0.8
+        : node.width,
     };
     locations[node.taxon_id.toLowerCase()] = { x: node.xStart, y: node.yStart };
-
     lines.push({
       ...node,
       hLine: d3line()([
@@ -611,7 +624,7 @@ export const processTreePaths = ({
               ]),
             })),
       label,
-      labelWidth: label ? label.length * charLen : 0,
+      labelWidth: label ? stringLength(label) * pointSize * 0.8 : 0,
       color,
       highlightColor,
       source,
@@ -619,14 +632,16 @@ export const processTreePaths = ({
       bar,
     });
   });
+  maxWidth += maxTip + pointSize / 2;
   return {
     lines,
     maxDepth,
     maxWidth,
     maxTip,
     yField,
+    valueScale,
     dataWidth,
-    plotHeight: yScale(0) - yScale(yMax) + charHeight / 2,
+    plotHeight: yScale(0) - yScale(yMax) + charHeight / 2 + charHeight,
     charHeight,
     locations,
     other,
@@ -640,9 +655,24 @@ export const processTree = ({
   xQuery,
   yQuery,
   treeStyle = "rect",
+  pointSize = 15,
 }) => {
   if (treeStyle == "ring") {
-    return processTreeRings({ nodes, bounds, yBounds, xQuery, yQuery });
+    return processTreeRings({
+      nodes,
+      bounds,
+      yBounds,
+      xQuery,
+      yQuery,
+      pointSize,
+    });
   }
-  return processTreePaths({ nodes, bounds, yBounds, xQuery, yQuery });
+  return processTreePaths({
+    nodes,
+    bounds,
+    yBounds,
+    xQuery,
+    yQuery,
+    pointSize,
+  });
 };

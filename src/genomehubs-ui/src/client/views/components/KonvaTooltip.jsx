@@ -1,7 +1,18 @@
 import { Group, Label, Rect, Tag, Text } from "react-konva";
+import {
+  ancestralColor,
+  descendantColor,
+  directColor,
+} from "../reducers/color";
 
 import React from "react";
 import { format } from "d3-format";
+
+const colors = {
+  direct: { color: directColor, size: 3 },
+  descendant: { color: descendantColor, size: 2 },
+  ancestor: { color: ancestralColor, size: 1 },
+};
 
 const sci = (v) => {
   if (v < 10) {
@@ -19,16 +30,11 @@ const sciInt = (v) => {
   return format(".3s")(v);
 };
 
-const colors = {
-  direct: { color: "green", size: 3 },
-  descendant: { color: "orange", size: 2 },
-  ancestor: { color: "red", size: 1 },
-};
-
-const KonvaTooltip = ({ e, segment, field, scale }) => {
+const KonvaTooltip = ({ e, segment, field, scale, statusColors }) => {
   if (!segment) {
     return null;
   }
+
   const stage = e.target.getStage();
   const offset = { x: stage.x(), y: stage.y() };
   let x = e.evt.layerX - offset.x;

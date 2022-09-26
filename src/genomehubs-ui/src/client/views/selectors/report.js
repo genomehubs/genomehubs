@@ -37,9 +37,9 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     report: true,
     query: { not: new Set(["sources"]), as: "x" },
     x: { not: new Set(["sources"]) },
-    y: { in: new Set(["scatter", "table", "tree", "xInY"]) },
+    y: { in: new Set(["scatter", "table", "tree", "arc"]) },
     z: { in: new Set(["scatter"]) },
-    cat: { not: new Set(["sources", "xInY"]) },
+    cat: { not: new Set(["sources", "arc"]) },
     rank: { not: new Set(["sources", "tree"]) },
     ranks: { in: new Set(["tree"]) },
     levels: { in: new Set(["tree"]), ui: true },
@@ -71,12 +71,16 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     yScale: { in: new Set(["histogram"]), ui: true },
     zScale: { in: new Set(["scatter"]), ui: true },
     stacked: { in: new Set(["histogram", "scatter"]), ui: true },
+    pointSize: {
+      in: new Set(["histogram", "scatter", "tree", "arc"]),
+      ui: true,
+    },
     cumulative: { in: new Set(["histogram", "table"]), ui: true },
     // reversed: { in: new Set(["table"]), ui: true },
     mapThreshold: { in: new Set(["map"]) },
     treeThreshold: { in: new Set(["tree"]) },
     queryId: {
-      in: new Set(["histogram", "map", "scatter", "table", "tree", "xInY"]),
+      in: new Set(["histogram", "map", "scatter", "table", "tree", "arc"]),
     },
     release: true,
     indent: false,
@@ -632,11 +636,14 @@ const processTable = (report) => {
   return { headers, rows };
 };
 
-const processReport = (report) => {
+const processReport = (report, { searchTerm = {} }) => {
   if (!report || !report.name) return {};
   if (report.name == "tree") {
     let { treeStyle } = qs.parse(report.report.queryString);
     let { tree, xQuery, yQuery, bounds, yBounds } = report.report.tree;
+    if (!searchTerm) {
+      searchTerm = qs.parse(window.location.search.replace(/^\?/, ""));
+    }
     return {
       ...report,
       report: {
@@ -650,6 +657,7 @@ const processReport = (report) => {
             xQuery,
             yQuery,
             treeStyle,
+            pointSize: 1 * (searchTerm.pointSize || 15),
           }),
         },
       },
@@ -704,9 +712,10 @@ export const cacheReportByReportId = createSelectorForReportId(
 
 export const getReportByReportId = createCachedSelector(
   (state, reportId) => getReport(state, reportId),
+  getSearchTerm,
   (_state, reportId) => reportId,
-  (report, reportId) => {
-    return processReport(report, reportId);
+  (report, searchTerm, reportId) => {
+    return processReport(report, { reportId, searchTerm });
   }
 )((_state, reportId) => reportId);
 
@@ -781,7 +790,7 @@ const reportOptions = {
       value: "rect",
     },
   },
-  xInY: {
+  arc: {
     x: {
       default: "query",
       fieldType: "value",

@@ -1,9 +1,9 @@
 import React, { useCallback, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-// import Grid from "@material-ui/core/Grid";
 // import SVGDownloadButton from "./SVGDownloadButton";
 import Tooltip from "@material-ui/core/Tooltip";
+import Typography from "@material-ui/core/Typography";
 // import VariableFilter from "./VariableFilter";
 import classnames from "classnames";
 import { compose } from "recompose";
@@ -38,6 +38,7 @@ const ReportTreeRings = ({
   handleSearch,
   width,
   height,
+  pointSize,
   plotHeight,
 }) => {
   if (!arcs || arcs.length == 0) {
@@ -140,7 +141,7 @@ const ReportTreeRings = ({
       paths.push(
         <Tooltip
           key={`tt-${segment.taxon_id}`}
-          title={segment.scientific_name}
+          title={<Typography>{segment.scientific_name}</Typography>}
           onPointerMove={(e) => setPosition({ x: e.clientX, y: e.clientY })}
           PopperProps={{
             anchorEl: {
@@ -206,7 +207,7 @@ const ReportTreeRings = ({
           fill={"white"}
           style={{ pointerEvents: "none" }}
           textAnchor="middle"
-          fontSize={label.labelScale > 1 && `${label.labelScale * 10}pt`}
+          fontSize={label.labelScale > 1 && `${label.labelScale * pointSize}px`}
         >
           <textPath
             xlinkHref={`#${label.taxon_id}-label-path`}
@@ -272,7 +273,7 @@ const ReportTreeRings = ({
           style={{
             fontFamily:
               '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
-            fontSize: "10pt",
+            fontSize: `${pointSize}px`,
           }}
         >
           {paths}

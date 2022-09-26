@@ -84,7 +84,27 @@ export const matchAttributes = (
                       "attributes.2dp_value",
                       "attributes.3dp_value",
                       "attributes.4dp_value",
-                    ].concat(searchRawValues ? ["attributes.values.*"] : []),
+                    ].concat(
+                      searchRawValues
+                        ? [
+                            "attributes.keyword_value.raw",
+                            "attributes.date_value",
+                            "attributes.geo_point_value",
+                            "attributes.long_value",
+                            "attributes.integer_value",
+                            "attributes.short_value",
+                            "attributes.byte_value",
+                            "attributes.double_value",
+                            "attributes.float_value",
+                            "attributes.half_float_value",
+                            "attributes.1dp_value",
+                            "attributes.2dp_value",
+                            "attributes.3dp_value",
+                            "attributes.4dp_value",
+                            "attributes.values.source",
+                          ]
+                        : []
+                    ),
                     size: 100,
                   },
                 },
