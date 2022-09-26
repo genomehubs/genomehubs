@@ -33,4 +33,4 @@ attributes:
     display_level: 2
     display_name: BUSCO score
     display_group: busco
-    type: short
+    type: half_float

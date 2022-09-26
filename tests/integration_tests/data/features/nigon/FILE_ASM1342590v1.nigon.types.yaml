@@ -33,10 +33,13 @@ attributes:
     index: 3
   end:
     index: 4
-  strand: 1
+  strand:
+    index: 5
+    translate:
+      "-": -1
+      "+": 1
   length:
-    index: 4
-    function: "{} - {start} + 1"
+    index: 7
   midpoint:
     index: 3
     function: "{length} / 2 + {}"
@@ -2349,7 +2352,7 @@ attributes:
   busco_status:
     index: 1
   busco_score:
-    index: 5
+    index: 6
 features:
   assembly_id: GCA_013425905.1
   feature_id:
