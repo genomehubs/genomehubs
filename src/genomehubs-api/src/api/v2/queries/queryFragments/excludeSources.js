@@ -47,7 +47,11 @@ export const excludeSources = (exclusions = {}, fields) => {
 
     exclusions[source].forEach((field) => {
       if (source == "missing") {
-        delete fields[field];
+        try {
+          delete fields[field];
+        } catch (err) {
+          // needed in case field is an array method (e.g. length)
+        }
         excluded.push({
           bool: {
             must_not: {

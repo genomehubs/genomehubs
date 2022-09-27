@@ -8,6 +8,7 @@ import { attrTypes } from "../functions/attrTypes";
 import { checkResponse } from "../functions/checkResponse";
 import { client } from "../functions/connection";
 import { combineQueries } from "../functions/combineQueries";
+import { feature } from "../reports/feature";
 import { formatJson } from "../functions/formatJson";
 import { getResultCount } from "../functions/getResultCount";
 import { histogram } from "../reports/histogram";
@@ -30,6 +31,59 @@ const plurals = (singular) => {
     superkingdom: "superkingdoms",
   };
   return ranks[singular.toLowerCase()] || singular;
+};
+
+export const getFeature = async ({
+  x,
+  y,
+  cat,
+  taxonomy,
+  queryString,
+  fields,
+  req,
+  ...apiParams
+}) => {
+  // Return feature results
+  let status;
+  let res = await feature({
+    x,
+    y,
+    cat,
+    result: apiParams.result,
+    taxonomy,
+    fields,
+    req,
+    apiParams,
+  });
+  if (res.status.success == false) {
+    if (!status) {
+      status = res.status;
+    }
+  } else {
+    status = { success: true };
+  }
+  let report = res.report;
+  let xQuery = res.xQuery;
+  let yQuery = res.yQuery;
+  let xLabel = res.xLabel;
+  let caption;
+  if (report) {
+    caption = `Feature report of ${x}${report.y ? ` against ${y}` : ""}`;
+    if (cat) {
+      caption += ` by ${cat.replace(/=.+$/, "")}`;
+    }
+  }
+  return {
+    status,
+    report: {
+      feature: report,
+      xQuery,
+      // yQuery,
+      xLabel,
+      queryString,
+      caption,
+    },
+  };
 };
 
 export const getMap = async ({
@@ -927,6 +981,14 @@ export const getReport = async (req, res) => {
     let reportFunc;
     let reportParams = { ...req.query, queryString, req };
     switch (req.query.report) {
+      case "arc": {
+        reportFunc = arcPerRank;
+        break;
+      }
+      case "feature": {
+        reportFunc = getFeature;
+        break;
+      }
       case "histogram": {
         reportFunc = histPerRank;
         break;
@@ -953,10 +1015,6 @@ export const getReport = async (req, res) => {
       }
       case "types": {
         reportFunc = getTypes;
-        break;
-      }
-      case "arc": {
-        reportFunc = arcPerRank;
         break;
       }
       case "xPerRank": {
