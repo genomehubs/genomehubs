@@ -247,6 +247,45 @@ const getFeatures = async ({
     domains[assembly] = [0, offset];
   }
 
+  let groupScores = {};
+  for (let [sequence_id] of sortedSeqs[asms[0]]) {
+    for (let feat of byAssembly[asms[0]][sequence_id]) {
+      let { group, start } = feat;
+      groupScores[group] = start + seqOffsets[asms[0]][sequence_id];
+    }
+  }
+  let seqScores = {};
+  for (let [sequence_id] of Object.entries(activeSeqs[asms[1]])) {
+    let seqScore = 0;
+    let seqCount = 0;
+    for (let feat of byAssembly[asms[1]][sequence_id]) {
+      let { group } = feat;
+      if (!groupScores[group]) {
+        continue;
+      }
+      seqScore += groupScores[group];
+      seqCount++;
+    }
+    seqScores[sequence_id] = seqScore / seqCount;
+    if (isNaN(seqScores[sequence_id])) {
+      seqScores[sequence_id] = 0;
+    }
+  }
+  seqOffsets[asms[1]] = {};
+  seqIndices[asms[1]] = {};
+  let offset = 0;
+  buckets[asms[1]] = [];
+  for (let [seq, score] of Object.entries(seqScores).sort(
+    (a, b) => a[1] - b[1]
+  )) {
+    seqOffsets[asms[1]][seq] = offset;
+    seqIndices[asms[1]][seq] = buckets[asms[1]].length;
+    buckets[asms[1]].push(offset);
+    offset += seqLengths[asms[1]][seq];
+  }
+  buckets[asms[1]].push(offset);
+  domains[asms[1]] = [0, offset];
+
   let rawData = {};
   //   {
   //     "scientific_name": "Acanthisitta chloris",
@@ -273,7 +312,7 @@ const getFeatures = async ({
   for (let [sequence_id, len] of sortedSeqs[asms[0]]) {
     allValues[i] = byAssembly[asms[0]][sequence_id].flat().length;
     allYValues[i] = buckets[asms[1]].map(() => 0);
-    for (let feat of byAssembly[asms[0]][sequence_id].sort((a, b) => a - b)) {
+    for (let feat of byAssembly[asms[0]][sequence_id]) {
       let {
         group,
         start,
@@ -288,6 +327,8 @@ const getFeatures = async ({
       if (!rawData[cat]) {
         rawData[cat] = [];
       }
+      start += seqOffsets[assembly_id][sequence_id];
+      end += seqOffsets[assembly_id][sequence_id];
       byCat[cat][i]++;
       for (let [assembly, arr] of Object.entries(groupedData[group])) {
         // if (assembly == assembly_id) {
@@ -295,6 +336,9 @@ const getFeatures = async ({
         // }
         for (let partner of arr) {
           let index = seqIndices[assembly][partner.sequence_id];
+          let pStart =
+            partner.start + seqOffsets[assembly][partner.sequence_id];
+          let pEnd = partner.end + seqOffsets[assembly][partner.sequence_id];
           allYValues[i][index]++;
           yValuesByCat[cat][i][index]++;
           rawData[cat].push({
@@ -306,8 +350,8 @@ const getFeatures = async ({
             cat,
             x: strand > 0 ? start : end,
             x2: strand > 0 ? end : start,
-            y: partner.strand > 0 ? partner.start : partner.end,
-            y2: partner.strand > 0 ? partner.end : partner.start,
+            y: partner.strand > 0 ? pStart : pEnd,
+            y2: partner.strand > 0 ? pEnd : pStart,
             strand,
             yStrand: partner.strand,
           });
@@ -318,17 +362,51 @@ const getFeatures = async ({
   }
   let yArr = allYValues.flat();
   let zDomain = [Math.min(...yArr), Math.max(...yArr)];
+  bounds = {
+    field: asms[0],
+    scale: "linear",
+    stats: {
+      count: xRes.results.length, // update this
+      min: domains[asms[0]][0],
+      max: domains[asms[0]][1],
+    },
+    type: "coordinate",
+    domain: domains[asms[0]],
+    tickCount: buckets[asms[0]].length,
+    by: bounds.by,
+    cat: bounds.cat,
+    cats: bounds.cats,
+  };
+  yBounds = {
+    field: asms[1],
+    scale: "linear",
+    stats: {
+      count: xRes.results.length, // update this
+      min: domains[asms[1]][0],
+      max: domains[asms[1]][1],
+    },
+    type: "coordinate",
+    domain: domains[asms[1]],
+    tickCount: buckets[asms[1]].length,
+    by: bounds.by,
+    cat: bounds.cat,
+    cats: bounds.cats,
+  };
   return {
     buckets: buckets[asms[0]],
     allValues,
     byCat,
     rawData,
+    cat: bounds.cat,
+    cats: bounds.cats,
     valueType: "coordinate",
     yValueType: "coordinate",
-    yBuckets: buckets[asms[0]],
+    yBuckets: buckets[asms[1]],
     allYValues,
     yValuesByCat,
     zDomain,
+    bounds,
+    yBounds,
   };
 };
 
@@ -511,14 +589,18 @@ export const feature = async ({
     status = { ...feature.status };
     feature = {};
   }
+  let yBounds;
+  ({ bounds, yBounds } = feature);
 
   return {
     status: status || { success: true },
     report: {
       status,
-      feature,
+      histograms: feature,
       bounds,
-      // yBounds,
+      cat: bounds.cat,
+      cats: bounds.cats,
+      yBounds,
       xQuery: {
         ...xQuery,
         fields: optionalFields.join(","),

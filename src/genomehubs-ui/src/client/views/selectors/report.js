@@ -662,6 +662,17 @@ const processReport = (report, { searchTerm = {} }) => {
         },
       },
     };
+  } else if (report.name == "feature") {
+    return {
+      ...report,
+      report: {
+        ...report.report,
+        scatter: {
+          ...report.report.feature,
+          ...processScatter(report.report.feature),
+        },
+      },
+    };
   } else if (report.name == "scatter") {
     return {
       ...report,

@@ -679,6 +679,7 @@ const ReportScatter = ({
 
   let locations = {};
   if (scatter && scatter.status) {
+    let scatterReport = scatter.report.scatter || scatter.report.feature;
     let chart;
     let {
       bounds,
@@ -688,10 +689,11 @@ const ReportScatter = ({
       chartData,
       histograms: heatmaps,
       pointData,
-    } = scatter.report.scatter;
+    } = scatterReport;
     if (pointData) {
-      ({ locations } = scatter.report.scatter);
+      ({ locations } = scatterReport);
     }
+    console.log(cats);
     useEffect(() => {
       if (locations[reportTerm]) {
         setHighlight([locations[reportTerm]]);

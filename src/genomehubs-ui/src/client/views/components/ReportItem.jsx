@@ -243,6 +243,28 @@ const ReportItem = ({
           />
         );
         break;
+      case "feature":
+        component = (
+          <ReportScatter
+            scatter={reportById}
+            chartRef={chartRef}
+            containerRef={containerRef}
+            embedded={embedded}
+            ratio={ratio}
+            xOpts={xOpts}
+            yOpts={yOpts}
+            highlightArea={highlightArea}
+            stacked={stacked}
+            pointSize={pointSize}
+            zScale={zScale}
+            scatterThreshold={scatterThreshold}
+            includeEstimates={includeEstimates}
+            {...qs.parse(queryString)}
+            minDim={minDim}
+            setMinDim={setMinDim}
+          />
+        );
+        break;
       case "scatter":
         component = (
           <ReportScatter
