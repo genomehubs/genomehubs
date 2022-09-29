@@ -81,6 +81,7 @@
     "deep-equal": "^2.0.5",
     "deep-get-set": "^1.1.1",
     "hastscript": "^7.0.2",
+    "hex-to-hsl": "^1.0.2",
     "highlight.js": "^11.3.1",
     "html-to-image": "^1.9.0",
     "immutable-update": "^1.0.0",

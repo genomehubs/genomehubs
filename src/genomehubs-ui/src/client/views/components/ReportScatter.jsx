@@ -26,6 +26,7 @@ import { compose } from "recompose";
 import { line as d3Line } from "d3-shape";
 import dispatchMessage from "../hocs/dispatchMessage";
 import { format } from "d3-format";
+import hexToHSL from "hex-to-hsl";
 import { processLegendData } from "./MultiCatLegend";
 // import { point } from "leaflet";
 import qs from "../functions/qs";
@@ -228,8 +229,16 @@ const drawHeatRect = ({ props, chartProps, h, w }) => {
   );
 };
 
-const CustomShape = (props, chartProps) => {
+const CustomShape = (props, chartProps, handleClick) => {
   let h = props.yAxis.height / chartProps.yLength;
+  let xScale = scaleLinear()
+    .domain(chartProps.bounds.domain)
+    .range([0, props.xAxis.width]);
+  let xIndex = chartProps.buckets.indexOf(props.payload.x);
+  let yScale = scaleLinear()
+    .domain(chartProps.bounds.domain)
+    .range([0, props.yAxis.height]);
+  let yIndex = chartProps.yBuckets.indexOf(props.payload.y);
   if (chartProps.yValueType == "date") {
     h =
       props.yAxis.scale(props.payload.y) -
@@ -241,6 +250,11 @@ const CustomShape = (props, chartProps) => {
       props.xAxis.scale(props.payload.xBound) -
       props.xAxis.scale(props.payload.x);
   }
+  w =
+    xScale(chartProps.buckets[xIndex + 1]) - xScale(chartProps.buckets[xIndex]);
+  h =
+    yScale(chartProps.yBuckets[yIndex + 1]) -
+    yScale(chartProps.yBuckets[yIndex]);
   let heatRect, legendGroup;
   let xRange, yRange;
   if (chartProps.bounds.scale == "ordinal") {
@@ -296,7 +310,11 @@ const CustomShape = (props, chartProps) => {
     heatRect = drawHeatRect({ props, chartProps, h, w });
   }
   if (props.key == "symbol-0") {
-    legendGroup = zLegend({ props, chartProps });
+    legendGroup = zLegend({
+      props,
+      chartProps,
+      handleClick,
+    });
   }
 
   return (
@@ -409,6 +427,7 @@ const CustomizedYAxisTick = (props, buckets, fmt, translations, pointSize) => {
         y={0}
         dy={5}
         textAnchor="end"
+        alignmentBaseline={"middle"}
         dominantBaseline={"middle"}
         fill={fill}
         fontSize={pointSize}
@@ -442,6 +461,27 @@ const Heatmap = ({
   colors,
   legendRows,
 }) => {
+  const fadeColor = ({ hex, i, active }) => {
+    let [h, s, l] = hexToHSL(hex);
+    let lighten = active !== false ? (i == active ? false : true) : false;
+    if (lighten) {
+      s = 15; // s / 2;
+      l = (l + 100) / 2;
+    }
+    return `hsl(${h},${s}%,${l}%)`;
+  };
+  const [currentSeries, setCurrentSeries] = useState(false);
+  let fillColors = colors.map((hex, i) =>
+    fadeColor({ hex, i, active: currentSeries })
+  );
+  let orderedCats = [...cats];
+  let catOrder = cats
+    .map((cat, i) => ({ [cat]: i }))
+    .reduce((a, b) => ({ ...b, ...a }), {});
+  if (currentSeries !== false) {
+    let [lastCat] = orderedCats.splice(currentSeries, 1);
+    orderedCats.push(lastCat);
+  }
   let xScale =
     chartProps.bounds.scale == "ordinal" ? "linear" : chartProps.bounds.scale;
   let yScale =
@@ -597,34 +637,40 @@ const Heatmap = ({
     >
       {/* {patterns} */}
       {axes}
-      {cats.map((cat, i) => {
-        let range = [Math.max()];
-
-        return (
-          <Scatter
-            name={cat}
-            key={cat}
-            data={data[i]}
-            fill={colors[i] || "rgb(102, 102, 102)"}
-            shape={(props) => CustomShape(props, { ...chartProps, i })}
-            isAnimationActive={false}
-          />
-        );
-      })}
+      {cats.map((cat, i) => (
+        <Scatter
+          name={cat}
+          key={cat}
+          data={data[i]}
+          fill={fillColors[i] || "rgb(102, 102, 102)"}
+          shape={(props) =>
+            CustomShape(props, { ...chartProps, i }, (i) => {
+              currentSeries !== false && currentSeries == i
+                ? setCurrentSeries(false)
+                : setCurrentSeries(i);
+            })
+          }
+          isAnimationActive={false}
+        />
+      ))}
       {pointData &&
-        cats.map((cat, i) => (
-          <Scatter
-            name={`${cat}_points`}
-            legendType="none"
-            key={i}
-            data={pointData[i]}
-            fill={colors[i] || "rgb(102, 102, 102)"}
-            shape={(props) => CustomCircle(props, { ...chartProps })}
-            zAxisId={1}
-            isAnimationActive={false}
-            style={{ pointerEvents: "none" }}
-          />
-        ))}
+        orderedCats.map((cat, j) => {
+          let i = catOrder[cat];
+          let range = [Math.max()];
+          return (
+            <Scatter
+              name={`${cat}_points`}
+              legendType="none"
+              key={i}
+              data={pointData[i]}
+              fill={fillColors[i] || "rgb(102, 102, 102)"}
+              shape={(props) => CustomCircle(props, { ...chartProps })}
+              zAxisId={1}
+              isAnimationActive={false}
+              pointerEvents={"none"}
+            />
+          );
+        })}
       {pointData && highlight && (
         <Scatter
           name={"highlight"}
@@ -693,7 +739,6 @@ const ReportScatter = ({
     if (pointData) {
       ({ locations } = scatterReport);
     }
-    console.log(cats);
     useEffect(() => {
       if (locations[reportTerm]) {
         setHighlight([locations[reportTerm]]);
@@ -827,6 +872,8 @@ const ReportScatter = ({
           yTranslations,
           catTranslations,
           catOffsets,
+          buckets: heatmaps.buckets,
+          yBuckets: heatmaps.yBuckets,
           valueType,
           yValueType,
           stacked,

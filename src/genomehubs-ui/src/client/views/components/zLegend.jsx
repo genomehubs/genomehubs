@@ -1,6 +1,6 @@
 import MultiCatLegend from "./MultiCatLegend";
 
-export const zLegend = ({ props, chartProps }) => {
+export const zLegend = ({ props, chartProps, handleClick }) => {
   let { xAxis, yAxis, fill, name } = props;
   let { width, x } = xAxis;
   let { y } = yAxis;
@@ -33,6 +33,7 @@ export const zLegend = ({ props, chartProps }) => {
       row,
       pointSize,
       compactLegend,
+      handleClick,
     });
   } else {
     return MultiCatLegend({
@@ -49,6 +50,7 @@ export const zLegend = ({ props, chartProps }) => {
       row,
       pointSize,
       compactLegend,
+      handleClick,
     });
   }
 };

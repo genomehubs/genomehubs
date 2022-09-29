@@ -136,6 +136,7 @@ const MultiCatLegend = ({
   row,
   pointSize,
   compactLegend,
+  handleClick = () => {},
 }) => {
   let cellSize = pointSize * 1 + 5;
   let xPos;
@@ -173,6 +174,13 @@ const MultiCatLegend = ({
         cellSize / 2 + (j - 1) * ((compactLegend ? 1 : 2) * cellSize + 5)
       })`}
     >
+      <Rectangle
+        height={cellSize * (compactLegend ? 1 : 2)}
+        width={legendWidth}
+        fill={"rgba(255,255,255,0)"}
+        x={cellSize / 2 - legendWidth} // {props.cx + (w - width) / 2}
+        y={-cellSize / 2}
+      />
       <Text
         x={-5}
         y={0}
@@ -192,12 +200,20 @@ const MultiCatLegend = ({
         fill={fill || "rgb(102, 102, 102)"}
         x={0} // {props.cx + (w - width) / 2}
         y={-cellSize / 2}
-        style={{ pointerEvents: "none" }}
+        // style={{ pointerEvents: "none" }}
       />
     </g>
   );
 
-  return <g transform={`translate(${xPos}, 5)`}>{text}</g>;
+  return (
+    <g
+      transform={`translate(${xPos}, 5)`}
+      style={{ cursor: "pointer" }}
+      onClick={() => handleClick(i)}
+    >
+      {text}
+    </g>
+  );
 };
 
 export default MultiCatLegend;
