@@ -241,16 +241,16 @@ const Histogram = ({
       // }
       ticks={isNaN(buckets[0]) ? null : buckets}
       tick={(props) =>
-        ReportXAxisTick(
+        ReportXAxisTick({
           props,
           buckets,
-          chartProps.xFormat,
-          chartProps.translations,
-          chartProps.pointSize,
-          chartProps.orientation,
-          width - marginRight,
-          isNaN(buckets[0]) ? "catHistogram" : "histogram"
-        )
+          fmt: chartProps.xFormat,
+          translations: chartProps.translations,
+          pointSize: chartProps.pointSize,
+          orientation: chartProps.orientation,
+          lastPos: width - marginRight,
+          report: isNaN(buckets[0]) ? "catHistogram" : "histogram",
+        })
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
       interval={0}

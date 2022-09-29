@@ -66,6 +66,7 @@ export const getFeature = async ({
   let xQuery = res.xQuery;
   let yQuery = res.yQuery;
   let xLabel = res.xLabel;
+  let yLabel = res.yLabel;
   let caption;
   if (report) {
     caption = `Feature report of ${x}${report.y ? ` against ${y}` : ""}`;
@@ -80,6 +81,7 @@ export const getFeature = async ({
       xQuery,
       // yQuery,
       xLabel,
+      yLabel,
       queryString,
       caption,
     },

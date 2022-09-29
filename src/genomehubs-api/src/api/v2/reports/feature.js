@@ -222,6 +222,7 @@ const getFeatures = async ({
   let seqIndices = {};
   let domains = {};
   let buckets = {};
+  let labels = {};
   let allValues = {};
   let allYValues = {};
   let byCat = {};
@@ -237,10 +238,12 @@ const getFeatures = async ({
     seqIndices[assembly] = {};
     let offset = 0;
     buckets[assembly] = [];
+    labels[assembly] = [];
     for (let [seq, len] of sortedSeqs[assembly]) {
       seqOffsets[assembly][seq] = offset;
       seqIndices[assembly][seq] = buckets[assembly].length;
       buckets[assembly].push(offset);
+      labels[assembly].push(seq);
       offset += len;
     }
     buckets[assembly].push(offset);
@@ -275,12 +278,14 @@ const getFeatures = async ({
   seqIndices[asms[1]] = {};
   let offset = 0;
   buckets[asms[1]] = [];
+  labels[asms[1]] = [];
   for (let [seq, score] of Object.entries(seqScores).sort(
     (a, b) => a[1] - b[1]
   )) {
     seqOffsets[asms[1]][seq] = offset;
     seqIndices[asms[1]][seq] = buckets[asms[1]].length;
     buckets[asms[1]].push(offset);
+    labels[asms[1]].push(seq);
     offset += seqLengths[asms[1]][seq];
   }
   buckets[asms[1]].push(offset);
@@ -371,6 +376,7 @@ const getFeatures = async ({
       max: domains[asms[0]][1],
     },
     type: "coordinate",
+    labels: labels[asms[0]],
     domain: domains[asms[0]],
     tickCount: buckets[asms[0]].length,
     by: bounds.by,
@@ -386,6 +392,7 @@ const getFeatures = async ({
       max: domains[asms[1]][1],
     },
     type: "coordinate",
+    labels: labels[asms[1]],
     domain: domains[asms[1]],
     tickCount: buckets[asms[1]].length,
     by: bounds.by,
@@ -617,7 +624,8 @@ export const feature = async ({
     },
     xQuery,
     // ...(y && { yQuery }),
-    xLabel: fields[0],
+    xLabel: asms[0],
+    yLabel: asms[1],
     // ...(y && { yLabel: yFields[0] }),
   };
 };

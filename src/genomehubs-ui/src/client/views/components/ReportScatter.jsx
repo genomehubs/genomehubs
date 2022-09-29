@@ -236,7 +236,7 @@ const CustomShape = (props, chartProps, handleClick) => {
     .range([0, props.xAxis.width]);
   let xIndex = chartProps.buckets.indexOf(props.payload.x);
   let yScale = scaleLinear()
-    .domain(chartProps.bounds.domain)
+    .domain(chartProps.yBounds.domain)
     .range([0, props.yAxis.height]);
   let yIndex = chartProps.yBuckets.indexOf(props.payload.y);
   if (chartProps.yValueType == "date") {
@@ -257,7 +257,9 @@ const CustomShape = (props, chartProps, handleClick) => {
     yScale(chartProps.yBuckets[yIndex]);
   let heatRect, legendGroup;
   let xRange, yRange;
-  if (chartProps.bounds.scale == "ordinal") {
+  if (chartProps.valueType == "coordinate") {
+    xRange = chartProps.labels[xIndex];
+  } else if (chartProps.bounds.scale == "ordinal") {
     try {
       xRange = `${chartProps.bounds.stats.cats[props.payload.x].key}`;
     } catch {
@@ -268,7 +270,9 @@ const CustomShape = (props, chartProps, handleClick) => {
       props.payload.xBound
     )}`;
   }
-  if (chartProps.yBounds.scale == "ordinal") {
+  if (chartProps.yValueType == "coordinate") {
+    yRange = chartProps.yLabels[yIndex];
+  } else if (chartProps.yBounds.scale == "ordinal") {
     try {
       yRange = `${chartProps.yBounds.stats.cats[props.payload.y].key}`;
     } catch {
@@ -286,12 +290,13 @@ const CustomShape = (props, chartProps, handleClick) => {
         arrow
       >
         <Rectangle
+          className={styles.active}
           height={h}
           width={w}
           x={props.cx}
           y={props.cy - h}
           style={chartProps.embedded ? {} : { cursor: "pointer" }}
-          fill={"rgba(255,255,255,0)"}
+          fill={`rgba(125,125,125,0)`}
           onClick={
             chartProps.embedded
               ? () => {}
@@ -410,12 +415,19 @@ const HighlightShape = (props, chartProps) => {
   );
 };
 
-const CustomizedYAxisTick = (props, buckets, fmt, translations, pointSize) => {
+const CustomizedYAxisTick = (
+  props,
+  buckets,
+  fmt,
+  translations,
+  pointSize,
+  yLabels
+) => {
   const { x, y, fill, index, height, payload } = props;
   let value = payload.value;
   let offset = 0;
-  if (buckets[index] != payload.value) {
-    value = buckets[index] || "";
+  if (yLabels[index] != payload.value) {
+    value = yLabels[index] || "";
     offset = height / (buckets.length - 1) / 2;
   } else {
     value = fmt(value);
@@ -504,14 +516,15 @@ const Heatmap = ({
       range={xDomain}
       ticks={isNaN(buckets[0]) ? buckets.map((x, i) => i) : buckets}
       tick={(props) =>
-        ReportXAxisTick(
+        ReportXAxisTick({
           props,
           buckets,
-          chartProps.xFormat,
-          chartProps.translations,
-          chartProps.pointSize,
-          chartProps.orientation
-        )
+          fmt: chartProps.xFormat,
+          translations: chartProps.translations,
+          pointSize: chartProps.pointSize,
+          orientation: chartProps.orientation,
+          labels: chartProps.labels,
+        })
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
       interval={0}
@@ -541,7 +554,8 @@ const Heatmap = ({
           yBuckets,
           chartProps.yFormat,
           chartProps.yTranslations,
-          chartProps.pointSize
+          chartProps.pointSize,
+          chartProps.yLabels
         )
       }
       domain={yDomain}
@@ -804,10 +818,12 @@ const ReportScatter = ({
     const xFormat = (value) => formats(value, valueType, interval);
     const yFormat = (value) => formats(value, yValueType, yInterval);
 
-    const maxYLabel = maxStringLength(heatmaps.yBuckets, yFormat, pointSize);
+    let labels = bounds.labels || heatmaps.buckets;
+    let yLabels = yBounds.labels || heatmaps.yBuckets;
+    const maxYLabel = maxStringLength(yLabels, yFormat, pointSize);
     const marginWidth =
       maxYLabel + pointSize > 40 ? maxYLabel + pointSize - 40 : 0;
-    const maxXLabel = maxStringLength(heatmaps.buckets, xFormat, pointSize);
+    const maxXLabel = maxStringLength(labels, xFormat, pointSize);
     let marginHeight = 2 * pointSize;
     const marginRight = (stringLength(xFormat(endLabel)) * pointSize) / 2;
     let orientation = 0;
@@ -830,6 +846,8 @@ const ReportScatter = ({
         marginRight={marginRight}
         buckets={heatmaps.buckets}
         yBuckets={heatmaps.yBuckets}
+        labels={labels}
+        yLabels={yLabels}
         cats={cats}
         xLabel={xLabel}
         yLabel={yLabel}
@@ -874,6 +892,8 @@ const ReportScatter = ({
           catOffsets,
           buckets: heatmaps.buckets,
           yBuckets: heatmaps.yBuckets,
+          labels,
+          yLabels,
           valueType,
           yValueType,
           stacked,
