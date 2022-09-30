@@ -186,7 +186,7 @@ const validateTerm = (term, types) => {
   }
   if (parts[2] && parts[2].length > 0) {
     parts[2] = parts[2].toLowerCase();
-    if (parts[2].endsWith("_id")) {
+    if (parts[2].endsWith("_id") && (!types || !types(parts[2]))) {
       // TODO: validate IDs
       return { parts, validation: { success: true } };
     }
@@ -308,7 +308,11 @@ export const generateQuery = async ({
           parts[1] = parts[1].replace(/tax_/, "");
           taxTerm = parts;
         }
-      } else if (parts[2] && parts[2].endsWith("_id")) {
+      } else if (
+        parts[2] &&
+        parts[2].endsWith("_id") &&
+        (!lookupTypes[result] || !lookupTypes[result](parts[2]))
+      ) {
         if (!identifierTerms) {
           identifierTerms = {};
         }

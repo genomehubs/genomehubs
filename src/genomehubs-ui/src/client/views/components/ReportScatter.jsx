@@ -68,7 +68,9 @@ const searchByCell = ({
     )
     .replaceAll(/\s+/g, " ")
     .replace(/\s+$/, "");
-  if (valueType == "date") {
+  if (valueType == "coordinate") {
+    query += ` AND sequence_id = ${xRange},${yRange}`;
+  } else if (valueType == "date") {
     query += ` AND ${bounds.field} >= ${
       new Date(xRange[0]).toISOString().split(/t/i)[0]
     } AND ${bounds.field} < ${
@@ -109,7 +111,7 @@ const searchByCell = ({
     } else {
       query += ` AND ${yBounds.field} = ${val}`;
     }
-  } else {
+  } else if (yValueType != "coordinate") {
     query += ` AND ${yBounds.field} >= ${yRange[0]} AND ${yBounds.field} < ${yRange[1]}`;
   }
 
@@ -122,7 +124,9 @@ const searchByCell = ({
     delete options.sortOrder;
   }
   options.offset = 0;
-  fields = fields.join(",");
+  if (fields) {
+    fields = fields.join(",");
+  }
   if (ranks) {
     ranks = ranks.join(",");
   } else {
@@ -142,7 +146,7 @@ const searchByCell = ({
     ...xQuery,
     ...options,
     query,
-    y: yQuery.query,
+    ...(yQuery && { y: yQuery.query }),
     fields,
     report: "scatter",
     ranks,
@@ -256,32 +260,40 @@ const CustomShape = (props, chartProps, handleClick) => {
     yScale(chartProps.yBuckets[yIndex + 1]) -
     yScale(chartProps.yBuckets[yIndex]);
   let heatRect, legendGroup;
-  let xRange, yRange;
+  let xRange, yRange, xSearchRange, ySearchRange;
   if (chartProps.valueType == "coordinate") {
     xRange = chartProps.labels[xIndex];
-  } else if (chartProps.bounds.scale == "ordinal") {
-    try {
-      xRange = `${chartProps.bounds.stats.cats[props.payload.x].key}`;
-    } catch {
-      xRange = "other";
-    }
+    xSearchRange = xRange;
   } else {
-    xRange = `${chartProps.xFormat(props.payload.x)}-${chartProps.xFormat(
-      props.payload.xBound
-    )}`;
+    xSearchRange = [props.payload.x, props.payload.xBound];
+    if (chartProps.bounds.scale == "ordinal") {
+      try {
+        xRange = `${chartProps.bounds.stats.cats[props.payload.x].key}`;
+      } catch {
+        xRange = "other";
+      }
+    } else {
+      xRange = `${chartProps.xFormat(props.payload.x)}-${chartProps.xFormat(
+        props.payload.xBound
+      )}`;
+    }
   }
   if (chartProps.yValueType == "coordinate") {
     yRange = chartProps.yLabels[yIndex];
-  } else if (chartProps.yBounds.scale == "ordinal") {
-    try {
-      yRange = `${chartProps.yBounds.stats.cats[props.payload.y].key}`;
-    } catch {
-      yRange = "other";
-    }
+    ySearchRange = yRange;
   } else {
-    yRange = `${chartProps.yFormat(props.payload.y)}-${chartProps.yFormat(
-      props.payload.yBound
-    )}`;
+    ySearchRange = [props.payload.y, props.payload.yBound];
+    if (chartProps.yBounds.scale == "ordinal") {
+      try {
+        yRange = `${chartProps.yBounds.stats.cats[props.payload.y].key}`;
+      } catch {
+        yRange = "other";
+      }
+    } else {
+      yRange = `${chartProps.yFormat(props.payload.y)}-${chartProps.yFormat(
+        props.payload.yBound
+      )}`;
+    }
   }
   let bgRect = (
     <>
@@ -303,8 +315,8 @@ const CustomShape = (props, chartProps, handleClick) => {
               : () =>
                   searchByCell({
                     ...chartProps,
-                    xRange: [props.payload.x, props.payload.xBound],
-                    yRange: [props.payload.y, props.payload.yBound],
+                    xRange: xSearchRange,
+                    yRange: ySearchRange,
                   })
           }
         />
