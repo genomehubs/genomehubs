@@ -8,13 +8,13 @@ import { attrTypes } from "../functions/attrTypes";
 import { checkResponse } from "../functions/checkResponse";
 import { client } from "../functions/connection";
 import { combineQueries } from "../functions/combineQueries";
-import { feature } from "../reports/feature";
 import { formatJson } from "../functions/formatJson";
 import { getResultCount } from "../functions/getResultCount";
 import { histogram } from "../reports/histogram";
 import { indexName } from "../functions/indexName";
 import { logError } from "../functions/logger";
 import { map } from "../reports/map";
+import { oxford } from "../reports/oxford";
 import qs from "qs";
 import { queryParams } from "../reports/queryParams";
 import { setRanks } from "../functions/setRanks";
@@ -33,7 +33,7 @@ const plurals = (singular) => {
   return ranks[singular.toLowerCase()] || singular;
 };
 
-export const getFeature = async ({
+export const getOxford = async ({
   x,
   y,
   cat,
@@ -43,9 +43,9 @@ export const getFeature = async ({
   req,
   ...apiParams
 }) => {
-  // Return feature results
+  // Return oxford plot results
   let status;
-  let res = await feature({
+  let res = await oxford({
     x,
     y,
     cat,
@@ -69,7 +69,7 @@ export const getFeature = async ({
   let yLabel = res.yLabel;
   let caption;
   if (report) {
-    caption = `Feature report of ${x}${report.y ? ` against ${y}` : ""}`;
+    caption = `Oxford plot of ${x}${report.y ? ` against ${y}` : ""}`;
     if (cat) {
       caption += ` by ${cat.replace(/=.+$/, "")}`;
     }
@@ -77,7 +77,7 @@ export const getFeature = async ({
   return {
     status,
     report: {
-      feature: report,
+      oxford: report,
       xQuery,
       // yQuery,
       xLabel,
@@ -987,8 +987,8 @@ export const getReport = async (req, res) => {
         reportFunc = arcPerRank;
         break;
       }
-      case "feature": {
-        reportFunc = getFeature;
+      case "oxford": {
+        reportFunc = getOxford;
         break;
       }
       case "histogram": {

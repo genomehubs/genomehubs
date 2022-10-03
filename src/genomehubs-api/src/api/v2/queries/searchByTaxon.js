@@ -198,10 +198,13 @@ export const searchByTaxon = async ({
     query = { function_score };
   }
 
-  // TODO: run collate query here with aggregations
-  // test if any query can be run here
   if (collateTerm) {
-    let collateFilter = await collateAttributes({ query, collateTerm, index });
+    let collateFilter = await collateAttributes({
+      query,
+      collateTerm,
+      lookupTypes,
+      index,
+    });
     query.bool.filter = query.bool.filter.concat(collateFilter);
   }
 

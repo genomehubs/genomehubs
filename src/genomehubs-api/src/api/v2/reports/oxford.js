@@ -20,11 +20,35 @@ const valueTypes = {
   keyword: "keyword",
 };
 
+const parseAssemblies = (query) => {
+  let parts = query.split(/\sAND\s/i);
+  for (let part of parts) {
+    let [key, value] = part.split(/\s*=\s*/);
+    if (key != "assembly_id") {
+      continue;
+    }
+    return value.split(",");
+  }
+};
+
+const parseCollate = (query) => {
+  let parts = query.split(/\sAND\s/i);
+  for (let part of parts) {
+    let [key, value] = part.split(/\s*[\(\)]\s*/);
+    if (key != "collate") {
+      continue;
+    }
+    let [attrA, attrB] = value.split(",");
+    return attrB;
+  }
+};
+
 const getSequenceLengths = async ({ assemblies, xQuery, taxonomy, req }) => {
   let seqQuery = {
     ...xQuery,
     query: `assembly_id=${assemblies.join(",")} AND feature_type=topLevel`,
     fields: ["sequence_id", "length"],
+    exclusions: {},
   };
   let countRes = await getResultCount(seqQuery);
   if (!countRes.status.success) {
@@ -55,7 +79,7 @@ const getSequenceLengths = async ({ assemblies, xQuery, taxonomy, req }) => {
   return lengths;
 };
 
-const getFeatures = async ({
+const getOxford = async ({
   params,
   x,
   field,
@@ -166,7 +190,7 @@ const getFeatures = async ({
       }
     }
     if (!cat) {
-      cat = "all taxa";
+      cat = "all features";
     }
     byAssembly[assembly_id][sequence_id].push({
       group,
@@ -188,28 +212,6 @@ const getFeatures = async ({
         feature_id,
       });
     }
-
-    // if (!rawData[cat]) {
-    //   rawData[cat] = [];
-    // }
-    // if (!result.result.fields[field]) {
-    //   continue;
-    // }
-    // let coords = result.result.fields[field].value;
-    // let aggregation_source = result.result.fields[field].aggregation_source;
-    // rawData[cat].push({
-    //   ...(result.result.scientific_name && {
-    //     scientific_name: result.result.scientific_name,
-    //   }),
-    //   ...(result.result.taxon_id && { taxonId: result.result.taxon_id }),
-    //   ...(result.result.assembly_id && {
-    //     assemblyId: result.result.assembly_id,
-    //   }),
-    //   ...(result.result.sample_id && { sampleId: result.result.sample_id }),
-    //   coords,
-    //   aggregation_source,
-    //   cat,
-    // });
   }
   let seqLengths = await getSequenceLengths({
     assemblies: Object.keys(byAssembly),
@@ -302,18 +304,25 @@ const getFeatures = async ({
   let i = 0;
   allValues = [];
   allYValues = [];
-  byCat = bounds.cats
-    .map((cat) => cat.key)
-    .reduce((a, b) => ({ ...a, [b]: buckets[asms[0]].map(() => 0) }), {});
-  yValuesByCat = bounds.cats
-    .map((cat) => cat.key)
-    .reduce(
-      (a, b) => ({
-        ...a,
-        [b]: buckets[asms[0]].map(() => buckets[asms[1]].map(() => 0)),
-      }),
-      {}
+  if (bounds.cats) {
+    byCat = bounds.cats
+      .map((cat) => cat.key)
+      .reduce((a, b) => ({ ...a, [b]: buckets[asms[0]].map(() => 0) }), {});
+    yValuesByCat = bounds.cats
+      .map((cat) => cat.key)
+      .reduce(
+        (a, b) => ({
+          ...a,
+          [b]: buckets[asms[0]].map(() => buckets[asms[1]].map(() => 0)),
+        }),
+        {}
+      );
+  } else {
+    byCat["all features"] = buckets[asms[0]].map(() => 0);
+    yValuesByCat["all features"] = buckets[asms[0]].map(() =>
+      buckets[asms[1]].map(() => 0)
     );
+  }
   for (let [sequence_id, len] of sortedSeqs[asms[0]]) {
     allValues[i] = byAssembly[asms[0]][sequence_id].flat().length;
     allYValues[i] = buckets[asms[1]].map(() => 0);
@@ -380,8 +389,8 @@ const getFeatures = async ({
     domain: domains[asms[0]],
     tickCount: buckets[asms[0]].length,
     by: bounds.by,
-    cat: bounds.cat,
-    cats: bounds.cats,
+    cat: bounds.cat || "none",
+    cats: bounds.cats || [{ key: "all features", label: "all features" }],
   };
   yBounds = {
     field: asms[1],
@@ -404,6 +413,7 @@ const getFeatures = async ({
     allValues,
     byCat,
     rawData,
+    fields,
     cat: bounds.cat,
     cats: bounds.cats,
     valueType: "coordinate",
@@ -417,12 +427,10 @@ const getFeatures = async ({
   };
 };
 
-export const feature = async ({
+export const oxford = async ({
   x,
   // y,
   cat,
-  groupBy = "busco_gene",
-  asms = ["GCA_013425905.1", "GCA_905319855.2"],
   result,
   taxonomy,
   apiParams,
@@ -444,6 +452,9 @@ export const feature = async ({
     result,
     taxonomy,
   });
+
+  let asms = parseAssemblies(params.query);
+  let groupBy = parseCollate(params.query);
   // TODO: Get list of assemblies
   //       Choose primary assembly as one with most hits/best contiguity
   //       Use xOpts/yOpts to fix assembly ordering?
@@ -486,6 +497,15 @@ export const feature = async ({
       success: false,
       error: `unknown field in 'x = ${x}'`,
     };
+    return { status };
+  }
+
+  if (!groupBy || !lookupTypes(groupBy)) {
+    status = {
+      success: false,
+      error: `collate field not recognised.\nTry 'collate(assembly_id,busco_gene)'`,
+    };
+    return { status };
   }
   // let yTerm = combineQueries(x, y);
   // let {
@@ -569,9 +589,9 @@ export const feature = async ({
   //     opts: yOpts,
   //   });
   // }
-  let feature = status
+  let oxford = status
     ? {}
-    : await getFeatures({
+    : await getOxford({
         params,
         fields,
         catRank,
@@ -592,18 +612,18 @@ export const feature = async ({
         req,
         taxonomy,
       });
-  if (feature && feature.status && feature.status.success == false) {
-    status = { ...feature.status };
-    feature = {};
+  if (oxford && oxford.status && oxford.status.success == false) {
+    status = { ...oxford.status };
+    oxford = {};
   }
   let yBounds;
-  ({ bounds, yBounds } = feature);
+  ({ bounds, yBounds } = oxford);
 
   return {
     status: status || { success: true },
     report: {
       status,
-      histograms: feature,
+      histograms: oxford,
       bounds,
       cat: bounds.cat,
       cats: bounds.cats,

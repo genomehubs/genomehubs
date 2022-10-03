@@ -28,6 +28,7 @@ import withSiteName from "../hocs/withSiteName";
 const headings = {
   tree: "Tap tree nodes to browse taxa or long-press to search",
   histogram: "Tap bins to search",
+  oxford: "Tap bins to search",
   scatter: "Tap bins to search",
 };
 
@@ -243,7 +244,7 @@ const ReportItem = ({
           />
         );
         break;
-      case "feature":
+      case "oxford":
         component = (
           <ReportScatter
             scatter={reportById}

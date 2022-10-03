@@ -41,6 +41,7 @@ import { zLegend } from "./zLegend";
 const searchByCell = ({
   xQuery,
   yQuery,
+  report,
   xLabel,
   yLabel,
   xRange,
@@ -70,6 +71,7 @@ const searchByCell = ({
     .replace(/\s+$/, "");
   if (valueType == "coordinate") {
     query += ` AND sequence_id = ${xRange},${yRange}`;
+    query = query.replace("collate(assembly_id,", "collate(sequence_id,");
   } else if (valueType == "date") {
     query += ` AND ${bounds.field} >= ${
       new Date(xRange[0]).toISOString().split(/t/i)[0]
@@ -148,7 +150,7 @@ const searchByCell = ({
     query,
     ...(yQuery && { y: yQuery.query }),
     fields,
-    report: "scatter",
+    report,
     ranks,
   });
 
@@ -661,24 +663,7 @@ const Heatmap = ({
         bottom: width > 300 ? marginHeight : 5,
       }}
     >
-      {/* {patterns} */}
       {axes}
-      {cats.map((cat, i) => (
-        <Scatter
-          name={cat}
-          key={cat}
-          data={data[i]}
-          fill={fillColors[i] || "rgb(102, 102, 102)"}
-          shape={(props) =>
-            CustomShape(props, { ...chartProps, i }, (i) => {
-              currentSeries !== false && currentSeries == i
-                ? setCurrentSeries(false)
-                : setCurrentSeries(i);
-            })
-          }
-          isAnimationActive={false}
-        />
-      ))}
       {pointData &&
         orderedCats.map((cat, j) => {
           let i = catOrder[cat];
@@ -710,6 +695,22 @@ const Heatmap = ({
           style={{ pointerEvents: "none" }}
         />
       )}
+      {cats.map((cat, i) => (
+        <Scatter
+          name={cat}
+          key={cat}
+          data={data[i]}
+          fill={fillColors[i] || "rgb(102, 102, 102)"}
+          shape={(props) =>
+            CustomShape(props, { ...chartProps, i }, (i) => {
+              currentSeries !== false && currentSeries == i
+                ? setCurrentSeries(false)
+                : setCurrentSeries(i);
+            })
+          }
+          isAnimationActive={false}
+        />
+      ))}
       {highlightRect}
     </ScatterChart>
   );
@@ -718,6 +719,7 @@ const Heatmap = ({
 const ReportScatter = ({
   scatter,
   chartRef,
+  report,
   containerRef,
   embedded,
   ratio,
@@ -751,7 +753,7 @@ const ReportScatter = ({
 
   let locations = {};
   if (scatter && scatter.status) {
-    let scatterReport = scatter.report.scatter || scatter.report.feature;
+    let scatterReport = scatter.report.scatter || scatter.report.oxford;
     let chart;
     let {
       bounds,
@@ -875,6 +877,7 @@ const ReportScatter = ({
           xLength: heatmaps.buckets.length - 1,
           n: cats.length,
           zScale: zScale,
+          report,
           catSums,
           pointSize,
           xQuery: scatter.report.xQuery,

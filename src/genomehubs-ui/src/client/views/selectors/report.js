@@ -40,11 +40,13 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     y: { in: new Set(["scatter", "table", "tree", "arc"]) },
     z: { in: new Set(["scatter"]) },
     cat: { not: new Set(["sources", "arc"]) },
-    rank: { not: new Set(["sources", "tree"]) },
+    rank: { not: new Set(["oxford", "sources", "tree"]) },
     ranks: { in: new Set(["tree"]) },
     levels: { in: new Set(["tree"]), ui: true },
     names: { in: new Set(["tree"]) },
-    fields: { in: new Set(["histogram", "map", "scatter", "table", "tree"]) },
+    fields: {
+      in: new Set(["histogram", "map", "oxford", "scatter", "table", "tree"]),
+    },
     collapseMonotypic: { in: new Set(["tree"]) },
     includeEstimates: true,
     excludeAncestral: true,
@@ -72,7 +74,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     zScale: { in: new Set(["scatter"]), ui: true },
     stacked: { in: new Set(["histogram", "scatter"]), ui: true },
     pointSize: {
-      in: new Set(["histogram", "scatter", "tree", "arc"]),
+      in: new Set(["histogram", "oxford", "scatter", "tree", "arc"]),
       ui: true,
     },
     cumulative: { in: new Set(["histogram", "table"]), ui: true },
@@ -80,7 +82,15 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     mapThreshold: { in: new Set(["map"]) },
     treeThreshold: { in: new Set(["tree"]) },
     queryId: {
-      in: new Set(["histogram", "map", "scatter", "table", "tree", "arc"]),
+      in: new Set([
+        "histogram",
+        "map",
+        "oxford",
+        "scatter",
+        "table",
+        "tree",
+        "arc",
+      ]),
     },
     release: true,
     indent: false,
@@ -662,14 +672,14 @@ const processReport = (report, { searchTerm = {} }) => {
         },
       },
     };
-  } else if (report.name == "feature") {
+  } else if (report.name == "oxford") {
     return {
       ...report,
       report: {
         ...report.report,
         scatter: {
-          ...report.report.feature,
-          ...processScatter(report.report.feature),
+          ...report.report.oxford,
+          ...processScatter(report.report.oxford),
         },
       },
     };
@@ -762,6 +772,12 @@ const reportOptions = {
     },
     rank: {
       default: "query:tax_rank",
+    },
+  },
+  oxford: {
+    x: {
+      default: "query",
+      fieldType: "value",
     },
   },
   scatter: {

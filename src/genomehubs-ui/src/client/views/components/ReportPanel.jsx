@@ -18,6 +18,7 @@ const reportTypes = {
   arc: { name: "Arc" },
   histogram: { name: "Histogram" },
   map: { name: "Map" },
+  oxford: { name: "Oxford" },
   scatter: { name: "Scatter" },
   table: { name: "Table" },
   tree: { name: "Tree" },
