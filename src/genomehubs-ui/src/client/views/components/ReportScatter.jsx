@@ -164,12 +164,16 @@ const searchByCell = ({
 };
 
 const searchByPoint = ({ props, chartProps }) => {
-  let { xQuery, fields, ranks, groupBy, navigate, basename } = chartProps;
-  let { group, featureId, yFeatureId, x, y, cat } = props;
+  let { xQuery, fields, ranks, groupBy, navigate, basename, bounds, yBounds } =
+    chartProps;
+  let { group, featureId, yFeatureId, payload, cat } = props;
+  let { x, y } = payload;
   let { result, taxonomy } = xQuery;
   let pointQuery;
   if (featureId) {
     pointQuery = `feature_id=${featureId},${yFeatureId} AND ${groupBy}=${group}`;
+  } else {
+    pointQuery = `${bounds.field}=${x} AND ${yBounds.field}=${y}`;
   }
   let queryString = qs.stringify({
     query: pointQuery,
@@ -294,14 +298,16 @@ const CustomShape = (props, chartProps, handleClick) => {
       props.xAxis.scale(props.payload.xBound) -
       props.xAxis.scale(props.payload.x);
   }
-  w =
-    xScale(chartProps.buckets[xIndex + 1]) - xScale(chartProps.buckets[xIndex]);
-  h =
-    yScale(chartProps.yBuckets[yIndex + 1]) -
-    yScale(chartProps.yBuckets[yIndex]);
   let heatRect, legendGroup;
   let xRange, yRange, xSearchRange, ySearchRange;
   if (chartProps.valueType == "coordinate") {
+    w =
+      xScale(chartProps.buckets[xIndex + 1]) -
+      xScale(chartProps.buckets[xIndex]);
+    h =
+      yScale(chartProps.yBuckets[yIndex + 1]) -
+      yScale(chartProps.yBuckets[yIndex]);
+
     xRange = chartProps.labels[xIndex];
     xSearchRange = xRange;
   } else {
