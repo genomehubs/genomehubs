@@ -99,7 +99,7 @@ export const formats = (value, valueType, interval) => {
     return sciInt(value);
   } else if (valueType == "date") {
     return multiFormat(value, interval);
-  } else if (valueType == "keyword") {
+  } else if (valueType == "keyword" || valueType == "coordinate") {
     return value;
   }
   return sci(value);

@@ -281,13 +281,16 @@ def convert_lat_lon(location):
     return ""
 
 
-def convert_to_type(key, raw_value, to_type):
+def convert_to_type(key, raw_value, to_type, *, translate=None):
     """Convert values to type."""
     if to_type in {"byte", "integer", "long", "short"}:
         try:
             value = int(raw_value)
         except ValueError:
-            value = None
+            if translate and raw_value in translate:
+                value = convert_to_type(key, translate[raw_value], to_type)
+            else:
+                value = None
     elif to_type in {
         "double",
         "float",
@@ -300,7 +303,10 @@ def convert_to_type(key, raw_value, to_type):
         try:
             value = float(raw_value)
         except ValueError:
-            value = None
+            if translate and raw_value in translate:
+                value = convert_to_type(key, translate[raw_value], to_type)
+            else:
+                value = None
     elif to_type == "geo_point":
         value = convert_lat_lon(raw_value)
     else:
@@ -458,7 +464,7 @@ def validate_values(values, key, types, row_values, shared_values, blanks):
                 )
             except ValueError:
                 continue
-        value = convert_to_type(key, value, key_type)
+        value = convert_to_type(key, value, key_type, translate=types[key].get("translate", None))
         if isinstance(types[key], str):
             validated.append(value)
             continue

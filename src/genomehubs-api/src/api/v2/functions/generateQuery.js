@@ -29,6 +29,9 @@ const validateValue = (term, value, meta, types) => {
       type = "keyword";
     }
   }
+  if (meta.attribute == "collate") {
+    type = "keyword";
+  }
   if (type == "keyword") {
     if (types && types(meta.attribute)) {
       let summary = types(meta.attribute).summary;
@@ -180,13 +183,22 @@ const validateTerm = (term, types) => {
         }),
       };
     }
+    if (parts[1] == "collate") {
+      return {
+        parts,
+        validation: validateValue(term, parts[2], {
+          attribute: "collate",
+          type: parts[0],
+        }),
+      };
+    }
     if (!summaries.includes(parts[1])) {
       return { validation: fail(`invalid summary in ${term}`) };
     }
   }
   if (parts[2] && parts[2].length > 0) {
     parts[2] = parts[2].toLowerCase();
-    if (parts[2].endsWith("_id")) {
+    if (parts[2].endsWith("_id") && (!types || !types(parts[2]))) {
       // TODO: validate IDs
       return { parts, validation: { success: true } };
     }
@@ -266,7 +278,7 @@ export const generateQuery = async ({
       names[nameClass] = true;
     });
   }
-  let taxTerm, identifierTerms, rank, depth, multiTerm, idTerm;
+  let taxTerm, collateTerm, identifierTerms, rank, depth, multiTerm, idTerm;
   let filters = {};
   let properties = {};
   let status;
@@ -308,7 +320,13 @@ export const generateQuery = async ({
           parts[1] = parts[1].replace(/tax_/, "");
           taxTerm = parts;
         }
-      } else if (parts[2] && parts[2].endsWith("_id")) {
+      } else if (parts[1] && parts[1].startsWith("collate")) {
+        collateTerm = parts[2];
+      } else if (
+        parts[2] &&
+        parts[2].endsWith("_id") &&
+        (!lookupTypes[result] || !lookupTypes[result](parts[2]))
+      ) {
         if (!identifierTerms) {
           identifierTerms = {};
         }
@@ -403,6 +421,7 @@ export const generateQuery = async ({
   }
 
   let params = {
+    collateTerm,
     idTerm,
     identifierTerms,
     result,

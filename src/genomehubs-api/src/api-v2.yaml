@@ -541,9 +541,9 @@ components:
       required: true
       schema:
         enum:
-          - feature
           - histogram
           - map
+          - oxford
           - scatter
           - sources
           - table
@@ -1288,9 +1288,9 @@ paths:
 
         | Report        | Required          | Optional       |
         | ------------- | ----------------- | -------------- |
-        | **Feature**   | `x`               | `cat`, `xOpts`, `yOpts` |
         | **Histogram** | `x`               | `cat`, `rank`, `xOpts` |
         | **Map**       | `x`               | `cat`, `rank`          |
+        | **Oxford**    | `x`               | `cat`, `xOpts`, `yOpts` |
         | **Scatter**   | `x`, `y`, `rank`  | `cat`, `xOpts`, `yOpts`, `scatterThreshold` |
         | **Table**     | `x`, `y`          | `cat`, `rank`, `xOpts`, `yOpts`, `scatterThreshold` |
         | **Sources**   | -                 | -              |

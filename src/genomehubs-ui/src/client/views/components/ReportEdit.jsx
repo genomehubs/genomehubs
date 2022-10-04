@@ -69,6 +69,7 @@ export const queryPropList = {
     "includeEstimates",
     "mapThreshold",
   ],
+  oxford: ["report", xSettings, catSettings, "xOpts", pointSizeSettings],
   scatter: [
     "report",
     xSettings,
@@ -130,6 +131,7 @@ const autoCompleteTypes = {
 const reportTypes = [
   "histogram",
   "map",
+  "oxford",
   "scatter",
   "table",
   "tree",

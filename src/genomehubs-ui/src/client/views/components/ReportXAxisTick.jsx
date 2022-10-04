@@ -1,6 +1,6 @@
 import React from "react";
 
-export const ReportXAxisTick = (
+export const ReportXAxisTick = ({
   props,
   buckets,
   fmt,
@@ -8,8 +8,9 @@ export const ReportXAxisTick = (
   pointSize,
   orientation,
   lastPos,
-  report
-) => {
+  report,
+  labels,
+}) => {
   let { x, y, fill, index, width, payload } = props;
   let value = payload.value;
   let yPos = y;
@@ -40,7 +41,10 @@ export const ReportXAxisTick = (
       />
     );
   }
-  if (buckets[index] != payload.value) {
+  if (labels && labels[index] != payload.value) {
+    value = labels[index] || "";
+    offset += bucketWidth / 2;
+  } else if (buckets[index] != payload.value) {
     value = buckets[index] || "";
     offset += bucketWidth / 2;
   } else {

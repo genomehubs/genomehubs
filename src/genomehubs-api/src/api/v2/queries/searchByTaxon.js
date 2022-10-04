@@ -1,4 +1,5 @@
 import { attrTypes } from "../functions/attrTypes";
+import { collateAttributes } from "./queryFragments/collateAttributes";
 import { excludeSources } from "./queryFragments/excludeSources";
 import { filterAssemblies } from "./queryFragments/filterAssemblies";
 import { filterAttributes } from "./queryFragments/filterAttributes";
@@ -17,6 +18,7 @@ import { setSortOrder } from "./queryFragments/setSortOrder";
 
 export const searchByTaxon = async ({
   searchTerm,
+  collateTerm,
   idTerm,
   identifierTerms,
   multiTerm,
@@ -41,6 +43,7 @@ export const searchByTaxon = async ({
   sortBy,
   function_score,
   taxonomy,
+  index,
   aggs = {},
 }) => {
   let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
@@ -79,7 +82,7 @@ export const searchByTaxon = async ({
       "optionalAttributes"
     );
   }
-  let identifiers;
+  let identifiers = [];
   if (identifierTerms) {
     identifiers = filterIdentifiers(identifierTerms);
   }
@@ -193,6 +196,16 @@ export const searchByTaxon = async ({
   if (function_score) {
     function_score.query = query;
     query = { function_score };
+  }
+
+  if (collateTerm) {
+    let collateFilter = await collateAttributes({
+      query,
+      collateTerm,
+      lookupTypes,
+      index,
+    });
+    query.bool.filter = query.bool.filter.concat(collateFilter);
   }
 
   return {

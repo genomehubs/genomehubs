@@ -28,6 +28,7 @@ import withSiteName from "../hocs/withSiteName";
 const headings = {
   tree: "Tap tree nodes to browse taxa or long-press to search",
   histogram: "Tap bins to search",
+  oxford: "Tap bins to search",
   scatter: "Tap bins to search",
 };
 
@@ -77,6 +78,7 @@ const ReportItem = ({
   setMessage,
   saveReport,
   setReportEdit,
+  setReportSelect,
   setReportTerm,
   siteName,
   basename,
@@ -240,6 +242,28 @@ const ReportItem = ({
             minDim={minDim}
             setMinDim={setMinDim}
             mapThreshold={mapThreshold}
+          />
+        );
+        break;
+      case "oxford":
+        component = (
+          <ReportScatter
+            scatter={reportById}
+            chartRef={chartRef}
+            containerRef={containerRef}
+            embedded={embedded}
+            ratio={ratio}
+            xOpts={xOpts}
+            yOpts={yOpts}
+            highlightArea={highlightArea}
+            stacked={stacked}
+            pointSize={pointSize}
+            zScale={zScale}
+            scatterThreshold={scatterThreshold}
+            includeEstimates={includeEstimates}
+            {...qs.parse(queryString)}
+            minDim={minDim}
+            setMinDim={setMinDim}
           />
         );
         break;

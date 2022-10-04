@@ -19,6 +19,7 @@ import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
 import Grid from "@material-ui/core/Grid";
+import PointInfo from "./PointInfo";
 import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "@material-ui/core/Tooltip";
 import axisScales from "../functions/axisScales";
@@ -26,6 +27,7 @@ import { compose } from "recompose";
 import { line as d3Line } from "d3-shape";
 import dispatchMessage from "../hocs/dispatchMessage";
 import { format } from "d3-format";
+import hexToHSL from "hex-to-hsl";
 import { processLegendData } from "./MultiCatLegend";
 // import { point } from "leaflet";
 import qs from "../functions/qs";
@@ -40,6 +42,7 @@ import { zLegend } from "./zLegend";
 const searchByCell = ({
   xQuery,
   yQuery,
+  report,
   xLabel,
   yLabel,
   xRange,
@@ -67,7 +70,10 @@ const searchByCell = ({
     )
     .replaceAll(/\s+/g, " ")
     .replace(/\s+$/, "");
-  if (valueType == "date") {
+  if (valueType == "coordinate") {
+    query += ` AND sequence_id = ${xRange},${yRange}`;
+    query = query.replace("collate(assembly_id,", "collate(sequence_id,");
+  } else if (valueType == "date") {
     query += ` AND ${bounds.field} >= ${
       new Date(xRange[0]).toISOString().split(/t/i)[0]
     } AND ${bounds.field} < ${
@@ -108,7 +114,7 @@ const searchByCell = ({
     } else {
       query += ` AND ${yBounds.field} = ${val}`;
     }
-  } else {
+  } else if (yValueType != "coordinate") {
     query += ` AND ${yBounds.field} >= ${yRange[0]} AND ${yBounds.field} < ${yRange[1]}`;
   }
 
@@ -121,7 +127,9 @@ const searchByCell = ({
     delete options.sortOrder;
   }
   options.offset = 0;
-  fields = fields.join(",");
+  if (fields) {
+    fields = fields.join(",");
+  }
   if (ranks) {
     ranks = ranks.join(",");
   } else {
@@ -141,9 +149,9 @@ const searchByCell = ({
     ...xQuery,
     ...options,
     query,
-    y: yQuery.query,
+    ...(yQuery && { y: yQuery.query }),
     fields,
-    report: "scatter",
+    report,
     ranks,
   });
 
@@ -151,6 +159,34 @@ const searchByCell = ({
   navigate(
     `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
       query
+    )}`
+  );
+};
+
+const searchByPoint = ({ props, chartProps }) => {
+  let { xQuery, fields, ranks, groupBy, navigate, basename, bounds, yBounds } =
+    chartProps;
+  let { group, featureId, yFeatureId, payload, cat } = props;
+  let { x, y } = payload;
+  let { result, taxonomy } = xQuery;
+  let pointQuery;
+  if (featureId) {
+    pointQuery = `feature_id=${featureId},${yFeatureId} AND ${groupBy}=${group}`;
+  } else {
+    pointQuery = `${bounds.field}=${x} AND ${yBounds.field}=${y}`;
+  }
+  let queryString = qs.stringify({
+    query: pointQuery,
+    fields: fields.join(","),
+    ranks: ranks || "",
+    taxonomy,
+    result,
+  });
+
+  // let hash = encodeURIComponent(query);
+  navigate(
+    `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
+      pointQuery
     )}`
   );
 };
@@ -171,17 +207,30 @@ const CustomDot = (props, chartProps) => {
 
 const CustomCircle = (props, chartProps) => {
   let { cx, cy, height: r, fill } = props;
-  let { pointSize } = chartProps;
-  return (
+  let { pointSize, selectMode, active } = chartProps;
+  let dot = (
     <Dot
       cx={cx}
       cy={cy}
       r={pointSize / 2}
       stroke={"none"}
       fill={fill}
+      style={{
+        cursor: active && selectMode == "point" ? "pointer" : "default",
+      }}
       // strokeWidth={r / 2}
     />
   );
+  if (active && selectMode == "point") {
+    dot = (
+      <>
+        <Tooltip title={<PointInfo {...{ ...props, chartProps }} />} arrow>
+          <g onClick={() => searchByPoint({ props, chartProps })}>{dot}</g>
+        </Tooltip>
+      </>
+    );
+  }
+  return dot;
 };
 
 const drawHeatRect = ({ props, chartProps, h, w }) => {
@@ -228,8 +277,16 @@ const drawHeatRect = ({ props, chartProps, h, w }) => {
   );
 };
 
-const CustomShape = (props, chartProps) => {
+const CustomShape = (props, chartProps, handleClick) => {
   let h = props.yAxis.height / chartProps.yLength;
+  let xScale = scaleLinear()
+    .domain(chartProps.bounds.domain)
+    .range([0, props.xAxis.width]);
+  let xIndex = chartProps.buckets.indexOf(props.payload.x);
+  let yScale = scaleLinear()
+    .domain(chartProps.yBounds.domain)
+    .range([0, props.yAxis.height]);
+  let yIndex = chartProps.yBuckets.indexOf(props.payload.y);
   if (chartProps.yValueType == "date") {
     h =
       props.yAxis.scale(props.payload.y) -
@@ -242,61 +299,89 @@ const CustomShape = (props, chartProps) => {
       props.xAxis.scale(props.payload.x);
   }
   let heatRect, legendGroup;
-  let xRange, yRange;
-  if (chartProps.bounds.scale == "ordinal") {
-    try {
-      xRange = `${chartProps.bounds.stats.cats[props.payload.x].key}`;
-    } catch {
-      xRange = "other";
-    }
+  let xRange, yRange, xSearchRange, ySearchRange;
+  if (chartProps.valueType == "coordinate") {
+    w =
+      xScale(chartProps.buckets[xIndex + 1]) -
+      xScale(chartProps.buckets[xIndex]);
+    h =
+      yScale(chartProps.yBuckets[yIndex + 1]) -
+      yScale(chartProps.yBuckets[yIndex]);
+
+    xRange = chartProps.labels[xIndex];
+    xSearchRange = xRange;
   } else {
-    xRange = `${chartProps.xFormat(props.payload.x)}-${chartProps.xFormat(
-      props.payload.xBound
-    )}`;
-  }
-  if (chartProps.yBounds.scale == "ordinal") {
-    try {
-      yRange = `${chartProps.yBounds.stats.cats[props.payload.y].key}`;
-    } catch {
-      yRange = "other";
+    xSearchRange = [props.payload.x, props.payload.xBound];
+    if (chartProps.bounds.scale == "ordinal") {
+      try {
+        xRange = `${chartProps.bounds.stats.cats[props.payload.x].key}`;
+      } catch {
+        xRange = "other";
+      }
+    } else {
+      xRange = `${chartProps.xFormat(props.payload.x)}-${chartProps.xFormat(
+        props.payload.xBound
+      )}`;
     }
-  } else {
-    yRange = `${chartProps.yFormat(props.payload.y)}-${chartProps.yFormat(
-      props.payload.yBound
-    )}`;
   }
-  let bgRect = (
-    <>
-      <Tooltip
-        title={<CellInfo x={xRange} y={yRange} count={props.payload.count} />}
-        arrow
-      >
-        <Rectangle
-          height={h}
-          width={w}
-          x={props.cx}
-          y={props.cy - h}
-          style={chartProps.embedded ? {} : { cursor: "pointer" }}
-          fill={"rgba(255,255,255,0)"}
-          onClick={
-            chartProps.embedded
-              ? () => {}
-              : () =>
-                  searchByCell({
-                    ...chartProps,
-                    xRange: [props.payload.x, props.payload.xBound],
-                    yRange: [props.payload.y, props.payload.yBound],
-                  })
-          }
-        />
-      </Tooltip>
-    </>
-  );
+  if (chartProps.yValueType == "coordinate") {
+    yRange = chartProps.yLabels[yIndex];
+    ySearchRange = yRange;
+  } else {
+    ySearchRange = [props.payload.y, props.payload.yBound];
+    if (chartProps.yBounds.scale == "ordinal") {
+      try {
+        yRange = `${chartProps.yBounds.stats.cats[props.payload.y].key}`;
+      } catch {
+        yRange = "other";
+      }
+    } else {
+      yRange = `${chartProps.yFormat(props.payload.y)}-${chartProps.yFormat(
+        props.payload.yBound
+      )}`;
+    }
+  }
+  let bgRect;
+
   if (!chartProps.hasRawData) {
     heatRect = drawHeatRect({ props, chartProps, h, w });
   }
+  if ((heatRect || chartProps.selectMode == "bin") && chartProps.active) {
+    bgRect = (
+      <>
+        <Tooltip
+          title={<CellInfo x={xRange} y={yRange} count={props.payload.count} />}
+          arrow
+        >
+          <Rectangle
+            className={styles.active}
+            height={h}
+            width={w}
+            x={props.cx}
+            y={props.cy - h}
+            style={chartProps.embedded ? {} : { cursor: "pointer" }}
+            fill={`rgba(125,125,125,0)`}
+            onClick={
+              chartProps.embedded || !chartProps.active
+                ? () => {}
+                : () =>
+                    searchByCell({
+                      ...chartProps,
+                      xRange: xSearchRange,
+                      yRange: ySearchRange,
+                    })
+            }
+          />
+        </Tooltip>
+      </>
+    );
+  }
   if (props.key == "symbol-0") {
-    legendGroup = zLegend({ props, chartProps });
+    legendGroup = zLegend({
+      props,
+      chartProps,
+      handleClick,
+    });
   }
 
   return (
@@ -392,12 +477,19 @@ const HighlightShape = (props, chartProps) => {
   );
 };
 
-const CustomizedYAxisTick = (props, buckets, fmt, translations, pointSize) => {
+const CustomizedYAxisTick = (
+  props,
+  buckets,
+  fmt,
+  translations,
+  pointSize,
+  yLabels
+) => {
   const { x, y, fill, index, height, payload } = props;
   let value = payload.value;
   let offset = 0;
-  if (buckets[index] != payload.value) {
-    value = buckets[index] || "";
+  if (yLabels[index] != payload.value) {
+    value = yLabels[index] || "";
     offset = height / (buckets.length - 1) / 2;
   } else {
     value = fmt(value);
@@ -409,6 +501,7 @@ const CustomizedYAxisTick = (props, buckets, fmt, translations, pointSize) => {
         y={0}
         dy={5}
         textAnchor="end"
+        alignmentBaseline={"middle"}
         dominantBaseline={"middle"}
         fill={fill}
         fontSize={pointSize}
@@ -442,6 +535,27 @@ const Heatmap = ({
   colors,
   legendRows,
 }) => {
+  const fadeColor = ({ hex, i, active }) => {
+    let [h, s, l] = hexToHSL(hex);
+    let lighten = active !== false ? (i == active ? false : true) : false;
+    if (lighten) {
+      s = 15; // s / 2;
+      l = (l + 100) / 2;
+    }
+    return `hsl(${h},${s}%,${l}%)`;
+  };
+  const [currentSeries, setCurrentSeries] = useState(false);
+  let fillColors = colors.map((hex, i) =>
+    fadeColor({ hex, i, active: currentSeries })
+  );
+  let orderedCats = [...cats];
+  let catOrder = cats
+    .map((cat, i) => ({ [cat]: i }))
+    .reduce((a, b) => ({ ...b, ...a }), {});
+  if (currentSeries !== false) {
+    let [lastCat] = orderedCats.splice(currentSeries, 1);
+    orderedCats.push(lastCat);
+  }
   let xScale =
     chartProps.bounds.scale == "ordinal" ? "linear" : chartProps.bounds.scale;
   let yScale =
@@ -464,14 +578,15 @@ const Heatmap = ({
       range={xDomain}
       ticks={isNaN(buckets[0]) ? buckets.map((x, i) => i) : buckets}
       tick={(props) =>
-        ReportXAxisTick(
+        ReportXAxisTick({
           props,
           buckets,
-          chartProps.xFormat,
-          chartProps.translations,
-          chartProps.pointSize,
-          chartProps.orientation
-        )
+          fmt: chartProps.xFormat,
+          translations: chartProps.translations,
+          pointSize: chartProps.pointSize,
+          orientation: chartProps.orientation,
+          labels: chartProps.labels,
+        })
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
       interval={0}
@@ -501,7 +616,8 @@ const Heatmap = ({
           yBuckets,
           chartProps.yFormat,
           chartProps.yTranslations,
-          chartProps.pointSize
+          chartProps.pointSize,
+          chartProps.yLabels
         )
       }
       domain={yDomain}
@@ -595,36 +711,30 @@ const Heatmap = ({
         bottom: width > 300 ? marginHeight : 5,
       }}
     >
-      {/* {patterns} */}
       {axes}
-      {cats.map((cat, i) => {
-        let range = [Math.max()];
-
-        return (
-          <Scatter
-            name={cat}
-            key={cat}
-            data={data[i]}
-            fill={colors[i] || "rgb(102, 102, 102)"}
-            shape={(props) => CustomShape(props, { ...chartProps, i })}
-            isAnimationActive={false}
-          />
-        );
-      })}
       {pointData &&
-        cats.map((cat, i) => (
-          <Scatter
-            name={`${cat}_points`}
-            legendType="none"
-            key={i}
-            data={pointData[i]}
-            fill={colors[i] || "rgb(102, 102, 102)"}
-            shape={(props) => CustomCircle(props, { ...chartProps })}
-            zAxisId={1}
-            isAnimationActive={false}
-            style={{ pointerEvents: "none" }}
-          />
-        ))}
+        orderedCats.map((cat, j) => {
+          let i = catOrder[cat];
+          let range = [Math.max()];
+          return (
+            <Scatter
+              name={`${cat}_points`}
+              legendType="none"
+              key={i}
+              data={pointData[i]}
+              fill={fillColors[i] || "rgb(102, 102, 102)"}
+              shape={(props) =>
+                CustomCircle(props, {
+                  ...chartProps,
+                  active: currentSeries === false || currentSeries == i,
+                })
+              }
+              zAxisId={1}
+              isAnimationActive={false}
+              pointerEvents={"none"}
+            />
+          );
+        })}
       {pointData && highlight && (
         <Scatter
           name={"highlight"}
@@ -632,12 +742,40 @@ const Heatmap = ({
           key={"highlight"}
           data={highlight}
           fill={"yellow"}
-          shape={(props) => CustomDot(props, { ...chartProps })}
+          shape={(props) =>
+            CustomDot(props, {
+              ...chartProps,
+            })
+          }
           zAxisId={1}
           isAnimationActive={false}
           style={{ pointerEvents: "none" }}
         />
       )}
+      {cats.map((cat, i) => (
+        <Scatter
+          name={cat}
+          key={cat}
+          data={data[i]}
+          fill={fillColors[i] || "rgb(102, 102, 102)"}
+          shape={(props) =>
+            CustomShape(
+              props,
+              {
+                ...chartProps,
+                i,
+                active: currentSeries === false || currentSeries == i,
+              },
+              (i) => {
+                currentSeries !== false && currentSeries == i
+                  ? setCurrentSeries(false)
+                  : setCurrentSeries(i);
+              }
+            )
+          }
+          isAnimationActive={false}
+        />
+      ))}
       {highlightRect}
     </ScatterChart>
   );
@@ -646,11 +784,13 @@ const Heatmap = ({
 const ReportScatter = ({
   scatter,
   chartRef,
+  report,
   containerRef,
   embedded,
   ratio,
   zScale = "linear",
   setMessage,
+  reportSelect,
   reportTerm,
   colors,
   levels,
@@ -679,6 +819,7 @@ const ReportScatter = ({
 
   let locations = {};
   if (scatter && scatter.status) {
+    let scatterReport = scatter.report.scatter || scatter.report.oxford;
     let chart;
     let {
       bounds,
@@ -688,9 +829,10 @@ const ReportScatter = ({
       chartData,
       histograms: heatmaps,
       pointData,
-    } = scatter.report.scatter;
+      groupBy,
+    } = scatterReport;
     if (pointData) {
-      ({ locations } = scatter.report.scatter);
+      ({ locations } = scatterReport);
     }
     useEffect(() => {
       if (locations[reportTerm]) {
@@ -757,10 +899,12 @@ const ReportScatter = ({
     const xFormat = (value) => formats(value, valueType, interval);
     const yFormat = (value) => formats(value, yValueType, yInterval);
 
-    const maxYLabel = maxStringLength(heatmaps.yBuckets, yFormat, pointSize);
+    let labels = bounds.labels || heatmaps.buckets;
+    let yLabels = yBounds.labels || heatmaps.yBuckets;
+    const maxYLabel = maxStringLength(yLabels, yFormat, pointSize);
     const marginWidth =
       maxYLabel + pointSize > 40 ? maxYLabel + pointSize - 40 : 0;
-    const maxXLabel = maxStringLength(heatmaps.buckets, xFormat, pointSize);
+    const maxXLabel = maxStringLength(labels, xFormat, pointSize);
     let marginHeight = 2 * pointSize;
     const marginRight = (stringLength(xFormat(endLabel)) * pointSize) / 2;
     let orientation = 0;
@@ -783,6 +927,8 @@ const ReportScatter = ({
         marginRight={marginRight}
         buckets={heatmaps.buckets}
         yBuckets={heatmaps.yBuckets}
+        labels={labels}
+        yLabels={yLabels}
         cats={cats}
         xLabel={xLabel}
         yLabel={yLabel}
@@ -798,8 +944,11 @@ const ReportScatter = ({
           xLength: heatmaps.buckets.length - 1,
           n: cats.length,
           zScale: zScale,
+          report,
           catSums,
           pointSize,
+          groupBy,
+          selectMode: reportSelect,
           xQuery: scatter.report.xQuery,
           yQuery: scatter.report.yQuery,
           xLabel: scatter.report.xLabel,
@@ -825,6 +974,10 @@ const ReportScatter = ({
           yTranslations,
           catTranslations,
           catOffsets,
+          buckets: heatmaps.buckets,
+          yBuckets: heatmaps.yBuckets,
+          labels,
+          yLabels,
           valueType,
           yValueType,
           stacked,

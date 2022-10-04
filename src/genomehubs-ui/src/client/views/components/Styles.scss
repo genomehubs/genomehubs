@@ -63,6 +63,8 @@ body,
       text-decoration: none;
     }
 
+    .active:hover { fill: rgba(125,125,125,0.5);}
+
     .fillParent {
       height: 100%;
       position: relative;

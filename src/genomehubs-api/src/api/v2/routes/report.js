@@ -14,6 +14,7 @@ import { histogram } from "../reports/histogram";
 import { indexName } from "../functions/indexName";
 import { logError } from "../functions/logger";
 import { map } from "../reports/map";
+import { oxford } from "../reports/oxford";
 import qs from "qs";
 import { queryParams } from "../reports/queryParams";
 import { setRanks } from "../functions/setRanks";
@@ -30,6 +31,61 @@ const plurals = (singular) => {
     superkingdom: "superkingdoms",
   };
   return ranks[singular.toLowerCase()] || singular;
+};
+
+export const getOxford = async ({
+  x,
+  y,
+  cat,
+  taxonomy,
+  queryString,
+  fields,
+  req,
+  ...apiParams
+}) => {
+  // Return oxford plot results
+  let status;
+  let res = await oxford({
+    x,
+    y,
+    cat,
+    result: apiParams.result,
+    taxonomy,
+    fields,
+    req,
+    apiParams,
+  });
+  if (res.status.success == false) {
+    if (!status) {
+      status = res.status;
+    }
+  } else {
+    status = { success: true };
+  }
+  let report = res.report;
+  let xQuery = res.xQuery;
+  let yQuery = res.yQuery;
+  let xLabel = res.xLabel;
+  let yLabel = res.yLabel;
+  let caption;
+  if (report) {
+    caption = `Oxford plot of ${x}${report.y ? ` against ${y}` : ""}`;
+    if (cat) {
+      caption += ` by ${cat.replace(/=.+$/, "")}`;
+    }
+  }
+  return {
+    status,
+    report: {
+      oxford: report,
+      xQuery,
+      // yQuery,
+      xLabel,
+      yLabel,
+      queryString,
+      caption,
+    },
+  };
 };
 
 export const getMap = async ({
@@ -927,6 +983,14 @@ export const getReport = async (req, res) => {
     let reportFunc;
     let reportParams = { ...req.query, queryString, req };
     switch (req.query.report) {
+      case "arc": {
+        reportFunc = arcPerRank;
+        break;
+      }
+      case "oxford": {
+        reportFunc = getOxford;
+        break;
+      }
       case "histogram": {
         reportFunc = histPerRank;
         break;
@@ -953,10 +1017,6 @@ export const getReport = async (req, res) => {
       }
       case "types": {
         reportFunc = getTypes;
-        break;
-      }
-      case "arc": {
-        reportFunc = arcPerRank;
         break;
       }
       case "xPerRank": {

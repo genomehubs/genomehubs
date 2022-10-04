@@ -28,6 +28,7 @@ const NavLink = ({ to, tab, url, basename, siteName, dispatch, ...props }) => {
     <Link
       {...props}
       to={to.replace(/\/+/, basename + "/")}
+      onClick={() => console.log(to)}
       getProps={({ isCurrent }) => {
         let css = tab
           ? classnames(styles.tab, { [styles.tabHighlight]: isCurrent })

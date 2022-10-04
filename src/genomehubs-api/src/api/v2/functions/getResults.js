@@ -71,7 +71,7 @@ export const getResults = async (params) => {
       status: { success: false, error: error.message },
     };
   }
-  let query = await generateQuery({ ...params });
   let index = indexName({ ...params });
+  let query = await generateQuery({ ...params, index });
   return query.func({ index, ...query.params });
 };
