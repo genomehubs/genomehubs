@@ -14,14 +14,16 @@ import { sortReportQuery } from "../selectors/report";
 import styles from "./Styles.scss";
 import withReportDefaults from "../hocs/withReportDefaults";
 
+const indices = ["taxon", "assembly", "sample", "feature"];
+
 const reportTypes = {
-  arc: { name: "Arc" },
-  histogram: { name: "Histogram" },
-  map: { name: "Map" },
-  oxford: { name: "Oxford" },
-  scatter: { name: "Scatter" },
-  table: { name: "Table" },
-  tree: { name: "Tree" },
+  arc: { name: "Arc", indices },
+  histogram: { name: "Histogram", indices },
+  map: { name: "Map", indices: ["taxon", "assembly", "sample"] },
+  oxford: { name: "Oxford", indices: ["feature"] },
+  scatter: { name: "Scatter", indices },
+  table: { name: "Table", indices },
+  tree: { name: "Tree", indices: ["taxon", "assembly", "sample"] },
 };
 
 const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {
@@ -74,24 +76,25 @@ const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {
 
       {/* {text && <div>{text}</div>} */}
       <Grid container spacing={1} direction="row" style={{ width: "100%" }}>
-        {Object.keys(reportTypes).map((key) => {
-          let obj = reportTypes[key];
-          return (
-            <Grid
-              item
-              style={{ cursor: "pointer" }}
-              onClick={() => setReport(key)}
-              key={key}
-            >
-              <Chip
-                label={obj.name}
-                variant={key == report ? undefined : "outlined"}
-                onClick={() => handleClick(key)}
-                onDelete={key == report ? handleDelete : undefined}
-              />
-            </Grid>
-          );
-        })}
+        {Object.entries(reportTypes)
+          .filter(([key, obj]) => (obj.indices || []).includes(options.result))
+          .map(([key, obj]) => {
+            return (
+              <Grid
+                item
+                style={{ cursor: "pointer" }}
+                onClick={() => setReport(key)}
+                key={key}
+              >
+                <Chip
+                  label={obj.name}
+                  variant={key == report ? undefined : "outlined"}
+                  onClick={() => handleClick(key)}
+                  onDelete={key == report ? handleDelete : undefined}
+                />
+              </Grid>
+            );
+          })}
       </Grid>
 
       <Grid container spacing={1} direction="row">
