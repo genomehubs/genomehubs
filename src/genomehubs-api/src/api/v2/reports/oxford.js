@@ -625,6 +625,7 @@ export const oxford = async ({
       status,
       histograms: oxford,
       bounds,
+      groupBy,
       cat: bounds.cat,
       cats: bounds.cats,
       yBounds,

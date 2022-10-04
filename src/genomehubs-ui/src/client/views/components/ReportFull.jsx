@@ -157,8 +157,10 @@ export const ReportFull = ({
     <div
       style={{ marginLeft, height, width, maxHeight: "100%" }}
       onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        if (report != "sources") {
+          e.preventDefault();
+          e.stopPropagation();
+        }
       }}
       ref={reportRef}
     >

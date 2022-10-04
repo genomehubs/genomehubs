@@ -1,7 +1,6 @@
 import React, { Fragment, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import CloseIcon from "@material-ui/icons/Close";
 import CodeIcon from "@material-ui/icons/Code";
 import EditIcon from "@material-ui/icons/Edit";
 import GetAppIcon from "@material-ui/icons/GetApp";
@@ -12,8 +11,11 @@ import ReportDownload from "./ReportDownload";
 import ReportEdit from "./ReportEdit";
 import ReportInfo from "./ReportInfo";
 import ReportQuery from "./ReportQuery";
+import ReportSelect from "./ReportSelect";
 import SearchIcon from "@material-ui/icons/Search";
+import SelectIcon from "@material-ui/icons/SelectAll";
 import TocIcon from "@material-ui/icons/Toc";
+import Tooltip from "@material-ui/core/Tooltip";
 import { compose } from "recompose";
 import { useStyles } from "./ReportModal";
 import withReportTerm from "../hocs/withReportTerm";
@@ -38,6 +40,7 @@ export const ReportTools = ({
   const [query, setQuery] = useState(false);
   const [download, setDownload] = useState(false);
   const [info, setInfo] = useState(false);
+  const [select, setSelect] = useState(false);
 
   const permaLink = (queryString, toggle) => {
     let path = topLevel ? "report" : toggle ? "reporturl" : "report";
@@ -76,7 +79,7 @@ export const ReportTools = ({
   );
 
   let overlay;
-  if (reportEdit && !query && !info && !download && !code) {
+  if (reportEdit && !query && !info && !download && !code && !select) {
     overlay = (
       <ReportEdit
         reportId={reportId}
@@ -91,6 +94,8 @@ export const ReportTools = ({
     overlay = <ReportQuery reportId={reportId} report={report} />;
   } else if (info) {
     overlay = <ReportInfo reportId={reportId} report={report} />;
+  } else if (select) {
+    overlay = <ReportSelect reportId={reportId} report={report} />;
   } else if (download) {
     overlay = (
       <ReportDownload
@@ -136,57 +141,96 @@ export const ReportTools = ({
           </Grid> */}
           {!topLevel && (
             <Grid item align="right">
-              <EditIcon
-                onClick={() => {
-                  setInfo(false);
-                  setQuery(false);
-                  setDownload(false);
-                  setReportEdit(!reportEdit);
-                }}
-                style={{ cursor: "pointer" }}
-              />
+              <Tooltip title={"Edit"} arrow placement="left">
+                <EditIcon
+                  onClick={() => {
+                    setInfo(false);
+                    setQuery(false);
+                    setDownload(false);
+                    setSelect(false);
+                    setCode(false);
+                    setReportEdit(!reportEdit);
+                  }}
+                  style={{ cursor: "pointer" }}
+                />
+              </Tooltip>
             </Grid>
           )}
           {!topLevel && (
             <Grid item align="right">
-              <SearchIcon
-                onClick={() => {
-                  setInfo(false);
-                  setReportEdit(false);
-                  setDownload(false);
-                  setQuery(!query);
-                }}
-                style={{ cursor: "pointer" }}
-              />
+              <Tooltip title={"Search"} arrow placement="left">
+                <SearchIcon
+                  onClick={() => {
+                    setInfo(false);
+                    setReportEdit(false);
+                    setDownload(false);
+                    setSelect(false);
+                    setCode(false);
+                    setQuery(!query);
+                  }}
+                  style={{ cursor: "pointer" }}
+                />
+              </Tooltip>
+            </Grid>
+          )}
+          {!topLevel && (
+            <Grid item align="right">
+              <Tooltip title={"Select"} arrow placement="left">
+                <SelectIcon
+                  onClick={() => {
+                    setInfo(false);
+                    setReportEdit(false);
+                    setDownload(false);
+                    setQuery(false);
+                    setCode(false);
+                    setSelect(!select);
+                  }}
+                  style={{ cursor: "pointer" }}
+                />
+              </Tooltip>
             </Grid>
           )}
           <Grid item align="right">
-            <TocIcon
-              onClick={() => {
-                setInfo(!info);
-                setReportEdit(false);
-                setDownload(false);
-                setQuery(false);
-              }}
-              style={{ transform: "scaleX(-1)", cursor: "pointer" }}
-            />
+            <Tooltip title={"Legend"} arrow placement="left">
+              <TocIcon
+                onClick={() => {
+                  setInfo(!info);
+                  setReportEdit(false);
+                  setDownload(false);
+                  setQuery(false);
+                  setCode(false);
+                  setSelect(false);
+                }}
+                style={{ transform: "scaleX(-1)", cursor: "pointer" }}
+              />
+            </Tooltip>
           </Grid>
 
           <Grid item align="right">
-            <LinkIcon
-              onClick={() => {
-                permaLink(queryString, true);
-              }}
-              style={{ cursor: "pointer" }}
-            />
+            <Tooltip title={"Link"} arrow placement="left">
+              <LinkIcon
+                onClick={() => {
+                  permaLink(queryString, true);
+                }}
+                style={{ cursor: "pointer" }}
+              />
+            </Tooltip>
           </Grid>
           <Grid item align="right">
-            <CodeIcon
-              onClick={(e) => {
-                setCode(!code);
-              }}
-              style={{ cursor: "pointer" }}
-            />
+            <Tooltip title={"Code"} arrow placement="left">
+              <CodeIcon
+                onClick={(e) => {
+                  setInfo(false);
+                  setReportEdit(false);
+                  setDownload(false);
+                  setQuery(false);
+                  setSelect(false);
+                  setCode(false);
+                  setCode(!code);
+                }}
+                style={{ cursor: "pointer" }}
+              />
+            </Tooltip>
           </Grid>
           {/* <Grid item align="right">
             <GetAppIcon
@@ -201,15 +245,19 @@ export const ReportTools = ({
             />
           </Grid> */}
           <Grid item align="right">
-            <GetAppIcon
-              onClick={() => {
-                setInfo(false);
-                setReportEdit(false);
-                setDownload(!download);
-                setQuery(false);
-              }}
-              style={{ cursor: "pointer" }}
-            />
+            <Tooltip title={"Download"} arrow placement="left">
+              <GetAppIcon
+                onClick={() => {
+                  setInfo(false);
+                  setReportEdit(false);
+                  setDownload(!download);
+                  setQuery(false);
+                  setCode(false);
+                  setSelect(false);
+                }}
+                style={{ cursor: "pointer" }}
+              />
+            </Tooltip>
           </Grid>
         </Grid>
       </div>
@@ -227,6 +275,8 @@ export const ReportTools = ({
             setReportEdit(false);
             setDownload(false);
             setQuery(false);
+            setCode(false);
+            setSelect(false);
           }}
         />
       )}

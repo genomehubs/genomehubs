@@ -74,8 +74,17 @@ export const reportEdit = handleAction(
 );
 export const getReportEdit = (state) => state.reportEdit;
 
+export const setReportSelect = createAction("SET_REPORT_SELECT");
+export const reportSelect = handleAction(
+  "SET_REPORT_SELECT",
+  (state, action) => action.payload || "bin",
+  "bin"
+);
+export const getReportSelect = (state) => state.reportSelect;
+
 export const reportReducers = {
   reports,
   reportEdit,
+  reportSelect,
   reportTerm,
 };

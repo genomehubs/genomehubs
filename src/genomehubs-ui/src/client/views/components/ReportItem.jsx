@@ -78,6 +78,7 @@ const ReportItem = ({
   setMessage,
   saveReport,
   setReportEdit,
+  setReportSelect,
   setReportTerm,
   siteName,
   basename,

@@ -2,7 +2,7 @@ export const charWidth = (char, options = { factor: 0.7 }) => {
   const { factor } = options;
   const widths = {
     dot: 2,
-    number: 7,
+    number: 5,
     a: 5,
     g: 7,
     i: 4,

@@ -1,5 +1,9 @@
 import { fetchReport, saveReport } from "../selectors/report";
-import { setReportEdit, setReportTerm } from "../reducers/report";
+import {
+  setReportEdit,
+  setReportSelect,
+  setReportTerm,
+} from "../reducers/report";
 
 import React from "react";
 import { connect } from "react-redux";
@@ -16,6 +20,7 @@ const dispatchReport = (WrappedComponent) => (props) => {
       dispatch(saveReport(props));
     },
     setReportEdit: (term) => dispatch(setReportEdit(term)),
+    setReportSelect: (term) => dispatch(setReportSelect(term)),
     setReportTerm: (term) => dispatch(setReportTerm(term)),
   });
 

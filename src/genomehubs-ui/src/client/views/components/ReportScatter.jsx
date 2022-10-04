@@ -19,6 +19,7 @@ import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
 import Grid from "@material-ui/core/Grid";
+import PointInfo from "./PointInfo";
 import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "@material-ui/core/Tooltip";
 import axisScales from "../functions/axisScales";
@@ -162,6 +163,30 @@ const searchByCell = ({
   );
 };
 
+const searchByPoint = ({ props, chartProps }) => {
+  let { xQuery, fields, ranks, groupBy, navigate, basename } = chartProps;
+  let { group, featureId, yFeatureId, x, y, cat } = props;
+  let { result, taxonomy } = xQuery;
+  let pointQuery;
+  if (featureId) {
+    pointQuery = `feature_id=${featureId},${yFeatureId} AND ${groupBy}=${group}`;
+  }
+  let queryString = qs.stringify({
+    query: pointQuery,
+    fields: fields.join(","),
+    ranks: ranks || "",
+    taxonomy,
+    result,
+  });
+
+  // let hash = encodeURIComponent(query);
+  navigate(
+    `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
+      pointQuery
+    )}`
+  );
+};
+
 const CustomDot = (props, chartProps) => {
   let { cx, cy, height: r, fill } = props;
   return (
@@ -178,17 +203,30 @@ const CustomDot = (props, chartProps) => {
 
 const CustomCircle = (props, chartProps) => {
   let { cx, cy, height: r, fill } = props;
-  let { pointSize } = chartProps;
-  return (
+  let { pointSize, selectMode, active } = chartProps;
+  let dot = (
     <Dot
       cx={cx}
       cy={cy}
       r={pointSize / 2}
       stroke={"none"}
       fill={fill}
+      style={{
+        cursor: active && selectMode == "point" ? "pointer" : "default",
+      }}
       // strokeWidth={r / 2}
     />
   );
+  if (active && selectMode == "point") {
+    dot = (
+      <>
+        <Tooltip title={<PointInfo {...{ ...props, chartProps }} />} arrow>
+          <g onClick={() => searchByPoint({ props, chartProps })}>{dot}</g>
+        </Tooltip>
+      </>
+    );
+  }
+  return dot;
 };
 
 const drawHeatRect = ({ props, chartProps, h, w }) => {
@@ -297,36 +335,40 @@ const CustomShape = (props, chartProps, handleClick) => {
       )}`;
     }
   }
-  let bgRect = (
-    <>
-      <Tooltip
-        title={<CellInfo x={xRange} y={yRange} count={props.payload.count} />}
-        arrow
-      >
-        <Rectangle
-          className={styles.active}
-          height={h}
-          width={w}
-          x={props.cx}
-          y={props.cy - h}
-          style={chartProps.embedded ? {} : { cursor: "pointer" }}
-          fill={`rgba(125,125,125,0)`}
-          onClick={
-            chartProps.embedded
-              ? () => {}
-              : () =>
-                  searchByCell({
-                    ...chartProps,
-                    xRange: xSearchRange,
-                    yRange: ySearchRange,
-                  })
-          }
-        />
-      </Tooltip>
-    </>
-  );
+  let bgRect;
+
   if (!chartProps.hasRawData) {
     heatRect = drawHeatRect({ props, chartProps, h, w });
+  }
+  if ((heatRect || chartProps.selectMode == "bin") && chartProps.active) {
+    bgRect = (
+      <>
+        <Tooltip
+          title={<CellInfo x={xRange} y={yRange} count={props.payload.count} />}
+          arrow
+        >
+          <Rectangle
+            className={styles.active}
+            height={h}
+            width={w}
+            x={props.cx}
+            y={props.cy - h}
+            style={chartProps.embedded ? {} : { cursor: "pointer" }}
+            fill={`rgba(125,125,125,0)`}
+            onClick={
+              chartProps.embedded || !chartProps.active
+                ? () => {}
+                : () =>
+                    searchByCell({
+                      ...chartProps,
+                      xRange: xSearchRange,
+                      yRange: ySearchRange,
+                    })
+            }
+          />
+        </Tooltip>
+      </>
+    );
   }
   if (props.key == "symbol-0") {
     legendGroup = zLegend({
@@ -675,7 +717,12 @@ const Heatmap = ({
               key={i}
               data={pointData[i]}
               fill={fillColors[i] || "rgb(102, 102, 102)"}
-              shape={(props) => CustomCircle(props, { ...chartProps })}
+              shape={(props) =>
+                CustomCircle(props, {
+                  ...chartProps,
+                  active: currentSeries === false || currentSeries == i,
+                })
+              }
               zAxisId={1}
               isAnimationActive={false}
               pointerEvents={"none"}
@@ -689,7 +736,11 @@ const Heatmap = ({
           key={"highlight"}
           data={highlight}
           fill={"yellow"}
-          shape={(props) => CustomDot(props, { ...chartProps })}
+          shape={(props) =>
+            CustomDot(props, {
+              ...chartProps,
+            })
+          }
           zAxisId={1}
           isAnimationActive={false}
           style={{ pointerEvents: "none" }}
@@ -702,11 +753,19 @@ const Heatmap = ({
           data={data[i]}
           fill={fillColors[i] || "rgb(102, 102, 102)"}
           shape={(props) =>
-            CustomShape(props, { ...chartProps, i }, (i) => {
-              currentSeries !== false && currentSeries == i
-                ? setCurrentSeries(false)
-                : setCurrentSeries(i);
-            })
+            CustomShape(
+              props,
+              {
+                ...chartProps,
+                i,
+                active: currentSeries === false || currentSeries == i,
+              },
+              (i) => {
+                currentSeries !== false && currentSeries == i
+                  ? setCurrentSeries(false)
+                  : setCurrentSeries(i);
+              }
+            )
           }
           isAnimationActive={false}
         />
@@ -725,6 +784,7 @@ const ReportScatter = ({
   ratio,
   zScale = "linear",
   setMessage,
+  reportSelect,
   reportTerm,
   colors,
   levels,
@@ -763,6 +823,7 @@ const ReportScatter = ({
       chartData,
       histograms: heatmaps,
       pointData,
+      groupBy,
     } = scatterReport;
     if (pointData) {
       ({ locations } = scatterReport);
@@ -880,6 +941,8 @@ const ReportScatter = ({
           report,
           catSums,
           pointSize,
+          groupBy,
+          selectMode: reportSelect,
           xQuery: scatter.report.xQuery,
           yQuery: scatter.report.yQuery,
           xLabel: scatter.report.xLabel,
