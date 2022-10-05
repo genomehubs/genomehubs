@@ -77,19 +77,6 @@ attributes:
     taxon_name: "{{organelle}}_sample_location"
     taxon_summary: list
     type: geo_point
-file:
-  display_group: misc
-  format: tsv
-  header: true
-  name: refseq_organelles.tsv.gz
-  source: NCBI
-  source_url_stub: https://www.ncbi.nlm.nih.gov/nuccore/
-identifiers:
-  assembly_id:
-    constraint:
-      len: 32
-    index: 3
-    type: keyword
   bioproject:
     constraint:
       len: 32
@@ -103,6 +90,19 @@ identifiers:
     index: 6
     synonyms:
       - biosample_accession
+    type: keyword
+file:
+  display_group: misc
+  format: tsv
+  header: true
+  name: refseq_organelles.tsv.gz
+  source: NCBI
+  source_url_stub: https://www.ncbi.nlm.nih.gov/nuccore/
+identifiers:
+  assembly_id:
+    constraint:
+      len: 32
+    index: 3
     type: keyword
   genbank_accession:
     constraint:

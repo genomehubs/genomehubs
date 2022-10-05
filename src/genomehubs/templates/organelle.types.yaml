@@ -26,6 +26,20 @@ attributes:
       max: 8
       count: 10
       scale: log10
+  bioproject:
+    constraint:
+      len: 32
+    index: 5
+    synonyms:
+      - bioproject_accession
+    type: keyword
+  biosample:
+    constraint:
+      len: 32
+    index: 6
+    synonyms:
+      - biosample_accession
+    type: keyword
   gc_percent:
     display_group: metrics
     display_level: 1
@@ -86,20 +100,6 @@ identifiers:
     constraint:
       len: 32
     index: 3
-    type: keyword
-  bioproject:
-    constraint:
-      len: 32
-    index: 5
-    synonyms:
-      - bioproject_accession
-    type: keyword
-  biosample:
-    constraint:
-      len: 32
-    index: 6
-    synonyms:
-      - biosample_accession
     type: keyword
 metadata:
   organelle:
