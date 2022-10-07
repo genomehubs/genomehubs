@@ -69,7 +69,14 @@ export const queryPropList = {
     "includeEstimates",
     "mapThreshold",
   ],
-  oxford: ["report", xSettings, catSettings, "xOpts", pointSizeSettings],
+  oxford: [
+    "report",
+    xSettings,
+    catSettings,
+    "xOpts",
+    "plotRatio",
+    pointSizeSettings,
+  ],
   scatter: [
     "report",
     xSettings,
@@ -82,6 +89,7 @@ export const queryPropList = {
     "yOpts",
     "highlightArea",
     "stacked",
+    "plotRatio",
     "scatterThreshold",
     pointSizeSettings,
   ],
@@ -162,6 +170,9 @@ export const ReportEdit = ({
   let query = qs.parse(reportById.report?.queryString);
   if (query.report == "tree" && !query.treeStyle) {
     query.treeStyle = "rect";
+  }
+  if (query.report == "scatter" && !query.plotRatio) {
+    query.plotRatio = "auto";
   }
   let result = query.result;
 
@@ -388,6 +399,28 @@ export const ReportEdit = ({
             value={values["treeStyle"]}
             style={{ width: "95%" }}
             onChange={(e) => handleChange(e, "treeStyle")}
+          >
+            {items}
+          </Select>
+        </FormControl>
+      );
+    } else if (queryProp == "plotRatio") {
+      let items = ["auto", 1, 1.5, 2].map((value) => {
+        return (
+          <MenuItem key={value} value={value}>
+            {value}
+          </MenuItem>
+        );
+      });
+      input = (
+        <FormControl style={{ width: "95%" }}>
+          <InputLabel id="select-plot-ratio-label">plotRatio</InputLabel>
+          <Select
+            labelId="select-plot-ratio-label"
+            id="select-plot-ratio"
+            value={values["plotRatio"]}
+            style={{ width: "95%" }}
+            onChange={(e) => handleChange(e, "plotRatio")}
           >
             {items}
           </Select>

@@ -64,6 +64,7 @@ const ReportItem = ({
   zScale,
   pointSize,
   treeStyle,
+  plotRatio,
   treeThreshold,
   levels,
   handleUpdate,

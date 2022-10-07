@@ -70,6 +70,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     highlightArea: { in: new Set(["scatter"]), ui: true },
     scatterThreshold: { in: new Set(["scatter"]) },
     treeStyle: { in: new Set(["tree"]), ui: true },
+    plotRatio: { in: new Set(["oxford", "scatter"]), ui: true },
     yScale: { in: new Set(["histogram"]), ui: true },
     zScale: { in: new Set(["scatter"]), ui: true },
     stacked: { in: new Set(["histogram", "scatter"]), ui: true },

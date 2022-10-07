@@ -92,6 +92,7 @@ const Report = ({
   reportProps.zScale = props.zScale || "linear";
   reportProps.xOpts = props.xOpts;
   reportProps.treeStyle = props.treeStyle || "rect";
+  reportProps.plotRatio = props.plotRatio || "auto";
   reportProps.yOpts = props.yOpts;
   reportProps.highlightArea = props.highlightArea;
   reportProps.mapThreshold = props.mapThreshold;
@@ -117,7 +118,10 @@ const Report = ({
   if (height) {
     minDim = Math.floor(Math.min(width, height));
   } else {
-    minDim /= reportProps.ratio;
+    minDim /=
+      reportProps.plotRatio && !isNaN(reportProps.plotRatio)
+        ? reportProps.plotRatio
+        : reportProps.ratio;
   }
 
   return (

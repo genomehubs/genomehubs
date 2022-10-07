@@ -7,6 +7,7 @@ import ReportTools from "./ReportTools";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
+import qs from "qs";
 import styles from "./Styles.scss";
 import { useStyles } from "./ReportModal";
 import useWindowDimensions from "../hooks/useWindowDimensions";
@@ -33,6 +34,15 @@ export const ReportFull = ({
   if (report == "xInY") {
     report = "arc";
   }
+  let options = qs.parse(queryString);
+  let { plotRatio = "auto" } = options;
+  if (
+    !report ||
+    (report != "scatter" && report != "oxford") ||
+    plotRatio == "auto"
+  ) {
+    plotRatio = undefined;
+  }
 
   const windowDimensions = useWindowDimensions();
   let height = windowDimensions.height;
@@ -45,15 +55,19 @@ export const ReportFull = ({
     modal = true;
   } else if (topLevel) {
     width *= 0.96;
-    // Adjust height here with
-    // height *= 0.96 * 1.5
-    height *= 0.96;
+    if (plotRatio) {
+      height = width / plotRatio;
+    } else {
+      height *= 0.96;
+    }
   } else {
     marginLeft = width * -0.05;
     width *= 0.9;
-    // Adjust height here with
-    // height *= 0.96 * 1.5
-    height *= 0.9;
+    if (plotRatio) {
+      height = width / plotRatio;
+    } else {
+      height *= 0.9;
+    }
   }
 
   const permaLink = (queryString, toggle) => {
