@@ -1,9 +1,9 @@
 // import { RadialChart } from "react-vis";
 import {
   CartesianGrid,
+  Curve,
   Dot,
   Label,
-  Legend,
   Rectangle,
   Scatter,
   ScatterChart,
@@ -488,6 +488,7 @@ const CustomizedYAxisTick = ({
   valueType,
   bounds,
   maxLabel,
+  width,
 }) => {
   const { x, y, fill, index, height, payload } = props;
   let value = payload.value;
@@ -521,6 +522,17 @@ const CustomizedYAxisTick = ({
       </text>
     );
   } else {
+    text = (
+      <line
+        x1={0}
+        y1={0}
+        x2={-maxLabel * 0.8}
+        y2={0}
+        stroke={"rgb(125,125,125)"}
+        strokeDasharray={pointSize / 5}
+        strokeWidth={pointSize / 10}
+      />
+    );
     rect = (
       <Tooltip title={translations[value] || value} arrow placement="right">
         <Rectangle
@@ -655,6 +667,7 @@ const Heatmap = ({
           valueType: chartProps.yValueType,
           bounds: chartProps.yBounds,
           maxLabel: chartProps.maxYLabel,
+          width,
         })
       }
       domain={yDomain}

@@ -45,10 +45,14 @@ export const ReportFull = ({
     modal = true;
   } else if (topLevel) {
     width *= 0.96;
+    // Adjust height here with
+    // height *= 0.96 * 1.5
     height *= 0.96;
   } else {
     marginLeft = width * -0.05;
     width *= 0.9;
+    // Adjust height here with
+    // height *= 0.96 * 1.5
     height *= 0.9;
   }
 
@@ -155,7 +159,7 @@ export const ReportFull = ({
 
   return (
     <div
-      style={{ marginLeft, height, width, maxHeight: "100%" }}
+      style={{ marginLeft, height, width, maxHeight: "150%" }}
       onClick={(e) => {
         if (report != "sources") {
           e.preventDefault();
