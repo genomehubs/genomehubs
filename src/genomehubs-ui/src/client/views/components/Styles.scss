@@ -63,7 +63,7 @@ body,
       text-decoration: none;
     }
 
-    .active:hover { fill: rgba(125,125,125,0.5);}
+    .active:hover { fill-opacity: 0.5; stroke-opacity: 0.5;}
 
     .fillParent {
       height: 100%;

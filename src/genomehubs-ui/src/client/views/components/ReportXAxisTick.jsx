@@ -1,4 +1,5 @@
 import React from "react";
+import { scaleLinear } from "d3-scale";
 
 export const ReportXAxisTick = ({
   props,
@@ -10,12 +11,21 @@ export const ReportXAxisTick = ({
   lastPos,
   report,
   labels,
+  valueType,
+  bounds,
+  maxLabel,
 }) => {
   let { x, y, fill, index, width, payload } = props;
   let value = payload.value;
   let yPos = y;
   let offset = 0;
-  let bucketWidth = width / (buckets.length - 1);
+  let bucketWidth;
+  if (valueType == "coordinate") {
+    let xScale = scaleLinear().domain(bounds.domain).range([0, width]);
+    bucketWidth = xScale(buckets[index + 1]) - xScale(buckets[index]);
+  } else {
+    bucketWidth = width / (buckets.length - 1);
+  }
   let tickLine;
   if (isNaN(x) && lastPos) {
     x = lastPos;

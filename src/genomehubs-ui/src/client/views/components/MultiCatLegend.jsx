@@ -1,8 +1,10 @@
 import { Rectangle, Text } from "recharts";
 
 import React from "react";
+import Tooltip from "@material-ui/core/Tooltip";
 import formats from "../functions/formats";
 import stringLength from "../functions/stringLength";
+import styles from "./Styles.scss";
 
 export const processLegendData = ({
   bounds,
@@ -35,7 +37,7 @@ export const processLegendData = ({
     for (let i = 0; i < len; i++) {
       let cat = bounds.cats[i];
       let labelWidth = Math.max(
-        stringLength(cat.label) * pointSize * 1.1,
+        stringLength(cat.label) * pointSize * 1.2,
         minWidth
       );
       if (labelWidth + catOffset < width - 10) {
@@ -131,13 +133,17 @@ const MultiCatLegend = ({
   n = 1,
   name,
   stats,
-  legendWidth = 150,
+  legendWidth,
   offset,
   row,
   pointSize,
   compactLegend,
-  handleClick = () => {},
+  handleClick,
+  active,
 }) => {
+  if (!legendWidth) {
+    legendWidth = pointSize * 10;
+  }
   let cellSize = pointSize * 1 + 5;
   let xPos;
   let j = 1;
@@ -166,7 +172,25 @@ const MultiCatLegend = ({
   if (!compactLegend) {
     ({ value } = valueString({ stats, cellSize, pointSize, fill }));
   }
-
+  let strokeWidth = pointSize / 5;
+  let bgRect;
+  if (handleClick) {
+    bgRect = (
+      <Tooltip title={`Click to highlight ${name}`} arrow>
+        <Rectangle
+          className={styles.active}
+          height={cellSize * (compactLegend ? 1 : 2) + strokeWidth * 2}
+          width={legendWidth - cellSize / 2 + strokeWidth * 2}
+          fill={"white"}
+          stroke={fill || "rgb(102, 102, 102)"}
+          strokeOpacity={active ? 0.5 : 0}
+          strokeWidth={pointSize / 10}
+          x={cellSize - legendWidth - strokeWidth} // {props.cx + (w - width) / 2}
+          y={-cellSize / 2 - strokeWidth}
+        />
+      </Tooltip>
+    );
+  }
   let text = (
     <g
       key={`cell-${i}`}
@@ -174,42 +198,38 @@ const MultiCatLegend = ({
         cellSize / 2 + (j - 1) * ((compactLegend ? 1 : 2) * cellSize + 5)
       })`}
     >
-      <Rectangle
-        height={cellSize * (compactLegend ? 1 : 2)}
-        width={legendWidth}
-        fill={"rgba(255,255,255,0)"}
-        x={cellSize / 2 - legendWidth} // {props.cx + (w - width) / 2}
-        y={-cellSize / 2}
-      />
-      <Text
-        x={-5}
-        y={0}
-        fill={fill || "rgb(102, 102, 102)"}
-        dominantBaseline={"central"}
-        textAnchor={"end"}
-        fontWeight={"bold"}
-        fontSize={pointSize}
-      >
-        {name}
-      </Text>
-      {value}
-      <Rectangle
-        key={`cell-${i}`}
-        height={cellSize * (compactLegend ? 1 : 2)}
-        width={cellSize / 2}
-        fill={fill || "rgb(102, 102, 102)"}
-        x={0} // {props.cx + (w - width) / 2}
-        y={-cellSize / 2}
-        // style={{ pointerEvents: "none" }}
-      />
+      {bgRect}
+      <g pointerEvents={handleClick ? "none" : "auto"}>
+        <Text
+          x={-5}
+          y={0}
+          fill={fill || "rgb(102, 102, 102)"}
+          dominantBaseline={"central"}
+          textAnchor={"end"}
+          fontWeight={"bold"}
+          fontSize={pointSize}
+        >
+          {name}
+        </Text>
+        {value}
+        <Rectangle
+          key={`cell-${i}`}
+          height={cellSize * (compactLegend ? 1 : 2)}
+          width={cellSize / 2}
+          fill={fill || "rgb(102, 102, 102)"}
+          x={0} // {props.cx + (w - width) / 2}
+          y={-cellSize / 2}
+          // style={{ pointerEvents: "none" }}
+        />
+      </g>
     </g>
   );
 
   return (
     <g
       transform={`translate(${xPos}, 5)`}
-      style={{ cursor: "pointer" }}
-      onClick={() => handleClick(i)}
+      style={{ cursor: handleClick ? "pointer" : "default" }}
+      onClick={handleClick ? () => handleClick(i) : () => {}}
     >
       {text}
     </g>

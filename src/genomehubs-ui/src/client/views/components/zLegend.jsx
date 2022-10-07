@@ -12,7 +12,9 @@ export const zLegend = ({ props, chartProps, handleClick }) => {
     catTranslations = {},
     catOffsets = {},
     compactLegend,
+    currentSeries = false,
   } = chartProps;
+  let active = currentSeries !== false && currentSeries == i;
   let legendWidth = name.length * 10 + 15;
   legendWidth = Math.max(legendWidth, 50);
   let offset, row;
@@ -34,6 +36,7 @@ export const zLegend = ({ props, chartProps, handleClick }) => {
       pointSize,
       compactLegend,
       handleClick,
+      active,
     });
   } else {
     return MultiCatLegend({
@@ -45,12 +48,13 @@ export const zLegend = ({ props, chartProps, handleClick }) => {
       n,
       name: catTranslations[name] || name,
       stats: catSums[name],
-      legendWidth: Math.max(legendWidth, 150),
+      legendWidth: Math.max(legendWidth, pointSize * 10),
       offset,
       row,
       pointSize,
       compactLegend,
       handleClick,
+      active,
     });
   }
 };

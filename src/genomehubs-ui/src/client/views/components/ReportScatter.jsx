@@ -213,7 +213,7 @@ const CustomCircle = (props, chartProps) => {
       cx={cx}
       cy={cy}
       r={pointSize / 2}
-      stroke={"none"}
+      stroke={active ? "rgb(102,102,102)" : "none"}
       fill={fill}
       style={{
         cursor: active && selectMode == "point" ? "pointer" : "default",
@@ -278,39 +278,39 @@ const drawHeatRect = ({ props, chartProps, h, w }) => {
 };
 
 const CustomShape = (props, chartProps, handleClick) => {
-  let h = props.yAxis.height / chartProps.yLength;
-  let xScale = scaleLinear()
-    .domain(chartProps.bounds.domain)
-    .range([0, props.xAxis.width]);
-  let xIndex = chartProps.buckets.indexOf(props.payload.x);
-  let yScale = scaleLinear()
-    .domain(chartProps.yBounds.domain)
-    .range([0, props.yAxis.height]);
-  let yIndex = chartProps.yBuckets.indexOf(props.payload.y);
-  if (chartProps.yValueType == "date") {
-    h =
-      props.yAxis.scale(props.payload.y) -
-      props.yAxis.scale(props.payload.yBound);
-  }
-  let w = props.xAxis.width / chartProps.xLength;
-  if (chartProps.valueType == "date") {
-    w =
-      props.xAxis.scale(props.payload.xBound) -
-      props.xAxis.scale(props.payload.x);
-  }
+  let w, h;
   let heatRect, legendGroup;
-  let xRange, yRange, xSearchRange, ySearchRange;
+  let xRange, yRange, xSearchRange, ySearchRange, yIndex;
   if (chartProps.valueType == "coordinate") {
+    let xScale = scaleLinear()
+      .domain(chartProps.bounds.domain)
+      .range([0, props.xAxis.width]);
+    let xIndex = chartProps.buckets.indexOf(props.payload.x);
     w =
       xScale(chartProps.buckets[xIndex + 1]) -
       xScale(chartProps.buckets[xIndex]);
+    xRange = chartProps.labels[xIndex];
+    xSearchRange = xRange;
+    let yScale = scaleLinear()
+      .domain(chartProps.yBounds.domain)
+      .range([0, props.yAxis.height]);
+    yIndex = chartProps.yBuckets.indexOf(props.payload.y);
     h =
       yScale(chartProps.yBuckets[yIndex + 1]) -
       yScale(chartProps.yBuckets[yIndex]);
-
-    xRange = chartProps.labels[xIndex];
-    xSearchRange = xRange;
   } else {
+    h = props.yAxis.height / chartProps.yLength;
+    if (chartProps.yValueType == "date") {
+      h =
+        props.yAxis.scale(props.payload.y) -
+        props.yAxis.scale(props.payload.yBound);
+    }
+    w = props.xAxis.width / chartProps.xLength;
+    if (chartProps.valueType == "date") {
+      w =
+        props.xAxis.scale(props.payload.xBound) -
+        props.xAxis.scale(props.payload.x);
+    }
     xSearchRange = [props.payload.x, props.payload.xBound];
     if (chartProps.bounds.scale == "ordinal") {
       try {
@@ -360,7 +360,8 @@ const CustomShape = (props, chartProps, handleClick) => {
             x={props.cx}
             y={props.cy - h}
             style={chartProps.embedded ? {} : { cursor: "pointer" }}
-            fill={`rgba(125,125,125,0)`}
+            fill={`rgba(125,125,125)`}
+            fillOpacity={0}
             onClick={
               chartProps.embedded || !chartProps.active
                 ? () => {}
@@ -477,29 +478,38 @@ const HighlightShape = (props, chartProps) => {
   );
 };
 
-const CustomizedYAxisTick = (
+const CustomizedYAxisTick = ({
   props,
   buckets,
   fmt,
   translations,
   pointSize,
-  yLabels
-) => {
+  yLabels,
+  valueType,
+  bounds,
+  maxLabel,
+}) => {
   const { x, y, fill, index, height, payload } = props;
   let value = payload.value;
   let offset = 0;
+  let h = height / (buckets.length - 1);
   if (yLabels[index] != payload.value) {
     value = yLabels[index] || "";
-    offset = height / (buckets.length - 1) / 2;
+    if (valueType == "coordinate") {
+      let yScale = scaleLinear().domain(bounds.domain).range([0, height]);
+      h = yScale(buckets[index + 1]) - yScale(buckets[index]);
+    }
+    offset = h / 2;
   } else {
     value = fmt(value);
   }
-  return (
-    <g transform={`translate(${x - 2},${y - offset})`}>
+  let text;
+  let rect;
+  if (h >= pointSize * 0.8) {
+    text = (
       <text
         x={0}
         y={0}
-        dy={5}
         textAnchor="end"
         alignmentBaseline={"middle"}
         dominantBaseline={"middle"}
@@ -509,6 +519,27 @@ const CustomizedYAxisTick = (
       >
         {translations[value] || value}
       </text>
+    );
+  } else {
+    rect = (
+      <Tooltip title={translations[value] || value} arrow placement="right">
+        <Rectangle
+          className={styles.active}
+          x={-maxLabel}
+          y={-offset}
+          height={h}
+          width={maxLabel}
+          stroke={"none"}
+          fill={"rgb(125,125,125)"}
+          fillOpacity={0}
+        />
+      </Tooltip>
+    );
+  }
+  return (
+    <g transform={`translate(${x - 2},${y - offset})`}>
+      {rect}
+      {text}
     </g>
   );
 };
@@ -586,6 +617,9 @@ const Heatmap = ({
           pointSize: chartProps.pointSize,
           orientation: chartProps.orientation,
           labels: chartProps.labels,
+          valueType: chartProps.valueType,
+          bounds: chartProps.bounds,
+          maxLabel: chartProps.maxXlabel,
         })
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
@@ -611,14 +645,17 @@ const Heatmap = ({
       scale={axisScales[yScale]()}
       ticks={isNaN(yBuckets[0]) ? yBuckets.map((y, i) => i) : yBuckets}
       tick={(props) =>
-        CustomizedYAxisTick(
+        CustomizedYAxisTick({
           props,
-          yBuckets,
-          chartProps.yFormat,
-          chartProps.yTranslations,
-          chartProps.pointSize,
-          chartProps.yLabels
-        )
+          buckets: yBuckets,
+          fmt: chartProps.yFormat,
+          translations: chartProps.yTranslations,
+          pointSize: chartProps.pointSize,
+          yLabels: chartProps.yLabels,
+          valueType: chartProps.yValueType,
+          bounds: chartProps.yBounds,
+          maxLabel: chartProps.maxYLabel,
+        })
       }
       domain={yDomain}
       // domain={["auto", "auto"]}
@@ -752,30 +789,37 @@ const Heatmap = ({
           style={{ pointerEvents: "none" }}
         />
       )}
-      {cats.map((cat, i) => (
-        <Scatter
-          name={cat}
-          key={cat}
-          data={data[i]}
-          fill={fillColors[i] || "rgb(102, 102, 102)"}
-          shape={(props) =>
-            CustomShape(
-              props,
-              {
-                ...chartProps,
-                i,
-                active: currentSeries === false || currentSeries == i,
-              },
-              (i) => {
-                currentSeries !== false && currentSeries == i
-                  ? setCurrentSeries(false)
-                  : setCurrentSeries(i);
-              }
-            )
-          }
-          isAnimationActive={false}
-        />
-      ))}
+      {cats.map((cat, i) => {
+        let handleClick;
+        if (pointData && cats.length > 1) {
+          handleClick = (i) => {
+            currentSeries !== false && currentSeries == i
+              ? setCurrentSeries(false)
+              : setCurrentSeries(i);
+          };
+        }
+        return (
+          <Scatter
+            name={cat}
+            key={cat}
+            data={data[i]}
+            fill={fillColors[i] || "rgb(102, 102, 102)"}
+            shape={(props) =>
+              CustomShape(
+                props,
+                {
+                  ...chartProps,
+                  i,
+                  currentSeries,
+                  active: currentSeries === false || currentSeries == i,
+                },
+                handleClick
+              )
+            }
+            isAnimationActive={false}
+          />
+        );
+      })}
       {highlightRect}
     </ScatterChart>
   );
@@ -951,6 +995,8 @@ const ReportScatter = ({
           selectMode: reportSelect,
           xQuery: scatter.report.xQuery,
           yQuery: scatter.report.yQuery,
+          maxYLabel,
+          maxXLabel,
           xLabel: scatter.report.xLabel,
           yLabel: scatter.report.yLabel,
           showXTickLabels: xOptions[2]
