@@ -307,6 +307,9 @@ def convert_to_type(key, raw_value, to_type, *, translate=None):
                 value = convert_to_type(key, translate[raw_value], to_type)
             else:
                 value = None
+        except TypeError:
+            LOGGER.warn("Unable to import %s", key)
+            value = None
     elif to_type == "geo_point":
         value = convert_lat_lon(raw_value)
     else:
@@ -754,6 +757,8 @@ def process_row_values(row, types, data):
                     ):
                         separator = "|".join([re.escape(sep) for sep in meta["separator"]])
                         data[group][key] = re.split(rf"\s*{separator}\s*", value)
+                        if "limit" in meta:
+                            data[group][key] = data[group][key][:meta["limit"]]
                     elif value is not None and value != "None":
                         data[group][key] = value
                 except IndexError:

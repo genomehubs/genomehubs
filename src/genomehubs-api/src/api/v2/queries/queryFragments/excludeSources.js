@@ -45,47 +45,49 @@ export const excludeSources = (exclusions = {}, fields) => {
       return;
     }
 
-    exclusions[source].forEach((field) => {
-      if (source == "missing") {
-        try {
-          delete fields[field];
-        } catch (err) {
-          // needed in case field is an array method (e.g. length)
+    exclusions[source]
+      .filter((field) => typeof field !== "undefined")
+      .forEach((field) => {
+        if (source == "missing") {
+          try {
+            delete fields[field];
+          } catch (err) {
+            // needed in case field is an array method (e.g. length)
+          }
+          excluded.push({
+            bool: {
+              must_not: {
+                nested: {
+                  path: "attributes",
+                  query: {
+                    match: { "attributes.key": field },
+                  },
+                },
+              },
+            },
+          });
+          return;
         }
         excluded.push({
-          bool: {
-            must_not: {
-              nested: {
-                path: "attributes",
-                query: {
-                  match: { "attributes.key": field },
-                },
+          nested: {
+            path: "attributes",
+            query: {
+              bool: {
+                filter: [
+                  {
+                    match: { "attributes.key": field },
+                  },
+                  {
+                    match: {
+                      "attributes.aggregation_source": source,
+                    },
+                  },
+                ].concat(preserveMultiple({ field, source })),
               },
             },
           },
         });
-        return;
-      }
-      excluded.push({
-        nested: {
-          path: "attributes",
-          query: {
-            bool: {
-              filter: [
-                {
-                  match: { "attributes.key": field },
-                },
-                {
-                  match: {
-                    "attributes.aggregation_source": source,
-                  },
-                },
-              ].concat(preserveMultiple({ field, source })),
-            },
-          },
-        },
       });
-    });
   });
   return excluded;
 };
