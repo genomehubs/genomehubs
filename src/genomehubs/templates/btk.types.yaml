@@ -109,8 +109,10 @@ attributes:
     taxon_key: btk_nohit
     taxon_name: btk_nohit
     taxon_synonym: nohit
-    taxon_summary: median
-    taxon_traverse: median
+    taxon_summary:
+      - primary
+      - min
+    taxon_traverse: false
     taxon_type: 1dp
   btk_target:
     description: Hits matching target
@@ -131,8 +133,10 @@ attributes:
     taxon_key: btk_target
     taxon_name: btk_target
     taxon_synonym: target
-    taxon_summary: median
-    taxon_traverse: median
+    taxon_summary:
+      - primary
+      - max
+    taxon_traverse: false
     taxon_type: 1dp
 file:
   display_group: btk
