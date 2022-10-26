@@ -210,6 +210,9 @@ def parse_ncbi_datasets_record(record, parsed):
     for key in ("taxId", "organismName", "commonName", "isolate", "sex"):
         obj[key] = record.get(key, "None")
     assemblyInfo = record.get("assemblyInfo", {})
+    atypical = assemblyInfo.get("atypical", False)
+    if atypical:
+        return
     for key in (
         "assemblyLevel",
         "assemblyName",
@@ -269,6 +272,9 @@ def parse_ncbi_datasets_sample(record, parsed):
     for key in ("taxId", "isolate", "sex"):
         obj[key] = record.get(key, "None")
     assemblyInfo = record.get("assemblyInfo", {})
+    atypical = assemblyInfo.get("atypical", False)
+    if atypical:
+        return
     for key in (
         "assemblyLevel",
         "biosampleAccession",
@@ -283,11 +289,18 @@ def parse_ncbi_datasets_sample(record, parsed):
                 obj["primaryValue"] = 1
             else:
                 obj["primaryValue"] = None
-    attributes = {entry["name"]: entry.get("value", None) for entry in assemblyInfo.get("biosample", {}).get("attributes", [])}
+    attributes = {
+        entry["name"]: entry.get("value", None)
+        for entry in assemblyInfo.get("biosample", {}).get("attributes", [])
+    }
     for key in ("estimated_size", "geo_loc_name", "num_replicons", "ploidy"):
         obj[key] = attributes.get(key, None)
-    obj["latitude"] = degrees_to_decimal(attributes.get("geographic location (latitude)", None))
-    obj["longitude"] = degrees_to_decimal(attributes.get("geographic location (longitude)", None))
+    obj["latitude"] = degrees_to_decimal(
+        attributes.get("geographic location (latitude)", None)
+    )
+    obj["longitude"] = degrees_to_decimal(
+        attributes.get("geographic location (longitude)", None)
+    )
     obj["elevation"] = attributes.get("geographic location (elevation)", None)
     bioprojects = []
     for lineage in assemblyInfo.get("bioprojectLineage", []):
@@ -308,9 +321,7 @@ def ncbi_genome_parser(params, opts, *, types=None, names=None):
     jsonl = opts["ncbi-datasets-%s" % params]
     if not jsonl.endswith(".jsonl"):
         jsonl = "%s/ncbi_dataset/data/assembly_data_report.jsonl" % jsonl
-    with tofile.open_file_handle(
-        jsonl
-    ) as report:
+    with tofile.open_file_handle(jsonl) as report:
         for line in report:
             record = ujson.loads(line)
             if params == "sample":
