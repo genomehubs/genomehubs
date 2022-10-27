@@ -174,7 +174,7 @@ def median_list(arr):
     if length % 2 == 1:
         return [median(arr)]
     sorted_arr = sorted(arr, reverse=True)
-    return [sorted_arr[int(length / 2)], sorted_arr[int(length / 2) - 1]]
+    return list(set([sorted_arr[int(length / 2)], sorted_arr[int(length / 2) - 1]]))
 
 
 def mode_list(arr):
