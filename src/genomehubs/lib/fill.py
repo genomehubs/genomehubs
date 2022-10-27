@@ -44,6 +44,7 @@ import re
 import sys
 from collections import defaultdict
 from datetime import datetime
+from itertools import groupby
 from multiprocessing import Pool
 from statistics import mean
 from statistics import median
@@ -167,6 +168,45 @@ def range(arr):
     return latest(arr) - earliest(arr)
 
 
+def median_list(arr):
+    """Return both values in event of tied median."""
+    length = len(arr)
+    if length % 2 == 1:
+        return [median(arr)]
+    sorted_arr = sorted(arr, reverse=True)
+    return [sorted_arr[int(length / 2)], sorted_arr[int(length / 2) - 1]]
+
+
+def mode_list(arr):
+    """Return a list of modal values."""
+    mode_count = 0
+    mode_arr = []
+    for key, group in groupby(arr):
+        count = len(list(group))
+        if count < mode_count:
+            continue
+        if count > mode_count:
+            mode_count = count
+            mode_arr = []
+        mode_arr.append(key)
+    return mode_arr
+
+
+def mode_high(arr):
+    """Calculate mode using median_high to resolve ties."""
+    return median_high(mode_list(arr))
+
+
+def mode_low(arr):
+    """Calculate mode using median_low to resolve ties."""
+    return median_low(mode_list(arr))
+
+
+def mode_mean(arr):
+    """Calculate mode using mean to resolve ties."""
+    return mean(mode_list(arr))
+
+
 def flatten_list(arr):
     """Flatten a list by expanding any nested lists."""
     flattened = []
@@ -196,7 +236,7 @@ def apply_summary(
     summary_types=None,
     max_value=None,
     min_value=None,
-    order=None
+    order=None,
 ):
     """Apply summary statistic functions."""
     summaries = {
@@ -210,8 +250,13 @@ def apply_summary(
         "median": median,
         "median_high": median_high,
         "median_low": median_low,
+        "median_list": median_list,
         "mode": mode,
         "most_common": mode,
+        "mode_high": mode_high,
+        "mode_low": mode_low,
+        "mode_mean": mode_mean,
+        "mode_list": mode_list,
         "range": range,
         "sum": sum,
         "list": deduped_list,
@@ -317,7 +362,14 @@ def set_traverse_values(
 
 
 def summarise_attribute_values(
-    attribute, meta, *, values=None, count=0, max_value=None, min_value=None, source="direct"
+    attribute,
+    meta,
+    *,
+    values=None,
+    count=0,
+    max_value=None,
+    min_value=None,
+    source="direct",
 ):
     """Calculate a single summary value for an attribute."""
     if values is None and "values" not in attribute:
@@ -365,7 +417,9 @@ def summarise_attribute_values(
             )
         except Exception:
             print(format_exc())
-            LOGGER.error(f"Unable to generate summary values for attribute {meta['key']}")
+            LOGGER.error(
+                f"Unable to generate summary values for attribute {meta['key']}"
+            )
             sys.exit(1)
         if isinstance(max_value, float) or isinstance(max_value, int):
             attribute["max"] = max_value
@@ -442,7 +496,7 @@ def set_values_from_descendants(
     parents,
     descendant_ranks=None,
     attr_dict=None,
-    limits=None
+    limits=None,
 ):
     """Set attribute summary values from descendant values."""
     changed = False
@@ -597,7 +651,13 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
     attrs = set(meta.keys())
     parents = defaultdict(
         lambda: defaultdict(
-            lambda: {"max": None, "min": None, "values": [], "prefixed_values": [], "count": 0}
+            lambda: {
+                "max": None,
+                "min": None,
+                "values": [],
+                "prefixed_values": [],
+                "count": 0,
+            }
         )
     )
     limits = defaultdict(set)
