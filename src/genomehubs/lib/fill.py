@@ -44,6 +44,7 @@ import re
 import sys
 from collections import defaultdict
 from datetime import datetime
+from itertools import groupby
 from multiprocessing import Pool
 from statistics import mean
 from statistics import median
@@ -167,6 +168,36 @@ def range(arr):
     return latest(arr) - earliest(arr)
 
 
+def multi_mode(arr):
+    """Return a list of modal values."""
+    mode_count = 0
+    mode_arr = []
+    for key, group in groupby(arr):
+        count = len(list(group))
+        if count < mode_count:
+            continue
+        if count > mode_count:
+            mode_count = count
+            mode_arr = []
+        mode_arr.append(key)
+    return mode_arr
+
+
+def mode_high(arr):
+    """Calculate mode using median_high to resolve ties."""
+    return median_high(multi_mode(arr))
+
+
+def mode_low(arr):
+    """Calculate mode using median_low to resolve ties."""
+    return median_low(multi_mode(arr))
+
+
+def mode_mean(arr):
+    """Calculate mode using mean to resolve ties."""
+    return mean(multi_mode(arr))
+
+
 def flatten_list(arr):
     """Flatten a list by expanding any nested lists."""
     flattened = []
@@ -212,6 +243,9 @@ def apply_summary(
         "median_low": median_low,
         "mode": mode,
         "most_common": mode,
+        "mode_high": mode_high,
+        "mode_low": mode_low,
+        "mode_mean": mode_mean,
         "range": range,
         "sum": sum,
         "list": deduped_list,
