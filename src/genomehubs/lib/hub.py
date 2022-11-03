@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Hub functions."""
 
+
+import contextlib
 import csv
 import os
 import re
@@ -36,7 +38,7 @@ def dep(arg):
     """Dependency resolver."""
     # from https://code.activestate.com/recipes/576570-dependency-resolver/
     # © 2008 Louis Riviere (MIT)
-    d = dict((k, set(arg[k])) for k in arg)
+    d = {k: set(arg[k]) for k in arg}
     r = []
     c = 0
     while d and c < 10:
@@ -47,7 +49,7 @@ def dep(arg):
         # can be done right away
         r.append(t)
         # and cleaned up
-        d = dict(((k, v - t) for k, v in d.items() if v))
+        d = {k: v - t for k, v in d.items() if v}
         c += 1
     if d:
         LOGGER.error("Unable to resolve dependency tree")
@@ -69,7 +71,7 @@ def list_files(dir_path, pattern):
             needs = data["file"]["needs"]
             if not isinstance(needs, list):
                 needs = [needs]
-            deps[yaml_file] = ["%s/%s" % (yaml_dir, needed) for needed in needs]
+            deps[yaml_file] = [f"{yaml_dir}/{needed}" for needed in needs]
         else:
             deps[yaml_file] = []
     file_list = [item for sublist in dep(deps) for item in sublist]
@@ -80,32 +82,32 @@ def load_types(name, *, part="types"):
     """Read a types file from the templates directory."""
     script_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     types = None
-    try:
-        types_file = os.path.join(script_dir, "templates", "%s.%s.yaml" % (name, part))
+    with contextlib.suppress(Exception):
+        types_file = os.path.join(script_dir, "templates", f"{name}.{part}.yaml")
         types = tofile.load_yaml(types_file)
         # TODO: check if this code is redundant
-        try:
+        with contextlib.suppress(AttributeError):
             for key, value in types.items():
-                try:
-                    enum = set(
-                        [str(option).lower() for option in value["constraint"]["enum"]]
-                    )
+                with contextlib.suppress(KeyError):
+                    enum = {
+                        str(option).lower() for option in value["constraint"]["enum"]
+                    }
                     value["constraint"]["enum"] = enum
-                except KeyError:
-                    pass
-        except AttributeError:
-            pass
-    except Exception:
-        pass
     if types and "file" in types:
         for key, value in types["file"].items():
             if "attributes" in types:
                 for attr in types["attributes"].values():
-                    if key not in ("format", "header", "name") and key not in attr:
+                    if (
+                        key not in ("exclusions", "format", "header", "name")
+                        and key not in attr
+                    ):
                         attr[key] = value
             if "taxon_names" in types:
                 for attr in types["taxon_names"].values():
-                    if key not in ("format", "header", "name") and key not in attr:
+                    if (
+                        key not in ("exclusions", "format", "header", "name")
+                        and key not in attr
+                    ):
                         attr[key] = value
     return types
 
@@ -113,17 +115,16 @@ def load_types(name, *, part="types"):
 def index_templator(parts, opts):
     """Index template helper function."""
     script_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    mapping_file = os.path.join(script_dir, "templates", parts[0] + ".json")
+    mapping_file = os.path.join(script_dir, "templates", f"{parts[0]}.json")
     types = load_types(parts[0])
     names = load_types(parts[0], part="names")
-    template = {
+    return {
         "name": parts[0],
         "index_name": opts["hub-separator"].join(parts),
         "mapping": tofile.load_yaml(mapping_file),
         "types": types,
         "names": names,
     }
-    return template
 
 
 def add_names_to_types(names, types):
@@ -145,7 +146,7 @@ def add_names_to_types(names, types):
                         if field not in types[group]:
                             types[group][field] = deepcopy(attrs)
                         elif types[group][field]["header"] != attrs["header"]:
-                            types[group]["names_%s" % field] = deepcopy(attrs)
+                            types[group][f"names_{field}"] = deepcopy(attrs)
     return types
 
 
@@ -158,24 +159,22 @@ def order_parsed_fields(parsed, types, names=None):
     for group, entries in types.items():
         for field, attrs in entries.items():
             header = False
-            try:
+            with contextlib.suppress(AttributeError):
                 for key, value in attrs.items():
-                    if key == "index":
-                        if value not in columns:
-                            columns.update({value: field})
-                            fields.update({field: value})
-                    elif key == "header":
+                    if key == "header":
                         header = value
+                    elif key == "index":
+                        if value not in columns:
+                            columns[value] = field
+                            fields[field] = value
                 if header:
                     if not isinstance(header, list):
                         header = [header]
                     for head in header:
                         if head not in fields:
-                            columns.update({ctr: head})
-                            fields.update({head: ctr})
+                            columns[ctr] = head
+                            fields[head] = ctr
                             ctr += 1
-            except AttributeError:
-                pass
     order = [x[0] for x in sorted(fields.items(), key=lambda x: x[1])]
     data = [order]
     for entry in parsed:
@@ -200,51 +199,37 @@ def post_search_scripts(es):
 
 def byte_type_constraint(value):
     """Test byte_type constraint."""
-    if value >= -128 and value <= 128:
-        return True
-    return False
+    return value >= -128 and value <= 128
 
 
 def integer_type_constraint(value):
     """Test integer_type constraint."""
-    if value >= MIN_INTEGER and value <= MAX_INTEGER:
-        return True
-    return False
+    return value >= MIN_INTEGER and value <= MAX_INTEGER
 
 
 def short_type_constraint(value):
     """Test short_type constraint."""
-    if value >= -32768 and value <= 32767:
-        return True
-    return False
+    return value >= -32768 and value <= 32767
 
 
 def min_value_constraint(value, limit):
     """Test minimum value constraint."""
-    if value >= limit:
-        return True
-    return False
+    return value >= limit
 
 
 def max_value_constraint(value, limit):
     """Test maximum value constraint."""
-    if value <= limit:
-        return True
-    return False
+    return value <= limit
 
 
 def enum_constraint(value, enum):
     """Test value in predefined set constraint."""
-    if str(value).lower() in enum:
-        return True
-    return False
+    return str(value).lower() in enum
 
 
 def date_constraint(value, enum):
     """Test date constraint."""
-    if DATE.match(value):
-        return True
-    return False
+    return DATE.match(value)
 
 
 def test_constraint(value, constraint):
@@ -272,13 +257,10 @@ def convert_lat_lon(location):
     if location.endswith(("E", "W")):
         sign = {"N": "", "E": "", "S": "-", "W": "-"}
         parts = re.split(r"\s*([NESW])\s*", location)
-        string = "%s%s,%s%s" % (sign[parts[1]], parts[0], sign[parts[3]], parts[2])
-        return string
+        return f"{sign[parts[1]]}{parts[0]},{sign[parts[3]]}{parts[2]}"
     if re.match(r"-*\d+\.*\d*,-*\d+\.*\d*", location):
         return location
-    if location:
-        return None
-    return ""
+    return None if location else ""
 
 
 def convert_to_type(key, raw_value, to_type, *, translate=None):
@@ -316,36 +298,12 @@ def convert_to_type(key, raw_value, to_type, *, translate=None):
         value = str(raw_value)
     if value is None:
         LOGGER.warning(
-            "%s value %s is not a valid %s", key, str(raw_value), to_type,
+            "%s value %s is not a valid %s",
+            key,
+            str(raw_value),
+            to_type,
         )
     return value
-
-
-# def calculator():
-#     """Template-based calculator."""
-#     value1, operator, value2 = operation.split(" ")
-#     if value1 == "{}":
-#         value1 = float(value)
-#         value2 = float(value2)
-#     elif value2 == "{}":
-#         value2 = float(value)
-#         value1 = float(value1)
-#     if operator == "+":
-#         return value1 + value2
-#     elif operator == "-":
-#         return value1 - value2
-#     elif operator == "*":
-#         return value1 * value2
-#     elif operator == "/":
-#         try:
-#             return value1 / value2
-#         except ZeroDivisionError:
-#             return None
-#     elif operator == "%":
-#         if operator == "%":
-#             return value1 % value2
-#     else:
-#         return None
 
 
 def calculate(string):
@@ -359,10 +317,8 @@ def calculate(string):
         "**": pow,
     }
     string = string.replace(" ", "")
-    try:
+    with contextlib.suppress(ValueError):
         return float(string)
-    except ValueError:
-        pass
     parts = re.split(r"(\(.+\))", string)
     if len(parts) > 1:
         for index, part in enumerate(parts):
@@ -370,7 +326,7 @@ def calculate(string):
                 part = part[1:-1]
                 parts[index] = str(calculate(part))
         string = "".join(parts)
-    for function in operators.keys():
+    for function in operators:
         left, operator, right = string.partition(function)
         if operator in operators:
             try:
@@ -383,7 +339,7 @@ def lookup_attribute_value(identifier, attribute, shared_values):
     """Lookup an indexed attribute value."""
     value_type = shared_values["_types"]["attributes"][attribute]["type"]
     opts = {
-        "id_field": "%s_id" % shared_values["_index_type"],
+        "id_field": f'{shared_values["_index_type"]}_id',
         "primary_id": identifier,
         "attribute": attribute,
         "value_type": value_type,
@@ -397,11 +353,9 @@ def lookup_attribute_value(identifier, attribute, shared_values):
     hits = res["hits"]["hits"]
     try:
         if len(hits) == 1:
-            inner_hits = hits[0]["inner_hits"]["%s_values" % attribute]["hits"]["hits"]
+            inner_hits = hits[0]["inner_hits"][f"{attribute}_values"]["hits"]["hits"]
             if len(inner_hits) == 1:
-                field_values = inner_hits[0]["fields"][
-                    "attributes.%s_value" % value_type
-                ]
+                field_values = inner_hits[0]["fields"][f"attributes.{value_type}_value"]
                 if len(field_values) == 1:
                     shared_values[identifier][attribute] = field_values[0]
                     return field_values[0]
@@ -443,9 +397,7 @@ def calculator(value, operation, row_values, shared_values, template_type):
     """Template-based calculator."""
     # print(dict(shared_values))
     operation = apply_template(value, operation, row_values, shared_values)
-    if template_type == "template":
-        return operation
-    return calculate(operation)
+    return operation if template_type == "template" else calculate(operation)
 
 
 def validate_values(values, key, types, row_values, shared_values, blanks):
@@ -457,17 +409,23 @@ def validate_values(values, key, types, row_values, shared_values, blanks):
     for value in values:
         if value in blanks:
             continue
-        if "function" in types[key] or "template" in types[key]:
+        if "fuction" in types[key] or "template" in types[key]:
             if re.match(r"^\d+\.\d+e[\+-]\d+$", value):
                 value = str(float(value))
             try:
                 template_type = "function" if "function" in types[key] else "template"
                 value = calculator(
-                    value, types[key][template_type], row_values, shared_values, template_type
+                    value,
+                    types[key][template_type],
+                    row_values,
+                    shared_values,
+                    template_type,
                 )
             except ValueError:
                 continue
-        value = convert_to_type(key, value, key_type, translate=types[key].get("translate", None))
+        value = convert_to_type(
+            key, value, key_type, translate=types[key].get("translate", None)
+        )
         if isinstance(types[key], str):
             validated.append(value)
             continue
@@ -476,11 +434,9 @@ def validate_values(values, key, types, row_values, shared_values, blanks):
         if isinstance(value, str):
             if not value:
                 continue
-            try:
+            with contextlib.suppress(KeyError):
                 # print(types[key]["translate"])
                 value = types[key]["translate"][value.lower()]
-            except KeyError:
-                pass
         try:
             valid = test_constraint(value, key_type)
             if valid:
@@ -498,8 +454,7 @@ def apply_value_template(prop, value, attribute, *, taxon_types, has_taxon_data)
     """Set value using template."""
     template = re.compile(r"^(.*?\{\{)(.+)(\}\}.*)$")
     new_prop = prop.replace("taxon_", "")
-    match = template.match(str(value))
-    if match:
+    if match := template.match(str(value)):
         groups = match.groups()
         if groups[1] and groups[1] in attribute:
             has_taxon_data = True
@@ -514,17 +469,18 @@ def apply_value_template(prop, value, attribute, *, taxon_types, has_taxon_data)
                     str(new_value),
                     groups[2].replace("}}", ""),
                 )
-            taxon_types.update({new_prop: new_value})
-            taxon_types.update({"group": "taxon"})
-            if prop in taxon_types:
-                del taxon_types[prop]
+            update_taxon_types(taxon_types, new_prop, new_value, prop)
     else:
         has_taxon_data = True
-        taxon_types.update({new_prop: value})
-        taxon_types.update({"group": "taxon"})
-        if prop in taxon_types:
-            del taxon_types[prop]
+        update_taxon_types(taxon_types, new_prop, value, prop)
     return has_taxon_data
+
+
+def update_taxon_types(taxon_types, new_prop, value, prop):
+    """Set taxon attribute property."""
+    taxon_types.update({new_prop: value, "group": "taxon"})
+    if prop in taxon_types:
+        del taxon_types[prop]
 
 
 def add_attributes(
@@ -537,18 +493,17 @@ def add_attributes(
     meta=None,
     shared_values=None,
     row_values=None,
-    blanks=None
+    blanks=None,
 ):
     """Add attributes to a document."""
-    if attributes is None:
-        attributes = []
-    taxon_attributes = []
-    taxon_types = {}
-    if meta is None:
-        meta = {}
-    attribute_values = {}
-    if row_values is None:
-        row_values = {}
+    (
+        attributes,
+        meta,
+        row_values,
+        taxon_attributes,
+        taxon_types,
+        attribute_values,
+    ) = set_add_attributes_defaults(attributes, meta, row_values)
     for key, values in entry.items():
         if key in types:
             if not isinstance(values, list):
@@ -565,8 +520,8 @@ def add_attributes(
                     validated = validated[0]
                 row_values[key] = validated
                 if attr_type == "attributes":
-                    attribute = {"key": key, "%s_value" % types[key]["type"]: validated}
-                    attribute_values.update({key: attribute})
+                    attribute = {"key": key, f'{types[key]["type"]}_value': validated}
+                    attribute_values[key] = attribute
                 elif attr_type == "taxon_names":
                     attribute = {"name": validated, "class": key}
                 else:
@@ -606,13 +561,25 @@ def add_attributes(
             if has_taxon_data:
                 if "name" not in taxon_attribute_types:
                     taxon_attribute_types["name"] = attribute["key"]
-                taxon_attribute.update({"key": taxon_attribute_types["name"]})
+                taxon_attribute["key"] = taxon_attribute_types["name"]
                 # taxon_attribute.update({"name": taxon_attribute_types["key"]})
                 taxon_attributes.append(taxon_attribute)
-                taxon_types.update(
-                    {taxon_attribute_types["name"]: taxon_attribute_types}
-                )
+                taxon_types[taxon_attribute_types["name"]] = taxon_attribute_types
     return attributes, taxon_attributes, taxon_types
+
+
+def set_add_attributes_defaults(attributes, meta, row_values):
+    """Set default values for add_attributes."""
+    if attributes is None:
+        attributes = []
+    taxon_attributes = []
+    taxon_types = {}
+    if meta is None:
+        meta = {}
+    attribute_values = {}
+    if row_values is None:
+        row_values = {}
+    return attributes, meta, row_values, taxon_attributes, taxon_types, attribute_values
 
 
 def chunks(arr, n):
@@ -755,10 +722,12 @@ def process_row_values(row, types, data):
                     if "separator" in meta and any(
                         sep in value for sep in meta["separator"]
                     ):
-                        separator = "|".join([re.escape(sep) for sep in meta["separator"]])
+                        separator = "|".join(
+                            [re.escape(sep) for sep in meta["separator"]]
+                        )
                         data[group][key] = re.split(rf"\s*{separator}\s*", value)
                         if "limit" in meta:
-                            data[group][key] = data[group][key][:meta["limit"]]
+                            data[group][key] = data[group][key][: meta["limit"]]
                     elif value is not None and value != "None":
                         data[group][key] = value
                 except IndexError:
@@ -778,12 +747,11 @@ def process_taxon_names(data, types, row, names):
         )
     if data["taxonomy"] and names:
         for key in names.keys():
-            if key in data["taxonomy"]:
-                if data["taxonomy"][key] in names[key]:
-                    data["taxonomy"]["_taxon_id"] = names[key][data["taxonomy"][key]][
-                        "taxon_id"
-                    ]
-                    data["taxonomy"][key] = names[key][data["taxonomy"][key]]["name"]
+            if key in data["taxonomy"] and data["taxonomy"][key] in names[key]:
+                data["taxonomy"]["_taxon_id"] = names[key][data["taxonomy"][key]][
+                    "taxon_id"
+                ]
+                data["taxonomy"][key] = names[key][data["taxonomy"][key]]["name"]
 
 
 def process_features(data):
@@ -802,7 +770,9 @@ def contains_excluded_value(data, exclusions):
                 return True
 
 
-def process_row(types, names, row, shared_values, blanks, *, index_type="assembly", exclusions=None):
+def process_row(
+    types, names, row, shared_values, blanks, *, index_type="assembly", exclusions=None
+):
     """Process a row of data."""
     data = {
         "attributes": {},
@@ -838,7 +808,7 @@ def process_row(types, names, row, shared_values, blanks, *, index_type="assembl
     ):
         row_id = data["identifiers"][f"{index_type}_id"]
     row_values = {}
-    for attr_type in list(["attributes", "features", "identifiers", "taxon_names"]):
+    for attr_type in ["attributes", "features", "identifiers", "taxon_names"]:
         if attr_type in data and data[attr_type]:
             (
                 data[attr_type],
@@ -851,19 +821,18 @@ def process_row(types, names, row, shared_values, blanks, *, index_type="assembl
                 meta=data["metadata"],
                 shared_values=shared_values,
                 row_values=row_values,
-                blanks=blanks
+                blanks=blanks,
             )
         else:
             data[attr_type] = []
-    if row_id is not None:
-        if "attributes" in taxon_data and taxon_data["attributes"]:
-            for attr in taxon_data["attributes"]:
-                attr.update(
-                    {
-                        "source_index": index_type,
-                        "source_id": row_id,
-                    }
-                )
+    if row_id is not None and "attributes" in taxon_data and taxon_data["attributes"]:
+        for attr in taxon_data["attributes"]:
+            attr.update(
+                {
+                    "source_index": index_type,
+                    "source_id": row_id,
+                }
+            )
     process_taxon_names(data, types, row, names)
     process_features(data)
     return data, taxon_data, taxon_types.get("attributes", {})
@@ -893,44 +862,41 @@ def set_column_indices(types, header):
     for index, title in enumerate(header):
         if title in headers:
             duplicate_headers[title].update([headers[title], index])
-        headers.update({title: index})
+        headers[title] = index
     headers = {title: index for index, title in enumerate(header)}
     for entries in types.values():
         for value in entries.values():
-            if isinstance(value, dict):
-                if "header" in value:
-                    if isinstance(value["header"], list):
-                        # convert list of headers to list of indices
-                        value.update(
-                            {
-                                "index": [
-                                    find_index_for_header(
-                                        head, headers, duplicate_headers
-                                    )
-                                    for head in value["header"]
-                                ]
-                            }
-                        )
-                    else:
-                        value.update(
-                            {
-                                "index": find_index_for_header(
-                                    value["header"], headers, duplicate_headers
-                                )
-                            }
-                        )
+            if isinstance(value, dict) and "header" in value:
+                if isinstance(value["header"], list):
+                    # convert list of headers to list of indices
+                    value.update(
+                        {
+                            "index": [
+                                find_index_for_header(head, headers, duplicate_headers)
+                                for head in value["header"]
+                            ]
+                        }
+                    )
+                else:
+                    value.update(
+                        {
+                            "index": find_index_for_header(
+                                value["header"], headers, duplicate_headers
+                            )
+                        }
+                    )
 
 
 def write_imported_rows(rows, opts, *, types, header=None, label="imported"):
     """Write imported rows to processed file."""
-    file_key = "%s-exception" % opts["index"]
-    dir_key = "%s-dir" % opts["index"]
+    file_key = f'{opts["index"]}-exception'
+    dir_key = f'{opts["index"]}-dir'
     if file_key in opts and opts[file_key]:
         outdir = opts[file_key]
     else:
-        outdir = "%s/%s" % (opts[dir_key], label)
+        outdir = f"{opts[dir_key]}/{label}"
     os.makedirs(outdir, exist_ok=True)
-    outfile = "%s/%s" % (outdir, types["file"]["name"])
+    outfile = f'{outdir}/{types["file"]["name"]}'
     data = []
     header_len = 0
     if header is not None:
@@ -938,11 +904,9 @@ def write_imported_rows(rows, opts, *, types, header=None, label="imported"):
         header_len = 1
     if isinstance(rows, dict):
         for row_set in rows.values():
-            for row in row_set:
-                data.append(row)
+            data.extend(iter(row_set))
     else:
-        for row in rows:
-            data.append(row)
+        data.extend(iter(rows))
     LOGGER.info(
         "Writing %d records to %s file '%s'", len(data) - header_len, label, outfile
     )
@@ -951,7 +915,7 @@ def write_imported_rows(rows, opts, *, types, header=None, label="imported"):
 
 def write_spellchecked_taxa(spellings, opts, *, types):
     """Write spellchecked taxa to file."""
-    dir_key = "%s-dir" % opts["index"]
+    dir_key = f'{opts["index"]}-dir'
     filepath = Path(types["file"]["name"])
     extensions = "".join(filepath.suffixes)
     file_basename = str(filepath).replace(extensions, "")
@@ -959,14 +923,14 @@ def write_spellchecked_taxa(spellings, opts, *, types):
         "spellcheck": "exceptions",
         "synonym": "imported",
     }
-    for group in dirs.keys():
-        taxa = []
-        for name, obj in spellings[group].items():
-            taxa.append([obj["taxon_id"], name, obj["rank"]] + obj["matches"])
-        if taxa:
-            outdir = "%s/%s" % (opts[dir_key], dirs[group])
+    for group in dirs:
+        if taxa := [
+            [obj["taxon_id"], name, obj["rank"]] + obj["matches"]
+            for name, obj in spellings[group].items()
+        ]:
+            outdir = f"{opts[dir_key]}/{dirs[group]}"
             os.makedirs(outdir, exist_ok=True)
-            outfile = "%s/%s" % (outdir, "%s.spellcheck.tsv" % file_basename)
+            outfile = f"{outdir}/{file_basename}.spellcheck.tsv"
             LOGGER.info(
                 "Writing %d %s suggestions to spellcheck file '%s'",
                 len(taxa),
@@ -981,8 +945,8 @@ def write_spellchecked_taxa(spellings, opts, *, types):
 def write_imported_taxa(taxa, opts, *, types):
     """Write imported taxa to file."""
     imported = []
-    file_key = "%s-exception" % opts["index"]
-    dir_key = "%s-dir" % opts["index"]
+    file_key = f'{opts["index"]}-exception'
+    dir_key = f'{opts["index"]}-dir'
     filepath = Path(types["file"]["name"])
     extensions = "".join(filepath.suffixes)
     file_basename = str(filepath).replace(extensions, "")
@@ -991,16 +955,14 @@ def write_imported_taxa(taxa, opts, *, types):
         for obj in arr:
             if obj.get("additional_taxon", False):
                 prefix = "#"
-            imported.append(
-                ["%s%s" % (prefix, str(obj["taxon_id"])), name, obj["rank"]]
-            )
+            imported.append([f'{prefix}{str(obj["taxon_id"])}', name, obj["rank"]])
     if imported:
         if file_key in opts and opts[file_key]:
             outdir = opts[file_key]
         else:
-            outdir = "%s/imported" % opts[dir_key]
+            outdir = f"{opts[dir_key]}/imported"
         os.makedirs(outdir, exist_ok=True)
-        outfile = "%s/%s" % (outdir, "%s.taxon_ids.tsv" % file_basename)
+        outfile = f"{outdir}/{file_basename}.taxon_ids.tsv"
         LOGGER.info(
             "Writing %d taxon_ids to imported file '%s'",
             len(imported),

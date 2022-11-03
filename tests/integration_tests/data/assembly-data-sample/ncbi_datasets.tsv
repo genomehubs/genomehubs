@@ -74,14 +74,13 @@ taxId	organismName	genbankAssmAccession	biosampleAccession	refseqAssmAccession	w
 9615	None	GCA_000331495.1	SAMN01737209		None	None	PRJNA176193	female	None						Contig	None	GlaxoSmithKline		
 9622	None	GCA_001883655.1	SAMN04312209		None	None	PRJNA304992	female	Kenya WGF20		Kenya				Chromosome	None	Smithsonian Institution		
 9622	None	GCA_001887905.1	SAMN04312208		None	None	PRJNA304992	male	South Africa Ananku		South Africa				Chromosome	None	Smithsonian Institution		
-9615	None	GCA_002087435.1	SAMN04320964		None	None	PRJNA305243	male	Yoclon						Scaffold	None	CAAS		
 9627	None	GCA_003160815.1	SAMN06553695	GCF_003160815.1	None	None	PRJNA378561	male	None						Scaffold	None	University of Illinois at Urbana-Champaign		
 286419	None	GCA_003254725.2	SAMN09397198		None	None	PRJNA475652	female	Sandy						Chromosome	None	James Cook University		
 494514	None	GCA_004023825.1	SAMN07678118		None	None	PRJNA399424;PRJNA312960;PRJNA533106	None	US066						Scaffold	None	Broad Institute		
 9615	None	GCA_004027395.1	SAMN07678141		None	None	PRJNA399441;PRJNA312960;PRJNA533106	None	BS72						Scaffold	None	Broad Institute		
 9622	None	GCA_004216515.1	SAMN09917439		None	None	PRJNA488046	female	Sister 1						Scaffold	None	Stanford University		
 9615	None	GCA_004886185.2	SAMN10749847		None	None	PRJNA512874	male	MU ID 185726						Chromosome	None	University of Missouri		
-9615	None	GCA_005446665.1	SAMN04851098		None	None	PRJNA539970;PRJNA540662	female	Zoey						Contig	None	University of Michigan		
+9615	None	GCA_005444595.1	SAMN04851098	GCF_005444595.1	None	None	PRJNA318403;PRJNA540662	female	Zoey						Chromosome	None	University of Michigan		
 9612	None	GCA_007922845.1	SAMN03366711		None	None	PRJNA541172	female	RKW13451		USA: San Diego Zoo, CA				Scaffold	None	The University of Melbourne		
 9615	None	GCA_008641055.3	SAMN12574852		None	None	PRJNA560310	female	Nala						Chromosome	None	James Cook University		
 9615	None	GCA_011100685.1	SAMN13230619	GCF_011100685.1	None	None	PRJNA587469	female	Mischka						Chromosome	None	Uppsala University		

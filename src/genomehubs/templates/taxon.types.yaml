@@ -1,5 +1,5 @@
 file:
-  display_group: misc
+  display_group: general
 attributes:
   assembly_span:
     constraint:

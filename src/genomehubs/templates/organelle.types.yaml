@@ -1,5 +1,5 @@
 file:
-  display_group: misc
+  display_group: general
   format: tsv
   header: true
   source_url_stub: https://www.ncbi.nlm.nih.gov/nuccore/
@@ -40,6 +40,15 @@ attributes:
     synonyms:
       - biosample_accession
     type: keyword
+  organelle:
+    constraint:
+      enum:
+        - nucleus
+        - mitochondrion
+        - chloroplast
+        - plastid
+        - apicoplast
+    default: "{{organelle}}"
   gc_percent:
     display_group: metrics
     display_level: 1

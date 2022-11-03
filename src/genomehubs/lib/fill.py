@@ -76,8 +76,7 @@ def get_max_depth(es, *, index):
         "params": {"path": "lineage", "field": "node_depth"},
     }
     res = es.search_template(index=index, body=body)
-    max_depth = res["aggregations"]["depths"]["max_depth"]["value"]
-    return max_depth
+    return res["aggregations"]["depths"]["max_depth"]["value"]
 
 
 def get_max_depth_by_lineage(es, *, index, root):
@@ -92,8 +91,7 @@ def get_max_depth_by_lineage(es, *, index, root):
         },
     }
     res = es.search_template(index=index, body=body)
-    max_depth = res["aggregations"]["depths"]["root"]["max_depth"]["value"]
-    return max_depth
+    return res["aggregations"]["depths"]["root"]["max_depth"]["value"]
 
 
 def stream_nodes_by_root_depth(es, *, index, root, depth, size=10):
@@ -145,10 +143,9 @@ def earliest(arr, *args):
     """Select earliest date from a list."""
     if not isinstance(arr, list):
         arr = [arr]
-    if arr:
-        if isinstance(arr[0], str):
-            date_arr = [datetime.strptime(date, "%Y-%m-%d") for date in arr]
-            return datetime.strftime(min(date_arr), "%Y-%m-%d")
+    if arr and isinstance(arr[0], str):
+        date_arr = [datetime.strptime(date, "%Y-%m-%d") for date in arr]
+        return datetime.strftime(min(date_arr), "%Y-%m-%d")
     return min(arr + list(args))
 
 
@@ -156,10 +153,9 @@ def latest(arr, *args):
     """Select earliest date from a list."""
     if not isinstance(arr, list):
         arr = [arr]
-    if isinstance(arr[0], str):
-        if re.match(r"\d{4}-\d{2}-\d{2}", arr[0]):
-            date_arr = [datetime.strptime(date, "%Y-%m-%d") for date in arr]
-            return datetime.strftime(max(date_arr), "%Y-%m-%d")
+    if isinstance(arr[0], str) and re.match(r"\d{4}-\d{2}-\d{2}", arr[0]):
+        date_arr = [datetime.strptime(date, "%Y-%m-%d") for date in arr]
+        return datetime.strftime(max(date_arr), "%Y-%m-%d")
     return max(arr + list(args))
 
 
@@ -174,7 +170,7 @@ def median_list(arr):
     if length % 2 == 1:
         return [median(arr)]
     sorted_arr = sorted(arr, reverse=True)
-    return list(set([sorted_arr[int(length / 2)], sorted_arr[int(length / 2) - 1]]))
+    return list({sorted_arr[length // 2], sorted_arr[length // 2 - 1]})
 
 
 def mode_list(arr):
@@ -323,18 +319,15 @@ def set_traverse_values(
                     if summary == "primary" and "values" not in attribute:
                         summary = summary_types[0]
                     attribute[value_type] = value
-                    if count:
-                        attribute["count"] = count
-                    else:
-                        attribute["count"] = len(values)
+                    attribute["count"] = count or len(values)
                     if summary == "list":
                         attribute["length"] = deduped_list_length(values)
                     attribute["aggregation_method"] = summary
                     attribute["aggregation_source"] = source
-                traverse_value = value if value else []
+                traverse_value = value or []
             idx += 1
         if traverse and source == "descendant" and summary == traverse:
-            traverse_value = value if value else []
+            traverse_value = value or []
         elif summary != "list":
             if summary.startswith("median"):
                 summary = "median"
@@ -375,7 +368,7 @@ def summarise_attribute_values(
     if values is None and "values" not in attribute:
         return None, None, None
     if "summary" in meta:
-        value_type = "%s_value" % meta["type"]
+        value_type = f'{meta["type"]}_value'
         primary_values = []
         if "values" in attribute:
             # iterate_values(attribute, meta)
@@ -396,12 +389,11 @@ def summarise_attribute_values(
             meta["summary"] = [meta["summary"]]
         try:
             summaries = meta["summary"][:]
-            if traverse and source != "ancestor":
-                if summaries[0] != traverse:
-                    if summaries[0] != "primary":
-                        summaries = [traverse] + summaries
-                    elif summaries[1] != "primary":
-                        summaries.insert(1, traverse)
+            if traverse and source != "ancestor" and summaries[0] != traverse:
+                if summaries[0] != "primary":
+                    summaries = [traverse] + summaries
+                elif summaries[1] != "primary":
+                    summaries.insert(1, traverse)
             traverse_value, max_value, min_value = set_traverse_values(
                 summaries,
                 values,
@@ -421,7 +413,7 @@ def summarise_attribute_values(
                 f"Unable to generate summary values for attribute {meta['key']}"
             )
             sys.exit(1)
-        if isinstance(max_value, float) or isinstance(max_value, int):
+        if isinstance(max_value, (float, int)):
             attribute["max"] = max_value
             attribute["min"] = min_value
         elif meta["type"] == "date" and max_value and min_value:
@@ -512,8 +504,7 @@ def set_values_from_descendants(
             traverseable = False
         if not traverseable or taxon_id in limits[key]:
             continue
-        local_limit = meta[key].get("traverse_limit", traverse_limit)
-        if local_limit:
+        if local_limit := meta[key].get("traverse_limit", traverse_limit):
             if (
                 descendant_ranks is not None
                 and local_limit in descendant_ranks[taxon_id]
@@ -542,12 +533,6 @@ def set_values_from_descendants(
             attr_dict.update({key: attribute})
             if parent is not None:
                 parents[parent][key]["count"] += 1
-                # parents[parent][key]["prefixed_values"] = list(
-                #     set(
-                #         parents[parent][key]["prefixed_values"]
-                #         + attribute.get("prefixed_values", [])
-                #     )
-                # )
                 if isinstance(summary_value, list):
                     parents[parent][key]["values"] = list(
                         set(parents[parent][key]["values"] + summary_value)
@@ -576,16 +561,23 @@ def set_attributes_to_descend(meta, traverse_limit):
     desc_attrs = set()
     desc_attr_limits = {}
     for key, value in meta.items():
-        if "traverse" in value and value["traverse"]:
-            if "traverse_direction" not in value or value["traverse_direction"] in (
-                "down",
-                "both",
-            ):
-                desc_attrs.add(key)
-                if "traverse_limit" in value:
-                    desc_attr_limits.update({key: value["traverse_limit"]})
-                elif traverse_limit != "null":
-                    desc_attr_limits.update({key: traverse_limit})
+        if (
+            "traverse" in value
+            and value["traverse"]
+            and (
+                "traverse_direction" not in value
+                or value["traverse_direction"]
+                in (
+                    "down",
+                    "both",
+                )
+            )
+        ):
+            desc_attrs.add(key)
+            if "traverse_limit" in value:
+                desc_attr_limits[key] = value["traverse_limit"]
+            elif traverse_limit != "null":
+                desc_attr_limits[key] = traverse_limit
     return desc_attrs, desc_attr_limits
 
 
@@ -612,7 +604,7 @@ def track_missing_attribute_values(
                     )
                     obj["keys"].remove(key)
             if obj["keys"]:
-                missing_from_descendants.update({child_id: obj})
+                missing_from_descendants[child_id] = obj
             else:
                 # yield when all values filled or removed
                 yield obj["node"]["_id"], obj["node"]["_source"]
@@ -677,10 +669,8 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
             depth=root_depth,
             size=50,
         )
-        ctr = 0
-        for node in nodes:
+        for ctr, node in enumerate(nodes):
             track_descendant_ranks(node, descendant_ranks)
-            ctr += 1
             changed = False
             attr_dict = {}
             if "attributes" in node["_source"] and node["_source"]["attributes"]:
@@ -731,7 +721,7 @@ def copy_attribute_summary(source, meta):
         elif key != "list" and key in source:
             dest[key] = source[key]
     try:
-        dest["%s_value" % meta["type"]] = source["%s_value" % meta["type"]]
+        dest[f'{meta["type"]}_value'] = source[f'{meta["type"]}_value']
     except KeyError as err:
         raise (err)
     dest["count"] = source["count"]
@@ -745,9 +735,12 @@ def stream_missing_attributes_at_level(es, *, nodes, attrs, template, level=1):
         taxon_id = node["_source"]["taxon_id"]
         fill_attrs = []
         if "attributes" in node["_source"]:
-            for attribute in node["_source"]["attributes"]:
-                if attribute["key"] in attrs:
-                    fill_attrs.append(attribute)
+            fill_attrs.extend(
+                attribute
+                for attribute in node["_source"]["attributes"]
+                if attribute["key"] in attrs
+            )
+
         if not fill_attrs:
             continue
         meta = template["types"]["attributes"]
@@ -788,9 +781,14 @@ def traverse_from_root(es, opts, *, template, root=None, max_depth=None, log=Tru
     meta = template["types"]["attributes"]
     attrs = set({})
     for key, value in meta.items():
-        if "traverse" in value and value["traverse"]:
-            if "traverse_direction" not in value or value["traverse_direction"] != "up":
-                attrs.add(key)
+        if (
+            "traverse" in value
+            and value["traverse"]
+            and (
+                "traverse_direction" not in value or value["traverse_direction"] != "up"
+            )
+        ):
+            attrs.add(key)
     while root_depth >= 0:
         if log:
             LOGGER.info("Filling values at root depth %d" % root_depth)
@@ -860,7 +858,7 @@ def traverse_handler(es, opts, template):
     LOGGER.info("Filling values in subtrees")
     with Pool(processes=threads) as p:
         with tqdm(total=len(roots), unit=" subtrees") as pbar:
-            for root in p.imap_unordered(traverse_helper, roots):
+            for _ in p.imap_unordered(traverse_helper, roots):
                 pbar.update()
     LOGGER.info("Connecting subtrees")
     traverse_tree(es, opts, template, opts["traverse-root"], subtree_depth)
