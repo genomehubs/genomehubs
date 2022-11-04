@@ -3,6 +3,7 @@
 
 import contextlib
 import pytest
+import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -36,6 +37,7 @@ class TestLandingPage:
         assert histogram is not None
         svg = None
         with contextlib.suppress(Exception):
+            time.sleep(3)
             svg = histogram.find_element(By.TAG_NAME, "svg")
         assert svg is not None
         bars = None
