@@ -168,7 +168,7 @@ jobs:
       - name: Start UI
         run: |
           chmod 755 dist/artifact/genomehubs-ui-linux
-          ./dist/artifact/genomehubs-ui-linux &
+          GH_SITENAME=test_instance ./dist/artifact/genomehubs-ui-linux &
           sleep 5
       - name: Run UI tests
         run: |

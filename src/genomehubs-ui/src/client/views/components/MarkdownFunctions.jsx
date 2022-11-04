@@ -1,5 +1,6 @@
 import { Link, useLocation } from "@reach/router";
 import React, { Fragment, createElement, useEffect, useState } from "react";
+import { basename, siteName } from "../reducers/location";
 
 import AggregationIcon from "./AggregationIcon";
 import Grid from "@material-ui/core/Grid";
@@ -27,8 +28,6 @@ import withPages from "../hocs/withPages";
 import withSiteName from "../hocs/withSiteName";
 import { withStyles } from "@material-ui/core/styles";
 
-const siteName = SITENAME;
-const basename = BASENAME;
 const pagesUrl = PAGES_URL;
 const webpackHash = __webpack_hash__ || COMMIT_HASH;
 // const webpackHash = COMMIT_HASH;

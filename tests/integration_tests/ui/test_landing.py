@@ -17,7 +17,7 @@ class TestLandingPage:
     def test_title(self):
         """Check page title is set."""
         self.driver.get(BASE_URL)
-        assert self.driver.title == "GoaT"
+        assert self.driver.title == "test_instance"
 
     def test_histogram(self):
         """Check histogram loads."""
@@ -26,6 +26,9 @@ class TestLandingPage:
         )
         histogram = None
         with contextlib.suppress(Exception):
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, "theme-base"))
+            )
             WebDriverWait(self.driver, 10).until(
                 EC.visibility_of_element_located((By.ID, "histogram"))
             )

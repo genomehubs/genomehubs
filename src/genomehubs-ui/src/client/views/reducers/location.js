@@ -22,7 +22,19 @@ export const getBasename = () => {
 
 export const basename = getBasename();
 
-export const siteName = SITENAME || "";
+export const getSitename = () => {
+  if (
+    window &&
+    window.process &&
+    window.process.ENV &&
+    window.process.ENV.GH_SITENAME
+  ) {
+    return window.process.ENV.GH_SITENAME;
+  }
+  return SITENAME || "";
+};
+
+export const siteName = getSitename();
 
 export const setPathname = createAction("SET_PATHNAME");
 export const pathname = handleAction(

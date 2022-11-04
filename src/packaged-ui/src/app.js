@@ -9,6 +9,7 @@ const GH_API_HOST = process.env.GH_API_HOST || "localhost";
 const GH_SUGGESTED_TERM = process.env.GH_SUGGESTED_TERM || "Nematoda";
 const GH_API_VERSION = process.env.GH_API_VERSION || "v2";
 const GH_ARCHIVE = (process.env.GH_ARCHIVE || "").split(" ");
+const GH_SITENAME = process.env.GH_SITENAME || "";
 const GH_BASENAME =
   `/${process.env.GH_BASENAME}`.replace(/^\/\//, "/").replace(/\/$/, "") || "";
 const GH_API_URL =
@@ -18,8 +19,9 @@ const app = express();
 
 const ENV = {
   GH_API_URL,
-  GH_BASENAME,
   GH_ARCHIVE,
+  GH_BASENAME,
+  GH_SITENAME,
   GH_SUGGESTED_TERM,
 };
 
