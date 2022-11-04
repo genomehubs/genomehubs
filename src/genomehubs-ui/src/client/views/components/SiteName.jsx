@@ -1,6 +1,6 @@
+import { Link, useLocation } from "@reach/router";
 import React, { memo, useState } from "react";
 
-import { Link } from "@reach/router";
 import Popover from "@material-ui/core/Popover";
 import Typography from "@material-ui/core/Typography";
 import { compose } from "recompose";
@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
 const SiteName = ({ siteName, basename, archive }) => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
+  const location = useLocation();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -40,9 +41,13 @@ const SiteName = ({ siteName, basename, archive }) => {
   if (archive) {
     versions = archive
       .filter((v) => v != version && v > "")
-      // .map((v) => <Typography className={classes.typography}>{v}</Typography>);
       .map((v) => (
-        <Link key={v} to={`/${v}/`}>
+        <Link
+          key={v}
+          to={`${location.pathname
+            .replace(version, v)
+            .replace(/\/latest/, "")}${location.search}${location.hash}`}
+        >
           <Typography className={classes.typography}>{v}</Typography>
         </Link>
       ));
@@ -57,7 +62,7 @@ const SiteName = ({ siteName, basename, archive }) => {
               cursor: "pointer",
               fontSize: "0.9em",
               lineHeight: "1em",
-              color: "gray",
+              color: "#bbbbbb",
             }}
             onClick={handleClick}
           >

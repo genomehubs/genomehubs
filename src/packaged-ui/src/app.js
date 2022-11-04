@@ -9,6 +9,8 @@ const GH_API_HOST = process.env.GH_API_HOST || "localhost";
 const GH_SUGGESTED_TERM = process.env.GH_SUGGESTED_TERM || "Nematoda";
 const GH_API_VERSION = process.env.GH_API_VERSION || "v2";
 const GH_ARCHIVE = (process.env.GH_ARCHIVE || "").split(" ");
+const GH_BASENAME =
+  `/${process.env.GH_BASENAME}`.replace(/^\/\//, "/").replace(/\/$/, "") || "";
 const GH_API_URL =
   process.env.GH_API_URL ||
   `http://${GH_API_HOST}:${GH_API_PORT}/api/${GH_API_VERSION}`;
@@ -16,6 +18,7 @@ const app = express();
 
 const ENV = {
   GH_API_URL,
+  GH_BASENAME,
   GH_ARCHIVE,
   GH_SUGGESTED_TERM,
 };
@@ -45,8 +48,20 @@ app.use(
 app.use(express.static("/genomehubs/local"));
 app.use(express.static(path.resolve(__dirname, "public")));
 app.use(
-  "/manifest.json",
+  `${GH_BASENAME}/manifest.json`,
   express.static(path.resolve(__dirname, "public/manifest.json"))
+);
+app.use(
+  `${GH_BASENAME}/icon-192.png`,
+  express.static(path.resolve(__dirname, "public/icon-192.png"))
+);
+app.use(
+  `${GH_BASENAME}/icon-512.png`,
+  express.static(path.resolve(__dirname, "public/icon-512.png"))
+);
+app.use(
+  `${GH_BASENAME}/favicon.ico`,
+  express.static(path.resolve(__dirname, "public/favicon.ico"))
 );
 
 // handle every other route with index.html, which will contain

@@ -46,7 +46,9 @@ module.exports = {
   // pages Path
   pagesPath: process.env.GH_PAGES_PATH || "./src/client/static",
   // url basename
-  basename: process.env.GH_BASENAME || "",
+  basename:
+    `/${process.env.GH_BASENAME}`.replace(/^\/\//, "/").replace(/\/$/, "") ||
+    "",
   // path to read flatfiles
   filePath: FILE_PATH,
   // version

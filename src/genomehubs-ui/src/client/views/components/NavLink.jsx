@@ -27,7 +27,10 @@ const NavLink = ({ to, tab, url, basename, siteName, dispatch, ...props }) => {
   return (
     <Link
       {...props}
-      to={to.replace(/\/+/, basename + "/")}
+      to={to
+        .replace(/\/+/, `${basename}/`)
+        .replace(`${basename}${basename}`, basename)
+        .replace(/\/\//, "/")}
       onClick={() => console.log(to)}
       getProps={({ isCurrent }) => {
         let css = tab

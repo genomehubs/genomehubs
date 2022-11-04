@@ -8,7 +8,19 @@ import qs from "../functions/qs";
 import { queryToStore } from "../querySync";
 import store from "../store";
 
-export const basename = BASENAME || "";
+export const getBasename = () => {
+  if (
+    window &&
+    window.process &&
+    window.process.ENV &&
+    window.process.ENV.GH_BASENAME
+  ) {
+    return window.process.ENV.GH_BASENAME;
+  }
+  return BASENAME || "";
+};
+
+export const basename = getBasename();
 
 export const siteName = SITENAME || "";
 
