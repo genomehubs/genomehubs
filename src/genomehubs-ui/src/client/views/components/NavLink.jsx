@@ -7,12 +7,21 @@ import styles from "./Styles.scss";
 import { useLocation } from "@reach/router";
 import withSiteName from "../hocs/withSiteName";
 
-const NavLink = ({ to, tab, url, basename, siteName, dispatch, ...props }) => {
+const NavLink = ({
+  to,
+  tab,
+  plain,
+  url,
+  basename,
+  siteName,
+  dispatch,
+  ...props
+}) => {
   const location = useLocation();
   if (url) {
     to = url;
   } else if (to) {
-    to = basename + "/" + to + location.search + location.hash;
+    to = basename + "/" + to + (plain ? "" : location.search + location.hash);
   } else if (props.href) {
     if (props.href.match(/\:\/\//)) {
       return (
@@ -22,7 +31,7 @@ const NavLink = ({ to, tab, url, basename, siteName, dispatch, ...props }) => {
         </a>
       );
     }
-    to = basename + "/" + props.href + location.search + location.hash;
+    to = "";
   }
   return (
     <Link
@@ -31,7 +40,6 @@ const NavLink = ({ to, tab, url, basename, siteName, dispatch, ...props }) => {
         .replace(/\/+/, `${basename}/`)
         .replace(`${basename}${basename}`, basename)
         .replace(/\/\//, "/")}
-      onClick={() => console.log(to)}
       getProps={({ isCurrent }) => {
         let css = tab
           ? classnames(styles.tab, { [styles.tabHighlight]: isCurrent })

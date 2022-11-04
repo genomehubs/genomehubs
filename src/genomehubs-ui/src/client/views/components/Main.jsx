@@ -3,6 +3,7 @@ import React, { Fragment, memo } from "react";
 import ExplorePage from "./ExplorePage";
 import GenericPage from "./GenericPage";
 import Landing from "./Landing";
+import MissingPage from "./MissingPage";
 import RecordPage from "./RecordPage";
 import Redirect from "./Redirect";
 import ReportPage from "./ReportPage";
@@ -36,6 +37,7 @@ const Main = ({ routes, basename }) => {
     <RecordPage path="/record" key="/record" />,
     <SourcesPage path="/sources" key="/sources" />,
     <ReportPage path="/report" key="/report" />,
+    <MissingPage default />,
   ];
   routes.allIds.forEach((routeName) => {
     if (!fixedRoutes[routeName]) {

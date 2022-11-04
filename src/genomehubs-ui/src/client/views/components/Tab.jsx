@@ -12,7 +12,7 @@ const Tab = ({ routeName, pageId, setRoute, routesById }) => {
   }, [routeName]);
 
   return (
-    <NavLink to={routeName} tab>
+    <NavLink to={routeName} tab plain>
       {routeName}
     </NavLink>
   );
