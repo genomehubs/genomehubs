@@ -37,7 +37,7 @@ const Main = ({ routes, basename }) => {
     <RecordPage path="/record" key="/record" />,
     <SourcesPage path="/sources" key="/sources" />,
     <ReportPage path="/report" key="/report" />,
-    <MissingPage default />,
+    <MissingPage default key="404" />,
   ];
   routes.allIds.forEach((routeName) => {
     if (!fixedRoutes[routeName]) {

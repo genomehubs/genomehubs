@@ -1,10 +1,9 @@
-import { useLocation, useNavigate } from "@reach/router";
-
 import NavLink from "./NavLink";
 import Page from "./Page";
 import React from "react";
 import classnames from "classnames";
 import styles from "./Styles.scss";
+import { useLocation } from "@reach/router";
 
 const NotFoundPanel = ({ path }) => {
   let css = classnames(
@@ -29,11 +28,9 @@ const NotFoundPanel = ({ path }) => {
 };
 
 const MissingPage = ({}) => {
-  const navigate = useNavigate();
   const location = useLocation();
-  // let text = <TextPanel pageId={"search.md"}></TextPanel>;
   let text = <NotFoundPanel path={location.pathname} />;
-  return <Page key={404} searchBox panels={[{ panel: text }]} />;
+  return <Page searchBox panels={[{ panel: text }]} />;
 };
 
 export default MissingPage;
