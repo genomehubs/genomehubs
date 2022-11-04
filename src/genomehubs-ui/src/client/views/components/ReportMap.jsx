@@ -69,7 +69,9 @@ const MarkerComponent = ({
       if (obj.sampleId) {
         link = (
           <NavLink
-            url={`${basename}/record?recordId=${obj.sampleId}&result=sample&taxonomy=${options.taxonomy}`}
+            url={`${basename || ""}/record?recordId=${
+              obj.sampleId
+            }&result=sample&taxonomy=${options.taxonomy}`}
           >
             {obj.sampleId}
           </NavLink>
@@ -83,7 +85,7 @@ const MarkerComponent = ({
           taxonomy: options.taxonomy,
         };
 
-        let url = `${basename}/search?${qs.stringify(newOptions)}`;
+        let url = `${basename || ""}/search?${qs.stringify(newOptions)}`;
         link = (
           <NavLink url={url}>click to view samples from this location</NavLink>
         );
