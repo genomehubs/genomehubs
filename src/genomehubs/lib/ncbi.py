@@ -5,6 +5,7 @@ import contextlib
 import gzip
 import re
 from collections import Counter
+from urllib.error import ContentTooShortError
 
 import ujson
 from Bio import SeqIO
@@ -24,7 +25,10 @@ def refseq_listing(collection):
     """Fetch a directory listing for a RefSeq collection."""
     pattern = re.compile(r"(\w+\.\d+\.genomic\.gbff\.gz)")
     url = f"{REFSEQ_FTP}/{collection}"
-    html = tofetch.fetch_url(url)
+    for _ in range(5):
+        with contextlib.suppress(ContentTooShortError):
+            html = tofetch.fetch_url(url)
+            break
     listing = []
     for line in html.split("\n"):
         if match := pattern.search(line):
