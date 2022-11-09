@@ -165,10 +165,11 @@ jobs:
         run: |
           sudo apt-get install -y chromium-browser
           pip install -r tests/integration_tests/ui/requirements.txt
+      - run: netstat -lt
       - name: Start UI
         run: |
           chmod 755 dist/artifact/genomehubs-ui-linux
-          GH_SITENAME=test_instance ./dist/artifact/genomehubs-ui-linux &
+          GH_SITENAME=test_instance GH_API_URL=http://localhost:3000/api/v2 ./dist/artifact/genomehubs-ui-linux &
           sleep 5
       - name: Run UI tests
         run: |
