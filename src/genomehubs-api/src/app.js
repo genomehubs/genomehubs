@@ -6,6 +6,7 @@ import compression from "compression";
 import { config } from "./api/v2/functions/config.js";
 import cookieParser from "cookie-parser";
 import express from "express";
+import { logAccess } from "./api/v2/functions/logger.js";
 import { logError } from "./api/v2/functions/logger.js";
 import path from "path";
 import qs from "./api/v2/functions/qs.js";

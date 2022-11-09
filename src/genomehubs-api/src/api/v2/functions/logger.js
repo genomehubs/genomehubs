@@ -70,17 +70,13 @@ export const logError = ({ req, message }) => {
 };
 
 export const logAccess = function ({ req, code, size }) {
-  let { url, method, httpVersion, headers } = req;
+  let url, method, httpVersion, headers;
+  if (req) {
+    ({ url, method, httpVersion, headers } = req);
+  }
 
   logger.info({
-    url,
-    method,
-    httpVersion,
-    host: headers.host,
-    code,
-    size,
-    referrer: undefined,
-    userAgent: headers["user-agent"],
+    message: `${url} ${method} ${httpVersion} ${headers.host} ${headers["user-agent"]}`,
   });
 };
 
