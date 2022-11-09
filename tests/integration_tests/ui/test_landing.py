@@ -18,6 +18,7 @@ class TestLandingPage:
     def test_title(self):
         """Check page title is set."""
         self.driver.get(BASE_URL)
+        time.sleep(2)
         assert self.driver.title == "test_instance"
 
     def test_histogram(self):
@@ -25,6 +26,7 @@ class TestLandingPage:
         self.driver.get(
             f"{BASE_URL}/report?report=histogram&x=assembly_date&rank=species&cat=assembly_level&stacked=true&includeEstimates=true&excludeAncestral%5B0%5D=assembly_span&excludeMissing%5B0%5D=assembly_span&caption=Progress%20of%20genome%20assemblies%20published%20on%20INSDC%20over%20time%2C%20by%20assembly%20level&taxonomy=ncbi&result=taxon"
         )
+        time.sleep(2)
         histogram = None
         with contextlib.suppress(Exception):
             WebDriverWait(self.driver, 10).until(
