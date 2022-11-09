@@ -24,7 +24,10 @@ const errorTransport = new transports.DailyRotateFile({
 
 const accessTransport = new transports.DailyRotateFile({
   filename: config.accessLog,
-  format: format.simple(),
+  format: combine(
+    timestamp(),
+    printf((info) => `${info.level}: ${[info.timestamp]}: ${info.message}`)
+  ),
   datePattern: "YYYY-MM-DD",
   zippedArchive: true,
   maxSize: "20m",
