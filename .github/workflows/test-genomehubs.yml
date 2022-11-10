@@ -159,7 +159,6 @@ jobs:
         run: |
           chmod 755 dist/artifact/genomehubs-api-linux
           CID=$(docker run --rm -d \
-              --name gh-api \
               -e GH_RELEASE=2022.02.23 \
               -e GH_HUBNAME=test_instance \
               -p 3000:3000 \
@@ -167,12 +166,10 @@ jobs:
               genomehubs/genomehubs-api:latest)
           sleep 5
           echo $CID
-          docker logs gh-api
+          docker logs $CID
           netstat -lt
-          CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4 | cut -d' ' -f 1)
+          CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4 | tail -n 1)
           echo $CIP
-          HIP=$(ip route get 1 | awk '{print $NF;exit}')
-          echo $HIP
           sleep 5
           genomehubs test \
               --base-url http://$CIP:3000/api/v2 \
@@ -185,13 +182,11 @@ jobs:
       - run: netstat -lt
       - name: Start UI
         run: |
-          HIP=$(ip route get 1 | awk '{print $NF;exit}')
-          echo $HIP
-          CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4 | cut -d' ' -f 1)
+          CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4 | tail -n 1)
           echo $CIP
           chmod 755 dist/artifact/genomehubs-ui-linux
           GH_SITENAME=test_instance \
-          GH_ORIGINS='http://$HIP:8880 http://localhost:8880 null' \
+          GH_ORIGINS='http://172.17.0.1:8880 http://localhost:8880 null' \
           GH_API_URL=http://$CIP:3000/api/v2 \
           ./dist/artifact/genomehubs-ui-linux &
           sleep 5
