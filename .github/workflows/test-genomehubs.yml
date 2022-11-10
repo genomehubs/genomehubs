@@ -158,18 +158,28 @@ jobs:
       - name: Start API
         run: |
           chmod 755 dist/artifact/genomehubs-api-linux
-          docker run --rm -d \
+          CID=$(docker run --rm -d \
+              --name gh-api \
               -e GH_RELEASE=2022.02.23 \
               -e GH_HUBNAME=test_instance \
               -p 3000:3000 \
               -v `pwd`/dist/artifact/genomehubs-api-linux:/genomehubs/genomehubs-api \
-              genomehubs/genomehubs-api:latest
+              genomehubs/genomehubs-api:latest)
           sleep 5
-      - name: Run API tests
-        run: |
+          echo $CID
+          docker logs
+          netstat -lt
+          CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4)
+          echo $CIP
+          sleep 5
           genomehubs test \
               --base-url http://localhost:3000/api/v2 \
               --json-test-dir tests/integration_tests/templates/api/json
+      # - name: Run API tests
+      #   run: |
+      #     genomehubs test \
+      #         --base-url http://localhost:3000/api/v2 \
+      #         --json-test-dir tests/integration_tests/templates/api/json
       - run: netstat -lt
       - name: Start UI
         run: |
