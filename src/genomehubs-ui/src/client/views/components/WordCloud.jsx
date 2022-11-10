@@ -7,7 +7,7 @@ import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import useVisible from "../hooks/useVisible";
-// import withLookup from "../hocs/withLookup";
+import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
 import withSummary from "../hocs/withSummary";
@@ -23,6 +23,7 @@ const WordCloud = ({
   searchIndex,
   fetchSearchResults,
   setPreferSearchTerm,
+  setLookupTerm,
   // resetLookup,
   taxonomy,
   basename,
@@ -45,19 +46,26 @@ const WordCloud = ({
       query,
       searchRawValues: true,
       includeEstimates: false,
+      summaryValues: "count",
       result: "taxon",
       taxonomy,
     });
   };
+  // const updateSearch = (options) => {
+  //   // fetchSearchResults(options);
+  //   setPreferSearchTerm(false);
+  //   navigate(
+  //     `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
+  //       options.query
+  //     )}`
+  //   );
+  //   // resetLookup();
+  // };
   const updateSearch = (options) => {
-    // fetchSearchResults(options);
+    let hashTerm = encodeURIComponent(options.query) || "";
     setPreferSearchTerm(false);
-    navigate(
-      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
-        options.query
-      )}`
-    );
-    // resetLookup();
+    setLookupTerm(hashTerm);
+    navigate(`${basename}/search?${qs.stringify(options)}#${hashTerm}`);
   };
   let buckets = [];
   if (summaryById && summaryById.buckets) {
@@ -109,6 +117,7 @@ const WordCloud = ({
 export default compose(
   withSiteName,
   withTaxonomy,
+  withLookup,
   withSearch,
   withSummary,
   withSummaryById

@@ -331,9 +331,14 @@ const ResultTable = ({
   // if (!searchResults.status || !searchResults.status.hasOwnProperty("hits")) {
   if (searchResults && searchResults.status.error) {
     return <ReportError report={"search"} error={searchResults.status.error} />;
+  } else if (
+    !searchResults.status ||
+    !searchResults.status.hasOwnProperty("hits")
+  ) {
+    return (
+      <ReportError report={"search"} error={"Unknown error during search"} />
+    );
   }
-  return null;
-  // }
   const location = useLocation();
   useEffect(() => {
     if (!location.search.match("report=")) {
