@@ -158,26 +158,23 @@ jobs:
       - name: Start API
         run: |
           chmod 755 dist/artifact/genomehubs-api-linux
-          GH_RELEASE=2022.02.23 GH_HUBNAME=test_instance ./dist/artifact/genomehubs-api-linux &
+          docker run --rm -d \
+              -e GH_RELEASE=2022.02.23
+              -e GH_HUBNAME=test_instance
+              -v ./dist/artifact/genomehubs-api-linux:/genomehubs/genomehubs-api
+              genomehubs/genomehubs-api:latest
           sleep 5
-          chmod 755 dist/artifact/genomehubs-ui-linux
-          GH_SITENAME=test_instance GH_API_URL=http://localhost:3000/api/v2 ./dist/artifact/genomehubs-ui-linux &
-          sleep 5
+      - name: Run API tests
+        run: |
           genomehubs test \
               --base-url http://localhost:3000/api/v2 \
               --json-test-dir tests/integration_tests/templates/api/json
+      - run: netstat -lt
+      - name: Start UI
+        run: |
+          chmod 755 dist/artifact/genomehubs-ui-linux
+          GH_SITENAME=test_instance GH_API_URL=http://localhost:3000/api/v2 ./dist/artifact/genomehubs-ui-linux &
+          sleep 5
+      - name: Run UI tests
+        run: |
           python run_ui_tests.py
-      # - name: Run API tests
-      #   run: |
-      #     genomehubs test \
-      #         --base-url http://localhost:3000/api/v2 \
-      #         --json-test-dir tests/integration_tests/templates/api/json
-      - run: netstat -tulpen
-      # - name: Start UI
-      #   run: |
-      #     chmod 755 dist/artifact/genomehubs-ui-linux
-      #     GH_SITENAME=test_instance GH_API_URL=http://localhost:3000/api/v2 ./dist/artifact/genomehubs-ui-linux &
-      #     sleep 5
-      # - name: Run UI tests
-      #   run: |
-      #     python run_ui_tests.py
