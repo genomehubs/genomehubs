@@ -158,9 +158,12 @@ jobs:
       - name: Start API
         run: |
           chmod 755 dist/artifact/genomehubs-api-linux
+          HIP=$(ip route get 1 | awk '{print $(NF-2);exit}')
+          echo $HIP
           CID=$(docker run --rm -d \
               -e GH_RELEASE=2022.02.23 \
               -e GH_HUBNAME=test_instance \
+              -e GH_NODE='http://$HIP:9200' \
               -p 3000:3000 \
               -v `pwd`/dist/artifact/genomehubs-api-linux:/genomehubs/genomehubs-api \
               genomehubs/genomehubs-api:latest)
@@ -171,8 +174,6 @@ jobs:
           CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4 | tail -n 1)
           echo $CIP
           sleep 5
-          HIP=$(ip route get 1 | awk '{print $(NF-2);exit}')
-          echo $HIP
           genomehubs test \
               --base-url http://$HIP:3000/api/v2 \
               --json-test-dir tests/integration_tests/templates/api/json
