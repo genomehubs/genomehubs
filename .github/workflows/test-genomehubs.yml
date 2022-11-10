@@ -167,7 +167,7 @@ jobs:
               genomehubs/genomehubs-api:latest)
           sleep 5
           echo $CID
-          docker logs
+          docker logs gh-api
           netstat -lt
           CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4)
           echo $CIP
