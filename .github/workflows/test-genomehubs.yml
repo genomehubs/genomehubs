@@ -169,11 +169,11 @@ jobs:
           echo $CID
           docker logs gh-api
           netstat -lt
-          CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4)
+          CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4 | cut -d' ' -f 1')
           echo $CIP
           sleep 5
           genomehubs test \
-              --base-url http://localhost:3000/api/v2 \
+              --base-url http://$CIP:3000/api/v2 \
               --json-test-dir tests/integration_tests/templates/api/json
       # - name: Run API tests
       #   run: |
