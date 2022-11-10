@@ -171,6 +171,8 @@ jobs:
           netstat -lt
           CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4 | cut -d' ' -f 1')
           echo $CIP
+          HIP=$(ip route get 1 | awk '{print $NF;exit}')
+          echo $HIP
           sleep 5
           genomehubs test \
               --base-url http://$CIP:3000/api/v2 \
@@ -183,8 +185,15 @@ jobs:
       - run: netstat -lt
       - name: Start UI
         run: |
+          HIP=$(ip route get 1 | awk '{print $NF;exit}')
+          echo $HIP
+          CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4 | cut -d' ' -f 1')
+          echo $CIP
           chmod 755 dist/artifact/genomehubs-ui-linux
-          GH_SITENAME=test_instance GH_API_URL=http://localhost:3000/api/v2 ./dist/artifact/genomehubs-ui-linux &
+          GH_SITENAME=test_instance \
+          GH_ORIGINS='http://$HIP:8880 http://localhost:8880 null' \
+          GH_API_URL=http://$CIP:3000/api/v2 \
+          ./dist/artifact/genomehubs-ui-linux &
           sleep 5
       - name: Run UI tests
         run: |
