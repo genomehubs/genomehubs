@@ -171,8 +171,10 @@ jobs:
           CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4 | tail -n 1)
           echo $CIP
           sleep 5
+          HIP=$(ip route get 1 | awk '{print $(NF-2);exit}')
+          echo $HIP
           genomehubs test \
-              --base-url http://127.0.0.1:3000/api/v2 \
+              --base-url http://$HIP:3000/api/v2 \
               --json-test-dir tests/integration_tests/templates/api/json
       # - name: Run API tests
       #   run: |
@@ -184,10 +186,12 @@ jobs:
         run: |
           CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4 | tail -n 1)
           echo $CIP
+          HIP=$(ip route get 1 | awk '{print $(NF-2);exit}')
+          echo $HIP
           chmod 755 dist/artifact/genomehubs-ui-linux
           GH_SITENAME=test_instance \
-          GH_ORIGINS='http://127.0.0.1:8880 http://localhost:8880 null' \
-          GH_API_URL=http://$CIP:3000/api/v2 \
+          GH_ORIGINS='http://$HIP:8880 http://localhost:8880 null' \
+          GH_API_URL=http://$HIP:3000/api/v2 \
           ./dist/artifact/genomehubs-ui-linux &
           sleep 5
       - name: Run UI tests
