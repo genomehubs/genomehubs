@@ -158,43 +158,24 @@ jobs:
       - name: Start API
         run: |
           chmod 755 dist/artifact/genomehubs-api-linux
-          HIP=$(ip route get 1 | awk '{print $(NF-2);exit}')
-          echo $HIP
-          CID=$(docker run --rm -d \
-              -e GH_RELEASE=2022.02.23 \
-              -e GH_HUBNAME=test_instance \
-              -e GH_NODE='http://$HIP:9200' \
-              -p 3000:3000 \
-              -v `pwd`/dist/artifact/genomehubs-api-linux:/genomehubs/genomehubs-api \
-              genomehubs/genomehubs-api:latest)
+          GH_RELEASE=2022.02.23 GH_HUBNAME=test_instance ./dist/artifact/genomehubs-api-linux &
           sleep 5
-          echo $CID
-          docker logs $CID
-          curl http://localhost:3000/api/v2/taxonomies
-          netstat -lt
-          CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4 | tail -n 1)
-          echo $CIP
-          sleep 5
+      - name: Run API tests
+        run: |
           genomehubs test \
               --base-url http://localhost:3000/api/v2 \
               --json-test-dir tests/integration_tests/templates/api/json
-      # - name: Run API tests
-      #   run: |
-      #     genomehubs test \
-      #         --base-url http://localhost:3000/api/v2 \
-      #         --json-test-dir tests/integration_tests/templates/api/json
       - run: netstat -lt
       - name: Start UI
         run: |
-          CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4 | tail -n 1)
-          echo $CIP
-          HIP=$(ip route get 1 | awk '{print $(NF-2);exit}')
-          echo $HIP
+          curl http://localhost:3000/api/v2/taxonomies
           chmod 755 dist/artifact/genomehubs-ui-linux
+          GH_CLIENT_PORT=8880 \
           GH_SITENAME=test_instance \
           GH_API_URL=http://localhost:3000/api/v2 \
           ./dist/artifact/genomehubs-ui-linux &
           sleep 5
       - name: Run UI tests
         run: |
+          curl http://localhost:3000/api/v2/taxonomies
           python run_ui_tests.py
