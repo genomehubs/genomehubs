@@ -327,14 +327,13 @@ const ResultTable = ({
   const [attribute, setAttribute] = useState(null);
   const [recordId, setRecordId] = useState(null);
   const rootRef = useRef(null);
-  if (!searchResults.status || !searchResults.status.hasOwnProperty("hits")) {
-    if (searchResults && searchResults.status.error) {
-      return (
-        <ReportError report={"search"} error={searchResults.status.error} />
-      );
-    }
-    return null;
+
+  // if (!searchResults.status || !searchResults.status.hasOwnProperty("hits")) {
+  if (searchResults && searchResults.status.error) {
+    return <ReportError report={"search"} error={searchResults.status.error} />;
   }
+  return null;
+  // }
   const location = useLocation();
   useEffect(() => {
     if (!location.search.match("report=")) {
