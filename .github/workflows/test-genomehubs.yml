@@ -170,6 +170,7 @@ jobs:
           sleep 5
           echo $CID
           docker logs $CID
+          curl http://localhost:3000/api/v2/taxonomies
           netstat -lt
           CIP=$(docker inspect $CID | grep IPAddress | cut -d '"' -f 4 | tail -n 1)
           echo $CIP
