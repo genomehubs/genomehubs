@@ -151,6 +151,10 @@ jobs:
       - name: Check indices
         run: |
           curl -s "http://localhost:9200/_cat/indices"
+      - name: Install UI test dependencies
+        run: |
+          sudo apt-get install -y chromium-browser
+          pip install -r tests/integration_tests/ui/requirements.txt
       - name: Start API
         run: |
           chmod 755 dist/artifact/genomehubs-api-linux
@@ -161,11 +165,7 @@ jobs:
           genomehubs test \
               --base-url http://localhost:3000/api/v2 \
               --json-test-dir tests/integration_tests/templates/api/json
-      - name: Install UI test dependencies
-        run: |
-          sudo apt-get install -y chromium-browser
-          pip install -r tests/integration_tests/ui/requirements.txt
-      - run: netstat -lt
+      - run: netstat -tulpen
       - name: Start UI
         run: |
           chmod 755 dist/artifact/genomehubs-ui-linux
