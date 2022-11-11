@@ -335,9 +335,7 @@ const ResultTable = ({
     !searchResults.status ||
     !searchResults.status.hasOwnProperty("hits")
   ) {
-    return (
-      <ReportError report={"search"} error={"Unknown error during search"} />
-    );
+    return null;
   }
   const location = useLocation();
   useEffect(() => {
