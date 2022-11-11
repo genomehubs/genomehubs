@@ -208,8 +208,6 @@ export const searchByTaxon = async ({
     query.bool.filter = query.bool.filter.concat(collateFilter);
   }
 
-  console.log(JSON.stringify(query, null, 4));
-
   return {
     size,
     from: offset,
