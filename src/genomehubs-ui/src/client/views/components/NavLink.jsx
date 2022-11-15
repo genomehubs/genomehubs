@@ -23,7 +23,7 @@ const NavLink = ({
   } else if (to) {
     to = basename + "/" + to + (plain ? "" : location.search + location.hash);
   } else if (props.href) {
-    if (props.href.match(/\:\/\//)) {
+    if (props.href.match(/\:\/\//) && !props.href.match(location.origin)) {
       return (
         <a href={props.href} target="_blank" rel="noopener noreferrer">
           {props.children}
