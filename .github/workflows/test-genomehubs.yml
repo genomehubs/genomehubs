@@ -151,12 +151,12 @@ jobs:
       - name: Check indices
         run: |
           curl -s "http://localhost:9200/_cat/indices"
-          curl -s "http://localhost:3000/api/v2/report?report=histogram&x=genome_size&rank=species&taxonomy=ncbi&result=taxon"
       - name: Start API
         run: |
           chmod 755 dist/artifact/genomehubs-api-linux
           GH_RELEASE=2022.02.23 GH_HUBNAME=test_instance ./dist/artifact/genomehubs-api-linux &
           sleep 5
+          curl -s "http://localhost:3000/api/v2/report?report=histogram&x=genome_size&rank=species&taxonomy=ncbi&result=taxon"
       - name: Run API tests
         run: |
           genomehubs test \
