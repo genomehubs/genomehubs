@@ -161,18 +161,18 @@ jobs:
           genomehubs test \
               --base-url http://localhost:3000/api/v2 \
               --json-test-dir tests/integration_tests/templates/api/json
-      - name: Install UI test dependencies
-        run: |
-          sudo apt-get install -y chromium-browser
-          pip install -r tests/integration_tests/ui/requirements.txt
-      - name: Start UI
-        run: |
-          chmod 755 dist/artifact/genomehubs-ui-linux
-          GH_CLIENT_PORT=8880 \
-          GH_SITENAME=test_instance \
-          GH_API_URL=http://localhost:3000/api/v2 \
-          ./dist/artifact/genomehubs-ui-linux &
-          sleep 5
-      - name: Run UI tests
-        run: |
-          python run_ui_tests.py
+      # - name: Install UI test dependencies
+      #   run: |
+      #     sudo apt-get install -y chromium-browser
+      #     pip install -r tests/integration_tests/ui/requirements.txt
+      # - name: Start UI
+      #   run: |
+      #     chmod 755 dist/artifact/genomehubs-ui-linux
+      #     GH_CLIENT_PORT=8880 \
+      #     GH_SITENAME=test_instance \
+      #     GH_API_URL=http://localhost:3000/api/v2 \
+      #     ./dist/artifact/genomehubs-ui-linux &
+      #     sleep 5
+      # - name: Run UI tests
+      #   run: |
+      #     python run_ui_tests.py
