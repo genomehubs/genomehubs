@@ -326,7 +326,7 @@ def calculate(string):
                 part = part[1:-1]
                 parts[index] = str(calculate(part))
         string = "".join(parts)
-    for function in operators:
+    for function in operators.keys():
         left, operator, right = string.partition(function)
         if operator in operators:
             try:
@@ -923,7 +923,7 @@ def write_spellchecked_taxa(spellings, opts, *, types):
         "spellcheck": "exceptions",
         "synonym": "imported",
     }
-    for group in dirs:
+    for group in dirs.keys():
         if taxa := [
             [obj["taxon_id"], name, obj["rank"]] + obj["matches"]
             for name, obj in spellings[group].items()
