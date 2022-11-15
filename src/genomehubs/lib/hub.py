@@ -38,7 +38,7 @@ def dep(arg):
     """Dependency resolver."""
     # from https://code.activestate.com/recipes/576570-dependency-resolver/
     # © 2008 Louis Riviere (MIT)
-    d = {k: set(arg[k]) for k in arg}
+    d = dict((k, set(arg[k])) for k in arg)
     r = []
     c = 0
     while d and c < 10:
@@ -49,7 +49,7 @@ def dep(arg):
         # can be done right away
         r.append(t)
         # and cleaned up
-        d = {k: v - t for k, v in d.items() if v}
+        d = dict(((k, v - t) for k, v in d.items() if v))
         c += 1
     if d:
         LOGGER.error("Unable to resolve dependency tree")
@@ -409,7 +409,7 @@ def validate_values(values, key, types, row_values, shared_values, blanks):
     for value in values:
         if value in blanks:
             continue
-        if "fuction" in types[key] or "template" in types[key]:
+        if "function" in types[key] or "template" in types[key]:
             if re.match(r"^\d+\.\d+e[\+-]\d+$", value):
                 value = str(float(value))
             try:
@@ -454,7 +454,8 @@ def apply_value_template(prop, value, attribute, *, taxon_types, has_taxon_data)
     """Set value using template."""
     template = re.compile(r"^(.*?\{\{)(.+)(\}\}.*)$")
     new_prop = prop.replace("taxon_", "")
-    if match := template.match(str(value)):
+    match = template.match(str(value))
+    if match:
         groups = match.groups()
         if groups[1] and groups[1] in attribute:
             has_taxon_data = True
@@ -808,7 +809,7 @@ def process_row(
     ):
         row_id = data["identifiers"][f"{index_type}_id"]
     row_values = {}
-    for attr_type in ["attributes", "features", "identifiers", "taxon_names"]:
+    for attr_type in list(["attributes", "features", "identifiers", "taxon_names"]):
         if attr_type in data and data[attr_type]:
             (
                 data[attr_type],
@@ -904,9 +905,11 @@ def write_imported_rows(rows, opts, *, types, header=None, label="imported"):
         header_len = 1
     if isinstance(rows, dict):
         for row_set in rows.values():
-            data.extend(iter(row_set))
+            for row in row_set:
+                data.append(row)
     else:
-        data.extend(iter(rows))
+        for row in rows:
+            data.append(row)
     LOGGER.info(
         "Writing %d records to %s file '%s'", len(data) - header_len, label, outfile
     )
@@ -924,22 +927,23 @@ def write_spellchecked_taxa(spellings, opts, *, types):
         "synonym": "imported",
     }
     for group in dirs.keys():
-        if taxa := [
-            [obj["taxon_id"], name, obj["rank"]] + obj["matches"]
-            for name, obj in spellings[group].items()
-        ]:
-            outdir = f"{opts[dir_key]}/{dirs[group]}"
-            os.makedirs(outdir, exist_ok=True)
-            outfile = f"{outdir}/{file_basename}.spellcheck.tsv"
-            LOGGER.info(
-                "Writing %d %s suggestions to spellcheck file '%s'",
-                len(taxa),
-                group,
-                outfile,
-            )
-            tofile.write_file(
-                outfile, [["taxon_id", "input", "rank", "suggested"]] + taxa
-            )
+        for group in dirs.keys():
+            taxa = []
+            for name, obj in spellings[group].items():
+                taxa.append([obj["taxon_id"], name, obj["rank"]] + obj["matches"])
+            if taxa:
+                outdir = f"{opts[dir_key]}/{dirs[group]}"
+                os.makedirs(outdir, exist_ok=True)
+                outfile = f"{outdir}/{file_basename}.spellcheck.tsv"
+                LOGGER.info(
+                    "Writing %d %s suggestions to spellcheck file '%s'",
+                    len(taxa),
+                    group,
+                    outfile,
+                )
+                tofile.write_file(
+                    outfile, [["taxon_id", "input", "rank", "suggested"]] + taxa
+                )
 
 
 def write_imported_taxa(taxa, opts, *, types):
