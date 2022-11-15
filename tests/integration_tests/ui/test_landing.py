@@ -28,13 +28,14 @@ class TestLandingPage:
         )
         time.sleep(2)
         histogram = None
-        # with contextlib.suppress(Exception):
-        WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.ID, "theme-base"))
-        )
-        WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((By.ID, "histogram"))
-        )
+        with contextlib.suppress(Exception):
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, "theme-base"))
+            )
+            WebDriverWait(self.driver, 10).until(
+                EC.visibility_of_element_located((By.ID, "histogram"))
+            )
+            time.sleep(3)
         histogram = self.driver.find_element(By.ID, "histogram")
         assert histogram is not None
         svg = None

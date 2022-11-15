@@ -170,7 +170,7 @@ def median_list(arr):
     if length % 2 == 1:
         return [median(arr)]
     sorted_arr = sorted(arr, reverse=True)
-    return list({sorted_arr[length // 2], sorted_arr[length // 2 - 1]})
+    return list(set([sorted_arr[int(length / 2)], sorted_arr[int(length / 2) - 1]]))
 
 
 def mode_list(arr):
@@ -324,10 +324,10 @@ def set_traverse_values(
                         attribute["length"] = deduped_list_length(values)
                     attribute["aggregation_method"] = summary
                     attribute["aggregation_source"] = source
-                traverse_value = value or []
+                traverse_value = value if value else []
             idx += 1
         if traverse and source == "descendant" and summary == traverse:
-            traverse_value = value or []
+            traverse_value = value if value else []
         elif summary != "list":
             if summary.startswith("median"):
                 summary = "median"
@@ -413,7 +413,7 @@ def summarise_attribute_values(
                 f"Unable to generate summary values for attribute {meta['key']}"
             )
             sys.exit(1)
-        if isinstance(max_value, (float, int)):
+        if isinstance(max_value, float) or isinstance(max_value, int):
             attribute["max"] = max_value
             attribute["min"] = min_value
         elif meta["type"] == "date" and max_value and min_value:
@@ -504,7 +504,8 @@ def set_values_from_descendants(
             traverseable = False
         if not traverseable or taxon_id in limits[key]:
             continue
-        if local_limit := meta[key].get("traverse_limit", traverse_limit):
+        local_limit = meta[key].get("traverse_limit", traverse_limit)
+        if local_limit:
             if (
                 descendant_ranks is not None
                 and local_limit in descendant_ranks[taxon_id]
@@ -735,11 +736,9 @@ def stream_missing_attributes_at_level(es, *, nodes, attrs, template, level=1):
         taxon_id = node["_source"]["taxon_id"]
         fill_attrs = []
         if "attributes" in node["_source"]:
-            fill_attrs.extend(
-                attribute
-                for attribute in node["_source"]["attributes"]
-                if attribute["key"] in attrs
-            )
+            for attribute in node["_source"]["attributes"]:
+                if attribute["key"] in attrs:
+                    fill_attrs.append(attribute)
 
         if not fill_attrs:
             continue
