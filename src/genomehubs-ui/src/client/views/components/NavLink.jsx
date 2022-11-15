@@ -31,7 +31,7 @@ const NavLink = ({
         </a>
       );
     }
-    to = "";
+    to = props.href;
   }
   return (
     <Link

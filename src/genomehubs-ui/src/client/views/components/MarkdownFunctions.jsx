@@ -48,7 +48,7 @@ export const processProps = (props, newProps = {}) => {
       } else {
         newProps["src"] = value.replace(
           /^\/static\//,
-          `${basename}/static/${webpackHash}/`
+          `/static/${webpackHash}/`
         );
       }
     } else if (key == "xs") {
