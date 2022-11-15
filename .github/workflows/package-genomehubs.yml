@@ -11,33 +11,33 @@ jobs:
   package-ui:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: "16"
       - run: npm install -g pkg
       - run: ./package-ui.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./dist/*
 
   package-api:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: "16"
       - run: npm install -g pkg
       - run: ./package-api.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./dist/*
 
   package-genomehubs-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
@@ -45,14 +45,14 @@ jobs:
       - name: Build and publish
         run: |
           ./pip_install_latest.sh manylinux2014_x86_64
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./dist/*
 
   # package-genomehubs-macos:
   #   runs-on: macos-11
   #   steps:
-  #     - uses: actions/checkout@v2
+  #     - uses: actions/checkout@v3
   #     - name: Install dependencies
   #       run: |
   #         python3 -m pip install --upgrade pip
@@ -61,7 +61,7 @@ jobs:
   #       run: |
   #         ./pip_install_latest.sh macosx_11_0_x86_64
   #         python3 setup.py sdist bdist_wheel --python-tag py3 --plat-name macosx_10_9_x86_64
-  #     - uses: actions/upload-artifact@v2
+  #     - uses: actions/upload-artifact@v3
   #       with:
   #         path: ./dist/*.whl
 
@@ -73,7 +73,7 @@ jobs:
       - package-genomehubs-linux
       # - package-genomehubs-macos
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           path: ./dist
       - run: |
@@ -96,8 +96,8 @@ jobs:
     needs:
       - create-github-release
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           path: ./dist
       - run: |
@@ -117,8 +117,8 @@ jobs:
     needs:
       - create-github-release
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: "16"
       - run: npm install -g pkg
@@ -127,7 +127,7 @@ jobs:
           mv goat-ui/static/* src/genomehubs-ui/src/client/static/
           rm -r goat-ui
       - run: ./package-ui.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: goat-ui
           path: ./dist/*
@@ -137,7 +137,7 @@ jobs:
     needs: upload-to-pypi
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -148,7 +148,7 @@ jobs:
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
           images: genomehubs/genomehubs
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: artifact
           path: ./dist
@@ -167,8 +167,8 @@ jobs:
     needs: upload-to-pypi
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: artifact
           path: ./dist
@@ -198,8 +198,8 @@ jobs:
     needs: upload-to-pypi
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: artifact
           path: ./dist
@@ -229,8 +229,8 @@ jobs:
     needs: package-goat-ui
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: goat-ui
           path: ./dist
