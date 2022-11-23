@@ -49,6 +49,7 @@ attributes:
         - plastid
         - apicoplast
     default: "{{organelle}}"
+    type: keyword
   gc_percent:
     display_group: metrics
     display_level: 1
