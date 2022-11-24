@@ -108,7 +108,7 @@ def index_types(es, types_name, types, opts, *, dry_run=False):
             index_stream(es, template["index_name"], stream, dry_run=dry_run)
     if "taxon_names" in types:
         if "defaults" in types and "taxon_names" in types["defaults"]:
-            for key, value in types["names"].items():
+            for key, value in types["taxon_names"].items():
                 value = {
                     **types["defaults"]["taxon_names"],
                     **value,

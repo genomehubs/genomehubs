@@ -313,7 +313,8 @@ const QueryBuilder = ({
     return opts;
   });
 
-  const handleTaxonFilterChange = (e, { id, value }) => {
+  const handleTaxonFilterChange = (e, props = {}) => {
+    let { id, value } = props;
     if (!id) {
       e.stopPropagation();
       id = e.target.id ? e.target.id.replace("taxon-filter-", "") : "rank";

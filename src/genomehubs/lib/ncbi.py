@@ -5,6 +5,7 @@ import contextlib
 import gzip
 import re
 from collections import Counter
+from urllib.error import ContentTooShortError
 
 import ujson
 from Bio import SeqIO
@@ -24,7 +25,10 @@ def refseq_listing(collection):
     """Fetch a directory listing for a RefSeq collection."""
     pattern = re.compile(r"(\w+\.\d+\.genomic\.gbff\.gz)")
     url = f"{REFSEQ_FTP}/{collection}"
-    html = tofetch.fetch_url(url)
+    for _ in range(5):
+        with contextlib.suppress(ContentTooShortError):
+            html = tofetch.fetch_url(url)
+            break
     listing = []
     for line in html.split("\n"):
         if match := pattern.search(line):
@@ -243,7 +247,7 @@ def parse_ncbi_datasets_record(record, parsed):
             if obj["genbankAssmAccession"] in parsed:
                 parsed[obj["genbankAssmAccession"]].update(annot)
                 return
-            obj |= annot
+            obj.update(annot)
     bioprojects = []
     for lineage in assemblyInfo.get("bioprojectLineage", []):
         if "bioprojects" in lineage:
@@ -259,7 +263,7 @@ def parse_ncbi_datasets_record(record, parsed):
 
     obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else None
     assemblyStats = record.get("assemblyStats", {})
-    obj |= assemblyStats
+    obj.update(assemblyStats)
     metricDates(obj)
     wgsInfo = record.get("wgsInfo", {})
     for key in ("masterWgsUrl", "wgsContigsUrl", "wgsProjectAccession"):

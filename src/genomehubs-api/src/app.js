@@ -6,6 +6,7 @@ import compression from "compression";
 import { config } from "./api/v2/functions/config.js";
 import cookieParser from "cookie-parser";
 import express from "express";
+import { logAccess } from "./api/v2/functions/logger.js";
 import { logError } from "./api/v2/functions/logger.js";
 import path from "path";
 import qs from "./api/v2/functions/qs.js";
@@ -26,8 +27,10 @@ swaggerDocument.components.parameters.taxonomyParam.schema.default =
   config.taxonomy;
 swaggerDocument.servers[0].url = config.url;
 // Temporarily redirect old API requests to v2
-swaggerDocument.servers[1] = { ...swaggerDocument.servers[0] };
-swaggerDocument.servers[1].url = config.url.replace("v2", "v0.0.1");
+if (config.url.match("v2")) {
+  swaggerDocument.servers[1] = { ...swaggerDocument.servers[0] };
+  swaggerDocument.servers[1].url = config.url.replace("v2", "v0.0.1");
+}
 
 const swaggerOptions = {
   customCss: ".swagger-ui .topbar { display: none }",
@@ -45,6 +48,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.text());
 app.use(express.json());
 app.use(cookieParser());
+app.use((req, res, next) => {
+  logAccess({ req });
+  next();
+});
 // app.use(express.static(path.join(__dirname, "public")));
 app.get("/api-spec", function (req, res) {
   res.header("Content-Type", "text/yaml");

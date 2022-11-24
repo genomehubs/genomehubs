@@ -14,6 +14,7 @@ import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
 import { getSuggestedTerm } from "../reducers/search";
 import { makeStyles } from "@material-ui/core/styles";
 import qs from "../functions/qs";
+import { siteName } from "../reducers/location";
 import { useNavigate } from "@reach/router";
 import { useReadLocalStorage } from "usehooks-ts";
 import withLookup from "../hocs/withLookup";
@@ -42,8 +43,6 @@ export const useStyles = makeStyles((theme) => ({
 export const PlacedPopper = (props) => {
   return <Popper {...props} placement="bottom" />;
 };
-
-const siteName = SITENAME || "GenomeHub";
 
 const suggestedTerm = getSuggestedTerm();
 

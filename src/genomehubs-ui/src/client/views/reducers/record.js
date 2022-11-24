@@ -124,7 +124,18 @@ export const getCurrentRecord = createSelector(
   }
 );
 
+export const setAttributeSettings = createAction("SET_ATTRIBUTE_SETTINGS");
+export const attributeSettings = handleAction(
+  "SET_ATTRIBUTE_SETTINGS",
+  (state, action) => ({ ...state, ...action.payload }),
+  {
+    showAttribute: false,
+  }
+);
+export const getAttributeSettings = (state) => state.attributeSettings;
+
 export const recordReducers = {
   records,
   currentRecordId,
+  attributeSettings,
 };

@@ -10,6 +10,21 @@ export const filterAttributes = (
   let rangeQuery;
   if (searchRawValues) {
     rangeQuery = (field, stat) => {
+      if (lookupTypes(field).type == "keyword") {
+        return [
+          {
+            nested: {
+              path: "attributes.values",
+              query: {
+                match: {
+                  [`attributes.values.${lookupTypes(field).type}_value`]:
+                    filters[stat][field][0],
+                },
+              },
+            },
+          },
+        ];
+      }
       // TODO: support alternate stats and enum based query here
       return [
         {

@@ -24,7 +24,10 @@ const errorTransport = new transports.DailyRotateFile({
 
 const accessTransport = new transports.DailyRotateFile({
   filename: config.accessLog,
-  format: format.simple(),
+  format: combine(
+    timestamp(),
+    printf((info) => `${info.level}: ${[info.timestamp]}: ${info.message}`)
+  ),
   datePattern: "YYYY-MM-DD",
   zippedArchive: true,
   maxSize: "20m",
@@ -67,17 +70,13 @@ export const logError = ({ req, message }) => {
 };
 
 export const logAccess = function ({ req, code, size }) {
-  let { url, method, httpVersion, headers } = req;
+  let url, method, httpVersion, headers;
+  if (req) {
+    ({ url, method, httpVersion, headers } = req);
+  }
 
   logger.info({
-    url,
-    method,
-    httpVersion,
-    host: headers.host,
-    code,
-    size,
-    referrer: undefined,
-    userAgent: headers["user-agent"],
+    message: `${url} ${method} ${httpVersion} ${headers.host} ${headers["user-agent"]}`,
   });
 };
 

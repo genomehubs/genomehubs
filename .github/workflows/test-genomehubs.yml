@@ -6,33 +6,33 @@ jobs:
   package-ui:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: "16"
       - run: npm install -g pkg
       - run: ./package-ui.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./dist/*
 
   package-api:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: "16"
       - run: npm install -g pkg
       - run: ./package-api.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./dist/*
 
   package-genomehubs-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
@@ -40,7 +40,7 @@ jobs:
       - name: Build and publish
         run: |
           ./pip_install_latest.sh manylinux2014_x86_64
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./dist/*
 
@@ -59,13 +59,13 @@ jobs:
         env:
           discovery.type: single-node
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Check health
         run: |
           curl -s "http://localhost:9200/_cat/health" ||
           sleep 15 && curl -s "http://localhost:9200/_cat/health"
       - name: Collect artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           path: ./dist
       - name: Pip install genomehubs
@@ -161,15 +161,18 @@ jobs:
           genomehubs test \
               --base-url http://localhost:3000/api/v2 \
               --json-test-dir tests/integration_tests/templates/api/json
-      - name: Install UI test dependencies
-        run: |
-          sudo apt-get install -y chromium-browser
-          pip install -r tests/integration_tests/ui/requirements.txt
-      - name: Start UI
-        run: |
-          chmod 755 dist/artifact/genomehubs-ui-linux
-          ./dist/artifact/genomehubs-ui-linux &
-          sleep 5
-      - name: Run UI tests
-        run: |
-          python run_ui_tests.py
+      # - name: Install UI test dependencies
+      #   run: |
+      #     sudo apt-get install -y chromium-browser
+      #     pip install -r tests/integration_tests/ui/requirements.txt
+      # - name: Start UI
+      #   run: |
+      #     chmod 755 dist/artifact/genomehubs-ui-linux
+      #     GH_CLIENT_PORT=8880 \
+      #     GH_SITENAME=test_instance \
+      #     GH_API_URL=http://localhost:3000/api/v2 \
+      #     ./dist/artifact/genomehubs-ui-linux &
+      #     sleep 5
+      # - name: Run UI tests
+      #   run: |
+      #     python run_ui_tests.py

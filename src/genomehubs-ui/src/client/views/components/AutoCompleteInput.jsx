@@ -380,6 +380,9 @@ export const AutoCompleteInput = ({
   const handleHighlightChange = (e, option, reason) => {
     if (multipart) {
       if (e && option) {
+        if (reason == "mouse" && prefix.length == 0 && suffix.length == 0) {
+          setInValue(option.title);
+        }
         let range = highlightRange(option.title);
         setTimeout(() => {
           inputRef.current.setSelectionRange(...range);
@@ -403,7 +406,7 @@ export const AutoCompleteInput = ({
     if (newValue != inputValue) {
       if (!newValue.match(/[\r\n]/)) {
         setMultiline(false);
-        updateTerm(newValue, e.target.selectionStart, types);
+        updateTerm(newValue, e?.target?.selectionStart || prefix.length, types);
         setOpen(true);
       } else if (!multiline) {
         updateTerm(newValue, e.target.selectionStart, types);

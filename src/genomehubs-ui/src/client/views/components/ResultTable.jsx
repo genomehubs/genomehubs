@@ -3,21 +3,19 @@ import { makeStyles, withStyles } from "@material-ui/core/styles";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
-import AttributeModal from "./AttributeModal";
 import Box from "@material-ui/core/TableContainer";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import Checkbox from "@material-ui/core/Checkbox";
-import DialogContent from "@material-ui/core/DialogContent";
 import DownloadButton from "./DownloadButton";
 import Grid from "@material-ui/core/Grid";
 import Grow from "@material-ui/core/Grow";
 import IconButton from "@material-ui/core/IconButton";
 import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
 import LinkButton from "./LinkButton";
-import Modal from "@material-ui/core/Modal";
 import MuiTableCell from "@material-ui/core/TableCell";
 import ReportError from "./ReportError";
+import ResultModalControl from "./ResultModalControl";
 import SearchPagination from "./SearchPagination";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Table from "@material-ui/core/Table";
@@ -29,6 +27,7 @@ import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Tooltip from "@material-ui/core/Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
+import dispatchRecord from "../hocs/dispatchRecord";
 import { formatter } from "../functions/formatter";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
@@ -46,7 +45,7 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow);
 
-const useStyles = makeStyles((theme) => ({
+export const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: "100%",
     marginBottom: "1em",
@@ -94,37 +93,6 @@ const TableCell = withStyles((theme) => ({
     padding: "1px 6px",
   },
 }))(MuiTableCell);
-
-const ModalControl = ({
-  currentRecordId,
-  attributeId,
-  showAttribute,
-  setShowAttribute,
-  rootRef,
-}) => {
-  const classes = useStyles();
-  return (
-    <Modal
-      open={showAttribute}
-      onClose={(event, reason) => {
-        event.preventDefault();
-        event.stopPropagation();
-        setShowAttribute(false);
-      }}
-      aria-labelledby="search-options-modal-title"
-      aria-describedby="search-options-modal-description"
-      className={classes.modal}
-      container={() => rootRef.current}
-    >
-      <DialogContent className={classes.paper}>
-        <AttributeModal
-          attributeId={attributeId}
-          currentRecordId={currentRecordId}
-        />
-      </DialogContent>
-    </Modal>
-  );
-};
 
 const StyledCheckbox = ({ color, ...props }) => {
   return (
@@ -319,20 +287,19 @@ const ResultTable = ({
   activeRanks,
   searchIndex,
   setPreferSearchTerm,
+  setAttributeSettings,
   statusColors,
   taxonomy,
   basename,
 }) => {
-  const [showAttribute, setShowAttribute] = useState(false);
-  const [attribute, setAttribute] = useState(null);
-  const [recordId, setRecordId] = useState(null);
   const rootRef = useRef(null);
-  if (!searchResults.status || !searchResults.status.hasOwnProperty("hits")) {
-    if (searchResults && searchResults.status.error) {
-      return (
-        <ReportError report={"search"} error={searchResults.status.error} />
-      );
-    }
+
+  if (searchResults && searchResults.status.error) {
+    return <ReportError report={"search"} error={searchResults.status.error} />;
+  } else if (
+    !searchResults.status ||
+    !searchResults.status.hasOwnProperty("hits")
+  ) {
     return null;
   }
   const location = useLocation();
@@ -596,9 +563,11 @@ const ResultTable = ({
                 ref={rootRef}
                 style={{ cursor: "pointer" }}
                 onClick={() => {
-                  setShowAttribute(true);
-                  setAttribute(type.name);
-                  setRecordId(currentRecordId);
+                  setAttributeSettings({
+                    currentRecordId,
+                    attributeId: type.name,
+                    showAttribute: true,
+                  });
                 }}
               >
                 {field.aggregation_source && (
@@ -769,13 +738,7 @@ const ResultTable = ({
             <TableBody>{rows}</TableBody>
           </Table>
         </TableContainer>
-        <ModalControl
-          currentRecordId={recordId}
-          attributeId={attribute}
-          showAttribute={showAttribute}
-          setShowAttribute={setShowAttribute}
-          rootRef={rootRef}
-        />
+
         {/* )} */}
       </Grid>
 
@@ -808,6 +771,13 @@ const ResultTable = ({
             searchTerm={searchTerm}
           />
         </Grid>
+        <ResultModalControl
+          // currentRecordId={recordId}
+          // attributeId={attribute}
+          // showAttribute={showAttribute}
+          // setShowAttribute={setShowAttribute}
+          rootRef={rootRef}
+        />
       </Grid>
       {/* </Grid> */}
     </Grid>
@@ -815,6 +785,7 @@ const ResultTable = ({
 };
 
 export default compose(
+  dispatchRecord,
   withSiteName,
   withTypes,
   withTaxonomy,
