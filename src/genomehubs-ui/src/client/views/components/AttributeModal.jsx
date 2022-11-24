@@ -76,7 +76,7 @@ const AttributeModal = ({
         }
       }
     }
-  }, [options]);
+  }, [options, recordId]);
 
   if (!record.record) {
     return null;

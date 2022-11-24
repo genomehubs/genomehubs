@@ -1,6 +1,7 @@
 import {
   fetchRecord,
   resetRecord,
+  setAttributeSettings,
   setCurrentRecordId,
 } from "../reducers/record";
 
@@ -15,6 +16,7 @@ const dispatchRecord = (WrappedComponent) => (props) => {
       dispatch(fetchRecord(recordId, result, taxonomy, callback)),
     resetRecord: () => dispatch(resetRecord()),
     setRecordId: (recordId) => dispatch(setCurrentRecordId(recordId)),
+    setAttributeSettings: (obj) => dispatch(setAttributeSettings(obj)),
   });
 
   const Connected = connect(

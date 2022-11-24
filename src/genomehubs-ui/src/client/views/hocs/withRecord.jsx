@@ -1,9 +1,11 @@
 import {
   fetchRecord,
+  getAttributeSettings,
   getCurrentRecord,
   getCurrentRecordId,
   getRecordIsFetching,
   resetRecord,
+  setAttributeSettings,
   setCurrentRecordId,
 } from "../reducers/record";
 
@@ -13,6 +15,7 @@ import { getLineage } from "../selectors/record";
 
 const withRecord = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
+    attributeSettings: getAttributeSettings(state),
     record: getCurrentRecord(state),
     recordIsFetching: getRecordIsFetching(state),
     recordId: getCurrentRecordId(state),
@@ -24,6 +27,7 @@ const withRecord = (WrappedComponent) => (props) => {
       dispatch(fetchRecord(recordId, result, taxonomy, callback)),
     resetRecord: () => dispatch(resetRecord()),
     setRecordId: (recordId) => dispatch(setCurrentRecordId(recordId)),
+    setAttributeSettings: (obj) => dispatch(setAttributeSettings(obj)),
   });
 
   const Connected = connect(
