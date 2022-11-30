@@ -1,6 +1,6 @@
 name: package-genomehubs-archive
 
-on: push
+on: workflow_dispatch
 
 env:
   ARCHIVE_VERSION: 2022.11.16
@@ -42,7 +42,7 @@ jobs:
           mv dist/genomehubs-ui-linux src/docker/goat/
           rm -r dist/*
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}

@@ -6,15 +6,15 @@ jobs:
   package-ui:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{github.ref}}
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: "16"
       - run: npm install -g pkg
       - run: ./package-ui.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: genomehubs-ui
           path: ./dist/*
@@ -22,15 +22,15 @@ jobs:
   package-api:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{github.ref}}
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: "16"
       - run: npm install -g pkg
       - run: ./package-api.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: genomehubs-api
           path: ./dist/*
@@ -38,7 +38,7 @@ jobs:
   package-genomehubs-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{github.ref}}
       - name: Install dependencies
@@ -48,7 +48,7 @@ jobs:
       - name: Build and publish
         run: |
           ./pip_install_latest.sh manylinux2014_x86_64
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: genomehubs
           path: ./dist/*
@@ -56,10 +56,10 @@ jobs:
   package-goat-ui:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{github.ref}}
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: "16"
       - run: npm install -g pkg
@@ -68,7 +68,7 @@ jobs:
           mv goat-ui/static/* src/genomehubs-ui/src/client/static/
           rm -r goat-ui
       - run: ./package-ui.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: goat-ui
           path: ./dist/*
@@ -78,8 +78,8 @@ jobs:
     needs: package-genomehubs-linux
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: genomehubs
           path: ./dist
@@ -87,7 +87,7 @@ jobs:
           mv dist/*manylinux2014_x86_64.whl src/docker/
           rm -r dist/*
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
@@ -109,8 +109,8 @@ jobs:
     needs: package-api
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: genomehubs-api
           path: ./dist
@@ -118,7 +118,7 @@ jobs:
           mv dist/genomehubs-api-linux src/docker/api/
           rm -r dist/*
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
@@ -140,8 +140,8 @@ jobs:
     needs: package-ui
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: genomehubs-ui
           path: ./dist
@@ -149,7 +149,7 @@ jobs:
           mv dist/genomehubs-ui-linux src/docker/ui/
           rm -r dist/*
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
@@ -171,10 +171,10 @@ jobs:
     needs: package-goat-ui
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{github.ref}}
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: goat-ui
           path: ./dist
@@ -182,7 +182,7 @@ jobs:
           mv dist/genomehubs-ui-linux src/docker/goat/
           rm -r dist/*
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
