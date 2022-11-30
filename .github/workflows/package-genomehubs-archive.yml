@@ -1,6 +1,6 @@
 name: package-genomehubs-develop
 
-on: workflow_dispatch
+on: push
 
 env:
   ARCHIVE_VERSION: 2022.11.16
