@@ -11,6 +11,7 @@ const NavLink = ({
   to,
   tab,
   plain,
+  action = "navigate",
   url,
   basename,
   siteName,
@@ -31,7 +32,7 @@ const NavLink = ({
         </a>
       );
     }
-    to = props.href;
+    to = basename + "/" + props.href.replace(location.origin, "");
   }
   return (
     <Link
@@ -39,7 +40,7 @@ const NavLink = ({
       to={to
         .replace(/\/+/, `${basename}/`)
         .replace(`${basename}${basename}`, basename)
-        .replace(/\/\//, "/")}
+        .replace(/\/\/+/, "/")}
       getProps={({ isCurrent }) => {
         let css = tab
           ? classnames(styles.tab, { [styles.tabHighlight]: isCurrent })

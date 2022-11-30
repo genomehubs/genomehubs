@@ -1,6 +1,8 @@
 import { Link, useLocation } from "@reach/router";
 import React, { memo, useState } from "react";
 
+import LaunchIcon from "@material-ui/icons/Launch";
+import MenuItem from "@material-ui/core/MenuItem";
 import Popover from "@material-ui/core/Popover";
 import Typography from "@material-ui/core/Typography";
 import { compose } from "recompose";
@@ -42,14 +44,19 @@ const SiteName = ({ siteName, basename, archive }) => {
     versions = archive
       .filter((v) => v != version && v > "")
       .map((v) => (
-        <Link
+        <MenuItem
+          component="a"
           key={v}
-          to={`${location.pathname
+          href={`${location.pathname
             .replace(version, v)
             .replace(/\/latest/, "")}${location.search}${location.hash}`}
+          target="_blank"
+          rel="noopener noreferrer"
         >
-          <Typography className={classes.typography}>{v}</Typography>
-        </Link>
+          <p style={{ margin: "0.5em", whiteSpace: "nowrap" }}>
+            {v} <LaunchIcon fontSize="inherit" />
+          </p>
+        </MenuItem>
       ));
     if (versions && versions.length > 0) {
       content = (
