@@ -24,9 +24,6 @@ import remarkRehype from "remark-rehype";
 import styles from "./Styles.scss";
 import unified from "unified";
 import { visit } from "unist-util-visit";
-import withPages from "../hocs/withPages";
-import withSiteName from "../hocs/withSiteName";
-import { withStyles } from "@material-ui/core/styles";
 
 const pagesUrl = PAGES_URL;
 const webpackHash = __webpack_hash__ || COMMIT_HASH;
@@ -48,7 +45,7 @@ export const processProps = (props, newProps = {}) => {
       } else {
         newProps["src"] = value.replace(
           /^\/static\//,
-          `/static/${webpackHash}/`
+          `${basename}/static/${webpackHash}/`
         );
       }
     } else if (key == "xs") {
