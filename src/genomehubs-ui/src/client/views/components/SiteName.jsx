@@ -47,7 +47,7 @@ const SiteName = ({ siteName, basename, archive }) => {
         <MenuItem
           component="a"
           key={v}
-          href={`${location.pathname
+          href={`${version == "latest" ? `/${v}` : ""}${location.pathname
             .replace(version, v)
             .replace(/\/latest/, "")}${location.search}${location.hash}`}
           target="_blank"
