@@ -1,4 +1,4 @@
-name: package-genomehubs-develop
+name: package-genomehubs-archive
 
 on: push
 
@@ -9,10 +9,10 @@ jobs:
   package-goat-ui-archive:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{github.ref}}
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: "16"
       - run: npm install -g pkg
@@ -21,7 +21,7 @@ jobs:
           mv goat-ui/static/* src/genomehubs-ui/src/client/static/
           rm -r goat-ui
       - run: GH_BASENAME=$ARCHIVE_VERSION ./package-ui.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: goat-ui
           path: ./dist/*
@@ -31,10 +31,10 @@ jobs:
     needs: package-goat-ui-archive
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{github.ref}}
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: goat-ui
           path: ./dist
@@ -56,5 +56,5 @@ jobs:
         with:
           context: src/docker/goat
           push: true
-          tags: genomehubs/goat:$ARCHIVE_VERSION
+          tags: genomehubs/goat:${{ env.ARCHIVE_VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
