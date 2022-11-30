@@ -25,9 +25,8 @@ const ENV = {
   GH_SUGGESTED_TERM,
 };
 
-// disable browser caching
-// app.use(nocache());
-// app.set("etag", false);
+// set site basename
+app.set("base", GH_BASENAME);
 
 // set the view engine to ejs
 app.set("views", __dirname + "/views");
@@ -41,30 +40,14 @@ const getDirectories = (srcPath) => {
     .filter((file) => fs.statSync(path.join(srcPath, file)).isDirectory());
 };
 
-let directories = getDirectories(path.resolve(__dirname, "public", "static"));
+let directories = getDirectories(path.resolve(__dirname, "public"));
 
 app.use(
-  `static/${directories[0]}`,
+  `${GH_BASENAME}/static/${directories[0]}`,
   express.static("/genomehubs/local/static", { eTag: false, maxAge: 0 })
 );
-app.use(express.static("/genomehubs/local"));
-app.use(express.static(path.resolve(__dirname, "public")));
-app.use(
-  `${GH_BASENAME}/manifest.json`,
-  express.static(path.resolve(__dirname, "public/manifest.json"))
-);
-app.use(
-  `${GH_BASENAME}/icon-192.png`,
-  express.static(path.resolve(__dirname, "public/icon-192.png"))
-);
-app.use(
-  `${GH_BASENAME}/icon-512.png`,
-  express.static(path.resolve(__dirname, "public/icon-512.png"))
-);
-app.use(
-  `${GH_BASENAME}/favicon.ico`,
-  express.static(path.resolve(__dirname, "public/favicon.ico"))
-);
+
+app.use(GH_BASENAME, express.static(path.resolve(__dirname, "public")));
 
 // handle every other route with index.html, which will contain
 // a script tag to your application's JavaScript file(s).
