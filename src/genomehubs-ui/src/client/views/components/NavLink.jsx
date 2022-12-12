@@ -18,15 +18,25 @@ const NavLink = ({
   dispatch,
   ...props
 }) => {
+  console.log(props.title);
   const location = useLocation();
   if (url) {
     to = url;
   } else if (to) {
     to = basename + "/" + to + (plain ? "" : location.search + location.hash);
   } else if (props.href) {
-    if (props.href.match(/\:\/\//) && !props.href.match(location.origin)) {
+    if (
+      props.href.match(/\:\/\//) &&
+      (props.title.startsWith("external:") ||
+        !props.href.match(location.origin))
+    ) {
       return (
-        <a href={props.href} target="_blank" rel="noopener noreferrer">
+        <a
+          href={props.href}
+          title={props.title.replace(/^external:\s*/, "")}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {props.children}
           <LaunchIcon fontSize="inherit" />
         </a>
