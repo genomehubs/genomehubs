@@ -18,7 +18,6 @@ const NavLink = ({
   dispatch,
   ...props
 }) => {
-  console.log(props.title);
   const location = useLocation();
   if (url) {
     to = url;
@@ -27,13 +26,13 @@ const NavLink = ({
   } else if (props.href) {
     if (
       props.href.match(/\:\/\//) &&
-      (props.title.startsWith("external:") ||
+      (props.title?.startsWith("external:") ||
         !props.href.match(location.origin))
     ) {
       return (
         <a
           href={props.href}
-          title={props.title.replace(/^external:\s*/, "")}
+          title={(props.title || "").replace(/^external:\s*/, "")}
           target="_blank"
           rel="noopener noreferrer"
         >
