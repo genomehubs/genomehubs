@@ -9,6 +9,7 @@ import { compose } from "recompose";
 // import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
 import styles from "./Styles.scss";
 import withAutocomplete from "../hocs/withAutocomplete";
+// import withSearchDefaults from "../hocs/withSearchDefaults";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -16,6 +17,7 @@ export const AutoCompleteInput = ({
   id = "main-search",
   required,
   error,
+  searchDefaults,
   inputValue,
   setInputValue,
   inputRef,
@@ -95,7 +97,16 @@ export const AutoCompleteInput = ({
           } else {
             value = result.result.scientific_name;
           }
-          let title = `${prefix}${result.result.taxon_id}[${value}]${suffix}`;
+          let extra = "";
+          let closure = "";
+          if (!prefix.match(/tax_\w+\(\s*/)) {
+            extra = "tax_name(";
+            if (!suffix.match(/^\s*\($/)) {
+              closure = ")";
+            }
+          }
+          let title = `${prefix}${extra}${result.result.taxon_id}[${value}]${closure}${suffix}`;
+
           options.push({
             value,
             title,
@@ -555,5 +566,6 @@ export default compose(
   withTaxonomy,
   withTypes,
   withAutocomplete
+  // withSearchDefaults
   // dispatchLiveQuery
 )(AutoCompleteInput);
