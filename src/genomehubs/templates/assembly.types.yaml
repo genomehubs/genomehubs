@@ -57,6 +57,7 @@ attributes:
         - plastid
         - apicoplast
     default: nucleus
+    type: keyword
   bioproject:
     constraint:
       len: 32

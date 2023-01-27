@@ -51,7 +51,7 @@ const addSortParameter = (sortBy, lookupTypes, lookupNames) => {
     };
   } else if (lookupTypes(sortBy.by)) {
     return {
-      [`attributes.${lookupTypes(sortBy.by).type}_value`]: {
+      [`attributes.${lookupTypes(sortBy.by).type || "keyword"}_value`]: {
         mode: sortBy.mode || "max",
         order: sortBy.order || "asc",
         nested: {
