@@ -264,14 +264,14 @@ export const generateQuery = async ({
   optionalFields = optionalFields
     ? await parseFields({ result, fields: optionalFields, taxonomy })
     : [];
-  if (ranks) {
+  if (ranks && typeof ranks !== "object") {
     let rankNames = ranks.split(/\s*,\s*/);
     ranks = {};
     rankNames.forEach((name) => {
       ranks[name] = true;
     });
   }
-  if (names) {
+  if (names && typeof names !== "object") {
     let nameClasses = names.split(/\s*,\s*/);
     names = {};
     nameClasses.forEach((nameClass) => {
