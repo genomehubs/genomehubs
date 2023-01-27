@@ -135,6 +135,9 @@
           "scientific_name": {
             "type": "keyword",
             "normalizer": "lowercase",
+            "fields": {
+              "raw": { "type": "keyword" }
+            },
             "meta": { "description": "Scientific name" }
           },
           "node_depth": {
