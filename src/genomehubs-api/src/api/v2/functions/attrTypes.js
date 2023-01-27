@@ -90,6 +90,10 @@ const fetchTypes = async ({ result, taxonomy, hub, release, indexType }) => {
   if (result != "multi") {
     return { typesMap: typesMap[result], synonyms: synonyms[result] || {} };
   }
+  // Copy identifiers from taxon index if none in assembly index
+  if (indexType == "identifiers" && !typesMap.assembly) {
+    typesMap.assembly = typesMap.taxon;
+  }
   return { typesMap, synonyms };
 };
 
