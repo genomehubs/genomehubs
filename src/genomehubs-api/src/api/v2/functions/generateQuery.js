@@ -453,7 +453,7 @@ export const generateQuery = async ({
     let function_score;
     taxTerm[2] = taxTerm[2]
       .split(",")
-      .map((part) => part.replace(/^(\w+)\[.*\]$/, "$1"))
+      .map((part) => part.replace(/^(.+?)\[.*\]$/, "$1"))
       .join(",");
     if (taxTerm[1] == "lineage") {
       // convert search term to list of tax names
