@@ -3,7 +3,7 @@
   "version": "2.5.46",
   "description": "GenomeHubs API",
   "scripts": {
-    "api": "node --max-old-space-size=8192 -r esm src/app.js",
+    "api": "node --max-old-space-size=16384 -r esm src/app.js",
     "start": "nodemon -r esm src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "package": "./package.sh"
