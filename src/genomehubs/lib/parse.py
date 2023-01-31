@@ -5,6 +5,7 @@ Parse a local or remote data source.
 
 Usage:
     genomehubs parse [--btk] [--btk-root STRING...]
+                     [--busco PATH]
                      [--wikidata PATH] [--wikidata-root STRING...] [--wikidata-xref STRING...]
                      [--gbif] [--gbif-root STRING...] [--gbif-xref STRING...]
                      [--ncbi-datasets-genome PATH] [--ncbi-datasets-sample PATH]
@@ -16,6 +17,7 @@ Usage:
 Options:
     --btk                        Parse assemblies in BlobToolKit
     --btk-root STRING            Scientific name of root taxon
+    --busco PATH                 BUSCO full table file
     --gbif                       Parse taxa in GBIF
     --gbif-root STRING           GBIF taxon ID of root taxon
     --gbif-xref STRING           Include link to external reference from GBIF (e.g. NBN, BOLD)
@@ -46,9 +48,11 @@ from tolkein import tofile
 from tolkein import tolog
 
 from .btk import btk_parser
+from .busco import busco_parser
 from .config import config
 from .hub import load_types
 from .hub import order_parsed_fields
+
 # from .ncbi import ncbi_datasets_summary_parser
 from .ncbi import ncbi_genome_parser
 from .ncbi import refseq_organelle_parser
@@ -59,6 +63,7 @@ LOGGER = tolog.logger(__name__)
 
 PARSERS = {
     "btk": {"func": btk_parser, "params": None, "types": "btk"},
+    "busco": {"func": busco_parser, "params": None, "types": "busco"},
     "ncbi-datasets-genome": {
         "func": ncbi_genome_parser,
         "params": ("genome"),
@@ -98,12 +103,13 @@ def remove_temporary_types(types):
     new_types = {}
     for section, obj in types.items():
         if isinstance(obj, dict):
-            new_section = {}
-            for key, meta in obj.items():
-                if isinstance(meta, dict):
-                    if "temporary" in meta and meta["temporary"]:
-                        continue
-                new_section[key] = meta
+            new_section = {
+                key: meta
+                for key, meta in obj.items()
+                if not isinstance(meta, dict)
+                or "temporary" not in meta
+                or not meta["temporary"]
+            }
         else:
             new_section = section
         new_types[section] = new_section
@@ -119,7 +125,7 @@ def main(args):
             params = PARSERS[option]["params"]
             if params is None:
                 params = options["parse"][option]
-            LOGGER.info("Parsing %s" % option)
+            LOGGER.info(f"Parsing {option}")
             types = load_types(PARSERS[option]["types"])
             names = load_types(PARSERS[option]["types"], part="names")
             parsed = PARSERS[option]["func"](
@@ -128,6 +134,7 @@ def main(args):
             files = []
             if isinstance(parsed, tuple):
                 parsed, files = parsed
+            print(types)
             data = order_parsed_fields(parsed, types, names)
             tofile.write_file(options["parse"]["outfile"], data)
             filepath = Path(options["parse"]["outfile"])
@@ -139,12 +146,16 @@ def main(args):
                 stem = filepath.stem
             if types:
                 types["file"]["name"] = filepath.name
-                tofile.write_file("%s/%s.types.yaml" % (outdir, stem), remove_temporary_types(types))
+                tofile.write_file(
+                    f"{outdir}/{stem}.types.yaml", remove_temporary_types(types)
+                )
             if names:
                 names["file"]["name"] = filepath.name
-                tofile.write_file("%s/%s.names.yaml" % (outdir, stem), remove_temporary_types(names))
+                tofile.write_file(
+                    f"{outdir}/{stem}.names.yaml", remove_temporary_types(names)
+                )
             if files:
-                tofile.write_file("%s/%s.files.yaml" % (outdir, stem), files)
+                tofile.write_file(f"{outdir}/{stem}.files.yaml", files)
 
 
 def cli():
