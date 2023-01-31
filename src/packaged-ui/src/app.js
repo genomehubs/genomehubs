@@ -43,7 +43,11 @@ const getDirectories = (srcPath) => {
 let directories = getDirectories(path.resolve(__dirname, "public"));
 
 app.use(
-  `${GH_BASENAME}/static/${directories[0]}`,
+  `${
+    GH_BASENAME > "/"
+      ? `${GH_BASENAME}/static/${directories[0]}`
+      : `static/${directories[0]}`
+  }`,
   express.static("/genomehubs/local/static", { eTag: false, maxAge: 0 })
 );
 
