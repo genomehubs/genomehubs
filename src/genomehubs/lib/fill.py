@@ -233,6 +233,9 @@ def apply_summary(
     max_value=None,
     min_value=None,
     order=None,
+    attr_order=None,
+    meta=None,
+    linked_attributes=None,
 ):
     """Apply summary statistic functions."""
     summaries = {
@@ -265,6 +268,12 @@ def apply_summary(
     flattened = flatten_list(values)
     if summary == "enum":
         value = summaries[summary]((order, flattened))
+    elif summary == "ordered_list":
+        print(meta["key"])
+        print(attr_order)
+        print(linked_attributes.keys())
+        quit()
+        value = summaries[summary]((order, flattened))
     else:
         value = summaries[summary](flattened)
     if summary == "max":
@@ -290,10 +299,12 @@ def set_traverse_values(
     value_type,
     traverse,
     source,
+    linked_attributes,
 ):
     """Set values  use for tree traversal."""
     idx = 0
     order = meta.get("constraint", {}).get("enum", [])
+    attr_order = meta.get("order", [])
     default_summary = "median"
     if meta["type"] == "keyword":
         default_summary = "mode"
@@ -309,6 +320,9 @@ def set_traverse_values(
             max_value=max_value,
             min_value=min_value,
             order=order,
+            attr_order=attr_order,
+            meta=meta,
+            linked_attributes=linked_attributes,
         )
         if idx == 0:
             if value is not None:
@@ -358,6 +372,7 @@ def summarise_attribute_values(
     attribute,
     meta,
     *,
+    linked_attributes=None,
     values=None,
     count=0,
     max_value=None,
@@ -406,6 +421,7 @@ def summarise_attribute_values(
                 value_type,
                 traverse,
                 source,
+                linked_attributes,
             )
         except Exception:
             print(format_exc())
@@ -430,8 +446,15 @@ def summarise_attributes(*, attributes, attrs, meta, parent, parents):
     for node_attribute in attributes:
         if node_attribute["key"] in attrs:
             attr_dict[node_attribute["key"]] = node_attribute
+            linked_attributes = {}
+            if "order" in meta[node_attribute["key"]]:
+                for attribute in attributes:
+                    if attribute["key"] in meta[node_attribute["key"]]["order"]:
+                        linked_attributes[attribute["key"]] = attribute
             summary_value, max_value, min_value = summarise_attribute_values(
-                node_attribute, meta[node_attribute["key"]]
+                node_attribute,
+                {"key": node_attribute["key"], **meta[node_attribute["key"]]},
+                linked_attributes=linked_attributes,
             )
             if summary_value is not None:
                 changed = True
