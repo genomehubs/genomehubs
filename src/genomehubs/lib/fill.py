@@ -142,14 +142,15 @@ def enum(tup):
 def ordered_list(tup):
     """Remove values that are in a higher priority list."""
     (key, order, arr, linked) = tup
+    values = deduped_list(arr)
     seen = set()
     for i, k in enumerate(order):
         if i == 0 and k == key:
-            return arr
+            break
         if k == key:
-            return [value for value in arr if value not in seen]
-        seen.update(linked[k])
-    return arr
+            return [value for value in values if value not in seen]
+        seen.update(linked[k]["keyword_value"])
+    return values
 
 
 def earliest(arr, *args):
@@ -346,7 +347,7 @@ def set_traverse_values(
                         summary = summary_types[0]
                     attribute[value_type] = value
                     attribute["count"] = count or len(values)
-                    if summary == "list":
+                    if summary in ["list", "ordered_list"]:
                         attribute["length"] = deduped_list_length(values)
                     attribute["aggregation_method"] = summary
                     attribute["aggregation_source"] = source

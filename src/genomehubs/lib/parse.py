@@ -134,7 +134,6 @@ def main(args):
             files = []
             if isinstance(parsed, tuple):
                 parsed, files = parsed
-            print(types)
             data = order_parsed_fields(parsed, types, names)
             tofile.write_file(options["parse"]["outfile"], data)
             filepath = Path(options["parse"]["outfile"])

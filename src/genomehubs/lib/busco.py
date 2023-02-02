@@ -113,21 +113,6 @@ def busco_parser(params, opts, *, types=None, names=None):
                 if new_attributes:
                     types["attributes"].update(new_attributes)
         parsed.append(parsed_row)
-        break
     for key in template_keys:
         del types["attributes"][key]
-    # config = tofile.load_yaml(f"{opts['busco']}/config.yaml")
-    # full_table = opts["busco"]
-    # header = None
-    # header_rows = []
-    # with tofile.open_file_handle(full_table) as report:
-    #     for line in report:
-    #         line.strip()
-    #         if line.startswith("#"):
-    #             header_rows.append(line)
-    #             continue
-    #         if header is None:
-    #             header = parse_busco_header(header_rows)
-    #         parse_busco_record(line, parsed)
     return parsed
-    # return [{k: ",".join(v) for k, v in parsed.items()}]
