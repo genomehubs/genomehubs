@@ -139,6 +139,19 @@ def enum(tup):
     return result
 
 
+def ordered_list(tup):
+    """Remove values that are in a higher priority list."""
+    (key, order, arr, linked) = tup
+    seen = set()
+    for i, k in enumerate(order):
+        if i == 0 and k == key:
+            return arr
+        if k == key:
+            return [value for value in arr if value not in seen]
+        seen.update(linked[k])
+    return arr
+
+
 def earliest(arr, *args):
     """Select earliest date from a list."""
     if not isinstance(arr, list):
@@ -260,6 +273,7 @@ def apply_summary(
         "sum": sum,
         "list": deduped_list,
         "length": deduped_list_length,
+        "ordered_list": ordered_list,
     }
     if summary == "primary":
         if primary_values:
@@ -269,11 +283,9 @@ def apply_summary(
     if summary == "enum":
         value = summaries[summary]((order, flattened))
     elif summary == "ordered_list":
-        print(meta["key"])
-        print(attr_order)
-        print(linked_attributes.keys())
-        quit()
-        value = summaries[summary]((order, flattened))
+        value = summaries[summary](
+            (meta["key"], attr_order, flattened, linked_attributes)
+        )
     else:
         value = summaries[summary](flattened)
     if summary == "max":
@@ -338,10 +350,10 @@ def set_traverse_values(
                         attribute["length"] = deduped_list_length(values)
                     attribute["aggregation_method"] = summary
                     attribute["aggregation_source"] = source
-                traverse_value = value if value else []
+                traverse_value = value or []
             idx += 1
         if traverse and source == "descendant" and summary == traverse:
-            traverse_value = value if value else []
+            traverse_value = value or []
         elif summary != "list":
             if summary.startswith("median"):
                 summary = "median"
@@ -429,7 +441,7 @@ def summarise_attribute_values(
                 f"Unable to generate summary values for attribute {meta['key']}"
             )
             sys.exit(1)
-        if isinstance(max_value, float) or isinstance(max_value, int):
+        if isinstance(max_value, (float, int)):
             attribute["max"] = max_value
             attribute["min"] = min_value
         elif meta["type"] == "date" and max_value and min_value:
@@ -527,8 +539,7 @@ def set_values_from_descendants(
             traverseable = False
         if not traverseable or taxon_id in limits[key]:
             continue
-        local_limit = meta[key].get("traverse_limit", traverse_limit)
-        if local_limit:
+        if local_limit := meta[key].get("traverse_limit", traverse_limit):
             if (
                 descendant_ranks is not None
                 and local_limit in descendant_ranks[taxon_id]
@@ -541,14 +552,20 @@ def set_values_from_descendants(
         except StopIteration:
             attribute = {"key": key}
             attributes.append(attribute)
+        linked_attributes = {}
+        if "order" in meta[key]:
+            for attribute in attributes:
+                if attribute["key"] in meta[key]["order"]:
+                    linked_attributes[attribute["key"]] = attribute
         summary_value, max_value, min_value = summarise_attribute_values(
             attribute,
-            meta[key],
+            {"key": key, **meta[key]},
             values=obj["values"],
             count=obj["count"],
             max_value=obj["max"],
             min_value=obj["min"],
             source=set_aggregation_source(attribute),
+            linked_attributes=linked_attributes,
         )
         set_aggregation_source(attribute, "descendant")
 
@@ -759,10 +776,11 @@ def stream_missing_attributes_at_level(es, *, nodes, attrs, template, level=1):
         taxon_id = node["_source"]["taxon_id"]
         fill_attrs = []
         if "attributes" in node["_source"]:
-            for attribute in node["_source"]["attributes"]:
-                if attribute["key"] in attrs:
-                    fill_attrs.append(attribute)
-
+            fill_attrs.extend(
+                attribute
+                for attribute in node["_source"]["attributes"]
+                if attribute["key"] in attrs
+            )
         if not fill_attrs:
             continue
         meta = template["types"]["attributes"]
