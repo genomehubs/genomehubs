@@ -199,10 +199,15 @@ def refseq_organelle_parser(collections, opts, *, types=None, names=None):
 
 def metricDates(obj):
     """Add date fields for assemblies with sufficient metrics."""
-    if "contigN50" in obj and "scaffoldN50" in obj:
+    if "contigN50" in obj and "scaffoldN50" in obj and "assemblyLevel" in obj:
         contig_n50 = obj.get("contigN50", 0)
         scaffold_n50 = obj.get("scaffoldN50", 0)
-        if contig_n50 > 1000000 and scaffold_n50 > 10000000:
+        assembly_level = obj.get("assemblyLevel", "Contig")
+        if (
+            contig_n50 > 1000000
+            and scaffold_n50 > 10000000
+            and assembly_level in ["Chromosome", "Complete Genome"]
+        ):
             obj["ebpMetricDate"] = obj["submissionDate"]
 
 
