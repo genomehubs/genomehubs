@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""NCBI functions."""
+"""BUSCO functions."""
 
-import copy
 import glob
 import gzip
 import os
+import shlex
+import subprocess
 import tarfile
 
 from tolkein import tofile
 from tolkein import tolog
+
+from .hub import deep_replace
 
 LOGGER = tolog.logger(__name__)
 
@@ -29,29 +32,72 @@ def parse_busco_record(record, parsed):
     return
 
 
-def do_replace(item, query, replace):
-    """Recursively replace all instances of query string."""
-    if isinstance(item, dict):
-        matched_keys = {}
-        for key, value in item.items():
-            item[key] = do_replace(value, query, replace)
-            if query in key:
-                matched_keys[key] = do_replace(key, query, replace)
-        for key, new_key in matched_keys.items():
-            item[new_key] = item[key]
-            del item[key]
-    elif isinstance(item, list):
-        item = [do_replace(value, query, replace) for value in item]
-    elif isinstance(item, str):
-        item = item.replace(query, replace)
-    return item
+def parse_busco_lineages(
+    types, template_keys, expanded_keys, d, config, prefix, parsed_row
+):
+    """Parse all busco lineages for an assembly."""
+    for busco_lineage in config["busco"]["lineages"]:
+        lineage = busco_lineage.split("_")[0]
+        parsed_lineage = {"complete": [], "fragmented": [], "missing": []}
+        header = None
+        header_rows = []
+        tar = tarfile.open(f"{d}/{prefix}.busco.{busco_lineage}.tar")
+        data = gzip.decompress(
+            tar.extractfile(f"{prefix}.busco.{busco_lineage}/full_table.tsv.gz").read()
+        )
+        for line in str(data, "utf-8").split("\n"):
+            if not line:
+                continue
+            if line.startswith("#"):
+                header_rows.append(line)
+                continue
+            if header is None:
+                header = parse_busco_header(header_rows)
+            parse_busco_record(line, parsed_lineage)
+        parsed_row.update(
+            {
+                f"{lineage}_odb10_complete": ",".join(parsed_lineage["complete"]),
+                f"{lineage}_odb10_fragmented": ",".join(parsed_lineage["fragmented"]),
+                f"{lineage}_odb10_missing": ",".join(parsed_lineage["missing"]),
+            }
+        )
+        new_attributes = {}
+        for key, meta in types["attributes"].items():
+            if "<<lineage>>" in key:
+                template_keys.add(key)
+                new_key = key.replace("<<lineage>>", lineage)
+                if new_key not in expanded_keys:
+                    expanded_keys.add(new_key)
+                    new_attributes[new_key] = deep_replace(
+                        meta, [("<<lineage>>", lineage)]
+                    )
+        if new_attributes:
+            types["attributes"].update(new_attributes)
 
 
-def deep_replace(obj, query, replace):
-    """Replace all instances of query string in obj."""
-    new_obj = copy.deepcopy(obj)
-    new_obj = do_replace(new_obj, query, replace)
-    return new_obj
+def prepare_window_files(btk_dir, accession, prefix, opts):
+    """Generate tsv/yaml pairs for windowed assembly statistics."""
+    windows = "--window " + " --window ".join(opts["window-size"])
+    out_dir = os.path.dirname(os.path.abspath(opts["outfile"]))
+    outfile = f"{out_dir}/{accession}.window_stats.tsv"
+    if not os.path.exists(outfile):
+        cmd = f"btk pipeline window-stats {windows} \
+        --min-window-length 1000 \
+        --min-window-count 5 \
+        --in {btk_dir}/{prefix}.chunk_stats.tsv.gz \
+        --out {outfile}"
+        print(cmd)
+        subprocess.run(shlex.split(cmd))
+    for window in opts["window-size"]:
+        flag = "--window"
+        if window == "1":
+            flag += "-full"
+        cmd = f"genomehubs parse {flag} {btk_dir} \
+        --outfile {outfile}"
+        if window != "1":
+            cmd += f" --window-size {window}"
+        print(cmd)
+        subprocess.run(shlex.split(cmd))
 
 
 def busco_parser(params, opts, *, types=None, names=None):
@@ -63,56 +109,18 @@ def busco_parser(params, opts, *, types=None, names=None):
         d = os.path.abspath(d)
         if os.path.exists(f"{d}/config.yaml"):
             config = tofile.load_yaml(f"{d}/config.yaml")
-            taxid = config["taxon"]["taxid"]
             accession = config["assembly"]["accession"]
             prefix = config["assembly"]["prefix"]
+            if "window-size" in opts:
+                prepare_window_files(d, accession, prefix, opts)
+            taxid = config["taxon"]["taxid"]
+            prefix = config["assembly"]["prefix"]
             parsed_row = {"taxon_id": taxid, "assembly_id": accession}
-            for busco_lineage in config["busco"]["lineages"]:
-                lineage = busco_lineage.split("_")[0]
-                parsed_lineage = {"complete": [], "fragmented": [], "missing": []}
-                header = None
-                header_rows = []
-                tar = tarfile.open(f"{d}/{prefix}.busco.{busco_lineage}.tar")
-                data = gzip.decompress(
-                    tar.extractfile(
-                        f"{prefix}.busco.{busco_lineage}/full_table.tsv.gz"
-                    ).read()
-                )
-                for line in str(data, "utf-8").split("\n"):
-                    if not line:
-                        continue
-                    if line.startswith("#"):
-                        header_rows.append(line)
-                        continue
-                    if header is None:
-                        header = parse_busco_header(header_rows)
-                    parse_busco_record(line, parsed_lineage)
-                parsed_row.update(
-                    {
-                        f"{lineage}_odb10_complete": ",".join(
-                            parsed_lineage["complete"]
-                        ),
-                        f"{lineage}_odb10_fragmented": ",".join(
-                            parsed_lineage["fragmented"]
-                        ),
-                        f"{lineage}_odb10_missing": ",".join(parsed_lineage["missing"]),
-                    }
-                )
-                new_attributes = {}
-                for key, meta in types["attributes"].items():
-                    if "<<lineage>>" in key:
-                        template_keys.add(key)
-                        new_key = key.replace("<<lineage>>", lineage)
-                        if new_key not in expanded_keys:
-                            expanded_keys.add(new_key)
-                            new_attributes[new_key] = deep_replace(
-                                meta, "<<lineage>>", lineage
-                            )
-                            # new_attributes[new_key] = copy.deepcopy(meta)
-                            # new_attributes[new_key]["header"] = new_key
-                if new_attributes:
-                    types["attributes"].update(new_attributes)
+            parse_busco_lineages(
+                types, template_keys, expanded_keys, d, config, prefix, parsed_row
+            )
         parsed.append(parsed_row)
+        break
     for key in template_keys:
         del types["attributes"][key]
     return parsed

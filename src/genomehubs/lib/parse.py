@@ -5,7 +5,7 @@ Parse a local or remote data source.
 
 Usage:
     genomehubs parse [--btk] [--btk-root STRING...]
-                     [--busco PATH]
+                     [--busco PATH] [--window PATH] [--window-full PATH] [--window-size FLOAT...]
                      [--wikidata PATH] [--wikidata-root STRING...] [--wikidata-xref STRING...]
                      [--gbif] [--gbif-root STRING...] [--gbif-xref STRING...]
                      [--ncbi-datasets-genome PATH] [--ncbi-datasets-sample PATH]
@@ -17,7 +17,10 @@ Usage:
 Options:
     --btk                        Parse assemblies in BlobToolKit
     --btk-root STRING            Scientific name of root taxon
-    --busco PATH                 BUSCO full table file
+    --busco PATH                 Path to a set of Blobtoolkit data directories
+    --window PATH                Path to a single Blobtoolkit data directory
+    --window-full PATH           Path to a single Blobtoolkit data directory
+    --window-size FLOAT          Window size for sequence stats
     --gbif                       Parse taxa in GBIF
     --gbif-root STRING           GBIF taxon ID of root taxon
     --gbif-xref STRING           Include link to external reference from GBIF (e.g. NBN, BOLD)
@@ -49,6 +52,7 @@ from tolkein import tolog
 
 from .btk import btk_parser
 from .busco import busco_parser
+from .window import window_parser
 from .config import config
 from .hub import load_types
 from .hub import order_parsed_fields
@@ -64,6 +68,8 @@ LOGGER = tolog.logger(__name__)
 PARSERS = {
     "btk": {"func": btk_parser, "params": None, "types": "btk"},
     "busco": {"func": busco_parser, "params": None, "types": "busco"},
+    "window-full": {"func": window_parser, "params": None, "types": "window_full"},
+    "window": {"func": window_parser, "params": None, "types": "window_stats"},
     "ncbi-datasets-genome": {
         "func": ncbi_genome_parser,
         "params": ("genome"),
@@ -132,24 +138,32 @@ def main(args):
                 params, options["parse"], types=types, names=names
             )
             files = []
-            if isinstance(parsed, tuple):
-                parsed, files = parsed
-            data = order_parsed_fields(parsed, types, names)
-            tofile.write_file(options["parse"]["outfile"], data)
+            if parsed is not None:
+                if isinstance(parsed, tuple):
+                    parsed, files = parsed
+                data = order_parsed_fields(parsed, types, names)
+                tofile.write_file(options["parse"]["outfile"], data)
             filepath = Path(options["parse"]["outfile"])
             outdir = filepath.parent
             suff = re.compile(r"\.[^\.]+$")
+            suffix = filepath.name.replace(filepath.stem, "")
             if filepath.name.endswith(".gz"):
                 stem = re.sub(suff, "", filepath.stem)
             else:
                 stem = filepath.stem
+            if (
+                "window" in options["parse"]
+                and "window-size" in options["parse"]
+                and options["parse"]["window-size"][0] != "1"
+            ):
+                stem += "." + options["parse"]["window-size"][0]
             if types:
-                types["file"]["name"] = filepath.name
+                types["file"]["name"] = f"{stem}{suffix}"
                 tofile.write_file(
                     f"{outdir}/{stem}.types.yaml", remove_temporary_types(types)
                 )
             if names:
-                names["file"]["name"] = filepath.name
+                names["file"]["name"] = f"{stem}{suffix}"
                 tofile.write_file(
                     f"{outdir}/{stem}.names.yaml", remove_temporary_types(names)
                 )

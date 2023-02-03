@@ -98,7 +98,9 @@ def load_types(name, *, part="types"):
             if "attributes" in types:
                 for attr in types["attributes"].values():
                     if (
-                        key not in ("exclusions", "format", "header", "name")
+                        isinstance(attr, (dict, list))
+                        and key
+                        not in ("exclusions", "format", "header", "name", "needs")
                         and key not in attr
                     ):
                         attr[key] = value
@@ -973,3 +975,32 @@ def write_imported_taxa(taxa, opts, *, types):
             outfile,
         )
         tofile.write_file(outfile, [["taxon_id", "input", "rank"]] + imported)
+
+
+def do_replace(item, arr):
+    """Recursively replace all instances of query string."""
+    if isinstance(item, dict):
+        matched_keys = {}
+        for key, value in item.items():
+            item[key] = do_replace(value, arr)
+            matched_keys[key] = do_replace(key, arr)
+        for key, new_key in matched_keys.items():
+            if new_key != key:
+                item[new_key] = item[key]
+                del item[key]
+    elif isinstance(item, list):
+        item = [do_replace(value, arr) for value in item]
+    elif isinstance(item, str):
+        for (query, replace) in arr:
+            new_item = item.replace(query, str(replace))
+            if new_item != item:
+                item = new_item
+                break
+    return item
+
+
+def deep_replace(obj, arr):
+    """Replace all instances of each query string in obj."""
+    new_obj = deepcopy(obj)
+    new_obj = do_replace(new_obj, arr)
+    return new_obj
