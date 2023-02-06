@@ -1,11 +1,10 @@
 file:
   format: tsv
-  header: false
+  header: true
   name: <<accession>>.<<lineage>>.full_table.tsv.gz
   needs:
     - ATTR_busco.types.yaml
-    - ATTR_merian.types.yaml
-    - FILE_<<accession>>.window_stats.types.yaml
+    - <<accession>>.window_stats.types.yaml
   source: BlobToolKit
   source_url: https://blobtoolkit.genomehubs.org/view/dataset/<<blobtoolkit_id>>
 analysis:
@@ -18,7 +17,7 @@ analysis:
 features:
   assembly_id: <<accession>>
   feature_id:
-    index: 2
+    header: buscoId
     separator:
       - ":"
     limit: 1
@@ -28,42 +27,43 @@ taxonomy:
   taxon_id: "<<taxon_id>>"
 attributes:
   sequence_id:
-    index: 2
+    header: sequenceId
     separator:
       - ":"
     limit: 1
   feature_type:
     default:
+      - <<lineage>>-busco-gene
       - busco-gene
       - gene
   start:
-    index: 3
+    header: start
   end:
-    index: 4
+    header: end
   strand:
-    index: 5
+    header: strand
     translate:
       "-": -1
       "+": 1
   length:
-    index: 7
+    header: length
   midpoint:
-    index: 3
+    header: start
     function: "{length} / 2 + {}"
   midpoint_proportion:
-    index: 2
+    header: sequenceId
     separator:
       - ":"
     limit: 1
     function: "{midpoint} / {.length}"
   busco_gene:
-    index: 0
+    header: buscoId
   busco_status:
-    index: 1
+    header: status
   busco_score:
-    index: 6
+    header: score
   analysis_name:
     default: BUSCO_<<lineage>>
-  ancestral_unit:
-    index: 0
-    # include merian/nigon
+  # ancestral_unit:
+  #   index: 0
+  # include merian/nigon translation

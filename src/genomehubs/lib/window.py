@@ -27,7 +27,6 @@ def parse_config(config):
         ("<<taxon_id>>", config["taxon"]["taxid"]),
         ("<<level>>", config["assembly"]["level"]),
         ("<<span>>", config["assembly"]["span"]),
-        ("<<accession>>", config["assembly"]["accession"]),
         ("<<lineage>>", lineages[0]),
     ]
     return replacements, libraries
@@ -41,15 +40,19 @@ def fill_window_template(config_file, types, size=None):
         replacements.append(("<<window>>", size))
     types = deep_replace(types, replacements)
     if libraries:
-        types["attributes"] = {
-            "coverage": {"header": f"{libraries[0]}_cov", "function": '"{} + 0.01"'}
+        prefix = libraries[0]["prefix"]
+        types["attributes"]["coverage"] = {
+            "header": f"{prefix}_cov",
+            "function": "{} + 0.01",
         }
     return types
 
 
 def window_parser(params, opts, *, types=None, names=None):
     """Parse window_stats files."""
-    config_file = opts["window"] + "/config.yaml"
+    config_file = (
+        opts.get("window", False) or opts.get("window-full", False)
+    ) + "/config.yaml"
     if os.path.exists(config_file):
         new_types = fill_window_template(
             config_file, types, opts.get("window-size", [None])[0]

@@ -5,7 +5,7 @@ file:
   needs:
     - ATTR_feature.types.yaml
     - ATTR_window_stats.types.yaml
-    - FILE_<<accession>>.window_stats.types.yaml
+    - <<accession>>.window_stats.types.yaml
   source: BlobToolKit
   source_url: https://blobtoolkit.genomehubs.org/view/dataset/<<blobtoolkit_id>>
 analysis:

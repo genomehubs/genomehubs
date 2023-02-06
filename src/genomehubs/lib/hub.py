@@ -6,6 +6,7 @@ import contextlib
 import csv
 import os
 import re
+import shutil
 import sys
 from collections import defaultdict
 from copy import deepcopy
@@ -76,6 +77,15 @@ def list_files(dir_path, pattern):
             deps[yaml_file] = []
     file_list = [item for sublist in dep(deps) for item in sublist]
     return file_list
+
+
+def copy_types(name, directory):
+    """Copy a types file from the templates directory."""
+    script_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    with contextlib.suppress(Exception):
+        types_file = os.path.join(script_dir, "templates", name)
+        if not os.path.exists(f"directory/{name}"):
+            shutil.copy(types_file, directory)
 
 
 def load_types(name, *, part="types"):
@@ -995,7 +1005,6 @@ def do_replace(item, arr):
             new_item = item.replace(query, str(replace))
             if new_item != item:
                 item = new_item
-                break
     return item
 
 

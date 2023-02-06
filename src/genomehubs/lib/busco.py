@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """BUSCO functions."""
 
-import glob
 import gzip
 import os
-import shlex
-import subprocess
+import re
 import tarfile
 
 from tolkein import tofile
@@ -16,8 +14,28 @@ from .hub import deep_replace
 LOGGER = tolog.logger(__name__)
 
 
-def parse_busco_header(header):
+def parse_busco_header(header_rows):
     """Parse a BUSCO full table header."""
+    # print(header_rows)
+    return True
+
+
+def parse_busco_feature(record, parsed):
+    """Parse a single BUSCO full table record."""
+    row = record.split("\t")[:8]
+    if len(row) < 8:
+        return
+    cols = [
+        "buscoId",
+        "status",
+        "sequenceId",
+        "start",
+        "end",
+        "strand",
+        "score",
+        "length",
+    ]
+    parsed.append(dict(zip(cols, row)))
 
 
 def parse_busco_record(record, parsed):
@@ -36,6 +54,7 @@ def parse_busco_lineages(
     types, template_keys, expanded_keys, d, config, prefix, parsed_row
 ):
     """Parse all busco lineages for an assembly."""
+    lineages = []
     for busco_lineage in config["busco"]["lineages"]:
         lineage = busco_lineage.split("_")[0]
         parsed_lineage = {"complete": [], "fragmented": [], "missing": []}
@@ -54,6 +73,9 @@ def parse_busco_lineages(
             if header is None:
                 header = parse_busco_header(header_rows)
             parse_busco_record(line, parsed_lineage)
+        if not parsed_lineage["complete"] and not parsed_lineage["fragmented"]:
+            continue
+        lineages.append(lineage)
         parsed_row.update(
             {
                 f"{lineage}_odb10_complete": ",".join(parsed_lineage["complete"]),
@@ -73,54 +95,57 @@ def parse_busco_lineages(
                     )
         if new_attributes:
             types["attributes"].update(new_attributes)
+    return lineages
 
 
-def prepare_window_files(btk_dir, accession, prefix, opts):
-    """Generate tsv/yaml pairs for windowed assembly statistics."""
-    windows = "--window " + " --window ".join(opts["window-size"])
-    out_dir = os.path.dirname(os.path.abspath(opts["outfile"]))
-    outfile = f"{out_dir}/{accession}.window_stats.tsv"
-    if not os.path.exists(outfile):
-        cmd = f"btk pipeline window-stats {windows} \
-        --min-window-length 1000 \
-        --min-window-count 5 \
-        --in {btk_dir}/{prefix}.chunk_stats.tsv.gz \
-        --out {outfile}"
-        print(cmd)
-        subprocess.run(shlex.split(cmd))
-    for window in opts["window-size"]:
-        flag = "--window"
-        if window == "1":
-            flag += "-full"
-        cmd = f"genomehubs parse {flag} {btk_dir} \
-        --outfile {outfile}"
-        if window != "1":
-            cmd += f" --window-size {window}"
-        print(cmd)
-        subprocess.run(shlex.split(cmd))
+def parse_config(config, lineage):
+    """Parse values from config file."""
+    revision = config.get("revision", 0)
+    blobtoolkit_id = config["assembly"]["prefix"]
+    if revision:
+        blobtoolkit_id += f".{revision}"
+    return [
+        ("<<accession>>", config["assembly"]["accession"]),
+        ("<<blobtoolkit_id>>", blobtoolkit_id),
+        ("<<taxon_id>>", config["taxon"]["taxid"]),
+        ("<<lineage>>", lineage),
+    ]
 
 
-def busco_parser(params, opts, *, types=None, names=None):
-    """Parse NCBI Datasets genome report."""
+def fill_busco_feature_template(config_file, types, lineage):
+    """Replace template values in busco_feature types file."""
+    config = tofile.load_yaml(config_file)
+    replacements = parse_config(config, lineage)
+    return deep_replace(types, replacements)
+
+
+def busco_feature_parser(params, opts, *, types=None, names=None):
+    """Parse BUSCO full table file as features."""
     parsed = []
-    template_keys = set()
-    expanded_keys = set()
-    for d in glob.glob(f"{opts['busco']}/*/", recursive=False):
-        d = os.path.abspath(d)
-        if os.path.exists(f"{d}/config.yaml"):
-            config = tofile.load_yaml(f"{d}/config.yaml")
-            accession = config["assembly"]["accession"]
-            prefix = config["assembly"]["prefix"]
-            if "window-size" in opts:
-                prepare_window_files(d, accession, prefix, opts)
-            taxid = config["taxon"]["taxid"]
-            prefix = config["assembly"]["prefix"]
-            parsed_row = {"taxon_id": taxid, "assembly_id": accession}
-            parse_busco_lineages(
-                types, template_keys, expanded_keys, d, config, prefix, parsed_row
-            )
-        parsed.append(parsed_row)
-        break
-    for key in template_keys:
-        del types["attributes"][key]
+    config_file = opts["config"]
+    busco_file = os.path.abspath(opts["busco-feature"])
+    try:
+        lineage = re.search(r"\.(\w+?)_odb10", busco_file)[1]
+    except AttributeError:
+        return None
+    if os.path.exists(config_file):
+        new_types = fill_busco_feature_template(config_file, types, lineage)
+    for key, value in new_types.items():
+        types[key] = value
+
+    tar_name = os.path.dirname(os.path.dirname(busco_file))
+    tar = tarfile.open(f"{tar_name}.tar")
+    busco_tar = busco_file.replace(f"{tar_name}/", "")
+    data = gzip.decompress(tar.extractfile(busco_tar).read())
+    header_rows = []
+    header = None
+    for line in str(data, "utf-8").split("\n"):
+        if not line:
+            continue
+        if line.startswith("#"):
+            header_rows.append(line)
+            continue
+        if header is None:
+            header = parse_busco_header(header_rows)
+        parse_busco_feature(line, parsed)
     return parsed
