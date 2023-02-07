@@ -1,0 +1,51 @@
+file:
+  format: tsv
+  header: true
+  name: <<accession>>.window_stats.tsv.gz
+  needs:
+    - ATTR_feature.types.yaml
+    - ATTR_window_stats.types.yaml
+  source: BlobToolKit
+  source_url: https://blobtoolkit.genomehubs.org/view/dataset/<<blobtoolkit_id>>
+analysis:
+  analysis_id: assembly-<<accession>>
+  assembly_id: <<accession>>
+  taxon_id: "<<taxon_id>>"
+  description: Public assembly <<accession>>
+  name: Assembly
+  title: Public assembly <<accession>>
+features:
+  assembly_id: <<accession>>
+  feature_id:
+    header: sequence
+  primary_type: <<level>>
+taxonomy:
+  taxon_id: <<taxon_id>>
+attributes:
+  sequence_id:
+    header: sequence
+  feature_type:
+    default:
+      - <<level>>
+      - toplevel
+      - sequence
+  start:
+    header: start
+    function: "{} + 1"
+  end:
+    header: end
+  strand: 1
+  length:
+    header: end
+  seq_proportion:
+    header: end
+    function: "{} / <<span>>"
+  midpoint:
+    header: end
+    function: "{length} / 2"
+  gc:
+    header: gc
+  masked:
+    header: masked
+  busco_count:
+    header: <<lineage>>_count

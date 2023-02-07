@@ -139,6 +139,20 @@ def enum(tup):
     return result
 
 
+def ordered_list(tup):
+    """Remove values that are in a higher priority list."""
+    (key, order, arr, linked) = tup
+    values = deduped_list(arr)
+    seen = set()
+    for i, k in enumerate(order):
+        if i == 0 and k == key:
+            break
+        if k == key:
+            return [value for value in values if value not in seen]
+        seen.update(linked[k]["keyword_value"])
+    return values
+
+
 def earliest(arr, *args):
     """Select earliest date from a list."""
     if not isinstance(arr, list):
@@ -233,6 +247,9 @@ def apply_summary(
     max_value=None,
     min_value=None,
     order=None,
+    attr_order=None,
+    meta=None,
+    linked_attributes=None,
 ):
     """Apply summary statistic functions."""
     summaries = {
@@ -257,6 +274,7 @@ def apply_summary(
         "sum": sum,
         "list": deduped_list,
         "length": deduped_list_length,
+        "ordered_list": ordered_list,
     }
     if summary == "primary":
         if primary_values:
@@ -265,6 +283,10 @@ def apply_summary(
     flattened = flatten_list(values)
     if summary == "enum":
         value = summaries[summary]((order, flattened))
+    elif summary == "ordered_list":
+        value = summaries[summary](
+            (meta["key"], attr_order, flattened, linked_attributes)
+        )
     else:
         value = summaries[summary](flattened)
     if summary == "max":
@@ -290,10 +312,12 @@ def set_traverse_values(
     value_type,
     traverse,
     source,
+    linked_attributes,
 ):
     """Set values  use for tree traversal."""
     idx = 0
     order = meta.get("constraint", {}).get("enum", [])
+    attr_order = meta.get("order", [])
     default_summary = "median"
     if meta["type"] == "keyword":
         default_summary = "mode"
@@ -309,6 +333,9 @@ def set_traverse_values(
             max_value=max_value,
             min_value=min_value,
             order=order,
+            attr_order=attr_order,
+            meta=meta,
+            linked_attributes=linked_attributes,
         )
         if idx == 0:
             if value is not None:
@@ -320,14 +347,14 @@ def set_traverse_values(
                         summary = summary_types[0]
                     attribute[value_type] = value
                     attribute["count"] = count or len(values)
-                    if summary == "list":
+                    if summary in ["list", "ordered_list"]:
                         attribute["length"] = deduped_list_length(values)
                     attribute["aggregation_method"] = summary
                     attribute["aggregation_source"] = source
-                traverse_value = value if value else []
+                traverse_value = value or []
             idx += 1
         if traverse and source == "descendant" and summary == traverse:
-            traverse_value = value if value else []
+            traverse_value = value or []
         elif summary != "list":
             if summary.startswith("median"):
                 summary = "median"
@@ -358,6 +385,7 @@ def summarise_attribute_values(
     attribute,
     meta,
     *,
+    linked_attributes=None,
     values=None,
     count=0,
     max_value=None,
@@ -406,6 +434,7 @@ def summarise_attribute_values(
                 value_type,
                 traverse,
                 source,
+                linked_attributes,
             )
         except Exception:
             print(format_exc())
@@ -413,7 +442,7 @@ def summarise_attribute_values(
                 f"Unable to generate summary values for attribute {meta['key']}"
             )
             sys.exit(1)
-        if isinstance(max_value, float) or isinstance(max_value, int):
+        if isinstance(max_value, (float, int)):
             attribute["max"] = max_value
             attribute["min"] = min_value
         elif meta["type"] == "date" and max_value and min_value:
@@ -430,8 +459,15 @@ def summarise_attributes(*, attributes, attrs, meta, parent, parents):
     for node_attribute in attributes:
         if node_attribute["key"] in attrs:
             attr_dict[node_attribute["key"]] = node_attribute
+            linked_attributes = {}
+            if "order" in meta[node_attribute["key"]]:
+                for attribute in attributes:
+                    if attribute["key"] in meta[node_attribute["key"]]["order"]:
+                        linked_attributes[attribute["key"]] = attribute
             summary_value, max_value, min_value = summarise_attribute_values(
-                node_attribute, meta[node_attribute["key"]]
+                node_attribute,
+                {"key": node_attribute["key"], **meta[node_attribute["key"]]},
+                linked_attributes=linked_attributes,
             )
             if summary_value is not None:
                 changed = True
@@ -504,8 +540,7 @@ def set_values_from_descendants(
             traverseable = False
         if not traverseable or taxon_id in limits[key]:
             continue
-        local_limit = meta[key].get("traverse_limit", traverse_limit)
-        if local_limit:
+        if local_limit := meta[key].get("traverse_limit", traverse_limit):
             if (
                 descendant_ranks is not None
                 and local_limit in descendant_ranks[taxon_id]
@@ -518,14 +553,20 @@ def set_values_from_descendants(
         except StopIteration:
             attribute = {"key": key}
             attributes.append(attribute)
+        linked_attributes = {}
+        if "order" in meta[key]:
+            for attribute in attributes:
+                if attribute["key"] in meta[key]["order"]:
+                    linked_attributes[attribute["key"]] = attribute
         summary_value, max_value, min_value = summarise_attribute_values(
             attribute,
-            meta[key],
+            {"key": key, **meta[key]},
             values=obj["values"],
             count=obj["count"],
             max_value=obj["max"],
             min_value=obj["min"],
             source=set_aggregation_source(attribute),
+            linked_attributes=linked_attributes,
         )
         set_aggregation_source(attribute, "descendant")
 
@@ -736,10 +777,11 @@ def stream_missing_attributes_at_level(es, *, nodes, attrs, template, level=1):
         taxon_id = node["_source"]["taxon_id"]
         fill_attrs = []
         if "attributes" in node["_source"]:
-            for attribute in node["_source"]["attributes"]:
-                if attribute["key"] in attrs:
-                    fill_attrs.append(attribute)
-
+            fill_attrs.extend(
+                attribute
+                for attribute in node["_source"]["attributes"]
+                if attribute["key"] in attrs
+            )
         if not fill_attrs:
             continue
         meta = template["types"]["attributes"]

@@ -1,0 +1,69 @@
+file:
+  format: tsv
+  header: true
+  name: <<accession>>.<<lineage>>.full_table.tsv.gz
+  needs:
+    - ATTR_busco.types.yaml
+    - <<accession>>.window_stats.types.yaml
+  source: BlobToolKit
+  source_url: https://blobtoolkit.genomehubs.org/view/dataset/<<blobtoolkit_id>>
+analysis:
+  analysis_id: busco5-<<lineage>>-<<accession>>
+  assembly_id: <<accession>>
+  taxon_id: "<<taxon_id>>"
+  description: BUSCO v5 analysis of <<accession>> using <<lineage>> lineage
+  name: BUSCO_<<lineage>>
+  title: BUSCO v5 <<accession>> <<lineage>>
+features:
+  assembly_id: <<accession>>
+  feature_id:
+    header: sequenceId
+    separator:
+      - ":"
+    limit: 1
+    template: "{}:{start}-{end}:{busco_gene}"
+  primary_type: <<lineage>>-busco-gene
+taxonomy:
+  taxon_id: "<<taxon_id>>"
+attributes:
+  sequence_id:
+    header: sequenceId
+    separator:
+      - ":"
+    limit: 1
+  feature_type:
+    default:
+      - <<lineage>>-busco-gene
+      - busco-gene
+      - gene
+  start:
+    header: start
+  end:
+    header: end
+  strand:
+    header: strand
+    translate:
+      "-": -1
+      "+": 1
+  length:
+    header: length
+  midpoint:
+    header: start
+    function: "{length} / 2 + {}"
+  midpoint_proportion:
+    header: sequenceId
+    separator:
+      - ":"
+    limit: 1
+    function: "{midpoint} / {.length}"
+  busco_gene:
+    header: buscoId
+  busco_status:
+    header: status
+  busco_score:
+    header: score
+  analysis_name:
+    default: BUSCO_<<lineage>>
+  # ancestral_unit:
+  #   index: 0
+  # include merian/nigon translation

@@ -213,7 +213,10 @@ const validateTerm = (term, types) => {
       if (!Array.isArray(typeSummary)) {
         typeSummary = [typeSummary];
       }
-      if (typeSummary.includes("list")) {
+      if (
+        typeSummary.includes("list") ||
+        typeSummary.includes("ordered_list")
+      ) {
         typeSummary.push("length");
       }
       if (parts[1] && parts[1].length > 0 && !typeSummary.includes(parts[1])) {

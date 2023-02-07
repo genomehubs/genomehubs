@@ -552,10 +552,13 @@ const processScatter = (scatter) => {
           y = yScale(obj.y);
         }
         // TODO: Handle features with no scientific name
-        locations[obj.scientific_name.toLowerCase()] = {
-          x,
-          y,
-        };
+        if (obj.scientific_name) {
+          locations[obj.scientific_name.toLowerCase()] = {
+            x,
+            y,
+          };
+        }
+
         points.push({ ...obj, x, y });
       }
       pointData.push(points);

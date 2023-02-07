@@ -4,7 +4,8 @@
 Parse a local or remote data source.
 
 Usage:
-    genomehubs parse [--btk] [--btk-root STRING...]
+    genomehubs parse [--btk] [--btk-root STRING...] [--busco-feature TSV] [--config YAML]
+                     [--directory PATH] [--window PATH] [--window-full PATH] [--window-size FLOAT...]
                      [--wikidata PATH] [--wikidata-root STRING...] [--wikidata-xref STRING...]
                      [--gbif] [--gbif-root STRING...] [--gbif-xref STRING...]
                      [--ncbi-datasets-genome PATH] [--ncbi-datasets-sample PATH]
@@ -16,6 +17,13 @@ Usage:
 Options:
     --btk                        Parse assemblies in BlobToolKit
     --btk-root STRING            Scientific name of root taxon
+    --busco-feature TSV          Path to a busco full table TSV file
+                                 (current implementation expects this to be inside a tarred directory)
+    --config YAML                Path to a BlobToolKit config YAML file
+    --directory PATH             Path to a set of BlobToolKit data directories
+    --window PATH                Path to a single BlobToolKit data directory
+    --window-full PATH           Path to a single BlobToolKit data directory
+    --window-size FLOAT          Window size for sequence stats
     --gbif                       Parse taxa in GBIF
     --gbif-root STRING           GBIF taxon ID of root taxon
     --gbif-xref STRING           Include link to external reference from GBIF (e.g. NBN, BOLD)
@@ -37,6 +45,7 @@ Options:
     -v, --version                Show version number
 """
 
+import os
 import re
 import sys
 from pathlib import Path
@@ -46,9 +55,14 @@ from tolkein import tofile
 from tolkein import tolog
 
 from .btk import btk_parser
+from .busco import busco_feature_parser
+from .directory import directory_parser
+from .window import window_parser
 from .config import config
 from .hub import load_types
+from .hub import copy_types
 from .hub import order_parsed_fields
+
 # from .ncbi import ncbi_datasets_summary_parser
 from .ncbi import ncbi_genome_parser
 from .ncbi import refseq_organelle_parser
@@ -59,6 +73,14 @@ LOGGER = tolog.logger(__name__)
 
 PARSERS = {
     "btk": {"func": btk_parser, "params": None, "types": "btk"},
+    "busco-feature": {
+        "func": busco_feature_parser,
+        "params": None,
+        "types": "busco_feature",
+    },
+    "directory": {"func": directory_parser, "params": None, "types": "busco"},
+    "window-full": {"func": window_parser, "params": None, "types": "window_full"},
+    "window": {"func": window_parser, "params": None, "types": "window_stats"},
     "ncbi-datasets-genome": {
         "func": ncbi_genome_parser,
         "params": ("genome"),
@@ -98,12 +120,13 @@ def remove_temporary_types(types):
     new_types = {}
     for section, obj in types.items():
         if isinstance(obj, dict):
-            new_section = {}
-            for key, meta in obj.items():
-                if isinstance(meta, dict):
-                    if "temporary" in meta and meta["temporary"]:
-                        continue
-                new_section[key] = meta
+            new_section = {
+                key: meta
+                for key, meta in obj.items()
+                if not isinstance(meta, dict)
+                or "temporary" not in meta
+                or not meta["temporary"]
+            }
         else:
             new_section = section
         new_types[section] = new_section
@@ -119,32 +142,50 @@ def main(args):
             params = PARSERS[option]["params"]
             if params is None:
                 params = options["parse"][option]
-            LOGGER.info("Parsing %s" % option)
+            LOGGER.info(f"Parsing {option}")
             types = load_types(PARSERS[option]["types"])
             names = load_types(PARSERS[option]["types"], part="names")
             parsed = PARSERS[option]["func"](
                 params, options["parse"], types=types, names=names
             )
             files = []
-            if isinstance(parsed, tuple):
-                parsed, files = parsed
-            data = order_parsed_fields(parsed, types, names)
-            tofile.write_file(options["parse"]["outfile"], data)
             filepath = Path(options["parse"]["outfile"])
             outdir = filepath.parent
+            if not os.path.exists(outdir):
+                os.makedirs(outdir)
+            if parsed is not None:
+                if isinstance(parsed, tuple):
+                    parsed, files = parsed
+                data = order_parsed_fields(parsed, types, names)
+                tofile.write_file(options["parse"]["outfile"], data)
+            needs = types.get("file", {}).get("needs", [])
+            for needs_file in needs:
+                if needs_file.startswith("ATTR_"):
+                    copy_types(needs_file, outdir)
             suff = re.compile(r"\.[^\.]+$")
+            suffix = filepath.name.replace(filepath.stem, "")
             if filepath.name.endswith(".gz"):
                 stem = re.sub(suff, "", filepath.stem)
             else:
                 stem = filepath.stem
+            if (
+                "window" in options["parse"]
+                and "window-size" in options["parse"]
+                and options["parse"]["window-size"][0] != "1"
+            ):
+                stem += "." + options["parse"]["window-size"][0]
             if types:
-                types["file"]["name"] = filepath.name
-                tofile.write_file("%s/%s.types.yaml" % (outdir, stem), remove_temporary_types(types))
+                types["file"]["name"] = f"{stem}{suffix}"
+                tofile.write_file(
+                    f"{outdir}/{stem}.types.yaml", remove_temporary_types(types)
+                )
             if names:
-                names["file"]["name"] = filepath.name
-                tofile.write_file("%s/%s.names.yaml" % (outdir, stem), remove_temporary_types(names))
+                names["file"]["name"] = f"{stem}{suffix}"
+                tofile.write_file(
+                    f"{outdir}/{stem}.names.yaml", remove_temporary_types(names)
+                )
             if files:
-                tofile.write_file("%s/%s.files.yaml" % (outdir, stem), files)
+                tofile.write_file(f"{outdir}/{stem}.files.yaml", files)
 
 
 def cli():

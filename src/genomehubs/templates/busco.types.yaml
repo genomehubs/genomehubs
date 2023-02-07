@@ -1,0 +1,40 @@
+file:
+  display_group: busco
+  display_level: 2
+  format: tsv
+  header: true
+  order:
+    - <<lineage>>_odb10_complete
+    - <<lineage>>_odb10_fragmented
+    - <<lineage>>_odb10_missing
+  separator: ","
+  source_url_stub: https://blobtoolkit.genomehubs.org
+  source: BlobToolKit
+  type: keyword
+  taxon_summary: ordered_list
+  taxon_traverse: ordered_list
+  taxon_traverse_direction: up
+  taxon_traverse_limit: <<lineage>>
+  taxon_display_level: 2
+taxonomy:
+  taxon_id:
+    header: taxon_id
+identifiers:
+  assembly_id:
+    constraint:
+      len: 32
+    header: assembly_id
+    type: keyword
+attributes:
+  <<lineage>>_odb10_complete:
+    display_name: BUSCO <<lineage>>_odb10 complete
+    header: <<lineage>>_odb10_complete
+    list_key: <<lineage>>_odb10_complete
+  <<lineage>>_odb10_fragmented:
+    display_name: BUSCO <<lineage>>_odb10 fragmented
+    header: <<lineage>>_odb10_fragmented
+    list_key: <<lineage>>_odb10_fragmented
+  <<lineage>>_odb10_missing:
+    display_name: BUSCO <<lineage>>_odb10 missing
+    header: <<lineage>>_odb10_missing
+    list_key: <<lineage>>_odb10_missing
