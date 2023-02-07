@@ -53,9 +53,16 @@ attributes:
         - scaffold
         - sequence
         - toplevel
-        - gene
+        - archaea-busco-gene
+        - arthropoda-busco-gene
+        - bacteria-busco-gene
+        - endopterygota-busco-gene
+        - eukaryota-busco-gene
+        - insecta-busco-gene
+        - lepidoptera-busco-gene
+        - metazoa-busco-gene
         - busco-gene
-        - window
+        - gene
         - 1kb-window
         - window-1000
         - window-10000
@@ -65,6 +72,7 @@ attributes:
         - window-0.02
         - window-0.05
         - window-0.1
+        - window
     description: Feature type
     display_level: 1
     display_name: Feature type

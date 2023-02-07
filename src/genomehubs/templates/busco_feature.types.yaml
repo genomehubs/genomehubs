@@ -17,12 +17,12 @@ analysis:
 features:
   assembly_id: <<accession>>
   feature_id:
-    header: buscoId
+    header: sequenceId
     separator:
       - ":"
     limit: 1
     template: "{}:{start}-{end}:{busco_gene}"
-  primary_type: busco-gene
+  primary_type: <<lineage>>-busco-gene
 taxonomy:
   taxon_id: "<<taxon_id>>"
 attributes:

@@ -255,11 +255,10 @@ def test_constraint(value, constraint):
         "enum": enum_constraint,
         "date": date_constraint,
     }
-    for key in constraint:
-        if key in constraints:
-            if not constraints[key](value, constraint[key]):
-                return False
-    return True
+    return not any(
+        key in constraints and not constraints[key](value, constraint[key])
+        for key in constraint
+    )
 
 
 def convert_lat_lon(location):
@@ -449,16 +448,19 @@ def validate_values(values, key, types, row_values, shared_values, blanks):
             with contextlib.suppress(KeyError):
                 # print(types[key]["translate"])
                 value = types[key]["translate"][value.lower()]
-        try:
-            valid = test_constraint(value, key_type)
+        if not isinstance(value, list):
+            value = [value]
+        for v in value:
+            try:
+                valid = test_constraint(v, key_type)
+                if valid:
+                    valid = test_constraint(v, types[key]["constraint"])
+            except KeyError:
+                valid = True
             if valid:
-                valid = test_constraint(value, types[key]["constraint"])
-        except KeyError:
-            valid = True
-        if valid:
-            validated.append(value)
-        elif value:
-            LOGGER.warning("%s is not a valid %s value", str(value), key)
+                validated.append(v)
+            elif v:
+                LOGGER.warning("%s is not a valid %s value", str(v), key)
     return validated
 
 
@@ -466,8 +468,7 @@ def apply_value_template(prop, value, attribute, *, taxon_types, has_taxon_data)
     """Set value using template."""
     template = re.compile(r"^(.*?\{\{)(.+)(\}\}.*)$")
     new_prop = prop.replace("taxon_", "")
-    match = template.match(str(value))
-    if match:
+    if match := template.match(str(value)):
         groups = match.groups()
         if groups[1] and groups[1] in attribute:
             has_taxon_data = True
@@ -744,10 +745,10 @@ def process_row_values(row, types, data):
                     elif value is not None and value != "None":
                         data[group][key] = value
                 except IndexError:
-                    LOGGER.warning("Missing fields in row '%s'" % str(row))
+                    LOGGER.warning(f"Missing fields in row '{str(row)}'")
                     return None
                 except Exception as err:
-                    LOGGER.warning("Cannot parse row '%s'" % str(row))
+                    LOGGER.warning(f"Cannot parse row '{str(row)}'")
                     raise err
     return True
 
@@ -821,7 +822,7 @@ def process_row(
     ):
         row_id = data["identifiers"][f"{index_type}_id"]
     row_values = {}
-    for attr_type in list(["attributes", "features", "identifiers", "taxon_names"]):
+    for attr_type in ["attributes", "features", "identifiers", "taxon_names"]:
         if attr_type in data and data[attr_type]:
             (
                 data[attr_type],
@@ -917,11 +918,9 @@ def write_imported_rows(rows, opts, *, types, header=None, label="imported"):
         header_len = 1
     if isinstance(rows, dict):
         for row_set in rows.values():
-            for row in row_set:
-                data.append(row)
+            data.extend(iter(row_set))
     else:
-        for row in rows:
-            data.append(row)
+        data.extend(iter(rows))
     LOGGER.info(
         "Writing %d records to %s file '%s'", len(data) - header_len, label, outfile
     )

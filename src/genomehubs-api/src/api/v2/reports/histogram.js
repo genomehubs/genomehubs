@@ -176,51 +176,53 @@ const getHistogram = async ({
     if (yFields.length > 0 && raw) {
       pointData = {};
       for (let result of res.results) {
-        let cat;
+        let cats;
         if (bounds.cat) {
           if (bounds.by == "attribute") {
             if (!result.result.fields[bounds.cat]) {
-              cat = "missing";
+              cats = ["missing"];
             } else {
-              cat = result.result.fields[bounds.cat].value.toLowerCase();
+              let cat = result.result.fields[bounds.cat].value;
               if (Array.isArray(cat)) {
-                cat = cat[0].toLowerCase();
+                cats = cat.map((c) => c.toLowerCase());
               } else {
-                cat = result.result.fields[bounds.cat].value.toLowerCase();
+                cats = [cat.toLowerCase()];
               }
             }
           } else if (result.result.ranks) {
-            cat = result.result.ranks[bounds.cat];
-            if (cat) {
-              cat = cat.taxon_id;
+            cats = [result.result.ranks[bounds.cat]];
+            if (cats[0]) {
+              cats[0] = cats[0].taxon_id;
             } else {
-              cat = "other";
+              cats = ["other"];
             }
           }
         }
-        if (!pointData[cat]) {
-          pointData[cat] = [];
+        for (let cat of cats) {
+          if (!pointData[cat]) {
+            pointData[cat] = [];
+          }
+          if (!result.result.fields[field] || !result.result.fields[yField]) {
+            continue;
+          }
+          let x = result.result.fields[field][xSumm];
+          let y = result.result.fields[yField][ySumm];
+          if (valueType == "date") {
+            x = Date.parse(x);
+          }
+          if (yValueType == "date") {
+            y = Date.parse(y);
+          }
+          pointData[cat].push({
+            ...(result.result.scientific_name && {
+              scientific_name: result.result.scientific_name,
+            }),
+            ...(result.result.taxon_id && { taxonId: result.result.taxon_id }),
+            x,
+            y,
+            cat,
+          });
         }
-        if (!result.result.fields[field] || !result.result.fields[yField]) {
-          continue;
-        }
-        let x = result.result.fields[field][xSumm];
-        let y = result.result.fields[yField][ySumm];
-        if (valueType == "date") {
-          x = Date.parse(x);
-        }
-        if (yValueType == "date") {
-          y = Date.parse(y);
-        }
-        pointData[cat].push({
-          ...(result.result.scientific_name && {
-            scientific_name: result.result.scientific_name,
-          }),
-          ...(result.result.taxon_id && { taxonId: result.result.taxon_id }),
-          x,
-          y,
-          cat,
-        });
       }
     }
   }

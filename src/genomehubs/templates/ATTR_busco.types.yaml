@@ -18,7 +18,9 @@ attributes:
     separator:
       - ","
     translate:
-      duplicated: [complete, duplicated]
+      duplicated:
+        - Complete
+        - Duplicated
     type: keyword
   busco_score:
     bins:
@@ -28,7 +30,7 @@ attributes:
       scale: linear
     constraint:
       min: 1
-      max: 10000
+      max: 100000
     description: BUSCO score
     display_level: 2
     display_name: BUSCO score
