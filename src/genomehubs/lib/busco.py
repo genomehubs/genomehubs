@@ -35,6 +35,7 @@ def parse_busco_feature(record, parsed):
         "score",
         "length",
     ]
+    row[2] = re.sub(r"(\.\d+)_\d+$", r"\1", row[2])
     parsed.append(dict(zip(cols, row)))
 
 

@@ -43,8 +43,8 @@ attributes:
     header: sequence
     function: "{length} / {.length}"
   midpoint:
-    header: end
-    function: "{length} / 2 + {start}"
+    function: "{length} / 2 + {} + 1"
+    header: start
   midpoint_proportion:
     header: sequence
     function: "{midpoint} / {.length}"

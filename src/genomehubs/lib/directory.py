@@ -82,7 +82,6 @@ def directory_parser(params, opts, *, types=None, names=None):
             )
             prepare_busco_features(d, lineages, accession, prefix, opts)
         parsed.append(parsed_row)
-        break
     for key in template_keys:
         del types["attributes"][key]
     return parsed
