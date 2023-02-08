@@ -65,6 +65,7 @@ Examples:
 
 import csv
 import sys
+
 # import time
 from collections import defaultdict
 from pathlib import Path
@@ -141,32 +142,27 @@ def group_rows(
             taxon_asm_data[taxon_id].append(taxon_data)
             imported_rows.append(row)
 
+        elif "taxonomy" in types and not_blank(
+            "alt_taxon_id", processed_data["taxonomy"], blanks
+        ):
+            without_ids[processed_data["taxonomy"]["alt_taxon_id"]].append(
+                processed_data
+            )
+            taxon_asm_data[processed_data["taxonomy"]["alt_taxon_id"]].append(
+                taxon_data
+            )
+            failed_rows[processed_data["taxonomy"]["alt_taxon_id"]].append(row)
         else:
-            if "taxonomy" in types and not_blank(
-                "alt_taxon_id", processed_data["taxonomy"], blanks
-            ):
-                without_ids[processed_data["taxonomy"]["alt_taxon_id"]].append(
-                    processed_data
-                )
-                taxon_asm_data[processed_data["taxonomy"]["alt_taxon_id"]].append(
-                    taxon_data
-                )
-                failed_rows[processed_data["taxonomy"]["alt_taxon_id"]].append(row)
-            else:
-                row_rank = None
-                for rank in ranks:
-                    if not_blank(rank, processed_data["taxonomy"], blanks):
-                        row_rank = rank
-                        without_ids[processed_data["taxonomy"][rank]].append(
-                            processed_data
-                        )
-                        taxon_asm_data[processed_data["taxonomy"][rank]].append(
-                            taxon_data
-                        )
-                        failed_rows[processed_data["taxonomy"][rank]].append(row)
-                        break
-                if row_rank is None:
-                    failed_rows["None"].append(row)
+            row_rank = None
+            for rank in ranks:
+                if not_blank(rank, processed_data["taxonomy"], blanks):
+                    row_rank = rank
+                    without_ids[processed_data["taxonomy"][rank]].append(processed_data)
+                    taxon_asm_data[processed_data["taxonomy"][rank]].append(taxon_data)
+                    failed_rows[processed_data["taxonomy"][rank]].append(row)
+                    break
+            if row_rank is None:
+                failed_rows["None"].append(row)
 
 
 def index_taxon_records(es, taxonomy_name, opts, with_ids, blanks, types):
@@ -187,7 +183,14 @@ def index_taxon_records(es, taxonomy_name, opts, with_ids, blanks, types):
 
 
 def index_sample_records(
-    es, taxonomy_name, opts, with_ids, blanks, taxon_types, taxon_asm_data, index_type="sample"
+    es,
+    taxonomy_name,
+    opts,
+    with_ids,
+    blanks,
+    taxon_types,
+    taxon_asm_data,
+    index_type="sample",
 ):
     """Index sample records."""
     sample_template = sample.index_template(taxonomy_name, opts, index_type=index_type)
@@ -309,12 +312,26 @@ def process_taxon_sample_records(
         elif opts["index"] == "assembly":
             # TODO: keep track of taxon_id not found exceptions
             index_sample_records(
-                es, taxonomy_name, opts, with_ids, blanks, taxon_types, taxon_asm_data, index_type="assembly"
+                es,
+                taxonomy_name,
+                opts,
+                with_ids,
+                blanks,
+                taxon_types,
+                taxon_asm_data,
+                index_type="assembly",
             )
         elif opts["index"] == "sample":
             # TODO: keep track of taxon_id not found exceptions
             index_sample_records(
-                es, taxonomy_name, opts, with_ids, blanks, taxon_types, taxon_asm_data, index_type="sample"
+                es,
+                taxonomy_name,
+                opts,
+                with_ids,
+                blanks,
+                taxon_types,
+                taxon_asm_data,
+                index_type="sample",
             )
 
 
@@ -326,7 +343,7 @@ def convert_features_to_docs(with_ids):
             del entry["taxon_names"]
             del entry["taxonomy"]
             del entry["taxon_attributes"]
-            yield ("feature-%s" % entry["feature_id"], entry)
+            yield (f'feature-{entry["feature_id"]}', entry)
 
 
 def index_feature_records(es, opts, taxonomy_name, with_ids, blanks):
@@ -343,7 +360,17 @@ def index_feature_records(es, opts, taxonomy_name, with_ids, blanks):
     )
 
 
-def index_file(es, types, names, data, opts, *, taxon_table=None, shared_values=None, exclusions=None):
+def index_file(
+    es,
+    types,
+    names,
+    data,
+    opts,
+    *,
+    taxon_table=None,
+    shared_values=None,
+    exclusions=None,
+):
     """Index a file."""
     delimiters = {"csv": ",", "tsv": "\t"}
     rows = csv.reader(
@@ -360,7 +387,7 @@ def index_file(es, types, names, data, opts, *, taxon_table=None, shared_values=
     taxon_asm_data = defaultdict(list)
     failed_rows = defaultdict(list)
     imported_rows = []
-    blanks = set(["", "NA", "N/A", "None"])
+    blanks = {"", "NA", "N/A", "None"}
     taxon_types = {}
     taxonomy_name = opts["taxonomy-source"].lower()
     LOGGER.info("Processing rows")
@@ -368,7 +395,13 @@ def index_file(es, types, names, data, opts, *, taxon_table=None, shared_values=
     for row in tqdm(rows):
         try:
             processed_data, taxon_data, new_taxon_types = process_row(
-                types, names, row, shared_values, blanks, index_type=opts["index"], exclusions=exclusions,
+                types,
+                names,
+                row,
+                shared_values,
+                blanks,
+                index_type=opts["index"],
+                exclusions=exclusions,
             )
         except Exception:
             print(format_exc())
@@ -420,7 +453,7 @@ def index_taxon_sample(es, opts, index="taxon", *, dry_run=False, taxonomy_name)
             "any": defaultdict(list),
         }
         load_taxon_table(es, opts, taxonomy_name, taxon_table)
-    data_dir = "%s-dir" % index
+    data_dir = f"{index}-dir"
     if data_dir in opts:
         dir_path = opts[data_dir]
         for types_file in sorted(Path(dir_path).glob("*.names.yaml")):
@@ -428,7 +461,7 @@ def index_taxon_sample(es, opts, index="taxon", *, dry_run=False, taxonomy_name)
                 types_file, dir_path, es, index, opts
             )
             if "file" in types and "name" in types["file"]:
-                LOGGER.info("Indexing %s" % types["file"]["name"])
+                LOGGER.info(f'Indexing {types["file"]["name"]}')
                 index_types(es, index, types, opts, dry_run=dry_run)
                 index_file(
                     es,
@@ -444,14 +477,14 @@ def index_taxon_sample(es, opts, index="taxon", *, dry_run=False, taxonomy_name)
                 )
                 if "tests" in types["file"]:
                     result = test_json_dir(
-                        "%s/%s" % (dir_path, types["file"]["tests"]),
+                        f'{dir_path}/{types["file"]["tests"]}',
                         opts["es-host"][0],
                         opts,
                     )
                     if result is False:
                         LOGGER.error("Failed tests")
                         exit(1)
-                # time.sleep(5)
+                        # time.sleep(5)
         for types_file in sorted(Path(dir_path).glob("*.types.yaml")):
             types, data, names, exclusions = validate_types_file(
                 types_file, dir_path, es, index, opts
@@ -459,7 +492,7 @@ def index_taxon_sample(es, opts, index="taxon", *, dry_run=False, taxonomy_name)
             LOGGER.info("Indexing types")
             index_types(es, index, types, opts, dry_run=dry_run)
             if "file" in types and "name" in types["file"]:
-                LOGGER.info("Indexing %s" % types["file"]["name"])
+                LOGGER.info(f'Indexing {types["file"]["name"]}')
                 index_file(
                     es,
                     types,
@@ -471,11 +504,11 @@ def index_taxon_sample(es, opts, index="taxon", *, dry_run=False, taxonomy_name)
                         "index_types": index_types,
                     },
                     taxon_table=taxon_table,
-                    exclusions=exclusions
+                    exclusions=exclusions,
                 )
                 if "tests" in types["file"]:
                     result = test_json_dir(
-                        "%s/%s" % (dir_path, types["file"]["tests"]),
+                        f'{dir_path}/{types["file"]["tests"]}',
                         opts["es-host"][0],
                         opts,
                     )
@@ -505,7 +538,7 @@ def set_feature_types(types):
 def index_features(es, opts, *, dry_run=False):
     """Index assembly features."""
     index = "feature"
-    data_dir = "%s-dir" % index
+    data_dir = f"{index}-dir"
     if data_dir in opts:
         dir_path = opts[data_dir]
     stored_attributes = {}
@@ -522,7 +555,7 @@ def index_features(es, opts, *, dry_run=False):
         )
         LOGGER.info("Indexing types")
         if "file" in types and "name" in types["file"]:
-            LOGGER.info("Indexing %s" % types["file"]["name"])
+            LOGGER.info(f'Indexing {types["file"]["name"]}')
             if "features" in types:
                 set_feature_types(types)
             index_types(es, index, types, opts, dry_run=dry_run)
@@ -553,7 +586,7 @@ def main(args):
 
     taxonomy_name = options["index"]["taxonomy-source"].lower()
     dry_run = options["index"].get("dry-run", False)
-    for index in list(["taxon", "sample", "assembly"]):
+    for index in ["taxon", "sample", "assembly"]:
         index_taxon_sample(
             es,
             options["index"],
