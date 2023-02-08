@@ -163,11 +163,11 @@ def main(args):
                 if needs_file.startswith("ATTR_"):
                     copy_types(needs_file, outdir)
             suff = re.compile(r"\.[^\.]+$")
-            suffix = filepath.name.replace(filepath.stem, "")
             if filepath.name.endswith(".gz"):
                 stem = re.sub(suff, "", filepath.stem)
             else:
                 stem = filepath.stem
+            suffix = filepath.name.replace(stem, "")
             if (
                 "window" in options["parse"]
                 and "window-size" in options["parse"]
