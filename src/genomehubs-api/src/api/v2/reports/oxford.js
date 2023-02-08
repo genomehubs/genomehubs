@@ -1,4 +1,5 @@
 import { getProgress, setProgress } from "../functions/progress";
+import { linearRegression, medianSorted } from "simple-statistics";
 
 import { aInB } from "../functions/aInB";
 import { attrTypes } from "../functions/attrTypes";
@@ -253,29 +254,67 @@ const getOxford = async ({
   }
 
   let groupScores = {};
+  let featArrays = { ref: {}, cmp: {} };
   for (let [sequence_id] of sortedSeqs[asms[0]]) {
     for (let feat of byAssembly[asms[0]][sequence_id]) {
       let { group, start } = feat;
       groupScores[group] = start + seqOffsets[asms[0]][sequence_id];
+      if (!featArrays.ref[group]) {
+        featArrays.ref[group] = {};
+      }
+      if (!featArrays.ref[group][sequence_id]) {
+        featArrays.ref[group][sequence_id] = [];
+      }
+      featArrays.ref[group][sequence_id].push(start);
     }
   }
   let seqScores = {};
+  let seqOrient = {};
+
   for (let [sequence_id] of Object.entries(activeSeqs[asms[1]])) {
     let seqScore = 0;
     let seqCount = 0;
+    let seqArray = [];
     for (let feat of byAssembly[asms[1]][sequence_id]) {
-      let { group } = feat;
+      let { group, start } = feat;
       if (!groupScores[group]) {
         continue;
       }
+      for (let [refSeqId, startArray] of Object.entries(
+        featArrays.ref[group]
+      )) {
+        if (!featArrays.cmp[sequence_id]) {
+          featArrays.cmp[sequence_id] = {};
+        }
+        if (!featArrays.cmp[sequence_id][refSeqId]) {
+          featArrays.cmp[sequence_id][refSeqId] = [];
+        }
+        for (let refStart of featArrays.ref[group][refSeqId]) {
+          featArrays.cmp[sequence_id][refSeqId].push([refStart, start]);
+        }
+      }
       seqScore += groupScores[group];
+      seqArray.push(groupScores[group]);
       seqCount++;
     }
     seqScores[sequence_id] = seqScore / seqCount;
+    seqScores[sequence_id] = medianSorted(seqArray);
     if (isNaN(seqScores[sequence_id])) {
       seqScores[sequence_id] = 0;
     }
   }
+
+  for (let [sequenceId, obj] of Object.entries(featArrays.cmp)) {
+    let maxArray = [];
+    for (let arr of Object.values(obj)) {
+      if (arr.length > maxArray.length) {
+        maxArray = arr;
+      }
+    }
+    let eqn = linearRegression(maxArray);
+    seqOrient[sequenceId] = eqn.m >= 0 ? 1 : -1;
+  }
+
   seqOffsets[asms[1]] = {};
   seqIndices[asms[1]] = {};
   let offset = 0;
@@ -284,11 +323,18 @@ const getOxford = async ({
   for (let [seq, score] of Object.entries(seqScores).sort(
     (a, b) => a[1] - b[1]
   )) {
+    let offsetCorrection = 0;
+    if (seqOrient[seq] < 0) {
+      offsetCorrection = seqLengths[asms[1]][seq];
+      offset += offsetCorrection;
+    }
     seqOffsets[asms[1]][seq] = offset;
     seqIndices[asms[1]][seq] = buckets[asms[1]].length;
-    buckets[asms[1]].push(offset);
+    buckets[asms[1]].push(offset - offsetCorrection);
     labels[asms[1]].push(seq);
-    offset += seqLengths[asms[1]][seq];
+    if (seqOrient[seq] > 0) {
+      offset += seqLengths[asms[1]][seq];
+    }
   }
   buckets[asms[1]].push(offset);
   domains[asms[1]] = [0, offset];
@@ -350,9 +396,14 @@ const getOxford = async ({
         // }
         for (let partner of arr) {
           let index = seqIndices[assembly][partner.sequence_id];
-          let pStart =
-            partner.start + seqOffsets[assembly][partner.sequence_id];
-          let pEnd = partner.end + seqOffsets[assembly][partner.sequence_id];
+          let pStart, pEnd;
+          if (seqOrient[partner.sequence_id] > 0) {
+            pStart = partner.start + seqOffsets[assembly][partner.sequence_id];
+            pEnd = partner.end + seqOffsets[assembly][partner.sequence_id];
+          } else {
+            pStart = seqOffsets[assembly][partner.sequence_id] - partner.start;
+            pEnd = seqOffsets[assembly][partner.sequence_id] - partner.end;
+          }
           allYValues[i][index]++;
           yValuesByCat[cat][i][index]++;
           rawData[cat].push({
