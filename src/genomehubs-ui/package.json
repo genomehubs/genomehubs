@@ -94,7 +94,7 @@
     "pixi.js-legacy": "^5.3.11",
     "preact": "^10.6.2",
     "preact-compat": "^3.19.0",
-    "qs": "^6.10.1",
+    "qs": "^6.10.3",
     "re-reselect": "^4.0.0",
     "react": "^16.14.0",
     "react-cookie": "^4.1.1",
