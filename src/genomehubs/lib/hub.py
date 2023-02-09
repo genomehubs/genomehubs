@@ -398,7 +398,6 @@ def apply_template(value, operation, row_values, shared_values):
                     LOGGER.error("%s has no value for attribute %s", value, part)
                     sys.exit()
             else:
-                print(row_values)
                 LOGGER.error("function template '%s' is not supported", operation)
                 sys.exit(1)
     return "".join(parts)
@@ -451,6 +450,8 @@ def validate_values(values, key, types, row_values, shared_values, blanks):
         if not isinstance(value, list):
             value = [value]
         for v in value:
+            if v in blanks:
+                continue
             try:
                 valid = test_constraint(v, key_type)
                 if valid:

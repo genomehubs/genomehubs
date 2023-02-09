@@ -387,7 +387,7 @@ def index_file(
     taxon_asm_data = defaultdict(list)
     failed_rows = defaultdict(list)
     imported_rows = []
-    blanks = {"", "NA", "N/A", "None"}
+    blanks = {"", "NA", "N/A", "None", None}
     taxon_types = {}
     taxonomy_name = opts["taxonomy-source"].lower()
     LOGGER.info("Processing rows")
