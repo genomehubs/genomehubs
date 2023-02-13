@@ -470,6 +470,7 @@ const getOxford = async ({
     valueType: "coordinate",
     yValueType: "coordinate",
     yBuckets: buckets[asms[1]],
+    yOrientation: seqOrient,
     allYValues,
     yValuesByCat,
     zDomain,
@@ -669,6 +670,8 @@ export const oxford = async ({
   }
   let yBounds;
   ({ bounds, yBounds } = oxford);
+
+  console.log(oxford);
 
   return {
     status: status || { success: true },

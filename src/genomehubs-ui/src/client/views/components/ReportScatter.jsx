@@ -483,6 +483,7 @@ const HighlightShape = (props, chartProps) => {
 const CustomizedYAxisTick = ({
   props,
   buckets,
+  orientation,
   fmt,
   translations,
   pointSize,
@@ -490,9 +491,17 @@ const CustomizedYAxisTick = ({
   valueType,
   bounds,
   maxLabel,
-  width,
 }) => {
-  const { x, y, fill, index, height, payload } = props;
+  const {
+    x,
+    y,
+    fill,
+    index,
+    height,
+    width,
+    payload,
+    orientation: side,
+  } = props;
   let value = payload.value;
   let offset = 0;
   let h = height / (buckets.length - 1);
@@ -508,6 +517,8 @@ const CustomizedYAxisTick = ({
   }
   let text;
   let rect;
+  let ori;
+  let oriWidth = 2;
   if (h >= pointSize * 0.8) {
     text = (
       <text
@@ -518,6 +529,7 @@ const CustomizedYAxisTick = ({
         dominantBaseline={"middle"}
         fill={fill}
         fontSize={pointSize}
+        // fontWeight={orientation && orientation[index] < 0 ? "bold" : "normal"}
         // transform={"rotate(-90)"}
       >
         {translations[value] || value}
@@ -550,10 +562,30 @@ const CustomizedYAxisTick = ({
       </Tooltip>
     );
   }
+  if (
+    orientation &&
+    orientation[yLabels[index]] &&
+    orientation[yLabels[index]] < 0
+  ) {
+    ori = (
+      <g>
+        <Rectangle
+          className={styles.active}
+          x={side == "left" ? 10 - oriWidth : -7}
+          y={-offset}
+          height={h}
+          width={oriWidth}
+          stroke={"none"}
+          fill={fill}
+        />
+      </g>
+    );
+  }
   return (
     <g transform={`translate(${x - 2},${y - offset})`}>
-      {rect}
-      {text}
+      {ori}
+      {side == "left" && rect}
+      {side == "left" && text}
     </g>
   );
 };
@@ -569,6 +601,7 @@ const Heatmap = ({
   cats,
   buckets,
   yBuckets,
+  yOrientation,
   chartProps,
   endLabel,
   lastIndex,
@@ -662,6 +695,7 @@ const Heatmap = ({
         CustomizedYAxisTick({
           props,
           buckets: yBuckets,
+          orientation: yOrientation,
           fmt: chartProps.yFormat,
           translations: chartProps.yTranslations,
           pointSize: chartProps.pointSize,
@@ -690,6 +724,36 @@ const Heatmap = ({
         fontWeight="bold"
       />
     </YAxis>,
+    <YAxis
+      type="number"
+      dataKey="y"
+      key={"y2"}
+      yAxisId={"y2"}
+      axisLine={false}
+      tickLine={false}
+      orientation={"right"}
+      scale={axisScales[yScale]()}
+      ticks={isNaN(yBuckets[0]) ? yBuckets.map((y, i) => i) : yBuckets}
+      tick={(props) =>
+        CustomizedYAxisTick({
+          props,
+          buckets: yBuckets,
+          orientation: yOrientation,
+          fmt: chartProps.yFormat,
+          translations: chartProps.yTranslations,
+          pointSize: chartProps.pointSize,
+          yLabels: chartProps.yLabels,
+          valueType: chartProps.yValueType,
+          bounds: chartProps.yBounds,
+          maxLabel: chartProps.maxYLabel,
+          width,
+        })
+      }
+      domain={yDomain}
+      range={yDomain}
+      tickFormatter={() => ""}
+      interval={0}
+    />,
     <ZAxis
       id={0}
       type="number"
@@ -986,6 +1050,7 @@ const ReportScatter = ({
         marginRight={marginRight}
         buckets={heatmaps.buckets}
         yBuckets={heatmaps.yBuckets}
+        yOrientation={heatmaps.yOrientation}
         labels={labels}
         yLabels={yLabels}
         cats={cats}
