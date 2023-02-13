@@ -1,5 +1,5 @@
 import { getProgress, setProgress } from "../functions/progress";
-import { linearRegression, medianSorted } from "simple-statistics";
+import { linearRegression, median } from "simple-statistics";
 
 import { aInB } from "../functions/aInB";
 import { attrTypes } from "../functions/attrTypes";
@@ -298,7 +298,7 @@ const getOxford = async ({
       seqCount++;
     }
     seqScores[sequence_id] = seqScore / seqCount;
-    seqScores[sequence_id] = medianSorted(seqArray);
+    seqScores[sequence_id] = median([...seqArray]);
     if (isNaN(seqScores[sequence_id])) {
       seqScores[sequence_id] = 0;
     }
@@ -670,8 +670,6 @@ export const oxford = async ({
   }
   let yBounds;
   ({ bounds, yBounds } = oxford);
-
-  console.log(oxford);
 
   return {
     status: status || { success: true },
