@@ -60,6 +60,8 @@ export const queryPropList = {
     "stacked",
     "cumulative",
     pointSizeSettings,
+    "result",
+    "taxonomy",
   ],
   map: [
     "report",
@@ -68,6 +70,8 @@ export const queryPropList = {
     catSettings,
     "includeEstimates",
     "mapThreshold",
+    "result",
+    "taxonomy",
   ],
   oxford: [
     "report",
@@ -76,6 +80,8 @@ export const queryPropList = {
     "xOpts",
     "plotRatio",
     pointSizeSettings,
+    "result",
+    "taxonomy",
   ],
   scatter: [
     "report",
@@ -92,6 +98,8 @@ export const queryPropList = {
     "plotRatio",
     "scatterThreshold",
     pointSizeSettings,
+    "result",
+    "taxonomy",
   ],
   table: [
     "report",
@@ -104,6 +112,8 @@ export const queryPropList = {
     "yOpts",
     "cumulative",
     // "reversed",
+    "result",
+    "taxonomy",
   ],
   tree: [
     "report",
@@ -117,6 +127,8 @@ export const queryPropList = {
     "treeStyle",
     "treeThreshold",
     pointSizeSettings,
+    "result",
+    "taxonomy",
   ],
   arc: [
     "report",
@@ -125,8 +137,17 @@ export const queryPropList = {
     rankSettings,
     "includeEstimates",
     pointSizeSettings,
+    "result",
+    "taxonomy",
   ],
-  xPerRank: ["report", "x", rankSettings, "includeEstimates"],
+  xPerRank: [
+    "report",
+    "x",
+    rankSettings,
+    "includeEstimates",
+    "result",
+    "taxonomy",
+  ],
 };
 
 const autoCompleteTypes = {
