@@ -193,26 +193,28 @@ const searchByPoint = ({ props, chartProps }) => {
 
 const CustomDot = (props, chartProps) => {
   let { cx, cy, height: r, fill } = props;
+  let { pointRatio } = chartProps;
+
   return (
     <Dot
       cx={cx}
       cy={cy}
-      r={r}
+      r={r * pointRatio}
       stroke={fill}
       fill={"none"}
-      strokeWidth={r / 2}
+      strokeWidth={(r * pointRatio) / 2}
     />
   );
 };
 
 const CustomCircle = (props, chartProps) => {
   let { cx, cy, height: r, fill } = props;
-  let { pointSize, selectMode, active } = chartProps;
+  let { pointSize, pointRatio, selectMode, active } = chartProps;
   let dot = (
     <Dot
       cx={cx}
       cy={cy}
-      r={pointSize / 2}
+      r={(pointSize * pointRatio) / 2}
       stroke={active ? "rgb(102,102,102)" : "none"}
       fill={fill}
       style={{
@@ -1004,6 +1006,7 @@ const ReportScatter = ({
           report,
           catSums,
           pointSize,
+          pointRatio: scatter.report.oxford ? 0.5 : 1,
           groupBy,
           selectMode: reportSelect,
           xQuery: scatter.report.xQuery,
