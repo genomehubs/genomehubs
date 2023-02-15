@@ -40,6 +40,7 @@ attributes:
   bioproject:
     constraint:
       len: 32
+    description: INSDC bioproject ID or assembly collection name
     header: bioProjectAccession
     separator:
       - ;
