@@ -1,9 +1,17 @@
 import { operations } from "./operations";
 
-export const addCondition = (conditions, parts, type, summary = "value") => {
+export const addCondition = (
+  conditions,
+  parts,
+  type,
+  summary = "value",
+  fields,
+  optionalFields
+) => {
   if (!conditions) {
     conditions = {};
   }
+
   let stat = summary;
   if (parts[1] && parts[1].length > 0) {
     stat = parts[1];
@@ -28,27 +36,47 @@ export const addCondition = (conditions, parts, type, summary = "value") => {
     }
   }
 
+  let valueList = [];
+  let includesNull = false;
+  parts[4].split(",").forEach((value) => {
+    if (value.match(/^null$/i)) {
+      includesNull = true;
+    } else {
+      valueList.push(value.replaceAll("−", "-"));
+    }
+  });
+  if (includesNull) {
+    let fieldIndex = fields.indexOf(parts[2]);
+    if (fieldIndex >= 0) {
+      fields.splice(fieldIndex, 1);
+    }
+    fieldIndex = optionalFields.indexOf(parts[2]);
+    if (fieldIndex == -1) {
+      optionalFields.push(parts[2]);
+    }
+  }
+  if (valueList.length == 0) {
+    return conditions;
+  }
+
   if (stat == "keyword_value") {
     if (parts[3].match(/[><]/)) {
       let values = {};
       operations(parts[3]).forEach((operator) => {
-        values[operator] = parts[4];
+        values[operator] = valueList.join(",");
       });
       conditions[stat][parts[2]].push(values);
     } else {
       if (parts[3] == "!=") {
         conditions[stat][parts[2]].push(
-          parts[4]
-            .split(",")
-            .map((term) => `!${term}`)
-            .join(",")
+          valueList.map((term) => `!${term}`).join(",")
         );
       } else {
-        conditions[stat][parts[2]].push(parts[4]);
+        conditions[stat][parts[2]].push(valueList.join(","));
       }
     }
   } else if (stat == "geo_point_value") {
-    let [lat, lon] = parts[4].replaceAll("−", "-").split(",");
+    let [lat, lon] = valueList;
     conditions[stat][parts[2]] = {
       top_left: {
         lat: 1 * lat + 0.005,
@@ -63,12 +91,12 @@ export const addCondition = (conditions, parts, type, summary = "value") => {
     if (parts[3] == "==") {
       parts[3] = "=";
     }
-    if (parts[4].startsWith("!")) {
-      parts[4] = parts[4].replace("!", "");
+    if (valueList[0].startsWith("!")) {
+      valueList[0] = valueList[0].replace("!", "");
       parts[3] = `!${parts[3]}`;
     }
     operations(parts[3]).forEach((operator) => {
-      conditions[stat][parts[2]][operator] = parts[4].replace("−", "-");
+      conditions[stat][parts[2]][operator] = valueList.join(",");
     });
   }
   return conditions;

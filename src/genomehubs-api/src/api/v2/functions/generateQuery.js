@@ -51,6 +51,9 @@ const validateValue = (term, value, meta, types) => {
     values = value.split(/\s*,\s*/);
   }
   for (let v of values) {
+    if (v.match(/^null$/)) {
+      continue;
+    }
     if (type == "keyword") {
       if (attrEnum) {
         if (!attrEnum.has(v.replace(/^!/, ""))) {
@@ -376,7 +379,14 @@ export const generateQuery = async ({
                 };
               } else {
                 parts[2] = meta.name;
-                filters = addCondition(filters, parts, meta.type, summary);
+                filters = addCondition(
+                  filters,
+                  parts,
+                  meta.type,
+                  summary,
+                  fields,
+                  optionalFields
+                );
               }
             } else {
               properties = addCondition(properties, parts, "keyword");

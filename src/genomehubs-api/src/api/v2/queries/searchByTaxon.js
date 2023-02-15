@@ -92,7 +92,8 @@ export const searchByTaxon = async ({
     filters,
     lookupTypes,
     aggregation_source,
-    searchRawValues
+    searchRawValues,
+    optionalFields
   );
   let propertyValues = filterProperties(properties);
   let assemblyFilter = [];
