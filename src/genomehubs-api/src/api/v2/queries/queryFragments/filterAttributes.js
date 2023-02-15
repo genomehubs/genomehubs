@@ -2,7 +2,8 @@ export const filterAttributes = (
   filters,
   lookupTypes,
   aggregation_source,
-  searchRawValues
+  searchRawValues,
+  optionalFields
 ) => {
   if (Object.keys(filters).length == 0) {
     return [];
@@ -190,18 +191,53 @@ export const filterAttributes = (
   }
   let arr = [];
   Object.keys(filters).forEach((stat) => {
-    let subset = Object.keys(filters[stat]).map((field) => ({
-      nested: {
-        path: "attributes",
-        query: {
+    let subset = Object.keys(filters[stat]).map((field) => {
+      let filter = {
+        filter: [{ match: { "attributes.key": field } }]
+          .concat(aggregation_source || [])
+          .concat(rangeQuery(field, stat)),
+      };
+      if (optionalFields.includes(field)) {
+        return {
           bool: {
-            filter: [{ match: { "attributes.key": field } }]
-              .concat(aggregation_source || [])
-              .concat(rangeQuery(field, stat)),
+            should: [
+              {
+                bool: {
+                  must_not: [
+                    {
+                      nested: {
+                        path: "attributes",
+                        query: {
+                          bool: {
+                            filter: [{ term: { "attributes.key": field } }],
+                          },
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+              {
+                nested: {
+                  path: "attributes",
+                  query: {
+                    bool: filter,
+                  },
+                },
+              },
+            ],
+          },
+        };
+      }
+      return {
+        nested: {
+          path: "attributes",
+          query: {
+            bool: filter,
           },
         },
-      },
-    }));
+      };
+    });
     arr.push(...subset);
   });
   return arr;
