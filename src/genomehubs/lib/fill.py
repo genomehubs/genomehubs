@@ -839,7 +839,14 @@ def traverse_from_root(es, opts, *, template, root=None, max_depth=None, log=Tru
         desc_nodes = stream_missing_attributes_at_level(
             es, nodes=nodes, attrs=attrs, template=template
         )
-        index_stream(es, template["index_name"], desc_nodes, _op_type="update", log=log)
+        index_stream(
+            es,
+            template["index_name"],
+            desc_nodes,
+            _op_type="update",
+            log=log,
+            chunk_size=opts.get("es-batch", 500),
+        )
         root_depth -= 1
 
 
@@ -856,7 +863,12 @@ def traverse_tree(es, opts, template, root, max_depth):
             es,
             template["index_name"],
             traverse_from_tips(
-                es, opts, template=template, root=root, max_depth=max_depth
+                es,
+                opts,
+                template=template,
+                root=root,
+                max_depth=max_depth,
+                chunk_size=opts.get("es-batch", 500),
             ),
             _op_type="update",
             log=log,
