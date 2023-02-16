@@ -210,7 +210,7 @@ def main(args):
                     es,
                     template["index_name"],
                     stream,
-                    log=options["init"].get("es-log", True),
+                    log=options["init"].get("log-es", True),
                     chunk_size=options["init"].get("es-batch", 500),
                 )
 

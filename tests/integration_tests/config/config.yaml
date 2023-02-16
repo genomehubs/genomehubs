@@ -3,7 +3,6 @@ common:
     batch: 5000
     host:
       - "localhost:9200"
-    log: false
     timeout: 30
   hub:
     name: test_instance
@@ -11,6 +10,8 @@ common:
     separator: --
     version: 2022.02.23
   log:
+    es: false
+    fetch: false
     interval: 10
   taxonomy:
     format: ncbi

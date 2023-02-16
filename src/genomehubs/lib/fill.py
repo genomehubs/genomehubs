@@ -844,7 +844,7 @@ def traverse_from_root(es, opts, *, template, root=None, max_depth=None, log=Tru
             template["index_name"],
             desc_nodes,
             _op_type="update",
-            log=opts.get("es-log", True),
+            log=opts.get("log-es", True),
             chunk_size=opts.get("es-batch", 500),
         )
         root_depth -= 1
@@ -869,7 +869,7 @@ def traverse_tree(es, opts, template, root, max_depth):
                 max_depth=max_depth,
             ),
             _op_type="update",
-            log=opts.get("es-log", True),
+            log=opts.get("log-es", True),
             chunk_size=opts.get("es-batch", 500),
         )
     if "traverse-infer-descendants" in opts:

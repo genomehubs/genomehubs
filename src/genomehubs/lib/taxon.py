@@ -428,7 +428,7 @@ def find_or_create_taxa(es, opts, *, taxon_ids, taxon_template, asm_by_taxon_id=
         taxon_template["index_name"],
         stream_taxa(to_create),
         dry_run=opts.get("dry-run", False),
-        log=opts.get("es-log", True),
+        log=opts.get("log-es", True),
         chunk_size=opts.get("es-batch", 500),
     )
     taxa.update(
@@ -1085,7 +1085,7 @@ def create_taxa(
         taxon_template["index_name"],
         stream_taxa(new_taxa),
         dry_run=opts.get("dry-run", False),
-        log=opts.get("es-log", True),
+        log=opts.get("log-es", True),
         chunk_size=opts.get("es-batch", 500),
     )
     # return a list of alt_taxon_ids for the created taxa

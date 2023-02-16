@@ -110,7 +110,7 @@ def index_types(es, types_name, types, opts, *, dry_run=False):
                 template["index_name"],
                 stream,
                 dry_run=dry_run,
-                log=opts.get("es-log", True),
+                log=opts.get("log-es", True),
                 chunk_size=opts.get("es-batch", 500),
             )
     if "taxon_names" in types:
@@ -130,7 +130,7 @@ def index_types(es, types_name, types, opts, *, dry_run=False):
             template["index_name"],
             stream,
             dry_run=dry_run,
-            log=opts.get("es-log", True),
+            log=opts.get("log-es", True),
             chunk_size=opts.get("es-batch", 500),
         )
     return types
