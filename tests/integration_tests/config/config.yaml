@@ -10,6 +10,8 @@ common:
     path: tests/resources
     separator: --
     version: 2022.02.23
+  log:
+    interval: 1
   taxonomy:
     format: ncbi
     file:

@@ -11,7 +11,7 @@ Usage:
                     [--traverse-infer-ancestors] [--traverse-infer-descendants]
                     [--traverse-infer-both] [--traverse-threads INT]
                     [--traverse-depth INT] [--traverse-root STRING]
-                    [--traverse-weight STRING]
+                    [--traverse-weight STRING] [--log-interval INT]
                     [-h|--help] [-v|--version]
 
 Options:
@@ -32,6 +32,7 @@ Options:
     --traverse-threads INT        Number of threads to use for tree traversal. [Default: 1]
     --traverse-weight STRING      Weighting scheme for setting values during tree
                                   traversal.
+    --log-interval INT            Minimum time (seconds) between prgress bar updates [default: 1]
     -h, --help                    Show this
     -v, --version                 Show version number
 
@@ -908,7 +909,9 @@ def traverse_handler(es, opts, template):
     ]
     LOGGER.info("Filling values in subtrees")
     with Pool(processes=threads) as p:
-        with tqdm(total=len(roots), unit=" subtrees") as pbar:
+        with tqdm(
+            total=len(roots), unit=" subtrees", mininterval=opts.get("log-interval", 1)
+        ) as pbar:
             for _ in p.imap_unordered(traverse_helper, roots):
                 pbar.update()
     LOGGER.info("Connecting subtrees")

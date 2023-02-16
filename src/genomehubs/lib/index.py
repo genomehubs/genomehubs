@@ -18,7 +18,7 @@ Usage:
                      [--taxon-id STRING] [--assembly-id STRING]
                      [--sample-id STRING] [--analysis-id STRING]
                      [--file-title STRING] [--file-description STRING] [--file-metadata PATH]
-                     [--dry-run]
+                     [--dry-run] [--log-interval INT]
                      [-h|--help] [-v|--version]
 
 Options:
@@ -55,6 +55,7 @@ Options:
     --file-description STRING  Default description for all indexed files.
     --file-metadata PATH       CSV, TSV, YAML or JSON file metadata with one entry per file to be indexed.
     --dry-run                  Flag to run without loading data into the elasticsearch index.
+    --log-interval INT         Minimum time (seconds) between prgress bar updates [default: 1]
     -h, --help                 Show this
     -v, --version              Show version number
 
@@ -400,7 +401,7 @@ def index_file(
     taxonomy_name = opts["taxonomy-source"].lower()
     LOGGER.info("Processing rows")
     processed_rows = defaultdict(list)
-    for row in tqdm(rows):
+    for row in tqdm(rows, mininterval=opts.get("log-interval", 1)):
         try:
             processed_data, taxon_data, new_taxon_types = process_row(
                 types,

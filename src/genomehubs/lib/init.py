@@ -16,7 +16,7 @@ Usage:
                     [--taxonomy-file PATH...] [--taxon-preload]
                     [--docker-contain STRING...] [--docker-network STRING]
                     [--docker-timeout INT] [--docker-es-container STRING]
-                    [--docker-es-image URL]
+                    [--docker-es-image URL] [--log-interval INT]
                     [--reset] [--force-reset]
                     [-h|--help] [-v|--version]
 
@@ -52,6 +52,7 @@ Options:
     --reset                       Flag to reset GenomeHubs instance if already exists.
     --force-reset                 Flag to force reset GenomeHubs instance if already
                                   exists.
+    --log-interval INT            Minimum time (seconds) between prgress bar updates [default: 1]
     -h, --help                    Show this
     -v, --version                 Show version number
 
