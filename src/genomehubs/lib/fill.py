@@ -910,7 +910,9 @@ def traverse_handler(es, opts, template):
     LOGGER.info("Filling values in subtrees")
     with Pool(processes=threads) as p:
         with tqdm(
-            total=len(roots), unit=" subtrees", mininterval=opts.get("log-interval", 1)
+            total=len(roots),
+            unit=" subtrees",
+            mininterval=int(opts.get("log-interval", 1)),
         ) as pbar:
             for _ in p.imap_unordered(traverse_helper, roots):
                 pbar.update()

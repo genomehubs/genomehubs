@@ -401,7 +401,7 @@ def index_file(
     taxonomy_name = opts["taxonomy-source"].lower()
     LOGGER.info("Processing rows")
     processed_rows = defaultdict(list)
-    for row in tqdm(rows, mininterval=opts.get("log-interval", 1)):
+    for row in tqdm(rows, mininterval=int(opts.get("log-interval", 1))):
         try:
             processed_data, taxon_data, new_taxon_types = process_row(
                 types,

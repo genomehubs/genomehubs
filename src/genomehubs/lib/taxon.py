@@ -104,7 +104,9 @@ def lookup_missing_taxon_ids(
         "phylum",
     ]
     found_keys = []
-    pbar = tqdm(total=len(without_ids.keys()), mininterval=opts.get("log-interval", 1))
+    pbar = tqdm(
+        total=len(without_ids.keys()), mininterval=int(opts.get("log-interval", 1))
+    )
     for key, arr in without_ids.items():
         pbar.update(1)
         for obj in arr:
@@ -247,7 +249,7 @@ def load_taxon_table(es, opts, taxonomy_name, taxon_table):
         root = opts["taxon-lookup-root"]
     for node in tqdm(
         stream_taxon_names(es, index=taxon_template["index_name"], root=root),
-        mininterval=opts.get("log-interval", 1),
+        mininterval=int(opts.get("log-interval", 1)),
     ):
         lineage = {}
         node_names = set()
@@ -1005,7 +1007,7 @@ def create_taxa(
         spellings = {"spellcheck": {}, "synonym": {}}
     ancestors = {}
     matches = defaultdict(dict)
-    pbar = tqdm(total=len(data.keys()), mininterval=opts.get("log-interval", 1))
+    pbar = tqdm(total=len(data.keys()), mininterval=int(opts.get("log-interval", 1)))
     taxon_ids = set({})
     new_taxa = {}
     for rows in data.values():

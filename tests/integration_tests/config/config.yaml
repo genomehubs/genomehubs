@@ -11,7 +11,7 @@ common:
     separator: --
     version: 2022.02.23
   log:
-    interval: 1
+    interval: 10
   taxonomy:
     format: ncbi
     file:
