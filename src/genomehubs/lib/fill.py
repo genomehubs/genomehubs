@@ -6,12 +6,13 @@ Fill attribute values.
 Usage:
     genomehubs fill [--hub-name STRING] [--hub-path PATH] [--hub-version PATH]
                     [--config-file PATH...] [--config-save PATH]
-                    [--es-host URL...]  [--taxonomy-source STRING]
+                    [--es-batch INT] [--es-host URL...]  [--taxonomy-source STRING]
                     [--traverse-limit STRING]
                     [--traverse-infer-ancestors] [--traverse-infer-descendants]
                     [--traverse-infer-both] [--traverse-threads INT]
                     [--traverse-depth INT] [--traverse-root STRING]
                     [--traverse-weight STRING] [--log-interval INT]
+                    [--log-es BOOL]
                     [-h|--help] [-v|--version]
 
 Options:
@@ -20,6 +21,7 @@ Options:
     --hub-version STR             GenomeHubs instance version string.
     --config-file PATH            Path to YAML file containing configuration options.
     --config-save PATH            Path to write configuration options to YAML file.
+    --es-batch INT                Batch size for ElasticSearch bulk indexing. [Default: 500]
     --es-host URL                 ElasticSearch hostname/URL and port.
     --taxonomy-source STRING      Name of taxonomy to use (ncbi or ott).
     --traverse-depth INT          Maximum depth for tree traversal relative to root taxon.
@@ -33,6 +35,7 @@ Options:
     --traverse-weight STRING      Weighting scheme for setting values during tree
                                   traversal.
     --log-interval INT            Minimum time (seconds) between prgress bar updates [default: 1]
+    --log-es BOOL                 Show Info-level logs from elasticsearch [default: True]
     -h, --help                    Show this
     -v, --version                 Show version number
 

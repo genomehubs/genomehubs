@@ -6,7 +6,7 @@ Index a file, directory or repository.
 Usage:
     genomehubs index [--hub-name STRING] [--hub-path PATH] [--hub-version PATH]
                      [--config-file PATH...] [--config-save PATH]
-                     [--es-host URL...] [--assembly-dir PATH]
+                     [--es-batch INT] [--es-host URL...] [--assembly-dir PATH]
                      [--feature-dir PATH] [--sample-dir PATH]
                      [--taxon-dir PATH] [--taxon-repo URL] [--taxon-exception PATH]
                      [--taxon-lookup STRING] [--taxon-lookup-root STRING]
@@ -18,7 +18,7 @@ Usage:
                      [--taxon-id STRING] [--assembly-id STRING]
                      [--sample-id STRING] [--analysis-id STRING]
                      [--file-title STRING] [--file-description STRING] [--file-metadata PATH]
-                     [--dry-run] [--log-interval INT]
+                     [--dry-run] [--log-interval INT] [--log-es BOOL]
                      [-h|--help] [-v|--version]
 
 Options:
@@ -27,6 +27,7 @@ Options:
     --hub-version STR          GenomeHubs instance version string.
     --config-file PATH         Path to YAML file containing configuration options.
     --config-save PATH         Path to write configuration options to YAML file.
+    --es-batch INT             Batch size for ElasticSearch bulk indexing. [Default: 500]
     --es-host URL              ElasticSearch hostname/URL and port.
     --assembly-dir PATH        Path to directory containing assembly-level data.
     --sample-dir PATH          Path to directory containing sample-level data.
@@ -56,6 +57,7 @@ Options:
     --file-metadata PATH       CSV, TSV, YAML or JSON file metadata with one entry per file to be indexed.
     --dry-run                  Flag to run without loading data into the elasticsearch index.
     --log-interval INT         Minimum time (seconds) between prgress bar updates [default: 1]
+    --log-es BOOL              Show Info-level logs from elasticsearch [default: True]
     -h, --help                 Show this
     -v, --version              Show version number
 
