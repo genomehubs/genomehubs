@@ -205,7 +205,13 @@ def main(args):
                 )
             if "taxonomy-root" in options["init"]:
                 es_functions.load_mapping(es, template["name"], template["mapping"])
-                es_functions.index_stream(es, template["index_name"], stream)
+                es_functions.index_stream(
+                    es,
+                    template["index_name"],
+                    stream,
+                    log=options["init"].get("es-log", True),
+                    chunk_size=options["init"].get("es-batch", 500),
+                )
 
         # Prepare taxon index
         taxon_template = taxon.index_template(taxonomy_name, options["init"])
@@ -220,14 +226,18 @@ def main(args):
             es.reindex(body=body)
 
         # Prepare assembly index
-        assembly_template = sample.index_template(taxonomy_name, options["init"], index_type="assembly")
+        assembly_template = sample.index_template(
+            taxonomy_name, options["init"], index_type="assembly"
+        )
         es_functions.load_mapping(
             es, assembly_template["name"], assembly_template["mapping"]
         )
         es_functions.index_create(es, assembly_template["index_name"])
 
         # Prepare sample index
-        sample_template = sample.index_template(taxonomy_name, options["init"], index_type="sample")
+        sample_template = sample.index_template(
+            taxonomy_name, options["init"], index_type="sample"
+        )
         es_functions.load_mapping(
             es, sample_template["name"], sample_template["mapping"]
         )

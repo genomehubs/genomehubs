@@ -3,6 +3,7 @@ common:
     batch: 5000
     host:
       - "localhost:9200"
+    log: false
     timeout: 30
   hub:
     name: test_instance

@@ -831,8 +831,7 @@ def traverse_from_root(es, opts, *, template, root=None, max_depth=None, log=Tru
         ):
             attrs.add(key)
     while root_depth >= 0:
-        if log:
-            LOGGER.info("Filling values at root depth %d" % root_depth)
+        LOGGER.info("Filling values at root depth %d" % root_depth)
         nodes = stream_nodes_by_root_depth(
             es, index=template["index_name"], root=root, depth=root_depth, size=50
         )
@@ -844,7 +843,7 @@ def traverse_from_root(es, opts, *, template, root=None, max_depth=None, log=Tru
             template["index_name"],
             desc_nodes,
             _op_type="update",
-            log=log,
+            log=opts.get("es-log", True),
             chunk_size=opts.get("es-batch", 500),
         )
         root_depth -= 1
@@ -857,8 +856,7 @@ def traverse_tree(es, opts, template, root, max_depth):
         log = False
         es = launch_es(opts, log=log)
     if "traverse-infer-ancestors" in opts:
-        if log:
-            LOGGER.info("Inferring ancestral values for root taxon %s", root)
+        LOGGER.info("Inferring ancestral values for root taxon %s", root)
         _success, _failed = index_stream(
             es,
             template["index_name"],
@@ -868,10 +866,10 @@ def traverse_tree(es, opts, template, root, max_depth):
                 template=template,
                 root=root,
                 max_depth=max_depth,
-                chunk_size=opts.get("es-batch", 500),
             ),
             _op_type="update",
-            log=log,
+            log=opts.get("es-log", True),
+            chunk_size=opts.get("es-batch", 500),
         )
     if "traverse-infer-descendants" in opts:
         if log:

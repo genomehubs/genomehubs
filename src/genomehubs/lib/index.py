@@ -178,6 +178,7 @@ def index_taxon_records(es, taxonomy_name, opts, with_ids, blanks, types):
         summarise_imported_taxa(docs, imported_taxa),
         _op_type="update",
         dry_run=opts.get("dry-run", False),
+        log=opts.get("es-log", True),
         chunk_size=opts.get("es-batch", 500),
     )
     write_imported_taxa(imported_taxa, opts, types=types)
@@ -210,6 +211,7 @@ def index_sample_records(
         sample_template["index_name"],
         docs,
         dry_run=opts.get("dry-run", False),
+        log=opts.get("es-log", True),
         chunk_size=opts.get("es-batch", 500),
     )
     # index taxon-level attributes
@@ -237,6 +239,7 @@ def index_sample_records(
         taxon_docs,
         _op_type="update",
         dry_run=opts.get("dry-run", False),
+        log=opts.get("es-log", True),
         chunk_size=opts.get("es-batch", 500),
     )
 
@@ -360,6 +363,7 @@ def index_feature_records(es, opts, taxonomy_name, with_ids, blanks):
         feature_template["index_name"],
         docs,
         dry_run=opts.get("dry-run", False),
+        log=opts.get("es-log", True),
         chunk_size=opts.get("es-batch", 500),
     )
 

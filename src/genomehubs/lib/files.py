@@ -307,6 +307,7 @@ def index_docs(es, opts, doc_collection, template, *, dry_run=False):
                 docs,
                 _op_type=op_type,
                 dry_run=dry_run,
+                log=opts.get("es-log", True),
                 chunk_size=opts.get("es-batch", 500),
             )
 
