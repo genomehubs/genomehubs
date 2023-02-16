@@ -6,12 +6,13 @@ Fill attribute values.
 Usage:
     genomehubs fill [--hub-name STRING] [--hub-path PATH] [--hub-version PATH]
                     [--config-file PATH...] [--config-save PATH]
-                    [--es-host URL...]  [--taxonomy-source STRING]
+                    [--es-batch INT] [--es-host URL...]  [--taxonomy-source STRING]
                     [--traverse-limit STRING]
                     [--traverse-infer-ancestors] [--traverse-infer-descendants]
                     [--traverse-infer-both] [--traverse-threads INT]
                     [--traverse-depth INT] [--traverse-root STRING]
-                    [--traverse-weight STRING]
+                    [--traverse-weight STRING] [--log-interval INT]
+                    [--log-es BOOL]
                     [-h|--help] [-v|--version]
 
 Options:
@@ -20,6 +21,7 @@ Options:
     --hub-version STR             GenomeHubs instance version string.
     --config-file PATH            Path to YAML file containing configuration options.
     --config-save PATH            Path to write configuration options to YAML file.
+    --es-batch INT                Batch size for ElasticSearch bulk indexing. [Default: 500]
     --es-host URL                 ElasticSearch hostname/URL and port.
     --taxonomy-source STRING      Name of taxonomy to use (ncbi or ott).
     --traverse-depth INT          Maximum depth for tree traversal relative to root taxon.
@@ -32,6 +34,8 @@ Options:
     --traverse-threads INT        Number of threads to use for tree traversal. [Default: 1]
     --traverse-weight STRING      Weighting scheme for setting values during tree
                                   traversal.
+    --log-interval INT            Minimum time (seconds) between prgress bar updates [default: 1]
+    --log-es BOOL                 Show Info-level logs from elasticsearch [default: True]
     -h, --help                    Show this
     -v, --version                 Show version number
 
@@ -831,15 +835,21 @@ def traverse_from_root(es, opts, *, template, root=None, max_depth=None, log=Tru
         ):
             attrs.add(key)
     while root_depth >= 0:
-        if log:
-            LOGGER.info("Filling values at root depth %d" % root_depth)
+        LOGGER.info("Filling values at root depth %d" % root_depth)
         nodes = stream_nodes_by_root_depth(
             es, index=template["index_name"], root=root, depth=root_depth, size=50
         )
         desc_nodes = stream_missing_attributes_at_level(
             es, nodes=nodes, attrs=attrs, template=template
         )
-        index_stream(es, template["index_name"], desc_nodes, _op_type="update", log=log)
+        index_stream(
+            es,
+            template["index_name"],
+            desc_nodes,
+            _op_type="update",
+            log=opts.get("log-es", True),
+            chunk_size=opts.get("es-batch", 500),
+        )
         root_depth -= 1
 
 
@@ -850,16 +860,20 @@ def traverse_tree(es, opts, template, root, max_depth):
         log = False
         es = launch_es(opts, log=log)
     if "traverse-infer-ancestors" in opts:
-        if log:
-            LOGGER.info("Inferring ancestral values for root taxon %s", root)
+        LOGGER.info("Inferring ancestral values for root taxon %s", root)
         _success, _failed = index_stream(
             es,
             template["index_name"],
             traverse_from_tips(
-                es, opts, template=template, root=root, max_depth=max_depth
+                es,
+                opts,
+                template=template,
+                root=root,
+                max_depth=max_depth,
             ),
             _op_type="update",
-            log=log,
+            log=opts.get("log-es", True),
+            chunk_size=opts.get("es-batch", 500),
         )
     if "traverse-infer-descendants" in opts:
         if log:
@@ -898,7 +912,11 @@ def traverse_handler(es, opts, template):
     ]
     LOGGER.info("Filling values in subtrees")
     with Pool(processes=threads) as p:
-        with tqdm(total=len(roots), unit=" subtrees") as pbar:
+        with tqdm(
+            total=len(roots),
+            unit=" subtrees",
+            mininterval=int(opts.get("log-interval", 1)),
+        ) as pbar:
             for _ in p.imap_unordered(traverse_helper, roots):
                 pbar.update()
     LOGGER.info("Connecting subtrees")

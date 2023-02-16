@@ -128,7 +128,7 @@ def process_file(
     analysis_template=None,
     filename=None,
     meta=None,
-    local="symlink"
+    local="symlink",
 ):
     """Process a file for indexing."""
     filepath = Path(infile)
@@ -296,13 +296,19 @@ def stream_docs(doc_dict):
         yield doc_id, doc
 
 
-def index_docs(es, doc_collection, template, *, dry_run=False):
+def index_docs(es, opts, doc_collection, template, *, dry_run=False):
     """Index a collection of docs."""
     for op_type, doc_dict in doc_collection.items():
         if doc_dict:
             docs = stream_docs(doc_dict)
             index_stream(
-                es, template["index_name"], docs, _op_type=op_type, dry_run=dry_run
+                es,
+                template["index_name"],
+                docs,
+                _op_type=op_type,
+                dry_run=dry_run,
+                log=opts.get("log-es", True),
+                chunk_size=opts.get("es-batch", 500),
             )
 
 
@@ -344,7 +350,7 @@ def check_entries_exist(es, attrs, taxonomy_name, opts, *, index_type="assembly"
             [f"{index_type}-{entry_id}" for entry_id in entry_ids],
             entry_template,
             return_type="dict",
-            index_type="assembly"
+            index_type="assembly",
         )
     return entries
 
@@ -401,17 +407,23 @@ def index_metadata(es, file, taxonomy_name, opts, *, dry_run=False):
             )
             if "analysis_id" not in analysis_attrs:
                 file_name = file_attrs.get("name", file_attrs["file_id"])
-                LOGGER.warn("Unable to import %s: analysis_id must be specified", file_name)
+                LOGGER.warn(
+                    "Unable to import %s: analysis_id must be specified", file_name
+                )
                 continue
             # TODO: #30 check taxon_id(s) and assembly_id(s) exist in database
-            assemblies = check_entries_exist(es, analysis_attrs, taxonomy_name, opts, index_type="assembly")
+            assemblies = check_entries_exist(
+                es, analysis_attrs, taxonomy_name, opts, index_type="assembly"
+            )
             if assemblies is None:
                 continue
             if "taxon_id" in analysis_attrs and analysis_attrs["taxon_id"]:
                 taxa = check_taxa_exist(es, analysis_attrs, taxonomy_name, opts)
             else:
                 # set taxa from assembly index
-                taxa = {assembly["taxon_id"]: assembly for assembly in assemblies.values()}
+                taxa = {
+                    assembly["taxon_id"]: assembly for assembly in assemblies.values()
+                }
                 analysis_attrs["taxon_id"] = list(taxa.keys())
             if taxa is None:
                 continue
@@ -444,6 +456,6 @@ def index_metadata(es, file, taxonomy_name, opts, *, dry_run=False):
             pass
     # Create/update index entry according to returned action
     LOGGER.info("Indexing analyses")
-    index_docs(es, analysis_docs, analysis_template, dry_run=dry_run)
+    index_docs(es, opts, analysis_docs, analysis_template, dry_run=dry_run)
     LOGGER.info("Indexing files")
-    index_docs(es, file_docs, file_template, dry_run=dry_run)
+    index_docs(es, opts, file_docs, file_template, dry_run=dry_run)

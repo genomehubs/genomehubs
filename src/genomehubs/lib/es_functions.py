@@ -164,7 +164,16 @@ def load_mapping(es, mapping_name, mapping):
     return res
 
 
-def index_stream(es, index_name, stream, *, _op_type="index", log=True, dry_run=False):
+def index_stream(
+    es,
+    index_name,
+    stream,
+    *,
+    _op_type="index",
+    log=False,
+    dry_run=False,
+    chunk_size=500,
+):
     """Load bulk entries from stream into Elasticsearch index."""
     # LOGGER.info("Indexing bulk entries to %s", index_name)
     if _op_type == "index":
@@ -194,7 +203,7 @@ def index_stream(es, index_name, stream, *, _op_type="index", log=True, dry_run=
         if dry_run:
             iterator = dry_run_iterator(es, actions)
         else:
-            iterator = helpers.streaming_bulk(es, actions)
+            iterator = helpers.streaming_bulk(es, actions, chunk_size)
         success = 0
         failed = 0
         if log:

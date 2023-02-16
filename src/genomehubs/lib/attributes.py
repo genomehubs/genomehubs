@@ -105,7 +105,14 @@ def index_types(es, types_name, types, opts, *, dry_run=False):
                 es, types_name, new_attributes, opts, index_type="attribute"
             )
             load_mapping(es, template["name"], template["mapping"])
-            index_stream(es, template["index_name"], stream, dry_run=dry_run)
+            index_stream(
+                es,
+                template["index_name"],
+                stream,
+                dry_run=dry_run,
+                log=opts.get("log-es", True),
+                chunk_size=opts.get("es-batch", 500),
+            )
     if "taxon_names" in types:
         if "defaults" in types and "taxon_names" in types["defaults"]:
             for key, value in types["taxon_names"].items():
@@ -118,7 +125,14 @@ def index_types(es, types_name, types, opts, *, dry_run=False):
             es, types_name, types["taxon_names"], opts, index_type="identifier"
         )
         load_mapping(es, template["name"], template["mapping"])
-        index_stream(es, template["index_name"], stream, dry_run=dry_run)
+        index_stream(
+            es,
+            template["index_name"],
+            stream,
+            dry_run=dry_run,
+            log=opts.get("log-es", True),
+            chunk_size=opts.get("es-batch", 500),
+        )
     return types
 
 

@@ -104,7 +104,9 @@ def lookup_missing_taxon_ids(
         "phylum",
     ]
     found_keys = []
-    pbar = tqdm(total=len(without_ids.keys()))
+    pbar = tqdm(
+        total=len(without_ids.keys()), mininterval=int(opts.get("log-interval", 1))
+    )
     for key, arr in without_ids.items():
         pbar.update(1)
         for obj in arr:
@@ -121,7 +123,7 @@ def lookup_missing_taxon_ids(
                     return_type="taxon",
                     spellings=spellings,
                     taxon_table=taxon_table,
-                    taxonomy=obj["taxonomy"]
+                    taxonomy=obj["taxonomy"],
                 )
                 if index == 1 and not taxa:
                     break
@@ -246,7 +248,8 @@ def load_taxon_table(es, opts, taxonomy_name, taxon_table):
     if "taxon-lookup-root" in opts:
         root = opts["taxon-lookup-root"]
     for node in tqdm(
-        stream_taxon_names(es, index=taxon_template["index_name"], root=root)
+        stream_taxon_names(es, index=taxon_template["index_name"], root=root),
+        mininterval=int(opts.get("log-interval", 1)),
     ):
         lineage = {}
         node_names = set()
@@ -425,6 +428,8 @@ def find_or_create_taxa(es, opts, *, taxon_ids, taxon_template, asm_by_taxon_id=
         taxon_template["index_name"],
         stream_taxa(to_create),
         dry_run=opts.get("dry-run", False),
+        log=opts.get("log-es", True),
+        chunk_size=opts.get("es-batch", 500),
     )
     taxa.update(
         {
@@ -670,7 +675,7 @@ def lookup_taxon(
     return_type="taxon_id",
     spellings=None,
     taxon_table=None,
-    taxonomy=None
+    taxonomy=None,
 ):
     """Lookup taxon ID."""
     if spellings is None:
@@ -709,7 +714,7 @@ def lookup_taxon(
             return_type=return_type,
             spellings=spellings,
             taxon_table=taxon_table,
-            taxonomy=taxonomy
+            taxonomy=taxonomy,
         )
     if (
         not taxa
@@ -726,7 +731,7 @@ def lookup_taxon(
             return_type=return_type,
             spellings=spellings,
             taxon_table=taxon_table,
-            taxonomy=taxonomy
+            taxonomy=taxonomy,
         )
     if taxonomy is None or int(opts["taxon-matching-ranks"]) == 0:
         return taxa, name_class
@@ -737,8 +742,14 @@ def lookup_taxon(
         compatible = True
         for anc_index, ancestor in enumerate(taxon["_source"]["lineage"]):
             if not ancestor["taxon_rank"].endswith("species"):
-                if ancestor["taxon_rank"] in taxonomy and taxonomy[ancestor["taxon_rank"]]:
-                    if ancestor["scientific_name"].lower() != taxonomy[ancestor["taxon_rank"]].lower():
+                if (
+                    ancestor["taxon_rank"] in taxonomy
+                    and taxonomy[ancestor["taxon_rank"]]
+                ):
+                    if (
+                        ancestor["scientific_name"].lower()
+                        != taxonomy[ancestor["taxon_rank"]].lower()
+                    ):
                         anc_taxa, anc_name_class = lookup_taxon(
                             es,
                             taxonomy[ancestor["taxon_rank"]],
@@ -753,7 +764,12 @@ def lookup_taxon(
                         if anc_taxa:
                             compatible_anc = False
                             for anc_taxon in anc_taxa:
-                                if anc_taxon["_source"]["parent"] == taxon["_source"]["lineage"][anc_index + 1]["taxon_id"]:
+                                if (
+                                    anc_taxon["_source"]["parent"]
+                                    == taxon["_source"]["lineage"][anc_index + 1][
+                                        "taxon_id"
+                                    ]
+                                ):
                                     compatible_anc = True
                                     compatible_count += 1
                                     break
@@ -991,7 +1007,7 @@ def create_taxa(
         spellings = {"spellcheck": {}, "synonym": {}}
     ancestors = {}
     matches = defaultdict(dict)
-    pbar = tqdm(total=len(data.keys()))
+    pbar = tqdm(total=len(data.keys()), mininterval=int(opts.get("log-interval", 1)))
     taxon_ids = set({})
     new_taxa = {}
     for rows in data.values():
@@ -1069,6 +1085,8 @@ def create_taxa(
         taxon_template["index_name"],
         stream_taxa(new_taxa),
         dry_run=opts.get("dry-run", False),
+        log=opts.get("log-es", True),
+        chunk_size=opts.get("es-batch", 500),
     )
     # return a list of alt_taxon_ids for the created taxa
     return new_taxa.keys()

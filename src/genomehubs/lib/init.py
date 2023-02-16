@@ -6,7 +6,7 @@ Initialise a GenomeHubs instance.
 Usage:
     genomehubs init [--hub-name STRING] [--hub-path PATH] [--hub-version PATH]
                     [--config-file PATH...] [--config-save PATH]
-                    [--es-host URL...] [--es-url URL]
+                    [--es-batch INT] [--es-host URL...] [--es-url URL]
                     [--insdc-metadata] [--insdc-root INT...] [--restore-indices]
                     [--taxonomy-path PATH] [--taxonomy-source STRING]
                     [--taxonomy-ncbi-root INT] [--taxonomy-ncbi-url URL]
@@ -16,8 +16,8 @@ Usage:
                     [--taxonomy-file PATH...] [--taxon-preload]
                     [--docker-contain STRING...] [--docker-network STRING]
                     [--docker-timeout INT] [--docker-es-container STRING]
-                    [--docker-es-image URL]
-                    [--reset] [--force-reset]
+                    [--docker-es-image URL] [--log-interval INT] [--log-es BOOL]
+                    [--log-fetch BOOL|PATH] [--reset] [--force-reset]
                     [-h|--help] [-v|--version]
 
 Options:
@@ -26,6 +26,7 @@ Options:
     --hub-version STR             GenomeHubs instance version string.
     --config-file PATH            Path to YAML file containing configuration options.
     --config-save PATH            Path to write configuration options to YAML file.
+    --es-batch INT                Batch size for ElasticSearch bulk indexing. [Default: 500]
     --es-host URL                 ElasticSearch hostname/URL and port.
     --es-url URL                  Remote URL to fetch ElasticSearch code.
     --insdc-metadata              Flag to index metadata for public INSDC assemblies.
@@ -52,6 +53,9 @@ Options:
     --reset                       Flag to reset GenomeHubs instance if already exists.
     --force-reset                 Flag to force reset GenomeHubs instance if already
                                   exists.
+    --log-interval INT            Minimum time (seconds) between prgress bar updates [default: 1]
+    --log-es BOOL                 Show Info-level logs from elasticsearch [default: True]
+    --log-fetch BOOL|PATH         Show logs from fetch commands or redirect to PATH [default: True]
     -h, --help                    Show this
     -v, --version                 Show version number
 
@@ -205,7 +209,13 @@ def main(args):
                 )
             if "taxonomy-root" in options["init"]:
                 es_functions.load_mapping(es, template["name"], template["mapping"])
-                es_functions.index_stream(es, template["index_name"], stream)
+                es_functions.index_stream(
+                    es,
+                    template["index_name"],
+                    stream,
+                    log=options["init"].get("log-es", True),
+                    chunk_size=options["init"].get("es-batch", 500),
+                )
 
         # Prepare taxon index
         taxon_template = taxon.index_template(taxonomy_name, options["init"])
@@ -220,14 +230,18 @@ def main(args):
             es.reindex(body=body)
 
         # Prepare assembly index
-        assembly_template = sample.index_template(taxonomy_name, options["init"], index_type="assembly")
+        assembly_template = sample.index_template(
+            taxonomy_name, options["init"], index_type="assembly"
+        )
         es_functions.load_mapping(
             es, assembly_template["name"], assembly_template["mapping"]
         )
         es_functions.index_create(es, assembly_template["index_name"])
 
         # Prepare sample index
-        sample_template = sample.index_template(taxonomy_name, options["init"], index_type="sample")
+        sample_template = sample.index_template(
+            taxonomy_name, options["init"], index_type="sample"
+        )
         es_functions.load_mapping(
             es, sample_template["name"], sample_template["mapping"]
         )

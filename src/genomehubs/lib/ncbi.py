@@ -129,7 +129,7 @@ def parse_flatfile(flatfile, organelle, opts):
     )
     with gzip.open(flatfile, "rt") as fh:
         gb = SeqIO.parse(fh, "gb")
-        for entry in tqdm(gb):
+        for entry in tqdm(gb, mininterval=int(opts.get("log-interval", 1))):
             if (
                 "refseq-root" in opts
                 and opts["refseq-root"] not in entry.annotations["taxonomy"]
