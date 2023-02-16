@@ -53,9 +53,9 @@ Options:
     --reset                       Flag to reset GenomeHubs instance if already exists.
     --force-reset                 Flag to force reset GenomeHubs instance if already
                                   exists.
-    --log-interval INT            Minimum time (seconds) between prgress bar updates [default: 1]
-    --log-es BOOL                 Show Info-level logs from elasticsearch [default: True]
-    --log-fetch BOOL|PATH         Show logs from fetch commands or redirect to PATH [default: True]
+    --log-interval INT            Minimum time (seconds) between prgress bar updates
+    --log-es BOOL                 Show Info-level logs from elasticsearch
+    --log-fetch BOOL|PATH         Show logs from fetch commands or redirect to PATH
     -h, --help                    Show this
     -v, --version                 Show version number
 

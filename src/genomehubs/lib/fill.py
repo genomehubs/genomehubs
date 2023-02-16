@@ -21,7 +21,7 @@ Options:
     --hub-version STR             GenomeHubs instance version string.
     --config-file PATH            Path to YAML file containing configuration options.
     --config-save PATH            Path to write configuration options to YAML file.
-    --es-batch INT                Batch size for ElasticSearch bulk indexing. [Default: 500]
+    --es-batch INT                Batch size for ElasticSearch bulk indexing.
     --es-host URL                 ElasticSearch hostname/URL and port.
     --taxonomy-source STRING      Name of taxonomy to use (ncbi or ott).
     --traverse-depth INT          Maximum depth for tree traversal relative to root taxon.
@@ -34,8 +34,8 @@ Options:
     --traverse-threads INT        Number of threads to use for tree traversal. [Default: 1]
     --traverse-weight STRING      Weighting scheme for setting values during tree
                                   traversal.
-    --log-interval INT            Minimum time (seconds) between prgress bar updates [default: 1]
-    --log-es BOOL                 Show Info-level logs from elasticsearch [default: True]
+    --log-interval INT            Minimum time (seconds) between prgress bar updates.
+    --log-es BOOL                 Show Info-level logs from elasticsearch.
     -h, --help                    Show this
     -v, --version                 Show version number
 

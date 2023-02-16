@@ -56,8 +56,8 @@ Options:
     --file-description STRING  Default description for all indexed files.
     --file-metadata PATH       CSV, TSV, YAML or JSON file metadata with one entry per file to be indexed.
     --dry-run                  Flag to run without loading data into the elasticsearch index.
-    --log-interval INT         Minimum time (seconds) between prgress bar updates [default: 1]
-    --log-es BOOL              Show Info-level logs from elasticsearch [default: True]
+    --log-interval INT         Minimum time (seconds) between prgress bar updates
+    --log-es BOOL              Show Info-level logs from elasticsearch
     -h, --help                 Show this
     -v, --version              Show version number
 

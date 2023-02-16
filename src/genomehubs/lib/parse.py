@@ -33,7 +33,7 @@ Options:
     --wikidata-xref STRING       Include link to external reference from WikiData (e.g. NBN, BOLD)
     --ncbi-datasets-genome PATH  Parse NCBI Datasets genome directory
     --ncbi-datasets-sample PATH  Parse sample data from NCBI Datasets genome directory
-    --log-interval INT           Minimum time (seconds) between prgress bar updates [default: 1]
+    --log-interval INT           Minimum time (seconds) between progress bar updates
     --outfile PATH               Save parsed output to file
     --refseq-mitochondria        Parse mitochondrial genomes from the NCBI RefSeq
                                  organelle collection
