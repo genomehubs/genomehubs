@@ -203,6 +203,7 @@ def index_stream(
         if dry_run:
             iterator = dry_run_iterator(es, actions)
         else:
+            chunk_size = int(chunk_size)
             iterator = helpers.streaming_bulk(es, actions, chunk_size)
         success = 0
         failed = 0

@@ -10,6 +10,7 @@ genomehubs init \
     --taxonomy-root 2759 \
     --taxonomy-jsonl tests/integration_tests/ena-taxonomy.extra.jsonl \
     --taxon-preload &&
+exit
 genomehubs index \
     --config-file tests/integration_tests/config/config.yaml \
     --taxonomy-source ncbi \

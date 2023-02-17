@@ -26,7 +26,7 @@ Options:
     --hub-version STR             GenomeHubs instance version string.
     --config-file PATH            Path to YAML file containing configuration options.
     --config-save PATH            Path to write configuration options to YAML file.
-    --es-batch INT                Batch size for ElasticSearch bulk indexing. [Default: 500]
+    --es-batch INT                Batch size for ElasticSearch bulk indexing.
     --es-host URL                 ElasticSearch hostname/URL and port.
     --es-url URL                  Remote URL to fetch ElasticSearch code.
     --insdc-metadata              Flag to index metadata for public INSDC assemblies.
