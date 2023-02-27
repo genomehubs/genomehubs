@@ -146,6 +146,11 @@
         "ignore_above": 64,
         "normalizer": "lowercase",
         "meta": { "description": "Source url slug" }
+      },
+      "source_url_template": {
+        "type": "keyword",
+        "index": false,
+        "meta": { "description": "URL template" }
       }
     }
   }

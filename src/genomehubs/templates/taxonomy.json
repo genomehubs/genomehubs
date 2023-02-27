@@ -59,6 +59,16 @@
             "type": "keyword",
             "index": false,
             "meta": { "description": "URL slug for taxon name xref" }
+          },
+          "source_url": {
+            "type": "keyword",
+            "ignore_above": 128,
+            "meta": { "description": "Source URL" }
+          },
+          "source_url_template": {
+            "type": "keyword",
+            "index": false,
+            "meta": { "description": "URL template" }
           }
         }
       },

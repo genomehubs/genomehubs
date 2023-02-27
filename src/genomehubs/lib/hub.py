@@ -554,12 +554,10 @@ def add_attributes(
                     attribute.update(meta)
                     if "source" not in attribute and source is not None:
                         attribute.update({"source": source})
-                if "source_url" in attribute and isinstance(
-                    attribute["source_url"], dict
-                ):
+                if "source_url_template" in attribute:
                     attribute["source_url"] = apply_template(
                         None,
-                        attribute["source_url"].get("template", ""),
+                        attribute["source_url_template"],
                         row_values,
                         shared_values,
                     )

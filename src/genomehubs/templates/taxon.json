@@ -90,6 +90,16 @@
             "type": "keyword",
             "index": false,
             "meta": { "description": "URL slug for taxon name xref" }
+          },
+          "source_url": {
+            "type": "keyword",
+            "ignore_above": 128,
+            "meta": { "description": "Source URL" }
+          },
+          "source_url_template": {
+            "type": "keyword",
+            "index": false,
+            "meta": { "description": "URL template" }
           }
         }
       },
@@ -328,6 +338,16 @@
               "description": "Source taxon_id for ancestor derived values"
             }
           },
+          "source_url": {
+            "type": "keyword",
+            "ignore_above": 128,
+            "meta": { "description": "Source URL" }
+          },
+          "source_url_template": {
+            "type": "keyword",
+            "index": false,
+            "meta": { "description": "URL template" }
+          },
           "comment": {
             "type": "text",
             "index": false
@@ -450,6 +470,11 @@
                 "type": "keyword",
                 "ignore_above": 128,
                 "meta": { "description": "Source URL" }
+              },
+              "source_url_template": {
+                "type": "keyword",
+                "index": false,
+                "meta": { "description": "URL template" }
               },
               "source_date": {
                 "type": "date",

@@ -62,6 +62,16 @@
             "meta": {
               "description": "Source of identifier"
             }
+          },
+          "source_url": {
+            "type": "keyword",
+            "ignore_above": 128,
+            "meta": { "description": "Source URL" }
+          },
+          "source_url_template": {
+            "type": "keyword",
+            "index": false,
+            "meta": { "description": "URL template" }
           }
         }
       },
@@ -269,6 +279,16 @@
             },
             "meta": { "description": "Source of attribute value" }
           },
+          "source_url": {
+            "type": "keyword",
+            "ignore_above": 128,
+            "meta": { "description": "Source URL" }
+          },
+          "source_url_template": {
+            "type": "keyword",
+            "index": false,
+            "meta": { "description": "URL template" }
+          },
           "count": {
             "type": "integer",
             "meta": { "description": "Count of individual values" }
@@ -416,6 +436,16 @@
                 "type": "keyword",
                 "ignore_above": 64,
                 "meta": { "description": "Source of nested value" }
+              },
+              "source_url": {
+                "type": "keyword",
+                "ignore_above": 128,
+                "meta": { "description": "Source URL" }
+              },
+              "source_url_template": {
+                "type": "keyword",
+                "index": false,
+                "meta": { "description": "URL template" }
               },
               "source_index": {
                 "type": "keyword",

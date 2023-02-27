@@ -33,8 +33,7 @@ attributes:
     header: totalSequenceLength
     organelle: nucleus
     source: CNCB
-    source_url:
-      template: https://ngdc.cncb.ac.cn/gwh/Assembly/{genbank_accession}/show
+    source_url_template: https://ngdc.cncb.ac.cn/gwh/Assembly/{genbank_accession}/show
     bins:
       count: 10
       max: 11
