@@ -29,6 +29,7 @@ import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchRecord from "../hocs/dispatchRecord";
 import { formatter } from "../functions/formatter";
+import { getTypesMap } from "../selectors/types";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import withColors from "../hocs/withColors";
@@ -420,6 +421,12 @@ const ResultTable = ({
       `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`
     );
   };
+  let usedTypes = new Set();
+  searchResults.results.forEach((result) => {
+    Object.keys(result.result.fields).forEach((field) => {
+      usedTypes.add(field);
+    });
+  });
   let rows = searchResults.results.map((result) => {
     let name = result.result.scientific_name;
     let currentRecordId = result.result.taxon_id;
@@ -528,68 +535,69 @@ const ResultTable = ({
         </Tooltip>
       );
     }
-    displayTypes.forEach((type) => {
-      if (type.name != "sex_determination_system") {
-        if (
-          result.result.fields &&
-          result.result.fields.hasOwnProperty(type.name)
-        ) {
-          let field = result.result.fields[type.name];
-          let value = field.value;
-          if (Array.isArray(value)) {
-            value = value[0];
-          }
-          value = formatter(value, searchIndex);
-          if (Array.isArray(field.value) && field.count > 1) {
-            value = `${value} ...`;
-            let list = field.value.slice(0, 3).join(", ");
-            if (field.count > 3) {
-              list = `${list}, ...`;
-            }
-            value = (
-              <Tooltip title={list} placement="top" arrow>
-                <span>{value}</span>
-              </Tooltip>
-            );
-          }
-          cells.push(
-            <TableCell key={type.name}>
-              <Grid
-                container
-                direction="row"
-                wrap="nowrap"
-                spacing={1}
-                alignItems={"center"}
-                ref={rootRef}
-                style={{ cursor: "pointer" }}
-                onClick={() => {
-                  setAttributeSettings({
-                    currentRecordId,
-                    attributeId: type.name,
-                    showAttribute: true,
-                  });
-                }}
-              >
-                {field.aggregation_source && (
-                  <Grid item>
-                    <AggregationIcon
-                      method={field.aggregation_source}
-                      hasDescendants={field.has_descendants}
-                    />
-                  </Grid>
-                )}
-
-                <Grid item style={{ whiteSpace: "nowrap" }}>
-                  {value}
-                </Grid>
-              </Grid>
-            </TableCell>
-          );
-        } else {
-          cells.push(<TableCell key={type.name}>-</TableCell>);
-        }
+    for (let type of displayTypes) {
+      if (!usedTypes.has(type.name)) {
+        continue;
       }
-    });
+      if (
+        result.result.fields &&
+        result.result.fields.hasOwnProperty(type.name)
+      ) {
+        let field = result.result.fields[type.name];
+        let value = field.value;
+        if (Array.isArray(value)) {
+          value = value[0];
+        }
+        value = formatter(value, searchIndex);
+        if (Array.isArray(field.value) && field.count > 1) {
+          value = `${value} ...`;
+          let list = field.value.slice(0, 3).join(", ");
+          if (field.count > 3) {
+            list = `${list}, ...`;
+          }
+          value = (
+            <Tooltip title={list} placement="top" arrow>
+              <span>{value}</span>
+            </Tooltip>
+          );
+        }
+        cells.push(
+          <TableCell key={type.name}>
+            <Grid
+              container
+              direction="row"
+              wrap="nowrap"
+              spacing={1}
+              alignItems={"center"}
+              ref={rootRef}
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                setAttributeSettings({
+                  currentRecordId,
+                  attributeId: type.name,
+                  showAttribute: true,
+                });
+              }}
+            >
+              {field.aggregation_source && (
+                <Grid item>
+                  <AggregationIcon
+                    method={field.aggregation_source}
+                    hasDescendants={field.has_descendants}
+                  />
+                </Grid>
+              )}
+
+              <Grid item style={{ whiteSpace: "nowrap" }}>
+                {value}
+              </Grid>
+            </Grid>
+          </TableCell>
+        );
+      } else {
+        cells.push(<TableCell key={type.name}>-</TableCell>);
+      }
+    }
     cells.push(
       <Tooltip title={"Click to view record"} arrow key={"go to record"}>
         <TableCell>
@@ -691,31 +699,32 @@ const ResultTable = ({
       />
     );
   }
-  displayTypes.forEach((type) => {
-    if (type.name != "sex_determination_system") {
-      let sortDirection = sortBy === type.name ? sortOrder : false;
-      heads.push(
-        <SortableCell
-          key={type.name}
-          name={type.name}
-          description={type.description}
-          status={type.status}
-          classes={classes}
-          statusColors={statusColors}
-          sortBy={sortBy}
-          sortOrder={sortOrder}
-          sortDirection={sortDirection}
-          handleTableSort={handleTableSort}
-          showExcludeBoxes={searchIndex == "taxon" ? "all" : "missing"}
-          excludeAncestral={arrToObj(searchTerm.excludeAncestral)}
-          excludeDescendant={arrToObj(searchTerm.excludeDescendant)}
-          excludeDirect={arrToObj(searchTerm.excludeDirect)}
-          excludeMissing={arrToObj(searchTerm.excludeMissing)}
-          handleToggleExclusion={handleToggleExclusion}
-        />
-      );
+  for (let type of displayTypes) {
+    if (!usedTypes.has(type.name)) {
+      continue;
     }
-  });
+    let sortDirection = sortBy === type.name ? sortOrder : false;
+    heads.push(
+      <SortableCell
+        key={type.name}
+        name={type.name}
+        description={type.description}
+        status={type.status}
+        classes={classes}
+        statusColors={statusColors}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        sortDirection={sortDirection}
+        handleTableSort={handleTableSort}
+        showExcludeBoxes={searchIndex == "taxon" ? "all" : "missing"}
+        excludeAncestral={arrToObj(searchTerm.excludeAncestral)}
+        excludeDescendant={arrToObj(searchTerm.excludeDescendant)}
+        excludeDirect={arrToObj(searchTerm.excludeDirect)}
+        excludeMissing={arrToObj(searchTerm.excludeMissing)}
+        handleToggleExclusion={handleToggleExclusion}
+      />
+    );
+  }
   heads.push(<TableCell key={"last"}></TableCell>);
 
   return (
