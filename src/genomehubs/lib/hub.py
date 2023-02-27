@@ -554,6 +554,15 @@ def add_attributes(
                     attribute.update(meta)
                     if "source" not in attribute and source is not None:
                         attribute.update({"source": source})
+                if "source_url" in attribute and isinstance(
+                    attribute["source_url"], dict
+                ):
+                    attribute["source_url"] = apply_template(
+                        None,
+                        attribute["source_url"].get("template", ""),
+                        row_values,
+                        shared_values,
+                    )
                 attributes.append(attribute)
     if attribute_values:
         for attribute in attributes:
@@ -823,7 +832,7 @@ def process_row(
     ):
         row_id = data["identifiers"][f"{index_type}_id"]
     row_values = {}
-    for attr_type in ["attributes", "features", "identifiers", "taxon_names"]:
+    for attr_type in ["identifiers", "taxon_names", "attributes", "features"]:
         if attr_type in data and data[attr_type]:
             (
                 data[attr_type],

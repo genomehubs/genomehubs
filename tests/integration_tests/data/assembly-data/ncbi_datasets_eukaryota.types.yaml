@@ -32,8 +32,9 @@ attributes:
     display_name: Assembly span
     header: totalSequenceLength
     organelle: nucleus
-    source: INSDC
-    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    source: CNCB
+    source_url:
+      template: https://ngdc.cncb.ac.cn/gwh/Assembly/{genbank_accession}/show
     bins:
       count: 10
       max: 11
@@ -399,8 +400,8 @@ file:
   header: true
   name: ncbi_datasets_eukaryota.tsv.gz
   organelle: nucleus
-  source: INSDC
-  source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  # source: INSDC
+  # source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   tests: ncbi_datasets_tests
 identifiers:
   assembly_id:
