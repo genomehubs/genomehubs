@@ -5,22 +5,22 @@
 # genomehubs parse --directory ../lepbase-data/sources/raw_features/ --outfile tests/integration_tests/data/boat/assembly/lepidoptera.busco.tsv --window-size 1 --window-size 1000000
 
 
-curl -X DELETE "http://localhost:9200/taxon-*"
-curl -X DELETE "http://localhost:9200/a*"
-curl -X DELETE "http://localhost:9200/f*"
-curl -X DELETE "http://localhost:9200/s*"
-# curl -X DELETE "http://localhost:9200/*"
-
-# genomehubs init \
-#     --config-file tests/integration_tests/config/full.yaml \
-#     --taxonomy-source ncbi \
-#     --taxonomy-root 7088 \
-#     --taxon-preload &&
+# curl -X DELETE "http://localhost:9200/taxon-*"
+# curl -X DELETE "http://localhost:9200/a*"
+# curl -X DELETE "http://localhost:9200/f*"
+# curl -X DELETE "http://localhost:9200/s*"
+curl -X DELETE "http://localhost:9200/*"
 
 genomehubs init \
     --config-file tests/integration_tests/config/full.yaml \
     --taxonomy-source ncbi \
-    --restore-indices &&
+    --taxonomy-root 7088 \
+    --taxon-preload &&
+
+# genomehubs init \
+#     --config-file tests/integration_tests/config/full.yaml \
+#     --taxonomy-source ncbi \
+#     --restore-indices &&
 genomehubs index \
     --config-file tests/integration_tests/config/full.yaml \
     --taxonomy-source ncbi \

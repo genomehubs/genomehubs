@@ -540,11 +540,16 @@ const ResultTable = ({
             value = value[0];
           }
           value = formatter(value, searchIndex);
-          if (Array.isArray(field.value) && field.count > 1) {
+          let count = field.value.length;
+          if (Array.isArray(field.value) && count > 1) {
             value = `${value} ...`;
             let list = field.value.slice(0, 3).join(", ");
-            if (field.count > 3) {
-              list = `${list}, ...`;
+            if (count > 3) {
+              if (count > 4) {
+                list = `${list}, ... (${count - 3} more)`;
+              } else {
+                list = field.value.slice(0, 4).join(", ");
+              }
             }
             value = (
               <Tooltip title={list} placement="top" arrow>
