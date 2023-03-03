@@ -107,6 +107,9 @@ export const getBounds = async ({
   }
   let summary = summaries[0];
   let scaleType = setScale({ field, lookupTypes, opts });
+  if (scaleType == "ordinal" && summary == "length") {
+    scaleType = "linear";
+  }
   let fixedTerms = await setTerms({
     cat: field,
     opts,
@@ -138,16 +141,29 @@ export const getBounds = async ({
       term = catMeta.name;
     }
   }
+  let extra = {};
+  let valueKey = `${fieldMeta.type}_value`;
+  if (fieldMeta) {
+    if (fieldMeta.type == "keyword") {
+      if (summary == "length") {
+        valueKey = summary;
+        extra = { stats: true };
+      } else {
+        extra = { keywords: field };
+      }
+    } else if (fieldMeta.type == "geo_point") {
+      extra = { geo: true };
+    } else {
+      extra = { stats: true };
+    }
+  }
   params.aggs = await setAggs({
     field,
     summary,
     result,
     taxonomy,
-    ...(fieldMeta &&
-      fieldMeta.type != "keyword" &&
-      fieldMeta.type != "geo_point" && { stats: true }),
-    ...(fieldMeta && fieldMeta.type == "keyword" && { keywords: field }),
-    ...(fieldMeta && fieldMeta.type == "geo_point" && { geo: true }),
+    valueKey,
+    ...extra,
     fixedTerms,
     terms: extraTerms,
     size: definedTerms.size,
@@ -187,6 +203,9 @@ export const getBounds = async ({
     }
     if (!min || !max) {
       let valueType = valueTypes[fieldMeta.type] || "float";
+      if (valueType == "keyword" && scaleType != "ordinal") {
+        valueType = "integer";
+      }
       if (stats.min == stats.max) {
         tickCount = 2;
         if (valueType == "date") {

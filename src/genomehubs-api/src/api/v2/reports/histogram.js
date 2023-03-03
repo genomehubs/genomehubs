@@ -60,7 +60,7 @@ const getYValues = ({ obj, yField, lookupTypes, stats }) => {
   let yValueType = valueTypes[lookupTypes(yField).type] || "float";
   // TODO: use stats here
   let yHist = getHistAggResults(obj.yHistograms.by_attribute[yField], stats);
-  if (yValueType == "keyword") {
+  if (yValueType == "keyword" && stats.cats) {
     let bucketMap = {};
     stats.cats.forEach((obj, i) => {
       yBuckets.push(obj.key);
@@ -198,7 +198,7 @@ const getHistogram = async ({
             }
           }
         }
-        for (let cat of cats) {
+        for (let cat of cats || ["all data"]) {
           if (!pointData[cat]) {
             pointData[cat] = [];
           }
@@ -289,7 +289,7 @@ const getHistogram = async ({
   });
   if (fieldMeta.type == "date") {
     buckets = scaleBuckets(buckets, "date", bounds);
-  } else if (fieldMeta.type == "keyword") {
+  } else if (fieldMeta.type == "keyword" && summaries[0] != "length") {
     buckets.push(undefined);
   } else {
     buckets = scaleBuckets(buckets, bounds.scale, bounds);
@@ -299,7 +299,9 @@ const getHistogram = async ({
     // yBuckets = allYBuckets;
     if (yFieldMeta.type == "date") {
       yBuckets = scaleBuckets(yBuckets, "date", yBounds);
-    } else if (yFieldMeta.type != "keyword") {
+    } else if (yFieldMeta.type != "keyword" && summaries[0] != "length") {
+      yBuckets = scaleBuckets(yBuckets, yBounds.scale, yBounds);
+    } else {
       yBuckets = scaleBuckets(yBuckets, yBounds.scale, yBounds);
     }
   }

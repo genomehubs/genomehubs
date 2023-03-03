@@ -268,6 +268,7 @@ const termsAgg = ({ field, fixedTerms, lookupTypes, size, yHistograms }) => {
 export const setAggs = async ({
   field,
   summary,
+  valueKey,
   result,
   histogram,
   tree,
@@ -290,7 +291,7 @@ export const setAggs = async ({
       fieldMeta = lookupTypes(terms);
       field = fieldMeta.name;
       if (fieldMeta) {
-        if (fieldMeta.type == "keyword") {
+        if (fieldMeta.type == "keyword" && valueKey == "keyword_value") {
           terms = attributeTerms({ terms, size });
           return {
             aggregations: {
@@ -413,7 +414,7 @@ export const setAggs = async ({
   if (stats) {
     stats = {
       stats: {
-        field: `attributes.${fieldMeta.type}_value`,
+        field: `attributes.${valueKey}`,
       },
     };
   }

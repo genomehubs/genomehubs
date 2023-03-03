@@ -540,13 +540,12 @@ const ResultTable = ({
             value = value[0];
           }
           value = formatter(value, searchIndex);
-          let count = field.value.length;
-          if (Array.isArray(field.value) && count > 1) {
+          if (Array.isArray(field.value) && field.length > 1) {
             value = `${value} ...`;
             let list = field.value.slice(0, 3).join(", ");
-            if (count > 3) {
-              if (count > 4) {
-                list = `${list}, ... (${count - 3} more)`;
+            if (field.length > 3) {
+              if (field.length > 4) {
+                list = `${list}, ... (${field.length - 3} more)`;
               } else {
                 list = field.value.slice(0, 4).join(", ");
               }
