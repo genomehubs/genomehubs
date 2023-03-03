@@ -89,7 +89,7 @@ export const getBounds = async ({
   cat,
   result,
   exclusions,
-  tickCount = 10,
+  tickCount = 11,
   taxonomy,
   apiParams,
   opts = ";;",
