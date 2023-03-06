@@ -15,6 +15,7 @@ import {
   getSearchIndex,
   getSearchResults,
   getSearchTerm,
+  plurals,
 } from "../reducers/search";
 
 import { byIdSelectorCreator } from "../reducers/selectorCreators";
@@ -292,7 +293,7 @@ const expandValues = (obj, arr, buckets, yBuckets) => {
   return false;
 };
 
-const processScatter = (scatter) => {
+const processScatter = (scatter, result) => {
   if (!scatter) {
     return {};
   }
@@ -301,6 +302,7 @@ const processScatter = (scatter) => {
   if (!heatmaps) {
     return {};
   }
+  let searchIndexPlural = plurals[result] || "records";
   let valueType = heatmaps.valueType;
   let cats;
   let lastIndex = heatmaps.buckets.length - 2;
@@ -467,9 +469,9 @@ const processScatter = (scatter) => {
       }
     });
   } else {
-    cats = ["all taxa"];
+    cats = [`all ${searchIndexPlural}`];
     catSums = {};
-    catSums["all taxa"] = {
+    catSums[`all ${searchIndexPlural}`] = {
       sum: 0,
       min: Number.POSITIVE_INFINITY,
       max: Number.NEGATIVE_INFINITY,
@@ -509,9 +511,15 @@ const processScatter = (scatter) => {
                 z,
                 count: z,
               });
-              catSums["all taxa"].sum += z;
-              catSums["all taxa"].min = Math.min(catSums["all taxa"].min, z);
-              catSums["all taxa"].max = Math.max(catSums["all taxa"].max, z);
+              catSums[`all ${searchIndexPlural}`].sum += z;
+              catSums[`all ${searchIndexPlural}`].min = Math.min(
+                catSums[`all ${searchIndexPlural}`].min,
+                z
+              );
+              catSums[`all ${searchIndexPlural}`].max = Math.max(
+                catSums[`all ${searchIndexPlural}`].max,
+                z
+              );
             }
           }
         });
@@ -683,7 +691,10 @@ const processReport = (report, { searchTerm = {} }) => {
         ...report.report,
         scatter: {
           ...report.report.oxford,
-          ...processScatter(report.report.oxford),
+          ...processScatter(
+            report.report.oxford,
+            report?.report?.xQuery?.result
+          ),
         },
       },
     };
@@ -694,7 +705,10 @@ const processReport = (report, { searchTerm = {} }) => {
         ...report.report,
         scatter: {
           ...report.report.scatter,
-          ...processScatter(report.report.scatter),
+          ...processScatter(
+            report.report.scatter,
+            report?.report?.xQuery?.result
+          ),
         },
       },
     };

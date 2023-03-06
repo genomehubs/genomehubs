@@ -21,6 +21,7 @@ import dispatchMessage from "../hocs/dispatchMessage";
 import qs from "../functions/qs";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
+import withSearchIndex from "../hocs/withSearchIndex";
 import withSiteName from "../hocs/withSiteName";
 
 const SingleMarker = ({
@@ -168,6 +169,7 @@ const ReportMap = ({
   map,
   chartRef,
   containerRef,
+  searchIndexPlural,
   embedded,
   ratio,
   stacked,
@@ -231,7 +233,7 @@ const ReportMap = ({
       markers.push(
         <MarkerComponent
           key={0}
-          geoPoints={pointData["all taxa"]}
+          geoPoints={pointData[`all ${searchIndexPlural}`]}
           color={colors[0]}
           options={options}
         />
@@ -253,4 +255,9 @@ const ReportMap = ({
   }
 };
 
-export default compose(withSiteName, dispatchMessage, withColors)(ReportMap);
+export default compose(
+  withSiteName,
+  dispatchMessage,
+  withColors,
+  withSearchIndex
+)(ReportMap);

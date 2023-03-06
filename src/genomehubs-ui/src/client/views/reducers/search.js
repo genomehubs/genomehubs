@@ -95,6 +95,14 @@ export const searchIndex = handleAction(
 );
 export const getSearchIndex = (state) => state.searchIndex;
 
+export const plurals = {
+  assembly: "assemblies",
+  feature: "features",
+  taxon: "taxa",
+};
+export const getSearchIndexPlural = (state) =>
+  plurals[state.searchIndex] || "records";
+
 export const setPreferSearchTerm = createAction("SET_PREFER_SEARCH_TERM");
 export const preferSearchTerm = handleAction(
   "SET_PREFER_SEARCH_TERM",

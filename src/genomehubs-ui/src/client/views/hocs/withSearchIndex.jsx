@@ -1,4 +1,8 @@
-import { getSearchIndex, setSearchIndex } from "../reducers/search";
+import {
+  getSearchIndex,
+  getSearchIndexPlural,
+  setSearchIndex,
+} from "../reducers/search";
 
 import React from "react";
 import { connect } from "react-redux";
@@ -6,6 +10,7 @@ import { connect } from "react-redux";
 const withSearchIndex = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
     searchIndex: getSearchIndex(state),
+    searchIndexPlural: getSearchIndexPlural(state),
   });
 
   const mapDispatchToProps = (dispatch) => ({

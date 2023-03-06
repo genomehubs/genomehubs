@@ -26,6 +26,7 @@ import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
+import withSearchIndex from "../hocs/withSearchIndex";
 import withSiteName from "../hocs/withSiteName";
 
 const searchByCell = ({
@@ -384,6 +385,7 @@ const ReportHistogram = ({
   chartRef,
   containerRef,
   embedded,
+  searchIndexPlural,
   ratio,
   stacked,
   cumulative,
@@ -500,8 +502,8 @@ const ReportHistogram = ({
         }
       });
     } else {
-      cats = ["all taxa"];
-      stats["all taxa"] = {
+      cats = [`all ${searchIndexPlural}`];
+      stats[`all ${searchIndexPlural}`] = {
         sum: 0,
         min: Number.POSITIVE_INFINITY,
         max: Number.NEGATIVE_INFINITY,
@@ -511,9 +513,15 @@ const ReportHistogram = ({
         if (i < buckets.length - 1) {
           let value = histograms.allValues[i];
           if (value > 0) {
-            stats["all taxa"].sum += value;
-            stats["all taxa"].min = Math.min(stats["all taxa"].min, value);
-            stats["all taxa"].max = Math.max(stats["all taxa"].max, value);
+            stats[`all ${searchIndexPlural}`].sum += value;
+            stats[`all ${searchIndexPlural}`].min = Math.min(
+              stats[`all ${searchIndexPlural}`].min,
+              value
+            );
+            stats[`all ${searchIndexPlural}`].max = Math.max(
+              stats[`all ${searchIndexPlural}`].max,
+              value
+            );
           }
 
           if (cumulative) {
@@ -522,7 +530,10 @@ const ReportHistogram = ({
           }
           chartData.push({
             x: bucket,
-            "all taxa": scales[yScale](value, histogram.report.histogram.x),
+            [`all ${searchIndexPlural}`]: scales[yScale](
+              value,
+              histogram.report.histogram.x
+            ),
           });
         }
       });
@@ -617,5 +628,6 @@ const ReportHistogram = ({
 export default compose(
   withSiteName,
   dispatchMessage,
-  withColors
+  withColors,
+  withSearchIndex
 )(ReportHistogram);
