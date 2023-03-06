@@ -390,18 +390,28 @@ export const ReportEdit = ({
         );
       });
       input = (
-        <FormControl style={{ width: "95%" }}>
-          <InputLabel id="select-report-label">report</InputLabel>
-          <Select
-            labelId="select-report-label"
-            id="select-report"
-            value={values["report"]}
-            style={{ width: "95%" }}
-            onChange={(e) => handleChange(e, "report")}
-          >
-            {items}
-          </Select>
-        </FormControl>
+        <Grid container direction="row" alignItems="flex-end">
+          <Grid item xs={6}>
+            <FormControl style={{ width: "95%" }}>
+              <InputLabel id="select-report-label">report</InputLabel>
+              <Select
+                labelId="select-report-label"
+                id="select-report"
+                value={values["report"]}
+                style={{ width: "95%" }}
+                onChange={(e) => handleChange(e, "report")}
+              >
+                {items}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={6} align={"right"} key={"submit"}>
+            <SettingsButton
+              handleClick={handleSubmit}
+              handleResetClick={handleReset}
+            />
+          </Grid>
+        </Grid>
       );
     } else if (queryProp == "treeStyle") {
       let items = ["rect", "ring"].map((shape) => {
@@ -524,7 +534,12 @@ export const ReportEdit = ({
       if (min) {
         toggles.push(
           <div
-            style={{ float: "left", paddingTop: "0.7em", marginRight: "2em" }}
+            style={{
+              float: "left",
+              paddingTop: "0.7em",
+              marginRight: "2em",
+              paddingLeft: "0.75em",
+            }}
             key={queryProp}
           >
             <FormControl>
@@ -598,6 +613,7 @@ export const ReportEdit = ({
   }
   fields.push(
     <Grid item align="right" key={"submit"}>
+      <div>&nbsp;</div>
       <SettingsButton
         handleClick={handleSubmit}
         handleResetClick={handleReset}
@@ -615,7 +631,7 @@ export const ReportEdit = ({
         height: "100%",
         width: "100%",
         overflowY: "auto",
-        overflowX: "none",
+        overflowX: "visible",
       }}
     >
       <form ref={formRef}>{fields}</form>
