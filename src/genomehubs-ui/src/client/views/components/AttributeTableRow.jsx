@@ -2,12 +2,14 @@ import React, { Fragment, useState } from "react";
 
 import Box from "@material-ui/core/TableContainer";
 import Collapse from "@material-ui/core/Box";
+import FileCopyIcon from "@material-ui/icons/FileCopy";
 import IconButton from "@material-ui/core/IconButton";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import LaunchIcon from "@material-ui/icons/Launch";
 import LocationMap from "./LocationMap";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import NavLink from "./NavLink";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -40,6 +42,11 @@ const useRowStyles = makeStyles({
     "& > *": {
       borderBottom: "unset",
     },
+  },
+  tableCell: {
+    maxHeight: "14em",
+    overflowX: "auto",
+    display: "inline-block",
   },
 });
 
@@ -212,6 +219,7 @@ const ValueCell = ({
   types,
   meta,
   currentResult,
+  classes,
   setHighlightPointLocation,
   zoomPointLocation,
   setZoomPointLocation,
@@ -277,24 +285,68 @@ const ValueCell = ({
       links.push(entry);
     }
   });
+  let expandIcon;
+  let copyIcon;
   if (obj && obj.extra) {
     let title = open ? "Show less" : `Show ${obj.extra} more`;
-    links.push(
-      <span key={"extra"}>
-        {open ? "" : "; "}
-        <Tooltip title={title} arrow placement={"top"}>
-          <span style={{ cursor: "pointer" }} onClick={() => setOpen(!open)}>
-            {open ? "<<" : "..."}
-          </span>
-        </Tooltip>{" "}
-      </span>
-    );
+    if (open) {
+      expandIcon = (
+        <div className={styles.disableTheme}>
+          <Tooltip title={title} arrow placement={"top"}>
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpen(!open)}
+            >
+              <KeyboardArrowUpIcon />
+            </IconButton>
+          </Tooltip>
+        </div>
+      );
+      copyIcon = (
+        <div className={styles.disableTheme}>
+          <Tooltip title={"Copy to clipboard"} arrow placement={"top"}>
+            <IconButton
+              aria-label="copy to clipboard"
+              size="small"
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  values.map((v) => v.join("\t")).join("\n")
+                );
+              }}
+            >
+              <FileCopyIcon />
+            </IconButton>
+          </Tooltip>
+        </div>
+      );
+    } else {
+      links.push(
+        <span key={"extra"} className={styles.disableTheme}>
+          <Tooltip title={title} arrow placement={"top"}>
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpen(!open)}
+            >
+              <MoreHorizIcon />
+            </IconButton>
+          </Tooltip>
+        </span>
+      );
+    }
   }
   return (
-    <TableCell>
-      {links}
-      {range}
-    </TableCell>
+    <>
+      <TableCell className={classes.tableCell}>
+        {links}
+        {range}
+      </TableCell>
+      <TableCell>
+        {expandIcon}
+        {copyIcon}
+      </TableCell>
+    </>
   );
 };
 
@@ -371,6 +423,17 @@ const AttributeTableRow = ({
   let zoom;
   let geoPoints;
 
+  if (typeof meta.value === "undefined") {
+    return null;
+  }
+  let length = 1;
+  if (Array.isArray(meta.value)) {
+    if (meta.value.length == 0) {
+      return null;
+    }
+    length = meta.value.length;
+  }
+
   if (attributeId) {
     if (attributeId == "sample_location") {
       if (!Array.isArray(meta.value)) {
@@ -431,6 +494,7 @@ const AttributeTableRow = ({
         attributeId={attributeId}
         types={types}
         meta={meta}
+        classes={classes}
         currentResult={currentResult}
         setHighlightPointLocation={setHighlightPointLocation}
         zoomPointLocation={zoomPointLocation}
@@ -468,7 +532,8 @@ const AttributeTableRow = ({
           <Tooltip title={tipText} arrow placement={"top"}>
             <span onClick={handleClick} style={{ cursor: "pointer" }}>
               {" "}
-              {meta.aggregation_method} ({meta.count})
+              {meta.aggregation_method}
+              {length > 1 && ` (${length})`}
             </span>
           </Tooltip>{" "}
         </TableCell>
@@ -546,8 +611,7 @@ const AttributeTableRow = ({
             key={"aggregation_source"}
             style={{ whiteSpace: "nowrap" }}
           >
-            <span className={css}>{aggSource}</span>
-            {icons[0]}
+            <span className={css}>{aggSource}</span> ({meta.count}){icons[0]}
             {icons[1] && (
               <>
                 <span className={altCss}>{altAggSource}</span> {icons[1]}

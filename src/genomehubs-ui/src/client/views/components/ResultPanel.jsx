@@ -68,12 +68,22 @@ const ResultPanel = ({
   if (fields) {
     fields.forEach((field) => {
       let value = field.value;
-      if (Array.isArray(value)) {
-        value = value[0];
+      if (typeof value === "undefined") {
+        return null;
       }
-      value = formatter(value);
-      if (Array.isArray(field.value) && field.count > 1) {
-        value = `${value} ...`;
+      let length = 1;
+
+      if (Array.isArray(value)) {
+        if (value.length == 0) {
+          return null;
+        }
+        value = formatter(value, searchIndex, "array").values[0][0];
+        if (field.value.length > 1) {
+          length = field.value.length;
+          value += " ...";
+        }
+      } else {
+        value = formatter(value);
       }
       let highlight = [null, null];
       if (
@@ -81,6 +91,12 @@ const ResultPanel = ({
         field.id == summaryField
       ) {
         highlight = [styles["fieldHighlight"], styles["fieldNameHighlight"]];
+      }
+      let details;
+      if (field.aggregation_method.endsWith("list") && length > 1) {
+        details = `${field.aggregation_method} (${length}), n=${field.count}`;
+      } else {
+        details = `${field.aggregation_method}, n=${field.count}`;
       }
       let newDiv = (
         <Tooltip key={field.id} title={"Click to view summary plot"} arrow>
@@ -112,9 +128,7 @@ const ResultPanel = ({
                   <Grid item>{value}</Grid>
                 </Grid>
               </div>
-              <div
-                className={styles.fieldCount}
-              >{`${field.aggregation_method}, n=${field.count}`}</div>
+              <div className={styles.fieldCount}>{details}</div>
             </div>
           </Grid>
         </Tooltip>

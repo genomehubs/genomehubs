@@ -7,5 +7,12 @@ export const sortByFrequency = (arr) => {
     return obj;
   }, {});
 
-  return Object.entries(frequencyMap).sort((a, b) => b[1] - a[1]);
+  return Object.entries(frequencyMap).sort(
+    (a, b) =>
+      b[1] - a[1] ||
+      a[0].localeCompare(b[0], undefined, {
+        numeric: true,
+        sensitivity: "base",
+      })
+  );
 };
