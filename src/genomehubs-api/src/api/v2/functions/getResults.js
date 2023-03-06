@@ -60,7 +60,11 @@ export const chainQueries = async ({
 
 export const getResults = async (params) => {
   try {
-    params.query = await chainQueries(params);
+    if (params.query == "null") {
+      params.size = 0;
+    } else {
+      params.query = await chainQueries(params);
+    }
   } catch (error) {
     logError({ req: params.req, message: error });
     return {
