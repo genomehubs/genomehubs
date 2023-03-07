@@ -1,3 +1,29 @@
+const generateSubsetFn = (flt) => {
+  let subsetFn = (f) => f;
+  if (flt.hasOwnProperty("subset")) {
+    let subset = flt.subset
+      .replace("estimate", "ancestor,descendant")
+      .split(",");
+    subsetFn = (f) => {
+      let sub;
+      sub = {
+        bool: {
+          should: subset.map((s) => ({
+            match: { ["attributes.aggregation_source"]: s },
+          })),
+        },
+      };
+      return {
+        bool: {
+          filter: [f, sub],
+        },
+      };
+    };
+    delete flt.subset;
+  }
+  return subsetFn;
+};
+
 export const filterAttributes = (
   filters,
   lookupTypes,
@@ -54,6 +80,7 @@ export const filterAttributes = (
         Array.isArray(filters[stat][field]) &&
         typeof filters[stat][field][0] === "string"
       ) {
+        let subsetFn = generateSubsetFn(filters[stat][field]);
         return [
           {
             bool: {
@@ -73,12 +100,12 @@ export const filterAttributes = (
                   }
                 }
 
-                return {
+                return subsetFn({
                   bool: {
                     should: include,
                     must_not: exclude,
                   },
-                };
+                });
               }),
             },
           },
@@ -148,39 +175,42 @@ export const filterAttributes = (
         filter = [filter];
       }
       return filter.map((flt) => {
+        let subsetFn = generateSubsetFn(flt);
+
         if (typeof flt !== "object") {
           let values = flt.split(",");
-          return {
+          return subsetFn({
             bool: {
               should: values.map((value) => ({
                 match: { [`attributes.${stat}`]: value },
               })),
             },
-          };
+          });
         }
         let boolOperator = "should";
         if (flt.hasOwnProperty("ne")) {
           boolOperator = "must_not";
           delete flt.ne;
         }
+
         if (stat.startsWith("geo_")) {
           return {
             bool: {
-              [boolOperator]: {
+              [boolOperator]: subsetFn({
                 geo_bounding_box: {
                   [`attributes.${stat}`]: flt,
                 },
-              },
+              }),
             },
           };
         }
         return {
           bool: {
-            [boolOperator]: {
+            [boolOperator]: subsetFn({
               range: {
                 [`attributes.${stat}`]: flt,
               },
-            },
+            }),
           },
         };
       });
