@@ -83,7 +83,7 @@
     "hastscript": "^7.0.2",
     "hex-to-hsl": "^1.0.2",
     "highlight.js": "^11.3.1",
-    "html-to-image": "^1.9.0",
+    "html-to-image": "^1.11.11",
     "immutable-update": "^1.0.0",
     "jszip": "^3.10.1",
     "konva": "^3.4.1",

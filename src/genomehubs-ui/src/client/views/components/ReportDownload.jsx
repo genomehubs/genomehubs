@@ -1,7 +1,5 @@
 import * as htmlToImage from "html-to-image";
 
-import { saveSvgAsPng, svgAsDataUri } from "save-svg-as-png";
-
 import { Buffer } from "buffer";
 import DownloadButton from "./DownloadButton";
 import GetAppIcon from "@material-ui/icons/GetApp";
@@ -10,11 +8,14 @@ import JSZip from "jszip";
 import React from "react";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
+// import { domToPng } from "modern-screenshot";
 import mergeImages from "merge-images";
 import qs from "../functions/qs";
 import { queryPropList } from "./ReportEdit";
 import { useLocation } from "@reach/router";
 import withReportById from "../hocs/withReportById";
+
+// import { saveSvgAsPng, svgAsDataUri } from "save-svg-as-png";
 
 const downloadLink = async (uri, filename) => {
   const link = document.createElement("a");
@@ -47,7 +48,13 @@ const scrollingImage = async ({
     scrollContainer.scrollTop = top;
     let diff = top - scrollContainer.scrollTop;
     await new Promise((resolve) => setTimeout(resolve, 500));
-    let src = await htmlToImage.toPng(chartSVG, opts);
+    let src;
+    // Add test for safari
+    let reps = 1;
+    for (let i = 0; i < reps; i++) {
+      src = await htmlToImage.toPng(chartSVG, opts);
+      // src = await domToPng(chartSVG);
+    }
     images.push({
       src,
       x: 0,
@@ -135,14 +142,45 @@ export const ReportDownload = ({
         chartSVG = chartRef.current.childNodes[0];
         if (report == "tree" && !queryString.match("=ring")) {
           if (chartSVG.childNodes.length == 1) {
-            chartSVG =
-              chartSVG.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0];
+            let tmpNode = chartSVG;
+            while (tmpNode) {
+              tmpNode = tmpNode.childNodes[0];
+              try {
+                if (Object.entries(tmpNode)[1][1].id == "scaledTreeDiv") {
+                  chartSVG = tmpNode;
+                  //chartSVG = tmpNode.parentNode;
+                  break;
+                }
+              } catch {
+                break;
+              }
+            }
+            // chartSVG = chartSVG.getElementById("scaledTreeDiv");
+            // chartSVG =
+            //   chartSVG.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            //     .childNodes[0];
           } else {
             scrollContainer = chartSVG.childNodes[1];
-            chartSVG =
-              chartSVG.childNodes[1].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0];
+            let tmpNode = scrollContainer;
+            while (tmpNode) {
+              tmpNode = tmpNode.childNodes[0];
+              try {
+                if (Object.entries(tmpNode)[1][1].id == "stageDiv") {
+                  chartSVG = tmpNode.childNodes[0].childNodes[0];
+                  Object.entries(chartSVG)[1][1].style = {
+                    ...Object.entries(tmpNode)[1][1].style,
+                    top: 0,
+                  };
+                  break;
+                }
+              } catch {
+                break;
+              }
+            }
+            // scrollContainer = chartSVG.childNodes[1];
+            // chartSVG =
+            //   chartSVG.childNodes[1].childNodes[0].childNodes[0].childNodes[0]
+            //     .childNodes[0].parentNode;
           }
         }
       } else {

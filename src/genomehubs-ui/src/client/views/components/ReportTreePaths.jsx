@@ -1001,6 +1001,7 @@ const ReportTreePaths = ({
         ref={scrollContainerRef}
       >
         <div
+          id={"scaledTreeDiv"}
           style={{
             height: plotHeight * scale,
             width: divWidth,
@@ -1010,6 +1011,7 @@ const ReportTreePaths = ({
           ref={stageRef}
         >
           <div
+            id={"stageDiv"}
             style={{
               height: divHeight + padding * 2,
               width: divWidth,
@@ -1020,6 +1022,7 @@ const ReportTreePaths = ({
             }}
           >
             <Stage
+              id="konvaStage"
               width={divWidth}
               height={divHeight + padding * 2}
               x={-scrollPosition.x}
