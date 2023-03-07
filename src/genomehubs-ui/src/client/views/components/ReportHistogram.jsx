@@ -31,6 +31,7 @@ import withSiteName from "../hocs/withSiteName";
 
 const searchByCell = ({
   xQuery,
+  summary,
   xLabel,
   xBounds,
   bounds,
@@ -41,22 +42,36 @@ const searchByCell = ({
   basename,
 }) => {
   let query = xQuery.query;
+  let field = bounds.field;
   query = query
     .replaceAll(new RegExp("AND\\s+" + bounds.field + "\\s+AND", "gi"), "AND")
     .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+>=*\\s*[\\w\\d_\\.-]+", "gi"),
+      new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
       ""
     )
     .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+<=*\\s*[\\w\\d_\\.-]+", "gi"),
+      new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
       ""
-    )
-    .replaceAll(/\s+/g, " ")
-    .replace(/\s+$/, "");
-  if (bounds.scale == "ordinal") {
-    query += ` AND ${bounds.field} = ${xBounds[0]}`;
+    );
+  if (summary && summary != "value") {
+    field = `${summary}(${field})`;
+    query = query
+      .replaceAll(new RegExp("AND\\s+" + field + "\\s+AND", "gi"), "AND")
+      .replaceAll(
+        new RegExp("AND\\s+" + field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
+        ""
+      )
+      .replaceAll(
+        new RegExp("AND\\s+" + field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
+        ""
+      );
+  }
+  query = query.replaceAll(/\s+/g, " ").replace(/\s+$/, "");
+
+  if (bounds.scale == "ordinal" && field == bounds.field) {
+    query += ` AND ${field} = ${xBounds[0]}`;
   } else {
-    query += ` AND ${bounds.field} >= ${xBounds[0]} AND ${bounds.field} < ${xBounds[1]}`;
+    query += ` AND ${field} >= ${xBounds[0]} AND ${field} < ${xBounds[1]}`;
   }
 
   let options = qs.parse(location.search.replace(/^\?/, ""));
@@ -423,6 +438,7 @@ const ReportHistogram = ({
     }
     let buckets = histograms.buckets;
     let valueType = histograms.valueType;
+    let summary = histograms.summary;
     let compressX;
     if (
       histograms.byCat &&
@@ -606,6 +622,7 @@ const ReportHistogram = ({
           orientation,
           pointSize,
           valueType,
+          summary,
           embedded,
           navigate,
           location,

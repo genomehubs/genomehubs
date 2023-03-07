@@ -55,9 +55,12 @@ const searchByCell = ({
   ranks,
   valueType,
   yValueType,
+  summary,
+  ySummary,
   basename,
 }) => {
   let query = xQuery.query;
+  let field = bounds.field;
   query = query
     .replaceAll(new RegExp("AND\\s+" + bounds.field + "\\s+AND", "gi"), "AND")
     .replaceAll(
@@ -67,19 +70,29 @@ const searchByCell = ({
     .replaceAll(
       new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
       ""
-    )
-    .replaceAll(/\s+/g, " ")
-    .replace(/\s+$/, "");
+    );
+  if (summary && summary != "value") {
+    field = `${summary}(${field})`;
+    query = query
+      .replaceAll(new RegExp("AND\\s+" + field + "\\s+AND", "gi"), "AND")
+      .replaceAll(
+        new RegExp("AND\\s+" + field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
+        ""
+      )
+      .replaceAll(
+        new RegExp("AND\\s+" + field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
+        ""
+      );
+  }
+  query = query.replaceAll(/\s+/g, " ").replace(/\s+$/, "");
   if (valueType == "coordinate") {
     query += ` AND sequence_id = ${xRange},${yRange}`;
     query = query.replace("collate(assembly_id,", "collate(sequence_id,");
   } else if (valueType == "date") {
-    query += ` AND ${bounds.field} >= ${
+    query += ` AND ${field} >= ${
       new Date(xRange[0]).toISOString().split(/t/i)[0]
-    } AND ${bounds.field} < ${
-      new Date(xRange[1]).toISOString().split(/t/i)[0]
-    }`;
-  } else if (valueType == "keyword") {
+    } AND ${field} < ${new Date(xRange[1]).toISOString().split(/t/i)[0]}`;
+  } else if (valueType == "keyword" && field == bounds.field) {
     let val = bounds.stats.cats[xRange[0]].key;
     if (val == "other") {
       let list = [];
@@ -88,20 +101,22 @@ const searchByCell = ({
           list.push(obj.key);
         }
       }
-      query += ` AND ${bounds.field} != ${list.join(",")}`;
+      query += ` AND ${field} != ${list.join(",")}`;
     } else {
-      query += ` AND ${bounds.field} = ${val}`;
+      query += ` AND ${field} = ${val}`;
     }
   } else {
-    query += ` AND ${bounds.field} >= ${xRange[0]} AND ${bounds.field} < ${xRange[1]}`;
+    query += ` AND ${field} >= ${xRange[0]} AND ${field} < ${xRange[1]}`;
+  }
+  let yField = yBounds.field;
+  if (ySummary && ySummary != "value") {
+    yField = `${ySummary}(${yField})`;
   }
   if (yValueType == "date") {
-    query += ` AND ${yBounds.field} >= ${
+    query += ` AND ${yField} >= ${
       new Date(yRange[0]).toISOString().split(/t/i)[0]
-    } AND ${yBounds.field} < ${
-      new Date(yRange[1]).toISOString().split(/t/i)[0]
-    }`;
-  } else if (yValueType == "keyword") {
+    } AND ${yField} < ${new Date(yRange[1]).toISOString().split(/t/i)[0]}`;
+  } else if (yValueType == "keyword" && yField == yBounds.field) {
     let val = yBounds.stats.cats[yRange[0]].key;
     if (val == "other") {
       let list = [];
@@ -110,12 +125,12 @@ const searchByCell = ({
           list.push(obj.key);
         }
       }
-      query += ` AND ${yBounds.field} != ${list.join(",")}`;
+      query += ` AND ${yField} != ${list.join(",")}`;
     } else {
-      query += ` AND ${yBounds.field} = ${val}`;
+      query += ` AND ${yField} = ${val}`;
     }
   } else if (yValueType != "coordinate") {
-    query += ` AND ${yBounds.field} >= ${yRange[0]} AND ${yBounds.field} < ${yRange[1]}`;
+    query += ` AND ${yField} >= ${yRange[0]} AND ${yField} < ${yRange[1]}`;
   }
 
   // let fields = `${xLabel},${yLabel}`;
@@ -980,6 +995,8 @@ const ReportScatter = ({
     let yLabel = yOptions[4] || scatter.report.yLabel;
     let valueType = heatmaps.valueType;
     let yValueType = heatmaps.yValueType || "integer";
+    let summary = heatmaps.summary;
+    let ySummary = heatmaps.ySummary || "value";
     let lastIndex = heatmaps.buckets.length - 2;
     let interval;
     if (valueType == "date") {
@@ -1107,6 +1124,8 @@ const ReportScatter = ({
           yLabels,
           valueType,
           yValueType,
+          summary,
+          ySummary,
           stacked,
           hasRawData,
           embedded,
