@@ -396,6 +396,7 @@ const getTree = async ({
   }
   let maxDepth = lca.maxDepth;
   let mapped = params.query.split(/\s+(?:AND|and)\s+/);
+  // mapped.push("bioproject");
   let yMapped = yParams.query.split(/\s+(?:AND|and)\s+/);
   // TODO: include descendant values when include estimates is false and minDepth > tax_depth
   let match = params.query.match(/tax_depth\s*\((.+?)\)/);
@@ -423,6 +424,15 @@ const getTree = async ({
     }
   }
 
+  // let res = await getResults({
+  //   ...params,
+  //   taxonomy,
+  //   fields: [],
+  //   query,
+  //   exclusions,
+  //   maxDepth: 100,
+  //   lca: { maxDepth: 100 },
+  // });
   let xQuery = {
     ...params,
     query: mapped.join(" AND "),
@@ -526,13 +536,13 @@ export const tree = async ({
     catField = cat.replace(/[^\w_-].+$/, "");
     let catMeta = lookupTypes(catField);
     if (catMeta) {
-      fields = [...new Set(searchFields.concat([catMeta.name]))];
+      fields = [...new Set(xFields.concat([catMeta.name]))];
     } else {
       catRank = catField;
-      fields = [...new Set(searchFields)];
+      fields = [...new Set(xFields)];
     }
   } else {
-    fields = [...new Set(searchFields)];
+    fields = [...new Set(xFields)];
   }
 
   let status;
