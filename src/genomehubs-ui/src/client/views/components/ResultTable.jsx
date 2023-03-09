@@ -17,6 +17,8 @@ import MuiTableCell from "@material-ui/core/TableCell";
 import ReportError from "./ReportError";
 import ResultModalControl from "./ResultModalControl";
 import SearchPagination from "./SearchPagination";
+import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
+import SettingsIcon from "@material-ui/icons/Settings";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -110,6 +112,20 @@ const StyledCheckbox = ({ color, ...props }) => {
   );
 };
 
+const StyledColbox = ({ color, ...props }) => {
+  return (
+    <Checkbox
+      style={{
+        padding: "1px",
+        color: props.color,
+      }}
+      icon={<SettingsApplicationsIcon style={{ fontSize: "small" }} />}
+      checkedIcon={<SettingsIcon style={{ fontSize: "small" }} />}
+      {...props}
+    />
+  );
+};
+
 const SortableCell = ({
   name,
   description,
@@ -120,6 +136,7 @@ const SortableCell = ({
   sortOrder,
   sortDirection,
   handleTableSort,
+  setAttributeSettings,
   showExcludeBoxes,
   excludeDirect,
   excludeAncestral,
@@ -275,6 +292,27 @@ const SortableCell = ({
               />
             </span>
           </Tooltip>
+          {true && (
+            <Tooltip key={"columns"} title={"Show/hide subset columns"} arrow>
+              <span>
+                <StyledColbox
+                  // checked={!excludeAncestral.hasOwnProperty(prefix)}
+                  // onChange={() =>
+                  //   handleToggleExclusion({ toggleAncestral: prefix })
+                  // }
+                  onClick={() => {
+                    setAttributeSettings({
+                      attributeId: prefix,
+                      adjustColumns: true,
+                      showAttribute: true,
+                    });
+                  }}
+                  color={"blue"}
+                  inputProps={{ "aria-label": "show/hide columns" }}
+                />
+              </span>
+            </Tooltip>
+          )}
         </span>
       )) || <span className={css}></span>}
     </TableCell>
@@ -719,6 +757,7 @@ const ResultTable = ({
         sortOrder={sortOrder}
         sortDirection={sortDirection}
         handleTableSort={handleTableSort}
+        setAttributeSettings={setAttributeSettings}
         showExcludeBoxes={searchIndex == "taxon" ? "all" : "missing"}
         excludeAncestral={arrToObj(searchTerm.excludeAncestral)}
         excludeDescendant={arrToObj(searchTerm.excludeDescendant)}

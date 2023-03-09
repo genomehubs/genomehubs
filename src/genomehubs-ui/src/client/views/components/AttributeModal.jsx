@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import AttributePanel from "./AttributePanel";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
+import ResultColumnOptions from "./ResultColumnOptions";
 import { compose } from "recompose";
 import { makeStyles } from "@material-ui/core/styles";
 import qs from "../functions/qs";
@@ -38,6 +39,9 @@ const AttributeModal = ({
   recordIsFetching,
   setRecordId,
   taxonomy,
+  types,
+  displayTypes,
+  searchTerm,
 }) => {
   const classes = useStyles();
   let options = qs.parse(location.search.replace(/^\?/, ""));
@@ -79,7 +83,7 @@ const AttributeModal = ({
   }, [options, recordId]);
 
   if (!record.record) {
-    return null;
+    return <ResultColumnOptions attributeId={attributeId} />;
   }
 
   if (record.record.feature_id) {

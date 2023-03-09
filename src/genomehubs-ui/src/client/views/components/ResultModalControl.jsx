@@ -10,10 +10,12 @@ import withRecord from "../hocs/withRecord";
 export const ResultModalControl = ({
   attributeSettings,
   setAttributeSettings,
+  adjustColumns,
   rootRef,
 }) => {
   let { currentRecordId, attributeId, showAttribute } = attributeSettings;
   const classes = useStyles();
+  console.log(currentRecordId);
   return (
     <Modal
       open={showAttribute}
@@ -30,7 +32,7 @@ export const ResultModalControl = ({
       <DialogContent className={classes.paper}>
         <AttributeModal
           attributeId={attributeId}
-          currentRecordId={currentRecordId}
+          currentRecordId={adjustColumns ? false : currentRecordId}
         />
       </DialogContent>
     </Modal>
