@@ -419,7 +419,6 @@ export const generateQuery = async ({
       }
     }
   }
-  console.log(filters);
 
   if (status) {
     return {

@@ -128,12 +128,13 @@ const SortableCell = ({
   handleToggleExclusion,
 }) => {
   let css = styles.aggregationToggle;
+  let prefix = name.replace(/:.+$/, "");
   if (excludeAncestral) {
     if (
-      excludeDirect.hasOwnProperty(name) ||
-      excludeDescendant.hasOwnProperty(name) ||
-      excludeAncestral.hasOwnProperty(name) ||
-      excludeMissing.hasOwnProperty(name)
+      excludeDirect.hasOwnProperty(prefix) ||
+      excludeDescendant.hasOwnProperty(prefix) ||
+      excludeAncestral.hasOwnProperty(prefix) ||
+      excludeMissing.hasOwnProperty(prefix)
     ) {
       css = classnames(
         styles.aggregationToggle,
@@ -216,8 +217,10 @@ const SortableCell = ({
             >
               <span>
                 <StyledCheckbox
-                  checked={!excludeDirect.hasOwnProperty(name)}
-                  onChange={() => handleToggleExclusion({ toggleDirect: name })}
+                  checked={!excludeDirect.hasOwnProperty(prefix)}
+                  onChange={() =>
+                    handleToggleExclusion({ toggleDirect: prefix })
+                  }
                   color={statusColors.direct || "green"}
                   inputProps={{ "aria-label": "direct checkbox" }}
                 />
@@ -232,9 +235,9 @@ const SortableCell = ({
             >
               <span>
                 <StyledCheckbox
-                  checked={!excludeDescendant.hasOwnProperty(name)}
+                  checked={!excludeDescendant.hasOwnProperty(prefix)}
                   onChange={() =>
-                    handleToggleExclusion({ toggleDescendant: name })
+                    handleToggleExclusion({ toggleDescendant: prefix })
                   }
                   color={statusColors.descendant || "orange"}
                   inputProps={{ "aria-label": "descendant checkbox" }}
@@ -250,9 +253,9 @@ const SortableCell = ({
             >
               <span>
                 <StyledCheckbox
-                  checked={!excludeAncestral.hasOwnProperty(name)}
+                  checked={!excludeAncestral.hasOwnProperty(prefix)}
                   onChange={() =>
-                    handleToggleExclusion({ toggleAncestral: name })
+                    handleToggleExclusion({ toggleAncestral: prefix })
                   }
                   color={statusColors.ancestral || "red"}
                   inputProps={{ "aria-label": "ancestral checkbox" }}
@@ -263,8 +266,10 @@ const SortableCell = ({
           <Tooltip key={"missing"} title={"Toggle missing values"} arrow>
             <span>
               <StyledCheckbox
-                checked={!excludeMissing.hasOwnProperty(name)}
-                onChange={() => handleToggleExclusion({ toggleMissing: name })}
+                checked={!excludeMissing.hasOwnProperty(prefix)}
+                onChange={() =>
+                  handleToggleExclusion({ toggleMissing: prefix })
+                }
                 color={"black"}
                 inputProps={{ "aria-label": "missing checkbox" }}
               />
@@ -293,6 +298,12 @@ const ResultTable = ({
   basename,
 }) => {
   const rootRef = useRef(null);
+  let expandedTypes = [];
+  if (searchTerm) {
+    expandedTypes = searchTerm.fields.split(",").map((name) => ({
+      name,
+    }));
+  }
 
   if (searchResults && searchResults.status.error) {
     return <ReportError report={"search"} error={searchResults.status.error} />;
@@ -528,70 +539,69 @@ const ResultTable = ({
         </Tooltip>
       );
     }
-    displayTypes.forEach((type) => {
-      if (type.name != "sex_determination_system") {
-        if (
-          result.result.fields &&
-          result.result.fields.hasOwnProperty(type.name)
-        ) {
-          let field = result.result.fields[type.name];
-          let value = field.value;
-          if (Array.isArray(value)) {
-            value = value[0];
-          }
-          value = formatter(value, searchIndex);
-          if (Array.isArray(field.value) && field.length > 1) {
-            value = `${value} ...`;
-            let list = field.value.slice(0, 3).join(", ");
-            if (field.length > 3) {
-              if (field.length > 4) {
-                list = `${list}, ... (${field.length - 3} more)`;
-              } else {
-                list = field.value.slice(0, 4).join(", ");
-              }
-            }
-            value = (
-              <Tooltip title={list} placement="top" arrow>
-                <span>{value}</span>
-              </Tooltip>
-            );
-          }
-          cells.push(
-            <TableCell key={type.name}>
-              <Grid
-                container
-                direction="row"
-                wrap="nowrap"
-                spacing={1}
-                alignItems={"center"}
-                ref={rootRef}
-                style={{ cursor: "pointer" }}
-                onClick={() => {
-                  setAttributeSettings({
-                    currentRecordId,
-                    attributeId: type.name,
-                    showAttribute: true,
-                  });
-                }}
-              >
-                {field.aggregation_source && (
-                  <Grid item>
-                    <AggregationIcon
-                      method={field.aggregation_source}
-                      hasDescendants={field.has_descendants}
-                    />
-                  </Grid>
-                )}
 
-                <Grid item style={{ whiteSpace: "nowrap" }}>
-                  {value}
-                </Grid>
-              </Grid>
-            </TableCell>
-          );
-        } else {
-          cells.push(<TableCell key={type.name}>-</TableCell>);
+    expandedTypes.forEach((type) => {
+      if (
+        result.result.fields &&
+        result.result.fields.hasOwnProperty(type.name)
+      ) {
+        let field = result.result.fields[type.name];
+        let value = field.value;
+        if (Array.isArray(value)) {
+          value = value[0];
         }
+        value = formatter(value, searchIndex);
+        if (Array.isArray(field.value) && field.length > 1) {
+          value = `${value} ...`;
+          let list = field.value.slice(0, 3).join(", ");
+          if (field.length > 3) {
+            if (field.length > 4) {
+              list = `${list}, ... (${field.length - 3} more)`;
+            } else {
+              list = field.value.slice(0, 4).join(", ");
+            }
+          }
+          value = (
+            <Tooltip title={list} placement="top" arrow>
+              <span>{value}</span>
+            </Tooltip>
+          );
+        }
+        cells.push(
+          <TableCell key={type.name}>
+            <Grid
+              container
+              direction="row"
+              wrap="nowrap"
+              spacing={1}
+              alignItems={"center"}
+              ref={rootRef}
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                setAttributeSettings({
+                  currentRecordId,
+                  attributeId: type.name,
+                  showAttribute: true,
+                });
+              }}
+            >
+              {field.aggregation_source && (
+                <Grid item>
+                  <AggregationIcon
+                    method={field.aggregation_source}
+                    hasDescendants={field.has_descendants}
+                  />
+                </Grid>
+              )}
+
+              <Grid item style={{ whiteSpace: "nowrap" }}>
+                {value}
+              </Grid>
+            </Grid>
+          </TableCell>
+        );
+      } else {
+        cells.push(<TableCell key={type.name}>-</TableCell>);
       }
     });
     cells.push(
@@ -695,30 +705,28 @@ const ResultTable = ({
       />
     );
   }
-  displayTypes.forEach((type) => {
-    if (type.name != "sex_determination_system") {
-      let sortDirection = sortBy === type.name ? sortOrder : false;
-      heads.push(
-        <SortableCell
-          key={type.name}
-          name={type.name}
-          description={type.description}
-          status={type.status}
-          classes={classes}
-          statusColors={statusColors}
-          sortBy={sortBy}
-          sortOrder={sortOrder}
-          sortDirection={sortDirection}
-          handleTableSort={handleTableSort}
-          showExcludeBoxes={searchIndex == "taxon" ? "all" : "missing"}
-          excludeAncestral={arrToObj(searchTerm.excludeAncestral)}
-          excludeDescendant={arrToObj(searchTerm.excludeDescendant)}
-          excludeDirect={arrToObj(searchTerm.excludeDirect)}
-          excludeMissing={arrToObj(searchTerm.excludeMissing)}
-          handleToggleExclusion={handleToggleExclusion}
-        />
-      );
-    }
+  expandedTypes.forEach((type) => {
+    let sortDirection = sortBy === type.name ? sortOrder : false;
+    heads.push(
+      <SortableCell
+        key={type.name}
+        name={type.name}
+        description={type.description}
+        status={type.status}
+        classes={classes}
+        statusColors={statusColors}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        sortDirection={sortDirection}
+        handleTableSort={handleTableSort}
+        showExcludeBoxes={searchIndex == "taxon" ? "all" : "missing"}
+        excludeAncestral={arrToObj(searchTerm.excludeAncestral)}
+        excludeDescendant={arrToObj(searchTerm.excludeDescendant)}
+        excludeDirect={arrToObj(searchTerm.excludeDirect)}
+        excludeMissing={arrToObj(searchTerm.excludeMissing)}
+        handleToggleExclusion={handleToggleExclusion}
+      />
+    );
   });
   heads.push(<TableCell key={"last"}></TableCell>);
 

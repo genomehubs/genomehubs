@@ -1,15 +1,25 @@
 import { processDoc } from "./processDoc";
+import { subsets } from "./subsets";
 
 export const processHits = ({
   body,
   names,
   ranks,
+  fields,
   reason,
   lca,
   inner_hits,
   processAsDoc,
 }) => {
   let results = [];
+  let targetFields = {};
+  for (let field of fields) {
+    let [attr, suffix = "value"] = field.split(":");
+    if (!targetFields[attr]) {
+      targetFields[attr] = [];
+    }
+    targetFields[attr].push(suffix);
+  }
   body.hits.hits.forEach((hit) => {
     let result = {
       index: hit._index,
@@ -211,7 +221,32 @@ export const processHits = ({
             if (attrFields[name]) {
               field = { ...attrFields[name], ...field };
             }
-            fields[name] = field;
+            if (targetFields[name]) {
+              for (let subset of targetFields[name]) {
+                let newName = name;
+                if (subset != "value") {
+                  newName += `:${subset}`;
+                }
+                if (subsets.source.has(subset)) {
+                  let agg_sources = field.aggregation_source;
+                  if (!Array.isArray(agg_sources)) {
+                    agg_sources = [agg_sources];
+                  }
+                  if (
+                    subset == "estimate" &&
+                    agg_sources.some((s) => subsets.estimate.has(s))
+                  ) {
+                    fields[newName] = field;
+                  } else if (agg_sources.some((s) => s == subset)) {
+                    fields[newName] = field;
+                  }
+                } else if (subsets.summary.has(subset)) {
+                  fields[newName] = { ...field, value: field[subset] };
+                }
+              }
+            } else {
+              fields[name] = field;
+            }
           }
         });
       });
