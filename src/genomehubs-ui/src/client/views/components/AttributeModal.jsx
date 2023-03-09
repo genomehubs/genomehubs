@@ -99,11 +99,12 @@ const AttributeModal = ({
   }
 
   let table;
-  if (record?.record?.attributes && record.record.attributes[attributeId]) {
+  let prefix = attributeId.replace(/:.+$/, "");
+  if (record?.record?.attributes && record.record.attributes[prefix]) {
     table = (
       <AttributePanel
         key={"attributes"}
-        attributes={{ [attributeId]: record.record.attributes[attributeId] }}
+        attributes={{ [prefix]: record.record.attributes[prefix] }}
         result={options.result}
         taxonId={currentRecordId}
         title={title.join(" - ")}
