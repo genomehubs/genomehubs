@@ -26,6 +26,15 @@ export const parseFields = async ({ result, fields, taxonomy }) => {
       } else {
         fieldList.add(field);
       }
+      let [f, subset] = field.split(":");
+      if (subset) {
+        let m = lookupTypes(f);
+        if (m) {
+          fieldList.add(m.name);
+        } else {
+          fieldList.add(f);
+        }
+      }
     }
     fields = [...fieldList];
     return fields;
