@@ -1,15 +1,25 @@
 import { processDoc } from "./processDoc";
+import { subsets } from "./subsets";
 
 export const processHits = ({
   body,
   names,
   ranks,
+  fields,
   reason,
   lca,
   inner_hits,
   processAsDoc,
 }) => {
   let results = [];
+  let targetFields = {};
+  for (let field of fields) {
+    let [attr, suffix = "value"] = field.split(":");
+    if (!targetFields[attr]) {
+      targetFields[attr] = [];
+    }
+    targetFields[attr].push(suffix);
+  }
   body.hits.hits.forEach((hit) => {
     let result = {
       index: hit._index,
@@ -202,16 +212,59 @@ export const processHits = ({
             });
           }
           if (name) {
-            if (
-              name.endsWith("_date") &&
-              field.value.endsWith("T00:00:00.000Z")
-            ) {
-              field.value = field.value.replace("T00:00:00.000Z", "");
-            }
             if (attrFields[name]) {
               field = { ...attrFields[name], ...field };
             }
-            fields[name] = field;
+            if (targetFields[name]) {
+              for (let subset of targetFields[name]) {
+                let subsetKey = subset;
+                // if (subsets.source.has(subsetKey)) {
+                //   subsetKey = "value";
+                // }
+                if (name.endsWith("_date")) {
+                  if (subsetKey == "min") {
+                    subsetKey = "from";
+                  } else if (subsetKey == "max") {
+                    subsetKey = "to";
+                  }
+                  try {
+                    if (field[subsetKey].endsWith("T00:00:00.000Z")) {
+                      field[subsetKey] = field[subsetKey].replace(
+                        "T00:00:00.000Z",
+                        ""
+                      );
+                    }
+                  } catch {
+                    if (field.value.endsWith("T00:00:00.000Z")) {
+                      field.value = field.value.replace("T00:00:00.000Z", "");
+                    }
+                  }
+                }
+
+                let newName = name;
+                if (subset != "value") {
+                  newName += `:${subset}`;
+                }
+                if (subsets.source.has(subsetKey)) {
+                  let agg_sources = field.aggregation_source;
+                  if (!Array.isArray(agg_sources)) {
+                    agg_sources = [agg_sources];
+                  }
+                  if (
+                    subset == "estimate" &&
+                    agg_sources.some((s) => subsets.estimate.has(s))
+                  ) {
+                    fields[newName] = field;
+                  } else if (agg_sources.some((s) => s == subset)) {
+                    fields[newName] = field;
+                  }
+                } else if (subsets.summary.has(subsetKey)) {
+                  fields[newName] = { ...field, value: field[subsetKey] };
+                }
+              }
+            } else {
+              fields[name] = field;
+            }
           }
         });
       });

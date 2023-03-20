@@ -201,13 +201,14 @@ const validateTerm = (term, types) => {
   }
   if (parts[2] && parts[2].length > 0) {
     parts[2] = parts[2].toLowerCase();
-    if (parts[2].endsWith("_id") && (!types || !types(parts[2]))) {
+    let [attr_name, subset] = parts[2].split(":");
+    if (attr_name.endsWith("_id") && (!types || !types(attr_name))) {
       // TODO: validate IDs
       return { parts, validation: { success: true } };
     }
 
     if (types) {
-      let meta = types(parts[2]);
+      let meta = types(attr_name);
       if (!meta) {
         return { validation: fail(`invalid attribute name in ${term}`) };
       }
@@ -232,9 +233,10 @@ const validateTerm = (term, types) => {
     return {
       parts,
       validation: validateOperator(term, types, {
-        attribute: parts[2],
+        attribute: attr_name,
         type: parts[1],
       }),
+      subset,
     };
   }
   if (parts[0].match(/[<>=]/)) {
@@ -301,9 +303,12 @@ export const generateQuery = async ({
       query = query.toLowerCase();
     }
     for (let term of query.split(/\s+and\s+/)) {
-      let parts, validation;
+      let parts, validation, subset;
       try {
-        ({ parts, validation } = validateTerm(term, lookupTypes[result]));
+        ({ parts, validation, subset } = validateTerm(
+          term,
+          lookupTypes[result]
+        ));
       } catch (err) {
         validation = fail(`unable to validate query term ${term}`);
         console.warn(err);
@@ -383,6 +388,7 @@ export const generateQuery = async ({
                   filters,
                   parts,
                   meta.type,
+                  subset,
                   summary,
                   fields,
                   optionalFields

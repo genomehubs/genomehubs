@@ -1,3 +1,5 @@
+import { subsets } from "../../functions/subsets";
+
 const ranks = {
   superkingdom: true,
   kingdom: true,
@@ -11,19 +13,20 @@ const ranks = {
 };
 
 const addSortParameter = (sortBy, lookupTypes, lookupNames) => {
+  let [by, param = "value"] = sortBy.by.split(":");
   if (
-    sortBy.by == "scientific_name" ||
-    sortBy.by == "taxon_id" ||
-    sortBy.by == "assembly_id" ||
-    sortBy.by == "feature_id"
+    by == "scientific_name" ||
+    by == "taxon_id" ||
+    by == "assembly_id" ||
+    by == "feature_id"
   ) {
     return {
-      [sortBy.by]: {
+      [by]: {
         mode: sortBy.mode || "max",
         order: sortBy.order || "asc",
       },
     };
-  } else if (ranks[sortBy.by]) {
+  } else if (ranks[by]) {
     return {
       [`lineage.scientific_name`]: {
         mode: sortBy.mode || "max",
@@ -31,12 +34,12 @@ const addSortParameter = (sortBy, lookupTypes, lookupNames) => {
         nested: {
           path: "lineage",
           filter: {
-            term: { "lineage.taxon_rank": sortBy.by },
+            term: { "lineage.taxon_rank": by },
           },
         },
       },
     };
-  } else if (lookupNames(sortBy.by)) {
+  } else if (lookupNames(by)) {
     return {
       [`taxon_names.name`]: {
         mode: sortBy.mode || "max",
@@ -44,20 +47,21 @@ const addSortParameter = (sortBy, lookupTypes, lookupNames) => {
         nested: {
           path: "taxon_names",
           filter: {
-            term: { "taxon_names.class": lookupNames(sortBy.by).class },
+            term: { "taxon_names.class": lookupNames(by).class },
           },
         },
       },
     };
-  } else if (lookupTypes(sortBy.by)) {
+  } else if (lookupTypes(by)) {
+    let type = param ? param : `${lookupTypes(by).type || "keyword"}_value`;
     return {
-      [`attributes.${lookupTypes(sortBy.by).type || "keyword"}_value`]: {
+      [`attributes.${type}`]: {
         mode: sortBy.mode || "max",
         order: sortBy.order || "asc",
         nested: {
           path: "attributes",
           filter: {
-            term: { "attributes.key": lookupTypes(sortBy.by).name },
+            term: { "attributes.key": lookupTypes(by).name },
           },
         },
       },

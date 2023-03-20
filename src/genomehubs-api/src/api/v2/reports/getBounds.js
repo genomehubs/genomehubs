@@ -142,11 +142,10 @@ export const getBounds = async ({
     }
   }
   let extra = {};
-  let valueKey = `${fieldMeta.type}_value`;
+  let valueKey = summary == "value" ? `${fieldMeta.type}_value` : summary;
   if (fieldMeta) {
     if (fieldMeta.type == "keyword") {
       if (summary == "length") {
-        valueKey = summary;
         extra = { stats: true };
       } else {
         extra = { keywords: field };
@@ -155,6 +154,13 @@ export const getBounds = async ({
       extra = { geo: true };
     } else {
       extra = { stats: true };
+    }
+    if (fieldMeta.type == "date") {
+      if (valueKey == "min") {
+        valueKey = "from";
+      } else if (valueKey == "max") {
+        valueKey = "to";
+      }
     }
   }
   params.aggs = await setAggs({

@@ -4,6 +4,7 @@ export const addCondition = (
   conditions,
   parts,
   type,
+  subset,
   summary = "value",
   fields,
   optionalFields
@@ -34,6 +35,10 @@ export const addCondition = (
     } else {
       conditions[stat][parts[2]] = {};
     }
+  }
+
+  if (subset) {
+    conditions[stat][parts[2]].subset = subset;
   }
 
   let valueList = [];

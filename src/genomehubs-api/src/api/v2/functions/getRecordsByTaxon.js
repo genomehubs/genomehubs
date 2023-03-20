@@ -129,6 +129,7 @@ export const getRecordsByTaxon = async (props) => {
       lca: props.lca,
       names: props.names,
       ranks: props.ranks,
+      fields: props.fields,
     });
     if (body.aggregations) {
       aggs = body.aggregations;
