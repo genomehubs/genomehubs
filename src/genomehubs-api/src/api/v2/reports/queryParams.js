@@ -34,6 +34,9 @@ export const queryParams = async ({
         if (field.match(/\(/)) {
           [summary, field] = field.split(/[\(\)]/);
         }
+        // else if (field.match(/:/)) {
+        //   [field, summary] = field.split(":");
+        // }
         let fieldMeta = lookupTypes(field);
         field = fieldMeta.name;
         params.excludeMissing.push(field);

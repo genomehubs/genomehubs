@@ -212,22 +212,31 @@ export const processHits = ({
             });
           }
           if (name) {
-            if (
-              name.endsWith("_date") &&
-              field.value.endsWith("T00:00:00.000Z")
-            ) {
-              field.value = field.value.replace("T00:00:00.000Z", "");
-            }
             if (attrFields[name]) {
               field = { ...attrFields[name], ...field };
             }
             if (targetFields[name]) {
               for (let subset of targetFields[name]) {
+                let subsetKey = subset;
+                if (name.endsWith("_date")) {
+                  if (subsetKey == "min") {
+                    subsetKey = "from";
+                  } else if (subsetKey == "max") {
+                    subsetKey = "to";
+                  }
+                  if (field[subsetKey].endsWith("T00:00:00.000Z")) {
+                    field[subsetKey] = field[subsetKey].replace(
+                      "T00:00:00.000Z",
+                      ""
+                    );
+                  }
+                }
+
                 let newName = name;
                 if (subset != "value") {
                   newName += `:${subset}`;
                 }
-                if (subsets.source.has(subset)) {
+                if (subsets.source.has(subsetKey)) {
                   let agg_sources = field.aggregation_source;
                   if (!Array.isArray(agg_sources)) {
                     agg_sources = [agg_sources];
@@ -240,8 +249,8 @@ export const processHits = ({
                   } else if (agg_sources.some((s) => s == subset)) {
                     fields[newName] = field;
                   }
-                } else if (subsets.summary.has(subset)) {
-                  fields[newName] = { ...field, value: field[subset] };
+                } else if (subsets.summary.has(subsetKey)) {
+                  fields[newName] = { ...field, value: field[subsetKey] };
                 }
               }
             } else {

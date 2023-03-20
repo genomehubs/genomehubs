@@ -35,7 +35,7 @@ const formatMillisecond = timeFormat(".%L"),
   formatWeek = timeFormat("%b %d"),
   formatMonth = timeFormat("%b"),
   formatMonthDecimal = timeFormat("%m"),
-  formatMonthYear = timeFormat("%Y %b"),
+  formatMonthYear = timeFormat("%b %Y"),
   formatYear = timeFormat("%Y");
 
 const timeFormats = {
@@ -44,11 +44,11 @@ const timeFormats = {
   hour: formatHour,
   day: formatDay,
   week: formatWeek,
-  month: formatMonth,
-  // month: (date) =>
-  //   formatMonthDecimal(date) == "01"
-  //     ? formatMonthYear(date)
-  //     : formatMonth(date),
+  // month: formatMonth,
+  month: (date) =>
+    formatMonthDecimal(date) == "01"
+      ? formatMonthYear(date)
+      : formatMonth(date),
   year: formatYear,
 };
 

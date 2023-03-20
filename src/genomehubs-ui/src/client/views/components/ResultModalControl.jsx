@@ -15,7 +15,6 @@ export const ResultModalControl = ({
 }) => {
   let { currentRecordId, attributeId, showAttribute } = attributeSettings;
   const classes = useStyles();
-  console.log(currentRecordId);
   return (
     <Modal
       open={showAttribute}

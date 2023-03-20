@@ -418,6 +418,7 @@ export const setAggs = async ({
       },
     };
   }
+  console.log(stats);
   if (geo) {
     geo = {
       geo_bounds: {
