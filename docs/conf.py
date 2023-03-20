@@ -29,7 +29,7 @@ try:
     version = release = get_distribution("genomehubs").version
 except Exception:
     traceback.print_exc()
-    version = release = "2.6.8"
+    version = release = "2.6.9"
 
 pygments_style = "trac"
 templates_path = ["."]
