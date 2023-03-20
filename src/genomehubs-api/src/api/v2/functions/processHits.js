@@ -218,17 +218,26 @@ export const processHits = ({
             if (targetFields[name]) {
               for (let subset of targetFields[name]) {
                 let subsetKey = subset;
+                // if (subsets.source.has(subsetKey)) {
+                //   subsetKey = "value";
+                // }
                 if (name.endsWith("_date")) {
                   if (subsetKey == "min") {
                     subsetKey = "from";
                   } else if (subsetKey == "max") {
                     subsetKey = "to";
                   }
-                  if (field[subsetKey].endsWith("T00:00:00.000Z")) {
-                    field[subsetKey] = field[subsetKey].replace(
-                      "T00:00:00.000Z",
-                      ""
-                    );
+                  try {
+                    if (field[subsetKey].endsWith("T00:00:00.000Z")) {
+                      field[subsetKey] = field[subsetKey].replace(
+                        "T00:00:00.000Z",
+                        ""
+                      );
+                    }
+                  } catch {
+                    if (field.value.endsWith("T00:00:00.000Z")) {
+                      field.value = field.value.replace("T00:00:00.000Z", "");
+                    }
                   }
                 }
 
