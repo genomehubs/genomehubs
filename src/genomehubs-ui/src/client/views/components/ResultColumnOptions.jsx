@@ -67,7 +67,11 @@ const summaryTypesFromMeta = (meta) => {
   let summaryTypes = ["value"];
   if (meta.summary) {
     let skip = true;
-    for (let summary of meta.summary) {
+    let summaries = meta.summary;
+    if (!Array.isArray(summaries)) {
+      summaries = [summaries];
+    }
+    for (let summary of summaries) {
       if (summary == "primary") {
         continue;
       }

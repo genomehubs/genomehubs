@@ -592,20 +592,30 @@ const ResultTable = ({
       ) {
         let field = result.result.fields[type.name];
         let value = field.value;
+        let entries = [];
         if (Array.isArray(value)) {
-          value = value[0];
-        }
-        value = formatter(value, searchIndex);
-        if (Array.isArray(field.value) && field.length > 1) {
-          value = `${value} ...`;
-          let list = field.value.slice(0, 3).join(", ");
-          if (field.length > 3) {
-            if (field.length > 4) {
-              list = `${list}, ... (${field.length - 3} more)`;
-            } else {
-              list = field.value.slice(0, 4).join(", ");
+          value = formatter(value, searchIndex, "array");
+          let charLimit = 20;
+          for (let v of value.values) {
+            let entry = v[0];
+            if (charLimit == 20 || charLimit - entry.length > 0) {
+              entries.push(entry);
+              charLimit -= entry.length;
             }
           }
+          value = entries.join(", ");
+          if (field.value.length > 1) {
+            length = field.value.length;
+            if (field.value.length > entries.length) {
+              value += ", ...";
+            }
+          }
+        } else {
+          value = formatter(value, searchIndex);
+        }
+        if (Array.isArray(field.value) && field.length > entries.length) {
+          let list = entries.join(", ");
+          list = `${list}, ... (${field.length - entries.length} more)`;
           value = (
             <Tooltip title={list} placement="top" arrow>
               <span>{value}</span>
