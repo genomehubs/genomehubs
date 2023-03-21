@@ -54,7 +54,7 @@ const addSortParameter = (sortBy, lookupTypes, lookupNames) => {
     };
   } else if (lookupTypes(by)) {
     let type =
-      param && !subsets.source.has(param)
+      param && param != "value" && !subsets.source.has(param)
         ? param
         : `${lookupTypes(by).type || "keyword"}_value`;
     return {

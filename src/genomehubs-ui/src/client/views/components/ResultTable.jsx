@@ -207,10 +207,15 @@ const SortableCell = ({
           active={sortBy === name}
           direction={sortOrder}
           onClick={() =>
-            handleTableSort({
-              sortBy: name,
-              sortOrder: sortDirection && sortOrder === "asc" ? "desc" : "asc",
-            })
+            handleTableSort(
+              sortDirection && sortOrder === "desc"
+                ? { sortBy: "none" }
+                : {
+                    sortBy: name,
+                    sortOrder:
+                      sortDirection && sortOrder === "asc" ? "desc" : "asc",
+                  }
+            )
           }
         >
           {/* {name} */}
