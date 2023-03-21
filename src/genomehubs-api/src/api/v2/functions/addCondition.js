@@ -52,17 +52,19 @@ export const addCondition = (
   });
   if (includesNull) {
     let fieldIndex = fields.indexOf(parts[2]);
-    if (fieldIndex >= 0) {
-      fields.splice(fieldIndex, 1);
+    if (valueList.length == 0) {
+      if (fieldIndex >= 0) {
+        fields.splice(fieldIndex, 1);
+      }
     }
     fieldIndex = optionalFields.indexOf(parts[2]);
     if (fieldIndex == -1) {
       optionalFields.push(parts[2]);
     }
   }
-  if (valueList.length == 0) {
-    return conditions;
-  }
+  // if (valueList.length == 0) {
+  //   return conditions;
+  // }
 
   if (stat == "keyword_value") {
     if (parts[3].match(/[><]/)) {
