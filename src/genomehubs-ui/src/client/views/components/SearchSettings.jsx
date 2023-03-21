@@ -209,7 +209,6 @@ const SearchSettings = ({
         }
       }
     });
-    console.log(searchTerm);
     let fieldSets = {};
     searchTerm.fields.split(",").forEach((field) => {
       let [f, s = "value"] = field.split(":");
