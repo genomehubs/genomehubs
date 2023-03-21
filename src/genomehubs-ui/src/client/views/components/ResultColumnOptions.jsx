@@ -94,6 +94,7 @@ const summaryTypesFromMeta = (meta) => {
     } else {
       summaryTypes.push("ancestor");
       summaryTypes.push("descendant");
+      summaryTypes.push("estimate");
     }
   }
   return summaryTypes;
