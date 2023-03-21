@@ -45,26 +45,28 @@ export const addCondition = (
   let includesNull = false;
   parts[4].split(",").forEach((value) => {
     if (value.match(/^null$/i)) {
-      includesNull = true;
-    } else {
+      if (!parts[3].match(/^!/)) {
+        includesNull = true;
+      }
+    } else if (!value.match(/^!null$/i)) {
       valueList.push(value.replaceAll("−", "-"));
     }
   });
   if (includesNull) {
     let fieldIndex = fields.indexOf(parts[2]);
-    if (valueList.length == 0) {
-      if (fieldIndex >= 0) {
-        fields.splice(fieldIndex, 1);
-      }
+    // if (valueList.length == 0) {
+    if (fieldIndex >= 0) {
+      fields.splice(fieldIndex, 1);
     }
+    // }
     fieldIndex = optionalFields.indexOf(parts[2]);
     if (fieldIndex == -1) {
       optionalFields.push(parts[2]);
     }
   }
-  // if (valueList.length == 0) {
-  //   return conditions;
-  // }
+  if (valueList.length == 0) {
+    return conditions;
+  }
 
   if (stat == "keyword_value") {
     if (parts[3].match(/[><]/)) {
@@ -98,7 +100,10 @@ export const addCondition = (
     if (parts[3] == "==") {
       parts[3] = "=";
     }
-    if (valueList[0].startsWith("!")) {
+    if (valueList.length == 0) {
+      return conditions;
+    }
+    if (valueList[0] !== null && valueList[0].startsWith("!")) {
       valueList[0] = valueList[0].replace("!", "");
       parts[3] = `!${parts[3]}`;
     }
