@@ -209,12 +209,30 @@ const SearchSettings = ({
         }
       }
     });
-
+    console.log(searchTerm);
+    let fieldSets = {};
+    searchTerm.fields.split(",").forEach((field) => {
+      let [f, s = "value"] = field.split(":");
+      if (!fieldSets[f]) {
+        fieldSets[f] = [];
+      }
+      fieldSets[f].push(s);
+    });
+    let newFields = [];
+    for (let field of fields) {
+      if (fieldSets[field]) {
+        for (let subset of fieldSets[field]) {
+          newFields.push(subset == "value" ? field : `${field}:${subset}`);
+        }
+      } else {
+        newFields.push(field);
+      }
+    }
     let options = {
       ...searchTerm,
       result: index,
       offset: 0,
-      fields: fields.length > 0 ? fields.join(",") : "none",
+      fields: newFields.length > 0 ? newFields.join(",") : "none",
       names: names.join(","),
       ranks: ranks.join(","),
       taxonomy: state.taxonomy,
