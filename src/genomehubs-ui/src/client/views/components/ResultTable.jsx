@@ -338,9 +338,16 @@ const ResultTable = ({
   const rootRef = useRef(null);
   let expandedTypes = [];
   if (searchTerm) {
-    expandedTypes = searchTerm.fields.split(",").map((name) => ({
-      name,
-    }));
+    if (searchTerm.fields) {
+      expandedTypes = searchTerm.fields
+        .split(",")
+        .map((name) => ({
+          name,
+        }))
+        .filter((obj) => obj.name != "none");
+    } else {
+      expandedTypes = displayTypes;
+    }
   }
 
   if (searchResults && searchResults.status.error) {
@@ -743,7 +750,7 @@ const ResultTable = ({
       />
     );
   }
-  expandedTypes.forEach((type) => {
+  for (let type of expandedTypes) {
     let sortDirection = sortBy === type.name ? sortOrder : false;
     heads.push(
       <SortableCell
@@ -766,7 +773,7 @@ const ResultTable = ({
         handleToggleExclusion={handleToggleExclusion}
       />
     );
-  });
+  }
   heads.push(<TableCell key={"last"}></TableCell>);
 
   return (
