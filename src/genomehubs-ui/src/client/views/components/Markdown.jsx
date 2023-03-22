@@ -86,12 +86,7 @@ export const RehypeComponentsList = {
   include: (props) => {
     let nested = <Nested pgId={props.pageId} />;
     return (
-      <Grid
-        {...processProps(props)}
-        item
-        xs={8}
-        className={styles.reportContainer}
-      >
+      <Grid {...processProps(props)} item className={styles.reportContainer}>
         {nested}
       </Grid>
     );
