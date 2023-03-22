@@ -113,10 +113,12 @@ const ResultColumnOptions = ({
   const location = useLocation();
   const summaryTypes = summaryTypesFromMeta(types[attributeId]);
   const initialSelected = searchTerm.fields
-    .split(",")
-    .map((field) => field.split(":"))
-    .filter(([f]) => f == attributeId)
-    .map(([_, subset = "value"]) => subset);
+    ? searchTerm.fields
+        .split(",")
+        .map((field) => field.split(":"))
+        .filter(([f]) => f == attributeId)
+        .map(([_, subset = "value"]) => subset)
+    : ["value"];
   const [summaryCols, setsummaryCols] = React.useState(initialSelected);
 
   const handleChange = (e) => {
@@ -132,7 +134,7 @@ const ResultColumnOptions = ({
     let newFields = summaryCols.map((summary) =>
       summary == "value" ? attributeId : `${attributeId}:${summary}`
     );
-    let fields = searchTerm.fields.split(",");
+    let fields = searchTerm.fields ? searchTerm.fields.split(",") : [];
     let index = fields.findIndex(
       (f) => f == attributeId || f.startsWith(`${attributeId}:`)
     );
