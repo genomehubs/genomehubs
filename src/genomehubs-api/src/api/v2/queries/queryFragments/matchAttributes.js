@@ -65,6 +65,7 @@ export const matchAttributes = (
                       "attributes.mean",
                       "attributes.median",
                       "attributes.mode",
+                      "attributes.sum",
                       "attributes.from",
                       "attributes.to",
                       "attributes.range",
