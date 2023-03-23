@@ -367,6 +367,8 @@ def set_traverse_values(
         if summary == "range":
             attribute[summary] = value
             traverse_value = [min_value, max_value]
+        elif summary not in attribute and summary in {"mean", "median", "mode", "sum"}:
+            attribute[summary] = value
     return traverse_value, max_value, min_value
 
 

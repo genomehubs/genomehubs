@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
 
 const summaryTypesFromMeta = (meta) => {
   let summaryTypes = ["value"];
-  if (meta.summary) {
+  if (meta?.summary) {
     let skip = true;
     let summaries = meta.summary;
     if (!Array.isArray(summaries)) {
@@ -85,7 +85,7 @@ const summaryTypesFromMeta = (meta) => {
       summaryTypes.push(summary);
     }
   }
-  if (meta.traverse) {
+  if (meta?.traverse) {
     summaryTypes.push("direct");
     if (meta.traverse_direction && meta.traverse_direction == "up") {
       summaryTypes.push("descendant");
