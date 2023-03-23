@@ -4,27 +4,9 @@ GenomeHubs
 
 .. start-badges
 
-|travis| |coveralls|
-|docs| |code-style|
-|version| |conda| |commits-since|
+|version| |commits-since|
 |license|
 
-
-.. |code-style| image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :target: https://github.com/psf/black
-    :alt: Code Style Black
-
-.. |docs| image:: https://readthedocs.org/projects/genomehubs/badge/?style=flat
-    :target: https://readthedocs.org/projects/genomehubs
-    :alt: Documentation Status
-
-.. |travis| image:: https://api.travis-ci.org/genomehubs/genomehubs.svg?branch=main
-    :alt: Travis-CI Build Status
-    :target: https://travis-ci.org/genomehubs/genomehubs
-
-.. |coveralls| image:: https://coveralls.io/repos/genomehubs/genomehubs/badge.svg?branch=main&service=github
-    :alt: Coverage Status
-    :target: https://coveralls.io/r/genomehubs/genomehubs
 
 .. |version| image:: https://img.shields.io/pypi/v/genomehubs.svg
     :alt: PyPI Package latest release
@@ -33,10 +15,6 @@ GenomeHubs
 .. |supported-versions| image:: https://img.shields.io/pypi/pyversions/genomehubs.svg
     :alt: Supported versions
     :target: https://pypi.org/project/genomehubs
-
-.. |conda| image:: https://anaconda.org/tolkit/genomehubs/badges/installer/conda.svg
-    :alt: Install with Conda
-    :target: https://anaconda.org/tolkit/genomehubs
 
 .. |platforms| image:: https://anaconda.org/tolkit/genomehubs/badges/platforms.svg
     :alt: Conda platforms
@@ -53,33 +31,19 @@ GenomeHubs
 .. end-badges
 
 
+About
+=====
 
-Installation
-============
+GenomeHubs comprises a set of tools to parse index and search and display genomic metadata, assembly features and sequencing status for projects under the [Earth BioGenome Project](https://www.earthbiogenome.org) umbrella that aim to sequence all described eukaryotic species over a period of 10 years.
 
-::
+Genomehubs builds on legacy code that supported taxon-oriented databases of butterflies & moths ([lepbase.org](https://lepbase.org)), molluscs ([molluscdb.org](https://molluscdb.org)), mealybugs ([mealybug.org](https://mealybug.org)) and more. Genomehubs is now search-oriented and positioned to scale to the challenges of mining data across almost 2 million species.
 
-    conda install -c tolkit genomehubs
+The first output from the new search-oriented GenomeHubs is Genomes on a Tree (GoaT, [goat.genomehubs.org](https://goat.genomehubs.org)), which has been opublised in: Challis *et al*. 2023, **Genomes on a Tree (GoaT): A versatile, scalable search engine for genomic and sequencing project metadata across the eukaryotic tree of life**. Wellcome Open Research, **8**:24 doi:[10.12688/wellcomeopenres.18658.1](https://doi.org/10.12688/wellcomeopenres.18658.1)
 
-or 
+The goat.genomehubs.org website is freely available with no logins or restrictions, and is being widely used by the academic community and especially by the Earth BioGenome Project to plan and coordinate efforts to sequence all described eukaryotic species.
 
-    pip install genomehubs
+The core GoaT/Genomehubs components are available as a set of Docker containers:
 
-You can also install the in-development version with::
-
-    pip install https://github.com/genomehubs/genomehubs/archive/main.zip
-
-
-Documentation
-=============
-
-
-https://genomehubs.readthedocs.io/
-
-
-Development
-===========
-
-To run all tests run::
-
-    tox
+- [GoaT UI](https://hub.docker.com/repository/docker/genomehubs/goat) 
+- [Genomehubs API](https://hub.docker.com/repository/docker/genomehubs/genomehubs-api) 
+- [Genomehubs CLI](https://hub.docker.com/repository/docker/genomehubs/genomehubs) 
