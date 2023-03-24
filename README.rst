@@ -94,7 +94,7 @@ Usage
 Genomehubs API |api-docker|
 ---------------------------
 
-A bundled web server to run an instance of the GenomeHubs API. The GenomeHubs API underpins all search functionality for Genomes on a Tree (GoaT) `goat.genomehubs.org <https://goat.genomehubs.org>`_. OpenAPI documentation for the GenomeHubs API instance used by GoaT is available at `goat.genomehubs.org/api/v2/api-docs <https://goat.genomehubs.org/api/v2/api-docs>`_.
+A bundled web server to run an instance of the GenomeHubs API. The GenomeHubs API underpins all search functionality for Genomes on a Tree (GoaT) `goat.genomehubs.org <https://goat.genomehubs.org>`_. OpenAPI documentation for the GenomeHubs API instance used by GoaT is available at `goat.genomehubs.org/api-docs <https://goat.genomehubs.org/api-docs>`_.
 
 
 Usage
@@ -197,3 +197,29 @@ Fill taxon attribute values across the tree of life:
     :target: https://hub.docker.com/r/genomehubs/genomehubs
 
 
+Related projects
+================
+
+Some GenomeHubs components are hosted in separate open source repositories (all under MIT licenses), including:
+
+BlobToolKit |blobtoolkit-release|
+-----------
+
+Interactive quality assessment of genome assemblies.
+
+Explore analysed public assemblies at `blobtoolkit.genomehubs.org/view <https://blobtoolkit.genomehubs.org/view>`_
+
+.. |blobtoolkit-release| image:: https://img.shields.io/github/v/tag/blobtoolkit/blobtoolkit?label=release&sort=semver&style=flat-square
+    :alt: GitHub release
+    :target: https://github.com/blobtoolkit/blobtoolkit
+
+GoaT CLI  |goat-cli-release|
+--------
+
+A command line interface for GoaT.
+
+The GoaT CLI builds URLs to query the Goat API, removing some of the complexity of the `GoaT API <https://goat.genomehubs.org/api-docs>`_. for the end user.
+
+.. |goat-cli-release| image:: https://img.shields.io/github/v/tag/genomehubs/goat-cli?label=release&sort=semver&style=flat-square
+    :alt: GitHub release
+    :target: https://github.com/genomehubs/goat-cli
