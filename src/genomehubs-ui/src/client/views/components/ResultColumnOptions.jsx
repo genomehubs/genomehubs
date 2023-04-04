@@ -104,6 +104,7 @@ const ResultColumnOptions = ({
   attributeId,
   types,
   setAttributeSettings,
+  resetRecord,
   setPreferSearchTerm,
   searchTerm,
   basename,
@@ -156,7 +157,11 @@ const ResultColumnOptions = ({
     navigate(
       `${basename}/search?${qs.stringify(options)}${location.hash || ""}`
     );
-    setAttributeSettings({ showAttribute: false });
+    setAttributeSettings({
+      attributeId: undefined,
+      showAttribute: false,
+    });
+    resetRecord();
   };
 
   const handleResetClick = () => {
