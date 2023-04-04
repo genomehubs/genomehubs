@@ -825,15 +825,16 @@ def create_descendant_taxon(taxon_id, rank, name, closest_taxon):
         }
     ]
     if "lineage" in closest_taxon["_source"]:
-        for ancestor in closest_taxon["_source"]["lineage"]:
-            lineage.append(
-                {
-                    "taxon_id": ancestor["taxon_id"],
-                    "taxon_rank": ancestor["taxon_rank"],
-                    "scientific_name": ancestor["scientific_name"],
-                    "node_depth": ancestor["node_depth"] + 1,
-                }
-            )
+        lineage.extend(
+            {
+                "taxon_id": ancestor["taxon_id"],
+                "taxon_rank": ancestor["taxon_rank"],
+                "scientific_name": ancestor["scientific_name"],
+                "node_depth": ancestor["node_depth"] + 1,
+            }
+            for ancestor in closest_taxon["_source"]["lineage"]
+            if ancestor["taxon_id"] != closest_taxon["_source"]["taxon_id"]
+        )
     desc_taxon["_source"]["lineage"] = lineage
     return desc_taxon
 
@@ -1064,6 +1065,8 @@ def create_taxa(
                 else:
                     closest_taxon = matches[obj["taxonomy"][anc_rank]]["all"][0]
                 break
+            # immediate_anc = lineage[-1]
+            # if immediate_anc["rank"] != rank or immediate_anc["name"] != taxon:
             lineage.append({"rank": rank, "name": taxon})
         # create a new taxon if a closest ancestral taxon could be found
         create_new_taxon(
