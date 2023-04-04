@@ -16,10 +16,13 @@ export const getCatLabels = async ({
     qBody.push({ id: "taxon_by_name", params: { taxon: obj.key, rank: cat } });
   });
   const { body } = await client
-    .msearchTemplate({
-      body: qBody,
-      rest_total_hits_as_int: true,
-    })
+    .msearchTemplate(
+      {
+        body: qBody,
+        rest_total_hits_as_int: true,
+      },
+      { meta: true }
+    )
     .catch((err) => {
       return err.meta;
     });

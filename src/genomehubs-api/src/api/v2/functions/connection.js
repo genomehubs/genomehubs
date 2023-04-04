@@ -1,5 +1,3 @@
-const { Client } = require("@elastic/elasticsearch");
-
-import { config } from "./config";
-
-export const client = new Client({ node: config.node });
+const { Client, HttpConnection } = require("@elastic/elasticsearch");
+const client = new Client({ node: url.toString(), Connection: HttpConnection });
+export { client };

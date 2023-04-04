@@ -566,11 +566,14 @@ export const getRawSources = async (params) => {
   let index = indexName({ ...params });
   const query = await aggregateRawValueSources({});
   const { body } = await client
-    .search({
-      index,
-      body: query,
-      rest_total_hits_as_int: true,
-    })
+    .search(
+      {
+        index,
+        body: query,
+        rest_total_hits_as_int: true,
+      },
+      { meta: true }
+    )
     .catch((err) => {
       return err.meta;
     });
@@ -859,11 +862,14 @@ export const getTypes = async (params) => {
   let index = indexName({ ...params });
   let query = await aggregateRanks({});
   let { body } = await client
-    .search({
-      index,
-      body: query,
-      rest_total_hits_as_int: true,
-    })
+    .search(
+      {
+        index,
+        body: query,
+        rest_total_hits_as_int: true,
+      },
+      { meta: true }
+    )
     .catch((err) => {
       return err.meta;
     });
@@ -880,11 +886,14 @@ export const getTypes = async (params) => {
   // search names
   query = await aggregateNameClasses({});
   ({ body } = await client
-    .search({
-      index,
-      body: query,
-      rest_total_hits_as_int: true,
-    })
+    .search(
+      {
+        index,
+        body: query,
+        rest_total_hits_as_int: true,
+      },
+      { meta: true }
+    )
     .catch((err) => {
       return err.meta;
     }));

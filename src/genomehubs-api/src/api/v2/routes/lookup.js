@@ -56,11 +56,14 @@ const sayt = async (params, iter = 0) => {
   }
   let index = indexName(newParams);
   const { body } = await client
-    .search({
-      index,
-      body: saytQuery({ ...newParams }),
-      rest_total_hits_as_int: true,
-    })
+    .search(
+      {
+        index,
+        body: saytQuery({ ...newParams }),
+        rest_total_hits_as_int: true,
+      },
+      { meta: true }
+    )
     .catch((err) => {
       return err.meta;
     });
@@ -94,11 +97,14 @@ const lookup = async (params, iter = 0) => {
   let newParams = { ...params, result };
   let index = indexName(newParams);
   const { body } = await client
-    .search({
-      index,
-      body: lookupQuery({ ...newParams }),
-      rest_total_hits_as_int: true,
-    })
+    .search(
+      {
+        index,
+        body: lookupQuery({ ...newParams }),
+        rest_total_hits_as_int: true,
+      },
+      { meta: true }
+    )
     .catch((err) => {
       return err.meta;
     });
@@ -125,11 +131,14 @@ const suggest = async (params, iter = 0) => {
   let newParams = { ...params, result };
   let index = indexName(newParams);
   const { body } = await client
-    .search({
-      index,
-      body: suggestQuery({ ...newParams }),
-      rest_total_hits_as_int: true,
-    })
+    .search(
+      {
+        index,
+        body: suggestQuery({ ...newParams }),
+        rest_total_hits_as_int: true,
+      },
+      { meta: true }
+    )
     .catch((err) => {
       return err.meta;
     });
@@ -157,29 +166,29 @@ const suggest = async (params, iter = 0) => {
 };
 
 export const getIdentifiers = async (req, res) => {
-  try {
-    let response = {};
-    response = await sayt(req.query);
-    if (
-      !response.status ||
-      !response.status.success ||
-      response.status.hits == 0
-    ) {
-      response = await lookup(req.query);
-    }
-    if (
-      !response.status ||
-      !response.status.success ||
-      response.status.hits == 0
-    ) {
-      response = await suggest(req.query);
-    }
-    if (!response.status) {
-      response = { status: { success: true, hits: 0 }, results: [] };
-    }
-    return res.status(200).send(formatJson(response, req.query.indent));
-  } catch (message) {
-    logError({ req, message });
-    return res.status(400).send({ status: "error" });
+  // try {
+  let response = {};
+  response = await sayt(req.query);
+  if (
+    !response.status ||
+    !response.status.success ||
+    response.status.hits == 0
+  ) {
+    response = await lookup(req.query);
   }
+  if (
+    !response.status ||
+    !response.status.success ||
+    response.status.hits == 0
+  ) {
+    response = await suggest(req.query);
+  }
+  if (!response.status) {
+    response = { status: { success: true, hits: 0 }, results: [] };
+  }
+  return res.status(200).send(formatJson(response, req.query.indent));
+  // } catch (message) {
+  //   logError({ req, message });
+  //   return res.status(400).send({ status: "error" });
+  // }
 };

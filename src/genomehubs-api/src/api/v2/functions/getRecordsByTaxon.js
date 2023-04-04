@@ -103,11 +103,14 @@ export const getRecordsByTaxon = async (props) => {
     };
   } else {
     ({ body } = await client
-      .search({
-        index: props.index,
-        body: query,
-        rest_total_hits_as_int: true,
-      })
+      .search(
+        {
+          index: props.index,
+          body: query,
+          rest_total_hits_as_int: true,
+        },
+        { meta: true }
+      )
       .catch((err) => {
         logError({
           message: err.meta.body.error,
