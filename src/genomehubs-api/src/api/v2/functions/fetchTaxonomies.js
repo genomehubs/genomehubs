@@ -1,8 +1,20 @@
-import { checkResponse } from "./checkResponse";
 import { client } from "./connection";
 import { config } from "./config.js";
 
+// const elasticClient = require("./elasticClient");
 export const fetchTaxonomies = async (release = config.release) => {
+  // let client;
+  // try {
+  //   const { Client } = require("@elastic/elasticsearch");
+
+  //   new Client("http://localhost:9200");
+  // } catch (err) {
+  //   console.log(err);
+  //   return ["error"];
+  // }
+  if (!client) {
+    return ["broken"];
+  }
   const { body } = await client.cat.indices({}, { meta: true }).catch((err) => {
     return err.meta;
   });
