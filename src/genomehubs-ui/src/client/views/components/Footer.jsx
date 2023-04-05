@@ -49,17 +49,15 @@ const Footer = ({ version, fetchTypes, hidden, taxonomy }) => {
           {dataRelease}
         </Grid>
         <Grid item xs={6}>
-          <img
-            src={sangerLogo}
-            href="https://www.sanger.ac.uk/"
-            target="_blank"
-          />
-          <img
-            src={dtolLogo}
-            href="https://www.darwintreeoflife.org"
-            target="_blank"
-          />
-          <img src={bbsrcLogo} href="https://bbsrc.ukri.org/" target="_blank" />
+          <a href="https://www.sanger.ac.uk/" target="_blank">
+            <img src={sangerLogo} />
+          </a>
+          <a href="https://www.darwintreeoflife.org" target="_blank">
+            <img src={dtolLogo} />
+          </a>
+          <a href="https://bbsrc.ukri.org/" target="_blank">
+            <img src={bbsrcLogo} />
+          </a>
         </Grid>
         <Grid item xs={3}>
           <span style={{ float: "right", marginRight: "1em" }}>
