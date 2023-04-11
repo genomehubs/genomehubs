@@ -21,6 +21,9 @@ export const setIncludes = ({
     if (result == "sample") {
       include.push("sample_id");
     }
+    if (includeLineage) {
+      include.push("lineage.*");
+    }
   }
   if (result == "feature") {
     include = include
@@ -35,9 +38,6 @@ export const setIncludes = ({
 
   if (includeRawValues) {
     include.push("attributes.*");
-  }
-  if (includeLineage) {
-    include.push("lineage.*");
   }
   return include;
 };
