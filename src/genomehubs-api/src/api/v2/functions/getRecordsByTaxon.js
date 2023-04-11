@@ -12,7 +12,7 @@ async function* scrollSearch(params, scroll) {
     params = { ...params, scroll };
   }
 
-  let response = await client.search(params);
+  let response = await client.search(params, { meta: true });
 
   while (true) {
     const sourceHits = response.body.hits.hits;
@@ -29,10 +29,13 @@ async function* scrollSearch(params, scroll) {
       break;
     }
 
-    response = await client.scroll({
-      scrollId: response.body._scroll_id,
-      scroll: params.scroll,
-    });
+    response = await client.scroll(
+      {
+        scroll_id: response.body._scroll_id,
+        scroll: params.scroll,
+      },
+      { meta: true }
+    );
   }
 }
 
@@ -50,6 +53,7 @@ export const getRecordsByTaxon = async (props) => {
     });
     queryId = props.req.query.queryId;
     update = props.update || "x";
+    props.includeLineage = true;
   }
   const query = await searchBy(props);
   let scrollThreshold = config.scrollThreshold;

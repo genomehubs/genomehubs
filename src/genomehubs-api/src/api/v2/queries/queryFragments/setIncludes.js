@@ -3,6 +3,7 @@ export const setIncludes = ({
   summaryValues,
   non_attr_fields,
   includeRawValues,
+  includeLineage,
 }) => {
   let include = [];
   if (summaryValues && !Array.isArray(summaryValues)) {
@@ -34,6 +35,9 @@ export const setIncludes = ({
 
   if (includeRawValues) {
     include.push("attributes.*");
+  }
+  if (includeLineage) {
+    include.push("lineage.*");
   }
   return include;
 };
