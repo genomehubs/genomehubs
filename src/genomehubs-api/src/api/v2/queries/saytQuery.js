@@ -71,18 +71,21 @@ const identifiersSaytQuery = ({ idKey, searchTerm }) => {
             inner_hits: {
               _source: false,
               docvalue_fields: [
-                {
-                  field: "identifiers.identifier.raw",
-                  format: "use_field_mapping",
-                },
-                {
-                  field: "identifiers.source",
-                  format: "use_field_mapping",
-                },
-                {
-                  field: "identifiers.class",
-                  format: "use_field_mapping",
-                },
+                "identifiers.identifier.raw",
+                "identifiers.source",
+                "identifiers.class",
+                // {
+                //   field: "identifiers.identifier.raw.keyword",
+                //   format: "use_field_mapping",
+                // },
+                // {
+                //   field: "identifiers.source",
+                //   format: "use_field_mapping",
+                // },
+                // {
+                //   field: "identifiers.class",
+                //   format: "use_field_mapping",
+                // },
               ],
             },
           },
@@ -223,14 +226,16 @@ const taxonSaytQuery = ({ searchTerm, wildcardTerm = "", size }) => {
             inner_hits: {
               _source: false,
               docvalue_fields: [
-                {
-                  field: "taxon_names.name.raw",
-                  format: "use_field_mapping",
-                },
-                {
-                  field: "taxon_names.class",
-                  format: "use_field_mapping",
-                },
+                "taxon_names.name.raw",
+                "taxon_names.class",
+                // {
+                //   field: "taxon_names.name.raw.keyword",
+                //   format: "use_field_mapping",
+                // },
+                // {
+                //   field: "taxon_names.class.keyword",
+                //   format: "use_field_mapping",
+                // },
               ],
             },
           },
