@@ -23,6 +23,8 @@ export const getCatLabels = async ({
     .catch((err) => {
       return err.meta;
     });
+  // TODO: debug occassional error here
+  // - diff between instances with same index even though qBody identical
   if (body.responses) {
     body.responses.forEach((doc, i) => {
       if (doc.hits.total == 1) {
