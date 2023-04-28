@@ -10,8 +10,12 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const devMode = process.env.NODE_ENV !== "production";
 
+const { commitHash } = main;
+
 const BUILD_DIR = path.resolve(__dirname, `dist/public/`);
-const STATIC_DIR = path.resolve(__dirname, `dist/public/static/[fullhash]`);
+const STATIC_DIR = commitHash
+  ? path.resolve(__dirname, `dist/public/static/${commitHash}`)
+  : path.resolve(__dirname, `dist/public/static/[fullhash]`);
 const APP_DIR = path.resolve(__dirname, "src/client/views");
 
 const gitRevisionPlugin = new GitRevisionPlugin();
@@ -81,7 +85,7 @@ const config = {
       ARCHIVE: JSON.stringify(main.archive),
       BASENAME: JSON.stringify(main.basename),
       BRANCH: JSON.stringify(gitRevisionPlugin.branch()),
-      COMMIT_HASH: JSON.stringify(gitRevisionPlugin.commithash()),
+      COMMIT_HASH: JSON.stringify(commitHash),
       PAGES_URL: JSON.stringify(main.basename + main.pagesUrl),
       GA_ID: JSON.stringify(main.ga_id),
       GDPR_URL: JSON.stringify(main.gdpr_url),

@@ -26,7 +26,7 @@ import withPages from "../hocs/withPages";
 import { withStyles } from "@material-ui/core/styles";
 
 const pagesUrl = PAGES_URL;
-const webpackHash = __webpack_hash__ || COMMIT_HASH;
+const webpackHash = COMMIT_HASH || __webpack_hash__;
 // const webpackHash = COMMIT_HASH;
 
 export const processProps = (props, newProps = {}) => {
