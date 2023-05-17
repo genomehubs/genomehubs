@@ -1,7 +1,9 @@
 const { Client } = require("@elastic/elasticsearch");
 
+import { config } from "./config.js";
+
 const client = new Client({
-  node: "http://localhost:9200",
+  node: config.node,
 });
 
 export { client };

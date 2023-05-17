@@ -74,6 +74,10 @@ attributes:
     taxon_traverse_direction: up
     taxon_display_level: 2
     type: keyword
+    value_metadata:
+      default:
+        description: Click to view BioProject record on ENA
+        link: https://www.ebi.ac.uk/ena/browser/view/{}
   biosample:
     constraint:
       len: 32
@@ -89,6 +93,10 @@ attributes:
     taxon_traverse_direction: up
     taxon_display_level: 2
     type: keyword
+    value_metadata:
+      default:
+        description: Click to view BioSample record on ENA
+        link: https://www.ebi.ac.uk/ena/browser/view/{}
   gene_count:
     display_group: annotation
     display_level: 1
