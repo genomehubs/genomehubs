@@ -631,6 +631,8 @@ def lookup_taxon_in_index(
     """Lookup taxon in Elasticsearch index."""
     template = index_template(opts["taxonomy-source"].lower(), opts)
     index = template["index_name"]
+    name = name.replace("'", "\\'")
+    print(name)
     body = {
         "id": "taxon_by_name",
         "params": {"taxon": name, "rank": rank},
