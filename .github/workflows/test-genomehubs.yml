@@ -84,12 +84,10 @@ jobs:
               --taxonomy-source ncbi \
               --taxonomy-root 2759 \
               --taxonomy-jsonl tests/integration_tests/ena-taxonomy.extra.jsonl \
-              --taxon-preload
+              --taxon-preload | wc -l
       - name: check indices
         run: |
           curl localhost:9200/_cat/indices
-          curl "localhost:9200/taxonomy--ncbi--goat--2021.10.15/_mapping?pretty"
-          curl "localhost:9200/taxon--ncbi--goat--2021.10.15/_mapping?pretty"
           exit 1
       # - name: Run genomehubs parse
       #   run: |
