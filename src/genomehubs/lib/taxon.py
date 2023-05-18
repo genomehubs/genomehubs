@@ -680,6 +680,7 @@ def lookup_taxon(
     """Lookup taxon ID."""
     if spellings is None:
         spellings = {"spellcheck": {}, "synonym": {}}
+    print(name)
     if taxon_table is None or name_class == "spellcheck":
         taxa = lookup_taxon_in_index(
             es,

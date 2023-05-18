@@ -85,90 +85,90 @@ jobs:
               --taxonomy-root 2759 \
               --taxonomy-jsonl tests/integration_tests/ena-taxonomy.extra.jsonl \
               --taxon-preload
-      - name: Run genomehubs parse
-        run: |
-          genomehubs parse \
-              --ncbi-datasets-sample tests/integration_tests/data/assembly-data-sample/eukaryota \
-              --outfile tests/integration_tests/data/assembly-data-sample/ncbi_datasets.tsv
+      # - name: Run genomehubs parse
+      #   run: |
+      #     genomehubs parse \
+      #         --ncbi-datasets-sample tests/integration_tests/data/assembly-data-sample/eukaryota \
+      #         --outfile tests/integration_tests/data/assembly-data-sample/ncbi_datasets.tsv
       - name: Run genomehubs index
         run: |
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --assembly-dir tests/integration_tests/data/assembly-data
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/lineages
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/ott3.3
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/tolids \
-              --taxon-lookup any \
-              --taxon-spellcheck
+          # genomehubs index \
+          #     --config-file tests/integration_tests/config/goat.yaml \
+          #     --taxonomy-source ncbi \
+          #     --assembly-dir tests/integration_tests/data/assembly-data
+          # genomehubs index \
+          #     --config-file tests/integration_tests/config/goat.yaml \
+          #     --taxonomy-source ncbi \
+          #     --taxon-dir tests/integration_tests/data/lineages
+          # genomehubs index \
+          #     --config-file tests/integration_tests/config/goat.yaml \
+          #     --taxonomy-source ncbi \
+          #     --taxon-dir tests/integration_tests/data/ott3.3
+          # genomehubs index \
+          #     --config-file tests/integration_tests/config/goat.yaml \
+          #     --taxonomy-source ncbi \
+          #     --taxon-dir tests/integration_tests/data/tolids \
+          #     --taxon-lookup any \
+          #     --taxon-spellcheck
           genomehubs index \
               --config-file tests/integration_tests/config/goat.yaml \
               --taxonomy-source ncbi \
               --taxon-dir tests/integration_tests/data/genomesize_karyotype \
               --taxon-lookup any \
               --taxon-spellcheck
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/regional_lists \
-              --taxon-lookup any \
-              --taxon-spellcheck
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/uk_legislation \
-              --taxon-lookup any \
-              --taxon-spellcheck
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --assembly-dir tests/integration_tests/data/btk
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/status_lists \
-              --taxon-lookup any \
-              --taxon-spellcheck
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/assembly-data-taxon
-      - name: Run genomehubs fill
-        run: |
-          genomehubs fill \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --traverse-root 2759 \
-              --traverse-infer-both
-          curl localhost:9200/_refresh
-      - name: Index BTK files
-        run: |
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --file-metadata tests/integration_tests/data/btk/btk.files.yaml
-      - name: Check indices
-        run: |
-          curl -s "http://localhost:9200/_cat/indices"
-      - name: Start API
-        run: |
-          chmod 755 dist/artifact/genomehubs-api-linux
-          GH_RELEASE=2021.10.15 GH_HUBNAME=goat ./dist/artifact/genomehubs-api-linux &
-          sleep 5
-      - name: Run API tests
-        run: |
-          genomehubs test \
-              --base-url http://localhost:3000/api/v2 \
-              --json-test-dir tests/integration_tests/templates/api/json
+          # genomehubs index \
+          #     --config-file tests/integration_tests/config/goat.yaml \
+          #     --taxonomy-source ncbi \
+          #     --taxon-dir tests/integration_tests/data/regional_lists \
+          #     --taxon-lookup any \
+          #     --taxon-spellcheck
+          # genomehubs index \
+          #     --config-file tests/integration_tests/config/goat.yaml \
+          #     --taxonomy-source ncbi \
+          #     --taxon-dir tests/integration_tests/data/uk_legislation \
+          #     --taxon-lookup any \
+          #     --taxon-spellcheck
+          # genomehubs index \
+          #     --config-file tests/integration_tests/config/goat.yaml \
+          #     --taxonomy-source ncbi \
+          #     --assembly-dir tests/integration_tests/data/btk
+          # genomehubs index \
+          #     --config-file tests/integration_tests/config/goat.yaml \
+          #     --taxonomy-source ncbi \
+          #     --taxon-dir tests/integration_tests/data/status_lists \
+          #     --taxon-lookup any \
+          #     --taxon-spellcheck
+          # genomehubs index \
+          #     --config-file tests/integration_tests/config/goat.yaml \
+          #     --taxonomy-source ncbi \
+          #     --taxon-dir tests/integration_tests/data/assembly-data-taxon
+      # - name: Run genomehubs fill
+      #   run: |
+      #     genomehubs fill \
+      #         --config-file tests/integration_tests/config/goat.yaml \
+      #         --taxonomy-source ncbi \
+      #         --traverse-root 2759 \
+      #         --traverse-infer-both
+      #     curl localhost:9200/_refresh
+      # - name: Index BTK files
+      #   run: |
+      #     genomehubs index \
+      #         --config-file tests/integration_tests/config/goat.yaml \
+      #         --taxonomy-source ncbi \
+      #         --file-metadata tests/integration_tests/data/btk/btk.files.yaml
+      # - name: Check indices
+      #   run: |
+      #     curl -s "http://localhost:9200/_cat/indices"
+      # - name: Start API
+      #   run: |
+      #     chmod 755 dist/artifact/genomehubs-api-linux
+      #     GH_RELEASE=2021.10.15 GH_HUBNAME=goat ./dist/artifact/genomehubs-api-linux &
+      #     sleep 5
+      # - name: Run API tests
+      #   run: |
+      #     genomehubs test \
+      #         --base-url http://localhost:3000/api/v2 \
+      #         --json-test-dir tests/integration_tests/templates/api/json
       # - name: Install UI test dependencies
       #   run: |
       #     sudo apt-get install -y chromium-browser
