@@ -52,7 +52,7 @@ jobs:
       - package-genomehubs-linux
     services:
       elasticsearch:
-        image: elasticsearch:8.7.1
+        image: elasticsearch:8.7.0
         options: -v es-data:/usr/share/elasticsearch/data
         ports:
           - 9200:9200
