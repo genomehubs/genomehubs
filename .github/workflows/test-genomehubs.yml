@@ -45,7 +45,7 @@ jobs:
           path: ./dist/*
 
   run-test-fill:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:
       # - package-api
       # - package-ui
