@@ -177,9 +177,6 @@ def index_stream(
     """Load bulk entries from stream into Elasticsearch index."""
     # LOGGER.info("Indexing bulk entries to %s", index_name)
     if _op_type == "index":
-        for entry_id, entry in stream:
-            print(entry)
-            quit()
         actions = (
             {
                 "_index": index_name,
