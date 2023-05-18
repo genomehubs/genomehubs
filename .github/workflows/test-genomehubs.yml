@@ -85,6 +85,8 @@ jobs:
               --taxonomy-root 2759 \
               --taxonomy-jsonl tests/integration_tests/ena-taxonomy.extra.jsonl \
               --taxon-preload
+      - name: check indices
+        run: curl localhost:9200/_cat/indices
       # - name: Run genomehubs parse
       #   run: |
       #     genomehubs parse \
