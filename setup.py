@@ -109,6 +109,9 @@ setup(
         "tolkein>=0.5.0",
         "ujson>=3.0.0",
     ],  # Optional
+    setup_requires=[
+        "wheel",
+    ],
     # List additional groups of dependencies here (e.g. development
     # dependencies). Users will be able to install these using the "extras"
     # syntax, for example:
