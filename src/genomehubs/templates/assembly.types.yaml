@@ -79,51 +79,51 @@ attributes:
         description: Click to view BioProject record on ENA
         link: https://www.ebi.ac.uk/ena/browser/view/{}
       prjna533106:
-        description: "EBP (click to view on ENA)"
+        description: "Earth Biogenome Project (click to view on ENA)"
       prjna811786:
-        description: "AfricaBP (click to view on ENA)"
+        description: "Africa Biogenome Project (click to view on ENA)"
       prjna555319:
         description: "Ag100Pest (click to view on ENA)"
       prjeb43743:
-        description: "ASG (click to view on ENA)"
+        description: "Aquatic Symbiosis Genomics Project (click to view on ENA)"
       prjna489245:
-        description: "Bat1K (click to view on ENA)"
+        description: "Bat 1K (click to view on ENA)"
       prjna545868:
-        description: "B10K (click to view on ENA)"
+        description: "Bird 10K (click to view on ENA)"
       prjna813333:
-        description: "CanBP (click to view on ENA)"
+        description: "Canada Biogenome Project (click to view on ENA)"
       prjeb49670:
-        description: "CBP (click to view on ENA)"
+        description: "Catalan Biogenome Project (click to view on ENA)"
       prjna720569:
-        description: "CCGP (click to view on ENA)"
+        description: "California Conservation Genomics Project (click to view on ENA)"
       prjeb40665:
-        description: "DToL (click to view on ENA)"
+        description: "Darwin Tree of Life (click to view on ENA)"
       prjna712951:
         description: "ENDEMIXIT (click to view on ENA)"
       prjeb61747:
-        description: "ERGA-BGE (click to view on ENA)"
+        description: "ERGA Biodiversity Genomics Europe (click to view on ENA)"
       prjeb47820:
-        description: "ERGA-PIL (click to view on ENA)"
+        description: "ERGA Pilot (click to view on ENA)"
       prjeb43510:
-        description: "ERGA (click to view on ENA)"
+        description: "European Reference Genome Atlas (click to view on ENA)"
       prjna393850:
         description: "EUROFISH (click to view on ENA)"
       prjna649812:
-        description: "GIGA (click to view on ENA)"
+        description: "Global Invertebrate Genomics Alliance (click to view on ENA)"
       prjna163993:
         description: "i5K (click to view on ENA)"
       prjna844590:
-        description: "ILEBP (click to view on ENA)"
+        description: "Illinois EBP Pilot (click to view on ENA)"
       prjna948806:
-        description: "LMGP (click to view on ENA)"
+        description: "Lilioid Monocots Core Group Genome Project (click to view on ENA)"
       prjna706923:
-        description: "LOEWE-TBG (click to view on ENA)"
+        description: "LOEWE Centre for Translational Biodiversity Genomics (click to view on ENA)"
       prjna758215:
         description: "MetaInvert (click to view on ENA)"
       prjna707598:
         description: "Squalomix (click to view on ENA)"
       prjna489243:
-        description: "VGP (click to view on ENA)"
+        description: "Vertebrate Genomes Project (click to view on ENA)"
   biosample:
     constraint:
       len: 32
