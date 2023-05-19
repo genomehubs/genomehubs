@@ -66,6 +66,8 @@ jobs:
           search.max_buckets: 16384
     steps:
       - uses: actions/checkout@v3
+      - name: Set CONDA variable
+        run: echo "CONDA=$HOME/miniconda3/condabin" >> GITHUB_ENVy
       - name: Check health
         run: |
           max_retry=15
