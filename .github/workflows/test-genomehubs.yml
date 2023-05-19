@@ -71,9 +71,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: ./dist
-      - name: setup-python
-        uses: actions/setup-python@v4
+      - name: setup-conda
+        uses: conda-incubator/setup-miniconda@v2
         with:
+          auto-update-conda: true
           python-version: "3.9"
       - name: Pip install genomehubs
         run: |
