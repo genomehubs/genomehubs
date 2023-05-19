@@ -74,6 +74,56 @@ attributes:
     taxon_traverse_direction: up
     taxon_display_level: 2
     type: keyword
+    value_metadata:
+      default:
+        description: Click to view BioProject record on ENA
+        link: https://www.ebi.ac.uk/ena/browser/view/{}
+      prjna533106:
+        description: "Earth Biogenome Project (click to view on ENA)"
+      prjna811786:
+        description: "Africa Biogenome Project (click to view on ENA)"
+      prjna555319:
+        description: "Ag100Pest (click to view on ENA)"
+      prjeb43743:
+        description: "Aquatic Symbiosis Genomics Project (click to view on ENA)"
+      prjna489245:
+        description: "Bat 1K (click to view on ENA)"
+      prjna545868:
+        description: "Bird 10K (click to view on ENA)"
+      prjna813333:
+        description: "Canada Biogenome Project (click to view on ENA)"
+      prjeb49670:
+        description: "Catalan Biogenome Project (click to view on ENA)"
+      prjna720569:
+        description: "California Conservation Genomics Project (click to view on ENA)"
+      prjeb40665:
+        description: "Darwin Tree of Life (click to view on ENA)"
+      prjna712951:
+        description: "ENDEMIXIT (click to view on ENA)"
+      prjeb61747:
+        description: "ERGA Biodiversity Genomics Europe (click to view on ENA)"
+      prjeb47820:
+        description: "ERGA Pilot (click to view on ENA)"
+      prjeb43510:
+        description: "European Reference Genome Atlas (click to view on ENA)"
+      prjna393850:
+        description: "EUROFISH (click to view on ENA)"
+      prjna649812:
+        description: "Global Invertebrate Genomics Alliance (click to view on ENA)"
+      prjna163993:
+        description: "i5K (click to view on ENA)"
+      prjna844590:
+        description: "Illinois EBP Pilot (click to view on ENA)"
+      prjna948806:
+        description: "Lilioid Monocots Core Group Genome Project (click to view on ENA)"
+      prjna706923:
+        description: "LOEWE Centre for Translational Biodiversity Genomics (click to view on ENA)"
+      prjna758215:
+        description: "MetaInvert (click to view on ENA)"
+      prjna707598:
+        description: "Squalomix (click to view on ENA)"
+      prjna489243:
+        description: "Vertebrate Genomes Project (click to view on ENA)"
   biosample:
     constraint:
       len: 32
@@ -89,6 +139,10 @@ attributes:
     taxon_traverse_direction: up
     taxon_display_level: 2
     type: keyword
+    value_metadata:
+      default:
+        description: Click to view BioSample record on ENA
+        link: https://www.ebi.ac.uk/ena/browser/view/{}
   gene_count:
     display_group: annotation
     display_level: 1

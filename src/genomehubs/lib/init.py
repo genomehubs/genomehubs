@@ -208,6 +208,7 @@ def main(args):
                     stream, options["init"]["taxonomy-jsonl"]
                 )
             if "taxonomy-root" in options["init"]:
+                es_functions.index_create(es, template["index_name"])
                 es_functions.load_mapping(es, template["name"], template["mapping"])
                 es_functions.index_stream(
                     es,

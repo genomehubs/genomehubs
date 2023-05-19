@@ -39,11 +39,14 @@ const getSummary = async (params) => {
     taxonomy: params.taxonomy,
   });
   const { body } = await client
-    .search({
-      index,
-      body: query,
-      rest_total_hits_as_int: true,
-    })
+    .search(
+      {
+        index,
+        body: query,
+        rest_total_hits_as_int: true,
+      },
+      { meta: true }
+    )
     .catch((err) => {
       return err.meta;
     });

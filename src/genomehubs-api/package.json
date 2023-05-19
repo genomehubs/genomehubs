@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/genomehubs/genomehubs-api#readme",
   "dependencies": {
-    "@elastic/elasticsearch": "7.11",
+    "@elastic/elasticsearch": "^8.6.0",
     "archiver": "^5.3.1",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
@@ -31,7 +31,7 @@
     "dotenv": "^16.0.0",
     "esm": "^3.2.25",
     "express": "^4.17.2",
-    "express-openapi-validator": "^4.13.5",
+    "express-openapi-validator": "^5.0.3",
     "ioredis": "^5.2.3",
     "json2csv": "^5.0.6",
     "memcached": "^2.2.2",
@@ -40,6 +40,7 @@
     "reselect": "^4.1.6",
     "simple-statistics": "^7.8.2",
     "swagger-ui-express": "^4.3.0",
+    "undici": "github:genomehubs/undici",
     "winston": "^3.7.2",
     "winston-daily-rotate-file": "^4.6.1",
     "yamljs": "^0.3.0"

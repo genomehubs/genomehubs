@@ -9,29 +9,29 @@
 # curl -X DELETE "http://localhost:9200/a*"
 # curl -X DELETE "http://localhost:9200/f*"
 # curl -X DELETE "http://localhost:9200/s*"
-curl -X DELETE "http://localhost:9200/*"
+curl -X DELETE "http://localhost:9201/*"
 
 genomehubs init \
-    --config-file tests/integration_tests/config/full.yaml \
+    --config-file tests/integration_tests/config/boat.yaml \
     --taxonomy-source ncbi \
     --taxonomy-root 7088 \
     --taxon-preload &&
 
 # genomehubs init \
-#     --config-file tests/integration_tests/config/full.yaml \
+#     --config-file tests/integration_tests/config/boat.yaml \
 #     --taxonomy-source ncbi \
 #     --restore-indices &&
 genomehubs index \
-    --config-file tests/integration_tests/config/full.yaml \
+    --config-file tests/integration_tests/config/boat.yaml \
     --taxonomy-source ncbi \
     --assembly-dir tests/integration_tests/data/boat/assembly &&
 genomehubs fill \
-    --config-file tests/integration_tests/config/full.yaml \
+    --config-file tests/integration_tests/config/boat.yaml \
     --taxonomy-source ncbi \
     --traverse-root 7088 \
     --traverse-infer-both &&
 genomehubs index \
-    --config-file tests/integration_tests/config/config.yaml \
+    --config-file tests/integration_tests/config/boat.yaml \
     --taxonomy-source ncbi \
     --feature-dir tests/integration_tests/data/boat/feature &&
 echo done ||

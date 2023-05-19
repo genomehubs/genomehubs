@@ -32,6 +32,7 @@ export const searchByTaxon = async ({
   depth,
   maxDepth,
   includeEstimates,
+  includeLineage,
   includeRawValues,
   searchRawValues,
   filters,
@@ -175,6 +176,7 @@ export const searchByTaxon = async ({
     summaryValues,
     non_attr_fields,
     includeRawValues,
+    includeLineage,
   });
   let exclude = []; // includeRawValues ? [] : ["attributes.values*"];
   let sort = setSortOrder(sortBy, lookupTypes, lookupNames);

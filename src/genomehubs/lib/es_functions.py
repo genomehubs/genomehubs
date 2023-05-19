@@ -26,15 +26,15 @@ LOGGER = tolog.logger(__name__)
 def test_connection(opts, *, log=False):
     """Test connection to Elasticsearch."""
     connected = False
-    hosts = opts["es-host"]
-    with tolog.DisableLogger():
-        try:
-            es = Elasticsearch(
-                hosts=hosts, timeout=1800, max_retries=10, retry_on_timeout=True
-            )
-            connected = es.info()
-        except Exception:
-            pass
+    host = opts["es-host"][0]
+    host = f"http://{host}"
+    hosts = [host]
+    print(hosts)
+    # with tolog.DisableLogger():
+    # try:
+    es = Elasticsearch(hosts=hosts, timeout=1800, max_retries=10, retry_on_timeout=True)
+    connected = es.info()
+    #   pass
     if not connected:
         message = "Could not connect to Elasticsearch at '%s'" % ", ".join(hosts)
         if log:
@@ -115,7 +115,7 @@ def start_es_binary(opts):
 
 def launch_es(opts, log=True):
     """Launch ElasticSearch."""
-    es = test_connection(opts)
+    es = test_connection(opts, log=log)
     if es:
         if log:
             LOGGER.info("ElasticSearch is already running")
@@ -142,7 +142,7 @@ def index_exists(es, index_name):
     """Test if Elasticsearch index exists."""
     es_client = client.IndicesClient(es)
     with tolog.DisableLogger():
-        res = es_client.exists(index_name)
+        res = es_client.exists(index=index_name)
     return res
 
 
@@ -152,7 +152,7 @@ def index_create(es, index_name):
     res = index_exists(es, index_name)
     if not res:
         with tolog.DisableLogger():
-            res = es_client.create(index_name)
+            res = es_client.create(index=index_name)
     return res
 
 

@@ -1,5 +1,24 @@
 const { Client } = require("@elastic/elasticsearch");
 
-import { config } from "./config";
+import { config } from "./config.js";
 
-export const client = new Client({ node: config.node });
+const client = new Client({
+  node: config.node,
+});
+
+export { client };
+
+// console.log(client);
+
+// export const client = {
+//   test: "exports",
+//   cat: {
+//     indices: () => {
+//       console.log("testing");
+//     },
+//   },
+// };
+
+// console.log(client);
+
+// export default client;

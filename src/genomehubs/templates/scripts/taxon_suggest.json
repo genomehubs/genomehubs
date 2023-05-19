@@ -31,7 +31,7 @@
               "query": {
                 "source": {
                   "match_phrase": {
-                    "taxon_names.name": "{{=|| ||=}}{{suggestion}}||={{ }}=||"
+                    "taxon_names.name": "{{suggestion}}"
                   }
                 }
               },

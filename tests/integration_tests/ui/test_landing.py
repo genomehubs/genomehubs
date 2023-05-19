@@ -19,7 +19,7 @@ class TestLandingPage:
         """Check page title is set."""
         self.driver.get(BASE_URL)
         time.sleep(2)
-        assert self.driver.title == "test_instance"
+        assert self.driver.title == "goat"
 
     def test_histogram(self):
         """Check histogram loads."""

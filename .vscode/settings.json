@@ -4,14 +4,15 @@
   "python.linting.pydocstyleEnabled": true,
   "python.linting.flake8Enabled": true,
   "python.linting.enabled": true,
-  "python.formatting.provider": "black",
+  "python.formatting.provider": "none",
   "editor.formatOnSave": true,
   "python.sortImports.path": "isort",
   "python.sortImports.args": ["-m 3", "-tc"],
   "[python]": {
     "editor.codeActionsOnSave": {
       "source.organizeImports.python": true
-    }
+    },
+    "editor.defaultFormatter": "ms-python.black-formatter"
   },
   "esbonio.sphinx.confDir": "${workspaceFolder}/docs",
   "yaml.schemas": {

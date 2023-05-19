@@ -23,15 +23,16 @@ const NavLink = ({
     to = url;
   } else if (to) {
     to = basename + "/" + to + (plain ? "" : location.search + location.hash);
-  } else if (props.href) {
+  }
+  if ((to && to.startsWith("http")) || props.href) {
+    to = to || props.href;
     if (
-      props.href.match(/\:\/\//) &&
-      (props.title?.startsWith("external:") ||
-        !props.href.match(location.origin))
+      to.match(/\:\/\//) &&
+      (props.title?.startsWith("external:") || !to.match(location.origin))
     ) {
       return (
         <a
-          href={props.href}
+          href={to}
           title={(props.title || "").replace(/^external:\s*/, "")}
           target="_blank"
           rel="noopener noreferrer"
@@ -41,7 +42,7 @@ const NavLink = ({
         </a>
       );
     }
-    to = basename + "/" + props.href.replace(location.origin, "");
+    to = basename + "/" + to.replace(location.origin, "");
   }
   return (
     <Link

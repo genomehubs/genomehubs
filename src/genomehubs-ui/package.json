@@ -52,10 +52,7 @@
     "sass": "^1.51.0",
     "sass-loader": "^12.4.0",
     "style-loader": "^3.3.1",
-    "webpack": "^5.68.0",
-    "webpack-bundle-analyzer": "^3.9.0",
-    "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.7.4"
+    "webpack-bundle-analyzer": "^3.9.0"
   },
   "dependencies": {
     "@fontsource/open-sans": "^4.5.3",
@@ -133,6 +130,9 @@
     "unified": "^9.2.2",
     "unist-util-visit": "^3.1.0",
     "use-long-press": "^1.1.1",
-    "usehooks-ts": "^2.5.4"
+    "usehooks-ts": "^2.5.4",
+    "webpack": "^5.82.0",
+    "webpack-cli": "^5.0.2",
+    "webpack-dev-server": "^4.13.3"
   }
 }
