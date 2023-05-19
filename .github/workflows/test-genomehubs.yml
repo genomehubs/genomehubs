@@ -111,7 +111,6 @@ jobs:
       - name: check indices
         run: |
           curl localhost:9200/_cat/indices
-          exit 1
       - name: Run genomehubs parse
         run: |
           genomehubs parse \
