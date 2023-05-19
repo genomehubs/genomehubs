@@ -98,7 +98,8 @@ jobs:
           genomehubs -v
       - name: Run genomehubs init
         run: |
-          export PATH=/home/ubuntu/miniconda3/envs/test87/bin:/home/ubuntu/.local/bin:$PATH
+          which python
+          #export PATH=/home/ubuntu/miniconda3/envs/test87/bin:/home/ubuntu/.local/bin:$PATH
           curl -X DELETE "http://localhost:9200/*--*"
           genomehubs init \
               --config-file tests/integration_tests/config/goat.yaml \
