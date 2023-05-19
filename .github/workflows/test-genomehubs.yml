@@ -71,6 +71,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: ./dist
+      - name: setup-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
       - name: Pip install genomehubs
         run: |
           which python
