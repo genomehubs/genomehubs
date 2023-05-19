@@ -50,17 +50,17 @@ jobs:
       # - package-api
       # - package-ui
       - package-genomehubs-linux
-    services:
-      elasticsearch:
-        image: elasticsearch:8.7.0
-        options: -v es-data:/usr/share/elasticsearch/data
-        ports:
-          - 9200:9200
-        env:
-          discovery.type: single-node
-          xpack.security.enabled: false
-          action.destructive_requires_name: false
-          search.max_buckets: 16384
+    # services:
+    #   elasticsearch:
+    #     image: elasticsearch:8.7.0
+    #     options: -v es-data:/usr/share/elasticsearch/data
+    #     ports:
+    #       - 9200:9200
+    #     env:
+    #       discovery.type: single-node
+    #       xpack.security.enabled: false
+    #       action.destructive_requires_name: false
+    #       search.max_buckets: 16384
     steps:
       - uses: actions/checkout@v3
       - name: Check health
