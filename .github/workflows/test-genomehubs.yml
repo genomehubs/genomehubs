@@ -1,5 +1,8 @@
 name: test-genomehubs
 
+env:
+  CONDA: /home/ubuntu/miniconda3
+
 on: [push]
 
 jobs:
@@ -66,8 +69,6 @@ jobs:
           search.max_buckets: 16384
     steps:
       - uses: actions/checkout@v3
-      - name: Set CONDA variable
-        run: echo "CONDA=$HOME/miniconda3" >> GITHUB_ENV
       - name: Check health
         run: |
           max_retry=15
