@@ -68,8 +68,15 @@ jobs:
       - uses: actions/checkout@v3
       - name: Check health
         run: |
-          curl -s "http://localhost:9200/_cat/health" ||
-          sleep 15 && curl -s "http://localhost:9200/_cat/health"
+          max_retry=15
+          counter=0
+          until curl -s "http://localhost:9200/_cat/health"
+          do
+            sleep 2
+            [[ counter -eq $max_retry ]] && echo "Failed!" && exit 1
+            echo "Trying again. Try #$counter"
+            ((counter++))
+          done
       - name: Collect artifacts
         uses: actions/download-artifact@v3
         with:
@@ -78,16 +85,16 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
-          python-version: "3.9"
+          python-version: "3.8"
       - name: Pip install genomehubs
         run: |
           which python
           which pip
           # export PATH=/home/ubuntu/miniconda3/envs/test87/bin:/home/ubuntu/.local/bin:$PATH
           pip install --upgrade pip
-          pip install dist/artifact/*linux*.whl
-          #pip install setuptools wheel twine
-          #./pip_install_latest.sh manylinux2014_x86_64
+          #pip install dist/artifact/*linux*.whl
+          pip install setuptools wheel twine
+          ./pip_install_latest.sh manylinux2014_x86_64
           genomehubs -v
       - name: Run genomehubs init
         run: |
