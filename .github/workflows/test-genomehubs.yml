@@ -67,7 +67,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set CONDA variable
-        run: echo "CONDA=$HOME/miniconda3/condabin" >> GITHUB_ENVy
+        run: echo "CONDA=$HOME/miniconda3" >> GITHUB_ENV
       - name: Check health
         run: |
           max_retry=15
