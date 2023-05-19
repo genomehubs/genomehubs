@@ -97,7 +97,7 @@ jobs:
           #pip install --upgrade pip
           pip install dist/artifact/*linux*.whl
           #pip install setuptools wheel twine
-          #./pip_install_latest.sh manylinux2014_x86_64
+          # ./pip_install_latest.sh manylinux2014_x86_64
           genomehubs -v
       - name: Run genomehubs init
         run: |
