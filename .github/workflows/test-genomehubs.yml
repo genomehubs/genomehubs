@@ -71,15 +71,13 @@ jobs:
       - uses: actions/checkout@v3
       - name: Check health
         run: |
-          max_retry=15
-          counter=0
-          until curl -s "http://localhost:9200/_cat/health"
-          do
-            sleep 2
-            [[ counter -eq $max_retry ]] && echo "Failed!" && exit 1
-            echo "Trying again. Try #$counter"
-            ((counter++))
-          done
+          curl -s "http://localhost:9200/_cat/health" && exit 0
+          sleep 10
+          curl -s "http://localhost:9200/_cat/health" && exit 0
+          sleep 10
+          curl -s "http://localhost:9200/_cat/health" && exit 0
+          sleep 10
+          curl -s "http://localhost:9200/_cat/health" && exit 0 || exit 1
       - name: Collect artifacts
         uses: actions/download-artifact@v3
         with:
