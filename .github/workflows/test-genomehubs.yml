@@ -50,6 +50,9 @@ jobs:
       # - package-api
       # - package-ui
       - package-genomehubs-linux
+    defaults:
+      run:
+        shell: bash -l {0}
     services:
       elasticsearch:
         image: elasticsearch:8.7.0
@@ -71,7 +74,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: ./dist
-      - name: setup-conda
+      - name: Setup conda
         uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
