@@ -21,3 +21,4 @@ pyyaml
 sparqlwrapper>=1.4.1
 tolkein>=0.5.0
 ujson>=3.0.0
+urllib3>=1.26.2,<2
