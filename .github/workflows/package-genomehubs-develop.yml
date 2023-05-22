@@ -51,6 +51,8 @@ jobs:
           python-version: "3.8"
       - name: Pip install genomehubs
         run: |
+          $CONDA/bin/conda install pip
+          PATH=$CONDA/bin/:$PATH
           pip install --upgrade pip
           pip install setuptools wheel twine
           ./pip_install_latest.sh manylinux2014_x86_64
