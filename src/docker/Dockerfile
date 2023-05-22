@@ -16,6 +16,13 @@ RUN mkdir -p /genomehubs
 RUN useradd -m genomehubs \
     && chown -R genomehubs:genomehubs /genomehubs
 
+WORKDIR /opt
+
+RUN wget -P /usr/local/src https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+    && bash /usr/local/src/Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda \
+    && /opt/conda/bin/conda install -n base conda-libmamba-solver \
+    && rm /usr/local/src/Miniconda3-latest-Linux-x86_64.sh
+
 ARG CONDA_DIR=/opt/conda
 
 RUN $CONDA_DIR/bin/conda env create -n genomehubs python=3.8 \
