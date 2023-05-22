@@ -8,6 +8,7 @@ ENV CONTAINER_VERSION=$VERSION
 RUN apt-get update \
     && DEBIAN_FRONTEND="noninteractive" apt-get -y --no-install-recommends install \
     curl \
+    ca-certificates \
     pigz \
     wget
 
