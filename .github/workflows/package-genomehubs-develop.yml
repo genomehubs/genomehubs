@@ -1,5 +1,8 @@
 name: package-genomehubs-develop
 
+env:
+  CONDA: /home/ubuntu/miniconda3
+
 on: workflow_dispatch
 
 jobs:
@@ -36,18 +39,22 @@ jobs:
           path: ./dist/*
 
   package-genomehubs-linux:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
         with:
           ref: ${{github.ref}}
-      - name: Install dependencies
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: "3.8"
+      - name: Pip install genomehubs
         run: |
-          python3 -m pip install --upgrade pip
+          pip install --upgrade pip
           pip install setuptools wheel twine
-      - name: Build and publish
-        run: |
           ./pip_install_latest.sh manylinux2014_x86_64
+          genomehubs -v
       - uses: actions/upload-artifact@v3
         with:
           name: genomehubs
