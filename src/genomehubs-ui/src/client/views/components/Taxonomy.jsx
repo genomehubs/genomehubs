@@ -44,16 +44,17 @@ const Taxonomy = ({
   useEffect(() => {
     if (apiStatus) {
       setMessage({
-        message: "",
         duration: 0,
         severity: "info",
       });
     } else {
-      setMessage({
-        message: `Unable to connect to API, retrying in ${duration / 1000}s`,
-        duration: duration + interval,
-        severity: "warning",
-      });
+      if (duration < attempt * multiple * interval) {
+        setMessage({
+          message: `Unable to connect to API, retrying in ${duration / 1000}s`,
+          duration: duration + interval,
+          severity: "warning",
+        });
+      }
       const timer = setTimeout(() => {
         setDuration(duration - interval);
       }, interval);

@@ -59,9 +59,9 @@ const Page = ({
   useEffect(() => {
     selectPalette(options.palette || "default");
   }, []);
-  if (!apiStatus) {
-    return null;
-  }
+  // if (!apiStatus) {
+  //   return null;
+  // }
   let items = [];
   if (panels && panels.length > 0) {
     panels.forEach((obj, i) => {
