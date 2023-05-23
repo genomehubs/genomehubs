@@ -78,15 +78,18 @@ export const collateAttributes = async ({
 
   // Fetch top level filter terms
   let { body } = await client
-    .search({
-      index,
-      body: {
-        query,
-        size: 0,
-        aggs,
+    .search(
+      {
+        index,
+        body: {
+          query,
+          size: 0,
+          aggs,
+        },
+        rest_total_hits_as_int: true,
       },
-      rest_total_hits_as_int: true,
-    })
+      { meta: true }
+    )
     .catch((err) => {
       logError({
         message: err.meta.body.error,

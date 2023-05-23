@@ -54,10 +54,13 @@ export const getRecordsById = async ({
   let index = indexName({ result, taxonomy, hub, release });
   let ids = convertIdsToDocIds(recordId, result);
   const { body } = await client
-    .mget({
-      index,
-      body: { ids },
-    })
+    .mget(
+      {
+        index,
+        body: { ids },
+      },
+      { meta: true }
+    )
     .catch((err) => {
       return err.meta;
     });

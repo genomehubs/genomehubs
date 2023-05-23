@@ -76,48 +76,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Accordion = withStyles({
-  root: {
-    border: "1px solid rgba(0, 0, 0, .125)",
-    boxShadow: "none",
-    "&:not(:last-child)": {
-      borderBottom: 0,
-    },
-    "&:before": {
-      display: "none",
-    },
-    "&$expanded": {
-      margin: "auto",
-    },
-  },
-  expanded: {},
-})(MuiAccordion);
-
-const AccordionSummary = withStyles({
-  root: {
-    borderBottom: "1px solid rgba(0, 0, 0, .125)",
-    marginBottom: -1,
-    minHeight: "1em",
-    "&$expanded": {
-      minHeight: "1em",
-    },
-    padding: "0 1em",
-  },
-  content: {
-    margin: "3px 0",
-    "&$expanded": {
-      margin: "3px 0",
-    },
-  },
-  expanded: {},
-})(MuiAccordionSummary);
-
-const AccordionDetails = withStyles((theme) => ({
-  root: {
-    padding: "0 1em",
-  },
-}))(MuiAccordionDetails);
-
 const SearchSettings = ({
   searchTerm,
   setTaxonomy,
@@ -209,12 +167,31 @@ const SearchSettings = ({
         }
       }
     });
-
+    let fieldSets = {};
+    if (searchTerm.fields) {
+      searchTerm.fields.split(",").forEach((field) => {
+        let [f, s = "value"] = field.split(":");
+        if (!fieldSets[f]) {
+          fieldSets[f] = [];
+        }
+        fieldSets[f].push(s);
+      });
+    }
+    let newFields = [];
+    for (let field of fields) {
+      if (fieldSets[field]) {
+        for (let subset of fieldSets[field]) {
+          newFields.push(subset == "value" ? field : `${field}:${subset}`);
+        }
+      } else {
+        newFields.push(field);
+      }
+    }
     let options = {
       ...searchTerm,
       result: index,
       offset: 0,
-      fields: fields.length > 0 ? fields.join(",") : "none",
+      fields: newFields.length > 0 ? newFields.join(",") : "none",
       names: names.join(","),
       ranks: ranks.join(","),
       taxonomy: state.taxonomy,

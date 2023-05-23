@@ -4,11 +4,14 @@ import { processHits } from "./processHits";
 
 const altRecordId = async ({ index, name, source }) => {
   const { body } = await client
-    .searchTemplate({
-      index,
-      body: { id: "taxon_by_specific_name", params: { name, source } },
-      rest_total_hits_as_int: true,
-    })
+    .searchTemplate(
+      {
+        index,
+        body: { id: "taxon_by_specific_name", params: { name, source } },
+        rest_total_hits_as_int: true,
+      },
+      { meta: true }
+    )
     .catch((err) => {
       return err.meta;
     });

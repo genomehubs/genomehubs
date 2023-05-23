@@ -5,7 +5,7 @@ export const processHits = ({
   body,
   names,
   ranks,
-  fields,
+  fields = [],
   reason,
   lca,
   inner_hits,

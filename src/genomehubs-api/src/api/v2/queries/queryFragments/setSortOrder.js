@@ -53,7 +53,10 @@ const addSortParameter = (sortBy, lookupTypes, lookupNames) => {
       },
     };
   } else if (lookupTypes(by)) {
-    let type = param ? param : `${lookupTypes(by).type || "keyword"}_value`;
+    let type =
+      param && param != "value" && !subsets.source.has(param)
+        ? param
+        : `${lookupTypes(by).type || "keyword"}_value`;
     return {
       [`attributes.${type}`]: {
         mode: sortBy.mode || "max",

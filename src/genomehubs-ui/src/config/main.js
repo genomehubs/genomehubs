@@ -41,14 +41,18 @@ module.exports = {
   },
   // API URL
   apiUrl: GH_API_URL,
+  // pages commit hash
+  commitHash: process.env.GH_COMMIT_HASH || "",
   // pages URL
   pagesUrl: process.env.GH_PAGES_URL || "/static",
   // pages Path
   pagesPath: process.env.GH_PAGES_PATH || "./src/client/static",
   // url basename
   basename:
-    `/${process.env.GH_BASENAME}`.replace(/^\/\//, "/").replace(/\/$/, "") ||
-    "",
+    `/${process.env.GH_BASENAME}`
+      .replace(/^\/\//, "/")
+      .replace(/\/$/, "")
+      .replace("undefined", "") || "",
   // path to read flatfiles
   filePath: FILE_PATH,
   // version

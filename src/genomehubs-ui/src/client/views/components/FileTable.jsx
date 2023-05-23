@@ -23,7 +23,7 @@ import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import withAnalysesByAnyId from "../hocs/withAnalysesByAnyId";
 import withAnalysis from "../hocs/withAnalysis";
-import withApiUrl from "../hocs/withApiUrl";
+import withApi from "../hocs/withApi";
 import withFiles from "../hocs/withFiles";
 import withFilesByAnalysisId from "../hocs/withFilesByAnalysisId";
 import withRecord from "../hocs/withRecord";
@@ -139,7 +139,7 @@ const FileTable = ({
 
 export default compose(
   memo,
-  withApiUrl,
+  withApi,
   withFiles,
   withFilesByAnalysisId
 )(FileTable);

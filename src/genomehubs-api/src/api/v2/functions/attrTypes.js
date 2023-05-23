@@ -55,13 +55,16 @@ const fetchTypes = async ({ result, taxonomy, hub, release, indexType }) => {
     };
   }
   const { body } = await client
-    .search({
-      index,
-      body: {
-        query,
-        size: 1000,
+    .search(
+      {
+        index,
+        body: {
+          query,
+          size: 1000,
+        },
       },
-    })
+      { meta: true }
+    )
     .catch((err) => {
       return err.meta;
     });

@@ -10,6 +10,7 @@ import withRecord from "../hocs/withRecord";
 export const ResultModalControl = ({
   attributeSettings,
   setAttributeSettings,
+  resetRecord,
   adjustColumns,
   rootRef,
 }) => {
@@ -21,7 +22,11 @@ export const ResultModalControl = ({
       onClose={(event, reason) => {
         event.preventDefault();
         event.stopPropagation();
-        setAttributeSettings({ showAttribute: false });
+        setAttributeSettings({
+          attributeId: undefined,
+          showAttribute: false,
+        });
+        resetRecord();
       }}
       aria-labelledby="search-options-modal-title"
       aria-describedby="search-options-modal-description"

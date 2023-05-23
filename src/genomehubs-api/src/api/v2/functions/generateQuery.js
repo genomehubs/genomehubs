@@ -51,7 +51,7 @@ const validateValue = (term, value, meta, types) => {
     values = value.split(/\s*,\s*/);
   }
   for (let v of values) {
-    if (v.match(/^null$/)) {
+    if (v.match(/^!*null$/)) {
       continue;
     }
     if (type == "keyword") {
@@ -291,6 +291,9 @@ export const generateQuery = async ({
   let properties = {};
   let status;
   let excludeMissing = new Set();
+  let excludeDirect = new Set();
+  let excludeDescendant = new Set();
+  let excludeAncestral = new Set();
   if (query && query.match(/\n/) && query.split(/\n/)[1] > "") {
     multiTerm = query
       .toLowerCase()
@@ -394,6 +397,11 @@ export const generateQuery = async ({
                   optionalFields
                 );
               }
+              if (!parts[3].match(/^!/) && parts[4].match(/^null$/)) {
+                excludeAncestral.add(meta.name);
+                excludeDescendant.add(meta.name);
+                excludeDirect.add(meta.name);
+              }
             } else {
               properties = addCondition(properties, parts, "keyword");
             }
@@ -437,6 +445,33 @@ export const generateQuery = async ({
       exclusions.missing.forEach(excludeMissing.add, excludeMissing);
     }
     exclusions.missing = [...excludeMissing];
+  }
+  if (excludeDirect) {
+    if (!exclusions) {
+      exclusions = {};
+    }
+    if (exclusions.direct) {
+      exclusions.direct.forEach(excludeDirect.add, excludeDirect);
+    }
+    exclusions.direct = [...excludeDirect];
+  }
+  if (excludeDescendant) {
+    if (!exclusions) {
+      exclusions = {};
+    }
+    if (exclusions.descendant) {
+      exclusions.descendant.forEach(excludeDescendant.add, excludeDescendant);
+    }
+    exclusions.descendant = [...excludeDescendant];
+  }
+  if (excludeAncestral) {
+    if (!exclusions) {
+      exclusions = {};
+    }
+    if (exclusions.ancestor) {
+      exclusions.ancestor.forEach(excludeAncestral.add, excludeAncestral);
+    }
+    exclusions.ancestor = [...excludeAncestral];
   }
 
   let params = {

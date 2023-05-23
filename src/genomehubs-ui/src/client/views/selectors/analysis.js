@@ -30,6 +30,7 @@ export function fetchAnalyses(options) {
       json.options = options;
       dispatch(logAnalysisQuery(queryString));
       dispatch(receiveAnalyses(json));
+      // dispatch(setApiStatus(true));
     } catch (err) {
       dispatch(cancelAnalyses);
       return dispatch(setApiStatus(false));

@@ -8,7 +8,7 @@ import {
 import { createCachedSelector } from "re-reselect";
 
 export const pagesUrl = PAGES_URL || false;
-export const webpackHash = __webpack_hash__ || COMMIT_HASH;
+export const webpackHash = COMMIT_HASH || __webpack_hash__;
 
 export function fetchPages(pageId) {
   return async function (dispatch) {

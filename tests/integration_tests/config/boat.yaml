@@ -1,0 +1,30 @@
+common:
+  es:
+    batch: 500
+    host:
+      - "localhost:9201"
+    timeout: 30
+  hub:
+    name: boat
+    path: ~/projects/genomehubs/boat-resources
+    separator: --
+    version: 2021.10.15
+  log:
+    es: false
+    fetch: false
+    interval: 10
+  taxonomy:
+    format: ncbi
+    url: "ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz"
+    file:
+      - names.dmp
+      - nodes.dmp
+    path: ~/projects/genomehubs/boat-resources/taxdump
+fill: {}
+index:
+  taxonomy:
+    source: ncbi
+init: {}
+test:
+  taxonomy:
+    source: ncbi

@@ -65,9 +65,13 @@ const useStyles = makeStyles((theme) => ({
 
 const summaryTypesFromMeta = (meta) => {
   let summaryTypes = ["value"];
-  if (meta.summary) {
+  if (meta?.summary) {
     let skip = true;
-    for (let summary of meta.summary) {
+    let summaries = meta.summary;
+    if (!Array.isArray(summaries)) {
+      summaries = [summaries];
+    }
+    for (let summary of summaries) {
       if (summary == "primary") {
         continue;
       }
@@ -81,7 +85,7 @@ const summaryTypesFromMeta = (meta) => {
       summaryTypes.push(summary);
     }
   }
-  if (meta.traverse) {
+  if (meta?.traverse) {
     summaryTypes.push("direct");
     if (meta.traverse_direction && meta.traverse_direction == "up") {
       summaryTypes.push("descendant");
@@ -90,6 +94,7 @@ const summaryTypesFromMeta = (meta) => {
     } else {
       summaryTypes.push("ancestor");
       summaryTypes.push("descendant");
+      summaryTypes.push("estimate");
     }
   }
   return summaryTypes;
@@ -99,6 +104,7 @@ const ResultColumnOptions = ({
   attributeId,
   types,
   setAttributeSettings,
+  resetRecord,
   setPreferSearchTerm,
   searchTerm,
   basename,
@@ -108,10 +114,12 @@ const ResultColumnOptions = ({
   const location = useLocation();
   const summaryTypes = summaryTypesFromMeta(types[attributeId]);
   const initialSelected = searchTerm.fields
-    .split(",")
-    .map((field) => field.split(":"))
-    .filter(([f]) => f == attributeId)
-    .map(([_, subset = "value"]) => subset);
+    ? searchTerm.fields
+        .split(",")
+        .map((field) => field.split(":"))
+        .filter(([f]) => f == attributeId)
+        .map(([_, subset = "value"]) => subset)
+    : ["value"];
   const [summaryCols, setsummaryCols] = React.useState(initialSelected);
 
   const handleChange = (e) => {
@@ -127,7 +135,17 @@ const ResultColumnOptions = ({
     let newFields = summaryCols.map((summary) =>
       summary == "value" ? attributeId : `${attributeId}:${summary}`
     );
-    let fields = searchTerm.fields.split(",");
+    let fields = [];
+    if (searchTerm.fields) {
+      fields = searchTerm.fields.split(",");
+    } else {
+      fields = Object.entries(types)
+        .filter(
+          ([_, v]) => v.group == searchTerm.result && v.display_level == 1
+        )
+        .map(([k]) => k);
+    }
+
     let index = fields.findIndex(
       (f) => f == attributeId || f.startsWith(`${attributeId}:`)
     );
@@ -149,7 +167,11 @@ const ResultColumnOptions = ({
     navigate(
       `${basename}/search?${qs.stringify(options)}${location.hash || ""}`
     );
-    setAttributeSettings({ showAttribute: false });
+    setAttributeSettings({
+      attributeId: undefined,
+      showAttribute: false,
+    });
+    resetRecord();
   };
 
   const handleResetClick = () => {

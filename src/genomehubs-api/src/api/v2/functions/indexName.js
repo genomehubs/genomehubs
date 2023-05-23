@@ -10,7 +10,7 @@ export const indexName = ({ result, taxonomy, hub, release }) => {
    * @param {string} indexInfo.release - Hub release version.
    */
   let parts = [result];
-  if (taxonomy === undefined || taxonomy == "undefined") {
+  if (!taxonomy || taxonomy === undefined || taxonomy == "undefined") {
     taxonomy = config.taxonomy;
   }
   if (taxonomy) parts.push(taxonomy);

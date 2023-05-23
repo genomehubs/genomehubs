@@ -77,10 +77,22 @@ const ResultPanel = ({
         if (value.length == 0) {
           return null;
         }
-        value = formatter(value, searchIndex, "array").values[0][0];
+        value = formatter(value, searchIndex, "array");
+        let charLimit = 20;
+        let entries = [];
+        for (let v of value.values) {
+          let entry = v[0];
+          if (charLimit == 20 || charLimit - entry.length > 0) {
+            entries.push(entry);
+            charLimit -= entry.length;
+          }
+        }
+        value = entries.join(",");
         if (field.value.length > 1) {
           length = field.value.length;
-          value += " ...";
+          if (field.value.length > entries.length) {
+            value += ", ...";
+          }
         }
       } else {
         value = formatter(value);

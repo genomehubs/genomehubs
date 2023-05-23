@@ -16,6 +16,7 @@ import qs from "qs";
 import styles from "./Styles.scss";
 import { useLocation } from "@reach/router";
 import { useReadLocalStorage } from "usehooks-ts";
+import withApi from "../hocs/withApi";
 import withSearchIndex from "../hocs/withSearchIndex";
 
 const useStyles = makeStyles((theme) => ({
@@ -46,6 +47,7 @@ const Page = ({
   resultCount,
   result,
   selectPalette,
+  apiStatus,
 }) => {
   const classes = useStyles();
   const location = useLocation();
@@ -57,6 +59,9 @@ const Page = ({
   useEffect(() => {
     selectPalette(options.palette || "default");
   }, []);
+  // if (!apiStatus) {
+  //   return null;
+  // }
   let items = [];
   if (panels && panels.length > 0) {
     panels.forEach((obj, i) => {
@@ -155,4 +160,4 @@ const Page = ({
   );
 };
 
-export default compose(memo, dispatchColors, withSearchIndex)(Page);
+export default compose(memo, dispatchColors, withApi, withSearchIndex)(Page);

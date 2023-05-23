@@ -56,11 +56,14 @@ const sayt = async (params, iter = 0) => {
   }
   let index = indexName(newParams);
   const { body } = await client
-    .search({
-      index,
-      body: saytQuery({ ...newParams }),
-      rest_total_hits_as_int: true,
-    })
+    .search(
+      {
+        index,
+        body: saytQuery({ ...newParams }),
+        rest_total_hits_as_int: true,
+      },
+      { meta: true }
+    )
     .catch((err) => {
       return err.meta;
     });
@@ -94,11 +97,14 @@ const lookup = async (params, iter = 0) => {
   let newParams = { ...params, result };
   let index = indexName(newParams);
   const { body } = await client
-    .search({
-      index,
-      body: lookupQuery({ ...newParams }),
-      rest_total_hits_as_int: true,
-    })
+    .search(
+      {
+        index,
+        body: lookupQuery({ ...newParams }),
+        rest_total_hits_as_int: true,
+      },
+      { meta: true }
+    )
     .catch((err) => {
       return err.meta;
     });
@@ -125,11 +131,14 @@ const suggest = async (params, iter = 0) => {
   let newParams = { ...params, result };
   let index = indexName(newParams);
   const { body } = await client
-    .search({
-      index,
-      body: suggestQuery({ ...newParams }),
-      rest_total_hits_as_int: true,
-    })
+    .search(
+      {
+        index,
+        body: suggestQuery({ ...newParams }),
+        rest_total_hits_as_int: true,
+      },
+      { meta: true }
+    )
     .catch((err) => {
       return err.meta;
     });

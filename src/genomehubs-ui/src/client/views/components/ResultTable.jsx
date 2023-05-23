@@ -3,7 +3,7 @@ import { makeStyles, withStyles } from "@material-ui/core/styles";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
-import Box from "@material-ui/core/TableContainer";
+import Badge from "@material-ui/core/Badge";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -46,6 +46,18 @@ const StyledTableRow = withStyles((theme) => ({
     width: "100%",
   },
 }))(TableRow);
+
+const StyledBadge = withStyles((theme) => ({
+  badge: {
+    right: "50%",
+    top: 6,
+    fontSize: "0.8em",
+    border: `2px solid ${theme.palette.background.paper}`,
+    padding: "0 4px",
+    color: "white",
+    backgroundColor: "rgba(0,0,0,0.26)",
+  },
+}))(Badge);
 
 export const useStyles = makeStyles((theme) => ({
   root: {
@@ -207,10 +219,15 @@ const SortableCell = ({
           active={sortBy === name}
           direction={sortOrder}
           onClick={() =>
-            handleTableSort({
-              sortBy: name,
-              sortOrder: sortDirection && sortOrder === "asc" ? "desc" : "asc",
-            })
+            handleTableSort(
+              sortDirection && sortOrder === "desc"
+                ? { sortBy: "none" }
+                : {
+                    sortBy: name,
+                    sortOrder:
+                      sortDirection && sortOrder === "asc" ? "desc" : "asc",
+                  }
+            )
           }
         >
           {/* {name} */}
@@ -304,6 +321,7 @@ const SortableCell = ({
                     setAttributeSettings({
                       attributeId: prefix,
                       adjustColumns: true,
+                      currentRecordId: "none",
                       showAttribute: true,
                     });
                   }}
@@ -338,9 +356,16 @@ const ResultTable = ({
   const rootRef = useRef(null);
   let expandedTypes = [];
   if (searchTerm) {
-    expandedTypes = searchTerm.fields.split(",").map((name) => ({
-      name,
-    }));
+    if (searchTerm.fields) {
+      expandedTypes = searchTerm.fields
+        .split(",")
+        .map((name) => ({
+          name,
+        }))
+        .filter((obj) => obj.name != "none");
+    } else {
+      expandedTypes = displayTypes;
+    }
   }
 
   if (searchResults && searchResults.status.error) {
@@ -585,24 +610,42 @@ const ResultTable = ({
       ) {
         let field = result.result.fields[type.name];
         let value = field.value;
+        let entries = [];
         if (Array.isArray(value)) {
-          value = value[0];
-        }
-        value = formatter(value, searchIndex);
-        if (Array.isArray(field.value) && field.length > 1) {
-          value = `${value} ...`;
-          let list = field.value.slice(0, 3).join(", ");
-          if (field.length > 3) {
-            if (field.length > 4) {
-              list = `${list}, ... (${field.length - 3} more)`;
-            } else {
-              list = field.value.slice(0, 4).join(", ");
+          value = formatter(value, searchIndex, "array");
+          let charLimit = 20;
+          for (let v of value.values) {
+            let entry = v[0];
+            if (charLimit == 20 || charLimit - entry.length > 0) {
+              entries.push(entry);
+              charLimit -= entry.length;
             }
           }
+          value = entries.join(", ");
+          if (field.value.length > 1) {
+            length = field.value.length;
+            // if (field.value.length > entries.length) {
+            //   value += ", ...";
+            // }
+          }
+        } else {
+          value = formatter(value, searchIndex);
+        }
+        if (Array.isArray(field.value) && field.length > entries.length) {
+          // let list = entries.join(", ");
+          // list = `${list}, ... (${field.length - entries.length} more)`;
+          let badgeContent = `+${field.length - entries.length}`;
           value = (
-            <Tooltip title={list} placement="top" arrow>
-              <span>{value}</span>
-            </Tooltip>
+            // <Tooltip title={list} placement="top" arrow>
+            <span>
+              {value}
+              <StyledBadge badgeContent={badgeContent} color={"default"}>
+                <span style={{ padding: "0 6px", color: "rgba(0,0,0,0" }}>
+                  {badgeContent}
+                </span>
+              </StyledBadge>
+            </span>
+            // </Tooltip>
           );
         }
         cells.push(
@@ -743,7 +786,7 @@ const ResultTable = ({
       />
     );
   }
-  expandedTypes.forEach((type) => {
+  for (let type of expandedTypes) {
     let sortDirection = sortBy === type.name ? sortOrder : false;
     heads.push(
       <SortableCell
@@ -766,7 +809,7 @@ const ResultTable = ({
         handleToggleExclusion={handleToggleExclusion}
       />
     );
-  });
+  }
   heads.push(<TableCell key={"last"}></TableCell>);
 
   return (

@@ -22,6 +22,15 @@ export const apiStatus = handleAction(
 );
 export const getApiStatus = (state) => state.apiStatus;
 
+export const setApiAttempt = createAction("SET_API_ATTEMPT");
+export const apiAttempt = handleAction(
+  "SET_API_ATTEMPT",
+  (state, action) => action.payload,
+  1
+);
+export const getApiAttempt = (state) => state.apiAttempt;
+
 export const apiReducers = {
+  apiAttempt,
   apiStatus,
 };

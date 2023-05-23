@@ -11,14 +11,15 @@ import dtolLogo from "./img/dtol-logo.png";
 import qs from "../functions/qs";
 import sangerLogo from "./img/sanger-logo.png";
 import styles from "./Styles.scss";
+import withApi from "../hocs/withApi";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withVersion from "../hocs/withVersion";
 
-const Footer = ({ version, fetchTypes, hidden, taxonomy }) => {
+const Footer = ({ version, fetchTypes, hidden, taxonomy, apiStatus }) => {
   let options = qs.parse(location.search.replace(/^\?/, ""));
   useEffect(() => {
     fetchTypes("multi", options.taxonomy || taxonomy);
-  }, []);
+  }, [taxonomy, apiStatus]);
   if (hidden) {
     return null;
   }
@@ -49,17 +50,15 @@ const Footer = ({ version, fetchTypes, hidden, taxonomy }) => {
           {dataRelease}
         </Grid>
         <Grid item xs={6}>
-          <img
-            src={sangerLogo}
-            href="https://www.sanger.ac.uk/"
-            target="_blank"
-          />
-          <img
-            src={dtolLogo}
-            href="https://www.darwintreeoflife.org"
-            target="_blank"
-          />
-          <img src={bbsrcLogo} href="https://bbsrc.ukri.org/" target="_blank" />
+          <a href="https://www.sanger.ac.uk/" target="_blank">
+            <img src={sangerLogo} />
+          </a>
+          <a href="https://www.darwintreeoflife.org" target="_blank">
+            <img src={dtolLogo} />
+          </a>
+          <a href="https://bbsrc.ukri.org/" target="_blank">
+            <img src={bbsrcLogo} />
+          </a>
         </Grid>
         <Grid item xs={3}>
           <span style={{ float: "right", marginRight: "1em" }}>
@@ -83,6 +82,7 @@ export default compose(
   memo,
   dispatchRecord,
   withVersion,
+  withApi,
   withTaxonomy,
   dispatchTypes
 )(Footer);

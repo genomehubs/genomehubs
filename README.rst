@@ -16,9 +16,18 @@ GenomeHubs
     :alt: Supported versions
     :target: https://pypi.org/project/genomehubs
 
+.. |conda| image:: https://anaconda.org/tolkit/genomehubs/badges/installer/conda.svg
+    :alt: Install with Conda
+    :target: https://anaconda.org/tolkit/genomehubs
+
+.. |platforms| image:: https://anaconda.org/tolkit/genomehubs/badges/platforms.svg
+    :alt: Conda platforms
+    :target: https://anaconda.org/tolkit/genomehubs
+
+.. |commits-since| image:: https://img.shields.io/github/commits-since/genomehubs/genomehubs/2.7.1.svg
 .. |commits-since| image:: https://img.shields.io/github/commits-since/genomehubs/genomehubs/2.6.8.svg?style=flat-square
     :alt: Commits since latest release
-    :target: https://github.com/genomehubs/genomehubs/compare/2.6.8...main
+    :target: https://github.com/genomehubs/genomehubs/compare/2.7.1...main
 
 .. |license| image:: https://anaconda.org/tolkit/genomehubs/badges/license.svg
     :alt: MIT License

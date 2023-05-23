@@ -25,7 +25,7 @@ def read(*names, **kwargs):
 
 setup(
     name="genomehubs",  # Required
-    version="2.6.8",
+    version="2.7.1",
     description="GenomeHubs",  # Optional
     long_description="%s\n%s"
     % (
@@ -99,7 +99,7 @@ setup(
     install_requires=[
         "biopython>=1.78",
         "docopt>=0.6.2",
-        "elasticsearch>=7.8.1,<7.14.0",
+        "elasticsearch==8.7",
         "fastjsonschema>=2.15.3",
         "filetype>=1.0.7",
         "h3>=3.7.4",
@@ -108,7 +108,11 @@ setup(
         "sparqlwrapper>=1.4.1",
         "tolkein>=0.5.0",
         "ujson>=3.0.0",
+        "urllib3>=1.26.2, <2",  # for elastic-transport
     ],  # Optional
+    setup_requires=[
+        "wheel",
+    ],
     # List additional groups of dependencies here (e.g. development
     # dependencies). Users will be able to install these using the "extras"
     # syntax, for example:
