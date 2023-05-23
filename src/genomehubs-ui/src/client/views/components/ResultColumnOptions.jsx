@@ -135,7 +135,17 @@ const ResultColumnOptions = ({
     let newFields = summaryCols.map((summary) =>
       summary == "value" ? attributeId : `${attributeId}:${summary}`
     );
-    let fields = searchTerm.fields ? searchTerm.fields.split(",") : [];
+    let fields = [];
+    if (searchTerm.fields) {
+      fields = searchTerm.fields.split(",");
+    } else {
+      fields = Object.entries(types)
+        .filter(
+          ([_, v]) => v.group == searchTerm.result && v.display_level == 1
+        )
+        .map(([k]) => k);
+    }
+
     let index = fields.findIndex(
       (f) => f == attributeId || f.startsWith(`${attributeId}:`)
     );
