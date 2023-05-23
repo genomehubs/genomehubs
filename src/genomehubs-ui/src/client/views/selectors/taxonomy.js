@@ -1,3 +1,4 @@
+import { apiUrl, getApiAttempt, setApiAttempt } from "../reducers/api";
 import {
   getTaxonomies,
   getTaxonomiesFetching,
@@ -7,7 +8,6 @@ import {
   setCurrentTaxonomy,
 } from "../reducers/taxonomy";
 
-import { apiUrl } from "../reducers/api";
 import { setApiStatus } from "../reducers/api";
 import store from "../store";
 
@@ -34,20 +34,30 @@ export function fetchTaxonomies() {
       }
       dispatch(receiveTaxonomies(json));
       dispatch(setCurrentTaxonomy(json[0]));
-    } catch (err) {
-      return dispatch(setApiStatus(false));
-    }
-    url = `${apiUrl}/indices`;
-    try {
-      let json;
-      try {
-        const response = await fetch(url);
-        json = await response.json();
-      } catch (error) {
-        json = console.log("An error occured.", error);
+
+      if (json && json.length > 0) {
+        dispatch(setApiStatus(true));
+
+        url = `${apiUrl}/indices`;
+        try {
+          let json;
+          try {
+            const response = await fetch(url);
+            json = await response.json();
+          } catch (error) {
+            json = console.log("An error occured.", error);
+          }
+          dispatch(receiveIndices(json));
+          // dispatch(setApiStatus(true));
+        } catch (err) {
+          return dispatch(setApiStatus(false));
+        }
+      } else {
+        dispatch(setApiAttempt(getApiAttempt(state) + 1));
+        dispatch(setApiStatus(false));
       }
-      dispatch(receiveIndices(json));
     } catch (err) {
+      dispatch(setApiAttempt(getApiAttempt(state) + 1));
       return dispatch(setApiStatus(false));
     }
   };

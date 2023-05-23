@@ -9,7 +9,7 @@ import Typography from "@material-ui/core/Typography";
 import { compose } from "recompose";
 import { makeStyles } from "@material-ui/core/styles";
 import useWindowDimensions from "../hooks/useWindowDimensions";
-import withApiUrl from "../hocs/withApiUrl";
+import withApi from "../hocs/withApi";
 
 function getModalStyle() {
   return {
@@ -195,4 +195,4 @@ export const FileModal = ({ meta, apiUrl, link, children }) => {
   );
 };
 
-export default compose(withApiUrl)(FileModal);
+export default compose(withApi)(FileModal);

@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const DefaultLayout = ({ types }) => {
+const DefaultLayout = ({}) => {
   const classes = useStyles();
   return (
     <Grid
@@ -48,12 +48,12 @@ const DefaultLayout = ({ types }) => {
         <Header />
       </Grid>
       <Grid item className={classes.item} xs={true}>
-        {types && Object.keys(types).length > 0 && (
-          <>
-            <Main />
-            <DownloadMessage />
-          </>
-        )}
+        {/* {types && Object.keys(types).length > 0 && ( */}
+        <>
+          <Main />
+          <DownloadMessage />
+        </>
+        {/* )} */}
       </Grid>
       <Grid item className={classes.item} xs={1}>
         <Footer />
@@ -77,14 +77,15 @@ const SearchLayout = (props) => {
 
 const Layout = ({ types, basename }) => {
   const [paths, setPaths] = useState([]);
-  let typeString = JSON.stringify(types);
+  // let typeString = JSON.stringify(types);
+  // console.log(typeString);
   useEffect(() => {
     setPaths([
-      <DefaultLayout path="/*" key={0} types={types} />,
+      <DefaultLayout path="/*" key={0} types={{}} />,
       <ReportLayout path="/reporturl" key={1} />,
       <SearchLayout path="/searchurl" key={2} />,
     ]);
-  }, [typeString]);
+  }, []);
   return (
     <>
       <Router className={styles.fillParent} basepath={basename} primary={false}>
@@ -94,4 +95,4 @@ const Layout = ({ types, basename }) => {
   );
 };
 
-export default compose(memo, withSiteName, withTypes)(Layout);
+export default compose(memo, withSiteName)(Layout);

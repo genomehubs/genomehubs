@@ -35,6 +35,7 @@ export function fetchSummary(lineage, field, summary, taxonomy, result) {
         json = console.log("An error occured.", error);
       }
       dispatch(receiveSummary(json));
+      // dispatch(setApiStatus(true));
     } catch (err) {
       return dispatch(setApiStatus(false));
     }
