@@ -848,16 +848,18 @@ export const getTypes = async (params) => {
     taxonomy: params.taxonomy,
   });
   let byGroup = {};
-  Object.keys(typesMap).forEach((key) => {
+  Object.entries(typesMap).forEach(([key, value]) => {
     let group = typesMap[key].display_group;
     if (!byGroup[group]) {
       byGroup[group] = [];
     }
-    byGroup[group].push(key);
+    byGroup[group].push({ key, ...value });
   });
   Object.values(byGroup).forEach((values) => {
-    values = values.sort((a, b) => a.localeCompare(b));
+    values = values.sort((a, b) => a.name.localeCompare(b.name));
   });
+  return { report: { types: byGroup } };
+
   // search ranks
   let index = indexName({ ...params });
   let query = await aggregateRanks({});
