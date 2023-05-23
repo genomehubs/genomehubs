@@ -1,6 +1,34 @@
 import { client } from "../functions/connection";
 import { indexName } from "../functions/indexName";
 
+const queryByName = ({ taxon, rank }) => {
+  return {
+    query: {
+      bool: {
+        filter: [
+          {
+            multi_match: {
+              query: taxon,
+              fields: ["taxon_id", "scientific_name"],
+            },
+          },
+          { match: { taxon_rank: rank } },
+        ],
+      },
+    },
+    _source: {
+      includes: [
+        "taxon_id",
+        "taxon_rank",
+        "scientific_name",
+        "parent",
+        "taxon_names.*",
+        "lineage.*",
+      ],
+    },
+  };
+};
+
 export const getCatLabels = async ({
   cat,
   cats,
@@ -13,10 +41,10 @@ export const getCatLabels = async ({
   let labels = [];
   cats.forEach((obj) => {
     qBody.push({ index });
-    qBody.push({ id: "taxon_by_name", params: { taxon: obj.key, rank: cat } });
+    qBody.push(queryByName({ taxon: obj.key, rank: cat }));
   });
   const { body } = await client
-    .msearchTemplate(
+    .msearch(
       {
         body: qBody,
         rest_total_hits_as_int: true,
@@ -26,8 +54,6 @@ export const getCatLabels = async ({
     .catch((err) => {
       return err.meta;
     });
-  // TODO: debug occassional error here
-  // - diff between instances with same index even though qBody identical
   if (body.responses) {
     body.responses.forEach((doc, i) => {
       if (doc.hits.total == 1) {
