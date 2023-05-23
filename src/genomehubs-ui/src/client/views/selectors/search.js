@@ -110,6 +110,7 @@ export function fetchSearchResults(options, navigate) {
           });
         }
         dispatch(receiveSearch(json));
+        // dispatch(setApiStatus(true));
       }
     } catch (err) {
       dispatch(cancelSearch);

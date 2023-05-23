@@ -236,6 +236,7 @@ export function fetchReport({ reportId, reload, report, hideMessage }) {
 
         // }
         dispatch(receiveReport({ json, reportId }));
+        // dispatch(setApiStatus(true));
       }
     } catch (err) {
       return dispatch(setApiStatus(false));

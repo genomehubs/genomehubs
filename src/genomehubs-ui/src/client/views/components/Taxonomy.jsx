@@ -1,27 +1,65 @@
-import React, { memo, useEffect } from "react";
+import React, { memo, useEffect, useState } from "react";
 
 import BasicMenu from "./BasicMenu";
 import { compose } from "recompose";
+import dispatchMessage from "../hocs/dispatchMessage";
 import dispatchRecord from "../hocs/dispatchRecord";
 import qs from "../functions/qs";
+import { setMessage } from "../reducers/message";
 import { useNavigate } from "@reach/router";
+import withApi from "../hocs/withApi";
 import withTaxonomy from "../hocs/withTaxonomy";
 
 const Taxonomy = ({
+  apiStatus,
+  attempt,
   fetchTaxonomies,
   resetRecord,
+  setMessage,
   setTaxonomy,
   taxonomy = "",
   taxonomies = [],
   display = true,
 }) => {
   let options = qs.parse(location.search.replace(/^\?/, ""));
+  const multiple = 5;
+  const interval = 1000;
+  const [duration, setDuration] = useState(attempt * multiple * interval);
+
   useEffect(() => {
     if (taxonomies.length == 0) {
-      fetchTaxonomies();
+      const timer = setTimeout(
+        () => {
+          setDuration(duration);
+          fetchTaxonomies();
+        },
+        apiStatus ? 100 : duration
+      );
+      setDuration(attempt * multiple * interval);
+      return () => clearTimeout(timer);
     }
     setTaxonomy(options.taxonomy);
   }, [options.taxonomy]);
+
+  useEffect(() => {
+    if (apiStatus) {
+      setMessage({
+        message: "",
+        duration: 0,
+        severity: "info",
+      });
+    } else {
+      setMessage({
+        message: `Unable to connect to API, retrying in ${duration / 1000}s`,
+        duration: duration + interval,
+        severity: "warning",
+      });
+      const timer = setTimeout(() => {
+        setDuration(duration - interval);
+      }, interval);
+      return () => clearTimeout(timer);
+    }
+  }, [apiStatus, duration]);
   const navigate = useNavigate();
 
   const handleTaxonomyChange = (value) => {
@@ -45,4 +83,10 @@ const Taxonomy = ({
   );
 };
 
-export default compose(memo, withTaxonomy, dispatchRecord)(Taxonomy);
+export default compose(
+  memo,
+  withApi,
+  dispatchMessage,
+  withTaxonomy,
+  dispatchRecord
+)(Taxonomy);

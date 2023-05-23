@@ -99,6 +99,7 @@ export function fetchRecord(recordId, result, taxonomy, callback) {
         dispatch(resetRecord());
         callback(fetchedRecordId, result, taxonomy, fetchedTitle);
       }
+      // dispatch(setApiStatus(true));
     } catch (err) {
       return dispatch(setApiStatus(false));
     }

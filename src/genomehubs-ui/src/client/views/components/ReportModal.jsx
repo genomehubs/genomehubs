@@ -7,7 +7,7 @@ import { compose } from "recompose";
 import { makeStyles } from "@material-ui/core/styles";
 import { sortReportQuery } from "../selectors/report";
 import { useNavigate } from "@reach/router";
-import withApiUrl from "../hocs/withApiUrl";
+import withApi from "../hocs/withApi";
 import withSiteName from "../hocs/withSiteName";
 
 function getModalStyle() {
@@ -101,4 +101,4 @@ export const ReportModal = ({
   );
 };
 
-export default compose(withSiteName, withApiUrl)(ReportModal);
+export default compose(withSiteName, withApi)(ReportModal);

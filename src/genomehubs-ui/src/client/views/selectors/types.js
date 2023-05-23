@@ -495,6 +495,11 @@ export function fetchTypes(result, taxonomy) {
       }
       json.index = result;
       dispatch(receiveTypes(json));
+      if (json && Object.keys(json.fields).length > 0) {
+        dispatch(setApiStatus(true));
+      } else {
+        dispatch(setApiStatus(false));
+      }
     } catch (err) {
       return dispatch(setApiStatus(false));
     }

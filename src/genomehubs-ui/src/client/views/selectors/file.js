@@ -26,6 +26,7 @@ export function fetchFiles(options) {
         json = console.log("An error occured.", error);
       }
       dispatch(receiveFiles(json));
+      // dispatch(setApiStatus(true));
     } catch (err) {
       dispatch(cancelFiles);
       return dispatch(setApiStatus(false));
