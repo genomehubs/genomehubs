@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
 
 import Grid from "@material-ui/core/Grid";
 import LaunchIcon from "@material-ui/icons/Launch";
@@ -11,6 +12,13 @@ import TableRow from "@material-ui/core/TableRow";
 import Tooltip from "@material-ui/core/Tooltip";
 import { compose } from "recompose";
 import withTypes from "../hocs/withTypes";
+
+const StyledTableCell = withStyles((theme) => ({
+  head: {
+    backgroundColor: "#eeeeee",
+    fontWeight: 700,
+  },
+}))(TableCell);
 
 const ReportSources = ({ sources, minDim, types }) => {
   let rows = [];
@@ -109,12 +117,12 @@ const ReportSources = ({ sources, minDim, types }) => {
   });
   return (
     <Grid item xs style={{ maxHeight: minDim, overflowY: "auto" }}>
-      <Table>
+      <Table stickyHeader size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Source</TableCell>
-            <TableCell>Values</TableCell>
-            <TableCell>Attributes</TableCell>
+            <StyledTableCell>Source</StyledTableCell>
+            <StyledTableCell>Values</StyledTableCell>
+            <StyledTableCell>Attributes</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>{rows}</TableBody>

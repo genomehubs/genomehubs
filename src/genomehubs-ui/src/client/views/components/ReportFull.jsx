@@ -105,7 +105,11 @@ export const ReportFull = ({
   );
 
   let content;
-  if (report == "sources" || location.pathname == basename + "/reporturl") {
+  if (
+    report == "sources" ||
+    report == "types" ||
+    location.pathname == basename + "/reporturl"
+  ) {
     content = (
       <Grid
         container
@@ -175,7 +179,7 @@ export const ReportFull = ({
     <div
       style={{ marginLeft, height, width, maxHeight: "150%" }}
       onClick={(e) => {
-        if (report != "sources") {
+        if (report != "sources" && report != "types") {
           e.preventDefault();
           e.stopPropagation();
         }

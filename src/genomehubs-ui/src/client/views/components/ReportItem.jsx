@@ -13,6 +13,7 @@ import ReportScatter from "./ReportScatter";
 import ReportSources from "./ReportSources";
 import ReportTable from "./ReportTable";
 import ReportTree from "./ReportTree";
+import ReportTypes from "./ReportTypes";
 import ReportXPerRank from "./ReportXPerRank";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
@@ -351,6 +352,18 @@ const ReportItem = ({
             levels={levels}
             hidePreview={hideMessage}
             {...qs.parse(queryString)}
+            minDim={minDim}
+            setMinDim={setMinDim}
+          />
+        );
+        break;
+      case "types":
+        component = (
+          <ReportTypes
+            types={reportById.report.types}
+            chartRef={chartRef}
+            embedded={embedded}
+            containerRef={containerRef}
             minDim={minDim}
             setMinDim={setMinDim}
           />
