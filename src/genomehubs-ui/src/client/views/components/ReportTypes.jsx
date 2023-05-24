@@ -38,6 +38,10 @@ export const useStyles = makeStyles(() => ({
     // color: "#666666",
     fontWeight: 700,
   },
+  expandableConstraint: {
+    cursor: "pointer",
+    fontWeight: 700,
+  },
 }));
 
 const StyledTableCell = withStyles((theme) => ({
@@ -124,7 +128,9 @@ const TypeCell = ({ display_type, constraint, classes }) => {
           placement={"top"}
         >
           <span
-            className={classes.constraint}
+            className={
+              expandable ? classes.expandableConstraint : classes.constraint
+            }
             onClick={() => setExpanded(!expanded)}
           >
             {" "}
@@ -294,8 +300,8 @@ const ReportTypes = ({ minDim, types }) => {
         <TableHead>
           <TableRow>
             <StyledTableCell>Display group</StyledTableCell>
-            <StyledTableCell>Field name</StyledTableCell>
-            <StyledTableCell>Field type</StyledTableCell>
+            <StyledTableCell>Attribute name</StyledTableCell>
+            <StyledTableCell>Attribute type</StyledTableCell>
             <StyledTableCell>Summary function</StyledTableCell>
           </TableRow>
         </TableHead>
