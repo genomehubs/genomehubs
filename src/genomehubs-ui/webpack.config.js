@@ -28,7 +28,8 @@ const config = {
     main: ["@babel/polyfill", APP_DIR + "/index.jsx"],
   },
   output: {
-    publicPath: main.mode == "production" ? main.basename + "/" : "/",
+    publicPath:
+      main.mode == "production" ? main.basename + "/" : main.basename + "/",
     path: BUILD_DIR + "/",
     // filename: devMode ? "js/bundle.js" : "js/[name].[contenthash].js",
     filename: "js/[name].[contenthash].js",
@@ -230,7 +231,10 @@ $descendantColor: ${main.descendantColor};`,
         loader: "file-loader",
         options: {
           name: "img/[contenthash].[ext]",
-          publicPath: main.mode == "production" ? main.basename + "/" : "/",
+          publicPath:
+            main.mode == "production"
+              ? main.basename + "/"
+              : main.basename + "/",
         },
       },
       {
