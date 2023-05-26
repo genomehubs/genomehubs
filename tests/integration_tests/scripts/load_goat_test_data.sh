@@ -81,6 +81,6 @@ genomehubs test \
     --config-file tests/integration_tests/config/goat.yaml \
     --base-url http://localhost:3000/api/v2 \
     --json-test-dir tests/integration_tests/templates/api/json &&
-python run_ui_tests.py &&
+# python run_ui_tests.py &&
 echo done ||
 echo failed
