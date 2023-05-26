@@ -95,9 +95,11 @@ jobs:
       - name: Run genomehubs init
         run: |
           curl -X DELETE "http://localhost:9200/*--*"
-          chmod -R 
+          chmod -R
+          mkdir -p projects/genomehubs/goat-resources
           docker run --rm --network=host \
             -u $UID:$GROUPS \
+            -v `pwd`/projects/genomehubs/goat-resources:/projects/genomehubs/goat-resources \
             -v `pwd`/tests:/genomehubs/tests \
             genomehubs bash -c \
               "genomehubs init \
@@ -113,6 +115,7 @@ jobs:
         run: |
           docker run --rm --network=host \
             -u $UID:$GROUPS \
+            -v `pwd`/projects/genomehubs/goat-resources:/projects/genomehubs/goat-resources \
             -v `pwd`/tests:/genomehubs/tests \
             genomehubs bash -c \
               "genomehubs parse \
@@ -122,6 +125,7 @@ jobs:
         run: |
           docker run --rm --network=host \
             -u $UID:$GROUPS \
+            -v `pwd`/projects/genomehubs/goat-resources:/projects/genomehubs/goat-resources \
             -v `pwd`/tests:/genomehubs/tests \
             genomehubs bash -c \
               "genomehubs index \
@@ -178,6 +182,7 @@ jobs:
         run: |
           docker run --rm --network=host \
             -u $UID:$GROUPS \
+            -v `pwd`/projects/genomehubs/goat-resources:/projects/genomehubs/goat-resources \
             -v `pwd`/tests:/genomehubs/tests \
             genomehubs bash -c \
               "genomehubs fill \
@@ -190,6 +195,7 @@ jobs:
         run: |
           docker run --rm --network=host \
             -u $UID:$GROUPS \
+            -v `pwd`/projects/genomehubs/goat-resources:/projects/genomehubs/goat-resources \
             -v `pwd`/tests:/genomehubs/tests \
             genomehubs bash -c \
               "genomehubs index \
@@ -208,6 +214,7 @@ jobs:
         run: |
           docker run --rm --network=host \
             -u $UID:$GROUPS \
+            -v `pwd`/projects/genomehubs/goat-resources:/projects/genomehubs/goat-resources \
             -v `pwd`/tests:/genomehubs/tests \
             genomehubs bash -c \
               "genomehubs test \
