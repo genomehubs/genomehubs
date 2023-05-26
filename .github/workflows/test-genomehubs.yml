@@ -93,10 +93,10 @@ jobs:
       - name: Build docker image
         working-directory: ./src/docker
         run: docker build . -t genomehubs
-      - name: Start API
-        run: |
-          chmod 755 dist/artifact/genomehubs-api-linux
-          GH_RELEASE=2021.10.15 GH_HUBNAME=goat ./dist/artifact/genomehubs-api-linux
+      # - name: Start API
+      #   run: |
+      #     chmod 755 dist/artifact/genomehubs-api-linux
+      #     GH_RELEASE=2021.10.15 GH_HUBNAME=goat ./dist/artifact/genomehubs-api-linux
       - name: Run test import
         run: |
           docker run --rm -d \
