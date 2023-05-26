@@ -48,7 +48,7 @@ jobs:
           path: ./dist/*
 
   run-test-fill:
-    runs-on: self-hosted
+    runs-on: ubuntu-20.04
     needs:
       - package-api
       - package-ui
@@ -82,10 +82,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: ./dist
-      # - name: Setup conda
-      #   uses: conda-incubator/setup-miniconda@v2
-      #   with:
-      #     activate-environment: test
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: "3.8"
       - name: Pip install genomehubs
         run: |
           which python
