@@ -75,15 +75,15 @@ jobs:
     #       search.max_buckets: 16384
     steps:
       - uses: actions/checkout@v3
-      - name: Check health
-        run: |
-          curl -s "http://localhost:9200/_cat/health" && exit 0
-          sleep 10
-          curl -s "http://localhost:9200/_cat/health" && exit 0
-          sleep 10
-          curl -s "http://localhost:9200/_cat/health" && exit 0
-          sleep 10
-          curl -s "http://localhost:9200/_cat/health" && exit 0 || exit 1
+      # - name: Check health
+      #   run: |
+      #     curl -s "http://localhost:9200/_cat/health" && exit 0
+      #     sleep 10
+      #     curl -s "http://localhost:9200/_cat/health" && exit 0
+      #     sleep 10
+      #     curl -s "http://localhost:9200/_cat/health" && exit 0
+      #     sleep 10
+      #     curl -s "http://localhost:9200/_cat/health" && exit 0 || exit 1
       - name: Collect artifacts
         uses: actions/download-artifact@v3
         with:
