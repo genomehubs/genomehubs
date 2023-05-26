@@ -379,9 +379,7 @@ class EsQueryBuilder:
     def es_nested(self, path, bool_type="filter"):
         """Nested query."""
         self.es_bool(bool_type)
-        obj = {
-            "nested": {"path": path, "query": self._parts[0], "ignore_unmapped": True}
-        }
+        obj = {"nested": {"path": path, "query": self._parts[0]}}
         self._parts = [obj]
         return self
 
