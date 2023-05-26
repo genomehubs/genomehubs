@@ -44,6 +44,10 @@ jobs:
       - name: Install dependencies
         run: |
           # python3 -m pip install --upgrade pip
+          echo $USER
+          echo $GROUPS
+          echo $UID
+          exit 1
           pip install setuptools wheel twine
       - name: Build and publish
         run: |
@@ -95,8 +99,8 @@ jobs:
       - name: Run genomehubs init
         run: |
           curl -X DELETE "http://localhost:9200/*--*"
+          chmod -R 
           docker run --rm --network=host \
-            -u $USER:$GROUPS \
             -v `pwd`/tests:/genomehubs/tests \
             genomehubs bash -c \
               "genomehubs init \
@@ -111,7 +115,6 @@ jobs:
       - name: Run genomehubs parse
         run: |
           docker run --rm --network=host \
-            -u $USER:$GROUPS \
             -v `pwd`/tests:/genomehubs/tests \
             genomehubs bash -c \
               "genomehubs parse \
@@ -120,7 +123,6 @@ jobs:
       - name: Run genomehubs index
         run: |
           docker run --rm --network=host \
-            -u $USER:$GROUPS \
             -v `pwd`/tests:/genomehubs/tests \
             genomehubs bash -c \
               "genomehubs index \
@@ -176,7 +178,6 @@ jobs:
       - name: Run genomehubs fill
         run: |
           docker run --rm --network=host \
-            -u $USER:$GROUPS \
             -v `pwd`/tests:/genomehubs/tests \
             genomehubs bash -c \
               "genomehubs fill \
@@ -188,7 +189,6 @@ jobs:
       - name: Index BTK files
         run: |
           docker run --rm --network=host \
-            -u $USER:$GROUPS \
             -v `pwd`/tests:/genomehubs/tests \
             genomehubs bash -c \
               "genomehubs index \
@@ -206,7 +206,6 @@ jobs:
       - name: Run API tests
         run: |
           docker run --rm --network=host \
-            -u $USER:$GROUPS \
             -v `pwd`/tests:/genomehubs/tests \
             genomehubs bash -c \
               "genomehubs test \
