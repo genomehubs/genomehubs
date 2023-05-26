@@ -12,7 +12,7 @@ RUN apt-get update \
     pigz \
     wget
 
-RUN mkdir -p /genomehubs
+RUN mkdir -p /genomehubs/tests
 
 RUN useradd -m genomehubs \
     && chown -R genomehubs:genomehubs /genomehubs
