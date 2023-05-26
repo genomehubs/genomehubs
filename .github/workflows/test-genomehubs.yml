@@ -97,7 +97,7 @@ jobs:
           curl -X DELETE "http://localhost:9200/*--*"
           docker run --rm --network=host \
             -v `pwd`/tests:/genomehubs/tests \
-            genomehubs/genomehubs:$GENOMEHUBS_TAG bash -c \
+            genomehubs bash -c \
               "genomehubs init \
                 --config-file tests/integration_tests/config/goat.yaml \
                 --taxonomy-source ncbi \
@@ -111,7 +111,7 @@ jobs:
         run: |
           docker run --rm --network=host \
             -v `pwd`/tests:/genomehubs/tests \
-            genomehubs/genomehubs:$GENOMEHUBS_TAG bash -c \
+            genomehubs bash -c \
               "genomehubs parse \
                 --ncbi-datasets-sample tests/integration_tests/data/assembly-data-sample/eukaryota \
                 --outfile tests/integration_tests/data/assembly-data-sample/ncbi_datasets.tsv"
@@ -119,7 +119,7 @@ jobs:
         run: |
           docker run --rm --network=host \
             -v `pwd`/tests:/genomehubs/tests \
-            genomehubs/genomehubs:$GENOMEHUBS_TAG bash -c \
+            genomehubs bash -c \
               "genomehubs index \
                 --config-file tests/integration_tests/config/goat.yaml \
                 --taxonomy-source ncbi \
@@ -174,7 +174,7 @@ jobs:
         run: |
           docker run --rm --network=host \
             -v `pwd`/tests:/genomehubs/tests \
-            genomehubs/genomehubs:$GENOMEHUBS_TAG bash -c \
+            genomehubs bash -c \
               "genomehubs fill \
                 --config-file tests/integration_tests/config/goat.yaml \
                 --taxonomy-source ncbi \
