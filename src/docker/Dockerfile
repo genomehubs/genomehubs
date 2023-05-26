@@ -37,10 +37,10 @@ ENV PYTHONPATH $CONDA_DEFAULT_ENV/lib/python3.8/site-packages:$PYTHONPATH
 
 WORKDIR /tmp
 
-COPY genomehubs-${VERSION}-py3-none-manylinux2014_x86_64.whl ./
+COPY genomehubs-*-py3-none-manylinux2014_x86_64.whl ./
 
-RUN pip install ./genomehubs-${VERSION}-py3-none-manylinux2014_x86_64.whl \
-    && rm ./genomehubs-${VERSION}-py3-none-manylinux2014_x86_64.whl
+RUN pip install ./genomehubs-*-py3-none-manylinux2014_x86_64.whl \
+    && rm ./genomehubs-*-py3-none-manylinux2014_x86_64.whl
 
 WORKDIR /genomehubs
 
