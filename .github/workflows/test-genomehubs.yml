@@ -106,7 +106,7 @@ jobs:
             -e "search.max_buckets=16384" \
             -p 9200:9200 \
             -v es-data:/usr/share/elasticsearch/data \
-            elasticsearch:8.7.0
+            docker.elastic.co/elasticsearch/elasticsearch:8.7.1
           sleep 40
           curl -s "http://localhost:9200/_cat/health"
           mkdir -p projects/genomehubs/goat-resources
