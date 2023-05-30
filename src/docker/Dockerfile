@@ -44,6 +44,8 @@ RUN pip install ./genomehubs-*-py3-none-manylinux2014_x86_64.whl \
 
 WORKDIR /genomehubs
 
+COPY genomehubs-api-linux /genomehubs/genomehubs-api
+
 USER genomehubs
 
 CMD genomehubs -h
