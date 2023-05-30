@@ -68,9 +68,9 @@ jobs:
         with:
           path: ./dist
       - name: move wheel file
-        run: mv dist/artifact/*linux*.whl src/docker/
+        run: mv dist/artifact/*linux*.whl src/docker/test
       - name: move api executable
-        run: mv dist/artifact/genomehubs-api src/docker/genomehubs-api-linux
+        run: mv dist/artifact/genomehubs-api src/docker/test/genomehubs-api-linux
       - name: Build docker image
         working-directory: ./src/docker/test
         run: docker build . -t genomehubs
