@@ -46,6 +46,8 @@ WORKDIR /genomehubs
 
 COPY genomehubs-api-linux /genomehubs/genomehubs-api
 
+RUN chmod 755 genomehubs-api
+
 USER genomehubs
 
 CMD genomehubs -h
