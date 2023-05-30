@@ -12,7 +12,7 @@ RUN apt-get update \
     pigz \
     wget
 
-RUN mkdir -p /genomehubs
+RUN mkdir -p /genomehubs/tests
 
 RUN useradd -m genomehubs \
     && chown -R genomehubs:genomehubs /genomehubs
@@ -26,21 +26,21 @@ RUN wget -P /usr/local/src https://repo.anaconda.com/miniconda/Miniconda3-latest
 
 ARG CONDA_DIR=/opt/conda
 
-RUN $CONDA_DIR/bin/conda create -n genomehubs python=3.8 \
+RUN $CONDA_DIR/bin/conda create -n genomehubs python=3.9 \
     && $CONDA_DIR/bin/conda clean --all --yes
 
 ENV CONDA_DEFAULT_ENV $CONDA_DIR/envs/genomehubs
 
 ENV PATH $CONDA_DEFAULT_ENV/bin:$PATH
 
-ENV PYTHONPATH $CONDA_DEFAULT_ENV/lib/python3.8/site-packages:$PYTHONPATH
+ENV PYTHONPATH $CONDA_DEFAULT_ENV/lib/python3.9/site-packages:$PYTHONPATH
 
 WORKDIR /tmp
 
-COPY genomehubs-${VERSION}-py3-none-manylinux2014_x86_64.whl ./
+COPY genomehubs-*-py3-none-manylinux2014_x86_64.whl ./
 
-RUN pip install ./genomehubs-${VERSION}-py3-none-manylinux2014_x86_64.whl \
-    && rm ./genomehubs-${VERSION}-py3-none-manylinux2014_x86_64.whl
+RUN pip install ./genomehubs-*-py3-none-manylinux2014_x86_64.whl \
+    && rm ./genomehubs-*-py3-none-manylinux2014_x86_64.whl
 
 WORKDIR /genomehubs
 
