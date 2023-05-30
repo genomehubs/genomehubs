@@ -29,7 +29,9 @@ jobs:
         with:
           node-version: "16"
       - run: npm install -g pkg
-      - run: ./package-api.sh
+      - run: |
+          ./package-api.sh
+          mv ./dist/genomehubs-api-linux-x64 ./dist/genomehubs-api-linux
       - uses: actions/upload-artifact@v3
         with:
           path: ./dist/*
@@ -53,7 +55,6 @@ jobs:
           pip install setuptools wheel twine
           ./pip_install_latest.sh manylinux2014_x86_64
           genomehubs -v
-          mv ./dist/genomehubs-api-linux-x64 ./dist/genomehubs-api-linux
       - uses: actions/upload-artifact@v3
         with:
           name: artifact
