@@ -54,7 +54,7 @@ jobs:
           path: ./dist/*
 
   run-test-fill:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:
       - package-api
       - package-ui
@@ -99,15 +99,6 @@ jobs:
       #     GH_RELEASE=2021.10.15 GH_HUBNAME=goat ./dist/artifact/genomehubs-api-linux
       - name: Run test import
         run: |
-          docker run --rm -d \
-            -e "discovery.type=single-node" \
-            -e "xpack.security.enabled=false" \
-            -e "action.destructive_requires_name=false" \
-            -e "search.max_buckets=16384" \
-            -p 9200:9200 \
-            -v es-data:/usr/share/elasticsearch/data \
-            docker.elastic.co/elasticsearch/elasticsearch:8.8.0
-          sleep 40
           curl -s "http://localhost:9200/_cat/health"
           mkdir -p projects/genomehubs/goat-resources
           docker run --rm --network=host \
