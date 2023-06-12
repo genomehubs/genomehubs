@@ -9,6 +9,7 @@ import Report from "./Report";
 import Template from "./Template";
 import Toggle from "./Toggle";
 import Tooltip from "@material-ui/core/Tooltip";
+import YAML from "js-yaml";
 import classnames from "classnames";
 import { compose } from "recompose";
 import gfm from "remark-gfm";
@@ -27,9 +28,8 @@ import { withStyles } from "@material-ui/core/styles";
 
 const pagesUrl = PAGES_URL;
 const webpackHash = COMMIT_HASH || __webpack_hash__;
-// const webpackHash = COMMIT_HASH;
 
-export const processProps = (props, newProps = {}) => {
+export const processProps = ({ props, newProps = {} }) => {
   for (const [key, value] of Object.entries(props)) {
     if (value === false) {
       newProps[key] = value;
@@ -60,7 +60,7 @@ export const processProps = (props, newProps = {}) => {
 };
 
 export const RehypeComponentsList = {
-  a: (props) => <NavLink {...processProps(props)} />,
+  a: (props) => <NavLink {...processProps({ props })} />,
   aggregation: (props) => <AggregationIcon method={props.method} />,
   grid: (props) => {
     let { toggle, expand, title, ...gridProps } = props;
@@ -69,43 +69,62 @@ export const RehypeComponentsList = {
     }
     if (props.hasOwnProperty("toggle")) {
       return (
-        <Toggle {...processProps({ toggle, expand, title })}>
-          <Grid {...processProps(gridProps)} />
+        <Toggle {...processProps({ props: { toggle, expand, title } })}>
+          <Grid {...processProps({ props: gridProps })} />
         </Toggle>
       );
     } else {
-      return <Grid {...processProps(props)} />;
+      return <Grid {...processProps({ props })} />;
     }
   },
-  hub: (props) => <span {...processProps(props)}>{siteName}</span>,
+  hub: (props) => <span {...processProps({ props })}>{siteName}</span>,
   img: (props) => (
     <div className={styles.centerContent}>
-      <img {...processProps(props)} alt={props.alt.toString()} />
+      <img {...processProps({ props })} alt={props.alt.toString()} />
     </div>
   ),
   include: (props) => {
     let nested = <Nested pgId={props.pageId} />;
     return (
-      <Grid {...processProps(props)} item className={styles.reportContainer}>
+      <Grid
+        {...processProps({ props })}
+        item
+        className={styles.reportContainer}
+      >
         {nested}
       </Grid>
     );
   },
   item: (props) => (
-    <Grid {...processProps(props)} item className={styles.reportContainer} />
+    <Grid
+      {...processProps({ props })}
+      item
+      className={styles.reportContainer}
+    />
   ),
   markdown: (props) => <Nested pgId={props.pageId} />,
-  pre: (props) => <Highlight {...props} />,
+  pre: (props) => {
+    if (props.children?.[0]?.props?.className == "language-report") {
+      let reportProps = YAML.load(props.children[0].props.children[0] || "");
+      return (
+        <Report
+          {...processProps({ props: reportProps })}
+          className={styles.reportContainer}
+        />
+      );
+    }
+    return <Highlight {...processProps({ props })} />;
+  },
   report: (props) => (
-    <Report {...processProps(props)} className={styles.reportContainer} />
+    <Report {...processProps({ props })} className={styles.reportContainer} />
   ),
-  span: (props) => <span {...processProps(props)} />,
+  span: (props) => <span {...processProps({ props })} />,
   templat: (props) => (
-    <Template {...processProps(props)} className={styles.reportContainer} />
+    <Template {...processProps({ props })} className={styles.reportContainer} />
   ),
   tooltip: (props) => {
     return (
-      <Tooltip {...processProps(props, { placement: "top" })}>
+      <Tooltip {...processProps({ props, newProps: { placement: "top" } })}>
         <span>{props.children}</span>
       </Tooltip>
     );

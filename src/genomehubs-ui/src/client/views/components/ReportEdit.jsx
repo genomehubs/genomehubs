@@ -132,7 +132,7 @@ export const queryPropList = {
   ],
   arc: [
     "report",
-    ["x"],
+    "x",
     "y",
     rankSettings,
     "includeEstimates",

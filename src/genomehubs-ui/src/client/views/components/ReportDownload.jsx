@@ -226,22 +226,22 @@ export const ReportDownload = ({
       let propString = queryPropList[options.report]
         .map((entry) => (typeof entry === "string" ? entry : entry.prop))
         .filter((key) => options.hasOwnProperty(key))
-        .map((key) => `${key}="${options[key]}"`)
-        .join(" ");
+        .map((key) => `${key}: ${options[key]}`)
+        .join("\n");
       let text = [
         "# Report",
         "",
         `Exported from [${location.origin}${location.pathname}](${location.href})`,
         "",
         "## Embed in UI",
-        "```",
-        `::report{${propString}}`,
+        "```report",
+        `${propString}`,
         "```",
         "",
         "Notes:",
-        "- use `xs=` to control width if placing in a grid",
-        "- use `ratio=` to adjust width/height ratio",
-        "- use `pointSize=` to set font/point size",
+        "- use `xs:` to control width if placing in a grid",
+        "- use `ratio:` to adjust width/height ratio",
+        "- use `pointSize:` to set font/point size",
       ];
 
       let imageUrl = await exportChart({
