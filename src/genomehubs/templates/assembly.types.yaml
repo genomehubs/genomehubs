@@ -12,6 +12,7 @@ file:
   header: true
   needs:
     - ATTR_assembly.types.yaml
+    - TAXON_assembly.types.yaml
   organelle: nucleus
   source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   source: INSDC

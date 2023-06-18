@@ -1,0 +1,192 @@
+attributes:
+  assembly_level:
+    display_group: general
+    header: assemblyLevel
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  assembly_span:
+    display_group: general
+    header: totalSequenceLength
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  assembly_type:
+    display_group: general
+    header: assemblyType
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  bioproject:
+    display_group: general
+    header: bioProjectAccession
+    organelle: nucleus
+    separator:
+      - ;
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  biosample:
+    display_group: general
+    header: biosampleAccession
+    organelle: nucleus
+    separator:
+      - ;
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  chromosome_count:
+    display_group: general
+    header: totalNumberOfChromosomes
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  contig_count:
+    display_group: general
+    header: numberOfContigs
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  contig_l50:
+    display_group: general
+    header: contigL50
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  contig_n50:
+    display_group: general
+    header: contigN50
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  ebp_metric_date:
+    display_group: general
+    header: ebpMetricDate
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  gene_count:
+    display_group: general
+    header: geneCountTotal
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  isolate:
+    display_group: general
+    header: isolate
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  last_updated:
+    display_group: general
+    header: submissionDate
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  noncoding_gene_count:
+    display_group: general
+    header: geneCountNoncoding
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  protein_count:
+    display_group: general
+    header: geneCountProteincoding
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  pseudogene_count:
+    display_group: general
+    header: geneCountPseudogene
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  refseq_category:
+    display_group: general
+    header: refseqCategory
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  sample_sex:
+    display_group: general
+    header: sex
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  scaffold_count:
+    display_group: general
+    header: numberOfScaffolds
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  scaffold_l50:
+    display_group: general
+    header: scaffoldL50
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  scaffold_n50:
+    display_group: general
+    header: scaffoldN50
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  sequence_count:
+    display_group: general
+    header: numberOfComponentSequences
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  submitter:
+    display_group: general
+    header: submitter
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  ungapped_span:
+    display_group: general
+    display_name: Ungapped span
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+file:
+  display_group: general
+  exclusions:
+    attributes:
+      - bioproject
+      - biosample
+    identifiers:
+      - assembly_id
+    taxonomy:
+      - taxon_id
+  format: tsv
+  header: true
+  name: ncbi_datasets.tsv
+  needs:
+    - ATTR_assembly.types.yaml
+    - TAXON_assembly.types.yaml
+  organelle: nucleus
+  source: INSDC
+  source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+identifiers:
+  assembly_id:
+    header: genbankAssmAccession
+  assembly_name:
+    header: assemblyName
+  genbank_accession:
+    header: genbankAssmAccession
+  refseq_accession:
+    header: refseqAssmAccession
+  wgs_accession:
+    header: wgsProjectAccession
+metadata:
+  is_primary_value:
+    header: primaryValue
+  source_slug:
+    header: genbankAssmAccession
+names:
+  common_name:
+    header: commonName
+taxonomy:
+  taxon:
+    header: organismName
+  taxon_id:
+    header: taxId

@@ -1,0 +1,79 @@
+attributes:
+  bioproject:
+    taxon_display_group: assembly
+    taxon_summary:
+      - list
+    taxon_traverse: list
+    taxon_traverse_direction: up
+    taxon_display_level: 2
+  biosample:
+    taxon_display_group: assembly
+    taxon_summary:
+      - list
+    taxon_traverse: list
+    taxon_traverse_direction: up
+    taxon_display_level: 2
+  gene_count:
+    taxon_display_group: assembly
+    taxon_summary:
+      - primary
+      - median
+      - min
+      - max
+      - count
+    taxon_display_level: 2
+  assembly_level:
+    taxon_display_group: assembly
+    taxon_summary:
+      - primary
+      - enum
+    taxon_traverse: enum
+    taxon_traverse_direction: up
+  assembly_span:
+    taxon_display_group: assembly
+    taxon_summary:
+      - primary
+      - median
+      - min
+      - max
+      - count
+    taxon_traverse: median
+    taxon_traverse_direction: both
+  contig_n50:
+    taxon_display_group: assembly
+    taxon_summary:
+      - primary
+      - max
+      - median
+      - min
+      - count
+    taxon_traverse_direction: up
+    taxon_traverse: median
+    taxon_display_level: 2
+  scaffold_n50:
+    taxon_display_group: assembly
+    taxon_summary:
+      - primary
+      - max
+      - median
+      - min
+      - count
+    taxon_traverse_direction: up
+    taxon_traverse: median
+    taxon_display_level: 2
+  last_updated:
+    taxon_display_group: assembly
+    taxon_name: assembly_date
+    taxon_summary:
+      - primary
+      - max
+      - min
+    taxon_traverse: min
+    taxon_traverse_direction: up
+  ebp_metric_date:
+    taxon_display_group: assembly
+    taxon_summary:
+      - min
+      - max
+    taxon_traverse: min
+    taxon_traverse_direction: up
