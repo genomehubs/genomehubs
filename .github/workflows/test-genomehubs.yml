@@ -11,7 +11,9 @@ jobs:
         with:
           node-version: "16"
       - run: npm install -g pkg
-      - run: ./package-ui.sh
+      - run: |
+          sed -i '/"node16-macos-/d;s/"node16-linux-x64",/"node16-linux"/' src/packaged-ui/package.json
+          ./package-ui.sh
       - uses: actions/upload-artifact@v3
         with:
           path: ./dist/*
@@ -25,7 +27,7 @@ jobs:
           node-version: "16"
       - run: npm install -g pkg
       - run: |
-          sed -i '/"node16-macos-/d;s/"node16-linux-x64",/"node16-linux-x64"/' src/genomehubs-api/package.json
+          sed -i '/"node16-macos-/d;s/"node16-linux-x64",/"node16-linux"/' src/genomehubs-api/package.json
           ./package-api.sh
       - uses: actions/upload-artifact@v3
         with:
