@@ -233,12 +233,12 @@ def parse_ncbi_datasets_record(record, parsed):
         "submitter",
     ):
         obj[key] = assemblyInfo.get(key, None)
-        if key == "refseqCategory":
-            obj["primaryValue"] = 1 if obj[key] == "representative genome" else None
-    if obj["refseqAssmAccession"] == "na":
+    if obj["refseqAssmAccession"] is None or obj["refseqAssmAccession"] == "na":
         obj["refseqAssmAccession"] = None
         obj["refseqCategory"] = None
         obj["primaryValue"] = None
+    else:
+        obj["primaryValue"] = 1
     if annotationInfo := record.get("annotationInfo", {}):
         annot = {
             f"annotation{key.capitalize()}": annotationInfo.get(key, None)
