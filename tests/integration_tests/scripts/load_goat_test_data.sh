@@ -83,7 +83,7 @@ if [ ! -z "$CONTAINER_VERSION" ]; then
 else 
   GH_RELEASE=2021.10.15 GH_HUBNAME=goat GH_API_PORT=3001 ./dist/genomehubs-api &
   API_PID=$!
-fi
+fi &&
 sleep 5 &&
 genomehubs test \
     --config-file tests/integration_tests/config/goat.yaml \

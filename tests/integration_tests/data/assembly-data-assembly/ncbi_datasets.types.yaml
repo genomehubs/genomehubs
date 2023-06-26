@@ -22,7 +22,7 @@ attributes:
     header: bioProjectAccession
     organelle: nucleus
     separator:
-      - ;
+    - ;
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   biosample:
@@ -30,7 +30,7 @@ attributes:
     header: biosampleAccession
     organelle: nucleus
     separator:
-      - ;
+    - ;
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   chromosome_count:
@@ -151,18 +151,18 @@ file:
   display_group: general
   exclusions:
     attributes:
-      - bioproject
-      - biosample
+    - bioproject
+    - biosample
     identifiers:
-      - assembly_id
+    - assembly_id
     taxonomy:
-      - taxon_id
+    - taxon_id
   format: tsv
   header: true
   name: ncbi_datasets.tsv
   needs:
-    - ATTR_assembly.types.yaml
-    - TAXON_assembly.types.yaml
+  - ATTR_assembly.types.yaml
+  - TAXON_assembly.types.yaml
   organelle: nucleus
   source: INSDC
   source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
