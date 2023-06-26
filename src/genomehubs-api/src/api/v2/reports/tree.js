@@ -72,7 +72,7 @@ const getLCA = async ({
   let res = await getResults({
     ...params,
     taxonomy,
-    fields: [],
+    fields,
     query,
     exclusions,
     maxDepth: 100,
@@ -94,7 +94,7 @@ const getLCA = async ({
       res = await getResults({
         ...params,
         taxonomy,
-        fields: [],
+        fields,
         query: filtered.join(" AND "),
         exclusions,
         maxDepth: 100,
@@ -385,7 +385,12 @@ const getTree = async ({
   let exclusions;
   params.excludeUnclassified = true;
   exclusions = setExclusions(params);
-  let lca = await getLCA({ params: { ...params }, taxonomy, exclusions });
+  let lca = await getLCA({
+    params: { ...params },
+    fields,
+    taxonomy,
+    exclusions,
+  });
   if (treeThreshold > -1 && lca.count > treeThreshold) {
     return {
       status: {
