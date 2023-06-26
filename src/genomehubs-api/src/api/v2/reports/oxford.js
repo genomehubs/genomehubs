@@ -174,12 +174,16 @@ const getOxford = async ({
     let cat;
     if (bounds.cat) {
       if (bounds.by == "attribute") {
-        cat = result.result.fields[bounds.cat].value.toLowerCase();
+        let catObj = result.result.fields[bounds.cat];
+        if (catObj) {
+          cat = catObj.value.toLowerCase();
+        }
         if (Array.isArray(cat)) {
           cat = cat[0].toLowerCase();
-        } else {
-          cat = result.result.fields[bounds.cat].value.toLowerCase();
         }
+        // else {
+        //   cat = result.result.fields[bounds.cat]?.value.toLowerCase();
+        // }
       } else if (result.result.ranks) {
         cat = result.result.ranks[bounds.cat];
         if (cat) {
@@ -351,6 +355,9 @@ const getOxford = async ({
   allValues = [];
   allYValues = [];
   if (bounds.cats) {
+    if (bounds.showOther) {
+      bounds.cats.push({ key: "other", label: "other" });
+    }
     byCat = bounds.cats
       .map((cat) => cat.key)
       .reduce((a, b) => ({ ...a, [b]: buckets[asms[0]].map(() => 0) }), {});
@@ -389,7 +396,9 @@ const getOxford = async ({
       }
       start += seqOffsets[assembly_id][sequence_id];
       end += seqOffsets[assembly_id][sequence_id];
-      byCat[cat][i]++;
+      if (byCat[cat]) {
+        byCat[cat][i]++;
+      }
       for (let [assembly, arr] of Object.entries(groupedData[group])) {
         // if (assembly == assembly_id) {
         //   continue;
@@ -405,7 +414,9 @@ const getOxford = async ({
             pEnd = seqOffsets[assembly][partner.sequence_id] - partner.end;
           }
           allYValues[i][index]++;
-          yValuesByCat[cat][i][index]++;
+          if (yValuesByCat[cat]) {
+            yValuesByCat[cat][i][index]++;
+          }
           rawData[cat].push({
             featureId: feature_id,
             yFeatureId: partner.feature_id,
