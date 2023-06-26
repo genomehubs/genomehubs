@@ -544,6 +544,7 @@ export const tree = async ({
   } else {
     fields = [...new Set(xFields)];
   }
+  fields = [...new Set(fields.concat(searchFields))];
 
   let status;
   if (!x || !aInB(fields, Object.keys(typesMap))) {
