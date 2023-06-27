@@ -1,0 +1,142 @@
+attributes:
+  sequence_id:
+    description: Sequence ID
+    display_level: 1
+    display_name: Sequence ID
+    display_group: coordinates
+    type: keyword
+  start:
+    bins:
+      min: 1
+      max: 11
+      count: 10
+      scale: log10
+    constraint:
+      min: 1
+    description: Feature start position (1-indexed)
+    display_level: 1
+    display_name: Start
+    display_group: coordinates
+    type: long
+  end:
+    bins:
+      min: 1
+      max: 11
+      count: 10
+      scale: log10
+    constraint:
+      min: 1
+    description: Feature end position (1-indexed)
+    display_level: 1
+    display_name: End
+    display_group: coordinates
+    type: long
+  strand:
+    bins:
+      min: -1
+      max: 1
+      count: 3
+      scale: linear
+    constraint:
+      min: -1
+      max: 1
+    description: Strand
+    display_level: 1
+    display_name: Strand
+    display_group: coordinates
+    type: byte
+  feature_type:
+    constraint:
+      enum:
+        - chromosome
+        - contig
+        - scaffold
+        - sequence
+        - toplevel
+        - archaea-busco-gene
+        - arthropoda-busco-gene
+        - bacteria-busco-gene
+        - endopterygota-busco-gene
+        - eukaryota-busco-gene
+        - insecta-busco-gene
+        - lepidoptera-busco-gene
+        - metazoa-busco-gene
+        - busco-gene
+        - gene
+        - 1kb-window
+        - window-1000
+        - window-10000
+        - window-100000
+        - window-1000000
+        - window-0.01
+        - window-0.02
+        - window-0.05
+        - window-0.1
+        - window
+    description: Feature type
+    display_level: 1
+    display_name: Feature type
+    display_group: coordinates
+    type: keyword
+  length:
+    bins:
+      min: 1
+      max: 11
+      count: 10
+      scale: log10
+    constraint:
+      min: 0
+    description: Feature length
+    display_level: 1
+    display_name: Feature length
+    display_group: stats
+    type: long
+    units: bp
+  midpoint:
+    bins:
+      min: 1
+      max: 11
+      count: 10
+      scale: log10
+    constraint:
+      min: 0
+    description: Feature midpoint
+    display_level: 1
+    display_name: Feature midpoint
+    display_group: stats
+    type: long
+    units: bp
+  midpoint_proportion:
+    bins:
+      min: 0
+      max: 1
+      count: 10
+      scale: linear
+    constraint:
+      max: 1
+      min: 0
+    description: Proportional position of feature midpoint
+    display_level: 1
+    display_name: Midpoint proportion
+    display_group: stats
+    type: float
+  seq_proportion:
+    bins:
+      min: 0
+      max: 1
+      count: 10
+      scale: linear
+    constraint:
+      max: 1
+      min: 0
+    description: Proportional sequence length relative to full assembly span
+    display_level: 1
+    display_name: Proportional length
+    display_group: stats
+    type: float
+  analysis_name:
+    description: Non-unique analysis name
+    display_level: 1
+    display_name: Analysis name
+    display_group: analysis
+    type: keyword

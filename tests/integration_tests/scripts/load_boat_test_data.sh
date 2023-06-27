@@ -33,6 +33,6 @@ genomehubs fill \
 genomehubs index \
     --config-file tests/integration_tests/config/boat.yaml \
     --taxonomy-source ncbi \
-    --feature-dir tests/integration_tests/data/boat/feature &&
+    --feature-dir tests/integration_tests/data/boat/latest &&
 echo done ||
 echo failed

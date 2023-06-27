@@ -32,7 +32,7 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
         except Exception:
             pass
         if attributes:
-            sequence = max(int(d['sequence']) for d in attributes.values()) + 1
+            sequence = max(int(d["sequence"]) for d in attributes.values()) + 1
         else:
             sequence = 0
         for key, entry in types["attributes"].items():
@@ -49,7 +49,9 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
                 entry["constraint"]["enum"] = [value.lower() for value in enum]
             translate = entry.get("translate", {})
             if translate:
-                entry["translate"] = {key.lower(): value for key, value in translate.items()}
+                entry["translate"] = {
+                    key.lower(): value for key, value in translate.items()
+                }
     names = None
     exclusions = None
     data = None
@@ -84,6 +86,8 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
             )
             if "exclusions" in types["file"]:
                 exclusions = process_names_file(
-                    types, Path(dir_path) / "exclusions" / types["file"]["name"], value_path=types["file"]["exclusions"]
+                    types,
+                    Path(dir_path) / "exclusions" / types["file"]["name"],
+                    value_path=types["file"]["exclusions"],
                 )
     return types, data, names, exclusions
