@@ -14,16 +14,13 @@ attributes:
   btk_target:
     header: target
 file:
-  display_group: btk
   format: tsv
   header: true
   name: btk.tsv.gz
   needs:
     - ATTR_assembly.types.yaml
     - ATTR_btk.types.yaml
-    - ATTR_organelle.types.yaml
-  source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
-  source: BlobToolKit
+    - TAXON_assembly.types.yaml
 identifiers:
   assembly_alias:
     header: alias

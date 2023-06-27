@@ -1,3 +1,9 @@
+defaults:
+  attributes:
+    display_group: blobtoolkit
+    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
+    source: BlobToolKit
+    taxon_display_group: blobtoolkit
 attributes:
   busco_completeness:
     description: Busco completeness

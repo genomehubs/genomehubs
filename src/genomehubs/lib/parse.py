@@ -161,7 +161,7 @@ def main(args):
                 tofile.write_file(options["parse"]["outfile"], data)
             needs = types.get("file", {}).get("needs", [])
             for needs_file in needs:
-                if needs_file.startswith("ATTR_"):
+                if needs_file.startswith("ATTR_") or needs_file.startswith("TAXON_"):
                     copy_types(needs_file, outdir)
             suff = re.compile(r"\.[^\.]+$")
             if filepath.name.endswith(".gz"):
