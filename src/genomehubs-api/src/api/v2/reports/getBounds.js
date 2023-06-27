@@ -345,6 +345,7 @@ export const getBounds = async ({
   return {
     field,
     scale: scaleType,
+    query: params.query,
     stats,
     type,
     domain,

@@ -516,7 +516,6 @@ export const oxford = async ({
     taxonomy,
   });
 
-  let asms = parseAssemblies(params.query);
   let groupBy = parseCollate(params.query);
   // TODO: Get list of assemblies
   //       Choose primary assembly as one with most hits/best contiguity
@@ -623,6 +622,11 @@ export const oxford = async ({
   // }
   let bounds;
   let exclusions = setExclusions(params);
+  Object.entries(apiParams).forEach(([key, value]) => {
+    if (key.match(/^query[A-Z]$/)) {
+      params[key] = value;
+    }
+  });
   bounds = await getBounds({
     params: { ...params },
     fields: xFields.filter(
@@ -636,6 +640,9 @@ export const oxford = async ({
     apiParams,
     //opts: xOpts,
   });
+
+  let asms = parseAssemblies(bounds.query);
+  xQuery.query = bounds.query;
   // let yBounds;
   // if (y) {
   //   yBounds = await getBounds({
@@ -681,7 +688,6 @@ export const oxford = async ({
   }
   let yBounds;
   ({ bounds, yBounds } = oxford);
-
   return {
     status: status || { success: true },
     report: {
@@ -694,6 +700,7 @@ export const oxford = async ({
       yBounds,
       xQuery: {
         ...xQuery,
+        query: bounds.query,
         fields: optionalFields.join(","),
       },
       // ...(y && {

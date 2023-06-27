@@ -16,12 +16,12 @@ btk pipeline window-stats \
     --out ${OUTDIR}/${ACCESSION}.window_stats.tsv
 
 genomehubs parse \
-    --window ${DIR}/${BTK_ID} \
+    --window-full ${DIR}/${BTK_ID} \
     --outfile ${OUTDIR}/${ACCESSION}.window_stats.tsv
 
 
 echo Parsing window files
-for WINDOW in 100000 1000000 0.1; do
+for WINDOW in 1000000 0.1; do
   WINDOW_FLAG="${WINDOW_FLAG} --window ${WINDOW}"
   genomehubs parse \
     --window ${DIR}/${BTK_ID} \
@@ -35,7 +35,6 @@ btk pipeline window-stats ${WINDOW_FLAG} \
     --min-window-count 5 \
     --in ${DIR}/${BTK_ID}/${BTK_ID}.chunk_stats.tsv.gz \
     --out ${OUTDIR}/${ACCESSION}.window_stats.tsv
-
 
 echo "Parsing BUSCO tables"
 LINEAGES=$(yq -r '.busco.lineages[] | sub("_odb10$"; "")' ${DIR}/${BTK_ID}/config.yaml)
