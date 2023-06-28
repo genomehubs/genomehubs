@@ -86,6 +86,7 @@ attributes:
       Polyploid: NA
       Dikaryon: NA
       ">2n": NA
+      0: NA
     type: short
   elevation:
     constraint:
