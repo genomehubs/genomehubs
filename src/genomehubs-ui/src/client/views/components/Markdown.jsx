@@ -104,14 +104,23 @@ export const RehypeComponentsList = {
   ),
   markdown: (props) => <Nested pgId={props.pageId} />,
   pre: (props) => {
-    if (props.children?.[0]?.props?.className == "language-report") {
-      let reportProps = YAML.load(props.children[0].props.children[0] || "");
-      return (
-        <Report
-          {...processProps({ props: reportProps })}
-          className={styles.reportContainer}
-        />
-      );
+    let className = props.children?.[0]?.props?.className;
+    if (className) {
+      let nestedProps = YAML.load(props.children[0].props.children[0] || "");
+      if (className == "language-report") {
+        return (
+          <Report
+            {...processProps({ props: nestedProps })}
+            className={styles.reportContainer}
+          />
+        );
+      } else if (className == "language-template") {
+        return (
+          <Grid {...processProps({ props: nestedProps })} item>
+            <Template {...processProps({ props: nestedProps })} />
+          </Grid>
+        );
+      }
     }
     return <Highlight {...processProps({ props })} />;
   },
