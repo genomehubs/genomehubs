@@ -21,11 +21,9 @@ from pathlib import Path
 from tolkein import tofile
 from tolkein import tolog
 
-from .es_functions import query_flexible_template
-
 LOGGER = tolog.logger(__name__)
-MIN_INTEGER = -(2 ** 31)
-MAX_INTEGER = 2 ** 31 - 1
+MIN_INTEGER = -(2**31)
+MAX_INTEGER = 2**31 - 1
 DATE = re.compile(r"^[12]\d{3}-[01]\d-[0123]\d$")
 
 
@@ -346,6 +344,38 @@ def calculate(string):
                 return None
 
 
+def attribute_value_query(es, index, opts=None):
+    """Run attribute value query."""
+    query = {
+        "bool": {
+            "filter": [
+                {"match": {opts["id_field"]: opts["primary_id"]}},
+                {
+                    "nested": {
+                        "path": "attributes",
+                        "query": {
+                            "bool": {
+                                "filter": [
+                                    {"match": {"attributes.key": opts["attribute"]}}
+                                ]
+                            }
+                        },
+                        "inner_hits": {
+                            "_source": False,
+                            "name": "%s_values" % opts["attribute"],
+                            "docvalue_fields": [
+                                "attributes.key",
+                                "attributes.%s_value" % opts["value_type"],
+                            ],
+                        },
+                    }
+                },
+            ]
+        }
+    }
+    return es.search(index=index, body={"query": query, "_source": False})
+
+
 def lookup_attribute_value(identifier, attribute, shared_values):
     """Lookup an indexed attribute value."""
     value_type = shared_values["_types"]["attributes"][attribute]["type"]
@@ -355,9 +385,8 @@ def lookup_attribute_value(identifier, attribute, shared_values):
         "attribute": attribute,
         "value_type": value_type,
     }
-    res = query_flexible_template(
+    res = attribute_value_query(
         shared_values["_es"],
-        "attribute_value_by_primary_id",
         shared_values["_index"],
         opts,
     )
@@ -1008,7 +1037,7 @@ def do_replace(item, arr):
     elif isinstance(item, list):
         item = [do_replace(value, arr) for value in item]
     elif isinstance(item, str):
-        for (query, replace) in arr:
+        for query, replace in arr:
             new_item = item.replace(query, str(replace))
             if new_item != item:
                 item = new_item
