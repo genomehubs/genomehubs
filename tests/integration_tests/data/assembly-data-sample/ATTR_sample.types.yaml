@@ -42,7 +42,51 @@ attributes:
   ploidy:
     display_level: 1
     display_name: Ploidy
-    type: keyword
+    translate:
+      1n: 1
+      haoloid: 1
+      haoploid: 1
+      haploid: 1
+      haploidy: 1
+      heploid: 1
+      monokaryotic, haploid: 1
+      haploid/diploid: [1, 2]
+      haplo-diploidy: [1, 2]
+      "Male: haploid; female: diploid": [1, 2]
+      2n: 2
+      diploid: 2
+      diploidy: 2
+      dipolid: 2
+      diploid, occasionally higher: 2
+      diplod: 2
+      diplioid: 2
+      dipliod: 2
+      Haploid consensus of diploid genome: 2
+      Diploid (presumed): 2
+      protandrous diploid: 2
+      triploid: 3
+      allotetraploid: 4
+      allotetraploids: 4
+      protandrous tetraploid: 4
+      tetraploid: 4
+      hexaploid: 6
+      allopolyploid: NA
+      amphidiploid: NA
+      dikaryon: NA
+      dikaryotic: NA
+      polyploid macronucleus: NA
+      singal spore: NA
+      possible triploid: NA
+      polyploidy: NA
+      polyploid: NA
+      haploid /Dikaryon: NA
+      doubled haploid: NA
+      double ploidy level: NA
+      dikariotic (diploid): NA
+      Polyploid: NA
+      Dikaryon: NA
+      ">2n": NA
+    type: short
   elevation:
     constraint:
       max: 8500
