@@ -38,8 +38,8 @@ def stream_attributes(group, attributes, *, index_type="attribute"):
     for name, obj in attributes.items():
         ret = {"group": group, "name": name}
         for prop, value in obj.items():
-            if not prop.startswith("taxon_"):
-                ret.update({prop: value})
+            # if not prop.startswith("taxon_"):
+            ret.update({prop: value})
         yield "%s-%s-%s" % (index_type, group, name), ret
 
 
@@ -81,7 +81,6 @@ def add_attribute_sources(name, obj, attributes):
 
 def index_types(es, types_name, types, opts, *, dry_run=False):
     """Index types into Elasticsearch."""
-    # TODO: fetch existing types to allow new sources to add, not overwrite
     try:
         attributes = fetch_types(es, types_name, opts)
     except Exception:
@@ -92,10 +91,21 @@ def index_types(es, types_name, types, opts, *, dry_run=False):
             if "defaults" in types and "attributes" in types["defaults"]:
                 value = {**types["defaults"]["attributes"], **value}
             if key in attributes:
-                types["attributes"][key] = {
-                    **attributes[key],
-                    **value,
-                }
+                if (
+                    "header" not in types["attributes"][key]
+                    and "index" not in types["attributes"][key]
+                ):
+                    types["attributes"][key] = {
+                        **types["attributes"][key],
+                        **attributes[key],
+                        **value,
+                    }
+                    new_attributes[key] = types["attributes"][key]
+                else:
+                    types["attributes"][key] = {
+                        **attributes[key],
+                        **value,
+                    }
             else:
                 new_attributes[key] = {**value}
                 new_attributes[key].pop("header", None)

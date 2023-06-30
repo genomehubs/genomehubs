@@ -409,7 +409,11 @@ def summarise_attribute_values(
             if values is None:
                 values = []
                 for value in attribute["values"]:
-                    values.append(value[value_type])
+                    try:
+                        values.append(value[value_type])
+                    except KeyError:
+                        print(meta)
+                        print(value)
                     if "is_primary_value" in value and value["is_primary_value"]:
                         primary_values.append(value[value_type])
             else:

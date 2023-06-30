@@ -1,0 +1,117 @@
+defaults:
+  attributes:
+    display_group: blobtoolkit
+    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
+    source: BlobToolKit
+    taxon_display_group: blobtoolkit
+attributes:
+  busco_completeness:
+    description: Busco completeness
+    display_group: busco
+    display_level: 1
+    display_name: BUSCO completeness
+    taxon_bins:
+      count: 10
+      max: 100
+      min: 50
+      scale: linear
+    taxon_display_group: assembly
+    taxon_display_level: 1
+    taxon_key: busco_completeness
+    taxon_name: busco_completeness
+    taxon_summary: max
+    taxon_traverse: false
+    taxon_type: 1dp
+    type: 1dp
+    units: "%"
+  busco_lineage:
+    description: Busco lineage
+    display_group: busco
+    display_level: 2
+    display_name: BUSCO lineage
+    type: keyword
+    taxon_display_group: assembly
+    taxon_display_level: 2
+    taxon_key: busco_lineage
+    taxon_name: busco_lineage
+    taxon_summary: list
+    taxon_traverse: false
+    taxon_type: keyword
+  busco_string:
+    description: Busco string
+    display_group: busco
+    display_level: 2
+    display_name: BUSCO string
+    type: keyword
+    taxon_display_group: assembly
+    taxon_display_level: 2
+    taxon_key: busco_string
+    taxon_name: busco_string
+    taxon_summary: list
+    taxon_traverse: false
+    taxon_type: keyword
+  btk_nohit:
+    description: Sequences with no hits in the reference database
+    display_group: btk
+    display_level: 2
+    display_name: BTK no hit
+    synonym: nohit
+    type: 1dp
+    units: "%"
+    taxon_bins:
+      count: 10
+      max: 100
+      min: 0
+      scale: linear
+    taxon_display_group: assembly
+    taxon_display_level: 2
+    taxon_key: btk_nohit
+    taxon_name: btk_nohit
+    taxon_synonym: nohit
+    taxon_summary:
+      - primary
+      - min
+    taxon_traverse: false
+    taxon_type: 1dp
+  btk_target:
+    description: Hits matching target
+    display_group: btk
+    display_level: 2
+    display_name: BTK_target
+    synonym: target
+    type: 1dp
+    units: "%"
+    taxon_bins:
+      count: 10
+      max: 100
+      min: 0
+      scale: linear
+    taxon_display_group: assembly
+    taxon_display_level: 2
+    taxon_key: btk_target
+    taxon_name: btk_target
+    taxon_synonym: target
+    taxon_summary:
+      - primary
+      - max
+    taxon_traverse: false
+    taxon_type: 1dp
+identifiers:
+  assembly_alias:
+    type: keyword
+  assembly_id:
+    type: keyword
+  bioproject:
+    synonyms:
+      - bioproject_accession
+    type: keyword
+  biosample:
+    synonyms:
+      - biosample_accession
+    type: keyword
+  blobtoolkit_id:
+    synonyms:
+      - blobtoolkit_accession
+    type: keyword
+  genbank_accession:
+    type: keyword
