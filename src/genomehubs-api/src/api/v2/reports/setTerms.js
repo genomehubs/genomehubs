@@ -13,6 +13,7 @@ export const setTerms = async ({
   if (!cat) {
     return { cat, size, other };
   }
+  let min, max, scale;
   if (opts) {
     let options = opts.split(/\s*;\s*/);
     if (options.length == 1) {
@@ -37,6 +38,7 @@ export const setTerms = async ({
     }
     let portions = cat.split(/\s*[\[\]]\s*/);
     if (portions.length > 1) {
+      // TODO: get min, max and scale opts here
       size = portions[1];
       delete portions[1];
       cat = portions.join("");
