@@ -79,6 +79,7 @@ export const getCatsBy = async ({
 
     by = "attribute";
   }
+
   return { cats, by };
 };
 

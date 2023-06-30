@@ -13,7 +13,7 @@ const setProcessedType = (meta) => {
     return "float";
   }
   if (["long", "integer", "short", "byte"].includes(meta.type)) {
-    return "float";
+    return "integer";
   }
   if (meta.type == "keyword") {
     if (meta.summary) {

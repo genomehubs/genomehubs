@@ -81,6 +81,20 @@ const getSequenceLengths = async ({ assemblies, xQuery, taxonomy, req }) => {
   return lengths;
 };
 
+const scaleFuncs = {
+  log2: (value) => Math.pow(2, value),
+  log10: (value) => Math.pow(10, value),
+  log: (value) => Math.pow(Math.E, value),
+  sqrt: (value) => Math.pow(value, 2),
+  linear: (value) => value,
+};
+
+const formatValue = {
+  // TODO: format float to n s.f.
+  float: (value) => value,
+  integer: (value) => Math.floor(value),
+};
+
 const getOxford = async ({
   params,
   x,
@@ -90,6 +104,7 @@ const getOxford = async ({
   fields,
   groupBy,
   asms,
+  summaries,
   yFields,
   cat,
   bounds,
@@ -114,44 +129,56 @@ const getOxford = async ({
     fields,
     exclusions,
   };
+  let histogram;
   if (bounds.cat) {
     if (bounds.by == "attribute") {
       if (bounds.catType == "keyword" && !bounds.showOther) {
         xQuery.query += ` AND ${bounds.cat}=${bounds.cats
           .map(({ key }) => key)
           .join(",")}`;
+      } else {
+        let summary = summaries[0];
+        let field = bounds.cat;
+        // TODO: set this from option
+        bounds.tickCount = 5;
+        histogram = await histogramAgg({
+          field,
+          summary,
+          result,
+          bounds,
+          // yHistograms,
+          taxonomy,
+        });
+        xQuery.aggs = {
+          aggregations: {
+            nested: {
+              path: "attributes",
+            },
+            aggs: {
+              [field]: {
+                filter: {
+                  term: { "attributes.key": field },
+                },
+                aggs: {
+                  histogram,
+                },
+              },
+            },
+          },
+        };
       }
       xQuery.fields = [...new Set([...xQuery.fields, bounds.cat])];
     } else {
       xQuery.ranks = bounds.cat;
     }
   }
-  // TODO: set histogram agg if value cat
-  console.log({
-    field,
-    summary,
-    result,
-    rawValues,
-    bounds,
-    // yHistograms,
-    taxonomy,
-  });
-  let histogram = histogramAgg({
-    field,
-    summary,
-    result,
-    rawValues,
-    bounds,
-    // yHistograms,
-    taxonomy,
-  });
-  console.log(JSON.stringify(histogram, null, 4));
   let countRes = await getResultCount(xQuery);
   if (!countRes.status.success) {
     return { status: countRes.status };
   }
   let count = countRes.count;
 
+  // TODO: use scroll API to allow > 10000 results
   let xRes = await getResults({
     ...xQuery,
     size: count,
@@ -159,14 +186,37 @@ const getOxford = async ({
     req,
     // update: "x",
   });
+
   if (!xRes.status.success) {
     return { status: xRes.status };
   }
 
   let cats;
-  if (bounds.cats) {
+  if (bounds.cats && bounds.cats.length > 0) {
     cats = new Set(bounds.cats.map(({ key }) => key));
+  } else if (
+    bounds.cat &&
+    (bounds.catType == "float" || bounds.catType == "integer")
+  ) {
+    let buckets = xRes.aggs.aggregations[bounds.cat].histogram.buckets;
+    let catMeta = lookupTypes(bounds.cat);
+    let scaleFunc = catMeta.bins
+      ? scaleFuncs[catMeta.bins.scale]
+      : scaleFuncs.linear;
+    cats = buckets.map(({ key }, i) => [
+      scaleFunc(key),
+      scaleFunc(buckets[Math.min(i + 1, buckets.length - 1)].key),
+    ]);
+    bounds.cats = cats
+      .filter(([min, max]) => min != max)
+      .map(([min, max]) => ({
+        key: min,
+        label: `${formatValue[bounds.catType](min)}-${formatValue[
+          bounds.catType
+        ](max)}`,
+      }));
   }
+
   let byAssembly = {};
   let groupedData = {};
   let activeSeqs = {};
@@ -205,8 +255,12 @@ const getOxford = async ({
           }
         } else {
           // TODO: set cat using histogram
-          cat = "other";
-          bounds.cats = [{ key: "other", label: "other" }];
+          for (let limits of cats) {
+            if (catObj.value < limits[1]) {
+              cat = limits[0];
+              break;
+            }
+          }
         }
         // else {
         //   cat = result.result.fields[bounds.cat]?.value.toLowerCase();
@@ -217,11 +271,14 @@ const getOxford = async ({
           cat = cat.taxon_id;
         }
       }
-      if (!cat || !cats.has(cat)) {
+      if (
+        typeof cat === "undefined" ||
+        (!Array.isArray(cats) && !cats.has(cat))
+      ) {
         cat = "other";
       }
     }
-    if (!cat) {
+    if (typeof cat === "undefined") {
       cat = "all features";
     }
     byAssembly[assembly_id][sequence_id].push({
@@ -465,7 +522,6 @@ const getOxford = async ({
   }
   let yArr = allYValues.flat();
   let zDomain = [Math.min(...yArr), Math.max(...yArr)];
-  console.log(bounds);
   bounds = {
     field: asms[0],
     scale: "linear",
@@ -534,6 +590,7 @@ export const oxford = async ({
     fields,
     taxonomy,
   });
+
   let {
     params,
     fields: xFields,
@@ -545,6 +602,17 @@ export const oxford = async ({
   });
 
   let groupBy = parseCollate(params.query);
+
+  searchFields = [
+    ...new Set([
+      "sequence_id",
+      "start",
+      "end",
+      "strand",
+      groupBy,
+      ...searchFields,
+    ]),
+  ];
   // TODO: Get list of assemblies
   //       Choose primary assembly as one with most hits/best contiguity
   //       Use xOpts/yOpts to fix assembly ordering?
@@ -564,14 +632,14 @@ export const oxford = async ({
       xFields = [...new Set([catMeta.name].concat(searchFields))];
     } else {
       catRank = catField;
-      xFields = [...new Set(searchFields)];
+      xFields = searchFields;
     }
   } else {
-    xFields = [...new Set(searchFields)];
+    xFields = searchFields;
   }
-  xFields = [
-    ...new Set([...xFields, groupBy, "sequence_id", "start", "end", "strand"]),
-  ];
+  // xFields = [
+  //   ...new Set([...xFields, "sequence_id", "start", "end", "strand", groupBy]),
+  // ];
   fields = xFields;
 
   let status;
