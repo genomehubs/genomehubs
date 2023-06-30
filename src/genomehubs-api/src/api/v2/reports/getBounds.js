@@ -101,6 +101,7 @@ export const getBounds = async ({
   let fieldMeta = lookupTypes(fields[0]);
   let field = fieldMeta.name;
   let type = fieldMeta.type;
+  let catType;
   let catMeta = lookupTypes(cat);
   if (catMeta) {
     cat = catMeta.name;
@@ -140,6 +141,7 @@ export const getBounds = async ({
     } else {
       term = catMeta.name;
     }
+    catType = catMeta.processed_type;
   }
   let extra = {};
   let valueKey = summary == "value" ? `${fieldMeta.type}_value` : summary;
@@ -152,17 +154,17 @@ export const getBounds = async ({
       }
     } else if (fieldMeta.type == "geo_point") {
       extra = { geo: true };
-    } else {
-      extra = { stats: true };
-    }
-    if (fieldMeta.type == "date") {
+    } else if (fieldMeta.type == "date") {
       if (valueKey == "min") {
         valueKey = "from";
       } else if (valueKey == "max") {
         valueKey = "to";
       }
+    } else {
+      extra = { stats: true };
     }
   }
+
   params.aggs = await setAggs({
     field,
     summary,
@@ -351,6 +353,7 @@ export const getBounds = async ({
     domain,
     tickCount,
     cat,
+    catType,
     cats,
     by,
     showOther: definedTerms.other,

@@ -8,6 +8,7 @@ import { config } from "../functions/config";
 import { getBounds } from "./getBounds";
 import { getResultCount } from "../functions/getResultCount";
 import { getResults } from "../functions/getResults";
+import { histogramAgg } from "../queries/histogramAgg";
 import { parseFields } from "../functions/parseFields";
 import { queryParams } from "./queryParams";
 import { setExclusions } from "../functions/setExclusions";
@@ -115,7 +116,7 @@ const getOxford = async ({
   };
   if (bounds.cat) {
     if (bounds.by == "attribute") {
-      if (!bounds.showOther) {
+      if (bounds.catType == "keyword" && !bounds.showOther) {
         xQuery.query += ` AND ${bounds.cat}=${bounds.cats
           .map(({ key }) => key)
           .join(",")}`;
@@ -125,6 +126,26 @@ const getOxford = async ({
       xQuery.ranks = bounds.cat;
     }
   }
+  // TODO: set histogram agg if value cat
+  console.log({
+    field,
+    summary,
+    result,
+    rawValues,
+    bounds,
+    // yHistograms,
+    taxonomy,
+  });
+  let histogram = histogramAgg({
+    field,
+    summary,
+    result,
+    rawValues,
+    bounds,
+    // yHistograms,
+    taxonomy,
+  });
+  console.log(JSON.stringify(histogram, null, 4));
   let countRes = await getResultCount(xQuery);
   if (!countRes.status.success) {
     return { status: countRes.status };
@@ -175,11 +196,17 @@ const getOxford = async ({
     if (bounds.cat) {
       if (bounds.by == "attribute") {
         let catObj = result.result.fields[bounds.cat];
-        if (catObj) {
-          cat = catObj.value.toLowerCase();
-        }
-        if (Array.isArray(cat)) {
-          cat = cat[0].toLowerCase();
+        if (bounds.catType == "keyword") {
+          if (catObj) {
+            cat = catObj.value.toLowerCase();
+          }
+          if (Array.isArray(cat)) {
+            cat = cat[0].toLowerCase();
+          }
+        } else {
+          // TODO: set cat using histogram
+          cat = "other";
+          bounds.cats = [{ key: "other", label: "other" }];
         }
         // else {
         //   cat = result.result.fields[bounds.cat]?.value.toLowerCase();
@@ -438,6 +465,7 @@ const getOxford = async ({
   }
   let yArr = allYValues.flat();
   let zDomain = [Math.min(...yArr), Math.max(...yArr)];
+  console.log(bounds);
   bounds = {
     field: asms[0],
     scale: "linear",
@@ -533,7 +561,7 @@ export const oxford = async ({
     catField = cat.replace(/[^\w_-].+$/, "");
     let catMeta = lookupTypes(catField);
     if (catMeta) {
-      xFields = [...new Set(searchFields.concat([catMeta.name]))];
+      xFields = [...new Set([catMeta.name].concat(searchFields))];
     } else {
       catRank = catField;
       xFields = [...new Set(searchFields)];
@@ -542,14 +570,7 @@ export const oxford = async ({
     xFields = [...new Set(searchFields)];
   }
   xFields = [
-    ...new Set([
-      groupBy,
-      "sequence_id",
-      "start",
-      "end",
-      "strand",
-      ...searchFields,
-    ]),
+    ...new Set([...xFields, groupBy, "sequence_id", "start", "end", "strand"]),
   ];
   fields = xFields;
 
