@@ -57,10 +57,8 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
     data = None
     if "file" in types:
         if "name" in types["file"]:
-            if (
-                "taxonomy" not in types
-                and "features" not in types
-                and "taxon_id" not in types["features"]
+            if "taxonomy" not in types and (
+                "features" not in types or "taxon_id" not in types["features"]
             ):
                 LOGGER.error("Types file contains no taxonomy information")
                 sys.exit(1)

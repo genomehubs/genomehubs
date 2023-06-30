@@ -16,7 +16,9 @@ jobs:
         with:
           node-version: "16"
       - run: npm install -g pkg
-      - run: ./package-ui.sh
+      - run: |
+          ./package-ui.sh
+          mv ./dist/genomehubs-ui-linux-x64 ./dist/genomehubs-ui-linux || exit 0
       - uses: actions/upload-artifact@v3
         with:
           name: genomehubs-ui
@@ -32,7 +34,9 @@ jobs:
         with:
           node-version: "16"
       - run: npm install -g pkg
-      - run: ./package-api.sh
+      - run: |
+          ./package-api.sh
+          mv ./dist/genomehubs-api-linux-x64 ./dist/genomehubs-api-linux || exit 0
       - uses: actions/upload-artifact@v3
         with:
           name: genomehubs-api
@@ -105,11 +109,11 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        uses: docker/metadata-action@v4
         with:
           images: genomehubs/genomehubs
       - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: docker/build-push-action@v4
         with:
           context: src/docker
           push: true
@@ -136,11 +140,11 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        uses: docker/metadata-action@v4
         with:
           images: genomehubs/genomehubs-api
       - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: docker/build-push-action@v4
         with:
           context: src/docker/api
           push: true
@@ -167,11 +171,11 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        uses: docker/metadata-action@v4
         with:
           images: genomehubs/genomehubs-ui
       - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: docker/build-push-action@v4
         with:
           context: src/docker/ui
           push: true
@@ -200,11 +204,11 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        uses: docker/metadata-action@v4
         with:
           images: genomehubs/goat
       - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: docker/build-push-action@v4
         with:
           context: src/docker/goat
           push: true

@@ -219,6 +219,7 @@ def parse_ncbi_datasets_record(record, parsed):
     }
 
     assemblyInfo = record.get("assemblyInfo", {})
+    annotationInfo = record.get("annotationInfo", {})
     if assemblyInfo.get("atypical", False):
         return
     for key in (
@@ -232,26 +233,21 @@ def parse_ncbi_datasets_record(record, parsed):
         "submissionDate",
         "submitter",
     ):
-        obj[key] = assemblyInfo.get(key, None)
-        if key == "refseqCategory":
-            obj["primaryValue"] = 1 if obj[key] == "representative genome" else None
+        obj[key] = assemblyInfo.get(key, annotationInfo.get(key, "None"))
     if obj["refseqAssmAccession"] == "na":
-        obj["refseqAssmAccession"] = None
-        obj["refseqCategory"] = None
-        obj["primaryValue"] = None
-    if annotationInfo := record.get("annotationInfo", {}):
+        obj["refseqAssmAccession"] = "None"
+    elif obj["refseqCategory"] != "None":
+        obj["primaryValue"] = 1
+    if annotationInfo:
         annot = {
-            f"annotation{key.capitalize()}": annotationInfo.get(key, None)
+            f"annotation{key.capitalize()}": annotationInfo.get(key, "None")
             for key in ("name", "releaseDate", "reportUrl", "source")
         }
 
         if annot and "stats" in annotationInfo:
-            geneCounts = annotationInfo["stats"].get("geneCounts", None)
+            geneCounts = annotationInfo["stats"].get("geneCounts", "None")
             for key in ("nonCoding", "proteinCoding", "pseudogene", "total"):
-                annot[f"geneCount{key.capitalize()}"] = geneCounts.get(key, None)
-            if obj["genbankAssmAccession"] in parsed:
-                parsed[obj["genbankAssmAccession"]].update(annot)
-                return
+                annot[f"geneCount{key.capitalize()}"] = geneCounts.get(key, "None")
             obj.update(annot)
     bioprojects = []
     for lineage in assemblyInfo.get("bioprojectLineage", []):
@@ -266,14 +262,19 @@ def parse_ncbi_datasets_record(record, parsed):
             for bioproject in assemblyInfo["biosample"]["bioprojects"]
         )
 
-    obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else None
+    obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else "None"
     assemblyStats = record.get("assemblyStats", {})
     obj.update(assemblyStats)
     metricDates(obj)
     wgsInfo = record.get("wgsInfo", {})
     for key in ("masterWgsUrl", "wgsContigsUrl", "wgsProjectAccession"):
-        obj[key] = wgsInfo.get(key, None)
-    parsed[obj["genbankAssmAccession"]] = obj
+        obj[key] = wgsInfo.get(key, "None")
+    if obj["genbankAssmAccession"] in parsed:
+        for key, value in obj.items():
+            if value != "None":
+                parsed[obj["genbankAssmAccession"]][key] = value
+    else:
+        parsed[obj["genbankAssmAccession"]] = obj
 
 
 def parse_ncbi_datasets_sample(record, parsed):
@@ -290,11 +291,11 @@ def parse_ncbi_datasets_sample(record, parsed):
         "refseqCategory",
         "submitter",
     ):
-        obj[key] = assemblyInfo.get(key, None)
+        obj[key] = assemblyInfo.get(key, "None")
         if key == "refseqCategory":
-            obj["primaryValue"] = 1 if obj[key] == "representative genome" else None
+            obj["primaryValue"] = 1 if obj[key] == "representative genome" else "None"
     attributes = {
-        entry["name"]: entry.get("value", None)
+        entry["name"]: entry.get("value", "None")
         for entry in assemblyInfo.get("biosample", {}).get("attributes", [])
     }
     for key in ("estimated_size", "geo_loc_name", "num_replicons", "ploidy"):
@@ -319,7 +320,7 @@ def parse_ncbi_datasets_sample(record, parsed):
             for bioproject in assemblyInfo["biosample"]["bioprojects"]
         )
 
-    obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else None
+    obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else "None"
     parsed[obj["biosampleAccession"]] = obj
 
 

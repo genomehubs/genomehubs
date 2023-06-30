@@ -1,29 +1,15 @@
-file:
-  display_group: general
-  format: tsv
-  header: true
-  needs:
-    - ATTR_assembly.types.yaml
-  source_url_stub: https://www.ncbi.nlm.nih.gov/nuccore/
-  source: NCBI
 attributes:
   organelle:
     default: "{{organelle}}"
     type: keyword
   assembly_span:
-    index: 8
     taxon_display_group: "{{organelle}}_assembly"
     taxon_name: "{{organelle}}_assembly_span"
     taxon_key: "{{organelle}}_assembly_span"
     taxon_display_name: "{{organelle}} span"
     taxon_traverse_limit: phylum
     taxon_display_level: 2
-  bioproject:
-    index: 5
-  biosample:
-    index: 6
   gc_percent:
-    index: 9
     taxon_display_group: "{{organelle}}_assembly"
     taxon_display_name: "{{organelle}} GC%"
     taxon_name: "{{organelle}}_gc_percent"
@@ -37,40 +23,8 @@ attributes:
       max: 100
       count: 10
       scale: linear
-  n_percent:
-    index: 10
-  last_updated:
-    index: 11
   sample_location:
-    index: 12
     taxon_display_group: "{{organelle}}_assembly"
     taxon_name: "{{organelle}}_sample_location"
     taxon_key: "{{organelle}}_sample_location"
     taxon_display_name: "{{organelle}} sample location"
-identifiers:
-  assembly_id:
-    index: 3
-  genbank_accession:
-    index: 4
-  refseq_accession:
-    index: 3
-metadata:
-  organelle:
-    index: 7
-  source_author:
-    index: 13
-  source_year:
-    index: 14
-  source_title:
-    index: 15
-  source_pubmed_id:
-    index: 16
-  source_slug:
-    index: 3
-taxonomy:
-  taxon:
-    index: 0
-  taxon_id:
-    index: 1
-  lineage:
-    index: 2

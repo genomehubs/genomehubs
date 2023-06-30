@@ -1,184 +1,63 @@
 attributes:
-  busco_completeness:
-    description: Busco completeness
-    display_group: busco
-    display_level: 1
-    display_name: BUSCO completeness
-    header: busco_complete
-    source: BlobToolKit
-    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
-    synonyms:
-      - busco-completeness
-      - busco_score
-      - busco-score
-    taxon_bins:
-      count: 10
-      max: 100
-      min: 50
-      scale: linear
-    taxon_display_group: assembly
-    taxon_display_level: 1
-    taxon_key: busco_completeness
-    taxon_name: busco_completeness
-    taxon_summary: max
-    taxon_traverse: false
-    taxon_type: 1dp
-    type: 1dp
-    units: "%"
-  busco_lineage:
-    description: Busco lineage
-    display_group: busco
-    display_level: 2
-    display_name: BUSCO lineage
-    header: busco_lineage
-    source: BlobToolKit
-    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
-    taxon_display_group: assembly
-    taxon_display_level: 2
-    taxon_key: busco_lineage
-    taxon_name: busco_lineage
-    taxon_summary: list
-    taxon_traverse: false
-    taxon_type: keyword
-    type: keyword
-  busco_string:
-    description: Busco string
-    display_group: busco
-    display_level: 2
-    display_name: BUSCO string
-    header: busco_string
-    source: BlobToolKit
-    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
-    taxon_display_group: assembly
-    taxon_display_level: 2
-    taxon_key: busco_string
-    taxon_name: busco_string
-    taxon_summary: list
-    taxon_traverse: false
-    taxon_type: keyword
-    type: keyword
-  gc_percent:
-    description: GC percent
+  btk_nohit:
     display_group: btk
-    display_level: 2
-    display_name: GC percent
-    header: gc_percent
-    source: BlobToolKit
-    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
-    taxon_bins:
-      count: 10
-      max: 100
-      min: 0
-      scale: linear
-    taxon_display_group: assembly
-    taxon_display_level: 1
-    taxon_key: gc_percent
-    taxon_name: gc_percent
-    taxon_summary: median
-    taxon_traverse: median
-    taxon_traverse_direction: both
-    taxon_type: 1dp
-    type: 1dp
-    units: "%"
-  n_percent:
-    description: N percent
-    display_group: btk
-    display_level: 2
-    display_name: N percent
-    header: n_percent
-    source: BlobToolKit
-    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
-    taxon_bins:
-      count: 10
-      max: 100
-      min: 0
-      scale: linear
-    taxon_display_group: assembly
-    taxon_display_level: 2
-    taxon_key: n_percent
-    taxon_name: n_percent
-    taxon_summary:
-      - primary
-      - min
-    taxon_traverse: false
-    taxon_type: 1dp
-    type: 1dp
-    units: "%"
-  nohit:
-    description: Sequences with no hits in the reference database
-    display_group: btk
-    display_level: 2
-    display_name: No hit
     header: nohit
     source: BlobToolKit
     source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
-    taxon_bins:
-      count: 10
-      max: 100
-      min: 0
-      scale: linear
-    taxon_display_group: assembly
-    taxon_display_level: 2
-    taxon_key: nohit
-    taxon_name: nohit
-    taxon_summary: median
-    taxon_traverse: median
-    taxon_type: 1dp
-    type: 1dp
-    units: "%"
-  target:
-    description: Hits matching target
+  btk_target:
     display_group: btk
-    display_level: 2
-    display_name: Target
     header: target
     source: BlobToolKit
     source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
-    taxon_bins:
-      count: 10
-      max: 100
-      min: 0
-      scale: linear
-    taxon_display_group: assembly
-    taxon_display_level: 2
-    taxon_key: target
-    taxon_name: target
-    taxon_summary: median
-    taxon_traverse: median
-    taxon_type: 1dp
-    type: 1dp
-    units: "%"
+  busco_completeness:
+    display_group: btk
+    header: busco_complete
+    source: BlobToolKit
+    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
+  busco_lineage:
+    display_group: btk
+    header: busco_lineage
+    source: BlobToolKit
+    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
+  busco_string:
+    display_group: btk
+    header: busco_string
+    source: BlobToolKit
+    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
+  gc_percent:
+    display_group: btk
+    header: gc_percent
+    source: BlobToolKit
+    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
+  n_percent:
+    display_group: btk
+    header: n_percent
+    source: BlobToolKit
+    source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
 file:
   display_group: btk
   format: tsv
   header: true
   name: btk.tsv
+  needs:
+  - ATTR_assembly.types.yaml
+  - ATTR_btk.types.yaml
+  - ATTR_organelle.types.yaml
   source: BlobToolKit
   source_url_stub: https://blobtoolkit.genomehubs.org/view/dataset/
-  tests: btk_tests
 identifiers:
   assembly_alias:
     header: alias
-    type: keyword
   assembly_id:
     header: accession
-    type: keyword
   bioproject:
     header: bioproject
-    synonyms:
-      - bioproject_accession
-    type: keyword
   biosample:
     header: biosample
-    synonyms:
-      - biosample_accession
-    type: keyword
-  blobtoolkit_accession:
+  blobtoolkit_id:
     header: id
-    type: keyword
   genbank_accession:
     header: accession
-    type: keyword
 metadata:
   source:
     header: source
