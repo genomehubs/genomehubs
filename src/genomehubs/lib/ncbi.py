@@ -234,10 +234,8 @@ def parse_ncbi_datasets_record(record, parsed):
         "submitter",
     ):
         obj[key] = assemblyInfo.get(key, annotationInfo.get(key, "None"))
-    if obj["refseqAssmAccession"] == "None" or obj["refseqAssmAccession"] == "na":
+    if obj["refseqAssmAccession"] == "na":
         obj["refseqAssmAccession"] = "None"
-        obj["refseqCategory"] = "None"
-        obj["primaryValue"] = "None"
     elif obj["refseqCategory"] != "None":
         obj["primaryValue"] = 1
     if annotationInfo:
