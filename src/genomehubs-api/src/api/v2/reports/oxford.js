@@ -122,7 +122,6 @@ const getOxford = async ({
 
   // get list of assembly_ids
   // search all feature_type = top_level and create lookup table
-
   let xQuery = {
     ...params,
     // query: x,
@@ -136,16 +135,22 @@ const getOxford = async ({
         xQuery.query += ` AND ${bounds.cat}=${bounds.cats
           .map(({ key }) => key)
           .join(",")}`;
-      } else {
+      } else if (bounds.catType != "keyword") {
         let summary = summaries[0];
         let field = bounds.cat;
         // TODO: set this from option
-        bounds.tickCount = 5;
         histogram = await histogramAgg({
           field,
           summary,
           result,
-          bounds,
+          bounds: {
+            stats: {
+              min: bounds.domain[0],
+              max: bounds.domain[1],
+              ...bounds.stats,
+            },
+            ...bounds,
+          },
           // yHistograms,
           taxonomy,
         });
@@ -199,10 +204,7 @@ const getOxford = async ({
     (bounds.catType == "float" || bounds.catType == "integer")
   ) {
     let buckets = xRes.aggs.aggregations[bounds.cat].histogram.buckets;
-    let catMeta = lookupTypes(bounds.cat);
-    let scaleFunc = catMeta.bins
-      ? scaleFuncs[catMeta.bins.scale]
-      : scaleFuncs.linear;
+    let scaleFunc = bounds.scale ? scaleFuncs[bounds.scale] : scaleFuncs.linear;
     cats = buckets.map(({ key }, i) => [
       scaleFunc(key),
       scaleFunc(buckets[Math.min(i + 1, buckets.length - 1)].key),
@@ -304,7 +306,10 @@ const getOxford = async ({
   }
   let seqLengths = await getSequenceLengths({
     assemblies: Object.keys(byAssembly),
-    xQuery,
+    xQuery: {
+      ...xQuery,
+      aggs: undefined,
+    },
     taxonomy,
     req,
   });
@@ -716,6 +721,62 @@ export const oxford = async ({
       params[key] = value;
     }
   });
+  let catOpts = ";;";
+  let portions = cat.split(/\s*[\[\]]\s*/);
+  if (portions.length > 1) {
+    // check if opts are set and update query
+    if (portions[1].match(/[,;]/)) {
+      catOpts = portions[1];
+      let queryArr = (params.query || "").split(
+        /(\s*[<>=]+\s*|\s+AND\s+|\s+and\s+)/
+      );
+      let options = portions[1].split(";");
+      if (options.length == 1) {
+        options = options[0].split(",");
+      }
+      let min, max;
+      if (!typeof options[0] !== "undefined") {
+        min = options[0];
+      }
+      if (!typeof options[1] !== "undefined") {
+        max = options[1];
+      }
+      for (let i = 0; i < queryArr.length; i++) {
+        let qMeta = lookupTypes(queryArr[i].toLowerCase());
+        if (qMeta && qMeta.name == portions[0]) {
+          i++;
+          if (min && queryArr[i] && queryArr[i].match(/</)) {
+            i++;
+            if (queryArr[i] && !isNaN(queryArr[i])) {
+              if (min > queryArr[i]) {
+                queryArr[i] = min;
+                min = undefined;
+              }
+            }
+          } else if (max && queryArr[i] && queryArr[i].match(/>/)) {
+            i++;
+            if (queryArr[i] && !isNaN(queryArr[i])) {
+              if (max < queryArr[i]) {
+                queryArr[i] = max;
+                max = undefined;
+              }
+            }
+          }
+        }
+      }
+      if (min) {
+        queryArr = queryArr.concat([" AND ", portions[0], " >= ", min]);
+      }
+      if (max) {
+        queryArr = queryArr.concat([" AND ", portions[0], " <= ", max]);
+      }
+      params.query = queryArr.join("");
+    } else {
+      catOpts = `;;${portions[1]}`;
+    }
+    delete portions[1];
+    cat = portions.join("");
+  }
   bounds = await getBounds({
     params: { ...params },
     fields: xFields.filter(
@@ -727,7 +788,7 @@ export const oxford = async ({
     exclusions,
     taxonomy,
     apiParams,
-    //opts: xOpts,
+    opts: catOpts,
   });
 
   let asms = parseAssemblies(bounds.query);

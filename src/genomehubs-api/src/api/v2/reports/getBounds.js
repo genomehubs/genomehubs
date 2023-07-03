@@ -121,6 +121,7 @@ export const getBounds = async ({
   });
   let definedTerms = await setTerms({
     cat,
+    opts,
     lookupTypes,
     taxonomy,
     apiParams,
@@ -282,7 +283,7 @@ export const getBounds = async ({
           );
       }
     }
-    domain = [min, max];
+    domain = [min * 1, max * 1];
   } else {
     let keywords = aggs.keywords;
     if (keywords) {
