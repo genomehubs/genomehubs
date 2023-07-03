@@ -13,6 +13,7 @@ import YAML from "js-yaml";
 import classnames from "classnames";
 import { compose } from "recompose";
 import gfm from "remark-gfm";
+import { gridPropNames } from "../functions/propNames";
 import { h } from "hastscript";
 import rehypeRaw from "rehype-raw";
 import rehypeReact from "rehype-react";
@@ -29,8 +30,11 @@ import { withStyles } from "@material-ui/core/styles";
 const pagesUrl = PAGES_URL;
 const webpackHash = COMMIT_HASH || __webpack_hash__;
 
-export const processProps = ({ props, newProps = {} }) => {
+export const processProps = ({ props, newProps = {}, isGrid }) => {
   for (const [key, value] of Object.entries(props)) {
+    if (isGrid && !gridPropNames.has(key)) {
+      continue;
+    }
     if (value === false) {
       newProps[key] = value;
     } else if (value == "") {
@@ -70,11 +74,11 @@ export const RehypeComponentsList = {
     if (props.hasOwnProperty("toggle")) {
       return (
         <Toggle {...processProps({ props: { toggle, expand, title } })}>
-          <Grid {...processProps({ props: gridProps })} />
+          <Grid {...processProps({ props: gridProps, isGrid: true })} />
         </Toggle>
       );
     } else {
-      return <Grid {...processProps({ props })} />;
+      return <Grid {...processProps({ props, isGrid: true })} />;
     }
   },
   hub: (props) => <span {...processProps({ props })}>{siteName}</span>,
@@ -87,7 +91,7 @@ export const RehypeComponentsList = {
     let nested = <Nested pgId={props.pageId} />;
     return (
       <Grid
-        {...processProps({ props })}
+        {...processProps({ props, isGrid: true })}
         item
         className={styles.reportContainer}
       >
@@ -97,7 +101,7 @@ export const RehypeComponentsList = {
   },
   item: (props) => (
     <Grid
-      {...processProps({ props })}
+      {...processProps({ props, isGrid: true })}
       item
       className={styles.reportContainer}
     />
@@ -116,7 +120,7 @@ export const RehypeComponentsList = {
         );
       } else if (className == "language-template") {
         return (
-          <Grid {...processProps({ props: nestedProps })} item>
+          <Grid {...processProps({ props: nestedProps, isGrid: true })} item>
             <Template {...processProps({ props: nestedProps })} />
           </Grid>
         );
