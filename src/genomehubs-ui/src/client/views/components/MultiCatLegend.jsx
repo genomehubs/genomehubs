@@ -175,17 +175,20 @@ const MultiCatLegend = ({
   let strokeWidth = pointSize / 5;
   let bgRect;
   if (handleClick) {
+    let bgWidth = compactLegend
+      ? stringLength(name) * pointSize + cellSize / 2
+      : legendWidth - cellSize / 2 + strokeWidth * 2;
     bgRect = (
       <Tooltip title={`Click to highlight ${name}`} arrow>
         <Rectangle
           className={styles.active}
           height={cellSize * (compactLegend ? 1 : 2) + strokeWidth * 2}
-          width={legendWidth - cellSize / 2 + strokeWidth * 2}
+          width={bgWidth}
           fill={"white"}
           stroke={fill || "rgb(102, 102, 102)"}
           strokeOpacity={active ? 0.5 : 0}
           strokeWidth={pointSize / 10}
-          x={cellSize - legendWidth - strokeWidth} // {props.cx + (w - width) / 2}
+          x={cellSize - bgWidth - strokeWidth} // {props.cx + (w - width) / 2}
           y={-cellSize / 2 - strokeWidth}
         />
       </Tooltip>
