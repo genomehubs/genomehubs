@@ -242,9 +242,11 @@ const QueryBuilder = ({
     grouped[group].push(key);
     return grouped;
   }, {});
+  let attrs = [];
   Object.entries(groupedTypes).forEach(([group, values]) => {
     variables.push(<ListSubheader key={`g-${group}`}>{group}</ListSubheader>);
     values.forEach((value) => {
+      attrs.push(value);
       variables.push(
         <MenuItem key={value} value={value}>
           {value}
@@ -256,15 +258,23 @@ const QueryBuilder = ({
   attrFilters.forEach((parts, i) => {
     let summary = "value";
     let attr = parts[0];
-    if (!types[attr]) {
+    if (!types[attr] && !attr.endsWith("_id")) {
       [summary, attr] = attr.split(/[\(\))]/);
     }
     if (attr) {
+      let extra = [];
+      if (!attrs.includes(attr)) {
+        extra = [
+          <MenuItem key={attr} value={attr}>
+            {attr}
+          </MenuItem>,
+        ];
+      }
       filterOptions.push(
         <VariableFilter
           key={i}
           field={attr}
-          fields={variables}
+          fields={variables.concat(extra)}
           operator={parts[1]}
           value={parts[2]}
           summary={summary}
