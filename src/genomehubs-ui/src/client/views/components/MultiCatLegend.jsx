@@ -90,7 +90,7 @@ export const valueString = ({ stats, cellSize, pointSize, fill }) => {
       value = (
         <Text
           x={-5}
-          y={cellSize}
+          y={cellSize * 1.15}
           fill={"rgb(102, 102, 102)"}
           dominantBaseline={"central"}
           textAnchor={"end"}
@@ -205,7 +205,7 @@ const MultiCatLegend = ({
       <g pointerEvents={handleClick ? "none" : "auto"}>
         <Text
           x={-5}
-          y={0}
+          y={cellSize / 4}
           fill={fill || "rgb(102, 102, 102)"}
           dominantBaseline={"central"}
           textAnchor={"end"}
