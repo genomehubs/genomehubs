@@ -10,6 +10,7 @@ export const processLegendData = ({
   bounds,
   yBounds,
   minWidth = 50,
+  labelPadding = 80,
   width,
   pointSize,
 }) => {
@@ -40,7 +41,7 @@ export const processLegendData = ({
         stringLength(cat.label) * pointSize * 1.2,
         minWidth
       );
-      if (labelWidth + catOffset < width - 10) {
+      if (labelWidth + catOffset < width - labelPadding) {
         catOffsets[cat.label] = { offset: 0, row };
         for (let prevCat of previousCats) {
           catOffsets[prevCat].offset += labelWidth;
@@ -52,7 +53,7 @@ export const processLegendData = ({
           row++;
         }
         catOffsets[cat.label] = { offset: 0, row };
-        if (labelWidth > width - 50) {
+        if (labelWidth > width - labelPadding) {
           catOffset = 0;
           row++;
         } else {

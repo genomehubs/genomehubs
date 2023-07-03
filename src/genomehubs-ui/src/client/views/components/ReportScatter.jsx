@@ -973,6 +973,8 @@ const ReportScatter = ({
   report,
   containerRef,
   embedded,
+  compactLegend = true,
+  compactWidth = 600,
   ratio,
   zScale = "linear",
   setMessage,
@@ -1066,7 +1068,10 @@ const ReportScatter = ({
       valueType,
       interval
     );
-    let compactLegend = typeof embedded === "undefined" || width < 500;
+    compactLegend =
+      typeof compactLegend !== "undefined"
+        ? compactLegend
+        : typeof embedded === "undefined" || width < compactWidth;
 
     const {
       translations,
@@ -1089,7 +1094,7 @@ const ReportScatter = ({
 
     let labels = bounds.labels || heatmaps.buckets;
     let yLabels = yBounds.labels || heatmaps.yBuckets;
-    let showLabels = width >= 500;
+    let showLabels = width >= compactWidth;
     const maxYLabel = showLabels
       ? maxStringLength(yLabels, yFormat, pointSize)
       : 0;
