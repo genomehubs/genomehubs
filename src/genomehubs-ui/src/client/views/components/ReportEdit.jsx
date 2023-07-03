@@ -48,10 +48,24 @@ const pointSizeSettings = {
   step: 5,
 };
 
+const nestedQueries = [
+  "queryA",
+  "queryB",
+  "queryC",
+  "queryD",
+  "queryE",
+  "queryF",
+  "queryG",
+  "queryH",
+  "queryI",
+  "queryJ",
+];
+
 export const queryPropList = {
   histogram: [
     "report",
     xSettings,
+    ...nestedQueries,
     rankSettings,
     catSettings,
     "includeEstimates",
@@ -66,6 +80,7 @@ export const queryPropList = {
   map: [
     "report",
     xSettings,
+    ...nestedQueries,
     rankSettings,
     catSettings,
     "includeEstimates",
@@ -76,6 +91,7 @@ export const queryPropList = {
   oxford: [
     "report",
     xSettings,
+    ...nestedQueries,
     catSettings,
     "xOpts",
     "plotRatio",
@@ -86,6 +102,7 @@ export const queryPropList = {
   scatter: [
     "report",
     xSettings,
+    ...nestedQueries,
     { prop: "y", label: `c_value`, required: true },
     rankSettings,
     catSettings,
@@ -104,6 +121,7 @@ export const queryPropList = {
   table: [
     "report",
     xSettings,
+    ...nestedQueries,
     { prop: "y", label: `c_value` },
     rankSettings,
     catSettings,
@@ -118,6 +136,7 @@ export const queryPropList = {
   tree: [
     "report",
     { ...xSettings, label: `tax_tree(${suggestedTerm})` },
+    ...nestedQueries,
     { prop: "y", label: `c_value` },
     catSettings,
     { prop: "levels", label: "family, order, phylum" },
@@ -133,6 +152,7 @@ export const queryPropList = {
   arc: [
     "report",
     "x",
+    ...nestedQueries,
     "y",
     rankSettings,
     "includeEstimates",
@@ -143,6 +163,7 @@ export const queryPropList = {
   xPerRank: [
     "report",
     "x",
+    ...nestedQueries,
     rankSettings,
     "includeEstimates",
     "result",
@@ -378,6 +399,14 @@ export const ReportEdit = ({
     }
 
     if (except && except.includes(result)) {
+      continue;
+    }
+
+    if (
+      queryProp.match(/^query[A-Z]$/) ||
+      queryProp == "result" ||
+      queryProp == "taxonomy"
+    ) {
       continue;
     }
 

@@ -722,7 +722,7 @@ export const oxford = async ({
     }
   });
   let catOpts = ";;";
-  let portions = cat.split(/\s*[\[\]]\s*/);
+  let portions = (cat || "").split(/\s*[\[\]]\s*/);
   if (portions.length > 1) {
     // check if opts are set and update query
     if (portions[1].match(/[,;]/)) {
