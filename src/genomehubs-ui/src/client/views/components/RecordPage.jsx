@@ -3,6 +3,7 @@ import React, { memo, useEffect } from "react";
 import AnalysisPanel from "./AnalysisPanel";
 import AssembliesPanel from "./AssembliesPanel";
 import AttributePanel from "./AttributePanel";
+import FeaturePanel from "./FeaturePanel";
 import LineagePanel from "./LineagePanel";
 import NamesPanel from "./NamesPanel";
 import Page from "./Page";
@@ -169,7 +170,7 @@ const RecordPage = ({
         );
       }
     }
-    if (options.result == "sample") {
+    if (options.result == "sample" || options.result == "feature") {
       results.push(
         <AssembliesPanel
           key={"assemblies"}
@@ -182,6 +183,17 @@ const RecordPage = ({
       results.push(
         <AnalysisPanel
           key={"analysis"}
+          recordId={record.record.record_id}
+          result={options.result}
+          taxonomy={options.taxonomy}
+        />
+      );
+    }
+
+    if (options.result == "feature") {
+      results.push(
+        <FeaturePanel
+          key={"feature"}
           recordId={record.record.record_id}
           result={options.result}
           taxonomy={options.taxonomy}
