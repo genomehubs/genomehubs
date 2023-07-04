@@ -597,10 +597,10 @@ const CustomizedYAxisTick = ({
         <Tooltip title={ttValue} arrow placement="right">
           <Rectangle
             className={styles.active}
-            x={0}
+            x={-50}
             y={centered ? -offset : 0}
             height={h}
-            width={plotWidth - marginWidth - marginRight - 110}
+            width={plotWidth - marginWidth - marginRight - 60}
             stroke={"none"}
             fill={"rgb(200,200,200)"}
             fillOpacity={0}
@@ -741,6 +741,7 @@ const Heatmap = ({
         fill="#666"
         fontSize={chartProps.pointSize}
         fontWeight="bold"
+        pointerEvents={"none"}
       />
     </XAxis>,
     <YAxis
@@ -783,6 +784,7 @@ const Heatmap = ({
         style={{ textAnchor: "middle" }}
         fontSize={chartProps.pointSize}
         fontWeight="bold"
+        pointerEvents={"none"}
       />
     </YAxis>,
     <YAxis
@@ -973,7 +975,7 @@ const ReportScatter = ({
   report,
   containerRef,
   embedded,
-  compactLegend = true,
+  compactLegend,
   compactWidth = 600,
   ratio,
   zScale = "linear",

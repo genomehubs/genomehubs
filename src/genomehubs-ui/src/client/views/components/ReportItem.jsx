@@ -59,6 +59,8 @@ const ReportItem = ({
   reversed,
   xOpts,
   yOpts,
+  compactLegend,
+  compactWidth,
   highlightArea,
   mapThreshold,
   scatterThreshold,
@@ -232,6 +234,8 @@ const ReportItem = ({
             stacked={stacked}
             cumulative={cumulative}
             xOpts={xOpts}
+            compactLegend={compactLegend}
+            compactWidth={compactWidth}
             includeEstimates={includeEstimates}
             pointSize={pointSize}
             // yScale={yScale}
@@ -267,6 +271,8 @@ const ReportItem = ({
             ratio={ratio}
             xOpts={xOpts}
             yOpts={yOpts}
+            compactLegend={compactLegend}
+            compactWidth={compactWidth}
             highlightArea={highlightArea}
             stacked={stacked}
             pointSize={pointSize}
@@ -289,6 +295,8 @@ const ReportItem = ({
             ratio={ratio}
             xOpts={xOpts}
             yOpts={yOpts}
+            compactLegend={compactLegend}
+            compactWidth={compactWidth}
             highlightArea={highlightArea}
             stacked={stacked}
             pointSize={pointSize}

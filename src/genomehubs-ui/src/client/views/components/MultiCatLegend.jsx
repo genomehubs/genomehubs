@@ -38,7 +38,7 @@ export const processLegendData = ({
     for (let i = 0; i < len; i++) {
       let cat = bounds.cats[i];
       let labelWidth = Math.max(
-        stringLength(cat.label) * pointSize * 1.2,
+        stringLength(cat.label) * pointSize + 1 * pointSize,
         minWidth
       );
       if (labelWidth + catOffset < width - labelPadding) {
@@ -177,7 +177,7 @@ const MultiCatLegend = ({
   let bgRect;
   if (handleClick) {
     let bgWidth = compactLegend
-      ? stringLength(name) * pointSize + cellSize / 2
+      ? stringLength(name) * pointSize * 0.9 + cellSize
       : legendWidth - cellSize / 2 + strokeWidth * 2;
     bgRect = (
       <Tooltip title={`Click to highlight ${name}`} arrow>

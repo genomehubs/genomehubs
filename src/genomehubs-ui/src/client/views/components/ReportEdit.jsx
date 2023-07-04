@@ -74,6 +74,8 @@ export const queryPropList = {
     "stacked",
     "cumulative",
     pointSizeSettings,
+    "compactLegend",
+    "compactWidth",
     "result",
     "taxonomy",
   ],
@@ -96,6 +98,8 @@ export const queryPropList = {
     "xOpts",
     "plotRatio",
     pointSizeSettings,
+    "compactLegend",
+    "compactWidth",
     "result",
     "taxonomy",
   ],
@@ -115,6 +119,8 @@ export const queryPropList = {
     "plotRatio",
     "scatterThreshold",
     pointSizeSettings,
+    "compactLegend",
+    "compactWidth",
     "result",
     "taxonomy",
   ],
@@ -157,6 +163,8 @@ export const queryPropList = {
     rankSettings,
     "includeEstimates",
     pointSizeSettings,
+    "compactLegend",
+    "compactWidth",
     "result",
     "taxonomy",
   ],
@@ -491,7 +499,8 @@ export const ReportEdit = ({
       queryProp == "stacked" ||
       queryProp == "cumulative" ||
       queryProp == "reversed" ||
-      queryProp == "collapseMonotypic"
+      queryProp == "collapseMonotypic" ||
+      queryProp == "compactLegend"
     ) {
       toggles.push(
         <div style={{ float: "left", marginRight: "2em" }} key={queryProp}>
