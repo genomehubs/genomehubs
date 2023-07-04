@@ -3,9 +3,13 @@ import React, { memo, useEffect, useState } from "react";
 import AutoCompleteInput from "./AutoCompleteInput";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
+import Report from "./Report";
 import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
 import Tooltip from "@material-ui/core/Tooltip";
+import VisibilityIcon from "@material-ui/icons/Visibility";
+import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
+import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";
 
 // import classnames from "classnames";
@@ -15,6 +19,7 @@ import { useNavigate } from "@reach/router";
 const Template = ({ id, title, description, url, ...props }) => {
   // const [content, setContent] = useState(null);
   const [values, setValues] = useState({});
+  const [showPreview, setShowPreview] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -121,24 +126,55 @@ const Template = ({ id, title, description, url, ...props }) => {
       </Grid>
     );
   }
+  let report;
+  if (showPreview) {
+    let searchUrl = url;
+    for (let [key, value] of Object.entries(values)) {
+      searchUrl = searchUrl.replaceAll(`{${key}}`, value);
+    }
+    let reportProps = qs.parse(decodeURI(searchUrl.split(/[\?#]/)[1]));
+    report = (
+      <Grid item xs={12}>
+        <Report {...reportProps} caption={" "}></Report>
+      </Grid>
+    );
+  }
   return (
     <Grid container direction="column" spacing={1}>
       <Grid item xs={12}>
         <h2>{title}</h2>
         {description}
       </Grid>
+      {showPreview && report}
       {inputs}
-      <Grid item align="right" key={"submit"}>
-        <Button
-          variant="contained"
-          color="default"
-          disableElevation
-          // className={classes.button}
-          startIcon={<SearchIcon />}
-          onClick={handleSubmit}
-        >
-          Submit
-        </Button>
+      <Grid container direction="row" spacing={1} justifyContent="flex-end">
+        <Grid item key={"preview"}>
+          <Button
+            variant="contained"
+            color="default"
+            disableElevation
+            // className={classes.button}
+            startIcon={showPreview ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            onClick={(e) => {
+              e.preventDefault();
+              setShowPreview(!showPreview);
+            }}
+          >
+            {showPreview ? "Hide Preview" : "Preview"}
+          </Button>
+        </Grid>
+        <Grid item key={"submit"}>
+          <Button
+            variant="contained"
+            color="default"
+            disableElevation
+            // className={classes.button}
+            startIcon={<SearchIcon />}
+            onClick={handleSubmit}
+          >
+            Search
+          </Button>
+        </Grid>
       </Grid>
     </Grid>
   );
