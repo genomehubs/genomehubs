@@ -116,7 +116,7 @@ export const ReportXAxisTick = ({
         </text>
       );
     }
-  } else {
+  } else if (ttValue) {
     rect = (
       <g>
         <Tooltip title={ttValue} arrow placement="top">
@@ -124,7 +124,7 @@ export const ReportXAxisTick = ({
             className={styles.active}
             x={centered ? 0 - bucketWidth / 2 : 0}
             y={marginTop - yPos}
-            height={yPos + 50 - marginTop}
+            height={yPos + pointSize - marginTop}
             width={bucketWidth}
             stroke={"none"}
             fill={"rgb(200,200,200)"}

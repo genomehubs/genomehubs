@@ -597,10 +597,10 @@ const CustomizedYAxisTick = ({
         <Tooltip title={ttValue} arrow placement="right">
           <Rectangle
             className={styles.active}
-            x={-50}
+            x={-pointSize}
             y={centered ? -offset : 0}
             height={h}
-            width={plotWidth - marginWidth - marginRight - 60}
+            width={plotWidth - marginWidth - marginRight - 110 + pointSize}
             stroke={"none"}
             fill={"rgb(200,200,200)"}
             fillOpacity={0}
