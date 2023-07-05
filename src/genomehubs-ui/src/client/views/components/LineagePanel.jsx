@@ -2,15 +2,13 @@ import React from "react";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
-import { format } from "d3-format";
-import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
 import withTaxonomy from "../hocs/withTaxonomy";
 
-const LineagePanel = ({
+export const LineageList = ({
   taxon_id,
   setRecordId,
   lineage,
@@ -35,12 +33,8 @@ const LineagePanel = ({
     }
   };
 
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel
-  );
   let lineageDivs = [];
+
   if (lineage && lineage.lineage) {
     lineage.lineage.forEach((ancestor) => {
       lineageDivs.unshift(
@@ -58,12 +52,41 @@ const LineagePanel = ({
     });
   }
 
+  return <div style={{ maxWidth: "100%" }}>{lineageDivs}</div>;
+};
+
+const LineagePanel = ({
+  taxon_id,
+  setRecordId,
+  lineage,
+  fetchSearchResults,
+  setPreferSearchTerm,
+  setLookupTerm,
+  taxonomy,
+}) => {
+  let css = classnames(
+    styles.infoPanel,
+    styles[`infoPanel1Column`],
+    styles.resultPanel
+  );
+  let lineages = (
+    <LineageList
+      taxon_id={taxon_id}
+      setRecordId={setRecordId}
+      lineage={lineage}
+      fetchSearchResults={fetchSearchResults}
+      setPreferSearchTerm={setPreferSearchTerm}
+      setLookupTerm={setLookupTerm}
+      taxonomy={taxonomy}
+    />
+  );
+
   return (
     <div className={css}>
       <div className={styles.header}>
         <span className={styles.title}>Lineage</span>
       </div>
-      <div style={{ maxWidth: "100%" }}>{lineageDivs}</div>
+      {lineages}
     </div>
   );
 };

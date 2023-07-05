@@ -68,7 +68,7 @@ const ResultPanel = ({
   if (fields) {
     fields.forEach((field) => {
       let value = field.value;
-      if (typeof value === "undefined") {
+      if (typeof value === "undefined" || !field.aggregation_method) {
         return null;
       }
       let length = 1;

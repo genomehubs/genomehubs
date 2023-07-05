@@ -1,7 +1,11 @@
 import React, { useEffect } from "react";
 
 import AnalysisTableRow from "./AnalysisTableRow";
+import ContainedByFeatureTemplate from "./ContainedByFeatureTemplate";
+import ContainsFeatureTemplate from "./ContainsFeatureTemplate";
+import { Grid } from "@material-ui/core";
 import NavLink from "./NavLink";
+import OverlapsFeatureTemplate from "./OverlapsFeatureTemplate";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -37,8 +41,6 @@ const FeaturePanel = ({
       sequenceId = sequenceObj.value;
     }
   }
-
-  console.log(records);
 
   useEffect(() => {
     if (sequenceId && !records[sequenceId] && !recordIsFetching) {
@@ -216,6 +218,44 @@ const FeaturePanel = ({
     );
   }
 
+  let templates;
+  if (content) {
+    // Add searches to show:
+    //   - similar features on the same sequence
+    //   - features containing, overlapping or contained by this feature
+    //     (with option to restrict by type)
+    //   - assembly or taxon record for this feature
+
+    templates = (
+      <Grid container direction="row" justifyContent="flex-end">
+        <Grid item xs={6}>
+          <ContainsFeatureTemplate
+            featureId={record.record.feature_id}
+            featureType={"*"}
+            sequenceId={sequenceId}
+            taxonomy={taxonomy}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <OverlapsFeatureTemplate
+            featureId={record.record.feature_id}
+            featureType={"*"}
+            sequenceId={sequenceId}
+            taxonomy={taxonomy}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <ContainedByFeatureTemplate
+            featureId={record.record.feature_id}
+            featureType={"*"}
+            sequenceId={sequenceId}
+            taxonomy={taxonomy}
+          />
+        </Grid>
+      </Grid>
+    );
+  }
+
   let svg = (
     <svg
       viewBox={`0 0 ${width} ${height * 0.9}`}
@@ -244,10 +284,11 @@ const FeaturePanel = ({
   return (
     <div className={css}>
       <div className={styles.header}>
-        <span className={styles.title}>Feature</span>
+        <span className={styles.title}>Region</span>
       </div>
       <div>{svg}</div>
       <div style={{ float: "right" }}>{ensemblLink}</div>
+      {templates}
       <p />
     </div>
   );

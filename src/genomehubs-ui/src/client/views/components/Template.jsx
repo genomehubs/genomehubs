@@ -4,6 +4,7 @@ import AutoCompleteInput from "./AutoCompleteInput";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import Report from "./Report";
+import ResultCount from "./ResultCount";
 import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -126,18 +127,26 @@ const Template = ({ id, title, description, url, ...props }) => {
       </Grid>
     );
   }
-  let report;
+  let preview;
   if (showPreview) {
     let searchUrl = url;
     for (let [key, value] of Object.entries(values)) {
       searchUrl = searchUrl.replaceAll(`{${key}}`, value);
     }
     let reportProps = qs.parse(decodeURI(searchUrl.split(/[\?#]/)[1]));
-    report = (
-      <Grid item xs={12}>
-        <Report {...reportProps} caption={" "}></Report>
-      </Grid>
-    );
+    if (reportProps.report) {
+      preview = (
+        <Grid item xs={12}>
+          <Report {...reportProps} caption={" "}></Report>
+        </Grid>
+      );
+    } else {
+      preview = (
+        <Grid item xs={12}>
+          <ResultCount {...reportProps} caption={" "}></ResultCount>
+        </Grid>
+      );
+    }
   }
   return (
     <Grid container direction="column" spacing={1}>
@@ -145,7 +154,7 @@ const Template = ({ id, title, description, url, ...props }) => {
         <h2>{title}</h2>
         {description}
       </Grid>
-      {showPreview && report}
+      {showPreview && preview}
       {inputs}
       <Grid container direction="row" spacing={1} justifyContent="flex-end">
         <Grid item key={"preview"}>

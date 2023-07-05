@@ -8,6 +8,7 @@ import LineagePanel from "./LineagePanel";
 import NamesPanel from "./NamesPanel";
 import Page from "./Page";
 import ResultPanel from "./ResultPanel";
+import TaxonPanel from "./TaxonPanel";
 import TextPanel from "./TextPanel";
 import classnames from "classnames";
 import { compose } from "recompose";
@@ -147,10 +148,11 @@ const RecordPage = ({
       scientific_name: record.record.scientific_name,
       taxon_rank: record.record.taxon_rank,
     };
-    results.push(
-      <ResultPanel key={taxon.taxon_id} {...searchById} {...taxon} />
-    );
     if (options.result == "taxon") {
+      results.push(
+        <ResultPanel key={taxon.taxon_id} {...searchById} {...taxon} />
+      );
+
       if (record.record.lineage) {
         results.push(
           <LineagePanel
@@ -170,6 +172,18 @@ const RecordPage = ({
         );
       }
     }
+
+    if (options.result == "feature") {
+      results.push(
+        <FeaturePanel
+          key={"feature"}
+          recordId={record.record.record_id}
+          result={options.result}
+          taxonomy={options.taxonomy}
+        />
+      );
+    }
+
     if (options.result == "sample" || options.result == "feature") {
       results.push(
         <AssembliesPanel
@@ -190,11 +204,12 @@ const RecordPage = ({
       );
     }
 
-    if (options.result == "feature") {
+    if (options.result != "taxon") {
       results.push(
-        <FeaturePanel
-          key={"feature"}
+        <TaxonPanel
+          key={"taxon"}
           recordId={record.record.record_id}
+          {...record.record}
           result={options.result}
           taxonomy={options.taxonomy}
         />
