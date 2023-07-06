@@ -1,4 +1,5 @@
 import React from "react";
+import Tooltip from "@material-ui/core/Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
@@ -38,16 +39,21 @@ export const LineageList = ({
   if (lineage && lineage.lineage) {
     lineage.lineage.forEach((ancestor) => {
       lineageDivs.unshift(
-        <span
+        <Tooltip
+          title={`${ancestor.taxon_rank} [taxid: ${ancestor.taxon_id}]`}
+          arrow
+          placement="top"
           key={ancestor.taxon_id}
-          className={styles.lineage}
-          onClick={() =>
-            handleTaxonClick(ancestor.taxon_id, ancestor.scientific_name)
-          }
-          title={`${ancestor.taxon_rank}: ${ancestor.scientific_name} [taxid: ${ancestor.taxon_id}]`}
         >
-          {ancestor.scientific_name}
-        </span>
+          <span
+            className={styles.lineage}
+            onClick={() =>
+              handleTaxonClick(ancestor.taxon_id, ancestor.scientific_name)
+            }
+          >
+            {ancestor.scientific_name}
+          </span>
+        </Tooltip>
       );
     });
   }

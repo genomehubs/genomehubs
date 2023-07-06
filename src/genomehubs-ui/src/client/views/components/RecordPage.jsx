@@ -2,6 +2,7 @@ import React, { memo, useEffect } from "react";
 
 import AnalysisPanel from "./AnalysisPanel";
 import AssembliesPanel from "./AssembliesPanel";
+import AssemblyPanel from "./AssemblyPanel";
 import AttributePanel from "./AttributePanel";
 import FeaturePanel from "./FeaturePanel";
 import LineagePanel from "./LineagePanel";
@@ -173,7 +174,28 @@ const RecordPage = ({
       }
     }
 
+    if (options.result != "taxon") {
+      results.push(
+        <TaxonPanel
+          key={"taxon"}
+          recordId={record.record.record_id}
+          {...record.record}
+          result={options.result}
+          taxonomy={options.taxonomy}
+        />
+      );
+    }
+
     if (options.result == "feature") {
+      results.push(
+        <AssemblyPanel
+          key={"assembly"}
+          recordId={record.record.record_id}
+          assemblyId={record.record.assembly_id}
+          result={options.result}
+          taxonomy={options.taxonomy}
+        />
+      );
       results.push(
         <FeaturePanel
           key={"feature"}
@@ -182,9 +204,7 @@ const RecordPage = ({
           taxonomy={options.taxonomy}
         />
       );
-    }
-
-    if (options.result == "sample" || options.result == "feature") {
+    } else if (options.result == "sample") {
       results.push(
         <AssembliesPanel
           key={"assemblies"}
@@ -198,18 +218,6 @@ const RecordPage = ({
         <AnalysisPanel
           key={"analysis"}
           recordId={record.record.record_id}
-          result={options.result}
-          taxonomy={options.taxonomy}
-        />
-      );
-    }
-
-    if (options.result != "taxon") {
-      results.push(
-        <TaxonPanel
-          key={"taxon"}
-          recordId={record.record.record_id}
-          {...record.record}
           result={options.result}
           taxonomy={options.taxonomy}
         />

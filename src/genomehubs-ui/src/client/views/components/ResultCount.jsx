@@ -20,7 +20,6 @@ const ResultCount = ({ apiUrl, ...options }) => {
         json = console.log("An error occured.", error);
       }
       if (json && json.status && json.status.success) {
-        console.log(json);
         setCount(json.count);
       }
     };

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "@reach/router";
 
 import Grid from "@material-ui/core/Grid";
 import { LineageList } from "./LineagePanel";
+import NavLink from "./NavLink";
 import Tooltip from "@material-ui/core/Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
@@ -33,6 +34,7 @@ const TaxonPanel = ({
   let options = qs.parse(location.search.replace(/^\?/, ""));
 
   let lineages;
+  let taxidLink;
   if (taxon_id && !scientific_name) {
     if (records[taxon_id]) {
       scientific_name = records[taxon_id].record.scientific_name;
@@ -41,6 +43,17 @@ const TaxonPanel = ({
         taxon: { taxon_id, scientific_name, taxon_rank },
         lineage: records[taxon_id].record.lineage,
       };
+      if (taxonomy == "ncbi" && taxon_id.match(/^\d+$/)) {
+        let taxidUrl = `https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${taxon_id}`;
+        taxidLink = (
+          <>
+            View taxon in{" "}
+            <span style={{ textDecoration: "underline" }}>
+              <NavLink href={taxidUrl}>NCBI taxonomy</NavLink>
+            </span>
+          </>
+        );
+      }
     } else {
     }
   }
@@ -83,9 +96,9 @@ const TaxonPanel = ({
 
   return (
     <div className={css}>
-      <Tooltip title={"Click to view record"} arrow placement="top">
+      <Tooltip title={"Click to view full taxon record"} arrow placement="top">
         <div className={styles.header} onClick={handleTaxonClick}>
-          <span className={styles.title}>{scientific_name}</span>
+          <span className={styles.title}>Taxon — {scientific_name}</span>
           <span> ({taxon_rank})</span>
           <span className={styles.identifier}>
             <span className={styles.identifierPrefix}>taxId:</span>
@@ -95,12 +108,20 @@ const TaxonPanel = ({
       </Tooltip>
 
       <div>
-        <Grid container alignItems="center" direction="row" spacing={0}></Grid>
-        {/* <div className={styles.flexRow}>{fieldDivs}</div>
+        <Grid container alignItems="center" direction="column" spacing={1}>
+          {/* <div className={styles.flexRow}>{fieldDivs}</div>
         {additionalDivs.length > 0 && (
           <div className={styles.flexRow}>{additionalDivs}</div>
         )} */}
-        <div>{lineages}</div>
+          <Grid item>{lineages}</Grid>
+          {taxidLink && (
+            <>
+              <Grid container direction="row" justifyContent="flex-end">
+                <Grid item>{taxidLink}</Grid>
+              </Grid>
+            </>
+          )}
+        </Grid>
       </div>
     </div>
   );

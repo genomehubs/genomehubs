@@ -1,22 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-import AnalysisTableRow from "./AnalysisTableRow";
-import ContainedByFeatureTemplate from "./ContainedByFeatureTemplate";
-import ContainsFeatureTemplate from "./ContainsFeatureTemplate";
+import BasicSelect from "./BasicSelect";
 import { Grid } from "@material-ui/core";
 import NavLink from "./NavLink";
-import OverlapsFeatureTemplate from "./OverlapsFeatureTemplate";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
+import OverlapsRegionTemplate from "./OverlapsRegionTemplate";
 import classnames from "classnames";
 import { compose } from "recompose";
-import qs from "../functions/qs";
 import styles from "./Styles.scss";
-import withAnalysesByAnyId from "../hocs/withAnalysesByAnyId";
-import withAnalysis from "../hocs/withAnalysis";
 import withRecord from "../hocs/withRecord";
 
 const FeaturePanel = ({
@@ -34,13 +24,29 @@ const FeaturePanel = ({
     styles[`infoPanel1Column`],
     styles.resultPanel
   );
+
+  const [selectedTemplate, setSelectedTemplate] = useState("none");
+
+  const templateValues = {
+    " ": "none",
+    containing: "contains",
+    "contained by": "contained",
+    overlapping: "overlap",
+  };
+
   let sequenceId;
+  let featureId;
   if (record && record.record) {
+    featureId = record.record.feature_id;
     let sequenceObj = record.record.attributes.sequence_id;
     if (sequenceObj) {
       sequenceId = sequenceObj.value;
     }
   }
+
+  const handleUpdateTemplate = (e) => {
+    setSelectedTemplate(e.target.value);
+  };
 
   useEffect(() => {
     if (sequenceId && !records[sequenceId] && !recordIsFetching) {
@@ -48,7 +54,7 @@ const FeaturePanel = ({
     }
   }, [records]);
 
-  let primaryColor = "black";
+  let primaryColor = "#ff7001";
   let secondaryColor = "#666666";
   let width = 1000;
   let margin = 0.05;
@@ -59,12 +65,15 @@ const FeaturePanel = ({
 
   let content;
   let ensemblUrl;
+  let assemblyId;
+  let region;
 
   let scale = (value) => value * width * (1 - 2 * margin);
 
   if (record && record.record && sequenceId && records[sequenceId]) {
     let featureAttributes = record.record.attributes;
     let sequenceAttributes = records[sequenceId].record.attributes;
+    assemblyId = record.record.assembly_id;
 
     let midX =
       scale(
@@ -119,7 +128,7 @@ const FeaturePanel = ({
           y1={height * 0.15}
           x2={strand >= 0 ? endX : startX}
           y2={height * 0.15}
-          fill={"none"}
+          fill={primaryColor}
           stroke={primaryColor}
           strokeWidth={boldStroke}
           strokeLinecap={"round"}
@@ -217,6 +226,7 @@ const FeaturePanel = ({
       </>
     );
   }
+  let assemblyLink;
 
   let templates;
   if (content) {
@@ -226,34 +236,24 @@ const FeaturePanel = ({
     //     (with option to restrict by type)
     //   - assembly or taxon record for this feature
 
-    templates = (
-      <Grid container direction="row" justifyContent="flex-end">
+    region = featureId.replace(`${sequenceId}:`, "").split(":")[0];
+
+    if (selectedTemplate != "none") {
+      templates = (
         <Grid item xs={6}>
-          <ContainsFeatureTemplate
+          <OverlapsRegionTemplate
             featureId={record.record.feature_id}
             featureType={"*"}
+            region={region}
             sequenceId={sequenceId}
             taxonomy={taxonomy}
+            contains={selectedTemplate == "contains"}
+            contained={selectedTemplate == "contained"}
+            overlap={selectedTemplate == "overlap"}
           />
         </Grid>
-        <Grid item xs={6}>
-          <OverlapsFeatureTemplate
-            featureId={record.record.feature_id}
-            featureType={"*"}
-            sequenceId={sequenceId}
-            taxonomy={taxonomy}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <ContainedByFeatureTemplate
-            featureId={record.record.feature_id}
-            featureType={"*"}
-            sequenceId={sequenceId}
-            taxonomy={taxonomy}
-          />
-        </Grid>
-      </Grid>
-    );
+      );
+    }
   }
 
   let svg = (
@@ -268,6 +268,7 @@ const FeaturePanel = ({
           markerHeight={height * 0.05}
           refX={height * 0.03}
           refY={height * 0.025}
+          fill={primaryColor}
           orient="auto"
         >
           <polygon
@@ -284,11 +285,29 @@ const FeaturePanel = ({
   return (
     <div className={css}>
       <div className={styles.header}>
-        <span className={styles.title}>Region</span>
+        <span className={styles.title}>Feature — {featureId}</span>
       </div>
       <div>{svg}</div>
-      <div style={{ float: "right" }}>{ensemblLink}</div>
-      {templates}
+      <Grid container direction="column">
+        <Grid container direction="row" spacing={1}>
+          <Grid item xs={1}></Grid>
+          <Grid item xs={2}>
+            <BasicSelect
+              id={"select-feature-template"}
+              handleChange={handleUpdateTemplate}
+              helperText={"show search template"}
+              current={selectedTemplate}
+              values={templateValues}
+            />
+          </Grid>
+          <Grid item style={{ flexGrow: "1" }}></Grid>
+          <Grid item>{ensemblLink}</Grid>
+        </Grid>
+        <Grid container direction="row" spacing={1}>
+          <Grid item xs={3}></Grid>
+          {templates}
+        </Grid>
+      </Grid>
       <p />
     </div>
   );
