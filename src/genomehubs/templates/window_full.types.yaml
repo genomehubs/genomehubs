@@ -21,6 +21,11 @@ features:
   primary_type: <<level>>
 taxonomy:
   taxon_id: <<taxon_id>>
+identifiers:
+  genbank_accession:
+    header: sequence
+  assigned_name:
+    header: assigned_name
 attributes:
   sequence_id:
     header: sequence

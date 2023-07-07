@@ -15,7 +15,6 @@ const FeaturePanel = ({
   records,
   fetchRecord,
   recordIsFetching,
-  ensemblAssemblyId = "Erynnis_tages_GCA_905147235.1",
   result,
   taxonomy,
 }) => {
@@ -35,9 +34,11 @@ const FeaturePanel = ({
   };
 
   let sequenceId;
+  let taxonId;
   let featureId;
   if (record && record.record) {
     featureId = record.record.feature_id;
+    taxonId = record.record.taxon_id;
     let sequenceObj = record.record.attributes.sequence_id;
     if (sequenceObj) {
       sequenceId = sequenceObj.value;
@@ -51,6 +52,9 @@ const FeaturePanel = ({
   useEffect(() => {
     if (sequenceId && !records[sequenceId] && !recordIsFetching) {
       fetchRecord(sequenceId, result, taxonomy);
+    }
+    if (taxonId && !records[taxonId] && !recordIsFetching) {
+      fetchRecord(taxonId, "taxon", taxonomy);
     }
   }, [records]);
 
@@ -66,14 +70,32 @@ const FeaturePanel = ({
   let content;
   let ensemblUrl;
   let assemblyId;
+  let assignedName;
+  let featureAttributes;
   let region;
 
   let scale = (value) => value * width * (1 - 2 * margin);
 
   if (record && record.record && sequenceId && records[sequenceId]) {
-    let featureAttributes = record.record.attributes;
+    featureAttributes = record.record.attributes;
     let sequenceAttributes = records[sequenceId].record.attributes;
+    let sequenceIdentifiers = records[sequenceId].record.identifiers;
     assemblyId = record.record.assembly_id;
+    assignedName = sequenceIdentifiers.filter(
+      (obj) => obj.class == "assigned_name"
+    );
+    if (assignedName.length == 1) {
+      assignedName = assignedName[0].identifier;
+    } else {
+      assignedName = sequenceIdentifiers.filter(
+        (obj) => obj.class == "genbank_accession"
+      );
+      if (assignedName.length == 1) {
+        assignedName = assignedName[0].identifier;
+      } else {
+        assignedName = undefined;
+      }
+    }
 
     let midX =
       scale(
@@ -212,7 +234,14 @@ const FeaturePanel = ({
         {featureGroup}
       </g>
     );
-    ensemblUrl = `https://rapid.ensembl.org/${ensemblAssemblyId}/Location/View?r=4%3A${featureAttributes.start.value}-${featureAttributes.end.value}`;
+    if (assignedName && assemblyId && records[taxonId]) {
+      let ensemblAssemblyId =
+        `${records[taxonId].record.scientific_name}_${assemblyId}`.replaceAll(
+          " ",
+          "_"
+        );
+      ensemblUrl = `https://rapid.ensembl.org/${ensemblAssemblyId}/Location/View?r=${assignedName}%3A${featureAttributes.start.value}-${featureAttributes.end.value}`;
+    }
   }
 
   let ensemblLink;
@@ -236,7 +265,7 @@ const FeaturePanel = ({
     //     (with option to restrict by type)
     //   - assembly or taxon record for this feature
 
-    region = featureId.replace(`${sequenceId}:`, "").split(":")[0];
+    region = `${featureAttributes.start.value}-${featureAttributes.end.value}`;
 
     if (selectedTemplate != "none") {
       templates = (
