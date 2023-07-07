@@ -542,6 +542,11 @@ export const AutoCompleteInput = ({
           label={inputLabel}
           name={inputName}
           className={inputClassName}
+          InputLabelProps={{
+            ...((inputName || "").startsWith("query") && {
+              shrink: true,
+            }),
+          }}
           variant={size == "small" ? "standard" : "outlined"}
           fullWidth
           multiline={maxRows == 1 ? false : true}
