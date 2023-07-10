@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
+import ArtTrackIcon from "@material-ui/icons/ArtTrack";
 import ControlPointIcon from "@material-ui/icons/ControlPoint";
 import DialogContent from "@material-ui/core/DialogContent";
 import FormControl from "@material-ui/core/FormControl";
@@ -53,6 +54,7 @@ const SearchToggles = ({
   setSearchDefaults,
   setLookupTerm,
   basename,
+  toggleTemplate,
 }) => {
   const classes = useStyles();
   const navigate = useNavigate();
@@ -67,6 +69,30 @@ const SearchToggles = ({
     setLookupTerm("");
     navigate(`${basename}/search`);
   };
+  let templateButton = <Grid item xs={1}></Grid>;
+  if (toggleTemplate) {
+    templateButton = (
+      <Tooltip title={`Click to show search template`} arrow placement={"top"}>
+        <Grid
+          item
+          xs={1}
+          onClick={() => setShowSettings(true)}
+          style={{ cursor: "pointer" }}
+        >
+          <FormControl
+            className={classes.formControl}
+            style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
+            onClick={toggleTemplate}
+          >
+            <FormHelperText>template</FormHelperText>
+            <IconButton aria-label="show search template" size="small">
+              <ArtTrackIcon />
+            </IconButton>
+          </FormControl>
+        </Grid>
+      </Tooltip>
+    );
+  }
   return (
     <>
       <Grid container direction="row" ref={rootRef}>
@@ -167,7 +193,7 @@ const SearchToggles = ({
             </FormControl>
           </Grid>
         </Tooltip>
-        <Grid item xs={1}></Grid>
+        {templateButton}
         <Tooltip title={`Click to set result columns`} arrow placement={"top"}>
           <Grid
             item

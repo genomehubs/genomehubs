@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import BasicSelect from "./BasicSelect";
 import { Grid } from "@material-ui/core";
 import NavLink from "./NavLink";
-import OverlapsRegionTemplate from "./OverlapsRegionTemplate";
+import Template from "./Template";
 import classnames from "classnames";
 import { compose } from "recompose";
 import styles from "./Styles.scss";
@@ -268,17 +268,29 @@ const FeaturePanel = ({
     region = `${featureAttributes.start.value}-${featureAttributes.end.value}`;
 
     if (selectedTemplate != "none") {
+      let templateId;
+      switch (selectedTemplate) {
+        case "contains": {
+          templateId = "featureContainsRegion";
+          break;
+        }
+        case "contained": {
+          templateId = "featureContainedByRegion";
+          break;
+        }
+        default: {
+          templateId = "featureOverlappingRegion";
+          break;
+        }
+      }
       templates = (
         <Grid item xs={6}>
-          <OverlapsRegionTemplate
-            featureId={record.record.feature_id}
-            featureType={"*"}
-            region={region}
-            sequenceId={sequenceId}
-            taxonomy={taxonomy}
-            contains={selectedTemplate == "contains"}
-            contained={selectedTemplate == "contained"}
-            overlap={selectedTemplate == "overlap"}
+          <Template
+            id={templateId}
+            valueA={"*"}
+            valueB={sequenceId}
+            valueC={featureAttributes.start.value}
+            valueD={featureAttributes.end.value}
           />
         </Grid>
       );

@@ -812,6 +812,8 @@ const ResultTable = ({
   }
   heads.push(<TableCell key={"last"}></TableCell>);
 
+  console.log("ResultTable");
+
   return (
     <Grid
       container
