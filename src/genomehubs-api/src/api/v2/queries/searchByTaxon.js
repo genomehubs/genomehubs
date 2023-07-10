@@ -53,6 +53,14 @@ export const searchByTaxon = async ({
     indexType: "identifiers",
     taxonomy,
   });
+  let attr_summaries = {};
+  fields.forEach((field) => {
+    let [name, summary = "default"] = field.split(":");
+    if (!attr_summaries[name]) {
+      attr_summaries[name] = [];
+    }
+    attr_summaries[name].push(summary);
+  });
   let attr_fields = fields
     .filter((field) => lookupTypes(field))
     .map((field) => lookupTypes(field).name);
@@ -69,6 +77,7 @@ export const searchByTaxon = async ({
   let excludedSources = excludeSources(exclusions, fields);
   let attributesExist = matchAttributes(
     fields,
+    attr_summaries,
     lookupTypes,
     aggregation_source,
     searchRawValues

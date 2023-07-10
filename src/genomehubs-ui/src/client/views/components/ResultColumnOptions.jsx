@@ -65,6 +65,9 @@ const useStyles = makeStyles((theme) => ({
 
 const summaryTypesFromMeta = (meta) => {
   let summaryTypes = ["value"];
+  // if (meta) {
+  //   summaryTypes.push()
+  // }
   if (meta?.summary) {
     let skip = true;
     let summaries = meta.summary;
@@ -118,7 +121,7 @@ const ResultColumnOptions = ({
         .split(",")
         .map((field) => field.split(":"))
         .filter(([f]) => f == attributeId)
-        .map(([_, subset = "value"]) => subset)
+        .map(([name, subset = types[attributeId].processed_simple]) => subset)
     : ["value"];
   const [summaryCols, setsummaryCols] = React.useState(initialSelected);
 
@@ -132,9 +135,12 @@ const ResultColumnOptions = ({
   };
 
   const handleClick = () => {
-    let newFields = summaryCols.map((summary) =>
-      summary == "value" ? attributeId : `${attributeId}:${summary}`
-    );
+    let newFields = summaryCols.map((summary) => {
+      let processed_simple = types[attributeId].processed_simple || "value";
+      return summary == processed_simple
+        ? attributeId
+        : `${attributeId}:${summary}`;
+    });
     let fields = [];
     if (searchTerm.fields) {
       fields = searchTerm.fields.split(",");

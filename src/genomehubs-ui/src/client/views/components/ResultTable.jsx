@@ -338,6 +338,7 @@ const SortableCell = ({
 };
 
 const ResultTable = ({
+  types,
   displayTypes,
   fetchSearchResults,
   saveSearchResults,
@@ -363,8 +364,17 @@ const ResultTable = ({
           name,
         }))
         .filter((obj) => obj.name != "none");
+      for (let obj of expandedTypes) {
+        let [name, summary] = obj.name.split(":");
+        obj.summary =
+          summary ||
+          (types[name] || { processed_simple: "value" }).processed_simple;
+      }
     } else {
       expandedTypes = displayTypes;
+      for (let obj of expandedTypes) {
+        obj.summary = "value";
+      }
     }
   }
 
@@ -609,7 +619,7 @@ const ResultTable = ({
         result.result.fields.hasOwnProperty(type.name)
       ) {
         let field = result.result.fields[type.name];
-        let value = field.value;
+        let value = field[type.summary];
         let entries = [];
         if (Array.isArray(value)) {
           value = formatter(value, searchIndex, "array");

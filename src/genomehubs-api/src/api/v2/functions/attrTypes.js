@@ -35,6 +35,38 @@ const setProcessedType = (meta) => {
   return meta.type;
 };
 
+const setProcessedSummary = (meta, typesMap) => {
+  let summary;
+  let simple;
+  if (meta.type == "keyword") {
+    if (meta.summary) {
+      if (Array.isArray(meta.summary)) {
+        if (
+          meta.summary[0].endsWith("list") ||
+          (meta.summary[0] == "primary" && meta.summary[1].endsWith("list"))
+        ) {
+          summary = "length";
+          simple = "length";
+        }
+      }
+      if (meta.summary.endsWith("list")) {
+        summary = "length";
+        simple = "length";
+      }
+    }
+    if (!summary) {
+      summary = `${meta.type}_value.raw`;
+      simple = "value";
+    }
+  }
+  if (!summary) {
+    summary = `${meta.type}_value`;
+    simple = "value";
+  }
+  typesMap[meta.group][meta.name].processed_summary = summary;
+  typesMap[meta.group][meta.name].processed_simple = simple;
+};
+
 const fetchTypes = async ({ result, taxonomy, hub, release, indexType }) => {
   let index = indexName({
     result: indexType,
@@ -80,6 +112,7 @@ const fetchTypes = async ({ result, taxonomy, hub, release, indexType }) => {
       typesMap[hit._source.group][hit._source.name] = hit._source;
       typesMap[hit._source.group][hit._source.name].processed_type =
         setProcessedType(hit._source);
+      setProcessedSummary(hit._source, typesMap);
       if (hit._source.synonyms) {
         for (let synonym of hit._source.synonyms) {
           synonyms[hit._source.group][synonym] = hit._source.name;

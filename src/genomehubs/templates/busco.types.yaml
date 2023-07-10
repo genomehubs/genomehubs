@@ -11,6 +11,7 @@ file:
   source_url_stub: https://blobtoolkit.genomehubs.org
   source: BlobToolKit
   type: keyword
+  return_type: length
   taxon_summary: ordered_list
   taxon_traverse: ordered_list
   taxon_traverse_direction: up
