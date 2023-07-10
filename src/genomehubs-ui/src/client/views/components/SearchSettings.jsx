@@ -170,7 +170,10 @@ const SearchSettings = ({
     let fieldSets = {};
     if (searchTerm.fields) {
       searchTerm.fields.split(",").forEach((field) => {
-        let [f, s = "value"] = field.split(":");
+        let [f, s] = field.split(":");
+        if (!s) {
+          s = types[f].processed_simple;
+        }
         if (!fieldSets[f]) {
           fieldSets[f] = [];
         }
@@ -181,7 +184,11 @@ const SearchSettings = ({
     for (let field of fields) {
       if (fieldSets[field]) {
         for (let subset of fieldSets[field]) {
-          newFields.push(subset == "value" ? field : `${field}:${subset}`);
+          newFields.push(
+            subset == types[field].processed_simple
+              ? field
+              : `${field}:${subset}`
+          );
         }
       } else {
         newFields.push(field);
