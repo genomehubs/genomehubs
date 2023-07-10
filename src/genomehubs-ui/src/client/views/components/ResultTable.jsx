@@ -366,9 +366,12 @@ const ResultTable = ({
         .filter((obj) => obj.name != "none");
       for (let obj of expandedTypes) {
         let [name, summary] = obj.name.split(":");
-        obj.summary =
-          summary ||
-          (types[name] || { processed_simple: "value" }).processed_simple;
+        let defaultValue = (types[name] || { processed_simple: "value" })
+          .processed_simple;
+        if (["direct", "descendant", "ancestor"].includes(summary)) {
+          summary = defaultValue;
+        }
+        obj.summary = summary || defaultValue;
       }
     } else {
       expandedTypes = displayTypes;
@@ -641,7 +644,11 @@ const ResultTable = ({
         } else {
           value = formatter(value, searchIndex);
         }
-        if (Array.isArray(field.value) && field.length > entries.length) {
+        if (
+          type.summary == "value" &&
+          Array.isArray(field.value) &&
+          field.length > entries.length
+        ) {
           // let list = entries.join(", ");
           // list = `${list}, ... (${field.length - entries.length} more)`;
           let badgeContent = `+${field.length - entries.length}`;

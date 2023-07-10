@@ -252,7 +252,6 @@ export const processHits = ({
                 if (subset != defaultSummary) {
                   newName += `:${subset}`;
                 }
-                // console.log({ meta, subset, newName });
                 if (subsets.source.has(subsetKey)) {
                   let agg_sources = field.aggregation_source;
                   if (!Array.isArray(agg_sources)) {
