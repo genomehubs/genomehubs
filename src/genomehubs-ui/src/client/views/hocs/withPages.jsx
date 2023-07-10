@@ -8,7 +8,7 @@ const withPages = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
     pages: getPages(state),
     ...(props.pageId && {
-      pagesById: getPagesById(state, props.pageId),
+      pagesById: getPagesById(state, props.pgId || props.pageId),
     }),
   });
   const mapDispatchToProps = (dispatch) => ({

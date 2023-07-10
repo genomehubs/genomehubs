@@ -90,7 +90,6 @@ const SearchBox = ({
       }
     }
     if (!showSearchBox) {
-      console.log("SearchBox");
       return (
         <Template
           id={options.searchTemplate}

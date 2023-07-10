@@ -46,7 +46,6 @@ const Template = ({
           : props[`${match}_example`];
         exampleValues[match] = example;
       }
-      console.log(exampleValues);
       setValues(exampleValues);
     }
   }, [url]);

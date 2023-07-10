@@ -108,7 +108,6 @@ export const RehypeComponentsList = (extra) => {
       />
     ),
     markdown: (props) => {
-      console.log("Nested");
       return (
         <Nested
           pgId={props.pageId}
@@ -128,7 +127,6 @@ export const RehypeComponentsList = (extra) => {
             />
           );
         } else if (className == "language-template") {
-          console.log("Markdown");
           return (
             <Grid {...processProps({ props: nestedProps, isGrid: true })} item>
               <Template
@@ -210,22 +208,23 @@ const Markdown = ({
   classes,
   pgId,
   pageId,
-  pages,
+  pagesById,
   fetchPages,
   siteStyles,
   components = {},
   ...extra
 }) => {
-  console.log({ pgId, pageId, pages });
   useEffect(() => {
-    if (pgId && !pages.byId[pgId]) {
-      fetchPages(pgId);
-    } else if (pageId && !pages.byId[pgId]) {
-      fetchPages(pageId);
+    if (!pagesById) {
+      if (pgId) {
+        fetchPages(pgId);
+      } else if (pageId) {
+        fetchPages(pageId);
+      }
     }
   }, [pgId, pageId]);
 
-  const { contents, ast } = compile(pages.byId[pgId || pageId], {
+  const { contents, ast } = compile(pagesById, {
     ...RehypeComponentsList(extra),
     ...components,
   });

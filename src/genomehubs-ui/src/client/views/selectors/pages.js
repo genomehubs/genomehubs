@@ -17,7 +17,6 @@ export function fetchPages(pageId) {
     const state = store.getState();
     const isFetching = getPagesIsFetching(state);
     if (isFetching) {
-      console.log("return");
       return;
     }
     dispatch(requestPages());
