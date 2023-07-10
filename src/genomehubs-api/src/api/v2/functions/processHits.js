@@ -248,10 +248,7 @@ export const processHits = ({
 
                 let newName = name;
                 let meta = lookupTypes(name);
-                let defaultSummary = meta ? meta.processed_summary : "value";
-                if (defaultSummary.match("value")) {
-                  defaultSummary = "value";
-                }
+                let defaultSummary = meta ? meta.processed_simple : "value";
                 if (subset != defaultSummary) {
                   newName += `:${subset}`;
                 }

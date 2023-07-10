@@ -667,14 +667,13 @@ def add_attribute_values(existing, new, *, raw=True):
                 del entry["key"]
                 arr.append(entry)
             else:
-                existing.append(
-                    {
-                        **entry,
-                        "count": 1,
-                        # "aggregation_method": "unique",
-                        # "aggregation_source": "direct",
-                    }
-                )
+                mod_entry = {**entry, "count": 1}
+                if "keyword_value" in entry:
+                    if isinstance(mod_entry["keyword_value"], list):
+                        mod_entry["length"] = len(mod_entry["keyword_value"])
+                    else:
+                        mod_entry["length"] = 1
+                existing.append(mod_entry)
 
 
 def strip_comments(data, types):

@@ -293,6 +293,10 @@
             "type": "integer",
             "meta": { "description": "Count of individual values" }
           },
+          "length": {
+            "type": "integer",
+            "meta": { "description": "Number of values in list" }
+          },
           "min": {
             "type": "double",
             "meta": { "description": "Minimum value (numeric types only)" }
