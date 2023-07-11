@@ -788,7 +788,7 @@ export const oxford = async ({
     exclusions,
     taxonomy,
     apiParams,
-    opts: catOpts,
+    catOpts,
   });
 
   let asms = parseAssemblies(bounds.query);

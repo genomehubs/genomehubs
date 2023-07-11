@@ -94,6 +94,7 @@ export const getBounds = async ({
   taxonomy,
   apiParams,
   opts = ";;",
+  catOpts = ";;",
 }) => {
   let { lookupTypes } = await attrTypes({ result, taxonomy });
   params.size = 0;
@@ -114,14 +115,14 @@ export const getBounds = async ({
   }
   let fixedTerms = await setTerms({
     cat: field,
-    opts,
+    opts: catOpts,
     lookupTypes,
     taxonomy,
     apiParams,
   });
   let definedTerms = await setTerms({
     cat,
-    opts,
+    opts: catOpts,
     lookupTypes,
     taxonomy,
     apiParams,
@@ -156,14 +157,15 @@ export const getBounds = async ({
       }
     } else if (fieldMeta.type == "geo_point") {
       extra = { geo: true };
-    } else if (fieldMeta.type == "date") {
+    } else {
+      extra = { stats: true };
+    }
+    if (fieldMeta.type == "date") {
       if (valueKey == "min") {
         valueKey = "from";
       } else if (valueKey == "max") {
         valueKey = "to";
       }
-    } else {
-      extra = { stats: true };
     }
   }
 
