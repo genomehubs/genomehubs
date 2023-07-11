@@ -1,12 +1,12 @@
 // TODO: don't fetch raw value if not wanted
-export const matchAttributes = (
+export const matchAttributes = ({
   fields,
   attr_summaries,
   lookupTypes,
   aggregation_source,
   searchRawValues,
-  name = "attributes"
-) => {
+  name = "attributes",
+}) => {
   if (fields.length == 0) return [];
   let docValues = [];
   for (let field of fields) {
@@ -14,7 +14,7 @@ export const matchAttributes = (
     if (!meta) {
       continue;
     }
-    for (let summary of attr_summaries[field]) {
+    for (let summary of attr_summaries[field] || ["default"]) {
       let value;
       if (summary == "default") {
         value = `attributes.${meta.processed_summary}`;
