@@ -653,7 +653,6 @@ export const histogram = async ({
       },
     };
   }
-  console.log(bounds);
   if (cat && (!bounds.cats || bounds.cats.length == 0)) {
     return {
       status: {
