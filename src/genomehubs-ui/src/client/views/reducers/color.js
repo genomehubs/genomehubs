@@ -46,6 +46,19 @@ const brewerPalette = [
   "rgb(202,178,214)",
 ];
 
+const pridePalette = [
+  "#E50000",
+  "#FF8D00",
+  "#FFEE00",
+  "#028121",
+  "#004CFF",
+  "#770088",
+  "#000000",
+  "#613915",
+  "#73D7EE",
+  "#FFAFC7",
+];
+
 export const palettes = handleActions(
   {
     ADD_PALETTE: (state, action) =>
@@ -80,6 +93,7 @@ export const palettes = handleActions(
       turbo: createD3Palette(interpolateTurbo, 50),
       viridis: createD3Palette(interpolateViridis, 50),
       standard: { id: "default", default: brewerPalette, levels: [] },
+      pride: { id: "pride", default: pridePalette, levels: [] },
       paired: createD3Palette(schemePaired, 12),
       category: createD3Palette(schemeCategory10, 10),
       dark: createD3Palette(schemeDark2, 8),
