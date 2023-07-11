@@ -257,13 +257,13 @@ const GroupRows = ({ group, entries, classes }) => {
     }
 
     let display_type = processed_type;
-    if (display_type == "float") {
-      if (["short", "long"].includes(type)) {
-        display_type = `integer`;
-      } else if (["integer", "byte"].includes(type)) {
-        display_type = type;
-      }
-    }
+    // if (display_type == "float") {
+    //   if (["short", "long"].includes(type)) {
+    //     display_type = `integer`;
+    //   } else if (["integer", "byte"].includes(type)) {
+    //     display_type = type;
+    //   }
+    // }
 
     rows.push(
       <TableRow key={key}>

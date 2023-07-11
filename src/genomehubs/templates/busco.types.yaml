@@ -12,7 +12,7 @@ file:
   source: BlobToolKit
   summary: list
   type: keyword
-  return_type: length
+  default_summary: length
   taxon_summary: ordered_list
   taxon_traverse: ordered_list
   taxon_traverse_direction: up

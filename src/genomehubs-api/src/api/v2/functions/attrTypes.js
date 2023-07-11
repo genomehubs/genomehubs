@@ -37,31 +37,16 @@ const setProcessedType = (meta) => {
 
 const setProcessedSummary = (meta, typesMap) => {
   let summary;
-  let simple;
-  if (meta.type == "keyword") {
-    if (meta.summary) {
-      if (Array.isArray(meta.summary)) {
-        if (
-          meta.summary[0].endsWith("list") ||
-          (meta.summary[0] == "primary" && meta.summary[1].endsWith("list"))
-        ) {
-          summary = "length";
-          simple = "length";
-        }
-      }
-      if (meta.summary.endsWith("list")) {
-        summary = "length";
-        simple = "length";
-      }
-    }
-    if (!summary) {
-      summary = `${meta.type}_value.raw`;
-      simple = "value";
-    }
+  if (meta.default_summary) {
+    summary = meta.default_summary;
   }
+  let simple = "value";
   if (!summary) {
-    summary = `${meta.type}_value`;
-    simple = "value";
+    if (meta.type == "keyword") {
+      summary = "keyword_value.raw";
+    } else {
+      summary = `${meta.type}_value`;
+    }
   }
   typesMap[meta.group][meta.name].processed_summary = summary;
   typesMap[meta.group][meta.name].processed_simple = simple;
