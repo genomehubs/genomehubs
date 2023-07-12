@@ -138,11 +138,13 @@ export const getBounds = async ({
   }
   let term = field;
   catMeta = lookupTypes(cat);
+  let catTerm;
   if (catMeta) {
     if (fields.length > 0) {
       fields.push(catMeta.name);
+      catTerm = catMeta.name;
     } else {
-      term = catMeta.name;
+      catTerm = catMeta.name;
     }
     catType = catMeta.processed_type;
   }
@@ -188,31 +190,33 @@ export const getBounds = async ({
     exclusions,
   });
   let aggs;
+  let catAggs;
   let domain;
   try {
-    aggs = res.aggs.aggregations[term];
+    aggs = res.aggs.aggregations[term] || res.aggs.aggregations[catTerm];
   } catch {
     return;
+  }
+
+  let min, max;
+  if (opts) {
+    opts = opts.split(/\s*;\s*/);
+    if (opts.length == 1) {
+      opts = opts[0].split(/\s*,\s*/);
+    }
+    if (opts[0] && opts[0] > "") {
+      min = opts[0];
+    }
+    if (opts[1] && opts[1] > "") {
+      max = opts[1];
+    }
+    if (opts[2] && opts[2] > "") {
+      tickCount = Math.abs(opts[2]);
+    }
   }
   let stats = aggs.stats;
   if (stats) {
     // Set domain to nice numbers
-    let min, max;
-    if (opts) {
-      opts = opts.split(/\s*;\s*/);
-      if (opts.length == 1) {
-        opts = opts[0].split(/\s*,\s*/);
-      }
-      if (opts[0] && opts[0] > "") {
-        min = opts[0];
-      }
-      if (opts[1] && opts[1] > "") {
-        max = opts[1];
-      }
-      if (opts[2] && opts[2] > "") {
-        tickCount = Math.abs(opts[2]);
-      }
-    }
     if (!min || !max) {
       let valueType = valueTypes[fieldMeta.type] || "float";
       if (valueType == "keyword" && scaleType != "ordinal") {

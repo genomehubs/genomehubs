@@ -36,10 +36,12 @@ export const queryParams = async ({
           [summary, field] = field.split(/[\(\)]/);
         }
         let fieldMeta = lookupTypes(field);
-        field = fieldMeta.name;
-        params.excludeMissing.push(field);
-        fields.push(field);
-        summaries.push(summary);
+        if (fieldMeta) {
+          field = fieldMeta.name;
+          params.excludeMissing.push(field);
+          fields.push(field);
+          summaries.push(summary);
+        }
       }
     });
   } else {

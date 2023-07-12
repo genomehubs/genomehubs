@@ -9,6 +9,7 @@ import { getBounds } from "./getBounds";
 import { getResultCount } from "../functions/getResultCount";
 import { getResults } from "../functions/getResults";
 import { histogramAgg } from "../queries/histogramAgg";
+import parseCatOpts from "../functions/parseCatOpts";
 import { parseFields } from "../functions/parseFields";
 import { queryParams } from "./queryParams";
 import { setExclusions } from "../functions/setExclusions";
@@ -721,67 +722,30 @@ export const oxford = async ({
       params[key] = value;
     }
   });
-  let catOpts = ";;";
-  let portions = (cat || "").split(/\s*[\[\]]\s*/);
-  if (portions.length > 1) {
-    // check if opts are set and update query
-    if (portions[1].match(/[,;]/)) {
-      catOpts = portions[1];
-      let queryArr = (params.query || "").split(
-        /(\s*[<>=]+\s*|\s+AND\s+|\s+and\s+)/
-      );
-      let options = portions[1].split(";");
-      if (options.length == 1) {
-        options = options[0].split(",");
-      }
-      let min, max;
-      if (!typeof options[0] !== "undefined") {
-        min = options[0];
-      }
-      if (!typeof options[1] !== "undefined") {
-        max = options[1];
-      }
-      for (let i = 0; i < queryArr.length; i++) {
-        let qMeta = lookupTypes(queryArr[i].toLowerCase());
-        if (qMeta && qMeta.name == portions[0]) {
-          i++;
-          if (min && queryArr[i] && queryArr[i].match(/</)) {
-            i++;
-            if (queryArr[i] && !isNaN(queryArr[i])) {
-              if (min > queryArr[i]) {
-                queryArr[i] = min;
-                min = undefined;
-              }
-            }
-          } else if (max && queryArr[i] && queryArr[i].match(/>/)) {
-            i++;
-            if (queryArr[i] && !isNaN(queryArr[i])) {
-              if (max < queryArr[i]) {
-                queryArr[i] = max;
-                max = undefined;
-              }
-            }
-          }
-        }
-      }
-      if (min) {
-        queryArr = queryArr.concat([" AND ", portions[0], " >= ", min]);
-      }
-      if (max) {
-        queryArr = queryArr.concat([" AND ", portions[0], " <= ", max]);
-      }
-      params.query = queryArr.join("");
-    } else {
-      catOpts = `;;${portions[1]}`;
-    }
-    delete portions[1];
-    cat = portions.join("");
+  let { catOpts, catMeta } = parseCatOpts({
+    cat,
+    query: params.query,
+    searchFields,
+    lookupTypes,
+  });
+  if (catMeta) {
+    cat = catMeta.name;
   }
+  let filteredFields = xFields.filter(
+    (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
+  );
   bounds = await getBounds({
     params: { ...params },
-    fields: xFields.filter(
-      (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
-    ),
+    fields: filteredFields,
+    summaries,
+    result,
+    exclusions,
+    taxonomy,
+    apiParams,
+  });
+  let catBounds = await getBounds({
+    params: { ...params },
+    fields: filteredFields,
     summaries,
     cat,
     result,
@@ -790,6 +754,23 @@ export const oxford = async ({
     apiParams,
     catOpts,
   });
+  if (cat) {
+    if (!catBounds.cats || catBounds.cats.length == 0) {
+      return {
+        status: {
+          success: false,
+          error: `unknown field in 'cat = ${cat}'`,
+        },
+      };
+    }
+    if (catBounds) {
+      bounds.cat = catBounds.cat;
+      bounds.cats = catBounds.cats;
+      bounds.catType = catBounds.catType;
+      bounds.by = catBounds.by;
+      bounds.showOther = catBounds.showOther;
+    }
+  }
 
   let asms = parseAssemblies(bounds.query);
   xQuery.query = bounds.query;
