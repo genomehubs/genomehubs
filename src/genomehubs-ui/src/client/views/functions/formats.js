@@ -39,6 +39,8 @@ const formatMillisecond = timeFormat(".%L"),
   formatYear = timeFormat("%Y");
 
 const timeFormats = {
+  millisecond: formatMillisecond,
+  second: formatSecond,
   second: formatSecond,
   minute: formatMinute,
   hour: formatHour,
