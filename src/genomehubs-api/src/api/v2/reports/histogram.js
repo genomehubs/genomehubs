@@ -434,9 +434,12 @@ const getHistogram = async ({
   };
 };
 
-const updateQuery = ({ params, fields, opts, lookupTypes }) => {
+const updateQuery = ({ params, fields, summaries, opts, lookupTypes }) => {
   let meta = lookupTypes(fields[0]);
   let field = meta.name;
+  if (summaries[0] != meta.processed_simple) {
+    field = `${summaries[0]}(${field})`;
+  }
   if (!meta || !opts || meta.type == "keyword") {
     return;
   }
@@ -532,7 +535,7 @@ export const histogram = async ({
     rank,
     taxonomy,
   });
-  updateQuery({ params, fields, opts: xOpts, lookupTypes });
+  updateQuery({ params, fields, summaries, opts: xOpts, lookupTypes });
   fields = [...new Set(fields.concat(searchFields))];
   let yTerm, yFields, ySummaries;
   let yParams = {};
@@ -548,8 +551,20 @@ export const histogram = async ({
       rank,
       taxonomy,
     }));
-    updateQuery({ params: yParams, fields: yFields, opts: yOpts, lookupTypes });
-    updateQuery({ params: params, fields: yFields, opts: yOpts, lookupTypes });
+    updateQuery({
+      params: yParams,
+      fields: yFields,
+      summaries: ySummaries,
+      opts: yOpts,
+      lookupTypes,
+    });
+    updateQuery({
+      params: params,
+      fields: yFields,
+      summaries: ySummaries,
+      opts: yOpts,
+      lookupTypes,
+    });
   }
 
   let xQuery = { ...params };
