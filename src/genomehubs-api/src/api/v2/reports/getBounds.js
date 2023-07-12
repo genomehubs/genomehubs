@@ -96,6 +96,9 @@ export const getBounds = async ({
   opts = ";;",
   catOpts = ";;",
 }) => {
+  if (!cat) {
+    catOpts = opts;
+  }
   let { lookupTypes } = await attrTypes({ result, taxonomy });
   params.size = 0;
   params.query = await chainQueries(params);

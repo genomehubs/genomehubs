@@ -665,7 +665,7 @@ export const histogram = async ({
     exclusions,
     taxonomy,
     apiParams,
-    opts: xOpts,
+    // opts: xOpts,
     catOpts,
   });
   if (cat) {
