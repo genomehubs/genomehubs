@@ -1,4 +1,5 @@
 import { attrTypes } from "../functions/attrTypes";
+import { summaries } from "../functions/summaries";
 
 export const queryParams = async ({
   term,
@@ -35,10 +36,12 @@ export const queryParams = async ({
           [summary, field] = field.split(/[\(\)]/);
         }
         let fieldMeta = lookupTypes(field);
-        field = fieldMeta.name;
-        params.excludeMissing.push(field);
-        fields.push(field);
-        summaries.push(summary);
+        if (fieldMeta) {
+          field = fieldMeta.name;
+          params.excludeMissing.push(field);
+          fields.push(field);
+          summaries.push(summary);
+        }
       }
     });
   } else {
@@ -49,6 +52,10 @@ export const queryParams = async ({
   }
   let fieldList = new Set();
   for (let field of fields) {
+    let [summary, attr] = field.split(/[\(\)]/);
+    if (attr && summaries.includes(summary)) {
+      field = attr;
+    }
     let meta = lookupTypes(field);
     if (meta) {
       fieldList.add(meta.name);

@@ -13,6 +13,7 @@ export const setTerms = async ({
   if (!cat) {
     return { cat, size, other };
   }
+  let min, max, scale;
   if (opts) {
     let options = opts.split(/\s*;\s*/);
     if (options.length == 1) {
@@ -31,12 +32,9 @@ export const setTerms = async ({
       field = cat;
     }
   } else {
-    if (cat && cat.match(/\+/)) {
-      cat = cat.replace(/\+/, "");
-      other = true;
-    }
     let portions = cat.split(/\s*[\[\]]\s*/);
     if (portions.length > 1) {
+      // TODO: get min, max and scale opts here
       size = portions[1];
       delete portions[1];
       cat = portions.join("");
@@ -45,6 +43,10 @@ export const setTerms = async ({
       field = cat;
       // return { cat, size, other };
     }
+  }
+  if (field && field.match(/\+/)) {
+    field = field.replace(/\+/, "");
+    other = true;
   }
 
   let parts = cat.split(",");
@@ -84,5 +86,5 @@ export const setTerms = async ({
       terms.push({ key: obj.label, label: obj.key });
     });
   }
-  return { cat: field, terms, translations, by, size, other };
+  return { cat: field, terms, translations, by, size, min, max, scale, other };
 };

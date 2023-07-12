@@ -48,10 +48,24 @@ const pointSizeSettings = {
   step: 5,
 };
 
+const nestedQueries = [
+  "queryA",
+  "queryB",
+  "queryC",
+  "queryD",
+  "queryE",
+  "queryF",
+  "queryG",
+  "queryH",
+  "queryI",
+  "queryJ",
+];
+
 export const queryPropList = {
   histogram: [
     "report",
     xSettings,
+    ...nestedQueries,
     rankSettings,
     catSettings,
     "includeEstimates",
@@ -60,12 +74,15 @@ export const queryPropList = {
     "stacked",
     "cumulative",
     pointSizeSettings,
+    "compactLegend",
+    "compactWidth",
     "result",
     "taxonomy",
   ],
   map: [
     "report",
     xSettings,
+    ...nestedQueries,
     rankSettings,
     catSettings,
     "includeEstimates",
@@ -76,16 +93,20 @@ export const queryPropList = {
   oxford: [
     "report",
     xSettings,
+    ...nestedQueries,
     catSettings,
     "xOpts",
     "plotRatio",
     pointSizeSettings,
+    "compactLegend",
+    "compactWidth",
     "result",
     "taxonomy",
   ],
   scatter: [
     "report",
     xSettings,
+    ...nestedQueries,
     { prop: "y", label: `c_value`, required: true },
     rankSettings,
     catSettings,
@@ -98,12 +119,15 @@ export const queryPropList = {
     "plotRatio",
     "scatterThreshold",
     pointSizeSettings,
+    "compactLegend",
+    "compactWidth",
     "result",
     "taxonomy",
   ],
   table: [
     "report",
     xSettings,
+    ...nestedQueries,
     { prop: "y", label: `c_value` },
     rankSettings,
     catSettings,
@@ -118,6 +142,7 @@ export const queryPropList = {
   tree: [
     "report",
     { ...xSettings, label: `tax_tree(${suggestedTerm})` },
+    ...nestedQueries,
     { prop: "y", label: `c_value` },
     catSettings,
     { prop: "levels", label: "family, order, phylum" },
@@ -133,16 +158,20 @@ export const queryPropList = {
   arc: [
     "report",
     "x",
+    ...nestedQueries,
     "y",
     rankSettings,
     "includeEstimates",
     pointSizeSettings,
+    "compactLegend",
+    "compactWidth",
     "result",
     "taxonomy",
   ],
   xPerRank: [
     "report",
     "x",
+    ...nestedQueries,
     rankSettings,
     "includeEstimates",
     "result",
@@ -381,6 +410,14 @@ export const ReportEdit = ({
       continue;
     }
 
+    if (
+      queryProp.match(/^query[A-Z]$/) ||
+      queryProp == "result" ||
+      queryProp == "taxonomy"
+    ) {
+      continue;
+    }
+
     if (queryProp == "report") {
       let items = reportTypes.map((rep) => {
         return (
@@ -462,7 +499,8 @@ export const ReportEdit = ({
       queryProp == "stacked" ||
       queryProp == "cumulative" ||
       queryProp == "reversed" ||
-      queryProp == "collapseMonotypic"
+      queryProp == "collapseMonotypic" ||
+      queryProp == "compactLegend"
     ) {
       toggles.push(
         <div style={{ float: "left", marginRight: "2em" }} key={queryProp}>

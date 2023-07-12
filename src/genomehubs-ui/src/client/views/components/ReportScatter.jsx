@@ -506,6 +506,10 @@ const CustomizedYAxisTick = ({
   valueType,
   bounds,
   maxLabel,
+  showLabels,
+  marginRight,
+  marginWidth,
+  plotWidth,
 }) => {
   const {
     x,
@@ -520,61 +524,98 @@ const CustomizedYAxisTick = ({
   let value = payload.value;
   let offset = 0;
   let h = height / (buckets.length - 1);
+  let centered;
+  let ttValue;
   if (yLabels[index] != payload.value) {
     value = yLabels[index] || "";
     if (valueType == "coordinate") {
       let yScale = scaleLinear().domain(bounds.domain).range([0, height]);
       h = yScale(buckets[index + 1]) - yScale(buckets[index]);
     }
+    ttValue = value;
     offset = h / 2;
+    centered = true;
   } else {
+    if (index > 0) {
+      ttValue = `${fmt(yLabels[index - 1])}-${fmt(yLabels[index])}`;
+    }
     value = fmt(value);
   }
   let text;
   let rect;
   let ori;
   let oriWidth = 2;
-  if (h >= pointSize * 0.8) {
-    text = (
-      <text
-        x={0}
-        y={0}
-        textAnchor="end"
-        alignmentBaseline={"middle"}
-        dominantBaseline={"middle"}
-        fill={fill}
-        fontSize={pointSize}
-        // fontWeight={orientation && orientation[index] < 0 ? "bold" : "normal"}
-        // transform={"rotate(-90)"}
-      >
-        {translations[value] || value}
-      </text>
-    );
-  } else {
-    text = (
-      <line
-        x1={0}
-        y1={0}
-        x2={-maxLabel * 0.8}
-        y2={0}
-        stroke={"rgb(125,125,125)"}
-        strokeDasharray={pointSize / 5}
-        strokeWidth={pointSize / 10}
-      />
-    );
+  let textValue = translations[value] || value;
+  ttValue = translations[ttValue] || ttValue;
+  if (showLabels) {
+    if (h >= pointSize * 0.8) {
+      text = (
+        <text
+          x={0}
+          y={0}
+          textAnchor="end"
+          alignmentBaseline={"middle"}
+          dominantBaseline={"middle"}
+          fill={fill}
+          fontSize={pointSize}
+          // fontWeight={orientation && orientation[index] < 0 ? "bold" : "normal"}
+          // transform={"rotate(-90)"}
+        >
+          {textValue}
+        </text>
+      );
+    } else {
+      text = (
+        <line
+          x1={0}
+          y1={0}
+          x2={-maxLabel * 0.8}
+          y2={0}
+          stroke={"rgb(125,125,125)"}
+          strokeDasharray={pointSize / 5}
+          strokeWidth={pointSize / 10}
+        />
+      );
+      rect = (
+        <Tooltip title={textValue} arrow placement="right">
+          <Rectangle
+            className={styles.active}
+            x={-maxLabel}
+            y={-offset}
+            height={h}
+            width={maxLabel}
+            stroke={"none"}
+            fill={"rgb(125,125,125)"}
+            fillOpacity={0}
+          />
+        </Tooltip>
+      );
+    }
+  } else if (ttValue) {
     rect = (
-      <Tooltip title={translations[value] || value} arrow placement="right">
+      <g>
+        <Tooltip title={ttValue} arrow placement="right">
+          <Rectangle
+            className={styles.active}
+            x={-pointSize}
+            y={centered ? -offset : 0}
+            height={h}
+            width={plotWidth - marginWidth - marginRight - 110 + pointSize}
+            stroke={"none"}
+            fill={"rgb(200,200,200)"}
+            fillOpacity={0}
+          />
+        </Tooltip>
         <Rectangle
-          className={styles.active}
-          x={-maxLabel}
-          y={-offset}
+          x={10}
+          y={centered ? -offset : 0}
           height={h}
-          width={maxLabel}
+          width={plotWidth - marginWidth - marginRight - 120}
           stroke={"none"}
-          fill={"rgb(125,125,125)"}
+          fill={"rgb(255,255,255)"}
           fillOpacity={0}
         />
-      </Tooltip>
+      </g>
     );
   }
   if (
@@ -682,6 +723,8 @@ const Heatmap = ({
           valueType: chartProps.valueType,
           bounds: chartProps.bounds,
           maxLabel: chartProps.maxXlabel,
+          showLabels: chartProps.showLabels,
+          marginTop,
         })
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
@@ -698,6 +741,7 @@ const Heatmap = ({
         fill="#666"
         fontSize={chartProps.pointSize}
         fontWeight="bold"
+        pointerEvents={"none"}
       />
     </XAxis>,
     <YAxis
@@ -718,7 +762,10 @@ const Heatmap = ({
           valueType: chartProps.yValueType,
           bounds: chartProps.yBounds,
           maxLabel: chartProps.maxYLabel,
-          width,
+          showLabels: chartProps.showLabels,
+          plotWidth: width,
+          marginWidth,
+          marginRight,
         })
       }
       domain={yDomain}
@@ -737,6 +784,7 @@ const Heatmap = ({
         style={{ textAnchor: "middle" }}
         fontSize={chartProps.pointSize}
         fontWeight="bold"
+        pointerEvents={"none"}
       />
     </YAxis>,
     <YAxis
@@ -761,7 +809,9 @@ const Heatmap = ({
           valueType: chartProps.yValueType,
           bounds: chartProps.yBounds,
           maxLabel: chartProps.maxYLabel,
-          width,
+          plotWidth: width,
+          marginWidth,
+          marginRight,
         })
       }
       domain={yDomain}
@@ -839,7 +889,7 @@ const Heatmap = ({
         top: marginTop,
         right: marginRight,
         left: marginWidth,
-        bottom: width > 300 ? marginHeight : 5,
+        bottom: marginHeight,
       }}
     >
       {axes}
@@ -925,6 +975,8 @@ const ReportScatter = ({
   report,
   containerRef,
   embedded,
+  compactLegend,
+  compactWidth = 600,
   ratio,
   zScale = "linear",
   setMessage,
@@ -1018,7 +1070,10 @@ const ReportScatter = ({
       valueType,
       interval
     );
-    let compactLegend = typeof embedded === "undefined";
+    compactLegend =
+      typeof compactLegend !== "undefined"
+        ? compactLegend
+        : typeof embedded === "undefined" || width < compactWidth;
 
     const {
       translations,
@@ -1041,12 +1096,22 @@ const ReportScatter = ({
 
     let labels = bounds.labels || heatmaps.buckets;
     let yLabels = yBounds.labels || heatmaps.yBuckets;
-    const maxYLabel = maxStringLength(yLabels, yFormat, pointSize);
-    const marginWidth =
-      maxYLabel + pointSize > 40 ? maxYLabel + pointSize - 40 : 0;
-    const maxXLabel = maxStringLength(labels, xFormat, pointSize);
-    let marginHeight = 2 * pointSize;
-    const marginRight = (stringLength(xFormat(endLabel)) * pointSize) / 2;
+    let showLabels = width >= compactWidth;
+    const maxYLabel = showLabels
+      ? maxStringLength(yLabels, yFormat, pointSize)
+      : 0;
+    const marginWidth = showLabels
+      ? maxYLabel + pointSize > 40
+        ? maxYLabel + pointSize - 40
+        : 0
+      : pointSize - 35;
+    const maxXLabel = showLabels
+      ? maxStringLength(labels, xFormat, pointSize)
+      : 0;
+    let marginHeight = showLabels ? 2 * pointSize : pointSize - 15;
+    const marginRight = showLabels
+      ? (stringLength(xFormat(endLabel)) * pointSize) / 2
+      : 0;
     let orientation = 0;
     if (
       maxXLabel >
@@ -1061,7 +1126,7 @@ const ReportScatter = ({
         data={chartData}
         pointData={1 ? pointData : []}
         width={width}
-        height={minDim - 50}
+        height={minDim - (showLabels ? 50 : 0)}
         marginWidth={marginWidth}
         marginHeight={marginHeight}
         marginRight={marginRight}
@@ -1122,6 +1187,7 @@ const ReportScatter = ({
           yBuckets: heatmaps.yBuckets,
           labels,
           yLabels,
+          showLabels,
           valueType,
           yValueType,
           summary,

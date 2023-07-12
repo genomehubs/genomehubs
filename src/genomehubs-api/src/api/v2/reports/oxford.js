@@ -8,6 +8,8 @@ import { config } from "../functions/config";
 import { getBounds } from "./getBounds";
 import { getResultCount } from "../functions/getResultCount";
 import { getResults } from "../functions/getResults";
+import { histogramAgg } from "../queries/histogramAgg";
+import parseCatOpts from "../functions/parseCatOpts";
 import { parseFields } from "../functions/parseFields";
 import { queryParams } from "./queryParams";
 import { setExclusions } from "../functions/setExclusions";
@@ -80,6 +82,20 @@ const getSequenceLengths = async ({ assemblies, xQuery, taxonomy, req }) => {
   return lengths;
 };
 
+const scaleFuncs = {
+  log2: (value) => Math.pow(2, value),
+  log10: (value) => Math.pow(10, value),
+  log: (value) => Math.pow(Math.E, value),
+  sqrt: (value) => Math.pow(value, 2),
+  linear: (value) => value,
+};
+
+const formatValue = {
+  // TODO: format float to n s.f.
+  float: (value) => value,
+  integer: (value) => Math.floor(value),
+};
+
 const getOxford = async ({
   params,
   x,
@@ -89,6 +105,7 @@ const getOxford = async ({
   fields,
   groupBy,
   asms,
+  summaries,
   yFields,
   cat,
   bounds,
@@ -106,19 +123,55 @@ const getOxford = async ({
 
   // get list of assembly_ids
   // search all feature_type = top_level and create lookup table
-
   let xQuery = {
     ...params,
     // query: x,
     fields,
     exclusions,
   };
+  let histogram;
   if (bounds.cat) {
     if (bounds.by == "attribute") {
-      if (!bounds.showOther) {
+      if (bounds.catType == "keyword" && !bounds.showOther) {
         xQuery.query += ` AND ${bounds.cat}=${bounds.cats
           .map(({ key }) => key)
           .join(",")}`;
+      } else if (bounds.catType != "keyword") {
+        let summary = summaries[0];
+        let field = bounds.cat;
+        // TODO: set this from option
+        histogram = await histogramAgg({
+          field,
+          summary,
+          result,
+          bounds: {
+            stats: {
+              min: bounds.domain[0],
+              max: bounds.domain[1],
+              ...bounds.stats,
+            },
+            ...bounds,
+          },
+          // yHistograms,
+          taxonomy,
+        });
+        xQuery.aggs = {
+          aggregations: {
+            nested: {
+              path: "attributes",
+            },
+            aggs: {
+              [field]: {
+                filter: {
+                  term: { "attributes.key": field },
+                },
+                aggs: {
+                  histogram,
+                },
+              },
+            },
+          },
+        };
       }
       xQuery.fields = [...new Set([...xQuery.fields, bounds.cat])];
     } else {
@@ -131,6 +184,7 @@ const getOxford = async ({
   }
   let count = countRes.count;
 
+  // TODO: use scroll API to allow > 10000 results
   let xRes = await getResults({
     ...xQuery,
     size: count,
@@ -138,14 +192,34 @@ const getOxford = async ({
     req,
     // update: "x",
   });
+
   if (!xRes.status.success) {
     return { status: xRes.status };
   }
 
   let cats;
-  if (bounds.cats) {
+  if (bounds.cats && bounds.cats.length > 0) {
     cats = new Set(bounds.cats.map(({ key }) => key));
+  } else if (
+    bounds.cat &&
+    (bounds.catType == "float" || bounds.catType == "integer")
+  ) {
+    let buckets = xRes.aggs.aggregations[bounds.cat].histogram.buckets;
+    let scaleFunc = bounds.scale ? scaleFuncs[bounds.scale] : scaleFuncs.linear;
+    cats = buckets.map(({ key }, i) => [
+      scaleFunc(key),
+      scaleFunc(buckets[Math.min(i + 1, buckets.length - 1)].key),
+    ]);
+    bounds.cats = cats
+      .filter(([min, max]) => min != max)
+      .map(([min, max]) => ({
+        key: min,
+        label: `${formatValue[bounds.catType](min)}-${formatValue[
+          bounds.catType
+        ](max)}`,
+      }));
   }
+
   let byAssembly = {};
   let groupedData = {};
   let activeSeqs = {};
@@ -175,11 +249,21 @@ const getOxford = async ({
     if (bounds.cat) {
       if (bounds.by == "attribute") {
         let catObj = result.result.fields[bounds.cat];
-        if (catObj) {
-          cat = catObj.value.toLowerCase();
-        }
-        if (Array.isArray(cat)) {
-          cat = cat[0].toLowerCase();
+        if (bounds.catType == "keyword") {
+          if (catObj) {
+            cat = catObj.value.toLowerCase();
+          }
+          if (Array.isArray(cat)) {
+            cat = cat[0].toLowerCase();
+          }
+        } else {
+          // TODO: set cat using histogram
+          for (let limits of cats) {
+            if (catObj.value < limits[1]) {
+              cat = limits[0];
+              break;
+            }
+          }
         }
         // else {
         //   cat = result.result.fields[bounds.cat]?.value.toLowerCase();
@@ -190,11 +274,14 @@ const getOxford = async ({
           cat = cat.taxon_id;
         }
       }
-      if (!cat || !cats.has(cat)) {
+      if (
+        typeof cat === "undefined" ||
+        (!Array.isArray(cats) && !cats.has(cat))
+      ) {
         cat = "other";
       }
     }
-    if (!cat) {
+    if (typeof cat === "undefined") {
       cat = "all features";
     }
     byAssembly[assembly_id][sequence_id].push({
@@ -220,7 +307,10 @@ const getOxford = async ({
   }
   let seqLengths = await getSequenceLengths({
     assemblies: Object.keys(byAssembly),
-    xQuery,
+    xQuery: {
+      ...xQuery,
+      aggs: undefined,
+    },
     taxonomy,
     req,
   });
@@ -506,6 +596,7 @@ export const oxford = async ({
     fields,
     taxonomy,
   });
+
   let {
     params,
     fields: xFields,
@@ -516,8 +607,18 @@ export const oxford = async ({
     taxonomy,
   });
 
-  let asms = parseAssemblies(params.query);
   let groupBy = parseCollate(params.query);
+
+  searchFields = [
+    ...new Set([
+      "sequence_id",
+      "start",
+      "end",
+      "strand",
+      groupBy,
+      ...searchFields,
+    ]),
+  ];
   // TODO: Get list of assemblies
   //       Choose primary assembly as one with most hits/best contiguity
   //       Use xOpts/yOpts to fix assembly ordering?
@@ -534,24 +635,17 @@ export const oxford = async ({
     catField = cat.replace(/[^\w_-].+$/, "");
     let catMeta = lookupTypes(catField);
     if (catMeta) {
-      xFields = [...new Set(searchFields.concat([catMeta.name]))];
+      xFields = [...new Set([catMeta.name].concat(searchFields))];
     } else {
       catRank = catField;
-      xFields = [...new Set(searchFields)];
+      xFields = searchFields;
     }
   } else {
-    xFields = [...new Set(searchFields)];
+    xFields = searchFields;
   }
-  xFields = [
-    ...new Set([
-      groupBy,
-      "sequence_id",
-      "start",
-      "end",
-      "strand",
-      ...searchFields,
-    ]),
-  ];
+  // xFields = [
+  //   ...new Set([...xFields, "sequence_id", "start", "end", "strand", groupBy]),
+  // ];
   fields = xFields;
 
   let status;
@@ -623,19 +717,69 @@ export const oxford = async ({
   // }
   let bounds;
   let exclusions = setExclusions(params);
+  Object.entries(apiParams).forEach(([key, value]) => {
+    if (key.match(/^query[A-Z]$/)) {
+      params[key] = value;
+    }
+  });
+  let catOpts, catMeta;
+  ({
+    cat,
+    catOpts,
+    query: params.query,
+    catMeta,
+  } = parseCatOpts({
+    cat,
+    query: params.query,
+    searchFields,
+    lookupTypes,
+  }));
+  if (catMeta) {
+    cat = catMeta.name;
+  }
+  let filteredFields = xFields.filter(
+    (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
+  );
   bounds = await getBounds({
     params: { ...params },
-    fields: xFields.filter(
-      (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
-    ),
+    fields: filteredFields,
+    summaries,
+    result,
+    exclusions,
+    taxonomy,
+    apiParams,
+  });
+  let catBounds = await getBounds({
+    params: { ...params },
+    fields: filteredFields,
     summaries,
     cat,
     result,
     exclusions,
     taxonomy,
     apiParams,
-    //opts: xOpts,
+    catOpts,
   });
+  if (cat) {
+    if (!catBounds.cats || catBounds.cats.length == 0) {
+      return {
+        status: {
+          success: false,
+          error: `unknown field in 'cat = ${cat}'`,
+        },
+      };
+    }
+    if (catBounds) {
+      bounds.cat = catBounds.cat;
+      bounds.cats = catBounds.cats;
+      bounds.catType = catBounds.catType;
+      bounds.by = catBounds.by;
+      bounds.showOther = catBounds.showOther;
+    }
+  }
+
+  let asms = parseAssemblies(bounds.query);
+  xQuery.query = bounds.query;
   // let yBounds;
   // if (y) {
   //   yBounds = await getBounds({
@@ -681,7 +825,6 @@ export const oxford = async ({
   }
   let yBounds;
   ({ bounds, yBounds } = oxford);
-
   return {
     status: status || { success: true },
     report: {
@@ -694,6 +837,7 @@ export const oxford = async ({
       yBounds,
       xQuery: {
         ...xQuery,
+        query: bounds.query,
         fields: optionalFields.join(","),
       },
       // ...(y && {

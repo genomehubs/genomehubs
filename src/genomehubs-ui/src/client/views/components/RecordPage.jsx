@@ -2,11 +2,14 @@ import React, { memo, useEffect } from "react";
 
 import AnalysisPanel from "./AnalysisPanel";
 import AssembliesPanel from "./AssembliesPanel";
+import AssemblyPanel from "./AssemblyPanel";
 import AttributePanel from "./AttributePanel";
+import FeaturePanel from "./FeaturePanel";
 import LineagePanel from "./LineagePanel";
 import NamesPanel from "./NamesPanel";
 import Page from "./Page";
 import ResultPanel from "./ResultPanel";
+import TaxonPanel from "./TaxonPanel";
 import TextPanel from "./TextPanel";
 import classnames from "classnames";
 import { compose } from "recompose";
@@ -146,10 +149,11 @@ const RecordPage = ({
       scientific_name: record.record.scientific_name,
       taxon_rank: record.record.taxon_rank,
     };
-    results.push(
-      <ResultPanel key={taxon.taxon_id} {...searchById} {...taxon} />
-    );
     if (options.result == "taxon") {
+      results.push(
+        <ResultPanel key={taxon.taxon_id} {...searchById} {...taxon} />
+      );
+
       if (record.record.lineage) {
         results.push(
           <LineagePanel
@@ -169,7 +173,38 @@ const RecordPage = ({
         );
       }
     }
-    if (options.result == "sample") {
+
+    if (options.result != "taxon") {
+      results.push(
+        <TaxonPanel
+          key={"taxon"}
+          recordId={record.record.record_id}
+          {...record.record}
+          result={options.result}
+          taxonomy={options.taxonomy}
+        />
+      );
+    }
+
+    if (options.result == "feature") {
+      results.push(
+        <AssemblyPanel
+          key={"assembly"}
+          recordId={record.record.record_id}
+          assemblyId={record.record.assembly_id}
+          result={options.result}
+          taxonomy={options.taxonomy}
+        />
+      );
+      results.push(
+        <FeaturePanel
+          key={"feature"}
+          recordId={record.record.record_id}
+          result={options.result}
+          taxonomy={options.taxonomy}
+        />
+      );
+    } else if (options.result == "sample") {
       results.push(
         <AssembliesPanel
           key={"assemblies"}

@@ -98,6 +98,8 @@ const Report = ({
   reportProps.mapThreshold = props.mapThreshold;
   reportProps.scatterThreshold = props.scatterThreshold;
   reportProps.treeThreshold = props.treeThreshold;
+  reportProps.compactLegend = props.compactLegend;
+  reportProps.compactWidth = props.compactWidth;
   reportProps.pointSize =
     props.pointSize * 1 ||
     qs.parse(reportProps.queryString).pointSize * 1 ||

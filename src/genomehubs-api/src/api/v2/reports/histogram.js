@@ -5,6 +5,7 @@ import { combineQueries } from "../functions/combineQueries";
 import { formatJson } from "../functions/formatJson";
 import { getBounds } from "./getBounds";
 import { getResults } from "../functions/getResults";
+import { parseCatOpts } from "../functions/parseCatOpts";
 import { parseFields } from "../functions/parseFields";
 import { queryParams } from "./queryParams";
 import { scaleBuckets } from "./scaleBuckets";
@@ -433,9 +434,12 @@ const getHistogram = async ({
   };
 };
 
-const updateQuery = ({ params, fields, opts, lookupTypes }) => {
+const updateQuery = ({ params, fields, summaries, opts, lookupTypes }) => {
   let meta = lookupTypes(fields[0]);
   let field = meta.name;
+  if (summaries[0] != meta.processed_simple) {
+    field = `${summaries[0]}(${field})`;
+  }
   if (!meta || !opts || meta.type == "keyword") {
     return;
   }
@@ -515,11 +519,20 @@ export const histogram = async ({
     fields: apiParams.fields,
     taxonomy,
   });
-  let catMeta = lookupTypes((cat || "").replace(/[\+\[=].*/, ""));
-  if (catMeta && !x.match(catMeta.name)) {
-    searchFields.push(catMeta.name);
-    x += ` AND ${catMeta.name}`;
-    // exclude.push(cat);
+  let catOpts, catMeta;
+  ({
+    cat,
+    catOpts,
+    query: x,
+    catMeta,
+  } = parseCatOpts({
+    cat,
+    query: x,
+    searchFields,
+    lookupTypes,
+  }));
+  if (catMeta) {
+    cat = catMeta.name;
   }
   let xTerm = combineQueries(y, x);
   let { params, fields, summaries } = await queryParams({
@@ -528,7 +541,7 @@ export const histogram = async ({
     rank,
     taxonomy,
   });
-  updateQuery({ params, fields, opts: xOpts, lookupTypes });
+  updateQuery({ params, fields, summaries, opts: xOpts, lookupTypes });
   fields = [...new Set(fields.concat(searchFields))];
   let yTerm, yFields, ySummaries;
   let yParams = {};
@@ -544,8 +557,20 @@ export const histogram = async ({
       rank,
       taxonomy,
     }));
-    updateQuery({ params: yParams, fields: yFields, opts: yOpts, lookupTypes });
-    updateQuery({ params: params, fields: yFields, opts: yOpts, lookupTypes });
+    updateQuery({
+      params: yParams,
+      fields: yFields,
+      summaries: ySummaries,
+      opts: yOpts,
+      lookupTypes,
+    });
+    updateQuery({
+      params: params,
+      fields: yFields,
+      summaries: ySummaries,
+      opts: yOpts,
+      lookupTypes,
+    });
   }
 
   let xQuery = { ...params };
@@ -631,18 +656,17 @@ export const histogram = async ({
   let inputQueries = Object.entries(apiParams)
     .filter(([key, value]) => key.match(/query[A-Z]+/))
     .reduce((a, [key, value]) => ({ ...a, [key]: value }), {});
-
   let bounds = await getBounds({
     params: { ...params, ...inputQueries },
     fields,
     summaries,
-    cat,
     result,
     exclusions,
     taxonomy,
     apiParams,
     opts: xOpts,
   });
+
   if (!bounds) {
     return {
       status: {
@@ -653,21 +677,42 @@ export const histogram = async ({
       },
     };
   }
-  if (cat && (!bounds.cats || bounds.cats.length == 0)) {
-    return {
-      status: {
-        success: false,
-        error: `unknown field in 'cat = ${cat}'`,
-      },
-    };
+  let catBounds = await getBounds({
+    params: { ...params, ...inputQueries },
+    fields,
+    summaries,
+    cat,
+    result,
+    exclusions,
+    taxonomy,
+    apiParams,
+    // opts: xOpts,
+    catOpts,
+  });
+  if (cat) {
+    if (!catBounds.cats || catBounds.cats.length == 0) {
+      return {
+        status: {
+          success: false,
+          error: `unknown field in 'cat = ${cat}'`,
+        },
+      };
+    }
+    if (catBounds) {
+      bounds.cat = catBounds.cat;
+      bounds.cats = catBounds.cats;
+      bounds.catType = catBounds.catType;
+      bounds.by = catBounds.by;
+      bounds.showOther = catBounds.showOther;
+    }
   }
+
   let histograms, yBounds;
   if (yFields && yFields.length > 0) {
     yBounds = await getBounds({
       params: { ...yParams, ...inputQueries },
       fields: yFields,
       summaries: ySummaries,
-      cat,
       result,
       exclusions,
       taxonomy,

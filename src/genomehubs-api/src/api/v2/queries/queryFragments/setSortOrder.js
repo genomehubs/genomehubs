@@ -14,6 +14,9 @@ const ranks = {
 
 const addSortParameter = (sortBy, lookupTypes, lookupNames) => {
   let [by, param = "value"] = sortBy.by.split(":");
+  if (lookupTypes(by)) {
+    param = lookupTypes(by).processed_simple;
+  }
   if (
     by == "scientific_name" ||
     by == "taxon_id" ||

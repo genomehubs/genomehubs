@@ -1,0 +1,38 @@
+attributes:
+  busco_gene:
+    description: BUSCO gene
+    display_level: 2
+    display_name: BUSCO gene
+    display_group: busco
+    type: keyword
+  busco_status:
+    constraint:
+      enum:
+        - complete
+        - duplicated
+        - fragmented
+    description: BUSCO status
+    display_level: 2
+    display_name: BUSCO status
+    display_group: busco
+    separator:
+      - ","
+    translate:
+      duplicated:
+        - Complete
+        - Duplicated
+    type: keyword
+  busco_score:
+    bins:
+      min: 0
+      max: 10000
+      count: 10
+      scale: linear
+    constraint:
+      min: 1
+      max: 100000
+    description: BUSCO score
+    display_level: 2
+    display_name: BUSCO score
+    display_group: busco
+    type: half_float

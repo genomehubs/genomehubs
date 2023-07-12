@@ -338,6 +338,7 @@ const SortableCell = ({
 };
 
 const ResultTable = ({
+  types,
   displayTypes,
   fetchSearchResults,
   saveSearchResults,
@@ -363,8 +364,20 @@ const ResultTable = ({
           name,
         }))
         .filter((obj) => obj.name != "none");
+      for (let obj of expandedTypes) {
+        let [name, summary] = obj.name.split(":");
+        let defaultValue = (types[name] || { processed_simple: "value" })
+          .processed_simple;
+        if (["direct", "descendant", "ancestor"].includes(summary)) {
+          summary = defaultValue;
+        }
+        obj.summary = summary || defaultValue;
+      }
     } else {
       expandedTypes = displayTypes;
+      for (let obj of expandedTypes) {
+        obj.summary = "value";
+      }
     }
   }
 
@@ -609,7 +622,7 @@ const ResultTable = ({
         result.result.fields.hasOwnProperty(type.name)
       ) {
         let field = result.result.fields[type.name];
-        let value = field.value;
+        let value = field[type.summary];
         let entries = [];
         if (Array.isArray(value)) {
           value = formatter(value, searchIndex, "array");
@@ -631,7 +644,11 @@ const ResultTable = ({
         } else {
           value = formatter(value, searchIndex);
         }
-        if (Array.isArray(field.value) && field.length > entries.length) {
+        if (
+          type.summary == "value" &&
+          Array.isArray(field.value) &&
+          field.length > entries.length
+        ) {
           // let list = entries.join(", ");
           // list = `${list}, ... (${field.length - entries.length} more)`;
           let badgeContent = `+${field.length - entries.length}`;

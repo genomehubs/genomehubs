@@ -1,16 +1,15 @@
 import React from "react";
+import Tooltip from "@material-ui/core/Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
-import { format } from "d3-format";
-import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
 import withTaxonomy from "../hocs/withTaxonomy";
 
-const LineagePanel = ({
+export const LineageList = ({
   taxon_id,
   setRecordId,
   lineage,
@@ -35,35 +34,65 @@ const LineagePanel = ({
     }
   };
 
+  let lineageDivs = [];
+
+  if (lineage && lineage.lineage) {
+    lineage.lineage.forEach((ancestor) => {
+      lineageDivs.unshift(
+        <Tooltip
+          title={`${ancestor.taxon_rank} [taxid: ${ancestor.taxon_id}]`}
+          arrow
+          placement="top"
+          key={ancestor.taxon_id}
+        >
+          <span
+            className={styles.lineage}
+            onClick={() =>
+              handleTaxonClick(ancestor.taxon_id, ancestor.scientific_name)
+            }
+          >
+            {ancestor.scientific_name}
+          </span>
+        </Tooltip>
+      );
+    });
+  }
+
+  return <div style={{ maxWidth: "100%" }}>{lineageDivs}</div>;
+};
+
+const LineagePanel = ({
+  taxon_id,
+  setRecordId,
+  lineage,
+  fetchSearchResults,
+  setPreferSearchTerm,
+  setLookupTerm,
+  taxonomy,
+}) => {
   let css = classnames(
     styles.infoPanel,
     styles[`infoPanel1Column`],
     styles.resultPanel
   );
-  let lineageDivs = [];
-  if (lineage && lineage.lineage) {
-    lineage.lineage.forEach((ancestor) => {
-      lineageDivs.unshift(
-        <span
-          key={ancestor.taxon_id}
-          className={styles.lineage}
-          onClick={() =>
-            handleTaxonClick(ancestor.taxon_id, ancestor.scientific_name)
-          }
-          title={`${ancestor.taxon_rank}: ${ancestor.scientific_name} [taxid: ${ancestor.taxon_id}]`}
-        >
-          {ancestor.scientific_name}
-        </span>
-      );
-    });
-  }
+  let lineages = (
+    <LineageList
+      taxon_id={taxon_id}
+      setRecordId={setRecordId}
+      lineage={lineage}
+      fetchSearchResults={fetchSearchResults}
+      setPreferSearchTerm={setPreferSearchTerm}
+      setLookupTerm={setLookupTerm}
+      taxonomy={taxonomy}
+    />
+  );
 
   return (
     <div className={css}>
       <div className={styles.header}>
         <span className={styles.title}>Lineage</span>
       </div>
-      <div style={{ maxWidth: "100%" }}>{lineageDivs}</div>
+      {lineages}
     </div>
   );
 };

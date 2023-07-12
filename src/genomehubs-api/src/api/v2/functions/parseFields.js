@@ -1,5 +1,6 @@
 import { attrTypes } from "./attrTypes";
 import { logError } from "./logger";
+import { summaries } from "./summaries";
 
 export const parseFields = async ({ result, fields, taxonomy }) => {
   let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
@@ -20,6 +21,10 @@ export const parseFields = async ({ result, fields, taxonomy }) => {
     }
     let fieldList = new Set();
     for (let field of fields) {
+      let [summary, attr] = field.split(/[\(\)]/);
+      if (attr && summaries.includes(summary)) {
+        field = attr;
+      }
       let meta = lookupTypes(field);
       if (meta) {
         fieldList.add(meta.name);

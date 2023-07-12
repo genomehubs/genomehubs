@@ -8,11 +8,11 @@ const toReturnType = (value, formatted, returnType) => {
   return formatted;
 };
 
-export const formatter = (value, searchIndex, returnType) => {
+export const formatter = (value, searchIndex, returnType, limit = 15) => {
   if (isNaN(value)) {
     if (Array.isArray(value)) {
       let extra = value.length > 5 && value.length - 5;
-      let values = sortByFrequency(value);
+      let values = sortByFrequency(value).slice(0, limit);
       if (!returnType) {
         values = values.slice(0, 5);
       }

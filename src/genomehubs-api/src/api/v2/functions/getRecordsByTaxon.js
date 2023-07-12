@@ -1,5 +1,6 @@
 import { clearProgress, setProgress } from "./progress";
 
+import { attrTypes } from "./attrTypes";
 import { checkResponse } from "./checkResponse";
 import { client } from "./connection";
 import { config } from "./config";
@@ -127,6 +128,12 @@ export const getRecordsByTaxon = async (props) => {
   let results = [];
   let aggs;
   let status = checkResponse({ body });
+
+  let { typesMap, lookupTypes } = await attrTypes({
+    result: props.result,
+    taxonomy: props.taxonomy,
+  });
+  // set types
   status.size = props.size;
   status.offset = props.offset;
   if (status.hits) {
@@ -137,6 +144,7 @@ export const getRecordsByTaxon = async (props) => {
       names: props.names,
       ranks: props.ranks,
       fields: props.fields,
+      lookupTypes,
     });
     if (body.aggregations) {
       aggs = body.aggregations;

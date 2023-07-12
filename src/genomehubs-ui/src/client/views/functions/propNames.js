@@ -1,0 +1,18 @@
+export const gridPropNames = new Set([
+  "alignContent",
+  "alignItems",
+  "children",
+  "classes",
+  "component",
+  "container",
+  "direction",
+  "item",
+  "justifyContent",
+  "lg",
+  "md",
+  "sm",
+  "spacing",
+  "wrap",
+  "xl",
+  "xs",
+]);

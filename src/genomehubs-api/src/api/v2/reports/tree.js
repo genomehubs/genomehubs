@@ -368,6 +368,7 @@ const getTree = async ({
   y,
   yParams,
   fields,
+  xFields,
   yFields,
   optionalFields,
   cat,
@@ -391,6 +392,7 @@ const getTree = async ({
     taxonomy,
     exclusions,
   });
+  exclusions.missing = [...new Set(exclusions.missing.concat(xFields))];
   if (treeThreshold > -1 && lca.count > treeThreshold) {
     return {
       status: {
@@ -449,6 +451,9 @@ const getTree = async ({
     optionalFields,
     exclusions,
   };
+  if (!xQuery.query) {
+    xQuery.query = xQuery.x;
+  }
   if (queryId) {
     setProgress(queryId, { total: lca.count });
   }
@@ -647,6 +652,7 @@ export const tree = async ({
     : await getTree({
         params,
         fields,
+        xFields,
         optionalFields,
         catRank,
         summaries,

@@ -18,6 +18,7 @@ import ReportXPerRank from "./ReportXPerRank";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
 import dispatchReport from "../hocs/dispatchReport";
+import { gridPropNames } from "../functions/propNames";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
@@ -58,6 +59,8 @@ const ReportItem = ({
   reversed,
   xOpts,
   yOpts,
+  compactLegend,
+  compactWidth,
   highlightArea,
   mapThreshold,
   scatterThreshold,
@@ -84,8 +87,17 @@ const ReportItem = ({
   setReportTerm,
   siteName,
   basename,
-  ...gridProps
+  ...props
 }) => {
+  let reportProps = [];
+  let gridProps = [];
+  for (let [key, value] of Object.entries(props)) {
+    if (gridPropNames.has(key)) {
+      gridProps[key] = value;
+    } else {
+      reportProps[key] = value;
+    }
+  }
   queryString = qs.stringify({
     xOpts,
     yOpts,
@@ -222,6 +234,8 @@ const ReportItem = ({
             stacked={stacked}
             cumulative={cumulative}
             xOpts={xOpts}
+            compactLegend={compactLegend}
+            compactWidth={compactWidth}
             includeEstimates={includeEstimates}
             pointSize={pointSize}
             // yScale={yScale}
@@ -257,6 +271,8 @@ const ReportItem = ({
             ratio={ratio}
             xOpts={xOpts}
             yOpts={yOpts}
+            compactLegend={compactLegend}
+            compactWidth={compactWidth}
             highlightArea={highlightArea}
             stacked={stacked}
             pointSize={pointSize}
@@ -279,6 +295,8 @@ const ReportItem = ({
             ratio={ratio}
             xOpts={xOpts}
             yOpts={yOpts}
+            compactLegend={compactLegend}
+            compactWidth={compactWidth}
             highlightArea={highlightArea}
             stacked={stacked}
             pointSize={pointSize}

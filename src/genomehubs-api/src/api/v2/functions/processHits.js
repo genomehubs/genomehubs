@@ -6,6 +6,7 @@ export const processHits = ({
   names,
   ranks,
   fields = [],
+  lookupTypes,
   reason,
   lca,
   inner_hits,
@@ -14,7 +15,9 @@ export const processHits = ({
   let results = [];
   let targetFields = {};
   for (let field of fields) {
-    let [attr, suffix = "value"] = field.split(":");
+    let meta = lookupTypes(field);
+    let defaultSummary = meta ? meta.processed_simple : "value";
+    let [attr, suffix = defaultSummary] = field.split(":");
     if (!targetFields[attr]) {
       targetFields[attr] = [];
     }
@@ -34,6 +37,7 @@ export const processHits = ({
       });
     } else {
       result.result = hit._source;
+      // console.log(JSON.stringify(hit, null, 4));
       if (hit.inner_hits && hit.inner_hits.taxon_names) {
         if (names) {
           let taxonNames = {};
@@ -216,6 +220,7 @@ export const processHits = ({
               field = { ...attrFields[name], ...field };
             }
             if (targetFields[name]) {
+              // console.log({ targetFields });
               for (let subset of targetFields[name]) {
                 let subsetKey = subset;
                 // if (subsets.source.has(subsetKey)) {
@@ -242,7 +247,9 @@ export const processHits = ({
                 }
 
                 let newName = name;
-                if (subset != "value") {
+                let meta = lookupTypes(name);
+                let defaultSummary = meta ? meta.processed_simple : "value";
+                if (subset != defaultSummary) {
                   newName += `:${subset}`;
                 }
                 if (subsets.source.has(subsetKey)) {

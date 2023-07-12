@@ -265,6 +265,7 @@ const Histogram = ({
           pointSize: chartProps.pointSize,
           orientation: chartProps.orientation,
           lastPos: width - marginRight,
+          showLabels: chartProps.showLabels,
           report: isNaN(buckets[0]) ? "catHistogram" : "histogram",
         })
       }
@@ -297,7 +298,7 @@ const Histogram = ({
       domain={yDomain}
       key={"y"}
       style={{
-        fontSize: chartProps.pointSize,
+        fontSize: chartProps.showLabels ? chartProps.pointSize : 0,
       }}
       tickFormatter={
         chartProps.yScale == "proportion" ? (v) => v : chartProps.yFormat
@@ -413,6 +414,8 @@ const ReportHistogram = ({
   xOpts,
   basename,
   pointSize = 15,
+  compactLegend,
+  compactWidth = 600,
 }) => {
   pointSize *= 1;
   const navigate = useNavigate();
@@ -554,7 +557,10 @@ const ReportHistogram = ({
         }
       });
     }
-    let compactLegend = typeof embedded === "undefined";
+    compactLegend =
+      typeof compactLegend !== "undefined"
+        ? compactLegend
+        : typeof embedded === "undefined" || width < compactWidth;
     const { translations, catTranslations, catOffsets, legendRows } =
       processLegendData({
         bounds,
@@ -567,12 +573,19 @@ const ReportHistogram = ({
     }
     const xFormat = (value) => formats(value, valueType, interval);
     const yFormat = (value) => formats(value, "integer");
-    const maxYLabel = maxStringLength(histograms.zDomain, yFormat, pointSize);
+    let showLabels = width >= compactWidth;
+    const maxYLabel = showLabels
+      ? maxStringLength(histograms.zDomain, yFormat, pointSize)
+      : 0;
     const marginWidth =
       maxYLabel * 1 + pointSize > 40 ? maxYLabel * 1 + pointSize - 40 : 0;
-    const maxXLabel = maxStringLength(histograms.buckets, xFormat, pointSize);
+    const maxXLabel = showLabels
+      ? maxStringLength(histograms.buckets, xFormat, pointSize)
+      : 0;
     let marginHeight = 2 * pointSize;
-    const marginRight = (stringLength(xFormat(endLabel)) * pointSize) / 2;
+    const marginRight = showLabels
+      ? (stringLength(xFormat(endLabel)) * pointSize) / 2
+      : 0;
     let orientation = 0;
 
     if (maxXLabel > (width - marginWidth - marginRight) / buckets.length) {
@@ -584,7 +597,7 @@ const ReportHistogram = ({
       <Histogram
         data={chartData}
         width={width}
-        height={minDim - 50}
+        height={minDim - (showLabels ? 50 : 0)}
         marginWidth={marginWidth}
         marginHeight={marginHeight}
         marginRight={marginRight}
@@ -628,6 +641,7 @@ const ReportHistogram = ({
           location,
           basename,
           compactLegend,
+          showLabels,
         }}
       />
     );

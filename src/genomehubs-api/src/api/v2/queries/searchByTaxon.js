@@ -53,6 +53,14 @@ export const searchByTaxon = async ({
     indexType: "identifiers",
     taxonomy,
   });
+  let attr_summaries = {};
+  fields.forEach((field) => {
+    let [name, summary = "default"] = field.split(":");
+    if (!attr_summaries[name]) {
+      attr_summaries[name] = [];
+    }
+    attr_summaries[name].push(summary);
+  });
   let attr_fields = fields
     .filter((field) => lookupTypes(field))
     .map((field) => lookupTypes(field).name);
@@ -67,21 +75,23 @@ export const searchByTaxon = async ({
   }
   let aggregation_source = setAggregationSource(result, includeEstimates);
   let excludedSources = excludeSources(exclusions, fields);
-  let attributesExist = matchAttributes(
+  let attributesExist = matchAttributes({
     fields,
+    attr_summaries,
     lookupTypes,
     aggregation_source,
-    searchRawValues
-  );
+    searchRawValues,
+  });
   let optionalAttributesExist;
   if (optionalFields) {
-    optionalAttributesExist = matchAttributes(
-      optionalFields,
+    optionalAttributesExist = matchAttributes({
+      fields: optionalFields,
+      attr_summaries,
       lookupTypes,
       aggregation_source,
       searchRawValues,
-      "optionalAttributes"
-    );
+      name: "optionalAttributes",
+    });
   }
   let identifiers = [];
   if (identifierTerms) {

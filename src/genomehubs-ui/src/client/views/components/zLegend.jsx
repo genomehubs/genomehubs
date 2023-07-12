@@ -15,7 +15,7 @@ export const zLegend = ({ props, chartProps, handleClick }) => {
     currentSeries = false,
   } = chartProps;
   let active = currentSeries !== false && currentSeries == i;
-  let legendWidth = name.length * 10 + 15;
+  let legendWidth = (name?.length || 1) * 9 + 10;
   legendWidth = Math.max(legendWidth, 50);
   let offset, row;
   if (catOffsets[name]) {

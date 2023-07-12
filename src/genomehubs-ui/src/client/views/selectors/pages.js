@@ -1,17 +1,24 @@
 import {
   cancelPages,
   getPages,
+  getPagesIsFetching,
   receivePages,
   requestPages,
 } from "../reducers/pages";
 
 import { createCachedSelector } from "re-reselect";
+import store from "../store";
 
 export const pagesUrl = PAGES_URL || false;
 export const webpackHash = COMMIT_HASH || __webpack_hash__;
 
 export function fetchPages(pageId) {
   return async function (dispatch) {
+    const state = store.getState();
+    const isFetching = getPagesIsFetching(state);
+    if (isFetching) {
+      return;
+    }
     dispatch(requestPages());
     let url = `${pagesUrl}/${webpackHash}/${pageId.toLowerCase()}`.replaceAll(
       "//",
