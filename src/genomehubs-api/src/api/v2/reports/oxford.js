@@ -722,12 +722,18 @@ export const oxford = async ({
       params[key] = value;
     }
   });
-  let { catOpts, catMeta } = parseCatOpts({
+  let catOpts, catMeta;
+  ({
+    cat,
+    catOpts,
+    query: params.query,
+    catMeta,
+  } = parseCatOpts({
     cat,
     query: params.query,
     searchFields,
     lookupTypes,
-  });
+  }));
   if (catMeta) {
     cat = catMeta.name;
   }

@@ -519,12 +519,18 @@ export const histogram = async ({
     fields: apiParams.fields,
     taxonomy,
   });
-  let { catOpts, catMeta } = parseCatOpts({
+  let catOpts, catMeta;
+  ({
+    cat,
+    catOpts,
+    query: x,
+    catMeta,
+  } = parseCatOpts({
     cat,
     query: x,
     searchFields,
     lookupTypes,
-  });
+  }));
   if (catMeta) {
     cat = catMeta.name;
   }

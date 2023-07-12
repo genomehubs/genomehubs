@@ -1,12 +1,13 @@
 export const parseCatOpts = ({ cat, query, lookupTypes }) => {
   let catOpts = ";;";
   let portions = (cat || "").split(/\s*[\[\]]\s*/);
+  cat = portions[0];
   let catMeta = lookupTypes(portions[0]);
   if (portions.length > 1) {
     // check if opts are set and update query
     if (portions[1].match(/[,;]/)) {
       catOpts = portions[1];
-      let queryArr = (x || "").split(/(\s*[<>=]+\s*|\s+AND\s+|\s+and\s+)/);
+      let queryArr = (query || "").split(/(\s*[<>=]+\s*|\s+AND\s+|\s+and\s+)/);
       let options = portions[1].split(";");
       if (options.length == 1) {
         options = options[0].split(",");
@@ -58,7 +59,7 @@ export const parseCatOpts = ({ cat, query, lookupTypes }) => {
     delete portions[1];
     cat = portions.join("");
   }
-  return { catMeta, catOpts };
+  return { cat, catMeta, query, catOpts };
 };
 
 export default parseCatOpts;
