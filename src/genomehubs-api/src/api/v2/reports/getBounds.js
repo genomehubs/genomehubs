@@ -292,7 +292,10 @@ export const getBounds = async ({
           );
       }
     }
-    domain = [min, max].map((v) => (isNaN(v) ? v : v * 1));
+    domain = [min, max];
+    if (fieldMeta.type != "date" && !isNaN(min) && !isNaN(max)) {
+      domain = [min, max].map((v) => v * 1);
+    }
   } else {
     let keywords = aggs.keywords;
     if (keywords) {
