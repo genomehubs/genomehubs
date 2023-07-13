@@ -93,7 +93,7 @@ export const valueString = ({ stats, cellSize, pointSize, fill }) => {
           x={-5}
           y={cellSize * 1.15}
           fill={"rgb(102, 102, 102)"}
-          dominantBaseline={"central"}
+          dominantBaseline={"alphabetic"}
           textAnchor={"end"}
           fontSize={pointSize}
         >
@@ -112,7 +112,7 @@ export const valueString = ({ stats, cellSize, pointSize, fill }) => {
           x={-5}
           y={cellSize}
           fill={"rgb(102, 102, 102)"}
-          dominantBaseline={"central"}
+          dominantBaseline={"alphabetic"}
           textAnchor={"end"}
           fontSize={pointSize}
         >
@@ -208,7 +208,7 @@ const MultiCatLegend = ({
           x={-5}
           y={cellSize / 4}
           fill={fill || "rgb(102, 102, 102)"}
-          dominantBaseline={"central"}
+          dominantBaseline={"alphabetic"}
           textAnchor={"end"}
           fontWeight={"bold"}
           fontSize={pointSize}

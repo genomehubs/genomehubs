@@ -43,7 +43,7 @@ const PieComponent = ({ data, height, width, colors }) => {
         y={y}
         fill="white"
         textAnchor={"middle"}
-        dominantBaseline="central"
+        dominantBaseline="alphabetic"
         fontSize={innerRadius / 4}
       >
         {`${pct(percent)}`}
@@ -62,6 +62,7 @@ const PieComponent = ({ data, height, width, colors }) => {
           className="recharts-text recharts-label"
           textAnchor="middle"
           alignmentBaseline="central"
+          dominantBaseline="alphabetic"
           fontSize={innerRadius / 2.5}
         >
           {value1}
@@ -73,12 +74,17 @@ const PieComponent = ({ data, height, width, colors }) => {
           className="recharts-text recharts-label"
           textAnchor="middle"
           alignmentBaseline="hanging"
+          dominantBaseline="alphabetic"
           fontSize={innerRadius / 4.5}
         >
-          <tspan alignmentBaseline="hanging" fill={colors[0]}>
+          <tspan
+            alignmentBaseline="hanging"
+            dominantBaseline="alphabetic"
+            fill={colors[0]}
+          >
             {value2.toLocaleString()}
           </tspan>
-          <tspan alignmentBaseline="hanging">
+          <tspan alignmentBaseline="hanging" dominantBaseline="alphabetic">
             {" "}
             / {value3.toLocaleString()}
           </tspan>
@@ -163,7 +169,7 @@ const RadialBarComponent = ({
             x={cx}
             y={cy - viewBox.innerRadius - fontSize + 2}
             textAnchor="middle"
-            dominantBaseline="middle"
+            dominantBaseline="alphabetic"
             alignmentBaseline="middle"
           >
             {pct1(value)}

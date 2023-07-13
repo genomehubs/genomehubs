@@ -84,6 +84,7 @@ const WordCloud = ({
             fillOpacity={0.5}
             textAnchor="middle"
             alignmentBaseline="central"
+            dominantBaseline="alphabetic"
             pointerEvents={"none"}
           >
             no data

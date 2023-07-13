@@ -236,6 +236,7 @@ const ReportTreePaths = ({
                   y={segment.yStart}
                   textAnchor={segment.tip ? "start" : "end"}
                   alignmentBaseline={segment.tip ? "middle" : "bottom"}
+                  dominantBaseline={segment.tip ? "alphabetic" : "bottom"}
                   transform={`translate(${segment.tip ? 10 : -6}, ${
                     segment.tip ? 0 : -2
                   })`}
@@ -302,6 +303,7 @@ const ReportTreePaths = ({
             xlinkHref={`#${label.taxon_id}-label-path`}
             startOffset="50%"
             alignmentBaseline="central"
+            dominantBaseline="alphabetic"
           >
             {label.scientific_name}
           </textPath>

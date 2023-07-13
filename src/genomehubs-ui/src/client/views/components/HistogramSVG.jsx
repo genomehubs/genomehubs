@@ -92,6 +92,7 @@ const HistogramSVG = ({
           fillOpacity={0.5}
           textAnchor="middle"
           alignmentBaseline="central"
+          dominantBaseline="alphabetic"
         >
           no data
         </text>
@@ -149,6 +150,7 @@ const HistogramSVG = ({
         fill={"white"}
         textAnchor="middle"
         alignmentBaseline="central"
+        dominantBaseline="alphabetic"
       >
         {formatter(bucket.count)}
       </text>
