@@ -3,6 +3,7 @@ export const gridPropNames = new Set([
   "alignItems",
   "children",
   "classes",
+  "className",
   "component",
   "container",
   "direction",
