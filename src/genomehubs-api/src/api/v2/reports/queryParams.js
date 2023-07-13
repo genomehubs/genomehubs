@@ -40,7 +40,9 @@ export const queryParams = async ({
           field = fieldMeta.name;
           params.excludeMissing.push(field);
           fields.push(field);
-          summaries.push(summary);
+          if (summary != "collate") {
+            summaries.push(summary);
+          }
         }
       }
     });

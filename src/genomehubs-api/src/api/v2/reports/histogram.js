@@ -690,18 +690,19 @@ export const histogram = async ({
     catOpts,
   });
   if (cat) {
-    if (!catBounds.cats || catBounds.cats.length == 0) {
-      return {
-        status: {
-          success: false,
-          error: `unknown field in 'cat = ${cat}'`,
-        },
-      };
-    }
+    // if (!catBounds.cats || catBounds.cats.length == 0) {
+    //   return {
+    //     status: {
+    //       success: false,
+    //       error: `unknown field in 'cat = ${cat}'`,
+    //     },
+    //   };
+    // }
     if (catBounds) {
       bounds.cat = catBounds.cat;
       bounds.cats = catBounds.cats;
       bounds.catType = catBounds.catType;
+      bounds.catCount = catBounds.tickCount;
       bounds.by = catBounds.by;
       bounds.showOther = catBounds.showOther;
     }

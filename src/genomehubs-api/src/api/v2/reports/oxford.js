@@ -146,11 +146,12 @@ const getOxford = async ({
           result,
           bounds: {
             stats: {
+              ...bounds.stats,
               min: bounds.domain[0],
               max: bounds.domain[1],
-              ...bounds.stats,
             },
             ...bounds,
+            tickCount: bounds.catCount,
           },
           // yHistograms,
           taxonomy,
@@ -751,28 +752,30 @@ export const oxford = async ({
   });
   let catBounds = await getBounds({
     params: { ...params },
-    fields: filteredFields,
-    summaries,
+    fields: [cat, ...filteredFields],
+    summaries: ["value", ...summaries],
     cat,
     result,
     exclusions,
     taxonomy,
     apiParams,
+    opts: catOpts,
     catOpts,
   });
   if (cat) {
-    if (!catBounds.cats || catBounds.cats.length == 0) {
-      return {
-        status: {
-          success: false,
-          error: `unknown field in 'cat = ${cat}'`,
-        },
-      };
-    }
+    // if (!catBounds.cats || catBounds.cats.length == 0) {
+    //   return {
+    //     status: {
+    //       success: false,
+    //       error: `unknown field in 'cat = ${cat}'`,
+    //     },
+    //   };
+    // }
     if (catBounds) {
       bounds.cat = catBounds.cat;
       bounds.cats = catBounds.cats;
       bounds.catType = catBounds.catType;
+      bounds.catCount = catBounds.tickCount;
       bounds.by = catBounds.by;
       bounds.showOther = catBounds.showOther;
     }
