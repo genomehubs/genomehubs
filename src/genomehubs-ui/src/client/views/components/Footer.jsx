@@ -163,14 +163,14 @@ const Footer = ({
         </Grid>
       </Grid>
       <Grid container direction="row" spacing={0} style={{ maxHeight: "100%" }}>
-        <Grid item xs={3}>
+        <Grid item xs={4}>
           {settings}
           {settingsPopup}
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={4}>
           {poweredBy}
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={4}>
           {logos}
         </Grid>
       </Grid>
