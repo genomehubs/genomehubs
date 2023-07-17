@@ -4,7 +4,9 @@ import {
   descendantHighlight,
   directColor,
   directHighlight,
+  getAllPalettes,
   getDefaultPalette,
+  selectPalette,
 } from "../reducers/color";
 
 import React from "react";
@@ -37,10 +39,20 @@ const withColors = (WrappedComponent) => (props) => {
         descendantHighlight,
         directHighlight,
       },
+      palettes: getAllPalettes(state),
     };
   };
 
-  const Connected = connect(mapStateToProps)(WrappedComponent);
+  const mapDispatchToProps = (dispatch) => ({
+    selectPalette: (id) => {
+      dispatch(selectPalette(id));
+    },
+  });
+
+  const Connected = connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(WrappedComponent);
 
   return <Connected {...props} />;
 };
