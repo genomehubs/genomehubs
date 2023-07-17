@@ -1,7 +1,10 @@
-import React, { memo, useEffect } from "react";
+import PalettePicker, { PalettePreview } from "./PalettePicker";
+import React, { memo, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "@reach/router";
 
 import CopyrightIcon from "@material-ui/icons/Copyright";
 import Grid from "@material-ui/core/Grid";
+import { Popover } from "@material-ui/core";
 import Taxonomy from "./Taxonomy";
 import bbsrcLogo from "./img/bbsrc-logo.png";
 import { compose } from "recompose";
@@ -12,14 +15,51 @@ import qs from "../functions/qs";
 import sangerLogo from "./img/sanger-logo.png";
 import styles from "./Styles.scss";
 import withApi from "../hocs/withApi";
+import withColors from "../hocs/withColors";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withVersion from "../hocs/withVersion";
 
-const Footer = ({ version, fetchTypes, hidden, taxonomy, apiStatus }) => {
+const Footer = ({
+  id,
+  version,
+  fetchTypes,
+  hidden,
+  taxonomy,
+  apiStatus,
+  selectPalette,
+  levels,
+}) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const popupId = open ? "simple-popover" : undefined;
   let options = qs.parse(location.search.replace(/^\?/, ""));
+  let currentPalette = options.palette || id;
+  const updatePalette = (newPalette) => {
+    if (newPalette != currentPalette) {
+      options.palette = newPalette;
+    }
+    handleClose();
+    navigate(`${location.pathname}?${qs.stringify(options)}${location.hash}`);
+  };
   useEffect(() => {
     fetchTypes("multi", options.taxonomy || taxonomy);
   }, [taxonomy, apiStatus]);
+  useEffect(() => {
+    if (currentPalette != id) {
+      selectPalette(currentPalette);
+    }
+  }, [currentPalette, levels]);
   if (hidden) {
     return null;
   }
@@ -27,7 +67,7 @@ const Footer = ({ version, fetchTypes, hidden, taxonomy, apiStatus }) => {
   let dataRelease;
 
   if (version.hub) {
-    let releaseLink = `release ${version.release}`;
+    let releaseLink = version.release;
     if (version.source) {
       releaseLink = (
         <a className={styles.link} href={version.source} target="_blank">
@@ -37,10 +77,78 @@ const Footer = ({ version, fetchTypes, hidden, taxonomy, apiStatus }) => {
     }
     dataRelease = (
       <span style={{ float: "left", marginLeft: "1em" }}>
-        {version.hub} data {releaseLink}
+        {version.hub} data release {releaseLink}
       </span>
     );
   }
+  let colors = levels[6] || levels.default.slice(0, 6);
+  let palette = <PalettePreview colors={colors} size="2em" />;
+
+  let settingsPopup = (
+    <Popover
+      id={popupId}
+      open={open}
+      anchorEl={anchorEl}
+      onClose={handleClose}
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "left",
+      }}
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "center",
+      }}
+    >
+      <PalettePicker handleClick={updatePalette} />
+    </Popover>
+  );
+
+  let reportIssue = (
+    <span style={{ float: "right", marginRight: "1em" }}>
+      Report an{" "}
+      <a
+        className={styles.link}
+        href="https://github.com/genomehubs/genomehubs/issues"
+        target="_blank"
+      >
+        issue
+      </a>
+    </span>
+  );
+
+  let poweredBy = (
+    // <span style={{ float: "left", marginLeft: "1em" }}>
+    <span>
+      Powered by{" "}
+      <a className={styles.link} href="https://genomehubs.org/" target="_blank">
+        GenomeHubs
+      </a>{" "}
+      <CopyrightIcon fontSize="inherit" /> {new Date().getFullYear()}
+    </span>
+  );
+
+  let settings = (
+    <span
+      style={{ float: "left", marginLeft: "1em", cursor: "pointer" }}
+      onClick={handleClick}
+    >
+      {palette}
+    </span>
+  );
+
+  let logos = (
+    <span style={{ float: "right", marginRight: "0.5em" }}>
+      <a href="https://www.sanger.ac.uk/" target="_blank">
+        <img src={sangerLogo} />
+      </a>
+      <a href="https://www.darwintreeoflife.org" target="_blank">
+        <img src={dtolLogo} />
+      </a>
+      <a href="https://bbsrc.ukri.org/" target="_blank">
+        <img src={bbsrcLogo} />
+      </a>
+    </span>
+  );
 
   return (
     <footer>
@@ -49,29 +157,21 @@ const Footer = ({ version, fetchTypes, hidden, taxonomy, apiStatus }) => {
         <Grid item xs={3}>
           {dataRelease}
         </Grid>
-        <Grid item xs={6}>
-          <a href="https://www.sanger.ac.uk/" target="_blank">
-            <img src={sangerLogo} />
-          </a>
-          <a href="https://www.darwintreeoflife.org" target="_blank">
-            <img src={dtolLogo} />
-          </a>
-          <a href="https://bbsrc.ukri.org/" target="_blank">
-            <img src={bbsrcLogo} />
-          </a>
-        </Grid>
+        <Grid item xs={6}></Grid>
         <Grid item xs={3}>
-          <span style={{ float: "right", marginRight: "1em" }}>
-            Powered by{" "}
-            <a
-              className={styles.link}
-              href="https://genomehubs.org/"
-              target="_blank"
-            >
-              GenomeHubs
-            </a>{" "}
-            <CopyrightIcon fontSize="inherit" /> {new Date().getFullYear()}
-          </span>
+          {reportIssue}
+        </Grid>
+      </Grid>
+      <Grid container direction="row" spacing={0} style={{ maxHeight: "100%" }}>
+        <Grid item xs={4}>
+          {settings}
+          {settingsPopup}
+        </Grid>
+        <Grid item xs={4}>
+          {poweredBy}
+        </Grid>
+        <Grid item xs={4}>
+          {logos}
         </Grid>
       </Grid>
     </footer>
@@ -84,5 +184,6 @@ export default compose(
   withVersion,
   withApi,
   withTaxonomy,
-  dispatchTypes
+  dispatchTypes,
+  withColors
 )(Footer);
