@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import Grid from "@material-ui/core/Grid";
+import Tooltip from "@material-ui/core/Tooltip";
 import stringLength from "../functions/stringLength";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
@@ -31,9 +32,6 @@ const ReportCaption = ({ caption, embedded }) => {
   };
 
   let captionLength = stringLength(caption) * 10;
-  if (captionLength > width * 1.8 && caption.length > width / 2.9) {
-    caption = caption.slice(0, width / 3) + "...";
-  }
   let formattedCaption = formatCaption(caption);
 
   useEffect(() => {
