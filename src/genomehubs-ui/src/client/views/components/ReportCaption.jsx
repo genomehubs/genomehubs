@@ -30,9 +30,11 @@ const ReportCaption = ({ caption, embedded }) => {
     return;
   };
 
-  let formattedCaption = formatCaption(caption);
-
   let captionLength = stringLength(caption) * 10;
+  if (captionLength > width * 1.8 && caption.length > width / 2.9) {
+    caption = caption.slice(0, width / 3) + "...";
+  }
+  let formattedCaption = formatCaption(caption);
 
   useEffect(() => {
     if (typeof embedded !== "undefined" && captionLength < width * 1.8) {

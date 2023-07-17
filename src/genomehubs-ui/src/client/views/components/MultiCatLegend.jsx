@@ -9,10 +9,11 @@ import styles from "./Styles.scss";
 export const processLegendData = ({
   bounds,
   yBounds,
-  minWidth = 50,
-  labelPadding = 80,
+  minWidth = 40,
+  labelPadding = 70,
   width,
   pointSize,
+  compactLegend,
 }) => {
   let translations = {};
   let catTranslations = {};

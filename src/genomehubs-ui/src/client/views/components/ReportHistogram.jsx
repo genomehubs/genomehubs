@@ -567,6 +567,7 @@ const ReportHistogram = ({
         minWidth: compactLegend ? 50 : 10 * pointSize,
         width,
         pointSize,
+        compactLegend,
       });
     if (cats && cats.length > 1 && levels[cats.length]) {
       colors = levels[cats.length];

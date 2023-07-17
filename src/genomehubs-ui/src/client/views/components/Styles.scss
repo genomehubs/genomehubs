@@ -102,20 +102,36 @@ body,
       border-bottom: 0.2em solid themed("primary");
       flex: none;
       z-index: 1;
+      background: themed("secondary");
+
+      .siteText {
+        background: rgba(themed("primary"), 0.5);
+      }
+      
+      .siteLogo {
+        height: 2.15em;
+        width: 2.15em;
+        margin: 0;
+        float: left;
+        color: themed("primary");
+        background: rgba(themed("primary"), 0.5);
+      }
 
       .siteName {
         cursor: pointer;
         font-family: themed("titleFont");
         font-size: 120%;
-        line-height: 2em;
-        margin: 0;
-        margin-left: 0.5em;
+        line-height: 1.8em;
+        margin: 0 0.25em 0 0.25em;
         padding: 0;
-        color: themed("secondary")
+        color: themed("secondary");
       }
 
       .tabHolder {
         float: right;
+        background: rgba(themed("primary"), 0.5);
+        height: 2em;
+        overflow: visible
       }
 
       .tab {
@@ -126,7 +142,7 @@ body,
         cursor: pointer;
         display: inline-block;
         height: 2.2em;
-        line-height: 2em;
+        line-height: 1.8em;
         margin-right: -1px;
         margin-bottom: 0.2em;
         padding: 0 0.5em;

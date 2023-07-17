@@ -51,6 +51,8 @@ const getHistAggResults = (aggs, stats) => {
   } else if (hist.by_lineage) {
     // TODO: support lineage category histogram
     // console.log(hist);
+  } else {
+    // console.log(JSON.stringify(hist, null, 4));
   }
   return hist;
 };
@@ -146,6 +148,7 @@ const getHistogram = async ({
     yBounds,
     ySummary,
   });
+
   let catMeta = lookupTypes((cat || "").replace(/[\+\[=].*/, ""));
   let res = await getResults({
     ...params,
@@ -721,7 +724,7 @@ export const histogram = async ({
       opts: yOpts,
     });
   }
-  if (bounds && (!bounds.cats || bounds.cats.length > 0)) {
+  if (bounds && (!bounds.cats || bounds.cats.length > 0 || bounds.catType)) {
     let threshold = scatterThreshold >= 0 ? scatterThreshold : 10000;
     histograms = await getHistogram({
       params: { ...params, ...inputQueries },

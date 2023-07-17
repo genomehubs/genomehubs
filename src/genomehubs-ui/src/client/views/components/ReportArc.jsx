@@ -212,6 +212,7 @@ const RadialBarComponent = ({
     bounds,
     width,
     pointSize,
+    compactLegend,
   });
   // let plotHeight = height - 5 - legendRows * (2 * pointSize + 15);
   // if (compactLegend) {
@@ -219,7 +220,7 @@ const RadialBarComponent = ({
   // }
   let legendHeight = legendRows * (2 * pointSize + 15) + 5;
   if (compactLegend) {
-    legendHeight = legendRows * (pointSize + 10) + 5;
+    legendHeight = Math.min(legendRows, 2) * (pointSize + 10) + 5;
   }
   let plotHeight = height - legendHeight;
 
