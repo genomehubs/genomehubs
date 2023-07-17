@@ -46,7 +46,7 @@ const Page = ({
   fieldId,
   resultCount,
   result,
-  selectPalette,
+  // selectPalette,
   apiStatus,
 }) => {
   const classes = useStyles();
@@ -56,9 +56,9 @@ const Page = ({
   const savedOptions = useReadLocalStorage(`${searchIndex}Options`);
   const itemCss = topLevel ? classes.itemFull : classes.item;
   let options = qs.parse(location.search.replace(/^\?/, ""));
-  useEffect(() => {
-    selectPalette(options.palette || "default");
-  }, []);
+  // useEffect(() => {
+  //   selectPalette(options.palette || "default");
+  // }, []);
   // if (!apiStatus) {
   //   return null;
   // }
