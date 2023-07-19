@@ -31,11 +31,11 @@ export const queryParams = async ({
     term.split(/\s+(?:and|AND)\s+/).forEach((subterm) => {
       if (!subterm.match("tax_")) {
         let field = subterm.replace(/[^\w_\(\)-].+$/, "").toLowerCase();
-        let summary = "value";
+        let fieldMeta = lookupTypes(field);
+        let summary = fieldMeta ? fieldMeta.return_type || "value" : "value";
         if (field.match(/\(/)) {
           [summary, field] = field.split(/[\(\)]/);
         }
-        let fieldMeta = lookupTypes(field);
         if (fieldMeta) {
           field = fieldMeta.name;
           params.excludeMissing.push(field);

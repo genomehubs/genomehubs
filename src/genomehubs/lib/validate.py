@@ -69,7 +69,7 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
                 sys.exit(1)
         defaults = {"attributes": {}, "metadata": {}}
         if "defaults" in types:
-            for key, value in types["defaults"]:
+            for key, value in types["defaults"].items():
                 defaults[key] = value
         for key, value in types["file"].items():
             if key.startswith("display") or key.startswith("taxon"):

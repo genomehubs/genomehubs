@@ -656,7 +656,11 @@ const ResultTable = ({
             // <Tooltip title={list} placement="top" arrow>
             <span>
               {value}
-              <StyledBadge badgeContent={badgeContent} color={"default"}>
+              <StyledBadge
+                badgeContent={badgeContent}
+                color={"default"}
+                max={100000}
+              >
                 <span style={{ padding: "0 6px", color: "rgba(0,0,0,0" }}>
                   {badgeContent}
                 </span>

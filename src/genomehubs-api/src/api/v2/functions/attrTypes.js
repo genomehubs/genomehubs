@@ -41,6 +41,9 @@ const setProcessedSummary = (meta, typesMap) => {
     summary = meta.default_summary;
   }
   let simple = "value";
+  if (meta.return_type) {
+    simple = meta.return_type;
+  }
   if (!summary) {
     if (meta.type == "keyword") {
       summary = "keyword_value.raw";
