@@ -381,7 +381,7 @@ const ResultTable = ({
     }
   }
 
-  if (searchResults && searchResults.status.error) {
+  if (searchResults && searchResults.status && searchResults.status.error) {
     return <ReportError report={"search"} error={searchResults.status.error} />;
   } else if (
     !searchResults.status ||
