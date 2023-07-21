@@ -109,12 +109,12 @@ body,
       }
       
       .siteLogo {
-        height: 2.15em;
-        width: 2.15em;
+        height: 1.8em;
+        width: 1.8em;
         margin: 0;
         float: left;
         color: themed("primary");
-        background: rgba(themed("primary"), 0.5);
+        // background: rgba(themed("primary"), 0.5);
       }
 
       .siteName {
@@ -142,7 +142,7 @@ body,
         cursor: pointer;
         display: inline-block;
         height: 2.2em;
-        line-height: 1.8em;
+        line-height: 2em;
         margin-right: -1px;
         margin-bottom: 0.2em;
         padding: 0 0.5em;

@@ -103,7 +103,6 @@ export const histogramAgg = async ({
     }
     offset = min;
   }
-  console.log({ min, max, interval, scale, count });
   let fieldKey = `attributes${rawValues ? ".values" : ""}.`;
   if (!summary || summary == "value") {
     fieldKey += `${meta.type}_value`;

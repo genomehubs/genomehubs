@@ -23,6 +23,7 @@ import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
 import qs from "../functions/qs";
+import setColors from "../functions/setColors";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
@@ -409,6 +410,8 @@ const ReportHistogram = ({
   setMessage,
   colors,
   levels,
+  colorPalette,
+  palettes,
   minDim,
   setMinDim,
   xOpts,
@@ -569,9 +572,13 @@ const ReportHistogram = ({
         pointSize,
         compactLegend,
       });
-    if (cats && cats.length > 1 && levels[cats.length]) {
-      colors = levels[cats.length];
-    }
+    ({ levels, colors } = setColors({
+      colorPalette,
+      palettes,
+      levels,
+      count: cats.length,
+      colors,
+    }));
     const xFormat = (value) => formats(value, valueType, interval);
     const yFormat = (value) => formats(value, "integer");
     let showLabels = width >= compactWidth;

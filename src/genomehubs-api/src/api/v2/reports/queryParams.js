@@ -35,6 +35,9 @@ export const queryParams = async ({
         let summary = fieldMeta ? fieldMeta.return_type || "value" : "value";
         if (field.match(/\(/)) {
           [summary, field] = field.split(/[\(\)]/);
+          if (summary != "collate") {
+            fieldMeta = lookupTypes(field);
+          }
         }
         if (fieldMeta) {
           field = fieldMeta.name;

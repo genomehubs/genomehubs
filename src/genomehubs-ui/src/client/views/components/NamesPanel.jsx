@@ -6,28 +6,30 @@ import { format } from "d3-format";
 import styles from "./Styles.scss";
 import withRecord from "../hocs/withRecord";
 
-const NamesPanel = ({ taxon_id, names }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel
-  );
+export const NamesList = ({ names }) => {
   let nameDivs = [];
-  names.forEach((name, i) => {
-    let source = name.class;
+  names.forEach((obj, i) => {
+    let name = obj.name || obj.identifier;
+    let source = obj.class;
     let prefix;
-    if (name.source_stub) {
+    if (obj.source_url) {
       source = (
-        <a href={`${name.source_stub}${name.name}`} target="_blank">
+        <a href={`${obj.source_url}`} target="_blank">
           {source} <LaunchIcon fontSize="inherit" />
         </a>
       );
-    } else if (name.source_url_stub) {
-      if (name.source) {
-        prefix = `${name.source}:`;
+    } else if (obj.source_stub) {
+      source = (
+        <a href={`${obj.source_stub}${name}`} target="_blank">
+          {source} <LaunchIcon fontSize="inherit" />
+        </a>
+      );
+    } else if (obj.source_url_stub) {
+      if (obj.source) {
+        prefix = `${obj.source}:`;
       }
       source = (
-        <a href={`${name.source_url_stub}${name.name}`} target="_blank">
+        <a href={`${obj.source_url_stub}${name}`} target="_blank">
           {source} <LaunchIcon fontSize="inherit" />
         </a>
       );
@@ -35,25 +37,37 @@ const NamesPanel = ({ taxon_id, names }) => {
     nameDivs.push(
       <span key={i} className={styles.name}>
         {prefix}
-        {name.name} - {source}
+        {name} - {source}
       </span>
     );
   });
+  return (
+    <div
+      style={{
+        maxWidth: "100%",
+        columns: "3 200px",
+        columnRule: "1px solid",
+      }}
+    >
+      {nameDivs}
+    </div>
+  );
+};
+
+const NamesPanel = ({ taxon_id, names }) => {
+  let css = classnames(
+    styles.infoPanel,
+    styles[`infoPanel1Column`],
+    styles.resultPanel
+  );
+  let nameDiv = <NamesList names={names} />;
 
   return (
     <div className={css}>
       <div className={styles.header}>
         <span className={styles.title}>Names</span>
       </div>
-      <div
-        style={{
-          maxWidth: "100%",
-          columns: "3 200px",
-          columnRule: "1px solid",
-        }}
-      >
-        {nameDivs}
-      </div>
+      {nameDiv}
     </div>
   );
 };

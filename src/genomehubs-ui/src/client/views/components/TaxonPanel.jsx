@@ -114,7 +114,9 @@ const TaxonPanel = ({
         {additionalDivs.length > 0 && (
           <div className={styles.flexRow}>{additionalDivs}</div>
         )} */}
-          <Grid item>{lineages}</Grid>
+          <Grid item style={{ width: "100%" }}>
+            {lineages}
+          </Grid>
           {taxidLink && (
             <>
               <Grid container direction="row" justifyContent="flex-end">

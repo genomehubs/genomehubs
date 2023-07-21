@@ -16,6 +16,7 @@ import React, { useRef } from "react";
 import Grid from "@material-ui/core/Grid";
 import { compose } from "recompose";
 import { format } from "d3-format";
+import setColors from "../functions/setColors";
 import stringLength from "../functions/stringLength";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
@@ -275,6 +276,8 @@ const ReportArc = ({
   containerRef,
   colors,
   levels,
+  colorPalette,
+  palettes,
   minDim,
   embedded,
   pointSize,
@@ -288,9 +291,13 @@ const ReportArc = ({
     let chart;
     if (Array.isArray(arc.report.arc)) {
       arc.report.arc.forEach((report, i) => {
-        if (levels[arc.report.arc.length]) {
-          colors = levels[arc.report.arc.length];
-        }
+        ({ levels, colors } = setColors({
+          colorPalette,
+          palettes,
+          levels,
+          count: arc.report.arc.length,
+          colors,
+        }));
         let { arc: currentArc, x, y, rank } = report;
         chartData.push({
           xValue: x,
@@ -319,9 +326,13 @@ const ReportArc = ({
         { value: x, name: xTerm },
         { value: y - x, name: yTerm },
       ];
-      if (levels[2]) {
-        colors = levels[2];
-      }
+      ({ levels, colors } = setColors({
+        colorPalette,
+        palettes,
+        levels,
+        count: 2,
+        colors,
+      }));
       chart = (
         <PieComponent
           data={chartData}

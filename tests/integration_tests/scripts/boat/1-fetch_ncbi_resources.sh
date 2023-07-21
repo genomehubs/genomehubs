@@ -2,23 +2,27 @@
 
 ROOT_TAXON=Amphiesmenoptera
 ROOT_TAXID=85604
-FILE_PATH=tests/integration_tests/data/boat/assembly-data
+FILE_PATH=tests/integration_tests/data/boat/assembly-insdc
 CONFIG=tests/integration_tests/config/boat.yaml
+
+mkdir -p $FILE_PATH
+
+# Download Ensembl Rapid json file
+curl -Ls "https://ftp.ensembl.org/pub/rapid-release/species_metadata.json" > $FILE_PATH/ensembl_rapid_metadata.json
 
 # # Download NCBI datasets executable
 # curl https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/LATEST/mac/datasets > datasets
 # chmod a+x datasets
 
-# # Download NCBI datasets zip for ROOT_TAXON
-# mkdir -p $FILE_PATH
-# datasets download genome taxon "$ROOT_TAXON" \
-#    --no-progressbar \
-#    --dehydrated \
-#    --filename $FILE_PATH/$ROOT_TAXON.zip
+# Download NCBI datasets zip for ROOT_TAXON
+datasets download genome taxon "$ROOT_TAXON" \
+   --no-progressbar \
+   --dehydrated \
+   --filename $FILE_PATH/$ROOT_TAXON.zip
 
-# # Unzip NCBI datasets zip
-# unzip -o -d $FILE_PATH \
-#    $FILE_PATH/$ROOT_TAXON.zip
+# Unzip NCBI datasets zip
+unzip -o -d $FILE_PATH \
+   $FILE_PATH/$ROOT_TAXON.zip
 
 # Parse NCBI datasets
 genomehubs parse --ncbi-datasets-genome $FILE_PATH \
@@ -60,31 +64,28 @@ while read ACC; do
   fi
 done <<< "$ACCESSIONS"
 
+yq -r '.[] | [.taxonomy_id, .assembly_accession, .ensembl_production_name] | @tsv' $FILE_PATH/ensembl_rapid_metadata.json \
+    > $FILE_PATH/ensembl_rapid_metadata.tsv
+
+grep -Ff <(gunzip -c tests/integration_tests/data/boat/assembly-data/ncbi_datasets_Amphiesmenoptera.tsv.gz | cut -f 4) $FILE_PATH/ensembl_rapid_metadata.tsv \
+    > $FILE_PATH/ensembl_rapid_metadata.$ROOT_TAXON.tsv
+
+echo "file:
+  format: tsv
+  header: false
+  needs: ncbi_datasets_$ROOT_TAXON.types.yaml
+  name: ensembl_rapid_metadata.$ROOT_TAXON.tsv
+identifiers:
+  assembly_id:
+    index: 1
+  ensembl_id:
+    index: 2
+    source_url_template: https://rapid.ensembl.org/{}/Info/Index
+taxonomy:
+  taxon_id:
+    index: 0" > $FILE_PATH/ensembl_rapid_metadata.$ROOT_TAXON.names.yaml
+
 
 # # Clean up expanded ncbi datasets zip
 # rm -rf $FILE_PATH/ncbi_dataset \
 #    $FILE_PATH/$ROOT_TAXON.zip
-
-# Delete existing indices
-curl -X DELETE "http://localhost:9201/*"
-
-# Run genomehubs init
-genomehubs init \
-    --taxonomy-source ncbi \
-    --config-file $CONFIG \
-    --taxonomy-ncbi-root $ROOT_TAXID \
-    --taxon-preload
-
-curl -s -X PUT "localhost:9201/assembly--ncbi--boat--2021.10.15/_settings" \
-          -H 'Content-Type: application/json' \
-          -d '{ "index.mapping.nested_objects.limit" : 100000 }'
-
-curl -s -X PUT "localhost:9201/taxon--ncbi--boat--2021.10.15/_settings" \
-          -H 'Content-Type: application/json' \
-          -d '{ "index.mapping.nested_objects.limit" : 100000 }'
-
-# Run genomehubs index assembly assembly-data
-genomehubs index \
-    --taxonomy-source ncbi \
-    --config-file $CONFIG \
-    --assembly-dir $FILE_PATH

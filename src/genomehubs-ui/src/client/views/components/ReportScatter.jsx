@@ -32,6 +32,7 @@ import { processLegendData } from "./MultiCatLegend";
 // import { point } from "leaflet";
 import qs from "../functions/qs";
 import { scaleLinear } from "d3-scale";
+import setColors from "../functions/setColors";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
@@ -984,6 +985,8 @@ const ReportScatter = ({
   reportTerm,
   colors,
   levels,
+  colorPalette,
+  palettes,
   minDim,
   setMinDim,
   xOpts,
@@ -1089,9 +1092,13 @@ const ReportScatter = ({
       pointSize,
       compactLegend,
     });
-    if (cats && cats.length > 1 && levels[cats.length]) {
-      colors = levels[cats.length];
-    }
+    ({ levels, colors } = setColors({
+      colorPalette,
+      palettes,
+      levels,
+      count: cats.length,
+      colors,
+    }));
     const xFormat = (value) => formats(value, valueType, interval);
     const yFormat = (value) => formats(value, yValueType, yInterval);
 

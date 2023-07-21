@@ -1,7 +1,7 @@
 #!/bin/bash
 
 RAW_DIR=/tmp
-ASSEMBLY_DIR=$HOME/projects/genomehubs/genomehubs/tests/integration_tests/data/boat/assembly-data
+ASSEMBLY_DIR=$HOME/projects/genomehubs/genomehubs/tests/integration_tests/data/boat/assembly-btk
 GROUP=lepidoptera
 
 function set_header() {
@@ -101,10 +101,6 @@ function generate_yaml() {
     separator: \",\"
     source: BlobToolKit
     source_url_stub: https://blobtoolkit.genomehubs.org
-    taxon_display_level: 2
-    taxon_summary: ordered_list
-    taxon_traverse: ordered_list
-    taxon_traverse_direction: up
     type: keyword
     summary: list
     return_type: length
@@ -136,6 +132,10 @@ attributes:"
       - ${LINEAGE}_complete
       - ${LINEAGE}_fragmented
       - ${LINEAGE}_missing
+    taxon_display_level: 2
+    taxon_summary: ordered_list
+    taxon_traverse: ordered_list
+    taxon_traverse_direction: up
     taxon_traverse_limit: ${TAXON}"
       done
 
@@ -147,6 +147,10 @@ attributes:"
     order:
       - ${LINEAGE}_duplicated
       - ${LINEAGE}_single
+    taxon_display_level: 2
+    taxon_summary: ordered_list
+    taxon_traverse: ordered_list
+    taxon_traverse_direction: up
     taxon_traverse_limit: ${TAXON}"
       done
 

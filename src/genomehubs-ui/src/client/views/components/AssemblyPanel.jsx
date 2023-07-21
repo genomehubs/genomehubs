@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 import Grid from "@material-ui/core/Grid";
+import { NamesList } from "./NamesPanel";
 import NavLink from "./NavLink";
 import Tooltip from "@material-ui/core/Tooltip";
 import classnames from "classnames";
@@ -33,6 +34,7 @@ const AssemblyPanel = ({
   let options = qs.parse(location.search.replace(/^\?/, ""));
 
   let assemblyLink;
+  let namesDiv;
   if (assemblyId) {
     if (records[assemblyId]) {
       if (assemblyId.startsWith("GCA_")) {
@@ -49,6 +51,12 @@ const AssemblyPanel = ({
             </span>
           </>
         );
+      }
+      let identifiers = (records[assemblyId].record.identifiers || []).filter(
+        (obj) => obj.class != "assembly_id"
+      );
+      if (identifiers.length > 0) {
+        namesDiv = <NamesList names={identifiers} />;
       }
     } else {
     }
@@ -99,6 +107,9 @@ const AssemblyPanel = ({
 
       <div>
         <Grid container alignItems="center" direction="column" spacing={0}>
+          <Grid item style={{ width: "100%" }}>
+            {namesDiv}
+          </Grid>
           <Grid container direction="row" justifyContent="flex-end">
             <Grid item>{assemblyLink}</Grid>
           </Grid>

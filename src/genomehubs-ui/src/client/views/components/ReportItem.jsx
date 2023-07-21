@@ -76,6 +76,7 @@ const ReportItem = ({
   includeEstimates,
   includeDescendants,
   collapseMonotypic,
+  colorPalette,
   excludeMissing,
   excludeAncestral,
   excludeDirect,
@@ -216,6 +217,7 @@ const ReportItem = ({
             chartRef={chartRef}
             embedded={embedded}
             containerRef={targetRef}
+            colorPalette={colorPalette}
             ratio={ratio}
             pointSize={pointSize}
             minDim={minDim}
@@ -230,6 +232,7 @@ const ReportItem = ({
             chartRef={chartRef}
             containerRef={containerRef}
             ratio={ratio}
+            colorPalette={colorPalette}
             embedded={embedded}
             stacked={stacked}
             cumulative={cumulative}
@@ -252,6 +255,7 @@ const ReportItem = ({
             chartRef={chartRef}
             containerRef={containerRef}
             ratio={ratio}
+            colorPalette={colorPalette}
             embedded={embedded}
             includeEstimates={includeEstimates}
             {...qs.parse(queryString)}
@@ -269,6 +273,7 @@ const ReportItem = ({
             containerRef={containerRef}
             embedded={embedded}
             ratio={ratio}
+            colorPalette={colorPalette}
             xOpts={xOpts}
             yOpts={yOpts}
             compactLegend={compactLegend}
@@ -292,6 +297,7 @@ const ReportItem = ({
             chartRef={chartRef}
             containerRef={containerRef}
             embedded={embedded}
+            colorPalette={colorPalette}
             ratio={ratio}
             xOpts={xOpts}
             yOpts={yOpts}
@@ -356,6 +362,7 @@ const ReportItem = ({
             embedded={embedded}
             ratio={ratio}
             tree={reportById}
+            colorPalette={colorPalette}
             chartRef={chartRef}
             containerRef={containerRef}
             reportRef={reportRef}
