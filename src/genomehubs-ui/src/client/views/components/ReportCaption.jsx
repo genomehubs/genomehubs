@@ -11,7 +11,7 @@ const ReportCaption = ({ caption, embedded, inModal }) => {
   const { width, height } = useResize(gridRef);
   const [captionScale, setCaptionScale] = useState(100);
 
-  const formatCaption = (caption) => {
+  const formatCaption = ({ caption, tooltip }) => {
     if (caption && caption !== true) {
       let captionArr = [];
       let parts = (caption || "").split("**");
@@ -20,7 +20,7 @@ const ReportCaption = ({ caption, embedded, inModal }) => {
           captionArr.push(<span key={i}>{parts[i]}</span>);
         } else {
           captionArr.push(
-            <b key={i} style={{ color: "black" }}>
+            <b key={i} style={{ color: tooltip ? "yellow" : "black" }}>
               {parts[i]}
             </b>
           );
@@ -32,7 +32,6 @@ const ReportCaption = ({ caption, embedded, inModal }) => {
   };
 
   let captionLength = stringLength(caption) * 10;
-  let formattedCaption = formatCaption(caption);
 
   useEffect(() => {
     if (typeof embedded !== "undefined" && captionLength < width * 1.8) {
@@ -57,12 +56,12 @@ const ReportCaption = ({ caption, embedded, inModal }) => {
   if (displayCaption.length < caption.length - 3) {
     displayCaption += "...";
     displayCaption = (
-      <Tooltip title={formattedCaption} arrow>
-        {formatCaption(displayCaption)}
+      <Tooltip title={formatCaption({ caption, tooltip: true })} arrow>
+        {formatCaption({ caption: displayCaption })}
       </Tooltip>
     );
   } else {
-    displayCaption = formatCaption(displayCaption);
+    displayCaption = formatCaption({ caption: displayCaption });
   }
 
   return (
