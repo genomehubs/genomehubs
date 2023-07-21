@@ -369,7 +369,6 @@ const ReportItem = ({
         );
         break;
       case "tree":
-        console.log({ ratio, fixedRatio });
         if (!permaLink) {
           // fixedRatio *= 1.1;
           permaLink = (queryString, toggle) => {
