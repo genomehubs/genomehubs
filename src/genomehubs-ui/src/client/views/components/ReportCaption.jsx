@@ -47,21 +47,25 @@ const ReportCaption = ({ caption, embedded, inModal }) => {
         (stringLength(arr.join(" ")) * 8 * captionScale) / 100 / width
       ) * 1.5
     );
-
-  let captionArr = caption.split(" ");
-  while (captionArr.length > 1 && countRows(captionArr) > 2) {
-    captionArr.pop();
-  }
-  let displayCaption = captionArr.join(" ");
-  if (displayCaption.length < caption.length - 3) {
-    displayCaption += "...";
-    displayCaption = (
-      <Tooltip title={formatCaption({ caption, tooltip: true })} arrow>
-        {formatCaption({ caption: displayCaption })}
-      </Tooltip>
-    );
+  let displayCaption;
+  if (!inModal) {
+    let captionArr = caption.split(" ");
+    while (captionArr.length > 1 && countRows(captionArr) > 2) {
+      captionArr.pop();
+    }
+    displayCaption = captionArr.join(" ");
+    if (displayCaption.length < caption.length - 3) {
+      displayCaption += "...";
+      displayCaption = (
+        <Tooltip title={formatCaption({ caption, tooltip: true })} arrow>
+          {formatCaption({ caption: displayCaption })}
+        </Tooltip>
+      );
+    } else {
+      displayCaption = formatCaption({ caption: displayCaption });
+    }
   } else {
-    displayCaption = formatCaption({ caption: displayCaption });
+    displayCaption = formatCaption({ caption });
   }
 
   return (
