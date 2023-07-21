@@ -194,7 +194,14 @@ const ReportItem = ({
       setTimeout(() => setReportEdit(true), 500);
     }
     error = reportById.report[report].status.error;
-    component = <ReportError report={report} error={error} />;
+    component = (
+      <ReportError
+        report={report}
+        error={error}
+        minDim={minDim}
+        ratio={ratio}
+      />
+    );
     // message = {
     //   message: `Failed to fetch ${report} report`,
     //   duration: 5000,
@@ -362,7 +369,9 @@ const ReportItem = ({
         );
         break;
       case "tree":
+        console.log({ ratio, fixedRatio });
         if (!permaLink) {
+          // fixedRatio *= 1.1;
           permaLink = (queryString, toggle) => {
             let path = "report";
             // TODO: include taxonomy
@@ -490,7 +499,11 @@ const ReportItem = ({
         </div>
       </Grid>
       {!loading && !error && caption && (
-        <ReportCaption caption={caption} embedded={embedded} />
+        <ReportCaption
+          caption={caption}
+          embedded={embedded}
+          inModal={inModal}
+        />
       )}
     </Grid>
   );

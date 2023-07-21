@@ -176,7 +176,7 @@ const ReportTree = ({
     treeComponent = (
       <ReportTreeRings
         width={width}
-        height={minDim - 50}
+        height={minDim}
         {...tree.report.tree}
         handleNavigation={handleNavigation}
         handleSearch={handleSearch}
@@ -187,7 +187,7 @@ const ReportTree = ({
     treeComponent = (
       <ReportTreePaths
         width={width}
-        height={minDim - 50}
+        height={minDim}
         {...tree.report.tree}
         handleNavigation={handleNavigation}
         handleSearch={handleSearch}

@@ -2,14 +2,23 @@
 import React, { Fragment, useRef } from "react";
 
 import Grid from "@material-ui/core/Grid";
-import useResize from "../hooks/useResize";
+import { compose } from "recompose";
+import withColors from "../hocs/withColors";
 
-const ReportError = ({ report, error }) => {
+const ReportError = ({ report, error, statusColors }) => {
   if (error == "x_content_parse_exception") {
     error = "Error processing search query";
   }
   return (
-    <Grid item xs style={{ height: "100%" }}>
+    <Grid
+      item
+      xs
+      style={{
+        height: "100%",
+        background: statusColors.ancestral + "33",
+        padding: "1em",
+      }}
+    >
       {`Could not load ${report}`}
       <div>
         <pre>{error}</pre>
@@ -18,4 +27,4 @@ const ReportError = ({ report, error }) => {
   );
 };
 
-export default ReportError;
+export default compose(withColors)(ReportError);

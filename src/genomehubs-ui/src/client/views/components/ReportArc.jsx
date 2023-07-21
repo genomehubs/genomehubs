@@ -11,12 +11,13 @@ import MultiCatLegend, {
   processLegendData,
   valueString,
 } from "./MultiCatLegend";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 import Grid from "@material-ui/core/Grid";
 import { compose } from "recompose";
 import { format } from "d3-format";
 import setColors from "../functions/setColors";
+import { setMessage } from "../reducers/message";
 import stringLength from "../functions/stringLength";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
@@ -139,6 +140,7 @@ const RadialBarComponent = ({
   width,
   pointSize,
   compactLegend,
+  compactWidth = 350,
 }) => {
   const renderRadialBarLabel = (props) => {
     const {
@@ -161,21 +163,23 @@ const RadialBarComponent = ({
     let row = 1;
     return (
       <g>
-        <g
-          fill={fill}
-          style={{ fontSize, fontFamily: "sans-serif" }}
-          transform="translate(0,2)"
-        >
-          <text
-            x={cx}
-            y={cy - viewBox.innerRadius - fontSize + 2}
-            textAnchor="middle"
-            dominantBaseline="alphabetic"
-            alignmentBaseline="middle"
+        {width >= compactWidth && (
+          <g
+            fill={fill}
+            style={{ fontSize, fontFamily: "sans-serif" }}
+            transform="translate(0,2)"
           >
-            {pct1(value)}
-          </text>
-        </g>
+            <text
+              x={cx}
+              y={cy - viewBox.innerRadius - fontSize + 2}
+              textAnchor="middle"
+              dominantBaseline="alphabetic"
+              alignmentBaseline="middle"
+            >
+              {pct1(value)}
+            </text>
+          </g>
+        )}
         <g transform={`translate(0,${cy + 5})`}>
           {MultiCatLegend({
             width: width * 0.96,
@@ -276,16 +280,21 @@ const ReportArc = ({
   containerRef,
   colors,
   levels,
+  ratio,
   colorPalette,
   palettes,
   minDim,
+  setMinDim,
   embedded,
   pointSize,
+  compactWidth,
+  showLegend,
 }) => {
   const componentRef = chartRef ? chartRef : useRef();
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
+
   if (arc && arc.status) {
     let chartData = [];
     let chart;
@@ -315,9 +324,10 @@ const ReportArc = ({
         <RadialBarComponent
           data={chartData}
           width={compactLegend ? minDim : width}
-          height={minDim - 50}
+          height={minDim}
           pointSize={pointSize}
           compactLegend={compactLegend}
+          compactWidth={compactWidth}
         />
       );
     } else {
