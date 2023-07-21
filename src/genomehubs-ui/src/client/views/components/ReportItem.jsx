@@ -455,7 +455,7 @@ const ReportItem = ({
       style={{
         flexGrow: "1",
         width: "100%",
-        background: "rgba(240,240,240,0.5)",
+        // background: "rgba(240,240,240,0.5)",
       }}
     >
       {!loading && !error && heading && (inModal || topLevel) && (
@@ -468,7 +468,7 @@ const ReportItem = ({
         xs
         style={{
           width: "100%",
-          background: "rgba(240,240,240,0.5)",
+          // background: "rgba(240,240,240,0.5)",
           position: "relative",
           ...(fixedRatio && {
             paddingTop: `${(1 / fixedRatio) * 100}%`,
