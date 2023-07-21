@@ -336,8 +336,8 @@ const ReportArc = ({
       chart = (
         <PieComponent
           data={chartData}
-          width={minDim - 50}
-          height={minDim - 50}
+          width={minDim}
+          height={minDim}
           colors={colors}
         />
       );

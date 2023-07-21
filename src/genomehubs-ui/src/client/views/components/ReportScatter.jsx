@@ -21,7 +21,7 @@ import CellInfo from "./CellInfo";
 import Grid from "@material-ui/core/Grid";
 import PointInfo from "./PointInfo";
 import ReportXAxisTick from "./ReportXAxisTick";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
 import { line as d3Line } from "d3-shape";

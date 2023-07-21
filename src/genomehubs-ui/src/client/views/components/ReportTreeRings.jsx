@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 // import SVGDownloadButton from "./SVGDownloadButton";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import Typography from "@material-ui/core/Typography";
 // import VariableFilter from "./VariableFilter";
 import classnames from "classnames";

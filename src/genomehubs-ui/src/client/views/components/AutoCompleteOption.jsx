@@ -9,7 +9,7 @@ import PersonPinCircleIcon from "@material-ui/icons/PersonPinCircle";
 import React from "react";
 import SearchIcon from "@material-ui/icons/Search";
 import TodayIcon from "@material-ui/icons/Today";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import Typography from "@material-ui/core/Typography";
 import { useStyles } from "./SearchBox";
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 
 import Skeleton from "@material-ui/lab/Skeleton";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { formatter } from "../functions/formatter";
 import qs from "../functions/qs";

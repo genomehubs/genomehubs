@@ -1,6 +1,6 @@
 import React from "react";
 import { Rectangle } from "recharts";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import { scaleLinear } from "d3-scale";
 import styles from "./Styles.scss";
 export const ReportXAxisTick = ({

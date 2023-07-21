@@ -7,7 +7,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Popper from "@material-ui/core/Popper";
 import SearchIcon from "@material-ui/icons/Search";
 import SearchToggles from "./SearchToggles";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { getSuggestedTerm } from "../reducers/search";
 import { makeStyles } from "@material-ui/core/styles";

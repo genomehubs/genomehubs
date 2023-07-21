@@ -20,6 +20,7 @@ import dispatchMessage from "../hocs/dispatchMessage";
 import dispatchReport from "../hocs/dispatchReport";
 import { gridPropNames } from "../functions/propNames";
 import qs from "../functions/qs";
+import stringLength from "../functions/stringLength";
 import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
@@ -177,6 +178,11 @@ const ReportItem = ({
     }
   }, [status]);
   let component, error, loading;
+  let fixedRatio;
+  if (!inModal || typeof ratio === "string") {
+    fixedRatio = ratio;
+  }
+
   if (!reportById || Object.keys(reportById).length == 0) {
     loading = true;
   } else if (
@@ -211,6 +217,15 @@ const ReportItem = ({
   } else {
     switch (report) {
       case "arc":
+        if (reportById.report && Array.isArray(reportById.report.arc)) {
+          if (fixedRatio && fixedRatio == 1) {
+            if (minDim > 300) {
+              fixedRatio = 1.5;
+            } else if (minDim > 200) {
+              fixedRatio = 1.25;
+            }
+          }
+        }
         component = (
           <ReportArc
             arc={reportById}
@@ -218,7 +233,7 @@ const ReportItem = ({
             embedded={embedded}
             containerRef={targetRef}
             colorPalette={colorPalette}
-            ratio={ratio}
+            ratio={fixedRatio || ratio}
             pointSize={pointSize}
             minDim={minDim}
             setMinDim={setMinDim}
@@ -395,13 +410,18 @@ const ReportItem = ({
         );
         break;
       case "xPerRank":
+        if (fixedRatio && fixedRatio == 1) {
+          fixedRatio = 1.5;
+          if (reportById.report && Array.isArray(reportById.report.xPerRank));
+          fixedRatio = minDim / (reportById.report.xPerRank.length * 27);
+        }
         component = (
           <ReportXPerRank
             perRank={reportById}
             chartRef={chartRef}
             embedded={embedded}
             containerRef={containerRef}
-            ratio={ratio}
+            ratio={fixedRatio || ratio}
             minDim={minDim}
             setMinDim={setMinDim}
           />
@@ -427,21 +447,47 @@ const ReportItem = ({
   } else {
     caption = reportById?.report?.caption;
   }
-
   let content = (
     <Grid
       container
       direction="column"
       spacing={1}
-      style={{ flexGrow: "1", width: "100%" }}
+      style={{
+        flexGrow: "1",
+        width: "100%",
+        background: "rgba(240,240,240,0.5)",
+      }}
     >
       {!loading && !error && heading && (inModal || topLevel) && (
         <Grid item xs>
           <span className={styles.reportHeading}>{heading}</span>
         </Grid>
       )}
-      <Grid item xs style={{ width: "100%" }}>
-        {component}
+      <Grid
+        item
+        xs
+        style={{
+          width: "100%",
+          background: "rgba(240,240,240,0.5)",
+          position: "relative",
+          ...(fixedRatio && {
+            paddingTop: `${(1 / fixedRatio) * 100}%`,
+          }),
+        }}
+      >
+        <div
+          style={{
+            ...(fixedRatio && {
+              position: "absolute",
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+            }),
+          }}
+        >
+          {component}
+        </div>
       </Grid>
       {!loading && !error && caption && (
         <ReportCaption caption={caption} embedded={embedded} />
@@ -472,14 +518,22 @@ const ReportItem = ({
   //     </Grid>
   //   );
   // }
+  let adjustRatio = 1;
+  if (fixedRatio && fixedRatio != ratio) {
+    adjustRatio = fixedRatio;
+  }
   return (
-    <Grid ref={targetRef} style={{ minHeight: minDim }} {...gridProps}>
+    <Grid
+      ref={targetRef}
+      style={{ minHeight: minDim / adjustRatio }}
+      {...gridProps}
+    >
       <ReportLoading
         report={report}
         chartRef={chartRef}
         containerRef={containerRef}
         ratio={ratio}
-        minDim={minDim}
+        minDim={minDim / adjustRatio}
         setMinDim={setMinDim}
         loading={loading}
         content={content}

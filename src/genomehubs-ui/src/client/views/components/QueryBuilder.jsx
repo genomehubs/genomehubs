@@ -12,7 +12,7 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import SearchIcon from "@material-ui/icons/Search";
 import Switch from "@material-ui/core/Switch";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import Typography from "@material-ui/core/Typography";
 import VariableFilter from "./VariableFilter";
 import { compose } from "recompose";

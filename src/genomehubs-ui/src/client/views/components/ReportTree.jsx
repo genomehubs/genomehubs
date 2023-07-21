@@ -5,7 +5,7 @@ import Grid from "@material-ui/core/Grid";
 import LaunchIcon from "@material-ui/icons/Launch";
 import ReportTreePaths from "./ReportTreePaths";
 import ReportTreeRings from "./ReportTreeRings";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
 import qs from "../functions/qs";

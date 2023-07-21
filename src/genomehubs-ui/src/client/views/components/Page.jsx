@@ -7,7 +7,7 @@ import Modal from "@material-ui/core/Modal";
 import SaveSettingsModal from "./SaveSettingsModal";
 import SearchBox from "./SearchBox";
 import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchColors from "../hocs/dispatchColors";

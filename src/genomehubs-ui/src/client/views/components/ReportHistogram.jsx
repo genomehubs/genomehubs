@@ -18,7 +18,7 @@ import { useLocation, useNavigate } from "@reach/router";
 import CellInfo from "./CellInfo";
 import Grid from "@material-ui/core/Grid";
 import ReportXAxisTick from "./ReportXAxisTick";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";

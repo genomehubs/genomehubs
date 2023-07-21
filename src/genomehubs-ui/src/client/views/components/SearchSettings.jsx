@@ -19,7 +19,7 @@ import MuiAccordionSummary from "@material-ui/core/AccordionSummary";
 import Paper from "@material-ui/core/Paper";
 import Select from "@material-ui/core/Select";
 import SettingsButton from "./SettingsButton";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import qs from "../functions/qs";
 import { useLocalStorage } from "usehooks-ts";

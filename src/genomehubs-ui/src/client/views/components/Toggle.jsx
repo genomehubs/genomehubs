@@ -5,7 +5,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import Grid from "@material-ui/core/Grid";
 import Switch from "@material-ui/core/Switch";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 
 const Toggle = ({ toggle, expand, title, children }) => {
   const [showContent, setShowContent] = useState(Boolean(expand));
