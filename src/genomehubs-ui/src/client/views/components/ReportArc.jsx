@@ -409,12 +409,7 @@ const ReportArc = ({
     }
 
     return (
-      <Grid
-        item
-        xs
-        ref={componentRef}
-        style={{ height: "100%", background: "#99ff9900" }}
-      >
+      <Grid item xs ref={componentRef} style={{ height: "100%" }}>
         {chart}
       </Grid>
     );

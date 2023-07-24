@@ -41,7 +41,6 @@ const ReportLoading = ({
         // minWidth: minDim * ratio,
         minHeight: minDim,
         position: "relative",
-        background: "#99999999",
       }}
       ref={componentRef}
     >
@@ -66,7 +65,6 @@ const ReportLoading = ({
           left: 0,
           right: 0,
           bottom: 0,
-          background: "#999999ff99",
         }}
       >
         {content}

@@ -978,7 +978,7 @@ const ReportScatter = ({
   embedded,
   inModal,
   compactLegend,
-  compactWidth = 600,
+  compactWidth = 400,
   ratio,
   zScale = "linear",
   setMessage,
@@ -1166,7 +1166,7 @@ const ReportScatter = ({
         data={chartData}
         pointData={1 ? pointData : []}
         width={plotWidth}
-        height={plotHeight - (showLabels ? 50 : 0)}
+        height={plotHeight}
         marginWidth={marginWidth}
         marginHeight={marginHeight}
         marginRight={marginRight}

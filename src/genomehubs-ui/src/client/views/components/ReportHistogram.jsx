@@ -419,7 +419,7 @@ const ReportHistogram = ({
   basename,
   pointSize = 15,
   compactLegend,
-  compactWidth = 600,
+  compactWidth = 400,
 }) => {
   pointSize *= 1;
   const navigate = useNavigate();
@@ -646,7 +646,7 @@ const ReportHistogram = ({
         // width={width}
         // height={minDim - (showLabels ? 50 : 0)}
         width={plotWidth}
-        height={plotHeight - (showLabels ? 50 : 0)}
+        height={plotHeight}
         marginWidth={marginWidth}
         marginHeight={marginHeight}
         marginRight={marginRight}
