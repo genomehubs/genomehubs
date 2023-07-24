@@ -11,7 +11,7 @@ import MultiCatLegend, {
   processLegendData,
   valueString,
 } from "./MultiCatLegend";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import Grid from "@material-ui/core/Grid";
 import { compose } from "recompose";
@@ -140,7 +140,7 @@ const RadialBarComponent = ({
   width,
   pointSize,
   compactLegend,
-  compactWidth = 350,
+  compactWidth = 300,
 }) => {
   const renderRadialBarLabel = (props) => {
     const {
@@ -229,7 +229,7 @@ const RadialBarComponent = ({
   }
   let plotHeight = height - legendHeight;
 
-  let plotWidth = Math.min(width, 2 * plotHeight);
+  let plotWidth = width; //Math.min(width, 2 * plotHeight);
   plotHeight = plotWidth / 2 + legendHeight;
   let innerRadius = Math.floor(plotWidth * 0.1);
   let outerRadius = Math.floor(plotWidth * 0.5);
@@ -286,14 +286,66 @@ const ReportArc = ({
   minDim,
   setMinDim,
   embedded,
+  inModal,
   pointSize,
   compactWidth,
   showLegend,
 }) => {
   const componentRef = chartRef ? chartRef : useRef();
-  const { width, height } = containerRef
-    ? useResize(containerRef)
-    : useResize(componentRef);
+  const { width, height } = inModal
+    ? containerRef
+      ? useResize(containerRef)
+      : useResize(componentRef)
+    : componentRef
+    ? useResize(componentRef)
+    : useResize(containerRef);
+
+  // const { width, height } = useResize(componentRef);
+
+  const setDimensions = ({ width, height, timer, ratio = 1 }) => {
+    let plotHeight = inModal ? height : height;
+    let plotWidth = width;
+
+    if (arc.report && Array.isArray(arc.report.arc)) {
+      if (inModal) {
+        if (plotHeight < plotWidth / 2) {
+          plotWidth = plotHeight * 2;
+        } else {
+          plotHeight = plotWidth / 2 - 50;
+        }
+      } else {
+        plotHeight = plotWidth / 2 + pointSize * 3;
+      }
+    } else {
+      plotHeight = plotWidth;
+    }
+    let dimensionTimer;
+    if (timer && !inModal) {
+      dimensionTimer = setTimeout(() => {
+        minDim = Math.min(plotWidth, plotHeight);
+        setMinDim(minDim);
+      }, 50);
+    }
+    return {
+      plotWidth,
+      plotHeight,
+      dimensionTimer,
+    };
+  };
+
+  let dimensionTimer;
+  let { plotWidth, plotHeight } = setDimensions({ width, height });
+
+  useEffect(() => {
+    ({ plotWidth, plotHeight, dimensionTimer } = setDimensions({
+      width,
+      height,
+      timer: true,
+    }));
+    return () => {
+      clearTimeout(dimensionTimer);
+    };
+  }, [width]);
 
   if (arc && arc.status) {
     let chartData = [];
@@ -318,13 +370,14 @@ const ReportArc = ({
         });
       });
       chartData = chartData.reverse();
-      // TODO: set legend item widths dynamically
       let compactLegend = typeof embedded === "undefined";
       chart = (
         <RadialBarComponent
           data={chartData}
-          width={compactLegend ? minDim : width}
-          height={minDim}
+          width={
+            plotHeight - 50 < plotWidth / 2 ? plotHeight * 2 - 100 : plotWidth
+          }
+          height={plotHeight}
           pointSize={pointSize}
           compactLegend={compactLegend}
           compactWidth={compactWidth}
@@ -346,15 +399,22 @@ const ReportArc = ({
       chart = (
         <PieComponent
           data={chartData}
-          width={minDim}
-          height={minDim}
+          // width={minDim}
+          // height={minDim}
+          width={plotWidth}
+          height={plotHeight}
           colors={colors}
         />
       );
     }
 
     return (
-      <Grid item xs ref={componentRef} style={{ height: "100%" }}>
+      <Grid
+        item
+        xs
+        ref={componentRef}
+        style={{ height: "100%", background: "#99ff9900" }}
+      >
         {chart}
       </Grid>
     );

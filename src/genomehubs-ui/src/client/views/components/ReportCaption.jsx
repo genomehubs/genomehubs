@@ -6,7 +6,7 @@ import stringLength from "../functions/stringLength";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 
-const ReportCaption = ({ caption, embedded, inModal }) => {
+const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
   const gridRef = useRef();
   const { width, height } = useResize(gridRef);
   const [captionScale, setCaptionScale] = useState(100);
@@ -76,7 +76,7 @@ const ReportCaption = ({ caption, embedded, inModal }) => {
           pointerEvents: "auto",
           ...(captionScale && {
             fontSize: `${captionScale}%`,
-            marginTop: inModal ? "1em" : 0,
+            marginTop: inModal ? "1em" : padding ? `${padding}px` : 0,
           }),
         }}
       >

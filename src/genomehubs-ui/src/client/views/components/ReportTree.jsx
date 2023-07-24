@@ -18,6 +18,7 @@ const ReportTree = ({
   reportId,
   tree,
   embedded,
+  inModal,
   chartRef,
   containerRef,
   reportRef,
@@ -39,6 +40,37 @@ const ReportTree = ({
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
+
+  const setDimensions = ({ width, height, timer }) => {
+    let plotWidth = width;
+    let plotHeight = inModal ? height : plotWidth / ratio;
+
+    if (timer && plotHeight != height) {
+      dimensionTimer = setTimeout(() => {
+        minDim = Math.min(plotWidth, plotHeight);
+        setMinDim(minDim);
+      }, 50);
+    }
+    return {
+      plotWidth,
+      plotHeight,
+      dimensionTimer,
+    };
+  };
+
+  let dimensionTimer;
+  let { plotWidth, plotHeight } = setDimensions({ width, height });
+
+  useEffect(() => {
+    ({ plotWidth, plotHeight, dimensionTimer } = setDimensions({
+      width,
+      height,
+      timer: true,
+    }));
+    return () => {
+      clearTimeout(dimensionTimer);
+    };
+  }, [width]);
   // useEffect(() => {
   //   let newMinDim;
   //   if (height) {
@@ -175,8 +207,8 @@ const ReportTree = ({
   if (treeStyle == "ring") {
     treeComponent = (
       <ReportTreeRings
-        width={width}
-        height={minDim}
+        width={plotWidth}
+        height={plotHeight}
         {...tree.report.tree}
         handleNavigation={handleNavigation}
         handleSearch={handleSearch}
@@ -186,8 +218,8 @@ const ReportTree = ({
   } else {
     treeComponent = (
       <ReportTreePaths
-        width={width}
-        height={minDim}
+        width={plotWidth}
+        height={plotHeight}
         {...tree.report.tree}
         handleNavigation={handleNavigation}
         handleSearch={handleSearch}
