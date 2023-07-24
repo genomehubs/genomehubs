@@ -976,8 +976,9 @@ const ReportScatter = ({
   report,
   containerRef,
   embedded,
+  inModal,
   compactLegend,
-  compactWidth = 600,
+  compactWidth = 400,
   ratio,
   zScale = "linear",
   setMessage,
@@ -1009,6 +1010,37 @@ const ReportScatter = ({
       setMessage(null);
     }
   }, [scatter]);
+
+  const setDimensions = ({ width, height, timer }) => {
+    let plotWidth = width;
+    let plotHeight = inModal ? height : plotWidth / ratio;
+
+    if (timer && plotHeight != height) {
+      dimensionTimer = setTimeout(() => {
+        minDim = Math.min(plotWidth, plotHeight);
+        setMinDim(minDim);
+      }, 50);
+    }
+    return {
+      plotWidth,
+      plotHeight,
+      dimensionTimer,
+    };
+  };
+
+  let dimensionTimer;
+  let { plotWidth, plotHeight } = setDimensions({ width, height });
+
+  useEffect(() => {
+    ({ plotWidth, plotHeight, dimensionTimer } = setDimensions({
+      width,
+      height,
+      timer: true,
+    }));
+    return () => {
+      clearTimeout(dimensionTimer);
+    };
+  }, [width]);
 
   let locations = {};
   if (scatter && scatter.status) {
@@ -1076,7 +1108,7 @@ const ReportScatter = ({
     compactLegend =
       typeof compactLegend !== "undefined"
         ? compactLegend
-        : typeof embedded === "undefined" || width < compactWidth;
+        : typeof embedded === "undefined" || plotWidth < compactWidth;
 
     const {
       translations,
@@ -1088,7 +1120,7 @@ const ReportScatter = ({
       bounds,
       yBounds,
       minWidth: compactLegend ? 50 : 10 * pointSize,
-      width,
+      width: plotWidth,
       pointSize,
       compactLegend,
     });
@@ -1104,7 +1136,7 @@ const ReportScatter = ({
 
     let labels = bounds.labels || heatmaps.buckets;
     let yLabels = yBounds.labels || heatmaps.yBuckets;
-    let showLabels = width >= compactWidth;
+    let showLabels = plotWidth >= compactWidth;
     const maxYLabel = showLabels
       ? maxStringLength(yLabels, yFormat, pointSize)
       : 0;
@@ -1123,7 +1155,7 @@ const ReportScatter = ({
     let orientation = 0;
     if (
       maxXLabel >
-      (width - marginWidth - marginRight) / heatmaps.buckets.length
+      (plotWidth - marginWidth - marginRight) / heatmaps.buckets.length
     ) {
       orientation = -90;
       marginHeight =
@@ -1133,8 +1165,8 @@ const ReportScatter = ({
       <Heatmap
         data={chartData}
         pointData={1 ? pointData : []}
-        width={width}
-        height={minDim - (showLabels ? 50 : 0)}
+        width={plotWidth}
+        height={plotHeight}
         marginWidth={marginWidth}
         marginHeight={marginHeight}
         marginRight={marginRight}
