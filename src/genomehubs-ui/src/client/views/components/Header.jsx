@@ -1,6 +1,5 @@
 import React, { memo } from "react";
 
-import Logo from "./Logo";
 import { Router } from "@reach/router";
 import SiteName from "./SiteName";
 import Tabs from "./Tabs";
@@ -19,8 +18,8 @@ const Header = ({ id, levels }) => {
       : Array(6).fill("currentColor", 0);
 
   if (id == "pride") {
-    let height = 2;
-    let unit = "em";
+    let height = 100;
+    let unit = "%";
     let stops = [
       "0deg",
       colors[5],
@@ -40,12 +39,8 @@ const Header = ({ id, levels }) => {
   }
   return (
     <header style={style}>
-      <div className={styles.siteLogo}>
-        <Logo />
-      </div>
-
       <div style={{ float: "left" }} className={styles.siteText}>
-        <SiteName />
+        <SiteName logo />
       </div>
       <TabsFixed default />
       <Router basepath={basename} className={styles.tabHolder} primary={false}>

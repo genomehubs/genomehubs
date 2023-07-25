@@ -18,11 +18,12 @@ import { useLocation, useNavigate } from "@reach/router";
 import CellInfo from "./CellInfo";
 import Grid from "@material-ui/core/Grid";
 import ReportXAxisTick from "./ReportXAxisTick";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
 import qs from "../functions/qs";
+import setColors from "../functions/setColors";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
@@ -401,21 +402,24 @@ const ReportHistogram = ({
   chartRef,
   containerRef,
   embedded,
+  inModal,
   searchIndexPlural,
-  ratio,
+  ratio = 1,
   stacked,
   cumulative,
   yScale = "linear",
   setMessage,
   colors,
   levels,
+  colorPalette,
+  palettes,
   minDim,
   setMinDim,
   xOpts,
   basename,
   pointSize = 15,
   compactLegend,
-  compactWidth = 600,
+  compactWidth = 400,
 }) => {
   pointSize *= 1;
   const navigate = useNavigate();
@@ -428,6 +432,44 @@ const ReportHistogram = ({
       setMessage(null);
     }
   }, [histogram]);
+
+  // let { plotWidth, plotHeight } = setDimensions({ width, height });
+
+  // useEffect(() => {
+  //   ({ plotWidth, plotHeight } = setDimensions({ width, height }));
+  // }, [width]);
+
+  const setDimensions = ({ width, height, timer }) => {
+    let plotWidth = width;
+    let plotHeight = inModal ? height : plotWidth / ratio;
+
+    if (timer && plotHeight != height) {
+      dimensionTimer = setTimeout(() => {
+        minDim = Math.min(plotWidth, plotHeight);
+        setMinDim(minDim);
+      }, 50);
+    }
+    return {
+      plotWidth,
+      plotHeight,
+      dimensionTimer,
+    };
+  };
+
+  let dimensionTimer;
+  let { plotWidth, plotHeight } = setDimensions({ width, height });
+
+  useEffect(() => {
+    ({ plotWidth, plotHeight, dimensionTimer } = setDimensions({
+      width,
+      height,
+      timer: true,
+    }));
+    return () => {
+      clearTimeout(dimensionTimer);
+    };
+  }, [width]);
+
   if (histogram && histogram.status) {
     let chartData = [];
     let chart;
@@ -560,21 +602,25 @@ const ReportHistogram = ({
     compactLegend =
       typeof compactLegend !== "undefined"
         ? compactLegend
-        : typeof embedded === "undefined" || width < compactWidth;
+        : typeof embedded === "undefined" || plotWidth < compactWidth;
     const { translations, catTranslations, catOffsets, legendRows } =
       processLegendData({
         bounds,
         minWidth: compactLegend ? 50 : 10 * pointSize,
-        width,
+        width: plotWidth,
         pointSize,
         compactLegend,
       });
-    if (cats && cats.length > 1 && levels[cats.length]) {
-      colors = levels[cats.length];
-    }
+    ({ levels, colors } = setColors({
+      colorPalette,
+      palettes,
+      levels,
+      count: cats.length,
+      colors,
+    }));
     const xFormat = (value) => formats(value, valueType, interval);
     const yFormat = (value) => formats(value, "integer");
-    let showLabels = width >= compactWidth;
+    let showLabels = plotWidth >= compactWidth;
     const maxYLabel = showLabels
       ? maxStringLength(histograms.zDomain, yFormat, pointSize)
       : 0;
@@ -589,7 +635,7 @@ const ReportHistogram = ({
       : 0;
     let orientation = 0;
 
-    if (maxXLabel > (width - marginWidth - marginRight) / buckets.length) {
+    if (maxXLabel > (plotWidth - marginWidth - marginRight) / buckets.length) {
       orientation = -90;
       marginHeight =
         maxXLabel + pointSize > 20 ? maxXLabel + pointSize - 20 : 0;
@@ -597,8 +643,10 @@ const ReportHistogram = ({
     chart = (
       <Histogram
         data={chartData}
-        width={width}
-        height={minDim - (showLabels ? 50 : 0)}
+        // width={width}
+        // height={minDim - (showLabels ? 50 : 0)}
+        width={plotWidth}
+        height={plotHeight}
         marginWidth={marginWidth}
         marginHeight={marginHeight}
         marginRight={marginRight}

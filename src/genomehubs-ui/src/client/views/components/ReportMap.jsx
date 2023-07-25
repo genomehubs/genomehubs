@@ -19,6 +19,7 @@ import ZoomComponent from "./ZoomComponent";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
 import qs from "../functions/qs";
+import setColors from "../functions/setColors";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
 import withSearchIndex from "../hocs/withSearchIndex";
@@ -176,6 +177,8 @@ const ReportMap = ({
   setMessage,
   colors,
   levels,
+  colorPalette,
+  palettes,
   minDim,
   setMinDim,
   xOpts,
@@ -204,9 +207,13 @@ const ReportMap = ({
     let pointData = map.report.map.map.rawData;
     let markers = [];
     if (bounds.cats) {
-      if (levels[bounds.cats.length]) {
-        colors = levels[bounds.cats.length];
-      }
+      ({ levels, colors } = setColors({
+        colorPalette,
+        palettes,
+        levels,
+        count: bounds.cats.length,
+        colors,
+      }));
       bounds.cats.forEach((obj, i) => {
         markers.push(
           <MarkerComponent

@@ -49,6 +49,9 @@ const Footer = ({
     if (newPalette != currentPalette) {
       options.palette = newPalette;
     }
+    if (options.palette == "default") {
+      delete options.palette;
+    }
     handleClose();
     navigate(`${location.pathname}?${qs.stringify(options)}${location.hash}`);
   };

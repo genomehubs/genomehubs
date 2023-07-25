@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "@reach/router";
 import Grid from "@material-ui/core/Grid";
 import { LineageList } from "./LineagePanel";
 import NavLink from "./NavLink";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
@@ -114,7 +114,9 @@ const TaxonPanel = ({
         {additionalDivs.length > 0 && (
           <div className={styles.flexRow}>{additionalDivs}</div>
         )} */}
-          <Grid item>{lineages}</Grid>
+          <Grid item style={{ width: "100%" }}>
+            {lineages}
+          </Grid>
           {taxidLink && (
             <>
               <Grid container direction="row" justifyContent="flex-end">

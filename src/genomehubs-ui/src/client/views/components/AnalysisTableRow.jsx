@@ -8,7 +8,7 @@ import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import NavLink from "./NavLink";
 import TableCell from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchSetRecord from "../hocs/dispatchSetRecord";
 import { makeStyles } from "@material-ui/core/styles";

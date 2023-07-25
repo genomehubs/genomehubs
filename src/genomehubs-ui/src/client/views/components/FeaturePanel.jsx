@@ -34,11 +34,13 @@ const FeaturePanel = ({
   };
 
   let sequenceId;
+  let assemblyId;
   let taxonId;
   let featureId;
   if (record && record.record) {
     featureId = record.record.feature_id;
     taxonId = record.record.taxon_id;
+    assemblyId = record.record.assembly_id;
     let sequenceObj = record.record.attributes.sequence_id;
     if (sequenceObj) {
       sequenceId = sequenceObj.value;
@@ -56,6 +58,9 @@ const FeaturePanel = ({
     if (taxonId && !records[taxonId] && !recordIsFetching) {
       fetchRecord(taxonId, "taxon", taxonomy);
     }
+    if (assemblyId && !records[assemblyId] && !recordIsFetching) {
+      fetchRecord(assemblyId, "assembly", taxonomy);
+    }
   }, [records]);
 
   let primaryColor = "#ff7001";
@@ -69,7 +74,6 @@ const FeaturePanel = ({
 
   let content;
   let ensemblUrl;
-  let assemblyId;
   let assignedName;
   let featureAttributes;
   let region;
@@ -80,7 +84,6 @@ const FeaturePanel = ({
     featureAttributes = record.record.attributes;
     let sequenceAttributes = records[sequenceId].record.attributes;
     let sequenceIdentifiers = records[sequenceId].record.identifiers;
-    assemblyId = record.record.assembly_id;
     assignedName = sequenceIdentifiers.filter(
       (obj) => obj.class == "assigned_name"
     );
@@ -234,13 +237,14 @@ const FeaturePanel = ({
         {featureGroup}
       </g>
     );
-    if (assignedName && assemblyId && records[taxonId]) {
-      let ensemblAssemblyId =
-        `${records[taxonId].record.scientific_name}_${assemblyId}`.replaceAll(
-          " ",
-          "_"
-        );
-      ensemblUrl = `https://rapid.ensembl.org/${ensemblAssemblyId}/Location/View?r=${assignedName}%3A${featureAttributes.start.value}-${featureAttributes.end.value}`;
+    if (assignedName && assemblyId && records[assemblyId]) {
+      let identifiers = (records[assemblyId].record.identifiers || []).filter(
+        (obj) => obj.class == "ensembl_id"
+      );
+      console.log(identifiers);
+      if (identifiers.length > 0) {
+        ensemblUrl = `https://rapid.ensembl.org/${identifiers[0].identifier}/Location/View?r=${assignedName}%3A${featureAttributes.start.value}-${featureAttributes.end.value}`;
+      }
     }
   }
 

@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "@reach/router";
 // import Grid from "@material-ui/core/Grid";
 // import ReactDOM from "react-dom";
 // import SVGDownloadButton from "./SVGDownloadButton";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 // import VariableFilter from "./VariableFilter";
 import classnames from "classnames";
 import { compose } from "recompose";

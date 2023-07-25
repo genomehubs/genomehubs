@@ -81,7 +81,7 @@ attributes:
   sequence_count:
     header: numberOfComponentSequences
   last_updated:
-    header: submissionDate
+    header: releaseDate
   ebp_metric_date:
     header: ebpMetricDate
   refseq_category:

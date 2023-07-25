@@ -110,7 +110,11 @@ const SearchPage = ({
     // return null;
   }
 
-  let resultCount = searchResults.isFetching ? -1 : searchResults.status.hits;
+  let resultCount = searchResults.isFetching
+    ? -1
+    : searchResults.status
+    ? searchResults.status.hits
+    : 0;
   results = <ResultTable />;
   let report;
   if (searchResultArray.length > 0) {

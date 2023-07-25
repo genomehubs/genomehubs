@@ -57,11 +57,23 @@ def add_identifiers_to_list(existing, new, *, blanks=set({"NA"})):
             and id_class not in identifiers
             and identifier not in identifiers[id_class]
         ):
-            existing.append({"identifier": identifier, "class": id_class})
+            existing.append(
+                {
+                    "identifier": identifier,
+                    "class": id_class,
+                    **{
+                        key: value
+                        for key, value in entry.items()
+                        if key.startswith("source_") and not key.endswith("_template")
+                    },
+                }
+            )
             identifiers[id_class][identifier] = True
 
 
-def lookup_docs_by_doc_id(es, values, template, *, return_type="list", index_type="sample"):
+def lookup_docs_by_doc_id(
+    es, values, template, *, return_type="list", index_type="sample"
+):
     """Retrieve existing taxa from index."""
     docs = []
     if return_type == "dict":
@@ -130,7 +142,9 @@ def add_identifiers_and_attributes_to_entries(
             if "attributes" not in doc["_source"] or not doc["_source"]["attributes"]:
                 doc["_source"]["attributes"] = []
             if "attributes" in doc_data:
-                add_attribute_values(doc["_source"]["attributes"], doc_data["attributes"], raw=False)
+                add_attribute_values(
+                    doc["_source"]["attributes"], doc_data["attributes"], raw=False
+                )
             doc["_source"]["taxon_id"] = doc_data["taxon_id"]
             try:
                 add_taxonomy_info_to_meta(
@@ -139,13 +153,18 @@ def add_identifiers_and_attributes_to_entries(
                 yield doc["_id"], doc["_source"]
             except KeyError:
                 LOGGER.warning(
-                    "Taxon ID %s was not found in the taxonomy"
-                    % doc_data["taxon_id"]
+                    "Taxon ID %s was not found in the taxonomy" % doc_data["taxon_id"]
                 )
 
 
 def add_entry_attributes_to_taxon(
-    batch, entry_by_taxon_id, taxa, *, index_name, shared_attributes, index_type="sample"
+    batch,
+    entry_by_taxon_id,
+    taxa,
+    *,
+    index_name,
+    shared_attributes,
+    index_type="sample",
 ):
     """Add entry attributes to taxon."""
     for taxon_id, entries in entry_by_taxon_id.items():
@@ -162,9 +181,9 @@ def add_entry_attributes_to_taxon(
                     taxon_attr = {**attr}
                     del taxon_attr["key"]
                     taxon_attr["source_index"] = index_name
-                    taxon_attr["source_doc_id"] = (
-                        f"{index_type}-{entry_meta[f'{index_type}_id']}"
-                    )
+                    taxon_attr[
+                        "source_doc_id"
+                    ] = f"{index_type}-{entry_meta[f'{index_type}_id']}"
                     taxon_attributes[attr["key"]].append(taxon_attr)
             for key, values in taxon_attributes.items():
                 indices = get_list_indices_by_dict_value(

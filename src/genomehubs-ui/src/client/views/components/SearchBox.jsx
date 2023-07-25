@@ -10,7 +10,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import SearchInputQueries from "./SearchInputQueries";
 import SearchToggles from "./SearchToggles";
 import Template from "./Template";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
 import { getSuggestedTerm } from "../reducers/search";

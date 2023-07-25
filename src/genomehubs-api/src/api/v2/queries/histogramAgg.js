@@ -10,7 +10,6 @@ export const histogramAgg = async ({
   yHistograms,
   taxonomy,
 }) => {
-  console.log(bounds);
   const scales = {
     log2: "Math.max(Math.log(_value)/Math.log(2), 0)",
     log10: "Math.log10(_value)",
@@ -104,7 +103,6 @@ export const histogramAgg = async ({
     }
     offset = min;
   }
-  console.log({ min, max, interval, scale, count });
   let fieldKey = `attributes${rawValues ? ".values" : ""}.`;
   if (!summary || summary == "value") {
     fieldKey += `${meta.type}_value`;

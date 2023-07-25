@@ -39,6 +39,7 @@ const identifiersLookupQuery = ({ idKey, searchTerm }) => {
               docvalue_fields: [
                 "identifiers.identifier.raw",
                 "identifiers.class",
+                "identifiers.source_*",
                 // {
                 //   field: "identifiers.identifier.raw.keyword",
                 //   format: "use_field_mapping",

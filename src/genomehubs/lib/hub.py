@@ -567,9 +567,9 @@ def add_attributes(
                     attribute = {"key": key, f'{types[key]["type"]}_value': validated}
                     attribute_values[key] = attribute
                 elif attr_type == "taxon_names":
-                    attribute = {"name": validated, "class": key}
+                    attribute = {"name": validated, "class": key, **types[key]}
                 else:
-                    attribute = {"identifier": validated, "class": key}
+                    attribute = {"identifier": validated, "class": key, **types[key]}
                 if "source" in types[key]:
                     attribute.update(meta)
                     attribute.update(
@@ -585,7 +585,7 @@ def add_attributes(
                         attribute.update({"source": source})
                 if "source_url_template" in attribute:
                     attribute["source_url"] = apply_template(
-                        None,
+                        validated,
                         attribute["source_url_template"],
                         row_values,
                         shared_values,

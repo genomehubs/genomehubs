@@ -26,7 +26,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchRecord from "../hocs/dispatchRecord";
@@ -381,7 +381,7 @@ const ResultTable = ({
     }
   }
 
-  if (searchResults && searchResults.status.error) {
+  if (searchResults && searchResults.status && searchResults.status.error) {
     return <ReportError report={"search"} error={searchResults.status.error} />;
   } else if (
     !searchResults.status ||
@@ -656,7 +656,11 @@ const ResultTable = ({
             // <Tooltip title={list} placement="top" arrow>
             <span>
               {value}
-              <StyledBadge badgeContent={badgeContent} color={"default"}>
+              <StyledBadge
+                badgeContent={badgeContent}
+                color={"default"}
+                max={100000}
+              >
                 <span style={{ padding: "0 6px", color: "rgba(0,0,0,0" }}>
                   {badgeContent}
                 </span>

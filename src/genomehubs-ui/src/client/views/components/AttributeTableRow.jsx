@@ -17,7 +17,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import Typography from "@material-ui/core/Typography";
 import ZoomControl from "./ZoomControl";
 import classnames from "classnames";

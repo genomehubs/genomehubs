@@ -16,7 +16,7 @@ import SearchSettings from "./SearchSettings";
 import Switch from "@material-ui/core/Switch";
 import Terms from "./Terms";
 import TocIcon from "@material-ui/icons/Toc";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
 import { makeStyles } from "@material-ui/core/styles";

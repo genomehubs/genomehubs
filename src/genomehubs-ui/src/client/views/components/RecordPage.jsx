@@ -186,7 +186,7 @@ const RecordPage = ({
       );
     }
 
-    if (options.result == "feature") {
+    if (options.result == "assembly" || options.result == "feature") {
       results.push(
         <AssemblyPanel
           key={"assembly"}
@@ -196,14 +196,16 @@ const RecordPage = ({
           taxonomy={options.taxonomy}
         />
       );
-      results.push(
-        <FeaturePanel
-          key={"feature"}
-          recordId={record.record.record_id}
-          result={options.result}
-          taxonomy={options.taxonomy}
-        />
-      );
+      if (options.result == "feature") {
+        results.push(
+          <FeaturePanel
+            key={"feature"}
+            recordId={record.record.record_id}
+            result={options.result}
+            taxonomy={options.taxonomy}
+          />
+        );
+      }
     } else if (options.result == "sample") {
       results.push(
         <AssembliesPanel

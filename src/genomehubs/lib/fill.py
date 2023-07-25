@@ -153,7 +153,8 @@ def ordered_list(tup):
             break
         if k == key:
             return [value for value in values if value not in seen]
-        seen.update(linked[k]["keyword_value"])
+        if k in linked:
+            seen.update(linked[k]["keyword_value"])
     return values
 
 

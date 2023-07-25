@@ -49,6 +49,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
       in: new Set(["histogram", "map", "oxford", "scatter", "table", "tree"]),
     },
     collapseMonotypic: { in: new Set(["tree"]) },
+    colorPalette: { not: new Set(["sources"]), ui: true },
     includeEstimates: true,
     excludeAncestral: true,
     excludeDescendant: true,

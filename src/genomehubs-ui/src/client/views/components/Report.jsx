@@ -105,6 +105,7 @@ const Report = ({
     qs.parse(reportProps.queryString).pointSize * 1 ||
     15;
   reportProps.collapseMonotypic = props.collapseMonotypic;
+  reportProps.colorPalette = props.colorPalette;
   reportProps.excludeAncestral = props.excludeAncestral;
   reportProps.excludeDescendant = props.excludeDescendant;
   reportProps.excludeDirect = props.excludeDirect;

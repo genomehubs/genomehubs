@@ -1,7 +1,7 @@
 import { Rectangle, Text } from "recharts";
 
 import React from "react";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import formats from "../functions/formats";
 import stringLength from "../functions/stringLength";
 import styles from "./Styles.scss";

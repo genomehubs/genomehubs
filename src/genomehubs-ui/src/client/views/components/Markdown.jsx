@@ -8,7 +8,7 @@ import NavLink from "./NavLink";
 import Report from "./Report";
 import Template from "./Template";
 import Toggle from "./Toggle";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import YAML from "js-yaml";
 import classnames from "classnames";
 import { compose } from "recompose";
