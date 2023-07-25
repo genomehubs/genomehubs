@@ -22,7 +22,7 @@ const reportTypes = {
   map: { name: "Map", indices: ["taxon", "assembly", "sample"] },
   oxford: { name: "Oxford", indices: ["feature"] },
   scatter: { name: "Scatter", indices },
-  sources: { name: "Sources", indices },
+  sources: { name: "Sources", indices: ["taxon"] },
   table: { name: "Table", indices },
   tree: { name: "Tree", indices: ["taxon", "assembly", "sample"] },
 };
