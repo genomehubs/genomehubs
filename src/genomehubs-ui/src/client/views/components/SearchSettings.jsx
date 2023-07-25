@@ -170,9 +170,7 @@ const SearchSettings = ({
     let fieldSets = {};
     if (searchTerm.fields) {
       searchTerm.fields.split(",").forEach((field) => {
-        console.log(field);
         let [f, s] = field.split(":");
-        console.log({ f, s });
         if (!s) {
           s = types[f].processed_simple;
         }
