@@ -36,17 +36,25 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
   const reportTerms = {
     result: true,
     report: true,
-    query: { not: new Set(["sources"]), as: "x" },
-    x: { not: new Set(["sources"]) },
+    query: { not: new Set(["srces"]), as: "x" },
+    x: { not: new Set(["srces"]) },
     y: { in: new Set(["scatter", "table", "tree", "arc"]) },
     z: { in: new Set(["scatter"]) },
     cat: { not: new Set(["sources", "arc"]) },
-    rank: { not: new Set(["oxford", "sources", "tree"]) },
+    rank: { not: new Set(["oxford", "srces", "tree"]) },
     ranks: { in: new Set(["tree"]) },
     levels: { in: new Set(["tree"]), ui: true },
     names: { in: new Set(["tree"]) },
     fields: {
-      in: new Set(["histogram", "map", "oxford", "scatter", "table", "tree"]),
+      in: new Set([
+        "histogram",
+        "map",
+        "oxford",
+        "scatter",
+        "sources",
+        "table",
+        "tree",
+      ]),
     },
     collapseMonotypic: { in: new Set(["tree"]) },
     colorPalette: { not: new Set(["sources"]), ui: true },
@@ -812,6 +820,12 @@ const reportOptions = {
     },
     rank: {
       default: "query:tax_rank",
+    },
+  },
+  sources: {
+    x: {
+      default: "query",
+      fieldType: "value",
     },
   },
   table: {

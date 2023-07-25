@@ -45,7 +45,7 @@ export const getRecordsByTaxon = async (props) => {
   let active = true;
   let queryId;
   let update;
-  if (props.req) {
+  if (props.req && props.req.on) {
     props.req.on("close", () => {
       active = false;
     });
@@ -150,5 +150,5 @@ export const getRecordsByTaxon = async (props) => {
       aggs = body.aggregations;
     }
   }
-  return { status, results, aggs, fields: props.fields };
+  return { status, results, aggs, fields: props.fields, query };
 };

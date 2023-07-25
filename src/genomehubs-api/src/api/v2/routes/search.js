@@ -8,21 +8,7 @@ import { logError } from "../functions/logger";
 import { lookupAlternateIds } from "../functions/lookupAlternateIds";
 import { parseFields } from "../functions/parseFields";
 import { setExclusions } from "../functions/setExclusions";
-
-const setSortBy = ({ sortBy, sortOrder, sortMode }) => {
-  if (sortBy) {
-    let sort = {};
-    sort.by = sortBy;
-    if (sortOrder) {
-      sort.order = sortOrder;
-    }
-    if (sortMode) {
-      sort.mode = sortMode;
-    }
-    sortBy = sort;
-  }
-  return sortBy;
-};
+import setSortBy from "../reports/setSortBy";
 
 const replaceSearchIds = async (params) => {
   let query = params.query;
