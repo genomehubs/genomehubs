@@ -103,7 +103,7 @@ jobs:
           git clone https://github.com/genomehubs/boat-ui
           mv boat-ui/static/* src/genomehubs-ui/src/client/static/
           mv boat-ui/files/favicon/* src/genomehubs-ui/src/client/favicon/
-          mv boat-ui/static/* src/genomehubs-ui/src/client/views/components/
+          mv boat-ui/files/components/* src/genomehubs-ui/src/client/views/components/
           cd boat-ui
           echo "GH_COMMIT_HASH=$(git log -n 1 --pretty=format:'%H')" >> $GITHUB_ENV
           cd -
