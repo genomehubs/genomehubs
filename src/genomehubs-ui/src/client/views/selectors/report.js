@@ -809,6 +809,9 @@ const reportOptions = {
       default: "query",
       fieldType: "value",
     },
+    plotRatio: {
+      value: 1,
+    },
   },
   scatter: {
     x: {
