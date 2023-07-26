@@ -306,33 +306,28 @@ def parse_ncbi_datasets_record(record, parsed):
 def parse_ncbi_datasets_sample(record, parsed):
     """Parse sample information from a single NCBI datasets record."""
     obj = {key: record.get(key, "None") for key in ("taxId", "isolate", "sex")}
+    obj["genbankAssmAccession"] = record["accession"]
+    if "pairedAccession" in record:
+        if record["pairedAccession"].startswith("GCF_"):
+            obj["refseqAssmAccession"] = record["pairedAccession"]
+        else:
+            obj["refseqAssmAccession"] = record["accession"]
+            obj["genbankAssmAccession"] = record["pairedAccession"]
     assemblyInfo = record.get("assemblyInfo", {})
+    annotationInfo = record.get("annotationInfo", {})
     if assemblyInfo.get("atypical", False):
         return
-    obj["genbankAssmAccession"] = record["accession"]
-    if "pairedAccession" in record and obj["pairedAccession"].startswith("GCF_"):
-        obj["refseqAssmAccession"] = record["pairedAccession"]
+
     for key in (
         "assemblyLevel",
         "refseqCategory",
         "submitter",
     ):
-        obj[key] = assemblyInfo.get(key, "None")
-        if key == "refseqCategory":
-            obj["primaryValue"] = 1 if obj[key] == "representative genome" else "None"
-    attributes = {
-        entry["name"]: entry.get("value", "None")
-        for entry in assemblyInfo.get("biosample", {}).get("attributes", [])
-    }
-    for key in ("estimated_size", "geo_loc_name", "num_replicons", "ploidy"):
-        obj[key] = attributes.get(key)
-    obj["latitude"] = degrees_to_decimal(
-        attributes.get("geographic location (latitude)")
-    )
-    obj["longitude"] = degrees_to_decimal(
-        attributes.get("geographic location (longitude)")
-    )
-    obj["elevation"] = attributes.get("geographic location (elevation)")
+        obj[key] = assemblyInfo.get(key, annotationInfo.get(key, "None"))
+    if "refseqAssmAccession" not in obj or obj["refseqAssmAccession"] == "na":
+        obj["refseqAssmAccession"] = "None"
+    elif obj["refseqCategory"] != "None":
+        obj["primaryValue"] = 1
     bioprojects = []
     for lineage in assemblyInfo.get("bioprojectLineage", []):
         if "bioprojects" in lineage:
@@ -347,9 +342,23 @@ def parse_ncbi_datasets_sample(record, parsed):
         )
 
     obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else "None"
-    obj["biosampleAccession"] = assemblyInfo.get("biosample", {}).get(
-        "accession", "None"
+    biosample = assemblyInfo.get("biosample", {})
+    obj["biosampleAccession"] = biosample.get("accession", "None")
+    biosampleAttributes = get_biosample_attributes(biosample)
+
+    biosampleAttributes = {
+        entry["name"]: entry.get("value", "None")
+        for entry in biosample.get("attributes", [])
+    }
+    for key in ("estimated_size", "geo_loc_name", "num_replicons", "ploidy"):
+        obj[key] = biosampleAttributes.get(key)
+    obj["latitude"] = degrees_to_decimal(
+        biosampleAttributes.get("geographic location (latitude)")
     )
+    obj["longitude"] = degrees_to_decimal(
+        biosampleAttributes.get("geographic location (longitude)")
+    )
+    obj["elevation"] = biosampleAttributes.get("geographic location (elevation)")
     parsed[obj["biosampleAccession"]] = obj
 
 
