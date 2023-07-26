@@ -79,6 +79,8 @@ jobs:
       - run: |
           git clone https://github.com/genomehubs/goat-ui
           mv goat-ui/static/* src/genomehubs-ui/src/client/static/
+          mv goat-ui/files/favicon/* src/genomehubs-ui/src/client/favicon/
+          mv goat-ui/files/components/* src/genomehubs-ui/src/client/views/components/
           cd goat-ui
           echo "GH_COMMIT_HASH=$(git log -n 1 --pretty=format:'%H')" >> $GITHUB_ENV
           cd -

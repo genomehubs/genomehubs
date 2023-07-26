@@ -19,6 +19,8 @@ jobs:
       - run: |
           git clone https://github.com/genomehubs/goat-ui
           mv goat-ui/static/* src/genomehubs-ui/src/client/static/
+          mv goat-ui/files/favicon/* src/genomehubs-ui/src/client/favicon/
+          mv goat-ui/files/components/* src/genomehubs-ui/src/client/views/components/
           rm -r goat-ui
       - run: |
           GH_BASENAME=$ARCHIVE_VERSION ./package-ui.sh
