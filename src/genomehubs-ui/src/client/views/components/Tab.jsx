@@ -5,15 +5,20 @@ import { compose } from "recompose";
 import withRoutes from "../hocs/withRoutes";
 
 const Tab = ({ routeName, pageId, setRoute, routesById }) => {
+  let parsedName = routeName.replaceAll(/[\(\)]/g, "");
   useEffect(() => {
-    if (routeName && !routesById) {
-      setRoute(routeName, pageId);
+    if (parsedName && !routesById) {
+      setRoute(parsedName, pageId);
     }
-  }, [routeName]);
+  }, [parsedName]);
+
+  if (parsedName != routeName) {
+    return null;
+  }
 
   return (
-    <NavLink to={routeName} tab plain>
-      {routeName}
+    <NavLink to={parsedName} tab plain>
+      {parsedName}
     </NavLink>
   );
 };
