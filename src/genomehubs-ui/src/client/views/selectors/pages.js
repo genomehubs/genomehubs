@@ -48,7 +48,7 @@ const processPages = (pages, pageId) => {
   if (pageId == "tabs.md") {
     page = page
       .split("\n")
-      .filter((line) => line.match(/^-/))
+      .filter((line) => line.match(/^-[^-]/))
       .join("\n");
   }
   return page;
