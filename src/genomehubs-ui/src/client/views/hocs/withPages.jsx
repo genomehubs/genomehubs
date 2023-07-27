@@ -1,4 +1,4 @@
-import { cancelPages, getPages } from "../reducers/pages";
+import { cancelPages, getPages, getPagesIsFetching } from "../reducers/pages";
 import { fetchPages, getPagesById } from "../selectors/pages";
 
 import React from "react";
@@ -10,6 +10,7 @@ const withPages = (WrappedComponent) => (props) => {
     ...(props.pageId && {
       pagesById: getPagesById(state, props.pgId || props.pageId),
     }),
+    pagesIsFetching: getPagesIsFetching(state),
   });
   const mapDispatchToProps = (dispatch) => ({
     fetchPages: (pageId) => dispatch(fetchPages(pageId)),

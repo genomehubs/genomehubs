@@ -56,7 +56,6 @@ const options = [
   "records",
   "report",
   "search",
-  "templates",
   "tutorials",
 ];
 

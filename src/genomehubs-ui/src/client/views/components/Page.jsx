@@ -38,7 +38,11 @@ const useStyles = makeStyles((theme) => ({
 const Page = ({
   searchBox,
   panels,
+  searchPanels,
+  browsePanels,
+  preSearchPanels,
   text,
+  landingPage,
   topLevel,
   searchIndex,
   pageRef,
@@ -52,6 +56,8 @@ const Page = ({
   const classes = useStyles();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [showExamples, setShowExamples] = useState(false);
+  const [showBrowse, setShowBrowse] = useState(false);
   const rootRef = useRef(null);
   const savedOptions = useReadLocalStorage(`${searchIndex}Options`);
   const itemCss = topLevel ? classes.itemFull : classes.item;
@@ -62,17 +68,85 @@ const Page = ({
   // if (!apiStatus) {
   //   return null;
   // }
-  let items = [];
-  if (panels && panels.length > 0) {
-    panels.forEach((obj, i) => {
-      let styles = {};
+  let preSearchItems = [];
+  if (preSearchPanels && preSearchPanels.length > 0) {
+    preSearchPanels.forEach((obj, i) => {
+      let panelStyles = {};
       Object.keys(obj).forEach((key) => {
         if (key != "panel") {
-          styles[key] = obj[key];
+          panelStyles[key] = obj[key];
         }
       });
-      items.push(
-        <Grid item className={itemCss} style={styles} key={i}>
+      preSearchItems.push(
+        <Grid
+          item
+          className={itemCss}
+          style={panelStyles}
+          key={`pre_${i}`}
+          xs={12}
+        >
+          {obj.panel}
+        </Grid>
+      );
+    });
+  }
+
+  let searchItems = [];
+  if (searchPanels && searchPanels.length > 0) {
+    searchPanels.forEach((obj, i) => {
+      let panelStyles = {};
+      Object.keys(obj).forEach((key) => {
+        if (key != "panel") {
+          panelStyles[key] = obj[key];
+        }
+      });
+      searchItems.push(
+        <Grid
+          item
+          className={itemCss}
+          style={{ ...panelStyles, ...(showExamples || { display: "none" }) }}
+          key={`pre_${i}`}
+          xs={12}
+        >
+          {obj.panel}
+        </Grid>
+      );
+    });
+  }
+
+  let browseItems = [];
+  if (browsePanels && browsePanels.length > 0) {
+    browsePanels.forEach((obj, i) => {
+      let panelStyles = {};
+      Object.keys(obj).forEach((key) => {
+        if (key != "panel") {
+          panelStyles[key] = obj[key];
+        }
+      });
+      browseItems.push(
+        <Grid
+          item
+          className={itemCss}
+          style={{ ...panelStyles, ...(showBrowse || { display: "none" }) }}
+          key={`pre_${i}`}
+          xs={12}
+        >
+          {obj.panel}
+        </Grid>
+      );
+    });
+  }
+  let postSearchItems = [];
+  if (panels && panels.length > 0) {
+    panels.forEach((obj, i) => {
+      let panelStyles = {};
+      Object.keys(obj).forEach((key) => {
+        if (key != "panel") {
+          panelStyles[key] = obj[key];
+        }
+      });
+      postSearchItems.push(
+        <Grid item className={itemCss} style={panelStyles} key={i}>
           {obj.panel}
         </Grid>
       );
@@ -110,10 +184,85 @@ const Page = ({
       className={classes.container}
       ref={pageRef}
     >
+      {preSearchItems}
       {searchBox && (
-        <Grid item className={itemCss} style={{ marginTop: "2em" }}>
-          <SearchBox />
-        </Grid>
+        <>
+          {landingPage && (
+            <Grid
+              item
+              className={classes.item}
+              style={{
+                marginBottom: "-3.25em",
+                padding: "0 0.75em",
+                marginTop: "-1.5em",
+                minWidth: "80%",
+              }}
+            >
+              <h2>Search GoaT</h2>
+            </Grid>
+          )}
+          <Grid item xs={12} id="searchBox">
+            <Grid
+              container
+              direction="row"
+              // style={{ height: "calc( 100vh - 2em )", width: "100%" }}
+              alignItems="center"
+            >
+              <Grid
+                item
+                className={itemCss}
+                style={{
+                  marginTop: "2em",
+                }}
+                xs={12}
+              >
+                <SearchBox />
+              </Grid>
+            </Grid>
+          </Grid>
+          {landingPage && (
+            <>
+              <Grid
+                container
+                className={classes.item}
+                justifyContent="flex-end"
+              >
+                <Grid item>
+                  <span
+                    style={{
+                      float: "right",
+                      marginTop: "1em",
+                      marginBottom: showExamples ? 0 : "0",
+                      marginRight: "1em",
+                    }}
+                  >
+                    <a
+                      onClick={() => {
+                        setShowExamples(!showExamples);
+                        setShowBrowse(false);
+                      }}
+                      className={styles.link}
+                    >
+                      {showExamples ? "hide" : "show"} examples
+                    </a>
+                    <a> or </a>
+                    <a
+                      onClick={() => {
+                        setShowBrowse(!showBrowse);
+                        setShowExamples(false);
+                      }}
+                      className={styles.link}
+                    >
+                      {showBrowse ? "hide" : "browse"} tree
+                    </a>
+                  </span>
+                </Grid>
+              </Grid>
+              {searchItems}
+              {browseItems}
+            </>
+          )}
+        </>
       )}
       {title && (
         <Grid
@@ -150,7 +299,7 @@ const Page = ({
           )}
         </Grid>
       )}
-      {items}
+      {postSearchItems}
       {text && (
         <Grid item className={itemCss}>
           {text}

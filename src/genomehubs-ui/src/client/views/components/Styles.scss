@@ -65,6 +65,14 @@ body,
 
     .active:hover { fill-opacity: 0.5; stroke-opacity: 0.5;}
 
+    .link,
+    .link:visited {
+      text-decoration: underline;
+      color: #1f78b4;
+      cursor: pointer;
+    }
+
+
     .fillParent {
       height: 100%;
       position: relative;
@@ -682,6 +690,24 @@ body,
         text-decoration: underline;
         color: #1f78b4;
         cursor: pointer;
+      }
+
+      blockquote {
+        background: rgba(themed("primary"), 0.05);
+        background: #1f78b411; //#00616411;
+        border-left: 10px solid #1f78b433; //#00616433;
+        font-family: themed("bodyFont");
+        margin: 1.5em 10px;
+        padding: .5em 10px;
+        max-width: 90%;
+
+        a, .link {
+          color: themed("primary");
+        }
+      }
+
+      blockquote p {
+        display: inline;
       }
 
       .boldValue {

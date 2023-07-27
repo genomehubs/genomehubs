@@ -209,20 +209,21 @@ const Markdown = ({
   pgId,
   pageId,
   pagesById,
+  pagesIsFetching,
   fetchPages,
   siteStyles,
   components = {},
   ...extra
 }) => {
   useEffect(() => {
-    if (!pagesById) {
+    if (!pagesById && !pagesIsFetching) {
       if (pgId) {
         fetchPages(pgId);
       } else if (pageId) {
         fetchPages(pageId);
       }
     }
-  }, [pgId, pageId]);
+  }, [pgId, pageId, pagesIsFetching]);
 
   const { contents, ast } = compile(pagesById, {
     ...RehypeComponentsList(extra),

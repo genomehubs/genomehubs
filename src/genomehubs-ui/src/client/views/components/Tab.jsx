@@ -6,9 +6,10 @@ import withRoutes from "../hocs/withRoutes";
 
 const Tab = ({ routeName, pageId, setRoute, routesById }) => {
   let parsedName = routeName.replaceAll(/[\(\)]/g, "");
+  let parsedPageId = pageId.replaceAll(/[\(\)]/g, "");
   useEffect(() => {
     if (parsedName && !routesById) {
-      setRoute(parsedName, pageId);
+      setRoute(parsedName, parsedPageId);
     }
   }, [parsedName]);
 

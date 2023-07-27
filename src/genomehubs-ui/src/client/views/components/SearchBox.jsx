@@ -270,10 +270,15 @@ const SearchBox = ({
           </Grid>
         </Grid>
       </form>
-      <Grid container direction="row" alignItems="center">
+      <Grid
+        container
+        direction="row"
+        alignItems="center"
+        // style={{ paddingBottom: "1em" }}
+      >
         <Grid item xs={2}></Grid>
         <Grid item xs={8}>
-          <SearchToggles toggleTemplate={toggleTemplate} />
+          <SearchToggles toggleTemplate={toggleTemplate} id="searchToggles" />
         </Grid>
         <Grid item xs={2}></Grid>
       </Grid>
