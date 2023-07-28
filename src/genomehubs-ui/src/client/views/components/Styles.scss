@@ -722,6 +722,9 @@ body,
       .padded {
         margin-bottom: 3em;
       }
+      .unpadded {
+        padding-bottom: 0em !important;
+      }
 
       .paragraph {
         padding: 1em;

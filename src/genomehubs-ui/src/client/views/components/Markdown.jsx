@@ -4,6 +4,7 @@ import { basename, siteName } from "../reducers/location";
 import AggregationIcon from "./AggregationIcon";
 import Grid from "@material-ui/core/Grid";
 import Highlight from "./Highlight";
+import Logo from "./Logo";
 import NavLink from "./NavLink";
 import Report from "./Report";
 import Template from "./Template";
@@ -32,6 +33,7 @@ const webpackHash = COMMIT_HASH || __webpack_hash__;
 
 export const processProps = ({ props, newProps = {}, isGrid }) => {
   for (const [key, value] of Object.entries(props)) {
+    console.log({ key, value });
     if (isGrid && !gridPropNames.has(key)) {
       continue;
     }
@@ -83,6 +85,16 @@ export const RehypeComponentsList = (extra) => {
       }
     },
     hub: (props) => <span {...processProps({ props })}>{siteName}</span>,
+    logo: (props) => {
+      let { lineColor, fillColor, ...gridProps } = props;
+      return (
+        <Grid {...processProps({ props: gridProps })}>
+          <div className={styles.fixedAr} style={{ background: fillColor }}>
+            <Logo {...{ lineColor, fillColor }} />
+          </div>
+        </Grid>
+      );
+    },
     img: (props) => (
       <div className={styles.centerContent}>
         <img {...processProps({ props })} alt={props.alt.toString()} />
@@ -138,9 +150,13 @@ export const RehypeComponentsList = (extra) => {
       }
       return <Highlight {...processProps({ props })} />;
     },
-    report: (props) => (
-      <Report {...processProps({ props })} className={styles.reportContainer} />
-    ),
+    report: (props) => {
+      let css = styles.reportContainer;
+      if (props.className) {
+        css = classnames(styles.reportContainer, styles[props.className]);
+      }
+      return <Report {...processProps({ props })} className={css} />;
+    },
     span: (props) => <span {...processProps({ props })} />,
     templat: (props) => (
       <Template

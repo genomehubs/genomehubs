@@ -371,14 +371,17 @@ const ReportItem = ({
         );
         break;
       case "sources":
+        fixedRatio = undefined;
         component = (
           <ReportSources
             sources={reportById.report.sources}
             chartRef={chartRef}
             embedded={embedded}
-            containerRef={containerRef}
+            // containerRef={containerRef}
             minDim={minDim}
             setMinDim={setMinDim}
+            inModal={inModal}
+            containerRef={targetRef}
           />
         );
         break;
