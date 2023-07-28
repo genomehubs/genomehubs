@@ -178,7 +178,7 @@ body,
 
       .link {
         text-decoration: underline;
-        color: themed("secondary");
+        color: themed("secondary") !important;
       }
 
       img {
