@@ -33,7 +33,6 @@ const webpackHash = COMMIT_HASH || __webpack_hash__;
 
 export const processProps = ({ props, newProps = {}, isGrid }) => {
   for (const [key, value] of Object.entries(props)) {
-    console.log({ key, value });
     if (isGrid && !gridPropNames.has(key)) {
       continue;
     }
@@ -102,12 +101,13 @@ export const RehypeComponentsList = (extra) => {
     ),
     include: (props) => {
       let nested = <Nested pgId={props.pageId} {...props} />;
+      let css = styles.reportContainer;
+      if (props.className) {
+        css = classnames(styles.reportContainer, styles[props.className]);
+      }
+
       return (
-        <Grid
-          {...processProps({ props, isGrid: true })}
-          item
-          className={styles.reportContainer}
-        >
+        <Grid {...processProps({ props, isGrid: true })} item className={css}>
           {nested}
         </Grid>
       );

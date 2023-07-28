@@ -6,15 +6,37 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import Grid from "@material-ui/core/Grid";
 import Switch from "@material-ui/core/Switch";
 import Tooltip from "./Tooltip";
+import { compose } from "recompose";
+import setColors from "../functions/setColors";
+import withColors from "../hocs/withColors";
 
-const Toggle = ({ toggle, expand, title, children }) => {
+const Toggle = ({
+  toggle,
+  expand,
+  title,
+  children,
+  palettes,
+  levels,
+  colors,
+}) => {
   const [showContent, setShowContent] = useState(Boolean(expand));
+  // ({ levels, colors } = setColors({
+  //   palettes,
+  //   levels,
+  //   count: 6,
+  //   colors,
+  // }));
+  // let transpColor = colors[1].match(/#/)
+  //   ? `${colors[1]}33`
+  //   : colors[1].replace(/rgb\(/, "rgba(").replace(/\)/, ", 0.1)");
+  // transpColor = "#1f78b411";
+
   return (
     <Grid
       container
       direction="column"
       style={{
-        border: "0.2em solid #98999f",
+        border: `0.2em solid #1f78b466`,
         borderRadius: "1em",
         overflow: "hidden",
         marginBottom: "2em",
@@ -25,8 +47,8 @@ const Toggle = ({ toggle, expand, title, children }) => {
           container
           direction="row"
           style={{
-            backgroundColor: "#eeeeee",
-            borderBottom: showContent ? "0.2em solid #98999f" : "none",
+            backgroundColor: "#1f78b433",
+            borderBottom: showContent ? `0.2em solid #1f78b466` : "none",
           }}
         >
           <Grid item xs={10}>
@@ -81,4 +103,4 @@ const Toggle = ({ toggle, expand, title, children }) => {
   );
 };
 
-export default Toggle;
+export default compose(withColors)(Toggle);
