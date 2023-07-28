@@ -72,7 +72,6 @@ const ReportSources = ({
       }
     }
   }, [width]);
-  console.log({ width, height, plotWidth, plotHeight, minDim });
 
   let rows = [];
   let sorted = Object.entries(sources || []).sort(
