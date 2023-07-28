@@ -36,6 +36,7 @@ const NavLink = ({
           title={(props.title || "").replace(/^external:\s*/, "")}
           target="_blank"
           rel="noopener noreferrer"
+          style={{ whiteSpace: "nowrap" }}
         >
           {props.children}
           <LaunchIcon fontSize="inherit" />
