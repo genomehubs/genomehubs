@@ -34,7 +34,7 @@ const Toggle = ({
   return (
     <Grid
       container
-      direction="column"
+      direction="row"
       style={{
         border: `0.2em solid #1f78b466`,
         borderRadius: "1em",
@@ -94,11 +94,14 @@ const Toggle = ({
           )}
         </Grid>
       </Grid>
-      {showContent && (
-        <Grid item xs={12}>
-          {children}
-        </Grid>
-      )}
+      <Grid
+        id="toggleContent"
+        item
+        xs={12}
+        style={{ ...(!showContent && { maxHeight: 0 }) }}
+      >
+        {children}
+      </Grid>
     </Grid>
   );
 };
