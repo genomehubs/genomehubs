@@ -375,6 +375,10 @@ body,
       }
     }
 
+    a.link {
+      color: #1f78b4;
+    }
+
     .resultPanel {
       border-top: solid 0.25px rgba(themed("primary"), 0.25);
       box-sizing: border-box;
