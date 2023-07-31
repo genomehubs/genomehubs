@@ -21,6 +21,7 @@ const ReportEmpty = ({ report, statusColors, inModal }) => {
           <div
             style={{
               padding: "1em",
+              textAlign: "center",
             }}
           >{`No ${report} data to display`}</div>
         </>
@@ -29,6 +30,7 @@ const ReportEmpty = ({ report, statusColors, inModal }) => {
           <div
             style={{
               position: "absolute",
+              textAlign: "center",
               top: 0,
               right: 0,
               bottom: 0,

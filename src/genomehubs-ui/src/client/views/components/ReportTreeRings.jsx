@@ -257,6 +257,7 @@ const ReportTreeRings = ({
       style={{
         height: divHeight,
         overflow: "visible",
+        textAlign: "center",
       }}
     >
       <svg

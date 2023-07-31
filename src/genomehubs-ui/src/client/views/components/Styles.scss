@@ -731,6 +731,15 @@ body,
         padding: 1em !important;
       }
 
+      .unpadded {
+        // padding-top: 0 !important;
+        padding-bottom: 0 !important;
+      }
+
+      .unpaddedParagraph {
+        padding: 1em 1em 0 !important;
+      }
+
       .inline {
         padding: 0 !important;
         margin: 0 !important;

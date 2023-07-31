@@ -35,6 +35,26 @@ const headings = {
   scatter: "Tap bins to search",
 };
 
+const reportIsEmpty = (name, report) => {
+  switch (name) {
+    case "arc":
+      if (
+        (Array.isArray(report) && report.length == 0) ||
+        (report.x == 0 && report.y == 0)
+      ) {
+        return true;
+      }
+      return false;
+    case "tree":
+      if (report.x == 0 || Object.keys(report.tree.treeNodes).length == 0) {
+        return true;
+      }
+      return false;
+    default:
+      return report.x == 0;
+  }
+};
+
 const ReportItem = ({
   reportId,
   report,
@@ -189,7 +209,6 @@ const ReportItem = ({
   });
 
   let captionPadding = 0;
-
   if (!reportById || Object.keys(reportById).length == 0) {
     loading = true;
   } else if (
@@ -217,8 +236,7 @@ const ReportItem = ({
     // };
   } else if (
     reportById.report[report] &&
-    reportById.report[report].x == 0 &&
-    (report != "arc" || reportById.report[report].y == 0)
+    reportIsEmpty(report, reportById.report[report])
   ) {
     component = <ReportEmpty report={report} inModal={inModal} />;
     // message = {

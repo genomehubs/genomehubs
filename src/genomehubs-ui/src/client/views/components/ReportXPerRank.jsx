@@ -38,9 +38,10 @@ const ReportXPerRank = ({
         }
       }
     }, [width]);
+    let maxValue = Math.max(0, ...perRank.report.xPerRank.map((o) => o.x));
 
     perRank.report.xPerRank.forEach((entry) => {
-      if (entry.x) {
+      if ((maxValue > 0 && entry.x) || true) {
         let plural =
           entry.x != 1 && ranks[entry.rank]
             ? ranks[entry.rank].plural
