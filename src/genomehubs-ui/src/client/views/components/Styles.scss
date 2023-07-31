@@ -56,8 +56,7 @@ body,
       font-size: 2em;
     }
 
-    a,
-    a:visited {
+    a {
       color: themed("primary");
       font-family: themed("bodyFont");
       text-decoration: none;
@@ -65,8 +64,8 @@ body,
 
     .active:hover { fill-opacity: 0.5; stroke-opacity: 0.5;}
 
-    .link,
-    .link:visited {
+    a:link,
+    a:visited {
       text-decoration: underline;
       color: #1f78b4;
       cursor: pointer;
@@ -133,6 +132,7 @@ body,
         margin: 0 0.25em 0 0.25em;
         padding: 0;
         color: themed("secondary");
+        text-decoration: none !important;
       }
 
       .tabHolder {
@@ -154,6 +154,7 @@ body,
         margin-right: -1px;
         margin-bottom: 0.2em;
         padding: 0 0.5em;
+        text-decoration: none !important;
 
         &Highlight,
         &:hover {
@@ -269,6 +270,8 @@ body,
 
       .link {
         text-decoration: underline;
+        color: #1f78b4;
+        cursor: pointer;
       }
 
       code {
@@ -670,6 +673,24 @@ body,
       // }
     }
 
+    blockquote {
+      background: rgba(themed("primary"), 0.05);
+      background: #1f78b411; //#00616411;
+      border-left: 10px solid #1f78b433; //#00616433;
+      font-family: themed("bodyFont");
+      margin: 1.5em 10px;
+      padding: .5em 10px;
+      max-width: 90%;
+
+      a, .link {
+        color: themed("primary");
+      }
+    }
+
+    blockquote p {
+      display: inline;
+    }
+
     .markdown {
       font-family: themed("bodyFont");
       font-size: themed("bodyFontSize");
@@ -696,23 +717,7 @@ body,
         cursor: pointer;
       }
 
-      blockquote {
-        background: rgba(themed("primary"), 0.05);
-        background: #1f78b411; //#00616411;
-        border-left: 10px solid #1f78b433; //#00616433;
-        font-family: themed("bodyFont");
-        margin: 1.5em 10px;
-        padding: .5em 10px;
-        max-width: 90%;
-
-        a, .link {
-          color: themed("primary");
-        }
-      }
-
-      blockquote p {
-        display: inline;
-      }
+      
 
       .boldValue {
         display: inline-block;
