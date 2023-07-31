@@ -207,6 +207,7 @@ const ReportItem = ({
         error={error}
         minDim={minDim}
         ratio={ratio}
+        inModal={inModal}
       />
     );
     // message = {
@@ -214,15 +215,19 @@ const ReportItem = ({
     //   duration: 5000,
     //   severity: "error",
     // };
-  } else if (reportById.report[report] && reportById.report[report].x == 0) {
-    component = <ReportEmpty report={report} />;
+  } else if (
+    reportById.report[report] &&
+    reportById.report[report].x == 0 &&
+    (report != "arc" || reportById.report[report].y == 0)
+  ) {
+    component = <ReportEmpty report={report} inModal={inModal} />;
     // message = {
     //   message: `No ${report} data to display`,
     //   duration: 5000,
     //   severity: "warning",
     // };
   } else if (!reportById.report[report]) {
-    component = <ReportEmpty report={report} />;
+    component = <ReportEmpty report={report} inModal={inModal} />;
     // message = {
     //   message: `No ${report} data to display`,
     //   duration: 5000,

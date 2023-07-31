@@ -2,6 +2,7 @@ import React, { createElement, useEffect } from "react";
 import { basename, siteName } from "../reducers/location";
 
 import AggregationIcon from "./AggregationIcon";
+import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
 import Highlight from "./Highlight";
 import Logo from "./Logo";
@@ -68,6 +69,13 @@ export const RehypeComponentsList = (extra) => {
   return {
     a: (props) => <NavLink {...processProps({ props })} />,
     aggregation: (props) => <AggregationIcon method={props.method} />,
+    divider: (props) => (
+      <Divider
+        orientation={props.orientation || "vertical"}
+        flexItem
+        className={styles.divider}
+      />
+    ),
     grid: (props) => {
       let { toggle, expand, title, ...gridProps } = props;
       if (toggle && toggle !== true && toggle !== "true") {
