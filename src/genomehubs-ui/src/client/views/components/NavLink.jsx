@@ -30,16 +30,31 @@ const NavLink = ({
       to.match(/\:\/\//) &&
       (props.title?.startsWith("external:") || !to.match(location.origin))
     ) {
+      let children = props.children;
+      if (children.length == 1 && typeof children[0] === "string") {
+        children = children[0].match(/(.{1,12})/g);
+        children = children.map((str, i) => (
+          <span key={i}>
+            {i == children.length - 1 ? (
+              <span key={i} style={{ whiteSpace: "nowrap" }}>
+                {str}
+                <LaunchIcon fontSize="inherit" />
+              </span>
+            ) : (
+              str
+            )}
+          </span>
+        ));
+      }
       return (
         <a
           href={to}
           title={(props.title || "").replace(/^external:\s*/, "")}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ whiteSpace: "nowrap" }}
+          // style={{ whiteSpace: "wrap" }}
         >
-          {props.children}
-          <LaunchIcon fontSize="inherit" />
+          {children}
         </a>
       );
     }
