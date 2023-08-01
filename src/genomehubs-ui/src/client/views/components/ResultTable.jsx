@@ -7,6 +7,7 @@ import Badge from "@material-ui/core/Badge";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import Checkbox from "@material-ui/core/Checkbox";
+import Citation from "./Citation";
 import DownloadButton from "./DownloadButton";
 import Grid from "@material-ui/core/Grid";
 import Grow from "@material-ui/core/Grow";
@@ -61,8 +62,9 @@ const StyledBadge = withStyles((theme) => ({
 
 export const useStyles = makeStyles((theme) => ({
   root: {
-    maxWidth: "100%",
+    maxWidth: "calc( 100% - 0.5em )",
     marginBottom: "1em",
+    marginLeft: "0.5em",
     minWidth: 750,
   },
   table: {
@@ -833,6 +835,12 @@ const ResultTable = ({
   }
   heads.push(<TableCell key={"last"}></TableCell>);
 
+  let citationMessage;
+  if (rows.length > 0) {
+    citationMessage = (
+      <Citation resultCount={rows.length} searchTerm={searchTerm} />
+    );
+  }
   return (
     <Grid
       container
@@ -894,6 +902,7 @@ const ResultTable = ({
           rootRef={rootRef}
         />
       </Grid>
+      {citationMessage}
       {/* </Grid> */}
     </Grid>
   );

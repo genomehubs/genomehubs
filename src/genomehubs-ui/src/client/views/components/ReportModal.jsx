@@ -44,7 +44,8 @@ export const ReportModal = ({
   const navigate = useNavigate();
   const [modalStyle] = useState(getModalStyle);
   const [open, setOpen] = useState(false);
-  disableModal = report === "sources" ? true : disableModal;
+  disableModal =
+    report === "sources" ? true : report === "types" ? true : disableModal;
   // disableModal = true;
 
   const handleOpen = () => {

@@ -35,6 +35,26 @@ const headings = {
   scatter: "Tap bins to search",
 };
 
+const reportIsEmpty = (name, report) => {
+  switch (name) {
+    case "arc":
+      if (
+        (Array.isArray(report) && report.length == 0) ||
+        (report.x == 0 && report.y == 0)
+      ) {
+        return true;
+      }
+      return false;
+    case "tree":
+      if (report.x == 0 || Object.keys(report.tree.treeNodes).length == 0) {
+        return true;
+      }
+      return false;
+    default:
+      return report.x == 0;
+  }
+};
+
 const ReportItem = ({
   reportId,
   report,
@@ -189,7 +209,6 @@ const ReportItem = ({
   });
 
   let captionPadding = 0;
-
   if (!reportById || Object.keys(reportById).length == 0) {
     loading = true;
   } else if (
@@ -207,6 +226,7 @@ const ReportItem = ({
         error={error}
         minDim={minDim}
         ratio={ratio}
+        inModal={inModal}
       />
     );
     // message = {
@@ -214,15 +234,18 @@ const ReportItem = ({
     //   duration: 5000,
     //   severity: "error",
     // };
-  } else if (reportById.report[report] && reportById.report[report].x == 0) {
-    component = <ReportEmpty report={report} />;
+  } else if (
+    reportById.report[report] &&
+    reportIsEmpty(report, reportById.report[report])
+  ) {
+    component = <ReportEmpty report={report} inModal={inModal} />;
     // message = {
     //   message: `No ${report} data to display`,
     //   duration: 5000,
     //   severity: "warning",
     // };
   } else if (!reportById.report[report]) {
-    component = <ReportEmpty report={report} />;
+    component = <ReportEmpty report={report} inModal={inModal} />;
     // message = {
     //   message: `No ${report} data to display`,
     //   duration: 5000,
@@ -371,14 +394,17 @@ const ReportItem = ({
         );
         break;
       case "sources":
+        fixedRatio = undefined;
         component = (
           <ReportSources
             sources={reportById.report.sources}
             chartRef={chartRef}
             embedded={embedded}
-            containerRef={containerRef}
+            // containerRef={containerRef}
             minDim={minDim}
             setMinDim={setMinDim}
+            inModal={inModal}
+            containerRef={targetRef}
           />
         );
         break;

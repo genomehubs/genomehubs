@@ -3,7 +3,6 @@ import React from "react";
 const Logo = ({ lineColor = "#ffffff", fillOpacity = 0 }) => {
   return (
     <svg
-      width="100%"
       height="100%"
       viewBox="43.845234 65.678574 135.46666 135.46666"
       preserveAspectRatio="xMinYMin"

@@ -2,8 +2,10 @@ import React, { createElement, useEffect } from "react";
 import { basename, siteName } from "../reducers/location";
 
 import AggregationIcon from "./AggregationIcon";
+import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
 import Highlight from "./Highlight";
+import Logo from "./Logo";
 import NavLink from "./NavLink";
 import Report from "./Report";
 import Template from "./Template";
@@ -67,6 +69,13 @@ export const RehypeComponentsList = (extra) => {
   return {
     a: (props) => <NavLink {...processProps({ props })} />,
     aggregation: (props) => <AggregationIcon method={props.method} />,
+    divider: (props) => (
+      <Divider
+        orientation={props.orientation || "vertical"}
+        flexItem
+        className={styles.divider}
+      />
+    ),
     grid: (props) => {
       let { toggle, expand, title, ...gridProps } = props;
       if (toggle && toggle !== true && toggle !== "true") {
@@ -83,6 +92,16 @@ export const RehypeComponentsList = (extra) => {
       }
     },
     hub: (props) => <span {...processProps({ props })}>{siteName}</span>,
+    logo: (props) => {
+      let { lineColor, fillColor, ...gridProps } = props;
+      return (
+        <Grid {...processProps({ props: gridProps })}>
+          <div className={styles.fixedAr} style={{ background: fillColor }}>
+            <Logo {...{ lineColor, fillColor }} />
+          </div>
+        </Grid>
+      );
+    },
     img: (props) => (
       <div className={styles.centerContent}>
         <img {...processProps({ props })} alt={props.alt.toString()} />
@@ -90,12 +109,13 @@ export const RehypeComponentsList = (extra) => {
     ),
     include: (props) => {
       let nested = <Nested pgId={props.pageId} {...props} />;
+      let css = styles.reportContainer;
+      if (props.className) {
+        css = classnames(styles.reportContainer, styles[props.className]);
+      }
+
       return (
-        <Grid
-          {...processProps({ props, isGrid: true })}
-          item
-          className={styles.reportContainer}
-        >
+        <Grid {...processProps({ props, isGrid: true })} item className={css}>
           {nested}
         </Grid>
       );
@@ -138,9 +158,13 @@ export const RehypeComponentsList = (extra) => {
       }
       return <Highlight {...processProps({ props })} />;
     },
-    report: (props) => (
-      <Report {...processProps({ props })} className={styles.reportContainer} />
-    ),
+    report: (props) => {
+      let css = styles.reportContainer;
+      if (props.className) {
+        css = classnames(styles.reportContainer, styles[props.className]);
+      }
+      return <Report {...processProps({ props })} className={css} />;
+    },
     span: (props) => <span {...processProps({ props })} />,
     templat: (props) => (
       <Template

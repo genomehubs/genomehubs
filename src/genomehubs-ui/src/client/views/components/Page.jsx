@@ -268,7 +268,7 @@ const Page = ({
         <Grid
           item
           className={classnames(styles.pageTitle, itemCss)}
-          style={{ marginBottom: "0.5em" }}
+          style={{ marginBottom: "0.5em", paddingLeft: "0.5em" }}
           container
           direction="row"
           ref={rootRef}
