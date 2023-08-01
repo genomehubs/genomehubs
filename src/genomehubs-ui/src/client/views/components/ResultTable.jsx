@@ -62,8 +62,9 @@ const StyledBadge = withStyles((theme) => ({
 
 export const useStyles = makeStyles((theme) => ({
   root: {
-    maxWidth: "100%",
+    maxWidth: "calc( 100% - 0.5em )",
     marginBottom: "1em",
+    marginLeft: "0.5em",
     minWidth: 750,
   },
   table: {
