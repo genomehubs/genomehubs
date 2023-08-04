@@ -7,6 +7,7 @@ import BasicSelect from "./BasicSelect";
 import { Box } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
 import EnumSelect from "./EnumSelect";
+import FlagIcon from "./FlagIcon";
 import Grid from "@material-ui/core/Grid";
 import Highlight from "./Highlight";
 import Logo from "./Logo";
@@ -15,6 +16,7 @@ import Report from "./Report";
 import Template from "./Template";
 import Toggle from "./Toggle";
 import Tooltip from "./Tooltip";
+import TranslatedValue from "./TranslatedValue";
 import YAML from "js-yaml";
 import classnames from "classnames";
 import { compose } from "recompose";
@@ -88,6 +90,17 @@ export const RehypeComponentsList = (extra) => {
         className={styles.divider}
       />
     ),
+    flag: (props) => {
+      let { countryCode, size, ...gridProps } = props;
+
+      return (
+        <Grid {...processProps({ props: gridProps })}>
+          <FlagIcon
+            {...processProps({ props: { countryCode, size }, extra })}
+          />
+        </Grid>
+      );
+    },
     grid: (props) => {
       let { toggle, expand, title, ...gridProps } = props;
       if (toggle && toggle !== true && toggle !== "true") {
@@ -204,6 +217,9 @@ export const RehypeComponentsList = (extra) => {
           <span>{props.children}</span>
         </Tooltip>
       );
+    },
+    translated: (props) => {
+      return <TranslatedValue {...processProps({ props, extra })} />;
     },
   };
 };

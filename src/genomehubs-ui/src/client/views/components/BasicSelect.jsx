@@ -54,6 +54,9 @@ const BasicSelect = ({
         );
       });
   }
+  if (options.length == 0) {
+    return null;
+  }
 
   return (
     <FormControl className={classes.formControl}>
