@@ -36,7 +36,7 @@ const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
   useEffect(() => {
     if (typeof embedded !== "undefined" && captionLength < width * 1.8) {
       let ratio = ((width * 1.8) / captionLength) * 100;
-      ratio = Math.max(Math.min(ratio, 180), 80);
+      ratio = Math.max(Math.min(ratio, 150), 80);
       setCaptionScale(ratio);
     }
   }, [width]);

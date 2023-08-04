@@ -317,7 +317,7 @@ const ReportArc = ({
         plotHeight = plotWidth / 2 + pointSize * 3;
       }
     } else {
-      plotHeight = plotWidth;
+      plotHeight = Math.min(plotWidth, plotHeight);
     }
     let dimensionTimer;
     if (timer && !inModal) {
@@ -401,7 +401,7 @@ const ReportArc = ({
           data={chartData}
           // width={minDim}
           // height={minDim}
-          width={plotWidth}
+          width={plotHeight}
           height={plotHeight}
           colors={colors}
         />
