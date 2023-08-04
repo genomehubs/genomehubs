@@ -1,8 +1,12 @@
 import React, { createElement, useEffect } from "react";
 import { basename, siteName } from "../reducers/location";
+import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
+import BasicSelect from "./BasicSelect";
+import { Box } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
+import EnumSelect from "./EnumSelect";
 import Grid from "@material-ui/core/Grid";
 import Highlight from "./Highlight";
 import Logo from "./Logo";
@@ -17,6 +21,7 @@ import { compose } from "recompose";
 import gfm from "remark-gfm";
 import { gridPropNames } from "../functions/propNames";
 import { h } from "hastscript";
+import qs from "qs";
 import rehypeRaw from "rehype-raw";
 import rehypeReact from "rehype-react";
 import remarkDirective from "remark-directive";
@@ -32,8 +37,15 @@ import { withStyles } from "@material-ui/core/styles";
 const pagesUrl = PAGES_URL;
 const webpackHash = COMMIT_HASH || __webpack_hash__;
 
-export const processProps = ({ props, newProps = {}, isGrid }) => {
-  for (const [key, value] of Object.entries(props)) {
+export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
+  for (let [key, value] of Object.entries(props)) {
+    if (typeof value === "string") {
+      let parts = value.split(/(?:\{\{|\}\})/);
+      if (parts.length == 3 && extra.hasOwnProperty(parts[1])) {
+        parts[1] = extra[parts[1]];
+        value = parts.join("");
+      }
+    }
     if (isGrid && !gridPropNames.has(key)) {
       continue;
     }
@@ -142,7 +154,7 @@ export const RehypeComponentsList = (extra) => {
         if (className == "language-report") {
           return (
             <Report
-              {...processProps({ props: nestedProps })}
+              {...processProps({ props: nestedProps, extra })}
               className={styles.reportContainer}
             />
           );
@@ -163,7 +175,21 @@ export const RehypeComponentsList = (extra) => {
       if (props.className) {
         css = classnames(styles.reportContainer, styles[props.className]);
       }
-      return <Report {...processProps({ props })} className={css} />;
+      return <Report {...processProps({ props, extra })} className={css} />;
+    },
+    select: (props) => {
+      let processedProps = processProps({ props, extra });
+      let handleChange = () => {};
+      if (processedProps.url) {
+        handleChange = (e) => {
+          e.preventDefault();
+          extra.navigate(`${processedProps.url}${e.target.value}`);
+        };
+      }
+      if (processedProps.enumValues) {
+        return <EnumSelect {...processedProps} handleChange={handleChange} />;
+      }
+      return <BasicSelect {...processedProps} handleChange={handleChange} />;
     },
     span: (props) => <span {...processProps({ props })} />,
     templat: (props) => (
@@ -239,6 +265,8 @@ const Markdown = ({
   components = {},
   ...extra
 }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   useEffect(() => {
     if (!pagesById && !pagesIsFetching) {
       if (pgId) {
@@ -250,7 +278,11 @@ const Markdown = ({
   }, [pgId, pageId, pagesIsFetching]);
 
   const { contents, ast } = compile(pagesById, {
-    ...RehypeComponentsList(extra),
+    ...RehypeComponentsList({
+      ...qs.parse(location.search.replace(/^\?/, "")),
+      navigate,
+      ...extra,
+    }),
     ...components,
   });
   let css;
