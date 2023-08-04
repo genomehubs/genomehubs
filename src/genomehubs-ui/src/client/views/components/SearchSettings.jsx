@@ -19,7 +19,7 @@ import MuiAccordionSummary from "@material-ui/core/AccordionSummary";
 import Paper from "@material-ui/core/Paper";
 import Select from "@material-ui/core/Select";
 import SettingsButton from "./SettingsButton";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import qs from "../functions/qs";
 import { useLocalStorage } from "usehooks-ts";
@@ -170,7 +170,10 @@ const SearchSettings = ({
     let fieldSets = {};
     if (searchTerm.fields) {
       searchTerm.fields.split(",").forEach((field) => {
-        let [f, s = "value"] = field.split(":");
+        let [f, s] = field.split(":");
+        if (!s) {
+          s = types[f].processed_simple;
+        }
         if (!fieldSets[f]) {
           fieldSets[f] = [];
         }
@@ -181,7 +184,11 @@ const SearchSettings = ({
     for (let field of fields) {
       if (fieldSets[field]) {
         for (let subset of fieldSets[field]) {
-          newFields.push(subset == "value" ? field : `${field}:${subset}`);
+          newFields.push(
+            subset == types[field].processed_simple
+              ? field
+              : `${field}:${subset}`
+          );
         }
       } else {
         newFields.push(field);

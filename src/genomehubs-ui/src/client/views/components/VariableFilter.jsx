@@ -76,6 +76,10 @@ const VariableFilter = ({
   summary = summary == "undefined" ? "" : summary;
   value = value == "undefined" ? "" : value;
   let type = types[field]?.type || "keyword";
+  let collate;
+  if (summary == "collate") {
+    collate = true;
+  }
   return (
     <Grid container alignItems="center" direction="row" spacing={2}>
       {bool && (
@@ -85,34 +89,47 @@ const VariableFilter = ({
       )}
       {field && handleSummaryChange && (
         <Grid item>
+          {(collate && (
+            <BasicTextField
+              id={`collate-value-input`}
+              handleChange={handleValueChange}
+              helperText={"summary"}
+              value={summary}
+            />
+          )) || (
+            <BasicSelect
+              current={summary}
+              id={`summary-${field}-select`}
+              handleChange={handleSummaryChange}
+              helperText={"summary"}
+              values={allowedSummaries({ field, types })}
+            />
+          )}
+        </Grid>
+      )}
+      {(collate && <></>) || (
+        <Grid item>
           <BasicSelect
-            current={summary}
-            id={`summary-${field}-select`}
-            handleChange={handleSummaryChange}
-            helperText={"summary"}
-            values={allowedSummaries({ field, types })}
+            current={field}
+            id={`variable-${field}-select`}
+            handleChange={handleVariableChange}
+            helperText={"field"}
+            values={fields}
           />
         </Grid>
       )}
-      <Grid item>
-        <BasicSelect
-          current={field}
-          id={`variable-${field}-select`}
-          handleChange={handleVariableChange}
-          helperText={"field"}
-          values={fields}
-        />
-      </Grid>
-      <Grid item>
-        <BasicSelect
-          current={operator}
-          id={`variable-${field}-operator-select`}
-          handleChange={handleOperatorChange}
-          helperText={"operator"}
-          values={allowedOperators({ field, types, summary })}
-        />
-      </Grid>
-      <Grid item xs={3}>
+      {(collate && <></>) || (
+        <Grid item>
+          <BasicSelect
+            current={operator}
+            id={`variable-${field}-operator-select`}
+            handleChange={handleOperatorChange}
+            helperText={"operator"}
+            values={allowedOperators({ field, types, summary })}
+          />
+        </Grid>
+      )}
+      <Grid item xs={4}>
         {type == "keyword" && operator ? (
           <AutoCompleteInput
             id={`variable-${field}-value-input`}
@@ -129,7 +146,7 @@ const VariableFilter = ({
             id={`variable-${field}-value-input`}
             handleChange={handleValueChange}
             helperText={"value"}
-            value={value}
+            value={collate ? field : value}
           />
         )}
       </Grid>

@@ -60,7 +60,7 @@ const SearchPage = ({
           if (!equal(searchTerm, previousSearchTerm)) {
             setPreviousSearchTerm(searchTerm);
             setSearchIndex(options.result);
-            setLookupTerm(hashTerm);
+            setLookupTerm(hashTerm || options.query);
             fetchSearchResults(searchTerm);
           }
         } else {
@@ -78,7 +78,7 @@ const SearchPage = ({
             if (!equal(options, previousSearchTerm)) {
               setPreviousSearchTerm(options);
               setSearchIndex(options.result);
-              setLookupTerm(hashTerm);
+              setLookupTerm(hashTerm || options.query);
               fetchSearchResults(options, hashedNav);
             }
           } else {
@@ -92,7 +92,7 @@ const SearchPage = ({
             };
             setPreviousSearchTerm(options);
             setSearchIndex(options.result);
-            setLookupTerm(hashTerm);
+            setLookupTerm(hashTerm || options.query);
             fetchSearchResults(options, hashedNav);
           }
         }
@@ -110,7 +110,11 @@ const SearchPage = ({
     // return null;
   }
 
-  let resultCount = searchResults.isFetching ? -1 : searchResults.status.hits;
+  let resultCount = searchResults.isFetching
+    ? -1
+    : searchResults.status
+    ? searchResults.status.hits
+    : 0;
   results = <ResultTable />;
   let report;
   if (searchResultArray.length > 0) {

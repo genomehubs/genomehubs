@@ -79,6 +79,7 @@ export const getCatsBy = async ({
 
     by = "attribute";
   }
+
   return { cats, by };
 };
 
@@ -93,7 +94,11 @@ export const getBounds = async ({
   taxonomy,
   apiParams,
   opts = ";;",
+  catOpts = ";;",
 }) => {
+  if (!cat) {
+    catOpts = opts;
+  }
   let { lookupTypes } = await attrTypes({ result, taxonomy });
   params.size = 0;
   params.query = await chainQueries(params);
@@ -101,6 +106,7 @@ export const getBounds = async ({
   let fieldMeta = lookupTypes(fields[0]);
   let field = fieldMeta.name;
   let type = fieldMeta.type;
+  let catType;
   let catMeta = lookupTypes(cat);
   if (catMeta) {
     cat = catMeta.name;
@@ -112,13 +118,14 @@ export const getBounds = async ({
   }
   let fixedTerms = await setTerms({
     cat: field,
-    opts,
+    opts: catOpts,
     lookupTypes,
     taxonomy,
     apiParams,
   });
   let definedTerms = await setTerms({
     cat,
+    opts: catOpts,
     lookupTypes,
     taxonomy,
     apiParams,
@@ -134,12 +141,15 @@ export const getBounds = async ({
   }
   let term = field;
   catMeta = lookupTypes(cat);
+  let catTerm;
   if (catMeta) {
     if (fields.length > 0) {
       fields.push(catMeta.name);
+      catTerm = catMeta.name;
     } else {
-      term = catMeta.name;
+      catTerm = catMeta.name;
     }
+    catType = catMeta.processed_type;
   }
   let extra = {};
   let valueKey = summary == "value" ? `${fieldMeta.type}_value` : summary;
@@ -163,6 +173,7 @@ export const getBounds = async ({
       }
     }
   }
+
   params.aggs = await setAggs({
     field,
     summary,
@@ -182,31 +193,33 @@ export const getBounds = async ({
     exclusions,
   });
   let aggs;
+  let catAggs;
   let domain;
   try {
-    aggs = res.aggs.aggregations[term];
+    aggs = res.aggs.aggregations[term] || res.aggs.aggregations[catTerm];
   } catch {
     return;
+  }
+
+  let min, max;
+  if (opts) {
+    opts = opts.split(/\s*;\s*/);
+    if (opts.length == 1) {
+      opts = opts[0].split(/\s*,\s*/);
+    }
+    if (opts[0] && opts[0] > "") {
+      min = opts[0];
+    }
+    if (opts[1] && opts[1] > "") {
+      max = opts[1];
+    }
+    if (opts[2] && opts[2] > "") {
+      tickCount = Math.abs(opts[2]);
+    }
   }
   let stats = aggs.stats;
   if (stats) {
     // Set domain to nice numbers
-    let min, max;
-    if (opts) {
-      opts = opts.split(/\s*;\s*/);
-      if (opts.length == 1) {
-        opts = opts[0].split(/\s*,\s*/);
-      }
-      if (opts[0] && opts[0] > "") {
-        min = opts[0];
-      }
-      if (opts[1] && opts[1] > "") {
-        max = opts[1];
-      }
-      if (opts[2] && opts[2] > "") {
-        tickCount = Math.abs(opts[2]);
-      }
-    }
     if (!min || !max) {
       let valueType = valueTypes[fieldMeta.type] || "float";
       if (valueType == "keyword" && scaleType != "ordinal") {
@@ -280,6 +293,9 @@ export const getBounds = async ({
       }
     }
     domain = [min, max];
+    if (fieldMeta.type != "date" && !isNaN(min) && !isNaN(max)) {
+      domain = [min, max].map((v) => v * 1);
+    }
   } else {
     let keywords = aggs.keywords;
     if (keywords) {
@@ -345,11 +361,13 @@ export const getBounds = async ({
   return {
     field,
     scale: scaleType,
+    query: params.query,
     stats,
     type,
     domain,
     tickCount,
     cat,
+    catType,
     cats,
     by,
     showOther: definedTerms.other,

@@ -1,6 +1,6 @@
 name: package-genomehubs
 env:
-  VERSION: 2.7.1
+  VERSION: 2.7.12
 
 on:
   push:
@@ -16,7 +16,9 @@ jobs:
         with:
           node-version: "16"
       - run: npm install -g pkg
-      - run: ./package-ui.sh
+      - run: |
+          ./package-ui.sh
+          mv ./dist/genomehubs-ui-linux-x64 ./dist/genomehubs-ui-linux || exit 0
       - uses: actions/upload-artifact@v3
         with:
           path: ./dist/*
@@ -29,7 +31,9 @@ jobs:
         with:
           node-version: "16"
       - run: npm install -g pkg
-      - run: ./package-api.sh
+      - run: |
+          ./package-api.sh
+          mv ./dist/genomehubs-api-linux-x64 ./dist/genomehubs-api-linux || exit 0
       - uses: actions/upload-artifact@v3
         with:
           path: ./dist/*
@@ -38,15 +42,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install dependencies
+        with:
+          ref: ${{github.ref}}
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: "3.9"
+      - name: Pip install genomehubs
         run: |
-          python3 -m pip install --upgrade pip
+          $CONDA/bin/conda install pip
+          PATH=$CONDA/bin/:$PATH
+          pip install --upgrade pip
           pip install setuptools wheel twine
-      - name: Build and publish
-        run: |
           ./pip_install_latest.sh manylinux2014_x86_64
+          genomehubs -v
       - uses: actions/upload-artifact@v3
         with:
+          name: artifact
           path: ./dist/*
 
   # package-genomehubs-macos:
@@ -125,11 +138,36 @@ jobs:
       - run: |
           git clone https://github.com/genomehubs/goat-ui
           mv goat-ui/static/* src/genomehubs-ui/src/client/static/
+          mv goat-ui/files/favicon/* src/genomehubs-ui/src/client/favicon/
+          mv goat-ui/files/components/* src/genomehubs-ui/src/client/views/components/
+          sed -i '/<!---->/r goat-ui/files/html/index.html' src/genomehubs-ui/src/client/index.html
           rm -r goat-ui
       - run: ./package-ui.sh
       - uses: actions/upload-artifact@v3
         with:
           name: goat-ui
+          path: ./dist/*
+
+  package-boat-ui:
+    runs-on: ubuntu-latest
+    needs:
+      - create-github-release
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+      - run: npm install -g pkg
+      - run: |
+          git clone https://github.com/genomehubs/boat-ui
+          mv boat-ui/static/* src/genomehubs-ui/src/client/static/
+          mv boat-ui/files/favicon/* src/genomehubs-ui/src/client/favicon/
+          mv boat-ui/files/components/* src/genomehubs-ui/src/client/views/components/
+          rm -r boat-ui
+      - run: ./package-ui.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: boat-ui
           path: ./dist/*
 
   build-and-push-genomehubs:
@@ -145,7 +183,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        uses: docker/metadata-action@v4
         with:
           images: genomehubs/genomehubs
       - uses: actions/download-artifact@v3
@@ -155,7 +193,7 @@ jobs:
       - name: Add pip wheel to context
         run: mv dist/*manylinux2014_x86_64.whl src/docker
       - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: docker/build-push-action@v4
         with:
           context: src/docker
           push: true
@@ -182,11 +220,11 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        uses: docker/metadata-action@v4
         with:
           images: genomehubs/genomehubs-api
       - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: docker/build-push-action@v4
         with:
           context: src/docker/api
           push: true
@@ -213,11 +251,11 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        uses: docker/metadata-action@v4
         with:
           images: genomehubs/genomehubs-ui
       - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: docker/build-push-action@v4
         with:
           context: src/docker/ui
           push: true
@@ -244,13 +282,44 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        uses: docker/metadata-action@v4
         with:
           images: genomehubs/goat
       - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: docker/build-push-action@v4
         with:
           context: src/docker/goat
           push: true
           tags: genomehubs/goat:${{ env.VERSION }}, genomehubs/goat:latest
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-and-push-boat-ui:
+    runs-on: ubuntu-latest
+    needs: package-boat-ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: boat-ui
+          path: ./dist
+      - run: |
+          mv dist/genomehubs-ui-linux src/docker/boat/
+          rm -r dist/*
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: genomehubs/boat
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: src/docker/boat
+          push: true
+          tags: genomehubs/boat:${{ env.VERSION }}, genomehubs/boat:latest
           labels: ${{ steps.meta.outputs.labels }}

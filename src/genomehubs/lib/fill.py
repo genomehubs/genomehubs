@@ -153,7 +153,8 @@ def ordered_list(tup):
             break
         if k == key:
             return [value for value in values if value not in seen]
-        seen.update(linked[k]["keyword_value"])
+        if k in linked:
+            seen.update(linked[k]["keyword_value"])
     return values
 
 
@@ -409,7 +410,11 @@ def summarise_attribute_values(
             if values is None:
                 values = []
                 for value in attribute["values"]:
-                    values.append(value[value_type])
+                    try:
+                        values.append(value[value_type])
+                    except KeyError:
+                        print(meta)
+                        print(value)
                     if "is_primary_value" in value and value["is_primary_value"]:
                         primary_values.append(value[value_type])
             else:

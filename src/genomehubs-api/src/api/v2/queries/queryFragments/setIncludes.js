@@ -21,6 +21,9 @@ export const setIncludes = ({
     if (result == "sample") {
       include.push("sample_id");
     }
+    if (result == "taxon") {
+      include.push("taxon_names.*");
+    }
     if (includeLineage) {
       include.push("lineage.*");
     }

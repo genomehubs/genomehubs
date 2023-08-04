@@ -98,11 +98,14 @@ const Report = ({
   reportProps.mapThreshold = props.mapThreshold;
   reportProps.scatterThreshold = props.scatterThreshold;
   reportProps.treeThreshold = props.treeThreshold;
+  reportProps.compactLegend = props.compactLegend;
+  reportProps.compactWidth = props.compactWidth;
   reportProps.pointSize =
     props.pointSize * 1 ||
     qs.parse(reportProps.queryString).pointSize * 1 ||
     15;
   reportProps.collapseMonotypic = props.collapseMonotypic;
+  reportProps.colorPalette = props.colorPalette;
   reportProps.excludeAncestral = props.excludeAncestral;
   reportProps.excludeDescendant = props.excludeDescendant;
   reportProps.excludeDirect = props.excludeDirect;

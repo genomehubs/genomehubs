@@ -69,6 +69,12 @@ export const ReportFull = ({
       height *= 0.9;
     }
   }
+  if (report == "sources") {
+    console.log({ marginLeft });
+    width = Math.max(windowDimensions.width * 0.8, 900) - 15;
+    // width = windowDimensions.width * 0.9 + marginLeft;
+    marginLeft = 0;
+  }
 
   const permaLink = (queryString, toggle) => {
     let path = topLevel ? "report" : toggle ? "reporturl" : "report";
@@ -105,7 +111,11 @@ export const ReportFull = ({
   );
 
   let content;
-  if (report == "sources" || location.pathname == basename + "/reporturl") {
+  if (
+    report == "sources" ||
+    report == "types" ||
+    location.pathname == basename + "/reporturl"
+  ) {
     content = (
       <Grid
         container
@@ -175,7 +185,7 @@ export const ReportFull = ({
     <div
       style={{ marginLeft, height, width, maxHeight: "150%" }}
       onClick={(e) => {
-        if (report != "sources") {
+        if (report != "sources" && report != "types") {
           e.preventDefault();
           e.stopPropagation();
         }

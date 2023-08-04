@@ -10,6 +10,7 @@ import ReportPage from "./ReportPage";
 import { Router } from "@reach/router";
 import SearchPage from "./SearchPage";
 import SourcesPage from "./SourcesPage";
+import TypesPage from "./TypesPage";
 import classnames from "classnames";
 import { compose } from "recompose";
 import loadable from "@loadable/component";
@@ -36,6 +37,7 @@ const Main = ({ routes, basename }) => {
     />,
     <RecordPage path="/record" key="/record" />,
     <SourcesPage path="/sources" key="/sources" />,
+    <TypesPage path="/types" key="/types" />,
     <ReportPage path="/report" key="/report" />,
     <MissingPage default key="404" />,
   ];

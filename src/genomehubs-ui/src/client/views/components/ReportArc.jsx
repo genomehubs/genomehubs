@@ -11,11 +11,13 @@ import MultiCatLegend, {
   processLegendData,
   valueString,
 } from "./MultiCatLegend";
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import Grid from "@material-ui/core/Grid";
 import { compose } from "recompose";
 import { format } from "d3-format";
+import setColors from "../functions/setColors";
+import { setMessage } from "../reducers/message";
 import stringLength from "../functions/stringLength";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
@@ -43,7 +45,7 @@ const PieComponent = ({ data, height, width, colors }) => {
         y={y}
         fill="white"
         textAnchor={"middle"}
-        dominantBaseline="central"
+        dominantBaseline="alphabetic"
         fontSize={innerRadius / 4}
       >
         {`${pct(percent)}`}
@@ -62,6 +64,7 @@ const PieComponent = ({ data, height, width, colors }) => {
           className="recharts-text recharts-label"
           textAnchor="middle"
           alignmentBaseline="central"
+          dominantBaseline="alphabetic"
           fontSize={innerRadius / 2.5}
         >
           {value1}
@@ -73,12 +76,17 @@ const PieComponent = ({ data, height, width, colors }) => {
           className="recharts-text recharts-label"
           textAnchor="middle"
           alignmentBaseline="hanging"
+          dominantBaseline="alphabetic"
           fontSize={innerRadius / 4.5}
         >
-          <tspan alignmentBaseline="hanging" fill={colors[0]}>
+          <tspan
+            alignmentBaseline="hanging"
+            dominantBaseline="alphabetic"
+            fill={colors[0]}
+          >
             {value2.toLocaleString()}
           </tspan>
-          <tspan alignmentBaseline="hanging">
+          <tspan alignmentBaseline="hanging" dominantBaseline="alphabetic">
             {" "}
             / {value3.toLocaleString()}
           </tspan>
@@ -132,6 +140,7 @@ const RadialBarComponent = ({
   width,
   pointSize,
   compactLegend,
+  compactWidth = 300,
 }) => {
   const renderRadialBarLabel = (props) => {
     const {
@@ -154,21 +163,23 @@ const RadialBarComponent = ({
     let row = 1;
     return (
       <g>
-        <g
-          fill={fill}
-          style={{ fontSize, fontFamily: "sans-serif" }}
-          transform="translate(0,2)"
-        >
-          <text
-            x={cx}
-            y={cy - viewBox.innerRadius - fontSize + 2}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            alignmentBaseline="middle"
+        {width >= compactWidth && (
+          <g
+            fill={fill}
+            style={{ fontSize, fontFamily: "sans-serif" }}
+            transform="translate(0,2)"
           >
-            {pct1(value)}
-          </text>
-        </g>
+            <text
+              x={cx}
+              y={cy - viewBox.innerRadius - fontSize + 2}
+              textAnchor="middle"
+              dominantBaseline="alphabetic"
+              alignmentBaseline="middle"
+            >
+              {pct1(value)}
+            </text>
+          </g>
+        )}
         <g transform={`translate(0,${cy + 5})`}>
           {MultiCatLegend({
             width: width * 0.96,
@@ -206,6 +217,7 @@ const RadialBarComponent = ({
     bounds,
     width,
     pointSize,
+    compactLegend,
   });
   // let plotHeight = height - 5 - legendRows * (2 * pointSize + 15);
   // if (compactLegend) {
@@ -213,11 +225,11 @@ const RadialBarComponent = ({
   // }
   let legendHeight = legendRows * (2 * pointSize + 15) + 5;
   if (compactLegend) {
-    legendHeight = legendRows * (pointSize + 10) + 5;
+    legendHeight = Math.min(legendRows, 2) * (pointSize + 10) + 5;
   }
   let plotHeight = height - legendHeight;
 
-  let plotWidth = Math.min(width, 2 * plotHeight);
+  let plotWidth = width; //Math.min(width, 2 * plotHeight);
   plotHeight = plotWidth / 2 + legendHeight;
   let innerRadius = Math.floor(plotWidth * 0.1);
   let outerRadius = Math.floor(plotWidth * 0.5);
@@ -268,22 +280,85 @@ const ReportArc = ({
   containerRef,
   colors,
   levels,
+  ratio,
+  colorPalette,
+  palettes,
   minDim,
+  setMinDim,
   embedded,
+  inModal,
   pointSize,
+  compactWidth,
+  showLegend,
 }) => {
   const componentRef = chartRef ? chartRef : useRef();
-  const { width, height } = containerRef
-    ? useResize(containerRef)
-    : useResize(componentRef);
+  const { width, height } = inModal
+    ? containerRef
+      ? useResize(containerRef)
+      : useResize(componentRef)
+    : componentRef
+    ? useResize(componentRef)
+    : useResize(containerRef);
+
+  // const { width, height } = useResize(componentRef);
+
+  const setDimensions = ({ width, height, timer, ratio = 1 }) => {
+    let plotHeight = inModal ? height : height;
+    let plotWidth = width;
+
+    if (arc.report && Array.isArray(arc.report.arc)) {
+      if (inModal) {
+        if (plotHeight < plotWidth / 2) {
+          plotWidth = plotHeight * 2;
+        } else {
+          plotHeight = plotWidth / 2 - 50;
+        }
+      } else {
+        plotHeight = plotWidth / 2 + pointSize * 3;
+      }
+    } else {
+      plotHeight = plotWidth;
+    }
+    let dimensionTimer;
+    if (timer && !inModal) {
+      dimensionTimer = setTimeout(() => {
+        minDim = Math.min(plotWidth, plotHeight);
+        setMinDim(minDim);
+      }, 50);
+    }
+    return {
+      plotWidth,
+      plotHeight,
+      dimensionTimer,
+    };
+  };
+
+  let dimensionTimer;
+  let { plotWidth, plotHeight } = setDimensions({ width, height });
+
+  useEffect(() => {
+    ({ plotWidth, plotHeight, dimensionTimer } = setDimensions({
+      width,
+      height,
+      timer: true,
+    }));
+    return () => {
+      clearTimeout(dimensionTimer);
+    };
+  }, [width]);
+
   if (arc && arc.status) {
     let chartData = [];
     let chart;
     if (Array.isArray(arc.report.arc)) {
       arc.report.arc.forEach((report, i) => {
-        if (levels[arc.report.arc.length]) {
-          colors = levels[arc.report.arc.length];
-        }
+        ({ levels, colors } = setColors({
+          colorPalette,
+          palettes,
+          levels,
+          count: arc.report.arc.length,
+          colors,
+        }));
         let { arc: currentArc, x, y, rank } = report;
         chartData.push({
           xValue: x,
@@ -295,15 +370,17 @@ const ReportArc = ({
         });
       });
       chartData = chartData.reverse();
-      // TODO: set legend item widths dynamically
       let compactLegend = typeof embedded === "undefined";
       chart = (
         <RadialBarComponent
           data={chartData}
-          width={compactLegend ? minDim : width}
-          height={minDim - 50}
+          width={
+            plotHeight - 50 < plotWidth / 2 ? plotHeight * 2 - 100 : plotWidth
+          }
+          height={plotHeight}
           pointSize={pointSize}
           compactLegend={compactLegend}
+          compactWidth={compactWidth}
         />
       );
     } else {
@@ -312,14 +389,20 @@ const ReportArc = ({
         { value: x, name: xTerm },
         { value: y - x, name: yTerm },
       ];
-      if (levels[2]) {
-        colors = levels[2];
-      }
+      ({ levels, colors } = setColors({
+        colorPalette,
+        palettes,
+        levels,
+        count: 2,
+        colors,
+      }));
       chart = (
         <PieComponent
           data={chartData}
-          width={minDim - 50}
-          height={minDim - 50}
+          // width={minDim}
+          // height={minDim}
+          width={plotWidth}
+          height={plotHeight}
           colors={colors}
         />
       );

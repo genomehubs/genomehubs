@@ -1,11 +1,33 @@
-export const matchAttributes = (
+// TODO: don't fetch raw value if not wanted
+export const matchAttributes = ({
   fields,
+  attr_summaries,
   lookupTypes,
   aggregation_source,
   searchRawValues,
-  name = "attributes"
-) => {
+  name = "attributes",
+}) => {
   if (fields.length == 0) return [];
+  let docValues = [];
+  for (let field of fields) {
+    let meta = lookupTypes(field);
+    if (!meta) {
+      continue;
+    }
+    for (let summary of attr_summaries[field] || ["default"]) {
+      let value;
+      if (summary == "default") {
+        value = `attributes.${meta.processed_summary}`;
+      } else if (summary == "value") {
+        value = `attributes.${meta.type}_value`;
+      } else {
+        value = `attributes.${summary}`;
+      }
+      value = value.replace(/keyword_value$/, "keyword_value.raw");
+      docValues.push(value);
+    }
+  }
+  docValues = [...new Set(docValues)];
   return [
     {
       bool: {
@@ -74,41 +96,29 @@ export const matchAttributes = (
                       "attributes.aggregation_source",
                       "attributes.aggregation_rank",
                       "attributes.aggregation_taxon_id",
-                      "attributes.keyword_value.raw",
-                      "attributes.date_value",
-                      "attributes.geo_point_value",
-                      "attributes.long_value",
-                      "attributes.integer_value",
-                      "attributes.short_value",
-                      "attributes.byte_value",
-                      "attributes.double_value",
-                      "attributes.float_value",
-                      "attributes.half_float_value",
-                      "attributes.1dp_value",
-                      "attributes.2dp_value",
-                      "attributes.3dp_value",
-                      "attributes.4dp_value",
-                    ].concat(
-                      searchRawValues
-                        ? [
-                            "attributes.keyword_value.raw",
-                            "attributes.date_value",
-                            "attributes.geo_point_value",
-                            "attributes.long_value",
-                            "attributes.integer_value",
-                            "attributes.short_value",
-                            "attributes.byte_value",
-                            "attributes.double_value",
-                            "attributes.float_value",
-                            "attributes.half_float_value",
-                            "attributes.1dp_value",
-                            "attributes.2dp_value",
-                            "attributes.3dp_value",
-                            "attributes.4dp_value",
-                            "attributes.values.source",
-                          ]
-                        : []
-                    ),
+                    ]
+                      .concat(docValues)
+                      .concat(
+                        searchRawValues
+                          ? [
+                              "attributes.keyword_value.raw",
+                              "attributes.date_value",
+                              "attributes.geo_point_value",
+                              "attributes.long_value",
+                              "attributes.integer_value",
+                              "attributes.short_value",
+                              "attributes.byte_value",
+                              "attributes.double_value",
+                              "attributes.float_value",
+                              "attributes.half_float_value",
+                              "attributes.1dp_value",
+                              "attributes.2dp_value",
+                              "attributes.3dp_value",
+                              "attributes.4dp_value",
+                              "attributes.values.source",
+                            ]
+                          : []
+                      ),
                     size: 100,
                   },
                 },

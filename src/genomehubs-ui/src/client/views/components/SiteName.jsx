@@ -2,6 +2,7 @@ import { Link, useLocation } from "@reach/router";
 import React, { memo, useState } from "react";
 
 import LaunchIcon from "@material-ui/icons/Launch";
+import Logo from "./Logo";
 import MenuItem from "@material-ui/core/MenuItem";
 import Popover from "@material-ui/core/Popover";
 import Typography from "@material-ui/core/Typography";
@@ -17,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SiteName = ({ siteName, basename, archive }) => {
+const SiteName = ({ siteName, basename, archive, logo }) => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
   const location = useLocation();
@@ -35,6 +36,11 @@ const SiteName = ({ siteName, basename, archive }) => {
 
   let content = (
     <Link className={styles.siteName} to={`${basename}/`}>
+      {logo && (
+        <div className={styles.siteLogo}>
+          <Logo />
+        </div>
+      )}
       {siteName}
     </Link>
   );

@@ -74,7 +74,12 @@ export const histogramAgg = async ({
     calendar_interval = duration(max - min);
   } else {
     histKey = "histogram";
-    ({ scale, min, max, count } = meta.bins || {});
+    ({
+      scale = "linear",
+      min = bounds.stats.min,
+      max = bounds.stats.max,
+      // count = bounds.tickCount,
+    } = meta.bins || {});
     if (bounds) {
       if (!isNaN(bounds.domain[0])) {
         scale = bounds.scale;
@@ -89,7 +94,12 @@ export const histogramAgg = async ({
       count = bounds.tickCount - 1;
     }
     if (count) {
-      interval = (max - min) / count;
+      if (scale.startsWith("log")) {
+        interval = (max - min) / count;
+        max += interval;
+      } else {
+        interval = (max - min) / count;
+      }
     }
     offset = min;
   }

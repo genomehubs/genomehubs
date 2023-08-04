@@ -12,7 +12,7 @@ export const setScale = ({ field, lookupTypes, opts }) => {
   if (meta && meta.bins && meta.bins.scale) {
     return meta.bins.scale.toLowerCase();
   }
-  if (meta && meta.type == "keyword") {
+  if (meta && meta.type && !meta.return_type && meta.type == "keyword") {
     return "ordinal";
   }
   return "linear";

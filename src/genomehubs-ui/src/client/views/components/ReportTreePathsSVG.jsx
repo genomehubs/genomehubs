@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "@reach/router";
 // import Grid from "@material-ui/core/Grid";
 // import ReactDOM from "react-dom";
 // import SVGDownloadButton from "./SVGDownloadButton";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 // import VariableFilter from "./VariableFilter";
 import classnames from "classnames";
 import { compose } from "recompose";
@@ -236,6 +236,7 @@ const ReportTreePaths = ({
                   y={segment.yStart}
                   textAnchor={segment.tip ? "start" : "end"}
                   alignmentBaseline={segment.tip ? "middle" : "bottom"}
+                  dominantBaseline={segment.tip ? "alphabetic" : "bottom"}
                   transform={`translate(${segment.tip ? 10 : -6}, ${
                     segment.tip ? 0 : -2
                   })`}
@@ -302,6 +303,7 @@ const ReportTreePaths = ({
             xlinkHref={`#${label.taxon_id}-label-path`}
             startOffset="50%"
             alignmentBaseline="central"
+            dominantBaseline="alphabetic"
           >
             {label.scientific_name}
           </textPath>

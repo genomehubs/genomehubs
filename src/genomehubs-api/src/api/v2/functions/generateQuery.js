@@ -20,9 +20,9 @@ const validateValue = (term, value, meta, types) => {
   let type = meta.type;
   let attrEnum;
   if (types && types(meta.attribute)) {
-    if (!type || type == "value") {
-      type = types(meta.attribute).type;
-    }
+    // if (!type || type == "value") {
+    type = types(meta.attribute).type;
+    // }
   }
   if (meta.attribute == "taxonomy") {
     if (["tax_name", "tax_rank", "tax_eq", "tax_lineage"]) {
@@ -66,7 +66,7 @@ const validateValue = (term, value, meta, types) => {
         }
       }
       continue;
-    } else if (type == "date") {
+    } else if (meta.type == "date" || type == "date") {
       if (!isDate(v.replace(/^!/, ""))) {
         if (summaries.includes(type)) {
           return fail(`invalid date value for ${type} in ${term}`);
@@ -180,10 +180,15 @@ const validateTerm = (term, types) => {
       }
       return {
         parts,
-        validation: validateValue(term, parts[2], {
-          attribute: "taxonomy",
-          type: parts[0],
-        }),
+        validation: validateValue(
+          term,
+          parts[2],
+          {
+            attribute: "taxonomy",
+            type: parts[0],
+          },
+          types
+        ),
       };
     }
     if (parts[1] == "collate") {

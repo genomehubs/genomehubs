@@ -4,6 +4,7 @@ file:
   name: <<accession>>.<<lineage>>.full_table.tsv.gz
   needs:
     - ATTR_busco.types.yaml
+    - ATTR_ancestral_unit.types.yaml
     - <<accession>>.window_stats.types.yaml
   source: BlobToolKit
   source_url: https://blobtoolkit.genomehubs.org/view/dataset/<<blobtoolkit_id>>
@@ -64,6 +65,5 @@ attributes:
     header: score
   analysis_name:
     default: BUSCO_<<lineage>>
-  # ancestral_unit:
-  #   index: 0
-  # include merian/nigon translation
+  ancestral_unit:
+    header: buscoId

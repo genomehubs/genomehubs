@@ -7,6 +7,7 @@ import Badge from "@material-ui/core/Badge";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import Checkbox from "@material-ui/core/Checkbox";
+import Citation from "./Citation";
 import DownloadButton from "./DownloadButton";
 import Grid from "@material-ui/core/Grid";
 import Grow from "@material-ui/core/Grow";
@@ -26,7 +27,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchRecord from "../hocs/dispatchRecord";
@@ -61,8 +62,9 @@ const StyledBadge = withStyles((theme) => ({
 
 export const useStyles = makeStyles((theme) => ({
   root: {
-    maxWidth: "100%",
+    maxWidth: "calc( 100% - 0.5em )",
     marginBottom: "1em",
+    marginLeft: "0.5em",
     minWidth: 750,
   },
   table: {
@@ -338,6 +340,7 @@ const SortableCell = ({
 };
 
 const ResultTable = ({
+  types,
   displayTypes,
   fetchSearchResults,
   saveSearchResults,
@@ -363,12 +366,24 @@ const ResultTable = ({
           name,
         }))
         .filter((obj) => obj.name != "none");
+      for (let obj of expandedTypes) {
+        let [name, summary] = obj.name.split(":");
+        let defaultValue = (types[name] || { processed_simple: "value" })
+          .processed_simple;
+        if (["direct", "descendant", "ancestor"].includes(summary)) {
+          summary = defaultValue;
+        }
+        obj.summary = summary || defaultValue;
+      }
     } else {
       expandedTypes = displayTypes;
+      for (let obj of expandedTypes) {
+        obj.summary = "value";
+      }
     }
   }
 
-  if (searchResults && searchResults.status.error) {
+  if (searchResults && searchResults.status && searchResults.status.error) {
     return <ReportError report={"search"} error={searchResults.status.error} />;
   } else if (
     !searchResults.status ||
@@ -609,7 +624,7 @@ const ResultTable = ({
         result.result.fields.hasOwnProperty(type.name)
       ) {
         let field = result.result.fields[type.name];
-        let value = field.value;
+        let value = field[type.summary];
         let entries = [];
         if (Array.isArray(value)) {
           value = formatter(value, searchIndex, "array");
@@ -631,7 +646,11 @@ const ResultTable = ({
         } else {
           value = formatter(value, searchIndex);
         }
-        if (Array.isArray(field.value) && field.length > entries.length) {
+        if (
+          type.summary == "value" &&
+          Array.isArray(field.value) &&
+          field.length > entries.length
+        ) {
           // let list = entries.join(", ");
           // list = `${list}, ... (${field.length - entries.length} more)`;
           let badgeContent = `+${field.length - entries.length}`;
@@ -639,7 +658,11 @@ const ResultTable = ({
             // <Tooltip title={list} placement="top" arrow>
             <span>
               {value}
-              <StyledBadge badgeContent={badgeContent} color={"default"}>
+              <StyledBadge
+                badgeContent={badgeContent}
+                color={"default"}
+                max={100000}
+              >
                 <span style={{ padding: "0 6px", color: "rgba(0,0,0,0" }}>
                   {badgeContent}
                 </span>
@@ -812,6 +835,12 @@ const ResultTable = ({
   }
   heads.push(<TableCell key={"last"}></TableCell>);
 
+  let citationMessage;
+  if (rows.length > 0) {
+    citationMessage = (
+      <Citation resultCount={rows.length} searchTerm={searchTerm} />
+    );
+  }
   return (
     <Grid
       container
@@ -873,6 +902,7 @@ const ResultTable = ({
           rootRef={rootRef}
         />
       </Grid>
+      {citationMessage}
       {/* </Grid> */}
     </Grid>
   );

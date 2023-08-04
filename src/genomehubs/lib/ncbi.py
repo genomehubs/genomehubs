@@ -208,50 +208,67 @@ def metricDates(obj):
             and scaffold_n50 > 10000000
             and assembly_level in ["Chromosome", "Complete Genome"]
         ):
-            obj["ebpMetricDate"] = obj["submissionDate"]
+            obj["ebpMetricDate"] = obj["releaseDate"]
+
+
+def get_biosample_attributes(biosample):
+    """Extract attributes from a biosample."""
+    obj = {}
+    attributes = biosample.get("attributes", [])
+    for entry in attributes:
+        try:
+            if entry["value"].lower().startswith("not "):
+                continue
+            obj[entry["name"]] = entry["value"]
+        except KeyError:
+            continue
+    return obj
 
 
 def parse_ncbi_datasets_record(record, parsed):
     """Parse a single NCBI datasets record."""
+    organism = record.get("organism", {})
     obj = {
-        key: record.get(key, "None")
-        for key in ("taxId", "organismName", "commonName", "isolate", "sex")
+        key: organism.get(key, "None")
+        for key in ("taxId", "organismName", "commonName")
     }
 
+    obj["genbankAssmAccession"] = record["accession"]
+    if "pairedAccession" in record:
+        if record["pairedAccession"].startswith("GCF_"):
+            obj["refseqAssmAccession"] = record["pairedAccession"]
+        else:
+            obj["refseqAssmAccession"] = record["accession"]
+            obj["genbankAssmAccession"] = record["pairedAccession"]
     assemblyInfo = record.get("assemblyInfo", {})
+    annotationInfo = record.get("annotationInfo", {})
     if assemblyInfo.get("atypical", False):
         return
     for key in (
-        "assemblyLevel",
-        "assemblyName",
-        "assemblyType",
-        "biosampleAccession",
-        "genbankAssmAccession",
-        "refseqAssmAccession",
-        "refseqCategory",
-        "submissionDate",
-        "submitter",
+        "assemblyLevel",  #
+        "assemblyName",  #
+        "assemblyType",  #
+        # "biosampleAccession",  # biosample.accession
+        # "pairedAccession",  # refseqAssmAccession
+        "refseqCategory",  #
+        "releaseDate",  # submissionDate
+        "submitter",  #
     ):
-        obj[key] = assemblyInfo.get(key, None)
-        if key == "refseqCategory":
-            obj["primaryValue"] = 1 if obj[key] == "representative genome" else None
-    if obj["refseqAssmAccession"] == "na":
-        obj["refseqAssmAccession"] = None
-        obj["refseqCategory"] = None
-        obj["primaryValue"] = None
-    if annotationInfo := record.get("annotationInfo", {}):
+        obj[key] = assemblyInfo.get(key, annotationInfo.get(key, "None"))
+    if "refseqAssmAccession" not in obj or obj["refseqAssmAccession"] == "na":
+        obj["refseqAssmAccession"] = "None"
+    elif obj["refseqCategory"] != "None":
+        obj["primaryValue"] = 1
+    if annotationInfo:
         annot = {
-            f"annotation{key.capitalize()}": annotationInfo.get(key, None)
-            for key in ("name", "releaseDate", "reportUrl", "source")
+            f"annotation{key.capitalize()}": annotationInfo.get(key, "None")
+            for key in ("name", "releaseDate", "reportUrl", "source")  # sourceDatabase
         }
 
         if annot and "stats" in annotationInfo:
-            geneCounts = annotationInfo["stats"].get("geneCounts", None)
+            geneCounts = annotationInfo["stats"].get("geneCounts", "None")
             for key in ("nonCoding", "proteinCoding", "pseudogene", "total"):
-                annot[f"geneCount{key.capitalize()}"] = geneCounts.get(key, None)
-            if obj["genbankAssmAccession"] in parsed:
-                parsed[obj["genbankAssmAccession"]].update(annot)
-                return
+                annot[f"geneCount{key.capitalize()}"] = geneCounts.get(key, "None")
             obj.update(annot)
     bioprojects = []
     for lineage in assemblyInfo.get("bioprojectLineage", []):
@@ -266,46 +283,51 @@ def parse_ncbi_datasets_record(record, parsed):
             for bioproject in assemblyInfo["biosample"]["bioprojects"]
         )
 
-    obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else None
+    obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else "None"
+    biosample = assemblyInfo.get("biosample", {})
+    obj["biosampleAccession"] = biosample.get("accession", "None")
+    biosampleAttributes = get_biosample_attributes(biosample)
+    for key in ("isolate", "sex"):
+        obj[key] = biosampleAttributes.get(key, "None")
     assemblyStats = record.get("assemblyStats", {})
     obj.update(assemblyStats)
     metricDates(obj)
     wgsInfo = record.get("wgsInfo", {})
     for key in ("masterWgsUrl", "wgsContigsUrl", "wgsProjectAccession"):
-        obj[key] = wgsInfo.get(key, None)
-    parsed[obj["genbankAssmAccession"]] = obj
+        obj[key] = wgsInfo.get(key, "None")
+    if obj.get("genbankAssmAccession", "None") in parsed:
+        for key, value in obj.items():
+            if value != "None":
+                parsed[obj["genbankAssmAccession"]][key] = value
+    elif obj["genbankAssmAccession"].startswith("GCA_"):
+        parsed[obj["genbankAssmAccession"]] = obj
 
 
 def parse_ncbi_datasets_sample(record, parsed):
     """Parse sample information from a single NCBI datasets record."""
     obj = {key: record.get(key, "None") for key in ("taxId", "isolate", "sex")}
+    obj["genbankAssmAccession"] = record["accession"]
+    if "pairedAccession" in record:
+        if record["pairedAccession"].startswith("GCF_"):
+            obj["refseqAssmAccession"] = record["pairedAccession"]
+        else:
+            obj["refseqAssmAccession"] = record["accession"]
+            obj["genbankAssmAccession"] = record["pairedAccession"]
     assemblyInfo = record.get("assemblyInfo", {})
+    annotationInfo = record.get("annotationInfo", {})
     if assemblyInfo.get("atypical", False):
         return
+
     for key in (
         "assemblyLevel",
-        "biosampleAccession",
-        "genbankAssmAccession",
-        "refseqAssmAccession",
         "refseqCategory",
         "submitter",
     ):
-        obj[key] = assemblyInfo.get(key, None)
-        if key == "refseqCategory":
-            obj["primaryValue"] = 1 if obj[key] == "representative genome" else None
-    attributes = {
-        entry["name"]: entry.get("value", None)
-        for entry in assemblyInfo.get("biosample", {}).get("attributes", [])
-    }
-    for key in ("estimated_size", "geo_loc_name", "num_replicons", "ploidy"):
-        obj[key] = attributes.get(key)
-    obj["latitude"] = degrees_to_decimal(
-        attributes.get("geographic location (latitude)")
-    )
-    obj["longitude"] = degrees_to_decimal(
-        attributes.get("geographic location (longitude)")
-    )
-    obj["elevation"] = attributes.get("geographic location (elevation)")
+        obj[key] = assemblyInfo.get(key, annotationInfo.get(key, "None"))
+    if "refseqAssmAccession" not in obj or obj["refseqAssmAccession"] == "na":
+        obj["refseqAssmAccession"] = "None"
+    elif obj["refseqCategory"] != "None":
+        obj["primaryValue"] = 1
     bioprojects = []
     for lineage in assemblyInfo.get("bioprojectLineage", []):
         if "bioprojects" in lineage:
@@ -319,7 +341,24 @@ def parse_ncbi_datasets_sample(record, parsed):
             for bioproject in assemblyInfo["biosample"]["bioprojects"]
         )
 
-    obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else None
+    obj["bioProjectAccession"] = ";".join(bioprojects) if bioprojects else "None"
+    biosample = assemblyInfo.get("biosample", {})
+    obj["biosampleAccession"] = biosample.get("accession", "None")
+    biosampleAttributes = get_biosample_attributes(biosample)
+
+    biosampleAttributes = {
+        entry["name"]: entry.get("value", "None")
+        for entry in biosample.get("attributes", [])
+    }
+    for key in ("estimated_size", "geo_loc_name", "num_replicons", "ploidy"):
+        obj[key] = biosampleAttributes.get(key)
+    obj["latitude"] = degrees_to_decimal(
+        biosampleAttributes.get("geographic location (latitude)")
+    )
+    obj["longitude"] = degrees_to_decimal(
+        biosampleAttributes.get("geographic location (longitude)")
+    )
+    obj["elevation"] = biosampleAttributes.get("geographic location (elevation)")
     parsed[obj["biosampleAccession"]] = obj
 
 

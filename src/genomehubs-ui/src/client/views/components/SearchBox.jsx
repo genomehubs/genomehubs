@@ -1,4 +1,5 @@
 import React, { memo, useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "@reach/router";
 
 import AutoCompleteInput from "./AutoCompleteInput";
 import FormControl from "@material-ui/core/FormControl";
@@ -8,14 +9,14 @@ import Popper from "@material-ui/core/Popper";
 import SearchIcon from "@material-ui/icons/Search";
 import SearchInputQueries from "./SearchInputQueries";
 import SearchToggles from "./SearchToggles";
-import Tooltip from "@material-ui/core/Tooltip";
+import Template from "./Template";
+import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
 import { getSuggestedTerm } from "../reducers/search";
 import { makeStyles } from "@material-ui/core/styles";
 import qs from "../functions/qs";
 import { siteName } from "../reducers/location";
-import { useNavigate } from "@reach/router";
 import { useReadLocalStorage } from "usehooks-ts";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
@@ -64,6 +65,8 @@ const SearchBox = ({
 }) => {
   const classes = useStyles();
   const navigate = useNavigate();
+  const location = useLocation();
+  let options = qs.parse(location.search.replace(/^\?/, ""));
   const formRef = useRef(null);
   const searchBoxRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -74,8 +77,30 @@ const SearchBox = ({
     }
     return false;
   });
-
   let [result, setResult] = useState(searchIndex);
+  const [showSearchBox, setShowSearchBox] = useState(false);
+
+  let toggleTemplate;
+  if (options && options.searchTemplate) {
+    // Show search template
+    let templateProps = {};
+    for (let [key, val] of Object.entries(options)) {
+      if (key.match(/value[A-Z]/)) {
+        templateProps[key] = val;
+      }
+    }
+    if (!showSearchBox) {
+      return (
+        <Template
+          id={options.searchTemplate}
+          {...options}
+          toggleFunction={() => setShowSearchBox(!showSearchBox)}
+        />
+      );
+    }
+    toggleTemplate = (e) => setShowSearchBox(!showSearchBox);
+  }
+
   let fields =
     searchTerm.fields ||
     savedOptions?.fields?.join(",") ||
@@ -245,10 +270,15 @@ const SearchBox = ({
           </Grid>
         </Grid>
       </form>
-      <Grid container direction="row" alignItems="center">
+      <Grid
+        container
+        direction="row"
+        alignItems="center"
+        // style={{ paddingBottom: "1em" }}
+      >
         <Grid item xs={2}></Grid>
         <Grid item xs={8}>
-          <SearchToggles />
+          <SearchToggles toggleTemplate={toggleTemplate} id="searchToggles" />
         </Grid>
         <Grid item xs={2}></Grid>
       </Grid>

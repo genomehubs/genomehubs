@@ -13,7 +13,7 @@ const setProcessedType = (meta) => {
     return "float";
   }
   if (["long", "integer", "short", "byte"].includes(meta.type)) {
-    return "float";
+    return "integer";
   }
   if (meta.type == "keyword") {
     if (meta.summary) {
@@ -33,6 +33,26 @@ const setProcessedType = (meta) => {
     return "keyword";
   }
   return meta.type;
+};
+
+const setProcessedSummary = (meta, typesMap) => {
+  let summary;
+  if (meta.default_summary) {
+    summary = meta.default_summary;
+  }
+  let simple = "value";
+  if (meta.return_type) {
+    simple = meta.return_type;
+  }
+  if (!summary) {
+    if (meta.type == "keyword") {
+      summary = "keyword_value.raw";
+    } else {
+      summary = `${meta.type}_value`;
+    }
+  }
+  typesMap[meta.group][meta.name].processed_summary = summary;
+  typesMap[meta.group][meta.name].processed_simple = simple;
 };
 
 const fetchTypes = async ({ result, taxonomy, hub, release, indexType }) => {
@@ -80,6 +100,7 @@ const fetchTypes = async ({ result, taxonomy, hub, release, indexType }) => {
       typesMap[hit._source.group][hit._source.name] = hit._source;
       typesMap[hit._source.group][hit._source.name].processed_type =
         setProcessedType(hit._source);
+      setProcessedSummary(hit._source, typesMap);
       if (hit._source.synonyms) {
         for (let synonym of hit._source.synonyms) {
           synonyms[hit._source.group][synonym] = hit._source.name;

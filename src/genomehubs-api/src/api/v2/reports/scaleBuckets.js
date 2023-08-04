@@ -2,7 +2,7 @@ import { fmt } from "./fmt";
 import { scales } from "./scales";
 
 export const scaleBuckets = (buckets, scaleType = "Linear", bounds) => {
-  if (scaleType == "date") {
+  if (scaleType == "date" || scaleType == "ordinal") {
     buckets = buckets.map((value) => value);
   } else if (scaleType.startsWith("log")) {
     let base = scaleType == "log2" ? 2 : scaleType == "log10" ? 10 : Math.E;

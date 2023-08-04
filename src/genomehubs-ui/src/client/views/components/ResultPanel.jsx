@@ -4,7 +4,7 @@ import AggregationIcon from "./AggregationIcon";
 import Grid from "@material-ui/core/Grid";
 import HistogramSVG from "./HistogramSVG";
 import React from "react";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import WordCloud from "./WordCloud";
 import classnames from "classnames";
 import { compose } from "recompose";
@@ -17,6 +17,88 @@ import withSiteName from "../hocs/withSiteName";
 import withSummary from "../hocs/withSummary";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
+
+const AttributeSummary = ({
+  field,
+  searchIndex,
+  basename,
+  summaryField,
+  handleFieldClick,
+}) => {
+  let length = 1;
+  let value = field.value;
+
+  if (Array.isArray(value)) {
+    if (value.length == 0) {
+      return null;
+    }
+    value = formatter(value, searchIndex, "array");
+    let charLimit = 20;
+    let entries = [];
+    for (let v of value.values) {
+      let entry = v[0];
+      if (charLimit == 20 || charLimit - entry.length > 0) {
+        entries.push(entry);
+        charLimit -= entry.length;
+      }
+    }
+    value = entries.join(",");
+    if (field.value.length > 1) {
+      length = field.value.length;
+      if (field.value.length > entries.length) {
+        value += ", ...";
+      }
+    }
+  } else {
+    value = formatter(value);
+  }
+  let highlight = [null, null];
+  if (location.pathname == basename + "/explore" && field.id == summaryField) {
+    highlight = [styles["fieldHighlight"], styles["fieldNameHighlight"]];
+  }
+  let details;
+  if (field.aggregation_method.endsWith("list") && length > 1) {
+    details = `${field.aggregation_method} (${length}), n=${field.count}`;
+  } else {
+    details = `${field.aggregation_method}, n=${field.count}`;
+  }
+  let summary = (
+    <Tooltip key={field.id} title={"Click to view summary plot"} arrow>
+      <Grid item>
+        <div
+          key={field.id}
+          className={classnames(styles.field, highlight[0])}
+          onClick={() => handleFieldClick(field.id)}
+          // style={{ minWidth: "150px" }}
+        >
+          <div className={classnames(styles.fieldName, highlight[1])}>
+            {field.id}
+          </div>
+          <div className={styles.fieldValue}>
+            <Grid
+              container
+              direction="row"
+              wrap="nowrap"
+              spacing={1}
+              alignItems={"center"}
+            >
+              <Grid item>
+                <AggregationIcon
+                  method={field.aggregation_source}
+                  hasDescendants={field.has_descendants}
+                />
+              </Grid>
+
+              <Grid item>{value}</Grid>
+            </Grid>
+          </div>
+          <div className={styles.fieldCount}>{details}</div>
+        </div>
+      </Grid>
+    </Tooltip>
+  );
+  return summary;
+};
 
 const ResultPanel = ({
   scientific_name,
@@ -67,84 +149,16 @@ const ResultPanel = ({
 
   if (fields) {
     fields.forEach((field) => {
-      let value = field.value;
-      if (typeof value === "undefined") {
+      if (typeof field.value === "undefined" || !field.aggregation_method) {
         return null;
       }
-      let length = 1;
-
-      if (Array.isArray(value)) {
-        if (value.length == 0) {
-          return null;
-        }
-        value = formatter(value, searchIndex, "array");
-        let charLimit = 20;
-        let entries = [];
-        for (let v of value.values) {
-          let entry = v[0];
-          if (charLimit == 20 || charLimit - entry.length > 0) {
-            entries.push(entry);
-            charLimit -= entry.length;
-          }
-        }
-        value = entries.join(",");
-        if (field.value.length > 1) {
-          length = field.value.length;
-          if (field.value.length > entries.length) {
-            value += ", ...";
-          }
-        }
-      } else {
-        value = formatter(value);
-      }
-      let highlight = [null, null];
-      if (
-        location.pathname == basename + "/explore" &&
-        field.id == summaryField
-      ) {
-        highlight = [styles["fieldHighlight"], styles["fieldNameHighlight"]];
-      }
-      let details;
-      if (field.aggregation_method.endsWith("list") && length > 1) {
-        details = `${field.aggregation_method} (${length}), n=${field.count}`;
-      } else {
-        details = `${field.aggregation_method}, n=${field.count}`;
-      }
-      let newDiv = (
-        <Tooltip key={field.id} title={"Click to view summary plot"} arrow>
-          <Grid item>
-            <div
-              key={field.id}
-              className={classnames(styles.field, highlight[0])}
-              onClick={() => handleFieldClick(field.id)}
-              // style={{ minWidth: "150px" }}
-            >
-              <div className={classnames(styles.fieldName, highlight[1])}>
-                {field.id}
-              </div>
-              <div className={styles.fieldValue}>
-                <Grid
-                  container
-                  direction="row"
-                  wrap="nowrap"
-                  spacing={1}
-                  alignItems={"center"}
-                >
-                  <Grid item>
-                    <AggregationIcon
-                      method={field.aggregation_source}
-                      hasDescendants={field.has_descendants}
-                    />
-                  </Grid>
-
-                  <Grid item>{value}</Grid>
-                </Grid>
-              </div>
-              <div className={styles.fieldCount}>{details}</div>
-            </div>
-          </Grid>
-        </Tooltip>
-      );
+      let newDiv = AttributeSummary({
+        field,
+        searchIndex,
+        basename,
+        summaryField,
+        handleFieldClick,
+      });
       if (types[field.id] && types[field.id].traverse) {
         let group = types[field.id].display_group;
         if (!groupedDivs.hasOwnProperty(group)) {

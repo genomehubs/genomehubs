@@ -46,6 +46,19 @@ const brewerPalette = [
   "rgb(202,178,214)",
 ];
 
+const pridePalette = [
+  "#E50000",
+  "#FF8D00",
+  "#FFEE00",
+  "#028121",
+  "#004CFF",
+  "#770088",
+  "#000000",
+  "#613915",
+  "#73D7EE",
+  "#FFAFC7",
+];
+
 export const palettes = handleActions(
   {
     ADD_PALETTE: (state, action) =>
@@ -68,24 +81,25 @@ export const palettes = handleActions(
   },
   {
     byId: {
+      accent: createD3Palette(schemeAccent, 8),
       batlowS: createPalette(batlowS),
       batlow: createPalette(batlow, 50),
+      category: createD3Palette(schemeCategory10, 10),
       cividis: createD3Palette(interpolateCividis, 50),
-      cubeHelix: createD3Palette(interpolateCubehelixDefault, 50),
       cool: createD3Palette(interpolateCool, 50),
-      warm: createD3Palette(interpolateWarm, 50),
-      plasma: createD3Palette(interpolatePlasma, 50),
-      magma: createD3Palette(interpolateMagma, 50),
+      cubeHelix: createD3Palette(interpolateCubehelixDefault, 50),
+      dark: createD3Palette(schemeDark2, 8),
+      default: createD3Palette(interpolateViridis, 50),
       inferno: createD3Palette(interpolateInferno, 50),
+      magma: createD3Palette(interpolateMagma, 50),
+      paired: createD3Palette(schemePaired, 12),
+      plasma: createD3Palette(interpolatePlasma, 50),
+      pride: { id: "pride", default: pridePalette, levels: [] },
+      standard: { id: "default", default: brewerPalette, levels: [] },
+      tableau: createD3Palette(schemeTableau10, 10),
       turbo: createD3Palette(interpolateTurbo, 50),
       viridis: createD3Palette(interpolateViridis, 50),
-      standard: { id: "default", default: brewerPalette, levels: [] },
-      paired: createD3Palette(schemePaired, 12),
-      category: createD3Palette(schemeCategory10, 10),
-      dark: createD3Palette(schemeDark2, 8),
-      accent: createD3Palette(schemeAccent, 8),
-      tableau: createD3Palette(schemeTableau10, 10),
-      default: createD3Palette(interpolateViridis, 50),
+      warm: createD3Palette(interpolateWarm, 50),
     },
     allIds: ["default", "batlow", "batlowS", "cividis", "paired", "viridis"],
   }

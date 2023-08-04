@@ -10,6 +10,7 @@ import { client } from "../functions/connection";
 import { combineQueries } from "../functions/combineQueries";
 import { formatJson } from "../functions/formatJson";
 import { getResultCount } from "../functions/getResultCount";
+import { getResults } from "../functions/getResults";
 import { histogram } from "../reports/histogram";
 import { indexName } from "../functions/indexName";
 import { logError } from "../functions/logger";
@@ -17,6 +18,7 @@ import { map } from "../reports/map";
 import { oxford } from "../reports/oxford";
 import qs from "qs";
 import { queryParams } from "../reports/queryParams";
+import { setExclusions } from "../functions/setExclusions";
 import { setRanks } from "../functions/setRanks";
 import { tree } from "../reports/tree";
 
@@ -562,9 +564,9 @@ export const xPerRank = async ({
   };
 };
 
-export const getRawSources = async (params) => {
+export const getRawSources = async ({ params, query }) => {
   let index = indexName({ ...params });
-  const query = await aggregateRawValueSources({});
+  query = await aggregateRawValueSources({ query });
   const { body } = await client
     .search(
       {
@@ -585,59 +587,70 @@ export const getRawSources = async (params) => {
   return { status, fields };
 };
 
-export const getSources = async (params) => {
+export const getSources = async (params, query, queryFields) => {
   const { typesMap } = await attrTypes({
     result: params.result,
     indexType: "attributes",
     taxonomy: params.taxonomy,
   });
-  const binned = await getRawSources(params);
+  const binned = await getRawSources({
+    params,
+    ...(query && { query: query.query || query.x }),
+  });
   let counts = {};
   let fields = {};
   let urls = {};
   let dates = {};
   if (binned.status.success) {
     binned.fields.buckets.forEach(({ key: field, summary }) => {
-      summary.terms.buckets.forEach(
-        ({ key: source, doc_count: count, minDate, maxDate, url: urlAgg }) => {
-          minDate = (minDate || {}).value_as_string;
-          maxDate = (maxDate || {}).value_as_string;
-          let dateRange;
-          let url;
-          if (minDate) {
-            dateRange = [minDate, maxDate];
-          }
-          let urlBuckets = urlAgg.buckets;
-          if (urlBuckets && urlBuckets.length > 0) {
-            url = urlBuckets[0].key;
-          }
-          if (!counts[source]) {
-            counts[source] = 0;
-          }
-          if (!fields[source]) {
-            fields[source] = [];
-          }
-          counts[source] += count;
-          fields[source].push(field);
-          if (dateRange) {
-            if (dates[source]) {
-              dates[source] = [
-                dateRange[0] < dates[source][0]
-                  ? dateRange[0]
-                  : dates[source][0],
-                dateRange[1] > dates[source][1]
-                  ? dateRange[1]
-                  : dates[source][1],
-              ];
-            } else {
-              dates[source] = dateRange;
+      if (!queryFields || queryFields.includes(field)) {
+        summary.terms.buckets.forEach(
+          ({
+            key: source,
+            doc_count: count,
+            minDate,
+            maxDate,
+            url: urlAgg,
+          }) => {
+            minDate = (minDate || {}).value_as_string;
+            maxDate = (maxDate || {}).value_as_string;
+            let dateRange;
+            let url;
+            if (minDate) {
+              dateRange = [minDate, maxDate];
+            }
+            let urlBuckets = urlAgg.buckets;
+            if (urlBuckets && urlBuckets.length > 0) {
+              url = urlBuckets[0].key;
+            }
+            if (!counts[source]) {
+              counts[source] = 0;
+            }
+            if (!fields[source]) {
+              fields[source] = [];
+            }
+            counts[source] += count;
+            fields[source].push(field);
+            if (dateRange) {
+              if (dates[source]) {
+                dates[source] = [
+                  dateRange[0] < dates[source][0]
+                    ? dateRange[0]
+                    : dates[source][0],
+                  dateRange[1] > dates[source][1]
+                    ? dateRange[1]
+                    : dates[source][1],
+                ];
+              } else {
+                dates[source] = dateRange;
+              }
+            }
+            if (url) {
+              urls[source] = url;
             }
           }
-          if (url) {
-            urls[source] = url;
-          }
-        }
-      );
+        );
+      }
     });
   }
   let sources = {};
@@ -848,16 +861,18 @@ export const getTypes = async (params) => {
     taxonomy: params.taxonomy,
   });
   let byGroup = {};
-  Object.keys(typesMap).forEach((key) => {
+  Object.entries(typesMap).forEach(([key, value]) => {
     let group = typesMap[key].display_group;
     if (!byGroup[group]) {
       byGroup[group] = [];
     }
-    byGroup[group].push(key);
+    byGroup[group].push({ key, ...value });
   });
   Object.values(byGroup).forEach((values) => {
-    values = values.sort((a, b) => a.localeCompare(b));
+    values = values.sort((a, b) => a.name.localeCompare(b.name));
   });
+  return { report: { types: byGroup } };
+
   // search ranks
   let index = indexName({ ...params });
   let query = await aggregateRanks({});
@@ -979,6 +994,40 @@ const tableToCSV = ({
   return `${csv}\n`;
 };
 
+export const getSearchSources = async (req, res) => {
+  let response = {};
+  let reqQuery = req.req.query;
+  // TODO: handle excude direct ;
+  reqQuery.query = reqQuery.x
+    .replaceAll(/(tax_name|tax_eq)/g, "tax_tree")
+    .split(/\s+AND\s+/i)
+    .filter((t) => !t.startsWith("tax_rank"))
+    .join(" AND ");
+  let excludeDirect;
+  ({ excludeDirect, ...req } = req);
+  let exclusions = setExclusions(req);
+  response = await getResults({ ...reqQuery, exclusions, req });
+  if (!response.status.success) {
+    return res.status(200).send({ status: response.status });
+  }
+  if (response.status.hits == 0) {
+    let query = await replaceSearchIds(reqQuery);
+    if (query != reqQuery.query) {
+      response = await getResults({ ...reqQuery, query, exclusions, size: 0 });
+      // response = await getResults({
+      //   ...req.query,
+      //   query,
+      //   exclusions,
+      //   sortBy,
+      //   req,
+      // });
+      // response.queryString = query;
+    }
+  }
+  let sources = await getSources(reqQuery, response.query, response.fields);
+  return sources;
+};
+
 export const getReport = async (req, res) => {
   let report;
   try {
@@ -1013,7 +1062,11 @@ export const getReport = async (req, res) => {
         break;
       }
       case "sources": {
-        reportFunc = getSources;
+        if (!req.query.x) {
+          reportFunc = getSources;
+        } else {
+          reportFunc = getSearchSources;
+        }
         break;
       }
       case "table": {

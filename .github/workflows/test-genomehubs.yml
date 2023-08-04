@@ -1,8 +1,5 @@
 name: test-genomehubs
 
-env:
-  CONDA: /home/ubuntu/miniconda3
-
 on: [push]
 
 jobs:
@@ -14,7 +11,9 @@ jobs:
         with:
           node-version: "16"
       - run: npm install -g pkg
-      - run: ./package-ui.sh
+      - run: |
+          sed -i '/"node16-macos-/d;s/"node16-linux-x64",/"node16-linux"/' src/packaged-ui/package.json
+          ./package-ui.sh
       - uses: actions/upload-artifact@v3
         with:
           path: ./dist/*
@@ -27,7 +26,9 @@ jobs:
         with:
           node-version: "16"
       - run: npm install -g pkg
-      - run: ./package-api.sh
+      - run: |
+          sed -i '/"node16-macos-/d;s/"node16-linux-x64",/"node16-linux"/' src/genomehubs-api/package.json
+          ./package-api.sh
       - uses: actions/upload-artifact@v3
         with:
           path: ./dist/*
@@ -36,13 +37,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install dependencies
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: "3.9"
+      - name: Pip install genomehubs
         run: |
-          python3 -m pip install --upgrade pip
+          $CONDA/bin/conda install pip
+          PATH=$CONDA/bin/:$PATH
+          pip install --upgrade pip
           pip install setuptools wheel twine
-      - name: Build and publish
-        run: |
           ./pip_install_latest.sh manylinux2014_x86_64
+          genomehubs -v
       - uses: actions/upload-artifact@v3
         with:
           path: ./dist/*
@@ -56,157 +63,26 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
-    services:
-      elasticsearch:
-        image: elasticsearch:8.7.0
-        options: -v es-data:/usr/share/elasticsearch/data
-        ports:
-          - 9200:9200
-        env:
-          discovery.type: single-node
-          xpack.security.enabled: false
-          action.destructive_requires_name: false
-          search.max_buckets: 16384
     steps:
       - uses: actions/checkout@v3
-      - name: Check health
-        run: |
-          curl -s "http://localhost:9200/_cat/health" && exit 0
-          sleep 10
-          curl -s "http://localhost:9200/_cat/health" && exit 0
-          sleep 10
-          curl -s "http://localhost:9200/_cat/health" && exit 0
-          sleep 10
-          curl -s "http://localhost:9200/_cat/health" && exit 0 || exit 1
       - name: Collect artifacts
         uses: actions/download-artifact@v3
         with:
           path: ./dist
-      - name: Setup conda
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: "3.8"
-      - name: Pip install genomehubs
+      - name: move wheel file
+        run: mv dist/artifact/*linux*.whl src/docker/test
+      - name: move api executable
+        run: mv dist/artifact/genomehubs-api src/docker/test/genomehubs-api-linux
+      - name: Build docker image
+        working-directory: ./src/docker/test
+        run: docker build . -t genomehubs
+      - name: Run test import
         run: |
-          which python
-          which pip
-          # export PATH=/home/ubuntu/miniconda3/envs/test87/bin:/home/ubuntu/.local/bin:$PATH
-          #pip install --upgrade pip
-          pip install dist/artifact/*linux*.whl
-          #pip install setuptools wheel twine
-          # ./pip_install_latest.sh manylinux2014_x86_64
-          genomehubs -v
-      - name: Run genomehubs init
-        run: |
-          which python
-          #export PATH=/home/ubuntu/miniconda3/envs/test87/bin:/home/ubuntu/.local/bin:$PATH
-          curl -X DELETE "http://localhost:9200/*--*"
-          genomehubs init \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxonomy-root 2759 \
-              --taxonomy-jsonl tests/integration_tests/ena-taxonomy.extra.jsonl \
-              --taxon-preload
-      - name: check indices
-        run: |
-          curl localhost:9200/_cat/indices
-      - name: Run genomehubs parse
-        run: |
-          genomehubs parse \
-              --ncbi-datasets-sample tests/integration_tests/data/assembly-data-sample/eukaryota \
-              --outfile tests/integration_tests/data/assembly-data-sample/ncbi_datasets.tsv
-      - name: Run genomehubs index
-        run: |
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --assembly-dir tests/integration_tests/data/assembly-data
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/lineages
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/ott3.3
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/tolids \
-              --taxon-lookup any \
-              --taxon-spellcheck
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/genomesize_karyotype \
-              --taxon-lookup any \
-              --taxon-spellcheck
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/regional_lists \
-              --taxon-lookup any \
-              --taxon-spellcheck
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/uk_legislation \
-              --taxon-lookup any \
-              --taxon-spellcheck
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --assembly-dir tests/integration_tests/data/btk
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/status_lists \
-              --taxon-lookup any \
-              --taxon-spellcheck
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --taxon-dir tests/integration_tests/data/assembly-data-taxon
-      - name: Run genomehubs fill
-        run: |
-          genomehubs fill \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --traverse-root 2759 \
-              --traverse-infer-both
-          curl localhost:9200/_refresh
-      - name: Index BTK files
-        run: |
-          genomehubs index \
-              --config-file tests/integration_tests/config/goat.yaml \
-              --taxonomy-source ncbi \
-              --file-metadata tests/integration_tests/data/btk/btk.files.yaml
-      - name: Check indices
-        run: |
-          curl -s "http://localhost:9200/_cat/indices"
-      - name: Start API
-        run: |
-          chmod 755 dist/artifact/genomehubs-api-linux
-          GH_RELEASE=2021.10.15 GH_HUBNAME=goat ./dist/artifact/genomehubs-api-linux &
-          sleep 5
-      - name: Run API tests
-        run: |
-          genomehubs test \
-              --base-url http://localhost:3000/api/v2 \
-              --json-test-dir tests/integration_tests/templates/api/json
-      # - name: Install UI test dependencies
-      #   run: |
-      #     sudo apt-get install -y chromium-browser
-      #     pip install -r tests/integration_tests/ui/requirements.txt
-      # - name: Start UI
-      #   run: |
-      #     chmod 755 dist/artifact/genomehubs-ui-linux
-      #     GH_CLIENT_PORT=8880 \
-      #     GH_SITENAME=test_instance \
-      #     GH_API_URL=http://localhost:3000/api/v2 \
-      #     ./dist/artifact/genomehubs-ui-linux &
-      #     sleep 5
-      # - name: Run UI tests
-      #   run: |
-      #     python run_ui_tests.py
+          curl -s "http://localhost:9200/_cat/health"
+          mkdir -p projects/genomehubs/goat-resources
+          docker run --rm --network=host \
+            -u $UID:$GROUPS \
+            -v `pwd`/projects/genomehubs/goat-resources:/projects/genomehubs/goat-resources \
+            -v `pwd`/tests:/genomehubs/tests \
+            genomehubs bash -c \
+              "tests/integration_tests/scripts/load_goat_test_data.sh"

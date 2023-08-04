@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 
 import Skeleton from "@material-ui/lab/Skeleton";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { formatter } from "../functions/formatter";
 import qs from "../functions/qs";
@@ -92,6 +92,7 @@ const HistogramSVG = ({
           fillOpacity={0.5}
           textAnchor="middle"
           alignmentBaseline="central"
+          dominantBaseline="alphabetic"
         >
           no data
         </text>
@@ -149,6 +150,7 @@ const HistogramSVG = ({
         fill={"white"}
         textAnchor="middle"
         alignmentBaseline="central"
+        dominantBaseline="alphabetic"
       >
         {formatter(bucket.count)}
       </text>

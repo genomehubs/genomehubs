@@ -32,7 +32,7 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
         except Exception:
             pass
         if attributes:
-            sequence = max(int(d['sequence']) for d in attributes.values()) + 1
+            sequence = max(int(d["sequence"]) for d in attributes.values()) + 1
         else:
             sequence = 0
         for key, entry in types["attributes"].items():
@@ -49,16 +49,16 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
                 entry["constraint"]["enum"] = [value.lower() for value in enum]
             translate = entry.get("translate", {})
             if translate:
-                entry["translate"] = {key.lower(): value for key, value in translate.items()}
+                entry["translate"] = {
+                    key.lower(): value for key, value in translate.items()
+                }
     names = None
     exclusions = None
     data = None
     if "file" in types:
         if "name" in types["file"]:
-            if (
-                "taxonomy" not in types
-                and "features" not in types
-                and "taxon_id" not in types["features"]
+            if "taxonomy" not in types and (
+                "features" not in types or "taxon_id" not in types["features"]
             ):
                 LOGGER.error("Types file contains no taxonomy information")
                 sys.exit(1)
@@ -69,7 +69,7 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
                 sys.exit(1)
         defaults = {"attributes": {}, "metadata": {}}
         if "defaults" in types:
-            for key, value in types["defaults"]:
+            for key, value in types["defaults"].items():
                 defaults[key] = value
         for key, value in types["file"].items():
             if key.startswith("display") or key.startswith("taxon"):
@@ -84,6 +84,8 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
             )
             if "exclusions" in types["file"]:
                 exclusions = process_names_file(
-                    types, Path(dir_path) / "exclusions" / types["file"]["name"], value_path=types["file"]["exclusions"]
+                    types,
+                    Path(dir_path) / "exclusions" / types["file"]["name"],
+                    value_path=types["file"]["exclusions"],
                 )
     return types, data, names, exclusions

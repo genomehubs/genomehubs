@@ -72,7 +72,7 @@ const getLCA = async ({
   let res = await getResults({
     ...params,
     taxonomy,
-    fields: [],
+    fields,
     query,
     exclusions,
     maxDepth: 100,
@@ -94,7 +94,7 @@ const getLCA = async ({
       res = await getResults({
         ...params,
         taxonomy,
-        fields: [],
+        fields,
         query: filtered.join(" AND "),
         exclusions,
         maxDepth: 100,
@@ -368,6 +368,7 @@ const getTree = async ({
   y,
   yParams,
   fields,
+  xFields,
   yFields,
   optionalFields,
   cat,
@@ -385,7 +386,13 @@ const getTree = async ({
   let exclusions;
   params.excludeUnclassified = true;
   exclusions = setExclusions(params);
-  let lca = await getLCA({ params: { ...params }, taxonomy, exclusions });
+  let lca = await getLCA({
+    params: { ...params },
+    fields,
+    taxonomy,
+    exclusions,
+  });
+  exclusions.missing = [...new Set(exclusions.missing.concat(xFields))];
   if (treeThreshold > -1 && lca.count > treeThreshold) {
     return {
       status: {
@@ -444,6 +451,9 @@ const getTree = async ({
     optionalFields,
     exclusions,
   };
+  if (!xQuery.query) {
+    xQuery.query = xQuery.x;
+  }
   if (queryId) {
     setProgress(queryId, { total: lca.count });
   }
@@ -544,6 +554,7 @@ export const tree = async ({
   } else {
     fields = [...new Set(xFields)];
   }
+  fields = [...new Set(fields.concat(searchFields))];
 
   let status;
   if (!x || !aInB(fields, Object.keys(typesMap))) {
@@ -641,6 +652,7 @@ export const tree = async ({
     : await getTree({
         params,
         fields,
+        xFields,
         optionalFields,
         catRank,
         summaries,

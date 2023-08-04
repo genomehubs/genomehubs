@@ -1,0 +1,288 @@
+defaults:
+  attributes:
+    display_group: general
+    organelle: nucleus
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    source: INSDC
+    taxon_display_group: assembly
+identifiers:
+  assembly_id:
+    constraint:
+      len: 32
+    type: keyword
+  genbank_accession:
+    constraint:
+      len: 32
+    type: keyword
+  refseq_accession:
+    constraint:
+      len: 32
+    type: keyword
+  wgs_accession:
+    constraint:
+      len: 16
+    type: keyword
+  assembly_name:
+    constraint:
+      len: 64
+    type: keyword
+attributes:
+  organelle:
+    constraint:
+      enum:
+        - nucleus
+        - mitochondrion
+        - chloroplast
+        - plastid
+        - apicoplast
+    default: nucleus
+    type: keyword
+  bioproject:
+    constraint:
+      len: 32
+    description: INSDC bioproject ID or assembly collection name
+    synonyms:
+      - bioproject_accession
+    type: keyword
+    value_metadata:
+      default:
+        description: Click to view BioProject record on ENA
+        link: https://www.ebi.ac.uk/ena/browser/view/{}
+      prjna533106:
+        description: "Earth Biogenome Project (click to view on ENA)"
+      prjna811786:
+        description: "Africa Biogenome Project (click to view on ENA)"
+      prjna555319:
+        description: "Ag100Pest (click to view on ENA)"
+      prjeb43743:
+        description: "Aquatic Symbiosis Genomics Project (click to view on ENA)"
+      prjna489245:
+        description: "Bat 1K (click to view on ENA)"
+      prjna545868:
+        description: "Bird 10K (click to view on ENA)"
+      prjna813333:
+        description: "Canada Biogenome Project (click to view on ENA)"
+      prjeb49670:
+        description: "Catalan Biogenome Project (click to view on ENA)"
+      prjna720569:
+        description: "California Conservation Genomics Project (click to view on ENA)"
+      prjeb40665:
+        description: "Darwin Tree of Life (click to view on ENA)"
+      prjna712951:
+        description: "ENDEMIXIT (click to view on ENA)"
+      prjeb61747:
+        description: "ERGA Biodiversity Genomics Europe (click to view on ENA)"
+      prjeb47820:
+        description: "ERGA Pilot (click to view on ENA)"
+      prjeb43510:
+        description: "European Reference Genome Atlas (click to view on ENA)"
+      prjna393850:
+        description: "EUROFISH (click to view on ENA)"
+      prjna649812:
+        description: "Global Invertebrate Genomics Alliance (click to view on ENA)"
+      prjna163993:
+        description: "i5K (click to view on ENA)"
+      prjna844590:
+        description: "Illinois EBP Pilot (click to view on ENA)"
+      prjna948806:
+        description: "Lilioid Monocots Core Group Genome Project (click to view on ENA)"
+      prjna706923:
+        description: "LOEWE Centre for Translational Biodiversity Genomics (click to view on ENA)"
+      prjna758215:
+        description: "MetaInvert (click to view on ENA)"
+      prjna707598:
+        description: "Squalomix (click to view on ENA)"
+      prjna489243:
+        description: "Vertebrate Genomes Project (click to view on ENA)"
+  biosample:
+    constraint:
+      len: 32
+    synonyms:
+      - biosample_accession
+    type: keyword
+    value_metadata:
+      default:
+        description: Click to view BioSample record on ENA
+        link: https://www.ebi.ac.uk/ena/browser/view/{}
+  gene_count:
+    display_group: annotation
+    display_level: 1
+    display_name: Gene count
+    constraint:
+      min: 1
+    type: integer
+    bins:
+      min: 0
+      max: 5
+      count: 10
+      scale: log10
+  protein_count:
+    display_group: annotation
+    display_level: 2
+    display_name: Protein count
+    constraint:
+      min: 1
+    type: integer
+  pseudogene_count:
+    display_group: annotation
+    display_level: 2
+    display_name: Pseudogene count
+    constraint:
+      min: 1
+    type: integer
+  noncoding_gene_count:
+    display_group: annotation
+    display_level: 2
+    display_name: Non-coding gene count
+    constraint:
+      min: 1
+    type: integer
+  sample_sex:
+    display_level: 2
+    display_name: Sample sex
+    type: keyword
+  isolate:
+    display_level: 2
+    display_name: Isolate
+    type: keyword
+  assembly_level:
+    display_level: 1
+    display_name: Assembly level
+    type: keyword
+    constraint:
+      enum:
+        - complete genome
+        - chromosome
+        - scaffold
+        - contig
+  assembly_type:
+    display_level: 2
+    display_name: Assembly type
+    type: keyword
+  assembly_span:
+    display_group: metrics
+    display_level: 1
+    display_name: Assembly span
+    constraint:
+      min: 1
+    type: long
+    units: bases
+    bins:
+      min: 6
+      max: 11
+      count: 10
+      scale: log10
+  ungapped_span:
+    display_group: metrics
+    display_level: 2
+    display_name: Ungapped span
+    constraint:
+      min: 1
+    type: long
+    units: bases
+  contig_n50:
+    display_group: metrics
+    display_level: 1
+    display_name: Contig N50
+    constraint:
+      min: 1
+    type: long
+    units: bases
+    bins:
+      min: 4
+      max: 9
+      count: 10
+      scale: log10
+  contig_l50:
+    display_group: metrics
+    display_level: 2
+    display_name: Contig L50
+    constraint:
+      min: 1
+    type: long
+    units: bases
+  scaffold_n50:
+    display_group: metrics
+    display_level: 1
+    display_name: Scaffold N50
+    constraint:
+      min: 1
+    type: long
+    units: bases
+    bins:
+      min: 4
+      max: 9
+      count: 10
+      scale: log10
+  scaffold_l50:
+    display_group: metrics
+    display_level: 2
+    display_name: Scaffold L50
+    constraint:
+      min: 1
+    type: long
+    units: bases
+  contig_count:
+    display_group: metrics
+    display_level: 1
+    display_name: Contig count
+    constraint:
+      min: 1
+    type: long
+    units: bases
+  scaffold_count:
+    display_group: metrics
+    display_level: 1
+    display_name: Scaffold count
+    constraint:
+      min: 1
+    type: long
+    units: bases
+  chromosome_count:
+    display_group: metrics
+    display_level: 1
+    display_name: Chromosome count
+    constraint:
+      min: 1
+    type: long
+    units: bases
+  sequence_count:
+    display_group: metrics
+    display_level: 2
+    display_name: Sequence count
+    constraint:
+      min: 1
+    type: long
+    units: bases
+  last_updated:
+    display_level: 2
+    display_name: Last updated
+    type: date
+  ebp_metric_date:
+    display_level: 2
+    display_name: EBP metric date
+    type: date
+  refseq_category:
+    display_level: 2
+    display_name: RefSeq category
+    type: keyword
+  submitter:
+    display_level: 2
+    display_name: Submitter
+    type: keyword
+  gc_percent:
+    display_group: metrics
+    display_level: 1
+    constraint:
+      min: 0
+      max: 100
+    type: 2dp
+    units: "%"
+  n_percent:
+    display_group: metrics
+    display_level: 2
+    constraint:
+      min: 0
+      max: 100
+    type: 2dp
+    units: "%"

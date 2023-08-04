@@ -1,0 +1,108 @@
+defaults:
+  attributes:
+    display_group: general
+    organelle: nucleus
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+    source: INSDC
+    taxon_display_group: sample
+identifiers:
+  sample_id:
+    constraint:
+      len: 32
+    type: keyword
+attributes:
+  sample_sex:
+    display_level: 2
+    display_name: Sample sex
+    type: keyword
+    taxon_display_group: sample
+    taxon_summary:
+      - primary
+      - list
+      - count
+    taxon_display_level: 2
+  isolate:
+    display_level: 2
+    display_name: Isolate
+    type: keyword
+  estimated_genome_size:
+    display_level: 2
+    display_name: Estimated genome size
+    type: keyword
+  location_name:
+    display_level: 2
+    display_name: Location name
+    type: keyword
+  num_replicons:
+    constraint:
+      max: 32767
+    display_level: 2
+    display_name: Number of replicons
+    type: short
+  ploidy:
+    display_level: 1
+    display_name: Ploidy
+    translate:
+      1n: 1
+      haoloid: 1
+      haoploid: 1
+      haploid: 1
+      haploidy: 1
+      heploid: 1
+      monokaryotic, haploid: 1
+      haploid/diploid: [1, 2]
+      haplo-diploidy: [1, 2]
+      "Male: haploid; female: diploid": [1, 2]
+      2n: 2
+      diploid: 2
+      diploidy: 2
+      dipolid: 2
+      diploid, occasionally higher: 2
+      diplod: 2
+      diplioid: 2
+      dipliod: 2
+      Haploid consensus of diploid genome: 2
+      Diploid (presumed): 2
+      protandrous diploid: 2
+      triploid: 3
+      allotetraploid: 4
+      allotetraploids: 4
+      protandrous tetraploid: 4
+      tetraploid: 4
+      hexaploid: 6
+      allopolyploid: NA
+      amphidiploid: NA
+      dikaryon: NA
+      dikaryotic: NA
+      polyploid macronucleus: NA
+      singal spore: NA
+      possible triploid: NA
+      polyploidy: NA
+      polyploid: NA
+      haploid /Dikaryon: NA
+      doubled haploid: NA
+      double ploidy level: NA
+      dikariotic (diploid): NA
+      Polyploid: NA
+      Dikaryon: NA
+      ">2n": NA
+      "0": NA
+    type: short
+  elevation:
+    constraint:
+      max: 8500
+    display_level: 2
+    display_name: Elevation
+    type: short
+    unit: "m"
+  sample_location:
+    h3res: 5
+    display_level: 1
+    display_name: location
+    type: geo_point
+    taxon_display_group: sample
+    taxon_summary:
+      - list
+    taxon_traverse: list
+    taxon_traverse_direction: up
+    taxon_display_level: 2

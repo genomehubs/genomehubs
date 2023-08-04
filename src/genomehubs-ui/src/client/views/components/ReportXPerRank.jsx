@@ -1,6 +1,7 @@
-import React, { Fragment } from "react";
+import React, { useEffect, useRef } from "react";
 
 import styles from "./Styles.scss";
+import useResize from "../hooks/useResize";
 
 const ranks = {
   superkingdom: { plural: "superkingdoms" },
@@ -14,12 +15,33 @@ const ranks = {
   subspecies: { plural: "subspecies" },
 };
 
-const ReportXPerRank = ({ perRank, minDim, setMinDim }) => {
+const ReportXPerRank = ({
+  perRank,
+  minDim,
+  setMinDim,
+  containerRef,
+  chartRef,
+}) => {
+  const componentRef = chartRef ? chartRef : useRef();
+  const { width } = containerRef
+    ? useResize(containerRef)
+    : useResize(componentRef);
   let values = [];
   let ranks = [];
   if (perRank && perRank.status) {
+    useEffect(() => {
+      let height = perRank.report.xPerRank.length * 27;
+      let ratio = 400 / height;
+      if (ratio != minDim / 400) {
+        if (width > 0) {
+          setMinDim(height);
+        }
+      }
+    }, [width]);
+    let maxValue = Math.max(0, ...perRank.report.xPerRank.map((o) => o.x));
+
     perRank.report.xPerRank.forEach((entry) => {
-      if (entry.x) {
+      if ((maxValue > 0 && entry.x) || true) {
         let plural =
           entry.x != 1 && ranks[entry.rank]
             ? ranks[entry.rank].plural
@@ -36,7 +58,7 @@ const ReportXPerRank = ({ perRank, minDim, setMinDim }) => {
     return null;
   }
   return (
-    <div style={{ textAlign: "center" }}>
+    <div style={{ textAlign: "center" }} ref={componentRef}>
       <div style={{ display: "inline-block", textAlign: "left" }}>{values}</div>
     </div>
   );

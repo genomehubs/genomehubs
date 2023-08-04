@@ -10,7 +10,9 @@ file:
   separator: ","
   source_url_stub: https://blobtoolkit.genomehubs.org
   source: BlobToolKit
+  summary: list
   type: keyword
+  default_summary: length
   taxon_summary: ordered_list
   taxon_traverse: ordered_list
   taxon_traverse_direction: up

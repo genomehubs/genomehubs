@@ -9,7 +9,7 @@ import styles from "./Styles.scss";
 const Tabs = () => {
   const [content, setContent] = useState(null);
 
-  let css = classnames(styles.tabHolder);
+  let css; // = classnames(styles.tabHolder);
   const components = {
     ul: (props) => {
       return <nav className={css}>{props.children}</nav>;

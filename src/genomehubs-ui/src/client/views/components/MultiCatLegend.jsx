@@ -1,7 +1,7 @@
 import { Rectangle, Text } from "recharts";
 
 import React from "react";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import formats from "../functions/formats";
 import stringLength from "../functions/stringLength";
 import styles from "./Styles.scss";
@@ -9,9 +9,11 @@ import styles from "./Styles.scss";
 export const processLegendData = ({
   bounds,
   yBounds,
-  minWidth = 50,
+  minWidth = 40,
+  labelPadding = 70,
   width,
   pointSize,
+  compactLegend,
 }) => {
   let translations = {};
   let catTranslations = {};
@@ -37,10 +39,10 @@ export const processLegendData = ({
     for (let i = 0; i < len; i++) {
       let cat = bounds.cats[i];
       let labelWidth = Math.max(
-        stringLength(cat.label) * pointSize * 1.2,
+        stringLength(cat.label) * pointSize + 1 * pointSize,
         minWidth
       );
-      if (labelWidth + catOffset < width - 10) {
+      if (labelWidth + catOffset < width - labelPadding) {
         catOffsets[cat.label] = { offset: 0, row };
         for (let prevCat of previousCats) {
           catOffsets[prevCat].offset += labelWidth;
@@ -52,7 +54,7 @@ export const processLegendData = ({
           row++;
         }
         catOffsets[cat.label] = { offset: 0, row };
-        if (labelWidth > width - 50) {
+        if (labelWidth > width - labelPadding) {
           catOffset = 0;
           row++;
         } else {
@@ -90,9 +92,9 @@ export const valueString = ({ stats, cellSize, pointSize, fill }) => {
       value = (
         <Text
           x={-5}
-          y={cellSize}
+          y={cellSize * 1.15}
           fill={"rgb(102, 102, 102)"}
-          dominantBaseline={"central"}
+          dominantBaseline={"alphabetic"}
           textAnchor={"end"}
           fontSize={pointSize}
         >
@@ -111,7 +113,7 @@ export const valueString = ({ stats, cellSize, pointSize, fill }) => {
           x={-5}
           y={cellSize}
           fill={"rgb(102, 102, 102)"}
-          dominantBaseline={"central"}
+          dominantBaseline={"alphabetic"}
           textAnchor={"end"}
           fontSize={pointSize}
         >
@@ -175,17 +177,20 @@ const MultiCatLegend = ({
   let strokeWidth = pointSize / 5;
   let bgRect;
   if (handleClick) {
+    let bgWidth = compactLegend
+      ? stringLength(name) * pointSize * 0.9 + cellSize
+      : legendWidth - cellSize / 2 + strokeWidth * 2;
     bgRect = (
       <Tooltip title={`Click to highlight ${name}`} arrow>
         <Rectangle
           className={styles.active}
           height={cellSize * (compactLegend ? 1 : 2) + strokeWidth * 2}
-          width={legendWidth - cellSize / 2 + strokeWidth * 2}
+          width={bgWidth}
           fill={"white"}
           stroke={fill || "rgb(102, 102, 102)"}
           strokeOpacity={active ? 0.5 : 0}
           strokeWidth={pointSize / 10}
-          x={cellSize - legendWidth - strokeWidth} // {props.cx + (w - width) / 2}
+          x={cellSize - bgWidth - strokeWidth} // {props.cx + (w - width) / 2}
           y={-cellSize / 2 - strokeWidth}
         />
       </Tooltip>
@@ -202,9 +207,9 @@ const MultiCatLegend = ({
       <g pointerEvents={handleClick ? "none" : "auto"}>
         <Text
           x={-5}
-          y={0}
+          y={cellSize / 4}
           fill={fill || "rgb(102, 102, 102)"}
-          dominantBaseline={"central"}
+          dominantBaseline={"alphabetic"}
           textAnchor={"end"}
           fontWeight={"bold"}
           fontSize={pointSize}

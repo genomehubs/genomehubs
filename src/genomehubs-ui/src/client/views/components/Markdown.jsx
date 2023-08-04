@@ -2,16 +2,20 @@ import React, { createElement, useEffect } from "react";
 import { basename, siteName } from "../reducers/location";
 
 import AggregationIcon from "./AggregationIcon";
+import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
 import Highlight from "./Highlight";
+import Logo from "./Logo";
 import NavLink from "./NavLink";
 import Report from "./Report";
 import Template from "./Template";
 import Toggle from "./Toggle";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
+import YAML from "js-yaml";
 import classnames from "classnames";
 import { compose } from "recompose";
 import gfm from "remark-gfm";
+import { gridPropNames } from "../functions/propNames";
 import { h } from "hastscript";
 import rehypeRaw from "rehype-raw";
 import rehypeReact from "rehype-react";
@@ -27,10 +31,12 @@ import { withStyles } from "@material-ui/core/styles";
 
 const pagesUrl = PAGES_URL;
 const webpackHash = COMMIT_HASH || __webpack_hash__;
-// const webpackHash = COMMIT_HASH;
 
-export const processProps = (props, newProps = {}) => {
+export const processProps = ({ props, newProps = {}, isGrid }) => {
   for (const [key, value] of Object.entries(props)) {
+    if (isGrid && !gridPropNames.has(key)) {
+      continue;
+    }
     if (value === false) {
       newProps[key] = value;
     } else if (value == "") {
@@ -59,60 +65,124 @@ export const processProps = (props, newProps = {}) => {
   return newProps;
 };
 
-export const RehypeComponentsList = {
-  a: (props) => <NavLink {...processProps(props)} />,
-  aggregation: (props) => <AggregationIcon method={props.method} />,
-  grid: (props) => {
-    let { toggle, expand, title, ...gridProps } = props;
-    if (toggle && toggle !== true && toggle !== "true") {
-      toggle = false;
-    }
-    if (props.hasOwnProperty("toggle")) {
+export const RehypeComponentsList = (extra) => {
+  return {
+    a: (props) => <NavLink {...processProps({ props })} />,
+    aggregation: (props) => <AggregationIcon method={props.method} />,
+    divider: (props) => (
+      <Divider
+        orientation={props.orientation || "vertical"}
+        flexItem
+        className={styles.divider}
+      />
+    ),
+    grid: (props) => {
+      let { toggle, expand, title, ...gridProps } = props;
+      if (toggle && toggle !== true && toggle !== "true") {
+        toggle = false;
+      }
+      if (props.hasOwnProperty("toggle")) {
+        return (
+          <Toggle {...processProps({ props: { toggle, expand, title } })}>
+            <Grid {...processProps({ props: gridProps, isGrid: true })} />
+          </Toggle>
+        );
+      } else {
+        return <Grid {...processProps({ props, isGrid: true })} />;
+      }
+    },
+    hub: (props) => <span {...processProps({ props })}>{siteName}</span>,
+    logo: (props) => {
+      let { lineColor, fillColor, ...gridProps } = props;
       return (
-        <Toggle {...processProps({ toggle, expand, title })}>
-          <Grid {...processProps(gridProps)} />
-        </Toggle>
+        <Grid {...processProps({ props: gridProps })}>
+          <div className={styles.fixedAr} style={{ background: fillColor }}>
+            <Logo {...{ lineColor, fillColor }} />
+          </div>
+        </Grid>
       );
-    } else {
-      return <Grid {...processProps(props)} />;
-    }
-  },
-  hub: (props) => <span {...processProps(props)}>{siteName}</span>,
-  img: (props) => (
-    <div className={styles.centerContent}>
-      <img {...processProps(props)} alt={props.alt.toString()} />
-    </div>
-  ),
-  include: (props) => {
-    let nested = <Nested pgId={props.pageId} />;
-    return (
-      <Grid {...processProps(props)} item className={styles.reportContainer}>
-        {nested}
-      </Grid>
-    );
-  },
-  item: (props) => (
-    <Grid {...processProps(props)} item className={styles.reportContainer} />
-  ),
-  markdown: (props) => <Nested pgId={props.pageId} />,
-  pre: (props) => <Highlight {...props} />,
-  report: (props) => (
-    <Report {...processProps(props)} className={styles.reportContainer} />
-  ),
-  span: (props) => <span {...processProps(props)} />,
-  templat: (props) => (
-    <Template {...processProps(props)} className={styles.reportContainer} />
-  ),
-  tooltip: (props) => {
-    return (
-      <Tooltip {...processProps(props, { placement: "top" })}>
-        <span>{props.children}</span>
-      </Tooltip>
-    );
-  },
+    },
+    img: (props) => (
+      <div className={styles.centerContent}>
+        <img {...processProps({ props })} alt={props.alt.toString()} />
+      </div>
+    ),
+    include: (props) => {
+      let nested = <Nested pgId={props.pageId} {...props} />;
+      let css = styles.reportContainer;
+      if (props.className) {
+        css = classnames(styles.reportContainer, styles[props.className]);
+      }
+
+      return (
+        <Grid {...processProps({ props, isGrid: true })} item className={css}>
+          {nested}
+        </Grid>
+      );
+    },
+    item: (props) => (
+      <Grid
+        {...processProps({ props, isGrid: true })}
+        item
+        className={styles.reportContainer}
+      />
+    ),
+    markdown: (props) => {
+      return (
+        <Nested
+          pgId={props.pageId}
+          {...processProps({ props: { ...props, ...extra } })}
+        />
+      );
+    },
+    pre: (props) => {
+      let className = props.children?.[0]?.props?.className;
+      if (className) {
+        let nestedProps = YAML.load(props.children[0].props.children[0] || "");
+        if (className == "language-report") {
+          return (
+            <Report
+              {...processProps({ props: nestedProps })}
+              className={styles.reportContainer}
+            />
+          );
+        } else if (className == "language-template") {
+          return (
+            <Grid {...processProps({ props: nestedProps, isGrid: true })} item>
+              <Template
+                {...processProps({ props: { ...nestedProps, ...extra } })}
+              />
+            </Grid>
+          );
+        }
+      }
+      return <Highlight {...processProps({ props })} />;
+    },
+    report: (props) => {
+      let css = styles.reportContainer;
+      if (props.className) {
+        css = classnames(styles.reportContainer, styles[props.className]);
+      }
+      return <Report {...processProps({ props })} className={css} />;
+    },
+    span: (props) => <span {...processProps({ props })} />,
+    templat: (props) => (
+      <Template
+        {...processProps({ props })}
+        className={styles.reportContainer}
+      />
+    ),
+    tooltip: (props) => {
+      return (
+        <Tooltip {...processProps({ props, newProps: { placement: "top" } })}>
+          <span>{props.children}</span>
+        </Tooltip>
+      );
+    },
+  };
 };
 
-export function compile(val, components = RehypeComponentsList) {
+export function compile(val, components = RehypeComponentsList()) {
   const processor = unified()
     .use(remarkParse)
     .use(remarkReact)
@@ -162,22 +232,25 @@ const Markdown = ({
   classes,
   pgId,
   pageId,
-  pages,
+  pagesById,
+  pagesIsFetching,
   fetchPages,
   siteStyles,
   components = {},
+  ...extra
 }) => {
   useEffect(() => {
-    if (pgId && !pages.byId[pgId]) {
-      fetchPages(pgId);
+    if (!pagesById && !pagesIsFetching) {
+      if (pgId) {
+        fetchPages(pgId);
+      } else if (pageId) {
+        fetchPages(pageId);
+      }
     }
-    if (pageId && !pages.byId[pgId]) {
-      fetchPages(pageId);
-    }
-  }, [pgId, pageId]);
+  }, [pgId, pageId, pagesIsFetching]);
 
-  const { contents, ast } = compile(pages.byId[pgId || pageId], {
-    ...RehypeComponentsList,
+  const { contents, ast } = compile(pagesById, {
+    ...RehypeComponentsList(extra),
     ...components,
   });
   let css;
@@ -189,6 +262,6 @@ const Markdown = ({
   return <div className={css}>{contents}</div>;
 };
 
-const Nested = compose(withPages, withStyles(styles))(Markdown);
+export const Nested = compose(withPages, withStyles(styles))(Markdown);
 
 export default compose(withPages, withStyles(styles))(Markdown);

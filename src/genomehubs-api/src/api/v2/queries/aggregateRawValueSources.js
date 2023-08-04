@@ -7,60 +7,51 @@ const termsAgg = async () => {
   };
 };
 
-export const aggregateRawValueSources = async ({}) => {
-  let terms = await termsAgg();
-  return {
-    size: 0,
-    query: {
-      match_all: {},
+export const rawValueSourceAggregation = () => ({
+  attributes: {
+    nested: {
+      path: "attributes",
     },
     aggs: {
-      attributes: {
-        nested: {
-          path: "attributes",
+      direct: {
+        filter: {
+          match: { ["attributes.aggregation_source"]: "direct" },
         },
         aggs: {
-          direct: {
-            filter: {
-              match: { ["attributes.aggregation_source"]: "direct" },
+          fields: {
+            terms: {
+              field: "attributes.key",
+              size: 200,
             },
-            aggs: {
-              fields: {
-                terms: {
-                  field: "attributes.key",
-                  size: 200,
-                },
 
+            aggs: {
+              summary: {
+                nested: {
+                  path: "attributes.values",
+                },
                 aggs: {
-                  summary: {
-                    nested: {
-                      path: "attributes.values",
+                  terms: {
+                    terms: {
+                      field: "attributes.values.source.raw",
+                      size: 200,
                     },
                     aggs: {
-                      terms: {
-                        terms: {
-                          field: "attributes.values.source.raw",
-                          size: 200,
+                      min_date: {
+                        min: {
+                          field: "attributes.values.source_date",
+                          format: "yyyy-MM-dd",
                         },
-                        aggs: {
-                          min_date: {
-                            min: {
-                              field: "attributes.values.source_date",
-                              format: "yyyy-MM-dd",
-                            },
-                          },
-                          max_date: {
-                            max: {
-                              field: "attributes.values.source_date",
-                              format: "yyyy-MM-dd",
-                            },
-                          },
-                          url: {
-                            terms: {
-                              field: "attributes.values.source_url",
-                              size: 1,
-                            },
-                          },
+                      },
+                      max_date: {
+                        max: {
+                          field: "attributes.values.source_date",
+                          format: "yyyy-MM-dd",
+                        },
+                      },
+                      url: {
+                        terms: {
+                          field: "attributes.values.source_url",
+                          size: 1,
                         },
                       },
                     },
@@ -72,5 +63,17 @@ export const aggregateRawValueSources = async ({}) => {
         },
       },
     },
+  },
+});
+
+export const aggregateRawValueSources = async ({
+  query = {
+    match_all: {},
+  },
+}) => {
+  return {
+    size: 0,
+    query,
+    aggs: rawValueSourceAggregation(),
   };
 };

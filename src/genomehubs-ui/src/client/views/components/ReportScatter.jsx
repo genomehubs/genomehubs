@@ -21,7 +21,7 @@ import CellInfo from "./CellInfo";
 import Grid from "@material-ui/core/Grid";
 import PointInfo from "./PointInfo";
 import ReportXAxisTick from "./ReportXAxisTick";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
 import { line as d3Line } from "d3-shape";
@@ -32,6 +32,7 @@ import { processLegendData } from "./MultiCatLegend";
 // import { point } from "leaflet";
 import qs from "../functions/qs";
 import { scaleLinear } from "d3-scale";
+import setColors from "../functions/setColors";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
@@ -506,6 +507,10 @@ const CustomizedYAxisTick = ({
   valueType,
   bounds,
   maxLabel,
+  showLabels,
+  marginRight,
+  marginWidth,
+  plotWidth,
 }) => {
   const {
     x,
@@ -520,61 +525,98 @@ const CustomizedYAxisTick = ({
   let value = payload.value;
   let offset = 0;
   let h = height / (buckets.length - 1);
+  let centered;
+  let ttValue;
   if (yLabels[index] != payload.value) {
     value = yLabels[index] || "";
     if (valueType == "coordinate") {
       let yScale = scaleLinear().domain(bounds.domain).range([0, height]);
       h = yScale(buckets[index + 1]) - yScale(buckets[index]);
     }
+    ttValue = value;
     offset = h / 2;
+    centered = true;
   } else {
+    if (index > 0) {
+      ttValue = `${fmt(yLabels[index - 1])}-${fmt(yLabels[index])}`;
+    }
     value = fmt(value);
   }
   let text;
   let rect;
   let ori;
   let oriWidth = 2;
-  if (h >= pointSize * 0.8) {
-    text = (
-      <text
-        x={0}
-        y={0}
-        textAnchor="end"
-        alignmentBaseline={"middle"}
-        dominantBaseline={"middle"}
-        fill={fill}
-        fontSize={pointSize}
-        // fontWeight={orientation && orientation[index] < 0 ? "bold" : "normal"}
-        // transform={"rotate(-90)"}
-      >
-        {translations[value] || value}
-      </text>
-    );
-  } else {
-    text = (
-      <line
-        x1={0}
-        y1={0}
-        x2={-maxLabel * 0.8}
-        y2={0}
-        stroke={"rgb(125,125,125)"}
-        strokeDasharray={pointSize / 5}
-        strokeWidth={pointSize / 10}
-      />
-    );
+  let textValue = translations[value] || value;
+  ttValue = translations[ttValue] || ttValue;
+  if (showLabels) {
+    if (h >= pointSize * 0.8) {
+      text = (
+        <text
+          x={0}
+          y={0}
+          textAnchor="end"
+          alignmentBaseline={"middle"}
+          dominantBaseline={"alphabetic"}
+          fill={fill}
+          fontSize={pointSize}
+          // fontWeight={orientation && orientation[index] < 0 ? "bold" : "normal"}
+          // transform={"rotate(-90)"}
+        >
+          {textValue}
+        </text>
+      );
+    } else {
+      text = (
+        <line
+          x1={0}
+          y1={0}
+          x2={-maxLabel * 0.8}
+          y2={0}
+          stroke={"rgb(125,125,125)"}
+          strokeDasharray={pointSize / 5}
+          strokeWidth={pointSize / 10}
+        />
+      );
+      rect = (
+        <Tooltip title={textValue} arrow placement="right">
+          <Rectangle
+            className={styles.active}
+            x={-maxLabel}
+            y={-offset}
+            height={h}
+            width={maxLabel}
+            stroke={"none"}
+            fill={"rgb(125,125,125)"}
+            fillOpacity={0}
+          />
+        </Tooltip>
+      );
+    }
+  } else if (ttValue) {
     rect = (
-      <Tooltip title={translations[value] || value} arrow placement="right">
+      <g>
+        <Tooltip title={ttValue} arrow placement="right">
+          <Rectangle
+            className={styles.active}
+            x={-pointSize}
+            y={centered ? -offset : 0}
+            height={h}
+            width={plotWidth - marginWidth - marginRight - 110 + pointSize}
+            stroke={"none"}
+            fill={"rgb(200,200,200)"}
+            fillOpacity={0}
+          />
+        </Tooltip>
         <Rectangle
-          className={styles.active}
-          x={-maxLabel}
-          y={-offset}
+          x={10}
+          y={centered ? -offset : 0}
           height={h}
-          width={maxLabel}
+          width={plotWidth - marginWidth - marginRight - 120}
           stroke={"none"}
-          fill={"rgb(125,125,125)"}
+          fill={"rgb(255,255,255)"}
           fillOpacity={0}
         />
-      </Tooltip>
+      </g>
     );
   }
   if (
@@ -682,6 +724,8 @@ const Heatmap = ({
           valueType: chartProps.valueType,
           bounds: chartProps.bounds,
           maxLabel: chartProps.maxXlabel,
+          showLabels: chartProps.showLabels,
+          marginTop,
         })
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
@@ -698,6 +742,7 @@ const Heatmap = ({
         fill="#666"
         fontSize={chartProps.pointSize}
         fontWeight="bold"
+        pointerEvents={"none"}
       />
     </XAxis>,
     <YAxis
@@ -718,7 +763,10 @@ const Heatmap = ({
           valueType: chartProps.yValueType,
           bounds: chartProps.yBounds,
           maxLabel: chartProps.maxYLabel,
-          width,
+          showLabels: chartProps.showLabels,
+          plotWidth: width,
+          marginWidth,
+          marginRight,
         })
       }
       domain={yDomain}
@@ -737,6 +785,7 @@ const Heatmap = ({
         style={{ textAnchor: "middle" }}
         fontSize={chartProps.pointSize}
         fontWeight="bold"
+        pointerEvents={"none"}
       />
     </YAxis>,
     <YAxis
@@ -761,7 +810,9 @@ const Heatmap = ({
           valueType: chartProps.yValueType,
           bounds: chartProps.yBounds,
           maxLabel: chartProps.maxYLabel,
-          width,
+          plotWidth: width,
+          marginWidth,
+          marginRight,
         })
       }
       domain={yDomain}
@@ -839,7 +890,7 @@ const Heatmap = ({
         top: marginTop,
         right: marginRight,
         left: marginWidth,
-        bottom: width > 300 ? marginHeight : 5,
+        bottom: marginHeight,
       }}
     >
       {axes}
@@ -925,6 +976,9 @@ const ReportScatter = ({
   report,
   containerRef,
   embedded,
+  inModal,
+  compactLegend,
+  compactWidth = 400,
   ratio,
   zScale = "linear",
   setMessage,
@@ -932,6 +986,8 @@ const ReportScatter = ({
   reportTerm,
   colors,
   levels,
+  colorPalette,
+  palettes,
   minDim,
   setMinDim,
   xOpts,
@@ -954,6 +1010,37 @@ const ReportScatter = ({
       setMessage(null);
     }
   }, [scatter]);
+
+  const setDimensions = ({ width, height, timer }) => {
+    let plotWidth = width;
+    let plotHeight = inModal ? height : plotWidth / ratio;
+
+    if (timer && plotHeight != height) {
+      dimensionTimer = setTimeout(() => {
+        minDim = Math.min(plotWidth, plotHeight);
+        setMinDim(minDim);
+      }, 50);
+    }
+    return {
+      plotWidth,
+      plotHeight,
+      dimensionTimer,
+    };
+  };
+
+  let dimensionTimer;
+  let { plotWidth, plotHeight } = setDimensions({ width, height });
+
+  useEffect(() => {
+    ({ plotWidth, plotHeight, dimensionTimer } = setDimensions({
+      width,
+      height,
+      timer: true,
+    }));
+    return () => {
+      clearTimeout(dimensionTimer);
+    };
+  }, [width]);
 
   let locations = {};
   if (scatter && scatter.status) {
@@ -1018,7 +1105,10 @@ const ReportScatter = ({
       valueType,
       interval
     );
-    let compactLegend = typeof embedded === "undefined";
+    compactLegend =
+      typeof compactLegend !== "undefined"
+        ? compactLegend
+        : typeof embedded === "undefined" || plotWidth < compactWidth;
 
     const {
       translations,
@@ -1030,27 +1120,42 @@ const ReportScatter = ({
       bounds,
       yBounds,
       minWidth: compactLegend ? 50 : 10 * pointSize,
-      width,
+      width: plotWidth,
       pointSize,
+      compactLegend,
     });
-    if (cats && cats.length > 1 && levels[cats.length]) {
-      colors = levels[cats.length];
-    }
+    ({ levels, colors } = setColors({
+      colorPalette,
+      palettes,
+      levels,
+      count: cats.length,
+      colors,
+    }));
     const xFormat = (value) => formats(value, valueType, interval);
     const yFormat = (value) => formats(value, yValueType, yInterval);
 
     let labels = bounds.labels || heatmaps.buckets;
     let yLabels = yBounds.labels || heatmaps.yBuckets;
-    const maxYLabel = maxStringLength(yLabels, yFormat, pointSize);
-    const marginWidth =
-      maxYLabel + pointSize > 40 ? maxYLabel + pointSize - 40 : 0;
-    const maxXLabel = maxStringLength(labels, xFormat, pointSize);
-    let marginHeight = 2 * pointSize;
-    const marginRight = (stringLength(xFormat(endLabel)) * pointSize) / 2;
+    let showLabels = plotWidth >= compactWidth;
+    const maxYLabel = showLabels
+      ? maxStringLength(yLabels, yFormat, pointSize)
+      : 0;
+    const marginWidth = showLabels
+      ? maxYLabel + pointSize > 40
+        ? maxYLabel + pointSize - 40
+        : 0
+      : pointSize - 35;
+    const maxXLabel = showLabels
+      ? maxStringLength(labels, xFormat, pointSize)
+      : 0;
+    let marginHeight = showLabels ? 2 * pointSize : pointSize - 15;
+    const marginRight = showLabels
+      ? (stringLength(xFormat(endLabel)) * pointSize) / 2
+      : 0;
     let orientation = 0;
     if (
       maxXLabel >
-      (width - marginWidth - marginRight) / heatmaps.buckets.length
+      (plotWidth - marginWidth - marginRight) / heatmaps.buckets.length
     ) {
       orientation = -90;
       marginHeight =
@@ -1060,8 +1165,8 @@ const ReportScatter = ({
       <Heatmap
         data={chartData}
         pointData={1 ? pointData : []}
-        width={width}
-        height={minDim - 50}
+        width={plotWidth}
+        height={plotHeight}
         marginWidth={marginWidth}
         marginHeight={marginHeight}
         marginRight={marginRight}
@@ -1122,6 +1227,7 @@ const ReportScatter = ({
           yBuckets: heatmaps.yBuckets,
           labels,
           yLabels,
+          showLabels,
           valueType,
           yValueType,
           summary,

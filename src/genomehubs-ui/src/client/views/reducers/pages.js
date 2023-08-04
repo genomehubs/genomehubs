@@ -38,6 +38,7 @@ const pages = handleActions(
 );
 
 export const getPages = (state) => state.pages;
+export const getPagesIsFetching = (state) => state.pages.isFetching;
 
 export const pageReducers = {
   pages,

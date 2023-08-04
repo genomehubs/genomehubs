@@ -37,7 +37,8 @@ const ReportLoading = ({
       xs
       style={{
         height: "100%",
-        minWidth: minDim * ratio,
+        width: "100%",
+        // minWidth: minDim * ratio,
         minHeight: minDim,
         position: "relative",
       }}
@@ -49,6 +50,7 @@ const ReportLoading = ({
           top: 0,
           left: 0,
           right: 0,
+          bottom: 0,
           margin: "0 auto",
         }}
       >
@@ -61,8 +63,8 @@ const ReportLoading = ({
           position: "absolute",
           top: 0,
           left: 0,
-          height: "100%",
-          width: "100%",
+          right: 0,
+          bottom: 0,
         }}
       >
         {content}

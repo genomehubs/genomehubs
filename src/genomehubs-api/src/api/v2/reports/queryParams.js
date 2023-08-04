@@ -1,4 +1,5 @@
 import { attrTypes } from "../functions/attrTypes";
+import { summaries } from "../functions/summaries";
 
 export const queryParams = async ({
   term,
@@ -30,15 +31,22 @@ export const queryParams = async ({
     term.split(/\s+(?:and|AND)\s+/).forEach((subterm) => {
       if (!subterm.match("tax_")) {
         let field = subterm.replace(/[^\w_\(\)-].+$/, "").toLowerCase();
-        let summary = "value";
+        let fieldMeta = lookupTypes(field);
+        let summary = fieldMeta ? fieldMeta.return_type || "value" : "value";
         if (field.match(/\(/)) {
           [summary, field] = field.split(/[\(\)]/);
+          if (summary != "collate") {
+            fieldMeta = lookupTypes(field);
+          }
         }
-        let fieldMeta = lookupTypes(field);
-        field = fieldMeta.name;
-        params.excludeMissing.push(field);
-        fields.push(field);
-        summaries.push(summary);
+        if (fieldMeta) {
+          field = fieldMeta.name;
+          params.excludeMissing.push(field);
+          fields.push(field);
+          if (summary != "collate") {
+            summaries.push(summary);
+          }
+        }
       }
     });
   } else {
@@ -49,6 +57,10 @@ export const queryParams = async ({
   }
   let fieldList = new Set();
   for (let field of fields) {
+    let [summary, attr] = field.split(/[\(\)]/);
+    if (attr && summaries.includes(summary)) {
+      field = attr;
+    }
     let meta = lookupTypes(field);
     if (meta) {
       fieldList.add(meta.name);

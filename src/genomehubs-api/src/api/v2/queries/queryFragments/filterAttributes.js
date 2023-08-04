@@ -24,6 +24,23 @@ const generateSubsetFn = (flt) => {
   return subsetFn;
 };
 
+const wildcard_match = (field, value) => {
+  if (value.indexOf("*") != -1) {
+    return {
+      wildcard: {
+        [field]: {
+          value,
+          boost: 1.0,
+          rewrite: "constant_score",
+        },
+      },
+    };
+  }
+  return {
+    match: { [field]: value },
+  };
+};
+
 export const filterAttributes = (
   filters,
   lookupTypes,
@@ -90,13 +107,9 @@ export const filterAttributes = (
                 for (let option of term.split(",")) {
                   if (option.startsWith("!")) {
                     option = option.replace("!", "");
-                    exclude.push({
-                      match: { [`attributes.${stat}`]: option },
-                    });
+                    exclude.push(wildcard_match(`attributes.${stat}`, option));
                   } else {
-                    include.push({
-                      match: { [`attributes.${stat}`]: option },
-                    });
+                    include.push(wildcard_match(`attributes.${stat}`, option));
                   }
                 }
 

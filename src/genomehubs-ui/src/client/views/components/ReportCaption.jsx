@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import Grid from "@material-ui/core/Grid";
+import Tooltip from "./Tooltip";
 import stringLength from "../functions/stringLength";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 
-const ReportCaption = ({ caption, embedded }) => {
+const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
   const gridRef = useRef();
   const { width, height } = useResize(gridRef);
-  const [captionScale, setCaptionScale] = useState();
+  const [captionScale, setCaptionScale] = useState(100);
 
-  const formatCaption = (caption) => {
+  const formatCaption = ({ caption, tooltip }) => {
     if (caption && caption !== true) {
       let captionArr = [];
       let parts = (caption || "").split("**");
@@ -19,7 +20,7 @@ const ReportCaption = ({ caption, embedded }) => {
           captionArr.push(<span key={i}>{parts[i]}</span>);
         } else {
           captionArr.push(
-            <b key={i} style={{ color: "black" }}>
+            <b key={i} style={{ color: tooltip ? "yellow" : "black" }}>
               {parts[i]}
             </b>
           );
@@ -29,8 +30,6 @@ const ReportCaption = ({ caption, embedded }) => {
     }
     return;
   };
-
-  let formattedCaption = formatCaption(caption);
 
   let captionLength = stringLength(caption) * 10;
 
@@ -42,18 +41,46 @@ const ReportCaption = ({ caption, embedded }) => {
     }
   }, [width]);
 
+  const countRows = (arr) =>
+    Math.floor(
+      Math.ceil(
+        (stringLength(arr.join(" ")) * 8 * captionScale) / 100 / width
+      ) * 1.5
+    );
+  let displayCaption;
+  if (!inModal) {
+    let captionArr = caption.split(" ");
+    while (captionArr.length > 1 && countRows(captionArr) > 2) {
+      captionArr.pop();
+    }
+    displayCaption = captionArr.join(" ");
+    if (displayCaption.length < caption.length - 3) {
+      displayCaption += "...";
+      displayCaption = (
+        <Tooltip title={formatCaption({ caption, tooltip: true })} arrow>
+          {formatCaption({ caption: displayCaption })}
+        </Tooltip>
+      );
+    } else {
+      displayCaption = formatCaption({ caption: displayCaption });
+    }
+  } else {
+    displayCaption = formatCaption({ caption });
+  }
+
   return (
     <Grid ref={gridRef} item xs style={{ textAlign: "center" }}>
       <div
         className={styles.reportCaption}
         style={{
+          pointerEvents: "auto",
           ...(captionScale && {
             fontSize: `${captionScale}%`,
-            marginTop: "1em",
+            marginTop: inModal ? "1em" : padding ? `${padding}px` : 0,
           }),
         }}
       >
-        {formattedCaption}
+        {displayCaption}
       </div>
     </Grid>
   );

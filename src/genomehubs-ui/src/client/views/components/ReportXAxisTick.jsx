@@ -1,6 +1,8 @@
 import React from "react";
+import { Rectangle } from "recharts";
+import Tooltip from "./Tooltip";
 import { scaleLinear } from "d3-scale";
-
+import styles from "./Styles.scss";
 export const ReportXAxisTick = ({
   props,
   buckets,
@@ -13,7 +15,8 @@ export const ReportXAxisTick = ({
   labels,
   valueType,
   bounds,
-  maxLabel,
+  showLabels,
+  marginTop,
 }) => {
   let { x, y, fill, index, width, payload } = props;
   let value = payload.value;
@@ -51,13 +54,22 @@ export const ReportXAxisTick = ({
       />
     );
   }
+  let centered;
+  let ttValue;
   if (labels && labels[index] != payload.value) {
     value = labels[index] || "";
     offset += bucketWidth / 2;
+    centered = true;
+    ttValue = value;
   } else if (buckets[index] != payload.value) {
     value = buckets[index] || "";
     offset += bucketWidth / 2;
+    centered = true;
+    ttValue = value;
   } else {
+    if (index < buckets.length - 1) {
+      ttValue = `${fmt(buckets[index])}-${fmt(buckets[index + 1])}`;
+    }
     value = fmt(value);
     if (!orientation) {
       if (index % 2 == 1 && value.length * pointSize * 0.6 > bucketWidth) {
@@ -69,41 +81,73 @@ export const ReportXAxisTick = ({
     }
   }
   let text;
-  if (orientation == 0) {
-    text = (
-      <text
-        x={0}
-        y={0}
-        dy={5}
-        textAnchor="middle"
-        dominantBaseline={"hanging"}
-        fill={fill}
-        fontSize={pointSize}
-      >
-        {translations[value] || value}
-      </text>
-    );
-  } else {
-    text = (
-      <text
-        x={0}
-        y={0}
-        dy={5}
-        textAnchor="end"
-        dominantBaseline={"middle"}
-        alignmentBaseline={"alphabetic"}
-        fill={fill}
-        fontSize={pointSize}
-        transform={`rotate(${orientation})`}
-      >
-        {translations[value] || value}
-      </text>
+  let rect;
+  let textValue = translations[value] || value;
+  ttValue = translations[ttValue] || ttValue;
+  if (showLabels) {
+    if (orientation == 0) {
+      text = (
+        <text
+          x={0}
+          y={0}
+          dy={5}
+          textAnchor="middle"
+          dominantBaseline={"hanging"}
+          fill={fill}
+          fontSize={pointSize}
+        >
+          {textValue}
+        </text>
+      );
+    } else {
+      text = (
+        <text
+          x={0}
+          y={0}
+          dy={5}
+          textAnchor="end"
+          dominantBaseline={"alphabetic"}
+          alignmentBaseline={"middle"}
+          fill={fill}
+          fontSize={pointSize}
+          transform={`rotate(${orientation})`}
+        >
+          {textValue}
+        </text>
+      );
+    }
+  } else if (ttValue) {
+    rect = (
+      <g>
+        <Tooltip title={ttValue} arrow placement="top">
+          <Rectangle
+            className={styles.active}
+            x={centered ? 0 - bucketWidth / 2 : 0}
+            y={marginTop - yPos}
+            height={yPos + pointSize - marginTop}
+            width={bucketWidth}
+            stroke={"none"}
+            fill={"rgb(200,200,200)"}
+            fillOpacity={0}
+          />
+        </Tooltip>
+        <Rectangle
+          x={centered ? 0 - bucketWidth / 2 : 0}
+          y={marginTop - yPos}
+          height={yPos - 10 - marginTop}
+          width={bucketWidth}
+          stroke={"none"}
+          fill={"rgb(255,255,255)"}
+          fillOpacity={0}
+        />
+      </g>
     );
   }
   return (
     <g transform={`translate(${x + offset},${yPos})`}>
       {text}
       {tickLine}
+      {rect}
     </g>
   );
 };

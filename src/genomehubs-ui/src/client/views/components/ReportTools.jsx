@@ -15,7 +15,7 @@ import ReportSelect from "./ReportSelect";
 import SearchIcon from "@material-ui/icons/Search";
 import SelectIcon from "@material-ui/icons/SelectAll";
 import TocIcon from "@material-ui/icons/Toc";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { useStyles } from "./ReportModal";
 import withReportTerm from "../hocs/withReportTerm";

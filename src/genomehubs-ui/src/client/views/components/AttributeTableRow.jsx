@@ -17,7 +17,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "./Tooltip";
 import Typography from "@material-ui/core/Typography";
 import ZoomControl from "./ZoomControl";
 import classnames from "classnames";
@@ -235,7 +235,7 @@ const ValueCell = ({
   if (meta.from && meta.to && meta.to > meta.from) {
     range = ` (${formatter(meta.from)} to ${formatter(meta.to)})`;
   }
-  let obj = formatter(meta.value, currentResult, "array");
+  let obj = formatter(meta.value, currentResult, "array", 100000);
   let valueMeta = types[attributeId]?.value_metadata;
   let defaultDesc, defaultLink;
   if (valueMeta) {

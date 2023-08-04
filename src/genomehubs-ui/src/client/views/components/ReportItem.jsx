@@ -13,11 +13,14 @@ import ReportScatter from "./ReportScatter";
 import ReportSources from "./ReportSources";
 import ReportTable from "./ReportTable";
 import ReportTree from "./ReportTree";
+import ReportTypes from "./ReportTypes";
 import ReportXPerRank from "./ReportXPerRank";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
 import dispatchReport from "../hocs/dispatchReport";
+import { gridPropNames } from "../functions/propNames";
 import qs from "../functions/qs";
+import stringLength from "../functions/stringLength";
 import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
@@ -30,6 +33,26 @@ const headings = {
   histogram: "Tap bins to search",
   oxford: "Tap bins to search",
   scatter: "Tap bins to search",
+};
+
+const reportIsEmpty = (name, report) => {
+  switch (name) {
+    case "arc":
+      if (
+        (Array.isArray(report) && report.length == 0) ||
+        (report.x == 0 && report.y == 0)
+      ) {
+        return true;
+      }
+      return false;
+    case "tree":
+      if (report.x == 0 || Object.keys(report.tree.treeNodes).length == 0) {
+        return true;
+      }
+      return false;
+    default:
+      return report.x == 0;
+  }
 };
 
 const ReportItem = ({
@@ -57,6 +80,8 @@ const ReportItem = ({
   reversed,
   xOpts,
   yOpts,
+  compactLegend,
+  compactWidth,
   highlightArea,
   mapThreshold,
   scatterThreshold,
@@ -72,6 +97,7 @@ const ReportItem = ({
   includeEstimates,
   includeDescendants,
   collapseMonotypic,
+  colorPalette,
   excludeMissing,
   excludeAncestral,
   excludeDirect,
@@ -83,8 +109,17 @@ const ReportItem = ({
   setReportTerm,
   siteName,
   basename,
-  ...gridProps
+  ...props
 }) => {
+  let reportProps = [];
+  let gridProps = [];
+  for (let [key, value] of Object.entries(props)) {
+    if (gridPropNames.has(key)) {
+      gridProps[key] = value;
+    } else {
+      reportProps[key] = value;
+    }
+  }
   queryString = qs.stringify({
     xOpts,
     yOpts,
@@ -163,6 +198,17 @@ const ReportItem = ({
     }
   }, [status]);
   let component, error, loading;
+  let fixedRatio;
+  if (!inModal || typeof ratio === "string") {
+    fixedRatio = ratio;
+  }
+
+  let setDimensions = ({ width, height }) => ({
+    plotWidth: width,
+    plotHeight: height,
+  });
+
+  let captionPadding = 0;
   if (!reportById || Object.keys(reportById).length == 0) {
     loading = true;
   } else if (
@@ -174,21 +220,32 @@ const ReportItem = ({
       setTimeout(() => setReportEdit(true), 500);
     }
     error = reportById.report[report].status.error;
-    component = <ReportError report={report} error={error} />;
+    component = (
+      <ReportError
+        report={report}
+        error={error}
+        minDim={minDim}
+        ratio={ratio}
+        inModal={inModal}
+      />
+    );
     // message = {
     //   message: `Failed to fetch ${report} report`,
     //   duration: 5000,
     //   severity: "error",
     // };
-  } else if (reportById.report[report] && reportById.report[report].x == 0) {
-    component = <ReportEmpty report={report} />;
+  } else if (
+    reportById.report[report] &&
+    reportIsEmpty(report, reportById.report[report])
+  ) {
+    component = <ReportEmpty report={report} inModal={inModal} />;
     // message = {
     //   message: `No ${report} data to display`,
     //   duration: 5000,
     //   severity: "warning",
     // };
   } else if (!reportById.report[report]) {
-    component = <ReportEmpty report={report} />;
+    component = <ReportEmpty report={report} inModal={inModal} />;
     // message = {
     //   message: `No ${report} data to display`,
     //   duration: 5000,
@@ -197,13 +254,28 @@ const ReportItem = ({
   } else {
     switch (report) {
       case "arc":
+        if (reportById.report && Array.isArray(reportById.report.arc)) {
+          // if (fixedRatio && fixedRatio == 1) {
+          // if (minDim > 300) {
+          if (inModal) {
+          } else {
+            fixedRatio = 2;
+            captionPadding = 3 * pointSize;
+          }
+          // } else if (minDim > 200) {
+          //   fixedRatio = 1.25;
+          // }
+          // }
+        }
         component = (
           <ReportArc
             arc={reportById}
             chartRef={chartRef}
             embedded={embedded}
+            inModal={inModal}
             containerRef={targetRef}
-            ratio={ratio}
+            colorPalette={colorPalette}
+            ratio={fixedRatio || ratio}
             pointSize={pointSize}
             minDim={minDim}
             setMinDim={setMinDim}
@@ -217,10 +289,14 @@ const ReportItem = ({
             chartRef={chartRef}
             containerRef={containerRef}
             ratio={ratio}
+            colorPalette={colorPalette}
             embedded={embedded}
+            inModal={inModal}
             stacked={stacked}
             cumulative={cumulative}
             xOpts={xOpts}
+            compactLegend={compactLegend}
+            compactWidth={compactWidth}
             includeEstimates={includeEstimates}
             pointSize={pointSize}
             // yScale={yScale}
@@ -237,6 +313,7 @@ const ReportItem = ({
             chartRef={chartRef}
             containerRef={containerRef}
             ratio={ratio}
+            colorPalette={colorPalette}
             embedded={embedded}
             includeEstimates={includeEstimates}
             {...qs.parse(queryString)}
@@ -254,8 +331,11 @@ const ReportItem = ({
             containerRef={containerRef}
             embedded={embedded}
             ratio={ratio}
+            colorPalette={colorPalette}
             xOpts={xOpts}
             yOpts={yOpts}
+            compactLegend={compactLegend}
+            compactWidth={compactWidth}
             highlightArea={highlightArea}
             stacked={stacked}
             pointSize={pointSize}
@@ -275,9 +355,13 @@ const ReportItem = ({
             chartRef={chartRef}
             containerRef={containerRef}
             embedded={embedded}
+            inModal={inModal}
+            colorPalette={colorPalette}
             ratio={ratio}
             xOpts={xOpts}
             yOpts={yOpts}
+            compactLegend={compactLegend}
+            compactWidth={compactWidth}
             highlightArea={highlightArea}
             stacked={stacked}
             pointSize={pointSize}
@@ -310,19 +394,23 @@ const ReportItem = ({
         );
         break;
       case "sources":
+        fixedRatio = undefined;
         component = (
           <ReportSources
             sources={reportById.report.sources}
             chartRef={chartRef}
             embedded={embedded}
-            containerRef={containerRef}
+            // containerRef={containerRef}
             minDim={minDim}
             setMinDim={setMinDim}
+            inModal={inModal}
+            containerRef={targetRef}
           />
         );
         break;
       case "tree":
         if (!permaLink) {
+          // fixedRatio *= 1.1;
           permaLink = (queryString, toggle) => {
             let path = "report";
             // TODO: include taxonomy
@@ -335,8 +423,10 @@ const ReportItem = ({
             topLevel={topLevel}
             permaLink={permaLink}
             embedded={embedded}
+            inModal={inModal}
             ratio={ratio}
             tree={reportById}
+            colorPalette={colorPalette}
             chartRef={chartRef}
             containerRef={containerRef}
             reportRef={reportRef}
@@ -356,14 +446,33 @@ const ReportItem = ({
           />
         );
         break;
+      case "types":
+        component = (
+          <ReportTypes
+            types={reportById.report.types}
+            chartRef={chartRef}
+            embedded={embedded}
+            containerRef={containerRef}
+            minDim={minDim}
+            setMinDim={setMinDim}
+          />
+        );
+        break;
       case "xPerRank":
+        if (fixedRatio && fixedRatio == 1) {
+          fixedRatio = 1.5;
+          if (reportById.report && Array.isArray(reportById.report.xPerRank));
+          fixedRatio = 100;
+
+          captionPadding = reportById.report.xPerRank.length * 27;
+        }
         component = (
           <ReportXPerRank
             perRank={reportById}
             chartRef={chartRef}
             embedded={embedded}
             containerRef={containerRef}
-            ratio={ratio}
+            ratio={fixedRatio || ratio}
             minDim={minDim}
             setMinDim={setMinDim}
           />
@@ -373,6 +482,35 @@ const ReportItem = ({
         break;
     }
   }
+
+  setDimensions = ({ width, height, inModal }) => {
+    if (inModal) {
+      if (fixedRatio) {
+        if (height > width / fixedRatio) {
+          let plotHeight = width / fixedRatio;
+          return {
+            plotWidth: width,
+            plotHeight: width / fixedRatio,
+          };
+        } else {
+          let plotWidth = height * fixedRatio;
+          return {
+            plotWidth,
+            plotHeight: height,
+          };
+        }
+      }
+    }
+    if (fixedRatio) {
+      let plotHeight = width / fixedRatio;
+      return {
+        plotWidth: width,
+        plotHeight,
+      };
+    } else {
+      return { plotWidth: width, plotHeight: height };
+    }
+  };
 
   if (!embedded) {
     heading = heading || headings[report];
@@ -389,24 +527,55 @@ const ReportItem = ({
   } else {
     caption = reportById?.report?.caption;
   }
-
   let content = (
     <Grid
       container
       direction="column"
       spacing={1}
-      style={{ flexGrow: "1", width: "100%" }}
+      style={{
+        flexGrow: "1",
+        width: "100%",
+        // background: "rgba(240,240,240,0.5)",
+      }}
     >
       {!loading && !error && heading && (inModal || topLevel) && (
         <Grid item xs>
           <span className={styles.reportHeading}>{heading}</span>
         </Grid>
       )}
-      <Grid item xs style={{ width: "100%" }}>
-        {component}
+      <Grid
+        item
+        xs
+        style={{
+          width: "100%",
+          // background: "rgba(240,240,240,0.5)",
+          position: "relative",
+          ...(fixedRatio && {
+            paddingTop: `${(1 / fixedRatio) * 100}%`,
+          }),
+        }}
+      >
+        <div
+          style={{
+            ...(fixedRatio && {
+              position: "absolute",
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+            }),
+          }}
+        >
+          {component}
+        </div>
       </Grid>
       {!loading && !error && caption && (
-        <ReportCaption caption={caption} embedded={embedded} />
+        <ReportCaption
+          caption={caption}
+          embedded={embedded}
+          inModal={inModal}
+          padding={captionPadding}
+        />
       )}
     </Grid>
   );
@@ -434,8 +603,18 @@ const ReportItem = ({
   //     </Grid>
   //   );
   // }
+  let adjustRatio = 1;
+  if (fixedRatio && fixedRatio != ratio) {
+    adjustRatio = fixedRatio;
+  }
   return (
-    <Grid ref={targetRef} style={{ minHeight: minDim }} {...gridProps}>
+    <Grid
+      ref={targetRef}
+      style={{
+        minHeight: minDim,
+      }}
+      {...gridProps}
+    >
       <ReportLoading
         report={report}
         chartRef={chartRef}
