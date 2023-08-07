@@ -211,7 +211,7 @@ Related projects
 Some GenomeHubs components are hosted in separate open source repositories (all under MIT licenses), including:
 
 BlobToolKit |blobtoolkit-release|
------------
+---------------------------------
 
 Interactive quality assessment of genome assemblies.
 
@@ -222,7 +222,7 @@ Explore analysed public assemblies at `blobtoolkit.genomehubs.org/view <https://
     :target: https://github.com/blobtoolkit/blobtoolkit
 
 GoaT CLI  |goat-cli-release|
---------
+----------------------------
 
 A command line interface for GoaT.
 
