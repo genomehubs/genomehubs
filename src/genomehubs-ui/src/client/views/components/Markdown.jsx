@@ -58,7 +58,7 @@ export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
     } else if (key == "className") {
       newProps["className"] = styles[value];
     } else if (key.startsWith("exclude")) {
-      newProps[key] = value.split(",");
+      newProps[key] = Array.isArray(value) ? value : value.split(",");
     } else if (key == "src") {
       if (PAGES_URL.startsWith("http")) {
         newProps["src"] = `${pagesUrl}${value.replace(/^\/static/, "")}`;
