@@ -275,9 +275,13 @@ const drawHeatRect = ({ props, chartProps, h, w }) => {
     height = scale(z + offset) - scale(offset);
     y += h - height - scale(offset);
   } else {
-    width = scale(z);
-    height /= chartProps.n;
-    y += height * chartProps.i;
+    // width = scale(z);
+    // height /= chartProps.n;
+    // y += height * chartProps.i;
+    width /= chartProps.n;
+    height = scale(z);
+    y += h - height;
+    x += width * chartProps.i;
   }
   return (
     <Rectangle
