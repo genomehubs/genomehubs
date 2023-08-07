@@ -279,7 +279,7 @@ const drawHeatRect = ({ props, chartProps, h, w }) => {
     // height /= chartProps.n;
     // y += height * chartProps.i;
     width /= chartProps.n;
-    height = scale(z + offset) - scale(offset);
+    height = scale(z + offset) - scale(offset) + 0.5;
     y += h - height;
     x += width * chartProps.i;
   }
@@ -290,7 +290,6 @@ const drawHeatRect = ({ props, chartProps, h, w }) => {
       width={width}
       // mask={`url(#mask-stripe-${chartProps.n}-${chartProps.i})`}
       fill={props.fill}
-      // stroke={props.fill}
       // fill={"none"}
       x={x} // {props.cx + (w - width) / 2}
       y={y}

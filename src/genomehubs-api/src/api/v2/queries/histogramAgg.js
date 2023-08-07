@@ -96,7 +96,7 @@ export const histogramAgg = async ({
     if (count) {
       if (scale.startsWith("log")) {
         interval = (max - min) / count;
-        max += interval;
+        // max += interval;
       } else {
         interval = (max - min) / count;
       }
