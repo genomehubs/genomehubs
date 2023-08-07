@@ -136,7 +136,7 @@ export const saveSearchResults = ({ options, format = "tsv" }) => {
     let status;
     const interval = checkProgress({
       queryId,
-      delay: 1000,
+      delay: 2000,
       dispatch,
       message: `Preparing ${format.toUpperCase()} file for download`,
     });

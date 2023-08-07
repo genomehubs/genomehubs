@@ -134,7 +134,13 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
   return qs.stringify(newOptions);
 };
 
-export function fetchReport({ reportId, reload, report, hideMessage }) {
+export function fetchReport({
+  reportId,
+  reload,
+  report,
+  hideMessage,
+  inModal,
+}) {
   return async function (dispatch) {
     const state = store.getState();
     const fetching = getReportsFetching(state);
@@ -166,7 +172,7 @@ export function fetchReport({ reportId, reload, report, hideMessage }) {
       let status;
       const interval = checkProgress({
         queryId,
-        delay: 1000,
+        delay: inModal ? 1000 : 30000,
         dispatch,
         message: hideMessage ? undefined : `Fetching ${report} report`,
       });
@@ -959,7 +965,7 @@ export const saveReport = ({ options, format = "json" }) => {
     let status;
     const interval = checkProgress({
       queryId,
-      delay: 1000,
+      delay: 5000,
       dispatch,
       message: `Preparing ${format.toUpperCase()} file for download`,
     });

@@ -171,7 +171,8 @@ const ReportItem = ({
       //   sethideMessage(true);
       // }
       setTimeout(
-        () => fetchReport({ reportId, queryString, report, hideMessage }),
+        () =>
+          fetchReport({ reportId, queryString, report, hideMessage, inModal }),
         delay
       );
     }
