@@ -32,6 +32,13 @@ const Template = ({
   const [showPreview, setShowPreview] = useState(false);
   const navigate = useNavigate();
 
+  if (typeof url === "object") {
+    url = `${url.path}?${Object.entries(url)
+      .filter(([k, v]) => k != "path")
+      .map(([k, v]) => `${k}=${v}`)
+      .join("&")}`;
+  }
+
   useEffect(() => {
     if (url) {
       let matches = url
@@ -75,17 +82,21 @@ const Template = ({
 
   const handleSubmit = (e) => {
     e && e.preventDefault();
-    let searchUrl = url;
+    let [path, queryString] = url.split(/[\?#]/);
     for (let [key, value] of Object.entries(values)) {
-      searchUrl = searchUrl.replaceAll(`{${key}}`, value);
+      queryString = queryString.trim().replaceAll(`{${key}}`, value);
     }
-    let options = searchUrl.split("&");
+    let options = queryString.split("&");
     let newOptions = [`searchTemplate=${id}`];
     for (let [key, val] of Object.entries(values)) {
       newOptions.push(`${key}=${val}`);
     }
     options.splice(1, 0, ...newOptions);
-    navigate(options.join("&"));
+    let newQueryString = options
+      .map((p) => encodeURIComponent(p.replace(/=/, "____")))
+      .join("&")
+      .replaceAll("____", "=");
+    navigate(`${path}?${newQueryString}`);
   };
 
   if (!url) {
