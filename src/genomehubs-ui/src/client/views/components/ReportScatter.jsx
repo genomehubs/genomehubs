@@ -289,9 +289,9 @@ const drawHeatRect = ({ props, chartProps, h, w }) => {
       height={height}
       width={width}
       // mask={`url(#mask-stripe-${chartProps.n}-${chartProps.i})`}
-      // fill={props.fill}
-      stroke={props.fill}
-      fill={"none"}
+      fill={props.fill}
+      // stroke={props.fill}
+      // fill={"none"}
       x={x} // {props.cx + (w - width) / 2}
       y={y}
       // fillOpacity={chartProps.n > 1 ? 1 : props.zAxis.scale(props.payload.z)}
