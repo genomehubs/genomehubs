@@ -255,7 +255,7 @@ const drawHeatRect = ({ props, chartProps, h, w }) => {
   let { z, offset } = props.payload;
   let scale = axisScales[chartProps.zScale]();
   let domain = [1, chartProps.zDomain[1]];
-  scale.domain(domain).range([2, w]);
+  scale.domain(domain).range([2, h]);
   if (chartProps.n == 1) {
     scale.range([0.1, 1]);
   } else if (chartProps.zScale == "proportion") {
@@ -279,7 +279,7 @@ const drawHeatRect = ({ props, chartProps, h, w }) => {
     // height /= chartProps.n;
     // y += height * chartProps.i;
     width /= chartProps.n;
-    height = scale(z);
+    height = scale(z + offset) - scale(offset);
     y += h - height;
     x += width * chartProps.i;
   }
@@ -289,7 +289,9 @@ const drawHeatRect = ({ props, chartProps, h, w }) => {
       height={height}
       width={width}
       // mask={`url(#mask-stripe-${chartProps.n}-${chartProps.i})`}
-      fill={props.fill}
+      // fill={props.fill}
+      stroke={props.fill}
+      fill={"none"}
       x={x} // {props.cx + (w - width) / 2}
       y={y}
       // fillOpacity={chartProps.n > 1 ? 1 : props.zAxis.scale(props.payload.z)}
