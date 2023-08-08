@@ -100,7 +100,7 @@ const Toggle = ({
         xs={12}
         style={{ ...(!showContent && { maxHeight: 0 }) }}
       >
-        {children}
+        {showContent && children}
       </Grid>
     </Grid>
   );
