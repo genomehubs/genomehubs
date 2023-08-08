@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { memo, useRef, useState } from "react";
 
 import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -100,10 +100,10 @@ const Toggle = ({
         xs={12}
         style={{ ...(!showContent && { maxHeight: 0 }) }}
       >
-        {showContent && children}
+        {children}
       </Grid>
     </Grid>
   );
 };
 
-export default compose(withColors)(Toggle);
+export default compose(memo, withColors)(Toggle);
