@@ -10,6 +10,7 @@ const attributeTerms = ({ cat, terms, size, yHistograms }) => {
     terms = terms.terms;
   }
   if (Array.isArray(terms)) {
+    console.log(terms);
     if (terms.length > 0) {
       filters = {};
       let i = 0;
@@ -18,14 +19,15 @@ const attributeTerms = ({ cat, terms, size, yHistograms }) => {
         if (i > size) {
           break;
         }
+        console.log({ obj });
         filters[obj.key] = { term: { "attributes.keyword_value": obj.key } };
       }
       filters = { other_bucket_key: "other", filters: { ...filters } };
     }
-  } else {
+  } else if (typeof terms == "string") {
     attribute = terms;
   }
-  let by_value;
+  let by_value, more_values;
   if (filters) {
     by_value = {
       filters,
@@ -40,7 +42,18 @@ const attributeTerms = ({ cat, terms, size, yHistograms }) => {
         },
       },
     };
+  } else {
+    more_values = {
+      terms: { field: "attributes.keyword_value", size },
+      ...(yHistograms && {
+        aggs: {
+          yHistograms,
+        },
+      }),
+    };
   }
+
+  console.log(by_value);
 
   return {
     reverse_nested: {},
@@ -56,14 +69,7 @@ const attributeTerms = ({ cat, terms, size, yHistograms }) => {
             },
             aggs: {
               by_value,
-              more_values: {
-                terms: { field: "attributes.keyword_value", size },
-                ...(yHistograms && {
-                  aggs: {
-                    yHistograms,
-                  },
-                }),
-              },
+              more_values,
             },
           },
         },
@@ -252,6 +258,8 @@ const termsAgg = ({ field, fixedTerms, lookupTypes, size, yHistograms }) => {
   let fieldMeta = lookupTypes(field);
   if (fieldMeta) {
     if (fieldMeta.type == "keyword") {
+      console.log("y");
+      console.log(fixedTerms);
       return attributeTerms({
         cat: fieldMeta.name,
         terms: fixedTerms || fieldMeta.name,
@@ -292,6 +300,7 @@ export const setAggs = async ({
       field = fieldMeta.name;
       if (fieldMeta) {
         if (fieldMeta.type == "keyword" && valueKey == "keyword_value") {
+          console.log("x");
           terms = attributeTerms({ terms, size });
           return {
             aggregations: {
@@ -341,9 +350,13 @@ export const setAggs = async ({
   if (histogram && yField) {
     if (yBounds.stats.by) {
       let boundsTerms = { terms: yBounds.stats.cats };
+      console.log({ boundsTerms: yBounds.stats.cats });
       yHistogram = termsAgg({
         field: yField,
-        fixedTerms: boundsTerms,
+        fixedTerms: {
+          cat: yBounds.field,
+          terms: yBounds.stats.cats,
+        },
         lookupTypes,
         size: yBounds.stats.size,
       });

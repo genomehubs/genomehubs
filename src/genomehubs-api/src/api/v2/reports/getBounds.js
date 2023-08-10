@@ -55,15 +55,19 @@ export const getCatsBy = async ({
         });
       }
       if (i < fixedTerms.size) {
-        for (let obj of terms.by_attribute.by_cat.more_values.buckets) {
-          if (!usedTerms.has(obj.key.toLowerCase())) {
-            i++;
-            usedTerms.add(obj.key.toLowerCase());
-            cats.push({ key: obj.key.toLowerCase(), label: obj.key });
+        if (terms.by_attribute.by_cat.more_values) {
+          for (let obj of terms.by_attribute.by_cat.more_values.buckets) {
+            if (!usedTerms.has(obj.key.toLowerCase())) {
+              i++;
+              usedTerms.add(obj.key.toLowerCase());
+              cats.push({ key: obj.key.toLowerCase(), label: obj.key });
+            }
+            if (i >= fixedTerms.size) {
+              break;
+            }
           }
-          if (i >= fixedTerms.size) {
-            break;
-          }
+        } else {
+          cats = terms.by_attribute.by_cat.by_value.buckets;
         }
       }
     } else {
@@ -79,6 +83,16 @@ export const getCatsBy = async ({
 
     by = "attribute";
   }
+  console.log({ cats });
+  if (cats && !Array.isArray(cats)) {
+    cats = Object.keys(cats)
+      .filter((key) => key != "other")
+      .map((key) => ({
+        key,
+        label: key,
+      }));
+  }
+  console.log(cats);
 
   return { cats, by };
 };
@@ -218,6 +232,7 @@ export const getBounds = async ({
     }
   }
   let stats = aggs.stats;
+
   if (stats) {
     // Set domain to nice numbers
     if (!min || !max) {
@@ -357,6 +372,12 @@ export const getBounds = async ({
     }
     cats = definedCats;
     by = definedTerms.by;
+  }
+  if (stats && stats.cats && !Array.isArray(stats.cats)) {
+    stats.cats = Object.keys(stats.cats).map((key) => ({
+      key,
+      label: key,
+    }));
   }
   return {
     field,

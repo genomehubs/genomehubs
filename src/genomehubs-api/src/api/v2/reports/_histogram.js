@@ -19,10 +19,9 @@ const getHistAggResults = (aggs, stats) => {
     return;
   }
   if (hist.by_attribute) {
-    // if (hist.by_attribute.by_cat.by_value.cats) {
-    //   hist = hist.by_attribute.by_cat.by_value.cats;
-    // } else
-    if (stats) {
+    if (hist.by_attribute.by_cat.by_value.cats) {
+      hist = hist.by_attribute.by_cat.by_value.cats;
+    } else if (stats && stats.cats) {
       let cats = [...stats.cats];
       if (stats.showOther) {
         cats.push({ key: "other" });
@@ -41,18 +40,12 @@ const getHistAggResults = (aggs, stats) => {
         }
         buckets.push({ key, doc_count, yHistograms });
       });
-      // let buckets = Object.entries(
-      //   hist.by_attribute.by_cat.by_value.buckets || {}
-      // ).map(([key, obj]) => ({ key, doc_count: obj.doc_count }));
       hist = { buckets };
     } else {
       hist = {
-        // buckets: Object.entries(hist.by_attribute.by_cat.by_value.buckets).map(
-        //   ([key, obj]) => ({ key, doc_count: obj.doc_count })
-        // ),
-        buckets: Object.entries(
-          hist.by_attribute.by_cat.by_value.buckets || {}
-        ).map(([key, obj]) => ({ key, doc_count: obj.doc_count })),
+        buckets: Object.entries(hist.by_attribute.by_cat.by_value.buckets).map(
+          ([key, obj]) => ({ key, doc_count: obj.doc_count })
+        ),
       };
     }
   } else if (hist.by_lineage) {
@@ -69,9 +62,6 @@ const getYValues = ({ obj, yField, lookupTypes, stats }) => {
   let yValues = [];
   let yValueType = valueTypes[lookupTypes(yField).type] || "float";
   // TODO: use stats here
-  console.log(stats);
-  console.log(stats.cats);
-  stats.cats = [...stats.cats];
   let yHist = getHistAggResults(obj.yHistograms.by_attribute[yField], stats);
   if (yValueType == "keyword" && stats.cats) {
     let bucketMap = {};
@@ -723,12 +713,6 @@ export const histogram = async ({
 
   let histograms, yBounds;
   if (yFields && yFields.length > 0) {
-    if (bounds.stats.cats) {
-      yParams.query += ` AND ${bounds.field}=${bounds.stats.cats
-        .map(({ key }) => key)
-        .join(",")}`;
-    }
-    // TODO: use catBounds
     yBounds = await getBounds({
       params: { ...yParams, ...inputQueries },
       fields: yFields,
