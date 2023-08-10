@@ -33,7 +33,7 @@ const getHistAggResults = (aggs, stats) => {
           doc_count = hist.by_attribute.by_cat.by_value.buckets[key].doc_count;
         }
         let yHistograms;
-        if (doc_count) {
+        if (doc_count && hist.by_attribute.by_cat.by_value.buckets[key].cats) {
           yHistograms =
             hist.by_attribute.by_cat.by_value.buckets[key].cats.buckets[0]
               .yHistograms;

@@ -267,7 +267,7 @@ export const scatterPerRank = async ({
       xQuery,
       yQuery,
       xLabel,
-      yLabel,
+      yLabel: yLabel || `Count of ${ranks[0]}`,
       queryString,
       caption,
     },

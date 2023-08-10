@@ -97,6 +97,7 @@ const ReportItem = ({
   includeEstimates,
   includeDescendants,
   collapseMonotypic,
+  highlight,
   colorPalette,
   excludeMissing,
   excludeAncestral,
@@ -387,6 +388,7 @@ const ReportItem = ({
             yOpts={yOpts}
             cumulative={cumulative}
             reversed={reversed}
+            highlight={highlight}
             includeEstimates={includeEstimates}
             {...qs.parse(queryString)}
             minDim={minDim}
