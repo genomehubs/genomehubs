@@ -39,15 +39,23 @@ import { withStyles } from "@material-ui/core/styles";
 const pagesUrl = PAGES_URL;
 const webpackHash = COMMIT_HASH || __webpack_hash__;
 
+const fillTemplateValues = (value, extra) => {
+  if (typeof value === "string") {
+    let parts = value.split(/(?:\{\{|\}\})/);
+    if (parts.length >= 3) {
+      for (let i = 1; i < parts.length; i += 2) {
+        if (extra.hasOwnProperty(parts[i])) {
+          parts[i] = extra[parts[i]];
+        }
+      }
+      value = parts.join("");
+    }
+  }
+  return value;
+};
+
 export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
   for (let [key, value] of Object.entries(props)) {
-    if (typeof value === "string") {
-      let parts = value.split(/(?:\{\{|\}\})/);
-      if (parts.length == 3 && extra.hasOwnProperty(parts[1])) {
-        parts[1] = extra[parts[1]];
-        value = parts.join("");
-      }
-    }
     if (isGrid && !gridPropNames.has(key)) {
       continue;
     }
@@ -81,7 +89,7 @@ export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
 
 export const RehypeComponentsList = (extra) => {
   return {
-    a: (props) => <NavLink {...processProps({ props })} />,
+    a: (props) => <NavLink {...processProps({ props, extra })} />,
     aggregation: (props) => <AggregationIcon method={props.method} />,
     divider: (props) => (
       <Divider
@@ -292,15 +300,20 @@ const Markdown = ({
       }
     }
   }, [pgId, pageId, pagesIsFetching]);
-
-  const { contents, ast } = compile(pagesById, {
-    ...RehypeComponentsList({
-      ...qs.parse(location.search.replace(/^\?/, "")),
-      navigate,
-      ...extra,
-    }),
-    ...components,
-  });
+  const { contents, ast } = compile(
+    fillTemplateValues(
+      pagesById,
+      qs.parse((location.search || "").replace("?", ""))
+    ),
+    {
+      ...RehypeComponentsList({
+        ...qs.parse(location.search.replace(/^\?/, "")),
+        navigate,
+        ...extra,
+      }),
+      ...components,
+    }
+  );
   let css;
   if (siteStyles) {
     css = classes.root;
