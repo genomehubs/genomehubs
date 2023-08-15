@@ -51,7 +51,7 @@ export const useStyles = makeStyles((theme) => ({
 const QueryBuilder = ({
   searchTerm,
   searchIndex,
-  setSearchIndex,
+  // setSearchIndex,
   setSearchDefaults,
   setLookupTerm,
   setPreferSearchTerm,
@@ -114,22 +114,22 @@ const QueryBuilder = ({
     setTaxFilter(taxFilters);
   }, []);
 
-  const handleIndexChange = (e) => {
-    let options = qs.parse(location.search.replace(/^\?/, ""));
-    e.stopPropagation();
-    setSearchIndex(e.target.value);
-    setSearchDefaults({
-      includeEstimates: false,
-      includeDescendant: false,
-    });
-    navigate(
-      `${basename}/search?${qs.stringify({
-        taxonomy: options.taxonomy,
-        query: "null",
-        result: e.target.value,
-      })}`
-    );
-  };
+  // const handleIndexChange = (e) => {
+  //   let options = qs.parse(location.search.replace(/^\?/, ""));
+  //   e.stopPropagation();
+  //   setSearchIndex(e.target.value);
+  //   setSearchDefaults({
+  //     includeEstimates: false,
+  //     includeDescendant: false,
+  //   });
+  //   navigate(
+  //     `${basename}/search?${qs.stringify({
+  //       taxonomy: options.taxonomy,
+  //       query: "null",
+  //       result: e.target.value,
+  //     })}`
+  //   );
+  // };
 
   const buildQuery = () => {
     let query = "";
@@ -378,7 +378,7 @@ const QueryBuilder = ({
   return (
     <Paper className={classes.paper}>
       <Grid container alignItems="center" direction="column" spacing={2}>
-        <Grid container direction="row">
+        {/* <Grid container direction="row">
           <Grid item>
             <BasicSelect
               current={index}
@@ -393,7 +393,7 @@ const QueryBuilder = ({
               }}
             />
           </Grid>
-        </Grid>
+        </Grid> */}
         <Grid container alignItems="center" direction="row" spacing={2}>
           <Tooltip title="Taxon ID or scientific name" arrow placement={"top"}>
             <Grid item xs={3}>

@@ -278,6 +278,7 @@ def convert_to_type(key, raw_value, to_type, *, translate=None):
         try:
             value = int(raw_value)
         except ValueError:
+            raw_value = str(raw_value).lower()
             if translate and raw_value in translate:
                 value = convert_to_type(key, translate[raw_value], to_type)
             else:
@@ -294,6 +295,7 @@ def convert_to_type(key, raw_value, to_type, *, translate=None):
         try:
             value = float(raw_value)
         except ValueError:
+            raw_value = str(raw_value).lower()
             if translate and raw_value in translate:
                 value = convert_to_type(key, translate[raw_value], to_type)
             else:

@@ -52,6 +52,9 @@ const SearchPage = ({
             String(options.includeEstimates) == "false"
           ),
           includeDescendants: Boolean(options.query.match("tax_tree")),
+          emptyColumns:
+            options.hasOwnProperty("emptyColumns") &&
+            String(options.emptyColumns) == "true",
         };
         if (!shallow(searchDefaults, newDefaults)) {
           setSearchDefaults(newDefaults);

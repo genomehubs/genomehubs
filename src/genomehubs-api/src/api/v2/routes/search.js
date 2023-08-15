@@ -42,7 +42,13 @@ export const getSearchResults = async (req, res) => {
         setProgress(queryId, { total: countRes.status.hits });
       }
     }
-    response = await getResults({ ...req.query, exclusions, sortBy, req });
+    response = await getResults({
+      ...req.query,
+      exclusions,
+      sortBy,
+      countValues: true,
+      req,
+    });
     if (!response.status.success) {
       return res.status(200).send({ status: response.status });
     }
