@@ -304,7 +304,7 @@ const SearchSettings = ({
         >
           <InputLabel
             id="demo-mutiple-chip-checkbox-label"
-            style={{ marginTop: checked ? 0 : "-1em" }}
+            style={{ marginTop: checkedList.length > 0 ? 0 : "-1em" }}
           >
             <Checkbox
               color={"default"}
