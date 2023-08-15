@@ -305,7 +305,15 @@ def parse_ncbi_datasets_record(record, parsed):
 
 def parse_ncbi_datasets_sample(record, parsed):
     """Parse sample information from a single NCBI datasets record."""
-    obj = {key: record.get(key, "None") for key in ("taxId", "isolate", "sex")}
+    organism = record.get("organism", {})
+    obj = {
+        key: organism.get(key, "None")
+        for key in ("taxId", "organismName", "commonName", "infraspecificNames")
+    }
+    if obj["infraspecificNames"] != "None":
+        for key in ("sex", "isolate"):
+            obj[key] = obj["infraspecificNames"].get(key, "None")
+    del obj["infraspecificNames"]
     obj["genbankAssmAccession"] = record["accession"]
     if "pairedAccession" in record:
         if record["pairedAccession"].startswith("GCF_"):
