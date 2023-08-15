@@ -163,6 +163,7 @@ export const getSearchNameClasses = createSelector(
 const searchDefaultValues = {
   includeDescendants: false,
   includeEstimates: true,
+  emptyColumns: false,
 };
 
 export const setSearchDefaults = createAction("SET_SEARCH_DEFAULTS");

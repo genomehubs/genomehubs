@@ -22,9 +22,16 @@ const ReportError = ({ report, error, statusColors, inModal }) => {
     >
       {(inModal && (
         <>
-          <div>{`Could not load ${report}`}</div>
-          <div>
-            <pre>{error}</pre>
+          <div
+            style={{
+              padding: "1em",
+              textAlign: "center",
+            }}
+          >
+            {`Could not load ${report}`}
+            <div>
+              <span>{error}</span>
+            </div>
           </div>
         </>
       )) || (
@@ -32,6 +39,7 @@ const ReportError = ({ report, error, statusColors, inModal }) => {
           <div
             style={{
               position: "absolute",
+              textAlign: "center",
               top: 0,
               right: 0,
               bottom: 0,
@@ -45,7 +53,8 @@ const ReportError = ({ report, error, statusColors, inModal }) => {
               position: "absolute",
               background: "#ffffffcc",
               textAlign: "center",
-              padding: "1em",
+              lineHeight: "3em",
+              height: "3em",
               right: 0,
               top: 0,
               left: 0,

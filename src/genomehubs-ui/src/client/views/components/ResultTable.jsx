@@ -389,7 +389,9 @@ const ResultTable = ({
         obj.summary = summary || defaultValue;
       }
     } else {
-      expandedTypes = displayTypes;
+      expandedTypes = displayTypes.filter(
+        ({ name }) => !emptyBuckets.has(name)
+      );
       for (let obj of expandedTypes) {
         obj.summary = "value";
       }
@@ -397,7 +399,16 @@ const ResultTable = ({
   }
 
   if (searchResults && searchResults.status && searchResults.status.error) {
-    return <ReportError report={"search"} error={searchResults.status.error} />;
+    return (
+      <div
+        style={{
+          position: "relative",
+          height: "15em",
+        }}
+      >
+        <ReportError report={"search"} error={searchResults.status.error} />
+      </div>
+    );
   } else if (
     !searchResults.status ||
     !searchResults.status.hasOwnProperty("hits")

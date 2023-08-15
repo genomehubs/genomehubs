@@ -252,10 +252,12 @@ const SearchSettings = ({
             arrow
             placement={"top"}
           >
-            <MenuItem value={id} onClick={(e) => handleChange(e, id, key)}>
-              <Checkbox color={"default"} checked={state[id]} />
-              {label}
-            </MenuItem>
+            <div>
+              <MenuItem value={id} onClick={(e) => handleChange(e, id, key)}>
+                <Checkbox color={"default"} checked={state[id]} />
+                {label}
+              </MenuItem>
+            </div>
           </Tooltip>
         );
       } else {
@@ -274,26 +276,26 @@ const SearchSettings = ({
     let checked = state[`group-${key}`] == totals[key];
     let indeterminate =
       state[`group-${key}`] > 0 && state[`group-${key}`] < totals[key];
-    content.unshift(
-      <Tooltip
-        key={`all_${key}`}
-        title={`Toggle selection for all ${key} attributes`}
-        arrow
-        placement={"top"}
-      >
-        <MenuItem
-          value={key}
-          onClick={(e) => handleGroupChange(e, key, checked)}
-        >
-          <Checkbox
-            color={"default"}
-            checked={checked}
-            indeterminate={indeterminate}
-          />
-          all
-        </MenuItem>
-      </Tooltip>
-    );
+    // content.unshift(
+    //   <Tooltip
+    //     key={`all_${key}`}
+    //     title={`Toggle selection for all ${key} attributes`}
+    //     arrow
+    //     placement={"top"}
+    //   >
+    //     <MenuItem
+    //       value={key}
+    //       onClick={(e) => handleGroupChange(e, key, checked)}
+    //     >
+    //       <Checkbox
+    //         color={"default"}
+    //         checked={checked}
+    //         indeterminate={indeterminate}
+    //       />
+    //       all
+    //     </MenuItem>
+    //   </Tooltip>
+    // );
     groups.push(
       <Grid item key={key}>
         <FormControl
