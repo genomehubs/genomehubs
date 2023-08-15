@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     border: "none",
     boxShadow: "none",
-    overflowX: "hidden",
+    overflowX: "visible",
   },
   root: {
     width: "100%",
@@ -296,8 +296,23 @@ const SearchSettings = ({
     );
     groups.push(
       <Grid item key={key}>
-        <FormControl className={classes.formControl}>
-          <InputLabel id="demo-mutiple-chip-checkbox-label">{key}</InputLabel>
+        <FormControl
+          className={classes.formControl}
+          style={{ marginLeft: "1em" }}
+        >
+          <InputLabel
+            id="demo-mutiple-chip-checkbox-label"
+            style={{ marginTop: checked ? 0 : "-1em" }}
+          >
+            <Checkbox
+              color={"default"}
+              checked={checked}
+              indeterminate={indeterminate}
+              style={{ marginLeft: "-1.5em" }}
+              onClick={(e) => handleGroupChange(e, key, checked)}
+            />
+            {key}
+          </InputLabel>
           <Select
             labelId="demo-mutiple-chip-checkbox-label"
             id="demo-mutiple-chip-checkbox"
@@ -329,6 +344,7 @@ const SearchSettings = ({
             {content}
           </Select>
         </FormControl>
+
         {/* <Accordion>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
