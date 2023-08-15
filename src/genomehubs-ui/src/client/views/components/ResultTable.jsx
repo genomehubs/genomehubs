@@ -175,7 +175,7 @@ const SortableCell = ({
     }
   }
 
-  let title = `Sort by ${name}`;
+  let title = handleTableSort ? `Sort by ${name}` : name;
   if (description) {
     title = (
       <div style={{ whiteSpace: "pre-line", maxWidth: "14em" }}>
@@ -218,30 +218,39 @@ const SortableCell = ({
       sortDirection={sortDirection}
     >
       <Tooltip key={name} title={title} arrow>
-        <TableSortLabel
-          active={sortBy === name}
-          direction={sortOrder}
-          onClick={() =>
-            handleTableSort(
-              sortDirection && sortOrder === "desc"
-                ? { sortBy: "none" }
-                : {
-                    sortBy: name,
-                    sortOrder:
-                      sortDirection && sortOrder === "asc" ? "desc" : "asc",
-                  }
-            )
-          }
-        >
-          {/* {name} */}
-          {name.split("_").join(`_\u200b`)}
-          {status && status != "stable" && <sup>{`\u2020`}</sup>}
-          {sortBy === name ? (
-            <span className={classes.visuallyHidden}>
-              {sortOrder === "desc" ? "sorted descending" : "sorted ascending"}
-            </span>
-          ) : null}
-        </TableSortLabel>
+        {(handleTableSort && (
+          <TableSortLabel
+            active={sortBy === name}
+            direction={sortOrder}
+            onClick={() =>
+              handleTableSort(
+                sortDirection && sortOrder === "desc"
+                  ? { sortBy: "none" }
+                  : {
+                      sortBy: name,
+                      sortOrder:
+                        sortDirection && sortOrder === "asc" ? "desc" : "asc",
+                    }
+              )
+            }
+          >
+            {/* {name} */}
+            {name.split("_").join(`_\u200b`)}
+            {status && status != "stable" && <sup>{`\u2020`}</sup>}
+            {sortBy === name ? (
+              <span className={classes.visuallyHidden}>
+                {sortOrder === "desc"
+                  ? "sorted descending"
+                  : "sorted ascending"}
+              </span>
+            ) : null}
+          </TableSortLabel>
+        )) || (
+          <span>
+            {name.split("_").join(`_\u200b`)}
+            {status && status != "stable" && <sup>{`\u2020`}</sup>}
+          </span>
+        )}
       </Tooltip>
       <br />
       {(showExcludeBoxes && (
@@ -835,6 +844,9 @@ const ResultTable = ({
   }
   for (let type of expandedTypes) {
     let sortDirection = sortBy === type.name ? sortOrder : false;
+    if (type.processed_type == "geo_point") {
+    } else {
+    }
     heads.push(
       <SortableCell
         key={type.name}
@@ -846,7 +858,7 @@ const ResultTable = ({
         sortBy={sortBy}
         sortOrder={sortOrder}
         sortDirection={sortDirection}
-        handleTableSort={handleTableSort}
+        handleTableSort={type.processed_type != "geo_point" && handleTableSort}
         setAttributeSettings={setAttributeSettings}
         showExcludeBoxes={searchIndex == "taxon" ? "all" : "missing"}
         excludeAncestral={arrToObj(searchTerm.excludeAncestral)}
