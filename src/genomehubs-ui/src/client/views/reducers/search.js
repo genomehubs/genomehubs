@@ -35,6 +35,7 @@ const searchResults = handleActions(
       status: action.payload.status,
       results: action.payload.results,
       query: action.payload.query,
+      aggs: action.payload.aggs,
       fields: action.payload.fields,
       lastUpdated: action.meta.receivedAt,
     }),

@@ -25,19 +25,39 @@ export const parseFields = async ({ result, fields, taxonomy }) => {
       if (attr && summaries.includes(summary)) {
         field = attr;
       }
-      let meta = lookupTypes(field);
-      if (meta) {
-        fieldList.add(meta.name);
+      let fieldArr = [];
+      if (field.match(/\*/)) {
+        let parts = field.split(/\*/);
+        let starts = parts[0] > "" && parts[0];
+        let ends = parts[1] > "" && parts[1];
+        for (let fieldName of Object.keys(typesMap)) {
+          if (starts && !fieldName.startsWith(starts)) {
+            continue;
+          }
+          if (ends && !fieldName.endsWith(ends)) {
+            continue;
+          }
+          fieldArr.push(fieldName);
+        }
+        fieldArr;
       } else {
-        fieldList.add(field);
+        fieldArr = [field];
       }
-      let [f, subset] = field.split(":");
-      if (subset) {
-        let m = lookupTypes(f);
-        if (m) {
-          fieldList.add(m.name);
+      for (let fld of fieldArr) {
+        let meta = lookupTypes(fld);
+        if (meta) {
+          fieldList.add(meta.name);
         } else {
-          fieldList.add(f);
+          fieldList.add(fld);
+        }
+        let [f, subset] = fld.split(":");
+        if (subset) {
+          let m = lookupTypes(f);
+          if (m) {
+            fieldList.add(m.name);
+          } else {
+            fieldList.add(f);
+          }
         }
       }
     }
@@ -45,7 +65,7 @@ export const parseFields = async ({ result, fields, taxonomy }) => {
     return fields;
     // return fields.map((key) => key.toLowerCase());
   } catch (message) {
-    logError({ req, message });
+    logError({ req: {}, message });
     return typesMap ? Object.keys(typesMap) : [];
   }
 };

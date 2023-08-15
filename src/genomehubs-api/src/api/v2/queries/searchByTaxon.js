@@ -11,6 +11,7 @@ import { filterTaxa } from "./queryFragments/filterTaxa";
 import { matchAttributes } from "./queryFragments/matchAttributes";
 import { matchNames } from "./queryFragments/matchNames";
 import { matchRanks } from "./queryFragments/matchRanks";
+import { nullCountsAgg } from "./queryFragments/nullCountsAgg";
 import { restrictToRank } from "./queryFragments/restrictToRank";
 import { setAggregationSource } from "./queryFragments/setAggregationSource";
 import { setIncludes } from "./queryFragments/setIncludes";
@@ -188,6 +189,8 @@ export const searchByTaxon = async ({
     includeRawValues,
     includeLineage,
   });
+  let nullCounts = await nullCountsAgg({ fields, names, ranks });
+  aggs = nullCounts;
   let exclude = []; // includeRawValues ? [] : ["attributes.values*"];
   let sort = setSortOrder(sortBy, lookupTypes, lookupNames);
   let query = {

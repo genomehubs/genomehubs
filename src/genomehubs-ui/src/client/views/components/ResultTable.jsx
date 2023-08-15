@@ -31,6 +31,7 @@ import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchRecord from "../hocs/dispatchRecord";
+import expandFieldList from "../functions/expandFieldList";
 import { formatter } from "../functions/formatter";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
@@ -346,6 +347,7 @@ const ResultTable = ({
   saveSearchResults,
   searchResults,
   searchTerm,
+  hideEmpty = true,
   setSearchTerm,
   activeNameClasses,
   activeRanks,
@@ -358,10 +360,21 @@ const ResultTable = ({
 }) => {
   const rootRef = useRef(null);
   let expandedTypes = [];
+  let emptyBuckets = new Set();
+  if (searchResults.aggs) {
+    if (searchResults.aggs.fields) {
+      emptyBuckets = new Set(
+        Object.entries(searchResults.aggs.fields.by_key.buckets)
+          .filter(([key, obj]) => obj.doc_count == 0)
+          .map(([key]) => key)
+      );
+    }
+  }
   if (searchTerm) {
     if (searchTerm.fields) {
-      expandedTypes = searchTerm.fields
-        .split(",")
+      let fieldList = expandFieldList({ fields: searchTerm.fields, types });
+      expandedTypes = fieldList
+        .filter((name) => !emptyBuckets.has(name))
         .map((name) => ({
           name,
         }))

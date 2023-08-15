@@ -21,6 +21,7 @@ import Select from "@material-ui/core/Select";
 import SettingsButton from "./SettingsButton";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
+import expandFieldList from "../functions/expandFieldList";
 import qs from "../functions/qs";
 import { useLocalStorage } from "usehooks-ts";
 import withNames from "../hocs/withNames";
@@ -168,18 +169,6 @@ const SearchSettings = ({
       }
     });
     let fieldSets = {};
-    if (searchTerm.fields) {
-      searchTerm.fields.split(",").forEach((field) => {
-        let [f, s] = field.split(":");
-        if (!s) {
-          s = types[f].processed_simple;
-        }
-        if (!fieldSets[f]) {
-          fieldSets[f] = [];
-        }
-        fieldSets[f].push(s);
-      });
-    }
     let newFields = [];
     for (let field of fields) {
       if (fieldSets[field]) {
