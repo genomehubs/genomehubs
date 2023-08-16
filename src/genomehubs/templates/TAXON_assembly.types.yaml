@@ -1,6 +1,3 @@
-defaults:
-  attributes:
-    taxon_display_group: assembly
 attributes:
   bioproject:
     taxon_display_group: assembly

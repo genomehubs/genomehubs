@@ -4,7 +4,6 @@ defaults:
     organelle: nucleus
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
     source: INSDC
-    taxon_display_group: sample
 identifiers:
   sample_id:
     constraint:
