@@ -306,10 +306,10 @@ const Markdown = ({
     }
   }, [pgId, pageId, pagesIsFetching]);
   const { contents, ast } = compile(
-    fillTemplateValues(
-      pagesById,
-      qs.parse((location.search || "").replace("?", ""))
-    ),
+    fillTemplateValues(pagesById, {
+      ...extra,
+      ...qs.parse((location.search || "").replace("?", "")),
+    }),
     {
       ...RehypeComponentsList({
         ...qs.parse(location.search.replace(/^\?/, "")),
