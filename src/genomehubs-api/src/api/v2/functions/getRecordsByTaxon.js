@@ -61,9 +61,9 @@ export const getRecordsByTaxon = async (props) => {
   let scrollDuration = config.scrollDuration;
   let body;
   if (
-    query.size >= scrollThreshold &&
+    query.size >= scrollThreshold // &&
     // query.sort.length == 0 &&
-    Object.keys(query.aggs).length == 0
+    // Object.keys(query.aggs).length == 0
   ) {
     let total = 0;
     let hits = [];
