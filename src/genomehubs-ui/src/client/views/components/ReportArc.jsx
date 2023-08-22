@@ -6,6 +6,7 @@ import {
   PolarAngleAxis,
   RadialBar,
   RadialBarChart,
+  Tooltip,
 } from "recharts";
 import MultiCatLegend, {
   processLegendData,
@@ -14,16 +15,38 @@ import MultiCatLegend, {
 import React, { useEffect, useRef, useState } from "react";
 
 import Grid from "@material-ui/core/Grid";
+import MuiTooltip from "./Tooltip";
 import { compose } from "recompose";
 import { format } from "d3-format";
+import qs from "../functions/qs";
 import setColors from "../functions/setColors";
 import { setMessage } from "../reducers/message";
 import stringLength from "../functions/stringLength";
+import styles from "./Styles.scss";
+import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
+import withSiteName from "../hocs/withSiteName";
 
 const pct = format(".0%");
 const pct1 = format(".1%");
+
+const CustomTooltip = ({ active, payload, label }) => {
+  return null;
+  if (active && payload && payload.length) {
+    return (
+      <div style={{ overflow: "visible", padding: "3em", background: "red" }}>
+        <MuiTooltip title={"testing"} arrow placement={"top"}>
+          <div className="custom-tooltip" style={{ border: "solid blue" }}>
+            test
+          </div>
+        </MuiTooltip>
+      </div>
+    );
+  }
+
+  return null;
+};
 
 const PieComponent = ({ data, height, width, colors }) => {
   const RADIAN = Math.PI / 180;
@@ -134,6 +157,35 @@ const PieComponent = ({ data, height, width, colors }) => {
   );
 };
 
+const donut = (x, y, ir, or) => {
+  return (
+    "M" +
+    (x - or) +
+    " " +
+    y +
+    "A" +
+    or +
+    " " +
+    or +
+    " 0 1 1 " +
+    (x + or) +
+    " " +
+    y + // outer
+    "M" +
+    (x + ir) +
+    " " +
+    y +
+    "A" +
+    ir +
+    " " +
+    ir +
+    " 0 1 0 " +
+    (x - ir) +
+    " " +
+    y // inner
+  );
+};
+
 const RadialBarComponent = ({
   data,
   height,
@@ -180,6 +232,22 @@ const RadialBarComponent = ({
             </text>
           </g>
         )}
+        <MuiTooltip
+          title={`${data.name}: ${data.xValue} / ${data.yValue}`}
+          arrow
+          placement="top"
+        >
+          <path
+            d={donut(cx, cy, viewBox.innerRadius, viewBox.outerRadius)}
+            fillOpacity={0}
+            cursor={"pointer"}
+            onClick={() =>
+              data.navigate(
+                `${data.basename}/search?${qs.stringify(data.xQuery)}`
+              )
+            }
+          />
+        </MuiTooltip>
         <g transform={`translate(0,${cy + 5})`}>
           {MultiCatLegend({
             width: width * 0.96,
@@ -248,6 +316,8 @@ const RadialBarComponent = ({
       fontFamily={"sans-serif"}
     >
       <PolarAngleAxis type="number" domain={[0, 1]} tick={false} />
+      <Tooltip content={<CustomTooltip />} />
+
       <RadialBar
         minAngle={15}
         label={{
@@ -290,6 +360,7 @@ const ReportArc = ({
   pointSize,
   compactWidth,
   showLegend,
+  basename,
 }) => {
   const componentRef = chartRef ? chartRef : useRef();
   const { width, height } = inModal
@@ -336,6 +407,8 @@ const ReportArc = ({
   let dimensionTimer;
   let { plotWidth, plotHeight } = setDimensions({ width, height });
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     ({ plotWidth, plotHeight, dimensionTimer } = setDimensions({
       width,
@@ -359,7 +432,7 @@ const ReportArc = ({
           count: arc.report.arc.length,
           colors,
         }));
-        let { arc: currentArc, x, y, rank } = report;
+        let { arc: currentArc, x, y, rank, xQuery } = report;
         chartData.push({
           xValue: x,
           xPortion: currentArc,
@@ -367,6 +440,9 @@ const ReportArc = ({
           index: i,
           name: rank,
           fill: colors[i % colors.length],
+          xQuery,
+          navigate,
+          basename,
         });
       });
       chartData = chartData.reverse();
@@ -418,4 +494,4 @@ const ReportArc = ({
   }
 };
 
-export default compose(withColors)(ReportArc);
+export default compose(withColors, withSiteName)(ReportArc);

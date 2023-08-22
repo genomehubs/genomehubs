@@ -1,7 +1,12 @@
 import React, { useEffect, useRef } from "react";
 
+import Tooltip from "./Tooltip";
+import { compose } from "recompose";
+import qs from "../functions/qs";
 import styles from "./Styles.scss";
+import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
+import withSiteName from "../hocs/withSiteName";
 
 const ranks = {
   superkingdom: { plural: "superkingdoms" },
@@ -19,10 +24,12 @@ const ReportXPerRank = ({
   perRank,
   minDim,
   setMinDim,
+  basename,
   containerRef,
   chartRef,
 }) => {
   const componentRef = chartRef ? chartRef : useRef();
+  const navigate = useNavigate();
   const { width } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
@@ -43,14 +50,29 @@ const ReportXPerRank = ({
     perRank.report.xPerRank.forEach((entry) => {
       if ((maxValue > 0 && entry.x) || true) {
         let plural =
-          entry.x != 1 && ranks[entry.rank]
+          entry.x > 1 && ranks[entry.rank]
             ? ranks[entry.rank].plural
             : entry.rank;
         values.push(
-          <div key={entry.rank}>
-            <span className={styles.boldValue}>{entry.x.toLocaleString()}</span>
-            <span>{plural}</span>
-          </div>
+          <Tooltip
+            key={entry.rank}
+            title={`Click to ${entry.x > 1 ? "list all" : "view"} ${plural}`}
+            arrow
+            placement={"top"}
+          >
+            <div
+              key={entry.rank}
+              style={{ cursor: "pointer" }}
+              onClick={() =>
+                navigate(`${basename}/search?${qs.stringify(entry.xQuery)}`)
+              }
+            >
+              <span className={styles.boldValue}>
+                {entry.x.toLocaleString()}
+              </span>
+              <span>{plural}</span>
+            </div>
+          </Tooltip>
         );
       }
     });
@@ -64,4 +86,4 @@ const ReportXPerRank = ({
   );
 };
 
-export default ReportXPerRank;
+export default compose(withSiteName)(ReportXPerRank);
