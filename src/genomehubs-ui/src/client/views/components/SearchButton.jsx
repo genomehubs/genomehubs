@@ -17,9 +17,9 @@ import withTaxonomy from "../hocs/withTaxonomy";
 const ColorButtonGroup = withStyles((theme) => ({
   root: {
     color: theme.palette.getContrastText("#333333"),
-    backgroundColor: "#1f78b433",
+    backgroundColor: "#d2e4f0",
     "&:hover": {
-      backgroundColor: "#1f78b411",
+      backgroundColor: "#f0f6fa",
     },
   },
 }))(ButtonGroup);
@@ -30,6 +30,7 @@ const SearchButton = ({
   searchIndex,
   setSearchIndex,
   indices,
+  resetSearch,
   handleClick = () => {},
 }) => {
   const options = indexList.filter((index) => indices.includes(index));
@@ -40,9 +41,11 @@ const SearchButton = ({
   );
 
   const handleMenuItemClick = (e, index) => {
+    e.preventDefault();
     setSelectedIndex(index);
     setSearchIndex(options[index]);
-    handleClick(e, { index: options[index] });
+    resetSearch();
+    // handleClick(e, { index: options[index] });
     setOpen(false);
   };
 

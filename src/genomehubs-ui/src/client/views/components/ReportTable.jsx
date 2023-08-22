@@ -22,11 +22,11 @@ import { withStyles } from "@material-ui/core/styles";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: "#1f78b433",
+    backgroundColor: "#d2e4f0",
     fontWeight: 700,
   },
   body: {
-    backgroundColor: "#1f78b411",
+    backgroundColor: "#f0f6fa",
     fontWeight: 700,
   },
 }))(TableCell);

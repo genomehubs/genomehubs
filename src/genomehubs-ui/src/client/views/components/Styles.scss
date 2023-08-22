@@ -62,7 +62,10 @@ body,
       text-decoration: none;
     }
 
-    .active:hover { fill-opacity: 0.5; stroke-opacity: 0.5;}
+    .active:hover {
+      fill-opacity: 0.5;
+      stroke-opacity: 0.5;
+    }
 
     a:link,
     a:visited {
@@ -70,7 +73,6 @@ body,
       color: #1f78b4;
       cursor: pointer;
     }
-
 
     .fillParent {
       height: 100%;
@@ -114,7 +116,7 @@ body,
       .siteText {
         background: rgba(themed("primary"), 0.5);
       }
-      
+
       .siteLogo {
         height: 1.8em;
         width: 1.8em;
@@ -139,7 +141,7 @@ body,
         float: right;
         background: rgba(themed("primary"), 0.5);
         height: 2em;
-        overflow: visible
+        overflow: visible;
       }
 
       .tab {
@@ -160,7 +162,6 @@ body,
         &:hover {
           color: themed("secondary");
           border-bottom: 0.2em solid themed("secondary");
-      
         }
       }
     }
@@ -675,14 +676,15 @@ body,
 
     blockquote {
       background: rgba(themed("primary"), 0.05);
-      background: #1f78b411; //#00616411;
-      border-left: 10px solid #1f78b433; //#00616433;
+      background: #f0f6fa; //#00616411;
+      border-left: 10px solid #d2e4f0; //#00616433;
       font-family: themed("bodyFont");
       margin: 1.5em 10px;
-      padding: .5em 10px;
+      padding: 0.5em 10px;
       max-width: 90%;
 
-      a, .link {
+      a,
+      .link {
         color: themed("primary");
       }
     }
@@ -716,8 +718,6 @@ body,
         color: #1f78b4;
         cursor: pointer;
       }
-
-      
 
       .boldValue {
         display: inline-block;

@@ -16,7 +16,7 @@ import withTypes from "../hocs/withTypes";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: "#1f78b433",
+    backgroundColor: "#d2e4f0",
     fontWeight: 700,
   },
 }))(TableCell);

@@ -21,7 +21,7 @@ const SourcesPage = ({
   let query = sortReportQuery({
     queryString: qs.stringify({
       result,
-      ...qs.parse(queryString),
+      // ...qs.parse(queryString),
       report: "sources",
       taxonomy,
     }),

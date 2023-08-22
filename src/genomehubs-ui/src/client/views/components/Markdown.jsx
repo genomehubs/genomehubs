@@ -51,6 +51,8 @@ const fillTemplateValues = (value, extra) => {
         }
         if (extra.hasOwnProperty(parts[i])) {
           parts[i] = lower ? extra[parts[i]].toLowerCase() : extra[parts[i]];
+        } else {
+          parts[i] = "";
         }
       }
       value = parts.join("");
