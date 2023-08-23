@@ -16,6 +16,7 @@ import { indexName } from "../functions/indexName";
 import { logError } from "../functions/logger";
 import { map } from "../reports/map";
 import { oxford } from "../reports/oxford";
+import { parseFields } from "../functions/parseFields";
 import qs from "qs";
 import { queryParams } from "../reports/queryParams";
 import { setExclusions } from "../functions/setExclusions";
@@ -410,8 +411,9 @@ export const arc = async ({
       }
     });
     if (fields.length == 0) {
-      fields = ["all"];
+      fields = [];
     }
+    fields = [...new Set(fields)];
   }
   params.fields = fields;
   let yCount = await getResultCount({ ...params });

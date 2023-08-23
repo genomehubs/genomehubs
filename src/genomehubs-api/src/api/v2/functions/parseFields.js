@@ -61,7 +61,7 @@ export const parseFields = async ({ result, fields, taxonomy }) => {
         }
       }
     }
-    fields = [...fieldList];
+    fields = [...new Set(fieldList)];
     return fields;
     // return fields.map((key) => key.toLowerCase());
   } catch (message) {
