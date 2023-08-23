@@ -77,7 +77,7 @@ jobs:
           node-version: "16"
       - run: npm install -g pkg
       - run: |
-          git clone -b main --single-branch https://github.com/genomehubs/goat-ui
+          git clone -b site/goat-dev --single-branch https://github.com/genomehubs/goat-ui
           mv goat-ui/static/* src/genomehubs-ui/src/client/static/
           mv goat-ui/files/favicon/* src/genomehubs-ui/src/client/favicon/
           mv goat-ui/files/components/* src/genomehubs-ui/src/client/views/components/
