@@ -274,13 +274,22 @@ def convert_lat_lon(location):
 
 def convert_to_type(key, raw_value, to_type, *, translate=None):
     """Convert values to type."""
+    # print(raw_values)
+    # if not isinstance(raw_values, list):
+    #     raw_values = [raw_values]
+    # values = []
+    # for raw_value in raw_values:
     if to_type in {"byte", "integer", "long", "short"}:
         try:
             value = int(raw_value)
         except ValueError:
             raw_value = str(raw_value).lower()
             if translate and raw_value in translate:
-                value = convert_to_type(key, translate[raw_value], to_type)
+                new_value = translate[raw_value]
+                if isinstance(new_value, list):
+                    value = [convert_to_type(key, v, to_type) for v in new_value]
+                else:
+                    value = convert_to_type(key, translate[raw_value], to_type)
             else:
                 value = None
     elif to_type in {
@@ -314,6 +323,13 @@ def convert_to_type(key, raw_value, to_type, *, translate=None):
             str(raw_value),
             to_type,
         )
+    #     if isinstance(value, list):
+    #         values += value
+    #     else:
+    #         values.append(value)
+    #     print(values)
+    # if len(values) == 1:
+    #     return values[0]
     return value
 
 
