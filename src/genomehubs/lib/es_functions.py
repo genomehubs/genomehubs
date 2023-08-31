@@ -12,6 +12,7 @@ from subprocess import PIPE
 from subprocess import Popen
 
 import ujson
+from elasticsearch import ConflictError
 from elasticsearch import Elasticsearch
 from elasticsearch import NotFoundError
 from elasticsearch import client
@@ -242,7 +243,6 @@ def index_stream(
             if ok:
                 success += 1
             else:
-                LOGGER.warn(response)
                 failed += 1
     except Exception as bulk_err:
         for action in batch:
@@ -253,6 +253,8 @@ def index_stream(
                     )
                 else:
                     es.update(index=index_name, id=action["_id"], doc=action["doc"])
+            except ConflictError:
+                pass
             except Exception as err:
                 LOGGER.warn(
                     "Size of document that failed to index is %d bytes",
@@ -260,7 +262,7 @@ def index_stream(
                 )
                 LOGGER.warn(action)
                 raise err
-        raise bulk_err
+        # raise bulk_err
     es_client = client.IndicesClient(es)
     es_client.refresh(index=index_name)
     return success, failed
