@@ -242,6 +242,7 @@ def index_stream(
             if ok:
                 success += 1
             else:
+                LOGGER.warn(response)
                 failed += 1
     except Exception as bulk_err:
         for action in batch:
