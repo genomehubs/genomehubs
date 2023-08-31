@@ -255,6 +255,8 @@ def index_stream(
                     es.update(index=index_name, id=action["_id"], doc=action["doc"])
             except ConflictError:
                 pass
+            except OverflowError:
+                pass
             except Exception as err:
                 LOGGER.warn(
                     "Size of document that failed to index is %d bytes",
