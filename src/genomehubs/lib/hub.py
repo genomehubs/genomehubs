@@ -261,15 +261,26 @@ def test_constraint(value, constraint):
 
 def convert_lat_lon(location):
     """Convert lat and lon to array notation."""
-    if isinstance(location, list):
-        return ",".join(location)
-    if location.endswith(("E", "W")):
-        sign = {"N": "", "E": "", "S": "-", "W": "-"}
-        parts = re.split(r"\s*([NESW])\s*", location)
-        return f"{sign[parts[1]]}{parts[0]},{sign[parts[3]]}{parts[2]}"
-    if re.match(r"-*\d+\.*\d*,-*\d+\.*\d*", location):
-        return location
-    return None if location else ""
+    if not location:
+        return ""
+    sign = {"N": "", "E": "", "S": "-", "W": "-"}
+    if not isinstance(location, list):
+        if "," in location:
+            location = re.split(r"\s*,\s*", location)
+        elif location.endswith(("E", "W")):
+            parts = re.split(r"\s*([NESW])\s*", location)
+            location = [f"{sign[parts[1]]}{parts[0]}", f"{sign[parts[3]]}{parts[2]}"]
+        else:
+            return None
+    for index, coord in enumerate(location):
+        if coord.endswith(("N", "S", "E", "W")):
+            parts = re.split(r"\s*([NESW])\s*", coord)
+            location[index] = f"{sign[parts[1]]}{parts[0]}"
+        if not re.match(r"^-*\d{1,3}\.*\d*$", location[index]):
+            return None
+    if abs(float(location[0])) > 90 or abs(float(location[1])) > 180:
+        return None
+    return ",".join(location)
 
 
 def convert_to_type(key, raw_value, to_type, *, translate=None):
