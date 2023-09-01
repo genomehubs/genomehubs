@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useState } from "react";
 
+import CookieBanner from "./CookieBanner";
 import DownloadMessage from "./DownloadMessage";
 import Footer from "./Footer";
 import Grid from "@material-ui/core/Grid";
@@ -38,27 +39,32 @@ const useStyles = makeStyles((theme) => ({
 const DefaultLayout = ({}) => {
   const classes = useStyles();
   return (
-    <Grid
-      container
-      className={classes.container}
-      spacing={0}
-      direction="column"
-    >
-      <Grid item className={classes.item} xs={1}>
-        <Header />
-      </Grid>
-      <Grid item className={classes.item} xs={true}>
-        {/* {types && Object.keys(types).length > 0 && ( */}
-        <>
+    <div style={{ position: "relative", height: "100%", width: "100%" }}>
+      <Grid
+        container
+        className={classes.container}
+        spacing={0}
+        direction="column"
+      >
+        <Grid item className={classes.item} xs={1}>
+          <Header />
+        </Grid>
+        <Grid item className={classes.item} xs={true}>
+          {/* {types && Object.keys(types).length > 0 && ( */}
+
           <Main />
+
           <DownloadMessage />
-        </>
-        {/* )} */}
+
+          {/* )} */}
+        </Grid>
+        <Grid item className={classes.item} xs={1}>
+          <Footer />
+        </Grid>
       </Grid>
-      <Grid item className={classes.item} xs={1}>
-        <Footer />
-      </Grid>
-    </Grid>
+
+      <CookieBanner />
+    </div>
   );
 };
 
