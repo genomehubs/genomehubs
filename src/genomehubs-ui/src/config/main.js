@@ -6,6 +6,7 @@ const GH_HOST = process.env.GH_HOST || "localhost";
 const GH_CLIENT_PORT = Number(process.env.GH_CLIENT_PORT) || 8880;
 const GH_API_PORT = Number(process.env.GH_API_PORT) || 3000;
 const GH_API_VERSION = String(process.env.GH_API_VERSION) || "api/v0.0.1";
+const GH_COOKIES = process.env.GH_COOKIES || "false";
 const GH_HTTPS = String(process.env.GH_HTTPS) === "true";
 const GH_API_URL =
   process.env.GH_API_URL ||
@@ -64,6 +65,7 @@ module.exports = {
   // default taxonomy
   taxonomy: process.env.GH_TAXONOMY,
   mode: process.env.NODE_ENV || "test",
+  cookies: GH_COOKIES,
   ga_id: process.env.GH_GA_ID || "",
   gdpr_url: process.env.GH_GDPR_URL || "",
   message: process.env.GH_MESSAGE || false,

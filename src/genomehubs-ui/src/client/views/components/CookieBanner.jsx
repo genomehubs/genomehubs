@@ -5,6 +5,7 @@ import { Button } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
+import Logo from "./Logo";
 import Modal from "@material-ui/core/Modal";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Typography from "@material-ui/core/Typography";
@@ -12,6 +13,8 @@ import { compose } from "recompose";
 import { makeStyles } from "@material-ui/core/styles";
 import styles from "./Styles.scss";
 import useWindowDimensions from "../hooks/useWindowDimensions";
+
+const showBanner = COOKIE_BANNER == "true";
 
 function getModalStyle() {
   return {
@@ -112,6 +115,9 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
   const [open, setOpen] = React.useState(false);
   const windowDimensions = useWindowDimensions();
   const [previewDimensions, setPreviewDimensions] = useState(false);
+  if (!showBanner) {
+    return null;
+  }
 
   const handleOpen = () => {
     setOpen(true);

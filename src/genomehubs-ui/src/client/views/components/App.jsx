@@ -16,13 +16,15 @@ const App = ({ theme }) => {
   useEffect(() => {
     setContent(
       <StylesProvider injectFirst>
-        <div className={classnames(`theme${theme}`, styles.app)}>
-          <div id="theme-base" className={styles.infoPanel} />
-          <Head />
-          {/* <CookiesProvider>
+        <div style={{ position: "relative" }}>
+          <div className={classnames(`theme${theme}`, styles.app)}>
+            <div id="theme-base" className={styles.infoPanel} />
+            <Head />
+            {/* <CookiesProvider>
           <Layout cookies={cookies} />
         </CookiesProvider> */}
-          <Layout />
+            <Layout />
+          </div>
         </div>
       </StylesProvider>
     );

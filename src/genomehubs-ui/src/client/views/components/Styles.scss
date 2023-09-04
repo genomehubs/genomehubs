@@ -27,6 +27,12 @@ body,
   width: 100%;
 }
 
+.fillParent {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
 .app {
   @include themify($themes) {
     background: themed("secondary");
@@ -60,6 +66,27 @@ body,
       color: themed("primary");
       font-family: themed("bodyFont");
       text-decoration: none;
+    }
+
+    .banner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: sticky;
+      right: 0;
+      left: 0;
+      border-bottom: 2px solid themed("secondary");
+      top: 0;
+      min-height: 5em;
+      color: themed("secondary");
+
+      font-family: themed("bodyFont");
+      padding: 2em;
+      background-color: themed("primary");
+
+      a:link, a:visited {
+        color: themed("secondary");
+      }
     }
 
     .active:hover {
