@@ -20,19 +20,18 @@ const App = ({ theme, cookies }) => {
   const [content, setContent] = useState(null);
   useEffect(() => {
     setContent(
-      <>
-        <StylesProvider injectFirst>
+      <StylesProvider injectFirst>
+        <div style={{ position: "relative" }}>
           <div className={classnames(`theme${theme}`, styles.app)}>
             <div id="theme-base" className={styles.infoPanel} />
             <Head />
             {/* <CookiesProvider>
-            <Layout cookies={cookies} />
-          </CookiesProvider> */}
+          <Layout cookies={cookies} />
+        </CookiesProvider> */}
             <Layout />
           </div>
-        </StylesProvider>
-        {tracking}
-      </>
+        </div>
+      </StylesProvider>
     );
   }, [theme, cookies]);
   return content;

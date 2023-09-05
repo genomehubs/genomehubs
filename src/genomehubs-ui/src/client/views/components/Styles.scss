@@ -73,11 +73,11 @@ body,
       justify-content: center;
       align-items: center;
       position: sticky;
-      bottom: 0;
       right: 0;
       left: 0;
-      top: 50%;
-      height: 11em;
+      border-bottom: 2px solid themed("secondary");
+      top: 0;
+      min-height: 5em;
       color: themed("secondary");
 
       font-family: themed("bodyFont");

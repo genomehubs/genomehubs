@@ -47,13 +47,15 @@ const DefaultLayout = ({}) => {
         direction="column"
       >
         <Grid item className={classes.item} xs={1}>
+          <CookieBanner />
+        </Grid>
+        <Grid item className={classes.item} xs={1}>
           <Header />
         </Grid>
         <Grid item className={classes.item} xs={true}>
           {/* {types && Object.keys(types).length > 0 && ( */}
 
           <Main />
-
           <DownloadMessage />
 
           {/* )} */}
@@ -62,22 +64,29 @@ const DefaultLayout = ({}) => {
           <Footer />
         </Grid>
       </Grid>
-
-      <CookieBanner />
     </div>
   );
 };
 
 const ReportLayout = (props) => {
-  return <ReportPage topLevel {...props} />;
+  return (
+    <div style={{ position: "relative", height: "100%", width: "100%" }}>
+      <CookieBanner />
+      <div>
+        <ReportPage topLevel {...props} />
+      </div>
+      <Footer hidden />
+    </div>
+  );
 };
 
 const SearchLayout = (props) => {
   return (
-    <>
+    <div style={{ position: "relative", height: "100%", width: "100%" }}>
+      <CookieBanner />
       <SearchPage topLevel {...props} />
       <Footer hidden />
-    </>
+    </div>
   );
 };
 

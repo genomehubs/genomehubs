@@ -136,7 +136,7 @@ export const ReportDownload = ({
     let chartSVG;
     let scrollContainer;
     let success = false;
-    if (format == "png" || format == "svg") {
+    if (format == "png") {
       if (chartRef.current && chartRef.current.children) {
         // chartSVG = chartRef.current.childNodes[0].childNodes[0];
         chartSVG = chartRef.current.childNodes[0];
@@ -200,28 +200,28 @@ export const ReportDownload = ({
       let opts = {
         backgroundColor: "white",
       };
-      if (format == "png") {
-        // await saveSvgAsPng(chartSVG, `${filename}.png`, opts);
-        // let uri = await htmlToImage.toPng(chartSVG, opts);
-        if (scrollContainer) {
-          if (toUrl) return;
-          await scrollingDownload({
-            chartSVG,
-            scrollContainer,
-            filename,
-          });
-        } else {
-          let uri = await htmlToImage.toPng(chartSVG, opts);
-          if (toUrl) return uri;
-          await downloadLink(uri, `${filename}.png`);
-        }
-        success = true;
-      } else if (format == "svg") {
-        // let uri = await svgAsDataUri(chartSVG, opts);
-        let uri = await htmlToImage.toSvg(chartSVG, opts);
-        await downloadLink(uri, `${filename}.svg`);
-        success = true;
+
+      // await saveSvgAsPng(chartSVG, `${filename}.png`, opts);
+      // let uri = await htmlToImage.toPng(chartSVG, opts);
+      if (scrollContainer) {
+        if (toUrl) return;
+        await scrollingDownload({
+          chartSVG,
+          scrollContainer,
+          filename,
+        });
+      } else {
+        let uri = await htmlToImage.toPng(chartSVG, opts);
+        if (toUrl) return uri;
+        await downloadLink(uri, `${filename}.png`);
       }
+      success = true;
+    } else if (format == "svg") {
+      chartSVG = chartRef.current.childNodes[0].innerHTML;
+      let svgString = encodeURIComponent(chartSVG);
+      let uri = `data:image/svg+xml,${svgString}`;
+      await downloadLink(uri, `${filename}.svg`);
+      success = true;
     } else if (format == "md") {
       let propString = queryPropList[options.report]
         .map((entry) => (typeof entry === "string" ? entry : entry.prop))
