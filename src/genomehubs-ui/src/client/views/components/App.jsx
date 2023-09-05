@@ -7,11 +7,16 @@ import { StylesProvider } from "@material-ui/core/styles";
 import classnames from "classnames";
 import { compose } from "recompose";
 import styles from "./Styles.scss";
-// import { withCookies } from "react-cookie";
+import { withCookies } from "react-cookie";
 // import withFadeInOut from "../hocs/withFadeInOut";
 import withTheme from "../hocs/withTheme";
 
-const App = ({ theme }) => {
+const App = ({ theme, cookies }) => {
+  let tracking;
+  if (cookies.get("cookieConsent") == "all") {
+    tracking = <script src="/zxtm/piwik2.js"></script>;
+  }
+  console.log(tracking);
   const [content, setContent] = useState(null);
   useEffect(() => {
     setContent(
@@ -28,8 +33,8 @@ const App = ({ theme }) => {
         </div>
       </StylesProvider>
     );
-  }, [theme]);
+  }, [theme, cookies]);
   return content;
 };
 
-export default compose(memo, withTheme)(App);
+export default compose(memo, withTheme, withCookies)(App);

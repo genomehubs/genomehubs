@@ -56,7 +56,6 @@ const DefaultLayout = ({}) => {
           {/* {types && Object.keys(types).length > 0 && ( */}
 
           <Main />
-
           <DownloadMessage />
 
           {/* )} */}
