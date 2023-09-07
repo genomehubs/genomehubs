@@ -296,7 +296,7 @@ export const ReportDownload = ({
       direction="column"
       style={{ height: "100%", width: "100%" }}
     >
-      <Grid item align="right">
+      <Grid item align="right" id="report-download-button">
         {/* <GetAppIcon
           onClick={(e) => {
             if (code) {

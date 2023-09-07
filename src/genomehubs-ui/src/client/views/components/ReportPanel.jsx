@@ -70,7 +70,12 @@ const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {
     setReport(key);
   };
   return (
-    <div className={css} ref={reportRef} style={{ maxHeight: "100%" }}>
+    <div
+      id="report-panel"
+      className={css}
+      ref={reportRef}
+      style={{ maxHeight: "100%" }}
+    >
       {/* <div className={styles.header}>
         <span className={styles.title}>{title}</span>
       </div> */}
