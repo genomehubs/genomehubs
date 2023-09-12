@@ -81,14 +81,14 @@ export const histogramAgg = async ({
       // count = bounds.tickCount,
     } = meta.bins || {});
     if (bounds) {
-      if (!isNaN(bounds.domain[0])) {
+      if (bounds.domain && !isNaN(bounds.domain[0])) {
         scale = bounds.scale;
         min = funcs[scale](bounds.domain[0]);
         if (min == -Infinity) {
           min = 0;
         }
       }
-      if (!isNaN(bounds.domain[1])) {
+      if (bounds.domain && !isNaN(bounds.domain[1])) {
         max = funcs[scale](1 * bounds.domain[1]);
       }
       count = bounds.tickCount - 1;

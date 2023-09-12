@@ -28,10 +28,18 @@ export const aggregateRawValuesByTaxon = async ({
       result,
       rawValues: true,
       taxonomy,
+      bounds: { tickCount: 11 },
     });
   }
   if (summary == "terms") {
-    terms = await termsAgg({ field, result, taxonomy });
+    terms = await termsAgg({
+      field,
+      result,
+      taxonomy,
+      bounds: {
+        tickCount: 10,
+      },
+    });
   }
   return {
     size: 0,
