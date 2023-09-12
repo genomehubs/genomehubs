@@ -1,6 +1,8 @@
+import React, { memo } from "react";
+
 import Markdown from "./Markdown";
-import React from "react";
 import classnames from "classnames";
+import { compose } from "recompose";
 import styles from "./Styles.scss";
 
 const TextPanel = ({ pageId, ...overrideStyles }) => {
@@ -16,4 +18,4 @@ const TextPanel = ({ pageId, ...overrideStyles }) => {
   );
 };
 
-export default TextPanel;
+export default compose(memo)(TextPanel);

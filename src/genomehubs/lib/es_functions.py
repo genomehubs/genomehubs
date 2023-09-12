@@ -12,6 +12,7 @@ from subprocess import PIPE
 from subprocess import Popen
 
 import ujson
+from elasticsearch import ConflictError
 from elasticsearch import Elasticsearch
 from elasticsearch import NotFoundError
 from elasticsearch import client
@@ -163,6 +164,25 @@ def load_mapping(es, mapping_name, mapping):
     return res
 
 
+def get_size(obj, seen=None):
+    """Recursively find size of objects."""
+    size = sys.getsizeof(obj)
+    if seen is None:
+        seen = set()
+    obj_id = id(obj)
+    if obj_id in seen:
+        return 0
+    seen.add(obj_id)
+    if isinstance(obj, dict):
+        size += sum([get_size(v, seen) for v in obj.values()])
+        size += sum([get_size(k, seen) for k in obj.keys()])
+    elif hasattr(obj, "__dict__"):
+        size += get_size(obj.__dict__, seen)
+    elif hasattr(obj, "__iter__") and not isinstance(obj, (str, bytes, bytearray)):
+        size += sum([get_size(i, seen) for i in obj])
+    return size
+
+
 def index_stream(
     es,
     index_name,
@@ -196,6 +216,17 @@ def index_stream(
         for action in actions:
             yield True, {}
 
+    def debug_actions(actions, batch):
+        """Wrap actions for debugging."""
+        for action in actions:
+            if len(batch) == chunk_size:
+                batch = []
+            batch.append(action)
+            yield action
+
+    batch = []
+    actions = debug_actions(actions, batch)
+
     try:
         tracer = logging.getLogger("elasticsearch")
         tracer.setLevel(logging.ERROR)
@@ -213,8 +244,27 @@ def index_stream(
                 success += 1
             else:
                 failed += 1
-    except Exception as err:
-        raise err
+    except Exception as bulk_err:
+        for action in batch:
+            try:
+                if _op_type == "index":
+                    es.create(
+                        index=index_name, id=action["_id"], document=action["_source"]
+                    )
+                else:
+                    es.update(index=index_name, id=action["_id"], doc=action["doc"])
+            except ConflictError:
+                pass
+            except OverflowError:
+                pass
+            except Exception as err:
+                LOGGER.warn(
+                    "Size of document that failed to index is %d bytes",
+                    get_size(action),
+                )
+                LOGGER.warn(action)
+                raise err
+        # raise bulk_err
     es_client = client.IndicesClient(es)
     es_client.refresh(index=index_name)
     return success, failed

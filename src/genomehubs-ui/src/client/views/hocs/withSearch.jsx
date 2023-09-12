@@ -38,6 +38,7 @@ const withSearch = (WrappedComponent) => (props) => {
         dispatch(resetSearch());
       }
     },
+    resetSearch: () => dispatch(resetSearch()),
     setSearchTerm: (options) => dispatch(setSearchTerm(options)),
     setSearchIndex: (index) => dispatch(setSearchIndex(index)),
     setPreferSearchTerm: (bool) => dispatch(setPreferSearchTerm(bool)),

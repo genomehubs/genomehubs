@@ -244,7 +244,7 @@ export const ReportTools = ({
               style={{ cursor: "pointer" }}
             />
           </Grid> */}
-          <Grid item align="right">
+          <Grid item align="right" id="report-download-item">
             <Tooltip title={"Download"} arrow placement="left">
               <GetAppIcon
                 onClick={() => {

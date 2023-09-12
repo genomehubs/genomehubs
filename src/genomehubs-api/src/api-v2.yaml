@@ -225,6 +225,22 @@ components:
         minimum: 2
         type: integer
       style: form
+    emptyColumnsParam:
+      description: |
+        Flag to indicate whether search results should include attributes for which all values are empty.
+
+        Default `false` only return attributes if at least one record has a value.
+      examples:
+        false:
+          value:
+          summary: false - exclude attributes with no values from search results
+        true:
+          value: true
+          summary: true - include attributes with no values in search results
+      in: query
+      name: emptyColumns
+      schema:
+        type: boolean
     includeEstimatesParam:
       description: |
         Flag to indicate whether search results should include records for which all attribute fields are based on estimated values.

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-curl -X DELETE 'localhost:9200/*--*'
+curl -X DELETE 'localhost:9200/*2021.10.15*'
 genomehubs parse \
     --ncbi-datasets-sample tests/integration_tests/data/assembly-data-sample/eukaryota \
     --outfile tests/integration_tests/data/assembly-data-sample/ncbi_datasets.tsv

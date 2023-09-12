@@ -24,9 +24,9 @@ GenomeHubs
     :alt: Conda platforms
     :target: https://anaconda.org/tolkit/genomehubs
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/genomehubs/genomehubs/2.7.12.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/genomehubs/genomehubs/2.7.28.svg
     :alt: Commits since latest release
-    :target: https://github.com/genomehubs/genomehubs/compare/2.7.12...main
+    :target: https://github.com/genomehubs/genomehubs/compare/2.7.28...main
 
 .. |license| image:: https://anaconda.org/tolkit/genomehubs/badges/license.svg
     :alt: MIT License
@@ -211,7 +211,7 @@ Related projects
 Some GenomeHubs components are hosted in separate open source repositories (all under MIT licenses), including:
 
 BlobToolKit |blobtoolkit-release|
------------
+---------------------------------
 
 Interactive quality assessment of genome assemblies.
 
@@ -222,7 +222,7 @@ Explore analysed public assemblies at `blobtoolkit.genomehubs.org/view <https://
     :target: https://github.com/blobtoolkit/blobtoolkit
 
 GoaT CLI  |goat-cli-release|
---------
+----------------------------
 
 A command line interface for GoaT.
 

@@ -5,14 +5,15 @@ import {
   getSynonyms,
   getTypesMap,
 } from "../selectors/types";
+import { getTypes, resetTypes } from "../reducers/types";
 
 import React from "react";
 import { connect } from "react-redux";
-import { resetTypes } from "../reducers/types";
 
 const withTypes = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
     types: getTypesMap(state),
+    allTypes: getTypes(state),
     synonyms: getSynonyms(state),
     displayTypes: getDisplayTypes(state),
     groupedTypes: getGroupedTypes(state),

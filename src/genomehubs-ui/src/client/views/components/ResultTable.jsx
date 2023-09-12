@@ -31,6 +31,7 @@ import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchRecord from "../hocs/dispatchRecord";
+import expandFieldList from "../functions/expandFieldList";
 import { formatter } from "../functions/formatter";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
@@ -174,7 +175,7 @@ const SortableCell = ({
     }
   }
 
-  let title = `Sort by ${name}`;
+  let title = handleTableSort ? `Sort by ${name}` : name;
   if (description) {
     title = (
       <div style={{ whiteSpace: "pre-line", maxWidth: "14em" }}>
@@ -217,30 +218,39 @@ const SortableCell = ({
       sortDirection={sortDirection}
     >
       <Tooltip key={name} title={title} arrow>
-        <TableSortLabel
-          active={sortBy === name}
-          direction={sortOrder}
-          onClick={() =>
-            handleTableSort(
-              sortDirection && sortOrder === "desc"
-                ? { sortBy: "none" }
-                : {
-                    sortBy: name,
-                    sortOrder:
-                      sortDirection && sortOrder === "asc" ? "desc" : "asc",
-                  }
-            )
-          }
-        >
-          {/* {name} */}
-          {name.split("_").join(`_\u200b`)}
-          {status && status != "stable" && <sup>{`\u2020`}</sup>}
-          {sortBy === name ? (
-            <span className={classes.visuallyHidden}>
-              {sortOrder === "desc" ? "sorted descending" : "sorted ascending"}
-            </span>
-          ) : null}
-        </TableSortLabel>
+        {(handleTableSort && (
+          <TableSortLabel
+            active={sortBy === name}
+            direction={sortOrder}
+            onClick={() =>
+              handleTableSort(
+                sortDirection && sortOrder === "desc"
+                  ? { sortBy: "none" }
+                  : {
+                      sortBy: name,
+                      sortOrder:
+                        sortDirection && sortOrder === "asc" ? "desc" : "asc",
+                    }
+              )
+            }
+          >
+            {/* {name} */}
+            {name.split("_").join(`_\u200b`)}
+            {status && status != "stable" && <sup>{`\u2020`}</sup>}
+            {sortBy === name ? (
+              <span className={classes.visuallyHidden}>
+                {sortOrder === "desc"
+                  ? "sorted descending"
+                  : "sorted ascending"}
+              </span>
+            ) : null}
+          </TableSortLabel>
+        )) || (
+          <span>
+            {name.split("_").join(`_\u200b`)}
+            {status && status != "stable" && <sup>{`\u2020`}</sup>}
+          </span>
+        )}
       </Tooltip>
       <br />
       {(showExcludeBoxes && (
@@ -346,6 +356,7 @@ const ResultTable = ({
   saveSearchResults,
   searchResults,
   searchTerm,
+  hideEmpty = true,
   setSearchTerm,
   activeNameClasses,
   activeRanks,
@@ -358,10 +369,21 @@ const ResultTable = ({
 }) => {
   const rootRef = useRef(null);
   let expandedTypes = [];
+  let emptyBuckets = new Set();
+  if (searchResults.aggs) {
+    if (searchResults.aggs.fields) {
+      emptyBuckets = new Set(
+        Object.entries(searchResults.aggs.fields.by_key.buckets)
+          .filter(([key, obj]) => obj.doc_count == 0)
+          .map(([key]) => key)
+      );
+    }
+  }
   if (searchTerm) {
     if (searchTerm.fields) {
-      expandedTypes = searchTerm.fields
-        .split(",")
+      let fieldList = expandFieldList({ fields: searchTerm.fields, types });
+      expandedTypes = fieldList
+        .filter((name) => !emptyBuckets.has(name))
         .map((name) => ({
           name,
         }))
@@ -376,7 +398,9 @@ const ResultTable = ({
         obj.summary = summary || defaultValue;
       }
     } else {
-      expandedTypes = displayTypes;
+      expandedTypes = displayTypes.filter(
+        ({ name }) => !emptyBuckets.has(name)
+      );
       for (let obj of expandedTypes) {
         obj.summary = "value";
       }
@@ -384,7 +408,16 @@ const ResultTable = ({
   }
 
   if (searchResults && searchResults.status && searchResults.status.error) {
-    return <ReportError report={"search"} error={searchResults.status.error} />;
+    return (
+      <div
+        style={{
+          position: "relative",
+          height: "15em",
+        }}
+      >
+        <ReportError report={"search"} error={searchResults.status.error} />
+      </div>
+    );
   } else if (
     !searchResults.status ||
     !searchResults.status.hasOwnProperty("hits")
@@ -811,6 +844,9 @@ const ResultTable = ({
   }
   for (let type of expandedTypes) {
     let sortDirection = sortBy === type.name ? sortOrder : false;
+    if (type.processed_type == "geo_point") {
+    } else {
+    }
     heads.push(
       <SortableCell
         key={type.name}
@@ -822,7 +858,7 @@ const ResultTable = ({
         sortBy={sortBy}
         sortOrder={sortOrder}
         sortDirection={sortDirection}
-        handleTableSort={handleTableSort}
+        handleTableSort={type.processed_type != "geo_point" && handleTableSort}
         setAttributeSettings={setAttributeSettings}
         showExcludeBoxes={searchIndex == "taxon" ? "all" : "missing"}
         excludeAncestral={arrToObj(searchTerm.excludeAncestral)}

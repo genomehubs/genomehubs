@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 
 import DialogContent from "@material-ui/core/DialogContent";
+import LaunchIcon from "@material-ui/icons/Launch";
 import Modal from "@material-ui/core/Modal";
 import ReportFull from "./ReportFull";
+import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { makeStyles } from "@material-ui/core/styles";
 import { sortReportQuery } from "../selectors/report";
@@ -36,7 +38,7 @@ export const useStyles = makeStyles((theme) => ({
 export const ReportModal = ({
   reportId,
   report,
-  disableModal,
+  disableModal = true,
   queryString,
   basename,
   children,
@@ -49,10 +51,10 @@ export const ReportModal = ({
   // disableModal = true;
 
   const handleOpen = () => {
-    if (!disableModal) {
-      //setOpen(true);
-      navigate(`${basename}/report?${reportId}`);
-    }
+    // if (!disableModal) {
+    //setOpen(true);
+    navigate(`${basename}/report?${reportId}`);
+    // }
   };
 
   const handleClose = () => {
@@ -69,23 +71,40 @@ export const ReportModal = ({
   );
 
   return (
-    <div onClick={handleOpen} style={{ height: "100%", width: "100%" }}>
+    <div style={{ height: "100%", width: "100%" }}>
       <div
         style={{
-          cursor: open ? "default" : disableModal ? "default" : "pointer",
           height: "100%",
           width: "100%",
+          position: "relative",
         }}
       >
         <div
           style={{
-            pointerEvents: open ? "auto" : disableModal ? "auto" : "none",
-            height: "100%",
-            width: "100%",
+            pointerEvents: "auto",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            position: "absolute",
           }}
         >
           {children}
         </div>
+        <Tooltip title={"Click to view full report"} arrow placement={"top"}>
+          <div
+            onClick={handleOpen}
+            style={{
+              top: 0,
+              right: 0,
+              position: "absolute",
+              marginRight: "0.25em",
+              cursor: "pointer",
+            }}
+          >
+            <LaunchIcon />
+          </div>
+        </Tooltip>
       </div>
       <Modal
         open={open}

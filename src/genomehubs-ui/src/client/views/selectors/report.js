@@ -57,6 +57,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
       ]),
     },
     collapseMonotypic: { in: new Set(["tree"]) },
+    highlight: { in: new Set(["table"]), ui: true },
     colorPalette: { not: new Set(["sources"]), ui: true },
     includeEstimates: true,
     excludeAncestral: true,
@@ -134,7 +135,13 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
   return qs.stringify(newOptions);
 };
 
-export function fetchReport({ reportId, reload, report, hideMessage }) {
+export function fetchReport({
+  reportId,
+  reload,
+  report,
+  hideMessage,
+  inModal,
+}) {
   return async function (dispatch) {
     const state = store.getState();
     const fetching = getReportsFetching(state);
@@ -166,7 +173,7 @@ export function fetchReport({ reportId, reload, report, hideMessage }) {
       let status;
       const interval = checkProgress({
         queryId,
-        delay: 1000,
+        delay: inModal ? 1000 : 30000,
         dispatch,
         message: hideMessage ? undefined : `Fetching ${report} report`,
       });
@@ -590,12 +597,22 @@ const processScatter = (scatter, result) => {
 const oneDimensionTable = ({ report }) => {
   let histograms = report.table.histograms;
   let buckets = histograms.buckets.filter((bucket) => bucket && bucket !== 0);
-  let headers = buckets.map((bucket) => ({ key: bucket, label: bucket }));
-  let row = buckets.map((bucket, i) => ({
-    key: bucket,
-    count: histograms.allValues[i] || 0,
-  }));
-  return { headers, rows: [row] };
+  let headers = [
+    { key: report.xLabel, label: report.xLabel },
+    { key: "count", label: report.yLabel },
+  ];
+  let rows = buckets.map((bucket, i) => [
+    {
+      key: "bucket",
+      value: bucket,
+      label: bucket,
+    },
+    {
+      key: "count",
+      count: histograms.allValues[i] || 0,
+    },
+  ]);
+  return { headers, rows };
 };
 
 const twoDimensionTable = ({ report }) => {
@@ -655,12 +672,12 @@ const twoDimensionTable = ({ report }) => {
 };
 
 const processTable = (report) => {
-  let { table, xLabel, yLabel } = report;
+  let { table, xLabel, yQuery } = report;
   let { cat } = table;
   let headers, rows;
-  if (cat && yLabel) {
+  if (cat && yQuery) {
     ({ headers, rows } = twoDimensionTable({ report }));
-  } else if (cat || yLabel) {
+  } else if (cat || yQuery) {
     ({ headers, rows } = twoDimensionTable({ report }));
   } else if (xLabel) {
     ({ headers, rows } = oneDimensionTable({ report }));
@@ -959,7 +976,7 @@ export const saveReport = ({ options, format = "json" }) => {
     let status;
     const interval = checkProgress({
       queryId,
-      delay: 1000,
+      delay: 5000,
       dispatch,
       message: `Preparing ${format.toUpperCase()} file for download`,
     });

@@ -46,7 +46,7 @@ export const useStyles = makeStyles(() => ({
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: "#eeeeee",
+    backgroundColor: "#d2e4f0",
     fontWeight: 700,
   },
 }))(TableCell);

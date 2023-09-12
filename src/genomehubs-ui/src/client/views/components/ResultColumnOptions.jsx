@@ -15,6 +15,7 @@ import Paper from "@material-ui/core/Paper";
 import Select from "@material-ui/core/Select";
 import SettingsButton from "./SettingsButton";
 import { compose } from "recompose";
+import expandFieldList from "../functions/expandFieldList";
 import qs from "../functions/qs";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
@@ -143,7 +144,7 @@ const ResultColumnOptions = ({
     });
     let fields = [];
     if (searchTerm.fields) {
-      fields = searchTerm.fields.split(",");
+      fields = expandFieldList({ fields: searchTerm.fields, types });
     } else {
       fields = Object.entries(types)
         .filter(

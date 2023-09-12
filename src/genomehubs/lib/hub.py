@@ -261,25 +261,46 @@ def test_constraint(value, constraint):
 
 def convert_lat_lon(location):
     """Convert lat and lon to array notation."""
-    if isinstance(location, list):
-        return ",".join(location)
-    if location.endswith(("E", "W")):
-        sign = {"N": "", "E": "", "S": "-", "W": "-"}
-        parts = re.split(r"\s*([NESW])\s*", location)
-        return f"{sign[parts[1]]}{parts[0]},{sign[parts[3]]}{parts[2]}"
-    if re.match(r"-*\d+\.*\d*,-*\d+\.*\d*", location):
-        return location
-    return None if location else ""
+    if not location:
+        return ""
+    sign = {"N": "", "E": "", "S": "-", "W": "-"}
+    if not isinstance(location, list):
+        if "," in location:
+            location = re.split(r"\s*,\s*", location)
+        elif location.endswith(("E", "W")):
+            parts = re.split(r"\s*([NESW])\s*", location)
+            location = [f"{sign[parts[1]]}{parts[0]}", f"{sign[parts[3]]}{parts[2]}"]
+        else:
+            return None
+    for index, coord in enumerate(location):
+        if coord.endswith(("N", "S", "E", "W")):
+            parts = re.split(r"\s*([NESW])\s*", coord)
+            location[index] = f"{sign[parts[1]]}{parts[0]}"
+        if not re.match(r"^-*\d{1,3}\.*\d*$", location[index]):
+            return None
+    if abs(float(location[0])) > 90 or abs(float(location[1])) > 180:
+        return None
+    return ",".join(location)
 
 
 def convert_to_type(key, raw_value, to_type, *, translate=None):
     """Convert values to type."""
+    # print(raw_values)
+    # if not isinstance(raw_values, list):
+    #     raw_values = [raw_values]
+    # values = []
+    # for raw_value in raw_values:
     if to_type in {"byte", "integer", "long", "short"}:
         try:
             value = int(raw_value)
         except ValueError:
+            raw_value = str(raw_value).lower()
             if translate and raw_value in translate:
-                value = convert_to_type(key, translate[raw_value], to_type)
+                new_value = translate[raw_value]
+                if isinstance(new_value, list):
+                    value = [convert_to_type(key, v, to_type) for v in new_value]
+                else:
+                    value = convert_to_type(key, translate[raw_value], to_type)
             else:
                 value = None
     elif to_type in {
@@ -294,6 +315,7 @@ def convert_to_type(key, raw_value, to_type, *, translate=None):
         try:
             value = float(raw_value)
         except ValueError:
+            raw_value = str(raw_value).lower()
             if translate and raw_value in translate:
                 value = convert_to_type(key, translate[raw_value], to_type)
             else:
@@ -312,6 +334,13 @@ def convert_to_type(key, raw_value, to_type, *, translate=None):
             str(raw_value),
             to_type,
         )
+    #     if isinstance(value, list):
+    #         values += value
+    #     else:
+    #         values.append(value)
+    #     print(values)
+    # if len(values) == 1:
+    #     return values[0]
     return value
 
 

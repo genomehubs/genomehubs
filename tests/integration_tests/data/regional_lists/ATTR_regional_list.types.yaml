@@ -2,8 +2,256 @@ attributes:
   country_list:
     constraint:
       enum:
-        - gb
+        - af
+        - al
+        - dz
+        - as
+        - ad
+        - ao
+        - ai
+        - aq
+        - ag
+        - ar
+        - am
+        - aw
+        - au
+        - at
+        - az
+        - bs
+        - bh
+        - bd
+        - bb
+        - by
+        - be
+        - bz
+        - bj
+        - bm
+        - bt
+        - bo
+        - bq
+        - ba
+        - bw
+        - bv
+        - br
+        - io
+        - bn
+        - bg
+        - bf
+        - bi
+        - cv
+        - kh
+        - cm
+        - ca
+        - ky
+        - cf
+        - td
+        - cl
+        - cn
+        - cx
+        - cc
+        - co
+        - km
+        - cd
+        - cg
+        - ck
+        - cr
+        - hr
+        - cu
+        - cw
+        - cy
+        - cz
+        - ci
+        - dk
+        - dj
+        - dm
+        - do
+        - ec
+        - eg
+        - sv
+        - gq
+        - er
+        - ee
+        - sz
+        - et
+        - fk
+        - fo
+        - fj
+        - fi
+        - fr
+        - gf
+        - pf
+        - tf
+        - ga
+        - gm
+        - ge
+        - de
+        - gh
+        - gi
+        - gr
+        - gl
+        - gd
+        - gp
+        - gu
+        - gt
+        - gg
+        - gn
+        - gw
+        - gy
+        - ht
+        - hm
+        - va
+        - hn
+        - hk
+        - hu
+        - is
+        - in
+        - id
+        - ir
+        - iq
         - ie
+        - im
+        - il
+        - it
+        - jm
+        - jp
+        - je
+        - jo
+        - kz
+        - ke
+        - ki
+        - kp
+        - kr
+        - kw
+        - kg
+        - la
+        - lv
+        - lb
+        - ls
+        - lr
+        - ly
+        - li
+        - lt
+        - lu
+        - mo
+        - mg
+        - mw
+        - my
+        - mv
+        - ml
+        - mt
+        - mh
+        - mq
+        - mr
+        - mu
+        - yt
+        - mx
+        - fm
+        - md
+        - mc
+        - mn
+        - me
+        - ms
+        - ma
+        - mz
+        - mm
+        - na
+        - nr
+        - np
+        - nl
+        - nc
+        - nz
+        - ni
+        - ne
+        - ng
+        - nu
+        - nf
+        - mp
+        - "no"
+        - om
+        - pk
+        - pw
+        - ps
+        - pa
+        - pg
+        - py
+        - pe
+        - ph
+        - pn
+        - pl
+        - pt
+        - pr
+        - qa
+        - mk
+        - ro
+        - ru
+        - rw
+        - re
+        - bl
+        - sh
+        - kn
+        - lc
+        - mf
+        - pm
+        - vc
+        - ws
+        - sm
+        - st
+        - sa
+        - sn
+        - rs
+        - sc
+        - sl
+        - sg
+        - sx
+        - sk
+        - si
+        - sb
+        - so
+        - za
+        - gs
+        - ss
+        - es
+        - lk
+        - sd
+        - sr
+        - sj
+        - se
+        - ch
+        - sy
+        - tw
+        - tj
+        - tz
+        - th
+        - tl
+        - tg
+        - tk
+        - to
+        - tt
+        - tn
+        - tr
+        - tm
+        - tc
+        - tv
+        - ug
+        - ua
+        - ae
+        - gb
+        - um
+        - us
+        - uy
+        - uz
+        - vu
+        - ve
+        - vn
+        - vg
+        - vi
+        - wf
+        - eh
+        - ye
+        - zm
+        - zw
+        - ax
+        - xk
     description: List of countries where taxon is found
     display_group: regional_lists
     display_level: 2
@@ -12,3 +260,506 @@ attributes:
     traverse: list
     traverse_direction: up
     type: keyword
+    value_metadata:
+      default:
+        description: 2-letter country code
+      af:
+        description: Afghanistan
+      al:
+        description: Albania
+      dz:
+        description: Algeria
+      as:
+        description: American Samoa
+      ad:
+        description: Andorra
+      ao:
+        description: Angola
+      ai:
+        description: Anguilla
+      aq:
+        description: Antarctica
+      ag:
+        description: Antigua and Barbuda
+      ar:
+        description: Argentina
+      am:
+        description: Armenia
+      aw:
+        description: Aruba
+      au:
+        description: Australia
+      at:
+        description: Austria
+      az:
+        description: Azerbaijan
+      bs:
+        description: Bahamas (the)
+      bh:
+        description: Bahrain
+      bd:
+        description: Bangladesh
+      bb:
+        description: Barbados
+      by:
+        description: Belarus
+      be:
+        description: Belgium
+      bz:
+        description: Belize
+      bj:
+        description: Benin
+      bm:
+        description: Bermuda
+      bt:
+        description: Bhutan
+      bo:
+        description: Bolivia (Plurinational State of)
+      bq:
+        description: Bonaire, Sint Eustatius and Saba
+      ba:
+        description: Bosnia and Herzegovina
+      bw:
+        description: Botswana
+      bv:
+        description: Bouvet Island
+      br:
+        description: Brazil
+      io:
+        description: British Indian Ocean Territory (the)
+      bn:
+        description: Brunei Darussalam
+      bg:
+        description: Bulgaria
+      bf:
+        description: Burkina Faso
+      bi:
+        description: Burundi
+      cv:
+        description: Cabo Verde
+      kh:
+        description: Cambodia
+      cm:
+        description: Cameroon
+      ca:
+        description: Canada
+      ky:
+        description: Cayman Islands (the)
+      cf:
+        description: Central African Republic (the)
+      td:
+        description: Chad
+      cl:
+        description: Chile
+      cn:
+        description: China
+      cx:
+        description: Christmas Island
+      cc:
+        description: Cocos (Keeling) Islands (the)
+      co:
+        description: Colombia
+      km:
+        description: Comoros (the)
+      cd:
+        description: Congo (the Democratic Republic of the)
+      cg:
+        description: Congo (the)
+      ck:
+        description: Cook Islands (the)
+      cr:
+        description: Costa Rica
+      hr:
+        description: Croatia
+      cu:
+        description: Cuba
+      cw:
+        description: Curaçao
+      cy:
+        description: Cyprus
+      cz:
+        description: Czechia
+      ci:
+        description: Côte d'Ivoire
+      dk:
+        description: Denmark
+      dj:
+        description: Djibouti
+      dm:
+        description: Dominica
+      do:
+        description: Dominican Republic (the)
+      ec:
+        description: Ecuador
+      eg:
+        description: Egypt
+      sv:
+        description: El Salvador
+      gq:
+        description: Equatorial Guinea
+      er:
+        description: Eritrea
+      ee:
+        description: Estonia
+      sz:
+        description: Eswatini
+      et:
+        description: Ethiopia
+      fk:
+        description: Falkland Islands (the) [Malvinas]
+      fo:
+        description: Faroe Islands (the)
+      fj:
+        description: Fiji
+      fi:
+        description: Finland
+      fr:
+        description: France
+      gf:
+        description: French Guiana
+      pf:
+        description: French Polynesia
+      tf:
+        description: French Southern Territories (the)
+      ga:
+        description: Gabon
+      gm:
+        description: Gambia (the)
+      ge:
+        description: Georgia
+      de:
+        description: Germany
+      gh:
+        description: Ghana
+      gi:
+        description: Gibraltar
+      gr:
+        description: Greece
+      gl:
+        description: Greenland
+      gd:
+        description: Grenada
+      gp:
+        description: Guadeloupe
+      gu:
+        description: Guam
+      gt:
+        description: Guatemala
+      gg:
+        description: Guernsey
+      gn:
+        description: Guinea
+      gw:
+        description: Guinea-Bissau
+      gy:
+        description: Guyana
+      ht:
+        description: Haiti
+      hm:
+        description: Heard Island and McDonald Islands
+      va:
+        description: Holy See (the)
+      hn:
+        description: Honduras
+      hk:
+        description: Hong Kong
+      hu:
+        description: Hungary
+      is:
+        description: Iceland
+      in:
+        description: India
+      id:
+        description: Indonesia
+      ir:
+        description: Iran (Islamic Republic of)
+      iq:
+        description: Iraq
+      ie:
+        description: Ireland
+      im:
+        description: Isle of Man
+      il:
+        description: Israel
+      it:
+        description: Italy
+      jm:
+        description: Jamaica
+      jp:
+        description: Japan
+      je:
+        description: Jersey
+      jo:
+        description: Jordan
+      kz:
+        description: Kazakhstan
+      ke:
+        description: Kenya
+      ki:
+        description: Kiribati
+      kp:
+        description: Korea (the Democratic People's Republic of)
+      kr:
+        description: Korea (the Republic of)
+      kw:
+        description: Kuwait
+      kg:
+        description: Kyrgyzstan
+      la:
+        description: Lao People's Democratic Republic (the)
+      lv:
+        description: Latvia
+      lb:
+        description: Lebanon
+      ls:
+        description: Lesotho
+      lr:
+        description: Liberia
+      ly:
+        description: Libya
+      li:
+        description: Liechtenstein
+      lt:
+        description: Lithuania
+      lu:
+        description: Luxembourg
+      mo:
+        description: Macao
+      mg:
+        description: Madagascar
+      mw:
+        description: Malawi
+      my:
+        description: Malaysia
+      mv:
+        description: Maldives
+      ml:
+        description: Mali
+      mt:
+        description: Malta
+      mh:
+        description: Marshall Islands (the)
+      mq:
+        description: Martinique
+      mr:
+        description: Mauritania
+      mu:
+        description: Mauritius
+      yt:
+        description: Mayotte
+      mx:
+        description: Mexico
+      fm:
+        description: Micronesia (Federated States of)
+      md:
+        description: Moldova (the Republic of)
+      mc:
+        description: Monaco
+      mn:
+        description: Mongolia
+      me:
+        description: Montenegro
+      ms:
+        description: Montserrat
+      ma:
+        description: Morocco
+      mz:
+        description: Mozambique
+      mm:
+        description: Myanmar
+      na:
+        description: Namibia
+      nr:
+        description: Nauru
+      np:
+        description: Nepal
+      nl:
+        description: Netherlands (the)
+      nc:
+        description: New Caledonia
+      nz:
+        description: New Zealand
+      ni:
+        description: Nicaragua
+      ne:
+        description: Niger (the)
+      ng:
+        description: Nigeria
+      nu:
+        description: Niue
+      nf:
+        description: Norfolk Island
+      mp:
+        description: Northern Mariana Islands (the)
+      "no":
+        description: Norway
+      om:
+        description: Oman
+      pk:
+        description: Pakistan
+      pw:
+        description: Palau
+      ps:
+        description: Palestine, State of
+      pa:
+        description: Panama
+      pg:
+        description: Papua New Guinea
+      py:
+        description: Paraguay
+      pe:
+        description: Peru
+      ph:
+        description: Philippines (the)
+      pn:
+        description: Pitcairn
+      pl:
+        description: Poland
+      pt:
+        description: Portugal
+      pr:
+        description: Puerto Rico
+      qa:
+        description: Qatar
+      mk:
+        description: Republic of North Macedonia
+      ro:
+        description: Romania
+      ru:
+        description: Russian Federation (the)
+      rw:
+        description: Rwanda
+      re:
+        description: Réunion
+      bl:
+        description: Saint Barthélemy
+      sh:
+        description: Saint Helena, Ascension and Tristan da Cunha
+      kn:
+        description: Saint Kitts and Nevis
+      lc:
+        description: Saint Lucia
+      mf:
+        description: Saint Martin (French part)
+      pm:
+        description: Saint Pierre and Miquelon
+      vc:
+        description: Saint Vincent and the Grenadines
+      ws:
+        description: Samoa
+      sm:
+        description: San Marino
+      st:
+        description: Sao Tome and Principe
+      sa:
+        description: Saudi Arabia
+      sn:
+        description: Senegal
+      rs:
+        description: Serbia
+      sc:
+        description: Seychelles
+      sl:
+        description: Sierra Leone
+      sg:
+        description: Singapore
+      sx:
+        description: Sint Maarten (Dutch part)
+      sk:
+        description: Slovakia
+      si:
+        description: Slovenia
+      sb:
+        description: Solomon Islands
+      so:
+        description: Somalia
+      za:
+        description: South Africa
+      gs:
+        description: South Georgia and the South Sandwich Islands
+      ss:
+        description: South Sudan
+      es:
+        description: Spain
+      lk:
+        description: Sri Lanka
+      sd:
+        description: Sudan (the)
+      sr:
+        description: Suriname
+      sj:
+        description: Svalbard and Jan Mayen
+      se:
+        description: Sweden
+      ch:
+        description: Switzerland
+      sy:
+        description: Syrian Arab Republic
+      tw:
+        description: Taiwan (Province of China)
+      tj:
+        description: Tajikistan
+      tz:
+        description: Tanzania, United Republic of
+      th:
+        description: Thailand
+      tl:
+        description: Timor-Leste
+      tg:
+        description: Togo
+      tk:
+        description: Tokelau
+      to:
+        description: Tonga
+      tt:
+        description: Trinidad and Tobago
+      tn:
+        description: Tunisia
+      tr:
+        description: Turkey
+      tm:
+        description: Turkmenistan
+      tc:
+        description: Turks and Caicos Islands (the)
+      tv:
+        description: Tuvalu
+      ug:
+        description: Uganda
+      ua:
+        description: Ukraine
+      ae:
+        description: United Arab Emirates (the)
+      gb:
+        description: United Kingdom of Great Britain and Northern Ireland (the)
+      um:
+        description: United States Minor Outlying Islands (the)
+      us:
+        description: United States of America (the)
+      uy:
+        description: Uruguay
+      uz:
+        description: Uzbekistan
+      vu:
+        description: Vanuatu
+      ve:
+        description: Venezuela (Bolivarian Republic of)
+      vn:
+        description: Viet Nam
+      vg:
+        description: Virgin Islands (British)
+      vi:
+        description: Virgin Islands (U.S.)
+      wf:
+        description: Wallis and Futuna
+      eh:
+        description: Western Sahara
+      ye:
+        description: Yemen
+      zm:
+        description: Zambia
+      zw:
+        description: Zimbabwe
+      ax:
+        description: Åland Islands
+      xk:
+        description: Kosovo

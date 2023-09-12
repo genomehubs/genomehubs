@@ -59,6 +59,7 @@ const ReportLoading = ({
         )}
       </div>
       <div
+        id="report-loaded"
         style={{
           position: "absolute",
           top: 0,

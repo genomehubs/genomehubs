@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { memo, useRef, useState } from "react";
 
 import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -29,7 +29,7 @@ const Toggle = ({
   // let transpColor = colors[1].match(/#/)
   //   ? `${colors[1]}33`
   //   : colors[1].replace(/rgb\(/, "rgba(").replace(/\)/, ", 0.1)");
-  // transpColor = "#1f78b411";
+  // transpColor = "#f0f6fa";
 
   return (
     <Grid
@@ -47,7 +47,7 @@ const Toggle = ({
           container
           direction="row"
           style={{
-            backgroundColor: "#1f78b433",
+            backgroundColor: "#d2e4f0",
             borderBottom: showContent ? `0.2em solid #1f78b466` : "none",
           }}
         >
@@ -106,4 +106,4 @@ const Toggle = ({
   );
 };
 
-export default compose(withColors)(Toggle);
+export default compose(memo, withColors)(Toggle);

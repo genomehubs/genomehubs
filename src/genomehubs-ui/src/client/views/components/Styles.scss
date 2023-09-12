@@ -27,6 +27,12 @@ body,
   width: 100%;
 }
 
+.fillParent {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
 .app {
   @include themify($themes) {
     background: themed("secondary");
@@ -62,7 +68,31 @@ body,
       text-decoration: none;
     }
 
-    .active:hover { fill-opacity: 0.5; stroke-opacity: 0.5;}
+    .banner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: sticky;
+      right: 0;
+      left: 0;
+      border-bottom: 2px solid themed("secondary");
+      top: 0;
+      min-height: 5em;
+      color: themed("secondary");
+
+      font-family: themed("bodyFont");
+      padding: 2em;
+      background-color: themed("primary");
+
+      a:link, a:visited {
+        color: themed("secondary");
+      }
+    }
+
+    .active:hover {
+      fill-opacity: 0.5;
+      stroke-opacity: 0.5;
+    }
 
     a:link,
     a:visited {
@@ -70,7 +100,6 @@ body,
       color: #1f78b4;
       cursor: pointer;
     }
-
 
     .fillParent {
       height: 100%;
@@ -114,7 +143,7 @@ body,
       .siteText {
         background: rgba(themed("primary"), 0.5);
       }
-      
+
       .siteLogo {
         height: 1.8em;
         width: 1.8em;
@@ -139,7 +168,7 @@ body,
         float: right;
         background: rgba(themed("primary"), 0.5);
         height: 2em;
-        overflow: visible
+        overflow: visible;
       }
 
       .tab {
@@ -160,7 +189,6 @@ body,
         &:hover {
           color: themed("secondary");
           border-bottom: 0.2em solid themed("secondary");
-      
         }
       }
     }
@@ -675,14 +703,15 @@ body,
 
     blockquote {
       background: rgba(themed("primary"), 0.05);
-      background: #1f78b411; //#00616411;
-      border-left: 10px solid #1f78b433; //#00616433;
+      background: #f0f6fa; //#00616411;
+      border-left: 10px solid #d2e4f0; //#00616433;
       font-family: themed("bodyFont");
       margin: 1.5em 10px;
-      padding: .5em 10px;
+      padding: 0.5em 10px;
       max-width: 90%;
 
-      a, .link {
+      a,
+      .link {
         color: themed("primary");
       }
     }
@@ -717,8 +746,6 @@ body,
         cursor: pointer;
       }
 
-      
-
       .boldValue {
         display: inline-block;
         min-width: 5em;
@@ -742,6 +769,11 @@ body,
 
       .unpadded {
         // padding-top: 0 !important;
+        padding-bottom: 0 !important;
+      }
+
+      .negativePadded {
+        margin-top: -1em !important;
         padding-bottom: 0 !important;
       }
 

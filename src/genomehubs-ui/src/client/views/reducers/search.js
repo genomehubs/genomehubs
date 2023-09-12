@@ -35,6 +35,7 @@ const searchResults = handleActions(
       status: action.payload.status,
       results: action.payload.results,
       query: action.payload.query,
+      aggs: action.payload.aggs,
       fields: action.payload.fields,
       lastUpdated: action.meta.receivedAt,
     }),
@@ -162,6 +163,7 @@ export const getSearchNameClasses = createSelector(
 const searchDefaultValues = {
   includeDescendants: false,
   includeEstimates: true,
+  emptyColumns: false,
 };
 
 export const setSearchDefaults = createAction("SET_SEARCH_DEFAULTS");

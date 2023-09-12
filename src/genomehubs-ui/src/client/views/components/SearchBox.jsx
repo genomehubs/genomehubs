@@ -6,6 +6,7 @@ import FormControl from "@material-ui/core/FormControl";
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import Popper from "@material-ui/core/Popper";
+import SearchButton from "./SearchButton";
 import SearchIcon from "@material-ui/icons/Search";
 import SearchInputQueries from "./SearchInputQueries";
 import SearchToggles from "./SearchToggles";
@@ -247,8 +248,8 @@ const SearchBox = ({
               </FormControl>
             </Grid>
             <Grid item xs={2}>
-              <Tooltip title="Click to search" arrow placement={"top"}>
-                <IconButton
+              {/* <Tooltip title="Click to search" arrow placement={"top"}> */}
+              {/* <IconButton
                   className={classes.search}
                   aria-label="submit search"
                   onMouseDown={(e) => {
@@ -264,8 +265,22 @@ const SearchBox = ({
                   }}
                 >
                   <SearchIcon />
-                </IconButton>
-              </Tooltip>
+                </IconButton> */}
+              <SearchButton
+                handleClick={(e, props) => {
+                  e.preventDefault();
+                  handleSubmit(e, props);
+                  // setTimeout(() => {
+                  //   formRef.current.dispatchEvent(
+                  //     new Event("submit", {
+                  //       cancelable: false,
+                  //       bubbles: true,
+                  //     })
+                  //   );
+                  // }, 20);
+                }}
+              />
+              {/* </Tooltip> */}
             </Grid>
           </Grid>
         </Grid>

@@ -84,6 +84,10 @@
         "type": "keyword",
         "ignore_above": 32,
         "meta": { "description": "Units for values" }
+      },
+      "value_metadata": {
+        "type": "object",
+        "enabled": false
       }
     }
   }

@@ -88,6 +88,7 @@ const config = {
       BRANCH: JSON.stringify(gitRevisionPlugin.branch()),
       COMMIT_HASH: JSON.stringify(commitHash),
       PAGES_URL: JSON.stringify(main.basename + main.pagesUrl),
+      COOKIE_BANNER: JSON.stringify(main.cookies),
       GA_ID: JSON.stringify(main.ga_id),
       GDPR_URL: JSON.stringify(main.gdpr_url),
       GIT_VERSION: JSON.stringify(gitRevisionPlugin.version()),

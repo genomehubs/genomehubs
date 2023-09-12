@@ -6,7 +6,7 @@ import { formatJson } from "../functions/formatJson";
 import { indexName } from "../functions/indexName";
 import { logError } from "../functions/logger";
 
-const getSummary = async (params) => {
+const getSummary = async ({ query: params, ...req }) => {
   let { typesMap, lookupTypes } = await attrTypes({ ...params });
   let index = indexName({ ...params });
   let ids = Array.isArray(params.recordId)
@@ -47,8 +47,9 @@ const getSummary = async (params) => {
       },
       { meta: true }
     )
-    .catch((err) => {
-      return err.meta;
+    .catch((message) => {
+      logError({ req, message });
+      return message.meta;
     });
   let summaries = [];
   let status = checkResponse({ body });
@@ -71,7 +72,7 @@ const getSummary = async (params) => {
 export const getFieldSummary = async (req, res) => {
   try {
     let response = {};
-    response = await getSummary(req.query);
+    response = await getSummary(req);
     return res.status(200).send(formatJson(response, req.query.indent));
   } catch (message) {
     logError({ req, message });

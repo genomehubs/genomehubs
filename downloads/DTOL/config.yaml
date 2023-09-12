@@ -1,0 +1,5 @@
+- url: "http://localhost:8880/search?query=tax_tree%289608%5BCanidae%5D%29%20AND%20tax_rank%28species%29&result=taxon&includeEstimates=true&summaryValues=count&taxonomy=ncbi&report=scatter&rank=species&pointSize=15&y=genome_size&plotRatio=1.0#tax_tree(9608[Canidae])%20AND%20tax_rank(species)"
+  filename: "scatter2.png"
+- url: "http://localhost:8880/search?query=tax_tree%289608%5BCanidae%5D%29%20AND%20tax_rank%28species%29&result=taxon&includeEstimates=true&summaryValues=count&taxonomy=ncbi&report=tree&rank=species&pointSize=15&plotRatio=1#tax_tree(9608[Canidae])%20AND%20tax_rank(species)"
+  filename: "tree2.png"
+  size: 600

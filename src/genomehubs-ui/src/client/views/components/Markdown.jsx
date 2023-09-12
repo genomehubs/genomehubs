@@ -1,8 +1,13 @@
 import React, { createElement, useEffect } from "react";
 import { basename, siteName } from "../reducers/location";
+import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
+import BasicSelect from "./BasicSelect";
+import { Box } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
+import EnumSelect from "./EnumSelect";
+import FlagIcon from "./FlagIcon";
 import Grid from "@material-ui/core/Grid";
 import Highlight from "./Highlight";
 import Logo from "./Logo";
@@ -11,12 +16,14 @@ import Report from "./Report";
 import Template from "./Template";
 import Toggle from "./Toggle";
 import Tooltip from "./Tooltip";
+import TranslatedValue from "./TranslatedValue";
 import YAML from "js-yaml";
 import classnames from "classnames";
 import { compose } from "recompose";
 import gfm from "remark-gfm";
 import { gridPropNames } from "../functions/propNames";
 import { h } from "hastscript";
+import qs from "qs";
 import rehypeRaw from "rehype-raw";
 import rehypeReact from "rehype-react";
 import remarkDirective from "remark-directive";
@@ -32,8 +39,30 @@ import { withStyles } from "@material-ui/core/styles";
 const pagesUrl = PAGES_URL;
 const webpackHash = COMMIT_HASH || __webpack_hash__;
 
-export const processProps = ({ props, newProps = {}, isGrid }) => {
-  for (const [key, value] of Object.entries(props)) {
+const fillTemplateValues = (value, extra) => {
+  if (typeof value === "string") {
+    let parts = value.split(/(?:\{\{|\}\})/);
+    if (parts.length >= 3) {
+      for (let i = 1; i < parts.length; i += 2) {
+        let lower;
+        if (parts[i].startsWith("lc_")) {
+          lower = true;
+          parts[i] = parts[i].replace(/^lc_/, "");
+        }
+        if (extra.hasOwnProperty(parts[i])) {
+          parts[i] = lower ? extra[parts[i]].toLowerCase() : extra[parts[i]];
+        } else {
+          parts[i] = "";
+        }
+      }
+      value = parts.join("");
+    }
+  }
+  return value;
+};
+
+export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
+  for (let [key, value] of Object.entries(props)) {
     if (isGrid && !gridPropNames.has(key)) {
       continue;
     }
@@ -44,7 +73,7 @@ export const processProps = ({ props, newProps = {}, isGrid }) => {
     } else if (key == "className") {
       newProps["className"] = styles[value];
     } else if (key.startsWith("exclude")) {
-      newProps[key] = value.split(",");
+      newProps[key] = Array.isArray(value) ? value : value.split(",");
     } else if (key == "src") {
       if (PAGES_URL.startsWith("http")) {
         newProps["src"] = `${pagesUrl}${value.replace(/^\/static/, "")}`;
@@ -67,7 +96,7 @@ export const processProps = ({ props, newProps = {}, isGrid }) => {
 
 export const RehypeComponentsList = (extra) => {
   return {
-    a: (props) => <NavLink {...processProps({ props })} />,
+    a: (props) => <NavLink {...processProps({ props, extra })} />,
     aggregation: (props) => <AggregationIcon method={props.method} />,
     divider: (props) => (
       <Divider
@@ -76,6 +105,17 @@ export const RehypeComponentsList = (extra) => {
         className={styles.divider}
       />
     ),
+    flag: (props) => {
+      let { countryCode, size, ...gridProps } = props;
+
+      return (
+        <Grid {...processProps({ props: gridProps })}>
+          <FlagIcon
+            {...processProps({ props: { countryCode, size }, extra })}
+          />
+        </Grid>
+      );
+    },
     grid: (props) => {
       let { toggle, expand, title, ...gridProps } = props;
       if (toggle && toggle !== true && toggle !== "true") {
@@ -142,7 +182,7 @@ export const RehypeComponentsList = (extra) => {
         if (className == "language-report") {
           return (
             <Report
-              {...processProps({ props: nestedProps })}
+              {...processProps({ props: nestedProps, extra })}
               className={styles.reportContainer}
             />
           );
@@ -163,7 +203,21 @@ export const RehypeComponentsList = (extra) => {
       if (props.className) {
         css = classnames(styles.reportContainer, styles[props.className]);
       }
-      return <Report {...processProps({ props })} className={css} />;
+      return <Report {...processProps({ props, extra })} className={css} />;
+    },
+    select: (props) => {
+      let processedProps = processProps({ props, extra });
+      let handleChange = () => {};
+      if (processedProps.url) {
+        handleChange = (e) => {
+          e.preventDefault();
+          extra.navigate(`${processedProps.url}${e.target.value}`);
+        };
+      }
+      if (processedProps.enumValues) {
+        return <EnumSelect {...processedProps} handleChange={handleChange} />;
+      }
+      return <BasicSelect {...processedProps} handleChange={handleChange} />;
     },
     span: (props) => <span {...processProps({ props })} />,
     templat: (props) => (
@@ -178,6 +232,9 @@ export const RehypeComponentsList = (extra) => {
           <span>{props.children}</span>
         </Tooltip>
       );
+    },
+    translated: (props) => {
+      return <TranslatedValue {...processProps({ props, extra })} />;
     },
   };
 };
@@ -239,6 +296,8 @@ const Markdown = ({
   components = {},
   ...extra
 }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   useEffect(() => {
     if (!pagesById && !pagesIsFetching) {
       if (pgId) {
@@ -248,11 +307,20 @@ const Markdown = ({
       }
     }
   }, [pgId, pageId, pagesIsFetching]);
-
-  const { contents, ast } = compile(pagesById, {
-    ...RehypeComponentsList(extra),
-    ...components,
-  });
+  const { contents, ast } = compile(
+    fillTemplateValues(pagesById, {
+      ...extra,
+      ...qs.parse((location.search || "").replace("?", "")),
+    }),
+    {
+      ...RehypeComponentsList({
+        ...qs.parse(location.search.replace(/^\?/, "")),
+        navigate,
+        ...extra,
+      }),
+      ...components,
+    }
+  );
   let css;
   if (siteStyles) {
     css = classes.root;

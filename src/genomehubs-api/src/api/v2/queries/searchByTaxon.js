@@ -15,6 +15,7 @@ import { restrictToRank } from "./queryFragments/restrictToRank";
 import { setAggregationSource } from "./queryFragments/setAggregationSource";
 import { setIncludes } from "./queryFragments/setIncludes";
 import { setSortOrder } from "./queryFragments/setSortOrder";
+import { nullCountsAgg as valueCountsAgg } from "./queryFragments/nullCountsAgg";
 
 export const searchByTaxon = async ({
   searchTerm,
@@ -31,6 +32,7 @@ export const searchByTaxon = async ({
   rank,
   depth,
   maxDepth,
+  emptyColumns,
   includeEstimates,
   includeLineage,
   includeRawValues,
@@ -188,6 +190,13 @@ export const searchByTaxon = async ({
     includeRawValues,
     includeLineage,
   });
+  if (
+    Object.keys(aggs).length == 0 &&
+    (!emptyColumns || emptyColumns == "false")
+  ) {
+    let valueCounts = await valueCountsAgg({ fields, names, ranks });
+    aggs = valueCounts;
+  }
   let exclude = []; // includeRawValues ? [] : ["attributes.values*"];
   let sort = setSortOrder(sortBy, lookupTypes, lookupNames);
   let query = {

@@ -65,11 +65,15 @@ const SearchToggles = ({
   const rootRef = useRef(null);
   let options = qs.parse(location.search.replace(/^\?/, ""));
   const resetSearch = () => {
-    setSearchDefaults({ includeEstimates: false, includeDescendant: false });
+    setSearchDefaults({
+      includeEstimates: false,
+      includeDescendant: false,
+      emptyColumns: false,
+    });
     setLookupTerm("");
     navigate(`${basename}/search`);
   };
-  let templateButton = <Grid item xs={1}></Grid>;
+  let templateButton;
   if (toggleTemplate) {
     templateButton = (
       <Tooltip title={`Click to show search template`} arrow placement={"top"}>
@@ -92,6 +96,56 @@ const SearchToggles = ({
         </Grid>
       </Tooltip>
     );
+  } else {
+    templateButton = (
+      <Tooltip
+        title={`Toggle switch to ${
+          searchDefaults.emptyColumns ? "hide" : "show"
+        } empty columns`}
+        arrow
+        placement={"top"}
+      >
+        <Grid item xs={2}>
+          <FormControl
+            className={classes.formControl}
+            style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
+          >
+            <FormHelperText>{"empty columns"}</FormHelperText>
+            <FormControlLabel
+              className={classes.label}
+              control={
+                <Switch
+                  id={"show-empty-columns"}
+                  checked={searchDefaults.emptyColumns}
+                  onChange={() => {
+                    let emptyColumns = !searchDefaults.emptyColumns;
+                    setSearchDefaults({
+                      emptyColumns,
+                    });
+                    let query = options.query || "";
+                    let hash = location.hash || "";
+                    if (emptyColumns) {
+                      options.emptyColumns = true;
+                    } else if (options.hasOwnProperty("emptyColumns")) {
+                      options.emptyColumns = false;
+                    }
+                    navigate(
+                      `${location.pathname}?${qs.stringify({
+                        ...options,
+                        query,
+                      })}${hash}`
+                    );
+                  }}
+                  name="filter-type"
+                  color="default"
+                />
+              }
+              label={searchDefaults.emptyColumns ? "On" : "Off"}
+            />
+          </FormControl>
+        </Grid>
+      </Tooltip>
+    );
   }
   return (
     <>
@@ -108,7 +162,11 @@ const SearchToggles = ({
           <Grid item xs={3}>
             <FormControl
               className={classes.formControl}
-              style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
+              style={{
+                margin: "-8px 0 0",
+                transform: "scale(0.75)",
+                textAlign: "center",
+              }}
             >
               <FormHelperText>{"include descendants"}</FormHelperText>
               <FormControlLabel
@@ -160,7 +218,7 @@ const SearchToggles = ({
           arrow
           placement={"top"}
         >
-          <Grid item xs={3}>
+          <Grid item xs={2}>
             <FormControl
               className={classes.formControl}
               style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
@@ -198,7 +256,19 @@ const SearchToggles = ({
           <Grid
             item
             xs={2}
-            onClick={() => setShowSettings(true)}
+            onClick={(e) => {
+              let target = e.currentTarget;
+              setTimeout(() => {
+                target.dispatchEvent(
+                  new MouseEvent("mouseout", {
+                    view: window,
+                    bubbles: true,
+                    cancelable: true,
+                  })
+                );
+              }, 20);
+              setShowSettings(true);
+            }}
             style={{ cursor: "pointer" }}
           >
             <FormControl
@@ -217,6 +287,10 @@ const SearchToggles = ({
                 event.stopPropagation();
                 setShowSettings(false);
               }}
+              onMouseOver={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+              }}
               aria-labelledby="result-settings-modal-title"
               aria-describedby="result-settings-modal-description"
               className={classes.modal}
@@ -232,7 +306,19 @@ const SearchToggles = ({
           <Grid
             item
             xs={2}
-            onClick={() => setShowOptions(true)}
+            onClick={(e) => {
+              let target = e.currentTarget;
+              setTimeout(() => {
+                target.dispatchEvent(
+                  new MouseEvent("mouseout", {
+                    view: window,
+                    bubbles: true,
+                    cancelable: true,
+                  })
+                );
+              }, 20);
+              setShowOptions(true);
+            }}
             style={{ cursor: "pointer" }}
           >
             <FormControl
@@ -254,6 +340,10 @@ const SearchToggles = ({
                 event.preventDefault();
                 event.stopPropagation();
                 setShowOptions(false);
+              }}
+              onMouseOver={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
               }}
               aria-labelledby="search-options-modal-title"
               aria-describedby="search-options-modal-description"

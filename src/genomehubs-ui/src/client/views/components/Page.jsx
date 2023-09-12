@@ -18,6 +18,7 @@ import { useLocation } from "@reach/router";
 import { useReadLocalStorage } from "usehooks-ts";
 import withApi from "../hocs/withApi";
 import withSearchIndex from "../hocs/withSearchIndex";
+import withSiteName from "../hocs/withSiteName";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -50,6 +51,7 @@ const Page = ({
   fieldId,
   resultCount,
   result,
+  siteName,
   // selectPalette,
   apiStatus,
 }) => {
@@ -198,7 +200,7 @@ const Page = ({
                 minWidth: "80%",
               }}
             >
-              <h2>Search GoaT</h2>
+              <h2>Search {siteName}</h2>
             </Grid>
           )}
           <Grid item xs={12} id="searchBox">
@@ -309,4 +311,10 @@ const Page = ({
   );
 };
 
-export default compose(memo, dispatchColors, withApi, withSearchIndex)(Page);
+export default compose(
+  memo,
+  dispatchColors,
+  withApi,
+  withSiteName,
+  withSearchIndex
+)(Page);

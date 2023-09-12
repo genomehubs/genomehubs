@@ -29,16 +29,16 @@ const attributeTerms = ({ cat, terms, size, yHistograms }) => {
   if (filters) {
     by_value = {
       filters,
-      aggs: {
-        cats: {
-          terms: { field: "attributes.keyword_value", size },
-          ...(yHistograms && {
+      ...(yHistograms && {
+        aggs: {
+          cats: {
+            terms: { field: "attributes.keyword_value", size },
             aggs: {
               yHistograms,
             },
-          }),
+          },
         },
-      },
+      }),
     };
   }
 

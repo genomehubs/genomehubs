@@ -97,6 +97,7 @@ const ReportItem = ({
   includeEstimates,
   includeDescendants,
   collapseMonotypic,
+  highlight,
   colorPalette,
   excludeMissing,
   excludeAncestral,
@@ -171,7 +172,8 @@ const ReportItem = ({
       //   sethideMessage(true);
       // }
       setTimeout(
-        () => fetchReport({ reportId, queryString, report, hideMessage }),
+        () =>
+          fetchReport({ reportId, queryString, report, hideMessage, inModal }),
         delay
       );
     }
@@ -386,6 +388,7 @@ const ReportItem = ({
             yOpts={yOpts}
             cumulative={cumulative}
             reversed={reversed}
+            highlight={highlight}
             includeEstimates={includeEstimates}
             {...qs.parse(queryString)}
             minDim={minDim}

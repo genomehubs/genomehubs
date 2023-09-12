@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const BasicSelect = ({
-  current,
+  current = "",
   id,
   handleBlur = (e) => {
     e.preventDefault();
@@ -28,7 +28,19 @@ const BasicSelect = ({
   values,
 }) => {
   const classes = useStyles;
+  if (typeof current != "string") {
+    current = "";
+  }
   let options = [];
+  if (typeof values == "string") {
+    values = values.split(",").reduce((a, val) => {
+      let [v, k] = val.split(":");
+      if (typeof k === "undefined") {
+        k = v;
+      }
+      return { ...a, [k]: v };
+    }, {});
+  }
   if (Array.isArray(values)) {
     options = values;
   } else {
@@ -37,10 +49,13 @@ const BasicSelect = ({
       .forEach((key) => {
         options.push(
           <MenuItem value={values[key]} style={{ paddingTop: 0 }} key={key}>
-            {key}
+            {values[key]} {key != values[key] && ` — ${key}`}
           </MenuItem>
         );
       });
+  }
+  if (options.length == 0) {
+    return null;
   }
 
   return (

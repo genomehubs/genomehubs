@@ -14,16 +14,62 @@ import MultiCatLegend, {
 import React, { useEffect, useRef, useState } from "react";
 
 import Grid from "@material-ui/core/Grid";
+import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { format } from "d3-format";
+import qs from "../functions/qs";
 import setColors from "../functions/setColors";
 import { setMessage } from "../reducers/message";
 import stringLength from "../functions/stringLength";
+import styles from "./Styles.scss";
+import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
+import withSiteName from "../hocs/withSiteName";
 
 const pct = format(".0%");
 const pct1 = format(".1%");
+
+const arc = (
+  startX,
+  startY,
+  ir,
+  or,
+  endX,
+  endY,
+  istartX,
+  istartY,
+  iendX,
+  iendY,
+  flag
+) => {
+  return (
+    "M" +
+    startX +
+    " " +
+    startY +
+    "A" +
+    or +
+    " " +
+    or +
+    ` 0 ${!flag ? 1 : 0} 1 ` +
+    endX +
+    " " +
+    endY + // outer
+    "L" +
+    istartX +
+    " " +
+    istartY +
+    "A" +
+    ir +
+    " " +
+    ir +
+    ` 0 ${!flag ? 1 : 0} 0 ` +
+    iendX +
+    " " +
+    iendY // inner
+  );
+};
 
 const PieComponent = ({ data, height, width, colors }) => {
   const RADIAN = Math.PI / 180;
@@ -34,22 +80,66 @@ const PieComponent = ({ data, height, width, colors }) => {
     innerRadius,
     outerRadius,
     percent,
+    startAngle,
+    endAngle,
+    query,
   }) => {
+    if (percent < 0.05) {
+      return null;
+    }
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
+    if (percent == 1) {
+      startAngle -= 0.01;
+      endAngle += 0.01;
+    }
+    const startX = cx + outerRadius * Math.cos(-startAngle * RADIAN);
+    const startY = cy + outerRadius * Math.sin(-startAngle * RADIAN);
+    const endX = cx + outerRadius * Math.cos(-endAngle * RADIAN);
+    const endY = cy + outerRadius * Math.sin(-endAngle * RADIAN);
+    const istartX = cx + innerRadius * Math.cos(-endAngle * RADIAN);
+    const istartY = cy + innerRadius * Math.sin(-endAngle * RADIAN);
+    const iendX = cx + innerRadius * Math.cos(-startAngle * RADIAN);
+    const iendY = cy + innerRadius * Math.sin(-startAngle * RADIAN);
+
     return (
-      <text
-        x={x}
-        y={y}
-        fill="white"
-        textAnchor={"middle"}
-        dominantBaseline="alphabetic"
-        fontSize={innerRadius / 4}
-      >
-        {`${pct(percent)}`}
-      </text>
+      <g>
+        <Tooltip title={"Click to search"} arrow>
+          <path
+            d={arc(
+              startX,
+              startY,
+              innerRadius,
+              outerRadius,
+              endX,
+              endY,
+              istartX,
+              istartY,
+              iendX,
+              iendY,
+              percent < 0.5
+            )}
+            fillOpacity={0}
+            cursor={"pointer"}
+            onClick={() =>
+              data.navigate(`${data.basename}/search?${qs.stringify(query)}`)
+            }
+          />
+        </Tooltip>
+
+        <text
+          x={x}
+          y={y}
+          fill="white"
+          textAnchor={"middle"}
+          dominantBaseline="alphabetic"
+          fontSize={innerRadius / 4}
+        >
+          {`${pct(percent)}`}
+        </text>
+      </g>
     );
   };
 
@@ -134,6 +224,35 @@ const PieComponent = ({ data, height, width, colors }) => {
   );
 };
 
+const donut = (x, y, ir, or) => {
+  return (
+    "M" +
+    (x - or) +
+    " " +
+    y +
+    "A" +
+    or +
+    " " +
+    or +
+    " 0 1 1 " +
+    (x + or) +
+    " " +
+    y + // outer
+    "M" +
+    (x + ir) +
+    " " +
+    y +
+    "A" +
+    ir +
+    " " +
+    ir +
+    " 0 1 0 " +
+    (x - ir) +
+    " " +
+    y // inner
+  );
+};
+
 const RadialBarComponent = ({
   data,
   height,
@@ -180,6 +299,22 @@ const RadialBarComponent = ({
             </text>
           </g>
         )}
+        <Tooltip
+          title={`${data.name}: ${data.xValue} / ${data.yValue}`}
+          arrow
+          placement="top"
+        >
+          <path
+            d={donut(cx, cy, viewBox.innerRadius, viewBox.outerRadius)}
+            fillOpacity={0}
+            cursor={"pointer"}
+            onClick={() =>
+              data.navigate(
+                `${data.basename}/search?${qs.stringify(data.xQuery)}`
+              )
+            }
+          />
+        </Tooltip>
         <g transform={`translate(0,${cy + 5})`}>
           {MultiCatLegend({
             width: width * 0.96,
@@ -248,6 +383,7 @@ const RadialBarComponent = ({
       fontFamily={"sans-serif"}
     >
       <PolarAngleAxis type="number" domain={[0, 1]} tick={false} />
+
       <RadialBar
         minAngle={15}
         label={{
@@ -290,6 +426,7 @@ const ReportArc = ({
   pointSize,
   compactWidth,
   showLegend,
+  basename,
 }) => {
   const componentRef = chartRef ? chartRef : useRef();
   const { width, height } = inModal
@@ -317,7 +454,7 @@ const ReportArc = ({
         plotHeight = plotWidth / 2 + pointSize * 3;
       }
     } else {
-      plotHeight = plotWidth;
+      plotHeight = Math.min(plotWidth, plotHeight);
     }
     let dimensionTimer;
     if (timer && !inModal) {
@@ -335,6 +472,8 @@ const ReportArc = ({
 
   let dimensionTimer;
   let { plotWidth, plotHeight } = setDimensions({ width, height });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     ({ plotWidth, plotHeight, dimensionTimer } = setDimensions({
@@ -359,7 +498,7 @@ const ReportArc = ({
           count: arc.report.arc.length,
           colors,
         }));
-        let { arc: currentArc, x, y, rank } = report;
+        let { arc: currentArc, x, y, rank, xQuery } = report;
         chartData.push({
           xValue: x,
           xPortion: currentArc,
@@ -367,6 +506,9 @@ const ReportArc = ({
           index: i,
           name: rank,
           fill: colors[i % colors.length],
+          xQuery,
+          navigate,
+          basename,
         });
       });
       chartData = chartData.reverse();
@@ -384,11 +526,14 @@ const ReportArc = ({
         />
       );
     } else {
-      let { x, y, xTerm, yTerm } = arc.report.arc;
+      let { x, y, xTerm, yTerm, xQuery, yQuery } = arc.report.arc;
       chartData = [
-        { value: x, name: xTerm },
-        { value: y - x, name: yTerm },
+        { value: x, name: xTerm, query: xQuery },
+        { value: y - x, name: yTerm, query: yQuery },
       ];
+      chartData.navigate = navigate;
+      chartData.basename = basename;
+
       ({ levels, colors } = setColors({
         colorPalette,
         palettes,
@@ -401,7 +546,7 @@ const ReportArc = ({
           data={chartData}
           // width={minDim}
           // height={minDim}
-          width={plotWidth}
+          width={plotHeight}
           height={plotHeight}
           colors={colors}
         />
@@ -418,4 +563,4 @@ const ReportArc = ({
   }
 };
 
-export default compose(withColors)(ReportArc);
+export default compose(withColors, withSiteName)(ReportArc);

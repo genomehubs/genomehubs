@@ -1,72 +1,124 @@
-// import { RadialChart } from "react-vis";
-import {
-  CartesianGrid,
-  Dot,
-  Label,
-  Legend,
-  Rectangle,
-  Scatter,
-  ScatterChart,
-  Text,
-  XAxis,
-  YAxis,
-  ZAxis,
-} from "recharts";
 import React, { useEffect, useRef, useState } from "react";
-import formats, { setInterval } from "../functions/formats";
 import { useLocation, useNavigate } from "@reach/router";
 
-import CellInfo from "./CellInfo";
+import { Box } from "@material-ui/core";
+import FlagIcon from "./FlagIcon";
 import Grid from "@material-ui/core/Grid";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
+import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Tooltip from "./Tooltip";
-import axisScales from "../functions/axisScales";
+import TranslatedValue from "./TranslatedValue";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
-import { format } from "d3-format";
-import { processLegendData } from "./MultiCatLegend";
-// import { point } from "leaflet";
-import qs from "../functions/qs";
-import { scaleLinear } from "d3-scale";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withReportTerm from "../hocs/withReportTerm";
 import withSiteName from "../hocs/withSiteName";
-import { zLegend } from "./zLegend";
+import { withStyles } from "@material-ui/core/styles";
 
-const TableReport = ({ report, chartProps }) => {
+const StyledTableCell = withStyles((theme) => ({
+  head: {
+    backgroundColor: "#d2e4f0",
+    fontWeight: 700,
+  },
+  body: {
+    backgroundColor: "#f0f6fa",
+    fontWeight: 700,
+  },
+}))(TableCell);
+
+const TableReport = ({ report, chartProps, ...props }) => {
   const { headers, rows } = report.table;
+  let [highlightField, highlightValue] = (chartProps.highlight || "").split(
+    "="
+  );
+  let highlightRow = -1;
+  if (highlightField) {
+    let col = headers.map((obj) => obj.key).indexOf(highlightField);
+    if (col > -1) {
+      highlightRow = rows.map((arr) => arr[col].value).indexOf(highlightValue);
+    }
+  }
+  let defaultRowsPerPage = 10;
+  let highlightPage = 0;
+  if (highlightRow > -1) {
+    highlightPage = Math.floor(highlightRow / defaultRowsPerPage);
+  }
+  const [page, setPage] = React.useState(highlightPage);
+  const [rowsPerPage, setRowsPerPage] = React.useState(defaultRowsPerPage);
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
   if (!headers) {
     return null;
   }
+  const showIndex = headers[0].key == "country_list" ? true : false;
   let tableHeader = (
     <TableRow key={"header"}>
+      {showIndex && <StyledTableCell key="index"></StyledTableCell>}
       {headers.map((header) => (
-        <TableCell key={header.key}>{header.label}</TableCell>
+        <StyledTableCell key={header.key}>{header.label}</StyledTableCell>
       ))}
     </TableRow>
   );
-  let tableRows = rows.map((row) => {
-    let cumulative = 0;
-
-    let rowArr = row.map((cell) => {
-      let value = cell.label || cell.value;
-      if (cell.hasOwnProperty("count")) {
-        value = cell.count || 0;
-        if (chartProps.cumulative) {
-          value += cumulative;
-          cumulative = value;
+  let tableRows = rows
+    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    .map((row, j) => {
+      let cumulative = 0;
+      const Cell =
+        j + page * rowsPerPage == highlightRow ? StyledTableCell : TableCell;
+      let rowArr = row.map((cell, i) => {
+        let value = cell.label || cell.value;
+        let textAlign = "left";
+        let maxWidth;
+        let minWidth;
+        if (cell.hasOwnProperty("count")) {
+          value = cell.count || 0;
+          if (chartProps.cumulative) {
+            value += cumulative;
+            cumulative = value;
+          }
+          textAlign = "right";
+        } else if (i == 0 && headers[0].key == "country_list") {
+          value = (
+            <span style={{ whiteSpace: "nowrap" }}>
+              <div style={{ width: "40px", display: "inline-block" }}>
+                <FlagIcon countryCode={cell.label} size={30} />
+              </div>
+              <TranslatedValue type={headers[0].key} text={cell.label} />
+            </span>
+          );
+          maxWidth = "15em";
+          minWidth = "15em";
         }
+        return (
+          <Cell
+            key={cell.key}
+            style={{ textAlign, maxWidth, minWidth, overflow: "hidden" }}
+          >
+            {value}
+          </Cell>
+        );
+      });
+      if (showIndex) {
+        rowArr.unshift(
+          <Cell key="index" style={{ textAlign: "right" }}>
+            {j + page * rowsPerPage + 1}
+          </Cell>
+        );
       }
-      return <TableCell key={cell.key}>{value}</TableCell>;
-    });
 
-    return <TableRow key={row[0].value}>{rowArr}</TableRow>;
-  });
+      return <TableRow key={`${row[0].key}-${j}`}>{rowArr}</TableRow>;
+    });
 
   return (
     <div
@@ -76,10 +128,32 @@ const TableReport = ({ report, chartProps }) => {
         marginBottom: "1em",
       }}
     >
-      <Table size={"small"} className={styles.autoWidth}>
-        <TableHead>{tableHeader}</TableHead>
-        <TableBody>{tableRows}</TableBody>
-      </Table>
+      <Grid
+        container
+        direction="column"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Grid item>
+          <Table size={"small"} className={styles.autoWidth}>
+            <TableHead>{tableHeader}</TableHead>
+            <TableBody>{tableRows}</TableBody>
+          </Table>
+        </Grid>
+        {rows.length > 5 && (
+          <Grid item>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25, 100]}
+              component="div"
+              count={rows.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Grid>
+        )}
+      </Grid>
     </div>
   );
 };
@@ -94,6 +168,7 @@ const ReportTable = ({
   cumulative,
   reversed,
   reportTerm,
+  highlight,
   minDim,
   setMinDim,
   xOpts,
@@ -102,7 +177,6 @@ const ReportTable = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [highlight, setHighlight] = useState([]);
   const componentRef = chartRef ? chartRef : useRef();
   const { width, height } = containerRef
     ? useResize(containerRef)
@@ -114,7 +188,7 @@ const ReportTable = ({
   }, [table]);
 
   let content;
-  let chartProps = { cumulative, reversed, height: minDim - 25 };
+  let chartProps = { cumulative, reversed, highlight, height: minDim - 25 };
   if (table && table.status) {
     content = TableReport({ report: table.report, chartProps });
 

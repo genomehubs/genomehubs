@@ -9,7 +9,7 @@
 # curl -X DELETE "http://localhost:9200/a*"
 # curl -X DELETE "http://localhost:9200/f*"
 # curl -X DELETE "http://localhost:9200/s*"
-curl -X DELETE "http://localhost:9201/*"
+curl -X DELETE "http://localhost:9201/*2021.10.15*"
 
 genomehubs init \
     --config-file tests/integration_tests/config/boat.yaml \

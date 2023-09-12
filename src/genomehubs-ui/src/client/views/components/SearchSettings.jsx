@@ -21,6 +21,7 @@ import Select from "@material-ui/core/Select";
 import SettingsButton from "./SettingsButton";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
+import expandFieldList from "../functions/expandFieldList";
 import qs from "../functions/qs";
 import { useLocalStorage } from "usehooks-ts";
 import withNames from "../hocs/withNames";
@@ -39,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     border: "none",
     boxShadow: "none",
-    overflowX: "hidden",
+    overflowX: "visible",
   },
   root: {
     width: "100%",
@@ -168,18 +169,6 @@ const SearchSettings = ({
       }
     });
     let fieldSets = {};
-    if (searchTerm.fields) {
-      searchTerm.fields.split(",").forEach((field) => {
-        let [f, s] = field.split(":");
-        if (!s) {
-          s = types[f].processed_simple;
-        }
-        if (!fieldSets[f]) {
-          fieldSets[f] = [];
-        }
-        fieldSets[f].push(s);
-      });
-    }
     let newFields = [];
     for (let field of fields) {
       if (fieldSets[field]) {
@@ -263,10 +252,12 @@ const SearchSettings = ({
             arrow
             placement={"top"}
           >
-            <MenuItem value={id} onClick={(e) => handleChange(e, id, key)}>
-              <Checkbox color={"default"} checked={state[id]} />
-              {label}
-            </MenuItem>
+            <div>
+              <MenuItem value={id} onClick={(e) => handleChange(e, id, key)}>
+                <Checkbox color={"default"} checked={state[id]} />
+                {label}
+              </MenuItem>
+            </div>
           </Tooltip>
         );
       } else {
@@ -285,30 +276,45 @@ const SearchSettings = ({
     let checked = state[`group-${key}`] == totals[key];
     let indeterminate =
       state[`group-${key}`] > 0 && state[`group-${key}`] < totals[key];
-    content.unshift(
-      <Tooltip
-        key={`all_${key}`}
-        title={`Toggle selection for all ${key} attributes`}
-        arrow
-        placement={"top"}
-      >
-        <MenuItem
-          value={key}
-          onClick={(e) => handleGroupChange(e, key, checked)}
-        >
-          <Checkbox
-            color={"default"}
-            checked={checked}
-            indeterminate={indeterminate}
-          />
-          all
-        </MenuItem>
-      </Tooltip>
-    );
+    // content.unshift(
+    //   <Tooltip
+    //     key={`all_${key}`}
+    //     title={`Toggle selection for all ${key} attributes`}
+    //     arrow
+    //     placement={"top"}
+    //   >
+    //     <MenuItem
+    //       value={key}
+    //       onClick={(e) => handleGroupChange(e, key, checked)}
+    //     >
+    //       <Checkbox
+    //         color={"default"}
+    //         checked={checked}
+    //         indeterminate={indeterminate}
+    //       />
+    //       all
+    //     </MenuItem>
+    //   </Tooltip>
+    // );
     groups.push(
       <Grid item key={key}>
-        <FormControl className={classes.formControl}>
-          <InputLabel id="demo-mutiple-chip-checkbox-label">{key}</InputLabel>
+        <FormControl
+          className={classes.formControl}
+          style={{ marginLeft: "1em" }}
+        >
+          <InputLabel
+            id="demo-mutiple-chip-checkbox-label"
+            style={{ marginTop: checkedList.length > 0 ? 0 : "-1em" }}
+          >
+            <Checkbox
+              color={"default"}
+              checked={checked}
+              indeterminate={indeterminate}
+              style={{ marginLeft: "-1.5em" }}
+              onClick={(e) => handleGroupChange(e, key, checked)}
+            />
+            {key}
+          </InputLabel>
           <Select
             labelId="demo-mutiple-chip-checkbox-label"
             id="demo-mutiple-chip-checkbox"
@@ -340,6 +346,7 @@ const SearchSettings = ({
             {content}
           </Select>
         </FormControl>
+
         {/* <Accordion>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}

@@ -6,29 +6,168 @@ defaults:
     traverse: list
     traverse_direction: up
     type: keyword
-attributes:
-  sequencing_status:
     constraint:
       enum:
-        - published
-        - insdc_open
-        - insdc_submitted
-        - in_progress
-        - sample_acquired
-        - sample_collected
-    summary: enum
-    traverse: enum
-  sample_acquired:
-    type: keyword
-  in_progress:
-    type: keyword
-  insdc_submitted:
-    type: keyword
-  insdc_open:
-    type: keyword
-  published:
-    type: keyword
+        - africabp
+        - ag100pest
+        - agi
+        - arg
+        - asg
+        - bat1k
+        - b10k
+        - bioplatforms_australia
+        - canbp
+        - cbp
+        - ccgp
+        - cfgp
+        - cngb
+        - dtol
+        - ebpn
+        - ein
+        - endemixit
+        - erga
+        - erga-bge
+        - erga-ch
+        - erga-pil
+        - eurofish
+        - gaga
+        - gap
+        - gbr
+        - giga
+        - i5k
+        - ilebp
+        - 1kfg
+        - lmgp
+        - loewe-tbg
+        - metainvert
+        - ogg
+        - omg
+        - other
+        - pgp
+        - phyloalps
+        - prgp
+        - psyche
+        - squalomix
+        - tsi
+        - vgp
+        - ygg
+        - zoonomia
+    value_metadata:
+      default:
+        description: Click to view GoaT project page
+        link: https://goat.genomehubs.org/projects/{}
+      africabp:
+        description: "Africa Biogenome Project (click to view GoaT project page)"
+      ag100pest:
+        description: "Ag100Pest (click to view GoaT project page)"
+      agi:
+        description: "Applied Genomics Initiative (click to view GoaT project page)"
+      arg:
+        description: "Australian Amphibian and Reptile Genomics - AusARG (click to view GoaT project page)"
+      asg:
+        description: "Aquatic Symbiosis Genomics Project (click to view GoaT project page)"
+      bat1k:
+        description: "Bat 1K (click to view GoaT project page)"
+      b10k:
+        description: "Bird 10K (click to view GoaT project page)"
+      bioplatforms_australia:
+        description: "Bioplatforms Australia"
+      canbp:
+        description: "Canada Biogenome Project (click to view GoaT project page)"
+      cbp:
+        description: "Catalan Biogenome Project (click to view GoaT project page)"
+      ccgp:
+        description: "California Conservation Genomics Project (click to view GoaT project page)"
+      cfgp:
+        description: "Cartilaginous Fish Genome Project (click to view GoaT project page)"
+      dtol:
+        description: "Darwin Tree of Life (click to view GoaT project page)"
+      ebpn:
+        description: "EBP Norway (click to view GoaT project page)"
+      ein:
+        description: "Euglena International Network (click to view GoaT project page)"
+      endemixit:
+        description: "ENDEMIXIT (click to view GoaT project page)"
+      erga:
+        description: "European Reference Genome Atlas Umbrella (click to view GoaT project page)"
+      erga-bge:
+        description: "ERGA Biodiversity Genomics Europe (click to view GoaT project page)"
+      erga-ch:
+        description: "ERGA Switzerland (click to view GoaT project page)"
+      erga-pil:
+        description: "ERGA Pilot (click to view GoaT project page)"
+      eurofish:
+        description: "EUROFISH (click to view GoaT project page)"
+      gaga:
+        description: "Global Ant Genomics Alliance (click to view GoaT project page)"
+      gap:
+        description: "Genomics for Australian Plants (click to view GoaT project page)"
+      gbr:
+        description: "Great Reef Barrier (click to view GoaT project page)"
+      giga:
+        description: "Global Invertebrate Genomics Alliance (click to view GoaT project page)"
+      i5k:
+        description: "i5K (click to view GoaT project page)"
+      ilebp:
+        description: "Illinois EBP Pilot (click to view GoaT project page)"
+      1kfg:
+        description: "1K Fungal Genomes Project (click to view GoaT project page)"
+      lmgp:
+        description: "Lilioid Monocots Core Group Genome Project (click to view GoaT project page)"
+      loewe-tbg:
+        description: "LOEWE Centre for Translational Biodiversity Genomics (click to view GoaT project page)"
+      metainvert:
+        description: "MetaInvert (click to view GoaT project page)"
+      ogg:
+        description: "Open Green Genomes (click to view GoaT project page)"
+      omg:
+        description: "Oz Mammals Genomics (click to view GoaT project page)"
+      other:
+        description: "Other EBP Projects"
+      pgp:
+        description: "Polar Genomes Project (click to view GoaT project page)"
+      phyloalps:
+        description: "PhyloAlps (click to view GoaT project page)"
+      prgp:
+        description: "Primate Genomes Project (click to view GoaT project page)"
+      psyche:
+        description: "Project Psyche (click to view GoaT project page)"
+      squalomix:
+        description: "Squalomix (click to view GoaT project page)"
+      tsi:
+        description: "Threatened Species Initiative (click to view GoaT project page)"
+      vgp:
+        description: "Vertebrate Genomes Project (click to view GoaT project page)"
+      ygg:
+        description: "Yggdrasil (click to view GoaT project page)"
+      zoonomia:
+        description: "Zoonomia (click to view GoaT project page)"
+attributes:
+  sample_available:
+    description: "Project has available samples for the taxon (acronym)"
+    display_name: Sample collected
   sample_collected:
-    type: keyword
-  sample_collected_by:
-    type: keyword
+    description: "Project has collected samples for the taxon (acronym)"
+    display_name: Sample collected
+  resampling_required:
+    status: temporary
+    description: Project needs additional samples (acronym)
+    display_name: Resampling required
+  sample_acquired:
+    description: Samples received by sequencing center
+    display_name: Sample acquired
+  in_progress:
+    description: Sequencing started but assembly not yet publicly available
+    display_name: In progress
+  insdc_submitted:
+    description: Assembly submitted to INSDC but not yet publicly available
+    display_name: In progress
+  open:
+    description: Data publicly available
+    display_name: Open
+  insdc_open:
+    description: Data publicly available on INSDC sequence repositories
+    display_name: Open on INSDC
+  published:
+    description: Publication describing assembly is available
+    display_name: Published
