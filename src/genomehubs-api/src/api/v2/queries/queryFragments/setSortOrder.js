@@ -1,3 +1,4 @@
+import setSortBy from "../../reports/setSortBy";
 import { subsets } from "../../functions/subsets";
 
 const ranks = {
@@ -13,6 +14,9 @@ const ranks = {
 };
 
 const addSortParameter = (sortBy, lookupTypes, lookupNames) => {
+  if (typeof sortBy === "string") {
+    sortBy = setSortBy({ sortBy });
+  }
   let [by, param = "value"] = sortBy.by.split(":");
   if (lookupTypes(by)) {
     param = lookupTypes(by).processed_simple;
