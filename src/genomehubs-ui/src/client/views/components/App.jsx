@@ -16,7 +16,6 @@ const App = ({ theme, cookies }) => {
   if (cookies.get("cookieConsent") == "all") {
     tracking = <script src="/zxtm/piwik2.js"></script>;
   }
-  console.log(tracking);
   const [content, setContent] = useState(null);
   useEffect(() => {
     setContent(
