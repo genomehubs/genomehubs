@@ -12,10 +12,17 @@ const basename = BASENAME || "";
 
 const Header = ({ id, levels }) => {
   let style = {};
-  let colors =
-    id == "pride"
-      ? levels[6] || levels.default.slice(0, 6)
-      : Array(6).fill("currentColor", 0);
+  let colors;
+  switch (id) {
+    case "black":
+      colors = levels[4] || levels.default.slice(0, 4);
+      break;
+    case "pride":
+      colors = levels[6] || levels.default.slice(0, 6);
+      break;
+    default:
+      colors = Array(6).fill("currentColor", 0);
+  }
 
   if (id == "pride") {
     let height = 100;
@@ -34,6 +41,21 @@ const Header = ({ id, levels }) => {
       `${colors[1]} ${(height / colors.length) * 5}${unit}`,
       `${colors[0]} ${(height / colors.length) * 5}${unit}`,
       `${colors[0]} ${(height / colors.length) * 6}${unit}`,
+    ];
+    style = { background: `repeating-linear-gradient(${stops.join(", ")})` };
+  } else if (id == "black") {
+    let height = 100;
+    let unit = "%";
+    let stops = [
+      "0deg",
+      colors[3],
+      `${colors[3]} ${height / colors.length}${unit}`,
+      `${colors[2]} ${height / colors.length}${unit}`,
+      `${colors[2]} ${(height / colors.length) * 2}${unit}`,
+      `${colors[1]} ${(height / colors.length) * 2}${unit}`,
+      `${colors[1]} ${(height / colors.length) * 3}${unit}`,
+      `${colors[0]} ${(height / colors.length) * 3}${unit}`,
+      `${colors[0]} ${(height / colors.length) * 4}${unit}`,
     ];
     style = { background: `repeating-linear-gradient(${stops.join(", ")})` };
   }
