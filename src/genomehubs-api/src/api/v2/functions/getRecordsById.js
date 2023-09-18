@@ -10,7 +10,12 @@ const convertIdsToDocIds = (recordId, result) => {
    * @param {string|Array} recordId - One or more record IDs.
    * @param {string} result - The index type.
    */
-  let ids = Array.isArray(recordId) ? recordId : [recordId];
+  let ids;
+  if (Array.isArray(recordId)) {
+    ids = recordId;
+  } else {
+    ids = recordId.split(",");
+  }
   if (result == "taxon") {
     // TODO: #186 standardise doc id prefixes
     ids = ids.map((id) =>
