@@ -46,7 +46,7 @@ const brewerPalette = [
   "rgb(202,178,214)",
 ];
 
-const blackPalette = ["#202125", "#bd3829", "#ee8623", "#42632e"];
+const bhmPalette = ["#202125", "#bd3829", "#ee8623", "#42632e"];
 
 const pridePalette = [
   "#E50000",
@@ -86,7 +86,7 @@ export const palettes = handleActions(
       accent: createD3Palette(schemeAccent, 8),
       batlowS: createPalette(batlowS),
       batlow: createPalette(batlow, 50),
-      black: { id: "black", default: blackPalette, levels: [] },
+      bhm: { id: "bhm", default: bhmPalette, levels: [] },
       category: createD3Palette(schemeCategory10, 10),
       cividis: createD3Palette(interpolateCividis, 50),
       cool: createD3Palette(interpolateCool, 50),

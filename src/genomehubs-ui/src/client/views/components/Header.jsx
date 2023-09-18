@@ -14,7 +14,7 @@ const Header = ({ id, levels }) => {
   let style = {};
   let colors;
   switch (id) {
-    case "black":
+    case "bhm":
       colors = levels[4] || levels.default.slice(0, 4);
       break;
     case "pride":
@@ -43,7 +43,7 @@ const Header = ({ id, levels }) => {
       `${colors[0]} ${(height / colors.length) * 6}${unit}`,
     ];
     style = { background: `repeating-linear-gradient(${stops.join(", ")})` };
-  } else if (id == "black") {
+  } else if (id == "bhm") {
     let height = 100;
     let unit = "%";
     let stops = [
