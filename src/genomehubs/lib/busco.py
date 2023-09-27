@@ -126,18 +126,20 @@ def busco_feature_parser(params, opts, *, types=None, names=None):
     config_file = opts["config"]
     busco_file = os.path.abspath(opts["busco-feature"])
     try:
-        lineage = re.search(r"\.(\w+?)_odb10", busco_file)[1]
+        lineage = re.search(r"\b(\w+?)_odb10", busco_file)[1]
     except AttributeError:
         return None
     if os.path.exists(config_file):
         new_types = fill_busco_feature_template(config_file, types, lineage)
     for key, value in new_types.items():
         types[key] = value
-
-    tar_name = os.path.dirname(os.path.dirname(busco_file))
-    tar = tarfile.open(f"{tar_name}.tar")
-    busco_tar = busco_file.replace(f"{tar_name}/", "")
-    data = gzip.decompress(tar.extractfile(busco_tar).read())
+    if busco_file.endswith(".gz"):
+        data = gzip.open(busco_file, "rb").read()
+    else:
+        tar_name = os.path.dirname(os.path.dirname(busco_file))
+        tar = tarfile.open(f"{tar_name}.tar")
+        busco_tar = busco_file.replace(f"{tar_name}/", "")
+        data = gzip.decompress(tar.extractfile(busco_tar).read())
     header_rows = []
     header = None
     for line in str(data, "utf-8").split("\n"):
