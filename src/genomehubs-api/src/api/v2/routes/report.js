@@ -383,7 +383,7 @@ export const arc = async ({
       },
     };
   }
-  if (!rank) {
+  if (result == "taxon" && !rank) {
     return {
       status: {
         success: false,

@@ -218,14 +218,14 @@ body,
           .tab {
             margin-bottom: 0;
             display: block;
-            margin-right: 0.2em;
+            // margin-right: 0.2em;
 
             &Highlight,
             &:hover {
               color: themed("secondary");
-              border-right: 0.2em solid themed("secondary");
-              border-bottom: none;
-              margin-right: 0;
+              // border-right: 0.2em solid themed("secondary");
+              // border-bottom: none;
+              // margin-right: 0;
             }
           }
         }
