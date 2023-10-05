@@ -23,7 +23,7 @@ export const excludeSources = (exclusions = {}, fields, result) => {
     ];
   };
   let excluded = [];
-  if (result == "taxon") {
+  if (result == "taxon" || result == "assembly" || result == "sample") {
     Object.keys(exclusions).forEach((source) => {
       if (source == "unclassified") {
         excluded.push({
