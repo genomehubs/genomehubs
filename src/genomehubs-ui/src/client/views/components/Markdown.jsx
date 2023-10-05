@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "@reach/router";
 import AggregationIcon from "./AggregationIcon";
 import BasicSelect from "./BasicSelect";
 import { Box } from "@material-ui/core";
+import Breadcrumbs from "./Breadcrumbs";
 import Divider from "@material-ui/core/Divider";
 import EnumSelect from "./EnumSelect";
 import FlagIcon from "./FlagIcon";
@@ -98,6 +99,7 @@ export const RehypeComponentsList = (extra) => {
   return {
     a: (props) => <NavLink {...processProps({ props, extra })} />,
     aggregation: (props) => <AggregationIcon method={props.method} />,
+    breadcrumbs: (props) => <Breadcrumbs {...props} />,
     divider: (props) => (
       <Divider
         orientation={props.orientation || "vertical"}

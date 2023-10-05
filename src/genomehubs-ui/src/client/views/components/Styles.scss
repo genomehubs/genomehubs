@@ -169,6 +169,12 @@ body,
         background: rgba(themed("primary"), 0.5);
         height: 2em;
         overflow: visible;
+        white-space:nowrap;
+      }
+
+      .tabDiv {
+        float:left;
+        overflow: visible;
       }
 
       .tab {
@@ -181,7 +187,7 @@ body,
         height: 2.2em;
         line-height: 2em;
         margin-right: -1px;
-        margin-bottom: 0.2em;
+        // margin-bottom: 0.2em;
         padding: 0 0.5em;
         text-decoration: none !important;
 
@@ -189,6 +195,39 @@ body,
         &:hover {
           color: themed("secondary");
           border-bottom: 0.2em solid themed("secondary");
+        }
+
+      }
+
+      .nestedTab {
+        overflow: hidden;
+        .tabDiv {
+          float:none;
+          display:block;
+          overflow: hidden;
+          
+          background-color: themed("primary");
+        }
+        nav {
+          border-top: 0.2em solid themed("secondary");
+          background-color: themed("primary");
+          overflow: hidden;
+          // text-align:right;
+          opacity: 0.9;
+
+          .tab {
+            margin-bottom: 0;
+            display: block;
+            margin-right: 0.2em;
+
+            &Highlight,
+            &:hover {
+              color: themed("secondary");
+              border-right: 0.2em solid themed("secondary");
+              border-bottom: none;
+              margin-right: 0;
+            }
+          }
         }
       }
     }
