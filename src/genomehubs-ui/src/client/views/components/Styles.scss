@@ -804,19 +804,11 @@ body,
       .padded {
         margin-bottom: 3em;
       }
-      .unpadded {
-        // padding-top: 0 !important;
-        padding-bottom: 0 !important;
-      }
 
       .paragraph {
         padding: 1em !important;
       }
 
-      .unpadded {
-        // padding-top: 0 !important;
-        padding-bottom: 0 !important;
-      }
 
       .negativePadded {
         margin-top: -1em !important;
@@ -850,6 +842,11 @@ body,
         position: relative;
         min-height: 100%;
         padding: 0.5em 1em 4em;
+
+        
+      }
+      .unpadded {
+        padding-bottom: 0 !important;
       }
 
       // .reportContainer:not(:last-child):after {

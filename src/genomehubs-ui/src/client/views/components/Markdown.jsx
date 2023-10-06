@@ -19,6 +19,7 @@ import Toggle from "./Toggle";
 import Tooltip from "./Tooltip";
 import TranslatedValue from "./TranslatedValue";
 import YAML from "js-yaml";
+import classNames from "classnames";
 import classnames from "classnames";
 import { compose } from "recompose";
 import gfm from "remark-gfm";
@@ -225,7 +226,7 @@ export const RehypeComponentsList = (extra) => {
     templat: (props) => (
       <Template
         {...processProps({ props })}
-        className={styles.reportContainer}
+        className={classNames(styles.reportContainer, styles.unpadded)}
       />
     ),
     tooltip: (props) => {

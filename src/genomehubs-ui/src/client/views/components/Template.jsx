@@ -13,6 +13,7 @@ import Tooltip from "./Tooltip";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
 import qs from "../functions/qs";
+import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 
 // import classnames from "classnames";
