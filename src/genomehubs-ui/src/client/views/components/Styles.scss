@@ -170,6 +170,7 @@ body,
         height: 2em;
         overflow: visible;
         white-space:nowrap;
+        text-align: center;
       }
 
       .tabDiv {
@@ -193,8 +194,12 @@ body,
 
         &Highlight,
         &:hover {
-          color: themed("secondary");
+          background-color: mix(themed("primary"), themed("secondary"), 90%);
           border-bottom: 0.2em solid themed("secondary");
+        }
+
+        &:hover {
+          background-color: mix(themed("primary"), themed("secondary"), 75%);
         }
 
       }
@@ -210,22 +215,24 @@ body,
         }
         nav {
           border-top: 0.2em solid themed("secondary");
-          background-color: themed("primary");
           overflow: hidden;
           // text-align:right;
-          opacity: 0.9;
-
           .tab {
             margin-bottom: 0;
             display: block;
+            background-color: themed("primary");
+  
             // margin-right: 0.2em;
 
             &Highlight,
             &:hover {
-              color: themed("secondary");
               // border-right: 0.2em solid themed("secondary");
-              // border-bottom: none;
+              background-color: mix(themed("primary"), themed("secondary"), 90%);
+              border-bottom: none;
               // margin-right: 0;
+            }
+            &:hover {
+              background-color: mix(themed("primary"), themed("secondary"), 75%);
             }
           }
         }
