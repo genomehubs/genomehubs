@@ -64,11 +64,18 @@ const RecordPage = ({
     }
     if (options.recordId && options.recordId != recordId) {
       setRecordId(options.recordId);
+      let fields = Object.entries(types)
+        .filter(
+          ([key, val]) => val.group == options.result && val.display_level == 1
+        )
+        .map(([key, val]) => key)
+        .join(",");
+
       let searchTerm = {
         result: options.result,
         includeEstimates: true,
         taxonomy: options.taxonomy || taxonomy,
-        fields: "all",
+        fields,
       };
       if (options.result == "taxon") {
         searchTerm.query = `tax_eq(${options.recordId})`;
@@ -215,7 +222,9 @@ const RecordPage = ({
           taxonomy={options.taxonomy}
         />
       );
-    } else {
+    }
+
+    if (options.result == "taxon" || options.result == "assembly") {
       results.push(
         <AnalysisPanel
           key={"analysis"}
