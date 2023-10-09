@@ -215,7 +215,9 @@ body,
         }
         nav {
           border-top: 0.2em solid themed("secondary");
-          overflow: hidden;
+          overflow-x: hidden;
+          overflow-y: auto;
+          max-height: calc( 80vh - 2em );
           // text-align:right;
           .tab {
             margin-bottom: 0;
