@@ -2,9 +2,10 @@ import React, { memo, useEffect } from "react";
 
 import NavLink from "./NavLink";
 import { compose } from "recompose";
+import styles from "./Styles.scss";
 import withRoutes from "../hocs/withRoutes";
 
-const Tab = ({ routeName, pageId, setRoute, routesById }) => {
+const Tab = ({ path = "", routeName, pageId, setRoute, routesById }) => {
   let parsedName = routeName.replaceAll(/[\(\)]/g, "");
   let parsedPageId = pageId.replaceAll(/[\(\)]/g, "");
   useEffect(() => {
@@ -18,9 +19,11 @@ const Tab = ({ routeName, pageId, setRoute, routesById }) => {
   }
 
   return (
-    <NavLink to={parsedName} tab plain>
-      {parsedName}
-    </NavLink>
+    <div className={styles.tabDiv}>
+      <NavLink to={path ? `${path}/${routeName}` : parsedName} tab plain>
+        {parsedName}
+      </NavLink>
+    </div>
   );
 };
 

@@ -49,7 +49,7 @@ const DefaultLayout = ({}) => {
         <Grid item className={classes.item} xs={1}>
           <CookieBanner />
         </Grid>
-        <Grid item className={classes.item} xs={1}>
+        <Grid item className={classes.item} xs={1} style={{ zIndex: 1000 }}>
           <Header />
         </Grid>
         <Grid item className={classes.item} xs={true}>

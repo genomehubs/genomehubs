@@ -169,6 +169,13 @@ body,
         background: rgba(themed("primary"), 0.5);
         height: 2em;
         overflow: visible;
+        white-space:nowrap;
+        text-align: center;
+      }
+
+      .tabDiv {
+        float:left;
+        overflow: visible;
       }
 
       .tab {
@@ -181,14 +188,55 @@ body,
         height: 2.2em;
         line-height: 2em;
         margin-right: -1px;
-        margin-bottom: 0.2em;
+        // margin-bottom: 0.2em;
         padding: 0 0.5em;
         text-decoration: none !important;
 
         &Highlight,
         &:hover {
-          color: themed("secondary");
+          background-color: mix(themed("primary"), themed("secondary"), 90%);
           border-bottom: 0.2em solid themed("secondary");
+        }
+
+        &:hover {
+          background-color: mix(themed("primary"), themed("secondary"), 75%);
+        }
+
+      }
+
+      .nestedTab {
+        overflow: hidden;
+        .tabDiv {
+          float:none;
+          display:block;
+          overflow: hidden;
+          
+          background-color: themed("primary");
+        }
+        nav {
+          border-top: 0.2em solid themed("secondary");
+          overflow-x: hidden;
+          overflow-y: auto;
+          max-height: calc( 80vh - 2em );
+          // text-align:right;
+          .tab {
+            margin-bottom: 0;
+            display: block;
+            background-color: themed("primary");
+  
+            // margin-right: 0.2em;
+
+            &Highlight,
+            &:hover {
+              // border-right: 0.2em solid themed("secondary");
+              background-color: mix(themed("primary"), themed("secondary"), 90%);
+              border-bottom: none;
+              // margin-right: 0;
+            }
+            &:hover {
+              background-color: mix(themed("primary"), themed("secondary"), 75%);
+            }
+          }
         }
       }
     }
@@ -758,19 +806,11 @@ body,
       .padded {
         margin-bottom: 3em;
       }
-      .unpadded {
-        // padding-top: 0 !important;
-        padding-bottom: 0 !important;
-      }
 
       .paragraph {
         padding: 1em !important;
       }
 
-      .unpadded {
-        // padding-top: 0 !important;
-        padding-bottom: 0 !important;
-      }
 
       .negativePadded {
         margin-top: -1em !important;
@@ -804,6 +844,11 @@ body,
         position: relative;
         min-height: 100%;
         padding: 0.5em 1em 4em;
+
+        
+      }
+      .unpadded {
+        padding-bottom: 0 !important;
       }
 
       // .reportContainer:not(:last-child):after {

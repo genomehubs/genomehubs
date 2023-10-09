@@ -2,11 +2,12 @@ import React, { memo, useEffect, useState } from "react";
 
 import Markdown from "./Markdown";
 import Tab from "./Tab";
+import TabGroup from "./TabGroup";
 import classnames from "classnames";
 import { compose } from "recompose";
 import styles from "./Styles.scss";
 
-const Tabs = () => {
+const Tabs = ({ group = "tabs" }) => {
   const [content, setContent] = useState(null);
 
   let css; // = classnames(styles.tabHolder);
@@ -16,13 +17,30 @@ const Tabs = () => {
     },
     li: (props) => {
       let routeName = props.children[0].replace(/\n$/, "");
-      return <Tab routeName={routeName} pageId={`${routeName}.md`} />;
+      if (routeName.match(/\+/)) {
+        return (
+          <TabGroup
+            routeName={routeName}
+            pageId={`${routeName}.md`}
+            group={group}
+          />
+        );
+      } else {
+        let path = group.replaceAll("-", "/").replace(/\btabs\b/, "");
+        return (
+          <Tab path={path} routeName={routeName} pageId={`${routeName}.md`} />
+        );
+      }
     },
   };
 
   useEffect(() => {
     setContent(
-      <Markdown pageId={"tabs.md"} components={components} siteStyles={true} />
+      <Markdown
+        pageId={`${group}.md`}
+        components={components}
+        siteStyles={true}
+      />
     );
   }, []);
   return content;

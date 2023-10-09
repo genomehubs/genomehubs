@@ -615,6 +615,8 @@ const ReportItem = ({
       ref={targetRef}
       style={{
         minHeight: minDim,
+        maxWidth: "calc( 100% - 2em )",
+        boxSizing: "border-box",
       }}
       {...gridProps}
     >

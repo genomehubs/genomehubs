@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "@reach/router";
 import AggregationIcon from "./AggregationIcon";
 import BasicSelect from "./BasicSelect";
 import { Box } from "@material-ui/core";
+import Breadcrumbs from "./Breadcrumbs";
 import Divider from "@material-ui/core/Divider";
 import EnumSelect from "./EnumSelect";
 import FlagIcon from "./FlagIcon";
@@ -18,6 +19,7 @@ import Toggle from "./Toggle";
 import Tooltip from "./Tooltip";
 import TranslatedValue from "./TranslatedValue";
 import YAML from "js-yaml";
+import classNames from "classnames";
 import classnames from "classnames";
 import { compose } from "recompose";
 import gfm from "remark-gfm";
@@ -98,6 +100,7 @@ export const RehypeComponentsList = (extra) => {
   return {
     a: (props) => <NavLink {...processProps({ props, extra })} />,
     aggregation: (props) => <AggregationIcon method={props.method} />,
+    breadcrumbs: (props) => <Breadcrumbs {...props} />,
     divider: (props) => (
       <Divider
         orientation={props.orientation || "vertical"}
@@ -223,7 +226,7 @@ export const RehypeComponentsList = (extra) => {
     templat: (props) => (
       <Template
         {...processProps({ props })}
-        className={styles.reportContainer}
+        className={classNames(styles.reportContainer, styles.unpadded)}
       />
     ),
     tooltip: (props) => {

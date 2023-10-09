@@ -24,6 +24,7 @@ const NavLink = ({
   } else if (to) {
     to = basename + "/" + to + (plain ? "" : location.search + location.hash);
   }
+  let isCurrent = location.pathname.startsWith(to);
   if ((to && to.startsWith("http")) || props.href) {
     to = to || props.href;
     if (
@@ -60,6 +61,10 @@ const NavLink = ({
     }
     to = basename + "/" + to.replace(location.origin, "");
   }
+  let css = styles.link;
+  if (tab) {
+    css = classnames(styles.tab, { [styles.tabHighlight]: isCurrent });
+  }
   return (
     <Link
       {...props}
@@ -67,14 +72,7 @@ const NavLink = ({
         .replace(/\/+/, `${basename}/`)
         .replace(`${basename}${basename}`, basename)
         .replace(/\/\/+/, "/")}
-      getProps={({ isCurrent }) => {
-        let css = tab
-          ? classnames(styles.tab, { [styles.tabHighlight]: isCurrent })
-          : styles.link;
-        return {
-          className: css,
-        };
-      }}
+      className={css}
     />
   );
 };
