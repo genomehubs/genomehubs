@@ -1,29 +1,15 @@
 import React, { useEffect, useState } from "react";
 
 import { compose } from "recompose";
+import fetchCount from "../functions/fetchCount";
 import qs from "../functions/qs";
 import withApi from "../hocs/withApi";
 
 const ResultCount = ({ apiUrl, ...options }) => {
   let [count, setCount] = useState();
   useEffect(() => {
-    const fetchCount = async () => {
-      const queryString = qs.stringify({ ...options });
-      const endpoint = "count";
-      let url = `${apiUrl}/${endpoint}?${queryString}`;
-      // try {
-      let json;
-      try {
-        const response = await fetch(url);
-        json = await response.json();
-      } catch (error) {
-        json = console.log("An error occured.", error);
-      }
-      if (json && json.status && json.status.success) {
-        setCount(json.count);
-      }
-    };
-    fetchCount();
+    const queryString = qs.stringify({ ...options });
+    fetchCount({ queryString, setCount });
   }, []);
 
   if (typeof count !== "undefined") {

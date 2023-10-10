@@ -24,6 +24,7 @@ const Main = ({ routes, basename }) => {
   if (routes.allIds.length == 0) {
     return null;
   }
+  console.log({ routes, basename });
   let css = classnames(styles.fillParent);
   let paths = [
     <Landing path="/" key="/" />,
@@ -41,6 +42,7 @@ const Main = ({ routes, basename }) => {
     <ReportPage path="/report" key="/report" />,
     <MissingPage default key="404" />,
   ];
+  console.log(paths);
   routes.allIds.forEach((routeName) => {
     if (!fixedRoutes[routeName]) {
       paths.push(
