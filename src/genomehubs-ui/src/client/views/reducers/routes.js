@@ -1,4 +1,5 @@
 import { createAction, handleAction } from "redux-actions";
+
 import immutableUpdate from "immutable-update";
 
 export const setRoutes = createAction("SET_ROUTES");
@@ -8,7 +9,7 @@ export const routes = handleAction(
   (state, action) =>
     immutableUpdate(state, {
       byId: { [action.payload.routeName]: action.payload },
-      allIds: [...state.allIds, action.payload.routeName],
+      allIds: [...new Set([...state.allIds, action.payload.routeName])],
     }),
   { allIds: [], byId: {} }
 );

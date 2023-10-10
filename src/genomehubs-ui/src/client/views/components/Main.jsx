@@ -1,4 +1,4 @@
-import React, { Fragment, memo } from "react";
+import React, { Fragment, memo, useEffect, useState } from "react";
 
 import ExplorePage from "./ExplorePage";
 import GenericPage from "./GenericPage";
@@ -25,40 +25,47 @@ const Main = ({ routes, basename }) => {
     return null;
   }
   let css = classnames(styles.fillParent);
-  let paths = [
-    <Landing path="/" key="/" />,
-    <SearchPage path="/search" key="/search" />,
-    <ExplorePage path="/explore" key="/explore" />,
-    <Redirect
-      path="/records"
-      key="/records"
-      to="/record"
-      replace={{ record_id: "recordId" }}
-    />,
-    <RecordPage path="/record" key="/record" />,
-    <SourcesPage path="/sources" key="/sources" />,
-    <TypesPage path="/types" key="/types" />,
-    <ReportPage path="/report" key="/report" />,
-    <MissingPage default key="404" />,
-  ];
-  routes.allIds.forEach((routeName) => {
-    if (!fixedRoutes[routeName]) {
-      paths.push(
-        <GenericPage
-          path={`/${routeName}`}
-          pageId={routes.byId[routeName].pageId}
-          key={routeName}
-        />
-      );
-    }
-    paths.push(
-      <GenericPage
-        path={`/${routeName}/*`}
-        key={"other"}
-        // pageId={routes.byId[routeName].pageId}
-      />
-    );
-  });
+  const [paths, setPaths] = useState([]);
+  let routeStr = JSON.stringify(routes);
+  useEffect(() => {
+    let newPaths = [
+      <Landing path="/" key="/" />,
+      <SearchPage path="/search" key="/search" />,
+      <ExplorePage path="/explore" key="/explore" />,
+      <Redirect
+        path="/records"
+        key="/records"
+        to="/record"
+        replace={{ record_id: "recordId" }}
+      />,
+      <RecordPage path="/record" key="/record" />,
+      <SourcesPage path="/sources" key="/sources" />,
+      <TypesPage path="/types" key="/types" />,
+      <ReportPage path="/report" key="/report" />,
+      <MissingPage default key="404" />,
+    ];
+    routes.allIds.forEach((routeName) => {
+      if (!fixedRoutes[routeName]) {
+        newPaths.push(
+          <GenericPage
+            path={`/${routeName}`}
+            pageId={routes.byId[routeName].pageId}
+            key={routeName}
+          />
+        );
+      }
+      // newPaths.push(
+      //   <GenericPage
+      //     path={`/${routeName}/*`}
+      //     key={`${routeName}/*`}
+      //     // pageId={routes.byId[routeName].pageId}
+      //   />
+      // );
+    });
+    setPaths(newPaths);
+  }, [routeStr]);
+  console.log(paths);
+
   return (
     <Fragment>
       <Router className={css} basepath={basename} primary={false}>

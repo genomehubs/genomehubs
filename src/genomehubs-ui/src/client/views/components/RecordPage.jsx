@@ -238,7 +238,7 @@ const RecordPage = ({
     }
   }
 
-  let text = <TextPanel pageId={"record.md"}></TextPanel>;
+  // let text = <TextPanel pageId={"record.md"}></TextPanel>;
 
   return (
     <Page
@@ -247,7 +247,7 @@ const RecordPage = ({
       recordId={recordId}
       searchBox
       panels={[{ panel: results }]}
-      text={text}
+      // text={text}
     />
   );
 };

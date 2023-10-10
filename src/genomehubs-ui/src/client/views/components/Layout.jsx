@@ -101,6 +101,7 @@ const Layout = ({ types, basename }) => {
       <SearchLayout path="/searchurl" key={2} />,
     ]);
   }, []);
+  console.log("layout");
   return (
     <>
       <Router className={styles.fillParent} basepath={basename} primary={false}>
