@@ -1,4 +1,4 @@
-const apiUrl = API_URL;
+import { apiUrl } from "../reducers/api";
 
 export const fetchFieldCount = async ({ queryString, setCount }) => {
   const endpoint = "search";
