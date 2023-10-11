@@ -1,23 +1,15 @@
 import Markdown from "./Markdown";
 import React from "react";
-import classnames from "classnames";
-import styles from "./Styles.scss";
+import { compose } from "recompose";
+import getPrimaryAssemblyId from "../functions/getPrimaryAssemblyId";
+import withRecord from "../hocs/withRecord";
 
-const TaxonSummaryPanel = ({ taxon_id }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel
-  );
+const TaxonSummaryPanel = ({ record, taxonId }) => {
+  if (!record || !record.record || !record.record.attributes) {
+    return null;
+  }
 
-  return (
-    <div className={css}>
-      <div className={styles.header}>
-        <span className={styles.title}>Taxon Summary</span>
-      </div>
-      <Markdown pageId={"taxon_summary.md"} taxon_id={taxon_id} />
-    </div>
-  );
+  return <Markdown pageId={"taxon_summary.md"} taxonId={taxonId} />;
 };
 
-export default TaxonSummaryPanel;
+export default compose(withRecord)(TaxonSummaryPanel);

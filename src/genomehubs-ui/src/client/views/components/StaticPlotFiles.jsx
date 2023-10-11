@@ -25,6 +25,9 @@ const StaticPlotFiles = ({
   const [filename, setFilename] = useState(filenames && filenames[0]);
   const [fileId, setFileId] = useState();
   const [fileUrl, setFileUrl] = useState();
+  const [sourceUrl, setSourceUrl] = useState();
+  const [description, setDescription] = useState();
+  const [title, setTitle] = useState();
   const [ratio, setRatio] = useState(1);
   const [indices, setIndices] = useState({});
 
@@ -56,6 +59,9 @@ const StaticPlotFiles = ({
         setRatio(width / height);
         setFileId(meta.file_id);
         setFileUrl(meta.url);
+        setSourceUrl(meta.source_url);
+        setTitle(meta.title);
+        setDescription(meta.description);
       }
     }
   }, [analysisId, filesByAnalysisId, filename]);
@@ -68,13 +74,9 @@ const StaticPlotFiles = ({
     let prevIndex = index > 0 ? index - 1 : Object.keys(indices).length - 1;
     back = (
       <div
+        className={styles.plotArrow}
         style={{
-          height: "100%",
-          position: "absolute",
-          left: 0,
-          top: 0,
-          display: "flex",
-          alignItems: "center",
+          left: "-1.5em",
         }}
       >
         {/* <IconButton
@@ -82,11 +84,13 @@ const StaticPlotFiles = ({
           size="large"
           onClick={() => {}}
         > */}
-        <Tooltip title={"Previous"} arrow>
+        <Tooltip title={"Previous plot"} arrow>
           <KeyboardArrowLeftIcon
             style={{ cursor: "pointer" }}
             aria-label="show previous plot"
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               setFilename(Object.keys(indices)[prevIndex]);
             }}
           />
@@ -97,20 +101,18 @@ const StaticPlotFiles = ({
     let nextIndex = index < Object.keys(indices).length - 1 ? index + 1 : 0;
     forward = (
       <div
+        className={styles.plotArrow}
         style={{
-          height: "100%",
-          position: "absolute",
-          right: 0,
-          top: 0,
-          display: "flex",
-          alignItems: "center",
+          right: "-1.5em",
         }}
       >
-        <Tooltip title={"Next"} arrow>
+        <Tooltip title={"Next plot"} arrow>
           <KeyboardArrowRightIcon
             style={{ cursor: "pointer" }}
             aria-label="show next plot"
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               setFilename(Object.keys(indices)[nextIndex]);
             }}
           />
@@ -120,15 +122,32 @@ const StaticPlotFiles = ({
   }
 
   return (
-    <div style={{ height: "100%", width: "100%", position: "relative" }}>
-      <StaticPlotFile
-        fileId={fileId}
-        fileUrl={fileUrl}
-        ratio={ratio}
-        containerRef={containerRef}
-      />
-      {forward}
-      {back}
+    <div className={styles.plotContainer}>
+      <a href={sourceUrl} target="_blank">
+        <div
+          style={{
+            height: "100%",
+            width: "100%",
+            position: "relative",
+          }}
+        >
+          <Tooltip title={`Click to open ${sourceUrl} in a new tab`} arrow>
+            <div>
+              <StaticPlotFile
+                fileId={fileId}
+                fileUrl={fileUrl}
+                ratio={ratio}
+                containerRef={containerRef}
+              />
+            </div>
+          </Tooltip>
+          {forward}
+          {back}
+        </div>
+        <Tooltip title={description} arrow>
+          <div className={styles.plotDescription}>{title}</div>
+        </Tooltip>
+      </a>
     </div>
   );
 };

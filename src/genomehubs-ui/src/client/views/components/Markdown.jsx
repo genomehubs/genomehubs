@@ -14,6 +14,7 @@ import Grid from "@material-ui/core/Grid";
 import Highlight from "./Highlight";
 import Logo from "./Logo";
 import NavLink from "./NavLink";
+import RecordLink from "./RecordLink";
 import Report from "./Report";
 import StaticPlot from "./StaticPlot";
 import Template from "./Template";
@@ -103,7 +104,7 @@ export const RehypeComponentsList = (extra) => {
     a: (props) => <NavLink {...processProps({ props, extra })} />,
     aggregation: (props) => <AggregationIcon method={props.method} />,
     breadcrumbs: (props) => <Breadcrumbs {...props} />,
-    count: (props) => <Count {...props} />,
+    count: (props) => <Count {...processProps({ props, extra })} />,
     divider: (props) => (
       <Divider
         orientation={props.orientation || "vertical"}
@@ -204,6 +205,7 @@ export const RehypeComponentsList = (extra) => {
       }
       return <Highlight {...processProps({ props })} />;
     },
+    recordlink: (props) => <RecordLink {...processProps({ props, extra })} />,
     report: (props) => {
       let css = styles.reportContainer;
       if (props.className) {

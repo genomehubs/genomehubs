@@ -28,7 +28,6 @@ const pages = handleActions(
     RECEIVE_PAGE: (state, action) => {
       let byId = {};
       let { pageId, markdown } = action.payload;
-      console.log({ pageId, markdown });
       if (state.byId[pageId]) {
         return state;
       }

@@ -60,9 +60,7 @@ const RecordPage = ({
   let options = qs.parse(location.search.replace(/^\?/, ""));
   let hashTerm = decodeURIComponent(location.hash.replace(/^\#/, ""));
   useEffect(() => {
-    console.log(0);
     if (options.result != searchIndex) {
-      console.log("a");
       setSearchIndex(options.result);
     }
     if (options.recordId && options.recordId != recordId) {
@@ -81,14 +79,12 @@ const RecordPage = ({
       setPreviousSearchTerm(searchTerm);
       fetchSearchResults(searchTerm);
     } else if (recordId) {
-      console.log(0);
       if (
         options.result == "taxon" &&
         (!record.record ||
           recordId != record.record.taxon_id ||
           options.taxonomy != taxonomy)
       ) {
-        console.log(1);
         if (!recordIsFetching) {
           fetchRecord(
             recordId,
@@ -104,7 +100,6 @@ const RecordPage = ({
         options.result == "assembly" &&
         (!record.record || recordId != record.record.assembly_id)
       ) {
-        console.log(2);
         if (!recordIsFetching) {
           fetchRecord(
             recordId,
@@ -120,7 +115,6 @@ const RecordPage = ({
         options.result == "sample" &&
         (!record.record || recordId != record.record.sample_id)
       ) {
-        console.log(3);
         if (!recordIsFetching) {
           fetchRecord(
             recordId,
@@ -136,7 +130,6 @@ const RecordPage = ({
         options.result == "feature" &&
         (!record.record || recordId != record.record.feature_id)
       ) {
-        console.log(4);
         if (!recordIsFetching) {
           fetchRecord(
             recordId,
@@ -148,12 +141,9 @@ const RecordPage = ({
         if (hashTerm) {
           setLookupTerm(hashTerm);
         }
-      } else {
-        console.log(5);
       }
     }
   }, [location.search]);
-  console.log(options);
   if (record && record.record && record.record.taxon_id) {
     taxon = {
       taxon_id: record.record.taxon_id,
@@ -165,7 +155,7 @@ const RecordPage = ({
         <ResultPanel key={taxon.taxon_id} {...searchById} {...taxon} />
       );
 
-      results.push(<TaxonSummaryPanel key={"taxon_summary"} {...taxon} />);
+      // results.push(<TaxonSummaryPanel key={"taxon_summary"} {...taxon} />);
 
       if (record.record.lineage) {
         results.push(
