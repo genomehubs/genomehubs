@@ -28,7 +28,6 @@ const StaticPlotFile = ({
   if (!fileId) {
     return null;
   }
-  apiUrl = "https://goat.genomehubs.org/api/v2";
   const handleLoad = () => {
     setLoading(false);
   };
