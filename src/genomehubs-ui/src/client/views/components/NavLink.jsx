@@ -32,6 +32,9 @@ const NavLink = ({
       (props.title?.startsWith("external:") || !to.match(location.origin))
     ) {
       let children = props.children;
+      if (!Array.isArray(children)) {
+        children = [children];
+      }
       if (children.length == 1 && typeof children[0] === "string") {
         children = children[0].match(/(.{1,12})/g);
         children = children.map((str, i) => (

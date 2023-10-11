@@ -46,6 +46,7 @@ const AssemblyPanel = ({
             <span style={{ textDecoration: "underline" }}>
               <NavLink href={enaUrl}>ENA</NavLink>
             </span>
+            /
             <span style={{ textDecoration: "underline" }}>
               <NavLink href={ncbiUrl}>NCBI</NavLink>
             </span>
