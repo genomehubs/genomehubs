@@ -28,6 +28,9 @@ const pages = handleActions(
     RECEIVE_PAGE: (state, action) => {
       let byId = {};
       let { pageId, markdown } = action.payload;
+      if (state.byId[pageId]) {
+        return state;
+      }
       return immutableUpdate(state, {
         isFetching: false,
         byId: { ...state.byId, [pageId]: markdown },
