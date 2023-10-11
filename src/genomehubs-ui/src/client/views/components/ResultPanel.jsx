@@ -147,6 +147,7 @@ const ResultPanel = ({
   );
   let groupedDivs = {};
   let fieldDivs = [];
+  let taxonSummary;
 
   if (fields) {
     fields.forEach((field) => {
@@ -174,6 +175,11 @@ const ResultPanel = ({
         }
       }
     });
+    taxonSummary = (
+      <Grid item xs={12}>
+        <TaxonSummaryPanel taxonId={taxon_id} />
+      </Grid>
+    );
   }
   Object.keys(groupedDivs).forEach((key) => {
     fieldDivs = fieldDivs.concat(groupedDivs[key]);
@@ -231,9 +237,7 @@ const ResultPanel = ({
 
       <div>
         <Grid container alignItems="center" direction="row" spacing={0}>
-          <Grid item xs={12}>
-            <TaxonSummaryPanel taxonId={taxon_id} />
-          </Grid>
+          {taxonSummary}
         </Grid>
         <Grid container alignItems="center" direction="row" spacing={0}>
           {fieldDivs}

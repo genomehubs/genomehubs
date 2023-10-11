@@ -54,10 +54,13 @@ const fillTemplateValues = (value, extra) => {
           lower = true;
           parts[i] = parts[i].replace(/^lc_/, "");
         }
-        if (extra.hasOwnProperty(parts[i])) {
-          parts[i] = lower ? extra[parts[i]].toLowerCase() : extra[parts[i]];
-        } else {
-          parts[i] = "";
+        for (let part of parts[i].split("|")) {
+          if (extra.hasOwnProperty(part)) {
+            parts[i] = lower ? extra[part].toLowerCase() : extra[part];
+            break;
+          } else {
+            parts[i] = "";
+          }
         }
       }
       value = parts.join("");
