@@ -24,14 +24,20 @@ const RecordLink = ({
 }) => {
   let [count, setCount] = useState();
 
-  if (
-    !record ||
-    (result && !record.index.startsWith(result)) ||
-    !record.record ||
-    !url ||
-    !label
-  ) {
+  if (!record || !record.record || !url || !label) {
     return null;
+  }
+  if (result) {
+    let match;
+    for (let r of result.split(",")) {
+      if (record.index.startsWith(r)) {
+        match = true;
+        break;
+      }
+    }
+    if (!match) {
+      return null;
+    }
   }
 
   if (rank) {
@@ -54,6 +60,8 @@ const RecordLink = ({
     }
     if (value.values) {
       return value.values;
+    } else if (value.value) {
+      return value.value;
     }
     return value;
   };

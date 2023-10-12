@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
+import AssemblySummaryPanel from "./AssemblySummaryPanel";
 import Grid from "@material-ui/core/Grid";
 import { NamesList } from "./NamesPanel";
 import NavLink from "./NavLink";
@@ -108,6 +109,9 @@ const AssemblyPanel = ({
 
       <div>
         <Grid container alignItems="center" direction="column" spacing={0}>
+          <Grid item xs={12} style={{ width: "100%" }}>
+            <AssemblySummaryPanel assemblyId={assemblyId} />
+          </Grid>
           <Grid item style={{ width: "100%" }}>
             {namesDiv}
           </Grid>
