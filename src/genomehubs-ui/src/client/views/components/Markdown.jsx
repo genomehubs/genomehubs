@@ -21,6 +21,7 @@ import Template from "./Template";
 import Toggle from "./Toggle";
 import Tooltip from "./Tooltip";
 import TranslatedValue from "./TranslatedValue";
+import ValueRow from "./ValueRow";
 import YAML from "js-yaml";
 import classNames from "classnames";
 import classnames from "classnames";
@@ -258,6 +259,7 @@ export const RehypeComponentsList = (extra) => {
     translated: (props) => {
       return <TranslatedValue {...processProps({ props, extra })} />;
     },
+    valuerow: (props) => <ValueRow {...processProps({ props, extra })} />,
   };
 };
 

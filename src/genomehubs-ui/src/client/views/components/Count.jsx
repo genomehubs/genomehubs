@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import DisplayCount from "./DisplayCount";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import fetchCount from "../functions/fetchCount";
@@ -75,55 +76,21 @@ const Count = ({
     );
   };
 
-  const fillValues = (str) => {
-    return str
-      .split(/\{(.+?)\}/)
-      .map((part, i) => {
-        if (!part) {
-          return "";
-        }
-        if (i % 2 == 1) {
-          if (part == "count") {
-            return count.toLocaleString();
-          }
-          if (part == "scientific_name") {
-            return record.record.scientific_name;
-          }
-        }
-        return part;
-      })
-      .join("");
-  };
-
   if (typeof count !== "undefined") {
     return (
-      <div style={{ display: "flex", whiteSpace: "nowrap", maxHeight: "3em" }}>
-        <Tooltip title={fillValues(description)} arrow placement={"top"}>
-          <span style={{ cursor: "pointer" }} onClick={handleClick}>
-            <span
-              style={{
-                fontSize: "2em",
-                fontWeight: "bold",
-                display: "inline-flex",
-                alignItems: "center",
-              }}
-            >
-              {formats(count, "integer")}
-            </span>
-            <span
-              style={{
-                fontSize: "1.5em",
-                minHeight: "2em",
-                display: "inline-flex",
-                alignItems: "center",
-                marginLeft: "0.25em",
-              }}
-            >
-              {count == 1 ? suffix : suffix_plural || suffix}
-            </span>
-          </span>
-        </Tooltip>
-      </div>
+      <DisplayCount
+        {...{
+          values: {
+            count,
+            scientific_name: record.record.scientific_name,
+          },
+          description,
+          handleClick,
+          count,
+          suffix,
+          suffix_plural,
+        }}
+      />
     );
   }
   return null;

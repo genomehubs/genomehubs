@@ -177,18 +177,6 @@ const RecordPage = ({
       }
     }
 
-    if (options.result != "taxon") {
-      results.push(
-        <TaxonPanel
-          key={"taxon"}
-          recordId={record.record.record_id}
-          {...record.record}
-          result={options.result}
-          taxonomy={options.taxonomy}
-        />
-      );
-    }
-
     if (options.result == "assembly" || options.result == "feature") {
       results.push(
         <AssemblyPanel
@@ -214,6 +202,17 @@ const RecordPage = ({
         <AssembliesPanel
           key={"assemblies"}
           recordId={record.record.record_id}
+          result={options.result}
+          taxonomy={options.taxonomy}
+        />
+      );
+    }
+    if (options.result != "taxon") {
+      results.push(
+        <TaxonPanel
+          key={"taxon"}
+          recordId={record.record.record_id}
+          {...record.record}
           result={options.result}
           taxonomy={options.taxonomy}
         />

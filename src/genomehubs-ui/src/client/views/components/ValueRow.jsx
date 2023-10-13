@@ -1,6 +1,7 @@
+import { Chip, Grid } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 
-import { Chip } from "@material-ui/core";
+import DisplayCount from "./DisplayCount";
 import LaunchIcon from "@material-ui/icons/Launch";
 import Tooltip from "./Tooltip";
 import compareValues from "../functions/compareValues";
@@ -8,24 +9,25 @@ import { compose } from "recompose";
 import fetchCount from "../functions/fetchCount";
 import fetchFieldCount from "../functions/fetchFieldCount";
 import fetchValueCount from "../functions/fetchValueCount";
+import fillValues from "../functions/fillValues";
 import getPrimaryAssemblyId from "../functions/getPrimaryAssemblyId";
 import qs from "../functions/qs";
 import withApi from "../hocs/withApi";
 import withRecord from "../hocs/withRecord";
 
-const RecordLink = ({
+const ValueRow = ({
   record,
   result,
   rank,
   condition,
   url,
-  label,
+  suffix,
   description,
+  value,
+  unit,
   color = "#1f78b4",
 }) => {
-  let [count, setCount] = useState();
-
-  if (!record || !record.record || !url || !label) {
+  if (!record || !record.record || !suffix || !value) {
     return null;
   }
   if (result) {
@@ -67,23 +69,6 @@ const RecordLink = ({
     return value;
   };
 
-  const fillValues = (str) => {
-    return str
-      .split(/\{(.+?)\}/)
-      .map((part, i) => {
-        if (!part) {
-          return "";
-        }
-        if (i % 2 == 1) {
-          return fetchValue(part);
-        }
-        return part;
-      })
-      .join("");
-  };
-
-  let href;
-
   try {
     if (condition) {
       let [key, cmp, value] = condition.split(/([!><=]+)/);
@@ -92,15 +77,16 @@ const RecordLink = ({
           return null;
         }
       } else {
-        let recordValue = fetchValue(key);
+        let recordValue = fillValues(key, {
+          attributes: record.record.attributes,
+        });
         if (cmp && !compareValues(recordValue, value, cmp)) {
           return null;
         }
       }
     }
-
-    href = fillValues(url);
   } catch (err) {
+    throw err;
     return null;
   }
 
@@ -130,37 +116,32 @@ const RecordLink = ({
     // fetchCount({ queryString, setCount });
   }, []);
 
-  let chip = (
-    <Chip
-      // variant="outlined"
-      color="primary"
-      style={{
-        backgroundColor: color,
-        color: "white",
-        textDecoration: "none",
-        fontSize: "1em",
-        margin: "0.2em 0",
+  let count;
+  try {
+    count = fetchValue(value);
+  } catch (err) {
+    return null;
+  }
+  let handleClick;
+  return (
+    <DisplayCount
+      {...{
+        values: {
+          count,
+          scientific_name: record.record.scientific_name,
+          attributes: record.record.attributes,
+          assemblyId: record.record.assembly_id,
+        },
+        description,
+        handleClick,
+        count,
+        suffix,
+        unit,
+        // suffix,
+        // suffix_plural,
       }}
-      // size="small"
-      label={
-        <span style={{ whiteSpace: "nowrap" }}>
-          {label} <LaunchIcon fontSize="inherit" />
-        </span>
-      }
-      component="a"
-      target="_blank"
-      href={href}
-      clickable
     />
   );
-  if (description) {
-    chip = (
-      <Tooltip title={fillValues(description)} arrow placement={"top"}>
-        {chip}
-      </Tooltip>
-    );
-  }
-  return chip;
 };
 
-export default compose(withApi, withRecord)(RecordLink);
+export default compose(withApi, withRecord)(ValueRow);

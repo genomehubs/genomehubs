@@ -144,9 +144,11 @@ const StaticPlotFiles = ({
           {forward}
           {back}
         </div>
-        <Tooltip title={description} arrow>
-          <div className={styles.plotDescription}>{title}</div>
-        </Tooltip>
+        {description && (
+          <Tooltip title={description} arrow>
+            <div className={styles.plotDescription}>{title}</div>
+          </Tooltip>
+        )}
       </a>
     </div>
   );

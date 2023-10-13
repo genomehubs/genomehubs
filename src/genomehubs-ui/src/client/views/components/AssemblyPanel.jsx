@@ -38,22 +38,22 @@ const AssemblyPanel = ({
   let namesDiv;
   if (assemblyId) {
     if (records[assemblyId]) {
-      if (assemblyId.startsWith("GCA_")) {
-        let enaUrl = `https://www.ebi.ac.uk/ena/browser/view/${assemblyId}`;
-        let ncbiUrl = `https://www.ncbi.nlm.nih.gov/datasets/genome/${assemblyId}/`;
-        assemblyLink = (
-          <>
-            View assembly in{" "}
-            <span style={{ textDecoration: "underline" }}>
-              <NavLink href={enaUrl}>ENA</NavLink>
-            </span>
-            /
-            <span style={{ textDecoration: "underline" }}>
-              <NavLink href={ncbiUrl}>NCBI</NavLink>
-            </span>
-          </>
-        );
-      }
+      // if (assemblyId.startsWith("GCA_")) {
+      //   let enaUrl = `https://www.ebi.ac.uk/ena/browser/view/${assemblyId}`;
+      //   let ncbiUrl = `https://www.ncbi.nlm.nih.gov/datasets/genome/${assemblyId}/`;
+      //   assemblyLink = (
+      //     <>
+      //       View assembly in{" "}
+      //       <span style={{ textDecoration: "underline" }}>
+      //         <NavLink href={enaUrl}>ENA</NavLink>
+      //       </span>
+      //       /
+      //       <span style={{ textDecoration: "underline" }}>
+      //         <NavLink href={ncbiUrl}>NCBI</NavLink>
+      //       </span>
+      //     </>
+      //   );
+      // }
       let identifiers = (records[assemblyId].record.identifiers || []).filter(
         (obj) => obj.class != "assembly_id"
       );
@@ -91,12 +91,14 @@ const AssemblyPanel = ({
   );
 
   return (
-    <div className={css}>
-      <Tooltip
-        title={"Click to view full assembly record"}
-        arrow
-        placement="top"
-      >
+    <>
+      <div className={css}>
+        {/* <Tooltip
+          title={"Click to view full assembly record"}
+          arrow
+          placement="top"
+        > */}
+        {/* <div className={styles.header} onClick={handleAssemblyClick}> */}
         <div className={styles.header} onClick={handleAssemblyClick}>
           <span className={styles.title}>Assembly — {assemblyId}</span>
           {/* <span> ({taxon_rank})</span>
@@ -105,26 +107,46 @@ const AssemblyPanel = ({
             {taxon_id}
           </span> */}
         </div>
-      </Tooltip>
+        {/* </Tooltip> */}
 
-      <div>
-        <Grid container alignItems="center" direction="column" spacing={0}>
-          <Grid item xs={12} style={{ width: "100%" }}>
-            <AssemblySummaryPanel assemblyId={assemblyId} />
-          </Grid>
-          <Grid item style={{ width: "100%" }}>
-            {namesDiv}
-          </Grid>
-          <Grid container direction="row" justifyContent="flex-end">
+        <div>
+          <Grid container alignItems="center" direction="column" spacing={0}>
+            <Grid item xs={12} style={{ width: "100%" }}>
+              <AssemblySummaryPanel assemblyId={assemblyId} />
+            </Grid>
+
+            {/* <Grid container direction="row" justifyContent="flex-end">
             <Grid item>{assemblyLink}</Grid>
+          </Grid> */}
           </Grid>
-        </Grid>
-        {/* <div className={styles.flexRow}>{fieldDivs}</div>
+          {/* <div className={styles.flexRow}>{fieldDivs}</div>
         {additionalDivs.length > 0 && (
           <div className={styles.flexRow}>{additionalDivs}</div>
         )} */}
+        </div>
       </div>
-    </div>
+      {namesDiv && (
+        <div className={css}>
+          {/* <Tooltip
+            title={"Click to view full assembly record"}
+            arrow
+            placement="top"
+          > */}
+          <div className={styles.header}>
+            <span className={styles.title}>Identifiers</span>
+          </div>
+          {/* </Tooltip> */}
+
+          <div>
+            <Grid container alignItems="center" direction="column" spacing={0}>
+              <Grid item style={{ width: "100%" }}>
+                {namesDiv}
+              </Grid>
+            </Grid>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
