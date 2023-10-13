@@ -14,6 +14,7 @@ import Grid from "@material-ui/core/Grid";
 import Highlight from "./Highlight";
 import Logo from "./Logo";
 import NavLink from "./NavLink";
+import PhyloPics from "./PhyloPics";
 import RecordLink from "./RecordLink";
 import Report from "./Report";
 import StaticPlot from "./StaticPlot";
@@ -209,6 +210,7 @@ export const RehypeComponentsList = (extra) => {
       }
       return <Highlight {...processProps({ props })} />;
     },
+    phylopic: (props) => <PhyloPics {...processProps({ props, extra })} />,
     recordlink: (props) => <RecordLink {...processProps({ props, extra })} />,
     report: (props) => {
       let css = styles.reportContainer;

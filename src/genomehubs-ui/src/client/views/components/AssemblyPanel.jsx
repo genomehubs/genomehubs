@@ -5,6 +5,7 @@ import AssemblySummaryPanel from "./AssemblySummaryPanel";
 import Grid from "@material-ui/core/Grid";
 import { NamesList } from "./NamesPanel";
 import NavLink from "./NavLink";
+import PhyloPics from "./PhyloPics";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
@@ -16,7 +17,6 @@ import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
 
 const AssemblyPanel = ({
-  scientific_name,
   recordId,
   recordIsFetching,
   records,
@@ -34,7 +34,7 @@ const AssemblyPanel = ({
   const navigate = useNavigate();
   let options = qs.parse(location.search.replace(/^\?/, ""));
 
-  let assemblyLink;
+  let scientificName, lineage, rank;
   let namesDiv;
   if (assemblyId) {
     if (records[assemblyId]) {
@@ -60,6 +60,11 @@ const AssemblyPanel = ({
       if (identifiers.length > 0) {
         namesDiv = <NamesList names={identifiers} />;
       }
+      ({
+        scientific_name: scientificName,
+        lineage,
+        taxon_rank: rank,
+      } = records[assemblyId].record);
     } else {
     }
   }
@@ -114,7 +119,15 @@ const AssemblyPanel = ({
             <Grid item xs={12} style={{ width: "100%" }}>
               <AssemblySummaryPanel assemblyId={assemblyId} />
             </Grid>
-
+            <Grid container direction="row">
+              <Grid item xs={12} style={{ width: "100%" }}>
+                {/* <PhyloPics
+                // scientificName={scientificName}
+                // lineage={lineage}
+                // rank={rank}
+                /> */}
+              </Grid>
+            </Grid>
             {/* <Grid container direction="row" justifyContent="flex-end">
             <Grid item>{assemblyLink}</Grid>
           </Grid> */}

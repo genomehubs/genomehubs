@@ -794,6 +794,60 @@ body,
       
     }
 
+    .imageContainer {
+      cursor: pointer;
+      width: fit-content;
+      a, a:link, a:visited {
+        text-decoration: none !important;
+        color:themed("secondary");
+        .plotArrow {
+          height: 100%;
+          position: absolute;;
+          top: 0;
+          display: flex;
+          align-items: center;
+          color: themed("primary") !important;
+        }
+      }
+
+      .imageCredit {
+        font-size: 0.6em;
+        width: calc( 100% - 1em );
+        padding: 0.15em 0.5em;
+        color: themed("secondary");
+        text-align: center;
+        white-space:nowrap;
+
+        &Primary {
+          background-color: themed("primary");
+        }
+        &Descendant {
+          background-color: themed("descendant");
+        }
+        &Ancestral {
+          background-color: themed("ancestral");
+        }
+      }
+
+      
+    }
+
+    .blackToPrimary {
+      filter: invert(17%) sepia(14%) saturate(765%) hue-rotate(198deg) brightness(98%) contrast(91%);
+    }
+
+    .blackToDirect {
+      filter: invert(23%) sepia(99%) saturate(628%) hue-rotate(140deg) brightness(104%) contrast(101%);
+    }
+
+    .blackToDescendant {
+      filter: invert(85%) sepia(17%) saturate(4579%) hue-rotate(327deg) brightness(100%) contrast(87%);
+    }
+
+    .blackToAncestral {
+      filter: invert(35%) sepia(53%) saturate(2557%) hue-rotate(346deg) brightness(88%) contrast(95%);
+    }
+
     .markdown {
       font-family: themed("bodyFont");
       font-size: themed("bodyFontSize");
