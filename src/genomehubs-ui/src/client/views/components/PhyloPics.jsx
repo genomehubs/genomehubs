@@ -198,12 +198,12 @@ const PhyloPics = ({ containerRef, record }) => {
   let imageDescription = `${imageName} silhouette courtesy of PhyloPic.org`;
   console.log(source);
   if (source == "Ancestral") {
-    imageDescription += `. No matching image was found for ${scientificName} so the presented image of ${imageName} is a representative of the same ${imageRank}`;
+    imageDescription += `. No matching image was found for ${scientificName} so the presented image is a representative of the same ${imageRank}`;
   } else if (
     source == "Descendant" &&
     scientificName.toLowerCase != imageName
   ) {
-    imageDescription += `. The presented image shows ${imageName}`;
+    // imageDescription += `. The presented image shows ${imageName}`;
   }
   return (
     <div className={styles.imageContainer}>
