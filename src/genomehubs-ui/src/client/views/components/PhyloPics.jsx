@@ -10,6 +10,7 @@ import { compose } from "recompose";
 import formatter from "../functions/formatter";
 import { makeStyles } from "@material-ui/core/styles";
 import styles from "./Styles.scss";
+import truncate from "../functions/truncate";
 import withFiles from "../hocs/withFiles";
 import withFilesByAnalysisId from "../hocs/withFilesByAnalysisId";
 import withRecord from "../hocs/withRecord";
@@ -25,6 +26,7 @@ const PhyloPics = ({ containerRef, record }) => {
   const [ratio, setRatio] = useState(1);
   const [contributor, setContributor] = useState();
   const [imageName, setImageName] = useState();
+  const [uuid, setUuid] = useState();
   const [imageRank, setImageRank] = useState();
   const [indices, setIndices] = useState({});
 
@@ -68,34 +70,46 @@ const PhyloPics = ({ containerRef, record }) => {
         }
       }
       if (isMounted && validName) {
-        let filterResponse = await fetch(
-          `https://api.phylopic.org/nodes?build=262&filter_name=${validName}&page=0`
-        );
-        let filterJson = await filterResponse.json();
-        let { href, title } = filterJson._links.items[0];
-        if (isMounted && href) {
-          let nodeResponse = await fetch(
-            `https://api.phylopic.org${href}&embed_primaryImage=true`
+        try {
+          let buildResponse = await fetch(
+            `https://api.phylopic.org/nodes?filter_name=${validName}`
           );
-          let nodeJson = await nodeResponse.json();
-          let { _links, attribution } = nodeJson._embedded.primaryImage;
-          let { rasterFiles, contributor, license = "" } = _links;
-          if (isMounted && rasterFiles) {
-            setFileUrl(rasterFiles[1].href);
-            let [width, height] = rasterFiles[1].sizes.split("x");
-            setRatio(width / height);
-            if (validRank.endsWith("species")) {
-              setSource("Primary");
-            } else {
-              setSource(validRank == rank ? "Descendant" : "Ancestral");
+          let buildJson = await buildResponse.json();
+          let filterResponse = await fetch(
+            `https://api.phylopic.org${buildJson._links.firstPage.href}`
+          );
+          let filterJson = await filterResponse.json();
+          let { href, title } = filterJson._links.items[0];
+          if (isMounted && href) {
+            let nodeResponse = await fetch(
+              `https://api.phylopic.org${href}&embed_primaryImage=true`
+            );
+            let nodeJson = await nodeResponse.json();
+            let { _links, attribution, uuid } = nodeJson._embedded.primaryImage;
+            let {
+              rasterFiles,
+              contributor,
+              license = "",
+              specificNode,
+            } = _links;
+            if (isMounted && rasterFiles) {
+              setFileUrl(rasterFiles[1].href);
+              let [width, height] = rasterFiles[1].sizes.split("x");
+              setRatio(width / height);
+              if (validRank.endsWith("species")) {
+                setSource("Primary");
+              } else {
+                setSource(validRank == rank ? "Descendant" : "Ancestral");
+              }
+              setAttribution(attribution);
+              setLicense(license);
+              setContributor(contributor);
+              setImageName(specificNode.title);
+              setSourceUrl(`https://www.phylopic.org/images/${uuid}/`);
+              setImageRank(validRank);
             }
-            setAttribution(attribution);
-            setLicense(license);
-            setContributor(contributor);
-            setImageName(title);
-            setImageRank(validRank);
           }
-        }
+        } catch {}
       }
     };
     try {
@@ -195,15 +209,16 @@ const PhyloPics = ({ containerRef, record }) => {
       </div>
     );
   }
-  let imageDescription = `${imageName} silhouette courtesy of PhyloPic.org`;
-  console.log(source);
+  let imageDescription;
   if (source == "Ancestral") {
-    imageDescription += `. No matching image was found for ${scientificName} so the presented image is a representative of the same ${imageRank}`;
+    imageDescription = `No matching image was found for ${scientificName} so the presented image of ${imageName} from PhyloPic.org is a representative of the same ${imageRank}`;
   } else if (
     source == "Descendant" &&
     scientificName.toLowerCase != imageName
   ) {
-    // imageDescription += `. The presented image shows ${imageName}`;
+    imageDescription = `${scientificName} image from PhyloPic.org. The presented image shows ${imageName}`;
+  } else {
+    imageDescription = `${scientificName} image from PhyloPic.org`;
   }
   return (
     <div className={styles.imageContainer}>
@@ -232,8 +247,12 @@ const PhyloPics = ({ containerRef, record }) => {
                 styles.imageCredit,
                 styles[`imageCredit${source}`]
               )}
+              onClick={(e) => {
+                e.preventDefault();
+                window.open(license.href, "_blank");
+              }}
             >
-              {attribution}/PhyloPic
+              {truncate(attribution, 20)}/PhyloPic
             </div>
           </Tooltip>
         )}

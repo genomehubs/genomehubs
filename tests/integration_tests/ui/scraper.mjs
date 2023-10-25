@@ -106,7 +106,7 @@ async function scrape(reports, directory) {
   await browser.close();
 }
 
-let root = "./downloads";
+let root = "./tests/integration_tests/ui";
 
 for (let directory of getDirectories(root)) {
   let configFile = `${root}/${directory}/config.yaml`;
