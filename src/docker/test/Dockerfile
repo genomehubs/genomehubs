@@ -20,8 +20,13 @@ RUN mkdir -p /etc/apt/keyrings \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" \
     | tee /etc/apt/sources.list.d/nodesource.list
 
+RUN curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \ 
+    && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list
+
 RUN apt-get update \
-    && apt-get install nodejs -y
+    && apt-get install -y \
+    google-chrome-stable \
+    nodejs
 
 RUN mkdir -p /genomehubs/tests /genomehubs/tests-out
 
