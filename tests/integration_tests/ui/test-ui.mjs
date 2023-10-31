@@ -1,15 +1,8 @@
-import { dir } from "console";
-import { fileURLToPath } from "url";
+#!/usr/bin/env node
+
 import fs from "fs";
-import path from "path";
 import puppeteer from "puppeteer";
 import yaml from "js-yaml";
-
-const __filename = fileURLToPath(import.meta.url);
-
-const __dirname = path.dirname(__filename);
-
-const downloadPath = path.join(__dirname, "download");
 
 async function waitUntilDownload(page, fileName = "") {
   return new Promise((resolve, reject) => {
@@ -32,16 +25,12 @@ const getDirectories = (parent) => {
 };
 
 async function scrape(reports, directory) {
+  let errors = {};
   const browser = await puppeteer.launch({ headless: "new" });
   const page = await browser.newPage();
   const client = await page.target().createCDPSession();
 
-  let downloadPath;
-  if (directory.match(/^[\w\d]+$/)) {
-    downloadPath = `./downloads/${directory}`;
-  } else {
-    downloadPath = "./downloads";
-  }
+  let downloadPath = directory;
   fs.mkdirSync(downloadPath, { recursive: true });
   await client.send("Page.setDownloadBehavior", {
     behavior: "allow",
@@ -49,7 +38,9 @@ async function scrape(reports, directory) {
   });
 
   for (let { url, filename, size = 1000 } of reports) {
+    console.error(` - generating ${filename}`);
     console.error(` - loading ${url}`);
+    url = url.replace(/\/report\?/, "/search?").replace(/\bx=/, "query=");
     try {
       await page.setViewport({
         width: size,
@@ -64,32 +55,28 @@ async function scrape(reports, directory) {
         element.scrollIntoView();
       }
 
-      // Query for an element handle.
-      const element1 = await page.waitForSelector("#report-loaded");
+      await page.waitForSelector("#report-loaded");
 
-      // Query for an element handle.
       const element2 = await page.waitForSelector(
         "#report-download-item > svg"
       );
 
-      // Do something with element...
       await element2.click();
 
-      // Query for an element handle.
       const element3 = await page.waitForSelector(
         "#report-download-button >>>> button"
       );
 
-      // Do something with element...
       await element3.click();
 
       await waitUntilDownload(page, "report.png");
     } catch (err) {
       console.error(` - unable to download report`);
       console.error(err);
+      errors[filename] = "download";
       continue;
     }
-    if (filename.match(/^[\w\d\.]+$/)) {
+    if (filename.match(/^[-\w\d\.]+$/)) {
       try {
         fs.renameSync(
           `${downloadPath}/report.png`,
@@ -99,20 +86,35 @@ async function scrape(reports, directory) {
       } catch (err) {
         console.error(` - unable to rename to ${downloadPath}/${filename}`);
         console.error(err);
+        errors[filename] = "rename";
       }
     }
   }
 
   await browser.close();
+  return errors;
 }
 
-let root = "./tests/integration_tests/ui";
+const argv = process.argv.slice(2);
+if (argv.length < 2) {
+  process.exit(1);
+}
+let [inDir, outDir] = argv;
 
-for (let directory of getDirectories(root)) {
-  let configFile = `${root}/${directory}/config.yaml`;
+for (let directory of getDirectories(inDir)) {
+  let configFile = `${inDir}/${directory}/config.yaml`;
   if (fs.existsSync(configFile)) {
     console.error(`Reading ${configFile}`);
     let config = yaml.load(fs.readFileSync(configFile));
-    scrape(config, `${root}/${directory}`).then((data) => {});
+    scrape(config, `${outDir}/${directory}`).then((errors) => {
+      if (Object.keys(errors).length > 0) {
+        console.error(
+          `FAILED: ${Object.keys(errors).length} tests failed in ${directory}`
+        );
+        process.exit(1);
+      } else {
+        console.error(`PASSED: All tests passed for ${directory}`);
+      }
+    });
   }
 }
