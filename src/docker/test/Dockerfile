@@ -23,6 +23,8 @@ RUN mkdir -p /etc/apt/keyrings \
 RUN curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \ 
     && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list
 
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
 RUN apt-get update \
     && apt-get install -y \
     --no-install-recommends \
