@@ -104,18 +104,13 @@ async function scrape(reports, directory) {
   return errors;
 }
 
-const argv = process.argv.slice(2);
-if (argv.length < 2) {
-  process.exit(1);
-}
-let [inDir, outDir] = argv;
-
-for (let directory of getDirectories(inDir)) {
-  let configFile = `${inDir}/${directory}/config.yaml`;
-  if (fs.existsSync(configFile)) {
-    console.error(`Reading ${configFile}`);
-    let config = yaml.load(fs.readFileSync(configFile));
-    scrape(config, `${outDir}/${directory}`).then((errors) => {
+const loopTestDirs = async (parentDir) => {
+  for (let directory of getDirectories(parentDir)) {
+    let configFile = `${parentDir}/${directory}/config.yaml`;
+    if (fs.existsSync(configFile)) {
+      console.error(`Reading ${configFile}`);
+      let config = yaml.load(fs.readFileSync(configFile));
+      let errors = await scrape(config, `${outDir}/${directory}`);
       if (Object.keys(errors).length > 0) {
         console.error(
           `FAILED: ${Object.keys(errors).length} tests failed in ${directory}`
@@ -124,6 +119,14 @@ for (let directory of getDirectories(inDir)) {
       } else {
         console.error(`PASSED: All tests passed for ${directory}`);
       }
-    });
+    }
   }
+};
+
+const argv = process.argv.slice(2);
+if (argv.length < 2) {
+  process.exit(1);
 }
+let [inDir, outDir] = argv;
+
+loopTestDirs(inDir);

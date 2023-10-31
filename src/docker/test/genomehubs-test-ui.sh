@@ -16,6 +16,8 @@ if [ -z "$GH_RESOURCES" ]; then
   export GH_RESOURCES="/genomehubs/resources"
 fi
 
+export GH_BASENAME=
+
 /genomehubs/genomehubs-api &
 API_PID=$!
 /genomehubs/genomehubs-ui &
