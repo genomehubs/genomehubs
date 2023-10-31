@@ -26,7 +26,10 @@ const getDirectories = (parent) => {
 
 async function scrape(reports, directory) {
   let errors = {};
-  const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch({
+    executablePath: "/usr/bin/google-chrome",
+    headless: "new",
+  });
   const page = await browser.newPage();
   const client = await page.target().createCDPSession();
 
