@@ -25,6 +25,7 @@ RUN curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key a
 
 RUN apt-get update \
     && apt-get install -y \
+    --no-install-recommends \
     google-chrome-stable \
     nodejs
 
