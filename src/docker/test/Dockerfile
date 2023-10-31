@@ -55,6 +55,8 @@ RUN pip install ./genomehubs-*-py3-none-manylinux2014_x86_64.whl \
 
 WORKDIR /genomehubs
 
+RUN npm install js-yaml puppeteer
+
 COPY genomehubs-ui-linux genomehubs-ui
 
 COPY genomehubs-api-linux genomehubs-api
@@ -68,8 +70,6 @@ COPY test-ui.mjs test-ui.mjs
 RUN chmod 755 /genomehubs/genomehubs-*
 
 USER genomehubs
-
-RUN npm install -g js-yaml puppeteer
 
 CMD genomehubs -h
 
