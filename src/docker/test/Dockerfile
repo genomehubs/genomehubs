@@ -23,8 +23,6 @@ RUN mkdir -p /etc/apt/keyrings \
 RUN apt-get update \
     && apt-get install nodejs -y
 
-RUN npm install -g js-yaml puppeteer
-
 RUN mkdir -p /genomehubs/tests /genomehubs/tests-out
 
 RUN useradd -m genomehubs \
@@ -70,6 +68,8 @@ COPY test-ui.mjs test-ui.mjs
 RUN chmod 755 /genomehubs/genomehubs-*
 
 USER genomehubs
+
+RUN npm install -g js-yaml puppeteer
 
 CMD genomehubs -h
 
