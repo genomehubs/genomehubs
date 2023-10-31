@@ -29,6 +29,7 @@ async function scrape(reports, directory) {
   const browser = await puppeteer.launch({
     executablePath: "/usr/bin/google-chrome",
     headless: "new",
+    args: ["--no-sandbox"],
   });
   const page = await browser.newPage();
   const client = await page.target().createCDPSession();
