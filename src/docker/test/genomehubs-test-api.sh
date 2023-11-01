@@ -31,4 +31,8 @@ genomehubs test \
     --base-url http://localhost:3000/api/v2 \
     --json-test-dir /genomehubs/tests
 
+code=$?
+
 kill $API_PID
+
+exit $code
