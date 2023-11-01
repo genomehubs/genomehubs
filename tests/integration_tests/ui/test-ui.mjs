@@ -26,6 +26,7 @@ const getDirectories = (parent) => {
 
 async function scrape(reports, directory) {
   let errors = {};
+  let attempts = 5;
   const browser = await puppeteer.launch({
     executablePath: "/usr/bin/google-chrome",
     headless: "new",
@@ -50,39 +51,50 @@ async function scrape(reports, directory) {
     console.error(` - generating ${filename}`);
     console.error(` - loading ${url}`);
     url = url.replace(/\/report\?/, "/search?").replace(/\bx=/, "query=");
-    try {
-      await page.setViewport({
-        width: size,
-        height: size,
-        deviceScaleFactor: 2,
-      });
-      await page.goto(url, { waitUntil: "networkidle2" });
+    let success;
+    for (let i = 0; i < attempts; i++) {
+      try {
+        await page.setViewport({
+          width: size,
+          height: size,
+          deviceScaleFactor: 2,
+        });
+        await page.goto(url, { waitUntil: "networkidle2" });
 
-      const element = await page.waitForSelector("#report-panel");
+        const element = await page.waitForSelector("#report-panel");
 
-      if (element) {
-        element.scrollIntoView();
+        if (element) {
+          element.scrollIntoView();
+        }
+
+        await page.waitForSelector("#report-loaded");
+
+        const element2 = await page.waitForSelector(
+          "#report-download-item > svg"
+        );
+
+        await element2.click();
+
+        const element3 = await page.waitForSelector(
+          "#report-download-button >>>> button"
+        );
+
+        await element3.click();
+
+        await waitUntilDownload(page, "report.png");
+        sucess = true;
+      } catch (err) {
+        if (i < attempts - 1) {
+          console.error(` - problem fetching report, retrying`);
+          continue;
+        }
+        console.error(` - unable to download report`);
+        console.error(err);
+        errors[filename] = "download";
+        break;
       }
-
-      await page.waitForSelector("#report-loaded");
-
-      const element2 = await page.waitForSelector(
-        "#report-download-item > svg"
-      );
-
-      await element2.click();
-
-      const element3 = await page.waitForSelector(
-        "#report-download-button >>>> button"
-      );
-
-      await element3.click();
-
-      await waitUntilDownload(page, "report.png");
-    } catch (err) {
-      console.error(` - unable to download report`);
-      console.error(err);
-      errors[filename] = "download";
+    }
+    if (!success) {
       continue;
     }
     if (filename.match(/^[-\w\d\.]+$/)) {
