@@ -82,7 +82,7 @@ async function scrape(reports, directory) {
         await element3.click();
 
         await waitUntilDownload(page, "report.png");
-        sucess = true;
+        success = true;
       } catch (err) {
         if (i < attempts - 1) {
           console.error(` - problem fetching report, retrying`);
