@@ -1,0 +1,11 @@
+test:
+  es:
+    host:
+      - "localhost:9200"
+  hub:
+    name: goat
+    path: /genomehubs/resources
+    separator: --
+    version: 2021.10.15
+  taxonomy:
+    source: ncbi

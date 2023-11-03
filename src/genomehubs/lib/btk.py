@@ -67,6 +67,7 @@ def describe_btk_files(meta):
         plots.append("blob")
     files = []
     for plot in plots:
+        print(plots)
         if plot == "blob":
             url = "%s/image/%s/%s/circle?format=png" % (BTK_API, meta["id"], plot)
         else:
@@ -74,7 +75,8 @@ def describe_btk_files(meta):
         obj = {
             "name": "%s.png" % plot,
             "url": url,
-            "source_url": "%s/%s/dataset/%s/%s" % (BTK_VIEW, meta["id"], meta["id"], plot),
+            "source_url": "%s/%s/dataset/%s/%s"
+            % (BTK_VIEW, meta["id"], meta["id"], plot),
             "analysis_id": "btk-%s" % meta["id"],
             "description": "a %s plot from BlobToolKit analysis %s"
             % (plot, meta["id"]),
@@ -88,7 +90,8 @@ def describe_btk_files(meta):
                 "description": "Analysis of public assembly %s using BlobToolKit"
                 % meta["accession"],
                 "source": "BlobToolKit",
-                "source_url": "https://blobtoolkit.genomehubs.org/view/dataset/%s" % meta["id"]
+                "source_url": "https://blobtoolkit.genomehubs.org/view/dataset/%s"
+                % meta["id"],
             },
         }
         files.append(obj)
@@ -99,8 +102,10 @@ def btk_parser(_params, opts, *args, **kwargs):
     """Parse BlobToolKit assemblies."""
     parsed = []
     analyses = []
+    print(opts)
     for root in opts["btk-root"]:
         for key, meta in stream_btk_datasets(root):
+            print(key)
             files = describe_btk_files(meta)
             analyses += files
             extract_btk_stats(meta)
