@@ -26,6 +26,3 @@ attributes:
   reads:
     header: reads
     separator: ;
-    summary: list
-    traverse: false
-    type: long

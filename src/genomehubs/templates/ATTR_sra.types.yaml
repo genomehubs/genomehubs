@@ -17,15 +17,18 @@ attributes:
     type: long
   library_source:
     constraint:
+      # Generate full list with
+      # cut -f 4 sra.tsv | tr ';' '\n' | sort -u
       enum:
         - genomic
+        - genomic single cell
+        # - metagenomic
+        # - metatranscriptomic
+        # - other
+        # - synthetic
         - transcriptomic
-        - metagenomic
-        - metatranscriptomic
-        - other
-        - synthetic
-        - viral
-        - viral rna
+        - transcriptomic single cell
+        # - viral rna
     description: Library sources for most recent libraries (up to 10)
     summary: list
     traverse: list
@@ -33,11 +36,17 @@ attributes:
     type: keyword
   platform:
     constraint:
+      # Generate full list with
+      # cut -f 5 sra.tsv | tr ';' '\n' | sort -u
       enum:
         - ABI_SOLID
+        - BGISEQ
+        - CAPILLARY
+        - COMPLETE_GENOMICS
+        - DNBSEQ
+        - ELEMENT
         - HELICOS
         - ILLUMINA
-        - ILLUMINA_XTEN
         - ION_TORRENT
         - LS454
         - OXFORD_NANOPORE
