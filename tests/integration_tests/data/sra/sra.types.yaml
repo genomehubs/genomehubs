@@ -1,0 +1,32 @@
+attributes:
+  library_source:
+    header: library_source
+    separator: ;
+  platform:
+    header: platform
+    separator: ;
+  reads:
+    header: reads
+    separator: ;
+    summary: list
+    traverse: false
+    type: long
+  run_accession:
+    header: run_accession
+    separator: ;
+  sra_accession:
+    header: sra_accession
+    separator: ;
+  total_reads:
+    header: total_reads
+  total_runs:
+    header: total_runs
+file:
+  format: tsv
+  header: true
+  name: sra.tsv
+  needs:
+  - ATTR_sra.types.yaml
+taxonomy:
+  taxon_id:
+    header: taxon_id

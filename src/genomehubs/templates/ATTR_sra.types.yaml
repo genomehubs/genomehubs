@@ -1,0 +1,81 @@
+defaults:
+  display_group: sra
+  source_url: https://www.ncbi.nlm.nih.gov/sra/
+  source: NCBI
+attributes:
+  total_runs:
+    description: Total number of sequencing runs available in SRA
+    summary: max
+    traverse: sum
+    traverse_direction: up
+    type: integer
+  total_reads:
+    description: Total number of reads across all runs in SRA
+    summary: max
+    traverse: sum
+    traverse_direction: up
+    type: long
+  library_source:
+    constraint:
+      # Generate full list with
+      # cut -f 4 sra.tsv | tr ';' '\n' | sort -u
+      enum:
+        - genomic
+        - genomic single cell
+        # - metagenomic
+        # - metatranscriptomic
+        # - other
+        # - synthetic
+        - transcriptomic
+        - transcriptomic single cell
+        # - viral rna
+    description: Library sources for most recent libraries (up to 10)
+    summary: list
+    traverse: list
+    traverse_direction: up
+    type: keyword
+  platform:
+    constraint:
+      # Generate full list with
+      # cut -f 5 sra.tsv | tr ';' '\n' | sort -u
+      enum:
+        - ABI_SOLID
+        - BGISEQ
+        - CAPILLARY
+        - COMPLETE_GENOMICS
+        - DNBSEQ
+        - ELEMENT
+        - HELICOS
+        - ILLUMINA
+        - ION_TORRENT
+        - LS454
+        - OXFORD_NANOPORE
+        - PACBIO_SMRT
+    description: Sequencing platforms for most recent libraries (up to 10)
+    summary: list
+    traverse: list
+    traverse_direction: up
+    type: keyword
+  sra_accession:
+    description: Most recent SRA experiment accessions (up to 10)
+    summary: list
+    traverse: false
+    type: keyword
+    value_metadata:
+      default:
+        description: Click to view SRA experiment accession on ENA
+        link: https://www.ebi.ac.uk/ena/browser/view/{}
+  run_accession:
+    description: Most recent SRA run accessions (up to 10)
+    summary: list
+    traverse: false
+    type: keyword
+    value_metadata:
+      default:
+        description: Click to view SRA run accession on ENA
+        link: https://www.ebi.ac.uk/ena/browser/view/{}
+  reads:
+    description: Number of reads per run for the most recent libraries (up to 10)
+    summary: list
+    traverse: false
+    type: long
