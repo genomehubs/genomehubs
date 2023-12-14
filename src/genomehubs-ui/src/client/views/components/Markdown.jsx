@@ -3,6 +3,7 @@ import { basename, siteName } from "../reducers/location";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
+import Badge from "./Badge";
 import BasicSelect from "./BasicSelect";
 import { Box } from "@material-ui/core";
 import Breadcrumbs from "./Breadcrumbs";
@@ -108,6 +109,7 @@ export const RehypeComponentsList = (extra) => {
   return {
     a: (props) => <NavLink {...processProps({ props, extra })} />,
     aggregation: (props) => <AggregationIcon method={props.method} />,
+    badge: (props) => <Badge {...processProps({ props, extra })} />,
     breadcrumbs: (props) => <Breadcrumbs {...props} />,
     count: (props) => <Count {...processProps({ props, extra })} />,
     divider: (props) => (

@@ -848,6 +848,222 @@ body,
       filter: invert(35%) sepia(53%) saturate(2557%) hue-rotate(346deg) brightness(88%) contrast(95%);
     }
 
+    .badge {
+      font-family: themed("bodyFont");
+      font-size: themed("bodyFontSize");
+      margin: 0 auto;
+      position: relative;
+      margin: 0.15rem;
+      width: calc(50% - 0.75rem);
+      min-width: 26.75rem;
+      @media (min-width: 110rem) {
+        width: calc(33% - 0.75rem);
+      }
+      min-height: 4.5em;
+      height: auto;
+      color: themed("secondary");
+      display: inline-block;
+
+      &:before {
+        content: "";
+        position: absolute;
+        left: -2.15rem;
+        top: 1.7rem;
+        width: 2.15rem;
+        border-top: 0.2rem solid themed("primary");
+      }
+
+      // &:last-of-type:after {
+      //   border-color: red;
+      // }
+
+      .bg {
+        top: 0;
+        left: 0;
+        position: relative;
+        width: 100%;
+        height: 4.5em;
+        margin-bottom: 0.35rem;
+        background-color: themed("primary");
+        border-radius: 0.5rem;
+      }
+
+      .img {
+        height: 4em;
+        width: 4em;
+        top: 0.25em;
+        left: 0.25em;
+        padding: 0.25em;
+        box-sizing: border-box;
+        border-radius: 0.25em;
+        background-color: themed("secondary");
+        position: absolute;
+        display: grid;
+        align-items: center;
+        justify-content: center;
+
+        .imageContainer {
+          cursor: pointer;
+          width: 100%;
+        }
+      }
+
+      .id {
+        top: 0.1rem;
+        left: 4.25rem;
+        position: absolute;
+      }
+
+      .name {
+        top: 1.25rem;
+        left: 4.25rem;
+        font-family: themed("titleFont");
+        font-size: 1.5em;
+        position: absolute;
+      }
+
+      .rank {
+        right: 0.3rem;
+        top: 0.1rem;
+        position: absolute;
+      }
+
+      .links {
+        right: 0.3rem;
+        top: 2.75rem;
+        position: absolute;
+
+        a {
+          margin-right: 1rem;
+          color: mix(themed("secondary"), themed("primary"), 85%);
+          position: relative;
+          text-decoration: none;
+          user-select: none;
+
+          &.disabled {
+            pointer-events: none;
+            color: mix(themed("secondary"), themed("primary"), 25%);
+          }
+
+          &:hover {
+            color: themed("secondary");
+          }
+
+          &:not(:first-of-type):before {
+            content: "";
+            position: absolute;
+            left: -0.5rem;
+            top: 20%;
+            height: 70%;
+            border-left: 1px solid mix(themed("secondary"), themed("primary"), 85%);
+          }
+
+          &.active, &.expanded {
+            color: themed("secondary");
+            font-weight: bold;
+
+            &:hover {
+              color: mix(themed("secondary"), themed("primary"), 85%);
+            }
+          }
+
+          &.expanded {
+
+            &:after {
+              content: "";
+              position: absolute;
+              left: -0.5rem;
+              right: -0.5rem;
+              top: 100%;
+              background-color: themed("primary");
+              height: 0.5rem;
+            }
+          }
+
+          &:last-of-type {
+            margin-right: 0;
+            &.expanded {
+
+              &:after {
+                right: 0.1rem;
+              }
+            }
+          }
+        }
+      }
+
+      .nested {
+        left: 4rem;
+        position: relative;
+        margin-bottom: 0.35rem;
+        background-color: themed("primary");
+        padding: 0.25rem 0.5rem;
+        width: calc(100% - 5rem);
+        border-radius: 0.5em;
+      }
+
+      .nestedBadge {
+        left: 1rem;
+        position: relative;
+        min-height: 4.5rem;
+        width: calc(100% + 1rem);
+
+        .badge {
+          width: calc(100% - 1.09em);
+        }
+      }
+
+      .maskParent {
+        background-color: themed("secondary");
+        position: absolute;
+        margin-left: -2.3rem;
+        top: 1.9rem;
+        bottom: 1rem;
+        width: 0.5rem;
+        z-index: 1;
+      }
+
+      .badgeInfo {
+
+        position: relative;
+        display: inline-block;
+        text-align: center;
+        margin: 0.25rem;
+        border-radius: 0.25rem;
+        padding: 0 0.5em;
+        background-color: themed("secondary");
+          
+
+        .infoName {
+          font-family: themed("bodyFont");
+          color: mix(themed("secondary"), themed("primary"), 10%);
+          position: relative;
+          border-bottom: 0.1rem solid mix(themed("primary"), themed("secondary"), 15%);
+        }
+        .infoValue {
+          margin-left: 0.5rem;
+          color: themed("primary");
+          font-family: themed("titleFont");
+          font-size: 1.5em;
+          display: inline-block;
+          position: relative;
+        }
+
+      }
+    }
+    .badgeExpanded {
+      &:after {
+        content: "";
+        position: absolute;
+        left: -1rem;
+        top: 1.7rem;
+        bottom: 3.1rem;
+        width: 1rem;
+        border-left: 0.2rem solid themed("primary");
+      }
+    }
+
+
     .markdown {
       font-family: themed("bodyFont");
       font-size: themed("bodyFontSize");

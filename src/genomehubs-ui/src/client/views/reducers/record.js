@@ -1,6 +1,7 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 
 import { apiUrl } from "./api";
+import createCachedSelector from "re-reselect";
 import { createSelector } from "reselect";
 import { getCurrentTaxonomy } from "../reducers/taxonomy";
 import immutableUpdate from "immutable-update";
@@ -59,6 +60,14 @@ const records = handleActions(
 export const getRecords = (state) => state.records.byId;
 export const getRecordIsFetching = (state) => state.records.isFetching;
 
+export const getRecordById = createCachedSelector(
+  getRecords,
+  (_state, taxonId) => taxonId,
+  (records, taxonId) => {
+    return records[taxonId];
+  }
+)((_state, taxonId) => taxonId);
+
 export function fetchRecord(recordId, result, taxonomy, callback) {
   return async function (dispatch) {
     const state = store.getState();
@@ -98,10 +107,22 @@ export function fetchRecord(recordId, result, taxonomy, callback) {
       } else if (callback) {
         dispatch(resetRecord());
         callback(fetchedRecordId, result, taxonomy, fetchedTitle);
+      } else {
+        dispatch(
+          receiveRecord({
+            status: json.status,
+            records: [{ record: { record_id: recordId } }],
+          })
+        );
       }
       // dispatch(setApiStatus(true));
     } catch (err) {
-      return dispatch(setApiStatus(false));
+      dispatch(
+        receiveRecord({
+          status: { success: false },
+          records: [{ record: { record_id: recordId } }],
+        })
+      );
     }
   };
 }

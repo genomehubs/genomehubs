@@ -21,6 +21,7 @@ const Count = ({
   description,
   basename,
   record,
+  currentRecord,
   ...props
 }) => {
   let {
@@ -48,6 +49,7 @@ const Count = ({
     const queryString = qs.stringify({ ...options });
     let isApiSubscribed = true;
     let fetchFunc;
+    console.log({ of });
     switch (of) {
       case "fields":
         fetchFunc = fetchFieldCount;
@@ -75,6 +77,10 @@ const Count = ({
       `${basename}/search?${qs.stringify({ ...options, report: "sources" })}`
     );
   };
+
+  if (currentRecord) {
+    record = currentRecord;
+  }
 
   if (typeof count !== "undefined") {
     return (
