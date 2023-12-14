@@ -119,10 +119,7 @@ export function fetchPhylopic({ taxonId, scientificName, lineage, rank }) {
             `https://api.phylopic.org${buildJson._links.firstPage.href}`
           );
           let filterJson = await filterResponse.json();
-          let items = filterJson._links.items.filter(
-            (o) => o.title.toLowerCase() == name
-          );
-          let { href, title } = items[0] || filterJson._links.items[0] || {};
+          let { href, title } = filterJson._links.items[0] || {};
           if (href) {
             let nodeResponse = await fetch(
               `https://api.phylopic.org${href}&embed_primaryImage=true`

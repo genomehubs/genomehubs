@@ -49,7 +49,6 @@ const Count = ({
     const queryString = qs.stringify({ ...options });
     let isApiSubscribed = true;
     let fetchFunc;
-    console.log({ of });
     switch (of) {
       case "fields":
         fetchFunc = fetchFieldCount;

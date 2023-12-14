@@ -1028,11 +1028,11 @@ body,
         position: relative;
         display: inline-block;
         text-align: center;
+        cursor: pointer;
         margin: 0.25rem;
         border-radius: 0.25rem;
         padding: 0 0.5em;
         background-color: themed("secondary");
-          
 
         .infoName {
           font-family: themed("bodyFont");
@@ -1040,6 +1040,7 @@ body,
           position: relative;
           border-bottom: 0.1rem solid mix(themed("primary"), themed("secondary"), 15%);
         }
+
         .infoValue {
           margin-left: 0.5rem;
           color: themed("primary");
@@ -1050,6 +1051,30 @@ body,
         }
 
       }
+
+      .badgeInfoMore {
+        width: 100%;
+        margin-top: 0.25rem;
+        text-align: right;
+        display: block;
+
+        a {
+          color: mix(themed("secondary"), themed("primary"), 85%);
+          text-decoration: none;
+          user-select: none;
+          position: relative;
+
+          &.disabled {
+            pointer-events: none;
+            color: mix(themed("secondary"), themed("primary"), 25%);
+          }
+
+          &:hover {
+            color: themed("secondary");
+          }
+        }
+      }
+
     }
     .badgeExpanded {
       &:after {

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "@reach/router";
 
 import BadgeInfo from "./BadgeInfo";
 import BadgeStats from "./BadgeStats";
@@ -10,6 +11,8 @@ import fetchDescendantTaxIds from "../functions/fetchDescendantTaxIds";
 import styles from "./Styles.scss";
 import withDescendantsById from "../hocs/withDescendantsById";
 import withRecordById from "../hocs/withRecordById";
+import withSiteName from "../hocs/withSiteName";
+import withTaxonomy from "../hocs/withTaxonomy";
 
 // import withSearch from "../hocs/withSearch";
 
@@ -22,8 +25,10 @@ export const Badge = ({
   fetchDescendants,
   result,
   taxonomy,
+  basename,
 }) => {
   let scientificName, lineage, rank;
+  const navigate = useNavigate();
 
   const imgRef = useRef(null);
   const badgeRef = useRef(null);
@@ -161,6 +166,7 @@ export const Badge = ({
       currentRecordId={currentRecordId}
       currentRecord={recordById}
       scientificName={scientificName}
+      taxonId={currentRecordId}
       taxonomy={taxonomy}
       result={result}
       rank={rank}
@@ -171,19 +177,18 @@ export const Badge = ({
     <div className={badgeCss} ref={badgeRef}>
       <div className={styles.bg}>
         <div ref={imgRef} className={styles.img}>
-          {/* {recordById && (
+          {recordById && (
             <PhyloPics
               currentRecord={recordById}
               maxHeight={height}
               fixedRatio={1}
             />
-          )} */}
+          )}
         </div>
         <div className={styles.rank}>{rank}</div>
         <div className={styles.id}>{currentRecordId}</div>
         <div className={styles.name}>{scientificName}</div>
         <div className={styles.links}>
-          <a>search</a>
           {descendantsById && descendantsById.length > 0 ? (
             <a
               onClick={toggleBrowse}
@@ -206,6 +211,15 @@ export const Badge = ({
           >
             info
           </a>
+          <a
+            onClick={() =>
+              navigate(
+                `${basename}/search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29&includeEstimates=false&taxonomy=${taxonomy}&result=${result}`
+              )
+            }
+          >
+            search
+          </a>
         </div>
       </div>
       {maskParentElement && <div className={styles.maskParent}></div>}
@@ -216,6 +230,11 @@ export const Badge = ({
   );
 };
 
-const WrappedBadge = compose(withRecordById, withDescendantsById)(Badge);
+const WrappedBadge = compose(
+  withSiteName,
+  withTaxonomy,
+  withRecordById,
+  withDescendantsById
+)(Badge);
 
 export default WrappedBadge;

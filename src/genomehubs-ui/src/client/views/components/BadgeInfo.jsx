@@ -1,19 +1,32 @@
+import { useLocation, useNavigate } from "@reach/router";
+
 import AggregationIcon from "./AggregationIcon";
 import React from "react";
+import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import formatter from "../functions/formatter";
 import styles from "./Styles.scss";
+import withSiteName from "../hocs/withSiteName";
+import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
 export const BadgeInfo = ({
   currentRecord,
   currentRecordId,
   scientificName,
+  taxonId,
   taxonomy,
   result,
   rank,
+  basename,
   types,
 }) => {
+  const navigate = useNavigate();
+  const moreInfo = () => {
+    navigate(
+      `${basename}/record?recordId=${currentRecordId}&result=${result}&taxonomy=${taxonomy}`
+    );
+  };
   let fields = Object.entries(types)
     .filter(([_, v]) => v.display_level == 1)
     .map(([k]) => k);
@@ -51,19 +64,44 @@ export const BadgeInfo = ({
       value = formatter(value);
     }
 
+    let fieldName = k;
+
     return (
-      <div className={styles.badgeInfo} key={k}>
-        <div className={styles.infoName}>{meta.display_name || k}</div>
-        <AggregationIcon
-          method={field.aggregation_source}
-          hasDescendants={field.has_descendants}
-        />
-        <div className={styles.infoValue}>{value}</div>
-      </div>
+      <Tooltip
+        title={`Click to search ${fieldName} values for ${scientificName}`}
+        placement={"top"}
+        arrow
+        key={k}
+      >
+        <div
+          className={styles.badgeInfo}
+          onClick={() =>
+            navigate(
+              `${basename}/search?query=tax_tree%28${scientificName}%5B${taxonId}%5D%29%20AND%20${k}&fields=${k}&includeEstimates=false&taxonomy=${taxonomy}&result=${result}`
+            )
+          }
+        >
+          <div className={styles.infoName}>{fieldName}</div>
+          <AggregationIcon
+            method={field.aggregation_source}
+            hasDescendants={field.has_descendants}
+          />
+          <div className={styles.infoValue}>{value}</div>
+        </div>
+      </Tooltip>
     );
   });
 
-  return <div>{divs}</div>;
+  return (
+    <>
+      {divs}
+      <div className={styles.badgeInfoMore}>
+        <Tooltip title={"Click to view full record"} placement={"top"} arrow>
+          <a onClick={moreInfo}>more...</a>
+        </Tooltip>
+      </div>
+    </>
+  );
 };
 
-export default compose(withTypes)(BadgeInfo);
+export default compose(withSiteName, withTaxonomy, withTypes)(BadgeInfo);

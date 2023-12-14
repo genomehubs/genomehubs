@@ -18,7 +18,6 @@ export const fetchValueCount = async ({ queryString, setCount }) => {
     } catch {
       return 0;
     }
-    console.log(value);
     if (Array.isArray(value)) {
       return value.length;
     }
