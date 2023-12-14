@@ -98,6 +98,9 @@ export const Badge = ({
   }
 
   if (!scientificName) {
+    if (recordById) {
+      return null;
+    }
     <div className={badgeCss} ref={badgeRef}>
       <div className={styles.bg}></div>
     </div>;
@@ -201,13 +204,21 @@ export const Badge = ({
           )}
           <a
             onClick={toggleStats}
-            className={(showStats && styles.expanded) || ""}
+            className={
+              showStats
+                ? styles.expanded
+                : scientificName
+                ? ""
+                : styles.disabled
+            }
           >
             stats
           </a>
           <a
             onClick={toggleInfo}
-            className={(showInfo && styles.expanded) || ""}
+            className={
+              showInfo ? styles.expanded : scientificName ? "" : styles.disabled
+            }
           >
             info
           </a>
@@ -217,6 +228,7 @@ export const Badge = ({
                 `${basename}/search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29&includeEstimates=false&taxonomy=${taxonomy}&result=${result}`
               )
             }
+            className={scientificName ? "" : styles.disabled}
           >
             search
           </a>
