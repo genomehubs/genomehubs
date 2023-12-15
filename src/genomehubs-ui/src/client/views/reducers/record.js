@@ -156,8 +156,41 @@ export const attributeSettings = handleAction(
 );
 export const getAttributeSettings = (state) => state.attributeSettings;
 
+export const setBrowse = createAction("SET_BROWSE");
+export const browse = handleAction(
+  "SET_BROWSE",
+  (state, action) => {
+    return action.payload;
+  },
+  {}
+);
+export const getBrowse = (state) => state.browse;
+
+export const updateBrowse = (parents) => {
+  return async function (dispatch) {
+    const state = store.getState();
+    const data = getBrowseStatus(state);
+    dispatch(setBrowse(immutableUpdate(parents, data)));
+  };
+};
+
+export const setBrowseStatus = createAction("SET_BROWSE_STATUS");
+export const browseStatus = handleAction(
+  "SET_BROWSE_STATUS",
+  (state, action) => {
+    let { id, value } = action.payload;
+    return immutableUpdate(state, {
+      [id]: value,
+    });
+  },
+  {}
+);
+export const getBrowseStatus = (state) => state.browseStatus;
+
 export const recordReducers = {
   records,
+  browse,
+  browseStatus,
   currentRecordId,
   attributeSettings,
 };

@@ -15,6 +15,7 @@ export const BadgeInfo = ({
   currentRecordId,
   scientificName,
   taxonId,
+  setBrowse,
   taxonomy,
   result,
   rank,
@@ -26,6 +27,7 @@ export const BadgeInfo = ({
     navigate(
       `${basename}/record?recordId=${currentRecordId}&result=${result}&taxonomy=${taxonomy}`
     );
+    setBrowse();
   };
   let fields = Object.entries(types)
     .filter(([_, v]) => v.display_level == 1)
@@ -75,11 +77,13 @@ export const BadgeInfo = ({
       >
         <div
           className={styles.badgeInfo}
-          onClick={() =>
+          onClick={() => {
             navigate(
               `${basename}/search?query=tax_tree%28${scientificName}%5B${taxonId}%5D%29%20AND%20${k}&fields=${k}&includeEstimates=false&taxonomy=${taxonomy}&result=${result}`
-            )
-          }
+            );
+
+            setBrowse();
+          }}
         >
           <div className={styles.infoName}>{fieldName}</div>
           <AggregationIcon
