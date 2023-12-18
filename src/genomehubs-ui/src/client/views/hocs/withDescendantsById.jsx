@@ -17,8 +17,8 @@ const withDescendantsById = (WrappedComponent) => (props) => {
   });
 
   const mapDispatchToProps = (dispatch) => ({
-    fetchDescendants: ({ taxonId, taxonomy }) => {
-      dispatch(fetchDescendants({ taxonId, taxonomy }));
+    fetchDescendants: ({ taxonId, taxonomy, depth, rank }) => {
+      dispatch(fetchDescendants({ taxonId, taxonomy, depth, rank }));
     },
   });
 

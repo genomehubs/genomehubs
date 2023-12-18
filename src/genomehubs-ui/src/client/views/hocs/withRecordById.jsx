@@ -2,6 +2,7 @@ import {
   fetchRecord,
   getCurrentRecordId,
   getRecordById,
+  getRecordIsFetching,
   resetRecord,
   setAttributeSettings,
   setCurrentRecordId,
@@ -14,6 +15,7 @@ const withRecordById = (WrappedComponent) => (props) => {
   let { currentRecordId } = props;
   const mapStateToProps = (state) => ({
     recordId: getCurrentRecordId(state),
+    recordIsFetching: false, //getRecordIsFetching(state),
     recordById: getRecordById(state, currentRecordId || ""),
   });
 

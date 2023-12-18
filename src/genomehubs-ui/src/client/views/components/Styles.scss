@@ -908,6 +908,8 @@ body,
         }
       }
 
+      
+
       .id {
         top: 0.1rem;
         left: 4.25rem;
@@ -920,6 +922,14 @@ body,
         font-family: themed("titleFont");
         font-size: 1.5em;
         position: absolute;
+      }
+
+      .current {
+        .name {
+          // background-color: themed("primary");
+
+          text-decoration: underline;
+        }
       }
 
       .rank {

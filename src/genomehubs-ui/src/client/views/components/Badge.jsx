@@ -5,6 +5,7 @@ import BadgeInfo from "./BadgeInfo";
 import BadgeStats from "./BadgeStats";
 import Count from "./Count";
 import PhyloPics from "./PhyloPics";
+import classNames from "classnames";
 import classnames from "classnames";
 import { compose } from "recompose";
 import styles from "./Styles.scss";
@@ -15,18 +16,31 @@ import withRecordById from "../hocs/withRecordById";
 import withSiteName from "../hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 
-// import withSearch from "../hocs/withSearch";
+const setScrollPosition = (scrollY) => {
+  setTimeout(() => {
+    window.scrollTo({ top: scrollY });
+    if (window.scrollY < scrollY) {
+      setScrollPosition(scrollY);
+    }
+  }, 250);
+};
 
 const updateScrollPosition = (browse) => {
-  if (browse.scrollY && window.scrollY != browse.scrollY) {
-    console.log("scrolling");
-    window.scrollTo({ top: browse.scrollY });
+  if (
+    browse.scrollY &&
+    window.scrollY == 0 &&
+    window.scrollY != browse.scrollY
+  ) {
+    setScrollPosition(browse.scrollY);
   }
 };
 
 export const Badge = ({
+  recordId,
   currentRecordId,
+  setRecordId,
   fetchRecord,
+  recordIsFetching,
   recordById,
   maskParentElement,
   descendantsById,
@@ -35,11 +49,14 @@ export const Badge = ({
   parents,
   setBrowse,
   updateBrowseStatus,
+  depth,
+  rank: targetRank,
   result,
   taxonomy,
   basename,
 }) => {
   let scientificName, lineage, rank;
+  let topLevel = !parents;
   parents = parents || browse;
   const navigate = useNavigate();
 
@@ -93,66 +110,47 @@ export const Badge = ({
   };
 
   const updateBrowse = (parents) => {
-    setBrowse({ ...parents, scrollY: window.scrollY });
+    setRecordId(currentRecordId);
+    // setBrowse({ ...parents, scrollY: window.scrollY });
   };
 
   useEffect(() => {
-    imgRef.current && setHeight(imgRef.current.clientHeight * 0.875);
-    updateScrollPosition(browse);
-    if (browse[currentRecordId]) {
-      if (browse[currentRecordId].browse) {
-        expandBrowseDiv();
-      } else if (browse[currentRecordId].stats) {
-        setShowStats(true);
-      } else if (browse[currentRecordId].info) {
-        setShowInfo(true);
+    if (currentRecordId && recordById) {
+      imgRef.current && setHeight(imgRef.current.clientHeight * 0.875);
+      updateScrollPosition(browse);
+      if (browse[currentRecordId]) {
+        if (browse[currentRecordId].browse) {
+          expandBrowseDiv();
+        } else if (browse[currentRecordId].stats) {
+          setShowStats(true);
+        } else if (browse[currentRecordId].info) {
+          setShowInfo(true);
+        }
       }
     }
-  }, [updateScrollPosition]);
+  }, [descendantsById]);
   useEffect(() => {
-    if (currentRecordId && !recordById) {
-      fetchRecord(currentRecordId, result, taxonomy || "ncbi");
-      fetchDescendants({
-        taxonId: currentRecordId,
-        taxonomy: taxonomy || "ncbi",
-      });
+    let isMounted = true;
+    if (currentRecordId && !recordById && !recordIsFetching) {
+      setTimeout(() => {
+        if (isMounted) {
+          fetchRecord(currentRecordId, result, taxonomy || "ncbi");
+          fetchDescendants({
+            taxonId: currentRecordId,
+            taxonomy: taxonomy || "ncbi",
+            depth,
+            rank: targetRank,
+          });
+        }
+      }, 50);
     }
-  }, [currentRecordId]);
-
-  useEffect(() => {
-    let isApiSubscribed = true;
-
-    // if (!descendantsById && !descendantsIsFetching) {
-    //   fetchDescendants({
-    //     taxonId: currentRecordId,
-    //     taxonomy: taxonomy || "ncbi",
-    //   });
-    // }
-
-    // fetchDescendantTaxIds({ recordId: currentRecordId }).then((response) => {
-    //   if (isApiSubscribed) {
-    //     setBrowseDiv(
-    //       <>
-    //         {response.map((taxonId) => (
-    //           <Badge
-    //             key={taxonId}
-    //             currentRecordId={taxonId}
-    //             {...{
-    //               records,
-    //               recordIsFetching,
-    //               fetchRecord,
-    //               result,
-    //               taxonomy,
-    //             }}
-    //           />
-    //         ))}
-    //       </>
-    //     );
-    //   }
-    // });
     return () => {
-      // cancel the subscription
-      isApiSubscribed = false;
+      isMounted = false;
+      if (topLevel) {
+        let { scrollY } = window;
+        // window.scrollTo({ top: 0 });
+        setBrowse({ ...parents, scrollY });
+      }
     };
   }, [currentRecordId]);
 
@@ -172,6 +170,14 @@ export const Badge = ({
       <div className={styles.bg}></div>
     </div>;
   }
+
+  if (currentRecordId && targetRank && !parents[currentRecordId]) {
+    parents[currentRecordId] = { browse: true };
+  }
+
+  // if (targetRank && currentRecordId && recordById) {
+
+  // }
 
   const toggleStats = () => {
     if (!parents[currentRecordId]) {
@@ -253,7 +259,13 @@ export const Badge = ({
   return (
     <div style={{ position: "relative" }}>
       <div className={badgeCss} ref={badgeRef}>
-        <div className={styles.bg}>
+        <div
+          className={
+            currentRecordId == recordId
+              ? classNames(styles.bg, styles.current)
+              : styles.bg
+          }
+        >
           <div ref={imgRef} className={styles.img}>
             {recordById && (
               <PhyloPics

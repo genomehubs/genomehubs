@@ -68,7 +68,7 @@ export const getDescendantsByTaxonId = createCachedSelector(
   }
 )((_state, taxonId) => taxonId);
 
-export function fetchDescendants({ taxonId, taxonomy }) {
+export function fetchDescendants({ taxonId, taxonomy, depth = 1, rank }) {
   return async function (dispatch) {
     const state = store.getState();
     const descendants = getDescendants(state);
@@ -80,10 +80,15 @@ export function fetchDescendants({ taxonId, taxonomy }) {
     }
     dispatch(requestDescendants());
     const endpoint = "search";
-    let depth = 1;
     let lastJson = {};
-    for (depth = 1; depth < 30; depth++) {
+    let maxDepth = 30;
+    let url = `${apiUrl}/${endpoint}?query=tax_tree%28${taxonId}%29%20AND%20tax_depth%28${depth}%29&fields=none&sortBy=scientific_name&sortOrder=asc`;
+    for (depth; depth < maxDepth; depth++) {
       let url = `${apiUrl}/${endpoint}?query=tax_tree%28${taxonId}%29%20AND%20tax_depth%28${depth}%29&fields=none&sortBy=scientific_name&sortOrder=asc`;
+      if (rank) {
+        url = `${apiUrl}/${endpoint}?query=tax_tree%28${taxonId}%29%20AND%20tax_rank%28${rank}%29&fields=none&sortBy=scientific_name&sortOrder=asc`;
+        depth = maxDepth;
+      }
       try {
         let json;
         try {
