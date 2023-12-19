@@ -104,10 +104,13 @@ export function fetchDescendants({ taxonId, taxonomy, depth = 1, rank }) {
           json.status.hits >= 1
         ) {
           lastJson = json;
-          if (json.status.hits != 1) {
-            break;
+          if (json.status.hits == 1) {
+            if (lastJson.results[0].result.taxon_rank == "species") {
+              break;
+            }
+            continue;
           }
-          // break;
+          break;
         }
       } catch (err) {
         return dispatch(setApiStatus(false));
