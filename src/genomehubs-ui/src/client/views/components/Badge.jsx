@@ -16,22 +16,24 @@ import withRecordById from "../hocs/withRecordById";
 import withSiteName from "../hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 
-const setScrollPosition = (scrollY) => {
+const setScrollPosition = (scrollY, status) => {
   setTimeout(() => {
-    window.scrollTo({ top: scrollY });
-    if (window.scrollY < scrollY) {
-      setScrollPosition(scrollY);
+    if (status.isMounted) {
+      window.scrollTo({ top: scrollY });
+      if (window.scrollY < scrollY) {
+        setScrollPosition(scrollY, status);
+      }
     }
   }, 250);
 };
 
-const updateScrollPosition = (browse) => {
+const updateScrollPosition = (browse, status) => {
   if (
     browse.scrollY &&
     window.scrollY == 0 &&
     window.scrollY != browse.scrollY
   ) {
-    setScrollPosition(browse.scrollY);
+    setScrollPosition(browse.scrollY, status);
   }
 };
 
@@ -110,14 +112,21 @@ export const Badge = ({
   };
 
   const updateBrowse = (parents) => {
-    setRecordId(currentRecordId);
+    setTimeout(() => {
+      setRecordId(currentRecordId);
+      window.scrollTo({ top: 0 });
+    }, 50);
+
     // setBrowse({ ...parents, scrollY: window.scrollY });
   };
 
   useEffect(() => {
+    let status = { isMounted: true };
+    if (topLevel) {
+      updateScrollPosition(browse, status);
+    }
     if (currentRecordId && recordById) {
       imgRef.current && setHeight(imgRef.current.clientHeight * 0.875);
-      updateScrollPosition(browse);
       if (browse[currentRecordId]) {
         if (browse[currentRecordId].browse) {
           expandBrowseDiv();
@@ -128,6 +137,13 @@ export const Badge = ({
         }
       }
     }
+    return () => {
+      if (topLevel) {
+        status.isMounted = false;
+        let { scrollY } = window;
+        setBrowse({ ...parents, scrollY });
+      }
+    };
   }, [descendantsById]);
   useEffect(() => {
     let isMounted = true;
@@ -146,11 +162,6 @@ export const Badge = ({
     }
     return () => {
       isMounted = false;
-      if (topLevel) {
-        let { scrollY } = window;
-        // window.scrollTo({ top: 0 });
-        setBrowse({ ...parents, scrollY });
-      }
     };
   }, [currentRecordId]);
 
