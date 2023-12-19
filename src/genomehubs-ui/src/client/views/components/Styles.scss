@@ -854,11 +854,11 @@ body,
       margin: 0 auto;
       position: relative;
       margin: 0.15rem;
-      width: calc(50% - 0.75rem);
-      min-width: 26.75rem;
-      @media (min-width: 110rem) {
-        width: calc(33% - 0.75rem);
-      }
+      // width: calc(50% - 0.75rem);
+      width: 26.75rem;
+      // @media (min-width: 110rem) {
+      //   width: calc(33% - 0.75rem);
+      // }
       min-height: 4.5em;
       height: auto;
       color: themed("secondary");
@@ -877,7 +877,7 @@ body,
       //   border-color: red;
       // }
 
-      .bg {
+      .bg, .mainInfo {
         top: 0;
         left: 0;
         position: relative;
@@ -888,6 +888,10 @@ body,
         border-radius: 0.5rem;
       }
 
+      .bg {
+        cursor: pointer;
+      }
+
       .img {
         height: 4em;
         width: 4em;
@@ -896,6 +900,7 @@ body,
         padding: 0.25em;
         box-sizing: border-box;
         border-radius: 0.25em;
+        color: themed("primary");
         background-color: themed("secondary");
         position: absolute;
         display: grid;
@@ -919,15 +924,29 @@ body,
       .name {
         top: 1.25rem;
         left: 4.25rem;
+        right: 0.25rem;
         font-family: themed("titleFont");
         font-size: 1.5em;
         position: absolute;
+        white-space: nowrap;
+        overflow: hidden;
+
+        &:after {
+          content: "";
+          position: absolute;
+          right: 0;
+          top: 0;
+          height: 100%;
+          // background-color: themed("primary");
+          // background-color: red;
+          width: 1.5rem;
+          @include fadeFromPercent(left, themed("primary"), 0%)
+        }
       }
 
       .current {
         .name {
           // background-color: themed("primary");
-
           text-decoration: underline;
         }
       }
@@ -1039,9 +1058,10 @@ body,
         display: inline-block;
         text-align: center;
         cursor: pointer;
+        white-space: nowrap;
         margin: 0.25rem;
         border-radius: 0.25rem;
-        padding: 0 0.5em;
+        padding: 0 0.5em 0.05em;
         background-color: themed("secondary");
 
         .infoName {
@@ -1060,6 +1080,12 @@ body,
           position: relative;
         }
 
+      }
+
+      .badgeInfoSelected {
+        .infoName {
+          border-bottom: 0.1rem solid themed("primary");
+        }
       }
 
       .badgeInfoMore {
@@ -1083,6 +1109,26 @@ body,
             color: themed("secondary");
           }
         }
+      }
+
+      .mainInfo {
+        position: absolute;
+        left: calc(100% + 0.35rem);
+        // left: calc(100% + 5.35rem);
+        width: fit-content;
+        margin-bottom: 0;
+
+        // &:before {
+        //   content: "";
+        //   position: absolute;
+        //   left: -10.35rem;
+        //   width: 10.35rem;
+        //   // top: calc(50% - 0.25rem);
+        //   top: 50%;
+        //   // background-color: themed("primary");
+        //   border-top: solid 0.2rem themed("primary");
+        //   // height: 0.5rem;
+        // }
       }
 
     }

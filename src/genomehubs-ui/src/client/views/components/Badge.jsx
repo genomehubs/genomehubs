@@ -1,15 +1,14 @@
+import BadgeInfo, { BadgeInfoCell } from "./BadgeInfo";
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
 
-import BadgeInfo from "./BadgeInfo";
 import BadgeStats from "./BadgeStats";
-import Count from "./Count";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import PhyloPics from "./PhyloPics";
 import classNames from "classnames";
 import classnames from "classnames";
 import { compose } from "recompose";
 import styles from "./Styles.scss";
-// import useScrollPosition from "../hooks/useScrollPosition";
+import { useNavigate } from "@reach/router";
 import withBrowse from "../hocs/withBrowse";
 import withDescendantsById from "../hocs/withDescendantsById";
 import withRecordById from "../hocs/withRecordById";
@@ -50,9 +49,13 @@ export const Badge = ({
   browse,
   parents,
   setBrowse,
+  parentFieldName,
+  setParentFieldName,
   updateBrowseStatus,
   depth,
+  nestingLevel = 0,
   rank: targetRank,
+  size,
   result,
   taxonomy,
   basename,
@@ -76,36 +79,128 @@ export const Badge = ({
     browse[currentRecordId] && browse[currentRecordId].browse
   );
   const [browseDiv, setBrowseDiv] = useState(null);
-  // const scrollPosition = useScrollPosition();
+  const [fieldName, setFieldName] = useState(parentFieldName);
+  const setCurrentFieldName = setParentFieldName
+    ? (f) => {
+        setParentFieldName(f);
+        setFieldName(f);
+      }
+    : setFieldName;
+
+  const fetchMoreDescendants = ({ size, offset, depth }) => {
+    fetchDescendants({
+      taxonId: currentRecordId,
+      taxonomy: taxonomy || "ncbi",
+      depth,
+      rank: targetRank,
+      size,
+      offset,
+    });
+  };
 
   const expandBrowseDiv = () => {
     setBadgeCss(classnames(styles.badge, styles.badgeExpanded));
-    if (descendantsById) {
-      setBrowseDiv(
-        <>
-          {descendantsById.map(({ result: descendant }, i) => (
-            <WrappedBadge
-              key={descendant.taxon_id}
-              currentRecordId={descendant.taxon_id}
-              maskParentElement={i == descendantsById.length - 1}
-              {...{
-                // records,
-                // recordIsFetching,
-                // fetchDescendants,
-                // fetchRecord,
-                parents: {
-                  ...parents,
-                  ...(descendantsById && {
-                    [currentRecordId]: { browse: true },
-                  }),
-                },
-                result,
-                taxonomy,
+    if (descendantsById && descendantsById.results) {
+      let badges = descendantsById.results.map(({ result: descendant }, i) => (
+        <WrappedBadge
+          key={descendant.taxon_id}
+          currentRecordId={descendant.taxon_id}
+          maskParentElement={i == descendantsById.count - 1}
+          {...{
+            parents: {
+              ...parents,
+              ...(descendantsById && {
+                [currentRecordId]: { browse: true },
+              }),
+            },
+            parentFieldName: fieldName,
+            setParentFieldName: setCurrentFieldName,
+            nestingLevel: nestingLevel + 1,
+            result,
+            taxonomy,
+          }}
+        />
+      ));
+      let links = [];
+
+      if (descendantsById.count > descendantsById.results.length) {
+        let difference = descendantsById.count - descendantsById.results.length;
+        if (difference > 10) {
+          links.push(
+            <a
+              onClick={() => {
+                let { scrollY } = window;
+                fetchMoreDescendants({
+                  offset: descendantsById.results.length,
+                  size: 10,
+                  depth: descendantsById.depth,
+                });
+
+                setBrowse({ ...parents, scrollY });
               }}
-            />
-          ))}
-        </>
-      );
+            >
+              +10
+            </a>
+          );
+          if (difference > 100) {
+            links.push(
+              <a
+                onClick={() => {
+                  let { scrollY } = window;
+                  fetchMoreDescendants({
+                    offset: descendantsById.results.length,
+                    size: 100,
+                    depth: descendantsById.depth,
+                  });
+
+                  setBrowse({ ...parents, scrollY });
+                }}
+              >
+                +100
+              </a>
+            );
+          }
+        }
+        links.push(
+          <a
+            onClick={() => {
+              let { scrollY } = window;
+              fetchMoreDescendants({
+                offset: descendantsById.results.length,
+                size: difference,
+                depth: descendantsById.depth,
+              });
+
+              setBrowse({ ...parents, scrollY });
+            }}
+          >
+            show all
+          </a>
+        );
+
+        badges.push(
+          <div style={{ position: "relative" }} key={"showMore"}>
+            <div className={badgeCss} ref={badgeRef}>
+              <div className={styles.bg}>
+                <div ref={imgRef} className={styles.img}>
+                  <MoreHorizIcon
+                    preserveAspectRatio="xMidYMin"
+                    style={{ fontSize: "3em" }}
+                  />
+                </div>
+                <div className={styles.rank}></div>
+                <div className={styles.id}></div>
+                <div className={styles.name}>{`${difference} tax${
+                  difference > 0 ? "a" : "on"
+                } not shown`}</div>
+                <div className={styles.links}>{links}</div>
+              </div>
+              <div className={styles.maskParent}></div>
+            </div>
+          </div>
+        );
+      }
+      setBrowseDiv(<>{badges}</>);
     } else {
       setShowBrowse(false);
     }
@@ -116,15 +211,11 @@ export const Badge = ({
       setRecordId(currentRecordId);
       window.scrollTo({ top: 0 });
     }, 50);
-
-    // setBrowse({ ...parents, scrollY: window.scrollY });
   };
 
   useEffect(() => {
     let status = { isMounted: true };
-    if (topLevel) {
-      updateScrollPosition(browse, status);
-    }
+    updateScrollPosition(browse, status);
     if (currentRecordId && recordById) {
       imgRef.current && setHeight(imgRef.current.clientHeight * 0.875);
       if (browse[currentRecordId]) {
@@ -144,7 +235,7 @@ export const Badge = ({
         setBrowse({ ...parents, scrollY });
       }
     };
-  }, [descendantsById]);
+  }, [descendantsById, fieldName]);
   useEffect(() => {
     let isMounted = true;
     if (currentRecordId && !recordById && !recordIsFetching) {
@@ -156,6 +247,7 @@ export const Badge = ({
             taxonomy: taxonomy || "ncbi",
             depth,
             rank: targetRank,
+            size,
           });
         }
       }, 50);
@@ -186,11 +278,8 @@ export const Badge = ({
     parents[currentRecordId] = { browse: true };
   }
 
-  // if (targetRank && currentRecordId && recordById) {
-
-  // }
-
-  const toggleStats = () => {
+  const toggleStats = (e) => {
+    e.stopPropagation();
     if (!parents[currentRecordId]) {
       parents[currentRecordId] = {};
     }
@@ -201,7 +290,8 @@ export const Badge = ({
     updateBrowseStatus(currentRecordId, parents[currentRecordId]);
   };
 
-  const toggleInfo = () => {
+  const toggleInfo = (e) => {
+    e.stopPropagation();
     if (!parents[currentRecordId]) {
       parents[currentRecordId] = {};
     }
@@ -261,21 +351,56 @@ export const Badge = ({
           },
         })
       }
+      fieldName={fieldName}
+      setFieldName={setCurrentFieldName}
       taxonomy={taxonomy}
       result={result}
       rank={rank}
     />
   );
 
+  let badgeInfoDiv;
+  if (recordById && fieldName && recordById.record.attributes[fieldName]) {
+    let field = recordById.record.attributes[fieldName];
+    badgeInfoDiv = (
+      <div
+        className={styles.mainInfo}
+        // style={{
+        //   left: `calc(100% + ${Math.max(10.35 - nestingLevel, 0.35)}em)`,
+        // }}
+      >
+        <div className={styles.badgeInfo}>
+          <BadgeInfoCell
+            {...{
+              field,
+              fieldName,
+              result,
+              tipTitle: `Click to search ${fieldName} values for ${scientificName}`,
+              handleClick: () => {
+                navigate(
+                  `${basename}/search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29%20AND%20${fieldName}&fields=${fieldName}&includeEstimates=true&taxonomy=${taxonomy}&result=${result}`
+                );
+                setBrowse();
+              },
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ position: "relative" }}>
       <div className={badgeCss} ref={badgeRef}>
+        {badgeInfoDiv}
+
         <div
           className={
             currentRecordId == recordId
               ? classNames(styles.bg, styles.current)
               : styles.bg
           }
+          onClick={() => toggleBrowse(currentRecordId)}
         >
           <div ref={imgRef} className={styles.img}>
             {recordById && (
@@ -290,15 +415,20 @@ export const Badge = ({
           <div className={styles.id}>{currentRecordId}</div>
           <div className={styles.name}>{scientificName}</div>
           <div className={styles.links}>
-            {descendantsById && descendantsById.length > 0 ? (
+            {descendantsById &&
+            descendantsById.results &&
+            descendantsById.count > 0 ? (
               <a
-                onClick={() => toggleBrowse(currentRecordId)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleBrowse(currentRecordId);
+                }}
                 className={(showBrowse && styles.active) || ""}
               >
-                browse
+                expand
               </a>
             ) : (
-              <a className={styles.disabled}>browse</a>
+              <a className={styles.disabled}>expand</a>
             )}
             <a
               onClick={toggleStats}
@@ -322,19 +452,16 @@ export const Badge = ({
                   : styles.disabled
               }
             >
-              info
+              values
             </a>
             <a
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 navigate(
-                  `${basename}/search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29&includeEstimates=false&taxonomy=${taxonomy}&result=${result}`
+                  `${basename}/search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29&includeEstimates=true&taxonomy=${taxonomy}&result=${result}`
                 );
                 updateBrowse({
                   ...parents,
-                  // [currentRecordId]: {
-                  //   ...(parents[currentRecordId] || {}),
-                  //   browse: true,
-                  // },
                 });
               }}
               className={scientificName ? "" : styles.disabled}

@@ -24,11 +24,18 @@ const defaultState = () => ({
 
 function onReceiveDescendants(state, action) {
   const { payload, meta } = action;
-  const { taxonId: id, results } = payload;
+  const { taxonId: id, results, count, offset, depth } = payload;
 
-  const updatedWithDescendantsState = immutableUpdate(state, {
-    byId: { [id]: results },
-  });
+  let updatedWithDescendantsState;
+  if (state.byId && state.byId[id]) {
+    updatedWithDescendantsState = immutableUpdate(state, {
+      byId: { [id]: { results: [...state.byId[id].results, ...results] } },
+    });
+  } else {
+    updatedWithDescendantsState = immutableUpdate(state, {
+      byId: { [id]: { results, count, depth } },
+    });
+  }
 
   const updatedWithDescendantsList = immutableUpdate(
     updatedWithDescendantsState,
@@ -68,11 +75,18 @@ export const getDescendantsByTaxonId = createCachedSelector(
   }
 )((_state, taxonId) => taxonId);
 
-export function fetchDescendants({ taxonId, taxonomy, depth = 1, rank }) {
+export function fetchDescendants({
+  taxonId,
+  taxonomy,
+  depth = 1,
+  rank,
+  offset = 0,
+  size = 10,
+}) {
   return async function (dispatch) {
     const state = store.getState();
     const descendants = getDescendants(state);
-    if (descendants[taxonId]) {
+    if (offset == 0 && descendants[taxonId]) {
       return;
     }
     if (!taxonomy) {
@@ -82,11 +96,10 @@ export function fetchDescendants({ taxonId, taxonomy, depth = 1, rank }) {
     const endpoint = "search";
     let lastJson = {};
     let maxDepth = 30;
-    let url = `${apiUrl}/${endpoint}?query=tax_tree%28${taxonId}%29%20AND%20tax_depth%28${depth}%29&fields=none&sortBy=scientific_name&sortOrder=asc`;
     for (depth; depth < maxDepth; depth++) {
-      let url = `${apiUrl}/${endpoint}?query=tax_tree%28${taxonId}%29%20AND%20tax_depth%28${depth}%29&fields=none&sortBy=scientific_name&sortOrder=asc`;
+      let url = `${apiUrl}/${endpoint}?query=tax_tree%28${taxonId}%29%20AND%20tax_depth%28${depth}%29&fields=none&sortBy=scientific_name&sortOrder=asc&size=${size}&offset=${offset}`;
       if (rank) {
-        url = `${apiUrl}/${endpoint}?query=tax_tree%28${taxonId}%29%20AND%20tax_rank%28${rank}%29&fields=none&sortBy=scientific_name&sortOrder=asc`;
+        url = `${apiUrl}/${endpoint}?query=tax_tree%28${taxonId}%29%20AND%20tax_rank%28${rank}%29&fields=none&sortBy=scientific_name&sortOrder=asc&size=${size}&offset=${offset}`;
         depth = maxDepth;
       }
       try {
@@ -117,7 +130,15 @@ export function fetchDescendants({ taxonId, taxonomy, depth = 1, rank }) {
       }
     }
     if (lastJson.results) {
-      dispatch(receiveDescendants({ taxonId, results: lastJson.results }));
+      dispatch(
+        receiveDescendants({
+          taxonId,
+          results: lastJson.results,
+          count: lastJson.status.hits,
+          offset,
+          depth: depth < maxDepth ? depth : 1,
+        })
+      );
     }
   };
 }

@@ -23,7 +23,7 @@ export const BadgeStats = ({
 
       <Count
         currentRecord={currentRecord}
-        result={"assembly"}
+        result={"taxon"}
         taxonomy={taxonomy}
         query={`tax_tree(${currentRecordId}) AND assembly_level AND tax_rank(species)`}
         includeEstimates={true}
