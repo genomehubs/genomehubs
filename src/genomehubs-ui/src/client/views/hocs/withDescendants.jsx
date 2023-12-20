@@ -2,7 +2,7 @@ import {
   fetchDescendants,
   getDescendants,
   getDescendantsByTaxonId,
-  getDescendantsIsFetching,
+  getDescendantsIsFetchingByTaxonId,
 } from "../reducers/descendants";
 
 import React from "react";
@@ -14,8 +14,11 @@ const withDescendants = (WrappedComponent) => (props) => {
   // let { taxon_id: taxonId } = record ? record.record : {};
   const mapStateToProps = (state) => ({
     descendants: getDescendants(state),
-    descendantsIsFetching: getDescendantsIsFetching(state),
     ...(taxonId && {
+      descendantsIsFetchingById: getDescendantsIsFetchingByTaxonId(
+        state,
+        taxonId
+      ),
       descendantsById: getDescendantsByTaxonId(state, taxonId),
     }),
   });

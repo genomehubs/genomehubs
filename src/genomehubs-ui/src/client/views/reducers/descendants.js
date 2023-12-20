@@ -17,7 +17,7 @@ const receiveDescendants = createAction(
 export const resetDescendants = createAction("RESET_DESCENDANTS");
 
 const defaultState = () => ({
-  isFetching: false,
+  isFetching: {},
   allIds: [],
   byId: {},
 });
@@ -28,12 +28,22 @@ function onReceiveDescendants(state, action) {
 
   let updatedWithDescendantsState;
   if (state.byId && state.byId[id]) {
+    // let resultIds = new Set(state.byId[id].results.map((r) => r.id));
+    // let newResults = results.filter((r) => !resultIds.has(r.id));
+    let newResults = results;
+    if (newResults.length == 0) {
+      return immutableUpdate(state, {
+        isFetching: { [id]: false },
+      });
+    }
     updatedWithDescendantsState = immutableUpdate(state, {
-      byId: { [id]: { results: [...state.byId[id].results, ...results] } },
+      byId: { [id]: { results: [...state.byId[id].results, ...newResults] } },
+      isFetching: { [id]: false },
     });
   } else {
     updatedWithDescendantsState = immutableUpdate(state, {
       byId: { [id]: { results, count, depth } },
+      isFetching: { [id]: false },
     });
   }
 
@@ -45,7 +55,6 @@ function onReceiveDescendants(state, action) {
   );
 
   return immutableUpdate(updatedWithDescendantsList, {
-    isFetching: false,
     status,
     lastUpdated: meta.receivedAt,
   });
@@ -55,7 +64,7 @@ const descendants = handleActions(
   {
     REQUEST_DESCENDANTS: (state, action) =>
       immutableUpdate(state, {
-        isFetching: true,
+        isFetching: { [action.payload]: true },
       }),
     RECEIVE_DESCENDANTS: onReceiveDescendants,
     RESET_DESCENDANTS: defaultState,
@@ -75,6 +84,14 @@ export const getDescendantsByTaxonId = createCachedSelector(
   }
 )((_state, taxonId) => taxonId);
 
+export const getDescendantsIsFetchingByTaxonId = createCachedSelector(
+  getDescendantsIsFetching,
+  (_state, taxonId) => taxonId,
+  (descendantsIsFetching, taxonId) => {
+    return descendantsIsFetching[taxonId];
+  }
+)((_state, taxonId) => taxonId);
+
 export function fetchDescendants({
   taxonId,
   taxonomy,
@@ -86,13 +103,17 @@ export function fetchDescendants({
   return async function (dispatch) {
     const state = store.getState();
     const descendants = getDescendants(state);
-    if (offset == 0 && descendants[taxonId]) {
+    const descendantsIsFetching = getDescendantsIsFetchingByTaxonId(
+      state,
+      taxonId
+    );
+    if (descendantsIsFetching || (offset == 0 && descendants[taxonId])) {
       return;
     }
     if (!taxonomy) {
       taxonomy = getCurrentTaxonomy(state);
     }
-    dispatch(requestDescendants());
+    dispatch(requestDescendants(taxonId));
     const endpoint = "search";
     let lastJson = {};
     let maxDepth = 30;

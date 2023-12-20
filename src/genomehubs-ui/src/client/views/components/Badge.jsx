@@ -130,6 +130,7 @@ export const Badge = ({
         if (difference > 10) {
           links.push(
             <a
+              key={10}
               onClick={() => {
                 let { scrollY } = window;
                 fetchMoreDescendants({
@@ -147,6 +148,7 @@ export const Badge = ({
           if (difference > 100) {
             links.push(
               <a
+                key={100}
                 onClick={() => {
                   let { scrollY } = window;
                   fetchMoreDescendants({
@@ -163,7 +165,7 @@ export const Badge = ({
             );
           }
         }
-        links.push(<a>show all</a>);
+        links.push(<a key={"all"}>show all</a>);
 
         badges.push(
           <div style={{ position: "relative" }} key={"showMore"}>
