@@ -161,27 +161,27 @@ export const Badge = ({
             );
           }
         }
-        links.push(
-          <a
-            onClick={() => {
-              let { scrollY } = window;
-              fetchMoreDescendants({
-                offset: descendantsById.results.length,
-                size: difference,
-                depth: descendantsById.depth,
-              });
-
-              setBrowse({ ...parents, scrollY });
-            }}
-          >
-            show all
-          </a>
-        );
+        links.push(<a>show all</a>);
 
         badges.push(
           <div style={{ position: "relative" }} key={"showMore"}>
             <div className={badgeCss} ref={badgeRef}>
-              <div className={styles.bg}>
+              <div
+                className={styles.bg}
+                onClick={() => {
+                  if (links.length == 0) {
+                    return;
+                  }
+                  let { scrollY } = window;
+                  fetchMoreDescendants({
+                    offset: descendantsById.results.length,
+                    size: difference,
+                    depth: descendantsById.depth,
+                  });
+
+                  setBrowse({ ...parents, scrollY });
+                }}
+              >
                 <div ref={imgRef} className={styles.img}>
                   <MoreHorizIcon
                     preserveAspectRatio="xMidYMin"
@@ -407,7 +407,10 @@ export const Badge = ({
               <PhyloPics
                 currentRecord={recordById}
                 maxHeight={height}
+                hoverHeight={height * 2}
                 fixedRatio={1}
+                showAncestral={false}
+                sourceColors={false}
               />
             )}
           </div>

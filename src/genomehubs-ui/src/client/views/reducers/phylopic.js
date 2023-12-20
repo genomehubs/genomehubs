@@ -82,6 +82,9 @@ export function fetchPhylopic({ taxonId, scientificName, lineage, rank }) {
         break;
       }
     }
+    if (phylopics[taxonId]) {
+      return;
+    }
 
     const lookupName = async (name) => {
       let response = await fetch(
@@ -148,10 +151,11 @@ export function fetchPhylopic({ taxonId, scientificName, lineage, rank }) {
                 sourceUrl: `https://www.phylopic.org/images/${uuid}/`,
                 imageRank: validRank,
               };
-              if (validRank.endsWith("species")) {
+              if (validRank.endsWith("species") && validRank == rank) {
                 response.source = "Primary";
               } else {
-                response.source = rank ? "Descendant" : "Ancestral";
+                response.source =
+                  validRank == rank ? "Descendant" : "Ancestral";
               }
               dispatch(receivePhylopic(response));
             } else {

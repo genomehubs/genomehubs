@@ -13,6 +13,8 @@ const PhyloPics = ({
   phylopicById,
   fetchPhylopic,
   currentRecord,
+  sourceColors = true,
+  showAncestral = true,
   record,
   maxHeight,
   fixedRatio,
@@ -54,53 +56,106 @@ const PhyloPics = ({
 
   let imageDescription;
   if (source == "Ancestral") {
-    imageDescription = `No matching image was found for ${scientificName} so the presented image of ${imageName} from PhyloPic.org is a representative of the same ${imageRank}`;
+    if (!showAncestral) {
+      imageDescription = (
+        <div>
+          No image was found for {scientificName} at{" "}
+          <a href="https://phylopic.org" target="_blank">
+            PhyloPic.org
+          </a>
+        </div>
+      );
+      return (
+        <Tooltip title={imageDescription} styleName="dark" interactive arrow>
+          <div className={styles.blank}></div>
+        </Tooltip>
+      );
+    } else {
+      imageDescription = (
+        <div>
+          No image was found for {scientificName} so the presented image of{" "}
+          {imageName} from{" "}
+          <a href={fileUrl} target="_blank">
+            PhyloPic.org
+          </a>{" "}
+          is a representative of the same {imageRank}
+        </div>
+      );
+    }
   } else if (
     source == "Descendant" &&
     scientificName.toLowerCase != imageName
   ) {
-    imageDescription = `${scientificName} image from PhyloPic.org. The presented image shows ${imageName}`;
+    imageDescription = (
+      <div>
+        {scientificName} image from{" "}
+        <a href={fileUrl} target="_blank">
+          PhyloPic.org
+        </a>
+        . The presented image shows {imageName}
+      </div>
+    );
   } else {
-    imageDescription = `${scientificName} image from PhyloPic.org`;
+    imageDescription = (
+      <div>
+        {scientificName} image from{" "}
+        <a href={fileUrl} target="_blank">
+          PhyloPic.org
+        </a>
+      </div>
+    );
+  }
+  if (
+    fixedRatio &&
+    attribution &&
+    license &&
+    !license.href.match("publicdomain")
+  ) {
+    imageDescription = (
+      <div>
+        {imageDescription}
+        <small>
+          image credit: <a href={license.href}>{attribution}</a>
+        </small>
+      </div>
+    );
   }
   return (
     <div className={styles.imageContainer}>
-      <a href={sourceUrl} target="_blank">
-        <div>
-          <Tooltip title={imageDescription} arrow>
-            <div>
-              {fileUrl && (
-                <PhyloPic
-                  fileUrl={fileUrl}
-                  source={source}
-                  ratio={ratio}
-                  fixedRatio={fixedRatio}
-                  maxHeight={maxHeight}
-                />
+      <div>
+        <Tooltip title={imageDescription} styleName="dark" interactive arrow>
+          <div>
+            {fileUrl && (
+              <PhyloPic
+                fileUrl={fileUrl}
+                source={sourceColors ? source : "Primary"}
+                ratio={ratio}
+                fixedRatio={fixedRatio}
+                maxHeight={maxHeight}
+              />
+            )}
+          </div>
+        </Tooltip>
+      </div>
+      {!fixedRatio &&
+        attribution &&
+        license &&
+        !license.href.match("publicdomain") && (
+          <Tooltip title={attribution} arrow>
+            <div
+              className={classnames(
+                styles.imageCredit,
+                styles[`imageCredit${source}`]
               )}
+              onClick={(e) => {
+                e.preventDefault();
+                window.open(license.href, "_blank");
+              }}
+            >
+              {truncate(attribution, 20)}/PhyloPic.org
             </div>
           </Tooltip>
-        </div>
-        {!fixedRatio &&
-          attribution &&
-          license &&
-          !license.href.match("publicdomain") && (
-            <Tooltip title={attribution} arrow>
-              <div
-                className={classnames(
-                  styles.imageCredit,
-                  styles[`imageCredit${source}`]
-                )}
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.open(license.href, "_blank");
-                }}
-              >
-                {truncate(attribution, 20)}/PhyloPic
-              </div>
-            </Tooltip>
-          )}
-      </a>
+        )}
     </div>
   );
 };
