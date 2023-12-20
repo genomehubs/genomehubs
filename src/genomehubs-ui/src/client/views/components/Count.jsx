@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { fieldCount, simpleCount, valueCount } from "../functions/resultCount";
 
 import DisplayCount from "./DisplayCount";
-import Tooltip from "./Tooltip";
 import { compose } from "recompose";
-import fetchCount from "../functions/fetchCount";
-import fetchFieldCount from "../functions/fetchFieldCount";
-import fetchValueCount from "../functions/fetchValueCount";
-import formats from "../functions/formats";
 import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";
 import withApi from "../hocs/withApi";
+import withQueryById from "../hocs/withQueryById";
 import withRecord from "../hocs/withRecord";
 import withSiteName from "../hocs/withSiteName";
 
@@ -22,6 +19,8 @@ const Count = ({
   basename,
   record,
   currentRecord,
+  fetchQueryResults,
+  queryById,
   ...props
 }) => {
   let {
@@ -46,30 +45,22 @@ const Count = ({
   let [count, setCount] = useState();
   const navigate = useNavigate();
   useEffect(() => {
-    const queryString = qs.stringify({ ...options });
-    let isApiSubscribed = true;
-    let fetchFunc;
+    if (!queryById) {
+      fetchQueryResults(options);
+      setCount("...");
+      return;
+    }
     switch (of) {
       case "fields":
-        fetchFunc = fetchFieldCount;
+        setCount(fieldCount(queryById));
         break;
       case "values":
-        fetchFunc = fetchValueCount;
+        setCount(valueCount(queryById));
         break;
       default:
-        fetchFunc = fetchCount;
+        setCount(simpleCount(queryById));
     }
-    fetchFunc({ queryString }).then((response) => {
-      if (isApiSubscribed) {
-        setCount(response);
-      }
-    });
-    return () => {
-      // cancel the subscription
-      isApiSubscribed = false;
-    };
-    // fetchCount({ queryString, setCount });
-  }, []);
+  }, [queryById]);
 
   const handleClick = () => {
     navigate(
@@ -101,4 +92,4 @@ const Count = ({
   return null;
 };
 
-export default compose(withApi, withSiteName, withRecord)(Count);
+export default compose(withApi, withSiteName, withRecord, withQueryById)(Count);
