@@ -80,7 +80,7 @@ export const Badge = ({
   );
   const [browseDiv, setBrowseDiv] = useState(null);
   const [fieldName, setFieldName] = useState(
-    parentFieldName || browse.fieldName
+    parentFieldName || (topLevel && browse.fieldName)
   );
   const setCurrentFieldName = setParentFieldName
     ? (f) => {
