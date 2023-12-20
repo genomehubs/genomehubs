@@ -79,7 +79,9 @@ export const Badge = ({
     browse[currentRecordId] && browse[currentRecordId].browse
   );
   const [browseDiv, setBrowseDiv] = useState(null);
-  const [fieldName, setFieldName] = useState(parentFieldName);
+  const [fieldName, setFieldName] = useState(
+    parentFieldName || browse.fieldName
+  );
   const setCurrentFieldName = setParentFieldName
     ? (f) => {
         setParentFieldName(f);
@@ -136,7 +138,7 @@ export const Badge = ({
                   depth: descendantsById.depth,
                 });
 
-                setBrowse({ ...parents, scrollY });
+                setBrowse({ ...parents, scrollY, fieldName });
               }}
             >
               +10
@@ -153,7 +155,7 @@ export const Badge = ({
                     depth: descendantsById.depth,
                   });
 
-                  setBrowse({ ...parents, scrollY });
+                  setBrowse({ ...parents, scrollY, fieldName });
                 }}
               >
                 +100
@@ -179,7 +181,7 @@ export const Badge = ({
                     depth: descendantsById.depth,
                   });
 
-                  setBrowse({ ...parents, scrollY });
+                  setBrowse({ ...parents, scrollY, fieldName });
                 }}
               >
                 <div ref={imgRef} className={styles.img}>
@@ -232,7 +234,7 @@ export const Badge = ({
       if (topLevel) {
         status.isMounted = false;
         let { scrollY } = window;
-        setBrowse({ ...parents, scrollY });
+        setBrowse({ ...parents, scrollY, fieldName });
       }
     };
   }, [descendantsById, fieldName]);
