@@ -76,7 +76,62 @@ export const getSearchResultById = createCachedSelector(
   }
 )((_state, searchId) => searchId);
 
-// export let controller = new AbortController();
+export const requestQuery = createAction("REQUEST_QUERY");
+export const receiveQuery = createAction(
+  "RECEIVE_QUERY",
+  (json) => json,
+  () => ({ receivedAt: Date.now() })
+);
+export const cancelQuery = createAction("CANCEL_QUERY");
+export const resetQuery = createAction("RESET_QUERY");
+
+const defaultQueryState = () => ({
+  isFetching: false,
+  byId: {},
+  allIds: [],
+});
+
+const queryResults = handleActions(
+  {
+    REQUEST_QUERY: (state, action) =>
+      immutableUpdate(state, {
+        isFetching: true,
+      }),
+    CANCEL_QUERY: (state, action) =>
+      immutableUpdate(state, {
+        isFetching: false,
+      }),
+    RECEIVE_QUERY: (state, action) => {
+      const { payload, meta } = action;
+      const { queryString: id, json } = payload;
+
+      const updatedWithQueryState = immutableUpdate(state, {
+        byId: { [id]: { ...json } },
+      });
+
+      const updatedWithQueryList = immutableUpdate(updatedWithQueryState, {
+        allIds: [...new Set(updatedWithQueryState.allIds.concat(id))],
+      });
+
+      return immutableUpdate(updatedWithQueryList, {
+        isFetching: false,
+        lastUpdated: meta.receivedAt,
+      });
+    },
+    RESET_QUERY: defaultQueryState,
+  },
+  defaultQueryState()
+);
+
+export const getQueryResults = (state) => state.queryResults;
+
+export const getQueryResultById = createCachedSelector(
+  getQueryResults,
+  (_state, searchId) => searchId,
+  (results, searchId) => {
+    return results.byId[searchId];
+  }
+)((_state, searchId) => searchId);
 
 export const setSearchTerm = createAction("SET_SEARCH_TERM");
 export const searchTerm = handleAction(
@@ -204,6 +259,7 @@ export const searchReducers = {
   searchTerm,
   searchIndex,
   searchResults,
+  queryResults,
   searchHistory,
   preferSearchTerm,
   previousSearchTerm,

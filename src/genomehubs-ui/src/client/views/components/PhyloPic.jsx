@@ -20,6 +20,7 @@ const PhyloPic = ({
   apiUrl,
   containerRef,
   ratio = 1,
+  fixedRatio,
   windowDimensions,
   previewDimensions,
   setPreviewDimensions,
@@ -30,7 +31,9 @@ const PhyloPic = ({
   // const { width, height } = useResize(containerRef);
   const width = 300;
 
-  let imageWidth = Math.min(maxHeight * ratio, width);
+  let imageWidth = fixedRatio
+    ? maxHeight * ratio
+    : Math.min(maxHeight * ratio, width);
   // if (!fileId) {
   //   return null;
   // }
@@ -63,7 +66,7 @@ const PhyloPic = ({
 
     setSrc(fileUrl);
   }
-  return loading ? (
+  return loading && 0 ? (
     <div
       style={{
         width: `${imageWidth}px`,
@@ -85,6 +88,8 @@ const PhyloPic = ({
         className={styles[`blackTo${source}`]}
         style={{
           width: `${imageWidth}px`,
+          maxWidth: "100%",
+          maxHeight: "100%",
           // height: `${width / ratio}px`,
         }}
       />

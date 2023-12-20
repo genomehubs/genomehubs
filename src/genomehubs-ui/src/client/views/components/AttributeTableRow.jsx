@@ -61,24 +61,32 @@ const ExternalLink = ({ url, link }) => {
 
 const SourceLink = ({ row, types, format = "short" }) => {
   let link, link_url;
+  console.log(row);
   link = row.source || types.source;
   let url_stub = row.source_url_stub || types.source_url_stub;
   let url = row.source_url || types.source_url || types.url;
   let slug;
   if (url_stub) {
     if (row.source_slug) {
-      slug = row.source_slug;
-      link_url = `${url_stub}${row.source_slug}`;
+      slug = Array.isArray(row.source_slug)
+        ? row.source_slug[0]
+        : row.source_slug;
+      link_url = `${url_stub}${slug}`;
       if (format == "long") {
-        link = `${link} [${row.source_slug}]`;
+        link = `${link} [${slug}]`;
       }
     } else {
-      link_url = url ? url : url_stub;
+      link_url = url || url_stub;
     }
   } else if (url && !Array.isArray(url)) {
     link_url = url;
   }
-  if (link.toLowerCase() == "insdc" && slug && slug.startsWith("GCA_")) {
+  if (
+    link &&
+    link.toLowerCase() == "insdc" &&
+    slug &&
+    slug.startsWith("GCA_")
+  ) {
     return (
       <>
         <ExternalLink
@@ -171,7 +179,7 @@ const NestedTable = ({
               if (row.is_primary) {
                 comment = `Primary value. ${comment}`;
               }
-              let value = row.value;
+              let { value } = row;
               if (Array.isArray(value)) {
                 value = [...new Set(value)]
                   .sort((a, b) => `${a}`.localeCompare(b))

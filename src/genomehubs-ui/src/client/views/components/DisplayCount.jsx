@@ -43,6 +43,7 @@ export const DisplayCount = ({
                 fontWeight: "bold",
                 display: "inline-flex",
                 alignItems: "center",
+                opacity: count == "..." ? 0.5 : 1,
               }}
             >
               {isNaN(count)

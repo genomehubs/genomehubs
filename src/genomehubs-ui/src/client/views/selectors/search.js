@@ -1,9 +1,13 @@
 import { apiUrl, setApiStatus } from "../reducers/api";
 import {
+  cancelQuery,
   cancelSearch,
+  getQueryResultById,
   getSearchDefaults,
   getSearchHistory,
+  receiveQuery,
   receiveSearch,
+  requestQuery,
   requestSearch,
   setPreferSearchTerm,
   setSearchHistory,
@@ -114,6 +118,31 @@ export function fetchSearchResults(options, navigate) {
       }
     } catch (err) {
       dispatch(cancelSearch);
+      return dispatch(setApiStatus(false));
+    }
+  };
+}
+
+export function fetchQueryResults(queryString) {
+  return async function (dispatch) {
+    const state = store.getState();
+    if (getQueryResultById(state, queryString)) {
+      return;
+    }
+    dispatch(requestQuery());
+    const endpoint = "search";
+    let url = `${apiUrl}/${endpoint}?${queryString}`;
+    try {
+      let json;
+      try {
+        const response = await fetch(url);
+        json = await response.json();
+      } catch (error) {
+        json = console.log("An error occured.", error);
+      }
+      dispatch(receiveQuery({ json, queryString }));
+    } catch (err) {
+      dispatch(cancelQuery);
       return dispatch(setApiStatus(false));
     }
   };
