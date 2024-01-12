@@ -512,11 +512,12 @@ def load_genome_tsv(file):
     with open(file, newline="") as tsv_file:
         reader = csv.DictReader(tsv_file, delimiter="\t")
         for row in reader:
-            if row["sourceAccession"] == "None":
-                row["organelles"] = []
-                rows[row["genbankAssmAccession"]] = row
-            else:
-                rows[row["sourceAccession"]]["organelles"].append(row)
+            if "sourceAccession" in row:
+                if row["sourceAccession"] == "None":
+                    row["organelles"] = []
+                    rows[row["genbankAssmAccession"]] = row
+                else:
+                    rows[row["sourceAccession"]]["organelles"].append(row)
     return rows
 
 

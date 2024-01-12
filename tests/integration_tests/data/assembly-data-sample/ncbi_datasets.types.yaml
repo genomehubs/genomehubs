@@ -4,11 +4,13 @@ attributes:
     header: assemblyLevel
     organelle: nucleus
     source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   assembly_type:
     display_group: sample
     header: assemblyType
     organelle: nucleus
     source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   bioproject:
     display_group: sample
     header: bioProjectAccession
@@ -16,6 +18,7 @@ attributes:
     separator:
     - ;
     source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   biosample:
     display_group: sample
     header: biosampleAccession
@@ -23,36 +26,43 @@ attributes:
     separator:
     - ;
     source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   elevation:
     display_group: sample
     header: elevation
     organelle: nucleus
     source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   estimated_genome_size:
     display_group: sample
     header: estimated_size
     organelle: nucleus
     source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   isolate:
     display_group: sample
     header: isolate
     organelle: nucleus
     source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   location_name:
     display_group: sample
     header: geo_loc_name
     organelle: nucleus
     source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   num_replicons:
     display_group: sample
     header: num_replicons
     organelle: nucleus
     source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   ploidy:
     display_group: sample
     header: ploidy
     organelle: nucleus
     source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   sample_location:
     display_group: sample
     header:
@@ -61,16 +71,19 @@ attributes:
     join: ','
     organelle: nucleus
     source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   sample_sex:
     display_group: sample
     header: sex
     organelle: nucleus
     source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   submitter:
     display_group: sample
     header: submitter
     organelle: nucleus
     source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
 file:
   display_group: sample
   format: tsv
