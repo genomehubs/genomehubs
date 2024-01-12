@@ -61,7 +61,6 @@ const ExternalLink = ({ url, link }) => {
 
 const SourceLink = ({ row, types, format = "short" }) => {
   let link, link_url;
-  console.log(row);
   link = row.source || types.source;
   let url_stub = row.source_url_stub || types.source_url_stub;
   let url = row.source_url || types.source_url || types.url;

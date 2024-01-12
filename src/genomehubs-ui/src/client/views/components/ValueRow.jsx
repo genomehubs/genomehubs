@@ -86,7 +86,7 @@ const ValueRow = ({
       }
     }
   } catch (err) {
-    throw err;
+    // throw err;
     return null;
   }
 

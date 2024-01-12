@@ -4,11 +4,15 @@
 import contextlib
 import csv
 import gzip
+import json
+import math
 import os
 import re
+import subprocess
 from collections import Counter
 from collections import defaultdict
 from itertools import groupby
+from itertools import accumulate
 from operator import itemgetter
 from urllib.error import ContentTooShortError
 
@@ -204,18 +208,126 @@ def refseq_organelle_parser(collections, opts, *, types=None, names=None):
     return parsed
 
 
+def fetch_sequences_report(accession):
+    """Fetch a sequence report from NCBI datasets."""
+    result = subprocess.run(
+        [
+            "datasets",
+            "summary",
+            "genome",
+            "accession",
+            accession,
+            "--report",
+            "sequence",
+        ],
+        stdout=subprocess.PIPE,
+        timeout=15,
+    )
+    return result.stdout
+
+
+def add_organelle_entries(obj, organelles):
+    """Add entries for co-assembled organelles."""
+    obj["organelles"] = []
+    for seq in organelles.values():
+        organelle = {
+            k: obj[k]
+            for k in obj.keys()
+            & {
+                "taxId",
+                "organismName",
+                "commonName",
+                "releaseDate",
+                "submitter",
+                "bioProjectAccession",
+                "biosampleAccession",
+            }
+        }
+        organelle["sourceAccession"] = obj["genbankAssmAccession"]
+        organelle["organelle"] = seq[0]["assigned_molecule_location_type"]
+        organelle_name = (
+            "mitochondrion"
+            if seq[0]["assigned_molecule_location_type"] == "Mitochondrion"
+            else "plastid"
+        )
+        if len(seq) == 1 and seq[0]["role"] == "assembled-molecule":
+            organelle["genbankAssmAccession"] = seq[0]["genbank_accession"]
+            organelle["totalSequenceLength"] = seq[0]["length"]
+            organelle["gcPercent"] = seq[0]["gc_percent"]
+            obj[f"{organelle_name}AssemblySpan"] = organelle["totalSequenceLength"]
+            obj[f"{organelle_name}GcPercent"] = organelle["gcPercent"]
+            obj[f"{organelle_name}Accession"] = seq[0]["genbank_accession"]
+        else:
+            obj[f"{organelle_name}Scaffolds"] = ";".join(
+                [entry["genbank_accession"] for entry in seq]
+            )
+        obj["organelles"].append(organelle)
+
+
+def add_chromosome_entries(obj, chromosomes):
+    """Add feature entries for assembled chromosomes."""
+    obj["chromosomes"] = []
+    for seq in chromosomes:
+        obj["chromosomes"].append(
+            {
+                "sequence_id": seq["genbank_accession"],
+                "start": 1,
+                "end": seq["length"],
+                "strand": 1,
+                "length": seq["length"],
+                "midpoint": math.round(seq["length"] / 2),
+                "midpoint_proportion": 0.5,
+                "seq_proportion": seq["length"] / obj["totalSequenceLength"],
+            }
+        )
+
+
 def metricDates(obj):
     """Add date fields for assemblies with sufficient metrics."""
-    if "contigN50" in obj and "scaffoldN50" in obj and "assemblyLevel" in obj:
-        contig_n50 = obj.get("contigN50", 0)
-        scaffold_n50 = obj.get("scaffoldN50", 0)
-        assembly_level = obj.get("assemblyLevel", "Contig")
-        if (
-            contig_n50 > 1000000
-            and scaffold_n50 > 10000000
-            and assembly_level in ["Chromosome", "Complete Genome"]
-        ):
-            obj["ebpMetricDate"] = obj["releaseDate"]
+    accession = obj["genbankAssmAccession"]
+    print(accession)
+    span = int(obj["totalSequenceLength"])
+    organelles = defaultdict(list)
+    try:
+        report = fetch_sequences_report(accession)
+        data = json.loads(report)
+    except Exception as err:
+        print(err)
+        return
+    chromosomes = []
+    assigned_span = 0
+    for seq in data["reports"]:
+        if seq["assembly_unit"] == "non-nuclear":
+            organelles[seq["chr_name"]].append(seq)
+        elif seq["assembly_unit"] == "Primary Assembly":
+            if seq["assigned_molecule_location_type"] in [
+                "Chromosome",
+                "Linkage Group",
+            ] and seq["role"] in ["assembled-molecule", "unlocalized-scaffold"]:
+                assigned_span += seq["length"]
+                if seq["role"] == "assembled-molecule":
+                    chromosomes.append(seq)
+
+    if organelles:
+        add_organelle_entries(obj, organelles)
+    contig_n50 = obj.get("contigN50", 0)
+    scaffold_n50 = obj.get("scaffoldN50", 0)
+    if not chromosomes:
+        obj["assignedProportion"] = None
+        return
+    obj["assignedProportion"] = assigned_span / span
+    # add_chromosome_entries(obj, chromosomes)
+    standardCriteria = []
+    if contig_n50 > 1000000 and scaffold_n50 > 10000000:
+        standardCriteria.append("6.7.Q40")
+    if obj["assignedProportion"] >= 0.9:
+        if contig_n50 >= 1000000:
+            standardCriteria.append("6.C.Q40")
+        elif scaffold_n50 < 1000000 and contig_n50 >= 100000:
+            standardCriteria.append("5.C.Q40")
+    if standardCriteria:
+        obj["ebpStandardDate"] = obj["releaseDate"]
+        obj["ebpStandardCriteria"] = ";".join(standardCriteria)
 
 
 def get_biosample_attributes(biosample):
@@ -232,14 +344,14 @@ def get_biosample_attributes(biosample):
     return obj
 
 
-def parse_ncbi_datasets_record(record, parsed):
+def parse_ncbi_datasets_record(record, parsed, previous):
     """Parse a single NCBI datasets record."""
     organism = record.get("organism", {})
     obj = {
         key: organism.get(key, "None")
         for key in ("taxId", "organismName", "commonName")
     }
-
+    obj["organelle"] = "Nucleus"
     obj["genbankAssmAccession"] = record["accession"]
     if "pairedAccession" in record:
         if record["pairedAccession"].startswith("GCF_"):
@@ -247,6 +359,9 @@ def parse_ncbi_datasets_record(record, parsed):
         else:
             obj["refseqAssmAccession"] = record["accession"]
             obj["genbankAssmAccession"] = record["pairedAccession"]
+
+    if obj["genbankAssmAccession"] in parsed:
+        obj = parsed[obj["genbankAssmAccession"]]
     assemblyInfo = record.get("assemblyInfo", {})
     annotationInfo = record.get("annotationInfo", {})
     if assemblyInfo.get("atypical", False):
@@ -262,9 +377,18 @@ def parse_ncbi_datasets_record(record, parsed):
         "submitter",  #
     ):
         obj[key] = assemblyInfo.get(key, annotationInfo.get(key, "None"))
+    if (
+        obj["genbankAssmAccession"] in previous
+        and obj["releaseDate"] == previous[obj["genbankAssmAccession"]]["releaseDate"]
+    ):
+        parsed[obj["genbankAssmAccession"]] = previous[obj["genbankAssmAccession"]]
+        if "organelles" in previous[obj["genbankAssmAccession"]]:
+            for organelle in previous[obj["genbankAssmAccession"]]["organelles"]:
+                parsed[organelle["genbankAssmAccession"]] = organelle
+        return
     if "refseqAssmAccession" not in obj or obj["refseqAssmAccession"] == "na":
         obj["refseqAssmAccession"] = "None"
-    elif obj["refseqCategory"] != "None":
+    if obj["refseqCategory"] != "None":
         obj["primaryValue"] = 1
     if annotationInfo:
         annot = {
@@ -298,7 +422,8 @@ def parse_ncbi_datasets_record(record, parsed):
         obj[key] = biosampleAttributes.get(key, "None")
     assemblyStats = record.get("assemblyStats", {})
     obj.update(assemblyStats)
-    metricDates(obj)
+    if "assignedProportion" not in obj:
+        metricDates(obj)
     wgsInfo = record.get("wgsInfo", {})
     for key in ("masterWgsUrl", "wgsContigsUrl", "wgsProjectAccession"):
         obj[key] = wgsInfo.get(key, "None")
@@ -308,9 +433,13 @@ def parse_ncbi_datasets_record(record, parsed):
                 parsed[obj["genbankAssmAccession"]][key] = value
     elif obj["genbankAssmAccession"].startswith("GCA_"):
         parsed[obj["genbankAssmAccession"]] = obj
+        if "organelles" in obj:
+            for organelle in obj["organelles"]:
+                if "genbankAssmAccession" in organelle:
+                    parsed[organelle["genbankAssmAccession"]] = organelle
 
 
-def parse_ncbi_datasets_sample(record, parsed):
+def parse_ncbi_datasets_sample(record, parsed, previous):
     """Parse sample information from a single NCBI datasets record."""
     organism = record.get("organism", {})
     obj = {
@@ -377,19 +506,35 @@ def parse_ncbi_datasets_sample(record, parsed):
     parsed[obj["biosampleAccession"]] = obj
 
 
+def load_genome_tsv(file):
+    """Load rows from a TSV file."""
+    rows = {}
+    with open(file, newline="") as tsv_file:
+        reader = csv.DictReader(tsv_file, delimiter="\t")
+        for row in reader:
+            if row["sourceAccession"] == "None":
+                row["organelles"] = []
+                rows[row["genbankAssmAccession"]] = row
+            else:
+                rows[row["sourceAccession"]]["organelles"].append(row)
+    return rows
+
+
 def ncbi_genome_parser(params, opts, *, types=None, names=None):
     """Parse NCBI Datasets genome report."""
     parsed = {}
     jsonl = opts[f"ncbi-datasets-{params}"]
     if not jsonl.endswith(".jsonl"):
         jsonl = f"{jsonl}/ncbi_dataset/data/assembly_data_report.jsonl"
+    outfile = opts["outfile"]
+    previous = load_genome_tsv(outfile) if os.path.isfile(outfile) else {}
     with tofile.open_file_handle(jsonl) as report:
         for line in report:
             record = ujson.loads(line)
             if params == "sample":
-                parse_ncbi_datasets_sample(record, parsed)
+                parse_ncbi_datasets_sample(record, parsed, previous)
             else:
-                parse_ncbi_datasets_record(record, parsed)
+                parse_ncbi_datasets_record(record, parsed, previous)
     return list(parsed.values())
 
 
@@ -509,7 +654,7 @@ def group_by_taxon(rows, grouped=None):
     return rows
 
 
-def load_tsv(file):
+def load_sra_tsv(file):
     """Load rows from a TSV file."""
     grouped = defaultdict(lambda: {"count": 0, "reads": 0, "runs": []})
     with open(file, newline="") as tsv_file:
@@ -545,7 +690,7 @@ def sra_parser(params, opts, *, types=None, names=None):
     """Parse SRA efetch xml."""
     outfile = opts["outfile"]
     # Load older runs from tsv
-    previous = load_tsv(outfile) if os.path.isfile(outfile) else None
+    previous = load_sra_tsv(outfile) if os.path.isfile(outfile) else None
     xml_file = opts["sra"]
     # Load newer runs from xml
     rows = parse_sra_xml(xml_file)

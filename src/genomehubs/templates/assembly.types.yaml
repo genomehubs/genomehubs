@@ -36,6 +36,8 @@ identifiers:
   assembly_name:
     header: assemblyName
 attributes:
+  organelle:
+    header: organelle
   bioproject:
     header: bioProjectAccession
     separator:
@@ -62,6 +64,8 @@ attributes:
     header: assemblyType
   assembly_span:
     header: totalSequenceLength
+  gc_percent:
+    header: gcPercent
   ungapped_span:
     display_name: Ungapped span
   contig_n50:
@@ -82,12 +86,42 @@ attributes:
     header: numberOfComponentSequences
   last_updated:
     header: releaseDate
-  ebp_metric_date:
-    header: ebpMetricDate
+  ebp_standard_date:
+    header: ebpStandardDate
+  ebp_standard_criteria:
+    header: ebpStandardCriteria
+    separator:
+      - ;
   refseq_category:
     header: refseqCategory
   submitter:
     header: submitter
+  source_accession:
+    header: sourceAccession
+  mitochondrion_assembly_span:
+    header: mitochondrionAssemblySpan
+  mitochondrion_gc_percent:
+    header: mitochondrionGcPercent
+  mitochondrion_accession:
+    header: mitochondrionAccession
+    separator:
+      - ;
+  mitochondrion_scaffolds:
+    header: mitochondrionScaffolds
+    separator:
+      - ;
+  plastid_assembly_span:
+    header: plastidAssemblySpan
+  plastid_gc_percent:
+    header: plastidGcPercent
+  plastid_accession:
+    header: plastidAccession
+    separator:
+      - ;
+  plastid_scaffolds:
+    header: plastidScaffolds
+    separator:
+      - ;
 metadata:
   source_slug:
     header: genbankAssmAccession
