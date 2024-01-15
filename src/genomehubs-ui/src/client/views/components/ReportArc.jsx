@@ -1,5 +1,6 @@
 import {
   Cell,
+  ComposedChart,
   Label,
   Line,
   Pie,
@@ -54,7 +55,7 @@ const arc = (
     or +
     " " +
     or +
-    ` 0 ${!flag ? 1 : 0} 1 ` +
+    ` 0 ${flag ? 0 : 1} 1 ` +
     endX +
     " " +
     endY + // outer
@@ -66,11 +67,39 @@ const arc = (
     ir +
     " " +
     ir +
-    ` 0 ${!flag ? 1 : 0} 0 ` +
+    ` 0 ${flag ? 0 : 1} 0 ` +
     iendX +
     " " +
     iendY // inner
   );
+};
+const setupArc = ({
+  cx,
+  cy,
+  innerRadius,
+  outerRadius,
+  startAngle,
+  endAngle,
+}) => {
+  const RADIAN = Math.PI / 180;
+  const startX = cx + outerRadius * Math.cos(-startAngle * RADIAN);
+  const startY = cy + outerRadius * Math.sin(-startAngle * RADIAN);
+  const endX = cx + outerRadius * Math.cos(-endAngle * RADIAN);
+  const endY = cy + outerRadius * Math.sin(-endAngle * RADIAN);
+  const istartX = cx + innerRadius * Math.cos(-endAngle * RADIAN);
+  const istartY = cy + innerRadius * Math.sin(-endAngle * RADIAN);
+  const iendX = cx + innerRadius * Math.cos(-startAngle * RADIAN);
+  const iendY = cy + innerRadius * Math.sin(-startAngle * RADIAN);
+  return {
+    startX,
+    startY,
+    endX,
+    endY,
+    istartX,
+    istartY,
+    iendX,
+    iendY,
+  };
 };
 
 const PieComponent = ({ data, height, width, colors }) => {
@@ -152,36 +181,6 @@ const PieComponent = ({ data, height, width, colors }) => {
         </text>
       </g>
     );
-  };
-
-  const setupArc = ({
-    cx,
-    cy,
-    innerRadius,
-    outerRadius,
-    startAngle,
-    endAngle,
-  }) => {
-    console.log({ cx, cy, startAngle, endAngle, innerRadius, outerRadius });
-    const RADIAN = Math.PI / 180;
-    const startX = cx + outerRadius * Math.cos(-startAngle * RADIAN);
-    const startY = cy + outerRadius * Math.sin(-startAngle * RADIAN);
-    const endX = cx + outerRadius * Math.cos(-endAngle * RADIAN);
-    const endY = cy + outerRadius * Math.sin(-endAngle * RADIAN);
-    const istartX = cx + innerRadius * Math.cos(-endAngle * RADIAN);
-    const istartY = cy + innerRadius * Math.sin(-endAngle * RADIAN);
-    const iendX = cx + innerRadius * Math.cos(-startAngle * RADIAN);
-    const iendY = cy + innerRadius * Math.sin(-startAngle * RADIAN);
-    return {
-      startX,
-      startY,
-      endX,
-      endY,
-      istartX,
-      istartY,
-      iendX,
-      iendY,
-    };
   };
 
   const CustomLabel = ({ viewBox, value1, value2, value3, value4 }) => {
@@ -300,7 +299,6 @@ const PieComponent = ({ data, height, width, colors }) => {
   const xValue = data[0].value;
   const yValue = data[1].value;
   const zValue = data[2] ? data[2].value : 0;
-  console.log(data);
   const ratio = zValue
     ? pct1((xValue + yValue) / (xValue + yValue + zValue))
     : pct1(xValue / (xValue + yValue));
@@ -377,6 +375,7 @@ const RadialBarComponent = ({
   pointSize,
   compactLegend,
   compactWidth = 300,
+  portion = "xPortion",
 }) => {
   const renderRadialBarLabel = (props) => {
     const {
@@ -397,8 +396,42 @@ const RadialBarComponent = ({
     const fontSize = (viewBox.outerRadius - viewBox.innerRadius) / 2;
     let offset = 0;
     let row = 1;
+    let angle = 180 - data.yPortion * 180;
+    let strokeWidth = (viewBox.outerRadius - viewBox.innerRadius) / 15;
+    let innerRadius = viewBox.innerRadius + strokeWidth / 2;
+    let outerRadius = viewBox.outerRadius - strokeWidth / 2;
+    const { startX, startY, endX, endY, istartX, istartY, iendX, iendY } =
+      setupArc({
+        cx,
+        cy,
+        innerRadius,
+        outerRadius,
+        startAngle: 180,
+        endAngle: angle,
+      });
     return (
       <g>
+        <path
+          d={arc(
+            startX,
+            startY,
+            innerRadius,
+            outerRadius,
+            endX,
+            endY,
+            istartX,
+            istartY,
+            iendX,
+            iendY,
+            endX > startX
+          )}
+          fill={data.fill}
+          fillOpacity={0.3}
+          stroke={data.fill}
+          strokeWidth={strokeWidth}
+          // strokeDasharray={`1 ${strokeWidth * 2}`}
+          // strokeLinecap={"round"}
+        />
         {width >= compactWidth && (
           <g
             fill={fill}
@@ -412,12 +445,14 @@ const RadialBarComponent = ({
               dominantBaseline="alphabetic"
               alignmentBaseline="middle"
             >
-              {pct1(value)}
+              {pct1(data.yPortion || data.xPortion)}
             </text>
           </g>
         )}
         <Tooltip
-          title={`${data.name}: ${data.xValue} / ${data.yValue}`}
+          title={`${data.name}: ${data.xValue} / ${data.yValue}${
+            data.zValue ? ` / ${data.zValue}` : ""
+          }`}
           arrow
           placement="top"
         >
@@ -432,6 +467,16 @@ const RadialBarComponent = ({
             }
           />
         </Tooltip>
+        {/* <line
+          x1={istartX}
+          x2={endX}
+          y1={istartY}
+          y2={endY}
+          fill={"none"}
+          stroke={data.fill}
+          strokeWidth={strokeWidth}
+        /> */}
+
         <g transform={`translate(0,${cy + 5})`}>
           {MultiCatLegend({
             width: width * 0.96,
@@ -440,7 +485,11 @@ const RadialBarComponent = ({
             i: data.index,
             n,
             name: data.name,
-            stats: { count: data.xValue, total: data.yValue },
+            stats: {
+              count: data.xValue,
+              total: data.yValue,
+              ...(data.zValue && { all: data.zValue }),
+            },
             legendWidth: 100,
             pointSize,
             offset: catOffsets[catTranslations[data.name]].offset,
@@ -453,9 +502,9 @@ const RadialBarComponent = ({
   };
   let bounds = { cats: [] };
   for (let d of data) {
-    let name = d.name;
+    let { name } = d;
     let { string } = valueString({
-      stats: { count: d.xValue, total: d.yValue },
+      stats: { count: d.xValue, total: d.yValue, all: d.zValue },
     });
     let nameLen = stringLength(name);
     let strLen = stringLength(string);
@@ -486,7 +535,7 @@ const RadialBarComponent = ({
   let innerRadius = Math.floor(plotWidth * 0.1);
   let outerRadius = Math.floor(plotWidth * 0.5);
   let background = "#cccccc";
-  return (
+  let chart = (
     <RadialBarChart
       width={width}
       height={plotHeight}
@@ -503,28 +552,113 @@ const RadialBarComponent = ({
 
       <RadialBar
         minAngle={15}
-        label={{
-          position: "inside",
-          fill: "white",
-          content: (props) =>
-            renderRadialBarLabel({
-              ...props,
-              data: data[props.index],
-              background,
-              width,
-              n: data.length,
-              catOffsets,
-              catTranslations,
-              legendRows,
-            }),
-        }}
+        label={
+          portion == "xPortion" && {
+            position: "inside",
+            fill: "white",
+            content: (props) =>
+              renderRadialBarLabel({
+                ...props,
+                data: data[props.index],
+                background,
+                width,
+                n: data.length,
+                catOffsets,
+                catTranslations,
+                legendRows,
+              }),
+          }
+        }
         background={{ fill: background }}
         clockWise={false}
-        dataKey="xPortion"
+        dataKey={portion}
         isAnimationActive={false}
       />
     </RadialBarChart>
   );
+  if (portion == "yPortion") {
+    chart = (
+      <div style={{ position: "relative", height: plotHeight, width }}>
+        <div style={{ position: "absolute", top: 0, left: 0 }}>
+          <RadialBarChart
+            width={width}
+            height={plotHeight}
+            cx="50%"
+            cy={plotWidth / 2}
+            innerRadius={innerRadius}
+            outerRadius={outerRadius}
+            startAngle={180}
+            endAngle={0}
+            data={data}
+            fontFamily={"sans-serif"}
+          >
+            <PolarAngleAxis type="number" domain={[0, 1]} tick={false} />
+
+            <RadialBar
+              label={{
+                position: "inside",
+                fill: "white",
+                content: (props) =>
+                  renderRadialBarLabel({
+                    ...props,
+                    data: data[props.index],
+                    background,
+                    width,
+                    n: data.length,
+                    catOffsets,
+                    catTranslations,
+                    legendRows,
+                  }),
+              }}
+              background={{ fill: background }}
+              clockWise={false}
+              dataKey={"xPortion"}
+              isAnimationActive={false}
+            />
+          </RadialBarChart>
+        </div>
+        <div style={{ position: "absolute", top: 0, left: 0 }}>
+          {/* <RadialBarChart
+            width={width}
+            height={plotHeight}
+            cx="50%"
+            cy={plotWidth / 2}
+            innerRadius={innerRadius}
+            outerRadius={outerRadius}
+            startAngle={180}
+            endAngle={0}
+            data={data}
+            fontFamily={"sans-serif"}
+          >
+            <PolarAngleAxis type="number" domain={[0, 1]} tick={false} />
+
+            <RadialBar
+              label={{
+                position: "inside",
+                fill: "white",
+                content: (props) =>
+                  renderRadialBarLabel({
+                    ...props,
+                    data: data[props.index],
+                    background,
+                    width,
+                    n: data.length,
+                    catOffsets,
+                    catTranslations,
+                    legendRows,
+                  }),
+              }}
+              // background={{ fill: background }}
+              clockWise={false}
+              dataKey={"nullPortion"}
+              isAnimationActive={false}
+            />
+          </RadialBarChart> */}
+        </div>
+      </div>
+    );
+  }
+  return chart;
 };
 
 const ReportArc = ({
@@ -545,7 +679,7 @@ const ReportArc = ({
   showLegend,
   basename,
 }) => {
-  const componentRef = chartRef ? chartRef : useRef();
+  const componentRef = chartRef || useRef();
   const { width, height } = inModal
     ? containerRef
       ? useResize(containerRef)
@@ -606,6 +740,7 @@ const ReportArc = ({
   if (arc && arc.status) {
     let chartData = [];
     let chart;
+    let nQueries = 2;
     if (Array.isArray(arc.report.arc)) {
       arc.report.arc.forEach((report, i) => {
         ({ levels, colors } = setColors({
@@ -615,21 +750,15 @@ const ReportArc = ({
           count: arc.report.arc.length,
           colors,
         }));
-        let {
-          arc: currentArc,
-          arc2: currentArc2,
-          x,
-          y,
-          z,
-          rank,
-          xQuery,
-          yQuery,
-        } = report;
+        let { x, y, z, rank, xQuery, yQuery } = report;
+        if (z) {
+          nQueries = 3;
+        }
         chartData.push({
           xValue: x,
-          xPortion: currentArc,
+          xPortion: z ? x / z : x / y,
           yValue: y,
-          yProportion: currentArc2,
+          yPortion: y / z,
           zValue: z,
           index: i,
           name: rank,
@@ -651,6 +780,7 @@ const ReportArc = ({
           pointSize={pointSize}
           compactLegend={compactLegend}
           compactWidth={compactWidth}
+          portion={nQueries == 3 ? "yPortion" : "xPortion"}
         />
       );
     } else {

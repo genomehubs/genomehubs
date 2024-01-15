@@ -384,7 +384,6 @@ export const arc = async ({
       },
     };
   }
-  console.log({ x, y, z });
   if (result == "taxon" && !rank) {
     return {
       status: {
@@ -446,7 +445,6 @@ export const arc = async ({
   yParams.fields = yFields;
   let yCount = await getResultCount({ ...yParams });
   let yQuery = { ...yParams };
-  console.log(yCount);
 
   if (zFields.length > 0) {
     zQuery.fields = zFields.join(",");
@@ -489,6 +487,39 @@ export const arc = async ({
       },
     };
   }
+};
+
+const reduceRepetition = ({ x = "", y = "", z = "" }) => {
+  let partsX = x.split(/\sAND\s/i);
+  let partsY = y.split(/\sAND\s/i);
+  let partsZ = z.split(/\sAND\s/i);
+  let filteredX = [];
+  let filteredY = [];
+  for (let partX of partsX) {
+    let hasMatch = false;
+    for (let partY of partsY) {
+      if (partX == partY) {
+        hasMatch = true;
+        break;
+      }
+    }
+    if (!hasMatch) {
+      filteredX.push(partX);
+    }
+  }
+  for (let partY of partsY) {
+    let hasMatch = false;
+    for (let partZ of partsZ) {
+      if (partY == partZ) {
+        hasMatch = true;
+        break;
+      }
+    }
+    if (!hasMatch) {
+      filteredY.push(partY);
+    }
+  }
+  return { minX: filteredX.join(" AND "), minY: filteredY.join(" AND ") };
 };
 
 export const arcPerRank = async ({
@@ -541,11 +572,15 @@ export const arcPerRank = async ({
     taxa = "taxa";
   }
   let caption = taxa;
+  let { minX, minY } = reduceRepetition({ x, y, z });
   if (x) {
-    caption += ` with ${x} out of all ${taxa}`;
+    caption += ` with ${z ? minY : minX} out of all ${taxa}`;
   }
   if (y) {
-    caption += ` with ${y}`;
+    caption += ` with ${z || minY}`;
+  }
+  if (z) {
+    caption += ` highlighting those with ${minX}`;
   }
   return {
     status,

@@ -104,9 +104,14 @@ export const valueString = ({ stats, cellSize, pointSize, fill }) => {
     } else if (stats.count) {
       let num = formats(stats.count, "integer");
       let denom = formats(stats.total, "integer");
+      let all;
       string = num;
       if (denom) {
         string += ` / ${denom}`;
+      }
+      if (stats.all) {
+        all = formats(stats.all, "integer");
+        string += ` / ${all}`;
       }
       value = (
         <text
@@ -118,8 +123,21 @@ export const valueString = ({ stats, cellSize, pointSize, fill }) => {
           fontSize={pointSize}
         >
           {/* <tspan>{"n="}</tspan> */}
-          <tspan fill={fill}>{num}</tspan>
-          {stats.total && <tspan>{` / ${denom}`}</tspan>}
+          <tspan fill={fill} style={{ fontWeight: "bold" }}>
+            {num}
+          </tspan>
+          {stats.total && (
+            <>
+              {" / "}
+              <tspan fill={fill}>{denom}</tspan>
+            </>
+          )}
+          {stats.all && (
+            <>
+              {" / "}
+              <tspan>{all}</tspan>
+            </>
+          )}
         </text>
       );
     }
