@@ -369,6 +369,7 @@ export const tablePerRank = async ({
 export const arc = async ({
   x,
   y,
+  z = y,
   result,
   taxonomy,
   rank,
@@ -383,6 +384,7 @@ export const arc = async ({
       },
     };
   }
+  console.log({ x, y, z });
   if (result == "taxon" && !rank) {
     return {
       status: {
@@ -391,15 +393,23 @@ export const arc = async ({
       },
     };
   }
-  let { params, fields } = await queryParams({
+  let { params: zParams, fields: zFields } = await queryParams({
+    term: z,
+    result,
+    taxonomy,
+    rank,
+  });
+  let { params: yParams, fields: yFields } = await queryParams({
     term: y,
     result,
     taxonomy,
     rank,
   });
-  params.includeEstimates = apiParams.hasOwnProperty("includeEstimates")
+  zParams.includeEstimates = apiParams.hasOwnProperty("includeEstimates")
     ? apiParams.includeEstimates
     : false;
+  yParams.includeEstimates = zParams.includeEstimates;
+
   if (rank) {
     x.split(/\s+(?:and|AND)\s+/).forEach((term) => {
       if (!term.match("tax_")) {
@@ -407,29 +417,52 @@ export const arc = async ({
         if (field.match(/\(/)) {
           field = field.split(/[\(\)]/)[1];
         }
-        fields.push(field);
+        yFields.push(field);
+        zFields.push(field);
       }
     });
-    if (fields.length == 0) {
-      fields = [];
+    if (yFields.length == 0) {
+      yFields = [];
     }
-    fields = [...new Set(fields)];
+    yFields = [...new Set(yFields)];
+    (y || "").split(/\s+(?:and|AND)\s+/).forEach((term) => {
+      if (!term.match("tax_")) {
+        let field = term.replace(/[^\w_\(\)].+$/, "");
+        if (field.match(/\(/)) {
+          field = field.split(/[\(\)]/)[1];
+        }
+        zFields.push(field);
+      }
+    });
+    if (zFields.length == 0) {
+      zFields = [];
+    }
+    zFields = [...new Set(zFields)];
   }
-  params.fields = fields;
-  let yCount = await getResultCount({ ...params });
-  let yQuery = { ...params };
-  if (fields.length > 0) {
-    yQuery.fields = fields.join(",");
+
+  zParams.fields = zFields;
+  let zCount = await getResultCount({ ...zParams });
+  let zQuery = { ...zParams };
+  yParams.fields = yFields;
+  let yCount = await getResultCount({ ...yParams });
+  let yQuery = { ...yParams };
+  console.log(yCount);
+
+  if (zFields.length > 0) {
+    zQuery.fields = zFields.join(",");
   }
-  params.query = combineQueries(params.query, x);
-  params.excludeDirect = apiParams.excludeDirect || [];
-  params.excludeDescendant = apiParams.excludeDescendant || [];
-  params.excludeAncestral = apiParams.excludeAncestral || [];
-  params.excludeMissing = apiParams.excludeMissing || [];
-  let xCount = await getResultCount({ ...params });
-  let xQuery = params;
-  if (fields.length > 0) {
-    xQuery.fields = fields.join(",");
+  if (yFields.length > 0) {
+    yQuery.fields = yFields.join(",");
+  }
+  yParams.query = combineQueries(yParams.query, x);
+  yParams.excludeDirect = apiParams.excludeDirect || [];
+  yParams.excludeDescendant = apiParams.excludeDescendant || [];
+  yParams.excludeAncestral = apiParams.excludeAncestral || [];
+  yParams.excludeMissing = apiParams.excludeMissing || [];
+  let xCount = await getResultCount({ ...yParams });
+  let xQuery = yParams;
+  if (yFields.length > 0) {
+    xQuery.fields = yFields.join(",");
   }
   if (
     xCount.status &&
@@ -441,6 +474,9 @@ export const arc = async ({
       status: { success: true },
       report: {
         arc: xCount.count > 0 ? xCount.count / yCount.count : 0,
+        ...(zCount && {
+          arc2: yCount.count > 0 ? yCount.count / zCount.count : 0,
+        }),
         x: xCount.count,
         y: yCount.count,
         xTerm: x,
@@ -448,6 +484,7 @@ export const arc = async ({
         ...(rank && { rank }),
         xQuery,
         yQuery,
+        ...(z != y && { z: zCount.count, zTerm: z, zQuery }),
         queryString,
       },
     };
@@ -457,6 +494,7 @@ export const arc = async ({
 export const arcPerRank = async ({
   x,
   y,
+  z,
   result,
   taxonomy,
   rank,
@@ -472,6 +510,7 @@ export const arcPerRank = async ({
     let res = await arc({
       x,
       y,
+      z,
       result,
       rank,
       taxonomy,

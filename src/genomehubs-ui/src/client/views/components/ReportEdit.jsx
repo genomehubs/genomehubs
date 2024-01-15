@@ -160,6 +160,7 @@ export const queryPropList = {
     "x",
     ...nestedQueries,
     "y",
+    "z",
     rankSettings,
     "includeEstimates",
     pointSizeSettings,

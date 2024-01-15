@@ -1,11 +1,13 @@
 import {
   Cell,
   Label,
+  Line,
   Pie,
   PieChart,
   PolarAngleAxis,
   RadialBar,
   RadialBarChart,
+  Rectangle,
 } from "recharts";
 import MultiCatLegend, {
   processLegendData,
@@ -95,14 +97,23 @@ const PieComponent = ({ data, height, width, colors }) => {
       startAngle -= 0.01;
       endAngle += 0.01;
     }
-    const startX = cx + outerRadius * Math.cos(-startAngle * RADIAN);
-    const startY = cy + outerRadius * Math.sin(-startAngle * RADIAN);
-    const endX = cx + outerRadius * Math.cos(-endAngle * RADIAN);
-    const endY = cy + outerRadius * Math.sin(-endAngle * RADIAN);
-    const istartX = cx + innerRadius * Math.cos(-endAngle * RADIAN);
-    const istartY = cy + innerRadius * Math.sin(-endAngle * RADIAN);
-    const iendX = cx + innerRadius * Math.cos(-startAngle * RADIAN);
-    const iendY = cy + innerRadius * Math.sin(-startAngle * RADIAN);
+    const { startX, startY, endX, endY, istartX, istartY, iendX, iendY } =
+      setupArc({
+        cx,
+        cy,
+        innerRadius,
+        outerRadius,
+        startAngle,
+        endAngle,
+      });
+    // const startX = cx + outerRadius * Math.cos(-startAngle * RADIAN);
+    // const startY = cy + outerRadius * Math.sin(-startAngle * RADIAN);
+    // const endX = cx + outerRadius * Math.cos(-endAngle * RADIAN);
+    // const endY = cy + outerRadius * Math.sin(-endAngle * RADIAN);
+    // const istartX = cx + innerRadius * Math.cos(-endAngle * RADIAN);
+    // const istartY = cy + innerRadius * Math.sin(-endAngle * RADIAN);
+    // const iendX = cx + innerRadius * Math.cos(-startAngle * RADIAN);
+    // const iendY = cy + innerRadius * Math.sin(-startAngle * RADIAN);
 
     return (
       <g>
@@ -143,8 +154,49 @@ const PieComponent = ({ data, height, width, colors }) => {
     );
   };
 
-  const CustomLabel = ({ viewBox, value1, value2, value3 }) => {
-    const { cx, cy, innerRadius } = viewBox;
+  const setupArc = ({
+    cx,
+    cy,
+    innerRadius,
+    outerRadius,
+    startAngle,
+    endAngle,
+  }) => {
+    console.log({ cx, cy, startAngle, endAngle, innerRadius, outerRadius });
+    const RADIAN = Math.PI / 180;
+    const startX = cx + outerRadius * Math.cos(-startAngle * RADIAN);
+    const startY = cy + outerRadius * Math.sin(-startAngle * RADIAN);
+    const endX = cx + outerRadius * Math.cos(-endAngle * RADIAN);
+    const endY = cy + outerRadius * Math.sin(-endAngle * RADIAN);
+    const istartX = cx + innerRadius * Math.cos(-endAngle * RADIAN);
+    const istartY = cy + innerRadius * Math.sin(-endAngle * RADIAN);
+    const iendX = cx + innerRadius * Math.cos(-startAngle * RADIAN);
+    const iendY = cy + innerRadius * Math.sin(-startAngle * RADIAN);
+    return {
+      startX,
+      startY,
+      endX,
+      endY,
+      istartX,
+      istartY,
+      iendX,
+      iendY,
+    };
+  };
+
+  const CustomLabel = ({ viewBox, value1, value2, value3, value4 }) => {
+    const { cx, cy, innerRadius, outerRadius } = viewBox;
+
+    const { startX, startY, endX, endY, istartX, istartY, iendX, iendY } =
+      setupArc({
+        cx,
+        cy,
+        innerRadius: innerRadius * 0.92,
+        outerRadius: innerRadius * 0.96,
+        startAngle: 90,
+        endAngle: 90 - (value4 ? value3 / value4 : value2 / value3) * 360,
+      });
+
     return (
       <g>
         <text
@@ -159,6 +211,27 @@ const PieComponent = ({ data, height, width, colors }) => {
         >
           {value1}
         </text>
+        {/* {value4 && (
+          <>
+            <Rectangle
+              height={innerRadius / 10}
+              width={innerRadius}
+              fill={colors[1]}
+              stroke={"none"}
+              x={cx - innerRadius / 2} // {props.cx + (w - width) / 2}
+              y={cy + innerRadius / 6}
+            />
+            <Rectangle
+              height={innerRadius / 10}
+              width={(innerRadius * value2) / value3}
+              fill={colors[0]}
+              stroke={"none"}
+              x={cx - innerRadius / 2} // {props.cx + (w - width) / 2}
+              y={cy + innerRadius / 6}
+            />
+          </>
+        )} */}
+
         <text
           x={cx}
           y={cy + innerRadius / 5}
@@ -169,25 +242,68 @@ const PieComponent = ({ data, height, width, colors }) => {
           dominantBaseline="alphabetic"
           fontSize={innerRadius / 4.5}
         >
-          <tspan
-            alignmentBaseline="hanging"
-            dominantBaseline="alphabetic"
-            fill={colors[0]}
-          >
-            {value2.toLocaleString()}
+          <tspan alignmentBaseline="hanging" dominantBaseline="alphabetic">
+            {value4 ? value3.toLocaleString() : value2.toLocaleString()}
           </tspan>
           <tspan alignmentBaseline="hanging" dominantBaseline="alphabetic">
             {" "}
-            / {value3.toLocaleString()}
+            / {value4 ? value4.toLocaleString() : value3.toLocaleString()}
           </tspan>
         </text>
+
+        {value4 && (
+          <path
+            d={arc(
+              startX,
+              startY,
+              innerRadius * 0.92,
+              innerRadius * 0.96,
+              endX,
+              endY,
+              istartX,
+              istartY,
+              iendX,
+              iendY,
+              endX > startX
+            )}
+            fill={"#3d405c"}
+          />
+        )}
+        {/* {value4 && (
+          <text
+            x={cx}
+            y={cy - (2 * innerRadius) / 5}
+            fill="#3d405c"
+            className="recharts-text recharts-label"
+            textAnchor="middle"
+            alignmentBaseline="hanging"
+            dominantBaseline="alphabetic"
+            fontSize={innerRadius / 4.5}
+          >
+            <tspan
+              alignmentBaseline="hanging"
+              dominantBaseline="alphabetic"
+              fill={colors[1]}
+            >
+              {value3.toLocaleString()}
+            </tspan>
+            <tspan alignmentBaseline="hanging" dominantBaseline="alphabetic">
+              {" "}
+              / {value4.toLocaleString()}
+            </tspan>
+          </text>
+        )} */}
       </g>
     );
   };
 
   const xValue = data[0].value;
   const yValue = data[1].value;
-  const ratio = pct1(xValue / (xValue + yValue));
+  const zValue = data[2] ? data[2].value : 0;
+  console.log(data);
+  const ratio = zValue
+    ? pct1((xValue + yValue) / (xValue + yValue + zValue))
+    : pct1(xValue / (xValue + yValue));
 
   return (
     <PieChart width={width} height={height} fontFamily={"sans-serif"}>
@@ -216,6 +332,7 @@ const PieComponent = ({ data, height, width, colors }) => {
               value1={ratio}
               value2={xValue}
               value3={xValue + yValue}
+              value4={xValue + yValue + zValue}
             />
           }
         ></Label>
@@ -498,11 +615,22 @@ const ReportArc = ({
           count: arc.report.arc.length,
           colors,
         }));
-        let { arc: currentArc, x, y, rank, xQuery } = report;
+        let {
+          arc: currentArc,
+          arc2: currentArc2,
+          x,
+          y,
+          z,
+          rank,
+          xQuery,
+          yQuery,
+        } = report;
         chartData.push({
           xValue: x,
           xPortion: currentArc,
           yValue: y,
+          yProportion: currentArc2,
+          zValue: z,
           index: i,
           name: rank,
           fill: colors[i % colors.length],
@@ -526,10 +654,12 @@ const ReportArc = ({
         />
       );
     } else {
-      let { x, y, xTerm, yTerm, xQuery, yQuery } = arc.report.arc;
+      let { x, y, z, xTerm, yTerm, zTerm, xQuery, yQuery, zQuery } =
+        arc.report.arc;
       chartData = [
         { value: x, name: xTerm, query: xQuery },
         { value: y - x, name: yTerm, query: yQuery },
+        { value: z - y, name: zTerm, query: zQuery },
       ];
       chartData.navigate = navigate;
       chartData.basename = basename;
@@ -538,7 +668,7 @@ const ReportArc = ({
         colorPalette,
         palettes,
         levels,
-        count: 2,
+        count: z ? 3 : 2,
         colors,
       }));
       chart = (

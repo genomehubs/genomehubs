@@ -39,7 +39,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     query: { not: new Set(["srces"]), as: "x" },
     x: { not: new Set(["srces"]) },
     y: { in: new Set(["scatter", "table", "tree", "arc"]) },
-    z: { in: new Set(["scatter"]) },
+    z: { in: new Set(["arc", "scatter"]) },
     cat: { not: new Set(["sources", "arc"]) },
     rank: { not: new Set(["oxford", "srces", "tree"]) },
     ranks: { in: new Set(["tree"]) },
