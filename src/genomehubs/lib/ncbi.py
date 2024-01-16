@@ -221,7 +221,7 @@ def fetch_sequences_report(accession):
             "sequence",
         ],
         stdout=subprocess.PIPE,
-        timeout=15,
+        timeout=30,
     )
     return result.stdout
 
@@ -293,6 +293,8 @@ def metricDates(obj):
         data = json.loads(report)
     except Exception as err:
         print(err)
+        return
+    if "reports" not in data:
         return
     chromosomes = []
     assigned_span = 0
@@ -422,7 +424,10 @@ def parse_ncbi_datasets_record(record, parsed, previous):
         obj[key] = biosampleAttributes.get(key, "None")
     assemblyStats = record.get("assemblyStats", {})
     obj.update(assemblyStats)
-    if "assignedProportion" not in obj:
+    if (
+        obj["assemblyLevel"] in ["Chromosome", "Complete Genome"]
+        and "assignedProportion" not in obj
+    ):
         metricDates(obj)
     wgsInfo = record.get("wgsInfo", {})
     for key in ("masterWgsUrl", "wgsContigsUrl", "wgsProjectAccession"):
