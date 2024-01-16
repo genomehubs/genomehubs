@@ -82,10 +82,9 @@ const AttributeModal = ({
     }
   }, [options, recordId]);
 
-  if (!record.record) {
+  if (!record.record || record.record.record_id == "none") {
     return <ResultColumnOptions attributeId={attributeId} />;
   }
-
   if (record.record.feature_id) {
     title.unshift(record.record.feature_id);
   }
