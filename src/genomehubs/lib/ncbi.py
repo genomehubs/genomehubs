@@ -226,42 +226,50 @@ def fetch_sequences_report(accession):
     return result.stdout
 
 
+def set_organelle_values(seq, organelle, obj, organelle_name):
+    """Set metadate values for an organelle"""
+    organelle["genbankAssmAccession"] = seq[0]["genbank_accession"]
+    organelle["totalSequenceLength"] = seq[0]["length"]
+    organelle["gcPercent"] = seq[0]["gc_percent"]
+    obj[f"{organelle_name}AssemblySpan"] = organelle["totalSequenceLength"]
+    obj[f"{organelle_name}GcPercent"] = organelle["gcPercent"]
+    obj[f"{organelle_name}Accession"] = seq[0]["genbank_accession"]
+
+
 def add_organelle_entries(obj, organelles):
     """Add entries for co-assembled organelles."""
     obj["organelles"] = []
     for seq in organelles.values():
-        organelle = {
-            k: obj[k]
-            for k in obj.keys()
-            & {
-                "taxId",
-                "organismName",
-                "commonName",
-                "releaseDate",
-                "submitter",
-                "bioProjectAccession",
-                "biosampleAccession",
+        try:
+            organelle = {
+                k: obj[k]
+                for k in obj.keys()
+                & {
+                    "taxId",
+                    "organismName",
+                    "commonName",
+                    "releaseDate",
+                    "submitter",
+                    "bioProjectAccession",
+                    "biosampleAccession",
+                }
             }
-        }
-        organelle["sourceAccession"] = obj["genbankAssmAccession"]
-        organelle["organelle"] = seq[0]["assigned_molecule_location_type"]
-        organelle_name = (
-            "mitochondrion"
-            if seq[0]["assigned_molecule_location_type"] == "Mitochondrion"
-            else "plastid"
-        )
-        if len(seq) == 1 and seq[0]["role"] == "assembled-molecule":
-            organelle["genbankAssmAccession"] = seq[0]["genbank_accession"]
-            organelle["totalSequenceLength"] = seq[0]["length"]
-            organelle["gcPercent"] = seq[0]["gc_percent"]
-            obj[f"{organelle_name}AssemblySpan"] = organelle["totalSequenceLength"]
-            obj[f"{organelle_name}GcPercent"] = organelle["gcPercent"]
-            obj[f"{organelle_name}Accession"] = seq[0]["genbank_accession"]
-        else:
-            obj[f"{organelle_name}Scaffolds"] = ";".join(
-                [entry["genbank_accession"] for entry in seq]
+            organelle["sourceAccession"] = obj["genbankAssmAccession"]
+            organelle["organelle"] = seq[0]["assigned_molecule_location_type"]
+            organelle_name = (
+                "mitochondrion"
+                if seq[0]["assigned_molecule_location_type"] == "Mitochondrion"
+                else "plastid"
             )
-        obj["organelles"].append(organelle)
+            if len(seq) == 1 and seq[0]["role"] == "assembled-molecule":
+                set_organelle_values(seq, organelle, obj, organelle_name)
+            else:
+                obj[f"{organelle_name}Scaffolds"] = ";".join(
+                    [entry["genbank_accession"] for entry in seq]
+                )
+            obj["organelles"].append(organelle)
+        except Exception as err:
+            LOGGER.warn(err)
 
 
 def add_chromosome_entries(obj, chromosomes):
@@ -285,14 +293,14 @@ def add_chromosome_entries(obj, chromosomes):
 def metricDates(obj):
     """Add date fields for assemblies with sufficient metrics."""
     accession = obj["genbankAssmAccession"]
-    print(accession)
+    LOGGER.info(accession)
     span = int(obj["totalSequenceLength"])
     organelles = defaultdict(list)
     try:
         report = fetch_sequences_report(accession)
         data = json.loads(report)
     except Exception as err:
-        print(err)
+        LOGGER.warn(err)
         return
     if "reports" not in data:
         return
@@ -592,8 +600,8 @@ def parse_sra_xml(xml_file):
         for doc_num, doc in split_chunks(
             container_file, '<?xml version="1.0" encoding="UTF-8" ?>\n'
         ):
-            print(f"processing sub-document #{doc_num}")
-            print(len(rows))
+            LOGGER.info(f"processing sub-document #{doc_num}")
+            LOGGER.info(len(rows))
             lines = list(doc)
             try:
                 root = ET.fromstringlist(lines)
