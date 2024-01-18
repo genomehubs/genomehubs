@@ -37,6 +37,10 @@ ENV PYTHONPATH $CONDA_DEFAULT_ENV/lib/python3.9/site-packages:$PYTHONPATH
 
 WORKDIR /tmp
 
+RUN curl https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linux-amd64/datasets > datasets \
+    && chmod 755 datasets \
+    && mv datasets /usr/bin/datasets
+
 COPY genomehubs-*-py3-none-manylinux2014_x86_64.whl ./
 
 RUN pip install ./genomehubs-*-py3-none-manylinux2014_x86_64.whl \
