@@ -411,27 +411,29 @@ const RadialBarComponent = ({
       });
     return (
       <g>
-        <path
-          d={arc(
-            startX,
-            startY,
-            innerRadius,
-            outerRadius,
-            endX,
-            endY,
-            istartX,
-            istartY,
-            iendX,
-            iendY,
-            endX > startX
-          )}
-          fill={data.fill}
-          fillOpacity={0.3}
-          stroke={data.fill}
-          strokeWidth={strokeWidth}
-          // strokeDasharray={`1 ${strokeWidth * 2}`}
-          // strokeLinecap={"round"}
-        />
+        {isNaN(endX) || (
+          <path
+            d={arc(
+              startX,
+              startY,
+              innerRadius,
+              outerRadius,
+              endX,
+              endY,
+              istartX,
+              istartY,
+              iendX,
+              iendY,
+              endX > startX
+            )}
+            fill={data.fill}
+            fillOpacity={0.3}
+            stroke={data.fill}
+            strokeWidth={strokeWidth}
+            // strokeDasharray={`1 ${strokeWidth * 2}`}
+            // strokeLinecap={"round"}
+          />
+        )}
         {width >= compactWidth && (
           <g
             fill={fill}
