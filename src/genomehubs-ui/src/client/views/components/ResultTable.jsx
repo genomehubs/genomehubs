@@ -370,7 +370,7 @@ const ResultTable = ({
   basename,
 }) => {
   const rootRef = useRef(null);
-  const [showFilter, setShowFilter] = useState(false);
+  const [showFilter, setShowFilter] = useState(true);
   let expandedTypes = [];
   let emptyBuckets = new Set();
   if (searchResults.aggs) {
@@ -382,7 +382,6 @@ const ResultTable = ({
       );
     }
   }
-  console.log(searchResults.aggs);
   if (searchTerm) {
     if (searchTerm.fields) {
       let fieldList = expandFieldList({ fields: searchTerm.fields, types });

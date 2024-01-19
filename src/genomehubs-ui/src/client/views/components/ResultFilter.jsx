@@ -22,7 +22,6 @@ const ResultFilter = ({
   operator = "",
   handleUpdate = () => {},
 }) => {
-  console.log({ fieldMeta });
   let ranks = {
     "": "",
     superkingdom: "superkingdom",
@@ -74,15 +73,15 @@ const ResultFilter = ({
     setAttrFilters(attributes);
     setTaxFilter(taxFilters);
   }, []);
-  console.log(attrFilters);
 
-  const handleChange = (e, i, action, value) => {
-    value = value || e.target.value;
-    if (!value) {
-      return;
-    }
-    let attributes = [...attrFilters];
-    let attribute = attributes[i] || [""];
+  const handleChange = (e, i, action, attributes) => {
+    let { value } = e.target;
+    // if (!value) {
+    //   return;
+    // }
+    attributes = [...attrFilters];
+    console.log(attributes.length);
+    let attribute = attributes[i] || [i, "==", ""];
     if (action == "operator") {
       attribute[1] = value;
     } else if (action == "value") {
@@ -90,15 +89,25 @@ const ResultFilter = ({
     }
     if (action == "dismiss") {
       delete attributes[i];
-    } else {
-      attributes[i] = attribute;
+    } else if (value > "") {
+      if (isNaN(i)) {
+        attributes.push(attribute);
+      } else {
+        attributes[i] = attribute;
+      }
     }
     setAttrFilters(attributes);
   };
+  console.log(attrFilters);
 
   let filters = [];
+
+  // useEffect(() => {
+  //   console.log("change");
+  //   console.log(attrFilters);
+  // }, [attrFilters]);
   attrFilters.forEach((arr, i) => {
-    if (arr.length > 1 && arr[0] == name) {
+    if (arr && arr.length > 1 && arr[0] == name) {
       filters.push(
         <ResultFilterInput
           key={i}
@@ -107,37 +116,36 @@ const ResultFilter = ({
           types={{ [name]: fieldMeta }}
           value={arr[2] || ""}
           operator={arr[1] || ""}
-          handleOperatorChange={(e) => handleChange(e, i, "operator")}
+          handleOperatorChange={(e) =>
+            handleChange(e, i, "operator", [...attrFilters])
+          }
           handleValueChange={(e, obj = {}) => {
-            let { id, value } = obj;
-            return handleChange(e, i, "value", value);
+            return handleChange(e, i, "value", [...attrFilters]);
           }}
-          handleDismiss={(e) => handleChange(e, i, "dismiss")}
+          handleDismiss={(e) => handleChange(e, i, "dismiss", [...attrFilters])}
         />
       );
     }
   });
-  if (filters.length == 0) {
-    filters.push(
-      <ResultFilterInput
-        key={0}
-        field={name}
-        fields={[]}
-        value={""}
-        operator={""}
-        types={{ [name]: fieldMeta }}
-        handleOperatorChange={(e) =>
-          handleChange(e, filters.length, "operator")
-        }
-        handleValueChange={(e, obj = {}) => {
-          let { id, value } = obj;
-          return handleChange(e, filters.length, "value", value);
-        }}
-        handleDismiss={(e) => handleChange(e, filters.length, "dismiss")}
-      />
-    );
-  }
-  console.log({ [name]: fieldMeta });
+  // if (filters.length == 0) {
+  filters.push(
+    <ResultFilterInput
+      key={"last"}
+      field={name}
+      fields={[]}
+      value={""}
+      operator={""}
+      types={{ [name]: fieldMeta }}
+      handleOperatorChange={(e) =>
+        handleChange(e, name, "operator", [...attrFilters])
+      }
+      handleValueChange={(e) => {
+        return handleChange(e, name, "value", [...attrFilters]);
+      }}
+      handleDismiss={() => {}}
+    />
+  );
+  // }
 
   return (
     <TableCell key={name}>

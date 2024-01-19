@@ -1,3 +1,6 @@
+import { Avatar, Chip, MenuItem } from "@material-ui/core";
+import React, { useEffect, useState } from "react";
+
 import AutoCompleteInput from "./AutoCompleteInput";
 import AutorenewIcon from "@material-ui/icons/Autorenew";
 import BasicSelect from "./BasicSelect";
@@ -6,9 +9,8 @@ import Button from "@material-ui/core/Button";
 import CloseIcon from "@material-ui/icons/Close";
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
-import { MenuItem } from "@material-ui/core";
-import React from "react";
 import Typography from "@material-ui/core/Typography";
+import styles from "./Styles.scss";
 import { useStyles } from "./QueryBuilder";
 
 const allowedSummaries = ({ field, types }) => {
@@ -54,6 +56,28 @@ const allowedOperators = ({ field, types, summary }) => {
   ));
 };
 
+const ChipInput = ({ defaultWidth, value, placeholder, onBlur }) => {
+  const [currentValue, setCurrentValue] = useState(value);
+  return (
+    <input
+      type="text"
+      className={styles.chip}
+      style={{
+        width: `${currentValue ? currentValue.length + 0.5 : defaultWidth}ch`,
+      }}
+      value={currentValue}
+      placeholder={placeholder}
+      onChange={(e) => setCurrentValue(e.target.value)}
+      onBlur={onBlur}
+      onKeyUp={(e) => {
+        if (e.key === "Enter") {
+          onBlur(e);
+        }
+      }}
+    />
+  );
+};
+
 const ResultFilterInput = ({
   types,
   field,
@@ -72,53 +96,53 @@ const ResultFilterInput = ({
   handleDismiss,
 }) => {
   const classes = useStyles();
-  operator = operator == "undefined" ? "" : operator;
-  field = field == "undefined" ? "" : field;
-  summary = summary == "undefined" ? "" : summary;
-  value = value == "undefined" ? "" : value;
-  let collate;
-  if (summary == "collate") {
-    collate = true;
-  }
+  const [active, setActive] = useState(false);
+  value = value == "undefined" || typeof value === "undefined" ? "" : value;
+  operator =
+    operator == "undefined" || typeof operator === "undefined" ? "" : operator;
+
+  useEffect(() => {
+    if (value > "") {
+      setActive(true);
+    } else {
+      setActive(false);
+    }
+  }, [operator, value]);
+
+  const ChipLabel = ({ label }) => {
+    return (
+      <ChipInput
+        defaultWidth={9}
+        value={label}
+        placeholder={"enter value"}
+        onBlur={handleValueChange}
+      />
+    );
+  };
+
+  const AvatarLabel = ({ label }) => {
+    return (
+      <ChipInput
+        defaultWidth={1}
+        value={label}
+        placeholder={"enter value"}
+        onBlur={handleOperatorChange}
+      />
+    );
+  };
+
   return (
-    <Grid container alignItems="center" direction="row" spacing={2}>
-      {bool && (
-        <Grid item>
-          <Typography>{bool}</Typography>
-        </Grid>
-      )}
-
-      <Grid item>
-        <Grid item>
-          <BasicSelect
-            current={operator}
-            id={`variable-${field}-operator-select`}
-            handleChange={handleOperatorChange}
-            helperText={"operator"}
-            values={allowedOperators({ field, types, summary })}
-          />
-        </Grid>
-
-        <Grid item xs={4}>
-          <BasicTextField
-            id={`variable-${field}-value-input`}
-            handleChange={handleValueChange}
-            helperText={"value"}
-            value={collate ? field : value}
-          />
-        </Grid>
-
-        <Grid item style={{ marginLeft: "auto" }}>
-          <IconButton
-            aria-label="remove filter"
-            size="small"
-            onClick={handleDismiss}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Grid>
-      </Grid>
-    </Grid>
+    <div>
+      <Chip
+        color={active ? "primary" : "default"}
+        size="small"
+        label={<ChipLabel label={value} />}
+        {...(active && {
+          onDelete: handleDismiss,
+          avatar: <Avatar>{<AvatarLabel label={operator} />}</Avatar>,
+        })}
+      />
+    </div>
   );
 };
 
