@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "@reach/router";
 
 import { FormControl } from "@material-ui/core";
 import MuiTableCell from "@material-ui/core/TableCell";
 import ResultFilterInput from "./ResultFilterInput";
 import { compose } from "recompose";
+import qs from "../functions/qs";
 import withSearch from "../hocs/withSearch";
+import withSiteName from "../hocs/withSiteName";
 import { withStyles } from "@material-ui/core/styles";
 
 const TableCell = withStyles((theme) => ({
@@ -15,6 +18,8 @@ const TableCell = withStyles((theme) => ({
 
 const ResultFilter = ({
   name,
+  type = "attribute",
+  basename,
   searchTerm,
   searchIndex,
   fieldMeta,
@@ -22,6 +27,9 @@ const ResultFilter = ({
   operator = "",
   handleUpdate = () => {},
 }) => {
+  if (type == "hidden") {
+    return <TableCell key={name} />;
+  }
   let ranks = {
     "": "",
     superkingdom: "superkingdom",
@@ -40,6 +48,8 @@ const ResultFilter = ({
     rank: "",
     level: null,
   };
+
+  const navigate = useNavigate();
   const [index, setIndex] = useState(searchIndex);
   let [attrFilters, setAttrFilters] = useState([]);
   let [taxFilter, setTaxFilter] = useState(taxFilters);
@@ -66,6 +76,10 @@ const ResultFilter = ({
             parts[1] = `!${parts[1]}`;
             parts[0] = parts[0].replace("!", "");
           }
+          let nameParts = parts[0].split(/[\(\)]/);
+          if (nameParts.length > 1) {
+            parts[0] = `${nameParts[1]}:${nameParts[0]}`;
+          }
           attributes.push(parts);
         }
       });
@@ -74,18 +88,51 @@ const ResultFilter = ({
     setTaxFilter(taxFilters);
   }, []);
 
+  const updateSearch = (attributes) => {
+    let parts = [];
+    if (taxFilter) {
+      if (taxFilter.taxon && taxFilter.filter) {
+        parts.push(`${taxFilter.filter}(${taxFilter.taxon})`);
+      }
+      if (taxFilter.rank && taxFilter.rank > "") {
+        parts.push(`tax_rank(${taxFilter.rank})`);
+      }
+      if (taxFilter.level) {
+        parts.push(`tax_level(${taxFilter.level})`);
+      }
+    }
+    for (let arr of attributes) {
+      if (!arr) {
+        continue;
+      }
+      let attrParts = arr[0].split(":");
+      if (attrParts.length == 2) {
+        parts.push(`${attrParts[1]}(${attrParts[0]})${arr[1]}${arr[2]}`);
+      } else {
+        parts.push(`${arr[0]}${arr[1]}${arr[2]}`);
+      }
+    }
+    let options = { ...searchTerm, query: parts.join(" AND ") };
+    navigate(`${basename}/search?${qs.stringify(options)}`);
+  };
+
   const handleChange = (e, i, action, attributes) => {
     let { value } = e.target;
     // if (!value) {
     //   return;
     // }
     attributes = [...attrFilters];
-    console.log(attributes.length);
-    let attribute = attributes[i] || [i, "==", ""];
+    let attribute = attributes[i] || [i, "=", ""];
     if (action == "operator") {
       attribute[1] = value;
     } else if (action == "value") {
-      attribute[2] = value;
+      let parts = value.split(/(<=|==|>=|!=|<|=|>)/);
+      if (parts.length > 1) {
+        attribute[1] = parts[1];
+        attribute[2] = parts[2];
+      } else {
+        attribute[2] = value;
+      }
     }
     if (action == "dismiss") {
       delete attributes[i];
@@ -96,9 +143,9 @@ const ResultFilter = ({
         attributes[i] = attribute;
       }
     }
-    setAttrFilters(attributes);
+    updateSearch(attributes);
+    // setAttrFilters(attributes);
   };
-  console.log(attrFilters);
 
   let filters = [];
 
@@ -154,4 +201,4 @@ const ResultFilter = ({
   );
 };
 
-export default compose(withSearch)(ResultFilter);
+export default compose(withSiteName, withSearch)(ResultFilter);

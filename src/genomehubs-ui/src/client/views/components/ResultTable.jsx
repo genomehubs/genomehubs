@@ -783,9 +783,15 @@ const ResultTable = ({
     <ResultFilter
       name={"scientific_name"}
       key={"scientific_name"}
+      type="hidden"
       value={""}
     />,
-    <ResultFilter name={"taxon_id"} key={"taxon_id"} value={""} />,
+    <ResultFilter
+      name={"taxon_id"}
+      key={"taxon_id"}
+      type="hidden"
+      value={""}
+    />,
   ];
   Object.keys(activeNameClasses).forEach((nameClass) => {
     heads.push(
