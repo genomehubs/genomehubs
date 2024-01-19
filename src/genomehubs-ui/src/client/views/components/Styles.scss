@@ -458,6 +458,18 @@ body,
       color: #1f78b4;
     }
 
+    input.chip {
+      background-color: transparent;
+      border: 0 solid;
+      color: themed("secondary");
+      &:focus {
+        background-color: themed("secondary");
+        color: themed("primary");
+        outline: none;
+      }
+    }
+
+
     .resultPanel {
       border-top: solid 0.25px rgba(themed("primary"), 0.25);
       box-sizing: border-box;
