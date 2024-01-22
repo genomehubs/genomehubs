@@ -196,7 +196,9 @@ const ResultFilter = ({
 
   return (
     <TableCell key={name}>
-      <FormControl size="small">{filters}</FormControl>
+      <FormControl size="small" style={{ width: "100%" }}>
+        <div style={{ width: "100%" }}>{filters}</div>
+      </FormControl>
     </TableCell>
   );
 };

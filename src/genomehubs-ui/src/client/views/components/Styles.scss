@@ -43,6 +43,23 @@ body,
   }
 }
 
+.ttOpts {
+  ul {
+    // list-style-type: none;
+    margin-block-start: 0;
+    padding-inline-start: 1.5em;
+
+    li {
+      cursor: pointer;
+      white-space: nowrap;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
 * {
   @include themify($themes) {
     // background: inherit;
@@ -466,8 +483,14 @@ body,
         background-color: themed("secondary");
         color: themed("primary");
         outline: none;
+        &::placeholder {
+          color: transparent;
+          opacity: 1; /* Firefox */
+        }
       }
     }
+
+    
 
 
     .resultPanel {

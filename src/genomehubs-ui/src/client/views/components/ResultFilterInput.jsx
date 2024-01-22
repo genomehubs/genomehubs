@@ -9,6 +9,7 @@ import Button from "@material-ui/core/Button";
 import CloseIcon from "@material-ui/icons/Close";
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
+import Tooltip from "./Tooltip";
 import Typography from "@material-ui/core/Typography";
 import styles from "./Styles.scss";
 import { useStyles } from "./QueryBuilder";
@@ -49,11 +50,11 @@ const allowedOperators = ({ field, types, summary }) => {
   // } else {
   operators = numeric.concat(operators);
   // }
-  return ["", ...operators].map((value, i) => (
-    <MenuItem key={i} value={value}>
-      {value}
-    </MenuItem>
-  ));
+  return operators;
+};
+
+const allowedValues = ({ types, field, summary }) => {
+  return types[field]?.constraint?.enum;
 };
 
 const ChipInput = ({ defaultWidth, value, placeholder, onBlur }) => {
@@ -100,6 +101,8 @@ const ResultFilterInput = ({
   value = value == "undefined" || typeof value === "undefined" ? "" : value;
   operator =
     operator == "undefined" || typeof operator === "undefined" ? "" : operator;
+  let values = allowedValues({ field, types, summary });
+  let operators = allowedOperators({ field, types, summary });
 
   useEffect(() => {
     if (value > "") {
@@ -109,40 +112,83 @@ const ResultFilterInput = ({
     }
   }, [operator, value]);
 
-  const ChipLabel = ({ label }) => {
+  const ChipOptions = ({ title, children, allowedValues, handleChange }) => {
+    if (allowedValues) {
+      title = (
+        <div className={styles.ttOpts}>
+          {title}:
+          <ul>
+            {allowedValues.map((v) => (
+              <li
+                key={v}
+                onClick={(e) => {
+                  handleChange({ target: { value: v } });
+                }}
+              >
+                {v}
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
     return (
-      <ChipInput
-        defaultWidth={9}
-        value={label}
-        placeholder={"enter value"}
-        onBlur={handleValueChange}
-      />
+      <Tooltip title={title} styleName="dark" interactive arrow>
+        <span>{children}</span>
+      </Tooltip>
     );
   };
 
-  const AvatarLabel = ({ label }) => {
+  const ChipLabel = ({ label, allowedValues }) => {
     return (
-      <ChipInput
-        defaultWidth={1}
-        value={label}
-        placeholder={"enter value"}
-        onBlur={handleOperatorChange}
-      />
+      <ChipOptions
+        title={"Set value"}
+        allowedValues={allowedValues}
+        handleChange={(e) => e.target.value != label && handleValueChange(e)}
+      >
+        <ChipInput
+          defaultWidth={1}
+          value={label}
+          placeholder={"+"}
+          onBlur={(e) => e.target.value != label && handleValueChange(e)}
+        />
+      </ChipOptions>
+    );
+  };
+
+  const AvatarLabel = ({ label, allowedValues }) => {
+    return (
+      <ChipOptions
+        title={"Comparison operator"}
+        allowedValues={allowedValues}
+        handleChange={(e) => e.target.value != label && handleOperatorChange(e)}
+      >
+        <ChipInput
+          defaultWidth={1}
+          value={label}
+          placeholder={"enter value"}
+          onBlur={(e) => e.target.value != label && handleOperatorChange(e)}
+        />
+      </ChipOptions>
     );
   };
 
   return (
-    <div>
+    <span style={{ marginRight: "0.5em" }}>
       <Chip
         color={active ? "primary" : "default"}
         size="small"
-        label={<ChipLabel label={value} />}
+        label={<ChipLabel label={value} allowedValues={values} />}
         {...(active && {
           onDelete: handleDismiss,
-          avatar: <Avatar>{<AvatarLabel label={operator} />}</Avatar>,
+          avatar: (
+            <Avatar>
+              {<AvatarLabel label={operator} allowedValues={operators} />}
+            </Avatar>
+          ),
         })}
       />
-    </div>
+    </span>
   );
 };
 

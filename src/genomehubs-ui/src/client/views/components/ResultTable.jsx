@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import { useLocation, useNavigate } from "@reach/router";
 
@@ -41,6 +41,7 @@ import withColors from "../hocs/withColors";
 import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";
 import withSearch from "../hocs/withSearch";
+import withSearchDefaults from "../hocs/withSearchDefaults";
 import withSiteName from "../hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
@@ -357,6 +358,8 @@ const ResultTable = ({
   fetchSearchResults,
   saveSearchResults,
   searchResults,
+  searchDefaults,
+  setSearchDefaults,
   searchTerm,
   hideEmpty = true,
   setSearchTerm,
@@ -370,7 +373,6 @@ const ResultTable = ({
   basename,
 }) => {
   const rootRef = useRef(null);
-  const [showFilter, setShowFilter] = useState(true);
   let expandedTypes = [];
   let emptyBuckets = new Set();
   if (searchResults.aggs) {
@@ -911,7 +913,9 @@ const ResultTable = ({
         <IconButton
           aria-label="toggle filter"
           size="small"
-          onClick={() => setShowFilter(!showFilter)}
+          onClick={() =>
+            setSearchDefaults({ showFilter: !searchDefaults.showFilter })
+          }
         >
           <FilterListIcon />
         </IconButton>
@@ -941,7 +945,7 @@ const ResultTable = ({
           <Table size="small" aria-label="search results">
             <TableHead>
               <TableRow>{heads}</TableRow>
-              {showFilter && <TableRow>{filters}</TableRow>}
+              {searchDefaults.showFilter && <TableRow>{filters}</TableRow>}
             </TableHead>
             <TableBody>{rows}</TableBody>
           </Table>
@@ -1000,6 +1004,7 @@ export default compose(
   withTaxonomy,
   withColors,
   withSearch,
+  withSearchDefaults,
   withRanks,
   withNames
 )(ResultTable);

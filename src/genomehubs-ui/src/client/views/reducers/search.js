@@ -219,6 +219,7 @@ const searchDefaultValues = {
   includeDescendants: false,
   includeEstimates: true,
   emptyColumns: false,
+  showFilters: false,
 };
 
 export const setSearchDefaults = createAction("SET_SEARCH_DEFAULTS");
