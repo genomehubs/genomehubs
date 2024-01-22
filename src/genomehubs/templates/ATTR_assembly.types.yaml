@@ -267,6 +267,7 @@ attributes:
         - 6.C.Q40
         - 6.7.Q40
         - 5.C.Q40
+        - 5.6.Q40
     display_level: 2
     display_name: EBP standard criteria
     type: date
