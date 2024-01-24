@@ -243,6 +243,22 @@ attributes:
       min: 1
     type: long
     units: bases
+  chromosomal_percent:
+    display_group: metrics
+    display_level: 2
+    constraint:
+      min: 0
+      max: 100
+    function: "{} * 1000"
+    type: 2dp
+    units: "%"
+  assembly_status:
+    constraint:
+      enum:
+        - primary
+        - alternate
+    display_group: general
+    type: keyword
   sequence_count:
     display_group: metrics
     display_level: 2

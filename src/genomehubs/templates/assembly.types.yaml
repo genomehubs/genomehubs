@@ -122,6 +122,12 @@ attributes:
     header: plastidScaffolds
     separator:
       - ;
+  chromosomal_percent:
+    header: assignedProportion
+  assembly_status:
+    header: primaryValue
+    translate:
+      "1": primary
 metadata:
   source_slug:
     header: genbankAssmAccession
