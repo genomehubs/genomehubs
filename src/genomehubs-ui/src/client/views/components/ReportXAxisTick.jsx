@@ -23,6 +23,7 @@ export const ReportXAxisTick = ({
   let yPos = y;
   let offset = 0;
   let bucketWidth;
+  console.log({ valueType });
   if (valueType == "coordinate") {
     let xScale = scaleLinear().domain(bounds.domain).range([0, width]);
     bucketWidth = xScale(buckets[index + 1]) - xScale(buckets[index]);
@@ -56,6 +57,7 @@ export const ReportXAxisTick = ({
   }
   let centered;
   let ttValue;
+  console.log({ labels, buckets, payload });
   if (labels && labels[index] != payload.value) {
     value = labels[index] || "";
     offset += bucketWidth / 2;
@@ -72,6 +74,9 @@ export const ReportXAxisTick = ({
     }
     value = fmt(value);
     if (!orientation) {
+      if (!value) {
+        return null;
+      }
       if (index % 2 == 1 && value.length * pointSize * 0.6 > bucketWidth) {
         return null;
       }

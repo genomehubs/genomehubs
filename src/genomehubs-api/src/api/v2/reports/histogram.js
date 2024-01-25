@@ -754,10 +754,61 @@ export const histogram = async ({
     yBounds.stats.cats.push({ key: "other", label: "other" });
   }
 
+  // console.log(histograms);
+
+  let buckets = [];
+  let allValues = [];
+  let labels = [];
+  let byCat = {};
+  let zDomain = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
+
+  for (let b of histograms.buckets) {
+    if (b) {
+      byCat[b] = [];
+    }
+  }
+  for (let [k, a] of Object.entries(histograms.byCat)) {
+    let sum = 0;
+    a.forEach((v, i) => {
+      sum += v;
+      byCat[histograms.buckets[i]].push(v);
+    });
+    allValues.push(sum);
+    zDomain = [Math.min(zDomain[0], sum), Math.max(zDomain[1], sum)];
+    buckets.push(k);
+  }
+  buckets.push(undefined);
+
+  console.log(bounds);
+  for (cat of bounds.cats) {
+    labels.push(cat.label);
+  }
+  let boundStats = {
+    cat: bounds.cat,
+    by: bounds.by,
+    count: bounds.stats.count, // TODO: change this
+    size: bounds.cats.length,
+    showOther: bounds.showOther,
+  };
+
+  bounds = {
+    ...bounds,
+    ...bounds.stats,
+    labels,
+    stats: { ...boundStats },
+  };
+
   return {
     status: { success: true },
     report: {
-      histograms,
+      histograms: {
+        ...histograms,
+        buckets,
+        allValues,
+        byCat,
+        zDomain,
+        valueType: "keyword",
+      },
       ...bounds,
       bounds,
       yBounds,

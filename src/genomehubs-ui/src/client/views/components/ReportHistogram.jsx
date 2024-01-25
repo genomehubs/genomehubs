@@ -266,7 +266,9 @@ const Histogram = ({
           pointSize: chartProps.pointSize,
           orientation: chartProps.orientation,
           lastPos: width - marginRight,
+          labels: chartProps.labels,
           showLabels: chartProps.showLabels,
+          valueType: chartProps.valueType,
           report: isNaN(buckets[0]) ? "catHistogram" : "histogram",
         })
       }
@@ -423,7 +425,7 @@ const ReportHistogram = ({
 }) => {
   pointSize *= 1;
   const navigate = useNavigate();
-  const componentRef = chartRef ? chartRef : useRef();
+  const componentRef = chartRef || useRef();
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
@@ -481,9 +483,9 @@ const ReportHistogram = ({
     if (xOptions.length == 1) {
       xOptions = xOptions[0].split(",");
     }
-    let buckets = histograms.buckets;
-    let valueType = histograms.valueType;
-    let summary = histograms.summary;
+    let { buckets, valueType, summary } = histograms;
+    let labels = bounds.labels || buckets;
+
     let compressX;
     if (
       histograms.byCat &&
@@ -496,7 +498,7 @@ const ReportHistogram = ({
       compressX = true;
     }
     let xLabel = xOptions[4] || histogram.report.xLabel;
-    let yLabel = histogram.report.yLabel;
+    let { yLabel } = histogram.report;
     if (yScale == "log10") {
       yLabel = `Log10 ${yLabel}`;
     } else if (yScale == "proportion") {
@@ -666,6 +668,7 @@ const ReportHistogram = ({
           xQuery: histogram.report.xQuery,
           xLabel,
           bounds,
+          labels,
           fields: histograms.fields,
           // showTickLabels: xOptions[2]
           //   ? xOptions[2] >= 0
