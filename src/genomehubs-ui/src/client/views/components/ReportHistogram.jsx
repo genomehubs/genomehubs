@@ -39,40 +39,62 @@ const searchByCell = ({
   location,
   navigate,
   fields,
+  valueType,
   ranks,
   basename,
+  ...props
 }) => {
-  let query = xQuery.query;
-  let field = bounds.field;
-  query = query
-    .replaceAll(new RegExp("AND\\s+" + bounds.field + "\\s+AND", "gi"), "AND")
-    .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
-      ""
-    )
-    .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
-      ""
-    );
-  if (summary && summary != "value") {
-    field = `${summary}(${field})`;
+  let { query } = xQuery;
+  let { field } = bounds;
+  if (valueType == "lineage") {
     query = query
-      .replaceAll(new RegExp("AND\\s+" + field + "\\s+AND", "gi"), "AND")
-      .replaceAll(
-        new RegExp("AND\\s+" + field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
-        ""
-      )
-      .replaceAll(
-        new RegExp("AND\\s+" + field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
-        ""
-      );
+      .replaceAll(/tax_tree\(.+?\)\s*(?:AND\s*)?/gi, "")
+      .replaceAll(/AND\s+AND/gi, "AND");
+    query = `tax_tree(${xBounds[0]}) AND ${query}`;
+    if (bounds.cat) {
+      field = bounds.cat;
+      xBounds[0] = bounds.cats.map((o) => o.key).join(",");
+    } else {
+      field = undefined;
+    }
   }
-  query = query.replaceAll(/\s+/g, " ").replace(/\s+$/, "");
+  if (field) {
+    if (summary && summary != "value") {
+      field = `${summary}(${field})`;
+    }
+    if (summary && summary != "value") {
+      field = `${summary}(${field})`;
+      query = query
+        .replaceAll(new RegExp("AND\\s+" + field + "\\s+AND", "gi"), "AND")
+        .replaceAll(
+          new RegExp("AND\\s+" + field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
+          ""
+        )
+        .replaceAll(
+          new RegExp("AND\\s+" + field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
+          ""
+        );
+    }
 
-  if (bounds.scale == "ordinal" && field == bounds.field) {
-    query += ` AND ${field} = ${xBounds[0]}`;
-  } else {
-    query += ` AND ${field} >= ${xBounds[0]} AND ${field} < ${xBounds[1]}`;
+    query = query.replaceAll(/\s+/g, " ").replace(/\s+$/, "");
+    if (bounds.scale == "ordinal") {
+      if (xBounds[0] == "other") {
+        query += ` AND ${field} != ${bounds.stats.cats
+          .filter((o) => o.key != "other")
+          .map((o) => o.key)
+          .join(",")}`;
+      } else {
+        query += ` AND ${field} = ${xBounds[0]}`;
+      }
+    } else {
+      query += ` AND ${field} >= ${xBounds[0]} AND ${field} < ${xBounds[1]}`;
+    }
+  }
+  if (bounds.by == "lineage" && !bounds.showOther) {
+    query
+      .replaceAll(/tax_tree\(.+?\)\s*(?:AND\s*)?/gi, "")
+      .replaceAll(/AND\s+AND/gi, "AND");
+    query = `tax_tree(${bounds.cats.map((o) => o.key).join(",")}) AND ${query}`;
   }
 
   let options = qs.parse(location.search.replace(/^\?/, ""));
@@ -234,7 +256,7 @@ const Histogram = ({
   } else if (chartProps.yScale.startsWith("log")) {
     yDomain = [1, "dataMax"];
   }
-  let buckets = chartProps.buckets;
+  let { buckets } = chartProps;
 
   let axes = [
     <CartesianGrid key={"grid"} strokeDasharray="3 3" vertical={false} />,
@@ -266,7 +288,9 @@ const Histogram = ({
           pointSize: chartProps.pointSize,
           orientation: chartProps.orientation,
           lastPos: width - marginRight,
+          labels: chartProps.labels,
           showLabels: chartProps.showLabels,
+          valueType: chartProps.valueType,
           report: isNaN(buckets[0]) ? "catHistogram" : "histogram",
         })
       }
@@ -423,7 +447,7 @@ const ReportHistogram = ({
 }) => {
   pointSize *= 1;
   const navigate = useNavigate();
-  const componentRef = chartRef ? chartRef : useRef();
+  const componentRef = chartRef || useRef();
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
@@ -481,9 +505,9 @@ const ReportHistogram = ({
     if (xOptions.length == 1) {
       xOptions = xOptions[0].split(",");
     }
-    let buckets = histograms.buckets;
-    let valueType = histograms.valueType;
-    let summary = histograms.summary;
+    let { buckets, valueType, summary } = histograms;
+    let labels = bounds.labels || buckets;
+
     let compressX;
     if (
       histograms.byCat &&
@@ -496,7 +520,7 @@ const ReportHistogram = ({
       compressX = true;
     }
     let xLabel = xOptions[4] || histogram.report.xLabel;
-    let yLabel = histogram.report.yLabel;
+    let { yLabel } = histogram.report;
     if (yScale == "log10") {
       yLabel = `Log10 ${yLabel}`;
     } else if (yScale == "proportion") {
@@ -666,6 +690,7 @@ const ReportHistogram = ({
           xQuery: histogram.report.xQuery,
           xLabel,
           bounds,
+          labels,
           fields: histograms.fields,
           // showTickLabels: xOptions[2]
           //   ? xOptions[2] >= 0

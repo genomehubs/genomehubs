@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
     minHeight: "100%",
     minWidth: "100%",
     maxWidth: "100%",
+    paddingBottom: "1em",
   },
   item: { minWidth: "900px", maxWidth: "80%", align: "center" },
   itemFull: { width: "100%", align: "center" },

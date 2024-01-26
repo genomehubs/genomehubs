@@ -19,7 +19,7 @@ export const ReportXAxisTick = ({
   marginTop,
 }) => {
   let { x, y, fill, index, width, payload } = props;
-  let value = payload.value;
+  let { value } = payload;
   let yPos = y;
   let offset = 0;
   let bucketWidth;
@@ -31,8 +31,11 @@ export const ReportXAxisTick = ({
   }
   let tickLine;
   if (isNaN(x) && lastPos) {
+    if (valueType == "lineage") {
+      return;
+    }
     x = lastPos;
-    if (report == "histogram") {
+    if (report == "histogram" && valueType != "lineage") {
       x += bucketWidth / 2;
     }
   }
@@ -56,10 +59,13 @@ export const ReportXAxisTick = ({
   }
   let centered;
   let ttValue;
-  if (labels && labels[index] != payload.value) {
+  if (
+    (labels && labels[index] != payload.value) ||
+    (valueType == "lineage" && payload.value == "other")
+  ) {
     value = labels[index] || "";
     offset += bucketWidth / 2;
-    centered = true;
+    //centered = true;
     ttValue = value;
   } else if (buckets[index] != payload.value) {
     value = buckets[index] || "";
@@ -72,6 +78,9 @@ export const ReportXAxisTick = ({
     }
     value = fmt(value);
     if (!orientation) {
+      if (!value) {
+        return null;
+      }
       if (index % 2 == 1 && value.length * pointSize * 0.6 > bucketWidth) {
         return null;
       }
