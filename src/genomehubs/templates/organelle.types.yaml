@@ -12,31 +12,31 @@ attributes:
     type: keyword
   assembly_span:
     index: 8
-    taxon_display_group: "{{organelle}}_assembly"
-    taxon_name: "{{organelle}}_assembly_span"
-    taxon_key: "{{organelle}}_assembly_span"
-    taxon_display_name: "{{organelle}} span"
-    taxon_traverse_limit: phylum
-    taxon_display_level: 2
+    # taxon_display_group: "{{organelle}}_assembly"
+    # taxon_name: "{{organelle}}_assembly_span"
+    # taxon_key: "{{organelle}}_assembly_span"
+    # taxon_display_name: "{{organelle}} span"
+    # taxon_traverse_limit: phylum
+    # taxon_display_level: 2
   bioproject:
     index: 5
   biosample:
     index: 6
   gc_percent:
     index: 9
-    taxon_display_group: "{{organelle}}_assembly"
-    taxon_display_name: "{{organelle}} GC%"
-    taxon_name: "{{organelle}}_gc_percent"
-    taxon_key: "{{organelle}}_gc_percent"
-    taxon_summary: median
-    taxon_traverse: median
-    taxon_traverse_limit: phylum
-    taxon_display_level: 2
-    taxon_bins:
-      min: 0
-      max: 100
-      count: 10
-      scale: linear
+    # taxon_display_group: "{{organelle}}_assembly"
+    # taxon_display_name: "{{organelle}} GC%"
+    # taxon_name: "{{organelle}}_gc_percent"
+    # taxon_key: "{{organelle}}_gc_percent"
+    # taxon_summary: median
+    # taxon_traverse: median
+    # taxon_traverse_limit: phylum
+    # taxon_display_level: 2
+    # taxon_bins:
+    #   min: 0
+    #   max: 100
+    #   count: 10
+    #   scale: linear
   n_percent:
     index: 10
   last_updated:

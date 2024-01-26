@@ -3,8 +3,11 @@ import { basename, siteName } from "../reducers/location";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
+import Badge from "./Badge";
 import BasicSelect from "./BasicSelect";
 import { Box } from "@material-ui/core";
+import Breadcrumbs from "./Breadcrumbs";
+import Count from "./Count";
 import Divider from "@material-ui/core/Divider";
 import EnumSelect from "./EnumSelect";
 import FlagIcon from "./FlagIcon";
@@ -12,12 +15,17 @@ import Grid from "@material-ui/core/Grid";
 import Highlight from "./Highlight";
 import Logo from "./Logo";
 import NavLink from "./NavLink";
+import PhyloPics from "./PhyloPics";
+import RecordLink from "./RecordLink";
 import Report from "./Report";
+import StaticPlot from "./StaticPlot";
 import Template from "./Template";
 import Toggle from "./Toggle";
 import Tooltip from "./Tooltip";
 import TranslatedValue from "./TranslatedValue";
+import ValueRow from "./ValueRow";
 import YAML from "js-yaml";
+import classNames from "classnames";
 import classnames from "classnames";
 import { compose } from "recompose";
 import gfm from "remark-gfm";
@@ -49,10 +57,13 @@ const fillTemplateValues = (value, extra) => {
           lower = true;
           parts[i] = parts[i].replace(/^lc_/, "");
         }
-        if (extra.hasOwnProperty(parts[i])) {
-          parts[i] = lower ? extra[parts[i]].toLowerCase() : extra[parts[i]];
-        } else {
-          parts[i] = "";
+        for (let part of parts[i].split("|")) {
+          if (extra.hasOwnProperty(part)) {
+            parts[i] = lower ? extra[part].toLowerCase() : extra[part];
+            break;
+          } else {
+            parts[i] = "";
+          }
         }
       }
       value = parts.join("");
@@ -98,6 +109,9 @@ export const RehypeComponentsList = (extra) => {
   return {
     a: (props) => <NavLink {...processProps({ props, extra })} />,
     aggregation: (props) => <AggregationIcon method={props.method} />,
+    badge: (props) => <Badge {...processProps({ props, extra })} />,
+    breadcrumbs: (props) => <Breadcrumbs {...props} />,
+    count: (props) => <Count {...processProps({ props, extra })} />,
     divider: (props) => (
       <Divider
         orientation={props.orientation || "vertical"}
@@ -198,6 +212,8 @@ export const RehypeComponentsList = (extra) => {
       }
       return <Highlight {...processProps({ props })} />;
     },
+    phylopic: (props) => <PhyloPics {...processProps({ props, extra })} />,
+    recordlink: (props) => <RecordLink {...processProps({ props, extra })} />,
     report: (props) => {
       let css = styles.reportContainer;
       if (props.className) {
@@ -220,10 +236,21 @@ export const RehypeComponentsList = (extra) => {
       return <BasicSelect {...processedProps} handleChange={handleChange} />;
     },
     span: (props) => <span {...processProps({ props })} />,
+    static: (props) => {
+      let css = styles.reportContainer;
+      if (props.className) {
+        css = classnames(styles.reportContainer, styles[props.className]);
+      }
+      return (
+        <Grid {...processProps({ props, isGrid: true })}>
+          <StaticPlot {...processProps({ props, extra })} className={css} />
+        </Grid>
+      );
+    },
     templat: (props) => (
       <Template
         {...processProps({ props })}
-        className={styles.reportContainer}
+        className={classNames(styles.reportContainer, styles.unpadded)}
       />
     ),
     tooltip: (props) => {
@@ -236,6 +263,7 @@ export const RehypeComponentsList = (extra) => {
     translated: (props) => {
       return <TranslatedValue {...processProps({ props, extra })} />;
     },
+    valuerow: (props) => <ValueRow {...processProps({ props, extra })} />,
   };
 };
 

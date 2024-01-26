@@ -1,4 +1,4 @@
-export const excludeSources = (exclusions = {}, fields) => {
+export const excludeSources = (exclusions = {}, fields, result) => {
   const preserveMultiple = ({ field, source }) => {
     if (source == "direct" && !(exclusions.descendant || []).includes(field)) {
       source = "descendant";

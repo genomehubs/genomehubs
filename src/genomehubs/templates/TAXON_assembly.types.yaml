@@ -70,10 +70,59 @@ attributes:
       - min
     taxon_traverse: min
     taxon_traverse_direction: up
-  ebp_metric_date:
+  ebp_standard_date:
     taxon_display_group: assembly
     taxon_summary:
       - min
       - max
     taxon_traverse: min
     taxon_traverse_direction: up
+  ebp_standard_criteria:
+    taxon_display_group: assembly
+    taxon_summary:
+      - enum
+      - list
+    taxon_traverse: enum
+    taxon_traverse_direction: up
+  mitochondrion_assembly_span:
+    taxon_display_group: mitochondrion_assembly
+    taxon_name: mitochondrion_assembly_span
+    taxon_key: mitochondrion_assembly_span
+    taxon_display_name: mitochondrion span
+    taxon_traverse_limit: phylum
+    taxon_display_level: 2
+  mitochondrion_gc_percent:
+    taxon_display_group: mitochondrion_gc_percent
+    taxon_name: mitochondrion_gc_percent
+    taxon_key: mitochondrion_gc_percent
+    taxon_display_name: mitochondrion gc percent
+    taxon_traverse_limit: phylum
+    taxon_display_level: 2
+    taxon_summary: median
+    taxon_traverse: median
+    taxon_bins:
+      min: 0
+      max: 100
+      count: 10
+      scale: linear
+  plastid_assembly_span:
+    taxon_display_group: plastid_assembly
+    taxon_name: plastid_assembly_span
+    taxon_key: plastid_assembly_span
+    taxon_display_name: plastid span
+    taxon_traverse_limit: phylum
+    taxon_display_level: 2
+  plastid_gc_percent:
+    taxon_display_group: plastid_gc_percent
+    taxon_name: plastid_gc_percent
+    taxon_key: plastid_gc_percent
+    taxon_display_name: plastid gc percent
+    taxon_traverse_limit: phylum
+    taxon_display_level: 2
+    taxon_summary: median
+    taxon_traverse: median
+    taxon_bins:
+      min: 0
+      max: 100
+      count: 10
+      scale: linear

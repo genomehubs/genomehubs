@@ -4,6 +4,7 @@ import AggregationIcon from "./AggregationIcon";
 import Grid from "@material-ui/core/Grid";
 import HistogramSVG from "./HistogramSVG";
 import React from "react";
+import TaxonSummaryPanel from "./TaxonSummaryPanel";
 import Tooltip from "./Tooltip";
 import WordCloud from "./WordCloud";
 import classnames from "classnames";
@@ -146,6 +147,7 @@ const ResultPanel = ({
   );
   let groupedDivs = {};
   let fieldDivs = [];
+  let taxonSummary;
 
   if (fields) {
     fields.forEach((field) => {
@@ -173,6 +175,11 @@ const ResultPanel = ({
         }
       }
     });
+    taxonSummary = (
+      <Grid item xs={12}>
+        <TaxonSummaryPanel taxonId={taxon_id} />
+      </Grid>
+    );
   }
   Object.keys(groupedDivs).forEach((key) => {
     fieldDivs = fieldDivs.concat(groupedDivs[key]);
@@ -230,8 +237,12 @@ const ResultPanel = ({
 
       <div>
         <Grid container alignItems="center" direction="row" spacing={0}>
+          {taxonSummary}
+        </Grid>
+        <Grid container alignItems="center" direction="row" spacing={0}>
           {fieldDivs}
         </Grid>
+
         {/* <div className={styles.flexRow}>{fieldDivs}</div>
         {additionalDivs.length > 0 && (
           <div className={styles.flexRow}>{additionalDivs}</div>

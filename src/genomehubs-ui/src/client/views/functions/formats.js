@@ -9,7 +9,7 @@ import {
 } from "d3-time";
 
 import { format } from "d3-format";
-import { timeFormat } from "d3-time-format";
+import { utcFormat } from "d3-time-format";
 
 const sci = (v) => {
   if (v < 1000 && v >= 0.001) {
@@ -27,16 +27,16 @@ const sciInt = (v) => {
   return format(".3s")(v);
 };
 
-const formatMillisecond = timeFormat(".%L"),
-  formatSecond = timeFormat(":%S"),
-  formatMinute = timeFormat("%I:%M"),
-  formatHour = timeFormat("%I %p"),
-  formatDay = timeFormat("%a %d"),
-  formatWeek = timeFormat("%b %d"),
-  formatMonth = timeFormat("%b"),
-  formatMonthDecimal = timeFormat("%m"),
-  formatMonthYear = timeFormat("%b %Y"),
-  formatYear = timeFormat("%Y");
+const formatMillisecond = utcFormat(".%L"),
+  formatSecond = utcFormat(":%S"),
+  formatMinute = utcFormat("%I:%M"),
+  formatHour = utcFormat("%I %p"),
+  formatDay = utcFormat("%a %d"),
+  formatWeek = utcFormat("%b %d"),
+  formatMonth = utcFormat("%b"),
+  formatMonthDecimal = utcFormat("%m"),
+  formatMonthYear = utcFormat("%b %Y"),
+  formatYear = utcFormat("%Y");
 
 const timeFormats = {
   millisecond: formatMillisecond,

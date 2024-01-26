@@ -81,7 +81,7 @@ jobs:
           mv goat-ui/static/* src/genomehubs-ui/src/client/static/
           mv goat-ui/files/favicon/* src/genomehubs-ui/src/client/favicon/
           mv goat-ui/files/components/* src/genomehubs-ui/src/client/views/components/
-          sed -i '/<!---->/r goat-ui/files/html/index.html' src/genomehubs-ui/src/client/index.html
+          mv goat-ui/files/html/index.html src/genomehubs-ui/src/client/index.html
           cd goat-ui
           echo "GH_COMMIT_HASH=$(git log -n 1 --pretty=format:'%H')" >> $GITHUB_ENV
           cd -
@@ -274,4 +274,40 @@ jobs:
           context: src/docker/boat
           push: true
           tags: genomehubs/boat:develop
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-and-push-genomehubs-test:
+    runs-on: ubuntu-latest
+    needs:
+      - package-genomehubs-linux
+      - package-api
+      - package-ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          path: ./dist
+      - run: |
+          mv dist/genomehubs/*manylinux2014_x86_64.whl src/docker/test
+          mv dist/genomehubs-api/genomehubs-api-linux src/docker/test/
+          mv dist/genomehubs-ui/genomehubs-ui-linux src/docker/test/
+          cp tests/integration_tests/ui/test-ui.mjs src/docker/test/
+          rm -r dist/*
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: genomehubs/genomehubs-test
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: src/docker/test
+          push: true
+          tags: genomehubs/genomehubs-test:develop
           labels: ${{ steps.meta.outputs.labels }}

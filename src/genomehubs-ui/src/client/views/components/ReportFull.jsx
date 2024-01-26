@@ -70,7 +70,6 @@ export const ReportFull = ({
     }
   }
   if (report == "sources") {
-    console.log({ marginLeft });
     width = Math.max(windowDimensions.width * 0.8, 900) - 15;
     // width = windowDimensions.width * 0.9 + marginLeft;
     marginLeft = 0;

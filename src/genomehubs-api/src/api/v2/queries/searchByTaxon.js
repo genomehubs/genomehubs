@@ -76,7 +76,7 @@ export const searchByTaxon = async ({
     fields = [];
   }
   let aggregation_source = setAggregationSource(result, includeEstimates);
-  let excludedSources = excludeSources(exclusions, fields);
+  let excludedSources = excludeSources(exclusions, fields, result);
   let attributesExist = matchAttributes({
     fields,
     attr_summaries,

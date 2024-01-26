@@ -3,6 +3,7 @@ import {
   getAttributeSettings,
   getCurrentRecord,
   getCurrentRecordId,
+  getRecordById,
   getRecordIsFetching,
   getRecords,
   resetRecord,
@@ -15,12 +16,14 @@ import { connect } from "react-redux";
 import { getLineage } from "../selectors/record";
 
 const withRecord = (WrappedComponent) => (props) => {
+  let { currentRecordId } = props;
   const mapStateToProps = (state) => ({
     attributeSettings: getAttributeSettings(state),
     record: getCurrentRecord(state),
     records: getRecords(state),
     recordIsFetching: getRecordIsFetching(state),
     recordId: getCurrentRecordId(state),
+    recordById: getRecordById(state, currentRecordId || ""),
     lineage: getLineage(state),
   });
 

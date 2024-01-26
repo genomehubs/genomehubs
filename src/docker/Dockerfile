@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 LABEL maintainer="contact@genomehubs.org"
 LABEL license="MIT"
-ARG VERSION=2.7.28
+ARG VERSION=2.7.43
 LABEL version=$VERSION
 ENV CONTAINER_VERSION=$VERSION
 
@@ -36,6 +36,10 @@ ENV PATH $CONDA_DEFAULT_ENV/bin:$PATH
 ENV PYTHONPATH $CONDA_DEFAULT_ENV/lib/python3.9/site-packages:$PYTHONPATH
 
 WORKDIR /tmp
+
+RUN curl https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linux-amd64/datasets > datasets \
+    && chmod 755 datasets \
+    && mv datasets /usr/bin/datasets
 
 COPY genomehubs-*-py3-none-manylinux2014_x86_64.whl ./
 

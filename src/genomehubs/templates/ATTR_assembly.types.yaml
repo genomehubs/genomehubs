@@ -1,7 +1,6 @@
 defaults:
   attributes:
     display_group: general
-    organelle: nucleus
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
     source: INSDC
 identifiers:
@@ -34,7 +33,6 @@ attributes:
         - chloroplast
         - plastid
         - apicoplast
-    default: nucleus
     type: keyword
   bioproject:
     constraint:
@@ -245,6 +243,22 @@ attributes:
       min: 1
     type: long
     units: bases
+  chromosomal_percent:
+    display_group: metrics
+    display_level: 2
+    constraint:
+      min: 0
+      max: 100
+    function: "{} * 1000"
+    type: 2dp
+    units: "%"
+  assembly_status:
+    constraint:
+      enum:
+        - primary
+        - alternate
+    display_group: general
+    type: keyword
   sequence_count:
     display_group: metrics
     display_level: 2
@@ -257,9 +271,21 @@ attributes:
     display_level: 2
     display_name: Last updated
     type: date
-  ebp_metric_date:
+  ebp_standard_date:
     display_level: 2
     display_name: EBP metric date
+    synonyms:
+      - ebp_metric_date
+    type: date
+  ebp_standard_criteria:
+    constraint:
+      enum:
+        - 6.C.Q40
+        - 6.7.Q40
+        - 5.C.Q40
+        - 5.6.Q40
+    display_level: 2
+    display_name: EBP standard criteria
     type: date
   refseq_category:
     display_level: 2
@@ -285,3 +311,38 @@ attributes:
       max: 100
     type: 2dp
     units: "%"
+  source_accession:
+    display_group: linked assemblies
+    type: keyword
+  mitochondrion_assembly_span:
+    display_group: linked assemblies
+    type: keyword
+  mitochondrion_gc_percent:
+    display_group: linked assemblies
+    constraint:
+      min: 0
+      max: 100
+    type: 2dp
+    units: "%"
+  mitochondrion_accession:
+    display_group: linked assemblies
+    type: keyword
+  mitochondrion_scaffolds:
+    display_group: linked assemblies
+    type: keyword
+  plastid_assembly_span:
+    display_group: linked assemblies
+    type: keyword
+  plastid_gc_percent:
+    display_group: linked assemblies
+    constraint:
+      min: 0
+      max: 100
+    type: 2dp
+    units: "%"
+  plastid_accession:
+    display_group: linked assemblies
+    type: keyword
+  plastid_scaffolds:
+    display_group: linked assemblies
+    type: keyword

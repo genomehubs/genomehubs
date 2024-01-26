@@ -239,21 +239,25 @@ const Page = ({
                     }}
                   >
                     <a
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
                         setShowExamples(!showExamples);
                         setShowBrowse(false);
                       }}
                       className={styles.link}
+                      href=""
                     >
                       {showExamples ? "hide" : "show"} examples
                     </a>
                     <a> or </a>
                     <a
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
                         setShowBrowse(!showBrowse);
                         setShowExamples(false);
                       }}
                       className={styles.link}
+                      href="#"
                     >
                       {showBrowse ? "hide" : "browse"} tree
                     </a>

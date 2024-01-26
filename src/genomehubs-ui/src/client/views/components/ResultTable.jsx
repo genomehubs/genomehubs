@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import { useLocation, useNavigate } from "@reach/router";
 
@@ -9,6 +9,7 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import Checkbox from "@material-ui/core/Checkbox";
 import Citation from "./Citation";
 import DownloadButton from "./DownloadButton";
+import FilterListIcon from "@material-ui/icons/FilterList";
 import Grid from "@material-ui/core/Grid";
 import Grow from "@material-ui/core/Grow";
 import IconButton from "@material-ui/core/IconButton";
@@ -16,6 +17,7 @@ import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
 import LinkButton from "./LinkButton";
 import MuiTableCell from "@material-ui/core/TableCell";
 import ReportError from "./ReportError";
+import ResultFilter from "./ResultFilter";
 import ResultModalControl from "./ResultModalControl";
 import SearchPagination from "./SearchPagination";
 import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
@@ -39,6 +41,7 @@ import withColors from "../hocs/withColors";
 import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";
 import withSearch from "../hocs/withSearch";
+import withSearchDefaults from "../hocs/withSearchDefaults";
 import withSiteName from "../hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
@@ -355,6 +358,8 @@ const ResultTable = ({
   fetchSearchResults,
   saveSearchResults,
   searchResults,
+  searchDefaults,
+  setSearchDefaults,
   searchTerm,
   hideEmpty = true,
   setSearchTerm,
@@ -776,6 +781,20 @@ const ResultTable = ({
       key={"taxon_id"}
     />,
   ];
+  let filters = [
+    <ResultFilter
+      name={"scientific_name"}
+      key={"scientific_name"}
+      type="hidden"
+      value={""}
+    />,
+    <ResultFilter
+      name={"taxon_id"}
+      key={"taxon_id"}
+      type="hidden"
+      value={""}
+    />,
+  ];
   Object.keys(activeNameClasses).forEach((nameClass) => {
     heads.push(
       <SortableCell
@@ -788,6 +807,7 @@ const ResultTable = ({
         handleTableSort={handleTableSort}
       />
     );
+    filters.push(<ResultFilter name={nameClass} key={nameClass} value={""} />);
   });
   Object.keys(activeRanks).forEach((rank) => {
     heads.push(
@@ -801,6 +821,7 @@ const ResultTable = ({
         handleTableSort={handleTableSort}
       />
     );
+    filters.push(<ResultFilter name={rank} key={rank} value={""} />);
   });
   if (searchIndex == "assembly" || searchIndex == "feature") {
     heads.push(
@@ -813,6 +834,9 @@ const ResultTable = ({
         sortDirection={sortBy === "assembly_id" ? sortOrder : false}
         handleTableSort={handleTableSort}
       />
+    );
+    filters.push(
+      <ResultFilter name={"assembly_id"} key={"assembly_id"} value={""} />
     );
   }
   if (searchIndex == "sample") {
@@ -827,6 +851,9 @@ const ResultTable = ({
         handleTableSort={handleTableSort}
       />
     );
+    filters.push(
+      <ResultFilter name={"sample_id"} key={"sample_id"} value={""} />
+    );
   }
   if (searchIndex == "feature") {
     heads = [heads.pop()];
@@ -840,6 +867,9 @@ const ResultTable = ({
         sortDirection={sortBy === "feature_id" ? sortOrder : false}
         handleTableSort={handleTableSort}
       />
+    );
+    filters.push(
+      <ResultFilter name={"feature_id"} key={"feature_id"} value={""} />
     );
   }
   for (let type of expandedTypes) {
@@ -868,8 +898,30 @@ const ResultTable = ({
         handleToggleExclusion={handleToggleExclusion}
       />
     );
+    filters.push(
+      <ResultFilter
+        key={type.name}
+        name={type.name}
+        value={""}
+        fieldMeta={types[type.name]}
+      />
+    );
   }
-  heads.push(<TableCell key={"last"}></TableCell>);
+  heads.push(
+    <Tooltip title={"Click to toggle filter options"} arrow key={"filter"}>
+      <TableCell>
+        <IconButton
+          aria-label="toggle filter"
+          size="small"
+          onClick={() =>
+            setSearchDefaults({ showFilter: !searchDefaults.showFilter })
+          }
+        >
+          <FilterListIcon />
+        </IconButton>
+      </TableCell>
+    </Tooltip>
+  );
 
   let citationMessage;
   if (rows.length > 0) {
@@ -893,6 +945,7 @@ const ResultTable = ({
           <Table size="small" aria-label="search results">
             <TableHead>
               <TableRow>{heads}</TableRow>
+              {searchDefaults.showFilter && <TableRow>{filters}</TableRow>}
             </TableHead>
             <TableBody>{rows}</TableBody>
           </Table>
@@ -951,6 +1004,7 @@ export default compose(
   withTaxonomy,
   withColors,
   withSearch,
+  withSearchDefaults,
   withRanks,
   withNames
 )(ResultTable);

@@ -1,0 +1,80 @@
+attributes:
+  total_runs:
+    description: Total number of sequencing runs available in SRA
+    display_group: sra
+    source_url: https://ncbi.nlm.nih.gov/sra/
+    source: NCBI
+    summary: max
+    traverse: sum
+    traverse_direction: up
+    type: integer
+  total_reads:
+    description: Total number of reads across all runs in SRA
+    display_group: sra
+    source_url: https://ncbi.nlm.nih.gov/sra/
+    source: NCBI
+    summary: max
+    traverse: sum
+    traverse_direction: up
+    type: long
+  library_source:
+    constraint:
+      enum:
+        - transcriptomic
+        - single cell
+    description: Library sources for most recent libraries (up to 10)
+    display_group: sra
+    source_url: https://ncbi.nlm.nih.gov/sra/
+    source: NCBI
+    summary: list
+    translate:
+      "transcriptomic single cell": single cell
+    traverse: list
+    traverse_direction: up
+    type: keyword
+  platform:
+    constraint:
+      enum:
+        - ILLUMINA
+        - OXFORD_NANOPORE
+        - PACBIO_SMRT
+    description: Sequencing platforms for most recent libraries (up to 10)
+    display_group: sra
+    source_url: https://ncbi.nlm.nih.gov/sra/
+    source: NCBI
+    summary: list
+    traverse: list
+    traverse_direction: up
+    type: keyword
+  sra_accession:
+    description: Most recent SRA experiment accessions (up to 10)
+    display_group: sra
+    source_url: https://ncbi.nlm.nih.gov/sra/
+    source: NCBI
+    summary: list
+    traverse: false
+    type: keyword
+    value_metadata:
+      default:
+        description: Click to view SRA experiment accession on ENA
+        link: https://www.ebi.ac.uk/ena/browser/view/{}
+  run_accession:
+    description: Most recent SRA run accessions (up to 10)
+    display_group: sra
+    source_url: https://ncbi.nlm.nih.gov/sra/
+    source: NCBI
+    summary: list
+    traverse: false
+    type: keyword
+    value_metadata:
+      default:
+        description: Click to view SRA run accession on ENA
+        link: https://www.ebi.ac.uk/ena/browser/view/{}
+  reads:
+    description: Number of reads per run for the most recent libraries (up to 10)
+    display_group: sra
+    source_url: https://ncbi.nlm.nih.gov/sra/
+    source: NCBI
+    summary: list
+    traverse: false
+    type: long

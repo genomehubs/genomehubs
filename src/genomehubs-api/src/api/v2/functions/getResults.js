@@ -18,22 +18,24 @@ export const chainQueries = async ({
     if (!parentQuery) {
       throw Error(`${match[1]} is not defined`);
     }
-    let [result, str] = parentQuery.split("--");
+    let [parentResult, str] = parentQuery.split("--");
     if (!str) {
-      str = result;
-      result = "taxon";
+      str = parentResult;
+      parentResult = result;
     }
     let [summary, fields] = match[2].split(/[\(\)]/);
     if (!fields) {
       fields = summary;
       summary = "value";
     }
+    let { exclusions, passedParams } = params;
     let res = await getResults({
-      ...params,
+      ...passedParams,
+      ...(parentResult == result && { exclusions }),
       query: str,
       size: chainThreshold,
       fields,
-      result,
+      result: parentResult,
     });
     if (!res.status.success) {
       return { status: res.status };

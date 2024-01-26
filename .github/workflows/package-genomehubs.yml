@@ -1,6 +1,6 @@
 name: package-genomehubs
 env:
-  VERSION: 2.7.28
+  VERSION: 2.7.43
 
 on:
   push:
@@ -140,7 +140,7 @@ jobs:
           mv goat-ui/static/* src/genomehubs-ui/src/client/static/
           mv goat-ui/files/favicon/* src/genomehubs-ui/src/client/favicon/
           mv goat-ui/files/components/* src/genomehubs-ui/src/client/views/components/
-          sed -i '/<!---->/r goat-ui/files/html/index.html' src/genomehubs-ui/src/client/index.html
+          mv goat-ui/files/html/index.html src/genomehubs-ui/src/client/index.html
           rm -r goat-ui
       - run: ./package-ui.sh
       - uses: actions/upload-artifact@v3

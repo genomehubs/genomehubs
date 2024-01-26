@@ -10,7 +10,7 @@ Usage:
                      [--gbif] [--gbif-root STRING...] [--gbif-xref STRING...]
                      [--ncbi-datasets-genome PATH] [--ncbi-datasets-sample PATH]
                      [--refseq-mitochondria] [--refseq-organelles]
-                     [--refseq-plastids] [--refseq-root NAME]
+                     [--refseq-plastids] [--refseq-root NAME] [--sra PATH]
                      [--outfile PATH] [--log-interval INT]
                      [-h|--help] [-v|--version]
 
@@ -42,6 +42,7 @@ Options:
     --refseq-plastids            Parse plastid genomes from the NCBI RefSeq organelle
                                  collection
     --refseq-root NAME           Name (not taxId) of root taxon
+    --sra PATH                   Parse sra data from an efetch docsum xml file 
     -h, --help                   Show this
     -v, --version                Show version number
 """
@@ -67,6 +68,7 @@ from .hub import order_parsed_fields
 # from .ncbi import ncbi_datasets_summary_parser
 from .ncbi import ncbi_genome_parser
 from .ncbi import refseq_organelle_parser
+from .ncbi import sra_parser
 from .version import __version__
 from .wikidata import wikidata_parser
 
@@ -111,6 +113,11 @@ PARSERS = {
         "func": refseq_organelle_parser,
         "params": ("plastid"),
         "types": "organelle",
+    },
+    "sra": {
+        "func": sra_parser,
+        "params": (None),
+        "types": "sra",
     },
     "wikidata": {"func": wikidata_parser, "params": None, "types": "wikidata"},
 }

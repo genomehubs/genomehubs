@@ -10,6 +10,7 @@ import NamesPanel from "./NamesPanel";
 import Page from "./Page";
 import ResultPanel from "./ResultPanel";
 import TaxonPanel from "./TaxonPanel";
+import TaxonSummaryPanel from "./TaxonSummaryPanel";
 import TextPanel from "./TextPanel";
 import classnames from "classnames";
 import { compose } from "recompose";
@@ -68,7 +69,7 @@ const RecordPage = ({
         result: options.result,
         includeEstimates: true,
         taxonomy: options.taxonomy || taxonomy,
-        fields: "all",
+        fields: undefined,
       };
       if (options.result == "taxon") {
         searchTerm.query = `tax_eq(${options.recordId})`;
@@ -142,7 +143,7 @@ const RecordPage = ({
         }
       }
     }
-  }, [options]);
+  }, [location.search]);
   if (record && record.record && record.record.taxon_id) {
     taxon = {
       taxon_id: record.record.taxon_id,
@@ -153,6 +154,8 @@ const RecordPage = ({
       results.push(
         <ResultPanel key={taxon.taxon_id} {...searchById} {...taxon} />
       );
+
+      // results.push(<TaxonSummaryPanel key={"taxon_summary"} {...taxon} />);
 
       if (record.record.lineage) {
         results.push(
@@ -172,18 +175,6 @@ const RecordPage = ({
           />
         );
       }
-    }
-
-    if (options.result != "taxon") {
-      results.push(
-        <TaxonPanel
-          key={"taxon"}
-          recordId={record.record.record_id}
-          {...record.record}
-          result={options.result}
-          taxonomy={options.taxonomy}
-        />
-      );
     }
 
     if (options.result == "assembly" || options.result == "feature") {
@@ -215,7 +206,20 @@ const RecordPage = ({
           taxonomy={options.taxonomy}
         />
       );
-    } else {
+    }
+    if (options.result != "taxon") {
+      results.push(
+        <TaxonPanel
+          key={"taxon"}
+          recordId={record.record.record_id}
+          {...record.record}
+          result={options.result}
+          taxonomy={options.taxonomy}
+        />
+      );
+    }
+
+    if (options.result == "taxon" || options.result == "assembly") {
       results.push(
         <AnalysisPanel
           key={"analysis"}
