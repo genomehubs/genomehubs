@@ -75,6 +75,7 @@ export const queryPropList = {
     "cumulative",
     pointSizeSettings,
     "compactLegend",
+    "catToX",
     "compactWidth",
     "result",
     "taxonomy",
@@ -501,7 +502,8 @@ export const ReportEdit = ({
       queryProp == "cumulative" ||
       queryProp == "reversed" ||
       queryProp == "collapseMonotypic" ||
-      queryProp == "compactLegend"
+      queryProp == "compactLegend" ||
+      queryProp == "catToX"
     ) {
       toggles.push(
         <div style={{ float: "left", marginRight: "2em" }} key={queryProp}>

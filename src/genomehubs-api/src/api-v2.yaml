@@ -28,6 +28,22 @@ components:
       required: false
       schema:
         type: string
+    catToXParam:
+      description: |
+        Flag to indicate whether category and x-axis values should be swapped.
+
+        Only affects reports with a lineage as category and keyword attribute on the x-axis.
+      examples:
+        false:
+          value:
+          summary: false - do not swap values
+        true:
+          value: true
+          summary: true - swap values
+      in: query
+      name: catToX
+      schema:
+        type: boolean
     collapseMonotypicParam:
       description: |
         Collapse monotypic tree nodes.
@@ -1304,7 +1320,7 @@ paths:
 
         | Report        | Required          | Optional       |
         | ------------- | ----------------- | -------------- |
-        | **Histogram** | `x`               | `cat`, `rank`, `xOpts` |
+        | **Histogram** | `x`               | `cat`, `catToX`, `rank`, `xOpts` |
         | **Map**       | `x`               | `cat`, `rank`          |
         | **Oxford**    | `x`               | `cat`, `xOpts`, `yOpts` |
         | **Scatter**   | `x`, `y`, `rank`  | `cat`, `xOpts`, `yOpts`, `scatterThreshold` |
@@ -1324,6 +1340,7 @@ paths:
         - $ref: "#/components/parameters/yParam"
         # - $ref: "#/components/parameters/zParam"
         - $ref: "#/components/parameters/catParam"
+        - $ref: "#/components/parameters/catToXParam"
         - $ref: "#/components/parameters/rankParam"
         - $ref: "#/components/parameters/includeEstimatesParam"
         - $ref: "#/components/parameters/collapseMonotypicParam"

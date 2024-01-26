@@ -79,6 +79,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     xOpts: { in: new Set(["histogram", "scatter", "table"]) },
     yOpts: { in: new Set(["scatter", "table", "tree"]) },
     compactLegend: { in: new Set(["histogram", "oxford", "scatter"]) },
+    catToX: { in: new Set(["histogram"]) },
     compactWidth: { in: new Set(["histogram", "oxford", "scatter"]) },
     highlightArea: { in: new Set(["scatter"]), ui: true },
     scatterThreshold: { in: new Set(["scatter"]) },
