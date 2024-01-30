@@ -46,11 +46,12 @@ const searchByCell = ({
 }) => {
   let { query } = xQuery;
   let { field } = bounds;
+  let parts = query.split(/\s*AND\s*/gi);
+  let terms = [];
+  let tre;
   if (valueType == "lineage") {
-    query = query
-      .replaceAll(/tax_tree\(.+?\)\s*(?:AND\s*)?/gi, "")
-      .replaceAll(/AND\s+AND/gi, "AND");
-    query = `tax_tree(${xBounds[0]}) AND ${query}`;
+    tre = new RegExp(`tax_tree\\(.+?\\)`);
+    terms.push(`tax_tree(${xBounds[0]})`);
     if (bounds.cat) {
       field = bounds.cat;
       xBounds[0] = bounds.cats.map((o) => o.key).join(",");
@@ -59,43 +60,36 @@ const searchByCell = ({
     }
   }
   if (field) {
-    if (summary && summary != "value") {
-      field = `${summary}(${field})`;
+    let f = summary && summary != "value" ? `${summary}(${field})` : field;
+    let re = new RegExp(f == field ? `\\b${f}\\b` : `${summary}\\(${field}\\)`);
+    let index = parts.findIndex((p) => p.match(re));
+    for (let part of parts) {
+      if (!part.match(re) && (!tre || !part.match(re))) {
+        terms.push(part);
+      }
     }
-    if (summary && summary != "value") {
-      field = `${summary}(${field})`;
-      query = query
-        .replaceAll(new RegExp("AND\\s+" + field + "\\s+AND", "gi"), "AND")
-        .replaceAll(
-          new RegExp("AND\\s+" + field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
-          ""
-        )
-        .replaceAll(
-          new RegExp("AND\\s+" + field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
-          ""
-        );
-    }
-
-    query = query.replaceAll(/\s+/g, " ").replace(/\s+$/, "");
+    let newTerms = [];
     if (bounds.scale == "ordinal") {
       if (xBounds[0] == "other") {
-        query += ` AND ${field} != ${bounds.stats.cats
-          .filter((o) => o.key != "other")
-          .map((o) => o.key)
-          .join(",")}`;
+        terms.push(
+          `${f} != ${bounds.stats.cats
+            .filter((o) => o.key != "other")
+            .map((o) => o.key)
+            .join(",")}`
+        );
       } else {
-        query += ` AND ${field} = ${xBounds[0]}`;
+        newTerms.push(`${f} = ${xBounds[0]}`);
       }
     } else {
-      query += ` AND ${field} >= ${xBounds[0]} AND ${field} < ${xBounds[1]}`;
+      newTerms.push(`${f} >= ${xBounds[0]}`);
+      newTerms.push(`${f} < ${xBounds[1]}`);
     }
+    terms = index == 0 ? [...newTerms, ...terms] : [...terms, ...newTerms];
   }
   if (bounds.by == "lineage" && !bounds.showOther) {
-    query
-      .replaceAll(/tax_tree\(.+?\)\s*(?:AND\s*)?/gi, "")
-      .replaceAll(/AND\s+AND/gi, "AND");
-    query = `tax_tree(${bounds.cats.map((o) => o.key).join(",")}) AND ${query}`;
+    terms.push(`tax_tree(${bounds.cats.map((o) => o.key).join(",")})`);
   }
+  query = terms.join(" AND ");
 
   let options = qs.parse(location.search.replace(/^\?/, ""));
   if (options.sortBy && !fields.includes(options.sortBy)) {
