@@ -32,6 +32,7 @@ import { processLegendData } from "./MultiCatLegend";
 // import { point } from "leaflet";
 import qs from "../functions/qs";
 import { scaleLinear } from "d3-scale";
+import searchByCell from "../functions/searchByCell";
 import setColors from "../functions/setColors";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
@@ -40,144 +41,144 @@ import withReportTerm from "../hocs/withReportTerm";
 import withSiteName from "../hocs/withSiteName";
 import { zLegend } from "./zLegend";
 
-const searchByCell = ({
-  xQuery,
-  yQuery,
-  report,
-  xLabel,
-  yLabel,
-  xRange,
-  yRange,
-  bounds,
-  yBounds,
-  navigate,
-  location,
-  fields,
-  ranks,
-  valueType,
-  yValueType,
-  summary,
-  ySummary,
-  basename,
-}) => {
-  let query = xQuery.query;
-  let field = bounds.field;
-  query = query
-    .replaceAll(new RegExp("AND\\s+" + bounds.field + "\\s+AND", "gi"), "AND")
-    .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
-      ""
-    )
-    .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
-      ""
-    );
-  if (summary && summary != "value") {
-    field = `${summary}(${field})`;
-    query = query
-      .replaceAll(new RegExp("AND\\s+" + field + "\\s+AND", "gi"), "AND")
-      .replaceAll(
-        new RegExp("AND\\s+" + field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
-        ""
-      )
-      .replaceAll(
-        new RegExp("AND\\s+" + field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
-        ""
-      );
-  }
-  query = query.replaceAll(/\s+/g, " ").replace(/\s+$/, "");
-  if (valueType == "coordinate") {
-    query += ` AND sequence_id = ${xRange},${yRange}`;
-    query = query.replace("collate(assembly_id,", "collate(sequence_id,");
-  } else if (valueType == "date") {
-    query += ` AND ${field} >= ${
-      new Date(xRange[0]).toISOString().split(/t/i)[0]
-    } AND ${field} < ${new Date(xRange[1]).toISOString().split(/t/i)[0]}`;
-  } else if (valueType == "keyword" && field == bounds.field) {
-    let val = bounds.stats.cats[xRange[0]].key;
-    if (val == "other") {
-      let list = [];
-      for (let obj of bounds.stats.cats) {
-        if (obj.key != "other") {
-          list.push(obj.key);
-        }
-      }
-      query += ` AND ${field} != ${list.join(",")}`;
-    } else {
-      query += ` AND ${field} = ${val}`;
-    }
-  } else {
-    query += ` AND ${field} >= ${xRange[0]} AND ${field} < ${xRange[1]}`;
-  }
-  let yField = yBounds.field;
-  if (ySummary && ySummary != "value") {
-    yField = `${ySummary}(${yField})`;
-  }
-  if (yValueType == "date") {
-    query += ` AND ${yField} >= ${
-      new Date(yRange[0]).toISOString().split(/t/i)[0]
-    } AND ${yField} < ${new Date(yRange[1]).toISOString().split(/t/i)[0]}`;
-  } else if (yValueType == "keyword" && yField == yBounds.field) {
-    let val = yBounds.stats.cats[yRange[0]].key;
-    if (val == "other") {
-      let list = [];
-      for (let obj of yBounds.stats.cats) {
-        if (obj.key != "other") {
-          list.push(obj.key);
-        }
-      }
-      query += ` AND ${yField} != ${list.join(",")}`;
-    } else {
-      query += ` AND ${yField} = ${val}`;
-    }
-  } else if (yValueType != "coordinate") {
-    query += ` AND ${yField} >= ${yRange[0]} AND ${yField} < ${yRange[1]}`;
-  }
+// const searchByCell = ({
+//   xQuery,
+//   yQuery,
+//   report,
+//   xLabel,
+//   yLabel,
+//   xRange,
+//   yRange,
+//   bounds,
+//   yBounds,
+//   navigate,
+//   location,
+//   fields,
+//   ranks,
+//   valueType,
+//   yValueType,
+//   summary,
+//   ySummary,
+//   basename,
+// }) => {
+//   let query = xQuery.query;
+//   let field = bounds.field;
+//   query = query
+//     .replaceAll(new RegExp("AND\\s+" + bounds.field + "\\s+AND", "gi"), "AND")
+//     .replaceAll(
+//       new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
+//       ""
+//     )
+//     .replaceAll(
+//       new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
+//       ""
+//     );
+//   if (summary && summary != "value") {
+//     field = `${summary}(${field})`;
+//     query = query
+//       .replaceAll(new RegExp("AND\\s+" + field + "\\s+AND", "gi"), "AND")
+//       .replaceAll(
+//         new RegExp("AND\\s+" + field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
+//         ""
+//       )
+//       .replaceAll(
+//         new RegExp("AND\\s+" + field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
+//         ""
+//       );
+//   }
+//   query = query.replaceAll(/\s+/g, " ").replace(/\s+$/, "");
+//   if (valueType == "coordinate") {
+//     query += ` AND sequence_id = ${xRange},${yRange}`;
+//     query = query.replace("collate(assembly_id,", "collate(sequence_id,");
+//   } else if (valueType == "date") {
+//     query += ` AND ${field} >= ${
+//       new Date(xRange[0]).toISOString().split(/t/i)[0]
+//     } AND ${field} < ${new Date(xRange[1]).toISOString().split(/t/i)[0]}`;
+//   } else if (valueType == "keyword" && field == bounds.field) {
+//     let val = bounds.stats.cats[xRange[0]].key;
+//     if (val == "other") {
+//       let list = [];
+//       for (let obj of bounds.stats.cats) {
+//         if (obj.key != "other") {
+//           list.push(obj.key);
+//         }
+//       }
+//       query += ` AND ${field} != ${list.join(",")}`;
+//     } else {
+//       query += ` AND ${field} = ${val}`;
+//     }
+//   } else {
+//     query += ` AND ${field} >= ${xRange[0]} AND ${field} < ${xRange[1]}`;
+//   }
+//   let yField = yBounds.field;
+//   if (ySummary && ySummary != "value") {
+//     yField = `${ySummary}(${yField})`;
+//   }
+//   if (yValueType == "date") {
+//     query += ` AND ${yField} >= ${
+//       new Date(yRange[0]).toISOString().split(/t/i)[0]
+//     } AND ${yField} < ${new Date(yRange[1]).toISOString().split(/t/i)[0]}`;
+//   } else if (yValueType == "keyword" && yField == yBounds.field) {
+//     let val = yBounds.stats.cats[yRange[0]].key;
+//     if (val == "other") {
+//       let list = [];
+//       for (let obj of yBounds.stats.cats) {
+//         if (obj.key != "other") {
+//           list.push(obj.key);
+//         }
+//       }
+//       query += ` AND ${yField} != ${list.join(",")}`;
+//     } else {
+//       query += ` AND ${yField} = ${val}`;
+//     }
+//   } else if (yValueType != "coordinate") {
+//     query += ` AND ${yField} >= ${yRange[0]} AND ${yField} < ${yRange[1]}`;
+//   }
 
-  // let fields = `${xLabel},${yLabel}`;
-  let { xOpts, yOpts, highlightArea, ...options } = qs.parse(
-    location.search.replace(/^\?/, "")
-  );
-  if (options.sortBy && !fields.includes(options.sortBy)) {
-    delete options.sortBy;
-    delete options.sortOrder;
-  }
-  options.offset = 0;
-  if (fields) {
-    fields = fields.join(",");
-  }
-  if (ranks) {
-    ranks = ranks.join(",");
-  } else {
-    ranks = "";
-  }
-  for (let key of [
-    "excludeAncestral",
-    "excludeDescendant",
-    "excludeDirect",
-    "excludeMissing",
-  ]) {
-    if (xQuery[key]) {
-      delete xQuery[key];
-    }
-  }
-  let queryString = qs.stringify({
-    ...xQuery,
-    ...options,
-    query,
-    ...(yQuery && { y: yQuery.query }),
-    fields,
-    report,
-    ranks,
-  });
+//   // let fields = `${xLabel},${yLabel}`;
+//   let { xOpts, yOpts, highlightArea, ...options } = qs.parse(
+//     location.search.replace(/^\?/, "")
+//   );
+//   if (options.sortBy && !fields.includes(options.sortBy)) {
+//     delete options.sortBy;
+//     delete options.sortOrder;
+//   }
+//   options.offset = 0;
+//   if (fields) {
+//     fields = fields.join(",");
+//   }
+//   if (ranks) {
+//     ranks = ranks.join(",");
+//   } else {
+//     ranks = "";
+//   }
+//   for (let key of [
+//     "excludeAncestral",
+//     "excludeDescendant",
+//     "excludeDirect",
+//     "excludeMissing",
+//   ]) {
+//     if (xQuery[key]) {
+//       delete xQuery[key];
+//     }
+//   }
+//   let queryString = qs.stringify({
+//     ...xQuery,
+//     ...options,
+//     query,
+//     ...(yQuery && { y: yQuery.query }),
+//     fields,
+//     report,
+//     ranks,
+//   });
 
-  // let hash = encodeURIComponent(query);
-  navigate(
-    `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
-      query
-    )}`
-  );
-};
+//   // let hash = encodeURIComponent(query);
+//   navigate(
+//     `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
+//       query
+//     )}`
+//   );
+// };
 
 const searchByPoint = ({ props, chartProps }) => {
   let { xQuery, fields, ranks, groupBy, navigate, basename, bounds, yBounds } =

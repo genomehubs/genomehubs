@@ -60,6 +60,18 @@ body,
   }
 }
 
+.ttSwatch {
+  height: 1em;
+  width: 1em;
+  background-color: white;
+  border: solid white 0.125em;
+  margin-bottom: -0.2em;
+  display: inline-block;
+  margin-right: 0.5em;
+  box-sizing: border-box;
+  position:relative
+}
+
 * {
   @include themify($themes) {
     // background: inherit;
@@ -489,8 +501,6 @@ body,
         }
       }
     }
-
-    
 
 
     .resultPanel {
