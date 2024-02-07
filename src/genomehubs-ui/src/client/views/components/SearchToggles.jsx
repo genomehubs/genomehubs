@@ -55,6 +55,7 @@ const SearchToggles = ({
   setLookupTerm,
   basename,
   toggleTemplate,
+  searchIndex,
 }) => {
   const classes = useStyles();
   const navigate = useNavigate();
@@ -209,49 +210,52 @@ const SearchToggles = ({
             </FormControl>
           </Grid>
         </Tooltip>
-        <Tooltip
-          title={`Toggle switch to ${
-            searchDefaults.includeEstimates
-              ? "exclude estimated values from"
-              : "include estimated values in"
-          } results`}
-          arrow
-          placement={"top"}
-        >
-          <Grid item xs={2}>
-            <FormControl
-              className={classes.formControl}
-              style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
-            >
-              <FormHelperText>{"include estimates"}</FormHelperText>
-              <FormControlLabel
-                className={classes.label}
-                control={
-                  <Switch
-                    id={"estimated-values-filter"}
-                    checked={searchDefaults.includeEstimates}
-                    onChange={() => {
-                      let includeEstimates = !searchDefaults.includeEstimates;
-                      setSearchDefaults({
-                        includeEstimates,
-                      });
-                      navigate(
-                        `${location.pathname}?${qs.stringify({
-                          ...options,
+        {searchIndex == "taxon" && (
+          <Tooltip
+            title={`Toggle switch to ${
+              searchDefaults.includeEstimates
+                ? "exclude estimated values from"
+                : "include estimated values in"
+            } results`}
+            arrow
+            placement={"top"}
+          >
+            <Grid item xs={2}>
+              <FormControl
+                className={classes.formControl}
+                style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
+              >
+                <FormHelperText>{"include estimates"}</FormHelperText>
+                <FormControlLabel
+                  className={classes.label}
+                  control={
+                    <Switch
+                      id={"estimated-values-filter"}
+                      checked={searchDefaults.includeEstimates}
+                      onChange={() => {
+                        let includeEstimates = !searchDefaults.includeEstimates;
+                        setSearchDefaults({
                           includeEstimates,
-                        })}${location.hash}`
-                      );
-                    }}
-                    name="include-estimates"
-                    color="default"
-                  />
-                }
-                label={searchDefaults.includeEstimates ? "On" : "Off"}
-              />
-            </FormControl>
-          </Grid>
-        </Tooltip>
+                        });
+                        navigate(
+                          `${location.pathname}?${qs.stringify({
+                            ...options,
+                            includeEstimates,
+                          })}${location.hash}`
+                        );
+                      }}
+                      name="include-estimates"
+                      color="default"
+                    />
+                  }
+                  label={searchDefaults.includeEstimates ? "On" : "Off"}
+                />
+              </FormControl>
+            </Grid>
+          </Tooltip>
+        )}
         {templateButton}
+        {searchIndex != "taxon" && <Grid item xs={2} />}
         <Tooltip title={`Click to set result columns`} arrow placement={"top"}>
           <Grid
             item

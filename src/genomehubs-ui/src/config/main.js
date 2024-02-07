@@ -54,6 +54,8 @@ module.exports = {
       .replace(/^\/\//, "/")
       .replace(/\/$/, "")
       .replace("undefined", "") || "",
+  // default index
+  defaultIndex: process.env.GH_DEFAULT_INDEX || "taxon",
   // path to read flatfiles
   filePath: FILE_PATH,
   // version
