@@ -78,7 +78,7 @@ const Count = ({
         {...{
           values: {
             count,
-            scientific_name: record.record.scientific_name,
+            scientific_name: record?.record?.scientific_name || "",
           },
           description,
           handleClick,

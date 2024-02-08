@@ -71,6 +71,7 @@ export const DisplayCount = ({
       </div>
     );
   } catch (err) {
+    console.log(err);
     return null;
   }
   return formattedValue;
