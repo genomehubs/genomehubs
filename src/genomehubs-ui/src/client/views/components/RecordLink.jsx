@@ -48,13 +48,22 @@ const RecordLink = ({
     }
   }
 
-  const fetchValue = (key) => {
+  const fetchValue = (key, value) => {
     if (key == "assemblyId") {
       return getPrimaryAssemblyId(record);
     }
-    let value = record.record;
-    for (let k of key.split(".")) {
-      value = value[k];
+    let keys = key.split(/[\.\[]+/);
+    for (let k of keys) {
+      if (k.match(/\]$/)) {
+        k = k.replace(/\]$/, "");
+        let [subkey, subval] = k.split(":");
+
+        value = subval
+          ? value.find((o) => o[subkey] == subval)
+          : value.find((o) => o.hasOwnProperty(subkey));
+      } else {
+        value = value[k];
+      }
       if (typeof value === "undefined") {
         throw `ERROR fetching ${key}`;
       }
@@ -75,7 +84,7 @@ const RecordLink = ({
           return "";
         }
         if (i % 2 == 1) {
-          return fetchValue(part);
+          return fetchValue(part, record.record);
         }
         return part;
       })
@@ -92,7 +101,7 @@ const RecordLink = ({
           return null;
         }
       } else {
-        let recordValue = fetchValue(key);
+        let recordValue = fetchValue(key, record.record);
         if (cmp && !compareValues(recordValue, value, cmp)) {
           return null;
         }
