@@ -32,15 +32,13 @@ const validateValue = (term, value, meta, types) => {
   if (meta.attribute == "collate") {
     type = "keyword";
   }
-  if (type == "keyword") {
-    if (types && types(meta.attribute)) {
-      let summary = types(meta.attribute).summary;
-      if (
-        summary == "enum" ||
-        (Array.isArray(summary) && summary.includes("enum"))
-      ) {
-        attrEnum = new Set(types(meta.attribute).constraint.enum);
-      }
+  if (type == "keyword" && types && types(meta.attribute)) {
+    let summary = types(meta.attribute).summary;
+    if (
+      summary == "enum" ||
+      (Array.isArray(summary) && summary.includes("enum"))
+    ) {
+      attrEnum = new Set(types(meta.attribute).constraint.enum);
     }
   }
 
@@ -54,11 +52,9 @@ const validateValue = (term, value, meta, types) => {
     if (v.match(/^!*null$/)) {
       continue;
     }
-    if (type == "keyword") {
-      if (attrEnum) {
-        if (!attrEnum.has(v.replace(/^!/, ""))) {
-          return fail(`invalid value for ${meta.attribute} in ${term}`);
-        }
+    if (type == "keyword" || type == "flattened") {
+      if (attrEnum && !attrEnum.has(v.replace(/^!/, ""))) {
+        return fail(`invalid value for ${meta.attribute} in ${term}`);
       }
       if (meta.attribute == "taxonomy") {
         if (meta.type == "tax_rank") {
@@ -100,7 +96,7 @@ const validateOperator = (term, types, meta) => {
     if (!types) {
       return { success: true };
     }
-    let fullMeta = types(parts[0].toLowerCase());
+    let fullMeta = types(parts[0].replace(/\..+/, "").toLowerCase());
     if (fullMeta.processed_type == "keyword" && parts[1].match(/[<>]/)) {
       return fail(`invalid operator for ${fullMeta.name} in ${term}`);
     }
@@ -213,11 +209,11 @@ const validateTerm = (term, types) => {
     }
 
     if (types) {
-      let meta = types(attr_name);
+      let meta = types(attr_name.replace(/\..+/, ""));
       if (!meta) {
         return { validation: fail(`invalid attribute name in ${term}`) };
       }
-      parts[2] = meta.name;
+      parts[2] = attr_name.match(/\./) ? attr_name : meta.name;
       let typeSummary = meta.summary;
       if (!Array.isArray(typeSummary)) {
         typeSummary = [typeSummary];

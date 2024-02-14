@@ -4,6 +4,7 @@
 
 import contextlib
 import csv
+import json
 import os
 import re
 import shutil
@@ -325,6 +326,8 @@ def convert_to_type(key, raw_value, to_type, *, translate=None):
             value = None
     elif to_type == "geo_point":
         value = convert_lat_lon(raw_value)
+    elif to_type == "flattened":
+        value = json.loads(raw_value)
     else:
         value = str(raw_value)
     if value is None:
@@ -508,7 +511,7 @@ def validate_values(values, key, types, row_values, shared_values, blanks):
         if not isinstance(value, list):
             value = [value]
         for v in value:
-            if v in blanks:
+            if not isinstance(v, dict) and v in blanks:
                 continue
             try:
                 valid = test_constraint(v, key_type)

@@ -54,7 +54,8 @@ export const filterAttributes = (
   let rangeQuery;
   if (searchRawValues) {
     rangeQuery = (field, stat) => {
-      if (lookupTypes(field).type == "keyword") {
+      let fieldType = lookupTypes(field).type;
+      if (fieldType == "keyword") {
         return [
           {
             nested: {
@@ -104,12 +105,24 @@ export const filterAttributes = (
               filter: filters[stat][field].map((term) => {
                 let include = [];
                 let exclude = [];
+
                 for (let option of term.split(",")) {
+                  let parts = option.split(/\./);
+                  let path = "";
+                  let value = option;
+                  if (parts.length > 1) {
+                    path = `.${parts.slice(0, parts.length - 1).join(".")}`;
+                    value = parts[parts.length - 1];
+                  }
                   if (option.startsWith("!")) {
-                    option = option.replace("!", "");
-                    exclude.push(wildcard_match(`attributes.${stat}`, option));
+                    path = path.replace(".!", ".");
+                    exclude.push(
+                      wildcard_match(`attributes.${stat}${path}`, value)
+                    );
                   } else {
-                    include.push(wildcard_match(`attributes.${stat}`, option));
+                    include.push(
+                      wildcard_match(`attributes.${stat}${path}`, value)
+                    );
                   }
                 }
 
