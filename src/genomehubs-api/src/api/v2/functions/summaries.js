@@ -1,1 +1,9 @@
-export const summaries = ["value", "count", "length", "max", "min", "range"];
+export const summaries = [
+  "value",
+  "count",
+  "length",
+  "max",
+  "min",
+  "range",
+  "metadata",
+];

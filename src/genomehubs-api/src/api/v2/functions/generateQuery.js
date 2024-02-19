@@ -98,7 +98,7 @@ const validateOperator = (term, types, meta) => {
     }
     let fullMeta = types(parts[0].replace(/\..+/, "").toLowerCase());
     if (fullMeta.processed_type == "keyword" && parts[1].match(/[<>]/)) {
-      return fail(`invalid operator for ${fullMeta.name} in ${term}`);
+      // return fail(`invalid operator for ${fullMeta.name} in ${term}`);
     }
     if (!meta) {
       if (!fullMeta) {
@@ -134,6 +134,7 @@ const splitTerm = (term) => {
       return pattern;
     })
     .join("");
+  console.log({ subbedTerm });
   if (subbedTerm.match(/^[^=><]+\(/)) {
     parts = subbedTerm.match(/(.*?)\((.*)\)([^\)]*)/);
   }
@@ -141,6 +142,21 @@ const splitTerm = (term) => {
     // parts = subbedTerm.match(/()(.*?)\s*([!><=]+[^\)]*)/) || [subbedTerm];
     parts = subbedTerm.match(/()(.*?)\s*([!><=]+.*)/) || [subbedTerm];
   }
+  if (parts[1] == "" && parts[2].match(/\./)) {
+    let path = parts[2].split(/\./);
+    parts[1] = "metadata";
+    parts[2] = path[0];
+    let [operator, values] = parts[3].split(/([^!><=].+)/);
+    parts[3] = `${operator}${values
+      .split(/\s*,\s*/)
+      .map((val) => {
+        let [bang = "", v] = val.split(/([^!].+)/);
+        return `${bang}${path.slice(1).join(".")}.${v}`;
+      })
+      .join(",")}`;
+  }
+
+  console.log(parts);
   for (let i = 0; i < 3; i++) {
     if (parts[i]) {
       for (let pattern of patterns) {
@@ -224,6 +240,7 @@ const validateTerm = (term, types) => {
       ) {
         typeSummary.push("length");
       }
+      typeSummary.push("metadata");
       if (parts[1] && parts[1].length > 0 && !typeSummary.includes(parts[1])) {
         return {
           validation: fail(`invalid summary for ${parts[2]} in ${term}`),

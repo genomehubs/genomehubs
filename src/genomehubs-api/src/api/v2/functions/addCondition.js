@@ -68,7 +68,11 @@ export const addCondition = (
     return conditions;
   }
 
-  if (stat == "keyword_value" || stat == "flattened_value") {
+  if (
+    stat == "keyword_value" ||
+    stat == "flattened_value" ||
+    (stat == "metadata" && !parts[3].match(/[><]/))
+  ) {
     if (!Array.isArray(conditions[stat][parts[2]])) {
       conditions[stat][parts[2]] = [];
     }
@@ -114,5 +118,6 @@ export const addCondition = (
       conditions[stat][parts[2]][operator] = valueList.join(",");
     });
   }
+  console.log(conditions);
   return conditions;
 };

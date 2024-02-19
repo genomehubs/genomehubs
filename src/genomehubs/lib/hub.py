@@ -559,6 +559,37 @@ def update_taxon_types(taxon_types, new_prop, value, prop):
         del taxon_types[prop]
 
 
+def process_metadata(attribute, meta):
+    """Move attribute metadata to a single dict."""
+    paths = {
+        "comment": "value.comment",
+        "is_primary_value": "value.primary",
+        "organelle": "value.organelle",
+        "source": "source.name",
+        "source_pubmed_id": "source.pubmed",
+        "source_url_stub": "source.stub",
+        "url": "source.url",
+    }
+    metadata = json.loads(attribute["metadata"]) if "metadata" in attribute else {}
+    for key, value in attribute.items():
+        if key in paths:
+            path = paths[key]
+        elif key.startswith("source_"):
+            path = key.replace("_", ".")
+        else:
+            continue
+        parent = metadata
+        parts = path.lower().split(".")
+        for index, part in enumerate(parts):
+            if part not in parent and index < len(parts) - 1:
+                parent[part] = {}
+            if index < len(parts) - 1:
+                parent = parent[part]
+            else:
+                parent[part] = str(value).lower()
+    attribute["metadata"] = metadata
+
+
 def add_attributes(
     entry,
     types,
@@ -648,6 +679,7 @@ def add_attributes(
                 # taxon_attribute.update({"name": taxon_attribute_types["key"]})
                 taxon_attributes.append(taxon_attribute)
                 taxon_types[taxon_attribute_types["name"]] = taxon_attribute_types
+            process_metadata(attribute, meta)
     return attributes, taxon_attributes, taxon_types
 
 
