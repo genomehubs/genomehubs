@@ -653,12 +653,26 @@ def add_attributes(
                         row_values,
                         shared_values,
                     )
+                # if "metadata" in types[key]:
+                #     if "metadata" not in attribute:
+                #         attribute.update({"metadata": {}})
+                #     attribute.update(
+                #         {
+                #             "metadata": {
+                #                 k: v
+                #                 for k, v in types[key]["metadata"].items()
+                #                 if k not in attribute["metadata"]
+                #             }
+                #         }
+                #     )
+
                 attributes.append(attribute)
     if attribute_values:
         for attribute in attributes:
+            process_metadata(attribute, meta)
             has_taxon_data = False
-            taxon_attribute = {**attribute, "source_index": "assembly"}
             taxon_attribute_types = {**types[attribute["key"]]}
+            taxon_attribute = {**attribute, "source_index": "assembly"}
             # taxon_props = []
             for prop, value in types[attribute["key"]].items():
                 if prop.startswith("taxon_"):
@@ -679,7 +693,6 @@ def add_attributes(
                 # taxon_attribute.update({"name": taxon_attribute_types["key"]})
                 taxon_attributes.append(taxon_attribute)
                 taxon_types[taxon_attribute_types["name"]] = taxon_attribute_types
-            process_metadata(attribute, meta)
     return attributes, taxon_attributes, taxon_types
 
 

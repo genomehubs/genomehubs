@@ -48,13 +48,39 @@ export const filterAttributes = (
   searchRawValues,
   optionalFields
 ) => {
-  console.log(filters);
   if (Object.keys(filters).length == 0) {
     return [];
   }
   let rangeQuery;
   if (searchRawValues) {
     rangeQuery = (field, stat) => {
+      return filters[stat][field].map((flt) => {
+        if (typeof flt !== "object") {
+          let values = flt.split(",");
+          let path = "";
+          return {
+            nested: {
+              path: "attributes.values",
+              query: {
+                bool: {
+                  should: values.map((v) => {
+                    let parts = v.split("::");
+                    let value = v;
+                    if (parts.length > 1) {
+                      path = `.${parts.slice(0, parts.length - 1).join(".")}`;
+                      value = parts[parts.length - 1];
+                    }
+                    return {
+                      match: { [`attributes.values.${stat}${path}`]: value },
+                    };
+                  }),
+                },
+              },
+            },
+          };
+        }
+        // TODO: support object-based query here
+      });
       let fieldType = lookupTypes(field).type;
       if (fieldType == "keyword") {
         return [
@@ -106,9 +132,8 @@ export const filterAttributes = (
               filter: filters[stat][field].map((term) => {
                 let include = [];
                 let exclude = [];
-                console.log(term);
                 for (let option of term.split(",")) {
-                  let parts = option.split(/\./);
+                  let parts = option.split("::");
                   let path = "";
                   let value = option;
                   if (parts.length > 1) {
@@ -231,10 +256,9 @@ export const filterAttributes = (
             },
           };
         }
-        console.log({ stat, flt });
         let path = "";
         Object.entries(flt).forEach(([k, v]) => {
-          let parts = v.split(/\./);
+          let parts = v.split("::");
           let value = v;
           if (parts.length > 1) {
             path = `.${parts.slice(0, parts.length - 1).join(".")}`;
@@ -242,7 +266,6 @@ export const filterAttributes = (
           }
           flt[k] = value;
         });
-        console.log({ stat: path, flt });
 
         return {
           bool: {

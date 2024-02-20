@@ -17,23 +17,28 @@ const isDate = (date) => {
 };
 
 const validateValue = (term, value, meta, types) => {
-  let type = meta.type;
+  let { type } = meta;
   let attrEnum;
-  if (types && types(meta.attribute)) {
+  if (type != "metadata" && types && types(meta.attribute)) {
     // if (!type || type == "value") {
     type = types(meta.attribute).type;
     // }
   }
-  if (meta.attribute == "taxonomy") {
-    if (["tax_name", "tax_rank", "tax_eq", "tax_lineage"]) {
-      type = "keyword";
-    }
+  if (
+    meta.attribute == "taxonomy" && [
+      "tax_name",
+      "tax_rank",
+      "tax_eq",
+      "tax_lineage",
+    ]
+  ) {
+    type = "keyword";
   }
   if (meta.attribute == "collate") {
     type = "keyword";
   }
   if (type == "keyword" && types && types(meta.attribute)) {
-    let summary = types(meta.attribute).summary;
+    let { summary } = types(meta.attribute);
     if (
       summary == "enum" ||
       (Array.isArray(summary) && summary.includes("enum"))
@@ -52,14 +57,12 @@ const validateValue = (term, value, meta, types) => {
     if (v.match(/^!*null$/)) {
       continue;
     }
-    if (type == "keyword" || type == "flattened") {
+    if (type == "keyword" || type == "flattened" || type == "metadata") {
       if (attrEnum && !attrEnum.has(v.replace(/^!/, ""))) {
         return fail(`invalid value for ${meta.attribute} in ${term}`);
       }
-      if (meta.attribute == "taxonomy") {
-        if (meta.type == "tax_rank") {
-          // TODO: check rank is valid
-        }
+      if (meta.attribute == "taxonomy" && meta.type == "tax_rank") {
+        // TODO: check rank is valid
       }
       continue;
     } else if (meta.type == "date" || type == "date") {
@@ -134,7 +137,6 @@ const splitTerm = (term) => {
       return pattern;
     })
     .join("");
-  console.log({ subbedTerm });
   if (subbedTerm.match(/^[^=><]+\(/)) {
     parts = subbedTerm.match(/(.*?)\((.*)\)([^\)]*)/);
   }
@@ -151,12 +153,11 @@ const splitTerm = (term) => {
       .split(/\s*,\s*/)
       .map((val) => {
         let [bang = "", v] = val.split(/([^!].+)/);
-        return `${bang}${path.slice(1).join(".")}.${v}`;
+        return `${bang}${path.slice(1).join("::")}::${v}`;
       })
       .join(",")}`;
   }
 
-  console.log(parts);
   for (let i = 0; i < 3; i++) {
     if (parts[i]) {
       for (let pattern of patterns) {
@@ -377,11 +378,14 @@ export const generateQuery = async ({
           if (lookupTypes[result]) {
             let meta = lookupTypes[result](term);
             if (meta) {
-              let bins = meta.bins;
-              if (bins && bins.scale && bins.scale.startsWith("log")) {
-                if (!parts[3] || parts[3].length > 0) {
-                  parts[3] = ">0";
-                }
+              let { bins } = meta;
+              if (
+                bins &&
+                bins.scale &&
+                bins.scale.startsWith("log") &&
+                (!parts[3] || parts[3].length > 0)
+              ) {
+                parts[3] = ">0";
               }
               term = meta.name;
             }
