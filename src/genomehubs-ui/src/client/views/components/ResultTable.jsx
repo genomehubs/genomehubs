@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import { useLocation, useNavigate } from "@reach/router";
 
@@ -8,14 +8,17 @@ import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import Checkbox from "@material-ui/core/Checkbox";
 import Citation from "./Citation";
+import DescriptionIcon from "@material-ui/icons/Description";
 import DownloadButton from "./DownloadButton";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import Grid from "@material-ui/core/Grid";
 import Grow from "@material-ui/core/Grow";
 import IconButton from "@material-ui/core/IconButton";
 import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
+import LaunchIcon from "@material-ui/icons/Launch";
 import LinkButton from "./LinkButton";
 import MuiTableCell from "@material-ui/core/TableCell";
+import RadioButtonCheckedOutlinedIcon from "@material-ui/icons/RadioButtonCheckedOutlined";
 import ReportError from "./ReportError";
 import ResultFilter from "./ResultFilter";
 import ResultModalControl from "./ResultModalControl";
@@ -23,6 +26,7 @@ import SearchPagination from "./SearchPagination";
 import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
 import SettingsIcon from "@material-ui/icons/Settings";
 import Skeleton from "@material-ui/lab/Skeleton";
+import Tab from "./Tab";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableContainer from "@material-ui/core/TableContainer";
@@ -30,6 +34,9 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Tooltip from "./Tooltip";
+import ViewWeekIcon from "@material-ui/icons/ViewWeek";
+import ViewWeekOutlinedIcon from "@material-ui/icons/ViewWeekOutlined";
+import VisibilityIcon from "@material-ui/icons/Visibility";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchRecord from "../hocs/dispatchRecord";
@@ -45,6 +52,8 @@ import withSearchDefaults from "../hocs/withSearchDefaults";
 import withSiteName from "../hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
+
+const borderColor = "#dddddd";
 
 const StyledTableRow = withStyles((theme) => ({
   root: {
@@ -111,8 +120,38 @@ export const useStyles = makeStyles((theme) => ({
 const TableCell = withStyles((theme) => ({
   root: {
     padding: "1px 6px",
+    // borderBottom: `solid ${borderColor} 1px`,
+    lineHeight: "inherit",
   },
 }))(MuiTableCell);
+
+const StickyCell = withStyles((theme) => ({
+  root: {
+    position: "sticky",
+    left: 0,
+    zIndex: 100,
+    backgroundColor: "#f8f8f8",
+  },
+}))(TableCell);
+
+const OddTableCell = withStyles((theme) => ({
+  root: {
+    textAlign: "center",
+    backgroundColor: `#ffffff00`,
+  },
+}))(TableCell);
+
+const EvenTableCell = withStyles((theme) => ({
+  root: {
+    backgroundColor: `${borderColor}33`,
+  },
+}))(OddTableCell);
+
+const SpanTableCell = withStyles((theme) => ({
+  root: {
+    textAlign: "left",
+  },
+}))(EvenTableCell);
 
 const StyledCheckbox = ({ color, ...props }) => {
   return (
@@ -135,10 +174,24 @@ const StyledColbox = ({ color, ...props }) => {
     <Checkbox
       style={{
         padding: "1px",
-        color: props.color,
+        color,
       }}
       icon={<SettingsApplicationsIcon style={{ fontSize: "small" }} />}
       checkedIcon={<SettingsIcon style={{ fontSize: "small" }} />}
+      {...props}
+    />
+  );
+};
+
+const StyledColSplit = ({ color, ...props }) => {
+  return (
+    <Checkbox
+      style={{
+        padding: "1px",
+        color,
+      }}
+      icon={<ViewWeekOutlinedIcon style={{ fontSize: "small" }} />}
+      checkedIcon={<ViewWeekIcon style={{ fontSize: "small" }} />}
       {...props}
     />
   );
@@ -148,34 +201,39 @@ const SortableCell = ({
   name,
   description,
   status,
+  colCount,
+  colSpan,
   classes,
+  searchIndex,
+  CustomCell,
+  borderBottom,
   statusColors = {},
   sortBy,
   sortOrder,
   sortDirection,
-  handleTableSort,
+  handleTableSort = () => {},
   setAttributeSettings,
   showExcludeBoxes,
   excludeDirect,
   excludeAncestral,
   excludeDescendant,
   excludeMissing,
-  handleToggleExclusion,
+  handleToggleExclusion = () => {},
+  handleToggleColSpan = () => {},
 }) => {
+  if (!CustomCell) {
+    CustomCell = TableCell;
+  }
   let css = styles.aggregationToggle;
   let prefix = name.replace(/:.+$/, "");
-  if (excludeAncestral) {
-    if (
-      excludeDirect.hasOwnProperty(prefix) ||
+  if (
+    excludeAncestral &&
+    (excludeDirect.hasOwnProperty(prefix) ||
       excludeDescendant.hasOwnProperty(prefix) ||
       excludeAncestral.hasOwnProperty(prefix) ||
-      excludeMissing.hasOwnProperty(prefix)
-    ) {
-      css = classnames(
-        styles.aggregationToggle,
-        styles.aggregationToggleOpaque
-      );
-    }
+      excludeMissing.hasOwnProperty(prefix))
+  ) {
+    css = classnames(styles.aggregationToggle, styles.aggregationToggleOpaque);
   }
 
   let title = handleTableSort ? `Sort by ${name}` : name;
@@ -207,9 +265,12 @@ const SortableCell = ({
     );
   }
 
+  let SpanCell = colSpan > 1 ? SpanTableCell : CustomCell;
+
   return (
-    <TableCell
+    <SpanCell
       key={name}
+      colSpan={colSpan}
       style={{
         whiteSpace: "normal",
         wordWrap: "break-word",
@@ -217,6 +278,7 @@ const SortableCell = ({
         minWidth: "3rem",
         lineHeight: "1rem",
         verticalAlign: "bottom",
+        borderBottom,
       }}
       sortDirection={sortDirection}
     >
@@ -324,7 +386,7 @@ const SortableCell = ({
               />
             </span>
           </Tooltip>
-          {true && (
+          {searchIndex == "taxon" && (
             <Tooltip key={"columns"} title={"Show/hide subset columns"} arrow>
               <span>
                 <StyledColbox
@@ -340,15 +402,34 @@ const SortableCell = ({
                       showAttribute: true,
                     });
                   }}
-                  color={"blue"}
+                  color={"black"}
                   inputProps={{ "aria-label": "show/hide columns" }}
                 />
               </span>
             </Tooltip>
           )}
+          {colCount > 1 && (
+            <Tooltip key={"split"} title={"Toggle split column"} arrow>
+              <span>
+                <span>
+                  <StyledColSplit
+                    checked={colSpan > 1}
+                    // onChange={() =>
+                    //   handleToggleExclusion({ toggleAncestral: prefix })
+                    // }
+                    onClick={() => {
+                      handleToggleColSpan(prefix, colSpan);
+                    }}
+                    color={"black"}
+                    inputProps={{ "aria-label": "split/collapse column" }}
+                  />
+                </span>
+              </span>
+            </Tooltip>
+          )}
         </span>
       )) || <span className={css}></span>}
-    </TableCell>
+    </SpanCell>
   );
 };
 
@@ -373,26 +454,26 @@ const ResultTable = ({
   basename,
 }) => {
   const rootRef = useRef(null);
+  const [expandColumns, setExpandColumns] = useState({});
   let expandedTypes = [];
   let emptyBuckets = new Set();
-  if (searchResults.aggs) {
-    if (searchResults.aggs.fields) {
-      emptyBuckets = new Set(
-        Object.entries(searchResults.aggs.fields.by_key.buckets)
-          .filter(([key, obj]) => obj.doc_count == 0)
-          .map(([key]) => key)
-      );
-    }
+  if (searchResults.aggs?.fields) {
+    emptyBuckets = new Set(
+      Object.entries(searchResults.aggs.fields.by_key.buckets)
+        .filter(([_, obj]) => obj.doc_count == 0)
+        .map(([key]) => key)
+    );
   }
   if (searchTerm) {
     if (searchTerm.fields) {
       let fieldList = expandFieldList({ fields: searchTerm.fields, types });
-      expandedTypes = fieldList
-        .filter((name) => !emptyBuckets.has(name))
-        .map((name) => ({
-          name,
-        }))
-        .filter((obj) => obj.name != "none");
+      expandedTypes = displayTypes.filter(
+        ({ name }) => !emptyBuckets.has(name) && name != "none"
+      );
+      // .map((name) => ({
+      //   name,
+      // }))
+      // .filter((obj) => obj.name != "none");
       for (let obj of expandedTypes) {
         let [name, summary] = obj.name.split(":");
         let defaultValue = (types[name] || { processed_simple: "value" })
@@ -460,6 +541,14 @@ const ResultTable = ({
         searchText
       )}`
     );
+  };
+
+  const handleToggleColSpan = (id, colSpan) => {
+    if (colSpan > 1) {
+      setExpandColumns({ ...expandColumns, [id]: false });
+    } else {
+      setExpandColumns({ ...expandColumns, [id]: true });
+    }
   };
 
   const handleToggleExclusion = ({
@@ -558,12 +647,12 @@ const ResultTable = ({
     }
     let cells = [
       <Tooltip title={"Click to view record"} arrow key={"name"}>
-        <TableCell
+        <StickyCell
           style={{ cursor: "pointer" }}
           onClick={() => handleRecordClick(result.result)}
         >
           {name}
-        </TableCell>
+        </StickyCell>
       </Tooltip>,
       <Tooltip title={"Click to view record"} arrow key={"taxon_id"}>
         <TableCell
@@ -657,93 +746,164 @@ const ResultTable = ({
     }
 
     expandedTypes.forEach((type) => {
+      let colSpan = 1;
+      let colCount = type.constraint?.enum?.length || 1;
+      if (colCount > 1 && expandColumns[type.name]) {
+        colSpan = colCount;
+        maxColSpan = Math.max(colSpan, maxColSpan);
+      }
       if (
         result.result.fields &&
         result.result.fields.hasOwnProperty(type.name)
       ) {
         let field = result.result.fields[type.name];
         let value = field[type.summary];
-        let entries = [];
-        if (Array.isArray(value)) {
-          value = formatter(value, searchIndex, "array");
-          let charLimit = 20;
-          for (let v of value.values) {
-            let entry = v[0];
-            if (charLimit == 20 || charLimit - entry.length > 0) {
-              entries.push(entry);
-              charLimit -= entry.length;
+        if (colSpan == 1) {
+          let entries = [];
+          if (Array.isArray(value)) {
+            value = formatter(value, searchIndex, "array");
+            let charLimit = 20;
+            for (let v of value.values) {
+              let entry = v[0];
+              if (charLimit == 20 || charLimit - entry.length > 0) {
+                entries.push(entry);
+                charLimit -= entry.length;
+              }
             }
+            value = entries.join(", ");
+            if (field.value.length > 1) {
+              length = field.value.length;
+            }
+          } else {
+            value = formatter(value, searchIndex);
           }
-          value = entries.join(", ");
-          if (field.value.length > 1) {
-            length = field.value.length;
-            // if (field.value.length > entries.length) {
-            //   value += ", ...";
-            // }
+          if (
+            type.summary == "value" &&
+            Array.isArray(field.value) &&
+            field.length > entries.length
+          ) {
+            let badgeContent = `+${field.length - entries.length}`;
+            value = (
+              <span>
+                {value}
+                <StyledBadge
+                  badgeContent={badgeContent}
+                  color={"default"}
+                  max={100000}
+                >
+                  <span style={{ padding: "0 6px", color: "rgba(0,0,0,0" }}>
+                    {badgeContent}
+                  </span>
+                </StyledBadge>
+              </span>
+            );
           }
-        } else {
-          value = formatter(value, searchIndex);
-        }
-        if (
-          type.summary == "value" &&
-          Array.isArray(field.value) &&
-          field.length > entries.length
-        ) {
-          // let list = entries.join(", ");
-          // list = `${list}, ... (${field.length - entries.length} more)`;
-          let badgeContent = `+${field.length - entries.length}`;
-          value = (
-            // <Tooltip title={list} placement="top" arrow>
-            <span>
-              {value}
-              <StyledBadge
-                badgeContent={badgeContent}
-                color={"default"}
-                max={100000}
+          cells.push(
+            <TableCell key={type.name}>
+              <Grid
+                container
+                direction="row"
+                wrap="nowrap"
+                spacing={1}
+                alignItems={"center"}
+                ref={rootRef}
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setAttributeSettings({
+                    currentRecordId,
+                    attributeId: type.name,
+                    showAttribute: true,
+                  });
+                }}
               >
-                <span style={{ padding: "0 6px", color: "rgba(0,0,0,0" }}>
-                  {badgeContent}
-                </span>
-              </StyledBadge>
-            </span>
-            // </Tooltip>
+                {field.aggregation_source && (
+                  <Grid item>
+                    <AggregationIcon
+                      method={field.aggregation_source}
+                      hasDescendants={field.has_descendants}
+                    />
+                  </Grid>
+                )}
+
+                <Grid item style={{ whiteSpace: "nowrap" }}>
+                  {value}
+                </Grid>
+              </Grid>
+            </TableCell>
+          );
+        } else {
+          let values = (Array.isArray(value) ? value : [value]).map((v) =>
+            v.toLowerCase()
+          );
+          type.constraint.enum.forEach((key, i) => {
+            let OddEvenCell = i % 2 == 1 ? EvenTableCell : OddTableCell;
+            if (!values.includes(key)) {
+              cells.push(
+                <OddEvenCell key={`${type.name}-${key}-${i}`}>
+                  {/* <CheckBoxOutlineBlankIcon style={{ opacity: 0.25 }} /> */}
+                </OddEvenCell>
+              );
+            } else {
+              let list = type.value_metadata?.[key]?.icons;
+              let icons = [];
+              let url = type.value_metadata?.default?.link;
+              if (list) {
+                if (list.file) {
+                  url = list.file?.link || url;
+                  icons.push(
+                    <DescriptionIcon
+                      key="file"
+                      style={{
+                        fill: statusColors[field.aggregation_source],
+                        cursor: "pointer",
+                      }}
+                      onClick={() => window.open(url)}
+                    />
+                  );
+                }
+                if (list.view) {
+                  url = list.view?.link || url;
+                  icons.push(
+                    <VisibilityIcon
+                      key="view"
+                      style={{
+                        fill: statusColors[field.aggregation_source],
+                        cursor: "pointer",
+                      }}
+                    />
+                  );
+                }
+              } else {
+                icons.push(
+                  <RadioButtonCheckedOutlinedIcon
+                    style={{
+                      fill: statusColors[field.aggregation_source],
+                      cursor: "pointer",
+                    }}
+                    key="check"
+                  />
+                );
+              }
+              cells.push(
+                <OddEvenCell
+                  key={`${type.name}-${key}-${i}`}
+                  style={{ whiteSpace: "nowrap" }}
+                >
+                  {icons}
+                </OddEvenCell>
+              );
+            }
+          });
+        }
+      } else {
+        for (let i = 0; i < colSpan; i++) {
+          let OddEvenCell = i % 2 == 1 ? EvenTableCell : OddTableCell;
+          cells.push(
+            <OddEvenCell key={`${type.name}-${i}`}>
+              {colSpan == 1 && "-"}
+            </OddEvenCell>
           );
         }
-        cells.push(
-          <TableCell key={type.name}>
-            <Grid
-              container
-              direction="row"
-              wrap="nowrap"
-              spacing={1}
-              alignItems={"center"}
-              ref={rootRef}
-              style={{ cursor: "pointer" }}
-              onClick={() => {
-                setAttributeSettings({
-                  currentRecordId,
-                  attributeId: type.name,
-                  showAttribute: true,
-                });
-              }}
-            >
-              {field.aggregation_source && (
-                <Grid item>
-                  <AggregationIcon
-                    method={field.aggregation_source}
-                    hasDescendants={field.has_descendants}
-                  />
-                </Grid>
-              )}
-
-              <Grid item style={{ whiteSpace: "nowrap" }}>
-                {value}
-              </Grid>
-            </Grid>
-          </TableCell>
-        );
-      } else {
-        cells.push(<TableCell key={type.name}>-</TableCell>);
       }
     });
     cells.push(
@@ -764,21 +924,16 @@ const ResultTable = ({
   let heads = [
     <SortableCell
       name={"scientific_name"}
-      classes={classes}
-      sortBy={sortBy}
-      sortOrder={sortOrder}
       sortDirection={sortBy === "scientific_name" ? sortOrder : false}
-      handleTableSort={handleTableSort}
       key={"scientific_name"}
+      CustomCell={StickyCell}
+      {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
     />,
     <SortableCell
       name={"taxon_id"}
-      classes={classes}
-      sortBy={sortBy}
-      sortOrder={sortOrder}
       sortDirection={sortBy === "taxon_id" ? sortOrder : false}
-      handleTableSort={handleTableSort}
       key={"taxon_id"}
+      {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
     />,
   ];
   let filters = [
@@ -786,6 +941,7 @@ const ResultTable = ({
       name={"scientific_name"}
       key={"scientific_name"}
       type="hidden"
+      TableCell={StickyCell}
       value={""}
     />,
     <ResultFilter
@@ -795,65 +951,69 @@ const ResultTable = ({
       value={""}
     />,
   ];
+  let expandedCols = [
+    <StickyCell key={"scientific_name"} />,
+    <TableCell key={"taxon_id"} />,
+  ];
+  let maxColSpan = 1;
   Object.keys(activeNameClasses).forEach((nameClass) => {
     heads.push(
       <SortableCell
         name={nameClass}
         key={nameClass}
-        classes={classes}
-        sortBy={sortBy}
-        sortOrder={sortOrder}
         sortDirection={sortBy === nameClass ? sortOrder : false}
-        handleTableSort={handleTableSort}
+        {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
       />
     );
-    filters.push(<ResultFilter name={nameClass} key={nameClass} value={""} />);
+    filters.push(
+      <ResultFilter
+        name={nameClass}
+        key={nameClass}
+        value={""}
+        colSpan={colSpan}
+      />
+    );
+    expandedCols.push(<TableCell key={nameClass} />);
   });
   Object.keys(activeRanks).forEach((rank) => {
     heads.push(
       <SortableCell
         name={rank}
         key={rank}
-        classes={classes}
-        sortBy={sortBy}
-        sortOrder={sortOrder}
         sortDirection={sortBy === rank ? sortOrder : false}
-        handleTableSort={handleTableSort}
+        {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
       />
     );
     filters.push(<ResultFilter name={rank} key={rank} value={""} />);
+    expandedCols.push(<TableCell key={rank} />);
   });
   if (searchIndex == "assembly" || searchIndex == "feature") {
     heads.push(
       <SortableCell
         name={"assembly_id"}
         key={"assembly_id"}
-        classes={classes}
-        sortBy={sortBy}
-        sortOrder={sortOrder}
         sortDirection={sortBy === "assembly_id" ? sortOrder : false}
-        handleTableSort={handleTableSort}
+        {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
       />
     );
     filters.push(
       <ResultFilter name={"assembly_id"} key={"assembly_id"} value={""} />
     );
+    expandedCols.push(<TableCell key={"assembly_id"} />);
   }
   if (searchIndex == "sample") {
     heads.push(
       <SortableCell
         name={"sample_id"}
         key={"sample_id"}
-        classes={classes}
-        sortBy={sortBy}
-        sortOrder={sortOrder}
         sortDirection={sortBy === "sample_id" ? sortOrder : false}
-        handleTableSort={handleTableSort}
+        {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
       />
     );
     filters.push(
       <ResultFilter name={"sample_id"} key={"sample_id"} value={""} />
     );
+    expandedCols.push(<TableCell key={"sample_id"} />);
   }
   if (searchIndex == "feature") {
     heads = [heads.pop()];
@@ -861,21 +1021,25 @@ const ResultTable = ({
       <SortableCell
         name={"feature_id"}
         key={"feature_id"}
-        classes={classes}
-        sortBy={sortBy}
-        sortOrder={sortOrder}
         sortDirection={sortBy === "feature_id" ? sortOrder : false}
-        handleTableSort={handleTableSort}
+        {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
       />
     );
     filters.push(
       <ResultFilter name={"feature_id"} key={"feature_id"} value={""} />
     );
+    expandedCols.push(<TableCell key={"feature_id"} />);
   }
   for (let type of expandedTypes) {
     let sortDirection = sortBy === type.name ? sortOrder : false;
     if (type.processed_type == "geo_point") {
     } else {
+    }
+    let colSpan = 1;
+    let colCount = type.constraint?.enum?.length || 1;
+    if (colCount > 1 && expandColumns[type.name]) {
+      colSpan = colCount;
+      maxColSpan = Math.max(colSpan, maxColSpan);
     }
     heads.push(
       <SortableCell
@@ -883,11 +1047,6 @@ const ResultTable = ({
         name={type.name}
         description={type.description}
         status={type.status}
-        classes={classes}
-        statusColors={statusColors}
-        sortBy={sortBy}
-        sortOrder={sortOrder}
-        sortDirection={sortDirection}
         handleTableSort={type.processed_type != "geo_point" && handleTableSort}
         setAttributeSettings={setAttributeSettings}
         showExcludeBoxes={searchIndex == "taxon" ? "all" : "missing"}
@@ -895,17 +1054,46 @@ const ResultTable = ({
         excludeDescendant={arrToObj(searchTerm.excludeDescendant)}
         excludeDirect={arrToObj(searchTerm.excludeDirect)}
         excludeMissing={arrToObj(searchTerm.excludeMissing)}
-        handleToggleExclusion={handleToggleExclusion}
+        {...{
+          classes,
+          colCount,
+          colSpan,
+          handleToggleColSpan,
+          handleToggleExclusion,
+          searchIndex,
+          setAttributeSettings,
+          sortBy,
+          sortDirection,
+          sortOrder,
+          statusColors,
+        }}
       />
     );
     filters.push(
       <ResultFilter
         key={type.name}
         name={type.name}
+        colSpan={colSpan}
+        TableCell={colSpan > 1 ? SpanTableCell : TableCell}
         value={""}
         fieldMeta={types[type.name]}
       />
     );
+    if (colSpan > 1) {
+      type.constraint.enum.forEach((v, i) => {
+        let OddEvenCell = i % 2 == 1 ? EvenTableCell : OddTableCell;
+        expandedCols.push(
+          <OddEvenCell
+            key={`${type.name}-${v}`}
+            className={i % 2 == 1 ? classes.evenCol : ""}
+          >
+            {v}
+          </OddEvenCell>
+        );
+      });
+    } else {
+      expandedCols.push(<TableCell key={type.name} colSpan={colSpan} />);
+    }
   }
   heads.push(
     <Tooltip title={"Click to toggle filter options"} arrow key={"filter"}>
@@ -922,6 +1110,8 @@ const ResultTable = ({
       </TableCell>
     </Tooltip>
   );
+  filters.push(<TableCell key={"filter"} />);
+  expandedCols.push(<TableCell key={"filter"} />);
 
   let citationMessage;
   if (rows.length > 0) {
@@ -941,11 +1131,12 @@ const ResultTable = ({
         {/* {searchResults.isFetching ? (
           <Skeleton variant="rect" width={800} height={200} />
         ) : ( */}
-        <TableContainer className={classes.container}>
+        <TableContainer className={styles.resultsTable}>
           <Table size="small" aria-label="search results">
             <TableHead>
               <TableRow>{heads}</TableRow>
               {searchDefaults.showFilter && <TableRow>{filters}</TableRow>}
+              {maxColSpan > 1 && <TableRow>{expandedCols}</TableRow>}
             </TableHead>
             <TableBody>{rows}</TableBody>
           </Table>

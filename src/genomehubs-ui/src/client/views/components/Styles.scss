@@ -1197,6 +1197,47 @@ body,
       }
     }
 
+    .resultsTable {
+      max-height: 90vh;
+      border: solid #dddddd 3px;
+
+      table {
+        border-collapse: separate;
+
+        thead {
+          position: sticky;
+          top: 0;
+          z-index: 200;
+          background-color: #f8f8f8;
+          border-bottom: solid #dddddd 2px;
+
+          tr {
+            th: {
+              border-bottom: none;
+            }
+
+            th:first-of-type {
+              border-right: solid #dddddd 3px;
+            }
+          }
+
+          tr:last-of-type {
+            th {
+              border-bottom: solid #dddddd 3px;
+            }
+          }
+        }
+
+        tbody {
+          tr {
+            td:first-of-type {
+              border-right: solid #dddddd 3px;
+            }
+          }
+        }
+      }
+    }
+
 
     .markdown {
       font-family: themed("bodyFont");

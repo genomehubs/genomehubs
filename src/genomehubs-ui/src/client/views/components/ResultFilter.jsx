@@ -10,7 +10,7 @@ import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
 import { withStyles } from "@material-ui/core/styles";
 
-const TableCell = withStyles((theme) => ({
+const DefaultTableCell = withStyles((theme) => ({
   root: {
     padding: "1px 6px",
   },
@@ -23,10 +23,15 @@ const ResultFilter = ({
   searchTerm,
   searchIndex,
   fieldMeta,
+  colSpan = 1,
+  TableCell,
   value = "",
   operator = "",
   handleUpdate = () => {},
 }) => {
+  if (!TableCell) {
+    TableCell = DefaultTableCell;
+  }
   if (type == "hidden") {
     return <TableCell key={name} />;
   }
@@ -195,7 +200,7 @@ const ResultFilter = ({
   // }
 
   return (
-    <TableCell key={name}>
+    <TableCell key={name} colSpan={colSpan}>
       <FormControl size="small" style={{ width: "100%" }}>
         <div style={{ width: "100%" }}>{filters}</div>
       </FormControl>
