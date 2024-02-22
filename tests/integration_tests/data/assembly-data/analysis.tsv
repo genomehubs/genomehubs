@@ -1,0 +1,3 @@
+taxon_id	accession	date	analysis	files
+3750	GCA_000148765.2	2020-10-14	blobtoolkit,busco,coverage	{"busco":{"count": 3, "version": "5.5.0", "files": {"viridiplantae_odb10":"https://example.com"}, "lineages": ["viridiplantae_odb10", "eukaryota_odb10"]}}
+9612	GCA_905319855.2	2021-12-11	blobtoolkit,busco,composition,hic	{"busco":{"count": 3, "version": "5.5.0", "files": {"carnivora_odb10":"https://example.com"}, "lineages": ["carnivora_odb10", "metazoa_odb10", "eukaryota_odb10"]}}

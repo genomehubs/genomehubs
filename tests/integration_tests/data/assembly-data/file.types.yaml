@@ -1,0 +1,20 @@
+file:
+  comment: "#"
+  display_group: misc
+  format: tsv
+  header: true
+  name: files.tsv
+identifiers:
+  assembly_id:
+    constraint:
+      len: 32
+    header: accession
+    type: keyword
+attributes:
+  files:
+    display_level: 1
+    header: files
+    type: flattened
+taxonomy:
+  taxon_id:
+    header: taxon_id

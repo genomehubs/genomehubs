@@ -21,7 +21,7 @@ export const formatCsv = async (response, opts) => {
     });
   }
   let meta = ["aggregation_source", "aggregation_method"];
-  let raw = ["source"];
+  let source = ["name", "date"];
   let usedFields = {};
   let allFields = {};
   let data = [];
@@ -62,12 +62,17 @@ export const formatCsv = async (response, opts) => {
               if (fullResult.result.fields[key].hasOwnProperty("rawValues")) {
                 fullResult.result.fields[key]["rawValues"].forEach(
                   (rawValue) => {
+                    let sourceMeta =
+                      rawValue.metadata && rawValue.metadata.source;
+                    if (!sourceMeta) {
+                      return;
+                    }
                     let row = { ...datum };
                     row.field = key;
                     row.value = rawValue.value;
-                    raw.forEach((rawKey) => {
-                      if (rawValue.hasOwnProperty(rawKey)) {
-                        row[rawKey] = rawValue[rawKey];
+                    source.forEach((sourceKey) => {
+                      if (sourceMeta.hasOwnProperty(sourceKey)) {
+                        row[sourceKey] = sourceMeta[sourceKey];
                       }
                     });
                     data.push(row);
@@ -110,7 +115,7 @@ export const formatCsv = async (response, opts) => {
           .concat(names)
           .concat(ranks)
           .concat(["field", "value"])
-          .concat(raw);
+          .concat(source.map((s) => s.replace(/.+?\./, "")));
       } else {
         opts.fields = fields
           .concat(names)

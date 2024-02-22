@@ -54,7 +54,35 @@ export const filterAttributes = (
   let rangeQuery;
   if (searchRawValues) {
     rangeQuery = (field, stat) => {
-      if (lookupTypes(field).type == "keyword") {
+      return filters[stat][field].map((flt) => {
+        if (typeof flt !== "object") {
+          let values = flt.split(",");
+          let path = "";
+          return {
+            nested: {
+              path: "attributes.values",
+              query: {
+                bool: {
+                  should: values.map((v) => {
+                    let parts = v.split("::");
+                    let value = v;
+                    if (parts.length > 1) {
+                      path = `.${parts.slice(0, parts.length - 1).join(".")}`;
+                      value = parts[parts.length - 1];
+                    }
+                    return {
+                      match: { [`attributes.values.${stat}${path}`]: value },
+                    };
+                  }),
+                },
+              },
+            },
+          };
+        }
+        // TODO: support object-based query here
+      });
+      let fieldType = lookupTypes(field).type;
+      if (fieldType == "keyword") {
         return [
           {
             nested: {
@@ -105,11 +133,22 @@ export const filterAttributes = (
                 let include = [];
                 let exclude = [];
                 for (let option of term.split(",")) {
+                  let parts = option.split("::");
+                  let path = "";
+                  let value = option;
+                  if (parts.length > 1) {
+                    path = `.${parts.slice(0, parts.length - 1).join(".")}`;
+                    value = parts[parts.length - 1];
+                  }
                   if (option.startsWith("!")) {
-                    option = option.replace("!", "");
-                    exclude.push(wildcard_match(`attributes.${stat}`, option));
+                    path = path.replace(".!", ".");
+                    exclude.push(
+                      wildcard_match(`attributes.${stat}${path}`, value)
+                    );
                   } else {
-                    include.push(wildcard_match(`attributes.${stat}`, option));
+                    include.push(
+                      wildcard_match(`attributes.${stat}${path}`, value)
+                    );
                   }
                 }
 
@@ -217,11 +256,22 @@ export const filterAttributes = (
             },
           };
         }
+        let path = "";
+        Object.entries(flt).forEach(([k, v]) => {
+          let parts = v.split("::");
+          let value = v;
+          if (parts.length > 1) {
+            path = `.${parts.slice(0, parts.length - 1).join(".")}`;
+            value = parts[parts.length - 1];
+          }
+          flt[k] = value;
+        });
+
         return {
           bool: {
             [boolOperator]: subsetFn({
               range: {
-                [`attributes.${stat}`]: flt,
+                [`attributes.${stat}${path}`]: flt,
               },
             }),
           },

@@ -242,7 +242,12 @@ const ValueCell = ({
   if (meta.from && meta.to && meta.to > meta.from) {
     range = ` (${formatter(meta.from)} to ${formatter(meta.to)})`;
   }
-  let obj = formatter(meta.value, currentResult, "array", 100000);
+  let obj = {};
+  try {
+    obj = formatter(meta.value, currentResult, "array", 100000);
+  } catch (err) {
+    console.log(err);
+  }
   let valueMeta = types[attributeId]?.value_metadata;
   let defaultDesc, defaultLink;
   if (valueMeta) {

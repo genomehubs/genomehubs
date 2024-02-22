@@ -164,6 +164,11 @@
               "description": "Value of type keyword with source prefix"
             }
           },
+          "flattened_value": {
+            "type": "flattened",
+            "eager_global_ordinals": true,
+            "meta": { "description": "Value of type flattened" }
+          },
           "text_value": {
             "type": "text",
             "meta": { "description": "Value of type text" }
@@ -308,6 +313,11 @@
             "type": "float",
             "meta": { "description": "Standard deviation (numeric types only)" }
           },
+          "metadata": {
+            "type": "flattened",
+            "eager_global_ordinals": true,
+            "meta": { "description": "metadata associated with a value" }
+          },
           "aggregation_method": {
             "type": "keyword",
             "ignore_above": 64,
@@ -375,6 +385,11 @@
                 "meta": {
                   "description": "Value of type keyword (including ontology terms)"
                 }
+              },
+              "flattened_value": {
+                "type": "flattened",
+                "eager_global_ordinals": true,
+                "meta": { "description": "Value of type flattened" }
               },
               "text_value": {
                 "type": "text",
@@ -450,6 +465,11 @@
                 "meta": {
                   "description": "Ontology ID (with matching term in keyword_value)"
                 }
+              },
+              "metadata": {
+                "type": "flattened",
+                "eager_global_ordinals": true,
+                "meta": { "description": "metadata associated with a value" }
               },
               "source": {
                 "type": "keyword",

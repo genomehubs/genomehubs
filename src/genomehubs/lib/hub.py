@@ -4,6 +4,7 @@
 
 import contextlib
 import csv
+import json
 import os
 import re
 import shutil
@@ -325,6 +326,8 @@ def convert_to_type(key, raw_value, to_type, *, translate=None):
             value = None
     elif to_type == "geo_point":
         value = convert_lat_lon(raw_value)
+    elif to_type == "flattened":
+        value = json.loads(raw_value)
     else:
         value = str(raw_value)
     if value is None:
@@ -508,7 +511,7 @@ def validate_values(values, key, types, row_values, shared_values, blanks):
         if not isinstance(value, list):
             value = [value]
         for v in value:
-            if v in blanks:
+            if not isinstance(v, dict) and v in blanks:
                 continue
             try:
                 valid = test_constraint(v, key_type)
@@ -554,6 +557,37 @@ def update_taxon_types(taxon_types, new_prop, value, prop):
     taxon_types.update({new_prop: value, "group": "taxon"})
     if prop in taxon_types:
         del taxon_types[prop]
+
+
+def process_metadata(attribute, meta):
+    """Move attribute metadata to a single dict."""
+    paths = {
+        "comment": "value.comment",
+        "is_primary_value": "value.primary",
+        "organelle": "value.organelle",
+        "source": "source.name",
+        "source_pubmed_id": "source.pubmed",
+        "source_url_stub": "source.stub",
+        "url": "source.url",
+    }
+    metadata = json.loads(attribute["metadata"]) if "metadata" in attribute else {}
+    for key, value in attribute.items():
+        if key in paths:
+            path = paths[key]
+        elif key.startswith("source_"):
+            path = key.replace("_", ".")
+        else:
+            continue
+        parent = metadata
+        parts = path.lower().split(".")
+        for index, part in enumerate(parts):
+            if part not in parent and index < len(parts) - 1:
+                parent[part] = {}
+            if index < len(parts) - 1:
+                parent = parent[part]
+            else:
+                parent[part] = str(value).lower()
+    attribute["metadata"] = metadata
 
 
 def add_attributes(
@@ -619,12 +653,26 @@ def add_attributes(
                         row_values,
                         shared_values,
                     )
+                # if "metadata" in types[key]:
+                #     if "metadata" not in attribute:
+                #         attribute.update({"metadata": {}})
+                #     attribute.update(
+                #         {
+                #             "metadata": {
+                #                 k: v
+                #                 for k, v in types[key]["metadata"].items()
+                #                 if k not in attribute["metadata"]
+                #             }
+                #         }
+                #     )
+
                 attributes.append(attribute)
     if attribute_values:
         for attribute in attributes:
+            process_metadata(attribute, meta)
             has_taxon_data = False
-            taxon_attribute = {**attribute, "source_index": "assembly"}
             taxon_attribute_types = {**types[attribute["key"]]}
+            taxon_attribute = {**attribute, "source_index": "assembly"}
             # taxon_props = []
             for prop, value in types[attribute["key"]].items():
                 if prop.startswith("taxon_"):

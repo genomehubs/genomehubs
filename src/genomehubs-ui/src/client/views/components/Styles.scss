@@ -1197,6 +1197,62 @@ body,
       }
     }
 
+    .resultsTable {
+      max-height: 90vh;
+      border: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
+
+      table {
+        border-collapse: separate;
+
+        thead {
+          position: sticky;
+          top: 0;
+          z-index: 200;
+          background-color: #f8f8f8;
+
+          tr {
+            th: {
+              border-bottom: none;
+            }
+
+            th:first-of-type {
+              border-right: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
+            }
+          }
+
+          tr:last-of-type {
+            th {
+              border-bottom: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
+            }
+          }
+        }
+
+        tbody {
+          tr {
+            td:first-of-type {
+              border-right: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
+            }
+          }
+        }
+
+        thead, tbody {
+          tr, td {
+            .contrast {
+              background-color: mix(themed("primary"), themed("secondary"), 5%)
+            }
+
+            .first {
+              border-left: solid mix(themed("primary"), themed("secondary"), 10%) 2px;
+            }
+
+            .last {
+              border-right: solid mix(themed("primary"), themed("secondary"), 10%) 2px;
+            }
+          }
+        }
+      }
+    }
+
 
     .markdown {
       font-family: themed("bodyFont");

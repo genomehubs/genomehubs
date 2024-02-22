@@ -6,7 +6,9 @@ import AutorenewIcon from "@material-ui/icons/Autorenew";
 import BasicSelect from "./BasicSelect";
 import BasicTextField from "./BasicTextField";
 import Button from "@material-ui/core/Button";
+import Checkbox from "@material-ui/core/Checkbox";
 import CloseIcon from "@material-ui/icons/Close";
+import FilterListIcon from "@material-ui/icons/FilterList";
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "./Tooltip";
@@ -75,6 +77,7 @@ const ChipInput = ({ defaultWidth, value, placeholder, onBlur }) => {
           onBlur(e);
         }
       }}
+      autoFocus={typeof currentValue === "undefined" || currentValue === ""}
     />
   );
 };
@@ -98,6 +101,7 @@ const ResultFilterInput = ({
 }) => {
   const classes = useStyles();
   const [active, setActive] = useState(false);
+  const [editable, setEditable] = useState(false);
   value = value == "undefined" || typeof value === "undefined" ? "" : value;
   operator =
     operator == "undefined" || typeof operator === "undefined" ? "" : operator;
@@ -172,6 +176,25 @@ const ResultFilterInput = ({
       </ChipOptions>
     );
   };
+
+  if (value == "" && operator == "" && !editable) {
+    let color = "grey";
+    return (
+      <span style={{ marginRight: "0.5em" }}>
+        <Checkbox
+          style={{
+            padding: "1px",
+            color,
+          }}
+          icon={<FilterListIcon style={{ fontSize: "small", fill: color }} />}
+          checkedIcon={
+            <FilterListIcon style={{ fontSize: "small", fill: color }} />
+          }
+          onClick={() => setEditable(!editable)}
+        />
+      </span>
+    );
+  }
 
   return (
     <span style={{ marginRight: "0.5em" }}>

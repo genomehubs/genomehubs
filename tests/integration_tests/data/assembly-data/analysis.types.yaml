@@ -1,0 +1,62 @@
+file:
+  display_group: misc
+  format: tsv
+  header: true
+  name: analysis.tsv
+identifiers:
+  assembly_id:
+    constraint:
+      len: 32
+    header: accession
+    type: keyword
+attributes:
+  analysis:
+    display_level: 1
+    constraint:
+      enum:
+        - blobtoolkit
+        - busco
+        - composition
+        - coverage
+        - hic
+    header: analysis
+    separator: ","
+    type: keyword
+    value_metadata:
+      default:
+        description: Click to view BioProject record on ENA
+        link: https://gap.cog.sanger.ac.uk/{assembly_id}/{}
+      blobtoolkit:
+        description: "BlobToolKit genome quality assessment"
+        icons:
+          file:
+            link: https://gap.cog.sanger.ac.uk/{assembly_id}/blobtoolkit
+          view:
+            link: https://blobtoolkit.genomehubs.org/view/{assembly_id}
+      busco:
+        description: "BUSCO genome quality assessment"
+        icons:
+          file:
+            link: https://gap.cog.sanger.ac.uk/{assembly_id}/busco
+      base_content:
+        description: "Sequence composition"
+        icons:
+          file:
+            link: https://gap.cog.sanger.ac.uk/{assembly_id}/{}
+      coverage:
+        description: "mapped reads"
+        icons:
+          file:
+            link: https://gap.cog.sanger.ac.uk/{assembly_id}/mapped_reads
+metadata:
+  metadata:
+    header: files
+  source_date:
+    header: date
+  source:
+    default: GAP
+  source_url:
+    default: https://gap.cog.sanger.ac.uk
+taxonomy:
+  taxon_id:
+    header: taxon_id
