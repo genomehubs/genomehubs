@@ -267,10 +267,16 @@ const SortableCell = ({
 
   let SpanCell = colSpan > 1 ? SpanTableCell : CustomCell;
 
+  let cellCss;
+  if (colSpan > 1) {
+    cellCss = classnames(styles.first, styles.last);
+  }
+
   return (
     <SpanCell
       key={name}
       colSpan={colSpan}
+      className={cellCss}
       style={{
         whiteSpace: "normal",
         wordWrap: "break-word",
@@ -431,6 +437,19 @@ const SortableCell = ({
       )) || <span className={css}></span>}
     </SpanCell>
   );
+};
+
+const setCellClassName = (i, length) => {
+  if (length == 1) {
+    return "";
+  }
+  let css = i % 2 == 1 && styles.contrast;
+  if (i == 0) {
+    css = classnames(css, styles.first);
+  } else if (i == length - 1) {
+    css = classnames(css, styles.last);
+  }
+  return css;
 };
 
 const ResultTable = ({
@@ -836,12 +855,12 @@ const ResultTable = ({
             v.toLowerCase()
           );
           type.constraint.enum.forEach((key, i) => {
-            let OddEvenCell = i % 2 == 1 ? EvenTableCell : OddTableCell;
+            let css = setCellClassName(i, type.constraint.enum.length);
             if (!values.includes(key)) {
               cells.push(
-                <OddEvenCell key={`${type.name}-${key}-${i}`}>
+                <OddTableCell key={`${type.name}-${key}-${i}`} className={css}>
                   {/* <CheckBoxOutlineBlankIcon style={{ opacity: 0.25 }} /> */}
-                </OddEvenCell>
+                </OddTableCell>
               );
             } else {
               let list = type.value_metadata?.[key]?.icons;
@@ -885,23 +904,24 @@ const ResultTable = ({
                 );
               }
               cells.push(
-                <OddEvenCell
+                <OddTableCell
                   key={`${type.name}-${key}-${i}`}
                   style={{ whiteSpace: "nowrap" }}
+                  className={css}
                 >
                   {icons}
-                </OddEvenCell>
+                </OddTableCell>
               );
             }
           });
         }
       } else {
         for (let i = 0; i < colSpan; i++) {
-          let OddEvenCell = i % 2 == 1 ? EvenTableCell : OddTableCell;
+          let css = setCellClassName(i, colSpan);
           cells.push(
-            <OddEvenCell key={`${type.name}-${i}`}>
+            <OddTableCell key={`${type.name}-${i}`} className={css}>
               {colSpan == 1 && "-"}
-            </OddEvenCell>
+            </OddTableCell>
           );
         }
       }
@@ -1081,14 +1101,11 @@ const ResultTable = ({
     );
     if (colSpan > 1) {
       type.constraint.enum.forEach((v, i) => {
-        let OddEvenCell = i % 2 == 1 ? EvenTableCell : OddTableCell;
+        let css = setCellClassName(i, type.constraint.enum.length);
         expandedCols.push(
-          <OddEvenCell
-            key={`${type.name}-${v}`}
-            className={i % 2 == 1 ? classes.evenCol : ""}
-          >
+          <OddTableCell key={`${type.name}-${v}`} className={css}>
             {v}
-          </OddEvenCell>
+          </OddTableCell>
         );
       });
     } else {

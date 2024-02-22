@@ -4,8 +4,10 @@ import { useLocation, useNavigate } from "@reach/router";
 import { FormControl } from "@material-ui/core";
 import MuiTableCell from "@material-ui/core/TableCell";
 import ResultFilterInput from "./ResultFilterInput";
+import classnames from "classnames";
 import { compose } from "recompose";
 import qs from "../functions/qs";
+import styles from "./Styles.scss";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
 import { withStyles } from "@material-ui/core/styles";
@@ -198,9 +200,13 @@ const ResultFilter = ({
     />
   );
   // }
+  let css;
+  if (colSpan > 1) {
+    css = classnames(styles.first, styles.last);
+  }
 
   return (
-    <TableCell key={name} colSpan={colSpan}>
+    <TableCell key={name} colSpan={colSpan} className={css}>
       <FormControl size="small" style={{ width: "100%" }}>
         <div style={{ width: "100%" }}>{filters}</div>
       </FormControl>

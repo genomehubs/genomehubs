@@ -1199,7 +1199,7 @@ body,
 
     .resultsTable {
       max-height: 90vh;
-      border: solid #dddddd 3px;
+      border: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
 
       table {
         border-collapse: separate;
@@ -1209,7 +1209,6 @@ body,
           top: 0;
           z-index: 200;
           background-color: #f8f8f8;
-          border-bottom: solid #dddddd 2px;
 
           tr {
             th: {
@@ -1217,13 +1216,13 @@ body,
             }
 
             th:first-of-type {
-              border-right: solid #dddddd 3px;
+              border-right: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
             }
           }
 
           tr:last-of-type {
             th {
-              border-bottom: solid #dddddd 3px;
+              border-bottom: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
             }
           }
         }
@@ -1231,7 +1230,23 @@ body,
         tbody {
           tr {
             td:first-of-type {
-              border-right: solid #dddddd 3px;
+              border-right: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
+            }
+          }
+        }
+
+        thead, tbody {
+          tr, td {
+            .contrast {
+              background-color: mix(themed("primary"), themed("secondary"), 5%)
+            }
+
+            .first {
+              border-left: solid mix(themed("primary"), themed("secondary"), 10%) 2px;
+            }
+
+            .last {
+              border-right: solid mix(themed("primary"), themed("secondary"), 10%) 2px;
             }
           }
         }
