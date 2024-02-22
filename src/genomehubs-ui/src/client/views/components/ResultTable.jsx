@@ -267,7 +267,7 @@ const SortableCell = ({
 
   let SpanCell = colSpan > 1 ? SpanTableCell : CustomCell;
 
-  let cellCss;
+  let cellCss = "";
   if (colSpan > 1) {
     cellCss = classnames(styles.first, styles.last);
   }
@@ -443,7 +443,7 @@ const setCellClassName = (i, length) => {
   if (length == 1) {
     return "";
   }
-  let css = i % 2 == 1 && styles.contrast;
+  let css = i % 2 == 1 ? styles.contrast : "";
   if (i == 0) {
     css = classnames(css, styles.first);
   } else if (i == length - 1) {
@@ -473,7 +473,7 @@ const ResultTable = ({
   basename,
 }) => {
   const rootRef = useRef(null);
-  const [expandColumns, setExpandColumns] = useState({});
+  const expandColumns = searchDefaults.expandColumns || {};
   let expandedTypes = [];
   let emptyBuckets = new Set();
   if (searchResults.aggs?.fields) {
@@ -564,9 +564,9 @@ const ResultTable = ({
 
   const handleToggleColSpan = (id, colSpan) => {
     if (colSpan > 1) {
-      setExpandColumns({ ...expandColumns, [id]: false });
+      setSearchDefaults({ expandColumns: { ...expandColumns, [id]: false } });
     } else {
-      setExpandColumns({ ...expandColumns, [id]: true });
+      setSearchDefaults({ expandColumns: { ...expandColumns, [id]: true } });
     }
   };
 

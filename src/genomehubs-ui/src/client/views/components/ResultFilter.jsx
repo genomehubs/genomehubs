@@ -113,7 +113,13 @@ const ResultFilter = ({
         continue;
       }
       let attrParts = arr[0].split(":");
-      if (attrParts.length == 2) {
+      if (arr.length == 1) {
+        if (attrParts.length == 2) {
+          parts.push(`${attrParts[1]}(${attrParts[0]})`);
+        } else {
+          parts.push(`${arr[0]}`);
+        }
+      } else if (attrParts.length == 2) {
         parts.push(`${attrParts[1]}(${attrParts[0]})${arr[1]}${arr[2]}`);
       } else {
         parts.push(`${arr[0]}${arr[1]}${arr[2]}`);
@@ -200,7 +206,7 @@ const ResultFilter = ({
     />
   );
   // }
-  let css;
+  let css = "";
   if (colSpan > 1) {
     css = classnames(styles.first, styles.last);
   }
