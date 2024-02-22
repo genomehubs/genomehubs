@@ -79,38 +79,29 @@ export const filterAttributes = (
             },
           };
         }
-        // TODO: support object-based query here
-      });
-      let fieldType = lookupTypes(field).type;
-      if (fieldType == "keyword") {
-        return [
-          {
-            nested: {
-              path: "attributes.values",
-              query: {
-                match: {
-                  [`attributes.values.${lookupTypes(field).type}_value`]:
-                    filters[stat][field][0],
-                },
-              },
-            },
-          },
-        ];
-      }
-      // TODO: support alternate stats and enum based query here
-      return [
-        {
+        // TODO: check for full object-based query supporthere
+        let path = "";
+        Object.entries(flt).forEach(([k, v]) => {
+          let parts = v.split("::");
+          let value = v;
+          if (parts.length > 1) {
+            path = `.${parts.slice(0, parts.length - 1).join(".")}`;
+            value = parts[parts.length - 1];
+          }
+          flt[k] = value;
+        });
+
+        return {
           nested: {
             path: "attributes.values",
             query: {
               range: {
-                [`attributes.values.${lookupTypes(field).type}_value`]:
-                  filters[stat][field],
+                [`attributes.values.${stat}${path}`]: flt,
               },
             },
           },
-        },
-      ];
+        };
+      });
     };
   } else {
     rangeQuery = (field, stat) => {

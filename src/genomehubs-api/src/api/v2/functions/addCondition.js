@@ -118,6 +118,5 @@ export const addCondition = (
       conditions[stat][parts[2]][operator] = valueList.join(",");
     });
   }
-  console.log(conditions);
   return conditions;
 };
