@@ -139,6 +139,7 @@ const NestedTable = ({
             <TableCell>Value</TableCell>
             {hubHeader}
             <TableCell>External source</TableCell>
+            <TableCell>Last modified</TableCell>
             <TableCell>Comment</TableCell>
           </TableRow>
         </TableHead>
@@ -174,6 +175,7 @@ const NestedTable = ({
                   hubCell = <TableCell></TableCell>;
                 }
               }
+              let date = row.metadata?.source?.date;
               let comment = row.comment || "";
               if (row.is_primary) {
                 comment = `Primary value. ${comment}`;
@@ -199,7 +201,7 @@ const NestedTable = ({
                   >
                     {linkCell}
                   </Tooltip>
-
+                  <TableCell>{date}</TableCell>
                   <TableCell>{comment}</TableCell>
                 </TableRow>
               );
