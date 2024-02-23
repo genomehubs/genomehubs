@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import { useLocation, useNavigate } from "@reach/router";
 
+import AdjustIcon from "@material-ui/icons/Adjust";
 import AggregationIcon from "./AggregationIcon";
 import Badge from "@material-ui/core/Badge";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
@@ -19,6 +20,7 @@ import LaunchIcon from "@material-ui/icons/Launch";
 import LinkButton from "./LinkButton";
 import MuiTableCell from "@material-ui/core/TableCell";
 import RadioButtonCheckedOutlinedIcon from "@material-ui/icons/RadioButtonCheckedOutlined";
+import RadioButtonUncheckedIcon from "@material-ui/icons/RadioButtonUnchecked";
 import ReportError from "./ReportError";
 import ResultFilter from "./ResultFilter";
 import ResultModalControl from "./ResultModalControl";
@@ -153,17 +155,15 @@ const SpanTableCell = withStyles((theme) => ({
   },
 }))(EvenTableCell);
 
-const StyledCheckbox = ({ color, ...props }) => {
+const StyledCheckbox = ({ color, fontSize = "small", ...props }) => {
   return (
     <Checkbox
       style={{
         padding: "1px",
         color: props.color,
       }}
-      icon={
-        <CheckBoxOutlineBlankIcon style={{ fontSize: "small", fill: color }} />
-      }
-      checkedIcon={<CheckBoxIcon style={{ fontSize: "small", fill: color }} />}
+      icon={<CheckBoxOutlineBlankIcon style={{ fontSize, fill: color }} />}
+      checkedIcon={<CheckBoxIcon style={{ fontSize, fill: color }} />}
       {...props}
     />
   );
@@ -893,11 +893,19 @@ const ResultTable = ({
                   );
                 }
               } else {
+                let RadioIcon = RadioButtonCheckedOutlinedIcon;
+                let fill = statusColors[field.aggregation_source];
+                if (field.aggregation_source == "descendant") {
+                  RadioIcon = AdjustIcon;
+                } else if (field.aggregation_source == "ancestor") {
+                  RadioIcon = RadioButtonUncheckedIcon;
+                }
                 icons.push(
-                  <RadioButtonCheckedOutlinedIcon
+                  <RadioIcon
                     style={{
-                      fill: statusColors[field.aggregation_source],
+                      fill,
                       cursor: "pointer",
+                      fontSize: "1.25rem",
                     }}
                     key="check"
                   />
