@@ -134,7 +134,10 @@ export const filterAttributes = (
                   if (option.startsWith("!")) {
                     path = path.replace(".!", ".");
                     exclude.push(
-                      wildcard_match(`attributes.${stat}${path}`, value)
+                      wildcard_match(
+                        `attributes.${stat}${path}`,
+                        value.replace(/^!/, "")
+                      )
                     );
                   } else {
                     include.push(
