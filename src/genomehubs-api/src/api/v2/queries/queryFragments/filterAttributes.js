@@ -251,7 +251,13 @@ export const filterAttributes = (
           };
         }
         let path = "";
+        let lt, gt;
         Object.entries(flt).forEach(([k, v]) => {
+          if (k.startsWith("lt")) {
+            lt = true;
+          } else if (k.startsWith("gt")) {
+            gt = true;
+          }
           let parts = v.split("::");
           let value = v;
           if (parts.length > 1) {
@@ -260,6 +266,11 @@ export const filterAttributes = (
           }
           flt[k] = value;
         });
+        if (lt && !gt) {
+          flt.gt = "0";
+        } else if (!lt && gt) {
+          flt.lt = "999999999999999999999";
+        }
 
         return {
           bool: {

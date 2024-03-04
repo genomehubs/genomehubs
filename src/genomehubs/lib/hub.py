@@ -559,7 +559,7 @@ def update_taxon_types(taxon_types, new_prop, value, prop):
         del taxon_types[prop]
 
 
-def process_metadata(attribute, meta):
+def process_metadata(attribute, blanks):
     """Move attribute metadata to a single dict."""
     paths = {
         "comment": "value.comment",
@@ -570,7 +570,9 @@ def process_metadata(attribute, meta):
         "source_url_stub": "source.stub",
         "url": "source.url",
     }
-    metadata = json.loads(attribute["metadata"]) if "metadata" in attribute else {}
+    metadata = attribute["metadata"] if "metadata" in attribute else {}
+    if not isinstance(metadata, dict):
+        metadata = json.loads(metadata)
     for key, value in attribute.items():
         if key in paths:
             path = paths[key]
@@ -581,11 +583,11 @@ def process_metadata(attribute, meta):
         parent = metadata
         parts = path.lower().split(".")
         for index, part in enumerate(parts):
-            if part not in parent and index < len(parts) - 1:
-                parent[part] = {}
             if index < len(parts) - 1:
+                if part not in parent:
+                    parent[part] = {}
                 parent = parent[part]
-            else:
+            elif part not in parent or parent[part] in blanks:
                 parent[part] = str(value).lower()
     attribute["metadata"] = metadata
 
@@ -611,8 +613,24 @@ def add_attributes(
         taxon_types,
         attribute_values,
     ) = set_add_attributes_defaults(attributes, meta, row_values)
-    for key, values in entry.items():
-        if key in types:
+    indices = {}
+    for k, values in entry.items():
+        key, *rest = k.split(".") if "." in k else [k]
+        if rest:
+            attribute = attributes[indices[key]]
+            if "metadata" not in attribute:
+                attribute["metadata"] = {}
+            md = attribute["metadata"]
+            if any(value in blanks for value in values):
+                continue
+            for index, part in enumerate(rest):
+                if part not in md:
+                    md[part] = {}
+                if index < len(rest) - 1:
+                    md = md[part]
+                else:
+                    md[part] = values
+        elif key in types:
             if not isinstance(values, list):
                 values = [values]
             if attr_type == "taxon_names":
@@ -665,11 +683,11 @@ def add_attributes(
                 #             }
                 #         }
                 #     )
-
+                indices[key] = len(attributes)
                 attributes.append(attribute)
     if attribute_values:
         for attribute in attributes:
-            process_metadata(attribute, meta)
+            process_metadata(attribute, blanks)
             has_taxon_data = False
             taxon_attribute_types = {**types[attribute["key"]]}
             taxon_attribute = {**attribute, "source_index": "assembly"}

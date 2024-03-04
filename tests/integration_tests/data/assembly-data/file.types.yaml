@@ -4,6 +4,7 @@ file:
   format: tsv
   header: true
   name: files.tsv
+  source_date: "2022-10-15"
 identifiers:
   assembly_id:
     constraint:
@@ -14,7 +15,27 @@ attributes:
   files:
     display_level: 1
     header: files
-    type: flattened
+    separator: ","
+    type: keyword
+  files.busco.lineages:
+    header: files.busco.lineages
+    separator: ","
+  files.busco.carnivora_odb10:
+    header: files.busco.carnivora_odb10
+    separator: ","
+  files.busco.eukaryota_odb10:
+    header: files.busco.eukaryota_odb10
+    separator: ","
+  files.busco.metazoa_odb10:
+    header: files.busco.metazoa_odb10
+    separator: ","
+  files.busco.viridiplantae_odb10:
+    header: files.busco.viridiplantae_odb10
+    separator: ","
+  files.source.date:
+    header: files.source.date
+  files.source.name:
+    header: files.source.name
 taxonomy:
   taxon_id:
     header: taxon_id

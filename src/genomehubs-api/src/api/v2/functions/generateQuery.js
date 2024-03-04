@@ -150,6 +150,7 @@ const splitTerm = (term) => {
     parts[2] = path[0];
     let [operator, values] = parts[3].split(/([^!><=].+)/);
     parts[3] = `${operator}${values
+      .trim()
       .split(/\s*,\s*/)
       .map((val) => {
         let [bang = "", v] = val.split(/([^!].+)/);
