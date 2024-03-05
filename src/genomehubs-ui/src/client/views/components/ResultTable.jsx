@@ -489,10 +489,19 @@ const ResultTable = ({
       expandedTypes = displayTypes.filter(
         ({ name }) => !emptyBuckets.has(name) && name != "none"
       );
-      // .map((name) => ({
-      //   name,
-      // }))
-      // .filter((obj) => obj.name != "none");
+      for (let field of fieldList) {
+        if (!field.includes(":")) {
+          continue;
+        }
+        let [name, summary] = field.split(":");
+        let index = expandedTypes.findIndex(({ name: n }) => n == name);
+        let defaultValue = (types[name] || { processed_simple: "value" })
+          .processed_simple;
+        expandedTypes.splice(index + 1, 0, {
+          name: field,
+          summary: summary || defaultValue,
+        });
+      }
       for (let obj of expandedTypes) {
         let [name, summary] = obj.name.split(":");
         let defaultValue = (types[name] || { processed_simple: "value" })
