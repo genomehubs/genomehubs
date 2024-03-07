@@ -266,10 +266,12 @@ export const filterAttributes = (
           }
           flt[k] = value;
         });
-        if (lt && !gt) {
-          flt.gt = "0";
-        } else if (!lt && gt) {
-          flt.lt = "999999999999999999999";
+        if (stat == "metadata" || stat == "flattened_value") {
+          if (lt && !gt) {
+            flt.gt = "0";
+          } else if (!lt && gt) {
+            flt.lt = "999999999999999999999";
+          }
         }
 
         return {
