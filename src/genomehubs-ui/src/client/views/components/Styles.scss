@@ -594,8 +594,32 @@ body,
       .lineage {
         cursor: pointer;
         display: inline-block;
-        margin-right: 0.5em;
+        background-color: mix(themed("descendant"), themed("secondary"), 10%);
+        padding: 0.25em;
+        margin: 0.25em 0.5em 0.25em 0;
+        border-radius: 0.25em;
+        border: solid 2px themed("descendant");
+
+        &Direct {
+          background-color: mix(themed("direct"), themed("secondary"), 10%);
+          border-color: themed("direct");
+          cursor: default;
+        }
+
+        .rank {
+          color: rgba(themed("primary"), 0.75);
+          font-size: 0.75em;
+          display: block;
+          width: 100%;
+          line-height: 0.75em;
+          height: 1em;
+        }
+
+        .bold {
+          font-weight: bold;
+        }
       }
+      
       .name {
         display: block;
       }

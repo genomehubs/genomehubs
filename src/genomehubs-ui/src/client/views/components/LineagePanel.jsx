@@ -36,11 +36,30 @@ export const LineageList = ({
 
   let lineageDivs = [];
 
+  const fullRanks = new Set([
+    "subpecies",
+    "species",
+    "genus",
+    "family",
+    "order",
+    "class",
+    "phylum",
+    "kingdom",
+    "superkingdom",
+  ]);
+
   if (lineage && lineage.lineage) {
     lineage.lineage.forEach((ancestor) => {
+      let rank = ancestor.taxon_rank == "clade" ? "" : ancestor.taxon_rank;
+      let css = classnames(
+        styles.rank,
+        fullRanks.has(ancestor.taxon_rank) && styles.bold
+      );
+      let rankDiv = <div className={css}>{rank}</div>;
+
       lineageDivs.unshift(
         <Tooltip
-          title={`${ancestor.taxon_rank} [taxid: ${ancestor.taxon_id}]`}
+          title={`taxid: ${ancestor.taxon_id}`}
           arrow
           placement="top"
           key={ancestor.taxon_id}
@@ -51,12 +70,30 @@ export const LineageList = ({
               handleTaxonClick(ancestor.taxon_id, ancestor.scientific_name)
             }
           >
+            {rankDiv}
             {ancestor.scientific_name}
           </span>
         </Tooltip>
       );
     });
   }
+  console.log(lineage);
+  let rank =
+    lineage.taxon.taxon_rank == "clade" ? "" : lineage.taxon.taxon_rank;
+  let css = classnames(
+    styles.rank,
+    fullRanks.has(lineage.taxon.taxon_rank) && styles.bold
+  );
+  let rankDiv = <div className={css}>{rank}</div>;
+  lineageDivs.push(
+    <span
+      className={classnames(styles.lineage, styles.lineageDirect)}
+      key={lineage.taxon.taxon_id}
+    >
+      {rankDiv}
+      {lineage.taxon.scientific_name}
+    </span>
+  );
 
   return <div style={{ maxWidth: "100%" }}>{lineageDivs}</div>;
 };
