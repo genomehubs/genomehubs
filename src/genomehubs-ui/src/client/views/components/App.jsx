@@ -3,6 +3,7 @@ import React, { memo, useEffect, useState } from "react";
 import { CookiesProvider } from "react-cookie";
 import Head from "./Head";
 import Layout from "./Layout";
+import ReactErrorBoundary from "./ReactErrorBoundary";
 import { StylesProvider } from "@material-ui/core/styles";
 import classnames from "classnames";
 import { compose } from "recompose";
@@ -23,11 +24,15 @@ const App = ({ theme, cookies }) => {
         <div style={{ position: "relative" }}>
           <div className={classnames(`theme${theme}`, styles.app)}>
             <div id="theme-base" className={styles.infoPanel} />
-            <Head />
-            {/* <CookiesProvider>
+            <ReactErrorBoundary>
+              <>
+                <Head />
+                {/* <CookiesProvider>
           <Layout cookies={cookies} />
         </CookiesProvider> */}
-            <Layout />
+                <Layout />
+              </>
+            </ReactErrorBoundary>
           </div>
         </div>
       </StylesProvider>

@@ -98,6 +98,7 @@
     "react-cookie": "^4.1.1",
     "react-country-flag": "^3.1.0",
     "react-dom": "^16.14.0",
+    "react-error-boundary": "^4.0.13",
     "react-helmet": "^6.1.0",
     "react-hooks-visible": "^1.1.1",
     "react-json-pretty": "^2.2.0",

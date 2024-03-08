@@ -165,9 +165,15 @@ body,
       // background: mix(themed('primary'),themed('secondary'),50%);
       // color: themed('secondary');
       border-bottom: 0.2em solid themed("primary");
+      height: 2em;
       flex: none;
       z-index: 1;
       background: themed("secondary");
+
+      &.error {
+        background: mix(themed("ancestral"), themed("secondary"), 80%);
+        border-color: mix(themed("ancestral"), themed("secondary"), 80%);
+      }
 
       .siteText {
         background: rgba(themed("primary"), 0.5);
@@ -685,6 +691,8 @@ body,
       overflow: visible;
       padding: 1em;
       width: 100%;
+      font-family: themed("bodyFont");
+
     }
 
     .floatRight {

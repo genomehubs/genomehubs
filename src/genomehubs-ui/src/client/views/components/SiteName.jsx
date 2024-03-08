@@ -21,7 +21,12 @@ const useStyles = makeStyles((theme) => ({
 const SiteName = ({ siteName, basename, archive, logo }) => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
-  const location = useLocation();
+  let location;
+  try {
+    location = useLocation();
+  } catch {
+    location = {};
+  }
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
