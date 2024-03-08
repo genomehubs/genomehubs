@@ -77,7 +77,6 @@ export const LineageList = ({
       );
     });
   }
-  console.log(lineage);
   let rank =
     lineage.taxon.taxon_rank == "clade" ? "" : lineage.taxon.taxon_rank;
   let css = classnames(
@@ -88,6 +87,9 @@ export const LineageList = ({
   lineageDivs.push(
     <span
       className={classnames(styles.lineage, styles.lineageDirect)}
+      onClick={() =>
+        handleTaxonClick(lineage.taxon.taxon_id, lineage.taxon.scientific_name)
+      }
       key={lineage.taxon.taxon_id}
     >
       {rankDiv}

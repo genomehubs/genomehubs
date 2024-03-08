@@ -514,9 +514,10 @@ body,
       .header {
         cursor: pointer;
         margin: -0.25em -0.25em 0.25em -0.25em;
-        padding: 0.25em;
+        padding: 0.35em;
         color: themed("secondary");
         background-color: themed("primary");
+        border-radius: 0.25em;
 
         .identifier {
           float: right;
@@ -603,7 +604,6 @@ body,
         &Direct {
           background-color: mix(themed("direct"), themed("secondary"), 10%);
           border-color: themed("direct");
-          cursor: default;
         }
 
         .rank {
@@ -620,8 +620,31 @@ body,
         }
       }
       
-      .name {
+      .nameGroup {
         display: block;
+        margin: 0.5em 0;
+
+        .title {
+          display: table-cell;
+          font-size: 0.9em;
+          font-weight: bold;
+          min-width: 10em;
+        }
+
+        .content {
+          margin: 0.5em 0 0.5em 0;
+          
+          display: table-cell;
+        }
+
+        .name:not(:last-of-type):after {
+          content: ", ";
+        }
+
+        .bold {
+          font-size: 1.5em;
+          font-weight: bold;
+        }
       }
 
       .tagCloud {
