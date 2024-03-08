@@ -1003,12 +1003,7 @@ const ResultTable = ({
       />
     );
     filters.push(
-      <ResultFilter
-        name={nameClass}
-        key={nameClass}
-        value={""}
-        colSpan={colSpan}
-      />
+      <ResultFilter name={nameClass} key={nameClass} value={""} colSpan={1} />
     );
     expandedCols.push(<TableCell key={nameClass} />);
   });
