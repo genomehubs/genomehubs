@@ -464,7 +464,10 @@ const RadialBarComponent = ({
             cursor={"pointer"}
             onClick={() =>
               data.navigate(
-                `${data.basename}/search?${qs.stringify(data.xQuery)}`
+                `${data.basename}/search?${qs.stringify({
+                  ...data.xQuery,
+                  report: "arc",
+                })}`
               )
             }
           />
