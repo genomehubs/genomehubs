@@ -39,10 +39,10 @@ export const ReactErrorPage = ({
       <div className={styles.infoPage}>
         <div className={styles.errorHeading}>
           <h1>Something went wrong</h1>
+          <p>Sorry, we encountered an error loading this page:</p>
           <h2 style={{ marginLeft: "2em", color: statusColors.ancestral }}>
             <pre>{error.message}</pre>
           </h2>
-          <p>Sorry, we encountered an error loading this page.</p>
           <p>
             You can try refreshing{" "}
             <a

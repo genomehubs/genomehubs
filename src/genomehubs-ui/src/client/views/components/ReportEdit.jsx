@@ -6,6 +6,7 @@ import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import Grid from "@material-ui/core/Grid";
+import InputAdornment from "@material-ui/core/InputAdornment";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Radio from "@material-ui/core/Radio";
@@ -13,8 +14,10 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import Select from "@material-ui/core/Select";
 import SettingsButton from "./SettingsButton";
 import Slider from "@material-ui/core/Slider";
+import SwapHorizIcon from "@material-ui/icons/SwapHoriz";
 import Switch from "@material-ui/core/Switch";
 import TextField from "@material-ui/core/TextField";
+import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
 import { getSuggestedTerm } from "../reducers/search";
@@ -198,6 +201,8 @@ const reportTypes = [
   "arc",
   "xPerRank",
 ];
+
+const reversibleProps = new Set(["rank", "cat"]);
 
 export const useStyles = makeStyles((theme) => ({
   label: {
@@ -391,8 +396,39 @@ export const ReportEdit = ({
 
   let toggles = [];
 
+  const reverseIcon = ({ queryProp }) => {
+    if (!reversibleProps.has(queryProp)) {
+      return;
+    }
+    if (!values[queryProp] || !values[queryProp].match(/\S\s*,\s*\S/)) {
+      return;
+    }
+    const reverseValues = (value) => {
+      let [prefix, suffix] = value.split(/=/);
+      if (suffix) {
+        return `${prefix}=${suffix.split(",").reverse().join(",")}`;
+      }
+      return value.split(",").reverse().join(",");
+    };
+    return (
+      <Tooltip title={"click to reverse list order"} arrow placement={"top"}>
+        <SwapHorizIcon
+          style={{ cursor: "pointer", float: "right" }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setInputValue(reverseValues(values[queryProp] || ""), queryProp);
+            // if (document.activeElement !== inputRef.current) {
+            //   inputRef.current.focus();
+            // }
+          }}
+        />
+      </Tooltip>
+    );
+  };
+
   for (let queryProp of props) {
-    let except, input, label, required, min, max, step;
+    let except, input, icon, label, required, min, max, step;
     if (Array.isArray(queryProp)) {
       required = true;
       queryProp = queryProp[0];
@@ -603,6 +639,7 @@ export const ReportEdit = ({
           </div>
         );
       } else if (autoCompleteTypes.hasOwnProperty(queryProp)) {
+        icon = reverseIcon({ queryProp });
         input = (
           <AutoCompleteInput
             id={queryProp + Math.random()}
@@ -620,9 +657,17 @@ export const ReportEdit = ({
             maxRows={queryProp == "x" ? 5 : 1}
             fixedType={autoCompleteTypes[queryProp]}
             // doSearch={doSearch}
+            // inputProps={(value) =>
+            //   setInputProps({
+            //     label,
+            //     queryProp,
+            //     value,
+            //   })
+            // }
           />
         );
       } else {
+        icon = reverseIcon({ queryProp });
         input = (
           <TextField
             id={queryProp + Math.random()}
@@ -639,8 +684,23 @@ export const ReportEdit = ({
     }
     if (input) {
       fields.push(
-        <Grid item style={{ width: "95%" }} key={`input-${queryProp}`}>
-          {input}
+        <Grid
+          item
+          style={{ width: "95%" }}
+          key={`input-${queryProp}`}
+          justifyContent="flex-end"
+          alignItems="flex-end"
+          container
+          direction="row"
+        >
+          <Grid item xs={icon ? 11 : 12}>
+            {input}
+          </Grid>
+          {icon && (
+            <Grid item xs={1} style={{ color: "#777c78" }}>
+              {icon}
+            </Grid>
+          )}
         </Grid>
       );
     }

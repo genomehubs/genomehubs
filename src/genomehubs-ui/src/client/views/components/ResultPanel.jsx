@@ -1,3 +1,4 @@
+import BadgeInfo, { BadgeInfoCell } from "./BadgeInfo";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
@@ -97,6 +98,16 @@ const AttributeSummary = ({
         </div>
       </Grid>
     </Tooltip>
+  );
+  summary = (
+    <div className={styles.attrInfo}>
+      <div className={styles.infoName}>{field.id}</div>
+      <AggregationIcon
+        method={field.aggregation_source}
+        hasDescendants={field.has_descendants}
+      />
+      <div className={styles.infoValue}>{value}</div>
+    </div>
   );
   return summary;
 };
@@ -213,8 +224,7 @@ const ResultPanel = ({
     <div className={css}>
       <Tooltip title={"Click to view record"} arrow placement="top">
         <div className={styles.header} onClick={handleTaxonClick}>
-          <span className={styles.title}>{scientific_name}</span>
-          <span> ({taxon_rank})</span>
+          <span className={styles.title}>{taxon_rank}</span>
           <span className={styles.identifier}>
             <span className={styles.identifierPrefix}>taxId:</span>
             {taxon_id}
@@ -236,6 +246,19 @@ const ResultPanel = ({
       )}
 
       <div>
+        <Grid
+          container
+          alignItems="center"
+          direction="row"
+          spacing={0}
+          style={{ width: "100%" }}
+        >
+          <div className={styles.nameGroup}>
+            <div className={styles.content}>
+              <span className={classnames(styles.bold)}>{scientific_name}</span>
+            </div>
+          </div>
+        </Grid>
         <Grid container alignItems="center" direction="row" spacing={0}>
           {taxonSummary}
         </Grid>

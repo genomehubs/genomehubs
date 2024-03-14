@@ -171,8 +171,8 @@ body,
       background: themed("secondary");
 
       &.error {
-        background: mix(themed("ancestral"), themed("secondary"), 80%);
-        border-color: mix(themed("ancestral"), themed("secondary"), 80%);
+        background: themed("ancestral");
+        border-color: themed("ancestral");
       }
 
       .siteText {
@@ -1240,6 +1240,7 @@ body,
       }
 
     }
+    
     .badgeExpanded {
       &:after {
         content: "";
@@ -1306,6 +1307,41 @@ body,
           }
         }
       }
+    }
+
+    .attrInfo {
+
+      position: relative;
+      display: inline-block;
+      text-align: center;
+      cursor: pointer;
+      white-space: nowrap;
+      margin: 0.25rem;
+      border-radius: 0.25rem;
+      padding: 0 0.5em 0.05em;
+      background-color: themed("secondary");
+      border: solid 3px themed("primary");
+
+      .infoName {
+        font-family: themed("bodyFont");
+        color: mix(themed("secondary"), themed("primary"), 10%);
+        position: relative;
+        border-bottom: 0.1rem solid mix(themed("primary"), themed("secondary"), 15%);
+      }
+
+      .infoValue {
+        margin-left: 0.5rem;
+        color: themed("primary");
+        font-family: themed("titleFont");
+        font-size: 1.5em;
+        display: inline-block;
+        position: relative;
+      }
+
+      &:hover {
+        filter: invert(0.1);
+      }
+
     }
 
 
