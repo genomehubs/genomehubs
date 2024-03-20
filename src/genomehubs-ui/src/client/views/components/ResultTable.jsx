@@ -897,9 +897,14 @@ const ResultTable = ({
             </TableCell>
           );
         } else {
-          let values = (Array.isArray(value) ? value : [value]).map((v) =>
-            v.toLowerCase()
-          );
+          let values;
+          try {
+            values = (Array.isArray(value) ? value : [value]).map((v) =>
+              v.toLowerCase()
+            );
+          } catch {
+            values = [];
+          }
           let added = new Set();
           constraints[type.field].forEach((key, i) => {
             let css = setCellClassName(i, constraints[type.field].length);
@@ -1178,7 +1183,7 @@ const ResultTable = ({
             key={`${type.name}_${type.summary}-${v}`}
             className={css}
           >
-            {v}
+            {v.split("_").join(`_\u200b`).split(".").join(`.\u200b`)}
           </OddTableCell>
         );
       });
