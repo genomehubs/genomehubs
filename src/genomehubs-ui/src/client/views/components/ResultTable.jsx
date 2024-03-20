@@ -465,9 +465,16 @@ const setFileLink = ({ type, key, result }) => {
     return;
   }
   let parts = type.field.split(".");
+  if (parts.length == 1) {
+    if (type.file_paths[key]) {
+      return { expand: `${type.field}.${key}.run` };
+    }
+    return { expand: false };
+  }
   if (!parts.length == 3 || !type.file_paths[parts[1]]) {
     return;
   }
+
   let run = parts[2];
   if (run == "run") {
     parts[2] = key;
