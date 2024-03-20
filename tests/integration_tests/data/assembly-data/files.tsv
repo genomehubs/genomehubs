@@ -1,3 +1,4 @@
 taxon_id	accession	files	files.source.date	files.source.name	files.busco.run	files.busco.carnivora_odb10	files.busco.eukaryota_odb10	files.busco.metazoa_odb10	files.busco.viridiplantae_odb10
 3750	GCA_000148765.2	blobtoolkit,busco		topsy	viridiplantae_odb10,eukaryota_odb10		full_table,short_summary,single_copy_sequences		full_table,short_summary,single_copy_sequences
 9612	GCA_905319855.2	blobtoolkit,busco	2023-11-02	tim	carnivora_odb10,eukaryota_odb10,metazoa_odb10	full_table,short_summary,single_copy_sequences	full_table,short_summary,single_copy_sequences	full_table,short_summary,single_copy_sequences	
+3752	GCA_916048215.2	blobtoolkit,busco		topsy	viridiplantae_odb10,eukaryota_odb10		full_table,short_summary,single_copy_sequences		full_table,short_summary,single_copy_sequences

@@ -12,6 +12,7 @@ import Citation from "./Citation";
 import DescriptionIcon from "@material-ui/icons/Description";
 import DownloadButton from "./DownloadButton";
 import FilterListIcon from "@material-ui/icons/FilterList";
+import GetAppIcon from "@material-ui/icons/GetApp";
 import Grid from "@material-ui/core/Grid";
 import Grow from "@material-ui/core/Grow";
 import IconButton from "@material-ui/core/IconButton";
@@ -203,8 +204,8 @@ const SortableCell = ({
   summary = "",
   description,
   status,
-  colCount,
-  colSpan,
+  colCount = 0,
+  colSpan = 0,
   classes,
   searchIndex,
   CustomCell,
@@ -267,10 +268,10 @@ const SortableCell = ({
     );
   }
 
-  let SpanCell = colSpan > 1 ? SpanTableCell : CustomCell;
+  let SpanCell = colSpan > 0 ? SpanTableCell : CustomCell;
 
   let cellCss = "";
-  if (colSpan > 1) {
+  if (colSpan > 0) {
     cellCss = classnames(styles.first, styles.last);
   }
 
@@ -278,7 +279,6 @@ const SortableCell = ({
     summary && summary.startsWith("metadata.")
       ? `${name}${summary.replace("metadata", "")}`
       : name;
-
   return (
     <SpanCell
       key={`${name}_${summary}`}
@@ -421,12 +421,12 @@ const SortableCell = ({
               </span>
             </Tooltip>
           )}
-          {colCount > 1 && (
+          {colCount > 0 && (
             <Tooltip key={"split"} title={"Toggle split column"} arrow>
               <span>
                 <span>
                   <StyledColSplit
-                    checked={colSpan > 1}
+                    checked={colSpan > 0}
                     // onChange={() =>
                     //   handleToggleExclusion({ toggleAncestral: prefix })
                     // }
@@ -446,17 +446,54 @@ const SortableCell = ({
   );
 };
 
-const setCellClassName = (i, length) => {
-  if (length == 1) {
+const setCellClassName = (i, length, force) => {
+  if (length == 1 && !force) {
     return "";
   }
   let css = i % 2 == 1 ? styles.contrast : "";
   if (i == 0) {
     css = classnames(css, styles.first);
-  } else if (i == length - 1) {
+  }
+  if (i == length - 1) {
     css = classnames(css, styles.last);
   }
   return css;
+};
+
+const setFileLink = ({ type, key, result }) => {
+  if (!type.file_paths) {
+    return;
+  }
+  let parts = type.field.split(".");
+  if (!parts.length == 3 || !type.file_paths[parts[1]]) {
+    return;
+  }
+  let run = parts[2];
+  if (run == "run") {
+    parts[2] = key;
+    return { expand: parts.join(".") };
+  }
+  if (!type.file_paths[parts[1]][key]) {
+    return;
+  }
+  let { name, pattern } = type.file_paths[parts[1]][key];
+  let arr = pattern.split(/[\{\}]/);
+  arr.forEach((item, i) => {
+    if (i % 2 == 1) {
+      if (item == "run") {
+        arr[i] = run;
+      } else if (item == "name") {
+        arr[i] = name;
+      } else if (result.hasOwnProperty(item)) {
+        arr[i] = result[item];
+      } else if (result.result.hasOwnProperty(item)) {
+        arr[i] = result.result[item];
+      } else if (result.result.fields.hasOwnProperty(item)) {
+        arr[i] = result.result.fields[item].value;
+      }
+    }
+  });
+  return { download: arr.join("") };
 };
 
 const ResultTable = ({
@@ -480,7 +517,11 @@ const ResultTable = ({
   basename,
 }) => {
   const rootRef = useRef(null);
-  const expandColumns = searchDefaults.expandColumns || {};
+  const expandColumns =
+    searchDefaults.expandColumns ||
+    (searchTerm.expand || "")
+      .split(",")
+      .reduce((a, b) => ({ ...a, [b]: true }), {});
   let expandedTypes = [];
   let emptyBuckets = new Set();
   let constraints = {};
@@ -610,8 +651,38 @@ const ResultTable = ({
     );
   };
 
-  const handleToggleColSpan = (id, colSpan) => {
-    if (colSpan > 1) {
+  const handleToggleColSpan = (id, colSpan, linked) => {
+    if (linked) {
+      let fields = (searchTerm.fields || "").split(",");
+      let expand = "";
+
+      if (!fields.includes(id)) {
+        fields.push(id);
+        fields = fields.join(",");
+        expand = Object.entries(expandColumns)
+          .filter(([_, v]) => v)
+          .map(([k]) => k)
+          .concat([id])
+          .join(",");
+      } else if (colSpan > 0) {
+        fields = fields.filter((f) => f != id).join(",");
+        expand = Object.entries(expandColumns)
+          .filter(([_, v]) => v)
+          .map(([k]) => k)
+          .filter((f) => f != id)
+          .join(",");
+      }
+      if (fields != searchTerm.fields) {
+        navigate(
+          `${basename}${location.pathname}?${qs.stringify({
+            ...searchTerm,
+            expand,
+            fields,
+          })}`
+        );
+      }
+    }
+    if (colSpan > 0) {
       setSearchDefaults({ expandColumns: { ...expandColumns, [id]: false } });
     } else {
       setSearchDefaults({ expandColumns: { ...expandColumns, [id]: true } });
@@ -813,9 +884,9 @@ const ResultTable = ({
     }
 
     expandedTypes.forEach((type) => {
-      let colSpan = 1;
-      let colCount = constraints[type.field]?.length || 1;
-      if (colCount > 1 && expandColumns[type.field]) {
+      let colSpan = 0;
+      let colCount = constraints[type.field]?.length || 0;
+      if (colCount > 0 && expandColumns[type.field]) {
         colSpan = colCount;
         maxColSpan = Math.max(colSpan, maxColSpan);
       }
@@ -823,7 +894,7 @@ const ResultTable = ({
       if (result.result.fields && result.result.fields.hasOwnProperty(name)) {
         let field = result.result.fields[name];
         let value = field[type.summary];
-        if (colSpan == 1) {
+        if (colSpan == 0) {
           let entries = [];
           if (Array.isArray(value)) {
             value = formatter(value, searchIndex, "array");
@@ -907,7 +978,11 @@ const ResultTable = ({
           }
           let added = new Set();
           constraints[type.field].forEach((key, i) => {
-            let css = setCellClassName(i, constraints[type.field].length);
+            let css = setCellClassName(
+              i,
+              constraints[type.field].length,
+              expandColumns[type.field]
+            );
             if (!values.includes(key)) {
               if (key == "other" && values.length > added.size) {
                 let fill = statusColors[field.aggregation_source];
@@ -933,44 +1008,85 @@ const ResultTable = ({
                 );
               }
             } else {
+              let fileLink = setFileLink({ type, key, result });
               added.add(key);
               let list = type.value_metadata?.[key]?.icons;
               let icons = [];
               let url = type.value_metadata?.default?.link;
-              if (list) {
-                if (list.file) {
-                  url = list.file?.link || url;
+              let RadioIcon = RadioButtonCheckedOutlinedIcon;
+              let fill = statusColors[field.aggregation_source];
+              if (field.aggregation_source == "descendant") {
+                RadioIcon = AdjustIcon;
+              } else if (field.aggregation_source == "ancestor") {
+                RadioIcon = RadioButtonUncheckedIcon;
+              }
+              if (fileLink) {
+                if (fileLink.download) {
                   icons.push(
-                    <DescriptionIcon
+                    <GetAppIcon
                       key="file"
                       style={{
                         fill: statusColors[field.aggregation_source],
                         cursor: "pointer",
+                        fontSize: "1.25rem",
                       }}
-                      onClick={() => window.open(url)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(fileLink.download);
+                      }}
                     />
                   );
-                }
-                if (list.view) {
-                  url = list.view?.link || url;
+                } else if (fileLink.expand) {
+                  if (!expandColumns[fileLink.expand]) {
+                    RadioIcon = RadioButtonUncheckedIcon;
+                  }
                   icons.push(
-                    <VisibilityIcon
-                      key="view"
+                    <RadioIcon
+                      key="file"
                       style={{
                         fill: statusColors[field.aggregation_source],
                         cursor: "pointer",
+                        fontSize: "1.25rem",
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleColSpan(
+                          fileLink.expand,
+                          expandColumns[fileLink.expand] ? 1 : 0,
+                          true
+                        );
                       }}
                     />
                   );
                 }
+                // }
+                // if (list) {
+                //   if (list.file) {
+                //     url = list.file?.link || url;
+                //     icons.push(
+                //       <DescriptionIcon
+                //         key="file"
+                //         style={{
+                //           fill: statusColors[field.aggregation_source],
+                //           cursor: "pointer",
+                //         }}
+                //         onClick={() => window.open(url)}
+                //       />
+                //     );
+                //   }
+                //   if (list.view) {
+                //     url = list.view?.link || url;
+                //     icons.push(
+                //       <VisibilityIcon
+                //         key="view"
+                //         style={{
+                //           fill: statusColors[field.aggregation_source],
+                //           cursor: "pointer",
+                //         }}
+                //       />
+                //     );
+                //   }
               } else {
-                let RadioIcon = RadioButtonCheckedOutlinedIcon;
-                let fill = statusColors[field.aggregation_source];
-                if (field.aggregation_source == "descendant") {
-                  RadioIcon = AdjustIcon;
-                } else if (field.aggregation_source == "ancestor") {
-                  RadioIcon = RadioButtonUncheckedIcon;
-                }
                 icons.push(
                   <RadioIcon
                     style={{
@@ -995,11 +1111,15 @@ const ResultTable = ({
           });
         }
       } else {
-        for (let i = 0; i < colSpan; i++) {
-          let css = setCellClassName(i, colSpan);
+        if (!colSpan) {
+          colSpan = 0;
+          colCount = 1;
+        }
+        for (let i = 0; i < colCount; i++) {
+          let css = setCellClassName(i, colCount, expandColumns[type.field]);
           cells.push(
             <OddTableCell key={`${type.field}-${i}`} className={css}>
-              {colSpan == 1 && "-"}
+              {colSpan == 0 && "-"}
             </OddTableCell>
           );
         }
@@ -1054,7 +1174,7 @@ const ResultTable = ({
     <StickyCell key={"scientific_name"} />,
     <TableCell key={"taxon_id"} />,
   ];
-  let maxColSpan = 1;
+  let maxColSpan = 0;
   Object.keys(activeNameClasses).forEach((nameClass) => {
     heads.push(
       <SortableCell
@@ -1129,9 +1249,9 @@ const ResultTable = ({
     if (type.processed_type == "geo_point") {
     } else {
     }
-    let colSpan = 1;
-    let colCount = constraints[type.field]?.length || 1;
-    if (colCount > 1 && expandColumns[type.field]) {
+    let colSpan = 0;
+    let colCount = constraints[type.field]?.length || 0;
+    if (colCount > 0 && expandColumns[type.field]) {
       colSpan = colCount;
       maxColSpan = Math.max(colSpan, maxColSpan);
     }
@@ -1169,15 +1289,19 @@ const ResultTable = ({
       <ResultFilter
         key={`${type.name}_${type.summary}`}
         name={type.name}
-        colSpan={colSpan}
-        TableCell={colSpan > 1 ? SpanTableCell : TableCell}
+        colSpan={colSpan + 1}
+        TableCell={colSpan > 0 ? SpanTableCell : TableCell}
         value={""}
         fieldMeta={types[type.name]}
       />
     );
-    if (colSpan > 1) {
+    if (colSpan > 0) {
       constraints[type.field].forEach((v, i) => {
-        let css = setCellClassName(i, constraints[type.field].length);
+        let css = setCellClassName(
+          i,
+          constraints[type.field].length,
+          expandColumns[type.field]
+        );
         expandedCols.push(
           <OddTableCell
             key={`${type.name}_${type.summary}-${v}`}
@@ -1189,7 +1313,7 @@ const ResultTable = ({
       });
     } else {
       expandedCols.push(
-        <TableCell key={`${type.name}_${type.summary}`} colSpan={colSpan} />
+        <TableCell key={`${type.name}_${type.summary}`} colSpan={colSpan + 1} />
       );
     }
   }
@@ -1234,7 +1358,7 @@ const ResultTable = ({
             <TableHead>
               <TableRow>{heads}</TableRow>
               {searchDefaults.showFilter && <TableRow>{filters}</TableRow>}
-              {maxColSpan > 1 && <TableRow>{expandedCols}</TableRow>}
+              {maxColSpan > 0 && <TableRow>{expandedCols}</TableRow>}
             </TableHead>
             <TableBody>{rows}</TableBody>
           </Table>

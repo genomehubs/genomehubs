@@ -6,7 +6,7 @@ export const nullCountsAgg = async ({
   non_attr_fields,
   names,
   ranks,
-  termsCount = 3,
+  termsCount = 64,
 }) => {
   let fieldFilters = {};
   if (fields.length == 0) {
