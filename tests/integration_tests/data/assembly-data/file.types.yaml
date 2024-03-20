@@ -14,11 +14,22 @@ identifiers:
 attributes:
   files:
     display_level: 1
+    file_paths:
+      busco:
+        full_table:
+          name: full_table.tsv
+          pattern: https://busco.cog.sanger.ac.uk/{assembly_id}/{run}/{name}
+        short_summary:
+          name: short_summary.txt
+          pattern: https://busco.cog.sanger.ac.uk/{assembly_id}/{run}/{name}
+        single_copy_sequences:
+          name: single_copy_busco_sequences.tar.gz
+          pattern: https://busco.cog.sanger.ac.uk/{assembly_id}/{run}/busco_sequences/{name}
     header: files
     separator: ","
     type: keyword
-  files.busco.lineages:
-    header: files.busco.lineages
+  files.busco.run:
+    header: files.busco.run
     separator: ","
   files.busco.carnivora_odb10:
     header: files.busco.carnivora_odb10

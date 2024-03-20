@@ -199,6 +199,8 @@ const StyledColSplit = ({ color, ...props }) => {
 
 const SortableCell = ({
   name,
+  field,
+  summary = "",
   description,
   status,
   colCount,
@@ -272,9 +274,14 @@ const SortableCell = ({
     cellCss = classnames(styles.first, styles.last);
   }
 
+  let cellTitle =
+    summary && summary.startsWith("metadata.")
+      ? `${name}${summary.replace("metadata", "")}`
+      : name;
+
   return (
     <SpanCell
-      key={name}
+      key={`${name}_${summary}`}
       colSpan={colSpan}
       className={cellCss}
       style={{
@@ -306,7 +313,7 @@ const SortableCell = ({
             }
           >
             {/* {name} */}
-            {name.split("_").join(`_\u200b`)}
+            {cellTitle.split("_").join(`_\u200b`).split(".").join(`.\u200b`)}
             {status && status != "stable" && <sup>{`\u2020`}</sup>}
             {sortBy === name ? (
               <span className={classes.visuallyHidden}>
@@ -392,7 +399,7 @@ const SortableCell = ({
               />
             </span>
           </Tooltip>
-          {searchIndex == "taxon" && (
+          {(searchIndex == "taxon" || searchIndex == "assembly") && (
             <Tooltip key={"columns"} title={"Show/hide subset columns"} arrow>
               <span>
                 <StyledColbox
@@ -424,7 +431,7 @@ const SortableCell = ({
                     //   handleToggleExclusion({ toggleAncestral: prefix })
                     // }
                     onClick={() => {
-                      handleToggleColSpan(prefix, colSpan);
+                      handleToggleColSpan(field, colSpan);
                     }}
                     color={"black"}
                     inputProps={{ "aria-label": "split/collapse column" }}
@@ -476,34 +483,66 @@ const ResultTable = ({
   const expandColumns = searchDefaults.expandColumns || {};
   let expandedTypes = [];
   let emptyBuckets = new Set();
+  let constraints = {};
   if (searchResults.aggs?.fields) {
     emptyBuckets = new Set(
       Object.entries(searchResults.aggs.fields.by_key.buckets)
         .filter(([_, obj]) => obj.doc_count == 0)
-        .map(([key]) => key)
+        .map(([key, obj]) => key)
     );
+    for (let [key, value] of Object.entries(
+      searchResults.aggs.fields.by_key.buckets
+    )) {
+      let { buckets, sum_other_doc_count } = value.value_list;
+      if (buckets.length >= 1) {
+        constraints[key] = buckets.map(({ key }) => key);
+      }
+      if (sum_other_doc_count >= 1) {
+        constraints[key].push("other");
+      }
+    }
+    for (let [key, value] of Object.entries(searchResults.aggs.fields)) {
+      if (key.endsWith("_metadata")) {
+        for (let [path, obj] of Object.entries(value).filter(
+          ([p]) => p != "doc_count"
+        )) {
+          constraints[path] = obj.buckets.map(({ key }) => key);
+          if (obj.sum_other_doc_count >= 1) {
+            constraints[path].push("other");
+          }
+        }
+      }
+    }
   }
   if (searchTerm) {
     if (searchTerm.fields) {
       let fieldList = expandFieldList({ fields: searchTerm.fields, types });
-      expandedTypes = displayTypes.filter(
-        ({ name }) => !emptyBuckets.has(name) && name != "none"
-      );
+      expandedTypes = displayTypes
+        .filter(({ name }) => !emptyBuckets.has(name) && name != "none")
+        .map(({ name, ...rest }) => ({ name, field: name, ...rest }));
       for (let field of fieldList) {
-        if (!field.includes(":")) {
+        let name, summary;
+        if (field.includes(":")) {
+          [name, summary] = field.split(":");
+        } else if (field.includes(".")) {
+          [name, ...summary] = field.split(".");
+          summary = `metadata.${summary.join(".")}`;
+        } else {
           continue;
         }
-        let [name, summary] = field.split(":");
         let index = expandedTypes.findIndex(({ name: n }) => n == name);
         let defaultValue = (types[name] || { processed_simple: "value" })
           .processed_simple;
         expandedTypes.splice(index + 1, 0, {
-          name: field,
+          ...expandedTypes[index],
+          name: field.includes(".") ? name : `${name}:${summary}`,
           summary: summary || defaultValue,
+          field,
         });
       }
       for (let obj of expandedTypes) {
-        let [name, summary] = obj.name.split(":");
+        let { name, summary } = obj;
+        name = name.replace(/:.+/, "");
         let defaultValue = (types[name] || { processed_simple: "value" })
           .processed_simple;
         if (["direct", "descendant", "ancestor"].includes(summary)) {
@@ -775,16 +814,14 @@ const ResultTable = ({
 
     expandedTypes.forEach((type) => {
       let colSpan = 1;
-      let colCount = type.constraint?.enum?.length || 1;
-      if (colCount > 1 && expandColumns[type.name]) {
+      let colCount = constraints[type.field]?.length || 1;
+      if (colCount > 1 && expandColumns[type.field]) {
         colSpan = colCount;
         maxColSpan = Math.max(colSpan, maxColSpan);
       }
-      if (
-        result.result.fields &&
-        result.result.fields.hasOwnProperty(type.name)
-      ) {
-        let field = result.result.fields[type.name];
+      let name = type.name.split(":")[0];
+      if (result.result.fields && result.result.fields.hasOwnProperty(name)) {
+        let field = result.result.fields[name];
         let value = field[type.summary];
         if (colSpan == 1) {
           let entries = [];
@@ -827,7 +864,7 @@ const ResultTable = ({
             );
           }
           cells.push(
-            <TableCell key={type.name}>
+            <TableCell key={`${type.name}_${type.summary}`}>
               <Grid
                 container
                 direction="row"
@@ -863,15 +900,35 @@ const ResultTable = ({
           let values = (Array.isArray(value) ? value : [value]).map((v) =>
             v.toLowerCase()
           );
-          type.constraint.enum.forEach((key, i) => {
-            let css = setCellClassName(i, type.constraint.enum.length);
+          let added = new Set();
+          constraints[type.field].forEach((key, i) => {
+            let css = setCellClassName(i, constraints[type.field].length);
             if (!values.includes(key)) {
-              cells.push(
-                <OddTableCell key={`${type.name}-${key}-${i}`} className={css}>
-                  {/* <CheckBoxOutlineBlankIcon style={{ opacity: 0.25 }} /> */}
-                </OddTableCell>
-              );
+              if (key == "other" && values.length > added.size) {
+                let fill = statusColors[field.aggregation_source];
+
+                cells.push(
+                  <OddTableCell
+                    key={`${type.field}-${key}-${i}`}
+                    className={css}
+                  >
+                    <RadioButtonCheckedOutlinedIcon
+                      style={{ fill, fontSize: "1.25rem" }}
+                    />
+                  </OddTableCell>
+                );
+              } else {
+                cells.push(
+                  <OddTableCell
+                    key={`${type.field}-${key}-${i}`}
+                    className={css}
+                  >
+                    {/* <CheckBoxOutlineBlankIcon style={{ opacity: 0.25 }} /> */}
+                  </OddTableCell>
+                );
+              }
             } else {
+              added.add(key);
               let list = type.value_metadata?.[key]?.icons;
               let icons = [];
               let url = type.value_metadata?.default?.link;
@@ -922,7 +979,7 @@ const ResultTable = ({
               }
               cells.push(
                 <OddTableCell
-                  key={`${type.name}-${key}-${i}`}
+                  key={`${type.field}-${key}-${i}`}
                   style={{ whiteSpace: "nowrap" }}
                   className={css}
                 >
@@ -936,7 +993,7 @@ const ResultTable = ({
         for (let i = 0; i < colSpan; i++) {
           let css = setCellClassName(i, colSpan);
           cells.push(
-            <OddTableCell key={`${type.name}-${i}`} className={css}>
+            <OddTableCell key={`${type.field}-${i}`} className={css}>
               {colSpan == 1 && "-"}
             </OddTableCell>
           );
@@ -1068,15 +1125,17 @@ const ResultTable = ({
     } else {
     }
     let colSpan = 1;
-    let colCount = type.constraint?.enum?.length || 1;
-    if (colCount > 1 && expandColumns[type.name]) {
+    let colCount = constraints[type.field]?.length || 1;
+    if (colCount > 1 && expandColumns[type.field]) {
       colSpan = colCount;
       maxColSpan = Math.max(colSpan, maxColSpan);
     }
     heads.push(
       <SortableCell
-        key={type.name}
+        key={`${type.name}_${type.summary}`}
         name={type.name}
+        field={type.field}
+        summary={type.summary}
         description={type.description}
         status={type.status}
         handleTableSort={type.processed_type != "geo_point" && handleTableSort}
@@ -1103,7 +1162,7 @@ const ResultTable = ({
     );
     filters.push(
       <ResultFilter
-        key={type.name}
+        key={`${type.name}_${type.summary}`}
         name={type.name}
         colSpan={colSpan}
         TableCell={colSpan > 1 ? SpanTableCell : TableCell}
@@ -1112,16 +1171,21 @@ const ResultTable = ({
       />
     );
     if (colSpan > 1) {
-      type.constraint.enum.forEach((v, i) => {
-        let css = setCellClassName(i, type.constraint.enum.length);
+      constraints[type.field].forEach((v, i) => {
+        let css = setCellClassName(i, constraints[type.field].length);
         expandedCols.push(
-          <OddTableCell key={`${type.name}-${v}`} className={css}>
+          <OddTableCell
+            key={`${type.name}_${type.summary}-${v}`}
+            className={css}
+          >
             {v}
           </OddTableCell>
         );
       });
     } else {
-      expandedCols.push(<TableCell key={type.name} colSpan={colSpan} />);
+      expandedCols.push(
+        <TableCell key={`${type.name}_${type.summary}`} colSpan={colSpan} />
+      );
     }
   }
   heads.push(

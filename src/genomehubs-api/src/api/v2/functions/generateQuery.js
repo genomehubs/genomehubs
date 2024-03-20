@@ -242,7 +242,6 @@ const validateTerm = (term, types) => {
       ) {
         typeSummary.push("length");
       }
-      typeSummary.push("metadata");
       if (parts[1] && parts[1].length > 0 && !typeSummary.includes(parts[1])) {
         return {
           validation: fail(`invalid summary for ${parts[2]} in ${term}`),
