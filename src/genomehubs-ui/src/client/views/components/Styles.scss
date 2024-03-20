@@ -1308,6 +1308,10 @@ body,
 
             .last {
               border-right: solid mix(themed("primary"), themed("secondary"), 10%) 2px;
+            
+              & + .first {
+                border-left: none;
+              }
             }
           }
         }
