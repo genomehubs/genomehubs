@@ -1289,6 +1289,11 @@ body,
               border-right: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
             }
           }
+          tr:last-of-type {
+            td {
+              border-bottom: none;
+            }
+          }
         }
 
         thead, tbody {
