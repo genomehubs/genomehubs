@@ -500,7 +500,25 @@ const setFileLink = ({ type, key, result }) => {
       }
     }
   });
-  return { download: arr.join("") };
+  let download = arr.join("");
+  return {
+    download,
+    title: `download ${name} from ${download
+      .replace(/^s*(http|ftp)s*:\/\//, "")
+      .replace(/\/.+$/, "")}`,
+  };
+};
+
+const findLastIndex = ({ name, field, expandedTypes }) => {
+  let index = expandedTypes.findIndex(({ name: n }) => n == name);
+  for (let i = index + 1; i < expandedTypes.length; i++) {
+    if (expandedTypes[i].field.startsWith(`${name}.`)) {
+      index = i;
+    } else {
+      break;
+    }
+  }
+  return index;
 };
 
 const ResultTable = ({
@@ -529,6 +547,7 @@ const ResultTable = ({
     (searchTerm.expand || "")
       .split(",")
       .reduce((a, b) => ({ ...a, [b]: true }), {});
+
   let expandedTypes = [];
   let emptyBuckets = new Set();
   let constraints = {};
@@ -578,7 +597,7 @@ const ResultTable = ({
         } else {
           continue;
         }
-        let index = expandedTypes.findIndex(({ name: n }) => n == name);
+        let index = findLastIndex({ name, field, expandedTypes });
         let defaultValue = (types[name] || { processed_simple: "value" })
           .processed_simple;
         expandedTypes.splice(index + 1, 0, {
@@ -661,35 +680,57 @@ const ResultTable = ({
   const handleToggleColSpan = (id, colSpan, linked) => {
     if (linked) {
       let fields = (searchTerm.fields || "").split(",");
-      let expand = "";
+      let expand = expandColumns;
+      let newExpandColumns = { ...expandColumns };
 
       if (!fields.includes(id)) {
+        let prefix = id.replace(/\.[^\.]+$/, "");
+        fields = fields.filter(
+          (f) => !f.startsWith(prefix) || f == `${prefix}.run`
+        );
+
         fields.push(id);
-        fields = fields.join(",");
-        expand = Object.entries(expandColumns)
-          .filter(([_, v]) => v)
-          .map(([k]) => k)
-          .concat([id])
-          .join(",");
+        fields = [...new Set(fields)];
+        newExpandColumns = Object.entries(expandColumns)
+          .map(([k, v]) => {
+            if (k.startsWith(prefix) && k != `${prefix}.run`) {
+              return [k, false];
+            }
+            return [k, v];
+          })
+          .reduce((a, [k, v]) => ({ ...a, [k]: v }), {});
+        expand = Object.entries(newExpandColumns)
+          .filter(([k, v]) => v)
+          .map(([k]) => k);
+        expand.push(id);
+        newExpandColumns[id] = true;
       } else if (colSpan > 0) {
-        fields = fields.filter((f) => f != id).join(",");
-        expand = Object.entries(expandColumns)
-          .filter(([_, v]) => v)
-          .map(([k]) => k)
-          .filter((f) => f != id)
-          .join(",");
+        let prefix = id.replace(/\.run$/, "");
+        fields = fields.filter((f) => !f.startsWith(prefix));
+        newExpandColumns = Object.entries(expandColumns)
+          .map(([k, v]) => {
+            if (k.startsWith(prefix)) {
+              return [k, false];
+            }
+            return [k, v];
+          })
+          .reduce((a, [k, v]) => ({ ...a, [k]: v }), {});
+        expand = Object.entries(newExpandColumns)
+          .filter(([k, v]) => v)
+          .map(([k]) => k);
       }
+      setSearchDefaults({ expandColumns: newExpandColumns });
+
       if (fields != searchTerm.fields) {
         navigate(
           `${basename}${location.pathname}?${qs.stringify({
             ...searchTerm,
-            expand,
-            fields,
+            expand: expand.join(","),
+            fields: fields.join(","),
           })}`
         );
       }
-    }
-    if (colSpan > 0) {
+    } else if (colSpan > 0) {
       setSearchDefaults({ expandColumns: { ...expandColumns, [id]: false } });
     } else {
       setSearchDefaults({ expandColumns: { ...expandColumns, [id]: true } });
@@ -1030,18 +1071,24 @@ const ResultTable = ({
               if (fileLink) {
                 if (fileLink.download) {
                   icons.push(
-                    <GetAppIcon
+                    <Tooltip
+                      title={fileLink.title}
+                      arrow
+                      position="top"
                       key="file"
-                      style={{
-                        fill: statusColors[field.aggregation_source],
-                        cursor: "pointer",
-                        fontSize: "1.25rem",
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        window.open(fileLink.download);
-                      }}
-                    />
+                    >
+                      <GetAppIcon
+                        style={{
+                          fill: statusColors[field.aggregation_source],
+                          cursor: "pointer",
+                          fontSize: "1.25rem",
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(fileLink.download);
+                        }}
+                      />
+                    </Tooltip>
                   );
                 } else if (fileLink.expand) {
                   if (!expandColumns[fileLink.expand]) {
