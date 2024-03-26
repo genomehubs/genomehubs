@@ -203,7 +203,7 @@ const StyledColSplit = ({ color, ...props }) => {
 
 const SortableCell = ({
   name,
-  field,
+  field = name,
   summary = "",
   description,
   status,
