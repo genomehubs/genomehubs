@@ -16,15 +16,46 @@ attributes:
     display_level: 1
     file_paths:
       busco:
+        color: "#bb2200"
         full_table:
           name: full_table.tsv
-          pattern: https://busco.cog.sanger.ac.uk/{assembly_id}/{run}/{name}
+          links:
+            - icon: download
+              pattern: https://busco.cog.sanger.ac.uk/{assembly_id}/busco/full_table.tsv
+              title: Download full_table.tsv file from busco.cog.sanger.ac.uk
         short_summary:
           name: short_summary.txt
-          pattern: https://busco.cog.sanger.ac.uk/{assembly_id}/{run}/{name}
+          links:
+            - icon: download
+              pattern: https://busco.cog.sanger.ac.uk/{assembly_id}/busco/short_summary.txt
+              title: Download short_summary.txt file from busco.cog.sanger.ac.uk
         single_copy_sequences:
           name: single_copy_busco_sequences.tar.gz
-          pattern: https://busco.cog.sanger.ac.uk/{assembly_id}/{run}/busco_sequences/{name}
+          links:
+            - icon: download
+              pattern: https://busco.cog.sanger.ac.uk/{assembly_id}/busco/busco_sequences/single_copy_busco_sequences.tar.gz
+              title: Download single_copy_busco_sequences.tar.gz file from busco.cog.sanger.ac.uk
+      blobtoolkit:
+        color: "#9c528b"
+        all: true
+        blob:
+          name: blob
+          links:
+            - icon: view
+              pattern: https://blobtoolkit.genomehubs.org/view/dataset/{files.blobtoolkit.run}/blob
+              title: View blob plot at blobtoolkit.genomehubs.org
+        cumulative:
+          name: cumulative
+          links:
+            - icon: view
+              pattern: https://blobtoolkit.genomehubs.org/view/dataset/{files.blobtoolkit.run}/cumulative
+              title: View cumulative plot at blobtoolkit.genomehubs.org
+        snail:
+          name: snail
+          links:
+            - icon: view
+              pattern: https://blobtoolkit.genomehubs.org/view/dataset/{files.blobtoolkit.run}/snail
+              title: View snail plot at blobtoolkit.genomehubs.org
     header: files
     separator: ","
     type: keyword
@@ -47,6 +78,12 @@ attributes:
     header: files.source.date
   files.source.name:
     header: files.source.name
+  files.blobtoolkit.run:
+    header: files.blobtoolkit.run
+    separator: ","
+  files.blobtoolkit.all:
+    header: files.blobtoolkit.all
+    separator: ","
 taxonomy:
   taxon_id:
     header: taxon_id

@@ -11,6 +11,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import Citation from "./Citation";
 import DescriptionIcon from "@material-ui/icons/Description";
 import DownloadButton from "./DownloadButton";
+import FiberManualRecordSharpIcon from "@material-ui/icons/FiberManualRecordSharp";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import Grid from "@material-ui/core/Grid";
@@ -57,6 +58,8 @@ import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
 const borderColor = "#dddddd";
+const darkColor = 44;
+const lightColor = 22;
 
 const StyledTableRow = withStyles((theme) => ({
   root: {
@@ -206,6 +209,7 @@ const SortableCell = ({
   status,
   colCount = 0,
   colSpan = 0,
+  color,
   classes,
   searchIndex,
   CustomCell,
@@ -292,6 +296,7 @@ const SortableCell = ({
         lineHeight: "1rem",
         verticalAlign: "bottom",
         borderBottom,
+        backgroundColor: color,
       }}
       sortDirection={sortDirection}
     >
@@ -460,53 +465,66 @@ const setCellClassName = (i, length, force) => {
   return css;
 };
 
-const setFileLink = ({ type, key, result }) => {
+const setLinkIcons = ({ type, key, result }) => {
   if (!type.file_paths) {
-    return;
+    return [];
   }
   let parts = type.field.split(".");
   if (parts.length == 1) {
     if (type.file_paths[key]) {
-      return { expand: `${type.field}.${key}.run` };
+      let { color } = type.file_paths[key];
+      if (type.file_paths[key].all) {
+        return [{ expand: `${type.field}.${key}.all`, color }];
+      }
+      return [{ expand: `${type.field}.${key}.run`, color }];
     }
-    return { expand: false };
+    return [{ expand: false }];
   }
   if (!parts.length == 3 || !type.file_paths[parts[1]]) {
-    return;
+    return [];
   }
 
   let run = parts[2];
+  // let { color } = type.file_paths[parts[1]] || {};
   if (run == "run") {
     parts[2] = key;
-    return { expand: parts.join(".") };
+    return [{ expand: parts.join("."), color: type.color }];
   }
   if (!type.file_paths[parts[1]][key]) {
-    return;
+    return [];
   }
-  let { name, pattern } = type.file_paths[parts[1]][key];
-  let arr = pattern.split(/[\{\}]/);
-  arr.forEach((item, i) => {
-    if (i % 2 == 1) {
-      if (item == "run") {
-        arr[i] = run;
-      } else if (item == "name") {
-        arr[i] = name;
-      } else if (result.hasOwnProperty(item)) {
-        arr[i] = result[item];
-      } else if (result.result.hasOwnProperty(item)) {
-        arr[i] = result.result[item];
-      } else if (result.result.fields.hasOwnProperty(item)) {
-        arr[i] = result.result.fields[item].value;
+
+  let { name, links } = type.file_paths[parts[1]][key];
+  return links.map(({ icon, pattern, title }) => {
+    let arr = pattern.split(/[\{\}]/);
+    arr.forEach((item, i) => {
+      if (i % 2 == 1) {
+        if (item == "run") {
+          arr[i] = run;
+        } else if (item == "name") {
+          arr[i] = name;
+        } else if (result.hasOwnProperty(item)) {
+          arr[i] = result[item];
+        } else if (result.result.hasOwnProperty(item)) {
+          arr[i] = result.result[item];
+        } else if (result.result.fields.hasOwnProperty(item)) {
+          arr[i] = result.result.fields[item].value;
+        } else {
+          let bits = item.split(".");
+          let field = bits.shift();
+          if (result.result.fields.hasOwnProperty(field)) {
+            arr[i] = result.result.fields[field][`metadata.${bits.join(".")}`];
+          }
+        }
       }
-    }
+    });
+    return {
+      icon,
+      color: type.color,
+      url: arr.join(""),
+      title,
+    };
   });
-  let download = arr.join("");
-  return {
-    download,
-    title: `download ${name} from ${download
-      .replace(/^s*(http|ftp)s*:\/\//, "")
-      .replace(/\/.+$/, "")}`,
-  };
 };
 
 const findLastIndex = ({ name, field, expandedTypes }) => {
@@ -547,7 +565,6 @@ const ResultTable = ({
     (searchTerm.expand || "")
       .split(",")
       .reduce((a, b) => ({ ...a, [b]: true }), {});
-
   let expandedTypes = [];
   let emptyBuckets = new Set();
   let constraints = {};
@@ -608,7 +625,12 @@ const ResultTable = ({
         });
       }
       for (let obj of expandedTypes) {
-        let { name, summary } = obj;
+        let { name, field, summary, file_paths } = obj;
+        if (name != field && file_paths) {
+          let [_, key] = field.split(".");
+          let { color } = file_paths[key] || {};
+          obj.color = color;
+        }
         name = name.replace(/:.+/, "");
         let defaultValue = (types[name] || { processed_simple: "value" })
           .processed_simple;
@@ -686,14 +708,19 @@ const ResultTable = ({
       if (!fields.includes(id)) {
         let prefix = id.replace(/\.[^\.]+$/, "");
         fields = fields.filter(
-          (f) => !f.startsWith(prefix) || f == `${prefix}.run`
+          (f) =>
+            !f.startsWith(prefix) ||
+            f == `${prefix}.run` ||
+            f == `${prefix}.all`
         );
 
-        fields.push(id);
-        fields = [...new Set(fields)];
         newExpandColumns = Object.entries(expandColumns)
           .map(([k, v]) => {
-            if (k.startsWith(prefix) && k != `${prefix}.run`) {
+            if (
+              k.startsWith(prefix) &&
+              k != `${prefix}.run` &&
+              k != `${prefix}.all`
+            ) {
               return [k, false];
             }
             return [k, v];
@@ -702,10 +729,17 @@ const ResultTable = ({
         expand = Object.entries(newExpandColumns)
           .filter(([k, v]) => v)
           .map(([k]) => k);
+        if (id == `${prefix}.all`) {
+          fields.push(`${prefix}.run`);
+          // expand.push(`${prefix}.run`);
+          // newExpandColumns[`${prefix}.run`] = true;
+        }
+        fields.push(id);
         expand.push(id);
+        fields = [...new Set(fields)];
         newExpandColumns[id] = true;
       } else if (colSpan > 0) {
-        let prefix = id.replace(/\.run$/, "");
+        let prefix = id.replace(/\.run$/, "").replace(/\.all$/, "");
         fields = fields.filter((f) => !f.startsWith(prefix));
         newExpandColumns = Object.entries(expandColumns)
           .map(([k, v]) => {
@@ -982,8 +1016,18 @@ const ResultTable = ({
               </span>
             );
           }
+          let color;
+          if (type.name != type.field && type.file_paths) {
+            let [_, key] = type.field.split(".");
+            ({ color } = type.file_paths[key] || {});
+          }
           cells.push(
-            <TableCell key={`${type.name}_${type.summary}`}>
+            <TableCell
+              key={`${type.name}_${type.summary}`}
+              style={{
+                backgroundColor: `${type.color}${lightColor}`,
+              }}
+            >
               <Grid
                 container
                 direction="row"
@@ -1009,7 +1053,10 @@ const ResultTable = ({
                   </Grid>
                 )}
 
-                <Grid item style={{ whiteSpace: "nowrap" }}>
+                <Grid
+                  item
+                  style={{ whiteSpace: "nowrap", ...(color && { color }) }}
+                >
                   {value}
                 </Grid>
               </Grid>
@@ -1031,6 +1078,8 @@ const ResultTable = ({
               constraints[type.field].length,
               expandColumns[type.field]
             );
+            let color = type.color || type.file_paths?.[key]?.color;
+
             if (!values.includes(key)) {
               if (key == "other" && values.length > added.size) {
                 let fill = statusColors[field.aggregation_source];
@@ -1050,97 +1099,83 @@ const ResultTable = ({
                   <OddTableCell
                     key={`${type.field}-${key}-${i}`}
                     className={css}
+                    style={{
+                      backgroundColor: `${color}${
+                        i % 2 == 0 ? lightColor : darkColor
+                      }`,
+                    }}
                   >
                     {/* <CheckBoxOutlineBlankIcon style={{ opacity: 0.25 }} /> */}
                   </OddTableCell>
                 );
               }
             } else {
-              let fileLink = setFileLink({ type, key, result });
+              let linkIcons = setLinkIcons({ type, key, result });
               added.add(key);
               let list = type.value_metadata?.[key]?.icons;
               let icons = [];
               let url = type.value_metadata?.default?.link;
-              let RadioIcon = RadioButtonCheckedOutlinedIcon;
+              let RadioIcon = FiberManualRecordSharpIcon;
               let fill = statusColors[field.aggregation_source];
-              if (field.aggregation_source == "descendant") {
-                RadioIcon = AdjustIcon;
-              } else if (field.aggregation_source == "ancestor") {
-                RadioIcon = RadioButtonUncheckedIcon;
-              }
-              if (fileLink) {
-                if (fileLink.download) {
-                  icons.push(
-                    <Tooltip
-                      title={fileLink.title}
-                      arrow
-                      position="top"
-                      key="file"
-                    >
-                      <GetAppIcon
-                        style={{
-                          fill: statusColors[field.aggregation_source],
-                          cursor: "pointer",
-                          fontSize: "1.25rem",
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.open(fileLink.download);
-                        }}
-                      />
+              // if (field.aggregation_source == "descendant") {
+              //   RadioIcon = AdjustIcon;
+              // } else if (field.aggregation_source == "ancestor") {
+              //   RadioIcon = RadioButtonUncheckedIcon;
+              // }
+              for (let linkIcon of linkIcons) {
+                let title = linkIcon.title;
+                if (linkIcon.color) {
+                  fill = linkIcon.color;
+                }
+                let onClick = () => {};
+                if (linkIcon.icon) {
+                  if (linkIcon.icon == "download") {
+                    RadioIcon = GetAppIcon;
+                  } else if (linkIcon.icon == "view") {
+                    RadioIcon = VisibilityIcon;
+                  }
+                  onClick = (e) => {
+                    e.stopPropagation();
+                    window.open(linkIcon.url);
+                  };
+                } else if (linkIcon.expand) {
+                  if (!expandColumns[linkIcon.expand]) {
+                    RadioIcon = RadioButtonUncheckedIcon;
+                    title = "Click to expand column";
+                  } else {
+                    RadioIcon = RadioButtonCheckedOutlinedIcon;
+                    title = "Click to collapse column";
+                  }
+                  onClick = (e) => {
+                    e.stopPropagation();
+                    handleToggleColSpan(
+                      linkIcon.expand,
+                      expandColumns[linkIcon.expand] ? 1 : 0,
+                      true
+                    );
+                  };
+                }
+                let icon = (
+                  <RadioIcon
+                    style={{
+                      fill,
+                      cursor: "pointer",
+                      fontSize: "1.25rem",
+                    }}
+                    key={"file"}
+                    onClick={onClick}
+                  />
+                );
+                if (title) {
+                  icon = (
+                    <Tooltip title={title} arrow position="top" key="file">
+                      {icon}
                     </Tooltip>
                   );
-                } else if (fileLink.expand) {
-                  if (!expandColumns[fileLink.expand]) {
-                    RadioIcon = RadioButtonUncheckedIcon;
-                  }
-                  icons.push(
-                    <RadioIcon
-                      key="file"
-                      style={{
-                        fill: statusColors[field.aggregation_source],
-                        cursor: "pointer",
-                        fontSize: "1.25rem",
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleColSpan(
-                          fileLink.expand,
-                          expandColumns[fileLink.expand] ? 1 : 0,
-                          true
-                        );
-                      }}
-                    />
-                  );
                 }
-                // }
-                // if (list) {
-                //   if (list.file) {
-                //     url = list.file?.link || url;
-                //     icons.push(
-                //       <DescriptionIcon
-                //         key="file"
-                //         style={{
-                //           fill: statusColors[field.aggregation_source],
-                //           cursor: "pointer",
-                //         }}
-                //         onClick={() => window.open(url)}
-                //       />
-                //     );
-                //   }
-                //   if (list.view) {
-                //     url = list.view?.link || url;
-                //     icons.push(
-                //       <VisibilityIcon
-                //         key="view"
-                //         style={{
-                //           fill: statusColors[field.aggregation_source],
-                //           cursor: "pointer",
-                //         }}
-                //       />
-                //     );
-                //   }
-              } else {
+                icons.push(icon);
+              }
+              if (!linkIcons || linkIcons.length == 0) {
                 icons.push(
                   <RadioIcon
                     style={{
@@ -1155,7 +1190,12 @@ const ResultTable = ({
               cells.push(
                 <OddTableCell
                   key={`${type.field}-${key}-${i}`}
-                  style={{ whiteSpace: "nowrap" }}
+                  style={{
+                    whiteSpace: "nowrap",
+                    backgroundColor: `${color}${
+                      i % 2 == 0 ? lightColor : darkColor
+                    }`,
+                  }}
                   className={css}
                 >
                   {icons}
@@ -1316,6 +1356,7 @@ const ResultTable = ({
         field={type.field}
         summary={type.summary}
         description={type.description}
+        color={`${type.color}${darkColor}`}
         status={type.status}
         handleTableSort={type.processed_type != "geo_point" && handleTableSort}
         setAttributeSettings={setAttributeSettings}
@@ -1343,7 +1384,8 @@ const ResultTable = ({
       <ResultFilter
         key={`${type.name}_${type.summary}`}
         name={type.name}
-        colSpan={colSpan + 1}
+        colSpan={colSpan}
+        color={`${type.color}${darkColor}`}
         TableCell={colSpan > 0 ? SpanTableCell : TableCell}
         value={""}
         fieldMeta={types[type.name]}
@@ -1356,10 +1398,14 @@ const ResultTable = ({
           constraints[type.field].length,
           expandColumns[type.field]
         );
+        let color = type.color || type.file_paths?.[v]?.color;
         expandedCols.push(
           <OddTableCell
             key={`${type.name}_${type.summary}-${v}`}
             className={css}
+            style={{
+              backgroundColor: `${color}${i % 2 == 0 ? lightColor : darkColor}`,
+            }}
           >
             {v.split("_").join(`_\u200b`).split(".").join(`.\u200b`)}
           </OddTableCell>
@@ -1367,7 +1413,13 @@ const ResultTable = ({
       });
     } else {
       expandedCols.push(
-        <TableCell key={`${type.name}_${type.summary}`} colSpan={colSpan + 1} />
+        <TableCell
+          key={`${type.name}_${type.summary}`}
+          colSpan={colSpan + 1}
+          style={{
+            backgroundColor: `${type.color}${lightColor}`,
+          }}
+        />
       );
     }
   }

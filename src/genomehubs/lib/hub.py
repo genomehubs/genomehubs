@@ -506,7 +506,6 @@ def validate_values(values, key, types, row_values, shared_values, blanks):
             if not value:
                 continue
             with contextlib.suppress(KeyError):
-                # print(types[key]["translate"])
                 value = types[key]["translate"][value.lower()]
         if not isinstance(value, list):
             value = [value]

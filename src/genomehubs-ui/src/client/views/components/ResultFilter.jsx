@@ -22,6 +22,7 @@ const ResultFilter = ({
   name,
   type = "attribute",
   basename,
+  color,
   searchTerm,
   searchIndex,
   fieldMeta,
@@ -212,7 +213,12 @@ const ResultFilter = ({
   }
 
   return (
-    <TableCell key={name} colSpan={colSpan} className={css}>
+    <TableCell
+      key={name}
+      colSpan={colSpan}
+      className={css}
+      style={{ backgroundColor: color }}
+    >
       <FormControl size="small" style={{ width: "100%" }}>
         <div style={{ width: "100%" }}>{filters}</div>
       </FormControl>
