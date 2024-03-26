@@ -8,6 +8,7 @@ import { attrTypes } from "../functions/attrTypes";
 import { checkResponse } from "../functions/checkResponse";
 import { client } from "../functions/connection";
 import { combineQueries } from "../functions/combineQueries";
+import { files } from "../reports/files";
 import { formatJson } from "../functions/formatJson";
 import { getResultCount } from "../functions/getResultCount";
 import { getResults } from "../functions/getResults";
@@ -34,6 +35,46 @@ const plurals = (singular) => {
     superkingdom: "superkingdoms",
   };
   return ranks[singular.toLowerCase()] || singular;
+};
+
+export const getFiles = async ({
+  x,
+  checkedFiles,
+  taxonomy,
+  queryString,
+  fields,
+  req,
+  ...apiParams
+}) => {
+  // Return oxford plot results
+  let status;
+  let res = await files({
+    x,
+    checkedFiles,
+    result: apiParams.result,
+    taxonomy,
+    fields,
+    req,
+    apiParams,
+  });
+  if (res.status.success == false) {
+    if (!status) {
+      status = res.status;
+    }
+  } else {
+    status = { success: true };
+  }
+  let { report, xQuery } = res;
+  let caption = "files report";
+  return {
+    status,
+    report: {
+      files: report,
+      xQuery,
+      queryString,
+      caption,
+    },
+  };
 };
 
 export const getOxford = async ({
@@ -1121,6 +1162,10 @@ export const getReport = async (req, res) => {
     switch (req.query.report) {
       case "arc": {
         reportFunc = arcPerRank;
+        break;
+      }
+      case "files": {
+        reportFunc = getFiles;
         break;
       }
       case "oxford": {

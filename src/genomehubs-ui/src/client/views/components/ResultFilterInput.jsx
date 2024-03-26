@@ -55,8 +55,8 @@ const allowedOperators = ({ field, types, summary }) => {
   return operators;
 };
 
-const allowedValues = ({ types, field, summary }) => {
-  return types[field]?.constraint?.enum;
+const allowedValues = ({ types, field, summary, constraints }) => {
+  return constraints || types[field]?.constraint?.enum;
 };
 
 const ChipInput = ({ defaultWidth, value, placeholder, onBlur }) => {
@@ -85,6 +85,7 @@ const ChipInput = ({ defaultWidth, value, placeholder, onBlur }) => {
 const ResultFilterInput = ({
   types,
   field,
+  constraints,
   operator = "",
   value = "",
   summary = "value",
@@ -105,7 +106,7 @@ const ResultFilterInput = ({
   value = value == "undefined" || typeof value === "undefined" ? "" : value;
   operator =
     operator == "undefined" || typeof operator === "undefined" ? "" : operator;
-  let values = allowedValues({ field, types, summary });
+  let values = allowedValues({ field, types, summary, constraints });
   let operators = allowedOperators({ field, types, summary });
 
   useEffect(() => {

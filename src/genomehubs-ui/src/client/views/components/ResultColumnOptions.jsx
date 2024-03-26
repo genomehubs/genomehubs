@@ -116,7 +116,7 @@ const ResultColumnOptions = ({
   const classes = useStyles();
   const navigate = useNavigate();
   const location = useLocation();
-  const summaryTypes = summaryTypesFromMeta(types[attributeId]);
+  const summaryTypes = summaryTypesFromMeta(types[attributeId]) || [];
   const initialSelected = searchTerm.fields
     ? searchTerm.fields
         .split(",")
