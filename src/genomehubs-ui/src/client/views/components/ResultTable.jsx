@@ -243,7 +243,7 @@ const SortableCell = ({
     css = classnames(styles.aggregationToggle, styles.aggregationToggleOpaque);
   }
 
-  let title = handleTableSort ? `Sort by ${name}` : name;
+  let title = handleTableSort ? `Sort by ${field}` : field;
   if (description) {
     title = (
       <div style={{ whiteSpace: "pre-line", maxWidth: "14em" }}>
@@ -300,17 +300,17 @@ const SortableCell = ({
       }}
       sortDirection={sortDirection}
     >
-      <Tooltip key={name} title={title} arrow>
+      <Tooltip key={field} title={title} arrow>
         {(handleTableSort && (
           <TableSortLabel
-            active={sortBy === name}
+            active={sortBy === field}
             direction={sortOrder}
             onClick={() =>
               handleTableSort(
                 sortDirection && sortOrder === "desc"
                   ? { sortBy: "none" }
                   : {
-                      sortBy: name,
+                      sortBy: field,
                       sortOrder:
                         sortDirection && sortOrder === "asc" ? "desc" : "asc",
                     }
@@ -320,7 +320,7 @@ const SortableCell = ({
             {/* {name} */}
             {cellTitle.split("_").join(`_\u200b`).split(".").join(`.\u200b`)}
             {status && status != "stable" && <sup>{`\u2020`}</sup>}
-            {sortBy === name ? (
+            {sortBy === field ? (
               <span className={classes.visuallyHidden}>
                 {sortOrder === "desc"
                   ? "sorted descending"
@@ -1339,7 +1339,7 @@ const ResultTable = ({
     expandedCols.push(<TableCell key={"feature_id"} />);
   }
   for (let type of expandedTypes) {
-    let sortDirection = sortBy === type.name ? sortOrder : false;
+    let sortDirection = sortBy === type.field ? sortOrder : false;
     if (type.processed_type == "geo_point") {
     } else {
     }
