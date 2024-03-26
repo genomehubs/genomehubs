@@ -1384,11 +1384,13 @@ const ResultTable = ({
       <ResultFilter
         key={`${type.name}_${type.summary}`}
         name={type.name}
+        field={type.field}
         colSpan={colSpan}
         color={`${type.color}${darkColor}`}
         TableCell={colSpan > 0 ? SpanTableCell : TableCell}
         value={""}
         fieldMeta={types[type.name]}
+        constraints={constraints[type.field]}
       />
     );
     if (colSpan > 0) {
