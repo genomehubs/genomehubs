@@ -44,6 +44,21 @@ components:
       name: catToX
       schema:
         type: boolean
+    checkedFilesParam:
+      description: |
+        Comma separated list of file paths to return.
+      examples:
+        null:
+          value:
+          summary: Do not return any file paths
+        busco_metazoa_full_table:
+          value: busco.metazoa_odb10.full_table
+          summary: Full table files for BUSCO Metazoa odb10 lineage
+      in: query
+      name: checkedFiles
+      required: false
+      schema:
+        type: string
     collapseMonotypicParam:
       description: |
         Collapse monotypic tree nodes.
@@ -573,6 +588,7 @@ components:
       required: true
       schema:
         enum:
+          - files
           - histogram
           - map
           - oxford
@@ -1320,6 +1336,7 @@ paths:
 
         | Report        | Required          | Optional       |
         | ------------- | ----------------- | -------------- |
+        | **Files**     | `x`               | `checkedFiles` |
         | **Histogram** | `x`               | `cat`, `catToX`, `rank`, `xOpts` |
         | **Map**       | `x`               | `cat`, `rank`          |
         | **Oxford**    | `x`               | `cat`, `xOpts`, `yOpts` |
@@ -1353,6 +1370,7 @@ paths:
         - $ref: "#/components/parameters/taxonomyParam"
         - $ref: "#/components/parameters/xOptsParam"
         - $ref: "#/components/parameters/yOptsParam"
+        - $ref: "#/components/parameters/checkedFilesParam"
         - $ref: "#/components/parameters/mapThresholdParam"
         - $ref: "#/components/parameters/scatterThresholdParam"
         - $ref: "#/components/parameters/treeThresholdParam"

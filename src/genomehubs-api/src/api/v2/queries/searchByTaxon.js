@@ -58,8 +58,12 @@ export const searchByTaxon = async ({
   let attr_summaries = {};
   fields.forEach((field) => {
     let [name, summary = "default"] = field.split(":");
+    if (name.match(/\w\.+/)) {
+      [name, ...summary] = name.split(".");
+      summary = `metadata.${summary.join(".")}`;
+    }
     if (!attr_summaries[name]) {
-      attr_summaries[name] = [];
+      attr_summaries[name] = ["value"];
     }
     attr_summaries[name].push(summary);
   });
@@ -192,9 +196,15 @@ export const searchByTaxon = async ({
   });
   if (
     Object.keys(aggs).length == 0 &&
-    (!emptyColumns || emptyColumns == "false")
+    1 //(!emptyColumns || emptyColumns == "false")
+    // TODO: restore condition here
   ) {
-    let valueCounts = await valueCountsAgg({ fields, names, ranks });
+    let valueCounts = await valueCountsAgg({
+      fields,
+      non_attr_fields,
+      names,
+      ranks,
+    });
     aggs = valueCounts;
   }
   let exclude = []; // includeRawValues ? [] : ["attributes.values*"];

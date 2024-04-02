@@ -76,6 +76,21 @@ const addSortParameter = (sortBy, lookupTypes, lookupNames) => {
         },
       },
     };
+  } else if (by.match(/\./)) {
+    let [name, ...parts] = by.split(".");
+    let type = `metadata.${parts.join(".")}`;
+    return {
+      [`attributes.${type}`]: {
+        mode: sortBy.mode || "max",
+        order: sortBy.order || "asc",
+        nested: {
+          path: "attributes",
+          filter: {
+            term: { "attributes.key": lookupTypes(name).name },
+          },
+        },
+      },
+    };
   }
   return {};
 };

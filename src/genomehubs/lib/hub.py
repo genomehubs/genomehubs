@@ -506,7 +506,6 @@ def validate_values(values, key, types, row_values, shared_values, blanks):
             if not value:
                 continue
             with contextlib.suppress(KeyError):
-                # print(types[key]["translate"])
                 value = types[key]["translate"][value.lower()]
         if not isinstance(value, list):
             value = [value]
@@ -621,7 +620,9 @@ def add_attributes(
             if "metadata" not in attribute:
                 attribute["metadata"] = {}
             md = attribute["metadata"]
-            if any(value in blanks for value in values):
+            if (isinstance(values, str) and values in blanks) or any(
+                value in blanks for value in values
+            ):
                 continue
             for index, part in enumerate(rest):
                 if part not in md:

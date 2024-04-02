@@ -20,13 +20,16 @@ const DefaultTableCell = withStyles((theme) => ({
 
 const ResultFilter = ({
   name,
+  field,
   type = "attribute",
   basename,
+  color,
   searchTerm,
   searchIndex,
   fieldMeta,
   colSpan = 1,
   TableCell,
+  constraints,
   value = "",
   operator = "",
   handleUpdate = () => {},
@@ -55,7 +58,6 @@ const ResultFilter = ({
     rank: "",
     level: null,
   };
-
   const navigate = useNavigate();
   const [index, setIndex] = useState(searchIndex);
   let [attrFilters, setAttrFilters] = useState([]);
@@ -162,18 +164,16 @@ const ResultFilter = ({
 
   let filters = [];
 
-  // useEffect(() => {
-  //   console.log("change");
-  //   console.log(attrFilters);
-  // }, [attrFilters]);
   attrFilters.forEach((arr, i) => {
-    if (arr && arr.length > 1 && arr[0] == name) {
+    if (arr && arr.length > 1 && arr[0] == field) {
       filters.push(
         <ResultFilterInput
           key={i}
-          field={name}
+          name={name}
+          field={field}
           fields={[]}
-          types={{ [name]: fieldMeta }}
+          types={{ [field]: fieldMeta }}
+          constraints={constraints}
           value={arr[2] || ""}
           operator={arr[1] || ""}
           handleOperatorChange={(e) =>
@@ -191,16 +191,18 @@ const ResultFilter = ({
   filters.push(
     <ResultFilterInput
       key={"last"}
-      field={name}
+      name={name}
+      field={field}
       fields={[]}
       value={""}
       operator={""}
-      types={{ [name]: fieldMeta }}
+      constraints={constraints}
+      types={{ [field]: fieldMeta }}
       handleOperatorChange={(e) =>
-        handleChange(e, name, "operator", [...attrFilters])
+        handleChange(e, field, "operator", [...attrFilters])
       }
       handleValueChange={(e) => {
-        return handleChange(e, name, "value", [...attrFilters]);
+        return handleChange(e, field, "value", [...attrFilters]);
       }}
       handleDismiss={() => {}}
     />
@@ -212,7 +214,12 @@ const ResultFilter = ({
   }
 
   return (
-    <TableCell key={name} colSpan={colSpan} className={css}>
+    <TableCell
+      key={name}
+      colSpan={colSpan}
+      className={css}
+      style={{ backgroundColor: color }}
+    >
       <FormControl size="small" style={{ width: "100%" }}>
         <div style={{ width: "100%" }}>{filters}</div>
       </FormControl>
