@@ -15,7 +15,7 @@ genomehubs index \
     --taxonomy-source ncbi \
     --assembly-dir tests/integration_tests/data/assembly-data &&
 
-exit || exit 1
+# exit || exit 1
 genomehubs index \
     --config-file tests/integration_tests/config/goat.yaml \
     --taxonomy-source ncbi \

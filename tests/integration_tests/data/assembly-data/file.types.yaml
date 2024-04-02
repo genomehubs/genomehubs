@@ -21,19 +21,19 @@ attributes:
           name: full_table.tsv
           links:
             - icon: download
-              pattern: https://busco.cog.sanger.ac.uk/{assembly_id}/busco/full_table.tsv
+              pattern: https://busco.cog.sanger.ac.uk/{assembly_id}/{run}/full_table.tsv
               title: Download full_table.tsv file from busco.cog.sanger.ac.uk
         short_summary:
           name: short_summary.txt
           links:
             - icon: download
-              pattern: https://busco.cog.sanger.ac.uk/{assembly_id}/busco/short_summary.txt
+              pattern: https://busco.cog.sanger.ac.uk/{assembly_id}/{run}/short_summary.txt
               title: Download short_summary.txt file from busco.cog.sanger.ac.uk
         single_copy_sequences:
           name: single_copy_busco_sequences.tar.gz
           links:
             - icon: download
-              pattern: https://busco.cog.sanger.ac.uk/{assembly_id}/busco/busco_sequences/single_copy_busco_sequences.tar.gz
+              pattern: https://busco.cog.sanger.ac.uk/{assembly_id}/{run}/busco_sequences/single_copy_busco_sequences.tar.gz
               title: Download single_copy_busco_sequences.tar.gz file from busco.cog.sanger.ac.uk
       blobtoolkit:
         color: "#9c528b"

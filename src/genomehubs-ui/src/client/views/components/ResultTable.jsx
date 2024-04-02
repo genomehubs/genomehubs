@@ -279,6 +279,10 @@ const SortableCell = ({
     cellCss = classnames(styles.first, styles.last);
   }
 
+  if (Array.isArray(summary)) {
+    summary = summary[0];
+  }
+
   let cellTitle =
     summary && summary.startsWith("metadata.")
       ? `${name}${summary.replace("metadata", "")}`
@@ -648,6 +652,11 @@ const ResultTable = ({
       }
     }
   }
+  // for (let obj of expandedTypes) {
+  //   if (!obj.field) {
+  //     obj.field = obj.name;
+  //   }
+  // }
 
   if (searchResults && searchResults.status && searchResults.status.error) {
     return (
@@ -972,10 +981,33 @@ const ResultTable = ({
         colSpan = colCount;
         maxColSpan = Math.max(colSpan, maxColSpan);
       }
-      let name = type.name.split(":")[0];
+      let [name, summary] = type.name.split(":");
       if (result.result.fields && result.result.fields.hasOwnProperty(name)) {
         let field = result.result.fields[name];
-        let value = field[type.summary];
+        if (!summary) {
+          summary = Array.isArray(type.summary)
+            ? type.summary[0]
+            : type.summary;
+        }
+        let value;
+        if (summary && field[summary]) {
+          value = field[summary];
+        } else if (
+          field.aggregation_source &&
+          ["ancestor", "descendant", "direct", "estimate"].includes(summary)
+        ) {
+          if (
+            field.aggregation_source.includes(summary) ||
+            (summary == "estimate" &&
+              ["ancestor", "descendant"].includes(field.aggregation_source[0]))
+          ) {
+            value = field.value;
+          } else {
+            value = undefined;
+          }
+        } else {
+          value = field.value;
+        }
         if (colSpan == 0) {
           let entries = [];
           if (Array.isArray(value)) {
@@ -1028,38 +1060,40 @@ const ResultTable = ({
                 backgroundColor: `${type.color}${lightColor}`,
               }}
             >
-              <Grid
-                container
-                direction="row"
-                wrap="nowrap"
-                spacing={1}
-                alignItems={"center"}
-                ref={rootRef}
-                style={{ cursor: "pointer" }}
-                onClick={() => {
-                  setAttributeSettings({
-                    currentRecordId,
-                    attributeId: type.name,
-                    showAttribute: true,
-                  });
-                }}
-              >
-                {field.aggregation_source && (
-                  <Grid item>
-                    <AggregationIcon
-                      method={field.aggregation_source}
-                      hasDescendants={field.has_descendants}
-                    />
-                  </Grid>
-                )}
-
+              {typeof value != "undefined" && (
                 <Grid
-                  item
-                  style={{ whiteSpace: "nowrap", ...(color && { color }) }}
+                  container
+                  direction="row"
+                  wrap="nowrap"
+                  spacing={1}
+                  alignItems={"center"}
+                  ref={rootRef}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    setAttributeSettings({
+                      currentRecordId,
+                      attributeId: type.name,
+                      showAttribute: true,
+                    });
+                  }}
                 >
-                  {value}
+                  {field.aggregation_source && (
+                    <Grid item>
+                      <AggregationIcon
+                        method={field.aggregation_source}
+                        hasDescendants={field.has_descendants}
+                      />
+                    </Grid>
+                  )}
+
+                  <Grid
+                    item
+                    style={{ whiteSpace: "nowrap", ...(color && { color }) }}
+                  >
+                    {value}
+                  </Grid>
                 </Grid>
-              </Grid>
+              )}
             </TableCell>
           );
         } else {
@@ -1123,7 +1157,7 @@ const ResultTable = ({
               //   RadioIcon = RadioButtonUncheckedIcon;
               // }
               for (let linkIcon of linkIcons) {
-                let title = linkIcon.title;
+                let { title } = linkIcon;
                 if (linkIcon.color) {
                   fill = linkIcon.color;
                 }
@@ -1212,7 +1246,10 @@ const ResultTable = ({
         for (let i = 0; i < colCount; i++) {
           let css = setCellClassName(i, colCount, expandColumns[type.field]);
           cells.push(
-            <OddTableCell key={`${type.field}-${i}`} className={css}>
+            <OddTableCell
+              key={`${type.field || type.name}-${i}`}
+              className={css}
+            >
               {colSpan == 0 && "-"}
             </OddTableCell>
           );
