@@ -533,8 +533,13 @@ const setLinkIcons = ({ type, key, result }) => {
 
 const findLastIndex = ({ name, field, expandedTypes }) => {
   let index = expandedTypes.findIndex(({ name: n }) => n == name);
+  let parts = field.split(".");
   for (let i = index + 1; i < expandedTypes.length; i++) {
-    if (expandedTypes[i].field.startsWith(`${name}.`)) {
+    if (parts.length > 1 && parts[parts.length - 1] != "run") {
+      if (expandedTypes[i].field.startsWith(`${parts[0]}.${parts[1]}`)) {
+        index = i;
+      }
+    } else if (expandedTypes[i].field.startsWith(`${name}.`)) {
       index = i;
     } else {
       break;
@@ -649,6 +654,7 @@ const ResultTable = ({
       );
       for (let obj of expandedTypes) {
         obj.summary = "value";
+        obj.field = obj.name;
       }
     }
   }
@@ -710,7 +716,9 @@ const ResultTable = ({
 
   const handleToggleColSpan = (id, colSpan, linked) => {
     if (linked) {
-      let fields = (searchTerm.fields || "").split(",");
+      let fields = searchTerm.fields
+        ? searchTerm.fields.split(",")
+        : displayTypes.map((d) => d.name);
       let expand = expandColumns;
       let newExpandColumns = { ...expandColumns };
 
@@ -1050,7 +1058,7 @@ const ResultTable = ({
           }
           let color;
           if (type.name != type.field && type.file_paths) {
-            let [_, key] = type.field.split(".");
+            let [_, key] = (type.field || type.name).split(".");
             ({ color } = type.file_paths[key] || {});
           }
           cells.push(
@@ -1196,13 +1204,18 @@ const ResultTable = ({
                       cursor: "pointer",
                       fontSize: "1.25rem",
                     }}
-                    key={"file"}
+                    key={`file-${linkIcon.icon || ""}-${i}`}
                     onClick={onClick}
                   />
                 );
                 if (title) {
                   icon = (
-                    <Tooltip title={title} arrow position="top" key="file">
+                    <Tooltip
+                      title={title}
+                      arrow
+                      position="top"
+                      key={`file-${linkIcon.icon || ""}-${i}`}
+                    >
                       {icon}
                     </Tooltip>
                   );
