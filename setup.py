@@ -148,6 +148,8 @@ setup(
         "Bug Reports": "https://github.com/genomehubs/genomehubs/issues",
         "Source": "https://github.com/genomehubs/genomehubs",
     },
-    package_data={"genomehubs": ["genomehubs/config/dist.config.yaml"]},
+    package_data={
+        "genomehubs": ["genomehubs/config/dist.config.yaml", "genomehubs/py.typed"]
+    },
     include_package_data=True,
 )

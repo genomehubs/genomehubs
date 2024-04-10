@@ -7,4 +7,5 @@ from .lib import geo
 from .lib import init
 from .lib import sample
 from .lib import taxonomy
+from .lib import utils
 from .lib import version
