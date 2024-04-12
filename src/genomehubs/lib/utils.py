@@ -257,6 +257,27 @@ def print_to_tsv(headers: list[str], rows: list[dict], meta: dict):
             )
 
 
+def append_to_tsv(headers: list[str], rows: list[dict], meta: dict):
+    """
+    Appends the provided rows to a TSV file with the specified file name.
+
+    Args:
+        headers (list[str]): A list of column headers.
+        rows (list[dict]): A list of dictionaries, where each dictionary represents a
+            row of data and the keys correspond to the column headers.
+        meta (dict): A dictionary containing metadata, including the "file_name" key
+            which specifies the output file name.
+    """
+    with open(meta["file_name"], "a") as f:
+        for row in rows:
+            f.write(
+                "\t".join(
+                    [format_entry(row.get(col, []), col, meta) for col in headers]
+                )
+                + "\n"
+            )
+
+
 def extract_file_paths(config, attribute):
     """
     Extract file paths based on a specified attribute from a parsed YAML file.
@@ -353,7 +374,13 @@ def parse_previous(
     rows: dict[str, dict[str, str]] = {}
     for row in reader:
         row_dict = {header[i]: row[i] for i in range(len(header))}
-        rows[row_dict[key_name]] = row_dict
+        if row_dict[key_name] in rows:
+            if isinstance(rows[row_dict[key_name]], list):
+                rows[row_dict[key_name]].append(row_dict)
+            else:
+                rows[row_dict[key_name]] = [rows[row_dict[key_name]], row_dict]
+        else:
+            rows[row_dict[key_name]] = row_dict
     return rows
 
 
