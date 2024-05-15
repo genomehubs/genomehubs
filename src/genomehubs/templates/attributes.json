@@ -22,6 +22,11 @@
         "index": false,
         "meta": { "description": "Attribute display name" }
       },
+      "default": {
+        "type": "keyword",
+        "index": false,
+        "meta": { "description": "Default attribute value" }
+      },
       "sequence": {
         "type": "integer",
         "null_value": 0,

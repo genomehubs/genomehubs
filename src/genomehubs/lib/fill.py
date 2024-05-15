@@ -44,6 +44,8 @@ Examples:
     ./genomehubs fill --traverse-root 7088
 """
 
+
+import contextlib
 import re
 import sys
 from collections import defaultdict
@@ -154,7 +156,8 @@ def ordered_list(tup):
         if k == key:
             return [value for value in values if value not in seen]
         if k in linked:
-            seen.update(linked[k]["keyword_value"])
+            with contextlib.suppress(KeyError):
+                seen.update(linked[k]["keyword_value"])
     return values
 
 

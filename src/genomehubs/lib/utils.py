@@ -41,7 +41,7 @@ def load_yaml(yaml_path: str) -> dict:
     Loads a YAML file from the specified path.
 
     Args:
-        config_path (str): The path to the YAML file.
+        yaml_path (str): The path to the YAML file.
 
     Returns:
         dict: The data loaded from the YAML file.
@@ -145,7 +145,7 @@ def get_path_header(data: dict[str, Any]) -> Iterator[tuple[str, str]]:
     """
     for section in ["attributes", "identifiers", "metadata", "names", "taxonomy"]:
         for _, obj in data.get(section, {}).items():
-            if "path" in obj and "header" in obj:
+            if isinstance(obj, dict) and "path" in obj and "header" in obj:
                 yield obj["path"], obj["header"]
 
 
@@ -162,9 +162,10 @@ def set_headers(config: dict[str, Any]) -> list[str]:
     """
     headers: list[str] = []
     for section in ["attributes", "identifiers", "metadata", "names", "taxonomy"]:
-        for value in config.get(section, {}).values():
-            if "header" in value and value["header"] not in headers:
-                headers.append(value["header"])
+        for key, value in config.get(section, {}).items():
+            if isinstance(value, dict):
+                if "header" in value and value["header"] not in headers:
+                    headers.append(value["header"])
     return headers
 
 
@@ -316,8 +317,12 @@ def get_metadata(config: dict, yaml_file: str, attribute: Optional[str] = None) 
     headers: dict[str, str] = {}
     with contextlib.suppress(KeyError):
         for key, value in config["attributes"].items():
-            separators[key] = value.get("separator", ",")
-            headers[key] = value.get("header", key)
+            if isinstance(value, dict):
+                separators[key] = value.get("separator", ",")
+                headers[key] = value.get("header", key)
+            else:
+                separators[key] = ","
+                headers[key] = key
     return {
         "file_name": f"{yaml_dir}/{file_name}",
         "file_paths": extract_file_paths(config, attribute),
@@ -340,6 +345,18 @@ def write_tsv(parsed: dict[str, dict], headers: list[str], meta: dict):
     """
     rows = list(parsed.values())
     print_to_tsv(headers, rows, meta)
+
+
+def write_yaml(yaml_data: dict, yaml_file: str):
+    """
+    Writes a dictionary to a YAML file.
+
+    Args:
+        yaml_data (dict): The data to write to the YAML file.
+        yaml_file (str): The path to the YAML file to write the data to.
+    """
+    with open(yaml_file, "w") as f:
+        yaml.dump(yaml_data, f, default_flow_style=False)
 
 
 def parse_previous(
@@ -412,9 +429,11 @@ def load_previous(
         if file_path.suffix == ".gz"
         else open(str(file_path), "rt", encoding="utf-8")
     )
-
-    with open_fh as f:
-        return parse_previous(f, key_name, headers, delimiter)
+    try:
+        with open_fh as f:
+            return parse_previous(f, key_name, headers, delimiter)
+    except ValueError:
+        return {}
 
 
 def get_directories_by_prefix(s3: Any, bucket: str, prefix: str) -> list[str]:
@@ -460,6 +479,31 @@ def list_subdirectories(s3: Any, bucket: str, prefix: str) -> list[str]:
         for prefix in result.get("CommonPrefixes", []):
             subdir = prefix["Prefix"].split("/")[-2]
             names.append(subdir)
+        next_token = result.get("NextContinuationToken")
+    return names
+
+
+def list_files(s3: Any, bucket: str, prefix: str) -> list[str]:
+    """
+    List files within a specified prefix in an S3 bucket.
+
+    Args:
+        s3: The S3 client to use for listing files.
+        bucket (str): The name of the S3 bucket.
+        prefix (str): The prefix within the bucket to list files from.
+
+    Returns:
+        list: A list of file names found within the specified prefix.
+    """
+
+    names: list[str] = []
+    next_token: str = ""
+    while next_token is not None:
+        kwargs = {"Bucket": bucket, "Prefix": prefix, "Delimiter": "/"}
+        if next_token:
+            kwargs["ContinuationToken"] = next_token
+        result = s3.list_objects_v2(**kwargs)
+        names.extend(entry["Key"] for entry in result.get("Contents", []))
         next_token = result.get("NextContinuationToken")
     return names
 
@@ -523,3 +567,32 @@ def load_json_from_s3(s3: boto3.client, bucket: str, key: str) -> dict:
             bio.seek(0)
             data = json.load(bio)
     return data
+
+
+def load_tsv_from_s3(
+    s3: boto3.client, bucket: str, key: str, skip: int = 0
+) -> list[dict]:
+    """
+    Load TSV data from an S3 object.
+
+    Args:
+        s3 (boto3.client): S3 client object.
+        bucket (str): Name of the S3 bucket.
+        key (str): Key of the TSV file to load.
+        skip (int): Number of rows to skip at the start of the file.
+
+    Returns:
+        list[dict]: A list of dictionaries representing the rows of the TSV file.
+    """
+    obj = s3.get_object(Bucket=bucket, Key=key)
+    with io.BytesIO(obj["Body"].read()) as bio:
+        with (
+            gzip.open(bio, "rt", encoding="utf-8")
+            if key.endswith(".gz")
+            else io.TextIOWrapper(bio, encoding="utf-8")
+        ) as f:
+            while skip > 0:
+                next(f)
+                skip -= 1
+            reader = csv.DictReader(f, delimiter="\t")
+            return list(reader)

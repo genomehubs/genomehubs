@@ -990,8 +990,19 @@ const ResultTable = ({
         maxColSpan = Math.max(colSpan, maxColSpan);
       }
       let [name, summary] = type.name.split(":");
-      if (result.result.fields && result.result.fields.hasOwnProperty(name)) {
-        let field = result.result.fields[name];
+      let fieldName = name;
+      if (type.return_type) {
+        if (!summary) {
+          summary = type.return_type;
+        } else {
+          fieldName = `${name}:${summary}`;
+        }
+      }
+      if (
+        result.result.fields &&
+        result.result.fields.hasOwnProperty(fieldName)
+      ) {
+        let field = result.result.fields[fieldName];
         if (!summary) {
           summary = Array.isArray(type.summary)
             ? type.summary[0]
@@ -1115,20 +1126,21 @@ const ResultTable = ({
           }
           let added = new Set();
           constraints[type.field].forEach((key, i) => {
+            let lcKey = key.toLowerCase();
             let css = setCellClassName(
               i,
               constraints[type.field].length,
               expandColumns[type.field]
             );
-            let color = type.color || type.file_paths?.[key]?.color;
+            let color = type.color || type.file_paths?.[lcKey]?.color;
 
-            if (!values.includes(key)) {
-              if (key == "other" && values.length > added.size) {
+            if (!values.includes(lcKey)) {
+              if (lcKey == "other" && values.length > added.size) {
                 let fill = statusColors[field.aggregation_source];
 
                 cells.push(
                   <OddTableCell
-                    key={`${type.field}-${key}-${i}`}
+                    key={`${type.field}-${lcKey}-${i}`}
                     className={css}
                   >
                     <RadioButtonCheckedOutlinedIcon
@@ -1139,7 +1151,7 @@ const ResultTable = ({
               } else {
                 cells.push(
                   <OddTableCell
-                    key={`${type.field}-${key}-${i}`}
+                    key={`${type.field}-${lcKey}-${i}`}
                     className={css}
                     style={{
                       backgroundColor: `${color}${
@@ -1152,9 +1164,9 @@ const ResultTable = ({
                 );
               }
             } else {
-              let linkIcons = setLinkIcons({ type, key, result });
-              added.add(key);
-              let list = type.value_metadata?.[key]?.icons;
+              let linkIcons = setLinkIcons({ type, key: key, result });
+              added.add(lcKey);
+              let list = type.value_metadata?.[lcKey]?.icons;
               let icons = [];
               let url = type.value_metadata?.default?.link;
               let RadioIcon = FiberManualRecordSharpIcon;
@@ -1236,7 +1248,7 @@ const ResultTable = ({
               }
               cells.push(
                 <OddTableCell
-                  key={`${type.field}-${key}-${i}`}
+                  key={`${type.field}-${lcKey}-${i}`}
                   style={{
                     whiteSpace: "nowrap",
                     backgroundColor: `${color}${
