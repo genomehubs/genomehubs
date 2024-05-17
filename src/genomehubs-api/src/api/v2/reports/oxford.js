@@ -392,8 +392,11 @@ const getOxford = async ({
       seqArray.push(groupScores[group]);
       seqCount++;
     }
-    seqScores[sequence_id] = seqScore / seqCount;
-    seqScores[sequence_id] = median([...seqArray]);
+    try {
+      seqScores[sequence_id] = median([...seqArray]);
+    } catch (e) {
+      seqScores[sequence_id] = seqScore / seqCount;
+    }
     if (isNaN(seqScores[sequence_id])) {
       seqScores[sequence_id] = 0;
     }

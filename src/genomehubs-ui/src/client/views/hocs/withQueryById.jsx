@@ -11,6 +11,7 @@ const withQueryById = (WrappedComponent) => (props) => {
       apiUrl,
       suffix,
       suffix_plural,
+      inline,
       of,
       description,
       basename,

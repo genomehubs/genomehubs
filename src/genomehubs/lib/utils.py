@@ -483,7 +483,7 @@ def list_subdirectories(s3: Any, bucket: str, prefix: str) -> list[str]:
     return names
 
 
-def list_files(s3: Any, bucket: str, prefix: str) -> list[str]:
+def list_files(s3: Any, bucket: str, prefix: str, recursive: bool = False) -> list[str]:
     """
     List files within a specified prefix in an S3 bucket.
 
@@ -491,6 +491,7 @@ def list_files(s3: Any, bucket: str, prefix: str) -> list[str]:
         s3: The S3 client to use for listing files.
         bucket (str): The name of the S3 bucket.
         prefix (str): The prefix within the bucket to list files from.
+        recursive (bool): Whether to list files recursively or not.
 
     Returns:
         list: A list of file names found within the specified prefix.
@@ -505,6 +506,11 @@ def list_files(s3: Any, bucket: str, prefix: str) -> list[str]:
         result = s3.list_objects_v2(**kwargs)
         names.extend(entry["Key"] for entry in result.get("Contents", []))
         next_token = result.get("NextContinuationToken")
+        if recursive:
+            prefixes = result.get("CommonPrefixes", [])
+            for prefix_entry in prefixes:
+                sub_prefix = prefix_entry["Prefix"]
+                names.extend(list_files(s3, bucket, sub_prefix, recursive))
     return names
 
 

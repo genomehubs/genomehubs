@@ -13,11 +13,12 @@ export const DisplayCount = ({
   suffix_plural,
   label,
   unit,
+  inline,
 }) => {
   let formattedValue;
   try {
-    formattedValue = (
-      <div style={{ display: "flex", whiteSpace: "nowrap", maxHeight: "3em" }}>
+    if (inline) {
+      formattedValue = (
         <Tooltip
           title={fillValues(description, values)}
           arrow
@@ -27,8 +28,6 @@ export const DisplayCount = ({
             {label && (
               <span
                 style={{
-                  fontSize: "1.5em",
-                  minHeight: "2em",
                   display: "inline-flex",
                   alignItems: "center",
                   marginRight: "0.25em",
@@ -39,7 +38,6 @@ export const DisplayCount = ({
             )}
             <span
               style={{
-                fontSize: "2em",
                 fontWeight: "bold",
                 display: "inline-flex",
                 alignItems: "center",
@@ -51,25 +49,86 @@ export const DisplayCount = ({
                 : formats(count, `${count}`.match(/\./) ? "float" : "integer")}
               {unit}
             </span>
-            <span
-              style={{
-                fontSize: "1.5em",
-                minHeight: "2em",
-                display: "inline-flex",
-                alignItems: "center",
-                marginLeft: "0.25em",
-              }}
-            >
-              {count == 1
-                ? fillValues(suffix, values)
-                : suffix_plural
-                ? fillValues(suffix_plural, values)
-                : fillValues(suffix, values)}
-            </span>
+            {suffix ||
+              (suffix_plural && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    marginLeft: "0.25em",
+                  }}
+                >
+                  {count == 1
+                    ? fillValues(suffix, values)
+                    : suffix_plural
+                    ? fillValues(suffix_plural, values)
+                    : fillValues(suffix, values)}
+                </span>
+              ))}
           </span>
         </Tooltip>
-      </div>
-    );
+      );
+    } else {
+      formattedValue = (
+        <div
+          style={{ display: "flex", whiteSpace: "nowrap", maxHeight: "3em" }}
+        >
+          <Tooltip
+            title={fillValues(description, values)}
+            arrow
+            placement={"top"}
+          >
+            <span style={{ cursor: "pointer" }} onClick={handleClick}>
+              {label && (
+                <span
+                  style={{
+                    fontSize: "1.5em",
+                    minHeight: "2em",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    marginRight: "0.25em",
+                  }}
+                >
+                  {label}
+                </span>
+              )}
+              <span
+                style={{
+                  fontSize: "2em",
+                  fontWeight: "bold",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  opacity: count == "..." ? 0.5 : 1,
+                }}
+              >
+                {isNaN(count)
+                  ? count
+                  : formats(
+                      count,
+                      `${count}`.match(/\./) ? "float" : "integer"
+                    )}
+                {unit}
+              </span>
+              <span
+                style={{
+                  fontSize: "1.5em",
+                  minHeight: "2em",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  marginLeft: "0.25em",
+                }}
+              >
+                {count == 1
+                  ? fillValues(suffix, values)
+                  : suffix_plural
+                  ? fillValues(suffix_plural, values)
+                  : fillValues(suffix, values)}
+              </span>
+            </span>
+          </Tooltip>
+        </div>
+      );
+    }
   } catch (err) {
     console.log(err);
     return null;

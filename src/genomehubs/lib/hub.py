@@ -616,7 +616,10 @@ def add_attributes(
     for k, values in entry.items():
         key, *rest = k.split(".") if "." in k else [k]
         if rest:
-            attribute = attributes[indices[key]]
+            try:
+                attribute = attributes[indices[key]]
+            except KeyError:
+                continue
             if "metadata" not in attribute:
                 attribute["metadata"] = {}
             md = attribute["metadata"]

@@ -3,6 +3,7 @@ import { fieldCount, simpleCount, valueCount } from "../functions/resultCount";
 
 import DisplayCount from "./DisplayCount";
 import { compose } from "recompose";
+import formats from "../functions/formats";
 import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";
 import withApi from "../hocs/withApi";
@@ -14,6 +15,7 @@ const Count = ({
   apiUrl,
   suffix,
   suffix_plural,
+  inline,
   of = "records",
   description,
   basename,
@@ -71,7 +73,6 @@ const Count = ({
   if (currentRecord) {
     record = currentRecord;
   }
-
   if (typeof count !== "undefined") {
     return (
       <DisplayCount
@@ -85,6 +86,7 @@ const Count = ({
           count,
           suffix,
           suffix_plural,
+          inline,
         }}
       />
     );
