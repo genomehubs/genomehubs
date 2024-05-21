@@ -7,8 +7,10 @@ export const setColors = ({
 }) => {
   let palette;
   if (colorPalette) {
-    if (palettes.byId[colorPalette]) {
-      palette = palettes.byId[colorPalette];
+    let [paletteName, paletteLevels] = colorPalette.split(":");
+    count = paletteLevels || count;
+    if (palettes.byId[paletteName]) {
+      palette = palettes.byId[paletteName];
       levels = palette.levels || [];
     } else if (
       colorPalette.match(/[0-9a-f]{6}/i) &&
@@ -22,7 +24,11 @@ export const setColors = ({
     if (levels[count]) {
       colors = levels[count];
     } else if (palette) {
-      colors = palette.default;
+      if (palette[count]) {
+        colors = palette[count];
+      } else {
+        colors = palette.default;
+      }
     }
   }
   return { levels, colors };

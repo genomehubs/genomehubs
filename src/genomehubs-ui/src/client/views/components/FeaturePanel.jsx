@@ -239,9 +239,8 @@ const FeaturePanel = ({
     );
     if (assignedName && assemblyId && records[assemblyId]) {
       let identifiers = (records[assemblyId].record.identifiers || []).filter(
-        (obj) => obj.class == "ensembl_id"
+        (obj) => obj.class.match(/ensembl.*id/)
       );
-      console.log(identifiers);
       if (identifiers.length > 0) {
         ensemblUrl = `https://rapid.ensembl.org/${identifiers[0].identifier}/Location/View?r=${assignedName}%3A${featureAttributes.start.value}-${featureAttributes.end.value}`;
       }

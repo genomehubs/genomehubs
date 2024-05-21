@@ -10,6 +10,7 @@ import fetchFieldCount from "../functions/fetchFieldCount";
 import fetchValueCount from "../functions/fetchValueCount";
 import getPrimaryAssemblyId from "../functions/getPrimaryAssemblyId";
 import qs from "../functions/qs";
+import styles from "./Styles.scss";
 import withApi from "../hocs/withApi";
 import withRecord from "../hocs/withRecord";
 
@@ -22,6 +23,7 @@ const RecordLink = ({
   label,
   description,
   color = "#1f78b4",
+  icon,
 }) => {
   let [count, setCount] = useState();
 
@@ -57,7 +59,6 @@ const RecordLink = ({
       if (k.match(/\]$/)) {
         k = k.replace(/\]$/, "");
         let [subkey, subval] = k.split(":");
-
         value = subval
           ? value.find((o) => o[subkey] == subval)
           : value.find((o) => o.hasOwnProperty(subkey));
@@ -139,6 +140,8 @@ const RecordLink = ({
     // fetchCount({ queryString, setCount });
   }, []);
 
+  icon = icon ? <img className={styles.recordLinkIcon} src={icon} /> : null;
+
   let chip = (
     <Chip
       // variant="outlined"
@@ -153,6 +156,7 @@ const RecordLink = ({
       // size="small"
       label={
         <span style={{ whiteSpace: "nowrap" }}>
+          {icon}
           {label} <LaunchIcon fontSize="inherit" />
         </span>
       }

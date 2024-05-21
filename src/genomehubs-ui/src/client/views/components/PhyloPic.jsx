@@ -76,7 +76,9 @@ const PhyloPic = ({
       <img
         onError={handleError}
         onLoad={handleLoad}
-        style={{ display: "none" }}
+        style={{
+          display: "none",
+        }}
         src={src}
       />
       <Skeleton variant="rect" width={imageWidth} height={imageWidth / ratio} />

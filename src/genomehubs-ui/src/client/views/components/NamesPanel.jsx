@@ -85,7 +85,7 @@ export const NamesList = ({ names }) => {
         </a>
       );
     }
-    if (source) {
+    if (source && obj.source) {
       source = (
         <Tooltip title={obj.source} position="top" arrow>
           {source}
