@@ -672,6 +672,7 @@ const Heatmap = ({
   xLabel,
   yLabel,
   stacked,
+  reversed,
   highlight,
   colors,
   legendRows,
@@ -690,7 +691,7 @@ const Heatmap = ({
     fadeColor({ hex, i, active: currentSeries })
   );
   let orderedCats = [...cats];
-  let catOrder = cats
+  let catOrder = orderedCats
     .map((cat, i) => ({ [cat]: i }))
     .reduce((a, b) => ({ ...b, ...a }), {});
   if (currentSeries !== false) {
@@ -902,7 +903,9 @@ const Heatmap = ({
       {axes}
       {pointData &&
         orderedCats.map((cat, j) => {
-          let i = catOrder[cat];
+          let i = reversed
+            ? orderedCats.length - catOrder[cat] - 1
+            : catOrder[cat];
           let range = [Math.max()];
           return (
             <Scatter
@@ -998,6 +1001,7 @@ const ReportScatter = ({
   setMinDim,
   xOpts,
   yOpts,
+  reversed,
   stacked,
   highlightArea,
   basename,
@@ -1189,6 +1193,7 @@ const ReportScatter = ({
         highlight={highlight}
         highlightArea={highlightArea}
         colors={colors}
+        reversed={reversed}
         legendRows={legendRows}
         chartProps={{
           zDomain: heatmaps.zDomain,

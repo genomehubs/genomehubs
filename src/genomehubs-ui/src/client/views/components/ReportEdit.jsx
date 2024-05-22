@@ -126,6 +126,7 @@ export const queryPropList = {
     "compactLegend",
     "compactWidth",
     "result",
+    "reversed",
     "taxonomy",
   ],
   table: [

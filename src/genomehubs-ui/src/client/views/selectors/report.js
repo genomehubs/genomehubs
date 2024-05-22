@@ -93,7 +93,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
       ui: true,
     },
     cumulative: { in: new Set(["histogram", "table"]), ui: true },
-    // reversed: { in: new Set(["table"]), ui: true },
+    reversed: { in: new Set(["scatter"]), ui: true },
     mapThreshold: { in: new Set(["map"]) },
     treeThreshold: { in: new Set(["tree"]) },
     queryId: {
