@@ -70,6 +70,12 @@ const updateField = ({
             .map((o) => o.key)
             .join(",")}`
         );
+      } else if (
+        valueType == "keyword" &&
+        bounds?.stats?.cats &&
+        bounds.stats.cats.length >= range[0]
+      ) {
+        newTerms.push(`${f} = ${bounds.stats.cats[range[0]].key}`);
       } else {
         newTerms.push(`${f} = ${range[0]}`);
       }
