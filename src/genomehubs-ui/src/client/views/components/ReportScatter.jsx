@@ -887,6 +887,7 @@ const Heatmap = ({
       marginTop += legendRows * (2 * chartProps.pointSize + 15);
     }
   }
+  let currentLayer;
 
   return (
     <ScatterChart
@@ -907,7 +908,7 @@ const Heatmap = ({
             ? orderedCats.length - catOrder[cat] - 1
             : catOrder[cat];
           let range = [Math.max()];
-          return (
+          let scatterLayer = (
             <Scatter
               name={`${cat}_points`}
               legendType="none"
@@ -925,7 +926,13 @@ const Heatmap = ({
               pointerEvents={"none"}
             />
           );
+          if (currentSeries == i) {
+            currentLayer = scatterLayer;
+          } else {
+            return scatterLayer;
+          }
         })}
+      {currentLayer}
       {pointData && highlight && (
         <Scatter
           name={"highlight"}
