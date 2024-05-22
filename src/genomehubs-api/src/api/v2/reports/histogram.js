@@ -527,9 +527,9 @@ export const histogram = async ({
     searchFields,
     lookupTypes,
   }));
-  if (catMeta) {
-    cat = catMeta.name;
-  }
+  // if (catMeta) {
+  //   cat = catMeta.name;
+  // }
   let xTerm = combineQueries(y, x);
   let { params, fields, summaries } = await queryParams({
     term: xTerm,

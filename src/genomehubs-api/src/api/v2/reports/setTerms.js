@@ -48,7 +48,6 @@ export const setTerms = async ({
     field = field.replace(/\+/, "");
     other = true;
   }
-
   let parts = cat.split(",");
   let terms = [];
   let translations = {};

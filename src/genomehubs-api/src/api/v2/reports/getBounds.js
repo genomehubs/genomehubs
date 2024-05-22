@@ -104,8 +104,7 @@ export const getBounds = async ({
   params.query = await chainQueries(params);
   // find max and min plus most frequent categories
   let fieldMeta = lookupTypes(fields[0]);
-  let field = fieldMeta.name;
-  let type = fieldMeta.type;
+  let { type, name: field } = fieldMeta;
   let catType;
   let catMeta = lookupTypes(cat);
   if (catMeta) {

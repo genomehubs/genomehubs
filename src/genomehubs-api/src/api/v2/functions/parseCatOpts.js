@@ -25,19 +25,15 @@ export const parseCatOpts = ({ cat, query, lookupTypes }) => {
           i++;
           if (min && queryArr[i] && queryArr[i].match(/</)) {
             i++;
-            if (queryArr[i] && !isNaN(queryArr[i])) {
-              if (min > queryArr[i]) {
-                queryArr[i] = min;
-                min = undefined;
-              }
+            if (queryArr[i] && !isNaN(queryArr[i]) && min > queryArr[i]) {
+              queryArr[i] = min;
+              min = undefined;
             }
           } else if (max && queryArr[i] && queryArr[i].match(/>/)) {
             i++;
-            if (queryArr[i] && !isNaN(queryArr[i])) {
-              if (max < queryArr[i]) {
-                queryArr[i] = max;
-                max = undefined;
-              }
+            if (queryArr[i] && !isNaN(queryArr[i]) && max < queryArr[i]) {
+              queryArr[i] = max;
+              max = undefined;
             }
           }
         }
