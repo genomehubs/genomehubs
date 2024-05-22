@@ -14,6 +14,7 @@ export const setTerms = async ({
     return { cat, size, other };
   }
   let min, max, scale;
+  opts = opts.replace(/^nsort/, "");
   if (opts) {
     let options = opts.split(/\s*;\s*/);
     if (options.length == 1) {

@@ -1091,7 +1091,7 @@ const ReportScatter = ({
     if (xOptions.length == 1) {
       xOptions = xOptions[0].split(",");
     }
-    let yOptions = (yOpts || "").split(";");
+    let yOptions = (yOpts || "").replace("nsort", "").split(";");
     if (yOptions.length == 1) {
       yOptions = yOptions[0].split(",");
     }

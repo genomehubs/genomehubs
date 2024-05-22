@@ -99,6 +99,11 @@ export const getBounds = async ({
   if (!cat) {
     catOpts = opts;
   }
+  let nSort = false;
+  if (opts.startsWith("nsort")) {
+    nSort = true;
+    opts = opts.replace("nsort", "");
+  }
   let { lookupTypes } = await attrTypes({ result, taxonomy });
   params.size = 0;
   params.query = await chainQueries(params);
@@ -306,6 +311,9 @@ export const getBounds = async ({
         taxonomy,
         apiParams,
       });
+      if (nSort) {
+        cats = cats.sort((a, b) => a.key.localeCompare(b.key));
+      }
       stats = {
         cats,
         by,

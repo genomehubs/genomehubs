@@ -177,6 +177,12 @@ const getHistogram = async ({
     }
     if (yFields.length > 0 && raw) {
       pointData = {};
+      let xKeys = new Set(
+        (bounds.stats.cats || []).map((obj) => obj.key.toLowerCase())
+      );
+      let yKeys = new Set(
+        (yBounds.stats.cats || []).map((obj) => obj.key.toLowerCase())
+      );
       for (let result of res.results) {
         let cats;
         if (bounds.cat) {
@@ -208,7 +214,13 @@ const getHistogram = async ({
             continue;
           }
           let x = result.result.fields[field][xSumm];
+          if (valueType == "keyword" && !xKeys.has(x.toLowerCase())) {
+            continue;
+          }
           let y = result.result.fields[yField][ySumm];
+          if (yValueType == "keyword" && !yKeys.has(y.toLowerCase())) {
+            continue;
+          }
           if (valueType == "date") {
             x = Date.parse(x);
           }
@@ -494,8 +506,8 @@ export const histogram = async ({
   includeEstimates,
   queryString,
   taxonomy,
-  xOpts,
-  yOpts,
+  xOpts = ";;",
+  yOpts = ";;",
   scatterThreshold,
   report,
   apiParams,
@@ -537,7 +549,13 @@ export const histogram = async ({
     rank,
     taxonomy,
   });
-  updateQuery({ params, fields, summaries, opts: xOpts, lookupTypes });
+  updateQuery({
+    params,
+    fields,
+    summaries,
+    opts: xOpts.replace(/^nsort/, ""),
+    lookupTypes,
+  });
   fields = [...new Set(fields.concat(searchFields))];
   let yTerm, yFields, ySummaries;
   let yParams = {};
@@ -557,14 +575,14 @@ export const histogram = async ({
       params: yParams,
       fields: yFields,
       summaries: ySummaries,
-      opts: yOpts,
+      opts: yOpts.replace(/^nsort/, ""),
       lookupTypes,
     });
     updateQuery({
       params: params,
       fields: yFields,
       summaries: ySummaries,
-      opts: yOpts,
+      opts: yOpts.replace(/^nsort/, ""),
       lookupTypes,
     });
   }
