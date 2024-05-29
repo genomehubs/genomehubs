@@ -111,6 +111,13 @@ const FeaturePanel = ({
     );
     let startX = midX - len / 2;
     let endX = midX + len / 2;
+    let featureLabel = `${featureAttributes.start.value.toLocaleString()}-${featureAttributes.end.value.toLocaleString()}`;
+    let labelWidth = featureLabel.length * height * 0.1;
+    if (labelWidth / 2 > midX) {
+      midX = labelWidth / 2;
+    } else if (midX + labelWidth / 2 > width) {
+      midX = width - labelWidth / 2;
+    }
     let strand = featureAttributes.strand.value;
     let featureGroup = (
       <g id={"feature-group"}>
@@ -135,7 +142,7 @@ const FeaturePanel = ({
           textAnchor={"middle"}
           dominantBaseline={"bottom"}
         >
-          {`${featureAttributes.start.value.toLocaleString()}-${featureAttributes.end.value.toLocaleString()}`}
+          {featureLabel}
         </text>
         <line
           id={"end-line"}
