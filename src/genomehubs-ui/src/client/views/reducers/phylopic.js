@@ -172,7 +172,7 @@ export function fetchPhylopic({ taxonId, scientificName, lineage, rank }) {
     try {
       fetchData(scientificName.toLowerCase());
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   };
 }
