@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "@reach/router";
 
 import Grid from "@material-ui/core/Grid";
 import { LineageList } from "./LineagePanel";
+import LineageSummaryPanel from "./LineageSummaryPanel";
 import NavLink from "./NavLink";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
@@ -37,26 +38,17 @@ const TaxonPanel = ({
   let lineages;
   let taxidLink;
   if (taxon_id) {
-    if (!scientific_name) {
-      if (records[taxon_id]) {
-        scientific_name = records[taxon_id].record.scientific_name;
-        taxon_rank = records[taxon_id].record.taxon_rank;
-        lineage = {
-          taxon: { taxon_id, scientific_name, taxon_rank },
-          lineage: records[taxon_id].record.lineage,
-        };
-      }
+    if (records[taxon_id] && !scientific_name) {
+      scientific_name = records[taxon_id].record.scientific_name;
+      taxon_rank = records[taxon_id].record.taxon_rank;
+      lineage = {
+        taxon: { taxon_id, scientific_name, taxon_rank },
+        lineage: records[taxon_id].record.lineage,
+      };
     }
     if (taxonomy == "ncbi" && taxon_id.match(/^\d+$/)) {
       let taxidUrl = `https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=${taxon_id}`;
-      taxidLink = (
-        <>
-          View taxon in{" "}
-          <span style={{ textDecoration: "underline" }}>
-            <NavLink href={taxidUrl}>NCBI taxonomy</NavLink>
-          </span>
-        </>
-      );
+      taxidLink = <LineageSummaryPanel taxonId={taxon_id} />;
     }
   }
 

@@ -75,7 +75,8 @@ const RecordLink = ({
         value = value[k];
       }
       if (typeof value === "undefined") {
-        throw `ERROR fetching ${key}`;
+        continue;
+        // throw `ERROR fetching ${key}`;
       }
     }
     if (value.values) {
