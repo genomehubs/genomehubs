@@ -100,7 +100,7 @@ const AttributeSummary = ({
     </Tooltip>
   );
   summary = (
-    <div className={styles.attrInfo}>
+    <div key={field.id} className={styles.attrInfo}>
       <div className={styles.infoName}>{field.id}</div>
       <AggregationIcon
         method={field.aggregation_source}

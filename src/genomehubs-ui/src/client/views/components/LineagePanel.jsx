@@ -13,6 +13,7 @@ export const LineageList = ({
   taxon_id,
   setRecordId,
   lineage,
+  result,
   fetchSearchResults,
   setPreferSearchTerm,
   setLookupTerm,
@@ -21,7 +22,7 @@ export const LineageList = ({
   const navigate = useNavigate();
 
   const handleTaxonClick = (taxon, name) => {
-    if (taxon != taxon_id) {
+    if (taxon != taxon_id || result != "taxon") {
       setRecordId(taxon);
       fetchSearchResults({ query: `tax_eq(${taxon})`, result: "taxon" });
       setPreferSearchTerm(false);
@@ -104,6 +105,7 @@ const LineagePanel = ({
   taxon_id,
   setRecordId,
   lineage,
+  result,
   fetchSearchResults,
   setPreferSearchTerm,
   setLookupTerm,
@@ -123,6 +125,7 @@ const LineagePanel = ({
       setPreferSearchTerm={setPreferSearchTerm}
       setLookupTerm={setLookupTerm}
       taxonomy={taxonomy}
+      result={result}
     />
   );
 

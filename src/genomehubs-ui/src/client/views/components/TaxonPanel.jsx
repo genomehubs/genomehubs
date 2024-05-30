@@ -28,6 +28,7 @@ const TaxonPanel = ({
   setPreferSearchTerm,
   taxonomy,
   basename,
+  result,
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -69,6 +70,7 @@ const TaxonPanel = ({
         setPreferSearchTerm={setPreferSearchTerm}
         setLookupTerm={setLookupTerm}
         taxonomy={taxonomy}
+        result={result}
       />
     );
   }

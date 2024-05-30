@@ -57,7 +57,7 @@ const AssemblyPanel = ({
       let identifiers = (records[assemblyId].record.identifiers || []).filter(
         (obj) => obj.class != "assembly_id"
       );
-      if (identifiers.length > 0) {
+      if (result == "assembly" && identifiers.length > 0) {
         namesDiv = <NamesList names={identifiers} />;
       }
       ({
