@@ -79,9 +79,9 @@ const RecordLink = ({
         // throw `ERROR fetching ${key}`;
       }
     }
-    if (value.values) {
+    if (value && value.values) {
       return value.values;
-    } else if (value.value) {
+    } else if (value && value.value) {
       return value.value;
     }
     return value;
