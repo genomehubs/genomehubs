@@ -71,7 +71,7 @@ const RecordLink = ({
         value = subval
           ? value.find((o) => o[subkey] == subval)
           : value.find((o) => o.hasOwnProperty(subkey));
-      } else {
+      } else if (value && value.hasOwnProperty(k)) {
         value = value[k];
       }
       if (typeof value === "undefined") {
