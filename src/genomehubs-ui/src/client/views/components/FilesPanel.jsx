@@ -16,6 +16,9 @@ const FilesPanel = ({ files, types, record, taxonId, title = "Files" }) => {
     styles[`infoPanel1Column`],
     styles.resultPanel
   );
+  if (!types) {
+    return null;
+  }
   let { file_paths } = types.files;
   if (!file_paths) {
     return null;
