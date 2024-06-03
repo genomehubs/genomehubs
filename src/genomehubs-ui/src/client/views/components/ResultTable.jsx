@@ -469,7 +469,12 @@ const setCellClassName = (i, length, force) => {
   return css;
 };
 
-const setLinkIcons = ({ type, key, result }) => {
+export const setLinkIcons = ({
+  type,
+  key,
+  result,
+  record = { test: "test" },
+}) => {
   if (!type.file_paths) {
     return [];
   }
@@ -507,17 +512,35 @@ const setLinkIcons = ({ type, key, result }) => {
           arr[i] = run;
         } else if (item == "name") {
           arr[i] = name;
-        } else if (result.hasOwnProperty(item)) {
-          arr[i] = result[item];
-        } else if (result.result.hasOwnProperty(item)) {
-          arr[i] = result.result[item];
-        } else if (result.result.fields.hasOwnProperty(item)) {
-          arr[i] = result.result.fields[item].value;
-        } else {
-          let bits = item.split(".");
-          let field = bits.shift();
-          if (result.result.fields.hasOwnProperty(field)) {
-            arr[i] = result.result.fields[field][`metadata.${bits.join(".")}`];
+        } else if (result) {
+          if (result.hasOwnProperty(item)) {
+            arr[i] = result[item];
+          } else if (result.result.hasOwnProperty(item)) {
+            arr[i] = result.result[item];
+          } else if (result.result.fields.hasOwnProperty(item)) {
+            arr[i] = result.result.fields[item].value;
+          } else {
+            let bits = item.split(".");
+            let field = bits.shift();
+            if (result.result.fields.hasOwnProperty(field)) {
+              arr[i] =
+                result.result.fields[field][`metadata.${bits.join(".")}`];
+            }
+          }
+        } else if (record) {
+          if (record.hasOwnProperty(item)) {
+            arr[i] = record[item];
+          } else if (record.record.hasOwnProperty(item)) {
+            arr[i] = record.record[item];
+          } else if (record.record.attributes.hasOwnProperty(item)) {
+            arr[i] = record.result.attributes[item].value;
+          } else {
+            let bits = item.split(".");
+            let field = bits.shift();
+            if (record.result.attributes.hasOwnProperty(field)) {
+              arr[i] =
+                record.result.attributes[field][`metadata.${bits.join(".")}`];
+            }
           }
         }
       }

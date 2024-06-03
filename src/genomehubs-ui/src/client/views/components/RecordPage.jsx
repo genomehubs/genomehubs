@@ -5,6 +5,7 @@ import AssembliesPanel from "./AssembliesPanel";
 import AssemblyPanel from "./AssemblyPanel";
 import AttributePanel from "./AttributePanel";
 import FeaturePanel from "./FeaturePanel";
+import FilesPanel from "./FilesPanel";
 import LineagePanel from "./LineagePanel";
 import NamesPanel from "./NamesPanel";
 import Page from "./Page";
@@ -232,6 +233,17 @@ const RecordPage = ({
     }
 
     if (record.record.attributes) {
+      if (record.record.attributes.files && options.result == "assembly") {
+        results.push(
+          <FilesPanel
+            key={"files"}
+            recordId={record.record.record_id}
+            result={options.result}
+            taxonomy={options.taxonomy}
+            files={record.record.attributes.files}
+          />
+        );
+      }
       results.push(
         <AttributePanel
           key={"attributes"}

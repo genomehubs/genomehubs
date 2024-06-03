@@ -100,6 +100,9 @@ const ValueRow = ({
         if (cmp && !compareValues(recordValue, value, cmp)) {
           return null;
         }
+        if (!cmp && !recordValue) {
+          return null;
+        }
       }
     }
   } catch (err) {

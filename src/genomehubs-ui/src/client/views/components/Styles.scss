@@ -507,7 +507,11 @@ body,
         }
       }
     }
-
+    .filesTitle {
+      font-family: themed("titleFont");
+      font-size: 1.25em;
+      line-height: 2em;
+    }
 
     .resultPanel {
       border-top: solid 0.25px rgba(themed("primary"), 0.25);

@@ -23,6 +23,7 @@ const RecordLink = ({
   description,
   color = "#1f78b4",
   icon,
+  EndIcon = LaunchIcon,
 }) => {
   useEffect(() => {
     if (
@@ -123,6 +124,9 @@ const RecordLink = ({
         if (cmp && !compareValues(recordValue, value, cmp)) {
           return null;
         }
+        if (!cmp && !recordValue) {
+          return null;
+        }
       }
     }
     href = fillValues(url);
@@ -147,7 +151,8 @@ const RecordLink = ({
       label={
         <span style={{ whiteSpace: "nowrap" }}>
           {icon}
-          {label} <LaunchIcon fontSize="inherit" />
+          {label}{" "}
+          <EndIcon fontSize="inherit" style={{ marginBottom: "-0.1em" }} />
         </span>
       }
       component="a"
