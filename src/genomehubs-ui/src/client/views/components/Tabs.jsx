@@ -25,6 +25,10 @@ const Tabs = ({ group = "tabs" }) => {
             group={group}
           />
         );
+      } else if (routeName.match(/^\//)) {
+        return (
+          <Tab path={""} routeName={routeName} pageId={`${routeName}.md`} />
+        );
       } else {
         let path = group.replaceAll("-", "/").replace(/\btabs\b/, "");
         return (

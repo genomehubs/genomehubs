@@ -21,7 +21,7 @@ const Tab = ({ path = "", routeName, pageId, setRoute, routesById }) => {
   return (
     <div className={styles.tabDiv}>
       <NavLink to={path ? `${path}/${routeName}` : parsedName} tab plain>
-        {parsedName}
+        {parsedName.replace(/^\//g, "").replaceAll(/_/g, " ")}
       </NavLink>
     </div>
   );
