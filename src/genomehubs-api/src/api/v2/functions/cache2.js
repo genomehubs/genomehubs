@@ -3,7 +3,6 @@ import qs from "qs";
 import { rd } from "./redisClient";
 
 const fourDays = 4 * 24 * 60 * 60;
-const tenMinutesInMilliSeconds = 10 * 60 * 1000;
 
 const sortUrl = (url) => {
   let [path, search] = url.split(/[\?#]/);
@@ -14,22 +13,18 @@ const sortUrl = (url) => {
   return `${path}?${qs.stringify(sortedOptions)}`;
 };
 
-export const cacheFetch = async ({ url, persist }) => {
+export const cacheFetch = async (req) => {
   let key;
   let cachedData = false;
   const action = "FETCH";
   const store = rd;
   if (store) {
     let success = false;
-    let keys = await store.keys("*");
-    key = sortUrl(url);
+    key = sortUrl(req.url);
     try {
       cachedData = JSON.parse(await store.get(key));
       if (cachedData) {
         success = true;
-        if (persist && persist == "once") {
-          store.del(key);
-        }
       }
     } catch {
       success = false;
@@ -39,37 +34,24 @@ export const cacheFetch = async ({ url, persist }) => {
   return cachedData;
 };
 
-export const cachedResponse = async (req, limit = tenMinutesInMilliSeconds) => {
-  return new Promise((resolve) => {
-    let elapsed = 0;
-    let duration = 1000;
-    const interval = setInterval(() => {
-      cacheFetch(req).then((cachedData) => {
-        if (cachedData) {
-          resolve(cachedData);
-          clearInterval(interval);
-        } else if (cachedData === false || elapsed >= limit) {
-          resolve({ status: { success: false, message: "timeout" } });
-          clearInterval(interval);
-        }
-        elapsed += duration;
-      });
-    }, duration);
-  });
-};
-
 export const cacheStore = async (req, obj) => {
   let key, success;
+  console.log(req);
   const action = "STORE";
   const store = rd;
+  console.log(store);
   if (store) {
     try {
       key = sortUrl(req.url);
-      success = await store.setex(key, fourDays, JSON.stringify(obj));
+      console.log(key);
+      // success = await store.setex(key, fourDays, JSON.stringify(obj));
+      console.log(success);
       success = success == "OK";
     } catch (err) {
+      console.log(err);
       success = false;
     }
+    console.log(success);
     logMemcache({ key, action, success });
   }
   return success;
