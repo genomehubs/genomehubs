@@ -209,7 +209,7 @@ export const getTree = async ({
   } else {
     status = { success: true };
   }
-  let { report, xLabel, xQuery, yLabel } = res;
+  let { report, xLabel, xQuery, yLabel, yQuery } = res;
   let caption;
   if (report) {
     caption = `Tree of ${x}${report.y ? ` highlighting ${y}` : ""}`;
