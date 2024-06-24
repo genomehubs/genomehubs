@@ -87,10 +87,8 @@ export const getRecordsByTaxon = async (props) => {
     )) {
       hits.push(hit);
       total++;
-      if (total % 1000 == 0) {
-        if (queryId) {
-          setProgress(queryId, { [update]: total });
-        }
+      if (queryId && total % 1000 == 0) {
+        setProgress(queryId, { [update]: total });
       }
       if (!active || total == query.size) {
         if (queryId && !active) {

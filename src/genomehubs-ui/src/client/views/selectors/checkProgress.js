@@ -14,9 +14,11 @@ export function checkProgress({
   let url = `${apiUrl}/progress?queryId=${queryId}`;
   let isFetching = false;
 
+  let json = {};
+  const currentProgress = () => json.progress || {};
+
   const fetchProgress = async () => {
     if (iteration > 0 && !isFetching) {
-      let json;
       try {
         isFetching = true;
         const response = await fetch(url, {
@@ -43,5 +45,5 @@ export function checkProgress({
   };
 
   let interval = setInterval(fetchProgress, delay);
-  return interval;
+  return { interval, currentProgress };
 }

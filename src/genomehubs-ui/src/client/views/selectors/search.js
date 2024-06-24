@@ -164,13 +164,13 @@ export const saveSearchResults = ({ options, format = "tsv" }) => {
     const queryId = nanoid(10);
     let url = `${apiUrl}/search?${queryString}&queryId=${queryId}&persist=once`;
     let status;
-    const interval = checkProgress({
+    const { interval, currentProgress } = checkProgress({
       queryId,
       delay: 2000,
       dispatch,
       message: `Preparing ${format.toUpperCase()} file for download`,
     });
-    let maxTries = 10;
+    let maxTries = 50;
 
     for (let i = 0; i < maxTries; i++) {
       try {
@@ -183,6 +183,7 @@ export const saveSearchResults = ({ options, format = "tsv" }) => {
         });
         let { status } = response;
         if (status == 202) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
           continue;
         }
         clearInterval(interval);
@@ -215,7 +216,12 @@ export const saveSearchResults = ({ options, format = "tsv" }) => {
 
           dispatch(resetController());
           return false;
-        } else if (i == maxTries - 1) {
+        }
+        let progress = currentProgress();
+        if (!progress.uuid) {
+          i = maxTries;
+        }
+        if (i >= maxTries - 1) {
           dispatch(
             setMessage({
               message: `Unable to download ${format.toUpperCase()} file`,
@@ -224,7 +230,6 @@ export const saveSearchResults = ({ options, format = "tsv" }) => {
             })
           );
           status = { success: false, error: "Unexpected error" };
-          console.log(err);
           dispatch(resetController());
           return false;
         }

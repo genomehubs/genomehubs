@@ -1,9 +1,10 @@
+import { clearProgress } from "./progress";
 import { logMemcache } from "./logger";
 import qs from "qs";
 import { rd } from "./redisClient";
 
 const fourDays = 4 * 24 * 60 * 60;
-const tenMinutesInMilliSeconds = 10 * 60 * 1000;
+const tenSeconds = 10 * 1000;
 
 const sortUrl = (url) => {
   let [path, search] = url.split(/[\?#]/);
@@ -14,7 +15,7 @@ const sortUrl = (url) => {
   return `${path}?${qs.stringify(sortedOptions)}`;
 };
 
-export const cacheFetch = async ({ url, persist }) => {
+export const cacheFetch = async ({ url, persist, queryId }) => {
   let key;
   let cachedData = false;
   const action = "FETCH";
@@ -28,6 +29,7 @@ export const cacheFetch = async ({ url, persist }) => {
       if (cachedData) {
         success = true;
         if (persist && persist == "once") {
+          clearProgress(queryId);
           store.del(key);
         }
       }
@@ -39,7 +41,13 @@ export const cacheFetch = async ({ url, persist }) => {
   return cachedData;
 };
 
-export const cachedResponse = async (req, limit = tenMinutesInMilliSeconds) => {
+export const cachedResponse = async (req, limit = tenSeconds) => {
+  const store = rd;
+  if (!store) {
+    return new Promise((resolve) => {
+      false;
+    });
+  }
   return new Promise((resolve) => {
     let elapsed = 0;
     let duration = 1000;
@@ -73,4 +81,34 @@ export const cacheStore = async (req, obj) => {
     logMemcache({ key, action, success });
   }
   return success;
+};
+
+const withTimeout = async (millis, promise) => {
+  let timeoutPid;
+  const timeout = new Promise(
+    (_, reject) =>
+      (timeoutPid = setTimeout(
+        () => reject(`Timed out after ${millis} ms.`),
+        millis
+      ))
+  );
+  try {
+    return await Promise.race([promise, timeout]);
+  } finally {
+    if (timeoutPid) {
+      clearTimeout(timeoutPid);
+    }
+  }
+};
+export const pingCache = async () => {
+  const store = rd;
+  if (store) {
+    try {
+      let pong = await withTimeout(200, store.ping());
+      return pong == "PONG";
+    } catch {
+      return false;
+    }
+  }
+  return false;
 };

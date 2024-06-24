@@ -11,19 +11,14 @@ export const setProgress = (queryId, options) => {
   };
 };
 
-export const progressComplete = async (queryId) => {
-  return new Promise((resolve) => {
-    const interval = setInterval(() => {
-      if (progress[queryId]) {
-        if (progress[queryId].complete) {
-          resolve(progress[queryId]);
-          clearInterval(interval);
-        }
-      } else {
-        resolve(false);
-      }
-    }, 1000);
-  });
+export const isProgressComplete = (queryId) => {
+  if (progress[queryId]) {
+    if (progress[queryId].complete) {
+      return true;
+    }
+  } else {
+    return false;
+  }
 };
 
 export const clearProgress = (queryId) => {

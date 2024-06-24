@@ -1,8 +1,8 @@
-import { cacheFetch, cacheStore, cachedResponse } from "../functions/cache";
+import { cacheStore, cachedResponse, pingCache } from "../functions/cache";
 import {
   clearProgress,
   getProgress,
-  progressComplete,
+  isProgressComplete,
   setProgress,
 } from "../functions/progress";
 
@@ -92,19 +92,18 @@ export const getSearchResults = async (req, res) => {
     let sortBy = setSortBy(req.query);
     let { queryId, persist } = req.query;
     let progress = getProgress(queryId);
+    let uuid;
     if (queryId) {
-      if (
-        progress &&
-        (progress.disconnected || progress.disconnected) &&
-        progress.uuid
-      ) {
+      if (progress && progress.uuid) {
         try {
-          if (!progress.complete) {
-            await progressComplete(queryId);
+          if (!isProgressComplete(queryId)) {
+            return res.status(202).send();
           }
-          if (progress.complete) {
-            response = await cachedResponse({ url: progress.uuid, persist });
-          }
+          response = await cachedResponse({
+            url: progress.uuid,
+            persist,
+            queryId,
+          });
           if (Object.keys(response).length == 0) {
             return res.status(202).send();
           }
@@ -112,12 +111,12 @@ export const getSearchResults = async (req, res) => {
         } catch (message) {
           logError({ req, message });
         }
-      } else if (persist) {
-        setProgress(queryId, { persist, uuid: uuidv4() });
+      } else if (persist && (await pingCache())) {
+        uuid = uuidv4();
       }
       let countRes = await getResults({ ...req.query, exclusions, size: 0 });
       if (countRes.status && countRes.status.hits) {
-        setProgress(queryId, { total: countRes.status.hits, persist });
+        setProgress(queryId, { total: countRes.status.hits, persist, uuid });
       }
     }
     response = await getResults({
@@ -148,22 +147,24 @@ export const getSearchResults = async (req, res) => {
       }
     }
     progress = getProgress(queryId);
-    if (progress && progress.persist && progress.disconnected) {
+    if (
+      progress &&
+      progress.persist &&
+      progress.uuid &&
+      progress.disconnected
+    ) {
       try {
-        console.log("storing cache");
-        console.log(progress.uuid);
         await cacheStore({ url: progress.uuid }, response);
       } catch (message) {
-        console.log("error");
-        console.log(message);
         logError({ req, message });
       }
+      return res.status(200).send({ status: "ready" });
     }
-    console.log({ returnResponse: code });
-    return await formattedResponse(req, res, response);
+    let fResponse = await formattedResponse(req, res, response);
+    clearProgress(queryId);
+    return fResponse;
   } catch (message) {
     logError({ req, message });
-    console.log({ returnError: code });
     return res.status(400).send({ status: "error" });
   }
 };
