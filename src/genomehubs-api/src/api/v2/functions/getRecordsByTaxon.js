@@ -1,4 +1,4 @@
-import { clearProgress, setProgress } from "./progress";
+import { clearProgress, getProgress, setProgress } from "./progress";
 
 import { attrTypes } from "./attrTypes";
 import { checkResponse } from "./checkResponse";
@@ -46,13 +46,18 @@ export const getRecordsByTaxon = async (props) => {
   let queryId;
   let update;
   if (props.req && props.req.on) {
+    queryId = props.req.query.queryId;
+    let progress = getProgress(props.req.query.queryId);
     props.req.on("close", () => {
-      active = false;
+      if (progress && progress.persist) {
+        setProgress(queryId, { disconnected: true });
+      } else {
+        active = false;
+      }
     });
     props.req.on("end", () => {
       active = false;
     });
-    queryId = props.req.query.queryId;
     update = props.update || "x";
     props.includeLineage = true;
   }
@@ -82,10 +87,8 @@ export const getRecordsByTaxon = async (props) => {
     )) {
       hits.push(hit);
       total++;
-      if (total % 1000 == 0) {
-        if (queryId) {
-          setProgress(queryId, { [update]: total });
-        }
+      if (queryId && total % 1000 == 0) {
+        setProgress(queryId, { [update]: total });
       }
       if (!active || total == query.size) {
         if (queryId && !active) {
@@ -98,6 +101,7 @@ export const getRecordsByTaxon = async (props) => {
       setProgress(queryId, {
         [update]: total,
         ...(update == "x" && { total }),
+        complete: true,
       });
     }
     let took = Date.now() - startTime;

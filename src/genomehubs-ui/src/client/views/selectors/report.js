@@ -172,7 +172,7 @@ export function fetchReport({
     try {
       let json;
       let status;
-      const interval = checkProgress({
+      const { interval } = checkProgress({
         queryId,
         delay: inModal ? 1000 : 30000,
         dispatch,
@@ -975,7 +975,7 @@ export const saveReport = ({ options, format = "json" }) => {
     const state = store.getState();
     let url = `${apiUrl}/report?${queryString}&queryId=${queryId}`;
     let status;
-    const interval = checkProgress({
+    const { interval } = checkProgress({
       queryId,
       delay: 5000,
       dispatch,

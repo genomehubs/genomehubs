@@ -1,5 +1,5 @@
 import { createSelector } from "reselect";
-import qstr from "qs";
+// import qstr from "qs";
 
 // const translations = {
 //   caption: {
