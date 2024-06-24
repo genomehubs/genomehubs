@@ -104,7 +104,7 @@ export const pingCache = async () => {
   const store = rd;
   if (store) {
     try {
-      let pong = await withTimeout(200, store.ping());
+      let pong = await withTimeout(100, store.ping());
       return pong == "PONG";
     } catch {
       return false;
