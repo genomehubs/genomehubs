@@ -1,13 +1,8 @@
-import React, { memo, useEffect, useRef, useState } from "react";
+import React, { memo, useRef, useState } from "react";
 
-import DialogContent from "@material-ui/core/DialogContent";
 import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import Modal from "@material-ui/core/Modal";
-import SaveSettingsModal from "./SaveSettingsModal";
 import SearchBox from "./SearchBox";
-import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
-import Tooltip from "./Tooltip";
+import SearchHeaderButtons from "./SearchHeaderButtons";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchColors from "../hocs/dispatchColors";
@@ -59,6 +54,7 @@ const Page = ({
   const classes = useStyles();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [favourite, setFavourite] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
   const [showBrowse, setShowBrowse] = useState(false);
   const rootRef = useRef(null);
@@ -156,24 +152,13 @@ const Page = ({
     });
   }
   let title;
-  let button;
+
   if (recordId && result) {
     title = `${result} record ${recordId}`;
   } else if (fieldId) {
     title = `${fieldId} summary`;
   } else if (resultCount >= 0) {
     title = `${resultCount} ${resultCount == 1 ? "hit" : "hits"}`;
-    button = (
-      <Tooltip title="Save search settings" arrow placement={"top"}>
-        <IconButton
-          className={classes.saveSearchOptions}
-          aria-label="save search settings"
-          onClick={() => setOpen(!open)}
-        >
-          <SettingsApplicationsIcon />
-        </IconButton>
-      </Tooltip>
-    );
   } else if (resultCount < 0) {
     title = `updating search results...`;
   }
@@ -283,27 +268,10 @@ const Page = ({
           <Grid item xs={11}>
             {title}
           </Grid>
-          {button && (
-            <Grid item xs={1} style={{ textAlign: "end" }}>
-              {button}
-              <Modal
-                open={open}
-                onClose={(event, reason) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  setOpen(false);
-                }}
-                aria-labelledby="save-settings-modal-title"
-                aria-describedby="save-settings-modal-description"
-                className={classes.modal}
-                container={() => rootRef.current}
-              >
-                <DialogContent className={classes.paper}>
-                  <SaveSettingsModal handleClose={() => setOpen(false)} />
-                </DialogContent>
-              </Modal>
-            </Grid>
-          )}
+
+          <Grid item xs={1} style={{ textAlign: "end" }}>
+            <SearchHeaderButtons rootRef={rootRef} />
+          </Grid>
         </Grid>
       )}
       {postSearchItems}
