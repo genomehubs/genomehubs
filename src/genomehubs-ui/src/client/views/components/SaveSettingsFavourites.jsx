@@ -8,10 +8,12 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import MuiDialogContent from "@material-ui/core/DialogContent";
 import SearchIcon from "@material-ui/icons/Search";
 import Typography from "@material-ui/core/Typography";
-import YAML from "yaml";
+import YamlEditor from "@focus-reactive/react-yaml";
 import { compose } from "recompose";
 import { favouriteButton } from "./SearchHeaderButtons";
+import { format } from "d3-format";
 import qs from "../functions/qs";
+import { searchTerm } from "../reducers/search";
 import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
 import { useNavigate } from "@reach/router";
@@ -91,10 +93,14 @@ const SaveSettingsFavourites = ({ rootRef, currentIndex, handleClose }) => {
   const navigate = useNavigate();
   const [expand, setExpand] = useState({});
   const [remove, setRemove] = useState({});
+  const [edit, setEdit] = useState({});
+  // const [changed, setChanged] = useState({});
+  let changed = {};
   const [favourites, setFavourites] = useLocalStorage(
     `${currentIndex}Favourites`,
     {}
   );
+  const [currentFavourites, setCurrentFavourites] = useState(favourites);
 
   const DialogContent = withStyles((theme) => ({
     root: {
@@ -104,20 +110,63 @@ const SaveSettingsFavourites = ({ rootRef, currentIndex, handleClose }) => {
 
   let favListings = [];
 
+  const handleChange = ({ json, key }) => {
+    changed[key] = json;
+  };
+
+  const handleSave = () => {
+    let newFavourites = { ...currentFavourites };
+    Object.keys(changed).forEach((key) => {
+      newFavourites[JSON.stringify(changed[key])] = true;
+      delete newFavourites[key];
+    });
+    for (let key in remove) {
+      delete newFavourites[key];
+    }
+    setFavourites(newFavourites);
+  };
+
+  const toggleEdit = (key) => {
+    if (edit[key] && changed[key]) {
+      let newFavourites = { ...currentFavourites };
+      delete newFavourites[key];
+      newFavourites[JSON.stringify(changed[key])] = true;
+      setCurrentFavourites(newFavourites);
+      delete changed[key];
+    }
+    setEdit({ ...edit, [key]: !edit[key] });
+  };
+
   const handleExpand = (key) => {
     setExpand({ ...expand, [key]: !expand[key] });
   };
 
-  Object.keys(favourites).forEach((key, i) => {
+  const formatYaml = ({ searchTerm, reportTerm }) => {
+    let arr = Object.entries(searchTerm || {}).map(([key, value]) => (
+      <pre key={key} className={styles.favListing}>
+        <b>{key}:</b> {JSON.stringify(value)}
+      </pre>
+    ));
+    if (reportTerm && Object.keys(reportTerm).length > 0) {
+      arr.push(<hr key={"hr"} />);
+      arr = arr.concat(
+        Object.entries(reportTerm || {}).map(([key, value]) => (
+          <pre key={key} className={styles.favListing}>
+            <b>{key}:</b> {JSON.stringify(value)}
+          </pre>
+        ))
+      );
+    }
+    return arr;
+  };
+
+  Object.keys(currentFavourites).forEach((key, i) => {
     // let searchTerm = JSON.parse(key);
     let { searchTerm, reportTerm } = splitTerms(JSON.parse(key));
-    const searchTermsDoc = new YAML.Document();
-    searchTermsDoc.contents = searchTerm;
-    const reportTermsDoc = new YAML.Document();
-    reportTermsDoc.contents = reportTerm;
     let favButton = favouriteButton(!remove[key], () => {
       setRemove({ ...remove, [key]: !remove[key] });
     });
+
     favListings.push(
       <div key={i} className={styles.favListing}>
         <div className={styles.favListingContainer}>
@@ -135,28 +184,31 @@ const SaveSettingsFavourites = ({ rootRef, currentIndex, handleClose }) => {
                   marginRight: "1.5em",
                 }}
               >
-                {searchTerm.query}
+                {searchTerm.name || searchTerm.query}
               </span>
             </Typography>
           </div>
           {expand[key] && (
             <div className={styles.favListingContent}>
-              <pre>{searchTermsDoc.toString()}</pre>
-              {reportTermsDoc
-                .toString()
-                .split("\n")
-                .map((line, i) => (
-                  <pre className={styles.favListingExtra}>{line}</pre>
-                ))}
+              {edit[key] ? (
+                <YamlEditor
+                  json={{
+                    name: searchTerm.name || searchTerm.query,
+                    ...searchTerm,
+                    ...reportTerm,
+                  }}
+                  onChange={({ json }) => handleChange({ json, key })}
+                />
+              ) : (
+                formatYaml({ searchTerm, reportTerm })
+              )}
               <div className={styles.favListingButton}>
                 <Button
                   autoFocus
                   color="primary"
                   // variant="outlined"
                   startIcon={<EditIcon />}
-                  onClick={() =>
-                    navigate(`/search?${qs.stringify(JSON.parse(key))}`)
-                  }
+                  onClick={() => toggleEdit(key)}
                 >
                   Edit
                 </Button>
@@ -178,6 +230,35 @@ const SaveSettingsFavourites = ({ rootRef, currentIndex, handleClose }) => {
       </div>
     );
   });
+  if (favListings.length === 0) {
+    favListings = (
+      <Typography key="no-favourites">
+        You do not have any favourite searches for the {currentIndex} index.
+        <br />
+        To add a favourite, click the heart icon above the search results table.
+      </Typography>
+    );
+  } else if (
+    Object.keys(remove).filter((_, v) => v).length > 0 ||
+    Object.keys(changed).length > 0 ||
+    JSON.stringify(favourites) != JSON.stringify(currentFavourites)
+  ) {
+    favListings.push(
+      <div
+        key={"save-changes"}
+        style={{ position: "relative", height: "2em", width: "100%" }}
+      >
+        <Button
+          className={styles.favListingButton}
+          autoFocus
+          onClick={handleSave}
+          color="primary"
+        >
+          Save changes
+        </Button>
+      </div>
+    );
+  }
 
   return <DialogContent dividers>{favListings}</DialogContent>;
 };

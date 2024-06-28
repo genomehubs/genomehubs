@@ -136,8 +136,8 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
           // textColor="default"
           aria-label="icon label tabs example"
         >
-          <Tab icon={<SettingsApplicationsIcon />} label="DEFAULTS" />
           <Tab icon={<FavoriteIcon />} label="FAVORITES" />
+          <Tab icon={<SettingsApplicationsIcon />} label="DEFAULTS" />
         </Tabs>
         <Tabs
           value={secondaryTabValue}
@@ -153,21 +153,22 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
         {/* <DialogTitle id="customized-dialog-title" onClose={handleClose}>
           Search Settings
         </DialogTitle> */}
-
         {tabValue == 0 && (
-          <SaveSettingsDefaults
-            currentIndex={activeIndices[secondaryTabValue]}
-          />
-        )}
-        {tabValue == 1 && (
           <SaveSettingsFavourites
             currentIndex={activeIndices[secondaryTabValue]}
           />
         )}
+        {tabValue == 1 && (
+          <SaveSettingsDefaults
+            currentIndex={activeIndices[secondaryTabValue]}
+          />
+        )}
+
         <DialogActions>
-          <Button autoFocus onClick={handleClose} color="primary">
-            Save changes
-          </Button>
+          <span className={styles.favListingFooter}>
+            Save any changes before closing or changing tabs. Changes will be
+            lost if you navigate away.
+          </span>
         </DialogActions>
         {/* <Paper className={classes.paper}>
           <Grid container alignItems="center" direction="column" spacing={2}>

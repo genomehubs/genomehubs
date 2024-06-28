@@ -55,6 +55,7 @@
     "webpack-bundle-analyzer": "^3.9.0"
   },
   "dependencies": {
+    "@focus-reactive/react-yaml": "^1.1.2",
     "@fontsource/open-sans": "^4.5.3",
     "@fontsource/roboto-mono": "^4.5.1",
     "@fontsource/signika": "^4.5.2",

@@ -199,15 +199,16 @@ body,
 
       &Content {
         overflow-x: scroll;
-        margin: 0.5em 0.25em 1.5em;
+        margin: 0.5em 0.25em 1em;
 
         pre {
           margin: 0;
           width: fit-content;
         }
-        pre.favListingExtra {
-          background-color: #f0f0f0;
-          border-radius: 0.25em;
+        
+        hr {
+          margin: 0.25em 0;
+          color: themed("primary");
         }
       }
 
@@ -215,6 +216,12 @@ body,
         position: absolute;
         bottom: 0;
         right: 0;
+      }
+      &Footer {
+        font-family: themed("bodyFont");
+        font-size: 0.8em;
+        line-height: 1.5em;
+        color: mix(themed("primary"), themed("secondary"), 75%);
       }
     }
 

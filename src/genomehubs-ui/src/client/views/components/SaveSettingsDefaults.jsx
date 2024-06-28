@@ -1,70 +1,78 @@
 import React, { useEffect, useState } from "react";
 
+import Button from "@material-ui/core/Button";
+import EditIcon from "@material-ui/icons/Edit";
 import MuiDialogContent from "@material-ui/core/DialogContent";
-import YAML from "yaml";
+import PublishIcon from "@material-ui/icons/Publish";
+import SaveIcon from "@material-ui/icons/SaveAlt";
+import YamlEditor from "@focus-reactive/react-yaml";
 import classnames from "classnames";
 import { compose } from "recompose";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
+import withSearchIndex from "../hocs/withSearchIndex";
 import { withStyles } from "@material-ui/core/styles";
 import withTaxonomy from "../hocs/withTaxonomy";
 
 const SaveSettingsDefaults = ({
   currentIndex,
+  searchIndex,
   taxonomy,
   handleClose,
-  title = "Save search settings",
 }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel
-  );
   let options = qs.parse(location.search.replace(/^\?/, ""));
-
   const [savedOptions, setSavedOptions] = useLocalStorage(
     `${currentIndex}Options`,
     {}
   );
+  const [currentOptions, setCurrentOptions] = useState(savedOptions);
+  const [edit, setEdit] = useState(false);
+  let changed = {};
 
-  let currentOptions = {
-    result: options.result,
-    size: options.size || 10,
-    includeEstimates: Boolean(options.includeEstimates),
-    taxonomy,
+  const handleChange = ({ json }) => {
+    changed.value = json;
   };
-  ["fields", "names", "ranks"].forEach((key) => {
-    currentOptions[key] = options[key] ? options[key].split(",") : [];
-  });
-  if (options.sortBy) {
-    currentOptions.sortBy = options.sortBy;
-    currentOptions.sortOrder = options.sortOrder || "asc";
-  }
-  ["Ancestral", "Descendant", "Direct", "Missing"].forEach((key) => {
-    let keyName = `exclude${key}`;
-    if (options.hasOwnProperty(keyName)) {
-      currentOptions[keyName] = options[keyName];
+
+  const handleSave = () => {
+    setSavedOptions(changed.value || currentOptions);
+  };
+
+  const toggleEdit = () => {
+    if (edit) {
+      setCurrentOptions(changed.value || {});
+      delete changed.value;
     }
-  });
-  const searchDefaultsDoc = new YAML.Document();
-  searchDefaultsDoc.contents = currentOptions;
+    setEdit(!edit);
+  };
+
+  let urlOptions;
+  if (currentIndex == searchIndex) {
+    urlOptions = {
+      size: options.size || 10,
+      includeEstimates: Boolean(options.includeEstimates),
+      taxonomy,
+    };
+    ["fields", "names", "ranks"].forEach((key) => {
+      urlOptions[key] = options[key] ? options[key].split(",") : [];
+    });
+    if (options.sortBy) {
+      urlOptions.sortBy = options.sortBy;
+      urlOptions.sortOrder = options.sortOrder || "asc";
+    }
+    ["Ancestral", "Descendant", "Direct", "Missing"].forEach((key) => {
+      let keyName = `exclude${key}`;
+      if (options.hasOwnProperty(keyName)) {
+        urlOptions[keyName] = options[keyName];
+      }
+    });
+  }
 
   const DialogContent = withStyles((theme) => ({
     root: {
       padding: theme.spacing(2),
     },
   }))(MuiDialogContent);
-
-  let defaults = searchDefaultsDoc
-    .toString()
-    .split("\n")
-    .map((line, i) => (
-      <pre key={i} className={styles.favListingExtra}>
-        {line}
-      </pre>
-    ));
-  // setSavedOptions(currentOptions);
 
   const handleClear = () => {
     setSavedOptions({});
@@ -74,58 +82,64 @@ const SaveSettingsDefaults = ({
     handleClose();
   };
 
-  // let content = (
-  //   <Grid item xs={12}>
-  //     <Grid container direction="column">
-  //       <Grid item>
-  //         <Grid container direction="row" alignItems={"flex-end"}>
-  //           <Grid item xs={2}>
-  //             <IconButton
-  //               // className={classes.saveSearchOptions}
-  //               aria-label="save search settings"
-  //               onClick={handleClick}
-  //             >
-  //               Save
-  //               <SaveIcon />
-  //             </IconButton>
-  //           </Grid>
-  //           <Grid item xs={10}>
-  //             Click to save current search options to your browser. This
-  //             information will only be used to apply the current search options
-  //             to future searches. No personal data will be collected.
-  //           </Grid>
-  //         </Grid>
-  //       </Grid>
-  //       <Grid item>
-  //         <Grid container direction="row" alignItems={"flex-end"}>
-  //           <Grid item xs={2}>
-  //             <IconButton
-  //               // className={classes.saveSearchOptions}
-  //               aria-label="save search settings"
-  //               onClick={handleClear}
-  //             >
-  //               Clear
-  //               <ClearIcon />
-  //             </IconButton>
-  //           </Grid>
-  //           <Grid item xs={10}>
-  //             Click to clear saved search options from your browser.
-  //           </Grid>
-  //         </Grid>
-  //       </Grid>
-  //     </Grid>
-  //   </Grid>
-  // );
+  let defaults;
+  if (edit) {
+    defaults = [
+      <YamlEditor key={"edit"} json={currentOptions} onChange={handleChange} />,
+    ];
+  } else {
+    defaults = Object.entries(currentOptions).map(([key, value]) => (
+      <pre key={key} className={styles.favListing}>
+        <b>{key}:</b> {JSON.stringify(value)}
+      </pre>
+    ));
+  }
 
   return (
     <DialogContent dividers>
       <div className={styles.favListing}>
         <div className={styles.favListingContainer}>
           <div className={styles.favListingContent}>{defaults}</div>
+          <div className={styles.favListingButton}>
+            {urlOptions &&
+              JSON.stringify(urlOptions) != JSON.stringify(currentOptions) && (
+                <Button
+                  autoFocus
+                  color="primary"
+                  // variant="outlined"
+                  startIcon={<PublishIcon />}
+                  onClick={() => setCurrentOptions(urlOptions)}
+                >
+                  use current
+                </Button>
+              )}
+            <Button
+              autoFocus
+              color="primary"
+              // variant="outlined"
+              startIcon={<EditIcon />}
+              onClick={toggleEdit}
+            >
+              edit
+            </Button>
+            {(changed.value ||
+              JSON.stringify(savedOptions) !=
+                JSON.stringify(currentOptions)) && (
+              <Button
+                autoFocus
+                color="primary"
+                // variant="outlined"
+                startIcon={<SaveIcon />}
+                onClick={handleSave}
+              >
+                save changes
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </DialogContent>
   );
 };
 
-export default compose(withTaxonomy)(SaveSettingsDefaults);
+export default compose(withTaxonomy, withSearchIndex)(SaveSettingsDefaults);
