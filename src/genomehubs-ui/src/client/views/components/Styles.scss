@@ -222,6 +222,7 @@ body,
         font-size: 0.8em;
         line-height: 1.5em;
         color: mix(themed("primary"), themed("secondary"), 75%);
+        margin-right: 0.5em;
       }
     }
 
@@ -338,6 +339,10 @@ body,
             }
           }
         }
+      }
+      .searchIcon {
+        float: right;
+        line-height: 2em;
       }
     }
 

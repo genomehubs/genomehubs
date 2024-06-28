@@ -11,62 +11,15 @@ import Typography from "@material-ui/core/Typography";
 import YamlEditor from "@focus-reactive/react-yaml";
 import { compose } from "recompose";
 import { favouriteButton } from "./SearchHeaderButtons";
-import { format } from "d3-format";
 import qs from "../functions/qs";
-import { searchTerm } from "../reducers/search";
+import { splitTerms } from "./SearchHeaderButtons";
 import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
 import { useNavigate } from "@reach/router";
+import withSearchDefaults from "../hocs/withSearchDefaults";
+import withTaxonomy from "../hocs/withTaxonomy";
 
 // import withSearchIndex from "../hocs/withSearchIndex";
-
-const reportParams = {
-  report: false,
-  y: false,
-  z: false,
-  cat: false,
-  pointSize: 15,
-  rank: false,
-  stacked: false,
-  yScale: "linear",
-  cumulative: false,
-  compactLegend: false,
-  catToX: false,
-};
-
-const searchParams = {
-  query: false,
-  result: false,
-  includeEstimates: "false",
-  summaryValues: "count",
-  taxonomy: "ncbi",
-  size: 10,
-  offset: 0,
-  fields: "",
-  names: "",
-  ranks: "",
-};
-
-const splitTerms = (terms) => {
-  let searchTerm = {};
-  let reportTerm = {};
-  for (let key in terms) {
-    if (reportParams[key] !== undefined) {
-      if (reportParams[key] === false) {
-        reportTerm[key] = terms[key];
-      } else if (reportParams[key] != terms[key]) {
-        reportTerm[key] = terms[key];
-      }
-    } else if (searchParams.hasOwnProperty(key)) {
-      if (searchParams[key] != terms[key]) {
-        searchTerm[key] = terms[key];
-      }
-    } else {
-      searchTerm[key] = terms[key];
-    }
-  }
-  return { searchTerm, reportTerm: reportTerm.report ? reportTerm : undefined };
-};
 
 export const useStyles = makeStyles((theme) => ({
   paper: {
@@ -89,7 +42,13 @@ export const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SaveSettingsFavourites = ({ rootRef, currentIndex, handleClose }) => {
+const SaveSettingsFavourites = ({
+  rootRef,
+  currentIndex,
+  handleClose,
+  searchDefaults,
+  taxonomy,
+}) => {
   const navigate = useNavigate();
   const [expand, setExpand] = useState({});
   const [remove, setRemove] = useState({});
@@ -117,7 +76,8 @@ const SaveSettingsFavourites = ({ rootRef, currentIndex, handleClose }) => {
   const handleSave = () => {
     let newFavourites = { ...currentFavourites };
     Object.keys(changed).forEach((key) => {
-      newFavourites[JSON.stringify(changed[key])] = true;
+      let { name = true, ...rest } = changed[key];
+      newFavourites[JSON.stringify(rest)] = name;
       delete newFavourites[key];
     });
     for (let key in remove) {
@@ -130,7 +90,8 @@ const SaveSettingsFavourites = ({ rootRef, currentIndex, handleClose }) => {
     if (edit[key] && changed[key]) {
       let newFavourites = { ...currentFavourites };
       delete newFavourites[key];
-      newFavourites[JSON.stringify(changed[key])] = true;
+      let { name = true, ...rest } = changed[key];
+      newFavourites[JSON.stringify(rest)] = name;
       setCurrentFavourites(newFavourites);
       delete changed[key];
     }
@@ -163,19 +124,28 @@ const SaveSettingsFavourites = ({ rootRef, currentIndex, handleClose }) => {
   Object.keys(currentFavourites).forEach((key, i) => {
     // let searchTerm = JSON.parse(key);
     let { searchTerm, reportTerm } = splitTerms(JSON.parse(key));
-    let favButton = favouriteButton(!remove[key], () => {
-      setRemove({ ...remove, [key]: !remove[key] });
-    });
+    let name =
+      currentFavourites[key] === true
+        ? searchTerm.query
+        : currentFavourites[key];
 
+    let favButton = favouriteButton({
+      isFavourite: !remove[key],
+      handleClickFavourite: (e) => {
+        e.stopPropagation();
+        setRemove({ ...remove, [key]: !remove[key] });
+      },
+      name,
+    });
     favListings.push(
       <div key={i} className={styles.favListing}>
         <div className={styles.favListingContainer}>
-          <div className={styles.favListingHeader}>
+          <div
+            className={styles.favListingHeader}
+            onClick={() => handleExpand(key)}
+          >
             {favButton}
-            <span
-              className={styles.favListingExpand}
-              onClick={() => handleExpand(key)}
-            >
+            <span className={styles.favListingExpand}>
               {expand[key] ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </span>
             <Typography>
@@ -184,7 +154,7 @@ const SaveSettingsFavourites = ({ rootRef, currentIndex, handleClose }) => {
                   marginRight: "1.5em",
                 }}
               >
-                {searchTerm.name || searchTerm.query}
+                {name}
               </span>
             </Typography>
           </div>
@@ -193,7 +163,7 @@ const SaveSettingsFavourites = ({ rootRef, currentIndex, handleClose }) => {
               {edit[key] ? (
                 <YamlEditor
                   json={{
-                    name: searchTerm.name || searchTerm.query,
+                    name,
                     ...searchTerm,
                     ...reportTerm,
                   }}
@@ -217,9 +187,16 @@ const SaveSettingsFavourites = ({ rootRef, currentIndex, handleClose }) => {
                   color="primary"
                   // variant="outlined"
                   startIcon={<SearchIcon />}
-                  onClick={() =>
-                    navigate(`/search?${qs.stringify(JSON.parse(key))}`)
-                  }
+                  onClick={() => {
+                    let { name, ...rest } = JSON.parse(key);
+                    navigate(
+                      `/search?${qs.stringify({
+                        // ...searchDefaults,
+                        taxonomy,
+                        ...rest,
+                      })}`
+                    );
+                  }}
                 >
                   Search
                 </Button>
@@ -239,7 +216,7 @@ const SaveSettingsFavourites = ({ rootRef, currentIndex, handleClose }) => {
       </Typography>
     );
   } else if (
-    Object.keys(remove).filter((_, v) => v).length > 0 ||
+    Object.keys(remove).length > 0 ||
     Object.keys(changed).length > 0 ||
     JSON.stringify(favourites) != JSON.stringify(currentFavourites)
   ) {
@@ -263,4 +240,7 @@ const SaveSettingsFavourites = ({ rootRef, currentIndex, handleClose }) => {
   return <DialogContent dividers>{favListings}</DialogContent>;
 };
 
-export default SaveSettingsFavourites;
+export default compose(
+  withTaxonomy,
+  withSearchDefaults
+)(SaveSettingsFavourites);

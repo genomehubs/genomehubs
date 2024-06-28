@@ -1,37 +1,21 @@
 import React, { useState } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 
-import Button from "@material-ui/core/Button";
 import CloseIcon from "@material-ui/icons/Close";
 import Dialog from "@material-ui/core/Dialog";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import FavoriteIcon from "@material-ui/icons/Favorite";
-import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
-import JSONPretty from "react-json-pretty";
-import JSONPrettyMon from "react-json-pretty/dist/acai";
 import MuiDialogActions from "@material-ui/core/DialogActions";
 import MuiDialogContent from "@material-ui/core/DialogContent";
 import MuiDialogTitle from "@material-ui/core/DialogTitle";
-import NavLink from "./NavLink";
-import Paper from "@material-ui/core/Paper";
 import SaveSettingsDefaults from "./SaveSettingsDefaults";
 import SaveSettingsFavourites from "./SaveSettingsFavourites";
-import SaveSettingsPanel from "./SaveSettingsDefaults";
-import SearchIcon from "@material-ui/icons/Search";
 import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
 import Tab from "@material-ui/core/Tab";
 import Tabs from "@material-ui/core/Tabs";
 import Typography from "@material-ui/core/Typography";
-import YAML from "yaml";
 import { compose } from "recompose";
-import { favouriteButton } from "./SearchHeaderButtons";
-import qs from "../functions/qs";
-import { queryPropList } from "./ReportEdit";
 import styles from "./Styles.scss";
-import { useLocalStorage } from "usehooks-ts";
-import { useNavigate } from "@reach/router";
 import withSearchIndex from "../hocs/withSearchIndex";
 import withTaxonomy from "../hocs/withTaxonomy";
 

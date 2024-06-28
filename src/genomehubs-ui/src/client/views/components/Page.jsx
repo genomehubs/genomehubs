@@ -265,12 +265,12 @@ const Page = ({
           direction="row"
           ref={rootRef}
         >
-          <Grid item xs={11}>
+          <Grid item xs={6}>
             {title}
           </Grid>
 
-          <Grid item xs={1} style={{ textAlign: "end" }}>
-            <SearchHeaderButtons rootRef={rootRef} />
+          <Grid item xs={6} style={{ textAlign: "end" }}>
+            <SearchHeaderButtons rootRef={rootRef} showFavourite showName />
           </Grid>
         </Grid>
       )}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import Button from "@material-ui/core/Button";
 import EditIcon from "@material-ui/icons/Edit";
@@ -6,7 +6,6 @@ import MuiDialogContent from "@material-ui/core/DialogContent";
 import PublishIcon from "@material-ui/icons/Publish";
 import SaveIcon from "@material-ui/icons/SaveAlt";
 import YamlEditor from "@focus-reactive/react-yaml";
-import classnames from "classnames";
 import { compose } from "recompose";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
