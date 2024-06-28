@@ -70,6 +70,7 @@ const SearchBox = ({
   let options = qs.parse(location.search.replace(/^\?/, ""));
   const formRef = useRef(null);
   const searchBoxRef = useRef(null);
+  const rootRef = useRef(null);
   const searchInputRef = useRef(null);
   const savedOptions = useReadLocalStorage(`${searchIndex}Options`);
   let [multiline, setMultiline] = useState(() => {
@@ -116,9 +117,9 @@ const SearchBox = ({
     if (!options.hasOwnProperty("includeEstimates")) {
       options.includeEstimates = searchDefaults.includeEstimates;
     }
-    if (!options.hasOwnProperty("summaryValues")) {
-      options.summaryValues = "count";
-    }
+    // if (!options.hasOwnProperty("summaryValues")) {
+    //   options.summaryValues = "count";
+    // }
     if (!options.hasOwnProperty("fields")) {
       options.fields = fields;
     }
@@ -216,7 +217,7 @@ const SearchBox = ({
     searchText += ` (e.g. ${suggestedTerm})`;
   }
   return (
-    <Grid container alignItems="center" direction="column">
+    <Grid container alignItems="center" direction="column" ref={rootRef}>
       <form
         onSubmit={handleSubmit}
         ref={formRef}

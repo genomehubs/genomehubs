@@ -236,40 +236,7 @@ export const ReportEdit = ({
 
   let props = queryPropList[report];
 
-  const defaultState = () => {
-    let obj = {};
-    if (!query || !report || !queryPropList[report]) {
-      return obj;
-    }
-    for (let queryProp of queryPropList[report]) {
-      let prop;
-      let defaultValue = "";
-      if (Array.isArray(queryProp)) {
-        prop = queryProp[0];
-      } else if (typeof queryProp === "object" && queryProp !== null) {
-        ({ prop, defaultValue } = queryProp);
-      } else {
-        prop = queryProp;
-      }
-      if (prop == "xField") {
-        continue;
-      }
-      if (prop == "report" && query[prop] == "xInY") {
-        query[prop] = "arc";
-      }
-      obj[prop] = query.hasOwnProperty(prop) ? query[prop] : defaultValue;
-      if (prop == "x" && obj[prop]) {
-        obj.xField = "";
-        for (let part of obj[prop].split(/\s+/)) {
-          if (types.hasOwnProperty(part)) {
-            obj.xField = part;
-            break;
-          }
-        }
-      }
-    }
-    return obj;
-  };
+  const defaultState = setQueryProps(query, report, types);
   useEffect(() => {
     if (Object.keys(values).length == 0) {
       setValues(defaultState());
@@ -749,3 +716,40 @@ export default compose(
   withReportById,
   dispatchReport
 )(ReportEdit);
+
+export const setQueryProps = (query, report, types) => {
+  return () => {
+    let obj = {};
+    if (!query || !report || !queryPropList[report]) {
+      return obj;
+    }
+    for (let queryProp of queryPropList[report]) {
+      let prop;
+      let defaultValue = "";
+      if (Array.isArray(queryProp)) {
+        prop = queryProp[0];
+      } else if (typeof queryProp === "object" && queryProp !== null) {
+        ({ prop, defaultValue } = queryProp);
+      } else {
+        prop = queryProp;
+      }
+      if (prop == "xField") {
+        continue;
+      }
+      if (prop == "report" && query[prop] == "xInY") {
+        query[prop] = "arc";
+      }
+      obj[prop] = query.hasOwnProperty(prop) ? query[prop] : defaultValue;
+      if (prop == "x" && obj[prop]) {
+        obj.xField = "";
+        for (let part of obj[prop].split(/\s+/)) {
+          if (types.hasOwnProperty(part)) {
+            obj.xField = part;
+            break;
+          }
+        }
+      }
+    }
+    return obj;
+  };
+};

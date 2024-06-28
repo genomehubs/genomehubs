@@ -1,6 +1,7 @@
-import React, { memo } from "react";
+import React, { memo, useRef } from "react";
 
 import { Router } from "@reach/router";
+import SearchHeaderButtons from "./SearchHeaderButtons";
 import SiteName from "./SiteName";
 import Tabs from "./Tabs";
 import TabsFixed from "./TabsFixed";
@@ -11,6 +12,7 @@ import withColors from "../hocs/withColors";
 const basename = BASENAME || "";
 
 const Header = ({ id, levels }) => {
+  const rootRef = useRef(null);
   let style = {};
   let colors;
   switch (id) {
@@ -60,7 +62,10 @@ const Header = ({ id, levels }) => {
     style = { background: `repeating-linear-gradient(${stops.join(", ")})` };
   }
   return (
-    <header style={style}>
+    <header style={style} ref={rootRef}>
+      <div className={styles.searchIcon}>
+        <SearchHeaderButtons color={"white"} rootRef={rootRef} />
+      </div>
       <div style={{ float: "left" }} className={styles.siteText}>
         <SiteName logo />
       </div>
