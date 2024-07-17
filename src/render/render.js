@@ -1,5 +1,6 @@
 import { PuppeteerCrawler } from "@crawlee/puppeteer";
 import fs from "fs";
+import path from "path";
 
 const outputFileName = "output.pdf";
 
@@ -58,8 +59,8 @@ const crawler = new PuppeteerCrawler({
     );
 
     // Create a new top-level div
-    const topLevelDiv = "<div>" + elements.join("") + "</div>";
-    const modifiedTopLevelDiv = topLevelDiv
+    const mainContent = elements.join("");
+    const modifiedMainContent = mainContent
       .replace(/\n/g, "")
       .replace(/\s+/g, " ")
       .replace(/>\s+/g, ">")
@@ -71,8 +72,17 @@ const crawler = new PuppeteerCrawler({
       .replace(/<p>We use cookies.+?<\/p>/gi, "")
       .replace(/<svg\b[^>]*>.*?<\/svg>/gi, "");
 
+    // Replace the existing mainContainer div with the content of modifiedTopLevelDiv
+    await page.$eval(
+      "#app",
+      (element, modifiedMainContent) => {
+        element.innerHTML = modifiedMainContent;
+      },
+      modifiedMainContent
+    );
     // Save the modified HTML to a file
-    fs.writeFileSync("page.html", modifiedTopLevelDiv);
+    fs.mkdirSync(request.userData.htmlDir, { recursive: true });
+    fs.writeFileSync(request.userData.htmlFile, await page.content());
     // Save the HTML to a file
     // const modifiedAppDiv = appDiv
     //   .replace(/\n/g, "")
@@ -108,9 +118,102 @@ const crawler = new PuppeteerCrawler({
   },
 });
 
-await crawler.addRequests(["https://goat.genomehubs.org/projects/ebp"]);
+// Get the directory path from the GH_PAGES_PATH environment variable
+const staticPagesDir = process.env.GH_PAGES_PATH;
 
-// Run the crawler and wait for it to finish.
+const generateFileList = (tabTree, root = "/", fileList) => {
+  if (!fileList) {
+    fileList = new Set();
+  }
+  for (let key of Object.keys(tabTree)) {
+    if (tabTree[key] === null) {
+      fileList.add(`${root}${key}`);
+    } else if (Array.isArray(tabTree[key])) {
+      fileList.add(`${root}${key}`);
+      for (let link of tabTree[key]) {
+        fileList.add(link);
+      }
+    } else {
+      fileList.add(`${root}${key}`);
+      fileList.add(
+        ...generateFileList(tabTree[key], `${root}${key}/`, fileList)
+      );
+    }
+  }
+  return fileList;
+};
+
+const generateTabTree = (tabsFilePath = "./tabs.md") => {
+  // Read the tabs.md file
+  const tabsFileContent = fs.readFileSync(tabsFilePath, "utf8");
+
+  // Extract the list entries from the tabs.md file
+  const listEntries = tabsFileContent.match(/- .+/g);
+
+  // Create the tabTree object
+  const tabTree = {};
+
+  // Add the list entries to the tabTree object
+  listEntries.forEach((entry) => {
+    const hasChildren = entry.endsWith("+");
+    const absolute = entry.substring(2).startsWith("/");
+    const tabName = entry
+      .substring(2)
+      .replace(/[^\w\-]/g, "")
+      .toLowerCase();
+    if (hasChildren) {
+      tabTree[tabName] = generateTabTree(
+        tabsFilePath.replace(".md", `-${tabName}.md`)
+      );
+    } else {
+      const subDir = tabsFilePath
+        .replace(staticPagesDir, "")
+        .replace(/tabs-*/, "")
+        .replace(".md", "");
+      const filePath = absolute
+        ? path.join(staticPagesDir, `${tabName}.md`)
+        : path.join(staticPagesDir, subDir, `${tabName}.md`);
+      if (!fs.existsSync(filePath)) {
+        return;
+      }
+      const fileContent = fs.readFileSync(filePath, "utf8");
+      const links = (fileContent.match(/\[.*?\]\((.*?)\)/g) || [])
+        .map((link) => {
+          let m = link.match(/\[.*?\]\((.*?)\)/);
+          return m && m[1].toLowerCase();
+        })
+        .filter(
+          (link) =>
+            link &&
+            link.startsWith(subDir) &&
+            fs.existsSync(path.join(staticPagesDir, `${link}.md`))
+        );
+      if (links && links.length > 0) {
+        tabTree[tabName] = links;
+      } else {
+        tabTree[tabName] = null;
+      }
+    }
+  });
+  return tabTree;
+};
+
+const tabsFilePath = path.join(staticPagesDir, "tabs.md");
+const tabTree = generateTabTree(tabsFilePath);
+const fileList = ["/", ...generateFileList(tabTree)];
+
+await crawler.addRequests(
+  fileList.map((location) => {
+    let htmlDir = path.join("./rendered", location);
+    let htmlFile = path.join("./rendered", location, "index.html");
+    return {
+      url: `https://goat.genomehubs.org${location}`,
+      userData: { htmlDir, htmlFile },
+    };
+  })
+);
+
+// // // Run the crawler and wait for it to finish.
 await crawler.run();
 
 console.log("Crawler finished.");

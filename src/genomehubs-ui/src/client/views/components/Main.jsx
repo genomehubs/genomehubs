@@ -13,7 +13,6 @@ import SourcesPage from "./SourcesPage";
 import TypesPage from "./TypesPage";
 import classnames from "classnames";
 import { compose } from "recompose";
-import loadable from "@loadable/component";
 import styles from "./Styles.scss";
 import withRoutes from "../hocs/withRoutes";
 import withSiteName from "../hocs/withSiteName";

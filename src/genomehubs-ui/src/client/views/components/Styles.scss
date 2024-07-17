@@ -72,6 +72,10 @@ body,
   position:relative
 }
 
+.fadeIn { opacity: 1; transition: opacity 0.5s ease; }
+.fadeOut { opacity: 0; transition: opacity 0.5s ease; }
+
+
 * {
   @include themify($themes) {
     // background: inherit;
@@ -116,6 +120,101 @@ body,
       a:link, a:visited {
         color: themed("secondary");
       }
+    }
+
+
+
+    .loadingScreen {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      top: 0;
+      background-color: themed("primary");
+      color: themed("secondary");
+      z-index: 10000;
+
+      .loadingContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center align the children horizontally */
+        justify-content: center; /* Center align the children vertically */
+
+        animation: pulse 2s infinite;
+      }
+
+      .loadingLogo {
+        position: relative;
+      }
+
+      .loader {
+        // position: fixed;
+        width: 15em;
+        height: 15em;
+        margin: auto;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        padding: 0.75em;
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.5;
+        }
+      }
+      
+      // .loader:before,
+      // .loader:after {
+      //   position: absolute;
+      //   background: themed("secondary");
+      //   content: "";
+      //   width: 1.5em;
+      //   height: 1.5em;
+      //   left: 0;
+      //   top: 0;
+      //   border-radius: 50%;
+      //   animation: square 4s linear infinite;
+      //   will-change: transform; /* Add this line */
+      // }
+      
+      // .loader:after {
+      //   background: themed("secondary");
+      //   animation-delay: -2s;
+      // }
+      
+      // @keyframes square {
+      //   0%, 100% {
+      //     left: 0;
+      //     top: 0;
+      //     transform: translate(0, 0);
+      //   }
+      //   25% {
+      //     left: 100%;
+      //     top: 0;
+      //     transform: translate(-100%, 0);
+      //   }
+      //   50% {
+      //     left: 100%;
+      //     top: 100%;
+      //     transform: translate(-100%, -100%);
+      //   }
+      //   75% {
+      //     left: 0;
+      //     top: 100%;
+      //     transform: translate(0, -100%);
+      //   }
+      // }
     }
 
     .active:hover {
