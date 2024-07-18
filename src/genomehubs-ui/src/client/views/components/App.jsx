@@ -29,7 +29,7 @@ const App = ({ theme, cookies, loading }) => {
         <div style={{ position: "relative", height: "100%", width: "100%" }}>
           <div
             className={classnames(`theme${theme}`, styles.app)}
-            style={{ overflow: loading ? "hidden" : "visible" }}
+            // style={{ overflow: loading ? "hidden" : "visible" }}
           >
             <div id="theme-base" className={styles.infoPanel} />
             <ReactErrorBoundary>

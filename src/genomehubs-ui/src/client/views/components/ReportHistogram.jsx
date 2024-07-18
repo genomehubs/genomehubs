@@ -323,6 +323,7 @@ const ReportHistogram = ({
   stacked,
   cumulative,
   yScale = "linear",
+  message,
   setMessage,
   colors,
   levels,
@@ -343,7 +344,7 @@ const ReportHistogram = ({
     ? useResize(containerRef)
     : useResize(componentRef);
   useEffect(() => {
-    if (histogram && histogram.status) {
+    if (inModal && message && histogram && histogram.status) {
       setMessage(null);
     }
   }, [histogram]);

@@ -10,7 +10,6 @@ const LoadingScreen = ({ types, basename, siteName, loading, setLoading }) => {
   const [show, setShow] = useState(loading);
 
   useEffect(() => {
-    console.log(loading);
     if (loading == "finished") {
       // Start the fade out animation
       const timer = setTimeout(() => {

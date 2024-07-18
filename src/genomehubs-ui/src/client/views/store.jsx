@@ -9,9 +9,9 @@ const loggerMiddleware = createLogger();
 
 let timer;
 
-const customMiddleWare = (store) => (next) => (action) => {
+const loadingMiddleWare = (store) => (next) => (action) => {
   if (!store.getState().loading) {
-    return;
+    return next(action);
   }
   if (action.type === "SET_LOADING") {
     return next(action);
@@ -28,7 +28,7 @@ const store = createStore(
   applyMiddleware(
     // loggerMiddleware,
     thunkMiddleware,
-    customMiddleWare
+    loadingMiddleWare
   )
 );
 

@@ -997,6 +997,7 @@ const ReportScatter = ({
   compactWidth = 400,
   ratio,
   zScale = "linear",
+  message,
   setMessage,
   reportSelect,
   reportTerm,
@@ -1023,7 +1024,7 @@ const ReportScatter = ({
     ? useResize(containerRef)
     : useResize(componentRef);
   useEffect(() => {
-    if (scatter && scatter.status) {
+    if (inModal && message && scatter && scatter.status) {
       setMessage(null);
     }
   }, [scatter]);
