@@ -13,7 +13,7 @@ import SearchToggles from "./SearchToggles";
 import Template from "./Template";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
-import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
+// import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
 import { getSuggestedTerm } from "../reducers/search";
 import { makeStyles } from "@material-ui/core/styles";
 import qs from "../functions/qs";
@@ -62,7 +62,6 @@ const SearchBox = ({
   types,
   synonyms,
   basename,
-  setLiveQuery,
 }) => {
   const classes = useStyles();
   const navigate = useNavigate();
@@ -81,6 +80,7 @@ const SearchBox = ({
   });
   let [result, setResult] = useState(searchIndex);
   const [showSearchBox, setShowSearchBox] = useState(false);
+  const [liveQuery, setLiveQuery] = useState("");
 
   let toggleTemplate;
   if (options && options.searchTemplate) {
@@ -143,8 +143,9 @@ const SearchBox = ({
         if (
           savedOptions.hasOwnProperty(keyName) &&
           !options.hasOwnProperty(keyName)
-        )
+        ) {
           options[keyName] = savedOptions[keyName];
+        }
       });
     }
     fetchSearchResults(options);
@@ -155,10 +156,14 @@ const SearchBox = ({
   };
 
   const wrap_term = ({ term, taxWrap, result }) => {
-    if (result && result == "taxon" && !term.match(/[\(\)<>=]/)) {
-      if (!types[term] && !synonyms[term]) {
-        term = `${taxWrap}(${term})`;
-      }
+    if (
+      result &&
+      result == "taxon" &&
+      !term.match(/[\(\)<>=]/) &&
+      !types[term] &&
+      !synonyms[term]
+    ) {
+      term = `${taxWrap}(${term})`;
     }
     return term;
   };
@@ -226,7 +231,7 @@ const SearchBox = ({
           width: "100%",
         }}
       >
-        <SearchInputQueries />
+        <SearchInputQueries liveQuery={liveQuery} />
         <Grid item>
           <Grid container direction="row" alignItems="center">
             <Grid item xs={2}></Grid>
@@ -309,6 +314,6 @@ export default compose(
   withTypes,
   withSearch,
   withSearchDefaults,
-  withLookup,
-  dispatchLiveQuery
+  withLookup
+  // dispatchLiveQuery
 )(SearchBox);

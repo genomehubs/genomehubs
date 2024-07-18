@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef } from "react";
+import React, { memo, useRef } from "react";
 
 import ReportItem from "./ReportItem";
 import { compose } from "recompose";
@@ -127,7 +127,6 @@ const Report = ({
         ? reportProps.plotRatio
         : reportProps.ratio;
   }
-
   return (
     <ReportItem
       id={reportProps.id}
@@ -138,4 +137,4 @@ const Report = ({
   );
 };
 
-export default compose(withTaxonomy)(Report);
+export default compose(memo, withTaxonomy)(Report);

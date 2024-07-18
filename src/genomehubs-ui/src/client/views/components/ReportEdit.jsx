@@ -232,7 +232,7 @@ export const ReportEdit = ({
   if (query.report == "scatter" && !query.plotRatio) {
     query.plotRatio = "auto";
   }
-  let result = query.result;
+  let { result } = query;
 
   let props = queryPropList[report];
 
@@ -277,8 +277,7 @@ export const ReportEdit = ({
     e.stopPropagation();
     setValues({
       ...values,
-      [queryProp]:
-        values[queryProp] && values[queryProp] != "false" ? false : true,
+      [queryProp]: !(values[queryProp] && values[queryProp] != "false"),
     });
   };
 
@@ -332,7 +331,9 @@ export const ReportEdit = ({
     }
     if (!location.pathname.startsWith(basename + "/report")) {
       queryObj.query = queryObj.query || queryObj.x;
-      if (queryObj.x) delete queryObj.x;
+      if (queryObj.x) {
+        delete queryObj.x;
+      }
       if (queryObj.rank && !queryObj.query.match("tax_rank")) {
         queryObj.query += ` AND tax_rank(${queryObj.rank})`;
       }

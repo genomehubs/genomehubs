@@ -45,8 +45,7 @@ export const ReportFull = ({
   }
 
   const windowDimensions = useWindowDimensions();
-  let height = windowDimensions.height;
-  let width = windowDimensions.width;
+  let { height, width } = windowDimensions;
   let marginLeft = 0;
   let modal = false;
   if (Object.keys(modalStyle).length > 0) {

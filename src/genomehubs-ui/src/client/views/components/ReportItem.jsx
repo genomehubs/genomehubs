@@ -180,10 +180,13 @@ const ReportItem = ({
   }, [reportId, visible]);
 
   let status;
-  if (reportById && reportById.report && reportById.report[report]) {
-    if (reportById.report[report].status) {
-      status = reportById.report[report].status;
-    }
+  if (
+    reportById &&
+    reportById.report &&
+    reportById.report[report] &&
+    reportById.report[report].status
+  ) {
+    status = reportById.report[report].status;
   }
 
   useEffect(() => {
@@ -464,8 +467,8 @@ const ReportItem = ({
       case "xPerRank":
         if (fixedRatio && fixedRatio == 1) {
           fixedRatio = 1.5;
-          if (reportById.report && Array.isArray(reportById.report.xPerRank));
-          fixedRatio = 100;
+          // if (reportById.report && Array.isArray(reportById.report.xPerRank));
+          // fixedRatio = 100;
 
           captionPadding = reportById.report.xPerRank.length * 27;
         }
@@ -487,21 +490,18 @@ const ReportItem = ({
   }
 
   setDimensions = ({ width, height, inModal }) => {
-    if (inModal) {
-      if (fixedRatio) {
-        if (height > width / fixedRatio) {
-          let plotHeight = width / fixedRatio;
-          return {
-            plotWidth: width,
-            plotHeight: width / fixedRatio,
-          };
-        } else {
-          let plotWidth = height * fixedRatio;
-          return {
-            plotWidth,
-            plotHeight: height,
-          };
-        }
+    if (inModal && fixedRatio) {
+      if (height > width / fixedRatio) {
+        return {
+          plotWidth: width,
+          plotHeight: width / fixedRatio,
+        };
+      } else {
+        let plotWidth = height * fixedRatio;
+        return {
+          plotWidth,
+          plotHeight: height,
+        };
       }
     }
     if (fixedRatio) {

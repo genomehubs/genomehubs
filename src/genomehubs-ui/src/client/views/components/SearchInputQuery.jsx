@@ -1,22 +1,11 @@
-import React, { memo, useEffect, useRef, useState } from "react";
+import React, { memo, useRef, useState } from "react";
 
 import AutoCompleteInput from "./AutoCompleteInput";
 import FormControl from "@material-ui/core/FormControl";
 import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import Popper from "@material-ui/core/Popper";
-import SearchIcon from "@material-ui/icons/Search";
-import SearchToggles from "./SearchToggles";
-import Tooltip from "./Tooltip";
 import { compose } from "recompose";
-import { getSuggestedTerm } from "../reducers/search";
 import { makeStyles } from "@material-ui/core/styles";
-import qs from "../functions/qs";
-import { useNavigate } from "@reach/router";
-import { useReadLocalStorage } from "usehooks-ts";
 import withInputQueries from "../hocs/withInputQueries";
-import withLiveQuery from "../hocs/withLiveQuery";
-import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
 
 export const useStyles = makeStyles((theme) => ({
@@ -69,9 +58,6 @@ const SearchInputQuery = ({
             inputName={id}
             multiline={false}
             setMultiline={() => {}}
-            // handleSubmit={handleSubmit}
-            // doSearch={doSearch}
-            // setLiveQuery={setLiveQuery}
             result={searchIndex}
             multipart={true}
           />

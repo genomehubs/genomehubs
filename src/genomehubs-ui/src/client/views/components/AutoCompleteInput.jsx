@@ -6,9 +6,10 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import { PlacedPopper } from "./SearchBox";
 import TextField from "@material-ui/core/TextField";
 import { compose } from "recompose";
+import { fetchAutocomplete } from "../functions/autocomplete";
 // import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
 import styles from "./Styles.scss";
-import withAutocomplete from "../hocs/withAutocomplete";
+// import withAutocomplete from "../hocs/withAutocomplete";
 // import withSearchDefaults from "../hocs/withSearchDefaults";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
@@ -25,9 +26,6 @@ export const AutoCompleteInput = ({
   inputName,
   multiline,
   setMultiline = () => {},
-  autocompleteTerms,
-  fetchAutocomplete,
-  resetAutocomplete,
   handleSubmit = () => {},
   doSearch = () => {},
   size = "medium",
@@ -55,6 +53,7 @@ export const AutoCompleteInput = ({
   // let inValue = inputValue;
   // if (!setInputValue) {
   const [inValue, setInValue] = useState(inputValue);
+  const [autocompleteTerms, setAutocompleteTerms] = useState({});
   // }
   if (
     autocompleteTerms.status &&
@@ -90,114 +89,112 @@ export const AutoCompleteInput = ({
             <div className={styles.extra}>{`\u2014 ${result.type}`}</div>
           </div>
         );
-      } else {
-        if (autocompleteTerms.status.result == "taxon") {
-          if (result.reason) {
-            value = result.reason[0].fields["taxon_names.name.raw"][0];
-          } else {
-            value = result.result.scientific_name;
-          }
-          let extra = "";
-          let closure = "";
-          if (!prefix.match(/tax_\w+\(\s*/)) {
-            extra = "tax_name(";
-            if (!suffix.match(/^\s*\($/)) {
-              closure = ")";
-            }
-          }
-          let title = `${prefix}${extra}${result.result.taxon_id}[${value}]${closure}${suffix}`;
-
-          options.push({
-            value,
-            title,
-            prefix,
-            subTerm,
-            suffix,
-            result: "taxon",
-            unique_term: result.result.taxon_id,
-            taxon_id: result.result.taxon_id,
-            taxon_rank: result.result.taxon_rank,
-            scientific_name: result.result.scientific_name,
-            name_class: result.reason
-              ? result.reason[0].fields["taxon_names.class"]
-              : "taxon ID",
-            xref: Boolean(
-              result.reason &&
-                result.reason[0].fields["taxon_names.class"] &&
-                !result.reason[0].fields["taxon_names.class"][0].match(" name")
-            ),
-          });
-          terms.push(
-            <div key={i} className={styles.term}>
-              <span className={styles.value}>{value}</span>
-              <div
-                className={styles.extra}
-              >{`\u2014 ${result.result.taxon_rank}`}</div>
-            </div>
-          );
-        } else if (
-          autocompleteTerms.status.result == "assembly" ||
-          autocompleteTerms.status.result == "sample"
-        ) {
-          if (result.reason) {
-            value = result.reason[0].fields["identifiers.identifier.raw"][0];
-          } else {
-            value = result.result[`${autocompleteTerms.status.result}_id`];
-          }
-          options.push({
-            value,
-            title: `${prefix}${value}${suffix}`,
-            prefix,
-            subTerm,
-            suffix,
-            result: autocompleteTerms.status.result,
-            unique_term: result.result[`${autocompleteTerms.status.result}_id`],
-            taxon_id: result.result.taxon_id,
-            scientific_name: result.result.scientific_name,
-            [`${autocompleteTerms.status.result}_id`]:
-              result.result[`${autocompleteTerms.status.result}_id`],
-            identifier_class: result.reason
-              ? result.reason[0].fields["identifiers.class"]
-              : `${autocompleteTerms.status.result} ID`,
-          });
-          terms.push(
-            <div key={i} className={styles.term}>
-              <span className={styles.value}>{value}</span>
-              <div
-                className={styles.extra}
-              >{`\u2014 ${result.result.scientific_name}`}</div>
-            </div>
-          );
-        } else if (autocompleteTerms.status.result == "feature") {
-          if (result.reason) {
-            value = result.reason[0].fields["identifiers.identifier.raw"][0];
-          } else {
-            value = result.result.feature_id;
-          }
-          options.push({
-            value,
-            title: `${prefix}${value}${suffix}`,
-            prefix,
-            subTerm,
-            suffix,
-            result: "feature",
-            unique_term: result.result.feature_id,
-            taxon_id: result.result.taxon_id,
-            assembly_id: result.result.assembly_id,
-            feature_id: result.result.feature_id,
-            identifier_class: result.reason
-              ? result.reason[0].fields["identifiers.class"]
-              : "feature ID",
-          });
-          terms.push(
-            <div key={i} className={styles.term}>
-              <span className={styles.value}>{value}</span>
-              <div
-                className={styles.extra}
-              >{`\u2014 ${result.result.primary_type}`}</div>
-            </div>
-          );
+      } else if (autocompleteTerms.status.result == "taxon") {
+        if (result.reason) {
+          value = result.reason[0].fields["taxon_names.name.raw"][0];
+        } else {
+          value = result.result.scientific_name;
         }
+        let extra = "";
+        let closure = "";
+        if (!prefix.match(/tax_\w+\(\s*/)) {
+          extra = "tax_name(";
+          if (!suffix.match(/^\s*\($/)) {
+            closure = ")";
+          }
+        }
+        let title = `${prefix}${extra}${result.result.taxon_id}[${value}]${closure}${suffix}`;
+
+        options.push({
+          value,
+          title,
+          prefix,
+          subTerm,
+          suffix,
+          result: "taxon",
+          unique_term: result.result.taxon_id,
+          taxon_id: result.result.taxon_id,
+          taxon_rank: result.result.taxon_rank,
+          scientific_name: result.result.scientific_name,
+          name_class: result.reason
+            ? result.reason[0].fields["taxon_names.class"]
+            : "taxon ID",
+          xref: Boolean(
+            result.reason &&
+              result.reason[0].fields["taxon_names.class"] &&
+              !result.reason[0].fields["taxon_names.class"][0].match(" name")
+          ),
+        });
+        terms.push(
+          <div key={i} className={styles.term}>
+            <span className={styles.value}>{value}</span>
+            <div
+              className={styles.extra}
+            >{`\u2014 ${result.result.taxon_rank}`}</div>
+          </div>
+        );
+      } else if (
+        autocompleteTerms.status.result == "assembly" ||
+        autocompleteTerms.status.result == "sample"
+      ) {
+        if (result.reason) {
+          value = result.reason[0].fields["identifiers.identifier.raw"][0];
+        } else {
+          value = result.result[`${autocompleteTerms.status.result}_id`];
+        }
+        options.push({
+          value,
+          title: `${prefix}${value}${suffix}`,
+          prefix,
+          subTerm,
+          suffix,
+          result: autocompleteTerms.status.result,
+          unique_term: result.result[`${autocompleteTerms.status.result}_id`],
+          taxon_id: result.result.taxon_id,
+          scientific_name: result.result.scientific_name,
+          [`${autocompleteTerms.status.result}_id`]:
+            result.result[`${autocompleteTerms.status.result}_id`],
+          identifier_class: result.reason
+            ? result.reason[0].fields["identifiers.class"]
+            : `${autocompleteTerms.status.result} ID`,
+        });
+        terms.push(
+          <div key={i} className={styles.term}>
+            <span className={styles.value}>{value}</span>
+            <div
+              className={styles.extra}
+            >{`\u2014 ${result.result.scientific_name}`}</div>
+          </div>
+        );
+      } else if (autocompleteTerms.status.result == "feature") {
+        if (result.reason) {
+          value = result.reason[0].fields["identifiers.identifier.raw"][0];
+        } else {
+          value = result.result.feature_id;
+        }
+        options.push({
+          value,
+          title: `${prefix}${value}${suffix}`,
+          prefix,
+          subTerm,
+          suffix,
+          result: "feature",
+          unique_term: result.result.feature_id,
+          taxon_id: result.result.taxon_id,
+          assembly_id: result.result.assembly_id,
+          feature_id: result.result.feature_id,
+          identifier_class: result.reason
+            ? result.reason[0].fields["identifiers.class"]
+            : "feature ID",
+        });
+        terms.push(
+          <div key={i} className={styles.term}>
+            <span className={styles.value}>{value}</span>
+            <div
+              className={styles.extra}
+            >{`\u2014 ${result.result.primary_type}`}</div>
+          </div>
+        );
       }
     });
   }
@@ -328,19 +325,22 @@ export const AutoCompleteInput = ({
     setSubTerm(parts[section]);
     setActiveLookup(
       setTimeout(() => {
-        fetchAutocomplete({
+        let obj = fetchAutocomplete({
           lookupTerm: parts[section].replace(/^\s+/, ""),
           taxonomy,
           result:
             lastType?.type == "taxon"
               ? "taxon"
-              : queryResult
-              ? queryResult
-              : newPrefix
-              ? result
-              : undefined,
+              : queryResult || (newPrefix ? result : undefined),
           lastType: fixedType || lastType,
         });
+        if (obj instanceof Promise) {
+          obj.then((v) => {
+            setAutocompleteTerms(v);
+          });
+        } else {
+          setAutocompleteTerms(obj);
+        }
       }, 200)
     );
   };
@@ -367,7 +367,7 @@ export const AutoCompleteInput = ({
       }, 75);
     } else if (e) {
       let range = highlightRange();
-      let current = inputRef.current;
+      let { current } = inputRef;
       setTimeout(() => {
         range = highlightRange();
         try {
@@ -389,16 +389,14 @@ export const AutoCompleteInput = ({
     }
   };
   const handleHighlightChange = (e, option, reason) => {
-    if (multipart) {
-      if (e && option) {
-        if (reason == "mouse" && prefix.length == 0 && suffix.length == 0) {
-          setInValue(option.title);
-        }
-        let range = highlightRange(option.title);
-        setTimeout(() => {
-          inputRef.current.setSelectionRange(...range);
-        }, 20);
+    if (multipart && e && option) {
+      if (reason == "mouse" && prefix.length == 0 && suffix.length == 0) {
+        setInValue(option.title);
       }
+      let range = highlightRange(option.title);
+      setTimeout(() => {
+        inputRef.current.setSelectionRange(...range);
+      }, 20);
     }
   };
   const updateValue = (value) => {
@@ -427,7 +425,8 @@ export const AutoCompleteInput = ({
         if (e.key && e.key == "Enter") {
           updateValue(newValue);
         } else {
-          setLiveQuery(e.target.value || " ");
+          // disable for now
+          //setLiveQuery(e.target.value || " ");
         }
       }
     }
@@ -445,7 +444,7 @@ export const AutoCompleteInput = ({
         });
         // setInputValue(inputRef.current.value);
       }
-      resetAutocomplete();
+      setAutocompleteTerms({});
     }
   };
 
@@ -453,13 +452,13 @@ export const AutoCompleteInput = ({
     if (reason == "clear") {
       updateValue("");
       outerRef.current.blur();
-      resetAutocomplete();
+      setAutocompleteTerms({});
       return;
     }
     if (reason == "select-option") {
       updateValue(newValue.title);
       // setTimeout(() => {
-      resetAutocomplete();
+      setAutocompleteTerms({});
       if (multipart) {
         if (
           newValue.result == "assembly" ||
@@ -504,7 +503,7 @@ export const AutoCompleteInput = ({
         }
       }
     } else {
-      resetAutocomplete();
+      setAutocompleteTerms({});
       setMultiline(false);
     }
   };
@@ -550,10 +549,10 @@ export const AutoCompleteInput = ({
           }}
           variant={size == "small" ? "standard" : "outlined"}
           fullWidth
-          multiline={maxRows == 1 ? false : true}
+          multiline={maxRows != 1}
           maxRows={maxRows}
           onClick={() => {
-            resetAutocomplete();
+            setAutocompleteTerms({});
           }}
         />
       )}
@@ -570,8 +569,8 @@ export const AutoCompleteInput = ({
 export default compose(
   memo,
   withTaxonomy,
-  withTypes,
-  withAutocomplete
+  withTypes
+  // withAutocomplete
   // withSearchDefaults
   // dispatchLiveQuery
 )(AutoCompleteInput);
