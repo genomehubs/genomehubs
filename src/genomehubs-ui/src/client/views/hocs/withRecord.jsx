@@ -1,5 +1,4 @@
 import {
-  fetchRecord,
   getAttributeSettings,
   getCurrentRecord,
   getCurrentRecordId,
@@ -13,6 +12,7 @@ import {
 
 import React from "react";
 import { connect } from "react-redux";
+import { fetchRecord } from "../selectors/record";
 import { getLineage } from "../selectors/record";
 
 const withRecord = (WrappedComponent) => (props) => {

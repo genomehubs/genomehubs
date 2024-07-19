@@ -1,6 +1,6 @@
 import { batchActions } from "redux-batched-actions";
 import convert from "color-convert";
-import { getQueryValue } from "./reducers/location";
+// import { getQueryValue } from "./reducers/location";
 import { history } from "./reducers/history";
 import qs from "./functions/qs";
 
@@ -137,15 +137,15 @@ const mapDispatchToQuery = {
   },
 };
 
-export const defaultValue = (param) =>
-  mapDispatchToQuery[param].default || false;
+// export const defaultValue = (param) =>
+//   mapDispatchToQuery[param].default || false;
 
-export const qsDefault = (param) => {
-  console.log(param);
-  console.log(getQueryValue);
-  console.log(defaultValue);
-  return getQueryValue(param) || defaultValue(param);
-};
+// export const qsDefault = (param) => {
+//   console.log(param);
+//   console.log(getQueryValue);
+//   console.log(defaultValue);
+//   return getQueryValue(param) || defaultValue(param);
+// };
 
 export const queryToStore = (options = {}) => {
   return function (dispatch) {

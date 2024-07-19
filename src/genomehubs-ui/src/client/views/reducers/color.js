@@ -1,6 +1,5 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 import { createD3Palette, createPalette } from "./color/createPalette";
-import { createSelector, createSelectorCreator } from "reselect";
 import {
   interpolateCividis,
   interpolateCool,
@@ -20,9 +19,8 @@ import {
 
 import batlow from "./color/batlow";
 import batlowS from "./color/batlowS";
+import { createSelector } from "reselect";
 import immutableUpdate from "immutable-update";
-import paired12 from "./color/paired12";
-import store from "../store";
 
 export const ancestralColor = ANCESTRAL_COLOR || "red";
 export const descendantColor = DESCENDANT_COLOR || "orange";
@@ -69,10 +67,12 @@ export const palettes = handleActions(
         allIds: [...state.allIds, action.payload.id],
       }),
     EDIT_PALETTE: (state, action) => {
-      let id = action.payload.id;
-      let arr = action.payload[id].slice(0);
+      let { id } = action.payload;
+      let arr = action.payload[id].slice();
       state.byId[id].forEach((col, i) => {
-        if (!arr[i]) arr[i] = col;
+        if (!arr[i]) {
+          arr[i] = col;
+        }
       });
       return immutableUpdate(state, {
         byId: {
@@ -117,21 +117,6 @@ export const selectedPalette = handleAction(
   (state, action) => action.payload,
   "default"
 );
-
-// export const choosePalette = (palette) => {
-//   return function (dispatch) {
-//     let values = { palette };
-//     dispatch(queryToStore({ values }));
-//   };
-// };
-
-// export const chooseColors = (colors) => {
-//   return function (dispatch) {
-//     let existing = getColorPalette(store.getState());
-//     let values = { colors: { colors, existing } };
-//     dispatch(queryToStore({ values }));
-//   };
-// };
 
 export const getAllPalettes = (state) => state.palettes;
 

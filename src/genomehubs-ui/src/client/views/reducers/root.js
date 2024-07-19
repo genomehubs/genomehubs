@@ -16,7 +16,6 @@ import { recordReducers } from "./record";
 import { reportReducers } from "./report";
 import { routeReducers } from "./routes";
 import { searchReducers } from "./search";
-import { taxonomyRanks } from "../selectors/types";
 import { taxonomyReducers } from "./taxonomy";
 import { trackingReducers } from "./tracking";
 import { treeReducers } from "./tree";
@@ -52,9 +51,8 @@ const appReducer = combineReducers(allReducers);
 const rootReducer = (state, action) => {
   let newState = state;
   if (action.type === "REFRESH") {
-    let { cookieConsent, analytics, theme } = state;
+    let { cookieConsent, theme } = state;
     newState = {
-      analytics,
       cookieConsent,
       theme,
     };

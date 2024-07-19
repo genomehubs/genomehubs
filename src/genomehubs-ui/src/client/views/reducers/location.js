@@ -1,7 +1,5 @@
-import { createAction, handleAction, handleActions } from "redux-actions";
-import { getAnalytics, trackPage } from "./tracking";
+import { createAction, handleAction } from "redux-actions";
 
-import { byIdSelectorCreator } from "./selectorCreators";
 import { createSelector } from "reselect";
 import history from "./history";
 import qs from "../functions/qs";
@@ -106,28 +104,21 @@ export const updatePathname = (update = {}, remove = {}) => {
     let currentPathname = getPathname(state);
     let hash = getHashString(state);
     let search = getQueryString(state);
-    let id = getDatasetID(state);
     let views = getViews(state);
-    let static_url = state.staticURL;
     let newViews = {};
-    let primary = views.primary;
+    let { primary } = views;
     Object.keys(update).forEach((key) => {
       newViews[key] = update[key];
     });
     Object.keys(remove).forEach((key) => {
       delete newViews[key];
-      if (key == primary) primary = false;
+      if (key == primary) {
+        primary = false;
+      }
     });
     let pathname = viewsToPathname(newViews);
     if (pathname != currentPathname) {
       history.push({ pathname, hash, search });
-      if (getAnalytics(state)) {
-        trackPage(
-          pathname +
-            (search ? `?${search.replace(/^\?/, "")}` : "") +
-            (hash ? `#${hash}` : "")
-        );
-      }
       dispatch(setPathname(pathname));
     }
   };
@@ -201,10 +192,6 @@ window.onpopstate = (e) => {
 export const parseQueryString = createSelector(getQueryString, (str = "") =>
   qs.parse(str.replace("?", ""))
 );
-
-const createSelectorForQueryValue = byIdSelectorCreator();
-
-const _getQueryIdAsMemoKey = (queryId) => queryId;
 
 const getQueryId = (queryId) => queryId;
 

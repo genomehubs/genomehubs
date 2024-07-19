@@ -7,10 +7,7 @@ import { PlacedPopper } from "./SearchBox";
 import TextField from "@material-ui/core/TextField";
 import { compose } from "recompose";
 import { fetchAutocomplete } from "../functions/autocomplete";
-// import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
 import styles from "./Styles.scss";
-// import withAutocomplete from "../hocs/withAutocomplete";
-// import withSearchDefaults from "../hocs/withSearchDefaults";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -566,11 +563,4 @@ export const AutoCompleteInput = ({
   );
 };
 
-export default compose(
-  memo,
-  withTaxonomy,
-  withTypes
-  // withAutocomplete
-  // withSearchDefaults
-  // dispatchLiveQuery
-)(AutoCompleteInput);
+export default compose(memo, withTaxonomy, withTypes)(AutoCompleteInput);
