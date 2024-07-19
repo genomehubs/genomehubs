@@ -1,41 +1,31 @@
-import { Avatar, Chip, MenuItem } from "@material-ui/core";
+import { Avatar, Chip } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 
-import AutoCompleteInput from "./AutoCompleteInput";
-import AutorenewIcon from "@material-ui/icons/Autorenew";
-import BasicSelect from "./BasicSelect";
-import BasicTextField from "./BasicTextField";
-import Button from "@material-ui/core/Button";
 import Checkbox from "@material-ui/core/Checkbox";
-import CloseIcon from "@material-ui/icons/Close";
 import FilterListIcon from "@material-ui/icons/FilterList";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "./Tooltip";
-import Typography from "@material-ui/core/Typography";
 import styles from "./Styles.scss";
-import { useStyles } from "./QueryBuilder";
 
-const allowedSummaries = ({ field, types }) => {
-  let values = { value: "value" };
-  let possible = [
-    { key: "list", value: "length" },
-    { key: "max" },
-    { key: "min" },
-    { key: "range" },
-  ];
-  let summaries = types[field]?.summary || [];
-  if (!Array.isArray(summaries)) {
-    summaries = [summaries];
-  }
-  for (let obj of possible) {
-    if (summaries.includes(obj.key)) {
-      let summary = obj.value || obj.key;
-      values[summary] = summary;
-    }
-  }
-  return values;
-};
+// const allowedSummaries = ({ field, types }) => {
+//   let values = { value: "value" };
+//   let possible = [
+//     { key: "list", value: "length" },
+//     { key: "max" },
+//     { key: "min" },
+//     { key: "range" },
+//   ];
+//   let summaries = types[field]?.summary || [];
+//   if (!Array.isArray(summaries)) {
+//     summaries = [summaries];
+//   }
+//   for (let obj of possible) {
+//     if (summaries.includes(obj.key)) {
+//       let summary = obj.value || obj.key;
+//       values[summary] = summary;
+//     }
+//   }
+//   return values;
+// };
 
 const allowedOperators = ({ field, types, summary }) => {
   let operators = ["=", "==", "!="];
@@ -89,18 +79,10 @@ const ResultFilterInput = ({
   operator = "",
   value = "",
   summary = "value",
-  bool,
-  label,
-  fields,
-  type = types[field]?.type || "keyword",
-  handleVariableChange,
   handleOperatorChange,
-  handleSummaryChange,
   handleValueChange,
-  handleUpdate,
   handleDismiss,
 }) => {
-  const classes = useStyles();
   const [active, setActive] = useState(false);
   const [editable, setEditable] = useState(false);
   value = value == "undefined" || typeof value === "undefined" ? "" : value;

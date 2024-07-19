@@ -8,19 +8,18 @@ import ReportError from "./ReportError";
 import ReportHistogram from "./ReportHistogram";
 import ReportLoading from "./ReportLoading";
 import ReportMap from "./ReportMap";
-import ReportModal from "./ReportModal";
 import ReportScatter from "./ReportScatter";
 import ReportSources from "./ReportSources";
 import ReportTable from "./ReportTable";
 import ReportTree from "./ReportTree";
 import ReportTypes from "./ReportTypes";
+import ReportWrapper from "./ReportWrapper";
 import ReportXPerRank from "./ReportXPerRank";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
 import dispatchReport from "../hocs/dispatchReport";
 import { gridPropNames } from "../functions/propNames";
 import qs from "../functions/qs";
-import stringLength from "../functions/stringLength";
 import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
@@ -467,8 +466,9 @@ const ReportItem = ({
       case "xPerRank":
         if (fixedRatio && fixedRatio == 1) {
           fixedRatio = 1.5;
-          // if (reportById.report && Array.isArray(reportById.report.xPerRank));
-          // fixedRatio = 100;
+          if (reportById.report && Array.isArray(reportById.report.xPerRank)) {
+            fixedRatio = 100;
+          }
 
           captionPadding = reportById.report.xPerRank.length * 27;
         }
@@ -584,7 +584,8 @@ const ReportItem = ({
   );
   if (!inModal) {
     content = (
-      <ReportModal
+      <ReportWrapper
+        id="Modal"
         reportId={reportId}
         report={report}
         disableModal={disableModal}
@@ -593,7 +594,7 @@ const ReportItem = ({
         caption={caption}
       >
         {content}
-      </ReportModal>
+      </ReportWrapper>
     );
   }
   // if (reportById.report) {

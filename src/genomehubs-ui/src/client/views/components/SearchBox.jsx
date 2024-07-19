@@ -19,28 +19,13 @@ import { makeStyles } from "@material-ui/core/styles";
 import qs from "../functions/qs";
 import { siteName } from "../reducers/location";
 import { useReadLocalStorage } from "usehooks-ts";
+import { useStyles } from "./SearchBoxStyles";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
 import withSiteName from "../hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
-
-export const useStyles = makeStyles((theme) => ({
-  icon: {
-    color: theme.palette.text.secondary,
-    marginRight: theme.spacing(2),
-  },
-  formControl: {
-    marginTop: theme.spacing(2),
-    minWidth: "600px",
-  },
-  search: {
-    fontSize: "2em",
-    marginLeft: theme.spacing(1),
-    backgroundColor: "inherit",
-  },
-}));
 
 export const PlacedPopper = (props) => {
   return <Popper {...props} placement="bottom" />;
