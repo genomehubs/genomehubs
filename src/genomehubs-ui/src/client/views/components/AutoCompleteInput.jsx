@@ -3,7 +3,7 @@ import React, { memo, useRef, useState } from "react";
 import AutoCompleteOption from "./AutoCompleteOption";
 import AutoCompleteSuggestion from "./AutoCompleteSuggestion";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import { PlacedPopper } from "./SearchBox";
+import Popper from "@material-ui/core/Popper";
 import TextField from "@material-ui/core/TextField";
 import { compose } from "recompose";
 import { fetchAutocomplete } from "../functions/autocomplete";
@@ -11,6 +11,9 @@ import styles from "./Styles.scss";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
+export const PlacedPopper = (props) => {
+  return <Popper {...props} placement="bottom" />;
+};
 export const AutoCompleteInput = ({
   id = "main-search",
   required,

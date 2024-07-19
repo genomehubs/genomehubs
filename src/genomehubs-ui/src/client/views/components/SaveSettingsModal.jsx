@@ -8,11 +8,11 @@ import IconButton from "@material-ui/core/IconButton";
 import MuiDialogActions from "@material-ui/core/DialogActions";
 import MuiDialogContent from "@material-ui/core/DialogContent";
 import MuiDialogTitle from "@material-ui/core/DialogTitle";
+import MuiTab from "@material-ui/core/Tab";
+import MuiTabs from "@material-ui/core/Tabs";
 import SaveSettingsDefaults from "./SaveSettingsDefaults";
 import SaveSettingsFavourites from "./SaveSettingsFavourites";
 import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
-import Tab from "@material-ui/core/Tab";
-import Tabs from "@material-ui/core/Tabs";
 import Typography from "@material-ui/core/Typography";
 import { compose } from "recompose";
 import styles from "./Styles.scss";
@@ -113,17 +113,17 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
       // fullWidth={true}
     >
       <DialogContent className={classes.paper}>
-        <Tabs
+        <MuiTabs
           value={tabValue}
           onChange={handleTabChange}
           indicatorColor="primary"
           // textColor="default"
           aria-label="icon label tabs example"
         >
-          <Tab icon={<FavoriteIcon />} label="FAVORITES" />
-          <Tab icon={<SettingsApplicationsIcon />} label="DEFAULTS" />
-        </Tabs>
-        <Tabs
+          <MuiTab icon={<FavoriteIcon />} label="FAVORITES" />
+          <MuiTab icon={<SettingsApplicationsIcon />} label="DEFAULTS" />
+        </MuiTabs>
+        <MuiTabs
           value={secondaryTabValue}
           onChange={handleSecondaryTabChange}
           indicatorColor="secondary"
@@ -131,9 +131,9 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
           aria-label="icon label tabs example"
         >
           {activeIndices.map((index) => (
-            <Tab key={index} label={index} />
+            <MuiTab key={index} label={index} />
           ))}
-        </Tabs>
+        </MuiTabs>
         {/* <DialogTitle id="customized-dialog-title" onClose={handleClose}>
           Search Settings
         </DialogTitle> */}
