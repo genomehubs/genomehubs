@@ -53,6 +53,20 @@ app.use(
 
 app.use(GH_BASENAME, express.static(path.resolve(__dirname, "public")));
 
+app.use(
+  `${
+    GH_BASENAME > "/" ? `${GH_BASENAME}/${directories[0]}` : `${directories[0]}`
+  }`,
+  express.static("/genomehubs/local/render", {
+    eTag: false,
+    maxAge: 0,
+  })
+);
+
+app.use(GH_BASENAME, express.static(path.resolve(__dirname, "render")));
+
+app.use(GH_BASENAME, express.static(path.resolve(__dirname, "public")));
+
 // handle every other route with index.html, which will contain
 // a script tag to your application's JavaScript file(s).
 app.get("*", function (req, res) {

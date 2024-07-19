@@ -340,13 +340,11 @@ const QueryBuilder = ({
     }
     if (id == "filter") {
       value = e.target.checked ? "tax_tree" : "tax_eq";
-    } else if (id == "rank") {
-      if (value != "") {
-        setMoreOptions({
-          ...moreOptions,
-          includeEstimates: true,
-        });
-      }
+    } else if (id == "rank" && value != "") {
+      setMoreOptions({
+        ...moreOptions,
+        includeEstimates: true,
+      });
     }
     setTaxFilter({
       ...taxFilter,
@@ -362,8 +360,7 @@ const QueryBuilder = ({
       result: index,
       taxonomy,
     };
-    let includeDescendants = options.includeDescendants;
-    let includeEstimates = options.includeEstimates;
+    let { includeDescendants, includeEstimates } = options;
     setSearchDefaults({
       includeDescendants,
       includeEstimates,

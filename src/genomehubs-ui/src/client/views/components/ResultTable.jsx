@@ -1,24 +1,20 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import { useLocation, useNavigate } from "@reach/router";
 
-import AdjustIcon from "@material-ui/icons/Adjust";
 import AggregationIcon from "./AggregationIcon";
 import Badge from "@material-ui/core/Badge";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import Checkbox from "@material-ui/core/Checkbox";
 import Citation from "./Citation";
-import DescriptionIcon from "@material-ui/icons/Description";
 import DownloadButton from "./DownloadButton";
 import FiberManualRecordSharpIcon from "@material-ui/icons/FiberManualRecordSharp";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import Grid from "@material-ui/core/Grid";
-import Grow from "@material-ui/core/Grow";
 import IconButton from "@material-ui/core/IconButton";
 import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
-import LaunchIcon from "@material-ui/icons/Launch";
 import LinkButton from "./LinkButton";
 import MuiTableCell from "@material-ui/core/TableCell";
 import RadioButtonCheckedOutlinedIcon from "@material-ui/icons/RadioButtonCheckedOutlined";
@@ -29,8 +25,6 @@ import ResultModalControl from "./ResultModalControl";
 import SearchPagination from "./SearchPagination";
 import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
 import SettingsIcon from "@material-ui/icons/Settings";
-import Skeleton from "@material-ui/lab/Skeleton";
-import Tab from "./Tab";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableContainer from "@material-ui/core/TableContainer";
@@ -103,23 +97,6 @@ export const useStyles = makeStyles((theme) => ({
     position: "absolute",
     top: 20,
     width: 1,
-  },
-  modal: {
-    display: "flex",
-    padding: theme.spacing(1),
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  paper: {
-    width: 400,
-    maxWidth: "75vw",
-    maxHeight: "75vh",
-    backgroundColor: theme.palette.background.paper,
-    border: "2px solid #000",
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-    cursor: "default",
-    outline: 0,
   },
 }));
 

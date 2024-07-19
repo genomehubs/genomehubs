@@ -2,17 +2,35 @@ import AttributeModal from "./AttributeModal";
 import DialogContent from "@material-ui/core/DialogContent";
 import Modal from "@material-ui/core/Modal";
 import React from "react";
-import { attributeSettings } from "../reducers/record";
 import { compose } from "recompose";
-import { useStyles } from "./ResultTable";
+import { makeStyles } from "@material-ui/core/styles";
 import withRecord from "../hocs/withRecord";
+
+export const useStyles = makeStyles((theme) => ({
+  modal: {
+    display: "flex",
+    padding: theme.spacing(1),
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  paper: {
+    width: 400,
+    maxWidth: "75vw",
+    maxHeight: "75vh",
+    backgroundColor: theme.palette.background.paper,
+    border: "2px solid #000",
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+    cursor: "default",
+    outline: 0,
+  },
+}));
 
 export const ResultModalControl = ({
   attributeSettings,
   setAttributeSettings,
   resetRecord,
   adjustColumns,
-  rootRef,
 }) => {
   let { currentRecordId, attributeId, showAttribute } = attributeSettings;
   const classes = useStyles();

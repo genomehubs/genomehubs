@@ -1,6 +1,5 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 import { createD3Palette, createPalette } from "./color/createPalette";
-import { createSelector, createSelectorCreator } from "reselect";
 import {
   interpolateCividis,
   interpolateCool,
@@ -20,9 +19,8 @@ import {
 
 import batlow from "./color/batlow";
 import batlowS from "./color/batlowS";
+import { createSelector } from "reselect";
 import immutableUpdate from "immutable-update";
-import paired12 from "./color/paired12";
-import store from "../store";
 
 export const ancestralColor = ANCESTRAL_COLOR || "red";
 export const descendantColor = DESCENDANT_COLOR || "orange";
@@ -34,16 +32,18 @@ export const addPalette = createAction("ADD_PALETTE");
 export const editPalette = createAction("EDIT_PALETTE");
 
 const brewerPalette = [
-  "rgb(31,120,180)",
-  "rgb(166,206,227)",
-  "rgb(51,160,44)",
-  "rgb(178,223,138)",
-  "rgb(227,26,28)",
-  "rgb(251,154,153)",
-  "rgb(255,127,0)",
-  "rgb(253,191,111)",
-  "rgb(106,61,154)",
-  "rgb(202,178,214)",
+  "#1f78b4",
+  "#a6cee3",
+  "#33a02c",
+  "#b2df8a",
+  "#e31a1c",
+  "#fb9a99",
+  "#ff7f00",
+  "#fdbf6f",
+  "#6a3d9a",
+  "#cab2d6",
+  "#b15928",
+  "#ffff99",
 ];
 
 const bhmPalette = ["#202125", "#bd3829", "#ee8623", "#42632e"];
@@ -69,10 +69,12 @@ export const palettes = handleActions(
         allIds: [...state.allIds, action.payload.id],
       }),
     EDIT_PALETTE: (state, action) => {
-      let id = action.payload.id;
-      let arr = action.payload[id].slice(0);
+      let { id } = action.payload;
+      let arr = action.payload[id].slice();
       state.byId[id].forEach((col, i) => {
-        if (!arr[i]) arr[i] = col;
+        if (!arr[i]) {
+          arr[i] = col;
+        }
       });
       return immutableUpdate(state, {
         byId: {
@@ -117,21 +119,6 @@ export const selectedPalette = handleAction(
   (state, action) => action.payload,
   "default"
 );
-
-// export const choosePalette = (palette) => {
-//   return function (dispatch) {
-//     let values = { palette };
-//     dispatch(queryToStore({ values }));
-//   };
-// };
-
-// export const chooseColors = (colors) => {
-//   return function (dispatch) {
-//     let existing = getColorPalette(store.getState());
-//     let values = { colors: { colors, existing } };
-//     dispatch(queryToStore({ values }));
-//   };
-// };
 
 export const getAllPalettes = (state) => state.palettes;
 

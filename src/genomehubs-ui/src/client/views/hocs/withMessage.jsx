@@ -9,7 +9,7 @@ const withMessage = (WrappedComponent) => (props) => {
   });
 
   const mapDispatchToProps = (dispatch) => ({
-    setMessage: (message) => dispatch(setMessage(message)),
+    setMessage: (message) => {}, //dispatch(setMessage(message)),
   });
 
   const Connected = connect(

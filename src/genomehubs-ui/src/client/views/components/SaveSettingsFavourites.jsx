@@ -5,14 +5,14 @@ import Button from "@material-ui/core/Button";
 import EditIcon from "@material-ui/icons/Edit";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import FavouriteButton from "./FavouriteButton";
 import MuiDialogContent from "@material-ui/core/DialogContent";
 import SearchIcon from "@material-ui/icons/Search";
 import Typography from "@material-ui/core/Typography";
 import YamlEditor from "@focus-reactive/react-yaml";
 import { compose } from "recompose";
-import { favouriteButton } from "./SearchHeaderButtons";
 import qs from "../functions/qs";
-import { splitTerms } from "./SearchHeaderButtons";
+import { splitTerms } from "../functions/splitTerms";
 import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
 import { useNavigate } from "@reach/router";
@@ -129,14 +129,17 @@ const SaveSettingsFavourites = ({
         ? searchTerm.query
         : currentFavourites[key];
 
-    let favButton = favouriteButton({
-      isFavourite: !remove[key],
-      handleClickFavourite: (e) => {
-        e.stopPropagation();
-        setRemove({ ...remove, [key]: !remove[key] });
-      },
-      name,
-    });
+    let favButton = (
+      <FavouriteButton
+        isFavourite={!remove[key]}
+        handleClickFavourite={(e) => {
+          e.stopPropagation();
+          setRemove({ ...remove, [key]: !remove[key] });
+        }}
+        name={name}
+      />
+    );
+
     favListings.push(
       <div key={i} className={styles.favListing}>
         <div className={styles.favListingContainer}>

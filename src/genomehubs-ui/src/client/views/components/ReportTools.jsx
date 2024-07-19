@@ -17,7 +17,7 @@ import SelectIcon from "@material-ui/icons/SelectAll";
 import TocIcon from "@material-ui/icons/Toc";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
-import { useStyles } from "./ReportModal";
+import { useStyles } from "./ReportModalStyles";
 import withReportTerm from "../hocs/withReportTerm";
 import withSiteName from "../hocs/withSiteName";
 

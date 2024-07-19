@@ -12,7 +12,7 @@ import {
   YAxis,
   ZAxis,
 } from "recharts";
-import React, { useEffect, useRef, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import formats, { setInterval } from "../functions/formats";
 import stringLength, { maxStringLength } from "../functions/stringLength";
 import { useLocation, useNavigate } from "@reach/router";
@@ -528,12 +528,12 @@ const CustomizedYAxisTick = ({
     payload,
     orientation: side,
   } = props;
-  let value = payload.value;
+  let { value } = payload;
   let offset = 0;
   let h = height / (buckets.length - 1);
   let centered;
   let ttValue;
-  if (yLabels[index] != payload.value) {
+  if (yLabels[index] != value) {
     value = yLabels[index] || "";
     if (valueType == "coordinate") {
       let yScale = scaleLinear().domain(bounds.domain).range([0, height]);
@@ -679,7 +679,7 @@ const Heatmap = ({
 }) => {
   const fadeColor = ({ hex, i, active }) => {
     let [h, s, l] = hexToHSL(hex);
-    let lighten = active !== false ? (i == active ? false : true) : false;
+    let lighten = active !== false ? i != active : false;
     if (lighten) {
       s = 15; // s / 2;
       l = (l + 100) / 2;
@@ -997,6 +997,7 @@ const ReportScatter = ({
   compactWidth = 400,
   ratio,
   zScale = "linear",
+  message,
   setMessage,
   reportSelect,
   reportTerm,
@@ -1018,12 +1019,12 @@ const ReportScatter = ({
   const navigate = useNavigate();
   const location = useLocation();
   const [highlight, setHighlight] = useState([]);
-  const componentRef = chartRef ? chartRef : useRef();
+  const componentRef = chartRef || useRef();
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
   useEffect(() => {
-    if (scatter && scatter.status) {
+    if (inModal && message && scatter && scatter.status) {
       setMessage(null);
     }
   }, [scatter]);
@@ -1097,10 +1098,12 @@ const ReportScatter = ({
     }
     let xLabel = xOptions[4] || scatter.report.xLabel;
     let yLabel = yOptions[4] || scatter.report.yLabel;
-    let valueType = heatmaps.valueType;
-    let yValueType = heatmaps.yValueType || "integer";
-    let summary = heatmaps.summary;
-    let ySummary = heatmaps.ySummary || "value";
+    let {
+      valueType,
+      summary,
+      yValueType = "integer",
+      ySummary = "value",
+    } = heatmaps;
     let lastIndex = heatmaps.buckets.length - 2;
     let interval;
     if (valueType == "date") {
@@ -1220,16 +1223,8 @@ const ReportScatter = ({
           maxXLabel,
           xLabel: scatter.report.xLabel,
           yLabel: scatter.report.yLabel,
-          showXTickLabels: xOptions[2]
-            ? xOptions[2] >= 0
-              ? true
-              : false
-            : true,
-          showYTickLabels: yOptions[2]
-            ? yOptions[2] >= 0
-              ? true
-              : false
-            : true,
+          showXTickLabels: xOptions[2] ? xOptions[2] >= 0 : true,
+          showYTickLabels: yOptions[2] ? yOptions[2] >= 0 : true,
           xFormat,
           yFormat,
           orientation,
@@ -1271,6 +1266,7 @@ const ReportScatter = ({
 };
 
 export default compose(
+  memo,
   withSiteName,
   dispatchMessage,
   withColors,

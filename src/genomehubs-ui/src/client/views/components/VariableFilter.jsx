@@ -9,7 +9,6 @@ import IconButton from "@material-ui/core/IconButton";
 import { MenuItem } from "@material-ui/core";
 import React from "react";
 import Typography from "@material-ui/core/Typography";
-import { useStyles } from "./QueryBuilder";
 
 const allowedSummaries = ({ field, types }) => {
   let values = { value: "value" };
@@ -70,7 +69,6 @@ const VariableFilter = ({
   handleUpdate,
   handleDismiss,
 }) => {
-  const classes = useStyles();
   operator = operator == "undefined" ? "" : operator;
   field = field == "undefined" ? "" : field;
   summary = summary == "undefined" ? "" : summary;

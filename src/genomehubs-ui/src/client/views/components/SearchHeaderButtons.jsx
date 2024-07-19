@@ -2,62 +2,16 @@ import React, { useState } from "react";
 
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import FavoriteIcon from "@material-ui/icons/Favorite";
+import FavouriteButton from "./FavouriteButton";
 import IconButton from "@material-ui/core/IconButton";
 import SaveSettingsModal from "./SaveSettingsModal";
 import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
+import { splitTerms } from "../functions/splitTerms";
 import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
 import withSearch from "../hocs/withSearch";
-
-const reportParams = {
-  report: false,
-  y: false,
-  z: false,
-  cat: false,
-  pointSize: 15,
-  rank: false,
-  stacked: false,
-  yScale: "linear",
-  cumulative: false,
-  compactLegend: false,
-  catToX: false,
-};
-
-const searchParams = {
-  query: false,
-  result: false,
-  includeEstimates: "false",
-  summaryValues: "count",
-  taxonomy: "ncbi",
-  size: 10,
-  offset: 0,
-  fields: "",
-  names: "",
-  ranks: "",
-};
-
-export const splitTerms = (terms) => {
-  let searchTerm = {};
-  let reportTerm = {};
-  for (let key in terms) {
-    if (reportParams[key] !== undefined) {
-      if (reportParams[key] === false) {
-        reportTerm[key] = terms[key];
-      } else if (reportParams[key] != terms[key]) {
-        reportTerm[key] = terms[key];
-      }
-    } else if (searchParams.hasOwnProperty(key)) {
-      if (searchParams[key] != terms[key]) {
-        searchTerm[key] = terms[key];
-      }
-    } else {
-      searchTerm[key] = terms[key];
-    }
-  }
-  return { searchTerm, reportTerm: reportTerm.report ? reportTerm : undefined };
-};
 
 const SearchHeaderButtons = ({
   rootRef,
@@ -103,12 +57,13 @@ const SearchHeaderButtons = ({
         </span>
       );
     }
-    favButton = favouriteButton({
-      isFavourite,
-      handleClickFavourite,
-      name,
-      color,
-    });
+    favButton = (
+      <FavouriteButton
+        isFavourite={isFavourite}
+        handleClickFavourite={handleClickFavourite}
+        color={color}
+      />
+    );
   }
 
   let settingsButton = (
@@ -143,33 +98,3 @@ const SearchHeaderButtons = ({
 };
 
 export default compose(withSearch)(SearchHeaderButtons);
-
-export const favouriteButton = ({
-  isFavourite,
-  handleClickFavourite,
-  color = "inherit",
-}) => {
-  return (
-    <Tooltip
-      title={
-        isFavourite
-          ? "remove search from favourites"
-          : "add search to favourites"
-      }
-      arrow
-      placement={"top"}
-    >
-      <IconButton
-        className={styles.saveSearchOptions}
-        aria-label="save search to favourites"
-        onClick={handleClickFavourite}
-      >
-        {isFavourite ? (
-          <FavoriteIcon style={{ color }} />
-        ) : (
-          <FavoriteBorderIcon style={{ color }} />
-        )}
-      </IconButton>
-    </Tooltip>
-  );
-};
