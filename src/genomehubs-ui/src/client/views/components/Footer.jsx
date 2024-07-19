@@ -85,7 +85,9 @@ const Footer = ({
     );
   }
   let colors =
-    levels.default.length > 6 ? levels[6] : levels.default.slice(0, 6);
+    levels.default.length > 6
+      ? levels[6] || levels.default.slice(0, 6)
+      : levels.default.slice(0, 6);
   let palette = <PalettePreview colors={colors} size="2em" />;
 
   let settingsPopup = (

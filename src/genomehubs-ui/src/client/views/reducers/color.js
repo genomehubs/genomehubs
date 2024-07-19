@@ -32,16 +32,18 @@ export const addPalette = createAction("ADD_PALETTE");
 export const editPalette = createAction("EDIT_PALETTE");
 
 const brewerPalette = [
-  "rgb(31,120,180)",
-  "rgb(166,206,227)",
-  "rgb(51,160,44)",
-  "rgb(178,223,138)",
-  "rgb(227,26,28)",
-  "rgb(251,154,153)",
-  "rgb(255,127,0)",
-  "rgb(253,191,111)",
-  "rgb(106,61,154)",
-  "rgb(202,178,214)",
+  "#1f78b4",
+  "#a6cee3",
+  "#33a02c",
+  "#b2df8a",
+  "#e31a1c",
+  "#fb9a99",
+  "#ff7f00",
+  "#fdbf6f",
+  "#6a3d9a",
+  "#cab2d6",
+  "#b15928",
+  "#ffff99",
 ];
 
 const bhmPalette = ["#202125", "#bd3829", "#ee8623", "#42632e"];

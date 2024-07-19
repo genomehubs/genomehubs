@@ -1,3 +1,5 @@
+import convert from "color-convert";
+
 export const setColors = ({
   colorPalette,
   palettes,
@@ -31,7 +33,15 @@ export const setColors = ({
       }
     }
   }
-  return { levels, colors };
+  return {
+    levels,
+    colors: colors.map((c) => {
+      if (c.match("rgb")) {
+        return `#${convert.rgb.hex(c.split("(")[1].split(")")[0])}`;
+      }
+      return c;
+    }),
+  };
 };
 
 export default setColors;
