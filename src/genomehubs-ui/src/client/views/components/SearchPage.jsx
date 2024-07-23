@@ -118,7 +118,7 @@ const SearchPage = ({
     : searchResults.status
     ? searchResults.status.hits
     : 0;
-  results = <ResultTable />;
+  results = resultCount > -1 ? <ResultTable /> : null;
   let report;
   if (searchResultArray.length > 0) {
     report = <ReportPanel options={options} />;

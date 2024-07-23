@@ -3,6 +3,7 @@ import {
   getCurrentRecord,
   getRecords,
   receiveRecord,
+  requestRecord,
   resetRecord,
   setBrowse,
 } from "../reducers/record";
