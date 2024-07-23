@@ -537,7 +537,7 @@ const Markdown = ({
         fetchPages(pageId);
       }
     }
-  }, [pgId, pageId, pagesIsFetching]);
+  }, [pgId, pageId, pagesIsFetching, pagesById]);
   const { contents, ast } = compile(
     fillTemplateValues(pagesById, {
       ...extra,

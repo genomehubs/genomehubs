@@ -3,13 +3,7 @@ import React, { memo } from "react";
 import Grid from "@material-ui/core/Grid";
 import Markdown from "./Markdown";
 import NavLink from "./NavLink";
-import Tab from "./Tab";
-import classnames from "classnames";
 import { compose } from "recompose";
-// import withPages from "../hocs/withPages";
-// import dispatchTerms from "../hocs/dispatchTerms";
-import qs from "../functions/qs";
-import styles from "./Styles.scss";
 import withSiteName from "../hocs/withSiteName";
 
 const Terms = ({ basename }) => {
