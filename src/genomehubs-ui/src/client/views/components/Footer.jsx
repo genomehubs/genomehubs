@@ -63,8 +63,8 @@ const Footer = ({
       selectPalette(currentPalette);
     }
   }, [currentPalette, levels]);
-  if (hidden) {
-    return null;
+  if (!taxonomy || hidden) {
+    return <Taxonomy display={false} />;
   }
 
   let dataRelease;

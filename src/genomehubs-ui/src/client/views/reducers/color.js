@@ -177,9 +177,25 @@ export const theme = handleAction(
 );
 export const getTheme = (state) => state.theme;
 
+export const getStatusColors = (state) => state.statusColors;
+
+export const setStatusColors = createAction("STATUS_COLORS");
+export const statusColors = handleAction(
+  "STATUS_COLORS",
+  (state, action) => action.payload,
+  {
+    ancestral: ancestralColor,
+    descendant: descendantColor,
+    direct: directColor,
+    descendantHighlight,
+    directHighlight,
+  }
+);
+
 export const colorReducers = {
   palettes,
   selectedPalette,
   colorScheme,
   theme,
+  statusColors,
 };

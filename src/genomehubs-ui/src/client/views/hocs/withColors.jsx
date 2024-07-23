@@ -6,6 +6,7 @@ import {
   directHighlight,
   getAllPalettes,
   getDefaultPalette,
+  getStatusColors,
   selectPalette,
 } from "../reducers/color";
 
@@ -25,6 +26,16 @@ const COLORS = [
   "#cab2d6",
 ];
 
+function hashCode(string) {
+  var hash = 0;
+  for (var i = 0; i < string.length; i++) {
+    var code = string.charCodeAt(i);
+    hash = (hash << 5) - hash + code;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+}
+
 const withColors = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => {
     let { id, colors, levels } = getDefaultPalette(state);
@@ -32,13 +43,7 @@ const withColors = (WrappedComponent) => (props) => {
       id,
       colors,
       levels,
-      statusColors: {
-        ancestral: ancestralColor,
-        descendant: descendantColor,
-        direct: directColor,
-        descendantHighlight,
-        directHighlight,
-      },
+      statusColors: getStatusColors(state),
       palettes: getAllPalettes(state),
     };
   };
