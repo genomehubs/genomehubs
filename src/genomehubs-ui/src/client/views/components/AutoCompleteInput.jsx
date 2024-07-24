@@ -21,6 +21,7 @@ export const AutoCompleteInput = ({
   searchDefaults,
   inputValue,
   setInputValue,
+  handleBlur = (e) => setInputValue(e.target.value),
   inputRef,
   inputLabel,
   inputName,
@@ -507,9 +508,9 @@ export const AutoCompleteInput = ({
       setMultiline(false);
     }
   };
-  const handleBlur = (e) => {
-    setInputValue(e.target.value);
-  };
+  // const handleBlur = (e) => {
+  //   setInputValue(e.target.value);
+  // };
   return (
     <Autocomplete
       id={id}

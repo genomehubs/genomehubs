@@ -145,7 +145,7 @@ const SearchBox = ({
   };
 
   const doSearch = (queryString, result, hashTerm) => {
-    setLookupTerm(queryString);
+    // setLookupTerm(queryString);
     let taxWrap = "tax_name";
     if (searchDefaults.includeDescendants) {
       taxWrap = "tax_tree";
@@ -216,6 +216,7 @@ const SearchBox = ({
                 <AutoCompleteInput
                   inputValue={lookupTerm}
                   setInputValue={setLookupTerm}
+                  handleBlur={() => {}}
                   inputRef={searchInputRef}
                   inputLabel={searchText}
                   inputName={"query"}

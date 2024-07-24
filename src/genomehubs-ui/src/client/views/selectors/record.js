@@ -14,8 +14,10 @@ import { getCurrentTaxonomy } from "../reducers/taxonomy";
 import store from "../store";
 
 export const getLineage = createSelector(getCurrentRecord, (record) => {
-  if (!record || !record.record) return undefined;
-  let lineage = {
+  if (!record || !record.record) {
+    return undefined;
+  }
+  return {
     taxon: {
       taxon_id: record.record.taxon_id,
       scientific_name: record.record.scientific_name,
@@ -23,8 +25,6 @@ export const getLineage = createSelector(getCurrentRecord, (record) => {
     },
     lineage: record.record.lineage,
   };
-
-  return lineage;
 });
 
 export function fetchRecord(recordId, result, taxonomy, callback) {
