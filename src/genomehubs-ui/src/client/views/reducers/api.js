@@ -1,6 +1,6 @@
 import { createAction, handleAction } from "redux-actions";
 
-export const getApiURL = () => {
+const defaultApiUrl = () => {
   if (
     window &&
     window.process &&
@@ -12,7 +12,15 @@ export const getApiURL = () => {
   return API_URL || "api/v1";
 };
 
-export const apiUrl = getApiURL();
+export const apiUrl = defaultApiUrl();
+
+export const setApiUrl = createAction("SET_API_URL");
+export const apiUrlValue = handleAction(
+  "SET_API_URL",
+  (state, action) => action.payload,
+  defaultApiUrl()
+);
+export const getApiUrl = (state) => state.apiUrlValue;
 
 export const setApiStatus = createAction("SET_API_STATUS");
 export const apiStatus = handleAction(
@@ -31,6 +39,7 @@ export const apiAttempt = handleAction(
 export const getApiAttempt = (state) => state.apiAttempt;
 
 export const apiReducers = {
+  apiUrl,
   apiAttempt,
   apiStatus,
 };

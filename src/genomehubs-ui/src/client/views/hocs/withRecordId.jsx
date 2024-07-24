@@ -1,6 +1,7 @@
+import { getCurrentRecordId, setCurrentRecordId } from "../reducers/record";
+
 import React from "react";
 import { connect } from "react-redux";
-import { getCurrentRecordId } from "../reducers/record";
 
 const withRecordId = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({

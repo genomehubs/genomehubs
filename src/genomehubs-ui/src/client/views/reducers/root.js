@@ -9,6 +9,7 @@ import { fileReducers } from "./file";
 import { geographyReducers } from "./geography";
 import { loadingReducers } from "./loading";
 import { lookupReducers } from "./lookup";
+import { mapReducers } from "./map";
 import { messageReducers } from "./message";
 import { pageReducers } from "./pages";
 import { phylopicReducers } from "./phylopic";
@@ -33,6 +34,7 @@ const allReducers = Object.assign(
   geographyReducers,
   loadingReducers,
   lookupReducers,
+  mapReducers,
   messageReducers,
   pageReducers,
   phylopicReducers,

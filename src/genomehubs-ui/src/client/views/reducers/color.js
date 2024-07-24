@@ -61,6 +61,8 @@ const pridePalette = [
   "#FFAFC7",
 ];
 
+const ringsPalette = ["#3e76ec", "#FFCE01", "#000000", "#179A13", "#FF0000"];
+
 export const palettes = handleActions(
   {
     ADD_PALETTE: (state, action) =>
@@ -101,6 +103,7 @@ export const palettes = handleActions(
       paired: createD3Palette(schemePaired, 12),
       plasma: createD3Palette(interpolatePlasma, 50),
       pride: { id: "pride", default: pridePalette, levels: [] },
+      rings: { id: "rings", default: ringsPalette, levels: [] },
       standard: { id: "default", default: brewerPalette, levels: [] },
       tableau: createD3Palette(schemeTableau10, 10),
       turbo: createD3Palette(interpolateTurbo, 50),
@@ -126,14 +129,14 @@ export const getColorPalette = createSelector(
   getSelectedPalette,
   getAllPalettes,
   (id, palettes) => {
-    let colors = palettes ? palettes.byId[id] : [];
+    let colors = palettes ? palettes.byId[id] || palettes.byId["default"] : [];
     return { id, colors };
   }
 );
 
 export const getUserPalette = createSelector(getAllPalettes, (palettes) => {
   let id = "user";
-  let colors = palettes ? palettes.byId[id] : [];
+  let colors = palettes ? palettes.byId[id] || palettes.byId["default"] : [];
   return { id, colors };
 });
 
@@ -141,7 +144,7 @@ export const getDefaultPalette = createSelector(
   getSelectedPalette,
   getAllPalettes,
   (id, palettes) => {
-    let levels = palettes ? palettes.byId[id] : {};
+    let levels = palettes ? palettes.byId[id] || palettes.byId["default"] : {};
     return { id, colors: levels.default, levels };
   }
 );
