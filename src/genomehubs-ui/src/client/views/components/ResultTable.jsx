@@ -873,6 +873,29 @@ const ResultTable = ({
       `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`
     );
   };
+
+  const setColSpan = ({ type, maxColSpan = 0 }) => {
+    let [name, summary] = type.name.split(":");
+    let fieldName = name;
+    if (type.return_type) {
+      if (!summary) {
+        summary = type.return_type;
+      } else {
+        fieldName = `${name}:${summary}`;
+      }
+    }
+    let colSpan = 0;
+    let colCount = 0;
+    if (!summary || summary == "value") {
+      colCount = constraints[name]?.length || 0;
+    }
+    if (colCount > 0 && expandColumns[type.field]) {
+      colSpan = colCount;
+      maxColSpan = Math.max(colSpan, maxColSpan);
+    }
+    return { fieldName, summary, colCount, colSpan, maxColSpan };
+  };
+
   let rows = searchResults.results.map((result) => {
     let name = result.result.scientific_name;
     let currentRecordId = result.result.taxon_id;
@@ -983,21 +1006,9 @@ const ResultTable = ({
     }
 
     expandedTypes.forEach((type) => {
-      let colSpan = 0;
-      let colCount = constraints[type.field]?.length || 0;
-      if (colCount > 0 && expandColumns[type.field]) {
-        colSpan = colCount;
-        maxColSpan = Math.max(colSpan, maxColSpan);
-      }
-      let [name, summary] = type.name.split(":");
-      let fieldName = name;
-      if (type.return_type) {
-        if (!summary) {
-          summary = type.return_type;
-        } else {
-          fieldName = `${name}:${summary}`;
-        }
-      }
+      let { fieldName, summary, colCount, colSpan } = setColSpan({
+        type,
+      });
       if (
         result.result.fields &&
         result.result.fields.hasOwnProperty(fieldName)
@@ -1125,11 +1136,13 @@ const ResultTable = ({
             values = [];
           }
           let added = new Set();
-          constraints[type.field].forEach((key, i) => {
+          let fieldConstraints =
+            constraints[type.field.replace(/:.+$/, "")] || [];
+          fieldConstraints.forEach((key, i) => {
             let lcKey = key.toLowerCase();
             let css = setCellClassName(
               i,
-              constraints[type.field].length,
+              fieldConstraints.length,
               expandColumns[type.field]
             );
             let color = type.color || type.file_paths?.[lcKey]?.color;
@@ -1405,12 +1418,11 @@ const ResultTable = ({
     if (type.processed_type == "geo_point") {
     } else {
     }
-    let colSpan = 0;
-    let colCount = constraints[type.field]?.length || 0;
-    if (colCount > 0 && expandColumns[type.field]) {
-      colSpan = colCount;
-      maxColSpan = Math.max(colSpan, maxColSpan);
-    }
+    let colCount, colSpan;
+    ({ colCount, colSpan, maxColSpan } = setColSpan({
+      type,
+      maxColSpan,
+    }));
     heads.push(
       <SortableCell
         key={`${type.name}_${type.summary}`}
@@ -1442,6 +1454,8 @@ const ResultTable = ({
         }}
       />
     );
+
+    let fieldConstraints = constraints[type.field.replace(/:.+$/, "")] || [];
     filters.push(
       <ResultFilter
         key={`${type.name}_${type.summary}`}
@@ -1452,14 +1466,14 @@ const ResultTable = ({
         TableCell={colSpan > 0 ? SpanTableCell : TableCell}
         value={""}
         fieldMeta={types[type.name]}
-        constraints={constraints[type.field]}
+        constraints={fieldConstraints}
       />
     );
     if (colSpan > 0) {
-      constraints[type.field].forEach((v, i) => {
+      fieldConstraints.forEach((v, i) => {
         let css = setCellClassName(
           i,
-          constraints[type.field].length,
+          fieldConstraints.length,
           expandColumns[type.field]
         );
         let color = type.color || type.file_paths?.[v]?.color;
