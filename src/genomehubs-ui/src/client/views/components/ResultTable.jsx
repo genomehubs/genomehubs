@@ -715,6 +715,7 @@ const ResultTable = ({
   };
 
   const handleToggleColSpan = (id, colSpan, linked) => {
+    // currently unable to make this persist without a page reload
     if (linked) {
       let fields = searchTerm.fields
         ? searchTerm.fields.split(",")
@@ -781,10 +782,26 @@ const ResultTable = ({
           })}`
         );
       }
-    } else if (colSpan > 0) {
-      setSearchDefaults({ expandColumns: { ...expandColumns, [id]: false } });
     } else {
-      setSearchDefaults({ expandColumns: { ...expandColumns, [id]: true } });
+      let newExpandColumns = { ...expandColumns };
+      if (colSpan > 0) {
+        console.log("collapse", id);
+        newExpandColumns[id] = false;
+        setSearchDefaults({ expandColumns: newExpandColumns });
+      } else {
+        console.log("expand", id);
+        newExpandColumns[id] = true;
+        setSearchDefaults({ expandColumns: newExpandColumns });
+      }
+      // let expand = Object.entries(newExpandColumns)
+      //   .filter(([k, v]) => v)
+      //   .map(([k]) => k);
+      // navigate(
+      //   `${basename}${location.pathname}?${qs.stringify({
+      //     ...searchTerm,
+      //     expand: expand.join(","),
+      //   })}`
+      // );
     }
   };
 
@@ -876,6 +893,7 @@ const ResultTable = ({
 
   const setColSpan = ({ type, maxColSpan = 0 }) => {
     let [name, summary] = type.name.split(":");
+    let fullName = type.field.match(/\./) ? type.field : name;
     let fieldName = name;
     if (type.return_type) {
       if (!summary) {
@@ -887,7 +905,7 @@ const ResultTable = ({
     let colSpan = 0;
     let colCount = 0;
     if (!summary || summary == "value") {
-      colCount = constraints[name]?.length || 0;
+      colCount = constraints[fullName]?.length || 0;
     }
     if (colCount > 0 && expandColumns[type.field]) {
       colSpan = colCount;

@@ -1,12 +1,9 @@
 import React, { useCallback, useRef, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
 
 import Tooltip from "./Tooltip";
 import Typography from "@material-ui/core/Typography";
-import classnames from "classnames";
 import { compose } from "recompose";
 import { scaleLog } from "d3-scale";
-import styles from "./Styles.scss";
 import { useLongPress } from "use-long-press";
 import withTypes from "../hocs/withTypes";
 
@@ -172,7 +169,6 @@ const ReportTreeRings = ({
     });
   }
 
-  css = undefined;
   return (
     <div
       style={{
