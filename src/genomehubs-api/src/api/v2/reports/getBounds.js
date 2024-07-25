@@ -221,7 +221,7 @@ export const getBounds = async ({
       tickCount = Math.abs(opts[2]);
     }
   }
-  let stats = aggs.stats;
+  let { stats } = aggs;
   if (stats) {
     // Set domain to nice numbers
     if (!min || !max) {
@@ -301,7 +301,7 @@ export const getBounds = async ({
       domain = [min, max].map((v) => v * 1);
     }
   } else {
-    let keywords = aggs.keywords;
+    let { keywords } = aggs;
     if (keywords) {
       let { cats, by } = await getCatsBy({
         terms: keywords,
@@ -324,13 +324,13 @@ export const getBounds = async ({
     } else {
       stats = { count: res.status.hits };
     }
-    let geo = aggs.geo;
+    let { geo } = aggs;
     if (geo) {
       stats = stats || {};
       stats.geo = geo;
     }
   }
-  let terms = aggs.terms;
+  let { terms } = aggs;
   let cats;
   let by;
   if (terms) {

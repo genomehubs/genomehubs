@@ -214,11 +214,19 @@ const getHistogram = async ({
             continue;
           }
           let x = result.result.fields[field][xSumm];
-          if (valueType == "keyword" && !xKeys.has(x.toLowerCase())) {
+          if (
+            valueType == "keyword" &&
+            xSumm == "value" &&
+            !xKeys.has(x.toLowerCase())
+          ) {
             continue;
           }
           let y = result.result.fields[yField][ySumm];
-          if (yValueType == "keyword" && !yKeys.has(y.toLowerCase())) {
+          if (
+            yValueType == "keyword" &&
+            ySumm == "value" &&
+            !yKeys.has(y.toLowerCase())
+          ) {
             continue;
           }
           if (valueType == "date") {
