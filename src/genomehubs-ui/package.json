@@ -1,6 +1,6 @@
 {
   "name": "genomehubs-ui",
-  "version": "2.8.22",
+  "version": "2.8.23",
   "description": "Frontend for GenomeHubs",
   "main": "index.js",
   "scripts": {
