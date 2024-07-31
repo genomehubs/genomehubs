@@ -785,11 +785,9 @@ const ResultTable = ({
     } else {
       let newExpandColumns = { ...expandColumns };
       if (colSpan > 0) {
-        console.log("collapse", id);
         newExpandColumns[id] = false;
         setSearchDefaults({ expandColumns: newExpandColumns });
       } else {
-        console.log("expand", id);
         newExpandColumns[id] = true;
         setSearchDefaults({ expandColumns: newExpandColumns });
       }
@@ -1056,6 +1054,8 @@ const ResultTable = ({
         } else {
           value = field.value;
         }
+        // uncomment to use binned value if available
+        // value = field.hasOwnProperty("binned") ? field.binned : value;
         if (colSpan == 0) {
           let entries = [];
           if (Array.isArray(value)) {

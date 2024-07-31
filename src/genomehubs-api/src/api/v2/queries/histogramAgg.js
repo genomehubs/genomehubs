@@ -106,12 +106,10 @@ export const histogramAgg = async ({
   let fieldKey = `attributes${rawValues ? ".values" : ""}.`;
   if (!summary || summary == "value") {
     fieldKey += `${meta.type}_value`;
+  } else if (meta.type == "date") {
+    fieldKey += dateSummary[summary] || `${meta.type}_value`;
   } else {
-    if (meta.type == "date") {
-      fieldKey += dateSummary[summary] || `${meta.type}_value`;
-    } else {
-      fieldKey += summary;
-    }
+    fieldKey += summary;
   }
   return {
     [histKey]: {

@@ -8,11 +8,13 @@ import {
 
 import { formatCsv } from "../functions/formatCsv";
 import { formatJson } from "../functions/formatJson";
+import { getBounds } from "../reports/getBounds";
 import { getResults } from "../functions/getResults";
 import { indexName } from "../functions/indexName";
 import { logError } from "../functions/logger";
 import { lookupAlternateIds } from "../functions/lookupAlternateIds";
 import { parseFields } from "../functions/parseFields";
+import { queryParams } from "../reports/queryParams";
 import { setExclusions } from "../functions/setExclusions";
 import setSortBy from "../reports/setSortBy";
 import { v4 as uuidv4 } from "uuid";
@@ -90,7 +92,39 @@ export const getSearchResults = async (req, res) => {
     let response = {};
     let exclusions = setExclusions(req.query);
     let sortBy = setSortBy(req.query);
-    let { queryId, persist } = req.query;
+    let {
+      query,
+      queryId,
+      persist,
+      fieldOpts,
+      result,
+      taxonomy,
+      rank = "species",
+    } = req.query;
+    let bounds = {};
+    if (fieldOpts) {
+      for (let entry of fieldOpts) {
+        let [field, opts] = entry.split(":");
+
+        let { params, summaries } = await queryParams({
+          term: query,
+          result,
+          rank,
+          taxonomy,
+        });
+        let exclusions = setExclusions(params);
+        bounds[field] = await getBounds({
+          params,
+          fields: [field],
+          summaries,
+          result,
+          exclusions,
+          taxonomy,
+          apiParams: params,
+          opts,
+        });
+      }
+    }
     let progress = getProgress(queryId);
     let uuid;
     if (queryId) {
@@ -125,6 +159,7 @@ export const getSearchResults = async (req, res) => {
       sortBy,
       countValues: true,
       req,
+      bounds,
     });
     if (!response.status.success) {
       return res.status(200).send({ status: response.status });

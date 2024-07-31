@@ -1,6 +1,3 @@
-// import { client } from "../../functions/connection";
-// import { logError } from "../../functions/logger";
-
 export const nullCountsAgg = async ({
   fields,
   non_attr_fields,
@@ -38,7 +35,7 @@ export const nullCountsAgg = async ({
     }
   }
 
-  let aggs = {
+  return {
     fields: {
       nested: {
         path: "attributes",
@@ -61,6 +58,4 @@ export const nullCountsAgg = async ({
       },
     },
   };
-
-  return aggs;
 };

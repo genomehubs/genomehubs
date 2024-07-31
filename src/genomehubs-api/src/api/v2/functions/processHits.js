@@ -14,6 +14,7 @@ export const processHits = ({
 }) => {
   let results = [];
   let targetFields = {};
+  let fieldTypes = {};
   for (let field of fields) {
     let meta = lookupTypes(field);
     let defaultSummary = meta ? meta.processed_simple : "value";
@@ -22,6 +23,33 @@ export const processHits = ({
       targetFields[attr] = [];
     }
     targetFields[attr].push(suffix);
+    fieldTypes[attr] = meta.processed_type;
+  }
+  let buckets = {};
+
+  const deepFind = (obj, key) => {
+    let value;
+    Object.keys(obj).some((k) => {
+      if (k === key) {
+        value = obj[k];
+        return true;
+      }
+      if (obj[k] && typeof obj[k] === "object") {
+        value = deepFind(obj[k], key);
+        return value !== undefined;
+      }
+    });
+    return value;
+  };
+
+  for (let [key, value] of Object.entries(
+    body.aggregations ? body.aggregations.fields || {} : {}
+  )) {
+    if (key.endsWith("_histogram")) {
+      buckets[key.replace(/_histogram$/, "")] = deepFind(value, "buckets").map(
+        (b) => b.key
+      );
+    }
   }
   body.hits.hits.forEach((hit) => {
     let result = {
@@ -37,21 +65,17 @@ export const processHits = ({
       });
     } else {
       result.result = hit._source;
-      // console.log(JSON.stringify(hit, null, 4));
-      if (hit.inner_hits && hit.inner_hits.taxon_names) {
-        if (names) {
-          let taxonNames = {};
-          hit.inner_hits.taxon_names.hits.hits.forEach((obj) => {
-            let hitNames = {};
-            Object.keys(obj.fields).forEach((key) => {
-              hitNames[key.replace("taxon_names.", "").replace(".raw", "")] =
-                obj.fields[key];
-            });
-            taxonNames[obj.fields["taxon_names.class"]] = hitNames;
+      if (hit.inner_hits && hit.inner_hits.taxon_names && names) {
+        let taxonNames = {};
+        hit.inner_hits.taxon_names.hits.hits.forEach((obj) => {
+          let hitNames = {};
+          Object.keys(obj.fields).forEach((key) => {
+            hitNames[key.replace("taxon_names.", "").replace(".raw", "")] =
+              obj.fields[key];
           });
-          result.result.names = taxonNames;
-          // delete result.result.taxon_names;
-        }
+          taxonNames[obj.fields["taxon_names.class"]] = hitNames;
+        });
+        result.result.names = taxonNames;
       }
       if (hit.inner_hits && hit.inner_hits.lineage) {
         if (ranks) {
@@ -204,14 +228,12 @@ export const processHits = ({
                   field[ikey.replace(/attributes\./, "")] =
                     inner_hit.fields[ikey];
                 }
+              } else if (inner_hit.fields[ikey].length == 1) {
+                field[ikey.replace(/attributes\./, "")] =
+                  inner_hit.fields[ikey][0];
               } else {
-                if (inner_hit.fields[ikey].length == 1) {
-                  field[ikey.replace(/attributes\./, "")] =
-                    inner_hit.fields[ikey][0];
-                } else {
-                  field[ikey.replace(/attributes\./, "")] =
-                    inner_hit.fields[ikey];
-                }
+                field[ikey.replace(/attributes\./, "")] =
+                  inner_hit.fields[ikey];
               }
             });
           }
@@ -220,12 +242,8 @@ export const processHits = ({
               field = { ...attrFields[name], ...field };
             }
             if (targetFields[name]) {
-              // console.log({ targetFields });
               for (let subset of targetFields[name]) {
                 let subsetKey = subset;
-                // if (subsets.source.has(subsetKey)) {
-                //   subsetKey = "value";
-                // }
                 if (name.endsWith("_date")) {
                   if (subsetKey == "min") {
                     subsetKey = "from";
@@ -276,6 +294,28 @@ export const processHits = ({
         });
       });
       if (Object.keys(fields).length > 0) {
+        for (let [name, obj] of Object.entries(fields)) {
+          if (buckets[name]) {
+            let value = Array.isArray(obj.value) ? obj.value : [obj.value];
+
+            obj.binned = value.map((v) => {
+              if (fieldTypes[name] != "keyword") {
+                let i;
+                let val = fieldTypes[name] == "date" ? Date.parse(v) : v;
+                for (let [index, bucket] of buckets[name].entries()) {
+                  if (bucket < val) {
+                    i = index;
+                  } else {
+                    break;
+                  }
+                }
+                return i;
+              } else {
+                return buckets[name].indexOf(v.toLowerCase());
+              }
+            });
+          }
+        }
         result.result.fields = fields;
       }
     }

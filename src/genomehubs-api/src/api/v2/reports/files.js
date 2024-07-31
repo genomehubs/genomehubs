@@ -1,9 +1,7 @@
 import { attrTypes } from "../functions/attrTypes";
-import { getResultCount } from "../functions/getResultCount";
 import { getResults } from "../functions/getResults";
 import { nullCountsAgg } from "../queries/queryFragments/nullCountsAgg";
 import { parseFields } from "../functions/parseFields";
-import { processHits } from "../functions/processHits";
 import { queryParams } from "./queryParams";
 import { setExclusions } from "../functions/setExclusions";
 

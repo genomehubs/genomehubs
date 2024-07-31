@@ -77,13 +77,11 @@ const validateValue = (term, value, meta, types) => {
       if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
         return fail(`invalid value for ${meta.attribute} in ${term}`);
       }
-    } else {
-      if (isNaN(v.replace(/^!/, "").replaceAll("−", "-"))) {
-        if (summaries.includes(type)) {
-          return fail(`invalid value for ${type} in ${term}`);
-        }
-        return fail(`invalid value for ${meta.attribute} in ${term}`);
+    } else if (isNaN(v.replace(/^!/, "").replaceAll("−", "-"))) {
+      if (summaries.includes(type)) {
+        return fail(`invalid value for ${type} in ${term}`);
       }
+      return fail(`invalid value for ${meta.attribute} in ${term}`);
     }
   }
   return { success: true };
@@ -291,6 +289,7 @@ export const generateQuery = async ({
   aggs,
   req,
   update,
+  bounds,
 }) => {
   let { lookupTypes } = await attrTypes({ ...query, taxonomy });
   fields = await parseFields({ result, fields, taxonomy });
@@ -378,79 +377,77 @@ export const generateQuery = async ({
           parts[4] = condition[2];
         }
         identifierTerms = addCondition(identifierTerms, parts, "keyword");
-      } else {
-        if (parts.length > 1) {
-          if (lookupTypes[result]) {
-            let meta = lookupTypes[result](term);
-            if (meta) {
-              let { bins } = meta;
-              if (
-                bins &&
-                bins.scale &&
-                bins.scale.startsWith("log") &&
-                (!parts[3] || parts[3].length > 0)
-              ) {
-                parts[3] = ">0";
-              }
-              term = meta.name;
-            }
-          }
-          let summary;
-          if (parts[1] && parts[1].length > 0) {
-            summary = parts[1];
-          }
-          if (parts[3].match(/[\>\<=]/)) {
-            let condition = parts[3].split(/\s*([\>\<=]+)\s*/);
-            if (condition[0].endsWith("!")) {
-              condition[1] = `!${condition[1]}`;
-            }
-            parts[3] = condition[1];
-            parts[4] = condition[2];
-            if (lookupTypes[result]) {
-              let meta = lookupTypes[result](parts[2]);
-              if (!meta) {
-                status = {
-                  success: false,
-                  error: `Invalid field in '${term}'`,
-                };
-              } else {
-                parts[2] = meta.name;
-                filters = addCondition(
-                  filters,
-                  parts,
-                  meta.type,
-                  subset,
-                  summary,
-                  fields,
-                  optionalFields
-                );
-              }
-              if (!parts[3].match(/^!/) && parts[4].match(/^null$/)) {
-                excludeAncestral.add(meta.name);
-                excludeDescendant.add(meta.name);
-                excludeDirect.add(meta.name);
-              }
-            } else {
-              properties = addCondition(properties, parts, "keyword");
-            }
-          } else {
-            let meta = lookupTypes[result](parts[2]);
-            if (meta) {
-              parts[2] = meta.name;
-              fields.push(parts[2]);
-            } else {
-              idTerm = parts[2];
-            }
-          }
-        } else {
+      } else if (parts.length > 1) {
+        if (lookupTypes[result]) {
           let meta = lookupTypes[result](term);
           if (meta) {
+            let { bins } = meta;
+            if (
+              bins &&
+              bins.scale &&
+              bins.scale.startsWith("log") &&
+              (!parts[3] || parts[3].length > 0)
+            ) {
+              parts[3] = ">0";
+            }
             term = meta.name;
-            excludeMissing.add(meta.name);
-            fields.push(term);
-          } else {
-            idTerm = term;
           }
+        }
+        let summary;
+        if (parts[1] && parts[1].length > 0) {
+          summary = parts[1];
+        }
+        if (parts[3].match(/[\>\<=]/)) {
+          let condition = parts[3].split(/\s*([\>\<=]+)\s*/);
+          if (condition[0].endsWith("!")) {
+            condition[1] = `!${condition[1]}`;
+          }
+          parts[3] = condition[1];
+          parts[4] = condition[2];
+          if (lookupTypes[result]) {
+            let meta = lookupTypes[result](parts[2]);
+            if (!meta) {
+              status = {
+                success: false,
+                error: `Invalid field in '${term}'`,
+              };
+            } else {
+              parts[2] = meta.name;
+              filters = addCondition(
+                filters,
+                parts,
+                meta.type,
+                subset,
+                summary,
+                fields,
+                optionalFields
+              );
+            }
+            if (!parts[3].match(/^!/) && parts[4].match(/^null$/)) {
+              excludeAncestral.add(meta.name);
+              excludeDescendant.add(meta.name);
+              excludeDirect.add(meta.name);
+            }
+          } else {
+            properties = addCondition(properties, parts, "keyword");
+          }
+        } else {
+          let meta = lookupTypes[result](parts[2]);
+          if (meta) {
+            parts[2] = meta.name;
+            fields.push(parts[2]);
+          } else {
+            idTerm = parts[2];
+          }
+        }
+      } else {
+        let meta = lookupTypes[result](term);
+        if (meta) {
+          term = meta.name;
+          excludeMissing.add(meta.name);
+          fields.push(term);
+        } else {
+          idTerm = term;
         }
       }
     }
@@ -531,6 +528,7 @@ export const generateQuery = async ({
     req,
     update,
     taxonomy,
+    bounds,
   };
   if (taxTerm) {
     let function_score;

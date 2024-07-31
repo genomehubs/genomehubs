@@ -5,6 +5,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import Dialog from "@material-ui/core/Dialog";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import IconButton from "@material-ui/core/IconButton";
+import ListIcon from "@material-ui/icons/List";
 import MuiDialogActions from "@material-ui/core/DialogActions";
 import MuiDialogContent from "@material-ui/core/DialogContent";
 import MuiDialogTitle from "@material-ui/core/DialogTitle";
@@ -12,6 +13,7 @@ import MuiTab from "@material-ui/core/Tab";
 import MuiTabs from "@material-ui/core/Tabs";
 import SaveSettingsDefaults from "./SaveSettingsDefaults";
 import SaveSettingsFavourites from "./SaveSettingsFavourites";
+// import SaveSettingsLists from "./SaveSettingsLists";
 import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
 import Typography from "@material-ui/core/Typography";
 import { compose } from "recompose";
@@ -122,6 +124,7 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
         >
           <MuiTab icon={<FavoriteIcon />} label="FAVORITES" />
           <MuiTab icon={<SettingsApplicationsIcon />} label="DEFAULTS" />
+          <MuiTab icon={<ListIcon />} label="LISTS" />
         </MuiTabs>
         <MuiTabs
           value={secondaryTabValue}

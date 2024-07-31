@@ -62,8 +62,7 @@ export const getRecordsByTaxon = async (props) => {
     props.includeLineage = true;
   }
   const query = await searchBy(props);
-  let scrollThreshold = config.scrollThreshold;
-  let scrollDuration = config.scrollDuration;
+  let { scrollThreshold, scrollDuration } = config;
   let body;
   if (
     query.size > 10000 ||

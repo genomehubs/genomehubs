@@ -197,6 +197,39 @@ components:
           type: string
         type: array
       style: form
+    fieldOptsParam:
+      description: |
+        field options.
+
+        A string of the form <fieldName:options> where options is a comma or semicolon separated string in the order:
+
+        1. minimum value
+        2. maximum value
+        3. tick count
+        4. scale
+        5. axis title
+
+        For category fields, the minimum value can be a comma separated list to define the category order, in which case semicolons must be used as the primary separator. Tick count may be used to specify the number of categories and a `+` sign to indicate that an `other` category should be included.
+      examples:
+        null:
+          value:
+          summary: Do not specify fieldOpts
+        assembly_span:
+          value: assembly_span:10000000,10000000000,5
+          summary: Values between 10M and 10G with 4 ticks
+        scale_only:
+          value: "assembly_span:,,,linear"
+          summary: Use a linear scale
+        category_axis:
+          value: "assembly_level:chromosome,scaffold,,2+"
+          summary: Show values for chromosome and scaffold plus other
+      in: query
+      name: fieldOpts
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
     fieldsParam:
       description: |
         Comma separated list of attribute fields to return.
@@ -1455,6 +1488,7 @@ paths:
         - $ref: "#/components/parameters/sortByParam"
         - $ref: "#/components/parameters/sortOrderParam"
         - $ref: "#/components/parameters/sortModeParam"
+        - $ref: "#/components/parameters/fieldOptsParam"
         - $ref: "#/components/parameters/taxonomyParam"
         - $ref: "#/components/parameters/releaseParam"
         - $ref: "#/components/parameters/queryIdParam"
