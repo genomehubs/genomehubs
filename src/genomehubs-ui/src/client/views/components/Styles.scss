@@ -383,6 +383,7 @@ body,
       .tabDiv {
         float:left;
         overflow: visible;
+        position: relative;
       }
 
       .tab {
@@ -393,6 +394,7 @@ body,
         cursor: pointer;
         display: inline-block;
         height: 2.2em;
+        min-width: 6em;
         line-height: 2em;
         margin-right: -1px;
         // margin-bottom: 0.2em;
@@ -413,6 +415,8 @@ body,
 
       .nestedTab {
         overflow: hidden;
+        position: absolute;
+        right: 0;
         .tabDiv {
           float:none;
           display:block;
@@ -421,7 +425,7 @@ body,
           background-color: themed("primary");
         }
         nav {
-          border-top: 0.2em solid themed("secondary");
+          // border-top: 0.2em solid themed("secondary");
           overflow-x: hidden;
           overflow-y: auto;
           max-height: calc( 80vh - 2em );
