@@ -31,7 +31,6 @@ export const processHits = ({
   inner_hits,
   processAsDoc,
   bounds,
-  fieldOpts = {},
 }) => {
   let results = [];
   let targetFields = {};
@@ -44,7 +43,9 @@ export const processHits = ({
       targetFields[attr] = [];
     }
     targetFields[attr].push(suffix);
-    fieldTypes[attr] = meta.processed_type;
+    if (meta) {
+      fieldTypes[attr] = meta.processed_type;
+    }
   }
   let buckets = {};
 
@@ -85,7 +86,7 @@ export const processHits = ({
         if (i == bucketLabels.length - 1) {
           return ">" + v;
         } else {
-          return `${v} - ${bucketLabels[i + 1]}`;
+          return `${v}–${bucketLabels[i + 1]}`;
         }
       });
     }
@@ -95,8 +96,8 @@ export const processHits = ({
   for (let [key, value] of Object.entries(
     body.aggregations ? body.aggregations.fields || {} : {}
   )) {
-    if (key.endsWith("_histogram")) {
-      let bucketKey = key.replace(/_histogram$/, "");
+    let bucketKey = key.replace(/_histogram$/, "");
+    if (fieldTypes[bucketKey] && key.endsWith("_histogram")) {
       buckets[bucketKey] = setBucketValues(
         value,
         fieldTypes[bucketKey],
@@ -297,7 +298,7 @@ export const processHits = ({
             if (targetFields[name]) {
               for (let subset of targetFields[name]) {
                 let subsetKey = subset;
-                if (name.endsWith("_date")) {
+                if (fieldTypes[name] == "date") {
                   if (subsetKey == "min") {
                     subsetKey = "from";
                   } else if (subsetKey == "max") {
@@ -338,6 +339,9 @@ export const processHits = ({
                   }
                 } else if (subsets.summary.has(subsetKey)) {
                   fields[newName] = { ...field, value: field[subsetKey] };
+                }
+                if (newName != name) {
+                  fields[name][subsetKey] = field[subsetKey];
                 }
               }
             } else {

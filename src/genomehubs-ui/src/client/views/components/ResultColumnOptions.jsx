@@ -1,3 +1,4 @@
+import { FormGroup, TextField } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { Theme, createStyles, makeStyles } from "@material-ui/core/styles";
 import { useLocation, useNavigate } from "@reach/router";
@@ -117,6 +118,7 @@ const ResultColumnOptions = ({
   const navigate = useNavigate();
   const location = useLocation();
   const summaryTypes = summaryTypesFromMeta(types[attributeId]) || [];
+  console.log(searchTerm);
   const initialSelected = searchTerm.fields
     ? searchTerm.fields
         .split(",")
@@ -124,15 +126,24 @@ const ResultColumnOptions = ({
         .filter(([f]) => f == attributeId)
         .map(([name, subset = types[attributeId].processed_simple]) => subset)
     : ["value"];
-  const [summaryCols, setsummaryCols] = React.useState(initialSelected);
+  const [summaryCols, setSummaryCols] = React.useState(initialSelected);
+  let initialFieldOpts =
+    searchTerm?.fieldOpts?.find((f) => f.startsWith(attributeId)) || ";;";
+  initialFieldOpts = initialFieldOpts.replace(`${attributeId}:`, "");
+  console.log(initialFieldOpts);
+  const [fieldOpts, setFieldOpts] = React.useState(initialFieldOpts);
 
   const handleChange = (e) => {
-    setsummaryCols(e.target.value);
+    setSummaryCols(e.target.value);
+  };
+
+  const handleOptsChange = (e) => {
+    setFieldOpts(e.target.value);
   };
 
   const handleDelete = (e, value) => {
     e.preventDefault();
-    setsummaryCols(summaryCols.filter((entry) => entry !== value));
+    setSummaryCols(summaryCols.filter((entry) => entry !== value));
   };
 
   const handleClick = () => {
@@ -160,12 +171,20 @@ const ResultColumnOptions = ({
       (f) => f != attributeId && !f.startsWith(`${attributeId}:`)
     );
     fields.splice(index, 0, ...newFields);
+    let newFieldOpts = (searchTerm.fieldOpts || []).filter((entry) => {
+      return !entry.startsWith(`${attributeId}:`);
+    });
+    if (fieldOpts && !fieldOpts.match("^[,;]*$")) {
+      newFieldOpts.push(`${attributeId}:${fieldOpts}`);
+    }
 
     let options = {
       ...searchTerm,
       // result: index,
       offset: 0,
       fields: fields.length > 0 ? fields.join(",") : "none",
+      fieldOpts: newFieldOpts,
+
       // names: names.join(","),
       // ranks: ranks.join(","),
       // taxonomy: state.taxonomy,
@@ -195,45 +214,58 @@ const ResultColumnOptions = ({
   };
 
   let form = (
-    <FormControl className={classes.formControl}>
-      <InputLabel id="subset-checkbox-label">Subset</InputLabel>
-      <Select
-        labelId="subset-checkbox-label"
-        id="subset-checkbox"
-        multiple
-        value={summaryCols}
-        onChange={handleChange}
-        IconComponent={KeyboardArrowDownIcon}
-        renderValue={(selected) => (
-          <div className={classes.chips}>
-            {selected.map((value) => (
-              <Chip
-                key={value}
-                label={value}
-                clickable
-                deleteIcon={
-                  <CancelIcon
-                    onMouseDown={(event) => event.stopPropagation()}
-                  />
-                }
-                className={classes.chip}
-                onDelete={(e) => handleDelete(e, value)}
+    <div>
+      <FormControl className={classes.formControl}>
+        <InputLabel id="subset-checkbox-label">Subset</InputLabel>
+        <Select
+          labelId="subset-checkbox-label"
+          id="subset-checkbox"
+          multiple
+          value={summaryCols}
+          onChange={handleChange}
+          IconComponent={KeyboardArrowDownIcon}
+          renderValue={(selected) => (
+            <div className={classes.chips}>
+              {selected.map((value) => (
+                <Chip
+                  key={value}
+                  label={value}
+                  clickable
+                  deleteIcon={
+                    <CancelIcon
+                      onMouseDown={(event) => event.stopPropagation()}
+                    />
+                  }
+                  className={classes.chip}
+                  onDelete={(e) => handleDelete(e, value)}
+                />
+              ))}
+            </div>
+          )}
+        >
+          {summaryTypes.map((summary) => (
+            <MenuItem key={summary} value={summary}>
+              <Checkbox
+                color={"default"}
+                checked={summaryCols.includes(summary)}
               />
-            ))}
-          </div>
-        )}
-      >
-        {summaryTypes.map((summary) => (
-          <MenuItem key={summary} value={summary}>
-            <Checkbox
-              color={"default"}
-              checked={summaryCols.includes(summary)}
-            />
-            <ListItemText primary={summary} />
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+              <ListItemText primary={summary} />
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <FormControl className={classes.formControl}>
+        <TextField
+          label={"fieldOpts"}
+          id="fieldopts-textbox"
+          value={fieldOpts}
+          onChange={handleOptsChange}
+          variant="outlined"
+          helperText="Enter field options"
+        />
+      </FormControl>
+    </div>
   );
   return (
     <Paper className={classes.paper}>
