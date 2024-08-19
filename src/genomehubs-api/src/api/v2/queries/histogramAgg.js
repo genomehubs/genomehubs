@@ -1,6 +1,21 @@
 import { attrTypes } from "../functions/attrTypes";
 import { scaleTime } from "d3-scale";
 
+export const scaleFuncs = {
+  log2: (value) => Math.log2(value),
+  log10: (value) => Math.log10(value),
+  log: (value) => Math.log(value),
+  sqrt: (value) => Math.sqrt(value),
+  linear: (value) => value,
+  ordinal: (value) => value,
+  log2Inv: (value) => Math.pow(2, value),
+  log10Inv: (value) => Math.pow(10, value),
+  logInv: (value) => Math.pow(Math.E, value),
+  sqrtInv: (value) => value * value,
+  linearInv: (value) => value,
+  ordinalInv: (value) => value,
+};
+
 export const histogramAgg = async ({
   field,
   summary,
@@ -15,13 +30,6 @@ export const histogramAgg = async ({
     log10: "Math.log10(_value)",
     log: "Math.log(_value)",
     sqrt: "Math.sqrt(_value)",
-  };
-  const funcs = {
-    log2: (value) => Math.log2(value),
-    log10: (value) => Math.log10(value),
-    log: (value) => Math.log(value),
-    sqrt: (value) => Math.sqrt(value),
-    linear: (value) => value,
   };
 
   const day = 86400000;
@@ -83,13 +91,13 @@ export const histogramAgg = async ({
     if (bounds) {
       if (bounds.domain && !isNaN(bounds.domain[0])) {
         scale = bounds.scale;
-        min = funcs[scale](bounds.domain[0]);
+        min = scaleFuncs[scale](bounds.domain[0]);
         if (min == -Infinity) {
           min = 0;
         }
       }
       if (bounds.domain && !isNaN(bounds.domain[1])) {
-        max = funcs[scale](1 * bounds.domain[1]);
+        max = scaleFuncs[scale](1 * bounds.domain[1]);
       }
       count = bounds.tickCount - 1;
     }

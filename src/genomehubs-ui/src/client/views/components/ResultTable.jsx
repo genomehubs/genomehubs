@@ -1055,7 +1055,7 @@ const ResultTable = ({
           value = field.value;
         }
         // uncomment to use binned value if available
-        // value = field.hasOwnProperty("binned") ? field.binned : value;
+        value = field.hasOwnProperty("binned") ? field.binned : value;
         if (colSpan == 0) {
           let entries = [];
           if (Array.isArray(value)) {

@@ -149,6 +149,7 @@ export const getRecordsByTaxon = async (props) => {
       ranks: props.ranks,
       fields: props.fields,
       lookupTypes,
+      bounds: props.bounds,
     });
     if (body.aggregations) {
       aggs = body.aggregations;

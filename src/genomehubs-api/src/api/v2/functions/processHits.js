@@ -1,5 +1,24 @@
+import { format } from "d3-format";
 import { processDoc } from "./processDoc";
+import { scaleFuncs } from "../queries/histogramAgg";
 import { subsets } from "./subsets";
+import { utcFormat } from "d3-time-format";
+
+const sci = (v) => {
+  if (v < 1000 && v >= 0.001) {
+    if (v < 10) {
+      return format(".3r")(v).replace(/0*$/, "");
+    }
+    return format(".3r")(v);
+  }
+  return format(".3s")(v);
+};
+const sciInt = (v) => {
+  if (v < 1000) {
+    return Math.ceil(v);
+  }
+  return format(".3s")(v);
+};
 
 export const processHits = ({
   body,
@@ -11,6 +30,8 @@ export const processHits = ({
   lca,
   inner_hits,
   processAsDoc,
+  bounds,
+  fieldOpts = {},
 }) => {
   let results = [];
   let targetFields = {};
@@ -42,12 +63,44 @@ export const processHits = ({
     return value;
   };
 
+  const setBucketValues = (value, bucketType, scaleFunc) => {
+    let bucketValues = deepFind(value, "buckets").map((b) => b.key);
+    let bucketLabels, hasRange;
+    if (bucketType == "date") {
+      bucketLabels = bucketValues.map(
+        (v) => new Date(v).toISOString().split("T")[0]
+        // .replace(/(-01)*$/g, "")
+      );
+      hasRange = true;
+    } else if (!bucketType.endsWith("keyword")) {
+      bucketLabels = bucketValues.map((v) =>
+        bucketType == "date" ? v : sci(scaleFunc(v))
+      );
+      hasRange = true;
+    } else {
+      bucketLabels = bucketValues;
+    }
+    if (hasRange) {
+      bucketLabels = bucketLabels.map((v, i) => {
+        if (i == bucketLabels.length - 1) {
+          return ">" + v;
+        } else {
+          return `${v} - ${bucketLabels[i + 1]}`;
+        }
+      });
+    }
+    return { values: bucketValues, labels: bucketLabels };
+  };
+
   for (let [key, value] of Object.entries(
     body.aggregations ? body.aggregations.fields || {} : {}
   )) {
     if (key.endsWith("_histogram")) {
-      buckets[key.replace(/_histogram$/, "")] = deepFind(value, "buckets").map(
-        (b) => b.key
+      let bucketKey = key.replace(/_histogram$/, "");
+      buckets[bucketKey] = setBucketValues(
+        value,
+        fieldTypes[bucketKey],
+        scaleFuncs[`${bounds[bucketKey].scale || "linear"}Inv`]
       );
     }
   }
@@ -299,19 +352,23 @@ export const processHits = ({
             let value = Array.isArray(obj.value) ? obj.value : [obj.value];
 
             obj.binned = value.map((v) => {
-              if (fieldTypes[name] != "keyword") {
+              if (!fieldTypes[name].endsWith("keyword")) {
                 let i;
                 let val = fieldTypes[name] == "date" ? Date.parse(v) : v;
-                for (let [index, bucket] of buckets[name].entries()) {
-                  if (bucket < val) {
+                for (let [index, bucket] of buckets[name].values.entries()) {
+                  if (
+                    bucket < scaleFuncs[bounds[name].scale || "linear"](val)
+                  ) {
                     i = index;
                   } else {
                     break;
                   }
                 }
-                return i;
+                return buckets[name].labels[i];
               } else {
-                return buckets[name].indexOf(v.toLowerCase());
+                return buckets[name].values.includes(v.toLowerCase())
+                  ? v
+                  : "Other";
               }
             });
           }
