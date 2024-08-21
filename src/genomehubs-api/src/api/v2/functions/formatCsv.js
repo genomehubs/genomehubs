@@ -21,7 +21,7 @@ export const formatCsv = async (response, opts) => {
     });
   }
   let meta = ["aggregation_source", "aggregation_method"];
-  let raw = ["source"];
+  let source = ["name", "date"];
   let usedFields = {};
   let allFields = {};
   let data = [];
@@ -56,18 +56,24 @@ export const formatCsv = async (response, opts) => {
         ) {
           // TODO: add option for sparse table
           usedFields[key] = true;
-          let value = fullResult.result.fields[key].value;
+          let { value, binned = value } = fullResult.result.fields[key];
+          value = binned;
           if (opts.tidyData) {
             if (opts.includeRawValues) {
               if (fullResult.result.fields[key].hasOwnProperty("rawValues")) {
                 fullResult.result.fields[key]["rawValues"].forEach(
                   (rawValue) => {
+                    let sourceMeta =
+                      rawValue.metadata && rawValue.metadata.source;
+                    if (!sourceMeta) {
+                      return;
+                    }
                     let row = { ...datum };
                     row.field = key;
                     row.value = rawValue.value;
-                    raw.forEach((rawKey) => {
-                      if (rawValue.hasOwnProperty(rawKey)) {
-                        row[rawKey] = rawValue[rawKey];
+                    source.forEach((sourceKey) => {
+                      if (sourceMeta.hasOwnProperty(sourceKey)) {
+                        row[sourceKey] = sourceMeta[sourceKey];
                       }
                     });
                     data.push(row);
@@ -110,7 +116,7 @@ export const formatCsv = async (response, opts) => {
           .concat(names)
           .concat(ranks)
           .concat(["field", "value"])
-          .concat(raw);
+          .concat(source.map((s) => s.replace(/.+?\./, "")));
       } else {
         opts.fields = fields
           .concat(names)
@@ -128,8 +134,7 @@ export const formatCsv = async (response, opts) => {
 
   try {
     const parser = new Parser(opts);
-    const csv = parser.parse(data);
-    return csv;
+    return parser.parse(data);
   } catch (err) {
     console.error(err);
   }

@@ -79,6 +79,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     xOpts: { in: new Set(["histogram", "scatter", "table"]) },
     yOpts: { in: new Set(["scatter", "table", "tree"]) },
     compactLegend: { in: new Set(["histogram", "oxford", "scatter"]) },
+    catToX: { in: new Set(["histogram"]) },
     compactWidth: { in: new Set(["histogram", "oxford", "scatter"]) },
     highlightArea: { in: new Set(["scatter"]), ui: true },
     scatterThreshold: { in: new Set(["scatter"]) },
@@ -92,7 +93,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
       ui: true,
     },
     cumulative: { in: new Set(["histogram", "table"]), ui: true },
-    // reversed: { in: new Set(["table"]), ui: true },
+    reversed: { in: new Set(["scatter"]), ui: true },
     mapThreshold: { in: new Set(["map"]) },
     treeThreshold: { in: new Set(["tree"]) },
     queryId: {
@@ -171,7 +172,7 @@ export function fetchReport({
     try {
       let json;
       let status;
-      const interval = checkProgress({
+      const { interval } = checkProgress({
         queryId,
         delay: inModal ? 1000 : 30000,
         dispatch,
@@ -974,7 +975,7 @@ export const saveReport = ({ options, format = "json" }) => {
     const state = store.getState();
     let url = `${apiUrl}/report?${queryString}&queryId=${queryId}`;
     let status;
-    const interval = checkProgress({
+    const { interval } = checkProgress({
       queryId,
       delay: 5000,
       dispatch,

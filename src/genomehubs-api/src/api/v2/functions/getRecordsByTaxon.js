@@ -1,4 +1,4 @@
-import { clearProgress, setProgress } from "./progress";
+import { clearProgress, getProgress, setProgress } from "./progress";
 
 import { attrTypes } from "./attrTypes";
 import { checkResponse } from "./checkResponse";
@@ -46,19 +46,23 @@ export const getRecordsByTaxon = async (props) => {
   let queryId;
   let update;
   if (props.req && props.req.on) {
+    queryId = props.req.query.queryId;
+    let progress = getProgress(props.req.query.queryId);
     props.req.on("close", () => {
-      active = false;
+      if (progress && progress.persist) {
+        setProgress(queryId, { disconnected: true });
+      } else {
+        active = false;
+      }
     });
     props.req.on("end", () => {
       active = false;
     });
-    queryId = props.req.query.queryId;
     update = props.update || "x";
     props.includeLineage = true;
   }
   const query = await searchBy(props);
-  let scrollThreshold = config.scrollThreshold;
-  let scrollDuration = config.scrollDuration;
+  let { scrollThreshold, scrollDuration } = config;
   let body;
   if (
     query.size > 10000 ||
@@ -82,10 +86,8 @@ export const getRecordsByTaxon = async (props) => {
     )) {
       hits.push(hit);
       total++;
-      if (total % 1000 == 0) {
-        if (queryId) {
-          setProgress(queryId, { [update]: total });
-        }
+      if (queryId && total % 1000 == 0) {
+        setProgress(queryId, { [update]: total });
       }
       if (!active || total == query.size) {
         if (queryId && !active) {
@@ -98,6 +100,7 @@ export const getRecordsByTaxon = async (props) => {
       setProgress(queryId, {
         [update]: total,
         ...(update == "x" && { total }),
+        complete: true,
       });
     }
     let took = Date.now() - startTime;
@@ -137,6 +140,9 @@ export const getRecordsByTaxon = async (props) => {
   // set types
   status.size = props.size;
   status.offset = props.offset;
+  if (props.aggregations && !body.aggregations) {
+    body.aggregations = props.aggregations;
+  }
   if (status.hits) {
     results = processHits({
       body,
@@ -146,6 +152,7 @@ export const getRecordsByTaxon = async (props) => {
       ranks: props.ranks,
       fields: props.fields,
       lookupTypes,
+      bounds: props.bounds,
     });
     if (body.aggregations) {
       aggs = body.aggregations;

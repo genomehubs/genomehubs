@@ -1,5 +1,4 @@
 import {
-  fetchRecord,
   getCurrentRecordId,
   getRecordById,
   getRecordIsFetching,
@@ -10,6 +9,7 @@ import {
 
 import React from "react";
 import { connect } from "react-redux";
+import { fetchRecord } from "../selectors/record";
 
 const withRecordById = (WrappedComponent) => (props) => {
   let { currentRecordId } = props;

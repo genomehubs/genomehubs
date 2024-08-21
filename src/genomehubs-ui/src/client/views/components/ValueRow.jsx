@@ -17,6 +17,9 @@ import withRecord from "../hocs/withRecord";
 
 const ValueRow = ({
   record,
+  records,
+  fetchRecord,
+  recordIsFetching,
   result,
   rank,
   condition,
@@ -27,6 +30,16 @@ const ValueRow = ({
   unit,
   color = "#1f78b4",
 }) => {
+  useEffect(() => {
+    if (
+      condition?.startsWith("assembly.") &&
+      record?.record?.assembly_id &&
+      !records[record.record.assembly_id] &&
+      !recordIsFetching
+    ) {
+      fetchRecord(record.record.assembly_id, "assembly", taxonomy);
+    }
+  }, [records]);
   if (!record || !record.record || !suffix || !value) {
     return null;
   }
@@ -54,7 +67,9 @@ const ValueRow = ({
     if (key == "assemblyId") {
       return getPrimaryAssemblyId(record);
     }
-    let value = record.record;
+    let value = key?.startsWith("assembly.")
+      ? { assembly: records[record.record.assembly_id]?.record }
+      : record.record;
     for (let k of key.split(".")) {
       value = value[k];
       if (typeof value === "undefined") {
@@ -77,10 +92,15 @@ const ValueRow = ({
           return null;
         }
       } else {
-        let recordValue = fillValues(key, {
-          attributes: record.record.attributes,
-        });
+        let currentRecord = condition?.startsWith("assembly.")
+          ? { assembly: records[record.record.assembly_id]?.record }
+          : record.record;
+
+        let recordValue = fillValues(key, currentRecord);
         if (cmp && !compareValues(recordValue, value, cmp)) {
+          return null;
+        }
+        if (!cmp && !recordValue) {
           return null;
         }
       }

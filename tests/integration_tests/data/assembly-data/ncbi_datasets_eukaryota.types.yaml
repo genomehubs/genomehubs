@@ -491,3 +491,7 @@ taxonomy:
     header: organismName
   taxon_id:
     header: taxId
+  species:
+    header: organismName
+  family:
+    default: Canidae

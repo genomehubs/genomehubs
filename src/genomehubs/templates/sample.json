@@ -185,6 +185,11 @@
               "description": "Value of type keyword (including ontology terms)"
             }
           },
+          "flattened_value": {
+            "type": "flattened",
+            "eager_global_ordinals": true,
+            "meta": { "description": "Value of type flattened" }
+          },
           "text_value": {
             "type": "text",
             "meta": { "description": "Value of type text" }
@@ -327,6 +332,11 @@
           "stdev": {
             "type": "float",
             "meta": { "description": "Standard deviation (numeric types only)" }
+          },
+          "metadata": {
+            "type": "flattened",
+            "eager_global_ordinals": true,
+            "meta": { "description": "metadata associated with a value" }
           },
           "comment": {
             "type": "text",

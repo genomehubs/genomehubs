@@ -25,7 +25,7 @@ def read(*names, **kwargs):
 
 setup(
     name="genomehubs",  # Required
-    version="2.7.43",
+    version="2.8.24",
     description="GenomeHubs",  # Optional
     long_description="%s\n%s"
     % (
@@ -98,6 +98,7 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
         "biopython>=1.78",
+        "boto3>=1.34.84",
         "docopt>=0.6.2",
         "elasticsearch==8.7",
         "fastjsonschema>=2.15.3",
@@ -148,6 +149,8 @@ setup(
         "Bug Reports": "https://github.com/genomehubs/genomehubs/issues",
         "Source": "https://github.com/genomehubs/genomehubs",
     },
-    package_data={"genomehubs": ["genomehubs/config/dist.config.yaml"]},
+    package_data={
+        "genomehubs": ["genomehubs/config/dist.config.yaml", "genomehubs/py.typed"]
+    },
     include_package_data=True,
 )

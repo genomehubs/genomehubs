@@ -22,9 +22,7 @@ import { compose } from "recompose";
 import { format } from "d3-format";
 import qs from "../functions/qs";
 import setColors from "../functions/setColors";
-import { setMessage } from "../reducers/message";
 import stringLength from "../functions/stringLength";
-import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
@@ -464,7 +462,10 @@ const RadialBarComponent = ({
             cursor={"pointer"}
             onClick={() =>
               data.navigate(
-                `${data.basename}/search?${qs.stringify(data.xQuery)}`
+                `${data.basename}/search?${qs.stringify({
+                  ...data.xQuery,
+                  report: "arc",
+                })}`
               )
             }
           />

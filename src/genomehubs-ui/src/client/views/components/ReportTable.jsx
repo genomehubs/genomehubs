@@ -162,27 +162,17 @@ const ReportTable = ({
   table,
   chartRef,
   containerRef,
-  embedded,
-  ratio,
+  message,
   setMessage,
   cumulative,
   reversed,
-  reportTerm,
   highlight,
   minDim,
-  setMinDim,
-  xOpts,
-  yOpts,
-  basename,
 }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
   const componentRef = chartRef ? chartRef : useRef();
-  const { width, height } = containerRef
-    ? useResize(containerRef)
-    : useResize(componentRef);
+
   useEffect(() => {
-    if (table && table.status) {
+    if (message && table && table.status) {
       setMessage(null);
     }
   }, [table]);

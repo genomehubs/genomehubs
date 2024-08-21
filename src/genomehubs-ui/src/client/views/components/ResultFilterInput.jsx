@@ -1,39 +1,31 @@
-import { Avatar, Chip, MenuItem } from "@material-ui/core";
+import { Avatar, Chip } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 
-import AutoCompleteInput from "./AutoCompleteInput";
-import AutorenewIcon from "@material-ui/icons/Autorenew";
-import BasicSelect from "./BasicSelect";
-import BasicTextField from "./BasicTextField";
-import Button from "@material-ui/core/Button";
-import CloseIcon from "@material-ui/icons/Close";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
+import Checkbox from "@material-ui/core/Checkbox";
+import FilterListIcon from "@material-ui/icons/FilterList";
 import Tooltip from "./Tooltip";
-import Typography from "@material-ui/core/Typography";
 import styles from "./Styles.scss";
-import { useStyles } from "./QueryBuilder";
 
-const allowedSummaries = ({ field, types }) => {
-  let values = { value: "value" };
-  let possible = [
-    { key: "list", value: "length" },
-    { key: "max" },
-    { key: "min" },
-    { key: "range" },
-  ];
-  let summaries = types[field]?.summary || [];
-  if (!Array.isArray(summaries)) {
-    summaries = [summaries];
-  }
-  for (let obj of possible) {
-    if (summaries.includes(obj.key)) {
-      let summary = obj.value || obj.key;
-      values[summary] = summary;
-    }
-  }
-  return values;
-};
+// const allowedSummaries = ({ field, types }) => {
+//   let values = { value: "value" };
+//   let possible = [
+//     { key: "list", value: "length" },
+//     { key: "max" },
+//     { key: "min" },
+//     { key: "range" },
+//   ];
+//   let summaries = types[field]?.summary || [];
+//   if (!Array.isArray(summaries)) {
+//     summaries = [summaries];
+//   }
+//   for (let obj of possible) {
+//     if (summaries.includes(obj.key)) {
+//       let summary = obj.value || obj.key;
+//       values[summary] = summary;
+//     }
+//   }
+//   return values;
+// };
 
 const allowedOperators = ({ field, types, summary }) => {
   let operators = ["=", "==", "!="];
@@ -53,8 +45,8 @@ const allowedOperators = ({ field, types, summary }) => {
   return operators;
 };
 
-const allowedValues = ({ types, field, summary }) => {
-  return types[field]?.constraint?.enum;
+const allowedValues = ({ types, field, summary, constraints }) => {
+  return constraints || types[field]?.constraint?.enum;
 };
 
 const ChipInput = ({ defaultWidth, value, placeholder, onBlur }) => {
@@ -75,6 +67,7 @@ const ChipInput = ({ defaultWidth, value, placeholder, onBlur }) => {
           onBlur(e);
         }
       }}
+      autoFocus={typeof currentValue === "undefined" || currentValue === ""}
     />
   );
 };
@@ -82,26 +75,20 @@ const ChipInput = ({ defaultWidth, value, placeholder, onBlur }) => {
 const ResultFilterInput = ({
   types,
   field,
+  constraints,
   operator = "",
   value = "",
   summary = "value",
-  bool,
-  label,
-  fields,
-  type = types[field]?.type || "keyword",
-  handleVariableChange,
   handleOperatorChange,
-  handleSummaryChange,
   handleValueChange,
-  handleUpdate,
   handleDismiss,
 }) => {
-  const classes = useStyles();
   const [active, setActive] = useState(false);
+  const [editable, setEditable] = useState(false);
   value = value == "undefined" || typeof value === "undefined" ? "" : value;
   operator =
     operator == "undefined" || typeof operator === "undefined" ? "" : operator;
-  let values = allowedValues({ field, types, summary });
+  let values = allowedValues({ field, types, summary, constraints });
   let operators = allowedOperators({ field, types, summary });
 
   useEffect(() => {
@@ -172,6 +159,25 @@ const ResultFilterInput = ({
       </ChipOptions>
     );
   };
+
+  if (value == "" && operator == "" && !editable) {
+    let color = "grey";
+    return (
+      <span style={{ marginRight: "0.5em" }}>
+        <Checkbox
+          style={{
+            padding: "1px",
+            color,
+          }}
+          icon={<FilterListIcon style={{ fontSize: "small", fill: color }} />}
+          checkedIcon={
+            <FilterListIcon style={{ fontSize: "small", fill: color }} />
+          }
+          onClick={() => setEditable(!editable)}
+        />
+      </span>
+    );
+  }
 
   return (
     <span style={{ marginRight: "0.5em" }}>

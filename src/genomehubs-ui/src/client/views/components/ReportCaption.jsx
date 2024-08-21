@@ -36,7 +36,7 @@ const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
   useEffect(() => {
     if (typeof embedded !== "undefined" && captionLength < width * 1.8) {
       let ratio = ((width * 1.8) / captionLength) * 100;
-      ratio = Math.max(Math.min(ratio, 150), 80);
+      ratio = Math.max(Math.min(ratio, 135), 80);
       setCaptionScale(ratio);
     }
   }, [width]);
@@ -76,7 +76,7 @@ const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
           pointerEvents: "auto",
           ...(captionScale && {
             fontSize: `${captionScale}%`,
-            marginTop: inModal ? "1em" : padding ? `${padding}px` : 0,
+            marginTop: inModal ? "0.5em" : padding ? `${padding}px` : 0,
           }),
         }}
       >

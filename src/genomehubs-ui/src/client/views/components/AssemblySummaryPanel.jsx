@@ -3,7 +3,8 @@ import React from "react";
 import { compose } from "recompose";
 import withRecord from "../hocs/withRecord";
 
-const AssemblySummaryPanel = ({ record, taxonId, assemblyId }) => {
+const AssemblySummaryPanel = ({ records, taxonId, assemblyId }) => {
+  let record = records[assemblyId];
   if (!record || !record.record || !record.record.attributes) {
     return null;
   }

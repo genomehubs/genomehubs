@@ -50,8 +50,8 @@ const KonvaTooltip = ({ e, segment, field, scale, statusColors }) => {
   if (field) {
     if (segment.fields && segment.fields[field]) {
       let value = sci(segment.fields[field].value);
-      let min = sci(segment.fields[field].min);
-      let max = sci(segment.fields[field].max);
+      let min = sci(segment.fields[field].min || segment.fields[field].value);
+      let max = sci(segment.fields[field].max || segment.fields[field].value);
       if (max != min) {
         value = `${value} [${min}-${max}]`;
       }

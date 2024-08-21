@@ -1,6 +1,5 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 import { createD3Palette, createPalette } from "./color/createPalette";
-import { createSelector, createSelectorCreator } from "reselect";
 import {
   interpolateCividis,
   interpolateCool,
@@ -20,9 +19,8 @@ import {
 
 import batlow from "./color/batlow";
 import batlowS from "./color/batlowS";
+import { createSelector } from "reselect";
 import immutableUpdate from "immutable-update";
-import paired12 from "./color/paired12";
-import store from "../store";
 
 export const ancestralColor = ANCESTRAL_COLOR || "red";
 export const descendantColor = DESCENDANT_COLOR || "orange";
@@ -34,16 +32,18 @@ export const addPalette = createAction("ADD_PALETTE");
 export const editPalette = createAction("EDIT_PALETTE");
 
 const brewerPalette = [
-  "rgb(31,120,180)",
-  "rgb(166,206,227)",
-  "rgb(51,160,44)",
-  "rgb(178,223,138)",
-  "rgb(227,26,28)",
-  "rgb(251,154,153)",
-  "rgb(255,127,0)",
-  "rgb(253,191,111)",
-  "rgb(106,61,154)",
-  "rgb(202,178,214)",
+  "#1f78b4",
+  "#a6cee3",
+  "#33a02c",
+  "#b2df8a",
+  "#e31a1c",
+  "#fb9a99",
+  "#ff7f00",
+  "#fdbf6f",
+  "#6a3d9a",
+  "#cab2d6",
+  "#b15928",
+  "#ffff99",
 ];
 
 const bhmPalette = ["#202125", "#bd3829", "#ee8623", "#42632e"];
@@ -61,6 +61,8 @@ const pridePalette = [
   "#FFAFC7",
 ];
 
+const ringsPalette = ["#3e76ec", "#FFCE01", "#000000", "#179A13", "#FF0000"];
+
 export const palettes = handleActions(
   {
     ADD_PALETTE: (state, action) =>
@@ -69,10 +71,12 @@ export const palettes = handleActions(
         allIds: [...state.allIds, action.payload.id],
       }),
     EDIT_PALETTE: (state, action) => {
-      let id = action.payload.id;
-      let arr = action.payload[id].slice(0);
+      let { id } = action.payload;
+      let arr = action.payload[id].slice();
       state.byId[id].forEach((col, i) => {
-        if (!arr[i]) arr[i] = col;
+        if (!arr[i]) {
+          arr[i] = col;
+        }
       });
       return immutableUpdate(state, {
         byId: {
@@ -86,7 +90,8 @@ export const palettes = handleActions(
       accent: createD3Palette(schemeAccent, 8),
       batlowS: createPalette(batlowS),
       batlow: createPalette(batlow, 50),
-      bhm: { id: "bhm", default: bhmPalette, levels: [] },
+      // bhm: { id: "bhm", default: bhmPalette, levels: [] },
+      bhm: createPalette(bhmPalette),
       category: createD3Palette(schemeCategory10, 10),
       cividis: createD3Palette(interpolateCividis, 50),
       cool: createD3Palette(interpolateCool, 50),
@@ -98,6 +103,7 @@ export const palettes = handleActions(
       paired: createD3Palette(schemePaired, 12),
       plasma: createD3Palette(interpolatePlasma, 50),
       pride: { id: "pride", default: pridePalette, levels: [] },
+      rings: { id: "rings", default: ringsPalette, levels: [] },
       standard: { id: "default", default: brewerPalette, levels: [] },
       tableau: createD3Palette(schemeTableau10, 10),
       turbo: createD3Palette(interpolateTurbo, 50),
@@ -117,35 +123,20 @@ export const selectedPalette = handleAction(
   "default"
 );
 
-// export const choosePalette = (palette) => {
-//   return function (dispatch) {
-//     let values = { palette };
-//     dispatch(queryToStore({ values }));
-//   };
-// };
-
-// export const chooseColors = (colors) => {
-//   return function (dispatch) {
-//     let existing = getColorPalette(store.getState());
-//     let values = { colors: { colors, existing } };
-//     dispatch(queryToStore({ values }));
-//   };
-// };
-
 export const getAllPalettes = (state) => state.palettes;
 
 export const getColorPalette = createSelector(
   getSelectedPalette,
   getAllPalettes,
   (id, palettes) => {
-    let colors = palettes ? palettes.byId[id] : [];
+    let colors = palettes ? palettes.byId[id] || palettes.byId["default"] : [];
     return { id, colors };
   }
 );
 
 export const getUserPalette = createSelector(getAllPalettes, (palettes) => {
   let id = "user";
-  let colors = palettes ? palettes.byId[id] : [];
+  let colors = palettes ? palettes.byId[id] || palettes.byId["default"] : [];
   return { id, colors };
 });
 
@@ -153,7 +144,7 @@ export const getDefaultPalette = createSelector(
   getSelectedPalette,
   getAllPalettes,
   (id, palettes) => {
-    let levels = palettes ? palettes.byId[id] : {};
+    let levels = palettes ? palettes.byId[id] || palettes.byId["default"] : {};
     return { id, colors: levels.default, levels };
   }
 );
@@ -189,9 +180,25 @@ export const theme = handleAction(
 );
 export const getTheme = (state) => state.theme;
 
+export const getStatusColors = (state) => state.statusColors;
+
+export const setStatusColors = createAction("STATUS_COLORS");
+export const statusColors = handleAction(
+  "STATUS_COLORS",
+  (state, action) => action.payload,
+  {
+    ancestral: ancestralColor,
+    descendant: descendantColor,
+    direct: directColor,
+    descendantHighlight,
+    directHighlight,
+  }
+);
+
 export const colorReducers = {
   palettes,
   selectedPalette,
   colorScheme,
   theme,
+  statusColors,
 };

@@ -9,6 +9,14 @@ export const resetNodes = createAction("RESET_NODES");
 
 export const treeThreshold = TREE_THRESHOLD;
 
+export const setTreeThreshold = createAction("SET_TREE_THRESHOLD");
+export const treeThresholdValue = handleAction(
+  "SET_TREE_THRESHOLD",
+  (state, action) => action.payload,
+  treeThreshold
+);
+export const getTreeThreshold = (state) => state.treeThresholdValue;
+
 const defaultState = () => ({
   isFetching: false,
   treeNodes: {},
@@ -75,4 +83,5 @@ export const treeReducers = {
   rootNode,
   treeHighlight,
   treeQuery,
+  treeThresholdValue,
 };

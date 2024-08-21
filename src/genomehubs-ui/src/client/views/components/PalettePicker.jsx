@@ -38,7 +38,10 @@ export const PalettePreview = ({ colors, size = "2em" }) => {
 const PalettePicker = ({ palettes, handleClick }) => {
   const classes = useStyles();
   let palettePreviews = Object.entries(palettes.byId).map(([id, palette]) => {
-    let colors = palette[6] || palette.default.slice(0, 6);
+    let colors =
+      palette.default.length > 6
+        ? palette[6] || palette.default.slice(0, 6)
+        : palette.default.slice(0, 6);
     let preview = <PalettePreview colors={colors}></PalettePreview>;
 
     return (

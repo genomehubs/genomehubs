@@ -4,6 +4,20 @@ import { createCachedSelector } from "re-reselect";
 import { createSelector } from "reselect";
 import immutableUpdate from "immutable-update";
 
+export const getDefaultIndex = () => {
+  if (
+    window &&
+    window.process &&
+    window.process.ENV &&
+    window.process.ENV.GH_DEFAULT_INDEX
+  ) {
+    return window.process.ENV.GH_DEFAULT_INDEX;
+  }
+  return DEFAULT_INDEX || "taxon";
+};
+
+export const defaultIndex = getDefaultIndex();
+
 export const requestSearch = createAction("REQUEST_SEARCH");
 export const receiveSearch = createAction(
   "RECEIVE_SEARCH",
@@ -147,13 +161,14 @@ export const searchIndex = handleAction(
   (state, action) => {
     return action.payload;
   },
-  "taxon"
+  defaultIndex
 );
 export const getSearchIndex = (state) => state.searchIndex;
 
 export const plurals = {
   assembly: "assemblies",
   feature: "features",
+  sample: "samples",
   taxon: "taxa",
 };
 export const getSearchIndexPlural = (state) =>

@@ -128,7 +128,7 @@ if (config.https) {
   });
 } else {
   const http = require("http");
-  http.createServer(app).listen(port, () => {
+  const server = http.createServer(app).listen(port, () => {
     console.log(`genomehubs-api started on http port ${port}`);
   });
 }

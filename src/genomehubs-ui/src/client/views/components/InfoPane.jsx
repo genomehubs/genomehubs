@@ -1,11 +1,13 @@
 import React, { memo, useState } from "react";
-import { compose } from "recompose";
-import classnames from "classnames";
-import styles from "./Styles.scss";
-import loadable from "@loadable/component";
-import { Link } from "@reach/router";
 
-const InfoCard = loadable(() => import("./InfoCard"));
+// import loadable from "@loadable/component";
+import InfoCard from "./InfoCard";
+import { Link } from "@reach/router";
+import classnames from "classnames";
+import { compose } from "recompose";
+import styles from "./Styles.scss";
+
+// const InfoCard = loadable(() => import("./InfoCard"));
 
 const InfoPane = (props) => {
   const [hover, setHover] = useState(false);

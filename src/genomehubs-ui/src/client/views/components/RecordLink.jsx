@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 import { Chip } from "@material-ui/core";
 import LaunchIcon from "@material-ui/icons/Launch";
 import Tooltip from "./Tooltip";
 import compareValues from "../functions/compareValues";
 import { compose } from "recompose";
-import fetchCount from "../functions/fetchCount";
-import fetchFieldCount from "../functions/fetchFieldCount";
-import fetchValueCount from "../functions/fetchValueCount";
 import getPrimaryAssemblyId from "../functions/getPrimaryAssemblyId";
-import qs from "../functions/qs";
+import styles from "./Styles.scss";
 import withApi from "../hocs/withApi";
 import withRecord from "../hocs/withRecord";
 
 const RecordLink = ({
   record,
+  records,
+  fetchRecord,
+  recordIsFetching,
   result,
   rank,
   condition,
@@ -22,12 +22,24 @@ const RecordLink = ({
   label,
   description,
   color = "#1f78b4",
+  icon,
+  EndIcon = LaunchIcon,
 }) => {
-  let [count, setCount] = useState();
+  useEffect(() => {
+    if (
+      condition?.startsWith("assembly.") &&
+      record?.record?.assembly_id &&
+      !records[record.record.assembly_id] &&
+      !recordIsFetching
+    ) {
+      fetchRecord(record.record.assembly_id, "assembly", taxonomy);
+    }
+  }, [records]);
 
   if (!record || !record.record || !url || !label) {
     return null;
   }
+
   if (result) {
     let match;
     for (let r of result.split(",")) {
@@ -48,20 +60,29 @@ const RecordLink = ({
     }
   }
 
-  const fetchValue = (key) => {
+  const fetchValue = (key, value) => {
     if (key == "assemblyId") {
       return getPrimaryAssemblyId(record);
     }
-    let value = record.record;
-    for (let k of key.split(".")) {
-      value = value[k];
+    let keys = key.split(/[\.\[]+/);
+    for (let k of keys) {
+      if (k.match(/\]$/)) {
+        k = k.replace(/\]$/, "");
+        let [subkey, subval] = k.split(":");
+        value = subval
+          ? value.find((o) => o[subkey] == subval)
+          : value.find((o) => o.hasOwnProperty(subkey));
+      } else if (value && value.hasOwnProperty(k)) {
+        value = value[k];
+      }
       if (typeof value === "undefined") {
-        throw `ERROR fetching ${key}`;
+        continue;
+        // throw `ERROR fetching ${key}`;
       }
     }
-    if (value.values) {
+    if (value && value.values) {
       return value.values;
-    } else if (value.value) {
+    } else if (value && value.value) {
       return value.value;
     }
     return value;
@@ -74,8 +95,12 @@ const RecordLink = ({
         if (!part) {
           return "";
         }
+        let currentRecord = part?.startsWith("assembly.")
+          ? { assembly: records[record.record.assembly_id]?.record }
+          : record.record;
+
         if (i % 2 == 1) {
-          return fetchValue(part);
+          return fetchValue(part, currentRecord);
         }
         return part;
       })
@@ -92,43 +117,24 @@ const RecordLink = ({
           return null;
         }
       } else {
-        let recordValue = fetchValue(key);
+        let currentRecord = condition?.startsWith("assembly.")
+          ? { assembly: records[record.record.assembly_id]?.record }
+          : record.record;
+        let recordValue = fetchValue(key, currentRecord);
         if (cmp && !compareValues(recordValue, value, cmp)) {
+          return null;
+        }
+        if (!cmp && !recordValue) {
           return null;
         }
       }
     }
-
     href = fillValues(url);
   } catch (err) {
     return null;
   }
 
-  useEffect(() => {
-    // const queryString = qs.stringify({ ...options });
-    // let isApiSubscribed = true;
-    // let fetchFunc;
-    // switch (of) {
-    //   case "fields":
-    //     fetchFunc = fetchFieldCount;
-    //     break;
-    //   case "values":
-    //     fetchFunc = fetchValueCount;
-    //     break;
-    //   default:
-    //     fetchFunc = fetchCount;
-    // }
-    // fetchFunc({ queryString }).then((response) => {
-    //   if (isApiSubscribed) {
-    //     setCount(response);
-    //   }
-    // });
-    // return () => {
-    //   // cancel the subscription
-    //   isApiSubscribed = false;
-    // };
-    // fetchCount({ queryString, setCount });
-  }, []);
+  icon = icon ? <img className={styles.recordLinkIcon} src={icon} /> : null;
 
   let chip = (
     <Chip
@@ -144,7 +150,9 @@ const RecordLink = ({
       // size="small"
       label={
         <span style={{ whiteSpace: "nowrap" }}>
-          {label} <LaunchIcon fontSize="inherit" />
+          {icon}
+          {label}{" "}
+          <EndIcon fontSize="inherit" style={{ marginBottom: "-0.1em" }} />
         </span>
       }
       component="a"

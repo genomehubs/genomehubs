@@ -6,7 +6,6 @@ attributes:
       enum:
         - asg
         - cbp
-        - ebpn
         - cfgp
         - dtol
         - ebpn
@@ -40,7 +39,6 @@ attributes:
       enum:
         - asg
         - cbp
-        - ebpn
         - cfgp
         - dtol
         - ebpn
@@ -62,7 +60,6 @@ attributes:
       enum:
         - asg
         - cbp
-        - ebpn
         - cfgp
         - dtol
         - ebpn

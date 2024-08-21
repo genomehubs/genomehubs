@@ -23,106 +23,13 @@ import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
 import qs from "../functions/qs";
+import searchByCell from "../functions/searchByCell";
 import setColors from "../functions/setColors";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
 import withSearchIndex from "../hocs/withSearchIndex";
 import withSiteName from "../hocs/withSiteName";
-
-const searchByCell = ({
-  xQuery,
-  summary,
-  xLabel,
-  xBounds,
-  bounds,
-  location,
-  navigate,
-  fields,
-  ranks,
-  basename,
-}) => {
-  let query = xQuery.query;
-  let field = bounds.field;
-  query = query
-    .replaceAll(new RegExp("AND\\s+" + bounds.field + "\\s+AND", "gi"), "AND")
-    .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
-      ""
-    )
-    .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
-      ""
-    );
-  if (summary && summary != "value") {
-    field = `${summary}(${field})`;
-    query = query
-      .replaceAll(new RegExp("AND\\s+" + field + "\\s+AND", "gi"), "AND")
-      .replaceAll(
-        new RegExp("AND\\s+" + field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
-        ""
-      )
-      .replaceAll(
-        new RegExp("AND\\s+" + field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
-        ""
-      );
-  }
-  query = query.replaceAll(/\s+/g, " ").replace(/\s+$/, "");
-
-  if (bounds.scale == "ordinal" && field == bounds.field) {
-    query += ` AND ${field} = ${xBounds[0]}`;
-  } else {
-    query += ` AND ${field} >= ${xBounds[0]} AND ${field} < ${xBounds[1]}`;
-  }
-
-  let options = qs.parse(location.search.replace(/^\?/, ""));
-  if (options.sortBy && !fields.includes(options.sortBy)) {
-    delete options.sortBy;
-    delete options.sortOrder;
-  }
-  options.offset = 0;
-  fields = fields.join(",");
-  if (ranks) {
-    ranks = ranks.join(",");
-  } else {
-    ranks = "";
-  }
-  for (let key of [
-    "excludeAncestral",
-    "excludeDescendant",
-    "excludeDirect",
-    "excludeMissing",
-  ]) {
-    if (xQuery[key]) {
-      delete xQuery[key];
-    }
-  }
-  let xOpts = (options.xOpts || "").split(";");
-  if (xOpts.length == 1) {
-    xOpts = xOpts[0].split(",");
-  }
-  if (xOpts.length > 1) {
-    xOpts[0] = "";
-    xOpts[1] = "";
-  }
-  xOpts = xOpts.join(";");
-
-  let queryString = qs.stringify({
-    ...xQuery,
-    ...options,
-    xOpts,
-    query,
-    fields,
-    report: "histogram",
-    ranks,
-  });
-  // let hash = encodeURIComponent(query);
-  navigate(
-    `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
-      query
-    )}`
-  );
-};
 
 const CustomBackground = ({ chartProps, ...props }) => {
   let legendGroup = null;
@@ -142,21 +49,21 @@ const CustomBackground = ({ chartProps, ...props }) => {
   }
   let h = props.background.height;
   let w = props.width * chartProps.n;
-  let xBounds = [
+  let xRange = [
     chartProps.buckets[props.index],
     chartProps.buckets[props.index + 1],
   ];
 
-  let xRange;
+  let xLimits;
   if (chartProps.bounds.scale == "ordinal") {
-    xRange = xBounds[0];
+    xLimits = xRange[0];
   } else {
-    xRange = `${chartProps.xFormat(xBounds[0])}-${chartProps.xFormat(
-      xBounds[1]
+    xLimits = `${chartProps.xFormat(xRange[0])}-${chartProps.xFormat(
+      xRange[1]
     )}`;
   }
   if (chartProps.valueType == "date") {
-    xBounds = xBounds.map((bound) =>
+    xRange = xRange.map((bound) =>
       new Date(bound)
         .toISOString()
         .substring(0, 10)
@@ -172,6 +79,12 @@ const CustomBackground = ({ chartProps, ...props }) => {
       count += counts[key] * 1;
       series.push(
         <div key={key}>
+          <span
+            className={styles.ttSwatch}
+            style={{
+              backgroundColor: chartProps.colors[i],
+            }}
+          />
           {key}: {counts[key]}
         </div>
       );
@@ -181,7 +94,8 @@ const CustomBackground = ({ chartProps, ...props }) => {
   return (
     <>
       <Tooltip
-        title={<CellInfo x={xRange} count={count} rows={series} />}
+        interactive
+        title={<CellInfo x={xLimits} count={count} rows={series} />}
         arrow
       >
         <Rectangle
@@ -199,7 +113,7 @@ const CustomBackground = ({ chartProps, ...props }) => {
                   e.stopPropagation();
                   searchByCell({
                     ...chartProps,
-                    xBounds,
+                    xRange,
                   });
                 }
           }
@@ -225,7 +139,6 @@ const Histogram = ({
   stacked,
   cumulative,
   chartProps,
-  colors,
   legendRows,
 }) => {
   let yDomain = [0, "dataMax"];
@@ -234,7 +147,7 @@ const Histogram = ({
   } else if (chartProps.yScale.startsWith("log")) {
     yDomain = [1, "dataMax"];
   }
-  let buckets = chartProps.buckets;
+  let { buckets } = chartProps;
 
   let axes = [
     <CartesianGrid key={"grid"} strokeDasharray="3 3" vertical={false} />,
@@ -266,7 +179,9 @@ const Histogram = ({
           pointSize: chartProps.pointSize,
           orientation: chartProps.orientation,
           lastPos: width - marginRight,
+          labels: chartProps.labels,
           showLabels: chartProps.showLabels,
+          valueType: chartProps.valueType,
           report: isNaN(buckets[0]) ? "catHistogram" : "histogram",
         })
       }
@@ -364,7 +279,7 @@ const Histogram = ({
                 width: width - 45,
                 x: 10,
                 name: cat,
-                fill: colors[i] || "rgb(102, 102, 102)",
+                fill: chartProps.colors[i] || "rgb(102, 102, 102)",
                 i,
                 stats: chartProps.stats[cat],
               }}
@@ -378,7 +293,7 @@ const Histogram = ({
             dataKey={cat}
             key={i}
             stackId={stacked ? 1 : false}
-            fill={colors[i] || "rgb(102, 102, 102)"}
+            fill={chartProps.colors[i] || "rgb(102, 102, 102)"}
             isAnimationActive={false}
             style={{ pointerEvents: "none" }}
           />
@@ -408,6 +323,7 @@ const ReportHistogram = ({
   stacked,
   cumulative,
   yScale = "linear",
+  message,
   setMessage,
   colors,
   levels,
@@ -423,12 +339,12 @@ const ReportHistogram = ({
 }) => {
   pointSize *= 1;
   const navigate = useNavigate();
-  const componentRef = chartRef ? chartRef : useRef();
+  const componentRef = chartRef || useRef();
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
   useEffect(() => {
-    if (histogram && histogram.status) {
+    if (inModal && message && histogram && histogram.status) {
       setMessage(null);
     }
   }, [histogram]);
@@ -481,9 +397,9 @@ const ReportHistogram = ({
     if (xOptions.length == 1) {
       xOptions = xOptions[0].split(",");
     }
-    let buckets = histograms.buckets;
-    let valueType = histograms.valueType;
-    let summary = histograms.summary;
+    let { buckets, valueType, summary } = histograms;
+    let labels = bounds.labels || buckets;
+
     let compressX;
     if (
       histograms.byCat &&
@@ -496,7 +412,7 @@ const ReportHistogram = ({
       compressX = true;
     }
     let xLabel = xOptions[4] || histogram.report.xLabel;
-    let yLabel = histogram.report.yLabel;
+    let { yLabel } = histogram.report;
     if (yScale == "log10") {
       yLabel = `Log10 ${yLabel}`;
     } else if (yScale == "proportion") {
@@ -656,7 +572,6 @@ const ReportHistogram = ({
         endLabel={endLabel}
         lastIndex={lastIndex}
         stacked={stacked}
-        colors={colors}
         legendRows={legendRows}
         chartProps={{
           zDomain: histograms.zDomain,
@@ -666,6 +581,8 @@ const ReportHistogram = ({
           xQuery: histogram.report.xQuery,
           xLabel,
           bounds,
+          labels,
+          colors,
           fields: histograms.fields,
           // showTickLabels: xOptions[2]
           //   ? xOptions[2] >= 0

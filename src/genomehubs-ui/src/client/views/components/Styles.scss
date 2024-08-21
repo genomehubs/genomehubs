@@ -60,6 +60,22 @@ body,
   }
 }
 
+.ttSwatch {
+  height: 1em;
+  width: 1em;
+  background-color: white;
+  border: solid white 0.125em;
+  margin-bottom: -0.2em;
+  display: inline-block;
+  margin-right: 0.5em;
+  box-sizing: border-box;
+  position:relative
+}
+
+.fadeIn { opacity: 1; transition: opacity 0.5s ease; }
+.fadeOut { opacity: 0; transition: opacity 0.5s ease; }
+
+
 * {
   @include themify($themes) {
     // background: inherit;
@@ -106,6 +122,108 @@ body,
       }
     }
 
+
+
+    .loadingScreen {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      top: 0;
+      background-color: themed("primary");
+      color: mix(themed("secondary"), themed("primary"), 65%);
+      z-index: 10000;
+
+      .loadingContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center align the children horizontally */
+        justify-content: center; /* Center align the children vertically */
+
+        animation: pulse 3s infinite;
+      }
+
+      .loadingLogo {
+        position: relative;
+
+        &::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: radial-gradient(rgba(themed("primary"), 0.0), rgba(themed("primary"), 1));
+        }
+      }
+
+      .loader {
+        // position: fixed;
+        width: 15em;
+        height: 15em;
+        margin: auto;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        padding: 0.75em;
+      }
+
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 0.25;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+      
+      // .loader:before,
+      // .loader:after {
+      //   position: absolute;
+      //   background: themed("secondary");
+      //   content: "";
+      //   width: 1.5em;
+      //   height: 1.5em;
+      //   left: 0;
+      //   top: 0;
+      //   border-radius: 50%;
+      //   animation: square 4s linear infinite;
+      //   will-change: transform; /* Add this line */
+      // }
+      
+      // .loader:after {
+      //   background: themed("secondary");
+      //   animation-delay: -2s;
+      // }
+      
+      // @keyframes square {
+      //   0%, 100% {
+      //     left: 0;
+      //     top: 0;
+      //     transform: translate(0, 0);
+      //   }
+      //   25% {
+      //     left: 100%;
+      //     top: 0;
+      //     transform: translate(-100%, 0);
+      //   }
+      //   50% {
+      //     left: 100%;
+      //     top: 100%;
+      //     transform: translate(-100%, -100%);
+      //   }
+      //   75% {
+      //     left: 0;
+      //     top: 100%;
+      //     transform: translate(0, -100%);
+      //   }
+      // }
+    }
+
     .active:hover {
       fill-opacity: 0.5;
       stroke-opacity: 0.5;
@@ -149,13 +267,85 @@ body,
       flex-direction: row;
     }
 
+
+    .saveSearchOptions {
+      font-size: 2em;
+      background-color: inherit;
+      padding: 0;
+      &:not(:last-child) {
+        margin-right: 0.25em;
+      }
+    }
+
+    .favListing {
+      margin-bottom: 0.5em;
+
+      &Container {
+        position: relative;
+        border: solid #f0f0f0 0.1em;
+        border-radius: 0.25em;
+      }
+
+      &Header {
+        position: relative;
+        background-color: #f0f0f0;
+        min-height: 1.5em;
+
+        .saveSearchOptions {
+          float: left;
+          margin-right: 0.1em;
+        }
+      }
+
+      &Expand {
+        position: absolute;
+        right: 0;
+        top: 0
+      }
+
+      &Content {
+        overflow-x: scroll;
+        margin: 0.5em 0.25em 1em;
+
+        pre {
+          margin: 0;
+          width: fit-content;
+        }
+        
+        hr {
+          margin: 0.25em 0;
+          color: themed("primary");
+        }
+      }
+
+      &Button {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+      }
+      &Footer {
+        font-family: themed("bodyFont");
+        font-size: 0.8em;
+        line-height: 1.5em;
+        color: mix(themed("primary"), themed("secondary"), 75%);
+        margin-right: 0.5em;
+      }
+    }
+
+
     header {
       // background: mix(themed('primary'),themed('secondary'),50%);
       // color: themed('secondary');
       border-bottom: 0.2em solid themed("primary");
+      height: 2em;
       flex: none;
       z-index: 1;
       background: themed("secondary");
+
+      &.error {
+        background: themed("ancestral");
+        border-color: themed("ancestral");
+      }
 
       .siteText {
         background: rgba(themed("primary"), 0.5);
@@ -193,6 +383,7 @@ body,
       .tabDiv {
         float:left;
         overflow: visible;
+        position: relative;
       }
 
       .tab {
@@ -203,6 +394,7 @@ body,
         cursor: pointer;
         display: inline-block;
         height: 2.2em;
+        min-width: 6em;
         line-height: 2em;
         margin-right: -1px;
         // margin-bottom: 0.2em;
@@ -223,6 +415,8 @@ body,
 
       .nestedTab {
         overflow: hidden;
+        position: absolute;
+        right: 0;
         .tabDiv {
           float:none;
           display:block;
@@ -231,7 +425,7 @@ body,
           background-color: themed("primary");
         }
         nav {
-          border-top: 0.2em solid themed("secondary");
+          // border-top: 0.2em solid themed("secondary");
           overflow-x: hidden;
           overflow-y: auto;
           max-height: calc( 80vh - 2em );
@@ -255,6 +449,10 @@ body,
             }
           }
         }
+      }
+      .searchIcon {
+        float: right;
+        line-height: 2em;
       }
     }
 
@@ -489,9 +687,11 @@ body,
         }
       }
     }
-
-    
-
+    .filesTitle {
+      font-family: themed("titleFont");
+      font-size: 1.25em;
+      line-height: 2em;
+    }
 
     .resultPanel {
       border-top: solid 0.25px rgba(themed("primary"), 0.25);
@@ -504,9 +704,10 @@ body,
       .header {
         cursor: pointer;
         margin: -0.25em -0.25em 0.25em -0.25em;
-        padding: 0.25em;
+        padding: 0.35em;
         color: themed("secondary");
         background-color: themed("primary");
+        border-radius: 0.25em;
 
         .identifier {
           float: right;
@@ -584,10 +785,56 @@ body,
       .lineage {
         cursor: pointer;
         display: inline-block;
-        margin-right: 0.5em;
+        background-color: mix(themed("descendant"), themed("secondary"), 10%);
+        padding: 0.25em;
+        margin: 0.25em 0.5em 0.25em 0;
+        border-radius: 0.25em;
+        border: solid 2px themed("descendant");
+
+        &Direct {
+          background-color: mix(themed("direct"), themed("secondary"), 10%);
+          border-color: themed("direct");
+        }
+
+        .rank {
+          color: rgba(themed("primary"), 0.75);
+          font-size: 0.75em;
+          display: block;
+          width: 100%;
+          line-height: 0.75em;
+          height: 1em;
+        }
+
+        .bold {
+          font-weight: bold;
+        }
       }
-      .name {
+      
+      .nameGroup {
         display: block;
+        margin: 0.5em 0;
+
+        .title {
+          display: table-cell;
+          font-size: 0.9em;
+          font-weight: bold;
+          min-width: 10em;
+        }
+
+        .content {
+          margin: 0.5em 0 0.5em 0;
+          
+          display: table-cell;
+        }
+
+        .name:not(:last-of-type):after {
+          content: ", ";
+        }
+
+        .bold {
+          font-size: 1.5em;
+          font-weight: bold;
+        }
       }
 
       .tagCloud {
@@ -628,6 +875,8 @@ body,
       overflow: visible;
       padding: 1em;
       width: 100%;
+      font-family: themed("bodyFont");
+
     }
 
     .floatRight {
@@ -1175,6 +1424,7 @@ body,
       }
 
     }
+    
     .badgeExpanded {
       &:after {
         content: "";
@@ -1185,6 +1435,106 @@ body,
         width: 1rem;
         border-left: 0.2rem solid themed("primary");
       }
+    }
+
+    .resultsTable {
+      max-height: 90vh;
+      border: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
+
+      table {
+        border-collapse: separate;
+
+        thead {
+          position: sticky;
+          top: 0;
+          z-index: 200;
+          background-color: #f8f8f8;
+
+          tr {
+            th: {
+              border-bottom: none;
+            }
+
+            th:first-of-type {
+              border-right: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
+            }
+          }
+
+          tr:last-of-type {
+            th {
+              border-bottom: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
+            }
+          }
+        }
+
+        tbody {
+          tr {
+            td:first-of-type {
+              border-right: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
+            }
+          }
+          tr:last-of-type {
+            td {
+              border-bottom: none;
+            }
+          }
+        }
+
+        thead, tbody {
+          tr, td {
+            .contrast {
+              background-color: mix(themed("primary"), themed("secondary"), 5%)
+            }
+
+            .first {
+              border-left: solid mix(themed("primary"), themed("secondary"), 10%) 2px;
+            }
+
+            .last {
+              border-right: solid mix(themed("primary"), themed("secondary"), 10%) 2px;
+            
+              & + .first {
+                border-left: none;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .attrInfo {
+
+      position: relative;
+      display: inline-block;
+      text-align: center;
+      cursor: pointer;
+      white-space: nowrap;
+      margin: 0.25rem;
+      border-radius: 0.25rem;
+      padding: 0 0.5em 0.05em;
+      background-color: themed("secondary");
+      border: solid 3px themed("primary");
+
+      .infoName {
+        font-family: themed("bodyFont");
+        color: mix(themed("secondary"), themed("primary"), 10%);
+        position: relative;
+        border-bottom: 0.1rem solid mix(themed("primary"), themed("secondary"), 15%);
+      }
+
+      .infoValue {
+        margin-left: 0.5rem;
+        color: themed("primary");
+        font-family: themed("titleFont");
+        font-size: 1.5em;
+        display: inline-block;
+        position: relative;
+      }
+
+      &:hover {
+        filter: invert(0.1);
+      }
+
     }
 
 
@@ -1344,6 +1694,13 @@ body,
         display: table;
         clear: both;
       }
+    }
+
+    .recordLinkIcon {
+      height: 1.5em;
+      width: 1.5em;
+      margin: 0 0.25em -0.2em 0;
+      display: inline-block;
     }
   }
 }

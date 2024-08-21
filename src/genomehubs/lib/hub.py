@@ -4,6 +4,7 @@
 
 import contextlib
 import csv
+import json
 import os
 import re
 import shutil
@@ -325,6 +326,8 @@ def convert_to_type(key, raw_value, to_type, *, translate=None):
             value = None
     elif to_type == "geo_point":
         value = convert_lat_lon(raw_value)
+    elif to_type == "flattened":
+        value = json.loads(raw_value)
     else:
         value = str(raw_value)
     if value is None:
@@ -503,12 +506,11 @@ def validate_values(values, key, types, row_values, shared_values, blanks):
             if not value:
                 continue
             with contextlib.suppress(KeyError):
-                # print(types[key]["translate"])
                 value = types[key]["translate"][value.lower()]
         if not isinstance(value, list):
             value = [value]
         for v in value:
-            if v in blanks:
+            if not isinstance(v, dict) and v in blanks:
                 continue
             try:
                 valid = test_constraint(v, key_type)
@@ -556,6 +558,39 @@ def update_taxon_types(taxon_types, new_prop, value, prop):
         del taxon_types[prop]
 
 
+def process_metadata(attribute, blanks):
+    """Move attribute metadata to a single dict."""
+    paths = {
+        "comment": "value.comment",
+        "is_primary_value": "value.primary",
+        "organelle": "value.organelle",
+        "source": "source.name",
+        "source_pubmed_id": "source.pubmed",
+        "source_url_stub": "source.stub",
+        "url": "source.url",
+    }
+    metadata = attribute["metadata"] if "metadata" in attribute else {}
+    if not isinstance(metadata, dict):
+        metadata = json.loads(metadata)
+    for key, value in attribute.items():
+        if key in paths:
+            path = paths[key]
+        elif key.startswith("source_"):
+            path = key.replace("_", ".")
+        else:
+            continue
+        parent = metadata
+        parts = path.lower().split(".")
+        for index, part in enumerate(parts):
+            if index < len(parts) - 1:
+                if part not in parent:
+                    parent[part] = {}
+                parent = parent[part]
+            elif part not in parent or parent[part] in blanks:
+                parent[part] = str(value).lower()
+    attribute["metadata"] = metadata
+
+
 def add_attributes(
     entry,
     types,
@@ -577,8 +612,29 @@ def add_attributes(
         taxon_types,
         attribute_values,
     ) = set_add_attributes_defaults(attributes, meta, row_values)
-    for key, values in entry.items():
-        if key in types:
+    indices = {}
+    for k, values in entry.items():
+        key, *rest = k.split(".") if "." in k else [k]
+        if rest:
+            try:
+                attribute = attributes[indices[key]]
+            except KeyError:
+                continue
+            if "metadata" not in attribute:
+                attribute["metadata"] = {}
+            md = attribute["metadata"]
+            if (isinstance(values, str) and values in blanks) or any(
+                value in blanks for value in values
+            ):
+                continue
+            for index, part in enumerate(rest):
+                if part not in md:
+                    md[part] = {}
+                if index < len(rest) - 1:
+                    md = md[part]
+                else:
+                    md[part] = values
+        elif key in types:
             if not isinstance(values, list):
                 values = [values]
             if attr_type == "taxon_names":
@@ -619,12 +675,26 @@ def add_attributes(
                         row_values,
                         shared_values,
                     )
+                # if "metadata" in types[key]:
+                #     if "metadata" not in attribute:
+                #         attribute.update({"metadata": {}})
+                #     attribute.update(
+                #         {
+                #             "metadata": {
+                #                 k: v
+                #                 for k, v in types[key]["metadata"].items()
+                #                 if k not in attribute["metadata"]
+                #             }
+                #         }
+                #     )
+                indices[key] = len(attributes)
                 attributes.append(attribute)
     if attribute_values:
         for attribute in attributes:
+            process_metadata(attribute, blanks)
             has_taxon_data = False
-            taxon_attribute = {**attribute, "source_index": "assembly"}
             taxon_attribute_types = {**types[attribute["key"]]}
+            taxon_attribute = {**attribute, "source_index": "assembly"}
             # taxon_props = []
             for prop, value in types[attribute["key"]].items():
                 if prop.startswith("taxon_"):

@@ -174,6 +174,7 @@ const ReportMap = ({
   embedded,
   ratio,
   stacked,
+  message,
   setMessage,
   colors,
   levels,
@@ -190,7 +191,7 @@ const ReportMap = ({
     ? useResize(containerRef)
     : useResize(componentRef);
   useEffect(() => {
-    if (map && map.status) {
+    if (message && map && map.status) {
       setMessage(null);
     }
   }, [map]);

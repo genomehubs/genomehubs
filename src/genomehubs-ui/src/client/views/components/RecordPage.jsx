@@ -5,6 +5,7 @@ import AssembliesPanel from "./AssembliesPanel";
 import AssemblyPanel from "./AssemblyPanel";
 import AttributePanel from "./AttributePanel";
 import FeaturePanel from "./FeaturePanel";
+import FilesPanel from "./FilesPanel";
 import LineagePanel from "./LineagePanel";
 import NamesPanel from "./NamesPanel";
 import Page from "./Page";
@@ -163,6 +164,7 @@ const RecordPage = ({
             key={"lineage"}
             taxon_id={taxon.taxon_id}
             lineage={record.record.lineage.slice().reverse()}
+            result={options.result}
           />
         );
       }
@@ -178,15 +180,6 @@ const RecordPage = ({
     }
 
     if (options.result == "assembly" || options.result == "feature") {
-      results.push(
-        <AssemblyPanel
-          key={"assembly"}
-          recordId={record.record.record_id}
-          assemblyId={record.record.assembly_id}
-          result={options.result}
-          taxonomy={options.taxonomy}
-        />
-      );
       if (options.result == "feature") {
         results.push(
           <FeaturePanel
@@ -197,6 +190,15 @@ const RecordPage = ({
           />
         );
       }
+      results.push(
+        <AssemblyPanel
+          key={"assembly"}
+          recordId={record.record.record_id}
+          assemblyId={record.record.assembly_id}
+          result={options.result}
+          taxonomy={options.taxonomy}
+        />
+      );
     } else if (options.result == "sample") {
       results.push(
         <AssembliesPanel
@@ -231,6 +233,17 @@ const RecordPage = ({
     }
 
     if (record.record.attributes) {
+      if (record.record.attributes.files && options.result == "assembly") {
+        results.push(
+          <FilesPanel
+            key={"files"}
+            recordId={record.record.record_id}
+            result={options.result}
+            taxonomy={options.taxonomy}
+            files={record.record.attributes.files}
+          />
+        );
+      }
       results.push(
         <AttributePanel
           key={"attributes"}

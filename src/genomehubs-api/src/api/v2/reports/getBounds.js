@@ -99,19 +99,23 @@ export const getBounds = async ({
   if (!cat) {
     catOpts = opts;
   }
+  let nSort = false;
+  if (opts.startsWith("nsort")) {
+    nSort = true;
+    opts = opts.replace("nsort", "");
+  }
   let { lookupTypes } = await attrTypes({ result, taxonomy });
   params.size = 0;
   params.query = await chainQueries(params);
   // find max and min plus most frequent categories
   let fieldMeta = lookupTypes(fields[0]);
-  let field = fieldMeta.name;
-  let type = fieldMeta.type;
+  let { type, name: field } = fieldMeta;
   let catType;
   let catMeta = lookupTypes(cat);
   if (catMeta) {
     cat = catMeta.name;
   }
-  let summary = summaries[0];
+  let summary = summaries[0] || "value";
   let scaleType = setScale({ field, lookupTypes, opts });
   if (scaleType == "ordinal" && summary == "length") {
     scaleType = "linear";
@@ -217,7 +221,7 @@ export const getBounds = async ({
       tickCount = Math.abs(opts[2]);
     }
   }
-  let stats = aggs.stats;
+  let { stats } = aggs;
   if (stats) {
     // Set domain to nice numbers
     if (!min || !max) {
@@ -297,7 +301,7 @@ export const getBounds = async ({
       domain = [min, max].map((v) => v * 1);
     }
   } else {
-    let keywords = aggs.keywords;
+    let { keywords } = aggs;
     if (keywords) {
       let { cats, by } = await getCatsBy({
         terms: keywords,
@@ -307,6 +311,9 @@ export const getBounds = async ({
         taxonomy,
         apiParams,
       });
+      if (nSort) {
+        cats = cats.sort((a, b) => a.key.localeCompare(b.key));
+      }
       stats = {
         cats,
         by,
@@ -317,13 +324,13 @@ export const getBounds = async ({
     } else {
       stats = { count: res.status.hits };
     }
-    let geo = aggs.geo;
+    let { geo } = aggs;
     if (geo) {
       stats = stats || {};
       stats.geo = geo;
     }
   }
-  let terms = aggs.terms;
+  let { terms } = aggs;
   let cats;
   let by;
   if (terms) {

@@ -7,7 +7,9 @@ import { descendantsReducers } from "./descendants";
 import { exploreReducers } from "./explore";
 import { fileReducers } from "./file";
 import { geographyReducers } from "./geography";
+import { loadingReducers } from "./loading";
 import { lookupReducers } from "./lookup";
+import { mapReducers } from "./map";
 import { messageReducers } from "./message";
 import { pageReducers } from "./pages";
 import { phylopicReducers } from "./phylopic";
@@ -15,7 +17,6 @@ import { recordReducers } from "./record";
 import { reportReducers } from "./report";
 import { routeReducers } from "./routes";
 import { searchReducers } from "./search";
-import { taxonomyRanks } from "../selectors/types";
 import { taxonomyReducers } from "./taxonomy";
 import { trackingReducers } from "./tracking";
 import { treeReducers } from "./tree";
@@ -31,7 +32,9 @@ const allReducers = Object.assign(
   exploreReducers,
   fileReducers,
   geographyReducers,
+  loadingReducers,
   lookupReducers,
+  mapReducers,
   messageReducers,
   pageReducers,
   phylopicReducers,
@@ -48,15 +51,15 @@ const allReducers = Object.assign(
 const appReducer = combineReducers(allReducers);
 
 const rootReducer = (state, action) => {
+  let newState = state;
   if (action.type === "REFRESH") {
-    let { cookieConsent, analytics, theme } = state;
-    state = {
-      analytics,
+    let { cookieConsent, theme } = state;
+    newState = {
       cookieConsent,
       theme,
     };
   }
-  return appReducer(state, action);
+  return appReducer(newState, action);
 };
 
 export default rootReducer;

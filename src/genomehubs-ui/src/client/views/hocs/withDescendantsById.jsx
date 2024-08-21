@@ -1,11 +1,11 @@
 import {
-  fetchDescendants,
   getDescendantsByTaxonId,
   getDescendantsIsFetchingByTaxonId,
 } from "../reducers/descendants";
 
 import React from "react";
 import { connect } from "react-redux";
+import { fetchDescendants } from "../selectors/descendants";
 
 const withDescendantsById = (WrappedComponent) => (props) => {
   let { currentRecordId: taxonId } = props;

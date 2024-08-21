@@ -118,17 +118,15 @@ const getHistogram = async ({
   let ySummary;
   let rawData;
   let pointData;
-  if (bounds.cat) {
-    if (bounds.by == "attribute") {
-      if (!bounds.showOther) {
-        let parts = params.query.split(/\s+AND\s+/i);
-        let filtered = parts.filter((part) => part != bounds.cat);
-        params.query = `${filtered.join(" AND ")} AND ${
-          bounds.cat
-        }=${bounds.cats.map(({ key }) => key).join(",")}`;
-      }
-      fields = [...new Set([...fields, bounds.cat])];
+  if (bounds.cat && bounds.by == "attribute") {
+    if (!bounds.showOther) {
+      let parts = params.query.split(/\s+AND\s+/i);
+      let filtered = parts.filter((part) => part != bounds.cat);
+      params.query = `${filtered.join(" AND ")} AND ${bounds.cat}=${bounds.cats
+        .map(({ key }) => key)
+        .join(",")}`;
     }
+    fields = [...new Set([...fields, bounds.cat])];
   }
   if (yFields && yFields.length > 0) {
     yFieldMeta = lookupTypes(yFields[0]);
@@ -179,6 +177,12 @@ const getHistogram = async ({
     }
     if (yFields.length > 0 && raw) {
       pointData = {};
+      let xKeys = new Set(
+        (bounds.stats.cats || []).map((obj) => obj.key.toLowerCase())
+      );
+      let yKeys = new Set(
+        (yBounds.stats.cats || []).map((obj) => obj.key.toLowerCase())
+      );
       for (let result of res.results) {
         let cats;
         if (bounds.cat) {
@@ -210,7 +214,21 @@ const getHistogram = async ({
             continue;
           }
           let x = result.result.fields[field][xSumm];
+          if (
+            valueType == "keyword" &&
+            xSumm == "value" &&
+            !xKeys.has(x.toLowerCase())
+          ) {
+            continue;
+          }
           let y = result.result.fields[yField][ySumm];
+          if (
+            yValueType == "keyword" &&
+            ySumm == "value" &&
+            !yKeys.has(y.toLowerCase())
+          ) {
+            continue;
+          }
           if (valueType == "date") {
             x = Date.parse(x);
           }
@@ -284,11 +302,9 @@ const getHistogram = async ({
       } else {
         allYValues.push([]);
       }
-    } else {
-      if (obj.doc_count > 0) {
-        zDomain[0] = Math.min(zDomain[0], obj.doc_count);
-        zDomain[1] = Math.max(zDomain[1], obj.doc_count);
-      }
+    } else if (obj.doc_count > 0) {
+      zDomain[0] = Math.min(zDomain[0], obj.doc_count);
+      zDomain[1] = Math.max(zDomain[1], obj.doc_count);
     }
   });
   if (fieldMeta.type == "date") {
@@ -466,19 +482,15 @@ const updateQuery = ({ params, fields, summaries, opts, lookupTypes }) => {
       i++;
       if (min && queryArr[i] && queryArr[i].match(/</)) {
         i++;
-        if (queryArr[i] && !isNaN(queryArr[i])) {
-          if (min > queryArr[i]) {
-            queryArr[i] = min;
-            min = undefined;
-          }
+        if (queryArr[i] && !isNaN(queryArr[i]) && min > queryArr[i]) {
+          queryArr[i] = min;
+          min = undefined;
         }
       } else if (max && queryArr[i] && queryArr[i].match(/>/)) {
         i++;
-        if (queryArr[i] && !isNaN(queryArr[i])) {
-          if (max < queryArr[i]) {
-            queryArr[i] = max;
-            max = undefined;
-          }
+        if (queryArr[i] && !isNaN(queryArr[i]) && max < queryArr[i]) {
+          queryArr[i] = max;
+          max = undefined;
         }
       }
     }
@@ -496,13 +508,14 @@ export const histogram = async ({
   x,
   y,
   cat,
+  catToX,
   result,
   rank,
   includeEstimates,
   queryString,
   taxonomy,
-  xOpts,
-  yOpts,
+  xOpts = ";;",
+  yOpts = ";;",
   scatterThreshold,
   report,
   apiParams,
@@ -534,9 +547,9 @@ export const histogram = async ({
     searchFields,
     lookupTypes,
   }));
-  if (catMeta) {
-    cat = catMeta.name;
-  }
+  // if (catMeta) {
+  //   cat = catMeta.name;
+  // }
   let xTerm = combineQueries(y, x);
   let { params, fields, summaries } = await queryParams({
     term: xTerm,
@@ -544,7 +557,13 @@ export const histogram = async ({
     rank,
     taxonomy,
   });
-  updateQuery({ params, fields, summaries, opts: xOpts, lookupTypes });
+  updateQuery({
+    params,
+    fields,
+    summaries,
+    opts: xOpts.replace(/^nsort/, ""),
+    lookupTypes,
+  });
   fields = [...new Set(fields.concat(searchFields))];
   let yTerm, yFields, ySummaries;
   let yParams = {};
@@ -564,14 +583,14 @@ export const histogram = async ({
       params: yParams,
       fields: yFields,
       summaries: ySummaries,
-      opts: yOpts,
+      opts: yOpts.replace(/^nsort/, ""),
       lookupTypes,
     });
     updateQuery({
       params: params,
       fields: yFields,
       summaries: ySummaries,
-      opts: yOpts,
+      opts: yOpts.replace(/^nsort/, ""),
       lookupTypes,
     });
   }
@@ -597,16 +616,13 @@ export const histogram = async ({
       },
     };
   }
-  if (yFields && yFields.length > 0) {
-    // exclude.push(yFields[0]);
-    if (!aInB(yFields, Object.keys(typesMap))) {
-      return {
-        status: {
-          success: false,
-          error: `unknown field in 'y = ${y}'`,
-        },
-      };
-    }
+  if (yFields && yFields.length > 0 && !aInB(yFields, Object.keys(typesMap))) {
+    return {
+      status: {
+        success: false,
+        error: `unknown field in 'y = ${y}'`,
+      },
+    };
   }
 
   if (report == "scatter" && (!y || yFields.length == 0)) {
@@ -692,23 +708,13 @@ export const histogram = async ({
     // opts: xOpts,
     catOpts,
   });
-  if (cat) {
-    // if (!catBounds.cats || catBounds.cats.length == 0) {
-    //   return {
-    //     status: {
-    //       success: false,
-    //       error: `unknown field in 'cat = ${cat}'`,
-    //     },
-    //   };
-    // }
-    if (catBounds) {
-      bounds.cat = catBounds.cat;
-      bounds.cats = catBounds.cats;
-      bounds.catType = catBounds.catType;
-      bounds.catCount = catBounds.tickCount;
-      bounds.by = catBounds.by;
-      bounds.showOther = catBounds.showOther;
-    }
+  if (cat && catBounds) {
+    bounds.cat = catBounds.cat;
+    bounds.cats = catBounds.cats;
+    bounds.catType = catBounds.catType;
+    bounds.catCount = catBounds.tickCount;
+    bounds.by = catBounds.by;
+    bounds.showOther = catBounds.showOther;
   }
 
   let histograms, yBounds;
@@ -754,10 +760,68 @@ export const histogram = async ({
     yBounds.stats.cats.push({ key: "other", label: "other" });
   }
 
+  let { buckets, allValues, labels, byCat, valueType, zDomain } = histograms;
+  if (catToX && bounds.by == "lineage" && bounds.scale == "ordinal") {
+    buckets = [];
+    allValues = [];
+    labels = [];
+    byCat = {};
+    zDomain = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
+    valueType = "lineage";
+
+    for (let b of histograms.buckets) {
+      if (b) {
+        byCat[b] = [];
+      }
+    }
+    for (let [k, a] of Object.entries(histograms.byCat)) {
+      let sum = 0;
+      a.forEach((v, i) => {
+        sum += v;
+        byCat[histograms.buckets[i]].push(v);
+      });
+      allValues.push(sum);
+      zDomain = [Math.min(zDomain[0], sum), Math.max(zDomain[1], sum)];
+      buckets.push(k);
+    }
+    buckets.push(undefined);
+
+    for (cat of bounds.cats) {
+      labels[buckets.indexOf(cat.key)] = cat.label;
+    }
+    if (bounds.showOther) {
+      labels[buckets.indexOf("other")] = "other";
+    }
+    let boundStats = {
+      cats: bounds.cats,
+      cat: bounds.cat,
+      by: bounds.by,
+      count: bounds.stats.count, // TODO: change this
+      size: bounds.cats.length,
+      showOther: bounds.showOther,
+    };
+
+    bounds = {
+      ...bounds,
+      ...bounds.stats,
+      cat: bounds.field,
+      field: bounds.cat,
+      labels,
+      stats: { ...boundStats },
+    };
+  }
+
   return {
     status: { success: true },
     report: {
-      histograms,
+      histograms: {
+        ...histograms,
+        buckets,
+        allValues,
+        byCat,
+        zDomain,
+        valueType,
+      },
       ...bounds,
       bounds,
       yBounds,
@@ -773,6 +837,8 @@ export const histogram = async ({
       yQuery: { query: y },
       yLabel: histograms ? histograms.yLabel : yFields[0],
     }),
-    xLabel: histograms ? histograms.xLabel : fields[0],
+    xLabel: (valueType = "lineage"
+      ? bounds.stats.cat || histograms.xLabel
+      : fields[0]),
   };
 };

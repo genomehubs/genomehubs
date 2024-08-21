@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 import Grid from "@material-ui/core/Grid";
@@ -9,7 +9,7 @@ import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
 import qs from "qs";
 import styles from "./Styles.scss";
-import { useStyles } from "./ReportModal";
+import { useStyles } from "./ReportModalStyles";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import withSiteName from "../hocs/withSiteName";
 
@@ -45,8 +45,7 @@ export const ReportFull = ({
   }
 
   const windowDimensions = useWindowDimensions();
-  let height = windowDimensions.height;
-  let width = windowDimensions.width;
+  let { height, width } = windowDimensions;
   let marginLeft = 0;
   let modal = false;
   if (Object.keys(modalStyle).length > 0) {
@@ -92,6 +91,7 @@ export const ReportFull = ({
 
   let reportComponent = (
     <Report
+      id="report"
       reportId={reportId}
       report={report}
       queryString={queryString}

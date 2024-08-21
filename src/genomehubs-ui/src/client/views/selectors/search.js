@@ -16,6 +16,7 @@ import {
 } from "../reducers/search";
 import {
   getController,
+  getMessage,
   resetController,
   setMessage,
 } from "../reducers/message";
@@ -161,62 +162,78 @@ export const saveSearchResults = ({ options, format = "tsv" }) => {
       tsv: "text/tab-separated-values",
     };
     const queryId = nanoid(10);
-    let url = `${apiUrl}/search?${queryString}&queryId=${queryId}`;
+    let url = `${apiUrl}/search?${queryString}&queryId=${queryId}&persist=once`;
     let status;
-    const interval = checkProgress({
+    const { interval, currentProgress } = checkProgress({
       queryId,
       delay: 2000,
       dispatch,
       message: `Preparing ${format.toUpperCase()} file for download`,
     });
+    let maxTries = 50;
 
-    try {
-      let response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Accept: formats[format],
-        },
-        signal: getController(state).signal,
-      });
-      clearInterval(interval);
-      let blob = await response.blob();
-      dispatch(
-        setMessage({
-          duration: 0,
-          severity: "info",
-        })
-      );
-      const linkUrl = window.URL.createObjectURL(new Blob([blob]));
-      const link = document.createElement("a");
-      link.href = linkUrl;
-      link.setAttribute("download", filename);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-    } catch (err) {
-      clearInterval(interval);
-      if (getController(state).signal.aborted) {
+    for (let i = 0; i < maxTries; i++) {
+      try {
+        let response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Accept: formats[format],
+          },
+          signal: getController(state).signal,
+        });
+        let { status } = response;
+        if (status == 202) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          continue;
+        }
+        clearInterval(interval);
+        let blob = await response.blob();
         dispatch(
           setMessage({
-            message: `Cancelled ${format.toUpperCase()} file download`,
-            duration: 5000,
-            severity: "warning",
+            duration: 0,
+            severity: "info",
           })
         );
-        status = { success: false, error: "Request cancelled" };
-      } else {
-        dispatch(
-          setMessage({
-            message: `Unable to download ${format.toUpperCase()} file`,
-            duration: 5000,
-            severity: "error",
-          })
-        );
-        status = { success: false, error: "Unexpected error" };
-        console.log(error);
+        const linkUrl = window.URL.createObjectURL(new Blob([blob]));
+        const link = document.createElement("a");
+        link.href = linkUrl;
+        link.setAttribute("download", filename);
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+        break;
+      } catch (err) {
+        clearInterval(interval);
+        if (getController(state).signal.aborted) {
+          dispatch(
+            setMessage({
+              message: `Cancelled ${format.toUpperCase()} file download`,
+              duration: 5000,
+              severity: "warning",
+            })
+          );
+          status = { success: false, error: "Request cancelled" };
+
+          dispatch(resetController());
+          return false;
+        }
+        let progress = currentProgress();
+        if (!progress.uuid) {
+          i = maxTries;
+        }
+        if (i >= maxTries - 1) {
+          dispatch(
+            setMessage({
+              message: `Unable to download ${format.toUpperCase()} file`,
+              duration: 5000,
+              severity: "error",
+            })
+          );
+          status = { success: false, error: "Unexpected error" };
+          dispatch(resetController());
+          return false;
+        }
       }
-      dispatch(resetController());
-      return false;
     }
     dispatch(
       setMessage({

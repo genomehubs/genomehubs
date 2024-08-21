@@ -68,7 +68,14 @@ export const addCondition = (
     return conditions;
   }
 
-  if (stat == "keyword_value") {
+  if (
+    stat == "keyword_value" ||
+    stat == "flattened_value" ||
+    (stat == "metadata" && !parts[3].match(/[><]/))
+  ) {
+    if (!Array.isArray(conditions[stat][parts[2]])) {
+      conditions[stat][parts[2]] = [];
+    }
     if (parts[3].match(/[><]/)) {
       let values = {};
       operations(parts[3]).forEach((operator) => {

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 
 import BasicSelect from "./BasicSelect";
+import FeatureSummaryPanel from "./FeatureSummaryPanel";
 import { Grid } from "@material-ui/core";
-import NavLink from "./NavLink";
-import Template from "./Template";
+import { Template } from "./Markdown";
 import classnames from "classnames";
 import { compose } from "recompose";
 import styles from "./Styles.scss";
@@ -110,6 +110,13 @@ const FeaturePanel = ({
     );
     let startX = midX - len / 2;
     let endX = midX + len / 2;
+    let featureLabel = `${featureAttributes.start.value.toLocaleString()}-${featureAttributes.end.value.toLocaleString()}`;
+    let labelWidth = featureLabel.length * height * 0.1;
+    if (labelWidth / 2 > midX) {
+      midX = labelWidth / 2;
+    } else if (midX + labelWidth / 2 > width) {
+      midX = width - labelWidth / 2;
+    }
     let strand = featureAttributes.strand.value;
     let featureGroup = (
       <g id={"feature-group"}>
@@ -134,7 +141,7 @@ const FeaturePanel = ({
           textAnchor={"middle"}
           dominantBaseline={"bottom"}
         >
-          {`${featureAttributes.start.value.toLocaleString()}-${featureAttributes.end.value.toLocaleString()}`}
+          {featureLabel}
         </text>
         <line
           id={"end-line"}
@@ -237,26 +244,33 @@ const FeaturePanel = ({
         {featureGroup}
       </g>
     );
-    if (assignedName && assemblyId && records[assemblyId]) {
-      let identifiers = (records[assemblyId].record.identifiers || []).filter(
-        (obj) => obj.class == "ensembl_id"
-      );
-      console.log(identifiers);
-      if (identifiers.length > 0) {
-        ensemblUrl = `https://rapid.ensembl.org/${identifiers[0].identifier}/Location/View?r=${assignedName}%3A${featureAttributes.start.value}-${featureAttributes.end.value}`;
-      }
-    }
+    // if (assignedName && assemblyId && records[assemblyId]) {
+    //   // console.log({ assignedName });
+    //   // let identifiers = (records[assemblyId].record.identifiers || []).filter(
+    //   //   (obj) => obj.class.match(/ensembl.*id/)
+    //   // );
+    //   // if (identifiers.length > 0) {
+    //   //   ensemblUrl = `https://rapid.ensembl.org/${identifiers[0].identifier}/Location/View?r=${assignedName}%3A${featureAttributes.start.value}-${featureAttributes.end.value}`;
+    //   // }
+    // }
   }
 
-  let ensemblLink;
-  if (ensemblUrl) {
-    ensemblLink = (
-      <>
-        View region in{" "}
-        <span style={{ textDecoration: "underline" }}>
-          <NavLink href={ensemblUrl}>Ensembl Rapid Release</NavLink>
-        </span>
-      </>
+  let browserLinks;
+  if (assignedName && featureAttributes && records[assemblyId]) {
+    browserLinks = (
+      // <>
+      //   View region in{" "}
+      //   <span style={{ textDecoration: "underline" }}>
+      //     <NavLink href={ensemblUrl}>Ensembl Rapid Release</NavLink>
+      //   </span>
+      // </>
+      <FeatureSummaryPanel
+        taxonId={taxonId}
+        assemblyId={assemblyId}
+        start={featureAttributes.start.value}
+        end={featureAttributes.end.value}
+        sequenceName={assignedName}
+      />
     );
   }
   let assemblyLink;
@@ -346,7 +360,7 @@ const FeaturePanel = ({
             />
           </Grid>
           <Grid item style={{ flexGrow: "1" }}></Grid>
-          <Grid item>{ensemblLink}</Grid>
+          <Grid item>{browserLinks}</Grid>
         </Grid>
         <Grid container direction="row" spacing={1}>
           <Grid item xs={3}></Grid>

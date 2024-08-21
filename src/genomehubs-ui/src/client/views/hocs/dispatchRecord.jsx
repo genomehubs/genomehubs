@@ -1,5 +1,4 @@
 import {
-  fetchRecord,
   resetRecord,
   setAttributeSettings,
   setCurrentRecordId,
@@ -7,6 +6,7 @@ import {
 
 import React from "react";
 import { connect } from "react-redux";
+import { fetchRecord } from "../selectors/record";
 
 const dispatchRecord = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({});

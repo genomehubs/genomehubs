@@ -4,13 +4,15 @@ import { useLocation, useNavigate } from "@reach/router";
 import { FormControl } from "@material-ui/core";
 import MuiTableCell from "@material-ui/core/TableCell";
 import ResultFilterInput from "./ResultFilterInput";
+import classnames from "classnames";
 import { compose } from "recompose";
 import qs from "../functions/qs";
+import styles from "./Styles.scss";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
 import { withStyles } from "@material-ui/core/styles";
 
-const TableCell = withStyles((theme) => ({
+const DefaultTableCell = withStyles((theme) => ({
   root: {
     padding: "1px 6px",
   },
@@ -18,15 +20,23 @@ const TableCell = withStyles((theme) => ({
 
 const ResultFilter = ({
   name,
+  field,
   type = "attribute",
   basename,
+  color,
   searchTerm,
   searchIndex,
   fieldMeta,
+  colSpan = 1,
+  TableCell,
+  constraints,
   value = "",
   operator = "",
   handleUpdate = () => {},
 }) => {
+  if (!TableCell) {
+    TableCell = DefaultTableCell;
+  }
   if (type == "hidden") {
     return <TableCell key={name} />;
   }
@@ -48,7 +58,6 @@ const ResultFilter = ({
     rank: "",
     level: null,
   };
-
   const navigate = useNavigate();
   const [index, setIndex] = useState(searchIndex);
   let [attrFilters, setAttrFilters] = useState([]);
@@ -106,7 +115,13 @@ const ResultFilter = ({
         continue;
       }
       let attrParts = arr[0].split(":");
-      if (attrParts.length == 2) {
+      if (arr.length == 1) {
+        if (attrParts.length == 2) {
+          parts.push(`${attrParts[1]}(${attrParts[0]})`);
+        } else {
+          parts.push(`${arr[0]}`);
+        }
+      } else if (attrParts.length == 2) {
         parts.push(`${attrParts[1]}(${attrParts[0]})${arr[1]}${arr[2]}`);
       } else {
         parts.push(`${arr[0]}${arr[1]}${arr[2]}`);
@@ -149,18 +164,16 @@ const ResultFilter = ({
 
   let filters = [];
 
-  // useEffect(() => {
-  //   console.log("change");
-  //   console.log(attrFilters);
-  // }, [attrFilters]);
   attrFilters.forEach((arr, i) => {
-    if (arr && arr.length > 1 && arr[0] == name) {
+    if (arr && arr.length > 1 && arr[0] == field) {
       filters.push(
         <ResultFilterInput
           key={i}
-          field={name}
+          name={name}
+          field={field}
           fields={[]}
-          types={{ [name]: fieldMeta }}
+          types={{ [field]: fieldMeta }}
+          constraints={constraints}
           value={arr[2] || ""}
           operator={arr[1] || ""}
           handleOperatorChange={(e) =>
@@ -178,24 +191,35 @@ const ResultFilter = ({
   filters.push(
     <ResultFilterInput
       key={"last"}
-      field={name}
+      name={name}
+      field={field}
       fields={[]}
       value={""}
       operator={""}
-      types={{ [name]: fieldMeta }}
+      constraints={constraints}
+      types={{ [field]: fieldMeta }}
       handleOperatorChange={(e) =>
-        handleChange(e, name, "operator", [...attrFilters])
+        handleChange(e, field, "operator", [...attrFilters])
       }
       handleValueChange={(e) => {
-        return handleChange(e, name, "value", [...attrFilters]);
+        return handleChange(e, field, "value", [...attrFilters]);
       }}
       handleDismiss={() => {}}
     />
   );
   // }
+  let css = "";
+  if (colSpan > 1) {
+    css = classnames(styles.first, styles.last);
+  }
 
   return (
-    <TableCell key={name}>
+    <TableCell
+      key={name}
+      colSpan={colSpan}
+      className={css}
+      style={{ backgroundColor: color }}
+    >
       <FormControl size="small" style={{ width: "100%" }}>
         <div style={{ width: "100%" }}>{filters}</div>
       </FormControl>

@@ -89,6 +89,7 @@ const config = {
       COMMIT_HASH: JSON.stringify(commitHash),
       PAGES_URL: JSON.stringify(main.basename + main.pagesUrl),
       COOKIE_BANNER: JSON.stringify(main.cookies),
+      DEFAULT_INDEX: JSON.stringify(main.defaultIndex),
       GA_ID: JSON.stringify(main.ga_id),
       GDPR_URL: JSON.stringify(main.gdpr_url),
       GIT_VERSION: JSON.stringify(gitRevisionPlugin.version()),

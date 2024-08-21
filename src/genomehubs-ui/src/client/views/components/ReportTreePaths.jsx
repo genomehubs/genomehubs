@@ -318,7 +318,7 @@ const ReportTreePaths = ({
         });
         let tick = ticks[0];
         let tickLabel = formats(tick);
-        let tickLabelLength = stringLength(tickLabel) * charHeight * 0.6;
+        let tickLabelLength = stringLength(tickLabel) * charHeight * 0.7;
         tickLines.push(
           <Text
             key={`tx-${tick}`}
@@ -424,6 +424,7 @@ const ReportTreePaths = ({
               ]}
               strokeWidth={strokeWidth}
               stroke={segment.color}
+              lineCap="round"
               // strokeScaleEnabled={false}
             />
           );

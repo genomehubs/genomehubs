@@ -5,17 +5,15 @@ import DownloadMessage from "./DownloadMessage";
 import Footer from "./Footer";
 import Grid from "@material-ui/core/Grid";
 import Header from "./Header";
+import LoadingScreen from "./LoadingScreen";
 import Main from "./Main";
 import ReportPage from "./ReportPage";
 import { Router } from "@reach/router";
 import SearchPage from "./SearchPage";
-import classnames from "classnames";
 import { compose } from "recompose";
-import loadable from "@loadable/component";
 import { makeStyles } from "@material-ui/core/styles";
 import styles from "./Styles.scss";
 import withSiteName from "../hocs/withSiteName";
-import withTypes from "../hocs/withTypes";
 
 // const ReportPage = loadable(() => import("./ReportPage"));
 
@@ -52,11 +50,11 @@ const DefaultLayout = ({}) => {
         <Grid item className={classes.item} xs={1} style={{ zIndex: 1000 }}>
           <Header />
         </Grid>
-        <Grid item className={classes.item} xs={true}>
+        <Grid item className={classes.item} xs={true} id="mainContainer">
           {/* {types && Object.keys(types).length > 0 && ( */}
 
           <Main />
-          <DownloadMessage />
+          {/* <DownloadMessage /> */}
 
           {/* )} */}
         </Grid>
@@ -90,7 +88,7 @@ const SearchLayout = (props) => {
   );
 };
 
-const Layout = ({ types, basename }) => {
+const Layout = ({ types, basename, loading }) => {
   const [paths, setPaths] = useState([]);
   // let typeString = JSON.stringify(types);
   // console.log(typeString);

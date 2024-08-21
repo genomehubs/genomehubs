@@ -2,7 +2,7 @@ import Grid from "@material-ui/core/Grid";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 import React from "react";
 import Typography from "@material-ui/core/Typography";
-import { useStyles } from "./SearchBox";
+import { useStyles } from "./SearchBoxStyles";
 
 export const AutoCompleteSuggestion = ({ option }) => {
   const classes = useStyles();

@@ -1,50 +1,26 @@
-import React, { memo, useEffect, useRef, useState } from "react";
+import React, { memo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AutoCompleteInput from "./AutoCompleteInput";
 import FormControl from "@material-ui/core/FormControl";
 import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import Popper from "@material-ui/core/Popper";
 import SearchButton from "./SearchButton";
-import SearchIcon from "@material-ui/icons/Search";
 import SearchInputQueries from "./SearchInputQueries";
 import SearchToggles from "./SearchToggles";
-import Template from "./Template";
-import Tooltip from "./Tooltip";
+import { Template } from "./Markdown";
 import { compose } from "recompose";
-import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
+// import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
 import { getSuggestedTerm } from "../reducers/search";
-import { makeStyles } from "@material-ui/core/styles";
 import qs from "../functions/qs";
 import { siteName } from "../reducers/location";
 import { useReadLocalStorage } from "usehooks-ts";
+import { useStyles } from "./SearchBoxStyles";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
 import withSiteName from "../hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
-
-export const useStyles = makeStyles((theme) => ({
-  icon: {
-    color: theme.palette.text.secondary,
-    marginRight: theme.spacing(2),
-  },
-  formControl: {
-    marginTop: theme.spacing(2),
-    minWidth: "600px",
-  },
-  search: {
-    fontSize: "2em",
-    marginLeft: theme.spacing(1),
-    backgroundColor: "inherit",
-  },
-}));
-
-export const PlacedPopper = (props) => {
-  return <Popper {...props} placement="bottom" />;
-};
 
 const suggestedTerm = getSuggestedTerm();
 
@@ -62,7 +38,6 @@ const SearchBox = ({
   types,
   synonyms,
   basename,
-  setLiveQuery,
 }) => {
   const classes = useStyles();
   const navigate = useNavigate();
@@ -70,6 +45,7 @@ const SearchBox = ({
   let options = qs.parse(location.search.replace(/^\?/, ""));
   const formRef = useRef(null);
   const searchBoxRef = useRef(null);
+  const rootRef = useRef(null);
   const searchInputRef = useRef(null);
   const savedOptions = useReadLocalStorage(`${searchIndex}Options`);
   let [multiline, setMultiline] = useState(() => {
@@ -80,6 +56,7 @@ const SearchBox = ({
   });
   let [result, setResult] = useState(searchIndex);
   const [showSearchBox, setShowSearchBox] = useState(false);
+  const [liveQuery, setLiveQuery] = useState("");
 
   let toggleTemplate;
   if (options && options.searchTemplate) {
@@ -116,9 +93,9 @@ const SearchBox = ({
     if (!options.hasOwnProperty("includeEstimates")) {
       options.includeEstimates = searchDefaults.includeEstimates;
     }
-    if (!options.hasOwnProperty("summaryValues")) {
-      options.summaryValues = "count";
-    }
+    // if (!options.hasOwnProperty("summaryValues")) {
+    //   options.summaryValues = "count";
+    // }
     if (!options.hasOwnProperty("fields")) {
       options.fields = fields;
     }
@@ -142,8 +119,9 @@ const SearchBox = ({
         if (
           savedOptions.hasOwnProperty(keyName) &&
           !options.hasOwnProperty(keyName)
-        )
+        ) {
           options[keyName] = savedOptions[keyName];
+        }
       });
     }
     fetchSearchResults(options);
@@ -154,16 +132,23 @@ const SearchBox = ({
   };
 
   const wrap_term = ({ term, taxWrap, result }) => {
-    if (result && result == "taxon" && !term.match(/[\(\)<>=]/)) {
-      if (!types[term] && !synonyms[term]) {
-        term = `${taxWrap}(${term})`;
-      }
+    if (
+      result &&
+      result == "taxon" &&
+      !term.match(/[\(\)<>=]/) &&
+      !types[term] &&
+      !synonyms[term]
+    ) {
+      term = `${taxWrap}(${term})`;
     }
     return term;
   };
 
   const doSearch = (queryString, result, hashTerm) => {
-    setLookupTerm(queryString);
+    // setLookupTerm(queryString);
+    if (lookupTerm != queryString) {
+      setLookupTerm(queryString);
+    }
     let taxWrap = "tax_name";
     if (searchDefaults.includeDescendants) {
       taxWrap = "tax_tree";
@@ -216,7 +201,7 @@ const SearchBox = ({
     searchText += ` (e.g. ${suggestedTerm})`;
   }
   return (
-    <Grid container alignItems="center" direction="column">
+    <Grid container alignItems="center" direction="column" ref={rootRef}>
       <form
         onSubmit={handleSubmit}
         ref={formRef}
@@ -225,7 +210,7 @@ const SearchBox = ({
           width: "100%",
         }}
       >
-        <SearchInputQueries />
+        <SearchInputQueries liveQuery={liveQuery} />
         <Grid item>
           <Grid container direction="row" alignItems="center">
             <Grid item xs={2}></Grid>
@@ -234,6 +219,7 @@ const SearchBox = ({
                 <AutoCompleteInput
                   inputValue={lookupTerm}
                   setInputValue={setLookupTerm}
+                  handleBlur={() => {}}
                   inputRef={searchInputRef}
                   inputLabel={searchText}
                   inputName={"query"}
@@ -308,6 +294,6 @@ export default compose(
   withTypes,
   withSearch,
   withSearchDefaults,
-  withLookup,
-  dispatchLiveQuery
+  withLookup
+  // dispatchLiveQuery
 )(SearchBox);

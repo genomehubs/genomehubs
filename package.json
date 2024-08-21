@@ -6,5 +6,8 @@
     "babel-loader": "^8.2.3",
     "js-yaml": "^4.1.0",
     "puppeteer": "^21.1.1"
+  },
+  "dependencies": {
+    "@crawlee/puppeteer": "^3.10.5"
   }
 }

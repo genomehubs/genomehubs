@@ -15,11 +15,11 @@ export const webpackHash = COMMIT_HASH || __webpack_hash__;
 export function fetchPages(pageId) {
   return async function (dispatch) {
     const state = store.getState();
-    const isFetching = getPagesIsFetching(state);
+    const isFetching = getPagesIsFetchingById(state, pageId);
     if (isFetching) {
       return;
     }
-    dispatch(requestPages());
+    dispatch(requestPages({ pageId }));
     let url = `${pagesUrl}/${webpackHash}/${pageId.toLowerCase()}`.replaceAll(
       "//",
       "/"
@@ -36,15 +36,19 @@ export function fetchPages(pageId) {
       }
       dispatch(receivePages({ pageId, markdown }));
     } catch (err) {
-      dispatch(cancelPages);
+      dispatch(cancelPages({ pageId }));
     }
   };
 }
 
 const processPages = (pages, pageId) => {
   let page = pages.byId[pageId];
-  if (page === false) return false;
-  if (!page) return undefined;
+  if (page === false) {
+    return false;
+  }
+  if (!page) {
+    return undefined;
+  }
   if (pageId == "tabs.md") {
     page = page
       .split("\n")
@@ -58,4 +62,10 @@ export const getPagesById = createCachedSelector(
   getPages,
   (_state, pageId) => pageId,
   (pages, pageId) => processPages(pages, pageId)
+)((_state, pageId) => pageId);
+
+export const getPagesIsFetchingById = createCachedSelector(
+  getPagesIsFetching,
+  (_state, pageId) => pageId,
+  (pagesIsFetching, pageId) => pagesIsFetching[pageId] || false
 )((_state, pageId) => pageId);

@@ -4,15 +4,12 @@ import { useLocation, useNavigate } from "@reach/router";
 import Page from "./Page";
 import ReportPanel from "./ReportPanel";
 import ResultTable from "./ResultTable";
-import SearchSummary from "./SearchSummary";
 import TextPanel from "./TextPanel";
-import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
 import equal from "deep-equal";
 import qs from "../functions/qs";
 import shallow from "shallowequal";
-import styles from "./Styles.scss";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/dispatchSearchDefaults";
 
@@ -41,7 +38,7 @@ const SearchPage = ({
     options.ranks = options.ranks.join(",");
   }
   let hashTerm = decodeURIComponent(location.hash.replace(/^\#/, ""));
-  let isFetching = searchResults.isFetching;
+  let { isFetching } = searchResults;
   let values = JSON.stringify(Object.values(options));
   useEffect(() => {
     if (!isFetching) {
@@ -66,38 +63,36 @@ const SearchPage = ({
             setLookupTerm(hashTerm || options.query);
             fetchSearchResults(searchTerm);
           }
-        } else {
-          if (Object.keys(previousSearchTerm).length > 0) {
-            let hashedNav = (path) => {
-              path = path.replace(
-                /\/search\b/,
-                `${location.pathname.replace(basename, "")}`
-              );
-              let to = path;
-              let from = `${location.pathname}?${qs.stringify(
-                previousSearchTerm
-              )}`;
-            };
-            if (!equal(options, previousSearchTerm)) {
-              setPreviousSearchTerm(options);
-              setSearchIndex(options.result);
-              setLookupTerm(hashTerm || options.query);
-              fetchSearchResults(options, hashedNav);
-            }
-          } else {
-            let hashedNav = (path) => {
-              // TODO: include taxonomy
-              path = path.replace(
-                /\/search\b/,
-                `${location.pathname.replace(basename, "")}`
-              );
-              navigate(`${path}#${encodeURIComponent(hashTerm)}`);
-            };
+        } else if (Object.keys(previousSearchTerm).length > 0) {
+          let hashedNav = (path) => {
+            path = path.replace(
+              /\/search\b/,
+              `${location.pathname.replace(basename, "")}`
+            );
+            let to = path;
+            let from = `${location.pathname}?${qs.stringify(
+              previousSearchTerm
+            )}`;
+          };
+          if (!equal(options, previousSearchTerm)) {
             setPreviousSearchTerm(options);
             setSearchIndex(options.result);
             setLookupTerm(hashTerm || options.query);
             fetchSearchResults(options, hashedNav);
           }
+        } else {
+          let hashedNav = (path) => {
+            // TODO: include taxonomy
+            path = path.replace(
+              /\/search\b/,
+              `${location.pathname.replace(basename, "")}`
+            );
+            navigate(`${path}#${encodeURIComponent(hashTerm)}`);
+          };
+          setPreviousSearchTerm(options);
+          setSearchIndex(options.result);
+          setLookupTerm(hashTerm || options.query);
+          fetchSearchResults(options, hashedNav);
         }
       } else if (searchTerm.query && !options.query) {
         setPreviousSearchTerm({});
@@ -118,7 +113,7 @@ const SearchPage = ({
     : searchResults.status
     ? searchResults.status.hits
     : 0;
-  results = <ResultTable />;
+  results = resultCount > -1 ? <ResultTable /> : null;
   let report;
   if (searchResultArray.length > 0) {
     report = <ReportPanel options={options} />;

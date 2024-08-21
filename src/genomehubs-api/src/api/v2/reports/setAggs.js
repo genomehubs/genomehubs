@@ -429,7 +429,7 @@ export const setAggs = async ({
   terms = termsAgg({ field: terms, lookupTypes, size });
   keywords = termsAgg({
     field: keywords,
-    fixedTerms: fixedTerms ? fixedTerms : undefined,
+    fixedTerms: fixedTerms || undefined,
     lookupTypes,
     size: fixedTerms ? fixedTerms.size : 5,
   });

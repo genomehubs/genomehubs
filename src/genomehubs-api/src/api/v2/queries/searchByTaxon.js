@@ -8,11 +8,14 @@ import { filterProperties } from "./queryFragments/filterProperties";
 import { filterSamples } from "./queryFragments/filterSamples";
 import { filterTaxId } from "./queryFragments/filterTaxId";
 import { filterTaxa } from "./queryFragments/filterTaxa";
+import { histogram } from "../reports/histogram";
+import { histogramAgg } from "./histogramAgg";
 import { matchAttributes } from "./queryFragments/matchAttributes";
 import { matchNames } from "./queryFragments/matchNames";
 import { matchRanks } from "./queryFragments/matchRanks";
 import { restrictToRank } from "./queryFragments/restrictToRank";
 import { setAggregationSource } from "./queryFragments/setAggregationSource";
+import { setAggs } from "../reports/setAggs";
 import { setIncludes } from "./queryFragments/setIncludes";
 import { setSortOrder } from "./queryFragments/setSortOrder";
 import { nullCountsAgg as valueCountsAgg } from "./queryFragments/nullCountsAgg";
@@ -47,6 +50,7 @@ export const searchByTaxon = async ({
   function_score,
   taxonomy,
   index,
+  bounds,
   aggs = {},
 }) => {
   let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
@@ -58,8 +62,12 @@ export const searchByTaxon = async ({
   let attr_summaries = {};
   fields.forEach((field) => {
     let [name, summary = "default"] = field.split(":");
+    if (name.match(/\w\.+/)) {
+      [name, ...summary] = name.split(".");
+      summary = `metadata.${summary.join(".")}`;
+    }
     if (!attr_summaries[name]) {
-      attr_summaries[name] = [];
+      attr_summaries[name] = ["value"];
     }
     attr_summaries[name].push(summary);
   });
@@ -192,9 +200,36 @@ export const searchByTaxon = async ({
   });
   if (
     Object.keys(aggs).length == 0 &&
-    (!emptyColumns || emptyColumns == "false")
+    1 //(!emptyColumns || emptyColumns == "false")
+    // TODO: restore condition here
   ) {
-    let valueCounts = await valueCountsAgg({ fields, names, ranks });
+    let boundAggs = {};
+    if (bounds && Object.keys(bounds).length > 0) {
+      for (let [field, obj] of Object.entries(bounds)) {
+        let histogram = await setAggs({
+          field,
+          result,
+          histogram: true,
+          taxonomy,
+          bounds: obj,
+        });
+        // boundAggs[`${field}_histogram`] = {
+        //   filter: { term: { ["attributes.key"]: field } },
+        //   aggs: { histogram },
+        // };
+        boundAggs[`${field}_histogram`] = histogram.aggregations.aggs[field];
+      }
+    }
+    let valueCounts = await valueCountsAgg({
+      fields,
+      non_attr_fields,
+      names,
+      ranks,
+    });
+    valueCounts.fields.aggs = {
+      ...valueCounts.fields.aggs,
+      ...boundAggs,
+    };
     aggs = valueCounts;
   }
   let exclude = []; // includeRawValues ? [] : ["attributes.values*"];

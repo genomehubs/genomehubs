@@ -11,20 +11,26 @@ export const receivePages = createAction(
 export const cancelPages = createAction("CANCEL_PAGE");
 
 const defaultState = () => ({
-  isFetching: false,
+  isFetching: {},
   byId: {},
 });
 
 const pages = handleActions(
   {
-    REQUEST_PAGE: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
-      }),
-    CANCEL_PAGE: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: false,
-      }),
+    REQUEST_PAGE: (state, action) => {
+      let { pageId } = action.payload;
+      return immutableUpdate(state, {
+        ...state,
+        isFetching: { ...state.isFetching, [pageId]: true },
+      });
+    },
+    CANCEL_PAGE: (state, action) => {
+      let { pageId } = action.payload;
+      return immutableUpdate(state, {
+        ...state,
+        isFetching: { ...state.isFetching, [pageId]: false },
+      });
+    },
     RECEIVE_PAGE: (state, action) => {
       let byId = {};
       let { pageId, markdown } = action.payload;
@@ -32,7 +38,7 @@ const pages = handleActions(
         return state;
       }
       return immutableUpdate(state, {
-        isFetching: false,
+        isFetching: { ...state.isFetching, [pageId]: false },
         byId: { ...state.byId, [pageId]: markdown || " " },
       });
     },

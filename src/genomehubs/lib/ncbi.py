@@ -329,14 +329,14 @@ def metricDates(obj):
     # add_chromosome_entries(obj, chromosomes)
     standardCriteria = []
     if contig_n50 >= 1000000 and scaffold_n50 >= 10000000:
-        standardCriteria.append("6.7.Q40")
+        standardCriteria.append("6.7")
     if obj["assignedProportion"] >= 0.9:
         if contig_n50 >= 1000000:
-            standardCriteria.append("6.C.Q40")
+            standardCriteria.append("6.C")
         elif scaffold_n50 < 1000000 and contig_n50 >= 100000:
-            standardCriteria.append("5.C.Q40")
+            standardCriteria.append("5.C")
         elif scaffold_n50 < 10000000 and contig_n50 >= 100000:
-            standardCriteria.append("5.6.Q40")
+            standardCriteria.append("5.6")
     if standardCriteria:
         obj["ebpStandardDate"] = obj["releaseDate"]
         obj["ebpStandardCriteria"] = ";".join(standardCriteria)

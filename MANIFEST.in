@@ -4,6 +4,7 @@ exclude .coverage
 exclude .travis.yml
 include *.rst
 include setup.py
+include src/genomehubs/py.typed
 prune .cache
 prune .git
 prune build

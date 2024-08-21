@@ -14,6 +14,7 @@ export const setTerms = async ({
     return { cat, size, other };
   }
   let min, max, scale;
+  opts = opts.replace(/^nsort/, "");
   if (opts) {
     let options = opts.split(/\s*;\s*/);
     if (options.length == 1) {
@@ -48,7 +49,6 @@ export const setTerms = async ({
     field = field.replace(/\+/, "");
     other = true;
   }
-
   let parts = cat.split(",");
   let terms = [];
   let translations = {};

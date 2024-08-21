@@ -1,6 +1,6 @@
 {
   "name": "genomehubs-ui",
-  "version": "2.7.43",
+  "version": "2.8.24",
   "description": "Frontend for GenomeHubs",
   "main": "index.js",
   "scripts": {
@@ -55,6 +55,7 @@
     "webpack-bundle-analyzer": "^3.9.0"
   },
   "dependencies": {
+    "@focus-reactive/react-yaml": "^1.1.2",
     "@fontsource/open-sans": "^4.5.3",
     "@fontsource/roboto-mono": "^4.5.1",
     "@fontsource/signika": "^4.5.2",
@@ -98,6 +99,7 @@
     "react-cookie": "^4.1.1",
     "react-country-flag": "^3.1.0",
     "react-dom": "^16.14.0",
+    "react-error-boundary": "^4.0.13",
     "react-helmet": "^6.1.0",
     "react-hooks-visible": "^1.1.1",
     "react-json-pretty": "^2.2.0",

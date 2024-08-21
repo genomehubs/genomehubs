@@ -25,12 +25,21 @@ RUN curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key a
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CC86BB64
+RUN add-apt-repository ppa:rmescandon/yq
+
 RUN apt-get update \
     && apt-get install -y \
     --no-install-recommends \
     google-chrome-stable \
     nodejs \
+    yq \
     && rm -rf /var/lib/apt/lists/*
+
+ARG VERSION=v4.16.2
+ARG BINARY=yq_linux_386
+RUN wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY} -O /usr/bin/yq \ 
+    && chmod +x /usr/bin/yq
 
 RUN mkdir -p /genomehubs/tests /genomehubs/tests-out
 

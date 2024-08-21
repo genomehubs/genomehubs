@@ -1,3 +1,5 @@
+import convert from "color-convert";
+
 export const setColors = ({
   colorPalette,
   palettes,
@@ -7,8 +9,10 @@ export const setColors = ({
 }) => {
   let palette;
   if (colorPalette) {
-    if (palettes.byId[colorPalette]) {
-      palette = palettes.byId[colorPalette];
+    let [paletteName, paletteLevels] = colorPalette.split(":");
+    count = paletteLevels || count;
+    if (palettes.byId[paletteName]) {
+      palette = palettes.byId[paletteName];
       levels = palette.levels || [];
     } else if (
       colorPalette.match(/[0-9a-f]{6}/i) &&
@@ -22,10 +26,22 @@ export const setColors = ({
     if (levels[count]) {
       colors = levels[count];
     } else if (palette) {
-      colors = palette.default;
+      if (palette[count]) {
+        colors = palette[count];
+      } else {
+        colors = palette.default;
+      }
     }
   }
-  return { levels, colors };
+  return {
+    levels,
+    colors: colors.map((c) => {
+      if (c.match("rgb")) {
+        return `#${convert.rgb.hex(c.split("(")[1].split(")")[0])}`;
+      }
+      return c;
+    }),
+  };
 };
 
 export default setColors;

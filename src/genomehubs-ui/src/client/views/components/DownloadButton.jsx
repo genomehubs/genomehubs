@@ -51,7 +51,7 @@ const DownloadButton = ({
     //   duration: 60000,
     //   severity: "info",
     // });
-    let format = options[key].format;
+    let { format } = options[key];
     let fullOptions = {
       ...searchTerm,
       ...options[key],

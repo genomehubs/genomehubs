@@ -54,35 +54,54 @@ export const filterAttributes = (
   let rangeQuery;
   if (searchRawValues) {
     rangeQuery = (field, stat) => {
-      if (lookupTypes(field).type == "keyword") {
-        return [
-          {
+      return filters[stat][field].map((flt) => {
+        if (typeof flt !== "object") {
+          let values = flt.split(",");
+          let path = "";
+          return {
             nested: {
               path: "attributes.values",
               query: {
-                match: {
-                  [`attributes.values.${lookupTypes(field).type}_value`]:
-                    filters[stat][field][0],
+                bool: {
+                  should: values.map((v) => {
+                    let parts = v.split("::");
+                    let value = v;
+                    if (parts.length > 1) {
+                      path = `.${parts.slice(0, parts.length - 1).join(".")}`;
+                      value = parts[parts.length - 1];
+                    }
+                    return {
+                      match: { [`attributes.values.${stat}${path}`]: value },
+                    };
+                  }),
                 },
               },
             },
-          },
-        ];
-      }
-      // TODO: support alternate stats and enum based query here
-      return [
-        {
+          };
+        }
+        // TODO: check for full object-based query supporthere
+        let path = "";
+        Object.entries(flt).forEach(([k, v]) => {
+          let parts = v.split("::");
+          let value = v;
+          if (parts.length > 1) {
+            path = `.${parts.slice(0, parts.length - 1).join(".")}`;
+            value = parts[parts.length - 1];
+          }
+          flt[k] = value;
+        });
+
+        return {
           nested: {
             path: "attributes.values",
             query: {
               range: {
-                [`attributes.values.${lookupTypes(field).type}_value`]:
-                  filters[stat][field],
+                [`attributes.values.${stat}${path}`]: flt,
               },
             },
           },
-        },
-      ];
+        };
+      });
     };
   } else {
     rangeQuery = (field, stat) => {
@@ -105,11 +124,25 @@ export const filterAttributes = (
                 let include = [];
                 let exclude = [];
                 for (let option of term.split(",")) {
+                  let parts = option.split("::");
+                  let path = "";
+                  let value = option;
+                  if (parts.length > 1) {
+                    path = `.${parts.slice(0, parts.length - 1).join(".")}`;
+                    value = parts[parts.length - 1];
+                  }
                   if (option.startsWith("!")) {
-                    option = option.replace("!", "");
-                    exclude.push(wildcard_match(`attributes.${stat}`, option));
+                    path = path.replace(".!", ".");
+                    exclude.push(
+                      wildcard_match(
+                        `attributes.${stat}${path}`,
+                        value.replace(/^!/, "")
+                      )
+                    );
                   } else {
-                    include.push(wildcard_match(`attributes.${stat}`, option));
+                    include.push(
+                      wildcard_match(`attributes.${stat}${path}`, value)
+                    );
                   }
                 }
 
@@ -217,11 +250,35 @@ export const filterAttributes = (
             },
           };
         }
+        let path = "";
+        let lt, gt;
+        Object.entries(flt).forEach(([k, v]) => {
+          if (k.startsWith("lt")) {
+            lt = true;
+          } else if (k.startsWith("gt")) {
+            gt = true;
+          }
+          let parts = v.split("::");
+          let value = v;
+          if (parts.length > 1) {
+            path = `.${parts.slice(0, parts.length - 1).join(".")}`;
+            value = parts[parts.length - 1];
+          }
+          flt[k] = value;
+        });
+        if (stat == "metadata" || stat == "flattened_value") {
+          if (lt && !gt) {
+            flt.gt = "0";
+          } else if (!lt && gt) {
+            flt.lt = "999999999999999999999";
+          }
+        }
+
         return {
           bool: {
             [boolOperator]: subsetFn({
               range: {
-                [`attributes.${stat}`]: flt,
+                [`attributes.${stat}${path}`]: flt,
               },
             }),
           },

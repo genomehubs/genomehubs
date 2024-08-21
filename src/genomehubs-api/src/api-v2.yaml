@@ -28,6 +28,37 @@ components:
       required: false
       schema:
         type: string
+    catToXParam:
+      description: |
+        Flag to indicate whether category and x-axis values should be swapped.
+
+        Only affects reports with a lineage as category and keyword attribute on the x-axis.
+      examples:
+        false:
+          value:
+          summary: false - do not swap values
+        true:
+          value: true
+          summary: true - swap values
+      in: query
+      name: catToX
+      schema:
+        type: boolean
+    checkedFilesParam:
+      description: |
+        Comma separated list of file paths to return.
+      examples:
+        null:
+          value:
+          summary: Do not return any file paths
+        busco_metazoa_full_table:
+          value: busco.metazoa_odb10.full_table
+          summary: Full table files for BUSCO Metazoa odb10 lineage
+      in: query
+      name: checkedFiles
+      required: false
+      schema:
+        type: string
     collapseMonotypicParam:
       description: |
         Collapse monotypic tree nodes.
@@ -166,6 +197,39 @@ components:
           type: string
         type: array
       style: form
+    fieldOptsParam:
+      description: |
+        field options.
+
+        A string of the form <fieldName:options> where options is a comma or semicolon separated string in the order:
+
+        1. minimum value
+        2. maximum value
+        3. tick count
+        4. scale
+        5. axis title
+
+        For category fields, the minimum value can be a comma separated list to define the category order, in which case semicolons must be used as the primary separator. Tick count may be used to specify the number of categories and a `+` sign to indicate that an `other` category should be included.
+      examples:
+        null:
+          value:
+          summary: Do not specify fieldOpts
+        assembly_span:
+          value: assembly_span:10000000,10000000000,5
+          summary: Values between 10M and 10G with 4 ticks
+        scale_only:
+          value: "assembly_span:,,,linear"
+          summary: Use a linear scale
+        category_axis:
+          value: "assembly_level:chromosome,scaffold,,2+"
+          summary: Show values for chromosome and scaffold plus other
+      in: query
+      name: fieldOpts
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
     fieldsParam:
       description: |
         Comma separated list of attribute fields to return.
@@ -557,6 +621,7 @@ components:
       required: true
       schema:
         enum:
+          - files
           - histogram
           - map
           - oxford
@@ -1304,7 +1369,8 @@ paths:
 
         | Report        | Required          | Optional       |
         | ------------- | ----------------- | -------------- |
-        | **Histogram** | `x`               | `cat`, `rank`, `xOpts` |
+        | **Files**     | `x`               | `checkedFiles` |
+        | **Histogram** | `x`               | `cat`, `catToX`, `rank`, `xOpts` |
         | **Map**       | `x`               | `cat`, `rank`          |
         | **Oxford**    | `x`               | `cat`, `xOpts`, `yOpts` |
         | **Scatter**   | `x`, `y`, `rank`  | `cat`, `xOpts`, `yOpts`, `scatterThreshold` |
@@ -1324,6 +1390,7 @@ paths:
         - $ref: "#/components/parameters/yParam"
         # - $ref: "#/components/parameters/zParam"
         - $ref: "#/components/parameters/catParam"
+        - $ref: "#/components/parameters/catToXParam"
         - $ref: "#/components/parameters/rankParam"
         - $ref: "#/components/parameters/includeEstimatesParam"
         - $ref: "#/components/parameters/collapseMonotypicParam"
@@ -1336,6 +1403,7 @@ paths:
         - $ref: "#/components/parameters/taxonomyParam"
         - $ref: "#/components/parameters/xOptsParam"
         - $ref: "#/components/parameters/yOptsParam"
+        - $ref: "#/components/parameters/checkedFilesParam"
         - $ref: "#/components/parameters/mapThresholdParam"
         - $ref: "#/components/parameters/scatterThresholdParam"
         - $ref: "#/components/parameters/treeThresholdParam"
@@ -1420,6 +1488,7 @@ paths:
         - $ref: "#/components/parameters/sortByParam"
         - $ref: "#/components/parameters/sortOrderParam"
         - $ref: "#/components/parameters/sortModeParam"
+        - $ref: "#/components/parameters/fieldOptsParam"
         - $ref: "#/components/parameters/taxonomyParam"
         - $ref: "#/components/parameters/releaseParam"
         - $ref: "#/components/parameters/queryIdParam"

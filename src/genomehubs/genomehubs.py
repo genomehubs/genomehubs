@@ -17,6 +17,8 @@ Commands:
 See 'genomehubs <command> --help' for more information on a specific command.
 """
 
+from __future__ import annotations
+
 import sys
 
 from docopt import DocoptExit

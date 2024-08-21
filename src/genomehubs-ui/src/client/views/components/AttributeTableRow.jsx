@@ -18,12 +18,10 @@ import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Tooltip from "./Tooltip";
-import Typography from "@material-ui/core/Typography";
 import ZoomControl from "./ZoomControl";
 import classnames from "classnames";
 import { compose } from "recompose";
 import { formatter } from "../functions/formatter";
-import loadable from "@loadable/component";
 import { makeStyles } from "@material-ui/core/styles";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
@@ -139,6 +137,7 @@ const NestedTable = ({
             <TableCell>Value</TableCell>
             {hubHeader}
             <TableCell>External source</TableCell>
+            <TableCell>Last modified</TableCell>
             <TableCell>Comment</TableCell>
           </TableRow>
         </TableHead>
@@ -174,6 +173,7 @@ const NestedTable = ({
                   hubCell = <TableCell></TableCell>;
                 }
               }
+              let date = row.metadata?.source?.date;
               let comment = row.comment || "";
               if (row.is_primary) {
                 comment = `Primary value. ${comment}`;
@@ -199,7 +199,7 @@ const NestedTable = ({
                   >
                     {linkCell}
                   </Tooltip>
-
+                  <TableCell>{date}</TableCell>
                   <TableCell>{comment}</TableCell>
                 </TableRow>
               );
@@ -242,7 +242,12 @@ const ValueCell = ({
   if (meta.from && meta.to && meta.to > meta.from) {
     range = ` (${formatter(meta.from)} to ${formatter(meta.to)})`;
   }
-  let obj = formatter(meta.value, currentResult, "array", 100000);
+  let obj = {};
+  try {
+    obj = formatter(meta.value, currentResult, "array", 100000);
+  } catch (err) {
+    console.log(err);
+  }
   let valueMeta = types[attributeId]?.value_metadata;
   let defaultDesc, defaultLink;
   if (valueMeta) {

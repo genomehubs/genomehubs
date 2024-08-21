@@ -1,6 +1,6 @@
 {
   "name": "genomehubs-ui",
-  "version": "2.7.43",
+  "version": "2.8.24",
   "repository": "https://github.com/genomehubs/genomehubs",
   "description": "",
   "bin": "src/app.js",
@@ -14,7 +14,8 @@
   "pkg": {
     "assets": [
       "./src/public/**/*",
-      "./src/views/**/*"
+      "./src/views/**/*",
+      "/Users/rchallis/projects/genomehubs/genomehubs/src/render/**/*"
     ],
     "targets": [
       "node16-linux-x64",

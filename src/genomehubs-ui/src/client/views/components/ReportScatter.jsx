@@ -12,7 +12,7 @@ import {
   YAxis,
   ZAxis,
 } from "recharts";
-import React, { useEffect, useRef, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import formats, { setInterval } from "../functions/formats";
 import stringLength, { maxStringLength } from "../functions/stringLength";
 import { useLocation, useNavigate } from "@reach/router";
@@ -32,6 +32,7 @@ import { processLegendData } from "./MultiCatLegend";
 // import { point } from "leaflet";
 import qs from "../functions/qs";
 import { scaleLinear } from "d3-scale";
+import searchByCell from "../functions/searchByCell";
 import setColors from "../functions/setColors";
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
@@ -40,144 +41,144 @@ import withReportTerm from "../hocs/withReportTerm";
 import withSiteName from "../hocs/withSiteName";
 import { zLegend } from "./zLegend";
 
-const searchByCell = ({
-  xQuery,
-  yQuery,
-  report,
-  xLabel,
-  yLabel,
-  xRange,
-  yRange,
-  bounds,
-  yBounds,
-  navigate,
-  location,
-  fields,
-  ranks,
-  valueType,
-  yValueType,
-  summary,
-  ySummary,
-  basename,
-}) => {
-  let query = xQuery.query;
-  let field = bounds.field;
-  query = query
-    .replaceAll(new RegExp("AND\\s+" + bounds.field + "\\s+AND", "gi"), "AND")
-    .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
-      ""
-    )
-    .replaceAll(
-      new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
-      ""
-    );
-  if (summary && summary != "value") {
-    field = `${summary}(${field})`;
-    query = query
-      .replaceAll(new RegExp("AND\\s+" + field + "\\s+AND", "gi"), "AND")
-      .replaceAll(
-        new RegExp("AND\\s+" + field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
-        ""
-      )
-      .replaceAll(
-        new RegExp("AND\\s+" + field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
-        ""
-      );
-  }
-  query = query.replaceAll(/\s+/g, " ").replace(/\s+$/, "");
-  if (valueType == "coordinate") {
-    query += ` AND sequence_id = ${xRange},${yRange}`;
-    query = query.replace("collate(assembly_id,", "collate(sequence_id,");
-  } else if (valueType == "date") {
-    query += ` AND ${field} >= ${
-      new Date(xRange[0]).toISOString().split(/t/i)[0]
-    } AND ${field} < ${new Date(xRange[1]).toISOString().split(/t/i)[0]}`;
-  } else if (valueType == "keyword" && field == bounds.field) {
-    let val = bounds.stats.cats[xRange[0]].key;
-    if (val == "other") {
-      let list = [];
-      for (let obj of bounds.stats.cats) {
-        if (obj.key != "other") {
-          list.push(obj.key);
-        }
-      }
-      query += ` AND ${field} != ${list.join(",")}`;
-    } else {
-      query += ` AND ${field} = ${val}`;
-    }
-  } else {
-    query += ` AND ${field} >= ${xRange[0]} AND ${field} < ${xRange[1]}`;
-  }
-  let yField = yBounds.field;
-  if (ySummary && ySummary != "value") {
-    yField = `${ySummary}(${yField})`;
-  }
-  if (yValueType == "date") {
-    query += ` AND ${yField} >= ${
-      new Date(yRange[0]).toISOString().split(/t/i)[0]
-    } AND ${yField} < ${new Date(yRange[1]).toISOString().split(/t/i)[0]}`;
-  } else if (yValueType == "keyword" && yField == yBounds.field) {
-    let val = yBounds.stats.cats[yRange[0]].key;
-    if (val == "other") {
-      let list = [];
-      for (let obj of yBounds.stats.cats) {
-        if (obj.key != "other") {
-          list.push(obj.key);
-        }
-      }
-      query += ` AND ${yField} != ${list.join(",")}`;
-    } else {
-      query += ` AND ${yField} = ${val}`;
-    }
-  } else if (yValueType != "coordinate") {
-    query += ` AND ${yField} >= ${yRange[0]} AND ${yField} < ${yRange[1]}`;
-  }
+// const searchByCell = ({
+//   xQuery,
+//   yQuery,
+//   report,
+//   xLabel,
+//   yLabel,
+//   xRange,
+//   yRange,
+//   bounds,
+//   yBounds,
+//   navigate,
+//   location,
+//   fields,
+//   ranks,
+//   valueType,
+//   yValueType,
+//   summary,
+//   ySummary,
+//   basename,
+// }) => {
+//   let query = xQuery.query;
+//   let field = bounds.field;
+//   query = query
+//     .replaceAll(new RegExp("AND\\s+" + bounds.field + "\\s+AND", "gi"), "AND")
+//     .replaceAll(
+//       new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
+//       ""
+//     )
+//     .replaceAll(
+//       new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
+//       ""
+//     );
+//   if (summary && summary != "value") {
+//     field = `${summary}(${field})`;
+//     query = query
+//       .replaceAll(new RegExp("AND\\s+" + field + "\\s+AND", "gi"), "AND")
+//       .replaceAll(
+//         new RegExp("AND\\s+" + field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
+//         ""
+//       )
+//       .replaceAll(
+//         new RegExp("AND\\s+" + field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
+//         ""
+//       );
+//   }
+//   query = query.replaceAll(/\s+/g, " ").replace(/\s+$/, "");
+//   if (valueType == "coordinate") {
+//     query += ` AND sequence_id = ${xRange},${yRange}`;
+//     query = query.replace("collate(assembly_id,", "collate(sequence_id,");
+//   } else if (valueType == "date") {
+//     query += ` AND ${field} >= ${
+//       new Date(xRange[0]).toISOString().split(/t/i)[0]
+//     } AND ${field} < ${new Date(xRange[1]).toISOString().split(/t/i)[0]}`;
+//   } else if (valueType == "keyword" && field == bounds.field) {
+//     let val = bounds.stats.cats[xRange[0]].key;
+//     if (val == "other") {
+//       let list = [];
+//       for (let obj of bounds.stats.cats) {
+//         if (obj.key != "other") {
+//           list.push(obj.key);
+//         }
+//       }
+//       query += ` AND ${field} != ${list.join(",")}`;
+//     } else {
+//       query += ` AND ${field} = ${val}`;
+//     }
+//   } else {
+//     query += ` AND ${field} >= ${xRange[0]} AND ${field} < ${xRange[1]}`;
+//   }
+//   let yField = yBounds.field;
+//   if (ySummary && ySummary != "value") {
+//     yField = `${ySummary}(${yField})`;
+//   }
+//   if (yValueType == "date") {
+//     query += ` AND ${yField} >= ${
+//       new Date(yRange[0]).toISOString().split(/t/i)[0]
+//     } AND ${yField} < ${new Date(yRange[1]).toISOString().split(/t/i)[0]}`;
+//   } else if (yValueType == "keyword" && yField == yBounds.field) {
+//     let val = yBounds.stats.cats[yRange[0]].key;
+//     if (val == "other") {
+//       let list = [];
+//       for (let obj of yBounds.stats.cats) {
+//         if (obj.key != "other") {
+//           list.push(obj.key);
+//         }
+//       }
+//       query += ` AND ${yField} != ${list.join(",")}`;
+//     } else {
+//       query += ` AND ${yField} = ${val}`;
+//     }
+//   } else if (yValueType != "coordinate") {
+//     query += ` AND ${yField} >= ${yRange[0]} AND ${yField} < ${yRange[1]}`;
+//   }
 
-  // let fields = `${xLabel},${yLabel}`;
-  let { xOpts, yOpts, highlightArea, ...options } = qs.parse(
-    location.search.replace(/^\?/, "")
-  );
-  if (options.sortBy && !fields.includes(options.sortBy)) {
-    delete options.sortBy;
-    delete options.sortOrder;
-  }
-  options.offset = 0;
-  if (fields) {
-    fields = fields.join(",");
-  }
-  if (ranks) {
-    ranks = ranks.join(",");
-  } else {
-    ranks = "";
-  }
-  for (let key of [
-    "excludeAncestral",
-    "excludeDescendant",
-    "excludeDirect",
-    "excludeMissing",
-  ]) {
-    if (xQuery[key]) {
-      delete xQuery[key];
-    }
-  }
-  let queryString = qs.stringify({
-    ...xQuery,
-    ...options,
-    query,
-    ...(yQuery && { y: yQuery.query }),
-    fields,
-    report,
-    ranks,
-  });
+//   // let fields = `${xLabel},${yLabel}`;
+//   let { xOpts, yOpts, highlightArea, ...options } = qs.parse(
+//     location.search.replace(/^\?/, "")
+//   );
+//   if (options.sortBy && !fields.includes(options.sortBy)) {
+//     delete options.sortBy;
+//     delete options.sortOrder;
+//   }
+//   options.offset = 0;
+//   if (fields) {
+//     fields = fields.join(",");
+//   }
+//   if (ranks) {
+//     ranks = ranks.join(",");
+//   } else {
+//     ranks = "";
+//   }
+//   for (let key of [
+//     "excludeAncestral",
+//     "excludeDescendant",
+//     "excludeDirect",
+//     "excludeMissing",
+//   ]) {
+//     if (xQuery[key]) {
+//       delete xQuery[key];
+//     }
+//   }
+//   let queryString = qs.stringify({
+//     ...xQuery,
+//     ...options,
+//     query,
+//     ...(yQuery && { y: yQuery.query }),
+//     fields,
+//     report,
+//     ranks,
+//   });
 
-  // let hash = encodeURIComponent(query);
-  navigate(
-    `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
-      query
-    )}`
-  );
-};
+//   // let hash = encodeURIComponent(query);
+//   navigate(
+//     `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
+//       query
+//     )}`
+//   );
+// };
 
 const searchByPoint = ({ props, chartProps }) => {
   let { xQuery, fields, ranks, groupBy, navigate, basename, bounds, yBounds } =
@@ -527,12 +528,12 @@ const CustomizedYAxisTick = ({
     payload,
     orientation: side,
   } = props;
-  let value = payload.value;
+  let { value } = payload;
   let offset = 0;
   let h = height / (buckets.length - 1);
   let centered;
   let ttValue;
-  if (yLabels[index] != payload.value) {
+  if (yLabels[index] != value) {
     value = yLabels[index] || "";
     if (valueType == "coordinate") {
       let yScale = scaleLinear().domain(bounds.domain).range([0, height]);
@@ -671,13 +672,14 @@ const Heatmap = ({
   xLabel,
   yLabel,
   stacked,
+  reversed,
   highlight,
   colors,
   legendRows,
 }) => {
   const fadeColor = ({ hex, i, active }) => {
     let [h, s, l] = hexToHSL(hex);
-    let lighten = active !== false ? (i == active ? false : true) : false;
+    let lighten = active !== false ? i != active : false;
     if (lighten) {
       s = 15; // s / 2;
       l = (l + 100) / 2;
@@ -689,7 +691,7 @@ const Heatmap = ({
     fadeColor({ hex, i, active: currentSeries })
   );
   let orderedCats = [...cats];
-  let catOrder = cats
+  let catOrder = orderedCats
     .map((cat, i) => ({ [cat]: i }))
     .reduce((a, b) => ({ ...b, ...a }), {});
   if (currentSeries !== false) {
@@ -885,6 +887,7 @@ const Heatmap = ({
       marginTop += legendRows * (2 * chartProps.pointSize + 15);
     }
   }
+  let currentLayer;
 
   return (
     <ScatterChart
@@ -901,9 +904,11 @@ const Heatmap = ({
       {axes}
       {pointData &&
         orderedCats.map((cat, j) => {
-          let i = catOrder[cat];
+          let i = reversed
+            ? orderedCats.length - catOrder[cat] - 1
+            : catOrder[cat];
           let range = [Math.max()];
-          return (
+          let scatterLayer = (
             <Scatter
               name={`${cat}_points`}
               legendType="none"
@@ -921,7 +926,13 @@ const Heatmap = ({
               pointerEvents={"none"}
             />
           );
+          if (currentSeries == i) {
+            currentLayer = scatterLayer;
+          } else {
+            return scatterLayer;
+          }
         })}
+      {currentLayer}
       {pointData && highlight && (
         <Scatter
           name={"highlight"}
@@ -986,6 +997,7 @@ const ReportScatter = ({
   compactWidth = 400,
   ratio,
   zScale = "linear",
+  message,
   setMessage,
   reportSelect,
   reportTerm,
@@ -997,6 +1009,7 @@ const ReportScatter = ({
   setMinDim,
   xOpts,
   yOpts,
+  reversed,
   stacked,
   highlightArea,
   basename,
@@ -1006,12 +1019,12 @@ const ReportScatter = ({
   const navigate = useNavigate();
   const location = useLocation();
   const [highlight, setHighlight] = useState([]);
-  const componentRef = chartRef ? chartRef : useRef();
+  const componentRef = chartRef || useRef();
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
   useEffect(() => {
-    if (scatter && scatter.status) {
+    if (inModal && message && scatter && scatter.status) {
       setMessage(null);
     }
   }, [scatter]);
@@ -1079,16 +1092,18 @@ const ReportScatter = ({
     if (xOptions.length == 1) {
       xOptions = xOptions[0].split(",");
     }
-    let yOptions = (yOpts || "").split(";");
+    let yOptions = (yOpts || "").replace("nsort", "").split(";");
     if (yOptions.length == 1) {
       yOptions = yOptions[0].split(",");
     }
     let xLabel = xOptions[4] || scatter.report.xLabel;
     let yLabel = yOptions[4] || scatter.report.yLabel;
-    let valueType = heatmaps.valueType;
-    let yValueType = heatmaps.yValueType || "integer";
-    let summary = heatmaps.summary;
-    let ySummary = heatmaps.ySummary || "value";
+    let {
+      valueType,
+      summary,
+      yValueType = "integer",
+      ySummary = "value",
+    } = heatmaps;
     let lastIndex = heatmaps.buckets.length - 2;
     let interval;
     if (valueType == "date") {
@@ -1188,6 +1203,7 @@ const ReportScatter = ({
         highlight={highlight}
         highlightArea={highlightArea}
         colors={colors}
+        reversed={reversed}
         legendRows={legendRows}
         chartProps={{
           zDomain: heatmaps.zDomain,
@@ -1207,16 +1223,8 @@ const ReportScatter = ({
           maxXLabel,
           xLabel: scatter.report.xLabel,
           yLabel: scatter.report.yLabel,
-          showXTickLabels: xOptions[2]
-            ? xOptions[2] >= 0
-              ? true
-              : false
-            : true,
-          showYTickLabels: yOptions[2]
-            ? yOptions[2] >= 0
-              ? true
-              : false
-            : true,
+          showXTickLabels: xOptions[2] ? xOptions[2] >= 0 : true,
+          showYTickLabels: yOptions[2] ? yOptions[2] >= 0 : true,
           xFormat,
           yFormat,
           orientation,
@@ -1258,6 +1266,7 @@ const ReportScatter = ({
 };
 
 export default compose(
+  memo,
   withSiteName,
   dispatchMessage,
   withColors,

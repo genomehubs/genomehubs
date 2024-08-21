@@ -63,8 +63,8 @@ const Footer = ({
       selectPalette(currentPalette);
     }
   }, [currentPalette, levels]);
-  if (hidden) {
-    return null;
+  if (!taxonomy || hidden) {
+    return <Taxonomy display={false} />;
   }
 
   let dataRelease;
@@ -84,7 +84,10 @@ const Footer = ({
       </span>
     );
   }
-  let colors = levels[6] || levels.default.slice(0, 6);
+  let colors =
+    levels.default.length > 6
+      ? levels[6] || levels.default.slice(0, 6)
+      : levels.default.slice(0, 6);
   let palette = <PalettePreview colors={colors} size="2em" />;
 
   let settingsPopup = (
