@@ -493,9 +493,6 @@ body,
     }
 
     .searchBox {
-      @include placeholderColor(
-        mix(themed("primary"), themed("secondary"), 65%)
-      );
       background-color: mix(themed("primary"), themed("secondary"), 5%);
       border: 2px solid mix(themed("primary"), themed("secondary"), 15%);
       font-family: themed("titleFont");
@@ -506,19 +503,22 @@ body,
       padding: 0.25em;
       text-align: center;
       width: 600px;
+      @include placeholderColor(
+        mix(themed("primary"), themed("secondary"), 65%)
+      );
 
       &:focus {
-        @include placeholderColor(themed("secondary"));
         background-color: themed("secondary");
         border-color: themed("primary");
+        @include placeholderColor(themed("secondary"));
       }
 
       &:hover {
+        background-color: themed("secondary");
+        border-color: themed("primary");
         @include placeholderColor(
           mix(themed("primary"), themed("secondary"), 35%)
         );
-        background-color: themed("secondary");
-        border-color: themed("primary");
       }
     }
 
