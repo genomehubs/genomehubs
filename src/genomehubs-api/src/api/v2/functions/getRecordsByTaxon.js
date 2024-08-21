@@ -62,8 +62,7 @@ export const getRecordsByTaxon = async (props) => {
     props.includeLineage = true;
   }
   const query = await searchBy(props);
-  let scrollThreshold = config.scrollThreshold;
-  let scrollDuration = config.scrollDuration;
+  let { scrollThreshold, scrollDuration } = config;
   let body;
   if (
     query.size > 10000 ||
@@ -141,6 +140,9 @@ export const getRecordsByTaxon = async (props) => {
   // set types
   status.size = props.size;
   status.offset = props.offset;
+  if (props.aggregations && !body.aggregations) {
+    body.aggregations = props.aggregations;
+  }
   if (status.hits) {
     results = processHits({
       body,
@@ -150,6 +152,7 @@ export const getRecordsByTaxon = async (props) => {
       ranks: props.ranks,
       fields: props.fields,
       lookupTypes,
+      bounds: props.bounds,
     });
     if (body.aggregations) {
       aggs = body.aggregations;

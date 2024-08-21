@@ -115,7 +115,7 @@ export const getBounds = async ({
   if (catMeta) {
     cat = catMeta.name;
   }
-  let summary = summaries[0];
+  let summary = summaries[0] || "value";
   let scaleType = setScale({ field, lookupTypes, opts });
   if (scaleType == "ordinal" && summary == "length") {
     scaleType = "linear";

@@ -1,5 +1,24 @@
+import { format } from "d3-format";
 import { processDoc } from "./processDoc";
+import { scaleFuncs } from "../queries/histogramAgg";
 import { subsets } from "./subsets";
+import { utcFormat } from "d3-time-format";
+
+const sci = (v) => {
+  if (v < 1000 && v >= 0.001) {
+    if (v < 10) {
+      return format(".3r")(v).replace(/0*$/, "");
+    }
+    return format(".3r")(v);
+  }
+  return format(".3s")(v);
+};
+const sciInt = (v) => {
+  if (v < 1000) {
+    return Math.ceil(v);
+  }
+  return format(".3s")(v);
+};
 
 export const processHits = ({
   body,
@@ -11,9 +30,11 @@ export const processHits = ({
   lca,
   inner_hits,
   processAsDoc,
+  bounds,
 }) => {
   let results = [];
   let targetFields = {};
+  let fieldTypes = {};
   for (let field of fields) {
     let meta = lookupTypes(field);
     let defaultSummary = meta ? meta.processed_simple : "value";
@@ -22,6 +43,67 @@ export const processHits = ({
       targetFields[attr] = [];
     }
     targetFields[attr].push(suffix);
+    if (meta) {
+      fieldTypes[attr] = meta.processed_type;
+    }
+  }
+  let buckets = {};
+
+  const deepFind = (obj, key) => {
+    let value;
+    Object.keys(obj).some((k) => {
+      if (k === key) {
+        value = obj[k];
+        return true;
+      }
+      if (obj[k] && typeof obj[k] === "object") {
+        value = deepFind(obj[k], key);
+        return value !== undefined;
+      }
+    });
+    return value;
+  };
+
+  const setBucketValues = (value, bucketType, scaleFunc) => {
+    let bucketValues = deepFind(value, "buckets").map((b) => b.key);
+    let bucketLabels, hasRange;
+    if (bucketType == "date") {
+      bucketLabels = bucketValues.map(
+        (v) => new Date(v).toISOString().split("T")[0]
+        // .replace(/(-01)*$/g, "")
+      );
+      hasRange = true;
+    } else if (!bucketType.endsWith("keyword")) {
+      bucketLabels = bucketValues.map((v) =>
+        bucketType == "date" ? v : sci(scaleFunc(v))
+      );
+      hasRange = true;
+    } else {
+      bucketLabels = bucketValues;
+    }
+    if (hasRange) {
+      bucketLabels = bucketLabels.map((v, i) => {
+        if (i == bucketLabels.length - 1) {
+          return ">" + v;
+        } else {
+          return `${v}–${bucketLabels[i + 1]}`;
+        }
+      });
+    }
+    return { values: bucketValues, labels: bucketLabels };
+  };
+
+  for (let [key, value] of Object.entries(
+    body.aggregations ? body.aggregations.fields || {} : {}
+  )) {
+    let bucketKey = key.replace(/_histogram$/, "");
+    if (fieldTypes[bucketKey] && key.endsWith("_histogram")) {
+      buckets[bucketKey] = setBucketValues(
+        value,
+        fieldTypes[bucketKey],
+        scaleFuncs[`${bounds[bucketKey].scale || "linear"}Inv`]
+      );
+    }
   }
   body.hits.hits.forEach((hit) => {
     let result = {
@@ -37,21 +119,17 @@ export const processHits = ({
       });
     } else {
       result.result = hit._source;
-      // console.log(JSON.stringify(hit, null, 4));
-      if (hit.inner_hits && hit.inner_hits.taxon_names) {
-        if (names) {
-          let taxonNames = {};
-          hit.inner_hits.taxon_names.hits.hits.forEach((obj) => {
-            let hitNames = {};
-            Object.keys(obj.fields).forEach((key) => {
-              hitNames[key.replace("taxon_names.", "").replace(".raw", "")] =
-                obj.fields[key];
-            });
-            taxonNames[obj.fields["taxon_names.class"]] = hitNames;
+      if (hit.inner_hits && hit.inner_hits.taxon_names && names) {
+        let taxonNames = {};
+        hit.inner_hits.taxon_names.hits.hits.forEach((obj) => {
+          let hitNames = {};
+          Object.keys(obj.fields).forEach((key) => {
+            hitNames[key.replace("taxon_names.", "").replace(".raw", "")] =
+              obj.fields[key];
           });
-          result.result.names = taxonNames;
-          // delete result.result.taxon_names;
-        }
+          taxonNames[obj.fields["taxon_names.class"]] = hitNames;
+        });
+        result.result.names = taxonNames;
       }
       if (hit.inner_hits && hit.inner_hits.lineage) {
         if (ranks) {
@@ -204,14 +282,12 @@ export const processHits = ({
                   field[ikey.replace(/attributes\./, "")] =
                     inner_hit.fields[ikey];
                 }
+              } else if (inner_hit.fields[ikey].length == 1) {
+                field[ikey.replace(/attributes\./, "")] =
+                  inner_hit.fields[ikey][0];
               } else {
-                if (inner_hit.fields[ikey].length == 1) {
-                  field[ikey.replace(/attributes\./, "")] =
-                    inner_hit.fields[ikey][0];
-                } else {
-                  field[ikey.replace(/attributes\./, "")] =
-                    inner_hit.fields[ikey];
-                }
+                field[ikey.replace(/attributes\./, "")] =
+                  inner_hit.fields[ikey];
               }
             });
           }
@@ -220,13 +296,9 @@ export const processHits = ({
               field = { ...attrFields[name], ...field };
             }
             if (targetFields[name]) {
-              // console.log({ targetFields });
               for (let subset of targetFields[name]) {
                 let subsetKey = subset;
-                // if (subsets.source.has(subsetKey)) {
-                //   subsetKey = "value";
-                // }
-                if (name.endsWith("_date")) {
+                if (fieldTypes[name] == "date") {
                   if (subsetKey == "min") {
                     subsetKey = "from";
                   } else if (subsetKey == "max") {
@@ -268,6 +340,9 @@ export const processHits = ({
                 } else if (subsets.summary.has(subsetKey)) {
                   fields[newName] = { ...field, value: field[subsetKey] };
                 }
+                if (newName != name) {
+                  fields[name][subsetKey] = field[subsetKey];
+                }
               }
             } else {
               fields[name] = field;
@@ -276,6 +351,41 @@ export const processHits = ({
         });
       });
       if (Object.keys(fields).length > 0) {
+        for (let [name, obj] of Object.entries(fields)) {
+          if (buckets[name]) {
+            let value = Array.isArray(obj.value) ? obj.value : [obj.value];
+
+            obj.binned = [
+              ...new Set(
+                value
+                  .map((v) => {
+                    if (!fieldTypes[name].endsWith("keyword")) {
+                      let i;
+                      let val = fieldTypes[name] == "date" ? Date.parse(v) : v;
+                      for (let [index, bucket] of buckets[
+                        name
+                      ].values.entries()) {
+                        if (
+                          bucket <
+                          scaleFuncs[bounds[name].scale || "linear"](val)
+                        ) {
+                          i = index;
+                        } else {
+                          break;
+                        }
+                      }
+                      return buckets[name].labels[i];
+                    } else {
+                      return buckets[name].values.includes(v.toLowerCase())
+                        ? v
+                        : "Other";
+                    }
+                  })
+                  .sort()
+              ),
+            ];
+          }
+        }
         result.result.fields = fields;
       }
     }

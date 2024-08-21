@@ -785,11 +785,9 @@ const ResultTable = ({
     } else {
       let newExpandColumns = { ...expandColumns };
       if (colSpan > 0) {
-        console.log("collapse", id);
         newExpandColumns[id] = false;
         setSearchDefaults({ expandColumns: newExpandColumns });
       } else {
-        console.log("expand", id);
         newExpandColumns[id] = true;
         setSearchDefaults({ expandColumns: newExpandColumns });
       }
@@ -1037,9 +1035,18 @@ const ResultTable = ({
             ? type.summary[0]
             : type.summary;
         }
-        let value;
+        let value, binnable;
+        if (type.processed_type == "date") {
+          if (summary == "min") {
+            summary = "from";
+          }
+          if (summary == "max") {
+            summary = "to";
+          }
+        }
         if (summary && field[summary]) {
           value = field[summary];
+          binnable = summary == "value";
         } else if (
           field.aggregation_source &&
           ["ancestor", "descendant", "direct", "estimate"].includes(summary)
@@ -1050,12 +1057,17 @@ const ResultTable = ({
               ["ancestor", "descendant"].includes(field.aggregation_source[0]))
           ) {
             value = field.value;
+            binnable = true;
           } else {
             value = undefined;
           }
         } else {
           value = field.value;
+          binnable = true;
         }
+        // uncomment to use binned value if available
+        value =
+          binnable && field.hasOwnProperty("binned") ? field.binned : value;
         if (colSpan == 0) {
           let entries = [];
           if (Array.isArray(value)) {
