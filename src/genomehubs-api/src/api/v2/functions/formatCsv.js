@@ -56,7 +56,8 @@ export const formatCsv = async (response, opts) => {
         ) {
           // TODO: add option for sparse table
           usedFields[key] = true;
-          let value = fullResult.result.fields[key].value;
+          let { value, binned = value } = fullResult.result.fields[key];
+          value = binned;
           if (opts.tidyData) {
             if (opts.includeRawValues) {
               if (fullResult.result.fields[key].hasOwnProperty("rawValues")) {
@@ -133,8 +134,7 @@ export const formatCsv = async (response, opts) => {
 
   try {
     const parser = new Parser(opts);
-    const csv = parser.parse(data);
-    return csv;
+    return parser.parse(data);
   } catch (err) {
     console.error(err);
   }

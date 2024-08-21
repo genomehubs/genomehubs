@@ -355,26 +355,35 @@ export const processHits = ({
           if (buckets[name]) {
             let value = Array.isArray(obj.value) ? obj.value : [obj.value];
 
-            obj.binned = value.map((v) => {
-              if (!fieldTypes[name].endsWith("keyword")) {
-                let i;
-                let val = fieldTypes[name] == "date" ? Date.parse(v) : v;
-                for (let [index, bucket] of buckets[name].values.entries()) {
-                  if (
-                    bucket < scaleFuncs[bounds[name].scale || "linear"](val)
-                  ) {
-                    i = index;
-                  } else {
-                    break;
-                  }
-                }
-                return buckets[name].labels[i];
-              } else {
-                return buckets[name].values.includes(v.toLowerCase())
-                  ? v
-                  : "Other";
-              }
-            });
+            obj.binned = [
+              ...new Set(
+                value
+                  .map((v) => {
+                    if (!fieldTypes[name].endsWith("keyword")) {
+                      let i;
+                      let val = fieldTypes[name] == "date" ? Date.parse(v) : v;
+                      for (let [index, bucket] of buckets[
+                        name
+                      ].values.entries()) {
+                        if (
+                          bucket <
+                          scaleFuncs[bounds[name].scale || "linear"](val)
+                        ) {
+                          i = index;
+                        } else {
+                          break;
+                        }
+                      }
+                      return buckets[name].labels[i];
+                    } else {
+                      return buckets[name].values.includes(v.toLowerCase())
+                        ? v
+                        : "Other";
+                    }
+                  })
+                  .sort()
+              ),
+            ];
           }
         }
         result.result.fields = fields;

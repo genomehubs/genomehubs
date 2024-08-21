@@ -118,7 +118,6 @@ const ResultColumnOptions = ({
   const navigate = useNavigate();
   const location = useLocation();
   const summaryTypes = summaryTypesFromMeta(types[attributeId]) || [];
-  console.log(searchTerm);
   const initialSelected = searchTerm.fields
     ? searchTerm.fields
         .split(",")
@@ -130,7 +129,6 @@ const ResultColumnOptions = ({
   let initialFieldOpts =
     searchTerm?.fieldOpts?.find((f) => f.startsWith(attributeId)) || ";;";
   initialFieldOpts = initialFieldOpts.replace(`${attributeId}:`, "");
-  console.log(initialFieldOpts);
   const [fieldOpts, setFieldOpts] = React.useState(initialFieldOpts);
 
   const handleChange = (e) => {

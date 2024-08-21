@@ -100,6 +100,7 @@ export const getSearchResults = async (req, res) => {
       result,
       taxonomy,
       rank = "species",
+      size,
     } = req.query;
     let bounds = {};
     if (fieldOpts) {
@@ -148,8 +149,16 @@ export const getSearchResults = async (req, res) => {
       } else if (persist && (await pingCache())) {
         uuid = uuidv4();
       }
-      let countRes = await getResults({ ...req.query, exclusions, size: 0 });
-      if (countRes.status && countRes.status.hits) {
+    }
+    let countRes = {};
+    if (queryId || size > 1000) {
+      countRes = await getResults({
+        ...req.query,
+        exclusions,
+        size: 0,
+        bounds,
+      });
+      if (queryId && countRes.status && countRes.status.hits) {
         setProgress(queryId, { total: countRes.status.hits, persist, uuid });
       }
     }
@@ -160,6 +169,7 @@ export const getSearchResults = async (req, res) => {
       countValues: true,
       req,
       bounds,
+      aggregations: countRes.aggs,
     });
     if (!response.status.success) {
       return res.status(200).send({ status: response.status });
@@ -167,9 +177,16 @@ export const getSearchResults = async (req, res) => {
     if (response.status.hits == 0) {
       let query = await replaceSearchIds(req.query);
       if (query != req.query.query) {
-        let countRes = await getResults({ ...req.query, exclusions, size: 0 });
-        if (countRes.status && countRes.status.hits) {
-          setProgress(queryId, { total: countRes.status.hits });
+        if (countRes) {
+          countRes = await getResults({
+            ...req.query,
+            exclusions,
+            size: 0,
+            bounds,
+          });
+          if (countRes.status && countRes.status.hits) {
+            setProgress(queryId, { total: countRes.status.hits });
+          }
         }
         response = await getResults({
           ...req.query,
@@ -177,9 +194,14 @@ export const getSearchResults = async (req, res) => {
           exclusions,
           sortBy,
           req,
+          bounds,
+          aggregations: countRes.aggs,
         });
         response.queryString = query;
       }
+    }
+    if (countRes.aggs && !response.aggs) {
+      response.aggs = countRes.aggs;
     }
     progress = getProgress(queryId);
     if (

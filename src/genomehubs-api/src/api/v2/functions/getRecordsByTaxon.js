@@ -140,6 +140,9 @@ export const getRecordsByTaxon = async (props) => {
   // set types
   status.size = props.size;
   status.offset = props.offset;
+  if (props.aggregations && !body.aggregations) {
+    body.aggregations = props.aggregations;
+  }
   if (status.hits) {
     results = processHits({
       body,

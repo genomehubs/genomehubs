@@ -291,6 +291,7 @@ export const generateQuery = async ({
   req,
   update,
   bounds = {},
+  aggregations,
 }) => {
   let { lookupTypes } = await attrTypes({ ...query, taxonomy });
   fields = await parseFields({ result, fields, taxonomy });
@@ -530,6 +531,7 @@ export const generateQuery = async ({
     update,
     taxonomy,
     bounds,
+    aggregations,
   };
   if (taxTerm) {
     let function_score;
