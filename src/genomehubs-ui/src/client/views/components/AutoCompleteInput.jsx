@@ -2,9 +2,9 @@ import React, { memo, useRef, useState } from "react";
 
 import AutoCompleteOption from "./AutoCompleteOption";
 import AutoCompleteSuggestion from "./AutoCompleteSuggestion";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import Popper from "@material-ui/core/Popper";
-import TextField from "@material-ui/core/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import Popper from "@mui/material/Popper";
+import TextField from "@mui/material/TextField";
 import { compose } from "recompose";
 import { fetchAutocomplete } from "../functions/autocomplete";
 import styles from "./Styles.scss";
@@ -517,7 +517,7 @@ export const AutoCompleteInput = ({
       getOptionLabel={(option) =>
         typeof option === "string" ? option : option.title
       }
-      getOptionSelected={(option, value) => option.title === value.title}
+      isOptionEqualToValue={(option, value) => option.title === value.title}
       options={options}
       autoComplete
       includeInputInList

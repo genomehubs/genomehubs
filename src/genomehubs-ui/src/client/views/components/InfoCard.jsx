@@ -1,9 +1,9 @@
 import React from "react";
 import styles from "./Styles.scss";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import CardMedia from "@material-ui/core/CardMedia";
-import Typography from "@material-ui/core/Typography";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Typography from "@mui/material/Typography";
 
 export const images = require.context("./img", true, /\.(png|jpe?g|svg)$/);
 

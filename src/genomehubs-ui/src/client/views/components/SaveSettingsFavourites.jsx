@@ -1,22 +1,23 @@
 import React, { useState } from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
 
-import Button from "@material-ui/core/Button";
-import EditIcon from "@material-ui/icons/Edit";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import Button from "@mui/material/Button";
+import EditIcon from "@mui/icons-material/Edit";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FavouriteButton from "./FavouriteButton";
-import MuiDialogContent from "@material-ui/core/DialogContent";
-import SearchIcon from "@material-ui/icons/Search";
-import Typography from "@material-ui/core/Typography";
+import MuiDialogContent from "@mui/material/DialogContent";
+import SearchIcon from "@mui/icons-material/Search";
+import Typography from "@mui/material/Typography";
 import YamlEditor from "@focus-reactive/react-yaml";
 import { compose } from "recompose";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import { splitTerms } from "../functions/splitTerms";
 import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
 import { useNavigate } from "@reach/router";
 import withSearchDefaults from "../hocs/withSearchDefaults";
+import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
 
 // import withSearchIndex from "../hocs/withSearchIndex";
@@ -25,17 +26,17 @@ export const useStyles = makeStyles((theme) => ({
   paper: {
     // width: "96%",
     // minWidth: "600px",
-    // padding: theme.spacing(2),
-    // marginTop: theme.spacing(2),
+    // padding: 16,
+    // marginTop: 16,
 
     boxShadow: "none",
   },
   formControl: {
-    margin: theme.spacing(2),
+    margin: 16,
     minWidth: 120,
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
+    marginTop: 16,
   },
   label: {
     color: "rgba(0, 0, 0, 0.54)",
@@ -63,7 +64,7 @@ const SaveSettingsFavourites = ({
 
   const DialogContent = withStyles((theme) => ({
     root: {
-      padding: theme.spacing(2),
+      padding: 16,
     },
   }))(MuiDialogContent);
 

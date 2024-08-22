@@ -1,12 +1,12 @@
 import React, { memo, useEffect, useState } from "react";
 
-import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
-import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import StaticPlotFile from "./StaticPlotFile";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import formatter from "../functions/formatter";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import styles from "./Styles.scss";
 import withApi from "../hocs/withApi";
 import withFiles from "../hocs/withFiles";

@@ -3,17 +3,17 @@ import { basename, siteName } from "../reducers/location";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
-import ArtTrackIcon from "@material-ui/icons/ArtTrack";
+import ArtTrackIcon from "@mui/icons-material/ArtTrack";
 import AutoCompleteInput from "./AutoCompleteInput";
 import Badge from "./Badge";
 import BasicSelect from "./BasicSelect";
 import Breadcrumbs from "./Breadcrumbs";
-import Button from "@material-ui/core/Button";
+import Button from "@mui/material/Button";
 import Count from "./Count";
-import Divider from "@material-ui/core/Divider";
+import Divider from "@mui/material/Divider";
 import EnumSelect from "./EnumSelect";
 import FlagIcon from "./FlagIcon";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import Highlight from "./Highlight";
 import Logo from "./Logo";
 import NavLink from "./NavLink";
@@ -21,15 +21,15 @@ import PhyloPics from "./PhyloPics";
 import RecordLink from "./RecordLink";
 import Report from "./Report";
 import ResultCount from "./ResultCount";
-import SearchIcon from "@material-ui/icons/Search";
+import SearchIcon from "@mui/icons-material/Search";
 import StaticPlot from "./StaticPlot";
-import TextField from "@material-ui/core/TextField";
+import TextField from "@mui/material/TextField";
 import Toggle from "./Toggle";
 import Tooltip from "./Tooltip";
 import TranslatedValue from "./TranslatedValue";
 import ValueRow from "./ValueRow";
-import VisibilityIcon from "@material-ui/icons/Visibility";
-import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import YAML from "js-yaml";
 import classNames from "classnames";
 import classnames from "classnames";
@@ -48,7 +48,7 @@ import styles from "./Styles.scss";
 import unified from "unified";
 import { visit } from "unist-util-visit";
 import withPages from "../hocs/withPages";
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@mui/styles/withStyles";
 
 const pagesUrl = PAGES_URL;
 const webpackHash = COMMIT_HASH || __webpack_hash__;
@@ -156,6 +156,7 @@ export const Template = ({
     let description = props[`${match}_description`];
     let input = (
       <TextField
+        variant="standard"
         id={match + Math.random()}
         label={label}
         value={values[match]}
@@ -208,7 +209,6 @@ export const Template = ({
           <Grid item key={"toggle"}>
             <Button
               variant="contained"
-              color="default"
               disableElevation
               startIcon={<ArtTrackIcon />}
               onClick={(e) => {
@@ -223,7 +223,6 @@ export const Template = ({
         <Grid item key={"preview"}>
           <Button
             variant="contained"
-            color="default"
             disableElevation
             startIcon={showPreview ? <VisibilityOffIcon /> : <VisibilityIcon />}
             onClick={(e) => {
@@ -237,7 +236,6 @@ export const Template = ({
         <Grid item key={"submit"}>
           <Button
             variant="contained"
-            color="default"
             disableElevation
             startIcon={<SearchIcon />}
             onClick={handleSubmit}
@@ -472,8 +470,8 @@ export const RehypeComponentsList = (extra) => {
 
 export function compile(val, components = RehypeComponentsList()) {
   const processor = unified()
-    .use(remarkParse)
-    .use(remarkReact)
+    .use(remarkParse, { fragment: true })
+    // .use(remarkReact, React)
     .use(gfm)
     .use(remarkDirective)
     .use(htmlDirectives)

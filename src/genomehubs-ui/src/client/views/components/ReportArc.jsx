@@ -16,7 +16,7 @@ import MultiCatLegend, {
 } from "./MultiCatLegend";
 import React, { useEffect, useRef, useState } from "react";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { format } from "d3-format";

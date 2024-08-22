@@ -1,13 +1,13 @@
 import React, { Fragment, useLayoutEffect, useRef, useState } from "react";
 
-import CloseIcon from "@material-ui/icons/Close";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import Modal from "@material-ui/core/Modal";
-import Skeleton from "@material-ui/lab/Skeleton";
-import Typography from "@material-ui/core/Typography";
+import CloseIcon from "@mui/icons-material/Close";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import Modal from "@mui/material/Modal";
+import Skeleton from '@mui/material/Skeleton';
+import Typography from "@mui/material/Typography";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import useWindowDimensions from "../hooks/useWindowDimensions";
@@ -81,7 +81,7 @@ const PhyloPic = ({
         }}
         src={src}
       />
-      <Skeleton variant="rect" width={imageWidth} height={imageWidth / ratio} />
+      <Skeleton variant="rectangular" width={imageWidth} height={imageWidth / ratio} />
     </div>
   ) : (
     <div>

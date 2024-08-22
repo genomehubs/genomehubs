@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import Report from "./Report";
 import ReportTools from "./ReportTools";
 import classnames from "classnames";

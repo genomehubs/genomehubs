@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 
-import { Chip } from "@material-ui/core";
-import LaunchIcon from "@material-ui/icons/Launch";
+import { Chip } from "@mui/material";
+import LaunchIcon from "@mui/icons-material/Launch";
 import Tooltip from "./Tooltip";
 import compareValues from "../functions/compareValues";
 import { compose } from "recompose";

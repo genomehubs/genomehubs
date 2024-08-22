@@ -1,4 +1,4 @@
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import React from "react";
 import { compose } from "recompose";
 import withColors from "../hocs/withColors";

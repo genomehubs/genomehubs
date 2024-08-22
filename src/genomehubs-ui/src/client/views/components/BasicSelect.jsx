@@ -1,15 +1,15 @@
 import BasicTextField from "./BasicTextField";
-import FormControl from "@material-ui/core/FormControl";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
 import React from "react";
-import Select from "@material-ui/core/Select";
-import { makeStyles } from "@material-ui/core/styles";
+import Select from "@mui/material/Select";
+import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
-    margin: theme.spacing(2),
+    margin: 16,
     minWidth: 120,
   },
 }));
@@ -59,17 +59,17 @@ const BasicSelect = ({
   }
 
   return (
-    <FormControl className={classes.formControl}>
+    <FormControl variant="standard" className={classes.formControl}>
       {label && <InputLabel id={`${id}-label`}>{label}</InputLabel>}
       <Select
+        variant="standard"
         labelId={label ? `${id}-label` : undefined}
         id={id}
         value={current}
         onBlur={handleBlur}
         onChange={handleChange}
         label={label}
-        inputProps={{ "aria-label": label ? label : helperText }}
-      >
+        inputProps={{ "aria-label": label ? label : helperText }}>
         {options}
       </Select>
       {helperText && <FormHelperText>{helperText}</FormHelperText>}

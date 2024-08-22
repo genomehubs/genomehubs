@@ -1,15 +1,15 @@
 import AttributeModal from "./AttributeModal";
-import DialogContent from "@material-ui/core/DialogContent";
-import Modal from "@material-ui/core/Modal";
+import DialogContent from "@mui/material/DialogContent";
+import Modal from "@mui/material/Modal";
 import React from "react";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import withRecord from "../hocs/withRecord";
 
 export const useStyles = makeStyles((theme) => ({
   modal: {
     display: "flex",
-    padding: theme.spacing(1),
+    padding: 8,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -17,10 +17,10 @@ export const useStyles = makeStyles((theme) => ({
     width: 400,
     maxWidth: "75vw",
     maxHeight: "75vh",
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: "white",
     border: "2px solid #000",
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
+    boxShadow: "#333333", // theme.shadows[5],
+    padding: "16px 32px 24px",
     cursor: "default",
     outline: 0,
   },

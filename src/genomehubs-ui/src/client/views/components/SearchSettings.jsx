@@ -1,34 +1,36 @@
 import React, { memo, useState } from "react";
-import { Theme, createStyles, makeStyles } from "@material-ui/core/styles";
 import { useLocation, useNavigate } from "@reach/router";
 
-import CancelIcon from "@material-ui/icons/Cancel";
-import Checkbox from "@material-ui/core/Checkbox";
-import Chip from "@material-ui/core/Chip";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Grid from "@material-ui/core/Grid";
-import InputLabel from "@material-ui/core/InputLabel";
-import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
-import ListItemText from "@material-ui/core/ListItemText";
-import MenuItem from "@material-ui/core/MenuItem";
-import MuiAccordion from "@material-ui/core/Accordion";
-import MuiAccordionDetails from "@material-ui/core/AccordionDetails";
-import MuiAccordionSummary from "@material-ui/core/AccordionSummary";
-import Paper from "@material-ui/core/Paper";
-import Select from "@material-ui/core/Select";
+import CancelIcon from "@mui/icons-material/Cancel";
+import Checkbox from "@mui/material/Checkbox";
+import Chip from "@mui/material/Chip";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Grid from "@mui/material/Grid";
+import InputLabel from "@mui/material/InputLabel";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import ListItemText from "@mui/material/ListItemText";
+import MenuItem from "@mui/material/MenuItem";
+import MuiAccordion from "@mui/material/Accordion";
+import MuiAccordionDetails from "@mui/material/AccordionDetails";
+import MuiAccordionSummary from "@mui/material/AccordionSummary";
+import Paper from "@mui/material/Paper";
+import Select from "@mui/material/Select";
 import SettingsButton from "./SettingsButton";
+import { Theme } from "@mui/material/styles";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
+import createStyles from "@mui/styles/createStyles";
 import expandFieldList from "../functions/expandFieldList";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import { useLocalStorage } from "usehooks-ts";
 import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -36,8 +38,8 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     width: "100%",
     minWidth: "600px",
-    padding: theme.spacing(1),
-    marginTop: theme.spacing(1),
+    padding: 8,
+    marginTop: 8,
     border: "none",
     boxShadow: "none",
     overflowX: "visible",
@@ -46,11 +48,11 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
   },
   formControl: {
-    margin: theme.spacing(2),
+    margin: 16,
     minWidth: 120,
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
+    marginTop: 16,
   },
   redBackground: {
     backgroundColor: "#C00",
@@ -60,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#FFF",
   },
   formControl: {
-    margin: theme.spacing(1),
+    margin: 8,
     minWidth: 240,
     maxWidth: 480,
   },
@@ -73,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#FFF",
   },
   noLabel: {
-    marginTop: theme.spacing(3),
+    marginTop: 24,
   },
 }));
 
@@ -299,9 +301,9 @@ const SearchSettings = ({
     groups.push(
       <Grid item key={key}>
         <FormControl
+          variant="standard"
           className={classes.formControl}
-          style={{ marginLeft: "1em" }}
-        >
+          style={{ marginLeft: "1em" }}>
           <InputLabel
             id="demo-mutiple-chip-checkbox-label"
             style={{ marginTop: checkedList.length > 0 ? 0 : "-1em" }}
@@ -316,6 +318,7 @@ const SearchSettings = ({
             {key}
           </InputLabel>
           <Select
+            variant="standard"
             labelId="demo-mutiple-chip-checkbox-label"
             id="demo-mutiple-chip-checkbox"
             multiple
@@ -341,8 +344,7 @@ const SearchSettings = ({
                   />
                 ))}
               </div>
-            )}
-          >
+            )}>
             {content}
           </Select>
         </FormControl>

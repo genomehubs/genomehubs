@@ -1,22 +1,22 @@
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
-import Button from "@material-ui/core/Button";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
-import ClickAwayListener from "@material-ui/core/ClickAwayListener";
-import MenuItem from "@material-ui/core/MenuItem";
-import MenuList from "@material-ui/core/MenuList";
-import Paper from "@material-ui/core/Paper";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import Button from "@mui/material/Button";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
+import MenuItem from "@mui/material/MenuItem";
+import MenuList from "@mui/material/MenuList";
+import Paper from "@mui/material/Paper";
 import React from "react";
-import SearchIcon from "@material-ui/icons/Search";
+import SearchIcon from "@mui/icons-material/Search";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 // import { compose } from "recompose";
 import withSearch from "../hocs/withSearch";
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
 
 const ColorButtonGroup = withStyles((theme) => ({
   root: {
-    color: theme.palette.getContrastText("#333333"),
+    color: "black", // theme.palette.getContrastText("#333333"),
     backgroundColor: "#d2e4f0",
     "&:hover": {
       backgroundColor: "#f0f6fa",

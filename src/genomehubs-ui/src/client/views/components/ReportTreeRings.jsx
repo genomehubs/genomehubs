@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from "react";
 
 import Tooltip from "./Tooltip";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import { compose } from "recompose";
 import { scaleLog } from "d3-scale";
 import { useLongPress } from "use-long-press";

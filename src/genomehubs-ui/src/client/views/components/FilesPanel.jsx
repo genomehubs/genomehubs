@@ -1,8 +1,8 @@
-import GetAppIcon from "@material-ui/icons/GetApp";
-import { Grid } from "@material-ui/core";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import { Grid } from "@mui/material";
 import React from "react";
 import RecordLink from "./RecordLink";
-import VisibilityIcon from "@material-ui/icons/Visibility";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import classnames from "classnames";
 import { compose } from "recompose";
 import { setLinkIcons } from "./ResultTable";

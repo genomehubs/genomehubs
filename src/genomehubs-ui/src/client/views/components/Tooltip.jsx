@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 
-import MuiTooltip from "@material-ui/core/Tooltip";
-import { makeStyles } from "@material-ui/core/styles";
+import MuiTooltip from "@mui/material/Tooltip";
+import makeStyles from "@mui/styles/makeStyles";
 import { useEventListener } from "../hooks/useEventListener";
 
 const useStyles = {

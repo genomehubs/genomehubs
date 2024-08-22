@@ -1,14 +1,15 @@
 import React, { useEffect, useRef } from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
 
-import Grid from "@material-ui/core/Grid";
-import LaunchIcon from "@material-ui/icons/Launch";
+import Grid from "@mui/material/Grid";
+import LaunchIcon from "@mui/icons-material/Launch";
 import NavLink from "./NavLink";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import useResize from "../hooks/useResize";

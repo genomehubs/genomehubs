@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import BasicSelect from "./BasicSelect";
 import FeatureSummaryPanel from "./FeatureSummaryPanel";
-import { Grid } from "@material-ui/core";
+import { Grid } from "@mui/material";
 import { Template } from "./Markdown";
 import classnames from "classnames";
 import { compose } from "recompose";

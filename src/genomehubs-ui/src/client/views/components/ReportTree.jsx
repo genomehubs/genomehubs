@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import Grid from "@material-ui/core/Grid";
-import LaunchIcon from "@material-ui/icons/Launch";
+import Grid from "@mui/material/Grid";
+import LaunchIcon from "@mui/icons-material/Launch";
 import ReportTreePaths from "./ReportTreePaths";
 import ReportTreeRings from "./ReportTreeRings";
 import Tooltip from "./Tooltip";

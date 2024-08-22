@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import { FormControl } from "@material-ui/core";
-import MuiTableCell from "@material-ui/core/TableCell";
+import { FormControl } from "@mui/material";
+import MuiTableCell from "@mui/material/TableCell";
 import ResultFilterInput from "./ResultFilterInput";
 import classnames from "classnames";
 import { compose } from "recompose";
@@ -10,7 +10,7 @@ import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from '@mui/styles/withStyles';
 
 const DefaultTableCell = withStyles((theme) => ({
   root: {
@@ -220,7 +220,7 @@ const ResultFilter = ({
       className={css}
       style={{ backgroundColor: color }}
     >
-      <FormControl size="small" style={{ width: "100%" }}>
+      <FormControl variant="standard" size="small" style={{ width: "100%" }}>
         <div style={{ width: "100%" }}>{filters}</div>
       </FormControl>
     </TableCell>

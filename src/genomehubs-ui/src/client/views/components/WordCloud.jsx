@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-import Skeleton from "@material-ui/lab/Skeleton";
+import Skeleton from '@mui/material/Skeleton';
 import { TagCloud } from "react-tagcloud";
 import { compose } from "recompose";
 import qs from "../functions/qs";
@@ -97,7 +97,7 @@ const WordCloud = ({
   if (buckets.length == 0) {
     return (
       <div className={styles.fullWidth} ref={targetRef}>
-        <Skeleton variant="rect" width={400} height={50} />
+        <Skeleton variant="rectangular" width={400} height={50} />
       </div>
     );
   }

@@ -5,20 +5,28 @@ export default (rootElRef, top) => {
   useEffect(() => {
     let mounted = true;
     if (rootElRef && rootElRef.current) {
-      const ob = new IntersectionObserver(
-        ([entry]) => {
-          if (mounted && !visible) {
-            setVisible(entry.isIntersecting);
+      try {
+        const ob = new IntersectionObserver(
+          ([entry]) => {
+            if (mounted && !visible) {
+              setVisible(entry.isIntersecting);
+            }
+          },
+          {
+            rootMargin: top,
           }
-        },
-        {
-          rootMargin: top,
-        }
-      );
-      ob.observe(rootElRef.current);
-      return () => {
-        ob.unobserve(rootElRef.current);
-      };
+        );
+        ob.observe(rootElRef.current);
+        return () => {
+          try {
+            ob.unobserve(rootElRef.current);
+          } catch (e) {
+            console.log(e);
+          }
+        };
+      } catch (e) {
+        console.log(e);
+      }
     }
     return () => {
       mounted = false;

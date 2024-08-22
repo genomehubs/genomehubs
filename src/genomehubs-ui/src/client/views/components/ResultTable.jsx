@@ -1,45 +1,45 @@
 import React, { useEffect, useRef } from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
-import Badge from "@material-ui/core/Badge";
-import CheckBoxIcon from "@material-ui/icons/CheckBox";
-import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import Checkbox from "@material-ui/core/Checkbox";
+import Badge from "@mui/material/Badge";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import Checkbox from "@mui/material/Checkbox";
 import Citation from "./Citation";
 import DownloadButton from "./DownloadButton";
-import FiberManualRecordSharpIcon from "@material-ui/icons/FiberManualRecordSharp";
-import FilterListIcon from "@material-ui/icons/FilterList";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
+import FiberManualRecordSharpIcon from "@mui/icons-material/FiberManualRecordSharp";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import LinkButton from "./LinkButton";
-import MuiTableCell from "@material-ui/core/TableCell";
-import RadioButtonCheckedOutlinedIcon from "@material-ui/icons/RadioButtonCheckedOutlined";
-import RadioButtonUncheckedIcon from "@material-ui/icons/RadioButtonUnchecked";
+import MuiTableCell from "@mui/material/TableCell";
+import RadioButtonCheckedOutlinedIcon from "@mui/icons-material/RadioButtonCheckedOutlined";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import ReportError from "./ReportError";
 import ResultFilter from "./ResultFilter";
 import ResultModalControl from "./ResultModalControl";
 import SearchPagination from "./SearchPagination";
-import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
-import SettingsIcon from "@material-ui/icons/Settings";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
+import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
+import SettingsIcon from "@mui/icons-material/Settings";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableSortLabel from "@mui/material/TableSortLabel";
 import Tooltip from "./Tooltip";
-import ViewWeekIcon from "@material-ui/icons/ViewWeek";
-import ViewWeekOutlinedIcon from "@material-ui/icons/ViewWeekOutlined";
-import VisibilityIcon from "@material-ui/icons/Visibility";
+import ViewWeekIcon from "@mui/icons-material/ViewWeek";
+import ViewWeekOutlinedIcon from "@mui/icons-material/ViewWeekOutlined";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchRecord from "../hocs/dispatchRecord";
 import expandFieldList from "../functions/expandFieldList";
 import { formatter } from "../functions/formatter";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import withColors from "../hocs/withColors";
@@ -48,6 +48,7 @@ import withRanks from "../hocs/withRanks";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
 import withSiteName from "../hocs/withSiteName";
+import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -66,7 +67,7 @@ const StyledBadge = withStyles((theme) => ({
     right: "50%",
     top: 6,
     fontSize: "0.8em",
-    border: `2px solid ${theme.palette.background.paper}`,
+    border: "2px solid white",
     padding: "0 4px",
     color: "white",
     backgroundColor: "rgba(0,0,0,0.26)",

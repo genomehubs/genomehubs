@@ -2,7 +2,7 @@ import BadgeInfo, { BadgeInfoCell } from "./BadgeInfo";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import HistogramSVG from "./HistogramSVG";
 import React from "react";
 import TaxonSummaryPanel from "./TaxonSummaryPanel";

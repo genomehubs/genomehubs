@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AssemblySummaryPanel from "./AssemblySummaryPanel";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import { NamesList } from "./NamesPanel";
 import NavLink from "./NavLink";
 import PhyloPics from "./PhyloPics";

@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 
-import Button from "@material-ui/core/Button";
-import EditIcon from "@material-ui/icons/Edit";
-import MuiDialogContent from "@material-ui/core/DialogContent";
-import PublishIcon from "@material-ui/icons/Publish";
-import SaveIcon from "@material-ui/icons/SaveAlt";
+import Button from "@mui/material/Button";
+import EditIcon from "@mui/icons-material/Edit";
+import MuiDialogContent from "@mui/material/DialogContent";
+import PublishIcon from "@mui/icons-material/Publish";
+import SaveIcon from "@mui/icons-material/SaveAlt";
 import YamlEditor from "@focus-reactive/react-yaml";
 import { compose } from "recompose";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
 import withSearchIndex from "../hocs/withSearchIndex";
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
 
 const SaveSettingsDefaults = ({
@@ -69,7 +69,7 @@ const SaveSettingsDefaults = ({
 
   const DialogContent = withStyles((theme) => ({
     root: {
-      padding: theme.spacing(2),
+      padding: 16,
     },
   }))(MuiDialogContent);
 

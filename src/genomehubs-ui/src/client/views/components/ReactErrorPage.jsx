@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
 
-import FileCopyIcon from "@material-ui/icons/FileCopy";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
+import FileCopyIcon from "@mui/icons-material/FileCopy";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
 import Logo from "./Logo";
 import SiteName from "./SiteName";
 import Tooltip from "./Tooltip";
@@ -23,8 +23,8 @@ export const ReactErrorPage = ({
   return (
     <div className={"error-page"}>
       <header
-        item
-        xs
+        item="true"
+        xs={12}
         className={styles.error}
         onClick={(e) => {
           e.preventDefault();

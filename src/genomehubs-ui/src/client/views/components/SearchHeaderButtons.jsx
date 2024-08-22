@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
-import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
-import FavoriteIcon from "@material-ui/icons/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavouriteButton from "./FavouriteButton";
-import IconButton from "@material-ui/core/IconButton";
+import IconButton from "@mui/material/IconButton";
 import SaveSettingsModal from "./SaveSettingsModal";
-import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
+import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { splitTerms } from "../functions/splitTerms";
@@ -72,7 +72,7 @@ const SearchHeaderButtons = ({
         className={styles.saveSearchOptions}
         aria-label="search settings"
         onClick={() => setOpen(!open)}
-      >
+        size="large">
         <SettingsApplicationsIcon style={{ color }} />
       </IconButton>
     </Tooltip>

@@ -1,22 +1,24 @@
-import { FormGroup, TextField } from "@material-ui/core";
+import { FormGroup, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { Theme, createStyles, makeStyles } from "@material-ui/core/styles";
 import { useLocation, useNavigate } from "@reach/router";
 
-import CancelIcon from "@material-ui/icons/Cancel";
-import Checkbox from "@material-ui/core/Checkbox";
-import Chip from "@material-ui/core/Chip";
-import FormControl from "@material-ui/core/FormControl";
-import Grid from "@material-ui/core/Grid";
-import InputLabel from "@material-ui/core/InputLabel";
-import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
-import ListItemText from "@material-ui/core/ListItemText";
-import MenuItem from "@material-ui/core/MenuItem";
-import Paper from "@material-ui/core/Paper";
-import Select from "@material-ui/core/Select";
+import CancelIcon from "@mui/icons-material/Cancel";
+import Checkbox from "@mui/material/Checkbox";
+import Chip from "@mui/material/Chip";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid";
+import InputLabel from "@mui/material/InputLabel";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import ListItemText from "@mui/material/ListItemText";
+import MenuItem from "@mui/material/MenuItem";
+import Paper from "@mui/material/Paper";
+import Select from "@mui/material/Select";
 import SettingsButton from "./SettingsButton";
+import { Theme } from "@mui/material/styles";
 import { compose } from "recompose";
+import createStyles from "@mui/styles/createStyles";
 import expandFieldList from "../functions/expandFieldList";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
@@ -28,8 +30,8 @@ const useStyles = makeStyles((theme) => ({
     width: "95%",
     minWidth: "600px",
     minHeight: "200px",
-    padding: theme.spacing(1),
-    marginTop: theme.spacing(1),
+    padding: 8,
+    marginTop: 8,
     border: "none",
     boxShadow: "none",
     overflowX: "hidden",
@@ -38,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
+    marginTop: 16,
   },
   redBackground: {
     backgroundColor: "#C00",
@@ -48,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#FFF",
   },
   formControl: {
-    margin: theme.spacing(1),
+    margin: 8,
     minWidth: 240,
     maxWidth: 480,
   },
@@ -61,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#FFF",
   },
   noLabel: {
-    marginTop: theme.spacing(3),
+    marginTop: 24,
   },
 }));
 
@@ -213,9 +215,10 @@ const ResultColumnOptions = ({
 
   let form = (
     <div>
-      <FormControl className={classes.formControl}>
+      <FormControl variant="standard" className={classes.formControl}>
         <InputLabel id="subset-checkbox-label">Subset</InputLabel>
         <Select
+          variant="standard"
           labelId="subset-checkbox-label"
           id="subset-checkbox"
           multiple
@@ -239,8 +242,7 @@ const ResultColumnOptions = ({
                 />
               ))}
             </div>
-          )}
-        >
+          )}>
           {summaryTypes.map((summary) => (
             <MenuItem key={summary} value={summary}>
               <Checkbox
@@ -253,7 +255,7 @@ const ResultColumnOptions = ({
         </Select>
       </FormControl>
 
-      <FormControl className={classes.formControl}>
+      <FormControl variant="standard" className={classes.formControl}>
         <TextField
           label={"fieldOpts"}
           id="fieldopts-textbox"

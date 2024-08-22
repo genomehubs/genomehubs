@@ -1,17 +1,17 @@
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 
 export const useStyles = makeStyles((theme) => ({
   icon: {
-    color: theme.palette.text.secondary,
-    marginRight: theme.spacing(2),
+    color: "black", // theme.palette.text.secondary,
+    marginRight: 16,
   },
   formControl: {
-    marginTop: theme.spacing(2),
+    marginTop: 16,
     minWidth: "600px",
   },
   search: {
     fontSize: "2em",
-    marginLeft: theme.spacing(1),
+    marginLeft: 8,
     backgroundColor: "inherit",
   },
 }));

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-import Skeleton from "@material-ui/lab/Skeleton";
+import Skeleton from '@mui/material/Skeleton';
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { formatter } from "../functions/formatter";
@@ -109,7 +109,7 @@ const HistogramSVG = ({
             transformOrigin: "left top",
           }}
         >
-          <Skeleton variant="rect" width={1000} height={height} />
+          <Skeleton variant="rectangular" width={1000} height={height} />
         </div>
       </div>
     );

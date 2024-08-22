@@ -1,17 +1,17 @@
 import React, { Fragment, memo, useEffect, useState } from "react";
 
 import FileTable from "./FileTable";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import NavLink from "./NavLink";
-import TableCell from "@material-ui/core/TableCell";
-import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableRow from "@mui/material/TableRow";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchSetRecord from "../hocs/dispatchSetRecord";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import withAnalysesByAnyId from "../hocs/withAnalysesByAnyId";

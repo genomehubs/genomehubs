@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import Tooltip from "./Tooltip";
 import stringLength from "../functions/stringLength";
 import styles from "./Styles.scss";

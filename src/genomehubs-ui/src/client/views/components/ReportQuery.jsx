@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
-import CloseIcon from "@material-ui/icons/Close";
-import FindInPageIcon from "@material-ui/icons/FindInPage";
-import Grid from "@material-ui/core/Grid";
-import SearchIcon from "@material-ui/icons/Search";
-import TextField from "@material-ui/core/TextField";
+import CloseIcon from "@mui/icons-material/Close";
+import FindInPageIcon from "@mui/icons-material/FindInPage";
+import Grid from "@mui/material/Grid";
+import SearchIcon from "@mui/icons-material/Search";
+import TextField from "@mui/material/TextField";
 import { compose } from "recompose";
 import qs from "../functions/qs";
 import { setSearchTerm } from "../reducers/search";
@@ -94,12 +94,12 @@ export const ReportQuery = ({
         <Grid container direction="row" alignItems="flex-end">
           <Grid item xs={10}>
             <TextField
+              variant="standard"
               value={value}
               fullWidth
               label="Find in report"
               onChange={handleChange}
-              onKeyPress={handleKeyPress}
-            />
+              onKeyPress={handleKeyPress} />
           </Grid>
           <Grid item xs={1}>
             <FindInPageIcon

@@ -1,16 +1,16 @@
 import React, { Fragment, useLayoutEffect, useRef, useState } from "react";
 import { useCookies, withCookies } from "react-cookie";
 
-import { Button } from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
+import { Button } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
 import Logo from "./Logo";
-import Modal from "@material-ui/core/Modal";
-import Skeleton from "@material-ui/lab/Skeleton";
-import Typography from "@material-ui/core/Typography";
+import Modal from "@mui/material/Modal";
+import Skeleton from "@mui/material/Skeleton";
+import Typography from "@mui/material/Typography";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import styles from "./Styles.scss";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 
@@ -27,7 +27,7 @@ function getModalStyle() {
 const useStyles = makeStyles((theme) => ({
   paper: {
     position: "absolute",
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: "white",
     border: "none",
     boxShadow: "none",
     padding: "10px",
@@ -157,6 +157,7 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
               color="default"
               style={{ padding: 0 }}
               onClick={handleClose}
+              size="large"
             >
               <CloseIcon style={{ cursor: "pointer" }} />
             </IconButton>
@@ -207,7 +208,6 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
         <Grid item>
           <Button
             variant="contained"
-            color="default"
             disableElevation
             className={classes.button}
             //   startIcon={<SearchIcon />}
@@ -220,7 +220,6 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
         <Grid item>
           <Button
             variant="contained"
-            color="default"
             disableElevation
             className={classes.button}
             //   startIcon={<SearchIcon />}
@@ -233,7 +232,6 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
         <Grid item>
           <Button
             variant="contained"
-            color="default"
             disableElevation
             className={classes.button}
             //   startIcon={<SearchIcon />}

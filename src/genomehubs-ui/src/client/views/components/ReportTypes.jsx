@@ -1,19 +1,20 @@
 import React, { useState } from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
 
-import Grid from "@material-ui/core/Grid";
-import HeightIcon from "@material-ui/icons/Height";
-import IconButton from "@material-ui/core/IconButton";
-import LaunchIcon from "@material-ui/icons/Launch";
+import Grid from "@mui/material/Grid";
+import HeightIcon from "@mui/icons-material/Height";
+import IconButton from "@mui/material/IconButton";
+import LaunchIcon from "@mui/icons-material/Launch";
 import NavLink from "./NavLink";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 import Tooltip from "./Tooltip";
-import TrendingFlatIcon from "@material-ui/icons/TrendingFlat";
-import VerticalAlignTopIcon from "@material-ui/icons/VerticalAlignTop";
+import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
+import VerticalAlignTopIcon from "@mui/icons-material/VerticalAlignTop";
 import { compose } from "recompose";
 
 export const useStyles = makeStyles(() => ({

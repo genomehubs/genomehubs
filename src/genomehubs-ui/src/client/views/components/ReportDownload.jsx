@@ -2,8 +2,8 @@ import * as htmlToImage from "html-to-image";
 
 import { Buffer } from "buffer";
 import DownloadButton from "./DownloadButton";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import Grid from "@material-ui/core/Grid";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import Grid from "@mui/material/Grid";
 import JSZip from "jszip";
 import React from "react";
 import { compose } from "recompose";
@@ -204,7 +204,9 @@ export const ReportDownload = ({
       // await saveSvgAsPng(chartSVG, `${filename}.png`, opts);
       // let uri = await htmlToImage.toPng(chartSVG, opts);
       if (scrollContainer) {
-        if (toUrl) return;
+        if (toUrl) {
+          return;
+        }
         await scrollingDownload({
           chartSVG,
           scrollContainer,
@@ -212,7 +214,9 @@ export const ReportDownload = ({
         });
       } else {
         let uri = await htmlToImage.toPng(chartSVG, opts);
-        if (toUrl) return uri;
+        if (toUrl) {
+          return uri;
+        }
         await downloadLink(uri, `${filename}.png`);
       }
       success = true;

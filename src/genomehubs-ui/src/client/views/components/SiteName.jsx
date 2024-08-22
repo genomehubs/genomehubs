@@ -1,25 +1,25 @@
 import { Link, useLocation } from "@reach/router";
 import React, { memo, useState } from "react";
 
-import LaunchIcon from "@material-ui/icons/Launch";
+import LaunchIcon from "@mui/icons-material/Launch";
 import Logo from "./Logo";
-import MenuItem from "@material-ui/core/MenuItem";
-import Popover from "@material-ui/core/Popover";
-import Typography from "@material-ui/core/Typography";
+import MenuItem from "@mui/material/MenuItem";
+import Popover from "@mui/material/Popover";
+import Typography from "@mui/material/Typography";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import styles from "./Styles.scss";
 import withArchive from "../hocs/withArchive";
 import withSiteName from "../hocs/withSiteName";
 
 const useStyles = makeStyles((theme) => ({
   typography: {
-    padding: theme.spacing(1),
+    padding: 8,
   },
 }));
 
-const SiteName = ({ siteName, basename, archive, logo }) => {
-  const classes = useStyles();
+const SiteName = ({ siteName, basename, archive, logo, theme }) => {
+  const classes = useStyles(theme);
   const [anchorEl, setAnchorEl] = useState(null);
   let location;
   try {

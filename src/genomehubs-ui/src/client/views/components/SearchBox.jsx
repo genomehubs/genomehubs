@@ -2,8 +2,8 @@ import React, { memo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AutoCompleteInput from "./AutoCompleteInput";
-import FormControl from "@material-ui/core/FormControl";
-import Grid from "@material-ui/core/Grid";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid";
 import SearchButton from "./SearchButton";
 import SearchInputQueries from "./SearchInputQueries";
 import SearchToggles from "./SearchToggles";
@@ -214,8 +214,14 @@ const SearchBox = ({
         <Grid item>
           <Grid container direction="row" alignItems="center">
             <Grid item xs={2}></Grid>
-            <Grid item ref={searchBoxRef} xs={"auto"}>
-              <FormControl className={classes.formControl}>
+            <Grid item ref={searchBoxRef} xs={8}>
+              <FormControl
+                variant="standard"
+                className={classes.formControl}
+                style={{
+                  width: "100%",
+                }}
+              >
                 <AutoCompleteInput
                   inputValue={lookupTerm}
                   setInputValue={setLookupTerm}

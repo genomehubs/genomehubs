@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useRef, useState } from "react";
 
-import { Grid } from "@material-ui/core";
+import { Grid } from "@mui/material";
 import { compose } from "recompose";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";

@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import FlagIcon from "./FlagIcon";
-import Grid from "@material-ui/core/Grid";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TablePagination from "@material-ui/core/TablePagination";
-import TableRow from "@material-ui/core/TableRow";
+import Grid from "@mui/material/Grid";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TablePagination from "@mui/material/TablePagination";
+import TableRow from "@mui/material/TableRow";
 import Tooltip from "./Tooltip";
 import TranslatedValue from "./TranslatedValue";
 import { compose } from "recompose";
@@ -18,7 +18,7 @@ import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withReportTerm from "../hocs/withReportTerm";
 import withSiteName from "../hocs/withSiteName";
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from '@mui/styles/withStyles';
 
 const StyledTableCell = withStyles((theme) => ({
   head: {

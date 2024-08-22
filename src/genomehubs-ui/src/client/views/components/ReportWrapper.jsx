@@ -1,4 +1,4 @@
-import LaunchIcon from "@material-ui/icons/Launch";
+import LaunchIcon from "@mui/icons-material/Launch";
 import React from "react";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";

@@ -1,25 +1,25 @@
 import React, { useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import ArtTrackIcon from "@material-ui/icons/ArtTrack";
-import ControlPointIcon from "@material-ui/icons/ControlPoint";
-import DialogContent from "@material-ui/core/DialogContent";
-import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import Modal from "@material-ui/core/Modal";
+import ArtTrackIcon from "@mui/icons-material/ArtTrack";
+import ControlPointIcon from "@mui/icons-material/ControlPoint";
+import DialogContent from "@mui/material/DialogContent";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormHelperText from "@mui/material/FormHelperText";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import Modal from "@mui/material/Modal";
 import QueryBuilder from "./QueryBuilder";
-import ReplayIcon from "@material-ui/icons/Replay";
+import ReplayIcon from "@mui/icons-material/Replay";
 import SearchSettings from "./SearchSettings";
-import Switch from "@material-ui/core/Switch";
+import Switch from "@mui/material/Switch";
 import Terms from "./Terms";
-import TocIcon from "@material-ui/icons/Toc";
+import TocIcon from "@mui/icons-material/Toc";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
@@ -28,7 +28,7 @@ import withSiteName from "../hocs/withSiteName";
 export const useStyles = makeStyles((theme) => ({
   modal: {
     display: "flex",
-    padding: theme.spacing(1),
+    padding: 8,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -36,10 +36,10 @@ export const useStyles = makeStyles((theme) => ({
     width: 400,
     maxWidth: "75vw",
     maxHeight: "75vh",
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: "white",
     border: "2px solid #000",
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
+    boxShadow: "#333333", // theme.shadows[5],
+    padding: "16px 32px 24px",
     overflowX: "hidden",
   },
   label: {
@@ -85,6 +85,7 @@ const SearchToggles = ({
           style={{ cursor: "pointer" }}
         >
           <FormControl
+            variant="standard"
             className={classes.formControl}
             style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
             onClick={toggleTemplate}
@@ -108,6 +109,7 @@ const SearchToggles = ({
       >
         <Grid item xs={2}>
           <FormControl
+            variant="standard"
             className={classes.formControl}
             style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
           >
@@ -162,6 +164,7 @@ const SearchToggles = ({
         >
           <Grid item xs={3}>
             <FormControl
+              variant="standard"
               className={classes.formControl}
               style={{
                 margin: "-8px 0 0",
@@ -222,6 +225,7 @@ const SearchToggles = ({
           >
             <Grid item xs={2}>
               <FormControl
+                variant="standard"
                 className={classes.formControl}
                 style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
               >
@@ -276,6 +280,7 @@ const SearchToggles = ({
             style={{ cursor: "pointer" }}
           >
             <FormControl
+              variant="standard"
               className={classes.formControl}
               style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
             >
@@ -326,6 +331,7 @@ const SearchToggles = ({
             style={{ cursor: "pointer" }}
           >
             <FormControl
+              variant="standard"
               className={classes.formControl}
               style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
             >
@@ -372,6 +378,7 @@ const SearchToggles = ({
             style={{ cursor: "pointer" }}
           >
             <FormControl
+              variant="standard"
               className={classes.formControl}
               style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
             >

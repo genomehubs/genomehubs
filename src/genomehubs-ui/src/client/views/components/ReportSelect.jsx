@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
-import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormLabel from "@material-ui/core/FormLabel";
-import Grid from "@material-ui/core/Grid";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormLabel from "@mui/material/FormLabel";
+import Grid from "@mui/material/Grid";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
 import { compose } from "recompose";
 import withReportTerm from "../hocs/withReportTerm";
 
@@ -16,7 +16,7 @@ export const ReportSelect = ({ reportSelect, setReportSelect }) => {
 
   let options = (
     <Grid item style={{ width: "100%" }}>
-      <FormControl component="fieldset">
+      <FormControl variant="standard" component="fieldset">
         <FormLabel component="legend">Select Mode</FormLabel>
         <RadioGroup
           aria-label="select-mode"

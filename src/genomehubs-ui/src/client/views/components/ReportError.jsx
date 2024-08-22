@@ -1,7 +1,7 @@
 // import { RadialChart } from "react-vis";
 import React, { Fragment, useRef } from "react";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import Logo from "./Logo";
 import { compose } from "recompose";
 import withColors from "../hocs/withColors";

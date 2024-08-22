@@ -1,8 +1,8 @@
 // import { RadialChart } from "react-vis";
 import React, { Fragment, useRef } from "react";
 
-import Grid from "@material-ui/core/Grid";
-import Skeleton from "@material-ui/lab/Skeleton";
+import Grid from "@mui/material/Grid";
+import Skeleton from '@mui/material/Skeleton';
 import { useEffect } from "react";
 import useResize from "../hooks/useResize";
 
@@ -55,7 +55,7 @@ const ReportLoading = ({
         }}
       >
         {loading && (
-          <Skeleton variant="rect" width={minDim * ratio} height={minDim} />
+          <Skeleton variant="rectangular" width={minDim * ratio} height={minDim} />
         )}
       </div>
       <div

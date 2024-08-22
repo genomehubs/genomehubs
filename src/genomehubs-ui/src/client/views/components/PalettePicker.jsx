@@ -1,9 +1,9 @@
 import React, { memo } from "react";
 
-import { Box } from "@material-ui/core";
-import Grid from "@material-ui/core/Grid";
+import { Box } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import qs from "qs";
 import styles from "./Styles.scss";
 import { useLocation } from "@reach/router";

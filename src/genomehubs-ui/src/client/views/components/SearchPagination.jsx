@@ -1,11 +1,11 @@
 import { useLocation, useNavigate } from "@reach/router";
 
 import React from "react";
-// import Pagination from "@material-ui/lab/Pagination";
-import TablePagination from "@material-ui/core/TablePagination";
+// import Pagination from "@mui/lab/Pagination";
+import TablePagination from "@mui/material/TablePagination";
 import classnames from "classnames";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
@@ -14,7 +14,7 @@ import withSearch from "../hocs/withSearch";
 const useStyles = makeStyles((theme) => ({
   root: {
     "& > *": {
-      marginTop: theme.spacing(2),
+      marginTop: 16,
     },
   },
 }));

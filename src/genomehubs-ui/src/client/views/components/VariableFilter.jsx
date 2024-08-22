@@ -1,14 +1,14 @@
 import AutoCompleteInput from "./AutoCompleteInput";
-import AutorenewIcon from "@material-ui/icons/Autorenew";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
 import BasicSelect from "./BasicSelect";
 import BasicTextField from "./BasicTextField";
-import Button from "@material-ui/core/Button";
-import CloseIcon from "@material-ui/icons/Close";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import { MenuItem } from "@material-ui/core";
+import Button from "@mui/material/Button";
+import CloseIcon from "@mui/icons-material/Close";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import { MenuItem } from "@mui/material";
 import React from "react";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 
 const allowedSummaries = ({ field, types }) => {
   let values = { value: "value" };
@@ -163,11 +163,9 @@ const VariableFilter = ({
         <Grid item>
           <Button
             variant="contained"
-            color="default"
             startIcon={<AutorenewIcon />}
             onClick={handleUpdate}
-            disableElevation
-          >
+            disableElevation>
             Update
           </Button>
         </Grid>

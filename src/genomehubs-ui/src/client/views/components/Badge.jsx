@@ -2,7 +2,7 @@ import BadgeInfo, { BadgeInfoCell } from "./BadgeInfo";
 import React, { useEffect, useRef, useState } from "react";
 
 import BadgeStats from "./BadgeStats";
-import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import PhyloPics from "./PhyloPics";
 import classNames from "classnames";
 import classnames from "classnames";

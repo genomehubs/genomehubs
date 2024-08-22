@@ -2,9 +2,9 @@ import PalettePicker, { PalettePreview } from "./PalettePicker";
 import React, { memo, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import CopyrightIcon from "@material-ui/icons/Copyright";
-import Grid from "@material-ui/core/Grid";
-import { Popover } from "@material-ui/core";
+import CopyrightIcon from "@mui/icons-material/Copyright";
+import Grid from "@mui/material/Grid";
+import { Popover } from "@mui/material";
 import Taxonomy from "./Taxonomy";
 import bbsrcLogo from "./img/bbsrc-logo.png";
 import { compose } from "recompose";

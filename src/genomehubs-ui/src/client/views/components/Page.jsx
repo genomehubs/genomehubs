@@ -1,12 +1,12 @@
 import React, { memo, useRef, useState } from "react";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import SearchBox from "./SearchBox";
 import SearchHeaderButtons from "./SearchHeaderButtons";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchColors from "../hocs/dispatchColors";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "qs";
 import styles from "./Styles.scss";
 import { useLocation } from "@reach/router";
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
   itemFull: { width: "100%", align: "center" },
   saveSearchOptions: {
     fontSize: "2em",
-    marginLeft: theme.spacing(1),
+    marginLeft: 8,
     backgroundColor: "inherit",
     padding: 0,
   },

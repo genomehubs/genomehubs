@@ -12,7 +12,7 @@ import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import LocationMapHighlightIcon from "./LocationMapHighlightIcon";
 import NavLink from "./NavLink";
 import ZoomComponent from "./ZoomComponent";

@@ -1,8 +1,8 @@
-import { Avatar, Chip } from "@material-ui/core";
+import { Avatar, Chip } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
-import Checkbox from "@material-ui/core/Checkbox";
-import FilterListIcon from "@material-ui/icons/FilterList";
+import Checkbox from "@mui/material/Checkbox";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import Tooltip from "./Tooltip";
 import styles from "./Styles.scss";
 

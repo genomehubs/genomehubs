@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 
-import CloseIcon from "@material-ui/icons/Close";
-import IconButton from "@material-ui/core/IconButton";
-import MuiAlert from "@material-ui/lab/Alert";
-import Snackbar from "@material-ui/core/Snackbar";
+import CloseIcon from "@mui/icons-material/Close";
+import IconButton from "@mui/material/IconButton";
+import MuiAlert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import { compose } from "recompose";
 import withController from "../hocs/withController";
 import withMessage from "../hocs/withMessage";

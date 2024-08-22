@@ -1,23 +1,23 @@
-import { ListSubheader, MenuItem } from "@material-ui/core";
+import { ListSubheader, MenuItem } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
 import AutoCompleteInput from "./AutoCompleteInput";
 import BasicSelect from "./BasicSelect";
 import BasicTextField from "./BasicTextField";
-import Button from "@material-ui/core/Button";
-import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import SearchIcon from "@material-ui/icons/Search";
-import Switch from "@material-ui/core/Switch";
+import Button from "@mui/material/Button";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormHelperText from "@mui/material/FormHelperText";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import SearchIcon from "@mui/icons-material/Search";
+import Switch from "@mui/material/Switch";
 import Tooltip from "./Tooltip";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import VariableFilter from "./VariableFilter";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import { setSearchTerm } from "../reducers/search";
 import { useNavigate } from "@reach/router";
@@ -32,16 +32,16 @@ export const useStyles = makeStyles((theme) => ({
   paper: {
     width: "100%",
     minWidth: "600px",
-    padding: theme.spacing(2),
-    marginTop: theme.spacing(2),
+    padding: 16,
+    marginTop: 16,
     boxShadow: "none",
   },
   formControl: {
-    margin: theme.spacing(2),
+    margin: 16,
     minWidth: 120,
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
+    marginTop: 16,
   },
   label: {
     color: "rgba(0, 0, 0, 0.54)",
@@ -427,7 +427,7 @@ const QueryBuilder = ({
               placement={"top"}
             >
               <Grid item>
-                <FormControl className={classes.formControl}>
+                <FormControl variant="standard" className={classes.formControl}>
                   <FormControlLabel
                     className={classes.label}
                     control={
@@ -471,7 +471,7 @@ const QueryBuilder = ({
             placement={"top"}
           >
             <Grid item>
-              <FormControl className={classes.formControl}>
+              <FormControl variant="standard" className={classes.formControl}>
                 <FormControlLabel
                   className={classes.label}
                   control={
@@ -509,7 +509,6 @@ const QueryBuilder = ({
           <Grid item>
             <Button
               variant="contained"
-              color="default"
               disableElevation
               className={classes.button}
               startIcon={<SearchIcon />}

@@ -3,7 +3,7 @@ import React, { memo, useEffect, useState } from "react";
 import CookieBanner from "./CookieBanner";
 import DownloadMessage from "./DownloadMessage";
 import Footer from "./Footer";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import Header from "./Header";
 import LoadingScreen from "./LoadingScreen";
 import Main from "./Main";
@@ -11,7 +11,7 @@ import ReportPage from "./ReportPage";
 import { Router } from "@reach/router";
 import SearchPage from "./SearchPage";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import styles from "./Styles.scss";
 import withSiteName from "../hocs/withSiteName";
 

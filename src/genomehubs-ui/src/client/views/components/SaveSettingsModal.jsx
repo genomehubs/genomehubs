@@ -1,24 +1,25 @@
 import React, { useState } from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
 
-import CloseIcon from "@material-ui/icons/Close";
-import Dialog from "@material-ui/core/Dialog";
-import FavoriteIcon from "@material-ui/icons/Favorite";
-import IconButton from "@material-ui/core/IconButton";
-import ListIcon from "@material-ui/icons/List";
-import MuiDialogActions from "@material-ui/core/DialogActions";
-import MuiDialogContent from "@material-ui/core/DialogContent";
-import MuiDialogTitle from "@material-ui/core/DialogTitle";
-import MuiTab from "@material-ui/core/Tab";
-import MuiTabs from "@material-ui/core/Tabs";
+import CloseIcon from "@mui/icons-material/Close";
+import Dialog from "@mui/material/Dialog";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import IconButton from "@mui/material/IconButton";
+import ListIcon from "@mui/icons-material/List";
+import MuiDialogActions from "@mui/material/DialogActions";
+import MuiDialogContent from "@mui/material/DialogContent";
+import MuiDialogTitle from "@mui/material/DialogTitle";
+import MuiTab from "@mui/material/Tab";
+import MuiTabs from "@mui/material/Tabs";
 import SaveSettingsDefaults from "./SaveSettingsDefaults";
 import SaveSettingsFavourites from "./SaveSettingsFavourites";
 // import SaveSettingsLists from "./SaveSettingsLists";
-import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
-import Typography from "@material-ui/core/Typography";
+import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
+import Typography from "@mui/material/Typography";
 import { compose } from "recompose";
+import makeStyles from "@mui/styles/makeStyles";
 import styles from "./Styles.scss";
 import withSearchIndex from "../hocs/withSearchIndex";
+import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
 
 export const useStyles = makeStyles((theme) => ({
@@ -26,11 +27,11 @@ export const useStyles = makeStyles((theme) => ({
     boxShadow: "none",
   },
   formControl: {
-    margin: theme.spacing(2),
+    margin: 16,
     minWidth: 120,
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
+    marginTop: 16,
   },
   label: {
     color: "rgba(0, 0, 0, 0.54)",
@@ -59,13 +60,13 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
   const customStyles = (theme) => ({
     root: {
       margin: 0,
-      padding: theme.spacing(2),
+      padding: 16,
     },
     closeButton: {
       position: "absolute",
-      right: theme.spacing(1),
-      top: theme.spacing(1),
-      color: theme.palette.grey[500],
+      right: 8,
+      top: 8,
+      color: "#bdbdbd", // theme.palette.grey[500],
     },
   });
 
@@ -79,6 +80,7 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
             aria-label="close"
             className={classes.closeButton}
             onClick={onClose}
+            size="large"
           >
             <CloseIcon />
           </IconButton>
@@ -89,14 +91,14 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
 
   const DialogContent = withStyles((theme) => ({
     root: {
-      padding: theme.spacing(2),
+      padding: 16,
     },
   }))(MuiDialogContent);
 
   const DialogActions = withStyles((theme) => ({
     root: {
       margin: 0,
-      padding: theme.spacing(1),
+      padding: 8,
     },
   }))(MuiDialogActions);
 

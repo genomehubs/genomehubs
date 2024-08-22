@@ -1,15 +1,15 @@
-import CategoryIcon from "@material-ui/icons/Category";
-import EmojiNatureIcon from "@material-ui/icons/EmojiNature";
-import ExtensionIcon from "@material-ui/icons/Extension";
-import FunctionsIcon from "@material-ui/icons/Functions";
-import Grid from "@material-ui/core/Grid";
-import LineStyleIcon from "@material-ui/icons/LineStyle";
-import LooksOneIcon from "@material-ui/icons/LooksOne";
-import PersonPinCircleIcon from "@material-ui/icons/PersonPinCircle";
+import CategoryIcon from "@mui/icons-material/Category";
+import EmojiNatureIcon from "@mui/icons-material/EmojiNature";
+import ExtensionIcon from "@mui/icons-material/Extension";
+import FunctionsIcon from "@mui/icons-material/Functions";
+import Grid from "@mui/material/Grid";
+import LineStyleIcon from "@mui/icons-material/LineStyle";
+import LooksOneIcon from "@mui/icons-material/LooksOne";
+import PersonPinCircleIcon from "@mui/icons-material/PersonPinCircle";
 import React from "react";
-import SearchIcon from "@material-ui/icons/Search";
-import TodayIcon from "@material-ui/icons/Today";
-import Typography from "@material-ui/core/Typography";
+import SearchIcon from "@mui/icons-material/Search";
+import TodayIcon from "@mui/icons-material/Today";
+import Typography from "@mui/material/Typography";
 import { useStyles } from "./SearchBoxStyles";
 
 export const AutoCompleteOption = ({ option }) => {

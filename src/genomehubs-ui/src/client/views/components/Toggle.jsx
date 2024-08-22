@@ -1,10 +1,10 @@
 import React, { memo, useRef, useState } from "react";
 
-import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import Grid from "@material-ui/core/Grid";
-import Switch from "@material-ui/core/Switch";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormHelperText from "@mui/material/FormHelperText";
+import Grid from "@mui/material/Grid";
+import Switch from "@mui/material/Switch";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import setColors from "../functions/setColors";
@@ -69,10 +69,9 @@ const Toggle = ({
                   textAlign: "right",
                 }}
               >
-                <FormControl
-                // className={classes.formControl}
+                <// className={classes.formControl}
                 // style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
-                >
+                FormControl variant="standard">
                   {/* <FormHelperText>{"TMP"}</FormHelperText> */}
                   <FormControlLabel
                     control={

@@ -16,7 +16,7 @@ import stringLength, { maxStringLength } from "../functions/stringLength";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "./Tooltip";
 import axisScales from "../functions/axisScales";
@@ -91,33 +91,39 @@ const CustomBackground = ({ chartProps, ...props }) => {
     }
   });
 
+  let CurrentRect = React.forwardRef((refProps, ref) => (
+    <rect
+      ref={ref}
+      {...refProps}
+      height={h}
+      width={w}
+      x={props.background.x}
+      y={props.background.y}
+      style={chartProps.embedded ? {} : { cursor: "pointer" }}
+      fill={"rgba(255,255,255,0)"}
+      onClick={
+        chartProps.embedded
+          ? () => {}
+          : (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              searchByCell({
+                ...chartProps,
+                xRange,
+              });
+            }
+      }
+    />
+  ));
+
   return (
     <>
       <Tooltip
-        interactive
+        interactive="true"
         title={<CellInfo x={xLimits} count={count} rows={series} />}
         arrow
       >
-        <Rectangle
-          height={h}
-          width={w}
-          x={props.background.x}
-          y={props.background.y}
-          style={chartProps.embedded ? {} : { cursor: "pointer" }}
-          fill={"rgba(255,255,255,0)"}
-          onClick={
-            chartProps.embedded
-              ? () => {}
-              : (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  searchByCell({
-                    ...chartProps,
-                    xRange,
-                  });
-                }
-          }
-        />
+        <CurrentRect />
       </Tooltip>
       {legendGroup}
     </>

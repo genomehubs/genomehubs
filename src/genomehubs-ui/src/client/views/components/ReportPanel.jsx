@@ -1,8 +1,8 @@
 import React, { memo, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import Chip from "@material-ui/core/Chip";
-import Grid from "@material-ui/core/Grid";
+import Chip from "@mui/material/Chip";
+import Grid from "@mui/material/Grid";
 import ReportFull from "./ReportFull";
 import ReportTerm from "./ReportTerm";
 import classnames from "classnames";
