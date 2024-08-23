@@ -1,11 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
+import {
+  header as headerStyle,
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  resultPanel as resultPanelStyle,
+  title as titleStyle,
+} from "./Styles.scss";
 
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
 import { scaleLog } from "d3-scale";
-import styles from "./Styles.scss";
 import { useLongPress } from "use-long-press";
 import withTypes from "../hocs/withTypes";
 
@@ -19,16 +24,12 @@ const ReportTreePaths = ({
   height,
   plotHeight,
 }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel
-  );
+  let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, resultPanelStyle);
   if (count > 10000) {
     return (
       <div className={css}>
-        <div className={styles.header} style={{ cursor: "default" }}>
-          <span className={styles.title}>Tree</span>
+        <div className={headerStyle} style={{ cursor: "default" }}>
+          <span className={titleStyle}>Tree</span>
           <span>
             {" "}
             (not available for queries returning over 10,000 results)

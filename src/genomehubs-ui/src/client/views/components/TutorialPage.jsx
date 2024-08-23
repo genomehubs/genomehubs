@@ -1,13 +1,19 @@
+import {
+  underscoreHigh as underscoreHighStyle,
+  underscoreLow as underscoreLowStyle,
+  underscoreMedium as underscoreMediumStyle,
+  underscore as underscoreStyle,
+} from "./Styles.scss";
+
 import Page from "./Page";
 import React from "react";
 import TextPanel from "./TextPanel";
 import classnames from "classnames";
-import styles from "./Styles.scss";
 
 const TutorialPage = ({}) => {
-  let direct = classnames(styles.underscore, styles.underscoreHigh);
-  let descendant = classnames(styles.underscore, styles.underscoreMedium);
-  let ancestor = classnames(styles.underscore, styles.underscoreLow);
+  let direct = classnames(underscoreStyle, underscoreHighStyle);
+  let descendant = classnames(underscoreStyle, underscoreMediumStyle);
+  let ancestor = classnames(underscoreStyle, underscoreLowStyle);
   let text = (
     <TextPanel view={"tutorials"}>
       <div>

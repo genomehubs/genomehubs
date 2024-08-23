@@ -1,4 +1,9 @@
 import React, { memo, useRef, useState } from "react";
+import {
+  extra as extraStyle,
+  term as termStyle,
+  value as valueStyle,
+} from "./Styles.scss";
 
 import AutoCompleteOption from "./AutoCompleteOption";
 import AutoCompleteSuggestion from "./AutoCompleteSuggestion";
@@ -7,7 +12,6 @@ import Popper from "@mui/material/Popper";
 import TextField from "@mui/material/TextField";
 import { compose } from "recompose";
 import { fetchAutocomplete } from "../functions/autocomplete";
-import styles from "./Styles.scss";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -85,9 +89,9 @@ export const AutoCompleteInput = ({
           unique_term: value,
         });
         terms.push(
-          <div key={i} className={styles.term}>
-            <span className={styles.value}>{result.key}</span>
-            <div className={styles.extra}>{`\u2014 ${result.type}`}</div>
+          <div key={i} className={termStyle}>
+            <span className={valueStyle}>{result.key}</span>
+            <div className={extraStyle}>{`\u2014 ${result.type}`}</div>
           </div>
         );
       } else if (autocompleteTerms.status.result == "taxon") {
@@ -127,10 +131,10 @@ export const AutoCompleteInput = ({
           ),
         });
         terms.push(
-          <div key={i} className={styles.term}>
-            <span className={styles.value}>{value}</span>
+          <div key={i} className={termStyle}>
+            <span className={valueStyle}>{value}</span>
             <div
-              className={styles.extra}
+              className={extraStyle}
             >{`\u2014 ${result.result.taxon_rank}`}</div>
           </div>
         );
@@ -160,10 +164,10 @@ export const AutoCompleteInput = ({
             : `${autocompleteTerms.status.result} ID`,
         });
         terms.push(
-          <div key={i} className={styles.term}>
-            <span className={styles.value}>{value}</span>
+          <div key={i} className={termStyle}>
+            <span className={valueStyle}>{value}</span>
             <div
-              className={styles.extra}
+              className={extraStyle}
             >{`\u2014 ${result.result.scientific_name}`}</div>
           </div>
         );
@@ -189,10 +193,10 @@ export const AutoCompleteInput = ({
             : "feature ID",
         });
         terms.push(
-          <div key={i} className={styles.term}>
-            <span className={styles.value}>{value}</span>
+          <div key={i} className={termStyle}>
+            <span className={valueStyle}>{value}</span>
             <div
-              className={styles.extra}
+              className={extraStyle}
             >{`\u2014 ${result.result.primary_type}`}</div>
           </div>
         );

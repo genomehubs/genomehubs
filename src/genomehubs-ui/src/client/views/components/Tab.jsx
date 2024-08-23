@@ -1,8 +1,8 @@
-import React, { memo, useEffect } from "react";
+import React, { useEffect } from "react";
 
 import NavLink from "./NavLink";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
+import { tabDiv as tabDivStyle } from "./Styles.scss";
 import withRoutes from "../hocs/withRoutes";
 
 const Tab = ({ path = "", routeName, pageId, setRoute, routesById }) => {
@@ -19,7 +19,7 @@ const Tab = ({ path = "", routeName, pageId, setRoute, routesById }) => {
   }
 
   return (
-    <div className={styles.tabDiv}>
+    <div className={tabDivStyle}>
       <NavLink to={path ? `${path}/${routeName}` : parsedName} tab plain>
         {parsedName.replace(/^\//g, "").replaceAll(/_/g, " ")}
       </NavLink>

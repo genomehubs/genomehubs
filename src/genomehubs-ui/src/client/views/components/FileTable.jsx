@@ -2,33 +2,19 @@ import React, { memo, useEffect } from "react";
 
 import FileModal from "./FileModal";
 import Grid from "@mui/material/Grid";
-import IconButton from "@mui/material/IconButton";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import LaunchIcon from "@mui/icons-material/Launch";
 import NavLink from "./NavLink";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import Tooltip from "./Tooltip";
-import Typography from "@mui/material/Typography";
-import classnames from "classnames";
+import { autoWidth as autoWidthStyle } from "./Styles.scss";
 import { compose } from "recompose";
 import formatter from "../functions/formatter";
-import makeStyles from '@mui/styles/makeStyles';
-import styles from "./Styles.scss";
-import { useNavigate } from "@reach/router";
-import withAnalysesByAnyId from "../hocs/withAnalysesByAnyId";
-import withAnalysis from "../hocs/withAnalysis";
+import makeStyles from "@mui/styles/makeStyles";
 import withApi from "../hocs/withApi";
 import withFiles from "../hocs/withFiles";
 import withFilesByAnalysisId from "../hocs/withFilesByAnalysisId";
-import withRecord from "../hocs/withRecord";
-import withSummary from "../hocs/withSummary";
-import withTypes from "../hocs/withTypes";
 
 const useStyles = makeStyles((theme) => ({
   pale: {
@@ -48,12 +34,10 @@ const FileTable = ({
   fetchFiles,
 }) => {
   useEffect(() => {
-    if (analysisId) {
-      if (!files.isFetching && !filesByAnalysisId) {
-        let query = `analysis_id==${analysisId}`;
-        let result = "file";
-        fetchFiles({ query, result });
-      }
+    if (analysisId && !files.isFetching && !filesByAnalysisId) {
+      let query = `analysis_id==${analysisId}`;
+      let result = "file";
+      fetchFiles({ query, result });
     }
   }, [analysisId, filesByAnalysisId]);
   const classes = useStyles();
@@ -130,7 +114,7 @@ const FileTable = ({
     </TableHead>
   );
   return (
-    <Table size={"small"} className={styles.autoWidth}>
+    <Table size={"small"} className={autoWidthStyle}>
       {tableHead}
       <TableBody>{tableRows}</TableBody>
     </Table>

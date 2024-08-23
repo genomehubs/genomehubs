@@ -5,7 +5,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import styles from "./Styles.scss";
+import { autoWidth as autoWidthStyle } from "./Styles.scss";
 
 const AttributeTable = ({ attributes, result, taxonId }) => {
   if (attributes) {
@@ -21,7 +21,7 @@ const AttributeTable = ({ attributes, result, taxonId }) => {
       );
     });
     return (
-      <Table size={"small"} className={styles.autoWidth}>
+      <Table size={"small"} className={autoWidthStyle}>
         <TableHead>
           <TableRow>
             <TableCell>Attribute</TableCell>

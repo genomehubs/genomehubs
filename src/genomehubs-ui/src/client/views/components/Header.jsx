@@ -1,4 +1,9 @@
 import React, { memo, useRef } from "react";
+import {
+  searchIcon as searchIconStyle,
+  siteText as siteTextStyle,
+  tabHolder as tabHolderStyle,
+} from "./Styles.scss";
 
 import { Router } from "@reach/router";
 import SearchHeaderButtons from "./SearchHeaderButtons";
@@ -6,7 +11,6 @@ import SiteName from "./SiteName";
 import Tabs from "./Tabs";
 import TabsFixed from "./TabsFixed";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
 import withColors from "../hocs/withColors";
 
 const basename = BASENAME || "";
@@ -63,14 +67,14 @@ const Header = ({ id, levels }) => {
   }
   return (
     <header style={style} ref={rootRef}>
-      <div className={styles.searchIcon}>
+      <div className={searchIconStyle}>
         <SearchHeaderButtons color={"white"} rootRef={rootRef} />
       </div>
-      <div style={{ float: "left" }} className={styles.siteText}>
+      <div style={{ float: "left" }} className={siteTextStyle}>
         <SiteName logo />
       </div>
       <TabsFixed default />
-      <Router basepath={basename} className={styles.tabHolder} primary={false}>
+      <Router basepath={basename} className={tabHolderStyle} primary={false}>
         <Tabs default />
       </Router>
     </header>

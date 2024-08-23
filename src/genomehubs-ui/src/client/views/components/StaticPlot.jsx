@@ -21,11 +21,6 @@ const StaticPlot = ({
   resetAnalyses,
   taxonomy,
 }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel
-  );
   const containerRef = useRef(null);
   let assemblyId = getPrimaryAssemblyId(record);
 

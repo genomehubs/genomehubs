@@ -1,8 +1,9 @@
 import React from "react";
 import { Rectangle } from "recharts";
 import Tooltip from "./Tooltip";
+import { active as activeStyle } from "./Styles.scss";
 import { scaleLinear } from "d3-scale";
-import styles from "./Styles.scss";
+
 export const ReportXAxisTick = ({
   props,
   buckets,
@@ -130,7 +131,7 @@ export const ReportXAxisTick = ({
       <g>
         <Tooltip title={ttValue} arrow placement="top">
           <Rectangle
-            className={styles.active}
+            className={activeStyle}
             x={centered ? 0 - bucketWidth / 2 : 0}
             y={marginTop - yPos}
             height={yPos + pointSize - marginTop}

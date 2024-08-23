@@ -1,4 +1,10 @@
 import React, { useState } from "react";
+import {
+  favListingButton as favListingButtonStyle,
+  favListingContainer as favListingContainerStyle,
+  favListingContent as favListingContentStyle,
+  favListing as favListingStyle,
+} from "./Styles.scss";
 
 import Button from "@mui/material/Button";
 import EditIcon from "@mui/icons-material/Edit";
@@ -8,7 +14,6 @@ import SaveIcon from "@mui/icons-material/SaveAlt";
 import YamlEditor from "@focus-reactive/react-yaml";
 import { compose } from "recompose";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
 import withSearchIndex from "../hocs/withSearchIndex";
 import withStyles from "@mui/styles/withStyles";
@@ -88,7 +93,7 @@ const SaveSettingsDefaults = ({
     ];
   } else {
     defaults = Object.entries(currentOptions).map(([key, value]) => (
-      <pre key={key} className={styles.favListing}>
+      <pre key={key} className={favListingStyle}>
         <b>{key}:</b> {JSON.stringify(value)}
       </pre>
     ));
@@ -96,10 +101,10 @@ const SaveSettingsDefaults = ({
 
   return (
     <DialogContent dividers>
-      <div className={styles.favListing}>
-        <div className={styles.favListingContainer}>
-          <div className={styles.favListingContent}>{defaults}</div>
-          <div className={styles.favListingButton}>
+      <div className={favListingStyle}>
+        <div className={favListingContainerStyle}>
+          <div className={favListingContentStyle}>{defaults}</div>
+          <div className={favListingButtonStyle}>
             {urlOptions &&
               JSON.stringify(urlOptions) != JSON.stringify(currentOptions) && (
                 <Button

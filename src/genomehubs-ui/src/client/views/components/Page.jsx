@@ -1,4 +1,5 @@
 import React, { memo, useRef, useState } from "react";
+import { link as linkStyle, pageTitle as pageTitleStyle } from "./Styles.scss";
 
 import Grid from "@mui/material/Grid";
 import SearchBox from "./SearchBox";
@@ -7,10 +8,6 @@ import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchColors from "../hocs/dispatchColors";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "qs";
-import styles from "./Styles.scss";
-import { useLocation } from "@reach/router";
-import { useReadLocalStorage } from "usehooks-ts";
 import withApi from "../hocs/withApi";
 import withSearchIndex from "../hocs/withSearchIndex";
 import withSiteName from "../hocs/withSiteName";
@@ -41,32 +38,18 @@ const Page = ({
   text,
   landingPage,
   topLevel,
-  searchIndex,
   pageRef,
   recordId,
   fieldId,
   resultCount,
   result,
   siteName,
-  // selectPalette,
-  apiStatus,
 }) => {
   const classes = useStyles();
-  const location = useLocation();
-  const [open, setOpen] = useState(false);
-  const [favourite, setFavourite] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
   const [showBrowse, setShowBrowse] = useState(false);
   const rootRef = useRef(null);
-  const savedOptions = useReadLocalStorage(`${searchIndex}Options`);
   const itemCss = topLevel ? classes.itemFull : classes.item;
-  let options = qs.parse(location.search.replace(/^\?/, ""));
-  // useEffect(() => {
-  //   selectPalette(options.palette || "default");
-  // }, []);
-  // if (!apiStatus) {
-  //   return null;
-  // }
   let preSearchItems = [];
   if (preSearchPanels && preSearchPanels.length > 0) {
     preSearchPanels.forEach((obj, i) => {
@@ -230,7 +213,7 @@ const Page = ({
                         setShowExamples(!showExamples);
                         setShowBrowse(false);
                       }}
-                      className={styles.link}
+                      className={linkStyle}
                       href=""
                     >
                       {showExamples ? "hide" : "show"} examples
@@ -242,7 +225,7 @@ const Page = ({
                         setShowBrowse(!showBrowse);
                         setShowExamples(false);
                       }}
-                      className={styles.link}
+                      className={linkStyle}
                       href="#"
                     >
                       {showBrowse ? "hide" : "browse"} tree
@@ -259,7 +242,7 @@ const Page = ({
       {title && (
         <Grid
           item
-          className={classnames(styles.pageTitle, itemCss)}
+          className={classnames(pageTitleStyle, itemCss)}
           style={{ marginBottom: "0.5em", paddingLeft: "0.5em" }}
           container
           direction="row"

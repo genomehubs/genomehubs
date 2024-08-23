@@ -1,16 +1,17 @@
+import {
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  textPanel as textPanelStyle,
+} from "./Styles.scss";
+
 import NavLink from "./NavLink";
 import Page from "./Page";
 import React from "react";
 import classnames from "classnames";
-import styles from "./Styles.scss";
 import { useLocation } from "@reach/router";
 
 const NotFoundPanel = ({ path }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.textPanel
-  );
+  let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, textPanelStyle);
   return (
     <div className={css}>
       <h1>Page not found</h1>

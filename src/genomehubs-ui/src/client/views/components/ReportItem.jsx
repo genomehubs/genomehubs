@@ -20,7 +20,7 @@ import dispatchMessage from "../hocs/dispatchMessage";
 import dispatchReport from "../hocs/dispatchReport";
 import { gridPropNames } from "../functions/propNames";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
+import { reportHeading as reportHeadingStyle } from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
 import useVisible from "../hooks/useVisible";
@@ -538,12 +538,11 @@ const ReportItem = ({
       style={{
         flexGrow: "1",
         width: "100%",
-        // background: "rgba(240,240,240,0.5)",
       }}
     >
       {!loading && !error && heading && (inModal || topLevel) && (
         <Grid item xs>
-          <span className={styles.reportHeading}>{heading}</span>
+          <span className={reportHeadingStyle}>{heading}</span>
         </Grid>
       )}
       <Grid

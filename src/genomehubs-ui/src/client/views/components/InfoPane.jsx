@@ -1,23 +1,33 @@
 import React, { memo, useState } from "react";
+import {
+  fillParent as fillParentStyle,
+  fixedArSixteenNine as fixedArSixteenNineStyle,
+  fixedAr as fixedArStyle,
+  flexCenterHorizontal as flexCenterHorizontalStyle,
+  flexCenter as flexCenterStyle,
+  infoPaneDefault as infoPaneDefaultStyle,
+  infoPaneDescription as infoPaneDescriptionStyle,
+  infoPaneHoverReveal as infoPaneHoverRevealStyle,
+  infoPane as infoPaneStyle,
+} from "./Styles.scss";
 
 // import loadable from "@loadable/component";
 import InfoCard from "./InfoCard";
 import { Link } from "@reach/router";
 import classnames from "classnames";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
 
 // const InfoCard = loadable(() => import("./InfoCard"));
 
 const InfoPane = (props) => {
   const [hover, setHover] = useState(false);
   let css = classnames(
-    styles.flexCenter,
-    styles.flexCenterHorizontal,
-    styles.infoPane,
-    styles.infoPaneDefault,
-    styles.fixedAr,
-    styles.fixedArSixteenNine
+    flexCenterStyle,
+    flexCenterHorizontalStyle,
+    infoPaneStyle,
+    infoPaneDefaultStyle,
+    fixedArStyle,
+    fixedArSixteenNineStyle
   );
   let placeholder;
   if (props.image) {
@@ -25,8 +35,8 @@ const InfoPane = (props) => {
   } else {
     placeholder = "placeholder.png";
   }
-  let desc_css = classnames(styles.fillParent, styles.infoPaneDescription, {
-    [styles.infoPaneHoverReveal]: hover,
+  let desc_css = classnames(fillParentStyle, infoPaneDescriptionStyle, {
+    [infoPaneHoverRevealStyle]: hover,
   });
   return (
     <Link

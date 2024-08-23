@@ -1,18 +1,16 @@
 import React, { memo, useEffect, useState } from "react";
 
 import CookieBanner from "./CookieBanner";
-import DownloadMessage from "./DownloadMessage";
 import Footer from "./Footer";
 import Grid from "@mui/material/Grid";
 import Header from "./Header";
-import LoadingScreen from "./LoadingScreen";
 import Main from "./Main";
 import ReportPage from "./ReportPage";
 import { Router } from "@reach/router";
 import SearchPage from "./SearchPage";
 import { compose } from "recompose";
-import makeStyles from '@mui/styles/makeStyles';
-import styles from "./Styles.scss";
+import { fillParent as fillParentStyle } from "./Styles.scss";
+import makeStyles from "@mui/styles/makeStyles";
 import withSiteName from "../hocs/withSiteName";
 
 // const ReportPage = loadable(() => import("./ReportPage"));
@@ -101,7 +99,7 @@ const Layout = ({ types, basename, loading }) => {
   }, []);
   return (
     <>
-      <Router className={styles.fillParent} basepath={basename} primary={false}>
+      <Router className={fillParentStyle} basepath={basename} primary={false}>
         {paths}
       </Router>
     </>

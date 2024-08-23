@@ -1,17 +1,19 @@
-import React, { memo, useEffect, useRef } from "react";
+import React, { memo, useRef } from "react";
+import {
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  textPanel as textPanelStyle,
+} from "./Styles.scss";
 import { useLocation, useNavigate } from "@reach/router";
 
 import Chip from "@mui/material/Chip";
 import Grid from "@mui/material/Grid";
 import ReportFull from "./ReportFull";
-import ReportTerm from "./ReportTerm";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
-import { formatter } from "../functions/formatter";
 import qs from "../functions/qs";
 import { sortReportQuery } from "../selectors/report";
-import styles from "./Styles.scss";
 import withReportDefaults from "../hocs/withReportDefaults";
 
 const indices = ["taxon", "assembly", "sample", "feature"];
@@ -28,11 +30,7 @@ const reportTypes = {
 };
 
 const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.textPanel
-  );
+  let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, textPanelStyle);
   const reportRef = useRef(null);
   const location = useLocation();
   // useEffect(() => {
@@ -53,14 +51,12 @@ const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {
       `${location.pathname}?${qs.stringify(newOptions)}${location.hash}`
     );
   };
-  let { query, ...treeOptions } = options;
-  let report = options.report;
+  let { query, report, ...treeOptions } = options;
   let queryString = qs.stringify({
     ...treeOptions,
     ...reportDefaults[report],
     report,
   });
-  // TODO: use mui-grid
 
   const handleDelete = () => {
     setReportTerm(false);
@@ -76,8 +72,8 @@ const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {
       ref={reportRef}
       style={{ maxHeight: "100%" }}
     >
-      {/* <div className={styles.header}>
-        <span className={styles.title}>{title}</span>
+      {/* <div className={headerStyle}>
+        <span className={titleStyle}>{title}</span>
       </div> */}
 
       {/* {text && <div>{text}</div>} */}

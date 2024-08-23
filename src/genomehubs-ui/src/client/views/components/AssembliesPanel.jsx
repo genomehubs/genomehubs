@@ -1,21 +1,17 @@
-import React, { useEffect } from "react";
+import {
+  header as headerStyle,
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  resultPanel as resultPanelStyle,
+  title as titleStyle,
+} from "./Styles.scss";
 
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
+import React from "react";
 import classnames from "classnames";
 import { compose } from "recompose";
-import qs from "../functions/qs";
-import styles from "./Styles.scss";
 
-const AssembliesPanel = ({ recordId, result, taxonomy }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel
-  );
+const AssembliesPanel = () => {
+  let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, resultPanelStyle);
 
   // TODO: Add lookup to link assemblies to samples
   let content = (
@@ -27,8 +23,8 @@ const AssembliesPanel = ({ recordId, result, taxonomy }) => {
 
   return (
     <div className={css}>
-      <div className={styles.header}>
-        <span className={styles.title}>Assemblies</span>
+      <div className={headerStyle}>
+        <span className={titleStyle}>Assemblies</span>
       </div>
       <div>{content}</div>
     </div>

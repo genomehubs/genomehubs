@@ -2,7 +2,7 @@ import { Circle, Group, Layer, Line, Rect, Stage, Text } from "react-konva";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import KonvaTooltip from "./KonvaTooltip";
-import Skeleton from '@mui/material/Skeleton';
+import Skeleton from "@mui/material/Skeleton";
 import classnames from "classnames";
 import { compose } from "recompose";
 import formats from "../functions/formats";

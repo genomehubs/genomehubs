@@ -1,10 +1,21 @@
+import {
+  bold as boldStyle,
+  content as contentStyle,
+  header as headerStyle,
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  nameGroup as nameGroupStyle,
+  name as nameStyle,
+  resultPanel as resultPanelStyle,
+  source as sourceStyle,
+  title as titleStyle,
+} from "./Styles.scss";
+
 import LaunchIcon from "@mui/icons-material/Launch";
 import React from "react";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
-import { format } from "d3-format";
-import styles from "./Styles.scss";
 import withRecord from "../hocs/withRecord";
 
 const NameGroup = ({ title, names, sort, bold }) => {
@@ -18,23 +29,19 @@ const NameGroup = ({ title, names, sort, bold }) => {
     let { name, source } = obj;
     let sources;
     if (source && source.length > 0) {
-      sources = source.map((s, j) => (
-        <span key={j} className={styles.source}>
-          {s}
-        </span>
-      ));
+      sources = source.map((s, j) => <span key={j}>{s}</span>);
     }
     return (
-      <span key={i} className={classnames(styles.name, bold && styles.bold)}>
+      <span key={i} className={classnames(nameStyle, bold && boldStyle)}>
         {name}
         {sources ? <> {sources}</> : ""}
       </span>
     );
   });
   return (
-    <div className={styles.nameGroup}>
-      <div className={styles.title}>{title} </div>
-      <div className={styles.content}>{nameDivs}</div>
+    <div className={nameGroupStyle}>
+      <div className={titleStyle}>{title} </div>
+      <div className={contentStyle}>{nameDivs}</div>
     </div>
   );
 };
@@ -106,7 +113,7 @@ export const NamesList = ({ names }) => {
     }
 
     // let nameDiv = (
-    //   <span key={i} className={styles.name}>
+    //   <span key={i} className={nameStyle}>
     //     {prefix}
     //     {name}
     //     {sourceClass == "other" ? <> - {source}</> : ""}
@@ -171,17 +178,13 @@ export const NamesList = ({ names }) => {
 };
 
 const NamesPanel = ({ taxon_id, names }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel
-  );
+  let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, resultPanelStyle);
   let nameDiv = <NamesList names={names} />;
 
   return (
     <div className={css}>
-      <div className={styles.header}>
-        <span className={styles.title}>Names</span>
+      <div className={headerStyle}>
+        <span className={titleStyle}>Names</span>
       </div>
       {nameDiv}
     </div>

@@ -61,13 +61,6 @@ const AggregationIcon = ({ method, hasDescendants, statusColors = {} }) => {
       </span>
     </Tooltip>
   );
-  {
-    /* <div className={styles.confidence}>
-      <div className={classnames(styles.one, styles[`one${level}`])}></div>
-      <div className={classnames(styles.two, styles[`two${level}`])}></div>
-      <div className={classnames(styles.three, styles[`three${level}`])}></div>
-    </div> */
-  }
 };
 
 export default compose(withColors)(AggregationIcon);

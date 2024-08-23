@@ -1,10 +1,22 @@
 import React, { createElement, useEffect, useState } from "react";
 import { basename, siteName } from "../reducers/location";
+import {
+  centerContent as centerContentStyle,
+  divider as dividerStyle,
+  fixedAr as fixedArStyle,
+  inline as inlineStyle,
+  markdown as markdownStyle,
+  negativePadded as negativePaddedStyle,
+  padded as paddedStyle,
+  paragraph as paragraphStyle,
+  reportContainer as reportContainerStyle,
+  unpaddedParagraph as unpaddedParagraphStyle,
+  unpadded as unpaddedStyle,
+} from "./Styles.scss";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
 import ArtTrackIcon from "@mui/icons-material/ArtTrack";
-import AutoCompleteInput from "./AutoCompleteInput";
 import Badge from "./Badge";
 import BasicSelect from "./BasicSelect";
 import Breadcrumbs from "./Breadcrumbs";
@@ -44,7 +56,6 @@ import remarkDirective from "remark-directive";
 import remarkParse from "remark-parse";
 import remarkReact from "remark-react";
 import remarkRehype from "remark-rehype";
-import styles from "./Styles.scss";
 import unified from "unified";
 import { visit } from "unist-util-visit";
 import withPages from "../hocs/withPages";
@@ -52,6 +63,16 @@ import withStyles from "@mui/styles/withStyles";
 
 const pagesUrl = PAGES_URL;
 const webpackHash = COMMIT_HASH || __webpack_hash__;
+
+const styleMap = {
+  centerContentStyle,
+  paddedStyle,
+  negativePaddedStyle,
+  unpaddedParagraphStyle,
+  paragraphStyle,
+  inlineStyle,
+  unpaddedStyle,
+};
 
 export const Template = ({
   id,
@@ -283,7 +304,7 @@ export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
     } else if (value == "") {
       newProps[key] = true;
     } else if (key == "className") {
-      newProps["className"] = styles[value];
+      newProps["className"] = styleMap[`${value}Style`];
     } else if (key.startsWith("exclude")) {
       newProps[key] = Array.isArray(value) ? value : value.split(",");
     } else if (key == "src") {
@@ -317,7 +338,7 @@ export const RehypeComponentsList = (extra) => {
       <Divider
         orientation={props.orientation || "vertical"}
         flexItem
-        className={styles.divider}
+        className={dividerStyle}
       />
     ),
     flag: (props) => {
@@ -351,22 +372,25 @@ export const RehypeComponentsList = (extra) => {
       let { lineColor, fillColor, ...gridProps } = props;
       return (
         <Grid {...processProps({ props: gridProps })}>
-          <div className={styles.fixedAr} style={{ background: fillColor }}>
+          <div className={fixedArStyle} style={{ background: fillColor }}>
             <Logo {...{ lineColor, fillColor }} />
           </div>
         </Grid>
       );
     },
     img: (props) => (
-      <div className={styles.centerContent}>
+      <div className={centerContentStyle}>
         <img {...processProps({ props })} alt={props.alt.toString()} />
       </div>
     ),
     include: (props) => {
       let nested = <Nested pgId={props.pageId} {...props} />;
-      let css = styles.reportContainer;
+      let css = reportContainerStyle;
       if (props.className) {
-        css = classnames(styles.reportContainer, styles[props.className]);
+        css = classnames(
+          reportContainerStyle,
+          styleMap[`${props.className}Style`]
+        );
       }
 
       return (
@@ -379,7 +403,7 @@ export const RehypeComponentsList = (extra) => {
       <Grid
         {...processProps({ props, isGrid: true })}
         item
-        className={styles.reportContainer}
+        className={reportContainerStyle}
       />
     ),
     markdown: (props) => {
@@ -398,7 +422,7 @@ export const RehypeComponentsList = (extra) => {
           return (
             <Report
               {...processProps({ props: nestedProps, extra })}
-              className={styles.reportContainer}
+              className={reportContainerStyle}
             />
           );
         } else if (className == "language-template") {
@@ -416,9 +440,12 @@ export const RehypeComponentsList = (extra) => {
     phylopic: (props) => <PhyloPics {...processProps({ props, extra })} />,
     recordlink: (props) => <RecordLink {...processProps({ props, extra })} />,
     report: (props) => {
-      let css = styles.reportContainer;
+      let css = reportContainerStyle;
       if (props.className) {
-        css = classnames(styles.reportContainer, styles[props.className]);
+        css = classnames(
+          reportContainerStyle,
+          styleMap[`${props.className}Style`]
+        );
       }
       return <Report {...processProps({ props, extra })} className={css} />;
     },
@@ -438,9 +465,12 @@ export const RehypeComponentsList = (extra) => {
     },
     span: (props) => <span {...processProps({ props })} />,
     static: (props) => {
-      let css = styles.reportContainer;
+      let css = reportContainerStyle;
       if (props.className) {
-        css = classnames(styles.reportContainer, styles[props.className]);
+        css = classnames(
+          reportContainerStyle,
+          styleMap[`${props.className}Style`]
+        );
       }
       return (
         <Grid {...processProps({ props, isGrid: true })}>
@@ -451,7 +481,7 @@ export const RehypeComponentsList = (extra) => {
     templat: (props) => (
       <Template
         {...processProps({ props })}
-        className={classNames(styles.reportContainer, styles.unpadded)}
+        className={classNames(reportContainerStyle, unpaddedStyle)}
       />
     ),
     tooltip: (props) => {
@@ -554,11 +584,11 @@ const Markdown = ({
   if (siteStyles) {
     css = classes.root;
   } else {
-    css = classnames(styles.markdown, classes.root);
+    css = classnames(markdownStyle, classes.root);
   }
   return <div className={css}>{contents}</div>;
 };
 
-export const Nested = compose(withPages, withStyles(styles))(Markdown);
+export const Nested = compose(withPages, withStyles(styleMap))(Markdown);
 
-export default compose(withPages, withStyles(styles))(Markdown);
+export default compose(withPages, withStyles(styleMap))(Markdown);

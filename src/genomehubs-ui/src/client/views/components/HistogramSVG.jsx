@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from "react";
 
-import Skeleton from '@mui/material/Skeleton';
+import Skeleton from "@mui/material/Skeleton";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { formatter } from "../functions/formatter";
+import { fullWidth as fullWidthStyle } from "./Styles.scss";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import useVisible from "../hooks/useVisible";
 import withLookup from "../hocs/withLookup";
@@ -102,7 +102,7 @@ const HistogramSVG = ({
   if (buckets.length == 0) {
     let scale = 0.75;
     return (
-      <div className={styles.fullWidth} ref={targetRef}>
+      <div className={fullWidthStyle} ref={targetRef}>
         <div
           style={{
             transform: `translate(25px, 10px) scale(${scale})`,

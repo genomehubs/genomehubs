@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 
 import Grid from "@mui/material/Grid";
 import Tooltip from "./Tooltip";
+import { reportCaption as reportCaptionStyle } from "./Styles.scss";
 import stringLength from "../functions/stringLength";
-import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 
 const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
@@ -71,7 +71,7 @@ const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
   return (
     <Grid ref={gridRef} item xs style={{ textAlign: "center" }}>
       <div
-        className={styles.reportCaption}
+        className={reportCaptionStyle}
         style={{
           pointerEvents: "auto",
           ...(captionScale && {

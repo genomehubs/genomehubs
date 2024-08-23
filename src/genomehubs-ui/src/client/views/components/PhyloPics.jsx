@@ -1,13 +1,27 @@
 import React, { useEffect, useState } from "react";
+import {
+  blank as blankStyle,
+  imageContainer as imageContainerStyle,
+  imageCreditAncestral as imageCreditAncestralStyle,
+  imageCreditDescendant as imageCreditDescendantStyle,
+  imageCreditPrimary as imageCreditPrimaryStyle,
+  imageCredit as imageCreditStyle,
+} from "./Styles.scss";
 
 import PhyloPic from "./PhyloPic";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
 import truncate from "../functions/truncate";
 import withPhylopicsById from "../hocs/withPhylopicsById";
 import withRecord from "../hocs/withRecord";
+
+const styleMap = {
+  imageCreditStyle,
+  imageCreditPrimaryStyle,
+  imageCreditDescendantStyle,
+  imageCreditAncestralStyle,
+};
 
 const PhyloPics = ({
   phylopicById,
@@ -67,7 +81,7 @@ const PhyloPics = ({
       );
       return (
         <Tooltip title={imageDescription} styleName="dark" interactive arrow>
-          <div className={styles.blank}></div>
+          <div className={blankStyle}></div>
         </Tooltip>
       );
     } else {
@@ -121,7 +135,7 @@ const PhyloPics = ({
     );
   }
   return (
-    <div className={styles.imageContainer}>
+    <div className={imageContainerStyle}>
       <div>
         <Tooltip title={imageDescription} styleName="dark" interactive arrow>
           <div>
@@ -144,8 +158,8 @@ const PhyloPics = ({
           <Tooltip title={attribution} arrow>
             <div
               className={classnames(
-                styles.imageCredit,
-                styles[`imageCredit${source}`]
+                imageCreditStyle,
+                styleMap[`imageCredit${source}Style`]
               )}
               onClick={(e) => {
                 e.preventDefault();

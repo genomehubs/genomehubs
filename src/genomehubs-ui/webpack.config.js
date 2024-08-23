@@ -206,8 +206,10 @@ const config = {
           {
             loader: "css-loader",
             options: {
+              esModule: true,
               modules: {
                 localIdentName: "[name]__[local]___[hash:base64:5]",
+                namedExport: true,
               },
               sourceMap: true,
               importLoaders: 2,

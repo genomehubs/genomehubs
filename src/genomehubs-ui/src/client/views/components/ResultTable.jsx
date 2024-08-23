@@ -1,4 +1,11 @@
 import React, { useEffect, useRef } from "react";
+import {
+  aggregationToggleOpaque as aggregationToggleOpaqueStyle,
+  aggregationToggle as aggregationToggleStyle,
+  contrast as contrastStyle,
+  first as firstStyle,
+  last as lastStyle,
+} from "./Styles.scss";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
@@ -41,7 +48,6 @@ import expandFieldList from "../functions/expandFieldList";
 import { formatter } from "../functions/formatter";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
 import withColors from "../hocs/withColors";
 import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";
@@ -209,7 +215,7 @@ const SortableCell = ({
   if (!CustomCell) {
     CustomCell = TableCell;
   }
-  let css = styles.aggregationToggle;
+  let css = aggregationToggleStyle;
   let prefix = name.replace(/:.+$/, "");
   if (
     excludeAncestral &&
@@ -218,7 +224,7 @@ const SortableCell = ({
       excludeAncestral.hasOwnProperty(prefix) ||
       excludeMissing.hasOwnProperty(prefix))
   ) {
-    css = classnames(styles.aggregationToggle, styles.aggregationToggleOpaque);
+    css = classnames(aggregationToggleStyle, aggregationToggleOpaqueStyle);
   }
 
   let title = handleTableSort ? `Sort by ${field}` : field;
@@ -254,7 +260,7 @@ const SortableCell = ({
 
   let cellCss = "";
   if (colSpan > 0) {
-    cellCss = classnames(styles.first, styles.last);
+    cellCss = classnames(firstStyle, lastStyle);
   }
 
   if (Array.isArray(summary)) {
@@ -437,12 +443,12 @@ const setCellClassName = (i, length, force) => {
   if (length == 1 && !force) {
     return "";
   }
-  let css = i % 2 == 1 ? styles.contrast : "";
+  let css = i % 2 == 1 ? contrastStyle : "";
   if (i == 0) {
-    css = classnames(css, styles.first);
+    css = classnames(css, firstStyle);
   }
   if (i == length - 1) {
-    css = classnames(css, styles.last);
+    css = classnames(css, lastStyle);
   }
   return css;
 };
@@ -1568,7 +1574,7 @@ const ResultTable = ({
         {/* {searchResults.isFetching ? (
           <Skeleton variant="rect" width={800} height={200} />
         ) : ( */}
-        <TableContainer className={styles.resultsTable}>
+        <TableContainer className={resultsTableStyle}>
           <Table size="small" aria-label="search results">
             <TableHead>
               <TableRow>{heads}</TableRow>

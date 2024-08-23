@@ -3,7 +3,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "@mui/material/IconButton";
 import React from "react";
 import Tooltip from "./Tooltip";
-import styles from "./Styles.scss";
+import { saveSearchOptions as saveSearchOptionsStyle } from "./Styles.scss";
 
 export const FavouriteButton = ({
   isFavourite,
@@ -21,10 +21,11 @@ export const FavouriteButton = ({
       placement={"top"}
     >
       <IconButton
-        className={styles.saveSearchOptions}
+        className={saveSearchOptionsStyle}
         aria-label="save search to favourites"
         onClick={handleClickFavourite}
-        size="large">
+        size="large"
+      >
         {isFavourite ? (
           <FavoriteIcon style={{ color }} />
         ) : (

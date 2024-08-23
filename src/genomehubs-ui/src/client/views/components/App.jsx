@@ -4,6 +4,7 @@ import {
   createTheme,
   makeStyles,
 } from "@material-ui/core/styles";
+import { app as appStyle, infoPanel as infoPanelStyle } from "./Styles.scss";
 
 import { CookiesProvider } from "react-cookie";
 import Head from "./Head";
@@ -13,7 +14,6 @@ import ReactErrorBoundary from "./ReactErrorBoundary";
 import StylesProvider from "@mui/styles/StylesProvider";
 import classnames from "classnames";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
 import { withCookies } from "react-cookie";
 import withLoading from "../hocs/withLoading";
 // import withFadeInOut from "../hocs/withFadeInOut";
@@ -42,10 +42,10 @@ const App = ({ theme, cookies, loading }) => {
         <StylesProvider injectFirst>
           <div style={{ position: "relative", height: "100%", width: "100%" }}>
             <div
-              className={classnames(`theme${theme}`, styles.app)}
+              className={classnames(`theme${theme}`, appStyle)}
               // style={{ overflow: loading ? "hidden" : "visible" }}
             >
-              <div id="theme-base" className={styles.infoPanel} />
+              <div id="theme-base" className={infoPanelStyle} />
               <ReactErrorBoundary>
                 <>
                   <Head />

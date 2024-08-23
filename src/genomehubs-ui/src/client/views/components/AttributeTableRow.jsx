@@ -1,4 +1,11 @@
 import React, { Fragment, useState } from "react";
+import {
+  title as titleStyle,
+  underscoreHigh as underscoreHighStyle,
+  underscoreLow as underscoreLowStyle,
+  underscoreMedium as underscoreMediumStyle,
+  underscore as underscoreStyle,
+} from "./Styles.scss";
 
 import Box from "@mui/material/TableContainer";
 import Collapse from "@mui/material/Box";
@@ -22,9 +29,8 @@ import ZoomControl from "./ZoomControl";
 import classnames from "classnames";
 import { compose } from "recompose";
 import { formatter } from "../functions/formatter";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
@@ -33,7 +39,11 @@ import withSummary from "../hocs/withSummary";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
-// const LocationMap = loadable(() => import("./LocationMap"));
+const styleMap = {
+  underscoreHighStyle,
+  underscoreLowStyle,
+  underscoreMediumStyle,
+};
 
 const useRowStyles = makeStyles({
   root: {
@@ -221,16 +231,7 @@ const NestedTable = ({
   );
 };
 
-const ValueCell = ({
-  attributeId,
-  types,
-  meta,
-  currentResult,
-  classes,
-  setHighlightPointLocation,
-  zoomPointLocation,
-  setZoomPointLocation,
-}) => {
+const ValueCell = ({ attributeId, types, meta, currentResult, classes }) => {
   const [open, setOpen] = useState(false);
   let range;
   if (meta.max > meta.min) {
@@ -303,7 +304,7 @@ const ValueCell = ({
     let title = open ? "Show less" : `Show ${obj.extra} more`;
     if (open) {
       expandIcon = (
-        <div className={styles.disableTheme}>
+        <div>
           <Tooltip title={title} arrow placement={"top"}>
             <IconButton
               aria-label="expand row"
@@ -316,7 +317,7 @@ const ValueCell = ({
         </div>
       );
       copyIcon = (
-        <div className={styles.disableTheme}>
+        <div>
           <Tooltip title={"Copy to clipboard"} arrow placement={"top"}>
             <IconButton
               aria-label="copy to clipboard"
@@ -334,7 +335,7 @@ const ValueCell = ({
       );
     } else {
       links.push(
-        <span key={"extra"} className={styles.disableTheme}>
+        <span key={"extra"}>
           <Tooltip title={title} arrow placement={"top"}>
             <IconButton
               aria-label="expand row"
@@ -557,18 +558,18 @@ const AttributeTableRow = ({
 
         source = meta["aggregation_source"];
         css = classnames(
-          styles.underscore,
-          styles[`underscore${confidence[source]}`]
+          underscoreStyle,
+          styleMap[`underscore${confidence[source]}Style`]
         );
         aggSource = formatter(source);
         let altCss = classnames(
-          styles.underscore,
-          styles[`underscore${confidence["descendant"]}`]
+          underscoreStyle,
+          styleMap[`underscore${confidence["descendant"]}Style`]
         );
         let altAggSource = formatter("descendant");
         if (source == "direct") {
           icons.push(
-            <span key="direct" className={styles.disableTheme}>
+            <span key="direct">
               <IconButton
                 aria-label="expand row"
                 size="small"
@@ -581,7 +582,7 @@ const AttributeTableRow = ({
         }
         if (source == "descendant" || meta.has_descendants) {
           icons.push(
-            <span key="descendant" className={styles.disableTheme}>
+            <span key="descendant">
               <IconButton
                 aria-label="show descendant values"
                 size="small"
@@ -593,7 +594,7 @@ const AttributeTableRow = ({
           );
         } else if (source == "ancestor") {
           icons.push(
-            <span key="ancestor" className={styles.disableTheme}>
+            <span key="ancestor">
               <IconButton
                 aria-label="show ancestral values"
                 size="small"
@@ -676,7 +677,7 @@ const AttributeTableRow = ({
     }
   }
   let header = (
-    <span className={styles.title}>
+    <span className={titleStyle}>
       {attributeId}
       {meta && meta.units && <span> ({meta.units})</span>}
     </span>

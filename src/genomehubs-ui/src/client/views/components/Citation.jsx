@@ -1,9 +1,8 @@
-import React, { memo, useEffect, useRef, useState } from "react";
-
 import { Grid } from "@mui/material";
+import React from "react";
 import { compose } from "recompose";
+import { link as linkStyle } from "./Styles.scss";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import withSiteName from "../hocs/withSiteName";
 
@@ -28,7 +27,7 @@ const Citation = ({ basename, searchTerm, resultCount }) => {
       <a
         href=""
         onClick={showSources}
-        className={styles.link}
+        className={linkStyle}
         style={{ textDecoration: "underline" }}
       >
         sources

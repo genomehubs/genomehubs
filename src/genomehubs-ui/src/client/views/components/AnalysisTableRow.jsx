@@ -11,8 +11,7 @@ import TableRow from "@mui/material/TableRow";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchSetRecord from "../hocs/dispatchSetRecord";
-import makeStyles from '@mui/styles/makeStyles';
-import styles from "./Styles.scss";
+import makeStyles from "@mui/styles/makeStyles";
 import { useNavigate } from "@reach/router";
 import withAnalysesByAnyId from "../hocs/withAnalysesByAnyId";
 import withAnalysis from "../hocs/withAnalysis";
@@ -61,7 +60,7 @@ const AnalysisTableRow = ({
   const expandIcon = ({ condition = true, open, setOpen }) => {
     if (condition) {
       return (
-        <span className={styles.disableTheme}>
+        <span>
           <IconButton
             aria-label="expand row"
             size="small"

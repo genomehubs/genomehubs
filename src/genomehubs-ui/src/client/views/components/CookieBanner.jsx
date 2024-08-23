@@ -1,17 +1,15 @@
-import React, { Fragment, useLayoutEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { useCookies, withCookies } from "react-cookie";
 
 import { Button } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
-import Logo from "./Logo";
 import Modal from "@mui/material/Modal";
-import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
+import { banner as bannerStyle } from "./Styles.scss";
 import { compose } from "recompose";
 import makeStyles from "@mui/styles/makeStyles";
-import styles from "./Styles.scss";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 
 const showBanner = COOKIE_BANNER == "true";
@@ -189,7 +187,7 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
   );
   return (
     <div
-      className={styles.banner}
+      className={bannerStyle}
       //
     >
       <Grid container direction="row" spacing={2}>

@@ -1,9 +1,20 @@
+import {
+  bold as boldStyle,
+  header as headerStyle,
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  lineageDirect as lineageDirectStyle,
+  lineage as lineageStyle,
+  rank as rankStyle,
+  resultPanel as resultPanelStyle,
+  title as titleStyle,
+} from "./Styles.scss";
+
 import React from "react";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
-import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
@@ -53,8 +64,8 @@ export const LineageList = ({
     lineage.lineage.forEach((ancestor) => {
       let rank = ancestor.taxon_rank == "clade" ? "" : ancestor.taxon_rank;
       let css = classnames(
-        styles.rank,
-        fullRanks.has(ancestor.taxon_rank) && styles.bold
+        rankStyle,
+        fullRanks.has(ancestor.taxon_rank) && boldStyle
       );
       let rankDiv = <div className={css}>{rank}</div>;
 
@@ -66,7 +77,7 @@ export const LineageList = ({
           key={ancestor.taxon_id}
         >
           <span
-            className={styles.lineage}
+            className={lineageStyle}
             onClick={() =>
               handleTaxonClick(ancestor.taxon_id, ancestor.scientific_name)
             }
@@ -81,13 +92,13 @@ export const LineageList = ({
   let rank =
     lineage.taxon.taxon_rank == "clade" ? "" : lineage.taxon.taxon_rank;
   let css = classnames(
-    styles.rank,
-    fullRanks.has(lineage.taxon.taxon_rank) && styles.bold
+    rankStyle,
+    fullRanks.has(lineage.taxon.taxon_rank) && boldStyle
   );
   let rankDiv = <div className={css}>{rank}</div>;
   lineageDivs.push(
     <span
-      className={classnames(styles.lineage, styles.lineageDirect)}
+      className={classnames(lineageStyle, lineageDirectStyle)}
       onClick={() =>
         handleTaxonClick(lineage.taxon.taxon_id, lineage.taxon.scientific_name)
       }
@@ -111,11 +122,7 @@ const LineagePanel = ({
   setLookupTerm,
   taxonomy,
 }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel
-  );
+  let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, resultPanelStyle);
   let lineages = (
     <LineageList
       taxon_id={taxon_id}
@@ -131,8 +138,8 @@ const LineagePanel = ({
 
   return (
     <div className={css}>
-      <div className={styles.header}>
-        <span className={styles.title}>Lineage</span>
+      <div className={headerStyle}>
+        <span className={titleStyle}>Lineage</span>
       </div>
       {lineages}
     </div>

@@ -1,7 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
+import React, { useEffect, useRef } from "react";
 
-import { Box } from "@mui/material";
 import FlagIcon from "./FlagIcon";
 import Grid from "@mui/material/Grid";
 import Table from "@mui/material/Table";
@@ -10,15 +8,13 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import Tooltip from "./Tooltip";
 import TranslatedValue from "./TranslatedValue";
+import { autoWidth as autoWidthStyle } from "./Styles.scss";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
-import styles from "./Styles.scss";
-import useResize from "../hooks/useResize";
 import withReportTerm from "../hocs/withReportTerm";
 import withSiteName from "../hocs/withSiteName";
-import withStyles from '@mui/styles/withStyles';
+import withStyles from "@mui/styles/withStyles";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -31,7 +27,7 @@ const StyledTableCell = withStyles((theme) => ({
   },
 }))(TableCell);
 
-const TableReport = ({ report, chartProps, ...props }) => {
+const TableReport = ({ report, chartProps }) => {
   const { headers, rows } = report.table;
   let [highlightField, highlightValue] = (chartProps.highlight || "").split(
     "="
@@ -61,7 +57,7 @@ const TableReport = ({ report, chartProps, ...props }) => {
   if (!headers) {
     return null;
   }
-  const showIndex = headers[0].key == "country_list" ? true : false;
+  const showIndex = !!(headers[0].key == "country_list");
   let tableHeader = (
     <TableRow key={"header"}>
       {showIndex && <StyledTableCell key="index"></StyledTableCell>}
@@ -135,7 +131,7 @@ const TableReport = ({ report, chartProps, ...props }) => {
         justifyContent="center"
       >
         <Grid item>
-          <Table size={"small"} className={styles.autoWidth}>
+          <Table size={"small"} className={autoWidthStyle}>
             <TableHead>{tableHeader}</TableHead>
             <TableBody>{tableRows}</TableBody>
           </Table>
@@ -161,7 +157,6 @@ const TableReport = ({ report, chartProps, ...props }) => {
 const ReportTable = ({
   table,
   chartRef,
-  containerRef,
   message,
   setMessage,
   cumulative,
@@ -169,7 +164,7 @@ const ReportTable = ({
   highlight,
   minDim,
 }) => {
-  const componentRef = chartRef ? chartRef : useRef();
+  const componentRef = chartRef || useRef();
 
   useEffect(() => {
     if (message && table && table.status) {

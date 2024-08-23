@@ -7,8 +7,8 @@ import ReportTools from "./ReportTools";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
+import { markdown as markdownStyle } from "./Styles.scss";
 import qs from "qs";
-import styles from "./Styles.scss";
 import { useStyles } from "./ReportModalStyles";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import withSiteName from "../hocs/withSiteName";
@@ -126,7 +126,7 @@ export const ReportFull = ({
           flexGrow: 1,
           maxHeight: "100%",
         }}
-        className={classnames(classes.paper, styles.markdown)}
+        className={classnames(classes.paper, markdownStyle)}
         ref={gridRef}
       >
         <Grid
@@ -152,7 +152,7 @@ export const ReportFull = ({
           flexGrow: 1,
           maxHeight: "100%",
         }}
-        className={classnames(classes.paper, styles.markdown)}
+        className={classnames(classes.paper, markdownStyle)}
         ref={gridRef}
       >
         <Grid item xs={1} />

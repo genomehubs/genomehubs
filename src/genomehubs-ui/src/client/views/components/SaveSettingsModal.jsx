@@ -12,12 +12,11 @@ import MuiTab from "@mui/material/Tab";
 import MuiTabs from "@mui/material/Tabs";
 import SaveSettingsDefaults from "./SaveSettingsDefaults";
 import SaveSettingsFavourites from "./SaveSettingsFavourites";
-// import SaveSettingsLists from "./SaveSettingsLists";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import Typography from "@mui/material/Typography";
 import { compose } from "recompose";
+import { favListingFooter as favListingFooterStyle } from "./Styles.scss";
 import makeStyles from "@mui/styles/makeStyles";
-import styles from "./Styles.scss";
 import withSearchIndex from "../hocs/withSearchIndex";
 import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
@@ -154,7 +153,7 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
         )}
 
         <DialogActions>
-          <span className={styles.favListingFooter}>
+          <span className={favListingFooterStyle}>
             Save any changes before closing or changing tabs. Changes will be
             lost if you navigate away.
           </span>

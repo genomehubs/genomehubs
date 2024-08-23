@@ -1,4 +1,12 @@
 import React, { useState } from "react";
+import {
+  favListingButton as favListingButtonStyle,
+  favListingContainer as favListingContainerStyle,
+  favListingContent as favListingContentStyle,
+  favListingExpand as favListingExpandStyle,
+  favListingHeader as favListingHeaderStyle,
+  favListing as favListingStyle,
+} from "./Styles.scss";
 
 import Button from "@mui/material/Button";
 import EditIcon from "@mui/icons-material/Edit";
@@ -13,22 +21,14 @@ import { compose } from "recompose";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import { splitTerms } from "../functions/splitTerms";
-import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
 import { useNavigate } from "@reach/router";
 import withSearchDefaults from "../hocs/withSearchDefaults";
 import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
 
-// import withSearchIndex from "../hocs/withSearchIndex";
-
 export const useStyles = makeStyles((theme) => ({
   paper: {
-    // width: "96%",
-    // minWidth: "600px",
-    // padding: 16,
-    // marginTop: 16,
-
     boxShadow: "none",
   },
   formControl: {
@@ -105,7 +105,7 @@ const SaveSettingsFavourites = ({
 
   const formatYaml = ({ searchTerm, reportTerm }) => {
     let arr = Object.entries(searchTerm || {}).map(([key, value]) => (
-      <pre key={key} className={styles.favListing}>
+      <pre key={key} className={favListingStyle}>
         <b>{key}:</b> {JSON.stringify(value)}
       </pre>
     ));
@@ -113,7 +113,7 @@ const SaveSettingsFavourites = ({
       arr.push(<hr key={"hr"} />);
       arr = arr.concat(
         Object.entries(reportTerm || {}).map(([key, value]) => (
-          <pre key={key} className={styles.favListing}>
+          <pre key={key} className={favListingStyle}>
             <b>{key}:</b> {JSON.stringify(value)}
           </pre>
         ))
@@ -142,14 +142,14 @@ const SaveSettingsFavourites = ({
     );
 
     favListings.push(
-      <div key={i} className={styles.favListing}>
-        <div className={styles.favListingContainer}>
+      <div key={i} className={favListingStyle}>
+        <div className={favListingContainerStyle}>
           <div
-            className={styles.favListingHeader}
+            className={favListingHeaderStyle}
             onClick={() => handleExpand(key)}
           >
             {favButton}
-            <span className={styles.favListingExpand}>
+            <span className={favListingExpandStyle}>
               {expand[key] ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </span>
             <Typography>
@@ -163,7 +163,7 @@ const SaveSettingsFavourites = ({
             </Typography>
           </div>
           {expand[key] && (
-            <div className={styles.favListingContent}>
+            <div className={favListingContentStyle}>
               {edit[key] ? (
                 <YamlEditor
                   json={{
@@ -176,7 +176,7 @@ const SaveSettingsFavourites = ({
               ) : (
                 formatYaml({ searchTerm, reportTerm })
               )}
-              <div className={styles.favListingButton}>
+              <div className={favListingButtonStyle}>
                 <Button
                   autoFocus
                   color="primary"
@@ -230,7 +230,7 @@ const SaveSettingsFavourites = ({
         style={{ position: "relative", height: "2em", width: "100%" }}
       >
         <Button
-          className={styles.favListingButton}
+          className={favListingButtonStyle}
           autoFocus
           onClick={handleSave}
           color="primary"

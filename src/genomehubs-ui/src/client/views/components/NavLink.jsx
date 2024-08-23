@@ -1,9 +1,14 @@
+import {
+  link as linkStyle,
+  tabHighlight as tabHighlightStyle,
+  tab as tabStyle,
+} from "./Styles.scss";
+
 import LaunchIcon from "@mui/icons-material/Launch";
 import { Link } from "@reach/router";
 import React from "react";
 import classnames from "classnames";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
 import { useLocation } from "@reach/router";
 import withSiteName from "../hocs/withSiteName";
 
@@ -31,7 +36,7 @@ const NavLink = ({
       to.match(/\:\/\//) &&
       (props.title?.startsWith("external:") || !to.match(location.origin))
     ) {
-      let children = props.children;
+      let { children } = props;
       if (!Array.isArray(children)) {
         children = [children];
       }
@@ -64,9 +69,9 @@ const NavLink = ({
     }
     to = basename + "/" + to.replace(location.origin, "");
   }
-  let css = styles.link;
+  let css = linkStyle;
   if (tab) {
-    css = classnames(styles.tab, { [styles.tabHighlight]: isCurrent });
+    css = classnames(tabStyle, { [tabHighlightStyle]: isCurrent });
   }
   return (
     <Link

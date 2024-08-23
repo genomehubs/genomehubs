@@ -1,4 +1,12 @@
 import React, { useEffect } from "react";
+import {
+  autoWidth as autoWidthStyle,
+  header as headerStyle,
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  resultPanel as resultPanelStyle,
+  title as titleStyle,
+} from "./Styles.scss";
 
 import AnalysisTableRow from "./AnalysisTableRow";
 import Table from "@mui/material/Table";
@@ -9,7 +17,6 @@ import TableRow from "@mui/material/TableRow";
 import classnames from "classnames";
 import { compose } from "recompose";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
 import withAnalysesByAnyId from "../hocs/withAnalysesByAnyId";
 import withAnalysis from "../hocs/withAnalysis";
 
@@ -23,11 +30,7 @@ const AnalysisPanel = ({
   fetchAnalyses,
   taxonomy,
 }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel
-  );
+  let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, resultPanelStyle);
   const analysesByRecordId = {
     assembly: analysesByAssemblyId,
     taxon: analysesByTaxonId,
@@ -54,7 +57,7 @@ const AnalysisPanel = ({
       );
     });
     analysisTable = (
-      <Table size={"small"} className={styles.autoWidth}>
+      <Table size={"small"} className={autoWidthStyle}>
         <TableHead>
           <TableRow>
             <TableCell>Title</TableCell>
@@ -70,8 +73,8 @@ const AnalysisPanel = ({
   }
   return (
     <div className={css}>
-      <div className={styles.header}>
-        <span className={styles.title}>Analyses</span>
+      <div className={headerStyle}>
+        <span className={titleStyle}>Analyses</span>
       </div>
       <div>{analysisTable}</div>
     </div>

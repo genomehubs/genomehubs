@@ -1,14 +1,16 @@
 import { Link, useLocation } from "@reach/router";
 import React, { memo, useState } from "react";
+import {
+  siteLogo as siteLogoStyle,
+  siteName as siteNameStyle,
+} from "./Styles.scss";
 
 import LaunchIcon from "@mui/icons-material/Launch";
 import Logo from "./Logo";
 import MenuItem from "@mui/material/MenuItem";
 import Popover from "@mui/material/Popover";
-import Typography from "@mui/material/Typography";
 import { compose } from "recompose";
 import makeStyles from "@mui/styles/makeStyles";
-import styles from "./Styles.scss";
 import withArchive from "../hocs/withArchive";
 import withSiteName from "../hocs/withSiteName";
 
@@ -40,9 +42,9 @@ const SiteName = ({ siteName, basename, archive, logo, theme }) => {
   const id = open ? "simple-popover" : undefined;
 
   let content = (
-    <Link className={styles.siteName} to={`${basename}/`}>
+    <Link className={siteNameStyle} to={`${basename}/`}>
       {logo && (
-        <div className={styles.siteLogo}>
+        <div className={siteLogoStyle}>
           <Logo />
         </div>
       )}

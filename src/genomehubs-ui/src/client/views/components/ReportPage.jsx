@@ -1,4 +1,10 @@
 import React, { useEffect } from "react";
+import {
+  fillParent as fillParentStyle,
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  textPanel as textPanelStyle,
+} from "./Styles.scss";
 
 import Page from "./Page";
 import ReportFull from "./ReportFull";
@@ -7,7 +13,6 @@ import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
 import qs from "../functions/qs";
 import { sortReportQuery } from "../selectors/report";
-import styles from "./Styles.scss";
 
 const ReportPage = ({ location, setLookupTerm, topLevel, ...props }) => {
   let queryString = location.search.replace(/^\?/, "");
@@ -19,10 +24,10 @@ const ReportPage = ({ location, setLookupTerm, topLevel, ...props }) => {
   }, [hashTerm]);
 
   let css = classnames(
-    { [styles.infoPanel]: !topLevel },
-    { [styles[`infoPanel1Column`]]: !topLevel },
-    { [styles.textPanel]: !topLevel },
-    styles.fillParent
+    { [infoPanelStyle]: !topLevel },
+    { [infoPanel1ColumnStyle]: !topLevel },
+    { [textPanelStyle]: !topLevel },
+    fillParentStyle
   );
   let content = (
     <div className={css}>
