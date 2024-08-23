@@ -1,9 +1,9 @@
-import { attrTypes } from "../functions/attrTypes";
-import { getResults } from "../functions/getResults";
-import { nullCountsAgg } from "../queries/queryFragments/nullCountsAgg";
-import { parseFields } from "../functions/parseFields";
-import { queryParams } from "./queryParams";
-import { setExclusions } from "../functions/setExclusions";
+import { attrTypes } from "../functions/attrTypes.js";
+import { getResults } from "../functions/getResults.js";
+import { nullCountsAgg } from "../queries/queryFragments/nullCountsAgg.js";
+import { parseFields } from "../functions/parseFields.js";
+import { queryParams } from "./queryParams.js";
+import { setExclusions } from "../functions/setExclusions.js";
 
 const getFileMatrix = async ({
   result,

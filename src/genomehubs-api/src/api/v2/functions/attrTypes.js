@@ -1,7 +1,7 @@
-import { checkResponse } from "./checkResponse";
-import { client } from "./connection";
+import { checkResponse } from "./checkResponse.js";
+import { client } from "./connection.js";
 import { config } from "./config.js";
-import { indexName } from "./indexName";
+import { indexName } from "./indexName.js";
 
 const setProcessedType = (meta) => {
   if (

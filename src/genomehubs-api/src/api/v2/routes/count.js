@@ -1,6 +1,6 @@
-import { formatJson } from "../functions/formatJson";
-import { getResultCount } from "../functions/getResultCount";
-import { logError } from "../functions/logger";
+import { formatJson } from "../functions/formatJson.js";
+import { getResultCount } from "../functions/getResultCount.js";
+import { logError } from "../functions/logger.js";
 
 export const getSearchResultCount = async (req, res) => {
   try {

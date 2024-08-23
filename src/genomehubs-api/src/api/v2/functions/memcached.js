@@ -1,6 +1,5 @@
-const Memcached = require("memcached-promise");
-
-import { config } from "./config";
+import Memcached from "memcached-promise";
+import { config } from "./config.js";
 
 export const mc = config.memcached
   ? new Memcached(config.memcached, {

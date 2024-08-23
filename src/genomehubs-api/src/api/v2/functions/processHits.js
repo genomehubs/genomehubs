@@ -1,7 +1,7 @@
 import { format } from "d3-format";
-import { processDoc } from "./processDoc";
-import { scaleFuncs } from "../queries/histogramAgg";
-import { subsets } from "./subsets";
+import { processDoc } from "./processDoc.js";
+import { scaleFuncs } from "../queries/histogramAgg.js";
+import { subsets } from "./subsets.js";
 import { utcFormat } from "d3-time-format";
 
 const sci = (v) => {

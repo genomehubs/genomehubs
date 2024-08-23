@@ -1,6 +1,6 @@
-import { attrTypes } from "./attrTypes";
-import { logError } from "./logger";
-import { summaries } from "./summaries";
+import { attrTypes } from "./attrTypes.js";
+import { logError } from "./logger.js";
+import { summaries } from "./summaries.js";
 
 export const parseFields = async ({ result, fields, taxonomy }) => {
   let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });

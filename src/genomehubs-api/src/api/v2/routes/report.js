@@ -1,28 +1,28 @@
-import { cacheFetch, cacheStore, pingCache } from "../functions/cache";
+import { cacheFetch, cacheStore, pingCache } from "../functions/cache.js";
 
 import Archiver from "archiver";
-import { aggregateNameClasses } from "../queries/aggregateNameClasses";
-import { aggregateRanks } from "../queries/aggregateRanks";
-import { aggregateRawValueSources } from "../queries/aggregateRawValueSources";
-import { attrTypes } from "../functions/attrTypes";
-import { checkResponse } from "../functions/checkResponse";
-import { client } from "../functions/connection";
-import { combineQueries } from "../functions/combineQueries";
-import { files } from "../reports/files";
-import { formatJson } from "../functions/formatJson";
-import { getResultCount } from "../functions/getResultCount";
-import { getResults } from "../functions/getResults";
-import { histogram } from "../reports/histogram";
-import { indexName } from "../functions/indexName";
-import { logError } from "../functions/logger";
-import { map } from "../reports/map";
-import { oxford } from "../reports/oxford";
-import { parseFields } from "../functions/parseFields";
+import { aggregateNameClasses } from "../queries/aggregateNameClasses.js";
+import { aggregateRanks } from "../queries/aggregateRanks.js";
+import { aggregateRawValueSources } from "../queries/aggregateRawValueSources.js";
+import { attrTypes } from "../functions/attrTypes.js";
+import { checkResponse } from "../functions/checkResponse.js";
+import { client } from "../functions/connection.js";
+import { combineQueries } from "../functions/combineQueries.js";
+import { files } from "../reports/files.js";
+import { formatJson } from "../functions/formatJson.js";
+import { getResultCount } from "../functions/getResultCount.js";
+import { getResults } from "../functions/getResults.js";
+import { histogram } from "../reports/histogram.js";
+import { indexName } from "../functions/indexName.js";
+import { logError } from "../functions/logger.js";
+import { map } from "../reports/map.js";
+import { oxford } from "../reports/oxford.js";
+import { parseFields } from "../functions/parseFields.js";
 import qs from "qs";
-import { queryParams } from "../reports/queryParams";
-import { setExclusions } from "../functions/setExclusions";
-import { setRanks } from "../functions/setRanks";
-import { tree } from "../reports/tree";
+import { queryParams } from "../reports/queryParams.js";
+import { setExclusions } from "../functions/setExclusions.js";
+import { setRanks } from "../functions/setRanks.js";
+import { tree } from "../reports/tree.js";
 
 const plurals = (singular) => {
   const ranks = {

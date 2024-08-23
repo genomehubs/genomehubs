@@ -1,14 +1,14 @@
-import { chainQueries, getResults } from "../functions/getResults";
+import { chainQueries, getResults } from "../functions/getResults.js";
 
-import { attrTypes } from "../functions/attrTypes";
-import { fmt } from "./fmt";
-import { getCatLabels } from "./getCatLabels";
-import { incrementDate } from "./incrementDate";
-import { scales } from "./scales";
-import { setAggs } from "./setAggs";
-import { setScale } from "./setScale";
-import { setTerms } from "./setTerms";
-import { valueTypes } from "./valueTypes";
+import { attrTypes } from "../functions/attrTypes.js";
+import { fmt } from "./fmt.js";
+import { getCatLabels } from "./getCatLabels.js";
+import { incrementDate } from "./incrementDate.js";
+import { scales } from "./scales.js";
+import { setAggs } from "./setAggs.js";
+import { setScale } from "./setScale.js";
+import { setTerms } from "./setTerms.js";
+import { valueTypes } from "./valueTypes.js";
 
 export const getCatsBy = async ({
   terms,

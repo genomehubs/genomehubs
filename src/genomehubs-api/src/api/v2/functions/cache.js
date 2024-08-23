@@ -1,7 +1,7 @@
-import { clearProgress } from "./progress";
-import { logMemcache } from "./logger";
+import { clearProgress } from "./progress.js";
+import { logMemcache } from "./logger.js";
 import qs from "qs";
-import { rd } from "./redisClient";
+import { rd } from "./redisClient.js";
 
 const fourDays = 4 * 24 * 60 * 60;
 const tenSeconds = 10 * 1000;

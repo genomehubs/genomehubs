@@ -1,8 +1,8 @@
-import { checkDocResponse } from "./checkDocResponse";
-import { client } from "./connection";
-import { indexName } from "./indexName";
-import { lookupAlternateIds } from "./lookupAlternateIds";
-import { processDoc } from "./processDoc";
+import { checkDocResponse } from "./checkDocResponse.js";
+import { client } from "./connection.js";
+import { indexName } from "./indexName.js";
+import { lookupAlternateIds } from "./lookupAlternateIds.js";
+import { processDoc } from "./processDoc.js";
 
 const convertIdsToDocIds = (recordId, result) => {
   /**

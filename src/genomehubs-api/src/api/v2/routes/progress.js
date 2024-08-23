@@ -1,10 +1,10 @@
-import { formatJson } from "../functions/formatJson";
-import { getProgress as getQueryProgress } from "../functions/progress";
-import { logError } from "../functions/logger";
+import { formatJson } from "../functions/formatJson.js";
+import { getProgress as getQueryProgress } from "../functions/progress.js";
+import { logError } from "../functions/logger.js";
 
 export const getProgress = async (req, res) => {
   try {
-    let queryId = req.query.queryId;
+    let { queryId } = req.query;
     let progress = getQueryProgress(queryId);
     let response;
     if (queryId) {

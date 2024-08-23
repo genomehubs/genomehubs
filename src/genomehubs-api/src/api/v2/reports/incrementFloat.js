@@ -1,4 +1,4 @@
-import { precision } from "./precision";
+import { precision } from "./precision.js";
 
 const incrementFloat = (val) => {
   let prec = precision(val);

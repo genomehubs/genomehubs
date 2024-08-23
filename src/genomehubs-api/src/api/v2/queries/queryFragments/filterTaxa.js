@@ -1,5 +1,5 @@
-import { limitDepth } from "./limitDepth";
-import { searchInLineage } from "./searchInLineage";
+import { limitDepth } from "./limitDepth.js";
+import { searchInLineage } from "./searchInLineage.js";
 
 export const filterTaxa = ({
   depth,

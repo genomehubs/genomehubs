@@ -1,14 +1,14 @@
-import { getProgress, setProgress } from "../functions/progress";
+import { getProgress, setProgress } from "../functions/progress.js";
 
-import { aInB } from "../functions/aInB";
-import { attrTypes } from "../functions/attrTypes";
-import { combineQueries } from "../functions/combineQueries";
-import { config } from "../functions/config";
-import { getBounds } from "./getBounds";
-import { getResults } from "../functions/getResults";
-import { parseFields } from "../functions/parseFields";
-import { queryParams } from "./queryParams";
-import { setExclusions } from "../functions/setExclusions";
+import { aInB } from "../functions/aInB.js";
+import { attrTypes } from "../functions/attrTypes.js";
+import { combineQueries } from "../functions/combineQueries.js";
+import { config } from "../functions/config.js";
+import { getBounds } from "./getBounds.js";
+import { getResults } from "../functions/getResults.js";
+import { parseFields } from "../functions/parseFields.js";
+import { queryParams } from "./queryParams.js";
+import { setExclusions } from "../functions/setExclusions.js";
 
 const valueTypes = {
   long: "integer",

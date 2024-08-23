@@ -1,6 +1,6 @@
-import { logMemcache } from "./logger";
+import { logMemcache } from "./logger.js";
 import qs from "qs";
-import { rd } from "./redisClient";
+import { rd } from "./redisClient.js";
 
 const fourDays = 4 * 24 * 60 * 60;
 

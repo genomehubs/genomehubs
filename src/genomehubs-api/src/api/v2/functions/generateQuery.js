@@ -1,9 +1,9 @@
-import { addCondition } from "./addCondition";
-import { attrTypes } from "./attrTypes";
-import { getRecordsByTaxon } from "./getRecordsByTaxon";
-import { getResults } from "../functions/getResults";
-import { parseFields } from "./parseFields";
-import { summaries } from "./summaries";
+import { addCondition } from "./addCondition.js";
+import { attrTypes } from "./attrTypes.js";
+import { getRecordsByTaxon } from "./getRecordsByTaxon.js";
+import { getResults } from "../functions/getResults.js";
+import { parseFields } from "./parseFields.js";
+import { summaries } from "./summaries.js";
 
 const fail = (error) => {
   return {

@@ -1,5 +1,5 @@
-import { client } from "../functions/connection";
-import { indexName } from "../functions/indexName";
+import { client } from "../functions/connection.js";
+import { indexName } from "../functions/indexName.js";
 
 const queryByName = ({ taxon, rank }) => {
   return {

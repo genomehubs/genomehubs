@@ -1,8 +1,9 @@
-import { checkResponse } from "./checkResponse";
-import { client } from "./connection";
+import { checkResponse } from "./checkResponse.js";
+import { client } from "./connection.js";
 import { config } from "./config.js";
 
 export const fetchIndices = async (release = config.release) => {
+  console.log(client);
   const { body } = await client.cat.indices({}, { meta: true }).catch((err) => {
     return err.meta;
   });

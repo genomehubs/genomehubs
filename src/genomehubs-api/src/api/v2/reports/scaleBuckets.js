@@ -1,5 +1,5 @@
-import { fmt } from "./fmt";
-import { scales } from "./scales";
+import { fmt } from "./fmt.js";
+import { scales } from "./scales.js";
 
 export const scaleBuckets = (buckets, scaleType = "Linear", bounds) => {
   if (scaleType == "date" || scaleType == "ordinal") {

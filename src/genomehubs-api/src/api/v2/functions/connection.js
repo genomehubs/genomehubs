@@ -1,5 +1,4 @@
-const { Client } = require("@elastic/elasticsearch");
-
+import { Client } from "@elastic/elasticsearch";
 import { config } from "./config.js";
 
 const client = new Client({

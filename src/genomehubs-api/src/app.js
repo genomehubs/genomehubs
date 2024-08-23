@@ -1,18 +1,27 @@
 import * as OpenApiValidator from "express-openapi-validator";
 
 import YAML from "yamljs";
-// import { cache } from "./api/v2/functions/cache";
+// import { cache } from "./api/v2/functions/cache.js";
 import compression from "compression";
 import { config } from "./api/v2/functions/config.js";
 import cookieParser from "cookie-parser";
+import cors from "cors";
+import esmResolver from "./api/v2/functions/esmResolver.js";
 import express from "express";
+import { fileURLToPath } from "url";
+import fs from "fs";
+import http from "http";
+import https from "https";
 import { logAccess } from "./api/v2/functions/logger.js";
 import { logError } from "./api/v2/functions/logger.js";
 import path from "path";
 import qs from "./api/v2/functions/qs.js";
 import swaggerUi from "swagger-ui-express";
 
-const port = config.port;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const { port } = config;
 const apiSpec = path.join(__dirname, "api-v2.yaml");
 
 let swaggerDocument = YAML.load(apiSpec);
@@ -40,7 +49,6 @@ const swaggerOptions = {
 const app = express();
 app.use(compression());
 if (config.cors) {
-  const cors = require("cors");
   app.use(cors(config.cors));
 }
 
@@ -103,7 +111,7 @@ app.use(
       removeAdditional: "failing",
     },
     validateResponses: true,
-    operationHandlers: path.join(__dirname),
+    operationHandlers: esmResolver(path.join(__dirname)),
   })
 );
 
@@ -117,8 +125,6 @@ app.use((err, req, res, next) => {
 });
 
 if (config.https) {
-  const https = require("https");
-  const fs = require("fs");
   const options = {
     key: fs.readFileSync(config.keyFile),
     cert: fs.readFileSync(config.certFile),
@@ -127,7 +133,6 @@ if (config.https) {
     console.log(`genomehubs-api started on https port ${port}`);
   });
 } else {
-  const http = require("http");
   const server = http.createServer(app).listen(port, () => {
     console.log(`genomehubs-api started on http port ${port}`);
   });
@@ -135,4 +140,4 @@ if (config.https) {
 
 export default app;
 
-module.exports = app;
+export { app };

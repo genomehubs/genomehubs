@@ -1,4 +1,4 @@
-import { attrTypes } from "../functions/attrTypes";
+import { attrTypes } from "../functions/attrTypes.js";
 import { scaleTime } from "d3-scale";
 
 export const scaleFuncs = {
