@@ -610,7 +610,7 @@ export const tree = async ({
   }
   optionalFields = [...new Set([...optionalFields])];
 
-  let treeThreshold = `${apiParams.treeThreshold}` || config.treeThreshold;
+  let treeThreshold = apiParams.treeThreshold || config.treeThreshold;
   if (treeThreshold < 0) {
     treeThreshold = 100000;
   }
