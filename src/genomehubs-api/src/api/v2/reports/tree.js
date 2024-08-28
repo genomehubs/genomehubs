@@ -59,7 +59,7 @@ const getLCA = async ({
       },
     },
   };
-  let query = params.query;
+  let { query } = params;
   let maxDepth;
   let taxon;
   if (query) {
@@ -135,13 +135,11 @@ const getLCA = async ({
           parent = ancestor.taxon_id;
           break;
         }
-      } else {
-        if (child) {
-          parent = ancestor.taxon_id;
-          break;
-        } else if (taxon_id == ancestor.taxon_id) {
-          child = taxon_id;
-        }
+      } else if (child) {
+        parent = ancestor.taxon_id;
+        break;
+      } else if (taxon_id == ancestor.taxon_id) {
+        child = taxon_id;
       }
     }
     // }
@@ -158,7 +156,9 @@ const getLCA = async ({
 };
 
 const chunkArray = (arr, chunkSize) => {
-  if (chunkSize <= 0) throw "Invalid chunk size";
+  if (chunkSize <= 0) {
+    throw "Invalid chunk size";
+  }
   let chunks = [];
   for (let i = 0, len = arr.length; i < len; i += chunkSize) {
     chunks.push(arr.slice(i, i + chunkSize));
@@ -253,7 +253,7 @@ const addXResultsToTree = async ({
   for (let result of xRes.results) {
     let taxonId = result.result.taxon_id;
     let child = taxonId;
-    let status = treeNodes[taxonId].status;
+    let { status } = treeNodes[taxonId];
     let descIds = [child];
     if (!isParentNode[taxonId]) {
       treeNodes[child].count = 1;
@@ -297,7 +297,7 @@ const addXResultsToTree = async ({
   }
   if (missingIds.size > 0) {
     let progress = getProgress(queryId);
-    let x = progress.x;
+    let { x } = progress;
     if (queryId) {
       setProgress(queryId, { total: progress.total + missingIds.size });
       progress = getProgress(queryId);
@@ -401,34 +401,30 @@ const getTree = async ({
       },
     };
   }
-  let maxDepth = lca.maxDepth;
+  let { maxDepth } = lca;
   let mapped = params.query.split(/\s+(?:AND|and)\s+/);
   // mapped.push("bioproject");
   let yMapped = yParams.query.split(/\s+(?:AND|and)\s+/);
   // TODO: include descendant values when include estimates is false and minDepth > tax_depth
   let match = params.query.match(/tax_depth\s*\((.+?)\)/);
-  if (match) {
-    if (match[1] > maxDepth) {
-      return {
-        lca,
-        status: {
-          success: false,
-          error: `tax_depth greater than tree depth\nConsider reducing to 'tax_depth(${maxDepth})'`,
-        },
-      };
-    }
+  if (match && match[1] > maxDepth) {
+    return {
+      lca,
+      status: {
+        success: false,
+        error: `tax_depth greater than tree depth\nConsider reducing to 'tax_depth(${maxDepth})'`,
+      },
+    };
   }
   let yMatch = params.query.match(/tax_depth\s*\((.+?)\)/);
-  if (yMatch) {
-    if (yMatch[1] > maxDepth) {
-      return {
-        lca,
-        status: {
-          success: false,
-          error: `tax_depth greater than tree depth\nConsider reducing to 'tax_depth(${maxDepth})'`,
-        },
-      };
-    }
+  if (yMatch && yMatch[1] > maxDepth) {
+    return {
+      lca,
+      status: {
+        success: false,
+        error: `tax_depth greater than tree depth\nConsider reducing to 'tax_depth(${maxDepth})'`,
+      },
+    };
   }
 
   // let res = await getResults({

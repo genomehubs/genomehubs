@@ -5,6 +5,7 @@ import {
   contrast as contrastStyle,
   first as firstStyle,
   last as lastStyle,
+  resultsTable as resultsTableStyle,
 } from "./Styles.scss";
 import { useLocation, useNavigate } from "@reach/router";
 
