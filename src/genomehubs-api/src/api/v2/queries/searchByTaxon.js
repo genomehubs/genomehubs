@@ -226,10 +226,12 @@ export const searchByTaxon = async ({
       names,
       ranks,
     });
-    valueCounts.fields.aggs = {
-      ...valueCounts.fields.aggs,
-      ...boundAggs,
-    };
+    if (valueCounts) {
+      valueCounts.fields.aggs = {
+        ...valueCounts.fields.aggs,
+        ...boundAggs,
+      };
+    }
     aggs = valueCounts;
   }
   let exclude = []; // includeRawValues ? [] : ["attributes.values*"];

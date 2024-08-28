@@ -80,7 +80,12 @@ const PhyloPics = ({
         </div>
       );
       return (
-        <Tooltip title={imageDescription} styleName="dark" interactive arrow>
+        <Tooltip
+          title={imageDescription}
+          styleName="dark"
+          interactive="true"
+          arrow
+        >
           <div className={blankStyle}></div>
         </Tooltip>
       );
@@ -137,7 +142,12 @@ const PhyloPics = ({
   return (
     <div className={imageContainerStyle}>
       <div>
-        <Tooltip title={imageDescription} styleName="dark" interactive arrow>
+        <Tooltip
+          title={imageDescription}
+          styleName="dark"
+          interactive="true"
+          arrow
+        >
           <div>
             {fileUrl && (
               <PhyloPic

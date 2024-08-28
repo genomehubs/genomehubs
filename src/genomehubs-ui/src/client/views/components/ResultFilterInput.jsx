@@ -89,7 +89,7 @@ const ResultFilterInput = ({
       );
     }
     return (
-      <Tooltip title={title} styleName="dark" interactive arrow>
+      <Tooltip title={title} styleName="dark" interactive="true" arrow>
         <span>{children}</span>
       </Tooltip>
     );

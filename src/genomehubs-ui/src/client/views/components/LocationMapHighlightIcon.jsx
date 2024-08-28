@@ -28,7 +28,7 @@ const LocationMapHighlightIcon = ({
         center={position}
         color={"#993404"}
         fillOpacity={0.5}
-        interactive={false}
+        interactive="true"
       />
     );
   }

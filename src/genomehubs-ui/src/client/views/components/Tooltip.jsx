@@ -7,7 +7,7 @@ import { useEventListener } from "../hooks/useEventListener";
 const useStyles = {
   default: makeStyles({
     tooltip: {
-      fontSize: "0.9rem",
+      fontSize: "1.2rem",
     },
   }),
   dark: makeStyles({
@@ -15,7 +15,7 @@ const useStyles = {
       color: "#464752ee",
     },
     tooltip: {
-      fontSize: "0.9rem",
+      fontSize: "1.2rem",
       // backgroundColor: "#31323fcc",
       backgroundColor: "#464752ee",
       "& a": {
