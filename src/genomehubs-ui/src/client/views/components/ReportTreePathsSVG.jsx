@@ -162,7 +162,7 @@ const ReportTreePaths = ({
             <g>
               {segment.label && (
                 <text
-                  {...longPress}
+                  {...longPress()}
                   fill={segment.color}
                   style={{ cursor: "pointer" }}
                   x={segment.xEnd}
