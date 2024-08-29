@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useRef, useState } from "react";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import ReportArc from "./ReportArc";
 import ReportCaption from "./ReportCaption";
 import ReportEmpty from "./ReportEmpty";

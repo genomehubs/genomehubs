@@ -1,9 +1,7 @@
 import React, { memo, useEffect, useState } from "react";
-import {
-  ThemeProvider,
-  createTheme,
-  makeStyles,
-} from "@material-ui/core/styles";
+//   createTheme,
+//   makeStyles,
+// } from "@material-ui/core/styles";
 import { app as appStyle, infoPanel as infoPanelStyle } from "./Styles.scss";
 
 import Head from "./Head";
@@ -11,8 +9,10 @@ import Layout from "./Layout";
 import LoadingScreen from "./LoadingScreen";
 import ReactErrorBoundary from "./ReactErrorBoundary";
 import StylesProvider from "@mui/styles/StylesProvider";
+import { ThemeProvider } from "@mui/styles";
 import classnames from "classnames";
 import { compose } from "recompose";
+import { createTheme } from "@mui/material/styles";
 import { withCookies } from "react-cookie";
 import withLoading from "../hocs/withLoading";
 import withTheme from "../hocs/withTheme";

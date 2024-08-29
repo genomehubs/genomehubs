@@ -43,32 +43,32 @@
       },
       "lodash"
     ],
-    [
-      "import",
-      {
-        "libraryName": "@material-ui/core",
-        "libraryDirectory": "components",
-        "camel2DashComponentName": false
-      },
-      "mui-core"
-    ],
-    [
-      "import",
-      {
-        "libraryName": "@material-ui/lab",
-        "libraryDirectory": "components",
-        "camel2DashComponentName": false
-      },
-      "mui-lab"
-    ],
-    [
-      "import",
-      {
-        "libraryName": "@material-ui/icons",
-        "libraryDirectory": "components",
-        "camel2DashComponentName": false
-      },
-      "mui-icons"
-    ]
+    // [
+    //   "import",
+    //   {
+    //     "libraryName": "@material-ui/core",
+    //     "libraryDirectory": "components",
+    //     "camel2DashComponentName": false
+    //   },
+    //   "mui-core"
+    // ],
+    // [
+    //   "import",
+    //   {
+    //     "libraryName": "@material-ui/lab",
+    //     "libraryDirectory": "components",
+    //     "camel2DashComponentName": false
+    //   },
+    //   "mui-lab"
+    // ],
+    // [
+    //   "import",
+    //   {
+    //     "libraryName": "@material-ui/icons",
+    //     "libraryDirectory": "components",
+    //     "camel2DashComponentName": false
+    //   },
+    //   "mui-icons"
+    // ]
   ]
 }
