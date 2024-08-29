@@ -8,8 +8,8 @@ import Skeleton from "@mui/material/Skeleton";
 import { TagCloud } from "react-tagcloud";
 import { compose } from "recompose";
 import qs from "../functions/qs";
+import { useIntersectionObserver } from "usehooks-ts";
 import { useNavigate } from "@reach/router";
-import useVisible from "../hooks/useVisible";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
@@ -33,8 +33,9 @@ const WordCloud = ({
 }) => {
   const navigate = useNavigate();
   const height = 100;
-  const targetRef = useRef();
-  let visible = useVisible(targetRef);
+  const { isIntersecting: visible, ref: targetRef } = useIntersectionObserver({
+    threshold: 0.01,
+  });
   let parts = summaryId.split("--");
   useEffect(() => {
     if (summaryId && visible) {

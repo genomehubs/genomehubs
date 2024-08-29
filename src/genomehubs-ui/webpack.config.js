@@ -25,7 +25,7 @@ const protocol = main.https ? "https" : "http";
 const config = {
   mode: devMode ? "development" : "production",
   entry: {
-    main: ["@babel/polyfill", APP_DIR + "/index.jsx"],
+    main: [APP_DIR + "/index.jsx"],
   },
   output: {
     publicPath:

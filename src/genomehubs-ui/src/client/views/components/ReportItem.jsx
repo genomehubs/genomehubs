@@ -21,9 +21,9 @@ import dispatchReport from "../hocs/dispatchReport";
 import { gridPropNames } from "../functions/propNames";
 import qs from "../functions/qs";
 import { reportHeading as reportHeadingStyle } from "./Styles.scss";
+import { useIntersectionObserver } from "usehooks-ts";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
-import useVisible from "../hooks/useVisible";
 import withReportById from "../hocs/withReportById";
 import withSiteName from "../hocs/withSiteName";
 
@@ -130,8 +130,9 @@ const ReportItem = ({
   });
   const navigate = useNavigate();
   const hideMessage = !inModal && !topLevel;
-  const targetRef = useRef();
-  let visible = useVisible(targetRef);
+  const { isIntersecting: visible, ref: targetRef } = useIntersectionObserver({
+    threshold: 0.01,
+  });
   const [minDim, basicSetMinDim] = useState(0);
   let setMinDim;
 
