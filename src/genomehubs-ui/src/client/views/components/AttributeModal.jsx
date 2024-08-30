@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import AttributePanel from "./AttributePanel";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import Paper from "@mui/material/Paper";
 import ResultColumnOptions from "./ResultColumnOptions";
 import { compose } from "recompose";
@@ -14,16 +14,16 @@ export const useStyles = makeStyles((theme) => ({
   paper: {
     width: "96%",
     minWidth: "600px",
-    padding: 16,
-    marginTop: 16,
+    padding: "16px",
+    marginTop: "16px",
     boxShadow: "none",
   },
   formControl: {
-    margin: 16,
-    minWidth: 120,
+    margin: "16px",
+    minWidth: "120px",
   },
   selectEmpty: {
-    marginTop: 16,
+    marginTop: "16px",
   },
   label: {
     color: "rgba(0, 0, 0, 0.54)",
@@ -73,11 +73,10 @@ const AttributeModal = ({
         }
       } else if (
         options.result == "feature" &&
-        (!record.record || recordId != record.record.feature_id)
+        (!record.record || recordId != record.record.feature_id) &&
+        !recordIsFetching
       ) {
-        if (!recordIsFetching) {
-          fetchRecord(recordId, "feature", taxonomy);
-        }
+        fetchRecord(recordId, "feature", taxonomy);
       }
     }
   }, [options, recordId]);

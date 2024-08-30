@@ -9,7 +9,7 @@ import {
 import { useLocation, useNavigate } from "@reach/router";
 
 import AssemblySummaryPanel from "./AssemblySummaryPanel";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import { NamesList } from "./NamesPanel";
 import classnames from "classnames";
 import { compose } from "recompose";
@@ -82,11 +82,11 @@ const AssemblyPanel = ({
 
         <div>
           <Grid container alignItems="center" direction="column" spacing={0}>
-            <Grid item xs={12} style={{ width: "100%" }}>
+            <Grid style={{ width: "100%" }}>
               <AssemblySummaryPanel assemblyId={assemblyId} />
             </Grid>
             <Grid container direction="row">
-              <Grid item xs={12} style={{ width: "100%" }}></Grid>
+              <Grid style={{ width: "100%" }} size={12}></Grid>
             </Grid>
           </Grid>
         </div>
@@ -99,9 +99,7 @@ const AssemblyPanel = ({
 
           <div>
             <Grid container alignItems="center" direction="column" spacing={0}>
-              <Grid item style={{ width: "100%" }}>
-                {namesDiv}
-              </Grid>
+              <Grid style={{ width: "100%" }}>{namesDiv}</Grid>
             </Grid>
           </div>
         </div>

@@ -8,7 +8,7 @@ import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import Paper from "@mui/material/Paper";
 import SearchIcon from "@mui/icons-material/Search";
 import Switch from "@mui/material/Switch";
@@ -32,16 +32,16 @@ export const useStyles = makeStyles((theme) => ({
   paper: {
     width: "100%",
     minWidth: "600px",
-    padding: 16,
-    marginTop: 16,
+    padding: "16px",
+    marginTop: "16px",
     boxShadow: "none",
   },
   formControl: {
-    margin: 16,
-    minWidth: 120,
+    margin: "16px",
+    minWidth: "120px",
   },
   selectEmpty: {
-    marginTop: 16,
+    marginTop: "16px",
   },
   label: {
     color: "rgba(0, 0, 0, 0.54)",
@@ -295,11 +295,11 @@ const QueryBuilder = ({
   filterOptions.push(
     <Grid container alignItems="center" direction="row" spacing={2} key={"new"}>
       {bool && (
-        <Grid item>
+        <Grid>
           <Typography>{bool}</Typography>
         </Grid>
       )}
-      <Grid item>
+      <Grid>
         <BasicSelect
           current={""}
           id={`new-variable-select`}
@@ -376,7 +376,7 @@ const QueryBuilder = ({
     <Paper className={classes.paper}>
       <Grid container alignItems="center" direction="column" spacing={2}>
         {/* <Grid container direction="row">
-          <Grid item>
+          <Grid>
             <BasicSelect
               current={index}
               id={"search-index-select"}
@@ -393,7 +393,7 @@ const QueryBuilder = ({
         </Grid> */}
         <Grid container alignItems="center" direction="row" spacing={2}>
           <Tooltip title="Taxon ID or scientific name" arrow placement={"top"}>
-            <Grid item xs={3}>
+            <Grid size={3}>
               {/* <BasicTextField
                 id={"taxon-filter-taxon"}
                 handleChange={handleTaxonFilterChange}
@@ -426,7 +426,7 @@ const QueryBuilder = ({
               arrow
               placement={"top"}
             >
-              <Grid item>
+              <Grid>
                 <FormControl variant="standard" className={classes.formControl}>
                   <FormControlLabel
                     className={classes.label}
@@ -451,7 +451,7 @@ const QueryBuilder = ({
             arrow
             placement={"top"}
           >
-            <Grid item>
+            <Grid>
               <BasicSelect
                 id={"taxon-filter-rank"}
                 handleChange={handleTaxonFilterChange}
@@ -470,7 +470,7 @@ const QueryBuilder = ({
             arrow
             placement={"top"}
           >
-            <Grid item>
+            <Grid>
               <FormControl variant="standard" className={classes.formControl}>
                 <FormControlLabel
                   className={classes.label}
@@ -494,7 +494,7 @@ const QueryBuilder = ({
             arrow
             placement={"top"}
           >
-            <Grid item>
+            <Grid>
               <BasicTextField
                 id={"taxon-filter-depth"}
                 handleChange={handleTaxonFilterChange}
@@ -506,7 +506,7 @@ const QueryBuilder = ({
         </Grid>
         {filterOptions}
         <Grid container alignItems="flex-end" direction="row">
-          <Grid item>
+          <Grid>
             <Button
               variant="contained"
               disableElevation

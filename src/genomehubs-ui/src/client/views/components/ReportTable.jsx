@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 
 import FlagIcon from "./FlagIcon";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -130,14 +130,14 @@ const TableReport = ({ report, chartProps }) => {
         alignItems="center"
         justifyContent="center"
       >
-        <Grid item>
+        <Grid>
           <Table size={"small"} className={autoWidthStyle}>
             <TableHead>{tableHeader}</TableHead>
             <TableBody>{tableRows}</TableBody>
           </Table>
         </Grid>
         {rows.length > 5 && (
-          <Grid item>
+          <Grid>
             <TablePagination
               rowsPerPageOptions={[5, 10, 25, 100]}
               component="div"
@@ -178,7 +178,7 @@ const ReportTable = ({
     content = TableReport({ report: table.report, chartProps });
 
     return (
-      <Grid item xs ref={componentRef} style={{ height: "100%" }}>
+      <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
         {content}
       </Grid>
     );

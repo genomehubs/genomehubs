@@ -1,4 +1,4 @@
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import React from "react";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
@@ -37,8 +37,6 @@ const AggregationIcon = ({ method, hasDescendants, statusColors = {} }) => {
           direction="column"
         >
           <Grid
-            item
-            xs={1}
             style={{
               backgroundColor: colors[method],
               minHeight: `${heights[method]}em`,

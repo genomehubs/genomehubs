@@ -30,8 +30,8 @@ const ReportTreeRings = ({
   const [dimensions, setDimensions] = useState({
     x: 0,
     y: 0,
-    height: 1000,
-    width: 1000,
+    height: "1000px",
+    width: "1000px",
   });
 
   const [highlight, setHighlight] = useState();
@@ -92,15 +92,15 @@ const ReportTreeRings = ({
           onPointerMove={(e) => setPosition({ x: e.clientX, y: e.clientY })}
           PopperProps={{
             anchorEl: {
-              clientHeight: 0,
-              clientWidth: 0,
+              clientHeight: "0px",
+              clientWidth: "0px",
               getBoundingClientRect: () => ({
                 top: position.y,
                 left: position.x,
                 right: position.x,
                 bottom: position.y + 10,
-                width: 0,
-                height: 10,
+                width: "0px",
+                height: "10px",
               }),
             },
           }}

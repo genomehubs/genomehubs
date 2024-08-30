@@ -204,8 +204,8 @@ const ReportTreePaths = ({
   const [treeDimensions, setTreeDimensions] = useState({
     x: 0,
     y: 0,
-    width: 0,
-    height: 0,
+    width: "0px",
+    height: "0px",
   });
   const getDimensions = (myRef) => {
     return treeDimensions;

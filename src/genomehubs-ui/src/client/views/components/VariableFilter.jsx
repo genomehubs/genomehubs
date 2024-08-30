@@ -4,7 +4,7 @@ import BasicSelect from "./BasicSelect";
 import BasicTextField from "./BasicTextField";
 import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import IconButton from "@mui/material/IconButton";
 import { MenuItem } from "@mui/material";
 import React from "react";
@@ -79,14 +79,14 @@ const VariableFilter = ({
     collate = true;
   }
   return (
-    <Grid container alignItems="center" direction="row" spacing={2}>
+    (<Grid container alignItems="center" direction="row" spacing={2}>
       {bool && (
-        <Grid item>
+        <Grid>
           <Typography>{bool}</Typography>
         </Grid>
       )}
       {field && handleSummaryChange && (
-        <Grid item>
+        <Grid>
           {(collate && (
             <BasicTextField
               id={`collate-value-input`}
@@ -106,7 +106,7 @@ const VariableFilter = ({
         </Grid>
       )}
       {(collate && <></>) || (
-        <Grid item>
+        <Grid>
           <BasicSelect
             current={field}
             id={`variable-${field}-select`}
@@ -117,7 +117,7 @@ const VariableFilter = ({
         </Grid>
       )}
       {(collate && <></>) || (
-        <Grid item>
+        <Grid>
           <BasicSelect
             current={operator}
             id={`variable-${field}-operator-select`}
@@ -127,7 +127,7 @@ const VariableFilter = ({
           />
         </Grid>
       )}
-      <Grid item xs={4}>
+      <Grid size={4}>
         {type == "keyword" && operator ? (
           <AutoCompleteInput
             id={`variable-${field}-value-input`}
@@ -149,7 +149,7 @@ const VariableFilter = ({
         )}
       </Grid>
       {handleDismiss && (
-        <Grid item style={{ marginLeft: "auto" }}>
+        <Grid style={{ marginLeft: "auto" }}>
           <IconButton
             aria-label="remove filter"
             size="small"
@@ -160,7 +160,7 @@ const VariableFilter = ({
         </Grid>
       )}
       {handleUpdate && (
-        <Grid item>
+        <Grid>
           <Button
             variant="contained"
             startIcon={<AutorenewIcon />}
@@ -170,7 +170,7 @@ const VariableFilter = ({
           </Button>
         </Grid>
       )}
-    </Grid>
+    </Grid>)
   );
 };
 

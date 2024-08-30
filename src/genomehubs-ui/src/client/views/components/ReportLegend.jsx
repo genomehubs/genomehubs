@@ -1,4 +1,4 @@
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import React from "react";
 import { compose } from "recompose";
 import withColors from "../hocs/withColors";
@@ -13,10 +13,10 @@ export const ReportLegend = ({ reportById, report, colors, levels }) => {
 
   const LegendEntry = ({ obj, color }) => {
     return (
-      <Grid item>
+      <Grid>
         <Grid container direction="row">
-          <Grid item xs={1}></Grid>
-          <Grid item xs={1}>
+          <Grid size={1}></Grid>
+          <Grid size={1}>
             <div
               style={{
                 height: "1.5em",
@@ -26,11 +26,9 @@ export const ReportLegend = ({ reportById, report, colors, levels }) => {
               }}
             />
           </Grid>
-          <Grid item>{obj.label}</Grid>
-          <Grid item style={{ marginLeft: "auto" }}>
-            {obj.doc_count}
-          </Grid>
-          <Grid item xs={1}></Grid>
+          <Grid>{obj.label}</Grid>
+          <Grid style={{ marginLeft: "auto" }}>{obj.doc_count}</Grid>
+          <Grid size={1}></Grid>
         </Grid>
       </Grid>
     );
@@ -61,7 +59,7 @@ export const ReportLegend = ({ reportById, report, colors, levels }) => {
 
       legend = (
         <Grid container direction="column" spacing={2}>
-          <Grid item>{cat}</Grid>
+          <Grid>{cat}</Grid>
           {cats
             .map((obj, i) => (
               <LegendEntry obj={obj} color={colors[i]} key={obj.key} />

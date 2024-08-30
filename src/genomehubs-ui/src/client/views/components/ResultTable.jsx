@@ -19,7 +19,7 @@ import DownloadButton from "./DownloadButton";
 import FiberManualRecordSharpIcon from "@mui/icons-material/FiberManualRecordSharp";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import GetAppIcon from "@mui/icons-material/GetApp";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import LinkButton from "./LinkButton";
@@ -75,7 +75,7 @@ const StyledBadge = withStyles((theme) => ({
     top: 6,
     fontSize: "0.8em",
     border: "2px solid white",
-    padding: "0 4px",
+    padding: "0px 4px",
     color: "white",
     backgroundColor: "rgba(0,0,0,0.26)",
   },
@@ -86,11 +86,11 @@ export const useStyles = makeStyles((theme) => ({
     maxWidth: "calc( 100% - 0.5em )",
     marginBottom: "1em",
     marginLeft: "0.5em",
-    minWidth: 750,
+    minWidth: "750px",
   },
   table: {
     maxWidth: "100%",
-    minWidth: 750,
+    minWidth: "750px",
   },
   ["PrivateSwitchBase-root-4"]: {
     padding: "3px",
@@ -98,13 +98,13 @@ export const useStyles = makeStyles((theme) => ({
   visuallyHidden: {
     border: 0,
     clip: "rect(0 0 0 0)",
-    height: 1,
+    height: "1px",
     margin: -1,
     overflow: "hidden",
-    padding: 0,
+    padding: "0px",
     position: "absolute",
     top: 20,
-    width: 1,
+    width: "1px",
   },
 }));
 
@@ -1109,7 +1109,7 @@ const ResultTable = ({
                   color={"default"}
                   max={100000}
                 >
-                  <span style={{ padding: "0 6px", color: "rgba(0,0,0,0" }}>
+                  <span style={{ padding: "0px 6px", color: "rgba(0,0,0,0" }}>
                     {badgeContent}
                   </span>
                 </StyledBadge>
@@ -1146,7 +1146,7 @@ const ResultTable = ({
                   }}
                 >
                   {field.aggregation_source && (
-                    <Grid item>
+                    <Grid>
                       <AggregationIcon
                         method={field.aggregation_source}
                         hasDescendants={field.has_descendants}
@@ -1155,7 +1155,6 @@ const ResultTable = ({
                   )}
 
                   <Grid
-                    item
                     style={{ whiteSpace: "nowrap", ...(color && { color }) }}
                   >
                     {value}
@@ -1571,7 +1570,7 @@ const ResultTable = ({
       spacing={1}
       className={classes.root}
     >
-      <Grid item className={classes.table}>
+      <Grid className={classes.table}>
         {/* {searchResults.isFetching ? (
           <Skeleton variant="rect" width={800} height={200} />
         ) : ( */}
@@ -1590,7 +1589,6 @@ const ResultTable = ({
       </Grid>
 
       {/* <Grid
-        item
         // style={{
         //   display: "flex",
         //   justifyContent: "flex-start",
@@ -1606,13 +1604,13 @@ const ResultTable = ({
         spacing={1}
         className={classes.root}
       >
-        <Grid item>
+        <Grid>
           <LinkButton options={["search", "searchurl"]} />
         </Grid>
-        <Grid item>
+        <Grid>
           <SearchPagination />
         </Grid>
-        <Grid item style={{ marginLeft: "auto" }}>
+        <Grid style={{ marginLeft: "auto" }}>
           <DownloadButton
             onButtonClick={saveSearchResults}
             searchTerm={searchTerm}

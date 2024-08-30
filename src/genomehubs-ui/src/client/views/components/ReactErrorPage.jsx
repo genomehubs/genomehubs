@@ -27,7 +27,6 @@ export const ReactErrorPage = ({
   return (
     <div className={"error-page"}>
       <header
-        item="true"
         xs={12}
         className={errorStyle}
         onClick={(e) => {

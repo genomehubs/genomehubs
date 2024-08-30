@@ -3,7 +3,7 @@ import * as htmlToImage from "html-to-image";
 import { Buffer } from "buffer";
 import DownloadButton from "./DownloadButton";
 import GetAppIcon from "@mui/icons-material/GetApp";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import JSZip from "jszip";
 import React from "react";
 import { compose } from "recompose";
@@ -300,7 +300,7 @@ export const ReportDownload = ({
       direction="column"
       style={{ height: "100%", width: "100%" }}
     >
-      <Grid item align="right" id="report-download-button">
+      <Grid align="right" id="report-download-button">
         {/* <GetAppIcon
           onClick={(e) => {
             if (code) {

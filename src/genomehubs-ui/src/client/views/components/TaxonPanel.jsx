@@ -6,7 +6,7 @@ import {
 } from "./Styles.scss";
 import { useLocation, useNavigate } from "@reach/router";
 
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import { LineageList } from "./LineagePanel";
 import LineageSummaryPanel from "./LineageSummaryPanel";
 import Tooltip from "./Tooltip";
@@ -103,17 +103,11 @@ const TaxonPanel = ({
 
       <div>
         <Grid container alignItems="center" direction="column" spacing={1}>
-          {/* <div className={flexRowStyle}>{fieldDivs}</div>
-        {additionalDivs.length > 0 && (
-          <div className={flexRowStyle}>{additionalDivs}</div>
-        )} */}
-          <Grid item style={{ width: "100%" }}>
-            {lineages}
-          </Grid>
+          <Grid style={{ width: "100%" }}>{lineages}</Grid>
           {taxidLink && (
             <>
               <Grid container direction="row" justifyContent="flex-end">
-                <Grid item>{taxidLink}</Grid>
+                <Grid>{taxidLink}</Grid>
               </Grid>
             </>
           )}

@@ -9,7 +9,7 @@ import {
 
 import BasicSelect from "./BasicSelect";
 import FeatureSummaryPanel from "./FeatureSummaryPanel";
-import { Grid } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import { Template } from "./Markdown";
 import classnames from "classnames";
 import { compose } from "recompose";
@@ -303,7 +303,7 @@ const FeaturePanel = ({
         }
       }
       templates = (
-        <Grid item xs={6}>
+        <Grid xs={6}>
           <Template
             id={templateId}
             valueA={"*"}
@@ -350,8 +350,8 @@ const FeaturePanel = ({
       <div>{svg}</div>
       <Grid container direction="column">
         <Grid container direction="row" spacing={1}>
-          <Grid item xs={1}></Grid>
-          <Grid item xs={2}>
+          <Grid size={1}></Grid>
+          <Grid size={2}>
             <BasicSelect
               id={"select-feature-template"}
               handleChange={handleUpdateTemplate}
@@ -360,11 +360,11 @@ const FeaturePanel = ({
               values={templateValues}
             />
           </Grid>
-          <Grid item style={{ flexGrow: "1" }}></Grid>
-          <Grid item>{browserLinks}</Grid>
+          <Grid style={{ flexGrow: "1" }}></Grid>
+          <Grid>{browserLinks}</Grid>
         </Grid>
         <Grid container direction="row" spacing={1}>
-          <Grid item xs={3}></Grid>
+          <Grid size={3}></Grid>
           {templates}
         </Grid>
       </Grid>

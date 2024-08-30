@@ -1,8 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import makeStyles from '@mui/styles/makeStyles';
-import withStyles from '@mui/styles/withStyles';
 
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import LaunchIcon from "@mui/icons-material/Launch";
 import NavLink from "./NavLink";
 import Table from "@mui/material/Table";
@@ -12,7 +10,9 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
+import makeStyles from '@mui/styles/makeStyles';
 import useResize from "../hooks/useResize";
+import withStyles from '@mui/styles/withStyles';
 import withTypes from "../hocs/withTypes";
 
 const StyledTableCell = withStyles((theme) => ({
@@ -169,7 +169,7 @@ const ReportSources = ({
     );
   });
   return (
-    <Grid id="sources" item xs style={{ maxHeight: minDim, overflowY: "auto" }}>
+    (<Grid id="sources" style={{ maxHeight: minDim, overflowY: "auto" }} size="grow">
       <Table stickyHeader size="small" ref={componentRef}>
         <TableHead>
           <TableRow>
@@ -180,7 +180,7 @@ const ReportSources = ({
         </TableHead>
         <TableBody>{rows}</TableBody>
       </Table>
-    </Grid>
+    </Grid>)
   );
 };
 

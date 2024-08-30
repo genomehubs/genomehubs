@@ -2,7 +2,7 @@ import CategoryIcon from "@mui/icons-material/Category";
 import EmojiNatureIcon from "@mui/icons-material/EmojiNature";
 import ExtensionIcon from "@mui/icons-material/Extension";
 import FunctionsIcon from "@mui/icons-material/Functions";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import LineStyleIcon from "@mui/icons-material/LineStyle";
 import LooksOneIcon from "@mui/icons-material/LooksOne";
 import PersonPinCircleIcon from "@mui/icons-material/PersonPinCircle";
@@ -87,7 +87,7 @@ export const AutoCompleteOption = ({ option }) => {
   }
 
   let item = (
-    <Grid item xs>
+    <Grid size="grow">
       <div>{primaryText}</div>
       <span style={{ float: "right" }}>
         <Typography variant="body2" color="textSecondary">
@@ -103,7 +103,7 @@ export const AutoCompleteOption = ({ option }) => {
 
   return (
     <Grid container alignItems="center">
-      <Grid item>{optionIcon}</Grid>
+      <Grid>{optionIcon}</Grid>
       {item}
     </Grid>
   );

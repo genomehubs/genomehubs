@@ -2,7 +2,7 @@ import React, { memo, useEffect, useState } from "react";
 
 import CookieBanner from "./CookieBanner";
 import Footer from "./Footer";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import Header from "./Header";
 import Main from "./Main";
 import ReportPage from "./ReportPage";
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     overflowX: "hidden",
   },
   item: {
-    minWidth: "100%",
+    minWidth: "100% !important",
     maxWidth: "100%",
   },
   footer: {
@@ -42,13 +42,13 @@ const DefaultLayout = ({}) => {
         spacing={0}
         direction="column"
       >
-        <Grid item className={classes.item} xs={1}>
+        <Grid className={classes.item}>
           <CookieBanner />
         </Grid>
-        <Grid item className={classes.item} xs={1} style={{ zIndex: 1000 }}>
-          <Header />
+        <Grid className={classes.item} style={{ zIndex: 1000 }}>
+          <Header id="header" />
         </Grid>
-        <Grid item className={classes.item} xs={true} id="mainContainer">
+        <Grid className={classes.item} id="mainContainer">
           {/* {types && Object.keys(types).length > 0 && ( */}
 
           <Main />
@@ -56,7 +56,7 @@ const DefaultLayout = ({}) => {
 
           {/* )} */}
         </Grid>
-        <Grid item className={classes.item} xs={1}>
+        <Grid className={classes.item}>
           <Footer />
         </Grid>
       </Grid>

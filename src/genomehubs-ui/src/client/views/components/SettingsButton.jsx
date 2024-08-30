@@ -13,7 +13,7 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import withStyles from "@mui/styles/withStyles";
 
 // const SettingsButton =()=>{
-//   return <Grid item>
+//   return <Grid>
 //     <Button
 //       variant="contained"
 //       color="default"
@@ -25,7 +25,7 @@ import withStyles from "@mui/styles/withStyles";
 //       Update
 //     </Button>
 //   </Grid>
-//   <Grid item>
+//   <Grid>
 //     <Button
 //       variant="contained"
 //       color="default"

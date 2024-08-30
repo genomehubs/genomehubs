@@ -16,7 +16,7 @@ import withSiteName from "../hocs/withSiteName";
 
 const useStyles = makeStyles((theme) => ({
   typography: {
-    padding: 8,
+    padding: "8px",
   },
 }));
 

@@ -45,7 +45,7 @@ const BasicMenu = ({
       <List
         component="nav"
         aria-label={helperText}
-        style={{ paddingTop: 0, paddingBottom: 0 }}
+        style={{ paddingTop: "0px", paddingBottom: "0px" }}
       >
         <ListItem
           button
@@ -53,12 +53,12 @@ const BasicMenu = ({
           aria-controls={id}
           aria-label={label}
           onClick={handleClickListItem}
-          style={{ paddingTop: 0, paddingBottom: 0 }}
+          style={{ paddingTop: "0px", paddingBottom: "0px" }}
         >
           <ListItemText
             primary={label}
             secondary={options[selectedIndex]}
-            style={{ paddingTop: 0, paddingBottom: 0 }}
+            style={{ paddingTop: "0px", paddingBottom: "0px" }}
           />
         </ListItem>
       </List>
@@ -96,8 +96,8 @@ export default BasicMenu;
 
 // const useStyles = makeStyles((theme) => ({
 //   formControl: {
-//     margin: 16,
-//     minWidth: 120,
+//     margin: "16px",
+//     minWidth: "120px",
 //   },
 // }));
 

@@ -5,7 +5,7 @@ import formats, { setInterval } from "../functions/formats";
 import stringLength, { maxStringLength } from "../functions/stringLength";
 
 import CellInfo from "./CellInfo";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
@@ -607,9 +607,9 @@ const ReportHistogram = ({
     );
 
     return (
-      <Grid item xs ref={componentRef} style={{ height: "100%" }}>
+      (<Grid ref={componentRef} style={{ height: "100%" }} size="grow">
         {chart}
-      </Grid>
+      </Grid>)
     );
   } else {
     return null;

@@ -25,7 +25,7 @@ import Count from "./Count";
 import Divider from "@mui/material/Divider";
 import EnumSelect from "./EnumSelect";
 import FlagIcon from "./FlagIcon";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import Highlight from "./Highlight";
 import Logo from "./Logo";
 import NavLink from "./NavLink";
@@ -189,7 +189,7 @@ export const Template = ({
       />
     );
     inputs.push(
-      <Grid item xs={12} key={match}>
+      <Grid key={match} size={12}>
         <Tooltip title={description} arrow>
           {input}
         </Tooltip>
@@ -205,13 +205,13 @@ export const Template = ({
     let reportProps = qs.parse(decodeURI(searchUrl.split(/[\?#]/)[1]));
     if (reportProps.report) {
       preview = (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Report {...reportProps} caption={" "}></Report>
         </Grid>
       );
     } else {
       preview = (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <ResultCount {...reportProps} caption={" "}></ResultCount>
         </Grid>
       );
@@ -219,7 +219,7 @@ export const Template = ({
   }
   return (
     <Grid container direction="column" spacing={1}>
-      <Grid item xs={12}>
+      <Grid>
         <h2>{title}</h2>
         {description}
       </Grid>
@@ -227,7 +227,7 @@ export const Template = ({
       {inputs}
       <Grid container direction="row" spacing={1} justifyContent="flex-end">
         {toggleFunction && (
-          <Grid item key={"toggle"}>
+          <Grid key={"toggle"}>
             <Button
               variant="contained"
               disableElevation
@@ -241,7 +241,7 @@ export const Template = ({
             </Button>
           </Grid>
         )}
-        <Grid item key={"preview"}>
+        <Grid key={"preview"}>
           <Button
             variant="contained"
             disableElevation
@@ -254,7 +254,7 @@ export const Template = ({
             {showPreview ? "Hide Preview" : "Preview"}
           </Button>
         </Grid>
-        <Grid item key={"submit"}>
+        <Grid key={"submit"}>
           <Button
             variant="contained"
             disableElevation
@@ -316,8 +316,8 @@ export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
           `${basename}/static/${webpackHash}/`
         );
       }
-    } else if (key == "xs") {
-      newProps["xs"] = value * 1;
+    } else if (key == "xs" || key == "size") {
+      newProps["size"] = value * 1;
     } else if (key == "spacing") {
       newProps["spacing"] = value * 1;
     } else if (key != "pageId") {
@@ -394,7 +394,7 @@ export const RehypeComponentsList = (extra) => {
       }
 
       return (
-        <Grid {...processProps({ props, isGrid: true })} item className={css}>
+        <Grid {...processProps({ props, isGrid: true })} className={css}>
           {nested}
         </Grid>
       );
@@ -402,7 +402,6 @@ export const RehypeComponentsList = (extra) => {
     item: (props) => (
       <Grid
         {...processProps({ props, isGrid: true })}
-        item
         className={reportContainerStyle}
       />
     ),
@@ -427,7 +426,7 @@ export const RehypeComponentsList = (extra) => {
           );
         } else if (className == "language-template") {
           return (
-            <Grid {...processProps({ props: nestedProps, isGrid: true })} item>
+            <Grid {...processProps({ props: nestedProps, isGrid: true })}>
               <Template
                 {...processProps({ props: { ...nestedProps, ...extra } })}
               />

@@ -14,7 +14,7 @@ import withSearch from "../hocs/withSearch";
 const useStyles = makeStyles((theme) => ({
   root: {
     "& > *": {
-      marginTop: 16,
+      marginTop: "16px",
     },
   },
 }));

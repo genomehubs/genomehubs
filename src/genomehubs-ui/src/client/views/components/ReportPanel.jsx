@@ -7,7 +7,7 @@ import {
 import { useLocation, useNavigate } from "@reach/router";
 
 import Chip from "@mui/material/Chip";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import ReportFull from "./ReportFull";
 import classnames from "classnames";
 import { compose } from "recompose";
@@ -83,7 +83,6 @@ const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {
           .map(([key, obj]) => {
             return (
               <Grid
-                item
                 style={{ cursor: "pointer" }}
                 onClick={() => setReport(key)}
                 key={key}

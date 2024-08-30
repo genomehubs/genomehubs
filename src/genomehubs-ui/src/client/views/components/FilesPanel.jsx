@@ -8,7 +8,7 @@ import {
 } from "./Styles.scss";
 
 import GetAppIcon from "@mui/icons-material/GetApp";
-import { Grid } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import React from "react";
 import RecordLink from "./RecordLink";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -71,26 +71,22 @@ const FilesPanel = ({ files, types, record, taxonId, title = "Files" }) => {
         if (runDivs.length) {
           valueDivs.push(
             <Grid container key={run} direction="row">
-              <Grid item xs={2}>
+              <Grid size={2}>
                 <span className={filesTitleStyle}>{run}</span>
               </Grid>
-              <Grid item xs={10}>
-                {runDivs}
-              </Grid>
+              <Grid size={10}>{runDivs}</Grid>
             </Grid>
           );
         }
       }
       if (valueDivs.length) {
         linkDivs.push(
-          <Grid key={value} item xs={12}>
+          <Grid key={value}>
             <Grid container direction="row">
-              <Grid item xs={1}>
+              <Grid size={1}>
                 <span className={filesTitleStyle}>{value}</span>
               </Grid>
-              <Grid item xs={11}>
-                {valueDivs}
-              </Grid>
+              <Grid size={11}>{valueDivs}</Grid>
             </Grid>
           </Grid>
         );

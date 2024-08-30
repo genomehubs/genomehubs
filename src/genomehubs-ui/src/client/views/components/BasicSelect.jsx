@@ -9,8 +9,8 @@ import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
-    margin: 16,
-    minWidth: 120,
+    margin: "16px",
+    minWidth: "120px",
   },
 }));
 
@@ -48,7 +48,7 @@ const BasicSelect = ({
       .sort((a, b) => a.localeCompare(b))
       .forEach((key) => {
         options.push(
-          <MenuItem value={values[key]} style={{ paddingTop: 0 }} key={key}>
+          <MenuItem value={values[key]} style={{ paddingTop: "0px" }} key={key}>
             {values[key]} {key != values[key] && ` — ${key}`}
           </MenuItem>
         );
@@ -69,7 +69,8 @@ const BasicSelect = ({
         onBlur={handleBlur}
         onChange={handleChange}
         label={label}
-        inputProps={{ "aria-label": label ? label : helperText }}>
+        inputProps={{ "aria-label": label ? label : helperText }}
+      >
         {options}
       </Select>
       {helperText && <FormHelperText>{helperText}</FormHelperText>}

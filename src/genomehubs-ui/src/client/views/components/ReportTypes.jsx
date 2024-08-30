@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import makeStyles from '@mui/styles/makeStyles';
-import withStyles from '@mui/styles/withStyles';
 
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import HeightIcon from "@mui/icons-material/Height";
 import IconButton from "@mui/material/IconButton";
 import LaunchIcon from "@mui/icons-material/Launch";
@@ -16,6 +14,8 @@ import Tooltip from "./Tooltip";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 import VerticalAlignTopIcon from "@mui/icons-material/VerticalAlignTop";
 import { compose } from "recompose";
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
 
 export const useStyles = makeStyles(() => ({
   upIcon: {
@@ -296,7 +296,7 @@ const ReportTypes = ({ minDim, types }) => {
     );
   }
   return (
-    <Grid item xs style={{ maxHeight: minDim, overflowY: "auto" }}>
+    (<Grid style={{ maxHeight: minDim, overflowY: "auto" }} size="grow">
       <Table stickyHeader size="small">
         <TableHead>
           <TableRow>
@@ -308,7 +308,7 @@ const ReportTypes = ({ minDim, types }) => {
         </TableHead>
         <TableBody>{rows}</TableBody>
       </Table>
-    </Grid>
+    </Grid>)
   );
 };
 

@@ -6,8 +6,8 @@ import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
-    margin: 16,
-    minWidth: 120,
+    margin: "16px",
+    minWidth: "120px",
   },
 }));
 const BasicTextField = ({
@@ -31,7 +31,8 @@ const BasicTextField = ({
         label={label}
         value={value || ""}
         onBlur={handleBlur}
-        onChange={handleChange} />
+        onChange={handleChange}
+      />
       {helperText && <FormHelperText>{helperText}</FormHelperText>}
     </FormControl>
   );

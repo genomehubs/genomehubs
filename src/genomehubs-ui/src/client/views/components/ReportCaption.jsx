@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import Tooltip from "./Tooltip";
 import { reportCaption as reportCaptionStyle } from "./Styles.scss";
 import stringLength from "../functions/stringLength";
@@ -69,7 +69,7 @@ const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
   }
 
   return (
-    <Grid ref={gridRef} item xs style={{ textAlign: "center" }}>
+    (<Grid ref={gridRef} style={{ textAlign: "center" }} size="grow">
       <div
         className={reportCaptionStyle}
         style={{
@@ -82,7 +82,7 @@ const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
       >
         {displayCaption}
       </div>
-    </Grid>
+    </Grid>)
   );
 };
 

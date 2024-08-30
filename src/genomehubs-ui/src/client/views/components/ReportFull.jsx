@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import Report from "./Report";
 import ReportTools from "./ReportTools";
 import classnames from "classnames";
@@ -130,11 +130,10 @@ export const ReportFull = ({
         ref={gridRef}
       >
         <Grid
-          item
-          xs={12}
           align="center"
           ref={containerRef}
           style={{ width: "100%", height: "100%" }}
+          size={12}
         >
           {reportComponent}
         </Grid>
@@ -155,19 +154,17 @@ export const ReportFull = ({
         className={classnames(classes.paper, markdownStyle)}
         ref={gridRef}
       >
-        <Grid item xs={1} />
+        <Grid size={1} />
         <Grid
-          item
-          // xs={edit || query || info || download ? 5 : 10}
-          xs={10}
           align="center"
           ref={containerRef}
-          style={{ width: "100%", height: "100%" }}
+          style={{ height: "100%" }}
+          size={10}
         >
           {reportComponent}
         </Grid>
 
-        <Grid item xs={1}>
+        <Grid size={1}>
           <ReportTools
             queryString={queryString}
             reportId={reportId}

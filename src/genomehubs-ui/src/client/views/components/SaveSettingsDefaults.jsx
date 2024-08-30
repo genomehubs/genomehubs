@@ -74,7 +74,7 @@ const SaveSettingsDefaults = ({
 
   const DialogContent = withStyles((theme) => ({
     root: {
-      padding: 16,
+      padding: "16px",
     },
   }))(MuiDialogContent);
 

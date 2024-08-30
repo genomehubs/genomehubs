@@ -19,7 +19,7 @@
         "lodash": {
           "transform": "lodash/${member}",
           "preventFullImport": true
-        },
+        }
         // "@material-ui/core": {
         //   "transform": "@material-ui/core/esm/${member}",
         //   "preventFullImport": true
@@ -42,7 +42,7 @@
         "camel2DashComponentName": false
       },
       "lodash"
-    ],
+    ]
     // [
     //   "import",
     //   {

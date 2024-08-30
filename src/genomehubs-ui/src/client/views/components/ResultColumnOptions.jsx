@@ -6,7 +6,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import Checkbox from "@mui/material/Checkbox";
 import Chip from "@mui/material/Chip";
 import FormControl from "@mui/material/FormControl";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import InputLabel from "@mui/material/InputLabel";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ListItemText from "@mui/material/ListItemText";
@@ -30,8 +30,8 @@ const useStyles = makeStyles((theme) => ({
     width: "95%",
     minWidth: "600px",
     minHeight: "200px",
-    padding: 8,
-    marginTop: 8,
+    padding: "8px",
+    marginTop: "8px",
     border: "none",
     boxShadow: "none",
     overflowX: "hidden",
@@ -40,30 +40,30 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
   },
   selectEmpty: {
-    marginTop: 16,
+    marginTop: "16px",
   },
   redBackground: {
     backgroundColor: "#C00",
-    padding: 10,
+    padding: "10px",
   },
   whiteBackground: {
     backgroundColor: "#FFF",
   },
   formControl: {
-    margin: 8,
-    minWidth: 240,
-    maxWidth: 480,
+    margin: "8px",
+    minWidth: "240px",
+    maxWidth: "480px",
   },
   chips: {
     display: "flex",
     flexWrap: "wrap",
   },
   chip: {
-    margin: 2,
+    margin: "2px",
     backgroundColor: "#FFF",
   },
   noLabel: {
-    marginTop: 24,
+    marginTop: "24px",
   },
 }));
 
@@ -242,7 +242,8 @@ const ResultColumnOptions = ({
                 />
               ))}
             </div>
-          )}>
+          )}
+        >
           {summaryTypes.map((summary) => (
             <MenuItem key={summary} value={summary}>
               <Checkbox
@@ -271,7 +272,7 @@ const ResultColumnOptions = ({
     <Paper className={classes.paper}>
       <Grid container alignItems="center" direction="column" spacing={2}>
         <Grid container direction="row">
-          <Grid item>{form}</Grid>
+          <Grid>{form}</Grid>
         </Grid>
         <Grid container alignItems="flex-end" direction="row" spacing={2}>
           <SettingsButton

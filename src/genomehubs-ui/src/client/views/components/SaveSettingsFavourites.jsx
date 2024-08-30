@@ -32,11 +32,11 @@ export const useStyles = makeStyles((theme) => ({
     boxShadow: "none",
   },
   formControl: {
-    margin: 16,
-    minWidth: 120,
+    margin: "16px",
+    minWidth: "120px",
   },
   selectEmpty: {
-    marginTop: 16,
+    marginTop: "16px",
   },
   label: {
     color: "rgba(0, 0, 0, 0.54)",
@@ -64,7 +64,7 @@ const SaveSettingsFavourites = ({
 
   const DialogContent = withStyles((theme) => ({
     root: {
-      padding: 16,
+      padding: "16px",
     },
   }))(MuiDialogContent);
 

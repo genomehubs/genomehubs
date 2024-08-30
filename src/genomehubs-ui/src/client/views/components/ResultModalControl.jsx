@@ -9,12 +9,12 @@ import withRecord from "../hocs/withRecord";
 export const useStyles = makeStyles((theme) => ({
   modal: {
     display: "flex",
-    padding: 8,
+    padding: "8px",
     alignItems: "center",
     justifyContent: "center",
   },
   paper: {
-    width: 400,
+    width: "400px",
     maxWidth: "75vw",
     maxHeight: "75vh",
     backgroundColor: "white",

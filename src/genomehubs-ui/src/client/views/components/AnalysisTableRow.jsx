@@ -1,7 +1,7 @@
 import React, { Fragment, memo, useEffect, useState } from "react";
 
 import FileTable from "./FileTable";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -121,10 +121,10 @@ const AnalysisTableRow = ({
       if (open) {
         return (
           <Grid container direction="column" key={"grid"}>
-            <Grid item>
+            <Grid>
               {list.length} {plural[result]} {icon}
             </Grid>
-            <Grid item>{list.map((entryId) => entrySpan(entryId))}</Grid>
+            <Grid>{list.map((entryId) => entrySpan(entryId))}</Grid>
           </Grid>
         );
       } else if (Array.isArray(list)) {

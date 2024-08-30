@@ -1,8 +1,8 @@
 // import { RadialChart } from "react-vis";
 import React, { Fragment, useRef } from "react";
 
-import Grid from "@mui/material/Grid";
-import Skeleton from '@mui/material/Skeleton';
+import Grid from "@mui/material/Grid2";
+import Skeleton from "@mui/material/Skeleton";
 import { useEffect } from "react";
 import useResize from "../hooks/useResize";
 
@@ -16,7 +16,7 @@ const ReportLoading = ({
   loading,
   content,
 }) => {
-  const componentRef = chartRef ? chartRef : useRef();
+  const componentRef = chartRef || useRef();
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
@@ -32,9 +32,7 @@ const ReportLoading = ({
     }
   }, [width, height]);
   return (
-    <Grid
-      item
-      xs
+    (<Grid
       style={{
         height: "100%",
         width: "100%",
@@ -43,6 +41,7 @@ const ReportLoading = ({
         position: "relative",
       }}
       ref={componentRef}
+      size="grow"
     >
       <div
         style={{
@@ -55,7 +54,11 @@ const ReportLoading = ({
         }}
       >
         {loading && (
-          <Skeleton variant="rectangular" width={minDim * ratio} height={minDim} />
+          <Skeleton
+            variant="rectangular"
+            width={minDim * ratio}
+            height={minDim}
+          />
         )}
       </div>
       <div
@@ -70,7 +73,7 @@ const ReportLoading = ({
       >
         {content}
       </div>
-    </Grid>
+    </Grid>)
   );
 };
 

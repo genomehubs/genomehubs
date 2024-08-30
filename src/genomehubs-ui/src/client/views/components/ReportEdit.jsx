@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import InputAdornment from "@mui/material/InputAdornment";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -21,7 +21,7 @@ import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
 import { getSuggestedTerm } from "../reducers/search";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import withReportById from "../hocs/withReportById";
 import withSiteName from "../hocs/withSiteName";
@@ -435,7 +435,7 @@ export const ReportEdit = ({
       });
       input = (
         <Grid container direction="row" alignItems="flex-end">
-          <Grid item xs={6}>
+          <Grid size={6}>
             <FormControl variant="standard" style={{ width: "95%" }}>
               <InputLabel id="select-report-label">report</InputLabel>
               <Select
@@ -444,12 +444,13 @@ export const ReportEdit = ({
                 id="select-report"
                 value={values["report"]}
                 style={{ width: "95%" }}
-                onChange={(e) => handleChange(e, "report")}>
+                onChange={(e) => handleChange(e, "report")}
+              >
                 {items}
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6} align={"right"} key={"submit"}>
+          <Grid align={"right"} key={"submit"} size={6}>
             <SettingsButton
               handleClick={handleSubmit}
               handleResetClick={handleReset}
@@ -474,7 +475,8 @@ export const ReportEdit = ({
             id="select-tree-style"
             value={values["treeStyle"]}
             style={{ width: "95%" }}
-            onChange={(e) => handleChange(e, "treeStyle")}>
+            onChange={(e) => handleChange(e, "treeStyle")}
+          >
             {items}
           </Select>
         </FormControl>
@@ -496,7 +498,8 @@ export const ReportEdit = ({
             id="select-plot-ratio"
             value={values["plotRatio"]}
             style={{ width: "95%" }}
-            onChange={(e) => handleChange(e, "plotRatio")}>
+            onChange={(e) => handleChange(e, "plotRatio")}
+          >
             {items}
           </Select>
         </FormControl>
@@ -647,14 +650,14 @@ export const ReportEdit = ({
             error={required && !values[queryProp]}
             style={{ width: "95%" }}
             onChange={(e) => handleChange(e, queryProp)}
-            onKeyPress={handleKeyPress} />
+            onKeyPress={handleKeyPress}
+          />
         );
       }
     }
     if (input) {
       fields.push(
         <Grid
-          item
           style={{ width: "95%" }}
           key={`input-${queryProp}`}
           justifyContent="flex-end"
@@ -662,11 +665,9 @@ export const ReportEdit = ({
           container
           direction="row"
         >
-          <Grid item xs={icon ? 11 : 12}>
-            {input}
-          </Grid>
+          <Grid size={icon ? 11 : 12}>{input}</Grid>
           {icon && (
-            <Grid item xs={1} style={{ color: "#777c78" }}>
+            <Grid style={{ color: "#777c78" }} size={1}>
               {icon}
             </Grid>
           )}
@@ -676,13 +677,13 @@ export const ReportEdit = ({
   }
   if (toggles.length > 0) {
     fields.push(
-      <Grid item align="left" key={"toggles"}>
+      <Grid align="left" key={"toggles"}>
         {toggles}
       </Grid>
     );
   }
   fields.push(
-    <Grid item align="right" key={"submit"}>
+    <Grid align="right" key={"submit"}>
       <div>&nbsp;</div>
       <SettingsButton
         handleClick={handleSubmit}
@@ -691,11 +692,6 @@ export const ReportEdit = ({
     </Grid>
   );
   return (
-    // <Grid
-    //   container
-    //   direction="column"
-    //   style={{ height: "100%", width: "100%" }}
-    // >
     <Box
       style={{
         height: "100%",
@@ -706,7 +702,6 @@ export const ReportEdit = ({
     >
       <form ref={formRef}>{fields}</form>
     </Box>
-    // </Grid>
   );
 };
 

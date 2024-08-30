@@ -25,7 +25,7 @@ import {
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import HistogramSVG from "./HistogramSVG";
 import React from "react";
 import TaxonSummaryPanel from "./TaxonSummaryPanel";
@@ -88,7 +88,7 @@ const AttributeSummary = ({
   }
   let summary = (
     <Tooltip key={field.id} title={"Click to view summary plot"} arrow>
-      <Grid item>
+      <Grid>
         <div
           key={field.id}
           className={classnames(fieldStyle, highlight[0])}
@@ -106,14 +106,14 @@ const AttributeSummary = ({
               spacing={1}
               alignItems={"center"}
             >
-              <Grid item>
+              <Grid>
                 <AggregationIcon
                   method={field.aggregation_source}
                   hasDescendants={field.has_descendants}
                 />
               </Grid>
 
-              <Grid item>{value}</Grid>
+              <Grid>{value}</Grid>
             </Grid>
           </div>
           <div className={fieldCountStyle}>{details}</div>
@@ -205,7 +205,7 @@ const ResultPanel = ({
       }
     });
     taxonSummary = (
-      <Grid item xs={12}>
+      <Grid size={12}>
         <TaxonSummaryPanel taxonId={taxon_id} />
       </Grid>
     );

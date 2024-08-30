@@ -7,7 +7,7 @@ import {
   resultPanel as resultPanelStyle,
 } from "./Styles.scss";
 
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import React from "react";
 import Skeleton from "@mui/material/Skeleton";
 import classnames from "classnames";
@@ -35,11 +35,11 @@ const SearchSummary = ({ searchTerm, searchResults }) => {
     <div className={css}>
       <Grid container alignItems="center">
         {searchResults.isFetching ? (
-          <Grid item style={{ minWidth: "150px" }}>
+          <Grid style={{ minWidth: "150px" }}>
             <Skeleton variant="text" />
           </Grid>
         ) : (
-          <Grid item>
+          <Grid>
             {count} result{count >= 1 ? (count == 1 ? ":" : "s:") : "s"}
           </Grid>
         )}

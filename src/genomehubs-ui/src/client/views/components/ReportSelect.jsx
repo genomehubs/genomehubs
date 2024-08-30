@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import { compose } from "recompose";
@@ -15,7 +15,7 @@ export const ReportSelect = ({ reportSelect, setReportSelect }) => {
   };
 
   let options = (
-    <Grid item style={{ width: "100%" }}>
+    <Grid style={{ width: "100%" }}>
       <FormControl variant="standard" component="fieldset">
         <FormLabel component="legend">Select Mode</FormLabel>
         <RadioGroup
@@ -48,9 +48,7 @@ export const ReportSelect = ({ reportSelect, setReportSelect }) => {
       style={{ height: "100%", width: "100%" }}
       spacing={2}
     >
-      <Grid item style={{ width: "100%" }}>
-        Update selection settings:
-      </Grid>
+      <Grid style={{ width: "100%" }}>Update selection settings:</Grid>
       {options}
     </Grid>
   );

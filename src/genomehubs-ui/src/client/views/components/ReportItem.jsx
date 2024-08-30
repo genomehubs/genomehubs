@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useRef, useState } from "react";
 
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import ReportArc from "./ReportArc";
 import ReportCaption from "./ReportCaption";
 import ReportEmpty from "./ReportEmpty";
@@ -152,6 +152,7 @@ const ReportItem = ({
     // } else {
     //   minDim /= ratio;
     // }
+    console.log({ width, height });
     setMinDim = (value) => {
       // if (!minDim || height > minDim) {
       basicSetMinDim(value);
@@ -542,13 +543,11 @@ const ReportItem = ({
       }}
     >
       {!loading && !error && heading && (inModal || topLevel) && (
-        <Grid item xs>
+        <Grid>
           <span className={reportHeadingStyle}>{heading}</span>
         </Grid>
       )}
       <Grid
-        item
-        xs
         style={{
           width: "100%",
           // background: "rgba(240,240,240,0.5)",
@@ -597,20 +596,12 @@ const ReportItem = ({
       </ReportWrapper>
     );
   }
-  // if (reportById.report) {
-  //   content = (
-  //     <Grid container direction="column" width="100%">
-  //       <Grid item>{content}</Grid>
-  //       <Grid item style={{ textAlign: "left" }}>
-  //         {reportById.report.caption}
-  //       </Grid>
-  //     </Grid>
-  //   );
-  // }
+
   let adjustRatio = 1;
   if (fixedRatio && fixedRatio != ratio) {
     adjustRatio = fixedRatio;
   }
+  console.log(minDim);
   return (
     <Grid
       ref={targetRef}

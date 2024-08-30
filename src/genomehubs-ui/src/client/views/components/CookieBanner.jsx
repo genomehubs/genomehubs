@@ -3,7 +3,7 @@ import { useCookies, withCookies } from "react-cookie";
 
 import { Button } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import IconButton from "@mui/material/IconButton";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
@@ -137,9 +137,9 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
       style={{ ...modalStyle, height, width }}
       className={classes.paper}
     >
-      <Grid item xs style={{ width: previewDimensions.width }}>
+      <Grid style={{ width: previewDimensions.width }}>
         <Grid container direction="row" justifyContent="flex-start">
-          <Grid item xs={true}>
+          <Grid size="grow">
             <Typography
               id="file-modal-title"
               variant="h5"
@@ -149,11 +149,11 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
               Testing
             </Typography>
           </Grid>
-          <Grid item xs={1} style={{ textAlign: "end" }}>
+          <Grid style={{ textAlign: "end" }} size={1}>
             <IconButton
               aria-label="close-modal"
               color="default"
-              style={{ padding: 0 }}
+              style={{ padding: "0px" }}
               onClick={handleClose}
               size="large"
             >
@@ -162,7 +162,7 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid item xs align="center">
+      <Grid align="center">
         {modalContent({
           meta,
           apiUrl,
@@ -173,11 +173,7 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
       </Grid>
 
       {0 && (
-        <Grid
-          item
-          xs
-          style={{ overflowY: "auto", width: previewDimensions.width }}
-        >
+        <Grid style={{ overflowY: "auto", width: previewDimensions.width }}>
           <Typography id="file-modal-description" variant="body1" gutterBottom>
             {meta.description} {link}
           </Typography>
@@ -191,7 +187,7 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
       //
     >
       <Grid container direction="row" spacing={2}>
-        <Grid item>
+        <Grid>
           <div>
             We use cookies to enable functionality on our website and track
             usage.
@@ -203,7 +199,7 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
             </a>
           </div>
         </Grid>
-        <Grid item>
+        <Grid>
           <Button
             variant="contained"
             disableElevation
@@ -215,7 +211,7 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
           </Button>
         </Grid>
 
-        <Grid item>
+        <Grid>
           <Button
             variant="contained"
             disableElevation
@@ -227,7 +223,7 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
           </Button>
         </Grid>
 
-        <Grid item>
+        <Grid>
           <Button
             variant="contained"
             disableElevation

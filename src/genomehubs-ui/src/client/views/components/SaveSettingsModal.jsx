@@ -26,11 +26,11 @@ export const useStyles = makeStyles((theme) => ({
     boxShadow: "none",
   },
   formControl: {
-    margin: 16,
-    minWidth: 120,
+    margin: "16px",
+    minWidth: "120px",
   },
   selectEmpty: {
-    marginTop: 16,
+    marginTop: "16px",
   },
   label: {
     color: "rgba(0, 0, 0, 0.54)",
@@ -58,8 +58,8 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
 
   const customStyles = (theme) => ({
     root: {
-      margin: 0,
-      padding: 16,
+      margin: "0px",
+      padding: "16px",
     },
     closeButton: {
       position: "absolute",
@@ -90,14 +90,14 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
 
   const DialogContent = withStyles((theme) => ({
     root: {
-      padding: 16,
+      padding: "16px",
     },
   }))(MuiDialogContent);
 
   const DialogActions = withStyles((theme) => ({
     root: {
-      margin: 0,
-      padding: 8,
+      margin: "0px",
+      padding: "8px",
     },
   }))(MuiDialogActions);
 
@@ -158,19 +158,6 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
             lost if you navigate away.
           </span>
         </DialogActions>
-        {/* <Paper className={classes.paper}>
-          <Grid container alignItems="center" direction="column" spacing={2}>
-            <Grid container direction="row">
-              <SaveSettingsPanel handleClose={handleClose} />
-            </Grid>
-            <Grid
-              container
-              alignItems="center"
-              direction="row"
-              spacing={2}
-            ></Grid>
-          </Grid>
-        </Paper> */}
       </DialogContent>
     </Dialog>
   );

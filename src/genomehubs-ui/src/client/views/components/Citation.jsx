@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import React from "react";
 import { compose } from "recompose";
 import { link as linkStyle } from "./Styles.scss";
@@ -43,7 +43,7 @@ const Citation = ({ basename, searchTerm, resultCount }) => {
       justifyContent={"center"}
       style={{ marginBottom: "-1em" }}
     >
-      <Grid item>
+      <Grid>
         <a>Please cite the </a>
         {sourcesLink}
       </Grid>

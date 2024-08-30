@@ -650,7 +650,7 @@ const AttributeTableRow = ({
             <TableRow>
               <TableCell></TableCell>
               <TableCell
-                style={{ paddingBottom: 0, paddingTop: 0 }}
+                style={{ paddingBottom: "0px", paddingTop: "0px" }}
                 colSpan={colSpan}
               >
                 <Collapse in={open.toString()} timeout="auto">

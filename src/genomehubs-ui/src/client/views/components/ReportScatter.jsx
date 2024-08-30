@@ -16,7 +16,7 @@ import stringLength, { maxStringLength } from "../functions/stringLength";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import PointInfo from "./PointInfo";
 import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "./Tooltip";
@@ -123,6 +123,7 @@ const drawHeatRect = ({ props, chartProps, h, w }) => {
   let height = h;
   let x = props.cx;
   let y = props.cy - h;
+  let opacity = 1;
   if (chartProps.n == 1) {
     opacity = scale(z);
   } else if (chartProps.stacked) {
@@ -1085,7 +1086,7 @@ const ReportScatter = ({
       />
     );
     return (
-      <Grid item xs ref={componentRef} style={{ height: "100%" }}>
+      <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
         {chart}
       </Grid>
     );

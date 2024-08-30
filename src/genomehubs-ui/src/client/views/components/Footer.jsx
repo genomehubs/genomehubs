@@ -3,7 +3,7 @@ import React, { memo, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CopyrightIcon from "@mui/icons-material/Copyright";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import { Popover } from "@mui/material";
 import Taxonomy from "./Taxonomy";
 import bbsrcLogo from "./img/bbsrc-logo.png";
@@ -124,13 +124,12 @@ const Footer = ({
 
   let poweredBy = (
     // <span style={{ float: "left", marginLeft: "1em" }}>
-    <span>
-      Powered by{" "}
+    (<span>Powered by{" "}
       <a className={linkStyle} href="https://genomehubs.org/" target="_blank">
         GenomeHubs
       </a>{" "}
       <CopyrightIcon fontSize="inherit" /> {new Date().getFullYear()}
-    </span>
+    </span>)
   );
 
   let settings = (
@@ -157,30 +156,22 @@ const Footer = ({
   );
 
   return (
-    <footer>
+    (<footer>
       <Taxonomy display={false} />
       <Grid container direction="row" spacing={0} style={{ maxHeight: "100%" }}>
-        <Grid item xs={3}>
-          {dataRelease}
-        </Grid>
-        <Grid item xs={6}></Grid>
-        <Grid item xs={3}>
-          {reportIssue}
-        </Grid>
+        <Grid size={3}>{dataRelease}</Grid>
+        <Grid size={6}></Grid>
+        <Grid size={3}>{reportIssue}</Grid>
       </Grid>
       <Grid container direction="row" spacing={0} style={{ maxHeight: "100%" }}>
-        <Grid item xs={4}>
+        <Grid size={4}>
           {settings}
           {settingsPopup}
         </Grid>
-        <Grid item xs={4}>
-          {poweredBy}
-        </Grid>
-        <Grid item xs={4}>
-          {logos}
-        </Grid>
+        <Grid size={4}>{poweredBy}</Grid>
+        <Grid size={4}>{logos}</Grid>
       </Grid>
-    </footer>
+    </footer>)
   );
 };
 

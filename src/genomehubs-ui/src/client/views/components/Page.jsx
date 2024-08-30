@@ -1,7 +1,7 @@
 import React, { memo, useRef, useState } from "react";
 import { link as linkStyle, pageTitle as pageTitleStyle } from "./Styles.scss";
 
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import SearchBox from "./SearchBox";
 import SearchHeaderButtons from "./SearchHeaderButtons";
 import classnames from "classnames";
@@ -17,15 +17,20 @@ const useStyles = makeStyles((theme) => ({
     minHeight: "100%",
     minWidth: "100%",
     maxWidth: "100%",
+    width: "100%",
     paddingBottom: "1em",
   },
-  item: { minWidth: "900px", maxWidth: "80%", align: "center" },
+  item: {
+    minWidth: "900px",
+    maxWidth: "80%",
+    align: "center",
+  },
   itemFull: { width: "100%", align: "center" },
   saveSearchOptions: {
     fontSize: "2em",
-    marginLeft: 8,
+    marginLeft: "8px",
     backgroundColor: "inherit",
-    padding: 0,
+    padding: "0px",
   },
 }));
 
@@ -65,7 +70,7 @@ const Page = ({
           className={itemCss}
           style={panelStyles}
           key={`pre_${i}`}
-          xs={12}
+          size={12}
         >
           {obj.panel}
         </Grid>
@@ -88,7 +93,7 @@ const Page = ({
           className={itemCss}
           style={{ ...panelStyles, ...(showExamples || { display: "none" }) }}
           key={`pre_${i}`}
-          xs={12}
+          size={12}
         >
           {obj.panel}
         </Grid>
@@ -111,7 +116,7 @@ const Page = ({
           className={itemCss}
           style={{ ...panelStyles, ...(showBrowse || { display: "none" }) }}
           key={`pre_${i}`}
-          xs={12}
+          size={12}
         >
           {obj.panel}
         </Grid>
@@ -128,7 +133,7 @@ const Page = ({
         }
       });
       postSearchItems.push(
-        <Grid item className={itemCss} style={panelStyles} key={i}>
+        <Grid className={itemCss} style={panelStyles} key={i}>
           {obj.panel}
         </Grid>
       );
@@ -160,11 +165,10 @@ const Page = ({
         <>
           {landingPage && (
             <Grid
-              item
               className={classes.item}
               style={{
                 marginBottom: "-3.25em",
-                padding: "0 0.75em",
+                padding: "0em 0.75em",
                 marginTop: "-1.5em",
                 minWidth: "80%",
               }}
@@ -172,7 +176,7 @@ const Page = ({
               <h2>Search {siteName}</h2>
             </Grid>
           )}
-          <Grid item xs={12} id="searchBox">
+          <Grid id="searchBox">
             <Grid
               container
               direction="row"
@@ -180,12 +184,11 @@ const Page = ({
               alignItems="center"
             >
               <Grid
-                item
                 className={itemCss}
                 style={{
                   marginTop: "2em",
                 }}
-                xs={12}
+                size={12}
               >
                 <SearchBox />
               </Grid>
@@ -198,7 +201,7 @@ const Page = ({
                 className={classes.item}
                 justifyContent="flex-end"
               >
-                <Grid item>
+                <Grid>
                   <span
                     style={{
                       float: "right",
@@ -241,28 +244,21 @@ const Page = ({
       )}
       {title && (
         <Grid
-          item
           className={classnames(pageTitleStyle, itemCss)}
           style={{ marginBottom: "0.5em", paddingLeft: "0.5em" }}
           container
           direction="row"
           ref={rootRef}
         >
-          <Grid item xs={6}>
-            {title}
-          </Grid>
+          <Grid size={6}>{title}</Grid>
 
-          <Grid item xs={6} style={{ textAlign: "end" }}>
+          <Grid style={{ textAlign: "end" }} size={6}>
             <SearchHeaderButtons rootRef={rootRef} showFavourite showName />
           </Grid>
         </Grid>
       )}
       {postSearchItems}
-      {text && (
-        <Grid item className={itemCss}>
-          {text}
-        </Grid>
-      )}
+      {text && <Grid className={itemCss}>{text}</Grid>}
     </Grid>
   );
 };

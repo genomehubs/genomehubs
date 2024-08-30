@@ -1,7 +1,7 @@
 import React, { memo, useEffect } from "react";
 
 import FileModal from "./FileModal";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import NavLink from "./NavLink";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -83,16 +83,16 @@ const FileTable = ({
           </TableCell>
           <TableCell>
             <Grid container direction="column">
-              <Grid item xs>
+              <Grid>
                 <span className={classes.pale}>dimensions: </span>
                 {meta.size_pixels}
               </Grid>
-              <Grid item xs>
+              <Grid>
                 <span className={classes.pale}>description: </span>
                 {meta.description}
               </Grid>
               {externalLink && (
-                <Grid item xs>
+                <Grid>
                   <span className={classes.pale}>source: </span>
                   {externalLink}
                 </Grid>

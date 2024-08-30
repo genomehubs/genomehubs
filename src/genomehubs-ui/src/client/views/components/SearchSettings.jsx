@@ -7,7 +7,7 @@ import Chip from "@mui/material/Chip";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import InputLabel from "@mui/material/InputLabel";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ListItemText from "@mui/material/ListItemText";
@@ -38,8 +38,8 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     width: "100%",
     minWidth: "600px",
-    padding: 8,
-    marginTop: 8,
+    padding: "8px",
+    marginTop: "8px",
     border: "none",
     boxShadow: "none",
     overflowX: "visible",
@@ -48,34 +48,34 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
   },
   formControl: {
-    margin: 16,
-    minWidth: 120,
+    margin: "16px",
+    minWidth: "120px",
   },
   selectEmpty: {
-    marginTop: 16,
+    marginTop: "16px",
   },
   redBackground: {
     backgroundColor: "#C00",
-    padding: 10,
+    padding: "10px",
   },
   whiteBackground: {
     backgroundColor: "#FFF",
   },
   formControl: {
-    margin: 8,
-    minWidth: 240,
-    maxWidth: 480,
+    margin: "8px",
+    minWidth: "240px",
+    maxWidth: "480px",
   },
   chips: {
     display: "flex",
     flexWrap: "wrap",
   },
   chip: {
-    margin: 2,
+    margin: "2px",
     backgroundColor: "#FFF",
   },
   noLabel: {
-    marginTop: 24,
+    marginTop: "24px",
   },
 }));
 
@@ -236,15 +236,6 @@ const SearchSettings = ({
 
       if (state[id]) {
         checkedList.push(id);
-        // activeChips.push(
-        //   <Chip
-        //     key={id}
-        //     label={id}
-        //     clickable
-        //     className={classes.chip}
-        //     onDelete={(e) => handleChange(e, id, key)}
-        //   />
-        // );
       }
       if (group[id].description) {
         content.push(
@@ -278,32 +269,13 @@ const SearchSettings = ({
     let checked = state[`group-${key}`] == totals[key];
     let indeterminate =
       state[`group-${key}`] > 0 && state[`group-${key}`] < totals[key];
-    // content.unshift(
-    //   <Tooltip
-    //     key={`all_${key}`}
-    //     title={`Toggle selection for all ${key} attributes`}
-    //     arrow
-    //     placement={"top"}
-    //   >
-    //     <MenuItem
-    //       value={key}
-    //       onClick={(e) => handleGroupChange(e, key, checked)}
-    //     >
-    //       <Checkbox
-    //         color={"default"}
-    //         checked={checked}
-    //         indeterminate={indeterminate}
-    //       />
-    //       all
-    //     </MenuItem>
-    //   </Tooltip>
-    // );
     groups.push(
-      <Grid item key={key}>
+      <Grid key={key}>
         <FormControl
           variant="standard"
           className={classes.formControl}
-          style={{ marginLeft: "1em" }}>
+          style={{ marginLeft: "1em" }}
+        >
           <InputLabel
             id="demo-mutiple-chip-checkbox-label"
             style={{ marginTop: checkedList.length > 0 ? 0 : "-1em" }}
@@ -323,9 +295,6 @@ const SearchSettings = ({
             id="demo-mutiple-chip-checkbox"
             multiple
             value={checkedList}
-            // onChange={handleChange}
-            //input={<Input />}
-            // MenuProps={MenuProps}
             IconComponent={KeyboardArrowDownIcon}
             renderValue={(selected) => (
               <div className={classes.chips}>
@@ -344,38 +313,11 @@ const SearchSettings = ({
                   />
                 ))}
               </div>
-            )}>
+            )}
+          >
             {content}
           </Select>
         </FormControl>
-
-        {/* <Accordion>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-label="Expand"
-            aria-controls={`${key}-content`}
-            id={`${key}-header`}
-          >
-            <FormControlLabel
-              aria-label={`${key}`}
-              onClick={(e) => handleGroupChange(e, key, checked)}
-              onFocus={(e) => e.stopPropagation()}
-              control={
-                <Checkbox
-                  color="default"
-                  checked={checked}
-                  indeterminate={indeterminate}
-                />
-              }
-              label={key}
-            />
-          </AccordionSummary>
-          <AccordionDetails>
-            <Grid container justifyContent="flex-start" direction="column">
-              {content}
-            </Grid>
-          </AccordionDetails>
-        </Accordion> */}
       </Grid>
     );
   });
@@ -399,9 +341,6 @@ const SearchSettings = ({
             handleResetClick={handleResetClick}
           />
         </Grid>
-        {/* <Grid container alignItems="flex-end" direction="row" spacing={2}>
-          {activeChips}
-        </Grid> */}
       </Grid>
     </Paper>
   );

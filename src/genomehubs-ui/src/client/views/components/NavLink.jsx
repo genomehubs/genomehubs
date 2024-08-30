@@ -56,7 +56,7 @@ const NavLink = ({
         ));
       }
       return (
-        <a
+        (<a
           href={to}
           title={(props.title || "").replace(/^external:\s*/, "")}
           target="_blank"
@@ -64,7 +64,7 @@ const NavLink = ({
           // style={{ whiteSpace: "wrap" }}
         >
           {children}
-        </a>
+        </a>)
       );
     }
     to = basename + "/" + to.replace(location.origin, "");
@@ -74,14 +74,14 @@ const NavLink = ({
     css = classnames(tabStyle, { [tabHighlightStyle]: isCurrent });
   }
   return (
-    <Link
+    (<Link
       {...props}
       to={to
         .replace(/\/+/, `${basename}/`)
         .replace(`${basename}${basename}`, basename)
         .replace(/\/\/+/, "/")}
       className={css}
-    />
+    />)
   );
 };
 

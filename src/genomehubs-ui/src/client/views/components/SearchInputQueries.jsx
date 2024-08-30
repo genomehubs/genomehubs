@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useState } from "react";
 
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import SearchInputQuery from "./SearchInputQuery";
 import { compose } from "recompose";
 import makeStyles from "@mui/styles/makeStyles";
@@ -12,15 +12,15 @@ import withSearch from "../hocs/withSearch";
 export const useStyles = makeStyles((theme) => ({
   icon: {
     color: "black", // theme.palette.text.secondary,
-    marginRight: 16,
+    marginRight: "16px",
   },
   formControl: {
-    marginTop: 16,
+    marginTop: "16px",
     minWidth: "600px",
   },
   search: {
     fontSize: "2em",
-    marginLeft: 8,
+    marginLeft: "8px",
     backgroundColor: "inherit",
   },
 }));
@@ -73,7 +73,7 @@ const SearchInputQueries = ({
 
   let queryInputs = inputs.map((id) => <SearchInputQuery key={id} id={id} />);
   return (
-    <Grid item>
+    <Grid>
       <Grid container direction="column">
         {queryInputs}
       </Grid>
