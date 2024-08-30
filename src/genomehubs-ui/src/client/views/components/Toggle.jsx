@@ -32,7 +32,7 @@ const Toggle = ({
   // transpColor = "#f0f6fa";
 
   return (
-    (<Grid
+    <Grid
       style={{
         border: `0.2em solid #1f78b466`,
         borderRadius: "1em",
@@ -40,7 +40,7 @@ const Toggle = ({
         marginBottom: "2em",
       }}
     >
-      <div style={{width: "100%"}}>
+      <div style={{ width: "100%" }}>
         <Grid
           container
           direction="row"
@@ -96,7 +96,7 @@ const Toggle = ({
       >
         {children}
       </div>
-    </Grid>)
+    </Grid>
   );
 };
 
