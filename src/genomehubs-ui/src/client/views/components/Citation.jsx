@@ -42,6 +42,7 @@ const Citation = ({ basename, searchTerm, resultCount }) => {
       direction="row"
       justifyContent={"center"}
       style={{ marginBottom: "-1em" }}
+      size={12}
     >
       <Grid>
         <a>Please cite the </a>

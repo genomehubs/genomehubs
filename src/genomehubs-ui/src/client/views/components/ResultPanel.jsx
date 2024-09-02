@@ -270,6 +270,7 @@ const ResultPanel = ({
           direction="row"
           spacing={0}
           style={{ width: "100%" }}
+          size={12}
         >
           <div className={nameGroupStyle}>
             <div className={contentStyle}>

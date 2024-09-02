@@ -133,7 +133,7 @@ const Page = ({
         }
       });
       postSearchItems.push(
-        <Grid className={itemCss} style={panelStyles} key={i}>
+        <Grid size={12} className={itemCss} style={panelStyles} key={i}>
           {obj.panel}
         </Grid>
       );
@@ -249,6 +249,7 @@ const Page = ({
           container
           direction="row"
           ref={rootRef}
+          size={12}
         >
           <Grid size={6}>{title}</Grid>
 

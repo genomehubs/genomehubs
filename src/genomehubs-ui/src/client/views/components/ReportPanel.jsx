@@ -77,7 +77,13 @@ const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {
       </div> */}
 
       {/* {text && <div>{text}</div>} */}
-      <Grid container spacing={1} direction="row" style={{ width: "100%" }}>
+      <Grid
+        container
+        spacing={1}
+        direction="row"
+        style={{ width: "100%" }}
+        size={12}
+      >
         {Object.entries(reportTypes)
           .filter(([key, obj]) => (obj.indices || []).includes(options.result))
           .map(([key, obj]) => {
@@ -98,7 +104,7 @@ const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {
           })}
       </Grid>
 
-      <Grid container spacing={1} direction="row">
+      <Grid container spacing={1} direction="row" size={12}>
         {report && (
           <ReportFull
             reportId={sortReportQuery({ queryString })}

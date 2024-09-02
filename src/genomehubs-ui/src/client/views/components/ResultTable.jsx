@@ -49,6 +49,7 @@ import expandFieldList from "../functions/expandFieldList";
 import { formatter } from "../functions/formatter";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
+import { styled } from "@mui/material/styles";
 import withColors from "../hocs/withColors";
 import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";
@@ -108,13 +109,10 @@ export const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TableCell = withStyles((theme) => ({
-  root: {
-    padding: "1px 6px",
-    // borderBottom: `solid ${borderColor} 1px`,
-    lineHeight: "inherit",
-  },
-}))(MuiTableCell);
+const TableCell = styled(MuiTableCell)({
+  padding: "1px 6px",
+  lineHeight: "inherit",
+});
 
 const StickyCell = withStyles((theme) => ({
   root: {
@@ -1602,6 +1600,7 @@ const ResultTable = ({
         justifyContent="center"
         direction="row"
         spacing={1}
+        size={10}
         className={classes.root}
       >
         <Grid>
