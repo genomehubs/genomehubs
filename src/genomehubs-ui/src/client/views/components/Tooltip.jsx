@@ -1,9 +1,24 @@
+import MuiTooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import React, { useCallback, useState } from "react";
 
-import MuiTooltip from "@mui/material/Tooltip";
 import makeStyles from "@mui/styles/makeStyles";
+import { styled } from "@mui/material/styles";
 import { useEventListener } from "../hooks/useEventListener";
 
+const StyledTooltip = styled(({ className, ...props }) => (
+  <MuiTooltip {...props} classes={{ popper: className }} />
+))(() => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    fontSize: "1.1rem",
+    backgroundColor: "#464752ee",
+    "& a": {
+      color: "#ffffff",
+    },
+  },
+  [`& .${tooltipClasses.arrow}`]: {
+    color: "#464752ee",
+  },
+}));
 const useStyles = {
   default: makeStyles({
     tooltip: {
@@ -43,12 +58,13 @@ export const Tooltip = ({
   useEventListener("keydown", handler);
 
   return (
-    <MuiTooltip
+    <StyledTooltip
       open={open}
       onOpen={onOpen}
       onClose={onClose}
       classes={useStyles[styleName]()}
       disableInteractive={disableInteractive}
+      sx={{ fontSize: "3rem" }}
       {...props}
     />
   );
