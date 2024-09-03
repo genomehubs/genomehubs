@@ -25,7 +25,11 @@ const useStyles = {
   }),
 };
 
-export const Tooltip = ({ styleName = "dark", ...props }) => {
+export const Tooltip = ({
+  styleName = "dark",
+  disableInteractive = true,
+  ...props
+}) => {
   const [open, setOpen] = useState(false);
   const onOpen = () => setOpen(true);
   const onClose = () => setOpen(false);
@@ -44,6 +48,7 @@ export const Tooltip = ({ styleName = "dark", ...props }) => {
       onOpen={onOpen}
       onClose={onClose}
       classes={useStyles[styleName]()}
+      disableInteractive={disableInteractive}
       {...props}
     />
   );

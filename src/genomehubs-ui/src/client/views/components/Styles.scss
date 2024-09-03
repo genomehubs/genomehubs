@@ -304,8 +304,8 @@ body,
       }
 
       &Content {
-        overflow-x: scroll;
-        margin: 0.5em 0.25em 1em;
+        overflow-x: auto;
+        margin: 0.5em 0.25em 1.5em;
 
         pre {
           margin: 0;

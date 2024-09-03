@@ -107,7 +107,7 @@ const CustomBackground = ({ chartProps, ...props }) => {
   return (
     <>
       <Tooltip
-        interactive="true"
+        disableInteractive={false}
         title={<CellInfo x={xLimits} count={count} rows={series} />}
         arrow
       >
@@ -607,9 +607,9 @@ const ReportHistogram = ({
     );
 
     return (
-      (<Grid ref={componentRef} style={{ height: "100%" }} size="grow">
+      <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
         {chart}
-      </Grid>)
+      </Grid>
     );
   } else {
     return null;

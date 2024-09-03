@@ -265,13 +265,13 @@ const FeaturePanel = ({
       //     <NavLink href={ensemblUrl}>Ensembl Rapid Release</NavLink>
       //   </span>
       // </>
-      <FeatureSummaryPanel
+      (<FeatureSummaryPanel
         taxonId={taxonId}
         assemblyId={assemblyId}
         start={featureAttributes.start.value}
         end={featureAttributes.end.value}
         sequenceName={assignedName}
-      />
+      />)
     );
   }
   let assemblyLink;

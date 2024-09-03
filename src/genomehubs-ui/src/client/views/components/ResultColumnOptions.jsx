@@ -1,5 +1,3 @@
-import { FormGroup, TextField } from "@mui/material";
-import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -12,14 +10,15 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
+import React from "react";
 import Select from "@mui/material/Select";
 import SettingsButton from "./SettingsButton";
-import { Theme } from "@mui/material/styles";
+import { TextField } from "@mui/material";
 import { compose } from "recompose";
-import createStyles from "@mui/styles/createStyles";
 import expandFieldList from "../functions/expandFieldList";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
+import { styled } from "@mui/material/styles";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
@@ -65,6 +64,9 @@ const useStyles = makeStyles((theme) => ({
   noLabel: {
     marginTop: "24px",
   },
+  label: {
+    color: "#ff7001",
+  },
 }));
 
 const summaryTypesFromMeta = (meta) => {
@@ -106,6 +108,11 @@ const summaryTypesFromMeta = (meta) => {
   }
   return summaryTypes;
 };
+
+const MyInputLabel = styled(InputLabel)({
+  color: "green",
+  backgroundColor: "aliceblue",
+});
 
 const ResultColumnOptions = ({
   attributeId,
@@ -216,11 +223,42 @@ const ResultColumnOptions = ({
   let form = (
     <div>
       <FormControl variant="standard" className={classes.formControl}>
-        <InputLabel id="subset-checkbox-label">Subset</InputLabel>
+        <MyInputLabel
+          id="subset-checkbox-label"
+          sx={{
+            color: "red",
+            "&.Mui-focused": { color: "green" },
+            "&.MuiInputLabel-shrink": {
+              color: "red",
+            },
+            "&.MuiInputLabel-root": {
+              color: "blue",
+            },
+          }}
+        >
+          Subset
+        </MyInputLabel>
         <Select
           variant="standard"
           labelId="subset-checkbox-label"
           id="subset-checkbox"
+          sx={{
+            "& .MuiInput-root": {
+              color: "#000",
+              fontFamily: "Arial",
+              fontWeight: "bold",
+              // Bottom border
+              "&:before": {
+                borderColor: "#2e2e2e",
+                borderWidth: "2px",
+              },
+            },
+            // Label
+            "& .MuiInputLabel-root": {
+              color: "#2e2e2e",
+              fontWeight: "bold",
+            },
+          }}
           multiple
           value={summaryCols}
           onChange={handleChange}

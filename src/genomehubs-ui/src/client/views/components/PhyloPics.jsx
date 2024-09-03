@@ -83,7 +83,7 @@ const PhyloPics = ({
         <Tooltip
           title={imageDescription}
           styleName="dark"
-          interactive="true"
+          disableInteractive={false}
           arrow
         >
           <div className={blankStyle}></div>
@@ -145,7 +145,7 @@ const PhyloPics = ({
         <Tooltip
           title={imageDescription}
           styleName="dark"
-          interactive="true"
+          disableInteractive={false}
           arrow
         >
           <div>

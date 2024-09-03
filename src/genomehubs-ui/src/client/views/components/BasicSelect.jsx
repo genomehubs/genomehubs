@@ -26,6 +26,7 @@ const BasicSelect = ({
   label,
   helperText,
   values,
+  sx,
 }) => {
   const classes = useStyles;
   if (typeof current != "string") {
@@ -70,6 +71,7 @@ const BasicSelect = ({
         onChange={handleChange}
         label={label}
         inputProps={{ "aria-label": label ? label : helperText }}
+        sx={sx}
       >
         {options}
       </Select>

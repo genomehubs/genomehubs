@@ -434,23 +434,28 @@ export const ReportEdit = ({
         );
       });
       input = (
-        <Grid container direction="row" alignItems="flex-end">
-          <Grid size={6}>
-            <FormControl variant="standard" style={{ width: "95%" }}>
+        <Grid
+          container
+          spacing={1}
+          direction="row"
+          sx={{ flexGrow: 1, width: "95%" }}
+        >
+          <Grid size={{ xs: "grow" }}>
+            <FormControl variant="standard" style={{ width: "100%" }}>
               <InputLabel id="select-report-label">report</InputLabel>
               <Select
                 variant="standard"
                 labelId="select-report-label"
                 id="select-report"
                 value={values["report"]}
-                style={{ width: "95%" }}
+                sx={{ minWidth: "95%" }}
                 onChange={(e) => handleChange(e, "report")}
               >
                 {items}
               </Select>
             </FormControl>
           </Grid>
-          <Grid align={"right"} key={"submit"} size={6}>
+          <Grid align={"right"} key={"submit"} size={{ xs: "grow" }}>
             <SettingsButton
               handleClick={handleSubmit}
               handleResetClick={handleReset}

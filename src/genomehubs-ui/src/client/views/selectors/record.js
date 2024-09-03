@@ -11,6 +11,7 @@ import {
 import { apiUrl } from "../reducers/api";
 import { createSelector } from "reselect";
 import { getCurrentTaxonomy } from "../reducers/taxonomy";
+import immutableUpdate from "immutable-update";
 import store from "../store";
 
 export const getLineage = createSelector(getCurrentRecord, (record) => {

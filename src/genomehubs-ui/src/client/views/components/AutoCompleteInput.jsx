@@ -68,6 +68,7 @@ export const AutoCompleteInput = ({
   ) {
     terms = [];
     autocompleteTerms.results.forEach((result, i) => {
+      console.log(result);
       let value;
       if (result.result.type) {
         let display_value = result.result.name || result.result.key;
@@ -130,6 +131,7 @@ export const AutoCompleteInput = ({
               !result.reason[0].fields["taxon_names.class"][0].match(" name")
           ),
         });
+        console.log(options);
         terms.push(
           <div key={i} className={termStyle}>
             <span className={valueStyle}>{value}</span>
@@ -223,6 +225,7 @@ export const AutoCompleteInput = ({
       });
     });
   }
+  console.log(options);
   if (options.length == 1 && options[0].value == options[0].subTerm) {
     // options = [];
   }
@@ -515,6 +518,7 @@ export const AutoCompleteInput = ({
   // const handleBlur = (e) => {
   //   setInputValue(e.target.value);
   // };
+  console.log(options);
   return (
     <Autocomplete
       id={id}
@@ -539,18 +543,21 @@ export const AutoCompleteInput = ({
       PopperComponent={PlacedPopper}
       renderInput={(params) => (
         <TextField
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyPress}
           {...params}
           required={required}
+          ref={params.InputProps.ref}
           inputRef={inputRef}
           label={inputLabel}
           name={inputName}
           className={inputClassName}
-          InputLabelProps={{
-            ...(inValue &&
-              (inputName || "").startsWith("query") && {
-                shrink: true,
-              }),
+          slotProps={{
+            inputLabel: {
+              ...(inValue &&
+                (inputName || "").startsWith("query") && {
+                  shrink: true,
+                }),
+            },
           }}
           variant={size == "small" ? "standard" : "outlined"}
           fullWidth
@@ -565,7 +572,11 @@ export const AutoCompleteInput = ({
         if (option.highlighted) {
           return <AutoCompleteSuggestion option={option} />;
         }
-        return <AutoCompleteOption option={option} />;
+        return (
+          <AutoCompleteOption
+            option={{ ...options[option["data-option-index"]], ...option }}
+          />
+        );
       }}
     />
   );

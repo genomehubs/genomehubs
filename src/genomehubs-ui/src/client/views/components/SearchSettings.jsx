@@ -1,28 +1,20 @@
 import React, { memo, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
+import Box from "@mui/material/Box";
 import CancelIcon from "@mui/icons-material/Cancel";
 import Checkbox from "@mui/material/Checkbox";
 import Chip from "@mui/material/Chip";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FormControl from "@mui/material/FormControl";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid2";
 import InputLabel from "@mui/material/InputLabel";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
-import MuiAccordion from "@mui/material/Accordion";
-import MuiAccordionDetails from "@mui/material/AccordionDetails";
-import MuiAccordionSummary from "@mui/material/AccordionSummary";
-import Paper from "@mui/material/Paper";
 import Select from "@mui/material/Select";
 import SettingsButton from "./SettingsButton";
-import { Theme } from "@mui/material/styles";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
-import createStyles from "@mui/styles/createStyles";
-import expandFieldList from "../functions/expandFieldList";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import { useLocalStorage } from "usehooks-ts";
@@ -30,7 +22,6 @@ import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
-import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -81,16 +72,11 @@ const useStyles = makeStyles((theme) => ({
 
 const SearchSettings = ({
   searchTerm,
-  setTaxonomy,
   taxonomy,
   taxonomies,
-  hashTerm,
-  searchResults,
-  fetchSearchResults,
   setPreferSearchTerm,
   searchIndex,
   types,
-  displayRanks,
   taxonomyRanks,
   nameClasses,
   groupedTypes,
@@ -278,7 +264,10 @@ const SearchSettings = ({
         >
           <InputLabel
             id="demo-mutiple-chip-checkbox-label"
-            style={{ marginTop: checkedList.length > 0 ? 0 : "-1em" }}
+            sx={{
+              marginTop: checkedList.length > 0 ? 0 : "-1em",
+              overflow: "visible",
+            }}
           >
             <Checkbox
               color={"default"}
@@ -294,6 +283,7 @@ const SearchSettings = ({
             labelId="demo-mutiple-chip-checkbox-label"
             id="demo-mutiple-chip-checkbox"
             multiple
+            sx={{ minWidth: "240px" }}
             value={checkedList}
             IconComponent={KeyboardArrowDownIcon}
             renderValue={(selected) => (
@@ -328,7 +318,7 @@ const SearchSettings = ({
   });
 
   return (
-    <Paper className={classes.paper}>
+    <Box className={classes.paper}>
       <Grid container alignItems="center" direction="column">
         {/* <Grid container alignItems="center" direction="row" spacing={2}></Grid> */}
         <Grid container alignItems="flex-end" direction="row" spacing={2}>
@@ -342,7 +332,7 @@ const SearchSettings = ({
           />
         </Grid>
       </Grid>
-    </Paper>
+    </Box>
   );
 };
 

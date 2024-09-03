@@ -57,12 +57,12 @@ const NavLink = ({
       }
       return (
         (<a
-          href={to}
-          title={(props.title || "").replace(/^external:\s*/, "")}
-          target="_blank"
-          rel="noopener noreferrer"
-          // style={{ whiteSpace: "wrap" }}
-        >
+                href={to}
+                title={(props.title || "").replace(/^external:\s*/, "")}
+                target="_blank"
+                rel="noopener noreferrer"
+                // style={{ whiteSpace: "wrap" }}
+              >
           {children}
         </a>)
       );
@@ -75,13 +75,13 @@ const NavLink = ({
   }
   return (
     (<Link
-      {...props}
-      to={to
-        .replace(/\/+/, `${basename}/`)
-        .replace(`${basename}${basename}`, basename)
-        .replace(/\/\/+/, "/")}
-      className={css}
-    />)
+            {...props}
+            to={to
+              .replace(/\/+/, `${basename}/`)
+              .replace(`${basename}${basename}`, basename)
+              .replace(/\/\/+/, "/")}
+            className={css}
+          />)
   );
 };
 

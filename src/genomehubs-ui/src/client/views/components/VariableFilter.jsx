@@ -79,7 +79,7 @@ const VariableFilter = ({
     collate = true;
   }
   return (
-    (<Grid container alignItems="center" direction="row" spacing={2}>
+    <Grid container alignItems="center" direction="row" spacing={2} size={12}>
       {bool && (
         <Grid>
           <Typography>{bool}</Typography>
@@ -165,12 +165,13 @@ const VariableFilter = ({
             variant="contained"
             startIcon={<AutorenewIcon />}
             onClick={handleUpdate}
-            disableElevation>
+            disableElevation
+          >
             Update
           </Button>
         </Grid>
       )}
-    </Grid>)
+    </Grid>
   );
 };
 

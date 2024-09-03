@@ -12,7 +12,7 @@ import TodayIcon from "@mui/icons-material/Today";
 import Typography from "@mui/material/Typography";
 import { useStyles } from "./SearchBoxStyles";
 
-export const AutoCompleteOption = ({ option }) => {
+export const AutoCompleteOption = ({ option, ...props }) => {
   const classes = useStyles();
   let primaryText, secondaryText;
   let optionIcon = <SearchIcon className={classes.icon} />;
@@ -86,6 +86,8 @@ export const AutoCompleteOption = ({ option }) => {
     );
   }
 
+  console.log(option);
+
   let item = (
     <Grid size="grow">
       <div>{primaryText}</div>
@@ -94,7 +96,8 @@ export const AutoCompleteOption = ({ option }) => {
           {(option.name_class && option.taxon_id) ||
             option.assembly_id ||
             option.description ||
-            option.name}
+            option.name ||
+            "blank"}
         </Typography>
       </span>
       {secondaryText}
@@ -102,10 +105,12 @@ export const AutoCompleteOption = ({ option }) => {
   );
 
   return (
-    <Grid container alignItems="center">
-      <Grid>{optionIcon}</Grid>
-      {item}
-    </Grid>
+    <li {...props}>
+      <Grid container alignItems="center">
+        <Grid>{optionIcon}</Grid>
+        {item}
+      </Grid>
+    </li>
   );
 };
 

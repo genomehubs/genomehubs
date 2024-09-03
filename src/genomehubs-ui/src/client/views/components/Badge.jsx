@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   active as activeStyle,
   badgeExpanded as badgeExpandedStyle,
+  badgeInfo as badgeInfoStyle,
   badge as badgeStyle,
   bg as bgStyle,
   current as currentStyle,
