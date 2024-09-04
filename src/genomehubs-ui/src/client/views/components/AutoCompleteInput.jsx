@@ -207,8 +207,8 @@ export const AutoCompleteInput = ({
     autocompleteTerms.status &&
     autocompleteTerms.status.success &&
     autocompleteTerms.suggestions &&
-    autocompleteTerms.suggestions.length > 0 &&
-    !/[\(\)<>=]/.test(inputValue)
+    autocompleteTerms.suggestions.length > 0 // &&
+    // !/[\(\)<>=]/.test(inputValue)
   ) {
     autocompleteTerms.suggestions.forEach((suggestion, i) => {
       let value = suggestion.suggestion.text;
@@ -521,7 +521,13 @@ export const AutoCompleteInput = ({
       getOptionLabel={(option) =>
         typeof option === "string" ? option : option.title
       }
-      isOptionEqualToValue={(option, value) => option.title === value.title}
+      isOptionEqualToValue={(option, value) => {
+        let val = value.title || value;
+        if (option.matchTerm) {
+          return option.matchTerm === val;
+        }
+        return option.title === val;
+      }}
       options={options}
       autoComplete
       includeInputInList
@@ -534,6 +540,7 @@ export const AutoCompleteInput = ({
       onChange={handleKeyDown}
       onBlur={handleBlur}
       onClose={handlePopperClose}
+      filterOptions={(options, state) => options}
       onInputChange={handleChange}
       onHighlightChange={handleHighlightChange}
       PopperComponent={PlacedPopper}
