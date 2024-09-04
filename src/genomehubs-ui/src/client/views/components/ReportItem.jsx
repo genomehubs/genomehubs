@@ -152,7 +152,6 @@ const ReportItem = ({
     // } else {
     //   minDim /= ratio;
     // }
-    console.log({ width, height });
     setMinDim = (value) => {
       // if (!minDim || height > minDim) {
       basicSetMinDim(value);
@@ -601,7 +600,6 @@ const ReportItem = ({
   if (fixedRatio && fixedRatio != ratio) {
     adjustRatio = fixedRatio;
   }
-  console.log(minDim);
   return (
     <Grid
       ref={targetRef}

@@ -86,8 +86,6 @@ export const AutoCompleteOption = ({ option, ...props }) => {
     );
   }
 
-  console.log(option);
-
   let item = (
     <Grid size="grow">
       <div>{primaryText}</div>
@@ -106,7 +104,7 @@ export const AutoCompleteOption = ({ option, ...props }) => {
 
   return (
     <li {...props}>
-      <Grid container alignItems="center">
+      <Grid container alignItems="center" size={12}>
         <Grid>{optionIcon}</Grid>
         {item}
       </Grid>
