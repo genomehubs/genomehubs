@@ -30,8 +30,8 @@ const ReportTreeRings = ({
   const [dimensions, setDimensions] = useState({
     x: 0,
     y: 0,
-    height: "1000px",
-    width: "1000px",
+    height: 1000,
+    width: 1000,
   });
 
   const [highlight, setHighlight] = useState();

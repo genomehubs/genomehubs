@@ -70,7 +70,7 @@ const BasicSelect = ({
         onBlur={handleBlur}
         onChange={handleChange}
         label={label}
-        inputProps={{ "aria-label": label ? label : helperText }}
+        inputProps={{ "aria-label": label || helperText }}
         sx={sx}
       >
         {options}

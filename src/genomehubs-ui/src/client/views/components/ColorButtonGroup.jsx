@@ -16,7 +16,7 @@ const StyledButtonGroup = styled(ButtonGroup)(({ theme }) => ({
 
 export const ColorButtonGroup = ({ children, ...props }) => {
   return (
-    <StyledButtonGroup color="primary" {...props} >
+    <StyledButtonGroup color="primary" {...props}>
       {children}
     </StyledButtonGroup>
   );

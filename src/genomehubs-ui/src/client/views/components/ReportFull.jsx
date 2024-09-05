@@ -128,6 +128,7 @@ export const ReportFull = ({
         }}
         className={classnames(classes.paper, markdownStyle)}
         ref={gridRef}
+        size={12}
       >
         <Grid
           align="center"
@@ -153,6 +154,7 @@ export const ReportFull = ({
         }}
         className={classnames(classes.paper, markdownStyle)}
         ref={gridRef}
+        size={12}
       >
         <Grid size={1} />
         <Grid
