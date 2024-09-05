@@ -20,7 +20,7 @@ import ArtTrackIcon from "@mui/icons-material/ArtTrack";
 import Badge from "./Badge";
 import BasicSelect from "./BasicSelect";
 import Breadcrumbs from "./Breadcrumbs";
-import Button from "@mui/material/Button";
+import ColorButton from "./ColorButton";
 import Count from "./Count";
 import Divider from "@mui/material/Divider";
 import EnumSelect from "./EnumSelect";
@@ -228,7 +228,7 @@ export const Template = ({
       <Grid container direction="row" spacing={1} justifyContent="flex-end">
         {toggleFunction && (
           <Grid key={"toggle"}>
-            <Button
+            <ColorButton
               variant="contained"
               disableElevation
               startIcon={<ArtTrackIcon />}
@@ -238,11 +238,11 @@ export const Template = ({
               }}
             >
               Template
-            </Button>
+            </ColorButton>
           </Grid>
         )}
         <Grid key={"preview"}>
-          <Button
+          <ColorButton
             variant="contained"
             disableElevation
             startIcon={showPreview ? <VisibilityOffIcon /> : <VisibilityIcon />}
@@ -252,17 +252,17 @@ export const Template = ({
             }}
           >
             {showPreview ? "Hide Preview" : "Preview"}
-          </Button>
+          </ColorButton>
         </Grid>
         <Grid key={"submit"}>
-          <Button
+          <ColorButton
             variant="contained"
             disableElevation
             startIcon={<SearchIcon />}
             onClick={handleSubmit}
           >
             Search
-          </Button>
+          </ColorButton>
         </Grid>
       </Grid>
     </Grid>
@@ -316,7 +316,7 @@ export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
           `${basename}/static/${webpackHash}/`
         );
       }
-    } else if (key == "xs" || key == "size") {
+    } else if (key == "size") {
       newProps["size"] = value * 1;
     } else if (key == "spacing") {
       newProps["spacing"] = value * 1;
@@ -471,6 +471,7 @@ export const RehypeComponentsList = (extra) => {
           styleMap[`${props.className}Style`]
         );
       }
+      console.log(processProps({ props, isGrid: true }));
       return (
         <Grid {...processProps({ props, isGrid: true })}>
           <StaticPlot {...processProps({ props, extra })} className={css} />

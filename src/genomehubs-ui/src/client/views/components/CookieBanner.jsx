@@ -200,7 +200,7 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
           </div>
         </Grid>
         <Grid>
-          <Button
+          <ColorButton
             variant="contained"
             disableElevation
             className={classes.button}
@@ -208,11 +208,11 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
             onClick={() => setCookie("cookieConsent", "essential")}
           >
             Accept Essential
-          </Button>
+          </ColorButton>
         </Grid>
 
         <Grid>
-          <Button
+          <ColorButton
             variant="contained"
             disableElevation
             className={classes.button}
@@ -220,11 +220,11 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
             onClick={() => setCookie("cookieConsent", "all")}
           >
             Accept All
-          </Button>
+          </ColorButton>
         </Grid>
 
         <Grid>
-          <Button
+          <ColorButton
             variant="contained"
             disableElevation
             className={classes.button}
@@ -233,7 +233,7 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
             onClick={handleOpen}
           >
             Cookie Settings
-          </Button>
+          </ColorButton>
         </Grid>
       </Grid>
       {/* <div>Accept Essential</div>

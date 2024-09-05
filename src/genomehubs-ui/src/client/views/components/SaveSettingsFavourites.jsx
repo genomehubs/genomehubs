@@ -8,7 +8,7 @@ import {
   favListing as favListingStyle,
 } from "./Styles.scss";
 
-import Button from "@mui/material/Button";
+import ColorButton from "./ColorButton";
 import EditIcon from "@mui/icons-material/Edit";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -177,7 +177,7 @@ const SaveSettingsFavourites = ({
                 formatYaml({ searchTerm, reportTerm })
               )}
               <div className={favListingButtonStyle}>
-                <Button
+                <ColorButton
                   autoFocus
                   color="primary"
                   // variant="outlined"
@@ -185,8 +185,8 @@ const SaveSettingsFavourites = ({
                   onClick={() => toggleEdit(key)}
                 >
                   Edit
-                </Button>
-                <Button
+                </ColorButton>
+                <ColorButton
                   autoFocus
                   color="primary"
                   // variant="outlined"
@@ -203,7 +203,7 @@ const SaveSettingsFavourites = ({
                   }}
                 >
                   Search
-                </Button>
+                </ColorButton>
               </div>
             </div>
           )}
@@ -229,14 +229,14 @@ const SaveSettingsFavourites = ({
         key={"save-changes"}
         style={{ position: "relative", height: "2em", width: "100%" }}
       >
-        <Button
+        <ColorButton
           className={favListingButtonStyle}
           autoFocus
           onClick={handleSave}
           color="primary"
         >
           Save changes
-        </Button>
+        </ColorButton>
       </div>
     );
   }

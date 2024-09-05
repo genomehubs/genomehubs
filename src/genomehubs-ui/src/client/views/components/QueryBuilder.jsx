@@ -5,7 +5,7 @@ import AutoCompleteInput from "./AutoCompleteInput";
 import BasicSelect from "./BasicSelect";
 import BasicTextField from "./BasicTextField";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
+import ColorButton from "./ColorButton";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
@@ -470,7 +470,7 @@ const QueryBuilder = ({
         {filterOptions}
         <Grid container alignItems="flex-end" direction="row" size={12}>
           <Grid>
-            <Button
+            <ColorButton
               variant="contained"
               disableElevation
               className={classes.button}
@@ -478,7 +478,7 @@ const QueryBuilder = ({
               onClick={handleClick}
             >
               Search
-            </Button>
+            </ColorButton>
           </Grid>
         </Grid>
       </Grid>

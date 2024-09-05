@@ -1,24 +1,12 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import Button from "@mui/material/Button";
-import ButtonGroup from "@mui/material/ButtonGroup";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
-import DownloadMessage from "./DownloadMessage";
+import ColorButton from "./ColorButton";
+import ColorButtonGroup from "./ColorButtonGroup";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import MenuItem from "@mui/material/MenuItem";
 import MenuList from "@mui/material/MenuList";
 import Paper from "@mui/material/Paper";
 import React from "react";
-import withStyles from "@mui/styles/withStyles";
-
-const ColorButtonGroup = withStyles((theme) => ({
-  root: {
-    color: "white",
-    backgroundColor: "#333333",
-    "&:hover": {
-      backgroundColor: "#999999",
-    },
-  },
-}))(ButtonGroup);
 
 const defaultOptions = {
   TSV: { format: "tsv" },
@@ -118,10 +106,10 @@ const DownloadButton = ({
         ref={anchorRef}
         aria-label="split button"
       >
-        <Button startIcon={<GetAppIcon />} onClick={handleClick}>
+        <ColorButton startIcon={<GetAppIcon />} onClick={handleClick}>
           {Object.keys(options)[selectedIndex]}
-        </Button>
-        <Button
+        </ColorButton>
+        <ColorButton
           // color="primary"
           size="small"
           aria-controls={open ? "split-button-menu" : undefined}
@@ -131,7 +119,7 @@ const DownloadButton = ({
           onClick={handleToggle}
         >
           <ArrowDropDownIcon />
-        </Button>
+        </ColorButton>
       </ColorButtonGroup>
 
       <Paper style={{ height: open ? "auto" : 0, overflow: "hidden" }}>

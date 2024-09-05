@@ -2,8 +2,8 @@ import AutoCompleteInput from "./AutoCompleteInput";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import BasicSelect from "./BasicSelect";
 import BasicTextField from "./BasicTextField";
-import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
+import ColorButton from "./ColorButton";
 import Grid from "@mui/material/Grid2";
 import IconButton from "@mui/material/IconButton";
 import { MenuItem } from "@mui/material";
@@ -161,14 +161,14 @@ const VariableFilter = ({
       )}
       {handleUpdate && (
         <Grid>
-          <Button
+           <ColorButton
             variant="contained"
             startIcon={<AutorenewIcon />}
             onClick={handleUpdate}
             disableElevation
           >
             Update
-          </Button>
+           </ColorButton>
         </Grid>
       )}
     </Grid>

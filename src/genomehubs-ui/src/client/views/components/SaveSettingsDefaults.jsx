@@ -6,7 +6,7 @@ import {
   favListing as favListingStyle,
 } from "./Styles.scss";
 
-import Button from "@mui/material/Button";
+import ColorButton from "./ColorButton";
 import EditIcon from "@mui/icons-material/Edit";
 import MuiDialogContent from "@mui/material/DialogContent";
 import PublishIcon from "@mui/icons-material/Publish";
@@ -107,7 +107,7 @@ const SaveSettingsDefaults = ({
           <div className={favListingButtonStyle}>
             {urlOptions &&
               JSON.stringify(urlOptions) != JSON.stringify(currentOptions) && (
-                <Button
+                <ColorButton
                   autoFocus
                   color="primary"
                   // variant="outlined"
@@ -115,9 +115,9 @@ const SaveSettingsDefaults = ({
                   onClick={() => setCurrentOptions(urlOptions)}
                 >
                   use current
-                </Button>
+                </ColorButton>
               )}
-            <Button
+            <ColorButton
               autoFocus
               color="primary"
               // variant="outlined"
@@ -125,11 +125,11 @@ const SaveSettingsDefaults = ({
               onClick={toggleEdit}
             >
               edit
-            </Button>
+            </ColorButton>
             {(changed.value ||
               JSON.stringify(savedOptions) !=
                 JSON.stringify(currentOptions)) && (
-              <Button
+              <ColorButton
                 autoFocus
                 color="primary"
                 // variant="outlined"
@@ -137,7 +137,7 @@ const SaveSettingsDefaults = ({
                 onClick={handleSave}
               >
                 save changes
-              </Button>
+              </ColorButton>
             )}
           </div>
         </div>
