@@ -14,9 +14,9 @@ const StyledButton = styled(Button)(({ theme }) => ({
 
 export const ColorButton = forwardRef(({ children, ...props }, ref) => {
   return (
-    <Button color="primary" {...props} ref={ref}>
+    <StyledButton color="primary" {...props} ref={ref}>
       {children}
-    </Button>
+    </StyledButton>
   );
 });
 
