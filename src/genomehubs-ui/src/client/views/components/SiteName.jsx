@@ -53,6 +53,8 @@ const SiteName = ({ siteName, basename, archive, logo, theme }) => {
   );
   let version = basename ? basename.replace("/", "") : "latest";
   let versions;
+  console.log(archive);
+  console.log(location);
   if (archive) {
     versions = archive
       .filter((v) => v != version && v > "")
@@ -60,7 +62,9 @@ const SiteName = ({ siteName, basename, archive, logo, theme }) => {
         <MenuItem
           component="a"
           key={v}
-          href={`${version == "latest" ? `/${v}` : ""}${location.pathname
+          href={`${version == "latest" ? `/${v}` : ""}${(
+            location.pathname || ""
+          )
             .replace(version, v)
             .replace(/\/latest/, "")}${location.search}${location.hash}`}
           target="_blank"

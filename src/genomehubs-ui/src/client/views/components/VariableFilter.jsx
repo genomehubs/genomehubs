@@ -161,14 +161,14 @@ const VariableFilter = ({
       )}
       {handleUpdate && (
         <Grid>
-           <ColorButton
+          <ColorButton
             variant="contained"
             startIcon={<AutorenewIcon />}
             onClick={handleUpdate}
             disableElevation
           >
             Update
-           </ColorButton>
+          </ColorButton>
         </Grid>
       )}
     </Grid>
