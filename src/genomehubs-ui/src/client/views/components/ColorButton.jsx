@@ -1,5 +1,6 @@
+import React, { forwardRef } from "react";
+
 import Button from "@mui/material/Button";
-import React from "react";
 import { grey as orange } from "@mui/material/colors";
 import { styled } from "@mui/material/styles";
 
@@ -11,12 +12,12 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-export const ColorButton = ({ children, ...props }) => {
+export const ColorButton = forwardRef(({ children, ...props }, ref) => {
   return (
-    <StyledButton color="primary" {...props}>
+    <Button color="primary" {...props} ref={ref}>
       {children}
-    </StyledButton>
+    </Button>
   );
-};
+});
 
 export default ColorButton;

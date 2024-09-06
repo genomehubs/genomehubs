@@ -1,3 +1,5 @@
+import React, { forwardRef } from "react";
+
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import ColorButton from "./ColorButton";
@@ -6,7 +8,6 @@ import GetAppIcon from "@mui/icons-material/GetApp";
 import MenuItem from "@mui/material/MenuItem";
 import MenuList from "@mui/material/MenuList";
 import Paper from "@mui/material/Paper";
-import React from "react";
 
 const defaultOptions = {
   TSV: { format: "tsv" },
@@ -89,6 +90,32 @@ const DownloadButton = ({
     setOpen(false);
   };
 
+  const GroupedButton = forwardRef((props, ref) => (
+    <ColorButtonGroup
+      variant="contained"
+      disableElevation
+      // color="primary"
+      {...props}
+      ref={ref}
+      aria-label="split button"
+    >
+      <ColorButton startIcon={<GetAppIcon />} onClick={handleClick}>
+        {Object.keys(options)[selectedIndex]}
+      </ColorButton>
+      <ColorButton
+        // color="primary"
+        size="small"
+        aria-controls={open ? "split-button-menu" : undefined}
+        aria-expanded={open ? "true" : undefined}
+        aria-label="select merge strategy"
+        aria-haspopup="menu"
+        onClick={handleToggle}
+      >
+        <ArrowDropDownIcon />
+      </ColorButton>
+    </ColorButtonGroup>
+  ));
+
   return (
     <span
       style={{
@@ -99,29 +126,7 @@ const DownloadButton = ({
         flex: "0 1 auto",
       }}
     >
-      <ColorButtonGroup
-        variant="contained"
-        disableElevation
-        // color="primary"
-        ref={anchorRef}
-        aria-label="split button"
-      >
-        <ColorButton startIcon={<GetAppIcon />} onClick={handleClick}>
-          {Object.keys(options)[selectedIndex]}
-        </ColorButton>
-        <ColorButton
-          // color="primary"
-          size="small"
-          aria-controls={open ? "split-button-menu" : undefined}
-          aria-expanded={open ? "true" : undefined}
-          aria-label="select merge strategy"
-          aria-haspopup="menu"
-          onClick={handleToggle}
-        >
-          <ArrowDropDownIcon />
-        </ColorButton>
-      </ColorButtonGroup>
-
+      <GroupedButton ref={anchorRef} />
       <Paper style={{ height: open ? "auto" : 0, overflow: "hidden" }}>
         <ClickAwayListener onClickAway={handleClose}>
           <MenuList id="split-button-menu">

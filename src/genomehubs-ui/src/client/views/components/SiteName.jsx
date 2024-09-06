@@ -53,8 +53,6 @@ const SiteName = ({ siteName, basename, archive, logo, theme }) => {
   );
   let version = basename ? basename.replace("/", "") : "latest";
   let versions;
-  console.log(archive);
-  console.log(location);
   if (archive) {
     versions = archive
       .filter((v) => v != version && v > "")
