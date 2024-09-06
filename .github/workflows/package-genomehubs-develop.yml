@@ -36,7 +36,6 @@ jobs:
       - run: npm install -g pkg
       - run: |
           ./package-api.sh
-          ls -l ./dist
           mv ./dist/genomehubs-api ./dist/genomehubs-api-linux || exit 0
       - uses: actions/upload-artifact@v3
         with:
