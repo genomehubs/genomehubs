@@ -32,7 +32,7 @@ jobs:
           ref: ${{github.ref}}
       - uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "18"
       - run: npm install -g pkg
       - run: |
           ./package-api.sh
@@ -74,7 +74,7 @@ jobs:
           ref: ${{github.ref}}
       - uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "18"
       - run: npm install -g pkg
       - run: |
           git clone -b main --single-branch https://github.com/genomehubs/goat-ui
@@ -100,7 +100,7 @@ jobs:
           ref: ${{github.ref}}
       - uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "18"
       - run: npm install -g pkg
       - run: |
           git clone https://github.com/genomehubs/boat-ui
