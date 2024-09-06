@@ -59,7 +59,7 @@
       "build/**/*"
     ],
     "targets": [
-      "node20-linux-x64"
+      "node18-linux-x64"
     ],
     "outputPath": "dist"
   }
