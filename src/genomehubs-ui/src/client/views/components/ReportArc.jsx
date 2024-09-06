@@ -46,7 +46,7 @@ const arc = (
 ) => {
   return (
     // inner
-    ("M" +
+    "M" +
     startX +
     " " +
     startY +
@@ -68,7 +68,8 @@ const arc = (
     ir +
     ` 0 ${flag ? 0 : 1} 0 ` +
     iendX +
-    " " + iendY)
+    " " +
+    iendY
   );
 };
 const setupArc = ({
@@ -340,7 +341,7 @@ const PieComponent = ({ data, height, width, colors }) => {
 const donut = (x, y, ir, or) => {
   return (
     // inner
-    ("M" +
+    "M" +
     (x - or) +
     " " +
     y +
@@ -362,7 +363,8 @@ const donut = (x, y, ir, or) => {
     ir +
     " 0 1 0 " +
     (x - ir) +
-    " " + y)
+    " " +
+    y
   );
 };
 
@@ -690,7 +692,6 @@ const ReportArc = ({
     : componentRef
     ? useResize(componentRef)
     : useResize(containerRef);
-  console.log({ containerRef, componentRef, width, height });
 
   // const { width, height } = useResize(componentRef);
 
@@ -736,7 +737,6 @@ const ReportArc = ({
       height,
       timer: true,
     }));
-    console.log({ plotWidth, plotHeight });
     return () => {
       clearTimeout(dimensionTimer);
     };
@@ -819,9 +819,9 @@ const ReportArc = ({
     }
 
     return (
-      (<Grid ref={componentRef} style={{ height: "100%" }} size="grow">
+      <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
         {chart}
-      </Grid>)
+      </Grid>
     );
   } else {
     return null;
