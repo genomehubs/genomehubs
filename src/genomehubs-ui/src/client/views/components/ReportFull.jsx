@@ -1,14 +1,14 @@
 import React, { useRef } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import Report from "./Report";
 import ReportTools from "./ReportTools";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
+import { markdown as markdownStyle } from "./Styles.scss";
 import qs from "qs";
-import styles from "./Styles.scss";
 import { useStyles } from "./ReportModalStyles";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import withSiteName from "../hocs/withSiteName";
@@ -126,15 +126,15 @@ export const ReportFull = ({
           flexGrow: 1,
           maxHeight: "100%",
         }}
-        className={classnames(classes.paper, styles.markdown)}
+        className={classnames(classes.paper, markdownStyle)}
         ref={gridRef}
+        size={12}
       >
         <Grid
-          item
-          xs={12}
           align="center"
           ref={containerRef}
           style={{ width: "100%", height: "100%" }}
+          size={12}
         >
           {reportComponent}
         </Grid>
@@ -152,22 +152,21 @@ export const ReportFull = ({
           flexGrow: 1,
           maxHeight: "100%",
         }}
-        className={classnames(classes.paper, styles.markdown)}
+        className={classnames(classes.paper, markdownStyle)}
         ref={gridRef}
+        size={12}
       >
-        <Grid item xs={1} />
+        <Grid size={1} />
         <Grid
-          item
-          // xs={edit || query || info || download ? 5 : 10}
-          xs={10}
           align="center"
           ref={containerRef}
-          style={{ width: "100%", height: "100%" }}
+          style={{ height: "100%" }}
+          size={10}
         >
           {reportComponent}
         </Grid>
 
-        <Grid item xs={1}>
+        <Grid size={1}>
           <ReportTools
             queryString={queryString}
             reportId={reportId}

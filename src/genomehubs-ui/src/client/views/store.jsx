@@ -3,7 +3,7 @@ import { applyMiddleware, createStore } from "redux";
 import { createLogger } from "redux-logger";
 import { enableBatching } from "redux-batched-actions";
 import rootReducer from "./reducers/root";
-import thunkMiddleware from "redux-thunk";
+import { thunk as thunkMiddleware } from "redux-thunk";
 
 const loggerMiddleware = createLogger();
 

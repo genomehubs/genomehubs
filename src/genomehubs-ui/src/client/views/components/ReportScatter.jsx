@@ -1,7 +1,5 @@
-// import { RadialChart } from "react-vis";
 import {
   CartesianGrid,
-  Curve,
   Dot,
   Label,
   Rectangle,
@@ -18,167 +16,26 @@ import stringLength, { maxStringLength } from "../functions/stringLength";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import PointInfo from "./PointInfo";
 import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "./Tooltip";
+import { active as activeStyle } from "./Styles.scss";
 import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
 import { line as d3Line } from "d3-shape";
 import dispatchMessage from "../hocs/dispatchMessage";
-import { format } from "d3-format";
 import hexToHSL from "hex-to-hsl";
 import { processLegendData } from "./MultiCatLegend";
-// import { point } from "leaflet";
 import qs from "../functions/qs";
 import { scaleLinear } from "d3-scale";
 import searchByCell from "../functions/searchByCell";
 import setColors from "../functions/setColors";
-import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";
 import withSiteName from "../hocs/withSiteName";
 import { zLegend } from "./zLegend";
-
-// const searchByCell = ({
-//   xQuery,
-//   yQuery,
-//   report,
-//   xLabel,
-//   yLabel,
-//   xRange,
-//   yRange,
-//   bounds,
-//   yBounds,
-//   navigate,
-//   location,
-//   fields,
-//   ranks,
-//   valueType,
-//   yValueType,
-//   summary,
-//   ySummary,
-//   basename,
-// }) => {
-//   let query = xQuery.query;
-//   let field = bounds.field;
-//   query = query
-//     .replaceAll(new RegExp("AND\\s+" + bounds.field + "\\s+AND", "gi"), "AND")
-//     .replaceAll(
-//       new RegExp("AND\\s+" + bounds.field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
-//       ""
-//     )
-//     .replaceAll(
-//       new RegExp("AND\\s+" + bounds.field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
-//       ""
-//     );
-//   if (summary && summary != "value") {
-//     field = `${summary}(${field})`;
-//     query = query
-//       .replaceAll(new RegExp("AND\\s+" + field + "\\s+AND", "gi"), "AND")
-//       .replaceAll(
-//         new RegExp("AND\\s+" + field + "\\s+>=\\s*[\\w\\d_\\.-]+", "gi"),
-//         ""
-//       )
-//       .replaceAll(
-//         new RegExp("AND\\s+" + field + "\\s+<\\s*[\\w\\d_\\.-]+", "gi"),
-//         ""
-//       );
-//   }
-//   query = query.replaceAll(/\s+/g, " ").replace(/\s+$/, "");
-//   if (valueType == "coordinate") {
-//     query += ` AND sequence_id = ${xRange},${yRange}`;
-//     query = query.replace("collate(assembly_id,", "collate(sequence_id,");
-//   } else if (valueType == "date") {
-//     query += ` AND ${field} >= ${
-//       new Date(xRange[0]).toISOString().split(/t/i)[0]
-//     } AND ${field} < ${new Date(xRange[1]).toISOString().split(/t/i)[0]}`;
-//   } else if (valueType == "keyword" && field == bounds.field) {
-//     let val = bounds.stats.cats[xRange[0]].key;
-//     if (val == "other") {
-//       let list = [];
-//       for (let obj of bounds.stats.cats) {
-//         if (obj.key != "other") {
-//           list.push(obj.key);
-//         }
-//       }
-//       query += ` AND ${field} != ${list.join(",")}`;
-//     } else {
-//       query += ` AND ${field} = ${val}`;
-//     }
-//   } else {
-//     query += ` AND ${field} >= ${xRange[0]} AND ${field} < ${xRange[1]}`;
-//   }
-//   let yField = yBounds.field;
-//   if (ySummary && ySummary != "value") {
-//     yField = `${ySummary}(${yField})`;
-//   }
-//   if (yValueType == "date") {
-//     query += ` AND ${yField} >= ${
-//       new Date(yRange[0]).toISOString().split(/t/i)[0]
-//     } AND ${yField} < ${new Date(yRange[1]).toISOString().split(/t/i)[0]}`;
-//   } else if (yValueType == "keyword" && yField == yBounds.field) {
-//     let val = yBounds.stats.cats[yRange[0]].key;
-//     if (val == "other") {
-//       let list = [];
-//       for (let obj of yBounds.stats.cats) {
-//         if (obj.key != "other") {
-//           list.push(obj.key);
-//         }
-//       }
-//       query += ` AND ${yField} != ${list.join(",")}`;
-//     } else {
-//       query += ` AND ${yField} = ${val}`;
-//     }
-//   } else if (yValueType != "coordinate") {
-//     query += ` AND ${yField} >= ${yRange[0]} AND ${yField} < ${yRange[1]}`;
-//   }
-
-//   // let fields = `${xLabel},${yLabel}`;
-//   let { xOpts, yOpts, highlightArea, ...options } = qs.parse(
-//     location.search.replace(/^\?/, "")
-//   );
-//   if (options.sortBy && !fields.includes(options.sortBy)) {
-//     delete options.sortBy;
-//     delete options.sortOrder;
-//   }
-//   options.offset = 0;
-//   if (fields) {
-//     fields = fields.join(",");
-//   }
-//   if (ranks) {
-//     ranks = ranks.join(",");
-//   } else {
-//     ranks = "";
-//   }
-//   for (let key of [
-//     "excludeAncestral",
-//     "excludeDescendant",
-//     "excludeDirect",
-//     "excludeMissing",
-//   ]) {
-//     if (xQuery[key]) {
-//       delete xQuery[key];
-//     }
-//   }
-//   let queryString = qs.stringify({
-//     ...xQuery,
-//     ...options,
-//     query,
-//     ...(yQuery && { y: yQuery.query }),
-//     fields,
-//     report,
-//     ranks,
-//   });
-
-//   // let hash = encodeURIComponent(query);
-//   navigate(
-//     `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
-//       query
-//     )}`
-//   );
-// };
 
 const searchByPoint = ({ props, chartProps }) => {
   let { xQuery, fields, ranks, groupBy, navigate, basename, bounds, yBounds } =
@@ -200,7 +57,6 @@ const searchByPoint = ({ props, chartProps }) => {
     result,
   });
 
-  // let hash = encodeURIComponent(query);
   navigate(
     `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
       pointQuery
@@ -237,7 +93,6 @@ const CustomCircle = (props, chartProps) => {
       style={{
         cursor: active && selectMode == "point" ? "pointer" : "default",
       }}
-      // strokeWidth={r / 2}
     />
   );
   if (active && selectMode == "point") {
@@ -276,9 +131,6 @@ const drawHeatRect = ({ props, chartProps, h, w }) => {
     height = scale(z + offset) - scale(offset);
     y += h - height - scale(offset);
   } else {
-    // width = scale(z);
-    // height /= chartProps.n;
-    // y += height * chartProps.i;
     width /= chartProps.n;
     height = scale(z + offset) - scale(offset) + 0.5;
     y += h - height;
@@ -289,12 +141,9 @@ const drawHeatRect = ({ props, chartProps, h, w }) => {
       {...props}
       height={height}
       width={width}
-      // mask={`url(#mask-stripe-${chartProps.n}-${chartProps.i})`}
       fill={props.fill}
-      // fill={"none"}
-      x={x} // {props.cx + (w - width) / 2}
+      x={x}
       y={y}
-      // fillOpacity={chartProps.n > 1 ? 1 : props.zAxis.scale(props.payload.z)}
       fillOpacity={chartProps.n > 1 ? 1 : scale(props.payload.z)}
       style={{ pointerEvents: "none" }}
     />
@@ -378,7 +227,7 @@ const CustomShape = (props, chartProps, handleClick) => {
           arrow
         >
           <Rectangle
-            className={styles.active}
+            className={activeStyle}
             height={h}
             width={w}
             x={props.cx}
@@ -414,7 +263,6 @@ const CustomShape = (props, chartProps, handleClick) => {
       {bgRect}
       {heatRect}
       {legendGroup}
-      {/* {legendGroupOrig} */}
     </>
   );
 };
@@ -518,16 +366,7 @@ const CustomizedYAxisTick = ({
   marginWidth,
   plotWidth,
 }) => {
-  const {
-    x,
-    y,
-    fill,
-    index,
-    height,
-    width,
-    payload,
-    orientation: side,
-  } = props;
+  const { x, y, fill, index, height, payload, orientation: side } = props;
   let { value } = payload;
   let offset = 0;
   let h = height / (buckets.length - 1);
@@ -565,8 +404,6 @@ const CustomizedYAxisTick = ({
           dominantBaseline={"alphabetic"}
           fill={fill}
           fontSize={pointSize}
-          // fontWeight={orientation && orientation[index] < 0 ? "bold" : "normal"}
-          // transform={"rotate(-90)"}
         >
           {textValue}
         </text>
@@ -586,7 +423,7 @@ const CustomizedYAxisTick = ({
       rect = (
         <Tooltip title={textValue} arrow placement="right">
           <Rectangle
-            className={styles.active}
+            className={activeStyle}
             x={-maxLabel}
             y={-offset}
             height={h}
@@ -603,7 +440,7 @@ const CustomizedYAxisTick = ({
       <g>
         <Tooltip title={ttValue} arrow placement="right">
           <Rectangle
-            className={styles.active}
+            className={activeStyle}
             x={-pointSize}
             y={centered ? -offset : 0}
             height={h}
@@ -633,7 +470,7 @@ const CustomizedYAxisTick = ({
     ori = (
       <g>
         <Rectangle
-          className={styles.active}
+          className={activeStyle}
           x={side == "left" ? 10 - oriWidth : -7}
           y={-offset}
           height={h}
@@ -666,12 +503,9 @@ const Heatmap = ({
   yBuckets,
   yOrientation,
   chartProps,
-  endLabel,
-  lastIndex,
   highlightArea,
   xLabel,
   yLabel,
-  stacked,
   reversed,
   highlight,
   colors,
@@ -681,7 +515,7 @@ const Heatmap = ({
     let [h, s, l] = hexToHSL(hex);
     let lighten = active !== false ? i != active : false;
     if (lighten) {
-      s = 15; // s / 2;
+      s = 15;
       l = (l + 100) / 2;
     }
     return `hsl(${h},${s}%,${l}%)`;
@@ -741,7 +575,6 @@ const Heatmap = ({
     >
       <Label
         value={xLabel}
-        // offset={buckets.length > 15 ? chartProps.pointSize + 10 : 10}
         offset={marginHeight - chartProps.pointSize}
         dy={0}
         position="bottom"
@@ -777,8 +610,6 @@ const Heatmap = ({
         })
       }
       domain={yDomain}
-      // domain={["auto", "auto"]}
-      // range={["auto", "auto"]}
       range={yDomain}
       tickFormatter={chartProps.showYTickLabels ? chartProps.yFormat : () => ""}
       interval={0}
@@ -907,7 +738,6 @@ const Heatmap = ({
           let i = reversed
             ? orderedCats.length - catOrder[cat] - 1
             : catOrder[cat];
-          let range = [Math.max()];
           let scatterLayer = (
             <Scatter
               name={`${cat}_points`}
@@ -1256,7 +1086,7 @@ const ReportScatter = ({
       />
     );
     return (
-      <Grid item xs ref={componentRef} style={{ height: "100%" }}>
+      <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
         {chart}
       </Grid>
     );

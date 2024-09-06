@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 
 import AttributePanel from "./AttributePanel";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
+import Grid from "@mui/material/Grid2";
+import Paper from "@mui/material/Paper";
 import ResultColumnOptions from "./ResultColumnOptions";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import withRecord from "../hocs/withRecord";
 import withTaxonomy from "../hocs/withTaxonomy";
@@ -14,16 +14,16 @@ export const useStyles = makeStyles((theme) => ({
   paper: {
     width: "96%",
     minWidth: "600px",
-    padding: theme.spacing(2),
-    marginTop: theme.spacing(2),
+    padding: "16px",
+    marginTop: "16px",
     boxShadow: "none",
   },
   formControl: {
-    margin: theme.spacing(2),
-    minWidth: 120,
+    margin: "16px",
+    minWidth: "120px",
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
+    marginTop: "16px",
   },
   label: {
     color: "rgba(0, 0, 0, 0.54)",
@@ -73,11 +73,10 @@ const AttributeModal = ({
         }
       } else if (
         options.result == "feature" &&
-        (!record.record || recordId != record.record.feature_id)
+        (!record.record || recordId != record.record.feature_id) &&
+        !recordIsFetching
       ) {
-        if (!recordIsFetching) {
-          fetchRecord(recordId, "feature", taxonomy);
-        }
+        fetchRecord(recordId, "feature", taxonomy);
       }
     }
   }, [options, recordId]);

@@ -22,6 +22,10 @@ for FILE in $FILES; do
 done &&
 
 echo " - transpiling src/app.js to build/app.js" &&
+sed -i '/^const __filename/d' src/app.js &&
+sed -i '/^const __dirname/d' src/app.js &&
+sed -i '/^import esmResolver/d' src/app.js &&
+sed -i 's/esmResolver(path.join(__dirname))/path.join(__dirname)/g' src/app.js &&
 npx babel --plugins @babel/plugin-transform-modules-commonjs src/app.js > build/app.js &&
 
 echo "Copying files" &&

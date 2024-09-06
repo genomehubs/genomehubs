@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useRef, useState } from "react";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import ReportArc from "./ReportArc";
 import ReportCaption from "./ReportCaption";
 import ReportEmpty from "./ReportEmpty";
@@ -20,10 +20,10 @@ import dispatchMessage from "../hocs/dispatchMessage";
 import dispatchReport from "../hocs/dispatchReport";
 import { gridPropNames } from "../functions/propNames";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
+import { reportHeading as reportHeadingStyle } from "./Styles.scss";
+import { useIntersectionObserver } from "usehooks-ts";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
-import useVisible from "../hooks/useVisible";
 import withReportById from "../hocs/withReportById";
 import withSiteName from "../hocs/withSiteName";
 
@@ -130,8 +130,9 @@ const ReportItem = ({
   });
   const navigate = useNavigate();
   const hideMessage = !inModal && !topLevel;
-  const targetRef = useRef();
-  let visible = useVisible(targetRef);
+  const { isIntersecting: visible, ref: targetRef } = useIntersectionObserver({
+    threshold: 0.01,
+  });
   const [minDim, basicSetMinDim] = useState(0);
   let setMinDim;
 
@@ -277,7 +278,7 @@ const ReportItem = ({
             chartRef={chartRef}
             embedded={embedded}
             inModal={inModal}
-            containerRef={targetRef}
+            containerRef={containerRef}
             colorPalette={colorPalette}
             ratio={fixedRatio || ratio}
             pointSize={pointSize}
@@ -538,17 +539,14 @@ const ReportItem = ({
       style={{
         flexGrow: "1",
         width: "100%",
-        // background: "rgba(240,240,240,0.5)",
       }}
     >
       {!loading && !error && heading && (inModal || topLevel) && (
-        <Grid item xs>
-          <span className={styles.reportHeading}>{heading}</span>
+        <Grid>
+          <span className={reportHeadingStyle}>{heading}</span>
         </Grid>
       )}
       <Grid
-        item
-        xs
         style={{
           width: "100%",
           // background: "rgba(240,240,240,0.5)",
@@ -597,16 +595,7 @@ const ReportItem = ({
       </ReportWrapper>
     );
   }
-  // if (reportById.report) {
-  //   content = (
-  //     <Grid container direction="column" width="100%">
-  //       <Grid item>{content}</Grid>
-  //       <Grid item style={{ textAlign: "left" }}>
-  //         {reportById.report.caption}
-  //       </Grid>
-  //     </Grid>
-  //   );
-  // }
+
   let adjustRatio = 1;
   if (fixedRatio && fixedRatio != ratio) {
     adjustRatio = fixedRatio;

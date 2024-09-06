@@ -1,10 +1,10 @@
 import React, { memo, useRef, useState } from "react";
 
-import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import Grid from "@material-ui/core/Grid";
-import Switch from "@material-ui/core/Switch";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormHelperText from "@mui/material/FormHelperText";
+import Grid from "@mui/material/Grid2";
+import Switch from "@mui/material/Switch";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import setColors from "../functions/setColors";
@@ -33,8 +33,6 @@ const Toggle = ({
 
   return (
     <Grid
-      container
-      direction="row"
       style={{
         border: `0.2em solid #1f78b466`,
         borderRadius: "1em",
@@ -42,16 +40,17 @@ const Toggle = ({
         marginBottom: "2em",
       }}
     >
-      <Grid item xs={12}>
+      <div style={{ width: "100%" }}>
         <Grid
           container
           direction="row"
           style={{
             backgroundColor: "#d2e4f0",
             borderBottom: showContent ? `0.2em solid #1f78b466` : "none",
+            width: "100%",
           }}
         >
-          <Grid item xs={10}>
+          <Grid size={10}>
             <h3 style={{ marginLeft: "1em", fontWeight: "normal" }}>{title}</h3>
           </Grid>
           {toggle && (
@@ -61,18 +60,15 @@ const Toggle = ({
               placement={"top"}
             >
               <Grid
-                item
-                xs={2}
                 style={{
                   cursor: "pointer",
                   margin: "auto",
                   textAlign: "right",
                 }}
+                offset={10}
+                size={2}
               >
-                <FormControl
-                // className={classes.formControl}
-                // style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
-                >
+                <FormControl variant="standard">
                   {/* <FormHelperText>{"TMP"}</FormHelperText> */}
                   <FormControlLabel
                     control={
@@ -93,15 +89,13 @@ const Toggle = ({
             </Tooltip>
           )}
         </Grid>
-      </Grid>
-      <Grid
+      </div>
+      <div
         id="toggleContent"
-        item
-        xs={12}
-        style={{ ...(!showContent && { maxHeight: 0 }) }}
+        style={{ width: "100%", ...(!showContent && { maxHeight: 0 }) }}
       >
         {children}
-      </Grid>
+      </div>
     </Grid>
   );
 };

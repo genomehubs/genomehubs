@@ -12,7 +12,7 @@ import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import LocationMapHighlightIcon from "./LocationMapHighlightIcon";
 import NavLink from "./NavLink";
 import ZoomComponent from "./ZoomComponent";
@@ -249,14 +249,14 @@ const ReportMap = ({
     }
 
     return (
-      <Grid item xs ref={componentRef} style={{ height: "100%" }}>
+      (<Grid ref={componentRef} style={{ height: "100%" }} size="grow">
         <Map
           bounds={geoBounds}
           markers={markers}
           width={width}
           height={height}
         />
-      </Grid>
+      </Grid>)
     );
   } else {
     return null;

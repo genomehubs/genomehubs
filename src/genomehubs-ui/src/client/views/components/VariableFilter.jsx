@@ -1,14 +1,14 @@
 import AutoCompleteInput from "./AutoCompleteInput";
-import AutorenewIcon from "@material-ui/icons/Autorenew";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
 import BasicSelect from "./BasicSelect";
 import BasicTextField from "./BasicTextField";
-import Button from "@material-ui/core/Button";
-import CloseIcon from "@material-ui/icons/Close";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import { MenuItem } from "@material-ui/core";
+import CloseIcon from "@mui/icons-material/Close";
+import ColorButton from "./ColorButton";
+import Grid from "@mui/material/Grid2";
+import IconButton from "@mui/material/IconButton";
+import { MenuItem } from "@mui/material";
 import React from "react";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 
 const allowedSummaries = ({ field, types }) => {
   let values = { value: "value" };
@@ -79,14 +79,14 @@ const VariableFilter = ({
     collate = true;
   }
   return (
-    <Grid container alignItems="center" direction="row" spacing={2}>
+    <Grid container alignItems="center" direction="row" spacing={2} size={12}>
       {bool && (
-        <Grid item>
+        <Grid>
           <Typography>{bool}</Typography>
         </Grid>
       )}
       {field && handleSummaryChange && (
-        <Grid item>
+        <Grid>
           {(collate && (
             <BasicTextField
               id={`collate-value-input`}
@@ -106,7 +106,7 @@ const VariableFilter = ({
         </Grid>
       )}
       {(collate && <></>) || (
-        <Grid item>
+        <Grid>
           <BasicSelect
             current={field}
             id={`variable-${field}-select`}
@@ -117,7 +117,7 @@ const VariableFilter = ({
         </Grid>
       )}
       {(collate && <></>) || (
-        <Grid item>
+        <Grid>
           <BasicSelect
             current={operator}
             id={`variable-${field}-operator-select`}
@@ -127,7 +127,7 @@ const VariableFilter = ({
           />
         </Grid>
       )}
-      <Grid item xs={4}>
+      <Grid size={4}>
         {type == "keyword" && operator ? (
           <AutoCompleteInput
             id={`variable-${field}-value-input`}
@@ -149,7 +149,7 @@ const VariableFilter = ({
         )}
       </Grid>
       {handleDismiss && (
-        <Grid item style={{ marginLeft: "auto" }}>
+        <Grid style={{ marginLeft: "auto" }}>
           <IconButton
             aria-label="remove filter"
             size="small"
@@ -160,16 +160,15 @@ const VariableFilter = ({
         </Grid>
       )}
       {handleUpdate && (
-        <Grid item>
-          <Button
+        <Grid>
+          <ColorButton
             variant="contained"
-            color="default"
             startIcon={<AutorenewIcon />}
             onClick={handleUpdate}
             disableElevation
           >
             Update
-          </Button>
+          </ColorButton>
         </Grid>
       )}
     </Grid>

@@ -1,13 +1,17 @@
 import React, { useRef } from "react";
+import {
+  errorHeading as errorHeadingStyle,
+  error as errorStyle,
+  infoPage as infoPageStyle,
+  link as linkStyle,
+  siteTextError as siteTextErrorStyle,
+} from "./Styles.scss";
 
-import FileCopyIcon from "@material-ui/icons/FileCopy";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import Logo from "./Logo";
+import FileCopyIcon from "@mui/icons-material/FileCopy";
+import IconButton from "@mui/material/IconButton";
 import SiteName from "./SiteName";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
 import withColors from "../hocs/withColors";
 import withSiteName from "../hocs/withSiteName";
 
@@ -23,21 +27,20 @@ export const ReactErrorPage = ({
   return (
     <div className={"error-page"}>
       <header
-        item
-        xs
-        className={styles.error}
+        xs={12}
+        className={errorStyle}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
           resetErrorBoundary();
         }}
       >
-        <div style={{ float: "left" }} className={styles.siteTextError}>
+        <div style={{ float: "left" }}>
           <SiteName logo />
         </div>
       </header>
-      <div className={styles.infoPage}>
-        <div className={styles.errorHeading}>
+      <div className={infoPageStyle}>
+        <div>
           <h1>Something went wrong</h1>
           <p>Sorry, we encountered an error loading this page:</p>
           <h2 style={{ marginLeft: "2em", color: statusColors.ancestral }}>
@@ -70,7 +73,7 @@ export const ReactErrorPage = ({
             If the problem persists, please report it to us by creating an issue
             in our{" "}
             <a
-              className={styles.link}
+              className={linkStyle}
               href="https://github.com/genomehubs/genomehubs/issues"
               target="_blank"
             >

@@ -1,5 +1,5 @@
-import { client } from "../../functions/connection";
-import { logError } from "../../functions/logger";
+import { client } from "../../functions/connection.js";
+import { logError } from "../../functions/logger.js";
 
 export const collateAttributes = async ({
   query,

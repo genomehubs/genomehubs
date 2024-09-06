@@ -1,25 +1,27 @@
 import { Link, useLocation } from "@reach/router";
 import React, { memo, useState } from "react";
+import {
+  siteLogo as siteLogoStyle,
+  siteName as siteNameStyle,
+} from "./Styles.scss";
 
-import LaunchIcon from "@material-ui/icons/Launch";
+import LaunchIcon from "@mui/icons-material/Launch";
 import Logo from "./Logo";
-import MenuItem from "@material-ui/core/MenuItem";
-import Popover from "@material-ui/core/Popover";
-import Typography from "@material-ui/core/Typography";
+import MenuItem from "@mui/material/MenuItem";
+import Popover from "@mui/material/Popover";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
-import styles from "./Styles.scss";
+import makeStyles from "@mui/styles/makeStyles";
 import withArchive from "../hocs/withArchive";
 import withSiteName from "../hocs/withSiteName";
 
 const useStyles = makeStyles((theme) => ({
   typography: {
-    padding: theme.spacing(1),
+    padding: "8px",
   },
 }));
 
-const SiteName = ({ siteName, basename, archive, logo }) => {
-  const classes = useStyles();
+const SiteName = ({ siteName, basename, archive, logo, theme }) => {
+  const classes = useStyles(theme);
   const [anchorEl, setAnchorEl] = useState(null);
   let location;
   try {
@@ -40,9 +42,9 @@ const SiteName = ({ siteName, basename, archive, logo }) => {
   const id = open ? "simple-popover" : undefined;
 
   let content = (
-    <Link className={styles.siteName} to={`${basename}/`}>
+    <Link className={siteNameStyle} to={`${basename}/`}>
       {logo && (
-        <div className={styles.siteLogo}>
+        <div className={siteLogoStyle}>
           <Logo />
         </div>
       )}
@@ -58,7 +60,9 @@ const SiteName = ({ siteName, basename, archive, logo }) => {
         <MenuItem
           component="a"
           key={v}
-          href={`${version == "latest" ? `/${v}` : ""}${location.pathname
+          href={`${version == "latest" ? `/${v}` : ""}${(
+            location.pathname || ""
+          )
             .replace(version, v)
             .replace(/\/latest/, "")}${location.search}${location.hash}`}
           target="_blank"

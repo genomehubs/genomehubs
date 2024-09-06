@@ -1,13 +1,15 @@
 import React, { memo, useEffect, useState } from "react";
+import {
+  plotArrow as plotArrowStyle,
+  plotContainer as plotContainerStyle,
+  plotDescription as plotDescriptionStyle,
+} from "./Styles.scss";
 
-import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
-import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import StaticPlotFile from "./StaticPlotFile";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
-import formatter from "../functions/formatter";
-import { makeStyles } from "@material-ui/core/styles";
-import styles from "./Styles.scss";
 import withApi from "../hocs/withApi";
 import withFiles from "../hocs/withFiles";
 import withFilesByAnalysisId from "../hocs/withFilesByAnalysisId";
@@ -16,8 +18,6 @@ const StaticPlotFiles = ({
   analysisId,
   containerRef,
   filenames,
-  analysisMeta,
-  apiUrl,
   files,
   filesByAnalysisId,
   fetchFiles,
@@ -74,16 +74,11 @@ const StaticPlotFiles = ({
     let prevIndex = index > 0 ? index - 1 : Object.keys(indices).length - 1;
     back = (
       <div
-        className={styles.plotArrow}
+        className={plotArrowStyle}
         style={{
           left: "-1.5em",
         }}
       >
-        {/* <IconButton
-          aria-label="show previous plot"
-          size="large"
-          onClick={() => {}}
-        > */}
         <Tooltip title={"Previous plot"} arrow>
           <KeyboardArrowLeftIcon
             style={{ cursor: "pointer" }}
@@ -95,13 +90,12 @@ const StaticPlotFiles = ({
             }}
           />
         </Tooltip>
-        {/* </IconButton> */}
       </div>
     );
     let nextIndex = index < Object.keys(indices).length - 1 ? index + 1 : 0;
     forward = (
       <div
-        className={styles.plotArrow}
+        className={plotArrowStyle}
         style={{
           right: "-1.5em",
         }}
@@ -122,7 +116,7 @@ const StaticPlotFiles = ({
   }
 
   return (
-    <div className={styles.plotContainer}>
+    <div className={plotContainerStyle}>
       <a href={sourceUrl} target="_blank">
         <div
           style={{
@@ -146,7 +140,7 @@ const StaticPlotFiles = ({
         </div>
         {description && (
           <Tooltip title={description} arrow>
-            <div className={styles.plotDescription}>{title}</div>
+            <div className={plotDescriptionStyle}>{title}</div>
           </Tooltip>
         )}
       </a>

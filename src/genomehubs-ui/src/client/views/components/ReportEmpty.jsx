@@ -1,4 +1,4 @@
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import Logo from "./Logo";
 // import { RadialChart } from "react-vis";
 import React from "react";
@@ -7,14 +7,13 @@ import withColors from "../hocs/withColors";
 
 const ReportEmpty = ({ report, statusColors, inModal }) => {
   return (
-    <Grid
-      item
-      xs
+    (<Grid
       style={{
         height: "100%",
         background: statusColors.descendant + "cc",
         padding: "1em",
       }}
+      size="grow"
     >
       {(inModal && (
         <>
@@ -53,7 +52,7 @@ const ReportEmpty = ({ report, statusColors, inModal }) => {
           >{`No ${report} data to display`}</div>
         </>
       )}
-    </Grid>
+    </Grid>)
   );
 };
 

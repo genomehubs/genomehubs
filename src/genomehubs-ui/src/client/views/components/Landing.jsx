@@ -8,22 +8,22 @@ const Landing = () => {
   const componentRef = useRef();
   let titleStyles = {
     minWidth: "80%",
-    paddingBottom: 0,
+    paddingBottom: "0px",
     border: "none",
     borderBottom: "0.2em solid #98999f",
     paddingBottom: "2em",
   };
   let exampleStyles = {
     minWidth: "80%",
-    paddingBottom: 0,
+    paddingBottom: "0px",
     marginTop: "-0.5em",
-    paddingTop: 0,
+    paddingTop: "0px",
     border: "none",
   };
 
   let browseStyles = { ...exampleStyles };
   let textStyles = {
-    // marginTop: 0,
+    // marginTop: "0px",
   };
   let title = <TextPanel pageId={"title.md"} {...titleStyles}></TextPanel>;
   let examples = (
@@ -44,13 +44,13 @@ const Landing = () => {
       searchPanels={[
         {
           panel: examples,
-          paddingTop: 0,
+          paddingTop: "0px",
         },
       ]}
       browsePanels={[
         {
           panel: browse,
-          paddingTop: 0,
+          paddingTop: "0px",
         },
       ]}
       pageRef={componentRef}

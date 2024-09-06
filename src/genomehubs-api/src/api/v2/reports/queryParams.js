@@ -1,5 +1,5 @@
-import { attrTypes } from "../functions/attrTypes";
-import { summaries } from "../functions/summaries";
+import { attrTypes } from "../functions/attrTypes.js";
+import { summaries } from "../functions/summaries.js";
 
 export const queryParams = async ({
   term,

@@ -1,14 +1,17 @@
-import FormControl from "@material-ui/core/FormControl";
-import Grid from "@material-ui/core/Grid";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
+import {
+  flexCenterHorizontal as flexCenterHorizontalStyle,
+  flexCenter as flexCenterStyle,
+  fullWidth as fullWidthStyle,
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  resultPanel as resultPanelStyle,
+} from "./Styles.scss";
+
+import Grid from "@mui/material/Grid2";
 import React from "react";
-import Select from "@material-ui/core/Select";
-import Skeleton from "@material-ui/lab/Skeleton";
+import Skeleton from "@mui/material/Skeleton";
 import classnames from "classnames";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
-import styles from "./Styles.scss";
 import withSearch from "../hocs/withSearch";
 import withTypes from "../hocs/withTypes";
 
@@ -18,12 +21,12 @@ const SearchSummary = ({ searchTerm, searchResults }) => {
   }
   const count = searchResults.status.hits;
   let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel,
-    styles.flexCenter,
-    styles.flexCenterHorizontal,
-    styles.fullWidth
+    infoPanelStyle,
+    infoPanel1ColumnStyle,
+    resultPanelStyle,
+    flexCenterStyle,
+    flexCenterHorizontalStyle,
+    fullWidthStyle
   );
 
   let summary;
@@ -32,11 +35,11 @@ const SearchSummary = ({ searchTerm, searchResults }) => {
     <div className={css}>
       <Grid container alignItems="center">
         {searchResults.isFetching ? (
-          <Grid item style={{ minWidth: "150px" }}>
+          <Grid style={{ minWidth: "150px" }}>
             <Skeleton variant="text" />
           </Grid>
         ) : (
-          <Grid item>
+          <Grid>
             {count} result{count >= 1 ? (count == 1 ? ":" : "s:") : "s"}
           </Grid>
         )}

@@ -1,31 +1,19 @@
-// import { RadialChart } from "react-vis";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Label,
-  Legend,
-  Rectangle,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, Label, XAxis, YAxis } from "recharts";
 import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
-import React, { Fragment, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import formats, { setInterval } from "../functions/formats";
 import stringLength, { maxStringLength } from "../functions/stringLength";
-import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "./Tooltip";
-import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
-import qs from "../functions/qs";
 import searchByCell from "../functions/searchByCell";
 import setColors from "../functions/setColors";
-import styles from "./Styles.scss";
+import { ttSwatch as ttSwatchStyle } from "./Styles.scss";
+import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
 import withSearchIndex from "../hocs/withSearchIndex";
@@ -80,7 +68,7 @@ const CustomBackground = ({ chartProps, ...props }) => {
       series.push(
         <div key={key}>
           <span
-            className={styles.ttSwatch}
+            className={ttSwatchStyle}
             style={{
               backgroundColor: chartProps.colors[i],
             }}
@@ -91,33 +79,39 @@ const CustomBackground = ({ chartProps, ...props }) => {
     }
   });
 
+  let CurrentRect = React.forwardRef((refProps, ref) => (
+    <rect
+      ref={ref}
+      {...refProps}
+      height={h}
+      width={w}
+      x={props.background.x}
+      y={props.background.y}
+      style={chartProps.embedded ? {} : { cursor: "pointer" }}
+      fill={"rgba(255,255,255,0)"}
+      onClick={
+        chartProps.embedded
+          ? () => {}
+          : (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              searchByCell({
+                ...chartProps,
+                xRange,
+              });
+            }
+      }
+    />
+  ));
+
   return (
     <>
       <Tooltip
-        interactive
+        disableInteractive={false}
         title={<CellInfo x={xLimits} count={count} rows={series} />}
         arrow
       >
-        <Rectangle
-          height={h}
-          width={w}
-          x={props.background.x}
-          y={props.background.y}
-          style={chartProps.embedded ? {} : { cursor: "pointer" }}
-          fill={"rgba(255,255,255,0)"}
-          onClick={
-            chartProps.embedded
-              ? () => {}
-              : (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  searchByCell({
-                    ...chartProps,
-                    xRange,
-                  });
-                }
-          }
-        />
+        <CurrentRect />
       </Tooltip>
       {legendGroup}
     </>
@@ -613,7 +607,7 @@ const ReportHistogram = ({
     );
 
     return (
-      <Grid item xs ref={componentRef} style={{ height: "100%" }}>
+      <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
         {chart}
       </Grid>
     );

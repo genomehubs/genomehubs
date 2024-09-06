@@ -3,10 +3,10 @@ import React, { memo } from "react";
 import NavLink from "./NavLink";
 import classnames from "classnames";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
+import { tabHolder as tabHolderStyle } from "./Styles.scss";
 
 const TabsFixed = () => {
-  let css = classnames(styles.tabHolder);
+  let css = classnames(tabHolderStyle);
   let content = [
     <NavLink key={"sources"} to={"sources"} tab>
       {"sources"}

@@ -1,7 +1,14 @@
+import {
+  header as headerStyle,
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  resultPanel as resultPanelStyle,
+  title as titleStyle,
+} from "./Styles.scss";
+
 import AttributeTable from "./AttributeTable";
 import React from "react";
 import classnames from "classnames";
-import styles from "./Styles.scss";
 
 const AttributePanel = ({
   attributes,
@@ -9,16 +16,12 @@ const AttributePanel = ({
   taxonId,
   title = "Attributes",
 }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel
-  );
+  let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, resultPanelStyle);
 
   return (
     <div className={css}>
-      <div className={styles.header}>
-        <span className={styles.title}>{title}</span>
+      <div className={headerStyle}>
+        <span className={titleStyle}>{title}</span>
       </div>
       <div>
         <AttributeTable

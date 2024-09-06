@@ -2,7 +2,7 @@ import "winston-daily-rotate-file";
 
 import { createLogger, format, transports } from "winston";
 
-import { config } from "./config";
+import { config } from "./config.js";
 
 const { combine, timestamp, prettyPrint, colorize, errors, label, printf } =
   format;

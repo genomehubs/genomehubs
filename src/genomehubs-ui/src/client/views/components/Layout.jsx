@@ -1,18 +1,16 @@
 import React, { memo, useEffect, useState } from "react";
 
 import CookieBanner from "./CookieBanner";
-import DownloadMessage from "./DownloadMessage";
 import Footer from "./Footer";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import Header from "./Header";
-import LoadingScreen from "./LoadingScreen";
 import Main from "./Main";
 import ReportPage from "./ReportPage";
 import { Router } from "@reach/router";
 import SearchPage from "./SearchPage";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
-import styles from "./Styles.scss";
+import { fillParent as fillParentStyle } from "./Styles.scss";
+import makeStyles from "@mui/styles/makeStyles";
 import withSiteName from "../hocs/withSiteName";
 
 // const ReportPage = loadable(() => import("./ReportPage"));
@@ -25,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     overflowX: "hidden",
   },
   item: {
-    minWidth: "100%",
+    minWidth: "100% !important",
     maxWidth: "100%",
   },
   footer: {
@@ -44,13 +42,13 @@ const DefaultLayout = ({}) => {
         spacing={0}
         direction="column"
       >
-        <Grid item className={classes.item} xs={1}>
+        <Grid className={classes.item}>
           <CookieBanner />
         </Grid>
-        <Grid item className={classes.item} xs={1} style={{ zIndex: 1000 }}>
-          <Header />
+        <Grid className={classes.item} style={{ zIndex: 1000 }}>
+          <Header id="header" />
         </Grid>
-        <Grid item className={classes.item} xs={true} id="mainContainer">
+        <Grid className={classes.item} id="mainContainer">
           {/* {types && Object.keys(types).length > 0 && ( */}
 
           <Main />
@@ -58,7 +56,7 @@ const DefaultLayout = ({}) => {
 
           {/* )} */}
         </Grid>
-        <Grid item className={classes.item} xs={1}>
+        <Grid className={classes.item}>
           <Footer />
         </Grid>
       </Grid>
@@ -101,7 +99,7 @@ const Layout = ({ types, basename, loading }) => {
   }, []);
   return (
     <>
-      <Router className={styles.fillParent} basepath={basename} primary={false}>
+      <Router className={fillParentStyle} basepath={basename} primary={false}>
         {paths}
       </Router>
     </>

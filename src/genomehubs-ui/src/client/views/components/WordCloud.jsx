@@ -1,12 +1,15 @@
 import React, { useEffect, useRef } from "react";
+import {
+  fullWidth as fullWidthStyle,
+  tagCloud as tagCloudStyle,
+} from "./Styles.scss";
 
-import Skeleton from "@material-ui/lab/Skeleton";
+import Skeleton from "@mui/material/Skeleton";
 import { TagCloud } from "react-tagcloud";
 import { compose } from "recompose";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
+import { useIntersectionObserver } from "usehooks-ts";
 import { useNavigate } from "@reach/router";
-import useVisible from "../hooks/useVisible";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
@@ -30,8 +33,9 @@ const WordCloud = ({
 }) => {
   const navigate = useNavigate();
   const height = 100;
-  const targetRef = useRef();
-  let visible = useVisible(targetRef);
+  const { isIntersecting: visible, ref: targetRef } = useIntersectionObserver({
+    threshold: 0.01,
+  });
   let parts = summaryId.split("--");
   useEffect(() => {
     if (summaryId && visible) {
@@ -96,15 +100,15 @@ const WordCloud = ({
 
   if (buckets.length == 0) {
     return (
-      <div className={styles.fullWidth} ref={targetRef}>
-        <Skeleton variant="rect" width={400} height={50} />
+      <div className={fullWidthStyle} ref={targetRef}>
+        <Skeleton variant="rectangular" width={400} height={50} />
       </div>
     );
   }
   return (
     <div ref={targetRef}>
       <TagCloud
-        className={styles.tagCloud}
+        className={tagCloudStyle}
         minSize={12}
         maxSize={35}
         tags={buckets}

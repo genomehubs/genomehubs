@@ -9,11 +9,8 @@ export const gridPropNames = new Set([
   "direction",
   "item",
   "justifyContent",
-  "lg",
-  "md",
-  "sm",
   "spacing",
   "wrap",
-  "xl",
-  "xs",
+  "size",
+  "offset",
 ]);

@@ -1,22 +1,22 @@
-import { cacheStore, cachedResponse, pingCache } from "../functions/cache";
+import { cacheStore, cachedResponse, pingCache } from "../functions/cache.js";
 import {
   clearProgress,
   getProgress,
   isProgressComplete,
   setProgress,
-} from "../functions/progress";
+} from "../functions/progress.js";
 
-import { formatCsv } from "../functions/formatCsv";
-import { formatJson } from "../functions/formatJson";
-import { getBounds } from "../reports/getBounds";
-import { getResults } from "../functions/getResults";
-import { indexName } from "../functions/indexName";
-import { logError } from "../functions/logger";
-import { lookupAlternateIds } from "../functions/lookupAlternateIds";
-import { parseFields } from "../functions/parseFields";
-import { queryParams } from "../reports/queryParams";
-import { setExclusions } from "../functions/setExclusions";
-import setSortBy from "../reports/setSortBy";
+import { formatCsv } from "../functions/formatCsv.js";
+import { formatJson } from "../functions/formatJson.js";
+import { getBounds } from "../reports/getBounds.js";
+import { getResults } from "../functions/getResults.js";
+import { indexName } from "../functions/indexName.js";
+import { logError } from "../functions/logger.js";
+import { lookupAlternateIds } from "../functions/lookupAlternateIds.js";
+import { parseFields } from "../functions/parseFields.js";
+import { queryParams } from "../reports/queryParams.js";
+import { setExclusions } from "../functions/setExclusions.js";
+import setSortBy from "../reports/setSortBy.js";
 import { v4 as uuidv4 } from "uuid";
 
 const replaceSearchIds = async (params) => {

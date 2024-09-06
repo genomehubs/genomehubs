@@ -1,22 +1,21 @@
 import React, { useEffect } from "react";
+import {
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  textPanel as textPanelStyle,
+} from "./Styles.scss";
 
-import Page from "./Page";
 import ReportFull from "./ReportFull";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
 import qs from "../functions/qs";
 import { sortReportQuery } from "../selectors/report";
-import styles from "./Styles.scss";
 import { useLocation } from "@reach/router";
 import withTaxonomy from "../hocs/withTaxonomy";
 
 const SourcesPanel = ({ setLookupTerm, taxonomy }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.textPanel
-  );
+  let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, textPanelStyle);
   const location = useLocation();
   let queryString = location.search.replace(/^\?/, "");
   let hashTerm = decodeURIComponent(location.hash.replace(/^\#/, ""));

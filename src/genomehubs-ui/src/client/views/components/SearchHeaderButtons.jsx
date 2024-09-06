@@ -1,15 +1,16 @@
 import React, { useState } from "react";
+import {
+  favListingFooter as favListingFooterStyle,
+  saveSearchOptions as saveSearchOptionsStyle,
+} from "./Styles.scss";
 
-import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
-import FavoriteIcon from "@material-ui/icons/Favorite";
 import FavouriteButton from "./FavouriteButton";
-import IconButton from "@material-ui/core/IconButton";
+import IconButton from "@mui/material/IconButton";
 import SaveSettingsModal from "./SaveSettingsModal";
-import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
+import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { splitTerms } from "../functions/splitTerms";
-import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
 import withSearch from "../hocs/withSearch";
 
@@ -52,9 +53,7 @@ const SearchHeaderButtons = ({
   if (showFavourite) {
     if (showName && favourites[stringTerm] !== true) {
       favName = (
-        <span className={styles.favListingFooter}>
-          {favourites[stringTerm]}
-        </span>
+        <span className={favListingFooterStyle}>{favourites[stringTerm]}</span>
       );
     }
     favButton = (
@@ -69,9 +68,10 @@ const SearchHeaderButtons = ({
   let settingsButton = (
     <Tooltip title="Search settings" arrow placement={"top"}>
       <IconButton
-        className={styles.saveSearchOptions}
+        className={saveSearchOptionsStyle}
         aria-label="search settings"
         onClick={() => setOpen(!open)}
+        size="large"
       >
         <SettingsApplicationsIcon style={{ color }} />
       </IconButton>

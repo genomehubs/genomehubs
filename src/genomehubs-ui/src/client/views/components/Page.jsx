@@ -1,16 +1,13 @@
 import React, { memo, useRef, useState } from "react";
+import { link as linkStyle, pageTitle as pageTitleStyle } from "./Styles.scss";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import SearchBox from "./SearchBox";
 import SearchHeaderButtons from "./SearchHeaderButtons";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchColors from "../hocs/dispatchColors";
-import { makeStyles } from "@material-ui/core/styles";
-import qs from "qs";
-import styles from "./Styles.scss";
-import { useLocation } from "@reach/router";
-import { useReadLocalStorage } from "usehooks-ts";
+import makeStyles from "@mui/styles/makeStyles";
 import withApi from "../hocs/withApi";
 import withSearchIndex from "../hocs/withSearchIndex";
 import withSiteName from "../hocs/withSiteName";
@@ -20,15 +17,20 @@ const useStyles = makeStyles((theme) => ({
     minHeight: "100%",
     minWidth: "100%",
     maxWidth: "100%",
+    width: "100%",
     paddingBottom: "1em",
   },
-  item: { minWidth: "900px", maxWidth: "80%", align: "center" },
+  item: {
+    minWidth: "900px",
+    maxWidth: "80%",
+    align: "center",
+  },
   itemFull: { width: "100%", align: "center" },
   saveSearchOptions: {
     fontSize: "2em",
-    marginLeft: theme.spacing(1),
+    marginLeft: "8px",
     backgroundColor: "inherit",
-    padding: 0,
+    padding: "0px",
   },
 }));
 
@@ -41,32 +43,18 @@ const Page = ({
   text,
   landingPage,
   topLevel,
-  searchIndex,
   pageRef,
   recordId,
   fieldId,
   resultCount,
   result,
   siteName,
-  // selectPalette,
-  apiStatus,
 }) => {
   const classes = useStyles();
-  const location = useLocation();
-  const [open, setOpen] = useState(false);
-  const [favourite, setFavourite] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
   const [showBrowse, setShowBrowse] = useState(false);
   const rootRef = useRef(null);
-  const savedOptions = useReadLocalStorage(`${searchIndex}Options`);
   const itemCss = topLevel ? classes.itemFull : classes.item;
-  let options = qs.parse(location.search.replace(/^\?/, ""));
-  // useEffect(() => {
-  //   selectPalette(options.palette || "default");
-  // }, []);
-  // if (!apiStatus) {
-  //   return null;
-  // }
   let preSearchItems = [];
   if (preSearchPanels && preSearchPanels.length > 0) {
     preSearchPanels.forEach((obj, i) => {
@@ -82,7 +70,7 @@ const Page = ({
           className={itemCss}
           style={panelStyles}
           key={`pre_${i}`}
-          xs={12}
+          size={12}
         >
           {obj.panel}
         </Grid>
@@ -105,7 +93,7 @@ const Page = ({
           className={itemCss}
           style={{ ...panelStyles, ...(showExamples || { display: "none" }) }}
           key={`pre_${i}`}
-          xs={12}
+          size={12}
         >
           {obj.panel}
         </Grid>
@@ -128,7 +116,7 @@ const Page = ({
           className={itemCss}
           style={{ ...panelStyles, ...(showBrowse || { display: "none" }) }}
           key={`pre_${i}`}
-          xs={12}
+          size={12}
         >
           {obj.panel}
         </Grid>
@@ -145,7 +133,7 @@ const Page = ({
         }
       });
       postSearchItems.push(
-        <Grid item className={itemCss} style={panelStyles} key={i}>
+        <Grid size={12} className={itemCss} style={panelStyles} key={i}>
           {obj.panel}
         </Grid>
       );
@@ -177,11 +165,10 @@ const Page = ({
         <>
           {landingPage && (
             <Grid
-              item
               className={classes.item}
               style={{
                 marginBottom: "-3.25em",
-                padding: "0 0.75em",
+                padding: "0em 0.75em",
                 marginTop: "-1.5em",
                 minWidth: "80%",
               }}
@@ -189,7 +176,7 @@ const Page = ({
               <h2>Search {siteName}</h2>
             </Grid>
           )}
-          <Grid item xs={12} id="searchBox">
+          <Grid id="searchBox">
             <Grid
               container
               direction="row"
@@ -197,12 +184,11 @@ const Page = ({
               alignItems="center"
             >
               <Grid
-                item
                 className={itemCss}
                 style={{
                   marginTop: "2em",
                 }}
-                xs={12}
+                size={12}
               >
                 <SearchBox />
               </Grid>
@@ -215,7 +201,7 @@ const Page = ({
                 className={classes.item}
                 justifyContent="flex-end"
               >
-                <Grid item>
+                <Grid>
                   <span
                     style={{
                       float: "right",
@@ -230,7 +216,7 @@ const Page = ({
                         setShowExamples(!showExamples);
                         setShowBrowse(false);
                       }}
-                      className={styles.link}
+                      className={linkStyle}
                       href=""
                     >
                       {showExamples ? "hide" : "show"} examples
@@ -242,7 +228,7 @@ const Page = ({
                         setShowBrowse(!showBrowse);
                         setShowExamples(false);
                       }}
-                      className={styles.link}
+                      className={linkStyle}
                       href="#"
                     >
                       {showBrowse ? "hide" : "browse"} tree
@@ -258,28 +244,22 @@ const Page = ({
       )}
       {title && (
         <Grid
-          item
-          className={classnames(styles.pageTitle, itemCss)}
+          className={classnames(pageTitleStyle, itemCss)}
           style={{ marginBottom: "0.5em", paddingLeft: "0.5em" }}
           container
           direction="row"
           ref={rootRef}
+          size={12}
         >
-          <Grid item xs={6}>
-            {title}
-          </Grid>
+          <Grid size={6}>{title}</Grid>
 
-          <Grid item xs={6} style={{ textAlign: "end" }}>
+          <Grid style={{ textAlign: "end" }} size={6}>
             <SearchHeaderButtons rootRef={rootRef} showFavourite showName />
           </Grid>
         </Grid>
       )}
       {postSearchItems}
-      {text && (
-        <Grid item className={itemCss}>
-          {text}
-        </Grid>
-      )}
+      {text && <Grid className={itemCss}>{text}</Grid>}
     </Grid>
   );
 };

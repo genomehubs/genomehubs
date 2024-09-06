@@ -1,5 +1,5 @@
-import { attrTypes } from "../functions/attrTypes";
-import { histogramAgg } from "../queries/histogramAgg";
+import { attrTypes } from "../functions/attrTypes.js";
+import { histogramAgg } from "../queries/histogramAgg.js";
 
 const attributeTerms = ({ cat, terms, size, yHistograms }) => {
   let filter;

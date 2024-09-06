@@ -1,8 +1,31 @@
-import BadgeInfo, { BadgeInfoCell } from "./BadgeInfo";
+import {
+  arrowLarge as arrowLargeStyle,
+  arrowRight as arrowRightStyle,
+  arrow as arrowStyle,
+  attrInfo as attrInfoStyle,
+  bold as boldStyle,
+  content as contentStyle,
+  fieldCount as fieldCountStyle,
+  fieldHighlight as fieldHighlightStyle,
+  fieldNameHighlight as fieldNameHighlightStyle,
+  fieldName as fieldNameStyle,
+  field as fieldStyle,
+  fieldValue as fieldValueStyle,
+  header as headerStyle,
+  identifierPrefix as identifierPrefixStyle,
+  identifier as identifierStyle,
+  infoName as infoNameStyle,
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  infoValue as infoValueStyle,
+  nameGroup as nameGroupStyle,
+  resultPanel as resultPanelStyle,
+  title as titleStyle,
+} from "./Styles.scss";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import HistogramSVG from "./HistogramSVG";
 import React from "react";
 import TaxonSummaryPanel from "./TaxonSummaryPanel";
@@ -12,7 +35,6 @@ import classnames from "classnames";
 import { compose } from "recompose";
 import { formatter } from "../functions/formatter";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
@@ -28,7 +50,7 @@ const AttributeSummary = ({
   handleFieldClick,
 }) => {
   let length = 1;
-  let value = field.value;
+  let { value } = field;
 
   if (Array.isArray(value)) {
     if (value.length == 0) {
@@ -56,7 +78,7 @@ const AttributeSummary = ({
   }
   let highlight = [null, null];
   if (location.pathname == basename + "/explore" && field.id == summaryField) {
-    highlight = [styles["fieldHighlight"], styles["fieldNameHighlight"]];
+    highlight = [fieldHighlightStyle, fieldNameHighlightStyle];
   }
   let details;
   if (field.aggregation_method.endsWith("list") && length > 1) {
@@ -66,17 +88,17 @@ const AttributeSummary = ({
   }
   let summary = (
     <Tooltip key={field.id} title={"Click to view summary plot"} arrow>
-      <Grid item>
+      <Grid>
         <div
           key={field.id}
-          className={classnames(styles.field, highlight[0])}
+          className={classnames(fieldStyle, highlight[0])}
           onClick={() => handleFieldClick(field.id)}
           // style={{ minWidth: "150px" }}
         >
-          <div className={classnames(styles.fieldName, highlight[1])}>
+          <div className={classnames(fieldNameStyle, highlight[1])}>
             {field.id}
           </div>
-          <div className={styles.fieldValue}>
+          <div className={fieldValueStyle}>
             <Grid
               container
               direction="row"
@@ -84,29 +106,29 @@ const AttributeSummary = ({
               spacing={1}
               alignItems={"center"}
             >
-              <Grid item>
+              <Grid>
                 <AggregationIcon
                   method={field.aggregation_source}
                   hasDescendants={field.has_descendants}
                 />
               </Grid>
 
-              <Grid item>{value}</Grid>
+              <Grid>{value}</Grid>
             </Grid>
           </div>
-          <div className={styles.fieldCount}>{details}</div>
+          <div className={fieldCountStyle}>{details}</div>
         </div>
       </Grid>
     </Tooltip>
   );
   summary = (
-    <div key={field.id} className={styles.attrInfo}>
-      <div className={styles.infoName}>{field.id}</div>
+    <div key={field.id} className={attrInfoStyle}>
+      <div className={infoNameStyle}>{field.id}</div>
       <AggregationIcon
         method={field.aggregation_source}
         hasDescendants={field.has_descendants}
       />
-      <div className={styles.infoValue}>{value}</div>
+      <div className={infoValueStyle}>{value}</div>
     </div>
   );
   return summary;
@@ -151,11 +173,7 @@ const ResultPanel = ({
       }&field_id=${fieldId}${location.hash}`
     );
   };
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel
-  );
+  let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, resultPanelStyle);
   let groupedDivs = {};
   let fieldDivs = [];
   let taxonSummary;
@@ -187,7 +205,7 @@ const ResultPanel = ({
       }
     });
     taxonSummary = (
-      <Grid item xs={12}>
+      <Grid size={12}>
         <TaxonSummaryPanel taxonId={taxon_id} />
       </Grid>
     );
@@ -223,10 +241,10 @@ const ResultPanel = ({
   return (
     <div className={css}>
       <Tooltip title={"Click to view record"} arrow placement="top">
-        <div className={styles.header} onClick={handleTaxonClick}>
-          <span className={styles.title}>{taxon_rank}</span>
-          <span className={styles.identifier}>
-            <span className={styles.identifierPrefix}>taxId:</span>
+        <div className={headerStyle} onClick={handleTaxonClick}>
+          <span className={titleStyle}>{taxon_rank}</span>
+          <span className={identifierStyle}>
+            <span className={identifierPrefixStyle}>taxId:</span>
             {taxon_id}
           </span>
         </div>
@@ -236,9 +254,9 @@ const ResultPanel = ({
           <Tooltip title={"Click to view record"} arrow>
             <i
               className={classnames(
-                styles.arrow,
-                styles.arrowRight,
-                styles.arrowLarge
+                arrowStyle,
+                arrowRightStyle,
+                arrowLargeStyle
               )}
             ></i>
           </Tooltip>
@@ -252,10 +270,11 @@ const ResultPanel = ({
           direction="row"
           spacing={0}
           style={{ width: "100%" }}
+          size={12}
         >
-          <div className={styles.nameGroup}>
-            <div className={styles.content}>
-              <span className={classnames(styles.bold)}>{scientific_name}</span>
+          <div className={nameGroupStyle}>
+            <div className={contentStyle}>
+              <span className={classnames(boldStyle)}>{scientific_name}</span>
             </div>
           </div>
         </Grid>
@@ -266,9 +285,9 @@ const ResultPanel = ({
           {fieldDivs}
         </Grid>
 
-        {/* <div className={styles.flexRow}>{fieldDivs}</div>
+        {/* <div className={flexRowStyle}>{fieldDivs}</div>
         {additionalDivs.length > 0 && (
-          <div className={styles.flexRow}>{additionalDivs}</div>
+          <div className={flexRowStyle}>{additionalDivs}</div>
         )} */}
         <div>{summaryPlot}</div>
       </div>

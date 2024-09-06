@@ -1,5 +1,5 @@
-import { checkResponse } from "./checkResponse";
-import { client } from "./connection";
+import { checkResponse } from "./checkResponse.js";
+import { client } from "./connection.js";
 import { config } from "./config.js";
 
 export const fetchIndices = async (release = config.release) => {

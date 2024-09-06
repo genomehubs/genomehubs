@@ -1,27 +1,27 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import AutoCompleteInput from "./AutoCompleteInput";
-import Box from "@material-ui/core/Box";
-import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import Grid from "@material-ui/core/Grid";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import Select from "@material-ui/core/Select";
+import Box from "@mui/material/Box";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormHelperText from "@mui/material/FormHelperText";
+import Grid from "@mui/material/Grid2";
+import InputAdornment from "@mui/material/InputAdornment";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import Select from "@mui/material/Select";
 import SettingsButton from "./SettingsButton";
-import Slider from "@material-ui/core/Slider";
-import SwapHorizIcon from "@material-ui/icons/SwapHoriz";
-import Switch from "@material-ui/core/Switch";
-import TextField from "@material-ui/core/TextField";
+import Slider from "@mui/material/Slider";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import Switch from "@mui/material/Switch";
+import TextField from "@mui/material/TextField";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
 import { getSuggestedTerm } from "../reducers/search";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import withReportById from "../hocs/withReportById";
 import withSiteName from "../hocs/withSiteName";
@@ -434,22 +434,28 @@ export const ReportEdit = ({
         );
       });
       input = (
-        <Grid container direction="row" alignItems="flex-end">
-          <Grid item xs={6}>
-            <FormControl style={{ width: "95%" }}>
+        <Grid
+          container
+          spacing={1}
+          direction="row"
+          sx={{ flexGrow: 1, width: "95%" }}
+        >
+          <Grid size={{ xs: "grow" }}>
+            <FormControl variant="standard" style={{ width: "100%" }}>
               <InputLabel id="select-report-label">report</InputLabel>
               <Select
+                variant="standard"
                 labelId="select-report-label"
                 id="select-report"
                 value={values["report"]}
-                style={{ width: "95%" }}
+                sx={{ minWidth: "95%" }}
                 onChange={(e) => handleChange(e, "report")}
               >
                 {items}
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6} align={"right"} key={"submit"}>
+          <Grid align={"right"} key={"submit"} size={{ xs: "grow" }}>
             <SettingsButton
               handleClick={handleSubmit}
               handleResetClick={handleReset}
@@ -466,9 +472,10 @@ export const ReportEdit = ({
         );
       });
       input = (
-        <FormControl style={{ width: "95%" }}>
+        <FormControl variant="standard" style={{ width: "95%" }}>
           <InputLabel id="select-tree-style-label">treeStyle</InputLabel>
           <Select
+            variant="standard"
             labelId="select-tree-style-label"
             id="select-tree-style"
             value={values["treeStyle"]}
@@ -488,9 +495,10 @@ export const ReportEdit = ({
         );
       });
       input = (
-        <FormControl style={{ width: "95%" }}>
+        <FormControl variant="standard" style={{ width: "95%" }}>
           <InputLabel id="select-plot-ratio-label">plotRatio</InputLabel>
           <Select
+            variant="standard"
             labelId="select-plot-ratio-label"
             id="select-plot-ratio"
             value={values["plotRatio"]}
@@ -512,7 +520,7 @@ export const ReportEdit = ({
     ) {
       toggles.push(
         <div style={{ float: "left", marginRight: "2em" }} key={queryProp}>
-          <FormControl key={queryProp}>
+          <FormControl variant="standard" key={queryProp}>
             <FormControlLabel
               className={classes.label}
               control={
@@ -588,7 +596,7 @@ export const ReportEdit = ({
             }}
             key={queryProp}
           >
-            <FormControl>
+            <FormControl variant="standard">
               <Slider
                 id={queryProp + Math.random()}
                 value={values[queryProp] * 1}
@@ -639,6 +647,7 @@ export const ReportEdit = ({
         icon = reverseIcon({ queryProp });
         input = (
           <TextField
+            variant="standard"
             id={queryProp + Math.random()}
             label={label}
             value={values[queryProp]}
@@ -654,7 +663,6 @@ export const ReportEdit = ({
     if (input) {
       fields.push(
         <Grid
-          item
           style={{ width: "95%" }}
           key={`input-${queryProp}`}
           justifyContent="flex-end"
@@ -662,11 +670,9 @@ export const ReportEdit = ({
           container
           direction="row"
         >
-          <Grid item xs={icon ? 11 : 12}>
-            {input}
-          </Grid>
+          <Grid size={icon ? 11 : 12}>{input}</Grid>
           {icon && (
-            <Grid item xs={1} style={{ color: "#777c78" }}>
+            <Grid style={{ color: "#777c78" }} size={1}>
               {icon}
             </Grid>
           )}
@@ -676,13 +682,13 @@ export const ReportEdit = ({
   }
   if (toggles.length > 0) {
     fields.push(
-      <Grid item align="left" key={"toggles"}>
+      <Grid align="left" key={"toggles"}>
         {toggles}
       </Grid>
     );
   }
   fields.push(
-    <Grid item align="right" key={"submit"}>
+    <Grid align="right" key={"submit"}>
       <div>&nbsp;</div>
       <SettingsButton
         handleClick={handleSubmit}
@@ -691,11 +697,6 @@ export const ReportEdit = ({
     </Grid>
   );
   return (
-    // <Grid
-    //   container
-    //   direction="column"
-    //   style={{ height: "100%", width: "100%" }}
-    // >
     <Box
       style={{
         height: "100%",
@@ -706,7 +707,6 @@ export const ReportEdit = ({
     >
       <form ref={formRef}>{fields}</form>
     </Box>
-    // </Grid>
   );
 };
 

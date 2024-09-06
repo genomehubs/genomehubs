@@ -1,4 +1,4 @@
-import { getCatLabels } from "./getCatLabels";
+import { getCatLabels } from "./getCatLabels.js";
 
 export const setTerms = async ({
   cat,

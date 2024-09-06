@@ -2,8 +2,8 @@ import React, { memo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AutoCompleteInput from "./AutoCompleteInput";
-import FormControl from "@material-ui/core/FormControl";
-import Grid from "@material-ui/core/Grid";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid2";
 import SearchButton from "./SearchButton";
 import SearchInputQueries from "./SearchInputQueries";
 import SearchToggles from "./SearchToggles";
@@ -211,11 +211,17 @@ const SearchBox = ({
         }}
       >
         <SearchInputQueries liveQuery={liveQuery} />
-        <Grid item>
+        <Grid>
           <Grid container direction="row" alignItems="center">
-            <Grid item xs={2}></Grid>
-            <Grid item ref={searchBoxRef} xs={"auto"}>
-              <FormControl className={classes.formControl}>
+            <Grid size={2}></Grid>
+            <Grid ref={searchBoxRef} size={8}>
+              <FormControl
+                variant="standard"
+                className={classes.formControl}
+                style={{
+                  width: "100%",
+                }}
+              >
                 <AutoCompleteInput
                   inputValue={lookupTerm}
                   setInputValue={setLookupTerm}
@@ -233,7 +239,7 @@ const SearchBox = ({
                 />
               </FormControl>
             </Grid>
-            <Grid item xs={2}>
+            <Grid size={2}>
               {/* <Tooltip title="Click to search" arrow placement={"top"}> */}
               {/* <IconButton
                   className={classes.search}
@@ -271,18 +277,18 @@ const SearchBox = ({
           </Grid>
         </Grid>
       </form>
-      <Grid
+      {/* <Grid
         container
         direction="row"
         alignItems="center"
         // style={{ paddingBottom: "1em" }}
-      >
-        <Grid item xs={2}></Grid>
-        <Grid item xs={8}>
-          <SearchToggles toggleTemplate={toggleTemplate} id="searchToggles" />
-        </Grid>
-        <Grid item xs={2}></Grid>
+      > */}
+      <Grid size={1}></Grid>
+      <Grid size={10}>
+        <SearchToggles toggleTemplate={toggleTemplate} id="searchToggles" />
       </Grid>
+      <Grid size={1}></Grid>
+      {/* </Grid> */}
     </Grid>
   );
 };

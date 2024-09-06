@@ -1,16 +1,19 @@
 import React, { useEffect } from "react";
+import {
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  resultPanel as resultPanelStyle,
+} from "./Styles.scss";
 import { useLocation, useNavigate } from "@reach/router";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import { LineageList } from "./LineagePanel";
 import LineageSummaryPanel from "./LineageSummaryPanel";
-import NavLink from "./NavLink";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
@@ -83,20 +86,16 @@ const TaxonPanel = ({
     // setRecordId(taxon_id);
   };
 
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel
-  );
+  let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, resultPanelStyle);
 
   return (
     <div className={css}>
       <Tooltip title={"Click to view full taxon record"} arrow placement="top">
-        <div className={styles.header} onClick={handleTaxonClick}>
-          <span className={styles.title}>Taxon — {scientific_name}</span>
+        <div className={headerStyle} onClick={handleTaxonClick}>
+          <span className={titleStyle}>Taxon — {scientific_name}</span>
           <span> ({taxon_rank})</span>
-          <span className={styles.identifier}>
-            <span className={styles.identifierPrefix}>taxId:</span>
+          <span className={identifierStyle}>
+            <span className={identifierPrefixStyle}>taxId:</span>
             {taxon_id}
           </span>
         </div>
@@ -104,17 +103,11 @@ const TaxonPanel = ({
 
       <div>
         <Grid container alignItems="center" direction="column" spacing={1}>
-          {/* <div className={styles.flexRow}>{fieldDivs}</div>
-        {additionalDivs.length > 0 && (
-          <div className={styles.flexRow}>{additionalDivs}</div>
-        )} */}
-          <Grid item style={{ width: "100%" }}>
-            {lineages}
-          </Grid>
+          <Grid style={{ width: "100%" }}>{lineages}</Grid>
           {taxidLink && (
             <>
               <Grid container direction="row" justifyContent="flex-end">
-                <Grid item>{taxidLink}</Grid>
+                <Grid>{taxidLink}</Grid>
               </Grid>
             </>
           )}

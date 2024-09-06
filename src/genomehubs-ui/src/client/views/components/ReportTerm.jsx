@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useRef } from "react";
 
-import Chip from "@material-ui/core/Chip";
+import Chip from "@mui/material/Chip";
 import { compose } from "recompose";
 import withReportTerm from "../hocs/withReportTerm";
 

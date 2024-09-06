@@ -1,41 +1,42 @@
 import React, { useState } from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import {
+  favListingButton as favListingButtonStyle,
+  favListingContainer as favListingContainerStyle,
+  favListingContent as favListingContentStyle,
+  favListingExpand as favListingExpandStyle,
+  favListingHeader as favListingHeaderStyle,
+  favListing as favListingStyle,
+} from "./Styles.scss";
 
-import Button from "@material-ui/core/Button";
-import EditIcon from "@material-ui/icons/Edit";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ColorButton from "./ColorButton";
+import EditIcon from "@mui/icons-material/Edit";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FavouriteButton from "./FavouriteButton";
-import MuiDialogContent from "@material-ui/core/DialogContent";
-import SearchIcon from "@material-ui/icons/Search";
-import Typography from "@material-ui/core/Typography";
+import MuiDialogContent from "@mui/material/DialogContent";
+import SearchIcon from "@mui/icons-material/Search";
+import Typography from "@mui/material/Typography";
 import YamlEditor from "@focus-reactive/react-yaml";
 import { compose } from "recompose";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import { splitTerms } from "../functions/splitTerms";
-import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
 import { useNavigate } from "@reach/router";
 import withSearchDefaults from "../hocs/withSearchDefaults";
+import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
-
-// import withSearchIndex from "../hocs/withSearchIndex";
 
 export const useStyles = makeStyles((theme) => ({
   paper: {
-    // width: "96%",
-    // minWidth: "600px",
-    // padding: theme.spacing(2),
-    // marginTop: theme.spacing(2),
-
     boxShadow: "none",
   },
   formControl: {
-    margin: theme.spacing(2),
-    minWidth: 120,
+    margin: "16px",
+    minWidth: "120px",
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
+    marginTop: "16px",
   },
   label: {
     color: "rgba(0, 0, 0, 0.54)",
@@ -63,7 +64,7 @@ const SaveSettingsFavourites = ({
 
   const DialogContent = withStyles((theme) => ({
     root: {
-      padding: theme.spacing(2),
+      padding: "16px",
     },
   }))(MuiDialogContent);
 
@@ -104,7 +105,7 @@ const SaveSettingsFavourites = ({
 
   const formatYaml = ({ searchTerm, reportTerm }) => {
     let arr = Object.entries(searchTerm || {}).map(([key, value]) => (
-      <pre key={key} className={styles.favListing}>
+      <pre key={key} className={favListingStyle}>
         <b>{key}:</b> {JSON.stringify(value)}
       </pre>
     ));
@@ -112,7 +113,7 @@ const SaveSettingsFavourites = ({
       arr.push(<hr key={"hr"} />);
       arr = arr.concat(
         Object.entries(reportTerm || {}).map(([key, value]) => (
-          <pre key={key} className={styles.favListing}>
+          <pre key={key} className={favListingStyle}>
             <b>{key}:</b> {JSON.stringify(value)}
           </pre>
         ))
@@ -141,14 +142,14 @@ const SaveSettingsFavourites = ({
     );
 
     favListings.push(
-      <div key={i} className={styles.favListing}>
-        <div className={styles.favListingContainer}>
+      <div key={i} className={favListingStyle}>
+        <div className={favListingContainerStyle}>
           <div
-            className={styles.favListingHeader}
+            className={favListingHeaderStyle}
             onClick={() => handleExpand(key)}
           >
             {favButton}
-            <span className={styles.favListingExpand}>
+            <span className={favListingExpandStyle}>
               {expand[key] ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </span>
             <Typography>
@@ -162,7 +163,7 @@ const SaveSettingsFavourites = ({
             </Typography>
           </div>
           {expand[key] && (
-            <div className={styles.favListingContent}>
+            <div className={favListingContentStyle}>
               {edit[key] ? (
                 <YamlEditor
                   json={{
@@ -175,8 +176,8 @@ const SaveSettingsFavourites = ({
               ) : (
                 formatYaml({ searchTerm, reportTerm })
               )}
-              <div className={styles.favListingButton}>
-                <Button
+              <div className={favListingButtonStyle}>
+                <ColorButton
                   autoFocus
                   color="primary"
                   // variant="outlined"
@@ -184,8 +185,8 @@ const SaveSettingsFavourites = ({
                   onClick={() => toggleEdit(key)}
                 >
                   Edit
-                </Button>
-                <Button
+                </ColorButton>
+                <ColorButton
                   autoFocus
                   color="primary"
                   // variant="outlined"
@@ -202,7 +203,7 @@ const SaveSettingsFavourites = ({
                   }}
                 >
                   Search
-                </Button>
+                </ColorButton>
               </div>
             </div>
           )}
@@ -228,14 +229,14 @@ const SaveSettingsFavourites = ({
         key={"save-changes"}
         style={{ position: "relative", height: "2em", width: "100%" }}
       >
-        <Button
-          className={styles.favListingButton}
+        <ColorButton
+          className={favListingButtonStyle}
           autoFocus
           onClick={handleSave}
           color="primary"
         >
           Save changes
-        </Button>
+        </ColorButton>
       </div>
     );
   }

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import Grid from "@material-ui/core/Grid";
-import LaunchIcon from "@material-ui/icons/Launch";
+import Grid from "@mui/material/Grid2";
+import LaunchIcon from "@mui/icons-material/Launch";
 import ReportTreePaths from "./ReportTreePaths";
 import ReportTreeRings from "./ReportTreeRings";
 import Tooltip from "./Tooltip";
@@ -232,9 +232,9 @@ const ReportTree = ({
     );
   }
   return (
-    <Grid item xs ref={componentRef} style={{ height: "100%" }}>
+    (<Grid ref={componentRef} style={{ height: "100%" }} size="grow">
       {treeComponent}
-    </Grid>
+    </Grid>)
   );
 };
 

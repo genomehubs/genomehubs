@@ -1,13 +1,17 @@
 import React, { memo, useRef, useState } from "react";
+import {
+  extra as extraStyle,
+  term as termStyle,
+  value as valueStyle,
+} from "./Styles.scss";
 
 import AutoCompleteOption from "./AutoCompleteOption";
 import AutoCompleteSuggestion from "./AutoCompleteSuggestion";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import Popper from "@material-ui/core/Popper";
-import TextField from "@material-ui/core/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import Popper from "@mui/material/Popper";
+import TextField from "@mui/material/TextField";
 import { compose } from "recompose";
 import { fetchAutocomplete } from "../functions/autocomplete";
-import styles from "./Styles.scss";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -85,9 +89,9 @@ export const AutoCompleteInput = ({
           unique_term: value,
         });
         terms.push(
-          <div key={i} className={styles.term}>
-            <span className={styles.value}>{result.key}</span>
-            <div className={styles.extra}>{`\u2014 ${result.type}`}</div>
+          <div key={i} className={termStyle}>
+            <span className={valueStyle}>{result.key}</span>
+            <div className={extraStyle}>{`\u2014 ${result.type}`}</div>
           </div>
         );
       } else if (autocompleteTerms.status.result == "taxon") {
@@ -127,10 +131,10 @@ export const AutoCompleteInput = ({
           ),
         });
         terms.push(
-          <div key={i} className={styles.term}>
-            <span className={styles.value}>{value}</span>
+          <div key={i} className={termStyle}>
+            <span className={valueStyle}>{value}</span>
             <div
-              className={styles.extra}
+              className={extraStyle}
             >{`\u2014 ${result.result.taxon_rank}`}</div>
           </div>
         );
@@ -160,10 +164,10 @@ export const AutoCompleteInput = ({
             : `${autocompleteTerms.status.result} ID`,
         });
         terms.push(
-          <div key={i} className={styles.term}>
-            <span className={styles.value}>{value}</span>
+          <div key={i} className={termStyle}>
+            <span className={valueStyle}>{value}</span>
             <div
-              className={styles.extra}
+              className={extraStyle}
             >{`\u2014 ${result.result.scientific_name}`}</div>
           </div>
         );
@@ -189,10 +193,10 @@ export const AutoCompleteInput = ({
             : "feature ID",
         });
         terms.push(
-          <div key={i} className={styles.term}>
-            <span className={styles.value}>{value}</span>
+          <div key={i} className={termStyle}>
+            <span className={valueStyle}>{value}</span>
             <div
-              className={styles.extra}
+              className={extraStyle}
             >{`\u2014 ${result.result.primary_type}`}</div>
           </div>
         );
@@ -203,8 +207,8 @@ export const AutoCompleteInput = ({
     autocompleteTerms.status &&
     autocompleteTerms.status.success &&
     autocompleteTerms.suggestions &&
-    autocompleteTerms.suggestions.length > 0 &&
-    !/[\(\)<>=]/.test(inputValue)
+    autocompleteTerms.suggestions.length > 0 // &&
+    // !/[\(\)<>=]/.test(inputValue)
   ) {
     autocompleteTerms.suggestions.forEach((suggestion, i) => {
       let value = suggestion.suggestion.text;
@@ -517,7 +521,13 @@ export const AutoCompleteInput = ({
       getOptionLabel={(option) =>
         typeof option === "string" ? option : option.title
       }
-      getOptionSelected={(option, value) => option.title === value.title}
+      isOptionEqualToValue={(option, value) => {
+        let val = value.title || value;
+        if (option.matchTerm) {
+          return option.matchTerm === val;
+        }
+        return option.title === val;
+      }}
       options={options}
       autoComplete
       includeInputInList
@@ -530,23 +540,27 @@ export const AutoCompleteInput = ({
       onChange={handleKeyDown}
       onBlur={handleBlur}
       onClose={handlePopperClose}
+      filterOptions={(options, state) => options}
       onInputChange={handleChange}
       onHighlightChange={handleHighlightChange}
       PopperComponent={PlacedPopper}
       renderInput={(params) => (
         <TextField
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyPress}
           {...params}
           required={required}
+          ref={params.InputProps.ref}
           inputRef={inputRef}
           label={inputLabel}
           name={inputName}
           className={inputClassName}
-          InputLabelProps={{
-            ...(inValue &&
-              (inputName || "").startsWith("query") && {
-                shrink: true,
-              }),
+          slotProps={{
+            inputLabel: {
+              ...(inValue &&
+                (inputName || "").startsWith("query") && {
+                  shrink: true,
+                }),
+            },
           }}
           variant={size == "small" ? "standard" : "outlined"}
           fullWidth
@@ -557,11 +571,11 @@ export const AutoCompleteInput = ({
           }}
         />
       )}
-      renderOption={(option) => {
+      renderOption={(props, option) => {
         if (option.highlighted) {
-          return <AutoCompleteSuggestion option={option} />;
+          return <AutoCompleteSuggestion option={option} {...props} />;
         }
-        return <AutoCompleteOption option={option} />;
+        return <AutoCompleteOption option={option} {...props} />;
       }}
     />
   );

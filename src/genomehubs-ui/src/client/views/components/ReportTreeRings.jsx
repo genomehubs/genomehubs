@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from "react";
 
 import Tooltip from "./Tooltip";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import { compose } from "recompose";
 import { scaleLog } from "d3-scale";
 import { useLongPress } from "use-long-press";
@@ -92,15 +92,15 @@ const ReportTreeRings = ({
           onPointerMove={(e) => setPosition({ x: e.clientX, y: e.clientY })}
           PopperProps={{
             anchorEl: {
-              clientHeight: 0,
-              clientWidth: 0,
+              clientHeight: "0px",
+              clientWidth: "0px",
               getBoundingClientRect: () => ({
                 top: position.y,
                 left: position.x,
                 right: position.x,
                 bottom: position.y + 10,
-                width: 0,
-                height: 10,
+                width: "0px",
+                height: "10px",
               }),
             },
           }}
@@ -112,7 +112,7 @@ const ReportTreeRings = ({
             fill={segment.color}
             onPointerEnter={(e) => highlightSegment(segment)}
             onPointerLeave={(e) => highlightSegment()}
-            {...longPress}
+            {...longPress()}
             stroke="white"
             strokeWidth={strokeWidth}
             d={segment.arc}

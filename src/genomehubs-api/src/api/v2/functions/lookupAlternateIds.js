@@ -1,6 +1,6 @@
-import { checkResponse } from "./checkResponse";
-import { client } from "./connection";
-import { processHits } from "./processHits";
+import { checkResponse } from "./checkResponse.js";
+import { client } from "./connection.js";
+import { processHits } from "./processHits.js";
 
 const altRecordId = async ({ index, name, source }) => {
   const { body } = await client

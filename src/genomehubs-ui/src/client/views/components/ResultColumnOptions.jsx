@@ -1,23 +1,24 @@
-import { FormGroup, TextField } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
-import { Theme, createStyles, makeStyles } from "@material-ui/core/styles";
 import { useLocation, useNavigate } from "@reach/router";
 
-import CancelIcon from "@material-ui/icons/Cancel";
-import Checkbox from "@material-ui/core/Checkbox";
-import Chip from "@material-ui/core/Chip";
-import FormControl from "@material-ui/core/FormControl";
-import Grid from "@material-ui/core/Grid";
-import InputLabel from "@material-ui/core/InputLabel";
-import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
-import ListItemText from "@material-ui/core/ListItemText";
-import MenuItem from "@material-ui/core/MenuItem";
-import Paper from "@material-ui/core/Paper";
-import Select from "@material-ui/core/Select";
+import CancelIcon from "@mui/icons-material/Cancel";
+import Checkbox from "@mui/material/Checkbox";
+import Chip from "@mui/material/Chip";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid2";
+import InputLabel from "@mui/material/InputLabel";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import ListItemText from "@mui/material/ListItemText";
+import MenuItem from "@mui/material/MenuItem";
+import Paper from "@mui/material/Paper";
+import React from "react";
+import Select from "@mui/material/Select";
 import SettingsButton from "./SettingsButton";
+import { TextField } from "@mui/material";
 import { compose } from "recompose";
 import expandFieldList from "../functions/expandFieldList";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
+import { styled } from "@mui/material/styles";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
@@ -28,8 +29,8 @@ const useStyles = makeStyles((theme) => ({
     width: "95%",
     minWidth: "600px",
     minHeight: "200px",
-    padding: theme.spacing(1),
-    marginTop: theme.spacing(1),
+    padding: "8px",
+    marginTop: "8px",
     border: "none",
     boxShadow: "none",
     overflowX: "hidden",
@@ -38,30 +39,33 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
+    marginTop: "16px",
   },
   redBackground: {
     backgroundColor: "#C00",
-    padding: 10,
+    padding: "10px",
   },
   whiteBackground: {
     backgroundColor: "#FFF",
   },
   formControl: {
-    margin: theme.spacing(1),
-    minWidth: 240,
-    maxWidth: 480,
+    margin: "8px",
+    minWidth: "240px",
+    maxWidth: "480px",
   },
   chips: {
     display: "flex",
     flexWrap: "wrap",
   },
   chip: {
-    margin: 2,
+    margin: "2px",
     backgroundColor: "#FFF",
   },
   noLabel: {
-    marginTop: theme.spacing(3),
+    marginTop: "24px",
+  },
+  label: {
+    color: "#ff7001",
   },
 }));
 
@@ -104,6 +108,11 @@ const summaryTypesFromMeta = (meta) => {
   }
   return summaryTypes;
 };
+
+const MyInputLabel = styled(InputLabel)({
+  color: "green",
+  backgroundColor: "aliceblue",
+});
 
 const ResultColumnOptions = ({
   attributeId,
@@ -213,11 +222,43 @@ const ResultColumnOptions = ({
 
   let form = (
     <div>
-      <FormControl className={classes.formControl}>
-        <InputLabel id="subset-checkbox-label">Subset</InputLabel>
+      <FormControl variant="standard" className={classes.formControl}>
+        <MyInputLabel
+          id="subset-checkbox-label"
+          sx={{
+            color: "red",
+            "&.Mui-focused": { color: "green" },
+            "&.MuiInputLabel-shrink": {
+              color: "red",
+            },
+            "&.MuiInputLabel-root": {
+              color: "blue",
+            },
+          }}
+        >
+          Subset
+        </MyInputLabel>
         <Select
+          variant="standard"
           labelId="subset-checkbox-label"
           id="subset-checkbox"
+          sx={{
+            "& .MuiInput-root": {
+              color: "#000",
+              fontFamily: "Arial",
+              fontWeight: "bold",
+              // Bottom border
+              "&:before": {
+                borderColor: "#2e2e2e",
+                borderWidth: "2px",
+              },
+            },
+            // Label
+            "& .MuiInputLabel-root": {
+              color: "#2e2e2e",
+              fontWeight: "bold",
+            },
+          }}
           multiple
           value={summaryCols}
           onChange={handleChange}
@@ -253,7 +294,7 @@ const ResultColumnOptions = ({
         </Select>
       </FormControl>
 
-      <FormControl className={classes.formControl}>
+      <FormControl variant="standard" className={classes.formControl}>
         <TextField
           label={"fieldOpts"}
           id="fieldopts-textbox"
@@ -269,7 +310,7 @@ const ResultColumnOptions = ({
     <Paper className={classes.paper}>
       <Grid container alignItems="center" direction="column" spacing={2}>
         <Grid container direction="row">
-          <Grid item>{form}</Grid>
+          <Grid>{form}</Grid>
         </Grid>
         <Grid container alignItems="flex-end" direction="row" spacing={2}>
           <SettingsButton

@@ -1,12 +1,12 @@
-import { checkResponse } from "../functions/checkResponse";
-import { client } from "../functions/connection";
-import { formatJson } from "../functions/formatJson";
-import { indexName } from "../functions/indexName";
-import { logError } from "../functions/logger";
-import { lookupQuery } from "../queries/lookupQuery";
-import { processHits } from "../functions/processHits";
-import { saytQuery } from "../queries/saytQuery";
-import { suggestQuery } from "../queries/suggestQuery";
+import { checkResponse } from "../functions/checkResponse.js";
+import { client } from "../functions/connection.js";
+import { formatJson } from "../functions/formatJson.js";
+import { indexName } from "../functions/indexName.js";
+import { logError } from "../functions/logger.js";
+import { lookupQuery } from "../queries/lookupQuery.js";
+import { processHits } from "../functions/processHits.js";
+import { saytQuery } from "../queries/saytQuery.js";
+import { suggestQuery } from "../queries/suggestQuery.js";
 
 const indices = {
   taxon: "taxon_id",

@@ -1,53 +1,62 @@
 import React, { useEffect, useRef } from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import {
+  aggregationToggleOpaque as aggregationToggleOpaqueStyle,
+  aggregationToggle as aggregationToggleStyle,
+  contrast as contrastStyle,
+  first as firstStyle,
+  last as lastStyle,
+  resultsTable as resultsTableStyle,
+} from "./Styles.scss";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
-import Badge from "@material-ui/core/Badge";
-import CheckBoxIcon from "@material-ui/icons/CheckBox";
-import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import Checkbox from "@material-ui/core/Checkbox";
+import Badge from "@mui/material/Badge";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import Checkbox from "@mui/material/Checkbox";
 import Citation from "./Citation";
 import DownloadButton from "./DownloadButton";
-import FiberManualRecordSharpIcon from "@material-ui/icons/FiberManualRecordSharp";
-import FilterListIcon from "@material-ui/icons/FilterList";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
+import FiberManualRecordSharpIcon from "@mui/icons-material/FiberManualRecordSharp";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import Grid from "@mui/material/Grid2";
+import IconButton from "@mui/material/IconButton";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import LinkButton from "./LinkButton";
-import MuiTableCell from "@material-ui/core/TableCell";
-import RadioButtonCheckedOutlinedIcon from "@material-ui/icons/RadioButtonCheckedOutlined";
-import RadioButtonUncheckedIcon from "@material-ui/icons/RadioButtonUnchecked";
+import MuiTableCell from "@mui/material/TableCell";
+import RadioButtonCheckedOutlinedIcon from "@mui/icons-material/RadioButtonCheckedOutlined";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import ReportError from "./ReportError";
 import ResultFilter from "./ResultFilter";
 import ResultModalControl from "./ResultModalControl";
 import SearchPagination from "./SearchPagination";
-import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
-import SettingsIcon from "@material-ui/icons/Settings";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
+import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
+import SettingsIcon from "@mui/icons-material/Settings";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableSortLabel from "@mui/material/TableSortLabel";
 import Tooltip from "./Tooltip";
-import ViewWeekIcon from "@material-ui/icons/ViewWeek";
-import ViewWeekOutlinedIcon from "@material-ui/icons/ViewWeekOutlined";
-import VisibilityIcon from "@material-ui/icons/Visibility";
+import ViewWeekIcon from "@mui/icons-material/ViewWeek";
+import ViewWeekOutlinedIcon from "@mui/icons-material/ViewWeekOutlined";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchRecord from "../hocs/dispatchRecord";
 import expandFieldList from "../functions/expandFieldList";
 import { formatter } from "../functions/formatter";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
+import { styled } from "@mui/material/styles";
 import withColors from "../hocs/withColors";
 import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
 import withSiteName from "../hocs/withSiteName";
+import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -66,8 +75,8 @@ const StyledBadge = withStyles((theme) => ({
     right: "50%",
     top: 6,
     fontSize: "0.8em",
-    border: `2px solid ${theme.palette.background.paper}`,
-    padding: "0 4px",
+    border: "2px solid white",
+    padding: "0px 4px",
     color: "white",
     backgroundColor: "rgba(0,0,0,0.26)",
   },
@@ -78,11 +87,11 @@ export const useStyles = makeStyles((theme) => ({
     maxWidth: "calc( 100% - 0.5em )",
     marginBottom: "1em",
     marginLeft: "0.5em",
-    minWidth: 750,
+    minWidth: "750px",
   },
   table: {
     maxWidth: "100%",
-    minWidth: 750,
+    minWidth: "750px",
   },
   ["PrivateSwitchBase-root-4"]: {
     padding: "3px",
@@ -90,23 +99,20 @@ export const useStyles = makeStyles((theme) => ({
   visuallyHidden: {
     border: 0,
     clip: "rect(0 0 0 0)",
-    height: 1,
+    height: "1px",
     margin: -1,
     overflow: "hidden",
-    padding: 0,
+    padding: "0px",
     position: "absolute",
     top: 20,
-    width: 1,
+    width: "1px",
   },
 }));
 
-const TableCell = withStyles((theme) => ({
-  root: {
-    padding: "1px 6px",
-    // borderBottom: `solid ${borderColor} 1px`,
-    lineHeight: "inherit",
-  },
-}))(MuiTableCell);
+const TableCell = styled(MuiTableCell)({
+  padding: "1px 6px",
+  lineHeight: "inherit",
+});
 
 const StickyCell = withStyles((theme) => ({
   root: {
@@ -208,7 +214,7 @@ const SortableCell = ({
   if (!CustomCell) {
     CustomCell = TableCell;
   }
-  let css = styles.aggregationToggle;
+  let css = aggregationToggleStyle;
   let prefix = name.replace(/:.+$/, "");
   if (
     excludeAncestral &&
@@ -217,7 +223,7 @@ const SortableCell = ({
       excludeAncestral.hasOwnProperty(prefix) ||
       excludeMissing.hasOwnProperty(prefix))
   ) {
-    css = classnames(styles.aggregationToggle, styles.aggregationToggleOpaque);
+    css = classnames(aggregationToggleStyle, aggregationToggleOpaqueStyle);
   }
 
   let title = handleTableSort ? `Sort by ${field}` : field;
@@ -253,7 +259,7 @@ const SortableCell = ({
 
   let cellCss = "";
   if (colSpan > 0) {
-    cellCss = classnames(styles.first, styles.last);
+    cellCss = classnames(firstStyle, lastStyle);
   }
 
   if (Array.isArray(summary)) {
@@ -436,12 +442,12 @@ const setCellClassName = (i, length, force) => {
   if (length == 1 && !force) {
     return "";
   }
-  let css = i % 2 == 1 ? styles.contrast : "";
+  let css = i % 2 == 1 ? contrastStyle : "";
   if (i == 0) {
-    css = classnames(css, styles.first);
+    css = classnames(css, firstStyle);
   }
   if (i == length - 1) {
-    css = classnames(css, styles.last);
+    css = classnames(css, lastStyle);
   }
   return css;
 };
@@ -1101,7 +1107,7 @@ const ResultTable = ({
                   color={"default"}
                   max={100000}
                 >
-                  <span style={{ padding: "0 6px", color: "rgba(0,0,0,0" }}>
+                  <span style={{ padding: "0px 6px", color: "rgba(0,0,0,0" }}>
                     {badgeContent}
                   </span>
                 </StyledBadge>
@@ -1138,7 +1144,7 @@ const ResultTable = ({
                   }}
                 >
                   {field.aggregation_source && (
-                    <Grid item>
+                    <Grid>
                       <AggregationIcon
                         method={field.aggregation_source}
                         hasDescendants={field.has_descendants}
@@ -1147,7 +1153,6 @@ const ResultTable = ({
                   )}
 
                   <Grid
-                    item
                     style={{ whiteSpace: "nowrap", ...(color && { color }) }}
                   >
                     {value}
@@ -1563,11 +1568,11 @@ const ResultTable = ({
       spacing={1}
       className={classes.root}
     >
-      <Grid item className={classes.table}>
+      <Grid className={classes.table}>
         {/* {searchResults.isFetching ? (
           <Skeleton variant="rect" width={800} height={200} />
         ) : ( */}
-        <TableContainer className={styles.resultsTable}>
+        <TableContainer className={resultsTableStyle}>
           <Table size="small" aria-label="search results">
             <TableHead>
               <TableRow>{heads}</TableRow>
@@ -1582,7 +1587,6 @@ const ResultTable = ({
       </Grid>
 
       {/* <Grid
-        item
         // style={{
         //   display: "flex",
         //   justifyContent: "flex-start",
@@ -1596,15 +1600,16 @@ const ResultTable = ({
         justifyContent="center"
         direction="row"
         spacing={1}
+        size={10}
         className={classes.root}
       >
-        <Grid item>
+        <Grid>
           <LinkButton options={["search", "searchurl"]} />
         </Grid>
-        <Grid item>
+        <Grid>
           <SearchPagination />
         </Grid>
-        <Grid item style={{ marginLeft: "auto" }}>
+        <Grid style={{ marginLeft: "auto" }}>
           <DownloadButton
             onButtonClick={saveSearchResults}
             searchTerm={searchTerm}

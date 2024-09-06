@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 
-import { Chip } from "@material-ui/core";
-import LaunchIcon from "@material-ui/icons/Launch";
+import { Chip } from "@mui/material";
+import LaunchIcon from "@mui/icons-material/Launch";
 import Tooltip from "./Tooltip";
 import compareValues from "../functions/compareValues";
 import { compose } from "recompose";
 import getPrimaryAssemblyId from "../functions/getPrimaryAssemblyId";
-import styles from "./Styles.scss";
+import { recordLinkIcon as recordLinkIconStyle } from "./Styles.scss";
 import withApi from "../hocs/withApi";
 import withRecord from "../hocs/withRecord";
 
@@ -134,7 +134,7 @@ const RecordLink = ({
     return null;
   }
 
-  icon = icon ? <img className={styles.recordLinkIcon} src={icon} /> : null;
+  icon = icon ? <img className={recordLinkIconStyle} src={icon} /> : null;
 
   let chip = (
     <Chip

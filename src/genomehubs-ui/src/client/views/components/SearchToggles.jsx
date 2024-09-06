@@ -1,25 +1,25 @@
 import React, { useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import ArtTrackIcon from "@material-ui/icons/ArtTrack";
-import ControlPointIcon from "@material-ui/icons/ControlPoint";
-import DialogContent from "@material-ui/core/DialogContent";
-import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import Modal from "@material-ui/core/Modal";
+import ArtTrackIcon from "@mui/icons-material/ArtTrack";
+import ControlPointIcon from "@mui/icons-material/ControlPoint";
+import DialogContent from "@mui/material/DialogContent";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormHelperText from "@mui/material/FormHelperText";
+import Grid from "@mui/material/Grid2";
+import IconButton from "@mui/material/IconButton";
+import Modal from "@mui/material/Modal";
 import QueryBuilder from "./QueryBuilder";
-import ReplayIcon from "@material-ui/icons/Replay";
+import ReplayIcon from "@mui/icons-material/Replay";
 import SearchSettings from "./SearchSettings";
-import Switch from "@material-ui/core/Switch";
+import Switch from "@mui/material/Switch";
 import Terms from "./Terms";
-import TocIcon from "@material-ui/icons/Toc";
+import TocIcon from "@mui/icons-material/Toc";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
@@ -28,18 +28,18 @@ import withSiteName from "../hocs/withSiteName";
 export const useStyles = makeStyles((theme) => ({
   modal: {
     display: "flex",
-    padding: theme.spacing(1),
+    padding: "8px",
     alignItems: "center",
     justifyContent: "center",
   },
   paper: {
-    width: 400,
+    width: "400px",
     maxWidth: "75vw",
     maxHeight: "75vh",
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: "white",
     border: "2px solid #000",
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
+    boxShadow: "#333333", // theme.shadows[5],
+    padding: "16px 32px 24px",
     overflowX: "hidden",
   },
   label: {
@@ -79,12 +79,12 @@ const SearchToggles = ({
     templateButton = (
       <Tooltip title={`Click to show search template`} arrow placement={"top"}>
         <Grid
-          item
-          xs={1}
           onClick={() => setShowSettings(true)}
           style={{ cursor: "pointer" }}
+          size={1}
         >
           <FormControl
+            variant="standard"
             className={classes.formControl}
             style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
             onClick={toggleTemplate}
@@ -106,8 +106,9 @@ const SearchToggles = ({
         arrow
         placement={"top"}
       >
-        <Grid item xs={2}>
+        <Grid size={2}>
           <FormControl
+            variant="standard"
             className={classes.formControl}
             style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
           >
@@ -160,8 +161,9 @@ const SearchToggles = ({
           arrow
           placement={"top"}
         >
-          <Grid item xs={3}>
+          <Grid size={3}>
             <FormControl
+              variant="standard"
               className={classes.formControl}
               style={{
                 margin: "-8px 0 0",
@@ -220,8 +222,9 @@ const SearchToggles = ({
             arrow
             placement={"top"}
           >
-            <Grid item xs={2}>
+            <Grid size={2}>
               <FormControl
+                variant="standard"
                 className={classes.formControl}
                 style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
               >
@@ -255,11 +258,9 @@ const SearchToggles = ({
           </Tooltip>
         )}
         {templateButton}
-        {searchIndex != "taxon" && <Grid item xs={2} />}
+        {searchIndex != "taxon" && <Grid size={2} />}
         <Tooltip title={`Click to set result columns`} arrow placement={"top"}>
           <Grid
-            item
-            xs={2}
             onClick={(e) => {
               let target = e.currentTarget;
               setTimeout(() => {
@@ -274,8 +275,10 @@ const SearchToggles = ({
               setShowSettings(true);
             }}
             style={{ cursor: "pointer" }}
+            size={2}
           >
             <FormControl
+              variant="standard"
               className={classes.formControl}
               style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
             >
@@ -308,8 +311,6 @@ const SearchToggles = ({
         </Tooltip>
         <Tooltip title={`Click to show query builder`} arrow placement={"top"}>
           <Grid
-            item
-            xs={2}
             onClick={(e) => {
               let target = e.currentTarget;
               setTimeout(() => {
@@ -324,8 +325,10 @@ const SearchToggles = ({
               setShowOptions(true);
             }}
             style={{ cursor: "pointer" }}
+            size={2}
           >
             <FormControl
+              variant="standard"
               className={classes.formControl}
               style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
             >
@@ -366,12 +369,12 @@ const SearchToggles = ({
           placement={"top"}
         >
           <Grid
-            item
-            xs={1}
             onClick={() => resetSearch()}
             style={{ cursor: "pointer" }}
+            size={1}
           >
             <FormControl
+              variant="standard"
               className={classes.formControl}
               style={{ margin: "-8px 0 0", transform: "scale(0.75)" }}
             >

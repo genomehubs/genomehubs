@@ -1,13 +1,31 @@
 import BadgeInfo, { BadgeInfoCell } from "./BadgeInfo";
 import React, { useEffect, useRef, useState } from "react";
+import {
+  active as activeStyle,
+  badgeExpanded as badgeExpandedStyle,
+  badgeInfo as badgeInfoStyle,
+  badge as badgeStyle,
+  bg as bgStyle,
+  current as currentStyle,
+  disabled as disabledStyle,
+  expanded as expandedStyle,
+  id as idStyle,
+  img as imgStyle,
+  links as linksStyle,
+  mainInfo as mainInfoStyle,
+  maskParent as maskParentStyle,
+  name as nameStyle,
+  nestedBadge as nestedBadgeStyle,
+  nested as nestedStyle,
+  rank as rankStyle,
+} from "./Styles.scss";
 
 import BadgeStats from "./BadgeStats";
-import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import PhyloPics from "./PhyloPics";
 import classNames from "classnames";
 import classnames from "classnames";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import withBrowse from "../hocs/withBrowse";
 import withDescendantsById from "../hocs/withDescendantsById";
@@ -68,7 +86,7 @@ export const Badge = ({
   const imgRef = useRef(null);
   const badgeRef = useRef(null);
   const [height, setHeight] = useState(0);
-  const [badgeCss, setBadgeCss] = useState(styles.badge);
+  const [badgeCss, setBadgeCss] = useState(badgeStyle);
   const [showStats, setShowStats] = useState(
     browse[currentRecordId] && browse[currentRecordId].stats
   );
@@ -101,7 +119,7 @@ export const Badge = ({
   };
 
   const expandBrowseDiv = () => {
-    setBadgeCss(classnames(styles.badge, styles.badgeExpanded));
+    setBadgeCss(classnames(badgeStyle, badgeExpandedStyle));
     if (descendantsById && descendantsById.results) {
       let badges = descendantsById.results.map(({ result: descendant }, i) => (
         <WrappedBadge
@@ -171,7 +189,7 @@ export const Badge = ({
           <div style={{ position: "relative" }} key={"showMore"}>
             <div className={badgeCss} ref={badgeRef}>
               <div
-                className={styles.bg}
+                className={bgStyle}
                 onClick={() => {
                   if (links.length == 0) {
                     return;
@@ -186,20 +204,20 @@ export const Badge = ({
                   setBrowse({ ...parents, scrollY, fieldName });
                 }}
               >
-                <div ref={imgRef} className={styles.img}>
+                <div ref={imgRef} className={imgStyle}>
                   <MoreHorizIcon
                     preserveAspectRatio="xMidYMin"
                     style={{ fontSize: "3em" }}
                   />
                 </div>
-                <div className={styles.rank}></div>
-                <div className={styles.id}></div>
-                <div className={styles.name}>{`${difference} tax${
+                <div className={rankStyle}></div>
+                <div className={idStyle}></div>
+                <div className={nameStyle}>{`${difference} tax${
                   difference > 0 ? "a" : "on"
                 } not shown`}</div>
-                <div className={styles.links}>{links}</div>
+                <div className={linksStyle}>{links}</div>
               </div>
-              <div className={styles.maskParent}></div>
+              <div className={maskParentStyle}></div>
             </div>
           </div>
         );
@@ -274,7 +292,7 @@ export const Badge = ({
       return null;
     }
     <div className={badgeCss} ref={badgeRef}>
-      <div className={styles.bg}></div>
+      <div className={bgStyle}></div>
     </div>;
   }
 
@@ -313,7 +331,7 @@ export const Badge = ({
     if (!showBrowse) {
       expandBrowseDiv();
     } else {
-      setBadgeCss(styles.badge);
+      setBadgeCss(badgeStyle);
     }
     parents[recordId].browse = !parents[recordId].browse;
     setShowBrowse(!showBrowse);
@@ -368,12 +386,12 @@ export const Badge = ({
     let field = recordById.record.attributes[fieldName];
     badgeInfoDiv = (
       <div
-        className={styles.mainInfo}
+        className={mainInfoStyle}
         // style={{
         //   left: `calc(100% + ${Math.max(10.35 - nestingLevel, 0.35)}em)`,
         // }}
       >
-        <div className={styles.badgeInfo}>
+        <div className={badgeInfoStyle}>
           <BadgeInfoCell
             {...{
               field,
@@ -401,12 +419,12 @@ export const Badge = ({
         <div
           className={
             currentRecordId == recordId
-              ? classNames(styles.bg, styles.current)
-              : styles.bg
+              ? classNames(bgStyle, currentStyle)
+              : bgStyle
           }
           onClick={() => toggleBrowse(currentRecordId)}
         >
-          <div ref={imgRef} className={styles.img}>
+          <div ref={imgRef} className={imgStyle}>
             {recordById && (
               <PhyloPics
                 currentRecord={recordById}
@@ -418,10 +436,10 @@ export const Badge = ({
               />
             )}
           </div>
-          <div className={styles.rank}>{rank}</div>
-          <div className={styles.id}>{currentRecordId}</div>
-          <div className={styles.name}>{scientificName}</div>
-          <div className={styles.links}>
+          <div className={rankStyle}>{rank}</div>
+          <div className={idStyle}>{currentRecordId}</div>
+          <div className={nameStyle}>{scientificName}</div>
+          <div className={linksStyle}>
             {descendantsById &&
             descendantsById.results &&
             descendantsById.count > 0 ? (
@@ -430,21 +448,17 @@ export const Badge = ({
                   e.stopPropagation();
                   toggleBrowse(currentRecordId);
                 }}
-                className={(showBrowse && styles.active) || ""}
+                className={(showBrowse && activeStyle) || ""}
               >
                 expand
               </a>
             ) : (
-              <a className={styles.disabled}>expand</a>
+              <a className={disabledStyle}>expand</a>
             )}
             <a
               onClick={toggleStats}
               className={
-                showStats
-                  ? styles.expanded
-                  : scientificName
-                  ? ""
-                  : styles.disabled
+                showStats ? expandedStyle : scientificName ? "" : disabledStyle
               }
             >
               stats
@@ -452,11 +466,7 @@ export const Badge = ({
             <a
               onClick={toggleInfo}
               className={
-                showInfo
-                  ? styles.expanded
-                  : scientificName
-                  ? ""
-                  : styles.disabled
+                showInfo ? expandedStyle : scientificName ? "" : disabledStyle
               }
             >
               values
@@ -471,16 +481,16 @@ export const Badge = ({
                   ...parents,
                 });
               }}
-              className={scientificName ? "" : styles.disabled}
+              className={scientificName ? "" : disabledStyle}
             >
               search
             </a>
           </div>
         </div>
-        {maskParentElement && <div className={styles.maskParent}></div>}
-        {statsDiv && <div className={styles.nested}>{statsDiv}</div>}
-        {infoDiv && <div className={styles.nested}>{infoDiv}</div>}
-        {showBrowse && <div className={styles.nestedBadge}>{browseDiv}</div>}
+        {maskParentElement && <div className={maskParentStyle}></div>}
+        {statsDiv && <div className={nestedStyle}>{statsDiv}</div>}
+        {infoDiv && <div className={nestedStyle}>{infoDiv}</div>}
+        {showBrowse && <div className={nestedBadgeStyle}>{browseDiv}</div>}
       </div>
     </div>
   );

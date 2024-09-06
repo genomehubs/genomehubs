@@ -1,24 +1,20 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
+import React, { useEffect, useRef } from "react";
 
-import { Box } from "@material-ui/core";
 import FlagIcon from "./FlagIcon";
-import Grid from "@material-ui/core/Grid";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TablePagination from "@material-ui/core/TablePagination";
-import TableRow from "@material-ui/core/TableRow";
-import Tooltip from "./Tooltip";
+import Grid from "@mui/material/Grid2";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TablePagination from "@mui/material/TablePagination";
+import TableRow from "@mui/material/TableRow";
 import TranslatedValue from "./TranslatedValue";
+import { autoWidth as autoWidthStyle } from "./Styles.scss";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
-import styles from "./Styles.scss";
-import useResize from "../hooks/useResize";
 import withReportTerm from "../hocs/withReportTerm";
 import withSiteName from "../hocs/withSiteName";
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@mui/styles/withStyles";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -31,7 +27,7 @@ const StyledTableCell = withStyles((theme) => ({
   },
 }))(TableCell);
 
-const TableReport = ({ report, chartProps, ...props }) => {
+const TableReport = ({ report, chartProps }) => {
   const { headers, rows } = report.table;
   let [highlightField, highlightValue] = (chartProps.highlight || "").split(
     "="
@@ -61,7 +57,7 @@ const TableReport = ({ report, chartProps, ...props }) => {
   if (!headers) {
     return null;
   }
-  const showIndex = headers[0].key == "country_list" ? true : false;
+  const showIndex = !!(headers[0].key == "country_list");
   let tableHeader = (
     <TableRow key={"header"}>
       {showIndex && <StyledTableCell key="index"></StyledTableCell>}
@@ -134,14 +130,14 @@ const TableReport = ({ report, chartProps, ...props }) => {
         alignItems="center"
         justifyContent="center"
       >
-        <Grid item>
-          <Table size={"small"} className={styles.autoWidth}>
+        <Grid>
+          <Table size={"small"} className={autoWidthStyle}>
             <TableHead>{tableHeader}</TableHead>
             <TableBody>{tableRows}</TableBody>
           </Table>
         </Grid>
         {rows.length > 5 && (
-          <Grid item>
+          <Grid>
             <TablePagination
               rowsPerPageOptions={[5, 10, 25, 100]}
               component="div"
@@ -161,7 +157,6 @@ const TableReport = ({ report, chartProps, ...props }) => {
 const ReportTable = ({
   table,
   chartRef,
-  containerRef,
   message,
   setMessage,
   cumulative,
@@ -169,7 +164,7 @@ const ReportTable = ({
   highlight,
   minDim,
 }) => {
-  const componentRef = chartRef ? chartRef : useRef();
+  const componentRef = chartRef || useRef();
 
   useEffect(() => {
     if (message && table && table.status) {
@@ -183,7 +178,7 @@ const ReportTable = ({
     content = TableReport({ report: table.report, chartProps });
 
     return (
-      <Grid item xs ref={componentRef} style={{ height: "100%" }}>
+      <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
         {content}
       </Grid>
     );

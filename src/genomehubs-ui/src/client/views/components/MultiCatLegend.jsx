@@ -2,9 +2,9 @@ import { Rectangle, Text } from "recharts";
 
 import React from "react";
 import Tooltip from "./Tooltip";
+import { active as activeStyle } from "./Styles.scss";
 import formats from "../functions/formats";
 import stringLength from "../functions/stringLength";
-import styles from "./Styles.scss";
 
 export const processLegendData = ({
   bounds,
@@ -201,7 +201,7 @@ const MultiCatLegend = ({
     bgRect = (
       <Tooltip title={`Click to highlight ${name}`} arrow>
         <Rectangle
-          className={styles.active}
+          className={activeStyle}
           height={cellSize * (compactLegend ? 1 : 2) + strokeWidth * 2}
           width={bgWidth}
           fill={"white"}

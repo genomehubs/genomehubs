@@ -1,21 +1,25 @@
 import React, { memo, useEffect, useState } from "react";
+//   createTheme,
+//   makeStyles,
+// } from "@material-ui/core/styles";
+import { app as appStyle, infoPanel as infoPanelStyle } from "./Styles.scss";
 
-import { CookiesProvider } from "react-cookie";
 import Head from "./Head";
 import Layout from "./Layout";
 import LoadingScreen from "./LoadingScreen";
 import ReactErrorBoundary from "./ReactErrorBoundary";
-import { StylesProvider } from "@material-ui/core/styles";
+import StylesProvider from "@mui/styles/StylesProvider";
+import { ThemeProvider } from "@mui/styles";
 import classnames from "classnames";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
+import { createTheme } from "@mui/material/styles";
 import { withCookies } from "react-cookie";
 import withLoading from "../hocs/withLoading";
-// import withFadeInOut from "../hocs/withFadeInOut";
 import withTheme from "../hocs/withTheme";
 
+const muiTheme = createTheme();
+
 const App = ({ theme, cookies, loading }) => {
-  let tracking;
   if (cookies.get("cookieConsent") == "all") {
     tracking = <script src="/zxtm/piwik2.js"></script>;
   }
@@ -25,27 +29,23 @@ const App = ({ theme, cookies, loading }) => {
       return;
     }
     setContent(
-      <StylesProvider injectFirst>
-        <div style={{ position: "relative", height: "100%", width: "100%" }}>
-          <div
-            className={classnames(`theme${theme}`, styles.app)}
-            // style={{ overflow: loading ? "hidden" : "visible" }}
-          >
-            <div id="theme-base" className={styles.infoPanel} />
-            <ReactErrorBoundary>
-              <>
-                <Head />
-                {/* <CookiesProvider>
-          <Layout cookies={cookies} />
-        </CookiesProvider> */}
-                <LoadingScreen />
+      <ThemeProvider theme={muiTheme}>
+        <StylesProvider injectFirst>
+          <div style={{ position: "relative", height: "100%", width: "100%" }}>
+            <div className={classnames(`theme${theme}`, appStyle)}>
+              <div id="theme-base" className={infoPanelStyle} />
+              <ReactErrorBoundary>
+                <>
+                  <Head />
+                  <LoadingScreen />
 
-                <Layout />
-              </>
-            </ReactErrorBoundary>
+                  <Layout />
+                </>
+              </ReactErrorBoundary>
+            </div>
           </div>
-        </div>
-      </StylesProvider>
+        </StylesProvider>
+      </ThemeProvider>
     );
   }, [theme, cookies, loading]);
   return content;

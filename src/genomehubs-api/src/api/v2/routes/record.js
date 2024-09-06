@@ -1,6 +1,6 @@
-import { formatJson } from "../functions/formatJson";
-import { getRecordsById } from "../functions/getRecordsById";
-import { logError } from "../functions/logger";
+import { formatJson } from "../functions/formatJson.js";
+import { getRecordsById } from "../functions/getRecordsById.js";
+import { logError } from "../functions/logger.js";
 
 export const getRecords = async (req, res) => {
   // try {

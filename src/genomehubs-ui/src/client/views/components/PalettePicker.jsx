@@ -1,9 +1,9 @@
 import React, { memo } from "react";
 
-import { Box } from "@material-ui/core";
-import Grid from "@material-ui/core/Grid";
+import { Box } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "qs";
 import styles from "./Styles.scss";
 import { useLocation } from "@reach/router";
@@ -45,7 +45,7 @@ const PalettePicker = ({ palettes, handleClick }) => {
     let preview = <PalettePreview colors={colors}></PalettePreview>;
 
     return (
-      <Grid item key={id}>
+      <Grid key={id}>
         <Grid
           container
           direction="row"
@@ -54,8 +54,8 @@ const PalettePicker = ({ palettes, handleClick }) => {
           style={{ cursor: handleClick ? "pointer" : "auto" }}
           onClick={handleClick ? () => handleClick(id) : () => {}}
         >
-          <Grid item>{id}</Grid>
-          <Grid item>{preview}</Grid>
+          <Grid>{id}</Grid>
+          <Grid>{preview}</Grid>
         </Grid>
       </Grid>
     );

@@ -1,25 +1,25 @@
 import React, { memo, useRef, useState } from "react";
 
 import AutoCompleteInput from "./AutoCompleteInput";
-import FormControl from "@material-ui/core/FormControl";
-import Grid from "@material-ui/core/Grid";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid2";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import withInputQueries from "../hocs/withInputQueries";
 import withSearch from "../hocs/withSearch";
 
 export const useStyles = makeStyles((theme) => ({
   icon: {
-    color: theme.palette.text.secondary,
-    marginRight: theme.spacing(2),
+    color: "black", // theme.palette.text.secondary,
+    marginRight: "16px",
   },
   formControl: {
-    marginTop: theme.spacing(2),
+    marginTop: "16px",
     minWidth: "600px",
   },
   search: {
     fontSize: "1.5em",
-    marginLeft: theme.spacing(1),
+    marginLeft: "8px",
     backgroundColor: "inherit",
   },
 }));
@@ -43,10 +43,10 @@ const SearchInputQuery = ({
     setValue(query);
   };
   return (
-    <Grid container direction="row">
-      <Grid item xs={2}></Grid>
-      <Grid item xs={"auto"}>
-        <FormControl className={classes.formControl}>
+    (<Grid container direction="row">
+      <Grid size={2}></Grid>
+      <Grid size={8}>
+        <FormControl variant="standard" className={classes.formControl}>
           <AutoCompleteInput
             size={"small"}
             required
@@ -63,8 +63,8 @@ const SearchInputQuery = ({
           />
         </FormControl>
       </Grid>
-      <Grid item xs={2}></Grid>
-    </Grid>
+      <Grid size={2}></Grid>
+    </Grid>)
   );
 };
 

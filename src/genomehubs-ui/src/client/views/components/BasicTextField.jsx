@@ -1,13 +1,13 @@
-import FormControl from "@material-ui/core/FormControl";
-import FormHelperText from "@material-ui/core/FormHelperText";
+import FormControl from "@mui/material/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
 import React from "react";
-import TextField from "@material-ui/core/TextField";
-import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@mui/material/TextField";
+import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
-    margin: theme.spacing(2),
-    minWidth: 120,
+    margin: "16px",
+    minWidth: "120px",
   },
 }));
 const BasicTextField = ({
@@ -24,8 +24,9 @@ const BasicTextField = ({
 }) => {
   const classes = useStyles;
   return (
-    <FormControl className={classes.formControl}>
+    <FormControl variant="standard" className={classes.formControl}>
       <TextField
+        variant="standard"
         id={id}
         label={label}
         value={value || ""}

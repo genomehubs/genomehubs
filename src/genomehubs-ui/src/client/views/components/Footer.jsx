@@ -2,18 +2,18 @@ import PalettePicker, { PalettePreview } from "./PalettePicker";
 import React, { memo, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import CopyrightIcon from "@material-ui/icons/Copyright";
-import Grid from "@material-ui/core/Grid";
-import { Popover } from "@material-ui/core";
+import CopyrightIcon from "@mui/icons-material/Copyright";
+import Grid from "@mui/material/Grid2";
+import { Popover } from "@mui/material";
 import Taxonomy from "./Taxonomy";
 import bbsrcLogo from "./img/bbsrc-logo.png";
 import { compose } from "recompose";
 import dispatchRecord from "../hocs/dispatchRecord";
 import dispatchTypes from "../hocs/dispatchTypes";
 import dtolLogo from "./img/dtol-logo.png";
+import { link as linkStyle } from "./Styles.scss";
 import qs from "../functions/qs";
 import sangerLogo from "./img/sanger-logo.png";
-import styles from "./Styles.scss";
 import withApi from "../hocs/withApi";
 import withColors from "../hocs/withColors";
 import withTaxonomy from "../hocs/withTaxonomy";
@@ -73,7 +73,7 @@ const Footer = ({
     let releaseLink = version.release;
     if (version.source) {
       releaseLink = (
-        <a className={styles.link} href={version.source} target="_blank">
+        <a className={linkStyle} href={version.source} target="_blank">
           {releaseLink}
         </a>
       );
@@ -113,7 +113,7 @@ const Footer = ({
     <span style={{ float: "right", marginRight: "1em" }}>
       Report an{" "}
       <a
-        className={styles.link}
+        className={linkStyle}
         href="https://github.com/genomehubs/genomehubs/issues"
         target="_blank"
       >
@@ -124,13 +124,12 @@ const Footer = ({
 
   let poweredBy = (
     // <span style={{ float: "left", marginLeft: "1em" }}>
-    <span>
-      Powered by{" "}
-      <a className={styles.link} href="https://genomehubs.org/" target="_blank">
+    (<span>Powered by{" "}
+      <a className={linkStyle} href="https://genomehubs.org/" target="_blank">
         GenomeHubs
       </a>{" "}
       <CopyrightIcon fontSize="inherit" /> {new Date().getFullYear()}
-    </span>
+    </span>)
   );
 
   let settings = (
@@ -157,30 +156,22 @@ const Footer = ({
   );
 
   return (
-    <footer>
+    (<footer>
       <Taxonomy display={false} />
       <Grid container direction="row" spacing={0} style={{ maxHeight: "100%" }}>
-        <Grid item xs={3}>
-          {dataRelease}
-        </Grid>
-        <Grid item xs={6}></Grid>
-        <Grid item xs={3}>
-          {reportIssue}
-        </Grid>
+        <Grid size={3}>{dataRelease}</Grid>
+        <Grid size={6}></Grid>
+        <Grid size={3}>{reportIssue}</Grid>
       </Grid>
       <Grid container direction="row" spacing={0} style={{ maxHeight: "100%" }}>
-        <Grid item xs={4}>
+        <Grid size={4}>
           {settings}
           {settingsPopup}
         </Grid>
-        <Grid item xs={4}>
-          {poweredBy}
-        </Grid>
-        <Grid item xs={4}>
-          {logos}
-        </Grid>
+        <Grid size={4}>{poweredBy}</Grid>
+        <Grid size={4}>{logos}</Grid>
       </Grid>
-    </footer>
+    </footer>)
   );
 };
 

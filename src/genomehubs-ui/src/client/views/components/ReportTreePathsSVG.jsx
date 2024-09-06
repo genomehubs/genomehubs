@@ -1,11 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
+import {
+  header as headerStyle,
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  resultPanel as resultPanelStyle,
+  title as titleStyle,
+} from "./Styles.scss";
 
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
 import { scaleLog } from "d3-scale";
-import styles from "./Styles.scss";
 import { useLongPress } from "use-long-press";
 import withTypes from "../hocs/withTypes";
 
@@ -19,16 +24,12 @@ const ReportTreePaths = ({
   height,
   plotHeight,
 }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel
-  );
+  let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, resultPanelStyle);
   if (count > 10000) {
     return (
       <div className={css}>
-        <div className={styles.header} style={{ cursor: "default" }}>
-          <span className={styles.title}>Tree</span>
+        <div className={headerStyle} style={{ cursor: "default" }}>
+          <span className={titleStyle}>Tree</span>
           <span>
             {" "}
             (not available for queries returning over 10,000 results)
@@ -50,7 +51,7 @@ const ReportTreePaths = ({
     x: 0,
     y: 0,
     height: plotHeight,
-    width: 1000,
+    width: "1000px",
   });
 
   const [highlight, setHighlight] = useState();
@@ -60,8 +61,8 @@ const ReportTreePaths = ({
   const [treeDimensions, setTreeDimensions] = useState({
     x: 0,
     y: 0,
-    width: 0,
-    height: 0,
+    width: "0px",
+    height: "0px",
   });
   const getDimensions = (myRef) => myRef.current.getBBox();
   useEffect(() => {
@@ -143,15 +144,15 @@ const ReportTreePaths = ({
             onPointerMove={(e) => setPosition({ x: e.clientX, y: e.clientY })}
             PopperProps={{
               anchorEl: {
-                clientHeight: 0,
-                clientWidth: 0,
+                clientHeight: "0px",
+                clientWidth: "0px",
                 getBoundingClientRect: () => ({
                   top: position.y,
                   left: position.x,
                   right: position.x,
                   bottom: position.y + 10,
-                  width: 0,
-                  height: 10,
+                  width: "0px",
+                  height: "10px",
                 }),
               },
             }}
@@ -161,7 +162,7 @@ const ReportTreePaths = ({
             <g>
               {segment.label && (
                 <text
-                  {...longPress}
+                  {...longPress()}
                   fill={segment.color}
                   style={{ cursor: "pointer" }}
                   x={segment.xEnd}

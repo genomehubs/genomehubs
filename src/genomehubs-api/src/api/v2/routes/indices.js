@@ -1,6 +1,6 @@
-import { fetchIndices } from "../functions/fetchIndices";
-import { formatJson } from "../functions/formatJson";
-import { logError } from "../functions/logger";
+import { fetchIndices } from "../functions/fetchIndices.js";
+import { formatJson } from "../functions/formatJson.js";
+import { logError } from "../functions/logger.js";
 
 export const getIndices = async (req, res) => {
   let response = [];

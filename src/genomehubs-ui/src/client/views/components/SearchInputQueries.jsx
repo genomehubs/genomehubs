@@ -1,9 +1,9 @@
 import React, { memo, useEffect, useState } from "react";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import SearchInputQuery from "./SearchInputQuery";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import withInputQueries from "../hocs/withInputQueries";
 // import withLiveQuery from "../hocs/withLiveQuery";
 import withLookup from "../hocs/withLookup";
@@ -11,16 +11,16 @@ import withSearch from "../hocs/withSearch";
 
 export const useStyles = makeStyles((theme) => ({
   icon: {
-    color: theme.palette.text.secondary,
-    marginRight: theme.spacing(2),
+    color: "black", // theme.palette.text.secondary,
+    marginRight: "16px",
   },
   formControl: {
-    marginTop: theme.spacing(2),
+    marginTop: "16px",
     minWidth: "600px",
   },
   search: {
     fontSize: "2em",
-    marginLeft: theme.spacing(1),
+    marginLeft: "8px",
     backgroundColor: "inherit",
   },
 }));
@@ -73,7 +73,7 @@ const SearchInputQueries = ({
 
   let queryInputs = inputs.map((id) => <SearchInputQuery key={id} id={id} />);
   return (
-    <Grid item>
+    <Grid>
       <Grid container direction="column">
         {queryInputs}
       </Grid>

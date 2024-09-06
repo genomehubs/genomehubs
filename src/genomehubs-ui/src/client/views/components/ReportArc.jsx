@@ -16,7 +16,7 @@ import MultiCatLegend, {
 } from "./MultiCatLegend";
 import React, { useEffect, useRef, useState } from "react";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { format } from "d3-format";
@@ -45,6 +45,7 @@ const arc = (
   flag
 ) => {
   return (
+    // inner
     "M" +
     startX +
     " " +
@@ -68,7 +69,7 @@ const arc = (
     ` 0 ${flag ? 0 : 1} 0 ` +
     iendX +
     " " +
-    iendY // inner
+    iendY
   );
 };
 const setupArc = ({
@@ -339,6 +340,7 @@ const PieComponent = ({ data, height, width, colors }) => {
 
 const donut = (x, y, ir, or) => {
   return (
+    // inner
     "M" +
     (x - or) +
     " " +
@@ -362,7 +364,7 @@ const donut = (x, y, ir, or) => {
     " 0 1 0 " +
     (x - ir) +
     " " +
-    y // inner
+    y
   );
 };
 
@@ -817,7 +819,7 @@ const ReportArc = ({
     }
 
     return (
-      <Grid item xs ref={componentRef} style={{ height: "100%" }}>
+      <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
         {chart}
       </Grid>
     );

@@ -1,24 +1,24 @@
-import { attrTypes } from "../functions/attrTypes";
-import { collateAttributes } from "./queryFragments/collateAttributes";
-import { excludeSources } from "./queryFragments/excludeSources";
-import { filterAssemblies } from "./queryFragments/filterAssemblies";
-import { filterAttributes } from "./queryFragments/filterAttributes";
-import { filterIdentifiers } from "./queryFragments/filterIdentifiers";
-import { filterProperties } from "./queryFragments/filterProperties";
-import { filterSamples } from "./queryFragments/filterSamples";
-import { filterTaxId } from "./queryFragments/filterTaxId";
-import { filterTaxa } from "./queryFragments/filterTaxa";
-import { histogram } from "../reports/histogram";
-import { histogramAgg } from "./histogramAgg";
-import { matchAttributes } from "./queryFragments/matchAttributes";
-import { matchNames } from "./queryFragments/matchNames";
-import { matchRanks } from "./queryFragments/matchRanks";
-import { restrictToRank } from "./queryFragments/restrictToRank";
-import { setAggregationSource } from "./queryFragments/setAggregationSource";
-import { setAggs } from "../reports/setAggs";
-import { setIncludes } from "./queryFragments/setIncludes";
-import { setSortOrder } from "./queryFragments/setSortOrder";
-import { nullCountsAgg as valueCountsAgg } from "./queryFragments/nullCountsAgg";
+import { attrTypes } from "../functions/attrTypes.js";
+import { collateAttributes } from "./queryFragments/collateAttributes.js";
+import { excludeSources } from "./queryFragments/excludeSources.js";
+import { filterAssemblies } from "./queryFragments/filterAssemblies.js";
+import { filterAttributes } from "./queryFragments/filterAttributes.js";
+import { filterIdentifiers } from "./queryFragments/filterIdentifiers.js";
+import { filterProperties } from "./queryFragments/filterProperties.js";
+import { filterSamples } from "./queryFragments/filterSamples.js";
+import { filterTaxId } from "./queryFragments/filterTaxId.js";
+import { filterTaxa } from "./queryFragments/filterTaxa.js";
+import { histogram } from "../reports/histogram.js";
+import { histogramAgg } from "./histogramAgg.js";
+import { matchAttributes } from "./queryFragments/matchAttributes.js";
+import { matchNames } from "./queryFragments/matchNames.js";
+import { matchRanks } from "./queryFragments/matchRanks.js";
+import { restrictToRank } from "./queryFragments/restrictToRank.js";
+import { setAggregationSource } from "./queryFragments/setAggregationSource.js";
+import { setAggs } from "../reports/setAggs.js";
+import { setIncludes } from "./queryFragments/setIncludes.js";
+import { setSortOrder } from "./queryFragments/setSortOrder.js";
+import { nullCountsAgg as valueCountsAgg } from "./queryFragments/nullCountsAgg.js";
 
 export const searchByTaxon = async ({
   searchTerm,
@@ -226,10 +226,12 @@ export const searchByTaxon = async ({
       names,
       ranks,
     });
-    valueCounts.fields.aggs = {
-      ...valueCounts.fields.aggs,
-      ...boundAggs,
-    };
+    if (valueCounts) {
+      valueCounts.fields.aggs = {
+        ...valueCounts.fields.aggs,
+        ...boundAggs,
+      };
+    }
     aggs = valueCounts;
   }
   let exclude = []; // includeRawValues ? [] : ["attributes.values*"];

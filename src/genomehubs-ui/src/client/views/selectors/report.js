@@ -114,7 +114,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     options = qs.parse(queryString);
   }
   let newOptions = {};
-  let report = options.report;
+  let { report } = options;
   Object.entries(options).forEach(([key, value]) => {
     if (reportTerms[key]) {
       if (reportTerms[key] === true) {
@@ -125,10 +125,8 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
           if (reportTerms[key].in.has(report)) {
             newOptions[newKey] = value;
           }
-        } else {
-          if (!reportTerms[key].not.has(report)) {
-            newOptions[newKey] = value;
-          }
+        } else if (!reportTerms[key].not.has(report)) {
+          newOptions[newKey] = value;
         }
       }
     }
@@ -147,10 +145,8 @@ export function fetchReport({
     const state = store.getState();
     const fetching = getReportsFetching(state);
     const reports = getReports(state);
-    if (!reload) {
-      if (reports[reportId] || fetching[reportId]) {
-        return;
-      }
+    if (!reload && (reports[reportId] || fetching[reportId])) {
+      return;
     }
     dispatch(requestReport(reportId));
     let queryString = reportId;
@@ -323,9 +319,7 @@ const processScatter = (scatter, result) => {
     return {};
   }
   let searchIndexPlural = plurals[result] || "records";
-  let valueType = heatmaps.valueType;
   let cats;
-  let lastIndex = heatmaps.buckets.length - 2;
   let xScale = (x) => x;
   let yScale = (y) => y;
   let h, w;
@@ -348,7 +342,7 @@ const processScatter = (scatter, result) => {
   let catSums;
   let pointData;
   let locations = {};
-  let hasRawData = heatmaps.rawData ? true : false;
+  let hasRawData = !!heatmaps.rawData;
   if (hasRawData) {
     pointData = [];
   }
@@ -596,7 +590,7 @@ const processScatter = (scatter, result) => {
 };
 
 const oneDimensionTable = ({ report }) => {
-  let histograms = report.table.histograms;
+  let { histograms } = report.table;
   let buckets = histograms.buckets.filter((bucket) => bucket && bucket !== 0);
   let headers = [
     { key: report.xLabel, label: report.xLabel },
@@ -689,7 +683,9 @@ const processTable = (report) => {
 };
 
 const processReport = (report, { searchTerm = {} }) => {
-  if (!report || !report.name) return {};
+  if (!report || !report.name) {
+    return {};
+  }
   if (report.name == "tree") {
     let { treeStyle } = qs.parse(report.report.queryString);
     let { tree, xQuery, yQuery, bounds, yBounds } = report.report.tree;
@@ -964,7 +960,7 @@ export const saveReport = ({ options, format = "json" }) => {
   return async function (dispatch) {
     const filename = `report.${format}`;
     options.filename = filename;
-    const queryString = sortReportQuery({ options });
+    const queryString = sortReportQuery({ options, ui: false });
     const formats = {
       json: "application/json",
       nwk: "text/x-nh",

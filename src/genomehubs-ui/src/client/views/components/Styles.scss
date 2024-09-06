@@ -304,8 +304,8 @@ body,
       }
 
       &Content {
-        overflow-x: scroll;
-        margin: 0.5em 0.25em 1em;
+        overflow-x: auto;
+        margin: 0.5em 0.25em 1.5em;
 
         pre {
           margin: 0;
@@ -493,9 +493,6 @@ body,
     }
 
     .searchBox {
-      @include placeholderColor(
-        mix(themed("primary"), themed("secondary"), 65%)
-      );
       background-color: mix(themed("primary"), themed("secondary"), 5%);
       border: 2px solid mix(themed("primary"), themed("secondary"), 15%);
       font-family: themed("titleFont");
@@ -506,19 +503,22 @@ body,
       padding: 0.25em;
       text-align: center;
       width: 600px;
+      @include placeholderColor(
+        mix(themed("primary"), themed("secondary"), 65%)
+      );
 
       &:focus {
-        @include placeholderColor(themed("secondary"));
         background-color: themed("secondary");
         border-color: themed("primary");
+        @include placeholderColor(themed("secondary"));
       }
 
       &:hover {
+        background-color: themed("secondary");
+        border-color: themed("primary");
         @include placeholderColor(
           mix(themed("primary"), themed("secondary"), 35%)
         );
-        background-color: themed("secondary");
-        border-color: themed("primary");
       }
     }
 
@@ -554,7 +554,6 @@ body,
 
       &1Column {
         .infoPane {
-          // height: calc(calc(100vh - 17em) / 2);
           width: 100%;
         }
       }
@@ -1663,7 +1662,7 @@ body,
       .divider {
         background-color: rgba(themed("primary"), 0.2);
         border: 0;
-        margin-right: -0.2em;
+        margin: 0 -0.5em;
         width: 0.2em;
       }
 

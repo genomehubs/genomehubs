@@ -3,12 +3,13 @@
   "version": "2.8.24",
   "description": "GenomeHubs API",
   "scripts": {
-    "api": "node --max-old-space-size=8192 -r esm src/app.js",
-    "start": "nodemon -r esm src/app.js",
+    "api": "node --max-old-space-size=8192 src/app.js",
+    "start": "nodemon src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "package": "./package.sh"
   },
   "main": "src/app.js",
+  "type": "module",
   "bin": "build/app.js",
   "repository": {
     "type": "git",
@@ -21,7 +22,7 @@
   },
   "homepage": "https://github.com/genomehubs/genomehubs-api#readme",
   "dependencies": {
-    "@elastic/elasticsearch": "^8.6.0",
+    "@elastic/elasticsearch": "^8.15.0",
     "archiver": "^5.3.1",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
@@ -29,7 +30,6 @@
     "d3-format": "^2.0.0",
     "d3-scale": "^3.3.0",
     "dotenv": "^16.0.0",
-    "esm": "^3.2.25",
     "express": "^4.17.2",
     "express-openapi-validator": "^5.0.3",
     "ioredis": "^5.4.1",
@@ -51,6 +51,7 @@
     "@babel/cli": "^7.17.3",
     "@babel/core": "^7.17.5",
     "@babel/plugin-transform-modules-commonjs": "^7.16.8",
+    "@types/node": "^22.5.0",
     "nodemon": "^2.0.15"
   },
   "pkg": {
@@ -58,9 +59,7 @@
       "build/**/*"
     ],
     "targets": [
-      "node16-linux-x64",
-      "node16-macos-arm64",
-      "node16-macos-x64"
+      "node18-linux-x64"
     ],
     "outputPath": "dist"
   }

@@ -1,20 +1,20 @@
 import React, { Fragment, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import CodeIcon from "@material-ui/icons/Code";
-import EditIcon from "@material-ui/icons/Edit";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import Grid from "@material-ui/core/Grid";
-import LinkIcon from "@material-ui/icons/Link";
+import CodeIcon from "@mui/icons-material/Code";
+import EditIcon from "@mui/icons-material/Edit";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import Grid from "@mui/material/Grid2";
+import LinkIcon from "@mui/icons-material/Link";
 import ReportCode from "./ReportCode";
 import ReportDownload from "./ReportDownload";
 import ReportEdit from "./ReportEdit";
 import ReportInfo from "./ReportInfo";
 import ReportQuery from "./ReportQuery";
 import ReportSelect from "./ReportSelect";
-import SearchIcon from "@material-ui/icons/Search";
-import SelectIcon from "@material-ui/icons/SelectAll";
-import TocIcon from "@material-ui/icons/Toc";
+import SearchIcon from "@mui/icons-material/Search";
+import SelectIcon from "@mui/icons-material/SelectAll";
+import TocIcon from "@mui/icons-material/Toc";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { useStyles } from "./ReportModalStyles";
@@ -134,13 +134,13 @@ export const ReportTools = ({
         }}
       >
         <Grid container direction="column">
-          {/* <Grid item align="right">
+          {/* <Grid align="right">
             {handleClose && (
               <CloseIcon onClick={handleClose} style={{ cursor: "pointer" }} />
             )}
           </Grid> */}
           {!topLevel && (
-            <Grid item align="right">
+            <Grid align="right">
               <Tooltip title={"Edit"} arrow placement="left">
                 <EditIcon
                   onClick={() => {
@@ -157,7 +157,7 @@ export const ReportTools = ({
             </Grid>
           )}
           {!topLevel && (
-            <Grid item align="right">
+            <Grid align="right">
               <Tooltip title={"Search"} arrow placement="left">
                 <SearchIcon
                   onClick={() => {
@@ -174,7 +174,7 @@ export const ReportTools = ({
             </Grid>
           )}
           {!topLevel && (
-            <Grid item align="right">
+            <Grid align="right">
               <Tooltip title={"Select"} arrow placement="left">
                 <SelectIcon
                   onClick={() => {
@@ -190,7 +190,7 @@ export const ReportTools = ({
               </Tooltip>
             </Grid>
           )}
-          <Grid item align="right">
+          <Grid align="right">
             <Tooltip title={"Legend"} arrow placement="left">
               <TocIcon
                 onClick={() => {
@@ -206,7 +206,7 @@ export const ReportTools = ({
             </Tooltip>
           </Grid>
 
-          <Grid item align="right">
+          <Grid align="right">
             <Tooltip title={"Link"} arrow placement="left">
               <LinkIcon
                 onClick={() => {
@@ -216,7 +216,7 @@ export const ReportTools = ({
               />
             </Tooltip>
           </Grid>
-          <Grid item align="right">
+          <Grid align="right">
             <Tooltip title={"Code"} arrow placement="left">
               <CodeIcon
                 onClick={(e) => {
@@ -232,7 +232,7 @@ export const ReportTools = ({
               />
             </Tooltip>
           </Grid>
-          {/* <Grid item align="right">
+          {/* <Grid align="right">
             <GetAppIcon
               onClick={(e) => {
                 if (code) {
@@ -244,7 +244,7 @@ export const ReportTools = ({
               style={{ cursor: "pointer" }}
             />
           </Grid> */}
-          <Grid item align="right" id="report-download-item">
+          <Grid align="right" id="report-download-item">
             <Tooltip title={"Download"} arrow placement="left">
               <GetAppIcon
                 onClick={() => {

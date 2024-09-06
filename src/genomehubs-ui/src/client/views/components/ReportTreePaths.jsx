@@ -2,7 +2,7 @@ import { Circle, Group, Layer, Line, Rect, Stage, Text } from "react-konva";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import KonvaTooltip from "./KonvaTooltip";
-import Skeleton from "@material-ui/lab/Skeleton";
+import Skeleton from "@mui/material/Skeleton";
 import classnames from "classnames";
 import { compose } from "recompose";
 import formats from "../functions/formats";
@@ -204,8 +204,8 @@ const ReportTreePaths = ({
   const [treeDimensions, setTreeDimensions] = useState({
     x: 0,
     y: 0,
-    width: 0,
-    height: 0,
+    width: "0px",
+    height: "0px",
   });
   const getDimensions = (myRef) => {
     return treeDimensions;
@@ -974,7 +974,7 @@ const ReportTreePaths = ({
           left: 0,
         }}
       >
-        <Skeleton variant="rect" width={divWidth} height={divHeight} />
+        <Skeleton variant="rectangular" width={divWidth} height={divHeight} />
       </div>
     );
   }

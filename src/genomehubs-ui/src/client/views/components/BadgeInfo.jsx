@@ -1,4 +1,10 @@
-import { useLocation, useNavigate } from "@reach/router";
+import {
+  badgeInfoMore as badgeInfoMoreStyle,
+  badgeInfoSelected as badgeInfoSelectedStyle,
+  badgeInfo as badgeInfoStyle,
+  infoName as infoNameStyle,
+  infoValue as infoValueStyle,
+} from "./Styles.scss";
 
 import AggregationIcon from "./AggregationIcon";
 import React from "react";
@@ -6,7 +12,7 @@ import Tooltip from "./Tooltip";
 import classNames from "classnames";
 import { compose } from "recompose";
 import formatter from "../functions/formatter";
-import styles from "./Styles.scss";
+import { useNavigate } from "@reach/router";
 import withSiteName from "../hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
@@ -49,20 +55,20 @@ export const BadgeInfoCell = ({
     value = formatter(value);
   }
 
-  let css = styles.badgeInfo;
+  let css = badgeInfoStyle;
   if (selected) {
-    css = classNames(styles.badgeInfo, styles.badgeInfoSelected);
+    css = classNames(badgeInfoStyle, badgeInfoSelectedStyle);
   }
 
   return (
     <Tooltip title={tipTitle} placement={"top"} arrow>
       <div className={css} onClick={handleClick}>
-        <div className={styles.infoName}>{fieldName}</div>
+        <div className={infoNameStyle}>{fieldName}</div>
         <AggregationIcon
           method={field.aggregation_source}
           hasDescendants={field.has_descendants}
         />
-        <div className={styles.infoValue}>{value}</div>
+        <div className={infoValueStyle}>{value}</div>
       </div>
     </Tooltip>
   );
@@ -118,7 +124,7 @@ export const BadgeInfo = ({
   return (
     <>
       {divs}
-      <div className={styles.badgeInfoMore}>
+      <div className={badgeInfoMoreStyle}>
         <Tooltip title={"Click to view full record"} placement={"top"} arrow>
           <a onClick={moreInfo}>more...</a>
         </Tooltip>
