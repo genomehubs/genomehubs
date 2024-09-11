@@ -100,7 +100,7 @@ const processHistogram = (summary) => {
         }),
         ...(bin < xBinDomain[1] - 0.3 && {
           max: format(",.3~r")(
-            xBinScale(summary.summary.buckets[i + 1].key)
+            xBinScale(summary.summary.buckets[i + 1].key),
           ).replaceAll(",", ""),
         }),
       });
@@ -145,7 +145,9 @@ const processTerms = (summary) => {
 };
 const processSummary = (summaries, summaryId) => {
   let summary = summaries[summaryId];
-  if (!summary) return {};
+  if (!summary) {
+    return {};
+  }
   if (summary.name == "histogram") {
     return processHistogram(summary);
   }
@@ -158,7 +160,7 @@ const processSummary = (summaries, summaryId) => {
 export const getSummaryBySummaryId = createCachedSelector(
   getSummaries,
   (_state, summaryId) => summaryId,
-  (summaries, summaryId) => processSummary(summaries, summaryId)
+  (summaries, summaryId) => processSummary(summaries, summaryId),
 )((_state, summaryId) => summaryId);
 
 export const getHistograms = createSelector(getSummaries, (summaries) => {

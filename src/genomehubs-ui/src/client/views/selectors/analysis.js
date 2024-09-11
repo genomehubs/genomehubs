@@ -38,62 +38,44 @@ export function fetchAnalyses(options) {
   };
 }
 
-// const processAnalysesByAssemblyId = (analyses, assemblyId) => {
-//   let analysisSet = analyses.byAssemblyId[assemblyId];
-//   if (!analysisSet) return undefined;
-//   return Object.values(analysisSet.byId);
-// };
-
-// export const getAnalysesByAssemblyId = createCachedSelector(
-//   getAnalyses,
-//   (_state, assemblyId) => assemblyId,
-//   (analyses, assemblyId) => processAnalysesByAssemblyId(analyses, assemblyId)
-// )((_state, assemblyId) => assemblyId);
-
 const processAnalysesByAssemblyId = (analyses, assemblyId) => {
   let analysisSet = analyses.byAssemblyId[assemblyId];
-  if (!analysisSet) return undefined;
+  if (!analysisSet) {
+    return undefined;
+  }
   return Object.values(analysisSet.byId);
 };
 
 export const getAnalysesByAssemblyId = createSelector(
   getAnalyses,
   (_state, assemblyId) => assemblyId,
-  (analyses, assemblyId) => processAnalysesByAssemblyId(analyses, assemblyId)
+  (analyses, assemblyId) => processAnalysesByAssemblyId(analyses, assemblyId),
 );
-
-// const processAnalysesByTaxonId = (analyses, taxonId) => {
-//   let analysisSet = analyses.byTaxonId[taxonId];
-//   if (!analysisSet) return undefined;
-//   return Object.values(analysisSet).byId;
-// };
-
-// export const getAnalysesByTaxonId = createCachedSelector(
-//   getAnalyses,
-//   (_state, taxonId) => taxonId,
-//   (analyses, taxonId) => processAnalysesByTaxonId(analyses, taxonId)
-// )((_state, taxonId) => taxonId);
 
 const processAnalysesByTaxonId = (analyses, taxonId) => {
   let analysisSet = analyses.byTaxonId[taxonId];
-  if (!analysisSet) return undefined;
+  if (!analysisSet) {
+    return undefined;
+  }
   return Object.values(analysisSet.byId);
 };
 
 export const getAnalysesByTaxonId = createSelector(
   getAnalyses,
   (_state, taxonId) => taxonId,
-  (analyses, taxonId) => processAnalysesByTaxonId(analyses, taxonId)
+  (analyses, taxonId) => processAnalysesByTaxonId(analyses, taxonId),
 );
 
 const processAnalysisById = (analyses, analysisId) => {
   let analysis = analyses.byId[analysisId];
-  if (!analysis) return undefined;
+  if (!analysis) {
+    return undefined;
+  }
   return Object.values(analysis);
 };
 
 export const getAnalysisById = createCachedSelector(
   getAnalyses,
   (_state, analysisId) => analysisId,
-  (analyses, analysisId) => processAnalysisById(analyses, analysisId)
+  (analyses, analysisId) => processAnalysisById(analyses, analysisId),
 )((_state, analysisId) => analysisId);

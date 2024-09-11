@@ -7,7 +7,6 @@ export const gridPropNames = new Set([
   "component",
   "container",
   "direction",
-  "item",
   "justifyContent",
   "spacing",
   "wrap",

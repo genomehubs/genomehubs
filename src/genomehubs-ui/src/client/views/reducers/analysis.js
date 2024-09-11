@@ -6,7 +6,7 @@ export const requestAnalyses = createAction("REQUEST_ANALYSES");
 export const receiveAnalyses = createAction(
   "RECEIVE_ANALYSES",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 export const cancelAnalyses = createAction("CANCEL_ANALYSES");
 export const resetAnalyses = createAction("RESET_ANALYSES");
@@ -85,54 +85,14 @@ const analyses = handleActions(
         allIds: byAnalysisId.allIds,
         byAssemblyId,
         byTaxonId,
-        // lastUpdated: action.meta.receivedAt,
       });
-      // return {
-      //   isFetching: false,
-      //   status: action.payload.status,
-      //   byId,
-      //   allIds,
-      //   byAssemblyId,
-      //   byTaxonId,
-      //   lastUpdated: action.meta.receivedAt,
-      // };
     },
     RESET_ANALYSES: defaultState,
   },
-  defaultState()
+  defaultState(),
 );
 
 export const getAnalyses = (state) => state.analyses;
-
-// export const getSearchResultArray = createSelector(
-//   getSearchResults,
-//   (results) => {
-//     if (!results.status || !results.status.success || !results.results) {
-//       return [];
-//     }
-//     let arr = [];
-//     results.results.forEach((result) => {
-//       let obj = { id: result.id, ...result.result };
-//       if (obj.fields) {
-//         obj.fields = Object.keys(obj.fields).map((key) => ({
-//           id: key,
-//           ...obj.fields[key],
-//         }));
-//       }
-
-//       arr.push(obj);
-//     });
-//     return arr;
-//   }
-// );
-
-// export const getAnalysisById = createCachedSelector(
-//   getSearchResultArray,
-//   (_state, searchId) => searchId,
-//   (results, searchId) => {
-//     return results.find((result) => result.taxon_id === searchId);
-//   }
-// )((_state, searchId) => searchId);
 
 export const logAnalysisQuery = createAction("LOG_ANALYSIS_QUERY");
 export const analysisQueries = handleAction(
@@ -140,10 +100,9 @@ export const analysisQueries = handleAction(
   (state, action) => {
     return immutableUpdate(state, {
       [action.payload]: true,
-      // lastUpdated: action.meta.receivedAt,
     });
   },
-  {}
+  {},
 );
 export const getAnalysisQueries = (state) => state.analysisQueries;
 

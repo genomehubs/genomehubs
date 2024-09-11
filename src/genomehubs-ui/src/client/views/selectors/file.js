@@ -36,12 +36,14 @@ export function fetchFiles(options) {
 
 const processFiles = (files, analysisId) => {
   let fileSet = files.byAnalysisId[analysisId];
-  if (!fileSet) return undefined;
+  if (!fileSet) {
+    return undefined;
+  }
   return Object.values(fileSet.byId);
 };
 
 export const getFilesByAnalysisId = createCachedSelector(
   getFiles,
   (_state, analysisId) => analysisId,
-  (files, analysisId) => processFiles(files, analysisId)
+  (files, analysisId) => processFiles(files, analysisId),
 )((_state, analysisId) => analysisId);

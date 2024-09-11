@@ -66,14 +66,13 @@ const Page = ({
       });
       preSearchItems.push(
         <Grid
-          item
           className={itemCss}
           style={panelStyles}
           key={`pre_${i}`}
           size={12}
         >
           {obj.panel}
-        </Grid>
+        </Grid>,
       );
     });
   }
@@ -89,14 +88,13 @@ const Page = ({
       });
       searchItems.push(
         <Grid
-          item
           className={itemCss}
           style={{ ...panelStyles, ...(showExamples || { display: "none" }) }}
           key={`pre_${i}`}
           size={12}
         >
           {obj.panel}
-        </Grid>
+        </Grid>,
       );
     });
   }
@@ -112,14 +110,13 @@ const Page = ({
       });
       browseItems.push(
         <Grid
-          item
           className={itemCss}
           style={{ ...panelStyles, ...(showBrowse || { display: "none" }) }}
           key={`pre_${i}`}
           size={12}
         >
           {obj.panel}
-        </Grid>
+        </Grid>,
       );
     });
   }
@@ -135,7 +132,7 @@ const Page = ({
       postSearchItems.push(
         <Grid size={12} className={itemCss} style={panelStyles} key={i}>
           {obj.panel}
-        </Grid>
+        </Grid>,
       );
     });
   }
@@ -269,5 +266,5 @@ export default compose(
   dispatchColors,
   withApi,
   withSiteName,
-  withSearchIndex
+  withSearchIndex,
 )(Page);

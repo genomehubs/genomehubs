@@ -1,11 +1,6 @@
 import { apiUrl, setApiStatus } from "../reducers/api";
 import formats, { setInterval } from "../functions/formats";
 import {
-  getController,
-  resetController,
-  setMessage,
-} from "../reducers/message";
-import {
   getReports,
   getReportsFetching,
   receiveReport,
@@ -17,6 +12,7 @@ import {
   getSearchTerm,
   plurals,
 } from "../reducers/search";
+import { resetController, setMessage } from "../reducers/message";
 
 import { byIdSelectorCreator } from "../reducers/selectorCreators";
 import { checkProgress } from "./checkProgress";
@@ -163,7 +159,7 @@ export function fetchReport({
     const queryId = nanoid(10);
     let url = `${apiUrl}/report?${apiQueryString.replace(
       /^\?/,
-      ""
+      "",
     )}&queryId=${queryId}`;
     try {
       let json;
@@ -183,19 +179,19 @@ export function fetchReport({
         //   })
         // );
         const response = await fetch(url, {
-          signal: getController(state).signal,
+          signal: window.controller.signal,
         });
         json = await response.json();
         clearInterval(interval);
       } catch (error) {
         clearInterval(interval);
-        if (getController(state).signal.aborted && !hideMessage) {
+        if (window.controller.signal.aborted && !hideMessage) {
           dispatch(
             setMessage({
               message: `Cancelled`,
               duration: 5000,
               severity: "warning",
-            })
+            }),
           );
           status = { success: false, error: "Request cancelled" };
         } else {
@@ -205,14 +201,14 @@ export function fetchReport({
                 message: `Failed to fetch ${report} report`,
                 duration: 5000,
                 severity: "error",
-              })
+              }),
             );
           }
 
           status = { success: false, error: "Unexpected error" };
           console.log(error);
         }
-        dispatch(resetController());
+        resetController();
         json = {
           status,
           report: {
@@ -245,7 +241,7 @@ export function fetchReport({
             setMessage({
               duration: 0,
               severity: "info",
-            })
+            }),
           );
         }
 
@@ -424,7 +420,7 @@ const processScatter = (scatter, result) => {
                 obj,
                 heatmaps.rawData[cat.key],
                 heatmaps.buckets,
-                heatmaps.yBuckets
+                heatmaps.yBuckets,
               )
             ) {
               continue;
@@ -528,11 +524,11 @@ const processScatter = (scatter, result) => {
               catSums[`all ${searchIndexPlural}`].sum += z;
               catSums[`all ${searchIndexPlural}`].min = Math.min(
                 catSums[`all ${searchIndexPlural}`].min,
-                z
+                z,
               );
               catSums[`all ${searchIndexPlural}`].max = Math.max(
                 catSums[`all ${searchIndexPlural}`].max,
-                z
+                z,
               );
             }
           }
@@ -548,7 +544,7 @@ const processScatter = (scatter, result) => {
             obj,
             heatmaps.rawData,
             heatmaps.buckets,
-            heatmaps.yBuckets
+            heatmaps.yBuckets,
           )
         ) {
           continue;
@@ -639,12 +635,12 @@ const twoDimensionTable = ({ report }) => {
       if (valueType == "date") {
         interval = setInterval(
           yBuckets[yBuckets.length - 1] - yBuckets[0],
-          yBuckets.length - 1
+          yBuckets.length - 1,
         );
       }
     }
     let yBuckets = histograms.yBuckets.filter(
-      (bucket) => bucket && bucket !== 0
+      (bucket) => bucket && bucket !== 0,
     );
     headers.unshift({ key: yLabel, label: yLabel });
     let values = histograms.allYValues;
@@ -719,7 +715,7 @@ const processReport = (report, { searchTerm = {} }) => {
           ...report.report.oxford,
           ...processScatter(
             report.report.oxford,
-            report?.report?.xQuery?.result
+            report?.report?.xQuery?.result,
           ),
         },
       },
@@ -733,7 +729,7 @@ const processReport = (report, { searchTerm = {} }) => {
           ...report.report.scatter,
           ...processScatter(
             report.report.scatter,
-            report?.report?.xQuery?.result
+            report?.report?.xQuery?.result,
           ),
         },
       },
@@ -761,7 +757,7 @@ const processReport = (report, { searchTerm = {} }) => {
 };
 
 const createSelectorForReportId = byIdSelectorCreator();
-const _getReportIdAsMemoKey = (state, _state, reportId) => {
+const _getReportIdAsMemoKey = (_state, reportId) => {
   return reportId;
 };
 
@@ -772,16 +768,16 @@ const getReport = (state, reportId) => {
 export const cacheReportByReportId = createSelectorForReportId(
   _getReportIdAsMemoKey,
   getReport,
-  (report) => report
+  (report) => report,
 );
 
 export const getReportByReportId = createCachedSelector(
-  (state, reportId) => getReport(state, reportId),
+  cacheReportByReportId,
   getSearchTerm,
-  (_state, reportId) => reportId,
+  _getReportIdAsMemoKey,
   (report, searchTerm, reportId) => {
     return processReport(report, { reportId, searchTerm });
-  }
+  },
 )((_state, reportId) => reportId);
 
 export const getReportFields = createSelector(
@@ -796,7 +792,7 @@ export const getReportFields = createSelector(
       }
     }
     return fields;
-  }
+  },
 );
 
 const reportOptions = {
@@ -953,7 +949,7 @@ export const getReportDefaults = createSelector(
       }
     });
     return reportDefaults;
-  }
+  },
 );
 
 export const saveReport = ({ options, format = "json" }) => {
@@ -983,7 +979,7 @@ export const saveReport = ({ options, format = "json" }) => {
         headers: {
           Accept: formats[format],
         },
-        signal: getController(state).signal,
+        signal: window.controller.signal,
       });
       clearInterval(interval);
       let blob = await response.blob();
@@ -997,13 +993,13 @@ export const saveReport = ({ options, format = "json" }) => {
       link.parentNode.removeChild(link);
     } catch (err) {
       clearInterval(interval);
-      if (getController(state).signal.aborted) {
+      if (window.controller.signal.aborted) {
         dispatch(
           setMessage({
             message: `Cancelled ${format.toUpperCase()} file download`,
             duration: 5000,
             severity: "warning",
-          })
+          }),
         );
         status = { success: false, error: "Request cancelled" };
       } else {
@@ -1012,19 +1008,19 @@ export const saveReport = ({ options, format = "json" }) => {
             message: `Failed to prepare ${format.toUpperCase()} file for download`,
             duration: 5000,
             severity: "error",
-          })
+          }),
         );
         status = { success: false, error: "Unexpected error" };
         console.log(error);
       }
-      dispatch(resetController());
+      resetController();
       return false;
     }
     dispatch(
       setMessage({
         duration: 0,
         severity: "info",
-      })
+      }),
     );
     return true;
   };

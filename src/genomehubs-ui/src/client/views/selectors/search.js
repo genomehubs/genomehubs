@@ -14,12 +14,7 @@ import {
   setSearchIndex,
   setSearchTerm,
 } from "../reducers/search";
-import {
-  getController,
-  getMessage,
-  resetController,
-  setMessage,
-} from "../reducers/message";
+import { resetController, setMessage } from "../reducers/message";
 
 import { basename } from "../reducers/location";
 import { checkProgress } from "./checkProgress";
@@ -179,7 +174,7 @@ export const saveSearchResults = ({ options, format = "tsv" }) => {
           headers: {
             Accept: formats[format],
           },
-          signal: getController(state).signal,
+          signal: window.controller.signal,
         });
         let { status } = response;
         if (status == 202) {
@@ -192,7 +187,7 @@ export const saveSearchResults = ({ options, format = "tsv" }) => {
           setMessage({
             duration: 0,
             severity: "info",
-          })
+          }),
         );
         const linkUrl = window.URL.createObjectURL(new Blob([blob]));
         const link = document.createElement("a");
@@ -204,17 +199,17 @@ export const saveSearchResults = ({ options, format = "tsv" }) => {
         break;
       } catch (err) {
         clearInterval(interval);
-        if (getController(state).signal.aborted) {
+        if (window.controller.signal.aborted) {
           dispatch(
             setMessage({
               message: `Cancelled ${format.toUpperCase()} file download`,
               duration: 5000,
               severity: "warning",
-            })
+            }),
           );
           status = { success: false, error: "Request cancelled" };
 
-          dispatch(resetController());
+          resetController();
           return false;
         }
         let progress = currentProgress();
@@ -227,10 +222,10 @@ export const saveSearchResults = ({ options, format = "tsv" }) => {
               message: `Unable to download ${format.toUpperCase()} file`,
               duration: 5000,
               severity: "error",
-            })
+            }),
           );
           status = { success: false, error: "Unexpected error" };
-          dispatch(resetController());
+          resetController();
           return false;
         }
       }
@@ -239,7 +234,7 @@ export const saveSearchResults = ({ options, format = "tsv" }) => {
       setMessage({
         duration: 0,
         severity: "info",
-      })
+      }),
     );
     return true;
   };
