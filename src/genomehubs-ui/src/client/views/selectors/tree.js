@@ -27,6 +27,7 @@ import {
 
 import { apiUrl } from "../reducers/api";
 import axisScales from "../functions/axisScales";
+import deepcopy from "deepcopy";
 import { getStatusPalette } from "../reducers/color";
 import qs from "../functions/qs";
 import store from "../store";
@@ -301,7 +302,7 @@ export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
             if (parts.length == 3) {
               addlabel(
                 `${parts[0].charAt(0)}. ${parts[1].charAt(0)}. ${parts[2]}`,
-                nextOpts
+                nextOpts,
               );
             }
           } else {
@@ -328,7 +329,7 @@ export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
       children.sort(
         (a, b) =>
           a.count - b.count ||
-          b.scientific_name.localeCompare(a.scientific_name)
+          b.scientific_name.localeCompare(a.scientific_name),
       );
       children.forEach((child) => {
         // test if node has been visited already - indicates problem with tree
@@ -366,8 +367,8 @@ export const setCats = ({ node, cats, cat, other }) => {
       return typeof cats[catList.toLowerCase()] === "number"
         ? [cats[catList.toLowerCase()]]
         : other
-        ? [other]
-        : [];
+          ? [other]
+          : [];
     } else {
       let nodeCats = [];
       let hasOther;
@@ -394,8 +395,8 @@ export const setCats = ({ node, cats, cat, other }) => {
     return typeof cats[nodeCat.toLowerCase()] === "number"
       ? [cats[nodeCat.toLowerCase()]]
       : other
-      ? [other]
-      : [];
+        ? [other]
+        : [];
   }
 };
 
@@ -403,11 +404,12 @@ export const processTreePaths = ({
   nodes,
   bounds = {},
   yBounds = {},
-  xQuery,
   yQuery,
   pointSize,
 }) => {
-  if (!nodes) return undefined;
+  if (!nodes) {
+    return undefined;
+  }
   const { cat, cats: catArray, showOther } = bounds;
   let cats = {};
   let other;
@@ -423,7 +425,7 @@ export const processTreePaths = ({
       cats.other = other;
     }
   }
-  let { treeNodes, lca } = nodes;
+  let { treeNodes, lca } = deepcopy(nodes);
   let yField = (yQuery?.yFields || [])[0];
   let valueScale;
   let targetWidth = 1000;
@@ -492,7 +494,7 @@ export const processTreePaths = ({
       children.sort(
         (b, a) =>
           b.count - a.count ||
-          a.scientific_name.localeCompare(b.scientific_name)
+          a.scientific_name.localeCompare(b.scientific_name),
       );
       for (let child of children) {
         if (!visited[child.taxon_id]) {
@@ -588,7 +590,7 @@ export const processTreePaths = ({
         if (label.length * charLen - 2 > node.width) {
           label = `${label.substring(
             0,
-            Math.floor(node.width / charLen) - 1
+            Math.floor(node.width / charLen) - 1,
           )}...`;
         }
       }
