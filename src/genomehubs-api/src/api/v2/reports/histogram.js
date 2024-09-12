@@ -470,10 +470,10 @@ const updateQuery = ({ params, fields, summaries, opts, lookupTypes }) => {
     options = options[0].split(",");
   }
   let min, max;
-  if (!typeof options[0] !== "undefined") {
+  if (typeof options[0] !== "undefined") {
     min = options[0];
   }
-  if (!typeof options[1] !== "undefined") {
+  if (typeof options[1] !== "undefined") {
     max = options[1];
   }
   for (let i = 0; i < queryArr.length; i++) {

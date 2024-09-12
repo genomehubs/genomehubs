@@ -13,10 +13,10 @@ export const parseCatOpts = ({ cat, query, lookupTypes }) => {
         options = options[0].split(",");
       }
       let min, max;
-      if (!typeof options[0] !== "undefined") {
+      if (typeof options[0] !== "undefined") {
         min = options[0];
       }
-      if (!typeof options[1] !== "undefined") {
+      if (typeof options[1] !== "undefined") {
         max = options[1];
       }
       for (let i = 0; i < queryArr.length; i++) {
@@ -25,13 +25,21 @@ export const parseCatOpts = ({ cat, query, lookupTypes }) => {
           i++;
           if (min && queryArr[i] && queryArr[i].match(/</)) {
             i++;
-            if (queryArr[i] && !isNaN(queryArr[i]) && min > queryArr[i]) {
+            if (
+              queryArr[i] &&
+              !Number.isNaN(queryArr[i]) &&
+              min > queryArr[i]
+            ) {
               queryArr[i] = min;
               min = undefined;
             }
           } else if (max && queryArr[i] && queryArr[i].match(/>/)) {
             i++;
-            if (queryArr[i] && !isNaN(queryArr[i]) && max < queryArr[i]) {
+            if (
+              queryArr[i] &&
+              !Number.isNaN(queryArr[i]) &&
+              max < queryArr[i]
+            ) {
               queryArr[i] = max;
               max = undefined;
             }

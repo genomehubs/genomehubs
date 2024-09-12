@@ -21,6 +21,9 @@ import { v4 as uuidv4 } from "uuid";
 
 const replaceSearchIds = async (params) => {
   let { query } = params;
+  if (typeof query !== "string") {
+    return "";
+  }
   let index = indexName({ ...params });
   let match = query.match(/tax_\w+\(\s*([^\)]+\s*)/);
   if (match) {
@@ -42,11 +45,15 @@ const replaceSearchIds = async (params) => {
 const formattedResponse = async (req, res, response) => {
   res.format({
     json: () => {
-      if (req.query.filename) {
-        let filename = `${req.query.filename.replace(/\.json$/, "")}.json`;
+      let { filename, indent } = req.query;
+      if (typeof filename === "string") {
+        filename = `${filename.replace(/\.json$/, "")}.json`;
         res.attachment(filename);
       }
-      res.status(200).send(formatJson(response, req.query.indent));
+      if (typeof indent !== "number" || indent.match(/^\d+$/)) {
+        indent = 4;
+      }
+      res.status(200).send(formatJson(response, indent));
     },
     csv: async () => {
       let opts = {
