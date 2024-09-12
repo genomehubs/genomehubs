@@ -47,7 +47,7 @@ const CustomBackground = ({ chartProps, ...props }) => {
     xLimits = xRange[0];
   } else {
     xLimits = `${chartProps.xFormat(xRange[0])}-${chartProps.xFormat(
-      xRange[1]
+      xRange[1],
     )}`;
   }
   if (chartProps.valueType == "date") {
@@ -55,7 +55,7 @@ const CustomBackground = ({ chartProps, ...props }) => {
       new Date(bound)
         .toISOString()
         .substring(0, 10)
-        .replaceAll(/(-01-01|-01)$/g, "")
+        .replaceAll(/(-01-01|-01)$/g, ""),
     );
   }
 
@@ -74,7 +74,7 @@ const CustomBackground = ({ chartProps, ...props }) => {
             }}
           />
           {key}: {counts[key]}
-        </div>
+        </div>,
       );
     }
   });
@@ -454,7 +454,7 @@ const ReportHistogram = ({
 
             series[cat.label] = scales[yScale](
               value,
-              stacked ? histogram.report.histogram.x : cat.doc_count
+              stacked ? histogram.report.histogram.x : cat.doc_count,
             );
           });
           if (compressX) {
@@ -487,11 +487,11 @@ const ReportHistogram = ({
             stats[`all ${searchIndexPlural}`].sum += value;
             stats[`all ${searchIndexPlural}`].min = Math.min(
               stats[`all ${searchIndexPlural}`].min,
-              value
+              value,
             );
             stats[`all ${searchIndexPlural}`].max = Math.max(
               stats[`all ${searchIndexPlural}`].max,
-              value
+              value,
             );
           }
 
@@ -503,7 +503,7 @@ const ReportHistogram = ({
             x: bucket,
             [`all ${searchIndexPlural}`]: scales[yScale](
               value,
-              histogram.report.histogram.x
+              histogram.report.histogram.x,
             ),
           });
         }
@@ -620,5 +620,5 @@ export default compose(
   withSiteName,
   dispatchMessage,
   withColors,
-  withSearchIndex
+  withSearchIndex,
 )(ReportHistogram);

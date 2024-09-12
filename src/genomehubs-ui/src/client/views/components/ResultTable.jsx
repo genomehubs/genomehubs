@@ -300,7 +300,7 @@ const SortableCell = ({
                       sortBy: field,
                       sortOrder:
                         sortDirection && sortOrder === "asc" ? "desc" : "asc",
-                    }
+                    },
               )
             }
           >
@@ -472,7 +472,7 @@ export const setLinkIcons = ({
     }
     return [{ expand: false }];
   }
-  if (!parts.length == 3 || !type.file_paths[parts[1]]) {
+  if (parts.length != 3 || !type.file_paths[parts[1]]) {
     return [];
   }
 
@@ -587,10 +587,10 @@ const ResultTable = ({
     emptyBuckets = new Set(
       Object.entries(searchResults.aggs.fields.by_key.buckets)
         .filter(([_, obj]) => obj.doc_count == 0)
-        .map(([key, obj]) => key)
+        .map(([key, obj]) => key),
     );
     for (let [key, value] of Object.entries(
-      searchResults.aggs.fields.by_key.buckets
+      searchResults.aggs.fields.by_key.buckets,
     )) {
       let { buckets, sum_other_doc_count } = value.value_list;
       if (buckets.length >= 1) {
@@ -603,7 +603,7 @@ const ResultTable = ({
     for (let [key, value] of Object.entries(searchResults.aggs.fields)) {
       if (key.endsWith("_metadata")) {
         for (let [path, obj] of Object.entries(value).filter(
-          ([p]) => p != "doc_count"
+          ([p]) => p != "doc_count",
         )) {
           constraints[path] = obj.buckets.map(({ key }) => key);
           if (obj.sum_other_doc_count >= 1) {
@@ -656,7 +656,7 @@ const ResultTable = ({
       }
     } else {
       expandedTypes = displayTypes.filter(
-        ({ name }) => !emptyBuckets.has(name)
+        ({ name }) => !emptyBuckets.has(name),
       );
       for (let obj of expandedTypes) {
         obj.summary = "value";
@@ -715,8 +715,8 @@ const ResultTable = ({
     }
     navigate(
       `${basename}/record?recordId=${recordId}&result=${searchIndex}&taxonomy=${taxonomy}#${encodeURIComponent(
-        searchText
-      )}`
+        searchText,
+      )}`,
     );
   };
 
@@ -735,7 +735,7 @@ const ResultTable = ({
           (f) =>
             !f.startsWith(prefix) ||
             f == `${prefix}.run` ||
-            f == `${prefix}.all`
+            f == `${prefix}.all`,
         );
 
         newExpandColumns = Object.entries(expandColumns)
@@ -785,7 +785,7 @@ const ResultTable = ({
             ...searchTerm,
             expand: expand.join(","),
             fields: fields.join(","),
-          })}`
+          })}`,
         );
       }
     } else {
@@ -858,7 +858,7 @@ const ResultTable = ({
       }
     });
     navigate(
-      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`
+      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`,
     );
   };
   const arrToObj = (arr) => {
@@ -891,7 +891,7 @@ const ResultTable = ({
     }
     options.offset = 0;
     navigate(
-      `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`
+      `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`,
     );
   };
 
@@ -954,7 +954,7 @@ const ResultTable = ({
         cells.push(
           <TableCell key={nameClass}>
             {result.result.names[nameClass].name}
-          </TableCell>
+          </TableCell>,
         );
       } else {
         cells.push(<TableCell key={nameClass}>-</TableCell>);
@@ -970,7 +970,7 @@ const ResultTable = ({
         cells.push(
           <TableCell key={rank}>
             {result.result.ranks[rank].scientific_name}
-          </TableCell>
+          </TableCell>,
         );
       } else {
         cells.push(<TableCell key={rank}>-</TableCell>);
@@ -986,7 +986,7 @@ const ResultTable = ({
           >
             {result.result.assembly_id}
           </TableCell>
-        </Tooltip>
+        </Tooltip>,
       );
     }
     if (searchIndex == "sample") {
@@ -999,7 +999,7 @@ const ResultTable = ({
           >
             {result.result.sample_id}
           </TableCell>
-        </Tooltip>
+        </Tooltip>,
       );
     }
     if (searchIndex == "feature") {
@@ -1013,7 +1013,7 @@ const ResultTable = ({
           >
             {result.result.assembly_id}
           </TableCell>
-        </Tooltip>
+        </Tooltip>,
       );
       cells.push(
         <Tooltip title={"Click to view feature"} arrow key={"feature_id"}>
@@ -1023,7 +1023,7 @@ const ResultTable = ({
           >
             {result.result.feature_id}
           </TableCell>
-        </Tooltip>
+        </Tooltip>,
       );
     }
 
@@ -1159,13 +1159,13 @@ const ResultTable = ({
                   </Grid>
                 </Grid>
               )}
-            </TableCell>
+            </TableCell>,
           );
         } else {
           let values;
           try {
             values = (Array.isArray(value) ? value : [value]).map((v) =>
-              v.toLowerCase()
+              v.toLowerCase(),
             );
           } catch {
             values = [];
@@ -1178,7 +1178,7 @@ const ResultTable = ({
             let css = setCellClassName(
               i,
               fieldConstraints.length,
-              expandColumns[type.field]
+              expandColumns[type.field],
             );
             let color = type.color || type.file_paths?.[lcKey]?.color;
 
@@ -1194,7 +1194,7 @@ const ResultTable = ({
                     <RadioButtonCheckedOutlinedIcon
                       style={{ fill, fontSize: "1.25rem" }}
                     />
-                  </OddTableCell>
+                  </OddTableCell>,
                 );
               } else {
                 cells.push(
@@ -1208,7 +1208,7 @@ const ResultTable = ({
                     }}
                   >
                     {/* <CheckBoxOutlineBlankIcon style={{ opacity: 0.25 }} /> */}
-                  </OddTableCell>
+                  </OddTableCell>,
                 );
               }
             } else {
@@ -1253,7 +1253,7 @@ const ResultTable = ({
                     handleToggleColSpan(
                       linkIcon.expand,
                       expandColumns[linkIcon.expand] ? 1 : 0,
-                      true
+                      true,
                     );
                   };
                 }
@@ -1291,7 +1291,7 @@ const ResultTable = ({
                       fontSize: "1.25rem",
                     }}
                     key="check"
-                  />
+                  />,
                 );
               }
               cells.push(
@@ -1306,7 +1306,7 @@ const ResultTable = ({
                   className={css}
                 >
                   {icons}
-                </OddTableCell>
+                </OddTableCell>,
               );
             }
           });
@@ -1324,7 +1324,7 @@ const ResultTable = ({
               className={css}
             >
               {colSpan == 0 && "-"}
-            </OddTableCell>
+            </OddTableCell>,
           );
         }
       }
@@ -1340,7 +1340,7 @@ const ResultTable = ({
             <KeyboardArrowRightIcon />
           </IconButton>
         </TableCell>
-      </Tooltip>
+      </Tooltip>,
     );
     return <StyledTableRow key={result.id}>{cells}</StyledTableRow>;
   });
@@ -1386,10 +1386,10 @@ const ResultTable = ({
         key={nameClass}
         sortDirection={sortBy === nameClass ? sortOrder : false}
         {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-      />
+      />,
     );
     filters.push(
-      <ResultFilter name={nameClass} key={nameClass} value={""} colSpan={1} />
+      <ResultFilter name={nameClass} key={nameClass} value={""} colSpan={1} />,
     );
     expandedCols.push(<TableCell key={nameClass} />);
   });
@@ -1400,7 +1400,7 @@ const ResultTable = ({
         key={rank}
         sortDirection={sortBy === rank ? sortOrder : false}
         {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-      />
+      />,
     );
     filters.push(<ResultFilter name={rank} key={rank} value={""} />);
     expandedCols.push(<TableCell key={rank} />);
@@ -1412,10 +1412,10 @@ const ResultTable = ({
         key={"assembly_id"}
         sortDirection={sortBy === "assembly_id" ? sortOrder : false}
         {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-      />
+      />,
     );
     filters.push(
-      <ResultFilter name={"assembly_id"} key={"assembly_id"} value={""} />
+      <ResultFilter name={"assembly_id"} key={"assembly_id"} value={""} />,
     );
     expandedCols.push(<TableCell key={"assembly_id"} />);
   }
@@ -1426,10 +1426,10 @@ const ResultTable = ({
         key={"sample_id"}
         sortDirection={sortBy === "sample_id" ? sortOrder : false}
         {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-      />
+      />,
     );
     filters.push(
-      <ResultFilter name={"sample_id"} key={"sample_id"} value={""} />
+      <ResultFilter name={"sample_id"} key={"sample_id"} value={""} />,
     );
     expandedCols.push(<TableCell key={"sample_id"} />);
   }
@@ -1441,10 +1441,10 @@ const ResultTable = ({
         key={"feature_id"}
         sortDirection={sortBy === "feature_id" ? sortOrder : false}
         {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-      />
+      />,
     );
     filters.push(
-      <ResultFilter name={"feature_id"} key={"feature_id"} value={""} />
+      <ResultFilter name={"feature_id"} key={"feature_id"} value={""} />,
     );
     expandedCols.push(<TableCell key={"feature_id"} />);
   }
@@ -1487,7 +1487,7 @@ const ResultTable = ({
           sortOrder,
           statusColors,
         }}
-      />
+      />,
     );
 
     let fieldConstraints = constraints[type.field.replace(/:.+$/, "")] || [];
@@ -1502,14 +1502,14 @@ const ResultTable = ({
         value={""}
         fieldMeta={types[type.name]}
         constraints={fieldConstraints}
-      />
+      />,
     );
     if (colSpan > 0) {
       fieldConstraints.forEach((v, i) => {
         let css = setCellClassName(
           i,
           fieldConstraints.length,
-          expandColumns[type.field]
+          expandColumns[type.field],
         );
         let color = type.color || type.file_paths?.[v]?.color;
         expandedCols.push(
@@ -1521,7 +1521,7 @@ const ResultTable = ({
             }}
           >
             {v.split("_").join(`_\u200b`).split(".").join(`.\u200b`)}
-          </OddTableCell>
+          </OddTableCell>,
         );
       });
     } else {
@@ -1532,7 +1532,7 @@ const ResultTable = ({
           style={{
             backgroundColor: `${type.color}${lightColor}`,
           }}
-        />
+        />,
       );
     }
   }
@@ -1549,7 +1549,7 @@ const ResultTable = ({
           <FilterListIcon />
         </IconButton>
       </TableCell>
-    </Tooltip>
+    </Tooltip>,
   );
   filters.push(<TableCell key={"filter"} />);
   expandedCols.push(<TableCell key={"filter"} />);
@@ -1638,5 +1638,5 @@ export default compose(
   withSearch,
   withSearchDefaults,
   withRanks,
-  withNames
+  withNames,
 )(ResultTable);
