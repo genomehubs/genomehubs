@@ -257,7 +257,7 @@ export function fetchReport({
 
 const gaussianRand = () => {
   let rand = 0;
-  for (var i = 0; i < 6; i += 1) {
+  for (let i = 0; i < 6; i += 1) {
     rand += Math.random();
   }
   return rand / 6;
@@ -273,7 +273,7 @@ const applyJitter = (x, i) => {
     let rand = (gaussianRandom(0, i) - i / 2) / 100;
     return x + rand;
   }
-  return x + gaussianRandom(0, i) - i / 2;
+  return Number(x) + gaussianRandom(0, i) - i / 2;
 };
 
 const expandValues = (obj, arr, buckets, yBuckets) => {
@@ -353,7 +353,8 @@ const processScatter = (scatter, result) => {
         max: Number.NEGATIVE_INFINITY,
       };
       let catData = [];
-      heatmaps.buckets.forEach((bucket, i) => {
+      heatmaps.buckets.forEach((b, i) => {
+        let bucket = b;
         if (typeof offsets[i] === "undefined") {
           offsets[i] = [];
         }
@@ -361,7 +362,8 @@ const processScatter = (scatter, result) => {
           bucket = bucket.toLowerCase();
         }
         if (i < heatmaps.buckets.length - 1) {
-          heatmaps.yBuckets.forEach((yBucket, j) => {
+          heatmaps.yBuckets.forEach((yB, j) => {
+            let yBucket = yB;
             if (typeof offsets[i][j] === "undefined") {
               offsets[i][j] = 0;
             }
@@ -487,12 +489,14 @@ const processScatter = (scatter, result) => {
       max: Number.NEGATIVE_INFINITY,
     };
     let catData = [];
-    heatmaps.buckets.forEach((bucket, i) => {
+    heatmaps.buckets.forEach((b, i) => {
+      let bucket = b;
       if (bucket && scatter.bounds.scale == "ordinal") {
         bucket = bucket.toLowerCase();
       }
       if (i < heatmaps.buckets.length - 1) {
-        heatmaps.yBuckets.forEach((yBucket, j) => {
+        heatmaps.yBuckets.forEach((yB, j) => {
+          let yBucket = yB;
           if (yBucket && scatter.yBounds.scale == "ordinal") {
             yBucket = yBucket.toLowerCase();
           }
@@ -666,9 +670,7 @@ const processTable = (report) => {
   let { table, xLabel, yQuery } = report;
   let { cat } = table;
   let headers, rows;
-  if (cat && yQuery) {
-    ({ headers, rows } = twoDimensionTable({ report }));
-  } else if (cat || yQuery) {
+  if (cat || yQuery) {
     ({ headers, rows } = twoDimensionTable({ report }));
   } else if (xLabel) {
     ({ headers, rows } = oneDimensionTable({ report }));
@@ -983,10 +985,11 @@ export const saveReport = ({ options, format = "json" }) => {
       });
       clearInterval(interval);
       let blob = await response.blob();
+      const sanitizedBlob = new Blob([blob], { type: blob.type });
 
-      const linkUrl = window.URL.createObjectURL(new Blob([blob]));
+      const sanitizedLinkUrl = window.URL.createObjectURL(sanitizedBlob);
       const link = document.createElement("a");
-      link.href = linkUrl;
+      link.href = sanitizedLinkUrl;
       link.setAttribute("download", filename);
       document.body.appendChild(link);
       link.click();
@@ -1011,7 +1014,6 @@ export const saveReport = ({ options, format = "json" }) => {
           }),
         );
         status = { success: false, error: "Unexpected error" };
-        console.log(error);
       }
       resetController();
       return false;

@@ -163,7 +163,7 @@ const Histogram = ({
       //     translations: chartProps.translations,
       //   })
       // }
-      ticks={isNaN(buckets[0]) ? null : buckets}
+      ticks={Number.isNaN(buckets[0]) ? null : buckets}
       tick={(props) =>
         ReportXAxisTick({
           props,
@@ -176,7 +176,7 @@ const Histogram = ({
           labels: chartProps.labels,
           showLabels: chartProps.showLabels,
           valueType: chartProps.valueType,
-          report: isNaN(buckets[0]) ? "catHistogram" : "histogram",
+          report: Number.isNaN(buckets[0]) ? "catHistogram" : "histogram",
         })
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}

@@ -59,8 +59,14 @@ const formattedResponse = async (req, res, response) => {
       let opts = {
         delimiter: ",",
         fields: await parseFields({ ...req.query }),
-        names: req.query.names ? req.query.names.split(/\s*,\s*/) : [],
-        ranks: req.query.ranks ? req.query.ranks.split(/\s*,\s*/) : [],
+        names:
+          typeof req.query.names === "string"
+            ? req.query.names.split(/\s*,\s*/)
+            : [],
+        ranks:
+          typeof req.query.ranks === "string"
+            ? req.query.ranks.split(/\s*,\s*/)
+            : [],
         tidyData: req.query.tidyData,
         includeRawValues: req.query.includeRawValues,
         result: req.query.result,
@@ -77,8 +83,14 @@ const formattedResponse = async (req, res, response) => {
       let opts = {
         delimiter: "\t",
         fields: await parseFields({ ...req.query }),
-        names: req.query.names ? req.query.names.split(/\s*,\s*/) : [],
-        ranks: req.query.ranks ? req.query.ranks.split(/\s*,\s*/) : [],
+        names:
+          typeof req.query.names === "string"
+            ? req.query.names.split(/\s*,\s*/)
+            : [],
+        ranks:
+          typeof req.query.ranks === "string"
+            ? req.query.ranks.split(/\s*,\s*/)
+            : [],
         tidyData: req.query.tidyData,
         includeRawValues: req.query.includeRawValues,
         result: req.query.result,

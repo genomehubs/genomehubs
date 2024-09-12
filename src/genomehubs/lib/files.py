@@ -2,6 +2,8 @@
 
 """File indexing methods."""
 
+
+import contextlib
 import hashlib
 import os
 import urllib
@@ -35,18 +37,15 @@ TODAY = date.today().strftime("%Y-%m-%d")
 def index_template(taxonomy_name, opts):
     """Index template (includes name, mapping and types)."""
     parts = ["file", taxonomy_name, opts["hub-name"], opts["hub-version"]]
-    template = index_templator(parts, opts)
-    return template
+    return index_templator(parts, opts)
 
 
 def force_copy(sourcename, destname, symlink=True):
     """Create or replace a symlink to a file."""
     localfile = Path(destname)
     os.makedirs(Path(destname).parent, exist_ok=True)
-    try:
+    with contextlib.suppress(FileNotFoundError):
         localfile.unlink()
-    except FileNotFoundError:
-        pass
     if symlink:
         localfile.symlink_to(Path(sourcename))
     else:
@@ -59,21 +58,21 @@ def process_image_file(infile, filename, opts, *, dest_dir="./", attrs=None):
         attrs = {}
     filepath = Path(filename)
     dimensions = (100, 100)
-    thumbname = "%s.thm%s" % (filepath.stem, filepath.suffix)
+    thumbname = f"{filepath.stem}.thm{filepath.suffix}"
     with Image.open(infile) as im:
         attrs.update(
             {
                 "preview_name": thumbname,
                 "preview_mime_type": attrs["mime_type"],
                 "format": im.format,
-                "size_pixels": "%sx%s" % (im.width, im.height),
+                "size_pixels": f"{im.width}x{im.height}",
             }
         )
         if filename != thumbname:
             try:
                 im.thumbnail(dimensions)
-                os.makedirs("%s/%s" % (opts["hub-path"], dest_dir), exist_ok=True)
-                im.save("%s/%s/%s" % (opts["hub-path"], dest_dir, thumbname))
+                os.makedirs(f'{opts["hub-path"]}/{dest_dir}', exist_ok=True)
+                im.save(f'{opts["hub-path"]}/{dest_dir}/{thumbname}')
             except OSError as err:
                 print(err)
                 LOGGER.warn("Cannot create thumbnail for '%s'", infile)
@@ -91,9 +90,8 @@ def set_file_meta_defaults(opts):
         "file-title",
         "file-description",
     }:
-        value = opts.get(key, False)
-        if value:
-            defaults.update({key.replace("file-", "").replace("-", "_"): value})
+        if value := opts.get(key, False):
+            defaults[key.replace("file-", "").replace("-", "_")] = value
     return defaults
 
 
@@ -112,7 +110,7 @@ def make_local_copy(infile, filepath, filename, attrs, opts, local):
         except TypeError:
             dest_dir += "/assembly-MULTI"
         dest_dir += "/analysis-" + attrs.get("analysis_id", "all")
-        localname = "%s/%s/%s" % (opts["hub-path"], dest_dir, filename)
+        localname = f'{opts["hub-path"]}/{dest_dir}/{filename}'
         if local == "symlink":
             force_copy(infile, localname)
         elif local == "copy":
@@ -143,7 +141,7 @@ def process_file(
         **meta,
     }
     dest_dir = make_local_copy(infile, filepath, filename, attrs, opts, local)
-    attrs.update({"location": dest_dir})
+    attrs["location"] = dest_dir
     kind = filetype.guess(infile)
     if kind is not None:
         attrs.update({"extension": kind.extension, "mime_type": kind.mime})
@@ -151,8 +149,8 @@ def process_file(
             process_image_file(infile, filename, opts, dest_dir=dest_dir, attrs=attrs)
         # TODO: #32 Generate text file previews
     else:
-        attrs.update({"extension": filepath.suffix.replace(".", "")})
-        attrs.update({"mime_type": guess_type(filepath)[0]})
+        attrs["extension"] = filepath.suffix.replace(".", "")
+        attrs["mime_type"] = guess_type(filepath)[0]
     file_props = file_template["mapping"]["mappings"]["properties"].keys()
     analysis_props = analysis_template["mapping"]["mappings"]["properties"].keys()
     file_attrs = {}
@@ -160,23 +158,21 @@ def process_file(
     # split attrs into 2 sets for indexing
     for key, value in attrs.items():
         if key in file_props:
-            file_attrs.update({key: value})
+            file_attrs[key] = value
             if key == "analysis_id":
-                analysis_attrs.update({key: value})
+                analysis_attrs[key] = value
         elif key in analysis_props:
-            analysis_attrs.update({key: value})
+            analysis_attrs[key] = value
         elif key == "analysis":
             for sub_key, sub_value in value.items():
                 if sub_key in analysis_props:
-                    analysis_attrs.update({sub_key: sub_value})
-    file_location = "%s/%s" % (file_attrs["location"], file_attrs["name"])
-    file_attrs.update(
-        {"file_id": hashlib.md5(file_location.encode("utf-8")).hexdigest()}
-    )
+                    analysis_attrs[sub_key] = sub_value
+    file_location = f'{file_attrs["location"]}/{file_attrs["name"]}'
+    file_attrs["file_id"] = hashlib.md5(file_location.encode("utf-8")).hexdigest()
     if not file_attrs.get("date_created", False):
-        file_attrs.update({"date_created": TODAY})
+        file_attrs["date_created"] = TODAY
     if "url" in file_attrs:
-        file_attrs.update({"date_accessed": TODAY})
+        file_attrs["date_accessed"] = TODAY
     return file_attrs, analysis_attrs
 
 
@@ -361,7 +357,7 @@ def index_metadata(es, file, taxonomy_name, opts, *, dry_run=False):
     file_template = index_template(taxonomy_name, opts)
     analysis_template = analysis_index_template(taxonomy_name, opts)
     if data is None:
-        LOGGER.warn("Unable to load file metadata from '%s'" % file)
+        LOGGER.warn(f"Unable to load file metadata from '{file}'")
         return
     analyses = {}
     files = {}
@@ -381,10 +377,10 @@ def index_metadata(es, file, taxonomy_name, opts, *, dry_run=False):
                     infile = tofetch.fetch_tmp_file(meta["url"])
                     local = None
                 except urllib.error.HTTPError as err:
-                    LOGGER.warn("Got %s error for %s" % (str(err.code), meta["url"]))
+                    LOGGER.warn(f'Got {str(err.code)} error for {meta["url"]}')
                     continue
                 except ConnectionResetError:
-                    LOGGER.warn("Got ConnectionResetError for %s" % meta["url"])
+                    LOGGER.warn(f'Got ConnectionResetError for {meta["url"]}')
                     continue
             elif "name" in meta:
                 infile = meta["name"]
@@ -436,7 +432,7 @@ def index_metadata(es, file, taxonomy_name, opts, *, dry_run=False):
             if not action:
                 # TODO: remove analysis and files with shared analysis name
                 continue
-            analysis_id = "analysis-%s" % analysis_attrs["analysis_id"]
+            analysis_id = f'analysis-{analysis_attrs["analysis_id"]}'
             if analysis_id in analysis_docs["index"]:
                 action = "index"
             analysis_docs[action].update({analysis_id: analyses[analysis_id]})
@@ -446,14 +442,13 @@ def index_metadata(es, file, taxonomy_name, opts, *, dry_run=False):
             )
             if not file_action:
                 continue
-            file_id = "file-%s" % file_attrs["file_id"]
+            file_id = f'file-{file_attrs["file_id"]}'
             if analysis_id in analysis_docs["index"]:
                 action = "index"
             file_docs[file_action].update({file_id: files[file_id]})
         except Exception:
             LOGGER.warn("Caught unexpected error")
             print(format_exc())
-            pass
     # Create/update index entry according to returned action
     LOGGER.info("Indexing analyses")
     index_docs(es, opts, analysis_docs, analysis_template, dry_run=dry_run)
