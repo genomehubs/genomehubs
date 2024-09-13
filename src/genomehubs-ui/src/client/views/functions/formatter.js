@@ -18,7 +18,7 @@ const sortByFrequency = (arr) => {
 };
 
 export const formatter = (value, searchIndex, returnType, limit = 15) => {
-  if (Number.isNaN(value)) {
+  if (isNaN(value)) {
     if (Array.isArray(value)) {
       let extra = value.length > 5 && value.length - 5;
       let values = sortByFrequency(value).slice(0, limit);
@@ -36,10 +36,7 @@ export const formatter = (value, searchIndex, returnType, limit = 15) => {
       return `${formatted.join("; ")}${extra ? "; ..." : ""}`;
     }
     let parts = (value || "").split(/\s*,\s*/);
-    if (
-      parts.length == 2 &&
-      !Number.isNaN(parts[0] && !Number.isNaN(parts[1]))
-    ) {
+    if (parts.length == 2 && !isNaN(parts[0] && !isNaN(parts[1]))) {
       value = parts.map((p) => format(".2f")(p, searchIndex)).join(",");
     }
     let formatted = value;

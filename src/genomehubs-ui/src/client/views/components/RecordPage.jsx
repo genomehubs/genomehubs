@@ -92,7 +92,7 @@ const RecordPage = ({
         includeEstimates: true,
         taxonomy: options.taxonomy || taxonomy,
         fields,
-        ranks,
+        // ranks,
       };
       if (options.result == "taxon") {
         searchTerm.query = `tax_eq(${options.recordId})`;

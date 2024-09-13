@@ -196,9 +196,10 @@ const Page = ({
               <Grid
                 container
                 className={classes.item}
-                justifyContent="flex-end"
+                justifyContent="center"
+                size={12}
               >
-                <Grid>
+                <Grid size={12}>
                   <span
                     style={{
                       float: "right",
@@ -232,9 +233,9 @@ const Page = ({
                     </a>
                   </span>
                 </Grid>
+                {searchItems}
+                {browseItems}
               </Grid>
-              {searchItems}
-              {browseItems}
             </>
           )}
         </>

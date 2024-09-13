@@ -60,7 +60,12 @@ export const getRecordsById = async ({
    * @param {string} recordInfo.release - Hub release version.
    */
   let opts = {};
-  if (groups) {
+  if (
+    groups &&
+    groups.length > 0 &&
+    groups != "undefined" &&
+    groups != "none"
+  ) {
     opts.groups = groups.split(",");
     let { typesMap } = await attrTypes({ result, taxonomy });
     opts.fields = [];
