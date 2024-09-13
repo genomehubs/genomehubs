@@ -38,7 +38,7 @@ const AssemblyPanel = ({
   if (assemblyId) {
     if (records[assemblyId]) {
       let identifiers = (records[assemblyId].record.identifiers || []).filter(
-        (obj) => obj.class != "assembly_id"
+        (obj) => obj.class != "assembly_id",
       );
       if (result == "assembly" && identifiers.length > 0) {
         namesDiv = <NamesList names={identifiers} />;
@@ -54,11 +54,11 @@ const AssemblyPanel = ({
 
   useEffect(() => {
     if (assemblyId && !records[assemblyId] && !recordIsFetching) {
-      fetchRecord(
-        assemblyId,
-        "assembly",
-        options.taxonomy || taxonomy || "ncbi"
-      );
+      fetchRecord({
+        recordId: assemblyId,
+        result: "assembly",
+        taxonomy: options.taxonomy || taxonomy || "ncbi",
+      });
     }
   }, [assemblyId]);
 
@@ -67,7 +67,7 @@ const AssemblyPanel = ({
     navigate(
       `${basename}/record?recordId=${assemblyId}&result=assembly&taxonomy=${
         options.taxonomy || taxonomy
-      }#${encodeURIComponent(assemblyId)}`
+      }#${encodeURIComponent(assemblyId)}`,
     );
   };
 
@@ -112,5 +112,5 @@ export default compose(
   withSiteName,
   withSearch,
   withRecord,
-  dispatchLookup
+  dispatchLookup,
 )(AssemblyPanel);

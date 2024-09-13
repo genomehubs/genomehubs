@@ -15,7 +15,7 @@ export const fillValues = (str, obj = {}) => {
               throw `ERROR fetching ${part}`;
             }
           }
-          if (isNaN(value)) {
+          if (Number.isNaN(value)) {
             return lower ? value.toLowerCase() : value;
           } else {
             return value.toLocaleString();

@@ -44,7 +44,7 @@ export const DisplayCount = ({
                 opacity: count == "..." ? 0.5 : 1,
               }}
             >
-              {isNaN(count)
+              {Number.isNaN(count)
                 ? count
                 : formats(count, `${count}`.match(/\./) ? "float" : "integer")}
               {unit}
@@ -61,8 +61,8 @@ export const DisplayCount = ({
                   {count == 1
                     ? fillValues(suffix, values)
                     : suffix_plural
-                    ? fillValues(suffix_plural, values)
-                    : fillValues(suffix, values)}
+                      ? fillValues(suffix_plural, values)
+                      : fillValues(suffix, values)}
                 </span>
               ))}
           </span>
@@ -101,11 +101,11 @@ export const DisplayCount = ({
                   opacity: count == "..." ? 0.5 : 1,
                 }}
               >
-                {isNaN(count)
+                {Number.isNaN(count)
                   ? count
                   : formats(
                       count,
-                      `${count}`.match(/\./) ? "float" : "integer"
+                      `${count}`.match(/\./) ? "float" : "integer",
                     )}
                 {unit}
               </span>
@@ -121,8 +121,8 @@ export const DisplayCount = ({
                 {count == 1
                   ? fillValues(suffix, values)
                   : suffix_plural
-                  ? fillValues(suffix_plural, values)
-                  : fillValues(suffix, values)}
+                    ? fillValues(suffix_plural, values)
+                    : fillValues(suffix, values)}
               </span>
             </span>
           </Tooltip>

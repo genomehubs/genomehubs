@@ -55,28 +55,28 @@ const AttributeModal = ({
         (!record.record || recordId != record.record.taxon_id)
       ) {
         if (!recordIsFetching) {
-          fetchRecord(recordId, "taxon", taxonomy);
+          fetchRecord({ recordId, result: "taxon", taxonomy });
         }
       } else if (
         options.result == "assembly" &&
         (!record.record || recordId != record.record.assembly_id)
       ) {
         if (!recordIsFetching) {
-          fetchRecord(recordId, "assembly", taxonomy);
+          fetchRecord({ recordId, result: "assembly", taxonomy });
         }
       } else if (
         options.result == "sample" &&
         (!record.record || recordId != record.record.sample_id)
       ) {
         if (!recordIsFetching) {
-          fetchRecord(recordId, "sample", taxonomy);
+          fetchRecord({ recordId, result: "sample", taxonomy });
         }
       } else if (
         options.result == "feature" &&
         (!record.record || recordId != record.record.feature_id) &&
         !recordIsFetching
       ) {
-        fetchRecord(recordId, "feature", taxonomy);
+        fetchRecord({ recordId, result: "feature", taxonomy });
       }
     }
   }, [options, recordId]);
@@ -93,7 +93,7 @@ const AttributeModal = ({
   if (record.record.taxon_id) {
     if (record.record.scientific_name) {
       title.unshift(
-        `${record.record.scientific_name} (${record.record.taxon_id})`
+        `${record.record.scientific_name} (${record.record.taxon_id})`,
       );
     } else {
       title.unshift(`Taxon ID ${record.record.taxon_id}`);

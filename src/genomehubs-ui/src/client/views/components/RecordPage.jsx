@@ -52,7 +52,7 @@ const RecordPage = ({
     }
     navigate(
       `?recordId=${recordId}&result=${result}&taxonomy=${taxonomy}${hash}`,
-      { replace: true }
+      { replace: true },
     );
   };
 
@@ -66,11 +66,33 @@ const RecordPage = ({
     }
     if (options.recordId && options.recordId != recordId) {
       setRecordId(options.recordId);
+      let fields;
+      let ranks;
+      if (options.groups) {
+        let groups = options.groups.split(",");
+        let groupFields = [];
+        for (let [key, type] of Object.entries(types)) {
+          if (
+            type.display_group &&
+            groups.includes(type.display_group) &&
+            type.display_level >= 1
+          ) {
+            groupFields.push(key);
+          }
+        }
+        if (groupFields.length) {
+          fields = groupFields.join(",");
+        } else {
+          fields = "none";
+          ranks = "phylum";
+        }
+      }
       let searchTerm = {
         result: options.result,
         includeEstimates: true,
         taxonomy: options.taxonomy || taxonomy,
-        fields: undefined,
+        fields,
+        ranks,
       };
       if (options.result == "taxon") {
         searchTerm.query = `tax_eq(${options.recordId})`;
@@ -79,69 +101,21 @@ const RecordPage = ({
       }
       setPreviousSearchTerm(searchTerm);
       fetchSearchResults(searchTerm);
-    } else if (recordId) {
-      if (
-        options.result == "taxon" &&
-        (!record.record ||
-          recordId != record.record.taxon_id ||
-          options.taxonomy != taxonomy)
-      ) {
-        if (!recordIsFetching) {
-          fetchRecord(
-            recordId,
-            options.result,
-            options.taxonomy,
-            changeRecordUrl
-          );
-        }
-        if (hashTerm) {
-          setLookupTerm(hashTerm);
-        }
-      } else if (
-        options.result == "assembly" &&
-        (!record.record || recordId != record.record.assembly_id)
-      ) {
-        if (!recordIsFetching) {
-          fetchRecord(
-            recordId,
-            options.result,
-            options.taxonomy,
-            changeRecordUrl
-          );
-        }
-        if (hashTerm) {
-          setLookupTerm(hashTerm);
-        }
-      } else if (
-        options.result == "sample" &&
-        (!record.record || recordId != record.record.sample_id)
-      ) {
-        if (!recordIsFetching) {
-          fetchRecord(
-            recordId,
-            options.result,
-            options.taxonomy,
-            changeRecordUrl
-          );
-        }
-        if (hashTerm) {
-          setLookupTerm(hashTerm);
-        }
-      } else if (
-        options.result == "feature" &&
-        (!record.record || recordId != record.record.feature_id)
-      ) {
-        if (!recordIsFetching) {
-          fetchRecord(
-            recordId,
-            options.result,
-            options.taxonomy,
-            changeRecordUrl
-          );
-        }
-        if (hashTerm) {
-          setLookupTerm(hashTerm);
-        }
+    } else if (
+      recordId &&
+      (!record.record ||
+        recordId != record.record[`${options.result}_id`] ||
+        options.taxonomy != taxonomy)
+    ) {
+      if (!recordIsFetching) {
+        fetchRecord({
+          ...options,
+          recordId,
+          callback: changeRecordUrl,
+        });
+      }
+      if (hashTerm) {
+        setLookupTerm(hashTerm);
       }
     }
   }, [location.search]);
@@ -153,7 +127,7 @@ const RecordPage = ({
     };
     if (options.result == "taxon") {
       results.push(
-        <ResultPanel key={taxon.taxon_id} {...searchById} {...taxon} />
+        <ResultPanel key={taxon.taxon_id} {...searchById} {...taxon} />,
       );
 
       // results.push(<TaxonSummaryPanel key={"taxon_summary"} {...taxon} />);
@@ -165,7 +139,7 @@ const RecordPage = ({
             taxon_id={taxon.taxon_id}
             lineage={record.record.lineage.slice().reverse()}
             result={options.result}
-          />
+          />,
         );
       }
       if (record.record.taxon_names) {
@@ -174,7 +148,7 @@ const RecordPage = ({
             key={"names"}
             taxon_id={taxon.taxon_id}
             names={record.record.taxon_names}
-          />
+          />,
         );
       }
     }
@@ -187,7 +161,7 @@ const RecordPage = ({
             recordId={record.record.record_id}
             result={options.result}
             taxonomy={options.taxonomy}
-          />
+          />,
         );
       }
       results.push(
@@ -197,7 +171,7 @@ const RecordPage = ({
           assemblyId={record.record.assembly_id}
           result={options.result}
           taxonomy={options.taxonomy}
-        />
+        />,
       );
     } else if (options.result == "sample") {
       results.push(
@@ -206,7 +180,7 @@ const RecordPage = ({
           recordId={record.record.record_id}
           result={options.result}
           taxonomy={options.taxonomy}
-        />
+        />,
       );
     }
     if (options.result != "taxon") {
@@ -217,7 +191,7 @@ const RecordPage = ({
           {...record.record}
           result={options.result}
           taxonomy={options.taxonomy}
-        />
+        />,
       );
     }
 
@@ -228,7 +202,7 @@ const RecordPage = ({
           recordId={record.record.record_id}
           result={options.result}
           taxonomy={options.taxonomy}
-        />
+        />,
       );
     }
 
@@ -241,7 +215,7 @@ const RecordPage = ({
             result={options.result}
             taxonomy={options.taxonomy}
             files={record.record.attributes.files}
-          />
+          />,
         );
       }
       results.push(
@@ -250,7 +224,7 @@ const RecordPage = ({
           taxonId={taxon.taxon_id}
           attributes={record.record.attributes}
           result={options.result}
-        />
+        />,
       );
     }
   }
@@ -275,5 +249,5 @@ export default compose(
   withRecord,
   withSearch,
   dispatchLookup,
-  withTypes
+  withTypes,
 )(RecordPage);

@@ -37,7 +37,11 @@ const ValueRow = ({
       !records[record.record.assembly_id] &&
       !recordIsFetching
     ) {
-      fetchRecord(record.record.assembly_id, "assembly", taxonomy);
+      fetchRecord({
+        recordId: record.record.assembly_id,
+        result: "assembly",
+        taxonomy,
+      });
     }
   }, [records]);
   if (!record || !record.record || !suffix || !value) {

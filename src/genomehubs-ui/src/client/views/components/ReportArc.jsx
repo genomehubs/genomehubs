@@ -42,7 +42,7 @@ const arc = (
   istartY,
   iendX,
   iendY,
-  flag
+  flag,
 ) => {
   return (
     // inner
@@ -158,7 +158,7 @@ const PieComponent = ({ data, height, width, colors }) => {
               istartY,
               iendX,
               iendY,
-              percent < 0.5
+              percent < 0.5,
             )}
             fillOpacity={0}
             cursor={"pointer"}
@@ -262,7 +262,7 @@ const PieComponent = ({ data, height, width, colors }) => {
               istartY,
               iendX,
               iendY,
-              endX > startX
+              endX > startX,
             )}
             fill={"#3d405c"}
           />
@@ -411,7 +411,7 @@ const RadialBarComponent = ({
       });
     return (
       <g>
-        {isNaN(endX) || (
+        {Number.isNaN(endX) || (
           <path
             d={arc(
               startX,
@@ -424,7 +424,7 @@ const RadialBarComponent = ({
               istartY,
               iendX,
               iendY,
-              endX > startX
+              endX > startX,
             )}
             fill={data.fill}
             fillOpacity={0.3}
@@ -467,7 +467,7 @@ const RadialBarComponent = ({
                 `${data.basename}/search?${qs.stringify({
                   ...data.xQuery,
                   report: "arc",
-                })}`
+                })}`,
               )
             }
           />
@@ -690,8 +690,8 @@ const ReportArc = ({
       ? useResize(containerRef)
       : useResize(componentRef)
     : componentRef
-    ? useResize(componentRef)
-    : useResize(containerRef);
+      ? useResize(componentRef)
+      : useResize(containerRef);
 
   // const { width, height } = useResize(componentRef);
 

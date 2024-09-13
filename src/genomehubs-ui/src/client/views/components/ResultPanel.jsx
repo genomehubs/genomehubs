@@ -158,7 +158,7 @@ const ResultPanel = ({
     navigate(
       `${basename}/record?recordId=${taxon_id}&result=taxon&taxonomy=${
         options.taxonomy || taxonomy
-      }#${encodeURIComponent(scientific_name)}`
+      }#${encodeURIComponent(scientific_name)}`,
     );
     // setRecordId(taxon_id);
   };
@@ -170,7 +170,7 @@ const ResultPanel = ({
     navigate(
       `${basename}/explore?taxon_id=${taxon_id}&result=${searchIndex}&taxonomy=${
         options.taxonomy || taxonomy
-      }&field_id=${fieldId}${location.hash}`
+      }&field_id=${fieldId}${location.hash}`,
     );
   };
   let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, resultPanelStyle);
@@ -181,7 +181,7 @@ const ResultPanel = ({
   if (fields) {
     fields.forEach((field) => {
       if (typeof field.value === "undefined" || !field.aggregation_method) {
-        return null;
+        return;
       }
       let newDiv = AttributeSummary({
         field,
@@ -256,7 +256,7 @@ const ResultPanel = ({
               className={classnames(
                 arrowStyle,
                 arrowRightStyle,
-                arrowLargeStyle
+                arrowLargeStyle,
               )}
             ></i>
           </Tooltip>
@@ -301,5 +301,5 @@ export default compose(
   withRecord,
   withSearch,
   withSummary,
-  withTypes
+  withTypes,
 )(ResultPanel);

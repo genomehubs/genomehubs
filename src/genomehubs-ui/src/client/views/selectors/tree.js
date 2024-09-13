@@ -86,7 +86,7 @@ const deepGet = (obj, path, value) => {
 };
 
 const isNumeric = (n) => {
-  return !isNaN(parseFloat(n)) && isFinite(n);
+  return !Number.isNaN(parseFloat(n)) && isFinite(n);
 };
 
 const compare = {

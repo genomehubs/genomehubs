@@ -174,7 +174,7 @@ const ReportItem = ({
       setTimeout(
         () =>
           fetchReport({ reportId, queryString, report, hideMessage, inModal }),
-        delay
+        delay,
       );
     }
   }, [reportId, visible]);
@@ -240,22 +240,11 @@ const ReportItem = ({
     //   severity: "error",
     // };
   } else if (
-    reportById.report[report] &&
-    reportIsEmpty(report, reportById.report[report])
+    (reportById.report[report] &&
+      reportIsEmpty(report, reportById.report[report])) ||
+    !reportById.report[report]
   ) {
     component = <ReportEmpty report={report} inModal={inModal} />;
-    // message = {
-    //   message: `No ${report} data to display`,
-    //   duration: 5000,
-    //   severity: "warning",
-    // };
-  } else if (!reportById.report[report]) {
-    component = <ReportEmpty report={report} inModal={inModal} />;
-    // message = {
-    //   message: `No ${report} data to display`,
-    //   duration: 5000,
-    //   severity: "warning",
-    // };
   } else {
     switch (report) {
       case "arc":
@@ -629,5 +618,5 @@ export default compose(
   withSiteName,
   dispatchMessage,
   dispatchReport,
-  withReportById
+  withReportById,
 )(ReportItem);

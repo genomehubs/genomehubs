@@ -32,7 +32,11 @@ const RecordLink = ({
       !records[record.record.assembly_id] &&
       !recordIsFetching
     ) {
-      fetchRecord(record.record.assembly_id, "assembly", taxonomy);
+      fetchRecord({
+        recordId: record.record.assembly_id,
+        result: "assembly",
+        taxonomy,
+      });
     }
   }, [records]);
 
@@ -60,13 +64,14 @@ const RecordLink = ({
     }
   }
 
-  const fetchValue = (key, value) => {
+  const fetchValue = (key, v) => {
+    let value = v;
     if (key == "assemblyId") {
       return getPrimaryAssemblyId(record);
     }
     let keys = key.split(/[\.\[]+/);
     for (let k of keys) {
-      if (k.match(/\]$/)) {
+      if (k.match(/\]$/) && Array.isArray(value)) {
         k = k.replace(/\]$/, "");
         let [subkey, subval] = k.split(":");
         value = subval

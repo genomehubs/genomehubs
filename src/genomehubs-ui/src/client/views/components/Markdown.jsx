@@ -193,7 +193,7 @@ export const Template = ({
         <Tooltip title={description} arrow>
           {input}
         </Tooltip>
-      </Grid>
+      </Grid>,
     );
   }
   let preview;
@@ -313,7 +313,7 @@ export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
       } else {
         newProps["src"] = value.replace(
           /^\/static\//,
-          `${basename}/static/${webpackHash}/`
+          `${basename}/static/${webpackHash}/`,
         );
       }
     } else if (key == "size") {
@@ -389,7 +389,7 @@ export const RehypeComponentsList = (extra) => {
       if (props.className) {
         css = classnames(
           reportContainerStyle,
-          styleMap[`${props.className}Style`]
+          styleMap[`${props.className}Style`],
         );
       }
 
@@ -443,7 +443,7 @@ export const RehypeComponentsList = (extra) => {
       if (props.className) {
         css = classnames(
           reportContainerStyle,
-          styleMap[`${props.className}Style`]
+          styleMap[`${props.className}Style`],
         );
       }
       return <Report {...processProps({ props, extra })} className={css} />;
@@ -468,10 +468,9 @@ export const RehypeComponentsList = (extra) => {
       if (props.className) {
         css = classnames(
           reportContainerStyle,
-          styleMap[`${props.className}Style`]
+          styleMap[`${props.className}Style`],
         );
       }
-      console.log(processProps({ props, isGrid: true }));
       return (
         <Grid {...processProps({ props, isGrid: true })}>
           <StaticPlot {...processProps({ props, extra })} className={css} />
@@ -528,7 +527,7 @@ export function htmlDirectives() {
     visit(
       tree,
       ["textDirective", "leafDirective", "containerDirective"],
-      (node) => ondirective(node, index)
+      (node) => ondirective(node, index),
     );
   }
 
@@ -578,7 +577,7 @@ const Markdown = ({
         ...extra,
       }),
       ...components,
-    }
+    },
   );
   let css;
   if (siteStyles) {

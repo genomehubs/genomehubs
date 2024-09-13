@@ -16,7 +16,7 @@ const Terms = ({ basename }) => {
       );
     },
     li: (props) => {
-      let [term, params] = props.children[0].replace(/\n$/, "").split("::");
+      let [term, params] = props.children[0].replace(/\r?\n$/, "").split("::");
       let url = `${basename}/search?query=${term}&${params}#${term}`;
       return (
         <Grid>

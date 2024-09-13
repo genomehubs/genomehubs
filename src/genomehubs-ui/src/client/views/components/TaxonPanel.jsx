@@ -72,7 +72,11 @@ const TaxonPanel = ({
 
   useEffect(() => {
     if (taxon_id && !scientific_name && !recordIsFetching) {
-      fetchRecord(taxon_id, "taxon", options.taxonomy || taxonomy || "ncbi");
+      fetchRecord({
+        recordId: taxon_id,
+        result: "taxon",
+        taxonomy: options.taxonomy || taxonomy || "ncbi",
+      });
     }
   }, [taxon_id]);
 
@@ -81,7 +85,7 @@ const TaxonPanel = ({
     navigate(
       `${basename}/record?recordId=${taxon_id}&result=taxon&taxonomy=${
         options.taxonomy || taxonomy
-      }#${encodeURIComponent(scientific_name)}`
+      }#${encodeURIComponent(scientific_name)}`,
     );
     // setRecordId(taxon_id);
   };
@@ -121,5 +125,5 @@ export default compose(
   withSiteName,
   withSearch,
   withRecord,
-  dispatchLookup
+  dispatchLookup,
 )(TaxonPanel);

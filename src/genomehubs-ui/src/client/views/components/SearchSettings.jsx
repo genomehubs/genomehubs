@@ -38,10 +38,6 @@ const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
   },
-  formControl: {
-    margin: "16px",
-    minWidth: "120px",
-  },
   selectEmpty: {
     marginTop: "16px",
   },
@@ -101,7 +97,7 @@ const SearchSettings = ({
 
   const [savedOptions, setSavedOptions] = useLocalStorage(
     `${searchIndex}Options`,
-    {}
+    {},
   );
 
   const handleTaxonomyChange = (e) => {
@@ -164,7 +160,7 @@ const SearchSettings = ({
           newFields.push(
             subset == types[field].processed_simple
               ? field
-              : `${field}:${subset}`
+              : `${field}:${subset}`,
           );
         }
       } else {
@@ -182,7 +178,7 @@ const SearchSettings = ({
     };
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`
+      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`,
     );
   };
 
@@ -204,7 +200,7 @@ const SearchSettings = ({
     setPreferSearchTerm(false);
     setSavedOptions({});
     navigate(
-      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`
+      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`,
     );
   };
 
@@ -237,7 +233,7 @@ const SearchSettings = ({
                 {label}
               </MenuItem>
             </div>
-          </Tooltip>
+          </Tooltip>,
         );
       } else {
         content.push(
@@ -248,7 +244,7 @@ const SearchSettings = ({
           >
             <Checkbox color={"default"} checked={state[id]} />
             {label}
-          </MenuItem>
+          </MenuItem>,
         );
       }
     });
@@ -308,7 +304,7 @@ const SearchSettings = ({
             {content}
           </Select>
         </FormControl>
-      </Grid>
+      </Grid>,
     );
   });
 
@@ -343,5 +339,5 @@ export default compose(
   withTaxonomy,
   withSearch,
   withRanks,
-  withNames
+  withNames,
 )(SearchSettings);
