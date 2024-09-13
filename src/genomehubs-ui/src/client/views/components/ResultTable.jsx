@@ -618,7 +618,11 @@ const ResultTable = ({
       let fieldList = expandFieldList({ fields: searchTerm.fields, types });
       expandedTypes = displayTypes
         .filter(({ name }) => !emptyBuckets.has(name) && name != "none")
-        .map(({ name, ...rest }) => ({ name, field: name, ...rest }));
+        .map(({ name, ...rest }) => ({
+          name,
+          field: name,
+          ...structuredClone({ rest }),
+        }));
       for (let field of fieldList) {
         let name, summary;
         if (field.includes(":")) {
@@ -655,20 +659,15 @@ const ResultTable = ({
         obj.summary = summary || defaultValue;
       }
     } else {
-      expandedTypes = displayTypes.filter(
-        ({ name }) => !emptyBuckets.has(name),
-      );
+      expandedTypes = displayTypes
+        .filter(({ name }) => !emptyBuckets.has(name))
+        .map((obj) => structuredClone(obj));
       for (let obj of expandedTypes) {
         obj.summary = "value";
         obj.field = obj.name;
       }
     }
   }
-  // for (let obj of expandedTypes) {
-  //   if (!obj.field) {
-  //     obj.field = obj.name;
-  //   }
-  // }
 
   if (searchResults && searchResults.status && searchResults.status.error) {
     return (

@@ -27,7 +27,7 @@ const reportsSlice = createSlice({
       state.byId[reportId] = report;
       state.allIds = [...new Set(state.allIds.concat(reportId))];
     },
-    resetReport(state, action) {
+    resetReport() {
       defaultReportState();
     },
   },

@@ -27,8 +27,6 @@ import {
 
 import { apiUrl } from "../reducers/api";
 import axisScales from "../functions/axisScales";
-import deepcopy from "deepcopy";
-import { getStatusPalette } from "../reducers/color";
 import qs from "../functions/qs";
 import store from "../store";
 import stringLength from "../functions/stringLength";
@@ -425,7 +423,7 @@ export const processTreePaths = ({
       cats.other = other;
     }
   }
-  let { treeNodes, lca } = deepcopy(nodes);
+  let { treeNodes, lca } = structuredClone(nodes);
   let yField = (yQuery?.yFields || [])[0];
   let valueScale;
   let targetWidth = 1000;
