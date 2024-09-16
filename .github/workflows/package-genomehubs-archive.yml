@@ -3,7 +3,7 @@ name: package-genomehubs-archive
 on: workflow_dispatch
 
 env:
-  ARCHIVE_VERSION: 2024.09.24
+  ARCHIVE_VERSION: 2024.09.14
 
 jobs:
   package-goat-ui-archive:
