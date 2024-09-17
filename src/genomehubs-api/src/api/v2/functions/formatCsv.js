@@ -1,4 +1,4 @@
-import { Parser } from "json2csv";
+import { AsyncParser } from "@json2csv/node";
 
 export const formatCsv = async (response, opts) => {
   let fields = ["taxon_id", "taxon_rank", "scientific_name"];
@@ -133,8 +133,8 @@ export const formatCsv = async (response, opts) => {
   }
 
   try {
-    const parser = new Parser(opts);
-    return parser.parse(data);
+    const parser = new AsyncParser(opts);
+    return await parser.parse(data).promise();
   } catch (err) {
     console.error(err);
   }

@@ -152,7 +152,7 @@ const ResultFilter = ({
     if (action == "dismiss") {
       delete attributes[i];
     } else if (value > "") {
-      if (isNaN(i)) {
+      if (Number.isNaN(i)) {
         attributes.push(attribute);
       } else {
         attributes[i] = attribute;
@@ -183,7 +183,7 @@ const ResultFilter = ({
             return handleChange(e, i, "value", [...attrFilters]);
           }}
           handleDismiss={(e) => handleChange(e, i, "dismiss", [...attrFilters])}
-        />
+        />,
       );
     }
   });
@@ -205,7 +205,7 @@ const ResultFilter = ({
         return handleChange(e, field, "value", [...attrFilters]);
       }}
       handleDismiss={() => {}}
-    />
+    />,
   );
   // }
   let css = "";

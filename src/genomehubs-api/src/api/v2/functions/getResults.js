@@ -5,6 +5,7 @@ import { indexName } from "./indexName.js";
 import { logError } from "./logger.js";
 import { parseFields } from "./parseFields.js";
 import { summaries } from "./summaries.js";
+import { type } from "os";
 
 const fail = (error) => {
   return {
@@ -245,7 +246,7 @@ const validateTerm = (term, types) => {
         parts[1] &&
         parts[1].length > 0 &&
         !typeSummary.includes(parts[1]) &&
-        !parts[1] == "metadata"
+        parts[1] != "metadata"
       ) {
         return {
           validation: fail(`invalid summary for ${parts[2]} in ${term}`),
@@ -692,13 +693,17 @@ export const getResults = async (params) => {
       params.query = await chainQueries(params);
     }
   } catch (error) {
+    let { errorString } = error;
+    if (typeof message == "object") {
+      errorString = JSON.stringify(message);
+    }
     logError({ req: params.req, message: error });
     return {
       func: () => ({
-        status: { success: false, error: error.message },
+        status: { success: false, error: errorString },
       }),
       params: {},
-      status: { success: false, error: error.message },
+      status: { success: false, error: errorString },
     };
   }
   let index = indexName({ ...params });

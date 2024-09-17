@@ -1,6 +1,9 @@
 export const compareValues = (valueA, valueB, comp) => {
   let inverse, cmp;
   if (comp.startsWith("!")) {
+    if (comp == "!" && valueB == "" && typeof valueA == "undefined") {
+      return true;
+    }
     inverse = true;
     cmp = str.substring(1);
   } else {
@@ -8,7 +11,7 @@ export const compareValues = (valueA, valueB, comp) => {
   }
   if (cmp.match(/^=+$/)) {
     let arrA = (Array.isArray(valueA) ? valueA : [valueA]).flatMap(
-      (o) => o.value || o
+      (o) => o.value || o,
     );
     let arrB = valueB.split(",");
     let match = false;

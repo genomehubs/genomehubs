@@ -51,7 +51,7 @@ const SiteName = ({ siteName, basename, archive, logo, theme }) => {
       {siteName}
     </Link>
   );
-  let version = basename ? basename.replace("/", "") : "latest";
+  let version = basename ? basename.replace(/\/$/, "") : "latest";
   let versions;
   if (archive) {
     versions = archive

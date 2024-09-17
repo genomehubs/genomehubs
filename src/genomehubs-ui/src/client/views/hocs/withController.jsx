@@ -1,20 +1,21 @@
-import { getController, resetController } from "../reducers/message";
-
 import React from "react";
 import { connect } from "react-redux";
+import { resetController } from "../reducers/message";
+
+window.controller = new AbortController();
 
 const withController = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
-    controller: getController(state),
+    controller: window.controller,
   });
 
   const mapDispatchToProps = (dispatch) => ({
-    resetController: () => resetController(),
+    resetController,
   });
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

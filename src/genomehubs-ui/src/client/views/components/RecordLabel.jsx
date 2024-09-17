@@ -1,16 +1,22 @@
 import React, { useEffect } from "react";
 
+import CatchingPokemonIcon from "@mui/icons-material/CatchingPokemon";
 import { Chip } from "@mui/material";
+import GppGoodIcon from "@mui/icons-material/GppGood";
 import LaunchIcon from "@mui/icons-material/Launch";
+import MoreIcon from "@mui/icons-material/More";
 import Tooltip from "./Tooltip";
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import compareValues from "../functions/compareValues";
 import { compose } from "recompose";
+import getContrast from "../functions/getContrast";
 import getPrimaryAssemblyId from "../functions/getPrimaryAssemblyId";
 import { recordLinkIcon as recordLinkIconStyle } from "./Styles.scss";
 import withApi from "../hocs/withApi";
+import withColors from "../hocs/withColors";
 import withRecord from "../hocs/withRecord";
 
-const RecordLink = ({
+const RecordLabel = ({
   record,
   records,
   fetchRecord,
@@ -18,13 +24,15 @@ const RecordLink = ({
   result,
   rank,
   condition,
-  url,
   label,
   description,
   color = "#1f78b4",
+  levels,
+  colors,
   icon,
   EndIcon = LaunchIcon,
 }) => {
+  let contrast;
   useEffect(() => {
     if (
       condition?.startsWith("assembly.") &&
@@ -40,8 +48,20 @@ const RecordLink = ({
     }
   }, [records]);
 
-  if (!record || !record.record || !url || !label) {
+  if (!record || !record.record || !label) {
     return null;
+  }
+
+  if (color.match(/^\d+\/\d+$/)) {
+    let [num, den] = color.split("/");
+    if (levels && levels[den] && levels[den][num - 1]) {
+      color = levels[den][num - 1];
+    } else {
+      color = colors[num - 1];
+    }
+    contrast = getContrast(color, 0.25);
+  } else {
+    contrast = getContrast(color, 0.25);
   }
 
   if (result) {
@@ -71,7 +91,7 @@ const RecordLink = ({
     }
     let keys = key.split(/[\.\[]+/);
     for (let k of keys) {
-      if (k.match(/\]$/) && Array.isArray(value)) {
+      if (k.match(/\]$/)) {
         k = k.replace(/\]$/, "");
         let [subkey, subval] = k.split(":");
         value = subval
@@ -79,6 +99,9 @@ const RecordLink = ({
           : value.find((o) => o.hasOwnProperty(subkey));
       } else if (value && value.hasOwnProperty(k)) {
         value = value[k];
+      } else {
+        value = undefined;
+        break;
       }
       if (typeof value === "undefined") {
         continue;
@@ -112,58 +135,82 @@ const RecordLink = ({
       .join("");
   };
 
-  let href;
-
   try {
     if (condition) {
-      let [key, cmp, value] = condition.split(/([!><=]+)/);
-      if (key && key == "assemblyId") {
-        if (!getPrimaryAssemblyId(record)) {
-          return null;
-        }
-      } else {
-        let currentRecord = condition?.startsWith("assembly.")
-          ? { assembly: records[record.record.assembly_id]?.record }
-          : record.record;
-        let recordValue = fetchValue(key, currentRecord);
-        if (cmp && !compareValues(recordValue, value, cmp)) {
-          return null;
-        }
-        if (!cmp && !recordValue) {
-          return null;
+      let conditions = condition.split("&&");
+      let match = true;
+      for (let cond of conditions) {
+        let [key, cmp, value] = cond.split(/([!><=]+)/);
+        if (key && key == "assemblyId") {
+          if (!getPrimaryAssemblyId(record)) {
+            match = false;
+            break;
+          }
+        } else {
+          let currentRecord = cond?.startsWith("assembly.")
+            ? { assembly: records[record.record.assembly_id]?.record }
+            : record.record;
+          let recordValue = fetchValue(key, currentRecord);
+          if (cmp && !compareValues(recordValue, value, cmp)) {
+            match = false;
+            break;
+          }
+          if (!cmp && !recordValue) {
+            match = false;
+            break;
+          }
         }
       }
+      if (!match) {
+        return null;
+      }
     }
-    href = fillValues(url);
   } catch (err) {
     return null;
   }
 
-  icon = icon ? <img className={recordLinkIconStyle} src={icon} /> : null;
+  let muiIcon, extIcon;
+
+  switch (icon) {
+    case "prize":
+      muiIcon = <WorkspacePremiumIcon sx={{ "&&": { color } }} />;
+      break;
+    case "quality":
+      muiIcon = <GppGoodIcon sx={{ "&&": { color } }} />;
+      break;
+    case "catch":
+      muiIcon = <CatchingPokemonIcon sx={{ "&&": { color } }} />;
+      break;
+    case "more":
+      muiIcon = <MoreIcon sx={{ "&&": { color } }} />;
+      break;
+    default:
+      extIcon = <img className={recordLinkIconStyle} src={icon} />;
+  }
+  //icon ? <img className={recordLinkIconStyle} src={icon} /> : null;
 
   let chip = (
     <Chip
-      // variant="outlined"
+      variant="outlined"
       color="primary"
+      size="small"
       style={{
-        backgroundColor: color,
-        color: "white",
+        border: `solid 0.2em ${color}`,
+        backgroundColor: `${color}66`,
+        color: contrast,
         textDecoration: "none",
         fontSize: "1em",
-        margin: "0.2em 0",
+        margin: "-0.5em 0 0.2em 0",
       }}
+      icon={muiIcon}
       // size="small"
       label={
         <span style={{ whiteSpace: "nowrap" }}>
-          {icon}
-          {label}{" "}
-          <EndIcon fontSize="inherit" style={{ marginBottom: "-0.1em" }} />
+          {extIcon}
+          {label}
         </span>
       }
-      component="a"
-      target="_blank"
-      href={href}
-      clickable
+      component="span"
     />
   );
   if (description) {
@@ -176,4 +223,4 @@ const RecordLink = ({
   return chip;
 };
 
-export default compose(withApi, withRecord)(RecordLink);
+export default compose(withApi, withColors, withRecord)(RecordLabel);

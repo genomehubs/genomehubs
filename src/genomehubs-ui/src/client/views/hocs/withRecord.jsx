@@ -28,8 +28,7 @@ const withRecord = (WrappedComponent) => (props) => {
   });
 
   const mapDispatchToProps = (dispatch) => ({
-    fetchRecord: (recordId, result, taxonomy, callback) =>
-      dispatch(fetchRecord(recordId, result, taxonomy, callback)),
+    fetchRecord: (options) => dispatch(fetchRecord(options)),
     resetRecord: () => dispatch(resetRecord()),
     setRecordId: (recordId) => dispatch(setCurrentRecordId(recordId)),
     setAttributeSettings: (obj) => dispatch(setAttributeSettings(obj)),
@@ -37,7 +36,7 @@ const withRecord = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

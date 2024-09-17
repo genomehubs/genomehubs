@@ -1,17 +1,17 @@
 import React, { forwardRef } from "react";
 
 import ButtonGroup from "@mui/material/ButtonGroup";
-import { grey as orange } from "@mui/material/colors";
+import { grey } from "@mui/material/colors";
 import { styled } from "@mui/material/styles";
 
 const StyledButtonGroup = styled(ButtonGroup)(({ theme }) => ({
-  color: theme.palette.getContrastText(orange[400]),
-  backgroundColor: orange[400],
+  color: theme.palette.getContrastText(grey[300]),
+  backgroundColor: grey[300],
   "&:hover": {
-    backgroundColor: orange[600],
+    backgroundColor: grey[500],
   },
   "& .MuiButtonGroup-grouped:not(:last-of-type)": {
-    borderColor: orange[500],
+    borderColor: grey[400],
   },
 }));
 

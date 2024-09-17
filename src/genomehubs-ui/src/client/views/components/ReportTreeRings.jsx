@@ -25,7 +25,10 @@ const ReportTreeRings = ({
   });
 
   let divHeight = height;
-  height = Math.min(isNaN(height) ? 100 : height, isNaN(width) ? 100 : width);
+  height = Math.min(
+    Number.isNaN(height) ? 100 : height,
+    Number.isNaN(width) ? 100 : width,
+  );
   width = height;
   const [dimensions, setDimensions] = useState({
     x: 0,
@@ -117,7 +120,7 @@ const ReportTreeRings = ({
             strokeWidth={strokeWidth}
             d={segment.arc}
           />
-        </Tooltip>
+        </Tooltip>,
       );
     });
   }
@@ -146,7 +149,7 @@ const ReportTreeRings = ({
           id={`${label.taxon_id}-label-path`}
           style={{ pointerEvents: "none" }}
           d={label.arc}
-        />
+        />,
       );
       text.push(
         <text
@@ -164,7 +167,7 @@ const ReportTreeRings = ({
           >
             {label.scientific_name}
           </textPath>
-        </text>
+        </text>,
       );
     });
   }

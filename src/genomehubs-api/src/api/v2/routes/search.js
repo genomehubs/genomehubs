@@ -21,6 +21,9 @@ import { v4 as uuidv4 } from "uuid";
 
 const replaceSearchIds = async (params) => {
   let { query } = params;
+  if (typeof query !== "string") {
+    return "";
+  }
   let index = indexName({ ...params });
   let match = query.match(/tax_\w+\(\s*([^\)]+\s*)/);
   if (match) {
@@ -42,18 +45,28 @@ const replaceSearchIds = async (params) => {
 const formattedResponse = async (req, res, response) => {
   res.format({
     json: () => {
-      if (req.query.filename) {
-        let filename = `${req.query.filename.replace(/\.json$/, "")}.json`;
+      let { filename, indent } = req.query;
+      if (typeof filename === "string") {
+        filename = `${filename.replace(/\.json$/, "")}.json`;
         res.attachment(filename);
       }
-      res.status(200).send(formatJson(response, req.query.indent));
+      if (typeof indent !== "number" || indent.match(/^\d+$/)) {
+        indent = 4;
+      }
+      res.status(200).send(formatJson(response, indent));
     },
     csv: async () => {
       let opts = {
         delimiter: ",",
         fields: await parseFields({ ...req.query }),
-        names: req.query.names ? req.query.names.split(/\s*,\s*/) : [],
-        ranks: req.query.ranks ? req.query.ranks.split(/\s*,\s*/) : [],
+        names:
+          typeof req.query.names === "string"
+            ? req.query.names.split(/\s*,\s*/)
+            : [],
+        ranks:
+          typeof req.query.ranks === "string"
+            ? req.query.ranks.split(/\s*,\s*/)
+            : [],
         tidyData: req.query.tidyData,
         includeRawValues: req.query.includeRawValues,
         result: req.query.result,
@@ -70,8 +83,14 @@ const formattedResponse = async (req, res, response) => {
       let opts = {
         delimiter: "\t",
         fields: await parseFields({ ...req.query }),
-        names: req.query.names ? req.query.names.split(/\s*,\s*/) : [],
-        ranks: req.query.ranks ? req.query.ranks.split(/\s*,\s*/) : [],
+        names:
+          typeof req.query.names === "string"
+            ? req.query.names.split(/\s*,\s*/)
+            : [],
+        ranks:
+          typeof req.query.ranks === "string"
+            ? req.query.ranks.split(/\s*,\s*/)
+            : [],
         tidyData: req.query.tidyData,
         includeRawValues: req.query.includeRawValues,
         result: req.query.result,

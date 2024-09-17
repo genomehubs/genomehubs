@@ -262,7 +262,7 @@ def test_constraint(value, constraint):
 
 def convert_lat_lon(location):
     """Convert lat and lon to array notation."""
-    if not location:
+    if location is None or not location:
         return ""
     sign = {"N": "", "E": "", "S": "-", "W": "-"}
     if not isinstance(location, list):

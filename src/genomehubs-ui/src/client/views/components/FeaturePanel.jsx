@@ -54,13 +54,13 @@ const FeaturePanel = ({
 
   useEffect(() => {
     if (sequenceId && !records[sequenceId] && !recordIsFetching) {
-      fetchRecord(sequenceId, result, taxonomy);
+      fetchRecord({ recordId: sequenceId, result, taxonomy });
     }
     if (taxonId && !records[taxonId] && !recordIsFetching) {
-      fetchRecord(taxonId, "taxon", taxonomy);
+      fetchRecord({ recordId: taxonId, result: "taxon", taxonomy });
     }
     if (assemblyId && !records[assemblyId] && !recordIsFetching) {
-      fetchRecord(assemblyId, "assembly", taxonomy);
+      fetchRecord({ recordId: assemblyId, result: "assembly", taxonomy });
     }
   }, [records]);
 
@@ -86,13 +86,13 @@ const FeaturePanel = ({
     let sequenceAttributes = records[sequenceId].record.attributes;
     let sequenceIdentifiers = records[sequenceId].record.identifiers;
     assignedName = sequenceIdentifiers.filter(
-      (obj) => obj.class == "assigned_name"
+      (obj) => obj.class == "assigned_name",
     );
     if (assignedName.length == 1) {
       assignedName = assignedName[0].identifier;
     } else {
       assignedName = sequenceIdentifiers.filter(
-        (obj) => obj.class == "genbank_accession"
+        (obj) => obj.class == "genbank_accession",
       );
       if (assignedName.length == 1) {
         assignedName = assignedName[0].identifier;
@@ -103,11 +103,11 @@ const FeaturePanel = ({
 
     let midX =
       scale(
-        featureAttributes.midpoint.value / sequenceAttributes.length.value
+        featureAttributes.midpoint.value / sequenceAttributes.length.value,
       ) +
       width * margin;
     let len = scale(
-      featureAttributes.length.value / sequenceAttributes.length.value
+      featureAttributes.length.value / sequenceAttributes.length.value,
     );
     let startX = midX - len / 2;
     let endX = midX + len / 2;
@@ -265,13 +265,13 @@ const FeaturePanel = ({
       //     <NavLink href={ensemblUrl}>Ensembl Rapid Release</NavLink>
       //   </span>
       // </>
-      (<FeatureSummaryPanel
+      <FeatureSummaryPanel
         taxonId={taxonId}
         assemblyId={assemblyId}
         start={featureAttributes.start.value}
         end={featureAttributes.end.value}
         sequenceName={assignedName}
-      />)
+      />
     );
   }
   let assemblyLink;

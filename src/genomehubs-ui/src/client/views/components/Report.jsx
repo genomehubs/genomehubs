@@ -123,7 +123,7 @@ const Report = ({
     minDim = Math.floor(Math.min(width, height));
   } else {
     minDim /=
-      reportProps.plotRatio && !isNaN(reportProps.plotRatio)
+      reportProps.plotRatio && !Number.isNaN(reportProps.plotRatio)
         ? reportProps.plotRatio
         : reportProps.ratio;
   }

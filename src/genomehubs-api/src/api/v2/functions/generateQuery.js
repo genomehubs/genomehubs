@@ -13,7 +13,7 @@ const fail = (error) => {
 };
 
 const isDate = (date) => {
-  return new Date(date) !== "Invalid Date" && !isNaN(new Date(date));
+  return new Date(date) !== "Invalid Date" && !Number.isNaN(new Date(date));
 };
 
 const validateValue = (term, value, meta, types) => {
@@ -74,10 +74,10 @@ const validateValue = (term, value, meta, types) => {
       }
     } else if (type == "geo_point") {
       let [lat, lon] = v.replaceAll("−", "-").split(",");
-      if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
+      if (!lat || !lon || Number.isNaN(lat) || Number.isNaN(lon)) {
         return fail(`invalid value for ${meta.attribute} in ${term}`);
       }
-    } else if (isNaN(v.replace(/^!/, "").replaceAll("−", "-"))) {
+    } else if (Number.isNaN(v.replace(/^!/, "").replaceAll("−", "-"))) {
       if (summaries.includes(type)) {
         return fail(`invalid value for ${type} in ${term}`);
       }
@@ -244,7 +244,7 @@ const validateTerm = (term, types) => {
         parts[1] &&
         parts[1].length > 0 &&
         !typeSummary.includes(parts[1]) &&
-        !parts[1] == "metadata"
+        parts[1] != "metadata"
       ) {
         return {
           validation: fail(`invalid summary for ${parts[2]} in ${term}`),

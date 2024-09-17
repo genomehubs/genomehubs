@@ -88,17 +88,17 @@ export const Badge = ({
   const [height, setHeight] = useState(0);
   const [badgeCss, setBadgeCss] = useState(badgeStyle);
   const [showStats, setShowStats] = useState(
-    browse[currentRecordId] && browse[currentRecordId].stats
+    browse[currentRecordId] && browse[currentRecordId].stats,
   );
   const [showInfo, setShowInfo] = useState(
-    browse[currentRecordId] && browse[currentRecordId].info
+    browse[currentRecordId] && browse[currentRecordId].info,
   );
   const [showBrowse, setShowBrowse] = useState(
-    browse[currentRecordId] && browse[currentRecordId].browse
+    browse[currentRecordId] && browse[currentRecordId].browse,
   );
   const [browseDiv, setBrowseDiv] = useState(null);
   const [fieldName, setFieldName] = useState(
-    parentFieldName || (topLevel && browse.fieldName)
+    parentFieldName || (topLevel && browse.fieldName),
   );
   const setCurrentFieldName = setParentFieldName
     ? (f) => {
@@ -161,7 +161,7 @@ export const Badge = ({
               }}
             >
               +10
-            </a>
+            </a>,
           );
           if (difference > 100) {
             links.push(
@@ -179,7 +179,7 @@ export const Badge = ({
                 }}
               >
                 +100
-              </a>
+              </a>,
             );
           }
         }
@@ -219,7 +219,7 @@ export const Badge = ({
               </div>
               <div className={maskParentStyle}></div>
             </div>
-          </div>
+          </div>,
         );
       }
       setBrowseDiv(<>{badges}</>);
@@ -263,7 +263,11 @@ export const Badge = ({
     if (currentRecordId && !recordById && !recordIsFetching) {
       setTimeout(() => {
         if (isMounted) {
-          fetchRecord(currentRecordId, result, taxonomy || "ncbi");
+          fetchRecord({
+            recordId: currentRecordId,
+            result,
+            taxonomy: taxonomy || "ncbi",
+          });
           fetchDescendants({
             taxonId: currentRecordId,
             taxonomy: taxonomy || "ncbi",
@@ -400,7 +404,7 @@ export const Badge = ({
               tipTitle: `Click to search ${fieldName} values for ${scientificName}`,
               handleClick: () => {
                 navigate(
-                  `${basename}/search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29%20AND%20${fieldName}&fields=${fieldName}&includeEstimates=true&taxonomy=${taxonomy}&result=${result}`
+                  `${basename}/search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29%20AND%20${fieldName}&fields=${fieldName}&includeEstimates=true&taxonomy=${taxonomy}&result=${result}`,
                 );
                 setBrowse();
               },
@@ -475,7 +479,7 @@ export const Badge = ({
               onClick={(e) => {
                 e.stopPropagation();
                 navigate(
-                  `${basename}/search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29&includeEstimates=true&taxonomy=${taxonomy}&result=${result}`
+                  `${basename}/search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29&includeEstimates=true&taxonomy=${taxonomy}&result=${result}`,
                 );
                 updateBrowse({
                   ...parents,
@@ -501,7 +505,7 @@ const WrappedBadge = compose(
   withTaxonomy,
   withRecordById,
   withDescendantsById,
-  withBrowse
+  withBrowse,
 )(Badge);
 
 export default WrappedBadge;

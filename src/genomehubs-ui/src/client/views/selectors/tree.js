@@ -27,7 +27,6 @@ import {
 
 import { apiUrl } from "../reducers/api";
 import axisScales from "../functions/axisScales";
-import { getStatusPalette } from "../reducers/color";
 import qs from "../functions/qs";
 import store from "../store";
 import stringLength from "../functions/stringLength";
@@ -85,7 +84,7 @@ const deepGet = (obj, path, value) => {
 };
 
 const isNumeric = (n) => {
-  return !isNaN(parseFloat(n)) && isFinite(n);
+  return !Number.isNaN(parseFloat(n)) && isFinite(n);
 };
 
 const compare = {
@@ -99,14 +98,13 @@ const compare = {
     Array.isArray(a) ? a.some((value) => value.includes(b)) : a.includes(b),
 };
 
-const test_condition = (meta, operator, value) => {
+const test_condition = (meta, operator = "=", value) => {
   if (!meta || !meta.value) {
     return false;
   }
   if (!value) {
     return true;
   }
-  if (!operator) operator = "=";
   return compare[operator](meta.value, value);
 };
 
@@ -179,12 +177,18 @@ const setColor = ({ node, yQuery, recurse }) => {
 };
 
 export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
-  if (!nodes) return undefined;
+  if (!nodes) {
+    return undefined;
+  }
   let { treeNodes, lca } = nodes;
-  if (!lca) return undefined;
+  if (!lca) {
+    return undefined;
+  }
   let { maxDepth, taxDepth, taxon_id: rootNode, parent: ancNode } = lca;
-  maxDepth = taxDepth ? taxDepth : maxDepth;
-  if (!treeNodes || !rootNode) return undefined;
+  maxDepth = taxDepth || maxDepth;
+  if (!treeNodes || !rootNode) {
+    return undefined;
+  }
   let radius = 498;
   let rScale = scalePow()
     .exponent(1)
@@ -197,7 +201,7 @@ export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
   let scaleFont = false;
   let charHeight = pointSize;
   let charLen = charHeight / 1.3;
-  var radialLine = lineRadial()
+  let radialLine = lineRadial()
     .angle((d) => d.a)
     .radius((d) => d.r);
   let visited = {};
@@ -207,7 +211,9 @@ export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
   const drawArcs = ({ node, depth = 0, start = 0, recurse = true }) => {
     visited[node.taxon_id] = true;
     let outer = depth + 1;
-    if (!node) return {};
+    if (!node) {
+      return {};
+    }
     let { color, highlightColor } = setColor({ node, yQuery, recurse });
 
     if (
@@ -264,7 +270,9 @@ export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
       let labelScale = 1.1;
       if (arcLen > radLen) {
         if (labelLen < arcLen) {
-          if (scaleFont) labelScale = arcLen / labelLen;
+          if (scaleFont) {
+            labelScale = arcLen / labelLen;
+          }
           let labelArc = outerArc({
             innerRadius: midRadius,
             outerRadius: midRadius,
@@ -279,7 +287,9 @@ export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
           });
         }
       } else if (arcLen > charHeight && labelLen <= radLen) {
-        if (scaleFont) labelScale = radLen / labelLen;
+        if (scaleFont) {
+          labelScale = radLen / labelLen;
+        }
         labels.push({
           ...node,
           scientific_name: label,
@@ -301,7 +311,7 @@ export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
             if (parts.length == 3) {
               addlabel(
                 `${parts[0].charAt(0)}. ${parts[1].charAt(0)}. ${parts[2]}`,
-                nextOpts
+                nextOpts,
               );
             }
           } else {
@@ -328,7 +338,7 @@ export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
       children.sort(
         (a, b) =>
           a.count - b.count ||
-          b.scientific_name.localeCompare(a.scientific_name)
+          b.scientific_name.localeCompare(a.scientific_name),
       );
       children.forEach((child) => {
         // test if node has been visited already - indicates problem with tree
@@ -366,8 +376,8 @@ export const setCats = ({ node, cats, cat, other }) => {
       return typeof cats[catList.toLowerCase()] === "number"
         ? [cats[catList.toLowerCase()]]
         : other
-        ? [other]
-        : [];
+          ? [other]
+          : [];
     } else {
       let nodeCats = [];
       let hasOther;
@@ -394,8 +404,8 @@ export const setCats = ({ node, cats, cat, other }) => {
     return typeof cats[nodeCat.toLowerCase()] === "number"
       ? [cats[nodeCat.toLowerCase()]]
       : other
-      ? [other]
-      : [];
+        ? [other]
+        : [];
   }
 };
 
@@ -403,11 +413,12 @@ export const processTreePaths = ({
   nodes,
   bounds = {},
   yBounds = {},
-  xQuery,
   yQuery,
   pointSize,
 }) => {
-  if (!nodes) return undefined;
+  if (!nodes) {
+    return undefined;
+  }
   const { cat, cats: catArray, showOther } = bounds;
   let cats = {};
   let other;
@@ -423,7 +434,7 @@ export const processTreePaths = ({
       cats.other = other;
     }
   }
-  let { treeNodes, lca } = nodes;
+  let { treeNodes, lca } = structuredClone(nodes);
   let yField = (yQuery?.yFields || [])[0];
   let valueScale;
   let targetWidth = 1000;
@@ -436,10 +447,14 @@ export const processTreePaths = ({
     dataWidth = 120;
     targetWidth -= 120;
   }
-  if (!lca) return undefined;
+  if (!lca) {
+    return undefined;
+  }
   let { maxDepth, taxDepth, taxon_id: rootNode, parent: ancNode } = lca;
-  maxDepth = taxDepth ? taxDepth : maxDepth;
-  if (!treeNodes || !rootNode) return undefined;
+  maxDepth = taxDepth || maxDepth;
+  if (!treeNodes || !rootNode) {
+    return undefined;
+  }
   let maxWidth = 0;
   let maxTip = 0;
   let charHeight = pointSize;
@@ -462,7 +477,9 @@ export const processTreePaths = ({
     recurse = true,
     parent = ancNode,
   }) => {
-    if (!node) return {};
+    if (!node) {
+      return {};
+    }
     visited[node.taxon_id] = true;
 
     let rightDepth = depth + 1;
@@ -492,7 +509,7 @@ export const processTreePaths = ({
       children.sort(
         (b, a) =>
           b.count - a.count ||
-          a.scientific_name.localeCompare(b.scientific_name)
+          a.scientific_name.localeCompare(b.scientific_name),
       );
       for (let child of children) {
         if (!visited[child.taxon_id]) {
@@ -588,7 +605,7 @@ export const processTreePaths = ({
         if (label.length * charLen - 2 > node.width) {
           label = `${label.substring(
             0,
-            Math.floor(node.width / charLen) - 1
+            Math.floor(node.width / charLen) - 1,
           )}...`;
         }
       }

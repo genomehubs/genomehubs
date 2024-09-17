@@ -41,7 +41,6 @@ const formatMillisecond = utcFormat(".%L"),
 const timeFormats = {
   millisecond: formatMillisecond,
   second: formatSecond,
-  second: formatSecond,
   minute: formatMinute,
   hour: formatHour,
   day: formatDay,
@@ -59,18 +58,18 @@ export const setInterval = (diff, bins) => {
   return interval < 1000
     ? "millisecond"
     : interval < 60000
-    ? "second"
-    : interval < 3600000
-    ? "minute"
-    : interval < 86400000
-    ? "hour"
-    : interval < 604800000
-    ? "day"
-    : interval < 2628000000
-    ? "week"
-    : interval < 31535965000
-    ? "month"
-    : "year";
+      ? "second"
+      : interval < 3600000
+        ? "minute"
+        : interval < 86400000
+          ? "hour"
+          : interval < 604800000
+            ? "day"
+            : interval < 2628000000
+              ? "week"
+              : interval < 31535965000
+                ? "month"
+                : "year";
 };
 
 function multiFormat(date, interval) {
@@ -81,18 +80,18 @@ function multiFormat(date, interval) {
     timeSecond(date) < date
       ? formatMillisecond
       : timeMinute(date) < date
-      ? formatSecond
-      : timeHour(date) < date
-      ? formatMinute
-      : timeDay(date) < date
-      ? formatHour
-      : timeMonth(date) < date
-      ? timeWeek(date) < date
-        ? formatDay
-        : formatWeek
-      : timeYear(date) < date
-      ? formatMonth
-      : formatYear
+        ? formatSecond
+        : timeHour(date) < date
+          ? formatMinute
+          : timeDay(date) < date
+            ? formatHour
+            : timeMonth(date) < date
+              ? timeWeek(date) < date
+                ? formatDay
+                : formatWeek
+              : timeYear(date) < date
+                ? formatMonth
+                : formatYear
   )(date);
 }
 

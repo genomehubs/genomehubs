@@ -1,14 +1,14 @@
 import React, { forwardRef } from "react";
 
 import Button from "@mui/material/Button";
-import { grey as orange } from "@mui/material/colors";
+import { grey } from "@mui/material/colors";
 import { styled } from "@mui/material/styles";
 
 const StyledButton = styled(Button)(({ theme }) => ({
-  color: theme.palette.getContrastText(orange[400]),
-  backgroundColor: orange[400],
+  color: theme.palette.getContrastText(grey[300]),
+  backgroundColor: grey[300],
   "&:hover": {
-    backgroundColor: orange[600],
+    backgroundColor: grey[500],
   },
 }));
 

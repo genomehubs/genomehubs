@@ -70,6 +70,8 @@ const AnalysisPanel = ({
         <TableBody>{tableRows}</TableBody>
       </Table>
     );
+  } else {
+    return null;
   }
   return (
     <div className={css}>

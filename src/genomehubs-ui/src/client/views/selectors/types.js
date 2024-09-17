@@ -28,7 +28,7 @@ export const getTypesMap = createSelector(
   (types, index) => {
     if (!types[index]) return {};
     return types[index];
-  }
+  },
 );
 
 export const getSynonyms = createSelector(getTypesMap, (types) => {
@@ -55,7 +55,7 @@ export const getVersion = createSelector(
   (hub, release, source) => {
     if (!hub) return {};
     return { hub, release, source };
-  }
+  },
 );
 
 export const getActiveTypes = createSelector(
@@ -78,7 +78,7 @@ export const getActiveTypes = createSelector(
       });
     }
     return activeTypes;
-  }
+  },
 );
 
 export const taxonomyRanks = {
@@ -160,7 +160,7 @@ export const getNamesMap = createSelector(
   (types, index) => {
     if (!types[index]) return {};
     return types[index];
-  }
+  },
 );
 
 export const getAttributeTrie = createSelector(getTypesMap, (types) => {
@@ -282,7 +282,7 @@ export const getRankTrie = createSelector(getTypesMap, (types) => {
   trie.addAll(
     ranks
       .map((key) => ({ key, display_name: key, wildcard: "*" }))
-      .concat(otherRanks.map((key) => ({ key, display_name: key })))
+      .concat(otherRanks.map((key) => ({ key, display_name: key }))),
   );
   return trie;
 });
@@ -393,7 +393,7 @@ export const getValueTrie = createCachedSelector(
   (_state, key) => key,
   (types, key) => {
     return processValueTrie(types, key);
-  }
+  },
 )((_state, key) => key);
 
 export const getActiveNameClasses = createSelector(
@@ -416,7 +416,7 @@ export const getActiveNameClasses = createSelector(
       });
     }
     return activeNameClasses;
-  }
+  },
 );
 
 export const getDisplayTypes = createSelector(
@@ -429,8 +429,8 @@ export const getDisplayTypes = createSelector(
         displayTypes.push(types[key]);
       }
     });
-    return displayTypes.sort((a, b) => b.sequence < a.sequence);
-  }
+    return displayTypes.sort((a, b) => a.sequence - b.sequence);
+  },
 );
 
 export const getGroupedTypes = createSelector(
@@ -467,7 +467,7 @@ export const getGroupedTypes = createSelector(
       }
     });
     return groupedTypes;
-  }
+  },
 );
 
 export function fetchTypes(result, taxonomy) {
@@ -483,7 +483,7 @@ export function fetchTypes(result, taxonomy) {
     }
     dispatch(requestTypes(result));
     let url = `${apiUrl}/resultFields?result=${result}&taxonomy=${encodeURIComponent(
-      taxonomy
+      taxonomy,
     )}`;
     try {
       let json;

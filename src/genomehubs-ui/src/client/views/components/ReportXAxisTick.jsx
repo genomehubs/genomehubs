@@ -31,7 +31,7 @@ export const ReportXAxisTick = ({
     bucketWidth = width / (buckets.length - 1);
   }
   let tickLine;
-  if (isNaN(x) && lastPos) {
+  if (Number.isNaN(x) && lastPos) {
     if (valueType == "lineage") {
       return;
     }

@@ -305,6 +305,27 @@ components:
       name: emptyColumns
       schema:
         type: boolean
+    groupsParam:
+      description: |
+        Comma separated list of attribute display groups to return.
+      examples:
+        null:
+          value:
+          summary: return values for all display groups
+        top_level:
+          value: top_level
+          summary: all top level attribute fields
+        none:
+          value: none
+          summary: no attribute fields
+        assembly:
+          value: assembly
+          summary: assembly display group
+      in: query
+      name: groups
+      required: false
+      schema:
+        type: string
     includeEstimatesParam:
       description: |
         Flag to indicate whether search results should include records for which all attribute fields are based on estimated values.
@@ -1339,7 +1360,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/recordIdParam"
         - $ref: "#/components/parameters/resultParam"
-        - $ref: "#/components/parameters/sizeParam"
+        - $ref: "#/components/parameters/groupsParam"
+        - $ref: "#/components/parameters/sizeParam" # not used
         - $ref: "#/components/parameters/taxonomyParam"
         - $ref: "#/components/parameters/releaseParam"
         - $ref: "#/components/parameters/indentParam"
