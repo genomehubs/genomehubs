@@ -40,9 +40,8 @@ const AggregationIcon = ({ method, hasDescendants, statusColors = {} }) => {
             style={{
               backgroundColor: colors[method],
               minHeight: `${heights[method]}em`,
-              minWidth: "0.34em",
-              maxWidth: "0.34em",
-              margin: "-0.08em",
+              minWidth: "100%",
+              margin: "0",
               ...(append && { marginLeft: 0 }),
               marginTop: `${0.97 - heights[method]}em`,
             }}
