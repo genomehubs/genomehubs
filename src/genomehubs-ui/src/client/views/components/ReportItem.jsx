@@ -5,6 +5,7 @@ import ReportArc from "./ReportArc";
 import ReportCaption from "./ReportCaption";
 import ReportEmpty from "./ReportEmpty";
 import ReportError from "./ReportError";
+import ReportFlatter from "./ReportFlatter";
 import ReportHistogram from "./ReportHistogram";
 import ReportLoading from "./ReportLoading";
 import ReportMap from "./ReportMap";
@@ -319,12 +320,12 @@ const ReportItem = ({
         break;
       case "oxford":
         component = (
-          <ReportScatter
+          <ReportFlatter
             scatter={reportById}
             chartRef={chartRef}
             containerRef={containerRef}
             embedded={embedded}
-            ratio={ratio}
+            ratio={ratio * 2}
             colorPalette={colorPalette}
             xOpts={xOpts}
             yOpts={yOpts}
