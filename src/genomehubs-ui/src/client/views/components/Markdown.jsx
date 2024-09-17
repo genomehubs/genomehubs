@@ -30,6 +30,7 @@ import Highlight from "./Highlight";
 import Logo from "./Logo";
 import NavLink from "./NavLink";
 import PhyloPics from "./PhyloPics";
+import RecordLabel from "./RecordLabel";
 import RecordLink from "./RecordLink";
 import Report from "./Report";
 import ResultCount from "./ResultCount";
@@ -437,6 +438,7 @@ export const RehypeComponentsList = (extra) => {
       return <Highlight {...processProps({ props })} />;
     },
     phylopic: (props) => <PhyloPics {...processProps({ props, extra })} />,
+    recordlabel: (props) => <RecordLabel {...processProps({ props, extra })} />,
     recordlink: (props) => <RecordLink {...processProps({ props, extra })} />,
     report: (props) => {
       let css = reportContainerStyle;

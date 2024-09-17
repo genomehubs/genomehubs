@@ -19,6 +19,7 @@ import dispatchLookup from "../hocs/dispatchLookup";
 import { getRecordIsFetching } from "../reducers/record";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
+import { ucFirst } from "../functions/formatter";
 import { useNavigate } from "@reach/router";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
@@ -58,6 +59,7 @@ const RecordPage = ({
 
   let results = [];
   let taxon = {};
+  let groups = Object.values(types).map((obj) => obj.display_group);
   let options = qs.parse(location.search.replace(/^\?/, ""));
   let hashTerm = decodeURIComponent(location.hash.replace(/^\#/, ""));
   useEffect(() => {
@@ -69,22 +71,22 @@ const RecordPage = ({
       let fields;
       let ranks;
       if (options.groups) {
-        let groups = options.groups.split(",");
+        let wanted_groups = options.groups.split(",");
         let groupFields = [];
         for (let [key, type] of Object.entries(types)) {
           if (
             type.display_group &&
-            groups.includes(type.display_group) &&
+            wanted_groups.includes(type.display_group) &&
             type.display_level >= 1
           ) {
             groupFields.push(key);
+            groups.push(type.display_group);
           }
         }
         if (groupFields.length) {
           fields = groupFields.join(",");
         } else {
-          fields = "none";
-          ranks = "phylum";
+          fields = "";
         }
       }
       let searchTerm = {
@@ -218,14 +220,30 @@ const RecordPage = ({
           />,
         );
       }
-      results.push(
-        <AttributePanel
-          key={"attributes"}
-          taxonId={taxon.taxon_id}
-          attributes={record.record.attributes}
-          result={options.result}
-        />,
-      );
+      groups = [...new Set(groups.filter((group) => group && group.length))];
+      for (let group of groups) {
+        let groupAttributes = Object.entries(record.record.attributes)
+          .filter(([key, value]) => {
+            return types[key]?.display_group === group;
+          })
+          .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+          .reduce((acc, [key, value]) => {
+            acc[key] = value;
+            return acc;
+          }, {});
+
+        if (Object.keys(groupAttributes).length) {
+          results.push(
+            <AttributePanel
+              key={group}
+              title={`${ucFirst(group).replace(/_/g, " ")} attributes`}
+              taxonId={taxon.taxon_id}
+              attributes={groupAttributes}
+              result={options.result}
+            />,
+          );
+        }
+      }
     }
   }
 

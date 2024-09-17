@@ -51,4 +51,7 @@ export const formatter = (value, searchIndex, returnType, limit = 15) => {
   return toReturnType(value, format(",.3~s")(value), returnType);
 };
 
+export const ucFirst = (string = "") =>
+  string.charAt(0).toUpperCase() + string.slice(1);
+
 export default formatter;

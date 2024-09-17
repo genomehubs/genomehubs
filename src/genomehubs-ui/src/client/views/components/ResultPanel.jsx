@@ -206,7 +206,10 @@ const ResultPanel = ({
     });
     taxonSummary = (
       <Grid size={12}>
-        <TaxonSummaryPanel taxonId={taxon_id} />
+        <TaxonSummaryPanel
+          taxonId={taxon_id}
+          scientific_name={scientific_name}
+        />
       </Grid>
     );
   }
@@ -264,7 +267,7 @@ const ResultPanel = ({
       )}
 
       <div>
-        <Grid
+        {/* <Grid
           container
           alignItems="center"
           direction="row"
@@ -277,7 +280,7 @@ const ResultPanel = ({
               <span className={classnames(boldStyle)}>{scientific_name}</span>
             </div>
           </div>
-        </Grid>
+        </Grid> */}
         <Grid container alignItems="center" direction="row" spacing={0}>
           {taxonSummary}
         </Grid>

@@ -98,14 +98,13 @@ const compare = {
     Array.isArray(a) ? a.some((value) => value.includes(b)) : a.includes(b),
 };
 
-const test_condition = (meta, operator, value) => {
+const test_condition = (meta, operator = "=", value) => {
   if (!meta || !meta.value) {
     return false;
   }
   if (!value) {
     return true;
   }
-  if (!operator) operator = "=";
   return compare[operator](meta.value, value);
 };
 
@@ -178,12 +177,18 @@ const setColor = ({ node, yQuery, recurse }) => {
 };
 
 export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
-  if (!nodes) return undefined;
+  if (!nodes) {
+    return undefined;
+  }
   let { treeNodes, lca } = nodes;
-  if (!lca) return undefined;
+  if (!lca) {
+    return undefined;
+  }
   let { maxDepth, taxDepth, taxon_id: rootNode, parent: ancNode } = lca;
-  maxDepth = taxDepth ? taxDepth : maxDepth;
-  if (!treeNodes || !rootNode) return undefined;
+  maxDepth = taxDepth || maxDepth;
+  if (!treeNodes || !rootNode) {
+    return undefined;
+  }
   let radius = 498;
   let rScale = scalePow()
     .exponent(1)
@@ -196,7 +201,7 @@ export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
   let scaleFont = false;
   let charHeight = pointSize;
   let charLen = charHeight / 1.3;
-  var radialLine = lineRadial()
+  let radialLine = lineRadial()
     .angle((d) => d.a)
     .radius((d) => d.r);
   let visited = {};
@@ -206,7 +211,9 @@ export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
   const drawArcs = ({ node, depth = 0, start = 0, recurse = true }) => {
     visited[node.taxon_id] = true;
     let outer = depth + 1;
-    if (!node) return {};
+    if (!node) {
+      return {};
+    }
     let { color, highlightColor } = setColor({ node, yQuery, recurse });
 
     if (
@@ -263,7 +270,9 @@ export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
       let labelScale = 1.1;
       if (arcLen > radLen) {
         if (labelLen < arcLen) {
-          if (scaleFont) labelScale = arcLen / labelLen;
+          if (scaleFont) {
+            labelScale = arcLen / labelLen;
+          }
           let labelArc = outerArc({
             innerRadius: midRadius,
             outerRadius: midRadius,
@@ -278,7 +287,9 @@ export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
           });
         }
       } else if (arcLen > charHeight && labelLen <= radLen) {
-        if (scaleFont) labelScale = radLen / labelLen;
+        if (scaleFont) {
+          labelScale = radLen / labelLen;
+        }
         labels.push({
           ...node,
           scientific_name: label,
@@ -436,10 +447,14 @@ export const processTreePaths = ({
     dataWidth = 120;
     targetWidth -= 120;
   }
-  if (!lca) return undefined;
+  if (!lca) {
+    return undefined;
+  }
   let { maxDepth, taxDepth, taxon_id: rootNode, parent: ancNode } = lca;
-  maxDepth = taxDepth ? taxDepth : maxDepth;
-  if (!treeNodes || !rootNode) return undefined;
+  maxDepth = taxDepth || maxDepth;
+  if (!treeNodes || !rootNode) {
+    return undefined;
+  }
   let maxWidth = 0;
   let maxTip = 0;
   let charHeight = pointSize;
@@ -462,7 +477,9 @@ export const processTreePaths = ({
     recurse = true,
     parent = ancNode,
   }) => {
-    if (!node) return {};
+    if (!node) {
+      return {};
+    }
     visited[node.taxon_id] = true;
 
     let rightDepth = depth + 1;
