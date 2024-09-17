@@ -137,22 +137,32 @@ const RecordLabel = ({
 
   try {
     if (condition) {
-      let [key, cmp, value] = condition.split(/([!><=]+)/);
-      if (key && key == "assemblyId") {
-        if (!getPrimaryAssemblyId(record)) {
-          return null;
+      let conditions = condition.split("&&");
+      let match = true;
+      for (let cond of conditions) {
+        let [key, cmp, value] = cond.split(/([!><=]+)/);
+        if (key && key == "assemblyId") {
+          if (!getPrimaryAssemblyId(record)) {
+            match = false;
+            break;
+          }
+        } else {
+          let currentRecord = cond?.startsWith("assembly.")
+            ? { assembly: records[record.record.assembly_id]?.record }
+            : record.record;
+          let recordValue = fetchValue(key, currentRecord);
+          if (cmp && !compareValues(recordValue, value, cmp)) {
+            match = false;
+            break;
+          }
+          if (!cmp && !recordValue) {
+            match = false;
+            break;
+          }
         }
-      } else {
-        let currentRecord = condition?.startsWith("assembly.")
-          ? { assembly: records[record.record.assembly_id]?.record }
-          : record.record;
-        let recordValue = fetchValue(key, currentRecord);
-        if (cmp && !compareValues(recordValue, value, cmp)) {
-          return null;
-        }
-        if (!cmp && !recordValue) {
-          return null;
-        }
+      }
+      if (!match) {
+        return null;
       }
     }
   } catch (err) {
@@ -183,13 +193,14 @@ const RecordLabel = ({
     <Chip
       variant="outlined"
       color="primary"
+      size="small"
       style={{
         border: `solid 0.2em ${color}`,
         backgroundColor: `${color}66`,
         color: contrast,
         textDecoration: "none",
         fontSize: "1em",
-        margin: "0.2em 0",
+        margin: "-0.5em 0 0.2em 0",
       }}
       icon={muiIcon}
       // size="small"
