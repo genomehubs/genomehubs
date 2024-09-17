@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 
-import CatchingPokemonIcon from "@mui/icons-material/CatchingPokemon";
 import { Chip } from "@mui/material";
 import GppGoodIcon from "@mui/icons-material/GppGood";
 import LaunchIcon from "@mui/icons-material/Launch";
 import MoreIcon from "@mui/icons-material/More";
+import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import Tooltip from "./Tooltip";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import compareValues from "../functions/compareValues";
@@ -179,7 +179,7 @@ const RecordLabel = ({
       muiIcon = <GppGoodIcon sx={{ "&&": { color } }} />;
       break;
     case "catch":
-      muiIcon = <CatchingPokemonIcon sx={{ "&&": { color } }} />;
+      muiIcon = <ShoppingBasketIcon sx={{ "&&": { color } }} />;
       break;
     case "more":
       muiIcon = <MoreIcon sx={{ "&&": { color } }} />;
