@@ -10,7 +10,7 @@ import esmResolver from "./api/v2/functions/esmResolver.js";
 import express from "express";
 import { fileURLToPath } from "url";
 import fs from "fs";
-import helmet from "helmet";
+// import helmet from "helmet";
 import http from "http";
 import https from "https";
 import { logAccess } from "./api/v2/functions/logger.js";
@@ -125,7 +125,7 @@ app.use((err, req, res, next) => {
   logError({ ...error, req });
 });
 
-app.use(helmet());
+// app.use(helmet());
 
 if (config.https) {
   const options = {
