@@ -201,7 +201,7 @@ const QueryBuilder = ({
   let variables = [];
   let sortedTypes = Object.entries(types).sort(([aKey, aVal], [bKey, bVal]) => {
     let group = (aVal.display_group || "ZZZ").localeCompare(
-      bVal.display_group || "ZZZ"
+      bVal.display_group || "ZZZ",
     );
     if (group == 0) {
       return aKey.localeCompare(bKey);
@@ -224,7 +224,7 @@ const QueryBuilder = ({
       variables.push(
         <MenuItem key={value} value={value}>
           {value}
-        </MenuItem>
+        </MenuItem>,
       );
     });
   });
@@ -262,7 +262,7 @@ const QueryBuilder = ({
             return handleChange(e, i, "value", value);
           }}
           handleDismiss={(e) => handleChange(e, i, "dismiss")}
-        />
+        />,
       );
     }
   });
@@ -290,7 +290,7 @@ const QueryBuilder = ({
           sx={{ minWidth: "240px" }}
         />
       </Grid>
-    </Grid>
+    </Grid>,
   );
 
   let [moreOptions, setMoreOptions] = useState(() => {
@@ -350,8 +350,8 @@ const QueryBuilder = ({
     setPreferSearchTerm(false);
     navigate(
       `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
-        options.query
-      )}`
+        options.query,
+      )}`,
     );
   };
   return (
@@ -493,5 +493,5 @@ export default compose(
   withTaxonomy,
   withSearch,
   withSearchDefaults,
-  withLookup
+  withLookup,
 )(QueryBuilder);

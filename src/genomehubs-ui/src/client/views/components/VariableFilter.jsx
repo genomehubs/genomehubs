@@ -135,6 +135,7 @@ const VariableFilter = ({
             setInputValue={() => {}}
             inputLabel={"value"}
             handleSubmit={handleValueChange}
+            handleBlur={handleValueChange}
             size={"small"}
             maxRows={1}
             fixedType={{ name: field, operator }}
