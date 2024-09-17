@@ -35,6 +35,7 @@ const AssemblyPanel = ({
 
   let scientificName, rank;
   let namesDiv;
+  let lineage;
   if (assemblyId) {
     if (records[assemblyId]) {
       let identifiers = (records[assemblyId].record.identifiers || []).filter(

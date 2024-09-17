@@ -520,7 +520,7 @@ export const setLinkIcons = ({
           } else {
             let bits = item.split(".");
             let field = bits.shift();
-            if (record.result.attributes.hasOwnProperty(field)) {
+            if (record.result?.attributes?.hasOwnProperty(field)) {
               arr[i] =
                 record.result.attributes[field][`metadata.${bits.join(".")}`];
             }
