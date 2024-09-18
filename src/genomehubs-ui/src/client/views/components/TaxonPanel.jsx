@@ -1,8 +1,12 @@
 import React, { useEffect } from "react";
 import {
+  header as headerStyle,
+  identifierPrefix as identifierPrefixStyle,
+  identifier as identifierStyle,
   infoPanel1Column as infoPanel1ColumnStyle,
   infoPanel as infoPanelStyle,
   resultPanel as resultPanelStyle,
+  title as titleStyle,
 } from "./Styles.scss";
 import { useLocation, useNavigate } from "@reach/router";
 
