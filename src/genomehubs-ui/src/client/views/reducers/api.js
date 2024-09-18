@@ -1,7 +1,6 @@
 import { createAction, handleAction } from "redux-actions";
 
 const defaultApiUrl = () => {
-  console.log(window.process);
   if (
     window &&
     window.process &&

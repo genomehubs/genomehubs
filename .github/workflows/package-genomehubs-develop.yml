@@ -118,6 +118,11 @@ jobs:
           cd -
           rm -rf boat-ui
       - run: ./package-ui.sh
+        env:
+          GH_API_URL: "https://boat.genomehubs.org/api/v2"
+          GH_BASENAME: ""
+          GH_SITENAME: BoaT
+          GH_SUGGESTED_TERM: Lepidoptera
       - uses: actions/upload-artifact@v3
         with:
           name: boat-ui
