@@ -10,6 +10,7 @@ import {
   YAxis,
   ZAxis,
 } from "recharts";
+import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
 import React, { memo, useEffect, useRef, useState } from "react";
 import formats, { setInterval } from "../functions/formats";
 import stringLength, { maxStringLength } from "../functions/stringLength";
@@ -26,8 +27,8 @@ import { compose } from "recompose";
 import { line as d3Line } from "d3-shape";
 import { path as d3Path } from "d3-path";
 import dispatchMessage from "../hocs/dispatchMessage";
+import { fadeColor } from "../functions/fadeColor";
 import hexToHSL from "hex-to-hsl";
-import { processLegendData } from "./MultiCatLegend";
 import qs from "../functions/qs";
 import { scaleLinear } from "d3-scale";
 import searchByCell from "../functions/searchByCell";
@@ -817,30 +818,101 @@ const Heatmap = ({
   );
 };
 
-const Ribbon = ({ pointData, width, height, buckets, yBuckets, colors }) => {
+const STROKE_WIDTH = 5;
+
+const Ribbon = ({
+  pointData,
+  width,
+  height,
+  buckets,
+  yBuckets,
+  colors,
+  cats,
+  chartProps,
+  marginWidth,
+  marginHeight,
+  marginRight,
+  marginTop,
+  dropShadow,
+}) => {
+  const [currentSeries, setCurrentSeries] = useState(false);
+  let fillColors = colors.map((hex, i) =>
+    fadeColor({ hex, i, active: currentSeries }),
+  );
   let xScale = scaleLinear()
     .domain([0, buckets[buckets.length - 1]])
     .range([0, width]);
   let yScale = scaleLinear()
     .domain([0, yBuckets[yBuckets.length - 1]])
-    .range([0, width]);
+    .range([0, height]);
+  let topCoord = marginTop;
+  let bottomCoord = height - marginHeight;
   let groups = [];
+  let legend = [];
+  let current = [];
   pointData.forEach((arr, i) => {
-    let paths = [];
+    let handleClick;
+    if (cats.length > 1) {
+      handleClick = (i) => {
+        currentSeries !== false && currentSeries == i
+          ? setCurrentSeries(false)
+          : setCurrentSeries(i);
+      };
+    }
+    let offset, row;
+    if (chartProps.catOffsets[cats[i]]) {
+      ({ offset, row } = chartProps.catOffsets[cats[i]]);
+    }
+    let legendProps = {
+      ...chartProps,
+      width: width - 45,
+      x: 10,
+      name: cats[i],
+      fill: colors[i],
+      i,
+      stats: cats[i],
+    };
+    legend.push(
+      MultiCatLegend({
+        ...legendProps,
+        offset,
+        row,
+        handleClick,
+      }),
+    );
     arr.forEach((point, j) => {
       let x = xScale(point.x);
       let y = yScale(point.y);
       const path = d3Path();
-      path.moveTo(x, 0);
-      path.bezierCurveTo(x, height * 0.25, y, height * 0.75, y, height);
+      path.moveTo(x, bottomCoord);
+      path.bezierCurveTo(
+        x,
+        bottomCoord + (topCoord - bottomCoord) * 0.25,
+        y,
+        bottomCoord + (topCoord - bottomCoord) * 0.75,
+        y,
+        topCoord,
+      );
+      // path.moveTo(x, height);
+      // path.bezierCurveTo(x, y * 0.95, x * 0.05, y, 0, y);
       // let path = `M${x},0L${y},${height}`;
-      paths.push(<path key={j} d={path} />);
+      let pathSvg = (
+        <path
+          key={`${i}-${j}`}
+          fill="none"
+          stroke={fillColors[i]}
+          strokeWidth={STROKE_WIDTH}
+          style={{ ...(dropShadow && { filter: "URL(#shadow)" }) }}
+          d={path}
+        />
+      );
+      if (currentSeries !== false && currentSeries == i) {
+        current.push(pathSvg);
+      } else {
+        groups.push(pathSvg);
+      }
     });
-    groups.push(
-      <g key={i} fill="none" stroke={colors[i]} strokeWidth={2}>
-        {paths}
-      </g>,
-    );
+    //
   });
   return (
     <svg
@@ -851,7 +923,19 @@ const Ribbon = ({ pointData, width, height, buckets, yBuckets, colors }) => {
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
     >
+      <defs>
+        <filter id="shadow">
+          <feDropShadow
+            dx={STROKE_WIDTH / 2}
+            dy={STROKE_WIDTH / 2}
+            stdDeviation={STROKE_WIDTH}
+            floodOpacity={0.75}
+          />
+        </filter>
+      </defs>
       <g>{groups}</g>
+      <g>{current}</g>
+      <g>{legend}</g>
     </svg>
   );
 };
@@ -1051,6 +1135,14 @@ const ReportFlatter = ({
       marginHeight =
         maxXLabel + pointSize > 20 ? maxXLabel + pointSize - 20 : 0;
     }
+    let marginTop = 5;
+    if (legendRows) {
+      if (compactLegend) {
+        marginTop += legendRows * (pointSize + 10);
+      } else {
+        marginTop += legendRows * (2 * pointSize + 15);
+      }
+    }
     chart = (
       <Ribbon
         pointData={pointData}
@@ -1058,7 +1150,61 @@ const ReportFlatter = ({
         height={plotHeight}
         buckets={heatmaps.buckets}
         yBuckets={heatmaps.yBuckets}
+        marginWidth={marginWidth}
+        marginHeight={marginHeight}
+        marginRight={marginRight}
+        marginTop={marginTop}
         colors={colors}
+        cats={cats}
+        legendRows={legendRows}
+        chartProps={{
+          zDomain: heatmaps.zDomain,
+          yLength: heatmaps.yBuckets.length - 1,
+          xLength: heatmaps.buckets.length - 1,
+          n: cats.length,
+          zScale: zScale,
+          report,
+          catSums,
+          pointSize,
+          pointRatio: scatter.report.oxford ? 0.5 : 1,
+          groupBy,
+          selectMode: reportSelect,
+          xQuery: scatter.report.xQuery,
+          yQuery: scatter.report.yQuery,
+          maxYLabel,
+          maxXLabel,
+          xLabel: scatter.report.xLabel,
+          yLabel: scatter.report.yLabel,
+          showXTickLabels: xOptions[2] ? xOptions[2] >= 0 : true,
+          showYTickLabels: yOptions[2] ? yOptions[2] >= 0 : true,
+          xFormat,
+          yFormat,
+          orientation,
+          fields: heatmaps.fields,
+          ranks: heatmaps.ranks,
+          bounds,
+          yBounds,
+          translations,
+          yTranslations,
+          catTranslations,
+          catOffsets,
+          buckets: heatmaps.buckets,
+          yBuckets: heatmaps.yBuckets,
+          labels,
+          yLabels,
+          showLabels,
+          valueType,
+          yValueType,
+          summary,
+          ySummary,
+          stacked,
+          hasRawData,
+          embedded,
+          navigate,
+          location,
+          basename,
+          compactLegend,
+        }}
       />
     );
     // chart = (

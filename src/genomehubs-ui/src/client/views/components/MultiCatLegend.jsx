@@ -40,7 +40,7 @@ export const processLegendData = ({
       let cat = bounds.cats[i];
       let labelWidth = Math.max(
         stringLength(cat.label) * pointSize + 1 * pointSize,
-        minWidth
+        minWidth,
       );
       if (labelWidth + catOffset < width - labelPadding) {
         catOffsets[cat.label] = { offset: 0, row };
@@ -85,7 +85,7 @@ export const valueString = ({ stats, cellSize, pointSize, fill }) => {
         stats.sum > 0 && stats.max > stats.min
           ? ` [${formats(stats.min, "integer")}-${formats(
               stats.max,
-              "integer"
+              "integer",
             )}]`
           : ""
       }`;

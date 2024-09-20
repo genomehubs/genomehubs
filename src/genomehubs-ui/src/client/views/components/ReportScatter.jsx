@@ -25,7 +25,7 @@ import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
 import { line as d3Line } from "d3-shape";
 import dispatchMessage from "../hocs/dispatchMessage";
-import hexToHSL from "hex-to-hsl";
+import { fadeColor } from "../functions/fadeColor";
 import { processLegendData } from "./MultiCatLegend";
 import qs from "../functions/qs";
 import { scaleLinear } from "d3-scale";
@@ -511,15 +511,6 @@ const Heatmap = ({
   colors,
   legendRows,
 }) => {
-  const fadeColor = ({ hex, i, active }) => {
-    let [h, s, l] = hexToHSL(hex);
-    let lighten = active !== false ? i != active : false;
-    if (lighten) {
-      s = 15;
-      l = (l + 100) / 2;
-    }
-    return `hsl(${h},${s}%,${l}%)`;
-  };
   const [currentSeries, setCurrentSeries] = useState(false);
   let fillColors = colors.map((hex, i) =>
     fadeColor({ hex, i, active: currentSeries }),
