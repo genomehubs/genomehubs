@@ -1,2 +1,2 @@
 export const aInB = (a = [], b = []) =>
-  a.every((val) => b.includes(val.replace(/:.+/, "")));
+  a.every((val) => b.includes((val || "").replace(/:.+/, "")));
