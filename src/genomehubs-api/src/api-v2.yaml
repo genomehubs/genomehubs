@@ -646,6 +646,7 @@ components:
           - histogram
           - map
           - oxford
+          - ribbon
           - scatter
           - sources
           - table

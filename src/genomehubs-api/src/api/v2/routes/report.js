@@ -1251,6 +1251,10 @@ export const getReport = async (req, res) => {
         reportFunc = getOxford;
         break;
       }
+      case "ribbon": {
+        reportFunc = getOxford;
+        break;
+      }
       case "histogram": {
         reportFunc = histPerRank;
         break;

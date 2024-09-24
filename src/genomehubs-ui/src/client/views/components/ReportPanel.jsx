@@ -23,6 +23,7 @@ const reportTypes = {
   histogram: { name: "Histogram", indices },
   map: { name: "Map", indices: ["taxon", "assembly", "sample"] },
   oxford: { name: "Oxford", indices: ["feature"] },
+  ribbon: { name: "Ribbon", indices: ["feature"] },
   scatter: { name: "Scatter", indices },
   sources: { name: "Sources", indices: ["taxon"] },
   table: { name: "Table", indices },
@@ -48,7 +49,7 @@ const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {
       delete newOptions.report;
     }
     navigate(
-      `${location.pathname}?${qs.stringify(newOptions)}${location.hash}`
+      `${location.pathname}?${qs.stringify(newOptions)}${location.hash}`,
     );
   };
   let { query, report, ...treeOptions } = options;

@@ -94,7 +94,7 @@ const Ribbon = ({
 
     let { x, query = x } = search;
     let options = qs.parse(search.replace(/^\?/, ""));
-    let queryParts = options.query
+    let queryParts = (options.query || options.x)
       .split(" AND ")
       .filter((part) => !part.startsWith("sequence_id"));
     let newQuery =
@@ -192,8 +192,11 @@ const Ribbon = ({
       let x2 = scales[label]([buckets[i + 1]]);
       let labelLength = stringLength(label);
       let formattedLabel = label;
-      if ((labelLength - 2) * padding > x2 - x1) {
-        formattedLabel = truncate(label, Math.floor((x2 - x1) / padding));
+      let k = 1;
+      while ((labelLength - 2) * padding > x2 - x1) {
+        formattedLabel = truncate(label, label.length - k);
+        labelLength = stringLength(formattedLabel);
+        k++;
       }
       let stroke = visible[label] ? "white" : "#31323f";
       let fill = visible[label] ? "#31323f" : "white";
@@ -209,7 +212,7 @@ const Ribbon = ({
             y2={padding * 2}
             stroke={stroke}
             strokeWidth={2}
-            strokeDasharray={`${padding / 4} ${padding * 1.5}`}
+            strokeDasharray={`${padding / 3} ${(padding * 4) / 3}`}
           />,
         );
       }
@@ -397,14 +400,14 @@ const Ribbon = ({
         </g>
         <g clipPath="url(#clipRect)">{current}</g>
       </g>
-      <g transform={`translate(0,${bottomCoord - 10})`}>{xChrs}</g>
-      <g transform={`translate(0,${topCoord - 10})`}>{yChrs}</g>
+      <g transform={`translate(0,${bottomCoord - padding})`}>{xChrs}</g>
+      <g transform={`translate(0,${topCoord - padding})`}>{yChrs}</g>
       <g>{legend}</g>
     </svg>
   );
 };
 
-const ReportFlatter = ({
+const ReportRibbon = ({
   scatter,
   chartRef,
   report,
@@ -449,7 +452,7 @@ const ReportFlatter = ({
 
   const setDimensions = ({ width, height, timer }) => {
     let plotWidth = width;
-    let plotHeight = inModal ? height : plotWidth / ratio;
+    let plotHeight = height; // inModal ? height : plotWidth / ratio;
 
     if (timer && plotHeight != height) {
       dimensionTimer = setTimeout(() => {
@@ -480,7 +483,9 @@ const ReportFlatter = ({
 
   let locations = {};
   if (scatter && scatter.status) {
-    let scatterReport = scatter.report.scatter || scatter.report.oxford;
+    console.log("scatter", scatter);
+    let scatterReport =
+      scatter.report.scatter || scatter.report.ribbon || scatter.report.oxford;
     let chart;
     let {
       bounds,
@@ -583,9 +588,7 @@ const ReportFlatter = ({
         ? maxYLabel + pointSize - 40
         : 0
       : pointSize - 35;
-    const maxXLabel = showLabels
-      ? maxStringLength(labels, xFormat, pointSize)
-      : 0;
+    const maxXLabel = 0;
     let marginHeight = showLabels ? 2 * pointSize : pointSize - 15;
     const marginRight = showLabels
       ? (stringLength(xFormat(endLabel)) * pointSize) / 2
@@ -631,7 +634,7 @@ const ReportFlatter = ({
           report,
           catSums,
           pointSize,
-          pointRatio: scatter.report.oxford ? 0.5 : 1,
+          pointRatio: 1,
           groupBy,
           selectMode: reportSelect,
           xQuery: scatter.report.xQuery,
@@ -672,80 +675,6 @@ const ReportFlatter = ({
         }}
       />
     );
-    // chart = (
-    //   <Heatmap
-    //     data={chartData}
-    //     pointData={1 ? pointData : []}
-    //     width={plotWidth}
-    //     height={plotHeight}
-    //     marginWidth={marginWidth}
-    //     marginHeight={marginHeight}
-    //     marginRight={marginRight}
-    //     buckets={heatmaps.buckets}
-    //     yBuckets={heatmaps.yBuckets}
-    //     yOrientation={heatmaps.yOrientation}
-    //     labels={labels}
-    //     yLabels={yLabels}
-    //     cats={cats}
-    //     xLabel={xLabel}
-    //     yLabel={yLabel}
-    //     endLabel={endLabel}
-    //     lastIndex={lastIndex}
-    //     highlight={highlight}
-    //     highlightArea={highlightArea}
-    //     colors={colors}
-    //     reversed={reversed}
-    //     legendRows={legendRows}
-    //     chartProps={{
-    //       zDomain: heatmaps.zDomain,
-    //       yLength: heatmaps.yBuckets.length - 1,
-    //       xLength: heatmaps.buckets.length - 1,
-    //       n: cats.length,
-    //       zScale: zScale,
-    //       report,
-    //       catSums,
-    //       pointSize,
-    //       pointRatio: scatter.report.oxford ? 0.5 : 1,
-    //       groupBy,
-    //       selectMode: reportSelect,
-    //       xQuery: scatter.report.xQuery,
-    //       yQuery: scatter.report.yQuery,
-    //       maxYLabel,
-    //       maxXLabel,
-    //       xLabel: scatter.report.xLabel,
-    //       yLabel: scatter.report.yLabel,
-    //       showXTickLabels: xOptions[2] ? xOptions[2] >= 0 : true,
-    //       showYTickLabels: yOptions[2] ? yOptions[2] >= 0 : true,
-    //       xFormat,
-    //       yFormat,
-    //       orientation,
-    //       fields: heatmaps.fields,
-    //       ranks: heatmaps.ranks,
-    //       bounds,
-    //       yBounds,
-    //       translations,
-    //       yTranslations,
-    //       catTranslations,
-    //       catOffsets,
-    //       buckets: heatmaps.buckets,
-    //       yBuckets: heatmaps.yBuckets,
-    //       labels,
-    //       yLabels,
-    //       showLabels,
-    //       valueType,
-    //       yValueType,
-    //       summary,
-    //       ySummary,
-    //       stacked,
-    //       hasRawData,
-    //       embedded,
-    //       navigate,
-    //       location,
-    //       basename,
-    //       compactLegend,
-    //     }}
-    //   />
-    // );
     return (
       <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
         {chart}
@@ -762,4 +691,4 @@ export default compose(
   dispatchMessage,
   withColors,
   withReportTerm,
-)(ReportFlatter);
+)(ReportRibbon);
