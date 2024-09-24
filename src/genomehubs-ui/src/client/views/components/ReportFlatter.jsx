@@ -14,6 +14,7 @@ import { fadeColor } from "../functions/fadeColor";
 import qs from "../functions/qs";
 import { scaleLinear } from "d3-scale";
 import setColors from "../functions/setColors";
+import truncate from "../functions/truncate";
 import { useLongPress } from "use-long-press";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
@@ -133,8 +134,20 @@ const Ribbon = ({
   let labelHeight = 20;
   let padding = labelHeight / 2;
   let { labels, yLabels } = chartProps;
-  if (width < Math.max(labels.length, yLabels.length) * labelHeight) {
+  let dataWidth = width - Math.max(labels.length, yLabels.length) * labelHeight;
+  if (dataWidth < 50) {
     return null;
+  }
+
+  let maxSpan = Math.max(
+    buckets[buckets.length - 1] - buckets[0],
+    yBuckets[yBuckets.length - 1] - yBuckets[0],
+  );
+
+  let division = Math.ceil(Math.log10(maxSpan));
+  let step = Math.pow(10, division - 2);
+  while (maxSpan / step < 50) {
+    step /= 2;
   }
 
   const generateSteppedScale = ({ buckets, labels, padding, width }) => {
@@ -177,41 +190,70 @@ const Ribbon = ({
     labels.forEach((label, i) => {
       let x1 = scales[label]([buckets[i]]);
       let x2 = scales[label]([buckets[i + 1]]);
+      let labelLength = stringLength(label);
+      let formattedLabel = label;
+      if ((labelLength - 2) * padding > x2 - x1) {
+        formattedLabel = truncate(label, Math.floor((x2 - x1) / padding));
+      }
       let stroke = visible[label] ? "white" : "#31323f";
       let fill = visible[label] ? "#31323f" : "white";
-      chrs.push(
-        <g
-          key={label}
-          // onClick={() => {
-          //   searchBySequence(label);
-          //   handleLabelClick(label);
-          // }}
-          {...longPress(label)}
-          style={{ cursor: "pointer" }}
-        >
-          <rect
-            x={x1 - padding}
-            y={0}
-            width={x2 - x1 + padding * 2}
-            height={padding * 2}
-            fill={fill}
-            stroke={visible[label] ? fill : stroke}
+      let lines = [];
+      for (let n = 0; n < buckets[i + 1] - buckets[i]; n += step) {
+        let x = scales[label]([buckets[i] + n]);
+        lines.push(
+          <line
+            key={n}
+            x1={x}
+            y1={0}
+            x2={x}
+            y2={padding * 2}
+            stroke={stroke}
             strokeWidth={2}
-            rx={padding}
-          />
-          <text
-            x={(x1 + x2) / 2}
+            strokeDasharray={`${padding / 4} ${padding * 1.5}`}
+          />,
+        );
+      }
+      chrs.push(
+        <Tooltip
+          title={`${label} (${formats(buckets[i + 1] - buckets[i], "integer")}bp)`}
+          arrow
+          key={label}
+          enterDelay={500}
+        >
+          <g
             key={label}
-            y={padding}
-            textAnchor="middle"
-            fontSize={padding}
-            dominantBaseline="middle"
-            alignmentBaseline="middle"
-            fill={stroke}
+            // onClick={() => {
+            //   searchBySequence(label);
+            //   handleLabelClick(label);
+            // }}
+            {...longPress(label)}
+            style={{ cursor: "pointer" }}
           >
-            {label}
-          </text>
-        </g>,
+            <rect
+              x={x1 - padding}
+              y={0}
+              width={x2 - x1 + padding * 2}
+              height={padding * 2}
+              fill={fill}
+              stroke={visible[label] ? fill : stroke}
+              strokeWidth={2}
+              rx={padding}
+            />
+            {lines}
+            <text
+              x={(x1 + x2) / 2}
+              key={label}
+              y={padding}
+              textAnchor="middle"
+              fontSize={padding}
+              dominantBaseline="middle"
+              alignmentBaseline="middle"
+              fill={stroke}
+            >
+              {formattedLabel}
+            </text>
+          </g>
+        </Tooltip>,
       );
     });
     return chrs;
