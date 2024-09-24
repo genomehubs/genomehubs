@@ -1,5 +1,5 @@
 import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
-import React, { memo, useEffect, useRef, useState } from "react";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import formats, { setInterval } from "../functions/formats";
 import stringLength, { maxStringLength } from "../functions/stringLength";
 import { useLocation, useNavigate } from "@reach/router";
@@ -14,6 +14,7 @@ import { fadeColor } from "../functions/fadeColor";
 import qs from "../functions/qs";
 import { scaleLinear } from "d3-scale";
 import setColors from "../functions/setColors";
+import { useLongPress } from "use-long-press";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";
@@ -110,12 +111,31 @@ const Ribbon = ({
       )}`,
     );
   };
+
+  const longPressCallback = useCallback((e, value) => {
+    e.preventDefault();
+    e.stopPropagation();
+    searchBySequence(value.context);
+  }, []);
+
+  const longPress = useLongPress(longPressCallback, {
+    onStart: (e) => e.preventDefault(),
+    onCancel: (e, value) => {
+      handleLabelClick(value.context);
+    },
+    captureEvent: true,
+    threshold: 500,
+  });
+
   let fillColors = colors.map((hex, i) =>
     fadeColor({ hex, i, active: currentSeries }),
   );
   let labelHeight = 20;
   let padding = labelHeight / 2;
   let { labels, yLabels } = chartProps;
+  if (width < Math.max(labels.length, yLabels.length) * labelHeight) {
+    return null;
+  }
 
   const generateSteppedScale = ({ buckets, labels, padding, width }) => {
     let span = buckets[buckets.length - 1] - buckets[0];
@@ -154,7 +174,7 @@ const Ribbon = ({
   let bottomCoord = height - marginHeight - padding;
   const setChrs = ({ scales, labels, buckets, padding }) => {
     let chrs = [];
-    labels.map((label, i) => {
+    labels.forEach((label, i) => {
       let x1 = scales[label]([buckets[i]]);
       let x2 = scales[label]([buckets[i + 1]]);
       let stroke = visible[label] ? "white" : "#31323f";
@@ -162,10 +182,11 @@ const Ribbon = ({
       chrs.push(
         <g
           key={label}
-          onClick={() => {
-            searchBySequence(label);
-            handleLabelClick(label);
-          }}
+          // onClick={() => {
+          //   searchBySequence(label);
+          //   handleLabelClick(label);
+          // }}
+          {...longPress(label)}
           style={{ cursor: "pointer" }}
         >
           <rect
@@ -208,45 +229,42 @@ const Ribbon = ({
   let current = [];
   let clipRect = (
     <clipPath id="clipRect">
-      <rect
-        x={0}
-        y={topCoord}
-        width={width}
-        height={bottomCoord - topCoord}
-        fill="blue"
-      />
+      <rect x={0} y={topCoord} width={width} height={bottomCoord - topCoord} />
     </clipPath>
   );
   pointData.forEach((arr, i) => {
-    let handleClick;
-    if (cats.length > 1) {
-      handleClick = (i) => {
-        currentSeries !== false && currentSeries == i
-          ? setCurrentSeries(false)
-          : setCurrentSeries(i);
+    if (arr.length > 0) {
+      let handleClick;
+      if (cats.length > 1) {
+        handleClick = (i) => {
+          currentSeries !== false && currentSeries == i
+            ? setCurrentSeries(false)
+            : setCurrentSeries(i);
+        };
+      }
+      let offset, row;
+      if (chartProps.catOffsets[cats[i]]) {
+        ({ offset, row } = chartProps.catOffsets[cats[i]]);
+      }
+      let legendProps = {
+        ...chartProps,
+        width: width - 45,
+        x: 10,
+        name: cats[i],
+        fill: colors[i],
+        i,
+        stats: cats[i],
       };
+      legend.push(
+        MultiCatLegend({
+          ...legendProps,
+          offset,
+          row,
+          handleClick,
+          active: currentSeries === i,
+        }),
+      );
     }
-    let offset, row;
-    if (chartProps.catOffsets[cats[i]]) {
-      ({ offset, row } = chartProps.catOffsets[cats[i]]);
-    }
-    let legendProps = {
-      ...chartProps,
-      width: width - 45,
-      x: 10,
-      name: cats[i],
-      fill: colors[i],
-      i,
-      stats: cats[i],
-    };
-    legend.push(
-      MultiCatLegend({
-        ...legendProps,
-        offset,
-        row,
-        handleClick,
-      }),
-    );
     // dropShadow = currentSeries !== false && currentSeries == i;
     arr.forEach((point, j) => {
       if (
@@ -276,9 +294,9 @@ const Ribbon = ({
             }
             arrow
             followCursor={true}
+            key={`${i}-${j}`}
           >
             <path
-              key={`${i}-${j}`}
               fill="none"
               stroke={fillColors[i]}
               strokeWidth={STROKE_WIDTH}
@@ -330,8 +348,12 @@ const Ribbon = ({
         {clipRect}
       </defs>
       <g id="ribbons">
-        <g>{groups}</g>
-        <g clip-path="url(#clipRect)">{current}</g>
+        <g
+          style={{ ...(currentSeries !== false && { pointerEvents: "none" }) }}
+        >
+          {groups}
+        </g>
+        <g clipPath="url(#clipRect)">{current}</g>
       </g>
       <g transform={`translate(0,${bottomCoord - 10})`}>{xChrs}</g>
       <g transform={`translate(0,${topCoord - 10})`}>{yChrs}</g>
@@ -385,7 +407,6 @@ const ReportFlatter = ({
 
   const setDimensions = ({ width, height, timer }) => {
     let plotWidth = width;
-    console.log(ratio);
     let plotHeight = inModal ? height : plotWidth / ratio;
 
     if (timer && plotHeight != height) {

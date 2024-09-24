@@ -253,6 +253,7 @@ const MultiCatLegend = ({
       transform={`translate(${xPos}, 5)`}
       style={{ cursor: handleClick ? "pointer" : "default" }}
       onClick={handleClick ? () => handleClick(i) : () => {}}
+      key={`cell-${i}`}
     >
       {text}
     </g>
