@@ -1,5 +1,6 @@
 import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import { path as d3Path, pathRound } from "d3-path";
 import formats, { setInterval } from "../functions/formats";
 import stringLength, { maxStringLength } from "../functions/stringLength";
 import { useLocation, useNavigate } from "@reach/router";
@@ -8,7 +9,6 @@ import Grid from "@mui/material/Grid2";
 import PointInfo from "./PointInfo";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
-import { path as d3Path } from "d3-path";
 import dispatchMessage from "../hocs/dispatchMessage";
 import { fadeColor } from "../functions/fadeColor";
 import qs from "../functions/qs";
@@ -48,8 +48,6 @@ const searchByPoint = ({ props, chartProps }) => {
   );
 };
 
-const STROKE_WIDTH = 5;
-
 const Ribbon = ({
   pointData,
   width,
@@ -64,7 +62,7 @@ const Ribbon = ({
   marginHeight,
   marginRight,
   marginTop,
-  dropShadow = false,
+  dropShadow = true,
 }) => {
   const [currentSeries, setCurrentSeries] = useState(false);
   const [visible, setVisible] = useState({});
@@ -131,9 +129,10 @@ const Ribbon = ({
   let fillColors = colors.map((hex, i) =>
     fadeColor({ hex, i, active: currentSeries }),
   );
-  let labelHeight = 20;
+  let { labels, yLabels, pointSize } = chartProps;
+  let labelHeight = (pointSize * 3) / 2;
   let padding = labelHeight / 2;
-  let { labels, yLabels } = chartProps;
+  let strokeWidth = pointSize / 3;
   let dataWidth = width - Math.max(labels.length, yLabels.length) * labelHeight;
   if (dataWidth < 50) {
     return null;
@@ -319,7 +318,7 @@ const Ribbon = ({
       ) {
         let x = xScales[point.sequenceId](point.x);
         let y = yScales[point.ySequenceId](point.y);
-        const path = d3Path();
+        const path = pathRound(3);
         path.moveTo(x, bottomCoord);
         path.bezierCurveTo(
           x,
@@ -329,9 +328,6 @@ const Ribbon = ({
           y,
           topCoord,
         );
-        // path.moveTo(x, height);
-        // path.bezierCurveTo(x, y * 0.95, x * 0.05, y, 0, y);
-        // let path = `M${x},0L${y},${height}`;
         let pathSvg = (
           <Tooltip
             title={
@@ -344,7 +340,7 @@ const Ribbon = ({
             <path
               fill="none"
               stroke={fillColors[i]}
-              strokeWidth={STROKE_WIDTH}
+              strokeWidth={strokeWidth}
               onClick={() =>
                 searchByPoint({
                   props: {
@@ -383,22 +379,22 @@ const Ribbon = ({
       <defs>
         <filter id="shadow">
           <feDropShadow
-            dx={STROKE_WIDTH / 2}
-            dy={STROKE_WIDTH / 2}
-            stdDeviation={STROKE_WIDTH}
+            dx={strokeWidth / 2}
+            dy={strokeWidth / 2}
+            stdDeviation={strokeWidth}
             floodOpacity={0.75}
             floodColor="#31323f"
           />
         </filter>
         {clipRect}
       </defs>
-      <g id="ribbons">
+      <g clipPath="url(#clipRect)" id="ribbons">
         <g
           style={{ ...(currentSeries !== false && { pointerEvents: "none" }) }}
         >
           {groups}
         </g>
-        <g clipPath="url(#clipRect)">{current}</g>
+        <g>{current}</g>
       </g>
       <g transform={`translate(0,${bottomCoord - padding})`}>{xChrs}</g>
       <g transform={`translate(0,${topCoord - padding})`}>{yChrs}</g>
@@ -483,7 +479,6 @@ const ReportRibbon = ({
 
   let locations = {};
   if (scatter && scatter.status) {
-    console.log("scatter", scatter);
     let scatterReport =
       scatter.report.scatter || scatter.report.ribbon || scatter.report.oxford;
     let chart;

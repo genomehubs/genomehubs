@@ -727,8 +727,6 @@ const processReport = (report, { searchTerm = {} }) => {
       },
     };
   } else if (report.name == "ribbon") {
-    console.log(report);
-    console.log(report.report.oxford);
     return {
       ...report,
       report: {
