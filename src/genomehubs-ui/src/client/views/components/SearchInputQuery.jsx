@@ -43,10 +43,14 @@ const SearchInputQuery = ({
     setValue(query);
   };
   return (
-    (<Grid container direction="row">
+    <Grid container direction="row" size={12} style={{ marginBottom: "1em" }}>
       <Grid size={2}></Grid>
       <Grid size={8}>
-        <FormControl variant="standard" className={classes.formControl}>
+        <FormControl
+          variant="standard"
+          className={classes.formControl}
+          style={{ width: "100%" }}
+        >
           <AutoCompleteInput
             size={"small"}
             required
@@ -64,7 +68,7 @@ const SearchInputQuery = ({
         </FormControl>
       </Grid>
       <Grid size={2}></Grid>
-    </Grid>)
+    </Grid>
   );
 };
 

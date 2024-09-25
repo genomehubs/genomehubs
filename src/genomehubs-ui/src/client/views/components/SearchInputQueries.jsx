@@ -35,7 +35,7 @@ const SearchInputQueries = ({
   const classes = useStyles();
   const [inputs, setInputs] = useState([
     Object.keys(searchTerm.query || {}).filter((key) =>
-      key.match(/query[A-Z]+/)
+      key.match(/query[A-Z]+/),
     ),
   ]);
 
@@ -52,7 +52,7 @@ const SearchInputQueries = ({
       }
     } else {
       let newInputs = Object.keys(searchTerm.query || {}).filter((key) =>
-        key.match(/query[A-Z]+/)
+        key.match(/query[A-Z]+/),
       );
       if (newInputs.length == 0) {
         newInputs = lookupTerm.match(/query[A-Z]/g);
@@ -73,8 +73,8 @@ const SearchInputQueries = ({
 
   let queryInputs = inputs.map((id) => <SearchInputQuery key={id} id={id} />);
   return (
-    <Grid>
-      <Grid container direction="column">
+    <Grid size={12}>
+      <Grid container direction="column" size={12}>
         {queryInputs}
       </Grid>
     </Grid>
@@ -85,6 +85,6 @@ export default compose(
   memo,
   withSearch,
   withLookup,
-  withInputQueries
+  withInputQueries,
   // withLiveQuery
 )(SearchInputQueries);
