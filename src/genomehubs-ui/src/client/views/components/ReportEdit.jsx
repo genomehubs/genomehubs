@@ -103,6 +103,7 @@ export const queryPropList = {
     "plotRatio",
     pointSizeSettings,
     "compactLegend",
+    "reorient",
     "compactWidth",
     "result",
     "taxonomy",
@@ -116,6 +117,8 @@ export const queryPropList = {
     "plotRatio",
     pointSizeSettings,
     "compactLegend",
+    "reorient",
+    "dropShadow",
     "compactWidth",
     "result",
     "taxonomy",
@@ -530,6 +533,8 @@ export const ReportEdit = ({
       queryProp == "reversed" ||
       queryProp == "collapseMonotypic" ||
       queryProp == "compactLegend" ||
+      queryProp == "reorient" ||
+      queryProp == "dropShadow" ||
       queryProp == "catToX"
     ) {
       toggles.push(

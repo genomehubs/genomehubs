@@ -62,7 +62,7 @@ const Ribbon = ({
   marginHeight,
   marginRight,
   marginTop,
-  dropShadow = true,
+  dropShadow,
 }) => {
   const [currentSeries, setCurrentSeries] = useState(false);
   const [visible, setVisible] = useState({});
@@ -151,8 +151,8 @@ const Ribbon = ({
 
   const generateSteppedScale = ({ buckets, labels, padding, width }) => {
     let span = buckets[buckets.length - 1] - buckets[0];
-    let dataWidth = width - labels.length * padding * 2;
-    let left = padding;
+    let dataWidth = width - 2 - labels.length * padding * 2;
+    let left = padding + 1;
     let scales = {};
     labels.forEach((label, i) => {
       let right = left + ((buckets[i + 1] - buckets[i]) / span) * dataWidth;
@@ -193,7 +193,7 @@ const Ribbon = ({
       let formattedLabel = label;
       let k = 1;
       while ((labelLength - 2) * padding > x2 - x1) {
-        formattedLabel = truncate(label, label.length - k);
+        formattedLabel = truncate(label, label.length - k, true);
         labelLength = stringLength(formattedLabel);
         k++;
       }
@@ -411,6 +411,8 @@ const ReportRibbon = ({
   embedded,
   inModal,
   compactLegend,
+  reorient,
+  dropShadow,
   compactWidth = 400,
   ratio,
   zScale = "linear",
@@ -561,6 +563,7 @@ const ReportRibbon = ({
       width: plotWidth,
       pointSize,
       compactLegend,
+      pointData,
     });
     ({ levels, colors } = setColors({
       colorPalette,
@@ -584,19 +587,11 @@ const ReportRibbon = ({
         : 0
       : pointSize - 35;
     const maxXLabel = 0;
-    let marginHeight = showLabels ? 2 * pointSize : pointSize - 15;
+    let marginHeight = (marginHeight = pointSize);
     const marginRight = showLabels
       ? (stringLength(xFormat(endLabel)) * pointSize) / 2
       : 0;
     let orientation = 0;
-    if (
-      maxXLabel >
-      (plotWidth - marginWidth - marginRight) / heatmaps.buckets.length
-    ) {
-      orientation = -90;
-      marginHeight =
-        maxXLabel + pointSize > 20 ? maxXLabel + pointSize - 20 : 0;
-    }
     let marginTop = 5;
     if (legendRows) {
       if (compactLegend) {
@@ -618,6 +613,7 @@ const ReportRibbon = ({
         marginTop={marginTop}
         colors={colors}
         cats={cats}
+        dropShadow={dropShadow}
         legendRows={legendRows}
         basename={basename}
         chartProps={{

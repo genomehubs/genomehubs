@@ -17,12 +17,21 @@ const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
       let parts = (caption || "").split("**");
       for (let i = 0; i < parts.length; i++) {
         if (i % 2 == 0) {
-          captionArr.push(<span key={i}>{parts[i]}</span>);
+          let units = parts[i].split(",");
+          for (let j = 0; j < units.length; j++) {
+            captionArr.push(
+              <span key={i + j}>
+                {units[j]}
+                {j < units.length - 1 && ",\u200b"}
+              </span>,
+            );
+          }
+          // captionArr.push(<span key={i}>{parts[i]}</span>);
         } else {
           captionArr.push(
             <b key={i} style={{ color: tooltip ? "yellow" : "black" }}>
               {parts[i]}
-            </b>
+            </b>,
           );
         }
       }
@@ -44,8 +53,8 @@ const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
   const countRows = (arr) =>
     Math.floor(
       Math.ceil(
-        (stringLength(arr.join(" ")) * 8 * captionScale) / 100 / width
-      ) * 1.5
+        (stringLength(arr.join(" ")) * 8 * captionScale) / 100 / width,
+      ) * 1.5,
     );
   let displayCaption;
   if (!inModal) {
@@ -69,7 +78,7 @@ const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
   }
 
   return (
-    (<Grid ref={gridRef} style={{ textAlign: "center" }} size="grow">
+    <Grid ref={gridRef} style={{ textAlign: "center" }} size="grow">
       <div
         className={reportCaptionStyle}
         style={{
@@ -82,7 +91,7 @@ const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
       >
         {displayCaption}
       </div>
-    </Grid>)
+    </Grid>
   );
 };
 

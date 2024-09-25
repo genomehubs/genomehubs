@@ -82,6 +82,8 @@ const ReportItem = ({
   xOpts,
   yOpts,
   compactLegend,
+  reorient,
+  dropShadow,
   compactWidth,
   highlightArea,
   mapThreshold,
@@ -331,6 +333,8 @@ const ReportItem = ({
             xOpts={xOpts}
             yOpts={yOpts}
             compactLegend={compactLegend}
+            reorient={reorient}
+            dropShadow={dropShadow}
             compactWidth={compactWidth}
             highlightArea={highlightArea}
             stacked={stacked}
@@ -357,6 +361,8 @@ const ReportItem = ({
             xOpts={xOpts}
             yOpts={yOpts}
             compactLegend={compactLegend}
+            reorient={reorient}
+            dropShadow={dropShadow}
             compactWidth={compactWidth}
             highlightArea={highlightArea}
             stacked={stacked}

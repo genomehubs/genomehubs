@@ -99,6 +99,8 @@ const Report = ({
   reportProps.scatterThreshold = props.scatterThreshold;
   reportProps.treeThreshold = props.treeThreshold;
   reportProps.compactLegend = props.compactLegend;
+  reportProps.dropShadow = props.dropShadow;
+  reportProps.reorient = props.reorient;
   reportProps.compactWidth = props.compactWidth;
   reportProps.pointSize =
     props.pointSize * 1 ||

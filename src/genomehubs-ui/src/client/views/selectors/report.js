@@ -78,6 +78,10 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     compactLegend: {
       in: new Set(["histogram", "oxford", "ribbon", "scatter"]),
     },
+    reorient: {
+      in: new Set(["oxford", "ribbon"]),
+    },
+    dropShadow: { in: new Set(["ribbon"]), ui: true },
     catToX: { in: new Set(["histogram"]) },
     compactWidth: { in: new Set(["histogram", "oxford", "ribbon", "scatter"]) },
     highlightArea: { in: new Set(["scatter"]), ui: true },

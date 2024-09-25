@@ -815,6 +815,7 @@ const ReportScatter = ({
   embedded,
   inModal,
   compactLegend,
+  reorient,
   compactWidth = 400,
   ratio,
   zScale = "linear",

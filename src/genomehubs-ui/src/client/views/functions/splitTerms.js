@@ -9,6 +9,8 @@ const reportParams = {
   yScale: "linear",
   cumulative: false,
   compactLegend: false,
+  reorient: false,
+  dropShadow: false,
   catToX: false,
 };
 

@@ -103,6 +103,7 @@ const getOxford = async ({
   yBounds,
   result,
   taxonomy,
+  reorient,
   req,
 }) => {
   let exclusions;
@@ -389,8 +390,12 @@ const getOxford = async ({
         maxArray = arr;
       }
     }
-    let eqn = linearRegression(maxArray);
-    seqOrient[sequenceId] = eqn.m >= 0 ? 1 : -1;
+    if (reorient) {
+      let eqn = linearRegression(maxArray);
+      seqOrient[sequenceId] = eqn.m >= 0 ? 1 : -1;
+    } else {
+      seqOrient[sequenceId] = 1;
+    }
   }
 
   seqOffsets[asms[1]] = {};
@@ -558,6 +563,7 @@ export const oxford = async ({
   cat,
   result,
   taxonomy,
+  reorient,
   apiParams,
   fields,
   req,
@@ -712,6 +718,7 @@ export const oxford = async ({
         queryId: apiParams.queryId,
         req,
         taxonomy,
+        reorient,
       });
   if (oxford && oxford.status && oxford.status.success == false) {
     status = { ...oxford.status };
