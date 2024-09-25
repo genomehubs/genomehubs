@@ -358,6 +358,22 @@ components:
       name: includeRawValues
       schema:
         type: boolean
+    reorientParam:
+      description: |
+        reorient chromosomes in secondary assembly.
+
+        This parameter only applies to reports with `report=oxford` or `report=ribbon`.
+      examples:
+        false:
+          value:
+          summary: false - do not reorient chromosomes
+        true:
+          value: true
+          summary: true - reorient chromosomes if linear regression is negative
+      in: query
+      name: reorient
+      schema:
+        type: boolean
     indentParam:
       description: |
         Format output with indented lines.
@@ -646,6 +662,7 @@ components:
           - histogram
           - map
           - oxford
+          - ribbon
           - scatter
           - sources
           - table
@@ -1394,7 +1411,8 @@ paths:
         | **Files**     | `x`               | `checkedFiles` |
         | **Histogram** | `x`               | `cat`, `catToX`, `rank`, `xOpts` |
         | **Map**       | `x`               | `cat`, `rank`          |
-        | **Oxford**    | `x`               | `cat`, `xOpts`, `yOpts` |
+        | **Oxford**    | `x`               | `cat`, `xOpts`, `yOpts`, `reorient` |
+        | **Ribbon**    | `x`               | `cat`, `xOpts`, `reorient` |
         | **Scatter**   | `x`, `y`, `rank`  | `cat`, `xOpts`, `yOpts`, `scatterThreshold` |
         | **Table**     | `x`, `y`          | `cat`, `rank`, `xOpts`, `yOpts`, `scatterThreshold` |
         | **Sources**   | -                 | -              |
@@ -1425,6 +1443,7 @@ paths:
         - $ref: "#/components/parameters/taxonomyParam"
         - $ref: "#/components/parameters/xOptsParam"
         - $ref: "#/components/parameters/yOptsParam"
+        - $ref: "#/components/parameters/reorientParam"
         - $ref: "#/components/parameters/checkedFilesParam"
         - $ref: "#/components/parameters/mapThresholdParam"
         - $ref: "#/components/parameters/scatterThresholdParam"

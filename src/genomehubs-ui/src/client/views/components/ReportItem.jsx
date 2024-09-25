@@ -8,6 +8,7 @@ import ReportError from "./ReportError";
 import ReportHistogram from "./ReportHistogram";
 import ReportLoading from "./ReportLoading";
 import ReportMap from "./ReportMap";
+import ReportRibbon from "./ReportRibbon";
 import ReportScatter from "./ReportScatter";
 import ReportSources from "./ReportSources";
 import ReportTable from "./ReportTable";
@@ -31,6 +32,7 @@ const headings = {
   tree: "Tap tree nodes to browse taxa or long-press to search",
   histogram: "Tap bins to search",
   oxford: "Tap bins to search",
+  ribbon: "Long press to search",
   scatter: "Tap bins to search",
 };
 
@@ -80,6 +82,8 @@ const ReportItem = ({
   xOpts,
   yOpts,
   compactLegend,
+  reorient,
+  dropShadow,
   compactWidth,
   highlightArea,
   mapThreshold,
@@ -329,6 +333,36 @@ const ReportItem = ({
             xOpts={xOpts}
             yOpts={yOpts}
             compactLegend={compactLegend}
+            reorient={reorient}
+            dropShadow={dropShadow}
+            compactWidth={compactWidth}
+            highlightArea={highlightArea}
+            stacked={stacked}
+            pointSize={pointSize}
+            zScale={zScale}
+            scatterThreshold={scatterThreshold}
+            includeEstimates={includeEstimates}
+            {...qs.parse(queryString)}
+            minDim={minDim}
+            setMinDim={setMinDim}
+          />
+        );
+        break;
+
+      case "ribbon":
+        component = (
+          <ReportRibbon
+            scatter={reportById}
+            chartRef={chartRef}
+            containerRef={containerRef}
+            embedded={embedded}
+            ratio={ratio}
+            colorPalette={colorPalette}
+            xOpts={xOpts}
+            yOpts={yOpts}
+            compactLegend={compactLegend}
+            reorient={reorient}
+            dropShadow={dropShadow}
             compactWidth={compactWidth}
             highlightArea={highlightArea}
             stacked={stacked}

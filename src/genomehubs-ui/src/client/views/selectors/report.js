@@ -37,7 +37,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     y: { in: new Set(["scatter", "table", "tree", "arc"]) },
     z: { in: new Set(["arc", "scatter"]) },
     cat: { not: new Set(["sources", "arc"]) },
-    rank: { not: new Set(["oxford", "srces", "tree"]) },
+    rank: { not: new Set(["oxford", "ribbon", "srces", "tree"]) },
     ranks: { in: new Set(["tree"]) },
     levels: { in: new Set(["tree"]), ui: true },
     names: { in: new Set(["tree"]) },
@@ -46,6 +46,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
         "histogram",
         "map",
         "oxford",
+        "ribbon",
         "scatter",
         "sources",
         "table",
@@ -74,18 +75,24 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     queryJ: true,
     xOpts: { in: new Set(["histogram", "scatter", "table"]) },
     yOpts: { in: new Set(["scatter", "table", "tree"]) },
-    compactLegend: { in: new Set(["histogram", "oxford", "scatter"]) },
+    compactLegend: {
+      in: new Set(["histogram", "oxford", "ribbon", "scatter"]),
+    },
+    reorient: {
+      in: new Set(["oxford", "ribbon"]),
+    },
+    dropShadow: { in: new Set(["ribbon"]), ui: true },
     catToX: { in: new Set(["histogram"]) },
-    compactWidth: { in: new Set(["histogram", "oxford", "scatter"]) },
+    compactWidth: { in: new Set(["histogram", "oxford", "ribbon", "scatter"]) },
     highlightArea: { in: new Set(["scatter"]), ui: true },
     scatterThreshold: { in: new Set(["scatter"]) },
     treeStyle: { in: new Set(["tree"]), ui: true },
-    plotRatio: { in: new Set(["oxford", "scatter"]), ui: true },
+    plotRatio: { in: new Set(["oxford", "ribbon", "scatter"]), ui: true },
     yScale: { in: new Set(["histogram"]), ui: true },
     zScale: { in: new Set(["scatter"]), ui: true },
     stacked: { in: new Set(["histogram", "scatter"]), ui: true },
     pointSize: {
-      in: new Set(["histogram", "oxford", "scatter", "tree", "arc"]),
+      in: new Set(["histogram", "oxford", "ribbon", "scatter", "tree", "arc"]),
       ui: true,
     },
     cumulative: { in: new Set(["histogram", "table"]), ui: true },
@@ -97,6 +104,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
         "histogram",
         "map",
         "oxford",
+        "ribbon",
         "scatter",
         "table",
         "tree",
@@ -722,6 +730,23 @@ const processReport = (report, { searchTerm = {} }) => {
         },
       },
     };
+  } else if (report.name == "ribbon") {
+    return {
+      ...report,
+      report: {
+        ...report.report,
+        ribbon: {
+          ...report.report.oxford,
+        },
+        scatter: {
+          ...report.report.oxford,
+          ...processScatter(
+            report.report.oxford,
+            report?.report?.xQuery?.result,
+          ),
+        },
+      },
+    };
   } else if (report.name == "scatter") {
     return {
       ...report,
@@ -823,6 +848,12 @@ const reportOptions = {
     },
     plotRatio: {
       value: 1,
+    },
+  },
+  ribbon: {
+    x: {
+      default: "query",
+      fieldType: "value",
     },
   },
   scatter: {

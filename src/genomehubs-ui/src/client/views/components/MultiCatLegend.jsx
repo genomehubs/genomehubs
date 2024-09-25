@@ -14,6 +14,7 @@ export const processLegendData = ({
   width,
   pointSize,
   compactLegend,
+  pointData,
 }) => {
   let translations = {};
   let catTranslations = {};
@@ -37,10 +38,13 @@ export const processLegendData = ({
     let row = 1;
     let previousCats = [];
     for (let i = 0; i < len; i++) {
+      if (pointData && pointData[i].length === 0) {
+        continue;
+      }
       let cat = bounds.cats[i];
       let labelWidth = Math.max(
         stringLength(cat.label) * pointSize + 1 * pointSize,
-        minWidth
+        minWidth,
       );
       if (labelWidth + catOffset < width - labelPadding) {
         catOffsets[cat.label] = { offset: 0, row };
@@ -85,7 +89,7 @@ export const valueString = ({ stats, cellSize, pointSize, fill }) => {
         stats.sum > 0 && stats.max > stats.min
           ? ` [${formats(stats.min, "integer")}-${formats(
               stats.max,
-              "integer"
+              "integer",
             )}]`
           : ""
       }`;
@@ -200,16 +204,18 @@ const MultiCatLegend = ({
       : legendWidth - cellSize / 2 + strokeWidth * 2;
     bgRect = (
       <Tooltip title={`Click to highlight ${name}`} arrow>
-        <Rectangle
+        <rect
           className={activeStyle}
           height={cellSize * (compactLegend ? 1 : 2) + strokeWidth * 2}
           width={bgWidth}
           fill={"white"}
+          fillOpacity={0}
           stroke={fill || "rgb(102, 102, 102)"}
-          strokeOpacity={active ? 0.5 : 0}
-          strokeWidth={pointSize / 10}
+          strokeOpacity={active ? 1 : 0}
+          strokeWidth={pointSize / 7.5}
           x={cellSize - bgWidth - strokeWidth} // {props.cx + (w - width) / 2}
           y={-cellSize / 2 - strokeWidth}
+          rx={cellSize / (compactLegend ? 2 : 1)}
         />
       </Tooltip>
     );
@@ -253,6 +259,7 @@ const MultiCatLegend = ({
       transform={`translate(${xPos}, 5)`}
       style={{ cursor: handleClick ? "pointer" : "default" }}
       onClick={handleClick ? () => handleClick(i) : () => {}}
+      key={`cell-${i}`}
     >
       {text}
     </g>

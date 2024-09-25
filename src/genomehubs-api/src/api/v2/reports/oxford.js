@@ -1,10 +1,7 @@
-import { getProgress, setProgress } from "../functions/progress.js";
 import { linearRegression, median } from "simple-statistics";
 
 import { aInB } from "../functions/aInB.js";
 import { attrTypes } from "../functions/attrTypes.js";
-import { combineQueries } from "../functions/combineQueries.js";
-import { config } from "../functions/config.js";
 import { getBounds } from "./getBounds.js";
 import { getResultCount } from "../functions/getResultCount.js";
 import { getResults } from "../functions/getResults.js";
@@ -57,7 +54,7 @@ const getSequenceLengths = async ({ assemblies, xQuery, taxonomy, req }) => {
   if (!countRes.status.success) {
     return { status: countRes.status };
   }
-  let count = countRes.count;
+  let { count } = countRes;
 
   let seqRes = await getResults({
     ...seqQuery,
@@ -98,26 +95,17 @@ const formatValue = {
 
 const getOxford = async ({
   params,
-  x,
-  field,
-  y,
-  yParams,
   fields,
   groupBy,
   asms,
   summaries,
-  yFields,
-  cat,
   bounds,
   yBounds,
   result,
-  queryId,
-  catRank,
   taxonomy,
+  reorient,
   req,
 }) => {
-  let { lookupTypes } = await attrTypes({ result, taxonomy });
-  // let field = yFields[0] || fields[0];
   let exclusions;
   exclusions = setExclusions(params);
 
@@ -125,7 +113,6 @@ const getOxford = async ({
   // search all feature_type = top_level and create lookup table
   let xQuery = {
     ...params,
-    // query: x,
     fields,
     exclusions,
   };
@@ -153,7 +140,6 @@ const getOxford = async ({
             ...bounds,
             tickCount: bounds.catCount,
           },
-          // yHistograms,
           taxonomy,
         });
         xQuery.aggs = {
@@ -183,7 +169,7 @@ const getOxford = async ({
   if (!countRes.status.success) {
     return { status: countRes.status };
   }
-  let count = countRes.count;
+  let { count } = countRes;
 
   // TODO: use scroll API to allow > 10000 results
   let xRes = await getResults({
@@ -191,7 +177,6 @@ const getOxford = async ({
     size: count,
     taxonomy,
     req,
-    // update: "x",
   });
 
   if (!xRes.status.success) {
@@ -205,7 +190,7 @@ const getOxford = async ({
     bounds.cat &&
     (bounds.catType == "float" || bounds.catType == "integer")
   ) {
-    let buckets = xRes.aggs.aggregations[bounds.cat].histogram.buckets;
+    let { buckets } = xRes.aggs.aggregations[bounds.cat].histogram;
     let scaleFunc = bounds.scale ? scaleFuncs[bounds.scale] : scaleFuncs.linear;
     cats = buckets.map(({ key }, i) => [
       scaleFunc(key),
@@ -258,7 +243,6 @@ const getOxford = async ({
             cat = cat[0].toLowerCase();
           }
         } else {
-          // TODO: set cat using histogram
           for (let limits of cats) {
             if (catObj.value < limits[1]) {
               cat = limits[0];
@@ -266,9 +250,6 @@ const getOxford = async ({
             }
           }
         }
-        // else {
-        //   cat = result.result.fields[bounds.cat]?.value.toLowerCase();
-        // }
       } else if (result.result.ranks) {
         cat = result.result.ranks[bounds.cat];
         if (cat) {
@@ -409,8 +390,12 @@ const getOxford = async ({
         maxArray = arr;
       }
     }
-    let eqn = linearRegression(maxArray);
-    seqOrient[sequenceId] = eqn.m >= 0 ? 1 : -1;
+    if (reorient) {
+      let eqn = linearRegression(maxArray);
+      seqOrient[sequenceId] = eqn.m >= 0 ? 1 : -1;
+    } else {
+      seqOrient[sequenceId] = 1;
+    }
   }
 
   seqOffsets[asms[1]] = {};
@@ -438,13 +423,6 @@ const getOxford = async ({
   domains[asms[1]] = [0, offset];
 
   let rawData = {};
-  //   {
-  //     "scientific_name": "Acanthisitta chloris",
-  //     "taxonId": "57068",
-  //     "x": 1753226,
-  //     "y": 1753226,
-  //     "cat": "alternate-pseudohaplotype"
-  // },
   let i = 0;
   allValues = [];
   allYValues = [];
@@ -484,7 +462,6 @@ const getOxford = async ({
         feature_id,
         cat,
       } = feat;
-      // allValues[asms[0]][i]++;
       if (!rawData[cat]) {
         rawData[cat] = [];
       }
@@ -494,9 +471,6 @@ const getOxford = async ({
         byCat[cat][i]++;
       }
       for (let [assembly, arr] of Object.entries(groupedData[group])) {
-        // if (assembly == assembly_id) {
-        //   continue;
-        // }
         for (let partner of arr) {
           let index = seqIndices[assembly][partner.sequence_id];
           let pStart, pEnd;
@@ -586,10 +560,10 @@ const getOxford = async ({
 
 export const oxford = async ({
   x,
-  // y,
   cat,
   result,
   taxonomy,
+  reorient,
   apiParams,
   fields,
   req,
@@ -623,16 +597,6 @@ export const oxford = async ({
       ...searchFields,
     ]),
   ];
-  // TODO: Get list of assemblies
-  //       Choose primary assembly as one with most hits/best contiguity
-  //       Use xOpts/yOpts to fix assembly ordering?
-  //       Find position and orientation of each feature on each assembly
-  //       Group by contiguous (+syntenic) blocks for Circos
-  //       Sort features by primary assembly position/orientation
-  //       Add options for secondary assembly sort order
-
-  // 1. Get count per assembly (bin by cat and by sequence)
-  // 2. Find all assembly names
   let catRank;
   if (cat) {
     let catField;
@@ -647,9 +611,6 @@ export const oxford = async ({
   } else {
     xFields = searchFields;
   }
-  // xFields = [
-  //   ...new Set([...xFields, "sequence_id", "start", "end", "strand", groupBy]),
-  // ];
   fields = xFields;
 
   let status;
@@ -668,46 +629,16 @@ export const oxford = async ({
     };
     return { status };
   }
-  // let yTerm = combineQueries(x, y);
-  // let {
-  //   params: yParams,
-  //   fields: yFields,
-  //   summaries: ySummaries,
-  // } = await queryParams({
-  //   term: yTerm,
-  //   result,
-  //   taxonomy,
-  // });
-  // if (y && !aInB(yFields, Object.keys(typesMap))) {
-  //   status = {
-  //     success: false,
-  //     error: `unknown field in 'y = ${y}'`,
-  //   };
-  // }
+
   params.includeEstimates = apiParams.hasOwnProperty("includeEstimates")
     ? apiParams.includeEstimates
     : false;
-  // yParams.includeEstimates = params.includeEstimates;
   params.excludeDirect = apiParams.excludeDirect || [];
   params.excludeDescendant = apiParams.excludeDescendant || [];
   params.excludeAncestral = apiParams.excludeAncestral || [];
   params.excludeMissing = apiParams.excludeMissing || [];
 
-  // yParams.excludeDirect = apiParams.excludeDirect || [];
-  // yParams.excludeDescendant = apiParams.excludeDescendant || [];
-  // yParams.excludeAncestral = apiParams.excludeAncestral || [];
-  // yParams.excludeMissing = apiParams.excludeMissing || [];
-
-  // if (params.includeEstimates) {
-  //   delete params.excludeAncestral;
-  //   delete yParams.excludeAncestral;
-  // }
-
-  // delete params.excludeDescendant;
-  // delete yParams.excludeDescendant;
-
   let xQuery = { ...params };
-  // let yQuery = { ...yParams };
 
   let optionalFields = [...fields];
   if (apiParams.fields) {
@@ -715,10 +646,6 @@ export const oxford = async ({
   }
   optionalFields = [...new Set([...optionalFields])];
 
-  // let mapThreshold = apiParams.mapThreshold || config.mapThreshold;
-  // if (mapThreshold < 0) {
-  //   mapThreshold = 1000;
-  // }
   let bounds;
   let exclusions = setExclusions(params);
   Object.entries(apiParams).forEach(([key, value]) => {
@@ -738,9 +665,7 @@ export const oxford = async ({
     searchFields,
     lookupTypes,
   }));
-  if (catMeta) {
-    cat = catMeta.name;
-  }
+
   let filteredFields = xFields.filter(
     (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
   );
@@ -755,7 +680,7 @@ export const oxford = async ({
   });
   let catBounds = await getBounds({
     params: { ...params },
-    fields: [cat, ...filteredFields],
+    fields: [catMeta.name, ...filteredFields],
     summaries: ["value", ...summaries],
     cat,
     result,
@@ -765,43 +690,18 @@ export const oxford = async ({
     opts: catOpts,
     catOpts,
   });
-  if (cat) {
-    // if (!catBounds.cats || catBounds.cats.length == 0) {
-    //   return {
-    //     status: {
-    //       success: false,
-    //       error: `unknown field in 'cat = ${cat}'`,
-    //     },
-    //   };
-    // }
-    if (catBounds) {
-      bounds.cat = catBounds.cat;
-      bounds.cats = catBounds.cats;
-      bounds.catType = catBounds.catType;
-      bounds.catCount = catBounds.tickCount;
-      bounds.by = catBounds.by;
-      bounds.showOther = catBounds.showOther;
-    }
+
+  if (cat && catBounds) {
+    bounds.cat = catBounds.cat;
+    bounds.cats = catBounds.cats;
+    bounds.catType = catBounds.catType;
+    bounds.catCount = catBounds.tickCount;
+    bounds.by = catBounds.by;
+    bounds.showOther = catBounds.showOther;
   }
 
   let asms = parseAssemblies(bounds.query);
   xQuery.query = bounds.query;
-  // let yBounds;
-  // if (y) {
-  //   yBounds = await getBounds({
-  //     params: { ...params },
-  //     fields: yFields.filter(
-  //       (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
-  //     ),
-  //     summaries,
-  //     cat,
-  //     result,
-  //     exclusions,
-  //     taxonomy,
-  //     apiParams,
-  //     opts: yOpts,
-  //   });
-  // }
   let oxford = status
     ? {}
     : await getOxford({
@@ -809,21 +709,16 @@ export const oxford = async ({
         fields,
         catRank,
         summaries,
-        cat,
+        cat: catMeta.name,
         groupBy,
         asms,
         bounds,
-        // yBounds,
         x,
-        // y,
-        // yParams,
-        // yFields,
-        // ySummaries,
         result,
-        // mapThreshold,
         queryId: apiParams.queryId,
         req,
         taxonomy,
+        reorient,
       });
   if (oxford && oxford.status && oxford.status.success == false) {
     status = { ...oxford.status };
@@ -846,20 +741,9 @@ export const oxford = async ({
         query: bounds.query,
         fields: optionalFields.join(","),
       },
-      // ...(y && {
-      //   yQuery: {
-      //     ...yQuery,
-      //     fields: optionalFields.join(","),
-      //     yFields,
-      //   },
-      // }),
-      // x: tree.lca ? tree.lca.count : 0,
-      // ...(y && { y: tree.lca && tree.lca.yCount ? tree.lca.yCount : 0 }),
     },
     xQuery,
-    // ...(y && { yQuery }),
     xLabel: asms[0],
     yLabel: asms[1],
-    // ...(y && { yLabel: yFields[0] }),
   };
 };

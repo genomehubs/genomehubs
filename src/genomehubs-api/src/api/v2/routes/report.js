@@ -84,6 +84,7 @@ export const getOxford = async ({
   taxonomy,
   queryString,
   fields,
+  reorient,
   req,
   ...apiParams
 }) => {
@@ -96,6 +97,7 @@ export const getOxford = async ({
     result: apiParams.result,
     taxonomy,
     fields,
+    reorient,
     req,
     apiParams,
   });
@@ -1248,6 +1250,10 @@ export const getReport = async (req, res) => {
         break;
       }
       case "oxford": {
+        reportFunc = getOxford;
+        break;
+      }
+      case "ribbon": {
         reportFunc = getOxford;
         break;
       }

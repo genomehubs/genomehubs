@@ -102,8 +102,8 @@ export const palettes = handleActions(
       magma: createD3Palette(interpolateMagma, 50),
       paired: createD3Palette(schemePaired, 12),
       plasma: createD3Palette(interpolatePlasma, 50),
-      pride: { id: "pride", default: pridePalette, levels: [] },
-      rings: { id: "rings", default: ringsPalette, levels: [] },
+      pride: createPalette(pridePalette),
+      rings: createPalette(ringsPalette),
       standard: { id: "default", default: brewerPalette, levels: [] },
       tableau: createD3Palette(schemeTableau10, 10),
       turbo: createD3Palette(interpolateTurbo, 50),
@@ -111,7 +111,7 @@ export const palettes = handleActions(
       warm: createD3Palette(interpolateWarm, 50),
     },
     allIds: ["default", "batlow", "batlowS", "cividis", "paired", "viridis"],
-  }
+  },
 );
 
 export const getSelectedPalette = (state) => state.selectedPalette;
@@ -120,7 +120,7 @@ export const selectPalette = createAction("SELECT_PALETTE");
 export const selectedPalette = handleAction(
   "SELECT_PALETTE",
   (state, action) => action.payload,
-  "default"
+  "default",
 );
 
 export const getAllPalettes = (state) => state.palettes;
@@ -131,7 +131,7 @@ export const getColorPalette = createSelector(
   (id, palettes) => {
     let colors = palettes ? palettes.byId[id] || palettes.byId["default"] : [];
     return { id, colors };
-  }
+  },
 );
 
 export const getUserPalette = createSelector(getAllPalettes, (palettes) => {
@@ -146,7 +146,7 @@ export const getDefaultPalette = createSelector(
   (id, palettes) => {
     let levels = palettes ? palettes.byId[id] || palettes.byId["default"] : {};
     return { id, colors: levels.default, levels };
-  }
+  },
 );
 
 /* Coolors Exported Palette - coolors.co/d7cdcc-ffffff-59656f-9c528b-1d1e2c */
@@ -167,7 +167,7 @@ export const setColorScheme = createAction("SET_COLOR_SCHEME");
 export const colorScheme = handleAction(
   "SET_COLOR_SCHEME",
   (state, action) => action.payload,
-  schemeColors
+  schemeColors,
 );
 
 export const getColorScheme = (state) => state.colorScheme;
@@ -176,7 +176,7 @@ export const setTheme = createAction("SET_THEME");
 export const theme = handleAction(
   "SET_THEME",
   (state, action) => action.payload,
-  "Light"
+  "Light",
 );
 export const getTheme = (state) => state.theme;
 
@@ -192,7 +192,7 @@ export const statusColors = handleAction(
     direct: directColor,
     descendantHighlight,
     directHighlight,
-  }
+  },
 );
 
 export const colorReducers = {

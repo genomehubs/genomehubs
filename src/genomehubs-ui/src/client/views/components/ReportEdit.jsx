@@ -103,6 +103,22 @@ export const queryPropList = {
     "plotRatio",
     pointSizeSettings,
     "compactLegend",
+    "reorient",
+    "compactWidth",
+    "result",
+    "taxonomy",
+  ],
+  ribbon: [
+    "report",
+    xSettings,
+    ...nestedQueries,
+    catSettings,
+    "xOpts",
+    "plotRatio",
+    pointSizeSettings,
+    "compactLegend",
+    "reorient",
+    "dropShadow",
     "compactWidth",
     "result",
     "taxonomy",
@@ -196,6 +212,7 @@ const reportTypes = [
   "histogram",
   "map",
   "oxford",
+  "ribbon",
   "scatter",
   "table",
   "tree",
@@ -304,7 +321,7 @@ export const ReportEdit = ({
           delete prevQuery[k];
           return false;
         }
-      })
+      }),
     );
     if (
       !values.hasOwnProperty("includeEstimates") ||
@@ -516,6 +533,8 @@ export const ReportEdit = ({
       queryProp == "reversed" ||
       queryProp == "collapseMonotypic" ||
       queryProp == "compactLegend" ||
+      queryProp == "reorient" ||
+      queryProp == "dropShadow" ||
       queryProp == "catToX"
     ) {
       toggles.push(
@@ -527,7 +546,7 @@ export const ReportEdit = ({
                 <Switch
                   id={`report-${queryProp}`}
                   checked={Boolean(
-                    values[queryProp] && values[queryProp] != "false"
+                    values[queryProp] && values[queryProp] != "false",
                   )}
                   onClick={(e) => toggleSwitch(e, queryProp)}
                   name={queryProp}
@@ -541,7 +560,7 @@ export const ReportEdit = ({
 
             <FormHelperText>{queryProp}</FormHelperText>
           </FormControl>
-        </div>
+        </div>,
       );
     } else if (queryProp.endsWith("Scale")) {
       input = (
@@ -613,7 +632,7 @@ export const ReportEdit = ({
               />
               <FormHelperText>{queryProp}</FormHelperText>
             </FormControl>
-          </div>
+          </div>,
         );
       } else if (autoCompleteTypes.hasOwnProperty(queryProp)) {
         icon = reverseIcon({ queryProp });
@@ -676,7 +695,7 @@ export const ReportEdit = ({
               {icon}
             </Grid>
           )}
-        </Grid>
+        </Grid>,
       );
     }
   }
@@ -684,7 +703,7 @@ export const ReportEdit = ({
     fields.push(
       <Grid align="left" key={"toggles"}>
         {toggles}
-      </Grid>
+      </Grid>,
     );
   }
   fields.push(
@@ -694,7 +713,7 @@ export const ReportEdit = ({
         handleClick={handleSubmit}
         handleResetClick={handleReset}
       />
-    </Grid>
+    </Grid>,
   );
   return (
     <Box
@@ -715,7 +734,7 @@ export default compose(
   withTaxonomy,
   withTypes,
   withReportById,
-  dispatchReport
+  dispatchReport,
 )(ReportEdit);
 
 export const setQueryProps = (query, report, types) => {
