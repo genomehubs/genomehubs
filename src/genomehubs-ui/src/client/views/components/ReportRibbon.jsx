@@ -63,6 +63,7 @@ const Ribbon = ({
   marginRight,
   marginTop,
   dropShadow,
+  yOrientation,
 }) => {
   const [currentSeries, setCurrentSeries] = useState(false);
   const [visible, setVisible] = useState({});
@@ -200,18 +201,47 @@ const Ribbon = ({
       let stroke = visible[label] ? "white" : "#31323f";
       let fill = visible[label] ? "#31323f" : "white";
       let lines = [];
-      for (let n = 0; n < buckets[i + 1] - buckets[i]; n += step) {
-        let x = scales[label]([buckets[i] + n]);
-        lines.push(
-          <line
-            key={n}
-            x1={x}
-            y1={0}
-            x2={x}
-            y2={padding * 2}
-            stroke={stroke}
-            strokeWidth={2}
-            strokeDasharray={`${padding / 3} ${(padding * 4) / 3}`}
+      if (yOrientation[label] == -1) {
+        for (let n = buckets[i + 1] - buckets[i]; n > 0; n -= step) {
+          let x = scales[label]([buckets[i] + n]);
+          lines.push(
+            <line
+              key={n}
+              x1={x}
+              y1={0}
+              x2={x}
+              y2={padding * 2}
+              stroke={stroke}
+              strokeWidth={2}
+              strokeDasharray={`${padding / 3} ${(padding * 4) / 3}`}
+            />,
+          );
+        }
+      } else {
+        for (let n = 0; n < buckets[i + 1] - buckets[i]; n += step) {
+          let x = scales[label]([buckets[i] + n]);
+          lines.push(
+            <line
+              key={n}
+              x1={x}
+              y1={0}
+              x2={x}
+              y2={padding * 2}
+              stroke={stroke}
+              strokeWidth={2}
+              strokeDasharray={`${padding / 3} ${(padding * 4) / 3}`}
+            />,
+          );
+        }
+      }
+      let arrows = [];
+      if (yOrientation[label] == -1) {
+        arrows.push(
+          <polygon
+            key="left"
+            points={`${x2 - padding / 2},${padding} ${x2 + padding / 2},${padding * 1.75} ${x2 + padding / 2},${padding * 0.25}`}
+            fill={"stroke"}
+            fillOpacity={0.25}
           />,
         );
       }
@@ -242,6 +272,7 @@ const Ribbon = ({
               rx={padding}
             />
             {lines}
+            {arrows}
             <text
               x={(x1 + x2) / 2}
               key={label}
@@ -616,6 +647,7 @@ const ReportRibbon = ({
         dropShadow={dropShadow}
         legendRows={legendRows}
         basename={basename}
+        yOrientation={heatmaps.yOrientation}
         chartProps={{
           zDomain: heatmaps.zDomain,
           yLength: heatmaps.yBuckets.length - 1,
