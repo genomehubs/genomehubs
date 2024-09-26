@@ -15,6 +15,7 @@ export const processLegendData = ({
   pointSize,
   compactLegend,
   pointData,
+  catSums,
 }) => {
   let translations = {};
   let catTranslations = {};
@@ -38,10 +39,12 @@ export const processLegendData = ({
     let row = 1;
     let previousCats = [];
     for (let i = 0; i < len; i++) {
+      let cat = bounds.cats[i];
       if (pointData && pointData[i].length === 0) {
         continue;
+      } else if (catSums && catSums[cat.label].sum === 0) {
+        continue;
       }
-      let cat = bounds.cats[i];
       let labelWidth = Math.max(
         stringLength(cat.label) * pointSize + 1 * pointSize,
         minWidth,

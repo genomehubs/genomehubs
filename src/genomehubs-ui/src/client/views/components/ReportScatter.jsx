@@ -150,7 +150,7 @@ const drawHeatRect = ({ props, chartProps, h, w }) => {
   );
 };
 
-const CustomShape = (props, chartProps, handleClick) => {
+const CustomShape = (props, chartProps, handleClick, ctr) => {
   let w, h;
   let heatRect, legendGroup;
   let xRange, yRange, xSearchRange, ySearchRange, yIndex;
@@ -250,12 +250,13 @@ const CustomShape = (props, chartProps, handleClick) => {
       </>
     );
   }
-  if (props.key == "symbol-0") {
+  if (!ctr[props.name] && chartProps.catSums[props.name].sum > 0) {
     legendGroup = zLegend({
       props,
       chartProps,
       handleClick,
     });
+    ctr[props.name] = true;
   }
 
   return (
@@ -270,13 +271,13 @@ const CustomShape = (props, chartProps, handleClick) => {
 const eqnToLine = (eqn, { x: xMin, y: yMin, xBound, yBound, xAxis, yAxis }) => {
   let points = [];
   let xScale = scaleLinear().domain([0, 100]).range([xMin, xBound]);
-  let m = eqn[1] == "" ? 1 : Number.isNaN(eqn[1]) ? 1 : eqn[1] * 1;
+  let m = eqn[1] == "" ? 1 : isNaN(eqn[1]) ? 1 : eqn[1] * 1;
   let pow = 1;
   let c = 0;
   if (eqn[2].match(/(\*\*|\^)/)) {
     pow = eqn[3] * 1;
   }
-  c = eqn[4] == "" ? 0 : Number.isNaN(eqn[4]) ? 0 : eqn[4] * 1;
+  c = eqn[4] == "" ? 0 : isNaN(eqn[4]) ? 0 : eqn[4] * 1;
   for (let i = 0; i <= 100; i++) {
     let x = xScale(i);
     let y = m * x ** pow + c;
@@ -527,10 +528,10 @@ const Heatmap = ({
     chartProps.bounds.scale == "ordinal" ? "linear" : chartProps.bounds.scale;
   let yScale =
     chartProps.yBounds.scale == "ordinal" ? "linear" : chartProps.yBounds.scale;
-  let xDomain = Number.isNaN(buckets[0])
+  let xDomain = isNaN(buckets[0])
     ? [0, buckets.length - 1]
     : [buckets[0], buckets[buckets.length - 1]];
-  let yDomain = Number.isNaN(yBuckets[0])
+  let yDomain = isNaN(yBuckets[0])
     ? [0, yBuckets.length - 1]
     : [yBuckets[0], yBuckets[yBuckets.length - 1]];
   let axes = [
@@ -543,7 +544,7 @@ const Heatmap = ({
       angle={buckets.length > 15 ? -90 : 0}
       domain={xDomain}
       range={xDomain}
-      ticks={Number.isNaN(buckets[0]) ? buckets.map((x, i) => i) : buckets}
+      ticks={isNaN(buckets[0]) ? buckets.map((x, i) => i) : buckets}
       tick={(props) =>
         ReportXAxisTick({
           props,
@@ -581,7 +582,7 @@ const Heatmap = ({
       dataKey="y"
       key={"y"}
       scale={axisScales[yScale]()}
-      ticks={Number.isNaN(yBuckets[0]) ? yBuckets.map((y, i) => i) : yBuckets}
+      ticks={isNaN(yBuckets[0]) ? yBuckets.map((y, i) => i) : yBuckets}
       tick={(props) =>
         CustomizedYAxisTick({
           props,
@@ -626,7 +627,7 @@ const Heatmap = ({
       tickLine={false}
       orientation={"right"}
       scale={axisScales[yScale]()}
-      ticks={Number.isNaN(yBuckets[0]) ? yBuckets.map((y, i) => i) : yBuckets}
+      ticks={isNaN(yBuckets[0]) ? yBuckets.map((y, i) => i) : yBuckets}
       tick={(props) =>
         CustomizedYAxisTick({
           props,
@@ -780,6 +781,7 @@ const Heatmap = ({
               : setCurrentSeries(i);
           };
         }
+        let ctr = {};
         return (
           <Scatter
             name={cat}
@@ -796,6 +798,7 @@ const Heatmap = ({
                   active: currentSeries === false || currentSeries == i,
                 },
                 handleClick,
+                ctr,
               )
             }
             isAnimationActive={false}
@@ -965,6 +968,7 @@ const ReportScatter = ({
       width: plotWidth,
       pointSize,
       compactLegend,
+      catSums,
     });
     ({ levels, colors } = setColors({
       colorPalette,

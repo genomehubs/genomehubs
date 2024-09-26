@@ -146,6 +146,12 @@ export const searchByCell = ({
     range: xRange,
     xRange: yRange,
   });
+  let cat;
+  if (bounds.cat) {
+    cat = bounds.cat;
+    let cats = bounds.cats.map((o) => (o.key == o.value ? o.key : `${o.key}`));
+    cat += `[${cats.length}]=${cats.join(",")}`;
+  }
   if (bounds.by == "lineage" && !bounds.showOther) {
     terms.push(`tax_tree(${bounds.cats.map((o) => o.key).join(",")})`);
   }
@@ -181,6 +187,7 @@ export const searchByCell = ({
     ...xQuery,
     ...options,
     xOpts,
+    cat,
     query,
     ...(yQuery && { y: yQuery.query }),
     fields,
