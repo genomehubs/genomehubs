@@ -89,7 +89,7 @@ jobs:
       - run: ./package-ui.sh
         env:
           GH_API_URL: "https://goat.genomehubs.org/api/v2"
-          GH_ARCHIVE: "latest 2024.03.01 2023.10.16 2023.05.18 2023.02.20 2022.11.16"
+          GH_ARCHIVE: "latest 2024.09.14 2024.03.01 2023.10.16 2023.05.18 2023.02.20 2022.11.16"
           GH_BASENAME: ""
           GH_SITENAME: GoaT
           GH_SUGGESTED_TERM: Canidae
