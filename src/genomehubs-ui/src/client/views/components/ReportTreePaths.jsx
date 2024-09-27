@@ -36,6 +36,7 @@ const ReportTreePaths = ({
   levels,
   colorPalette,
   palettes,
+  cats: catArray,
 }) => {
   if (!lines || lines.length == 0) {
     return null;
@@ -44,7 +45,7 @@ const ReportTreePaths = ({
     colorPalette,
     palettes,
     levels,
-    count: (cats || []).length,
+    count: catArray.length,
     colors,
   }));
   let rootRank;
