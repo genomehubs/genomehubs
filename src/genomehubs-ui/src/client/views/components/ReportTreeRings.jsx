@@ -30,7 +30,7 @@ const ReportTreeRings = ({
     colorPalette,
     palettes,
     levels,
-    count: cats.length,
+    count: cats.length || 1,
     colors,
   }));
 

@@ -195,7 +195,7 @@ export const processTreeRings = ({
   if (!treeNodes || !rootNode) {
     return undefined;
   }
-  const { cat, cats: catArray, showOther } = bounds;
+  const { cat, cats: catArray, showOther } = bounds || {};
   let cats = {};
   let other;
   if (catArray) {
@@ -389,7 +389,9 @@ export const processTreeRings = ({
     arcs,
     labels,
     maxDepth,
-    cats: [...catArray].concat(other ? [{ key: "other", label: "other" }] : []),
+    cats: [...(catArray || [])].concat(
+      other ? [{ key: "other", label: "other" }] : [],
+    ),
     other,
   };
 };
@@ -691,7 +693,9 @@ export const processTreePaths = ({
     locations,
     other,
     // cats: bounds.cats,
-    cats: [...catArray].concat(other ? [{ key: "other", label: "other" }] : []),
+    cats: [...(catArray || [])].concat(
+      other ? [{ key: "other", label: "other" }] : [],
+    ),
   };
 };
 

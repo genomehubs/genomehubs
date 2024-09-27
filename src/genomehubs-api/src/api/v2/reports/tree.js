@@ -463,7 +463,7 @@ const getTree = async ({
   if (y) {
     yParams.excludeMissing.push(...yFields);
     let catField;
-    catField = cat.replace(/[^\w_-].+$/, "");
+    catField = (cat || "").replace(/[^\w_-].+$/, "");
     let catMeta = lookupTypes(catField);
     if (catMeta) {
       yParams.excludeMissing.push(catMeta.name);
@@ -644,6 +644,9 @@ export const tree = async ({
     apiParams,
     //opts: xOpts,
   });
+  if (!bounds) {
+    bounds = {};
+  }
   let yBounds;
   if (y) {
     yBounds = await getBounds({
@@ -659,18 +662,21 @@ export const tree = async ({
       opts: yOpts,
     });
   }
-  let catBounds = await getBounds({
-    params: { ...params },
-    fields: [catMeta.name, ...boundFields],
-    summaries: ["value", ...summaries],
-    cat,
-    result,
-    exclusions,
-    taxonomy,
-    apiParams,
-    opts: catOpts,
-    catOpts,
-  });
+  let catBounds;
+  if (cat) {
+    catBounds = await getBounds({
+      params: { ...params },
+      fields: [catMeta.name, ...boundFields],
+      summaries: ["value", ...summaries],
+      cat,
+      result,
+      exclusions,
+      taxonomy,
+      apiParams,
+      opts: catOpts,
+      catOpts,
+    });
+  }
 
   if (cat && catBounds) {
     bounds.cat = catBounds.cat;
@@ -697,7 +703,7 @@ export const tree = async ({
         optionalFields,
         catRank,
         summaries,
-        cat: catMeta.name,
+        cat: (catMeta && catMeta.name) || cat,
         x,
         y,
         yParams,
