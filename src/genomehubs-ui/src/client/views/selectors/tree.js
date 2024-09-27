@@ -176,7 +176,13 @@ const setColor = ({ node, yQuery, recurse }) => {
   return { color, highlightColor, source, value, min, max };
 };
 
-export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
+export const processTreeRings = ({
+  nodes,
+  xQuery,
+  bounds,
+  yQuery,
+  pointSize,
+}) => {
   if (!nodes) {
     return undefined;
   }
@@ -188,6 +194,21 @@ export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
   maxDepth = taxDepth || maxDepth;
   if (!treeNodes || !rootNode) {
     return undefined;
+  }
+  const { cat, cats: catArray, showOther } = bounds;
+  let cats = {};
+  let other;
+  if (catArray) {
+    cats = {};
+    catArray.forEach((cat, index) => {
+      if (cat.key) {
+        cats[cat.key] = index;
+      }
+    });
+    if (showOther) {
+      other = catArray.length;
+      cats.other = other;
+    }
   }
   let radius = 498;
   let rScale = scalePow()
@@ -250,6 +271,7 @@ export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
         startAngle,
         endAngle,
       }),
+      cats: setCats({ node, cat, cats, other }),
       start: start,
       depth: depth,
       color,
@@ -363,7 +385,13 @@ export const processTreeRings = ({ nodes, xQuery, yQuery, pointSize }) => {
     recurse: false,
   });
   drawArcs({ node: treeNodes[rootNode] });
-  return { arcs, labels, maxDepth };
+  return {
+    arcs,
+    labels,
+    maxDepth,
+    cats: [...catArray].concat(other ? [{ key: "other", label: "other" }] : []),
+    other,
+  };
 };
 
 export const setCats = ({ node, cats, cat, other }) => {
@@ -662,6 +690,8 @@ export const processTreePaths = ({
     charHeight,
     locations,
     other,
+    // cats: bounds.cats,
+    cats: [...catArray].concat(other ? [{ key: "other", label: "other" }] : []),
   };
 };
 

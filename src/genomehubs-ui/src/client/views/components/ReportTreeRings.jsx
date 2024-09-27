@@ -4,7 +4,9 @@ import Tooltip from "./Tooltip";
 import Typography from "@mui/material/Typography";
 import { compose } from "recompose";
 import { scaleLog } from "d3-scale";
+import setColors from "../functions/setColors";
 import { useLongPress } from "use-long-press";
+import withColors from "../hocs/withColors";
 import withTypes from "../hocs/withTypes";
 
 const ReportTreeRings = ({
@@ -15,14 +17,22 @@ const ReportTreeRings = ({
   width,
   height,
   pointSize,
+  colors,
+  colorPalette,
+  palettes,
+  levels,
+  cats,
 }) => {
   if (!arcs || arcs.length == 0) {
     return null;
   }
-  const [position, setPosition] = useState({
-    x: undefined,
-    y: undefined,
-  });
+  ({ levels, colors } = setColors({
+    colorPalette,
+    palettes,
+    levels,
+    count: cats.length,
+    colors,
+  }));
 
   let divHeight = height;
   height = Math.min(
@@ -87,39 +97,34 @@ const ReportTreeRings = ({
         captureEvent: true,
         threshold: 500,
       });
-
+      let { color } = segment;
+      if (segment.cats && segment.cats.length == 1) {
+        color = colors[segment.cats[0]];
+      }
       paths.push(
         <Tooltip
           key={`tt-${segment.taxon_id}`}
           title={<Typography>{segment.scientific_name}</Typography>}
-          onPointerMove={(e) => setPosition({ x: e.clientX, y: e.clientY })}
-          PopperProps={{
-            anchorEl: {
-              clientHeight: "0px",
-              clientWidth: "0px",
-              getBoundingClientRect: () => ({
-                top: position.y,
-                left: position.x,
-                right: position.x,
-                bottom: position.y + 10,
-                width: "0px",
-                height: "10px",
-              }),
-            },
-          }}
           arrow
-          placement="bottom"
+          enterDelay={500}
+          followCursor={true}
         >
-          <path
-            key={segment.taxon_id}
-            fill={segment.color}
-            onPointerEnter={(e) => highlightSegment(segment)}
-            onPointerLeave={(e) => highlightSegment()}
-            {...longPress()}
-            stroke="white"
-            strokeWidth={strokeWidth}
-            d={segment.arc}
-          />
+          <g>
+            <path
+              key={segment.taxon_id}
+              fill={
+                segment.cats && segment.cats.length == 1
+                  ? colors[segment.cats[0]]
+                  : segment.color
+              }
+              onPointerEnter={(e) => highlightSegment(segment)}
+              onPointerLeave={(e) => highlightSegment()}
+              {...longPress()}
+              stroke="white"
+              strokeWidth={strokeWidth}
+              d={segment.arc}
+            />
+          </g>
         </Tooltip>,
       );
     });
@@ -207,4 +212,4 @@ const ReportTreeRings = ({
   );
 };
 
-export default compose(withTypes)(ReportTreeRings);
+export default compose(withTypes, withColors)(ReportTreeRings);

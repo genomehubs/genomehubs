@@ -6,6 +6,7 @@ import { combineQueries } from "../functions/combineQueries.js";
 import { config } from "../functions/config.js";
 import { getBounds } from "./getBounds.js";
 import { getResults } from "../functions/getResults.js";
+import parseCatOpts from "../functions/parseCatOpts.js";
 import { parseFields } from "../functions/parseFields.js";
 import { queryParams } from "./queryParams.js";
 import { setExclusions } from "../functions/setExclusions.js";
@@ -461,7 +462,9 @@ const getTree = async ({
   let yRes;
   if (y) {
     yParams.excludeMissing.push(...yFields);
-    let catMeta = lookupTypes(cat);
+    let catField;
+    catField = cat.replace(/[^\w_-].+$/, "");
+    let catMeta = lookupTypes(catField);
     if (catMeta) {
       yParams.excludeMissing.push(catMeta.name);
     }
@@ -526,6 +529,7 @@ export const tree = async ({
     fields: apiParams.fields,
     taxonomy,
   });
+
   let {
     params,
     fields: xFields,
@@ -535,16 +539,29 @@ export const tree = async ({
     result,
     taxonomy,
   });
+  let catOpts, catMeta;
+
   let fields;
   let catRank;
   if (cat) {
+    ({
+      cat,
+      catOpts,
+      query: params.query,
+      catMeta,
+    } = parseCatOpts({
+      cat,
+      query: params.query,
+      searchFields,
+      lookupTypes,
+    }));
     let catField;
     catField = cat.replace(/[^\w_-].+$/, "");
-    let catMeta = lookupTypes(catField);
+    // catMeta = lookupTypes(catField);
     if (catMeta) {
       fields = [...new Set(xFields.concat([catMeta.name]))];
     } else {
-      catRank = catField;
+      catRank = catField.replace(/\+/, "");
       fields = [...new Set(xFields)];
     }
   } else {
@@ -612,15 +629,15 @@ export const tree = async ({
   }
   let bounds;
   let exclusions = setExclusions(params);
+  let boundFields = xFields
+    .concat(yFields)
+    .filter(
+      (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
+    );
   bounds = await getBounds({
     params: { ...params },
-    fields: xFields
-      .concat(yFields)
-      .filter(
-        (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
-      ),
+    fields: boundFields,
     summaries,
-    cat,
     result,
     exclusions,
     taxonomy,
@@ -635,7 +652,6 @@ export const tree = async ({
         (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
       ),
       summaries,
-      cat,
       result,
       exclusions,
       taxonomy,
@@ -643,6 +659,36 @@ export const tree = async ({
       opts: yOpts,
     });
   }
+  let catBounds = await getBounds({
+    params: { ...params },
+    fields: [catMeta.name, ...boundFields],
+    summaries: ["value", ...summaries],
+    cat,
+    result,
+    exclusions,
+    taxonomy,
+    apiParams,
+    opts: catOpts,
+    catOpts,
+  });
+
+  if (cat && catBounds) {
+    bounds.cat = catBounds.cat;
+    bounds.cats = catBounds.cats;
+    bounds.catType = catBounds.catType;
+    bounds.catCount = catBounds.tickCount;
+    bounds.by = catBounds.by;
+    bounds.showOther = catBounds.showOther;
+    if (yBounds) {
+      yBounds.cat = catBounds.cat;
+      yBounds.cats = catBounds.cats;
+      yBounds.catType = catBounds.catType;
+      yBounds.catCount = catBounds.tickCount;
+      yBounds.by = catBounds.by;
+      yBounds.showOther = catBounds.showOther;
+    }
+  }
+  console.log(catRank);
   let tree = status
     ? {}
     : await getTree({
@@ -652,7 +698,7 @@ export const tree = async ({
         optionalFields,
         catRank,
         summaries,
-        cat,
+        cat: catMeta.name,
         x,
         y,
         yParams,

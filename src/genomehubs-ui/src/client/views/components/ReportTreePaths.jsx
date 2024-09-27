@@ -6,6 +6,7 @@ import Skeleton from "@mui/material/Skeleton";
 import { compose } from "recompose";
 import formats from "../functions/formats";
 import { scaleLinear } from "d3-scale";
+import setColors from "../functions/setColors";
 import stringLength from "../functions/stringLength";
 import { useScrollPosition } from "@n8tb1t/use-scroll-position";
 import withColors from "../hocs/withColors";
@@ -33,10 +34,19 @@ const ReportTreePaths = ({
   setReportTerm,
   colors,
   levels,
+  colorPalette,
+  palettes,
 }) => {
   if (!lines || lines.length == 0) {
     return null;
   }
+  ({ levels, colors } = setColors({
+    colorPalette,
+    palettes,
+    levels,
+    count: (cats || []).length,
+    colors,
+  }));
   let rootRank;
   if (lines.length >= 2) {
     rootRank = lines[lines.length - 2].taxon_rank;
@@ -420,13 +430,9 @@ const ReportTreePaths = ({
               strokeWidth={strokeWidth}
               stroke={segment.color}
               lineCap="round"
-              // strokeScaleEnabled={false}
             />,
           );
           if (segment.cats) {
-            if (levels[segment.cats.length]) {
-              colors = levels[segment.cats.length];
-            }
             segment.cats.forEach((cat, i) => {
               let xPos = segment.xEnd - charHeight * (i / 2 + 0.5);
               newCats.push(
