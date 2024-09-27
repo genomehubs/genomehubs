@@ -547,12 +547,6 @@ export const histogram = async ({
     searchFields,
     lookupTypes,
   }));
-  console.log({
-    cat,
-    query: x,
-    searchFields,
-    lookupTypes,
-  });
   // if (catMeta) {
   //   cat = catMeta.name;
   // }
@@ -702,7 +696,6 @@ export const histogram = async ({
       },
     };
   }
-  console.log(cat);
   let catBounds = await getBounds({
     params: { ...params, ...inputQueries },
     fields,

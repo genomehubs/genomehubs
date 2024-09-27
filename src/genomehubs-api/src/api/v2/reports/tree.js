@@ -688,7 +688,6 @@ export const tree = async ({
       yBounds.showOther = catBounds.showOther;
     }
   }
-  console.log(catRank);
   let tree = status
     ? {}
     : await getTree({
