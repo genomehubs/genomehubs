@@ -60,6 +60,8 @@ export const getCatLabels = async ({
         let label = cats[i];
         label.label = doc.hits.hits[0]._source[key];
         labels.push(label);
+      } else {
+        labels.push({ label: cats[i].key, key: cats[i].key });
       }
     });
   }

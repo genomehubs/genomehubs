@@ -96,7 +96,13 @@ export const getBounds = async ({
   opts = ";;",
   catOpts = ";;",
 }) => {
-  if (!cat) {
+  let showOther = false;
+  if (cat) {
+    if (cat.match(/\+/)) {
+      showOther = true;
+      cat = cat.replace(/\+/, "");
+    }
+  } else {
     catOpts = opts;
   }
   let nSort = false;
@@ -377,6 +383,6 @@ export const getBounds = async ({
     catType,
     cats,
     by,
-    showOther: definedTerms.other,
+    showOther,
   };
 };
