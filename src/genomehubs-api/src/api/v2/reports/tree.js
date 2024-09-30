@@ -220,16 +220,19 @@ const addXResultsToTree = async ({
       }
       continue;
     } else {
+      let { taxon_rank, scientific_name, parent, lineage } = result.result;
+
       treeNodes[taxonId] = {
         count: 0,
         children: {},
         taxon_id: taxonId,
-        scientific_name: result.result.scientific_name,
-        taxon_rank: result.result.taxon_rank,
+        scientific_name,
+        taxon_rank,
         ...(treeFields && { fields: treeFields }),
+        ...(catRank && taxon_rank == catRank && { cat: taxonId }),
       };
-      isParentNode[result.result.parent] = true;
-      lineages[taxonId] = result.result.lineage;
+      isParentNode[parent] = true;
+      lineages[taxonId] = lineage;
     }
   }
   if (update) {
@@ -324,7 +327,6 @@ const addXResultsToTree = async ({
         ancStatus,
         queryId,
         taxonomy,
-        catRank,
       });
       x += chunkSize;
       setProgress(queryId, { x });

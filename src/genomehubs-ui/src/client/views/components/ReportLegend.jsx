@@ -41,10 +41,11 @@ export const ReportLegend = ({ reportById, report, colors, levels }) => {
       }
       let other = [];
       if (showOther) {
-        let otherCount =
-          stats.count -
-          cats.reduce((a, b) => ({ doc_count: a.doc_count + b.doc_count }))
-            .doc_count;
+        let otherCount = stats
+          ? stats.count -
+            cats.reduce((a, b) => ({ doc_count: a.doc_count + b.doc_count }))
+              .doc_count
+          : undefined;
         other = (
           <LegendEntry
             obj={{ label: "other", doc_count: otherCount }}

@@ -118,7 +118,7 @@ const ReportTreeRings = ({
                   : segment.color
               }
               onPointerEnter={(e) => highlightSegment(segment)}
-              onPointerLeave={(e) => highlightSegment()}
+              onPointerOut={(e) => highlightSegment()}
               {...longPress()}
               stroke="white"
               strokeWidth={strokeWidth}

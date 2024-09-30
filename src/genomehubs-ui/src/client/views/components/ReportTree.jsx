@@ -1,21 +1,17 @@
 import React, { useEffect, useRef } from "react";
-import { useLocation, useNavigate } from "@reach/router";
 
 import Grid from "@mui/material/Grid2";
-import LaunchIcon from "@mui/icons-material/Launch";
 import ReportTreePaths from "./ReportTreePaths";
 import ReportTreeRings from "./ReportTreeRings";
-import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
+import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
 import withReportById from "../hocs/withReportById";
 import withSiteName from "../hocs/withSiteName";
 
 const ReportTree = ({
-  reportId,
   tree,
   embedded,
   inModal,
@@ -25,9 +21,6 @@ const ReportTree = ({
   gridRef,
   ratio,
   hidePreview,
-  fetchReport,
-  topLevel,
-  permaLink,
   pointSize,
   treeStyle,
   levels,
@@ -36,7 +29,7 @@ const ReportTree = ({
   basename,
 }) => {
   const navigate = useNavigate();
-  const componentRef = chartRef ? chartRef : useRef();
+  const componentRef = chartRef || useRef();
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
@@ -71,26 +64,17 @@ const ReportTree = ({
       clearTimeout(dimensionTimer);
     };
   }, [width]);
-  // useEffect(() => {
-  //   let newMinDim;
-  //   if (height) {
-  //     newMinDim = Math.floor(Math.min(width, height));
-  //   } else if (width) {
-  //     newMinDim = Math.floor(width) / ratio;
-  //   }
-  //   if (newMinDim) {
-  //     setMinDim(newMinDim);
-  //   }
-  // }, [width, height]);
-  if (!tree.report) return null;
-  let maxDepth = tree.report.tree.maxDepth;
+  if (!tree.report) {
+    return null;
+  }
+  let { maxDepth } = tree.report.tree;
   let queryObj = qs.parse(tree.report.queryString);
   const updateQuery = ({ root, name, depth, rank, rootRank }) => {
     let { query, x, ...options } = tree.report.xQuery;
     if (query && !x) {
       x = query;
     }
-    let y = queryObj.y;
+    let { y } = queryObj;
     if (root) {
       if (x.match("tax_tree")) {
         x = x.replace(/tax_tree\([\w\[\]]+?\)/, `tax_tree(${root})`);
@@ -99,9 +83,7 @@ const ReportTree = ({
       }
     }
     if (x.match("tax_depth")) {
-      if (maxDepth > tree.report.tree.maxDepth) {
-        maxDepth = tree.report.tree.maxDepth;
-      }
+      maxDepth = Math.min(maxDepth, tree.report.tree.maxDepth);
       x = x.replace(/tax_depth\(\d+\)/, `tax_depth(${maxDepth})`);
       if (y) {
         y = y.replace(/tax_depth\(\d+\)/, `tax_depth(${maxDepth})`);
@@ -124,10 +106,8 @@ const ReportTree = ({
           ) {
             newRank = ranks[index + 1];
           }
-        } else {
-          if (index > 0) {
-            newRank = ranks[index - 1];
-          }
+        } else if (index > 0) {
+          newRank = ranks[index - 1];
         }
         x = x.replace(/tax_rank\(\w+\)/, `tax_rank(${newRank})`);
         if (y) {
@@ -135,20 +115,10 @@ const ReportTree = ({
         }
       }
     }
-    let fields = tree.report.tree.xQuery.fields;
+    let { fields } = tree.report.tree.xQuery;
 
     return { ...queryObj, fields, x, y, options };
   };
-
-  // const handleNavigation = ({ root, name }) => {
-  //   let newQuery = updateQuery({ root, name });
-  //   let newQueryString = qs.stringify(newQuery);
-  //   if (topLevel) {
-  //     fetchReport({ reportId, queryString: newQueryString, reload: true });
-  //   } else {
-  //     permaLink(newQueryString);
-  //   }
-  // };
 
   const handleSearch = ({ root, name, depth, rank, rootRank }) => {
     if (embedded) {
@@ -180,7 +150,7 @@ const ReportTree = ({
         report: "tree",
         x,
         y,
-      })}#${encodeURIComponent(hash)}`
+      })}#${encodeURIComponent(hash)}`,
     );
   };
 
@@ -199,7 +169,7 @@ const ReportTree = ({
         recordId: root,
         taxonomy,
         result,
-      })}#${encodeURIComponent(name)}`
+      })}#${encodeURIComponent(name)}`,
     );
   };
 
@@ -232,14 +202,14 @@ const ReportTree = ({
     );
   }
   return (
-    (<Grid ref={componentRef} style={{ height: "100%" }} size="grow">
+    <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
       {treeComponent}
-    </Grid>)
+    </Grid>
   );
 };
 
 export default compose(
   withSiteName,
   dispatchReport,
-  withReportById
+  withReportById,
 )(ReportTree);
