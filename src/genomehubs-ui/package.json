@@ -87,6 +87,7 @@
     "leaflet": "^1.7.1",
     "merge-images": "^2.0.0",
     "nanoid": "^5.0.7",
+    "qrcode.react": "^4.0.1",
     "qs": "^6.10.1",
     "re-reselect": "^4.0.1",
     "react": "^18.3.1",
