@@ -247,7 +247,7 @@ const SaveSettingsFavourites = ({ currentIndex, basename, taxonomy }) => {
                   marginSize={"4"}
                   size={qrCodeSize}
                   imageSettings={{
-                    src: "/apple-touch-icon.png",
+                    src: "/android-chrome-192x192.png",
                     height: qrCodeSize / 5,
                     width: qrCodeSize / 5,
                     excavate: true,
