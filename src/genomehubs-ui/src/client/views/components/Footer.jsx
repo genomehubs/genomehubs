@@ -1,11 +1,17 @@
+import * as htmlToImage from "html-to-image";
+
 import PalettePicker, { PalettePreview } from "./PalettePicker";
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CopyrightIcon from "@mui/icons-material/Copyright";
 import Grid from "@mui/material/Grid2";
+import IconButton from "@mui/material/IconButton";
 import { Popover } from "@mui/material";
+import { QRCodeSVG } from "qrcode.react";
+import QrCodeIcon from "@mui/icons-material/QrCode";
 import Taxonomy from "./Taxonomy";
+import Tooltip from "./Tooltip";
 import bbsrcLogo from "./img/bbsrc-logo.png";
 import { compose } from "recompose";
 import dispatchRecord from "../hocs/dispatchRecord";
@@ -14,6 +20,7 @@ import dtolLogo from "./img/dtol-logo.png";
 import { link as linkStyle } from "./Styles.scss";
 import qs from "../functions/qs";
 import sangerLogo from "./img/sanger-logo.png";
+import { saveSearchOptions as saveSearchOptionsStyle } from "./Styles.scss";
 import withApi from "../hocs/withApi";
 import withColors from "../hocs/withColors";
 import withTaxonomy from "../hocs/withTaxonomy";
@@ -32,6 +39,7 @@ const Footer = ({
   const [anchorEl, setAnchorEl] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const qrRef = useRef();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -122,14 +130,63 @@ const Footer = ({
     </span>
   );
 
+  const qrCodeSize = 512;
+
+  const handleQRClick = async (qrRef) => {
+    let opts = {
+      backgroundColor: "white",
+      width: qrCodeSize,
+      height: qrCodeSize,
+    };
+
+    let uri = await htmlToImage.toBlob(qrRef, opts);
+    let fileURL = URL.createObjectURL(uri);
+    window.open(fileURL, "_blank");
+  };
+
+  let qrButton = (
+    <Tooltip title="Generate QR Code for page" arrow placement={"top"}>
+      <span>
+        <IconButton
+          className={saveSearchOptionsStyle}
+          aria-label="search settings"
+          // onClick={() => setOpen(!open)}
+          size="large"
+          onClick={() => handleQRClick(qrRef.current)}
+        >
+          <QrCodeIcon style={{ color: "white" }} />
+        </IconButton>
+        <div style={{ height: 0, display: "none" }}>
+          <QRCodeSVG
+            ref={qrRef}
+            key={"qrcode"}
+            value={location.href}
+            level={"M"}
+            fgColor={"#31323f"}
+            marginSize={"4"}
+            size={qrCodeSize}
+            imageSettings={{
+              src: "/android-chrome-192x192.png",
+              height: qrCodeSize / 5,
+              width: qrCodeSize / 5,
+              excavate: true,
+              crossOrigin: "",
+            }}
+          />
+        </div>
+      </span>
+    </Tooltip>
+  );
+
   let poweredBy = (
     // <span style={{ float: "left", marginLeft: "1em" }}>
-    (<span>Powered by{" "}
+    <span>
+      Powered by{" "}
       <a className={linkStyle} href="https://genomehubs.org/" target="_blank">
         GenomeHubs
       </a>{" "}
       <CopyrightIcon fontSize="inherit" /> {new Date().getFullYear()}
-    </span>)
+    </span>
   );
 
   let settings = (
@@ -156,11 +213,11 @@ const Footer = ({
   );
 
   return (
-    (<footer>
+    <footer>
       <Taxonomy display={false} />
       <Grid container direction="row" spacing={0} style={{ maxHeight: "100%" }}>
         <Grid size={3}>{dataRelease}</Grid>
-        <Grid size={6}></Grid>
+        <Grid size={6}>{qrButton}</Grid>
         <Grid size={3}>{reportIssue}</Grid>
       </Grid>
       <Grid container direction="row" spacing={0} style={{ maxHeight: "100%" }}>
@@ -171,7 +228,7 @@ const Footer = ({
         <Grid size={4}>{poweredBy}</Grid>
         <Grid size={4}>{logos}</Grid>
       </Grid>
-    </footer>)
+    </footer>
   );
 };
 
@@ -182,5 +239,5 @@ export default compose(
   withApi,
   withTaxonomy,
   dispatchTypes,
-  withColors
+  withColors,
 )(Footer);

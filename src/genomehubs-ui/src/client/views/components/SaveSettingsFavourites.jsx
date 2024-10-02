@@ -248,8 +248,8 @@ const SaveSettingsFavourites = ({ currentIndex, basename, taxonomy }) => {
                   size={qrCodeSize}
                   imageSettings={{
                     src: "/apple-touch-icon.png",
-                    height: qrCodeSize / 4,
-                    width: qrCodeSize / 4,
+                    height: qrCodeSize / 5,
+                    width: qrCodeSize / 5,
                     excavate: true,
                   }}
                 />
