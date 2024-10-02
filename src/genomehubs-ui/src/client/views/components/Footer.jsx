@@ -170,7 +170,6 @@ const Footer = ({
               height: qrCodeSize / 5,
               width: qrCodeSize / 5,
               excavate: true,
-              crossOrigin: "",
             }}
           />
         </div>
