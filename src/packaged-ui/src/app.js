@@ -32,22 +32,22 @@ app.set("base", GH_BASENAME);
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 
-app.use(
-  helmet(
-    helmet.contentSecurityPolicy({
-      useDefaults: true,
-      directives: {
-        "img-src": [
-          "'self'",
-          "https: data:",
-          "https://*.genomehubs.org",
-          "https://*.sanger.ac.uk",
-          "https://*.phylopic.org",
-        ],
-      },
-    })
-  )
-);
+// app.use(
+//   helmet(
+//     helmet.contentSecurityPolicy({
+//       useDefaults: true,
+//       directives: {
+//         "img-src": [
+//           "'self'",
+//           "https: data:",
+//           "https://*.genomehubs.org",
+//           "https://*.sanger.ac.uk",
+//           "https://*.phylopic.org",
+//         ],
+//       },
+//     })
+//   )
+// );
 
 // serve static assets normally
 // get hash value from directory name
@@ -84,6 +84,12 @@ app.use(GH_BASENAME, express.static(path.resolve(__dirname, "render")));
 
 app.use(GH_BASENAME, express.static(path.resolve(__dirname, "public")));
 
+app.get("*", function (req, res) {
+  // response.sendFile(path.resolve(__dirname, "view/index.html"));
+  res.render("index", {
+    variables: `window.process = ${JSON.stringify({ ENV })}`,
+  });
+});
 // handle every other route with index.html, which will contain
 // a script tag to your application's JavaScript file(s).
 app.get("*", function (req, res) {
