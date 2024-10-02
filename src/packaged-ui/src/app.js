@@ -84,12 +84,10 @@ app.use(GH_BASENAME, express.static(path.resolve(__dirname, "render")));
 
 app.use(GH_BASENAME, express.static(path.resolve(__dirname, "public")));
 
-app.get("*", function (req, res) {
-  // response.sendFile(path.resolve(__dirname, "view/index.html"));
-  res.render("index", {
-    variables: `window.process = ${JSON.stringify({ ENV })}`,
-  });
+app.get("*.md", (req, res) => {
+  res.status(200).send(`${req.path} not found`);
 });
+
 // handle every other route with index.html, which will contain
 // a script tag to your application's JavaScript file(s).
 app.get("*", function (req, res) {
