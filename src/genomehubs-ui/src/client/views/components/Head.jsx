@@ -7,6 +7,10 @@ const Head = ({ siteName, basename }) => {
   return (
     <Helmet>
       <meta charset="utf8" />
+      <meta
+        http-equiv="Content-Security-Policy"
+        content="img-src 'self' data:"
+      />
       <title>{siteName}</title>
       <link
         rel="apple-touch-icon"
