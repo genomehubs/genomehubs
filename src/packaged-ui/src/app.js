@@ -41,7 +41,12 @@ app.use(
           "'self'",
           "https: data:",
           "https://*.genomehubs.org",
-          "https://*.sanger.ac.uk",
+          "https://*.phylopic.org",
+        ],
+        "connect-src": [
+          "'self'",
+          "https: data:",
+          "https://*.genomehubs.org",
           "https://*.phylopic.org",
         ],
       },
