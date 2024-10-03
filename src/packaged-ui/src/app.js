@@ -35,7 +35,7 @@ app.set("view engine", "ejs");
 app.use(
   helmet(
     helmet.contentSecurityPolicy({
-      useDefaults: true,
+      useDefaults: false,
       directives: {
         imgSrc: [
           "'self'",
