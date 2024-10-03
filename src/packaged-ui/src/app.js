@@ -32,22 +32,22 @@ app.set("base", GH_BASENAME);
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 
-// app.use(
-//   helmet(
-//     helmet.contentSecurityPolicy({
-//       useDefaults: true,
-//       directives: {
-//         "img-src": [
-//           "'self'",
-//           "https: data:",
-//           "https://*.genomehubs.org",
-//           "https://*.sanger.ac.uk",
-//           "https://*.phylopic.org",
-//         ],
-//       },
-//     })
-//   )
-// );
+app.use(
+  helmet(
+    helmet.contentSecurityPolicy({
+      useDefaults: true,
+      directives: {
+        "img-src": [
+          "'self'",
+          "https: data:",
+          "https://*.genomehubs.org",
+          "https://*.sanger.ac.uk",
+          "https://*.phylopic.org",
+        ],
+      },
+    })
+  )
+);
 
 // serve static assets normally
 // get hash value from directory name
