@@ -1,7 +1,7 @@
 import charWidth from "./charWidth";
 
 export const stringLength = (str, options) => {
-  let length = `${Number.isNaN(str) ? (str ? str : "") : str}`
+  let length = `${isNaN(str) ? (str ? str : "") : str}`
     .split("")
     .reduce((a, b) => a + charWidth(b, options), 0);
   return length;

@@ -35,15 +35,15 @@ app.set("view engine", "ejs");
 app.use(
   helmet(
     helmet.contentSecurityPolicy({
-      useDefaults: false,
+      useDefaults: true,
       directives: {
         imgSrc: [
           "'self'",
           "https: data:",
           "https://*.genomehubs.org",
-          "https://api.phylopic.org",
+          "api.phylopic.org",
         ],
-        connectSrc: ["'self'", "https: data:", "https://api.phylopic.org"],
+        connectSrc: ["'self'", "api.phylopic.org"],
       },
     })
   )
