@@ -1,7 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-// const helmet = require("helmet");
+const helmet = require("helmet");
 
 const PORT = process.env.GH_PORT || process.env.GH_CLIENT_PORT || "8880";
 const GH_API_PORT = process.env.GH_API_PORT || "3000";
