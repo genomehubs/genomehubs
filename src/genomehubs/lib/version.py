@@ -1,4 +1,4 @@
 #!/usr/bin/env python3
 """genomehubs version."""
 
-__version__ = "2.9.11"
+__version__ = "2.9.12"
