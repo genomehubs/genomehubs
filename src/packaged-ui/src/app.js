@@ -37,16 +37,11 @@ app.use(
     helmet.contentSecurityPolicy({
       useDefaults: true,
       directives: {
-        imgSrc: [
+        imgSrc: ["'self'", "https: data:"],
+        defaultSrc: [
           "'self'",
-          "https: data:",
           "https://*.genomehubs.org",
-          "api.phylopic.org",
-        ],
-        connectSrc: [
-          "'self'",
-          "https://api.phylopic.org",
-          "https://api.phylopic.org/*",
+          "https://*.phylopic.org",
         ],
       },
     })
