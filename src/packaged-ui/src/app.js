@@ -43,7 +43,11 @@ app.use(
           "https://*.genomehubs.org",
           "api.phylopic.org",
         ],
-        connectSrc: ["'self'", "api.phylopic.org"],
+        connectSrc: [
+          "'self'",
+          "https://api.phylopic.org",
+          "https://api.phylopic.org/*",
+        ],
       },
     })
   )
