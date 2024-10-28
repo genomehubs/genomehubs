@@ -80,7 +80,7 @@ export const Badge = ({
 }) => {
   let scientificName, lineage, rank;
   let topLevel = !parents;
-  parents = parents || browse;
+  let currentParents = structuredClone(parents || browse);
   const navigate = useNavigate();
 
   const imgRef = useRef(null);
@@ -128,7 +128,7 @@ export const Badge = ({
           maskParentElement={i == descendantsById.count - 1}
           {...{
             parents: {
-              ...parents,
+              ...currentParents,
               ...(descendantsById && {
                 [currentRecordId]: { browse: true },
               }),
@@ -157,7 +157,7 @@ export const Badge = ({
                   depth: descendantsById.depth,
                 });
 
-                setBrowse({ ...parents, scrollY, fieldName });
+                setBrowse({ ...currentParents, scrollY, fieldName });
               }}
             >
               +10
@@ -175,7 +175,7 @@ export const Badge = ({
                     depth: descendantsById.depth,
                   });
 
-                  setBrowse({ ...parents, scrollY, fieldName });
+                  setBrowse({ ...currentParents, scrollY, fieldName });
                 }}
               >
                 +100
@@ -201,7 +201,7 @@ export const Badge = ({
                     depth: descendantsById.depth,
                   });
 
-                  setBrowse({ ...parents, scrollY, fieldName });
+                  setBrowse({ ...currentParents, scrollY, fieldName });
                 }}
               >
                 <div ref={imgRef} className={imgStyle}>
@@ -254,7 +254,7 @@ export const Badge = ({
       if (topLevel) {
         status.isMounted = false;
         let { scrollY } = window;
-        setBrowse({ ...parents, scrollY, fieldName });
+        setBrowse({ ...currentParents, scrollY, fieldName });
       }
     };
   }, [descendantsById, fieldName]);
@@ -300,46 +300,48 @@ export const Badge = ({
     </div>;
   }
 
-  if (currentRecordId && targetRank && !parents[currentRecordId]) {
-    parents[currentRecordId] = { browse: true };
+  if (currentRecordId && targetRank && !currentParents[currentRecordId]) {
+    currentParents[currentRecordId] = { browse: true };
   }
 
   const toggleStats = (e) => {
     e.stopPropagation();
-    if (!parents[currentRecordId]) {
-      parents[currentRecordId] = {};
+    if (!currentParents[currentRecordId]) {
+      currentParents[currentRecordId] = {};
     }
     setShowInfo(false);
-    parents[currentRecordId].info = false;
-    parents[currentRecordId].stats = !parents[currentRecordId].stats;
+    currentParents[currentRecordId].info = false;
+    currentParents[currentRecordId].stats =
+      !currentParents[currentRecordId].stats;
     setShowStats(!showStats);
-    updateBrowseStatus(currentRecordId, parents[currentRecordId]);
+    updateBrowseStatus(currentRecordId, currentParents[currentRecordId]);
   };
 
   const toggleInfo = (e) => {
     e.stopPropagation();
-    if (!parents[currentRecordId]) {
-      parents[currentRecordId] = {};
+    if (!currentParents[currentRecordId]) {
+      currentParents[currentRecordId] = {};
     }
     setShowStats(false);
-    parents[currentRecordId].stats = false;
-    parents[currentRecordId].info = !parents[currentRecordId].info;
+    currentParents[currentRecordId].stats = false;
+    currentParents[currentRecordId].info =
+      !currentParents[currentRecordId].info;
     setShowInfo(!showInfo);
-    updateBrowseStatus(currentRecordId, parents[currentRecordId]);
+    updateBrowseStatus(currentRecordId, currentParents[currentRecordId]);
   };
 
   const toggleBrowse = (recordId) => {
-    if (!parents[recordId]) {
-      parents[recordId] = {};
+    if (!currentParents[recordId]) {
+      currentParents[recordId] = {};
     }
     if (!showBrowse) {
       expandBrowseDiv();
     } else {
       setBadgeCss(badgeStyle);
     }
-    parents[recordId].browse = !parents[recordId].browse;
+    currentParents[recordId].browse = !currentParents[recordId].browse;
     setShowBrowse(!showBrowse);
-    updateBrowseStatus(currentRecordId, parents[currentRecordId]);
+    updateBrowseStatus(currentRecordId, currentParents[currentRecordId]);
   };
 
   let statsDiv = showStats && (
@@ -349,9 +351,9 @@ export const Badge = ({
       scientificName={scientificName}
       setBrowse={() =>
         updateBrowse({
-          ...parents,
+          ...currentParents,
           [currentRecordId]: {
-            ...(parents[currentRecordId] || {}),
+            ...(currentParents[currentRecordId] || {}),
             stats: true,
           },
         })
@@ -370,9 +372,9 @@ export const Badge = ({
       taxonId={currentRecordId}
       setBrowse={() =>
         updateBrowse({
-          ...parents,
+          ...currentParents,
           [currentRecordId]: {
-            ...(parents[currentRecordId] || {}),
+            ...(currentParents[currentRecordId] || {}),
             info: true,
           },
         })
@@ -482,7 +484,7 @@ export const Badge = ({
                   `${basename}/search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29&includeEstimates=true&taxonomy=${taxonomy}&result=${result}`,
                 );
                 updateBrowse({
-                  ...parents,
+                  ...currentParents,
                 });
               }}
               className={scientificName ? "" : disabledStyle}

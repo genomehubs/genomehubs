@@ -2,13 +2,14 @@ import { createAction, handleAction, handleActions } from "redux-actions";
 
 import createCachedSelector from "re-reselect";
 import { createSelector } from "reselect";
+import { createSlice } from "@reduxjs/toolkit";
 import immutableUpdate from "immutable-update";
 
 export const requestRecord = createAction("REQUEST_RECORD");
 export const receiveRecord = createAction(
   "RECEIVE_RECORD",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 export const resetRecord = createAction("RESET_RECORD");
 
@@ -48,7 +49,7 @@ const records = handleActions(
     RECEIVE_RECORD: onReceiveRecord,
     RESET_RECORD: defaultState,
   },
-  defaultState()
+  defaultState(),
 );
 
 export const getRecords = (state) => state.records.byId;
@@ -59,14 +60,14 @@ export const getRecordById = createCachedSelector(
   (_state, taxonId) => taxonId,
   (records, taxonId) => {
     return records[taxonId];
-  }
+  },
 )((_state, taxonId) => taxonId);
 
 export const setCurrentRecordId = createAction("SET_CURRENT_RECORD_ID");
 export const currentRecordId = handleAction(
   "SET_CURRENT_RECORD_ID",
   (state, action) => action.payload,
-  ""
+  "",
 );
 export const getCurrentRecordId = (state) => state.currentRecordId;
 
@@ -78,7 +79,7 @@ export const getCurrentRecord = createSelector(
       return {};
     }
     return records[recordId];
-  }
+  },
 );
 
 export const setAttributeSettings = createAction("SET_ATTRIBUTE_SETTINGS");
@@ -87,37 +88,42 @@ export const attributeSettings = handleAction(
   (state, action) => ({ ...state, ...action.payload }),
   {
     showAttribute: false,
-  }
+  },
 );
 export const getAttributeSettings = (state) => state.attributeSettings;
 
-export const setBrowse = createAction("SET_BROWSE");
-export const browse = handleAction(
-  "SET_BROWSE",
-  (state, action) => {
-    return action.payload;
+const browseSlice = createSlice({
+  name: "browse",
+  initialState: {},
+  reducers: {
+    setBrowse(state, action) {
+      action.payload;
+    },
   },
-  {}
-);
+});
+
 export const getBrowse = (state) => state.browse;
 
-export const setBrowseStatus = createAction("SET_BROWSE_STATUS");
-export const browseStatus = handleAction(
-  "SET_BROWSE_STATUS",
-  (state, action) => {
-    let { id, value } = action.payload;
-    return immutableUpdate(state, {
-      [id]: value,
-    });
+const browseStatusSlice = createSlice({
+  name: "browseStatus",
+  initialState: {},
+  reducers: {
+    setBrowseStatus(state, action) {
+      state[action.payload.id] = action.payload.value;
+    },
   },
-  {}
-);
+});
+
 export const getBrowseStatus = (state) => state.browseStatus;
+
+export const { setBrowse } = browseSlice.actions;
+
+export const { setBrowseStatus } = browseStatusSlice.actions;
 
 export const recordReducers = {
   records,
-  browse,
-  browseStatus,
+  browse: browseSlice.reducer,
+  browseStatus: browseStatusSlice.reducer,
   currentRecordId,
   attributeSettings,
 };

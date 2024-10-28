@@ -1,5 +1,6 @@
 import {
   getPhylopicIsFetching,
+  getPhylopicIsFetchingById,
   getPhylopics,
   receivePhylopic,
   requestPhylopic,
@@ -21,7 +22,11 @@ export function fetchPhylopic({ taxonId, scientificName, lineage, rank }) {
     for (let i = 0; i < 10; i++) {
       await timeout(100 + Math.floor(Math.random() * 100));
       if (!getPhylopicIsFetching(state)) {
-        dispatch(requestPhylopic());
+        let fetchingById = getPhylopicIsFetchingById(store.getState());
+        if (fetchingById[taxonId]) {
+          return;
+        }
+        dispatch(requestPhylopic(taxonId));
         break;
       }
     }
@@ -29,92 +34,66 @@ export function fetchPhylopic({ taxonId, scientificName, lineage, rank }) {
       return;
     }
 
-    const lookupName = async (name) => {
+    const resolveByTaxId = async ({ taxonId, lineage, rank }) => {
+      let taxIdList = [];
+      let ranks = {};
+      lineage.forEach((taxon) => {
+        taxIdList.push(taxon.taxon_id);
+        ranks[taxon.taxon_id] = taxon.taxon_rank;
+      });
       let response = await fetch(
-        `https://api.phylopic.org/autocomplete?query=${name}`
+        `https://api.phylopic.org/resolve/ncbi.nlm.nih.gov/taxid?objectIDs=${encodeURIComponent([taxonId, ...taxIdList].join(","))}`,
       );
       let json = await response.json();
-      if (json.matches && json.matches.includes(name)) {
-        return true;
-      }
-    };
+      let { href, title } = json._links.primaryImage || {};
+      let external = (json._links.external || []).find((link) =>
+        link.href.includes("ncbi.nlm.nih.gov/taxid"),
+      );
+      let validRank =
+        ranks[external.href.split("/")[4].replace(/\?.+/, "")] || rank;
+      if (href) {
+        let nodeResponse = await fetch(`https://api.phylopic.org/${href}`);
+        let nodeJson = await nodeResponse.json();
 
-    const fetchData = async (name) => {
-      let validName;
-      let validRank;
-      if (await lookupName(name)) {
-        validName = name;
-        validRank = rank;
-      } else {
-        // use lineage
-        for (let { scientific_name, taxon_rank } of lineage) {
-          if (await lookupName(scientific_name.toLowerCase())) {
-            validName = scientific_name.toLowerCase();
-            validRank = taxon_rank;
-            break;
-          }
-        }
-      }
-      if (validName) {
-        try {
-          let buildResponse = await fetch(
-            `https://api.phylopic.org/nodes?filter_name=${validName}`
-          );
-          let buildJson = await buildResponse.json();
-          let filterResponse = await fetch(
-            `https://api.phylopic.org${buildJson._links.firstPage.href}`
-          );
-          let filterJson = await filterResponse.json();
-          let { href, title } = filterJson._links.items[0] || {};
-          if (href) {
-            let nodeResponse = await fetch(
-              `https://api.phylopic.org${href}&embed_primaryImage=true`
-            );
-            let nodeJson = await nodeResponse.json();
-            let { _links, attribution, uuid } = nodeJson._embedded.primaryImage;
-            let {
-              rasterFiles,
-              contributor,
-              license = "",
-              specificNode,
-            } = _links;
-            if (rasterFiles) {
-              let rasterFile =
-                rasterFiles.length > 1 ? rasterFiles[1] : rasterFiles[0];
-              let [width, height] = rasterFile.sizes.split("x");
+        let { _links, attribution, uuid } = nodeJson;
+        let { rasterFiles, contributor, license = "", specificNode } = _links;
+        if (rasterFiles) {
+          let rasterFile =
+            rasterFiles.length > 1 ? rasterFiles[1] : rasterFiles[0];
+          let [width, height] = rasterFile.sizes.split("x");
 
-              let response = {
-                taxonId,
-                fileUrl: rasterFile.href,
-                ratio: width / height,
-                attribution,
-                license,
-                contributor,
-                imageName: specificNode.title,
-                sourceUrl: `https://www.phylopic.org/images/${uuid}/`,
-                imageRank: validRank,
-              };
-              if (validRank.endsWith("species") && validRank == rank) {
-                response.source = "Primary";
-              } else {
-                response.source =
-                  validRank == rank ? "Descendant" : "Ancestral";
-              }
-              dispatch(receivePhylopic(response));
-            } else {
-              console.log({ [taxonId]: "no files" });
-            }
+          let response = {
+            taxonId,
+            fileUrl: rasterFile.href,
+            ratio: width / height,
+            attribution,
+            license,
+            contributor,
+            imageName: specificNode.title,
+            sourceUrl: `https://www.phylopic.org/images/${uuid}/`,
+            imageRank: validRank,
+          };
+          if (validRank.endsWith("species") && validRank == rank) {
+            response.source = "Primary";
           } else {
-            console.log({ [taxonId]: "href" });
+            response.source = validRank == rank ? "Descendant" : "Ancestral";
           }
-        } catch (err) {
-          console.log(err);
+          dispatch(receivePhylopic(response));
+        } else {
+          dispatch(receivePhylopic({ taxonId, error: "no files" }));
+          console.log({ [taxonId]: "no files" });
         }
+      } else {
+        dispatch(receivePhylopic({ taxonId }));
+        console.log({ [taxonId]: "href" });
       }
     };
+
     try {
-      fetchData(scientificName.toLowerCase());
+      resolveByTaxId({ taxonId, lineage, rank });
+      // fetchData(scientificName.toLowerCase());
     } catch (err) {
+      dispatch(receivePhylopic({ taxonId }));
       // console.log(err);
     }
   };
