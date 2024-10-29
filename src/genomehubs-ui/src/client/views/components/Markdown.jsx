@@ -3,6 +3,7 @@ import { basename, siteName } from "../reducers/location";
 import {
   centerContent as centerContentStyle,
   divider as dividerStyle,
+  fixedArSixteenNine as fixedArSixteenNineStyle,
   fixedAr as fixedArStyle,
   inline as inlineStyle,
   markdown as markdownStyle,
@@ -296,7 +297,7 @@ const fillTemplateValues = (value, extra) => {
 };
 
 export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
-  for (let [key, value] of Object.entries(props)) {
+  for (let [key, value] of Object.entries(props || {})) {
     if (isGrid && !gridPropNames.has(key)) {
       continue;
     }
@@ -375,6 +376,20 @@ export const RehypeComponentsList = (extra) => {
         <Grid {...processProps({ props: gridProps })}>
           <div className={fixedArStyle} style={{ background: fillColor }}>
             <Logo {...{ lineColor, fillColor }} />
+          </div>
+        </Grid>
+      );
+    },
+    iframe: (props) => {
+      let { size = 12, aspectRatio, ...iframeProps } = props;
+      return (
+        <Grid size={size}>
+          <div style={{ aspectRatio }}>
+            <iframe
+              {...processProps({ props: iframeProps })}
+              width={"100%"}
+              height={"100%"}
+            />
           </div>
         </Grid>
       );
