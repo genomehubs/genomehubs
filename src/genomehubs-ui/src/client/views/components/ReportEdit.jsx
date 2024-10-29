@@ -674,6 +674,7 @@ export const ReportEdit = ({
             error={required && !values[queryProp]}
             style={{ width: "95%" }}
             onChange={(e) => handleChange(e, queryProp)}
+            onBlur={(e) => handleChange(e, queryProp)}
             onKeyPress={handleKeyPress}
           />
         );
