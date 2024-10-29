@@ -127,7 +127,7 @@ const SearchBox = ({
     fetchSearchResults(options);
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(term)}`
+      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(term)}`,
     );
   };
 
@@ -168,7 +168,7 @@ const SearchBox = ({
     let inputs = Array.from(
       formRef.current
         ? formRef.current.getElementsByClassName("inputQuery")
-        : []
+        : [],
     )
       .map((el) => ({
         name: el.children[1].children[0].name,
@@ -177,11 +177,11 @@ const SearchBox = ({
       .filter((el) => el.name.match(/query[A-Z]+/) && el.value);
     let inputQueries = inputs.reduce(
       (a, el) => ({ ...a, [el.name]: el.value }),
-      {}
+      {},
     );
     dispatchSearch(
       { query: queryString, ...inputQueries, result, fields },
-      hashTerm
+      hashTerm,
     );
     // resetLookup();
   };
@@ -300,6 +300,6 @@ export default compose(
   withTypes,
   withSearch,
   withSearchDefaults,
-  withLookup
+  withLookup,
   // dispatchLiveQuery
 )(SearchBox);

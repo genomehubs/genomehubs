@@ -5,7 +5,6 @@ import { indexName } from "./indexName.js";
 import { logError } from "./logger.js";
 import { parseFields } from "./parseFields.js";
 import { summaries } from "./summaries.js";
-import { type } from "os";
 
 const fail = (error) => {
   return {
@@ -500,6 +499,10 @@ export const generateQuery = async ({
       exclusions.ancestor.forEach(excludeAncestral.add, excludeAncestral);
     }
     exclusions.ancestor = [...excludeAncestral];
+  }
+
+  if (["taxon", "assembly", "sample"].includes(result) && !taxTerm) {
+    taxTerm = ["tax_tree(2759)", "tree", "2759"];
   }
 
   let params = {

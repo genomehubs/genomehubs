@@ -19,6 +19,7 @@ import { resetController, setMessage } from "../reducers/message";
 import { basename } from "../reducers/location";
 import { checkProgress } from "./checkProgress";
 import { getCurrentTaxonomy } from "../reducers/taxonomy";
+import { getTypes } from "../reducers/types";
 import { nanoid } from "nanoid";
 import qs from "../functions/qs";
 import { setTreeQuery } from "../reducers/tree";
@@ -27,32 +28,42 @@ import store from "../store";
 // import { fetchTypes } from "./types";
 
 export function fetchSearchResults(options, navigate) {
+  let params = structuredClone(options);
   return async function (dispatch) {
-    if (!options.hasOwnProperty("query")) {
+    if (!params.hasOwnProperty("query")) {
       dispatch(cancelSearch);
     }
     const state = store.getState();
     const searchHistory = getSearchHistory(state);
     const taxonomy = getCurrentTaxonomy(state);
     const searchDefaults = getSearchDefaults(state);
+    let types = getTypes(state);
 
-    dispatch(setSearchHistory(options));
+    dispatch(setSearchHistory(params));
 
-    let searchTerm = options.query;
-    if (!options.hasOwnProperty("result")) {
-      options.result = "assembly";
+    let searchTerm = params.query;
+    if (!params.hasOwnProperty("result")) {
+      params.result = "assembly";
     }
-    if (!options.hasOwnProperty("taxonomy")) {
-      options.taxonomy = taxonomy;
+    if (types[params.result]) {
+      types = types[params.result];
     }
-    if (options.result == "taxon" && !options.query.match(/[\(\)<>=\n\*]/)) {
-      if (!options.hasOwnProperty("includeEstimates")) {
-        options.includeEstimates = searchDefaults.includeEstimates;
+    if (!params.hasOwnProperty("taxonomy")) {
+      params.taxonomy = taxonomy;
+    }
+    if (
+      params.result == "taxon" &&
+      !params.query.match(/[\(\)<>=\n\*]/) &&
+      !params.query.match(/\s+AND\s+/) &&
+      !types[params.query]
+    ) {
+      if (!params.hasOwnProperty("includeEstimates")) {
+        params.includeEstimates = searchDefaults.includeEstimates;
       }
       let taxFilter = searchDefaults.includeDescendants
         ? "tax_tree"
         : "tax_name";
-      options.query = `${taxFilter}(${options.query})`;
+      params.query = `${taxFilter}(${params.query})`;
     }
     // if (!options.hasOwnProperty("summaryValues")) {
     //   options.summaryValues = "count";
@@ -60,9 +71,9 @@ export function fetchSearchResults(options, navigate) {
     // dispatch(setSearchIndex(options.result));
     // dispatch(fetchTypes(options.result));
     dispatch(requestSearch());
-    dispatch(setSearchTerm(options));
+    dispatch(setSearchTerm(params));
     dispatch(setTreeQuery(null));
-    const queryString = qs.stringify(options);
+    const queryString = qs.stringify(params);
     const endpoint = "search";
     let url = `${apiUrl}/${endpoint}?${queryString}`;
     try {
@@ -74,23 +85,23 @@ export function fetchSearchResults(options, navigate) {
         json = console.log("An error occured.", error);
       }
       if (!json.results || json.results.length == 0) {
-        if (!searchTerm.match(/[\(\)<>=\n\*]/)) {
-          options.query = `tax_name(${searchTerm})`;
+        if (params.result == "taxon" && !searchTerm.match(/[\(\)<>=\n\*]/)) {
+          // if (options.result == "taxon") {
+          params.query = `tax_name(${searchTerm})`;
           dispatch(setPreferSearchTerm(true));
-          dispatch(fetchSearchResults(options, navigate));
+          dispatch(fetchSearchResults(params, navigate));
           // } else if (searchTerm.match(/tax_tree/)) {
           //   options.query = searchTerm.replace("tax_tree", "tax_name");
-
           //   dispatch(setPreferSearchTerm(true));
           //   dispatch(fetchSearchResults(options, navigate));
         } else if (
           searchTerm.match(/tax_rank/) ||
           searchTerm.match(/tax_depth/)
         ) {
-          if (!options.hasOwnProperty("includeEstimates")) {
-            options.includeEstimates = true;
+          if (!params.hasOwnProperty("includeEstimates")) {
+            params.includeEstimates = true;
             dispatch(setPreferSearchTerm(true));
-            dispatch(fetchSearchResults(options, navigate));
+            dispatch(fetchSearchResults(params, navigate));
           } else {
             dispatch(receiveSearch(json));
           }
@@ -101,7 +112,7 @@ export function fetchSearchResults(options, navigate) {
         dispatch(receiveSearch(json));
 
         if (navigate) {
-          let navOptions = { ...options };
+          let navOptions = { ...params };
           if (json.queryString) {
             navOptions.query = json.queryString;
           }
