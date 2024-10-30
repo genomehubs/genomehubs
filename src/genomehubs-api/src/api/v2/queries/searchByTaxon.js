@@ -200,8 +200,7 @@ export const searchByTaxon = async ({
   });
   if (
     Object.keys(aggs).length == 0 &&
-    1 //(!emptyColumns || emptyColumns == "false")
-    // TODO: restore condition here
+    (!emptyColumns || emptyColumns == "false")
   ) {
     let boundAggs = {};
     if (bounds && Object.keys(bounds).length > 0) {
