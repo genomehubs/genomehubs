@@ -131,7 +131,7 @@ const SearchBox = ({
     );
   };
 
-  const wrap_term = ({ term, taxWrap, result }) => {
+  const wrapTerm = ({ term, taxWrap, result }) => {
     if (
       result &&
       result == "taxon" &&
@@ -156,11 +156,11 @@ const SearchBox = ({
     if (!queryString.match("\n")) {
       let query = queryString
         .split(/\s+and\s+/i)
-        .map((term) => wrap_term({ term, taxWrap, result }));
+        .map((term) => wrapTerm({ term, taxWrap, result }));
       queryString = query.join(" AND ");
       let hash = hashTerm
         .split(/\s+and\s+/i)
-        .map((term) => wrap_term({ term, taxWrap, result }));
+        .map((term) => wrapTerm({ term, taxWrap, result }));
       hashTerm = hash.join(" AND ");
     }
     setSearchIndex(result);
@@ -190,6 +190,7 @@ const SearchBox = ({
     e && e.preventDefault();
     const { index } = props;
     let term = searchInputRef.current.value;
+    console.log(term);
     doSearch(term, index || result, term);
   };
 
