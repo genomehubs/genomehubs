@@ -110,7 +110,7 @@ const ResultFilter = ({
         parts.push(`tax_level(${taxFilter.level})`);
       }
     }
-    for (let arr of attributes) {
+    for (let arr of Object.values(attributes)) {
       if (!arr) {
         continue;
       }

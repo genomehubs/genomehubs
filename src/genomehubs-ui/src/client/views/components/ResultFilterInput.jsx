@@ -77,7 +77,8 @@ const ResultFilterInput = ({
             {allowedValues.map((v) => (
               <li
                 key={v}
-                onClick={(e) => {
+                onPointerDown={(e) => {
+                  e.preventDefault();
                   handleChange({ target: { value: v } });
                 }}
               >

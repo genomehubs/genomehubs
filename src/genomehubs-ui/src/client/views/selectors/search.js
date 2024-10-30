@@ -86,14 +86,9 @@ export function fetchSearchResults(options, navigate) {
       }
       if (!json.results || json.results.length == 0) {
         if (params.result == "taxon" && !searchTerm.match(/[\(\)<>=\n\*]/)) {
-          // if (options.result == "taxon") {
           params.query = `tax_name(${searchTerm})`;
           dispatch(setPreferSearchTerm(true));
           dispatch(fetchSearchResults(params, navigate));
-          // } else if (searchTerm.match(/tax_tree/)) {
-          //   options.query = searchTerm.replace("tax_tree", "tax_name");
-          //   dispatch(setPreferSearchTerm(true));
-          //   dispatch(fetchSearchResults(options, navigate));
         } else if (
           searchTerm.match(/tax_rank/) ||
           searchTerm.match(/tax_depth/)
@@ -121,7 +116,6 @@ export function fetchSearchResults(options, navigate) {
           });
         }
         dispatch(receiveSearch(json));
-        // dispatch(setApiStatus(true));
       }
     } catch (err) {
       dispatch(cancelSearch);
