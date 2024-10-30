@@ -201,6 +201,7 @@ export const searchByTaxon = async ({
   if (
     Object.keys(aggs).length == 0 &&
     (!emptyColumns || emptyColumns == "false")
+    // TODO: handle empty expanded columns
   ) {
     let boundAggs = {};
     if (bounds && Object.keys(bounds).length > 0) {
