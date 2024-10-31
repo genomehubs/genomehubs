@@ -144,38 +144,43 @@ const Footer = ({
     window.open(fileURL, "_blank");
   };
 
-  let qrButton = (
-    <Tooltip title="Generate QR Code for page" arrow placement={"top"}>
-      <span>
-        <IconButton
-          className={saveSearchOptionsStyle}
-          aria-label="search settings"
-          // onClick={() => setOpen(!open)}
-          size="large"
-          onClick={() => handleQRClick(qrRef.current)}
-        >
-          <QrCodeIcon style={{ color: "white" }} />
-        </IconButton>
-        <div style={{ height: 0, display: "none" }}>
-          <QRCodeSVG
-            ref={qrRef}
-            key={"qrcode"}
-            value={location.href}
-            level={"M"}
-            fgColor={"#31323f"}
-            marginSize={"4"}
-            size={qrCodeSize}
-            imageSettings={{
-              src: "/android-chrome-192x192.png",
-              height: qrCodeSize / 5,
-              width: qrCodeSize / 5,
-              excavate: true,
-            }}
-          />
-        </div>
-      </span>
-    </Tooltip>
-  );
+  let qrButton;
+  if (location.href.length < 2000) {
+    qrButton = (
+      <Tooltip title="Generate QR Code for page" arrow placement={"top"}>
+        <span>
+          <IconButton
+            className={saveSearchOptionsStyle}
+            aria-label="search settings"
+            // onClick={() => setOpen(!open)}
+            size="large"
+            onClick={() => handleQRClick(qrRef.current)}
+          >
+            <QrCodeIcon style={{ color: "white" }} />
+          </IconButton>
+          <div style={{ height: 0, display: "none" }}>
+            <QRCodeSVG
+              ref={qrRef}
+              key={"qrcode"}
+              value={location.href}
+              level={"M"}
+              fgColor={"#31323f"}
+              marginSize={"4"}
+              size={qrCodeSize}
+              imageSettings={{
+                src: "/android-chrome-192x192.png",
+                height: qrCodeSize / 5,
+                width: qrCodeSize / 5,
+                excavate: true,
+              }}
+            />
+          </div>
+        </span>
+      </Tooltip>
+    );
+  } else {
+    qrButton = null;
+  }
 
   let poweredBy = (
     // <span style={{ float: "left", marginLeft: "1em" }}>

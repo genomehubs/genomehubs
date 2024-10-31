@@ -430,6 +430,12 @@ export const AutoCompleteInput = ({
         updateTerm(newValue, e?.target?.selectionStart || prefix.length, types);
         setOpen(true);
       } else if (!multiline) {
+        updateTerm(
+          newValue.replace(/\r*\n/, ","),
+          e.target.selectionStart,
+          types,
+        );
+
         updateTerm(newValue, e.target.selectionStart, types);
         setOpen(true);
       }
@@ -447,8 +453,7 @@ export const AutoCompleteInput = ({
     if (e.key === "Enter") {
       if (e.shiftKey) {
         e.preventDefault();
-        setMultiline(true);
-        setInValue(`${inputRef.current.value}\n`);
+        setInValue(`${inputRef.current.value},`);
       } else if (!multiline) {
         handleSubmit(e, {
           id,
@@ -458,6 +463,16 @@ export const AutoCompleteInput = ({
       }
       setAutocompleteTerms({});
     }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    let value = e.clipboardData.getData("text");
+    let values = [value];
+    if (value.match(/[\r\n]/)) {
+      values = value.split(/\s*\r*\n\s*/g);
+    }
+    updateTerm(values.join(","), value.length, types);
   };
 
   const handleKeyDown = (e, newValue, reason) => {
@@ -551,6 +566,7 @@ export const AutoCompleteInput = ({
       onChange={handleKeyDown}
       onBlur={handleBlur}
       onClose={handlePopperClose}
+      onPaste={handlePaste}
       filterOptions={(options, state) => options}
       onInputChange={handleChange}
       onHighlightChange={handleHighlightChange}
