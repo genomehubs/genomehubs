@@ -27,6 +27,7 @@ import {
 
 import { apiUrl } from "../reducers/api";
 import axisScales from "../functions/axisScales";
+import { formats } from "../functions/formats";
 import qs from "../functions/qs";
 import store from "../store";
 import stringLength from "../functions/stringLength";
@@ -120,7 +121,7 @@ const outerArc = ({ innerRadius, outerRadius, startAngle, endAngle }) => {
 
 export const getAPITreeNodes = getNodes;
 
-const setColor = ({ node, yQuery, recurse }) => {
+const setColor = ({ node, yQuery, recurse, hideSourceColors }) => {
   let field = (yQuery?.yFields || [])[0];
   let color, highlightColor;
   let tonalRange = 9;
@@ -137,7 +138,7 @@ const setColor = ({ node, yQuery, recurse }) => {
     color = "white";
     highlightColor = "white";
   } else if (yQuery) {
-    let status = node.status ? 1 : 0;
+    let status = node.status ? 1 : hideSourceColors ? 5 : 0;
     if (node.fields && node.fields[field]) {
       source = node.fields[field].source;
       value = node.fields[field].value;
@@ -145,10 +146,10 @@ const setColor = ({ node, yQuery, recurse }) => {
       max = node.fields[field].max;
     }
     // color = greys[baseTone + status];
-    color = ancestralColor;
+    color = hideSourceColors ? greys[baseTone + status] : ancestralColor;
     highlightColor = greys[baseTone + 1 + status];
 
-    if (source == "direct") {
+    if (!hideSourceColors && source == "direct") {
       if (status) {
         // color = greens[baseTone + 2 + status * 2];
         // highlightColor = greens[baseTone + 3 + status * 2];
@@ -158,7 +159,7 @@ const setColor = ({ node, yQuery, recurse }) => {
         color = greys[baseTone + 1];
         highlightColor = greys[baseTone + 1];
       }
-    } else if (source == "descendant") {
+    } else if (!hideSourceColors && source == "descendant") {
       if (status) {
         // color = oranges[baseTone + status * 2];
         highlightColor = oranges[baseTone + 2 + status * 2];
@@ -182,6 +183,9 @@ export const processTreeRings = ({
   bounds,
   yQuery,
   pointSize,
+  yBounds,
+  hideErrorBars,
+  hideSourceColors,
 }) => {
   if (!nodes) {
     return undefined;
@@ -211,12 +215,55 @@ export const processTreeRings = ({
     }
   }
   let radius = 498;
+  let yField = (yQuery?.yFields || [])[0];
+  let valueScale;
+  let dataWidth = 0;
+  let ticks = [];
+  if (yBounds && yBounds.domain && yBounds.type != "date") {
+    valueScale = axisScales[yBounds.scale]()
+      .domain(yBounds.domain)
+      // .nice()
+      .range([0, 100]);
+    dataWidth = 120;
+    radius -= 120;
+    let tickMarks = valueScale.ticks();
+    let mid = tickMarks[Math.floor(tickMarks.length / 2)];
+    ticks.push({
+      value: valueScale.domain()[0],
+      label: formats(valueScale.domain()[0]),
+      radius: radius + 10 + valueScale(valueScale.domain()[0]),
+    });
+
+    let arcString = arc()({
+      innerRadius: radius + 10 + valueScale(mid),
+      outerRadius: radius + 10 + valueScale(valueScale.domain()[1]),
+      startAngle: -Math.PI,
+      endAngle: Math.PI * 0.95,
+    });
+    let parts = arcString.split(/[MLZ]/);
+
+    ticks.push({
+      value: mid,
+      label: formats(mid),
+      radius: radius + 10 + valueScale(mid),
+      arc: `M${parts[2]}`,
+    });
+    ticks.push({
+      value: valueScale.domain()[1],
+      label: formats(valueScale.domain()[1]),
+      radius: radius + 10 + valueScale(valueScale.domain()[1]),
+      arc: `M${parts[1]}`,
+    });
+  }
+
   let rScale = scalePow()
     .exponent(1)
     .domain([-0.5, maxDepth + 1])
     .range([0, radius]);
   let cMax = treeNodes[rootNode] ? treeNodes[rootNode].count : 0;
-  let cScale = scaleLinear().domain([0, cMax]).range([-Math.PI, Math.PI]);
+  let cScale = scaleLinear()
+    .domain([0, dataWidth ? cMax * 1.025 : cMax])
+    .range([-Math.PI, Math.PI]);
   let arcs = [];
 
   let scaleFont = false;
@@ -235,7 +282,23 @@ export const processTreeRings = ({
     if (!node) {
       return {};
     }
-    let { color, highlightColor } = setColor({ node, yQuery, recurse });
+    let { color, highlightColor, source, value, min, max } = setColor({
+      node,
+      yQuery,
+      recurse,
+      hideSourceColors,
+    });
+    let bar = [];
+    let scaledValue;
+    ({ scaledValue, bar } = setBar({
+      node,
+      value,
+      min,
+      max,
+      valueScale,
+      bar,
+      ratio: [1, 100],
+    }));
 
     if (
       !node.hasOwnProperty("children") ||
@@ -256,6 +319,8 @@ export const processTreeRings = ({
     let startAngle = cScale(cStart);
     let endAngle = cScale(cEnd);
     let midAngle = (startAngle + endAngle) / 2;
+    let barAngle =
+      (Math.min(((cEnd - cStart) / cMax) * 360 * 0.25, 0.25) * Math.PI) / 180;
 
     arcs.push({
       ...node,
@@ -276,6 +341,23 @@ export const processTreeRings = ({
       depth: depth,
       color,
       highlightColor,
+      value,
+      valueLabel: formats(value),
+      ...((!node.children || Object.keys(node.children).length == 0) && {
+        valueArc: arc()({
+          innerRadius: radius + 10,
+          outerRadius: radius + 10 + valueScale(value),
+          startAngle,
+          endAngle,
+        }),
+        valueBar: arc()({
+          innerRadius: radius + 10 + Math.max(bar[1], 0),
+          outerRadius: radius + 10 + bar[2],
+          startAngle: midAngle - barAngle,
+          endAngle: midAngle + barAngle,
+        }),
+      }),
+      bar,
     });
 
     const addlabel = (label, { truncate = false, stopIteration = false }) => {
@@ -392,6 +474,7 @@ export const processTreeRings = ({
     cats: [...(catArray || [])].concat(
       other ? [{ key: "other", label: "other" }] : [],
     ),
+    ticks,
     other,
   };
 };
@@ -439,12 +522,41 @@ export const setCats = ({ node, cats, cat, other }) => {
   }
 };
 
+const setBar = ({
+  node,
+  value,
+  min,
+  max,
+  valueScale,
+  bar,
+  ratio = [12.5, 10],
+}) => {
+  let scaledValue = value;
+  if (valueScale && value) {
+    if (typeof value === "number" && valueScale) {
+      bar[0] = valueScale(value);
+      if (min !== undefined) {
+        bar[1] = valueScale(min);
+      }
+      if (max !== undefined) {
+        bar[2] = valueScale(max);
+      }
+      value = bar[0] / ratio[0];
+    } else {
+      value = ratio[1];
+    }
+  }
+  return { scaledValue, bar };
+};
+
 export const processTreePaths = ({
   nodes,
   bounds = {},
   yBounds = {},
   yQuery,
   pointSize,
+  hideErrorBars,
+  hideSourceColors,
 }) => {
   if (!nodes) {
     return undefined;
@@ -601,22 +713,18 @@ export const processTreePaths = ({
       node,
       yQuery,
       recurse: true,
+      hideSourceColors,
     });
     let bar = [];
-    if (value) {
-      if (typeof value === "number" && valueScale) {
-        bar[0] = valueScale(value);
-        if (min !== undefined) {
-          bar[1] = valueScale(min);
-        }
-        if (max !== undefined) {
-          bar[2] = valueScale(max);
-        }
-        value = bar[0] / 12.5;
-      } else {
-        value = 10;
-      }
-    }
+    let scaledValue;
+    ({ scaledValue, bar } = setBar({
+      node,
+      value,
+      min,
+      max,
+      valueScale,
+      bar,
+    }));
 
     let label;
     if (node.tip) {
@@ -675,7 +783,7 @@ export const processTreePaths = ({
       color,
       highlightColor,
       source,
-      value,
+      value: scaledValue,
       bar,
     });
   });
@@ -707,6 +815,8 @@ export const processTree = ({
   yQuery,
   treeStyle = "rect",
   pointSize = 15,
+  hideErrorBars,
+  hideSourceColors,
 }) => {
   if (treeStyle == "ring") {
     return processTreeRings({
@@ -716,6 +826,8 @@ export const processTree = ({
       xQuery,
       yQuery,
       pointSize,
+      hideErrorBars,
+      hideSourceColors,
     });
   }
   return processTreePaths({
@@ -725,5 +837,7 @@ export const processTree = ({
     xQuery,
     yQuery,
     pointSize,
+    hideErrorBars,
+    hideSourceColors,
   });
 };

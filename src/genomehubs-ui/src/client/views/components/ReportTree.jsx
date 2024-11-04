@@ -24,6 +24,8 @@ const ReportTree = ({
   pointSize,
   treeStyle,
   levels,
+  hideSourceColors,
+  hideErrorBars,
   minDim,
   setMinDim,
   basename,
@@ -183,6 +185,8 @@ const ReportTree = ({
         handleNavigation={handleNavigation}
         handleSearch={handleSearch}
         pointSize={pointSize}
+        hideSourceColors={hideSourceColors}
+        hideErrorBars={hideErrorBars}
       />
     );
   } else {
@@ -198,6 +202,8 @@ const ReportTree = ({
         gridRef={gridRef}
         hidePreview={hidePreview}
         pointSize={pointSize}
+        hideSourceColors={hideSourceColors}
+        hideErrorBars={hideErrorBars}
       />
     );
   }
