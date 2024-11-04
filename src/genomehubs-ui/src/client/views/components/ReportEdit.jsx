@@ -169,6 +169,8 @@ export const queryPropList = {
     { prop: "levels", label: "family, order, phylum" },
     "includeEstimates",
     "collapseMonotypic",
+    "hideSourceColors",
+    "hideErrorBars",
     "yOpts",
     "treeStyle",
     "treeThreshold",
@@ -532,6 +534,8 @@ export const ReportEdit = ({
       queryProp == "cumulative" ||
       queryProp == "reversed" ||
       queryProp == "collapseMonotypic" ||
+      queryProp == "hideSourceColors" ||
+      queryProp == "hideErrorBars" ||
       queryProp == "compactLegend" ||
       queryProp == "reorient" ||
       queryProp == "dropShadow" ||

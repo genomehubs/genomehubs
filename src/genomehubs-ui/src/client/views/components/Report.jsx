@@ -107,6 +107,8 @@ const Report = ({
     qs.parse(reportProps.queryString).pointSize * 1 ||
     15;
   reportProps.collapseMonotypic = props.collapseMonotypic;
+  reportProps.hideSourceColors = props.hideSourceColors;
+  reportProps.hideErrorBars = props.hideErrorBars;
   reportProps.highlight = props.highlight;
   reportProps.colorPalette = props.colorPalette;
   reportProps.excludeAncestral = props.excludeAncestral;

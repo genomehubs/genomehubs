@@ -12,6 +12,7 @@ import withTypes from "../hocs/withTypes";
 const ReportTreeRings = ({
   arcs,
   labels,
+  ticks,
   handleNavigation,
   handleSearch,
   width,
@@ -21,6 +22,8 @@ const ReportTreeRings = ({
   colorPalette,
   palettes,
   levels,
+  hideSourceColors,
+  hideErrorBars,
   cats,
 }) => {
   if (!arcs || arcs.length == 0) {
@@ -127,6 +130,47 @@ const ReportTreeRings = ({
           </g>
         </Tooltip>,
       );
+
+      if (!hideErrorBars && segment.valueBar) {
+        paths.push(
+          <path
+            key={`bar-${segment.taxon_id}`}
+            fill={color}
+            stroke={"none"}
+            d={segment.valueBar}
+            onPointerEnter={(e) => highlightSegment(segment)}
+            onPointerOut={(e) => highlightSegment()}
+            {...longPress()}
+          />,
+        );
+      }
+      if (segment.valueArc) {
+        paths.push(
+          <Tooltip
+            key={`value-${segment.taxon_id}`}
+            title={
+              <div>
+                <div>{segment.scientific_name}</div>
+                <div>{segment.valueLabel}</div>
+              </div>
+            }
+            arrow
+            enterDelay={500}
+            followCursor={true}
+          >
+            <path
+              fill={color}
+              stroke={color}
+              fillOpacity={0.5}
+              strokeOpacity={0.75}
+              d={segment.valueArc}
+              onPointerEnter={(e) => highlightSegment(segment)}
+              onPointerOut={(e) => highlightSegment()}
+              {...longPress()}
+            />
+          </Tooltip>,
+        );
+      }
     });
   }
 
@@ -141,6 +185,26 @@ const ReportTreeRings = ({
           fillOpacity={0.25}
           d={highlight.highlight}
         />
+        {highlight.valueArc && (
+          <path
+            fill={"white"}
+            strokeWidth={3}
+            stroke={highlight.highlightColor}
+            fillOpacity={0.5}
+            strokeOpacity={0.75}
+            d={highlight.valueArc}
+          />
+        )}
+        {highlight.valueBar && !hideErrorBars && (
+          <path
+            fill={"white"}
+            strokeWidth={3}
+            stroke={highlight.highlightColor}
+            fillOpacity={0.5}
+            strokeOpacity={0.75}
+            d={highlight.valueBar}
+          />
+        )}
       </g>
     );
   }
@@ -177,6 +241,64 @@ const ReportTreeRings = ({
     });
   }
 
+  let ticksText = [];
+  let tickRings = [];
+  if (ticks) {
+    ticks.forEach((tick, i) => {
+      ticksText.push(
+        <g key={tick.value}>
+          <text
+            fill={"#333333"}
+            style={{ pointerEvents: "none" }}
+            textAnchor="start"
+            alignmentBaseline="middle"
+            dominantBaseline="middle"
+            x={8}
+            y={tick.radius}
+          >
+            {tick.label}
+          </text>
+          <line
+            x1={0}
+            y1={tick.radius}
+            x2={5}
+            y2={tick.radius}
+            fill={"none"}
+            stroke={"#333333"}
+            strokeWidth={2}
+            strokeLinecap={"round"}
+          ></line>
+        </g>,
+      );
+      if (tick.arc) {
+        tickRings.push(
+          <path
+            key={tick.value}
+            fill={"none"}
+            stroke={"#999999"}
+            strokeWidth={1}
+            strokeDasharray={"2 4"}
+            strokeLinecap={"round"}
+            d={tick.arc}
+          />,
+        );
+      }
+    });
+    ticksText.push(
+      <line
+        key={"axis"}
+        x1={0}
+        y1={ticks[0].radius}
+        x2={0}
+        y2={ticks[ticks.length - 1].radius}
+        fill={"none"}
+        stroke={"#333333"}
+        strokeWidth={2}
+        strokeLinecap={"round"}
+      ></line>,
+    );
+  }
+
   return (
     <div
       style={{
@@ -203,8 +325,10 @@ const ReportTreeRings = ({
             fontSize: `${pointSize}px`,
           }}
         >
+          {tickRings}
           {paths}
           {text}
+          {ticksText}
           {highlightPath}
         </g>
       </svg>

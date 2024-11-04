@@ -100,6 +100,8 @@ const ReportItem = ({
   includeEstimates,
   includeDescendants,
   collapseMonotypic,
+  hideSourceColors,
+  hideErrorBars,
   highlight,
   colorPalette,
   excludeMissing,
@@ -467,6 +469,8 @@ const ReportItem = ({
             includeEstimates={includeEstimates}
             treeThreshold={treeThreshold}
             collapseMonotypic={collapseMonotypic}
+            hideSourceColors={hideSourceColors}
+            hideErrorBars={hideErrorBars}
             levels={levels}
             hidePreview={hideMessage}
             {...qs.parse(queryString)}
