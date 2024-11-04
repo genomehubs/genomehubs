@@ -243,7 +243,7 @@ const ReportTreeRings = ({
 
   let ticksText = [];
   let tickRings = [];
-  if (ticks) {
+  if (ticks && ticks.length > 0 && ticks[0].radius) {
     ticks.forEach((tick, i) => {
       ticksText.push(
         <g key={tick.value}>

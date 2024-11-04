@@ -343,20 +343,21 @@ export const processTreeRings = ({
       highlightColor,
       value,
       valueLabel: formats(value),
-      ...((!node.children || Object.keys(node.children).length == 0) && {
-        valueArc: arc()({
-          innerRadius: radius + 10,
-          outerRadius: radius + 10 + valueScale(value),
-          startAngle,
-          endAngle,
+      ...((!node.children || Object.keys(node.children).length == 0) &&
+        valueScale && {
+          valueArc: arc()({
+            innerRadius: radius + 10,
+            outerRadius: radius + 10 + valueScale(value),
+            startAngle,
+            endAngle,
+          }),
+          valueBar: arc()({
+            innerRadius: radius + 10 + Math.max(bar[1], 0),
+            outerRadius: radius + 10 + bar[2],
+            startAngle: midAngle - barAngle,
+            endAngle: midAngle + barAngle,
+          }),
         }),
-        valueBar: arc()({
-          innerRadius: radius + 10 + Math.max(bar[1], 0),
-          outerRadius: radius + 10 + bar[2],
-          startAngle: midAngle - barAngle,
-          endAngle: midAngle + barAngle,
-        }),
-      }),
       bar,
     });
 
