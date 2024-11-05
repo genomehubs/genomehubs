@@ -185,6 +185,7 @@ export const processTreeRings = ({
   pointSize,
   yBounds,
   hideErrorBars,
+  hideAncestralBars,
   hideSourceColors,
 }) => {
   if (!nodes) {
@@ -290,15 +291,17 @@ export const processTreeRings = ({
     });
     let bar = [];
     let scaledValue;
-    ({ scaledValue, bar } = setBar({
-      node,
-      value,
-      min,
-      max,
-      valueScale,
-      bar,
-      ratio: [1, 100],
-    }));
+    if (!hideAncestralBars || (source && !source.includes("ancestor"))) {
+      ({ scaledValue, bar } = setBar({
+        node,
+        value,
+        min,
+        max,
+        valueScale,
+        bar,
+        ratio: [1, 100],
+      }));
+    }
 
     if (
       !node.hasOwnProperty("children") ||
@@ -321,7 +324,6 @@ export const processTreeRings = ({
     let midAngle = (startAngle + endAngle) / 2;
     let barAngle =
       (Math.min(((cEnd - cStart) / cMax) * 360 * 0.25, 0.25) * Math.PI) / 180;
-
     arcs.push({
       ...node,
       arc: arc()({
@@ -344,7 +346,8 @@ export const processTreeRings = ({
       value,
       valueLabel: formats(value),
       ...((!node.children || Object.keys(node.children).length == 0) &&
-        valueScale && {
+        valueScale &&
+        scaledValue && {
           valueArc: arc()({
             innerRadius: radius + 10,
             outerRadius: radius + 10 + valueScale(value),
@@ -557,6 +560,7 @@ export const processTreePaths = ({
   yQuery,
   pointSize,
   hideErrorBars,
+  hideAncestralBars,
   hideSourceColors,
 }) => {
   if (!nodes) {
@@ -585,7 +589,7 @@ export const processTreePaths = ({
   if (yBounds && yBounds.domain && yBounds.type != "date") {
     valueScale = axisScales[yBounds.scale]()
       .domain(yBounds.domain)
-      .nice()
+      // .nice()
       .range([0, 100]);
     dataWidth = 120;
     targetWidth -= 120;
@@ -758,6 +762,9 @@ export const processTreePaths = ({
         : node.width,
     };
     locations[node.taxon_id.toLowerCase()] = { x: node.xStart, y: node.yStart };
+    if (hideAncestralBars && source && source.includes("ancestor")) {
+      bar = undefined;
+    }
     lines.push({
       ...node,
       hLine: d3line()([
@@ -817,6 +824,7 @@ export const processTree = ({
   treeStyle = "rect",
   pointSize = 15,
   hideErrorBars,
+  hideAncestralBars,
   hideSourceColors,
 }) => {
   if (treeStyle == "ring") {
@@ -828,6 +836,7 @@ export const processTree = ({
       yQuery,
       pointSize,
       hideErrorBars,
+      hideAncestralBars,
       hideSourceColors,
     });
   }
@@ -839,6 +848,7 @@ export const processTree = ({
     yQuery,
     pointSize,
     hideErrorBars,
+    hideAncestralBars,
     hideSourceColors,
   });
 };

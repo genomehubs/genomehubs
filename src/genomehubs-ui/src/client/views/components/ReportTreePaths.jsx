@@ -37,6 +37,7 @@ const ReportTreePaths = ({
   colorPalette,
   palettes,
   cats: catArray,
+  hideErrorBars,
 }) => {
   if (!lines || lines.length == 0) {
     return null;
@@ -303,57 +304,76 @@ const ReportTreePaths = ({
       let newErrorBars = [];
       let newCats = [];
       if (valueScale) {
-        let ticks = valueScale.ticks();
+        let tickMarks = valueScale.ticks();
+        let mid = tickMarks[Math.floor(tickMarks.length / 2)];
+        let ticks = [valueScale.domain()[0], mid, valueScale.domain()[1]];
+
         let top = charHeight + charHeight / 1.8;
         let tickLines = ticks.map((tick, i) => {
-          let end = i == 0 || i == ticks.length - 1;
+          let tickLabel = formats(tick);
+          let tickLabelLength = stringLength(tickLabel) * charHeight * 0.7;
+
           return (
-            <Line
-              key={`t-${tick}`}
-              points={[
-                valueScale(tick),
-                top - (end ? 3 : 0),
-                valueScale(tick),
-                plotHeight,
-              ]}
-              stroke={"grey"}
-              strokeWidth={end ? 1 : 0.5}
-              opacity={end ? 1 : 0.5}
-            />
+            <g>
+              <Line
+                key={`t-${tick}`}
+                points={[
+                  valueScale(tick),
+                  top - 3,
+                  valueScale(tick),
+                  plotHeight,
+                ]}
+                stroke={"#999999"}
+                strokeWidth={0.5}
+                dash={[2, 4]}
+              />
+
+              <Text
+                key={`tx-${tick}`}
+                x={valueScale(tick) - tickLabelLength / 2}
+                y={top - charHeight}
+                width={tickLabelLength}
+                fill={"#333333"}
+                fontSize={charHeight * 0.75}
+                textAlign={"center"}
+                textBaseline={"bottom"}
+                text={tickLabel}
+              />
+            </g>
           );
         });
-        let tick = ticks[0];
-        let tickLabel = formats(tick);
-        let tickLabelLength = stringLength(tickLabel) * charHeight * 0.7;
-        tickLines.push(
-          <Text
-            key={`tx-${tick}`}
-            x={-tickLabelLength / 2}
-            y={top - charHeight}
-            width={tickLabelLength}
-            fill={"grey"}
-            fontSize={charHeight * 0.75}
-            textAlign={"center"}
-            textBaseline={"bottom"}
-            text={tickLabel}
-          />,
-        );
-        tick = ticks[ticks.length - 1];
-        tickLabel = formats(tick);
-        tickLabelLength = stringLength(tickLabel) * charHeight * 0.6;
-        tickLines.push(
-          <Text
-            key={`tx-${tick}`}
-            x={valueScale(tick) - tickLabelLength / 2}
-            y={top - charHeight}
-            width={charHeight * 5}
-            fill={"grey"}
-            fontSize={charHeight * 0.75}
-            textAlign={"center"}
-            textBaseline={"bottom"}
-            text={tickLabel}
-          />,
-        );
+        // let tick = ticks[0];
+        // let tickLabel = formats(tick);
+        // let tickLabelLength = stringLength(tickLabel) * charHeight * 0.7;
+        // tickLines.push(
+        //   <Text
+        //     key={`tx-${tick}`}
+        //     x={-tickLabelLength / 2}
+        //     y={top - charHeight}
+        //     width={tickLabelLength}
+        //     fill={"#333333"}
+        //     fontSize={charHeight * 0.75}
+        //     textAlign={"center"}
+        //     textBaseline={"bottom"}
+        //     text={tickLabel}
+        //   />,
+        // );
+        // tick = ticks[ticks.length - 1];
+        // tickLabel = formats(tick);
+        // tickLabelLength = stringLength(tickLabel) * charHeight * 0.6;
+        // tickLines.push(
+        //   <Text
+        //     key={`tx-${tick}`}
+        //     x={valueScale(tick) - tickLabelLength / 2}
+        //     y={top - charHeight}
+        //     width={charHeight * 5}
+        //     fill={"#333333"}
+        //     fontSize={charHeight * 0.75}
+        //     textAlign={"center"}
+        //     textBaseline={"bottom"}
+        //     text={tickLabel}
+        //   />,
+        // );
         setValueTicks({ ticks, tickLines });
       }
       if (portionCache[portion]) {
@@ -674,10 +694,10 @@ const ReportTreePaths = ({
                         segment.yStart,
                         segment.bar[2],
                         segment.yStart,
-                        segment.bar[2],
-                        segment.yStart - charHeight / 4,
-                        segment.bar[2],
-                        segment.yStart + charHeight / 4,
+                        // segment.bar[2],
+                        // segment.yStart - charHeight / 4,
+                        // segment.bar[2],
+                        // segment.yStart + charHeight / 4,
                       ]}
                       stroke={segment.color}
                     />,
@@ -694,10 +714,10 @@ const ReportTreePaths = ({
                           segment.yStart,
                           segment.bar[1],
                           segment.yStart,
-                          segment.bar[1],
-                          segment.yStart - charHeight / 4,
-                          segment.bar[1],
-                          segment.yStart + charHeight / 4,
+                          // segment.bar[1],
+                          // segment.yStart - charHeight / 4,
+                          // segment.bar[1],
+                          // segment.yStart + charHeight / 4,
                         ]}
                         stroke={"white"}
                       />,
@@ -726,7 +746,9 @@ const ReportTreePaths = ({
       setRegions(newRegions);
       setConnectors(newConnectors);
       setBars(newBars);
-      setErrorBars(newErrorBars);
+      if (!hideErrorBars) {
+        setErrorBars(newErrorBars);
+      }
       setCats(newCats);
       if (newOverview.length > 0) {
         setOverview(newOverview);

@@ -102,6 +102,7 @@ const ReportItem = ({
   collapseMonotypic,
   hideSourceColors,
   hideErrorBars,
+  hideAncestralBars,
   highlight,
   colorPalette,
   excludeMissing,
@@ -471,6 +472,7 @@ const ReportItem = ({
             collapseMonotypic={collapseMonotypic}
             hideSourceColors={hideSourceColors}
             hideErrorBars={hideErrorBars}
+            hideAncestralBars={hideAncestralBars}
             levels={levels}
             hidePreview={hideMessage}
             {...qs.parse(queryString)}

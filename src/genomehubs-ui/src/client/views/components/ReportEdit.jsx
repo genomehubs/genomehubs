@@ -171,6 +171,7 @@ export const queryPropList = {
     "collapseMonotypic",
     "hideSourceColors",
     "hideErrorBars",
+    "hideAncestralBars",
     "yOpts",
     "treeStyle",
     "treeThreshold",
@@ -536,6 +537,7 @@ export const ReportEdit = ({
       queryProp == "collapseMonotypic" ||
       queryProp == "hideSourceColors" ||
       queryProp == "hideErrorBars" ||
+      queryProp == "hideAncestralBars" ||
       queryProp == "compactLegend" ||
       queryProp == "reorient" ||
       queryProp == "dropShadow" ||

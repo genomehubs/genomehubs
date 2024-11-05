@@ -24,6 +24,7 @@ const ReportTreeRings = ({
   levels,
   hideSourceColors,
   hideErrorBars,
+  hideAncestralBars,
   cats,
 }) => {
   if (!arcs || arcs.length == 0) {
