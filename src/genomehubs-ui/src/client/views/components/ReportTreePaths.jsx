@@ -314,9 +314,8 @@ const ReportTreePaths = ({
           let tickLabelLength = stringLength(tickLabel) * charHeight * 0.7;
 
           return (
-            <g>
+            <Group key={`t-${tick}`}>
               <Line
-                key={`t-${tick}`}
                 points={[
                   valueScale(tick),
                   top - 3,
@@ -339,7 +338,7 @@ const ReportTreePaths = ({
                 textBaseline={"bottom"}
                 text={tickLabel}
               />
-            </g>
+            </Group>
           );
         });
         // let tick = ticks[0];
