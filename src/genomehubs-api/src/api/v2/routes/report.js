@@ -444,6 +444,13 @@ export const arc = async ({
     : false;
   yParams.includeEstimates = zParams.includeEstimates;
 
+  let extraParams = {};
+  for (let [p, v] of Object.entries(apiParams)) {
+    if (p.match(/query[A-Z]$/)) {
+      extraParams[p] = v;
+    }
+  }
+
   if (rank) {
     x.split(/\s+(?:and|AND)\s+/).forEach((term) => {
       if (!term.match("tax_")) {
@@ -475,10 +482,10 @@ export const arc = async ({
   }
 
   zParams.fields = zFields;
-  let zCount = await getResultCount({ ...zParams });
+  let zCount = await getResultCount({ ...zParams, ...extraParams });
   let zQuery = { ...zParams };
   yParams.fields = yFields;
-  let yCount = await getResultCount({ ...yParams });
+  let yCount = await getResultCount({ ...yParams, ...extraParams });
   let yQuery = { ...yParams };
 
   if (zFields.length > 0) {
@@ -492,7 +499,7 @@ export const arc = async ({
   yParams.excludeDescendant = apiParams.excludeDescendant || [];
   yParams.excludeAncestral = apiParams.excludeAncestral || [];
   yParams.excludeMissing = apiParams.excludeMissing || [];
-  let xCount = await getResultCount({ ...yParams });
+  let xCount = await getResultCount({ ...yParams, ...extraParams });
   let xQuery = yParams;
   if (yFields.length > 0) {
     xQuery.fields = yFields.join(",");

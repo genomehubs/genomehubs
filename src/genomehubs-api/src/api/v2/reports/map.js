@@ -37,6 +37,7 @@ const getMap = async ({
   mapThreshold = 1000,
   taxonomy,
   req,
+  apiParams,
 }) => {
   let { lookupTypes } = await attrTypes({ result, taxonomy });
   // let field = yFields[0] || fields[0];
@@ -49,6 +50,11 @@ const getMap = async ({
     fields,
     exclusions,
   };
+  for (let [p, v] of Object.entries(apiParams)) {
+    if (p.match(/query[A-Z]$/)) {
+      xQuery[p] = v;
+    }
+  }
   if (bounds.cat) {
     if (bounds.by == "attribute") {
       if (!bounds.showOther) {
@@ -303,6 +309,7 @@ export const map = async ({
         queryId: apiParams.queryId,
         req,
         taxonomy,
+        apiParams,
       });
   if (map && map.status && map.status.success == false) {
     status = { ...map.status };

@@ -112,6 +112,11 @@ export const getBounds = async ({
   }
   let { lookupTypes } = await attrTypes({ result, taxonomy });
   params.size = 0;
+  for (let [p, v] of Object.entries(apiParams)) {
+    if (p.match(/query[A-Z]$/)) {
+      params[p] = v;
+    }
+  }
   params.query = await chainQueries(params);
   // find max and min plus most frequent categories
   let fieldMeta = lookupTypes(fields[0]);

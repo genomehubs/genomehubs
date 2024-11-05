@@ -61,6 +61,11 @@ const getLCA = async ({
     },
   };
   let { query } = params;
+  for (let [p, v] of Object.entries(apiParams)) {
+    if (p.match(/query[A-Z]$/)) {
+      params[p] = v;
+    }
+  }
   let maxDepth;
   let taxon;
   if (query) {
@@ -382,6 +387,7 @@ const getTree = async ({
   taxonomy,
   collapseMonotypic,
   req,
+  apiParams,
 }) => {
   cat = undefined;
   let { lookupTypes } = await attrTypes({ result, taxonomy });
@@ -394,6 +400,7 @@ const getTree = async ({
     fields,
     taxonomy,
     exclusions,
+    apiParams,
   });
   exclusions.missing = [...new Set(exclusions.missing.concat(xFields))];
   if (treeThreshold > -1 && lca.count > treeThreshold) {
@@ -453,6 +460,11 @@ const getTree = async ({
   if (!xQuery.query) {
     xQuery.query = xQuery.x;
   }
+  for (let [p, v] of Object.entries(apiParams)) {
+    if (p.match(/query[A-Z]$/)) {
+      xQuery[p] = v;
+    }
+  }
   if (queryId) {
     setProgress(queryId, { total: lca.count });
   }
@@ -473,6 +485,11 @@ const getTree = async ({
     yParams.excludeMissing = [...new Set(yParams.excludeMissing)];
     yParams.excludeUnclassified = true;
     exclusions = setExclusions(yParams);
+    for (let [p, v] of Object.entries(apiParams)) {
+      if (p.match(/query[A-Z]$/)) {
+        yParams[p] = v;
+      }
+    }
     yRes = await getResults({
       ...yParams,
       taxonomy,
@@ -717,6 +734,7 @@ export const tree = async ({
         collapseMonotypic: apiParams.collapseMonotypic,
         req,
         taxonomy,
+        apiParams,
       });
   if (tree && tree.status && tree.status.success == false) {
     status = { ...tree.status };

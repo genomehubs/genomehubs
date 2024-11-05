@@ -29,7 +29,7 @@ export const filterTaxa = ({
             let source;
 
             if (term.match(":")) {
-              [source, term] = term.split(":");
+              [source, term] = term.split(/\s*:\s*/);
               should = [
                 {
                   match: {
