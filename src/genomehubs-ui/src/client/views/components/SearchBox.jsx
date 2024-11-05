@@ -190,7 +190,6 @@ const SearchBox = ({
     e && e.preventDefault();
     const { index } = props;
     let term = searchInputRef.current.value;
-    console.log(term);
     doSearch(term, index || result, term);
   };
 

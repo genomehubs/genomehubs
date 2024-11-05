@@ -57,6 +57,8 @@ const SearchInputQuery = ({
             inputClassName={"inputQuery"}
             inputValue={value}
             setInputValue={handleValueChange}
+            onBlur={(e) => handleValueChange(e.target.value)}
+            handleSubmit={(e) => handleValueChange(e.target.value)}
             inputRef={inputRef}
             inputLabel={id}
             inputName={id}
