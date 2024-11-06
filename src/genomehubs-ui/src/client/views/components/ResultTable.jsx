@@ -70,17 +70,17 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow);
 
-const StyledBadge = withStyles((theme) => ({
-  badge: {
+const StyledBadge = styled(Badge)((theme) => ({
+  "& .MuiBadge-badge": {
     right: "50%",
-    top: 6,
+    top: 2,
     fontSize: "0.8em",
     border: "2px solid white",
     padding: "0px 4px",
     color: "white",
     backgroundColor: "rgba(0,0,0,0.26)",
   },
-}))(Badge);
+}));
 
 export const useStyles = makeStyles((theme) => ({
   root: {
@@ -1079,18 +1079,55 @@ const ResultTable = ({
             value = formatter(value, searchIndex, "array");
             let charLimit = 20;
             for (let v of value.values) {
+              let description;
+              if (
+                type.rest &&
+                type.rest.value_metadata &&
+                type.rest.value_metadata[v[0].toLowerCase()]
+              ) {
+                ({ description } =
+                  type.rest.value_metadata[v[0].toLowerCase()]);
+              }
               let entry = v[0];
               if (charLimit == 20 || charLimit - entry.length > 0) {
-                entries.push(entry);
+                if (description) {
+                  entries.push(
+                    <Tooltip title={description} key={entry}>
+                      <span>{entry}</span>
+                    </Tooltip>,
+                  );
+                } else {
+                  entries.push(<span key={entry}>{entry}</span>);
+                }
+                entries.push(<span key={`sep-${entry}`}>, </span>);
                 charLimit -= entry.length;
               }
             }
-            value = entries.join(", ");
+            if (entries.length > 0) {
+              entries.pop();
+            }
+            value = entries;
             if (field.value.length > 1) {
               length = field.value.length;
             }
           } else {
+            let description;
+            if (
+              type.rest &&
+              type.rest.value_metadata &&
+              type.rest.value_metadata[value.toLowerCase()]
+            ) {
+              ({ description } = type.rest.value_metadata[value.toLowerCase()]);
+            }
+
             value = formatter(value, searchIndex);
+            if (description) {
+              value = (
+                <Tooltip title={description} key={value}>
+                  <span>{value}</span>
+                </Tooltip>
+              );
+            }
           }
           if (
             type.summary == "value" &&
