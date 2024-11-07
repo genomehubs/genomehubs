@@ -138,7 +138,7 @@ const setColor = ({ node, yQuery, recurse, hideSourceColors }) => {
     color = "white";
     highlightColor = "white";
   } else if (yQuery) {
-    let status = node.status ? 1 : hideSourceColors ? 5 : 0;
+    let status = node.status ? 2 : hideSourceColors || !node.fields ? 2 : 1;
     if (node.fields && node.fields[field]) {
       source = node.fields[field].source;
       value = node.fields[field].value;
@@ -146,7 +146,11 @@ const setColor = ({ node, yQuery, recurse, hideSourceColors }) => {
       max = node.fields[field].max;
     }
     // color = greys[baseTone + status];
-    color = hideSourceColors ? greys[baseTone + status] : ancestralColor;
+
+    color =
+      hideSourceColors || !node.fields || node.taxon_rank == "assembly"
+        ? greys[baseTone + status]
+        : ancestralColor;
     highlightColor = greys[baseTone + 1 + status];
 
     if (!hideSourceColors && source == "direct") {
@@ -470,7 +474,9 @@ export const processTreeRings = ({
     depth: -1,
     recurse: false,
   });
-  drawArcs({ node: treeNodes[rootNode] });
+  if (treeNodes[rootNode]) {
+    drawArcs({ node: treeNodes[rootNode] });
+  }
   return {
     arcs,
     labels,

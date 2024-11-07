@@ -153,7 +153,7 @@ const getLCA = async ({
     lca = {
       taxon_id,
       count: bucket.doc_count,
-      maxDepth,
+      maxDepth: result == "taxon" ? maxDepth : maxDepth + 1,
       minDepth,
       parent,
     };
@@ -187,6 +187,7 @@ const addXResultsToTree = async ({
   queryId,
   taxonomy,
   catRank,
+  index,
 }) => {
   let isParentNode = {};
   let lineages = {};
@@ -225,21 +226,56 @@ const addXResultsToTree = async ({
       }
       continue;
     } else {
-      let { taxon_rank, scientific_name, parent, lineage } = result.result;
+      let { assembly_id, taxon_rank, scientific_name, parent, lineage } =
+        result.result;
 
-      treeNodes[taxonId] = {
-        count: 0,
-        children: {},
-        taxon_id: taxonId,
-        scientific_name,
-        taxon_rank,
-        ...(treeFields && { fields: treeFields }),
-        ...(catRank && taxon_rank == catRank && { cat: taxonId }),
-      };
-      isParentNode[parent] = true;
-      lineages[taxonId] = lineage;
+      if (!treeNodes[taxonId]) {
+        treeNodes[taxonId] = {
+          count: 0,
+          children: {},
+          taxon_id: taxonId,
+          scientific_name,
+          taxon_rank,
+          ...(index == "taxon" && treeFields && { fields: treeFields }),
+          ...(catRank && taxon_rank == catRank && { cat: taxonId }),
+        };
+        isParentNode[parent] = true;
+        lineages[taxonId] = [
+          ...lineage.map((obj) => ({ ...obj, node_depth: obj.node_depth + 1 })),
+        ];
+      }
+
+      if (assembly_id) {
+        treeNodes[taxonId].children = {
+          ...treeNodes[taxonId].children,
+          [assembly_id]: true,
+        };
+        isParentNode[taxonId] = true;
+        treeNodes[taxonId].count += 1;
+        treeNodes[taxonId].hasAssemblies = true;
+        treeNodes[assembly_id] = {
+          count: 1,
+          children: {},
+          taxon_id: assembly_id,
+          scientific_name: assembly_id,
+          taxon_rank: "assembly",
+          ...(treeFields && { fields: treeFields }),
+          ...(catRank && taxon_rank == catRank && { cat: taxonId }),
+        };
+        // isParentNode[taxonId] = true;
+        lineages[assembly_id] = [
+          {
+            taxon_id: assembly_id,
+            taxon_rank: "assembly",
+            scientific_name: assembly_id,
+            node_depth: 0,
+          },
+          ...lineage.map((obj) => ({ ...obj, node_depth: obj.node_depth + 1 })),
+        ];
+      }
     }
   }
+
   if (update) {
     return;
   }
@@ -263,9 +299,10 @@ const addXResultsToTree = async ({
     let taxonId = result.result.taxon_id;
     let child = taxonId;
     let { status } = treeNodes[taxonId];
+
     let descIds = [child];
-    if (!isParentNode[taxonId]) {
-      treeNodes[child].count = 1;
+    if (!isParentNode[taxonId] || treeNodes[taxonId].hasAssemblies) {
+      treeNodes[child].count = treeNodes[child].count || 1;
       if (lineages[taxonId]) {
         for (let ancestor of lineages[taxonId]) {
           let ancestorId = ancestor.taxon_id;
@@ -277,7 +314,7 @@ const addXResultsToTree = async ({
           }
           descIds.push(ancestorId);
           if (status) {
-            ancStatus.add(ancestorId);
+            // ancStatus.add(ancestorId);
           }
           if (!treeNodes[ancestorId]) {
             missingIds.add(ancestorId);
@@ -332,6 +369,7 @@ const addXResultsToTree = async ({
         ancStatus,
         queryId,
         taxonomy,
+        index,
       });
       x += chunkSize;
       setProgress(queryId, { x });
@@ -401,6 +439,7 @@ const getTree = async ({
     taxonomy,
     exclusions,
     apiParams,
+    result,
   });
   exclusions.missing = [...new Set(exclusions.missing.concat(xFields))];
   if (treeThreshold > -1 && lca.count > treeThreshold) {
@@ -516,6 +555,7 @@ const getTree = async ({
     queryId,
     taxonomy,
     catRank,
+    index: result,
   });
 
   if (
