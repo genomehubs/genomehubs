@@ -272,6 +272,13 @@ const addXResultsToTree = async ({
           },
           ...lineage.map((obj) => ({ ...obj, node_depth: obj.node_depth + 1 })),
         ];
+        if (catRank) {
+          for (let node of lineage) {
+            if (node.taxon_rank == catRank) {
+              treeNodes[assembly_id].cat = node.taxon_id;
+            }
+          }
+        }
       }
     }
   }
@@ -301,9 +308,11 @@ const addXResultsToTree = async ({
     let { status } = treeNodes[taxonId];
 
     let descIds = [child];
+    console.log(taxonId);
     if (!isParentNode[taxonId] || treeNodes[taxonId].hasAssemblies) {
       treeNodes[child].count = treeNodes[child].count || 1;
       if (lineages[taxonId]) {
+        console.log({ taxonId });
         for (let ancestor of lineages[taxonId]) {
           let ancestorId = ancestor.taxon_id;
           if (ancestorId == child) {
