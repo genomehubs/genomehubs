@@ -47,7 +47,13 @@ const SearchBox = ({
   const searchBoxRef = useRef(null);
   const rootRef = useRef(null);
   const searchInputRef = useRef(null);
-  const savedOptions = useReadLocalStorage(`${searchIndex}Options`);
+
+  const allOptions = {
+    taxon: useReadLocalStorage(`taxonOptions`) || {},
+    assembly: useReadLocalStorage(`assemblyOptions`) || {},
+    sample: useReadLocalStorage(`sampleOptions`) || {},
+    feature: useReadLocalStorage(`featureOptions`) || {},
+  };
   let [multiline, setMultiline] = useState(() => {
     if (searchTerm && searchTerm.query && searchTerm.query.match(/[\r\n]/)) {
       return true;
@@ -79,32 +85,37 @@ const SearchBox = ({
     toggleTemplate = (e) => setShowSearchBox(!showSearchBox);
   }
 
-  let fields =
-    // searchTerm.fields ||
-    savedOptions?.fields?.join(",") || searchDefaults.fields;
-  let ranks =
-    searchTerm.ranks || savedOptions?.ranks?.join(",") || searchDefaults.ranks;
-  let names =
-    searchTerm.names || savedOptions?.names?.join(",") || searchDefaults.names;
-
   const dispatchSearch = (searchOptions, term) => {
     let options = { ...searchTerm, ...searchOptions };
     if (!options.hasOwnProperty("includeEstimates")) {
       options.includeEstimates = searchDefaults.includeEstimates;
     }
-    // if (!options.hasOwnProperty("summaryValues")) {
-    //   options.summaryValues = "count";
-    // }
-    console.log("dispatchSearch", options);
-    if (!options.hasOwnProperty("fields")) {
+
+    let savedOptions = allOptions[options.result];
+
+    let fields = savedOptions?.fields?.join(",") || searchDefaults.fields;
+    let ranks = savedOptions?.ranks?.join(",") || searchDefaults.ranks;
+    let names = savedOptions?.names?.join(",") || searchDefaults.names;
+
+    if (
+      !options.hasOwnProperty("fields") ||
+      searchTerm.result != searchOptions.result
+    ) {
       options.fields = fields;
     }
-    if (!options.hasOwnProperty("ranks")) {
+    if (
+      !options.hasOwnProperty("ranks") ||
+      searchTerm.result != searchOptions.result
+    ) {
       options.ranks = ranks;
     }
-    if (!options.hasOwnProperty("names")) {
+    if (
+      !options.hasOwnProperty("names") ||
+      searchTerm.result != searchOptions.result
+    ) {
       options.names = names;
     }
+
     options.taxonomy = taxonomy;
     if (!options.size && savedOptions?.size) {
       options.size = savedOptions.size;
@@ -180,6 +191,11 @@ const SearchBox = ({
       (a, el) => ({ ...a, [el.name]: el.value }),
       {},
     );
+
+    let savedOptions = allOptions[options.result];
+    let fields =
+      // searchTerm.fields ||
+      savedOptions?.fields?.join(",") || searchDefaults.fields;
     dispatchSearch(
       { query: queryString, ...inputQueries, result, fields },
       hashTerm,
