@@ -68,6 +68,9 @@ const SearchTips = ({
 
   const location = useLocation();
   const navigate = useNavigate();
+  const fuzzyOpts = {
+    threshold: 0.8,
+  };
   let options = qs.parse(location.search.replace(/^\?/, ""));
   if (!options.query) {
     return null;
@@ -128,7 +131,7 @@ const SearchTips = ({
       let [key, value] = queryParts[i].split(/\s*[<>!=]\s*/);
       key = key.replace("!", "");
       if (!types.hasOwnProperty(key)) {
-        let valid_keys = didYouMean(key, Object.keys(types));
+        let valid_keys = didYouMean(key, Object.keys(types), fuzzyOpts) || [];
         if (typeof valid_keys == "string") {
           valid_keys = [valid_keys];
         }
@@ -167,7 +170,11 @@ const SearchTips = ({
         for (let v of value.split(/\s*,\s*/)) {
           v = v.replace(/['"!]/g, "");
           if (!types[key].constraint.enum.includes(v)) {
-            let valid_values = didYouMean(v, types[key].constraint.enum);
+            let valid_values = didYouMean(
+              v,
+              types[key].constraint.enum,
+              fuzzyOpts,
+            );
             if (typeof valid_values == "string") {
               valid_values = [valid_values];
             }
