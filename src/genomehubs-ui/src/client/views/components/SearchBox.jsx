@@ -137,7 +137,8 @@ const SearchBox = ({
       result == "taxon" &&
       !term.match(/[\(\)<>=]/) &&
       !types[term] &&
-      !synonyms[term]
+      !synonyms[term] &&
+      term > ""
     ) {
       term = `${taxWrap}(${term})`;
     }

@@ -4,6 +4,7 @@ import { link as linkStyle, pageTitle as pageTitleStyle } from "./Styles.scss";
 import Grid from "@mui/material/Grid2";
 import SearchBox from "./SearchBox";
 import SearchHeaderButtons from "./SearchHeaderButtons";
+import SearchTips from "./SearchTips";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchColors from "../hocs/dispatchColors";
@@ -137,6 +138,7 @@ const Page = ({
     });
   }
   let title;
+  let searchTips;
 
   if (recordId && result) {
     title = `${result} record ${recordId}`;
@@ -144,8 +146,14 @@ const Page = ({
     title = `${fieldId} summary`;
   } else if (resultCount >= 0) {
     title = `${resultCount} ${resultCount == 1 ? "hit" : "hits"}`;
+    if (resultCount == 0) {
+      searchTips = <SearchTips />;
+    }
   } else if (resultCount < 0) {
     title = `updating search results...`;
+  } else {
+    title = `no search results`;
+    searchTips = <SearchTips />;
   }
   return (
     <Grid
@@ -256,6 +264,7 @@ const Page = ({
           </Grid>
         </Grid>
       )}
+      {searchTips && <Grid className={itemCss}>{searchTips}</Grid>}
       {postSearchItems}
       {text && <Grid className={itemCss}>{text}</Grid>}
     </Grid>

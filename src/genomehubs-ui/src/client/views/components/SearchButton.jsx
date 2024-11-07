@@ -25,7 +25,7 @@ const SearchButton = ({
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
   const [selectedIndex, setSelectedIndex] = React.useState(
-    options.indexOf(searchIndex)
+    options.indexOf(searchIndex),
   );
 
   const handleMenuItemClick = (e, index) => {
@@ -33,7 +33,7 @@ const SearchButton = ({
     setSelectedIndex(index);
     setSearchIndex(options[index]);
     resetSearch();
-    // handleClick(e, { index: options[index] });
+    handleClick(e, { index: options[index] });
     setOpen(false);
   };
 

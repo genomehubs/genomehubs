@@ -30,7 +30,7 @@ import store from "../store";
 export function fetchSearchResults(options, navigate) {
   let params = structuredClone(options);
   return async function (dispatch) {
-    if (!params.hasOwnProperty("query")) {
+    if (!params.hasOwnProperty("query") || params.query == "") {
       dispatch(cancelSearch);
     }
     const state = store.getState();

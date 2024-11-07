@@ -451,7 +451,6 @@ export const AutoCompleteInput = ({
   };
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      console.log(multiline);
       if (e.shiftKey) {
         e.preventDefault();
         setInValue(`${inputRef.current.value},`);
