@@ -148,7 +148,9 @@ const setColor = ({ node, yQuery, recurse, hideSourceColors }) => {
     // color = greys[baseTone + status];
 
     color =
-      hideSourceColors || !node.fields || node.taxon_rank == "assembly"
+      hideSourceColors ||
+      !node.fields ||
+      ["assembly", "sample"].includes(node.taxon_rank)
         ? greys[baseTone + status]
         : ancestralColor;
     highlightColor = greys[baseTone + 1 + status];

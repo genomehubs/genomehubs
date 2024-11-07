@@ -80,9 +80,8 @@ const SearchBox = ({
   }
 
   let fields =
-    searchTerm.fields ||
-    savedOptions?.fields?.join(",") ||
-    searchDefaults.fields;
+    // searchTerm.fields ||
+    savedOptions?.fields?.join(",") || searchDefaults.fields;
   let ranks =
     searchTerm.ranks || savedOptions?.ranks?.join(",") || searchDefaults.ranks;
   let names =
@@ -96,6 +95,7 @@ const SearchBox = ({
     // if (!options.hasOwnProperty("summaryValues")) {
     //   options.summaryValues = "count";
     // }
+    console.log("dispatchSearch", options);
     if (!options.hasOwnProperty("fields")) {
       options.fields = fields;
     }

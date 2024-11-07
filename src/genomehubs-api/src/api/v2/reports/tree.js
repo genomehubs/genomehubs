@@ -226,8 +226,14 @@ const addXResultsToTree = async ({
       }
       continue;
     } else {
-      let { assembly_id, taxon_rank, scientific_name, parent, lineage } =
-        result.result;
+      let {
+        assembly_id,
+        sample_id,
+        taxon_rank,
+        scientific_name,
+        parent,
+        lineage,
+      } = result.result;
 
       if (!treeNodes[taxonId]) {
         treeNodes[taxonId] = {
@@ -245,29 +251,30 @@ const addXResultsToTree = async ({
         ];
       }
 
-      if (assembly_id) {
+      if (assembly_id || sample_id) {
         treeNodes[taxonId].children = {
           ...treeNodes[taxonId].children,
-          [assembly_id]: true,
+          [assembly_id || sample_id]: true,
         };
         isParentNode[taxonId] = true;
         treeNodes[taxonId].count += 1;
-        treeNodes[taxonId].hasAssemblies = true;
-        treeNodes[assembly_id] = {
+        treeNodes[taxonId].hasAssemblies = !!assembly_id;
+        treeNodes[taxonId].hasSamples = !!sample_id;
+        treeNodes[assembly_id || sample_id] = {
           count: 1,
           children: {},
-          taxon_id: assembly_id,
-          scientific_name: assembly_id,
-          taxon_rank: "assembly",
+          taxon_id: assembly_id || sample_id,
+          scientific_name: assembly_id || sample_id,
+          taxon_rank: assembly_id ? "assembly" : "sample",
           ...(treeFields && { fields: treeFields }),
           ...(catRank && taxon_rank == catRank && { cat: taxonId }),
         };
         // isParentNode[taxonId] = true;
-        lineages[assembly_id] = [
+        lineages[assembly_id || sample_id] = [
           {
-            taxon_id: assembly_id,
-            taxon_rank: "assembly",
-            scientific_name: assembly_id,
+            taxon_id: assembly_id || sample_id,
+            taxon_rank: assembly_id ? "assembly" : "sample",
+            scientific_name: assembly_id || sample_id,
             node_depth: 0,
           },
           ...lineage.map((obj) => ({ ...obj, node_depth: obj.node_depth + 1 })),
@@ -275,7 +282,7 @@ const addXResultsToTree = async ({
         if (catRank) {
           for (let node of lineage) {
             if (node.taxon_rank == catRank) {
-              treeNodes[assembly_id].cat = node.taxon_id;
+              treeNodes[assembly_id || sample_id].cat = node.taxon_id;
             }
           }
         }
@@ -308,11 +315,13 @@ const addXResultsToTree = async ({
     let { status } = treeNodes[taxonId];
 
     let descIds = [child];
-    console.log(taxonId);
-    if (!isParentNode[taxonId] || treeNodes[taxonId].hasAssemblies) {
+    if (
+      !isParentNode[taxonId] ||
+      treeNodes[taxonId].hasAssemblies ||
+      treeNodes[taxonId].hasSamples
+    ) {
       treeNodes[child].count = treeNodes[child].count || 1;
       if (lineages[taxonId]) {
-        console.log({ taxonId });
         for (let ancestor of lineages[taxonId]) {
           let ancestorId = ancestor.taxon_id;
           if (ancestorId == child) {

@@ -33,7 +33,7 @@ const SearchButton = ({
     setSelectedIndex(index);
     setSearchIndex(options[index]);
     resetSearch();
-    handleClick(e, { index: options[index] });
+    handleClick(e, { index: options[index], fields: "" });
     setOpen(false);
   };
 
