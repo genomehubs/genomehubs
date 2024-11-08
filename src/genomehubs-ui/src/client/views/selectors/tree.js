@@ -315,7 +315,7 @@ export const processTreeRings = ({
     ) {
       outer = maxDepth + 1;
     }
-    let innerRadius = rScale(depth);
+    let innerRadius = rScale(Math.max(depth, -0.5));
     let outerRadius = rScale(outer);
     let farOuterRadius = rScale(maxDepth + 1);
     let cStart = start;
