@@ -307,9 +307,9 @@ const ReportTreeRings = ({
     if (!taxonId) {
       continue;
     }
-    let { x, y, angle, scientificName, width, height } = opts;
+    let { x, y, angle, scientificName, width, height, arc } = opts;
     phylopicElements.push(
-      <g key={taxonId} transform={`translate(${x}, ${y}) rotate(${angle})`}>
+      <g key={taxonId}>
         <Phylopics
           taxonId={taxonId}
           scientificName={scientificName}
@@ -319,6 +319,7 @@ const ReportTreeRings = ({
           showAncestral={false}
           sourceColors={false}
           embed={true}
+          transform={`translate(${x}, ${y}) rotate(${angle})`}
         />
       </g>,
     );

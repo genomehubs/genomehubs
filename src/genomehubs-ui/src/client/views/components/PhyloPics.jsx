@@ -36,6 +36,7 @@ const PhyloPics = ({
   maxWidth,
   fixedRatio,
   embed,
+  transform,
   ...props
 }) => {
   const [metadata, setMetadata] = useState({});
@@ -151,13 +152,30 @@ const PhyloPics = ({
   }
   if (embed) {
     return (
-      <image
-        x={-maxWidth / 2}
-        y={-maxHeight / 2}
-        height={maxHeight}
-        width={maxWidth}
-        xlinkHref={fileUrl}
-      />
+      <g transform={transform}>
+        <image
+          x={-maxWidth / 2}
+          y={-maxHeight / 2}
+          height={maxHeight}
+          width={maxWidth}
+          xlinkHref={fileUrl}
+        />
+        <Tooltip
+          title={imageDescription}
+          arrow
+          enterDelay={500}
+          disableInteractive={false}
+        >
+          <rect
+            fill={"rgba(255,255,255,0)"}
+            stroke={"none"}
+            x={-maxWidth / 2}
+            y={-maxHeight / 2}
+            height={maxHeight}
+            width={maxWidth}
+          />
+        </Tooltip>
+      </g>
     );
   }
   return (

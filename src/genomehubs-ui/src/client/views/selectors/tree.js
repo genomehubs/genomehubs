@@ -351,6 +351,12 @@ export const processTreeRings = ({
           scientificName: node.scientific_name,
           width,
           height,
+          arc: arc()({
+            innerRadius: radius + dataWidth,
+            outerRadius: radius + dataWidth + phylopicWidth,
+            startAngle,
+            endAngle,
+          }),
           ...circleXY(r, midAngle),
         };
       }
