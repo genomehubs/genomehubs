@@ -103,6 +103,7 @@ const ReportItem = ({
   hideSourceColors,
   hideErrorBars,
   hideAncestralBars,
+  showPhyloPics,
   highlight,
   colorPalette,
   excludeMissing,
@@ -473,6 +474,7 @@ const ReportItem = ({
             hideSourceColors={hideSourceColors}
             hideErrorBars={hideErrorBars}
             hideAncestralBars={hideAncestralBars}
+            showPhylopics={showPhyloPics}
             levels={levels}
             hidePreview={hideMessage}
             {...qs.parse(queryString)}

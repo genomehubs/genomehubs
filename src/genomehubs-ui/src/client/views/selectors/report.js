@@ -57,6 +57,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     hideSourceColors: { in: new Set(["tree"]), ui: true },
     hideErrorBars: { in: new Set(["tree"]), ui: true },
     hideAncestralBars: { in: new Set(["tree"]), ui: true },
+    showPhylopics: { in: new Set(["tree"]), ui: true },
     highlight: { in: new Set(["table"]), ui: true },
     colorPalette: { not: new Set(["sources"]), ui: true },
     includeEstimates: true,
@@ -701,7 +702,8 @@ const processReport = (report, { searchTerm = {} }) => {
     if (!searchTerm) {
       searchTerm = qs.parse(window.location.search.replace(/^\?/, ""));
     }
-    let { hideErrorBars, hideAncestralBars, hideSourceColors } = searchTerm;
+    let { hideErrorBars, hideAncestralBars, hideSourceColors, showPhylopics } =
+      searchTerm;
     return {
       ...report,
       report: {
@@ -719,6 +721,7 @@ const processReport = (report, { searchTerm = {} }) => {
             hideErrorBars,
             hideAncestralBars,
             hideSourceColors,
+            showPhylopics,
           }),
         },
       },

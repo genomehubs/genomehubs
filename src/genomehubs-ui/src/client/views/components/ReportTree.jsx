@@ -27,6 +27,7 @@ const ReportTree = ({
   hideSourceColors,
   hideErrorBars,
   hideAncestralBars,
+  showPhyloPics,
   minDim,
   setMinDim,
   basename,
@@ -189,6 +190,7 @@ const ReportTree = ({
         hideSourceColors={hideSourceColors}
         hideErrorBars={hideErrorBars}
         hideAncestralBars={hideAncestralBars}
+        showPhylopics={showPhyloPics}
       />
     );
   } else {
@@ -207,6 +209,7 @@ const ReportTree = ({
         hideSourceColors={hideSourceColors}
         hideErrorBars={hideErrorBars}
         hideAncestralBars={hideAncestralBars}
+        showPhylopics={showPhyloPics}
       />
     );
   }

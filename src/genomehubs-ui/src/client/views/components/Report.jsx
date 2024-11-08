@@ -110,6 +110,7 @@ const Report = ({
   reportProps.hideSourceColors = props.hideSourceColors;
   reportProps.hideErrorBars = props.hideErrorBars;
   reportProps.hideAncestralBars = props.hideAncestralBars;
+  reportProps.showPhylopics = props.showPhylopics;
   reportProps.highlight = props.highlight;
   reportProps.colorPalette = props.colorPalette;
   reportProps.excludeAncestral = props.excludeAncestral;

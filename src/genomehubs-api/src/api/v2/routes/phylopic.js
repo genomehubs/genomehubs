@@ -1,0 +1,105 @@
+import { getRecordsById } from "../functions/getRecordsById.js";
+import { logError } from "../functions/logger.js";
+
+let phylopics = {};
+
+const fetchPhylopic = async ({ taxonId, lineage, rank, scientificName }) => {
+  if (phylopics[taxonId]) {
+    return phylopics[taxonId];
+  }
+
+  const resolveByTaxId = async ({ taxonId, lineage, rank, scientificName }) => {
+    let taxIdList = [];
+    let ranks = {};
+    lineage.forEach((taxon) => {
+      taxIdList.push(taxon.taxon_id);
+      ranks[taxon.taxon_id] = taxon.taxon_rank;
+    });
+    let response = await fetch(
+      `https://api.phylopic.org/resolve/ncbi.nlm.nih.gov/taxid?objectIDs=${encodeURIComponent(
+        [taxonId, ...taxIdList].join(",")
+      )}`
+    );
+    let json = await response.json();
+    let { href, title } = json._links.primaryImage || {};
+    let external = (json._links.external || []).find((link) =>
+      link.href.includes("ncbi.nlm.nih.gov/taxid")
+    );
+    let validRank =
+      ranks[external.href.split("/")[4].replace(/\?.+/, "")] || rank;
+    if (href) {
+      let nodeResponse = await fetch(`https://api.phylopic.org/${href}`);
+      let nodeJson = await nodeResponse.json();
+
+      let { _links, attribution, uuid } = nodeJson;
+      let { rasterFiles, contributor, license = "", specificNode } = _links;
+      if (rasterFiles) {
+        let rasterFile =
+          rasterFiles.length > 1 ? rasterFiles[1] : rasterFiles[0];
+        let [width, height] = rasterFile.sizes.split("x");
+
+        let response = {
+          taxonId,
+          fileUrl: rasterFile.href,
+          ratio: width / height,
+          attribution,
+          license,
+          contributor,
+          imageName: specificNode.title,
+          sourceUrl: `https://www.phylopic.org/images/${uuid}/`,
+          imageRank: validRank,
+        };
+        if (
+          scientificName == specificNode.title ||
+          (validRank.endsWith("species") && validRank == rank)
+        ) {
+          response.source = "Primary";
+        } else {
+          response.source = validRank == rank ? "Descendant" : "Ancestral";
+        }
+        return { status: { success: true }, phylopic: response };
+      } else {
+        return { status: { success: false, error: "no files" } };
+      }
+    } else {
+      return { status: { success: false, error: "no href" } };
+    }
+  };
+
+  try {
+    return resolveByTaxId({ taxonId, lineage, rank, scientificName });
+  } catch (err) {
+    return { status: { success: false, error: "unable to fetch" } };
+  }
+};
+
+export const getPhylopic = async (req, res) => {
+  try {
+    let response = {};
+    let startTime = performance.now();
+    let { taxonId, taxonomy } = req.query;
+    if (phylopics[taxonId]) {
+      let endTime = performance.now();
+      return res.status(200).send(JSON.stringify(phylopics[taxonId], null, 2));
+    }
+    let record = await getRecordsById({
+      recordId: taxonId,
+      result: "taxon",
+      taxonomy,
+    });
+    let {
+      lineage,
+      taxon_rank: rank,
+      scientific_name: scientificName,
+    } = record.records[0].record;
+
+    let midTime = performance.now();
+    response = await fetchPhylopic({ taxonId, lineage, rank, scientificName });
+    let endTime = performance.now();
+    phylopics[taxonId] = response;
+    return res.status(200).send(JSON.stringify(response, null, 2));
+  } catch (message) {
+    logError({ req, message });
+    return res.status(400).send({ status: "error" });
+  }
+};

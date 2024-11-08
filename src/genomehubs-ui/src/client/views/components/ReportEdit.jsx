@@ -172,6 +172,7 @@ export const queryPropList = {
     "hideSourceColors",
     "hideErrorBars",
     "hideAncestralBars",
+    "showPhylopics",
     "yOpts",
     "treeStyle",
     "treeThreshold",
@@ -538,6 +539,7 @@ export const ReportEdit = ({
       queryProp == "hideSourceColors" ||
       queryProp == "hideErrorBars" ||
       queryProp == "hideAncestralBars" ||
+      queryProp == "showPhylopics" ||
       queryProp == "compactLegend" ||
       queryProp == "reorient" ||
       queryProp == "dropShadow" ||

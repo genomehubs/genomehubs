@@ -25,33 +25,30 @@ const styleMap = {
 
 const PhyloPics = ({
   phylopicById,
+  record,
+  currentRecord = record,
+  taxonId = taxonId || currentRecord.record.taxon_id,
+  scientificName = scientificName || currentRecord.record.scientific_name,
   fetchPhylopic,
-  currentRecord,
   sourceColors = true,
   showAncestral = true,
-  record,
   maxHeight,
+  maxWidth,
   fixedRatio,
+  embed,
+  ...props
 }) => {
   const [metadata, setMetadata] = useState({});
 
-  if (!currentRecord && !record) {
+  if (!taxonId) {
     return null;
   }
-  record = currentRecord || record;
-
-  let {
-    scientific_name: scientificName,
-    lineage,
-    taxon_rank: rank,
-    taxon_id: taxonId,
-  } = record.record;
 
   useEffect(() => {
-    if (taxonId && !phylopicById) {
-      fetchPhylopic({ taxonId, scientificName, lineage, rank });
+    if (!phylopicById) {
+      fetchPhylopic({ taxonId });
     }
-  }, [taxonId]);
+  }, [taxonId, phylopicById]);
 
   useEffect(() => {
     setMetadata(phylopicById || {});
@@ -67,6 +64,19 @@ const PhyloPics = ({
     imageName,
     imageRank,
   } = metadata;
+  if (maxWidth && !maxHeight) {
+    maxHeight = maxWidth / ratio;
+  } else if (maxHeight && !maxWidth) {
+    maxWidth = maxHeight * ratio;
+  } else if (maxHeight * ratio > maxWidth) {
+    maxHeight = maxWidth / ratio;
+  } else {
+    maxWidth = maxHeight * ratio;
+  }
+
+  if (!ratio) {
+    return null;
+  }
 
   let imageDescription;
   if (source == "Ancestral") {
@@ -139,6 +149,17 @@ const PhyloPics = ({
       </div>
     );
   }
+  if (embed) {
+    return (
+      <image
+        x={-maxWidth / 2}
+        y={-maxHeight / 2}
+        height={maxHeight}
+        width={maxWidth}
+        xlinkHref={fileUrl}
+      />
+    );
+  }
   return (
     <div className={imageContainerStyle}>
       <div>
@@ -169,7 +190,7 @@ const PhyloPics = ({
             <div
               className={classnames(
                 imageCreditStyle,
-                styleMap[`imageCredit${source}Style`]
+                styleMap[`imageCredit${source}Style`],
               )}
               onClick={(e) => {
                 e.preventDefault();

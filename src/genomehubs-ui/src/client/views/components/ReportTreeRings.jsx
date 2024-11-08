@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
 
+import Phylopics from "./PhyloPics";
 import Tooltip from "./Tooltip";
 import Typography from "@mui/material/Typography";
 import { compose } from "recompose";
@@ -26,6 +27,7 @@ const ReportTreeRings = ({
   hideErrorBars,
   hideAncestralBars,
   cats,
+  phylopics,
 }) => {
   if (!arcs || arcs.length == 0) {
     return null;
@@ -300,6 +302,28 @@ const ReportTreeRings = ({
     );
   }
 
+  let phylopicElements = [];
+  for (let [taxonId, opts] of Object.entries(phylopics)) {
+    if (!taxonId) {
+      continue;
+    }
+    let { x, y, angle, scientificName, width, height } = opts;
+    phylopicElements.push(
+      <g key={taxonId} transform={`translate(${x}, ${y}) rotate(${angle})`}>
+        <Phylopics
+          taxonId={taxonId}
+          scientificName={scientificName}
+          maxHeight={height}
+          maxWidth={width}
+          fixedRatio={1}
+          showAncestral={false}
+          sourceColors={false}
+          embed={true}
+        />
+      </g>,
+    );
+  }
+
   return (
     <div
       style={{
@@ -331,6 +355,7 @@ const ReportTreeRings = ({
           {text}
           {ticksText}
           {highlightPath}
+          {phylopicElements}
         </g>
       </svg>
     </div>

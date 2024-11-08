@@ -183,6 +183,11 @@ const setColor = ({ node, yQuery, recurse, hideSourceColors }) => {
   return { color, highlightColor, source, value, min, max };
 };
 
+export const circleXY = (r, theta) => {
+  theta -= Math.PI / 2;
+  return { x: r * Math.cos(theta), y: r * Math.sin(theta) };
+};
+
 export const processTreeRings = ({
   nodes,
   xQuery,
@@ -193,6 +198,7 @@ export const processTreeRings = ({
   hideErrorBars,
   hideAncestralBars,
   hideSourceColors,
+  showPhylopics,
 }) => {
   if (!nodes) {
     return undefined;
@@ -226,6 +232,13 @@ export const processTreeRings = ({
   let valueScale;
   let dataWidth = 0;
   let ticks = [];
+  let phylopics = {};
+  let cMax = treeNodes[rootNode] ? treeNodes[rootNode].count : 0;
+  let phylopicWidth = 0;
+  if (showPhylopics) {
+    phylopicWidth = Math.min((radius * Math.PI * 2) / cMax, 100);
+    radius -= phylopicWidth;
+  }
   if (yBounds && yBounds.domain && yBounds.type != "date") {
     valueScale = axisScales[yBounds.scale]()
       .domain(yBounds.domain)
@@ -267,7 +280,6 @@ export const processTreeRings = ({
     .exponent(1)
     .domain([-0.5, maxDepth + 1])
     .range([0, radius]);
-  let cMax = treeNodes[rootNode] ? treeNodes[rootNode].count : 0;
   let cScale = scaleLinear()
     .domain([0, dataWidth ? cMax * 1.025 : cMax])
     .range([-Math.PI, Math.PI]);
@@ -309,15 +321,6 @@ export const processTreeRings = ({
       }));
     }
 
-    if (
-      !node.hasOwnProperty("children") ||
-      Object.keys(node.children).length == 0
-    ) {
-      outer = maxDepth + 1;
-    }
-    let innerRadius = rScale(Math.max(depth, -0.5));
-    let outerRadius = rScale(outer);
-    let farOuterRadius = rScale(maxDepth + 1);
     let cStart = start;
     let cEnd = start + node.count;
     if (cEnd - cStart == cMax) {
@@ -330,6 +333,31 @@ export const processTreeRings = ({
     let midAngle = (startAngle + endAngle) / 2;
     let barAngle =
       (Math.min(((cEnd - cStart) / cMax) * 360 * 0.25, 0.25) * Math.PI) / 180;
+    let innerRadius = rScale(Math.max(depth, -0.5));
+    if (
+      !node.hasOwnProperty("children") ||
+      Object.keys(node.children).length == 0
+    ) {
+      outer = maxDepth + 1;
+      if (node.taxon_id && showPhylopics && node.scientific_name != "parent") {
+        let r = radius + dataWidth + phylopicWidth / 2;
+
+        let width = (Math.PI * r * 2 * 0.9) / cMax;
+        let height = phylopicWidth * 0.9;
+
+        phylopics[node.taxon_id] = {
+          angle: (midAngle * 180) / Math.PI,
+          radius: r,
+          scientificName: node.scientific_name,
+          width,
+          height,
+          ...circleXY(r, midAngle),
+        };
+      }
+    }
+    let outerRadius = rScale(outer);
+    let farOuterRadius = rScale(maxDepth + 1);
+
     arcs.push({
       ...node,
       arc: arc()({
@@ -488,6 +516,7 @@ export const processTreeRings = ({
     ),
     ticks,
     other,
+    phylopics,
   };
 };
 
@@ -568,6 +597,7 @@ export const processTreePaths = ({
   yQuery,
   pointSize,
   hideErrorBars,
+  showPhylopics,
   hideAncestralBars,
   hideSourceColors,
 }) => {
@@ -832,6 +862,7 @@ export const processTree = ({
   treeStyle = "rect",
   pointSize = 15,
   hideErrorBars,
+  showPhylopics,
   hideAncestralBars,
   hideSourceColors,
 }) => {
@@ -846,6 +877,7 @@ export const processTree = ({
       hideErrorBars,
       hideAncestralBars,
       hideSourceColors,
+      showPhylopics,
     });
   }
   return processTreePaths({
@@ -858,5 +890,6 @@ export const processTree = ({
     hideErrorBars,
     hideAncestralBars,
     hideSourceColors,
+    showPhylopics,
   });
 };

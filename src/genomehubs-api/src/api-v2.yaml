@@ -976,6 +976,24 @@ components:
       required: false
       schema:
         type: string
+    taxonIdParam:
+      description: |
+        Unique taxon identifier.
+      examples:
+        canis_lupus:
+          value: "9612"
+          summary: Taxon ID for Canis lupus
+        metazoa:
+          value: "33208"
+          summary: Taxon ID for Metazoa
+      explode: false
+      in: query
+      name: taxonId
+      required: true
+      schema:
+        items:
+          type: string
+      style: form
     tidyDataParam:
       description: |
         Format delimited text output as Tidy Data.
@@ -1285,6 +1303,30 @@ paths:
       tags:
         - Tools
       x-eov-operation-handler: api/v2/routes/download
+  /phylopic:
+    get:
+      description: Get phylopic
+      operationId: getPhylopic
+      parameters:
+        - $ref: "#/components/parameters/taxonIdParam"
+        - $ref: "#/components/parameters/taxonomyParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: "#/components/schemas/Status"
+                    status: null
+                  - $ref: "#/components/schemas/Count"
+                    count: null
+          description: successful operation
+        "400":
+          description: Invalid query
+      summary: Get phylopic
+      tags:
+        - External
+      x-eov-operation-handler: api/v2/routes/phylopic
   /indices:
     get:
       description: Returns a list of available indices
@@ -1617,3 +1659,5 @@ tags:
     name: Metadata
   - description: Download files and check query progress
     name: Tools
+  - description: Fetch external resources
+    name: External

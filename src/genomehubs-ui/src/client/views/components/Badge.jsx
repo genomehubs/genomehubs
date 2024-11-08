@@ -416,7 +416,6 @@ export const Badge = ({
       </div>
     );
   }
-
   return (
     <div style={{ position: "relative" }}>
       <div className={badgeCss} ref={badgeRef}>
@@ -433,7 +432,8 @@ export const Badge = ({
           <div ref={imgRef} className={imgStyle}>
             {recordById && (
               <PhyloPics
-                currentRecord={recordById}
+                taxonId={recordById.record.taxon_id}
+                scientificName={recordById.record.scientific_name}
                 maxHeight={height}
                 hoverHeight={height * 2}
                 fixedRatio={1}
