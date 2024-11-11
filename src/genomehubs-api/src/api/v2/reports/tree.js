@@ -183,12 +183,14 @@ const addXResultsToTree = async ({
   xQuery,
   update,
   yRes,
+  summaries = [],
   ancStatus,
   queryId,
   taxonomy,
   catRank,
   index,
 }) => {
+  let wantedSummaries = new Set([...summaries, "value", "min", "max"]);
   let isParentNode = {};
   let lineages = {};
   if (!ancStatus) {
@@ -202,19 +204,14 @@ const addXResultsToTree = async ({
       treeFields = {};
       for (let f of optionalFields) {
         if (result.result.fields[f]) {
-          let {
-            aggregation_source: source,
-            value,
-            min,
-            max,
-            range,
-          } = result.result.fields[f];
           treeFields[f] = {
-            source,
-            value,
-            ...(min && { min }),
-            ...(max && { max }),
+            source: result.result.fields[f].aggregation_source,
           };
+          for (let v of wantedSummaries) {
+            if (result.result.fields[f].hasOwnProperty(v)) {
+              treeFields[f][v] = result.result.fields[f][v];
+            }
+          }
         }
       }
     }
@@ -383,6 +380,7 @@ const addXResultsToTree = async ({
         optionalFields,
         lca,
         xQuery: newQuery,
+        summaries,
         update: true,
         ancStatus,
         queryId,
@@ -434,6 +432,7 @@ const getTree = async ({
   fields,
   xFields,
   yFields,
+  ySummaries,
   optionalFields,
   cat,
   result,
@@ -570,6 +569,7 @@ const getTree = async ({
     lca,
     xQuery,
     yRes,
+    summaries: ySummaries,
     queryId,
     taxonomy,
     catRank,
@@ -729,9 +729,11 @@ export const tree = async ({
     yBounds = await getBounds({
       params: { ...params },
       fields: yFields.filter(
-        (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
+        (field, i) =>
+          lookupTypes(field) &&
+          (ySummaries[i] == "length" || lookupTypes(field).type != "keyword")
       ),
-      summaries,
+      summaries: ySummaries,
       result,
       exclusions,
       taxonomy,
@@ -739,6 +741,7 @@ export const tree = async ({
       opts: yOpts,
     });
   }
+
   let catBounds;
   if (cat) {
     catBounds = await getBounds({
@@ -815,6 +818,7 @@ export const tree = async ({
           ...yQuery,
           fields: optionalFields.join(","),
           yFields,
+          ySummaries,
         },
       }),
       x: tree.lca ? tree.lca.count : 0,

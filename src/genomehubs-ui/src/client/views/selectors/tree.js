@@ -85,7 +85,7 @@ const deepGet = (obj, path, value) => {
 };
 
 const isNumeric = (n) => {
-  return !Number.isNaN(parseFloat(n)) && isFinite(n);
+  return !isNaN(parseFloat(n)) && isFinite(n);
 };
 
 const compare = {
@@ -123,6 +123,7 @@ export const getAPITreeNodes = getNodes;
 
 const setColor = ({ node, yQuery, recurse, hideSourceColors }) => {
   let field = (yQuery?.yFields || [])[0];
+  let summary = (yQuery?.ySummaries || ["value"])[0];
   let color, highlightColor;
   let tonalRange = 9;
   let baseTone = 2;
@@ -141,7 +142,7 @@ const setColor = ({ node, yQuery, recurse, hideSourceColors }) => {
     let status = node.status ? 2 : hideSourceColors || !node.fields ? 2 : 1;
     if (node.fields && node.fields[field]) {
       source = node.fields[field].source;
-      value = node.fields[field].value;
+      value = node.fields[field][summary];
       min = node.fields[field].min;
       max = node.fields[field].max;
     }
@@ -186,6 +187,28 @@ const setColor = ({ node, yQuery, recurse, hideSourceColors }) => {
 export const circleXY = (r, theta) => {
   theta -= Math.PI / 2;
   return { x: r * Math.cos(theta), y: r * Math.sin(theta) };
+};
+
+const updateDomain = ({ domain, field, summary, treeNodes }) => {
+  let newDomain = [...domain];
+  if (summary != "value") {
+    for (let node of Object.values(treeNodes)) {
+      if (
+        node.hasOwnProperty("children") &&
+        Object.keys(node.children).length > 0
+      ) {
+        continue;
+      }
+      if (node.fields && node.fields[field]) {
+        let value = node.fields[field][summary];
+        if (isNumeric(value)) {
+          newDomain[0] = Math.min(newDomain[0], value);
+          newDomain[1] = Math.max(newDomain[1], value);
+        }
+      }
+    }
+  }
+  return newDomain;
 };
 
 export const processTreeRings = ({
@@ -239,9 +262,17 @@ export const processTreeRings = ({
     phylopicWidth = Math.min((radius * Math.PI * 2) / cMax, 100);
     radius -= phylopicWidth;
   }
-  if (yBounds && yBounds.domain && yBounds.type != "date") {
+  let summary = (yQuery?.ySummaries || ["value"])[0];
+  let yDomain = yBounds && yBounds.domain;
+  if (yDomain && yBounds.type != "date") {
+    yDomain = updateDomain({
+      domain: yDomain,
+      field: yField,
+      summary,
+      treeNodes,
+    });
     valueScale = axisScales[yBounds.scale]()
-      .domain(yBounds.domain)
+      .domain(yDomain)
       // .nice()
       .range([0, 100]);
     dataWidth = 120;
@@ -630,9 +661,17 @@ export const processTreePaths = ({
   let valueScale;
   let targetWidth = 1000;
   let dataWidth = 0;
-  if (yBounds && yBounds.domain && yBounds.type != "date") {
+  let summary = (yQuery?.ySummaries || ["value"])[0];
+  let yDomain = yBounds && yBounds.domain;
+  if (yDomain && yBounds.type != "date") {
+    yDomain = updateDomain({
+      domain: yDomain,
+      field: yField,
+      summary,
+      treeNodes,
+    });
     valueScale = axisScales[yBounds.scale]()
-      .domain(yBounds.domain)
+      .domain(yDomain)
       // .nice()
       .range([0, 100]);
     dataWidth = 120;
