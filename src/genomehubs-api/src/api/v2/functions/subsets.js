@@ -3,6 +3,7 @@ export const subsets = {
   estimate: new Set(["ancestor", "descendant"]),
   summary: new Set([
     "count",
+    "sp_count",
     "from",
     "length",
     "max",

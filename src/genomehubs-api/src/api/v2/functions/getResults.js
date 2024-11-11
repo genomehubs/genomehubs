@@ -241,6 +241,7 @@ const validateTerm = (term, types) => {
       ) {
         typeSummary.push("length");
       }
+      typeSummary.push("sp_count");
       if (
         parts[1] &&
         parts[1].length > 0 &&

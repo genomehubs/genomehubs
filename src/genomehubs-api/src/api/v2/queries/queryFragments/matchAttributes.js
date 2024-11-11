@@ -82,6 +82,7 @@ export const matchAttributes = ({
                       "attributes.key",
                       "attributes.is_primary_value",
                       "attributes.count",
+                      "attributes.sp_count",
                       "attributes.max",
                       "attributes.min",
                       "attributes.mean",

@@ -4,7 +4,7 @@
 
 import re
 
-from h3 import latlng_to_cell
+from h3 import geo_to_h3
 
 
 def degrees_to_decimal(coord):
@@ -25,6 +25,6 @@ def degrees_to_decimal(coord):
 
 def process_lat_lon(lat, lon, resolution):
     """Process raw lat/lon into h3."""
-    hex_coords = latlng_to_cell(lat, lon, resolution)
+    hex_coords = geo_to_h3(lat, lon, resolution)
     print(hex_coords)
     return {}

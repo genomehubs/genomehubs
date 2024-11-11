@@ -189,7 +189,7 @@ export const circleXY = (r, theta) => {
   return { x: r * Math.cos(theta), y: r * Math.sin(theta) };
 };
 
-const updateDomain = ({ domain, field, summary, treeNodes }) => {
+const updateDomain = ({ domain = [], field, summary, treeNodes }) => {
   let newDomain = [...domain];
   if (summary != "value") {
     for (let node of Object.values(treeNodes)) {
@@ -202,8 +202,12 @@ const updateDomain = ({ domain, field, summary, treeNodes }) => {
       if (node.fields && node.fields[field]) {
         let value = node.fields[field][summary];
         if (isNumeric(value)) {
-          newDomain[0] = Math.min(newDomain[0], value);
-          newDomain[1] = Math.max(newDomain[1], value);
+          if (newDomain.length == 0) {
+            newDomain = [value * 0.95, value * 1.05];
+          } else {
+            newDomain[0] = Math.min(newDomain[0], value);
+            newDomain[1] = Math.max(newDomain[1], value);
+          }
         }
       }
     }
@@ -263,15 +267,27 @@ export const processTreeRings = ({
     radius -= phylopicWidth;
   }
   let summary = (yQuery?.ySummaries || ["value"])[0];
+
+  yBounds = yBounds
+    ? structuredClone(yBounds)
+    : {
+        scale: "linear",
+        domain: [],
+      };
+
+  if (summary.endsWith("count")) {
+    yBounds.domain = [0, 1];
+  }
   let yDomain = yBounds && yBounds.domain;
-  if (yDomain && yBounds.type != "date") {
+
+  if ((yDomain && yBounds.type != "date") || summary != "value") {
     yDomain = updateDomain({
       domain: yDomain,
       field: yField,
       summary,
       treeNodes,
     });
-    valueScale = axisScales[yBounds.scale]()
+    valueScale = axisScales[yBounds.scale || "linear"]()
       .domain(yDomain)
       // .nice()
       .range([0, 100]);
@@ -663,7 +679,7 @@ export const processTreePaths = ({
   let dataWidth = 0;
   let summary = (yQuery?.ySummaries || ["value"])[0];
   let yDomain = yBounds && yBounds.domain;
-  if (yDomain && yBounds.type != "date") {
+  if ((yDomain && yBounds.type != "date") || summary != "value") {
     yDomain = updateDomain({
       domain: yDomain,
       field: yField,
