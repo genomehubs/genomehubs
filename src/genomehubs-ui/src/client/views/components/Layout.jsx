@@ -1,6 +1,7 @@
 import React, { memo, useEffect, useState } from "react";
 
 import CookieBanner from "./CookieBanner";
+import DownloadMessage from "./DownloadMessage";
 import Footer from "./Footer";
 import Grid from "@mui/material/Grid2";
 import Header from "./Header";
@@ -52,7 +53,7 @@ const DefaultLayout = ({}) => {
           {/* {types && Object.keys(types).length > 0 && ( */}
 
           <Main />
-          {/* <DownloadMessage /> */}
+          <DownloadMessage />
 
           {/* )} */}
         </Grid>

@@ -1,6 +1,7 @@
 import { cacheFetch, cacheStore, pingCache } from "../functions/cache.js";
 
 import Archiver from "archiver";
+import { JsonStreamStringify } from "json-stream-stringify";
 import { aggregateNameClasses } from "../queries/aggregateNameClasses.js";
 import { aggregateRanks } from "../queries/aggregateRanks.js";
 import { aggregateRawValueSources } from "../queries/aggregateRawValueSources.js";
@@ -1147,18 +1148,25 @@ export const getSearchSources = async (req, res) => {
 function formatReport(res, report, req) {
   return res.format({
     json: () => {
-      let response = formatJson(
-        { status: { success: true }, report },
-        req.query.indent
-      );
-      res.status(200).send(response);
+      // let response = formatJson(
+      //   { status: { success: true }, report },
+      //   req.query.indent
+      // );
+      // res.status(200).send(response);
+      res.type("json");
+      res.status(200);
+      new JsonStreamStringify({ status: { success: true }, report }).pipe(res);
     },
     "text/html": () => {
-      let response = formatJson(
-        { status: { success: true }, report },
-        req.query.indent
-      );
-      res.status(200).send(response);
+      // let response = formatJson(
+      //   { status: { success: true }, report },
+      //   req.query.indent
+      // );
+      // res.status(200).send(response);
+
+      res.type("json");
+      res.status(200);
+      new JsonStreamStringify({ status: { success: true }, report }).pipe(res);
     },
     ...(report.name == "table" && {
       csv: () => {

@@ -6,8 +6,9 @@ import {
   setProgress,
 } from "../functions/progress.js";
 
+import { JsonStreamStringify } from "json-stream-stringify";
 import { formatCsv } from "../functions/formatCsv.js";
-import { formatJson } from "../functions/formatJson.js";
+// import { formatJson } from "../functions/formatJson.js";
 import { getBounds } from "../reports/getBounds.js";
 import { getResults } from "../functions/getResults.js";
 import { indexName } from "../functions/indexName.js";
@@ -50,10 +51,13 @@ const formattedResponse = async (req, res, response) => {
         filename = `${filename.replace(/\.json$/, "")}.json`;
         res.attachment(filename);
       }
-      if (typeof indent !== "number" || indent.match(/^\d+$/)) {
-        indent = 4;
-      }
-      res.status(200).send(formatJson(response, indent));
+      // if (typeof indent !== "number" || indent.match(/^\d+$/)) {
+      //   indent = 0;
+      // }
+      res.type("json");
+      res.status(200);
+      new JsonStreamStringify(response).pipe(res);
+      // res.status(200).send(formatJson(response, indent));
     },
     csv: async () => {
       let opts = {
