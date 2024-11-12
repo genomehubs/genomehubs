@@ -192,6 +192,7 @@ export const circleXY = (r, theta) => {
 const updateDomain = ({ domain = [], field, summary, treeNodes }) => {
   let newDomain = [...domain];
   if (summary != "value") {
+    newDomain = [];
     for (let node of Object.values(treeNodes)) {
       if (
         node.hasOwnProperty("children") &&
@@ -203,7 +204,7 @@ const updateDomain = ({ domain = [], field, summary, treeNodes }) => {
         let value = node.fields[field][summary];
         if (isNumeric(value)) {
           if (newDomain.length == 0) {
-            newDomain = [value * 0.95, value * 1.05];
+            newDomain = [summary.endsWith("count") ? 0 : value, value];
           } else {
             newDomain[0] = Math.min(newDomain[0], value);
             newDomain[1] = Math.max(newDomain[1], value);
@@ -275,12 +276,18 @@ export const processTreeRings = ({
         domain: [],
       };
 
+  let hideBar;
+
   if (summary.endsWith("count")) {
     yBounds.domain = [0, 1];
+    yBounds.scale = "linear";
+    yBounds.min = undefined;
+    yBounds.max = undefined;
+    hideBar = true;
   }
   let yDomain = yBounds && yBounds.domain;
 
-  if ((yDomain && yBounds.type != "date") || summary != "value") {
+  if (yDomain && (yBounds.type != "date" || summary != "value")) {
     yDomain = updateDomain({
       domain: yDomain,
       field: yField,
@@ -441,11 +448,13 @@ export const processTreeRings = ({
             startAngle,
             endAngle,
           }),
-          valueBar: arc()({
-            innerRadius: radius + 10 + Math.max(bar[1], 0),
-            outerRadius: radius + 10 + bar[2],
-            startAngle: midAngle - barAngle,
-            endAngle: midAngle + barAngle,
+          ...(!hideBar && {
+            valueBar: arc()({
+              innerRadius: radius + 10 + Math.max(bar[1], 0),
+              outerRadius: radius + 10 + bar[2],
+              startAngle: midAngle - barAngle,
+              endAngle: midAngle + barAngle,
+            }),
           }),
         }),
       bar,
@@ -678,6 +687,22 @@ export const processTreePaths = ({
   let targetWidth = 1000;
   let dataWidth = 0;
   let summary = (yQuery?.ySummaries || ["value"])[0];
+  yBounds = yBounds
+    ? structuredClone(yBounds)
+    : {
+        scale: "linear",
+        domain: [],
+      };
+
+  let hideBar;
+
+  if (summary.endsWith("count")) {
+    yBounds.domain = [0, 1];
+    yBounds.scale = "linear";
+    yBounds.min = undefined;
+    yBounds.max = undefined;
+    hideBar = true;
+  }
   let yDomain = yBounds && yBounds.domain;
   if ((yDomain && yBounds.type != "date") || summary != "value") {
     yDomain = updateDomain({

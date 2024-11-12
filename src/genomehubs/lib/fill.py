@@ -677,6 +677,7 @@ def track_missing_attribute_values(
                         }
                     )
                     obj["keys"].remove(key)
+                    obj["attributes"][-1].pop("sp_count", None)
             if obj["keys"]:
                 missing_from_descendants[child_id] = obj
             else:
