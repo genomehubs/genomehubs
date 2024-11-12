@@ -8,11 +8,13 @@ import {
   imageCredit as imageCreditStyle,
 } from "./Styles.scss";
 
+import { Image } from "react-konva";
 import PhyloPic from "./PhyloPic";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
 import truncate from "../functions/truncate";
+import useImage from "use-image";
 import withPhylopicsById from "../hocs/withPhylopicsById";
 import withRecord from "../hocs/withRecord";
 
@@ -23,12 +25,26 @@ const styleMap = {
   imageCreditAncestralStyle,
 };
 
+const PhyloPicKonvaImage = ({ fileUrl, maxHeight, maxWidth, x, y }) => {
+  let [image] = useImage(fileUrl);
+  return (
+    <Image
+      image={image}
+      x={-maxWidth / 2}
+      y={y}
+      height={maxHeight}
+      width={maxWidth}
+      crossOrigin="anonymous"
+    />
+  );
+};
+
 const PhyloPics = ({
   phylopicById,
   record,
   currentRecord = record,
-  taxonId = taxonId || currentRecord.record.taxon_id,
-  scientificName = scientificName || currentRecord.record.scientific_name,
+  taxonId = taxonId || currentRecord.record?.taxon_id,
+  scientificName = scientificName || currentRecord.record?.scientific_name,
   fetchPhylopic,
   sourceColors = true,
   showAncestral = true,
@@ -82,6 +98,9 @@ const PhyloPics = ({
   let imageDescription;
   if (source == "Ancestral") {
     if (!showAncestral) {
+      if (embed) {
+        return null;
+      }
       imageDescription = (
         <div>
           No image was found for {scientificName} at{" "}
@@ -151,32 +170,43 @@ const PhyloPics = ({
     );
   }
   if (embed) {
-    return (
-      <g transform={transform}>
-        <image
-          x={-maxWidth / 2}
-          y={-maxHeight / 2}
-          height={maxHeight}
-          width={maxWidth}
-          xlinkHref={fileUrl}
+    if (embed == "konva") {
+      return (
+        <PhyloPicKonvaImage
+          fileUrl={fileUrl}
+          maxHeight={maxHeight}
+          maxWidth={maxWidth}
+          {...props}
         />
-        <Tooltip
-          title={imageDescription}
-          arrow
-          enterDelay={500}
-          disableInteractive={false}
-        >
-          <rect
-            fill={"rgba(255,255,255,0)"}
-            stroke={"none"}
+      );
+    } else {
+      return (
+        <g transform={transform}>
+          <image
             x={-maxWidth / 2}
             y={-maxHeight / 2}
             height={maxHeight}
             width={maxWidth}
+            xlinkHref={fileUrl}
           />
-        </Tooltip>
-      </g>
-    );
+          <Tooltip
+            title={imageDescription}
+            arrow
+            enterDelay={500}
+            disableInteractive={false}
+          >
+            <rect
+              fill={"rgba(255,255,255,0)"}
+              stroke={"none"}
+              x={-maxWidth / 2}
+              y={-maxHeight / 2}
+              height={maxHeight}
+              width={maxWidth}
+            />
+          </Tooltip>
+        </g>
+      );
+    }
   }
   return (
     <div className={imageContainerStyle}>

@@ -2,6 +2,7 @@ import { Circle, Group, Layer, Line, Rect, Stage, Text } from "react-konva";
 import React, { useEffect, useRef, useState } from "react";
 
 import KonvaTooltip from "./KonvaTooltip";
+import PhyloPics from "./PhyloPics";
 import Skeleton from "@mui/material/Skeleton";
 import { compose } from "recompose";
 import formats from "../functions/formats";
@@ -37,6 +38,7 @@ const ReportTreePaths = ({
   colorPalette,
   palettes,
   cats: catArray,
+  phylopicWidth,
   hideErrorBars,
 }) => {
   if (!lines || lines.length == 0) {
@@ -74,7 +76,9 @@ const ReportTreePaths = ({
   const [previewOffset, setPreviewOffset] = useState({ x: 0, y: 0 });
   const [scrollBarWidth, setScrollBarWidth] = useState(0);
   const [scale, setScale] = useState(
-    divWidth ? divWidth / (maxWidth + dataWidth + 10 || divWidth) : 1,
+    divWidth
+      ? divWidth / (maxWidth + dataWidth + phylopicWidth + 10 || divWidth)
+      : 1,
   );
   const padding = 500;
   let previewScale = 1;
@@ -93,7 +97,11 @@ const ReportTreePaths = ({
   let globalYClickScale = scaleLinear();
 
   useEffect(() => {
-    setScale(divWidth ? divWidth / (maxWidth + dataWidth + 10 || divWidth) : 1);
+    setScale(
+      divWidth
+        ? divWidth / (maxWidth + dataWidth + phylopicWidth + 10 || divWidth)
+        : 1,
+    );
   }, [maxWidth, dataWidth, divWidth]);
 
   // Element scroll position
@@ -250,6 +258,7 @@ const ReportTreePaths = ({
   const [connectors, setConnectors] = useState([]);
   const [bars, setBars] = useState([]);
   const [errorBars, setErrorBars] = useState([]);
+  const [phylopics, setPhylopics] = useState([]);
   const [overview, setOverview] = useState([]);
   const [portion, setPortion] = useState(0);
   const updateCache = (index, value) => {
@@ -303,6 +312,7 @@ const ReportTreePaths = ({
       let newBars = [];
       let newErrorBars = [];
       let newCats = [];
+      let newPhyloPics = [];
       if (valueScale) {
         let tickMarks = valueScale.ticks();
         let mid = tickMarks[Math.floor(tickMarks.length / 2)];
@@ -385,6 +395,7 @@ const ReportTreePaths = ({
           newBars,
           newErrorBars,
           newCats,
+          newPhyloPics,
         } = portionCache[portion]);
       } else {
         let lowerY = portionHeight * portion - portionOverlap;
@@ -724,6 +735,23 @@ const ReportTreePaths = ({
                   }
                 }
               }
+              if (segment.showPhylopic) {
+                newPhyloPics.push(
+                  <PhyloPics
+                    key={segment.taxon_id}
+                    taxonId={segment.taxon_id}
+                    scientificName={segment.scientific_name}
+                    maxHeight={charHeight}
+                    maxWidth={phylopicWidth}
+                    x={maxWidth + dataWidth}
+                    y={segment.yStart - charHeight / 2}
+                    fixedRatio={1}
+                    showAncestral={false}
+                    sourceColors={false}
+                    embed={"konva"}
+                  />,
+                );
+              }
             }
           }
         }
@@ -736,6 +764,7 @@ const ReportTreePaths = ({
           newBars,
           newErrorBars,
           newCats,
+          newPhyloPics,
         });
       }
 
@@ -752,6 +781,7 @@ const ReportTreePaths = ({
       if (newOverview.length > 0) {
         setOverview(newOverview);
       }
+      setPhylopics(newPhyloPics);
     }
   }, [lines, portion]);
 
@@ -1069,6 +1099,7 @@ const ReportTreePaths = ({
                 <Group x={maxWidth}>{bars}</Group>
                 <Group x={maxWidth}>{errorBars}</Group>
                 {paths}
+                <Group x={maxWidth + dataWidth}>{phylopics}</Group>
               </Layer>
               <Layer>
                 <Group>{cats}</Group>

@@ -7,7 +7,7 @@ const withPhylopicsById = (WrappedComponent) => (props) => {
   let {
     record,
     currentRecord = record,
-    taxonId = currentRecord.record.taxon_id,
+    taxonId = currentRecord.record?.taxon_id,
   } = props;
   const mapStateToProps = (state) => ({
     ...(taxonId && {

@@ -666,6 +666,7 @@ export const processTreePaths = ({
   if (!nodes) {
     return undefined;
   }
+  let charHeight = pointSize;
   const { cat, cats: catArray, showOther } = bounds;
   let cats = {};
   let other;
@@ -686,6 +687,14 @@ export const processTreePaths = ({
   let valueScale;
   let targetWidth = 1000;
   let dataWidth = 0;
+
+  let phylopics = {};
+  let phylopicWidth = 0;
+
+  if (showPhylopics) {
+    phylopicWidth = charHeight * 1.5;
+    targetWidth -= phylopicWidth;
+  }
   let summary = (yQuery?.ySummaries || ["value"])[0];
   yBounds = yBounds
     ? structuredClone(yBounds)
@@ -728,7 +737,6 @@ export const processTreePaths = ({
   }
   let maxWidth = 0;
   let maxTip = 0;
-  let charHeight = pointSize;
   let charLen = charHeight / 1.6;
   let xScale = scaleLinear()
     .domain([-0.5, maxDepth + 2])
@@ -855,11 +863,26 @@ export const processTreePaths = ({
       bar,
     }));
 
+    if (node.tip) {
+      let width = phylopicWidth;
+      let height = node.yMax - node.yMin;
+
+      phylopics[node.taxon_id] = {
+        scientificName: node.scientific_name,
+        width,
+        height,
+        x: targetWidth - dataWidth,
+        y: node.yMin,
+      };
+    }
+
     let label;
+    let showPhylopic;
     if (node.tip) {
       label = node.scientific_name;
       maxWidth = Math.max(maxWidth, stringLength(label) * pointSize * 0.8);
       maxTip = Math.max(maxTip, node.xEnd + 10);
+      showPhylopic = showPhylopics && node.scientific_name != "parent";
     } else if (node.scientific_name != "parent" && node.width > charLen * 5) {
       label = node.scientific_name;
       if (label.length * charLen - 2 > node.width) {
@@ -917,6 +940,7 @@ export const processTreePaths = ({
       source,
       value: scaledValue,
       bar,
+      showPhylopic,
     });
   });
   maxWidth += maxTip + pointSize / 2;
@@ -936,6 +960,8 @@ export const processTreePaths = ({
     cats: [...(catArray || [])].concat(
       other ? [{ key: "other", label: "other" }] : [],
     ),
+    // phylopics,
+    phylopicWidth,
   };
 };
 
