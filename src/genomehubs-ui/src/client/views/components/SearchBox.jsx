@@ -85,11 +85,13 @@ const SearchBox = ({
     toggleTemplate = (e) => setShowSearchBox(!showSearchBox);
   }
 
-  const dispatchSearch = (searchOptions, term) => {
-    let options = { ...searchTerm, ...searchOptions };
-    if (!options.hasOwnProperty("includeEstimates")) {
-      options.includeEstimates = searchDefaults.includeEstimates;
+  const dispatchSearch = (searchOptions = {}, term) => {
+    let sameIndex = searchIndex == searchOptions.result;
+    let fullOptions = { ...searchTerm, ...searchOptions };
+    if (!fullOptions.hasOwnProperty("includeEstimates")) {
+      fullOptions.includeEstimates = searchDefaults.includeEstimates;
     }
+    console.log(sameIndex);
 
     let savedOptions = allOptions[options.result];
 
@@ -97,48 +99,55 @@ const SearchBox = ({
     let ranks = savedOptions?.ranks?.join(",") || searchDefaults.ranks;
     let names = savedOptions?.names?.join(",") || searchDefaults.names;
 
-    if (
-      !options.hasOwnProperty("fields") ||
-      searchTerm.result != searchOptions.result
-    ) {
-      options.fields = fields;
+    if (sameIndex) {
+      fields = options.fields || fields;
+      ranks = options.ranks || ranks;
+      names = options.names || names;
     }
-    if (
-      !options.hasOwnProperty("ranks") ||
-      searchTerm.result != searchOptions.result
-    ) {
-      options.ranks = ranks;
-    }
-    if (
-      !options.hasOwnProperty("names") ||
-      searchTerm.result != searchOptions.result
-    ) {
-      options.names = names;
-    }
+    console.log(fields);
 
-    options.taxonomy = taxonomy;
-    if (!options.size && savedOptions?.size) {
-      options.size = savedOptions.size;
+    // if (
+    //   !fullOptions.hasOwnProperty("fields") ||
+    //   searchTerm.result != searchOptions.result
+    // ) {
+    fullOptions.fields = fields;
+    // }
+    // if (
+    //   !fullOptions.hasOwnProperty("ranks") ||
+    //   searchTerm.result != searchOptions.result
+    // ) {
+    fullOptions.ranks = ranks;
+    // }
+    // if (
+    //   !fullOptions.hasOwnProperty("names") ||
+    //   searchTerm.result != searchOptions.result
+    // ) {
+    fullOptions.names = names;
+    // }
+
+    fullOptions.taxonomy = taxonomy;
+    if (!fullOptions.size && savedOptions?.size) {
+      fullOptions.size = savedOptions.size;
     }
     if (savedOptions) {
-      if (savedOptions.sortBy && !options.sortBy) {
-        options.sortBy = savedOptions.sortBy;
-        options.sortOrder = savedOptions.sortOrder || "asc";
+      if (savedOptions.sortBy && !fullOptions.sortBy) {
+        fullOptions.sortBy = savedOptions.sortBy;
+        fullOptions.sortOrder = savedOptions.sortOrder || "asc";
       }
       ["Ancestral", "Descendant", "Direct", "Missing"].forEach((key) => {
         let keyName = `exclude${key}`;
         if (
           savedOptions.hasOwnProperty(keyName) &&
-          !options.hasOwnProperty(keyName)
+          !fullOptions.hasOwnProperty(keyName)
         ) {
-          options[keyName] = savedOptions[keyName];
+          fullOptions[keyName] = savedOptions[keyName];
         }
       });
     }
-    fetchSearchResults(options);
+    fetchSearchResults(fullOptions);
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(term)}`,
+      `${basename}/search?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
     );
   };
 

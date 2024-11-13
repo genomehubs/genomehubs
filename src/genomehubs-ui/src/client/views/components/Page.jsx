@@ -9,6 +9,7 @@ import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchColors from "../hocs/dispatchColors";
 import makeStyles from "@mui/styles/makeStyles";
+import { useLocation } from "@reach/router";
 import withApi from "../hocs/withApi";
 import withSearchIndex from "../hocs/withSearchIndex";
 import withSiteName from "../hocs/withSiteName";
@@ -52,6 +53,7 @@ const Page = ({
   siteName,
 }) => {
   const classes = useStyles();
+  const location = useLocation();
   const [showExamples, setShowExamples] = useState(false);
   const [showBrowse, setShowBrowse] = useState(false);
   const rootRef = useRef(null);
@@ -151,7 +153,7 @@ const Page = ({
     }
   } else if (resultCount < 0) {
     title = `updating search results...`;
-  } else {
+  } else if (location.search && location.search.match(/query=/)) {
     title = `no search results`;
     searchTips = <SearchTips />;
   }

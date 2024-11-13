@@ -177,6 +177,8 @@ const SearchTips = ({
             );
             if (typeof valid_values == "string") {
               valid_values = [valid_values];
+            } else if (!Array.isArray(valid_values)) {
+              continue;
             }
             for (let valid_value of valid_values) {
               let validParts = [...queryParts];
