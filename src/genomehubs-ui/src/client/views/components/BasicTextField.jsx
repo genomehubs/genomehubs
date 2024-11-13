@@ -12,12 +12,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 const BasicTextField = ({
   id,
-  handleBlur = (e) => {
-    e.preventDefault();
-  },
   handleChange = (e) => {
     e.preventDefault();
   },
+  handleBlur = handleChange,
   label,
   helperText,
   value,
