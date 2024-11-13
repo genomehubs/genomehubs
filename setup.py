@@ -103,7 +103,6 @@ setup(
         "elasticsearch==8.7",
         "fastjsonschema>=2.15.3",
         "filetype>=1.0.7",
-        "h3>=3.7.4",
         "Pillow>=8.0",
         "pyyaml",
         "sparqlwrapper>=1.4.1",
