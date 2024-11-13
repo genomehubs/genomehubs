@@ -17,12 +17,13 @@ const useStyles = makeStyles((theme) => ({
 const BasicSelect = ({
   current = "",
   id,
-  handleBlur = (e) => {
-    e.preventDefault();
-  },
+  // handleBlur = (e) => {
+  //   e.preventDefault();
+  // },
   handleChange = (e) => {
     e.preventDefault();
   },
+  handleBlur = handleChange,
   label,
   helperText,
   values,
@@ -51,7 +52,7 @@ const BasicSelect = ({
         options.push(
           <MenuItem value={values[key]} style={{ paddingTop: "0px" }} key={key}>
             {values[key]} {key != values[key] && ` — ${key}`}
-          </MenuItem>
+          </MenuItem>,
         );
       });
   }

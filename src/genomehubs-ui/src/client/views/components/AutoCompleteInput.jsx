@@ -42,6 +42,7 @@ export const AutoCompleteInput = ({
   multipart,
   setLiveQuery = () => {},
   inputClassName = "autocompleteInput",
+  wrapTaxTerms = false,
 }) => {
   const [open, setOpen] = useState(false);
   const [prefix, setPrefix] = useState("");
@@ -105,7 +106,7 @@ export const AutoCompleteInput = ({
         }
         let extra = "";
         let closure = "";
-        if (!prefix.match(/tax_\w+\(\s*/)) {
+        if (wrapTaxTerms && !prefix.match(/tax_\w+\(\s*/)) {
           extra = "tax_name(";
           if (!suffix.match(/^\s*\($/)) {
             closure = ")";
@@ -467,7 +468,11 @@ export const AutoCompleteInput = ({
 
   const handlePaste = (e) => {
     e.preventDefault();
-    let value = e.clipboardData.getData("text");
+    let oldValue = e.target.value;
+    let prefix = oldValue.substring(0, e.target.selectionStart);
+    let suffix = oldValue.substring(e.target.selectionEnd);
+    let pasteValue = e.clipboardData.getData("text");
+    let value = `${prefix}${pasteValue}${suffix}`;
     let values = [value];
     if (value.match(/[\r\n]/)) {
       values = value.split(/\s*\r*\n\s*/g);

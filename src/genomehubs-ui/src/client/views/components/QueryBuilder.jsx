@@ -372,6 +372,7 @@ const QueryBuilder = ({
                 setInputValue={() => {}}
                 inputLabel={"taxon"}
                 handleSubmit={handleTaxonFilterChange}
+                handleBlur={handleTaxonFilterChange}
                 size={"small"}
                 maxRows={1}
                 result={"taxon"}
