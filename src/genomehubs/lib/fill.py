@@ -606,13 +606,10 @@ def set_values_from_descendants(
             attr_dict.update({key: attribute})
             if parent is not None:
                 parents[parent][key]["count"] += 1
-                try:
-                    if "sp_count" not in parents[parent][key]:
-                        parents[parent][key]["sp_count"] = 0
-                    if "sp_count" in attribute:
-                        parents[parent][key]["sp_count"] += attribute["sp_count"]
-                except KeyError:
-                    print("error 609")
+                if "sp_count" not in parents[parent][key]:
+                    parents[parent][key]["sp_count"] = 0
+                if "sp_count" in attribute:
+                    parents[parent][key]["sp_count"] += attribute["sp_count"]
                 if isinstance(summary_value, list):
                     parents[parent][key]["values"] = list(
                         set(parents[parent][key]["values"] + summary_value)
@@ -683,10 +680,7 @@ def track_missing_attribute_values(
                         }
                     )
                     obj["keys"].remove(key)
-                    try:
-                        obj["attributes"][-1].pop("sp_count", None)
-                    except KeyError:
-                        print("error 680")
+                    obj["attributes"][-1].pop("sp_count", None)
             if obj["keys"]:
                 missing_from_descendants[child_id] = obj
             else:
@@ -811,10 +805,7 @@ def copy_attribute_summary(source, meta):
     except KeyError as err:
         raise (err)
     dest["count"] = source["count"]
-    try:
-        dest["sp_count"] = source["sp_count"]
-    except KeyError:
-        print("error 805")
+    dest["sp_count"] = source.get("sp_count", 0)
     dest["key"] = source["key"]
     return dest
 
