@@ -393,6 +393,14 @@ export const processTreeRings = ({
       Object.keys(node.children).length == 0
     ) {
       outer = maxDepth + 1;
+    }
+    if (
+      node.taxon_rank != "assembly" &&
+      (!node.hasOwnProperty("children") ||
+        Object.keys(node.children).length == 0 ||
+        node.hasAssemblies ||
+        node.hasSamples)
+    ) {
       if (node.taxon_id && showPhylopics && node.scientific_name != "parent") {
         let r = radius + dataWidth + phylopicWidth / 2;
 
