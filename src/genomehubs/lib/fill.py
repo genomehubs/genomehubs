@@ -607,7 +607,10 @@ def set_values_from_descendants(
             if parent is not None:
                 parents[parent][key]["count"] += 1
                 try:
-                    parents[parent][key]["sp_count"] += attribute["sp_count"]
+                    if "sp_count" not in parents[parent][key]:
+                        parents[parent][key]["sp_count"] = 0
+                    if "sp_count" in attribute:
+                        parents[parent][key]["sp_count"] += attribute["sp_count"]
                 except KeyError:
                     print("error 609")
                 if isinstance(summary_value, list):
