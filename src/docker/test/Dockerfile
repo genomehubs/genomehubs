@@ -12,6 +12,7 @@ RUN apt-get update \
     ca-certificates \
     gnupg \
     pigz \
+    software-properties-common \
     wget
 
 RUN mkdir -p /etc/apt/keyrings \
