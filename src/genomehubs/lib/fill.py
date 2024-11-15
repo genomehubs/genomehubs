@@ -479,14 +479,14 @@ def summarise_attributes(*, attributes, rank, attrs, meta, parent, parents):
         if node_attribute["key"] in attrs:
             attr_dict[node_attribute["key"]] = node_attribute
             sp_count = 0
-            if rank == "species":
-                sp_count = 1
-                parents[parent][node_attribute["key"]]["sp_count"] += 1
-                attr_dict[node_attribute["key"]]["sp_count"] = 1
-            elif rank in ["subspecies", "varietas", "strain"]:
-                sp_count = 0
-                parents[parent][node_attribute["key"]]["sp_count"] = 1
-                attr_dict[node_attribute["key"]]["sp_count"] = 0
+            # if rank == "species":
+            #     sp_count = 1
+            #     parents[parent][node_attribute["key"]]["sp_count"] += 1
+            #     attr_dict[node_attribute["key"]]["sp_count"] = 1
+            # elif rank in ["subspecies", "varietas", "strain"]:
+            #     sp_count = 0
+            #     parents[parent][node_attribute["key"]]["sp_count"] = 1
+            #     attr_dict[node_attribute["key"]]["sp_count"] = 0
 
             linked_attributes = {}
             if "order" in meta[node_attribute["key"]]:
