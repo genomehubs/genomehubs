@@ -87,7 +87,7 @@ const fetchPhylopic = async ({
     );
     let json = await response.json();
     let { items = [] } = json._links || {};
-    if (items.length > 1) {
+    if (items.length >= 1) {
       let synonyms = taxonNames.map(({ name }) => name.toLowerCase());
       items =
         items.filter(({ title }) => synonyms.includes(title.toLowerCase())) ||

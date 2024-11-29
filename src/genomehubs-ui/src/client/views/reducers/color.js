@@ -63,6 +63,28 @@ const pridePalette = [
 
 const ringsPalette = ["#3e76ec", "#FFCE01", "#000000", "#179A13", "#FF0000"];
 
+const cudPalette = [
+  "#000000",
+  "#E69F00",
+  "#56B4E9",
+  "#009E73",
+  "#F0E442",
+  "#0072B2",
+  "#D55E00",
+  "#CC79A7",
+];
+
+const cudRainbowPalette = [
+  "#D55E00", // Red
+  "#E69F00", // Orange
+  "#F0E442", // Yellow
+  "#009E73", // Green
+  "#56B4E9", // Blue
+  "#0072B2", // Dark Blue
+  "#CC79A7", // Pink
+  "#000000", // Black
+];
+
 export const palettes = handleActions(
   {
     ADD_PALETTE: (state, action) =>
@@ -90,14 +112,16 @@ export const palettes = handleActions(
       accent: createD3Palette(schemeAccent, 8),
       batlowS: createPalette(batlowS),
       batlow: createPalette(batlow, 50),
-      // bhm: { id: "bhm", default: bhmPalette, levels: [] },
       bhm: createPalette(bhmPalette),
       category: createD3Palette(schemeCategory10, 10),
       cividis: createD3Palette(interpolateCividis, 50),
       cool: createD3Palette(interpolateCool, 50),
       cubeHelix: createD3Palette(interpolateCubehelixDefault, 50),
+      cud: createPalette(cudPalette),
+      cudRainbow: createPalette(cudRainbowPalette),
       dark: createD3Palette(schemeDark2, 8),
       default: createD3Palette(interpolateViridis, 50),
+      cudReverse: createPalette(cudPalette.reverse().splice(1)),
       inferno: createD3Palette(interpolateInferno, 50),
       magma: createD3Palette(interpolateMagma, 50),
       paired: createD3Palette(schemePaired, 12),
@@ -110,7 +134,17 @@ export const palettes = handleActions(
       viridis: createD3Palette(interpolateViridis, 50),
       warm: createD3Palette(interpolateWarm, 50),
     },
-    allIds: ["default", "batlow", "batlowS", "cividis", "paired", "viridis"],
+    allIds: [
+      "default",
+      "batlow",
+      "batlowS",
+      "cividis",
+      "paired",
+      "viridis",
+      "cud",
+      "cudRainbow",
+      "cudReverse",
+    ],
   },
 );
 
