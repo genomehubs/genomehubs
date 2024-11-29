@@ -96,12 +96,18 @@ function multiFormat(date, interval) {
 }
 
 export const formats = (value, valueType, interval) => {
+  if (
+    value == "..." ||
+    isNaN(value) ||
+    valueType == "keyword" ||
+    valueType == "coordinate"
+  ) {
+    return value;
+  }
   if (valueType == "integer") {
     return sciInt(value);
   } else if (valueType == "date") {
     return multiFormat(value, interval);
-  } else if (valueType == "keyword" || valueType == "coordinate") {
-    return value;
   }
   return sci(value);
 };
