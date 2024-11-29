@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import {
   blank as blankStyle,
   imageContainer as imageContainerStyle,
@@ -65,7 +65,7 @@ const PhyloPics = ({
     if (!phylopicById) {
       fetchPhylopic({ taxonId });
     }
-  }, [taxonId, phylopicById]);
+  }, [taxonId]);
 
   useEffect(() => {
     setMetadata(phylopicById || {});
@@ -253,4 +253,4 @@ const PhyloPics = ({
   );
 };
 
-export default compose(withRecord, withPhylopicsById)(PhyloPics);
+export default compose(withRecord, withPhylopicsById, memo)(PhyloPics);

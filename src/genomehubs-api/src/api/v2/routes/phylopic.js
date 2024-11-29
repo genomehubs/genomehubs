@@ -118,7 +118,6 @@ const fetchPhylopic = async ({
   } catch (err) {
     response = { status: { success: false, error: "unable to fetch" } };
   }
-  console.log(response);
 
   if (response.status.success && response.phylopic.source == "Ancestral") {
     let newResponse = await resolveByName({
