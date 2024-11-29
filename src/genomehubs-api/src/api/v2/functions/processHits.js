@@ -131,6 +131,18 @@ export const processHits = ({
         });
         result.result.names = taxonNames;
       }
+      if (hit.inner_hits && hit.inner_hits.identifiers && names) {
+        let recordNames = {};
+        hit.inner_hits.identifiers.hits.hits.forEach((obj) => {
+          let hitNames = {};
+          Object.keys(obj.fields).forEach((key) => {
+            hitNames[key.replace("identifiers.", "").replace(".raw", "")] =
+              obj.fields[key];
+          });
+          recordNames[obj.fields["identifiers.class"]] = hitNames;
+        });
+        result.result.names = recordNames;
+      }
       if (hit.inner_hits && hit.inner_hits.lineage) {
         if (ranks) {
           let taxonRanks = {};

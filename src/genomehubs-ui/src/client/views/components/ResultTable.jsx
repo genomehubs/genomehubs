@@ -948,11 +948,13 @@ const ResultTable = ({
       if (
         result.result.names &&
         result.result.names[nameClass] &&
-        result.result.names[nameClass].name
+        (result.result.names[nameClass].name ||
+          result.result.names[nameClass].identifier)
       ) {
         cells.push(
-          <TableCell key={nameClass}>
-            {result.result.names[nameClass].name}
+          <TableCell key={`name-${nameClass}`}>
+            {result.result.names[nameClass].name ||
+              result.result.names[nameClass].identifier}
           </TableCell>,
         );
       } else {
@@ -967,7 +969,7 @@ const ResultTable = ({
         result.result.ranks[rank].scientific_name
       ) {
         cells.push(
-          <TableCell key={rank}>
+          <TableCell key={`rank-${rank}`}>
             {result.result.ranks[rank].scientific_name}
           </TableCell>,
         );
@@ -1382,13 +1384,18 @@ const ResultTable = ({
     heads.push(
       <SortableCell
         name={nameClass}
-        key={nameClass}
+        key={`name-${nameClass}`}
         sortDirection={sortBy === nameClass ? sortOrder : false}
         {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
       />,
     );
     filters.push(
-      <ResultFilter name={nameClass} key={nameClass} value={""} colSpan={1} />,
+      <ResultFilter
+        name={nameClass}
+        key={`name-${nameClass}`}
+        value={""}
+        colSpan={1}
+      />,
     );
     expandedCols.push(<TableCell key={nameClass} />);
   });
@@ -1396,12 +1403,12 @@ const ResultTable = ({
     heads.push(
       <SortableCell
         name={rank}
-        key={rank}
+        key={`rank-${rank}`}
         sortDirection={sortBy === rank ? sortOrder : false}
         {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
       />,
     );
-    filters.push(<ResultFilter name={rank} key={rank} value={""} />);
+    filters.push(<ResultFilter name={rank} key={`rank-${rank}`} value={""} />);
     expandedCols.push(<TableCell key={rank} />);
   });
   if (searchIndex == "assembly" || searchIndex == "feature") {

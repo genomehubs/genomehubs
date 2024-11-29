@@ -111,7 +111,7 @@ const ResultFilter = ({
       }
     }
     for (let arr of Object.values(attributes)) {
-      if (!arr) {
+      if (!arr || arr.length < 3 || !arr[0]) {
         continue;
       }
       let attrParts = arr[0].split(":");

@@ -11,6 +11,7 @@ import { filterTaxa } from "./queryFragments/filterTaxa.js";
 import { histogram } from "../reports/histogram.js";
 import { histogramAgg } from "./histogramAgg.js";
 import { matchAttributes } from "./queryFragments/matchAttributes.js";
+import { matchIdentifiers } from "./queryFragments/matchIdentifiers.js";
 import { matchNames } from "./queryFragments/matchNames.js";
 import { matchRanks } from "./queryFragments/matchRanks.js";
 import { restrictToRank } from "./queryFragments/restrictToRank.js";
@@ -107,7 +108,12 @@ export const searchByTaxon = async ({
   if (identifierTerms) {
     identifiers = filterIdentifiers(identifierTerms);
   }
-  let namesExist = matchNames(names, namesMap);
+  let namesExist;
+  if (result == "taxon") {
+    namesExist = matchNames(names, namesMap);
+  } else {
+    namesExist = matchIdentifiers(names, namesMap);
+  }
   let lineageRanks = matchRanks(ranks, maxDepth);
   let attributeValues = filterAttributes(
     filters,

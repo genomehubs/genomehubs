@@ -38,7 +38,10 @@ export const formatCsv = async (response, opts) => {
         if (nameClass && nameClass != "") {
           datum[nameClass] =
             fullResult.result.names[nameClass] &&
-            fullResult.result.names[nameClass].name;
+            (
+              fullResult.result.names[nameClass].name ||
+              fullResult.result.names[nameClass].identifier
+            ).join(";");
         }
       });
     }
