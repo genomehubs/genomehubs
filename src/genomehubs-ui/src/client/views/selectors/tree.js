@@ -287,7 +287,11 @@ export const processTreeRings = ({
   }
   let yDomain = yBounds && yBounds.domain;
 
-  if (yDomain && (yBounds.type != "date" || summary != "value")) {
+  if (
+    yDomain &&
+    yDomain.length > 0 &&
+    (yBounds.type != "date" || summary != "value")
+  ) {
     yDomain = updateDomain({
       domain: yDomain,
       field: yField,
@@ -307,6 +311,7 @@ export const processTreeRings = ({
       label: formats(valueScale.domain()[0]),
       radius: radius + 10 + valueScale(valueScale.domain()[0]),
     });
+    console.log({ radius, dataWidth, phylopicWidth });
 
     let arcString = arc()({
       innerRadius: radius + 10 + valueScale(mid),
