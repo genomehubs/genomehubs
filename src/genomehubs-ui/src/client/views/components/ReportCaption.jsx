@@ -1,12 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import Grid from "@mui/material/Grid2";
+import PhylopicAttributions from "./PhylopicAttributions";
 import Tooltip from "./Tooltip";
 import { reportCaption as reportCaptionStyle } from "./Styles.scss";
 import stringLength from "../functions/stringLength";
 import useResize from "../hooks/useResize";
 
-const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
+const ReportCaption = ({
+  reportById,
+  caption,
+  embedded,
+  inModal,
+  padding = 0,
+}) => {
   const gridRef = useRef();
   const { width, height } = useResize(gridRef);
   const [captionScale, setCaptionScale] = useState(100);
@@ -77,19 +84,35 @@ const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
     displayCaption = formatCaption({ caption });
   }
 
+  let captionFooter;
+  let { tree } = reportById.report;
+  if (tree && tree.phylopics && Object.keys(tree.phylopics).length > 0) {
+    captionFooter = (
+      <PhylopicAttributions
+        taxIds={tree.phylopics}
+        showAncestral={false}
+        fontSize={12}
+        embed={false}
+      />
+    );
+  }
+
   return (
     <Grid ref={gridRef} style={{ textAlign: "center" }} size="grow">
-      <div
-        className={reportCaptionStyle}
-        style={{
-          pointerEvents: "auto",
-          ...(captionScale && {
-            fontSize: `${captionScale}%`,
-            marginTop: inModal ? "0.5em" : padding ? `${padding}px` : 0,
-          }),
-        }}
-      >
-        {displayCaption}
+      <div style={{ width: "100%", maxHeight: "6em", overflowY: "auto" }}>
+        <div
+          className={reportCaptionStyle}
+          style={{
+            pointerEvents: "auto",
+            ...(captionScale && {
+              fontSize: `${captionScale}%`,
+              marginTop: inModal ? "0.5em" : padding ? `${padding}px` : 0,
+            }),
+          }}
+        >
+          {displayCaption}
+        </div>
+        {captionFooter}
       </div>
     </Grid>
   );

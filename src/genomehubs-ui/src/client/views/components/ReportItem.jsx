@@ -603,6 +603,7 @@ const ReportItem = ({
       </Grid>
       {!loading && !error && caption && (
         <ReportCaption
+          reportById={reportById}
           caption={caption}
           embedded={embedded}
           inModal={inModal}

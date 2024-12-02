@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
 
+import PhylopicAttributions from "./PhylopicAttributions";
 import Phylopics from "./PhyloPics";
 import Tooltip from "./Tooltip";
 import Typography from "@mui/material/Typography";
@@ -303,6 +304,8 @@ const ReportTreeRings = ({
   }
 
   let phylopicElements = [];
+  let taxIds = {};
+  let ctr = 0;
   for (let [taxonId, opts] of Object.entries(phylopics)) {
     if (!taxonId) {
       continue;
@@ -323,7 +326,17 @@ const ReportTreeRings = ({
         />
       </g>,
     );
+    taxIds[taxonId] = scientificName;
   }
+
+  let attributions = (
+    <PhylopicAttributions
+      taxIds={taxIds}
+      embed={"svg"}
+      x={0}
+      fontSize={pointSize}
+    />
+  );
 
   return (
     <div
@@ -344,7 +357,7 @@ const ReportTreeRings = ({
       >
         <defs>{defs}</defs>
         <g
-          transform="translate(500, 500)"
+          transform={`translate(${dimensions.width / 2}, ${dimensions.height / 2})`}
           style={{
             fontFamily:
               '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
@@ -357,6 +370,16 @@ const ReportTreeRings = ({
           {ticksText}
           {highlightPath}
           {phylopicElements}
+        </g>
+        <g
+          transform={`translate(${dimensions.width / 2}, ${dimensions.height})`}
+          style={{
+            fontFamily:
+              '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+            fontSize: `${pointSize}px`,
+          }}
+        >
+          {attributions}
         </g>
       </svg>
     </div>
