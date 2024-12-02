@@ -74,6 +74,7 @@ const PhyloPics = ({
   let {
     attribution,
     fileUrl,
+    dataUri,
     source,
     sourceUrl,
     license,
@@ -96,6 +97,7 @@ const PhyloPics = ({
   }
 
   let imageDescription;
+
   if (source == "Ancestral") {
     if (!showAncestral) {
       if (embed) {
@@ -104,7 +106,13 @@ const PhyloPics = ({
       imageDescription = (
         <div>
           No image was found for {scientificName} at{" "}
-          <a href="https://phylopic.org" target="_blank">
+          <a
+            href={"https://phylopic.org"}
+            onClick={(e) => {
+              e.preventDefault();
+              window.open("https://phylopic.org", "_blank");
+            }}
+          >
             PhyloPic.org
           </a>
         </div>
@@ -124,7 +132,13 @@ const PhyloPics = ({
         <div>
           No image was found for {scientificName} so the presented image of{" "}
           {imageName} from{" "}
-          <a href={fileUrl} target="_blank">
+          <a
+            href={sourceUrl}
+            onClick={(e) => {
+              e.preventDefault();
+              window.open(sourceUrl, "_blank");
+            }}
+          >
             PhyloPic.org
           </a>{" "}
           is a representative of the same {imageRank}
@@ -138,7 +152,13 @@ const PhyloPics = ({
     imageDescription = (
       <div>
         {scientificName} image from{" "}
-        <a href={fileUrl} target="_blank">
+        <a
+          href={sourceUrl}
+          onClick={(e) => {
+            e.preventDefault();
+            window.open(sourceUrl, "_blank");
+          }}
+        >
           PhyloPic.org
         </a>
         . The presented image shows {imageName}
@@ -148,7 +168,13 @@ const PhyloPics = ({
     imageDescription = (
       <div>
         {scientificName} image from{" "}
-        <a href={fileUrl} target="_blank">
+        <a
+          href={sourceUrl}
+          onClick={(e) => {
+            e.preventDefault();
+            window.open(sourceUrl, "_blank");
+          }}
+        >
           PhyloPic.org
         </a>
       </div>
@@ -164,7 +190,16 @@ const PhyloPics = ({
       <div>
         {imageDescription}
         <small>
-          image credit: <a href={license.href}>{attribution}</a>
+          image credit: {attribution}{" "}
+          <a
+            href={license.href}
+            onClick={(e) => {
+              e.preventDefault();
+              window.open(license.href, "_blank");
+            }}
+          >
+            {license.name}
+          </a>
         </small>
       </div>
     );
@@ -187,16 +222,18 @@ const PhyloPics = ({
             y={-maxHeight / 2}
             height={maxHeight}
             width={maxWidth}
-            xlinkHref={fileUrl}
+            xlinkHref={dataUri}
           />
           <Tooltip
             title={imageDescription}
             arrow
             enterDelay={500}
+            leaveDelay={100}
             disableInteractive={false}
           >
             <rect
               fill={"rgba(255,255,255,0)"}
+              fillOpacity={0}
               stroke={"none"}
               x={-maxWidth / 2}
               y={-maxHeight / 2}
@@ -240,12 +277,16 @@ const PhyloPics = ({
                 imageCreditStyle,
                 styleMap[`imageCredit${source}Style`],
               )}
-              onClick={(e) => {
-                e.preventDefault();
-                window.open(license.href, "_blank");
-              }}
             >
-              {truncate(attribution, 20)}/PhyloPic.org
+              {truncate(attribution, 20)}/PhyloPic.org{" "}
+              <a
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.open(license.href, "_blank");
+                }}
+              >
+                {license.name}
+              </a>
             </div>
           </Tooltip>
         )}

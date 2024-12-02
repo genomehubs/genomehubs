@@ -235,7 +235,7 @@ const ReportTreeRings = ({
             xlinkHref={`#${label.taxon_id}-label-path`}
             startOffset="50%"
             alignmentBaseline="central"
-            dominantBaseline="alphabetic"
+            dominantBaseline="central"
           >
             {label.scientific_name}
           </textPath>

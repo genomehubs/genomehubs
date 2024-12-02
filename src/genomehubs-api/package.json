@@ -42,6 +42,7 @@
     "redis": "^4.6.14",
     "reselect": "^5.1.1",
     "simple-statistics": "^7.8.2",
+    "spdx-license-list": "^6.9.0",
     "swagger-ui-express": "^5.0.1",
     "undici": "github:genomehubs/undici",
     "uuid": "^10.0.0",

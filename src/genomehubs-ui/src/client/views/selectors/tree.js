@@ -311,7 +311,6 @@ export const processTreeRings = ({
       label: formats(valueScale.domain()[0]),
       radius: radius + 10 + valueScale(valueScale.domain()[0]),
     });
-    console.log({ radius, dataWidth, phylopicWidth });
 
     let arcString = arc()({
       innerRadius: radius + 10 + valueScale(mid),

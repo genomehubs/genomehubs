@@ -1,7 +1,18 @@
 import { getRecordsById } from "../functions/getRecordsById.js";
 import { logError } from "../functions/logger.js";
+import spdxLicenseList from "spdx-license-list";
 
 let phylopics = {};
+
+const licensesByUrl = Object.entries(spdxLicenseList).reduce(
+  (acc, [key, value]) => {
+    if (value.url) {
+      acc[value.url.replace("/legalcode", "/").replace("//$", "/")] = key;
+    }
+    return acc;
+  },
+  {}
+);
 
 const fetchPhylopic = async ({
   taxonId,
@@ -31,7 +42,7 @@ const fetchPhylopic = async ({
           fileUrl: rasterFile.href,
           ratio: width / height,
           attribution,
-          license,
+          license: { ...license, name: licensesByUrl[license.href] },
           contributor,
           imageName: specificNode.title,
           sourceUrl: `https://www.phylopic.org/images/${uuid}/`,

@@ -1097,6 +1097,7 @@ body,
         font-size: 0.6em;
         width: calc( 100% - 1em );
         padding: 0.15em 0.5em;
+        cursor: default;
         color: themed("secondary");
         text-align: center;
         white-space:nowrap;
@@ -1109,6 +1110,11 @@ body,
         }
         &Ancestral {
           background-color: themed("ancestral");
+        }
+        a {
+          color: themed("secondary");
+          text-decoration: underline;
+          cursor: pointer;
         }
       }
 

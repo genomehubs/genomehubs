@@ -46,6 +46,19 @@ export function fetchPhylopic({ taxonId, taxonomy = "ncbi" }) {
       } catch (error) {
         json = console.log("An error occured.", error);
       }
+      if (json.phylopic && json.phylopic.source !== "Ancestral") {
+        json.phylopic.dataUri = await fetch(json.phylopic.fileUrl)
+          .then((response) => response.arrayBuffer())
+          .then((buffer) => {
+            let binary = "";
+            let bytes = new Uint8Array(buffer);
+            let len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+              binary += String.fromCharCode(bytes[i]);
+            }
+            return `data:image/png;base64,${btoa(binary)}`;
+          });
+      }
       dispatch(receivePhylopic(json.phylopic || { taxonId }));
     } catch (err) {
       dispatch(receivePhylopic({ taxonId }));
