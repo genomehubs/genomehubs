@@ -126,8 +126,8 @@ const NestedTable = ({
     setPreferSearchTerm(false);
     navigate(
       `${basename}/record?recordId=${recordId}&result=${result}&taxonomy=${taxonomy}#${encodeURIComponent(
-        recordId
-      )}`
+        recordId,
+      )}`,
     );
   };
 
@@ -237,7 +237,7 @@ const ValueCell = ({ attributeId, types, meta, currentResult, classes }) => {
   if (meta.max > meta.min) {
     range = ` (${formatter(meta.min, currentResult)}-${formatter(
       meta.max,
-      currentResult
+      currentResult,
     )})`;
   }
   if (meta.from && meta.to && meta.to > meta.from) {
@@ -324,7 +324,7 @@ const ValueCell = ({ attributeId, types, meta, currentResult, classes }) => {
               size="small"
               onClick={() => {
                 navigator.clipboard.writeText(
-                  values.map((v) => v.join("\t")).join("\n")
+                  values.map((v) => v.join("\t")).join("\n"),
                 );
               }}
             >
@@ -345,7 +345,7 @@ const ValueCell = ({ attributeId, types, meta, currentResult, classes }) => {
               <MoreHorizIcon />
             </IconButton>
           </Tooltip>
-        </span>
+        </span>,
       );
     }
   }
@@ -403,8 +403,8 @@ const AttributeTableRow = ({
     }
     navigate(
       `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
-        options.query
-      )}`
+        options.query,
+      )}`,
     );
   };
 
@@ -424,8 +424,8 @@ const AttributeTableRow = ({
     }
     navigate(
       `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
-        options.query
-      )}`
+        options.query,
+      )}`,
     );
   };
 
@@ -512,7 +512,7 @@ const AttributeTableRow = ({
         setHighlightPointLocation={setHighlightPointLocation}
         zoomPointLocation={zoomPointLocation}
         setZoomPointLocation={setZoomPointLocation}
-      />
+      />,
     );
     if (currentResult == "taxon") {
       let source = meta.aggregation_source;
@@ -549,7 +549,7 @@ const AttributeTableRow = ({
               {length > 1 && ` (${length})`}
             </span>
           </Tooltip>{" "}
-        </TableCell>
+        </TableCell>,
       );
 
       if (meta.aggregation_source) {
@@ -559,12 +559,12 @@ const AttributeTableRow = ({
         source = meta["aggregation_source"];
         css = classnames(
           underscoreStyle,
-          styleMap[`underscore${confidence[source]}Style`]
+          styleMap[`underscore${confidence[source]}Style`],
         );
         aggSource = formatter(source);
         let altCss = classnames(
           underscoreStyle,
-          styleMap[`underscore${confidence["descendant"]}Style`]
+          styleMap[`underscore${confidence["descendant"]}Style`],
         );
         let altAggSource = formatter("descendant");
         if (source == "direct") {
@@ -577,7 +577,7 @@ const AttributeTableRow = ({
               >
                 {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
               </IconButton>
-            </span>
+            </span>,
           );
         }
         if (source == "descendant" || meta.has_descendants) {
@@ -590,7 +590,7 @@ const AttributeTableRow = ({
               >
                 <KeyboardArrowRightIcon />
               </IconButton>
-            </span>
+            </span>,
           );
         } else if (source == "ancestor") {
           icons.push(
@@ -604,7 +604,7 @@ const AttributeTableRow = ({
               >
                 <KeyboardArrowRightIcon />
               </IconButton>
-            </span>
+            </span>,
           );
           if (meta.aggregation_rank) {
             aggSource = (
@@ -630,7 +630,7 @@ const AttributeTableRow = ({
                 <span className={altCss}>{altAggSource}</span> {icons[1]}
               </>
             )}
-          </TableCell>
+          </TableCell>,
         );
         colSpan++;
       }
@@ -672,7 +672,7 @@ const AttributeTableRow = ({
       fieldValues.push(
         <TableCell key={"source"} style={{ whiteSpace: "nowrap" }}>
           <SourceLink row={meta} types={types} />
-        </TableCell>
+        </TableCell>,
       );
     }
   }
@@ -716,5 +716,5 @@ export default compose(
   withRecord,
   withSummary,
   withSearch,
-  withTypes
+  withTypes,
 )(AttributeTableRow);

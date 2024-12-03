@@ -76,7 +76,7 @@ const StyledBadge = withStyles((theme) => ({
     top: 6,
     fontSize: "0.8em",
     border: "2px solid white",
-    padding: "0px 4px",
+    // padding: "0px 4px",
     color: "white",
     backgroundColor: "rgba(0,0,0,0.26)",
   },
@@ -554,6 +554,49 @@ const findLastIndex = ({ name, field, expandedTypes }) => {
   return index;
 };
 
+const formatCellValue = ({
+  value,
+  type,
+  field,
+  searchIndex,
+  charLimit = 20,
+}) => {
+  let entries = [];
+  if (Array.isArray(value)) {
+    value = formatter(value, searchIndex, "array");
+    let charLimit = 20;
+    for (let v of value.values) {
+      let entry = v[0];
+      if (charLimit == 20 || charLimit - entry.length > 0) {
+        entries.push(entry);
+        charLimit -= entry.length;
+      }
+    }
+    value = entries.join(", ");
+    if (field.value.length > 1) {
+      length = field.value.length;
+    }
+  } else {
+    value = formatter(value, searchIndex);
+  }
+  if (
+    type.summary == "value" &&
+    Array.isArray(field.value) &&
+    field.length > entries.length
+  ) {
+    let badgeContent = `+${field.length - entries.length}`;
+    value = (
+      <span style={{ whiteSpace: "nowrap", marginRight: "0.75em" }}>
+        {value}
+        <StyledBadge badgeContent={badgeContent} color={"default"} max={100000}>
+          <span style={{ color: "rgba(0,0,0,0" }}>{badgeContent}</span>
+        </StyledBadge>
+      </span>
+    );
+  }
+  return value;
+};
+
 const ResultTable = ({
   types,
   displayTypes,
@@ -951,10 +994,30 @@ const ResultTable = ({
         (result.result.names[nameClass].name ||
           result.result.names[nameClass].identifier)
       ) {
+        let value =
+          result.result.names[nameClass].name ||
+          result.result.names[nameClass].identifier;
+        value = formatCellValue({
+          value,
+          type: { summary: "value" },
+          searchIndex,
+          field: { value, length: value.length },
+        });
         cells.push(
           <TableCell key={`name-${nameClass}`}>
-            {result.result.names[nameClass].name ||
-              result.result.names[nameClass].identifier}
+            <span
+              ref={rootRef}
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                setAttributeSettings({
+                  currentRecordId,
+                  attributeId: nameClass,
+                  showAttribute: true,
+                });
+              }}
+            >
+              {value}
+            </span>
           </TableCell>,
         );
       } else {
@@ -1076,45 +1139,12 @@ const ResultTable = ({
         value =
           binnable && field.hasOwnProperty("binned") ? field.binned : value;
         if (colSpan == 0) {
-          let entries = [];
-          if (Array.isArray(value)) {
-            value = formatter(value, searchIndex, "array");
-            let charLimit = 20;
-            for (let v of value.values) {
-              let entry = v[0];
-              if (charLimit == 20 || charLimit - entry.length > 0) {
-                entries.push(entry);
-                charLimit -= entry.length;
-              }
-            }
-            value = entries.join(", ");
-            if (field.value.length > 1) {
-              length = field.value.length;
-            }
-          } else {
-            value = formatter(value, searchIndex);
-          }
-          if (
-            type.summary == "value" &&
-            Array.isArray(field.value) &&
-            field.length > entries.length
-          ) {
-            let badgeContent = `+${field.length - entries.length}`;
-            value = (
-              <span>
-                {value}
-                <StyledBadge
-                  badgeContent={badgeContent}
-                  color={"default"}
-                  max={100000}
-                >
-                  <span style={{ padding: "0px 6px", color: "rgba(0,0,0,0" }}>
-                    {badgeContent}
-                  </span>
-                </StyledBadge>
-              </span>
-            );
-          }
+          value = formatCellValue({
+            value,
+            type,
+            searchIndex,
+            field,
+          });
           let color;
           if (type.name != type.field && type.file_paths) {
             let [_, key] = (type.field || type.name).split(".");

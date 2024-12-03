@@ -20,6 +20,30 @@ const sciInt = (v) => {
   return format(".3s")(v);
 };
 
+const parseNamesIdentifiers = ({ names, hit, field, hitField, result }) => {
+  if (hit.inner_hits && hit.inner_hits[hitField] && names) {
+    let parsed = {};
+    hit.inner_hits[hitField].hits.hits.forEach((obj) => {
+      let hitNames = parsed[obj.fields[`${hitField}.class`]] || {};
+      Object.keys(obj.fields).forEach((key) => {
+        let k = key.replace(`${hitField}.`, "").replace(".raw", "");
+        if (k == "name") {
+          if (!hitNames[k]) {
+            hitNames[k] = obj.fields[key];
+          } else {
+            hitNames[k].push(...obj.fields[key]);
+          }
+        } else {
+          hitNames[k] = obj.fields[key];
+        }
+      });
+
+      parsed[obj.fields[`${hitField}.class`]] = hitNames;
+    });
+    result[field] = parsed;
+  }
+};
+
 export const processHits = ({
   body,
   names,
@@ -119,30 +143,53 @@ export const processHits = ({
       });
     } else {
       result.result = hit._source;
-      if (hit.inner_hits && hit.inner_hits.taxon_names && names) {
-        let taxonNames = {};
-        hit.inner_hits.taxon_names.hits.hits.forEach((obj) => {
-          let hitNames = {};
-          Object.keys(obj.fields).forEach((key) => {
-            hitNames[key.replace("taxon_names.", "").replace(".raw", "")] =
-              obj.fields[key];
-          });
-          taxonNames[obj.fields["taxon_names.class"]] = hitNames;
-        });
-        result.result.names = taxonNames;
-      }
-      if (hit.inner_hits && hit.inner_hits.identifiers && names) {
-        let recordNames = {};
-        hit.inner_hits.identifiers.hits.hits.forEach((obj) => {
-          let hitNames = {};
-          Object.keys(obj.fields).forEach((key) => {
-            hitNames[key.replace("identifiers.", "").replace(".raw", "")] =
-              obj.fields[key];
-          });
-          recordNames[obj.fields["identifiers.class"]] = hitNames;
-        });
-        result.result.names = recordNames;
-      }
+      parseNamesIdentifiers({
+        names,
+        hit,
+        field: "names",
+        hitField: "taxon_names",
+        result: result.result,
+      });
+      parseNamesIdentifiers({
+        names,
+        hit,
+        field: "names",
+        hitField: "identifiers",
+        result: result.result,
+      });
+      // if (hit.inner_hits && hit.inner_hits.taxon_names && names) {
+      //   let taxonNames = {};
+      //   hit.inner_hits.taxon_names.hits.hits.forEach((obj) => {
+      //     let hitNames = taxonNames[obj.fields["taxon_names.class"]] || {};
+      //     Object.keys(obj.fields).forEach((key) => {
+      //       let k = key.replace("taxon_names.", "").replace(".raw", "");
+      //       if (k == "name") {
+      //         if (!hitNames[k]) {
+      //           hitNames[k] = obj.fields[key];
+      //         } else {
+      //           hitNames[k].push(obj.fields[key]);
+      //         }
+      //       } else {
+      //         hitNames[k] = obj.fields[key];
+      //       }
+      //     });
+
+      //     taxonNames[obj.fields["taxon_names.class"]] = hitNames;
+      //   });
+      //   result.result.names = taxonNames;
+      // }
+      // if (hit.inner_hits && hit.inner_hits.identifiers && names) {
+      //   let recordNames = {};
+      //   hit.inner_hits.identifiers.hits.hits.forEach((obj) => {
+      //     let hitNames = {};
+      //     Object.keys(obj.fields).forEach((key) => {
+      //       hitNames[key.replace("identifiers.", "").replace(".raw", "")] =
+      //         obj.fields[key];
+      //     });
+      //     recordNames[obj.fields["identifiers.class"]] = hitNames;
+      //   });
+      //   result.result.names = recordNames;
+      // }
       if (hit.inner_hits && hit.inner_hits.lineage) {
         if (ranks) {
           let taxonRanks = {};
@@ -189,25 +236,6 @@ export const processHits = ({
           result.result.lineage = lineage;
         }
       }
-      // if (result.result.lineage) {
-      //   if (ranks) {
-      //     let taxonRanks = { ...ranks };
-      //     result.result.lineage.forEach((anc) => {
-      //       if (taxonRanks[anc.taxon_rank]) {
-      //         taxonRanks[anc.taxon_rank] = anc;
-      //       }
-      //     });
-      //     if (taxonRanks[result.result.taxon_rank]) {
-      //       taxonRanks[result.result.taxon_rank] = {
-      //         scientific_name: result.result.scientific_name,
-      //         taxon_id: result.result.taxon_id,
-      //         taxon_rank: result.result.taxon_rank,
-      //       };
-      //     }
-      //     result.result.ranks = taxonRanks;
-      //     delete result.result.lineage;
-      //   }
-      // }
       if (result.result.attributes) {
         let fields = {};
         result.result.attributes.forEach((attribute) => {

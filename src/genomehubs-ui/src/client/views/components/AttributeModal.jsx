@@ -112,7 +112,44 @@ const AttributeModal = ({
         title={title.join(" - ")}
       />
     );
+  } else if (record?.record?.taxon_names) {
+    let list = record.record.taxon_names
+      .filter((obj) => obj.class == prefix)
+      .map((obj) => obj.name.replace(",", " ").replace(/\s+/, " "));
+    table = (
+      <AttributePanel
+        key={"attributes"}
+        attributes={{ [prefix]: { value: list } }}
+        result={options.result}
+        taxonId={currentRecordId}
+        title={title.join(" - ")}
+      />
+    );
+  } else if (record?.record?.identifiers && record.record.identifiers[prefix]) {
+    let list = record.record.identifiers
+      .filter((obj) => obj.class == prefix)
+      .map((obj) => obj.name);
+    table = (
+      <AttributePanel
+        key={"attributes"}
+        attributes={{ [prefix]: { value: list } }}
+        result={options.result}
+        taxonId={currentRecordId}
+        title={title.join(" - ")}
+      />
+    );
+  } else {
+    table = (
+      <AttributePanel
+        key={"attributes"}
+        attributes={{ [prefix]: { value: ["No data available"] } }}
+        result={options.result}
+        taxonId={currentRecordId}
+        title={title.join(" - ")}
+      />
+    );
   }
+
   return (
     <Paper className={classes.paper}>
       <Grid container alignItems="center" direction="column" spacing={2}>
