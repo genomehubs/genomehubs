@@ -6,8 +6,13 @@ export const setColors = ({
   levels,
   count,
   colors,
+  offset,
+  reverse,
 }) => {
   let palette;
+
+  levels = structuredClone(levels);
+
   if (colorPalette) {
     let [paletteName, paletteLevels] = colorPalette.split(":");
     count = paletteLevels || count;
@@ -24,15 +29,37 @@ export const setColors = ({
   }
   if (count) {
     if (levels[count]) {
-      colors = levels[count];
+      colors = [...levels[count]];
     } else if (palette) {
       if (palette[count]) {
-        colors = palette[count];
+        colors = [...palette[count]];
       } else {
-        colors = palette.default;
+        colors = [...palette.default];
+      }
+    }
+  } else {
+    colors = [...colors];
+  }
+
+  for (let [key, arr] of Object.entries(levels)) {
+    if (!isNaN(key)) {
+      if (reverse) {
+        levels[key] = arr.slice().reverse();
+      }
+      if (offset) {
+        let modOffset = offset % arr.length;
+        levels[key] = [...arr.slice(modOffset).concat(arr.slice(0, modOffset))];
       }
     }
   }
+  if (offset) {
+    let arr = levels[colors.length + offset];
+    colors = [...arr.slice(0, colors.length)];
+  }
+  if (reverse) {
+    colors = colors.slice().reverse();
+  }
+
   return {
     levels,
     colors: colors.map((c) => {

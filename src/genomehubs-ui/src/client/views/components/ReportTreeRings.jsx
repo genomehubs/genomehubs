@@ -39,6 +39,8 @@ const ReportTreeRings = ({
     levels,
     count: cats.length || 1,
     colors,
+    offset: 3,
+    reverse: true,
   }));
 
   let divHeight = height;

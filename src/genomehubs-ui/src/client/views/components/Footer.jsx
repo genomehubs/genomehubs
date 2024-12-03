@@ -68,7 +68,7 @@ const Footer = ({
   }, [taxonomy, apiStatus]);
   useEffect(() => {
     if (currentPalette != id) {
-      selectPalette(currentPalette);
+      selectPalette({ id: currentPalette });
     }
   }, [currentPalette, levels]);
   if (!taxonomy || hidden) {

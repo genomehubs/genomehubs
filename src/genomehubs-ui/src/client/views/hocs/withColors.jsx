@@ -21,14 +21,14 @@ const withColors = (WrappedComponent) => (props) => {
   };
 
   const mapDispatchToProps = (dispatch) => ({
-    selectPalette: (id) => {
-      dispatch(selectPalette(id));
+    selectPalette: ({ id = "default", offset = 0, reverse = false }) => {
+      dispatch(selectPalette({ id, offset, reverse }));
     },
   });
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

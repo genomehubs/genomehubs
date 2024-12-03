@@ -5,7 +5,7 @@ const rowToHex = (row) => {
     .map((v) =>
       Math.round(v * 255)
         .toString(16)
-        .padStart(2, "0")
+        .padStart(2, "0"),
     )
     .join("")}`;
 };
@@ -23,15 +23,15 @@ export const createD3Palette = (interpolateFunc, n) => {
       palette.push(
         Array.isArray(interpolateFunc)
           ? interpolateFunc[i]
-          : interpolateFunc(i / (iter > 4 ? iter - 1 : iter))
+          : interpolateFunc(i / (iter > 4 ? iter - 1 : iter)),
       );
     }
     levels[iter] = palette.map((row) =>
       row.startsWith("rgb")
         ? `#${convert.rgb.hex(
-            row.replace("rgb(", "").replace(")", "").split(",")
+            row.replace("rgb(", "").replace(")", "").split(","),
           )}`
-        : row
+        : row,
     );
     if (iter == n) {
       levels.default = palette;
@@ -57,7 +57,7 @@ export const createPalette = (raw, n) => {
       }
       return row.startsWith("rgb")
         ? `#${convert.rgb.hex(
-            row.replace("rgb(", "").replace(")", "").split(",")
+            row.replace("rgb(", "").replace(")", "").split(","),
           )}`
         : row;
     });
@@ -94,7 +94,7 @@ export const createPalette = (raw, n) => {
   if (n < 100) {
     let j = 1;
     for (let i = n + 1; i <= 100; i++) {
-      levels[i] = levels[i - 1].concat([levels[i - 1][j - 1]]);
+      levels[i] = [...levels[i - 1]].concat([levels[i - 1][j - 1]]);
       j++;
     }
   }

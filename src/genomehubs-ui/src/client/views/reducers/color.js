@@ -153,32 +153,28 @@ export const getSelectedPalette = (state) => state.selectedPalette;
 export const selectPalette = createAction("SELECT_PALETTE");
 export const selectedPalette = handleAction(
   "SELECT_PALETTE",
-  (state, action) => action.payload,
-  "default",
+  (state, action) => ({ ...state, ...action.payload }),
+  { id: "default", offset: 0, reverse: true },
 );
 
 export const getAllPalettes = (state) => state.palettes;
 
-export const getColorPalette = createSelector(
-  getSelectedPalette,
-  getAllPalettes,
-  (id, palettes) => {
-    let colors = palettes ? palettes.byId[id] || palettes.byId["default"] : [];
-    return { id, colors };
-  },
-);
-
-export const getUserPalette = createSelector(getAllPalettes, (palettes) => {
-  let id = "user";
-  let colors = palettes ? palettes.byId[id] || palettes.byId["default"] : [];
-  return { id, colors };
-});
-
 export const getDefaultPalette = createSelector(
   getSelectedPalette,
   getAllPalettes,
-  (id, palettes) => {
-    let levels = palettes ? palettes.byId[id] || palettes.byId["default"] : {};
+  ({ id, offset, reverse }, palettes) => {
+    let levels = structuredClone(
+      palettes ? palettes.byId[id] || palettes.byId["default"] : {},
+    );
+    for (let [key, arr] of Object.entries(levels)) {
+      if (reverse) {
+        levels[key] = arr.slice().reverse();
+      }
+      if (offset) {
+        levels[key] = arr.slice(offset).concat(arr.slice(0, offset));
+      }
+    }
+
     return { id, colors: levels.default, levels };
   },
 );
