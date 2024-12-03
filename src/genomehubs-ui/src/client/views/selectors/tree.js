@@ -403,29 +403,30 @@ export const processTreeRings = ({
       (!node.hasOwnProperty("children") ||
         Object.keys(node.children).length == 0 ||
         node.hasAssemblies ||
-        node.hasSamples)
+        node.hasSamples) &&
+      node.taxon_id &&
+      showPhylopics &&
+      node.scientific_name != "parent"
     ) {
-      if (node.taxon_id && showPhylopics && node.scientific_name != "parent") {
-        let r = radius + dataWidth + phylopicWidth / 2;
+      let r = radius + dataWidth + phylopicWidth / 2;
 
-        let width = (Math.PI * r * 2 * 0.9) / cMax;
-        let height = phylopicWidth * 0.9;
+      let width = (Math.PI * r * 2 * 0.9) / cMax;
+      let height = phylopicWidth * 0.9;
 
-        phylopics[node.taxon_id] = {
-          angle: (midAngle * 180) / Math.PI,
-          radius: r,
-          scientificName: node.scientific_name,
-          width,
-          height,
-          arc: arc()({
-            innerRadius: radius + dataWidth,
-            outerRadius: radius + dataWidth + phylopicWidth,
-            startAngle,
-            endAngle,
-          }),
-          ...circleXY(r, midAngle),
-        };
-      }
+      phylopics[node.taxon_id] = {
+        angle: (midAngle * 180) / Math.PI,
+        radius: r,
+        scientificName: node.scientific_name,
+        width,
+        height,
+        arc: arc()({
+          innerRadius: radius + dataWidth,
+          outerRadius: radius + dataWidth + phylopicWidth,
+          startAngle,
+          endAngle,
+        }),
+        ...circleXY(r, midAngle),
+      };
     }
     let outerRadius = rScale(outer);
     let farOuterRadius = rScale(maxDepth + 1);
