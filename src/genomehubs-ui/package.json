@@ -88,7 +88,7 @@
     "konva": "^3.4.1",
     "leaflet": "^1.7.1",
     "merge-images": "^2.0.0",
-    "nanoid": "^3.1.31",
+    "nanoid": "^3.3.8",
     "pixi.js": "^5.3.11",
     "pixi.js-legacy": "^5.3.11",
     "preact": "^10.6.2",
@@ -139,6 +139,6 @@
     "usehooks-ts": "^2.5.4",
     "webpack": "^5.82.0",
     "webpack-cli": "^5.0.2",
-    "webpack-dev-server": "^4.13.3"
+    "webpack-dev-server": "^5.2.0"
   }
 }
