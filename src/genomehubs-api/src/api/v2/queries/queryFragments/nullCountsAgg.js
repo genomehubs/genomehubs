@@ -50,6 +50,24 @@ export const nullCountsAgg = async ({
             value_list: {
               terms: { field: "attributes.keyword_value", size: termsCount },
             },
+            long_sum: {
+              sum: { field: "attributes.long_value" },
+            },
+            integer_sum: {
+              sum: { field: "attributes.integer_value" },
+            },
+            short_sum: {
+              sum: { field: "attributes.short_value" },
+            },
+            byte_sum: {
+              sum: { field: "attributes.byte_value" },
+            },
+            float_sum: {
+              sum: { field: "attributes.float_value" },
+            },
+            double_sum: {
+              sum: { field: "attributes.double_value" },
+            },
           },
         },
         ...(Object.keys(metaTerms).length > 0 && {

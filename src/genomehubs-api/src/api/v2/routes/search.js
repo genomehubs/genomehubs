@@ -226,6 +226,23 @@ export const getSearchResults = async (req, res) => {
     if (countRes.aggs && !response.aggs) {
       response.aggs = countRes.aggs;
     }
+    for (let [field, agg] of Object.entries(
+      response.aggs.fields.by_key.buckets
+    )) {
+      for (let [key, value] of Object.entries(agg)) {
+        if (
+          typeof value !== "object" ||
+          (value.hasOwnProperty("value") && value.value == 0)
+        ) {
+          delete agg[key];
+          continue;
+        }
+        if (key.endsWith("_sum")) {
+          agg.value_sum = { ...value };
+          delete agg[key];
+        }
+      }
+    }
     progress = getProgress(queryId);
     if (
       progress &&
