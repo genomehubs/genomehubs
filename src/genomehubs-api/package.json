@@ -41,7 +41,7 @@
     "reselect": "^4.1.6",
     "simple-statistics": "^7.8.2",
     "swagger-ui-express": "^4.3.0",
-    "undici": "github:genomehubs/undici",
+    "undici": "5.28.5",
     "uuid": "^9.0.1",
     "winston": "^3.7.2",
     "winston-daily-rotate-file": "^4.6.1",
