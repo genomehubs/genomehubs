@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 
-import { Chip } from "@material-ui/core";
-import LaunchIcon from "@material-ui/icons/Launch";
+import { Chip } from "@mui/material";
+import LaunchIcon from "@mui/icons-material/Launch";
 import Tooltip from "./Tooltip";
 import compareValues from "../functions/compareValues";
 import { compose } from "recompose";
 import getPrimaryAssemblyId from "../functions/getPrimaryAssemblyId";
-import styles from "./Styles.scss";
+import { recordLinkIcon as recordLinkIconStyle } from "./Styles.scss";
 import withApi from "../hocs/withApi";
 import withRecord from "../hocs/withRecord";
 
@@ -32,7 +32,11 @@ const RecordLink = ({
       !records[record.record.assembly_id] &&
       !recordIsFetching
     ) {
-      fetchRecord(record.record.assembly_id, "assembly", taxonomy);
+      fetchRecord({
+        recordId: record.record.assembly_id,
+        result: "assembly",
+        taxonomy,
+      });
     }
   }, [records]);
 
@@ -60,13 +64,14 @@ const RecordLink = ({
     }
   }
 
-  const fetchValue = (key, value) => {
+  const fetchValue = (key, v) => {
+    let value = v;
     if (key == "assemblyId") {
       return getPrimaryAssemblyId(record);
     }
     let keys = key.split(/[\.\[]+/);
     for (let k of keys) {
-      if (k.match(/\]$/)) {
+      if (k.match(/\]$/) && Array.isArray(value)) {
         k = k.replace(/\]$/, "");
         let [subkey, subval] = k.split(":");
         value = subval
@@ -134,7 +139,7 @@ const RecordLink = ({
     return null;
   }
 
-  icon = icon ? <img className={styles.recordLinkIcon} src={icon} /> : null;
+  icon = icon ? <img className={recordLinkIconStyle} src={icon} /> : null;
 
   let chip = (
     <Chip

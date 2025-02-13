@@ -40,16 +40,17 @@ mkdir -p src/views &&
 
 rm -rf src/views/* &&
 
-TEMPLATE="<% if (variables) { %> \
-<script> \
-<%- variables %> \
-</script> \
-<% } %> \
-" &&
+# TEMPLATE="<% if (variables) { %> \
+# <script> \
+# <%- variables %> \
+# </script> \
+# <% } %> \
+# " &&
 
-sed 's:<!---->:'"$TEMPLATE"':' src/public/index.html > src/views/index.ejs &&
+# sed 's:<!---->:'"$TEMPLATE"':' src/public/index.html > src/views/index.ejs &&
+mv src/public/index.html src/views/index.ejs &&
 
-rm src/public/index.html &&
+# rm src/public/index.html &&
 
 echo "Installing package dependencies" &&
 

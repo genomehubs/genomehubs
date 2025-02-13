@@ -1,12 +1,13 @@
-import { checkResponse } from "../functions/checkResponse";
-import { client } from "../functions/connection";
-import { formatJson } from "../functions/formatJson";
-import { indexName } from "../functions/indexName";
-import { logError } from "../functions/logger";
-import { lookupQuery } from "../queries/lookupQuery";
-import { processHits } from "../functions/processHits";
-import { saytQuery } from "../queries/saytQuery";
-import { suggestQuery } from "../queries/suggestQuery";
+import { checkResponse } from "../functions/checkResponse.js";
+import { client } from "../functions/connection.js";
+import { formatJson } from "../functions/formatJson.js";
+import { indexName } from "../functions/indexName.js";
+import { logError } from "../functions/logger.js";
+import { lookupQuery } from "../queries/lookupQuery.js";
+import { processHits } from "../functions/processHits.js";
+import { saytQuery } from "../queries/saytQuery.js";
+import { suggestQuery } from "../queries/suggestQuery.js";
+import { type } from "os";
 
 const indices = {
   taxon: "taxon_id",
@@ -36,23 +37,31 @@ const sayt = async (params, iter = 0) => {
    * @param {string} params.searchTerm - The search term to look up.
    * @param {Number} iter - Iterator to keep track of recursive function calls.
    */
-  let result = params.result;
+  let { result } = params;
   if (result == "multi") {
     result = setResult(iter);
-    if (!result) return { status: undefined, results: [] };
+    if (!result) {
+      return { status: undefined, results: [] };
+    }
   }
   let newParams = { ...params, result };
-  if (result == "taxon" && params.searchTerm.match(/\s/)) {
-    if (params.searchTerm.match(/\*/)) {
-      newParams.wildcardTerm = params.searchTerm;
+  let { searchTerm } = params;
+  if (typeof searchTerm == "string") {
+    searchTerm = searchTerm.trim();
+  } else {
+    searchTerm = "";
+  }
+  if (result && result == "taxon" && searchTerm.match(/\s/)) {
+    if (searchTerm.match(/\*/)) {
+      newParams.wildcardTerm = searchTerm;
     } else {
-      let parts = params.searchTerm.split(/\s+/);
+      let parts = searchTerm.split(/\s+/);
       if (parts.length == 2) {
         newParams.wildcardTerm = `${parts.join(" * ")}*`;
       }
     }
-  } else if (params.searchTerm.match(/\*/)) {
-    newParams.wildcardTerm = params.searchTerm;
+  } else if (searchTerm.match(/\*/)) {
+    newParams.wildcardTerm = searchTerm;
   }
   let index = indexName(newParams);
   const { body } = await client
@@ -89,10 +98,12 @@ const lookup = async (params, iter = 0) => {
    * @param {string} params.searchTerm - The search term to look up.
    * @param {Number} iter - Iterator to keep track of recursive function calls.
    */
-  let result = params.result;
+  let { result } = params;
   if (result == "multi") {
     result = setResult(iter);
-    if (!result) return { status: undefined, results: [] };
+    if (!result) {
+      return { status: undefined, results: [] };
+    }
   }
   let newParams = { ...params, result };
   let index = indexName(newParams);
@@ -123,10 +134,12 @@ const lookup = async (params, iter = 0) => {
 };
 
 const suggest = async (params, iter = 0) => {
-  let result = params.result;
+  let { result } = params;
   if (result == "multi") {
     result = setResult(iter);
-    if (!result) return { status: undefined, results: [] };
+    if (!result) {
+      return { status: undefined, results: [] };
+    }
   }
   let newParams = { ...params, result };
   let index = indexName(newParams);

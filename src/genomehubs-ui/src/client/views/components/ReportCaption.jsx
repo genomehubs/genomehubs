@@ -1,12 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
+import PhylopicAttributions from "./PhylopicAttributions";
 import Tooltip from "./Tooltip";
+import { reportCaption as reportCaptionStyle } from "./Styles.scss";
 import stringLength from "../functions/stringLength";
-import styles from "./Styles.scss";
 import useResize from "../hooks/useResize";
 
-const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
+const ReportCaption = ({
+  reportById,
+  caption,
+  embedded,
+  inModal,
+  padding = 0,
+}) => {
   const gridRef = useRef();
   const { width, height } = useResize(gridRef);
   const [captionScale, setCaptionScale] = useState(100);
@@ -17,12 +24,21 @@ const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
       let parts = (caption || "").split("**");
       for (let i = 0; i < parts.length; i++) {
         if (i % 2 == 0) {
-          captionArr.push(<span key={i}>{parts[i]}</span>);
+          let units = parts[i].split(",");
+          for (let j = 0; j < units.length; j++) {
+            captionArr.push(
+              <span key={i + j}>
+                {units[j]}
+                {j < units.length - 1 && ",\u200b"}
+              </span>,
+            );
+          }
+          // captionArr.push(<span key={i}>{parts[i]}</span>);
         } else {
           captionArr.push(
             <b key={i} style={{ color: tooltip ? "yellow" : "black" }}>
               {parts[i]}
-            </b>
+            </b>,
           );
         }
       }
@@ -44,8 +60,8 @@ const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
   const countRows = (arr) =>
     Math.floor(
       Math.ceil(
-        (stringLength(arr.join(" ")) * 8 * captionScale) / 100 / width
-      ) * 1.5
+        (stringLength(arr.join(" ")) * 8 * captionScale) / 100 / width,
+      ) * 1.5,
     );
   let displayCaption;
   if (!inModal) {
@@ -68,19 +84,35 @@ const ReportCaption = ({ caption, embedded, inModal, padding = 0 }) => {
     displayCaption = formatCaption({ caption });
   }
 
+  let captionFooter;
+  let { tree } = reportById.report;
+  if (tree && tree.phylopics && Object.keys(tree.phylopics).length > 0) {
+    captionFooter = (
+      <PhylopicAttributions
+        taxIds={tree.phylopics}
+        showAncestral={false}
+        fontSize={12}
+        embed={false}
+      />
+    );
+  }
+
   return (
-    <Grid ref={gridRef} item xs style={{ textAlign: "center" }}>
-      <div
-        className={styles.reportCaption}
-        style={{
-          pointerEvents: "auto",
-          ...(captionScale && {
-            fontSize: `${captionScale}%`,
-            marginTop: inModal ? "0.5em" : padding ? `${padding}px` : 0,
-          }),
-        }}
-      >
-        {displayCaption}
+    <Grid ref={gridRef} style={{ textAlign: "center" }} size="grow">
+      <div style={{ width: "100%", maxHeight: "6em", overflowY: "auto" }}>
+        <div
+          className={reportCaptionStyle}
+          style={{
+            pointerEvents: "auto",
+            ...(captionScale && {
+              fontSize: `${captionScale}%`,
+              marginTop: inModal ? "0.5em" : padding ? `${padding}px` : 0,
+            }),
+          }}
+        >
+          {displayCaption}
+        </div>
+        {captionFooter}
       </div>
     </Grid>
   );

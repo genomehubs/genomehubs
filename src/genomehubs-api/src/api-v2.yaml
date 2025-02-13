@@ -305,6 +305,27 @@ components:
       name: emptyColumns
       schema:
         type: boolean
+    groupsParam:
+      description: |
+        Comma separated list of attribute display groups to return.
+      examples:
+        null:
+          value:
+          summary: return values for all display groups
+        top_level:
+          value: top_level
+          summary: all top level attribute fields
+        none:
+          value: none
+          summary: no attribute fields
+        assembly:
+          value: assembly
+          summary: assembly display group
+      in: query
+      name: groups
+      required: false
+      schema:
+        type: string
     includeEstimatesParam:
       description: |
         Flag to indicate whether search results should include records for which all attribute fields are based on estimated values.
@@ -335,6 +356,22 @@ components:
           summary: true - include raw values
       in: query
       name: includeRawValues
+      schema:
+        type: boolean
+    reorientParam:
+      description: |
+        reorient chromosomes in secondary assembly.
+
+        This parameter only applies to reports with `report=oxford` or `report=ribbon`.
+      examples:
+        false:
+          value:
+          summary: false - do not reorient chromosomes
+        true:
+          value: true
+          summary: true - reorient chromosomes if linear regression is negative
+      in: query
+      name: reorient
       schema:
         type: boolean
     indentParam:
@@ -625,6 +662,7 @@ components:
           - histogram
           - map
           - oxford
+          - ribbon
           - scatter
           - sources
           - table
@@ -938,6 +976,24 @@ components:
       required: false
       schema:
         type: string
+    taxonIdParam:
+      description: |
+        Unique taxon identifier.
+      examples:
+        canis_lupus:
+          value: "9612"
+          summary: Taxon ID for Canis lupus
+        metazoa:
+          value: "33208"
+          summary: Taxon ID for Metazoa
+      explode: false
+      in: query
+      name: taxonId
+      required: true
+      schema:
+        items:
+          type: string
+      style: form
     tidyDataParam:
       description: |
         Format delimited text output as Tidy Data.
@@ -1247,6 +1303,30 @@ paths:
       tags:
         - Tools
       x-eov-operation-handler: api/v2/routes/download
+  /phylopic:
+    get:
+      description: Get phylopic
+      operationId: getPhylopic
+      parameters:
+        - $ref: "#/components/parameters/taxonIdParam"
+        - $ref: "#/components/parameters/taxonomyParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: "#/components/schemas/Status"
+                    status: null
+                  - $ref: "#/components/schemas/Count"
+                    count: null
+          description: successful operation
+        "400":
+          description: Invalid query
+      summary: Get phylopic
+      tags:
+        - External
+      x-eov-operation-handler: api/v2/routes/phylopic
   /indices:
     get:
       description: Returns a list of available indices
@@ -1339,7 +1419,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/recordIdParam"
         - $ref: "#/components/parameters/resultParam"
-        - $ref: "#/components/parameters/sizeParam"
+        - $ref: "#/components/parameters/groupsParam"
+        - $ref: "#/components/parameters/sizeParam" # not used
         - $ref: "#/components/parameters/taxonomyParam"
         - $ref: "#/components/parameters/releaseParam"
         - $ref: "#/components/parameters/indentParam"
@@ -1372,7 +1453,8 @@ paths:
         | **Files**     | `x`               | `checkedFiles` |
         | **Histogram** | `x`               | `cat`, `catToX`, `rank`, `xOpts` |
         | **Map**       | `x`               | `cat`, `rank`          |
-        | **Oxford**    | `x`               | `cat`, `xOpts`, `yOpts` |
+        | **Oxford**    | `x`               | `cat`, `xOpts`, `yOpts`, `reorient` |
+        | **Ribbon**    | `x`               | `cat`, `xOpts`, `reorient` |
         | **Scatter**   | `x`, `y`, `rank`  | `cat`, `xOpts`, `yOpts`, `scatterThreshold` |
         | **Table**     | `x`, `y`          | `cat`, `rank`, `xOpts`, `yOpts`, `scatterThreshold` |
         | **Sources**   | -                 | -              |
@@ -1403,6 +1485,7 @@ paths:
         - $ref: "#/components/parameters/taxonomyParam"
         - $ref: "#/components/parameters/xOptsParam"
         - $ref: "#/components/parameters/yOptsParam"
+        - $ref: "#/components/parameters/reorientParam"
         - $ref: "#/components/parameters/checkedFilesParam"
         - $ref: "#/components/parameters/mapThresholdParam"
         - $ref: "#/components/parameters/scatterThresholdParam"
@@ -1576,3 +1659,5 @@ tags:
     name: Metadata
   - description: Download files and check query progress
     name: Tools
+  - description: Fetch external resources
+    name: External

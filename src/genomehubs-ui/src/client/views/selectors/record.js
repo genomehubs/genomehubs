@@ -11,6 +11,7 @@ import {
 import { apiUrl } from "../reducers/api";
 import { createSelector } from "reselect";
 import { getCurrentTaxonomy } from "../reducers/taxonomy";
+import immutableUpdate from "immutable-update";
 import store from "../store";
 
 export const getLineage = createSelector(getCurrentRecord, (record) => {
@@ -27,7 +28,7 @@ export const getLineage = createSelector(getCurrentRecord, (record) => {
   };
 });
 
-export function fetchRecord(recordId, result, taxonomy, callback) {
+export function fetchRecord({ recordId, result, taxonomy, groups, callback }) {
   return async function (dispatch) {
     const state = store.getState();
     const records = getRecords(state);
@@ -39,8 +40,8 @@ export function fetchRecord(recordId, result, taxonomy, callback) {
     }
     dispatch(requestRecord());
     let url = `${apiUrl}/record?recordId=${encodeURIComponent(
-      recordId
-    )}&result=${result}&taxonomy=${taxonomy}`;
+      recordId,
+    )}&result=${result}&taxonomy=${taxonomy}&groups=${encodeURIComponent(groups)}`;
     try {
       let json;
       try {
@@ -71,7 +72,7 @@ export function fetchRecord(recordId, result, taxonomy, callback) {
           receiveRecord({
             status: json.status,
             records: [{ record: { record_id: recordId } }],
-          })
+          }),
         );
       }
       // dispatch(setApiStatus(true));
@@ -80,7 +81,7 @@ export function fetchRecord(recordId, result, taxonomy, callback) {
         receiveRecord({
           status: { success: false },
           records: [{ record: { record_id: recordId } }],
-        })
+        }),
       );
     }
   };

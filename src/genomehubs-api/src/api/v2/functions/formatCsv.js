@@ -33,18 +33,25 @@ export const formatCsv = async (response, opts) => {
     fields.forEach((key) => {
       datum[key] = fullResult.result[key];
     });
-    if (opts.names) {
+    if (opts.names && fullResult.result.names) {
       opts.names.forEach((nameClass) => {
-        datum[nameClass] =
-          fullResult.result.names[nameClass] &&
-          fullResult.result.names[nameClass].name;
+        if (nameClass && nameClass != "") {
+          datum[nameClass] =
+            fullResult.result.names[nameClass] &&
+            (
+              fullResult.result.names[nameClass].name ||
+              fullResult.result.names[nameClass].identifier
+            ).join(";");
+        }
       });
     }
-    if (opts.ranks) {
+    if (opts.ranks && fullResult.result.ranks) {
       opts.ranks.forEach((rank) => {
-        datum[rank] =
-          fullResult.result.ranks[rank] &&
-          fullResult.result.ranks[rank].scientific_name;
+        if (rank && rank != "") {
+          datum[rank] =
+            fullResult.result.ranks[rank] &&
+            fullResult.result.ranks[rank].scientific_name;
+        }
       });
     }
     if (opts.fields) {

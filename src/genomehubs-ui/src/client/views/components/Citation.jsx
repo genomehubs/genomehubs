@@ -1,9 +1,8 @@
-import React, { memo, useEffect, useRef, useState } from "react";
-
-import { Grid } from "@material-ui/core";
+import Grid from "@mui/material/Grid2";
+import React from "react";
 import { compose } from "recompose";
+import { link as linkStyle } from "./Styles.scss";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import withSiteName from "../hocs/withSiteName";
 
@@ -28,7 +27,7 @@ const Citation = ({ basename, searchTerm, resultCount }) => {
       <a
         href=""
         onClick={showSources}
-        className={styles.link}
+        className={linkStyle}
         style={{ textDecoration: "underline" }}
       >
         sources
@@ -43,8 +42,9 @@ const Citation = ({ basename, searchTerm, resultCount }) => {
       direction="row"
       justifyContent={"center"}
       style={{ marginBottom: "-1em" }}
+      size={12}
     >
-      <Grid item>
+      <Grid>
         <a>Please cite the </a>
         {sourcesLink}
       </Grid>

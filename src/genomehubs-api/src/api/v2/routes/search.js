@@ -1,26 +1,30 @@
-import { cacheStore, cachedResponse, pingCache } from "../functions/cache";
+import { cacheStore, cachedResponse, pingCache } from "../functions/cache.js";
 import {
   clearProgress,
   getProgress,
   isProgressComplete,
   setProgress,
-} from "../functions/progress";
+} from "../functions/progress.js";
 
-import { formatCsv } from "../functions/formatCsv";
-import { formatJson } from "../functions/formatJson";
-import { getBounds } from "../reports/getBounds";
-import { getResults } from "../functions/getResults";
-import { indexName } from "../functions/indexName";
-import { logError } from "../functions/logger";
-import { lookupAlternateIds } from "../functions/lookupAlternateIds";
-import { parseFields } from "../functions/parseFields";
-import { queryParams } from "../reports/queryParams";
-import { setExclusions } from "../functions/setExclusions";
-import setSortBy from "../reports/setSortBy";
+import { JsonStreamStringify } from "json-stream-stringify";
+import { formatCsv } from "../functions/formatCsv.js";
+// import { formatJson } from "../functions/formatJson.js";
+import { getBounds } from "../reports/getBounds.js";
+import { getResults } from "../functions/getResults.js";
+import { indexName } from "../functions/indexName.js";
+import { logError } from "../functions/logger.js";
+import { lookupAlternateIds } from "../functions/lookupAlternateIds.js";
+import { parseFields } from "../functions/parseFields.js";
+import { queryParams } from "../reports/queryParams.js";
+import { setExclusions } from "../functions/setExclusions.js";
+import setSortBy from "../reports/setSortBy.js";
 import { v4 as uuidv4 } from "uuid";
 
 const replaceSearchIds = async (params) => {
   let { query } = params;
+  if (typeof query !== "string") {
+    return "";
+  }
   let index = indexName({ ...params });
   let match = query.match(/tax_\w+\(\s*([^\)]+\s*)/);
   if (match) {
@@ -42,18 +46,31 @@ const replaceSearchIds = async (params) => {
 const formattedResponse = async (req, res, response) => {
   res.format({
     json: () => {
-      if (req.query.filename) {
-        let filename = `${req.query.filename.replace(/\.json$/, "")}.json`;
+      let { filename, indent } = req.query;
+      if (typeof filename === "string") {
+        filename = `${filename.replace(/\.json$/, "")}.json`;
         res.attachment(filename);
       }
-      res.status(200).send(formatJson(response, req.query.indent));
+      // if (typeof indent !== "number" || indent.match(/^\d+$/)) {
+      //   indent = 0;
+      // }
+      res.type("json");
+      res.status(200);
+      new JsonStreamStringify(response).pipe(res);
+      // res.status(200).send(formatJson(response, indent));
     },
     csv: async () => {
       let opts = {
         delimiter: ",",
         fields: await parseFields({ ...req.query }),
-        names: req.query.names ? req.query.names.split(/\s*,\s*/) : [],
-        ranks: req.query.ranks ? req.query.ranks.split(/\s*,\s*/) : [],
+        names:
+          typeof req.query.names === "string"
+            ? req.query.names.split(/\s*,\s*/)
+            : [],
+        ranks:
+          typeof req.query.ranks === "string"
+            ? req.query.ranks.split(/\s*,\s*/)
+            : [],
         tidyData: req.query.tidyData,
         includeRawValues: req.query.includeRawValues,
         result: req.query.result,
@@ -70,8 +87,14 @@ const formattedResponse = async (req, res, response) => {
       let opts = {
         delimiter: "\t",
         fields: await parseFields({ ...req.query }),
-        names: req.query.names ? req.query.names.split(/\s*,\s*/) : [],
-        ranks: req.query.ranks ? req.query.ranks.split(/\s*,\s*/) : [],
+        names:
+          typeof req.query.names === "string"
+            ? req.query.names.split(/\s*,\s*/)
+            : [],
+        ranks:
+          typeof req.query.ranks === "string"
+            ? req.query.ranks.split(/\s*,\s*/)
+            : [],
         tidyData: req.query.tidyData,
         includeRawValues: req.query.includeRawValues,
         result: req.query.result,

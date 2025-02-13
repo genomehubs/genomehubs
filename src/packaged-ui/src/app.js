@@ -1,7 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-// const nocache = require("nocache");
+// const helmet = require("helmet");
 
 const PORT = process.env.GH_PORT || process.env.GH_CLIENT_PORT || "8880";
 const GH_API_PORT = process.env.GH_API_PORT || "3000";
@@ -31,6 +31,23 @@ app.set("base", GH_BASENAME);
 // set the view engine to ejs
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
+
+// app.use(
+//   helmet(
+//     helmet.contentSecurityPolicy({
+//       useDefaults: true,
+//       directives: {
+//         "img-src": [
+//           "'self'",
+//           "https: data:",
+//           "https://*.genomehubs.org",
+//           "https://*.sanger.ac.uk",
+//           "https://*.phylopic.org",
+//         ],
+//       },
+//     })
+//   )
+// );
 
 // serve static assets normally
 // get hash value from directory name
@@ -66,6 +83,10 @@ app.use(
 app.use(GH_BASENAME, express.static(path.resolve(__dirname, "render")));
 
 app.use(GH_BASENAME, express.static(path.resolve(__dirname, "public")));
+
+app.get("*.md", (req, res) => {
+  res.status(200).send(`${req.path} not found`);
+});
 
 // handle every other route with index.html, which will contain
 // a script tag to your application's JavaScript file(s).

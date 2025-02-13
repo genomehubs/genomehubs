@@ -1,10 +1,13 @@
 import React, { memo, useEffect, useState } from "react";
+import {
+  nestedTab as nestedTabStyle,
+  tabDiv as tabDivStyle,
+} from "./Styles.scss";
 
 import Markdown from "./Markdown";
 import NavLink from "./NavLink";
 import Tab from "./Tab";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
 import withRoutes from "../hocs/withRoutes";
 
 const TabGroupComponent = ({
@@ -27,15 +30,12 @@ const TabGroupComponent = ({
     <div
       onPointerEnter={() => setVisible(true)}
       onPointerLeave={() => setVisible(false)}
-      className={styles.tabDiv}
+      className={tabDivStyle}
     >
       <NavLink to={parsedName} tab plain>
         {parsedName}
       </NavLink>
-      <div
-        className={styles.nestedTab}
-        style={{ height: visible ? "auto" : 0 }}
-      >
+      <div className={nestedTabStyle} style={{ height: visible ? "auto" : 0 }}>
         <Tabs group={`${group}-${parsedName}`} />
       </div>
     </div>
@@ -47,13 +47,13 @@ const TabGroup = compose(withRoutes)(TabGroupComponent);
 const Tabs = ({ group = "tabs" }) => {
   const [content, setContent] = useState(null);
 
-  let css; // = classnames(styles.tabHolder);
+  let css;
   const components = {
     ul: (props) => {
       return <nav className={css}>{props.children}</nav>;
     },
     li: (props) => {
-      let routeName = props.children[0].replace(/\n$/, "");
+      let routeName = props.children[0].replace(/\r?\n$/, "");
       if (routeName.match(/\+/)) {
         return (
           <TabGroup
@@ -81,7 +81,7 @@ const Tabs = ({ group = "tabs" }) => {
         pageId={`${group}.md`}
         components={components}
         siteStyles={true}
-      />
+      />,
     );
   }, []);
   return content;

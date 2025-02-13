@@ -1,41 +1,69 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
+import {
+  blank as blankStyle,
+  imageContainer as imageContainerStyle,
+  imageCreditAncestral as imageCreditAncestralStyle,
+  imageCreditDescendant as imageCreditDescendantStyle,
+  imageCreditPrimary as imageCreditPrimaryStyle,
+  imageCredit as imageCreditStyle,
+} from "./Styles.scss";
 
+import { Image } from "react-konva";
 import PhyloPic from "./PhyloPic";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
 import truncate from "../functions/truncate";
+import useImage from "use-image";
 import withPhylopicsById from "../hocs/withPhylopicsById";
 import withRecord from "../hocs/withRecord";
 
+const styleMap = {
+  imageCreditStyle,
+  imageCreditPrimaryStyle,
+  imageCreditDescendantStyle,
+  imageCreditAncestralStyle,
+};
+
+const PhyloPicKonvaImage = ({ fileUrl, maxHeight, maxWidth, x, y }) => {
+  let [image] = useImage(fileUrl);
+  return (
+    <Image
+      image={image}
+      x={-maxWidth / 2}
+      y={y}
+      height={maxHeight}
+      width={maxWidth}
+      crossOrigin="anonymous"
+    />
+  );
+};
+
 const PhyloPics = ({
   phylopicById,
+  record,
+  currentRecord = record,
+  taxonId = taxonId || currentRecord.record?.taxon_id,
+  scientificName = scientificName || currentRecord.record?.scientific_name,
   fetchPhylopic,
-  currentRecord,
   sourceColors = true,
   showAncestral = true,
-  record,
   maxHeight,
+  maxWidth,
   fixedRatio,
+  embed,
+  transform,
+  ...props
 }) => {
   const [metadata, setMetadata] = useState({});
 
-  if (!currentRecord && !record) {
+  if (!taxonId) {
     return null;
   }
-  record = currentRecord || record;
-
-  let {
-    scientific_name: scientificName,
-    lineage,
-    taxon_rank: rank,
-    taxon_id: taxonId,
-  } = record.record;
 
   useEffect(() => {
-    if (taxonId && !phylopicById) {
-      fetchPhylopic({ taxonId, scientificName, lineage, rank });
+    if (!phylopicById) {
+      fetchPhylopic({ taxonId });
     }
   }, [taxonId]);
 
@@ -46,6 +74,7 @@ const PhyloPics = ({
   let {
     attribution,
     fileUrl,
+    dataUri,
     source,
     sourceUrl,
     license,
@@ -53,21 +82,49 @@ const PhyloPics = ({
     imageName,
     imageRank,
   } = metadata;
+  if (maxWidth && !maxHeight) {
+    maxHeight = maxWidth / ratio;
+  } else if (maxHeight && !maxWidth) {
+    maxWidth = maxHeight * ratio;
+  } else if (maxHeight * ratio > maxWidth) {
+    maxHeight = maxWidth / ratio;
+  } else {
+    maxWidth = maxHeight * ratio;
+  }
+
+  if (!ratio) {
+    return null;
+  }
 
   let imageDescription;
+
   if (source == "Ancestral") {
     if (!showAncestral) {
+      if (embed) {
+        return null;
+      }
       imageDescription = (
         <div>
           No image was found for {scientificName} at{" "}
-          <a href="https://phylopic.org" target="_blank">
+          <a
+            href={"https://phylopic.org"}
+            onClick={(e) => {
+              e.preventDefault();
+              window.open("https://phylopic.org", "_blank");
+            }}
+          >
             PhyloPic.org
           </a>
         </div>
       );
       return (
-        <Tooltip title={imageDescription} styleName="dark" interactive arrow>
-          <div className={styles.blank}></div>
+        <Tooltip
+          title={imageDescription}
+          styleName="dark"
+          disableInteractive={false}
+          arrow
+        >
+          <div className={blankStyle}></div>
         </Tooltip>
       );
     } else {
@@ -75,7 +132,13 @@ const PhyloPics = ({
         <div>
           No image was found for {scientificName} so the presented image of{" "}
           {imageName} from{" "}
-          <a href={fileUrl} target="_blank">
+          <a
+            href={sourceUrl}
+            onClick={(e) => {
+              e.preventDefault();
+              window.open(sourceUrl, "_blank");
+            }}
+          >
             PhyloPic.org
           </a>{" "}
           is a representative of the same {imageRank}
@@ -89,7 +152,13 @@ const PhyloPics = ({
     imageDescription = (
       <div>
         {scientificName} image from{" "}
-        <a href={fileUrl} target="_blank">
+        <a
+          href={sourceUrl}
+          onClick={(e) => {
+            e.preventDefault();
+            window.open(sourceUrl, "_blank");
+          }}
+        >
           PhyloPic.org
         </a>
         . The presented image shows {imageName}
@@ -99,7 +168,13 @@ const PhyloPics = ({
     imageDescription = (
       <div>
         {scientificName} image from{" "}
-        <a href={fileUrl} target="_blank">
+        <a
+          href={sourceUrl}
+          onClick={(e) => {
+            e.preventDefault();
+            window.open(sourceUrl, "_blank");
+          }}
+        >
           PhyloPic.org
         </a>
       </div>
@@ -115,15 +190,70 @@ const PhyloPics = ({
       <div>
         {imageDescription}
         <small>
-          image credit: <a href={license.href}>{attribution}</a>
+          image credit: {attribution}{" "}
+          <a
+            href={license.href}
+            onClick={(e) => {
+              e.preventDefault();
+              window.open(license.href, "_blank");
+            }}
+          >
+            {license.name}
+          </a>
         </small>
       </div>
     );
   }
+  if (embed) {
+    if (embed == "konva") {
+      return (
+        <PhyloPicKonvaImage
+          fileUrl={fileUrl}
+          maxHeight={maxHeight}
+          maxWidth={maxWidth}
+          {...props}
+        />
+      );
+    } else {
+      return (
+        <g transform={transform}>
+          <image
+            x={-maxWidth / 2}
+            y={-maxHeight / 2}
+            height={maxHeight}
+            width={maxWidth}
+            xlinkHref={dataUri}
+          />
+          <Tooltip
+            title={imageDescription}
+            arrow
+            enterDelay={500}
+            leaveDelay={100}
+            disableInteractive={false}
+          >
+            <rect
+              fill={"rgba(255,255,255,0)"}
+              fillOpacity={0}
+              stroke={"none"}
+              x={-maxWidth / 2}
+              y={-maxHeight / 2}
+              height={maxHeight}
+              width={maxWidth}
+            />
+          </Tooltip>
+        </g>
+      );
+    }
+  }
   return (
-    <div className={styles.imageContainer}>
+    <div className={imageContainerStyle}>
       <div>
-        <Tooltip title={imageDescription} styleName="dark" interactive arrow>
+        <Tooltip
+          title={imageDescription}
+          styleName="dark"
+          disableInteractive={false}
+          arrow
+        >
           <div>
             {fileUrl && (
               <PhyloPic
@@ -144,15 +274,19 @@ const PhyloPics = ({
           <Tooltip title={attribution} arrow>
             <div
               className={classnames(
-                styles.imageCredit,
-                styles[`imageCredit${source}`]
+                imageCreditStyle,
+                styleMap[`imageCredit${source}Style`],
               )}
-              onClick={(e) => {
-                e.preventDefault();
-                window.open(license.href, "_blank");
-              }}
             >
-              {truncate(attribution, 20)}/PhyloPic.org
+              {truncate(attribution, 20)}/PhyloPic.org{" "}
+              <a
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.open(license.href, "_blank");
+                }}
+              >
+                {license.name}
+              </a>
             </div>
           </Tooltip>
         )}
@@ -160,4 +294,4 @@ const PhyloPics = ({
   );
 };
 
-export default compose(withRecord, withPhylopicsById)(PhyloPics);
+export default compose(withRecord, withPhylopicsById, memo)(PhyloPics);

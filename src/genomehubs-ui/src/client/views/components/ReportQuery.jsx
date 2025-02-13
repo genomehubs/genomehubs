@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
-import CloseIcon from "@material-ui/icons/Close";
-import FindInPageIcon from "@material-ui/icons/FindInPage";
-import Grid from "@material-ui/core/Grid";
-import SearchIcon from "@material-ui/icons/Search";
-import TextField from "@material-ui/core/TextField";
+import CloseIcon from "@mui/icons-material/Close";
+import FindInPageIcon from "@mui/icons-material/FindInPage";
+import Grid from "@mui/material/Grid2";
+import SearchIcon from "@mui/icons-material/Search";
+import TextField from "@mui/material/TextField";
 import { compose } from "recompose";
 import qs from "../functions/qs";
 import { setSearchTerm } from "../reducers/search";
@@ -51,17 +51,17 @@ export const ReportQuery = ({
 
   let params = ["x", "y"];
   let reports = reportById.report[report];
-  if (!Array.isArray(reports)) reports = [reports];
+  if (!Array.isArray(reports)) {
+    reports = [reports];
+  }
   reports.forEach((rep) => {
     params.forEach((param) => {
       if (rep[param] > 0 && rep[`${param}Query`]) {
         terms.push(
-          <Grid item style={{ width: "100%" }} key={param}>
+          <Grid style={{ width: "100%" }} key={param}>
             <Grid container direction="row" style={{ width: "100%" }}>
-              <Grid item xs={11}>
-                {rep[`${param}Query`].query}
-              </Grid>
-              <Grid item xs={1}>
+              <Grid size={11}>{rep[`${param}Query`].query}</Grid>
+              <Grid size={1}>
                 <SearchIcon
                   style={{ cursor: "pointer" }}
                   onClick={() => {
@@ -90,10 +90,11 @@ export const ReportQuery = ({
   };
   if (report == "tree" || report == "scatter") {
     searchInReport = (
-      <Grid item style={{ width: "100%" }}>
+      <Grid style={{ width: "100%" }}>
         <Grid container direction="row" alignItems="flex-end">
-          <Grid item xs={10}>
+          <Grid size={10}>
             <TextField
+              variant="standard"
               value={value}
               fullWidth
               label="Find in report"
@@ -101,7 +102,7 @@ export const ReportQuery = ({
               onKeyPress={handleKeyPress}
             />
           </Grid>
-          <Grid item xs={1}>
+          <Grid size={1}>
             <FindInPageIcon
               style={{ cursor: "pointer" }}
               onClick={() => {
@@ -109,7 +110,7 @@ export const ReportQuery = ({
               }}
             />
           </Grid>
-          <Grid item xs={1}>
+          <Grid size={1}>
             <CloseIcon
               style={{ cursor: "pointer" }}
               onClick={() => {
@@ -129,9 +130,7 @@ export const ReportQuery = ({
       spacing={2}
     >
       {searchInReport}
-      <Grid item style={{ width: "100%" }}>
-        Search using report query:
-      </Grid>
+      <Grid style={{ width: "100%" }}>Search using report query:</Grid>
       {terms}
     </Grid>
   );

@@ -1,4 +1,4 @@
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import React from "react";
 import ReportLegend from "./ReportLegend";
 import { compose } from "recompose";
@@ -9,7 +9,7 @@ export const ReportInfo = ({ reportById, report }) => {
     return null;
   }
 
-  let caption = reportById.report.caption;
+  let { caption } = reportById.report;
   return (
     <Grid
       container
@@ -17,8 +17,8 @@ export const ReportInfo = ({ reportById, report }) => {
       style={{ height: "100%", width: "100%" }}
       spacing={2}
     >
-      <Grid item>{caption}</Grid>
-      <Grid item>
+      <Grid>{caption}</Grid>
+      <Grid>
         <ReportLegend reportById={reportById} report={report} />
       </Grid>
     </Grid>

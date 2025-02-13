@@ -9,6 +9,8 @@ const reportParams = {
   yScale: "linear",
   cumulative: false,
   compactLegend: false,
+  reorient: false,
+  dropShadow: false,
   catToX: false,
 };
 
@@ -30,9 +32,7 @@ export const splitTerms = (terms) => {
   let reportTerm = {};
   for (let key in terms) {
     if (reportParams[key] !== undefined) {
-      if (reportParams[key] === false) {
-        reportTerm[key] = terms[key];
-      } else if (reportParams[key] != terms[key]) {
+      if (reportParams[key] === false || reportParams[key] != terms[key]) {
         reportTerm[key] = terms[key];
       }
     } else if (searchParams.hasOwnProperty(key)) {

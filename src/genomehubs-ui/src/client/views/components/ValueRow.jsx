@@ -1,8 +1,8 @@
-import { Chip, Grid } from "@material-ui/core";
+import { Chip, Grid } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
 import DisplayCount from "./DisplayCount";
-import LaunchIcon from "@material-ui/icons/Launch";
+import LaunchIcon from "@mui/icons-material/Launch";
 import Tooltip from "./Tooltip";
 import compareValues from "../functions/compareValues";
 import { compose } from "recompose";
@@ -37,7 +37,11 @@ const ValueRow = ({
       !records[record.record.assembly_id] &&
       !recordIsFetching
     ) {
-      fetchRecord(record.record.assembly_id, "assembly", taxonomy);
+      fetchRecord({
+        recordId: record.record.assembly_id,
+        result: "assembly",
+        taxonomy,
+      });
     }
   }, [records]);
   if (!record || !record.record || !suffix || !value) {

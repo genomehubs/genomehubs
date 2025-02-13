@@ -1,42 +1,36 @@
-import React, { Fragment, useLayoutEffect, useRef, useState } from "react";
+import React, { useState } from "react";
+import {
+  blackToAncestral as blackToAncestralStyle,
+  blackToDescendant as blackToDescendantStyle,
+  blackToDirect as blackToDirectStyle,
+  blackToPrimary as blackToPrimaryStyle,
+} from "./Styles.scss";
 
-import CloseIcon from "@material-ui/icons/Close";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import Modal from "@material-ui/core/Modal";
-import Skeleton from "@material-ui/lab/Skeleton";
-import Typography from "@material-ui/core/Typography";
+import Skeleton from "@mui/material/Skeleton";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
-import styles from "./Styles.scss";
-import useResize from "../hooks/useResize";
-import useWindowDimensions from "../hooks/useWindowDimensions";
 import withApi from "../hocs/withApi";
 
+const styleMap = {
+  blackToAncestralStyle,
+  blackToDescendantStyle,
+  blackToDirectStyle,
+  blackToPrimaryStyle,
+};
+
 const PhyloPic = ({
-  fileId,
   fileUrl,
   source = "Primary",
-  apiUrl,
-  containerRef,
   ratio = 1,
   fixedRatio,
-  windowDimensions,
-  previewDimensions,
-  setPreviewDimensions,
   maxHeight = 100,
 }) => {
   const [src, setSrc] = useState(false);
   const [loading, setLoading] = useState(true);
-  // const { width, height } = useResize(containerRef);
   const width = 300;
 
   let imageWidth = fixedRatio
     ? maxHeight * ratio
     : Math.min(maxHeight * ratio, width);
-  // if (!fileId) {
-  //   return null;
-  // }
   const handleLoad = () => {
     setLoading(false);
   };
@@ -52,18 +46,6 @@ const PhyloPic = ({
     }
   };
   if (!src) {
-    // let [width, height] = meta.size_pixels.split("x");
-    // let ratio = height / width;
-    // let modalWidth = windowDimensions.width * 0.6;
-    // let modalHeight = windowDimensions.height * 0.6;
-    // if (width / height > modalWidth / modalHeight) {
-    //   let imgWidth = Math.min(width, modalWidth);
-    //   setPreviewDimensions({ width: imgWidth, height: imgWidth * ratio });
-    // } else {
-    //   let imgHeight = Math.min(height, modalHeight);
-    //   setPreviewDimensions({ width: imgHeight / ratio, height: imgHeight });
-    // }
-
     setSrc(fileUrl);
   }
   return loading && 0 ? (
@@ -81,13 +63,17 @@ const PhyloPic = ({
         }}
         src={src}
       />
-      <Skeleton variant="rect" width={imageWidth} height={imageWidth / ratio} />
+      <Skeleton
+        variant="rectangular"
+        width={imageWidth}
+        height={imageWidth / ratio}
+      />
     </div>
   ) : (
     <div>
       <img
         src={src}
-        className={styles[`blackTo${source}`]}
+        className={styleMap[`blackTo${source}Style`]}
         style={{
           width: `${imageWidth}px`,
           maxWidth: "100%",

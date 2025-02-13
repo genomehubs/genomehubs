@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 
-import CloseIcon from "@material-ui/icons/Close";
-import IconButton from "@material-ui/core/IconButton";
-import MuiAlert from "@material-ui/lab/Alert";
-import Snackbar from "@material-ui/core/Snackbar";
+import CloseIcon from "@mui/icons-material/Close";
+import IconButton from "@mui/material/IconButton";
+import MuiAlert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import { compose } from "recompose";
 import withController from "../hocs/withController";
 import withMessage from "../hocs/withMessage";
@@ -56,7 +56,7 @@ const DownloadMessage = ({ message, setMessage, controller }) => {
               bottom: 4,
               left: "1em",
               right: "3em",
-              height: 4,
+              height: "4px",
               width: "auto",
               backgroundColor: "white",
               overflow: "hidden",
@@ -68,7 +68,7 @@ const DownloadMessage = ({ message, setMessage, controller }) => {
                   position: "absolute",
                   left: 0,
                   top: 0,
-                  height: 4,
+                  height: "4px",
                   width: `${(x / total) * 100}%`,
                   backgroundColor: "#2196f3",
                   opacity: "50%",
@@ -81,7 +81,7 @@ const DownloadMessage = ({ message, setMessage, controller }) => {
                   position: "absolute",
                   left: 0,
                   top: 0,
-                  height: 4,
+                  height: "4px",
                   width: `${(y / total) * 100}%`,
                   backgroundColor: "#2196f3",
                   opacity: "50%",

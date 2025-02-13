@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 
 import AttributePanel from "./AttributePanel";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
+import Grid from "@mui/material/Grid2";
+import Paper from "@mui/material/Paper";
 import ResultColumnOptions from "./ResultColumnOptions";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import withRecord from "../hocs/withRecord";
 import withTaxonomy from "../hocs/withTaxonomy";
@@ -14,16 +14,16 @@ export const useStyles = makeStyles((theme) => ({
   paper: {
     width: "96%",
     minWidth: "600px",
-    padding: theme.spacing(2),
-    marginTop: theme.spacing(2),
+    padding: "16px",
+    marginTop: "16px",
     boxShadow: "none",
   },
   formControl: {
-    margin: theme.spacing(2),
-    minWidth: 120,
+    margin: "16px",
+    minWidth: "120px",
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
+    marginTop: "16px",
   },
   label: {
     color: "rgba(0, 0, 0, 0.54)",
@@ -55,29 +55,28 @@ const AttributeModal = ({
         (!record.record || recordId != record.record.taxon_id)
       ) {
         if (!recordIsFetching) {
-          fetchRecord(recordId, "taxon", taxonomy);
+          fetchRecord({ recordId, result: "taxon", taxonomy });
         }
       } else if (
         options.result == "assembly" &&
         (!record.record || recordId != record.record.assembly_id)
       ) {
         if (!recordIsFetching) {
-          fetchRecord(recordId, "assembly", taxonomy);
+          fetchRecord({ recordId, result: "assembly", taxonomy });
         }
       } else if (
         options.result == "sample" &&
         (!record.record || recordId != record.record.sample_id)
       ) {
         if (!recordIsFetching) {
-          fetchRecord(recordId, "sample", taxonomy);
+          fetchRecord({ recordId, result: "sample", taxonomy });
         }
       } else if (
         options.result == "feature" &&
-        (!record.record || recordId != record.record.feature_id)
+        (!record.record || recordId != record.record.feature_id) &&
+        !recordIsFetching
       ) {
-        if (!recordIsFetching) {
-          fetchRecord(recordId, "feature", taxonomy);
-        }
+        fetchRecord({ recordId, result: "feature", taxonomy });
       }
     }
   }, [options, recordId]);
@@ -94,7 +93,7 @@ const AttributeModal = ({
   if (record.record.taxon_id) {
     if (record.record.scientific_name) {
       title.unshift(
-        `${record.record.scientific_name} (${record.record.taxon_id})`
+        `${record.record.scientific_name} (${record.record.taxon_id})`,
       );
     } else {
       title.unshift(`Taxon ID ${record.record.taxon_id}`);
@@ -113,7 +112,44 @@ const AttributeModal = ({
         title={title.join(" - ")}
       />
     );
+  } else if (record?.record?.taxon_names) {
+    let list = record.record.taxon_names
+      .filter((obj) => obj.class == prefix)
+      .map((obj) => obj.name.replace(",", " ").replace(/\s+/, " "));
+    table = (
+      <AttributePanel
+        key={"attributes"}
+        attributes={{ [prefix]: { value: list } }}
+        result={options.result}
+        taxonId={currentRecordId}
+        title={title.join(" - ")}
+      />
+    );
+  } else if (record?.record?.identifiers && record.record.identifiers[prefix]) {
+    let list = record.record.identifiers
+      .filter((obj) => obj.class == prefix)
+      .map((obj) => obj.name);
+    table = (
+      <AttributePanel
+        key={"attributes"}
+        attributes={{ [prefix]: { value: list } }}
+        result={options.result}
+        taxonId={currentRecordId}
+        title={title.join(" - ")}
+      />
+    );
+  } else {
+    table = (
+      <AttributePanel
+        key={"attributes"}
+        attributes={{ [prefix]: { value: ["No data available"] } }}
+        result={options.result}
+        taxonId={currentRecordId}
+        title={title.join(" - ")}
+      />
+    );
   }
+
   return (
     <Paper className={classes.paper}>
       <Grid container alignItems="center" direction="column" spacing={2}>

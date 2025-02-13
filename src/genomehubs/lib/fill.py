@@ -280,6 +280,7 @@ def apply_summary(
         "mode_list": mode_list,
         "range": range,
         "sum": sum,
+        "sp_count": len,
         "list": deduped_list,
         "length": deduped_list_length,
         "ordered_list": ordered_list,
@@ -313,6 +314,7 @@ def set_traverse_values(
     values,
     primary_values,
     count,
+    sp_count,
     max_value,
     min_value,
     meta,
@@ -355,6 +357,7 @@ def set_traverse_values(
                         summary = summary_types[0]
                     attribute[value_type] = value
                     attribute["count"] = count or len(values)
+                    attribute["sp_count"] = sp_count
                     if summary in ["list", "ordered_list"]:
                         attribute["length"] = deduped_list_length(values)
                     attribute["aggregation_method"] = summary
@@ -398,6 +401,7 @@ def summarise_attribute_values(
     linked_attributes=None,
     values=None,
     count=0,
+    sp_count=0,
     max_value=None,
     min_value=None,
     source="direct",
@@ -441,6 +445,7 @@ def summarise_attribute_values(
                 values,
                 primary_values,
                 count,
+                sp_count,
                 max_value,
                 min_value,
                 meta,
@@ -466,13 +471,23 @@ def summarise_attribute_values(
     return None, None, None
 
 
-def summarise_attributes(*, attributes, attrs, meta, parent, parents):
+def summarise_attributes(*, attributes, rank, attrs, meta, parent, parents):
     """Set attribute summary values."""
     changed = False
     attr_dict = {}
     for node_attribute in attributes:
         if node_attribute["key"] in attrs:
             attr_dict[node_attribute["key"]] = node_attribute
+            sp_count = 0
+            if rank == "species":
+                sp_count = 1
+                parents[parent][node_attribute["key"]]["sp_count"] += 1
+                attr_dict[node_attribute["key"]]["sp_count"] = 1
+            elif rank in ["subspecies", "varietas", "strain"]:
+                sp_count = 0
+                parents[parent][node_attribute["key"]]["sp_count"] = 1
+                attr_dict[node_attribute["key"]]["sp_count"] = 0
+
             linked_attributes = {}
             if "order" in meta[node_attribute["key"]]:
                 for attribute in attributes:
@@ -482,6 +497,7 @@ def summarise_attributes(*, attributes, attrs, meta, parent, parents):
                 node_attribute,
                 {"key": node_attribute["key"], **meta[node_attribute["key"]]},
                 linked_attributes=linked_attributes,
+                # sp_count=sp_count,
             )
             if summary_value is not None:
                 changed = True
@@ -577,6 +593,7 @@ def set_values_from_descendants(
             {"key": key, **meta[key]},
             values=obj["values"],
             count=obj["count"],
+            sp_count=obj["sp_count"],
             max_value=obj["max"],
             min_value=obj["min"],
             source=set_aggregation_source(attribute),
@@ -589,6 +606,10 @@ def set_values_from_descendants(
             attr_dict.update({key: attribute})
             if parent is not None:
                 parents[parent][key]["count"] += 1
+                if "sp_count" not in parents[parent][key]:
+                    parents[parent][key]["sp_count"] = 0
+                if "sp_count" in attribute:
+                    parents[parent][key]["sp_count"] += attribute["sp_count"]
                 if isinstance(summary_value, list):
                     parents[parent][key]["values"] = list(
                         set(parents[parent][key]["values"] + summary_value)
@@ -659,6 +680,7 @@ def track_missing_attribute_values(
                         }
                     )
                     obj["keys"].remove(key)
+                    obj["attributes"][-1].pop("sp_count", None)
             if obj["keys"]:
                 missing_from_descendants[child_id] = obj
             else:
@@ -705,6 +727,7 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
                 "values": [],
                 "prefixed_values": [],
                 "count": 0,
+                "sp_count": 0,
             }
         )
     )
@@ -732,6 +755,7 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
             if "attributes" in node["_source"] and node["_source"]["attributes"]:
                 changed, attr_dict = summarise_attributes(
                     attributes=node["_source"]["attributes"],
+                    rank=node["_source"]["taxon_rank"],
                     attrs=attrs,
                     meta=meta,
                     parent=node["_source"].get("parent", None),
@@ -781,6 +805,7 @@ def copy_attribute_summary(source, meta):
     except KeyError as err:
         raise (err)
     dest["count"] = source["count"]
+    dest["sp_count"] = source.get("sp_count", 0)
     dest["key"] = source["key"]
     return dest
 

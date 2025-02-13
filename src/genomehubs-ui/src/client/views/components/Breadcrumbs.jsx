@@ -1,4 +1,4 @@
-import LaunchIcon from "@material-ui/icons/Launch";
+import LaunchIcon from "@mui/icons-material/Launch";
 import { Link } from "@reach/router";
 import NavLink from "./NavLink";
 import React from "react";

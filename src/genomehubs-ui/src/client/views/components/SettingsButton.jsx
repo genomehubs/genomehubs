@@ -1,53 +1,15 @@
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
+import ColorButton from "./ColorButton";
+import ColorButtonGroup from "./ColorButtonGroup";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import MenuItem from "@mui/material/MenuItem";
+import MenuList from "@mui/material/MenuList";
+import Paper from "@mui/material/Paper";
 import React from "react";
-import { withStyles } from "@material-ui/core/styles";
-import AutorenewIcon from "@material-ui/icons/Autorenew";
-import Button from "@material-ui/core/Button";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
-import ReplayIcon from "@material-ui/icons/Replay";
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
-import ClickAwayListener from "@material-ui/core/ClickAwayListener";
-import Paper from "@material-ui/core/Paper";
-import MenuItem from "@material-ui/core/MenuItem";
-import MenuList from "@material-ui/core/MenuList";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-
-// const SettingsButton =()=>{
-//   return <Grid item>
-//     <Button
-//       variant="contained"
-//       color="default"
-//       disableElevation
-//       className={classes.button}
-//       startIcon={<AutorenewIcon />}
-//       onClick={handleClick}
-//     >
-//       Update
-//     </Button>
-//   </Grid>
-//   <Grid item>
-//     <Button
-//       variant="contained"
-//       color="default"
-//       disableElevation
-//       className={classes.button}
-//       startIcon={<ReplayIcon />}
-//       onClick={handleResetClick}
-//     >
-//       Reset
-//     </Button>
-//   </Grid>
-// }
-
-const ColorButtonGroup = withStyles((theme) => ({
-  root: {
-    color: theme.palette.getContrastText("#333333"),
-    backgroundColor: "#333333",
-    "&:hover": {
-      backgroundColor: "#999999",
-    },
-  },
-}))(ButtonGroup);
+import ReplayIcon from "@mui/icons-material/Replay";
 
 const DownloadButton = ({ handleClick, handleResetClick }) => {
   const options = {
@@ -96,13 +58,13 @@ const DownloadButton = ({ handleClick, handleResetClick }) => {
         ref={anchorRef}
         aria-label="split button"
       >
-        <Button
+        <ColorButton
           startIcon={options[current].icon}
           onClick={options[current].func}
         >
           {current}
-        </Button>
-        <Button
+        </ColorButton>
+        <ColorButton
           // color="primary"
           size="small"
           aria-controls={open ? "split-button-menu" : undefined}
@@ -112,7 +74,7 @@ const DownloadButton = ({ handleClick, handleResetClick }) => {
           onClick={handleToggle}
         >
           <ArrowDropDownIcon />
-        </Button>
+        </ColorButton>
       </ColorButtonGroup>
 
       <Paper style={{ height: open ? "auto" : 0, overflow: "hidden" }}>

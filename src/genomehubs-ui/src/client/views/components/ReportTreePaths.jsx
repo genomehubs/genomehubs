@@ -1,14 +1,14 @@
 import { Circle, Group, Layer, Line, Rect, Stage, Text } from "react-konva";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import KonvaTooltip from "./KonvaTooltip";
-import Skeleton from "@material-ui/lab/Skeleton";
-import classnames from "classnames";
+import PhyloPics from "./PhyloPics";
+import Skeleton from "@mui/material/Skeleton";
 import { compose } from "recompose";
 import formats from "../functions/formats";
 import { scaleLinear } from "d3-scale";
+import setColors from "../functions/setColors";
 import stringLength from "../functions/stringLength";
-import styles from "./Styles.scss";
 import { useScrollPosition } from "@n8tb1t/use-scroll-position";
 import withColors from "../hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";
@@ -35,10 +35,22 @@ const ReportTreePaths = ({
   setReportTerm,
   colors,
   levels,
+  colorPalette,
+  palettes,
+  cats: catArray,
+  phylopicWidth,
+  hideErrorBars,
 }) => {
   if (!lines || lines.length == 0) {
     return null;
   }
+  ({ levels, colors } = setColors({
+    colorPalette,
+    palettes,
+    levels,
+    count: catArray.length,
+    colors,
+  }));
   let rootRank;
   if (lines.length >= 2) {
     rootRank = lines[lines.length - 2].taxon_rank;
@@ -64,7 +76,9 @@ const ReportTreePaths = ({
   const [previewOffset, setPreviewOffset] = useState({ x: 0, y: 0 });
   const [scrollBarWidth, setScrollBarWidth] = useState(0);
   const [scale, setScale] = useState(
-    divWidth ? divWidth / (maxWidth + dataWidth + 10 || divWidth) : 1
+    divWidth
+      ? divWidth / (maxWidth + dataWidth + phylopicWidth + 10 || divWidth)
+      : 1,
   );
   const padding = 500;
   let previewScale = 1;
@@ -83,7 +97,11 @@ const ReportTreePaths = ({
   let globalYClickScale = scaleLinear();
 
   useEffect(() => {
-    setScale(divWidth ? divWidth / (maxWidth + dataWidth + 10 || divWidth) : 1);
+    setScale(
+      divWidth
+        ? divWidth / (maxWidth + dataWidth + phylopicWidth + 10 || divWidth)
+        : 1,
+    );
   }, [maxWidth, dataWidth, divWidth]);
 
   // Element scroll position
@@ -105,24 +123,22 @@ const ReportTreePaths = ({
     stageRef,
     false,
     100,
-    scrollContainerRef
+    scrollContainerRef,
   );
 
   useEffect(() => {
     let mounted = true;
-    if (reportTerm && locations[reportTerm.toLowerCase()]) {
-      if (mounted) {
-        let x = scrollPosition.x;
-        let y = locations[reportTerm.toLowerCase()].y - divHeight / 2;
-        y = Math.max(0, Math.min(y, maxY));
-        y *= scale;
-        setScrollPosition({
-          x,
-          y,
-        });
-        scrollContainerRef.current.scrollLeft = x;
-        scrollContainerRef.current.scrollTop = y;
-      }
+    if (reportTerm && locations[reportTerm.toLowerCase()] && mounted) {
+      let { x } = scrollPosition;
+      let y = locations[reportTerm.toLowerCase()].y - divHeight / 2;
+      y = Math.max(0, Math.min(y, maxY));
+      y *= scale;
+      setScrollPosition({
+        x,
+        y,
+      });
+      scrollContainerRef.current.scrollLeft = x;
+      scrollContainerRef.current.scrollTop = y;
     }
     return () => {
       mounted = false;
@@ -137,7 +153,7 @@ const ReportTreePaths = ({
     }
   };
   const handleDragEnd = (event) => {
-    let x = scrollPosition.x;
+    let { x } = scrollPosition;
     let y = event.target.y() * scale;
     setScrollPosition({
       x,
@@ -148,7 +164,7 @@ const ReportTreePaths = ({
   };
 
   const handleGlobalDragEnd = (event, limit) => {
-    let x = scrollPosition.x;
+    let { x } = scrollPosition;
     let y = event.target.y();
     if (limit) {
       event.target.y(Math.max(0, Math.min(event.target.y(), limit)));
@@ -165,7 +181,7 @@ const ReportTreePaths = ({
   const handlePreviewClick = ({ evt, target }) => {
     const stage = target.getStage();
     const offset = { x: stage.x(), y: stage.y() };
-    let x = scrollPosition.x;
+    let { x } = scrollPosition;
     let y = evt.layerY - offset.y;
     y = previewYScale(y) * scale;
     y = Math.max(Math.min(y, maxY * scale), 0);
@@ -187,7 +203,7 @@ const ReportTreePaths = ({
   const handleGlobalClick = ({ evt, target }) => {
     const stage = target.getStage();
     const offset = { x: stage.x(), y: stage.y() };
-    let x = scrollPosition.x;
+    let { x } = scrollPosition;
     let y = evt.layerY - offset.y;
     y = globalYClickScale(y) * scale;
     y = Math.max(Math.min(y, maxY * scale), 0);
@@ -204,12 +220,11 @@ const ReportTreePaths = ({
   const [treeDimensions, setTreeDimensions] = useState({
     x: 0,
     y: 0,
-    width: 0,
-    height: 0,
+    width: "0px",
+    height: "0px",
   });
   const getDimensions = (myRef) => {
     return treeDimensions;
-    myRef.current ? myRef.current.getBBox() : treeDimensions;
   };
   useEffect(() => {
     if (treeRef.current) {
@@ -218,7 +233,7 @@ const ReportTreePaths = ({
     }
     if (stageRef.current) {
       setScrollBarWidth(
-        stageRef.current.offsetWidth - stageRef.current.clientWidth
+        stageRef.current.offsetWidth - stageRef.current.clientWidth,
       );
     }
   }, [treeRef, stageRef]);
@@ -243,6 +258,7 @@ const ReportTreePaths = ({
   const [connectors, setConnectors] = useState([]);
   const [bars, setBars] = useState([]);
   const [errorBars, setErrorBars] = useState([]);
+  const [phylopics, setPhylopics] = useState([]);
   const [overview, setOverview] = useState([]);
   const [portion, setPortion] = useState(0);
   const updateCache = (index, value) => {
@@ -262,7 +278,7 @@ const ReportTreePaths = ({
 
   useEffect(() => {
     let visiblePortion = Math.floor(
-      Math.max(0, scrollPosition.y) / portionHeight
+      Math.max(0, scrollPosition.y) / portionHeight,
     );
     if (visiblePortion != portion) {
       setPortion(visiblePortion);
@@ -296,58 +312,77 @@ const ReportTreePaths = ({
       let newBars = [];
       let newErrorBars = [];
       let newCats = [];
+      let newPhyloPics = [];
       if (valueScale) {
-        let ticks = valueScale.ticks();
+        let tickMarks = valueScale.ticks();
+        let mid = tickMarks[Math.floor(tickMarks.length / 2)];
+        let ticks = [valueScale.domain()[0], mid, valueScale.domain()[1]];
+
         let top = charHeight + charHeight / 1.8;
         let tickLines = ticks.map((tick, i) => {
-          let end = i == 0 || i == ticks.length - 1;
+          let tickLabel = formats(tick);
+          let tickLabelLength = stringLength(tickLabel) * charHeight * 0.7;
+
           return (
-            <Line
-              key={`t-${tick}`}
-              points={[
-                valueScale(tick),
-                top - (end ? 3 : 0),
-                valueScale(tick),
-                plotHeight,
-              ]}
-              stroke={"grey"}
-              strokeWidth={end ? 1 : 0.5}
-              opacity={end ? 1 : 0.5}
-            />
+            <Group key={`t-${tick}`}>
+              <Line
+                points={[
+                  valueScale(tick),
+                  top - 3,
+                  valueScale(tick),
+                  plotHeight,
+                ]}
+                stroke={"#999999"}
+                strokeWidth={0.5}
+                dash={[2, 4]}
+              />
+
+              <Text
+                key={`tx-${tick}`}
+                x={valueScale(tick) - tickLabelLength / 2}
+                y={top - charHeight}
+                width={tickLabelLength}
+                fill={"#333333"}
+                fontSize={charHeight * 0.75}
+                textAlign={"center"}
+                textBaseline={"bottom"}
+                text={tickLabel}
+              />
+            </Group>
           );
         });
-        let tick = ticks[0];
-        let tickLabel = formats(tick);
-        let tickLabelLength = stringLength(tickLabel) * charHeight * 0.7;
-        tickLines.push(
-          <Text
-            key={`tx-${tick}`}
-            x={-tickLabelLength / 2}
-            y={top - charHeight}
-            width={tickLabelLength}
-            fill={"grey"}
-            fontSize={charHeight * 0.75}
-            textAlign={"center"}
-            textBaseline={"bottom"}
-            text={tickLabel}
-          />
-        );
-        tick = ticks[ticks.length - 1];
-        tickLabel = formats(tick);
-        tickLabelLength = stringLength(tickLabel) * charHeight * 0.6;
-        tickLines.push(
-          <Text
-            key={`tx-${tick}`}
-            x={valueScale(tick) - tickLabelLength / 2}
-            y={top - charHeight}
-            width={charHeight * 5}
-            fill={"grey"}
-            fontSize={charHeight * 0.75}
-            textAlign={"center"}
-            textBaseline={"bottom"}
-            text={tickLabel}
-          />
-        );
+        // let tick = ticks[0];
+        // let tickLabel = formats(tick);
+        // let tickLabelLength = stringLength(tickLabel) * charHeight * 0.7;
+        // tickLines.push(
+        //   <Text
+        //     key={`tx-${tick}`}
+        //     x={-tickLabelLength / 2}
+        //     y={top - charHeight}
+        //     width={tickLabelLength}
+        //     fill={"#333333"}
+        //     fontSize={charHeight * 0.75}
+        //     textAlign={"center"}
+        //     textBaseline={"bottom"}
+        //     text={tickLabel}
+        //   />,
+        // );
+        // tick = ticks[ticks.length - 1];
+        // tickLabel = formats(tick);
+        // tickLabelLength = stringLength(tickLabel) * charHeight * 0.6;
+        // tickLines.push(
+        //   <Text
+        //     key={`tx-${tick}`}
+        //     x={valueScale(tick) - tickLabelLength / 2}
+        //     y={top - charHeight}
+        //     width={charHeight * 5}
+        //     fill={"#333333"}
+        //     fontSize={charHeight * 0.75}
+        //     textAlign={"center"}
+        //     textBaseline={"bottom"}
+        //     text={tickLabel}
+        //   />,
+        // );
         setValueTicks({ ticks, tickLines });
       }
       if (portionCache[portion]) {
@@ -360,6 +395,7 @@ const ReportTreePaths = ({
           newBars,
           newErrorBars,
           newCats,
+          newPhyloPics,
         } = portionCache[portion]);
       } else {
         let lowerY = portionHeight * portion - portionOverlap;
@@ -391,7 +427,7 @@ const ReportTreePaths = ({
                   points={points}
                   stroke={segment.color}
                   opacity={0.5}
-                />
+                />,
               );
             }
             if (
@@ -425,13 +461,9 @@ const ReportTreePaths = ({
               strokeWidth={strokeWidth}
               stroke={segment.color}
               lineCap="round"
-              // strokeScaleEnabled={false}
-            />
+            />,
           );
           if (segment.cats) {
-            if (levels[segment.cats.length]) {
-              colors = levels[segment.cats.length];
-            }
             segment.cats.forEach((cat, i) => {
               let xPos = segment.xEnd - charHeight * (i / 2 + 0.5);
               newCats.push(
@@ -443,7 +475,7 @@ const ReportTreePaths = ({
                   fill={colors[cat]}
                   stroke={colors[cat]}
                   strokeScaleEnabled={false}
-                />
+                />,
               );
               if (cat == other) {
                 newNodes.push(
@@ -454,7 +486,7 @@ const ReportTreePaths = ({
                     points={plusPoints}
                     stroke={"white"}
                     opacity={0.75}
-                  />
+                  />,
                 );
               }
             });
@@ -473,7 +505,7 @@ const ReportTreePaths = ({
                 ]}
                 strokeWidth={strokeWidth}
                 stroke={segment.color}
-              />
+              />,
             );
           } else if (segment.vLine) {
             newPaths.push(
@@ -488,7 +520,7 @@ const ReportTreePaths = ({
                 strokeWidth={strokeWidth}
                 stroke={segment.color}
                 strokeScaleEnabled={false}
-              />
+              />,
             );
           }
           newRegions.push(
@@ -529,7 +561,7 @@ const ReportTreePaths = ({
                   rootRank,
                 });
               }}
-            />
+            />,
           );
           if (
             segment.scientific_name == "parent" ||
@@ -543,7 +575,7 @@ const ReportTreePaths = ({
                 fill={segment.color}
                 stroke={segment.color}
                 key={`c-${segment.taxon_id}`}
-              />
+              />,
             );
           }
 
@@ -593,7 +625,7 @@ const ReportTreePaths = ({
                 fill={segment.color}
                 align={segment.tip ? "left" : "right"}
                 verticalAlign={segment.tip ? "middle" : "top"}
-              />
+              />,
             );
             if (segment.tip) {
               newConnectors.push(
@@ -608,7 +640,7 @@ const ReportTreePaths = ({
                   strokeWidth={strokeWidth}
                   stroke={"#dddddd"}
                   dash={[2, 5]}
-                />
+                />,
               );
               if (segment.bar && segment.bar.length > 0) {
                 newBars.push(
@@ -620,7 +652,7 @@ const ReportTreePaths = ({
                     width={segment.bar[0] + 1}
                     height={charHeight}
                     fill={segment.color}
-                  />
+                  />,
                 );
                 newRegions.push(
                   <Rect
@@ -658,7 +690,7 @@ const ReportTreePaths = ({
                         rank: segment.taxon_rank,
                       });
                     }}
-                  />
+                  />,
                 );
                 if (
                   segment.bar.length >= 2 &&
@@ -672,13 +704,13 @@ const ReportTreePaths = ({
                         segment.yStart,
                         segment.bar[2],
                         segment.yStart,
-                        segment.bar[2],
-                        segment.yStart - charHeight / 4,
-                        segment.bar[2],
-                        segment.yStart + charHeight / 4,
+                        // segment.bar[2],
+                        // segment.yStart - charHeight / 4,
+                        // segment.bar[2],
+                        // segment.yStart + charHeight / 4,
                       ]}
                       stroke={segment.color}
-                    />
+                    />,
                   );
                   if (
                     segment.bar.length >= 2 &&
@@ -692,16 +724,33 @@ const ReportTreePaths = ({
                           segment.yStart,
                           segment.bar[1],
                           segment.yStart,
-                          segment.bar[1],
-                          segment.yStart - charHeight / 4,
-                          segment.bar[1],
-                          segment.yStart + charHeight / 4,
+                          // segment.bar[1],
+                          // segment.yStart - charHeight / 4,
+                          // segment.bar[1],
+                          // segment.yStart + charHeight / 4,
                         ]}
                         stroke={"white"}
-                      />
+                      />,
                     );
                   }
                 }
+              }
+              if (segment.showPhylopic) {
+                newPhyloPics.push(
+                  <PhyloPics
+                    key={segment.taxon_id}
+                    taxonId={segment.taxon_id}
+                    scientificName={segment.scientific_name}
+                    maxHeight={charHeight}
+                    maxWidth={phylopicWidth}
+                    x={maxWidth + dataWidth}
+                    y={segment.yStart - charHeight / 2}
+                    fixedRatio={1}
+                    showAncestral={false}
+                    sourceColors={false}
+                    embed={"konva"}
+                  />,
+                );
               }
             }
           }
@@ -715,6 +764,7 @@ const ReportTreePaths = ({
           newBars,
           newErrorBars,
           newCats,
+          newPhyloPics,
         });
       }
 
@@ -724,11 +774,14 @@ const ReportTreePaths = ({
       setRegions(newRegions);
       setConnectors(newConnectors);
       setBars(newBars);
-      setErrorBars(newErrorBars);
+      if (!hideErrorBars) {
+        setErrorBars(newErrorBars);
+      }
       setCats(newCats);
       if (newOverview.length > 0) {
         setOverview(newOverview);
       }
+      setPhylopics(newPhyloPics);
     }
   }, [lines, portion]);
 
@@ -846,13 +899,13 @@ const ReportTreePaths = ({
                   onDragMove={(e) =>
                     handleDragMove(
                       e,
-                      divHeight - previewDivHeight * previewRatio
+                      divHeight - previewDivHeight * previewRatio,
                     )
                   }
                   onDragEnd={(e) =>
                     handleGlobalDragEnd(
                       e,
-                      divHeight - previewDivHeight * previewRatio
+                      divHeight - previewDivHeight * previewRatio,
                     )
                   }
                 >
@@ -946,7 +999,7 @@ const ReportTreePaths = ({
                   draggable={true}
                   onDragStart={handleDragStart}
                   onDragMove={handleDragMove}
-                  onDragEnd={(e) => handleDragEnd(e, maxY)}
+                  onDragEnd={(e) => handleDragEnd(e)}
                   onClick={({ evt }) => {
                     evt.preventDefault();
                     evt.stopPropagation();
@@ -974,7 +1027,7 @@ const ReportTreePaths = ({
           left: 0,
         }}
       >
-        <Skeleton variant="rect" width={divWidth} height={divHeight} />
+        <Skeleton variant="rectangular" width={divWidth} height={divHeight} />
       </div>
     );
   }
@@ -1046,6 +1099,7 @@ const ReportTreePaths = ({
                 <Group x={maxWidth}>{bars}</Group>
                 <Group x={maxWidth}>{errorBars}</Group>
                 {paths}
+                <Group x={maxWidth + dataWidth}>{phylopics}</Group>
               </Layer>
               <Layer>
                 <Group>{cats}</Group>

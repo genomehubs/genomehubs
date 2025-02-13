@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from "react";
+import {
+  header as headerStyle,
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  resultPanel as resultPanelStyle,
+  title as titleStyle,
+} from "./Styles.scss";
 
 import BasicSelect from "./BasicSelect";
 import FeatureSummaryPanel from "./FeatureSummaryPanel";
-import { Grid } from "@material-ui/core";
+import Grid from "@mui/material/Grid2";
 import { Template } from "./Markdown";
 import classnames from "classnames";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
 import withRecord from "../hocs/withRecord";
 
 const FeaturePanel = ({
-  recordId,
   record,
   records,
   fetchRecord,
@@ -18,11 +23,7 @@ const FeaturePanel = ({
   result,
   taxonomy,
 }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.resultPanel
-  );
+  let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, resultPanelStyle);
 
   const [selectedTemplate, setSelectedTemplate] = useState("none");
 
@@ -53,13 +54,13 @@ const FeaturePanel = ({
 
   useEffect(() => {
     if (sequenceId && !records[sequenceId] && !recordIsFetching) {
-      fetchRecord(sequenceId, result, taxonomy);
+      fetchRecord({ recordId: sequenceId, result, taxonomy });
     }
     if (taxonId && !records[taxonId] && !recordIsFetching) {
-      fetchRecord(taxonId, "taxon", taxonomy);
+      fetchRecord({ recordId: taxonId, result: "taxon", taxonomy });
     }
     if (assemblyId && !records[assemblyId] && !recordIsFetching) {
-      fetchRecord(assemblyId, "assembly", taxonomy);
+      fetchRecord({ recordId: assemblyId, result: "assembly", taxonomy });
     }
   }, [records]);
 
@@ -85,13 +86,13 @@ const FeaturePanel = ({
     let sequenceAttributes = records[sequenceId].record.attributes;
     let sequenceIdentifiers = records[sequenceId].record.identifiers;
     assignedName = sequenceIdentifiers.filter(
-      (obj) => obj.class == "assigned_name"
+      (obj) => obj.class == "assigned_name",
     );
     if (assignedName.length == 1) {
       assignedName = assignedName[0].identifier;
     } else {
       assignedName = sequenceIdentifiers.filter(
-        (obj) => obj.class == "genbank_accession"
+        (obj) => obj.class == "genbank_accession",
       );
       if (assignedName.length == 1) {
         assignedName = assignedName[0].identifier;
@@ -102,11 +103,11 @@ const FeaturePanel = ({
 
     let midX =
       scale(
-        featureAttributes.midpoint.value / sequenceAttributes.length.value
+        featureAttributes.midpoint.value / sequenceAttributes.length.value,
       ) +
       width * margin;
     let len = scale(
-      featureAttributes.length.value / sequenceAttributes.length.value
+      featureAttributes.length.value / sequenceAttributes.length.value,
     );
     let startX = midX - len / 2;
     let endX = midX + len / 2;
@@ -302,7 +303,7 @@ const FeaturePanel = ({
         }
       }
       templates = (
-        <Grid item xs={6}>
+        <Grid xs={6}>
           <Template
             id={templateId}
             valueA={"*"}
@@ -343,14 +344,14 @@ const FeaturePanel = ({
 
   return (
     <div className={css}>
-      <div className={styles.header}>
-        <span className={styles.title}>Feature — {featureId}</span>
+      <div className={headerStyle}>
+        <span className={titleStyle}>Feature — {featureId}</span>
       </div>
       <div>{svg}</div>
       <Grid container direction="column">
         <Grid container direction="row" spacing={1}>
-          <Grid item xs={1}></Grid>
-          <Grid item xs={2}>
+          <Grid size={1}></Grid>
+          <Grid size={2}>
             <BasicSelect
               id={"select-feature-template"}
               handleChange={handleUpdateTemplate}
@@ -359,11 +360,11 @@ const FeaturePanel = ({
               values={templateValues}
             />
           </Grid>
-          <Grid item style={{ flexGrow: "1" }}></Grid>
-          <Grid item>{browserLinks}</Grid>
+          <Grid style={{ flexGrow: "1" }}></Grid>
+          <Grid>{browserLinks}</Grid>
         </Grid>
         <Grid container direction="row" spacing={1}>
-          <Grid item xs={3}></Grid>
+          <Grid size={3}></Grid>
           {templates}
         </Grid>
       </Grid>

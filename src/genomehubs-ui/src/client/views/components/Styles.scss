@@ -13,7 +13,7 @@ body,
 .app {
   height: 100%;
   margin: 0;
-  // min-width: 800px;
+  min-width: 900px;
   overflow: visible;
   overscroll-behavior: none;
   width: 100%;
@@ -304,8 +304,8 @@ body,
       }
 
       &Content {
-        overflow-x: scroll;
-        margin: 0.5em 0.25em 1em;
+        overflow-x: auto;
+        margin: 0.5em 0.25em 1.5em;
 
         pre {
           margin: 0;
@@ -493,9 +493,6 @@ body,
     }
 
     .searchBox {
-      @include placeholderColor(
-        mix(themed("primary"), themed("secondary"), 65%)
-      );
       background-color: mix(themed("primary"), themed("secondary"), 5%);
       border: 2px solid mix(themed("primary"), themed("secondary"), 15%);
       font-family: themed("titleFont");
@@ -506,19 +503,22 @@ body,
       padding: 0.25em;
       text-align: center;
       width: 600px;
+      @include placeholderColor(
+        mix(themed("primary"), themed("secondary"), 65%)
+      );
 
       &:focus {
-        @include placeholderColor(themed("secondary"));
         background-color: themed("secondary");
         border-color: themed("primary");
+        @include placeholderColor(themed("secondary"));
       }
 
       &:hover {
+        background-color: themed("secondary");
+        border-color: themed("primary");
         @include placeholderColor(
           mix(themed("primary"), themed("secondary"), 35%)
         );
-        background-color: themed("secondary");
-        border-color: themed("primary");
       }
     }
 
@@ -554,7 +554,6 @@ body,
 
       &1Column {
         .infoPane {
-          // height: calc(calc(100vh - 17em) / 2);
           width: 100%;
         }
       }
@@ -704,7 +703,7 @@ body,
       .header {
         cursor: pointer;
         margin: -0.25em -0.25em 0.25em -0.25em;
-        padding: 0.35em;
+        padding: 0.5em 0.75em;
         color: themed("secondary");
         background-color: themed("primary");
         border-radius: 0.25em;
@@ -1098,6 +1097,7 @@ body,
         font-size: 0.6em;
         width: calc( 100% - 1em );
         padding: 0.15em 0.5em;
+        cursor: default;
         color: themed("secondary");
         text-align: center;
         white-space:nowrap;
@@ -1110,6 +1110,11 @@ body,
         }
         &Ancestral {
           background-color: themed("ancestral");
+        }
+        a {
+          color: themed("secondary");
+          text-decoration: underline;
+          cursor: pointer;
         }
       }
 
@@ -1663,7 +1668,7 @@ body,
       .divider {
         background-color: rgba(themed("primary"), 0.2);
         border: 0;
-        margin-right: -0.2em;
+        margin: 0 -0.5em;
         width: 0.2em;
       }
 
@@ -1699,7 +1704,7 @@ body,
     .recordLinkIcon {
       height: 1.5em;
       width: 1.5em;
-      margin: 0 0.25em -0.2em 0;
+      margin: 0 0.25em -0.4em 0;
       display: inline-block;
     }
   }

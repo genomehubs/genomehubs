@@ -67,11 +67,11 @@ const SearchPage = ({
           let hashedNav = (path) => {
             path = path.replace(
               /\/search\b/,
-              `${location.pathname.replace(basename, "")}`
+              `${location.pathname.replace(basename, "")}`,
             );
             let to = path;
             let from = `${location.pathname}?${qs.stringify(
-              previousSearchTerm
+              previousSearchTerm,
             )}`;
           };
           if (!equal(options, previousSearchTerm)) {
@@ -85,7 +85,7 @@ const SearchPage = ({
             // TODO: include taxonomy
             path = path.replace(
               /\/search\b/,
-              `${location.pathname.replace(basename, "")}`
+              `${location.pathname.replace(basename, "")}`,
             );
             navigate(`${path}#${encodeURIComponent(hashTerm)}`);
           };
@@ -111,9 +111,9 @@ const SearchPage = ({
   let resultCount = searchResults.isFetching
     ? -1
     : searchResults.status
-    ? searchResults.status.hits
-    : 0;
-  results = resultCount > -1 ? <ResultTable /> : null;
+      ? searchResults.status.hits
+      : 0;
+  results = resultCount > 0 ? <ResultTable /> : null;
   let report;
   if (searchResultArray.length > 0) {
     report = <ReportPanel options={options} />;
@@ -140,5 +140,5 @@ export default compose(
   memo,
   dispatchLookup,
   withSearchDefaults,
-  withSearch
+  withSearch,
 )(SearchPage);

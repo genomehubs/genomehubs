@@ -1,13 +1,13 @@
 import React, { Fragment, useLayoutEffect, useRef, useState } from "react";
 
-import CloseIcon from "@material-ui/icons/Close";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import Modal from "@material-ui/core/Modal";
-import Skeleton from "@material-ui/lab/Skeleton";
-import Typography from "@material-ui/core/Typography";
+import CloseIcon from "@mui/icons-material/Close";
+import Grid from "@mui/material/Grid2";
+import IconButton from "@mui/material/IconButton";
+import Modal from "@mui/material/Modal";
+import Skeleton from "@mui/material/Skeleton";
+import Typography from "@mui/material/Typography";
 import { compose } from "recompose";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import withApi from "../hocs/withApi";
 
@@ -22,7 +22,7 @@ function getModalStyle() {
 const useStyles = makeStyles((theme) => ({
   paper: {
     position: "absolute",
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: "white",
     border: "none",
     boxShadow: "none",
     padding: "10px",
@@ -84,7 +84,7 @@ const modalContent = ({
           src={src}
         />
         <Skeleton
-          variant="rect"
+          variant="rectangular"
           width={previewDimensions.width}
           height={previewDimensions.height}
         />
@@ -129,9 +129,9 @@ export const FileModal = ({ meta, apiUrl, link, children }) => {
       style={{ ...modalStyle, height, width }}
       className={classes.paper}
     >
-      <Grid item xs style={{ width: previewDimensions.width }}>
+      <Grid style={{ width: previewDimensions.width }}>
         <Grid container direction="row" justifyContent="flex-start">
-          <Grid item xs={true}>
+          <Grid size="grow">
             <Typography
               id="file-modal-title"
               variant="h5"
@@ -141,19 +141,20 @@ export const FileModal = ({ meta, apiUrl, link, children }) => {
               {meta.title || meta.name}
             </Typography>
           </Grid>
-          <Grid item xs={1} style={{ textAlign: "end" }}>
+          <Grid style={{ textAlign: "end" }} size={1}>
             <IconButton
               aria-label="close-modal"
               color="default"
-              style={{ padding: 0 }}
+              style={{ padding: "0px" }}
               onClick={handleClose}
+              size="large"
             >
               <CloseIcon style={{ cursor: "pointer" }} />
             </IconButton>
           </Grid>
         </Grid>
       </Grid>
-      <Grid item xs align="center">
+      <Grid align="center">
         {modalContent({
           meta,
           apiUrl,
@@ -164,11 +165,7 @@ export const FileModal = ({ meta, apiUrl, link, children }) => {
       </Grid>
 
       {meta.description && (
-        <Grid
-          item
-          xs
-          style={{ overflowY: "auto", width: previewDimensions.width }}
-        >
+        <Grid style={{ overflowY: "auto", width: previewDimensions.width }}>
           <Typography id="file-modal-description" variant="body1" gutterBottom>
             {meta.description} {link}
           </Typography>

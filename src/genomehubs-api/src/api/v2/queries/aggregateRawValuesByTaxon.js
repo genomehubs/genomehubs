@@ -1,5 +1,5 @@
-import { attrTypes } from "../functions/attrTypes";
-import { histogramAgg } from "./histogramAgg";
+import { attrTypes } from "../functions/attrTypes.js";
+import { histogramAgg } from "./histogramAgg.js";
 
 const termsAgg = async ({ field, result, taxonomy }) => {
   let { lookupTypes } = await attrTypes({ result, taxonomy });

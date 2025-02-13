@@ -1,11 +1,11 @@
 import AttributeTableRow from "./AttributeTableRow";
 import React from "react";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import styles from "./Styles.scss";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import { autoWidth as autoWidthStyle } from "./Styles.scss";
 
 const AttributeTable = ({ attributes, result, taxonId }) => {
   if (attributes) {
@@ -21,7 +21,7 @@ const AttributeTable = ({ attributes, result, taxonId }) => {
       );
     });
     return (
-      <Table size={"small"} className={styles.autoWidth}>
+      <Table size={"small"} className={autoWidthStyle}>
         <TableHead>
           <TableRow>
             <TableCell>Attribute</TableCell>

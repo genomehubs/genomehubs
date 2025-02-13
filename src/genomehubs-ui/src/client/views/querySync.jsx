@@ -72,7 +72,7 @@ const keyed = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 
 const mapDispatchToQuery = {
   palette: {
-    type: "SELECT_PALETTE",
+    mode: "SELECT_PALETTE",
     payload: (k, v) => v,
     default: "default",
   },

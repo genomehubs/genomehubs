@@ -1,9 +1,8 @@
-import { applyMiddleware, createStore } from "redux";
-
+import { configureStore } from "@reduxjs/toolkit";
 import { createLogger } from "redux-logger";
 import { enableBatching } from "redux-batched-actions";
 import rootReducer from "./reducers/root";
-import thunkMiddleware from "redux-thunk";
+import { thunk as thunkMiddleware } from "redux-thunk";
 
 const loggerMiddleware = createLogger();
 
@@ -23,13 +22,19 @@ const loadingMiddleWare = (store) => (next) => (action) => {
   next(action);
 };
 
-const store = createStore(
-  enableBatching(rootReducer),
-  applyMiddleware(
-    // loggerMiddleware,
-    thunkMiddleware,
-    loadingMiddleWare
-  )
-);
+// const store = createStore(
+//   enableBatching(rootReducer),
+//   applyMiddleware(
+//     // loggerMiddleware,
+//     thunkMiddleware,
+//     loadingMiddleWare
+//   )
+// );
+
+const store = configureStore({
+  reducer: enableBatching(rootReducer),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(thunkMiddleware, loadingMiddleWare),
+});
 
 export default store;

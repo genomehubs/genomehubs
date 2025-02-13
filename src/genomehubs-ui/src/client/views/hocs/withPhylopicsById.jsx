@@ -4,9 +4,11 @@ import { fetchPhylopic } from "../selectors/phylopic";
 import { getPhylopicByTaxonId } from "../reducers/phylopic";
 
 const withPhylopicsById = (WrappedComponent) => (props) => {
-  let { currentRecord, record } = props;
-  record = currentRecord || record;
-  let { taxon_id: taxonId } = record ? record.record : {};
+  let {
+    record,
+    currentRecord = record,
+    taxonId = currentRecord.record?.taxon_id,
+  } = props;
   const mapStateToProps = (state) => ({
     ...(taxonId && {
       phylopicById: getPhylopicByTaxonId(state, taxonId),
@@ -21,7 +23,7 @@ const withPhylopicsById = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

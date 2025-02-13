@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from "react";
+import {
+  fadeIn as fadeInStyle,
+  fadeOut as fadeOutStyle,
+  loader as loaderStyle,
+  loadingContainer as loadingContainerStyle,
+  loadingLogo as loadingLogoStyle,
+  loadingScreen as loadingScreenStyle,
+} from "./Styles.scss";
 
 import Logo from "./Logo";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
 import withLoading from "../hocs/withLoading";
 import withSiteName from "../hocs/withSiteName";
 
@@ -26,11 +33,11 @@ const LoadingScreen = ({ types, basename, siteName, loading, setLoading }) => {
     return null;
   }
   return (
-    <span className={loading == "started" ? styles.fadeIn : styles.fadeOut}>
-      <div className={styles.loadingScreen}>
-        <div className={styles.loadingContainer}>
-          <div className={styles.loadingLogo}>
-            <div className={styles.loader}>
+    <span className={loading == "started" ? fadeInStyle : fadeOutStyle}>
+      <div className={loadingScreenStyle}>
+        <div className={loadingContainerStyle}>
+          <div className={loadingLogoStyle}>
+            <div className={loaderStyle}>
               <Logo />
             </div>
           </div>

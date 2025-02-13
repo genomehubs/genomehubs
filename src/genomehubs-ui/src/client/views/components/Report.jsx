@@ -99,12 +99,18 @@ const Report = ({
   reportProps.scatterThreshold = props.scatterThreshold;
   reportProps.treeThreshold = props.treeThreshold;
   reportProps.compactLegend = props.compactLegend;
+  reportProps.dropShadow = props.dropShadow;
+  reportProps.reorient = props.reorient;
   reportProps.compactWidth = props.compactWidth;
   reportProps.pointSize =
     props.pointSize * 1 ||
     qs.parse(reportProps.queryString).pointSize * 1 ||
     15;
   reportProps.collapseMonotypic = props.collapseMonotypic;
+  reportProps.hideSourceColors = props.hideSourceColors;
+  reportProps.hideErrorBars = props.hideErrorBars;
+  reportProps.hideAncestralBars = props.hideAncestralBars;
+  reportProps.showPhylopics = props.showPhylopics;
   reportProps.highlight = props.highlight;
   reportProps.colorPalette = props.colorPalette;
   reportProps.excludeAncestral = props.excludeAncestral;
@@ -123,7 +129,7 @@ const Report = ({
     minDim = Math.floor(Math.min(width, height));
   } else {
     minDim /=
-      reportProps.plotRatio && !isNaN(reportProps.plotRatio)
+      reportProps.plotRatio && !Number.isNaN(reportProps.plotRatio)
         ? reportProps.plotRatio
         : reportProps.ratio;
   }

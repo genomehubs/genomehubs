@@ -1,35 +1,49 @@
 import React, { createElement, useEffect, useState } from "react";
 import { basename, siteName } from "../reducers/location";
+import {
+  centerContent as centerContentStyle,
+  divider as dividerStyle,
+  fixedArSixteenNine as fixedArSixteenNineStyle,
+  fixedAr as fixedArStyle,
+  inline as inlineStyle,
+  markdown as markdownStyle,
+  negativePadded as negativePaddedStyle,
+  padded as paddedStyle,
+  paragraph as paragraphStyle,
+  reportContainer as reportContainerStyle,
+  unpaddedParagraph as unpaddedParagraphStyle,
+  unpadded as unpaddedStyle,
+} from "./Styles.scss";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
-import ArtTrackIcon from "@material-ui/icons/ArtTrack";
-import AutoCompleteInput from "./AutoCompleteInput";
+import ArtTrackIcon from "@mui/icons-material/ArtTrack";
 import Badge from "./Badge";
 import BasicSelect from "./BasicSelect";
 import Breadcrumbs from "./Breadcrumbs";
-import Button from "@material-ui/core/Button";
+import ColorButton from "./ColorButton";
 import Count from "./Count";
-import Divider from "@material-ui/core/Divider";
+import Divider from "@mui/material/Divider";
 import EnumSelect from "./EnumSelect";
 import FlagIcon from "./FlagIcon";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import Highlight from "./Highlight";
 import Logo from "./Logo";
 import NavLink from "./NavLink";
 import PhyloPics from "./PhyloPics";
+import RecordLabel from "./RecordLabel";
 import RecordLink from "./RecordLink";
 import Report from "./Report";
 import ResultCount from "./ResultCount";
-import SearchIcon from "@material-ui/icons/Search";
+import SearchIcon from "@mui/icons-material/Search";
 import StaticPlot from "./StaticPlot";
-import TextField from "@material-ui/core/TextField";
+import TextField from "@mui/material/TextField";
 import Toggle from "./Toggle";
 import Tooltip from "./Tooltip";
 import TranslatedValue from "./TranslatedValue";
 import ValueRow from "./ValueRow";
-import VisibilityIcon from "@material-ui/icons/Visibility";
-import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import YAML from "js-yaml";
 import classNames from "classnames";
 import classnames from "classnames";
@@ -44,14 +58,23 @@ import remarkDirective from "remark-directive";
 import remarkParse from "remark-parse";
 import remarkReact from "remark-react";
 import remarkRehype from "remark-rehype";
-import styles from "./Styles.scss";
 import unified from "unified";
 import { visit } from "unist-util-visit";
 import withPages from "../hocs/withPages";
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@mui/styles/withStyles";
 
 const pagesUrl = PAGES_URL;
 const webpackHash = COMMIT_HASH || __webpack_hash__;
+
+const styleMap = {
+  centerContentStyle,
+  paddedStyle,
+  negativePaddedStyle,
+  unpaddedParagraphStyle,
+  paragraphStyle,
+  inlineStyle,
+  unpaddedStyle,
+};
 
 export const Template = ({
   id,
@@ -156,6 +179,7 @@ export const Template = ({
     let description = props[`${match}_description`];
     let input = (
       <TextField
+        variant="standard"
         id={match + Math.random()}
         label={label}
         value={values[match]}
@@ -167,11 +191,11 @@ export const Template = ({
       />
     );
     inputs.push(
-      <Grid item xs={12} key={match}>
+      <Grid key={match} size={12}>
         <Tooltip title={description} arrow>
           {input}
         </Tooltip>
-      </Grid>
+      </Grid>,
     );
   }
   let preview;
@@ -183,13 +207,13 @@ export const Template = ({
     let reportProps = qs.parse(decodeURI(searchUrl.split(/[\?#]/)[1]));
     if (reportProps.report) {
       preview = (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Report {...reportProps} caption={" "}></Report>
         </Grid>
       );
     } else {
       preview = (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <ResultCount {...reportProps} caption={" "}></ResultCount>
         </Grid>
       );
@@ -197,7 +221,7 @@ export const Template = ({
   }
   return (
     <Grid container direction="column" spacing={1}>
-      <Grid item xs={12}>
+      <Grid>
         <h2>{title}</h2>
         {description}
       </Grid>
@@ -205,10 +229,9 @@ export const Template = ({
       {inputs}
       <Grid container direction="row" spacing={1} justifyContent="flex-end">
         {toggleFunction && (
-          <Grid item key={"toggle"}>
-            <Button
+          <Grid key={"toggle"}>
+            <ColorButton
               variant="contained"
-              color="default"
               disableElevation
               startIcon={<ArtTrackIcon />}
               onClick={(e) => {
@@ -217,13 +240,12 @@ export const Template = ({
               }}
             >
               Template
-            </Button>
+            </ColorButton>
           </Grid>
         )}
-        <Grid item key={"preview"}>
-          <Button
+        <Grid key={"preview"}>
+          <ColorButton
             variant="contained"
-            color="default"
             disableElevation
             startIcon={showPreview ? <VisibilityOffIcon /> : <VisibilityIcon />}
             onClick={(e) => {
@@ -232,18 +254,17 @@ export const Template = ({
             }}
           >
             {showPreview ? "Hide Preview" : "Preview"}
-          </Button>
+          </ColorButton>
         </Grid>
-        <Grid item key={"submit"}>
-          <Button
+        <Grid key={"submit"}>
+          <ColorButton
             variant="contained"
-            color="default"
             disableElevation
             startIcon={<SearchIcon />}
             onClick={handleSubmit}
           >
             Search
-          </Button>
+          </ColorButton>
         </Grid>
       </Grid>
     </Grid>
@@ -276,7 +297,7 @@ const fillTemplateValues = (value, extra) => {
 };
 
 export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
-  for (let [key, value] of Object.entries(props)) {
+  for (let [key, value] of Object.entries(props || {})) {
     if (isGrid && !gridPropNames.has(key)) {
       continue;
     }
@@ -285,7 +306,7 @@ export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
     } else if (value == "") {
       newProps[key] = true;
     } else if (key == "className") {
-      newProps["className"] = styles[value];
+      newProps["className"] = styleMap[`${value}Style`];
     } else if (key.startsWith("exclude")) {
       newProps[key] = Array.isArray(value) ? value : value.split(",");
     } else if (key == "src") {
@@ -294,11 +315,11 @@ export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
       } else {
         newProps["src"] = value.replace(
           /^\/static\//,
-          `${basename}/static/${webpackHash}/`
+          `${basename}/static/${webpackHash}/`,
         );
       }
-    } else if (key == "xs") {
-      newProps["xs"] = value * 1;
+    } else if (key == "size") {
+      newProps["size"] = value * 1;
     } else if (key == "spacing") {
       newProps["spacing"] = value * 1;
     } else if (key != "pageId") {
@@ -319,7 +340,7 @@ export const RehypeComponentsList = (extra) => {
       <Divider
         orientation={props.orientation || "vertical"}
         flexItem
-        className={styles.divider}
+        className={dividerStyle}
       />
     ),
     flag: (props) => {
@@ -353,26 +374,43 @@ export const RehypeComponentsList = (extra) => {
       let { lineColor, fillColor, ...gridProps } = props;
       return (
         <Grid {...processProps({ props: gridProps })}>
-          <div className={styles.fixedAr} style={{ background: fillColor }}>
+          <div className={fixedArStyle} style={{ background: fillColor }}>
             <Logo {...{ lineColor, fillColor }} />
           </div>
         </Grid>
       );
     },
+    iframe: (props) => {
+      let { size = 12, aspectRatio, ...iframeProps } = props;
+      return (
+        <Grid size={size}>
+          <div style={{ aspectRatio }}>
+            <iframe
+              {...processProps({ props: iframeProps })}
+              width={"100%"}
+              height={"100%"}
+            />
+          </div>
+        </Grid>
+      );
+    },
     img: (props) => (
-      <div className={styles.centerContent}>
+      <div className={centerContentStyle}>
         <img {...processProps({ props })} alt={props.alt.toString()} />
       </div>
     ),
     include: (props) => {
       let nested = <Nested pgId={props.pageId} {...props} />;
-      let css = styles.reportContainer;
+      let css = reportContainerStyle;
       if (props.className) {
-        css = classnames(styles.reportContainer, styles[props.className]);
+        css = classnames(
+          reportContainerStyle,
+          styleMap[`${props.className}Style`],
+        );
       }
 
       return (
-        <Grid {...processProps({ props, isGrid: true })} item className={css}>
+        <Grid {...processProps({ props, isGrid: true })} className={css}>
           {nested}
         </Grid>
       );
@@ -380,8 +418,7 @@ export const RehypeComponentsList = (extra) => {
     item: (props) => (
       <Grid
         {...processProps({ props, isGrid: true })}
-        item
-        className={styles.reportContainer}
+        className={reportContainerStyle}
       />
     ),
     markdown: (props) => {
@@ -400,12 +437,12 @@ export const RehypeComponentsList = (extra) => {
           return (
             <Report
               {...processProps({ props: nestedProps, extra })}
-              className={styles.reportContainer}
+              className={reportContainerStyle}
             />
           );
         } else if (className == "language-template") {
           return (
-            <Grid {...processProps({ props: nestedProps, isGrid: true })} item>
+            <Grid {...processProps({ props: nestedProps, isGrid: true })}>
               <Template
                 {...processProps({ props: { ...nestedProps, ...extra } })}
               />
@@ -416,11 +453,15 @@ export const RehypeComponentsList = (extra) => {
       return <Highlight {...processProps({ props })} />;
     },
     phylopic: (props) => <PhyloPics {...processProps({ props, extra })} />,
+    recordlabel: (props) => <RecordLabel {...processProps({ props, extra })} />,
     recordlink: (props) => <RecordLink {...processProps({ props, extra })} />,
     report: (props) => {
-      let css = styles.reportContainer;
+      let css = reportContainerStyle;
       if (props.className) {
-        css = classnames(styles.reportContainer, styles[props.className]);
+        css = classnames(
+          reportContainerStyle,
+          styleMap[`${props.className}Style`],
+        );
       }
       return <Report {...processProps({ props, extra })} className={css} />;
     },
@@ -440,9 +481,12 @@ export const RehypeComponentsList = (extra) => {
     },
     span: (props) => <span {...processProps({ props })} />,
     static: (props) => {
-      let css = styles.reportContainer;
+      let css = reportContainerStyle;
       if (props.className) {
-        css = classnames(styles.reportContainer, styles[props.className]);
+        css = classnames(
+          reportContainerStyle,
+          styleMap[`${props.className}Style`],
+        );
       }
       return (
         <Grid {...processProps({ props, isGrid: true })}>
@@ -453,7 +497,7 @@ export const RehypeComponentsList = (extra) => {
     templat: (props) => (
       <Template
         {...processProps({ props })}
-        className={classNames(styles.reportContainer, styles.unpadded)}
+        className={classNames(reportContainerStyle, unpaddedStyle)}
       />
     ),
     tooltip: (props) => {
@@ -472,8 +516,8 @@ export const RehypeComponentsList = (extra) => {
 
 export function compile(val, components = RehypeComponentsList()) {
   const processor = unified()
-    .use(remarkParse)
-    .use(remarkReact)
+    .use(remarkParse, { fragment: true })
+    // .use(remarkReact, React)
     .use(gfm)
     .use(remarkDirective)
     .use(htmlDirectives)
@@ -500,7 +544,7 @@ export function htmlDirectives() {
     visit(
       tree,
       ["textDirective", "leafDirective", "containerDirective"],
-      (node) => ondirective(node, index)
+      (node) => ondirective(node, index),
     );
   }
 
@@ -550,17 +594,17 @@ const Markdown = ({
         ...extra,
       }),
       ...components,
-    }
+    },
   );
   let css;
   if (siteStyles) {
     css = classes.root;
   } else {
-    css = classnames(styles.markdown, classes.root);
+    css = classnames(markdownStyle, classes.root);
   }
   return <div className={css}>{contents}</div>;
 };
 
-export const Nested = compose(withPages, withStyles(styles))(Markdown);
+export const Nested = compose(withPages, withStyles(styleMap))(Markdown);
 
-export default compose(withPages, withStyles(styles))(Markdown);
+export default compose(withPages, withStyles(styleMap))(Markdown);

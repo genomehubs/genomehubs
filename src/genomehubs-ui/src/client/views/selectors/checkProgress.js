@@ -1,6 +1,5 @@
-import { getController, setMessage } from "../reducers/message";
-
 import { apiUrl } from "../reducers/api";
+import { setMessage } from "../reducers/message";
 import store from "../store";
 
 export function checkProgress({
@@ -22,7 +21,7 @@ export function checkProgress({
       try {
         isFetching = true;
         const response = await fetch(url, {
-          signal: getController(state).signal,
+          signal: window.controller.signal,
         });
         json = await response.json();
       } catch (error) {
@@ -36,7 +35,7 @@ export function checkProgress({
           duration: null,
           severity: "info",
           ...(json.progress && { ...json.progress }),
-        })
+        }),
       );
 
       isFetching = false;

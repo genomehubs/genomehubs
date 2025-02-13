@@ -1,17 +1,17 @@
-import { aInB } from "../functions/aInB";
-import { attrTypes } from "../functions/attrTypes";
-import { checkResponse } from "../functions/checkResponse";
-import { combineQueries } from "../functions/combineQueries";
-import { formatJson } from "../functions/formatJson";
-import { getBounds } from "./getBounds";
-import { getResults } from "../functions/getResults";
-import { parseCatOpts } from "../functions/parseCatOpts";
-import { parseFields } from "../functions/parseFields";
-import { queryParams } from "./queryParams";
-import { scaleBuckets } from "./scaleBuckets";
-import { setAggs } from "./setAggs";
-import { setExclusions } from "../functions/setExclusions";
-import { valueTypes } from "./valueTypes";
+import { aInB } from "../functions/aInB.js";
+import { attrTypes } from "../functions/attrTypes.js";
+import { checkResponse } from "../functions/checkResponse.js";
+import { combineQueries } from "../functions/combineQueries.js";
+import { formatJson } from "../functions/formatJson.js";
+import { getBounds } from "./getBounds.js";
+import { getResults } from "../functions/getResults.js";
+import { parseCatOpts } from "../functions/parseCatOpts.js";
+import { parseFields } from "../functions/parseFields.js";
+import { queryParams } from "./queryParams.js";
+import { scaleBuckets } from "./scaleBuckets.js";
+import { setAggs } from "./setAggs.js";
+import { setExclusions } from "../functions/setExclusions.js";
+import { valueTypes } from "./valueTypes.js";
 
 const getHistAggResults = (aggs, stats) => {
   let hist = aggs.histogram;
@@ -470,10 +470,10 @@ const updateQuery = ({ params, fields, summaries, opts, lookupTypes }) => {
     options = options[0].split(",");
   }
   let min, max;
-  if (!typeof options[0] !== "undefined") {
+  if (typeof options[0] !== "undefined") {
     min = options[0];
   }
-  if (!typeof options[1] !== "undefined") {
+  if (typeof options[1] !== "undefined") {
     max = options[1];
   }
   for (let i = 0; i < queryArr.length; i++) {

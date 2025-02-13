@@ -1,5 +1,5 @@
-import { client } from "../functions/connection";
-import { indexName } from "../functions/indexName";
+import { client } from "../functions/connection.js";
+import { indexName } from "../functions/indexName.js";
 
 const queryByName = ({ taxon, rank }) => {
   return {
@@ -60,6 +60,8 @@ export const getCatLabels = async ({
         let label = cats[i];
         label.label = doc.hits.hits[0]._source[key];
         labels.push(label);
+      } else {
+        labels.push({ label: cats[i].key, key: cats[i].key });
       }
     });
   }

@@ -1,4 +1,4 @@
-import { operations } from "./operations";
+import { operations } from "./operations.js";
 
 export const addCondition = (
   conditions,

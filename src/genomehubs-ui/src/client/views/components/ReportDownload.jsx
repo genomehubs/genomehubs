@@ -2,22 +2,18 @@ import * as htmlToImage from "html-to-image";
 
 import { Buffer } from "buffer";
 import DownloadButton from "./DownloadButton";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import JSZip from "jszip";
 import React from "react";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
-// import { domToPng } from "modern-screenshot";
 import mergeImages from "merge-images";
 import qs from "../functions/qs";
 import { queryPropList } from "./ReportEdit";
 import { useLocation } from "@reach/router";
 import withReportById from "../hocs/withReportById";
 
-// import { saveSvgAsPng, svgAsDataUri } from "save-svg-as-png";
-
-const downloadLink = async (uri, filename) => {
+export const downloadLink = async (uri, filename) => {
   const link = document.createElement("a");
   link.href = uri;
   link.setAttribute("download", filename);
@@ -53,7 +49,6 @@ const scrollingImage = async ({
     let reps = 1;
     for (let i = 0; i < reps; i++) {
       src = await htmlToImage.toPng(chartSVG, opts);
-      // src = await domToPng(chartSVG);
     }
     images.push({
       src,
@@ -204,7 +199,9 @@ export const ReportDownload = ({
       // await saveSvgAsPng(chartSVG, `${filename}.png`, opts);
       // let uri = await htmlToImage.toPng(chartSVG, opts);
       if (scrollContainer) {
-        if (toUrl) return;
+        if (toUrl) {
+          return;
+        }
         await scrollingDownload({
           chartSVG,
           scrollContainer,
@@ -212,7 +209,9 @@ export const ReportDownload = ({
         });
       } else {
         let uri = await htmlToImage.toPng(chartSVG, opts);
-        if (toUrl) return uri;
+        if (toUrl) {
+          return uri;
+        }
         await downloadLink(uri, `${filename}.png`);
       }
       success = true;
@@ -239,7 +238,7 @@ export const ReportDownload = ({
         "```",
         "",
         "Notes:",
-        "- use `xs:` to control width if placing in a grid",
+        "- use `size:` to control width if placing in a grid",
         "- use `ratio:` to adjust width/height ratio",
         "- use `pointSize:` to set font/point size",
       ];
@@ -259,9 +258,9 @@ export const ReportDownload = ({
       }
       await downloadLink(
         `data:text/markdown;charset=UTF-8;base64,${new Buffer(
-          text.join("\n")
+          text.join("\n"),
         ).toString("base64")}`,
-        `${filename}.md`
+        `${filename}.md`,
       );
       success = true;
     } else if (format) {
@@ -296,7 +295,7 @@ export const ReportDownload = ({
       direction="column"
       style={{ height: "100%", width: "100%" }}
     >
-      <Grid item align="right" id="report-download-button">
+      <Grid align="right" id="report-download-button">
         {/* <GetAppIcon
           onClick={(e) => {
             if (code) {

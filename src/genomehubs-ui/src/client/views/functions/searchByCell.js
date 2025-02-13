@@ -40,14 +40,14 @@ const updateField = ({
       let collateIndex = terms.findIndex((t) => t.startsWith("collate"));
       terms[collateIndex] = terms[collateIndex].replace(
         "collate(assembly_id,",
-        "collate(sequence_id,"
+        "collate(sequence_id,",
       );
     } else if (valueType == "date") {
       newTerms.push(
-        `${field} >= ${new Date(range[0]).toISOString().split(/t/i)[0]}`
+        `${field} >= ${new Date(range[0]).toISOString().split(/t/i)[0]}`,
       );
       newTerms.push(
-        `${field} < ${new Date(range[1]).toISOString().split(/t/i)[0]}`
+        `${field} < ${new Date(range[1]).toISOString().split(/t/i)[0]}`,
       );
       // } else if (valueType == "keyword" && field == bounds.field) {
       //   let val = bounds.stats.cats[range[0]].key;
@@ -68,7 +68,7 @@ const updateField = ({
           `${f} != ${bounds.stats.cats
             .filter((o) => o.key != "other")
             .map((o) => o.key)
-            .join(",")}`
+            .join(",")}`,
         );
       } else if (
         valueType == "keyword" &&
@@ -111,6 +111,7 @@ const updateExclusions = (options) => {
       delete options[key];
     }
   }
+  return options;
 };
 
 export const searchByCell = ({
@@ -145,6 +146,12 @@ export const searchByCell = ({
     range: xRange,
     xRange: yRange,
   });
+  let cat;
+  if (bounds.cat) {
+    cat = bounds.cat;
+    let cats = bounds.cats.map((o) => (o.key == o.value ? o.key : `${o.key}`));
+    cat += `[${cats.length}]=${cats.join(",")}`;
+  }
   if (bounds.by == "lineage" && !bounds.showOther) {
     terms.push(`tax_tree(${bounds.cats.map((o) => o.key).join(",")})`);
   }
@@ -173,13 +180,14 @@ export const searchByCell = ({
   } else {
     ranks = "";
   }
-  updateExclusions(xQuery);
+  xQuery = updateExclusions({ ...xQuery });
   let xOpts = updateOpts(options.xOpts);
 
   let queryString = qs.stringify({
     ...xQuery,
     ...options,
     xOpts,
+    cat,
     query,
     ...(yQuery && { y: yQuery.query }),
     fields,
@@ -188,8 +196,8 @@ export const searchByCell = ({
   });
   navigate(
     `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
-      query
-    )}`
+      query,
+    )}`,
   );
 };
 

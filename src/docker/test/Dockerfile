@@ -12,6 +12,7 @@ RUN apt-get update \
     ca-certificates \
     gnupg \
     pigz \
+    software-properties-common \
     wget
 
 RUN mkdir -p /etc/apt/keyrings \
@@ -48,10 +49,9 @@ RUN useradd -m genomehubs \
 
 WORKDIR /opt
 
-RUN wget -P /usr/local/src https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-    && bash /usr/local/src/Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda \
-    && /opt/conda/bin/conda install -n base conda-libmamba-solver \
-    && rm /usr/local/src/Miniconda3-latest-Linux-x86_64.sh
+RUN wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" \
+    && bash Miniforge3.sh -b -p /opt/conda \
+    && rm Miniforge3.sh
 
 ARG CONDA_DIR=/opt/conda
 

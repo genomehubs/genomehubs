@@ -13,7 +13,7 @@ import SourcesPage from "./SourcesPage";
 import TypesPage from "./TypesPage";
 import classnames from "classnames";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
+import { fillParent as fillParentStyle } from "./Styles.scss";
 import withRoutes from "../hocs/withRoutes";
 import withSiteName from "../hocs/withSiteName";
 
@@ -23,7 +23,7 @@ const Main = ({ routes, basename }) => {
   if (routes.allIds.length == 0) {
     return null;
   }
-  let css = classnames(styles.fillParent);
+  let css = classnames(fillParentStyle);
   let paths = [
     <Landing path="/" key="/" />,
     <SearchPage path="/search" key="/search" />,
@@ -50,13 +50,7 @@ const Main = ({ routes, basename }) => {
         />
       );
     }
-    paths.push(
-      <GenericPage
-        path={`/${routeName}/*`}
-        key={"other"}
-        // pageId={routes.byId[routeName].pageId}
-      />
-    );
+    paths.push(<GenericPage path={`/${routeName}/*`} key={"other"} />);
   });
   return (
     <Fragment>

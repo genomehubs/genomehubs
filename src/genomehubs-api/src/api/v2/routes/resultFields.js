@@ -1,7 +1,7 @@
-import { attrTypes } from "../functions/attrTypes";
-import { config } from "../functions/config";
-import { formatJson } from "../functions/formatJson";
-import { logError } from "../functions/logger";
+import { attrTypes } from "../functions/attrTypes.js";
+import { config } from "../functions/config.js";
+import { formatJson } from "../functions/formatJson.js";
+import { logError } from "../functions/logger.js";
 
 export const getResultFields = async (req, res) => {
   let fields = {};

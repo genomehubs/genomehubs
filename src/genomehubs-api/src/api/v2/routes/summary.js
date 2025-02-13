@@ -1,10 +1,10 @@
-import { aggregateRawValuesByTaxon } from "../queries/aggregateRawValuesByTaxon";
-import { attrTypes } from "../functions/attrTypes";
-import { checkResponse } from "../functions/checkResponse";
-import { client } from "../functions/connection";
-import { formatJson } from "../functions/formatJson";
-import { indexName } from "../functions/indexName";
-import { logError } from "../functions/logger";
+import { aggregateRawValuesByTaxon } from "../queries/aggregateRawValuesByTaxon.js";
+import { attrTypes } from "../functions/attrTypes.js";
+import { checkResponse } from "../functions/checkResponse.js";
+import { client } from "../functions/connection.js";
+import { formatJson } from "../functions/formatJson.js";
+import { indexName } from "../functions/indexName.js";
+import { logError } from "../functions/logger.js";
 
 const getSummary = async ({ query: params, ...req }) => {
   let { typesMap, lookupTypes } = await attrTypes({ ...params });

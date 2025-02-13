@@ -1,12 +1,12 @@
-import { clearProgress, getProgress, setProgress } from "./progress";
+import { clearProgress, getProgress, setProgress } from "./progress.js";
 
-import { attrTypes } from "./attrTypes";
-import { checkResponse } from "./checkResponse";
-import { client } from "./connection";
-import { config } from "./config";
-import { logError } from "./logger";
-import { processHits } from "./processHits";
-import { searchByTaxon } from "../queries/searchByTaxon";
+import { attrTypes } from "./attrTypes.js";
+import { checkResponse } from "./checkResponse.js";
+import { client } from "./connection.js";
+import { config } from "./config.js";
+import { logError } from "./logger.js";
+import { processHits } from "./processHits.js";
+import { searchByTaxon } from "../queries/searchByTaxon.js";
 
 async function* scrollSearch(params, scroll) {
   if (!params.scroll) {

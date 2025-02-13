@@ -17,6 +17,7 @@ export const setIncludes = ({
       );
     if (result == "assembly") {
       include.push("assembly_id");
+      include.push("identifiers.*");
     }
     if (result == "sample") {
       include.push("sample_id");

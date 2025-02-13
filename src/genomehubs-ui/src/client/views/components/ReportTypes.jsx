@@ -1,20 +1,22 @@
 import React, { useState } from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
 
-import Grid from "@material-ui/core/Grid";
-import HeightIcon from "@material-ui/icons/Height";
-import IconButton from "@material-ui/core/IconButton";
-import LaunchIcon from "@material-ui/icons/Launch";
-import NavLink from "./NavLink";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import Badge from "@mui/material/Badge";
+import DescriptionIcon from "@mui/icons-material/Description";
+import Grid from "@mui/material/Grid2";
+import HeightIcon from "@mui/icons-material/Height";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 import Tooltip from "./Tooltip";
-import TrendingFlatIcon from "@material-ui/icons/TrendingFlat";
-import VerticalAlignTopIcon from "@material-ui/icons/VerticalAlignTop";
+import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
+import VerticalAlignTopIcon from "@mui/icons-material/VerticalAlignTop";
 import { compose } from "recompose";
+import makeStyles from "@mui/styles/makeStyles";
+import { styled } from "@mui/material/styles";
+import withStyles from "@mui/styles/withStyles";
 
 export const useStyles = makeStyles(() => ({
   upIcon: {
@@ -50,6 +52,19 @@ const StyledTableCell = withStyles((theme) => ({
     fontWeight: 700,
   },
 }))(TableCell);
+
+const StyledBadge = styled(Badge)((theme) => ({
+  "& .MuiBadge-badge": {
+    right: "-1.5em",
+    //top: 2,
+    //left: 0,
+    fontSize: "0.6em",
+    border: "2px solid rgba(0,0,0,0.26)",
+    padding: "2px",
+    color: "white",
+    backgroundColor: "rgba(0,0,0,0.26)",
+  },
+}));
 
 const truncateList = ({ values, charLimit }) => {
   let entries = [];
@@ -142,95 +157,151 @@ const TypeCell = ({ display_type, constraint, classes }) => {
   );
 };
 
-const GroupRows = ({ group, entries, classes }) => {
-  let rows = [];
-  for (let entry of entries) {
-    let { key, display_name, description } = entry;
-    let { display_level, type, processed_type, constraint } = entry;
-    let { summary, traverse, traverse_direction, traverse_limit } = entry;
-
-    let summaryArray = Array.isArray(summary) ? summary : [summary];
-    summary = Array.isArray(summary) ? summary.join(", ") : summary;
-    let traverseDirection = traverse_direction;
-    if (traverse) {
-      let traverseIcon;
-      switch (traverse_direction) {
-        case "up":
-          if (traverse_limit) {
-            traverseIcon = (
-              <VerticalAlignTopIcon className={classes.iconButton} />
-            );
-          } else {
-            traverseIcon = <TrendingFlatIcon className={classes.upIcon} />;
-          }
-          break;
-        case "down":
-          traverseIcon = <TrendingFlatIcon className={classes.downIcon} />;
-          break;
-        default:
-          traverseDirection = "up & down";
-          traverseIcon = <HeightIcon className={classes.iconButton} />;
+const ValueCell = ({ value_metadata, classes }) => {
+  let [expanded, setExpanded] = useState(false);
+  let expandable;
+  let descriptions = [];
+  if (value_metadata) {
+    for (let [value, obj] of Object.entries(value_metadata)) {
+      if (value == "default") {
+        continue;
       }
-      let traverseIndex = summaryArray.indexOf(traverse);
-      traverse = (
-        <span style={{ whiteSpace: "nowrap" }}>
-          <span className={classes.iconButton}>{traverse}</span>
-          {traverseIcon}
-        </span>
-      );
-      summaryArray = summaryArray.map((value, i) => (
-        <span key={i}>
-          {value}
-          {i < summaryArray.length - 1 && ", "}
-        </span>
-      ));
-
-      if (traverseIndex > -1) {
-        summaryArray[traverseIndex] = (
-          <Tooltip
-            key={traverseIndex}
-            title={`values filled ${traverseDirection} the tree`}
-            arrow
-            placement={"top"}
+      let { description } = obj;
+      if (description) {
+        descriptions.push(
+          <TableRow
+            key={value}
+            sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
           >
-            <span>
-              {traverse}
-              {traverseIndex < summaryArray.length - 1 && ", "}
-            </span>
-          </Tooltip>
+            <TableCell>{value}</TableCell>
+            <TableCell>{description}</TableCell>
+          </TableRow>,
         );
       }
-    } else {
-      summaryArray = summaryArray.map((value, i) => (
-        <span key={i}>
-          {value}
-          {i < summaryArray.length - 1 && ", "}
+    }
+  }
+  if (descriptions.length == 0) {
+    return <TableCell />;
+  }
+  return (
+    <TableCell>
+      <Tooltip
+        title={
+          expanded
+            ? "click to hide value descriptions"
+            : `click to show ${descriptions.length} value descriptions`
+        }
+        arrow
+        placement={"top"}
+      >
+        <span
+          className={
+            expandable ? classes.expandableConstraint : classes.constraint
+          }
+          onClick={() => setExpanded(!expanded)}
+        >
+          <div>{descriptions.length} value descriptions</div>
+          {expanded && <Table size="small">{descriptions}</Table>}
         </span>
-      ));
-      traverse = undefined;
+      </Tooltip>
+    </TableCell>
+  );
+};
+
+const GroupRows = ({ group, entries, classes, result }) => {
+  let rows = [];
+  for (let entry of entries) {
+    let { key, display_name, description, long_description } = entry;
+    let { display_level, type, processed_type, constraint, value_metadata } =
+      entry;
+    let summaryCell;
+    if (result == "taxon") {
+      let { summary, traverse, traverse_direction, traverse_limit } = entry;
+
+      let summaryArray = Array.isArray(summary) ? summary : [summary];
+      summary = Array.isArray(summary) ? summary.join(", ") : summary;
+      let traverseDirection = traverse_direction;
+      if (traverse) {
+        let traverseIcon;
+        switch (traverse_direction) {
+          case "up":
+            if (traverse_limit) {
+              traverseIcon = (
+                <VerticalAlignTopIcon className={classes.iconButton} />
+              );
+            } else {
+              traverseIcon = <TrendingFlatIcon className={classes.upIcon} />;
+            }
+            break;
+          case "down":
+            traverseIcon = <TrendingFlatIcon className={classes.downIcon} />;
+            break;
+          default:
+            traverseDirection = "up & down";
+            traverseIcon = <HeightIcon className={classes.iconButton} />;
+        }
+        let traverseIndex = summaryArray.indexOf(traverse);
+        traverse = (
+          <span style={{ whiteSpace: "nowrap" }}>
+            <span className={classes.iconButton}>{traverse}</span>
+            {traverseIcon}
+          </span>
+        );
+        summaryArray = summaryArray.map((value, i) => (
+          <span key={i}>
+            {value}
+            {i < summaryArray.length - 1 && ", "}
+          </span>
+        ));
+
+        if (traverseIndex > -1) {
+          summaryArray[traverseIndex] = (
+            <Tooltip
+              key={traverseIndex}
+              title={`values filled ${traverseDirection} the tree`}
+              arrow
+              placement={"top"}
+            >
+              <span>
+                {traverse}
+                {traverseIndex < summaryArray.length - 1 && ", "}
+              </span>
+            </Tooltip>
+          );
+        }
+      } else {
+        summaryArray = summaryArray.map((value, i) => (
+          <span key={i}>
+            {value}
+            {i < summaryArray.length - 1 && ", "}
+          </span>
+        ));
+        traverse = undefined;
+      }
+      summaryCell = <TableCell>{summaryArray}</TableCell>;
     }
 
     let title;
+    let desc_title;
     if (display_name) {
       title = display_name;
+    }
+    if (long_description) {
       if (description) {
-        title = (
-          <div style={{ whiteSpace: "pre-line", maxWidth: "14em" }}>
-            <div>{title}</div>
-            <div
-              style={{
-                width: "100%",
-                marginTop: "0.5em",
-                borderTop: "solid white 1px",
-              }}
+        desc_title = long_description;
+        description = (
+          <span>
+            {description}
+            <span
+              style={{ position: "relative", top: "-0.4em", left: "0.1em" }}
             >
-              {description}
-            </div>
-          </div>
+              <DescriptionIcon sx={{ fontSize: 12 }} />
+            </span>
+          </span>
         );
+      } else {
+        description = long_description;
       }
-    } else if (description) {
-      title = description;
     }
     let name = key;
     if (title) {
@@ -250,9 +321,29 @@ const GroupRows = ({ group, entries, classes }) => {
             arrow
             placement={"top"}
           >
-            <span style={{ fontWeight: 700 }}>*</span>
+            <span style={{ position: "relative", top: "-0.4em", left: "0em" }}>
+              <AutoAwesomeIcon sx={{ fontSize: 12 }} />
+            </span>
           </Tooltip>
         </>
+      );
+    }
+    if (desc_title) {
+      description = (
+        <Tooltip
+          key={name}
+          title={
+            <div style={{ whiteSpace: "pre-line", maxWidth: "14em" }}>
+              {desc_title}
+            </div>
+          }
+          arrow
+          placement={"top"}
+          followCursor
+          enterDelay={500}
+        >
+          {description}
+        </Tooltip>
       );
     }
 
@@ -269,19 +360,27 @@ const GroupRows = ({ group, entries, classes }) => {
       <TableRow key={key}>
         <TableCell>{group}</TableCell>
         <TableCell>{name}</TableCell>
+        <TableCell>{description}</TableCell>
         <TypeCell
           display_type={display_type}
           constraint={constraint}
           classes={classes}
         />
-        <TableCell>{summaryArray}</TableCell>
-      </TableRow>
+        {summaryCell}
+        <ValueCell value_metadata={value_metadata} classes={classes} />
+      </TableRow>,
     );
   }
   return rows;
 };
 
 const ReportTypes = ({ minDim, types }) => {
+  let result;
+  try {
+    result = Object.values(types)[0][0].group;
+  } catch (e) {
+    result = "taxon";
+  }
   const classes = useStyles();
   let rows = [];
   for (let [group, entries] of Object.entries(types)) {
@@ -291,18 +390,23 @@ const ReportTypes = ({ minDim, types }) => {
         group={group}
         entries={entries}
         classes={classes}
-      />
+        result={result}
+      />,
     );
   }
   return (
-    <Grid item xs style={{ maxHeight: minDim, overflowY: "auto" }}>
+    <Grid style={{ maxHeight: minDim, overflowY: "auto" }} size="grow">
       <Table stickyHeader size="small">
         <TableHead>
           <TableRow>
             <StyledTableCell>Display group</StyledTableCell>
             <StyledTableCell>Attribute name</StyledTableCell>
+            <StyledTableCell>Attribute description</StyledTableCell>
             <StyledTableCell>Attribute type</StyledTableCell>
-            <StyledTableCell>Summary function</StyledTableCell>
+            {result == "taxon" && (
+              <StyledTableCell>Summary function</StyledTableCell>
+            )}
+            <StyledTableCell>Described values</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>{rows}</TableBody>

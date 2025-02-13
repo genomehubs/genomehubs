@@ -1,34 +1,20 @@
 import React, { memo, useEffect } from "react";
 
 import FileModal from "./FileModal";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
-import LaunchIcon from "@material-ui/icons/Launch";
+import Grid from "@mui/material/Grid2";
 import NavLink from "./NavLink";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TablePagination from "@material-ui/core/TablePagination";
-import TableRow from "@material-ui/core/TableRow";
-import Tooltip from "./Tooltip";
-import Typography from "@material-ui/core/Typography";
-import classnames from "classnames";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import { autoWidth as autoWidthStyle } from "./Styles.scss";
 import { compose } from "recompose";
 import formatter from "../functions/formatter";
-import { makeStyles } from "@material-ui/core/styles";
-import styles from "./Styles.scss";
-import { useNavigate } from "@reach/router";
-import withAnalysesByAnyId from "../hocs/withAnalysesByAnyId";
-import withAnalysis from "../hocs/withAnalysis";
+import makeStyles from "@mui/styles/makeStyles";
 import withApi from "../hocs/withApi";
 import withFiles from "../hocs/withFiles";
 import withFilesByAnalysisId from "../hocs/withFilesByAnalysisId";
-import withRecord from "../hocs/withRecord";
-import withSummary from "../hocs/withSummary";
-import withTypes from "../hocs/withTypes";
 
 const useStyles = makeStyles((theme) => ({
   pale: {
@@ -48,12 +34,10 @@ const FileTable = ({
   fetchFiles,
 }) => {
   useEffect(() => {
-    if (analysisId) {
-      if (!files.isFetching && !filesByAnalysisId) {
-        let query = `analysis_id==${analysisId}`;
-        let result = "file";
-        fetchFiles({ query, result });
-      }
+    if (analysisId && !files.isFetching && !filesByAnalysisId) {
+      let query = `analysis_id==${analysisId}`;
+      let result = "file";
+      fetchFiles({ query, result });
     }
   }, [analysisId, filesByAnalysisId]);
   const classes = useStyles();
@@ -99,16 +83,16 @@ const FileTable = ({
           </TableCell>
           <TableCell>
             <Grid container direction="column">
-              <Grid item xs>
+              <Grid>
                 <span className={classes.pale}>dimensions: </span>
                 {meta.size_pixels}
               </Grid>
-              <Grid item xs>
+              <Grid>
                 <span className={classes.pale}>description: </span>
                 {meta.description}
               </Grid>
               {externalLink && (
-                <Grid item xs>
+                <Grid>
                   <span className={classes.pale}>source: </span>
                   {externalLink}
                 </Grid>
@@ -130,7 +114,7 @@ const FileTable = ({
     </TableHead>
   );
   return (
-    <Table size={"small"} className={styles.autoWidth}>
+    <Table size={"small"} className={autoWidthStyle}>
       {tableHead}
       <TableBody>{tableRows}</TableBody>
     </Table>

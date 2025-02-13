@@ -1,24 +1,12 @@
 import React, { useEffect, useRef } from "react";
 
 import Tooltip from "./Tooltip";
+import { boldValue as boldValueStyle } from "./Styles.scss";
 import { compose } from "recompose";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
 import withSiteName from "../hocs/withSiteName";
-
-const ranks = {
-  superkingdom: { plural: "superkingdoms" },
-  kingdom: { plural: "kingdoms" },
-  phylum: { plural: "phyla" },
-  class: { plural: "classes" },
-  order: { plural: "orders" },
-  family: { plural: "families" },
-  genus: { plural: "genera" },
-  species: { plural: "species" },
-  subspecies: { plural: "subspecies" },
-};
 
 const ReportXPerRank = ({
   perRank,
@@ -28,7 +16,7 @@ const ReportXPerRank = ({
   containerRef,
   chartRef,
 }) => {
-  const componentRef = chartRef ? chartRef : useRef();
+  const componentRef = chartRef || useRef();
   const navigate = useNavigate();
   const { width } = containerRef
     ? useResize(containerRef)
@@ -39,10 +27,8 @@ const ReportXPerRank = ({
     useEffect(() => {
       let height = perRank.report.xPerRank.length * 27;
       let ratio = 400 / height;
-      if (ratio != minDim / 400) {
-        if (width > 0) {
-          setMinDim(height);
-        }
+      if (ratio != minDim / 400 && width > 0) {
+        setMinDim(height);
       }
     }, [width]);
     let maxValue = Math.max(0, ...perRank.report.xPerRank.map((o) => o.x));
@@ -67,9 +53,7 @@ const ReportXPerRank = ({
                 navigate(`${basename}/search?${qs.stringify(entry.xQuery)}`)
               }
             >
-              <span className={styles.boldValue}>
-                {entry.x.toLocaleString()}
-              </span>
+              <span className={boldValueStyle}>{entry.x.toLocaleString()}</span>
               <span>{plural}</span>
             </div>
           </Tooltip>

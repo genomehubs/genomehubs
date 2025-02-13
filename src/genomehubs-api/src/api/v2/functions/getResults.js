@@ -1,10 +1,10 @@
-import { addCondition } from "./addCondition";
-import { attrTypes } from "./attrTypes";
-import { getRecordsByTaxon } from "./getRecordsByTaxon";
-import { indexName } from "./indexName";
-import { logError } from "./logger";
-import { parseFields } from "./parseFields";
-import { summaries } from "./summaries";
+import { addCondition } from "./addCondition.js";
+import { attrTypes } from "./attrTypes.js";
+import { getRecordsByTaxon } from "./getRecordsByTaxon.js";
+import { indexName } from "./indexName.js";
+import { logError } from "./logger.js";
+import { parseFields } from "./parseFields.js";
+import { summaries } from "./summaries.js";
 
 const fail = (error) => {
   return {
@@ -241,11 +241,12 @@ const validateTerm = (term, types) => {
       ) {
         typeSummary.push("length");
       }
+      typeSummary.push("sp_count");
       if (
         parts[1] &&
         parts[1].length > 0 &&
         !typeSummary.includes(parts[1]) &&
-        !parts[1] == "metadata"
+        parts[1] != "metadata"
       ) {
         return {
           validation: fail(`invalid summary for ${parts[2]} in ${term}`),
@@ -501,6 +502,10 @@ export const generateQuery = async ({
     exclusions.ancestor = [...excludeAncestral];
   }
 
+  if (["taxon", "assembly", "sample"].includes(result) && !taxTerm) {
+    taxTerm = ["tax_tree(2759)", "tree", "2759"];
+  }
+
   let params = {
     collateTerm,
     idTerm,
@@ -692,13 +697,17 @@ export const getResults = async (params) => {
       params.query = await chainQueries(params);
     }
   } catch (error) {
+    let { errorString } = error;
+    if (typeof message == "object") {
+      errorString = JSON.stringify(message);
+    }
     logError({ req: params.req, message: error });
     return {
       func: () => ({
-        status: { success: false, error: error.message },
+        status: { success: false, error: errorString },
       }),
       params: {},
-      status: { success: false, error: error.message },
+      status: { success: false, error: errorString },
     };
   }
   let index = indexName({ ...params });

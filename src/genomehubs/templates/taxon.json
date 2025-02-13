@@ -269,6 +269,10 @@
             "type": "integer",
             "meta": { "description": "Count of individual values" }
           },
+          "sp_count": {
+            "type": "integer",
+            "meta": { "description": "Count of species with values" }
+          },
           "min": {
             "type": "double",
             "meta": { "description": "Minimum value (numeric types only)" }

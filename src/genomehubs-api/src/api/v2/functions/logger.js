@@ -2,7 +2,7 @@ import "winston-daily-rotate-file";
 
 import { createLogger, format, transports } from "winston";
 
-import { config } from "./config";
+import { config } from "./config.js";
 
 const { combine, timestamp, prettyPrint, colorize, errors, label, printf } =
   format;
@@ -22,6 +22,10 @@ const errorTransport = new transports.DailyRotateFile({
   maxFiles: "14d",
 });
 
+errorTransport.on("error", (error) => {
+  console.log("errorTransport", error);
+});
+
 const accessTransport = new transports.DailyRotateFile({
   filename: config.accessLog,
   format: combine(
@@ -34,6 +38,10 @@ const accessTransport = new transports.DailyRotateFile({
   maxFiles: "14d",
 });
 
+accessTransport.on("error", (error) => {
+  console.log("accessTransport", error);
+});
+
 const memcacheTransport = new transports.DailyRotateFile({
   filename: config.memcacheLog,
   format: combine(timestamp(), prettyPrint()),
@@ -41,6 +49,10 @@ const memcacheTransport = new transports.DailyRotateFile({
   zippedArchive: true,
   maxSize: "20m",
   maxFiles: "14d",
+});
+
+memcacheTransport.on("error", (error) => {
+  console.log("memcacheTransport", error);
 });
 
 export const logger = createLogger({

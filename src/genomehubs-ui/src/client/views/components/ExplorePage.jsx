@@ -39,7 +39,7 @@ const ExplorePage = ({
   useEffect(() => {
     if (options.taxon_id && !record.isFetching) {
       if (!taxon_id) {
-        fetchRecord(options.taxon_id, options.result, options.taxonomy);
+        fetchRecord({ recordId: options.taxon_id, ...options });
         setRecordId(options.taxon_id);
       } else if (
         options.taxon_id != taxon_id ||
@@ -81,7 +81,7 @@ const ExplorePage = ({
         {...lineage.taxon}
         summaryId={summaryId}
         summary={summary}
-      />
+      />,
     );
   }
   if (lineage) {
@@ -98,7 +98,7 @@ const ExplorePage = ({
           summaryId={summaryId}
           sequence={i + 1}
           summary={summary}
-        />
+        />,
       );
     });
   }
@@ -122,5 +122,5 @@ export default compose(
   withSearch,
   withTypes,
   withSummary,
-  dispatchLookup
+  dispatchLookup,
 )(ExplorePage);

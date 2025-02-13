@@ -1,47 +1,16 @@
-import { Avatar, Chip } from "@material-ui/core";
+import { Avatar, Chip } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import { chip as chipStyle, ttOpts as ttOptsStyle } from "./Styles.scss";
 
-import Checkbox from "@material-ui/core/Checkbox";
-import FilterListIcon from "@material-ui/icons/FilterList";
+import Checkbox from "@mui/material/Checkbox";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import Tooltip from "./Tooltip";
-import styles from "./Styles.scss";
-
-// const allowedSummaries = ({ field, types }) => {
-//   let values = { value: "value" };
-//   let possible = [
-//     { key: "list", value: "length" },
-//     { key: "max" },
-//     { key: "min" },
-//     { key: "range" },
-//   ];
-//   let summaries = types[field]?.summary || [];
-//   if (!Array.isArray(summaries)) {
-//     summaries = [summaries];
-//   }
-//   for (let obj of possible) {
-//     if (summaries.includes(obj.key)) {
-//       let summary = obj.value || obj.key;
-//       values[summary] = summary;
-//     }
-//   }
-//   return values;
-// };
 
 const allowedOperators = ({ field, types, summary }) => {
   let operators = ["=", "==", "!="];
   let numeric = [">", ">=", "<", "<="];
-  let type = types[field]?.type || "keyword";
-  // if (type == "keyword" && summary == "value") {
-  //   let summary = types[field]?.summary || "list";
-  //   if (Array.isArray(summary)) {
-  //     summary = summary[0];
-  //   }
-  //   if (summary == "enum") {
-  //     operators = numeric.concat(operators);
-  //   }
-  // } else {
+
   operators = numeric.concat(operators);
-  // }
   return operators;
 };
 
@@ -54,7 +23,7 @@ const ChipInput = ({ defaultWidth, value, placeholder, onBlur }) => {
   return (
     <input
       type="text"
-      className={styles.chip}
+      className={chipStyle}
       style={{
         width: `${currentValue ? currentValue.length + 0.5 : defaultWidth}ch`,
       }}
@@ -102,13 +71,14 @@ const ResultFilterInput = ({
   const ChipOptions = ({ title, children, allowedValues, handleChange }) => {
     if (allowedValues) {
       title = (
-        <div className={styles.ttOpts}>
+        <div className={ttOptsStyle}>
           {title}:
           <ul>
             {allowedValues.map((v) => (
               <li
                 key={v}
-                onClick={(e) => {
+                onPointerDown={(e) => {
+                  e.preventDefault();
                   handleChange({ target: { value: v } });
                 }}
               >
@@ -120,7 +90,7 @@ const ResultFilterInput = ({
       );
     }
     return (
-      <Tooltip title={title} styleName="dark" interactive arrow>
+      <Tooltip title={title} styleName="dark" disableInteractive={false} arrow>
         <span>{children}</span>
       </Tooltip>
     );

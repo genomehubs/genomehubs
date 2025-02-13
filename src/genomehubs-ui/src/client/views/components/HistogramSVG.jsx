@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from "react";
 
-import Skeleton from "@material-ui/lab/Skeleton";
+import Skeleton from "@mui/material/Skeleton";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { formatter } from "../functions/formatter";
+import { fullWidth as fullWidthStyle } from "./Styles.scss";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
+import { useIntersectionObserver } from "usehooks-ts";
 import { useNavigate } from "@reach/router";
-import useVisible from "../hooks/useVisible";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
@@ -31,8 +31,9 @@ const HistogramSVG = ({
   const navigate = useNavigate();
 
   const height = 100;
-  const targetRef = useRef(null);
-  let visible = useVisible(targetRef);
+  const { isIntersecting: visible, ref: targetRef } = useIntersectionObserver({
+    threshold: 0.01,
+  });
   let parts = summaryId.split("--");
   useEffect(() => {
     let mounted = true;
@@ -102,14 +103,14 @@ const HistogramSVG = ({
   if (buckets.length == 0) {
     let scale = 0.75;
     return (
-      <div className={styles.fullWidth} ref={targetRef}>
+      <div className={fullWidthStyle} ref={targetRef}>
         <div
           style={{
             transform: `translate(25px, 10px) scale(${scale})`,
             transformOrigin: "left top",
           }}
         >
-          <Skeleton variant="rect" width={1000} height={height} />
+          <Skeleton variant="rectangular" width={1000} height={height} />
         </div>
       </div>
     );

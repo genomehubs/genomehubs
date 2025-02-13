@@ -63,6 +63,28 @@ const pridePalette = [
 
 const ringsPalette = ["#3e76ec", "#FFCE01", "#000000", "#179A13", "#FF0000"];
 
+const cudPalette = [
+  "#000000",
+  "#E69F00",
+  "#56B4E9",
+  "#009E73",
+  "#F0E442",
+  "#0072B2",
+  "#D55E00",
+  "#CC79A7",
+];
+
+const cudRainbowPalette = [
+  "#D55E00", // Red
+  "#E69F00", // Orange
+  "#F0E442", // Yellow
+  "#009E73", // Green
+  "#56B4E9", // Blue
+  "#0072B2", // Dark Blue
+  "#CC79A7", // Pink
+  "#000000", // Black
+];
+
 export const palettes = handleActions(
   {
     ADD_PALETTE: (state, action) =>
@@ -90,28 +112,40 @@ export const palettes = handleActions(
       accent: createD3Palette(schemeAccent, 8),
       batlowS: createPalette(batlowS),
       batlow: createPalette(batlow, 50),
-      // bhm: { id: "bhm", default: bhmPalette, levels: [] },
       bhm: createPalette(bhmPalette),
       category: createD3Palette(schemeCategory10, 10),
       cividis: createD3Palette(interpolateCividis, 50),
       cool: createD3Palette(interpolateCool, 50),
       cubeHelix: createD3Palette(interpolateCubehelixDefault, 50),
+      cud: createPalette(cudPalette),
+      cudRainbow: createPalette(cudRainbowPalette),
       dark: createD3Palette(schemeDark2, 8),
       default: createD3Palette(interpolateViridis, 50),
+      cudReverse: createPalette(cudPalette.reverse().splice(1)),
       inferno: createD3Palette(interpolateInferno, 50),
       magma: createD3Palette(interpolateMagma, 50),
       paired: createD3Palette(schemePaired, 12),
       plasma: createD3Palette(interpolatePlasma, 50),
-      pride: { id: "pride", default: pridePalette, levels: [] },
-      rings: { id: "rings", default: ringsPalette, levels: [] },
+      pride: createPalette(pridePalette),
+      rings: createPalette(ringsPalette),
       standard: { id: "default", default: brewerPalette, levels: [] },
       tableau: createD3Palette(schemeTableau10, 10),
       turbo: createD3Palette(interpolateTurbo, 50),
       viridis: createD3Palette(interpolateViridis, 50),
       warm: createD3Palette(interpolateWarm, 50),
     },
-    allIds: ["default", "batlow", "batlowS", "cividis", "paired", "viridis"],
-  }
+    allIds: [
+      "default",
+      "batlow",
+      "batlowS",
+      "cividis",
+      "paired",
+      "viridis",
+      "cud",
+      "cudRainbow",
+      "cudReverse",
+    ],
+  },
 );
 
 export const getSelectedPalette = (state) => state.selectedPalette;
@@ -120,7 +154,7 @@ export const selectPalette = createAction("SELECT_PALETTE");
 export const selectedPalette = handleAction(
   "SELECT_PALETTE",
   (state, action) => action.payload,
-  "default"
+  "default",
 );
 
 export const getAllPalettes = (state) => state.palettes;
@@ -131,7 +165,7 @@ export const getColorPalette = createSelector(
   (id, palettes) => {
     let colors = palettes ? palettes.byId[id] || palettes.byId["default"] : [];
     return { id, colors };
-  }
+  },
 );
 
 export const getUserPalette = createSelector(getAllPalettes, (palettes) => {
@@ -146,7 +180,7 @@ export const getDefaultPalette = createSelector(
   (id, palettes) => {
     let levels = palettes ? palettes.byId[id] || palettes.byId["default"] : {};
     return { id, colors: levels.default, levels };
-  }
+  },
 );
 
 /* Coolors Exported Palette - coolors.co/d7cdcc-ffffff-59656f-9c528b-1d1e2c */
@@ -167,7 +201,7 @@ export const setColorScheme = createAction("SET_COLOR_SCHEME");
 export const colorScheme = handleAction(
   "SET_COLOR_SCHEME",
   (state, action) => action.payload,
-  schemeColors
+  schemeColors,
 );
 
 export const getColorScheme = (state) => state.colorScheme;
@@ -176,7 +210,7 @@ export const setTheme = createAction("SET_THEME");
 export const theme = handleAction(
   "SET_THEME",
   (state, action) => action.payload,
-  "Light"
+  "Light",
 );
 export const getTheme = (state) => state.theme;
 
@@ -192,7 +226,7 @@ export const statusColors = handleAction(
     direct: directColor,
     descendantHighlight,
     directHighlight,
-  }
+  },
 );
 
 export const colorReducers = {

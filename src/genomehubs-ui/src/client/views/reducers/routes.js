@@ -1,19 +1,23 @@
-import { createAction, handleAction } from "redux-actions";
-import immutableUpdate from "immutable-update";
+import { createSlice } from "@reduxjs/toolkit";
 
-export const setRoutes = createAction("SET_ROUTES");
+const routesSlice = createSlice({
+  name: "routes",
+  initialState: { allIds: [], byId: {} },
+  reducers: {
+    setRoutes(state, action) {
+      state.byId[action.payload.routeName] = action.payload;
+      state.allIds.push(action.payload.routeName);
+    },
+  },
+});
 
-export const routes = handleAction(
-  "SET_ROUTES",
-  (state, action) =>
-    immutableUpdate(state, {
-      byId: { [action.payload.routeName]: action.payload },
-      allIds: [...state.allIds, action.payload.routeName],
-    }),
-  { allIds: [], byId: {} }
-);
 export const getRoutes = (state) => state.routes;
 
+export const { setRoutes } = routesSlice.actions;
+
+// Export the slice reducer as the default export
+export default routesSlice.reducer;
+
 export const routeReducers = {
-  routes,
+  routes: routesSlice.reducer,
 };

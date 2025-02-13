@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useRef, useState } from "react";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import ReportArc from "./ReportArc";
 import ReportCaption from "./ReportCaption";
 import ReportEmpty from "./ReportEmpty";
@@ -8,6 +8,7 @@ import ReportError from "./ReportError";
 import ReportHistogram from "./ReportHistogram";
 import ReportLoading from "./ReportLoading";
 import ReportMap from "./ReportMap";
+import ReportRibbon from "./ReportRibbon";
 import ReportScatter from "./ReportScatter";
 import ReportSources from "./ReportSources";
 import ReportTable from "./ReportTable";
@@ -20,10 +21,10 @@ import dispatchMessage from "../hocs/dispatchMessage";
 import dispatchReport from "../hocs/dispatchReport";
 import { gridPropNames } from "../functions/propNames";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
+import { reportHeading as reportHeadingStyle } from "./Styles.scss";
+import { useIntersectionObserver } from "usehooks-ts";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
-import useVisible from "../hooks/useVisible";
 import withReportById from "../hocs/withReportById";
 import withSiteName from "../hocs/withSiteName";
 
@@ -31,6 +32,7 @@ const headings = {
   tree: "Tap tree nodes to browse taxa or long-press to search",
   histogram: "Tap bins to search",
   oxford: "Tap bins to search",
+  ribbon: "Long press to search",
   scatter: "Tap bins to search",
 };
 
@@ -80,6 +82,8 @@ const ReportItem = ({
   xOpts,
   yOpts,
   compactLegend,
+  reorient,
+  dropShadow,
   compactWidth,
   highlightArea,
   mapThreshold,
@@ -96,6 +100,10 @@ const ReportItem = ({
   includeEstimates,
   includeDescendants,
   collapseMonotypic,
+  hideSourceColors,
+  hideErrorBars,
+  hideAncestralBars,
+  showPhyloPics,
   highlight,
   colorPalette,
   excludeMissing,
@@ -130,8 +138,9 @@ const ReportItem = ({
   });
   const navigate = useNavigate();
   const hideMessage = !inModal && !topLevel;
-  const targetRef = useRef();
-  let visible = useVisible(targetRef);
+  const { isIntersecting: visible, ref: targetRef } = useIntersectionObserver({
+    threshold: 0.01,
+  });
   const [minDim, basicSetMinDim] = useState(0);
   let setMinDim;
 
@@ -173,7 +182,7 @@ const ReportItem = ({
       setTimeout(
         () =>
           fetchReport({ reportId, queryString, report, hideMessage, inModal }),
-        delay
+        delay,
       );
     }
   }, [reportId, visible]);
@@ -239,22 +248,11 @@ const ReportItem = ({
     //   severity: "error",
     // };
   } else if (
-    reportById.report[report] &&
-    reportIsEmpty(report, reportById.report[report])
+    (reportById.report[report] &&
+      reportIsEmpty(report, reportById.report[report])) ||
+    !reportById.report[report]
   ) {
     component = <ReportEmpty report={report} inModal={inModal} />;
-    // message = {
-    //   message: `No ${report} data to display`,
-    //   duration: 5000,
-    //   severity: "warning",
-    // };
-  } else if (!reportById.report[report]) {
-    component = <ReportEmpty report={report} inModal={inModal} />;
-    // message = {
-    //   message: `No ${report} data to display`,
-    //   duration: 5000,
-    //   severity: "warning",
-    // };
   } else {
     switch (report) {
       case "arc":
@@ -277,7 +275,7 @@ const ReportItem = ({
             chartRef={chartRef}
             embedded={embedded}
             inModal={inModal}
-            containerRef={targetRef}
+            containerRef={containerRef}
             colorPalette={colorPalette}
             ratio={fixedRatio || ratio}
             pointSize={pointSize}
@@ -339,6 +337,36 @@ const ReportItem = ({
             xOpts={xOpts}
             yOpts={yOpts}
             compactLegend={compactLegend}
+            reorient={reorient}
+            dropShadow={dropShadow}
+            compactWidth={compactWidth}
+            highlightArea={highlightArea}
+            stacked={stacked}
+            pointSize={pointSize}
+            zScale={zScale}
+            scatterThreshold={scatterThreshold}
+            includeEstimates={includeEstimates}
+            {...qs.parse(queryString)}
+            minDim={minDim}
+            setMinDim={setMinDim}
+          />
+        );
+        break;
+
+      case "ribbon":
+        component = (
+          <ReportRibbon
+            scatter={reportById}
+            chartRef={chartRef}
+            containerRef={containerRef}
+            embedded={embedded}
+            ratio={ratio}
+            colorPalette={colorPalette}
+            xOpts={xOpts}
+            yOpts={yOpts}
+            compactLegend={compactLegend}
+            reorient={reorient}
+            dropShadow={dropShadow}
             compactWidth={compactWidth}
             highlightArea={highlightArea}
             stacked={stacked}
@@ -443,6 +471,10 @@ const ReportItem = ({
             includeEstimates={includeEstimates}
             treeThreshold={treeThreshold}
             collapseMonotypic={collapseMonotypic}
+            hideSourceColors={hideSourceColors}
+            hideErrorBars={hideErrorBars}
+            hideAncestralBars={hideAncestralBars}
+            showPhylopics={showPhyloPics}
             levels={levels}
             hidePreview={hideMessage}
             {...qs.parse(queryString)}
@@ -538,17 +570,14 @@ const ReportItem = ({
       style={{
         flexGrow: "1",
         width: "100%",
-        // background: "rgba(240,240,240,0.5)",
       }}
     >
       {!loading && !error && heading && (inModal || topLevel) && (
-        <Grid item xs>
-          <span className={styles.reportHeading}>{heading}</span>
+        <Grid>
+          <span className={reportHeadingStyle}>{heading}</span>
         </Grid>
       )}
       <Grid
-        item
-        xs
         style={{
           width: "100%",
           // background: "rgba(240,240,240,0.5)",
@@ -574,6 +603,7 @@ const ReportItem = ({
       </Grid>
       {!loading && !error && caption && (
         <ReportCaption
+          reportById={reportById}
           caption={caption}
           embedded={embedded}
           inModal={inModal}
@@ -597,16 +627,7 @@ const ReportItem = ({
       </ReportWrapper>
     );
   }
-  // if (reportById.report) {
-  //   content = (
-  //     <Grid container direction="column" width="100%">
-  //       <Grid item>{content}</Grid>
-  //       <Grid item style={{ textAlign: "left" }}>
-  //         {reportById.report.caption}
-  //       </Grid>
-  //     </Grid>
-  //   );
-  // }
+
   let adjustRatio = 1;
   if (fixedRatio && fixedRatio != ratio) {
     adjustRatio = fixedRatio;
@@ -640,5 +661,5 @@ export default compose(
   withSiteName,
   dispatchMessage,
   dispatchReport,
-  withReportById
+  withReportById,
 )(ReportItem);

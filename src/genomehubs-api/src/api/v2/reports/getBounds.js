@@ -1,14 +1,14 @@
-import { chainQueries, getResults } from "../functions/getResults";
+import { chainQueries, getResults } from "../functions/getResults.js";
 
-import { attrTypes } from "../functions/attrTypes";
-import { fmt } from "./fmt";
-import { getCatLabels } from "./getCatLabels";
-import { incrementDate } from "./incrementDate";
-import { scales } from "./scales";
-import { setAggs } from "./setAggs";
-import { setScale } from "./setScale";
-import { setTerms } from "./setTerms";
-import { valueTypes } from "./valueTypes";
+import { attrTypes } from "../functions/attrTypes.js";
+import { fmt } from "./fmt.js";
+import { getCatLabels } from "./getCatLabels.js";
+import { incrementDate } from "./incrementDate.js";
+import { scales } from "./scales.js";
+import { setAggs } from "./setAggs.js";
+import { setScale } from "./setScale.js";
+import { setTerms } from "./setTerms.js";
+import { valueTypes } from "./valueTypes.js";
 
 export const getCatsBy = async ({
   terms,
@@ -96,7 +96,13 @@ export const getBounds = async ({
   opts = ";;",
   catOpts = ";;",
 }) => {
-  if (!cat) {
+  let showOther = false;
+  if (cat) {
+    if (cat.match(/\+/)) {
+      showOther = true;
+      cat = cat.replace(/\+/, "");
+    }
+  } else {
     catOpts = opts;
   }
   let nSort = false;
@@ -106,6 +112,11 @@ export const getBounds = async ({
   }
   let { lookupTypes } = await attrTypes({ result, taxonomy });
   params.size = 0;
+  for (let [p, v] of Object.entries(apiParams)) {
+    if (p.match(/query[A-Z]$/)) {
+      params[p] = v;
+    }
+  }
   params.query = await chainQueries(params);
   // find max and min plus most frequent categories
   let fieldMeta = lookupTypes(fields[0]);
@@ -377,6 +388,6 @@ export const getBounds = async ({
     catType,
     cats,
     by,
-    showOther: definedTerms.other,
+    showOther,
   };
 };

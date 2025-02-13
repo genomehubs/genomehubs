@@ -1,14 +1,15 @@
-import { getProgress, setProgress } from "../functions/progress";
+import { getProgress, setProgress } from "../functions/progress.js";
 
-import { aInB } from "../functions/aInB";
-import { attrTypes } from "../functions/attrTypes";
-import { combineQueries } from "../functions/combineQueries";
-import { config } from "../functions/config";
-import { getBounds } from "./getBounds";
-import { getResults } from "../functions/getResults";
-import { parseFields } from "../functions/parseFields";
-import { queryParams } from "./queryParams";
-import { setExclusions } from "../functions/setExclusions";
+import { aInB } from "../functions/aInB.js";
+import { attrTypes } from "../functions/attrTypes.js";
+import { combineQueries } from "../functions/combineQueries.js";
+import { config } from "../functions/config.js";
+import { getBounds } from "./getBounds.js";
+import { getResults } from "../functions/getResults.js";
+import parseCatOpts from "../functions/parseCatOpts.js";
+import { parseFields } from "../functions/parseFields.js";
+import { queryParams } from "./queryParams.js";
+import { setExclusions } from "../functions/setExclusions.js";
 
 const valueTypes = {
   long: "integer",
@@ -59,7 +60,12 @@ const getLCA = async ({
       },
     },
   };
-  let query = params.query;
+  let { query } = params;
+  for (let [p, v] of Object.entries(apiParams)) {
+    if (p.match(/query[A-Z]$/)) {
+      params[p] = v;
+    }
+  }
   let maxDepth;
   let taxon;
   if (query) {
@@ -135,13 +141,11 @@ const getLCA = async ({
           parent = ancestor.taxon_id;
           break;
         }
-      } else {
-        if (child) {
-          parent = ancestor.taxon_id;
-          break;
-        } else if (taxon_id == ancestor.taxon_id) {
-          child = taxon_id;
-        }
+      } else if (child) {
+        parent = ancestor.taxon_id;
+        break;
+      } else if (taxon_id == ancestor.taxon_id) {
+        child = taxon_id;
       }
     }
     // }
@@ -149,7 +153,7 @@ const getLCA = async ({
     lca = {
       taxon_id,
       count: bucket.doc_count,
-      maxDepth,
+      maxDepth: result == "taxon" ? maxDepth : maxDepth + 1,
       minDepth,
       parent,
     };
@@ -158,7 +162,9 @@ const getLCA = async ({
 };
 
 const chunkArray = (arr, chunkSize) => {
-  if (chunkSize <= 0) throw "Invalid chunk size";
+  if (chunkSize <= 0) {
+    throw "Invalid chunk size";
+  }
   let chunks = [];
   for (let i = 0, len = arr.length; i < len; i += chunkSize) {
     chunks.push(arr.slice(i, i + chunkSize));
@@ -177,11 +183,14 @@ const addXResultsToTree = async ({
   xQuery,
   update,
   yRes,
+  summaries = [],
   ancStatus,
   queryId,
   taxonomy,
   catRank,
+  index,
 }) => {
+  let wantedSummaries = new Set([...summaries, "value", "min", "max"]);
   let isParentNode = {};
   let lineages = {};
   if (!ancStatus) {
@@ -195,19 +204,14 @@ const addXResultsToTree = async ({
       treeFields = {};
       for (let f of optionalFields) {
         if (result.result.fields[f]) {
-          let {
-            aggregation_source: source,
-            value,
-            min,
-            max,
-            range,
-          } = result.result.fields[f];
           treeFields[f] = {
-            source,
-            value,
-            ...(min && { min }),
-            ...(max && { max }),
+            source: result.result.fields[f].aggregation_source,
           };
+          for (let v of wantedSummaries) {
+            if (result.result.fields[f].hasOwnProperty(v)) {
+              treeFields[f][v] = result.result.fields[f][v];
+            }
+          }
         }
       }
     }
@@ -219,18 +223,70 @@ const addXResultsToTree = async ({
       }
       continue;
     } else {
-      treeNodes[taxonId] = {
-        count: 0,
-        children: {},
-        taxon_id: taxonId,
-        scientific_name: result.result.scientific_name,
-        taxon_rank: result.result.taxon_rank,
-        ...(treeFields && { fields: treeFields }),
-      };
-      isParentNode[result.result.parent] = true;
-      lineages[taxonId] = result.result.lineage;
+      let {
+        assembly_id,
+        sample_id,
+        taxon_rank,
+        scientific_name,
+        parent,
+        lineage,
+      } = result.result;
+
+      if (!treeNodes[taxonId]) {
+        treeNodes[taxonId] = {
+          count: 0,
+          children: {},
+          taxon_id: taxonId,
+          scientific_name,
+          taxon_rank,
+          ...(index == "taxon" && treeFields && { fields: treeFields }),
+          ...(catRank && taxon_rank == catRank && { cat: taxonId }),
+        };
+        isParentNode[parent] = true;
+        lineages[taxonId] = [
+          ...lineage.map((obj) => ({ ...obj, node_depth: obj.node_depth + 1 })),
+        ];
+      }
+
+      if (assembly_id || sample_id) {
+        treeNodes[taxonId].children = {
+          ...treeNodes[taxonId].children,
+          [assembly_id || sample_id]: true,
+        };
+        isParentNode[taxonId] = true;
+        treeNodes[taxonId].count += 1;
+        treeNodes[taxonId].hasAssemblies = !!assembly_id;
+        treeNodes[taxonId].hasSamples = !!sample_id;
+        treeNodes[assembly_id || sample_id] = {
+          count: 1,
+          children: {},
+          taxon_id: assembly_id || sample_id,
+          scientific_name: assembly_id || sample_id,
+          taxon_rank: assembly_id ? "assembly" : "sample",
+          ...(treeFields && { fields: treeFields }),
+          ...(catRank && taxon_rank == catRank && { cat: taxonId }),
+        };
+        // isParentNode[taxonId] = true;
+        lineages[assembly_id || sample_id] = [
+          {
+            taxon_id: assembly_id || sample_id,
+            taxon_rank: assembly_id ? "assembly" : "sample",
+            scientific_name: assembly_id || sample_id,
+            node_depth: 0,
+          },
+          ...lineage.map((obj) => ({ ...obj, node_depth: obj.node_depth + 1 })),
+        ];
+        if (catRank) {
+          for (let node of lineage) {
+            if (node.taxon_rank == catRank) {
+              treeNodes[assembly_id || sample_id].cat = node.taxon_id;
+            }
+          }
+        }
+      }
     }
   }
+
   if (update) {
     return;
   }
@@ -253,10 +309,15 @@ const addXResultsToTree = async ({
   for (let result of xRes.results) {
     let taxonId = result.result.taxon_id;
     let child = taxonId;
-    let status = treeNodes[taxonId].status;
+    let { status } = treeNodes[taxonId];
+
     let descIds = [child];
-    if (!isParentNode[taxonId]) {
-      treeNodes[child].count = 1;
+    if (
+      !isParentNode[taxonId] ||
+      treeNodes[taxonId].hasAssemblies ||
+      treeNodes[taxonId].hasSamples
+    ) {
+      treeNodes[child].count = treeNodes[child].count || 1;
       if (lineages[taxonId]) {
         for (let ancestor of lineages[taxonId]) {
           let ancestorId = ancestor.taxon_id;
@@ -268,7 +329,7 @@ const addXResultsToTree = async ({
           }
           descIds.push(ancestorId);
           if (status) {
-            ancStatus.add(ancestorId);
+            // ancStatus.add(ancestorId);
           }
           if (!treeNodes[ancestorId]) {
             missingIds.add(ancestorId);
@@ -297,7 +358,7 @@ const addXResultsToTree = async ({
   }
   if (missingIds.size > 0) {
     let progress = getProgress(queryId);
-    let x = progress.x;
+    let { x } = progress;
     if (queryId) {
       setProgress(queryId, { total: progress.total + missingIds.size });
       progress = getProgress(queryId);
@@ -319,11 +380,12 @@ const addXResultsToTree = async ({
         optionalFields,
         lca,
         xQuery: newQuery,
+        summaries,
         update: true,
         ancStatus,
         queryId,
         taxonomy,
-        catRank,
+        index,
       });
       x += chunkSize;
       setProgress(queryId, { x });
@@ -370,6 +432,7 @@ const getTree = async ({
   fields,
   xFields,
   yFields,
+  ySummaries,
   optionalFields,
   cat,
   result,
@@ -379,6 +442,7 @@ const getTree = async ({
   taxonomy,
   collapseMonotypic,
   req,
+  apiParams,
 }) => {
   cat = undefined;
   let { lookupTypes } = await attrTypes({ result, taxonomy });
@@ -391,6 +455,8 @@ const getTree = async ({
     fields,
     taxonomy,
     exclusions,
+    apiParams,
+    result,
   });
   exclusions.missing = [...new Set(exclusions.missing.concat(xFields))];
   if (treeThreshold > -1 && lca.count > treeThreshold) {
@@ -401,34 +467,30 @@ const getTree = async ({
       },
     };
   }
-  let maxDepth = lca.maxDepth;
+  let { maxDepth } = lca;
   let mapped = params.query.split(/\s+(?:AND|and)\s+/);
   // mapped.push("bioproject");
   let yMapped = yParams.query.split(/\s+(?:AND|and)\s+/);
   // TODO: include descendant values when include estimates is false and minDepth > tax_depth
   let match = params.query.match(/tax_depth\s*\((.+?)\)/);
-  if (match) {
-    if (match[1] > maxDepth) {
-      return {
-        lca,
-        status: {
-          success: false,
-          error: `tax_depth greater than tree depth\nConsider reducing to 'tax_depth(${maxDepth})'`,
-        },
-      };
-    }
+  if (match && match[1] > maxDepth) {
+    return {
+      lca,
+      status: {
+        success: false,
+        error: `tax_depth greater than tree depth\nConsider reducing to 'tax_depth(${maxDepth})'`,
+      },
+    };
   }
   let yMatch = params.query.match(/tax_depth\s*\((.+?)\)/);
-  if (yMatch) {
-    if (yMatch[1] > maxDepth) {
-      return {
-        lca,
-        status: {
-          success: false,
-          error: `tax_depth greater than tree depth\nConsider reducing to 'tax_depth(${maxDepth})'`,
-        },
-      };
-    }
+  if (yMatch && yMatch[1] > maxDepth) {
+    return {
+      lca,
+      status: {
+        success: false,
+        error: `tax_depth greater than tree depth\nConsider reducing to 'tax_depth(${maxDepth})'`,
+      },
+    };
   }
 
   // let res = await getResults({
@@ -454,6 +516,11 @@ const getTree = async ({
   if (!xQuery.query) {
     xQuery.query = xQuery.x;
   }
+  for (let [p, v] of Object.entries(apiParams)) {
+    if (p.match(/query[A-Z]$/)) {
+      xQuery[p] = v;
+    }
+  }
   if (queryId) {
     setProgress(queryId, { total: lca.count });
   }
@@ -465,13 +532,20 @@ const getTree = async ({
   let yRes;
   if (y) {
     yParams.excludeMissing.push(...yFields);
-    let catMeta = lookupTypes(cat);
+    let catField;
+    catField = (cat || "").replace(/[^\w_-].+$/, "");
+    let catMeta = lookupTypes(catField);
     if (catMeta) {
       yParams.excludeMissing.push(catMeta.name);
     }
     yParams.excludeMissing = [...new Set(yParams.excludeMissing)];
     yParams.excludeUnclassified = true;
     exclusions = setExclusions(yParams);
+    for (let [p, v] of Object.entries(apiParams)) {
+      if (p.match(/query[A-Z]$/)) {
+        yParams[p] = v;
+      }
+    }
     yRes = await getResults({
       ...yParams,
       taxonomy,
@@ -495,9 +569,11 @@ const getTree = async ({
     lca,
     xQuery,
     yRes,
+    summaries: ySummaries,
     queryId,
     taxonomy,
     catRank,
+    index: result,
   });
 
   if (
@@ -530,6 +606,7 @@ export const tree = async ({
     fields: apiParams.fields,
     taxonomy,
   });
+
   let {
     params,
     fields: xFields,
@@ -539,16 +616,29 @@ export const tree = async ({
     result,
     taxonomy,
   });
+  let catOpts, catMeta;
+
   let fields;
   let catRank;
   if (cat) {
+    ({
+      cat,
+      catOpts,
+      query: params.query,
+      catMeta,
+    } = parseCatOpts({
+      cat,
+      query: params.query,
+      searchFields,
+      lookupTypes,
+    }));
     let catField;
     catField = cat.replace(/[^\w_-].+$/, "");
-    let catMeta = lookupTypes(catField);
+    // catMeta = lookupTypes(catField);
     if (catMeta) {
       fields = [...new Set(xFields.concat([catMeta.name]))];
     } else {
-      catRank = catField;
+      catRank = catField.replace(/\+/, "");
       fields = [...new Set(xFields)];
     }
   } else {
@@ -610,42 +700,79 @@ export const tree = async ({
   }
   optionalFields = [...new Set([...optionalFields])];
 
-  let treeThreshold = `${apiParams.treeThreshold}` || config.treeThreshold;
+  let treeThreshold = apiParams.treeThreshold || config.treeThreshold;
   if (treeThreshold < 0) {
     treeThreshold = 100000;
   }
   let bounds;
   let exclusions = setExclusions(params);
+  let boundFields = xFields
+    .concat(yFields)
+    .filter(
+      (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
+    );
   bounds = await getBounds({
     params: { ...params },
-    fields: xFields
-      .concat(yFields)
-      .filter(
-        (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
-      ),
+    fields: boundFields,
     summaries,
-    cat,
     result,
     exclusions,
     taxonomy,
     apiParams,
     //opts: xOpts,
   });
+  if (!bounds) {
+    bounds = {};
+  }
   let yBounds;
   if (y) {
     yBounds = await getBounds({
       params: { ...params },
       fields: yFields.filter(
-        (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
+        (field, i) =>
+          lookupTypes(field) &&
+          (ySummaries[i] == "length" || lookupTypes(field).type != "keyword")
       ),
-      summaries,
-      cat,
+      summaries: ySummaries,
       result,
       exclusions,
       taxonomy,
       apiParams,
       opts: yOpts,
     });
+  }
+
+  let catBounds;
+  if (cat) {
+    catBounds = await getBounds({
+      params: { ...params },
+      fields: [catMeta.name, ...boundFields],
+      summaries: ["value", ...summaries],
+      cat,
+      result,
+      exclusions,
+      taxonomy,
+      apiParams,
+      opts: catOpts,
+      catOpts,
+    });
+  }
+
+  if (cat && catBounds) {
+    bounds.cat = catBounds.cat;
+    bounds.cats = catBounds.cats;
+    bounds.catType = catBounds.catType;
+    bounds.catCount = catBounds.tickCount;
+    bounds.by = catBounds.by;
+    bounds.showOther = catBounds.showOther;
+    if (yBounds) {
+      yBounds.cat = catBounds.cat;
+      yBounds.cats = catBounds.cats;
+      yBounds.catType = catBounds.catType;
+      yBounds.catCount = catBounds.tickCount;
+      yBounds.by = catBounds.by;
+      yBounds.showOther = catBounds.showOther;
+    }
   }
   let tree = status
     ? {}
@@ -656,7 +783,7 @@ export const tree = async ({
         optionalFields,
         catRank,
         summaries,
-        cat,
+        cat: (catMeta && catMeta.name) || cat,
         x,
         y,
         yParams,
@@ -668,6 +795,7 @@ export const tree = async ({
         collapseMonotypic: apiParams.collapseMonotypic,
         req,
         taxonomy,
+        apiParams,
       });
   if (tree && tree.status && tree.status.success == false) {
     status = { ...tree.status };
@@ -690,6 +818,7 @@ export const tree = async ({
           ...yQuery,
           fields: optionalFields.join(","),
           yFields,
+          ySummaries,
         },
       }),
       x: tree.lca ? tree.lca.count : 0,

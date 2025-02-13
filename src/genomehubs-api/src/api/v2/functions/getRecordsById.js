@@ -1,8 +1,10 @@
-import { checkDocResponse } from "./checkDocResponse";
-import { client } from "./connection";
-import { indexName } from "./indexName";
-import { lookupAlternateIds } from "./lookupAlternateIds";
-import { processDoc } from "./processDoc";
+import { attrTypes } from "./attrTypes.js";
+import { checkDocResponse } from "./checkDocResponse.js";
+import { client } from "./connection.js";
+import { indexName } from "./indexName.js";
+import { lookupAlternateIds } from "./lookupAlternateIds.js";
+import { processDoc } from "./processDoc.js";
+import { types } from "util";
 
 const convertIdsToDocIds = (recordId, result) => {
   /**
@@ -42,6 +44,7 @@ const convertIdsToDocIds = (recordId, result) => {
 export const getRecordsById = async ({
   recordId,
   result,
+  groups,
   taxonomy,
   hub,
   release,
@@ -56,6 +59,22 @@ export const getRecordsById = async ({
    * @param {string} recordInfo.hub - Hub name.
    * @param {string} recordInfo.release - Hub release version.
    */
+  let opts = {};
+  if (
+    groups &&
+    groups.length > 0 &&
+    groups != "undefined" &&
+    groups != "none"
+  ) {
+    opts.groups = groups.split(",");
+    let { typesMap } = await attrTypes({ result, taxonomy });
+    opts.fields = [];
+    Object.entries(typesMap).forEach(([key, type]) => {
+      if (type.display_group && opts.groups.includes(type.display_group)) {
+        opts.fields.push(key);
+      }
+    });
+  }
   let index = indexName({ result, taxonomy, hub, release });
   let ids = convertIdsToDocIds(recordId, result);
   const { body } = await client
@@ -75,7 +94,7 @@ export const getRecordsById = async ({
     body.docs.forEach((doc) => {
       let obj = { id: doc._id, index: doc._index, found: doc.found };
       if (doc.found && doc._source) {
-        obj.record = processDoc({ doc: doc._source });
+        obj.record = processDoc({ doc: doc._source, opts });
         obj.record.record_id = obj.record[`${result}_id`];
         records.push(obj);
       }
@@ -88,6 +107,7 @@ export const getRecordsById = async ({
       let alt = await getRecordsById({
         recordId: newIds,
         result,
+        groups,
         taxonomy,
         hub,
         release,

@@ -1,31 +1,19 @@
-// import { RadialChart } from "react-vis";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Label,
-  Legend,
-  Rectangle,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, Label, XAxis, YAxis } from "recharts";
 import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
-import React, { Fragment, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import formats, { setInterval } from "../functions/formats";
 import stringLength, { maxStringLength } from "../functions/stringLength";
-import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid2";
 import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "./Tooltip";
-import axisScales from "../functions/axisScales";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
-import qs from "../functions/qs";
 import searchByCell from "../functions/searchByCell";
 import setColors from "../functions/setColors";
-import styles from "./Styles.scss";
+import { ttSwatch as ttSwatchStyle } from "./Styles.scss";
+import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
 import withSearchIndex from "../hocs/withSearchIndex";
@@ -59,7 +47,7 @@ const CustomBackground = ({ chartProps, ...props }) => {
     xLimits = xRange[0];
   } else {
     xLimits = `${chartProps.xFormat(xRange[0])}-${chartProps.xFormat(
-      xRange[1]
+      xRange[1],
     )}`;
   }
   if (chartProps.valueType == "date") {
@@ -67,7 +55,7 @@ const CustomBackground = ({ chartProps, ...props }) => {
       new Date(bound)
         .toISOString()
         .substring(0, 10)
-        .replaceAll(/(-01-01|-01)$/g, "")
+        .replaceAll(/(-01-01|-01)$/g, ""),
     );
   }
 
@@ -80,44 +68,50 @@ const CustomBackground = ({ chartProps, ...props }) => {
       series.push(
         <div key={key}>
           <span
-            className={styles.ttSwatch}
+            className={ttSwatchStyle}
             style={{
               backgroundColor: chartProps.colors[i],
             }}
           />
           {key}: {counts[key]}
-        </div>
+        </div>,
       );
     }
   });
 
+  let CurrentRect = React.forwardRef((refProps, ref) => (
+    <rect
+      ref={ref}
+      {...refProps}
+      height={h}
+      width={w}
+      x={props.background.x}
+      y={props.background.y}
+      style={chartProps.embedded ? {} : { cursor: "pointer" }}
+      fill={"rgba(255,255,255,0)"}
+      onClick={
+        chartProps.embedded
+          ? () => {}
+          : (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              searchByCell({
+                ...chartProps,
+                xRange,
+              });
+            }
+      }
+    />
+  ));
+
   return (
     <>
       <Tooltip
-        interactive
+        disableInteractive={false}
         title={<CellInfo x={xLimits} count={count} rows={series} />}
         arrow
       >
-        <Rectangle
-          height={h}
-          width={w}
-          x={props.background.x}
-          y={props.background.y}
-          style={chartProps.embedded ? {} : { cursor: "pointer" }}
-          fill={"rgba(255,255,255,0)"}
-          onClick={
-            chartProps.embedded
-              ? () => {}
-              : (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  searchByCell({
-                    ...chartProps,
-                    xRange,
-                  });
-                }
-          }
-        />
+        <CurrentRect />
       </Tooltip>
       {legendGroup}
     </>
@@ -169,7 +163,7 @@ const Histogram = ({
       //     translations: chartProps.translations,
       //   })
       // }
-      ticks={isNaN(buckets[0]) ? null : buckets}
+      ticks={Number.isNaN(buckets[0]) ? null : buckets}
       tick={(props) =>
         ReportXAxisTick({
           props,
@@ -182,7 +176,7 @@ const Histogram = ({
           labels: chartProps.labels,
           showLabels: chartProps.showLabels,
           valueType: chartProps.valueType,
-          report: isNaN(buckets[0]) ? "catHistogram" : "histogram",
+          report: Number.isNaN(buckets[0]) ? "catHistogram" : "histogram",
         })
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
@@ -460,7 +454,7 @@ const ReportHistogram = ({
 
             series[cat.label] = scales[yScale](
               value,
-              stacked ? histogram.report.histogram.x : cat.doc_count
+              stacked ? histogram.report.histogram.x : cat.doc_count,
             );
           });
           if (compressX) {
@@ -493,11 +487,11 @@ const ReportHistogram = ({
             stats[`all ${searchIndexPlural}`].sum += value;
             stats[`all ${searchIndexPlural}`].min = Math.min(
               stats[`all ${searchIndexPlural}`].min,
-              value
+              value,
             );
             stats[`all ${searchIndexPlural}`].max = Math.max(
               stats[`all ${searchIndexPlural}`].max,
-              value
+              value,
             );
           }
 
@@ -509,7 +503,7 @@ const ReportHistogram = ({
             x: bucket,
             [`all ${searchIndexPlural}`]: scales[yScale](
               value,
-              histogram.report.histogram.x
+              histogram.report.histogram.x,
             ),
           });
         }
@@ -613,7 +607,7 @@ const ReportHistogram = ({
     );
 
     return (
-      <Grid item xs ref={componentRef} style={{ height: "100%" }}>
+      <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
         {chart}
       </Grid>
     );
@@ -626,5 +620,5 @@ export default compose(
   withSiteName,
   dispatchMessage,
   withColors,
-  withSearchIndex
+  withSearchIndex,
 )(ReportHistogram);

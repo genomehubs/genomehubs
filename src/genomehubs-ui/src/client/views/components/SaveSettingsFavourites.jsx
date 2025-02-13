@@ -1,69 +1,72 @@
-import React, { useState } from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import * as htmlToImage from "html-to-image";
 
-import Button from "@material-ui/core/Button";
-import EditIcon from "@material-ui/icons/Edit";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import React, { useRef, useState } from "react";
+import {
+  favListingButton as favListingButtonStyle,
+  favListingContainer as favListingContainerStyle,
+  favListingContent as favListingContentStyle,
+  favListingExpand as favListingExpandStyle,
+  favListingHeader as favListingHeaderStyle,
+  favListing as favListingStyle,
+} from "./Styles.scss";
+import { useLocation, useNavigate } from "@reach/router";
+
+import ColorButton from "./ColorButton";
+import EditIcon from "@mui/icons-material/Edit";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FavouriteButton from "./FavouriteButton";
-import MuiDialogContent from "@material-ui/core/DialogContent";
-import SearchIcon from "@material-ui/icons/Search";
-import Typography from "@material-ui/core/Typography";
+import MuiDialogContent from "@mui/material/DialogContent";
+import { QRCodeSVG } from "qrcode.react";
+import QrCodeIcon from "@mui/icons-material/QrCode";
+import SearchIcon from "@mui/icons-material/Search";
+import Typography from "@mui/material/Typography";
 import YamlEditor from "@focus-reactive/react-yaml";
 import { compose } from "recompose";
+import { downloadLink } from "./ReportDownload";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import { splitTerms } from "../functions/splitTerms";
-import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
-import { useNavigate } from "@reach/router";
 import withSearchDefaults from "../hocs/withSearchDefaults";
+import withSiteName from "../hocs/withSiteName";
+import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
-
-// import withSearchIndex from "../hocs/withSearchIndex";
 
 export const useStyles = makeStyles((theme) => ({
   paper: {
-    // width: "96%",
-    // minWidth: "600px",
-    // padding: theme.spacing(2),
-    // marginTop: theme.spacing(2),
-
     boxShadow: "none",
   },
   formControl: {
-    margin: theme.spacing(2),
-    minWidth: 120,
+    margin: "16px",
+    minWidth: "120px",
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
+    marginTop: "16px",
   },
   label: {
     color: "rgba(0, 0, 0, 0.54)",
   },
 }));
 
-const SaveSettingsFavourites = ({
-  rootRef,
-  currentIndex,
-  handleClose,
-  searchDefaults,
-  taxonomy,
-}) => {
+const SaveSettingsFavourites = ({ currentIndex, basename, taxonomy }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [expand, setExpand] = useState({});
   const [remove, setRemove] = useState({});
   const [edit, setEdit] = useState({});
+  const qrRef = useRef();
   // const [changed, setChanged] = useState({});
   let changed = {};
   const [favourites, setFavourites] = useLocalStorage(
     `${currentIndex}Favourites`,
-    {}
+    {},
   );
   const [currentFavourites, setCurrentFavourites] = useState(favourites);
 
   const DialogContent = withStyles((theme) => ({
     root: {
-      padding: theme.spacing(2),
+      padding: "16px",
     },
   }))(MuiDialogContent);
 
@@ -72,6 +75,8 @@ const SaveSettingsFavourites = ({
   const handleChange = ({ json, key }) => {
     changed[key] = json;
   };
+
+  const qrCodeSize = 512;
 
   const handleSave = () => {
     let newFavourites = { ...currentFavourites };
@@ -102,9 +107,25 @@ const SaveSettingsFavourites = ({
     setExpand({ ...expand, [key]: !expand[key] });
   };
 
+  const handleQRClick = async (chartSVG, filename, toUrl = false) => {
+    let opts = {
+      backgroundColor: "white",
+      width: qrCodeSize,
+      height: qrCodeSize,
+    };
+    if (toUrl) {
+      let uri = await htmlToImage.toBlob(chartSVG, opts);
+      let fileURL = URL.createObjectURL(uri);
+      window.open(fileURL, "_blank");
+      return;
+    }
+    let uri = await htmlToImage.toPng(chartSVG, opts);
+    await downloadLink(uri, `${filename}.png`);
+  };
+
   const formatYaml = ({ searchTerm, reportTerm }) => {
     let arr = Object.entries(searchTerm || {}).map(([key, value]) => (
-      <pre key={key} className={styles.favListing}>
+      <pre key={key} className={favListingStyle}>
         <b>{key}:</b> {JSON.stringify(value)}
       </pre>
     ));
@@ -112,10 +133,10 @@ const SaveSettingsFavourites = ({
       arr.push(<hr key={"hr"} />);
       arr = arr.concat(
         Object.entries(reportTerm || {}).map(([key, value]) => (
-          <pre key={key} className={styles.favListing}>
+          <pre key={key} className={favListingStyle}>
             <b>{key}:</b> {JSON.stringify(value)}
           </pre>
-        ))
+        )),
       );
     }
     return arr;
@@ -140,15 +161,16 @@ const SaveSettingsFavourites = ({
       />
     );
 
+    let qrLink = `${location.origin}${basename}/search?${encodeURIComponent(qs.stringify({ taxonomy, ...searchTerm, ...reportTerm }))}#${encodeURIComponent(searchTerm.query)}`;
     favListings.push(
-      <div key={i} className={styles.favListing}>
-        <div className={styles.favListingContainer}>
+      <div key={i} className={favListingStyle}>
+        <div className={favListingContainerStyle}>
           <div
-            className={styles.favListingHeader}
+            className={favListingHeaderStyle}
             onClick={() => handleExpand(key)}
           >
             {favButton}
-            <span className={styles.favListingExpand}>
+            <span className={favListingExpandStyle}>
               {expand[key] ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </span>
             <Typography>
@@ -162,7 +184,7 @@ const SaveSettingsFavourites = ({
             </Typography>
           </div>
           {expand[key] && (
-            <div className={styles.favListingContent}>
+            <div className={favListingContentStyle}>
               {edit[key] ? (
                 <YamlEditor
                   json={{
@@ -175,17 +197,27 @@ const SaveSettingsFavourites = ({
               ) : (
                 formatYaml({ searchTerm, reportTerm })
               )}
-              <div className={styles.favListingButton}>
-                <Button
+              <div className={favListingButtonStyle}>
+                <ColorButton
+                  autoFocus
+                  color="primary"
+                  // variant="outlined"
+                  startIcon={<QrCodeIcon />}
+                  onClick={() => handleQRClick(qrRef.current, "link", true)}
+                >
+                  QR Code
+                </ColorButton>
+                <ColorButton
                   autoFocus
                   color="primary"
                   // variant="outlined"
                   startIcon={<EditIcon />}
                   onClick={() => toggleEdit(key)}
+                  style={{ marginLeft: "1em" }}
                 >
                   Edit
-                </Button>
-                <Button
+                </ColorButton>
+                <ColorButton
                   autoFocus
                   color="primary"
                   // variant="outlined"
@@ -197,17 +229,35 @@ const SaveSettingsFavourites = ({
                         // ...searchDefaults,
                         taxonomy,
                         ...rest,
-                      })}`
+                      })}`,
                     );
                   }}
+                  style={{ marginLeft: "1em" }}
                 >
                   Search
-                </Button>
+                </ColorButton>
+              </div>
+              <div style={{ height: 0, display: "none" }}>
+                <QRCodeSVG
+                  ref={qrRef}
+                  key={"qrcode"}
+                  value={qrLink}
+                  level={"M"}
+                  fgColor={"#31323f"}
+                  marginSize={"4"}
+                  size={qrCodeSize}
+                  imageSettings={{
+                    src: "/android-chrome-192x192.png",
+                    height: qrCodeSize / 5,
+                    width: qrCodeSize / 5,
+                    excavate: true,
+                  }}
+                />
               </div>
             </div>
           )}
         </div>
-      </div>
+      </div>,
     );
   });
   if (favListings.length === 0) {
@@ -228,15 +278,15 @@ const SaveSettingsFavourites = ({
         key={"save-changes"}
         style={{ position: "relative", height: "2em", width: "100%" }}
       >
-        <Button
-          className={styles.favListingButton}
+        <ColorButton
+          className={favListingButtonStyle}
           autoFocus
           onClick={handleSave}
           color="primary"
         >
           Save changes
-        </Button>
-      </div>
+        </ColorButton>
+      </div>,
     );
   }
 
@@ -245,5 +295,6 @@ const SaveSettingsFavourites = ({
 
 export default compose(
   withTaxonomy,
-  withSearchDefaults
+  withSiteName,
+  withSearchDefaults,
 )(SaveSettingsFavourites);

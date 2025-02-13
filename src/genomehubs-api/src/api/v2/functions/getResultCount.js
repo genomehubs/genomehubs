@@ -1,5 +1,5 @@
-import { getResults } from "./getResults";
-import { setExclusions } from "./setExclusions";
+import { getResults } from "./getResults.js";
+import { setExclusions } from "./setExclusions.js";
 
 export const getResultCount = async (params) => {
   params.size = 0;

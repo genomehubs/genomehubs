@@ -1,13 +1,17 @@
 import React, { memo, useRef, useState } from "react";
+import {
+  extra as extraStyle,
+  term as termStyle,
+  value as valueStyle,
+} from "./Styles.scss";
 
 import AutoCompleteOption from "./AutoCompleteOption";
 import AutoCompleteSuggestion from "./AutoCompleteSuggestion";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import Popper from "@material-ui/core/Popper";
-import TextField from "@material-ui/core/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import Popper from "@mui/material/Popper";
+import TextField from "@mui/material/TextField";
 import { compose } from "recompose";
 import { fetchAutocomplete } from "../functions/autocomplete";
-import styles from "./Styles.scss";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -38,6 +42,7 @@ export const AutoCompleteInput = ({
   multipart,
   setLiveQuery = () => {},
   inputClassName = "autocompleteInput",
+  wrapTaxTerms = false,
 }) => {
   const [open, setOpen] = useState(false);
   const [prefix, setPrefix] = useState("");
@@ -63,48 +68,55 @@ export const AutoCompleteInput = ({
     autocompleteTerms.results.length > 0
   ) {
     terms = [];
-    autocompleteTerms.results.forEach((result, i) => {
+    autocompleteTerms.results.forEach((acResult, i) => {
       let value;
-      if (result.result.type) {
-        let display_value = result.result.name || result.result.key;
+      if (acResult.result.type) {
+        let display_value = acResult.result.name || acResult.result.key;
         let value = display_value;
-        if (result.result.after && !suffix.startsWith(result.result.after)) {
-          value += result.result.after;
+        if (
+          acResult.result.after &&
+          !suffix.startsWith(acResult.result.after)
+        ) {
+          value += acResult.result.after;
         }
         options.push({
           value,
           display_value,
-          description: result.result.description,
-          name: result.result.display_name,
-          type: result.result.type,
+          description: acResult.result.description,
+          name: acResult.result.display_name,
+          type: acResult.result.type,
           title: `${prefix}${value}${suffix}`,
           prefix,
           subTerm,
           suffix,
-          result: result.result.group,
+          result: acResult.result.group,
           unique_term: value,
         });
         terms.push(
-          <div key={i} className={styles.term}>
-            <span className={styles.value}>{result.key}</span>
-            <div className={styles.extra}>{`\u2014 ${result.type}`}</div>
-          </div>
+          <div key={i} className={termStyle}>
+            <span className={valueStyle}>{acResult.key}</span>
+            <div className={extraStyle}>{`\u2014 ${acResult.type}`}</div>
+          </div>,
         );
       } else if (autocompleteTerms.status.result == "taxon") {
-        if (result.reason) {
-          value = result.reason[0].fields["taxon_names.name.raw"][0];
+        if (acResult.reason) {
+          value = acResult.reason[0].fields["taxon_names.name.raw"][0];
         } else {
-          value = result.result.scientific_name;
+          value = acResult.result.scientific_name;
         }
         let extra = "";
         let closure = "";
-        if (!prefix.match(/tax_\w+\(\s*/)) {
+        if (wrapTaxTerms && !prefix.match(/tax_\w+\(\s*/)) {
           extra = "tax_name(";
           if (!suffix.match(/^\s*\($/)) {
             closure = ")";
           }
         }
-        let title = `${prefix}${extra}${result.result.taxon_id}[${value}]${closure}${suffix}`;
+        let title = `${prefix}${extra}${acResult.result.taxon_id}[${value}]${closure}${suffix}`;
+        let newResult = "taxon";
+        if (["assembly", "sample"].includes(result)) {
+          newResult = result;
+        }
 
         options.push({
           value,
@@ -112,36 +124,36 @@ export const AutoCompleteInput = ({
           prefix,
           subTerm,
           suffix,
-          result: "taxon",
-          unique_term: result.result.taxon_id,
-          taxon_id: result.result.taxon_id,
-          taxon_rank: result.result.taxon_rank,
-          scientific_name: result.result.scientific_name,
-          name_class: result.reason
-            ? result.reason[0].fields["taxon_names.class"]
+          result: newResult,
+          unique_term: acResult.result.taxon_id,
+          taxon_id: acResult.result.taxon_id,
+          taxon_rank: acResult.result.taxon_rank,
+          scientific_name: acResult.result.scientific_name,
+          name_class: acResult.reason
+            ? acResult.reason[0].fields["taxon_names.class"]
             : "taxon ID",
           xref: Boolean(
-            result.reason &&
-              result.reason[0].fields["taxon_names.class"] &&
-              !result.reason[0].fields["taxon_names.class"][0].match(" name")
+            acResult.reason &&
+              acResult.reason[0].fields["taxon_names.class"] &&
+              !acResult.reason[0].fields["taxon_names.class"][0].match(" name"),
           ),
         });
         terms.push(
-          <div key={i} className={styles.term}>
-            <span className={styles.value}>{value}</span>
+          <div key={i} className={termStyle}>
+            <span className={valueStyle}>{value}</span>
             <div
-              className={styles.extra}
-            >{`\u2014 ${result.result.taxon_rank}`}</div>
-          </div>
+              className={extraStyle}
+            >{`\u2014 ${acResult.result.taxon_rank}`}</div>
+          </div>,
         );
       } else if (
         autocompleteTerms.status.result == "assembly" ||
         autocompleteTerms.status.result == "sample"
       ) {
-        if (result.reason) {
-          value = result.reason[0].fields["identifiers.identifier.raw"][0];
+        if (acResult.reason) {
+          value = acResult.reason[0].fields["identifiers.identifier.raw"][0];
         } else {
-          value = result.result[`${autocompleteTerms.status.result}_id`];
+          value = acResult.result[`${autocompleteTerms.status.result}_id`];
         }
         options.push({
           value,
@@ -150,28 +162,28 @@ export const AutoCompleteInput = ({
           subTerm,
           suffix,
           result: autocompleteTerms.status.result,
-          unique_term: result.result[`${autocompleteTerms.status.result}_id`],
-          taxon_id: result.result.taxon_id,
-          scientific_name: result.result.scientific_name,
+          unique_term: acResult.result[`${autocompleteTerms.status.result}_id`],
+          taxon_id: acResult.result.taxon_id,
+          scientific_name: acResult.result.scientific_name,
           [`${autocompleteTerms.status.result}_id`]:
-            result.result[`${autocompleteTerms.status.result}_id`],
-          identifier_class: result.reason
-            ? result.reason[0].fields["identifiers.class"]
+            acResult.result[`${autocompleteTerms.status.result}_id`],
+          identifier_class: acResult.reason
+            ? acResult.reason[0].fields["identifiers.class"]
             : `${autocompleteTerms.status.result} ID`,
         });
         terms.push(
-          <div key={i} className={styles.term}>
-            <span className={styles.value}>{value}</span>
+          <div key={i} className={termStyle}>
+            <span className={valueStyle}>{value}</span>
             <div
-              className={styles.extra}
-            >{`\u2014 ${result.result.scientific_name}`}</div>
-          </div>
+              className={extraStyle}
+            >{`\u2014 ${acResult.result.scientific_name}`}</div>
+          </div>,
         );
       } else if (autocompleteTerms.status.result == "feature") {
-        if (result.reason) {
-          value = result.reason[0].fields["identifiers.identifier.raw"][0];
+        if (acResult.reason) {
+          value = acResult.reason[0].fields["identifiers.identifier.raw"][0];
         } else {
-          value = result.result.feature_id;
+          value = acResult.result.feature_id;
         }
         options.push({
           value,
@@ -180,21 +192,21 @@ export const AutoCompleteInput = ({
           subTerm,
           suffix,
           result: "feature",
-          unique_term: result.result.feature_id,
-          taxon_id: result.result.taxon_id,
-          assembly_id: result.result.assembly_id,
-          feature_id: result.result.feature_id,
-          identifier_class: result.reason
-            ? result.reason[0].fields["identifiers.class"]
+          unique_term: acResult.result.feature_id,
+          taxon_id: acResult.result.taxon_id,
+          assembly_id: acResult.result.assembly_id,
+          feature_id: acResult.result.feature_id,
+          identifier_class: acResult.reason
+            ? acResult.reason[0].fields["identifiers.class"]
             : "feature ID",
         });
         terms.push(
-          <div key={i} className={styles.term}>
-            <span className={styles.value}>{value}</span>
+          <div key={i} className={termStyle}>
+            <span className={valueStyle}>{value}</span>
             <div
-              className={styles.extra}
-            >{`\u2014 ${result.result.primary_type}`}</div>
-          </div>
+              className={extraStyle}
+            >{`\u2014 ${acResult.result.primary_type}`}</div>
+          </div>,
         );
       }
     });
@@ -203,8 +215,8 @@ export const AutoCompleteInput = ({
     autocompleteTerms.status &&
     autocompleteTerms.status.success &&
     autocompleteTerms.suggestions &&
-    autocompleteTerms.suggestions.length > 0 &&
-    !/[\(\)<>=]/.test(inputValue)
+    autocompleteTerms.suggestions.length > 0 // &&
+    // !/[\(\)<>=]/.test(inputValue)
   ) {
     autocompleteTerms.suggestions.forEach((suggestion, i) => {
       let value = suggestion.suggestion.text;
@@ -301,7 +313,7 @@ export const AutoCompleteInput = ({
     }
     if (
       parts[section].match(
-        /(\s(?:<=|!=|>=|<|=|>|and)\s|(?:\s{0,1}[\(\),!]\s{0,1})|^and\s)/i
+        /(\s(?:<=|!=|>=|<|=|>|and)\s|(?:\s{0,1}[\(\),!]\s{0,1})|^and\s)/i,
       )
     ) {
       newPrefix += parts[section];
@@ -342,7 +354,7 @@ export const AutoCompleteInput = ({
         } else {
           setAutocompleteTerms(obj);
         }
-      }, 200)
+      }, 200),
     );
   };
 
@@ -350,8 +362,8 @@ export const AutoCompleteInput = ({
     let length = text
       ? text.length
       : inputRef.current?.value
-      ? inputRef.current.value.length
-      : 0;
+        ? inputRef.current.value.length
+        : 0;
     let end = length;
     end = length - suffix.length;
     return [prefix.length, end];
@@ -419,6 +431,12 @@ export const AutoCompleteInput = ({
         updateTerm(newValue, e?.target?.selectionStart || prefix.length, types);
         setOpen(true);
       } else if (!multiline) {
+        updateTerm(
+          newValue.replace(/\r*\n/, ","),
+          e.target.selectionStart,
+          types,
+        );
+
         updateTerm(newValue, e.target.selectionStart, types);
         setOpen(true);
       }
@@ -436,8 +454,7 @@ export const AutoCompleteInput = ({
     if (e.key === "Enter") {
       if (e.shiftKey) {
         e.preventDefault();
-        setMultiline(true);
-        setInValue(`${inputRef.current.value}\n`);
+        setInValue(`${inputRef.current.value},`);
       } else if (!multiline) {
         handleSubmit(e, {
           id,
@@ -447,6 +464,20 @@ export const AutoCompleteInput = ({
       }
       setAutocompleteTerms({});
     }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    let oldValue = e.target.value;
+    let prefix = oldValue.substring(0, e.target.selectionStart);
+    let suffix = oldValue.substring(e.target.selectionEnd);
+    let pasteValue = e.clipboardData.getData("text");
+    let value = `${prefix}${pasteValue}${suffix}`;
+    let values = [value];
+    if (value.match(/[\r\n]/)) {
+      values = value.split(/\s*\r*\n\s*/g);
+    }
+    updateTerm(values.join(","), value.length, types);
   };
 
   const handleKeyDown = (e, newValue, reason) => {
@@ -496,10 +527,14 @@ export const AutoCompleteInput = ({
           //   updateValue(newValue.title);
           // }
         } else {
+          let value = newValue.unique_term || e.target.value;
+          if (newValue.title.match(/tax_(name|tree)\(/)) {
+            value = newValue.title;
+          }
           doSearch(
-            newValue.unique_term || e.target.value,
+            value,
             newValue.result || result || "taxon",
-            newValue.title || e.target.value
+            newValue.title || e.target.value,
           );
         }
       }
@@ -517,7 +552,13 @@ export const AutoCompleteInput = ({
       getOptionLabel={(option) =>
         typeof option === "string" ? option : option.title
       }
-      getOptionSelected={(option, value) => option.title === value.title}
+      isOptionEqualToValue={(option, value) => {
+        let val = value.title || value;
+        if (option.matchTerm) {
+          return option.matchTerm === val;
+        }
+        return option.title === val;
+      }}
       options={options}
       autoComplete
       includeInputInList
@@ -530,23 +571,28 @@ export const AutoCompleteInput = ({
       onChange={handleKeyDown}
       onBlur={handleBlur}
       onClose={handlePopperClose}
+      onPaste={handlePaste}
+      filterOptions={(options, state) => options}
       onInputChange={handleChange}
       onHighlightChange={handleHighlightChange}
       PopperComponent={PlacedPopper}
       renderInput={(params) => (
         <TextField
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyPress}
           {...params}
           required={required}
+          ref={params.InputProps.ref}
           inputRef={inputRef}
           label={inputLabel}
           name={inputName}
           className={inputClassName}
-          InputLabelProps={{
-            ...(inValue &&
-              (inputName || "").startsWith("query") && {
-                shrink: true,
-              }),
+          slotProps={{
+            inputLabel: {
+              ...(inValue &&
+                (inputName || "").startsWith("query") && {
+                  shrink: true,
+                }),
+            },
           }}
           variant={size == "small" ? "standard" : "outlined"}
           fullWidth
@@ -557,11 +603,11 @@ export const AutoCompleteInput = ({
           }}
         />
       )}
-      renderOption={(option) => {
+      renderOption={(props, option) => {
         if (option.highlighted) {
-          return <AutoCompleteSuggestion option={option} />;
+          return <AutoCompleteSuggestion option={option} {...props} />;
         }
-        return <AutoCompleteOption option={option} />;
+        return <AutoCompleteOption option={option} {...props} />;
       }}
     />
   );

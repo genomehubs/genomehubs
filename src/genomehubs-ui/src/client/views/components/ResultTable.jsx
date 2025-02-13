@@ -1,53 +1,62 @@
 import React, { useEffect, useRef } from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import {
+  aggregationToggleOpaque as aggregationToggleOpaqueStyle,
+  aggregationToggle as aggregationToggleStyle,
+  contrast as contrastStyle,
+  first as firstStyle,
+  last as lastStyle,
+  resultsTable as resultsTableStyle,
+} from "./Styles.scss";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
-import Badge from "@material-ui/core/Badge";
-import CheckBoxIcon from "@material-ui/icons/CheckBox";
-import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import Checkbox from "@material-ui/core/Checkbox";
+import Badge from "@mui/material/Badge";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import Checkbox from "@mui/material/Checkbox";
 import Citation from "./Citation";
 import DownloadButton from "./DownloadButton";
-import FiberManualRecordSharpIcon from "@material-ui/icons/FiberManualRecordSharp";
-import FilterListIcon from "@material-ui/icons/FilterList";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
+import FiberManualRecordSharpIcon from "@mui/icons-material/FiberManualRecordSharp";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import Grid from "@mui/material/Grid2";
+import IconButton from "@mui/material/IconButton";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import LinkButton from "./LinkButton";
-import MuiTableCell from "@material-ui/core/TableCell";
-import RadioButtonCheckedOutlinedIcon from "@material-ui/icons/RadioButtonCheckedOutlined";
-import RadioButtonUncheckedIcon from "@material-ui/icons/RadioButtonUnchecked";
+import MuiTableCell from "@mui/material/TableCell";
+import RadioButtonCheckedOutlinedIcon from "@mui/icons-material/RadioButtonCheckedOutlined";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import ReportError from "./ReportError";
 import ResultFilter from "./ResultFilter";
 import ResultModalControl from "./ResultModalControl";
 import SearchPagination from "./SearchPagination";
-import SettingsApplicationsIcon from "@material-ui/icons/SettingsApplications";
-import SettingsIcon from "@material-ui/icons/Settings";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
+import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
+import SettingsIcon from "@mui/icons-material/Settings";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableSortLabel from "@mui/material/TableSortLabel";
 import Tooltip from "./Tooltip";
-import ViewWeekIcon from "@material-ui/icons/ViewWeek";
-import ViewWeekOutlinedIcon from "@material-ui/icons/ViewWeekOutlined";
-import VisibilityIcon from "@material-ui/icons/Visibility";
+import ViewWeekIcon from "@mui/icons-material/ViewWeek";
+import ViewWeekOutlinedIcon from "@mui/icons-material/ViewWeekOutlined";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import classnames from "classnames";
 import { compose } from "recompose";
 import dispatchRecord from "../hocs/dispatchRecord";
 import expandFieldList from "../functions/expandFieldList";
 import { formatter } from "../functions/formatter";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
-import styles from "./Styles.scss";
+import { styled } from "@mui/material/styles";
 import withColors from "../hocs/withColors";
 import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
 import withSiteName from "../hocs/withSiteName";
+import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -66,8 +75,8 @@ const StyledBadge = withStyles((theme) => ({
     right: "50%",
     top: 6,
     fontSize: "0.8em",
-    border: `2px solid ${theme.palette.background.paper}`,
-    padding: "0 4px",
+    border: "2px solid white",
+    // padding: "0px 4px",
     color: "white",
     backgroundColor: "rgba(0,0,0,0.26)",
   },
@@ -78,11 +87,11 @@ export const useStyles = makeStyles((theme) => ({
     maxWidth: "calc( 100% - 0.5em )",
     marginBottom: "1em",
     marginLeft: "0.5em",
-    minWidth: 750,
+    minWidth: "750px",
   },
   table: {
     maxWidth: "100%",
-    minWidth: 750,
+    minWidth: "750px",
   },
   ["PrivateSwitchBase-root-4"]: {
     padding: "3px",
@@ -90,23 +99,20 @@ export const useStyles = makeStyles((theme) => ({
   visuallyHidden: {
     border: 0,
     clip: "rect(0 0 0 0)",
-    height: 1,
+    height: "1px",
     margin: -1,
     overflow: "hidden",
-    padding: 0,
+    padding: "0px",
     position: "absolute",
     top: 20,
-    width: 1,
+    width: "1px",
   },
 }));
 
-const TableCell = withStyles((theme) => ({
-  root: {
-    padding: "1px 6px",
-    // borderBottom: `solid ${borderColor} 1px`,
-    lineHeight: "inherit",
-  },
-}))(MuiTableCell);
+const TableCell = styled(MuiTableCell)({
+  padding: "1px 6px",
+  lineHeight: "inherit",
+});
 
 const StickyCell = withStyles((theme) => ({
   root: {
@@ -208,7 +214,7 @@ const SortableCell = ({
   if (!CustomCell) {
     CustomCell = TableCell;
   }
-  let css = styles.aggregationToggle;
+  let css = aggregationToggleStyle;
   let prefix = name.replace(/:.+$/, "");
   if (
     excludeAncestral &&
@@ -217,7 +223,7 @@ const SortableCell = ({
       excludeAncestral.hasOwnProperty(prefix) ||
       excludeMissing.hasOwnProperty(prefix))
   ) {
-    css = classnames(styles.aggregationToggle, styles.aggregationToggleOpaque);
+    css = classnames(aggregationToggleStyle, aggregationToggleOpaqueStyle);
   }
 
   let title = handleTableSort ? `Sort by ${field}` : field;
@@ -253,7 +259,7 @@ const SortableCell = ({
 
   let cellCss = "";
   if (colSpan > 0) {
-    cellCss = classnames(styles.first, styles.last);
+    cellCss = classnames(firstStyle, lastStyle);
   }
 
   if (Array.isArray(summary)) {
@@ -294,7 +300,7 @@ const SortableCell = ({
                       sortBy: field,
                       sortOrder:
                         sortDirection && sortOrder === "asc" ? "desc" : "asc",
-                    }
+                    },
               )
             }
           >
@@ -436,12 +442,12 @@ const setCellClassName = (i, length, force) => {
   if (length == 1 && !force) {
     return "";
   }
-  let css = i % 2 == 1 ? styles.contrast : "";
+  let css = i % 2 == 1 ? contrastStyle : "";
   if (i == 0) {
-    css = classnames(css, styles.first);
+    css = classnames(css, firstStyle);
   }
   if (i == length - 1) {
-    css = classnames(css, styles.last);
+    css = classnames(css, lastStyle);
   }
   return css;
 };
@@ -466,7 +472,7 @@ export const setLinkIcons = ({
     }
     return [{ expand: false }];
   }
-  if (!parts.length == 3 || !type.file_paths[parts[1]]) {
+  if (parts.length != 3 || !type.file_paths[parts[1]]) {
     return [];
   }
 
@@ -514,7 +520,7 @@ export const setLinkIcons = ({
           } else {
             let bits = item.split(".");
             let field = bits.shift();
-            if (record.result.attributes.hasOwnProperty(field)) {
+            if (record.result?.attributes?.hasOwnProperty(field)) {
               arr[i] =
                 record.result.attributes[field][`metadata.${bits.join(".")}`];
             }
@@ -546,6 +552,49 @@ const findLastIndex = ({ name, field, expandedTypes }) => {
     }
   }
   return index;
+};
+
+const formatCellValue = ({
+  value,
+  type,
+  field,
+  searchIndex,
+  charLimit = 20,
+}) => {
+  let entries = [];
+  if (Array.isArray(value)) {
+    value = formatter(value, searchIndex, "array");
+    let charLimit = 20;
+    for (let v of value.values) {
+      let entry = v[0];
+      if (charLimit == 20 || charLimit - entry.length > 0) {
+        entries.push(entry);
+        charLimit -= entry.length;
+      }
+    }
+    value = entries.join(", ");
+    if (field.value.length > 1) {
+      length = field.value.length;
+    }
+  } else {
+    value = formatter(value, searchIndex);
+  }
+  if (
+    type.summary == "value" &&
+    Array.isArray(field.value) &&
+    field.length > entries.length
+  ) {
+    let badgeContent = `+${field.length - entries.length}`;
+    value = (
+      <span style={{ whiteSpace: "nowrap", marginRight: "0.75em" }}>
+        {value}
+        <StyledBadge badgeContent={badgeContent} color={"default"} max={100000}>
+          <span style={{ color: "rgba(0,0,0,0" }}>{badgeContent}</span>
+        </StyledBadge>
+      </span>
+    );
+  }
+  return value;
 };
 
 const ResultTable = ({
@@ -581,10 +630,10 @@ const ResultTable = ({
     emptyBuckets = new Set(
       Object.entries(searchResults.aggs.fields.by_key.buckets)
         .filter(([_, obj]) => obj.doc_count == 0)
-        .map(([key, obj]) => key)
+        .map(([key, obj]) => key),
     );
     for (let [key, value] of Object.entries(
-      searchResults.aggs.fields.by_key.buckets
+      searchResults.aggs.fields.by_key.buckets,
     )) {
       let { buckets, sum_other_doc_count } = value.value_list;
       if (buckets.length >= 1) {
@@ -597,7 +646,7 @@ const ResultTable = ({
     for (let [key, value] of Object.entries(searchResults.aggs.fields)) {
       if (key.endsWith("_metadata")) {
         for (let [path, obj] of Object.entries(value).filter(
-          ([p]) => p != "doc_count"
+          ([p]) => p != "doc_count",
         )) {
           constraints[path] = obj.buckets.map(({ key }) => key);
           if (obj.sum_other_doc_count >= 1) {
@@ -612,7 +661,11 @@ const ResultTable = ({
       let fieldList = expandFieldList({ fields: searchTerm.fields, types });
       expandedTypes = displayTypes
         .filter(({ name }) => !emptyBuckets.has(name) && name != "none")
-        .map(({ name, ...rest }) => ({ name, field: name, ...rest }));
+        .map(({ name, ...rest }) => ({
+          name,
+          field: name,
+          ...structuredClone({ rest }),
+        }));
       for (let field of fieldList) {
         let name, summary;
         if (field.includes(":")) {
@@ -649,20 +702,15 @@ const ResultTable = ({
         obj.summary = summary || defaultValue;
       }
     } else {
-      expandedTypes = displayTypes.filter(
-        ({ name }) => !emptyBuckets.has(name)
-      );
+      expandedTypes = displayTypes
+        .filter(({ name }) => !emptyBuckets.has(name))
+        .map((obj) => structuredClone(obj));
       for (let obj of expandedTypes) {
         obj.summary = "value";
         obj.field = obj.name;
       }
     }
   }
-  // for (let obj of expandedTypes) {
-  //   if (!obj.field) {
-  //     obj.field = obj.name;
-  //   }
-  // }
 
   if (searchResults && searchResults.status && searchResults.status.error) {
     return (
@@ -709,8 +757,8 @@ const ResultTable = ({
     }
     navigate(
       `${basename}/record?recordId=${recordId}&result=${searchIndex}&taxonomy=${taxonomy}#${encodeURIComponent(
-        searchText
-      )}`
+        searchText,
+      )}`,
     );
   };
 
@@ -729,7 +777,7 @@ const ResultTable = ({
           (f) =>
             !f.startsWith(prefix) ||
             f == `${prefix}.run` ||
-            f == `${prefix}.all`
+            f == `${prefix}.all`,
         );
 
         newExpandColumns = Object.entries(expandColumns)
@@ -779,7 +827,7 @@ const ResultTable = ({
             ...searchTerm,
             expand: expand.join(","),
             fields: fields.join(","),
-          })}`
+          })}`,
         );
       }
     } else {
@@ -852,7 +900,7 @@ const ResultTable = ({
       }
     });
     navigate(
-      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`
+      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`,
     );
   };
   const arrToObj = (arr) => {
@@ -885,7 +933,7 @@ const ResultTable = ({
     }
     options.offset = 0;
     navigate(
-      `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`
+      `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`,
     );
   };
 
@@ -943,12 +991,34 @@ const ResultTable = ({
       if (
         result.result.names &&
         result.result.names[nameClass] &&
-        result.result.names[nameClass].name
+        (result.result.names[nameClass].name ||
+          result.result.names[nameClass].identifier)
       ) {
+        let value =
+          result.result.names[nameClass].name ||
+          result.result.names[nameClass].identifier;
+        value = formatCellValue({
+          value,
+          type: { summary: "value" },
+          searchIndex,
+          field: { value, length: value.length },
+        });
         cells.push(
-          <TableCell key={nameClass}>
-            {result.result.names[nameClass].name}
-          </TableCell>
+          <TableCell key={`name-${nameClass}`}>
+            <span
+              ref={rootRef}
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                setAttributeSettings({
+                  currentRecordId,
+                  attributeId: nameClass,
+                  showAttribute: true,
+                });
+              }}
+            >
+              {value}
+            </span>
+          </TableCell>,
         );
       } else {
         cells.push(<TableCell key={nameClass}>-</TableCell>);
@@ -962,9 +1032,9 @@ const ResultTable = ({
         result.result.ranks[rank].scientific_name
       ) {
         cells.push(
-          <TableCell key={rank}>
+          <TableCell key={`rank-${rank}`}>
             {result.result.ranks[rank].scientific_name}
-          </TableCell>
+          </TableCell>,
         );
       } else {
         cells.push(<TableCell key={rank}>-</TableCell>);
@@ -980,7 +1050,7 @@ const ResultTable = ({
           >
             {result.result.assembly_id}
           </TableCell>
-        </Tooltip>
+        </Tooltip>,
       );
     }
     if (searchIndex == "sample") {
@@ -993,7 +1063,7 @@ const ResultTable = ({
           >
             {result.result.sample_id}
           </TableCell>
-        </Tooltip>
+        </Tooltip>,
       );
     }
     if (searchIndex == "feature") {
@@ -1007,7 +1077,7 @@ const ResultTable = ({
           >
             {result.result.assembly_id}
           </TableCell>
-        </Tooltip>
+        </Tooltip>,
       );
       cells.push(
         <Tooltip title={"Click to view feature"} arrow key={"feature_id"}>
@@ -1017,7 +1087,7 @@ const ResultTable = ({
           >
             {result.result.feature_id}
           </TableCell>
-        </Tooltip>
+        </Tooltip>,
       );
     }
 
@@ -1069,45 +1139,12 @@ const ResultTable = ({
         value =
           binnable && field.hasOwnProperty("binned") ? field.binned : value;
         if (colSpan == 0) {
-          let entries = [];
-          if (Array.isArray(value)) {
-            value = formatter(value, searchIndex, "array");
-            let charLimit = 20;
-            for (let v of value.values) {
-              let entry = v[0];
-              if (charLimit == 20 || charLimit - entry.length > 0) {
-                entries.push(entry);
-                charLimit -= entry.length;
-              }
-            }
-            value = entries.join(", ");
-            if (field.value.length > 1) {
-              length = field.value.length;
-            }
-          } else {
-            value = formatter(value, searchIndex);
-          }
-          if (
-            type.summary == "value" &&
-            Array.isArray(field.value) &&
-            field.length > entries.length
-          ) {
-            let badgeContent = `+${field.length - entries.length}`;
-            value = (
-              <span>
-                {value}
-                <StyledBadge
-                  badgeContent={badgeContent}
-                  color={"default"}
-                  max={100000}
-                >
-                  <span style={{ padding: "0 6px", color: "rgba(0,0,0,0" }}>
-                    {badgeContent}
-                  </span>
-                </StyledBadge>
-              </span>
-            );
-          }
+          value = formatCellValue({
+            value,
+            type,
+            searchIndex,
+            field,
+          });
           let color;
           if (type.name != type.field && type.file_paths) {
             let [_, key] = (type.field || type.name).split(".");
@@ -1138,7 +1175,7 @@ const ResultTable = ({
                   }}
                 >
                   {field.aggregation_source && (
-                    <Grid item>
+                    <Grid>
                       <AggregationIcon
                         method={field.aggregation_source}
                         hasDescendants={field.has_descendants}
@@ -1147,20 +1184,19 @@ const ResultTable = ({
                   )}
 
                   <Grid
-                    item
                     style={{ whiteSpace: "nowrap", ...(color && { color }) }}
                   >
                     {value}
                   </Grid>
                 </Grid>
               )}
-            </TableCell>
+            </TableCell>,
           );
         } else {
           let values;
           try {
             values = (Array.isArray(value) ? value : [value]).map((v) =>
-              v.toLowerCase()
+              v.toLowerCase(),
             );
           } catch {
             values = [];
@@ -1173,7 +1209,7 @@ const ResultTable = ({
             let css = setCellClassName(
               i,
               fieldConstraints.length,
-              expandColumns[type.field]
+              expandColumns[type.field],
             );
             let color = type.color || type.file_paths?.[lcKey]?.color;
 
@@ -1189,7 +1225,7 @@ const ResultTable = ({
                     <RadioButtonCheckedOutlinedIcon
                       style={{ fill, fontSize: "1.25rem" }}
                     />
-                  </OddTableCell>
+                  </OddTableCell>,
                 );
               } else {
                 cells.push(
@@ -1203,7 +1239,7 @@ const ResultTable = ({
                     }}
                   >
                     {/* <CheckBoxOutlineBlankIcon style={{ opacity: 0.25 }} /> */}
-                  </OddTableCell>
+                  </OddTableCell>,
                 );
               }
             } else {
@@ -1248,7 +1284,7 @@ const ResultTable = ({
                     handleToggleColSpan(
                       linkIcon.expand,
                       expandColumns[linkIcon.expand] ? 1 : 0,
-                      true
+                      true,
                     );
                   };
                 }
@@ -1286,7 +1322,7 @@ const ResultTable = ({
                       fontSize: "1.25rem",
                     }}
                     key="check"
-                  />
+                  />,
                 );
               }
               cells.push(
@@ -1301,7 +1337,7 @@ const ResultTable = ({
                   className={css}
                 >
                   {icons}
-                </OddTableCell>
+                </OddTableCell>,
               );
             }
           });
@@ -1319,7 +1355,7 @@ const ResultTable = ({
               className={css}
             >
               {colSpan == 0 && "-"}
-            </OddTableCell>
+            </OddTableCell>,
           );
         }
       }
@@ -1335,7 +1371,7 @@ const ResultTable = ({
             <KeyboardArrowRightIcon />
           </IconButton>
         </TableCell>
-      </Tooltip>
+      </Tooltip>,
     );
     return <StyledTableRow key={result.id}>{cells}</StyledTableRow>;
   });
@@ -1378,13 +1414,18 @@ const ResultTable = ({
     heads.push(
       <SortableCell
         name={nameClass}
-        key={nameClass}
+        key={`name-${nameClass}`}
         sortDirection={sortBy === nameClass ? sortOrder : false}
         {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-      />
+      />,
     );
     filters.push(
-      <ResultFilter name={nameClass} key={nameClass} value={""} colSpan={1} />
+      <ResultFilter
+        name={nameClass}
+        key={`name-${nameClass}`}
+        value={""}
+        colSpan={1}
+      />,
     );
     expandedCols.push(<TableCell key={nameClass} />);
   });
@@ -1392,12 +1433,12 @@ const ResultTable = ({
     heads.push(
       <SortableCell
         name={rank}
-        key={rank}
+        key={`rank-${rank}`}
         sortDirection={sortBy === rank ? sortOrder : false}
         {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-      />
+      />,
     );
-    filters.push(<ResultFilter name={rank} key={rank} value={""} />);
+    filters.push(<ResultFilter name={rank} key={`rank-${rank}`} value={""} />);
     expandedCols.push(<TableCell key={rank} />);
   });
   if (searchIndex == "assembly" || searchIndex == "feature") {
@@ -1407,10 +1448,10 @@ const ResultTable = ({
         key={"assembly_id"}
         sortDirection={sortBy === "assembly_id" ? sortOrder : false}
         {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-      />
+      />,
     );
     filters.push(
-      <ResultFilter name={"assembly_id"} key={"assembly_id"} value={""} />
+      <ResultFilter name={"assembly_id"} key={"assembly_id"} value={""} />,
     );
     expandedCols.push(<TableCell key={"assembly_id"} />);
   }
@@ -1421,10 +1462,10 @@ const ResultTable = ({
         key={"sample_id"}
         sortDirection={sortBy === "sample_id" ? sortOrder : false}
         {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-      />
+      />,
     );
     filters.push(
-      <ResultFilter name={"sample_id"} key={"sample_id"} value={""} />
+      <ResultFilter name={"sample_id"} key={"sample_id"} value={""} />,
     );
     expandedCols.push(<TableCell key={"sample_id"} />);
   }
@@ -1436,10 +1477,10 @@ const ResultTable = ({
         key={"feature_id"}
         sortDirection={sortBy === "feature_id" ? sortOrder : false}
         {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-      />
+      />,
     );
     filters.push(
-      <ResultFilter name={"feature_id"} key={"feature_id"} value={""} />
+      <ResultFilter name={"feature_id"} key={"feature_id"} value={""} />,
     );
     expandedCols.push(<TableCell key={"feature_id"} />);
   }
@@ -1482,7 +1523,7 @@ const ResultTable = ({
           sortOrder,
           statusColors,
         }}
-      />
+      />,
     );
 
     let fieldConstraints = constraints[type.field.replace(/:.+$/, "")] || [];
@@ -1497,14 +1538,14 @@ const ResultTable = ({
         value={""}
         fieldMeta={types[type.name]}
         constraints={fieldConstraints}
-      />
+      />,
     );
     if (colSpan > 0) {
       fieldConstraints.forEach((v, i) => {
         let css = setCellClassName(
           i,
           fieldConstraints.length,
-          expandColumns[type.field]
+          expandColumns[type.field],
         );
         let color = type.color || type.file_paths?.[v]?.color;
         expandedCols.push(
@@ -1516,7 +1557,7 @@ const ResultTable = ({
             }}
           >
             {v.split("_").join(`_\u200b`).split(".").join(`.\u200b`)}
-          </OddTableCell>
+          </OddTableCell>,
         );
       });
     } else {
@@ -1527,7 +1568,7 @@ const ResultTable = ({
           style={{
             backgroundColor: `${type.color}${lightColor}`,
           }}
-        />
+        />,
       );
     }
   }
@@ -1544,7 +1585,7 @@ const ResultTable = ({
           <FilterListIcon />
         </IconButton>
       </TableCell>
-    </Tooltip>
+    </Tooltip>,
   );
   filters.push(<TableCell key={"filter"} />);
   expandedCols.push(<TableCell key={"filter"} />);
@@ -1563,11 +1604,11 @@ const ResultTable = ({
       spacing={1}
       className={classes.root}
     >
-      <Grid item className={classes.table}>
+      <Grid className={classes.table}>
         {/* {searchResults.isFetching ? (
           <Skeleton variant="rect" width={800} height={200} />
         ) : ( */}
-        <TableContainer className={styles.resultsTable}>
+        <TableContainer className={resultsTableStyle}>
           <Table size="small" aria-label="search results">
             <TableHead>
               <TableRow>{heads}</TableRow>
@@ -1582,7 +1623,6 @@ const ResultTable = ({
       </Grid>
 
       {/* <Grid
-        item
         // style={{
         //   display: "flex",
         //   justifyContent: "flex-start",
@@ -1596,15 +1636,16 @@ const ResultTable = ({
         justifyContent="center"
         direction="row"
         spacing={1}
+        size={10}
         className={classes.root}
       >
-        <Grid item>
+        <Grid>
           <LinkButton options={["search", "searchurl"]} />
         </Grid>
-        <Grid item>
+        <Grid>
           <SearchPagination />
         </Grid>
-        <Grid item style={{ marginLeft: "auto" }}>
+        <Grid style={{ marginLeft: "auto" }}>
           <DownloadButton
             onButtonClick={saveSearchResults}
             searchTerm={searchTerm}
@@ -1633,5 +1674,5 @@ export default compose(
   withSearch,
   withSearchDefaults,
   withRanks,
-  withNames
+  withNames,
 )(ResultTable);

@@ -1,8 +1,8 @@
 import { createReadStream, promises as fs } from "fs";
 
 import { config } from "../functions/config.js";
-import { getRecordsById } from "../functions/getRecordsById";
-import { logError } from "../functions/logger";
+import { getRecordsById } from "../functions/getRecordsById.js";
+import { logError } from "../functions/logger.js";
 
 const locateFile = async (params) => {
   let response = await getRecordsById({ ...params, result: "file" });

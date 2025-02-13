@@ -1,7 +1,7 @@
-import { aggregateRawValueSources } from "../queries/aggregateRawValueSources";
-import { fetchTaxonomies } from "../functions/fetchTaxonomies";
-import { formatJson } from "../functions/formatJson";
-import { logError } from "../functions/logger";
+import { aggregateRawValueSources } from "../queries/aggregateRawValueSources.js";
+import { fetchTaxonomies } from "../functions/fetchTaxonomies.js";
+import { formatJson } from "../functions/formatJson.js";
+import { logError } from "../functions/logger.js";
 
 export const getTaxonomies = async (req, res) => {
   let response = [];

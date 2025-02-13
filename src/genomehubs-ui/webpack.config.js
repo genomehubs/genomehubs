@@ -25,7 +25,7 @@ const protocol = main.https ? "https" : "http";
 const config = {
   mode: devMode ? "development" : "production",
   entry: {
-    main: ["@babel/polyfill", APP_DIR + "/index.jsx"],
+    main: [APP_DIR + "/index.jsx"],
   },
   output: {
     publicPath:
@@ -206,8 +206,10 @@ const config = {
           {
             loader: "css-loader",
             options: {
+              esModule: true,
               modules: {
                 localIdentName: "[name]__[local]___[hash:base64:5]",
+                namedExport: true,
               },
               sourceMap: true,
               importLoaders: 2,

@@ -1,16 +1,16 @@
 import React, { memo } from "react";
+import {
+  infoPanel1Column as infoPanel1ColumnStyle,
+  infoPanel as infoPanelStyle,
+  textPanel as textPanelStyle,
+} from "./Styles.scss";
 
 import Markdown from "./Markdown";
 import classnames from "classnames";
 import { compose } from "recompose";
-import styles from "./Styles.scss";
 
 const TextPanel = ({ pageId, ...overrideStyles }) => {
-  let css = classnames(
-    styles.infoPanel,
-    styles[`infoPanel1Column`],
-    styles.textPanel
-  );
+  let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, textPanelStyle);
   return (
     <div className={css} id={"textPanel"} style={overrideStyles}>
       <Markdown pageId={pageId} />

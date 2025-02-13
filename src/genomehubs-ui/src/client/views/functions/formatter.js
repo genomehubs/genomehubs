@@ -31,7 +31,7 @@ export const formatter = (value, searchIndex, returnType, limit = 15) => {
         return { values, formatted, extra };
       }
       formatted = values.map(
-        (arr) => `${arr[0]}${arr[1] > 1 ? ` (${arr[1]})` : ""}`
+        (arr) => `${arr[0]}${arr[1] > 1 ? ` (${arr[1]})` : ""}`,
       );
       return `${formatted.join("; ")}${extra ? "; ..." : ""}`;
     }
@@ -50,5 +50,8 @@ export const formatter = (value, searchIndex, returnType, limit = 15) => {
   }
   return toReturnType(value, format(",.3~s")(value), returnType);
 };
+
+export const ucFirst = (string = "") =>
+  string.charAt(0).toUpperCase() + string.slice(1);
 
 export default formatter;

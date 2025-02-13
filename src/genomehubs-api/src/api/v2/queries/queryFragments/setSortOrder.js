@@ -1,5 +1,5 @@
-import setSortBy from "../../reports/setSortBy";
-import { subsets } from "../../functions/subsets";
+import setSortBy from "../../reports/setSortBy.js";
+import { subsets } from "../../functions/subsets.js";
 
 const ranks = {
   superkingdom: true,

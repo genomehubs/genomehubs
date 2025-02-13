@@ -7,9 +7,9 @@ SyntaxHighlighter.registerLanguage("markdown", markdown);
 
 const Highlight = (props) => {
   return (
-    <SyntaxHighlighter language="markdown" style={github} wrapLongLines={true}>
+    (<SyntaxHighlighter language="markdown" style={github} wrapLongLines={true}>
       {props.children[0].props.children[0].replace(/\s+$/, "")}
-    </SyntaxHighlighter>
+    </SyntaxHighlighter>)
   );
 };
 

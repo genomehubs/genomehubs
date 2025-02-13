@@ -15,6 +15,6 @@ export const checkDocResponse = ({ body }) => {
     status.error = "Timed out";
     return status;
   }
-  status.hits = body.docs.length;
+  status.hits = body.docs.filter((doc) => doc.found).length;
   return status;
 };

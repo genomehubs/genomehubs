@@ -1,25 +1,24 @@
-import { ListSubheader, MenuItem } from "@material-ui/core";
+import { ListSubheader, MenuItem } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
 import AutoCompleteInput from "./AutoCompleteInput";
 import BasicSelect from "./BasicSelect";
 import BasicTextField from "./BasicTextField";
-import Button from "@material-ui/core/Button";
-import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import SearchIcon from "@material-ui/icons/Search";
-import Switch from "@material-ui/core/Switch";
+import Box from "@mui/material/Box";
+import ColorButton from "./ColorButton";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormHelperText from "@mui/material/FormHelperText";
+import Grid from "@mui/material/Grid2";
+import SearchIcon from "@mui/icons-material/Search";
+import Switch from "@mui/material/Switch";
 import Tooltip from "./Tooltip";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import VariableFilter from "./VariableFilter";
 import { compose } from "recompose";
 import dispatchLookup from "../hocs/dispatchLookup";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
-import { setSearchTerm } from "../reducers/search";
 import { useNavigate } from "@reach/router";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
@@ -32,16 +31,16 @@ export const useStyles = makeStyles((theme) => ({
   paper: {
     width: "100%",
     minWidth: "600px",
-    padding: theme.spacing(2),
-    marginTop: theme.spacing(2),
+    padding: "16px",
+    marginTop: "16px",
     boxShadow: "none",
   },
   formControl: {
-    margin: theme.spacing(2),
-    minWidth: 120,
+    margin: "16px",
+    minWidth: "120px",
   },
   selectEmpty: {
-    marginTop: theme.spacing(2),
+    marginTop: "16px",
   },
   label: {
     color: "rgba(0, 0, 0, 0.54)",
@@ -51,11 +50,8 @@ export const useStyles = makeStyles((theme) => ({
 const QueryBuilder = ({
   searchTerm,
   searchIndex,
-  // setSearchIndex,
   setSearchDefaults,
-  setLookupTerm,
   setPreferSearchTerm,
-  indices,
   taxonomy,
   types,
   basename,
@@ -114,23 +110,6 @@ const QueryBuilder = ({
     setTaxFilter(taxFilters);
   }, []);
 
-  // const handleIndexChange = (e) => {
-  //   let options = qs.parse(location.search.replace(/^\?/, ""));
-  //   e.stopPropagation();
-  //   setSearchIndex(e.target.value);
-  //   setSearchDefaults({
-  //     includeEstimates: false,
-  //     includeDescendant: false,
-  //   });
-  //   navigate(
-  //     `${basename}/search?${qs.stringify({
-  //       taxonomy: options.taxonomy,
-  //       query: "null",
-  //       result: e.target.value,
-  //     })}`
-  //   );
-  // };
-
   const buildQuery = () => {
     let query = "";
     if (taxFilter.rank || taxFilter.depth) {
@@ -179,14 +158,9 @@ const QueryBuilder = ({
         attribute[0] = `${value}(${attribute[0]})`;
       }
     } else if (action == "variable") {
-      let [summary, attr] = attribute[0].split(/\s*[\(\)]\s*/);
-      // if (attr) {
-      //   attribute[0] = `${summary}(${attribute[0]})`;
-      // } else {
       attribute[0] = value;
       attribute[1] = "";
       attribute[2] = "";
-      // }
     } else if (action == "operator") {
       attribute[1] = value;
     } else if (action == "value") {
@@ -227,7 +201,7 @@ const QueryBuilder = ({
   let variables = [];
   let sortedTypes = Object.entries(types).sort(([aKey, aVal], [bKey, bVal]) => {
     let group = (aVal.display_group || "ZZZ").localeCompare(
-      bVal.display_group || "ZZZ"
+      bVal.display_group || "ZZZ",
     );
     if (group == 0) {
       return aKey.localeCompare(bKey);
@@ -250,7 +224,7 @@ const QueryBuilder = ({
       variables.push(
         <MenuItem key={value} value={value}>
           {value}
-        </MenuItem>
+        </MenuItem>,
       );
     });
   });
@@ -288,27 +262,35 @@ const QueryBuilder = ({
             return handleChange(e, i, "value", value);
           }}
           handleDismiss={(e) => handleChange(e, i, "dismiss")}
-        />
+        />,
       );
     }
   });
   filterOptions.push(
-    <Grid container alignItems="center" direction="row" spacing={2} key={"new"}>
+    <Grid
+      container
+      alignItems="center"
+      direction="row"
+      spacing={2}
+      key={"new"}
+      size={12}
+    >
       {bool && (
-        <Grid item>
+        <Grid>
           <Typography>{bool}</Typography>
         </Grid>
       )}
-      <Grid item>
+      <Grid>
         <BasicSelect
           current={""}
           id={`new-variable-select`}
           handleChange={(e) => handleChange(e, attrFilters.length, "variable")}
           helperText={"field"}
           values={variables}
+          sx={{ minWidth: "240px" }}
         />
       </Grid>
-    </Grid>
+    </Grid>,
   );
 
   let [moreOptions, setMoreOptions] = useState(() => {
@@ -368,51 +350,33 @@ const QueryBuilder = ({
     setPreferSearchTerm(false);
     navigate(
       `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
-        options.query
-      )}`
+        options.query,
+      )}`,
     );
   };
   return (
-    <Paper className={classes.paper}>
+    <Box className={classes.paper}>
       <Grid container alignItems="center" direction="column" spacing={2}>
-        {/* <Grid container direction="row">
-          <Grid item>
-            <BasicSelect
-              current={index}
-              id={"search-index-select"}
-              handleChange={handleIndexChange}
-              helperText={"search index"}
-              values={{
-                ...(indices.includes("taxon") && { Taxon: "taxon" }),
-                ...(indices.includes("sample") && { Sample: "sample" }),
-                ...(indices.includes("assembly") && { Assembly: "assembly" }),
-                ...(indices.includes("feature") && { Feature: "feature" }),
-              }}
-            />
-          </Grid>
-        </Grid> */}
-        <Grid container alignItems="center" direction="row" spacing={2}>
+        <Grid
+          container
+          alignItems="center"
+          direction="row"
+          spacing={2}
+          size={12}
+        >
           <Tooltip title="Taxon ID or scientific name" arrow placement={"top"}>
-            <Grid item xs={3}>
-              {/* <BasicTextField
-                id={"taxon-filter-taxon"}
-                handleChange={handleTaxonFilterChange}
-                helperText={"taxon"}
-                value={taxFilter.taxon}
-              />
-               */}
+            <Grid size={3}>
               <AutoCompleteInput
                 id={"taxon-filter-taxon"}
                 inputValue={taxFilter.taxon}
                 setInputValue={() => {}}
                 inputLabel={"taxon"}
-                // inputRef={refs[queryProp]}
                 handleSubmit={handleTaxonFilterChange}
+                handleBlur={handleTaxonFilterChange}
                 size={"small"}
                 maxRows={1}
                 result={"taxon"}
                 fixedType={{ type: "taxon" }}
-                // doSearch={doSearch}
               />
             </Grid>
           </Tooltip>
@@ -426,8 +390,8 @@ const QueryBuilder = ({
               arrow
               placement={"top"}
             >
-              <Grid item>
-                <FormControl className={classes.formControl}>
+              <Grid>
+                <FormControl variant="standard" className={classes.formControl}>
                   <FormControlLabel
                     className={classes.label}
                     control={
@@ -451,7 +415,7 @@ const QueryBuilder = ({
             arrow
             placement={"top"}
           >
-            <Grid item>
+            <Grid>
               <BasicSelect
                 id={"taxon-filter-rank"}
                 handleChange={handleTaxonFilterChange}
@@ -470,8 +434,8 @@ const QueryBuilder = ({
             arrow
             placement={"top"}
           >
-            <Grid item>
-              <FormControl className={classes.formControl}>
+            <Grid>
+              <FormControl variant="standard" className={classes.formControl}>
                 <FormControlLabel
                   className={classes.label}
                   control={
@@ -494,7 +458,7 @@ const QueryBuilder = ({
             arrow
             placement={"top"}
           >
-            <Grid item>
+            <Grid>
               <BasicTextField
                 id={"taxon-filter-depth"}
                 handleChange={handleTaxonFilterChange}
@@ -505,22 +469,21 @@ const QueryBuilder = ({
           </Tooltip>
         </Grid>
         {filterOptions}
-        <Grid container alignItems="flex-end" direction="row">
-          <Grid item>
-            <Button
+        <Grid container alignItems="flex-end" direction="row" size={12}>
+          <Grid>
+            <ColorButton
               variant="contained"
-              color="default"
               disableElevation
               className={classes.button}
               startIcon={<SearchIcon />}
               onClick={handleClick}
             >
               Search
-            </Button>
+            </ColorButton>
           </Grid>
         </Grid>
       </Grid>
-    </Paper>
+    </Box>
   );
 };
 
@@ -531,5 +494,5 @@ export default compose(
   withTaxonomy,
   withSearch,
   withSearchDefaults,
-  withLookup
+  withLookup,
 )(QueryBuilder);

@@ -1,14 +1,14 @@
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: "white",
   },
 }));
 
@@ -45,7 +45,7 @@ const BasicMenu = ({
       <List
         component="nav"
         aria-label={helperText}
-        style={{ paddingTop: 0, paddingBottom: 0 }}
+        style={{ paddingTop: "0px", paddingBottom: "0px" }}
       >
         <ListItem
           button
@@ -53,12 +53,12 @@ const BasicMenu = ({
           aria-controls={id}
           aria-label={label}
           onClick={handleClickListItem}
-          style={{ paddingTop: 0, paddingBottom: 0 }}
+          style={{ paddingTop: "0px", paddingBottom: "0px" }}
         >
           <ListItemText
             primary={label}
             secondary={options[selectedIndex]}
-            style={{ paddingTop: 0, paddingBottom: 0 }}
+            style={{ paddingTop: "0px", paddingBottom: "0px" }}
           />
         </ListItem>
       </List>
@@ -86,18 +86,18 @@ const BasicMenu = ({
 export default BasicMenu;
 
 // import React from "react";
-// import { makeStyles } from "@material-ui/core/styles";
-// import InputLabel from "@material-ui/core/InputLabel";
-// import MenuItem from "@material-ui/core/MenuItem";
-// import FormControl from "@material-ui/core/FormControl";
-// import FormHelperText from "@material-ui/core/FormHelperText";
-// import Select from "@material-ui/core/Select";
+// import { makeStyles } from "@mui/material/styles";
+// import InputLabel from "@mui/material/InputLabel";
+// import MenuItem from "@mui/material/MenuItem";
+// import FormControl from "@mui/material/FormControl";
+// import FormHelperText from "@mui/material/FormHelperText";
+// import Select from "@mui/material/Select";
 // import BasicTextField from "./BasicTextField";
 
 // const useStyles = makeStyles((theme) => ({
 //   formControl: {
-//     margin: theme.spacing(2),
-//     minWidth: 120,
+//     margin: "16px",
+//     minWidth: "120px",
 //   },
 // }));
 

@@ -2,8 +2,8 @@ import React, { memo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AutoCompleteInput from "./AutoCompleteInput";
-import FormControl from "@material-ui/core/FormControl";
-import Grid from "@material-ui/core/Grid";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid2";
 import SearchButton from "./SearchButton";
 import SearchInputQueries from "./SearchInputQueries";
 import SearchToggles from "./SearchToggles";
@@ -47,7 +47,13 @@ const SearchBox = ({
   const searchBoxRef = useRef(null);
   const rootRef = useRef(null);
   const searchInputRef = useRef(null);
-  const savedOptions = useReadLocalStorage(`${searchIndex}Options`);
+
+  const allOptions = {
+    taxon: useReadLocalStorage(`taxonOptions`) || {},
+    assembly: useReadLocalStorage(`assemblyOptions`) || {},
+    sample: useReadLocalStorage(`sampleOptions`) || {},
+    feature: useReadLocalStorage(`featureOptions`) || {},
+  };
   let [multiline, setMultiline] = useState(() => {
     if (searchTerm && searchTerm.query && searchTerm.query.match(/[\r\n]/)) {
       return true;
@@ -79,65 +85,80 @@ const SearchBox = ({
     toggleTemplate = (e) => setShowSearchBox(!showSearchBox);
   }
 
-  let fields =
-    searchTerm.fields ||
-    savedOptions?.fields?.join(",") ||
-    searchDefaults.fields;
-  let ranks =
-    searchTerm.ranks || savedOptions?.ranks?.join(",") || searchDefaults.ranks;
-  let names =
-    searchTerm.names || savedOptions?.names?.join(",") || searchDefaults.names;
+  const dispatchSearch = (searchOptions = {}, term) => {
+    let sameIndex = searchIndex == searchOptions.result;
+    let fullOptions = { ...searchTerm, ...searchOptions };
+    if (!fullOptions.hasOwnProperty("includeEstimates")) {
+      fullOptions.includeEstimates = searchDefaults.includeEstimates;
+    }
+    console.log(sameIndex);
 
-  const dispatchSearch = (searchOptions, term) => {
-    let options = { ...searchTerm, ...searchOptions };
-    if (!options.hasOwnProperty("includeEstimates")) {
-      options.includeEstimates = searchDefaults.includeEstimates;
+    let savedOptions = allOptions[options.result];
+
+    let fields = savedOptions?.fields?.join(",") || searchDefaults.fields;
+    let ranks = savedOptions?.ranks?.join(",") || searchDefaults.ranks;
+    let names = savedOptions?.names?.join(",") || searchDefaults.names;
+
+    if (sameIndex) {
+      fields = options.fields || fields;
+      ranks = options.ranks || ranks;
+      names = options.names || names;
     }
-    // if (!options.hasOwnProperty("summaryValues")) {
-    //   options.summaryValues = "count";
+    console.log(fields);
+
+    // if (
+    //   !fullOptions.hasOwnProperty("fields") ||
+    //   searchTerm.result != searchOptions.result
+    // ) {
+    fullOptions.fields = fields;
     // }
-    if (!options.hasOwnProperty("fields")) {
-      options.fields = fields;
-    }
-    if (!options.hasOwnProperty("ranks")) {
-      options.ranks = ranks;
-    }
-    if (!options.hasOwnProperty("names")) {
-      options.names = names;
-    }
-    options.taxonomy = taxonomy;
-    if (!options.size && savedOptions?.size) {
-      options.size = savedOptions.size;
+    // if (
+    //   !fullOptions.hasOwnProperty("ranks") ||
+    //   searchTerm.result != searchOptions.result
+    // ) {
+    fullOptions.ranks = ranks;
+    // }
+    // if (
+    //   !fullOptions.hasOwnProperty("names") ||
+    //   searchTerm.result != searchOptions.result
+    // ) {
+    fullOptions.names = names;
+    // }
+
+    fullOptions.taxonomy = taxonomy;
+    if (!fullOptions.size && savedOptions?.size) {
+      fullOptions.size = savedOptions.size;
     }
     if (savedOptions) {
-      if (savedOptions.sortBy && !options.sortBy) {
-        options.sortBy = savedOptions.sortBy;
-        options.sortOrder = savedOptions.sortOrder || "asc";
+      if (savedOptions.sortBy && !fullOptions.sortBy) {
+        fullOptions.sortBy = savedOptions.sortBy;
+        fullOptions.sortOrder = savedOptions.sortOrder || "asc";
       }
       ["Ancestral", "Descendant", "Direct", "Missing"].forEach((key) => {
         let keyName = `exclude${key}`;
         if (
           savedOptions.hasOwnProperty(keyName) &&
-          !options.hasOwnProperty(keyName)
+          !fullOptions.hasOwnProperty(keyName)
         ) {
-          options[keyName] = savedOptions[keyName];
+          fullOptions[keyName] = savedOptions[keyName];
         }
       });
     }
-    fetchSearchResults(options);
+    fetchSearchResults(fullOptions);
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(term)}`
+      `${basename}/search?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
     );
   };
 
-  const wrap_term = ({ term, taxWrap, result }) => {
+  const wrapTerm = ({ term, taxWrap, result }) => {
     if (
       result &&
       result == "taxon" &&
       !term.match(/[\(\)<>=]/) &&
       !types[term] &&
-      !synonyms[term]
+      !synonyms[term] &&
+      term > ""
     ) {
       term = `${taxWrap}(${term})`;
     }
@@ -156,11 +177,11 @@ const SearchBox = ({
     if (!queryString.match("\n")) {
       let query = queryString
         .split(/\s+and\s+/i)
-        .map((term) => wrap_term({ term, taxWrap, result }));
+        .map((term) => wrapTerm({ term, taxWrap, result }));
       queryString = query.join(" AND ");
       let hash = hashTerm
         .split(/\s+and\s+/i)
-        .map((term) => wrap_term({ term, taxWrap, result }));
+        .map((term) => wrapTerm({ term, taxWrap, result }));
       hashTerm = hash.join(" AND ");
     }
     setSearchIndex(result);
@@ -168,7 +189,7 @@ const SearchBox = ({
     let inputs = Array.from(
       formRef.current
         ? formRef.current.getElementsByClassName("inputQuery")
-        : []
+        : [],
     )
       .map((el) => ({
         name: el.children[1].children[0].name,
@@ -177,11 +198,16 @@ const SearchBox = ({
       .filter((el) => el.name.match(/query[A-Z]+/) && el.value);
     let inputQueries = inputs.reduce(
       (a, el) => ({ ...a, [el.name]: el.value }),
-      {}
+      {},
     );
+
+    let savedOptions = allOptions[options.result];
+    let fields =
+      // searchTerm.fields ||
+      savedOptions?.fields?.join(",") || searchDefaults.fields;
     dispatchSearch(
       { query: queryString, ...inputQueries, result, fields },
-      hashTerm
+      hashTerm,
     );
     // resetLookup();
   };
@@ -211,11 +237,17 @@ const SearchBox = ({
         }}
       >
         <SearchInputQueries liveQuery={liveQuery} />
-        <Grid item>
+        <Grid>
           <Grid container direction="row" alignItems="center">
-            <Grid item xs={2}></Grid>
-            <Grid item ref={searchBoxRef} xs={"auto"}>
-              <FormControl className={classes.formControl}>
+            <Grid size={2}></Grid>
+            <Grid ref={searchBoxRef} size={8}>
+              <FormControl
+                variant="standard"
+                className={classes.formControl}
+                style={{
+                  width: "100%",
+                }}
+              >
                 <AutoCompleteInput
                   inputValue={lookupTerm}
                   setInputValue={setLookupTerm}
@@ -233,7 +265,7 @@ const SearchBox = ({
                 />
               </FormControl>
             </Grid>
-            <Grid item xs={2}>
+            <Grid size={2}>
               {/* <Tooltip title="Click to search" arrow placement={"top"}> */}
               {/* <IconButton
                   className={classes.search}
@@ -271,18 +303,18 @@ const SearchBox = ({
           </Grid>
         </Grid>
       </form>
-      <Grid
+      {/* <Grid
         container
         direction="row"
         alignItems="center"
         // style={{ paddingBottom: "1em" }}
-      >
-        <Grid item xs={2}></Grid>
-        <Grid item xs={8}>
-          <SearchToggles toggleTemplate={toggleTemplate} id="searchToggles" />
-        </Grid>
-        <Grid item xs={2}></Grid>
+      > */}
+      <Grid size={1}></Grid>
+      <Grid size={10}>
+        <SearchToggles toggleTemplate={toggleTemplate} id="searchToggles" />
       </Grid>
+      <Grid size={1}></Grid>
+      {/* </Grid> */}
     </Grid>
   );
 };
@@ -294,6 +326,6 @@ export default compose(
   withTypes,
   withSearch,
   withSearchDefaults,
-  withLookup
+  withLookup,
   // dispatchLiveQuery
 )(SearchBox);
