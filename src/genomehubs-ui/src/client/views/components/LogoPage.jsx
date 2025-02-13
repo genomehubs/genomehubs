@@ -26,7 +26,7 @@ export const LogoPage = () => {
           boxSizing: "border-box",
         }}
       >
-        <Logo />
+        <Logo animate={true} delay={2} />
       </div>
     </div>
   );
