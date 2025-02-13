@@ -1,6 +1,12 @@
 import React from "react";
+import { motion } from "motion/react";
 
-const Logo = ({ lineColor = "#ffffff", fillOpacity = 0 }) => {
+const Logo = ({
+  lineColor = "#ffffff",
+  fillOpacity = 0,
+  animate = false,
+  delay = 0,
+}) => {
   return (
     <svg
       height="100%"
@@ -9,7 +15,12 @@ const Logo = ({ lineColor = "#ffffff", fillOpacity = 0 }) => {
     >
       <g id="layer1">
         <path
-          style={{ fill: "none", stroke: lineColor, strokeWidth: 6.35 }}
+          style={{
+            fill: "none",
+            stroke: lineColor,
+            strokeWidth: 6.35,
+            strokeLinecap: "round",
+          }}
           d="m 135.65868,142.93323 c -3.74596,13.5314 -17.69337,14.12532 -30.88725,16.44924 -29.975751,5.27984 -47.704015,-1.76881 -18.331467,-31.9466 9.651652,-9.91625 19.322437,-21.03455 32.300547,-17.25684 12.97808,3.7777 20.6641,19.22279 16.91817,32.7542 z"
         />
         <path
@@ -24,7 +35,7 @@ const Logo = ({ lineColor = "#ffffff", fillOpacity = 0 }) => {
           style={{ fill: "none", stroke: lineColor, strokeWidth: 7 }}
           d="M 129.21481,203.92495 V 152.84472"
         />
-        <ellipse
+        <motion.ellipse
           style={{
             fill: "none",
             fillOpacity,
@@ -36,6 +47,17 @@ const Logo = ({ lineColor = "#ffffff", fillOpacity = 0 }) => {
           rx="4.9599605"
           ry="3.6476221"
           transform="rotate(-16.128394)"
+          animate={
+            animate && {
+              ry: [3.6476221, 0, 3.6476221],
+              transition: {
+                duration: 1,
+                delay: delay + 10,
+                repeat: Infinity,
+                repeatDelay: 10,
+              },
+            }
+          }
         />
         <path
           style={{ fill: lineColor }}
@@ -45,8 +67,26 @@ const Logo = ({ lineColor = "#ffffff", fillOpacity = 0 }) => {
           style={{ fill: lineColor }}
           d="m 71.772986,154.25578 c 0,0 -1.566687,-2.57724 1.210774,-5.09975 2.12618,-1.93101 9.476713,-4.50868 9.476713,-4.50868 0,0 -6.802528,0.32967 -10.550479,2.74914 -3.747953,2.41947 -3.539589,6.15599 -3.426877,6.853 0.173402,1.07233 3.289869,0.007 3.289869,0.007 z"
         />
-        <path
-          style={{ fill: "none", stroke: lineColor, strokeWidth: 5.8 }}
+        <motion.path
+          style={{
+            fill: "none",
+            stroke: lineColor,
+            strokeWidth: 5.8,
+            strokeLineCap: "round",
+          }}
+          animate={
+            animate && {
+              pathOffset: [0, 0, 0, 1],
+              pathLength: [0, 1, 1, 1],
+              time: [0, 0.1, 0.9, 1],
+              transition: {
+                duration: 4,
+                delay,
+                repeat: Infinity,
+                repeatDelay: 0,
+              },
+            }
+          }
           d="M 38.580337,101.47897 118.18676,62.030086"
         />
       </g>

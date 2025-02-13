@@ -134,13 +134,13 @@ const config = {
                 to({ context, absoluteFilename }) {
                   return path.join(
                     STATIC_DIR,
-                    path.relative(context, absoluteFilename)
+                    path.relative(context, absoluteFilename),
                   );
                 },
               },
             ],
           }),
-        ]
+        ],
   ),
   module: {
     rules: [
@@ -188,7 +188,7 @@ const config = {
           /node_modules/,
           path.resolve(
             __dirname,
-            "src/client/views/components/style/node_modules.css"
+            "src/client/views/components/style/node_modules.css",
           ),
         ],
       },
@@ -198,7 +198,7 @@ const config = {
           /node_modules/,
           path.resolve(
             __dirname,
-            "/src/client/views/components/style/node_modules.css"
+            "/src/client/views/components/style/node_modules.css",
           ),
         ],
         use: [
