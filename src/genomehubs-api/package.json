@@ -30,7 +30,7 @@
     "d3-scale": "^3.3.0",
     "dotenv": "^16.0.0",
     "esm": "^3.2.25",
-    "express": "^4.17.2",
+    "express": "^4.21.2",
     "express-openapi-validator": "^5.0.3",
     "ioredis": "^5.4.1",
     "json2csv": "^5.0.6",
