@@ -1,19 +1,14 @@
-import React, { memo } from "react";
-
-import { Box } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+import PalettePreview from "./PalettePreview";
+import React from "react";
 import { compose } from "recompose";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "qs";
-import styles from "./Styles.scss";
-import { useLocation } from "@reach/router";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    backgroundColor: "rgb(49, 50, 63)",
-    minWidth: "20em",
-    padding: "0.5em",
+    // minWidth: "20em",
+    padding: "1em",
     overflow: "auto",
     scrollbarGutter: "stable both-edges",
     fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
@@ -21,41 +16,68 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const PalettePreview = ({ colors, size = "2em" }) => {
-  return colors.map((col, i) => (
-    <span
-      style={{
-        backgroundColor: col,
-        height: size,
-        width: size,
-        display: "inline-block",
-      }}
-      key={i}
-    ></span>
-  ));
-};
-
-const PalettePicker = ({ palettes, handleClick }) => {
+const PalettePicker = ({
+  palettes,
+  handleClick,
+  size = "2em",
+  swatches,
+  borderRadius = 0,
+  margin = "0em",
+  showTooltip = false,
+  theme = "dark",
+}) => {
   const classes = useStyles();
+
+  let darkColor = "#31323f";
+  let lightColor = "#ffffff";
+  let backgroundColor = theme === "dark" ? darkColor : lightColor;
+
+  let textColor = theme === "dark" ? lightColor : darkColor;
+  let highlightColor = theme === "dark" ? "#7f7f7f" : "#dfdfdf";
+
   let palettePreviews = Object.entries(palettes.byId).map(([id, palette]) => {
-    let colors =
-      palette.default.length > 6
-        ? palette[6] || palette.default.slice(0, 6)
-        : palette.default.slice(0, 6);
-    let preview = <PalettePreview colors={colors}></PalettePreview>;
+    let colors = palette[swatches] || palette.default.slice(0, swatches);
+    let preview = (
+      <PalettePreview
+        colors={colors}
+        size={size}
+        swatches={swatches}
+        borderRadius={borderRadius}
+        margin={margin}
+        showTooltip={showTooltip}
+        backgroundColor={backgroundColor}
+      ></PalettePreview>
+    );
 
     return (
-      <Grid key={id}>
+      <Grid
+        key={id}
+        onPointerEnter={(e) => {
+          e.target.style.backgroundColor = highlightColor;
+        }}
+        onPointerLeave={(e) => {
+          e.target.style.backgroundColor = "transparent";
+        }}
+        style={{
+          cursor: handleClick ? "pointer" : "auto",
+          width: "100%",
+          height: `calc( ${size} + 2 * ${margin} )`,
+          borderRadius: borderRadius ? "0.5em" : "0",
+          padding: "0 0.25em",
+        }}
+        onClick={handleClick ? () => handleClick(id) : () => {}}
+      >
         <Grid
           container
           direction="row"
           alignItems="center"
+          justifyContent="flex-end"
           spacing={1}
-          style={{ cursor: handleClick ? "pointer" : "auto" }}
-          onClick={handleClick ? () => handleClick(id) : () => {}}
+          color={textColor}
+          style={{ pointerEvents: "none" }}
         >
-          <Grid>{id}</Grid>
-          <Grid>{preview}</Grid>
+          <Grid item>{id}</Grid>
+          <Grid item>{preview}</Grid>
         </Grid>
       </Grid>
     );
@@ -69,10 +91,20 @@ const PalettePicker = ({ palettes, handleClick }) => {
       alignItems="flex-end"
       justifyContent="flex-end"
       className={classes.paper}
+      style={{
+        width: "fit-content",
+        borderRadius: borderRadius ? "0.5em" : "0",
+        margin: "0.5em",
+        padding: "0.5em",
+        backgroundColor: backgroundColor,
+        borderColor: theme === "dark" ? lightColor : darkColor,
+        borderWidth: "0.1em",
+        borderStyle: "solid",
+      }}
     >
       {palettePreviews}
     </Grid>
   );
 };
 
-export default compose(memo, withColors)(PalettePicker);
+export default compose(withColors)(PalettePicker);

@@ -8,7 +8,7 @@ import {
 import React from "react";
 import { connect } from "react-redux";
 
-const withColors = (WrappedComponent) => (props) => {
+export const withColors = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => {
     let { id, colors, levels } = getDefaultPalette(state);
     return {
@@ -28,7 +28,7 @@ const withColors = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

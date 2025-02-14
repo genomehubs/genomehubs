@@ -22,11 +22,22 @@ import batlowS from "./color/batlowS";
 import { createSelector } from "reselect";
 import immutableUpdate from "immutable-update";
 
-export const ancestralColor = ANCESTRAL_COLOR || "red";
-export const descendantColor = DESCENDANT_COLOR || "orange";
-export const directColor = DIRECT_COLOR || "green";
-export const descendantHighlight = DESCENDANT_HIGHLIGHT || "orange";
-export const directHighlight = DIRECT_HIGHLIGHT || "green";
+const ANCESTRAL_COLOR =
+  typeof ANCESTRAL_COLOR !== "undefined" ? ANCESTRAL_COLOR : "red";
+const DESCENDANT_COLOR =
+  typeof DESCENDANT_COLOR !== "undefined" ? DESCENDANT_COLOR : "orange";
+const DIRECT_COLOR =
+  typeof DIRECT_COLOR !== "undefined" ? DIRECT_COLOR : "green";
+const DESCENDANT_HIGHLIGHT =
+  typeof DESCENDANT_HIGHLIGHT !== "undefined" ? DESCENDANT_HIGHLIGHT : "orange";
+const DIRECT_HIGHLIGHT =
+  typeof DIRECT_HIGHLIGHT !== "undefined" ? DIRECT_HIGHLIGHT : "green";
+
+export const ancestralColor = ANCESTRAL_COLOR;
+export const descendantColor = DESCENDANT_COLOR;
+export const directColor = DIRECT_COLOR;
+export const descendantHighlight = DESCENDANT_HIGHLIGHT;
+export const directHighlight = DIRECT_HIGHLIGHT;
 
 export const addPalette = createAction("ADD_PALETTE");
 export const editPalette = createAction("EDIT_PALETTE");
@@ -85,6 +96,46 @@ const cudRainbowPalette = [
   "#000000", // Black
 ];
 
+export const defaultPalettes = {
+  byId: {
+    accent: createD3Palette(schemeAccent, 8),
+    batlowS: createPalette(batlowS),
+    batlow: createPalette(batlow, 50),
+    bhm: createPalette(bhmPalette),
+    category: createD3Palette(schemeCategory10, 10),
+    cividis: createD3Palette(interpolateCividis, 50),
+    cool: createD3Palette(interpolateCool, 50),
+    cubeHelix: createD3Palette(interpolateCubehelixDefault, 50),
+    cud: createPalette(cudPalette),
+    cudRainbow: createPalette(cudRainbowPalette),
+    dark: createD3Palette(schemeDark2, 8),
+    default: createD3Palette(interpolateViridis, 50),
+    cudReverse: createPalette(cudPalette.reverse().splice(1)),
+    inferno: createD3Palette(interpolateInferno, 50),
+    magma: createD3Palette(interpolateMagma, 50),
+    paired: createD3Palette(schemePaired, 12),
+    plasma: createD3Palette(interpolatePlasma, 50),
+    pride: createPalette(pridePalette),
+    rings: createPalette(ringsPalette),
+    standard: { id: "default", default: brewerPalette, levels: [] },
+    tableau: createD3Palette(schemeTableau10, 10),
+    turbo: createD3Palette(interpolateTurbo, 50),
+    viridis: createD3Palette(interpolateViridis, 50),
+    warm: createD3Palette(interpolateWarm, 50),
+  },
+  allIds: [
+    "default",
+    "batlow",
+    "batlowS",
+    "cividis",
+    "paired",
+    "viridis",
+    "cud",
+    "cudRainbow",
+    "cudReverse",
+  ],
+};
+
 export const palettes = handleActions(
   {
     ADD_PALETTE: (state, action) =>
@@ -107,45 +158,7 @@ export const palettes = handleActions(
       });
     },
   },
-  {
-    byId: {
-      accent: createD3Palette(schemeAccent, 8),
-      batlowS: createPalette(batlowS),
-      batlow: createPalette(batlow, 50),
-      bhm: createPalette(bhmPalette),
-      category: createD3Palette(schemeCategory10, 10),
-      cividis: createD3Palette(interpolateCividis, 50),
-      cool: createD3Palette(interpolateCool, 50),
-      cubeHelix: createD3Palette(interpolateCubehelixDefault, 50),
-      cud: createPalette(cudPalette),
-      cudRainbow: createPalette(cudRainbowPalette),
-      dark: createD3Palette(schemeDark2, 8),
-      default: createD3Palette(interpolateViridis, 50),
-      cudReverse: createPalette(cudPalette.reverse().splice(1)),
-      inferno: createD3Palette(interpolateInferno, 50),
-      magma: createD3Palette(interpolateMagma, 50),
-      paired: createD3Palette(schemePaired, 12),
-      plasma: createD3Palette(interpolatePlasma, 50),
-      pride: createPalette(pridePalette),
-      rings: createPalette(ringsPalette),
-      standard: { id: "default", default: brewerPalette, levels: [] },
-      tableau: createD3Palette(schemeTableau10, 10),
-      turbo: createD3Palette(interpolateTurbo, 50),
-      viridis: createD3Palette(interpolateViridis, 50),
-      warm: createD3Palette(interpolateWarm, 50),
-    },
-    allIds: [
-      "default",
-      "batlow",
-      "batlowS",
-      "cividis",
-      "paired",
-      "viridis",
-      "cud",
-      "cudRainbow",
-      "cudReverse",
-    ],
-  },
+  defaultPalettes,
 );
 
 export const getSelectedPalette = (state) => state.selectedPalette;
