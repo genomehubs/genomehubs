@@ -1,8 +1,5 @@
 {
-  "extends": [
-    "plugin:prettier/recommended",
-    "plugin:storybook/recommended"
-  ],
+  "extends": ["plugin:prettier/recommended", "plugin:storybook/recommended"],
   "env": {
     "browser": true,
     "node": true
@@ -13,8 +10,9 @@
   "ecmaFeatures": {
     "jsx": true
   },
-  "plugins": [
-    "react"
-  ],
-  "parser": "babel-eslint"
+  "plugins": ["react"],
+  "parser": "babel-eslint",
+  "rules": {
+    "no-undef": "error"
+  }
 }

@@ -23,15 +23,17 @@ import { createSelector } from "reselect";
 import immutableUpdate from "immutable-update";
 
 const ANCESTRAL_COLOR =
-  typeof ANCESTRAL_COLOR !== "undefined" ? ANCESTRAL_COLOR : "red";
+  typeof ANCESTRAL_COLOR !== "undefined" ? ANCESTRAL_COLOR : "#db4325";
 const DESCENDANT_COLOR =
-  typeof DESCENDANT_COLOR !== "undefined" ? DESCENDANT_COLOR : "orange";
+  typeof DESCENDANT_COLOR !== "undefined" ? DESCENDANT_COLOR : "#eda247";
 const DIRECT_COLOR =
-  typeof DIRECT_COLOR !== "undefined" ? DIRECT_COLOR : "green";
+  typeof DIRECT_COLOR !== "undefined" ? DIRECT_COLOR : "#006164";
 const DESCENDANT_HIGHLIGHT =
-  typeof DESCENDANT_HIGHLIGHT !== "undefined" ? DESCENDANT_HIGHLIGHT : "orange";
+  typeof DESCENDANT_HIGHLIGHT !== "undefined"
+    ? DESCENDANT_HIGHLIGHT
+    : "#e6e1bc";
 const DIRECT_HIGHLIGHT =
-  typeof DIRECT_HIGHLIGHT !== "undefined" ? DIRECT_HIGHLIGHT : "green";
+  typeof DIRECT_HIGHLIGHT !== "undefined" ? DIRECT_HIGHLIGHT : "#57c4ad";
 
 export const ancestralColor = ANCESTRAL_COLOR;
 export const descendantColor = DESCENDANT_COLOR;
@@ -198,34 +200,49 @@ export const getDefaultPalette = createSelector(
 
 /* Coolors Exported Palette - coolors.co/d7cdcc-ffffff-59656f-9c528b-1d1e2c */
 /* RGB */
-export const schemeColors = {
-  darkColor: "rgb(49, 50, 63)",
-  lightColor: "rgb(255, 255, 255)",
-  shadeColor: "rgb(89, 101, 111)",
-  deepColor: "rgb(65,74,81)",
-  highlightColor: "rgb(156, 82, 139)",
-  halfHighlightColor: "rgba(156, 82, 139, 0.5)",
-  paleColor: "rgb(215, 205, 204)",
-  brightColor: "rgb(255,255,30)",
-  clearColor: "rgba(255,255,255,0)",
+export const lightThemeColors = {
+  darkColor: "#31323F",
+  lightColor: "#FFFFFF",
+  shadeColor: "#59656F",
+  deepColor: "#414A51",
+  highlightColor: "#9C528B",
+  halfHighlightColor: "#9C528B80", // 50% opacity
+  paleColor: "#D7CDCC",
+  brightColor: "#FFFF1E",
+  clearColor: "#FFFFFF00", // 0% opacity
 };
 
-export const setColorScheme = createAction("SET_COLOR_SCHEME");
-export const colorScheme = handleAction(
-  "SET_COLOR_SCHEME",
-  (state, action) => action.payload,
-  schemeColors,
-);
+// invert light and dark colors for dark theme
+export const darkThemeColors = {
+  darkColor: "#FFFFFF",
+  lightColor: "#31323F",
+  shadeColor: "#9C528B",
+  deepColor: "#414A51",
+  highlightColor: "#59656F",
+  halfHighlightColor: "#59656F80", // 50% opacity
+  paleColor: "#D7CDCC",
+  brightColor: "#FFFF1E",
+  clearColor: "#FFFFFF00", // 0% opacity
+};
 
-export const getColorScheme = (state) => state.colorScheme;
+const defaultTheme = "light";
 
 export const setTheme = createAction("SET_THEME");
 export const theme = handleAction(
   "SET_THEME",
   (state, action) => action.payload,
-  "Light",
+  defaultTheme,
 );
 export const getTheme = (state) => state.theme;
+
+export const setColorScheme = createAction("SET_COLOR_SCHEME");
+export const colorScheme = handleAction(
+  "SET_COLOR_SCHEME",
+  (state, action) => action.payload,
+  defaultTheme === "light" ? lightThemeColors : darkThemeColors,
+);
+
+export const getColorScheme = (state) => state.colorScheme;
 
 export const getStatusColors = (state) => state.statusColors;
 

@@ -1,5 +1,6 @@
 import {
   getAllPalettes,
+  getColorScheme,
   getDefaultPalette,
   getStatusColors,
   selectPalette,
@@ -17,6 +18,7 @@ export const withColors = (WrappedComponent) => (props) => {
       levels,
       statusColors: getStatusColors(state),
       palettes: getAllPalettes(state),
+      colorScheme: getColorScheme(state),
     };
   };
 

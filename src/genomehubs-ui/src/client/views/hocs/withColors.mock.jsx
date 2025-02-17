@@ -1,21 +1,44 @@
+import {
+  getAllPalettes,
+  getColorScheme,
+  getDefaultPalette,
+  getStatusColors,
+  selectPalette,
+  setColorScheme,
+} from "../reducers/color";
+
 import React from "react";
-import { defaultPalettes } from "../reducers/color";
+import { connect } from "react-redux";
 import { fn } from "@storybook/test";
-import { interpolateViridis } from "d3-scale-chromatic";
 
 const mockWithColors = (WrappedComponent) => (props) => {
-  // let palette = createD3Palette(interpolateViridis, 50);
-  const newProps = {
-    ...props,
-    id: "default",
-    colors: defaultPalettes.byId.default,
-    levels: defaultPalettes.byId.default.levels,
-    statusColors: {},
-    palettes: defaultPalettes,
-    selectPalette: (id) => {},
+  const mapStateToProps = (state) => {
+    let { id, colors, levels } = getDefaultPalette(state);
+    return {
+      id,
+      colors,
+      levels,
+      statusColors: getStatusColors(state),
+      palettes: getAllPalettes(state),
+      colorScheme: getColorScheme(state),
+    };
   };
 
-  return <WrappedComponent {...newProps} />;
+  const mapDispatchToProps = (dispatch) => ({
+    selectPalette: (id) => {
+      dispatch(selectPalette(id));
+    },
+    selectColorScheme: (scheme) => {
+      dispatch(setColorScheme(scheme));
+    },
+  });
+
+  const Connected = connect(
+    mapStateToProps,
+    mapDispatchToProps,
+  )(WrappedComponent);
+
+  return <Connected {...props} />;
 };
 
 export const withColors = fn(mockWithColors).mockName("withColors");

@@ -8,8 +8,9 @@ import {
 
 import React from "react";
 import { connect } from "react-redux";
+import { fn } from "@storybook/test";
 
-const withTheme = (WrappedComponent) => (props) => {
+const mockWithTheme = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
     theme: getTheme(state),
   });
@@ -30,5 +31,7 @@ const withTheme = (WrappedComponent) => (props) => {
 
   return <Connected {...props} />;
 };
+
+export const withTheme = fn(mockWithTheme).mockName("withTheme");
 
 export default withTheme;

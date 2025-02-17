@@ -7,11 +7,15 @@ $shadeColor: rgb(89, 101, 111);
 $deepColor: rgb(65, 74, 81);
 // $highlightColor: rgb(130, 99, 168);
 $highlightColor: rgb(69, 170, 93);
+
+//$directHighlight: #57c4ad;
+//$descendantHighlight: #e6e1bc;
 $faintHighlightColor: rgba($highlightColor, 0.25);
 $paleColor: rgb(215, 205, 204);
 $brightColor: rgb(255, 255, 30);
 $clearColor: #ffffffff;
 $completeColor: rgb(51, 160, 44);
+
 $directColor: #006164;
 $descendantColor: #eda247;
 $ancestralColor: #db4325;

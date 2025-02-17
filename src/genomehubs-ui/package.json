@@ -7,7 +7,7 @@
     "build": "NODE_ENV=production webpack --mode production --config ./webpack.config.js",
     "client": "NODE_OPTIONS='--max-http-header-size=100000 --trace-deprecation' webpack serve --mode development",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "storybook": "storybook dev -p 6006",
+    "storybook": "storybook dev -p 6006 --debug-webpack",
     "build-storybook": "storybook build"
   },
   "repository": {
@@ -32,9 +32,11 @@
     "@loadable/babel-plugin": "^5.13.2",
     "@storybook/addon-essentials": "^8.5.5",
     "@storybook/addon-interactions": "^8.5.5",
-    "@storybook/addon-onboarding": "^8.5.5",
+    "@storybook/addon-styling-webpack": "^1.0.1",
+    "@storybook/addon-themes": "^8.5.6",
     "@storybook/addon-webpack5-compiler-swc": "^2.1.0",
     "@storybook/blocks": "^8.5.5",
+    "@storybook/preset-scss": "^1.0.3",
     "@storybook/react": "^8.5.5",
     "@storybook/react-webpack5": "^8.5.5",
     "@storybook/test": "^8.5.5",
@@ -58,8 +60,8 @@
     "mini-css-extract-plugin": "^2.5.3",
     "postcss-loader": "^8.1.1",
     "prettier": "^3.3.3",
-    "sass": "^1.51.0",
-    "sass-loader": "^16.0.1",
+    "sass": "^1.85.0",
+    "sass-loader": "^16.0.5",
     "storybook": "^8.5.5",
     "storybook-addon-react-docgen": "^1.2.44",
     "style-loader": "^4.0.0"
@@ -154,6 +156,10 @@
     "#hocs/withColors": {
       "storybook": "./src/client/views/hocs/withColors.mock.jsx",
       "default": "./src/client/views/hocs/withColors.jsx"
+    },
+    "#hocs/withTheme": {
+      "storybook": "./src/client/views/hocs/withTheme.mock.jsx",
+      "default": "./src/client/views/hocs/withTheme.jsx"
     },
     "#*": [
       "./*",

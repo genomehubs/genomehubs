@@ -1,5 +1,6 @@
-@import "colors";
-@import "themes";
+@use "sass:color";
+@use "colors";
+@use "themes";
 
 @mixin placeholderColor($color) {
   &placeholder {
@@ -34,11 +35,11 @@ body,
 }
 
 .app {
-  @include themify($themes) {
-    background: themed("secondary");
-    color: themed("primary");
-    font-family: themed("bodyFont");
-    font-size: themed("bodyFontSize");
+  @include themes.themify(themes.$themes) {
+    background: themes.themed("secondary");
+    color: themes.themed("primary");
+    font-family: themes.themed("bodyFont");
+    font-size: themes.themed("bodyFontSize");
     transition: all 0.3s ease-in 0s;
   }
 }
@@ -77,7 +78,7 @@ body,
 
 
 * {
-  @include themify($themes) {
+  @include themes.themify(themes.$themes) {
     // background: inherit;
     // color: inherit;
     // font-family: inherit;
@@ -88,7 +89,7 @@ body,
     h2,
     h3,
     h4 {
-      font-family: themed("titleFont");
+      font-family: themes.themed("titleFont");
     }
 
     h1 {
@@ -96,8 +97,8 @@ body,
     }
 
     a {
-      color: themed("primary");
-      font-family: themed("bodyFont");
+      color: themes.themed("primary");
+      font-family: themes.themed("bodyFont");
       text-decoration: none;
     }
 
@@ -108,17 +109,17 @@ body,
       position: sticky;
       right: 0;
       left: 0;
-      border-bottom: 2px solid themed("secondary");
+      border-bottom: 2px solid themes.themed("secondary");
       top: 0;
       min-height: 5em;
-      color: themed("secondary");
+      color: themes.themed("secondary");
 
-      font-family: themed("bodyFont");
+      font-family: themes.themed("bodyFont");
       padding: 2em;
-      background-color: themed("primary");
+      background-color: themes.themed("primary");
 
       a:link, a:visited {
-        color: themed("secondary");
+        color: themes.themed("secondary");
       }
     }
 
@@ -133,8 +134,8 @@ body,
       left: 0;
       bottom: 0;
       top: 0;
-      background-color: themed("primary");
-      color: mix(themed("secondary"), themed("primary"), 65%);
+      background-color: themes.themed("primary");
+      color: color.mix(themes.themed("secondary"), themes.themed("primary"), 65%);
       z-index: 10000;
 
       .loadingContainer {
@@ -156,7 +157,7 @@ body,
           left: 0;
           width: 100%;
           height: 100%;
-          background: radial-gradient(rgba(themed("primary"), 0.0), rgba(themed("primary"), 1));
+          background: radial-gradient(rgba(themes.themed("primary"), 0.0), rgba(themes.themed("primary"), 1));
         }
       }
 
@@ -314,7 +315,7 @@ body,
         
         hr {
           margin: 0.25em 0;
-          color: themed("primary");
+          color: themes.themed("primary");
         }
       }
 
@@ -324,10 +325,10 @@ body,
         right: 0;
       }
       &Footer {
-        font-family: themed("bodyFont");
+        font-family: themes.themed("bodyFont");
         font-size: 0.8em;
         line-height: 1.5em;
-        color: mix(themed("primary"), themed("secondary"), 75%);
+        color: color.mix(themes.themed("primary"), themes.themed("secondary"), 75%);
         margin-right: 0.5em;
       }
     }
@@ -336,19 +337,19 @@ body,
     header {
       // background: mix(themed('primary'),themed('secondary'),50%);
       // color: themed('secondary');
-      border-bottom: 0.2em solid themed("primary");
+      border-bottom: 0.2em solid themes.themed("primary");
       height: 2em;
       flex: none;
       z-index: 1;
-      background: themed("secondary");
+      background: themes.themed("secondary");
 
       &.error {
-        background: themed("ancestral");
-        border-color: themed("ancestral");
+        background: themes.themed("ancestral");
+        border-color: themes.themed("ancestral");
       }
 
       .siteText {
-        background: rgba(themed("primary"), 0.5);
+        background: rgba(themes.themed("primary"), 0.5);
       }
 
       .siteLogo {
@@ -356,24 +357,24 @@ body,
         width: 1.8em;
         margin: 0;
         float: left;
-        color: themed("primary");
+        color: themes.themed("primary");
         // background: rgba(themed("primary"), 0.5);
       }
 
       .siteName {
         cursor: pointer;
-        font-family: themed("titleFont");
+        font-family: themes.themed("titleFont");
         font-size: 120%;
         line-height: 1.8em;
         margin: 0 0.25em 0 0.25em;
         padding: 0;
-        color: themed("secondary");
+        color: themes.themed("secondary");
         text-decoration: none !important;
       }
 
       .tabHolder {
         float: right;
-        background: rgba(themed("primary"), 0.5);
+        background: rgba(themes.themed("primary"), 0.5);
         height: 2em;
         overflow: visible;
         white-space:nowrap;
@@ -387,7 +388,7 @@ body,
       }
 
       .tab {
-        color: themed("secondary");
+        color: themes.themed("secondary");
         border-bottom: 0;
         border-top: 0;
         box-sizing: border-box;
@@ -403,12 +404,12 @@ body,
 
         &Highlight,
         &:hover {
-          background-color: mix(themed("primary"), themed("secondary"), 90%);
-          border-bottom: 0.2em solid themed("secondary");
+          background-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 90%);
+          border-bottom: 0.2em solid themes.themed("secondary");
         }
 
         &:hover {
-          background-color: mix(themed("primary"), themed("secondary"), 75%);
+          background-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 75%);
         }
 
       }
@@ -422,7 +423,7 @@ body,
           display:block;
           overflow: hidden;
           
-          background-color: themed("primary");
+          background-color: themes.themed("primary");
         }
         nav {
           // border-top: 0.2em solid themed("secondary");
@@ -433,19 +434,19 @@ body,
           .tab {
             margin-bottom: 0;
             display: block;
-            background-color: themed("primary");
+            background-color: themes.themed("primary");
   
             // margin-right: 0.2em;
 
             &Highlight,
             &:hover {
               // border-right: 0.2em solid themed("secondary");
-              background-color: mix(themed("primary"), themed("secondary"), 90%);
+              background-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 90%);
               border-bottom: none;
               // margin-right: 0;
             }
             &:hover {
-              background-color: mix(themed("primary"), themed("secondary"), 75%);
+              background-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 75%);
             }
           }
         }
@@ -457,11 +458,11 @@ body,
     }
 
     footer {
-      background-color: themed("primary");
-      color: themed("secondary");
-      border-top: 0.2em solid themed("primary");
+      background-color: themes.themed("primary");
+      color: themes.themed("secondary");
+      border-top: 0.2em solid themes.themed("primary");
       flex: none;
-      font-family: themed("bodyFont");
+      font-family: themes.themed("bodyFont");
       font-size: 1em;
       line-height: 2em;
       min-height: 2.2em;
@@ -470,7 +471,7 @@ body,
 
       .link {
         text-decoration: underline;
-        color: themed("secondary") !important;
+        color: themes.themed("secondary") !important;
       }
 
       img {
@@ -480,10 +481,10 @@ body,
     }
 
     .pageTitle {
-      color: themed("primary");
-      background-color: themed("secondary");
-      border-bottom: themed("primary") 0.1em solid;
-      font-family: themed("titleFont");
+      color: themes.themed("primary");
+      background-color: themes.themed("secondary");
+      border-bottom: themes.themed("primary") 0.1em solid;
+      font-family: themes.themed("titleFont");
       font-size: 1.25em;
       text-align: left;
       padding: 0.25em;
@@ -493,9 +494,9 @@ body,
     }
 
     .searchBox {
-      background-color: mix(themed("primary"), themed("secondary"), 5%);
-      border: 2px solid mix(themed("primary"), themed("secondary"), 15%);
-      font-family: themed("titleFont");
+      background-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 5%);
+      border: 2px solid color.mix(themes.themed("primary"), themes.themed("secondary"), 15%);
+      font-family: themes.themed("titleFont");
       font-size: 2em;
       margin: 0.5em;
       max-width: 80%;
@@ -504,20 +505,20 @@ body,
       text-align: center;
       width: 600px;
       @include placeholderColor(
-        mix(themed("primary"), themed("secondary"), 65%)
+        color.mix(themes.themed("primary"), themes.themed("secondary"), 65%)
       );
 
       &:focus {
-        background-color: themed("secondary");
-        border-color: themed("primary");
-        @include placeholderColor(themed("secondary"));
+        background-color: themes.themed("secondary");
+        border-color: themes.themed("primary");
+        @include placeholderColor(themes.themed("secondary"));
       }
 
       &:hover {
-        background-color: themed("secondary");
-        border-color: themed("primary");
+        background-color: themes.themed("secondary");
+        border-color: themes.themed("primary");
         @include placeholderColor(
-          mix(themed("primary"), themed("secondary"), 35%)
+          color.mix(themes.themed("primary"), themes.themed("secondary"), 35%)
         );
       }
     }
@@ -526,8 +527,8 @@ body,
       background-color: transparent;
       margin: 1em 0;
       width: 100%;
-      font-family: themed("bodyFont");
-      font-size: themed("bodyFontSize");
+      font-family: themes.themed("bodyFont");
+      font-size: themes.themed("bodyFontSize");
 
       &4Column {
         .infoPane {
@@ -565,8 +566,8 @@ body,
       }
 
       code {
-        font-family: themed("codeFont");
-        background: mix(themed("primary"), themed("secondary"), 5%);
+        font-family: themes.themed("codeFont");
+        background: color.mix(themes.themed("primary"), themes.themed("secondary"), 5%);
       }
 
       li {
@@ -595,9 +596,9 @@ body,
     }
 
     .infoPane {
-      background: mix(themed("primary"), themed("secondary"), 5%);
-      border: 2px solid themed("secondary");
-      color: mix(themed("primary"), themed("secondary"), 85%);
+      background: color.mix(themes.themed("primary"), themes.themed("secondary"), 5%);
+      border: 2px solid themes.themed("secondary");
+      color: color.mix(themes.themed("primary"), themes.themed("secondary"), 85%);
       cursor: pointer;
       margin: 0 1em;
       position: relative;
@@ -613,7 +614,7 @@ body,
       &Header {
         background-color: transparent;
         flex: 0 1 4em;
-        font-family: themed("titleFont");
+        font-family: themes.themed("titleFont");
         font-size: 120%;
         line-height: 4em;
         padding-left: 2em;
@@ -630,7 +631,7 @@ body,
       }
 
       &Description {
-        background: rgba(themed("secondary"), 0.75);
+        background: rgba(themes.themed("secondary"), 0.75);
         box-sizing: border-box;
         opacity: 0;
         padding: 1em;
@@ -658,7 +659,7 @@ body,
         bottom: 0;
         width: 100%;
         height: calc(100% - 3rem);
-        background-color: themed("secondary");
+        background-color: themes.themed("secondary");
         // transition: all 0s ease-in 0s;
       }
       &:hover {
@@ -675,10 +676,10 @@ body,
     input.chip {
       background-color: transparent;
       border: 0 solid;
-      color: themed("secondary");
+      color: themes.themed("secondary");
       &:focus {
-        background-color: themed("secondary");
-        color: themed("primary");
+        background-color: themes.themed("secondary");
+        color: themes.themed("primary");
         outline: none;
         &::placeholder {
           color: transparent;
@@ -687,15 +688,15 @@ body,
       }
     }
     .filesTitle {
-      font-family: themed("titleFont");
+      font-family: themes.themed("titleFont");
       font-size: 1.25em;
       line-height: 2em;
     }
 
     .resultPanel {
-      border-top: solid 0.25px rgba(themed("primary"), 0.25);
+      border-top: solid 0.25px rgba(themes.themed("primary"), 0.25);
       box-sizing: border-box;
-      color: themed("primary");
+      color: themes.themed("primary");
       margin: 0 0 1em 0;
       padding: 0.25em;
       transition: all 0s ease-in 0s;
@@ -704,51 +705,51 @@ body,
         cursor: pointer;
         margin: -0.25em -0.25em 0.25em -0.25em;
         padding: 0.5em 0.75em;
-        color: themed("secondary");
-        background-color: themed("primary");
+        color: themes.themed("secondary");
+        background-color: themes.themed("primary");
         border-radius: 0.25em;
 
         .identifier {
           float: right;
 
           &Prefix {
-            color: rgba(themed("primary"), 0.75);
+            color: rgba(themes.themed("primary"), 0.75);
             font-size: 0.8em;
             line-height: 1em;
           }
         }
 
         .title {
-          font-family: themed("titleFont");
+          font-family: themes.themed("titleFont");
           font-size: 1.25em;
         }
       }
 
       .field {
-        border: solid 0.5px rgba(themed("primary"), 0.8);
+        border: solid 0.5px rgba(themes.themed("primary"), 0.8);
         box-sizing: border-box;
         margin: 0.25em;
         cursor: pointer;
 
         &Highlight,
         &:hover {
-          border-color: themed("primary");
+          border-color: themes.themed("primary");
           > .fieldName {
-            background-color: themed("primary");
+            background-color: themes.themed("primary");
           }
         }
 
         &Name {
-          background-color: rgba(themed("primary"), 0.8);
+          background-color: rgba(themes.themed("primary"), 0.8);
           font-size: 0.8em;
           line-height: 1.25em;
           padding: 0.25em;
           text-align: center;
-          color: themed("secondary");
+          color: themes.themed("secondary");
 
           &Highlight {
-            background-color: themed("primary");
-            color: themed("secondary");
+            background-color: themes.themed("primary");
+            color: themes.themed("secondary");
           }
         }
         &Value {
@@ -756,7 +757,7 @@ body,
           padding: 0.25em;
         }
         &Count {
-          color: rgba(themed("primary"), 0.75);
+          color: rgba(themes.themed("primary"), 0.75);
           font-size: 0.8em;
           padding: 0 0.25em 0.25em 0.25em;
           margin-top: -0.25em;
@@ -765,7 +766,7 @@ body,
       }
 
       .arrow {
-        border: solid rgba(themed("primary"), 0.75);
+        border: solid rgba(themes.themed("primary"), 0.75);
         border-width: 0 3px 3px 0;
         display: inline-block;
         padding: 3px;
@@ -784,19 +785,19 @@ body,
       .lineage {
         cursor: pointer;
         display: inline-block;
-        background-color: mix(themed("descendant"), themed("secondary"), 10%);
+        background-color: color.mix(themes.themed("descendant"), themes.themed("secondary"), 10%);
         padding: 0.25em;
         margin: 0.25em 0.5em 0.25em 0;
         border-radius: 0.25em;
-        border: solid 2px themed("descendant");
+        border: solid 2px themes.themed("descendant");
 
         &Direct {
-          background-color: mix(themed("direct"), themed("secondary"), 10%);
-          border-color: themed("direct");
+          background-color: color.mix(themes.themed("direct"), themes.themed("secondary"), 10%);
+          border-color: themes.themed("direct");
         }
 
         .rank {
-          color: rgba(themed("primary"), 0.75);
+          color: rgba(themes.themed("primary"), 0.75);
           font-size: 0.75em;
           display: block;
           width: 100%;
@@ -844,9 +845,9 @@ body,
     }
 
     .textPanel {
-      border-top: 0.2em solid mix(themed("primary"), themed("secondary"), 50%);
+      border-top: 0.2em solid color.mix(themes.themed("primary"), themes.themed("secondary"), 50%);
       box-sizing: border-box;
-      color: themed("primary");
+      color: themes.themed("primary");
       margin: 1em 0 1em 0;
       padding: 0.25em;
       padding-bottom: 5em;
@@ -856,7 +857,7 @@ body,
         display: block;
         margin: 0.5em 0 1em 0;
         .title {
-          font-family: themed("titleFont");
+          font-family: themes.themed("titleFont");
           font-size: 1.5em;
         }
       }
@@ -874,7 +875,7 @@ body,
       overflow: visible;
       padding: 1em;
       width: 100%;
-      font-family: themed("bodyFont");
+      font-family: themes.themed("bodyFont");
 
     }
 
@@ -887,7 +888,7 @@ body,
     // }
 
     header {
-      font-family: themed("titleFont");
+      font-family: themes.themed("titleFont");
       font-size: 1.1em;
       height: 2em;
       // left: 0;
@@ -896,8 +897,8 @@ body,
       // position: absolute;
       // top: 0;
       width: 100%;
-      color: themed("secondary");
-      background-color: themed("primary");
+      color: themes.themed("secondary");
+      background-color: themes.themed("primary");
     }
 
     main {
@@ -906,34 +907,34 @@ body,
     }
 
     .searchBox {
-      font-family: themed("titleFont");
+      font-family: themes.themed("titleFont");
       font-size: 2em;
       padding: 0.25em;
 
       &::selection {
         outline: none;
-        background-color: themed("faintHighlight");
+        background-color: themes.themed("faintHighlight");
       }
     }
 
     .completion {
-      font-family: themed("bodyFont");
-      font-size: themed("bodyFontSize");
+      font-family: themes.themed("bodyFont");
+      font-size: themes.themed("bodyFontSize");
       margin: 0 auto;
       position: relative;
       z-index: 10;
       max-width: 600px;
       // padding: 1em 0;
 
-      background-color: themed("secondary");
-      color: themed("primary");
+      background-color: themes.themed("secondary");
+      color: themes.themed("primary");
 
       .term {
         border-bottom: solid 0.25px grey;
         cursor: pointer;
         padding: 0 1em;
         &:hover {
-          background-color: themed("faintHighlight");
+          background-color: themes.themed("faintHighlight");
         }
         .value,
         .extra {
@@ -950,15 +951,15 @@ body,
       width: auto;
     }
     .underscore {
-      border-bottom: solid 0.2em themed("primary");
+      border-bottom: solid 0.2em themes.themed("primary");
       &High {
-        border-bottom-color: themed("direct");
+        border-bottom-color: themes.themed("direct");
       }
       &Medium {
-        border-bottom-color: themed("descendant");
+        border-bottom-color: themes.themed("descendant");
       }
       &Low {
-        border-bottom-color: themed("ancestral");
+        border-bottom-color: themes.themed("ancestral");
       }
     }
 
@@ -1003,21 +1004,21 @@ body,
             height: 0.33em;
             width: 0.33em;
             position: absolute;
-            background-color: rgba(themed("primary"), 0.25);
+            background-color: rgba(themes.themed("primary"), 0.25);
             &High {
-              background-color: themed("direct");
+              background-color: themes.themed("direct");
             }
           }
           .one,
           .two {
             &Medium {
-              background-color: themed("descendant");
+              background-color: themes.themed("descendant");
             }
           }
           .one {
             bottom: 0;
             &Low {
-              background-color: themed("ancestral");
+              background-color: themes.themed("ancestral");
             }
           }
           .two {
@@ -1033,17 +1034,17 @@ body,
     }
 
     blockquote {
-      background: rgba(themed("primary"), 0.05);
+      background: rgba(themes.themed("primary"), 0.05);
       background: #f0f6fa; //#00616411;
       border-left: 10px solid #d2e4f0; //#00616433;
-      font-family: themed("bodyFont");
+      font-family: themes.themed("bodyFont");
       margin: 1.5em 10px;
       padding: 0.5em 10px;
       max-width: 90%;
 
       a,
       .link {
-        color: themed("primary");
+        color: themes.themed("primary");
       }
     }
 
@@ -1054,8 +1055,8 @@ body,
     .plotDescription {
       width: calc( 100% - 2em );
       padding: 0.5em 1em;
-      background-color: themed("primary");
-      color: themed("secondary");
+      background-color: themes.themed("primary");
+      color: themes.themed("secondary");
       text-align: center;
     }
 
@@ -1063,18 +1064,41 @@ body,
       cursor: pointer;
       a, a:link, a:visited {
         text-decoration: none;
-        color:themed("secondary");
+        color:themes.themed("secondary");
         .plotArrow {
           height: 100%;
           position: absolute;;
           top: 0;
           display: flex;
           align-items: center;
-          color: themed("primary") !important;
+          color: themes.themed("primary") !important;
         }
       }
 
       
+    }
+
+    .paletteContainer {
+      position: relative;
+      width: 100%;
+      padding: 0 0.25em;
+      .overlay {
+        border: 0.2em solid themes.themed("highlight");
+        background-color: rgba(themes.themed("highlight"), 0.1);
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s ease-in-out;
+      }
+    }
+    .paletteContainer:hover {
+      .overlay {
+        opacity: 0.75;
+      }
     }
 
     .imageContainer {
@@ -1082,14 +1106,14 @@ body,
       width: fit-content;
       a, a:link, a:visited {
         text-decoration: none !important;
-        color:themed("secondary");
+        color:themes.themed("secondary");
         .plotArrow {
           height: 100%;
           position: absolute;;
           top: 0;
           display: flex;
           align-items: center;
-          color: themed("primary") !important;
+          color: themes.themed("primary") !important;
         }
       }
 
@@ -1098,21 +1122,21 @@ body,
         width: calc( 100% - 1em );
         padding: 0.15em 0.5em;
         cursor: default;
-        color: themed("secondary");
+        color: themes.themed("secondary");
         text-align: center;
         white-space:nowrap;
 
         &Primary {
-          background-color: themed("primary");
+          background-color: themes.themed("primary");
         }
         &Descendant {
-          background-color: themed("descendant");
+          background-color: themes.themed("descendant");
         }
         &Ancestral {
-          background-color: themed("ancestral");
+          background-color: themes.themed("ancestral");
         }
         a {
-          color: themed("secondary");
+          color: themes.themed("secondary");
           text-decoration: underline;
           cursor: pointer;
         }
@@ -1138,8 +1162,8 @@ body,
     }
 
     .badge {
-      font-family: themed("bodyFont");
-      font-size: themed("bodyFontSize");
+      font-family: themes.themed("bodyFont");
+      font-size: themes.themed("bodyFontSize");
       margin: 0 auto;
       position: relative;
       margin: 0.15rem;
@@ -1150,7 +1174,7 @@ body,
       // }
       min-height: 4.5em;
       height: auto;
-      color: themed("secondary");
+      color: themes.themed("secondary");
       display: inline-block;
 
       &:before {
@@ -1159,7 +1183,7 @@ body,
         left: -2.15rem;
         top: 1.7rem;
         width: 2.15rem;
-        border-top: 0.2rem solid themed("primary");
+        border-top: 0.2rem solid themes.themed("primary");
       }
 
       // &:last-of-type:after {
@@ -1173,7 +1197,7 @@ body,
         width: 100%;
         height: 4.5em;
         margin-bottom: 0.35rem;
-        background-color: themed("primary");
+        background-color: themes.themed("primary");
         border-radius: 0.5rem;
       }
 
@@ -1189,8 +1213,8 @@ body,
         padding: 0.25em;
         box-sizing: border-box;
         border-radius: 0.25em;
-        color: themed("primary");
-        background-color: themed("secondary");
+        color: themes.themed("primary");
+        background-color: themes.themed("secondary");
         position: absolute;
         display: grid;
         align-items: center;
@@ -1222,7 +1246,7 @@ body,
         top: 1.25rem;
         left: 4.25rem;
         right: 0.25rem;
-        font-family: themed("titleFont");
+        font-family: themes.themed("titleFont");
         font-size: 1.5em;
         position: absolute;
         white-space: nowrap;
@@ -1237,7 +1261,7 @@ body,
           // background-color: themed("primary");
           // background-color: red;
           width: 1.5rem;
-          @include fadeFromPercent(left, themed("primary"), 0%)
+          @include colors.fadeFromPercent(left, themes.themed("primary"), 0%)
         }
       }
 
@@ -1261,18 +1285,18 @@ body,
 
         a {
           margin-right: 1rem;
-          color: mix(themed("secondary"), themed("primary"), 85%);
+          color: color.mix(themes.themed("secondary"), themes.themed("primary"), 85%);
           position: relative;
           text-decoration: none;
           user-select: none;
 
           &.disabled {
             pointer-events: none;
-            color: mix(themed("secondary"), themed("primary"), 25%);
+            color: color.mix(themes.themed("secondary"), themes.themed("primary"), 25%);
           }
 
           &:hover {
-            color: themed("secondary");
+            color: themes.themed("secondary");
           }
 
           &:not(:first-of-type):before {
@@ -1281,15 +1305,15 @@ body,
             left: -0.5rem;
             top: 20%;
             height: 70%;
-            border-left: 1px solid mix(themed("secondary"), themed("primary"), 85%);
+            border-left: 1px solid color.mix(themes.themed("secondary"), themes.themed("primary"), 85%);
           }
 
           &.active, &.expanded {
-            color: themed("secondary");
+            color: themes.themed("secondary");
             font-weight: bold;
 
             &:hover {
-              color: mix(themed("secondary"), themed("primary"), 85%);
+              color: color.mix(themes.themed("secondary"), themes.themed("primary"), 85%);
             }
           }
 
@@ -1301,7 +1325,7 @@ body,
               left: -0.5rem;
               right: -0.5rem;
               top: 100%;
-              background-color: themed("primary");
+              background-color: themes.themed("primary");
               height: 0.5rem;
             }
           }
@@ -1322,7 +1346,7 @@ body,
         left: 4rem;
         position: relative;
         margin-bottom: 0.35rem;
-        background-color: themed("primary");
+        background-color: themes.themed("primary");
         padding: 0.25rem 0.5rem;
         width: calc(100% - 5rem);
         border-radius: 0.5em;
@@ -1340,7 +1364,7 @@ body,
       }
 
       .maskParent {
-        background-color: themed("secondary");
+        background-color: themes.themed("secondary");
         position: absolute;
         margin-left: -2.3rem;
         top: 1.9rem;
@@ -1359,19 +1383,19 @@ body,
         margin: 0.25rem;
         border-radius: 0.25rem;
         padding: 0 0.5em 0.05em;
-        background-color: themed("secondary");
+        background-color: themes.themed("secondary");
 
         .infoName {
-          font-family: themed("bodyFont");
-          color: mix(themed("secondary"), themed("primary"), 10%);
+          font-family: themes.themed("bodyFont");
+          color: color.mix(themes.themed("secondary"), themes.themed("primary"), 10%);
           position: relative;
-          border-bottom: 0.1rem solid mix(themed("primary"), themed("secondary"), 15%);
+          border-bottom: 0.1rem solid color.mix(themes.themed("primary"), themes.themed("secondary"), 15%);
         }
 
         .infoValue {
           margin-left: 0.5rem;
-          color: themed("primary");
-          font-family: themed("titleFont");
+          color: themes.themed("primary");
+          font-family: themes.themed("titleFont");
           font-size: 1.5em;
           display: inline-block;
           position: relative;
@@ -1381,7 +1405,7 @@ body,
 
       .badgeInfoSelected {
         .infoName {
-          border-bottom: 0.1rem solid themed("primary");
+          border-bottom: 0.1rem solid themes.themed("primary");
         }
       }
 
@@ -1392,18 +1416,18 @@ body,
         display: block;
 
         a {
-          color: mix(themed("secondary"), themed("primary"), 85%);
+          color: color.mix(themes.themed("secondary"), themes.themed("primary"), 85%);
           text-decoration: none;
           user-select: none;
           position: relative;
 
           &.disabled {
             pointer-events: none;
-            color: mix(themed("secondary"), themed("primary"), 25%);
+            color: color.mix(themes.themed("secondary"), themes.themed("primary"), 25%);
           }
 
           &:hover {
-            color: themed("secondary");
+            color: themes.themed("secondary");
           }
         }
       }
@@ -1438,13 +1462,13 @@ body,
         top: 1.7rem;
         bottom: 3.1rem;
         width: 1rem;
-        border-left: 0.2rem solid themed("primary");
+        border-left: 0.2rem solid themes.themed("primary");
       }
     }
 
     .resultsTable {
       max-height: 90vh;
-      border: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
+      border: solid color.mix(themes.themed("primary"), themes.themed("secondary"), 10%) 3px;
 
       table {
         border-collapse: separate;
@@ -1461,13 +1485,13 @@ body,
             }
 
             th:first-of-type {
-              border-right: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
+              border-right: solid color.mix(themes.themed("primary"), themes.themed("secondary"), 10%) 3px;
             }
           }
 
           tr:last-of-type {
             th {
-              border-bottom: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
+              border-bottom: solid color.mix(themes.themed("primary"), themes.themed("secondary"), 10%) 3px;
             }
           }
         }
@@ -1475,7 +1499,7 @@ body,
         tbody {
           tr {
             td:first-of-type {
-              border-right: solid mix(themed("primary"), themed("secondary"), 10%) 3px;
+              border-right: solid color.mix(themes.themed("primary"), themes.themed("secondary"), 10%) 3px;
             }
           }
           tr:last-of-type {
@@ -1488,15 +1512,15 @@ body,
         thead, tbody {
           tr, td {
             .contrast {
-              background-color: mix(themed("primary"), themed("secondary"), 5%)
+              background-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 5%)
             }
 
             .first {
-              border-left: solid mix(themed("primary"), themed("secondary"), 10%) 2px;
+              border-left: solid color.mix(themes.themed("primary"), themes.themed("secondary"), 10%) 2px;
             }
 
             .last {
-              border-right: solid mix(themed("primary"), themed("secondary"), 10%) 2px;
+              border-right: solid color.mix(themes.themed("primary"), themes.themed("secondary"), 10%) 2px;
             
               & + .first {
                 border-left: none;
@@ -1517,20 +1541,20 @@ body,
       margin: 0.25rem;
       border-radius: 0.25rem;
       padding: 0 0.5em 0.05em;
-      background-color: themed("secondary");
-      border: solid 3px themed("primary");
+      background-color: themes.themed("secondary");
+      border: solid 3px themes.themed("primary");
 
       .infoName {
-        font-family: themed("bodyFont");
-        color: mix(themed("secondary"), themed("primary"), 10%);
+        font-family: themes.themed("bodyFont");
+        color: color.mix(themes.themed("secondary"), themes.themed("primary"), 10%);
         position: relative;
-        border-bottom: 0.1rem solid mix(themed("primary"), themed("secondary"), 15%);
+        border-bottom: 0.1rem solid color.mix(themes.themed("primary"), themes.themed("secondary"), 15%);
       }
 
       .infoValue {
         margin-left: 0.5rem;
-        color: themed("primary");
-        font-family: themed("titleFont");
+        color: themes.themed("primary");
+        font-family: themes.themed("titleFont");
         font-size: 1.5em;
         display: inline-block;
         position: relative;
@@ -1544,8 +1568,8 @@ body,
 
 
     .markdown {
-      font-family: themed("bodyFont");
-      font-size: themed("bodyFontSize");
+      font-family: themes.themed("bodyFont");
+      font-size: themes.themed("bodyFontSize");
 
       figure {
         margin: 0;
@@ -1555,7 +1579,7 @@ body,
       h2,
       h3,
       h4 {
-        font-family: themed("titleFont");
+        font-family: themes.themed("titleFont");
       }
 
       h1 {
@@ -1605,7 +1629,7 @@ body,
       .reportCaption,
       .caption {
         font-weight: 600;
-        color: mix(themed("primary"), themed("secondary"), 75%);
+        color: color.mix(themes.themed("primary"), themes.themed("secondary"), 75%);
       }
 
       .reportCaption {
@@ -1662,29 +1686,29 @@ body,
 
       hr {
         border: 0;
-        border-top: 0.2em solid mix(themed("primary"), themed("secondary"), 50%);
+        border-top: 0.2em solid color.mix(themes.themed("primary"), themes.themed("secondary"), 50%);
       }
 
       .divider {
-        background-color: rgba(themed("primary"), 0.2);
+        background-color: rgba(themes.themed("primary"), 0.2);
         border: 0;
         margin: 0 -0.5em;
         width: 0.2em;
       }
 
       .outline {
-        border-color: mix(themed("primary"), themed("secondary"), 5%);
+        border-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 5%);
         border: 0.2em solid;
       }
 
       .direct {
-        border-bottom: solid 0.2em themed("direct");
+        border-bottom: solid 0.2em themes.themed("direct");
       }
       .descendant {
-        border-bottom: solid 0.2em themed("descendant");
+        border-bottom: solid 0.2em themes.themed("descendant");
       }
       .ancestor {
-        border-bottom: solid 0.2em themed("ancestral");
+        border-bottom: solid 0.2em themes.themed("ancestral");
       }
 
       .square::before {

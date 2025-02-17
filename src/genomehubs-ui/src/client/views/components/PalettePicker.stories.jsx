@@ -1,11 +1,14 @@
 import * as PalettePreviewStories from "./PalettePreview.stories";
 
 import PalettePicker from "./PalettePicker";
+import { Provider } from "react-redux";
+import React from "react";
+import colorStore from "../reducers/color.store";
 
 const meta = {
   component: PalettePicker,
   // title: "PalettePicker",
-  // decorators: [(story) => <div style={{ margin: "3rem" }}>{story()}</div>],
+  decorators: [(story) => <Provider store={colorStore}>{story()}</Provider>],
   tags: ["autodocs"],
   // excludeStories: /.*MockedState$/,
 };

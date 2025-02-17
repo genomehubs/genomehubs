@@ -1,9 +1,15 @@
+import {
+  overlay as overlayStyle,
+  paletteContainer as paletteContainerStyle,
+} from "./Styles.scss";
+
 import Grid from "@mui/material/Grid2";
 import PalettePreview from "./PalettePreview";
 import React from "react";
 import { compose } from "recompose";
 import makeStyles from "@mui/styles/makeStyles";
 import withColors from "#hocs/withColors";
+import withTheme from "#hocs/withTheme";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -24,16 +30,16 @@ const PalettePicker = ({
   borderRadius = 0,
   margin = "0em",
   showTooltip = false,
-  theme = "dark",
+  colorScheme,
+  theme,
 }) => {
   const classes = useStyles();
 
-  let darkColor = "#31323f";
-  let lightColor = "#ffffff";
+  let { darkColor, lightColor, highlightColor } = colorScheme;
   let backgroundColor = theme === "dark" ? darkColor : lightColor;
 
   let textColor = theme === "dark" ? lightColor : darkColor;
-  let highlightColor = theme === "dark" ? "#7f7f7f" : "#dfdfdf";
+  // let highlightColor = theme === "dark" ? "#7f7f7f" : "#dfdfdf";
 
   let palettePreviews = Object.entries(palettes.byId).map(([id, palette]) => {
     let colors = palette[swatches] || palette.default.slice(0, swatches);
@@ -52,19 +58,12 @@ const PalettePicker = ({
     return (
       <Grid
         key={id}
-        onPointerEnter={(e) => {
-          e.target.style.backgroundColor = highlightColor;
-        }}
-        onPointerLeave={(e) => {
-          e.target.style.backgroundColor = "transparent";
-        }}
         style={{
           cursor: handleClick ? "pointer" : "auto",
-          width: "100%",
           height: `calc( ${size} + 2 * ${margin} )`,
           borderRadius: borderRadius ? "0.5em" : "0",
-          padding: "0 0.25em",
         }}
+        className={paletteContainerStyle}
         onClick={handleClick ? () => handleClick(id) : () => {}}
       >
         <Grid
@@ -76,8 +75,14 @@ const PalettePicker = ({
           color={textColor}
           style={{ pointerEvents: "none" }}
         >
-          <Grid item>{id}</Grid>
-          <Grid item>{preview}</Grid>
+          <Grid>{id}</Grid>
+          <Grid>{preview}</Grid>
+          <div
+            className={overlayStyle}
+            style={{
+              borderRadius: borderRadius ? "0.5em" : "0",
+            }}
+          ></div>
         </Grid>
       </Grid>
     );
@@ -95,7 +100,7 @@ const PalettePicker = ({
         width: "fit-content",
         borderRadius: borderRadius ? "0.5em" : "0",
         margin: "0.5em",
-        padding: "0.5em",
+        // padding: "0.5em",
         backgroundColor: backgroundColor,
         borderColor: theme === "dark" ? lightColor : darkColor,
         borderWidth: "0.1em",
@@ -107,4 +112,4 @@ const PalettePicker = ({
   );
 };
 
-export default compose(withColors)(PalettePicker);
+export default compose(withTheme, withColors)(PalettePicker);
