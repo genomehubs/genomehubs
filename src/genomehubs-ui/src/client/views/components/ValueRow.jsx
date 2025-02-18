@@ -28,7 +28,6 @@ const ValueRow = ({
   description,
   value,
   unit,
-  color = "#1f78b4",
 }) => {
   useEffect(() => {
     if (

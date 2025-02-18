@@ -351,38 +351,6 @@ const ReportTreePaths = ({
             </Group>
           );
         });
-        // let tick = ticks[0];
-        // let tickLabel = formats(tick);
-        // let tickLabelLength = stringLength(tickLabel) * charHeight * 0.7;
-        // tickLines.push(
-        //   <Text
-        //     key={`tx-${tick}`}
-        //     x={-tickLabelLength / 2}
-        //     y={top - charHeight}
-        //     width={tickLabelLength}
-        //     fill={"#333333"}
-        //     fontSize={charHeight * 0.75}
-        //     textAlign={"center"}
-        //     textBaseline={"bottom"}
-        //     text={tickLabel}
-        //   />,
-        // );
-        // tick = ticks[ticks.length - 1];
-        // tickLabel = formats(tick);
-        // tickLabelLength = stringLength(tickLabel) * charHeight * 0.6;
-        // tickLines.push(
-        //   <Text
-        //     key={`tx-${tick}`}
-        //     x={valueScale(tick) - tickLabelLength / 2}
-        //     y={top - charHeight}
-        //     width={charHeight * 5}
-        //     fill={"#333333"}
-        //     fontSize={charHeight * 0.75}
-        //     textAlign={"center"}
-        //     textBaseline={"bottom"}
-        //     text={tickLabel}
-        //   />,
-        // );
         setValueTicks({ ticks, tickLines });
       }
       if (portionCache[portion]) {
