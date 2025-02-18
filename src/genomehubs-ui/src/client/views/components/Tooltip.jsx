@@ -1,16 +1,18 @@
 import MuiTooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import React, { useCallback, useState } from "react";
 
-import makeStyles from "@mui/styles/makeStyles";
+import { compose } from "recompose";
 import { styled } from "@mui/material/styles";
 import { useEventListener } from "../hooks/useEventListener";
+import withTheme from "#hocs/withTheme";
 
-const StyledTooltip = styled(({ className, ...props }) => (
+const DarkTooltip = styled(({ className, ...props }) => (
   <MuiTooltip {...props} classes={{ popper: className }} />
 ))(() => ({
   [`& .${tooltipClasses.tooltip}`]: {
     fontSize: "1.1rem",
     backgroundColor: "#464752ee",
+    color: "#ffffff",
     "& a": {
       color: "#ffffff",
     },
@@ -19,29 +21,26 @@ const StyledTooltip = styled(({ className, ...props }) => (
     color: "#464752ee",
   },
 }));
-const useStyles = {
-  default: makeStyles({
-    tooltip: {
-      fontSize: "1.2rem",
-    },
-  }),
-  dark: makeStyles({
-    arrow: {
+
+const LightTooltip = styled(({ className, ...props }) => (
+  <MuiTooltip {...props} classes={{ popper: className }} />
+))(() => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    fontSize: "1.1rem",
+    backgroundColor: "#f0f0f0",
+    color: "#464752ee",
+    "& a": {
       color: "#464752ee",
     },
-    tooltip: {
-      fontSize: "1.2rem",
-      // backgroundColor: "#31323fcc",
-      backgroundColor: "#464752ee",
-      "& a": {
-        color: "#ffffff",
-      },
-    },
-  }),
-};
+  },
+  [`& .${tooltipClasses.arrow}`]: {
+    color: "#f0f0f0",
+  },
+}));
 
 export const Tooltip = ({
-  styleName = "dark",
+  theme,
+  styleName = theme === "dark" ? "default" : "dark",
   disableInteractive = true,
   ...props
 }) => {
@@ -57,12 +56,13 @@ export const Tooltip = ({
 
   useEventListener("keydown", handler);
 
+  const StyledTooltip = theme === "light" ? DarkTooltip : LightTooltip;
+
   return (
     <StyledTooltip
       open={open}
       onOpen={onOpen}
       onClose={onClose}
-      classes={useStyles[styleName]()}
       disableInteractive={disableInteractive}
       sx={{ fontSize: "3rem" }}
       {...props}
@@ -70,4 +70,4 @@ export const Tooltip = ({
   );
 };
 
-export default Tooltip;
+export default compose(withTheme)(Tooltip);

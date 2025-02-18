@@ -12,7 +12,7 @@ import { fn } from "@storybook/test";
 
 const mockWithTheme = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
-    theme: getTheme(state),
+    // theme: getTheme(state),
   });
 
   const mapDispatchToProps = (dispatch) => ({

@@ -1,8 +1,16 @@
 import { PalettePreview } from "./PalettePreview";
+import { Provider } from "react-redux";
+import React from "react";
+import colorStore from "../reducers/color.store";
 
 const meta = {
+  decorators: [(story) => <Provider store={colorStore}>{story()}</Provider>],
   component: PalettePreview,
   tags: ["autodocs"],
+  args: {
+    // six colours from the viridis color palette
+    colors: ["#440154", "#414487", "#2A788E", "#22A884", "#7AD151", "#FDE725"],
+  },
 };
 
 /**
@@ -11,17 +19,13 @@ const meta = {
  */
 export default meta;
 
-export const Default = {
-  args: {
-    // six colours from the viridis color palette
-    colors: ["#440154", "#414487", "#2A788E", "#22A884", "#7AD151", "#FDE725"],
-  },
-  parameters: {
-    backgrounds: {
-      default: "dark",
-    },
-  },
+const themeFromContext = (context) => {
+  return context.theme || context.parameters.theme || context.globals.theme;
 };
+
+export const Default = (inputArgs, context) => (
+  <PalettePreview {...inputArgs} theme={themeFromContext(context)} />
+);
 
 export const FiveColors = {
   args: {
@@ -54,64 +58,58 @@ export const SevenColors = {
 
 export const Small = {
   args: {
-    ...Default.args,
     size: "1em",
   },
 };
 
 export const Large = {
   args: {
-    ...Default.args,
     size: "3em",
   },
 };
 
 export const SoftEdge = {
   args: {
-    ...Default.args,
     borderRadius: "15%",
   },
 };
 
 export const Rounded = {
   args: {
-    ...Default.args,
     borderRadius: "50%",
   },
 };
 
 export const Spaced = {
   args: {
-    ...Default.args,
     margin: "0.1em",
   },
 };
 
 export const RoundedSpaced = {
   args: {
-    ...Default.args,
     borderRadius: Rounded.args.borderRadius,
     margin: Spaced.args.margin,
   },
 };
 
-export const Tooltip = {
-  args: {
-    ...Default.args,
+export const Tooltip = (inputArgs, context) => {
+  let args = {
+    ...inputArgs,
     showTooltip: true,
-  },
+    theme: themeFromContext(context),
+  };
+  return <PalettePreview {...args} />;
 };
 
 export const Narrow = {
   args: {
-    ...Default.args,
     swatches: 4,
   },
 };
 
 export const Wide = {
   args: {
-    ...Default.args,
     swatches: 8,
   },
 };

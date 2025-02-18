@@ -1,5 +1,7 @@
 import * as PalettePreviewStories from "./PalettePreview.stories";
 
+import { useEffect, useState } from "react";
+
 import PalettePicker from "./PalettePicker";
 import { Provider } from "react-redux";
 import React from "react";
@@ -11,65 +13,86 @@ const meta = {
   decorators: [(story) => <Provider store={colorStore}>{story()}</Provider>],
   tags: ["autodocs"],
   // excludeStories: /.*MockedState$/,
+  args: {
+    swatches: 6,
+    theme: "light",
+  },
 };
 
 export default meta;
 
-export const Default = {
-  args: {
-    swatches: 6,
-  },
+const themeFromContext = (context) => {
+  return context.theme || context.parameters.theme || context.globals.theme;
 };
 
-export const Wide = {
-  args: {
-    swatches: 10,
-  },
+const withThemeFromContext = (Story, context) => {
+  return <Story theme={themeFromContext(context)} />;
 };
 
-export const Narrow = {
-  args: {
-    swatches: 3,
-  },
+export const Default = (inputArgs, context) => (
+  <PalettePicker {...inputArgs} theme={themeFromContext(context)} />
+);
+
+export const Wide = (inputArgs, context) => {
+  let args = { ...inputArgs, swatches: 10, theme: themeFromContext(context) };
+  return <PalettePicker {...args} />;
 };
 
-export const Auto = {
-  args: {
+export const Narrow = (inputArgs, context) => {
+  let args = { ...inputArgs, swatches: 3, theme: themeFromContext(context) };
+  return <PalettePicker {...args} />;
+};
+
+export const Auto = (inputArgs, context) => {
+  let args = {
+    ...inputArgs,
     swatches: undefined,
-  },
+    theme: themeFromContext(context),
+  };
+  return <PalettePicker {...args} />;
 };
 
-export const SoftEdge = {
-  args: {
+export const SoftEdge = (inputArgs, context) => {
+  let args = {
     ...PalettePreviewStories.SoftEdge.args,
-    ...Default.args,
-  },
+    ...inputArgs,
+    theme: themeFromContext(context),
+  };
+  return <PalettePicker {...args} />;
 };
 
-export const Rounded = {
-  args: {
+export const Rounded = (inputArgs, context) => {
+  let args = {
     ...PalettePreviewStories.Rounded.args,
-    ...Default.args,
-  },
+    ...inputArgs,
+    theme: themeFromContext(context),
+  };
+  return <PalettePicker {...args} />;
 };
 
-export const Spaced = {
-  args: {
+export const Spaced = (inputArgs, context) => {
+  let args = {
     ...PalettePreviewStories.Spaced.args,
-    ...Default.args,
-  },
+    ...inputArgs,
+    theme: themeFromContext(context),
+  };
+  return <PalettePicker {...args} />;
 };
 
-export const RoundedSpaced = {
-  args: {
+export const RoundedSpaced = (inputArgs, context) => {
+  let args = {
     ...PalettePreviewStories.RoundedSpaced.args,
-    ...Default.args,
-  },
+    ...inputArgs,
+    theme: themeFromContext(context),
+  };
+  return <PalettePicker {...args} />;
 };
 
-export const Tooltip = {
-  args: {
+export const Tooltip = (inputArgs, context) => {
+  let args = {
     ...PalettePreviewStories.Tooltip.args,
-    ...Default.args,
-  },
+    ...inputArgs,
+    theme: themeFromContext(context),
+  };
+  return <PalettePicker {...args} />;
 };

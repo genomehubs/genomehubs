@@ -32,7 +32,9 @@ const PalettePicker = ({
   showTooltip = false,
   colorScheme,
   theme,
+  args,
 }) => {
+  console.log({ theme });
   const classes = useStyles();
 
   let { darkColor, lightColor, highlightColor } = colorScheme;
