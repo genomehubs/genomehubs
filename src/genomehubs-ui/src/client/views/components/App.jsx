@@ -1,4 +1,5 @@
 import React, { memo, useEffect, useState } from "react";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 //   createTheme,
 //   makeStyles,
 // } from "@material-ui/core/styles";
@@ -9,17 +10,19 @@ import Layout from "./Layout";
 import LoadingScreen from "./LoadingScreen";
 import ReactErrorBoundary from "./ReactErrorBoundary";
 import StylesProvider from "@mui/styles/StylesProvider";
-import { ThemeProvider } from "@mui/styles";
 import classnames from "classnames";
 import { compose } from "recompose";
-import { createTheme } from "@mui/material/styles";
 import { withCookies } from "react-cookie";
 import withLoading from "../hocs/withLoading";
 import withTheme from "../hocs/withTheme";
 
-const muiTheme = createTheme();
-
-const App = ({ theme, cookies, loading }) => {
+const App = ({ theme = "light", cookies, loading }) => {
+  const muiTheme = createTheme({
+    palette: {
+      mode: theme,
+    },
+  });
+  let tracking;
   if (cookies.get("cookieConsent") == "all") {
     tracking = <script src="/zxtm/piwik2.js"></script>;
   }
@@ -45,7 +48,7 @@ const App = ({ theme, cookies, loading }) => {
             </div>
           </div>
         </StylesProvider>
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   }, [theme, cookies, loading]);
   return content;

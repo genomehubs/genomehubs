@@ -1,17 +1,20 @@
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+
 import React from "react";
 /** @type { import('@storybook/react').Preview } */
 import StylesProvider from "@mui/styles/StylesProvider";
-import { ThemeProvider } from "@mui/styles";
-import { createTheme } from "@mui/material/styles";
-import { themes } from "@storybook/theming";
-import withTheme from "../hocs/withTheme";
-import { withThemeByClassName } from "@storybook/addon-themes";
-import { withThemeFromJSXProvider } from "@storybook/addon-themes";
-import { withThemes } from "storybook-addon-themes/react";
-import { withThemesProvider } from "storybook-addon-styled-component-theme";
+
 const theme = "light";
-const lightTheme = createTheme();
-const darkTheme = createTheme();
+const lightTheme = createTheme({
+  palette: {
+    mode: "light",
+  },
+});
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
 
 const ThemeBlock = ({ left, fill, theme, children }) => {
   const lightColor = "#ffffff";
@@ -42,56 +45,48 @@ const ThemeBlock = ({ left, fill, theme, children }) => {
   );
 };
 
-const ThemeWrapper = ({ theme, children, ...props }) => {
+const withStoryTheme = (Story, theme) => {
+  return <Story theme={theme} />;
+};
+
+const ThemeWrapper = ({ theme, left, fill, children }) => {
   const muiTheme = theme === "light" ? lightTheme : darkTheme;
-  return <div className="themelight">{children}</div>;
+  return (
+    <ThemeProvider theme={muiTheme}>
+      <StylesProvider injectFirst>
+        <ThemeBlock left={left} fill={fill} theme={theme}>
+          <div className={`theme${theme}`}>{children}</div>
+        </ThemeBlock>
+      </StylesProvider>
+    </ThemeProvider>
+  );
 };
 
 export const withTheme = (story, context) => {
   // Get values from story parameter first, else fallback to globals
-  const theme = context.parameters.theme || context.globals.theme;
+  const theme = context.parameters.theme || context.globals.theme || "light";
   const muiTheme = theme === "light" ? lightTheme : darkTheme;
   const storyTheme = theme === "dark" ? "themedark" : "themelight";
   //   return <div className={storyTheme}>{Story()}</div>;
-
-  const withLightTheme = (Story) => {
-    return <Story theme={"light"} />;
-  };
-
-  const withDarkTheme = (Story) => {
-    return <Story theme={"dark"} />;
-  };
 
   switch (theme) {
     case "side-by-side": {
       return (
         <>
-          {/* <ThemeProvider theme={lightTheme}>
-            <StylesProvider injectFirst> */}
-          <ThemeBlock left>
-            <ThemeWrapper theme="light">{withLightTheme(story)}</ThemeWrapper>
-          </ThemeBlock>
-          {/* </StylesProvider>
-          </ThemeProvider> */}
-          {/* <ThemeProvider theme={darkTheme}>
-            <StylesProvider injectFirst> */}
-          <ThemeBlock theme="dark">
-            <div className="themedark">{withDarkTheme(story)}</div>
-          </ThemeBlock>
-          {/* </StylesProvider>
-          </ThemeProvider> */}
+          <ThemeWrapper theme="light" left>
+            {withStoryTheme(story, "light")}
+          </ThemeWrapper>
+          <ThemeWrapper theme="dark">
+            {withStoryTheme(story, "dark")}
+          </ThemeWrapper>
         </>
       );
     }
     default: {
       return (
-        // <ThemeProvider theme={muiTheme}>
-        //   <StylesProvider injectFirst>
-        <ThemeBlock fill theme={theme}>
-          <div className="themedark">{story()}</div>
-        </ThemeBlock>
-        //   </StylesProvider>
-        // </ThemeProvider>
+        <ThemeWrapper theme={theme} fill>
+          {withStoryTheme(story, theme)}
+        </ThemeWrapper>
       );
     }
   }
