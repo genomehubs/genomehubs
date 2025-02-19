@@ -26,6 +26,7 @@ import { compose } from "recompose";
 import { line as d3Line } from "d3-shape";
 import dispatchMessage from "../hocs/dispatchMessage";
 import { fadeColor } from "../functions/fadeColor";
+import { mixColor } from "../functions/mixColor";
 import { processLegendData } from "./MultiCatLegend";
 import qs from "../functions/qs";
 import { scaleLinear } from "d3-scale";
@@ -35,6 +36,7 @@ import useResize from "../hooks/useResize";
 import withColors from "../hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";
 import withSiteName from "../hocs/withSiteName";
+import withTheme from "../hocs/withTheme";
 import { zLegend } from "./zLegend";
 
 const searchByPoint = ({ props, chartProps }) => {
@@ -82,13 +84,14 @@ const CustomDot = (props, chartProps) => {
 
 const CustomCircle = (props, chartProps) => {
   let { cx, cy, height: r, fill } = props;
-  let { pointSize, pointRatio, selectMode, active } = chartProps;
+  let { pointSize, pointRatio, selectMode, active, axisColor } = chartProps;
+
   let dot = (
     <Dot
       cx={cx}
       cy={cy}
       r={(pointSize * pointRatio) / 2}
-      stroke={active ? "rgb(102,102,102)" : "none"}
+      stroke={active ? axisColor : "none"}
       fill={fill}
       style={{
         cursor: active && selectMode == "point" ? "pointer" : "default",
@@ -534,6 +537,7 @@ const Heatmap = ({
   let yDomain = isNaN(yBuckets[0])
     ? [0, yBuckets.length - 1]
     : [yBuckets[0], yBuckets[yBuckets.length - 1]];
+  let { axisColor } = chartProps;
   let axes = [
     <CartesianGrid key={"grid"} strokeDasharray="3 3" />,
     <XAxis
@@ -547,7 +551,7 @@ const Heatmap = ({
       ticks={isNaN(buckets[0]) ? buckets.map((x, i) => i) : buckets}
       tick={(props) =>
         ReportXAxisTick({
-          props,
+          props: { ...props, fill: axisColor },
           buckets,
           fmt: chartProps.xFormat,
           translations: chartProps.translations,
@@ -564,6 +568,8 @@ const Heatmap = ({
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
       interval={0}
       style={{ textAnchor: buckets.length > 15 ? "end" : "auto" }}
+      axisLine={{ stroke: axisColor }}
+      tickLine={{ stroke: axisColor }}
     >
       <Label
         value={xLabel}
@@ -571,7 +577,7 @@ const Heatmap = ({
         dy={0}
         position="bottom"
         dominantBaseline={"text-after-edge"}
-        fill="#666"
+        fill={axisColor}
         fontSize={chartProps.pointSize}
         fontWeight="bold"
         pointerEvents={"none"}
@@ -585,7 +591,7 @@ const Heatmap = ({
       ticks={isNaN(yBuckets[0]) ? yBuckets.map((y, i) => i) : yBuckets}
       tick={(props) =>
         CustomizedYAxisTick({
-          props,
+          props: { ...props, fill: axisColor },
           buckets: yBuckets,
           orientation: yOrientation,
           fmt: chartProps.yFormat,
@@ -605,12 +611,14 @@ const Heatmap = ({
       range={yDomain}
       tickFormatter={chartProps.showYTickLabels ? chartProps.yFormat : () => ""}
       interval={0}
+      axisLine={{ stroke: axisColor }}
+      tickLine={{ stroke: axisColor }}
     >
       <Label
         value={yLabel}
         offset={marginWidth + 60 - chartProps.pointSize}
         position="insideRight"
-        fill="#666"
+        fill={axisColor}
         angle={-90}
         style={{ textAnchor: "middle" }}
         fontSize={chartProps.pointSize}
@@ -741,6 +749,11 @@ const Heatmap = ({
                 CustomCircle(props, {
                   ...chartProps,
                   active: currentSeries === false || currentSeries == i,
+                  axisColor: mixColor({
+                    color1: axisColor,
+                    color2: "#999999",
+                    ratio: 0.5,
+                  }),
                 })
               }
               zAxisId={1}
@@ -829,7 +842,9 @@ const ReportScatter = ({
   colors,
   levels,
   colorPalette,
+  colorScheme,
   palettes,
+  theme,
   minDim,
   setMinDim,
   xOpts,
@@ -1078,6 +1093,7 @@ const ReportScatter = ({
           location,
           basename,
           compactLegend,
+          axisColor: colorScheme[theme].darkColor,
         }}
       />
     );
@@ -1095,6 +1111,7 @@ export default compose(
   memo,
   withSiteName,
   dispatchMessage,
+  withTheme,
   withColors,
   withReportTerm,
 )(ReportScatter);

@@ -9,6 +9,8 @@ $codeFontFamily: "Roboto Mono", "Courier New", Courier, monospace;
 $bodyFontSize: 11pt;
 $lightScheme: light;
 $darkScheme: dark;
+$blackToDarkColor: invert(17%) sepia(14%) saturate(765%) hue-rotate(198deg) brightness(98%) contrast(91%);
+$blackToLightColor: invert(100%) brightness(90%);
 
 $themes: (
   light: (
@@ -25,6 +27,7 @@ $themes: (
     ancestral: colors.$ancestralColor,
     colorScheme: $lightScheme,
     link: colors.$linkColor,
+    blackToPrimary: $blackToDarkColor,
   ),
   dark: (
     primary: colors.$lightColor,
@@ -40,6 +43,7 @@ $themes: (
     ancestral: colors.$ancestralColor,
     colorScheme: $darkScheme,
     link: colors.$highlightColor,
+    blackToPrimary: $blackToLightColor,
   ),
 );
 

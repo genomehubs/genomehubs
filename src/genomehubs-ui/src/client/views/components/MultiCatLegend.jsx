@@ -87,7 +87,13 @@ export const processLegendData = ({
   };
 };
 
-export const valueString = ({ stats, cellSize, pointSize, fill }) => {
+export const valueString = ({
+  stats,
+  cellSize,
+  pointSize,
+  fill,
+  axisColor = "#999999",
+}) => {
   let value, string;
   if (stats) {
     if (stats.sum) {
@@ -103,7 +109,7 @@ export const valueString = ({ stats, cellSize, pointSize, fill }) => {
         <Text
           x={-5}
           y={cellSize * 1.15}
-          fill={"rgb(102, 102, 102)"}
+          fill={axisColor}
           dominantBaseline={"alphabetic"}
           textAnchor={"end"}
           fontSize={pointSize}
@@ -127,7 +133,7 @@ export const valueString = ({ stats, cellSize, pointSize, fill }) => {
         <text
           x={-5}
           y={cellSize}
-          fill={"rgb(102, 102, 102)"}
+          fill={axisColor}
           dominantBaseline={"alphabetic"}
           textAnchor={"end"}
           fontSize={pointSize}
@@ -202,7 +208,13 @@ const MultiCatLegend = ({
 
   let value;
   if (!compactLegend) {
-    ({ value } = valueString({ stats, cellSize, pointSize, fill }));
+    ({ value } = valueString({
+      stats,
+      cellSize,
+      pointSize,
+      fill,
+      axisColor: colorScheme[theme].darkColor,
+    }));
   }
   let strokeWidth = pointSize / 5;
   let bgRect;

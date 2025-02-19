@@ -717,14 +717,14 @@ body,
         margin: -0.25em -0.25em 0.25em -0.25em;
         padding: 0.5em 0.75em;
         color: themes.themed("secondary");
-        background-color: themes.themed("primary");
+        background-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 85%);
         border-radius: 0.25em;
 
         .identifier {
           float: right;
 
           &Prefix {
-            color: rgba(themes.themed("primary"), 0.75);
+            color: color.mix(themes.themed("primary"), themes.themed("secondary"), 85%);
             font-size: 0.8em;
             line-height: 1em;
           }
@@ -1156,7 +1156,7 @@ body,
     }
 
     .blackToPrimary {
-      filter: invert(17%) sepia(14%) saturate(765%) hue-rotate(198deg) brightness(98%) contrast(91%);
+      filter: themes.themed("blackToPrimary");
     }
 
     .blackToDirect {
