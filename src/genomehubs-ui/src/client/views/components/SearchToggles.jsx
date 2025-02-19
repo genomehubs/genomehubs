@@ -135,7 +135,7 @@ const SearchToggles = ({
                       `${location.pathname}?${qs.stringify({
                         ...options,
                         query,
-                      })}${hash}`
+                      })}${hash}`,
                     );
                   }}
                   name="filter-type"
@@ -189,7 +189,7 @@ const SearchToggles = ({
                       if (includeDescendants) {
                         query = query.replaceAll(
                           /tax_(:?eq|name)/gi,
-                          "tax_tree"
+                          "tax_tree",
                         );
                         hash = hash.replaceAll(/tax_(:?eq|name)/gi, "tax_tree");
                       } else {
@@ -200,7 +200,7 @@ const SearchToggles = ({
                         `${location.pathname}?${qs.stringify({
                           ...options,
                           query,
-                        })}${hash}`
+                        })}${hash}`,
                       );
                     }}
                     name="filter-type"
@@ -244,7 +244,7 @@ const SearchToggles = ({
                           `${location.pathname}?${qs.stringify({
                             ...options,
                             includeEstimates,
-                          })}${location.hash}`
+                          })}${location.hash}`,
                         );
                       }}
                       name="include-estimates"
@@ -269,7 +269,7 @@ const SearchToggles = ({
                     view: window,
                     bubbles: true,
                     cancelable: true,
-                  })
+                  }),
                 );
               }, 20);
               setShowSettings(true);
@@ -319,7 +319,7 @@ const SearchToggles = ({
                     view: window,
                     bubbles: true,
                     cancelable: true,
-                  })
+                  }),
                 );
               }, 20);
               setShowOptions(true);
@@ -395,5 +395,5 @@ export default compose(
   withSiteName,
   dispatchLookup,
   withSearch,
-  withSearchDefaults
+  withSearchDefaults,
 )(SearchToggles);

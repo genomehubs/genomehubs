@@ -8,7 +8,8 @@
     "client": "NODE_OPTIONS='--max-http-header-size=100000 --trace-deprecation' webpack serve --mode development",
     "test": "echo \"Error: no test specified\" && exit 1",
     "storybook": "storybook dev -p 6006 --debug-webpack",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "chromatic": "npx chromatic"
   },
   "repository": {
     "type": "git",
@@ -47,6 +48,7 @@
     "babel-plugin-import": "^1.13.3",
     "babel-plugin-react-docgen": "^4.2.1",
     "babel-plugin-transform-imports": "^2.0.0",
+    "chromatic": "^11.25.2",
     "copy-webpack-plugin": "^12.0.2",
     "css-loader": "^7.1.2",
     "dotenv": "^16.4.5",

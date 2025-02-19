@@ -7,6 +7,8 @@ $titleFontFamily: "Signika", "Helvetica Neue", Helvetica, Arial, sans-serif;
 $bodyFontFamily: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 $codeFontFamily: "Roboto Mono", "Courier New", Courier, monospace;
 $bodyFontSize: 11pt;
+$lightScheme: light;
+$darkScheme: dark;
 
 $themes: (
   light: (
@@ -21,6 +23,8 @@ $themes: (
     direct: colors.$directColor,
     descendant: colors.$descendantColor,
     ancestral: colors.$ancestralColor,
+    colorScheme: $lightScheme,
+    link: colors.$linkColor,
   ),
   dark: (
     primary: colors.$lightColor,
@@ -34,6 +38,8 @@ $themes: (
     direct: colors.$directColor,
     descendant: colors.$descendantColor,
     ancestral: colors.$ancestralColor,
+    colorScheme: $darkScheme,
+    link: colors.$highlightColor,
   ),
 );
 
@@ -43,7 +49,7 @@ $themes: (
 
 @mixin themify($themes: $themes) {
   @each $theme, $map in $themes {
-    :global(.theme#{$theme}) & {
+    :global(.theme-#{$theme}) & {
       $themeMap: () !global;
       @each $key, $submap in $map {
         $value: map.get(map.get($themes, $theme), "#{$key}");

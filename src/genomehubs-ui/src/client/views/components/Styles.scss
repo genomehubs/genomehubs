@@ -36,7 +36,7 @@ body,
 
 .app {
   @include themes.themify(themes.$themes) {
-    background: themes.themed("secondary");
+    background-color: themes.themed("secondary");
     color: themes.themed("primary");
     font-family: themes.themed("bodyFont");
     font-size: themes.themed("bodyFontSize");
@@ -84,6 +84,16 @@ body,
     // font-family: inherit;
     // font-size: inherit;
     // transition: inherit;
+
+    // .wrapper {
+        // background-color: themes.themed("secondary");
+        // color: themes.themed("primary");
+        color-scheme: themes.themed("colorScheme");
+        // font-family: themes.themed("bodyFont");
+        // font-size: themes.themed("bodyFontSize");
+        // transition: all 0.3s ease-in 0s;
+    // }
+    
 
     h1,
     h2,
@@ -233,7 +243,7 @@ body,
     a:link,
     a:visited {
       text-decoration: underline;
-      color: #1f78b4;
+      color: themes.themed("link");
       cursor: pointer;
     }
 
@@ -283,13 +293,13 @@ body,
 
       &Container {
         position: relative;
-        border: solid #f0f0f0 0.1em;
+        border: solid color.mix(themes.themed("primary"), themes.themed("secondary"), 5%) 0.1em;
         border-radius: 0.25em;
       }
 
       &Header {
         position: relative;
-        background-color: #f0f0f0;
+        background-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 5%);
         min-height: 1.5em;
 
         .saveSearchOptions {
@@ -338,7 +348,7 @@ body,
       // background: mix(themed('primary'),themed('secondary'),50%);
       // color: themed('secondary');
       border-bottom: 0.2em solid themes.themed("primary");
-      height: 2em;
+      height: 2.2em;
       flex: none;
       z-index: 1;
       background: themes.themed("secondary");
@@ -350,6 +360,7 @@ body,
 
       .siteText {
         background: rgba(themes.themed("primary"), 0.5);
+        height: 2em;
       }
 
       .siteLogo {
@@ -555,13 +566,13 @@ body,
 
       &1Column {
         .infoPane {
-          width: 100%;
+          width: 100%
         }
       }
 
       .link {
         text-decoration: underline;
-        color: #1f78b4;
+        color: themes.themed("link");
         cursor: pointer;
       }
 
@@ -670,7 +681,7 @@ body,
     }
 
     a.link {
-      color: #1f78b4;
+      color: themes.themed("link");
     }
 
     input.chip {
@@ -1035,8 +1046,7 @@ body,
 
     blockquote {
       background: rgba(themes.themed("primary"), 0.05);
-      background: #f0f6fa; //#00616411;
-      border-left: 10px solid #d2e4f0; //#00616433;
+      border-left: 10px solid themes.themed("link");
       font-family: themes.themed("bodyFont");
       margin: 1.5em 10px;
       padding: 0.5em 10px;
@@ -1477,7 +1487,7 @@ body,
           position: sticky;
           top: 0;
           z-index: 200;
-          background-color: #f8f8f8;
+          background-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 5%);
 
           tr {
             th: {
@@ -1589,7 +1599,7 @@ body,
       a,
       .link {
         text-decoration: underline;
-        color: #1f78b4;
+        color: themes.themed("link");
         cursor: pointer;
       }
 

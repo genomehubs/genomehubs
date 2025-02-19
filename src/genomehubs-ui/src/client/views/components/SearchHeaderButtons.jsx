@@ -26,13 +26,13 @@ const SearchHeaderButtons = ({
 
   const [favourites, setFavourites] = useLocalStorage(
     `${searchIndex}Favourites`,
-    {}
+    {},
   );
 
   const { searchTerm, reportTerm } = splitTerms(urlTerm);
   const stringTerm = JSON.stringify({ ...searchTerm, ...reportTerm });
   const [isFavourite, setIsFavourite] = useState(
-    favourites[stringTerm] || false
+    favourites[stringTerm] || false,
   );
 
   const handleClickFavourite = () => {

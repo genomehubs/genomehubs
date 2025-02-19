@@ -210,6 +210,7 @@ export const lightThemeColors = {
   paleColor: "#D7CDCC",
   brightColor: "#FFFF1E",
   clearColor: "#FFFFFF00", // 0% opacity
+  linkColor: "#1f78b4",
 };
 
 // invert light and dark colors for dark theme
@@ -223,9 +224,10 @@ export const darkThemeColors = {
   paleColor: "#D7CDCC",
   brightColor: "#FFFF1E",
   clearColor: "#FFFFFF00", // 0% opacity
+  linkColor: "#1f78b4",
 };
 
-const defaultTheme = "light";
+const defaultTheme = "dark";
 
 export const setTheme = createAction("SET_THEME");
 export const theme = handleAction(
@@ -239,7 +241,7 @@ export const setColorScheme = createAction("SET_COLOR_SCHEME");
 export const colorScheme = handleAction(
   "SET_COLOR_SCHEME",
   (state, action) => action.payload,
-  defaultTheme === "light" ? lightThemeColors : darkThemeColors,
+  { light: lightThemeColors, dark: darkThemeColors },
 );
 
 export const getColorScheme = (state) => state.colorScheme;

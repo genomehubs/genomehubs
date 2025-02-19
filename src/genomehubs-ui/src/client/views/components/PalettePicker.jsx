@@ -18,7 +18,8 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     scrollbarGutter: "stable both-edges",
     fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
-    color: "white",
+    color: theme.palette.text.primary,
+    backgroundColor: theme.palette.background.default,
   },
 }));
 
@@ -31,13 +32,12 @@ const PalettePicker = ({
   margin = "0em",
   showTooltip = false,
   colorScheme,
-  theme,
+  theme = "light",
   args,
 }) => {
-  console.log({ theme });
   const classes = useStyles();
 
-  let { darkColor, lightColor, highlightColor } = colorScheme;
+  let { darkColor, lightColor, highlightColor } = colorScheme[theme];
   let backgroundColor = theme === "dark" ? darkColor : lightColor;
 
   let textColor = theme === "dark" ? lightColor : darkColor;

@@ -1,9 +1,8 @@
-import * as PalettePreviewStories from "./PalettePreview.stories";
-
 import { Provider } from "react-redux";
 import React from "react";
 import Tooltip from "./Tooltip";
 import colorStore from "../reducers/color.store";
+import { themeFromContext } from "../../../../.storybook/functions/themeFromContext";
 
 const meta = {
   component: Tooltip,
@@ -18,10 +17,6 @@ const meta = {
 };
 
 export default meta;
-
-const themeFromContext = (context) => {
-  return context.theme || context.parameters.theme || context.globals.theme;
-};
 
 const StyledElement = (
   <div style={{ height: "2em", width: "2em", backgroundColor: "red" }}></div>

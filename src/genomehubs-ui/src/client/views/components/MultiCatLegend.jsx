@@ -3,8 +3,11 @@ import { Rectangle, Text } from "recharts";
 import React from "react";
 import Tooltip from "./Tooltip";
 import { active as activeStyle } from "./Styles.scss";
+import { compose } from "recompose";
 import formats from "../functions/formats";
 import stringLength from "../functions/stringLength";
+import withColors from "#hocs/withColors";
+import withTheme from "#hocs/withTheme";
 
 export const processLegendData = ({
   bounds,
@@ -167,6 +170,8 @@ const MultiCatLegend = ({
   compactLegend,
   handleClick,
   active,
+  colorScheme,
+  theme,
 }) => {
   if (!legendWidth) {
     legendWidth = pointSize * 10;
@@ -211,7 +216,7 @@ const MultiCatLegend = ({
           className={activeStyle}
           height={cellSize * (compactLegend ? 1 : 2) + strokeWidth * 2}
           width={bgWidth}
-          fill={"white"}
+          fill={colorScheme[theme].lightColor}
           fillOpacity={0}
           stroke={fill || "rgb(102, 102, 102)"}
           strokeOpacity={active ? 1 : 0}
@@ -269,4 +274,4 @@ const MultiCatLegend = ({
   );
 };
 
-export default MultiCatLegend;
+export default compose(withTheme, withColors)(MultiCatLegend);

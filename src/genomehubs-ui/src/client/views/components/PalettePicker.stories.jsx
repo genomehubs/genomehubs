@@ -1,11 +1,10 @@
 import * as PalettePreviewStories from "./PalettePreview.stories";
 
-import { useEffect, useState } from "react";
-
 import PalettePicker from "./PalettePicker";
 import { Provider } from "react-redux";
 import React from "react";
 import colorStore from "../reducers/color.store";
+import { themeFromContext } from "../../../../.storybook/functions/themeFromContext";
 
 const meta = {
   component: PalettePicker,
@@ -20,14 +19,6 @@ const meta = {
 };
 
 export default meta;
-
-const themeFromContext = (context) => {
-  return context.theme || context.parameters.theme || context.globals.theme;
-};
-
-const withThemeFromContext = (Story, context) => {
-  return <Story theme={themeFromContext(context)} />;
-};
 
 export const Default = (inputArgs, context) => (
   <PalettePicker {...inputArgs} theme={themeFromContext(context)} />

@@ -55,7 +55,7 @@ const ThemeWrapper = ({ theme, left, fill, children }) => {
     <ThemeProvider theme={muiTheme}>
       <StylesProvider injectFirst>
         <ThemeBlock left={left} fill={fill} theme={theme}>
-          <div className={`theme${theme}`}>{children}</div>
+          <div className={`theme-${theme}`}>{children}</div>
         </ThemeBlock>
       </StylesProvider>
     </ThemeProvider>
@@ -66,7 +66,7 @@ export const withTheme = (story, context) => {
   // Get values from story parameter first, else fallback to globals
   const theme = context.parameters.theme || context.globals.theme || "light";
   const muiTheme = theme === "light" ? lightTheme : darkTheme;
-  const storyTheme = theme === "dark" ? "themedark" : "themelight";
+  const storyTheme = theme === "dark" ? "theme-dark" : "theme-light";
   //   return <div className={storyTheme}>{Story()}</div>;
 
   switch (theme) {
@@ -105,8 +105,8 @@ const preview = {
     withTheme,
     // withThemeByClassName({
     //   themes: {
-    //     light: "themelight",
-    //     dark: "themedark",
+    //     light: "theme-light",
+    //     dark: "theme-dark",
     //   },
     //   defaultTheme: theme,
     // }),
@@ -120,7 +120,7 @@ const preview = {
     // (Story, context) => {
     //   // Get the active theme value from the story parameter
     //   const { theme } = context.parameters;
-    //   const storyTheme = theme === "dark" ? "themedark" : "themelight";
+    //   const storyTheme = theme === "dark" ? "theme-dark" : "theme-light";
     //   return <div className={storyTheme}>{Story()}</div>;
     // },
   ],

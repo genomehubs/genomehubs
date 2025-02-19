@@ -15,6 +15,7 @@ import { recordLinkIcon as recordLinkIconStyle } from "./Styles.scss";
 import withApi from "../hocs/withApi";
 import withColors from "../hocs/withColors";
 import withRecord from "../hocs/withRecord";
+import withTheme from "../hocs/withTheme";
 
 const RecordLabel = ({
   record,
@@ -26,13 +27,18 @@ const RecordLabel = ({
   condition,
   label,
   description,
-  color = "#1f78b4",
+  color,
+  colorScheme,
+  theme,
   levels,
   colors,
   icon,
   EndIcon = LaunchIcon,
 }) => {
   let contrast;
+  if (!color) {
+    color = colorScheme[theme].linkColor;
+  }
   useEffect(() => {
     if (
       condition?.startsWith("assembly.") &&
@@ -223,4 +229,4 @@ const RecordLabel = ({
   return chip;
 };
 
-export default compose(withApi, withColors, withRecord)(RecordLabel);
+export default compose(withApi, withTheme, withColors, withRecord)(RecordLabel);
