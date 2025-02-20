@@ -120,11 +120,6 @@ const StickyCell = withStyles((theme) => ({
     position: "sticky",
     left: 0,
     zIndex: 100,
-    backgroundColor: mixColor({
-      color1: theme.palette.background.paper,
-      color2: theme.palette.text.primary,
-      ratio: 0.1,
-    }),
   },
 }))(TableCell);
 

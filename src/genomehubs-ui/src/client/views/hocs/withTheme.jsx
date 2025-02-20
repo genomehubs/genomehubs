@@ -1,10 +1,4 @@
-import {
-  darkThemeColors,
-  getTheme,
-  lightThemeColors,
-  setColorScheme,
-  setTheme,
-} from "../reducers/color";
+import { getTheme, setTheme } from "../reducers/color";
 
 import React from "react";
 import { connect } from "react-redux";
@@ -17,9 +11,6 @@ const withTheme = (WrappedComponent) => (props) => {
   const mapDispatchToProps = (dispatch) => ({
     setTheme: (theme) => {
       dispatch(setTheme(theme));
-      dispatch(
-        setColorScheme(theme === "light" ? lightThemeColors : darkThemeColors),
-      );
     },
   });
 

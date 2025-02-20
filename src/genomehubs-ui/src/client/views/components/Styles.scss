@@ -1510,6 +1510,8 @@ body,
           tr {
             td:first-of-type {
               border-right: solid color.mix(themes.themed("primary"), themes.themed("secondary"), 10%) 3px;
+              background-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 5%);
+
             }
           }
           tr:last-of-type {

@@ -18,12 +18,42 @@ import { withCookies } from "react-cookie";
 import withLoading from "../hocs/withLoading";
 import withTheme from "../hocs/withTheme";
 
-const App = ({ theme = "dark", cookies, loading, colorScheme }) => {
+const App = ({ theme = "dark", setTheme, cookies, loading, colorScheme }) => {
   const backgroundColor = colorScheme[theme].lightColor;
+  console.log("colorScheme", colorScheme);
   const muiTheme = createTheme({
     palette: {
       mode: theme,
       background: { default: backgroundColor, paper: backgroundColor },
+      // button color
+      button: {
+        // main: colorScheme[theme].darkColor,
+        // light: colorScheme[theme].darkColor,
+        // dark: colorScheme[theme].darkColor,
+        // primary: colorScheme[theme].darkColor,
+        // hover: colorScheme[theme].deepColor,
+        // contrastText: colorScheme[theme].lightColor,
+
+        main: colorScheme[theme].paleColor,
+        light: colorScheme[theme].paleColor,
+        dark: colorScheme[theme].paleColor,
+        primary: colorScheme[theme].paleColor,
+        hover: colorScheme[theme].hoverColor,
+        contrastText: colorScheme[theme].darkColor,
+      },
+    },
+    components: {
+      MuiSwitch: {
+        styleOverrides: {
+          MuiFormControlLabel: {
+            styleOverrides: {
+              label: {
+                color: colorScheme[theme].darkColor,
+              },
+            },
+          },
+        },
+      },
     },
   });
   let tracking;
@@ -31,6 +61,14 @@ const App = ({ theme = "dark", cookies, loading, colorScheme }) => {
     tracking = <script src="/zxtm/piwik2.js"></script>;
   }
   const [content, setContent] = useState(null);
+  useEffect(() => {
+    // add event listenerr to detect changes in preferred color scheme
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    mq.addEventListener("change", (evt) =>
+      setTheme(evt.matches ? "dark" : "light"),
+    );
+  }, []);
+
   useEffect(() => {
     if (loading == "finished") {
       return;

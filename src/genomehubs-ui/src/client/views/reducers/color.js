@@ -203,11 +203,12 @@ export const getDefaultPalette = createSelector(
 export const lightThemeColors = {
   darkColor: "#31323F",
   lightColor: "#FFFFFF",
+  paleColor: "#E0E0E0",
+  hoverColor: "#C0C0C0",
   shadeColor: "#59656F",
   deepColor: "#414A51",
   highlightColor: "#9C528B",
   halfHighlightColor: "#9C528B80", // 50% opacity
-  paleColor: "#D7CDCC",
   brightColor: "#FFFF1E",
   clearColor: "#FFFFFF00", // 0% opacity
   linkColor: "#1f78b4",
@@ -217,17 +218,19 @@ export const lightThemeColors = {
 export const darkThemeColors = {
   darkColor: "#FFFFFF",
   lightColor: "#31323F",
+  paleColor: "#515261",
+  hoverColor: "#717281",
   shadeColor: "#9C528B",
   deepColor: "#414A51",
   highlightColor: "#59656F",
   halfHighlightColor: "#59656F80", // 50% opacity
-  paleColor: "#D7CDCC",
   brightColor: "#FFFF1E",
   clearColor: "#FFFFFF00", // 0% opacity
   linkColor: "#1f78b4",
 };
 
-const defaultTheme = "dark";
+const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+const defaultTheme = prefersDark ? "dark" : "light";
 
 export const setTheme = createAction("SET_THEME");
 export const theme = handleAction(

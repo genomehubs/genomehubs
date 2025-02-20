@@ -36,15 +36,15 @@ export const useStyles = makeStyles((theme) => ({
     width: "400px",
     maxWidth: "75vw",
     maxHeight: "75vh",
-    backgroundColor: "white",
-    border: "2px solid #000",
+    backgroundColor: theme.palette.background.paper,
+    border: `2px solid ${theme.palette.primary.main}`,
     boxShadow: "#333333", // theme.shadows[5],
     padding: "16px 32px 24px",
     overflowX: "hidden",
   },
-  label: {
-    color: "rgba(0, 0, 0, 0.54)",
-  },
+  // label: {
+  //   color: "rgba(0, 0, 0, 0.54)",
+  // },
 }));
 
 // const handleValueChange =
