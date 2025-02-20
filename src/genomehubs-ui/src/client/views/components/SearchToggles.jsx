@@ -42,9 +42,6 @@ export const useStyles = makeStyles((theme) => ({
     padding: "16px 32px 24px",
     overflowX: "hidden",
   },
-  // label: {
-  //   color: "rgba(0, 0, 0, 0.54)",
-  // },
 }));
 
 // const handleValueChange =
@@ -114,7 +111,6 @@ const SearchToggles = ({
           >
             <FormHelperText>{"empty columns"}</FormHelperText>
             <FormControlLabel
-              className={classes.label}
               control={
                 <Switch
                   id={"show-empty-columns"}
@@ -173,7 +169,6 @@ const SearchToggles = ({
             >
               <FormHelperText>{"include descendants"}</FormHelperText>
               <FormControlLabel
-                className={classes.label}
                 control={
                   <Switch
                     id={"taxon-filter-filter"}
@@ -230,7 +225,6 @@ const SearchToggles = ({
               >
                 <FormHelperText>{"include estimates"}</FormHelperText>
                 <FormControlLabel
-                  className={classes.label}
                   control={
                     <Switch
                       id={"estimated-values-filter"}

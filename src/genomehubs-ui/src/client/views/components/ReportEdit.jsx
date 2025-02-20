@@ -21,7 +21,6 @@ import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
 import { getSuggestedTerm } from "../reducers/search";
-import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import withReportById from "../hocs/withReportById";
 import withSiteName from "../hocs/withSiteName";
@@ -226,12 +225,6 @@ const reportTypes = [
 
 const reversibleProps = new Set(["rank", "cat"]);
 
-export const useStyles = makeStyles((theme) => ({
-  label: {
-    color: "rgba(0, 0, 0, 0.54)",
-  },
-}));
-
 export const ReportEdit = ({
   reportId,
   reportById,
@@ -243,7 +236,6 @@ export const ReportEdit = ({
   types,
   basename,
 }) => {
-  const classes = useStyles();
   const formRef = useRef();
   const [values, setValues] = useState({});
   let query = qs.parse(reportById.report?.queryString);
@@ -549,7 +541,6 @@ export const ReportEdit = ({
         <div style={{ float: "left", marginRight: "2em" }} key={queryProp}>
           <FormControl variant="standard" key={queryProp}>
             <FormControlLabel
-              className={classes.label}
               control={
                 <Switch
                   id={`report-${queryProp}`}

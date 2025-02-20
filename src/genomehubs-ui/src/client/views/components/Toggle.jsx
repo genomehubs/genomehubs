@@ -38,7 +38,7 @@ const Toggle = ({
           container
           direction="row"
           style={{
-            backgroundColor: "#d2e4f0",
+            backgroundColor: `${linkColor}33`,
             borderBottom: showContent ? `0.2em solid ${linkColor}66` : "none",
             width: "100%",
           }}

@@ -222,11 +222,11 @@ export const darkThemeColors = {
   hoverColor: "#717281",
   shadeColor: "#9C528B",
   deepColor: "#414A51",
-  highlightColor: "#59656F",
-  halfHighlightColor: "#59656F80", // 50% opacity
+  highlightColor: "#b584f0",
+  halfHighlightColor: "#b584f080", // 50% opacity
   brightColor: "#FFFF1E",
   clearColor: "#FFFFFF00", // 0% opacity
-  linkColor: "#1f78b4",
+  linkColor: "#8263a8",
 };
 
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;

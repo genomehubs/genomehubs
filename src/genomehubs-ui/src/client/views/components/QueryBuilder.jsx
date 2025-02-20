@@ -433,7 +433,6 @@ const QueryBuilder = ({
             <Grid>
               <FormControl variant="standard" className={classes.formControl}>
                 <FormControlLabel
-                  className={classes.label}
                   control={
                     <Switch
                       id={"taxon-filter-estimates"}
