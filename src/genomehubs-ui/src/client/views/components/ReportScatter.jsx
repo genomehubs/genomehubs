@@ -295,11 +295,11 @@ const eqnToLine = (eqn, { x: xMin, y: yMin, xBound, yBound, xAxis, yAxis }) => {
 const HighlightShape = (props, chartProps) => {
   let { cx, cy, xAxis, yAxis } = props;
   let { x, y, xBound, yBound, label } = props.payload;
-  let { eqn } = chartProps;
+  let { eqn, axisColor } = chartProps;
   let height = yAxis.scale(yBound) - cy;
   let width = xAxis.scale(xBound) - cx;
   let text, rect, path;
-  let color = "black";
+  let color = axisColor;
   if (label) {
     text = (
       <Text
