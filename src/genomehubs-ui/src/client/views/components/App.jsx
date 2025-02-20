@@ -20,7 +20,6 @@ import withTheme from "../hocs/withTheme";
 
 const App = ({ theme = "dark", setTheme, cookies, loading, colorScheme }) => {
   const backgroundColor = colorScheme[theme].lightColor;
-  console.log("colorScheme", colorScheme);
   const muiTheme = createTheme({
     palette: {
       mode: theme,

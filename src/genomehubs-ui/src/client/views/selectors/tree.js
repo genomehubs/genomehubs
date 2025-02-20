@@ -136,8 +136,8 @@ const setColor = ({ node, yQuery, recurse, hideSourceColors }) => {
   let min;
   let max;
   if (!recurse) {
-    color = "white";
-    highlightColor = "white";
+    color = "#ffffff00";
+    highlightColor = "#ffffff00";
   } else if (yQuery) {
     let status = node.status ? 2 : hideSourceColors || !node.fields ? 2 : 1;
     if (node.fields && node.fields[field]) {

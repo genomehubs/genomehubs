@@ -17,6 +17,7 @@ import truncate from "../functions/truncate";
 import useImage from "use-image";
 import withPhylopicsById from "../hocs/withPhylopicsById";
 import withRecord from "../hocs/withRecord";
+import withTheme from "#hocs/withTheme";
 
 const styleMap = {
   imageCreditStyle,
@@ -53,6 +54,7 @@ const PhyloPics = ({
   fixedRatio,
   embed,
   transform,
+  theme,
   ...props
 }) => {
   const [metadata, setMetadata] = useState({});
@@ -223,6 +225,13 @@ const PhyloPics = ({
             height={maxHeight}
             width={maxWidth}
             xlinkHref={dataUri}
+            style={
+              theme == "dark"
+                ? {
+                    filter: "invert(1) brightness(.9)",
+                  }
+                : {}
+            }
           />
           <Tooltip
             title={imageDescription}
@@ -294,4 +303,9 @@ const PhyloPics = ({
   );
 };
 
-export default compose(withRecord, withPhylopicsById, memo)(PhyloPics);
+export default compose(
+  withTheme,
+  withRecord,
+  withPhylopicsById,
+  memo,
+)(PhyloPics);
