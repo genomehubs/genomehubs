@@ -348,10 +348,16 @@ body,
       // background: mix(themed('primary'),themed('secondary'),50%);
       // color: themed('secondary');
       border-bottom: 0.2em solid themes.themed("primary");
-      height: 2.2em;
+      height: 2em;
       flex: none;
       z-index: 1;
-      background: themes.themed("secondary");
+      background-color: themes.themed("header");
+        font-family: themes.themed("titleFont");
+        font-size: 1.1em;
+        min-width: 100%;
+        overflow: visible;
+        width: 100%;
+        color: themes.themed("headerText");
 
       &.error {
         background: themes.themed("ancestral");
@@ -359,33 +365,35 @@ body,
       }
 
       .siteText {
-        background: rgba(themes.themed("primary"), 0.5);
-        height: 2em;
+        // background: rgba(themes.themed("header"), 0.5);
+        height: 2rem;
       }
 
       .siteLogo {
-        height: 1.8em;
-        width: 1.8em;
+        height: 2rem;
+        width: 2rem;
         margin: 0;
         float: left;
-        color: themes.themed("primary");
+        color: themes.themed("header");
         // background: rgba(themed("primary"), 0.5);
+        overflow: hidden;
       }
 
       .siteName {
         cursor: pointer;
         font-family: themes.themed("titleFont");
         font-size: 120%;
-        line-height: 1.8em;
+        line-height: 2rem;
         margin: 0 0.25em 0 0.25em;
         padding: 0;
-        color: themes.themed("secondary");
+        color: themes.themed("headerText");
         text-decoration: none !important;
       }
 
       .tabHolder {
         float: right;
-        background: rgba(themes.themed("primary"), 0.5);
+        // background: rgba(themes.themed("header"), 0.5);
+        color: themes.themed("headerText");
         height: 2em;
         overflow: visible;
         white-space:nowrap;
@@ -399,13 +407,13 @@ body,
       }
 
       .tab {
-        color: themes.themed("secondary");
+        color: themes.themed("headerText");
         border-bottom: 0;
         border-top: 0;
         box-sizing: border-box;
         cursor: pointer;
         display: inline-block;
-        height: 2.2em;
+        height: 2em;
         min-width: 6em;
         line-height: 2em;
         margin-right: -1px;
@@ -415,12 +423,9 @@ body,
 
         &Highlight,
         &:hover {
-          background-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 90%);
-          border-bottom: 0.2em solid themes.themed("secondary");
-        }
-
-        &:hover {
-          background-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 75%);
+          background-color: themes.themed("headerText");
+          color: themes.themed("header");
+          border-bottom: 0.2em solid themes.themed("header");
         }
 
       }
@@ -428,37 +433,40 @@ body,
       .nestedTab {
         overflow: hidden;
         position: absolute;
-        right: 0;
+        right: -1px;
         .tabDiv {
           float:none;
           display:block;
           overflow: hidden;
           
-          background-color: themes.themed("primary");
+          background-color: themes.themed("headerText");
         }
         nav {
           // border-top: 0.2em solid themed("secondary");
           overflow-x: hidden;
           overflow-y: auto;
           max-height: calc( 80vh - 2em );
+          border: 1px solid themes.themed("primary");
           // text-align:right;
           .tab {
             margin-bottom: 0;
             display: block;
-            background-color: themes.themed("primary");
+            background-color: themes.themed("headerText");
+            color: themes.themed("header");
   
             // margin-right: 0.2em;
 
             &Highlight,
             &:hover {
               // border-right: 0.2em solid themed("secondary");
-              background-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 90%);
+              background-color: themes.themed("header");
+              color: themes.themed("headerText");
               border-bottom: none;
               // margin-right: 0;
             }
-            &:hover {
-              background-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 75%);
-            }
+            // &:hover {
+            //   background-color: color.mix(themes.themed("header"), themes.themed("headerText"), 75%);
+            // }
           }
         }
       }
@@ -469,8 +477,8 @@ body,
     }
 
     footer {
-      background-color: themes.themed("primary");
-      color: themes.themed("secondary");
+      background-color: themes.themed("header");
+      color: themes.themed("headerText");
       border-top: 0.2em solid themes.themed("primary");
       flex: none;
       font-family: themes.themed("bodyFont");
@@ -482,7 +490,7 @@ body,
 
       .link {
         text-decoration: underline;
-        color: themes.themed("secondary") !important;
+        color: themes.themed("headerText") !important;
       }
 
       img {
@@ -898,20 +906,6 @@ body,
     //   background-color: $darkColor
     // }
 
-    header {
-      font-family: themes.themed("titleFont");
-      font-size: 1.1em;
-      // height: 2em;
-      // left: 0;
-      min-width: 100%;
-      overflow: visible;
-      // position: absolute;
-      // top: 0;
-      width: 100%;
-      color: themes.themed("secondary");
-      background-color: themes.themed("primary");
-    }
-
     main {
       flex: 1 1 auto;
       padding-top: 1em;
@@ -1151,8 +1145,6 @@ body,
           cursor: pointer;
         }
       }
-
-      
     }
 
     .blackToPrimary {

@@ -6,12 +6,14 @@ import PhyloPics from "./PhyloPics";
 import Skeleton from "@mui/material/Skeleton";
 import { compose } from "recompose";
 import formats from "../functions/formats";
+import { mixColor } from "../functions/mixColor";
 import { scaleLinear } from "d3-scale";
 import setColors from "../functions/setColors";
 import stringLength from "../functions/stringLength";
 import { useScrollPosition } from "@n8tb1t/use-scroll-position";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";
+import withTheme from "#hocs/withTheme";
 import withTypes from "../hocs/withTypes";
 
 const ReportTreePaths = ({
@@ -37,6 +39,8 @@ const ReportTreePaths = ({
   levels,
   colorPalette,
   palettes,
+  colorScheme,
+  theme,
   cats: catArray,
   phylopicWidth,
   hideErrorBars,
@@ -51,6 +55,13 @@ const ReportTreePaths = ({
     count: catArray.length,
     colors,
   }));
+  const backgroundColor = colorScheme[theme].lightColor;
+  const gridColor = mixColor({
+    color1: colorScheme[theme].darkColor,
+    color2: colorScheme[theme].lightColor,
+    ratio: 0.5,
+  });
+  const linesColor = colorScheme[theme].darkColor;
   let rootRank;
   if (lines.length >= 2) {
     rootRank = lines[lines.length - 2].taxon_rank;
@@ -332,7 +343,7 @@ const ReportTreePaths = ({
                   valueScale(tick),
                   plotHeight,
                 ]}
-                stroke={"#999999"}
+                stroke={gridColor}
                 strokeWidth={0.5}
                 dash={[2, 4]}
               />
@@ -342,7 +353,7 @@ const ReportTreePaths = ({
                 x={valueScale(tick) - tickLabelLength / 2}
                 y={top - charHeight}
                 width={tickLabelLength}
-                fill={"#333333"}
+                fill={linesColor}
                 fontSize={charHeight * 0.75}
                 textAlign={"center"}
                 textBaseline={"bottom"}
@@ -393,7 +404,7 @@ const ReportTreePaths = ({
                 <Line
                   key={`o-${segment.taxon_id}`}
                   points={points}
-                  stroke={segment.color}
+                  stroke={segment.color || linesColor}
                   opacity={0.5}
                 />,
               );
@@ -427,7 +438,7 @@ const ReportTreePaths = ({
                 segment.yStart,
               ]}
               strokeWidth={strokeWidth}
-              stroke={segment.color}
+              stroke={segment.color || linesColor}
               lineCap="round"
             />,
           );
@@ -452,7 +463,7 @@ const ReportTreePaths = ({
                     x={xPos}
                     y={segment.yStart}
                     points={plusPoints}
-                    stroke={"white"}
+                    stroke={backgroundColor}
                     opacity={0.75}
                   />,
                 );
@@ -472,7 +483,7 @@ const ReportTreePaths = ({
                   segment.yMax,
                 ]}
                 strokeWidth={strokeWidth}
-                stroke={segment.color}
+                stroke={segment.color || linesColor}
               />,
             );
           } else if (segment.vLine) {
@@ -486,7 +497,7 @@ const ReportTreePaths = ({
                   segment.yMax,
                 ]}
                 strokeWidth={strokeWidth}
-                stroke={segment.color}
+                stroke={segment.color || linesColor}
                 strokeScaleEnabled={false}
               />,
             );
@@ -540,8 +551,8 @@ const ReportTreePaths = ({
                 x={segment.xEnd}
                 y={segment.yStart}
                 radius={2}
-                fill={segment.color}
-                stroke={segment.color}
+                fill={segment.color || linesColor}
+                stroke={segment.color || linesColor}
                 key={`c-${segment.taxon_id}`}
               />,
             );
@@ -590,7 +601,7 @@ const ReportTreePaths = ({
                 y={segment.tip ? segment.yMin : segment.yStart - pointSize}
                 width={segment.tip ? segment.labelWidth : segment.width}
                 height={segment.height}
-                fill={segment.color}
+                fill={segment.color || linesColor}
                 align={segment.tip ? "left" : "right"}
                 verticalAlign={segment.tip ? "middle" : "top"}
               />,
@@ -606,7 +617,7 @@ const ReportTreePaths = ({
                     segment.yStart,
                   ]}
                   strokeWidth={strokeWidth}
-                  stroke={"#dddddd"}
+                  stroke={gridColor}
                   dash={[2, 5]}
                 />,
               );
@@ -619,7 +630,7 @@ const ReportTreePaths = ({
                     y={segment.yStart - charHeight / 2}
                     width={segment.bar[0] + 1}
                     height={charHeight}
-                    fill={segment.color}
+                    fill={segment.color || linesColor}
                   />,
                 );
                 newRegions.push(
@@ -677,7 +688,7 @@ const ReportTreePaths = ({
                         // segment.bar[2],
                         // segment.yStart + charHeight / 4,
                       ]}
-                      stroke={segment.color}
+                      stroke={segment.color || linesColor}
                     />,
                   );
                   if (
@@ -697,7 +708,7 @@ const ReportTreePaths = ({
                           // segment.bar[1],
                           // segment.yStart + charHeight / 4,
                         ]}
-                        stroke={"white"}
+                        stroke={backgroundColor}
                       />,
                     );
                   }
@@ -917,7 +928,7 @@ const ReportTreePaths = ({
             position: "absolute",
             top: 0,
             right: 0,
-            border: "rgba(0,0,0,0.1) solid 1px",
+            border: `${gridColor} solid 1px`,
             borderRight: "none",
             boxSizing: "border-box",
             pointerEvents: "none",
@@ -963,7 +974,7 @@ const ReportTreePaths = ({
                   width={maxWidth + dataWidth}
                   y={yScale.invert(previewOffset.y)}
                   height={divHeight / scale}
-                  fill={"rgba(0,0,255,0.1)"}
+                  fill={`${colorScheme[theme].highlightColor}40`}
                   draggable={true}
                   onDragStart={handleDragStart}
                   onDragMove={handleDragMove}
@@ -1017,7 +1028,7 @@ const ReportTreePaths = ({
           overflowX: "hidden",
           width: divWidth,
           position: "absolute",
-          border: "rgba(0,0,0,0.1) solid 1px",
+          border: `${gridColor} solid 1px`,
           boxSizing: "border-box",
         }}
         ref={scrollContainerRef}
@@ -1059,7 +1070,7 @@ const ReportTreePaths = ({
                   width={divWidth / scale}
                   y={scrollPosition.y - padding}
                   height={divHeight + padding * 2}
-                  fill={"white"}
+                  fill={backgroundColor}
                 />
               </Layer>
               <Layer>
@@ -1089,4 +1100,9 @@ const ReportTreePaths = ({
   );
 };
 
-export default compose(withTypes, withColors, withReportTerm)(ReportTreePaths);
+export default compose(
+  withTypes,
+  withTheme,
+  withColors,
+  withReportTerm,
+)(ReportTreePaths);

@@ -152,7 +152,7 @@ const setColor = ({ node, yQuery, recurse, hideSourceColors }) => {
       hideSourceColors ||
       !node.fields ||
       ["assembly", "sample"].includes(node.taxon_rank)
-        ? greys[baseTone + status]
+        ? undefined // greys[baseTone + status]
         : ancestralColor;
     highlightColor = greys[baseTone + 1 + status];
 
@@ -178,7 +178,9 @@ const setColor = ({ node, yQuery, recurse, hideSourceColors }) => {
       }
     }
   } else {
-    color = greys[baseTone + 3];
+    // color = greys[baseTone + 3];
+    // highlightColor = greys[baseTone + 4];
+    color = undefined;
     highlightColor = greys[baseTone + 4];
   }
   return { color, highlightColor, source, value, min, max };

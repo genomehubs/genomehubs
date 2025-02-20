@@ -28,6 +28,8 @@ $themes: (
     colorScheme: $lightScheme,
     link: colors.$linkColor,
     blackToPrimary: $blackToDarkColor,
+    header: colors.$darkColor,
+    headerText: colors.$lightColor,
   ),
   dark: (
     primary: colors.$lightColor,
@@ -44,6 +46,8 @@ $themes: (
     colorScheme: $darkScheme,
     link: colors.$highlightColor,
     blackToPrimary: $blackToLightColor,
+    header: colors.$darkColor,
+    headerText: colors.$lightColor,
   ),
 );
 
