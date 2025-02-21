@@ -144,8 +144,8 @@ body,
       left: 0;
       bottom: 0;
       top: 0;
-      background-color: themes.themed("primary");
-      color: color.mix(themes.themed("secondary"), themes.themed("primary"), 65%);
+      background-color: themes.themed("header");
+      color: color.mix(themes.themed("headerText"), themes.themed("header"), 65%);
       z-index: 10000;
 
       .loadingContainer {
@@ -167,7 +167,7 @@ body,
           left: 0;
           width: 100%;
           height: 100%;
-          background: radial-gradient(rgba(themes.themed("primary"), 0.0), rgba(themes.themed("primary"), 1));
+          background: radial-gradient(rgba(themes.themed("header"), 0.0), rgba(themes.themed("header"), 1));
         }
       }
 

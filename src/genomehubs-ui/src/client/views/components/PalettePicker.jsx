@@ -37,10 +37,9 @@ const PalettePicker = ({
 }) => {
   const classes = useStyles();
 
-  let { darkColor, lightColor, highlightColor } = colorScheme[theme];
-  let backgroundColor = theme === "dark" ? darkColor : lightColor;
+  let backgroundColor = colorScheme[theme].lightColor;
 
-  let textColor = theme === "dark" ? lightColor : darkColor;
+  let textColor = colorScheme[theme].darkColor;
   // let highlightColor = theme === "dark" ? "#7f7f7f" : "#dfdfdf";
 
   let palettePreviews = Object.entries(palettes.byId).map(([id, palette]) => {
@@ -104,7 +103,7 @@ const PalettePicker = ({
         margin: "0.5em",
         // padding: "0.5em",
         backgroundColor: backgroundColor,
-        borderColor: theme === "dark" ? lightColor : darkColor,
+        borderColor: textColor,
         borderWidth: "0.1em",
         borderStyle: "solid",
       }}
