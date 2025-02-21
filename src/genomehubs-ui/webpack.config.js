@@ -134,13 +134,13 @@ const config = {
                 to({ context, absoluteFilename }) {
                   return path.join(
                     STATIC_DIR,
-                    path.relative(context, absoluteFilename)
+                    path.relative(context, absoluteFilename),
                   );
                 },
               },
             ],
           }),
-        ]
+        ],
   ),
   module: {
     rules: [
@@ -166,62 +166,6 @@ const config = {
                 removeComments: false,
                 collapseWhitespace: true,
               },
-            },
-          },
-        ],
-      },
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: "style-loader",
-            options: { injectType: "singletonStyleTag" },
-          },
-          {
-            loader: "css-loader",
-            options: {
-              modules: false,
-            },
-          },
-        ],
-        include: [
-          /node_modules/,
-          path.resolve(
-            __dirname,
-            "src/client/views/components/style/node_modules.css"
-          ),
-        ],
-      },
-      {
-        test: /\.(sa|sc|c)ss$/,
-        exclude: [
-          /node_modules/,
-          path.resolve(
-            __dirname,
-            "/src/client/views/components/style/node_modules.css"
-          ),
-        ],
-        use: [
-          devMode ? MiniCssExtractPlugin.loader : "style-loader",
-          {
-            loader: "css-loader",
-            options: {
-              esModule: true,
-              modules: {
-                localIdentName: "[name]__[local]___[hash:base64:5]",
-                namedExport: true,
-              },
-              sourceMap: true,
-              importLoaders: 2,
-            },
-          },
-          "postcss-loader",
-          {
-            loader: "sass-loader",
-            options: {
-              additionalData: `$directColor: ${main.directColor}; \
-$ancestralColor: ${main.ancestralColor};\
-$descendantColor: ${main.descendantColor};`,
             },
           },
         ],
@@ -253,6 +197,62 @@ $descendantColor: ${main.descendantColor};`,
         //   },
         // ],
         type: "asset/resource",
+      },
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: "style-loader",
+            options: { injectType: "singletonStyleTag" },
+          },
+          {
+            loader: "css-loader",
+            options: {
+              modules: false,
+            },
+          },
+        ],
+        include: [
+          /node_modules/,
+          path.resolve(
+            __dirname,
+            "src/client/views/components/style/node_modules.css",
+          ),
+        ],
+      },
+      {
+        test: /\.(sa|sc|c)ss$/,
+        exclude: [
+          /node_modules/,
+          path.resolve(
+            __dirname,
+            "/src/client/views/components/style/node_modules.css",
+          ),
+        ],
+        use: [
+          devMode ? MiniCssExtractPlugin.loader : "style-loader",
+          {
+            loader: "css-loader",
+            options: {
+              esModule: true,
+              modules: {
+                localIdentName: "[name]__[local]___[hash:base64:5]",
+                namedExport: true,
+              },
+              sourceMap: true,
+              importLoaders: 2,
+            },
+          },
+          "postcss-loader",
+          {
+            loader: "sass-loader",
+            options: {
+              additionalData: `$directColor: ${main.directColor}; \
+$ancestralColor: ${main.ancestralColor};\
+$descendantColor: ${main.descendantColor};`,
+            },
+          },
+        ],
       },
     ],
   },

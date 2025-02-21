@@ -8,7 +8,7 @@ import makeStyles from "@mui/styles/makeStyles";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: "white",
+    backgroundColor: theme.palette.background.paper,
   },
 }));
 
@@ -23,7 +23,7 @@ const BasicMenu = ({
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selectedIndex, setSelectedIndex] = React.useState(
-    options.indexOf(current)
+    options.indexOf(current),
   );
 
   const handleClickListItem = (event) => {

@@ -12,10 +12,11 @@ import Tabs from "./Tabs";
 import TabsFixed from "./TabsFixed";
 import { compose } from "recompose";
 import withColors from "../hocs/withColors";
+import withTheme from "../hocs/withTheme";
 
 const basename = BASENAME || "";
 
-const Header = ({ id, levels }) => {
+const Header = ({ id, levels, theme, colorScheme }) => {
   const rootRef = useRef(null);
   let style = {};
   let colors;
@@ -65,10 +66,11 @@ const Header = ({ id, levels }) => {
     ];
     style = { background: `repeating-linear-gradient(${stops.join(", ")})` };
   }
+  const buttonColor = colorScheme[theme].lightColor;
   return (
     <header style={style} ref={rootRef}>
       <div className={searchIconStyle}>
-        <SearchHeaderButtons color={"white"} rootRef={rootRef} />
+        <SearchHeaderButtons color={buttonColor} rootRef={rootRef} />
       </div>
       <div style={{ float: "left" }} className={siteTextStyle}>
         <SiteName logo />
@@ -81,5 +83,5 @@ const Header = ({ id, levels }) => {
   );
 };
 
-export default compose(memo, withColors)(Header);
+export default compose(memo, withTheme, withColors)(Header);
 // export default compose(memo)(Header);

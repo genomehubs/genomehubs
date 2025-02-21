@@ -5,14 +5,22 @@ import IconButton from "@mui/material/IconButton";
 import MuiAlert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import { compose } from "recompose";
+import withColors from "#hocs/withColors";
 import withController from "../hocs/withController";
 import withMessage from "../hocs/withMessage";
+import withTheme from "#hocs/withTheme";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const DownloadMessage = ({ message, setMessage, controller }) => {
+const DownloadMessage = ({
+  message,
+  setMessage,
+  controller,
+  colorScheme,
+  theme,
+}) => {
   let { message: text, severity, duration, x, y, total } = message || {};
   const [open, setOpen] = React.useState(false);
 
@@ -58,7 +66,7 @@ const DownloadMessage = ({ message, setMessage, controller }) => {
               right: "3em",
               height: "4px",
               width: "auto",
-              backgroundColor: "white",
+              backgroundColor: colorScheme[theme].lightColor,
               overflow: "hidden",
             }}
           >
@@ -95,4 +103,9 @@ const DownloadMessage = ({ message, setMessage, controller }) => {
   );
 };
 
-export default compose(withController, withMessage)(DownloadMessage);
+export default compose(
+  withController,
+  withTheme,
+  withColors,
+  withMessage,
+)(DownloadMessage);

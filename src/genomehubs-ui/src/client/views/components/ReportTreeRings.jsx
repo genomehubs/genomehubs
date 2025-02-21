@@ -8,7 +8,8 @@ import { compose } from "recompose";
 import { scaleLog } from "d3-scale";
 import setColors from "../functions/setColors";
 import { useLongPress } from "use-long-press";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
+import withTheme from "#hocs/withTheme";
 import withTypes from "../hocs/withTypes";
 
 const ReportTreeRings = ({
@@ -24,6 +25,8 @@ const ReportTreeRings = ({
   colorPalette,
   palettes,
   levels,
+  colorScheme,
+  theme,
   hideSourceColors,
   hideErrorBars,
   hideAncestralBars,
@@ -67,9 +70,10 @@ const ReportTreeRings = ({
     .range([1, 0.1])
     .clamp(true);
 
-  let strokeWidth = strokeScale((arcs || 1).length);
+  let strokeWidth = strokeScale((arcs || 1).length * 2);
 
   let paths = [];
+  let backgroundColor = colorScheme[theme].lightColor;
   if (arcs) {
     let rootRank;
     if (arcs.length >= 2) {
@@ -127,7 +131,7 @@ const ReportTreeRings = ({
               onPointerEnter={(e) => highlightSegment(segment)}
               onPointerOut={(e) => highlightSegment()}
               {...longPress()}
-              stroke="white"
+              stroke={backgroundColor}
               strokeWidth={strokeWidth}
               d={segment.arc}
             />
@@ -183,7 +187,7 @@ const ReportTreeRings = ({
     highlightPath = (
       <g key={"highlight"} style={{ pointerEvents: "none" }}>
         <path
-          fill={"white"}
+          fill={backgroundColor}
           strokeWidth={3}
           stroke={highlight.highlightColor}
           fillOpacity={0.25}
@@ -191,7 +195,7 @@ const ReportTreeRings = ({
         />
         {highlight.valueArc && (
           <path
-            fill={"white"}
+            fill={backgroundColor}
             strokeWidth={3}
             stroke={highlight.highlightColor}
             fillOpacity={0.5}
@@ -201,7 +205,7 @@ const ReportTreeRings = ({
         )}
         {highlight.valueBar && !hideErrorBars && (
           <path
-            fill={"white"}
+            fill={backgroundColor}
             strokeWidth={3}
             stroke={highlight.highlightColor}
             fillOpacity={0.5}
@@ -386,4 +390,4 @@ const ReportTreeRings = ({
   );
 };
 
-export default compose(withTypes, withColors)(ReportTreeRings);
+export default compose(withTypes, withTheme, withColors)(ReportTreeRings);

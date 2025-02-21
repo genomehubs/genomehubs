@@ -38,7 +38,7 @@ const LoadingScreen = ({ types, basename, siteName, loading, setLoading }) => {
         <div className={loadingContainerStyle}>
           <div className={loadingLogoStyle}>
             <div className={loaderStyle}>
-              <Logo />
+              <Logo lineColor={"white"} />
             </div>
           </div>
           <h1>loading {siteName}...</h1>

@@ -4,12 +4,14 @@ import React from "react";
 import TextField from "@mui/material/TextField";
 import makeStyles from "@mui/styles/makeStyles";
 
-const useStyles = makeStyles((theme) => ({
-  formControl: {
-    margin: "16px",
-    minWidth: "120px",
-  },
-}));
+const useStyles = makeStyles((theme) => {
+  return {
+    formControl: {
+      margin: "16px",
+      minWidth: "120px",
+    },
+  };
+});
 const BasicTextField = ({
   id,
   handleChange = (e) => {
@@ -20,9 +22,10 @@ const BasicTextField = ({
   helperText,
   value,
 }) => {
-  const classes = useStyles;
+  const classes = useStyles();
   return (
-    <FormControl variant="standard" className={classes.formControl}>
+    <FormControl variant="standard">
+      {/* className={classes.formControl}> */}
       <TextField
         variant="standard"
         id={id}

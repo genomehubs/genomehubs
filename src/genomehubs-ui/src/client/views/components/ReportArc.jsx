@@ -25,8 +25,9 @@ import setColors from "../functions/setColors";
 import stringLength from "../functions/stringLength";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withSiteName from "../hocs/withSiteName";
+import withTheme from "#hocs/withTheme";
 
 const pct = format(".0%");
 const pct1 = format(".1%");
@@ -101,7 +102,7 @@ const setupArc = ({
   };
 };
 
-const PieComponent = ({ data, height, width, colors }) => {
+const PieComponent = ({ data, height, width, colors, axisColor = "white" }) => {
   const RADIAN = Math.PI / 180;
   const renderCustomizedLabel = ({
     cx,
@@ -200,7 +201,7 @@ const PieComponent = ({ data, height, width, colors }) => {
         <text
           x={cx}
           y={cy - 5}
-          fill={"#3d405c"}
+          fill={axisColor}
           className="recharts-text recharts-label"
           textAnchor="middle"
           alignmentBaseline="central"
@@ -233,7 +234,7 @@ const PieComponent = ({ data, height, width, colors }) => {
         <text
           x={cx}
           y={cy + innerRadius / 5}
-          fill="#3d405c"
+          fill={axisColor}
           className="recharts-text recharts-label"
           textAnchor="middle"
           alignmentBaseline="hanging"
@@ -264,7 +265,7 @@ const PieComponent = ({ data, height, width, colors }) => {
               iendY,
               endX > startX,
             )}
-            fill={"#3d405c"}
+            fill={axisColor}
           />
         )}
         {/* {value4 && (
@@ -675,6 +676,8 @@ const ReportArc = ({
   ratio,
   colorPalette,
   palettes,
+  colorScheme,
+  theme,
   minDim,
   setMinDim,
   embedded,
@@ -814,6 +817,7 @@ const ReportArc = ({
           width={plotHeight}
           height={plotHeight}
           colors={colors}
+          axisColor={colorScheme[theme].darkColor}
         />
       );
     }
@@ -828,4 +832,4 @@ const ReportArc = ({
   }
 };
 
-export default compose(withColors, withSiteName)(ReportArc);
+export default compose(withSiteName, withTheme, withColors)(ReportArc);

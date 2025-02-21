@@ -15,10 +15,21 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import classnames from "classnames";
 import { compose } from "recompose";
 import { setLinkIcons } from "./ResultTable";
+import withColors from "../hocs/withColors";
 import withRecord from "../hocs/withRecord";
+import withTheme from "../hocs/withTheme";
 import withTypes from "../hocs/withTypes";
 
-const FilesPanel = ({ files, types, record, taxonId, title = "Files" }) => {
+const FilesPanel = ({
+  files,
+  types,
+  record,
+  taxonId,
+  title = "Files",
+  colorScheme,
+  theme,
+}) => {
+  let defaultColor = colorScheme[theme].linkColor;
   let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, resultPanelStyle);
   if (!types) {
     return null;
@@ -39,7 +50,7 @@ const FilesPanel = ({ files, types, record, taxonId, title = "Files" }) => {
               type: {
                 name: "files",
                 field: `files.${value}.${run}`,
-                color: file_paths[value].color || "#1f78b4",
+                color: file_paths[value].color || defaultColor,
                 ...types.files,
               },
               key,
@@ -61,8 +72,8 @@ const FilesPanel = ({ files, types, record, taxonId, title = "Files" }) => {
                   label={key}
                   description={link.title}
                   EndIcon={RadioIcon}
-                  color={link.color || "#1f78b4"}
-                />
+                  color={link.color || defaultColor}
+                />,
               );
               runDivs.push(" ");
             }
@@ -75,7 +86,7 @@ const FilesPanel = ({ files, types, record, taxonId, title = "Files" }) => {
                 <span className={filesTitleStyle}>{run}</span>
               </Grid>
               <Grid size={10}>{runDivs}</Grid>
-            </Grid>
+            </Grid>,
           );
         }
       }
@@ -88,7 +99,7 @@ const FilesPanel = ({ files, types, record, taxonId, title = "Files" }) => {
               </Grid>
               <Grid size={11}>{valueDivs}</Grid>
             </Grid>
-          </Grid>
+          </Grid>,
         );
       }
     }
@@ -106,4 +117,9 @@ const FilesPanel = ({ files, types, record, taxonId, title = "Files" }) => {
   );
 };
 
-export default compose(withTypes, withRecord)(FilesPanel);
+export default compose(
+  withTypes,
+  withTheme,
+  withColors,
+  withRecord,
+)(FilesPanel);

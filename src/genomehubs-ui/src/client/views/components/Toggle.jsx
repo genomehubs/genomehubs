@@ -9,6 +9,7 @@ import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import setColors from "../functions/setColors";
 import withColors from "../hocs/withColors";
+import withTheme from "../hocs/withTheme";
 
 const Toggle = ({
   toggle,
@@ -18,23 +19,15 @@ const Toggle = ({
   palettes,
   levels,
   colors,
+  colorScheme,
+  theme,
 }) => {
   const [showContent, setShowContent] = useState(Boolean(expand));
-  // ({ levels, colors } = setColors({
-  //   palettes,
-  //   levels,
-  //   count: 6,
-  //   colors,
-  // }));
-  // let transpColor = colors[1].match(/#/)
-  //   ? `${colors[1]}33`
-  //   : colors[1].replace(/rgb\(/, "rgba(").replace(/\)/, ", 0.1)");
-  // transpColor = "#f0f6fa";
-
+  let { linkColor } = colorScheme[theme];
   return (
     <Grid
       style={{
-        border: `0.2em solid #1f78b466`,
+        border: `0.2em solid ${linkColor}66`,
         borderRadius: "1em",
         overflow: "hidden",
         marginBottom: "2em",
@@ -45,8 +38,8 @@ const Toggle = ({
           container
           direction="row"
           style={{
-            backgroundColor: "#d2e4f0",
-            borderBottom: showContent ? `0.2em solid #1f78b466` : "none",
+            backgroundColor: `${linkColor}33`,
+            borderBottom: showContent ? `0.2em solid ${linkColor}66` : "none",
             width: "100%",
           }}
         >
@@ -100,4 +93,4 @@ const Toggle = ({
   );
 };
 
-export default compose(memo, withColors)(Toggle);
+export default compose(memo, withTheme, withColors)(Toggle);

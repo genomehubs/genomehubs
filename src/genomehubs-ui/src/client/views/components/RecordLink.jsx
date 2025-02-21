@@ -8,7 +8,9 @@ import { compose } from "recompose";
 import getPrimaryAssemblyId from "../functions/getPrimaryAssemblyId";
 import { recordLinkIcon as recordLinkIconStyle } from "./Styles.scss";
 import withApi from "../hocs/withApi";
+import withColors from "../hocs/withColors";
 import withRecord from "../hocs/withRecord";
+import withTheme from "../hocs/withTheme";
 
 const RecordLink = ({
   record,
@@ -21,10 +23,15 @@ const RecordLink = ({
   url,
   label,
   description,
-  color = "#1f78b4",
+  color,
+  colorScheme,
+  theme,
   icon,
   EndIcon = LaunchIcon,
 }) => {
+  if (!color) {
+    color = colorScheme[theme].linkColor;
+  }
   useEffect(() => {
     if (
       condition?.startsWith("assembly.") &&
@@ -176,4 +183,4 @@ const RecordLink = ({
   return chip;
 };
 
-export default compose(withApi, withRecord)(RecordLink);
+export default compose(withApi, withTheme, withColors, withRecord)(RecordLink);

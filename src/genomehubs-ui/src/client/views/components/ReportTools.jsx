@@ -18,8 +18,10 @@ import TocIcon from "@mui/icons-material/Toc";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { useStyles } from "./ReportModalStyles";
+import withColors from "../hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";
 import withSiteName from "../hocs/withSiteName";
+import withTheme from "../hocs/withTheme";
 
 export const ReportTools = ({
   reportEdit,
@@ -32,6 +34,8 @@ export const ReportTools = ({
   topLevel,
   chartRef,
   basename,
+  theme,
+  colorScheme,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -68,7 +72,8 @@ export const ReportTools = ({
         padding: "1em",
         top: "2em",
         position: "absolute",
-        backgroundColor: "rgba(255,255,255,0.9)",
+        backgroundColor: `${colorScheme[theme].lightColor}e6`,
+        border: `0.2em solid ${colorScheme[theme].darkColor}e6`,
         overflowY: "auto",
         overFlowX: "visible",
         backdropFilter: "blur(0.25em)",
@@ -285,4 +290,9 @@ export const ReportTools = ({
   );
 };
 
-export default compose(withSiteName, withReportTerm)(ReportTools);
+export default compose(
+  withSiteName,
+  withTheme,
+  withColors,
+  withReportTerm,
+)(ReportTools);

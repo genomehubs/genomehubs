@@ -5,19 +5,19 @@ import { grey } from "@mui/material/colors";
 import { styled } from "@mui/material/styles";
 
 const StyledButtonGroup = styled(ButtonGroup)(({ theme }) => ({
-  color: theme.palette.getContrastText(grey[300]),
-  backgroundColor: grey[300],
+  color: theme.palette.button.contrastText,
+  backgroundColor: theme.palette.button.main,
   "&:hover": {
-    backgroundColor: grey[500],
+    backgroundColor: theme.palette.button.hover,
   },
   "& .MuiButtonGroup-grouped:not(:last-of-type)": {
-    borderColor: grey[400],
+    borderColor: theme.palette.button.contrastText,
   },
 }));
 
 export const ColorButtonGroup = forwardRef(({ children, ...props }, ref) => {
   return (
-    <StyledButtonGroup color="primary" {...props} ref={ref}>
+    <StyledButtonGroup color="button" {...props} ref={ref}>
       {children}
     </StyledButtonGroup>
   );
