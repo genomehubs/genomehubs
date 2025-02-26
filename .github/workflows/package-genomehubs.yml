@@ -19,8 +19,9 @@ jobs:
       - run: |
           ./package-ui.sh
           mv ./dist/genomehubs-ui-linux-x64 ./dist/genomehubs-ui-linux || exit 0
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: genomehubs-ui
           path: ./dist/*
 
   package-api:
@@ -34,8 +35,9 @@ jobs:
       - run: |
           ./package-api.sh
           mv ./dist/genomehubs-api ./dist/genomehubs-api-linux || exit 0
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: genomehubs-api
           path: ./dist/*
 
   package-genomehubs-linux:
@@ -57,9 +59,9 @@ jobs:
           pip install setuptools wheel twine
           ./pip_install_latest.sh manylinux2014_x86_64
           genomehubs -v
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: artifact
+          name: genomehubs-linux
           path: ./dist/*
 
   # package-genomehubs-macos:
@@ -74,8 +76,9 @@ jobs:
   #       run: |
   #         ./pip_install_latest.sh macosx_11_0_x86_64
   #         python3 setup.py sdist bdist_wheel --python-tag py3 --plat-name macosx_10_9_x86_64
-  #     - uses: actions/upload-artifact@v3
+  #     - uses: actions/upload-artifact@v4
   #       with:
+  #         name: genomehubs-macos
   #         path: ./dist/*.whl
 
   create-github-release:
@@ -86,13 +89,15 @@ jobs:
       - package-genomehubs-linux
       # - package-genomehubs-macos
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          path: ./dist
+          path: ./tmp
       - run: |
-          mv dist/artifact/* dist/
-          rm -rf dist/artifact
-          rm dist/*.whl
+          mkdir -p dist
+          mv tmp/genomehubs-api/* dist/
+          mv tmp/genomehubs-ui/* dist/
+          mv tmp/genomehubs-linux/*gz dist/
+          rm -rf tmp
           chmod 755 dist/genomehubs-*-linux
       - name: create release
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
@@ -110,14 +115,10 @@ jobs:
       - create-github-release
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
+          name: genomehubs-linux
           path: ./dist
-      - run: |
-          mv dist/artifact/* dist/
-          rm -rf dist/artifact
-          rm -rf dist/genomehubs-ui*
-          rm -rf dist/genomehubs-api*
       - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@v1.5.0
         with:
@@ -149,7 +150,7 @@ jobs:
           GH_BASENAME: ""
           GH_SITENAME: GoaT
           GH_SUGGESTED_TERM: Canidae
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: goat-ui
           path: ./dist/*
@@ -176,7 +177,7 @@ jobs:
           GH_BASENAME: ""
           GH_SITENAME: BoaT
           GH_SUGGESTED_TERM: Lepidoptera
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: boat-ui
           path: ./dist/*
@@ -204,7 +205,7 @@ jobs:
           GH_BASENAME: ""
           GH_SITENAME: MolluscDB
           GH_SUGGESTED_TERM: Gastropoda
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: molluscdb-ui
           path: ./dist/*
@@ -225,9 +226,9 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: genomehubs/genomehubs
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: artifact
+          name: genomehubs-linux
           path: ./dist
       - name: Add pip wheel to context
         run: mv dist/*manylinux2014_x86_64.whl src/docker
@@ -245,9 +246,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: artifact
+          name: genomehubs-api
           path: ./dist
       - run: |
           mv dist/genomehubs-api-linux src/docker/api/
@@ -276,9 +277,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: artifact
+          name: genomehubs-ui
           path: ./dist
       - run: |
           mv dist/genomehubs-ui-linux src/docker/ui/
@@ -307,7 +308,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: goat-ui
           path: ./dist
@@ -338,7 +339,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: boat-ui
           path: ./dist
@@ -369,7 +370,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: molluscdb-ui
           path: ./dist
