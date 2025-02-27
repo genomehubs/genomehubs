@@ -67,11 +67,17 @@ const App = ({
   }
   const [content, setContent] = useState(null);
   useEffect(() => {
-    // add event listenerr to detect changes in preferred color scheme
+    // add event listener to detect changes in preferred color scheme
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    mq.addEventListener("change", (evt) =>
-      setTheme(evt.matches ? "darkTheme" : "lightTheme"),
-    );
+    const colorSchemeChangeHandler = (evt) =>
+      setTheme(evt.matches ? "darkTheme" : "lightTheme");
+
+    mq.addEventListener("change", colorSchemeChangeHandler);
+
+    // Cleanup: remove event listener when the component unmounts
+    return () => {
+      mq.removeEventListener("change", colorSchemeChangeHandler);
+    };
   }, []);
 
   useEffect(() => {
