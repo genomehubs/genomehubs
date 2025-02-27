@@ -333,6 +333,10 @@ body,
         position: absolute;
         bottom: 0;
         right: 0;
+        
+        button {
+          margin-left: 1em;
+        }
       }
       &Footer {
         font-family: themes.themed("bodyFont");

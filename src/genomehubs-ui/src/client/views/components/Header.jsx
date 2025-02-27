@@ -66,7 +66,7 @@ const Header = ({ id, levels, theme, colorScheme }) => {
     ];
     style = { background: `repeating-linear-gradient(${stops.join(", ")})` };
   }
-  const buttonColor = colorScheme[theme].lightColor;
+  const buttonColor = colorScheme[theme].headerText;
   return (
     <header style={style} ref={rootRef}>
       <div className={searchIconStyle}>

@@ -24,6 +24,7 @@ import withTaxonomy from "../hocs/withTaxonomy";
 export const useStyles = makeStyles((theme) => ({
   paper: {
     boxShadow: "none",
+    backgroundColor: theme.palette.background.default,
   },
   formControl: {
     margin: "16px",
@@ -49,7 +50,7 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
   };
 
   const [secondaryTabValue, setSecondaryTabValue] = useState(
-    activeIndices.indexOf(searchIndex)
+    activeIndices.indexOf(searchIndex),
   );
 
   const handleSecondaryTabChange = (event, newValue) => {
@@ -65,7 +66,7 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
       position: "absolute",
       right: 8,
       top: 8,
-      color: "#bdbdbd", // theme.palette.grey[500],
+      color: theme.palette.text.primary,
     },
   });
 

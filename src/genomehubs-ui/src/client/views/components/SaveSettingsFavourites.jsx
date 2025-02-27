@@ -213,7 +213,6 @@ const SaveSettingsFavourites = ({ currentIndex, basename, taxonomy }) => {
                   // variant="outlined"
                   startIcon={<EditIcon />}
                   onClick={() => toggleEdit(key)}
-                  style={{ marginLeft: "1em" }}
                 >
                   Edit
                 </ColorButton>
@@ -232,7 +231,6 @@ const SaveSettingsFavourites = ({ currentIndex, basename, taxonomy }) => {
                       })}`,
                     );
                   }}
-                  style={{ marginLeft: "1em" }}
                 >
                   Search
                 </ColorButton>
