@@ -19,7 +19,9 @@ const mockWithTheme = (WrappedComponent) => (props) => {
     setTheme: (theme) => {
       dispatch(setTheme(theme));
       dispatch(
-        setColorScheme(theme === "light" ? lightThemeColors : darkThemeColors),
+        setColorScheme(
+          theme === "lightTheme" ? lightThemeColors : darkThemeColors,
+        ),
       );
     },
   });

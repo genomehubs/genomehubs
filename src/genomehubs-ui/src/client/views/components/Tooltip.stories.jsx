@@ -11,7 +11,7 @@ const meta = {
   tags: ["autodocs"],
   // excludeStories: /.*MockedState$/,
   args: {
-    theme: "light",
+    theme: "lightTheme",
     title: "Tooltip",
   },
 };

@@ -13,7 +13,7 @@ $blackToDarkColor: invert(17%) sepia(14%) saturate(765%) hue-rotate(198deg) brig
 $blackToLightColor: invert(100%) brightness(90%);
 
 $themes: (
-  light: (
+  lightTheme: (
     primary: colors.$darkColor,
     secondary: colors.$lightColor,
     highlight: colors.$highlightColor,
@@ -31,7 +31,7 @@ $themes: (
     header: colors.$darkColor,
     headerText: colors.$lightColor,
   ),
-  dark: (
+  darkTheme: (
     primary: colors.$lightColor,
     secondary: colors.$darkColor,
     highlight: colors.$highlightColor,

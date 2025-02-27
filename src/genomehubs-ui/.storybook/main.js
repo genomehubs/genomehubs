@@ -8,6 +8,7 @@ const devMode = true; //process.env.NODE_ENV !== "production";
 
 const config = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
+
   addons: [
     "@storybook/addon-webpack5-compiler-swc",
     "@storybook/addon-essentials",
@@ -92,11 +93,14 @@ const config = {
         ],
       },
     },
+    "@storybook/addon-mdx-gfm"
   ],
+
   framework: {
     name: "@storybook/react-webpack5",
     options: {},
   },
+
   babel: async (options) => ({
     ...options,
     plugins: [
@@ -105,6 +109,7 @@ const config = {
       "@babel/preset-react",
     ],
   }),
+
   webpackFinal: async (config) => {
     console.log("config", config.module.rules);
     return {
@@ -115,5 +120,13 @@ const config = {
       },
     };
   },
+
+  docs: {
+    autodocs: true
+  },
+
+  typescript: {
+    reactDocgen: "react-docgen-typescript"
+  }
 };
 export default config;

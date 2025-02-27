@@ -40,7 +40,7 @@ const LightTooltip = styled(({ className, ...props }) => (
 
 export const Tooltip = ({
   theme,
-  styleName = theme === "dark" ? "default" : "dark",
+  styleName = theme === "darkTheme" ? "default" : "dark",
   disableInteractive = true,
   ...props
 }) => {
@@ -56,7 +56,7 @@ export const Tooltip = ({
 
   useEventListener("keydown", handler);
 
-  const StyledTooltip = theme === "light" ? DarkTooltip : LightTooltip;
+  const StyledTooltip = theme === "lightTheme" ? DarkTooltip : LightTooltip;
 
   return (
     <StyledTooltip

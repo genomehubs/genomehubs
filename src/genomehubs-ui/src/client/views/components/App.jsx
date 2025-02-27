@@ -18,11 +18,17 @@ import { withCookies } from "react-cookie";
 import withLoading from "../hocs/withLoading";
 import withTheme from "../hocs/withTheme";
 
-const App = ({ theme = "dark", setTheme, cookies, loading, colorScheme }) => {
+const App = ({
+  theme = "darkTheme",
+  setTheme,
+  cookies,
+  loading,
+  colorScheme,
+}) => {
   const backgroundColor = colorScheme[theme].lightColor;
   const muiTheme = createTheme({
     palette: {
-      mode: theme,
+      mode: theme == "darkTheme" ? "dark" : "light",
       background: { default: backgroundColor, paper: backgroundColor },
       // button color
       button: {
@@ -64,7 +70,7 @@ const App = ({ theme = "dark", setTheme, cookies, loading, colorScheme }) => {
     // add event listenerr to detect changes in preferred color scheme
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     mq.addEventListener("change", (evt) =>
-      setTheme(evt.matches ? "dark" : "light"),
+      setTheme(evt.matches ? "darkTheme" : "lightTheme"),
     );
   }, []);
 

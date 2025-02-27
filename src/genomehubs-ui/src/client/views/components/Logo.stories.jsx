@@ -8,7 +8,7 @@ const meta = {
   component: Logo,
   decorators: [(story) => <Provider store={colorStore}>{story()}</Provider>],
   tags: ["autodocs"],
-  args: { theme: "dark" },
+  args: { theme: "darkTheme" },
 };
 
 export default meta;

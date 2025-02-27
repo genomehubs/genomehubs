@@ -212,6 +212,8 @@ export const lightThemeColors = {
   brightColor: "#FFFF1E",
   clearColor: "#FFFFFF00", // 0% opacity
   linkColor: "#1f78b4",
+  headerText: "#FFFFFF",
+  headerBackground: "#31323F",
 };
 
 // invert light and dark colors for dark theme
@@ -227,10 +229,12 @@ export const darkThemeColors = {
   brightColor: "#FFFF1E",
   clearColor: "#FFFFFF00", // 0% opacity
   linkColor: "#8263a8",
+  headerText: "#FFFFFF",
+  headerBackground: "#31323F",
 };
 
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-const defaultTheme = prefersDark ? "dark" : "light";
+const defaultTheme = prefersDark ? "darkTheme" : "lightTheme";
 
 export const setTheme = createAction("SET_THEME");
 export const theme = handleAction(
@@ -244,7 +248,7 @@ export const setColorScheme = createAction("SET_COLOR_SCHEME");
 export const colorScheme = handleAction(
   "SET_COLOR_SCHEME",
   (state, action) => action.payload,
-  { light: lightThemeColors, dark: darkThemeColors },
+  { lightTheme: lightThemeColors, darkTheme: darkThemeColors },
 );
 
 export const getColorScheme = (state) => state.colorScheme;

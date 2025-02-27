@@ -5,7 +5,7 @@ import withTheme from "#hocs/withTheme";
 
 const Logo = ({
   lineColor,
-  theme = "light",
+  theme = "lightTheme",
   colorScheme,
   backgroundColor = "transparent",
   fillOpacity = 0,

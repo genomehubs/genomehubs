@@ -4,7 +4,7 @@ import React from "react";
 /** @type { import('@storybook/react').Preview } */
 import StylesProvider from "@mui/styles/StylesProvider";
 
-const theme = "light";
+const theme = "lightTheme";
 const lightTheme = createTheme({
   palette: {
     mode: "light",
@@ -32,7 +32,7 @@ const ThemeBlock = ({ left, fill, theme, children }) => {
         bottom: 0,
         overflow: "auto",
         padding: "1rem",
-        background: theme === "dark" ? `${darkColor}` : `${lightColor}`,
+        background: theme === "darkTheme" ? `${darkColor}` : `${lightColor}`,
         // [breakpoints.S]: {
         //   left: left ? 0 : "50vw",
         //   right: left ? "50vw" : 0,
@@ -50,12 +50,12 @@ const withStoryTheme = (Story, theme) => {
 };
 
 const ThemeWrapper = ({ theme, left, fill, children }) => {
-  const muiTheme = theme === "light" ? lightTheme : darkTheme;
+  const muiTheme = theme === "lightTheme" ? lightTheme : darkTheme;
   return (
     <ThemeProvider theme={muiTheme}>
       <StylesProvider injectFirst>
         <ThemeBlock left={left} fill={fill} theme={theme}>
-          <div className={`theme-${theme}`}>{children}</div>
+          <div className={theme}>{children}</div>
         </ThemeBlock>
       </StylesProvider>
     </ThemeProvider>
@@ -64,20 +64,21 @@ const ThemeWrapper = ({ theme, left, fill, children }) => {
 
 export const withTheme = (story, context) => {
   // Get values from story parameter first, else fallback to globals
-  const theme = context.parameters.theme || context.globals.theme || "light";
-  const muiTheme = theme === "light" ? lightTheme : darkTheme;
-  const storyTheme = theme === "dark" ? "theme-dark" : "theme-light";
+  const theme =
+    context.parameters.theme || context.globals.theme || "lightTheme";
+  const muiTheme = theme === "lightTheme" ? lightTheme : darkTheme;
+  const storyTheme = theme;
   //   return <div className={storyTheme}>{Story()}</div>;
 
   switch (theme) {
     case "side-by-side": {
       return (
         <>
-          <ThemeWrapper theme="light" left>
-            {withStoryTheme(story, "light")}
+          <ThemeWrapper theme="lightTheme" left>
+            {withStoryTheme(story, "lightTheme")}
           </ThemeWrapper>
-          <ThemeWrapper theme="dark">
-            {withStoryTheme(story, "dark")}
+          <ThemeWrapper theme="darkTheme">
+            {withStoryTheme(story, "darkTheme")}
           </ThemeWrapper>
         </>
       );
@@ -133,8 +134,8 @@ const preview = {
         // icon: "circlehollow",
         // Array of plain string values or MenuItem shape (see below)
         items: [
-          { value: "light", icon: "circlehollow", title: "light" },
-          { value: "dark", icon: "circle", title: "dark" },
+          { value: "lightTheme", icon: "circlehollow", title: "light" },
+          { value: "darkTheme", icon: "circle", title: "dark" },
           { value: "side-by-side", icon: "sidebar", title: "side by side" },
         ],
         // Change title based on selected value
@@ -143,7 +144,7 @@ const preview = {
     },
   },
   initialGlobals: {
-    theme: "light",
+    theme: "lightTheme",
   },
 };
 

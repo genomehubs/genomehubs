@@ -122,7 +122,7 @@ const PhyloPics = ({
       return (
         <Tooltip
           title={imageDescription}
-          styleName="dark"
+          styleName="darkTheme"
           disableInteractive={false}
           arrow
         >
@@ -226,8 +226,10 @@ const PhyloPics = ({
             width={maxWidth}
             xlinkHref={dataUri}
             style={
-              theme == "dark"
+              theme == "darkTheme"
                 ? {
+                    // Conditional inversion filter is applied for dark mode.
+                    // Source will always be a black png image so color needs to be inverted with a filter.
                     filter: "invert(1) brightness(.9)",
                   }
                 : {}
@@ -259,7 +261,7 @@ const PhyloPics = ({
       <div>
         <Tooltip
           title={imageDescription}
-          styleName="dark"
+          styleName="darkTheme"
           disableInteractive={false}
           arrow
         >

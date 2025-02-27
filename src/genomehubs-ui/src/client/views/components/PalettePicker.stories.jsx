@@ -14,7 +14,7 @@ const meta = {
   // excludeStories: /.*MockedState$/,
   args: {
     swatches: 6,
-    theme: "light",
+    theme: "lightTheme",
   },
 };
 
