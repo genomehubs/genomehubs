@@ -93,7 +93,7 @@ const config = {
         ],
       },
     },
-    "@storybook/addon-mdx-gfm"
+    "@storybook/addon-mdx-gfm",
   ],
 
   framework: {
@@ -111,22 +111,27 @@ const config = {
   }),
 
   webpackFinal: async (config) => {
-    console.log("config", config.module.rules);
+    // Extract test patterns from the custom rules for targeted replacement
+    const customTests = custom.module.rules.map((rule) => String(rule.test));
+    // Filter out existing rules that match any custom rule test pattern
+    const filteredRules = config.module.rules.filter(
+      (rule) => !(rule.test && customTests.includes(String(rule.test))),
+    );
     return {
       ...config,
       module: {
         ...config.module,
-        rules: [...config.module.rules.slice(0, -2), ...custom.module.rules],
+        rules: [...filteredRules, ...custom.module.rules],
       },
     };
   },
 
   docs: {
-    autodocs: true
+    autodocs: true,
   },
 
   typescript: {
-    reactDocgen: "react-docgen-typescript"
-  }
+    reactDocgen: "react-docgen-typescript",
+  },
 };
 export default config;

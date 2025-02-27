@@ -7,7 +7,7 @@
     "build": "NODE_ENV=production webpack --mode production --config ./webpack.config.js",
     "client": "NODE_OPTIONS='--max-http-header-size=100000 --trace-deprecation' webpack serve --mode development",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "storybook": "storybook dev -p 6006 --debug-webpack",
+    "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "chromatic": "npx chromatic"
   },
