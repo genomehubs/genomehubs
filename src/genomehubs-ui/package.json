@@ -33,6 +33,7 @@
     "@loadable/babel-plugin": "^5.13.2",
     "@storybook/addon-essentials": "^8.6.0",
     "@storybook/addon-interactions": "^8.6.0",
+    "@storybook/addon-mdx-gfm": "^8.6.0",
     "@storybook/addon-styling-webpack": "^1.0.1",
     "@storybook/addon-themes": "^8.6.0",
     "@storybook/addon-webpack5-compiler-swc": "^2.1.0",
