@@ -5,6 +5,7 @@ import Dialog from "@mui/material/Dialog";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "@mui/material/IconButton";
 import ListIcon from "@mui/icons-material/List";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import MuiDialogActions from "@mui/material/DialogActions";
 import MuiDialogContent from "@mui/material/DialogContent";
 import MuiDialogTitle from "@mui/material/DialogTitle";
@@ -12,6 +13,7 @@ import MuiTab from "@mui/material/Tab";
 import MuiTabs from "@mui/material/Tabs";
 import SaveSettingsDefaults from "./SaveSettingsDefaults";
 import SaveSettingsFavourites from "./SaveSettingsFavourites";
+import SaveSettingsMore from "./SaveSettingsMore";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import Typography from "@mui/material/Typography";
 import { compose } from "recompose";
@@ -127,6 +129,7 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
           <MuiTab icon={<FavoriteIcon />} label="FAVORITES" />
           <MuiTab icon={<SettingsApplicationsIcon />} label="DEFAULTS" />
           <MuiTab icon={<ListIcon />} label="LISTS" />
+          <MuiTab icon={<MoreHorizIcon />} label="MORE" />
         </MuiTabs>
         <MuiTabs
           value={secondaryTabValue}
@@ -152,6 +155,7 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
             currentIndex={activeIndices[secondaryTabValue]}
           />
         )}
+        {tabValue == 3 && <SaveSettingsMore />}
 
         <DialogActions>
           <span className={favListingFooterStyle}>
