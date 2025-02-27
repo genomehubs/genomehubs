@@ -136,8 +136,8 @@ const setColor = ({ node, yQuery, recurse, hideSourceColors }) => {
   let min;
   let max;
   if (!recurse) {
-    color = "white";
-    highlightColor = "white";
+    color = "#ffffff00";
+    highlightColor = "#ffffff00";
   } else if (yQuery) {
     let status = node.status ? 2 : hideSourceColors || !node.fields ? 2 : 1;
     if (node.fields && node.fields[field]) {
@@ -152,7 +152,7 @@ const setColor = ({ node, yQuery, recurse, hideSourceColors }) => {
       hideSourceColors ||
       !node.fields ||
       ["assembly", "sample"].includes(node.taxon_rank)
-        ? greys[baseTone + status]
+        ? undefined // greys[baseTone + status]
         : ancestralColor;
     highlightColor = greys[baseTone + 1 + status];
 
@@ -178,7 +178,9 @@ const setColor = ({ node, yQuery, recurse, hideSourceColors }) => {
       }
     }
   } else {
-    color = greys[baseTone + 3];
+    // color = greys[baseTone + 3];
+    // highlightColor = greys[baseTone + 4];
+    color = undefined;
     highlightColor = greys[baseTone + 4];
   }
   return { color, highlightColor, source, value, min, max };

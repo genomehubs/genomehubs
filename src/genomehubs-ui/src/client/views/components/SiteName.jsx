@@ -45,7 +45,7 @@ const SiteName = ({ siteName, basename, archive, logo, theme }) => {
     <Link className={siteNameStyle} to={`${basename}/`}>
       {logo && (
         <div className={siteLogoStyle}>
-          <Logo />
+          <Logo lineColor={"white"} />
         </div>
       )}
       {siteName}

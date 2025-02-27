@@ -3,8 +3,11 @@ import { Rectangle, Text } from "recharts";
 import React from "react";
 import Tooltip from "./Tooltip";
 import { active as activeStyle } from "./Styles.scss";
+import { compose } from "recompose";
 import formats from "../functions/formats";
 import stringLength from "../functions/stringLength";
+import withColors from "#hocs/withColors";
+import withTheme from "#hocs/withTheme";
 
 export const processLegendData = ({
   bounds,
@@ -84,7 +87,13 @@ export const processLegendData = ({
   };
 };
 
-export const valueString = ({ stats, cellSize, pointSize, fill }) => {
+export const valueString = ({
+  stats,
+  cellSize,
+  pointSize,
+  fill,
+  axisColor = "#999999",
+}) => {
   let value, string;
   if (stats) {
     if (stats.sum) {
@@ -100,7 +109,7 @@ export const valueString = ({ stats, cellSize, pointSize, fill }) => {
         <Text
           x={-5}
           y={cellSize * 1.15}
-          fill={"rgb(102, 102, 102)"}
+          fill={axisColor}
           dominantBaseline={"alphabetic"}
           textAnchor={"end"}
           fontSize={pointSize}
@@ -124,7 +133,7 @@ export const valueString = ({ stats, cellSize, pointSize, fill }) => {
         <text
           x={-5}
           y={cellSize}
-          fill={"rgb(102, 102, 102)"}
+          fill={axisColor}
           dominantBaseline={"alphabetic"}
           textAnchor={"end"}
           fontSize={pointSize}
@@ -167,6 +176,8 @@ const MultiCatLegend = ({
   compactLegend,
   handleClick,
   active,
+  colorScheme,
+  theme,
 }) => {
   if (!legendWidth) {
     legendWidth = pointSize * 10;
@@ -197,7 +208,13 @@ const MultiCatLegend = ({
 
   let value;
   if (!compactLegend) {
-    ({ value } = valueString({ stats, cellSize, pointSize, fill }));
+    ({ value } = valueString({
+      stats,
+      cellSize,
+      pointSize,
+      fill,
+      axisColor: colorScheme[theme].darkColor,
+    }));
   }
   let strokeWidth = pointSize / 5;
   let bgRect;
@@ -211,7 +228,7 @@ const MultiCatLegend = ({
           className={activeStyle}
           height={cellSize * (compactLegend ? 1 : 2) + strokeWidth * 2}
           width={bgWidth}
-          fill={"white"}
+          fill={colorScheme[theme].lightColor}
           fillOpacity={0}
           stroke={fill || "rgb(102, 102, 102)"}
           strokeOpacity={active ? 1 : 0}
@@ -269,4 +286,4 @@ const MultiCatLegend = ({
   );
 };
 
-export default MultiCatLegend;
+export default compose(withTheme, withColors)(MultiCatLegend);

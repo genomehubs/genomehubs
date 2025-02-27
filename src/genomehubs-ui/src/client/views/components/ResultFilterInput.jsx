@@ -90,7 +90,12 @@ const ResultFilterInput = ({
       );
     }
     return (
-      <Tooltip title={title} styleName="dark" disableInteractive={false} arrow>
+      <Tooltip
+        title={title}
+        styleName="darkTheme"
+        disableInteractive={false}
+        arrow
+      >
         <span>{children}</span>
       </Tooltip>
     );

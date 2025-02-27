@@ -17,6 +17,7 @@ import truncate from "../functions/truncate";
 import useImage from "use-image";
 import withPhylopicsById from "../hocs/withPhylopicsById";
 import withRecord from "../hocs/withRecord";
+import withTheme from "#hocs/withTheme";
 
 const styleMap = {
   imageCreditStyle,
@@ -53,6 +54,7 @@ const PhyloPics = ({
   fixedRatio,
   embed,
   transform,
+  theme,
   ...props
 }) => {
   const [metadata, setMetadata] = useState({});
@@ -120,7 +122,7 @@ const PhyloPics = ({
       return (
         <Tooltip
           title={imageDescription}
-          styleName="dark"
+          styleName="darkTheme"
           disableInteractive={false}
           arrow
         >
@@ -223,6 +225,15 @@ const PhyloPics = ({
             height={maxHeight}
             width={maxWidth}
             xlinkHref={dataUri}
+            style={
+              theme == "darkTheme"
+                ? {
+                    // Conditional inversion filter is applied for dark mode.
+                    // Source will always be a black png image so color needs to be inverted with a filter.
+                    filter: "invert(1) brightness(.9)",
+                  }
+                : {}
+            }
           />
           <Tooltip
             title={imageDescription}
@@ -250,7 +261,7 @@ const PhyloPics = ({
       <div>
         <Tooltip
           title={imageDescription}
-          styleName="dark"
+          styleName="darkTheme"
           disableInteractive={false}
           arrow
         >
@@ -294,4 +305,9 @@ const PhyloPics = ({
   );
 };
 
-export default compose(withRecord, withPhylopicsById, memo)(PhyloPics);
+export default compose(
+  withTheme,
+  withRecord,
+  withPhylopicsById,
+  memo,
+)(PhyloPics);

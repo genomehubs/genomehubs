@@ -2,7 +2,7 @@ import makeStyles from "@mui/styles/makeStyles";
 
 export const useStyles = makeStyles((theme) => ({
   icon: {
-    color: "black", // theme.palette.text.secondary,
+    color: theme.palette.text.secondary,
     marginRight: "16px",
   },
   formControl: {

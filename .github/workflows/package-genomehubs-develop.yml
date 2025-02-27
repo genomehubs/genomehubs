@@ -16,7 +16,7 @@ jobs:
       - run: |
           ./package-ui.sh
           mv ./dist/genomehubs-ui-linux-x64 ./dist/genomehubs-ui-linux || exit 0
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: genomehubs-ui
           path: ./dist/*
@@ -34,7 +34,7 @@ jobs:
       - run: |
           ./package-api.sh
           mv ./dist/genomehubs-api ./dist/genomehubs-api-linux || exit 0
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: genomehubs-api
           path: ./dist/*
@@ -58,7 +58,7 @@ jobs:
           pip install setuptools wheel twine
           ./pip_install_latest.sh manylinux2014_x86_64
           genomehubs -v
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: genomehubs
           path: ./dist/*
@@ -90,7 +90,7 @@ jobs:
           GH_BASENAME: ""
           GH_SITENAME: GoaT
           GH_SUGGESTED_TERM: Canidae
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: goat-ui
           path: ./dist/*
@@ -120,7 +120,7 @@ jobs:
           GH_BASENAME: ""
           GH_SITENAME: BoaT
           GH_SUGGESTED_TERM: Lepidoptera
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: boat-ui
           path: ./dist/*
@@ -131,7 +131,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: genomehubs
           path: ./dist
@@ -162,7 +162,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: genomehubs-api
           path: ./dist
@@ -193,7 +193,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: genomehubs-ui
           path: ./dist
@@ -226,7 +226,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{github.ref}}
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: goat-ui
           path: ./dist
@@ -259,7 +259,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{github.ref}}
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: boat-ui
           path: ./dist
@@ -293,7 +293,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           path: ./dist
       - run: |

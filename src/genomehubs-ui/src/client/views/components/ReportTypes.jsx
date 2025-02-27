@@ -22,22 +22,18 @@ export const useStyles = makeStyles(() => ({
   upIcon: {
     fontSize: "1em",
     transform: "rotate(270deg)",
-    // color: "#666666",
     fontWeight: 700,
   },
   downIcon: {
     fontSize: "1em",
     transform: "rotate(90deg)",
-    // color: "#666666",
     fontWeight: 700,
   },
   iconButton: {
     fontSize: "1em",
-    // color: "#666666",
     fontWeight: 700,
   },
   constraint: {
-    // color: "#666666",
     fontWeight: 700,
   },
   expandableConstraint: {
@@ -52,19 +48,6 @@ const StyledTableCell = withStyles((theme) => ({
     fontWeight: 700,
   },
 }))(TableCell);
-
-const StyledBadge = styled(Badge)((theme) => ({
-  "& .MuiBadge-badge": {
-    right: "-1.5em",
-    //top: 2,
-    //left: 0,
-    fontSize: "0.6em",
-    border: "2px solid rgba(0,0,0,0.26)",
-    padding: "2px",
-    color: "white",
-    backgroundColor: "rgba(0,0,0,0.26)",
-  },
-}));
 
 const truncateList = ({ values, charLimit }) => {
   let entries = [];

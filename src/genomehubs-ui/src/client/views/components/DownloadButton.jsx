@@ -8,6 +8,9 @@ import GetAppIcon from "@mui/icons-material/GetApp";
 import MenuItem from "@mui/material/MenuItem";
 import MenuList from "@mui/material/MenuList";
 import Paper from "@mui/material/Paper";
+import { compose } from "recompose";
+import withColors from "#hocs/withColors";
+import withTheme from "#hocs/withTheme";
 
 const defaultOptions = {
   TSV: { format: "tsv" },
@@ -26,6 +29,8 @@ const DownloadButton = ({
   searchTerm,
   options = defaultOptions,
   // setMessage,
+  theme,
+  colorScheme,
 }) => {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
@@ -122,7 +127,7 @@ const DownloadButton = ({
         margin: "1em 0 1em auto",
         maxHeight: "2em",
         overflow: "visible",
-        backgroundColor: "white",
+        backgroundColor: colorScheme[theme].lightColor,
         flex: "0 1 auto",
       }}
     >
@@ -146,4 +151,4 @@ const DownloadButton = ({
   );
 };
 
-export default DownloadButton;
+export default compose(withTheme, withColors)(DownloadButton);

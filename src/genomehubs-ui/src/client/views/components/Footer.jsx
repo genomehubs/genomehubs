@@ -1,12 +1,13 @@
 import * as htmlToImage from "html-to-image";
 
-import PalettePicker, { PalettePreview } from "./PalettePicker";
 import React, { memo, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CopyrightIcon from "@mui/icons-material/Copyright";
 import Grid from "@mui/material/Grid2";
 import IconButton from "@mui/material/IconButton";
+import PalettePicker from "./PalettePicker";
+import PalettePreview from "./PalettePreview";
 import { Popover } from "@mui/material";
 import { QRCodeSVG } from "qrcode.react";
 import QrCodeIcon from "@mui/icons-material/QrCode";
@@ -92,11 +93,18 @@ const Footer = ({
       </span>
     );
   }
-  let colors =
-    levels.default.length > 6
-      ? levels[6] || levels.default.slice(0, 6)
-      : levels.default.slice(0, 6);
-  let palette = <PalettePreview colors={colors} size="2em" />;
+  let borderRadius = "15%";
+  let swatches = 6;
+  let swatchSize = "2em";
+  let colors = levels[swatches] || levels.default.slice(0, swatches);
+  let palette = (
+    <PalettePreview
+      colors={colors}
+      size={swatchSize}
+      borderRadius={borderRadius}
+      swatches={swatches}
+    />
+  );
 
   let settingsPopup = (
     <Popover
@@ -113,7 +121,12 @@ const Footer = ({
         horizontal: "center",
       }}
     >
-      <PalettePicker handleClick={updatePalette} />
+      <PalettePicker
+        handleClick={updatePalette}
+        borderRadius={borderRadius}
+        swatches={swatches}
+        size={swatchSize}
+      />
     </Popover>
   );
 

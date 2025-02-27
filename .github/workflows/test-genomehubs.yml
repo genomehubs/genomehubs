@@ -14,8 +14,9 @@ jobs:
       - run: |
           sed -i '/"node16-macos-/d;s/"node16-linux-x64",/"node16-linux"/' src/packaged-ui/package.json
           ./package-ui.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: genomehubs-ui
           path: ./dist/*
 
   package-api:
@@ -29,8 +30,9 @@ jobs:
       - run: |
           sed -i '/"node16-macos-/d;s/"node16-linux-x64",/"node16-linux"/' src/genomehubs-api/package.json
           ./package-api.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: genomehubs-api
           path: ./dist/*
 
   package-genomehubs-linux:
@@ -50,8 +52,9 @@ jobs:
           pip install setuptools wheel twine
           ./pip_install_latest.sh manylinux2014_x86_64
           genomehubs -v
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: genomehubs-linux
           path: ./dist/*
 
   run-test-fill:
@@ -70,9 +73,9 @@ jobs:
         with:
           path: ./dist
       - name: move wheel file
-        run: mv dist/artifact/*linux*.whl src/docker/test
+        run: mv dist/genomehubs-linux/*linux*.whl src/docker/test
       - name: move api executable
-        run: mv dist/artifact/genomehubs-api src/docker/test/genomehubs-api-linux
+        run: mv dist/genomehubs-api/genomehubs-api src/docker/test/genomehubs-api-linux
       - name: Build docker image
         working-directory: ./src/docker/test
         run: docker build . -t genomehubs

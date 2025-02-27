@@ -15,9 +15,10 @@ import setColors from "../functions/setColors";
 import { ttSwatch as ttSwatchStyle } from "./Styles.scss";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withSearchIndex from "../hocs/withSearchIndex";
 import withSiteName from "../hocs/withSiteName";
+import withTheme from "#hocs/withTheme";
 
 const CustomBackground = ({ chartProps, ...props }) => {
   let legendGroup = null;
@@ -141,7 +142,7 @@ const Histogram = ({
   } else if (chartProps.yScale.startsWith("log")) {
     yDomain = [1, "dataMax"];
   }
-  let { buckets } = chartProps;
+  let { buckets, axisColor } = chartProps;
 
   let axes = [
     <CartesianGrid key={"grid"} strokeDasharray="3 3" vertical={false} />,
@@ -166,7 +167,7 @@ const Histogram = ({
       ticks={Number.isNaN(buckets[0]) ? null : buckets}
       tick={(props) =>
         ReportXAxisTick({
-          props,
+          props: { ...props, fill: axisColor },
           buckets,
           fmt: chartProps.xFormat,
           translations: chartProps.translations,
@@ -182,6 +183,8 @@ const Histogram = ({
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
       interval={0}
       style={{ textAnchor: buckets.length > 15 ? "end" : "auto" }}
+      axisLine={{ stroke: axisColor }}
+      tickLine={{ stroke: axisColor }}
     >
       <Label
         value={xLabel}
@@ -190,7 +193,7 @@ const Histogram = ({
         dy={0}
         position="bottom"
         dominantBaseline={"text-after-edge"}
-        fill="#666"
+        fill={axisColor}
         fontSize={chartProps.pointSize}
         fontWeight="bold"
       />
@@ -209,17 +212,20 @@ const Histogram = ({
       key={"y"}
       style={{
         fontSize: chartProps.showLabels ? chartProps.pointSize : 0,
+        fill: axisColor,
       }}
       tickFormatter={
         chartProps.yScale == "proportion" ? (v) => v : chartProps.yFormat
       }
+      axisLine={{ stroke: axisColor }}
+      tickLine={{ stroke: axisColor }}
     >
       {width > 300 && (
         <Label
           value={yLabel}
           offset={marginWidth + 60 - chartProps.pointSize}
           position="insideRight"
-          fill="#666"
+          fill={axisColor}
           angle={-90}
           style={{ textAnchor: "middle" }}
           fontSize={chartProps.pointSize}
@@ -323,6 +329,8 @@ const ReportHistogram = ({
   levels,
   colorPalette,
   palettes,
+  colorScheme,
+  theme,
   minDim,
   setMinDim,
   xOpts,
@@ -602,6 +610,7 @@ const ReportHistogram = ({
           basename,
           compactLegend,
           showLabels,
+          axisColor: colorScheme[theme].darkColor,
         }}
       />
     );
@@ -619,6 +628,7 @@ const ReportHistogram = ({
 export default compose(
   withSiteName,
   dispatchMessage,
+  withTheme,
   withColors,
   withSearchIndex,
 )(ReportHistogram);

@@ -1,48 +1,67 @@
+$themeMap: null;
+
+@use "sass:map";
+@use "colors";
+
 $titleFontFamily: "Signika", "Helvetica Neue", Helvetica, Arial, sans-serif;
 $bodyFontFamily: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 $codeFontFamily: "Roboto Mono", "Courier New", Courier, monospace;
 $bodyFontSize: 11pt;
+$lightScheme: light;
+$darkScheme: dark;
+$blackToDarkColor: invert(17%) sepia(14%) saturate(765%) hue-rotate(198deg) brightness(98%) contrast(91%);
+$blackToLightColor: invert(100%) brightness(90%);
 
 $themes: (
-  Light: (
-    primary: $darkColor,
-    secondary: $lightColor,
-    highlight: $highlightColor,
-    faintHighlight: $faintHighlightColor,
+  lightTheme: (
+    primary: colors.$darkColor,
+    secondary: colors.$lightColor,
+    highlight: colors.$highlightColor,
+    faintHighlight: colors.$faintHighlightColor,
     titleFont: $titleFontFamily,
     bodyFont: $bodyFontFamily,
     codeFont: $codeFontFamily,
     bodyFontSize: $bodyFontSize,
-    direct: $directColor,
-    descendant: $descendantColor,
-    ancestral: $ancestralColor,
+    direct: colors.$directColor,
+    descendant: colors.$descendantColor,
+    ancestral: colors.$ancestralColor,
+    colorScheme: $lightScheme,
+    link: colors.$linkColor,
+    blackToPrimary: $blackToDarkColor,
+    header: colors.$darkColor,
+    headerText: colors.$lightColor,
   ),
-  Dark: (
-    primary: $lightColor,
-    secondary: $darkColor,
-    highlight: $highlightColor,
-    faintHighlight: $faintHighlightColor,
+  darkTheme: (
+    primary: colors.$lightColor,
+    secondary: colors.$darkColor,
+    highlight: colors.$highlightColor,
+    faintHighlight: colors.$faintHighlightColor,
     titleFont: $titleFontFamily,
     bodyFont: $bodyFontFamily,
     codeFont: $codeFontFamily,
     bodyFontSize: $bodyFontSize,
-    direct: $directColor,
-    descendant: $descendantColor,
-    ancestral: $ancestralColor,
+    direct: colors.$directColor,
+    descendant: colors.$descendantColor,
+    ancestral: colors.$ancestralColor,
+    colorScheme: $darkScheme,
+    link: colors.$highlightColor,
+    blackToPrimary: $blackToLightColor,
+    header: colors.$darkColor,
+    headerText: colors.$lightColor,
   ),
 );
 
 @function themed($key) {
-  @return map-get($themeMap, $key);
+  @return map.get($themeMap, $key);
 }
 
 @mixin themify($themes: $themes) {
   @each $theme, $map in $themes {
-    :global(.theme#{$theme}) & {
+    :global(.theme-#{$theme}) & {
       $themeMap: () !global;
       @each $key, $submap in $map {
-        $value: map-get(map-get($themes, $theme), "#{$key}");
-        $themeMap: map-merge(
+        $value: map.get(map.get($themes, $theme), "#{$key}");
+        $themeMap: map.merge(
           $themeMap,
           (
             $key: $value,

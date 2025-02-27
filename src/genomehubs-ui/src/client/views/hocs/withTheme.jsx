@@ -1,6 +1,7 @@
+import { getTheme, setTheme } from "../reducers/color";
+
 import React from "react";
 import { connect } from "react-redux";
-import { getTheme, setTheme } from "../reducers/color";
 
 const withTheme = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
@@ -8,12 +9,14 @@ const withTheme = (WrappedComponent) => (props) => {
   });
 
   const mapDispatchToProps = (dispatch) => ({
-    setTheme: (theme) => dispatch(setTheme(theme)),
+    setTheme: (theme) => {
+      dispatch(setTheme(theme));
+    },
   });
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;
