@@ -1,0 +1,22 @@
+# prefect artifacts
+
+.prefectignore
+
+# python artifacts
+
+**pycache**/
+_.py[cod]
+_$py.class
+_.egg-info/
+_.egg
+
+# Type checking artifacts
+
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
+# MacOS
+
+.DS_Store

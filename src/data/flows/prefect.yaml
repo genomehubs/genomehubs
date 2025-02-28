@@ -1,0 +1,61 @@
+# generic metadata
+prefect-version: 3.1.12
+name: goat-data-import
+
+# preparation steps
+build: null
+push: null
+
+# runtime steps
+pull:
+  - prefect.deployments.steps.git_clone:
+      id: clone-step
+      repository: https://github.com/genomehubs/goat-data.git
+      branch: feature/assembly-pipelines
+
+definitions:
+  work_pools:
+    goat_data_work_pool: &goat_data_work_pool
+      name: goat-data
+      work_queue_name: default
+  schedules:
+    daily: &daily
+      cron: "5 0 * * 1-6"
+    weekly: &weekly
+      cron: "5 0 * * 1"
+
+deployments:
+  - name: update-ncbi-datasets
+    entrypoint: flows/lib/update_ncbi_datasets.py:update_ncbi_datasets
+    parameters:
+      root_taxid: "2759"
+      output_path: "/home/ubuntu/tmp/test/assembly-data-{{ prefect.variables.date }}/ncbi_datasets_eukaryota.jsonl"
+      s3_path: s3://goat/resources/assembly-data/ncbi_datasets_eukaryota.jsonl
+    schedules:
+      - *daily
+    work_pool: *goat_data_work_pool
+
+  - name: fetch-parse-validate-ncbi-datasets
+    entrypoint: flows/lib/wrapper_fetch_parse_validate.py:fetch_parse_validate
+    parameters:
+      parser: "ParserEnum.NCBI_ASSEMBLIES"
+      yaml_path: "sources/assembly-data/ncbi_datasets_eukaryota.types.yaml"
+      s3_path: "s3://goat/sources/assembly-data/"
+      work_dir: "/home/ubuntu/tmp/test/assembly-data-{{ prefect.variables.date }}"
+      append: true
+      dry_run: true
+    triggers:
+      - enabled: true
+        match:
+          prefect.resource.type: ncbi.datasets
+          prefect.resource.matches.previous: "no"
+        expect:
+          - update.ncbi.datasets.finished
+        parameters:
+          parser: "ParserEnum.NCBI_ASSEMBLIES"
+          yaml_path: "sources/assembly-data/ncbi_datasets_eukaryota.types.yaml"
+          s3_path: "s3://goat/sources/assembly-data/"
+          work_dir: "/home/ubuntu/tmp/test/assembly-data-{{ prefect.variables.date }}"
+          append: true
+          dry_run: true
+    work_pool: *goat_data_work_pool

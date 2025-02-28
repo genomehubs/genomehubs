@@ -207,3 +207,17 @@ ForEachAccession --> ForEachTaxDB
 FetchAssemblyMetadata --> ForEachTaxDB
 CreateDatabase --> TransferIndexes
 ```
+
+### FetchResources
+
+#### FetchGoatTargetList
+
+Generate `taxon_list.tsv` with:
+```
+SKIP_PREFECT=true python3 src/data/flows/lib/fetch_goat_target_list.py -q "query:tax_rank(species) AND assembly_level>=chromosome&fields:none"
+```
+
+Generate `assembly_list.tsv` with:
+```
+SKIP_PREFECT=true python3 src/data/flows/lib/fetch_goat_target_list.py -q "query:tax_rank(species) AND assembly_level=chromosome AND refseq_category&fields:none" -x assembly
+```
