@@ -4,12 +4,12 @@ export const setSortBy = ({ sortBy, sortOrder, sortMode }) => {
   }
   if((typeof sortBy==="string" && sortBy.includes(","))|| Array.isArray(sortBy)){
     const fields=Array.isArray(sortBy)?sortBy:sortBy.split(",");
-    const orders= sortOrder?(typeof sortOrder==="string"?sortOrder.split(","):sortOrder):[];
-    const modes= sortMode?(typeof sortMode==="string"?sortMode.split(","):sortMode):[];
+    const orders= parseValues(sortOrder);
+    const modes= parseValues(sortMode);
     return fields.map((field,index)=>{
       const sort={by:field};
-      sort.order=orders[index]!== undefined?orders[index]:"asc";
-      sort.mode=modes[index]!== undefined?modes[index]:"max";
+      sort.order=getValueWithFallback(orders, index, "asc");
+      sort.mode=getValueWithFallback(modes, index, "max")
       return sort;
     })
   }
@@ -24,5 +24,14 @@ export const setSortBy = ({ sortBy, sortOrder, sortMode }) => {
   sortBy = sort;
   return sortBy;
 };
+
+const parseValues = (value) => {  
+  if (!value) return [];  
+  return typeof value === "string" ? value.split(",") : value;  
+};  
+
+const getValueWithFallback = (value,index, fallback) => {
+  return value[index] !==undefined ? value[index] : (value.length > 0 ? value[value.length - 1] : fallback)
+}
 
 export default setSortBy;
