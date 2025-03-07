@@ -794,7 +794,7 @@ components:
       style: form
     sortByParam:
       description: |
-        Field name to sort results by.Multiple fields can be specified as a comma-separated list or array.
+        Field name to sort results by.Multiple fields can be specified as a comma-separated string.
       examples:
         null:
           value:
@@ -812,12 +812,10 @@ components:
       name: sortBy
       required: false
       schema:
-        type: array
-        items:
-          type: string
+        type: string
     sortModeParam:
       description: |
-        Method to summarise multiple values for sorting fields with lists of values.Multiple methods can be specified as a comma-separated list or array.
+        Method to summarise multiple values for sorting fields with lists of values.Multiple methods can be specified as a comma-separated string.
       examples:
         null:
           value:
@@ -844,18 +842,10 @@ components:
       name: sortMode
       required: false
       schema:
-        type: array
-        items:
-          type: string
-          enum:
-            - avg
-            - max
-            - median
-            - min
-            - sum
+        type: string
     sortOrderParam:
       description: |
-        Sort order(s) to use when returning results.Multiple orders can be specified as a comma-separated list or array.
+        Sort order(s) to use when returning results.Multiple orders can be specified as a comma-separated string.
 
         Only applicable when `sortBy` is defined.
       examples:
@@ -875,12 +865,7 @@ components:
       name: sortOrder
       required: false
       schema:
-        type: array
-        items:
-          type: string
-          enum:
-            - asc
-            - desc
+        type: string
     streamFileParam:
       description: |
         Stream a file instead of downloading
