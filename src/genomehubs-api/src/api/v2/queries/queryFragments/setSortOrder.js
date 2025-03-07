@@ -99,7 +99,11 @@ export const setSortOrder = (sortBys, lookupTypes, lookupNames = () => {}) => {
   if (!sortBys) {
     return [];
   }
-  if (Array.isArray(sortBys) && sortBys.length > 0 && Array.isArray(sortBys[0])) {
+  if (
+    Array.isArray(sortBys) &&
+    sortBys.length > 0 &&
+    Array.isArray(sortBys[0])
+  ) {
     sortBys = sortBys.flat();
   }
   if (!Array.isArray(sortBys)) {
