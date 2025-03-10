@@ -794,7 +794,7 @@ components:
       style: form
     sortByParam:
       description: |
-        Field name to sort results by
+        Field name to sort results by.Multiple fields can be specified as a comma-separated string.
       examples:
         null:
           value:
@@ -805,6 +805,9 @@ components:
         assembly_level:
           value: assembly_level
           summary: Sort results by assembly level
+        multiple_fields:
+          value: assembly_level,chromosome_number
+          summary: Sort results by assembly level, then by chromosome number
       in: query
       name: sortBy
       required: false
@@ -812,7 +815,7 @@ components:
         type: string
     sortModeParam:
       description: |
-        Method to summarise multiple values for sorting fields with lists of values
+        Method to summarise multiple values for sorting fields with lists of values.Multiple methods can be specified as a comma-separated string.
       examples:
         null:
           value:
@@ -832,20 +835,17 @@ components:
         sum:
           value: sum
           summary: Use sum of values (numeric fields only)
+        multiple_modes:
+          value: max,min
+          summary: Use maximum value for the first field, minimum value for the second field
       in: query
       name: sortMode
       required: false
       schema:
-        enum:
-          - avg
-          - max
-          - median
-          - min
-          - sum
         type: string
     sortOrderParam:
       description: |
-        Sort order to use when returning results.
+        Sort order(s) to use when returning results.Multiple orders can be specified as a comma-separated string.
 
         Only applicable when `sortBy` is defined.
       examples:
@@ -858,13 +858,13 @@ components:
         desc:
           value: desc
           summary: Sort values in descending order
+        multiple_orders:
+          value: asc,desc
+          summary: Sort first field in ascending order, second field in descending order
       in: query
       name: sortOrder
       required: false
       schema:
-        enum:
-          - asc
-          - desc
         type: string
     streamFileParam:
       description: |
