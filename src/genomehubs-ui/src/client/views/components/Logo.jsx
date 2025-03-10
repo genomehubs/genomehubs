@@ -1,12 +1,44 @@
 import React from "react";
+import { compose } from "recompose";
+import withColors from "#hocs/withColors";
+import withTheme from "#hocs/withTheme";
 
-const Logo = ({ lineColor = "#ffffff", fillOpacity = 0 }) => {
+const Logo = ({
+  lineColor,
+  theme = "lightTheme",
+  colorScheme,
+  backgroundColor = "transparent",
+  fillOpacity = 0,
+  invert,
+}) => {
+  if (!lineColor) {
+    lineColor = invert
+      ? colorScheme[theme].darkColor
+      : colorScheme[theme].lightColor;
+  }
+  if (backgroundColor === "contrast") {
+    backgroundColor = invert
+      ? colorScheme[theme].lightColor
+      : colorScheme[theme].darkColor;
+  }
+  let bgRect =
+    backgroundColor === "transparent" ? null : (
+      <rect
+        x="43.845234"
+        y="65.678574"
+        width="100%"
+        height="100%"
+        fill={backgroundColor}
+      />
+    );
+
   return (
     <svg
       height="100%"
       viewBox="43.845234 65.678574 135.46666 135.46666"
       preserveAspectRatio="xMinYMin"
     >
+      {bgRect}
       <g id="layer1">
         <path
           style={{ fill: "none", stroke: lineColor, strokeWidth: 6.35 }}
@@ -54,4 +86,4 @@ const Logo = ({ lineColor = "#ffffff", fillOpacity = 0 }) => {
   );
 };
 
-export default Logo;
+export default compose(withTheme, withColors)(Logo);

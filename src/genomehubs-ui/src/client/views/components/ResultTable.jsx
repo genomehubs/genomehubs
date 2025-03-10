@@ -48,6 +48,7 @@ import dispatchRecord from "../hocs/dispatchRecord";
 import expandFieldList from "../functions/expandFieldList";
 import { formatter } from "../functions/formatter";
 import makeStyles from "@mui/styles/makeStyles";
+import { mixColor } from "../functions/mixColor";
 import qs from "../functions/qs";
 import { styled } from "@mui/material/styles";
 import withColors from "../hocs/withColors";
@@ -119,7 +120,6 @@ const StickyCell = withStyles((theme) => ({
     position: "sticky",
     left: 0,
     zIndex: 100,
-    backgroundColor: "#f8f8f8",
   },
 }))(TableCell);
 

@@ -8,12 +8,14 @@ import { fullWidth as fullWidthStyle } from "./Styles.scss";
 import qs from "../functions/qs";
 import { useIntersectionObserver } from "usehooks-ts";
 import { useNavigate } from "@reach/router";
+import withColors from "../hocs/withColors";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "../hocs/withSiteName";
 import withSummary from "../hocs/withSummary";
 import withSummaryById from "../hocs/withSummaryById";
 import withTaxonomy from "../hocs/withTaxonomy";
+import withTheme from "../hocs/withTheme";
 
 const HistogramSVG = ({
   summaryId,
@@ -27,6 +29,8 @@ const HistogramSVG = ({
   setPreferSearchTerm,
   setLookupTerm,
   basename,
+  colorScheme,
+  theme,
 }) => {
   const navigate = useNavigate();
 
@@ -137,7 +141,7 @@ const HistogramSVG = ({
           style={{ cursor: "pointer", pointerEvents: "auto" }}
           onClick={() => handleClick(bucket)}
         />
-      </Tooltip>
+      </Tooltip>,
     );
     histogramText.push(
       <text
@@ -148,13 +152,13 @@ const HistogramSVG = ({
         }}
         x={bucket.x + bucket.width / 2}
         y={height / 2}
-        fill={"white"}
+        fill={colorScheme[theme].lightColor}
         textAnchor="middle"
         alignmentBaseline="central"
         dominantBaseline="alphabetic"
       >
         {formatter(bucket.count)}
-      </text>
+      </text>,
     );
   });
   ticks.forEach((tick, i) => {
@@ -170,7 +174,7 @@ const HistogramSVG = ({
         opacity={0.75}
       >
         {tick.value}
-      </line>
+      </line>,
     );
     histogramTickLabels.push(
       <text
@@ -185,7 +189,7 @@ const HistogramSVG = ({
         opacity={0.75}
       >
         {tick.value}
-      </text>
+      </text>,
     );
   });
   return (
@@ -215,8 +219,10 @@ const HistogramSVG = ({
 export default compose(
   withSiteName,
   withTaxonomy,
+  withTheme,
+  withColors,
   withLookup,
   withSearch,
   withSummary,
-  withSummaryById
+  withSummaryById,
 )(HistogramSVG);

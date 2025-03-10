@@ -22,11 +22,24 @@ import batlowS from "./color/batlowS";
 import { createSelector } from "reselect";
 import immutableUpdate from "immutable-update";
 
-export const ancestralColor = ANCESTRAL_COLOR || "red";
-export const descendantColor = DESCENDANT_COLOR || "orange";
-export const directColor = DIRECT_COLOR || "green";
-export const descendantHighlight = DESCENDANT_HIGHLIGHT || "orange";
-export const directHighlight = DIRECT_HIGHLIGHT || "green";
+const ANCESTRAL_COLOR =
+  typeof ANCESTRAL_COLOR !== "undefined" ? ANCESTRAL_COLOR : "#db4325";
+const DESCENDANT_COLOR =
+  typeof DESCENDANT_COLOR !== "undefined" ? DESCENDANT_COLOR : "#eda247";
+const DIRECT_COLOR =
+  typeof DIRECT_COLOR !== "undefined" ? DIRECT_COLOR : "#006164";
+const DESCENDANT_HIGHLIGHT =
+  typeof DESCENDANT_HIGHLIGHT !== "undefined"
+    ? DESCENDANT_HIGHLIGHT
+    : "#e6e1bc";
+const DIRECT_HIGHLIGHT =
+  typeof DIRECT_HIGHLIGHT !== "undefined" ? DIRECT_HIGHLIGHT : "#57c4ad";
+
+export const ancestralColor = ANCESTRAL_COLOR;
+export const descendantColor = DESCENDANT_COLOR;
+export const directColor = DIRECT_COLOR;
+export const descendantHighlight = DESCENDANT_HIGHLIGHT;
+export const directHighlight = DIRECT_HIGHLIGHT;
 
 export const addPalette = createAction("ADD_PALETTE");
 export const editPalette = createAction("EDIT_PALETTE");
@@ -85,6 +98,46 @@ const cudRainbowPalette = [
   "#000000", // Black
 ];
 
+export const defaultPalettes = {
+  byId: {
+    accent: createD3Palette(schemeAccent, 8),
+    batlowS: createPalette(batlowS),
+    batlow: createPalette(batlow, 50),
+    bhm: createPalette(bhmPalette),
+    category: createD3Palette(schemeCategory10, 10),
+    cividis: createD3Palette(interpolateCividis, 50),
+    cool: createD3Palette(interpolateCool, 50),
+    cubeHelix: createD3Palette(interpolateCubehelixDefault, 50),
+    cud: createPalette(cudPalette),
+    cudRainbow: createPalette(cudRainbowPalette),
+    dark: createD3Palette(schemeDark2, 8),
+    default: createD3Palette(interpolateViridis, 50),
+    cudReverse: createPalette(cudPalette.reverse().splice(1)),
+    inferno: createD3Palette(interpolateInferno, 50),
+    magma: createD3Palette(interpolateMagma, 50),
+    paired: createD3Palette(schemePaired, 12),
+    plasma: createD3Palette(interpolatePlasma, 50),
+    pride: createPalette(pridePalette),
+    rings: createPalette(ringsPalette),
+    standard: { id: "default", default: brewerPalette, levels: [] },
+    tableau: createD3Palette(schemeTableau10, 10),
+    turbo: createD3Palette(interpolateTurbo, 50),
+    viridis: createD3Palette(interpolateViridis, 50),
+    warm: createD3Palette(interpolateWarm, 50),
+  },
+  allIds: [
+    "default",
+    "batlow",
+    "batlowS",
+    "cividis",
+    "paired",
+    "viridis",
+    "cud",
+    "cudRainbow",
+    "cudReverse",
+  ],
+};
+
 export const palettes = handleActions(
   {
     ADD_PALETTE: (state, action) =>
@@ -107,45 +160,7 @@ export const palettes = handleActions(
       });
     },
   },
-  {
-    byId: {
-      accent: createD3Palette(schemeAccent, 8),
-      batlowS: createPalette(batlowS),
-      batlow: createPalette(batlow, 50),
-      bhm: createPalette(bhmPalette),
-      category: createD3Palette(schemeCategory10, 10),
-      cividis: createD3Palette(interpolateCividis, 50),
-      cool: createD3Palette(interpolateCool, 50),
-      cubeHelix: createD3Palette(interpolateCubehelixDefault, 50),
-      cud: createPalette(cudPalette),
-      cudRainbow: createPalette(cudRainbowPalette),
-      dark: createD3Palette(schemeDark2, 8),
-      default: createD3Palette(interpolateViridis, 50),
-      cudReverse: createPalette(cudPalette.reverse().splice(1)),
-      inferno: createD3Palette(interpolateInferno, 50),
-      magma: createD3Palette(interpolateMagma, 50),
-      paired: createD3Palette(schemePaired, 12),
-      plasma: createD3Palette(interpolatePlasma, 50),
-      pride: createPalette(pridePalette),
-      rings: createPalette(ringsPalette),
-      standard: { id: "default", default: brewerPalette, levels: [] },
-      tableau: createD3Palette(schemeTableau10, 10),
-      turbo: createD3Palette(interpolateTurbo, 50),
-      viridis: createD3Palette(interpolateViridis, 50),
-      warm: createD3Palette(interpolateWarm, 50),
-    },
-    allIds: [
-      "default",
-      "batlow",
-      "batlowS",
-      "cividis",
-      "paired",
-      "viridis",
-      "cud",
-      "cudRainbow",
-      "cudReverse",
-    ],
-  },
+  defaultPalettes,
 );
 
 export const getSelectedPalette = (state) => state.selectedPalette;
@@ -185,34 +200,58 @@ export const getDefaultPalette = createSelector(
 
 /* Coolors Exported Palette - coolors.co/d7cdcc-ffffff-59656f-9c528b-1d1e2c */
 /* RGB */
-export const schemeColors = {
-  darkColor: "rgb(49, 50, 63)",
-  lightColor: "rgb(255, 255, 255)",
-  shadeColor: "rgb(89, 101, 111)",
-  deepColor: "rgb(65,74,81)",
-  highlightColor: "rgb(156, 82, 139)",
-  halfHighlightColor: "rgba(156, 82, 139, 0.5)",
-  paleColor: "rgb(215, 205, 204)",
-  brightColor: "rgb(255,255,30)",
-  clearColor: "rgba(255,255,255,0)",
+export const lightThemeColors = {
+  darkColor: "#31323F",
+  lightColor: "#FFFFFF",
+  paleColor: "#E0E0E0",
+  hoverColor: "#C0C0C0",
+  shadeColor: "#59656F",
+  deepColor: "#414A51",
+  highlightColor: "#9C528B",
+  halfHighlightColor: "#9C528B80", // 50% opacity
+  brightColor: "#FFFF1E",
+  clearColor: "#FFFFFF00", // 0% opacity
+  linkColor: "#1f78b4",
+  headerText: "#FFFFFF",
+  headerBackground: "#31323F",
 };
 
-export const setColorScheme = createAction("SET_COLOR_SCHEME");
-export const colorScheme = handleAction(
-  "SET_COLOR_SCHEME",
-  (state, action) => action.payload,
-  schemeColors,
-);
+// invert light and dark colors for dark theme
+export const darkThemeColors = {
+  darkColor: "#FFFFFF",
+  lightColor: "#31323F",
+  paleColor: "#515261",
+  hoverColor: "#717281",
+  shadeColor: "#9C528B",
+  deepColor: "#414A51",
+  highlightColor: "#b584f0",
+  halfHighlightColor: "#b584f080", // 50% opacity
+  brightColor: "#FFFF1E",
+  clearColor: "#FFFFFF00", // 0% opacity
+  linkColor: "#8263a8",
+  headerText: "#FFFFFF",
+  headerBackground: "#31323F",
+};
 
-export const getColorScheme = (state) => state.colorScheme;
+const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+const defaultTheme = prefersDark ? "darkTheme" : "lightTheme";
 
 export const setTheme = createAction("SET_THEME");
 export const theme = handleAction(
   "SET_THEME",
   (state, action) => action.payload,
-  "Light",
+  defaultTheme,
 );
 export const getTheme = (state) => state.theme;
+
+export const setColorScheme = createAction("SET_COLOR_SCHEME");
+export const colorScheme = handleAction(
+  "SET_COLOR_SCHEME",
+  (state, action) => action.payload,
+  { lightTheme: lightThemeColors, darkTheme: darkThemeColors },
+);
+
+export const getColorScheme = (state) => state.colorScheme;
 
 export const getStatusColors = (state) => state.statusColors;
 

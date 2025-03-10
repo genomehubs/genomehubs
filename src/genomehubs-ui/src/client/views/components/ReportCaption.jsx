@@ -3,9 +3,12 @@ import React, { useEffect, useRef, useState } from "react";
 import Grid from "@mui/material/Grid2";
 import PhylopicAttributions from "./PhylopicAttributions";
 import Tooltip from "./Tooltip";
+import { compose } from "recompose";
 import { reportCaption as reportCaptionStyle } from "./Styles.scss";
 import stringLength from "../functions/stringLength";
 import useResize from "../hooks/useResize";
+import withColors from "#hocs/withColors";
+import withTheme from "#hocs/withTheme";
 
 const ReportCaption = ({
   reportById,
@@ -13,10 +16,13 @@ const ReportCaption = ({
   embedded,
   inModal,
   padding = 0,
+  colorScheme,
+  theme,
 }) => {
   const gridRef = useRef();
   const { width, height } = useResize(gridRef);
   const [captionScale, setCaptionScale] = useState(100);
+  const textColor = colorScheme[theme].darkColor;
 
   const formatCaption = ({ caption, tooltip }) => {
     if (caption && caption !== true) {
@@ -36,7 +42,12 @@ const ReportCaption = ({
           // captionArr.push(<span key={i}>{parts[i]}</span>);
         } else {
           captionArr.push(
-            <b key={i} style={{ color: tooltip ? "yellow" : "black" }}>
+            <b
+              key={i}
+              style={{
+                color: tooltip ? "yellow" : textColor,
+              }}
+            >
               {parts[i]}
             </b>,
           );
@@ -118,4 +129,4 @@ const ReportCaption = ({
   );
 };
 
-export default ReportCaption;
+export default compose(withTheme, withColors)(ReportCaption);

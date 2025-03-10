@@ -5,6 +5,7 @@ import Dialog from "@mui/material/Dialog";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "@mui/material/IconButton";
 import ListIcon from "@mui/icons-material/List";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import MuiDialogActions from "@mui/material/DialogActions";
 import MuiDialogContent from "@mui/material/DialogContent";
 import MuiDialogTitle from "@mui/material/DialogTitle";
@@ -12,6 +13,7 @@ import MuiTab from "@mui/material/Tab";
 import MuiTabs from "@mui/material/Tabs";
 import SaveSettingsDefaults from "./SaveSettingsDefaults";
 import SaveSettingsFavourites from "./SaveSettingsFavourites";
+import SaveSettingsMore from "./SaveSettingsMore";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import Typography from "@mui/material/Typography";
 import { compose } from "recompose";
@@ -24,6 +26,7 @@ import withTaxonomy from "../hocs/withTaxonomy";
 export const useStyles = makeStyles((theme) => ({
   paper: {
     boxShadow: "none",
+    backgroundColor: theme.palette.background.default,
   },
   formControl: {
     margin: "16px",
@@ -49,7 +52,7 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
   };
 
   const [secondaryTabValue, setSecondaryTabValue] = useState(
-    activeIndices.indexOf(searchIndex)
+    activeIndices.indexOf(searchIndex),
   );
 
   const handleSecondaryTabChange = (event, newValue) => {
@@ -65,7 +68,7 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
       position: "absolute",
       right: 8,
       top: 8,
-      color: "#bdbdbd", // theme.palette.grey[500],
+      color: theme.palette.text.primary,
     },
   });
 
@@ -126,6 +129,7 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
           <MuiTab icon={<FavoriteIcon />} label="FAVORITES" />
           <MuiTab icon={<SettingsApplicationsIcon />} label="DEFAULTS" />
           <MuiTab icon={<ListIcon />} label="LISTS" />
+          <MuiTab icon={<MoreHorizIcon />} label="MORE" />
         </MuiTabs>
         <MuiTabs
           value={secondaryTabValue}
@@ -151,6 +155,7 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
             currentIndex={activeIndices[secondaryTabValue]}
           />
         )}
+        {tabValue == 3 && <SaveSettingsMore />}
 
         <DialogActions>
           <span className={favListingFooterStyle}>

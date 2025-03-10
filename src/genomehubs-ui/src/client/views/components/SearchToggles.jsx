@@ -36,14 +36,11 @@ export const useStyles = makeStyles((theme) => ({
     width: "400px",
     maxWidth: "75vw",
     maxHeight: "75vh",
-    backgroundColor: "white",
-    border: "2px solid #000",
+    backgroundColor: theme.palette.background.paper,
+    border: `2px solid ${theme.palette.primary.main}`,
     boxShadow: "#333333", // theme.shadows[5],
     padding: "16px 32px 24px",
     overflowX: "hidden",
-  },
-  label: {
-    color: "rgba(0, 0, 0, 0.54)",
   },
 }));
 
@@ -114,7 +111,6 @@ const SearchToggles = ({
           >
             <FormHelperText>{"empty columns"}</FormHelperText>
             <FormControlLabel
-              className={classes.label}
               control={
                 <Switch
                   id={"show-empty-columns"}
@@ -135,7 +131,7 @@ const SearchToggles = ({
                       `${location.pathname}?${qs.stringify({
                         ...options,
                         query,
-                      })}${hash}`
+                      })}${hash}`,
                     );
                   }}
                   name="filter-type"
@@ -173,7 +169,6 @@ const SearchToggles = ({
             >
               <FormHelperText>{"include descendants"}</FormHelperText>
               <FormControlLabel
-                className={classes.label}
                 control={
                   <Switch
                     id={"taxon-filter-filter"}
@@ -189,7 +184,7 @@ const SearchToggles = ({
                       if (includeDescendants) {
                         query = query.replaceAll(
                           /tax_(:?eq|name)/gi,
-                          "tax_tree"
+                          "tax_tree",
                         );
                         hash = hash.replaceAll(/tax_(:?eq|name)/gi, "tax_tree");
                       } else {
@@ -200,7 +195,7 @@ const SearchToggles = ({
                         `${location.pathname}?${qs.stringify({
                           ...options,
                           query,
-                        })}${hash}`
+                        })}${hash}`,
                       );
                     }}
                     name="filter-type"
@@ -230,7 +225,6 @@ const SearchToggles = ({
               >
                 <FormHelperText>{"include estimates"}</FormHelperText>
                 <FormControlLabel
-                  className={classes.label}
                   control={
                     <Switch
                       id={"estimated-values-filter"}
@@ -244,7 +238,7 @@ const SearchToggles = ({
                           `${location.pathname}?${qs.stringify({
                             ...options,
                             includeEstimates,
-                          })}${location.hash}`
+                          })}${location.hash}`,
                         );
                       }}
                       name="include-estimates"
@@ -269,7 +263,7 @@ const SearchToggles = ({
                     view: window,
                     bubbles: true,
                     cancelable: true,
-                  })
+                  }),
                 );
               }, 20);
               setShowSettings(true);
@@ -319,7 +313,7 @@ const SearchToggles = ({
                     view: window,
                     bubbles: true,
                     cancelable: true,
-                  })
+                  }),
                 );
               }, 20);
               setShowOptions(true);
@@ -395,5 +389,5 @@ export default compose(
   withSiteName,
   dispatchLookup,
   withSearch,
-  withSearchDefaults
+  withSearchDefaults,
 )(SearchToggles);
