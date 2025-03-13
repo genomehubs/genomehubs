@@ -4,9 +4,23 @@
   "flake8.args": ["--max-line-length=88"],
   "[python]": {
     "editor.codeActionsOnSave": {
-      "source.organizeImports.python": "explicit"
+      "source.organizeImports": "explicit"
     },
+    "editor.formatOnSave": true,
+    "prettier.printWidth": 88,
     "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "yaml.schemas": {
     "swaggerviewer:openapi": "file:///Users/rchallis/projects/genomehubs/genomehubs/src/genomehubs-api/src/api-v2.yaml"
