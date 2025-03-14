@@ -24,7 +24,6 @@ attributes:
     display_level: 2
     display_group: assembly
     summary: list
-    traverse: false
     type: geo_point
   sample_sex:
     constraint:
@@ -37,7 +36,6 @@ attributes:
     display_level: 2
     display_group: assembly
     summary: list
-    traverse: false
     type: keyword
   sex_determination_system:
     constraint:
