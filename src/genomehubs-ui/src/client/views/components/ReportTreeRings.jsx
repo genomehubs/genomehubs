@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import { compose } from "recompose";
 import { scaleLog } from "d3-scale";
 import setColors from "../functions/setColors";
+import { shadesOfPurple } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { useLongPress } from "use-long-press";
 import withColors from "#hocs/withColors";
 import withTheme from "#hocs/withTheme";
@@ -43,6 +44,8 @@ const ReportTreeRings = ({
     count: cats.length || 1,
     colors,
   }));
+
+  let greyColor = colorScheme[theme].shadeColor;
 
   let divHeight = height;
   height = Math.min(
@@ -126,7 +129,7 @@ const ReportTreeRings = ({
               fill={
                 segment.cats && segment.cats.length == 1
                   ? colors[segment.cats[0]]
-                  : segment.color
+                  : segment.color || greyColor
               }
               onPointerEnter={(e) => highlightSegment(segment)}
               onPointerOut={(e) => highlightSegment()}
@@ -248,6 +251,38 @@ const ReportTreeRings = ({
       );
     });
   }
+  defs.push(
+    <filter id="invertFilter" key="invertFilter">
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="1 0" />
+        <feFuncG type="table" tableValues="1 0" />
+        <feFuncB type="table" tableValues="1 0" />
+      </feComponentTransfer>
+    </filter>,
+  );
+  defs.push(
+    <filter id="brightnessFilter" key="brightnessFilter">
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="0.9" />
+        <feFuncG type="linear" slope="0.9" />
+        <feFuncB type="linear" slope="0.9" />
+      </feComponentTransfer>
+    </filter>,
+  );
+  defs.push(
+    <filter id="combinedFilter" key="combinedFilter">
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="1 0" />
+        <feFuncG type="table" tableValues="1 0" />
+        <feFuncB type="table" tableValues="1 0" />
+      </feComponentTransfer>
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="0.9" />
+        <feFuncG type="linear" slope="0.9" />
+        <feFuncB type="linear" slope="0.9" />
+      </feComponentTransfer>
+    </filter>,
+  );
 
   let ticksText = [];
   let tickRings = [];

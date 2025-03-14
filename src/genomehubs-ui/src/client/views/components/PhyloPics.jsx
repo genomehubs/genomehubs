@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import {
   blank as blankStyle,
   imageContainer as imageContainerStyle,
@@ -9,6 +9,7 @@ import {
 } from "./Styles.scss";
 
 import { Image } from "react-konva";
+import Konva from "konva";
 import PhyloPic from "./PhyloPic";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
@@ -26,11 +27,21 @@ const styleMap = {
   imageCreditAncestralStyle,
 };
 
-const PhyloPicKonvaImage = ({ fileUrl, maxHeight, maxWidth, x, y }) => {
-  let [image] = useImage(fileUrl);
+const PhyloPicKonvaImage = ({ fileUrl, maxHeight, maxWidth, theme, x, y }) => {
+  const [image] = useImage(fileUrl, "anonymous");
+  const imageRef = useRef();
+  useEffect(() => {
+    if (imageRef.current && theme == "darkTheme") {
+      imageRef.current.cache();
+      imageRef.current.filters([Konva.Filters.Invert, Konva.Filters.Brighten]);
+      imageRef.current.brightness(0.9);
+      imageRef.current.getLayer().batchDraw();
+    }
+  }, [image]);
   return (
     <Image
       image={image}
+      ref={imageRef}
       x={-maxWidth / 2}
       y={y}
       height={maxHeight}
@@ -213,6 +224,7 @@ const PhyloPics = ({
           fileUrl={fileUrl}
           maxHeight={maxHeight}
           maxWidth={maxWidth}
+          theme={theme}
           {...props}
         />
       );
@@ -225,15 +237,7 @@ const PhyloPics = ({
             height={maxHeight}
             width={maxWidth}
             xlinkHref={dataUri}
-            style={
-              theme == "darkTheme"
-                ? {
-                    // Conditional inversion filter is applied for dark mode.
-                    // Source will always be a black png image so color needs to be inverted with a filter.
-                    filter: "invert(1) brightness(.9)",
-                  }
-                : {}
-            }
+            filter={theme == "darkTheme" ? "url(#combinedFilter)" : ""}
           />
           <Tooltip
             title={imageDescription}

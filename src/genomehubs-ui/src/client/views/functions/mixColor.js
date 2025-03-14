@@ -43,11 +43,23 @@ export const mixColor = ({ color1, color2, ratio }) => {
     return [r * 255, g * 255, b * 255, a];
   };
 
-  const rgbToHex = (r, g, b) => {
-    return (
+  const rgbToHex = (r, g, b, a = 1) => {
+    let hex =
       "#" +
-      ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()
-    );
+      ((1 << 24) + (r << 16) + (g << 8) + b)
+        .toString(16)
+        .slice(1)
+        .toUpperCase();
+    if (a < 1) {
+      let alphaHex = Math.round(a * 255)
+        .toString(16)
+        .toUpperCase();
+      if (alphaHex.length === 1) {
+        alphaHex = "0" + alphaHex;
+      }
+      hex += alphaHex;
+    }
+    return hex;
   };
 
   const parseColor = (color) => {
