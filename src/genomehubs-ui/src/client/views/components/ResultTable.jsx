@@ -858,7 +858,7 @@ const ResultTable = ({
     toggleMissing,
   }) => {
     setPreferSearchTerm(false);
-    let options = { ...searchTerm };
+    let options = { ...searchTerm, offset: 0 };
     let ancestral = arrToObj(options.excludeAncestral);
     if (toggleAncestral) {
       ancestral[toggleAncestral] = !ancestral[toggleAncestral];
