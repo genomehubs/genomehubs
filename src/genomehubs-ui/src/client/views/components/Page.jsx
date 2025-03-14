@@ -157,6 +157,17 @@ const Page = ({
     title = `no search results`;
     searchTips = <SearchTips />;
   }
+  if (searchTips) {
+    // insert into the second position in postSearchItems
+    postSearchItems.splice(
+      1,
+      0,
+      <Grid size={12} className={itemCss} key="searchTips">
+        {searchTips}
+      </Grid>,
+    );
+  }
+
   return (
     <Grid
       container
@@ -266,7 +277,6 @@ const Page = ({
           </Grid>
         </Grid>
       )}
-      {searchTips && <Grid className={itemCss}>{searchTips}</Grid>}
       {postSearchItems}
       {text && <Grid className={itemCss}>{text}</Grid>}
     </Grid>

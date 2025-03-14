@@ -1630,36 +1630,40 @@ const ResultTable = ({
         //   overflow: "visible",
         // }}
       > */}
-      <Grid
-        container
-        alignItems="center"
-        justifyContent="center"
-        direction="row"
-        spacing={1}
-        size={10}
-        className={classes.root}
-      >
-        <Grid>
-          <LinkButton options={["search", "searchurl"]} />
-        </Grid>
-        <Grid>
-          <SearchPagination />
-        </Grid>
-        <Grid style={{ marginLeft: "auto" }}>
-          <DownloadButton
-            onButtonClick={saveSearchResults}
-            searchTerm={searchTerm}
-          />
-        </Grid>
-        <ResultModalControl
-          // currentRecordId={recordId}
-          // attributeId={attribute}
-          // showAttribute={showAttribute}
-          // setShowAttribute={setShowAttribute}
-          rootRef={rootRef}
-        />
-      </Grid>
-      {citationMessage}
+      {rows.length > 0 && (
+        <>
+          <Grid
+            container
+            alignItems="center"
+            justifyContent="center"
+            direction="row"
+            spacing={1}
+            size={10}
+            className={classes.root}
+          >
+            <Grid>
+              <LinkButton options={["search", "searchurl"]} />
+            </Grid>
+            <Grid>
+              <SearchPagination />
+            </Grid>
+            <Grid style={{ marginLeft: "auto" }}>
+              <DownloadButton
+                onButtonClick={saveSearchResults}
+                searchTerm={searchTerm}
+              />
+            </Grid>
+            <ResultModalControl
+              // currentRecordId={recordId}
+              // attributeId={attribute}
+              // showAttribute={showAttribute}
+              // setShowAttribute={setShowAttribute}
+              rootRef={rootRef}
+            />
+          </Grid>
+          {citationMessage}
+        </>
+      )}
       {/* </Grid> */}
     </Grid>
   );
