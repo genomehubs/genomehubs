@@ -1,120 +1,69 @@
-const { PuppeteerCrawler } = require("@crawlee/puppeteer");
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
+import puppeteer from "puppeteer";
 
-// Create an instance of the PuppeteerCrawler class - a crawler
-// that automatically loads the URLs in headless Chrome / Puppeteer.
-const crawler = new PuppeteerCrawler({
-  // Here you can set options that are passed to the launchPuppeteer() function.
-  launchContext: {
-    launchOptions: {
-      headless: true,
-      // Other Puppeteer options
-    },
-  },
+// Function to process each URL
+async function processPage(url, htmlDir, htmlFile) {
+  const browser = await puppeteer.launch({ headless: "new" });
+  const page = await browser.newPage();
+  await page.goto(url, { waitUntil: "networkidle2" });
 
-  // Stop crawling after several pages
-  maxRequestsPerCrawl: 50,
+  await page.evaluate(async () => {
+    await new Promise((resolve) => {
+      const scrollInterval = setInterval(() => {
+        window.scrollTo(0, document.body.scrollHeight);
+      }, 100);
 
-  // This function will be called for each URL to crawl.
-  // Here you can write the Puppeteer scripts you are familiar with,
-  // with the exception that browsers and pages are automatically managed by Crawlee.
-  // The function accepts a single parameter, which is an object with the following fields:
-  // - request: an instance of the Request class with information such as URL and HTTP method
-  // - page: Puppeteer's Page object (see https://pptr.dev/#show=api-class-page)
-  async requestHandler({ pushData, request, page, enqueueLinks, log }) {
-    log.info(`Processing ${request.url}...`);
+      const idleTimeout = setTimeout(() => {
+        clearInterval(scrollInterval);
+        resolve();
+      }, 10000);
 
-    // A function to be evaluated by Puppeteer within the browser context.
-    // await new Promise((r) => setTimeout(r, 5000));
-
-    await page.evaluate(async () => {
-      await new Promise((resolve) => {
-        const scrollInterval = setInterval(() => {
-          window.scrollTo(0, document.body.scrollHeight);
-        }, 100);
-
-        const idleTimeout = setTimeout(() => {
-          clearInterval(scrollInterval);
-          resolve();
-        }, 10000);
-
-        window.addEventListener("load", () => {
-          clearInterval(scrollInterval);
-          clearTimeout(idleTimeout);
-          resolve();
-        });
+      window.addEventListener("load", () => {
+        clearInterval(scrollInterval);
+        clearTimeout(idleTimeout);
+        resolve();
       });
     });
+  });
 
-    // Save the HTML for the page
-    // Select the app div
-    // const appDiv = await page.$eval("#app", (element) => element.outerHTML);
-    // Select all p and a elements
-    const elements = await page.$$eval(
-      "a:not(header a):not(footer a), p:not(#searchBox):not(.MuiFormHelperText-root)",
-      (elements) => elements.map((element) => element.outerHTML)
-    );
+  const elements = await page.$$eval(
+    "body a:not(header a):not(footer a), body p:not(#searchBox):not(.MuiFormHelperText-root)",
+    (elements) => elements.map((element) => element.outerHTML)
+  );
 
-    // Create a new top-level div
-    const mainContent = elements.join("");
-    const modifiedMainContent = mainContent
-      .replace(/\n/g, "")
-      .replace(/\s+/g, " ")
-      .replace(/>\s+/g, ">")
-      .replace(/\s+</g, "<")
-      .replace(/([^>])<span(\b[^>]*)>/gi, "$1 <span$2>")
-      .replace(/<\/span>([^<])/gi, "</span> $1")
-      .replace(/([^>])<a(\b[^>]*)>/gi, "$1 <a$2>")
-      .replace(/<\/a>([^<])/gi, "</a> $1")
-      .replace(/<p>We use cookies.+?<\/p>/gi, "")
-      .replace(/<svg\b[^>]*>.*?<\/svg>/gi, "");
+  const mainContent = elements.join("");
+  const modifiedMainContent = mainContent
+    .replace(/\n/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/>\s+/g, ">")
+    .replace(/\s+</g, "<")
+    .replace(/([^>])<span(\b[^>]*)>/gi, "$1 <span$2>")
+    .replace(/<\/span>([^<])/gi, "</span> $1")
+    .replace(/([^>])<a(\b[^>]*)>/gi, "$1 <a$2>")
+    .replace(/<\/a>([^<])/gi, "</a> $1")
+    .replace(/<p>We use cookies[\s\S]+?<\/p>/gi, "")
+    .replace(/<svg\b[^>]*>([\s\S]*?)<\/svg>/gi, "");
 
-    // Replace the existing mainContainer div with the content of modifiedTopLevelDiv
-    await page.$eval(
-      "#app",
-      (element, modifiedMainContent) => {
-        element.innerHTML = modifiedMainContent;
-      },
-      modifiedMainContent
-    );
-    // Save the modified HTML to a file
-    fs.mkdirSync(request.userData.htmlDir, { recursive: true });
-    fs.writeFileSync(request.userData.htmlFile, await page.content());
-    // Save the HTML to a file
-    // const modifiedAppDiv = appDiv
-    //   .replace(/\n/g, "")
-    //   .replace(/\s+/g, " ")
-    //   .replace(/>\s+/g, ">")
-    //   .replace(/\s+</g, "<");
-    // fs.writeFileSync("page.html", modifiedAppDiv);
+  await page.$eval(
+    "#app",
+    (element, modifiedMainContent) => {
+      element.innerHTML = modifiedMainContent;
+    },
+    modifiedMainContent
+  );
 
-    // fs.writeFileSync("page.html", appDiv);
+  // Extract the inner HTML of the body element
+  const bodyContent = await page.$eval("body", (element) => element.innerHTML);
 
-    // await page.pdf({
-    //   path: outputFileName,
-    //   displayHeaderFooter: true,
-    //   headerTemplate: "",
-    //   footerTemplate: "",
-    //   printBackground: true,
-    //   format: "A4",
-    // });
+  // Wrap the body content in a full HTML document
+  const htmlContent = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>GenomeHubs</title></head><body>${bodyContent}</body></html>`;
 
-    // Find a link to the next page and enqueue it if it exists.
-    const infos = await enqueueLinks({
-      selector: ".morelink",
-    });
+  fs.mkdirSync(htmlDir, { recursive: true });
+  fs.writeFileSync(htmlFile, htmlContent);
 
-    if (infos.processedRequests.length === 0) {
-      log.info(`${request.url} is the last page!`);
-    }
-  },
-
-  // This function is called if the page processing failed more than maxRequestRetries+1 times.
-  failedRequestHandler({ request, log }) {
-    log.error(`Request ${request.url} failed too many times.`);
-  },
-});
+  await browser.close();
+}
 
 // Get the directory path from the GH_PAGES_PATH environment variable
 const staticPagesDir = process.env.GH_PAGES_PATH;
@@ -142,16 +91,10 @@ const generateFileList = (tabTree, root = "/", fileList) => {
 };
 
 const generateTabTree = (tabsFilePath = "./tabs.md") => {
-  // Read the tabs.md file
   const tabsFileContent = fs.readFileSync(tabsFilePath, "utf8");
-
-  // Extract the list entries from the tabs.md file
   const listEntries = tabsFileContent.match(/- .+/g);
-
-  // Create the tabTree object
   const tabTree = {};
 
-  // Add the list entries to the tabTree object
   listEntries.forEach((entry) => {
     const hasChildren = entry.endsWith("+");
     const absolute = entry.substring(2).startsWith("/");
@@ -199,20 +142,14 @@ const generateTabTree = (tabsFilePath = "./tabs.md") => {
 const tabsFilePath = path.join(staticPagesDir, "tabs.md");
 const tabTree = generateTabTree(tabsFilePath);
 const fileList = ["/", ...generateFileList(tabTree)];
-(async () => {
-  await crawler.addRequests(
-    fileList.map((location) => {
-      let htmlDir = path.join("./rendered", location);
-      let htmlFile = path.join("./rendered", location, "index.html");
-      return {
-        url: `https://goat.genomehubs.org${location}`,
-        userData: { htmlDir, htmlFile },
-      };
-    })
-  );
 
-  // Run the crawler and wait for it to finish.
-  await crawler.run();
+for (const location of fileList) {
+  console.log(`Processing ${location}`);
+  const htmlDir = path.join("./rendered", location);
+  const htmlFile = path.join("./rendered", location, "index.html");
+  const url = `https://goat.genomehubs.org${location}`;
+  await processPage(url, htmlDir, htmlFile);
+  console.log(`Processed ${url}`);
+}
 
-  console.log("Crawler finished.");
-})();
+console.log("Crawler finished.");
