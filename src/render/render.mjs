@@ -2,8 +2,6 @@ import { PuppeteerCrawler } from "@crawlee/puppeteer";
 import fs from "fs";
 import path from "path";
 
-const outputFileName = "output.pdf";
-
 // Create an instance of the PuppeteerCrawler class - a crawler
 // that automatically loads the URLs in headless Chrome / Puppeteer.
 const crawler = new PuppeteerCrawler({
