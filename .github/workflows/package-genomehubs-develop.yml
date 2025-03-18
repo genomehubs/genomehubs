@@ -87,7 +87,7 @@ jobs:
         id: puppeteer
         with:
           files: |
-            src/render/render.js
+            src/render/ls.js
             src/render/node_modules
         env:
           GH_PAGES_PATH: "goat-ui/static"
