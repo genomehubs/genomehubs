@@ -78,6 +78,7 @@ jobs:
           git clone -b main --single-branch https://github.com/genomehubs/goat-ui
           cd src/render
           npm install
+          cp node_modules ../../
           cd -
       - name: render pages
         uses: tj-actions/puppeteer@v5
