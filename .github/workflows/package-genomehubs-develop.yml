@@ -78,6 +78,7 @@ jobs:
           git clone -b main --single-branch https://github.com/genomehubs/goat-ui
           cd src/render
           npm install
+          ls node_modules
           cp -r node_modules ../../
           cd -
       - name: render pages
