@@ -1,6 +1,8 @@
 name: package-genomehubs-develop
 
-on: workflow_dispatch
+on:
+  - workflow_dispatch
+  - push
 
 jobs:
   package-ui:
@@ -83,6 +85,11 @@ jobs:
           echo "GH_COMMIT_HASH=$(git log -n 1 --pretty=format:'%H')" >> $GITHUB_ENV
           cd -
           rm -r goat-ui
+      - run: |
+          cd src/render
+          GH_PAGES_PATH=src/genomehubs-ui/src/client/static node render.js
+          cp -r rendered ../../dist/rendered
+          cd -
       - run: ./package-ui.sh
         env:
           GH_API_URL: "https://goat.genomehubs.org/api/v2"
@@ -232,6 +239,7 @@ jobs:
           path: ./dist
       - run: |
           mv dist/genomehubs-ui-linux src/docker/goat/
+          mv dist/rendered src/docker/goat/
           rm -rf dist/*
       - name: Login to Docker Hub
         uses: docker/login-action@v2
