@@ -74,11 +74,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: "20"
-      - run: npm install -g pkg
       - run: |
           git clone -b main --single-branch https://github.com/genomehubs/goat-ui
           cd src/render
           npm install
+          npm i puppeteer
           GH_PAGES_PATH=../../goat-ui/static node render.js
           cd -
           rm -r goat-ui
