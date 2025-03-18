@@ -66,7 +66,8 @@ async function processPage(url, htmlDir, htmlFile) {
 }
 
 // Get the directory path from the GH_PAGES_PATH environment variable
-const staticPagesDir = process.env.GH_PAGES_PATH;
+const staticPagesDir =
+  process.env.GH_PAGES_PATH || "src/genomehubs-ui/src/client/static";
 
 const generateFileList = (tabTree, root = "/", fileList) => {
   if (!fileList) {
