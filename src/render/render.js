@@ -1,6 +1,6 @@
-import { PuppeteerCrawler } from "@crawlee/puppeteer";
-import fs from "fs";
-import path from "path";
+const { PuppeteerCrawler } = require("@crawlee/puppeteer");
+const fs = require("fs");
+const path = require("path");
 
 // Create an instance of the PuppeteerCrawler class - a crawler
 // that automatically loads the URLs in headless Chrome / Puppeteer.
