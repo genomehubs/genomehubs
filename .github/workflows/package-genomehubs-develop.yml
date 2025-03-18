@@ -78,14 +78,19 @@ jobs:
           git clone -b main --single-branch https://github.com/genomehubs/goat-ui
           cd src/render
           npm install
-          npm i puppeteer
-          GH_PAGES_PATH=../../goat-ui/static node render.js
           cd -
-          rm -r goat-ui
+      - name: render pages
+        uses: tj-actions/puppeteer@v5
+        id: puppeteer
+        with:
+          files: |
+            src/render/render.js
+        env:
+          GH_PAGES_PATH: "goat-ui/static"
       - uses: actions/upload-artifact@v4
         with:
           name: goat-ui-rendered
-          path: ./src/render/rendered
+          path: ./rendered
 
   package-goat-ui:
     runs-on: ubuntu-latest
