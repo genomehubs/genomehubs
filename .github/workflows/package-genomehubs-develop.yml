@@ -87,6 +87,7 @@ jobs:
           rm -r goat-ui
       - run: |
           cd src/render
+          npm install
           GH_PAGES_PATH=src/genomehubs-ui/src/client/static node render.js
           cp -r rendered ../../dist/rendered
           cd -
