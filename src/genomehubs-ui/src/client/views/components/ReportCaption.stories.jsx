@@ -1,9 +1,13 @@
 import ReportCaption from "./ReportCaption";
 import { Provider } from "react-redux";
 import React from "react";
-import combinedStore from "../reducers/combinedStore";
+import { colorReducers } from "../reducers/color";
+import { phylopicReducers } from "../reducers/phylopic";
+import { createStoryStore } from "../../../../.storybook/functions/createStoryStore";
 import { themeFromContext } from "../../../../.storybook/functions/themeFromContext";
 import { theme } from "../reducers/color";
+
+const combinedStore = createStoryStore([colorReducers, phylopicReducers]);
 
 const meta = {
   component: ReportCaption,
