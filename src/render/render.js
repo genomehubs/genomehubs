@@ -199,19 +199,20 @@ const generateTabTree = (tabsFilePath = "./tabs.md") => {
 const tabsFilePath = path.join(staticPagesDir, "tabs.md");
 const tabTree = generateTabTree(tabsFilePath);
 const fileList = ["/", ...generateFileList(tabTree)];
+(async () => {
+  await crawler.addRequests(
+    fileList.map((location) => {
+      let htmlDir = path.join("./rendered", location);
+      let htmlFile = path.join("./rendered", location, "index.html");
+      return {
+        url: `https://goat.genomehubs.org${location}`,
+        userData: { htmlDir, htmlFile },
+      };
+    })
+  );
 
-await crawler.addRequests(
-  fileList.map((location) => {
-    let htmlDir = path.join("./rendered", location);
-    let htmlFile = path.join("./rendered", location, "index.html");
-    return {
-      url: `https://goat.genomehubs.org${location}`,
-      userData: { htmlDir, htmlFile },
-    };
-  })
-);
+  // Run the crawler and wait for it to finish.
+  await crawler.run();
 
-// // // Run the crawler and wait for it to finish.
-await crawler.run();
-
-console.log("Crawler finished.");
+  console.log("Crawler finished.");
+})();
