@@ -84,10 +84,14 @@ jobs:
         with:
           files: |
             src/render/render.mjs
+      - run: |
+          mkdir -p rendered
+          mv ${{ steps.puppeteer.outputs.home }}/rendered/* rendered/
+          ls rendered
       - uses: actions/upload-artifact@v4
         with:
           name: goat-ui-rendered
-          path: ./rendered
+          path: ./rendered/*
 
   # package-goat-ui:
   #   runs-on: ubuntu-latest
