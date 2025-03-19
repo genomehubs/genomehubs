@@ -73,10 +73,10 @@ jobs:
           ref: ${{github.ref}}
       - uses: actions/setup-node@v3
         with:
-          node-version: "20"
+          node-version: "18"
       - run: |
           git clone -b main --single-branch https://github.com/genomehubs/goat-ui
-          mv goat-ui/static/* src/genomehubs-ui/src/client/static/
+          GH_PAGES_PATH=goat-ui/static GH_URL=https://goat.genomehubs.org node src/render/updateFileList.mjs
           rm -r goat-ui
       - name: render pages
         uses: tj-actions/puppeteer@v5
