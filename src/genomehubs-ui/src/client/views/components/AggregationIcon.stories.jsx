@@ -4,7 +4,6 @@ import { Provider } from "react-redux";
 import store from "../reducers/color.store"; 
 
 export default {
-  title: "Components/AggregationIcon",
   component: AggregationIcon,
   decorators: [
     (Story) => (
