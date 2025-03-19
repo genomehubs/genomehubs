@@ -165,6 +165,10 @@
       "storybook": "./src/client/views/hocs/withTheme.mock.jsx",
       "default": "./src/client/views/hocs/withTheme.jsx"
     },
+    "#hocs/withPhylopics":{
+      "storybook": "./src/client/views/hocs/withPhylopics.mock.jsx",
+      "default": "./src/client/views/hocs/withPhylopics.jsx"
+    },
     "#*": [
       "./*",
       "./*.js",
