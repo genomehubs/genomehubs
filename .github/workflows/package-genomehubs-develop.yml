@@ -78,20 +78,17 @@ jobs:
           git clone -b main --single-branch https://github.com/genomehubs/goat-ui
           GH_PAGES_PATH=goat-ui/static GH_URL=https://goat.genomehubs.org node src/render/updateFileList.mjs
           rm -r goat-ui
-      - name: render pages
-        uses: tj-actions/puppeteer@v5
-        id: puppeteer
-        with:
-          files: |
-            src/render/render.mjs
+          npm i puppeteer
+          node src/render/render.mjs
+      # - name: render pages
+      #   uses: tj-actions/puppeteer@v5
+      #   id: puppeteer
+      #   with:
+      #     files: |
+      #       src/render/render.mjs
       - run: |
-          mkdir -p rendered
           ls
-          ls rendered
-          ls src/render
-          ls src/render/*
-          mv ${{ steps.puppeteer.outputs.home }}/rendered/* rendered/
-          ls rendered
+          ls -al rendered
       - uses: actions/upload-artifact@v4
         with:
           name: goat-ui-rendered
