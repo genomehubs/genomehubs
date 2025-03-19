@@ -1,10 +1,13 @@
 import fs from "fs";
 import path from "path";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
 
 // Function to process each URL
 async function processPage(url, htmlDir, htmlFile, indexHtml) {
-  const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch({
+    headless: "new",
+    executablePath: "/usr/bin/chromium-browser",
+  });
   const page = await browser.newPage();
   const response = await page.goto(url, { waitUntil: "networkidle2" });
 
