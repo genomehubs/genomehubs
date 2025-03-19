@@ -87,7 +87,9 @@ jobs:
       - run: |
           mkdir -p rendered
           ls
-          ls ${{ steps.puppeteer.outputs.home }}
+          ls rendered
+          ls src/render
+          ls src/render/*
           mv ${{ steps.puppeteer.outputs.home }}/rendered/* rendered/
           ls rendered
       - uses: actions/upload-artifact@v4
