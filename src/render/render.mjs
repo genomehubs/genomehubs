@@ -90,7 +90,7 @@ const ghUrl = "https://goat.genomehubs.org";
 const indexUrl = `${ghUrl}/`;
 const indexHtml = await (await fetch(indexUrl)).text();
 
-for (const location of fileList.slice(0, 2)) {
+for (const location of fileList) {
   console.log(`Processing ${location}`);
   const htmlDir = path.join("./rendered", location);
   const htmlFile = path.join("./rendered", location, "index.html");
