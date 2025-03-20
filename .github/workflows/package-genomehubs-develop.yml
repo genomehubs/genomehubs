@@ -86,7 +86,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: goat-ui-rendered
-          path: ./rendered/*
+          path: ./rendered
 
   package-goat-ui:
     runs-on: ubuntu-latest

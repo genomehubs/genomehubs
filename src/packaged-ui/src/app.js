@@ -72,7 +72,9 @@ app.use(GH_BASENAME, express.static(path.resolve(__dirname, "public")));
 
 app.use(
   `${
-    GH_BASENAME > "/" ? `${GH_BASENAME}/${directories[0]}` : `${directories[0]}`
+    GH_BASENAME > "/"
+      ? `${GH_BASENAME}/${directories[0]}/index.html`
+      : `${directories[0]}/index.html`
   }`,
   express.static("/genomehubs/local/render", {
     eTag: false,
