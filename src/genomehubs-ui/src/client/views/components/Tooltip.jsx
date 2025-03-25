@@ -40,6 +40,7 @@ const LightTooltip = styled(({ className, ...props }) => (
 
 export const Tooltip = ({
   theme,
+  setTheme,
   styleName = theme === "darkTheme" ? "default" : "dark",
   disableInteractive = true,
   ...props

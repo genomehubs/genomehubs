@@ -1,3 +1,14 @@
+import "@fontsource/open-sans/index.css";
+import "@fontsource/open-sans/700.css";
+import "@fontsource/open-sans/400-italic.css";
+import "@fontsource/open-sans/700-italic.css";
+import "@fontsource/signika/index.css";
+import "@fontsource/signika/700.css";
+import "@fontsource/roboto-mono/index.css";
+import "@fontsource/roboto-mono/700.css";
+import "@fontsource/roboto-mono/400-italic.css";
+import "@fontsource/roboto-mono/700-italic.css";
+
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 import React from "react";
@@ -33,11 +44,8 @@ const ThemeBlock = ({ left, fill, theme, children }) => {
         overflow: "auto",
         padding: "1rem",
         background: theme === "darkTheme" ? `${darkColor}` : `${lightColor}`,
-        // [breakpoints.S]: {
-        //   left: left ? 0 : "50vw",
-        //   right: left ? "50vw" : 0,
-        //   padding: "0 !important",
-        // },
+        color: theme === "darkTheme" ? `${lightColor}` : `${darkColor}`,
+        fontFamily: "Open Sans, sans-serif",
       }}
     >
       {children}
@@ -102,29 +110,7 @@ const preview = {
       },
     },
   },
-  decorators: [
-    withTheme,
-    // withThemeByClassName({
-    //   themes: {
-    //     light: "theme-light",
-    //     dark: "theme-dark",
-    //   },
-    //   defaultTheme: theme,
-    // }),
-    // withThemeFromJSXProvider({
-    //   themes: {
-    //     light: themes.light,
-    //     dark: themes.dark,
-    //   },
-    //   defaultTheme: theme,
-    // }),
-    // (Story, context) => {
-    //   // Get the active theme value from the story parameter
-    //   const { theme } = context.parameters;
-    //   const storyTheme = theme === "dark" ? "theme-dark" : "theme-light";
-    //   return <div className={storyTheme}>{Story()}</div>;
-    // },
-  ],
+  decorators: [withTheme],
   globalTypes: {
     theme: {
       description: "Global theme for components",

@@ -15,7 +15,7 @@ const config = {
     "@chromatic-com/storybook",
     "@storybook/addon-themes",
     "@storybook/addon-interactions",
-    // "@storybook/preset-scss",
+    "@storybook/preset-scss",
     {
       name: "@storybook/addon-styling-webpack",
       options: {

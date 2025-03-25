@@ -67,7 +67,6 @@ def describe_btk_files(meta):
         plots.append("blob")
     files = []
     for plot in plots:
-        print(plots)
         if plot == "blob":
             url = "%s/image/%s/%s/circle?format=png" % (BTK_API, meta["id"], plot)
         else:
@@ -102,12 +101,13 @@ def btk_parser(_params, opts, *args, **kwargs):
     """Parse BlobToolKit assemblies."""
     parsed = []
     analyses = []
-    print(opts)
     for root in opts["btk-root"]:
         for key, meta in stream_btk_datasets(root):
-            print(key)
-            files = describe_btk_files(meta)
-            analyses += files
-            extract_btk_stats(meta)
-            parsed.append(meta)
+            try:
+                files = describe_btk_files(meta)
+                analyses += files
+                extract_btk_stats(meta)
+                parsed.append(meta)
+            except Exception as err:
+                LOGGER.error("Error parsing %s: %s", key, err)
     return (parsed, analyses)

@@ -1,6 +1,6 @@
 {
   "name": "genomehubs-ui",
-  "version": "2.10.7",
+  "version": "2.10.10",
   "description": "Frontend for GenomeHubs",
   "main": "index.js",
   "scripts": {
@@ -164,6 +164,10 @@
     "#hocs/withTheme": {
       "storybook": "./src/client/views/hocs/withTheme.mock.jsx",
       "default": "./src/client/views/hocs/withTheme.jsx"
+    },
+    "#hocs/withPhylopics":{
+      "storybook": "./src/client/views/hocs/withPhylopics.mock.jsx",
+      "default": "./src/client/views/hocs/withPhylopics.jsx"
     },
     "#*": [
       "./*",

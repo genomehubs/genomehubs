@@ -59,7 +59,6 @@ attributes:
   sra_accession:
     description: Most recent SRA experiment accessions (up to 10)
     summary: list
-    traverse: false
     type: keyword
     value_metadata:
       default:
@@ -68,7 +67,6 @@ attributes:
   run_accession:
     description: Most recent SRA run accessions (up to 10)
     summary: list
-    traverse: false
     type: keyword
     value_metadata:
       default:
@@ -77,5 +75,4 @@ attributes:
   reads:
     description: Number of reads per run for the most recent libraries (up to 10)
     summary: list
-    traverse: false
     type: long

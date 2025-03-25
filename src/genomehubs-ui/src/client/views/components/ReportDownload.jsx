@@ -11,7 +11,9 @@ import mergeImages from "merge-images";
 import qs from "../functions/qs";
 import { queryPropList } from "./ReportEdit";
 import { useLocation } from "@reach/router";
+import withColors from "../hocs/withColors";
 import withReportById from "../hocs/withReportById";
+import withTheme from "../hocs/withTheme";
 
 export const downloadLink = async (uri, filename) => {
   const link = document.createElement("a");
@@ -115,10 +117,13 @@ export const ReportDownload = ({
   code,
   saveReport,
   queryString,
+  colorScheme,
+  theme,
 }) => {
   if (!reportById.report || !reportById.report[report]) {
     return null;
   }
+  const backgroundColor = colorScheme[theme].lightColor;
 
   const location = useLocation();
 
@@ -193,7 +198,7 @@ export const ReportDownload = ({
       //   width,
       // };
       let opts = {
-        backgroundColor: "white",
+        backgroundColor: backgroundColor,
       };
 
       // await saveSvgAsPng(chartSVG, `${filename}.png`, opts);
@@ -316,4 +321,9 @@ export const ReportDownload = ({
   );
 };
 
-export default compose(dispatchReport, withReportById)(ReportDownload);
+export default compose(
+  dispatchReport,
+  withTheme,
+  withColors,
+  withReportById,
+)(ReportDownload);

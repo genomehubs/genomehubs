@@ -220,6 +220,30 @@ const SearchTips = ({
       />,
     );
   }
+  // if any key in options matches /exclude\w+/
+  if (
+    Object.keys(options).some((key) => key.match(/exclude\w+/)) &&
+    !invalidTerm
+  ) {
+    let newOptions = { ...options };
+    let excludedAttributes = new Set();
+    for (let key in options) {
+      if (key.match(/exclude\w+/)) {
+        delete newOptions[key];
+        options[key].forEach((item) => excludedAttributes.add(item));
+      }
+    }
+    let excludedList = [...excludedAttributes].join(", ");
+    suggestions.push(
+      <Suggestion
+        key={"remove_exclude"}
+        title={`Remove 'exclude' filters`}
+        description={`Removing 'exclude' filters from ${excludedList.replace(/,([^,]+)$/, " and $1")} may restore missing results`}
+        options={newOptions}
+        colors={colors}
+      />,
+    );
+  }
   if (["assembly", "taxon"].includes(options.result)) {
     let altIndex = options.result == "assembly" ? "taxon" : "assembly";
     suggestions.push(

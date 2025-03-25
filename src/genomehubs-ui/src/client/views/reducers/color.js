@@ -21,6 +21,7 @@ import batlow from "./color/batlow";
 import batlowS from "./color/batlowS";
 import { createSelector } from "reselect";
 import immutableUpdate from "immutable-update";
+import { mixColor } from "../functions/mixColor";
 
 const ANCESTRAL_COLOR =
   typeof ANCESTRAL_COLOR !== "undefined" ? ANCESTRAL_COLOR : "#db4325";
@@ -200,37 +201,40 @@ export const getDefaultPalette = createSelector(
 
 /* Coolors Exported Palette - coolors.co/d7cdcc-ffffff-59656f-9c528b-1d1e2c */
 /* RGB */
+let darkColor = "#31323F";
+let lightColor = "#FFFFFF";
 export const lightThemeColors = {
-  darkColor: "#31323F",
-  lightColor: "#FFFFFF",
+  darkColor,
+  lightColor,
   paleColor: "#E0E0E0",
   hoverColor: "#C0C0C0",
-  shadeColor: "#59656F",
+  // mix light and dark colors for shades
+  shadeColor: mixColor({ color1: lightColor, color2: darkColor, ratio: 0.5 }),
   deepColor: "#414A51",
   highlightColor: "#9C528B",
   halfHighlightColor: "#9C528B80", // 50% opacity
   brightColor: "#FFFF1E",
   clearColor: "#FFFFFF00", // 0% opacity
   linkColor: "#1f78b4",
-  headerText: "#FFFFFF",
-  headerBackground: "#31323F",
+  headerText: lightColor,
+  headerBackground: darkColor,
 };
 
 // invert light and dark colors for dark theme
 export const darkThemeColors = {
-  darkColor: "#FFFFFF",
-  lightColor: "#31323F",
+  darkColor: lightColor,
+  lightColor: darkColor,
   paleColor: "#515261",
   hoverColor: "#717281",
-  shadeColor: "#9C528B",
+  shadeColor: mixColor({ color1: lightColor, color2: darkColor, ratio: 0.5 }),
   deepColor: "#414A51",
   highlightColor: "#b584f0",
   halfHighlightColor: "#b584f080", // 50% opacity
   brightColor: "#FFFF1E",
   clearColor: "#FFFFFF00", // 0% opacity
   linkColor: "#8263a8",
-  headerText: "#FFFFFF",
-  headerBackground: "#31323F",
+  headerText: lightColor,
+  headerBackground: darkColor,
 };
 
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;

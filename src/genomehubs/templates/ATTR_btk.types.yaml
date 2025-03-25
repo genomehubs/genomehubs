@@ -19,7 +19,6 @@ attributes:
     taxon_key: busco_completeness
     taxon_name: busco_completeness
     taxon_summary: max
-    taxon_traverse: false
     taxon_type: 1dp
     type: 1dp
     units: "%"
@@ -34,7 +33,6 @@ attributes:
     taxon_key: busco_lineage
     taxon_name: busco_lineage
     taxon_summary: list
-    taxon_traverse: false
     taxon_type: keyword
   busco_string:
     description: Busco string
@@ -47,7 +45,6 @@ attributes:
     taxon_key: busco_string
     taxon_name: busco_string
     taxon_summary: list
-    taxon_traverse: false
     taxon_type: keyword
   btk_nohit:
     description: Sequences with no hits in the reference database
@@ -70,7 +67,6 @@ attributes:
     taxon_summary:
       - primary
       - min
-    taxon_traverse: false
     taxon_type: 1dp
   btk_target:
     description: Hits matching target
@@ -93,7 +89,6 @@ attributes:
     taxon_summary:
       - primary
       - max
-    taxon_traverse: false
     taxon_type: 1dp
 identifiers:
   assembly_alias:
