@@ -44,25 +44,7 @@ const Logo = ({
       {bgRect}
       <g id="layer1">
         <path
-          style={{
-            fill: "none",
-            stroke: lineColor,
-            strokeWidth: 6.35,
-            strokeLinecap: "round",
-          }}
-          animate={
-            animate && {
-              pathOffset: [0, 0, 0, 1],
-              pathLength: [0, 1, 1, 1],
-              time: [0, 0.1, 0.9, 1],
-              transition: {
-                duration: 4,
-                delay,
-                repeat: Infinity,
-                repeatDelay: 0,
-              },
-            }
-          }
+          style={{ fill: "none", stroke: lineColor, strokeWidth: 6.35 }}
           d="m 135.65868,142.93323 c -3.74596,13.5314 -17.69337,14.12532 -30.88725,16.44924 -29.975751,5.27984 -47.704015,-1.76881 -18.331467,-31.9466 9.651652,-9.91625 19.322437,-21.03455 32.300547,-17.25684 12.97808,3.7777 20.6641,19.22279 16.91817,32.7542 z"
         />
         <path
@@ -76,6 +58,7 @@ const Logo = ({
         <path
           style={{ fill: "none", stroke: lineColor, strokeWidth: 7 }}
           d="M 129.21481,203.92495 V 152.84472"
+          transform="rotate(-8.1526193,162.90047,203.45574)"
         />
         <motion.ellipse
           style={{
