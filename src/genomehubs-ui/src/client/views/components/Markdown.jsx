@@ -1,4 +1,4 @@
-import React, { createElement, useEffect, useState } from "react";
+import React, { createElement, useEffect, useRef, useState } from "react";
 import { basename, siteName } from "../reducers/location";
 import {
   centerContent as centerContentStyle,
@@ -113,7 +113,7 @@ export const Template = ({
     }
   }, [url]);
 
-  const handleChange = (e, queryProp, value) => {
+  const handleChange = (e, queryProp, value, i) => {
     if (value) {
       // use given value
     } else if (e && e.preventDefault) {
@@ -123,11 +123,7 @@ export const Template = ({
     } else {
       value = "";
     }
-    setValues({ ...values, [queryProp]: value });
-  };
-
-  const setInputValue = (value, queryProp) => {
-    setValues({ ...values, [queryProp]: value });
+    setValues({ ...values, [queryProp]: value, focus: i });
   };
 
   const handleKeyPress = (e) => {
@@ -174,7 +170,8 @@ export const Template = ({
     .sort()
     .filter((el, i, arr) => i == arr.indexOf(el));
   let inputs = [];
-  for (let match of matches) {
+  for (let i = 0; i < matches.length; i++) {
+    let match = matches[i];
     let label = props[`${match}_label`];
     let description = props[`${match}_description`];
     let input = (
@@ -182,12 +179,11 @@ export const Template = ({
         variant="standard"
         id={match + Math.random()}
         label={label}
-        value={values[match]}
-        // required={required}
-        // error={required && !values[queryProp]}
+        value={values[match] || ""}
         style={{ width: "95%" }}
-        onChange={(e) => handleChange(e, match)}
-        onKeyPress={handleKeyPress}
+        onChange={(e) => handleChange(e, match, undefined, i)}
+        onKeyUp={handleKeyPress}
+        autoFocus={i == values.focus}
       />
     );
     inputs.push(

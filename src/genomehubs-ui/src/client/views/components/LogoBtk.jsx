@@ -25,35 +25,20 @@ const Logo = ({
       ? colorScheme[theme].lightColor
       : colorScheme[theme].darkColor;
   }
-  let bgRect =
-    backgroundColor === "transparent" ? null : (
-      <rect
-        x="43.845234"
-        y="65.678574"
-        width="100%"
-        height="100%"
-        fill={backgroundColor}
-      />
-    );
 
-  // const pathVariants = {
-  //   hidden: { pathLength: 0, pathOffset: 1 },
-  //   visible: { pathLength: 1, pathOffset: 0 },
-  //   exit: { pathLength: 0, pathOffset: 1 },
-  // };
+  const transitionProps = {
+    repeat: Infinity,
+    duration,
+    ease: "easeInOut",
+    delay,
+  };
 
   let dataHexes = (
-    <g
-      id="clouds"
-      style={{ fill: lineColor }}
-      // initial={{ x: 0 }}
-      // animate={{ x: [0, 150] }}
-      // transition={{ repeat: Infinity, duration: 16, delay: 0, ease: "linear" }}
-    >
+    <g id="data" style={{ fill: lineColor }}>
       <motion.g
         initial={{ scale: 1 }}
-        animate={{ scale: [1, 1.2, 1] }}
-        transition={{ repeat: Infinity, duration, ease: "easeInOut", delay }}
+        animate={{ ...(animate && { scale: [1, 1.2, 1] }) }}
+        transition={transitionProps}
       >
         <use
           xlinkHref="#data-hex"
@@ -62,13 +47,8 @@ const Logo = ({
       </motion.g>
       <motion.g
         initial={{ scale: 1 }}
-        animate={{ scale: [1, 0.7, 1] }}
-        transition={{
-          repeat: Infinity,
-          duration,
-          ease: "easeInOut",
-          delay,
-        }}
+        animate={{ ...(animate && { scale: [1, 0.7, 1] }) }}
+        transition={transitionProps}
       >
         <use
           xlinkHref="#data-hex"
@@ -77,13 +57,8 @@ const Logo = ({
       </motion.g>
       <motion.g
         initial={{ scale: 1 }}
-        animate={{ scale: [1, 1.1, 1] }}
-        transition={{
-          repeat: Infinity,
-          duration,
-          ease: "easeInOut",
-          delay,
-        }}
+        animate={{ ...(animate && { scale: [1, 1.1, 1] }) }}
+        transition={transitionProps}
       >
         <use
           xlinkHref="#data-hex"
@@ -92,13 +67,8 @@ const Logo = ({
       </motion.g>
       <motion.g
         initial={{ scale: 1 }}
-        animate={{ scale: [1, 0.9, 1] }}
-        transition={{
-          repeat: Infinity,
-          duration,
-          ease: "easeInOut",
-          delay,
-        }}
+        animate={{ ...(animate && { scale: [1, 0.9, 1] }) }}
+        transition={transitionProps}
       >
         <use
           xlinkHref="#data-hex"
@@ -107,13 +77,8 @@ const Logo = ({
       </motion.g>
       <motion.g
         initial={{ scale: 1 }}
-        animate={{ scale: [1, 1.3, 1] }}
-        transition={{
-          repeat: Infinity,
-          duration,
-          ease: "easeInOut",
-          delay,
-        }}
+        animate={{ ...(animate && { scale: [1, 1.3, 1] }) }}
+        transition={transitionProps}
       >
         <use
           xlinkHref="#data-hex"
@@ -122,13 +87,8 @@ const Logo = ({
       </motion.g>
       <motion.g
         initial={{ scale: 1 }}
-        animate={{ scale: [1, 0.7, 1] }}
-        transition={{
-          repeat: Infinity,
-          duration,
-          ease: "easeInOut",
-          delay,
-        }}
+        animate={{ ...(animate && { scale: [1, 0.7, 1] }) }}
+        transition={transitionProps}
       >
         <use
           xlinkHref="#data-hex"
@@ -137,13 +97,8 @@ const Logo = ({
       </motion.g>
       <motion.g
         initial={{ scale: 1 }}
-        animate={{ scale: [1, 1.1, 1] }}
-        transition={{
-          repeat: Infinity,
-          duration,
-          ease: "easeInOut",
-          delay,
-        }}
+        animate={{ ...(animate && { scale: [1, 1.1, 1] }) }}
+        transition={transitionProps}
       >
         <use
           xlinkHref="#data-hex"
@@ -154,32 +109,27 @@ const Logo = ({
   );
 
   let dataGrid = (
-    <g id="clouds" style={{ fill: "none", stroke: lineColor, strokeWidth: 3 }}>
+    <g id="grid" style={{ fill: "none", stroke: lineColor, strokeWidth: 3 }}>
       <use
         xlinkHref="#data-grid"
         transform="matrix(0.86389049,0,0,0.89849555,2.3627228,-63.846066)"
       />
-
       <use
         xlinkHref="#data-grid"
         transform="matrix(0.86389049,0,0,0.89849555,262.24245,-63.846073)"
       />
-
       <use
         xlinkHref="#data-grid"
         transform="matrix(0.86389049,0,0,0.89849555,392.18231,170.23174)"
       />
-
       <use
         xlinkHref="#data-grid"
         transform="matrix(0.86389049,0,0,0.89849555,262.24246,404.30957)"
       />
-
       <use
         xlinkHref="#data-grid"
         transform="matrix(0.86389049,0,0,0.89849555,2.3627349,404.30957)"
       />
-
       <use
         xlinkHref="#data-grid"
         transform="matrix(0.86389049,0,0,0.89849555,-127.57713,170.23176)"
@@ -187,14 +137,29 @@ const Logo = ({
     </g>
   );
 
+  const x = 0;
+  const y = 0;
+  const width = 512;
+  const height = 512;
+
+  // Define the background rectangle
+  const bgRect =
+    backgroundColor === "transparent" ? null : (
+      <rect x={x} y={y} width={width} height={height} fill={backgroundColor} />
+    );
+
   return (
     <svg
       width="100%"
       height="100%"
-      viewBox="0 0 512 512"
+      viewBox={`${x} ${y} ${width} ${height}`}
       preserveAspectRatio="xMidYMid meet"
+      style={{ display: "block", overflow: "hidden" }}
     >
       <defs>
+        <clipPath id="bgClip">
+          <rect x={x} y={y} width={width} height={height} />
+        </clipPath>
         <path
           id="data-grid"
           d="M 143.18645,269.13893 -7.2259728,182.29828 -7.2259774,8.6169779 143.18644,-78.223679 293.59887,8.6169698 l 0,173.6813002 z"
@@ -204,9 +169,8 @@ const Logo = ({
           d="m 158.37288,234.37738 -112.792699,-65.12089 -3e-6,-130.241793 112.792702,-65.120898 112.7927,65.120892 0,130.241789 z"
         />
       </defs>
-      {bgRect}
-
-      <g id="layer1">
+      <g id="layer1" clipPath="url(#bgClip)">
+        {bgRect}
         {dataGrid}
         {dataHexes}
       </g>

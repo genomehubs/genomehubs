@@ -13,6 +13,7 @@ const Logo = ({
   invert,
   animate = false,
   delay = 0,
+  duration = 8,
 }) => {
   if (!lineColor) {
     lineColor = invert
@@ -24,29 +25,20 @@ const Logo = ({
       ? colorScheme[theme].lightColor
       : colorScheme[theme].darkColor;
   }
-  let bgRect =
-    backgroundColor === "transparent" ? null : (
-      <rect
-        x="43.845234"
-        y="65.678574"
-        width="100%"
-        height="100%"
-        fill={backgroundColor}
-      />
-    );
 
-  // const pathVariants = {
-  //   hidden: { pathLength: 0, pathOffset: 1 },
-  //   visible: { pathLength: 1, pathOffset: 0 },
-  //   exit: { pathLength: 0, pathOffset: 1 },
-  // };
+  const transitionProps = {
+    repeat: Infinity,
+    duration,
+    ease: "linear",
+    delay,
+  };
 
   let clouds = (
     <motion.g
       id="clouds"
       initial={{ x: 0 }}
-      animate={{ x: [0, 150] }}
-      transition={{ repeat: Infinity, duration: 16, delay: 0, ease: "linear" }}
+      animate={{ ...(animate && { x: [0, 150] }) }}
+      transition={{ ...transitionProps, duration: duration * 2 }}
     >
       <use
         xlinkHref="#shape"
@@ -62,13 +54,23 @@ const Logo = ({
       />
     </motion.g>
   );
+  if (animate) {
+    clouds = (
+      <>
+        {clouds}
+        <g id="clouds-left" transform={"translate(-150, 0)"}>
+          {clouds}
+        </g>
+      </>
+    );
+  }
 
   let waves = (
     <motion.g
       id="waves"
       initial={{ x: 0 }}
-      animate={{ x: [0, 150] }}
-      transition={{ repeat: Infinity, duration: 8, delay: 0, ease: "linear" }}
+      animate={{ ...(animate && { x: [0, 150] }) }}
+      transition={transitionProps}
     >
       <use
         xlinkHref="#shape"
@@ -80,13 +82,25 @@ const Logo = ({
       />
     </motion.g>
   );
+  if (animate) {
+    waves = (
+      <>
+        {waves}
+        <g id="waves-left" transform={"translate(-150, 0)"}>
+          {waves}
+        </g>
+      </>
+    );
+  }
 
   let ship = (
     <motion.g
       id="ship"
       initial={{ rotate: 0, x: 0, y: 0 }}
-      animate={{ rotate: [-2, 2, -2], x: [0, 2, 0], y: [0, -2, 0, 0] }}
-      transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+      animate={{
+        ...(animate && { rotate: [-2, 2, -2], x: [0, 2, 0], y: [0, -2, 0, 0] }),
+      }}
+      transition={{ ...transitionProps, duration: duration / 2 }}
     >
       <use
         xlinkHref="#shape"
@@ -107,33 +121,36 @@ const Logo = ({
     </motion.g>
   );
 
+  const x = 43.845;
+  const y = 63.679;
+  const width = 135.46697;
+  const height = 135.46697;
+  let bgRect =
+    backgroundColor === "transparent" ? null : (
+      <rect x={x} y={y} width={width} height={height} fill={backgroundColor} />
+    );
+
   return (
     <svg
       width="100%"
       height="100%"
-      viewBox="43.845 65.679 135.46697 135.46697"
+      viewBox={`${x} ${y} ${width} ${height}`}
       preserveAspectRatio="xMidYMid meet"
+      style={{ display: "block", overflow: "hidden" }}
     >
       <defs>
+        <clipPath id="bgClip">
+          <rect x={x} y={y} width={width} height={height} />
+        </clipPath>
         <path
           id="shape"
           d="m 126.99393,113.67648 c 0,0 -0.62683,-11.32791 13.06036,-14.770453 10.47769,-2.635308 39.43316,1.848983 39.43316,1.848983 0,0 -23.15099,-10.969808 -39.87489,-9.590171 -16.7239,1.379637 -22.65896,14.144511 -23.52112,16.656591 -1.32643,3.86481 10.90249,5.85505 10.90249,5.85505 z"
         />
       </defs>
-      {bgRect}
-      <g id="layer1" style={{ fill: lineColor }}>
+      <g id="layer1" clipPath="url(#bgClip)" style={{ fill: lineColor }}>
+        {bgRect}
         {clouds}
-        {animate && (
-          <g id="clouds-left" transform={"translate(-150, 0)"}>
-            {clouds}
-          </g>
-        )}
         {waves}
-        {animate && (
-          <g id="waves-left" transform={"translate(-150, 0)"}>
-            {waves}
-          </g>
-        )}
         {ship}
       </g>
     </svg>

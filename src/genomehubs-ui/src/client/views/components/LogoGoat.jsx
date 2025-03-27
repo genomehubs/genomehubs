@@ -13,6 +13,7 @@ const Logo = ({
   invert,
   animate = false,
   delay = 0,
+  duration = 8,
 }) => {
   if (!lineColor) {
     lineColor = invert
@@ -24,25 +25,30 @@ const Logo = ({
       ? colorScheme[theme].lightColor
       : colorScheme[theme].darkColor;
   }
+  const x = 43.845234;
+  const y = 65.678574;
+  const width = 135.46666;
+  const height = 135.46666;
   let bgRect =
     backgroundColor === "transparent" ? null : (
-      <rect
-        x="43.845234"
-        y="65.678574"
-        width="100%"
-        height="100%"
-        fill={backgroundColor}
-      />
+      <rect x={x} y={y} width={width} height={height} fill={backgroundColor} />
     );
 
   return (
     <svg
+      width="100%"
       height="100%"
-      viewBox="43.845234 65.678574 135.46666 135.46666"
-      preserveAspectRatio="xMinYMin"
+      viewBox={`${x} ${y} ${width} ${height}`}
+      preserveAspectRatio="xMidYMid meet"
+      style={{ display: "block", overflow: "hidden" }}
     >
-      {bgRect}
-      <g id="layer1">
+      <defs>
+        <clipPath id="bgClip">
+          <rect x={x} y={y} width={width} height={height} />
+        </clipPath>
+      </defs>
+      <g id="layer1" clipPath="url(#bgClip)">
+        {bgRect}
         <path
           style={{ fill: "none", stroke: lineColor, strokeWidth: 6.35 }}
           d="m 135.65868,142.93323 c -3.74596,13.5314 -17.69337,14.12532 -30.88725,16.44924 -29.975751,5.27984 -47.704015,-1.76881 -18.331467,-31.9466 9.651652,-9.91625 19.322437,-21.03455 32.300547,-17.25684 12.97808,3.7777 20.6641,19.22279 16.91817,32.7542 z"
@@ -72,11 +78,12 @@ const Logo = ({
           rx="4.9599605"
           ry="3.6476221"
           transform="rotate(-16.128394)"
+          initial={{ ry: 3.6476221 }}
           animate={
             animate && {
               ry: [3.6476221, 0.1, 3.6476221],
               transition: {
-                duration: 1,
+                duration: duration / 16,
                 delay: delay + 10,
                 repeat: Infinity,
                 repeatDelay: 10,
@@ -99,16 +106,16 @@ const Logo = ({
             strokeWidth: 5.8,
             strokeLineCap: "round",
           }}
+          initial={{ pathOffset: 0, pathLength: 1 }}
           animate={
             animate && {
-              pathOffset: [0, 0, 0, 1],
-              pathLength: [0, 1, 1, 1],
-              time: [0, 0.1, 0.9, 1],
+              pathOffset: [0, 1, 0, 0, 0],
+              pathLength: [1, 0, 0, 1, 1],
               transition: {
-                duration: 4,
+                duration: duration / 2,
                 delay,
                 repeat: Infinity,
-                repeatDelay: 0,
+                repeatDelay: duration / 4,
               },
             }
           }

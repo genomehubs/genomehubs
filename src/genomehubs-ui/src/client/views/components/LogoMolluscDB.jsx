@@ -1,5 +1,6 @@
 import React from "react";
 import { compose } from "recompose";
+import { h } from "hastscript";
 import { motion } from "motion/react";
 import withColors from "#hocs/withColors";
 import withTheme from "#hocs/withTheme";
@@ -13,6 +14,7 @@ const Logo = ({
   invert,
   animate = false,
   delay = 0,
+  duration = 8,
 }) => {
   if (!lineColor) {
     lineColor = invert
@@ -24,32 +26,30 @@ const Logo = ({
       ? colorScheme[theme].lightColor
       : colorScheme[theme].darkColor;
   }
+  const x = 43.845;
+  const y = 65.679;
+  const width = 135.46697;
+  const height = 135.46697;
   let bgRect =
     backgroundColor === "transparent" ? null : (
-      <rect
-        x="43.845234"
-        y="65.678574"
-        width="100%"
-        height="100%"
-        fill={backgroundColor}
-      />
+      <rect x={x} y={y} width={width} height={height} fill={backgroundColor} />
     );
-
-  // const pathVariants = {
-  //   hidden: { pathLength: 0, pathOffset: 1 },
-  //   visible: { pathLength: 1, pathOffset: 0 },
-  //   exit: { pathLength: 0, pathOffset: 1 },
-  // };
 
   return (
     <svg
       width="100%"
       height="100%"
-      viewBox="43.845 65.679 135.46697 135.46697"
+      viewBox={`${x} ${y} ${width} ${height}`}
       preserveAspectRatio="xMidYMid meet"
+      style={{ display: "block", overflow: "hidden" }}
     >
-      {bgRect}
-      <g id="layer1">
+      <defs>
+        <clipPath id="bgClip">
+          <rect x={x} y={y} width={width} height={height} />
+        </clipPath>
+      </defs>
+      <g id="layer1" clipPath="url(#bgClip)">
+        {bgRect}
         <motion.path
           style={{
             fill: "none",
@@ -60,11 +60,10 @@ const Logo = ({
           }}
           animate={
             animate && {
-              pathOffset: [0, 1, 0, 0],
-              pathLength: [1, 0, 0, 1],
-              time: [0, 0.1, 0.9, 1],
+              pathOffset: [0, 1, 2],
+              pathLength: [1, 0, 1],
               transition: {
-                duration: 4,
+                duration,
                 delay,
                 repeat: Infinity,
                 repeatDelay: 0,
