@@ -172,6 +172,8 @@ export const queryPropList = {
     "hideErrorBars",
     "hideAncestralBars",
     "showPhylopics",
+    { prop: "phylopicRank", label: "species" },  
+    { prop: "phylopicSize", label: "100" }, 
     "yOpts",
     "treeStyle",
     "treeThreshold",
@@ -522,6 +524,58 @@ export const ReportEdit = ({
           </Select>
         </FormControl>
       );
+      if(queryProp=="phylopicRank"){
+        let items=[
+          { value: "", label: "Auto (tip nodes)" },
+          { value: "subspecies", label: "Subspecies" },
+          { value: "species", label: "Species" },
+          { value: "genus", label: "Genus" },
+          { value: "family", label: "Family" },
+          { value: "order", label: "Order" },
+          { value: "class", label: "Class" },
+          {value:"subphylum", label:"Subphylum"},
+          { value: "phylum", label: "Phylum" }
+        ].map(({value, label}) => (
+            <MenuItem key={value} value={value}>
+              {label}
+            </MenuItem>
+        ))
+        input = (
+          <FormControl variant="standard" style={{ width: "95%" }}>
+            <InputLabel id="select-phylopic-rank-label">PhyloPic Rank</InputLabel>
+            <Select
+              variant="standard"
+              labelId="select-phylopic-rank-label"
+              id="select-phylopic-rank"
+              value={values["phylopicRank"] || ""}
+              style={{ width: "95%" }}
+              onChange={(e) => handleChange(e, "phylopicRank")}
+            >
+              {items}
+            </Select>
+            <FormHelperText>
+              Which taxonomic rank to display PhyloPics for (empty = all tip nodes)
+            </FormHelperText>
+          </FormControl>
+        );
+      }
+      if(queryProp=="phylopicSize"){
+        input = (
+          <TextField
+            variant="standard"
+            id={queryProp + Math.random()}
+            label="PhyloPic Size (pixels)"
+            type="number"
+            value={values[queryProp] || ""}
+            style={{ width: "95%" }}
+            onChange={(e) => handleChange(e, "phylopicSize")}
+            onBlur={(e) => handleChange(e, "phylopicSize")}
+            onKeyPress={handleKeyPress}
+            inputProps={{ min: 20, max: 400, step: 10 }}
+            helperText="Size in pixels (20-400, empty = default(100))"
+          />
+        );
+      }
     } else if (
       queryProp == "includeEstimates" ||
       queryProp == "stacked" ||

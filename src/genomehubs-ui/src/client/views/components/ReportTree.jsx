@@ -28,6 +28,8 @@ const ReportTree = ({
   hideErrorBars,
   hideAncestralBars,
   showPhyloPics,
+  phylopicRank,
+  phylopicSize,
   minDim,
   setMinDim,
   basename,
@@ -191,6 +193,8 @@ const ReportTree = ({
         hideErrorBars={hideErrorBars}
         hideAncestralBars={hideAncestralBars}
         showPhylopics={showPhyloPics}
+        phylopicRank={phylopicRank}
+        phylopicSize={phylopicSize}
       />
     );
   } else {
@@ -210,6 +214,8 @@ const ReportTree = ({
         hideErrorBars={hideErrorBars}
         hideAncestralBars={hideAncestralBars}
         showPhylopics={showPhyloPics}
+        phylopicRank={phylopicRank}
+        phylopicSize={phylopicSize}
       />
     );
   }

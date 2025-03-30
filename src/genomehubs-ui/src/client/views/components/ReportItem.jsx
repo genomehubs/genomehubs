@@ -104,6 +104,8 @@ const ReportItem = ({
   hideErrorBars,
   hideAncestralBars,
   showPhyloPics,
+  phylopicRank, 
+  phylopicSize,
   highlight,
   colorPalette,
   excludeMissing,
@@ -475,6 +477,8 @@ const ReportItem = ({
             hideErrorBars={hideErrorBars}
             hideAncestralBars={hideAncestralBars}
             showPhylopics={showPhyloPics}
+            phylopicRank={phylopicRank}
+            phylopicSize={phylopicSize}
             levels={levels}
             hidePreview={hideMessage}
             {...qs.parse(queryString)}

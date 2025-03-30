@@ -43,6 +43,8 @@ const ReportTreePaths = ({
   theme,
   cats: catArray,
   phylopicWidth,
+  phylopicSize,
+  phylopicRank,
   hideErrorBars,
 }) => {
   if (!lines || lines.length == 0) {
@@ -715,15 +717,16 @@ const ReportTreePaths = ({
                 }
               }
               if (segment.showPhylopic) {
+                const phylopicHeight=charHeight|| phylopicSize;
                 newPhyloPics.push(
                   <PhyloPics
                     key={segment.taxon_id}
                     taxonId={segment.taxon_id}
                     scientificName={segment.scientific_name}
-                    maxHeight={charHeight}
+                    maxHeight={phylopicHeight}
                     maxWidth={phylopicWidth}
                     x={maxWidth + dataWidth}
-                    y={segment.yStart - charHeight / 2}
+                    y={segment.yStart - phylopicHeight / 2}
                     fixedRatio={1}
                     showAncestral={false}
                     sourceColors={false}
