@@ -717,7 +717,7 @@ const ReportTreePaths = ({
                 }
               }
               if (segment.showPhylopic) {
-                const phylopicHeight=charHeight|| phylopicSize;
+                const phylopicHeight=phylopicSize||charHeight;
                 newPhyloPics.push(
                   <PhyloPics
                     key={segment.taxon_id}
