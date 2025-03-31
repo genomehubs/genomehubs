@@ -717,11 +717,6 @@ const ReportTreePaths = ({
                 }
               }
             }
-            console.log("Segment with showPhylopic:", 
-              segment.showPhylopic ? 
-              {id: segment.taxon_id, name: segment.scientific_name, rank: segment.taxon_rank} : 
-              null
-            );
             if (segment.showPhylopic) {
               newPhyloPics.push(
                 <PhyloPics
