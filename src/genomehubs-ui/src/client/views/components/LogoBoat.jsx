@@ -139,7 +139,7 @@ const Logo = ({
       style={{ display: "block", overflow: "hidden" }}
     >
       <defs>
-        <clipPath id="bgClip">
+        <clipPath id="boatBgClip">
           <rect x={x} y={y} width={width} height={height} />
         </clipPath>
         <path
@@ -147,7 +147,7 @@ const Logo = ({
           d="m 126.99393,113.67648 c 0,0 -0.62683,-11.32791 13.06036,-14.770453 10.47769,-2.635308 39.43316,1.848983 39.43316,1.848983 0,0 -23.15099,-10.969808 -39.87489,-9.590171 -16.7239,1.379637 -22.65896,14.144511 -23.52112,16.656591 -1.32643,3.86481 10.90249,5.85505 10.90249,5.85505 z"
         />
       </defs>
-      <g id="layer1" clipPath="url(#bgClip)" style={{ fill: lineColor }}>
+      <g clipPath="url(#boatBgClip)" style={{ fill: lineColor }}>
         {bgRect}
         {clouds}
         {waves}

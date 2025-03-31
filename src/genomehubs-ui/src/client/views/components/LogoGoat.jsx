@@ -43,11 +43,11 @@ const Logo = ({
       style={{ display: "block", overflow: "hidden" }}
     >
       <defs>
-        <clipPath id="bgClip">
+        <clipPath id="goatBgClip">
           <rect x={x} y={y} width={width} height={height} />
         </clipPath>
       </defs>
-      <g id="layer1" clipPath="url(#bgClip)">
+      <g clipPath="url(#goatBgClip)">
         {bgRect}
         <path
           style={{ fill: "none", stroke: lineColor, strokeWidth: 6.35 }}

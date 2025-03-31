@@ -5,7 +5,7 @@ import Grid from "@mui/material/Grid2";
 import MdbLogo from "./LogoMolluscDB";
 import React from "react";
 import { compose } from "recompose";
-import { dark } from "@mui/material/styles/createPalette";
+import { fixedArSixteenNine as fixedArSixteenNineStyle } from "./Styles.scss";
 import withColors from "../hocs/withColors";
 import withTheme from "../hocs/withTheme";
 
@@ -17,7 +17,11 @@ const MemoizedMdbLogo = React.memo(MdbLogo);
 export const LogoPage = ({ colorScheme, theme }) => {
   const [animate, setAnimate] = React.useState(Array(6).fill(false));
 
-  let { darkColor, highlightColor, lightColor } = colorScheme[theme];
+  let {
+    headerBackground: darkColor,
+    highlightColor,
+    headerText: lightColor,
+  } = colorScheme[theme];
 
   const handleMouseOver = (index) => {
     setAnimate((prevAnimate) => {
@@ -56,13 +60,15 @@ export const LogoPage = ({ colorScheme, theme }) => {
     >
       <Grid
         container
-        spacing={2}
+        spacing={1}
         style={{
-          height: "100%",
-          width: "100%",
-          maxWidth: "calc(150vh - 20em)",
-          minHeight: "50vh",
+          maxHeight: "50vw",
+          maxWidth: "66.67vh",
+          minHeight: "30em",
+          minWidth: "45em",
+          overflow: "auto",
         }}
+        className={fixedArSixteenNineStyle}
       >
         {logos.map((Logo, index) => (
           <Grid
@@ -70,7 +76,14 @@ export const LogoPage = ({ colorScheme, theme }) => {
             key={index}
             style={{
               cursor: "pointer",
-              border: "1em solid rgba(255,255,255, 0.2)",
+              border: "0.5em solid rgba(255,255,255, 0.2)",
+              // minWidth: "10em",
+              // minHeight: "10em",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: "3em",
+              overflow: "hidden",
             }}
             onMouseOver={() => handleMouseOver(index)}
             onMouseOut={() => handleMouseOut(index)}
@@ -78,7 +91,7 @@ export const LogoPage = ({ colorScheme, theme }) => {
             <Logo
               animate={animate[index]}
               delay={0}
-              lineColor={animate[index] && highlightColor}
+              lineColor={animate[index] ? highlightColor : lightColor}
               backgroundColor={darkColor}
             />
           </Grid>

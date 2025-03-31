@@ -44,11 +44,11 @@ const Logo = ({
       style={{ display: "block", overflow: "hidden" }}
     >
       <defs>
-        <clipPath id="bgClip">
+        <clipPath id="molluscBgClip">
           <rect x={x} y={y} width={width} height={height} />
         </clipPath>
       </defs>
-      <g id="layer1" clipPath="url(#bgClip)">
+      <g clipPath="url(#molluscBgClip)">
         {bgRect}
         <motion.path
           style={{

@@ -28,7 +28,7 @@ const Logo = ({
 
   const transitionProps = {
     repeat: Infinity,
-    duration,
+    duration: duration / 2,
     ease: "easeInOut",
     delay,
   };
@@ -157,7 +157,7 @@ const Logo = ({
       style={{ display: "block", overflow: "hidden" }}
     >
       <defs>
-        <clipPath id="bgClip">
+        <clipPath id="btkBgClip">
           <rect x={x} y={y} width={width} height={height} />
         </clipPath>
         <path
@@ -169,7 +169,7 @@ const Logo = ({
           d="m 158.37288,234.37738 -112.792699,-65.12089 -3e-6,-130.241793 112.792702,-65.120898 112.7927,65.120892 0,130.241789 z"
         />
       </defs>
-      <g id="layer1" clipPath="url(#bgClip)">
+      <g clipPath="url(#btkBgClip)">
         {bgRect}
         {dataGrid}
         {dataHexes}
