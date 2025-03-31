@@ -100,26 +100,7 @@ const TransitionableLine = ({
     );
   }
 
-  return (
-    <g>
-      {featurePaths}
-      {/* <motion.line
-        {...staticAttributes}
-        // ref={ref}
-        animate={{
-          x1,
-          y1,
-          x2,
-          y2,
-          opacity: 1,
-          transition: {
-            default: { type: "spring", duration: 1 },
-            // opacity: { ease: "linear" }
-          },
-        }}
-      /> */}
-    </g>
-  );
+  return <g>{featurePaths}</g>;
 };
 
 const calculateFlatPoints = (curvedPoints, compression = 1) => {
@@ -147,27 +128,6 @@ const calculateFlatPoints = (curvedPoints, compression = 1) => {
   return flatPoints;
 };
 
-// const CURVED = [
-//   [20, 80],
-//   [100, 120],
-// ];
-
-// const POINTS = {
-//   curved: CURVED,
-//   flat: calculateFlatPoints(CURVED),
-
-//   features: ["M 20,80 L 100,80 L 100,120 L 20,120 Z"],
-// };
-
-// const CURVED = [
-//   [31.311717, 92.847939],
-//   [42.836168, 72.190903],
-//   [54.795506, 61.536223],
-//   [73.495559, 54.795506],
-//   [87.194436, 49.142001],
-//   [90.021188, 65.015302],
-//   [87.846763, 78.061851],
-//   [68.494382, 86.324665],
 let octagon = [];
 let paths = [];
 let centers = [];
@@ -346,7 +306,7 @@ const Logo = ({
   const [isopod, setIsopod] = useState(null);
   const [mouseDown, setMouseDown] = useState(false);
   const [animateInterval, setAnimateInterval] = useState(null);
-  let duration = (totalDuration / shapes.length) * index == 0 ? 1000 : 500;
+  let duration = (totalDuration / shapes.length) * (index == 0 ? 1000 : 500);
 
   const drawMovingLines = () => {
     let movingLines = [];
@@ -422,12 +382,6 @@ const Logo = ({
     );
   };
 
-  const toggleColors = () => {
-    setColoring(
-      coloring.map((color, i) => (color === "grey" ? colors[i] : "grey")),
-    );
-  };
-
   useEffect(() => {
     setIsopod(drawIsopod());
   }, [index, coloring]);
@@ -458,12 +412,7 @@ const Logo = ({
     );
 
   return (
-    <svg
-      height="100%"
-      viewBox="0 0 256 256"
-      preserveAspectRatio="xMinYMin"
-      onClick={toggleColors}
-    >
+    <svg height="100%" viewBox="0 0 256 256" preserveAspectRatio="xMinYMin">
       <g>
         {bgRect}
         <g id="isopod1">{isopod}</g>
