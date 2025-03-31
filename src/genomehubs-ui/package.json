@@ -108,6 +108,7 @@
     "konva": "^9.3.14",
     "leaflet": "^1.7.1",
     "merge-images": "^2.0.0",
+    "motion": "^12.5.0",
     "nanoid": "^5.0.7",
     "qrcode.react": "^4.0.1",
     "qs": "^6.10.1",
@@ -143,6 +144,7 @@
     "reselect": "^5.1.1",
     "save-svg-as-png": "^1.4.17",
     "shallowequal": "^1.1.0",
+    "svg-path-bbox": "^2.1.0",
     "svg-sprite-loader": "^6.0.11",
     "svgo-loader": "^4.0.0",
     "trie-search": "^2.0.0",
@@ -165,7 +167,7 @@
       "storybook": "./src/client/views/hocs/withTheme.mock.jsx",
       "default": "./src/client/views/hocs/withTheme.jsx"
     },
-    "#hocs/withPhylopics":{
+    "#hocs/withPhylopics": {
       "storybook": "./src/client/views/hocs/withPhylopics.mock.jsx",
       "default": "./src/client/views/hocs/withPhylopics.jsx"
     },

@@ -10,22 +10,11 @@ import {
 
 import Logo from "./Logo";
 import { compose } from "recompose";
-import withColors from "../hocs/withColors";
 import withLoading from "../hocs/withLoading";
 import withSiteName from "../hocs/withSiteName";
-import withTheme from "../hocs/withTheme";
 
-const LoadingScreen = ({
-  types,
-  basename,
-  colorScheme,
-  theme,
-  siteName,
-  loading,
-  setLoading,
-}) => {
+const LoadingScreen = ({ types, basename, siteName, loading, setLoading }) => {
   const [show, setShow] = useState(loading);
-  let lineColor = colorScheme[theme].headerText;
 
   useEffect(() => {
     if (loading == "finished") {
@@ -49,7 +38,7 @@ const LoadingScreen = ({
         <div className={loadingContainerStyle}>
           <div className={loadingLogoStyle}>
             <div className={loaderStyle}>
-              <Logo lineColor={lineColor} />
+              <Logo animate={true} delay={2} />
             </div>
           </div>
           <h1>loading {siteName}...</h1>
@@ -59,9 +48,4 @@ const LoadingScreen = ({
   );
 };
 
-export default compose(
-  withSiteName,
-  withTheme,
-  withColors,
-  withLoading,
-)(LoadingScreen);
+export default compose(withSiteName, withLoading)(LoadingScreen);

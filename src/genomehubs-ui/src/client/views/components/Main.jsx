@@ -3,6 +3,7 @@ import React, { Fragment, memo } from "react";
 import ExplorePage from "./ExplorePage";
 import GenericPage from "./GenericPage";
 import Landing from "./Landing";
+import LogoPage from "./LogoPage";
 import MissingPage from "./MissingPage";
 import RecordPage from "./RecordPage";
 import Redirect from "./Redirect";
@@ -39,6 +40,7 @@ const Main = ({ routes, basename }) => {
     <TypesPage path="/types" key="/types" />,
     <ReportPage path="/report" key="/report" />,
     <MissingPage default key="404" />,
+    <LogoPage path="/links" key="/links" />,
   ];
   routes.allIds.forEach((routeName) => {
     if (!fixedRoutes[routeName]) {
@@ -47,7 +49,7 @@ const Main = ({ routes, basename }) => {
           path={`/${routeName}`}
           pageId={routes.byId[routeName].pageId}
           key={routeName}
-        />
+        />,
       );
     }
     paths.push(<GenericPage path={`/${routeName}/*`} key={"other"} />);
