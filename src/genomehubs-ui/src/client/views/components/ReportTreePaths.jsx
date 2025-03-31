@@ -716,24 +716,28 @@ const ReportTreePaths = ({
                   }
                 }
               }
-              if (segment.showPhylopic) {
-                const phylopicHeight=phylopicSize||charHeight;
-                newPhyloPics.push(
-                  <PhyloPics
-                    key={segment.taxon_id}
-                    taxonId={segment.taxon_id}
-                    scientificName={segment.scientific_name}
-                    maxHeight={phylopicHeight}
-                    maxWidth={phylopicWidth}
-                    x={maxWidth + dataWidth}
-                    y={segment.yStart - phylopicHeight / 2}
-                    fixedRatio={1}
-                    showAncestral={false}
-                    sourceColors={false}
-                    embed={"konva"}
-                  />,
-                );
-              }
+            }
+            console.log("Segment with showPhylopic:", 
+              segment.showPhylopic ? 
+              {id: segment.taxon_id, name: segment.scientific_name, rank: segment.taxon_rank} : 
+              null
+            );
+            if (segment.showPhylopic) {
+              newPhyloPics.push(
+                <PhyloPics
+                  key={segment.taxon_id}
+                  taxonId={segment.taxon_id}
+                  scientificName={segment.scientific_name}
+                  maxHeight={phylopicSize || charHeight}
+                  maxWidth={phylopicWidth}
+                  x={maxWidth + dataWidth}
+                  y={segment.yStart - (phylopicSize || charHeight) / 2}
+                  fixedRatio={1}
+                  showAncestral={false}
+                  sourceColors={false}
+                  embed={"konva"}
+                />,
+              );
             }
           }
         }

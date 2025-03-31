@@ -172,8 +172,8 @@ export const queryPropList = {
     "hideErrorBars",
     "hideAncestralBars",
     "showPhylopics",
-    { prop: "phylopicRank", label: "species" },  
-    { prop: "phylopicSize", label: "100" }, 
+    "phylopicRank"  ,
+    "phylopicSize",
     "yOpts",
     "treeStyle",
     "treeThreshold",
@@ -524,7 +524,8 @@ export const ReportEdit = ({
           </Select>
         </FormControl>
       );
-      if(queryProp=="phylopicRank"){
+    }
+      else if(queryProp=="phylopicRank"){
         let items=[
           { value: "", label: "Auto (tip nodes)" },
           { value: "subspecies", label: "Subspecies" },
@@ -535,11 +536,13 @@ export const ReportEdit = ({
           { value: "class", label: "Class" },
           {value:"subphylum", label:"Subphylum"},
           { value: "phylum", label: "Phylum" }
-        ].map(({value, label}) => (
+        ].map(({value, label}) => {
+          return(
             <MenuItem key={value} value={value}>
               {label}
             </MenuItem>
-        ))
+          )
+      })
         input = (
           <FormControl variant="standard" style={{ width: "95%" }}>
             <InputLabel id="select-phylopic-rank-label">PhyloPic Rank</InputLabel>
@@ -559,7 +562,13 @@ export const ReportEdit = ({
           </FormControl>
         );
       }
-      if(queryProp=="phylopicSize"){
+      else if(queryProp=="phylopicSize"){
+        const treeStyle = values["treeStyle"] || "rect";
+        const sizeDefaults = {
+          rect: { min: 15, max: 60, default: 25, step: 5 },
+          ring: { min: 20, max: 80, default: 45, step: 5 }
+        }[treeStyle];
+        const helpText = `Size in pixels (${sizeDefaults.min}-${sizeDefaults.max}, empty = default(${sizeDefaults.default}))`;
         input = (
           <TextField
             variant="standard"
@@ -571,12 +580,16 @@ export const ReportEdit = ({
             onChange={(e) => handleChange(e, "phylopicSize")}
             onBlur={(e) => handleChange(e, "phylopicSize")}
             onKeyPress={handleKeyPress}
-            inputProps={{ min: 20, max: 400, step: 10 }}
-            helperText="Size in pixels (20-400, empty = default(100))"
+            inputProps={{ 
+              min: sizeDefaults.min, 
+              max: sizeDefaults.max, 
+              step: sizeDefaults.step 
+            }}
+            helperText={helpText}
           />
         );
       }
-    } else if (
+     else if (
       queryProp == "includeEstimates" ||
       queryProp == "stacked" ||
       queryProp == "cumulative" ||
