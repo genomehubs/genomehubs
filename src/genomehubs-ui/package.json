@@ -144,6 +144,7 @@
     "reselect": "^5.1.1",
     "save-svg-as-png": "^1.4.17",
     "shallowequal": "^1.1.0",
+    "svg-path-bbox": "^2.1.0",
     "svg-sprite-loader": "^6.0.11",
     "svgo-loader": "^4.0.0",
     "trie-search": "^2.0.0",

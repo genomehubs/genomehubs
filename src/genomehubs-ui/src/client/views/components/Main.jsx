@@ -40,7 +40,7 @@ const Main = ({ routes, basename }) => {
     <TypesPage path="/types" key="/types" />,
     <ReportPage path="/report" key="/report" />,
     <MissingPage default key="404" />,
-    <LogoPage path="/logo" key="/logo" />,
+    <LogoPage path="/links" key="/links" />,
   ];
   routes.allIds.forEach((routeName) => {
     if (!fixedRoutes[routeName]) {
