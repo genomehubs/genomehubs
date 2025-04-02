@@ -22,6 +22,8 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 
+import { current } from "@reduxjs/toolkit";
+
 const KeyValueChip = ({
   keyLabel,
   value,
@@ -31,6 +33,9 @@ const KeyValueChip = ({
 }) => {
   // Format numbers with suffixes (k, M, G, etc.)
   const formatValue = (val) => {
+    if (val === null || val === undefined || val == "") {
+      return ""; // Return empty string for null or undefined values
+    }
     if (isNaN(val)) {
       return val; // Return non-numeric values as-is
     }
@@ -41,7 +46,7 @@ const KeyValueChip = ({
     while (num >= 1000 && tier < suffixes.length - 1) {
       const nextNum = num / 1000;
       if (nextNum.toString().match(/^\d+\.\d{4}/)) {
-        return val; // If more than 3 decimal places are required, return full number
+        return (num * Math.pow(10, tier * 3)).toLocaleString(); // Format the number with commas
       } else {
         num = nextNum;
         tier++;
@@ -57,12 +62,14 @@ const KeyValueChip = ({
 
   // Determine the available operators based on the keyLabel
   const availableOperators =
-    keyLabel === "tax" ? ["name", "tree", "eq", "lineage"] : ["=", ">=", "<="];
+    keyLabel === "tax"
+      ? ["name", "tree", "eq", "lineage", "rank", "level"]
+      : ["=", ">", ">=", "<", "<=", "!="];
 
   // Parse values with suffixes back into numbers
   const parseValue = (val) => {
     const suffixes = { k: 1e3, M: 1e6, G: 1e9, T: 1e12, P: 1e15 };
-    const match = val.match(/^([\d.]+)([kMGTPE]?)$/);
+    const match = val.replace(",", "").match(/^([\d.]+)([kMGTPE]?)$/);
     if (!match) {
       return val; // Return as-is if no suffix is found
     }
@@ -107,6 +114,17 @@ const KeyValueChip = ({
     onDelete?.({ key: keyLabel, value: "", symbol: "=" });
   };
 
+  const truncate = (str, maxWidth = 30) => {
+    // format comma separated lists with spaces and truncate if too long
+    if (str.length > maxWidth) {
+      const parts = str.split(",");
+      const formattedParts = parts.map((part) => part.trim());
+      const truncatedStr = formattedParts.join(", ");
+      return `${truncatedStr.slice(0, maxWidth)}...`;
+    }
+    return str;
+  };
+
   return (
     <Box sx={{ display: "inline-flex", alignItems: "center" }}>
       <Chip
@@ -119,21 +137,36 @@ const KeyValueChip = ({
           >
             <Typography
               variant="body2"
-              sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}
+              sx={{
+                fontWeight: "bold",
+                whiteSpace: "nowrap",
+                height: "30px", // Ensure the key label has a fixed height
+                lineHeight: "30px", // Center the text vertically
+              }}
             >
               {keyLabel}
             </Typography>
             <Box
               sx={{
                 display: "flex",
-                alignItems: "center",
+                alignItems: "flexstart",
                 justifyContent: "center",
                 gap: 0.5,
+                height: "30px", // Ensure the operator and value have a fixed height
               }}
             >
               <Typography
                 variant="body2"
-                sx={{ cursor: "pointer", whiteSpace: "nowrap" }}
+                sx={{
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  backgroundColor: "#808080",
+                  borderRadius: "4px",
+                  padding: "2px 4px",
+                  height: "1.1em", // Ensure the operator has a fixed height
+                  lineHeight: "1.1em", // Center the text vertically
+                  marginTop: "6px",
+                }}
                 onClick={handleChipClick}
               >
                 {currentSymbol}
@@ -143,13 +176,21 @@ const KeyValueChip = ({
                   value={currentValue}
                   onChange={handleValueChange}
                   onBlur={handleValueBlur}
+                  multiline={currentValue.length * 8 > 100} // Allow multiline if value is too long
+                  maxRows={Math.ceil((currentValue.length * 8) / 100)} // Limit to 2 rows
                   size="small"
                   variant="standard"
                   autoFocus
                   sx={{
-                    width: "80px",
+                    marginTop: "4px",
+                    width: `${currentValue.length * 8 > 100 ? 400 : currentValue.length * 8 + 40}px`, // Dynamically set width based on value length
                     "& .MuiInputBase-input": {
                       textAlign: "center", // Center-align the text
+                    },
+                    "& .MuiInputBase-root": {
+                      backgroundColor: "#f0f0f0",
+                      borderRadius: "4px",
+                      padding: "0 2px 2px 2px",
                     },
                   }}
                 />
@@ -158,11 +199,16 @@ const KeyValueChip = ({
                   variant="body2"
                   sx={{
                     cursor: "pointer",
-                    whiteSpace: "nowrap",
+                    whiteSpace: currentValue.length > 100 ? "normal" : "nowrap", // Wrap text if too long
+                    wordBreak:
+                      currentValue.length > 100 ? "break-word" : "normal", // Break long words if necessary
+                    opacity: currentValue ? 1 : 0.5,
+                    fontStyle: currentValue ? "normal" : "italic",
+                    marginTop: "6px",
                   }}
                   onClick={handleValueEdit}
                 >
-                  {currentValue}
+                  {truncate(currentValue) || "value"}
                 </Typography>
               )}
             </Box>
@@ -170,14 +216,14 @@ const KeyValueChip = ({
         }
         onDelete={handleDelete} // Add delete functionality
         sx={{
-          padding: 0, // Ensure padding around the chip content
-          height: "48px", // Increase the chip height
+          padding: "0 0 0 1em", // Ensure padding around the chip content
+          height: "60px", // Increase the chip height
           "& .MuiChip-label": { display: "block", padding: 1 }, // Ensure padding around the label
           // Shade the top half of the chip
           background: "linear-gradient(to bottom, #808080 50%, #f0f0f0 50%)",
           // offset the delete icon so it is in the top half of the chip, not centered vertically
           "& .MuiChip-deleteIcon": {
-            marginTop: "-1em", // Adjust this value to move the delete icon up
+            marginTop: "-28px", // Adjust this value to move the delete icon up
             color: "#f0f0f0", // Change the delete icon color to match the top half
           },
           "&:hover": {

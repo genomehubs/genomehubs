@@ -69,3 +69,10 @@ TaxKey.args = {
   value: "Eukaryota",
   symbol: "tree",
 };
+
+export const LongValue = Template.bind({});
+LongValue.args = {
+  keyLabel: "bioproject",
+  value: "PRJEB40665,PRJEB40666,PRJEB40667,PRJEB40668,PRJEB40669",
+  symbol: "=",
+};

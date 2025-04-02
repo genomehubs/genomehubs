@@ -52,7 +52,9 @@ const ChipSearch = ({
         placeholder={placeholder}
         fullWidth
       />
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+      <Box
+        sx={{ display: "flex", flexWrap: "wrap", gap: 1, alignItems: "center" }}
+      >
         {chips.map((chip, index) => {
           if (chip === "AND") {
             // Render "AND" as a regular Chip
