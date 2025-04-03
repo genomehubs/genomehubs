@@ -906,11 +906,11 @@ export const processTreePaths = ({
 
     let label;
     let showPhylopic;
+    showPhylopic = showPhylopics && node.scientific_name != "parent" &&(phylopicRank?node.taxon_rank==phylopicRank:node.tip );
     if (node.tip) {
       label = node.scientific_name;
       maxWidth = Math.max(maxWidth, stringLength(label) * pointSize * 0.8);
       maxTip = Math.max(maxTip, node.xEnd + 10);
-      showPhylopic = showPhylopics && node.scientific_name != "parent" &&(phylopicRank?node.taxon_rank==phylopicRank:node.tip );
     } else if (node.scientific_name != "parent" && node.width > charLen * 5) {
       label = node.scientific_name;
       if (label.length * charLen - 2 > node.width) {

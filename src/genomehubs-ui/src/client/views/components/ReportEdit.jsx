@@ -526,49 +526,27 @@ export const ReportEdit = ({
       );
     }
       else if(queryProp=="phylopicRank"){
-        let items=[
-          { value: "", label: "Auto (tip nodes)" },
-          { value: "subspecies", label: "Subspecies" },
-          { value: "species", label: "Species" },
-          { value: "genus", label: "Genus" },
-          { value: "family", label: "Family" },
-          { value: "order", label: "Order" },
-          { value: "class", label: "Class" },
-          {value:"subphylum", label:"Subphylum"},
-          { value: "phylum", label: "Phylum" }
-        ].map(({value, label}) => {
-          return(
-            <MenuItem key={value} value={value}>
-              {label}
-            </MenuItem>
-          )
-      })
         input = (
-          <FormControl variant="standard" style={{ width: "95%" }}>
-            <InputLabel id="select-phylopic-rank-label">PhyloPic Rank</InputLabel>
-            <Select
-              variant="standard"
-              labelId="select-phylopic-rank-label"
-              id="select-phylopic-rank"
-              value={values["phylopicRank"] || ""}
-              style={{ width: "95%" }}
-              onChange={(e) => handleChange(e, "phylopicRank")}
-            >
-              {items}
-            </Select>
-            <FormHelperText>
-              Which taxonomic rank to display PhyloPics for (empty = all tip nodes)
-            </FormHelperText>
-          </FormControl>
+          <TextField
+            variant="standard"
+            id={queryProp + Math.random()}
+            label="PhyloPic Rank"
+            value={values[queryProp] || ""}
+            style={{ width: "95%" }}
+            onChange={(e) => handleChange(e, "phylopicRank")}
+            onBlur={(e) => handleChange(e, "phylopicRank")}
+            onKeyPress={handleKeyPress}
+            helperText="Taxonomic rank to display PhyloPics (e.g. species, genus, family, order, phylum, kingdom, etc. - empty = tip nodes)"
+          />
         );
       }
       else if(queryProp=="phylopicSize"){
         const treeStyle = values["treeStyle"] || "rect";
         const sizeDefaults = {
-          rect: { min: 15, max: 60, default: 25, step: 5 },
-          ring: { min: 20, max: 80, default: 45, step: 5 }
+          rect: { min: 15, max: 100, default:25, step: 5 },  
+          ring: { min: 20, max: 250, default: 100, step: 10 } 
         }[treeStyle];
-        const helpText = `Size in pixels (${sizeDefaults.min}-${sizeDefaults.max}, empty = default(${sizeDefaults.default}))`;
+        const helpText = `Size in pixels (${sizeDefaults.min}-${sizeDefaults.max}, empty = auto-sized based on available space)`;
         input = (
           <TextField
             variant="standard"
