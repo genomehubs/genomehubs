@@ -230,7 +230,7 @@ export const processTreeRings = ({
   hideSourceColors,
   showPhylopics,
   phylopicRank,
-  phylopicSize,
+  phylopicSize = 100,
 }) => {
   if (!nodes) {
     return undefined;
@@ -268,8 +268,7 @@ export const processTreeRings = ({
   let cMax = treeNodes[rootNode] ? treeNodes[rootNode].count : 0;
   let phylopicWidth = 0;
   if (showPhylopics) {
-    let size=phylopicSize??100;
-    phylopicWidth = Math.min((radius * Math.PI * 2) / cMax, size);
+    phylopicWidth = Math.min((radius * Math.PI * 2) / cMax, phylopicSize);
     radius -= phylopicWidth;
   }
   let summary = (yQuery?.ySummaries || ["value"])[0];
@@ -408,12 +407,12 @@ export const processTreeRings = ({
       node.taxon_id &&
       showPhylopics &&
       node.scientific_name != "parent" &&
-      (
-      (phylopicRank && node.taxon_rank===phylopicRank)
-      || (!phylopicRank && (!node.hasOwnProperty("children") || 
-      Object.keys(node.children).length == 0))||
-      node.hasAssemblies ||
-      node.hasSamples)
+      ((phylopicRank && node.taxon_rank === phylopicRank) ||
+        (!phylopicRank &&
+          (!node.hasOwnProperty("children") ||
+            Object.keys(node.children).length == 0)) ||
+        node.hasAssemblies ||
+        node.hasSamples)
     ) {
       let r = radius + dataWidth + phylopicWidth / 2;
 
@@ -714,7 +713,7 @@ export const processTreePaths = ({
   let phylopicWidth = 0;
 
   if (showPhylopics) {
-    phylopicWidth = phylopicSize||charHeight * 1.5;
+    phylopicWidth = phylopicSize || charHeight * 1.5;
     targetWidth -= phylopicWidth;
   }
   let summary = (yQuery?.ySummaries || ["value"])[0];
@@ -885,28 +884,37 @@ export const processTreePaths = ({
       bar,
     }));
 
-    // 
-    let is_phylopic=showPhylopics && node.scientific_name != "parent" && (phylopicRank ? node.taxon_rank == phylopicRank : node.tip);
-    if(is_phylopic) {
-      let width=phylopicWidth;
+    //
+    let is_phylopic =
+      showPhylopics &&
+      node.scientific_name != "parent" &&
+      (phylopicRank ? node.taxon_rank == phylopicRank : node.tip);
+    if (is_phylopic) {
+      let width = phylopicWidth;
       let height;
-      if(node.tip) {
+      if (node.tip) {
         height = node.yMax - node.yMin;
       } else {
-        height = Math.min(node.yMax - node.yMin,charHeight*Math.min(node.count,5));
+        height = Math.min(
+          node.yMax - node.yMin,
+          charHeight * Math.min(node.count, 5),
+        );
       }
       phylopics[node.taxon_id] = {
         ...phylopics[node.taxon_id],
         width,
         height,
-        x:targetWidth-dataWidth,
-        y:node.yMin+(node.yMax-node.yMin)/2-height/2,
+        x: targetWidth - dataWidth,
+        y: node.yMin + (node.yMax - node.yMin) / 2 - height / 2,
       };
     }
 
     let label;
     let showPhylopic;
-    showPhylopic = showPhylopics && node.scientific_name != "parent" &&(phylopicRank?node.taxon_rank==phylopicRank:node.tip );
+    showPhylopic =
+      showPhylopics &&
+      node.scientific_name != "parent" &&
+      (phylopicRank ? node.taxon_rank == phylopicRank : node.tip);
     if (node.tip) {
       label = node.scientific_name;
       maxWidth = Math.max(maxWidth, stringLength(label) * pointSize * 0.8);

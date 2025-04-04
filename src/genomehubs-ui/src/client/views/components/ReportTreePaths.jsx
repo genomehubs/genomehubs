@@ -718,15 +718,16 @@ const ReportTreePaths = ({
               }
             }
             if (segment.showPhylopic) {
+              let max_height = segment.count * charHeight;
               newPhyloPics.push(
                 <PhyloPics
                   key={segment.taxon_id}
                   taxonId={segment.taxon_id}
                   scientificName={segment.scientific_name}
-                  maxHeight={segment.size * charHeight}
+                  maxHeight={max_height}
                   maxWidth={phylopicWidth}
                   x={maxWidth + dataWidth}
-                  y={segment.yStart - (phylopicSize || charHeight) / 2}
+                  y={segment.yStart - max_height / 2}
                   fixedRatio={1}
                   showAncestral={false}
                   sourceColors={false}
