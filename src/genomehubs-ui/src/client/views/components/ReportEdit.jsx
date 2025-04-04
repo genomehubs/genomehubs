@@ -17,6 +17,7 @@ import Slider from "@mui/material/Slider";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
@@ -543,7 +544,7 @@ export const ReportEdit = ({
                   arrow
                   placement="top"
                 >
-                  <div style={{ fontSize: "1.2rem" }}>ⓘ</div>
+                  <div style={{ fontSize: "1.2rem" ,cursor:'pointer'}}><InfoOutlinedIcon/></div>
                 </Tooltip>
               </InputAdornment>
             ),
@@ -553,7 +554,7 @@ export const ReportEdit = ({
     } else if (queryProp == "phylopicSize") {
       const treeStyle = values["treeStyle"] || "rect";
       const sizeDefaults = {
-        rect: { min: 15, max: 100, default: 25, step: 5 },
+        rect: { min: 15, max: 250, default: 25, step: 5 },
         ring: { min: 20, max: 250, default: 100, step: 10 },
       }[treeStyle];
       const helpText = `Size in pixels (${sizeDefaults.min}-${sizeDefaults.max}, empty = auto-sized based on available space)`;
@@ -577,7 +578,7 @@ export const ReportEdit = ({
             endAdornment: (
               <InputAdornment position="end">
                 <Tooltip title={helpText} arrow placement="top">
-                  <div style={{ fontSize: "1.2rem" }}>ⓘ</div>
+                  <div style={{ fontSize: "1.2rem",cursor:'pointer' }}><InfoOutlinedIcon/></div>
                 </Tooltip>
               </InputAdornment>
             ),

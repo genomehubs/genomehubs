@@ -42,8 +42,8 @@ const PhyloPicKonvaImage = ({ fileUrl, maxHeight, maxWidth, theme, x, y }) => {
     <Image
       image={image}
       ref={imageRef}
-      x={-maxWidth / 2}
-      y={y}
+      x={x-maxWidth / 2}
+      y={y-maxHeight / 2}
       height={maxHeight}
       width={maxWidth}
       crossOrigin="anonymous"
