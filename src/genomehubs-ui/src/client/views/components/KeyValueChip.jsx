@@ -17,6 +17,7 @@ import {
   Chip,
   Menu,
   MenuItem,
+  Popper,
   TextField,
   Typography,
 } from "@mui/material";
@@ -56,6 +57,7 @@ const KeyValueChip = ({
     return tier === 0 ? num.toString() : `${num}${suffixes[tier]}`;
   };
   const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl2, setAnchorEl2] = useState(null);
   const [currentSymbol, setCurrentSymbol] = useState(symbol);
   const [currentValue, setCurrentValue] = useState(formatValue(value));
   const [isEditing, setIsEditing] = useState(false);
@@ -77,7 +79,7 @@ const KeyValueChip = ({
     return parseFloat(number) * (suffixes[suffix] || 1);
   };
 
-  const handleChipClick = (event) => {
+  const handleSymbolClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -93,8 +95,9 @@ const KeyValueChip = ({
     setAnchorEl(null);
   };
 
-  const handleValueEdit = () => {
+  const handleValueEdit = (event) => {
     setIsEditing(true);
+    setAnchorEl2(event.currentTarget);
   };
 
   const handleValueChange = (event) => {
@@ -103,6 +106,7 @@ const KeyValueChip = ({
 
   const handleValueBlur = () => {
     setIsEditing(false);
+    setAnchorEl2(null);
     const parsedValue = parseValue(currentValue);
     setCurrentValue(formatValue(parsedValue)); // Reformat the value for display
     onChange?.({ key: keyLabel, value: parsedValue, symbol: currentSymbol });
@@ -167,50 +171,27 @@ const KeyValueChip = ({
                   lineHeight: "1.1em", // Center the text vertically
                   marginTop: "6px",
                 }}
-                onClick={handleChipClick}
+                onClick={handleSymbolClick}
               >
                 {currentSymbol}
               </Typography>
-              {isEditing ? (
-                <TextField
-                  value={currentValue}
-                  onChange={handleValueChange}
-                  onBlur={handleValueBlur}
-                  multiline={currentValue.length * 8 > 100} // Allow multiline if value is too long
-                  maxRows={Math.ceil((currentValue.length * 8) / 100)} // Limit to 2 rows
-                  size="small"
-                  variant="standard"
-                  autoFocus
-                  sx={{
-                    marginTop: "4px",
-                    width: `${currentValue.length * 8 > 100 ? 400 : currentValue.length * 8 + 40}px`, // Dynamically set width based on value length
-                    "& .MuiInputBase-input": {
-                      textAlign: "center", // Center-align the text
-                    },
-                    "& .MuiInputBase-root": {
-                      backgroundColor: "#f0f0f0",
-                      borderRadius: "4px",
-                      padding: "0 2px 2px 2px",
-                    },
-                  }}
-                />
-              ) : (
-                <Typography
-                  variant="body2"
-                  sx={{
-                    cursor: "pointer",
-                    whiteSpace: currentValue.length > 100 ? "normal" : "nowrap", // Wrap text if too long
-                    wordBreak:
-                      currentValue.length > 100 ? "break-word" : "normal", // Break long words if necessary
-                    opacity: currentValue ? 1 : 0.5,
-                    fontStyle: currentValue ? "normal" : "italic",
-                    marginTop: "6px",
-                  }}
-                  onClick={handleValueEdit}
-                >
-                  {truncate(currentValue) || "value"}
-                </Typography>
-              )}
+
+              <Typography
+                variant="body2"
+                ref={anchorEl2}
+                sx={{
+                  cursor: "pointer",
+                  whiteSpace: currentValue.length > 100 ? "normal" : "nowrap", // Wrap text if too long
+                  wordBreak:
+                    currentValue.length > 100 ? "break-word" : "normal", // Break long words if necessary
+                  opacity: currentValue && !isEditing ? 1 : 0.5,
+                  fontStyle: currentValue ? "normal" : "italic",
+                  marginTop: "6px",
+                }}
+                onClick={handleValueEdit}
+              >
+                {truncate(currentValue) || "value"}
+              </Typography>
             </Box>
           </Box>
         }
@@ -234,6 +215,54 @@ const KeyValueChip = ({
           },
         }}
       />
+      {isEditing && (
+        <Popper
+          open={isEditing}
+          anchorEl={anchorEl2}
+          placement="bottom"
+          modifiers={[
+            {
+              name: "offset",
+              // options: {
+              //   offset: [0, 8], // Adjust the offset as needed
+              // },
+            },
+          ]}
+        >
+          <Box
+            sx={{
+              padding: "8px",
+              backgroundColor: "#f0f0f0",
+              borderRadius: "4px",
+              boxShadow:
+                "0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)",
+            }}
+          >
+            <TextField
+              value={currentValue}
+              onChange={handleValueChange}
+              onBlur={handleValueBlur}
+              multiline={currentValue.length * 8 > 100} // Allow multiline if value is too long
+              maxRows={Math.min(Math.ceil((currentValue.length * 8) / 100), 10)} // Limit to 2 rows
+              size="small"
+              variant="standard"
+              autoFocus
+              sx={{
+                marginTop: "4px",
+                width: `${currentValue.length * 8 > 100 ? 400 : currentValue.length * 8 + 40}px`, // Dynamically set width based on value length
+                "& .MuiInputBase-input": {
+                  textAlign: "center", // Center-align the text
+                },
+                "& .MuiInputBase-root": {
+                  backgroundColor: "#f0f0f0",
+                  borderRadius: "4px",
+                  padding: "0 2px 2px 2px",
+                },
+              }}
+            />
+          </Box>
+        </Popper>
+      )}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
