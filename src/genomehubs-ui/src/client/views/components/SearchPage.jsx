@@ -28,6 +28,7 @@ const SearchPage = ({
   searchDefaults,
   setSearchDefaults,
   topLevel,
+  pageId = "search.md",
   searchIndex,
 }) => {
   let results = [];
@@ -102,7 +103,7 @@ const SearchPage = ({
       }
     }
   }, [values, hashTerm, isFetching]);
-  let text = <TextPanel pageId={"search.md"}></TextPanel>;
+  let text = <TextPanel pageId={pageId}></TextPanel>;
 
   if (!searchTerm || searchTerm == "") {
     // return null;

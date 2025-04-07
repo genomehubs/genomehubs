@@ -43,6 +43,7 @@ const SearchBox = ({
   const navigate = useNavigate();
   const location = useLocation();
   let options = qs.parse(location.search.replace(/^\?/, ""));
+  let pathname = location.pathname.replace(/^\//, "");
   const formRef = useRef(null);
   const searchBoxRef = useRef(null);
   const rootRef = useRef(null);
@@ -146,9 +147,15 @@ const SearchBox = ({
     }
     fetchSearchResults(fullOptions);
     setPreferSearchTerm(false);
-    navigate(
-      `${basename}/search?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
-    );
+    if (pathname.match(/^search/)) {
+      navigate(
+        `${basename}/${pathname}?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
+      );
+    } else {
+      navigate(
+        `${basename}/search?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
+      );
+    }
   };
 
   const wrapTerm = ({ term, taxWrap, result }) => {

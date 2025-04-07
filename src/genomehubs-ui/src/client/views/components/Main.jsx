@@ -44,12 +44,20 @@ const Main = ({ routes, basename }) => {
   ];
   routes.allIds.forEach((routeName) => {
     if (!fixedRoutes[routeName]) {
+      let { fullPath, pageId } = routes.byId[routeName];
+      let Page = GenericPage;
+      if (fullPath.startsWith("/search/")) {
+        Page = SearchPage;
+        paths.push(
+          <Page
+            path={`${fullPath}`}
+            pageId={fullPath.replace(/^\//, "") + ".md"}
+            key={routeName}
+          />,
+        );
+      }
       paths.push(
-        <GenericPage
-          path={`/${routeName}`}
-          pageId={routes.byId[routeName].pageId}
-          key={routeName}
-        />,
+        <Page path={`/${routeName}`} pageId={pageId} key={routeName} />,
       );
     }
     paths.push(<GenericPage path={`/${routeName}/*`} key={"other"} />);

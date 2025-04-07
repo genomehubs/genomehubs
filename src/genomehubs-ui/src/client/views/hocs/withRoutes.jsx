@@ -13,18 +13,26 @@ const withRoutes = (WrappedComponent) => (props) => {
     }),
   });
   const mapDispatchToProps = (dispatch) => ({
-    setRoute: (routeName, pageId) =>
-      dispatch(
+    setRoute: (routeName, pageId, path) => {
+      let fullPath;
+      if (path && path.length > 0) {
+        fullPath = path.replace(/\/$/, "") + "/" + routeName;
+      } else {
+        fullPath = routeName.startsWith("/") ? routeName : `/${routeName}`;
+      }
+      return dispatch(
         setRoutes({
           routeName,
           pageId,
-        })
-      ),
+          fullPath,
+        }),
+      );
+    },
   });
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;
