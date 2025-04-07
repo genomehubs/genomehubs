@@ -13,6 +13,7 @@
  */
 
 import {
+  Autocomplete,
   Box,
   Chip,
   Menu,
@@ -23,12 +24,28 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 
-import { current } from "@reduxjs/toolkit";
-
 const KeyValueChip = ({
   keyLabel,
   value,
   symbol = "=",
+  modifier = "value",
+  availableModifiers = [
+    "count",
+    "length",
+    "max",
+    "mean",
+    "median",
+    "min",
+    "sum",
+    "value",
+  ],
+  availableKeys = [
+    "assembly_level",
+    "assembly_span",
+    "c_value",
+    "genome_size",
+    "tax",
+  ],
   onChange,
   onDelete,
 }) => {
@@ -56,12 +73,16 @@ const KeyValueChip = ({
 
     return tier === 0 ? num.toString() : `${num}${suffixes[tier]}`;
   };
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [anchorEl2, setAnchorEl2] = useState(null);
+  const [anchorElSymbol, setAnchorElSymbol] = useState(null);
+  const [anchorElModifier, setAnchorElModifier] = useState(null);
+  const [anchorElValue, setAnchorElValue] = useState(null);
+  const [currentModifier, setCurrentModifier] = useState(modifier);
   const [currentSymbol, setCurrentSymbol] = useState(symbol);
   const [currentValue, setCurrentValue] = useState(formatValue(value));
-  const [isEditing, setIsEditing] = useState(false);
-
+  const [currentKey, setCurrentKey] = useState(keyLabel);
+  const [isEditingValue, setIsEditingValue] = useState(false);
+  const [isEditingKey, setIsEditingKey] = useState(false);
+  const [anchorElKey, setAnchorElKey] = useState(null);
   // Determine the available operators based on the keyLabel
   const availableOperators =
     keyLabel === "tax"
@@ -80,7 +101,26 @@ const KeyValueChip = ({
   };
 
   const handleSymbolClick = (event) => {
-    setAnchorEl(event.currentTarget);
+    setAnchorElSymbol(event.currentTarget);
+  };
+
+  const handleModifierClick = (event) => {
+    event.stopPropagation(); // Prevent the click event from propagating to the parent
+    event.preventDefault(); // Prevent the default action
+    setAnchorElModifier(event.currentTarget);
+  };
+
+  const handleModifierMenuClose = (newModifier) => {
+    if (newModifier) {
+      setCurrentModifier(newModifier);
+      onChange?.({
+        key: keyLabel,
+        value: parseValue(currentValue),
+        symbol: currentSymbol,
+        modifier: newModifier,
+      });
+    }
+    setAnchorElModifier(null);
   };
 
   const handleMenuClose = (newSymbol) => {
@@ -89,33 +129,66 @@ const KeyValueChip = ({
       onChange?.({
         key: keyLabel,
         value: parseValue(currentValue),
+        modifier: currentModifier,
         symbol: newSymbol,
       });
     }
-    setAnchorEl(null);
+    setAnchorElSymbol(null);
   };
 
   const handleValueEdit = (event) => {
-    setIsEditing(true);
-    setAnchorEl2(event.currentTarget);
+    setIsEditingValue(true);
+    setAnchorElValue(event.currentTarget);
   };
 
   const handleValueChange = (event) => {
     setCurrentValue(event.target.value);
   };
 
-  const handleValueBlur = () => {
-    setIsEditing(false);
-    setAnchorEl2(null);
+  const handleValueBlur = (event) => {
+    event.stopPropagation(); // Prevent the click event from propagating to the parent
+    event.preventDefault(); // Prevent the default action
+    console.log("blur");
+    setIsEditingValue(false);
+    setAnchorElValue(null);
     const parsedValue = parseValue(currentValue);
     setCurrentValue(formatValue(parsedValue)); // Reformat the value for display
-    onChange?.({ key: keyLabel, value: parsedValue, symbol: currentSymbol });
+    onChange?.({
+      key: keyLabel,
+      value: parsedValue,
+      symbol: currentSymbol,
+      modifier: currentModifier,
+    });
+  };
+
+  const handleKeyEdit = (event) => {
+    setIsEditingKey(true);
+    setAnchorElKey(event.currentTarget);
+  };
+
+  const handleKeyChange = (event) => {
+    setCurrentKey(event.target.value);
+  };
+
+  const handleKeyBlur = (event) => {
+    event.stopPropagation(); // Prevent the click event from propagating to the parent
+    event.preventDefault(); // Prevent the default action
+    setIsEditingKey(false);
+    setAnchorElKey(null);
+    onChange?.({
+      key: currentKey,
+      value: parseValue(currentValue),
+      symbol: currentSymbol,
+      modifier: currentModifier,
+    });
   };
 
   const handleDelete = () => {
+    setCurrentKey(keyLabel);
+    setCurrentModifier("value");
     setCurrentSymbol("=");
     setCurrentValue("");
-    onDelete?.({ key: keyLabel, value: "", symbol: "=" });
+    onDelete?.({ key: keyLabel, value: "", symbol: "=", modifier: "value" });
   };
 
   const truncate = (str, maxWidth = 30) => {
@@ -130,25 +203,71 @@ const KeyValueChip = ({
   };
 
   return (
-    <Box sx={{ display: "inline-flex", alignItems: "center" }}>
+    <Box
+      sx={{
+        display: "inline-flex",
+        alignItems: "center",
+        "& .MuiChip-root": {
+          padding: 0,
+        },
+      }}
+    >
       <Chip
         label={
           <Box
             sx={{
               textAlign: "center",
               padding: "8px 12px", // Add padding to ensure content fits
+              position: "relative",
+              overflow: "visible",
+              marginLeft: "1em", // Add margin to the left for spacing
             }}
           >
+            {modifier && (
+              <span
+                style={{
+                  position: "absolute",
+                  marginLeft: "-26px",
+                  left: 0,
+                  top: "8px",
+                  height: "60px",
+                  width: "30px",
+                  fontSize: "1em",
+                  lineHeight: "28px",
+                  textOrientation: "mixed",
+                  writingMode: "vertical-lr",
+                  transform: "rotate(180deg)",
+                  color: "#ffffff",
+                  display: "block",
+                  overflow: "visible",
+                  backgroundColor: "#808080",
+                  // padding: "0 6px",
+                  borderRadius: "0 16px 16px 0",
+                  borderLeft:
+                    modifier == "value" ? "none" : "2px solid #666666",
+                  boxSizing: "border-box",
+                  cursor: "pointer",
+                  opacity: modifier == "value" ? 0.25 : 1,
+                }}
+                onClick={handleModifierClick}
+              >
+                {modifier == "value" ? "" : modifier}
+              </span>
+            )}
             <Typography
               variant="body2"
+              ref={anchorElKey}
               sx={{
                 fontWeight: "bold",
                 whiteSpace: "nowrap",
                 height: "30px", // Ensure the key label has a fixed height
                 lineHeight: "30px", // Center the text vertically
+                opacity: currentValue && !isEditingKey ? 1 : 0.5,
+                cursor: "pointer",
               }}
+              onClick={handleKeyEdit}
             >
-              {keyLabel}
+              {currentKey}
             </Typography>
             <Box
               sx={{
@@ -178,17 +297,17 @@ const KeyValueChip = ({
 
               <Typography
                 variant="body2"
-                ref={anchorEl2}
+                ref={anchorElValue}
                 sx={{
                   cursor: "pointer",
                   whiteSpace: currentValue.length > 100 ? "normal" : "nowrap", // Wrap text if too long
                   wordBreak:
                     currentValue.length > 100 ? "break-word" : "normal", // Break long words if necessary
-                  opacity: currentValue && !isEditing ? 1 : 0.5,
+                  opacity: currentValue && !isEditingValue ? 1 : 0.5,
                   fontStyle: currentValue ? "normal" : "italic",
                   marginTop: "6px",
                 }}
-                onClick={handleValueEdit}
+                onClick={isEditingValue ? handleValueBlur : handleValueEdit}
               >
                 {truncate(currentValue) || "value"}
               </Typography>
@@ -199,7 +318,7 @@ const KeyValueChip = ({
         sx={{
           padding: "0 0 0 1em", // Ensure padding around the chip content
           height: "60px", // Increase the chip height
-          "& .MuiChip-label": { display: "block", padding: 1 }, // Ensure padding around the label
+          "& .MuiChip-label": { display: "block", padding: "1em" }, // Ensure padding around the label
           // Shade the top half of the chip
           background: "linear-gradient(to bottom, #808080 50%, #f0f0f0 50%)",
           // offset the delete icon so it is in the top half of the chip, not centered vertically
@@ -215,10 +334,10 @@ const KeyValueChip = ({
           },
         }}
       />
-      {isEditing && (
+      {isEditingValue && (
         <Popper
-          open={isEditing}
-          anchorEl={anchorEl2}
+          open={isEditingValue}
+          anchorEl={anchorElValue}
           placement="bottom"
           modifiers={[
             {
@@ -240,7 +359,7 @@ const KeyValueChip = ({
           >
             <TextField
               value={currentValue}
-              onChange={handleValueChange}
+              // onChange={handleValueChange}
               onBlur={handleValueBlur}
               multiline={currentValue.length * 8 > 100} // Allow multiline if value is too long
               maxRows={Math.min(Math.ceil((currentValue.length * 8) / 100), 10)} // Limit to 2 rows
@@ -263,9 +382,65 @@ const KeyValueChip = ({
           </Box>
         </Popper>
       )}
+      {isEditingKey && (
+        <Popper
+          open={isEditingKey}
+          anchorEl={anchorElKey}
+          placement="bottom"
+          modifiers={[
+            {
+              name: "offset",
+              options: {
+                offset: [0, 8], // Adjust the offset as needed
+              },
+            },
+          ]}
+        >
+          <Box
+            sx={{
+              padding: "8px",
+              backgroundColor: "#f0f0f0",
+              borderRadius: "4px",
+              boxShadow:
+                "0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)",
+            }}
+          >
+            <Autocomplete
+              options={availableKeys} // Restrict options to availableKeys
+              value={currentKey}
+              onChange={(event, newValue) => {
+                setCurrentKey(newValue || ""); // Update the key with the selected value
+              }}
+              onBlur={(event) => {
+                handleKeyBlur(event); // Trigger the blur handler
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  size="small"
+                  variant="standard"
+                  autoFocus
+                  sx={{
+                    marginTop: "4px",
+                    width: `${Math.max(currentKey.length, 12) * 12 + 40}px`, // Dynamically set width based on key length
+                    "& .MuiInputBase-input": {
+                      textAlign: "center", // Center-align the text
+                    },
+                    "& .MuiInputBase-root": {
+                      backgroundColor: "#f0f0f0",
+                      borderRadius: "4px",
+                      padding: "0 2px 2px 2px",
+                    },
+                  }}
+                />
+              )}
+            />
+          </Box>
+        </Popper>
+      )}
       <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
+        anchorEl={anchorElSymbol}
+        open={Boolean(anchorElSymbol)}
         onClose={() => handleMenuClose()}
         MenuListProps={{
           sx: {
@@ -280,6 +455,26 @@ const KeyValueChip = ({
             selected={operator === currentSymbol}
           >
             {operator}
+          </MenuItem>
+        ))}
+      </Menu>
+      <Menu
+        anchorEl={anchorElModifier}
+        open={Boolean(anchorElModifier)}
+        onClose={() => handleModifierMenuClose()}
+        MenuListProps={{
+          sx: {
+            overflow: "visible", // Allow the menu to extend beyond the chip
+          },
+        }}
+      >
+        {availableModifiers.map((modifier) => (
+          <MenuItem
+            key={modifier}
+            onClick={() => handleModifierMenuClose(modifier)}
+            selected={modifier === currentModifier}
+          >
+            {modifier}
           </MenuItem>
         ))}
       </Menu>

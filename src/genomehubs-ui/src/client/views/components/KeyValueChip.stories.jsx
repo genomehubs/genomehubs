@@ -9,6 +9,7 @@ export default {
     keyLabel: { control: "text" },
     value: { control: "text" },
     symbol: { control: { type: "select", options: ["=", ">=", "<="] } },
+    modifier: { control: "text" },
     onChange: { action: "onChange" },
   },
 };
@@ -18,6 +19,7 @@ const Template = (args) => {
     key: args.keyLabel,
     value: args.value,
     symbol: args.symbol,
+    modifier: args.modifier,
   });
 
   const handleChipChange = (updatedChip) => {
@@ -30,6 +32,7 @@ const Template = (args) => {
       keyLabel={chipData.key}
       value={chipData.value}
       symbol={chipData.symbol}
+      modifier={chipData.modifier}
       onChange={handleChipChange}
     />
   );
@@ -75,4 +78,12 @@ LongValue.args = {
   keyLabel: "bioproject",
   value: "PRJEB40665,PRJEB40666,PRJEB40667,PRJEB40668,PRJEB40669",
   symbol: "=",
+};
+
+export const WithModifier = Template.bind({});
+WithModifier.args = {
+  keyLabel: "assembly_span",
+  value: "1000000000",
+  symbol: "<=",
+  modifier: "max",
 };
