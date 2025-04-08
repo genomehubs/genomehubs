@@ -24,6 +24,16 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 
+const listOperators = (keyLabel) => {
+  // Define the available operators based on the keyLabel
+
+  if (keyLabel === "tax") {
+    return ["name", "tree", "eq", "lineage", "rank", "level"];
+  } else {
+    return ["=", ">", ">=", "<", "<=", "!="];
+  }
+};
+
 const KeyValueChip = ({
   keyLabel,
   value,
@@ -73,6 +83,13 @@ const KeyValueChip = ({
 
     return tier === 0 ? num.toString() : `${num}${suffixes[tier]}`;
   };
+
+  let darkColor = "hsl(204, 70.60%, 31.40%)";
+  let lightColor = "#a6cee3";
+  let backgroundColor = "#808080";
+  let borderColor = "#1f78b4";
+  let textColor = "#ffffff";
+
   const [anchorElSymbol, setAnchorElSymbol] = useState(null);
   const [anchorElModifier, setAnchorElModifier] = useState(null);
   const [anchorElValue, setAnchorElValue] = useState(null);
@@ -84,11 +101,13 @@ const KeyValueChip = ({
   const [isEditingKey, setIsEditingKey] = useState(false);
   const [anchorElKey, setAnchorElKey] = useState(null);
   // Determine the available operators based on the keyLabel
-  const availableOperators =
-    keyLabel === "tax"
-      ? ["name", "tree", "eq", "lineage", "rank", "level"]
-      : ["=", ">", ">=", "<", "<=", "!="];
+  const [availableOperators, setAvailableOperators] = useState(
+    listOperators(keyLabel),
+  );
 
+  if (keyLabel === "tax") {
+    modifier = undefined;
+  }
   // Parse values with suffixes back into numbers
   const parseValue = (val) => {
     const suffixes = { k: 1e3, M: 1e6, G: 1e9, T: 1e12, P: 1e15 };
@@ -148,7 +167,6 @@ const KeyValueChip = ({
   const handleValueBlur = (event) => {
     event.stopPropagation(); // Prevent the click event from propagating to the parent
     event.preventDefault(); // Prevent the default action
-    console.log("blur");
     setIsEditingValue(false);
     setAnchorElValue(null);
     const parsedValue = parseValue(currentValue);
@@ -162,12 +180,14 @@ const KeyValueChip = ({
   };
 
   const handleKeyEdit = (event) => {
-    setIsEditingKey(true);
-    setAnchorElKey(event.currentTarget);
-  };
-
-  const handleKeyChange = (event) => {
-    setCurrentKey(event.target.value);
+    if (isEditingKey) {
+      event.stopPropagation(); // Prevent the click event from propagating to the parent
+      event.preventDefault(); // Prevent the default action
+      handleKeyBlur(event);
+    } else {
+      setIsEditingKey(true);
+      setAnchorElKey(event.currentTarget);
+    }
   };
 
   const handleKeyBlur = (event) => {
@@ -175,10 +195,17 @@ const KeyValueChip = ({
     event.preventDefault(); // Prevent the default action
     setIsEditingKey(false);
     setAnchorElKey(null);
+    let newOperators = listOperators(currentKey);
+    setAvailableOperators(newOperators);
+    let newSymbol = currentSymbol;
+    if (!newOperators.includes(currentSymbol)) {
+      newSymbol = newOperators[0]; // Reset to the first operator if the current one is not available
+      setCurrentSymbol(newSymbol);
+    }
     onChange?.({
       key: currentKey,
       value: parseValue(currentValue),
-      symbol: currentSymbol,
+      symbol: newSymbol,
       modifier: currentModifier,
     });
   };
@@ -217,10 +244,10 @@ const KeyValueChip = ({
           <Box
             sx={{
               textAlign: "center",
-              padding: "8px 12px", // Add padding to ensure content fits
+              padding: "8px 12px",
               position: "relative",
               overflow: "visible",
-              marginLeft: "1em", // Add margin to the left for spacing
+              marginLeft: "1em",
             }}
           >
             {modifier && (
@@ -237,14 +264,13 @@ const KeyValueChip = ({
                   textOrientation: "mixed",
                   writingMode: "vertical-lr",
                   transform: "rotate(180deg)",
-                  color: "#ffffff",
+                  color: textColor,
                   display: "block",
                   overflow: "visible",
-                  backgroundColor: "#808080",
-                  // padding: "0 6px",
-                  borderRadius: "0 16px 16px 0",
-                  borderLeft:
-                    modifier == "value" ? "none" : "2px solid #666666",
+                  backgroundColor: borderColor,
+                  borderRadius: modifier == "value" ? "0 16px 16px 0" : "16px",
+                  border:
+                    modifier == "value" ? "none" : `2px solid ${darkColor}`,
                   boxSizing: "border-box",
                   cursor: "pointer",
                   opacity: modifier == "value" ? 0.25 : 1,
@@ -260,8 +286,9 @@ const KeyValueChip = ({
               sx={{
                 fontWeight: "bold",
                 whiteSpace: "nowrap",
-                height: "30px", // Ensure the key label has a fixed height
-                lineHeight: "30px", // Center the text vertically
+                height: "30px",
+                lineHeight: "30px",
+                color: textColor,
                 opacity: currentValue && !isEditingKey ? 1 : 0.5,
                 cursor: "pointer",
               }}
@@ -275,7 +302,7 @@ const KeyValueChip = ({
                 alignItems: "flexstart",
                 justifyContent: "center",
                 gap: 0.5,
-                height: "30px", // Ensure the operator and value have a fixed height
+                height: "30px",
               }}
             >
               <Typography
@@ -283,11 +310,12 @@ const KeyValueChip = ({
                 sx={{
                   cursor: "pointer",
                   whiteSpace: "nowrap",
-                  backgroundColor: "#808080",
+                  backgroundColor: borderColor,
+                  color: textColor,
                   borderRadius: "4px",
                   padding: "2px 4px",
-                  height: "1.1em", // Ensure the operator has a fixed height
-                  lineHeight: "1.1em", // Center the text vertically
+                  height: "1.1em",
+                  lineHeight: "1.1em",
                   marginTop: "6px",
                 }}
                 onClick={handleSymbolClick}
@@ -300,9 +328,9 @@ const KeyValueChip = ({
                 ref={anchorElValue}
                 sx={{
                   cursor: "pointer",
-                  whiteSpace: currentValue.length > 100 ? "normal" : "nowrap", // Wrap text if too long
+                  whiteSpace: currentValue.length > 100 ? "normal" : "nowrap",
                   wordBreak:
-                    currentValue.length > 100 ? "break-word" : "normal", // Break long words if necessary
+                    currentValue.length > 100 ? "break-word" : "normal",
                   opacity: currentValue && !isEditingValue ? 1 : 0.5,
                   fontStyle: currentValue ? "normal" : "italic",
                   marginTop: "6px",
@@ -314,23 +342,21 @@ const KeyValueChip = ({
             </Box>
           </Box>
         }
-        onDelete={handleDelete} // Add delete functionality
+        onDelete={handleDelete}
         sx={{
-          padding: "0 0 0 1em", // Ensure padding around the chip content
-          height: "60px", // Increase the chip height
-          "& .MuiChip-label": { display: "block", padding: "1em" }, // Ensure padding around the label
-          // Shade the top half of the chip
-          background: "linear-gradient(to bottom, #808080 50%, #f0f0f0 50%)",
-          // offset the delete icon so it is in the top half of the chip, not centered vertically
+          padding: "0 0 0 1em",
+          height: "60px",
+          "& .MuiChip-label": { display: "block", padding: "1em" },
+          background: `linear-gradient(to bottom, ${borderColor} 50%, ${lightColor} 50%)`,
           "& .MuiChip-deleteIcon": {
-            marginTop: "-28px", // Adjust this value to move the delete icon up
-            color: "#f0f0f0", // Change the delete icon color to match the top half
+            marginTop: "-28px",
+            color: lightColor,
           },
           "&:hover": {
-            background: "linear-gradient(to bottom, #808080 50%, #f0f0f0 50%)",
+            background: `linear-gradient(to bottom, ${borderColor} 50%, ${lightColor} 50%)`,
           },
           "&:active": {
-            background: "linear-gradient(to bottom, #808080 50%, #f0f0f0 50%)",
+            background: `linear-gradient(to bottom, ${borderColor} 50%, ${lightColor} 50%)`,
           },
         }}
       />
@@ -339,19 +365,11 @@ const KeyValueChip = ({
           open={isEditingValue}
           anchorEl={anchorElValue}
           placement="bottom"
-          modifiers={[
-            {
-              name: "offset",
-              // options: {
-              //   offset: [0, 8], // Adjust the offset as needed
-              // },
-            },
-          ]}
         >
           <Box
             sx={{
               padding: "8px",
-              backgroundColor: "#f0f0f0",
+              backgroundColor: borderColor,
               borderRadius: "4px",
               boxShadow:
                 "0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)",
@@ -359,21 +377,27 @@ const KeyValueChip = ({
           >
             <TextField
               value={currentValue}
-              // onChange={handleValueChange}
+              onChange={handleValueChange}
               onBlur={handleValueBlur}
-              multiline={currentValue.length * 8 > 100} // Allow multiline if value is too long
-              maxRows={Math.min(Math.ceil((currentValue.length * 8) / 100), 10)} // Limit to 2 rows
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleValueBlur(event);
+                }
+              }}
+              multiline={currentValue.length * 8 > 100}
+              maxRows={Math.min(Math.ceil((currentValue.length * 8) / 100), 10)}
               size="small"
               variant="standard"
               autoFocus
               sx={{
                 marginTop: "4px",
-                width: `${currentValue.length * 8 > 100 ? 400 : currentValue.length * 8 + 40}px`, // Dynamically set width based on value length
+                width: `${currentValue.length * 8 > 100 ? 400 : currentValue.length * 8 + 40}px`,
                 "& .MuiInputBase-input": {
-                  textAlign: "center", // Center-align the text
+                  textAlign: "center",
                 },
                 "& .MuiInputBase-root": {
-                  backgroundColor: "#f0f0f0",
+                  backgroundColor: borderColor,
+                  color: textColor,
                   borderRadius: "4px",
                   padding: "0 2px 2px 2px",
                 },
@@ -383,36 +407,30 @@ const KeyValueChip = ({
         </Popper>
       )}
       {isEditingKey && (
-        <Popper
-          open={isEditingKey}
-          anchorEl={anchorElKey}
-          placement="bottom"
-          modifiers={[
-            {
-              name: "offset",
-              options: {
-                offset: [0, 8], // Adjust the offset as needed
-              },
-            },
-          ]}
-        >
+        <Popper open={isEditingKey} anchorEl={anchorElKey} placement="bottom">
           <Box
             sx={{
               padding: "8px",
-              backgroundColor: "#f0f0f0",
+              backgroundColor: borderColor,
+              color: textColor,
               borderRadius: "4px",
               boxShadow:
                 "0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)",
             }}
           >
             <Autocomplete
-              options={availableKeys} // Restrict options to availableKeys
+              options={availableKeys}
               value={currentKey}
               onChange={(event, newValue) => {
-                setCurrentKey(newValue || ""); // Update the key with the selected value
+                setCurrentKey(newValue || "");
               }}
               onBlur={(event) => {
-                handleKeyBlur(event); // Trigger the blur handler
+                handleKeyBlur(event);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleKeyBlur(event);
+                }
               }}
               renderInput={(params) => (
                 <TextField
@@ -422,12 +440,13 @@ const KeyValueChip = ({
                   autoFocus
                   sx={{
                     marginTop: "4px",
-                    width: `${Math.max(currentKey.length, 12) * 12 + 40}px`, // Dynamically set width based on key length
+                    width: `${Math.max(currentKey.length, 12) * 12 + 40}px`,
                     "& .MuiInputBase-input": {
-                      textAlign: "center", // Center-align the text
+                      textAlign: "center",
                     },
                     "& .MuiInputBase-root": {
-                      backgroundColor: "#f0f0f0",
+                      backgroundColor: borderColor,
+                      color: textColor,
                       borderRadius: "4px",
                       padding: "0 2px 2px 2px",
                     },
@@ -444,15 +463,37 @@ const KeyValueChip = ({
         onClose={() => handleMenuClose()}
         MenuListProps={{
           sx: {
-            overflow: "visible", // Allow the menu to extend beyond the chip
+            overflow: "visible",
+            backgroundColor: lightColor,
+            "& .MuiMenuItem-root": {
+              backgroundColor: lightColor,
+              "&.Mui-selected": {
+                backgroundColor: borderColor,
+                color: textColor,
+              },
+              "&:hover, &.Mui-focusVisible": {
+                backgroundColor: darkColor,
+                color: textColor,
+              },
+            },
           },
         }}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            event.preventDefault();
+          }
+        }}
       >
-        {availableOperators.map((operator) => (
+        {availableOperators.map((operator, index) => (
           <MenuItem
             key={operator}
             onClick={() => handleMenuClose(operator)}
             selected={operator === currentSymbol}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                handleMenuClose(operator);
+              }
+            }}
           >
             {operator}
           </MenuItem>
@@ -464,15 +505,37 @@ const KeyValueChip = ({
         onClose={() => handleModifierMenuClose()}
         MenuListProps={{
           sx: {
-            overflow: "visible", // Allow the menu to extend beyond the chip
+            overflow: "visible",
+            backgroundColor: lightColor,
+            "& .MuiMenuItem-root": {
+              backgroundColor: lightColor,
+              "&.Mui-selected": {
+                backgroundColor: borderColor,
+                color: textColor,
+              },
+              "&:hover, &.Mui-focusVisible": {
+                backgroundColor: darkColor,
+                color: textColor,
+              },
+            },
           },
         }}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            event.preventDefault();
+          }
+        }}
       >
-        {availableModifiers.map((modifier) => (
+        {availableModifiers.map((modifier, index) => (
           <MenuItem
             key={modifier}
             onClick={() => handleModifierMenuClose(modifier)}
             selected={modifier === currentModifier}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                handleModifierMenuClose(modifier);
+              }
+            }}
           >
             {modifier}
           </MenuItem>
