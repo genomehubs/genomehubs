@@ -17,6 +17,7 @@ export const queryParams = async ({
   };
   let fields = [];
   let summaries = [];
+  let nullFields = [];
   if (params.query) {
     if (
       (result == "taxon" || result == "assembly" || result == "sample") &&
@@ -30,7 +31,11 @@ export const queryParams = async ({
 
     term.split(/\s+(?:and|AND)\s+/).forEach((subterm) => {
       if (!subterm.match("tax_")) {
-        let field = subterm.replace(/[^\w_\(\)-].+$/, "").toLowerCase();
+        let [field, value] = subterm.split(/(?:=|!=|<=|>=|<|>)/);
+        field = field.replace(/[^\w_\(\)-].+$/, "").toLowerCase();
+        if (value && value.split(/\s*,\s*/).includes("null")) {
+          nullFields.push(field);
+        }
         let fieldMeta = lookupTypes(field);
         let summary = fieldMeta ? fieldMeta.return_type || "value" : "value";
         if (field.match(/\(/)) {
@@ -41,6 +46,7 @@ export const queryParams = async ({
         }
         if (fieldMeta) {
           field = fieldMeta.name;
+
           params.excludeMissing.push(field);
           fields.push(field);
           if (summary != "collate") {
@@ -71,6 +77,7 @@ export const queryParams = async ({
   params.excludeAncestral = [...new Set(params.excludeAncestral)];
   params.excludeDirect = [...new Set(params.excludeDirect)];
   params.excludeDescendant = [...new Set(params.excludeDescendant)];
+  params.nullFields = [...new Set(nullFields)];
 
   return { params, fields, summaries };
 };

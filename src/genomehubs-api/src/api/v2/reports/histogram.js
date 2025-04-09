@@ -4,6 +4,7 @@ import { checkResponse } from "../functions/checkResponse.js";
 import { combineQueries } from "../functions/combineQueries.js";
 import { formatJson } from "../functions/formatJson.js";
 import { getBounds } from "./getBounds.js";
+import { getResultCount } from "../functions/getResultCount.js";
 import { getResults } from "../functions/getResults.js";
 import { parseCatOpts } from "../functions/parseCatOpts.js";
 import { parseFields } from "../functions/parseFields.js";
@@ -109,6 +110,8 @@ const getHistogram = async ({
 }) => {
   let { lookupTypes } = await attrTypes({ result, taxonomy });
   params.size = raw;
+  // params.excludeMissing = [];
+  // exclusions.missing = [];
   // find max and min plus most frequent categories
   let fieldMeta = lookupTypes(fields[0]);
   let field = fieldMeta.name;
@@ -157,6 +160,28 @@ const getHistogram = async ({
   });
   if (!res.status.success) {
     return { status: res.status };
+  }
+
+  let totalCount;
+
+  let { nullFields } = params;
+
+  if (nullFields && nullFields.length > 0) {
+    let excludeMissing = params.excludeMissing.filter(
+      (field) => !nullFields.includes(field)
+    );
+    let resultCount = await getResultCount({
+      ...params,
+      excludeMissing,
+      fields,
+      queryId: undefined,
+      aggs: undefined,
+    });
+    ({ count: totalCount } = resultCount);
+  } else {
+    ({
+      status: { hits: totalCount },
+    } = res);
   }
   let xSumm, ySumm;
   const dateSummary = {
@@ -250,6 +275,7 @@ const getHistogram = async ({
   }
 
   let hist = getHistAggResults(res.aggs.aggregations[field], bounds.stats);
+
   if (!hist) {
     return;
   }
@@ -267,13 +293,19 @@ const getHistogram = async ({
   let other = [];
   let allOther = [];
   let translations = {};
+  let nullBucket = totalCount;
+  let nullIndex = -1;
   hist.buckets.forEach((obj, i) => {
+    if (obj.key == "null") {
+      nullIndex = i;
+    }
     buckets.push(obj.key);
     allValues.push(obj.doc_count);
 
     if (bounds.showOther) {
       other.push(obj.doc_count);
     }
+    nullBucket -= obj.doc_count;
 
     if (yField) {
       if (!allYValues) {
@@ -307,6 +339,9 @@ const getHistogram = async ({
       zDomain[1] = Math.max(zDomain[1], obj.doc_count);
     }
   });
+  if (nullIndex >= 0) {
+    allValues[nullIndex] = nullBucket;
+  }
   if (fieldMeta.type == "date") {
     buckets = scaleBuckets(buckets, "date", bounds);
   } else if (fieldMeta.type == "keyword" && summaries[0] != "length") {
@@ -557,6 +592,7 @@ export const histogram = async ({
     rank,
     taxonomy,
   });
+
   updateQuery({
     params,
     fields,
