@@ -212,7 +212,8 @@ export const getBounds = async ({
   let domain;
   try {
     aggs = res.aggs.aggregations[term] || res.aggs.aggregations[catTerm];
-  } catch {
+  } catch (err) {
+    console.log(res);
     return;
   }
 

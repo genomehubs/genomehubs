@@ -68,25 +68,6 @@ const attributeTerms = ({ cat, terms, size, yHistograms }) => {
           },
         },
       },
-      missing_key71: {
-        filter: {
-          bool: {
-            must_not: {
-              term: { "attributes.key": attribute },
-            },
-          },
-        },
-        aggs: {
-          by_value: {
-            filters,
-            ...(yHistograms && {
-              aggs: {
-                yHistograms,
-              },
-            }),
-          },
-        },
-      },
     },
   };
 };
@@ -137,23 +118,6 @@ const attributeCategory = ({ cat, cats, field, histogram, other }) => {
                   },
                 },
               },
-            },
-          },
-        },
-      },
-      missing_key114: {
-        filter: {
-          bool: {
-            must_not: {
-              term: { "attributes.key": cat },
-            },
-          },
-        },
-        aggs: {
-          by_value: {
-            filters,
-            aggs: {
-              histogram,
             },
           },
         },
@@ -492,25 +456,7 @@ export const setAggs = async ({
             terms,
             categoryHistograms,
             tree,
-            // yHistograms,
-          },
-        },
-        [`${field}_null`]: {
-          filter: {
-            bool: {
-              must_not: {
-                term: { "attributes.key": field },
-              },
-            },
-          },
-          aggs: {
-            histogram,
-            stats,
-            geo,
-            keywords,
-            terms,
-            categoryHistograms,
-            tree,
+            yHistograms,
           },
         },
       },

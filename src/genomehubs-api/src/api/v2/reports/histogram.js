@@ -166,6 +166,7 @@ const getHistogram = async ({
 
   let { nullFields } = params;
 
+  // need result count for each value!
   if (nullFields && nullFields.length > 0) {
     let excludeMissing = params.excludeMissing.filter(
       (field) => !nullFields.includes(field)
@@ -275,6 +276,9 @@ const getHistogram = async ({
   }
 
   let hist = getHistAggResults(res.aggs.aggregations[field], bounds.stats);
+  console.log(JSON.stringify(res.aggs.aggregations, null, 2));
+
+  // need a count for each value
 
   if (!hist) {
     return;
@@ -760,7 +764,10 @@ export const histogram = async ({
       fields: yFields,
       summaries: ySummaries,
       result,
-      exclusions,
+      exclusions: {
+        ...exclusions,
+        missing: ["bioproject"],
+      },
       taxonomy,
       apiParams,
       opts: yOpts,
