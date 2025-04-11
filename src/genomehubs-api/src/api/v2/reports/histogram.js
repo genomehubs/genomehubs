@@ -373,29 +373,36 @@ const getHistogram = async ({
           ) {
             continue;
           }
-          let y = result.result.fields[yField][ySumm];
-          if (
-            yValueType == "keyword" &&
-            ySumm == "value" &&
-            !yKeys.has(y.toLowerCase())
-          ) {
-            continue;
+          let ys = result.result.fields[yField][ySumm];
+          if (!Array.isArray(ys)) {
+            ys = [ys];
           }
-          if (valueType == "date") {
-            x = Date.parse(x);
+          for (let y of ys) {
+            if (
+              yValueType == "keyword" &&
+              ySumm == "value" &&
+              !yKeys.has(y.toLowerCase())
+            ) {
+              continue;
+            }
+            if (valueType == "date") {
+              x = Date.parse(x);
+            }
+            if (yValueType == "date") {
+              y = Date.parse(y);
+            }
+            pointData[cat].push({
+              ...(result.result.scientific_name && {
+                scientific_name: result.result.scientific_name,
+              }),
+              ...(result.result.taxon_id && {
+                taxonId: result.result.taxon_id,
+              }),
+              x,
+              y,
+              cat,
+            });
           }
-          if (yValueType == "date") {
-            y = Date.parse(y);
-          }
-          pointData[cat].push({
-            ...(result.result.scientific_name && {
-              scientific_name: result.result.scientific_name,
-            }),
-            ...(result.result.taxon_id && { taxonId: result.result.taxon_id }),
-            x,
-            y,
-            cat,
-          });
         }
       }
     }
