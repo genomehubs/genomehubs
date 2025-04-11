@@ -398,7 +398,7 @@ export const setAggs = async ({
         field,
         summary,
         histogram,
-        other: bounds.showOther,
+        other: bounds.stats.showOther,
       });
     } else {
       categoryHistograms = lineageCategory({
@@ -407,7 +407,7 @@ export const setAggs = async ({
         field,
         summary,
         histogram,
-        other: bounds.showOther,
+        other: bounds.stats.showOther,
       });
     }
   }
@@ -459,6 +459,12 @@ export const setAggs = async ({
             yHistograms,
           },
         },
+        ...(yHistograms && {
+          yHistograms,
+        }),
+        ...(categoryHistograms && {
+          categoryHistograms,
+        }),
       },
     },
   };

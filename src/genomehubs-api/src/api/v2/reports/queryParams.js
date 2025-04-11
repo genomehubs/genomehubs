@@ -46,8 +46,9 @@ export const queryParams = async ({
         }
         if (fieldMeta) {
           field = fieldMeta.name;
-
-          params.excludeMissing.push(field);
+          if (!nullFields.includes(field)) {
+            params.excludeMissing.push(field);
+          }
           fields.push(field);
           if (summary != "collate") {
             summaries.push(summary);
