@@ -645,7 +645,7 @@ const getHistogram = async ({
       yNullIndex,
       totalCount,
     });
-  } else if (catNullIndex > -1) {
+  } else if (nullIndex > -1 || catNullIndex > -1) {
     allCatValues = handleNulls2d({
       allYValues: allCatValues,
       allValues,
@@ -654,11 +654,10 @@ const getHistogram = async ({
       yNullIndex: catNullIndex,
       totalCount,
     });
-    // console.log({ allCatValues });
-    // console.log(bounds.cats);
     bounds.cats.forEach((obj, i) => {
-      byCat[obj.key] = allCatValues[i];
-      obj.doc_count = allCatValues[i].reduce((a, b) => a + b, 0);
+      let values = allCatValues.map((arr) => arr[i]);
+      byCat[obj.key] = values;
+      obj.doc_count = values.reduce((a, b) => a + b, 0);
     });
   }
 
