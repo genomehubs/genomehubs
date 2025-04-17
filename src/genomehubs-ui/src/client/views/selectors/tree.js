@@ -265,11 +265,13 @@ export const processTreeRings = ({
   let dataWidth = 0;
   let ticks = [];
   let phylopics = {};
+  let tipWidth = 0;
   let cMax = treeNodes[rootNode] ? treeNodes[rootNode].count : 0;
   let phylopicWidth = 0;
   if (showPhylopics) {
     phylopicWidth = Math.min((radius * Math.PI * 2) / cMax, phylopicSize);
-    radius -= phylopicWidth;
+    radius -= phylopicSize;
+    tipWidth = (radius * Math.PI * 2) / cMax; 
   }
   let summary = (yQuery?.ySummaries || ["value"])[0];
 
@@ -414,11 +416,9 @@ export const processTreeRings = ({
         node.hasAssemblies ||
         node.hasSamples)
     ) {
-      let r = radius + dataWidth + phylopicWidth / 2;
-
-      let width = (Math.PI * r * 2 * 0.9) / cMax;
-      let height = phylopicSize || phylopicWidth * 0.9;
-
+      let r = radius + dataWidth + phylopicSize*0.5; 
+      let width = tipWidth * node.count*0.9; 
+      let height = phylopicSize*0.9;
       phylopics[node.taxon_id] = {
         angle: (midAngle * 180) / Math.PI,
         radius: r,

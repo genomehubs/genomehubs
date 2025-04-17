@@ -244,12 +244,12 @@ const ReportTreePaths = ({
       let dimensions = getDimensions(treeRef);
       setTreeDimensions(dimensions);
     }
-    if (stageRef.current) {
+    if (scrollContainerRef.current) {
       setScrollBarWidth(
-        stageRef.current.offsetWidth - stageRef.current.clientWidth,
+        scrollContainerRef.current.offsetWidth - scrollContainerRef.current.clientWidth,
       );
     }
-  }, [treeRef, stageRef]);
+  }, [treeRef, scrollContainerRef]);
 
   const showTooltip = (e, segment, field) => {
     if (segment) {
@@ -1029,7 +1029,7 @@ const ReportTreePaths = ({
           height: divHeight,
           overflowY: "auto",
           overflowX: "hidden",
-          width: divWidth,
+          width: divWidth + scrollBarWidth,
           position: "absolute",
           border: `${gridColor} solid 1px`,
           boxSizing: "border-box",
@@ -1081,7 +1081,7 @@ const ReportTreePaths = ({
                 <Group x={maxWidth}>{bars}</Group>
                 <Group x={maxWidth}>{errorBars}</Group>
                 {paths}
-                <Group x={maxWidth + dataWidth}>{phylopics}</Group>
+                <Group x={maxWidth + dataWidth} >{phylopics}</Group>
               </Layer>
               <Layer>
                 <Group>{cats}</Group>

@@ -352,8 +352,8 @@ const ReportTreeRings = ({
       continue;
     }
     let { x, y, angle, scientificName, width, height, arc } = opts;
-    const useHeight = phylopicSize || height;
-    const useWidth = phylopicSize || width;
+    const useHeight = height;
+    const useWidth =  width;
     phylopicElements.push(
       <g key={taxonId}>
         <Phylopics
