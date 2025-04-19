@@ -73,8 +73,9 @@ const StyledTableRow = withStyles((theme) => ({
 
 const StyledBadge = withStyles((theme) => ({
   badge: {
-    right: "50%",
-    top: 6,
+    right: "30% !important",
+    top: "10px !important",
+    transform: "scale(1) translate(calc(50% + 4px), -50%) !important",
     fontSize: "0.8em",
     border: "2px solid white",
     // padding: "0px 4px",
@@ -586,7 +587,7 @@ const formatCellValue = ({
   ) {
     let badgeContent = `+${field.length - entries.length}`;
     value = (
-      <span style={{ whiteSpace: "nowrap", marginRight: "0.75em" }}>
+      <span style={{ whiteSpace: "nowrap" }}>
         {value}
         <StyledBadge badgeContent={badgeContent} color={"default"} max={100000}>
           <span style={{ color: "rgba(0,0,0,0" }}>{badgeContent}</span>
