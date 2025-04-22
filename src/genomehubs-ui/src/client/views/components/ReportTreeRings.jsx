@@ -33,7 +33,7 @@ const ReportTreeRings = ({
   hideAncestralBars,
   cats,
   phylopics,
-  phylopicRank , 
+  phylopicRank,
   phylopicSize,
 }) => {
   if (!arcs || arcs.length == 0) {
@@ -353,7 +353,7 @@ const ReportTreeRings = ({
     }
     let { x, y, angle, scientificName, width, height, arc } = opts;
     const useHeight = height;
-    const useWidth =  width;
+    const useWidth = width;
     phylopicElements.push(
       <g key={taxonId}>
         <Phylopics

@@ -246,7 +246,8 @@ const ReportTreePaths = ({
     }
     if (scrollContainerRef.current) {
       setScrollBarWidth(
-        scrollContainerRef.current.offsetWidth - scrollContainerRef.current.clientWidth,
+        scrollContainerRef.current.offsetWidth -
+          scrollContainerRef.current.clientWidth,
       );
     }
   }, [treeRef, scrollContainerRef]);
@@ -726,8 +727,8 @@ const ReportTreePaths = ({
                   scientificName={segment.scientific_name}
                   maxHeight={maxHeight}
                   maxWidth={phylopicWidth}
-                  x={phylopicWidth/2}
-                  y={segment.yStart }
+                  x={phylopicWidth / 2}
+                  y={segment.yStart}
                   fixedRatio={1}
                   showAncestral={false}
                   sourceColors={false}
@@ -1081,7 +1082,7 @@ const ReportTreePaths = ({
                 <Group x={maxWidth}>{bars}</Group>
                 <Group x={maxWidth}>{errorBars}</Group>
                 {paths}
-                <Group x={maxWidth + dataWidth} >{phylopics}</Group>
+                <Group x={maxWidth + dataWidth}>{phylopics}</Group>
               </Layer>
               <Layer>
                 <Group>{cats}</Group>
