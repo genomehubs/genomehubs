@@ -17,6 +17,7 @@ import Slider from "@mui/material/Slider";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
@@ -172,6 +173,8 @@ export const queryPropList = {
     "hideErrorBars",
     "hideAncestralBars",
     "showPhylopics",
+    "phylopicRank",
+    "phylopicSize",
     "yOpts",
     "treeStyle",
     "treeThreshold",
@@ -521,6 +524,66 @@ export const ReportEdit = ({
             {items}
           </Select>
         </FormControl>
+      );
+    } else if (queryProp == "phylopicRank") {
+      input = (
+        <TextField
+          variant="standard"
+          id={queryProp + Math.random()}
+          label="PhyloPic Rank"
+          value={values[queryProp] || ""}
+          style={{ width: "95%" }}
+          onChange={(e) => handleChange(e, "phylopicRank")}
+          onBlur={(e) => handleChange(e, "phylopicRank")}
+          onKeyPress={handleKeyPress}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Tooltip
+                  title="Taxonomic rank to display PhyloPics (e.g. species, genus, family, order, phylum, kingdom, etc. - empty = tip nodes)"
+                  arrow
+                  placement="top"
+                >
+                  <div style={{ fontSize: "1.2rem" ,cursor:'pointer'}}><InfoOutlinedIcon/></div>
+                </Tooltip>
+              </InputAdornment>
+            ),
+          }}
+        />
+      );
+    } else if (queryProp == "phylopicSize") {
+      const treeStyle = values["treeStyle"] || "rect";
+      const sizeDefaults = {
+        rect: { min: 15, max: 250, default: 25, step: 5 },
+        ring: { min: 20, max: 250, default: 100, step: 10 },
+      }[treeStyle];
+      const helpText = `Size in pixels (${sizeDefaults.min}-${sizeDefaults.max}, empty = auto-sized based on available space)`;
+      input = (
+        <TextField
+          variant="standard"
+          id={queryProp + Math.random()}
+          label="PhyloPic Size (pixels)"
+          type="number"
+          value={values[queryProp] || ""}
+          style={{ width: "95%" }}
+          onChange={(e) => handleChange(e, "phylopicSize")}
+          onBlur={(e) => handleChange(e, "phylopicSize")}
+          onKeyPress={handleKeyPress}
+          inputProps={{
+            min: sizeDefaults.min,
+            max: sizeDefaults.max,
+            step: sizeDefaults.step,
+          }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Tooltip title={helpText} arrow placement="top">
+                  <div style={{ fontSize: "1.2rem",cursor:'pointer' }}><InfoOutlinedIcon/></div>
+                </Tooltip>
+              </InputAdornment>
+            ),
+          }}
+        />
       );
     } else if (
       queryProp == "includeEstimates" ||

@@ -229,6 +229,8 @@ export const processTreeRings = ({
   hideAncestralBars,
   hideSourceColors,
   showPhylopics,
+  phylopicRank,
+  phylopicSize = 100,
 }) => {
   if (!nodes) {
     return undefined;
@@ -263,11 +265,13 @@ export const processTreeRings = ({
   let dataWidth = 0;
   let ticks = [];
   let phylopics = {};
+  let tipWidth = 0;
   let cMax = treeNodes[rootNode] ? treeNodes[rootNode].count : 0;
   let phylopicWidth = 0;
   if (showPhylopics) {
-    phylopicWidth = Math.min((radius * Math.PI * 2) / cMax, 100);
-    radius -= phylopicWidth;
+    phylopicWidth = Math.min((radius * Math.PI * 2) / cMax, phylopicSize);
+    radius -= phylopicSize;
+    tipWidth = (radius * Math.PI * 2) / cMax;
   }
   let summary = (yQuery?.ySummaries || ["value"])[0];
 
@@ -402,19 +406,19 @@ export const processTreeRings = ({
     }
     if (
       node.taxon_rank != "assembly" &&
-      (!node.hasOwnProperty("children") ||
-        Object.keys(node.children).length == 0 ||
-        node.hasAssemblies ||
-        node.hasSamples) &&
       node.taxon_id &&
       showPhylopics &&
-      node.scientific_name != "parent"
+      node.scientific_name != "parent" &&
+      ((phylopicRank && node.taxon_rank === phylopicRank) ||
+        (!phylopicRank &&
+          (!node.hasOwnProperty("children") ||
+            Object.keys(node.children).length == 0)) ||
+        node.hasAssemblies ||
+        node.hasSamples)
     ) {
-      let r = radius + dataWidth + phylopicWidth / 2;
-
-      let width = (Math.PI * r * 2 * 0.9) / cMax;
-      let height = phylopicWidth * 0.9;
-
+      let r = radius + dataWidth + phylopicSize * 0.5;
+      let width = tipWidth * node.count * 0.9;
+      let height = phylopicSize * 0.9;
       phylopics[node.taxon_id] = {
         angle: (midAngle * 180) / Math.PI,
         radius: r,
@@ -675,6 +679,8 @@ export const processTreePaths = ({
   pointSize,
   hideErrorBars,
   showPhylopics,
+  phylopicRank,
+  phylopicSize,
   hideAncestralBars,
   hideSourceColors,
 }) => {
@@ -707,7 +713,7 @@ export const processTreePaths = ({
   let phylopicWidth = 0;
 
   if (showPhylopics) {
-    phylopicWidth = charHeight * 1.5;
+    phylopicWidth = phylopicSize || charHeight * 1.5;
     targetWidth -= phylopicWidth;
   }
   let summary = (yQuery?.ySummaries || ["value"])[0];
@@ -878,26 +884,41 @@ export const processTreePaths = ({
       bar,
     }));
 
-    if (node.tip) {
+    //
+    let is_phylopic =
+      showPhylopics &&
+      node.scientific_name != "parent" &&
+      (phylopicRank ? node.taxon_rank == phylopicRank : node.tip);
+    if (is_phylopic) {
       let width = phylopicWidth;
-      let height = node.yMax - node.yMin;
-
+      let height;
+      if (node.tip) {
+        height = node.yMax - node.yMin;
+      } else {
+        height = Math.min(
+          node.yMax - node.yMin,
+          charHeight * Math.min(node.count, 5),
+        );
+      }
       phylopics[node.taxon_id] = {
-        scientificName: node.scientific_name,
+        ...phylopics[node.taxon_id],
         width,
         height,
         x: targetWidth - dataWidth,
-        y: node.yMin,
+        y: node.yMin + (node.yMax - node.yMin) / 2 - height / 2,
       };
     }
 
     let label;
     let showPhylopic;
+    showPhylopic =
+      showPhylopics &&
+      node.scientific_name != "parent" &&
+      (phylopicRank ? node.taxon_rank == phylopicRank : node.tip);
     if (node.tip) {
       label = node.scientific_name;
       maxWidth = Math.max(maxWidth, stringLength(label) * pointSize * 0.8);
       maxTip = Math.max(maxTip, node.xEnd + 10);
-      showPhylopic = showPhylopics && node.scientific_name != "parent";
     } else if (node.scientific_name != "parent" && node.width > charLen * 5) {
       label = node.scientific_name;
       if (label.length * charLen - 2 > node.width) {
@@ -990,6 +1011,8 @@ export const processTree = ({
   pointSize = 15,
   hideErrorBars,
   showPhylopics,
+  phylopicRank,
+  phylopicSize,
   hideAncestralBars,
   hideSourceColors,
 }) => {
@@ -1005,6 +1028,8 @@ export const processTree = ({
       hideAncestralBars,
       hideSourceColors,
       showPhylopics,
+      phylopicRank,
+      phylopicSize,
     });
   }
   return processTreePaths({
@@ -1018,5 +1043,7 @@ export const processTree = ({
     hideAncestralBars,
     hideSourceColors,
     showPhylopics,
+    phylopicRank,
+    phylopicSize,
   });
 };
