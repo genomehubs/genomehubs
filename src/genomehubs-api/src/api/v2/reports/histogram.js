@@ -168,6 +168,9 @@ const handleNulls2d = ({
         });
       });
       if (nullIndex > -1 && yNullIndex > -1) {
+        if (!processedNullValues[nullIndex]) {
+          processedNullValues[nullIndex] = [];
+        }
         processedNullValues[nullIndex][yNullIndex] = totalCount - assigned;
       }
     }
@@ -510,6 +513,12 @@ const getHistogram = async ({
     buckets = scaleBuckets(buckets, bounds.scale, bounds);
   }
 
+  // if (nullCount && nullIndex == -1) {
+  //   nullIndex = buckets.length;
+  //   buckets.push("null");
+  //   allValues.push(nullCount);
+  // }
+
   if (yBuckets) {
     // yBuckets = allYBuckets;
     if (yFieldMeta.type == "date") {
@@ -652,7 +661,7 @@ const getHistogram = async ({
       yNullIndex,
       totalCount,
     });
-  } else if (nullIndex > -1 || catNullIndex > -1) {
+  } else if (catNullIndex > -1) {
     allCatValues = handleNulls2d({
       allYValues: allCatValues,
       allValues,
@@ -666,6 +675,8 @@ const getHistogram = async ({
       byCat[obj.key] = values;
       obj.doc_count = values.reduce((a, b) => a + b, 0);
     });
+  } else if (nullIndex > -1) {
+    // do nothing
   }
 
   return {
