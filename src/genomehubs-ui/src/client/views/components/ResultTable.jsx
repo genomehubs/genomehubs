@@ -71,18 +71,17 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow);
 
-const StyledBadge = withStyles((theme) => ({
-  badge: {
-    right: "30% !important",
-    top: "10px !important",
-    transform: "scale(1) translate(calc(50% + 4px), -50%) !important",
-    fontSize: "0.8em",
+const StyledBadge = styled(Badge)(() => ({
+  "& .MuiBadge-badge": {
+    backgroundColor: "#333",
+    color: "#fff",
+    top: 0,
+    right: 0,
+    borderRadius: "10px",
     border: "2px solid white",
-    // padding: "0px 4px",
-    color: "white",
-    backgroundColor: "rgba(0,0,0,0.26)",
+    transform: "translate(98%, -50%)",
   },
-}))(Badge);
+}));
 
 export const useStyles = makeStyles((theme) => ({
   root: {
@@ -587,12 +586,13 @@ const formatCellValue = ({
   ) {
     let badgeContent = `+${field.length - entries.length}`;
     value = (
-      <span style={{ whiteSpace: "nowrap" }}>
-        {value}
-        <StyledBadge badgeContent={badgeContent} color={"default"} max={100000}>
-          <span style={{ color: "rgba(0,0,0,0" }}>{badgeContent}</span>
+      <div style={{ paddingRight: "80px", display: "inline-block" }}>
+        <StyledBadge badgeContent={badgeContent} max={100000}>
+          <span style={{ display: "inline-block", position: "relative" }}>
+            {value}
+          </span>
         </StyledBadge>
-      </span>
+      </div>
     );
   }
   return value;
