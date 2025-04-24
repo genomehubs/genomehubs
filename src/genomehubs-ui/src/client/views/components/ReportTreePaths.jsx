@@ -720,6 +720,19 @@ const ReportTreePaths = ({
             }
             if (segment.showPhylopic) {
               let maxHeight = segment.count * charHeight;
+              let yMid = segment.yStart;
+              if (segment.yLimits && segment.yLimits[1] > segment.yLimits[0]) {
+                newPhyloPics.push(
+                  <Line
+                    key={`phylopic-line-${segment.taxon_id}`}
+                    points={[-5, segment.yLimits[0], -5, segment.yLimits[1]]}
+                    stroke={segment.color || linesColor}
+                    strokeWidth={4}
+                    lineCap="round"
+                  />,
+                );
+                yMid = (segment.yLimits[0] + segment.yLimits[1]) / 2;
+              }
               newPhyloPics.push(
                 <PhyloPics
                   key={segment.taxon_id}
@@ -728,7 +741,7 @@ const ReportTreePaths = ({
                   maxHeight={maxHeight}
                   maxWidth={phylopicWidth}
                   x={phylopicWidth / 2}
-                  y={segment.yStart}
+                  y={yMid}
                   fixedRatio={1}
                   showAncestral={false}
                   sourceColors={false}

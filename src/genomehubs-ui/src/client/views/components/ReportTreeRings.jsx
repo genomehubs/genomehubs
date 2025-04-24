@@ -367,6 +367,13 @@ const ReportTreeRings = ({
           embed={true}
           transform={`translate(${x}, ${y}) rotate(${angle})`}
         />
+        <path
+          fill={"none"}
+          stroke={colors[ctr]}
+          strokeWidth={4}
+          strokeLinejoin="round"
+          d={arc}
+        ></path>
       </g>,
     );
     taxIds[taxonId] = scientificName;

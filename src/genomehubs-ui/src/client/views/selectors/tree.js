@@ -268,10 +268,13 @@ export const processTreeRings = ({
   let tipWidth = 0;
   let cMax = treeNodes[rootNode] ? treeNodes[rootNode].count : 0;
   let phylopicWidth = 0;
+  let gapAngle = 0;
+  let phylopicPadding = 10;
   if (showPhylopics) {
     phylopicWidth = Math.min((radius * Math.PI * 2) / cMax, phylopicSize);
-    radius -= phylopicSize;
+    radius -= phylopicSize + phylopicPadding;
     tipWidth = (radius * Math.PI * 2) / cMax;
+    gapAngle = Math.PI / cMax / 2;
   }
   let summary = (yQuery?.ySummaries || ["value"])[0];
 
@@ -416,21 +419,25 @@ export const processTreeRings = ({
         node.hasAssemblies ||
         node.hasSamples)
     ) {
-      let r = radius + dataWidth + phylopicSize * 0.5;
+      let r = radius + dataWidth + phylopicPadding; // + phylopicSize * 0.5;
       let width = tipWidth * node.count * 0.9;
       let height = phylopicSize * 0.9;
+      let arcPath;
+      if (node.count > 1) {
+        arcPath = arc()({
+          innerRadius: r - phylopicPadding / 2,
+          outerRadius: r - phylopicPadding / 2,
+          startAngle: startAngle + gapAngle,
+          endAngle: endAngle - gapAngle,
+        });
+      }
       phylopics[node.taxon_id] = {
         angle: (midAngle * 180) / Math.PI,
         radius: r,
         scientificName: node.scientific_name,
         width,
         height,
-        arc: arc()({
-          innerRadius: radius + dataWidth,
-          outerRadius: radius + dataWidth + phylopicWidth,
-          startAngle,
-          endAngle,
-        }),
+        arc: arcPath,
         ...circleXY(r, midAngle),
       };
     }
@@ -884,6 +891,28 @@ export const processTreePaths = ({
       bar,
     }));
 
+    let yLimits;
+    if (node.children) {
+      yLimits = Object.keys(node.children)
+        .map((child) => {
+          let { yStart, yLimits: childYLimits } = pathNodes[child];
+          if (childYLimits) {
+            return childYLimits;
+          }
+          return [yStart, yStart];
+        })
+        .reduce(
+          (a, b) => {
+            return [Math.min(a[0], b[0]), Math.max(a[1], b[1])];
+          },
+          [Infinity, -Infinity],
+        );
+    }
+    if (!yLimits || yLimits[0] == Infinity || yLimits.length == 0) {
+      yLimits = [node.yStart, node.yStart];
+    }
+    node.yLimits = yLimits;
+
     //
     let is_phylopic =
       showPhylopics &&
@@ -899,6 +928,11 @@ export const processTreePaths = ({
           node.yMax - node.yMin,
           charHeight * Math.min(node.count, 5),
         );
+      }
+
+      if (yLimits[0] == Infinity) {
+        yLimits[0] = node.yStart;
+        yLimits[1] = node.yStart;
       }
       phylopics[node.taxon_id] = {
         ...phylopics[node.taxon_id],
@@ -939,6 +973,7 @@ export const processTreePaths = ({
     locations[node.scientific_name.toLowerCase()] = {
       x: node.xStart,
       y: node.yStart,
+      yLimits: [yScale(yLimits[0]) + yScale(yLimits[1])],
       tip: node.tip ? node.width : false,
       width: node.tip
         ? stringLength(node.scientific_name) * pointSize * 0.8

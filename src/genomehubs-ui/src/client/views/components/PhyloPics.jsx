@@ -233,7 +233,7 @@ const PhyloPics = ({
         <g transform={transform}>
           <image
             x={-maxWidth / 2}
-            y={-maxHeight / 2}
+            y={-maxHeight}
             height={maxHeight}
             width={maxWidth}
             xlinkHref={dataUri}
