@@ -585,8 +585,11 @@ const formatCellValue = ({
     field.length > entries.length
   ) {
     let badgeContent = `+${field.length - entries.length}`;
+    let badgeLength = (badgeContent.length + 1) * 8;
     value = (
-      <div style={{ paddingRight: "80px", display: "inline-block" }}>
+      <div
+        style={{ paddingRight: `${badgeLength}px`, display: "inline-block" }}
+      >
         <StyledBadge badgeContent={badgeContent} max={100000}>
           <span style={{ display: "inline-block", position: "relative" }}>
             {value}
