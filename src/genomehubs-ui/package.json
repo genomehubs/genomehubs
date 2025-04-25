@@ -113,7 +113,7 @@
     "qs": "^6.10.1",
     "re-reselect": "^4.0.1",
     "react": "^18.3.1",
-    "react-cookie": "^7.2.0",
+    "react-cookie": "^8.0.1",
     "react-country-flag": "^3.1.0",
     "react-dom": "^18.3.1",
     "react-error-boundary": "^4.0.13",
