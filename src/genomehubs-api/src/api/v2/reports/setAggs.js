@@ -339,7 +339,7 @@ export const setAggs = async ({
 
   let yHistogram, yHistograms, categoryHistograms;
   if (histogram && yField) {
-    if (yBounds.stats.by) {
+    if (yBounds && yBounds.stats.by) {
       let boundsTerms = { terms: yBounds.stats.cats };
       yHistogram = termsAgg({
         field: yField,

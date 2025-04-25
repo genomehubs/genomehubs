@@ -102,13 +102,18 @@ const getYValues = ({ obj, yField, lookupTypes, stats }) => {
         });
       }
     }
-  } else {
-    yHist.buckets.forEach((yObj, j) => {
-      yBuckets.push(yObj.key);
-      yValues.push(yObj.doc_count);
-    });
-  }
-  if (yHist) {
+  } else if (yHist) {
+    if (Array.isArray(yHist.buckets)) {
+      yHist.buckets.forEach((yObj, j) => {
+        yBuckets.push(yObj.key);
+        yValues.push(yObj.doc_count);
+      });
+    } else {
+      Object.entries(yHist.buckets).forEach(([key, yObj]) => {
+        yBuckets.push(yObj.key);
+        yValues.push(yObj.doc_count);
+      });
+    }
   }
   return { yValues, yBuckets, yValueType };
 };
@@ -163,6 +168,7 @@ const handleNulls2d = ({
             } else {
               processedNullValues[i][j] = 0;
             }
+            processedNullValues[i][j] = Math.max(processedNullValues[i][j], 0);
           }
           assigned += processedNullValues[i][j] || 0;
         });
@@ -583,7 +589,7 @@ const getHistogram = async ({
         allCatValues[i][idx] = bin.doc_count;
         catObjs[key].doc_count += bin.doc_count;
         if (byCat.other) {
-          byCat.other[i] -= bin.doc_count;
+          byCat.other[i] = Math.max(byCat.other[i] - bin.doc_count, 0);
         }
         if (yField) {
           if (!yValuesByCat) {
@@ -601,7 +607,10 @@ const getHistogram = async ({
             });
             if (yValuesByCat.other) {
               yValues.forEach((count, j) => {
-                yValuesByCat.other[i][j] -= count;
+                yValuesByCat.other[i][j] = Math.max(
+                  yValuesByCat.other[i][j] - count,
+                  0
+                );
               });
             }
             yValuesByCat[key].push(yValues);
@@ -783,6 +792,7 @@ export const histogram = async ({
     taxonomy,
   });
   let catOpts, catMeta;
+  let catString = cat;
   ({
     cat,
     catOpts,
@@ -834,13 +844,14 @@ export const histogram = async ({
       opts: yOpts.replace(/^nsort/, ""),
       lookupTypes,
     });
-    updateQuery({
-      params: params,
-      fields: yFields,
-      summaries: ySummaries,
-      opts: yOpts.replace(/^nsort/, ""),
-      lookupTypes,
-    });
+    params.nullFields.concat(yParams.nullFields);
+    // updateQuery({
+    //   params: params,
+    //   fields: yFields,
+    //   summaries: ySummaries,
+    //   opts: yOpts.replace(/^nsort/, ""),
+    //   lookupTypes,
+    // });
   }
 
   let xQuery = { ...params };
@@ -946,6 +957,10 @@ export const histogram = async ({
       },
     };
   }
+
+  if (cat && catString.match(/\bnull\b/)) {
+    params.nullFields.push(cat);
+  }
   let catBounds = await getBounds({
     params: { ...params, ...inputQueries },
     fields,
@@ -958,24 +973,30 @@ export const histogram = async ({
     // opts: xOpts,
     catOpts,
   });
+  let nullCatBounds;
   if (cat && catBounds) {
     bounds.cat = catBounds.cat;
     bounds.cats = catBounds.cats;
     bounds.catType = catBounds.catType;
     bounds.catCount = catBounds.tickCount;
     bounds.by = catBounds.by;
+    nullCatBounds = catBounds;
     bounds.showOther = catBounds.showOther;
+    nullCatBounds = await getBounds({
+      params: { ...params, ...inputQueries },
+      fields: [catBounds.cat],
+      summaries,
+      result,
+      exclusions,
+      taxonomy,
+      apiParams,
+      opts: catOpts,
+    });
+    bounds.cats = nullCatBounds.stats.cats;
+    bounds.showOther =
+      nullCatBounds.stats.showOther || Boolean(catString.match(/\bnull\b/));
+    bounds.catCount = nullCatBounds.size;
   }
-  let nullCatBounds = await getBounds({
-    params: { ...params, ...inputQueries },
-    fields: [cat],
-    summaries,
-    result,
-    exclusions,
-    taxonomy,
-    apiParams,
-    opts: catOpts,
-  });
 
   let histograms, yBounds;
   if (yFields && yFields.length > 0) {
