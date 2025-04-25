@@ -151,6 +151,8 @@ const Ribbon = ({
   }
 
   const generateSteppedScale = ({ buckets, labels, padding, width }) => {
+    buckets = buckets.filter((b) => b > 0 || b === 0);
+    console.log(buckets);
     let span = buckets[buckets.length - 1] - buckets[0];
     let dataWidth = width - 2 - labels.length * padding * 2;
     let left = padding + 1;
@@ -188,106 +190,113 @@ const Ribbon = ({
   const setChrs = ({ scales, labels, buckets, padding }) => {
     let chrs = [];
     labels.forEach((label, i) => {
-      let x1 = scales[label]([buckets[i]]);
-      let x2 = scales[label]([buckets[i + 1]]);
-      let labelLength = stringLength(label);
-      let formattedLabel = label;
-      let k = 1;
-      while ((labelLength - 2) * padding > x2 - x1) {
-        formattedLabel = truncate(label, label.length - k, true);
-        labelLength = stringLength(formattedLabel);
-        k++;
-      }
-      let stroke = visible[label] ? "white" : "#31323f";
-      let fill = visible[label] ? "#31323f" : "white";
-      let lines = [];
-      if (yOrientation[label] == -1) {
-        for (let n = buckets[i + 1] - buckets[i]; n > 0; n -= step) {
-          let x = scales[label]([buckets[i] + n]);
-          lines.push(
-            <line
-              key={n}
-              x1={x}
-              y1={0}
-              x2={x}
-              y2={padding * 2}
-              stroke={stroke}
-              strokeWidth={2}
-              strokeDasharray={`${padding / 3} ${(padding * 4) / 3}`}
+      if (buckets[i] > 0 || buckets[i] === 0) {
+        console.log(buckets);
+        console.log(scales);
+        let x1 = scales[label]([buckets[i]]);
+        let x2 = scales[label]([buckets[i + 1]]);
+        let labelLength = stringLength(label);
+        let formattedLabel = label;
+        let k = 1;
+        console.log({ labelLength, padding, x2, x1 });
+
+        while ((labelLength - 2) * padding > x2 - x1) {
+          console.log({ labelLength, padding, x2, x1 });
+          formattedLabel = truncate(label, label.length - k, true);
+          labelLength = stringLength(formattedLabel);
+          k++;
+        }
+        let stroke = visible[label] ? "white" : "#31323f";
+        let fill = visible[label] ? "#31323f" : "white";
+        let lines = [];
+        if (yOrientation[label] == -1) {
+          for (let n = buckets[i + 1] - buckets[i]; n > 0; n -= step) {
+            let x = scales[label]([buckets[i] + n]);
+            lines.push(
+              <line
+                key={n}
+                x1={x}
+                y1={0}
+                x2={x}
+                y2={padding * 2}
+                stroke={stroke}
+                strokeWidth={2}
+                strokeDasharray={`${padding / 3} ${(padding * 4) / 3}`}
+              />,
+            );
+          }
+        } else {
+          for (let n = 0; n < buckets[i + 1] - buckets[i]; n += step) {
+            let x = scales[label]([buckets[i] + n]);
+            lines.push(
+              <line
+                key={n}
+                x1={x}
+                y1={0}
+                x2={x}
+                y2={padding * 2}
+                stroke={stroke}
+                strokeWidth={2}
+                strokeDasharray={`${padding / 3} ${(padding * 4) / 3}`}
+              />,
+            );
+          }
+        }
+        let arrows = [];
+        if (yOrientation[label] == -1) {
+          arrows.push(
+            <polygon
+              key="left"
+              points={`${x2 - padding / 2},${padding} ${x2 + padding / 2},${padding * 1.75} ${x2 + padding / 2},${padding * 0.25}`}
+              fill={"stroke"}
+              fillOpacity={0.25}
             />,
           );
         }
-      } else {
-        for (let n = 0; n < buckets[i + 1] - buckets[i]; n += step) {
-          let x = scales[label]([buckets[i] + n]);
-          lines.push(
-            <line
-              key={n}
-              x1={x}
-              y1={0}
-              x2={x}
-              y2={padding * 2}
-              stroke={stroke}
-              strokeWidth={2}
-              strokeDasharray={`${padding / 3} ${(padding * 4) / 3}`}
-            />,
-          );
-        }
-      }
-      let arrows = [];
-      if (yOrientation[label] == -1) {
-        arrows.push(
-          <polygon
-            key="left"
-            points={`${x2 - padding / 2},${padding} ${x2 + padding / 2},${padding * 1.75} ${x2 + padding / 2},${padding * 0.25}`}
-            fill={"stroke"}
-            fillOpacity={0.25}
-          />,
+        chrs.push(
+          <Tooltip
+            title={`${label} (${formats(buckets[i + 1] - buckets[i], "integer")}bp)`}
+            arrow
+            key={label}
+            enterDelay={500}
+          >
+            <g
+              key={label}
+              // onClick={() => {
+              //   searchBySequence(label);
+              //   handleLabelClick(label);
+              // }}
+              {...longPress(label)}
+              style={{ cursor: "pointer" }}
+            >
+              <rect
+                x={x1 - padding}
+                y={0}
+                width={x2 - x1 + padding * 2}
+                height={padding * 2}
+                fill={fill}
+                stroke={visible[label] ? fill : stroke}
+                strokeWidth={2}
+                rx={padding}
+              />
+              {lines}
+              {arrows}
+              <text
+                x={(x1 + x2) / 2}
+                key={label}
+                y={padding}
+                textAnchor="middle"
+                fontSize={padding}
+                dominantBaseline="middle"
+                alignmentBaseline="middle"
+                fill={stroke}
+              >
+                {formattedLabel}
+              </text>
+            </g>
+          </Tooltip>,
         );
       }
-      chrs.push(
-        <Tooltip
-          title={`${label} (${formats(buckets[i + 1] - buckets[i], "integer")}bp)`}
-          arrow
-          key={label}
-          enterDelay={500}
-        >
-          <g
-            key={label}
-            // onClick={() => {
-            //   searchBySequence(label);
-            //   handleLabelClick(label);
-            // }}
-            {...longPress(label)}
-            style={{ cursor: "pointer" }}
-          >
-            <rect
-              x={x1 - padding}
-              y={0}
-              width={x2 - x1 + padding * 2}
-              height={padding * 2}
-              fill={fill}
-              stroke={visible[label] ? fill : stroke}
-              strokeWidth={2}
-              rx={padding}
-            />
-            {lines}
-            {arrows}
-            <text
-              x={(x1 + x2) / 2}
-              key={label}
-              y={padding}
-              textAnchor="middle"
-              fontSize={padding}
-              dominantBaseline="middle"
-              alignmentBaseline="middle"
-              fill={stroke}
-            >
-              {formattedLabel}
-            </text>
-          </g>
-        </Tooltip>,
-      );
     });
     return chrs;
   };
@@ -298,6 +307,7 @@ const Ribbon = ({
     buckets: yBuckets,
     padding,
   });
+  console.log({ xChrs, yChrs });
 
   let groups = [];
   let legend = [];
@@ -465,6 +475,7 @@ const ReportRibbon = ({
   basename,
   pointSize = 15,
 }) => {
+  console.log({ scatter });
   pointSize *= 1;
   const navigate = useNavigate();
   const location = useLocation();
@@ -478,7 +489,7 @@ const ReportRibbon = ({
       setMessage(null);
     }
   }, [scatter]);
-
+  console.log({ width, height });
   const setDimensions = ({ width, height, timer }) => {
     let plotWidth = width;
     let plotHeight = height; // inModal ? height : plotWidth / ratio;
@@ -496,6 +507,8 @@ const ReportRibbon = ({
     };
   };
 
+  console.log({ width, height });
+
   let dimensionTimer;
   let { plotWidth, plotHeight } = setDimensions({ width, height });
 
@@ -509,6 +522,7 @@ const ReportRibbon = ({
       clearTimeout(dimensionTimer);
     };
   }, [width]);
+  console.log({ plotWidth, plotHeight });
 
   let locations = {};
   if (scatter && scatter.status) {
@@ -525,6 +539,7 @@ const ReportRibbon = ({
       pointData,
       groupBy,
     } = scatterReport;
+    console.log({ pointData });
     if (pointData) {
       ({ locations } = scatterReport);
     }
@@ -631,6 +646,7 @@ const ReportRibbon = ({
         marginTop += legendRows * (2 * pointSize + 15);
       }
     }
+    console.log({ pointData });
     chart = (
       <Ribbon
         pointData={pointData}

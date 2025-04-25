@@ -553,6 +553,7 @@ const processScatter = (scatter, result) => {
         });
       }
     });
+    console.log(catData);
     chartData.push(catData);
     if (hasRawData) {
       let points = [];
@@ -704,8 +705,14 @@ const processReport = (report, { searchTerm = {} }) => {
     if (!searchTerm) {
       searchTerm = qs.parse(window.location.search.replace(/^\?/, ""));
     }
-    let { hideErrorBars, hideAncestralBars, hideSourceColors, showPhylopics,phylopicRank,phylopicSize } =
-      searchTerm;
+    let {
+      hideErrorBars,
+      hideAncestralBars,
+      hideSourceColors,
+      showPhylopics,
+      phylopicRank,
+      phylopicSize,
+    } = searchTerm;
     return {
       ...report,
       report: {
@@ -725,7 +732,7 @@ const processReport = (report, { searchTerm = {} }) => {
             hideSourceColors,
             showPhylopics,
             phylopicRank,
-            phylopicSize:phylopicSize? parseInt(phylopicSize) : undefined,
+            phylopicSize: phylopicSize ? parseInt(phylopicSize) : undefined,
           }),
         },
       },

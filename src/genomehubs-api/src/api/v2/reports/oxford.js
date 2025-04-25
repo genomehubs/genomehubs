@@ -46,10 +46,14 @@ const parseCollate = (query) => {
 const getSequenceLengths = async ({ assemblies, xQuery, taxonomy, req }) => {
   let seqQuery = {
     ...xQuery,
-    query: `assembly_id=${assemblies.join(",")} AND feature_type=topLevel`,
+    // query: `assembly_id=${assemblies.join(",")} AND feature_type=topLevel`,
+    query: `assembly_id=${assemblies.join(
+      ","
+    )} AND feature_type=chromosome AND length>10000000`,
     fields: ["sequence_id", "length"],
     exclusions: {},
   };
+  console.log("seqQuery", seqQuery);
   let countRes = await getResultCount(seqQuery);
   if (!countRes.status.success) {
     return { status: countRes.status };
