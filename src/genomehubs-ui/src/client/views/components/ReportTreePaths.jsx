@@ -43,6 +43,8 @@ const ReportTreePaths = ({
   theme,
   cats: catArray,
   phylopicWidth,
+  phylopicSize,
+  phylopicRank,
   hideErrorBars,
 }) => {
   if (!lines || lines.length == 0) {
@@ -242,12 +244,13 @@ const ReportTreePaths = ({
       let dimensions = getDimensions(treeRef);
       setTreeDimensions(dimensions);
     }
-    if (stageRef.current) {
+    if (scrollContainerRef.current) {
       setScrollBarWidth(
-        stageRef.current.offsetWidth - stageRef.current.clientWidth,
+        scrollContainerRef.current.offsetWidth -
+          scrollContainerRef.current.clientWidth,
       );
     }
-  }, [treeRef, stageRef]);
+  }, [treeRef, scrollContainerRef]);
 
   const showTooltip = (e, segment, field) => {
     if (segment) {
@@ -714,23 +717,37 @@ const ReportTreePaths = ({
                   }
                 }
               }
-              if (segment.showPhylopic) {
+            }
+            if (segment.showPhylopic) {
+              let maxHeight = segment.count * charHeight;
+              let yMid = segment.yStart;
+              if (segment.yLimits && segment.yLimits[1] > segment.yLimits[0]) {
                 newPhyloPics.push(
-                  <PhyloPics
-                    key={segment.taxon_id}
-                    taxonId={segment.taxon_id}
-                    scientificName={segment.scientific_name}
-                    maxHeight={charHeight}
-                    maxWidth={phylopicWidth}
-                    x={maxWidth + dataWidth}
-                    y={segment.yStart - charHeight / 2}
-                    fixedRatio={1}
-                    showAncestral={false}
-                    sourceColors={false}
-                    embed={"konva"}
+                  <Line
+                    key={`phylopic-line-${segment.taxon_id}`}
+                    points={[-5, segment.yLimits[0], -5, segment.yLimits[1]]}
+                    stroke={segment.color || linesColor}
+                    strokeWidth={4}
+                    lineCap="round"
                   />,
                 );
+                yMid = (segment.yLimits[0] + segment.yLimits[1]) / 2;
               }
+              newPhyloPics.push(
+                <PhyloPics
+                  key={segment.taxon_id}
+                  taxonId={segment.taxon_id}
+                  scientificName={segment.scientific_name}
+                  maxHeight={maxHeight}
+                  maxWidth={phylopicWidth}
+                  x={phylopicWidth / 2}
+                  y={yMid}
+                  fixedRatio={1}
+                  showAncestral={false}
+                  sourceColors={false}
+                  embed={"konva"}
+                />,
+              );
             }
           }
         }
@@ -1026,7 +1043,7 @@ const ReportTreePaths = ({
           height: divHeight,
           overflowY: "auto",
           overflowX: "hidden",
-          width: divWidth,
+          width: divWidth + scrollBarWidth,
           position: "absolute",
           border: `${gridColor} solid 1px`,
           boxSizing: "border-box",

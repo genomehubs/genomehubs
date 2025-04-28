@@ -19,6 +19,8 @@ export const queryPropList = [
   "taxonomy",
   "includeEstimates",
   "treeStyle",
+  "phylopicRank",  
+  "phylopicSize",
 ];
 
 const Report = ({
@@ -111,6 +113,8 @@ const Report = ({
   reportProps.hideErrorBars = props.hideErrorBars;
   reportProps.hideAncestralBars = props.hideAncestralBars;
   reportProps.showPhylopics = props.showPhylopics;
+  reportProps.phylopicRank = props.phylopicRank;  
+  reportProps.phylopicSize = props.phylopicSize ? parseInt(props.phylopicSize) : undefined;
   reportProps.highlight = props.highlight;
   reportProps.colorPalette = props.colorPalette;
   reportProps.excludeAncestral = props.excludeAncestral;

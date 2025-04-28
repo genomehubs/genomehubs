@@ -33,6 +33,8 @@ const ReportTreeRings = ({
   hideAncestralBars,
   cats,
   phylopics,
+  phylopicRank,
+  phylopicSize,
 }) => {
   if (!arcs || arcs.length == 0) {
     return null;
@@ -350,19 +352,28 @@ const ReportTreeRings = ({
       continue;
     }
     let { x, y, angle, scientificName, width, height, arc } = opts;
+    const useHeight = height;
+    const useWidth = width;
     phylopicElements.push(
       <g key={taxonId}>
         <Phylopics
           taxonId={taxonId}
           scientificName={scientificName}
-          maxHeight={height}
-          maxWidth={width}
+          maxHeight={useHeight}
+          maxWidth={useWidth}
           fixedRatio={1}
           showAncestral={false}
           sourceColors={false}
           embed={true}
           transform={`translate(${x}, ${y}) rotate(${angle})`}
         />
+        <path
+          fill={"none"}
+          stroke={colors[ctr]}
+          strokeWidth={4}
+          strokeLinejoin="round"
+          d={arc}
+        ></path>
       </g>,
     );
     taxIds[taxonId] = scientificName;

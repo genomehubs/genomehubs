@@ -58,6 +58,8 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     hideErrorBars: { in: new Set(["tree"]), ui: true },
     hideAncestralBars: { in: new Set(["tree"]), ui: true },
     showPhylopics: { in: new Set(["tree"]), ui: true },
+    phylopicRank: { in: new Set(["tree"]), ui: true },
+    phylopicSize: { in: new Set(["tree"]), ui: true },
     highlight: { in: new Set(["table"]), ui: true },
     colorPalette: { not: new Set(["sources"]), ui: true },
     includeEstimates: true,
@@ -686,7 +688,7 @@ const processReport = (report, { searchTerm = {} }) => {
     if (!searchTerm) {
       searchTerm = qs.parse(window.location.search.replace(/^\?/, ""));
     }
-    let { hideErrorBars, hideAncestralBars, hideSourceColors, showPhylopics } =
+    let { hideErrorBars, hideAncestralBars, hideSourceColors, showPhylopics,phylopicRank,phylopicSize } =
       searchTerm;
     return {
       ...report,
@@ -706,6 +708,8 @@ const processReport = (report, { searchTerm = {} }) => {
             hideAncestralBars,
             hideSourceColors,
             showPhylopics,
+            phylopicRank,
+            phylopicSize:phylopicSize? parseInt(phylopicSize) : undefined,
           }),
         },
       },
