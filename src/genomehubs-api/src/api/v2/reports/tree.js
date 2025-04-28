@@ -449,6 +449,12 @@ const getTree = async ({
   // let field = yFields[0] || fields[0];
   let exclusions;
   params.excludeUnclassified = true;
+  let { nullFields } = params;
+  if (nullFields && nullFields.length > 0) {
+    params.excludeMissing = params.excludeMissing.filter(
+      (field) => !nullFields.includes(field)
+    );
+  }
   exclusions = setExclusions(params);
   let lca = await getLCA({
     params: { ...params },
@@ -459,6 +465,11 @@ const getTree = async ({
     result,
   });
   exclusions.missing = [...new Set(exclusions.missing.concat(xFields))];
+  if (nullFields && nullFields.length > 0) {
+    exclusions.missing = exclusions.missing.filter(
+      (field) => !nullFields.includes(field)
+    );
+  }
   if (treeThreshold > -1 && lca.count > treeThreshold) {
     return {
       status: {
@@ -682,14 +693,6 @@ export const tree = async ({
   yParams.excludeDescendant = apiParams.excludeDescendant || [];
   yParams.excludeAncestral = apiParams.excludeAncestral || [];
   yParams.excludeMissing = apiParams.excludeMissing || [];
-
-  // if (params.includeEstimates) {
-  //   delete params.excludeAncestral;
-  //   delete yParams.excludeAncestral;
-  // }
-
-  // delete params.excludeDescendant;
-  // delete yParams.excludeDescendant;
 
   let xQuery = { ...params };
   let yQuery = { ...yParams };

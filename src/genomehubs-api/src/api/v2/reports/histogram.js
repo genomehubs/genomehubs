@@ -147,38 +147,36 @@ const handleNulls2d = ({
   let { rowSums, colSums } = rowColSums(allYValues);
   let processedNullValues = allYValues.map((_) => []);
 
-  if (allValues && allValues.length > 0) {
-    if (fullYValues) {
-      let assigned = 0;
-      allValues.forEach((x, i) => {
-        fullYValues.forEach((y, j) => {
-          if (!allYValues[i]) {
-            allYValues[i] = [];
-            processedNullValues[i] = [];
-          }
-          if (allYValues[i][j]) {
-            processedNullValues[i][j] = allYValues[i][j];
-          } else {
-            if (i == nullIndex && j == yNullIndex) {
-              processedNullValues[i][j] = undefined;
-            } else if (i == nullIndex) {
-              processedNullValues[i][j] = y - rowSums[j];
-            } else if (j == yNullIndex) {
-              processedNullValues[i][j] = x - colSums[i];
-            } else {
-              processedNullValues[i][j] = 0;
-            }
-            processedNullValues[i][j] = Math.max(processedNullValues[i][j], 0);
-          }
-          assigned += processedNullValues[i][j] || 0;
-        });
-      });
-      if (nullIndex > -1 && yNullIndex > -1) {
-        if (!processedNullValues[nullIndex]) {
-          processedNullValues[nullIndex] = [];
+  if (allValues && allValues.length > 0 && fullYValues) {
+    let assigned = 0;
+    allValues.forEach((x, i) => {
+      fullYValues.forEach((y, j) => {
+        if (!allYValues[i]) {
+          allYValues[i] = [];
+          processedNullValues[i] = [];
         }
-        processedNullValues[nullIndex][yNullIndex] = totalCount - assigned;
+        if (allYValues[i][j]) {
+          processedNullValues[i][j] = allYValues[i][j];
+        } else {
+          if (i == nullIndex && j == yNullIndex) {
+            processedNullValues[i][j] = undefined;
+          } else if (i == nullIndex) {
+            processedNullValues[i][j] = y - rowSums[j];
+          } else if (j == yNullIndex) {
+            processedNullValues[i][j] = x - colSums[i];
+          } else {
+            processedNullValues[i][j] = 0;
+          }
+          processedNullValues[i][j] = Math.max(processedNullValues[i][j], 0);
+        }
+        assigned += processedNullValues[i][j] || 0;
+      });
+    });
+    if (nullIndex > -1 && yNullIndex > -1) {
+      if (!processedNullValues[nullIndex]) {
+        processedNullValues[nullIndex] = [];
       }
+      processedNullValues[nullIndex][yNullIndex] = totalCount - assigned;
     }
   }
   return processedNullValues;
@@ -606,11 +604,19 @@ const getHistogram = async ({
               stats: yBounds.stats,
             });
             if (yValuesByCat.other) {
+              if (!yValuesByCat.other[i]) {
+                yValuesByCat.other[i] = [];
+              }
+
               yValues.forEach((count, j) => {
-                yValuesByCat.other[i][j] = Math.max(
-                  yValuesByCat.other[i][j] - count,
-                  0
-                );
+                if (!yValuesByCat.other[i][j]) {
+                  yValuesByCat.other[i][j] = 0;
+                } else {
+                  yValuesByCat.other[i][j] = Math.max(
+                    yValuesByCat.other[i][j] - count,
+                    0
+                  );
+                }
               });
             }
             yValuesByCat[key].push(yValues);
@@ -670,6 +676,24 @@ const getHistogram = async ({
       yNullIndex,
       totalCount,
     });
+    if (rawData && rawData.length > 0) {
+      buckets.forEach((bucket, i) => {
+        yBuckets.forEach((yBucket, j) => {
+          if (bucket && yBucket && (bucket == "null" || yBucket == "null")) {
+            let count = allYValues[i][j];
+            if (count > 0) {
+              for (let k = 0; k < count; k++) {
+                rawData.push({
+                  x: bucket,
+                  y: yBucket,
+                  cat: "all data",
+                });
+              }
+            }
+          }
+        });
+      });
+    }
   } else if (catNullIndex > -1) {
     allCatValues = handleNulls2d({
       allYValues: allCatValues,
@@ -992,10 +1016,12 @@ export const histogram = async ({
       apiParams,
       opts: catOpts,
     });
-    bounds.cats = nullCatBounds.stats.cats;
-    bounds.showOther =
-      nullCatBounds.stats.showOther || Boolean(catString.match(/\bnull\b/));
-    bounds.catCount = nullCatBounds.size;
+    if (nullCatBounds.stats.cats) {
+      bounds.cats = nullCatBounds.stats.cats;
+      bounds.showOther =
+        nullCatBounds.stats.showOther || Boolean(catString.match(/\bnull\b/));
+      bounds.catCount = nullCatBounds.size;
+    }
   }
 
   let histograms, yBounds;
