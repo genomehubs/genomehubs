@@ -71,7 +71,7 @@ const getMap = async ({
   if (!countRes.status.success) {
     return { status: countRes.status };
   }
-  let count = countRes.count;
+  let { count } = countRes;
   if (mapThreshold > -1 && count > mapThreshold) {
     return {
       status: {
@@ -129,7 +129,7 @@ const getMap = async ({
       continue;
     }
     let coords = result.result.fields[field].value;
-    let aggregation_source = result.result.fields[field].aggregation_source;
+    let { aggregation_source } = result.result.fields[field];
     rawData[cat].push({
       ...(result.result.scientific_name && {
         scientific_name: result.result.scientific_name,
@@ -273,6 +273,12 @@ export const map = async ({
     apiParams,
     //opts: xOpts,
   });
+  if (!bounds) {
+    status = {
+      success: false,
+      error: `no results contain sample_location data for the current query`,
+    };
+  }
   let yBounds;
   if (y) {
     yBounds = await getBounds({

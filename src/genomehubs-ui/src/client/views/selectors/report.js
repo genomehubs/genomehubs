@@ -443,6 +443,7 @@ const processScatter = (scatter, result) => {
             }
             let x;
             let y;
+            let { x: rawX, y: rawY } = obj;
             if (scatter.bounds.scale == "ordinal") {
               let name = obj.x.toLowerCase();
               if (!buckets.has(name)) {
@@ -471,27 +472,10 @@ const processScatter = (scatter, result) => {
               };
             }
 
-            points.push({ ...obj, x, y });
+            points.push({ ...obj, x, y, rawX, rawY });
           }
         }
         pointData.push(points);
-        // pointData.push(heatmaps.rawData[cat.key]);
-        // for (let obj of heatmaps.rawData[cat.key]) {
-        //   if (Array.isArray(obj.x) || Array.isArray(obj.y)) {
-        //     // TODO: handle arrays of ordinal values
-        //     continue;
-        //   }
-        //   locations[obj.scientific_name.toLowerCase()] = {
-        //     x:
-        //       scatter.bounds.scale == "ordinal"
-        //         ? xScale(obj.x.toLowerCase())
-        //         : xScale(obj.x),
-        //     y:
-        //       scatter.yBounds.scale == "ordinal"
-        //         ? yScale(obj.y.toLowerCase())
-        //         : yScale(obj.y),
-        //   };
-        // }
       }
     });
   } else {

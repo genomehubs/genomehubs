@@ -339,7 +339,7 @@ export const setAggs = async ({
 
   let yHistogram, yHistograms, categoryHistograms;
   if (histogram && yField) {
-    if (yBounds.stats.by) {
+    if (yBounds && yBounds.stats.by) {
       let boundsTerms = { terms: yBounds.stats.cats };
       yHistogram = termsAgg({
         field: yField,
@@ -398,7 +398,7 @@ export const setAggs = async ({
         field,
         summary,
         histogram,
-        other: bounds.showOther,
+        other: bounds.stats.showOther,
       });
     } else {
       categoryHistograms = lineageCategory({
@@ -407,7 +407,7 @@ export const setAggs = async ({
         field,
         summary,
         histogram,
-        other: bounds.showOther,
+        other: bounds.stats.showOther,
       });
     }
   }
@@ -456,9 +456,15 @@ export const setAggs = async ({
             terms,
             categoryHistograms,
             tree,
-            // yHistograms,
+            yHistograms,
           },
         },
+        ...(yHistograms && {
+          yHistograms,
+        }),
+        ...(categoryHistograms && {
+          categoryHistograms,
+        }),
       },
     },
   };

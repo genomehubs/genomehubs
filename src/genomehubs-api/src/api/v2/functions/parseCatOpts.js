@@ -1,4 +1,42 @@
 export const parseCatOpts = ({ cat, query, lookupTypes }) => {
+  // splits cat and opts
+  // examples:
+  // input: cat = "c_value_method"
+  // output: cat = "c_value_method"
+  //         catOpts = ";;"
+  //
+  // input: cat = "c_value_method=flow cytometry"
+  // output: cat = "c_value_method"
+  //         catOpts = "flow cytometry;;"
+  //
+  // input: cat = "c_value_method[12]"
+  // output: cat = "c_value_method"
+  //         catOpts = ";;12"
+  //
+  // input: cat = "c_value_method[5+]"
+  // output: cat = "c_value_method"
+  //         catOpts = ";;5+"
+  //
+  // input: cat = "c_value_method[5+]=flow cytometry"
+  // output: cat = "c_value_method"
+  //         catOpts = "flow cytometry;;5+"
+  //
+  // input: cat = "c_value_method[5+]=flow cytometry,null"
+  // output: cat = "c_value_method"
+  //         catOpts = "flow cytometry,null;;5+"
+  //
+  // input: cat = "c_value_method[5+]=flow cytometry,null,feulgen densitometry"
+  // output: cat = "c_value_method"
+  //         catOpts = "flow cytometry,null,feulgen densitometry;;5+"
+  let [field, count, values] = (cat || "").split(/=*\[([\d\+]+)\]=*/);
+  let catMeta = lookupTypes(field);
+  let catOpts = `${typeof values === "undefined" ? "" : values};;${
+    typeof count === "undefined" ? "" : count
+  }`;
+  return { cat: field, catMeta, query, catOpts };
+};
+
+const oldParseCatOpts = ({ cat, query, lookupTypes }) => {
   let catOpts = ";;";
   let portions = (cat || "").split(/\s*[\[\]]\s*/);
   cat = portions[0];
@@ -52,7 +90,7 @@ export const parseCatOpts = ({ cat, query, lookupTypes }) => {
           queryArr = queryArr.concat([" AND ", portions[0], " <= ", max]);
         }
       } else {
-        queryArr = queryArr.concat([" AND ", portions[0]]);
+        // queryArr = queryArr.concat([" AND ", portions[0]]);
       }
       searchFields.push(portions[0]);
 
@@ -63,6 +101,8 @@ export const parseCatOpts = ({ cat, query, lookupTypes }) => {
     delete portions[1];
     cat = portions.join("");
   }
+  cat = "c_value_method";
+  catOpts = "flow cytometry,null,feulgen densitometry;;5+";
   return { cat, catMeta, query, catOpts };
 };
 

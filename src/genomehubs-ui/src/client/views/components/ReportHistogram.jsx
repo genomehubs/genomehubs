@@ -8,6 +8,7 @@ import CellInfo from "./CellInfo";
 import Grid from "@mui/material/Grid2";
 import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "./Tooltip";
+import { active as activeStyle } from "./Styles.scss";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
 import searchByCell from "../functions/searchByCell";
@@ -79,17 +80,19 @@ const CustomBackground = ({ chartProps, ...props }) => {
       );
     }
   });
-
+  let { highlightColor } = chartProps.colorScheme;
   let CurrentRect = React.forwardRef((refProps, ref) => (
     <rect
       ref={ref}
       {...refProps}
+      className={activeStyle}
       height={h}
       width={w}
       x={props.background.x}
       y={props.background.y}
       style={chartProps.embedded ? {} : { cursor: "pointer" }}
-      fill={"rgba(255,255,255,0)"}
+      fill={highlightColor}
+      fillOpacity={0}
       onClick={
         chartProps.embedded
           ? () => {}
@@ -184,7 +187,7 @@ const Histogram = ({
       interval={0}
       style={{ textAnchor: buckets.length > 15 ? "end" : "auto" }}
       axisLine={{ stroke: axisColor }}
-      tickLine={{ stroke: axisColor }}
+      // tickLine={{ stroke: axisColor }}
     >
       <Label
         value={xLabel}
@@ -265,6 +268,18 @@ const Histogram = ({
       }}
     >
       {axes}
+      {cats.map((cat, i) => {
+        return (
+          <Bar
+            dataKey={cat}
+            key={i}
+            stackId={stacked ? 1 : false}
+            fill={chartProps.colors[i] || "rgb(102, 102, 102)"}
+            isAnimationActive={false}
+            style={{ pointerEvents: "none" }}
+          />
+        );
+      })}
       {cats.map((cat, i) => (
         <Bar
           dataKey={cat}
@@ -287,18 +302,6 @@ const Histogram = ({
           }
         />
       ))}
-      {cats.map((cat, i) => {
-        return (
-          <Bar
-            dataKey={cat}
-            key={i}
-            stackId={stacked ? 1 : false}
-            fill={chartProps.colors[i] || "rgb(102, 102, 102)"}
-            isAnimationActive={false}
-            style={{ pointerEvents: "none" }}
-          />
-        );
-      })}
     </BarChart>
   );
 };
@@ -598,6 +601,7 @@ const ReportHistogram = ({
           translations,
           catTranslations,
           catOffsets,
+          colorScheme: colorScheme[theme],
           xFormat,
           yFormat,
           orientation,

@@ -43,8 +43,30 @@ export const ReportXAxisTick = ({
   if (report == "histogram") {
     offset -= bucketWidth / 2;
     tickLine = (
-      <line x1={0} x2={0} y1={-8} y2={-3} fill={"none"} stroke={fill} />
+      <line
+        x1={-bucketWidth / 2}
+        x2={-bucketWidth / 2}
+        y1={-8}
+        y2={-3}
+        fill={"none"}
+        stroke={fill}
+      />
     );
+    if (lastPos) {
+      tickLine = (
+        <>
+          {tickLine}
+          <line
+            x1={bucketWidth / 2}
+            x2={bucketWidth / 2}
+            y1={-8}
+            y2={-3}
+            fill={"none"}
+            stroke={fill}
+          />
+        </>
+      );
+    }
   }
   if (report == "catHistogram" && index < buckets.length - 2) {
     tickLine = (
@@ -68,7 +90,7 @@ export const ReportXAxisTick = ({
     offset += bucketWidth / 2;
     //centered = true;
     ttValue = value;
-  } else if (buckets[index] != payload.value) {
+  } else if (buckets[index] != payload.value || valueType == "keyword") {
     value = buckets[index] || "";
     offset += bucketWidth / 2;
     centered = true;
