@@ -58,7 +58,8 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     hideErrorBars: { in: new Set(["tree"]), ui: true },
     hideAncestralBars: { in: new Set(["tree"]), ui: true },
     showPhylopics: { in: new Set(["tree"]), ui: true },
-    phylopicRank: { in: new Set(["tree"]), ui: true },
+    phylopicRank: { in: new Set(["tree"]), api: "preserveRank", ui: true },
+    preserveRank: { in: new Set(["tree"]) },
     phylopicSize: { in: new Set(["tree"]), ui: true },
     highlight: { in: new Set(["table"]), ui: true },
     colorPalette: { not: new Set(["sources"]), ui: true },
@@ -139,8 +140,12 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
           newOptions[newKey] = value;
         }
       }
+      if (!ui && reportTerms[key].api) {
+        newOptions[reportTerms[key].api] = value;
+      }
     }
   });
+
   return qs.stringify(newOptions);
 };
 
@@ -169,6 +174,7 @@ export function fetchReport({
     if (queryString.match("report=map") && !queryString.match("mapThreshold")) {
       queryString += `&mapThreshold=${mapThreshold}`;
     }
+    queryString = queryString.replace(/\bphylopicRank\b/, "preserveRank");
     let apiQueryString = sortReportQuery({ queryString, ui: false });
     const queryId = nanoid(10);
     let url = `${apiUrl}/report?${apiQueryString.replace(
@@ -688,8 +694,14 @@ const processReport = (report, { searchTerm = {} }) => {
     if (!searchTerm) {
       searchTerm = qs.parse(window.location.search.replace(/^\?/, ""));
     }
-    let { hideErrorBars, hideAncestralBars, hideSourceColors, showPhylopics,phylopicRank,phylopicSize } =
-      searchTerm;
+    let {
+      hideErrorBars,
+      hideAncestralBars,
+      hideSourceColors,
+      showPhylopics,
+      phylopicRank,
+      phylopicSize,
+    } = searchTerm;
     return {
       ...report,
       report: {
@@ -709,7 +721,7 @@ const processReport = (report, { searchTerm = {} }) => {
             hideSourceColors,
             showPhylopics,
             phylopicRank,
-            phylopicSize:phylopicSize? parseInt(phylopicSize) : undefined,
+            phylopicSize: phylopicSize ? parseInt(phylopicSize) : undefined,
           }),
         },
       },
@@ -889,9 +901,6 @@ const reportOptions = {
       default: "query",
       fieldType: "value",
     },
-    // y: {
-    //   fieldType: "any",
-    // },
     treeStyle: {
       default: "treeStyle",
       value: "rect",

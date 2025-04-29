@@ -75,6 +75,25 @@ components:
       name: collapseMonotypic
       schema:
         type: boolean
+    preserveRankParam:
+      description: |
+        Do not collapse monotypic tree nodes at the specified rank. Value may be a single rank or a comma separated list of ranks.
+
+        This parameter only affects searches with `report=tree` and `collapseMonotypic=true`.
+      examples:
+        null:
+          value:
+          summary: null - do not preserve any monotypic nodes
+        family:
+          value: family
+          summary: Preserve monotypic nodes at family rank
+        family_and_order:
+          value: family,order
+          summary: Preserve monotypic nodes at family and order ranks
+      in: query
+      name: preserveRank
+      schema:
+        type: string
     confidenceParam:
       deprecated: true
       description: |
@@ -1476,6 +1495,7 @@ paths:
         - $ref: "#/components/parameters/rankParam"
         - $ref: "#/components/parameters/includeEstimatesParam"
         - $ref: "#/components/parameters/collapseMonotypicParam"
+        - $ref: "#/components/parameters/preserveRankParam"
         - $ref: "#/components/parameters/ranksParam"
         - $ref: "#/components/parameters/namesParam"
         - $ref: "#/components/parameters/excludeAncestralParam"
