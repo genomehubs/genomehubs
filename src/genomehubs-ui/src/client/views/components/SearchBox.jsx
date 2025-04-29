@@ -92,7 +92,6 @@ const SearchBox = ({
     if (!fullOptions.hasOwnProperty("includeEstimates")) {
       fullOptions.includeEstimates = searchDefaults.includeEstimates;
     }
-    console.log(sameIndex);
 
     let savedOptions = allOptions[options.result];
 
@@ -105,7 +104,6 @@ const SearchBox = ({
       ranks = options.ranks || ranks;
       names = options.names || names;
     }
-    console.log(fields);
 
     // if (
     //   !fullOptions.hasOwnProperty("fields") ||

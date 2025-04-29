@@ -59,7 +59,6 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     hideAncestralBars: { in: new Set(["tree"]), ui: true },
     showPhylopics: { in: new Set(["tree"]), ui: true },
     phylopicRank: { in: new Set(["tree"]), api: "preserveRank", ui: true },
-    preserveRank: { in: new Set(["tree"]) },
     phylopicSize: { in: new Set(["tree"]), ui: true },
     highlight: { in: new Set(["table"]), ui: true },
     colorPalette: { not: new Set(["sources"]), ui: true },
@@ -174,7 +173,6 @@ export function fetchReport({
     if (queryString.match("report=map") && !queryString.match("mapThreshold")) {
       queryString += `&mapThreshold=${mapThreshold}`;
     }
-    queryString = queryString.replace(/\bphylopicRank\b/, "preserveRank");
     let apiQueryString = sortReportQuery({ queryString, ui: false });
     const queryId = nanoid(10);
     let url = `${apiUrl}/report?${apiQueryString.replace(
@@ -689,7 +687,7 @@ const processReport = (report, { searchTerm = {} }) => {
     return {};
   }
   if (report.name == "tree") {
-    let { treeStyle } = qs.parse(report.report.queryString);
+    let { treeStyle, preserveRank } = qs.parse(report.report.queryString);
     let { tree, xQuery, yQuery, bounds, yBounds } = report.report.tree;
     if (!searchTerm) {
       searchTerm = qs.parse(window.location.search.replace(/^\?/, ""));
@@ -699,7 +697,7 @@ const processReport = (report, { searchTerm = {} }) => {
       hideAncestralBars,
       hideSourceColors,
       showPhylopics,
-      phylopicRank,
+      phylopicRank = preserveRank,
       phylopicSize,
     } = searchTerm;
     return {
