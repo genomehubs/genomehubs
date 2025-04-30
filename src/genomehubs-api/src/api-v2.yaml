@@ -1217,6 +1217,10 @@ components:
       items:
         type: string
       type: array
+    TaxonomicRanks:
+      items:
+        type: string
+      type: array
 info:
   contact:
     email: goat@genomehubs.org
@@ -1650,6 +1654,24 @@ paths:
       tags:
         - Metadata
       x-eov-operation-handler: api/v2/routes/taxonomies
+  /taxonomicRanks:
+    get:
+      summary: List of valid taxonomic ranks
+      description: Returns a list of valid taxonomic ranks such as domain, kingdom, phylum, etc.
+      operationId: getTaxonomicRanks
+      tags:
+        - Metadata
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaxonomicRanks"
+        "400":
+          description: Invalid request
+      x-eov-operation-handler: api/v2/routes/taxonomicRanks
+
 servers:
   - url: http://localhost:3000/api/v2
 tags:
