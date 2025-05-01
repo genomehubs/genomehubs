@@ -46,7 +46,7 @@ const parseCollate = (query) => {
 const getSequenceLengths = async ({ assemblies, xQuery, taxonomy, req }) => {
   let seqQuery = {
     ...xQuery,
-    query: `assembly_id=${assemblies.join(",")} AND feature_type=topLevel`,
+    query: `assembly_id=${assemblies.join(",")} AND feature_type=sequence`,
     fields: ["sequence_id", "length"],
     exclusions: {},
   };
@@ -100,6 +100,7 @@ const getOxford = async ({
   asms,
   summaries,
   bounds,
+  catBounds,
   yBounds,
   result,
   taxonomy,
@@ -261,6 +262,14 @@ const getOxford = async ({
         (!Array.isArray(cats) && !cats.has(cat))
       ) {
         cat = "other";
+      }
+    } else if (catBounds) {
+      let catObj = result.result.fields[catBounds.cat];
+      if (catObj) {
+        cat = catObj.value.toLowerCase();
+      }
+      if (Array.isArray(cat)) {
+        cat = cat[0].toLowerCase();
       }
     }
     if (typeof cat === "undefined") {
@@ -426,6 +435,14 @@ const getOxford = async ({
   let i = 0;
   allValues = [];
   allYValues = [];
+  if (catBounds && !bounds.cat) {
+    bounds.cat = catBounds.cat;
+    bounds.cats = catBounds.cats;
+    bounds.catType = catBounds.catType;
+    bounds.catCount = catBounds.catCount;
+    bounds.by = catBounds.by;
+    bounds.showOther = catBounds.showOther;
+  }
   if (bounds.cats) {
     if (bounds.showOther) {
       bounds.cats.push({ key: "other", label: "other" });
@@ -678,8 +695,24 @@ export const oxford = async ({
     taxonomy,
     apiParams,
   });
+  let catQuery = params.query;
+  if (cat == "sequence_id") {
+    let parts = catQuery.split(/\s+AND\s+/i);
+    let newParts = [];
+    for (let part of parts) {
+      let [key, value] = part.split(/\s*=\s*/);
+      if (key == "assembly_id") {
+        value = value.split(",")[0];
+        part = `${key}=${value}`;
+      } else if (key.startsWith("collate(")) {
+        continue;
+      }
+      newParts.push(part);
+    }
+    catQuery = newParts.join(" AND ");
+  }
   let catBounds = await getBounds({
-    params: { ...params },
+    params: { ...params, query: catQuery },
     fields: [catMeta.name, ...filteredFields],
     summaries: ["value", ...summaries],
     cat,
@@ -691,14 +724,15 @@ export const oxford = async ({
     catOpts,
   });
 
-  if (cat && catBounds) {
-    bounds.cat = catBounds.cat;
-    bounds.cats = catBounds.cats;
-    bounds.catType = catBounds.catType;
-    bounds.catCount = catBounds.tickCount;
-    bounds.by = catBounds.by;
-    bounds.showOther = catBounds.showOther;
-  }
+  // Don't assign catBounds to bounds until further checks
+  // if (cat && catBounds) {
+  //   bounds.cat = catBounds.cat;
+  //   bounds.cats = catBounds.cats;
+  //   bounds.catType = catBounds.catType;
+  //   bounds.catCount = catBounds.tickCount;
+  //   bounds.by = catBounds.by;
+  //   bounds.showOther = catBounds.showOther;
+  // }
 
   let asms = parseAssemblies(bounds.query);
   xQuery.query = bounds.query;
@@ -713,6 +747,7 @@ export const oxford = async ({
         groupBy,
         asms,
         bounds,
+        catBounds,
         x,
         result,
         queryId: apiParams.queryId,

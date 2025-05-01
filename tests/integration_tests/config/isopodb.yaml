@@ -1,0 +1,29 @@
+common:
+  es:
+    batch: 500
+    host:
+      - "localhost:9200"
+    timeout: 30
+  hub:
+    name: isopodb
+    path: ~/projects/genomehubs/isopodb-resources
+    separator: --
+    version: 2021.10.15
+  log:
+    es: false
+    fetch: false
+    interval: 10
+  taxonomy:
+    format: ncbi
+    file:
+      - names.dmp
+      - nodes.dmp
+    path: /Users/rchallis/projects/blobtoolkit/blobtk/rust/test/taxonomy/isopodb
+fill: {}
+index:
+  taxonomy:
+    source: ncbi
+init: {}
+test:
+  taxonomy:
+    source: ncbi
