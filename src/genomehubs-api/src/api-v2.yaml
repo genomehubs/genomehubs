@@ -1663,6 +1663,7 @@ paths:
         - Metadata
       parameters:
         - $ref: "#/components/parameters/resultParam"
+        - $ref: "#/components/parameters/taxonomyParam"
         - $ref: "#/components/parameters/releaseParam"
         - $ref: "#/components/parameters/indentParam"
       responses:
@@ -1671,7 +1672,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TaxonomicRanks"
+                anyOf:
+                  - $ref: "#/components/schemas/Status"
+                    status: null
+                  - $ref: "#/components/schemas/TaxonomicRanks"
+                    results: null
         "400":
           description: Invalid request
       x-eov-operation-handler: api/v2/routes/taxonomicRanks

@@ -1,14 +1,13 @@
 import { client } from "./connection.js";
-import { config } from "./config.js";
 import { indexName } from "./indexName.js";
+import { logError } from "./logger.js";
 
-export const fetchTaxonomicRanks = async ({ result: resultParam, release }) => {
+export const fetchTaxonomicRanks = async ({ req }) => {
   try {
     const index = indexName({
-      result: resultParam,
-      taxonomy: config.taxonomy,
-      hub: config.hub,
-      release: release,
+      result: req.query.result,
+      taxonomy: req.query.taxonomy,
+      release: req.query.release,
     });
 
     const esResult = await client.search({
@@ -33,13 +32,24 @@ export const fetchTaxonomicRanks = async ({ result: resultParam, release }) => {
       },
     });
 
-    const ranks = esResult.body.aggregations.unique_ranks.buckets.map(
+    const ranks = esResult?.body?.aggregations?.unique_ranks?.buckets.map(
       (bucket) => bucket.key
     );
-
-    return ranks;
+    return {
+      success: true,
+      error: null,
+      ranks,
+    };
   } catch (error) {
-    console.error("Error fetching taxonomic ranks:", error);
-    throw new Error("Failed to fetch taxonomic ranks");
+    logError({
+      req,
+      message: error.message,
+    });
+
+    return {
+      success: false,
+      error: error.message || "Failed to fetch taxonomic ranks",
+      ranks: [],
+    };
   }
 };
