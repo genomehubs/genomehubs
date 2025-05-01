@@ -1,9 +1,18 @@
 import { client } from "./connection.js";
+import { config } from "./config.js";
+import { indexName } from "./indexName.js";
 
 export const fetchTaxonomicRanks = async () => {
   try {
+    const index = indexName({
+      result: "sample",
+      taxonomy: config.taxonomy,
+      hub: config.hub,
+      release: config.release,
+    });
+
     const result = await client.search({
-      index: "taxonomy--ncbi--goat--2021.10.15",
+      index,
       body: {
         size: 0,
         query: {
