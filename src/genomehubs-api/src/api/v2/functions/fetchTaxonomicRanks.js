@@ -2,16 +2,16 @@ import { client } from "./connection.js";
 import { config } from "./config.js";
 import { indexName } from "./indexName.js";
 
-export const fetchTaxonomicRanks = async () => {
+export const fetchTaxonomicRanks = async ({ result: resultParam, release }) => {
   try {
     const index = indexName({
-      result: "sample",
+      result: resultParam,
       taxonomy: config.taxonomy,
       hub: config.hub,
-      release: config.release,
+      release: release,
     });
 
-    const result = await client.search({
+    const esResult = await client.search({
       index,
       body: {
         size: 0,
@@ -33,7 +33,7 @@ export const fetchTaxonomicRanks = async () => {
       },
     });
 
-    const ranks = result.body.aggregations.unique_ranks.buckets.map(
+    const ranks = esResult.body.aggregations.unique_ranks.buckets.map(
       (bucket) => bucket.key
     );
 

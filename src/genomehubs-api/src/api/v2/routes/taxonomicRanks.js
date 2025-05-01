@@ -4,8 +4,7 @@ import { fetchTaxonomicRanks } from "../functions/fetchTaxonomicRanks.js";
 
 export const getTaxonomicRanks = async (req, res) => {
   try {
-    let response = [];
-    const taxonomicRanks = await fetchTaxonomicRanks();
+    const taxonomicRanks = await fetchTaxonomicRanks(req.query);
     return res.status(200).send(formatJson(taxonomicRanks, req.query.indent));
   } catch (error) {
     logError({
