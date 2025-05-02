@@ -28,10 +28,76 @@ const listOperators = (keyLabel) => {
   // Define the available operators based on the keyLabel
 
   if (keyLabel === "tax") {
-    return ["name", "tree", "eq", "lineage", "rank", "level"];
+    return [];
   } else {
     return ["=", ">", ">=", "<", "<=", "!="];
   }
+};
+
+const listModifiers = (keyLabel) => {
+  // Define the available modifiers based on the keyLabel
+  if (keyLabel === "tax") {
+    return ["name", "tree", "eq", "lineage", "rank", "level"];
+  } else {
+    return ["count", "length", "max", "mean", "median", "min", "sum", "value"];
+  }
+};
+
+const chipPalletes = {
+  blue: {
+    dark: "#185b89",
+    light: "#a6cee3",
+    background: "#1f78b4",
+    text: "#ffffff",
+  },
+  green: {
+    dark: "#277821",
+    light: "#b2df8a",
+    background: "#33a02c",
+    text: "#ffffff",
+  },
+  red: {
+    dark: "#b51517",
+    light: "#fb9a99",
+    background: "#e31a1c",
+    text: "#ffffff",
+  },
+  orange: {
+    dark: "#cc6600",
+    light: "#fdbf6f",
+    background: "#ff7f00",
+    text: "#ffffff",
+  },
+  purple: {
+    dark: "#512f76",
+    light: "#cab2d6",
+    background: "#6a3d9a",
+    text: "#ffffff",
+  },
+  yellow: {
+    dark: "#87431f",
+    light: "#ffff99",
+    background: "#b15928",
+    text: "#000000",
+  },
+  grey: {
+    dark: "#636363",
+    light: "#bdbdbd",
+    background: "#969696",
+    text: "#ffffff",
+  },
+  black: {
+    dark: "#000000",
+    light: "#bdbdbd",
+    background: "#000000",
+    text: "#ffffff",
+  },
+  white: {
+    dark: "#ffffff",
+    light: "#bdbdbd",
+    background: "#ffffff",
+    text: "#000000",
+  },
 };
 
 const KeyValueChip = ({
@@ -39,16 +105,6 @@ const KeyValueChip = ({
   value,
   symbol = "=",
   modifier = "value",
-  availableModifiers = [
-    "count",
-    "length",
-    "max",
-    "mean",
-    "median",
-    "min",
-    "sum",
-    "value",
-  ],
   availableKeys = [
     "assembly_level",
     "assembly_span",
@@ -58,6 +114,7 @@ const KeyValueChip = ({
   ],
   onChange,
   onDelete,
+  palette = "blue",
 }) => {
   // Format numbers with suffixes (k, M, G, etc.)
   const formatValue = (val) => {
@@ -84,18 +141,19 @@ const KeyValueChip = ({
     return tier === 0 ? num.toString() : `${num}${suffixes[tier]}`;
   };
 
-  let darkColor = "hsl(204, 70.60%, 31.40%)";
-  let lightColor = "#a6cee3";
-  let backgroundColor = "#808080";
-  let borderColor = "#1f78b4";
-  let textColor = "#ffffff";
+  let darkColor = chipPalletes[palette].dark;
+  let lightColor = chipPalletes[palette].light;
+  let backgroundColor = chipPalletes[palette].background;
+  let textColor = chipPalletes[palette].text;
 
   const [anchorElSymbol, setAnchorElSymbol] = useState(null);
   const [anchorElModifier, setAnchorElModifier] = useState(null);
   const [anchorElValue, setAnchorElValue] = useState(null);
   const [currentModifier, setCurrentModifier] = useState(modifier);
   const [currentSymbol, setCurrentSymbol] = useState(symbol);
-  const [currentValue, setCurrentValue] = useState(formatValue(value));
+  const [currentValue, setCurrentValue] = useState(
+    keyLabel === "tax" ? value : formatValue(value),
+  );
   const [currentKey, setCurrentKey] = useState(keyLabel);
   const [isEditingValue, setIsEditingValue] = useState(false);
   const [isEditingKey, setIsEditingKey] = useState(false);
@@ -104,10 +162,13 @@ const KeyValueChip = ({
   const [availableOperators, setAvailableOperators] = useState(
     listOperators(keyLabel),
   );
+  const [availableModifiers, setAvailableModifiers] = useState(
+    listModifiers(keyLabel),
+  );
 
-  if (keyLabel === "tax") {
-    modifier = undefined;
-  }
+  // if (keyLabel === "tax") {
+  //   modifier = undefined;
+  // }
   // Parse values with suffixes back into numbers
   const parseValue = (val) => {
     const suffixes = { k: 1e3, M: 1e6, G: 1e9, T: 1e12, P: 1e15 };
@@ -130,13 +191,17 @@ const KeyValueChip = ({
   };
 
   const handleModifierMenuClose = (newModifier) => {
-    if (newModifier) {
-      setCurrentModifier(newModifier);
+    let processedModifier = newModifier;
+    if (processedModifier === "") {
+      processedModifier = "value"; // Default to "value" if empty
+    }
+    if (processedModifier) {
+      setCurrentModifier(processedModifier);
       onChange?.({
         key: keyLabel,
         value: parseValue(currentValue),
         symbol: currentSymbol,
-        modifier: newModifier,
+        modifier: processedModifier,
       });
     }
     setAnchorElModifier(null);
@@ -250,7 +315,7 @@ const KeyValueChip = ({
               marginLeft: "1em",
             }}
           >
-            {modifier && (
+            {currentModifier && (
               <span
                 style={{
                   position: "absolute",
@@ -267,17 +332,19 @@ const KeyValueChip = ({
                   color: textColor,
                   display: "block",
                   overflow: "visible",
-                  backgroundColor: borderColor,
-                  borderRadius: modifier == "value" ? "0 16px 16px 0" : "16px",
-                  border:
-                    modifier == "value" ? "none" : `2px solid ${darkColor}`,
+                  backgroundColor: backgroundColor,
+                  borderRadius: "0 16px 16px 0",
+                  borderLeft:
+                    currentModifier == "value"
+                      ? "none"
+                      : `1px solid ${darkColor}80`,
                   boxSizing: "border-box",
                   cursor: "pointer",
-                  opacity: modifier == "value" ? 0.25 : 1,
+                  opacity: currentModifier == "value" ? 0.25 : 1,
                 }}
                 onClick={handleModifierClick}
               >
-                {modifier == "value" ? "" : modifier}
+                {currentModifier == "value" ? "" : currentModifier}
               </span>
             )}
             <Typography
@@ -305,23 +372,25 @@ const KeyValueChip = ({
                 height: "30px",
               }}
             >
-              <Typography
-                variant="body2"
-                sx={{
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  backgroundColor: borderColor,
-                  color: textColor,
-                  borderRadius: "4px",
-                  padding: "2px 4px",
-                  height: "1.1em",
-                  lineHeight: "1.1em",
-                  marginTop: "6px",
-                }}
-                onClick={handleSymbolClick}
-              >
-                {currentSymbol}
-              </Typography>
+              {symbol !== null && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                    backgroundColor: backgroundColor,
+                    color: textColor,
+                    borderRadius: "4px",
+                    padding: "2px 4px",
+                    height: "1.1em",
+                    lineHeight: "1.1em",
+                    marginTop: "6px",
+                  }}
+                  onClick={handleSymbolClick}
+                >
+                  {currentSymbol}
+                </Typography>
+              )}
 
               <Typography
                 variant="body2"
@@ -347,16 +416,16 @@ const KeyValueChip = ({
           padding: "0 0 0 1em",
           height: "60px",
           "& .MuiChip-label": { display: "block", padding: "1em" },
-          background: `linear-gradient(to bottom, ${borderColor} 50%, ${lightColor} 50%)`,
+          background: `linear-gradient(to bottom, ${backgroundColor} 50%, ${lightColor} 50%)`,
           "& .MuiChip-deleteIcon": {
             marginTop: "-28px",
             color: lightColor,
           },
           "&:hover": {
-            background: `linear-gradient(to bottom, ${borderColor} 50%, ${lightColor} 50%)`,
+            background: `linear-gradient(to bottom, ${backgroundColor} 50%, ${lightColor} 50%)`,
           },
           "&:active": {
-            background: `linear-gradient(to bottom, ${borderColor} 50%, ${lightColor} 50%)`,
+            background: `linear-gradient(to bottom, ${backgroundColor} 50%, ${lightColor} 50%)`,
           },
         }}
       />
@@ -369,7 +438,7 @@ const KeyValueChip = ({
           <Box
             sx={{
               padding: "8px",
-              backgroundColor: borderColor,
+              backgroundColor: backgroundColor,
               borderRadius: "4px",
               boxShadow:
                 "0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)",
@@ -396,7 +465,7 @@ const KeyValueChip = ({
                   textAlign: "center",
                 },
                 "& .MuiInputBase-root": {
-                  backgroundColor: borderColor,
+                  backgroundColor: backgroundColor,
                   color: textColor,
                   borderRadius: "4px",
                   padding: "0 2px 2px 2px",
@@ -411,7 +480,7 @@ const KeyValueChip = ({
           <Box
             sx={{
               padding: "8px",
-              backgroundColor: borderColor,
+              backgroundColor: backgroundColor,
               color: textColor,
               borderRadius: "4px",
               boxShadow:
@@ -445,7 +514,7 @@ const KeyValueChip = ({
                       textAlign: "center",
                     },
                     "& .MuiInputBase-root": {
-                      backgroundColor: borderColor,
+                      backgroundColor: backgroundColor,
                       color: textColor,
                       borderRadius: "4px",
                       padding: "0 2px 2px 2px",
@@ -468,7 +537,7 @@ const KeyValueChip = ({
             "& .MuiMenuItem-root": {
               backgroundColor: lightColor,
               "&.Mui-selected": {
-                backgroundColor: borderColor,
+                backgroundColor: backgroundColor,
                 color: textColor,
               },
               "&:hover, &.Mui-focusVisible": {
@@ -510,7 +579,7 @@ const KeyValueChip = ({
             "& .MuiMenuItem-root": {
               backgroundColor: lightColor,
               "&.Mui-selected": {
-                backgroundColor: borderColor,
+                backgroundColor: backgroundColor,
                 color: textColor,
               },
               "&:hover, &.Mui-focusVisible": {
@@ -536,6 +605,7 @@ const KeyValueChip = ({
                 handleModifierMenuClose(modifier);
               }
             }}
+            style={{ minHeight: "1.5em" }}
           >
             {modifier}
           </MenuItem>

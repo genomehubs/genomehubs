@@ -57,15 +57,17 @@ const ChipSearch = ({
       >
         {chips.map((chip, index) => {
           if (chip === "AND") {
+            return null; // Skip rendering "AND" as a Chip
+            // Uncomment the following lines if you want to render "AND" as a Chip
             // Render "AND" as a regular Chip
-            return (
-              <Chip
-                key={index}
-                label={chip}
-                onDelete={() => handleDelete(chip)}
-                color="primary"
-              />
-            );
+            // return (
+            //   <Chip
+            //     key={index}
+            //     label={chip}
+            //     onDelete={() => handleDelete(chip)}
+            //     color="primary"
+            //   />
+            // );
           } else if (chip.includes("=")) {
             // Render key=value chips as KeyValueChip
             const [key, value] = chip.split("=");
@@ -85,9 +87,9 @@ const ChipSearch = ({
               .replace(")", "")
               .split("(")
               .map((str) => str.trim());
-            let symbol = "";
+            let modifier = "";
             if (func.startsWith("tax_")) {
-              symbol = func.replace("tax_", "");
+              modifier = func.replace("tax_", "");
               func = "tax";
             }
 
@@ -96,7 +98,9 @@ const ChipSearch = ({
                 key={index}
                 keyLabel={func}
                 value={variable}
-                symbol={symbol}
+                modifier={modifier}
+                symbol={null}
+                palette="purple"
                 onChange={handleChipChange}
                 onDelete={() => handleDelete(chip)}
               />

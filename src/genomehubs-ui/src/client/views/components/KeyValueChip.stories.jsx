@@ -10,6 +10,22 @@ export default {
     value: { control: "text" },
     symbol: { control: { type: "select", options: ["=", ">=", "<="] } },
     modifier: { control: "text" },
+    palette: {
+      control: {
+        type: "select",
+        options: [
+          "red",
+          "orange",
+          "yellow",
+          "green",
+          "blue",
+          "purple",
+          "grey",
+          "black",
+          "white",
+        ],
+      },
+    },
     onChange: { action: "onChange" },
   },
 };
@@ -20,6 +36,7 @@ const Template = (args) => {
     value: args.value,
     symbol: args.symbol,
     modifier: args.modifier,
+    palette: args.palette,
   });
 
   const handleChipChange = (updatedChip) => {
@@ -33,6 +50,7 @@ const Template = (args) => {
       value={chipData.value}
       symbol={chipData.symbol}
       modifier={chipData.modifier}
+      palette={chipData.palette} // Pass the palette prop
       onChange={handleChipChange}
     />
   );
@@ -71,6 +89,7 @@ TaxKey.args = {
   keyLabel: "tax",
   value: "Eukaryota",
   symbol: "tree",
+  palette: "purple",
 };
 
 export const LongValue = Template.bind({});
