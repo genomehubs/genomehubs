@@ -31,8 +31,8 @@ export const fetchTaxonomicRanks = async ({ req }) => {
         },
       },
     });
-
-    const ranks = esResult?.body?.aggregations?.unique_ranks?.buckets.map(
+    const aggregations = esResult?.body?.aggregations || esResult?.aggregations;
+    const ranks = aggregations?.unique_ranks?.buckets.map(
       (bucket) => bucket.key
     );
     return {
