@@ -202,6 +202,7 @@ const KeyValueChip = ({
         value: parseValue(currentValue),
         symbol: currentSymbol,
         modifier: processedModifier,
+        palette,
       });
     }
     setAnchorElModifier(null);
@@ -215,6 +216,7 @@ const KeyValueChip = ({
         value: parseValue(currentValue),
         modifier: currentModifier,
         symbol: newSymbol,
+        palette,
       });
     }
     setAnchorElSymbol(null);
@@ -235,12 +237,13 @@ const KeyValueChip = ({
     setIsEditingValue(false);
     setAnchorElValue(null);
     const parsedValue = parseValue(currentValue);
-    setCurrentValue(formatValue(parsedValue)); // Reformat the value for display
+    setCurrentValue(keyLabel == "tax" ? parsedValue : formatValue(parsedValue)); // Reformat the value for display
     onChange?.({
       key: keyLabel,
       value: parsedValue,
       symbol: currentSymbol,
       modifier: currentModifier,
+      palette,
     });
   };
 
@@ -272,6 +275,7 @@ const KeyValueChip = ({
       value: parseValue(currentValue),
       symbol: newSymbol,
       modifier: currentModifier,
+      palette,
     });
   };
 

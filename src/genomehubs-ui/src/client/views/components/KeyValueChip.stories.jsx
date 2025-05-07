@@ -88,7 +88,17 @@ export const TaxKey = Template.bind({});
 TaxKey.args = {
   keyLabel: "tax",
   value: "Eukaryota",
-  symbol: "tree",
+  symbol: null,
+  modifier: "tree",
+  palette: "purple",
+};
+
+export const LongTaxKey = Template.bind({});
+LongTaxKey.args = {
+  keyLabel: "tax",
+  value: "9608[Canidae]",
+  symbol: null,
+  modifier: "name",
   palette: "purple",
 };
 
