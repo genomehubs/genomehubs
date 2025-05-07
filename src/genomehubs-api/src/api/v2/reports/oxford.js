@@ -46,7 +46,7 @@ const parseCollate = (query) => {
 const getSequenceLengths = async ({ assemblies, xQuery, taxonomy, req }) => {
   let seqQuery = {
     ...xQuery,
-    query: `assembly_id=${assemblies.join(",")} AND feature_type=sequence`,
+    query: `assembly_id=${assemblies.join(",")} AND feature_type=topLevel`,
     fields: ["sequence_id", "length"],
     exclusions: {},
   };
