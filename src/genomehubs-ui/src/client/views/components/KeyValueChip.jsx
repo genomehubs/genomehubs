@@ -22,7 +22,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+
+import ErrorOutlineIcon from "@mui/icons-material/Error";
+import Tooltip from "./Tooltip";
 
 const listOperators = (keyLabel) => {
   // Define the available operators based on the keyLabel
@@ -43,7 +46,7 @@ const listModifiers = (keyLabel) => {
   }
 };
 
-const chipPalletes = {
+const chipPalettes = {
   blue: {
     dark: "#185b89",
     light: "#a6cee3",
@@ -100,6 +103,42 @@ const chipPalletes = {
   },
 };
 
+const allowedSymbols = ["=", "!=", ">=", "<=", "<", ">"];
+const allowedKeywordSymbols = allowedSymbols.slice(0, 2);
+const allowedModifiers = [
+  "count",
+  "length",
+  "max",
+  "mean",
+  "median",
+  "min",
+  "sum",
+  "value",
+];
+
+const allowedKeys = {
+  assembly_span: {
+    symbols: allowedSymbols,
+    modifiers: allowedModifiers,
+    type: "number",
+  },
+  assembly_level: {
+    symbols: allowedSymbols,
+    modifiers: "value",
+    type: "string",
+  },
+  tax: {
+    symbols: [],
+    modifiers: ["name", "tree", "eq", "lineage", "rank", "level"],
+    type: "string",
+  },
+  collate: {
+    symbols: [],
+    modifiers: ["collate"],
+    type: "string",
+  },
+};
+
 const KeyValueChip = ({
   keyLabel,
   value,
@@ -141,10 +180,25 @@ const KeyValueChip = ({
     return tier === 0 ? num.toString() : `${num}${suffixes[tier]}`;
   };
 
-  let darkColor = chipPalletes[palette].dark;
-  let lightColor = chipPalletes[palette].light;
-  let backgroundColor = chipPalletes[palette].background;
-  let textColor = chipPalletes[palette].text;
+  const colorsFromPalette = (palette) => {
+    // Check if the palette exists in the chipPalettes object
+    if (chipPalettes[palette]) {
+      return {
+        darkColor: chipPalettes[palette].dark,
+        lightColor: chipPalettes[palette].light,
+        backgroundColor: chipPalettes[palette].background,
+        textColor: chipPalettes[palette].text,
+      };
+    } else {
+      // If the palette doesn't exist, return default colors
+      return {
+        darkColor: chipPalettes["blue"].dark,
+        lightColor: chipPalettes["blue"].light,
+        backgroundColor: chipPalettes["blue"].background,
+        textColor: chipPalettes["blue"].text,
+      };
+    }
+  };
 
   const [anchorElSymbol, setAnchorElSymbol] = useState(null);
   const [anchorElModifier, setAnchorElModifier] = useState(null);
@@ -165,11 +219,10 @@ const KeyValueChip = ({
   const [availableModifiers, setAvailableModifiers] = useState(
     listModifiers(keyLabel),
   );
+  const [{ darkColor, lightColor, backgroundColor, textColor }, setColors] =
+    useState(colorsFromPalette(palette));
+  const [validationError, setValidationError] = useState(false);
 
-  // if (keyLabel === "tax") {
-  //   modifier = undefined;
-  // }
-  // Parse values with suffixes back into numbers
   const parseValue = (val) => {
     const suffixes = { k: 1e3, M: 1e6, G: 1e9, T: 1e12, P: 1e15 };
     const match = val.replace(",", "").match(/^([\d.]+)([kMGTPE]?)$/);
@@ -298,6 +351,82 @@ const KeyValueChip = ({
     return str;
   };
 
+  const validateKey = (key) => {
+    // Check if the key is in the list of available keys
+    return allowedKeys.hasOwnProperty(key);
+  };
+  const validateModifier = ({ key, modifier }) => {
+    // Check if the modifier is in the list of available modifiers
+    if (modifier === null) {
+      return true; // Allow null modifier
+    }
+    return allowedKeys[key]?.modifiers.includes(modifier);
+  };
+
+  const validateSymbol = ({ key, symbol }) => {
+    // Check if the symbol is in the list of available symbols
+    if (symbol === null) {
+      return true; // Allow null symbol
+    }
+    return allowedKeys[key]?.symbols.includes(symbol);
+  };
+  const validateValue = ({ key, value }) => {
+    // Check if the value is of the expected type for the key
+    const expectedType = allowedKeys[key]?.type;
+    if (expectedType === "number") {
+      return !isNaN(parseValue(value));
+    } else if (expectedType === "string") {
+      return (
+        value !== null &&
+        value !== undefined &&
+        typeof value.toString === "function"
+      );
+    }
+  };
+
+  const validateChip = ({ key, value, symbol, modifier }) => {
+    // Validate the key, value, symbol, and modifier
+    if (modifier == "collate") {
+      value = `${key},${value}`;
+      key = "collate";
+    }
+    if (!validateKey(key)) {
+      setValidationError("invalid key");
+      return false;
+    }
+    if (!validateValue({ key, value })) {
+      setValidationError("invalid value");
+      return false;
+    }
+    if (!validateSymbol({ key, symbol })) {
+      setValidationError("invalid symbol");
+      return false;
+    }
+    if (!validateModifier({ key, modifier })) {
+      setValidationError("invalid modifier");
+      return false;
+    }
+    setValidationError(false);
+    return true;
+  };
+
+  useEffect(() => {
+    // Validate the chip data when it changes
+    const isValid = validateChip({
+      key: currentKey,
+      value: currentValue,
+      symbol: currentSymbol,
+      modifier: currentModifier,
+    });
+
+    if (!isValid) {
+      setColors(colorsFromPalette("orange"));
+    }
+    if (isValid) {
+      setColors(colorsFromPalette(palette));
+    }
+  }, [currentKey, currentValue, currentSymbol, currentModifier]);
+
   return (
     <Box
       sx={{
@@ -359,6 +488,7 @@ const KeyValueChip = ({
                 whiteSpace: "nowrap",
                 height: "30px",
                 lineHeight: "30px",
+                marginRight: validationError ? "-1em" : "0",
                 color: textColor,
                 opacity: currentValue && !isEditingKey ? 1 : 0.5,
                 cursor: "pointer",
@@ -366,6 +496,24 @@ const KeyValueChip = ({
               onClick={handleKeyEdit}
             >
               {currentKey}
+              {validationError && (
+                <Tooltip title={validationError} arrow>
+                  <span
+                    style={{
+                      // fontSize: "0.8em",
+                      marginLeft: "1px",
+                      color: textColor,
+                    }}
+                  >
+                    <ErrorOutlineIcon
+                      sx={{
+                        fontSize: "1.2em",
+                        // color: chipPalettes.red.dark,
+                      }}
+                    />
+                  </span>
+                </Tooltip>
+              )}
             </Typography>
             <Box
               sx={{

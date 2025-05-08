@@ -27,9 +27,10 @@ const extractKeyValue = (chip) => {
         key = "tax";
       }
       if (modifier == "collate") {
-        value = key;
-        key = "collate";
-        modifier = null;
+        [key, ...value] = key.split(/\s*,\s*/);
+        value = value.join(",");
+        // key = "collate";
+        // modifier = null;
       }
     }
   }
@@ -48,15 +49,17 @@ const ChipSearch = ({
 }) => {
   const removeDuplicates = (arr) => {
     let uniqueArr = [];
-    let keyOrder = [];
+    let keyOrder = ["tax"];
     let seen = new Set(["AND"]);
-    let byKey = {};
+    let byKey = { tax: [] };
     arr.forEach((item) => {
       if (!seen.has(item)) {
         let { key } = extractKeyValue(item);
         if (!byKey[key]) {
           byKey[key] = [];
-          keyOrder.push(key);
+          if (key != "tax") {
+            keyOrder.push(key);
+          }
         }
         byKey[key].push(item);
         //uniqueArr.push(item);
@@ -77,7 +80,10 @@ const ChipSearch = ({
     return uniqueArr;
   };
 
-  const setPalette = (key) => {
+  const setPalette = ({ key, modifier }) => {
+    if (modifier == "collate") {
+      return "green";
+    }
     switch (key) {
       case "tax":
         return "purple";
@@ -141,7 +147,7 @@ const ChipSearch = ({
             value={value}
             symbol={symbol}
             modifier={modifier}
-            palette={setPalette(key)}
+            palette={setPalette({ key, modifier })} // Set the palette based on the key
             onChange={handleChipChange}
             onDelete={() => handleDelete(chip)}
             style={{ marginRight: "1em" }} // Add margin to chips

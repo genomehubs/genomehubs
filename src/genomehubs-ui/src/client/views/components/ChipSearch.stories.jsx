@@ -1,9 +1,12 @@
 import ChipSearch from "./ChipSearch";
+import { Provider } from "react-redux";
 import React from "react";
+import colorStore from "../reducers/color.store";
 
 export default {
   title: "Components/ChipSearch",
   component: ChipSearch,
+  decorators: [(story) => <Provider store={colorStore}>{story()}</Provider>],
 };
 
 const Template = (args) => <ChipSearch {...args} />;

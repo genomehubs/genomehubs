@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 
 import KeyValueChip from "./KeyValueChip";
+import { Provider } from "react-redux";
+import colorStore from "../reducers/color.store";
 
 export default {
   title: "Components/KeyValueChip",
   component: KeyValueChip,
+  decorators: [(story) => <Provider store={colorStore}>{story()}</Provider>],
   argTypes: {
     keyLabel: { control: "text" },
     value: { control: "text" },
