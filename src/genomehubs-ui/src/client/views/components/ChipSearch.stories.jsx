@@ -20,7 +20,7 @@ WithInitialChips.args = {
 };
 
 export const WithValueNote = Template.bind({});
-WithInitialChips.args = {
+WithValueNote.args = {
   initialChips: ["assembly_span=100000000", "AND", "tax_tree(2759[Eukaryota])"],
 };
 

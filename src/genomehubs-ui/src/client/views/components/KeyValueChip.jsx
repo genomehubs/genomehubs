@@ -180,7 +180,7 @@ const KeyValueChip = ({
     keyLabel === "tax" ? value : formatValue(value),
   );
   const [currentValueNote, setCurrentValueNote] = useState(valueNote);
-  const previousValueNote = useState(valueNote);
+  const [previousValueNote, setPreviousValueNote] = useState(valueNote);
   const [currentKey, setCurrentKey] = useState(keyLabel);
   const [isEditingValue, setIsEditingValue] = useState(false);
   const [isEditingKey, setIsEditingKey] = useState(false);
@@ -471,7 +471,7 @@ const KeyValueChip = ({
             )}
             <Typography
               variant="body2"
-              ref={anchorElKey}
+              ref={(el) => setAnchorElKey(el)} // Use a ref-setter function
               sx={{
                 fontWeight: "bold",
                 whiteSpace: "nowrap",
@@ -479,7 +479,7 @@ const KeyValueChip = ({
                 lineHeight: "30px",
                 marginRight: validationError ? "-1em" : "0",
                 color: textColor,
-                opacity: !isEditingKey ? 1 : 0.5,
+                opacity: isEditingKey ? 0.5 : 1,
                 cursor: "pointer",
               }}
               onClick={handleKeyEdit}
@@ -536,7 +536,7 @@ const KeyValueChip = ({
 
               <Typography
                 variant="body2"
-                ref={anchorElValue}
+                ref={(el) => setAnchorElValue(el)} // Use a ref-setter function
                 sx={{
                   cursor: "pointer",
                   whiteSpace: previousValue.length > 100 ? "normal" : "nowrap",
