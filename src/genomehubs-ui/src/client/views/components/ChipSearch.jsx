@@ -1,8 +1,9 @@
 import {
   Box,
-  Chip,
   IconButton,
   InputAdornment,
+  Menu,
+  MenuItem,
   TextField,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -10,8 +11,44 @@ import React, { useEffect, useState } from "react";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"; // Import an add icon
 import KeyValueChip from "./KeyValueChip";
 
+const allowedSymbols = ["=", "!=", ">=", "<=", "<", ">"];
+const allowedKeywordSymbols = allowedSymbols.slice(0, 2);
+const allowedModifiers = [
+  "count",
+  "length",
+  "max",
+  "mean",
+  "median",
+  "min",
+  "sum",
+  "value",
+];
+const allowedKeys = {
+  assembly_span: {
+    symbols: allowedSymbols,
+    modifiers: allowedModifiers,
+    type: "number",
+  },
+  assembly_level: {
+    symbols: allowedSymbols,
+    modifiers: "value",
+    type: "string",
+  },
+  tax: {
+    symbols: [],
+    modifiers: ["name", "tree", "eq", "lineage", "rank", "level"],
+    type: "string",
+  },
+  collate: {
+    symbols: [],
+    modifiers: ["collate"],
+    type: "string",
+  },
+};
+
 const extractKeyValue = (chip) => {
   let modifier;
+  let valueNote;
   let [key, symbol, value] = chip.split(/\s*(!=|>=|<=|<|>|=)\s*/);
   if (key.includes("(")) {
     if (value) {
@@ -21,23 +58,33 @@ const extractKeyValue = (chip) => {
       // Extract the function and variable
       [modifier, key] = key.split(/\s*\(\s*/);
       key = key.replace(")", "").trim();
-      if (modifier.startsWith("tax_")) {
-        modifier = modifier.replace("tax_", "");
+      if (modifier.startsWith("tax_") || modifier.startsWith("tax-")) {
+        modifier = modifier.replace("tax_", "").replace("tax-", "");
         value = key;
         key = "tax";
-      }
-      if (modifier == "collate") {
+        // if value matches value[valueNote], split into 2 variables
+        if (value.includes("[")) {
+          [value, valueNote] = value.split(/\s*\[\s*/);
+          valueNote = valueNote.replace("]", "").trim();
+        }
+      } else if (modifier == "collate") {
         [key, ...value] = key.split(/\s*,\s*/);
         value = value.join(",");
         // key = "collate";
         // modifier = null;
       }
     }
+  } else if (!value) {
+    symbol = "=";
+    modifier = "value";
+  } else if (value && symbol) {
+    modifier = "value";
   }
   return {
-    key: key.trim(),
+    key: key.trim().replace("-", "_"),
     symbol: symbol ? symbol.trim() : null,
-    value: value ? value.trim() : null,
+    value: value ? value.trim() : key == "tax" ? "" : null,
+    valueNote: valueNote ? valueNote.trim() : null,
     modifier: modifier ? modifier.trim() : null,
   };
 };
@@ -48,6 +95,7 @@ const ChipSearch = ({
   placeholder = "Enter key=value, function(variable), or AND",
 }) => {
   const removeDuplicates = (arr) => {
+    const symbolOrder = [">", ">=", "=", "<=", "<", "!="];
     let uniqueArr = [];
     let keyOrder = ["tax"];
     let seen = new Set(["AND"]);
@@ -67,7 +115,16 @@ const ChipSearch = ({
       }
     });
     for (let key of keyOrder) {
-      for (let item of byKey[key]) {
+      let items = byKey[key];
+      if (items.length > 1) {
+        // Sort by symbol order
+        items.sort((a, b) => {
+          let symbolA = extractKeyValue(a).symbol;
+          let symbolB = extractKeyValue(b).symbol;
+          return symbolOrder.indexOf(symbolA) - symbolOrder.indexOf(symbolB);
+        });
+      }
+      for (let item of items) {
         if (!uniqueArr.includes(item)) {
           if (uniqueArr.length > 0) {
             uniqueArr.push("AND");
@@ -97,6 +154,7 @@ const ChipSearch = ({
   const [inputValue, setInputValue] = useState(initialInput);
   const [chips, setChips] = useState(removeDuplicates(initialChips));
   const [chipsArr, setChipsArr] = useState(chips);
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
@@ -107,11 +165,12 @@ const ChipSearch = ({
   };
 
   const parseInput = (input) => {
-    const regex =
-      /((?:\w+\()?\w+\)*\s*(?:<=|>=|!=|=|<|>)\s*\w+|\w+\s*\(\s*[\w\[\],]+\s*\)|AND)/g;
-    const matches = input.match(regex);
-    if (matches) {
-      setChips((prevChips) => removeDuplicates([...prevChips, ...matches]));
+    // const regex =
+    //   /\s+AND\s+|((?:\w+\()?[\w-]+\)*\s*(?:<=|>=|!=|=|<|>)\s*\w[\w\s,-]*|\w[\w-]+\s*\(\s*\w[\w\s\[\],-]+\s*\)|\w[\w-]+)/g;
+    // const matches = input.match(regex);
+    const terms = input.split(/\s+AND\s+/i); //.flatMap((part) =>
+    if (terms && terms.length > 0) {
+      setChips((prevChips) => removeDuplicates([...prevChips, ...terms]));
     }
   };
 
@@ -129,8 +188,21 @@ const ChipSearch = ({
     );
   };
 
-  const handleAddEmptyChip = () => {
-    setChips((prevChips) => removeDuplicates([...prevChips, "key=value"])); // Add a default empty chip
+  const handleAddEmptyChip = (newChip = "key=value") => {
+    setChips((prevChips) => removeDuplicates([...prevChips, newChip])); // Add a default empty chip
+  };
+
+  const handleMenuOpen = (event) => {
+    setMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+  };
+
+  const handleMenuSelect = (chipType) => {
+    handleAddEmptyChip(chipType);
+    handleMenuClose();
   };
 
   const updateChipsArr = (chips) => {
@@ -139,14 +211,17 @@ const ChipSearch = ({
         return null; // Skip rendering "AND" as a Chip
       } else {
         // Extract key, symbol, and value from the chip
-        const { key, symbol, value, modifier } = extractKeyValue(chip);
+        const { key, symbol, value, valueNote, modifier } =
+          extractKeyValue(chip);
         return (
           <KeyValueChip
             key={chip + index} // Use a unique key for each chip
             keyLabel={key}
             value={value}
+            valueNote={valueNote}
             symbol={symbol}
             modifier={modifier}
+            allowedKeys={allowedKeys}
             palette={setPalette({ key, modifier })} // Set the palette based on the key
             onChange={handleChipChange}
             onDelete={() => handleDelete(chip)}
@@ -189,11 +264,53 @@ const ChipSearch = ({
           slotProps={{
             input: {
               startAdornment: (
-                <InputAdornment position="start">
-                  <IconButton onClick={handleAddEmptyChip} edge="start">
-                    <AddCircleOutlineIcon />
-                  </IconButton>
-                </InputAdornment>
+                <>
+                  <InputAdornment position="start">
+                    <IconButton onClick={handleMenuOpen} edge="start">
+                      <AddCircleOutlineIcon />
+                    </IconButton>
+                  </InputAdornment>
+                  <Menu
+                    anchorEl={menuAnchorEl}
+                    open={Boolean(menuAnchorEl)}
+                    onClose={handleMenuClose}
+                  >
+                    {Object.entries(allowedKeys).flatMap(([chipType, obj]) => {
+                      let chipTypes = [];
+                      if (chipType == "collate") {
+                        chipTypes.push({
+                          key: "collate",
+                          value: "collate(sequence_id,name)",
+                        });
+                      } else if (chipType == "tax") {
+                        chipTypes.push({
+                          key: "tax_tree",
+                          value: "tax_tree()",
+                        });
+                        chipTypes.push({
+                          key: "tax_name",
+                          value: "tax_name()",
+                        });
+                        chipTypes.push({
+                          key: "tax_rank",
+                          value: "tax_rank()",
+                        });
+                      } else {
+                        chipTypes.push({ key: chipType, value: chipType });
+                      }
+                      return chipTypes.map(({ key, value }) => {
+                        return (
+                          <MenuItem
+                            key={key}
+                            onClick={() => handleMenuSelect(value)}
+                          >
+                            {key}
+                          </MenuItem>
+                        );
+                      });
+                    })}
+                  </Menu>
+                </>
               ),
             },
           }}

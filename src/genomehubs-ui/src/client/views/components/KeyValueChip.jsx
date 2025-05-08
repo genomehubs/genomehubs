@@ -24,8 +24,10 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
-import ErrorOutlineIcon from "@mui/icons-material/Error";
+import AdjustIcon from "@mui/icons-material/Adjust";
+import ErrorIcon from "@mui/icons-material/Error";
 import Tooltip from "./Tooltip";
+import TreeIcon from "@mui/icons-material/Tree";
 
 const listOperators = (keyLabel) => {
   // Define the available operators based on the keyLabel
@@ -103,45 +105,10 @@ const chipPalettes = {
   },
 };
 
-const allowedSymbols = ["=", "!=", ">=", "<=", "<", ">"];
-const allowedKeywordSymbols = allowedSymbols.slice(0, 2);
-const allowedModifiers = [
-  "count",
-  "length",
-  "max",
-  "mean",
-  "median",
-  "min",
-  "sum",
-  "value",
-];
-
-const allowedKeys = {
-  assembly_span: {
-    symbols: allowedSymbols,
-    modifiers: allowedModifiers,
-    type: "number",
-  },
-  assembly_level: {
-    symbols: allowedSymbols,
-    modifiers: "value",
-    type: "string",
-  },
-  tax: {
-    symbols: [],
-    modifiers: ["name", "tree", "eq", "lineage", "rank", "level"],
-    type: "string",
-  },
-  collate: {
-    symbols: [],
-    modifiers: ["collate"],
-    type: "string",
-  },
-};
-
 const KeyValueChip = ({
   keyLabel,
   value,
+  valueNote,
   symbol = "=",
   modifier = "value",
   availableKeys = [
@@ -151,6 +118,7 @@ const KeyValueChip = ({
     "genome_size",
     "tax",
   ],
+  allowedKeys = {},
   onChange,
   onDelete,
   palette = "blue",
@@ -208,6 +176,11 @@ const KeyValueChip = ({
   const [currentValue, setCurrentValue] = useState(
     keyLabel === "tax" ? value : formatValue(value),
   );
+  const [previousValue, setPreviousValue] = useState(
+    keyLabel === "tax" ? value : formatValue(value),
+  );
+  const [currentValueNote, setCurrentValueNote] = useState(valueNote);
+  const previousValueNote = useState(valueNote);
   const [currentKey, setCurrentKey] = useState(keyLabel);
   const [isEditingValue, setIsEditingValue] = useState(false);
   const [isEditingKey, setIsEditingKey] = useState(false);
@@ -282,6 +255,7 @@ const KeyValueChip = ({
 
   const handleValueChange = (event) => {
     setCurrentValue(event.target.value);
+    setCurrentValueNote(undefined);
   };
 
   const handleValueBlur = (event) => {
@@ -291,9 +265,14 @@ const KeyValueChip = ({
     setAnchorElValue(null);
     const parsedValue = parseValue(currentValue);
     setCurrentValue(keyLabel == "tax" ? parsedValue : formatValue(parsedValue)); // Reformat the value for display
+    setPreviousValue(
+      keyLabel == "tax" ? parsedValue : formatValue(parsedValue),
+    );
+    setPreviousValueNote(undefined);
     onChange?.({
       key: keyLabel,
       value: parsedValue,
+      valueNote: undefined,
       symbol: currentSymbol,
       modifier: currentModifier,
       palette,
@@ -337,6 +316,7 @@ const KeyValueChip = ({
     setCurrentModifier("value");
     setCurrentSymbol("=");
     setCurrentValue("");
+    setCurrentValueNote(undefined);
     onDelete?.({ key: keyLabel, value: "", symbol: "=", modifier: "value" });
   };
 
@@ -411,21 +391,29 @@ const KeyValueChip = ({
   };
 
   useEffect(() => {
-    // Validate the chip data when it changes
-    const isValid = validateChip({
-      key: currentKey,
-      value: currentValue,
-      symbol: currentSymbol,
-      modifier: currentModifier,
-    });
+    if (validationError || (!isEditingValue && !isEditingKey)) {
+      // Validate the chip data when it loses focus
+      const isValid = validateChip({
+        key: currentKey,
+        value: currentValue,
+        symbol: currentSymbol,
+        modifier: currentModifier,
+      });
 
-    if (!isValid) {
-      setColors(colorsFromPalette("orange"));
+      if (!isValid) {
+        setColors(colorsFromPalette("orange"));
+      } else {
+        setColors(colorsFromPalette(palette));
+      }
     }
-    if (isValid) {
-      setColors(colorsFromPalette(palette));
-    }
-  }, [currentKey, currentValue, currentSymbol, currentModifier]);
+  }, [
+    isEditingValue,
+    isEditingKey,
+    currentKey,
+    currentValue,
+    currentSymbol,
+    currentModifier,
+  ]);
 
   return (
     <Box
@@ -458,11 +446,12 @@ const KeyValueChip = ({
                   height: "60px",
                   width: "30px",
                   fontSize: "1em",
+                  fontWeight: "bold",
                   lineHeight: "28px",
                   textOrientation: "mixed",
                   writingMode: "vertical-lr",
                   transform: "rotate(180deg)",
-                  color: textColor,
+                  color: `${textColor}dd`,
                   display: "block",
                   overflow: "visible",
                   backgroundColor: backgroundColor,
@@ -490,7 +479,7 @@ const KeyValueChip = ({
                 lineHeight: "30px",
                 marginRight: validationError ? "-1em" : "0",
                 color: textColor,
-                opacity: currentValue && !isEditingKey ? 1 : 0.5,
+                opacity: !isEditingKey ? 1 : 0.5,
                 cursor: "pointer",
               }}
               onClick={handleKeyEdit}
@@ -505,7 +494,7 @@ const KeyValueChip = ({
                       color: textColor,
                     }}
                   >
-                    <ErrorOutlineIcon
+                    <ErrorIcon
                       sx={{
                         fontSize: "1.2em",
                         // color: chipPalettes.red.dark,
@@ -522,6 +511,7 @@ const KeyValueChip = ({
                 justifyContent: "center",
                 gap: 0.5,
                 height: "30px",
+                opacity: currentValue ? 1 : 0.5,
               }}
             >
               {symbol !== null && (
@@ -549,16 +539,28 @@ const KeyValueChip = ({
                 ref={anchorElValue}
                 sx={{
                   cursor: "pointer",
-                  whiteSpace: currentValue.length > 100 ? "normal" : "nowrap",
+                  whiteSpace: previousValue.length > 100 ? "normal" : "nowrap",
                   wordBreak:
-                    currentValue.length > 100 ? "break-word" : "normal",
-                  opacity: currentValue && !isEditingValue ? 1 : 0.5,
-                  fontStyle: currentValue ? "normal" : "italic",
+                    previousValue.length > 100 ? "break-word" : "normal",
+                  opacity: previousValue && !isEditingValue ? 1 : 0.5,
+                  fontStyle: previousValue ? "normal" : "italic",
                   marginTop: "6px",
                 }}
                 onClick={isEditingValue ? handleValueBlur : handleValueEdit}
               >
-                {truncate(currentValue) || "value"}
+                {truncate(previousValue) || "value"}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  opacity: 0.5,
+                  fontStyle: "italic",
+                  fontSize: "0.8em",
+                  marginTop: "10px",
+                  pointerEvents: "none",
+                }}
+              >
+                {previousValueNote}
               </Typography>
             </Box>
           </Box>
@@ -605,14 +607,18 @@ const KeyValueChip = ({
                   handleValueBlur(event);
                 }
               }}
-              multiline={currentValue.length * 8 > 100}
-              maxRows={Math.min(Math.ceil((currentValue.length * 8) / 100), 10)}
+              multiline={previousValue.length * 8 > 100}
+              maxRows={Math.min(
+                Math.ceil((previousValue.length * 8) / 100),
+                10,
+              )}
               size="small"
               variant="standard"
               autoFocus
               sx={{
                 marginTop: "4px",
-                width: `${currentValue.length * 8 > 100 ? 400 : currentValue.length * 8 + 40}px`,
+                transition: "width 0.2s ease", // Smoothly transition width changes
+                width: `${Math.min(previousValue.length * 8 + 40, 400)}px`, // Cap width at 400px
                 "& .MuiInputBase-input": {
                   textAlign: "center",
                 },
