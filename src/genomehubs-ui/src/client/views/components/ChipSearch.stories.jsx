@@ -18,7 +18,8 @@ WithInitialChips.args = {
 
 export const LongInput = Template.bind({});
 LongInput.args = {
-  initialInput: "key1=value1 AND function1(variable1) AND key2=value2",
+  initialInput:
+    "assembly_span=100000000 AND tax_tree(2759) AND assembly_level=chromosome AND collate(sequence_id,name)",
 };
 
 export const CustomPlaceholder = Template.bind({});

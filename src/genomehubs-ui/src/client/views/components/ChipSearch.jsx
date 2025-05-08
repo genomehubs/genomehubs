@@ -1,17 +1,96 @@
-import { Box, Chip, TextField } from "@mui/material";
-import React, { useState } from "react";
+import {
+  Box,
+  Chip,
+  IconButton,
+  InputAdornment,
+  TextField,
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
 
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"; // Import an add icon
 import KeyValueChip from "./KeyValueChip";
+
+const extractKeyValue = (chip) => {
+  let modifier;
+  let [key, symbol, value] = chip.split(/\s*(!=|>=|<=|<|>|=)\s*/);
+  if (key.includes("(")) {
+    if (value) {
+      [modifier, key] = key.split(/\s*\(\s*/);
+      key = key.replace(")", "").trim();
+    } else {
+      // Extract the function and variable
+      [modifier, key] = key.split(/\s*\(\s*/);
+      key = key.replace(")", "").trim();
+      if (modifier.startsWith("tax_")) {
+        modifier = modifier.replace("tax_", "");
+        value = key;
+        key = "tax";
+      }
+      if (modifier == "collate") {
+        value = key;
+        key = "collate";
+        modifier = null;
+      }
+    }
+  }
+  return {
+    key: key.trim(),
+    symbol: symbol ? symbol.trim() : null,
+    value: value ? value.trim() : null,
+    modifier: modifier ? modifier.trim() : null,
+  };
+};
 
 const ChipSearch = ({
   initialChips = [],
   initialInput = "",
   placeholder = "Enter key=value, function(variable), or AND",
 }) => {
+  const removeDuplicates = (arr) => {
+    let uniqueArr = [];
+    let keyOrder = [];
+    let seen = new Set(["AND"]);
+    let byKey = {};
+    arr.forEach((item) => {
+      if (!seen.has(item)) {
+        let { key } = extractKeyValue(item);
+        if (!byKey[key]) {
+          byKey[key] = [];
+          keyOrder.push(key);
+        }
+        byKey[key].push(item);
+        //uniqueArr.push(item);
+        seen.add(item);
+      }
+    });
+    for (let key of keyOrder) {
+      for (let item of byKey[key]) {
+        if (!uniqueArr.includes(item)) {
+          if (uniqueArr.length > 0) {
+            uniqueArr.push("AND");
+          }
+          uniqueArr.push(item);
+        }
+      }
+    }
+
+    return uniqueArr;
+  };
+
+  const setPalette = (key) => {
+    switch (key) {
+      case "tax":
+        return "purple";
+      case "collate":
+        return "green";
+      default:
+        return "blue";
+    }
+  };
+
   const [inputValue, setInputValue] = useState(initialInput);
-  const [chips, setChips] = useState(initialChips);
-  const boxRef = React.useRef(null);
-  const [isOverflowing, setIsOverflowing] = useState(false);
+  const [chips, setChips] = useState(removeDuplicates(initialChips));
+  const [chipsArr, setChipsArr] = useState(chips);
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
@@ -22,10 +101,11 @@ const ChipSearch = ({
   };
 
   const parseInput = (input) => {
-    const regex = /(\w+\s*=\s*\w+|\w+\s*\(\s*\w+\s*\)|AND)/g;
+    const regex =
+      /((?:\w+\()?\w+\)*\s*(?:<=|>=|!=|=|<|>)\s*\w+|\w+\s*\(\s*[\w\[\],]+\s*\)|AND)/g;
     const matches = input.match(regex);
     if (matches) {
-      setChips((prevChips) => [...prevChips, ...matches]);
+      setChips((prevChips) => removeDuplicates([...prevChips, ...matches]));
     }
   };
 
@@ -43,51 +123,38 @@ const ChipSearch = ({
     );
   };
 
-  let chipsArr = chips.map((chip, index) => {
-    if (chip === "AND") {
-      return null; // Skip rendering "AND" as a Chip
-    } else if (chip.includes("=")) {
-      // Render key=value chips as KeyValueChip
-      const [key, value] = chip.split("=");
-      return (
-        <KeyValueChip
-          key={index}
-          keyLabel={key}
-          value={value}
-          symbol="="
-          onChange={handleChipChange}
-          onDelete={() => handleDelete(chip)}
-          style={{ marginRight: "1em" }} // Add margin to chips
-        />
-      );
-    } else if (chip.includes("(") && chip.includes(")")) {
-      // Render function(variable) chips as KeyValueChip
-      let [func, variable] = chip
-        .replace(")", "")
-        .split("(")
-        .map((str) => str.trim());
-      let modifier = "";
-      if (func.startsWith("tax_")) {
-        modifier = func.replace("tax_", "");
-        func = "tax";
-      }
+  const handleAddEmptyChip = () => {
+    setChips((prevChips) => removeDuplicates([...prevChips, "key=value"])); // Add a default empty chip
+  };
 
-      return (
-        <KeyValueChip
-          key={index}
-          keyLabel={func}
-          value={variable}
-          modifier={modifier}
-          symbol={null}
-          palette="purple"
-          onChange={handleChipChange}
-          onDelete={() => handleDelete(chip)}
-          style={{ marginRight: "1em" }}
-        />
-      );
-    }
-    return null;
-  });
+  const updateChipsArr = (chips) => {
+    let newChipsArr = chips.map((chip, index) => {
+      if (chip === "AND") {
+        return null; // Skip rendering "AND" as a Chip
+      } else {
+        // Extract key, symbol, and value from the chip
+        const { key, symbol, value, modifier } = extractKeyValue(chip);
+        return (
+          <KeyValueChip
+            key={chip + index} // Use a unique key for each chip
+            keyLabel={key}
+            value={value}
+            symbol={symbol}
+            modifier={modifier}
+            palette={setPalette(key)}
+            onChange={handleChipChange}
+            onDelete={() => handleDelete(chip)}
+            style={{ marginRight: "1em" }} // Add margin to chips
+          />
+        );
+      }
+    });
+    setChipsArr(newChipsArr);
+  };
+
+  useEffect(() => {
+    updateChipsArr(chips);
+  }, [chips]);
 
   return (
     <Box
@@ -112,7 +179,17 @@ const ChipSearch = ({
             flexGrow: 1,
             minWidth: "300px",
             maxWidth: "900px",
-            // flexBasis: "100%", // Ensure TextField takes full width on wrap
+          }}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <IconButton onClick={handleAddEmptyChip} edge="start">
+                    <AddCircleOutlineIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
           }}
         />
       </>
