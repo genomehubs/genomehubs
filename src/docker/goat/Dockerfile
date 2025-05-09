@@ -12,7 +12,7 @@ RUN mkdir -p /genomehubs/local/render
 
 COPY genomehubs-ui-linux /genomehubs/genomehubs-ui
 
-COPY rendered/* /genomehubs/local/render/
+COPY rendered/ /genomehubs/local/render/
 
 RUN addgroup -S genomehubs \
     && adduser -S genomehubs -G genomehubs \
