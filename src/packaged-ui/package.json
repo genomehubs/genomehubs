@@ -14,8 +14,7 @@
   "pkg": {
     "assets": [
       "./src/public/**/*",
-      "./src/views/**/*",
-      "/Users/rchallis/projects/genomehubs/genomehubs/src/render/**/*"
+      "./src/views/**/*"
     ],
     "targets": [
       "node18-linux-x64",

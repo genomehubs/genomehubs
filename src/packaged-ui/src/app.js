@@ -57,15 +57,12 @@ const getDirectories = (srcPath) => {
     .filter((file) => fs.statSync(path.join(srcPath, file)).isDirectory());
 };
 
+let directories = getDirectories(path.resolve(__dirname, "public"));
+
 app.use(
   GH_BASENAME,
-  express.static("/genomehubs/local/render", {
-    eTag: false,
-    maxAge: 0,
-  })
+  express.static("/genomehubs/local/render", { eTag: false, maxAge: 0 })
 );
-
-let directories = getDirectories(path.resolve(__dirname, "public"));
 
 app.use(
   `${
@@ -75,10 +72,6 @@ app.use(
   }`,
   express.static("/genomehubs/local/static", { eTag: false, maxAge: 0 })
 );
-
-app.use(GH_BASENAME, express.static(path.resolve(__dirname, "public")));
-
-app.use(GH_BASENAME, express.static(path.resolve(__dirname, "render")));
 
 app.use(GH_BASENAME, express.static(path.resolve(__dirname, "public")));
 
