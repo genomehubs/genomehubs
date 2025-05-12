@@ -8,10 +8,10 @@ jobs:
   # package-ui:
   #   runs-on: ubuntu-latest
   #   steps:
-  #     - uses: actions/checkout@v3
+  #     - uses: actions/checkout@v4
   #       with:
   #         ref: ${{github.ref}}
-  #     - uses: actions/setup-node@v3
+  #     - uses: actions/setup-node@v4
   #       with:
   #         node-version: "18"
   #     - run: npm install -g pkg
@@ -26,10 +26,10 @@ jobs:
   # package-api:
   #   runs-on: ubuntu-latest
   #   steps:
-  #     - uses: actions/checkout@v3
+  #     - uses: actions/checkout@v4
   #       with:
   #         ref: ${{github.ref}}
-  #     - uses: actions/setup-node@v3
+  #     - uses: actions/setup-node@v4
   #       with:
   #         node-version: "18"
   #     - run: npm install -g pkg
@@ -44,7 +44,7 @@ jobs:
   # package-genomehubs-linux:
   #   runs-on: ubuntu-latest
   #   steps:
-  #     - uses: actions/checkout@v3
+  #     - uses: actions/checkout@v4
   #       with:
   #         ref: ${{github.ref}}
   #     - name: Pip install genomehubs
@@ -68,10 +68,10 @@ jobs:
   render-goat-ui:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{github.ref}}
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: "22"
       - run: |
@@ -81,7 +81,7 @@ jobs:
           echo installing chromium
           sudo apt-get install chromium-browser
           echo installing puppeteer-core
-          npm i puppeteer-core --loglevel verbose
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm i puppeteer-core --loglevel verbose
           echo installed puppeteer-core
           node src/render/render.mjs
           ls rendered
@@ -93,10 +93,10 @@ jobs:
   package-goat-ui:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{github.ref}}
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: "18"
       - run: npm install -g pkg
@@ -125,10 +125,10 @@ jobs:
   # package-boat-ui:
   #   runs-on: ubuntu-latest
   #   steps:
-  #     - uses: actions/checkout@v3
+  #     - uses: actions/checkout@v4
   #       with:
   #         ref: ${{github.ref}}
-  #     - uses: actions/setup-node@v3
+  #     - uses: actions/setup-node@v4
   #       with:
   #         node-version: "18"
   #     - run: npm install -g pkg
@@ -157,7 +157,7 @@ jobs:
   #   needs: package-genomehubs-linux
   #   steps:
   #     - name: Checkout
-  #       uses: actions/checkout@v3
+  #       uses: actions/checkout@v4
   #     - uses: actions/download-artifact@v4
   #       with:
   #         name: genomehubs
@@ -188,7 +188,7 @@ jobs:
   #   needs: package-api
   #   steps:
   #     - name: Checkout
-  #       uses: actions/checkout@v3
+  #       uses: actions/checkout@v4
   #     - uses: actions/download-artifact@v4
   #       with:
   #         name: genomehubs-api
@@ -219,7 +219,7 @@ jobs:
   #   needs: package-ui
   #   steps:
   #     - name: Checkout
-  #       uses: actions/checkout@v3
+  #       uses: actions/checkout@v4
   #     - uses: actions/download-artifact@v4
   #       with:
   #         name: genomehubs-ui
@@ -252,7 +252,7 @@ jobs:
       - render-goat-ui
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{github.ref}}
       - uses: actions/download-artifact@v4
@@ -292,7 +292,7 @@ jobs:
   #   needs: package-boat-ui
   #   steps:
   #     - name: Checkout
-  #       uses: actions/checkout@v3
+  #       uses: actions/checkout@v4
   #       with:
   #         ref: ${{github.ref}}
   #     - uses: actions/download-artifact@v4
@@ -328,7 +328,7 @@ jobs:
   #     - package-ui
   #   steps:
   #     - name: Checkout
-  #       uses: actions/checkout@v3
+  #       uses: actions/checkout@v4
   #     - uses: actions/download-artifact@v4
   #       with:
   #         path: ./dist
