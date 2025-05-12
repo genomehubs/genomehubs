@@ -73,7 +73,7 @@ jobs:
           ref: ${{github.ref}}
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
       - run: |
           git clone -b main --single-branch https://github.com/genomehubs/goat-ui
           GH_PAGES_PATH=goat-ui/static GH_URL=https://goat.genomehubs.org node src/render/updateFileList.mjs
