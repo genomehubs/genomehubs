@@ -70,16 +70,21 @@ export const typesToValidation = () => {
     }
     const { summary = [], traverse_direction } = types[key] || {};
     let modifiers = new Set(["value"]);
-    for (let modifier of summary) {
+    for (let modifier of Array.isArray(summary) ? summary : [summary]) {
       if (modifier === "primary") {
         continue;
       }
-      if (mod === "list") {
+      if (modifier === "list") {
         modifiers.add("length");
         continue;
       }
-      let mod = modifier.split("_")[0];
-      modifiers.add(mod);
+      if (modifier.match(/\w+_\w+/)) {
+        let [mod] = modifier.split("_");
+
+        modifiers.add(mod);
+      } else {
+        modifiers.add(modifier);
+      }
     }
     if (traverse_direction) {
       modifiers.add("direct");

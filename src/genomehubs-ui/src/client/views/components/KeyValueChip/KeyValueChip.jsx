@@ -12,22 +12,17 @@
  * - Includes an `onDelete` function to clear all values.
  */
 
-import {
-  Autocomplete,
-  Box,
-  Chip,
-  Menu,
-  MenuItem,
-  Popper,
-  TextField,
-  Typography,
-} from "@mui/material";
 import React, { useEffect, useState } from "react";
 
-import AdjustIcon from "@mui/icons-material/Adjust";
-import ErrorIcon from "@mui/icons-material/Error";
-import Tooltip from "../Tooltip";
-import TreeIcon from "@mui/icons-material/Tree";
+import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import EditableText from "../EditableText";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Popper from "@mui/material/Popper";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import ValidationErrorTooltip from "./ValidationErrorToolTip";
 import formatValue from "./functions/formatValue";
 import parseValue from "./functions/parseValue";
 import typesToValidation from "./functions/typesToValidation";
@@ -200,11 +195,6 @@ const KeyValueChip = ({
     setAnchorElSymbol(null);
   };
 
-  const handleValueEdit = (event) => {
-    setIsEditingValue(true);
-    setAnchorElValue(event.currentTarget);
-  };
-
   const handleValueChange = (event) => {
     setCurrentValue(event.target.value);
     setCurrentValueNote(undefined);
@@ -229,17 +219,6 @@ const KeyValueChip = ({
       modifier: currentModifier,
       palette,
     });
-  };
-
-  const handleKeyEdit = (event) => {
-    if (isEditingKey) {
-      event.stopPropagation(); // Prevent the click event from propagating to the parent
-      event.preventDefault(); // Prevent the default action
-      handleKeyBlur(event);
-    } else {
-      setIsEditingKey(true);
-      setAnchorElKey(event.currentTarget);
-    }
   };
 
   const handleKeyBlur = (event) => {
@@ -283,39 +262,6 @@ const KeyValueChip = ({
     return str;
   };
 
-  // const validateKey = (key) => {
-  //   // Check if the key is in the list of available keys
-  //   return allowedKeys.hasOwnProperty(key);
-  // };
-  // const validateModifier = ({ key, modifier }) => {
-  //   // Check if the modifier is in the list of available modifiers
-  //   if (modifier === null) {
-  //     return true; // Allow null modifier
-  //   }
-  //   return allowedKeys[key]?.modifiers.includes(modifier);
-  // };
-
-  // const validateSymbol = ({ key, symbol }) => {
-  //   // Check if the symbol is in the list of available symbols
-  //   if (symbol === null) {
-  //     return true; // Allow null symbol
-  //   }
-  //   return allowedKeys[key]?.symbols.includes(symbol);
-  // };
-  // const validateValue = ({ key, value }) => {
-  //   // Check if the value is of the expected type for the key
-  //   const expectedType = allowedKeys[key]?.type;
-  //   if (expectedType === "number") {
-  //     return !isNaN(parseValue(value));
-  //   } else if (expectedType === "string") {
-  //     return (
-  //       value !== null &&
-  //       value !== undefined &&
-  //       typeof value.toString === "function"
-  //     );
-  //   }
-  // };
-
   const validateChip = ({ key, value, operator, modifier }) => {
     // Validate the key, value, operator, and modifier
     if (modifier == "collate") {
@@ -324,7 +270,7 @@ const KeyValueChip = ({
     }
     let { valid, reason } = validation.validateKey(key);
     if (!valid) {
-      setValidationError(reason);
+      setValidationError({ reason, component: "key" });
       return false;
     }
     ({ valid, reason } = validation.validateValue({
@@ -333,17 +279,17 @@ const KeyValueChip = ({
       modifier,
     }));
     if (!valid) {
-      setValidationError(reason);
+      setValidationError({ reason, component: "value" });
       return false;
     }
     ({ valid, reason } = validation.validateOperator({ key, operator }));
     if (!valid) {
-      setValidationError(reason);
+      setValidationError({ reason, component: "operator" });
       return false;
     }
     ({ valid, reason } = validation.validateModifier({ key, modifier }));
     if (!valid) {
-      setValidationError(reason);
+      setValidationError({ reason, component: "modifier" });
       return false;
     }
     setValidationError(false);
@@ -356,7 +302,7 @@ const KeyValueChip = ({
       const isValid = validateChip({
         key: currentKey,
         value: currentValue,
-        symbol: currentOperator,
+        operator: currentOperator,
         modifier: currentModifier,
       });
 
@@ -375,6 +321,7 @@ const KeyValueChip = ({
     currentModifier,
   ]);
 
+  let { component: errorComponent } = validationError || {};
   return (
     <Box
       sx={{
@@ -427,43 +374,52 @@ const KeyValueChip = ({
                 onClick={handleModifierClick}
               >
                 {currentModifier == "value" ? "" : currentModifier}
+                {errorComponent == "modifier" && (
+                  <span
+                    style={{
+                      position: "absolute",
+
+                      right: "1em",
+                      bottom: 0,
+                      display: "block",
+                      overflow: "visible",
+                    }}
+                  >
+                    <ValidationErrorTooltip
+                      validationError={validationError.reason}
+                      textColor={textColor}
+                    />
+                  </span>
+                )}
               </span>
             )}
-            <Typography
+            <EditableText
+              value={currentKey}
+              onChange={setCurrentKey}
+              onBlur={handleKeyBlur}
+              backgroundColor={backgroundColor}
+              textColor={textColor}
+              anchorEl={anchorElKey}
+              setAnchorEl={setAnchorElKey}
+              options={[...validation.validKeys().keys]}
               variant="body2"
-              ref={(el) => setAnchorElKey(el)} // Use a ref-setter function
               sx={{
                 fontWeight: "bold",
                 whiteSpace: "nowrap",
                 height: "30px",
                 lineHeight: "30px",
                 marginRight: validationError ? "-1em" : "0",
-                color: textColor,
-                opacity: isEditingKey ? 0.5 : 1,
-                cursor: "pointer",
               }}
-              onClick={handleKeyEdit}
-            >
-              {currentKey}
-              {validationError && (
-                <Tooltip title={validationError} arrow>
-                  <span
-                    style={{
-                      // fontSize: "0.8em",
-                      marginLeft: "1px",
-                      color: textColor,
-                    }}
-                  >
-                    <ErrorIcon
-                      sx={{
-                        fontSize: "1.2em",
-                        // color: chipPalettes.red.dark,
-                      }}
-                    />
-                  </span>
-                </Tooltip>
-              )}
-            </Typography>
+              endComponent={
+                errorComponent == "key" && (
+                  <ValidationErrorTooltip
+                    validationError={validationError.reason}
+                    textColor={textColor}
+                  />
+                )
+              }
+            />
+
             <Box
               sx={{
                 display: "flex",
@@ -491,10 +447,27 @@ const KeyValueChip = ({
                   onClick={handleSymbolClick}
                 >
                   {currentOperator}
+                  {errorComponent == "operator" && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        marginLeft: "0.25em",
+                        bottom: 0,
+                        marginBottom: "1.5em",
+                        display: "block",
+                        overflow: "visible",
+                      }}
+                    >
+                      <ValidationErrorTooltip
+                        validationError={validationError.reason}
+                        textColor={textColor}
+                      />
+                    </span>
+                  )}
                 </Typography>
               )}
 
-              <Typography
+              {/* <Typography
                 variant="body2"
                 ref={(el) => setAnchorElValue(el)} // Use a ref-setter function
                 sx={{
@@ -509,19 +482,49 @@ const KeyValueChip = ({
                 onClick={isEditingValue ? handleValueBlur : handleValueEdit}
               >
                 {truncate(previousValue) || "value"}
-              </Typography>
-              <Typography
+              </Typography> */}
+              <EditableText
+                value={truncate(currentValue) || "value"}
+                onChange={setCurrentValue}
+                onBlur={handleValueBlur}
+                backgroundColor={backgroundColor}
+                textColor={textColor}
+                anchorEl={anchorElValue}
+                setAnchorEl={setAnchorElValue}
+                endComponent={
+                  <>
+                    {errorComponent == "value" && (
+                      <ValidationErrorTooltip
+                        validationError={validationError.reason}
+                        textColor={textColor}
+                      />
+                    )}
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        opacity: 0.5,
+                        fontStyle: "italic",
+                        fontSize: "0.8em",
+                        marginTop: "10px",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      {previousValueNote}
+                    </Typography>
+                  </>
+                }
+                options={[...(validation.validValues(currentKey) || [])]}
                 variant="body2"
                 sx={{
-                  opacity: 0.5,
-                  fontStyle: "italic",
-                  fontSize: "0.8em",
-                  marginTop: "10px",
-                  pointerEvents: "none",
+                  fontWeight: "bold",
+                  whiteSpace: previousValue.length > 100 ? "normal" : "nowrap",
+                  wordBreak:
+                    previousValue.length > 100 ? "break-word" : "normal",
+                  opacity: previousValue && !isEditingValue ? 1 : 0.5,
+                  fontStyle: previousValue ? "normal" : "italic",
+                  marginTop: "6px",
                 }}
-              >
-                {previousValueNote}
-              </Typography>
+              />
             </Box>
           </Box>
         }
@@ -589,57 +592,6 @@ const KeyValueChip = ({
                   padding: "0 2px 2px 2px",
                 },
               }}
-            />
-          </Box>
-        </Popper>
-      )}
-      {isEditingKey && (
-        <Popper open={isEditingKey} anchorEl={anchorElKey} placement="bottom">
-          <Box
-            sx={{
-              padding: "8px",
-              backgroundColor: backgroundColor,
-              color: textColor,
-              borderRadius: "4px",
-              boxShadow:
-                "0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)",
-            }}
-          >
-            <Autocomplete
-              options={[...validation.validKeys().keys]}
-              value={currentKey}
-              onChange={(event, newValue) => {
-                setCurrentKey(newValue || "");
-              }}
-              onBlur={(event) => {
-                handleKeyBlur(event);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  handleKeyBlur(event);
-                }
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  size="small"
-                  variant="standard"
-                  autoFocus
-                  sx={{
-                    marginTop: "4px",
-                    width: `${Math.max(currentKey.length, 12) * 12 + 40}px`,
-                    "& .MuiInputBase-input": {
-                      textAlign: "center",
-                    },
-                    "& .MuiInputBase-root": {
-                      backgroundColor: backgroundColor,
-                      color: textColor,
-                      borderRadius: "4px",
-                      padding: "0 2px 2px 2px",
-                    },
-                  }}
-                />
-              )}
             />
           </Box>
         </Popper>
@@ -713,7 +665,7 @@ const KeyValueChip = ({
           }
         }}
       >
-        {availableModifiers.map((modifier, index) => (
+        {[...validation.validModifiers(currentKey)].map((modifier, index) => (
           <MenuItem
             key={modifier}
             onClick={() => handleModifierMenuClose(modifier)}
