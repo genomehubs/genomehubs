@@ -1,0 +1,3763 @@
+{
+  "c_value": {
+    "constraint": {
+      "max": 200,
+      "min": 0
+    },
+    "description": "1C value",
+    "display_level": 1,
+    "display_name": "C value",
+    "display_group": "genome_size",
+    "summary": [
+      "primary",
+      "median",
+      "min",
+      "max"
+    ],
+    "traverse_direction": "both",
+    "type": "half_float",
+    "units": "pgDNA",
+    "processed_type": "float",
+    "processed_summary": "half_float_value",
+    "processed_simple": "value"
+  },
+  "c_value_method": {
+    "constraint": {
+      "enum": [
+        "biochemical analysis",
+        "bulk fluorometric assay",
+        "complete genome sequencing",
+        "feulgen densitometry",
+        "feulgen image analysis densitometry",
+        "flow cytometry",
+        "flow karyotyping",
+        "fluorescence fading analysis",
+        "gallocyanin chrom alum densitometry",
+        "methyl green densitometry",
+        "not specified",
+        "static cell fluorometry",
+        "ultraviolet microscopy",
+        "unknown",
+        "biochemical analysis",
+        "feulgen image analysis densitometry",
+        "flow cytometry",
+        "feulgen densitometry",
+        "feulgen densitometry & flow cytometry",
+        "microdensitometry",
+        "pulse field gel electrophoresis",
+        "reassociation kinetics",
+        "whole genome sequencing"
+      ]
+    },
+    "description": "C value estimation method",
+    "display_level": 2,
+    "display_name": "C value method",
+    "display_group": "genome_size",
+    "summary": "list",
+    "type": "keyword",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "c_value_cell_type": {
+    "constraint": {
+      "enum": [
+        "antennae",
+        "antennal gland",
+        "blood cells",
+        "brain",
+        "buccal epithelium",
+        "coelomocytes",
+        "corneal epithelium",
+        "digestive gland",
+        "dorsal fin clip",
+        "egg",
+        "embyro",
+        "epidermis",
+        "exopodite",
+        "fibroblasts",
+        "fin clips",
+        "germarium",
+        "gills",
+        "haemocytes",
+        "heart cells",
+        "individual chromosomes",
+        "intestine",
+        "kidney cells",
+        "legs",
+        "leukocytes",
+        "liver",
+        "lung (culture)",
+        "mantle",
+        "midgut",
+        "muscle cells",
+        "ne",
+        "not specified",
+        "oocytes",
+        "ovaries",
+        "pancreas",
+        "pharynx",
+        "polypide cells in suspension",
+        "red blood cells",
+        "retinal cells",
+        "salivary gland",
+        "somatic cells",
+        "sperm",
+        "spleen",
+        "tentacles",
+        "testes",
+        "thymus",
+        "tissue culture",
+        "various",
+        "ventral hypodermal chord",
+        "whole body",
+        "whole body squash"
+      ]
+    },
+    "description": "Cell type",
+    "display_level": 2,
+    "display_name": "C value cell type",
+    "display_group": "genome_size",
+    "summary": "list",
+    "type": "keyword",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "genome_size": {
+    "constraint": {
+      "min": 0
+    },
+    "description": "Genome size",
+    "display_name": "Genome size",
+    "display_level": 1,
+    "display_group": "genome_size",
+    "summary": [
+      "primary",
+      "median",
+      "min",
+      "max"
+    ],
+    "traverse_direction": "both",
+    "type": "long",
+    "units": "bases",
+    "processed_type": "integer",
+    "processed_summary": "long_value",
+    "processed_simple": "value"
+  },
+  "genome_size_kmer": {
+    "constraint": {
+      "min": 0
+    },
+    "description": "Genome size estimate from kmers",
+    "display_level": 1,
+    "display_name": "Genome size kmer",
+    "display_group": "genome_size",
+    "summary": [
+      "primary",
+      "median",
+      "min",
+      "max"
+    ],
+    "type": "long",
+    "units": "bases",
+    "processed_type": "integer",
+    "processed_summary": "long_value",
+    "processed_simple": "value"
+  },
+  "genome_size_draft": {
+    "constraint": {
+      "min": 0
+    },
+    "description": "Genome size estimate from draft assembly",
+    "display_level": 1,
+    "display_name": "Genome size draft",
+    "display_group": "genome_size",
+    "summary": [
+      "primary",
+      "median",
+      "min",
+      "max"
+    ],
+    "type": "long",
+    "units": "bases",
+    "processed_type": "integer",
+    "processed_summary": "long_value",
+    "processed_simple": "value"
+  },
+  "assembly_level": {
+    "constraint": {
+      "enum": [
+        "complete genome",
+        "chromosome",
+        "scaffold",
+        "contig"
+      ]
+    },
+    "display_group": "assembly",
+    "display_level": 1,
+    "display_name": "Assembly level",
+    "type": "keyword",
+    "summary": [
+      "primary",
+      "enum"
+    ],
+    "traverse_direction": "up",
+    "processed_type": "ordered_keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "assembly_span": {
+    "constraint": {
+      "min": 1
+    },
+    "display_group": "assembly",
+    "display_level": 1,
+    "display_name": "Assembly span",
+    "type": "long",
+    "units": "bases",
+    "summary": [
+      "primary",
+      "median",
+      "min",
+      "max",
+      "count"
+    ],
+    "traverse_direction": "both",
+    "processed_type": "integer",
+    "processed_summary": "long_value",
+    "processed_simple": "value"
+  },
+  "bioproject": {
+    "constraint": {
+      "len": 32
+    },
+    "display_group": "assembly",
+    "type": "keyword",
+    "value_metadata": {
+      "default": {
+        "description": "Click to view BioProject record on ENA",
+        "link": "https://www.ebi.ac.uk/ena/browser/view/{}"
+      },
+      "prjna533106": {
+        "description": "Earth Biogenome Project (click to view on ENA)"
+      },
+      "prjna811786": {
+        "description": "Africa Biogenome Project (click to view on ENA)"
+      },
+      "prjna555319": {
+        "description": "Ag100Pest (click to view on ENA)"
+      },
+      "prjeb43743": {
+        "description": "Aquatic Symbiosis Genomics Project (click to view on ENA)"
+      },
+      "prjna489245": {
+        "description": "Bat 1K (click to view on ENA)"
+      },
+      "prjna545868": {
+        "description": "Bird 10K (click to view on ENA)"
+      },
+      "prjna813333": {
+        "description": "Canada Biogenome Project (click to view on ENA)"
+      },
+      "prjeb49670": {
+        "description": "Catalan Biogenome Project (click to view on ENA)"
+      },
+      "prjna720569": {
+        "description": "California Conservation Genomics Project (click to view on ENA)"
+      },
+      "prjeb40665": {
+        "description": "Darwin Tree of Life (click to view on ENA)"
+      },
+      "prjna712951": {
+        "description": "ENDEMIXIT (click to view on ENA)"
+      },
+      "prjeb61747": {
+        "description": "ERGA Biodiversity Genomics Europe (click to view on ENA)"
+      },
+      "prjeb47820": {
+        "description": "ERGA Pilot (click to view on ENA)"
+      },
+      "prjeb43510": {
+        "description": "European Reference Genome Atlas (click to view on ENA)"
+      },
+      "prjna393850": {
+        "description": "EUROFISH (click to view on ENA)"
+      },
+      "prjna649812": {
+        "description": "Global Invertebrate Genomics Alliance (click to view on ENA)"
+      },
+      "prjna163993": {
+        "description": "i5K (click to view on ENA)"
+      },
+      "prjna844590": {
+        "description": "Illinois EBP Pilot (click to view on ENA)"
+      },
+      "prjna948806": {
+        "description": "Lilioid Monocots Core Group Genome Project (click to view on ENA)"
+      },
+      "prjna706923": {
+        "description": "LOEWE Centre for Translational Biodiversity Genomics (click to view on ENA)"
+      },
+      "prjna758215": {
+        "description": "MetaInvert (click to view on ENA)"
+      },
+      "prjna707598": {
+        "description": "Squalomix (click to view on ENA)"
+      },
+      "prjna489243": {
+        "description": "Vertebrate Genomes Project (click to view on ENA)"
+      }
+    },
+    "display_level": 2,
+    "summary": [
+      "list"
+    ],
+    "traverse_direction": "up",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "biosample": {
+    "constraint": {
+      "len": 32
+    },
+    "display_group": "assembly",
+    "type": "keyword",
+    "display_level": 2,
+    "summary": [
+      "list"
+    ],
+    "traverse_direction": "up",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "contig_n50": {
+    "constraint": {
+      "min": 1
+    },
+    "display_group": "assembly",
+    "display_level": 2,
+    "display_name": "Contig N50",
+    "type": "long",
+    "units": "bases",
+    "summary": [
+      "primary",
+      "max",
+      "median",
+      "min",
+      "count"
+    ],
+    "traverse_direction": "up",
+    "processed_type": "integer",
+    "processed_summary": "long_value",
+    "processed_simple": "value"
+  },
+  "assembly_date": {
+    "display_group": "assembly",
+    "display_level": 2,
+    "display_name": "Last updated",
+    "type": "date",
+    "summary": [
+      "primary",
+      "max",
+      "min"
+    ],
+    "traverse_direction": "up",
+    "processed_type": "date",
+    "processed_summary": "date_value",
+    "processed_simple": "value"
+  },
+  "scaffold_n50": {
+    "constraint": {
+      "min": 1
+    },
+    "display_group": "assembly",
+    "display_level": 2,
+    "display_name": "Scaffold N50",
+    "type": "long",
+    "units": "bases",
+    "summary": [
+      "primary",
+      "max",
+      "median",
+      "min",
+      "count"
+    ],
+    "traverse_direction": "up",
+    "processed_type": "integer",
+    "processed_summary": "long_value",
+    "processed_simple": "value"
+  },
+  "gene_count": {
+    "constraint": {
+      "min": 1
+    },
+    "display_group": "assembly",
+    "display_level": 2,
+    "display_name": "Gene count",
+    "type": "integer",
+    "summary": [
+      "primary",
+      "median",
+      "min",
+      "max",
+      "count"
+    ],
+    "processed_type": "integer",
+    "processed_summary": "integer_value",
+    "processed_simple": "value"
+  },
+  "sample_sex": {
+    "display_group": "assembly",
+    "display_level": 2,
+    "display_name": "Sample sex",
+    "type": "keyword",
+    "summary": [
+      "primary",
+      "list",
+      "count"
+    ],
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "ebp_metric_date": {
+    "display_group": "assembly",
+    "display_level": 2,
+    "display_name": "EBP metric date",
+    "type": "date",
+    "summary": [
+      "min",
+      "max"
+    ],
+    "traverse_direction": "up",
+    "processed_type": "date",
+    "processed_summary": "date_value",
+    "processed_simple": "value"
+  },
+  "country_list": {
+    "constraint": {
+      "enum": [
+        "af",
+        "al",
+        "dz",
+        "as",
+        "ad",
+        "ao",
+        "ai",
+        "aq",
+        "ag",
+        "ar",
+        "am",
+        "aw",
+        "au",
+        "at",
+        "az",
+        "bs",
+        "bh",
+        "bd",
+        "bb",
+        "by",
+        "be",
+        "bz",
+        "bj",
+        "bm",
+        "bt",
+        "bo",
+        "bq",
+        "ba",
+        "bw",
+        "bv",
+        "br",
+        "io",
+        "bn",
+        "bg",
+        "bf",
+        "bi",
+        "cv",
+        "kh",
+        "cm",
+        "ca",
+        "ky",
+        "cf",
+        "td",
+        "cl",
+        "cn",
+        "cx",
+        "cc",
+        "co",
+        "km",
+        "cd",
+        "cg",
+        "ck",
+        "cr",
+        "hr",
+        "cu",
+        "cw",
+        "cy",
+        "cz",
+        "ci",
+        "dk",
+        "dj",
+        "dm",
+        "do",
+        "ec",
+        "eg",
+        "sv",
+        "gq",
+        "er",
+        "ee",
+        "sz",
+        "et",
+        "fk",
+        "fo",
+        "fj",
+        "fi",
+        "fr",
+        "gf",
+        "pf",
+        "tf",
+        "ga",
+        "gm",
+        "ge",
+        "de",
+        "gh",
+        "gi",
+        "gr",
+        "gl",
+        "gd",
+        "gp",
+        "gu",
+        "gt",
+        "gg",
+        "gn",
+        "gw",
+        "gy",
+        "ht",
+        "hm",
+        "va",
+        "hn",
+        "hk",
+        "hu",
+        "is",
+        "in",
+        "id",
+        "ir",
+        "iq",
+        "ie",
+        "im",
+        "il",
+        "it",
+        "jm",
+        "jp",
+        "je",
+        "jo",
+        "kz",
+        "ke",
+        "ki",
+        "kp",
+        "kr",
+        "kw",
+        "kg",
+        "la",
+        "lv",
+        "lb",
+        "ls",
+        "lr",
+        "ly",
+        "li",
+        "lt",
+        "lu",
+        "mo",
+        "mg",
+        "mw",
+        "my",
+        "mv",
+        "ml",
+        "mt",
+        "mh",
+        "mq",
+        "mr",
+        "mu",
+        "yt",
+        "mx",
+        "fm",
+        "md",
+        "mc",
+        "mn",
+        "me",
+        "ms",
+        "ma",
+        "mz",
+        "mm",
+        "na",
+        "nr",
+        "np",
+        "nl",
+        "nc",
+        "nz",
+        "ni",
+        "ne",
+        "ng",
+        "nu",
+        "nf",
+        "mp",
+        "no",
+        "om",
+        "pk",
+        "pw",
+        "ps",
+        "pa",
+        "pg",
+        "py",
+        "pe",
+        "ph",
+        "pn",
+        "pl",
+        "pt",
+        "pr",
+        "qa",
+        "mk",
+        "ro",
+        "ru",
+        "rw",
+        "re",
+        "bl",
+        "sh",
+        "kn",
+        "lc",
+        "mf",
+        "pm",
+        "vc",
+        "ws",
+        "sm",
+        "st",
+        "sa",
+        "sn",
+        "rs",
+        "sc",
+        "sl",
+        "sg",
+        "sx",
+        "sk",
+        "si",
+        "sb",
+        "so",
+        "za",
+        "gs",
+        "ss",
+        "es",
+        "lk",
+        "sd",
+        "sr",
+        "sj",
+        "se",
+        "ch",
+        "sy",
+        "tw",
+        "tj",
+        "tz",
+        "th",
+        "tl",
+        "tg",
+        "tk",
+        "to",
+        "tt",
+        "tn",
+        "tr",
+        "tm",
+        "tc",
+        "tv",
+        "ug",
+        "ua",
+        "ae",
+        "gb",
+        "um",
+        "us",
+        "uy",
+        "uz",
+        "vu",
+        "ve",
+        "vn",
+        "vg",
+        "vi",
+        "wf",
+        "eh",
+        "ye",
+        "zm",
+        "zw",
+        "ax",
+        "xk"
+      ]
+    },
+    "description": "List of countries where taxon is found",
+    "display_group": "regional_lists",
+    "display_level": 2,
+    "display_name": "Country list",
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "value_metadata": {
+      "default": {
+        "description": "2-letter country code"
+      },
+      "af": {
+        "description": "Afghanistan"
+      },
+      "al": {
+        "description": "Albania"
+      },
+      "dz": {
+        "description": "Algeria"
+      },
+      "as": {
+        "description": "American Samoa"
+      },
+      "ad": {
+        "description": "Andorra"
+      },
+      "ao": {
+        "description": "Angola"
+      },
+      "ai": {
+        "description": "Anguilla"
+      },
+      "aq": {
+        "description": "Antarctica"
+      },
+      "ag": {
+        "description": "Antigua and Barbuda"
+      },
+      "ar": {
+        "description": "Argentina"
+      },
+      "am": {
+        "description": "Armenia"
+      },
+      "aw": {
+        "description": "Aruba"
+      },
+      "au": {
+        "description": "Australia"
+      },
+      "at": {
+        "description": "Austria"
+      },
+      "az": {
+        "description": "Azerbaijan"
+      },
+      "bs": {
+        "description": "Bahamas (the)"
+      },
+      "bh": {
+        "description": "Bahrain"
+      },
+      "bd": {
+        "description": "Bangladesh"
+      },
+      "bb": {
+        "description": "Barbados"
+      },
+      "by": {
+        "description": "Belarus"
+      },
+      "be": {
+        "description": "Belgium"
+      },
+      "bz": {
+        "description": "Belize"
+      },
+      "bj": {
+        "description": "Benin"
+      },
+      "bm": {
+        "description": "Bermuda"
+      },
+      "bt": {
+        "description": "Bhutan"
+      },
+      "bo": {
+        "description": "Bolivia (Plurinational State of)"
+      },
+      "bq": {
+        "description": "Bonaire, Sint Eustatius and Saba"
+      },
+      "ba": {
+        "description": "Bosnia and Herzegovina"
+      },
+      "bw": {
+        "description": "Botswana"
+      },
+      "bv": {
+        "description": "Bouvet Island"
+      },
+      "br": {
+        "description": "Brazil"
+      },
+      "io": {
+        "description": "British Indian Ocean Territory (the)"
+      },
+      "bn": {
+        "description": "Brunei Darussalam"
+      },
+      "bg": {
+        "description": "Bulgaria"
+      },
+      "bf": {
+        "description": "Burkina Faso"
+      },
+      "bi": {
+        "description": "Burundi"
+      },
+      "cv": {
+        "description": "Cabo Verde"
+      },
+      "kh": {
+        "description": "Cambodia"
+      },
+      "cm": {
+        "description": "Cameroon"
+      },
+      "ca": {
+        "description": "Canada"
+      },
+      "ky": {
+        "description": "Cayman Islands (the)"
+      },
+      "cf": {
+        "description": "Central African Republic (the)"
+      },
+      "td": {
+        "description": "Chad"
+      },
+      "cl": {
+        "description": "Chile"
+      },
+      "cn": {
+        "description": "China"
+      },
+      "cx": {
+        "description": "Christmas Island"
+      },
+      "cc": {
+        "description": "Cocos (Keeling) Islands (the)"
+      },
+      "co": {
+        "description": "Colombia"
+      },
+      "km": {
+        "description": "Comoros (the)"
+      },
+      "cd": {
+        "description": "Congo (the Democratic Republic of the)"
+      },
+      "cg": {
+        "description": "Congo (the)"
+      },
+      "ck": {
+        "description": "Cook Islands (the)"
+      },
+      "cr": {
+        "description": "Costa Rica"
+      },
+      "hr": {
+        "description": "Croatia"
+      },
+      "cu": {
+        "description": "Cuba"
+      },
+      "cw": {
+        "description": "Curaçao"
+      },
+      "cy": {
+        "description": "Cyprus"
+      },
+      "cz": {
+        "description": "Czechia"
+      },
+      "ci": {
+        "description": "Côte d'Ivoire"
+      },
+      "dk": {
+        "description": "Denmark"
+      },
+      "dj": {
+        "description": "Djibouti"
+      },
+      "dm": {
+        "description": "Dominica"
+      },
+      "do": {
+        "description": "Dominican Republic (the)"
+      },
+      "ec": {
+        "description": "Ecuador"
+      },
+      "eg": {
+        "description": "Egypt"
+      },
+      "sv": {
+        "description": "El Salvador"
+      },
+      "gq": {
+        "description": "Equatorial Guinea"
+      },
+      "er": {
+        "description": "Eritrea"
+      },
+      "ee": {
+        "description": "Estonia"
+      },
+      "sz": {
+        "description": "Eswatini"
+      },
+      "et": {
+        "description": "Ethiopia"
+      },
+      "fk": {
+        "description": "Falkland Islands (the) [Malvinas]"
+      },
+      "fo": {
+        "description": "Faroe Islands (the)"
+      },
+      "fj": {
+        "description": "Fiji"
+      },
+      "fi": {
+        "description": "Finland"
+      },
+      "fr": {
+        "description": "France"
+      },
+      "gf": {
+        "description": "French Guiana"
+      },
+      "pf": {
+        "description": "French Polynesia"
+      },
+      "tf": {
+        "description": "French Southern Territories (the)"
+      },
+      "ga": {
+        "description": "Gabon"
+      },
+      "gm": {
+        "description": "Gambia (the)"
+      },
+      "ge": {
+        "description": "Georgia"
+      },
+      "de": {
+        "description": "Germany"
+      },
+      "gh": {
+        "description": "Ghana"
+      },
+      "gi": {
+        "description": "Gibraltar"
+      },
+      "gr": {
+        "description": "Greece"
+      },
+      "gl": {
+        "description": "Greenland"
+      },
+      "gd": {
+        "description": "Grenada"
+      },
+      "gp": {
+        "description": "Guadeloupe"
+      },
+      "gu": {
+        "description": "Guam"
+      },
+      "gt": {
+        "description": "Guatemala"
+      },
+      "gg": {
+        "description": "Guernsey"
+      },
+      "gn": {
+        "description": "Guinea"
+      },
+      "gw": {
+        "description": "Guinea-Bissau"
+      },
+      "gy": {
+        "description": "Guyana"
+      },
+      "ht": {
+        "description": "Haiti"
+      },
+      "hm": {
+        "description": "Heard Island and McDonald Islands"
+      },
+      "va": {
+        "description": "Holy See (the)"
+      },
+      "hn": {
+        "description": "Honduras"
+      },
+      "hk": {
+        "description": "Hong Kong"
+      },
+      "hu": {
+        "description": "Hungary"
+      },
+      "is": {
+        "description": "Iceland"
+      },
+      "in": {
+        "description": "India"
+      },
+      "id": {
+        "description": "Indonesia"
+      },
+      "ir": {
+        "description": "Iran (Islamic Republic of)"
+      },
+      "iq": {
+        "description": "Iraq"
+      },
+      "ie": {
+        "description": "Ireland"
+      },
+      "im": {
+        "description": "Isle of Man"
+      },
+      "il": {
+        "description": "Israel"
+      },
+      "it": {
+        "description": "Italy"
+      },
+      "jm": {
+        "description": "Jamaica"
+      },
+      "jp": {
+        "description": "Japan"
+      },
+      "je": {
+        "description": "Jersey"
+      },
+      "jo": {
+        "description": "Jordan"
+      },
+      "kz": {
+        "description": "Kazakhstan"
+      },
+      "ke": {
+        "description": "Kenya"
+      },
+      "ki": {
+        "description": "Kiribati"
+      },
+      "kp": {
+        "description": "Korea (the Democratic People's Republic of)"
+      },
+      "kr": {
+        "description": "Korea (the Republic of)"
+      },
+      "kw": {
+        "description": "Kuwait"
+      },
+      "kg": {
+        "description": "Kyrgyzstan"
+      },
+      "la": {
+        "description": "Lao People's Democratic Republic (the)"
+      },
+      "lv": {
+        "description": "Latvia"
+      },
+      "lb": {
+        "description": "Lebanon"
+      },
+      "ls": {
+        "description": "Lesotho"
+      },
+      "lr": {
+        "description": "Liberia"
+      },
+      "ly": {
+        "description": "Libya"
+      },
+      "li": {
+        "description": "Liechtenstein"
+      },
+      "lt": {
+        "description": "Lithuania"
+      },
+      "lu": {
+        "description": "Luxembourg"
+      },
+      "mo": {
+        "description": "Macao"
+      },
+      "mg": {
+        "description": "Madagascar"
+      },
+      "mw": {
+        "description": "Malawi"
+      },
+      "my": {
+        "description": "Malaysia"
+      },
+      "mv": {
+        "description": "Maldives"
+      },
+      "ml": {
+        "description": "Mali"
+      },
+      "mt": {
+        "description": "Malta"
+      },
+      "mh": {
+        "description": "Marshall Islands (the)"
+      },
+      "mq": {
+        "description": "Martinique"
+      },
+      "mr": {
+        "description": "Mauritania"
+      },
+      "mu": {
+        "description": "Mauritius"
+      },
+      "yt": {
+        "description": "Mayotte"
+      },
+      "mx": {
+        "description": "Mexico"
+      },
+      "fm": {
+        "description": "Micronesia (Federated States of)"
+      },
+      "md": {
+        "description": "Moldova (the Republic of)"
+      },
+      "mc": {
+        "description": "Monaco"
+      },
+      "mn": {
+        "description": "Mongolia"
+      },
+      "me": {
+        "description": "Montenegro"
+      },
+      "ms": {
+        "description": "Montserrat"
+      },
+      "ma": {
+        "description": "Morocco"
+      },
+      "mz": {
+        "description": "Mozambique"
+      },
+      "mm": {
+        "description": "Myanmar"
+      },
+      "na": {
+        "description": "Namibia"
+      },
+      "nr": {
+        "description": "Nauru"
+      },
+      "np": {
+        "description": "Nepal"
+      },
+      "nl": {
+        "description": "Netherlands (the)"
+      },
+      "nc": {
+        "description": "New Caledonia"
+      },
+      "nz": {
+        "description": "New Zealand"
+      },
+      "ni": {
+        "description": "Nicaragua"
+      },
+      "ne": {
+        "description": "Niger (the)"
+      },
+      "ng": {
+        "description": "Nigeria"
+      },
+      "nu": {
+        "description": "Niue"
+      },
+      "nf": {
+        "description": "Norfolk Island"
+      },
+      "mp": {
+        "description": "Northern Mariana Islands (the)"
+      },
+      "no": {
+        "description": "Norway"
+      },
+      "om": {
+        "description": "Oman"
+      },
+      "pk": {
+        "description": "Pakistan"
+      },
+      "pw": {
+        "description": "Palau"
+      },
+      "ps": {
+        "description": "Palestine, State of"
+      },
+      "pa": {
+        "description": "Panama"
+      },
+      "pg": {
+        "description": "Papua New Guinea"
+      },
+      "py": {
+        "description": "Paraguay"
+      },
+      "pe": {
+        "description": "Peru"
+      },
+      "ph": {
+        "description": "Philippines (the)"
+      },
+      "pn": {
+        "description": "Pitcairn"
+      },
+      "pl": {
+        "description": "Poland"
+      },
+      "pt": {
+        "description": "Portugal"
+      },
+      "pr": {
+        "description": "Puerto Rico"
+      },
+      "qa": {
+        "description": "Qatar"
+      },
+      "mk": {
+        "description": "Republic of North Macedonia"
+      },
+      "ro": {
+        "description": "Romania"
+      },
+      "ru": {
+        "description": "Russian Federation (the)"
+      },
+      "rw": {
+        "description": "Rwanda"
+      },
+      "re": {
+        "description": "Réunion"
+      },
+      "bl": {
+        "description": "Saint Barthélemy"
+      },
+      "sh": {
+        "description": "Saint Helena, Ascension and Tristan da Cunha"
+      },
+      "kn": {
+        "description": "Saint Kitts and Nevis"
+      },
+      "lc": {
+        "description": "Saint Lucia"
+      },
+      "mf": {
+        "description": "Saint Martin (French part)"
+      },
+      "pm": {
+        "description": "Saint Pierre and Miquelon"
+      },
+      "vc": {
+        "description": "Saint Vincent and the Grenadines"
+      },
+      "ws": {
+        "description": "Samoa"
+      },
+      "sm": {
+        "description": "San Marino"
+      },
+      "st": {
+        "description": "Sao Tome and Principe"
+      },
+      "sa": {
+        "description": "Saudi Arabia"
+      },
+      "sn": {
+        "description": "Senegal"
+      },
+      "rs": {
+        "description": "Serbia"
+      },
+      "sc": {
+        "description": "Seychelles"
+      },
+      "sl": {
+        "description": "Sierra Leone"
+      },
+      "sg": {
+        "description": "Singapore"
+      },
+      "sx": {
+        "description": "Sint Maarten (Dutch part)"
+      },
+      "sk": {
+        "description": "Slovakia"
+      },
+      "si": {
+        "description": "Slovenia"
+      },
+      "sb": {
+        "description": "Solomon Islands"
+      },
+      "so": {
+        "description": "Somalia"
+      },
+      "za": {
+        "description": "South Africa"
+      },
+      "gs": {
+        "description": "South Georgia and the South Sandwich Islands"
+      },
+      "ss": {
+        "description": "South Sudan"
+      },
+      "es": {
+        "description": "Spain"
+      },
+      "lk": {
+        "description": "Sri Lanka"
+      },
+      "sd": {
+        "description": "Sudan (the)"
+      },
+      "sr": {
+        "description": "Suriname"
+      },
+      "sj": {
+        "description": "Svalbard and Jan Mayen"
+      },
+      "se": {
+        "description": "Sweden"
+      },
+      "ch": {
+        "description": "Switzerland"
+      },
+      "sy": {
+        "description": "Syrian Arab Republic"
+      },
+      "tw": {
+        "description": "Taiwan (Province of China)"
+      },
+      "tj": {
+        "description": "Tajikistan"
+      },
+      "tz": {
+        "description": "Tanzania, United Republic of"
+      },
+      "th": {
+        "description": "Thailand"
+      },
+      "tl": {
+        "description": "Timor-Leste"
+      },
+      "tg": {
+        "description": "Togo"
+      },
+      "tk": {
+        "description": "Tokelau"
+      },
+      "to": {
+        "description": "Tonga"
+      },
+      "tt": {
+        "description": "Trinidad and Tobago"
+      },
+      "tn": {
+        "description": "Tunisia"
+      },
+      "tr": {
+        "description": "Turkey"
+      },
+      "tm": {
+        "description": "Turkmenistan"
+      },
+      "tc": {
+        "description": "Turks and Caicos Islands (the)"
+      },
+      "tv": {
+        "description": "Tuvalu"
+      },
+      "ug": {
+        "description": "Uganda"
+      },
+      "ua": {
+        "description": "Ukraine"
+      },
+      "ae": {
+        "description": "United Arab Emirates (the)"
+      },
+      "gb": {
+        "description": "United Kingdom of Great Britain and Northern Ireland (the)"
+      },
+      "um": {
+        "description": "United States Minor Outlying Islands (the)"
+      },
+      "us": {
+        "description": "United States of America (the)"
+      },
+      "uy": {
+        "description": "Uruguay"
+      },
+      "uz": {
+        "description": "Uzbekistan"
+      },
+      "vu": {
+        "description": "Vanuatu"
+      },
+      "ve": {
+        "description": "Venezuela (Bolivarian Republic of)"
+      },
+      "vn": {
+        "description": "Viet Nam"
+      },
+      "vg": {
+        "description": "Virgin Islands (British)"
+      },
+      "vi": {
+        "description": "Virgin Islands (U.S.)"
+      },
+      "wf": {
+        "description": "Wallis and Futuna"
+      },
+      "eh": {
+        "description": "Western Sahara"
+      },
+      "ye": {
+        "description": "Yemen"
+      },
+      "zm": {
+        "description": "Zambia"
+      },
+      "zw": {
+        "description": "Zimbabwe"
+      },
+      "ax": {
+        "description": "Åland Islands"
+      },
+      "xk": {
+        "description": "Kosovo"
+      }
+    },
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "mitochondrion_assembly_span": {
+    "display_group": "mitochondrion_assembly",
+    "constraint": {
+      "min": 1
+    },
+    "display_level": 2,
+    "display_name": "mitochondrion span",
+    "type": "long",
+    "units": "bases",
+    "summary": "median",
+    "traverse_direction": "both",
+    "processed_type": "integer",
+    "processed_summary": "long_value",
+    "processed_simple": "value"
+  },
+  "mitochondrion_gc_percent": {
+    "constraint": {
+      "max": 100,
+      "min": 0
+    },
+    "display_group": "mitochondrion_assembly",
+    "display_level": 2,
+    "type": "2dp",
+    "units": "%",
+    "display_name": "mitochondrion GC%",
+    "summary": "median",
+    "processed_type": "float",
+    "processed_summary": "2dp_value",
+    "processed_simple": "value"
+  },
+  "plastid_assembly_span": {
+    "display_group": "plastid_assembly",
+    "constraint": {
+      "min": 1
+    },
+    "display_level": 2,
+    "display_name": "plastid span",
+    "type": "long",
+    "units": "bases",
+    "summary": "median",
+    "traverse_direction": "both",
+    "processed_type": "integer",
+    "processed_summary": "long_value",
+    "processed_simple": "value"
+  },
+  "plastid_gc_percent": {
+    "constraint": {
+      "max": 100,
+      "min": 0
+    },
+    "display_group": "plastid_assembly",
+    "display_level": 2,
+    "type": "2dp",
+    "units": "%",
+    "display_name": "plastid GC%",
+    "summary": "median",
+    "processed_type": "float",
+    "processed_summary": "2dp_value",
+    "processed_simple": "value"
+  },
+  "chromosome_number": {
+    "display_group": "karyotype",
+    "constraint": {
+      "max": 2000,
+      "min": 0
+    },
+    "description": "Chromosome number",
+    "display_level": 1,
+    "display_name": "Chromosome number",
+    "summary": [
+      "median_high",
+      "mode",
+      "max",
+      "min"
+    ],
+    "traverse_direction": "both",
+    "type": "short",
+    "processed_type": "integer",
+    "processed_summary": "short_value",
+    "processed_simple": "value"
+  },
+  "haploid_number": {
+    "display_group": "karyotype",
+    "constraint": {
+      "max": 2000,
+      "min": 0
+    },
+    "description": "Haploid number",
+    "display_level": 1,
+    "display_name": "Haploid number",
+    "summary": [
+      "median_high",
+      "mode",
+      "max",
+      "min"
+    ],
+    "traverse_direction": "both",
+    "type": "short",
+    "processed_type": "integer",
+    "processed_summary": "short_value",
+    "processed_simple": "value"
+  },
+  "sex_determination": {
+    "display_group": "karyotype",
+    "description": "Sex determination mechanism",
+    "display_level": 2,
+    "display_name": "Sex Determination",
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "ploidy": {
+    "display_group": "karyotype",
+    "constraint": {
+      "max": 200,
+      "min": 0
+    },
+    "description": "Ploidy",
+    "display_level": 2,
+    "display_name": "Ploidy",
+    "summary": [
+      "median_high",
+      "mode",
+      "max",
+      "min"
+    ],
+    "traverse_direction": "both",
+    "type": "short",
+    "processed_type": "integer",
+    "processed_summary": "short_value",
+    "processed_simple": "value"
+  },
+  "echabs92": {
+    "constraint": {
+      "enum": [
+        "echabs92_annex_iib",
+        "echabs92_annex_ivb",
+        "echabs92_annex_iva"
+      ]
+    },
+    "description": "Section in which species is listed",
+    "display_group": "uk_legislation",
+    "display_level": 2,
+    "display_name": "EC Habitats Directive 1992",
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "habreg_2017": {
+    "constraint": {
+      "enum": [
+        "habreg-sch2",
+        "habreg-sch5"
+      ]
+    },
+    "description": "Section in which species is listed",
+    "display_group": "uk_legislation",
+    "display_level": 2,
+    "display_name": "Conservation of Habitats and Species Regulations 2017",
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "marhabreg-2017": {
+    "constraint": {
+      "enum": [
+        "marhabreg-sch1"
+      ]
+    },
+    "description": "Section in which species is listed",
+    "display_group": "uk_legislation",
+    "display_level": 2,
+    "display_name": "Conservation of Offshore Marine Habitats and Species Regulations 2017",
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "waca_1981": {
+    "constraint": {
+      "enum": [
+        "waca-sch1",
+        "waca-sch5"
+      ]
+    },
+    "description": "Section in which species is listed",
+    "display_group": "uk_legislation",
+    "display_level": 2,
+    "display_name": "Wildlife and Countryside Act 1981",
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "isb_wildlife_act_1976": {
+    "constraint": {
+      "enum": [
+        "iwa-nsch3",
+        "iwa-sch5"
+      ]
+    },
+    "description": "Section in which species is listed",
+    "display_group": "uk_legislation",
+    "display_level": 2,
+    "display_name": "Irish Statute Book Wildlife Act, 1976",
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "protection_of_badgers_act_1992": {
+    "constraint": {
+      "enum": [
+        "badgers92"
+      ]
+    },
+    "description": "Section in which species is listed",
+    "display_group": "uk_legislation",
+    "display_level": 2,
+    "display_name": "Protection of Badgers Act 1992",
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "sample_available": {
+    "display_group": "sequencing_status",
+    "display_level": 2,
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "constraint": {
+      "enum": [
+        "africabp",
+        "ag100pest",
+        "agi",
+        "arg",
+        "asg",
+        "bat1k",
+        "b10k",
+        "bioplatforms_australia",
+        "canbp",
+        "cbp",
+        "ccgp",
+        "cfgp",
+        "cngb",
+        "dtol",
+        "ebpn",
+        "ein",
+        "endemixit",
+        "erga",
+        "erga-bge",
+        "erga-ch",
+        "erga-pil",
+        "eurofish",
+        "gaga",
+        "gap",
+        "gbr",
+        "giga",
+        "i5k",
+        "ilebp",
+        "1kfg",
+        "lmgp",
+        "loewe-tbg",
+        "metainvert",
+        "ogg",
+        "omg",
+        "other",
+        "pgp",
+        "phyloalps",
+        "prgp",
+        "psyche",
+        "squalomix",
+        "tsi",
+        "vgp",
+        "ygg",
+        "zoonomia"
+      ]
+    },
+    "value_metadata": {
+      "default": {
+        "description": "Click to view GoaT project page",
+        "link": "https://goat.genomehubs.org/projects/{}"
+      },
+      "africabp": {
+        "description": "Africa Biogenome Project (click to view GoaT project page)"
+      },
+      "ag100pest": {
+        "description": "Ag100Pest (click to view GoaT project page)"
+      },
+      "agi": {
+        "description": "Applied Genomics Initiative (click to view GoaT project page)"
+      },
+      "arg": {
+        "description": "Australian Amphibian and Reptile Genomics - AusARG (click to view GoaT project page)"
+      },
+      "asg": {
+        "description": "Aquatic Symbiosis Genomics Project (click to view GoaT project page)"
+      },
+      "bat1k": {
+        "description": "Bat 1K (click to view GoaT project page)"
+      },
+      "b10k": {
+        "description": "Bird 10K (click to view GoaT project page)"
+      },
+      "bioplatforms_australia": {
+        "description": "Bioplatforms Australia"
+      },
+      "canbp": {
+        "description": "Canada Biogenome Project (click to view GoaT project page)"
+      },
+      "cbp": {
+        "description": "Catalan Biogenome Project (click to view GoaT project page)"
+      },
+      "ccgp": {
+        "description": "California Conservation Genomics Project (click to view GoaT project page)"
+      },
+      "cfgp": {
+        "description": "Cartilaginous Fish Genome Project (click to view GoaT project page)"
+      },
+      "dtol": {
+        "description": "Darwin Tree of Life (click to view GoaT project page)"
+      },
+      "ebpn": {
+        "description": "EBP Norway (click to view GoaT project page)"
+      },
+      "ein": {
+        "description": "Euglena International Network (click to view GoaT project page)"
+      },
+      "endemixit": {
+        "description": "ENDEMIXIT (click to view GoaT project page)"
+      },
+      "erga": {
+        "description": "European Reference Genome Atlas Umbrella (click to view GoaT project page)"
+      },
+      "erga-bge": {
+        "description": "ERGA Biodiversity Genomics Europe (click to view GoaT project page)"
+      },
+      "erga-ch": {
+        "description": "ERGA Switzerland (click to view GoaT project page)"
+      },
+      "erga-pil": {
+        "description": "ERGA Pilot (click to view GoaT project page)"
+      },
+      "eurofish": {
+        "description": "EUROFISH (click to view GoaT project page)"
+      },
+      "gaga": {
+        "description": "Global Ant Genomics Alliance (click to view GoaT project page)"
+      },
+      "gap": {
+        "description": "Genomics for Australian Plants (click to view GoaT project page)"
+      },
+      "gbr": {
+        "description": "Great Reef Barrier (click to view GoaT project page)"
+      },
+      "giga": {
+        "description": "Global Invertebrate Genomics Alliance (click to view GoaT project page)"
+      },
+      "i5k": {
+        "description": "i5K (click to view GoaT project page)"
+      },
+      "ilebp": {
+        "description": "Illinois EBP Pilot (click to view GoaT project page)"
+      },
+      "1kfg": {
+        "description": "1K Fungal Genomes Project (click to view GoaT project page)"
+      },
+      "lmgp": {
+        "description": "Lilioid Monocots Core Group Genome Project (click to view GoaT project page)"
+      },
+      "loewe-tbg": {
+        "description": "LOEWE Centre for Translational Biodiversity Genomics (click to view GoaT project page)"
+      },
+      "metainvert": {
+        "description": "MetaInvert (click to view GoaT project page)"
+      },
+      "ogg": {
+        "description": "Open Green Genomes (click to view GoaT project page)"
+      },
+      "omg": {
+        "description": "Oz Mammals Genomics (click to view GoaT project page)"
+      },
+      "other": {
+        "description": "Other EBP Projects"
+      },
+      "pgp": {
+        "description": "Polar Genomes Project (click to view GoaT project page)"
+      },
+      "phyloalps": {
+        "description": "PhyloAlps (click to view GoaT project page)"
+      },
+      "prgp": {
+        "description": "Primate Genomes Project (click to view GoaT project page)"
+      },
+      "psyche": {
+        "description": "Project Psyche (click to view GoaT project page)"
+      },
+      "squalomix": {
+        "description": "Squalomix (click to view GoaT project page)"
+      },
+      "tsi": {
+        "description": "Threatened Species Initiative (click to view GoaT project page)"
+      },
+      "vgp": {
+        "description": "Vertebrate Genomes Project (click to view GoaT project page)"
+      },
+      "ygg": {
+        "description": "Yggdrasil (click to view GoaT project page)"
+      },
+      "zoonomia": {
+        "description": "Zoonomia (click to view GoaT project page)"
+      }
+    },
+    "description": "Project has available samples for the taxon (acronym)",
+    "display_name": "Sample collected",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "sample_collected": {
+    "display_group": "sequencing_status",
+    "display_level": 2,
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "constraint": {
+      "enum": [
+        "africabp",
+        "ag100pest",
+        "agi",
+        "arg",
+        "asg",
+        "bat1k",
+        "b10k",
+        "bioplatforms_australia",
+        "canbp",
+        "cbp",
+        "ccgp",
+        "cfgp",
+        "cngb",
+        "dtol",
+        "ebpn",
+        "ein",
+        "endemixit",
+        "erga",
+        "erga-bge",
+        "erga-ch",
+        "erga-pil",
+        "eurofish",
+        "gaga",
+        "gap",
+        "gbr",
+        "giga",
+        "i5k",
+        "ilebp",
+        "1kfg",
+        "lmgp",
+        "loewe-tbg",
+        "metainvert",
+        "ogg",
+        "omg",
+        "other",
+        "pgp",
+        "phyloalps",
+        "prgp",
+        "psyche",
+        "squalomix",
+        "tsi",
+        "vgp",
+        "ygg",
+        "zoonomia"
+      ]
+    },
+    "value_metadata": {
+      "default": {
+        "description": "Click to view GoaT project page",
+        "link": "https://goat.genomehubs.org/projects/{}"
+      },
+      "africabp": {
+        "description": "Africa Biogenome Project (click to view GoaT project page)"
+      },
+      "ag100pest": {
+        "description": "Ag100Pest (click to view GoaT project page)"
+      },
+      "agi": {
+        "description": "Applied Genomics Initiative (click to view GoaT project page)"
+      },
+      "arg": {
+        "description": "Australian Amphibian and Reptile Genomics - AusARG (click to view GoaT project page)"
+      },
+      "asg": {
+        "description": "Aquatic Symbiosis Genomics Project (click to view GoaT project page)"
+      },
+      "bat1k": {
+        "description": "Bat 1K (click to view GoaT project page)"
+      },
+      "b10k": {
+        "description": "Bird 10K (click to view GoaT project page)"
+      },
+      "bioplatforms_australia": {
+        "description": "Bioplatforms Australia"
+      },
+      "canbp": {
+        "description": "Canada Biogenome Project (click to view GoaT project page)"
+      },
+      "cbp": {
+        "description": "Catalan Biogenome Project (click to view GoaT project page)"
+      },
+      "ccgp": {
+        "description": "California Conservation Genomics Project (click to view GoaT project page)"
+      },
+      "cfgp": {
+        "description": "Cartilaginous Fish Genome Project (click to view GoaT project page)"
+      },
+      "dtol": {
+        "description": "Darwin Tree of Life (click to view GoaT project page)"
+      },
+      "ebpn": {
+        "description": "EBP Norway (click to view GoaT project page)"
+      },
+      "ein": {
+        "description": "Euglena International Network (click to view GoaT project page)"
+      },
+      "endemixit": {
+        "description": "ENDEMIXIT (click to view GoaT project page)"
+      },
+      "erga": {
+        "description": "European Reference Genome Atlas Umbrella (click to view GoaT project page)"
+      },
+      "erga-bge": {
+        "description": "ERGA Biodiversity Genomics Europe (click to view GoaT project page)"
+      },
+      "erga-ch": {
+        "description": "ERGA Switzerland (click to view GoaT project page)"
+      },
+      "erga-pil": {
+        "description": "ERGA Pilot (click to view GoaT project page)"
+      },
+      "eurofish": {
+        "description": "EUROFISH (click to view GoaT project page)"
+      },
+      "gaga": {
+        "description": "Global Ant Genomics Alliance (click to view GoaT project page)"
+      },
+      "gap": {
+        "description": "Genomics for Australian Plants (click to view GoaT project page)"
+      },
+      "gbr": {
+        "description": "Great Reef Barrier (click to view GoaT project page)"
+      },
+      "giga": {
+        "description": "Global Invertebrate Genomics Alliance (click to view GoaT project page)"
+      },
+      "i5k": {
+        "description": "i5K (click to view GoaT project page)"
+      },
+      "ilebp": {
+        "description": "Illinois EBP Pilot (click to view GoaT project page)"
+      },
+      "1kfg": {
+        "description": "1K Fungal Genomes Project (click to view GoaT project page)"
+      },
+      "lmgp": {
+        "description": "Lilioid Monocots Core Group Genome Project (click to view GoaT project page)"
+      },
+      "loewe-tbg": {
+        "description": "LOEWE Centre for Translational Biodiversity Genomics (click to view GoaT project page)"
+      },
+      "metainvert": {
+        "description": "MetaInvert (click to view GoaT project page)"
+      },
+      "ogg": {
+        "description": "Open Green Genomes (click to view GoaT project page)"
+      },
+      "omg": {
+        "description": "Oz Mammals Genomics (click to view GoaT project page)"
+      },
+      "other": {
+        "description": "Other EBP Projects"
+      },
+      "pgp": {
+        "description": "Polar Genomes Project (click to view GoaT project page)"
+      },
+      "phyloalps": {
+        "description": "PhyloAlps (click to view GoaT project page)"
+      },
+      "prgp": {
+        "description": "Primate Genomes Project (click to view GoaT project page)"
+      },
+      "psyche": {
+        "description": "Project Psyche (click to view GoaT project page)"
+      },
+      "squalomix": {
+        "description": "Squalomix (click to view GoaT project page)"
+      },
+      "tsi": {
+        "description": "Threatened Species Initiative (click to view GoaT project page)"
+      },
+      "vgp": {
+        "description": "Vertebrate Genomes Project (click to view GoaT project page)"
+      },
+      "ygg": {
+        "description": "Yggdrasil (click to view GoaT project page)"
+      },
+      "zoonomia": {
+        "description": "Zoonomia (click to view GoaT project page)"
+      }
+    },
+    "description": "Project has collected samples for the taxon (acronym)",
+    "display_name": "Sample collected",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "resampling_required": {
+    "display_group": "sequencing_status",
+    "display_level": 2,
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "constraint": {
+      "enum": [
+        "africabp",
+        "ag100pest",
+        "agi",
+        "arg",
+        "asg",
+        "bat1k",
+        "b10k",
+        "bioplatforms_australia",
+        "canbp",
+        "cbp",
+        "ccgp",
+        "cfgp",
+        "cngb",
+        "dtol",
+        "ebpn",
+        "ein",
+        "endemixit",
+        "erga",
+        "erga-bge",
+        "erga-ch",
+        "erga-pil",
+        "eurofish",
+        "gaga",
+        "gap",
+        "gbr",
+        "giga",
+        "i5k",
+        "ilebp",
+        "1kfg",
+        "lmgp",
+        "loewe-tbg",
+        "metainvert",
+        "ogg",
+        "omg",
+        "other",
+        "pgp",
+        "phyloalps",
+        "prgp",
+        "psyche",
+        "squalomix",
+        "tsi",
+        "vgp",
+        "ygg",
+        "zoonomia"
+      ]
+    },
+    "value_metadata": {
+      "default": {
+        "description": "Click to view GoaT project page",
+        "link": "https://goat.genomehubs.org/projects/{}"
+      },
+      "africabp": {
+        "description": "Africa Biogenome Project (click to view GoaT project page)"
+      },
+      "ag100pest": {
+        "description": "Ag100Pest (click to view GoaT project page)"
+      },
+      "agi": {
+        "description": "Applied Genomics Initiative (click to view GoaT project page)"
+      },
+      "arg": {
+        "description": "Australian Amphibian and Reptile Genomics - AusARG (click to view GoaT project page)"
+      },
+      "asg": {
+        "description": "Aquatic Symbiosis Genomics Project (click to view GoaT project page)"
+      },
+      "bat1k": {
+        "description": "Bat 1K (click to view GoaT project page)"
+      },
+      "b10k": {
+        "description": "Bird 10K (click to view GoaT project page)"
+      },
+      "bioplatforms_australia": {
+        "description": "Bioplatforms Australia"
+      },
+      "canbp": {
+        "description": "Canada Biogenome Project (click to view GoaT project page)"
+      },
+      "cbp": {
+        "description": "Catalan Biogenome Project (click to view GoaT project page)"
+      },
+      "ccgp": {
+        "description": "California Conservation Genomics Project (click to view GoaT project page)"
+      },
+      "cfgp": {
+        "description": "Cartilaginous Fish Genome Project (click to view GoaT project page)"
+      },
+      "dtol": {
+        "description": "Darwin Tree of Life (click to view GoaT project page)"
+      },
+      "ebpn": {
+        "description": "EBP Norway (click to view GoaT project page)"
+      },
+      "ein": {
+        "description": "Euglena International Network (click to view GoaT project page)"
+      },
+      "endemixit": {
+        "description": "ENDEMIXIT (click to view GoaT project page)"
+      },
+      "erga": {
+        "description": "European Reference Genome Atlas Umbrella (click to view GoaT project page)"
+      },
+      "erga-bge": {
+        "description": "ERGA Biodiversity Genomics Europe (click to view GoaT project page)"
+      },
+      "erga-ch": {
+        "description": "ERGA Switzerland (click to view GoaT project page)"
+      },
+      "erga-pil": {
+        "description": "ERGA Pilot (click to view GoaT project page)"
+      },
+      "eurofish": {
+        "description": "EUROFISH (click to view GoaT project page)"
+      },
+      "gaga": {
+        "description": "Global Ant Genomics Alliance (click to view GoaT project page)"
+      },
+      "gap": {
+        "description": "Genomics for Australian Plants (click to view GoaT project page)"
+      },
+      "gbr": {
+        "description": "Great Reef Barrier (click to view GoaT project page)"
+      },
+      "giga": {
+        "description": "Global Invertebrate Genomics Alliance (click to view GoaT project page)"
+      },
+      "i5k": {
+        "description": "i5K (click to view GoaT project page)"
+      },
+      "ilebp": {
+        "description": "Illinois EBP Pilot (click to view GoaT project page)"
+      },
+      "1kfg": {
+        "description": "1K Fungal Genomes Project (click to view GoaT project page)"
+      },
+      "lmgp": {
+        "description": "Lilioid Monocots Core Group Genome Project (click to view GoaT project page)"
+      },
+      "loewe-tbg": {
+        "description": "LOEWE Centre for Translational Biodiversity Genomics (click to view GoaT project page)"
+      },
+      "metainvert": {
+        "description": "MetaInvert (click to view GoaT project page)"
+      },
+      "ogg": {
+        "description": "Open Green Genomes (click to view GoaT project page)"
+      },
+      "omg": {
+        "description": "Oz Mammals Genomics (click to view GoaT project page)"
+      },
+      "other": {
+        "description": "Other EBP Projects"
+      },
+      "pgp": {
+        "description": "Polar Genomes Project (click to view GoaT project page)"
+      },
+      "phyloalps": {
+        "description": "PhyloAlps (click to view GoaT project page)"
+      },
+      "prgp": {
+        "description": "Primate Genomes Project (click to view GoaT project page)"
+      },
+      "psyche": {
+        "description": "Project Psyche (click to view GoaT project page)"
+      },
+      "squalomix": {
+        "description": "Squalomix (click to view GoaT project page)"
+      },
+      "tsi": {
+        "description": "Threatened Species Initiative (click to view GoaT project page)"
+      },
+      "vgp": {
+        "description": "Vertebrate Genomes Project (click to view GoaT project page)"
+      },
+      "ygg": {
+        "description": "Yggdrasil (click to view GoaT project page)"
+      },
+      "zoonomia": {
+        "description": "Zoonomia (click to view GoaT project page)"
+      }
+    },
+    "description": "Project needs additional samples (acronym)",
+    "display_name": "Resampling required",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "sample_acquired": {
+    "display_group": "sequencing_status",
+    "display_level": 2,
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "constraint": {
+      "enum": [
+        "africabp",
+        "ag100pest",
+        "agi",
+        "arg",
+        "asg",
+        "bat1k",
+        "b10k",
+        "bioplatforms_australia",
+        "canbp",
+        "cbp",
+        "ccgp",
+        "cfgp",
+        "cngb",
+        "dtol",
+        "ebpn",
+        "ein",
+        "endemixit",
+        "erga",
+        "erga-bge",
+        "erga-ch",
+        "erga-pil",
+        "eurofish",
+        "gaga",
+        "gap",
+        "gbr",
+        "giga",
+        "i5k",
+        "ilebp",
+        "1kfg",
+        "lmgp",
+        "loewe-tbg",
+        "metainvert",
+        "ogg",
+        "omg",
+        "other",
+        "pgp",
+        "phyloalps",
+        "prgp",
+        "psyche",
+        "squalomix",
+        "tsi",
+        "vgp",
+        "ygg",
+        "zoonomia"
+      ]
+    },
+    "value_metadata": {
+      "default": {
+        "description": "Click to view GoaT project page",
+        "link": "https://goat.genomehubs.org/projects/{}"
+      },
+      "africabp": {
+        "description": "Africa Biogenome Project (click to view GoaT project page)"
+      },
+      "ag100pest": {
+        "description": "Ag100Pest (click to view GoaT project page)"
+      },
+      "agi": {
+        "description": "Applied Genomics Initiative (click to view GoaT project page)"
+      },
+      "arg": {
+        "description": "Australian Amphibian and Reptile Genomics - AusARG (click to view GoaT project page)"
+      },
+      "asg": {
+        "description": "Aquatic Symbiosis Genomics Project (click to view GoaT project page)"
+      },
+      "bat1k": {
+        "description": "Bat 1K (click to view GoaT project page)"
+      },
+      "b10k": {
+        "description": "Bird 10K (click to view GoaT project page)"
+      },
+      "bioplatforms_australia": {
+        "description": "Bioplatforms Australia"
+      },
+      "canbp": {
+        "description": "Canada Biogenome Project (click to view GoaT project page)"
+      },
+      "cbp": {
+        "description": "Catalan Biogenome Project (click to view GoaT project page)"
+      },
+      "ccgp": {
+        "description": "California Conservation Genomics Project (click to view GoaT project page)"
+      },
+      "cfgp": {
+        "description": "Cartilaginous Fish Genome Project (click to view GoaT project page)"
+      },
+      "dtol": {
+        "description": "Darwin Tree of Life (click to view GoaT project page)"
+      },
+      "ebpn": {
+        "description": "EBP Norway (click to view GoaT project page)"
+      },
+      "ein": {
+        "description": "Euglena International Network (click to view GoaT project page)"
+      },
+      "endemixit": {
+        "description": "ENDEMIXIT (click to view GoaT project page)"
+      },
+      "erga": {
+        "description": "European Reference Genome Atlas Umbrella (click to view GoaT project page)"
+      },
+      "erga-bge": {
+        "description": "ERGA Biodiversity Genomics Europe (click to view GoaT project page)"
+      },
+      "erga-ch": {
+        "description": "ERGA Switzerland (click to view GoaT project page)"
+      },
+      "erga-pil": {
+        "description": "ERGA Pilot (click to view GoaT project page)"
+      },
+      "eurofish": {
+        "description": "EUROFISH (click to view GoaT project page)"
+      },
+      "gaga": {
+        "description": "Global Ant Genomics Alliance (click to view GoaT project page)"
+      },
+      "gap": {
+        "description": "Genomics for Australian Plants (click to view GoaT project page)"
+      },
+      "gbr": {
+        "description": "Great Reef Barrier (click to view GoaT project page)"
+      },
+      "giga": {
+        "description": "Global Invertebrate Genomics Alliance (click to view GoaT project page)"
+      },
+      "i5k": {
+        "description": "i5K (click to view GoaT project page)"
+      },
+      "ilebp": {
+        "description": "Illinois EBP Pilot (click to view GoaT project page)"
+      },
+      "1kfg": {
+        "description": "1K Fungal Genomes Project (click to view GoaT project page)"
+      },
+      "lmgp": {
+        "description": "Lilioid Monocots Core Group Genome Project (click to view GoaT project page)"
+      },
+      "loewe-tbg": {
+        "description": "LOEWE Centre for Translational Biodiversity Genomics (click to view GoaT project page)"
+      },
+      "metainvert": {
+        "description": "MetaInvert (click to view GoaT project page)"
+      },
+      "ogg": {
+        "description": "Open Green Genomes (click to view GoaT project page)"
+      },
+      "omg": {
+        "description": "Oz Mammals Genomics (click to view GoaT project page)"
+      },
+      "other": {
+        "description": "Other EBP Projects"
+      },
+      "pgp": {
+        "description": "Polar Genomes Project (click to view GoaT project page)"
+      },
+      "phyloalps": {
+        "description": "PhyloAlps (click to view GoaT project page)"
+      },
+      "prgp": {
+        "description": "Primate Genomes Project (click to view GoaT project page)"
+      },
+      "psyche": {
+        "description": "Project Psyche (click to view GoaT project page)"
+      },
+      "squalomix": {
+        "description": "Squalomix (click to view GoaT project page)"
+      },
+      "tsi": {
+        "description": "Threatened Species Initiative (click to view GoaT project page)"
+      },
+      "vgp": {
+        "description": "Vertebrate Genomes Project (click to view GoaT project page)"
+      },
+      "ygg": {
+        "description": "Yggdrasil (click to view GoaT project page)"
+      },
+      "zoonomia": {
+        "description": "Zoonomia (click to view GoaT project page)"
+      }
+    },
+    "description": "Samples received by sequencing center",
+    "display_name": "Sample acquired",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "in_progress": {
+    "display_group": "sequencing_status",
+    "display_level": 2,
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "constraint": {
+      "enum": [
+        "africabp",
+        "ag100pest",
+        "agi",
+        "arg",
+        "asg",
+        "bat1k",
+        "b10k",
+        "bioplatforms_australia",
+        "canbp",
+        "cbp",
+        "ccgp",
+        "cfgp",
+        "cngb",
+        "dtol",
+        "ebpn",
+        "ein",
+        "endemixit",
+        "erga",
+        "erga-bge",
+        "erga-ch",
+        "erga-pil",
+        "eurofish",
+        "gaga",
+        "gap",
+        "gbr",
+        "giga",
+        "i5k",
+        "ilebp",
+        "1kfg",
+        "lmgp",
+        "loewe-tbg",
+        "metainvert",
+        "ogg",
+        "omg",
+        "other",
+        "pgp",
+        "phyloalps",
+        "prgp",
+        "psyche",
+        "squalomix",
+        "tsi",
+        "vgp",
+        "ygg",
+        "zoonomia"
+      ]
+    },
+    "value_metadata": {
+      "default": {
+        "description": "Click to view GoaT project page",
+        "link": "https://goat.genomehubs.org/projects/{}"
+      },
+      "africabp": {
+        "description": "Africa Biogenome Project (click to view GoaT project page)"
+      },
+      "ag100pest": {
+        "description": "Ag100Pest (click to view GoaT project page)"
+      },
+      "agi": {
+        "description": "Applied Genomics Initiative (click to view GoaT project page)"
+      },
+      "arg": {
+        "description": "Australian Amphibian and Reptile Genomics - AusARG (click to view GoaT project page)"
+      },
+      "asg": {
+        "description": "Aquatic Symbiosis Genomics Project (click to view GoaT project page)"
+      },
+      "bat1k": {
+        "description": "Bat 1K (click to view GoaT project page)"
+      },
+      "b10k": {
+        "description": "Bird 10K (click to view GoaT project page)"
+      },
+      "bioplatforms_australia": {
+        "description": "Bioplatforms Australia"
+      },
+      "canbp": {
+        "description": "Canada Biogenome Project (click to view GoaT project page)"
+      },
+      "cbp": {
+        "description": "Catalan Biogenome Project (click to view GoaT project page)"
+      },
+      "ccgp": {
+        "description": "California Conservation Genomics Project (click to view GoaT project page)"
+      },
+      "cfgp": {
+        "description": "Cartilaginous Fish Genome Project (click to view GoaT project page)"
+      },
+      "dtol": {
+        "description": "Darwin Tree of Life (click to view GoaT project page)"
+      },
+      "ebpn": {
+        "description": "EBP Norway (click to view GoaT project page)"
+      },
+      "ein": {
+        "description": "Euglena International Network (click to view GoaT project page)"
+      },
+      "endemixit": {
+        "description": "ENDEMIXIT (click to view GoaT project page)"
+      },
+      "erga": {
+        "description": "European Reference Genome Atlas Umbrella (click to view GoaT project page)"
+      },
+      "erga-bge": {
+        "description": "ERGA Biodiversity Genomics Europe (click to view GoaT project page)"
+      },
+      "erga-ch": {
+        "description": "ERGA Switzerland (click to view GoaT project page)"
+      },
+      "erga-pil": {
+        "description": "ERGA Pilot (click to view GoaT project page)"
+      },
+      "eurofish": {
+        "description": "EUROFISH (click to view GoaT project page)"
+      },
+      "gaga": {
+        "description": "Global Ant Genomics Alliance (click to view GoaT project page)"
+      },
+      "gap": {
+        "description": "Genomics for Australian Plants (click to view GoaT project page)"
+      },
+      "gbr": {
+        "description": "Great Reef Barrier (click to view GoaT project page)"
+      },
+      "giga": {
+        "description": "Global Invertebrate Genomics Alliance (click to view GoaT project page)"
+      },
+      "i5k": {
+        "description": "i5K (click to view GoaT project page)"
+      },
+      "ilebp": {
+        "description": "Illinois EBP Pilot (click to view GoaT project page)"
+      },
+      "1kfg": {
+        "description": "1K Fungal Genomes Project (click to view GoaT project page)"
+      },
+      "lmgp": {
+        "description": "Lilioid Monocots Core Group Genome Project (click to view GoaT project page)"
+      },
+      "loewe-tbg": {
+        "description": "LOEWE Centre for Translational Biodiversity Genomics (click to view GoaT project page)"
+      },
+      "metainvert": {
+        "description": "MetaInvert (click to view GoaT project page)"
+      },
+      "ogg": {
+        "description": "Open Green Genomes (click to view GoaT project page)"
+      },
+      "omg": {
+        "description": "Oz Mammals Genomics (click to view GoaT project page)"
+      },
+      "other": {
+        "description": "Other EBP Projects"
+      },
+      "pgp": {
+        "description": "Polar Genomes Project (click to view GoaT project page)"
+      },
+      "phyloalps": {
+        "description": "PhyloAlps (click to view GoaT project page)"
+      },
+      "prgp": {
+        "description": "Primate Genomes Project (click to view GoaT project page)"
+      },
+      "psyche": {
+        "description": "Project Psyche (click to view GoaT project page)"
+      },
+      "squalomix": {
+        "description": "Squalomix (click to view GoaT project page)"
+      },
+      "tsi": {
+        "description": "Threatened Species Initiative (click to view GoaT project page)"
+      },
+      "vgp": {
+        "description": "Vertebrate Genomes Project (click to view GoaT project page)"
+      },
+      "ygg": {
+        "description": "Yggdrasil (click to view GoaT project page)"
+      },
+      "zoonomia": {
+        "description": "Zoonomia (click to view GoaT project page)"
+      }
+    },
+    "description": "Sequencing started but assembly not yet publicly available",
+    "display_name": "In progress",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "insdc_submitted": {
+    "display_group": "sequencing_status",
+    "display_level": 2,
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "constraint": {
+      "enum": [
+        "africabp",
+        "ag100pest",
+        "agi",
+        "arg",
+        "asg",
+        "bat1k",
+        "b10k",
+        "bioplatforms_australia",
+        "canbp",
+        "cbp",
+        "ccgp",
+        "cfgp",
+        "cngb",
+        "dtol",
+        "ebpn",
+        "ein",
+        "endemixit",
+        "erga",
+        "erga-bge",
+        "erga-ch",
+        "erga-pil",
+        "eurofish",
+        "gaga",
+        "gap",
+        "gbr",
+        "giga",
+        "i5k",
+        "ilebp",
+        "1kfg",
+        "lmgp",
+        "loewe-tbg",
+        "metainvert",
+        "ogg",
+        "omg",
+        "other",
+        "pgp",
+        "phyloalps",
+        "prgp",
+        "psyche",
+        "squalomix",
+        "tsi",
+        "vgp",
+        "ygg",
+        "zoonomia"
+      ]
+    },
+    "value_metadata": {
+      "default": {
+        "description": "Click to view GoaT project page",
+        "link": "https://goat.genomehubs.org/projects/{}"
+      },
+      "africabp": {
+        "description": "Africa Biogenome Project (click to view GoaT project page)"
+      },
+      "ag100pest": {
+        "description": "Ag100Pest (click to view GoaT project page)"
+      },
+      "agi": {
+        "description": "Applied Genomics Initiative (click to view GoaT project page)"
+      },
+      "arg": {
+        "description": "Australian Amphibian and Reptile Genomics - AusARG (click to view GoaT project page)"
+      },
+      "asg": {
+        "description": "Aquatic Symbiosis Genomics Project (click to view GoaT project page)"
+      },
+      "bat1k": {
+        "description": "Bat 1K (click to view GoaT project page)"
+      },
+      "b10k": {
+        "description": "Bird 10K (click to view GoaT project page)"
+      },
+      "bioplatforms_australia": {
+        "description": "Bioplatforms Australia"
+      },
+      "canbp": {
+        "description": "Canada Biogenome Project (click to view GoaT project page)"
+      },
+      "cbp": {
+        "description": "Catalan Biogenome Project (click to view GoaT project page)"
+      },
+      "ccgp": {
+        "description": "California Conservation Genomics Project (click to view GoaT project page)"
+      },
+      "cfgp": {
+        "description": "Cartilaginous Fish Genome Project (click to view GoaT project page)"
+      },
+      "dtol": {
+        "description": "Darwin Tree of Life (click to view GoaT project page)"
+      },
+      "ebpn": {
+        "description": "EBP Norway (click to view GoaT project page)"
+      },
+      "ein": {
+        "description": "Euglena International Network (click to view GoaT project page)"
+      },
+      "endemixit": {
+        "description": "ENDEMIXIT (click to view GoaT project page)"
+      },
+      "erga": {
+        "description": "European Reference Genome Atlas Umbrella (click to view GoaT project page)"
+      },
+      "erga-bge": {
+        "description": "ERGA Biodiversity Genomics Europe (click to view GoaT project page)"
+      },
+      "erga-ch": {
+        "description": "ERGA Switzerland (click to view GoaT project page)"
+      },
+      "erga-pil": {
+        "description": "ERGA Pilot (click to view GoaT project page)"
+      },
+      "eurofish": {
+        "description": "EUROFISH (click to view GoaT project page)"
+      },
+      "gaga": {
+        "description": "Global Ant Genomics Alliance (click to view GoaT project page)"
+      },
+      "gap": {
+        "description": "Genomics for Australian Plants (click to view GoaT project page)"
+      },
+      "gbr": {
+        "description": "Great Reef Barrier (click to view GoaT project page)"
+      },
+      "giga": {
+        "description": "Global Invertebrate Genomics Alliance (click to view GoaT project page)"
+      },
+      "i5k": {
+        "description": "i5K (click to view GoaT project page)"
+      },
+      "ilebp": {
+        "description": "Illinois EBP Pilot (click to view GoaT project page)"
+      },
+      "1kfg": {
+        "description": "1K Fungal Genomes Project (click to view GoaT project page)"
+      },
+      "lmgp": {
+        "description": "Lilioid Monocots Core Group Genome Project (click to view GoaT project page)"
+      },
+      "loewe-tbg": {
+        "description": "LOEWE Centre for Translational Biodiversity Genomics (click to view GoaT project page)"
+      },
+      "metainvert": {
+        "description": "MetaInvert (click to view GoaT project page)"
+      },
+      "ogg": {
+        "description": "Open Green Genomes (click to view GoaT project page)"
+      },
+      "omg": {
+        "description": "Oz Mammals Genomics (click to view GoaT project page)"
+      },
+      "other": {
+        "description": "Other EBP Projects"
+      },
+      "pgp": {
+        "description": "Polar Genomes Project (click to view GoaT project page)"
+      },
+      "phyloalps": {
+        "description": "PhyloAlps (click to view GoaT project page)"
+      },
+      "prgp": {
+        "description": "Primate Genomes Project (click to view GoaT project page)"
+      },
+      "psyche": {
+        "description": "Project Psyche (click to view GoaT project page)"
+      },
+      "squalomix": {
+        "description": "Squalomix (click to view GoaT project page)"
+      },
+      "tsi": {
+        "description": "Threatened Species Initiative (click to view GoaT project page)"
+      },
+      "vgp": {
+        "description": "Vertebrate Genomes Project (click to view GoaT project page)"
+      },
+      "ygg": {
+        "description": "Yggdrasil (click to view GoaT project page)"
+      },
+      "zoonomia": {
+        "description": "Zoonomia (click to view GoaT project page)"
+      }
+    },
+    "description": "Assembly submitted to INSDC but not yet publicly available",
+    "display_name": "In progress",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "open": {
+    "display_group": "sequencing_status",
+    "display_level": 2,
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "constraint": {
+      "enum": [
+        "africabp",
+        "ag100pest",
+        "agi",
+        "arg",
+        "asg",
+        "bat1k",
+        "b10k",
+        "bioplatforms_australia",
+        "canbp",
+        "cbp",
+        "ccgp",
+        "cfgp",
+        "cngb",
+        "dtol",
+        "ebpn",
+        "ein",
+        "endemixit",
+        "erga",
+        "erga-bge",
+        "erga-ch",
+        "erga-pil",
+        "eurofish",
+        "gaga",
+        "gap",
+        "gbr",
+        "giga",
+        "i5k",
+        "ilebp",
+        "1kfg",
+        "lmgp",
+        "loewe-tbg",
+        "metainvert",
+        "ogg",
+        "omg",
+        "other",
+        "pgp",
+        "phyloalps",
+        "prgp",
+        "psyche",
+        "squalomix",
+        "tsi",
+        "vgp",
+        "ygg",
+        "zoonomia"
+      ]
+    },
+    "value_metadata": {
+      "default": {
+        "description": "Click to view GoaT project page",
+        "link": "https://goat.genomehubs.org/projects/{}"
+      },
+      "africabp": {
+        "description": "Africa Biogenome Project (click to view GoaT project page)"
+      },
+      "ag100pest": {
+        "description": "Ag100Pest (click to view GoaT project page)"
+      },
+      "agi": {
+        "description": "Applied Genomics Initiative (click to view GoaT project page)"
+      },
+      "arg": {
+        "description": "Australian Amphibian and Reptile Genomics - AusARG (click to view GoaT project page)"
+      },
+      "asg": {
+        "description": "Aquatic Symbiosis Genomics Project (click to view GoaT project page)"
+      },
+      "bat1k": {
+        "description": "Bat 1K (click to view GoaT project page)"
+      },
+      "b10k": {
+        "description": "Bird 10K (click to view GoaT project page)"
+      },
+      "bioplatforms_australia": {
+        "description": "Bioplatforms Australia"
+      },
+      "canbp": {
+        "description": "Canada Biogenome Project (click to view GoaT project page)"
+      },
+      "cbp": {
+        "description": "Catalan Biogenome Project (click to view GoaT project page)"
+      },
+      "ccgp": {
+        "description": "California Conservation Genomics Project (click to view GoaT project page)"
+      },
+      "cfgp": {
+        "description": "Cartilaginous Fish Genome Project (click to view GoaT project page)"
+      },
+      "dtol": {
+        "description": "Darwin Tree of Life (click to view GoaT project page)"
+      },
+      "ebpn": {
+        "description": "EBP Norway (click to view GoaT project page)"
+      },
+      "ein": {
+        "description": "Euglena International Network (click to view GoaT project page)"
+      },
+      "endemixit": {
+        "description": "ENDEMIXIT (click to view GoaT project page)"
+      },
+      "erga": {
+        "description": "European Reference Genome Atlas Umbrella (click to view GoaT project page)"
+      },
+      "erga-bge": {
+        "description": "ERGA Biodiversity Genomics Europe (click to view GoaT project page)"
+      },
+      "erga-ch": {
+        "description": "ERGA Switzerland (click to view GoaT project page)"
+      },
+      "erga-pil": {
+        "description": "ERGA Pilot (click to view GoaT project page)"
+      },
+      "eurofish": {
+        "description": "EUROFISH (click to view GoaT project page)"
+      },
+      "gaga": {
+        "description": "Global Ant Genomics Alliance (click to view GoaT project page)"
+      },
+      "gap": {
+        "description": "Genomics for Australian Plants (click to view GoaT project page)"
+      },
+      "gbr": {
+        "description": "Great Reef Barrier (click to view GoaT project page)"
+      },
+      "giga": {
+        "description": "Global Invertebrate Genomics Alliance (click to view GoaT project page)"
+      },
+      "i5k": {
+        "description": "i5K (click to view GoaT project page)"
+      },
+      "ilebp": {
+        "description": "Illinois EBP Pilot (click to view GoaT project page)"
+      },
+      "1kfg": {
+        "description": "1K Fungal Genomes Project (click to view GoaT project page)"
+      },
+      "lmgp": {
+        "description": "Lilioid Monocots Core Group Genome Project (click to view GoaT project page)"
+      },
+      "loewe-tbg": {
+        "description": "LOEWE Centre for Translational Biodiversity Genomics (click to view GoaT project page)"
+      },
+      "metainvert": {
+        "description": "MetaInvert (click to view GoaT project page)"
+      },
+      "ogg": {
+        "description": "Open Green Genomes (click to view GoaT project page)"
+      },
+      "omg": {
+        "description": "Oz Mammals Genomics (click to view GoaT project page)"
+      },
+      "other": {
+        "description": "Other EBP Projects"
+      },
+      "pgp": {
+        "description": "Polar Genomes Project (click to view GoaT project page)"
+      },
+      "phyloalps": {
+        "description": "PhyloAlps (click to view GoaT project page)"
+      },
+      "prgp": {
+        "description": "Primate Genomes Project (click to view GoaT project page)"
+      },
+      "psyche": {
+        "description": "Project Psyche (click to view GoaT project page)"
+      },
+      "squalomix": {
+        "description": "Squalomix (click to view GoaT project page)"
+      },
+      "tsi": {
+        "description": "Threatened Species Initiative (click to view GoaT project page)"
+      },
+      "vgp": {
+        "description": "Vertebrate Genomes Project (click to view GoaT project page)"
+      },
+      "ygg": {
+        "description": "Yggdrasil (click to view GoaT project page)"
+      },
+      "zoonomia": {
+        "description": "Zoonomia (click to view GoaT project page)"
+      }
+    },
+    "description": "Data publicly available",
+    "display_name": "Open",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "insdc_open": {
+    "display_group": "sequencing_status",
+    "display_level": 2,
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "constraint": {
+      "enum": [
+        "africabp",
+        "ag100pest",
+        "agi",
+        "arg",
+        "asg",
+        "bat1k",
+        "b10k",
+        "bioplatforms_australia",
+        "canbp",
+        "cbp",
+        "ccgp",
+        "cfgp",
+        "cngb",
+        "dtol",
+        "ebpn",
+        "ein",
+        "endemixit",
+        "erga",
+        "erga-bge",
+        "erga-ch",
+        "erga-pil",
+        "eurofish",
+        "gaga",
+        "gap",
+        "gbr",
+        "giga",
+        "i5k",
+        "ilebp",
+        "1kfg",
+        "lmgp",
+        "loewe-tbg",
+        "metainvert",
+        "ogg",
+        "omg",
+        "other",
+        "pgp",
+        "phyloalps",
+        "prgp",
+        "psyche",
+        "squalomix",
+        "tsi",
+        "vgp",
+        "ygg",
+        "zoonomia"
+      ]
+    },
+    "value_metadata": {
+      "default": {
+        "description": "Click to view GoaT project page",
+        "link": "https://goat.genomehubs.org/projects/{}"
+      },
+      "africabp": {
+        "description": "Africa Biogenome Project (click to view GoaT project page)"
+      },
+      "ag100pest": {
+        "description": "Ag100Pest (click to view GoaT project page)"
+      },
+      "agi": {
+        "description": "Applied Genomics Initiative (click to view GoaT project page)"
+      },
+      "arg": {
+        "description": "Australian Amphibian and Reptile Genomics - AusARG (click to view GoaT project page)"
+      },
+      "asg": {
+        "description": "Aquatic Symbiosis Genomics Project (click to view GoaT project page)"
+      },
+      "bat1k": {
+        "description": "Bat 1K (click to view GoaT project page)"
+      },
+      "b10k": {
+        "description": "Bird 10K (click to view GoaT project page)"
+      },
+      "bioplatforms_australia": {
+        "description": "Bioplatforms Australia"
+      },
+      "canbp": {
+        "description": "Canada Biogenome Project (click to view GoaT project page)"
+      },
+      "cbp": {
+        "description": "Catalan Biogenome Project (click to view GoaT project page)"
+      },
+      "ccgp": {
+        "description": "California Conservation Genomics Project (click to view GoaT project page)"
+      },
+      "cfgp": {
+        "description": "Cartilaginous Fish Genome Project (click to view GoaT project page)"
+      },
+      "dtol": {
+        "description": "Darwin Tree of Life (click to view GoaT project page)"
+      },
+      "ebpn": {
+        "description": "EBP Norway (click to view GoaT project page)"
+      },
+      "ein": {
+        "description": "Euglena International Network (click to view GoaT project page)"
+      },
+      "endemixit": {
+        "description": "ENDEMIXIT (click to view GoaT project page)"
+      },
+      "erga": {
+        "description": "European Reference Genome Atlas Umbrella (click to view GoaT project page)"
+      },
+      "erga-bge": {
+        "description": "ERGA Biodiversity Genomics Europe (click to view GoaT project page)"
+      },
+      "erga-ch": {
+        "description": "ERGA Switzerland (click to view GoaT project page)"
+      },
+      "erga-pil": {
+        "description": "ERGA Pilot (click to view GoaT project page)"
+      },
+      "eurofish": {
+        "description": "EUROFISH (click to view GoaT project page)"
+      },
+      "gaga": {
+        "description": "Global Ant Genomics Alliance (click to view GoaT project page)"
+      },
+      "gap": {
+        "description": "Genomics for Australian Plants (click to view GoaT project page)"
+      },
+      "gbr": {
+        "description": "Great Reef Barrier (click to view GoaT project page)"
+      },
+      "giga": {
+        "description": "Global Invertebrate Genomics Alliance (click to view GoaT project page)"
+      },
+      "i5k": {
+        "description": "i5K (click to view GoaT project page)"
+      },
+      "ilebp": {
+        "description": "Illinois EBP Pilot (click to view GoaT project page)"
+      },
+      "1kfg": {
+        "description": "1K Fungal Genomes Project (click to view GoaT project page)"
+      },
+      "lmgp": {
+        "description": "Lilioid Monocots Core Group Genome Project (click to view GoaT project page)"
+      },
+      "loewe-tbg": {
+        "description": "LOEWE Centre for Translational Biodiversity Genomics (click to view GoaT project page)"
+      },
+      "metainvert": {
+        "description": "MetaInvert (click to view GoaT project page)"
+      },
+      "ogg": {
+        "description": "Open Green Genomes (click to view GoaT project page)"
+      },
+      "omg": {
+        "description": "Oz Mammals Genomics (click to view GoaT project page)"
+      },
+      "other": {
+        "description": "Other EBP Projects"
+      },
+      "pgp": {
+        "description": "Polar Genomes Project (click to view GoaT project page)"
+      },
+      "phyloalps": {
+        "description": "PhyloAlps (click to view GoaT project page)"
+      },
+      "prgp": {
+        "description": "Primate Genomes Project (click to view GoaT project page)"
+      },
+      "psyche": {
+        "description": "Project Psyche (click to view GoaT project page)"
+      },
+      "squalomix": {
+        "description": "Squalomix (click to view GoaT project page)"
+      },
+      "tsi": {
+        "description": "Threatened Species Initiative (click to view GoaT project page)"
+      },
+      "vgp": {
+        "description": "Vertebrate Genomes Project (click to view GoaT project page)"
+      },
+      "ygg": {
+        "description": "Yggdrasil (click to view GoaT project page)"
+      },
+      "zoonomia": {
+        "description": "Zoonomia (click to view GoaT project page)"
+      }
+    },
+    "description": "Data publicly available on INSDC sequence repositories",
+    "display_name": "Open on INSDC",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "published": {
+    "display_group": "sequencing_status",
+    "display_level": 2,
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "constraint": {
+      "enum": [
+        "africabp",
+        "ag100pest",
+        "agi",
+        "arg",
+        "asg",
+        "bat1k",
+        "b10k",
+        "bioplatforms_australia",
+        "canbp",
+        "cbp",
+        "ccgp",
+        "cfgp",
+        "cngb",
+        "dtol",
+        "ebpn",
+        "ein",
+        "endemixit",
+        "erga",
+        "erga-bge",
+        "erga-ch",
+        "erga-pil",
+        "eurofish",
+        "gaga",
+        "gap",
+        "gbr",
+        "giga",
+        "i5k",
+        "ilebp",
+        "1kfg",
+        "lmgp",
+        "loewe-tbg",
+        "metainvert",
+        "ogg",
+        "omg",
+        "other",
+        "pgp",
+        "phyloalps",
+        "prgp",
+        "psyche",
+        "squalomix",
+        "tsi",
+        "vgp",
+        "ygg",
+        "zoonomia"
+      ]
+    },
+    "value_metadata": {
+      "default": {
+        "description": "Click to view GoaT project page",
+        "link": "https://goat.genomehubs.org/projects/{}"
+      },
+      "africabp": {
+        "description": "Africa Biogenome Project (click to view GoaT project page)"
+      },
+      "ag100pest": {
+        "description": "Ag100Pest (click to view GoaT project page)"
+      },
+      "agi": {
+        "description": "Applied Genomics Initiative (click to view GoaT project page)"
+      },
+      "arg": {
+        "description": "Australian Amphibian and Reptile Genomics - AusARG (click to view GoaT project page)"
+      },
+      "asg": {
+        "description": "Aquatic Symbiosis Genomics Project (click to view GoaT project page)"
+      },
+      "bat1k": {
+        "description": "Bat 1K (click to view GoaT project page)"
+      },
+      "b10k": {
+        "description": "Bird 10K (click to view GoaT project page)"
+      },
+      "bioplatforms_australia": {
+        "description": "Bioplatforms Australia"
+      },
+      "canbp": {
+        "description": "Canada Biogenome Project (click to view GoaT project page)"
+      },
+      "cbp": {
+        "description": "Catalan Biogenome Project (click to view GoaT project page)"
+      },
+      "ccgp": {
+        "description": "California Conservation Genomics Project (click to view GoaT project page)"
+      },
+      "cfgp": {
+        "description": "Cartilaginous Fish Genome Project (click to view GoaT project page)"
+      },
+      "dtol": {
+        "description": "Darwin Tree of Life (click to view GoaT project page)"
+      },
+      "ebpn": {
+        "description": "EBP Norway (click to view GoaT project page)"
+      },
+      "ein": {
+        "description": "Euglena International Network (click to view GoaT project page)"
+      },
+      "endemixit": {
+        "description": "ENDEMIXIT (click to view GoaT project page)"
+      },
+      "erga": {
+        "description": "European Reference Genome Atlas Umbrella (click to view GoaT project page)"
+      },
+      "erga-bge": {
+        "description": "ERGA Biodiversity Genomics Europe (click to view GoaT project page)"
+      },
+      "erga-ch": {
+        "description": "ERGA Switzerland (click to view GoaT project page)"
+      },
+      "erga-pil": {
+        "description": "ERGA Pilot (click to view GoaT project page)"
+      },
+      "eurofish": {
+        "description": "EUROFISH (click to view GoaT project page)"
+      },
+      "gaga": {
+        "description": "Global Ant Genomics Alliance (click to view GoaT project page)"
+      },
+      "gap": {
+        "description": "Genomics for Australian Plants (click to view GoaT project page)"
+      },
+      "gbr": {
+        "description": "Great Reef Barrier (click to view GoaT project page)"
+      },
+      "giga": {
+        "description": "Global Invertebrate Genomics Alliance (click to view GoaT project page)"
+      },
+      "i5k": {
+        "description": "i5K (click to view GoaT project page)"
+      },
+      "ilebp": {
+        "description": "Illinois EBP Pilot (click to view GoaT project page)"
+      },
+      "1kfg": {
+        "description": "1K Fungal Genomes Project (click to view GoaT project page)"
+      },
+      "lmgp": {
+        "description": "Lilioid Monocots Core Group Genome Project (click to view GoaT project page)"
+      },
+      "loewe-tbg": {
+        "description": "LOEWE Centre for Translational Biodiversity Genomics (click to view GoaT project page)"
+      },
+      "metainvert": {
+        "description": "MetaInvert (click to view GoaT project page)"
+      },
+      "ogg": {
+        "description": "Open Green Genomes (click to view GoaT project page)"
+      },
+      "omg": {
+        "description": "Oz Mammals Genomics (click to view GoaT project page)"
+      },
+      "other": {
+        "description": "Other EBP Projects"
+      },
+      "pgp": {
+        "description": "Polar Genomes Project (click to view GoaT project page)"
+      },
+      "phyloalps": {
+        "description": "PhyloAlps (click to view GoaT project page)"
+      },
+      "prgp": {
+        "description": "Primate Genomes Project (click to view GoaT project page)"
+      },
+      "psyche": {
+        "description": "Project Psyche (click to view GoaT project page)"
+      },
+      "squalomix": {
+        "description": "Squalomix (click to view GoaT project page)"
+      },
+      "tsi": {
+        "description": "Threatened Species Initiative (click to view GoaT project page)"
+      },
+      "vgp": {
+        "description": "Vertebrate Genomes Project (click to view GoaT project page)"
+      },
+      "ygg": {
+        "description": "Yggdrasil (click to view GoaT project page)"
+      },
+      "zoonomia": {
+        "description": "Zoonomia (click to view GoaT project page)"
+      }
+    },
+    "description": "Publication describing assembly is available",
+    "display_name": "Published",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "btk_nohit": {
+    "description": "Sequences with no hits in the reference database",
+    "display_group": "assembly",
+    "display_level": 2,
+    "display_name": "BTK no hit",
+    "type": "1dp",
+    "units": "%",
+    "summary": [
+      "primary",
+      "min"
+    ],
+    "processed_type": "float",
+    "processed_summary": "1dp_value",
+    "processed_simple": "value"
+  },
+  "btk_target": {
+    "description": "Hits matching target",
+    "display_group": "assembly",
+    "display_level": 2,
+    "display_name": "BTK_target",
+    "type": "1dp",
+    "units": "%",
+    "summary": [
+      "primary",
+      "max"
+    ],
+    "processed_type": "float",
+    "processed_summary": "1dp_value",
+    "processed_simple": "value"
+  },
+  "busco_completeness": {
+    "description": "Busco completeness",
+    "display_group": "assembly",
+    "display_level": 1,
+    "display_name": "BUSCO completeness",
+    "type": "1dp",
+    "units": "%",
+    "summary": "max",
+    "processed_type": "float",
+    "processed_summary": "1dp_value",
+    "processed_simple": "value"
+  },
+  "busco_lineage": {
+    "description": "Busco lineage",
+    "display_group": "assembly",
+    "display_level": 2,
+    "display_name": "BUSCO lineage",
+    "type": "keyword",
+    "summary": "list",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "busco_string": {
+    "description": "Busco string",
+    "display_group": "assembly",
+    "display_level": 2,
+    "display_name": "BUSCO string",
+    "type": "keyword",
+    "summary": "list",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "gc_percent": {
+    "display_group": "btk",
+    "constraint": {
+      "min": 0,
+      "max": 100
+    },
+    "display_level": 2,
+    "type": "2dp",
+    "units": "%",
+    "summary": "median",
+    "processed_type": "float",
+    "processed_summary": "2dp_value",
+    "processed_simple": "value"
+  },
+  "long_list": {
+    "display_group": "target_lists",
+    "display_level": 2,
+    "constraint": {
+      "enum": [
+        "asg",
+        "cbp",
+        "cfgp",
+        "dtol",
+        "ebpn",
+        "endemixit",
+        "erga",
+        "eurofish",
+        "gaga",
+        "squalomix",
+        "vgp"
+      ]
+    },
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "value_metadata": {
+      "default": {
+        "description": "Click to view GoaT project page",
+        "link": "/projects/{}"
+      },
+      "asg": {
+        "description": "Aquatic Symbiosis Genomics"
+      },
+      "dtol": {
+        "description": "Darwin Tree of Life"
+      },
+      "erga": {
+        "description": "European Reference Genome Atlas"
+      },
+      "vgp": {
+        "description": "Vertebrate Genomes Project"
+      }
+    },
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "other_priority": {
+    "display_group": "target_lists",
+    "display_level": 2,
+    "constraint": {
+      "enum": [
+        "asg",
+        "cbp",
+        "cfgp",
+        "dtol",
+        "ebpn",
+        "endemixit",
+        "erga",
+        "eurofish",
+        "gaga",
+        "squalomix",
+        "vgp"
+      ]
+    },
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "family_representative": {
+    "display_group": "target_lists",
+    "display_level": 2,
+    "constraint": {
+      "enum": [
+        "asg",
+        "cbp",
+        "cfgp",
+        "dtol",
+        "ebpn",
+        "endemixit",
+        "erga",
+        "eurofish",
+        "gaga",
+        "squalomix",
+        "vgp"
+      ]
+    },
+    "summary": "list",
+    "traverse_direction": "up",
+    "type": "keyword",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "sequencing_status_vgp": {
+    "display_group": "sequencing_status",
+    "constraint": {
+      "enum": [
+        "insdc_open",
+        "in_progress",
+        "sample_acquired",
+        "sample_collected"
+      ]
+    },
+    "processed_summary": "undefined_value",
+    "processed_simple": "value"
+  },
+  "sequencing_status_dtol": {
+    "display_group": "sequencing_status",
+    "constraint": {
+      "enum": [
+        "insdc_open",
+        "in_progress",
+        "sample_acquired",
+        "sample_collected"
+      ]
+    },
+    "processed_summary": "undefined_value",
+    "processed_simple": "value"
+  },
+  "sample_collected_by": {
+    "type": "keyword",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "sequencing_status": {
+    "type": "keyword",
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  },
+  "sample_location": {
+    "display_group": "sample",
+    "display_level": 2,
+    "display_name": "location",
+    "type": "geo_point",
+    "summary": [
+      "list"
+    ],
+    "traverse_direction": "up",
+    "processed_type": "geo_point",
+    "processed_summary": "geo_point_value",
+    "processed_simple": "value"
+  },
+  "odb10_lineage": {
+    "type": "keyword",
+    "constraint": {
+      "enum": [
+        "aconoidasida_odb10",
+        "actinopterygii_odb10",
+        "agaricales_odb10",
+        "agaricomycetes_odb10",
+        "alveolata_odb10",
+        "apicomplexa_odb10",
+        "arachnida_odb10",
+        "arthropoda_odb10",
+        "ascomycota_odb10",
+        "aves_odb10",
+        "basidiomycota_odb10",
+        "boletales_odb10",
+        "brassicales_odb10",
+        "capnodiales_odb10",
+        "carnivora_odb10",
+        "cetartiodactyla_odb10",
+        "chaetothyriales_odb10",
+        "chlorophyta_odb10",
+        "coccidia_odb10",
+        "cyprinodontiformes_odb10",
+        "diptera_odb10",
+        "dothideomycetes_odb10",
+        "embryophyta_odb10",
+        "endopterygota_odb10",
+        "euarchontoglires_odb10",
+        "eudicots_odb10",
+        "euglenozoa_odb10",
+        "eukaryota_odb10",
+        "eurotiales_odb10",
+        "eurotiomycetes_odb10",
+        "eutheria_odb10",
+        "fabales_odb10",
+        "fungi_odb10",
+        "glires_odb10",
+        "glomerellales_odb10",
+        "helotiales_odb10",
+        "hemiptera_odb10",
+        "hymenoptera_odb10",
+        "hypocreales_odb10",
+        "insecta_odb10",
+        "laurasiatheria_odb10",
+        "leotiomycetes_odb10",
+        "lepidoptera_odb10",
+        "liliopsida_odb10",
+        "mammalia_odb10",
+        "metazoa_odb10",
+        "microsporidia_odb10",
+        "mollusca_odb10",
+        "mucorales_odb10",
+        "mucoromycota_odb10",
+        "nematoda_odb10",
+        "onygenales_odb10",
+        "passeriformes_odb10",
+        "plasmodium_odb10",
+        "pleosporales_odb10",
+        "poales_odb10",
+        "polyporales_odb10",
+        "primates_odb10",
+        "saccharomycetes_odb10",
+        "sauropsida_odb10",
+        "solanales_odb10",
+        "sordariomycetes_odb10",
+        "stramenopiles_odb10",
+        "tetrapoda_odb10",
+        "tremellomycetes_odb10",
+        "vertebrata_odb10",
+        "viridiplantae_odb10"
+      ]
+    },
+    "display_group": "busco",
+    "display_level": 2,
+    "display_name": "Busco_odb10 lineage",
+    "summary": [
+      "list"
+    ],
+    "processed_type": "keyword",
+    "processed_summary": "keyword_value.raw",
+    "processed_simple": "value"
+  }
+}

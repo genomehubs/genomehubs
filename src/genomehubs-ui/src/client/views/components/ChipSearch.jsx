@@ -9,7 +9,7 @@ import {
 import React, { useEffect, useState } from "react";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"; // Import an add icon
-import KeyValueChip from "./KeyValueChip";
+import KeyValueChip from "./KeyValueChip/KeyValueChip";
 
 const allowedSymbols = ["=", "!=", ">=", "<=", "<", ">"];
 const allowedKeywordSymbols = allowedSymbols.slice(0, 2);

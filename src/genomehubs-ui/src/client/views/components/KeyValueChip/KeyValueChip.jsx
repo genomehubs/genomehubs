@@ -26,18 +26,11 @@ import React, { useEffect, useState } from "react";
 
 import AdjustIcon from "@mui/icons-material/Adjust";
 import ErrorIcon from "@mui/icons-material/Error";
-import Tooltip from "./Tooltip";
+import Tooltip from "../Tooltip";
 import TreeIcon from "@mui/icons-material/Tree";
-
-const listOperators = (keyLabel) => {
-  // Define the available operators based on the keyLabel
-
-  if (keyLabel === "tax") {
-    return [];
-  } else {
-    return ["=", ">", ">=", "<", "<=", "!="];
-  }
-};
+import formatValue from "./functions/formatValue";
+import parseValue from "./functions/parseValue";
+import typesToValidation from "./functions/typesToValidation";
 
 const listModifiers = (keyLabel) => {
   // Define the available modifiers based on the keyLabel
@@ -111,42 +104,11 @@ const KeyValueChip = ({
   valueNote,
   symbol = "=",
   modifier = "value",
-  availableKeys = [
-    "assembly_level",
-    "assembly_span",
-    "c_value",
-    "genome_size",
-    "tax",
-  ],
-  allowedKeys = {},
   onChange,
   onDelete,
   palette = "blue",
 }) => {
-  // Format numbers with suffixes (k, M, G, etc.)
-  const formatValue = (val) => {
-    if (val === null || val === undefined || val == "") {
-      return ""; // Return empty string for null or undefined values
-    }
-    if (isNaN(val)) {
-      return val; // Return non-numeric values as-is
-    }
-    const suffixes = ["", "k", "M", "G", "T", "P"];
-    let num = parseFloat(val);
-    let tier = 0;
-
-    while (num >= 1000 && tier < suffixes.length - 1) {
-      const nextNum = num / 1000;
-      if (nextNum.toString().match(/^\d+\.\d{4}/)) {
-        return (num * Math.pow(10, tier * 3)).toLocaleString(); // Format the number with commas
-      } else {
-        num = nextNum;
-        tier++;
-      }
-    }
-
-    return tier === 0 ? num.toString() : `${num}${suffixes[tier]}`;
-  };
+  const validation = typesToValidation();
 
   const colorsFromPalette = (palette) => {
     // Check if the palette exists in the chipPalettes object
@@ -172,7 +134,7 @@ const KeyValueChip = ({
   const [anchorElModifier, setAnchorElModifier] = useState(null);
   const [anchorElValue, setAnchorElValue] = useState(null);
   const [currentModifier, setCurrentModifier] = useState(modifier);
-  const [currentSymbol, setCurrentSymbol] = useState(symbol);
+  const [currentOperator, setCurrentOperator] = useState(symbol);
   const [currentValue, setCurrentValue] = useState(
     keyLabel === "tax" ? value : formatValue(value),
   );
@@ -186,25 +148,15 @@ const KeyValueChip = ({
   const [isEditingKey, setIsEditingKey] = useState(false);
   const [anchorElKey, setAnchorElKey] = useState(null);
   // Determine the available operators based on the keyLabel
-  const [availableOperators, setAvailableOperators] = useState(
-    listOperators(keyLabel),
-  );
+  const [availableOperators, setAvailableOperators] = useState([
+    ...validation.validOperators(keyLabel, modifier),
+  ]);
   const [availableModifiers, setAvailableModifiers] = useState(
     listModifiers(keyLabel),
   );
   const [{ darkColor, lightColor, backgroundColor, textColor }, setColors] =
     useState(colorsFromPalette(palette));
   const [validationError, setValidationError] = useState(false);
-
-  const parseValue = (val) => {
-    const suffixes = { k: 1e3, M: 1e6, G: 1e9, T: 1e12, P: 1e15 };
-    const match = val.replace(",", "").match(/^([\d.]+)([kMGTPE]?)$/);
-    if (!match) {
-      return val; // Return as-is if no suffix is found
-    }
-    const [, number, suffix] = match;
-    return parseFloat(number) * (suffixes[suffix] || 1);
-  };
 
   const handleSymbolClick = (event) => {
     setAnchorElSymbol(event.currentTarget);
@@ -226,7 +178,7 @@ const KeyValueChip = ({
       onChange?.({
         key: keyLabel,
         value: parseValue(currentValue),
-        symbol: currentSymbol,
+        symbol: currentOperator,
         modifier: processedModifier,
         palette,
       });
@@ -236,7 +188,7 @@ const KeyValueChip = ({
 
   const handleMenuClose = (newSymbol) => {
     if (newSymbol) {
-      setCurrentSymbol(newSymbol);
+      setCurrentOperator(newSymbol);
       onChange?.({
         key: keyLabel,
         value: parseValue(currentValue),
@@ -273,7 +225,7 @@ const KeyValueChip = ({
       key: keyLabel,
       value: parsedValue,
       valueNote: undefined,
-      symbol: currentSymbol,
+      symbol: currentOperator,
       modifier: currentModifier,
       palette,
     });
@@ -295,17 +247,17 @@ const KeyValueChip = ({
     event.preventDefault(); // Prevent the default action
     setIsEditingKey(false);
     setAnchorElKey(null);
-    let newOperators = listOperators(currentKey);
-    setAvailableOperators(newOperators);
-    let newSymbol = currentSymbol;
-    if (!newOperators.includes(currentSymbol)) {
-      newSymbol = newOperators[0]; // Reset to the first operator if the current one is not available
-      setCurrentSymbol(newSymbol);
+    let newOperators = validation.validOperators(currentKey, currentModifier);
+    setAvailableOperators([...newOperators]);
+    let newOperator = currentOperator;
+    if (!newOperators.has(currentOperator)) {
+      newOperator = [...newOperators][0]; // Convert the set to an array and reset to the first operator if the current one is not available
+      setCurrentOperator(newOperator);
     }
     onChange?.({
       key: currentKey,
       value: parseValue(currentValue),
-      symbol: newSymbol,
+      symbol: newOperator,
       modifier: currentModifier,
       palette,
     });
@@ -314,7 +266,7 @@ const KeyValueChip = ({
   const handleDelete = () => {
     setCurrentKey(keyLabel);
     setCurrentModifier("value");
-    setCurrentSymbol("=");
+    setCurrentOperator("=");
     setCurrentValue("");
     setCurrentValueNote(undefined);
     onDelete?.({ key: keyLabel, value: "", symbol: "=", modifier: "value" });
@@ -331,59 +283,67 @@ const KeyValueChip = ({
     return str;
   };
 
-  const validateKey = (key) => {
-    // Check if the key is in the list of available keys
-    return allowedKeys.hasOwnProperty(key);
-  };
-  const validateModifier = ({ key, modifier }) => {
-    // Check if the modifier is in the list of available modifiers
-    if (modifier === null) {
-      return true; // Allow null modifier
-    }
-    return allowedKeys[key]?.modifiers.includes(modifier);
-  };
+  // const validateKey = (key) => {
+  //   // Check if the key is in the list of available keys
+  //   return allowedKeys.hasOwnProperty(key);
+  // };
+  // const validateModifier = ({ key, modifier }) => {
+  //   // Check if the modifier is in the list of available modifiers
+  //   if (modifier === null) {
+  //     return true; // Allow null modifier
+  //   }
+  //   return allowedKeys[key]?.modifiers.includes(modifier);
+  // };
 
-  const validateSymbol = ({ key, symbol }) => {
-    // Check if the symbol is in the list of available symbols
-    if (symbol === null) {
-      return true; // Allow null symbol
-    }
-    return allowedKeys[key]?.symbols.includes(symbol);
-  };
-  const validateValue = ({ key, value }) => {
-    // Check if the value is of the expected type for the key
-    const expectedType = allowedKeys[key]?.type;
-    if (expectedType === "number") {
-      return !isNaN(parseValue(value));
-    } else if (expectedType === "string") {
-      return (
-        value !== null &&
-        value !== undefined &&
-        typeof value.toString === "function"
-      );
-    }
-  };
+  // const validateSymbol = ({ key, symbol }) => {
+  //   // Check if the symbol is in the list of available symbols
+  //   if (symbol === null) {
+  //     return true; // Allow null symbol
+  //   }
+  //   return allowedKeys[key]?.symbols.includes(symbol);
+  // };
+  // const validateValue = ({ key, value }) => {
+  //   // Check if the value is of the expected type for the key
+  //   const expectedType = allowedKeys[key]?.type;
+  //   if (expectedType === "number") {
+  //     return !isNaN(parseValue(value));
+  //   } else if (expectedType === "string") {
+  //     return (
+  //       value !== null &&
+  //       value !== undefined &&
+  //       typeof value.toString === "function"
+  //     );
+  //   }
+  // };
 
-  const validateChip = ({ key, value, symbol, modifier }) => {
-    // Validate the key, value, symbol, and modifier
+  const validateChip = ({ key, value, operator, modifier }) => {
+    // Validate the key, value, operator, and modifier
     if (modifier == "collate") {
       value = `${key},${value}`;
       key = "collate";
     }
-    if (!validateKey(key)) {
-      setValidationError("invalid key");
+    let { valid, reason } = validation.validateKey(key);
+    if (!valid) {
+      setValidationError(reason);
       return false;
     }
-    if (!validateValue({ key, value })) {
-      setValidationError("invalid value");
+    ({ valid, reason } = validation.validateValue({
+      key,
+      value,
+      modifier,
+    }));
+    if (!valid) {
+      setValidationError(reason);
       return false;
     }
-    if (!validateSymbol({ key, symbol })) {
-      setValidationError("invalid symbol");
+    ({ valid, reason } = validation.validateOperator({ key, operator }));
+    if (!valid) {
+      setValidationError(reason);
       return false;
     }
-    if (!validateModifier({ key, modifier })) {
-      setValidationError("invalid modifier");
+    ({ valid, reason } = validation.validateModifier({ key, modifier }));
+    if (!valid) {
+      setValidationError(reason);
       return false;
     }
     setValidationError(false);
@@ -396,7 +356,7 @@ const KeyValueChip = ({
       const isValid = validateChip({
         key: currentKey,
         value: currentValue,
-        symbol: currentSymbol,
+        symbol: currentOperator,
         modifier: currentModifier,
       });
 
@@ -411,7 +371,7 @@ const KeyValueChip = ({
     isEditingKey,
     currentKey,
     currentValue,
-    currentSymbol,
+    currentOperator,
     currentModifier,
   ]);
 
@@ -530,7 +490,7 @@ const KeyValueChip = ({
                   }}
                   onClick={handleSymbolClick}
                 >
-                  {currentSymbol}
+                  {currentOperator}
                 </Typography>
               )}
 
@@ -646,7 +606,7 @@ const KeyValueChip = ({
             }}
           >
             <Autocomplete
-              options={availableKeys}
+              options={[...validation.validKeys().keys]}
               value={currentKey}
               onChange={(event, newValue) => {
                 setCurrentKey(newValue || "");
@@ -715,7 +675,7 @@ const KeyValueChip = ({
           <MenuItem
             key={operator}
             onClick={() => handleMenuClose(operator)}
-            selected={operator === currentSymbol}
+            selected={operator === currentOperator}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 handleMenuClose(operator);

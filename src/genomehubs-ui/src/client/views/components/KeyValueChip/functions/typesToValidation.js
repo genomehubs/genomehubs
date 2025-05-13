@@ -1,0 +1,149 @@
+import parseValue from "./parseValue";
+import types from "./default.types.json";
+
+const validateNumber = ({ value, processed_type, constraint }) => {
+  let processedValue = parseValue(value);
+  if (processed_type === "integer" && !Number.isInteger(processedValue)) {
+    return { valid: false, reason: "not an integer" };
+  }
+  if (processed_type === "float" && typeof processedValue !== "number") {
+    return { valid: false, reason: "not a number" };
+  }
+  if (constraint.hasOwnProperty("min") && processedValue < constraint.min) {
+    return { valid: false, reason: "less than min" };
+  }
+  if (constraint.hasOwnProperty("max") && processedValue > constraint.max) {
+    return { valid: false, reason: "greater than max" };
+  }
+  return { valid: true };
+};
+
+const validateKeyword = ({ value, validValues }) => {
+  if (validValues && !validValues.has(value.toLowerCase())) {
+    return { valid: false, reason: "not in enum" };
+  }
+  return { valid: true };
+};
+
+export const typesToValidation = () => {
+  const validKeys = () => {
+    let keys = new Set(["tax"]);
+    let keysByGroup = {
+      primary: new Set(["tax_tree", "tax_name", "tax_rank"]),
+      tax: new Set([
+        "tax_tree",
+        "tax_name",
+        "tax_rank",
+        "tax_lineage",
+        "tax_level",
+        "tax_eq",
+      ]),
+    };
+    for (let [key, obj] of Object.entries(types)) {
+      keys.add(key);
+      if (obj.display_level == 1) {
+        keysByGroup.primary.add(key);
+      }
+      let { display_group } = obj;
+      if (!keysByGroup.hasOwnProperty(display_group)) {
+        keysByGroup[display_group] = new Set();
+      }
+      keysByGroup[display_group].add(key);
+    }
+    return {
+      keys,
+      keysByGroup,
+    };
+  };
+
+  const validValues = (key) => {
+    const { constraint = {} } = types[key] || {};
+    if (constraint.hasOwnProperty("enum")) {
+      return new Set(constraint.enum.map((v) => v.toLowerCase()));
+    }
+    return;
+  };
+
+  const validModifiers = (key) => {
+    if (key === "tax") {
+      return new Set(["tree", "name", "rank", "lineage", "level", "eq"]);
+    }
+    const { summary = [], traverse_direction } = types[key] || {};
+    let modifiers = new Set(["value"]);
+    for (let modifier of summary) {
+      if (modifier === "primary") {
+        continue;
+      }
+      if (mod === "list") {
+        modifiers.add("length");
+        continue;
+      }
+      let mod = modifier.split("_")[0];
+      modifiers.add(mod);
+    }
+    if (traverse_direction) {
+      modifiers.add("direct");
+      if (traverse_direction === "up") {
+        modifiers.add("descendant");
+      }
+      if (traverse_direction === "down" || traverse_direction === "both") {
+        modifiers.add("ancestor");
+      }
+    }
+    return modifiers;
+  };
+
+  const validOperators = ({ key, modifier }) => {
+    const { processed_type, summary = [] } = types[key] || {};
+    let operators = new Set(["=", "!="]);
+    if (processed_type !== "keyword" || modifier !== "value") {
+      operators.add(">");
+      operators.add("<");
+      operators.add(">=");
+      operators.add("<=");
+    }
+    return operators;
+  };
+  const validateKey = (key) => {
+    if (validKeys().keys.has(key)) {
+      return { valid: true };
+    }
+    return { valid: false, reason: "not a valid key" };
+  };
+  const validateValue = ({ key, value, modifier }) => {
+    let { constraint = {}, processed_type = "" } = types[key] || {};
+    if (["float", "integer"].includes(processed_type)) {
+      return validateNumber({ value, processed_type, constraint });
+    } else if (processed_type.endsWith("keyword")) {
+      return validateKeyword({ value, validValues: validValues(key) });
+    }
+    return { valid: true };
+  };
+  const validateModifier = ({ key, modifier }) => {
+    const modifiers = validModifiers(key);
+    if (modifiers.has(modifier)) {
+      return { valid: true };
+    }
+    return { valid: false, reason: "not a valid modifier" };
+  };
+  const validateOperator = ({ key, modifier = "value", operator }) => {
+    const operators = validOperators({ key, modifier });
+    if (!operator || operators.has(operator)) {
+      return { valid: true };
+    }
+    return { valid: false, reason: "not a valid operator" };
+  };
+
+  return {
+    validKeys,
+    validateKey,
+    validValues,
+    validateValue,
+    validModifiers,
+    validateModifier,
+    validOperators,
+    validateOperator,
+  };
+};
+
+export default typesToValidation;

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import KeyValueChip from "./KeyValueChip";
 import { Provider } from "react-redux";
-import colorStore from "../reducers/color.store";
+import colorStore from "../../reducers/color.store";
 
 export default {
   title: "Components/KeyValueChip",
