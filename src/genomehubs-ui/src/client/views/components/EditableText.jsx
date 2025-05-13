@@ -109,13 +109,18 @@ const EditableText = ({
           cursor: "pointer",
           color: textColor,
           opacity: isEditing ? 0.5 : 1,
+          whiteSpace: "nowrap",
+          display: "inline-flex",
+          alignItems: "center",
           ...sx,
         }}
         onClick={handleEdit}
         {...props}
       >
         {startComponent}
-        {value}
+        <Box component="span" sx={{ whiteSpace: "nowrap" }}>
+          {value}
+        </Box>
         {endComponent}
       </Typography>
       {isEditing && (

@@ -488,7 +488,7 @@ const KeyValueChip = ({
                 onChange={setCurrentValue}
                 onBlur={handleValueBlur}
                 backgroundColor={backgroundColor}
-                textColor={textColor}
+                textColor={null}
                 anchorEl={anchorElValue}
                 setAnchorEl={setAnchorElValue}
                 endComponent={
@@ -500,12 +500,13 @@ const KeyValueChip = ({
                       />
                     )}
                     <Typography
-                      variant="body2"
+                      variant="body3"
                       sx={{
                         opacity: 0.5,
                         fontStyle: "italic",
                         fontSize: "0.8em",
-                        marginTop: "10px",
+                        marginTop: "1px",
+                        marginLeft: "0.25em",
                         pointerEvents: "none",
                       }}
                     >
@@ -514,15 +515,14 @@ const KeyValueChip = ({
                   </>
                 }
                 options={[...(validation.validValues(currentKey) || [])]}
-                variant="body2"
+                variant="body3"
                 sx={{
-                  fontWeight: "bold",
                   whiteSpace: previousValue.length > 100 ? "normal" : "nowrap",
                   wordBreak:
                     previousValue.length > 100 ? "break-word" : "normal",
                   opacity: previousValue && !isEditingValue ? 1 : 0.5,
                   fontStyle: previousValue ? "normal" : "italic",
-                  marginTop: "6px",
+                  marginTop: "2px",
                 }}
               />
             </Box>
