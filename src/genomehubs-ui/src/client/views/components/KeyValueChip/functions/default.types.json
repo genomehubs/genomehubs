@@ -8,12 +8,7 @@
     "display_level": 1,
     "display_name": "C value",
     "display_group": "genome_size",
-    "summary": [
-      "primary",
-      "median",
-      "min",
-      "max"
-    ],
+    "summary": ["primary", "median", "min", "max"],
     "traverse_direction": "both",
     "type": "half_float",
     "units": "pgDNA",
@@ -132,12 +127,7 @@
     "display_name": "Genome size",
     "display_level": 1,
     "display_group": "genome_size",
-    "summary": [
-      "primary",
-      "median",
-      "min",
-      "max"
-    ],
+    "summary": ["primary", "median", "min", "max"],
     "traverse_direction": "both",
     "type": "long",
     "units": "bases",
@@ -153,12 +143,7 @@
     "display_level": 1,
     "display_name": "Genome size kmer",
     "display_group": "genome_size",
-    "summary": [
-      "primary",
-      "median",
-      "min",
-      "max"
-    ],
+    "summary": ["primary", "median", "min", "max"],
     "type": "long",
     "units": "bases",
     "processed_type": "integer",
@@ -173,12 +158,7 @@
     "display_level": 1,
     "display_name": "Genome size draft",
     "display_group": "genome_size",
-    "summary": [
-      "primary",
-      "median",
-      "min",
-      "max"
-    ],
+    "summary": ["primary", "median", "min", "max"],
     "type": "long",
     "units": "bases",
     "processed_type": "integer",
@@ -187,21 +167,13 @@
   },
   "assembly_level": {
     "constraint": {
-      "enum": [
-        "complete genome",
-        "chromosome",
-        "scaffold",
-        "contig"
-      ]
+      "enum": ["complete genome", "chromosome", "scaffold", "contig"]
     },
     "display_group": "assembly",
     "display_level": 1,
     "display_name": "Assembly level",
     "type": "keyword",
-    "summary": [
-      "primary",
-      "enum"
-    ],
+    "summary": ["primary", "enum"],
     "traverse_direction": "up",
     "processed_type": "ordered_keyword",
     "processed_summary": "keyword_value.raw",
@@ -216,13 +188,7 @@
     "display_name": "Assembly span",
     "type": "long",
     "units": "bases",
-    "summary": [
-      "primary",
-      "median",
-      "min",
-      "max",
-      "count"
-    ],
+    "summary": ["primary", "median", "min", "max", "count"],
     "traverse_direction": "both",
     "processed_type": "integer",
     "processed_summary": "long_value",
@@ -310,9 +276,7 @@
       }
     },
     "display_level": 2,
-    "summary": [
-      "list"
-    ],
+    "summary": ["list"],
     "traverse_direction": "up",
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
@@ -325,9 +289,7 @@
     "display_group": "assembly",
     "type": "keyword",
     "display_level": 2,
-    "summary": [
-      "list"
-    ],
+    "summary": ["list"],
     "traverse_direction": "up",
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
@@ -342,13 +304,7 @@
     "display_name": "Contig N50",
     "type": "long",
     "units": "bases",
-    "summary": [
-      "primary",
-      "max",
-      "median",
-      "min",
-      "count"
-    ],
+    "summary": ["primary", "max", "median", "min", "count"],
     "traverse_direction": "up",
     "processed_type": "integer",
     "processed_summary": "long_value",
@@ -359,11 +315,7 @@
     "display_level": 2,
     "display_name": "Last updated",
     "type": "date",
-    "summary": [
-      "primary",
-      "max",
-      "min"
-    ],
+    "summary": ["primary", "max", "min"],
     "traverse_direction": "up",
     "processed_type": "date",
     "processed_summary": "date_value",
@@ -378,13 +330,7 @@
     "display_name": "Scaffold N50",
     "type": "long",
     "units": "bases",
-    "summary": [
-      "primary",
-      "max",
-      "median",
-      "min",
-      "count"
-    ],
+    "summary": ["primary", "max", "median", "min", "count"],
     "traverse_direction": "up",
     "processed_type": "integer",
     "processed_summary": "long_value",
@@ -398,13 +344,7 @@
     "display_level": 2,
     "display_name": "Gene count",
     "type": "integer",
-    "summary": [
-      "primary",
-      "median",
-      "min",
-      "max",
-      "count"
-    ],
+    "summary": ["primary", "median", "min", "max", "count"],
     "processed_type": "integer",
     "processed_summary": "integer_value",
     "processed_simple": "value"
@@ -414,24 +354,17 @@
     "display_level": 2,
     "display_name": "Sample sex",
     "type": "keyword",
-    "summary": [
-      "primary",
-      "list",
-      "count"
-    ],
+    "summary": ["primary", "list", "count"],
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
-  "ebp_metric_date": {
+  "ebp_standard_date": {
     "display_group": "assembly",
     "display_level": 2,
     "display_name": "EBP metric date",
     "type": "date",
-    "summary": [
-      "min",
-      "max"
-    ],
+    "summary": ["min", "max"],
     "traverse_direction": "up",
     "processed_type": "date",
     "processed_summary": "date_value",
@@ -1527,12 +1460,7 @@
     "description": "Chromosome number",
     "display_level": 1,
     "display_name": "Chromosome number",
-    "summary": [
-      "median_high",
-      "mode",
-      "max",
-      "min"
-    ],
+    "summary": ["median_high", "mode", "max", "min"],
     "traverse_direction": "both",
     "type": "short",
     "processed_type": "integer",
@@ -1548,12 +1476,7 @@
     "description": "Haploid number",
     "display_level": 1,
     "display_name": "Haploid number",
-    "summary": [
-      "median_high",
-      "mode",
-      "max",
-      "min"
-    ],
+    "summary": ["median_high", "mode", "max", "min"],
     "traverse_direction": "both",
     "type": "short",
     "processed_type": "integer",
@@ -1581,12 +1504,7 @@
     "description": "Ploidy",
     "display_level": 2,
     "display_name": "Ploidy",
-    "summary": [
-      "median_high",
-      "mode",
-      "max",
-      "min"
-    ],
+    "summary": ["median_high", "mode", "max", "min"],
     "traverse_direction": "both",
     "type": "short",
     "processed_type": "integer",
@@ -1595,11 +1513,7 @@
   },
   "echabs92": {
     "constraint": {
-      "enum": [
-        "echabs92_annex_iib",
-        "echabs92_annex_ivb",
-        "echabs92_annex_iva"
-      ]
+      "enum": ["echabs92_annex_iib", "echabs92_annex_ivb", "echabs92_annex_iva"]
     },
     "description": "Section in which species is listed",
     "display_group": "uk_legislation",
@@ -1614,10 +1528,7 @@
   },
   "habreg_2017": {
     "constraint": {
-      "enum": [
-        "habreg-sch2",
-        "habreg-sch5"
-      ]
+      "enum": ["habreg-sch2", "habreg-sch5"]
     },
     "description": "Section in which species is listed",
     "display_group": "uk_legislation",
@@ -1632,9 +1543,7 @@
   },
   "marhabreg-2017": {
     "constraint": {
-      "enum": [
-        "marhabreg-sch1"
-      ]
+      "enum": ["marhabreg-sch1"]
     },
     "description": "Section in which species is listed",
     "display_group": "uk_legislation",
@@ -1649,10 +1558,7 @@
   },
   "waca_1981": {
     "constraint": {
-      "enum": [
-        "waca-sch1",
-        "waca-sch5"
-      ]
+      "enum": ["waca-sch1", "waca-sch5"]
     },
     "description": "Section in which species is listed",
     "display_group": "uk_legislation",
@@ -1667,10 +1573,7 @@
   },
   "isb_wildlife_act_1976": {
     "constraint": {
-      "enum": [
-        "iwa-nsch3",
-        "iwa-sch5"
-      ]
+      "enum": ["iwa-nsch3", "iwa-sch5"]
     },
     "description": "Section in which species is listed",
     "display_group": "uk_legislation",
@@ -1685,9 +1588,7 @@
   },
   "protection_of_badgers_act_1992": {
     "constraint": {
-      "enum": [
-        "badgers92"
-      ]
+      "enum": ["badgers92"]
     },
     "description": "Section in which species is listed",
     "display_group": "uk_legislation",
@@ -3462,10 +3363,7 @@
     "display_name": "BTK no hit",
     "type": "1dp",
     "units": "%",
-    "summary": [
-      "primary",
-      "min"
-    ],
+    "summary": ["primary", "min"],
     "processed_type": "float",
     "processed_summary": "1dp_value",
     "processed_simple": "value"
@@ -3477,10 +3375,7 @@
     "display_name": "BTK_target",
     "type": "1dp",
     "units": "%",
-    "summary": [
-      "primary",
-      "max"
-    ],
+    "summary": ["primary", "max"],
     "processed_type": "float",
     "processed_summary": "1dp_value",
     "processed_simple": "value"
@@ -3669,9 +3564,7 @@
     "display_level": 2,
     "display_name": "location",
     "type": "geo_point",
-    "summary": [
-      "list"
-    ],
+    "summary": ["list"],
     "traverse_direction": "up",
     "processed_type": "geo_point",
     "processed_summary": "geo_point_value",
@@ -3753,9 +3646,7 @@
     "display_group": "busco",
     "display_level": 2,
     "display_name": "Busco_odb10 lineage",
-    "summary": [
-      "list"
-    ],
+    "summary": ["list"],
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
