@@ -42,7 +42,7 @@ const ResultFilter = ({
   }
   let ranks = {
     "": "",
-    superkingdom: "superkingdom",
+    domain: "domain",
     kingdom: "kingdom",
     phylum: "phylum",
     class: "class",

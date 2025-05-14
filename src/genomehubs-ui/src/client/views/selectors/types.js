@@ -117,9 +117,9 @@ export const taxonomyRanks = {
     display_name: "Kingdom",
     display_group: "ranks",
   },
-  superkingdom: {
-    name: "superkingdom",
-    display_name: "Superkingdom",
+  domain: {
+    name: "domain",
+    display_name: "Domain",
     display_group: "ranks",
   },
 };
@@ -238,7 +238,7 @@ export const getRankTrie = createSelector(getTypesMap, (types) => {
     "class",
     "order",
     "phylum",
-    "superkingdom",
+    "domain",
   ];
   let otherRanks = [
     "biotype",

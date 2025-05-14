@@ -2,7 +2,7 @@ import setSortBy from "../../reports/setSortBy.js";
 import { subsets } from "../../functions/subsets.js";
 
 const ranks = {
-  superkingdom: true,
+  domain: true,
   kingdom: true,
   phylum: true,
   class: true,
