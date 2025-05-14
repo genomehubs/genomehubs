@@ -99,6 +99,10 @@ export const typesToValidation = () => {
   };
 
   const validOperators = ({ key, modifier }) => {
+    console.log("validOperators", key, modifier);
+    if (key === "tax" || key === "collate") {
+      return new Set([]);
+    }
     const { processed_type, summary = [] } = types[key] || {};
     let operators = new Set(["=", "!="]);
     if (processed_type !== "keyword" || modifier !== "value") {
@@ -111,7 +115,13 @@ export const typesToValidation = () => {
   };
   const validateKey = (key) => {
     if (validKeys().keys.has(key)) {
-      return { valid: true };
+      let color = "blue";
+      if (key === "tax") {
+        color = "purple";
+      } else if (key === "collate") {
+        color = "green";
+      }
+      return { valid: true, color };
     }
     return { valid: false, reason: "not a valid key" };
   };

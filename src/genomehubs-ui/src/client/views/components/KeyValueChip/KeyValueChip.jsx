@@ -97,7 +97,7 @@ const KeyValueChip = ({
   keyLabel,
   value,
   valueNote,
-  symbol = "=",
+  operator = "=",
   modifier = "value",
   onChange,
   onDelete,
@@ -129,7 +129,7 @@ const KeyValueChip = ({
   const [anchorElModifier, setAnchorElModifier] = useState(null);
   const [anchorElValue, setAnchorElValue] = useState(null);
   const [currentModifier, setCurrentModifier] = useState(modifier);
-  const [currentOperator, setCurrentOperator] = useState(symbol);
+  const [currentOperator, setCurrentOperator] = useState(operator);
   const [currentValue, setCurrentValue] = useState(
     keyLabel === "tax" ? value : formatValue(value),
   );
@@ -144,11 +144,8 @@ const KeyValueChip = ({
   const [anchorElKey, setAnchorElKey] = useState(null);
   // Determine the available operators based on the keyLabel
   const [availableOperators, setAvailableOperators] = useState([
-    ...validation.validOperators(keyLabel, modifier),
+    ...validation.validOperators({ key: currentKey, modifier }),
   ]);
-  const [availableModifiers, setAvailableModifiers] = useState(
-    listModifiers(keyLabel),
-  );
   const [{ darkColor, lightColor, backgroundColor, textColor }, setColors] =
     useState(colorsFromPalette(palette));
   const [validationError, setValidationError] = useState(false);
@@ -170,10 +167,11 @@ const KeyValueChip = ({
     }
     if (processedModifier) {
       setCurrentModifier(processedModifier);
+      updateOperators(currentKey, processedModifier);
       onChange?.({
         key: keyLabel,
         value: parseValue(currentValue),
-        symbol: currentOperator,
+        operator: currentOperator,
         modifier: processedModifier,
         palette,
       });
@@ -181,14 +179,14 @@ const KeyValueChip = ({
     setAnchorElModifier(null);
   };
 
-  const handleMenuClose = (newSymbol) => {
-    if (newSymbol) {
-      setCurrentOperator(newSymbol);
+  const handleMenuClose = (newOperator) => {
+    if (newOperator) {
+      setCurrentOperator(newOperator);
       onChange?.({
         key: keyLabel,
         value: parseValue(currentValue),
         modifier: currentModifier,
-        symbol: newSymbol,
+        operator: newOperator,
         palette,
       });
     }
@@ -215,10 +213,28 @@ const KeyValueChip = ({
       key: keyLabel,
       value: parsedValue,
       valueNote: undefined,
-      symbol: currentOperator,
+      operator: currentOperator,
       modifier: currentModifier,
       palette,
     });
+  };
+
+  const updateOperators = (key, modifier) => {
+    let newOperators = validation.validOperators({
+      key,
+      modifier,
+    });
+    setAvailableOperators([...newOperators]);
+    let newOperator = currentOperator;
+    if (!newOperators.has(currentOperator)) {
+      newOperator = [...newOperators][0] || null; // Convert the set to an array and reset to the first operator if the current one is not available
+      setCurrentOperator(newOperator);
+    }
+  };
+
+  const handleKeyChange = (newKey) => {
+    setCurrentKey(newKey);
+    updateOperators(newKey, currentModifier);
   };
 
   const handleKeyBlur = (event) => {
@@ -226,20 +242,14 @@ const KeyValueChip = ({
     event.preventDefault(); // Prevent the default action
     setIsEditingKey(false);
     setAnchorElKey(null);
-    let newOperators = validation.validOperators(currentKey, currentModifier);
-    setAvailableOperators([...newOperators]);
-    let newOperator = currentOperator;
-    if (!newOperators.has(currentOperator)) {
-      newOperator = [...newOperators][0]; // Convert the set to an array and reset to the first operator if the current one is not available
-      setCurrentOperator(newOperator);
-    }
-    onChange?.({
-      key: currentKey,
-      value: parseValue(currentValue),
-      symbol: newOperator,
-      modifier: currentModifier,
-      palette,
-    });
+
+    // onChange?.({
+    //   key: currentKey,
+    //   value: parseValue(currentValue),
+    //   symbol: newOperator,
+    //   modifier: currentModifier,
+    //   palette,
+    // });
   };
 
   const handleDelete = () => {
@@ -248,7 +258,7 @@ const KeyValueChip = ({
     setCurrentOperator("=");
     setCurrentValue("");
     setCurrentValueNote(undefined);
-    onDelete?.({ key: keyLabel, value: "", symbol: "=", modifier: "value" });
+    onDelete?.({ key: keyLabel, value: "", operator: "=", modifier: "value" });
   };
 
   const truncate = (str, maxWidth = 30) => {
@@ -268,9 +278,14 @@ const KeyValueChip = ({
       value = `${key},${value}`;
       key = "collate";
     }
-    let { valid, reason } = validation.validateKey(key);
+    let { valid, color, reason } = validation.validateKey(key);
     if (!valid) {
       setValidationError({ reason, component: "key" });
+      return false;
+    }
+    ({ valid, reason } = validation.validateModifier({ key, modifier }));
+    if (!valid) {
+      setValidationError({ reason, component: "modifier" });
       return false;
     }
     ({ valid, reason } = validation.validateValue({
@@ -287,19 +302,14 @@ const KeyValueChip = ({
       setValidationError({ reason, component: "operator" });
       return false;
     }
-    ({ valid, reason } = validation.validateModifier({ key, modifier }));
-    if (!valid) {
-      setValidationError({ reason, component: "modifier" });
-      return false;
-    }
     setValidationError(false);
-    return true;
+    return { isValid: true, chipColor: color };
   };
 
   useEffect(() => {
     if (validationError || (!isEditingValue && !isEditingKey)) {
       // Validate the chip data when it loses focus
-      const isValid = validateChip({
+      const { isValid, chipColor } = validateChip({
         key: currentKey,
         value: currentValue,
         operator: currentOperator,
@@ -309,7 +319,7 @@ const KeyValueChip = ({
       if (!isValid) {
         setColors(colorsFromPalette("orange"));
       } else {
-        setColors(colorsFromPalette(palette));
+        setColors(colorsFromPalette(chipColor || palette));
       }
     }
   }, [
@@ -395,7 +405,7 @@ const KeyValueChip = ({
             )}
             <EditableText
               value={currentKey}
-              onChange={setCurrentKey}
+              onChange={handleKeyChange}
               onBlur={handleKeyBlur}
               backgroundColor={backgroundColor}
               textColor={textColor}
@@ -430,7 +440,7 @@ const KeyValueChip = ({
                 opacity: currentValue ? 1 : 0.5,
               }}
             >
-              {symbol !== null && (
+              {currentOperator !== null && (
                 <Typography
                   variant="body2"
                   sx={{

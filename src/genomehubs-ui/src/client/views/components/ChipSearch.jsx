@@ -25,22 +25,22 @@ const allowedModifiers = [
 ];
 const allowedKeys = {
   assembly_span: {
-    symbols: allowedSymbols,
+    operators: allowedSymbols,
     modifiers: allowedModifiers,
     type: "number",
   },
   assembly_level: {
-    symbols: allowedSymbols,
+    operators: allowedSymbols,
     modifiers: "value",
     type: "string",
   },
   tax: {
-    symbols: [],
+    operators: [],
     modifiers: ["name", "tree", "eq", "lineage", "rank", "level"],
     type: "string",
   },
   collate: {
-    symbols: [],
+    operators: [],
     modifiers: ["collate"],
     type: "string",
   },
@@ -49,7 +49,7 @@ const allowedKeys = {
 const extractKeyValue = (chip) => {
   let modifier;
   let valueNote;
-  let [key, symbol, value] = chip.split(/\s*(!=|>=|<=|<|>|=)\s*/);
+  let [key, operator, value] = chip.split(/\s*(!=|>=|<=|<|>|=)\s*/);
   if (key.includes("(")) {
     if (value) {
       [modifier, key] = key.split(/\s*\(\s*/);
@@ -75,14 +75,14 @@ const extractKeyValue = (chip) => {
       }
     }
   } else if (!value) {
-    symbol = "=";
+    operator = "=";
     modifier = "value";
-  } else if (value && symbol) {
+  } else if (value && operator) {
     modifier = "value";
   }
   return {
     key: key.trim().replace("-", "_"),
-    symbol: symbol ? symbol.trim() : null,
+    operator: operator ? operator.trim() : null,
     value: value ? value.trim() : key == "tax" ? "" : null,
     valueNote: valueNote ? valueNote.trim() : null,
     modifier: modifier ? modifier.trim() : null,
@@ -95,7 +95,7 @@ const ChipSearch = ({
   placeholder = "Enter key=value, function(variable), or AND",
 }) => {
   const removeDuplicates = (arr) => {
-    const symbolOrder = [">", ">=", "=", "<=", "<", "!="];
+    const operatorOrder = [">", ">=", "=", "<=", "<", "!="];
     let uniqueArr = [];
     let keyOrder = ["tax"];
     let seen = new Set(["AND"]);
@@ -117,11 +117,13 @@ const ChipSearch = ({
     for (let key of keyOrder) {
       let items = byKey[key];
       if (items.length > 1) {
-        // Sort by symbol order
+        // Sort by operator order
         items.sort((a, b) => {
-          let symbolA = extractKeyValue(a).symbol;
-          let symbolB = extractKeyValue(b).symbol;
-          return symbolOrder.indexOf(symbolA) - symbolOrder.indexOf(symbolB);
+          let operatorA = extractKeyValue(a).operator;
+          let operatorB = extractKeyValue(b).operator;
+          return (
+            operatorOrder.indexOf(operatorA) - operatorOrder.indexOf(operatorB)
+          );
         });
       }
       for (let item of items) {
@@ -182,7 +184,7 @@ const ChipSearch = ({
     setChips((prevChips) =>
       prevChips.map((chip) =>
         chip === `${updatedChip.key}=${updatedChip.value}`
-          ? `${updatedChip.key}${updatedChip.symbol}${updatedChip.value}`
+          ? `${updatedChip.key}${updatedChip.operator}${updatedChip.value}`
           : chip,
       ),
     );
@@ -210,8 +212,8 @@ const ChipSearch = ({
       if (chip === "AND") {
         return null; // Skip rendering "AND" as a Chip
       } else {
-        // Extract key, symbol, and value from the chip
-        const { key, symbol, value, valueNote, modifier } =
+        // Extract key, operator, and value from the chip
+        const { key, operator, value, valueNote, modifier } =
           extractKeyValue(chip);
         return (
           <KeyValueChip
@@ -219,10 +221,9 @@ const ChipSearch = ({
             keyLabel={key}
             value={value}
             valueNote={valueNote}
-            symbol={symbol}
+            operator={operator}
             modifier={modifier}
-            allowedKeys={allowedKeys}
-            palette={setPalette({ key, modifier })} // Set the palette based on the key
+            // palette={setPalette({ key, modifier })} // Set the palette based on the key
             onChange={handleChipChange}
             onDelete={() => handleDelete(chip)}
             style={{ marginRight: "1em" }} // Add margin to chips

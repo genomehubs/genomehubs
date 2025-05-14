@@ -11,7 +11,7 @@ export default {
   argTypes: {
     keyLabel: { control: "text" },
     value: { control: "text" },
-    symbol: { control: { type: "select", options: ["=", ">=", "<="] } },
+    operator: { control: { type: "select", options: ["=", ">=", "<="] } },
     modifier: { control: "text" },
     palette: {
       control: {
@@ -37,7 +37,7 @@ const Template = (args) => {
   const [chipData, setChipData] = useState({
     key: args.keyLabel,
     value: args.value,
-    symbol: args.symbol,
+    operator: args.operator,
     modifier: args.modifier,
     palette: args.palette,
   });
@@ -51,7 +51,7 @@ const Template = (args) => {
     <KeyValueChip
       keyLabel={chipData.key}
       value={chipData.value}
-      symbol={chipData.symbol}
+      operator={chipData.operator}
       modifier={chipData.modifier}
       palette={chipData.palette} // Pass the palette prop
       onChange={handleChipChange}
@@ -63,35 +63,35 @@ export const Default = Template.bind({});
 Default.args = {
   keyLabel: "age",
   value: "30",
-  symbol: "=",
+  operator: "=",
 };
 
 export const GreaterThanOrEqual = Template.bind({});
 GreaterThanOrEqual.args = {
   keyLabel: "height",
   value: "180",
-  symbol: ">=",
+  operator: ">=",
 };
 
 export const LessThanOrEqual = Template.bind({});
 LessThanOrEqual.args = {
   keyLabel: "weight",
   value: "70",
-  symbol: "<=",
+  operator: "<=",
 };
 
 export const EditableValue = Template.bind({});
 EditableValue.args = {
   keyLabel: "score",
   value: "85",
-  symbol: "=",
+  operator: "=",
 };
 
 export const TaxKey = Template.bind({});
 TaxKey.args = {
   keyLabel: "tax",
   value: "Eukaryota",
-  symbol: null,
+  operator: null,
   modifier: "tree",
   palette: "purple",
 };
@@ -100,7 +100,7 @@ export const LongTaxKey = Template.bind({});
 LongTaxKey.args = {
   keyLabel: "tax",
   value: "9608[Canidae]",
-  symbol: null,
+  operator: null,
   modifier: "name",
   palette: "purple",
 };
@@ -109,13 +109,13 @@ export const LongValue = Template.bind({});
 LongValue.args = {
   keyLabel: "bioproject",
   value: "PRJEB40665,PRJEB40666,PRJEB40667,PRJEB40668,PRJEB40669",
-  symbol: "=",
+  operator: "=",
 };
 
 export const WithModifier = Template.bind({});
 WithModifier.args = {
   keyLabel: "assembly_span",
   value: "1000000000",
-  symbol: "<=",
+  operator: "<=",
   modifier: "max",
 };
