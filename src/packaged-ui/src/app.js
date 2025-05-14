@@ -61,7 +61,10 @@ let directories = getDirectories(path.resolve(__dirname, "public"));
 
 app.use(
   GH_BASENAME,
-  express.static("/genomehubs/local/render", { eTag: false, maxAge: 0 })
+  express.static(path.resolve("/genomehubs/local/render"), {
+    eTag: false,
+    maxAge: 0,
+  })
 );
 
 app.use(
