@@ -325,6 +325,7 @@ const KeyValueChip = ({
               position: "relative",
               overflow: "visible",
               marginLeft: "1em",
+              paddingRight: 0,
             }}
           >
             {currentModifier && (

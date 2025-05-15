@@ -217,7 +217,7 @@ const ChipSearch = ({
             // palette={setPalette({ key, modifier })} // Set the palette based on the key
             onChange={handleChipChange}
             onDelete={() => handleDelete(chip)}
-            style={{ marginRight: "1em" }} // Add margin to chips
+            style={{ marginRight: index === chips.length - 1 ? "-1em" : "1em" }} // Add margin to chips
           />
         );
       }

@@ -260,7 +260,7 @@ const EditableText = ({
           whiteSpace: "nowrap",
           display: "inline-flex",
           alignItems: "center",
-          paddingRight: "1em",
+          // paddingRight: "1em",
           ...sx,
         }}
         onClick={handleEdit}
