@@ -6,10 +6,10 @@ import {
   MenuItem,
   TextField,
 } from "@mui/material";
+import KeyValueChip, { typesToValidation } from "./KeyValueChip";
 import React, { useEffect, useState } from "react";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"; // Import an add icon
-import KeyValueChip from "./KeyValueChip/KeyValueChip";
 
 const allowedSymbols = ["=", "!=", ">=", "<=", "<", ">"];
 const allowedKeywordSymbols = allowedSymbols.slice(0, 2);
@@ -94,6 +94,8 @@ const ChipSearch = ({
   initialInput = "",
   placeholder = "Enter key=value, function(variable), or AND",
 }) => {
+  const validation = typesToValidation();
+  const validKeys = validation.validKeys();
   const removeDuplicates = (arr) => {
     let uniqueArr = [];
     let keyOrder = ["tax"];
@@ -265,7 +267,7 @@ const ChipSearch = ({
                     open={Boolean(menuAnchorEl)}
                     onClose={handleMenuClose}
                   >
-                    {Object.entries(allowedKeys).flatMap(([chipType, obj]) => {
+                    {/* {Object.entries(allowedKeys).flatMap(([chipType, obj]) => {
                       let chipTypes = [];
                       if (chipType == "collate") {
                         chipTypes.push({
@@ -287,17 +289,22 @@ const ChipSearch = ({
                         });
                       } else {
                         chipTypes.push({ key: chipType, value: chipType });
+                      } */}
+                    {[...validKeys.keysByGroup.primary].map((key) => {
+                      let value = key;
+                      if (key == "collate") {
+                        value = "collate(sequence_id,name)";
+                      } else if (key.startsWith("tax_")) {
+                        value = `${key}()`;
                       }
-                      return chipTypes.map(({ key, value }) => {
-                        return (
-                          <MenuItem
-                            key={key}
-                            onClick={() => handleMenuSelect(value)}
-                          >
-                            {key}
-                          </MenuItem>
-                        );
-                      });
+                      return (
+                        <MenuItem
+                          key={key}
+                          onClick={() => handleMenuSelect(value)}
+                        >
+                          {key}
+                        </MenuItem>
+                      );
                     })}
                   </Menu>
                 </>
