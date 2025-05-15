@@ -18,6 +18,7 @@ export const ValidationErrorTooltip = ({ validationError, textColor }) => {
         <ErrorIcon
           sx={{
             fontSize: "1.2em",
+            marginTop: "-0.5em",
           }}
         />
       </span>

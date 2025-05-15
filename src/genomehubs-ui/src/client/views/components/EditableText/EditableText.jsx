@@ -175,18 +175,18 @@ const EditableText = ({
           <TextField
             {...params}
             {...inputProps}
-            onChange={(newValue) => {
+            onChange={(event) => {
               const updatedValue = allowMultipleValues
-                ? newValue
+                ? event.target.value
                     .split(/\s*,\s*/)
                     .filter((v) => v)
                     .join(",")
-                : newValue;
+                : event.target.value;
 
-              setInputValue(updatedValue);
-              setIsEditing(false);
-              setAnchorEl(null);
-              onChange?.(updatedValue); // Pass the array of values to the parent
+              // setInputValue(updatedValue);
+              // setIsEditing(false);
+              // setAnchorEl(null);
+              // onChange?.(updatedValue); // Pass the array of values to the parent
             }}
             onKeyDown={(event) => {
               if (event.key === "Escape") {
@@ -249,6 +249,7 @@ const EditableText = ({
           whiteSpace: "nowrap",
           display: "inline-flex",
           alignItems: "center",
+          paddingRight: "1em",
           ...sx,
         }}
         onClick={handleEdit}

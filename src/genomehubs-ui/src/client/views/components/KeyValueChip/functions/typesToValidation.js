@@ -147,6 +147,9 @@ export const typesToValidation = () => {
     return { valid: false, reason: "not a valid key" };
   };
   const validateValue = ({ key, value, modifier }) => {
+    if (value === null || value === undefined || value === "") {
+      return { valid: true };
+    }
     let { constraint = {}, processed_type = "" } = types[key] || {};
     if (["float", "integer"].includes(processed_type)) {
       return validateNumber({ value, processed_type, constraint });

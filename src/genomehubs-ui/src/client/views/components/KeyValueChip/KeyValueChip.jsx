@@ -19,12 +19,9 @@ import Chip from "@mui/material/Chip";
 import EditableText from "../EditableText/EditableText";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import Popper from "@mui/material/Popper";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import ValidationErrorTooltip from "./ValidationErrorToolTip";
 import formatValue from "./functions/formatValue";
-import { parse } from "qs";
 import parseValue from "./functions/parseValue";
 import typesToValidation from "./functions/typesToValidation";
 
@@ -185,16 +182,16 @@ const KeyValueChip = ({
     setAnchorElSymbol(null);
   };
 
-  const handleValueChange = (event) => {
-    setCurrentValue(event.target.value);
-    setCurrentValueNote(undefined);
-  };
+  // const handleValueChange = (event) => {
+  //   setCurrentValue(event.target.value);
+  //   setCurrentValueNote(undefined);
+  // };
 
   const handleValueBlur = (event) => {
     event.stopPropagation(); // Prevent the click event from propagating to the parent
     event.preventDefault(); // Prevent the default action
     setIsEditingValue(false);
-    setAnchorElValue(null);
+    // setAnchorElValue(null);
     const parsedValue = parseValue(currentValue);
     setCurrentValue(keyLabel == "tax" ? parsedValue : formatValue(parsedValue)); // Reformat the value for display
     setPreviousValue(
@@ -232,16 +229,8 @@ const KeyValueChip = ({
   const handleKeyBlur = (event) => {
     event.stopPropagation(); // Prevent the click event from propagating to the parent
     event.preventDefault(); // Prevent the default action
-    setIsEditingKey(false);
-    setAnchorElKey(null);
-
-    // onChange?.({
-    //   key: currentKey,
-    //   value: parseValue(currentValue),
-    //   symbol: newOperator,
-    //   modifier: currentModifier,
-    //   palette,
-    // });
+    // setIsEditingKey(false);
+    // setAnchorElKey(null);
   };
 
   const handleDelete = () => {
@@ -423,7 +412,8 @@ const KeyValueChip = ({
                 justifyContent: "center",
                 gap: 0.5,
                 height: "30px",
-                opacity: currentValue ? 1 : 0.5,
+                opacity: currentValue || currentValue == 0 ? 1 : 0.5,
+                marginRight: "1em",
               }}
             >
               {currentOperator !== null && (
@@ -515,7 +505,10 @@ const KeyValueChip = ({
                   whiteSpace: currentValue.length > 100 ? "normal" : "nowrap",
                   wordBreak:
                     currentValue.length > 100 ? "break-word" : "normal",
-                  opacity: currentValue && !isEditingValue ? 1 : 0.5,
+                  opacity:
+                    (currentValue || currentValue == 0) && !isEditingValue
+                      ? 1
+                      : 0.5,
                   fontStyle: currentValue ? "normal" : "italic",
                   marginTop: "2px",
                 }}
@@ -527,7 +520,10 @@ const KeyValueChip = ({
         sx={{
           padding: "0 0 0 1em",
           height: "60px",
-          "& .MuiChip-label": { display: "block", padding: "1em" },
+          "& .MuiChip-label": {
+            display: "block",
+            padding: "1em",
+          },
           background: `linear-gradient(to bottom, ${backgroundColor} 50%, ${lightColor} 50%)`,
           "& .MuiChip-deleteIcon": {
             marginTop: "-28px",
@@ -541,56 +537,7 @@ const KeyValueChip = ({
           },
         }}
       />
-      {isEditingValue && (
-        <Popper
-          open={isEditingValue}
-          anchorEl={anchorElValue}
-          placement="bottom"
-        >
-          <Box
-            sx={{
-              padding: "8px",
-              backgroundColor: backgroundColor,
-              borderRadius: "4px",
-              boxShadow:
-                "0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)",
-            }}
-          >
-            <TextField
-              value={currentValue}
-              onChange={handleValueChange}
-              onBlur={handleValueBlur}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  handleValueBlur(event);
-                }
-              }}
-              multiline={previousValue.length * 8 > 100}
-              maxRows={Math.min(
-                Math.ceil((previousValue.length * 8) / 100),
-                10,
-              )}
-              size="small"
-              variant="standard"
-              autoFocus
-              sx={{
-                marginTop: "4px",
-                transition: "width 0.2s ease", // Smoothly transition width changes
-                width: `${Math.min(previousValue.length * 8 + 40, 400)}px`, // Cap width at 400px
-                "& .MuiInputBase-input": {
-                  textAlign: "center",
-                },
-                "& .MuiInputBase-root": {
-                  backgroundColor: backgroundColor,
-                  color: textColor,
-                  borderRadius: "4px",
-                  padding: "0 2px 2px 2px",
-                },
-              }}
-            />
-          </Box>
-        </Popper>
-      )}
+
       <Menu
         anchorEl={anchorElSymbol}
         open={Boolean(anchorElSymbol)}
