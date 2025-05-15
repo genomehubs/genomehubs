@@ -248,7 +248,7 @@ const KeyValueChip = ({
       value = `${key},${value}`;
       key = "collate";
     }
-    let { valid, color, reason } = validation.validateKey(key);
+    let { valid, color, reason } = validation.validateKey({ key });
     if (!valid) {
       setValidationError({ reason, component: "key" });
       return false;

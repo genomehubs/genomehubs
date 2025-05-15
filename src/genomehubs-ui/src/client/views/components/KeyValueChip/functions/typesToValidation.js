@@ -44,7 +44,7 @@ const validateKeyword = ({ value, validValues }) => {
 
 export const typesToValidation = () => {
   const validKeys = () => {
-    let keys = new Set(["tax"]);
+    let keys = new Set(["tax", "collate"]);
     let keysByGroup = {
       primary: new Set(["tax_tree", "tax_name", "tax_rank"]),
       tax: new Set([
@@ -121,7 +121,7 @@ export const typesToValidation = () => {
   };
 
   const validOperators = ({ key, modifier }) => {
-    if (key === "tax" || key === "collate") {
+    if (key === "tax" || modifier === "collate") {
       return new Set([]);
     }
     const { processed_type, summary = [] } = types[key] || {};
@@ -134,7 +134,7 @@ export const typesToValidation = () => {
     }
     return operators;
   };
-  const validateKey = (key) => {
+  const validateKey = ({ key }) => {
     if (validKeys().keys.has(key)) {
       let color = "blue";
       if (key === "tax") {
@@ -162,6 +162,9 @@ export const typesToValidation = () => {
     return { valid: true };
   };
   const validateModifier = ({ key, modifier }) => {
+    if (modifier === "collate") {
+      return { valid: true };
+    }
     const modifiers = validModifiers(key);
     if (modifiers.has(modifier)) {
       return { valid: true };
@@ -180,7 +183,7 @@ export const typesToValidation = () => {
     if (key === "tax") {
       return true;
     }
-    if (key === "collate") {
+    if (modifier === "collate") {
       return false;
     }
     if (modifier !== "value") {

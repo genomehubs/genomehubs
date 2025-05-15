@@ -124,53 +124,64 @@ const EditableText = ({
           onChange?.(updatedValue); // Pass the array of values to the parent
         }}
         onBlur={handleBlur}
-        renderTags={(value, getTagProps) =>
-          value.map((option, index) => {
-            const isNegated = option.startsWith("!");
-            const label = isNegated ? option.slice(1) : option;
+        renderTags={(value, getTagProps) => (
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 1,
+              width: "100%", // Ensure the chips take the full width
+            }}
+          >
+            {value.map((option, index) => {
+              const isNegated = option.startsWith("!");
+              const label = isNegated ? option.slice(1) : option;
 
-            return (
-              <Chip
-                key={index}
-                label={label}
-                icon={
-                  isNegated ? (
-                    <RemoveCircleIcon sx={{ fontSize: "1rem", color: "red" }} />
-                  ) : null
-                } // Add an icon if the value is negated
-                {...getTagProps({ index })}
-                sx={{
-                  backgroundColor: highlightColor,
-                  color: highlightContrastColor,
-
-                  height: "24px",
-                  lineHeight: "24px",
-                  fontSize: "0.875rem",
-                  maxWidth: "none",
-                  fontFamily: "'Roboto', 'Arial', sans-serif",
-                  display: "flex",
-                  justifyContent: "center", // Center the content horizontally
-                  alignItems: "center", // Vertically center content
-                  "& .MuiChip-deleteIcon": {
-                    color: highlightContrastColor || "inherit",
-                    opacity: 0.5,
-                    fontSize: "1rem", // Set a consistent size for the delete icon
-                    marginRight: "4px",
-                    opacity: 0.5,
-                  },
-                  "& .MuiChip-label": {
-                    padding: "0 0.6em 0 0.65em",
+              return (
+                <Chip
+                  key={index}
+                  label={label}
+                  icon={
+                    isNegated ? (
+                      <RemoveCircleIcon
+                        sx={{ fontSize: "1rem", color: "red" }}
+                      />
+                    ) : null
+                  } // Add an icon if the value is negated
+                  {...getTagProps({ index })}
+                  sx={{
+                    backgroundColor: highlightColor,
                     color: highlightContrastColor,
-                  },
-                  "& .MuiChip-icon": {
-                    color: highlightContrastColor || "inherit",
-                    fontSize: "1rem",
-                  },
-                }}
-              />
-            );
-          })
-        }
+
+                    height: "24px",
+                    lineHeight: "24px",
+                    fontSize: "0.875rem",
+                    maxWidth: "none",
+                    fontFamily: "'Roboto', 'Arial', sans-serif",
+                    display: "flex",
+                    justifyContent: "center", // Center the content horizontally
+                    alignItems: "center", // Vertically center content
+                    "& .MuiChip-deleteIcon": {
+                      color: highlightContrastColor || "inherit",
+                      opacity: 0.5,
+                      fontSize: "1rem", // Set a consistent size for the delete icon
+                      marginRight: "4px",
+                      opacity: 0.5,
+                    },
+                    "& .MuiChip-label": {
+                      padding: "0 0.6em 0 0.65em",
+                      color: highlightContrastColor,
+                    },
+                    "& .MuiChip-icon": {
+                      color: highlightContrastColor || "inherit",
+                      fontSize: "1rem",
+                    },
+                  }}
+                />
+              );
+            })}
+          </Box>
+        )}
         renderInput={(params) => (
           <TextField
             {...params}
