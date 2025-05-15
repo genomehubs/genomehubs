@@ -464,8 +464,12 @@ const KeyValueChip = ({
               )}
 
               <EditableText
-                value={currentValue || "value"}
+                value={currentValue}
                 allowMultipleValues={validation.allowMultipleValues({
+                  key: currentKey,
+                  modifier: currentModifier,
+                })}
+                isNegatable={validation.isNegatable({
                   key: currentKey,
                   modifier: currentModifier,
                 })}
@@ -508,11 +512,11 @@ const KeyValueChip = ({
                 ]}
                 variant="body3"
                 sx={{
-                  whiteSpace: previousValue.length > 100 ? "normal" : "nowrap",
+                  whiteSpace: currentValue.length > 100 ? "normal" : "nowrap",
                   wordBreak:
-                    previousValue.length > 100 ? "break-word" : "normal",
-                  opacity: previousValue && !isEditingValue ? 1 : 0.5,
-                  fontStyle: previousValue ? "normal" : "italic",
+                    currentValue.length > 100 ? "break-word" : "normal",
+                  opacity: currentValue && !isEditingValue ? 1 : 0.5,
+                  fontStyle: currentValue ? "normal" : "italic",
                   marginTop: "2px",
                 }}
               />

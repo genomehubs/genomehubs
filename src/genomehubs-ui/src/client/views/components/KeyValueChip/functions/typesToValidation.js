@@ -194,6 +194,23 @@ export const typesToValidation = () => {
     return true;
   };
 
+  const isNegatable = ({ key, modifier }) => {
+    if (key === "tax") {
+      if (["tree", "name", "eq"].includes(modifier)) {
+        return true;
+      }
+      return false;
+    }
+    if (modifier === "collate") {
+      return false;
+    }
+    const { processed_type } = types[key] || {};
+    if (processed_type === "integer" || processed_type === "float") {
+      return false;
+    }
+    return true;
+  };
+
   return {
     validKeys,
     validateKey,
@@ -204,6 +221,7 @@ export const typesToValidation = () => {
     validOperators,
     validateOperator,
     allowMultipleValues,
+    isNegatable,
   };
 };
 
