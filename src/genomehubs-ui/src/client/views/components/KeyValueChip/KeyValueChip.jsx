@@ -16,7 +16,7 @@ import React, { useEffect, useState } from "react";
 
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
-import EditableText from "../EditableText";
+import EditableText from "../EditableText/EditableText";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Popper from "@mui/material/Popper";
@@ -24,6 +24,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import ValidationErrorTooltip from "./ValidationErrorToolTip";
 import formatValue from "./functions/formatValue";
+import { parse } from "qs";
 import parseValue from "./functions/parseValue";
 import typesToValidation from "./functions/typesToValidation";
 
@@ -261,17 +262,6 @@ const KeyValueChip = ({
     onDelete?.({ key: keyLabel, value: "", operator: "=", modifier: "value" });
   };
 
-  const truncate = (str, maxWidth = 30) => {
-    // format comma separated lists with spaces and truncate if too long
-    if (str.length > maxWidth) {
-      const parts = str.split(",");
-      const formattedParts = parts.map((part) => part.trim());
-      const truncatedStr = formattedParts.join(", ");
-      return `${truncatedStr.slice(0, maxWidth)}...`;
-    }
-    return str;
-  };
-
   const validateChip = ({ key, value, operator, modifier }) => {
     // Validate the key, value, operator, and modifier
     if (modifier == "collate") {
@@ -297,7 +287,11 @@ const KeyValueChip = ({
       setValidationError({ reason, component: "value" });
       return false;
     }
-    ({ valid, reason } = validation.validateOperator({ key, operator }));
+    ({ valid, reason } = validation.validateOperator({
+      key,
+      modifier,
+      operator,
+    }));
     if (!valid) {
       setValidationError({ reason, component: "operator" });
       return false;
@@ -408,6 +402,7 @@ const KeyValueChip = ({
               onChange={handleKeyChange}
               onBlur={handleKeyBlur}
               backgroundColor={backgroundColor}
+              highlightColor={lightColor}
               textColor={textColor}
               anchorEl={anchorElKey}
               setAnchorEl={setAnchorElKey}
@@ -477,30 +472,16 @@ const KeyValueChip = ({
                 </Typography>
               )}
 
-              {/* <Typography
-                variant="body2"
-                ref={(el) => setAnchorElValue(el)} // Use a ref-setter function
-                sx={{
-                  cursor: "pointer",
-                  whiteSpace: previousValue.length > 100 ? "normal" : "nowrap",
-                  wordBreak:
-                    previousValue.length > 100 ? "break-word" : "normal",
-                  opacity: previousValue && !isEditingValue ? 1 : 0.5,
-                  fontStyle: previousValue ? "normal" : "italic",
-                  marginTop: "6px",
-                }}
-                onClick={isEditingValue ? handleValueBlur : handleValueEdit}
-              >
-                {truncate(previousValue) || "value"}
-              </Typography> */}
               <EditableText
-                value={truncate(currentValue) || "value"}
-                onChange={setCurrentValue}
+                value={currentValue || "value"}
+                onChange={(newValue) => setCurrentValue(parseValue(newValue))}
                 onBlur={handleValueBlur}
                 backgroundColor={backgroundColor}
-                textColor={null}
+                highlightColor={lightColor}
+                textColor={"black"}
                 anchorEl={anchorElValue}
                 setAnchorEl={setAnchorElValue}
+                valueAsChips={true}
                 endComponent={
                   <>
                     {errorComponent == "value" && (
@@ -524,7 +505,12 @@ const KeyValueChip = ({
                     </Typography>
                   </>
                 }
-                options={[...(validation.validValues(currentKey) || [])]}
+                options={[
+                  ...(validation.validValues({
+                    key: currentKey,
+                    modifier: currentModifier,
+                  }) || []),
+                ]}
                 variant="body3"
                 sx={{
                   whiteSpace: previousValue.length > 100 ? "normal" : "nowrap",

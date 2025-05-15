@@ -3555,7 +3555,7 @@
   },
   "sequencing_status": {
     "type": "keyword",
-    "processed_type": "keyword",
+    "processed_type": "ordered_keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },

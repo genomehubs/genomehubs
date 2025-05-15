@@ -81,7 +81,7 @@ const extractKeyValue = (chip) => {
     modifier = "value";
   }
   return {
-    key: key.trim().replace("-", "_"),
+    key: key.trim().replace(/-/g, "_"),
     operator: operator ? operator.trim() : null,
     value: value ? value.trim() : key == "tax" ? "" : null,
     valueNote: valueNote ? valueNote.trim() : null,
@@ -95,13 +95,13 @@ const ChipSearch = ({
   placeholder = "Enter key=value, function(variable), or AND",
 }) => {
   const removeDuplicates = (arr) => {
-    const operatorOrder = [">", ">=", "=", "<=", "<", "!="];
     let uniqueArr = [];
     let keyOrder = ["tax"];
     let seen = new Set(["AND"]);
     let byKey = { tax: [] };
     arr.forEach((item) => {
-      if (!seen.has(item)) {
+      let lcItem = item.toLowerCase().replace(/\s+/g, "").replace(/-/g, "_");
+      if (!seen.has(lcItem)) {
         let { key } = extractKeyValue(item);
         if (!byKey[key]) {
           byKey[key] = [];
@@ -111,22 +111,11 @@ const ChipSearch = ({
         }
         byKey[key].push(item);
         //uniqueArr.push(item);
-        seen.add(item);
+        seen.add(lcItem);
       }
     });
     for (let key of keyOrder) {
-      let items = byKey[key];
-      if (items.length > 1) {
-        // Sort by operator order
-        items.sort((a, b) => {
-          let operatorA = extractKeyValue(a).operator;
-          let operatorB = extractKeyValue(b).operator;
-          return (
-            operatorOrder.indexOf(operatorA) - operatorOrder.indexOf(operatorB)
-          );
-        });
-      }
-      for (let item of items) {
+      for (let item of byKey[key]) {
         if (!uniqueArr.includes(item)) {
           if (uniqueArr.length > 0) {
             uniqueArr.push("AND");

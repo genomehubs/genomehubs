@@ -2,25 +2,42 @@ import parseValue from "./parseValue";
 import types from "./default.types.json";
 
 const validateNumber = ({ value, processed_type, constraint }) => {
-  let processedValue = parseValue(value);
-  if (processed_type === "integer" && !Number.isInteger(processedValue)) {
-    return { valid: false, reason: "not an integer" };
-  }
-  if (processed_type === "float" && typeof processedValue !== "number") {
-    return { valid: false, reason: "not a number" };
-  }
-  if (constraint.hasOwnProperty("min") && processedValue < constraint.min) {
-    return { valid: false, reason: "less than min" };
-  }
-  if (constraint.hasOwnProperty("max") && processedValue > constraint.max) {
-    return { valid: false, reason: "greater than max" };
+  let values = Array.isArray(value) ? value : [value];
+  for (let v of values) {
+    let processedValue = parseValue(v);
+    if (processed_type === "integer" && !Number.isInteger(processedValue)) {
+      return { valid: false, reason: `${v} is not an integer` };
+    }
+    if (processed_type === "float" && typeof processedValue !== "number") {
+      return { valid: false, reason: `${v} is not a number` };
+    }
+    if (constraint.hasOwnProperty("min") && processedValue < constraint.min) {
+      return { valid: false, reason: `${v} is less than ${constraint.min}` };
+    }
+    if (constraint.hasOwnProperty("max") && processedValue > constraint.max) {
+      return { valid: false, reason: `${v} greater than ${constraint.max}` };
+    }
   }
   return { valid: true };
 };
 
 const validateKeyword = ({ value, validValues }) => {
-  if (validValues && !validValues.has(value.toLowerCase())) {
-    return { valid: false, reason: "not in enum" };
+  if (validValues) {
+    let values;
+    if (!Array.isArray(value)) {
+      if (typeof value === "string") {
+        values = value.split(/\s*,\s*/);
+      } else {
+        values = [value];
+      }
+    } else {
+      values = value;
+    }
+    for (let v of values) {
+      if (!validValues.has(v.replace(/^!/, "").toLowerCase())) {
+        return { valid: false, reason: `${v} is not a valid value` };
+      }
+    }
   }
   return { valid: true };
 };
@@ -56,10 +73,15 @@ export const typesToValidation = () => {
     };
   };
 
-  const validValues = (key) => {
+  const validValues = ({ key, modifier }) => {
+    if (key !== "tax" && key !== "constraint" && modifier !== "value") {
+      return;
+    }
     const { constraint = {} } = types[key] || {};
     if (constraint.hasOwnProperty("enum")) {
-      return new Set(constraint.enum.map((v) => v.toLowerCase()));
+      let values = new Set(constraint.enum.map((v) => v.toLowerCase()));
+      values.add("null");
+      return values;
     }
     return;
   };
@@ -99,7 +121,6 @@ export const typesToValidation = () => {
   };
 
   const validOperators = ({ key, modifier }) => {
-    console.log("validOperators", key, modifier);
     if (key === "tax" || key === "collate") {
       return new Set([]);
     }
@@ -130,7 +151,10 @@ export const typesToValidation = () => {
     if (["float", "integer"].includes(processed_type)) {
       return validateNumber({ value, processed_type, constraint });
     } else if (processed_type.endsWith("keyword")) {
-      return validateKeyword({ value, validValues: validValues(key) });
+      return validateKeyword({
+        value,
+        validValues: validValues({ key, modifier }),
+      });
     }
     return { valid: true };
   };

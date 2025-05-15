@@ -1,0 +1,235 @@
+import React, { useState } from "react";
+
+import Autocomplete from "@mui/material/Autocomplete";
+import AutowidthTextField from "../AutowidthTextField";
+import Box from "@mui/material/Box";
+import ErrorIcon from "@mui/icons-material/Error";
+import Popper from "@mui/material/Popper";
+import TextField from "@mui/material/TextField";
+import Tooltip from "../Tooltip";
+import Typography from "@mui/material/Typography";
+import ValueChips from "./ValueChips";
+import { set } from "core-js/core/dict";
+
+const checkContrast = (color, background, threshold = 4.5) => {
+  const hexToRgb = (hex) => {
+    let bigint = parseInt(hex.slice(1), 16);
+    let r = (bigint >> 16) & 255;
+    let g = (bigint >> 8) & 255;
+    let b = bigint & 255;
+    return [r, g, b];
+  };
+
+  let fg = hexToRgb(color);
+  let bg = hexToRgb(background);
+  let fgLum = 0.2126 * fg[0] + 0.7152 * fg[1] + 0.0722 * fg[2];
+  let bgLum = 0.2126 * bg[0] + 0.7152 * bg[1] + 0.0722 * bg[2];
+  let contrast =
+    fgLum > bgLum
+      ? (fgLum + 0.05) / (bgLum + 0.05)
+      : (bgLum + 0.05) / (fgLum + 0.05);
+  return contrast >= threshold;
+};
+
+const getContrastColor = (color) => {
+  // contrast color will either be "#31323f" or "#ffffff"
+  return checkContrast(color, "#31323f") ? "#31323f" : "#ffffff";
+};
+
+const EditableText = ({
+  value,
+  options = [],
+  onChange,
+  onBlur,
+  backgroundColor,
+  textColor,
+  highlightColor,
+  anchorEl,
+  setAnchorEl,
+  startComponent,
+  endComponent,
+  valueAsChips,
+  maxWidth = 250,
+  sx,
+  ...props
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [inputValue, setInputValue] = useState(value);
+
+  const contrastColor = getContrastColor(backgroundColor);
+  const highlightContrastColor = getContrastColor(highlightColor);
+
+  const handleEdit = (event) => {
+    setIsEditing(true);
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleBlur = (event) => {
+    setIsEditing(false);
+    setAnchorEl(null);
+    onChange?.(inputValue); // Pass the array of values to the parent
+    onBlur?.(event);
+  };
+
+  const handleChange = (newValue) => {
+    setInputValue(newValue);
+    setIsEditing(false);
+    setAnchorEl(null);
+    onChange?.(newValue);
+  };
+
+  let inputProps = {
+    size: "small",
+    variant: "standard",
+    autoFocus: true,
+    sx: {
+      maxWidth,
+      "& .MuiInputBase-input": {
+        textAlign: "center",
+      },
+      "& .MuiInputBase-root": {
+        backgroundColor: backgroundColor,
+        color: contrastColor,
+      },
+    },
+  };
+
+  let textInput = null;
+
+  if (options && options.length > 0) {
+    textInput = (
+      <Autocomplete
+        multiple
+        // freeSolo
+        options={options}
+        value={inputValue.split(/\s*,\s*/).filter((v) => v)}
+        onChange={(event, newValue) => {
+          const updatedValue = newValue.join(","); // Join the array back into a comma-separated string
+          setInputValue(updatedValue);
+          onChange?.(updatedValue); // Pass the array of values to the parent
+        }}
+        onBlur={handleBlur}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            {...inputProps}
+            onChange={(newValue) => {
+              console.log("newValue", newValue);
+              const updatedValue = newValue
+                .split(/\s*,\s*/)
+                .filter((v) => v)
+                .join(",");
+
+              setInputValue(updatedValue);
+              onChange?.(updatedValue); // Pass the array of values to the parent
+            }}
+            value={inputValue}
+            placeholder="Type values separated by commas..."
+            sx={{
+              ...inputProps.sx,
+              "& .MuiChip-root": {
+                backgroundColor: highlightColor,
+                color: highlightContrastColor,
+
+                height: "24px",
+                lineHeight: "24px",
+                fontSize: "0.875rem",
+                maxWidth: "none",
+                fontFamily: "'Roboto', 'Arial', sans-serif",
+                display: "flex",
+                justifyContent: "center", // Center the content horizontally
+                alignItems: "center", // Vertically center content
+                "& .MuiChip-deleteIcon": {
+                  color: highlightContrastColor || "inherit",
+                  opacity: 0.5,
+                  fontSize: "1rem", // Set a consistent size for the delete icon
+                  marginRight: "4px",
+                  opacity: 0.5,
+                },
+                "& .MuiChip-label": {
+                  padding: "0 0.5em 0 0.75em",
+                  color: highlightContrastColor,
+                },
+              },
+            }}
+            // padding={16}
+            // minWidth={100}
+            // maxWidth={300}
+          />
+        )}
+      />
+    );
+  } else {
+    textInput = (
+      <AutowidthTextField
+        value={inputValue} // Display as a comma-separated string
+        handleChange={handleChange}
+        onBlur={(event) => handleChange(event.target.value)}
+        maxWidth={maxWidth}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            setIsEditing(false);
+            setAnchorEl(null);
+          } else if (event.key === "Enter") {
+            handleChange(event.target.value);
+          }
+        }}
+        {...inputProps}
+      />
+    );
+  }
+
+  let displayValue = valueAsChips ? (
+    <ValueChips
+      value={inputValue}
+      handleChange={setInputValue}
+      backgroundColor={backgroundColor}
+      textColor={contrastColor}
+      maxChips={5}
+    />
+  ) : (
+    inputValue
+  );
+
+  return (
+    <>
+      <Typography
+        sx={{
+          cursor: "pointer",
+          color: textColor,
+          opacity: isEditing ? 0.5 : 1,
+          whiteSpace: "nowrap",
+          display: "inline-flex",
+          alignItems: "center",
+          ...sx,
+        }}
+        onClick={handleEdit}
+        {...props}
+      >
+        {startComponent}
+        <Box component="span" sx={{ whiteSpace: "nowrap" }}>
+          {displayValue}
+        </Box>
+        {endComponent}
+      </Typography>
+      {isEditing && (
+        <Popper open={isEditing} anchorEl={anchorEl} placement="bottom">
+          <Box
+            sx={{
+              padding: "8px",
+              backgroundColor: backgroundColor,
+              color: textColor,
+              borderRadius: "4px",
+              boxShadow:
+                "0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)",
+            }}
+          >
+            {textInput}
+          </Box>
+        </Popper>
+      )}
+    </>
+  );
+};
+
+export default EditableText;
