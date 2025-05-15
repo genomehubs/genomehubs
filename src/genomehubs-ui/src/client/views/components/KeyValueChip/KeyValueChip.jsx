@@ -28,15 +28,6 @@ import { parse } from "qs";
 import parseValue from "./functions/parseValue";
 import typesToValidation from "./functions/typesToValidation";
 
-const listModifiers = (keyLabel) => {
-  // Define the available modifiers based on the keyLabel
-  if (keyLabel === "tax") {
-    return ["name", "tree", "eq", "lineage", "rank", "level"];
-  } else {
-    return ["count", "length", "max", "mean", "median", "min", "sum", "value"];
-  }
-};
-
 const chipPalettes = {
   blue: {
     dark: "#185b89",
@@ -474,6 +465,10 @@ const KeyValueChip = ({
 
               <EditableText
                 value={currentValue || "value"}
+                allowMultipleValues={validation.allowMultipleValues({
+                  key: currentKey,
+                  modifier: currentModifier,
+                })}
                 onChange={(newValue) => setCurrentValue(parseValue(newValue))}
                 onBlur={handleValueBlur}
                 backgroundColor={backgroundColor}

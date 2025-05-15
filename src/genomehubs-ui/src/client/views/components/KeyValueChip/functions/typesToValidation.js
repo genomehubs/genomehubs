@@ -173,6 +173,27 @@ export const typesToValidation = () => {
     return { valid: false, reason: "not a valid operator" };
   };
 
+  const allowMultipleValues = ({ key, modifier }) => {
+    if (key === "tax") {
+      return true;
+    }
+    if (key === "collate") {
+      return false;
+    }
+    if (modifier !== "value") {
+      return false;
+    }
+    const { processed_type } = types[key] || {};
+    if (
+      processed_type === "integer" ||
+      processed_type === "float" ||
+      processed_type === "keyword"
+    ) {
+      return false;
+    }
+    return true;
+  };
+
   return {
     validKeys,
     validateKey,
@@ -182,6 +203,7 @@ export const typesToValidation = () => {
     validateModifier,
     validOperators,
     validateOperator,
+    allowMultipleValues,
   };
 };
 

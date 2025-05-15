@@ -3,13 +3,11 @@ import React, { useState } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import AutowidthTextField from "../AutowidthTextField";
 import Box from "@mui/material/Box";
-import ErrorIcon from "@mui/icons-material/Error";
 import Popper from "@mui/material/Popper";
 import TextField from "@mui/material/TextField";
-import Tooltip from "../Tooltip";
 import Typography from "@mui/material/Typography";
 import ValueChips from "./ValueChips";
-import { set } from "core-js/core/dict";
+import stringLength from "../../functions/stringLength";
 
 const checkContrast = (color, background, threshold = 4.5) => {
   const hexToRgb = (hex) => {
@@ -39,6 +37,7 @@ const getContrastColor = (color) => {
 const EditableText = ({
   value,
   options = [],
+  allowMultipleValues,
   onChange,
   onBlur,
   backgroundColor,
@@ -97,14 +96,26 @@ const EditableText = ({
   let textInput = null;
 
   if (options && options.length > 0) {
+    let minWidth = options.reduce(
+      (max, option) =>
+        Math.max(max, stringLength(option, { factor: 10 }) + 2 * 4),
+      0,
+    );
+    minWidth = `${Math.max(minWidth, 100)}px`; // Ensure a minimum width
     textInput = (
       <Autocomplete
-        multiple
+        multiple={allowMultipleValues}
         // freeSolo
         options={options}
-        value={inputValue.split(/\s*,\s*/).filter((v) => v)}
+        value={
+          allowMultipleValues
+            ? inputValue.split(/\s*,\s*/).filter((v) => v)
+            : inputValue
+        }
         onChange={(event, newValue) => {
-          const updatedValue = newValue.join(","); // Join the array back into a comma-separated string
+          const updatedValue = allowMultipleValues
+            ? newValue.join(",")
+            : newValue; // Join the array back into a comma-separated string
           setInputValue(updatedValue);
           onChange?.(updatedValue); // Pass the array of values to the parent
         }}
@@ -114,19 +125,31 @@ const EditableText = ({
             {...params}
             {...inputProps}
             onChange={(newValue) => {
-              console.log("newValue", newValue);
-              const updatedValue = newValue
-                .split(/\s*,\s*/)
-                .filter((v) => v)
-                .join(",");
+              const updatedValue = allowMultipleValues
+                ? newValue
+                    .split(/\s*,\s*/)
+                    .filter((v) => v)
+                    .join(",")
+                : newValue;
 
               setInputValue(updatedValue);
+              setIsEditing(false);
+              setAnchorEl(null);
               onChange?.(updatedValue); // Pass the array of values to the parent
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                setIsEditing(false);
+                setAnchorEl(null);
+              } else if (event.key === "Enter") {
+                handleChange(event.target.value);
+              }
             }}
             value={inputValue}
             placeholder="Type values separated by commas..."
             sx={{
               ...inputProps.sx,
+              minWidth,
               "& .MuiChip-root": {
                 backgroundColor: highlightColor,
                 color: highlightContrastColor,
@@ -152,9 +175,6 @@ const EditableText = ({
                 },
               },
             }}
-            // padding={16}
-            // minWidth={100}
-            // maxWidth={300}
           />
         )}
       />
