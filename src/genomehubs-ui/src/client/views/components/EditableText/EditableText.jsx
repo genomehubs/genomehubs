@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import Autocomplete from "@mui/material/Autocomplete";
 import AutowidthTextField from "../AutowidthTextField";
@@ -42,6 +42,7 @@ const EditableText = ({
   options = [],
   allowMultipleValues,
   isNegatable,
+  isAlreadyEditing,
   onChange,
   onBlur,
   backgroundColor,
@@ -59,8 +60,17 @@ const EditableText = ({
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(value);
 
+  const rootRef = useRef(null);
+
   const contrastColor = getContrastColor(backgroundColor);
   const highlightContrastColor = getContrastColor(highlightColor);
+
+  useEffect(() => {
+    if (isAlreadyEditing) {
+      setIsEditing(true);
+      setAnchorEl(rootRef.current);
+    }
+  }, [isAlreadyEditing]);
 
   const handleEdit = (event) => {
     setIsEditing(true);
@@ -253,6 +263,7 @@ const EditableText = ({
   return (
     <>
       <Typography
+        ref={rootRef}
         sx={{
           cursor: "pointer",
           color: textColor,

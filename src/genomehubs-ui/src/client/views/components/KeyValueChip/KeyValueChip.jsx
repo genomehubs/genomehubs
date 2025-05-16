@@ -16,6 +16,7 @@ import React, { useEffect, useState } from "react";
 
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
 import EditableText from "../EditableText/EditableText";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -93,6 +94,7 @@ const KeyValueChip = ({
   palette = "blue",
 }) => {
   const validation = typesToValidation();
+  const chipId = `${keyLabel}-${operator}-${value}-${modifier}`;
 
   const colorsFromPalette = (palette) => {
     // Check if the palette exists in the chipPalettes object
@@ -187,11 +189,17 @@ const KeyValueChip = ({
   //   setCurrentValueNote(undefined);
   // };
 
+  const handleClickAway = () => {
+    if (isEditingValue) {
+      setIsEditingValue(false); // Stop editing when clicking outside
+    }
+  };
+
   const handleValueBlur = (event) => {
     event.stopPropagation(); // Prevent the click event from propagating to the parent
     event.preventDefault(); // Prevent the default action
     setIsEditingValue(false);
-    // setAnchorElValue(null);
+    setAnchorElValue(null);
     const parsedValue = parseValue(currentValue);
     setCurrentValue(keyLabel == "tax" ? parsedValue : formatValue(parsedValue)); // Reformat the value for display
     setPreviousValue(
@@ -280,6 +288,24 @@ const KeyValueChip = ({
     return { isValid: true, chipColor: color };
   };
 
+  const handleChipClick = (event, offset = { x: 0, y: 0 }) => {
+    if (event.target === event.currentTarget) {
+      const boundingBox = event.currentTarget.getBoundingClientRect();
+      const clickY = event.clientY - boundingBox.top - offset.y;
+      const clickX = event.clientX - boundingBox.left - offset.x;
+
+      if (clickY <= 30 || (currentOperator === null && clickX <= 30)) {
+        return;
+      }
+
+      if (isEditingValue) {
+        handleValueBlur(event);
+      } else {
+        setIsEditingValue(true);
+      }
+    }
+  };
+
   useEffect(() => {
     if (validationError || (!isEditingValue && !isEditingKey)) {
       // Validate the chip data when it loses focus
@@ -307,140 +333,73 @@ const KeyValueChip = ({
 
   let { component: errorComponent } = validationError || {};
   return (
-    <Box
-      sx={{
-        display: "inline-flex",
-        alignItems: "center",
-        "& .MuiChip-root": {
-          padding: 0,
-        },
-      }}
-    >
-      <Chip
-        label={
-          <Box
-            sx={{
-              textAlign: "center",
-              padding: "8px 12px",
-              position: "relative",
-              overflow: "visible",
-              marginLeft: "1em",
-              paddingRight: 0,
-            }}
-          >
-            {currentModifier && (
-              <span
-                style={{
-                  position: "absolute",
-                  marginLeft: "-26px",
-                  left: 0,
-                  top: "8px",
-                  height: "60px",
-                  width: "30px",
-                  fontSize: "1em",
-                  fontWeight: "bold",
-                  lineHeight: "28px",
-                  textOrientation: "mixed",
-                  writingMode: "vertical-lr",
-                  transform: "rotate(180deg)",
-                  color: `${textColor}dd`,
-                  display: "block",
-                  overflow: "visible",
-                  backgroundColor: backgroundColor,
-                  borderRadius: "0 16px 16px 0",
-                  borderLeft:
-                    currentModifier == "value"
-                      ? "none"
-                      : `1px solid ${darkColor}80`,
-                  boxSizing: "border-box",
-                  cursor: "pointer",
-                  opacity: currentModifier == "value" ? 0.25 : 1,
-                }}
-                onClick={handleModifierClick}
-              >
-                {currentModifier == "value" ? "" : currentModifier}
-                {errorComponent == "modifier" && (
-                  <span
-                    style={{
-                      position: "absolute",
-
-                      right: "1em",
-                      bottom: 0,
-                      display: "block",
-                      overflow: "visible",
-                    }}
-                  >
-                    <ValidationErrorTooltip
-                      validationError={validationError.reason}
-                      textColor={textColor}
-                    />
-                  </span>
-                )}
-              </span>
-            )}
-            <EditableText
-              value={currentKey}
-              onChange={handleKeyChange}
-              onBlur={handleKeyBlur}
-              backgroundColor={backgroundColor}
-              highlightColor={lightColor}
-              textColor={textColor}
-              anchorEl={anchorElKey}
-              setAnchorEl={setAnchorElKey}
-              options={[...validation.validKeys().keys]}
-              variant="body2"
-              sx={{
-                fontWeight: "bold",
-                whiteSpace: "nowrap",
-                height: "30px",
-                lineHeight: "30px",
-                marginRight: validationError ? "-1em" : "0",
-              }}
-              endComponent={
-                errorComponent == "key" && (
-                  <ValidationErrorTooltip
-                    validationError={validationError.reason}
-                    textColor={textColor}
-                  />
-                )
-              }
-            />
-
+    <ClickAwayListener onClickAway={handleClickAway}>
+      <Box
+        sx={{
+          display: "inline-flex",
+          alignItems: "center",
+          "& .MuiChip-root": {
+            padding: 0,
+          },
+        }}
+      >
+        <Chip
+          id={chipId}
+          onClick={(event) => {
+            handleChipClick(event, { x: 30, y: 0 });
+          }}
+          label={
             <Box
               sx={{
-                display: "flex",
-                alignItems: "flexstart",
-                justifyContent: "center",
-                gap: 0.5,
-                height: "30px",
-                opacity: currentValue || currentValue == 0 ? 1 : 0.5,
-                marginRight: "1em",
+                textAlign: "center",
+                padding: "8px 12px",
+                position: "relative",
+                overflow: "visible",
+                marginLeft: "1em",
+                paddingRight: 0,
+              }}
+              onClick={(event) => {
+                handleChipClick(event, { x: 0, y: 8 });
               }}
             >
-              {currentOperator !== null && (
-                <Typography
-                  variant="body2"
-                  sx={{
-                    cursor: "pointer",
-                    whiteSpace: "nowrap",
+              {currentModifier && (
+                <span
+                  style={{
+                    position: "absolute",
+                    marginLeft: "-26px",
+                    left: 0,
+                    top: "8px",
+                    height: "60px",
+                    width: "30px",
+                    fontSize: "1em",
+                    fontWeight: "bold",
+                    lineHeight: "28px",
+                    textOrientation: "mixed",
+                    writingMode: "vertical-lr",
+                    transform: "rotate(180deg)",
+                    color: `${textColor}dd`,
+                    display: "block",
+                    overflow: "visible",
                     backgroundColor: backgroundColor,
-                    color: textColor,
-                    borderRadius: "4px",
-                    padding: "2px 4px",
-                    height: "1.1em",
-                    lineHeight: "1.1em",
-                    marginTop: "6px",
+                    borderRadius: "0 16px 16px 0",
+                    borderLeft:
+                      currentModifier == "value"
+                        ? "none"
+                        : `1px solid ${darkColor}80`,
+                    boxSizing: "border-box",
+                    cursor: "pointer",
+                    opacity: currentModifier == "value" ? 0.25 : 1,
                   }}
-                  onClick={handleSymbolClick}
+                  onClick={handleModifierClick}
                 >
-                  {currentOperator}
-                  {errorComponent == "operator" && (
+                  {currentModifier == "value" ? "" : currentModifier}
+                  {errorComponent == "modifier" && (
                     <span
                       style={{
                         position: "absolute",
-                        marginLeft: "0.25em",
+
+                        right: "1em",
                         bottom: 0,
-                        marginBottom: "1.5em",
                         display: "block",
                         overflow: "visible",
                       }}
@@ -451,180 +410,259 @@ const KeyValueChip = ({
                       />
                     </span>
                   )}
-                </Typography>
+                </span>
               )}
-
               <EditableText
-                value={currentValue}
-                allowMultipleValues={validation.allowMultipleValues({
-                  key: currentKey,
-                  modifier: currentModifier,
-                })}
-                isNegatable={validation.isNegatable({
-                  key: currentKey,
-                  modifier: currentModifier,
-                })}
-                onChange={(newValue) => setCurrentValue(parseValue(newValue))}
-                onBlur={handleValueBlur}
+                value={currentKey}
+                onChange={handleKeyChange}
+                onBlur={handleKeyBlur}
                 backgroundColor={backgroundColor}
                 highlightColor={lightColor}
-                textColor={"black"}
-                anchorEl={anchorElValue}
-                setAnchorEl={setAnchorElValue}
-                valueAsChips={true}
+                textColor={textColor}
+                anchorEl={anchorElKey}
+                setAnchorEl={setAnchorElKey}
+                options={[...validation.validKeys().keys]}
+                variant="body2"
+                sx={{
+                  fontWeight: "bold",
+                  whiteSpace: "nowrap",
+                  height: "30px",
+                  lineHeight: "30px",
+                  marginRight: validationError ? "-1em" : "0",
+                }}
                 endComponent={
-                  <>
-                    {errorComponent == "value" && (
-                      <ValidationErrorTooltip
-                        validationError={validationError.reason}
-                        textColor={textColor}
-                      />
-                    )}
-                    <Typography
-                      variant="body3"
-                      sx={{
-                        opacity: 0.5,
-                        fontStyle: "italic",
-                        fontSize: "0.8em",
-                        marginTop: "1px",
-                        marginLeft: "0.25em",
-                        pointerEvents: "none",
-                      }}
-                    >
-                      {previousValueNote}
-                    </Typography>
-                  </>
+                  errorComponent == "key" && (
+                    <ValidationErrorTooltip
+                      validationError={validationError.reason}
+                      textColor={textColor}
+                    />
+                  )
                 }
-                options={[
-                  ...(validation.validValues({
+              />
+
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "flexstart",
+                  justifyContent: "center",
+                  gap: 0.5,
+                  height: "30px",
+                  opacity: currentValue || currentValue == 0 ? 1 : 0.5,
+                  marginRight: "1em",
+                }}
+              >
+                {currentOperator !== null && (
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                      backgroundColor: backgroundColor,
+                      color: textColor,
+                      borderRadius: "4px",
+                      padding: "2px 4px",
+                      height: "1.1em",
+                      lineHeight: "1.1em",
+                      marginTop: "6px",
+                    }}
+                    onClick={handleSymbolClick}
+                  >
+                    {currentOperator}
+                    {errorComponent == "operator" && (
+                      <span
+                        style={{
+                          position: "absolute",
+                          marginLeft: "0.25em",
+                          bottom: 0,
+                          marginBottom: "1.5em",
+                          display: "block",
+                          overflow: "visible",
+                        }}
+                      >
+                        <ValidationErrorTooltip
+                          validationError={validationError.reason}
+                          textColor={textColor}
+                        />
+                      </span>
+                    )}
+                  </Typography>
+                )}
+
+                <EditableText
+                  value={currentValue}
+                  allowMultipleValues={validation.allowMultipleValues({
                     key: currentKey,
                     modifier: currentModifier,
-                  }) || []),
-                ]}
-                variant="body3"
-                sx={{
-                  whiteSpace: currentValue.length > 100 ? "normal" : "nowrap",
-                  wordBreak:
-                    currentValue.length > 100 ? "break-word" : "normal",
-                  opacity:
-                    (currentValue || currentValue == 0) && !isEditingValue
-                      ? 1
-                      : 0.5,
-                  fontStyle: currentValue ? "normal" : "italic",
-                  marginTop: "2px",
-                }}
-              />
+                  })}
+                  isNegatable={validation.isNegatable({
+                    key: currentKey,
+                    modifier: currentModifier,
+                  })}
+                  isAlreadyEditing={isEditingValue}
+                  onChange={(newValue) => setCurrentValue(parseValue(newValue))}
+                  onBlur={handleValueBlur}
+                  backgroundColor={backgroundColor}
+                  highlightColor={lightColor}
+                  textColor={"black"}
+                  anchorEl={anchorElValue}
+                  setAnchorEl={setAnchorElValue}
+                  valueAsChips={true}
+                  endComponent={
+                    <>
+                      {errorComponent == "value" && (
+                        <ValidationErrorTooltip
+                          validationError={validationError.reason}
+                          textColor={textColor}
+                        />
+                      )}
+                      <Typography
+                        variant="body3"
+                        sx={{
+                          opacity: 0.5,
+                          fontStyle: "italic",
+                          fontSize: "0.8em",
+                          marginTop: "1px",
+                          marginLeft: "0.25em",
+                          pointerEvents: "none",
+                        }}
+                      >
+                        {previousValueNote}
+                      </Typography>
+                    </>
+                  }
+                  options={[
+                    ...(validation.validValues({
+                      key: currentKey,
+                      modifier: currentModifier,
+                    }) || []),
+                  ]}
+                  variant="body3"
+                  sx={{
+                    whiteSpace: currentValue.length > 100 ? "normal" : "nowrap",
+                    wordBreak:
+                      currentValue.length > 100 ? "break-word" : "normal",
+                    opacity:
+                      (currentValue || currentValue == 0) &&
+                      !isEditingValue &&
+                      !anchorElValue
+                        ? 1
+                        : 0.5,
+                    fontStyle: currentValue ? "normal" : "italic",
+                    marginTop: "2px",
+                  }}
+                />
+              </Box>
             </Box>
-          </Box>
-        }
-        onDelete={handleDelete}
-        sx={{
-          padding: "0 0 0 1em",
-          height: "60px",
-          "& .MuiChip-label": {
-            display: "block",
-            padding: "1em",
-          },
-          background: `linear-gradient(to bottom, ${backgroundColor} 50%, ${lightColor} 50%)`,
-          "& .MuiChip-deleteIcon": {
-            marginTop: "-28px",
-            color: lightColor,
-          },
-          "&:hover": {
+          }
+          onDelete={handleDelete}
+          sx={{
+            padding: "0 0 0 1em",
+            height: "60px",
+            "& .MuiChip-label": {
+              display: "block",
+              padding: "1em",
+            },
             background: `linear-gradient(to bottom, ${backgroundColor} 50%, ${lightColor} 50%)`,
-          },
-          "&:active": {
-            background: `linear-gradient(to bottom, ${backgroundColor} 50%, ${lightColor} 50%)`,
-          },
-        }}
-      />
+            "& .MuiChip-deleteIcon": {
+              marginTop: "-28px",
+              color: lightColor,
+            },
+            "&:hover": {
+              background: `linear-gradient(to bottom, ${backgroundColor} 50%, ${lightColor} 50%)`,
+            },
+            "&:active": {
+              background: `linear-gradient(to bottom, ${backgroundColor} 50%, ${lightColor} 50%)`,
+            },
+          }}
+        />
 
-      <Menu
-        anchorEl={anchorElSymbol}
-        open={Boolean(anchorElSymbol)}
-        onClose={() => handleMenuClose()}
-        MenuListProps={{
-          sx: {
-            overflow: "visible",
-            backgroundColor: lightColor,
-            "& .MuiMenuItem-root": {
+        <Menu
+          anchorEl={anchorElSymbol}
+          open={Boolean(anchorElSymbol)}
+          onClose={() => handleMenuClose()}
+          MenuListProps={{
+            sx: {
+              overflow: "visible",
               backgroundColor: lightColor,
-              "&.Mui-selected": {
-                backgroundColor: backgroundColor,
-                color: textColor,
-              },
-              "&:hover, &.Mui-focusVisible": {
-                backgroundColor: darkColor,
-                color: textColor,
+              "& .MuiMenuItem-root": {
+                backgroundColor: lightColor,
+                "&.Mui-selected": {
+                  backgroundColor: backgroundColor,
+                  color: textColor,
+                },
+                "&:hover, &.Mui-focusVisible": {
+                  backgroundColor: darkColor,
+                  color: textColor,
+                },
               },
             },
-          },
-        }}
-        onKeyDown={(event) => {
-          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-            event.preventDefault();
-          }
-        }}
-      >
-        {availableOperators.map((operator, index) => (
-          <MenuItem
-            key={operator}
-            onClick={() => handleMenuClose(operator)}
-            selected={operator === currentOperator}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                handleMenuClose(operator);
-              }
-            }}
-          >
-            {operator}
-          </MenuItem>
-        ))}
-      </Menu>
-      <Menu
-        anchorEl={anchorElModifier}
-        open={Boolean(anchorElModifier)}
-        onClose={() => handleModifierMenuClose()}
-        MenuListProps={{
-          sx: {
-            overflow: "visible",
-            backgroundColor: lightColor,
-            "& .MuiMenuItem-root": {
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+              event.preventDefault();
+            }
+          }}
+        >
+          {availableOperators.map((operator, index) => (
+            <MenuItem
+              key={operator}
+              onClick={() => handleMenuClose(operator)}
+              selected={operator === currentOperator}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleMenuClose(operator);
+                }
+              }}
+            >
+              {operator}
+            </MenuItem>
+          ))}
+        </Menu>
+        <Menu
+          anchorEl={anchorElModifier}
+          open={Boolean(anchorElModifier)}
+          onClose={() => handleModifierMenuClose()}
+          MenuListProps={{
+            sx: {
+              overflow: "visible",
               backgroundColor: lightColor,
-              "&.Mui-selected": {
-                backgroundColor: backgroundColor,
-                color: textColor,
-              },
-              "&:hover, &.Mui-focusVisible": {
-                backgroundColor: darkColor,
-                color: textColor,
+              "& .MuiMenuItem-root": {
+                backgroundColor: lightColor,
+                "&.Mui-selected": {
+                  backgroundColor: backgroundColor,
+                  color: textColor,
+                },
+                "&:hover, &.Mui-focusVisible": {
+                  backgroundColor: darkColor,
+                  color: textColor,
+                },
               },
             },
-          },
-        }}
-        onKeyDown={(event) => {
-          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-            event.preventDefault();
-          }
-        }}
-      >
-        {[...validation.validModifiers(currentKey)].map((modifier, index) => (
-          <MenuItem
-            key={modifier}
-            onClick={() => handleModifierMenuClose(modifier)}
-            selected={modifier === currentModifier}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                handleModifierMenuClose(modifier);
-              }
-            }}
-            style={{ minHeight: "1.5em" }}
-          >
-            {modifier}
-          </MenuItem>
-        ))}
-      </Menu>
-    </Box>
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+              event.preventDefault();
+            }
+          }}
+        >
+          {[...validation.validModifiers(currentKey)].map((modifier, index) => (
+            <MenuItem
+              key={modifier}
+              onClick={() => handleModifierMenuClose(modifier)}
+              selected={modifier === currentModifier}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleModifierMenuClose(modifier);
+                }
+              }}
+              style={{ minHeight: "1.5em" }}
+            >
+              {modifier}
+            </MenuItem>
+          ))}
+        </Menu>
+      </Box>
+    </ClickAwayListener>
   );
 };
 
