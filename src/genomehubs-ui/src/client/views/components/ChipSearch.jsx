@@ -1,9 +1,11 @@
 import {
+  Alert,
   Box,
   IconButton,
   InputAdornment,
   Menu,
   MenuItem,
+  Snackbar,
   TextField,
 } from "@mui/material";
 import KeyValueChip, { typesToValidation } from "./KeyValueChip";
@@ -98,22 +100,30 @@ const ChipSearch = ({
   const validKeys = validation.validKeys();
   const removeDuplicates = (arr) => {
     let uniqueArr = [];
+    let duplicates = new Set();
     let keyOrder = ["tax"];
     let seen = new Set(["AND"]);
     let byKey = { tax: [] };
     arr.forEach((item) => {
       let lcItem = item.toLowerCase().replace(/\s+/g, "").replace(/-/g, "_");
-      if (!seen.has(lcItem)) {
+      if (lcItem !== "and") {
+        console.log({ lcItem });
         let { key } = extractKeyValue(item);
-        if (!byKey[key]) {
-          byKey[key] = [];
-          if (key != "tax") {
-            keyOrder.push(key);
+
+        if (!seen.has(lcItem)) {
+          let { key } = extractKeyValue(item);
+          if (!byKey[key]) {
+            byKey[key] = [];
+            if (key != "tax") {
+              keyOrder.push(key);
+            }
           }
+          byKey[key].push(item);
+          //uniqueArr.push(item);
+          seen.add(lcItem);
+        } else {
+          duplicates.add(key);
         }
-        byKey[key].push(item);
-        //uniqueArr.push(item);
-        seen.add(lcItem);
       }
     });
     for (let key of keyOrder) {
@@ -127,25 +137,22 @@ const ChipSearch = ({
       }
     }
 
-    return uniqueArr;
-  };
+    console.log({ uniqueArr, duplicates });
 
-  const setPalette = ({ key, modifier }) => {
-    if (modifier == "collate") {
-      return "green";
-    }
-    switch (key) {
-      case "tax":
-        return "purple";
-      case "collate":
-        return "green";
-      default:
-        return "blue";
-    }
+    return { uniqueArr, duplicates };
   };
 
   const [inputValue, setInputValue] = useState(initialInput);
-  const [chips, setChips] = useState(removeDuplicates(initialChips));
+  let { uniqueArr, duplicates } = removeDuplicates(initialChips);
+  const [chips, setChips] = useState(uniqueArr);
+  const [open, setOpen] = useState(false);
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
+  const [duplicateKeys, setDuplicateKeys] = useState(duplicates);
   const [chipsArr, setChipsArr] = useState(chips);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
@@ -163,7 +170,14 @@ const ChipSearch = ({
     // const matches = input.match(regex);
     const terms = input.split(/\s+AND\s+/i); //.flatMap((part) =>
     if (terms && terms.length > 0) {
-      setChips((prevChips) => removeDuplicates([...prevChips, ...terms]));
+      setChips((prevChips) => {
+        const { uniqueArr, duplicates } = removeDuplicates([
+          ...prevChips,
+          ...terms,
+        ]);
+        setDuplicateKeys(duplicates);
+        return uniqueArr;
+      });
     }
   };
 
@@ -182,7 +196,14 @@ const ChipSearch = ({
   };
 
   const handleAddEmptyChip = (newChip = "key=value") => {
-    setChips((prevChips) => removeDuplicates([...prevChips, newChip])); // Add a default empty chip
+    setChips((prevChips) => {
+      const { uniqueArr, duplicates } = removeDuplicates([
+        ...prevChips,
+        newChip,
+      ]);
+      setDuplicateKeys(duplicates);
+      return uniqueArr;
+    });
   };
 
   const handleMenuOpen = (event) => {
@@ -229,6 +250,14 @@ const ChipSearch = ({
     updateChipsArr(chips);
   }, [chips]);
 
+  // render a snackbar if there are duplicates
+  useEffect(() => {
+    if (duplicateKeys.size > 0) {
+      console.log("Duplicate keys found:", duplicateKeys);
+      setOpen(true);
+    }
+  }, [duplicateKeys]);
+
   return (
     <Box
       sx={{
@@ -267,29 +296,6 @@ const ChipSearch = ({
                     open={Boolean(menuAnchorEl)}
                     onClose={handleMenuClose}
                   >
-                    {/* {Object.entries(allowedKeys).flatMap(([chipType, obj]) => {
-                      let chipTypes = [];
-                      if (chipType == "collate") {
-                        chipTypes.push({
-                          key: "collate",
-                          value: "collate(sequence_id,name)",
-                        });
-                      } else if (chipType == "tax") {
-                        chipTypes.push({
-                          key: "tax_tree",
-                          value: "tax_tree()",
-                        });
-                        chipTypes.push({
-                          key: "tax_name",
-                          value: "tax_name()",
-                        });
-                        chipTypes.push({
-                          key: "tax_rank",
-                          value: "tax_rank()",
-                        });
-                      } else {
-                        chipTypes.push({ key: chipType, value: chipType });
-                      } */}
                     {[...validKeys.keysByGroup.primary].map((key) => {
                       let value = key;
                       if (key == "collate") {
@@ -313,6 +319,18 @@ const ChipSearch = ({
           }}
         />
       </>
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert
+          onClose={handleClose}
+          severity="info"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          Removed duplicate terms for{" "}
+          <b>{Array.from(duplicateKeys).join(", ")}</b>
+        </Alert>
+      </Snackbar>
+      ,
     </Box>
   );
 };
