@@ -1,13 +1,20 @@
 import React, { useState } from "react";
 
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import CircleIcon from "@mui/icons-material/Circle";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import stringLength from "../../functions/stringLength";
 
 const ValueChips = ({
   value = "",
   maxChips = 5,
+  maxWidth = 1000,
   handleChange,
   backgroundColor,
   textColor,
@@ -29,8 +36,10 @@ const ValueChips = ({
   };
 
   // Handle expanding the chips
-  const handleExpand = () => {
-    setExpanded(true);
+  const toggleExpand = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+    setExpanded((prev) => !prev);
   };
 
   const toggleNegate = ({ chip, negate }) => {
@@ -76,11 +85,25 @@ const ValueChips = ({
   };
 
   // Determine which chips to display
-  let visibleChips = expanded ? values : values.slice(0, maxChips);
-  if (visibleChips.length == 0) {
+  let visibleChips = values.slice(0, maxChips);
+  let fittingChips = maxChips;
+  if (visibleChips.length === 0) {
     visibleChips = [null];
+  } else {
+    let chipsWidth = 0;
+    for (let i = 0; i < visibleChips.length; i++) {
+      let chip = visibleChips[i];
+      const chipWidth = stringLength(chip, { factor: 9 }) + 40; // Estimate width based on character count
+      chipsWidth += chipWidth;
+
+      if (chipsWidth > maxWidth) {
+        fittingChips = Math.max(i, 1);
+        visibleChips = values.slice(0, fittingChips);
+        break;
+      }
+    }
   }
-  const hiddenCount = values.length - maxChips;
+  const hiddenCount = values.length - fittingChips;
 
   const chipStyle = {
     ...(backgroundColor && { backgroundColor }),
@@ -110,40 +133,92 @@ const ValueChips = ({
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 1,
-      }}
-      {...props}
-    >
-      {visibleChips.map((chip, index) => {
-        let negate = false;
-        let chipLabel = chip === null ? "value" : chip;
-        if (chipLabel.startsWith("!")) {
-          negate = true;
-          chipLabel = chipLabel.slice(1);
-        }
-        return (
+    <>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 1,
+        }}
+        {...props}
+      >
+        {visibleChips.map((chip, index) => {
+          let negate = false;
+          let chipLabel = chip === null ? "value" : chip;
+          if (chipLabel.startsWith("!")) {
+            negate = true;
+            chipLabel = chipLabel.slice(1);
+          }
+          return (
+            <Chip
+              key={index}
+              label={chipLabel}
+              icon={setChipIcon({ negate, chip })}
+              {...(chip !== null && { onDelete: () => handleDelete(chip) })}
+              size="small"
+              sx={chipStyle}
+            />
+          );
+        })}
+        {hiddenCount > 0 && (
           <Chip
-            key={index}
-            label={chipLabel}
-            icon={setChipIcon({ negate, chip })}
-            {...(chip !== null && { onDelete: () => handleDelete(chip) })}
-            size="small"
-            sx={chipStyle}
+            label={`+${hiddenCount}`}
+            onClick={toggleExpand}
+            sx={{
+              cursor: "pointer",
+              ...(backgroundColor && { backgroundColor }),
+              ...(textColor && { color: textColor }),
+              marginTop: "-2px",
+              cursor: "pointer",
+              height: "24px",
+              lineHeight: "24px",
+              fontSize: "0.875rem",
+              maxWidth: "none",
+              fontFamily: "'Roboto', 'Arial', sans-serif",
+              "& .MuiChip-label": {
+                padding: "0 0.5em 0 0.5em",
+              },
+            }}
           />
-        );
-      })}
-      {!expanded && hiddenCount > 0 && (
-        <Chip
-          label={`+${hiddenCount}`}
-          onClick={handleExpand}
-          sx={{ cursor: "pointer", backgroundColor: "#e0e0e0" }}
-        />
-      )}
-    </Box>
+        )}
+      </Box>
+
+      {/* Modal to display all chips */}
+      <Dialog open={expanded} onClose={toggleExpand} fullWidth maxWidth="sm">
+        <DialogTitle>All Values</DialogTitle>
+        <DialogContent>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 1,
+            }}
+          >
+            {values.map((chip, index) => {
+              let negate = false;
+              let chipLabel = chip === null ? "value" : chip;
+              if (chipLabel.startsWith("!")) {
+                negate = true;
+                chipLabel = chipLabel.slice(1);
+              }
+              return (
+                <Chip
+                  key={index}
+                  label={chipLabel}
+                  icon={setChipIcon({ negate, chip })}
+                  {...(chip !== null && { onDelete: () => handleDelete(chip) })}
+                  size="small"
+                  sx={chipStyle}
+                />
+              );
+            })}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={toggleExpand}>Close</Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 

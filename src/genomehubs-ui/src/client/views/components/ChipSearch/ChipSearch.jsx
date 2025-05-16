@@ -8,7 +8,7 @@ import {
   Snackbar,
   TextField,
 } from "@mui/material";
-import KeyValueChip, { parseValue, typesToValidation } from "./KeyValueChip";
+import KeyValueChip, { parseValue, typesToValidation } from "../KeyValueChip";
 import React, { useEffect, useState } from "react";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"; // Import an add icon

@@ -507,6 +507,7 @@ const KeyValueChip = ({
                   anchorEl={anchorElValue}
                   setAnchorEl={setAnchorElValue}
                   valueAsChips={true}
+                  maxWidth={500}
                   endComponent={
                     <>
                       {errorComponent == "value" && (

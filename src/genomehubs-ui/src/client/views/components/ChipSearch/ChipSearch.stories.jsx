@@ -1,7 +1,7 @@
 import ChipSearch from "./ChipSearch";
 import { Provider } from "react-redux";
 import React from "react";
-import colorStore from "../reducers/color.store";
+import colorStore from "../../reducers/color.store";
 
 export default {
   title: "Components/ChipSearch",
@@ -79,5 +79,16 @@ WithCrypticDuplication.args = {
     "bioproject=prjeb40655,null",
     "AND",
     "bioproject=null,prjeb40655",
+  ],
+};
+
+export const WithNegation = Template.bind({});
+WithNegation.args = {
+  initialChips: [
+    "assembly_span=100000000",
+    "AND",
+    "tax_tree(2759,!33090)",
+    "AND",
+    "bioproject=PRJEB40655,!PRJEB40655",
   ],
 };

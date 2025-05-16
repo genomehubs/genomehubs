@@ -254,6 +254,7 @@ const EditableText = ({
       backgroundColor={backgroundColor}
       textColor={contrastColor}
       isNegatable={isNegatable}
+      maxWidth={maxWidth}
       maxChips={5}
     />
   ) : (
