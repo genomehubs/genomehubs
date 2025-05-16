@@ -8,7 +8,7 @@ import {
   Snackbar,
   TextField,
 } from "@mui/material";
-import KeyValueChip, { typesToValidation } from "./KeyValueChip";
+import KeyValueChip, { parseValue, typesToValidation } from "./KeyValueChip";
 import React, { useEffect, useState } from "react";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"; // Import an add icon
@@ -105,11 +105,15 @@ const ChipSearch = ({
     let seen = new Set(["AND"]);
     let byKey = { tax: [] };
     arr.forEach((item) => {
-      let lcItem = item.toLowerCase().replace(/\s+/g, "").replace(/-/g, "_");
-      if (lcItem !== "and") {
-        console.log({ lcItem });
-        let { key } = extractKeyValue(item);
-
+      if (!item.match(/^\s*AND\s*$/i)) {
+        let { key, modifier, value, operator } = extractKeyValue(item);
+        let sortedValues = (value || "")
+          .split(",")
+          .map((v) => parseValue(v.trim()))
+          .sort((a, b) => a.localeCompare(b))
+          .join(",");
+        let lcItem = `${modifier || "value".toLowerCase()}(${key.toLowerCase()})${operator || "=".toLowerCase()}${sortedValues.toLowerCase()}`;
+        console.log("lcItem", lcItem);
         if (!seen.has(lcItem)) {
           let { key } = extractKeyValue(item);
           if (!byKey[key]) {
@@ -119,8 +123,9 @@ const ChipSearch = ({
             }
           }
           byKey[key].push(item);
-          //uniqueArr.push(item);
           seen.add(lcItem);
+        } else if (key == "tax") {
+          duplicates.add(`${key}_${modifier}`);
         } else {
           duplicates.add(key);
         }
@@ -136,8 +141,6 @@ const ChipSearch = ({
         }
       }
     }
-
-    console.log({ uniqueArr, duplicates });
 
     return { uniqueArr, duplicates };
   };
@@ -327,7 +330,16 @@ const ChipSearch = ({
           sx={{ width: "100%" }}
         >
           Removed duplicate terms for{" "}
-          <b>{Array.from(duplicateKeys).join(", ")}</b>
+          {Array.from(duplicateKeys).map((key, index, array) => (
+            <React.Fragment key={key}>
+              <b>{key}</b>
+              {index < array.length - 2
+                ? ", "
+                : index === array.length - 2
+                  ? " and "
+                  : ""}
+            </React.Fragment>
+          ))}
         </Alert>
       </Snackbar>
       ,
