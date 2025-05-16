@@ -331,6 +331,23 @@ const KeyValueChip = ({
     currentModifier,
   ]);
 
+  let valueTitle = currentKey;
+  valueTitle = (
+    <>
+      {currentModifier !== "value" && (
+        <i style={{ opacity: 0.75, paddingRight: "0.5rem" }}>
+          {currentModifier.toUpperCase()}
+        </i>
+      )}
+      <span style={{ fontSize: "1.33em" }}>
+        <b>{currentKey}</b>
+        <i style={{ opacity: 0.75, padding: "0 0.5rem" }}>
+          {currentOperator || ""}
+        </i>
+      </span>
+    </>
+  );
+
   let { component: errorComponent } = validationError || {};
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
@@ -489,6 +506,7 @@ const KeyValueChip = ({
                 )}
 
                 <EditableText
+                  title={valueTitle}
                   value={currentValue}
                   allowMultipleValues={validation.allowMultipleValues({
                     key: currentKey,

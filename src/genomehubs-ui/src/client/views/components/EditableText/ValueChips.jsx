@@ -16,6 +16,7 @@ const ValueChips = ({
   maxChips = 5,
   maxWidth = 1000,
   handleChange,
+  title = "All Values",
   backgroundColor,
   textColor,
   isNegatable,
@@ -113,7 +114,9 @@ const ValueChips = ({
     height: "24px",
     lineHeight: "24px",
     fontSize: "0.875rem",
-    maxWidth: "none",
+    maxWidth: `${maxWidth}px`,
+    overflow: "hidden",
+    whiteSpace: "nowrap",
     fontFamily: "'Roboto', 'Arial', sans-serif",
     display: "flex",
     justifyContent: "center", // Center the content horizontally
@@ -125,6 +128,9 @@ const ValueChips = ({
     },
     "& .MuiChip-label": {
       padding: "0 0.5em 0 0.5em",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
     },
     "& .MuiChip-icon": {
       color: textColor || "inherit",
@@ -184,14 +190,32 @@ const ValueChips = ({
       </Box>
 
       {/* Modal to display all chips */}
-      <Dialog open={expanded} onClose={toggleExpand} fullWidth maxWidth="sm">
-        <DialogTitle>All Values</DialogTitle>
+      <Dialog open={expanded} onClose={toggleExpand} fullWidth maxWidth="md">
+        <DialogTitle
+          sx={{
+            backgroundColor: backgroundColor || "primary.main",
+            color: textColor || "white",
+            fontSize: "1.25rem",
+            fontWeight: "bold",
+            padding: "1em",
+            textAlign: "center",
+            "& .MuiDialogTitle-root": {
+              padding: "0.5em 1em",
+            },
+          }}
+        >
+          {title}
+        </DialogTitle>
         <DialogContent>
           <Box
             sx={{
               display: "flex",
               flexWrap: "wrap",
+              justifyContent: "center", // Center horizontally
+              alignItems: "center", // Center vertically
+              paddingTop: "0.5em",
               gap: 1,
+              height: "100%", // Ensure the Box takes the full height of the DialogContent
             }}
           >
             {values.map((chip, index) => {
@@ -208,7 +232,22 @@ const ValueChips = ({
                   icon={setChipIcon({ negate, chip })}
                   {...(chip !== null && { onDelete: () => handleDelete(chip) })}
                   size="small"
-                  sx={chipStyle}
+                  sx={{
+                    ...chipStyle,
+                    height: "auto",
+                    whiteSpace: "normal", // Allow text to wrap
+                    // overflow: "hidden", // Prevent overflow
+                    wordBreak: "break-word", // Break long words to wrap properly
+                    minHeight: "24px", // Set a minimum height for the chip
+                    lineHeight: "1.2", // Adjust line height for multi-line text
+                    maxWidth: "100%", // Allow the chip to take full width
+                    "& .MuiChip-label": {
+                      padding: "0.25em 0.5em 0.25em 0.5em",
+                      whiteSpace: "normal", // Allow text to wrap
+                      wordBreak: "break-word", // Break long words
+                      textAlign: "left", // Center-align the text
+                    },
+                  }}
                 />
               );
             })}

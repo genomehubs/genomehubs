@@ -38,6 +38,7 @@ const getContrastColor = (color) => {
 };
 
 const EditableText = ({
+  title,
   value,
   options = [],
   allowMultipleValues,
@@ -249,6 +250,7 @@ const EditableText = ({
 
   let displayValue = valueAsChips ? (
     <ValueChips
+      title={title}
       value={inputValue}
       handleChange={handleChange}
       backgroundColor={backgroundColor}

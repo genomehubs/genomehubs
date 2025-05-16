@@ -113,7 +113,6 @@ const ChipSearch = ({
           .sort((a, b) => a.localeCompare(b))
           .join(",");
         let lcItem = `${modifier || "value".toLowerCase()}(${key.toLowerCase()})${operator || "=".toLowerCase()}${sortedValues.toLowerCase()}`;
-        console.log("lcItem", lcItem);
         if (!seen.has(lcItem)) {
           let { key } = extractKeyValue(item);
           if (!byKey[key]) {
