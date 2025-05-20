@@ -61,30 +61,23 @@ const Template = (args) => {
 
 export const Default = Template.bind({});
 Default.args = {
-  keyLabel: "age",
-  value: "30",
+  keyLabel: "c_value_method",
+  value: "feulgen densitometry",
   operator: "=",
 };
 
 export const GreaterThanOrEqual = Template.bind({});
 GreaterThanOrEqual.args = {
-  keyLabel: "height",
-  value: "180",
+  keyLabel: "assembly_span",
+  value: "2000000000",
   operator: ">=",
 };
 
 export const LessThanOrEqual = Template.bind({});
 LessThanOrEqual.args = {
-  keyLabel: "weight",
-  value: "70",
+  keyLabel: "assembly_level",
+  value: "scaffold",
   operator: "<=",
-};
-
-export const EditableValue = Template.bind({});
-EditableValue.args = {
-  keyLabel: "score",
-  value: "85",
-  operator: "=",
 };
 
 export const TaxKey = Template.bind({});
