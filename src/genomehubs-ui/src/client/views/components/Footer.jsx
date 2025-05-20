@@ -23,7 +23,7 @@ import qs from "../functions/qs";
 import sangerLogo from "./img/sanger-logo.png";
 import { saveSearchOptions as saveSearchOptionsStyle } from "./Styles.scss";
 import withApi from "../hocs/withApi";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withVersion from "../hocs/withVersion";
 

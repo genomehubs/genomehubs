@@ -6,6 +6,7 @@ import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
 import Grid from "@mui/material/Grid2";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import InputAdornment from "@mui/material/InputAdornment";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -17,14 +18,13 @@ import Slider from "@mui/material/Slider";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import dispatchReport from "../hocs/dispatchReport";
 import { getSuggestedTerm } from "../reducers/search";
 import qs from "../functions/qs";
 import withReportById from "../hocs/withReportById";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -544,7 +544,9 @@ export const ReportEdit = ({
                   arrow
                   placement="top"
                 >
-                  <div style={{ fontSize: "1.2rem" ,cursor:'pointer'}}><InfoOutlinedIcon/></div>
+                  <div style={{ fontSize: "1.2rem", cursor: "pointer" }}>
+                    <InfoOutlinedIcon />
+                  </div>
                 </Tooltip>
               </InputAdornment>
             ),
@@ -578,7 +580,9 @@ export const ReportEdit = ({
             endAdornment: (
               <InputAdornment position="end">
                 <Tooltip title={helpText} arrow placement="top">
-                  <div style={{ fontSize: "1.2rem",cursor:'pointer' }}><InfoOutlinedIcon/></div>
+                  <div style={{ fontSize: "1.2rem", cursor: "pointer" }}>
+                    <InfoOutlinedIcon />
+                  </div>
                 </Tooltip>
               </InputAdornment>
             ),

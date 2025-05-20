@@ -4,7 +4,7 @@ import ColorButton from "./ColorButton";
 import LinkIcon from "@mui/icons-material/Link";
 import React from "react";
 import { compose } from "recompose";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const LinkButton = ({ options, basename }) => {
   const location = useLocation();

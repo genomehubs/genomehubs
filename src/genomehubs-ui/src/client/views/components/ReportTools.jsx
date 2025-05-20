@@ -18,9 +18,9 @@ import TocIcon from "@mui/icons-material/Toc";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { useStyles } from "./ReportModalStyles";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withTheme from "../hocs/withTheme";
 
 export const ReportTools = ({

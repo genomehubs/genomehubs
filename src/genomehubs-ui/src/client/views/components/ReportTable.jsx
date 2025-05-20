@@ -13,7 +13,7 @@ import { autoWidth as autoWidthStyle } from "./Styles.scss";
 import { compose } from "recompose";
 import dispatchMessage from "../hocs/dispatchMessage";
 import withReportTerm from "../hocs/withReportTerm";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withStyles from "@mui/styles/withStyles";
 
 const StyledTableCell = withStyles((theme) => ({
@@ -30,7 +30,7 @@ const StyledTableCell = withStyles((theme) => ({
 const TableReport = ({ report, chartProps }) => {
   const { headers, rows } = report.table;
   let [highlightField, highlightValue] = (chartProps.highlight || "").split(
-    "="
+    "=",
   );
   let highlightRow = -1;
   if (highlightField) {
@@ -109,7 +109,7 @@ const TableReport = ({ report, chartProps }) => {
         rowArr.unshift(
           <Cell key="index" style={{ textAlign: "right" }}>
             {j + page * rowsPerPage + 1}
-          </Cell>
+          </Cell>,
         );
       }
 
@@ -188,5 +188,5 @@ const ReportTable = ({
 export default compose(
   withSiteName,
   dispatchMessage,
-  withReportTerm
+  withReportTerm,
 )(ReportTable);

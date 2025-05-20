@@ -10,7 +10,7 @@ import React from "react";
 import classnames from "classnames";
 import { compose } from "recompose";
 import { useLocation } from "@reach/router";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const NavLink = ({
   to,
@@ -56,15 +56,15 @@ const NavLink = ({
         ));
       }
       return (
-        (<a
-                href={to}
-                title={(props.title || "").replace(/^external:\s*/, "")}
-                target="_blank"
-                rel="noopener noreferrer"
-                // style={{ whiteSpace: "wrap" }}
-              >
+        <a
+          href={to}
+          title={(props.title || "").replace(/^external:\s*/, "")}
+          target="_blank"
+          rel="noopener noreferrer"
+          // style={{ whiteSpace: "wrap" }}
+        >
           {children}
-        </a>)
+        </a>
       );
     }
     to = basename + "/" + to.replace(location.origin, "");
@@ -74,14 +74,14 @@ const NavLink = ({
     css = classnames(tabStyle, { [tabHighlightStyle]: isCurrent });
   }
   return (
-    (<Link
-            {...props}
-            to={to
-              .replace(/\/+/, `${basename}/`)
-              .replace(`${basename}${basename}`, basename)
-              .replace(/\/\/+/, "/")}
-            className={css}
-          />)
+    <Link
+      {...props}
+      to={to
+        .replace(/\/+/, `${basename}/`)
+        .replace(`${basename}${basename}`, basename)
+        .replace(/\/\/+/, "/")}
+      className={css}
+    />
   );
 };
 

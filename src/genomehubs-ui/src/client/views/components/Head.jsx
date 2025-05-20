@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet";
 import React from "react";
 import { compose } from "recompose";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const Head = ({ siteName, basename }) => {
   return (

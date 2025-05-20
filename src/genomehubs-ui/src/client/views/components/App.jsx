@@ -13,7 +13,7 @@ import ReactErrorBoundary from "./ReactErrorBoundary";
 import StylesProvider from "@mui/styles/StylesProvider";
 import classnames from "classnames";
 import { compose } from "recompose";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import { withCookies } from "react-cookie";
 import withLoading from "../hocs/withLoading";
 import withTheme from "../hocs/withTheme";

@@ -30,7 +30,7 @@ import { useNavigate } from "@reach/router";
 import withBrowse from "../hocs/withBrowse";
 import withDescendantsById from "../hocs/withDescendantsById";
 import withRecordById from "../hocs/withRecordById";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 
 const setScrollPosition = (scrollY, status) => {

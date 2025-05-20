@@ -118,6 +118,7 @@
     "react-country-flag": "^3.1.0",
     "react-dom": "^18.3.1",
     "react-error-boundary": "^4.0.13",
+    "react-globe.gl": "^2.33.2",
     "react-helmet": "^6.1.0",
     "react-json-pretty": "^2.2.0",
     "react-konva": "^18.2.10",
@@ -147,6 +148,7 @@
     "svg-path-bbox": "^2.1.0",
     "svg-sprite-loader": "^6.0.11",
     "svgo-loader": "^4.0.0",
+    "three": "^0.176.0",
     "trie-search": "^2.0.0",
     "unfetch": "^5.0.0",
     "unified": "^9.2.2",
@@ -170,6 +172,10 @@
     "#hocs/withPhylopics": {
       "storybook": "./src/client/views/hocs/withPhylopics.mock.jsx",
       "default": "./src/client/views/hocs/withPhylopics.jsx"
+    },
+    "#hocs/withSiteName": {
+      "storybook": "./src/client/views/hocs/withSiteName.mock.jsx",
+      "default": "./src/client/views/hocs/withSiteName.jsx"
     },
     "#*": [
       "./*",

@@ -11,7 +11,7 @@ import { markdown as markdownStyle } from "./Styles.scss";
 import qs from "qs";
 import { useStyles } from "./ReportModalStyles";
 import useWindowDimensions from "../hooks/useWindowDimensions";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 export const ReportFull = ({
   reportId,

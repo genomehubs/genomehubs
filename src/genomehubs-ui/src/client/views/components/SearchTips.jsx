@@ -15,7 +15,7 @@ import { compose } from "recompose";
 import didYouMean from "didyoumean2";
 import qs from "../functions/qs";
 import setColors from "../functions/setColors";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withSearch from "../hocs/withSearch";
 import withTypes from "../hocs/withTypes";
 

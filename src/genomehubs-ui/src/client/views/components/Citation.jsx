@@ -4,7 +4,7 @@ import { compose } from "recompose";
 import { link as linkStyle } from "./Styles.scss";
 import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const Citation = ({ basename, searchTerm, resultCount }) => {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const Citation = ({ basename, searchTerm, resultCount }) => {
       `${basename}/search?${qs.stringify({
         ...searchTerm,
         report: "sources",
-      })}#${encodeURIComponent(searchTerm.query || searchTerm.x)}`
+      })}#${encodeURIComponent(searchTerm.query || searchTerm.x)}`,
     );
   };
   let sourcesLink;

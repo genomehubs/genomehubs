@@ -16,7 +16,7 @@ import ZoomComponent from "./ZoomComponent";
 import { compose } from "recompose";
 import dispatchGeography from "../hocs/dispatchGeography";
 import qs from "../functions/qs";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const SingleMarker = ({ position, children, setHighlightPointLocation }) => {
   return (

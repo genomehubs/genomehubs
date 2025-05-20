@@ -13,7 +13,7 @@ import classNames from "classnames";
 import { compose } from "recompose";
 import formatter from "../functions/formatter";
 import { useNavigate } from "@reach/router";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -91,7 +91,7 @@ export const BadgeInfo = ({
   const navigate = useNavigate();
   const moreInfo = () => {
     navigate(
-      `${basename}/record?recordId=${currentRecordId}&result=${result}&taxonomy=${taxonomy}`
+      `${basename}/record?recordId=${currentRecordId}&result=${result}&taxonomy=${taxonomy}`,
     );
     setBrowse();
   };

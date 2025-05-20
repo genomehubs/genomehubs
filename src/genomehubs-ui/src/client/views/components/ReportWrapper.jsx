@@ -4,7 +4,7 @@ import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { useNavigate } from "@reach/router";
 import withApi from "../hocs/withApi";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 export const ReportWrapper = ({
   reportId,

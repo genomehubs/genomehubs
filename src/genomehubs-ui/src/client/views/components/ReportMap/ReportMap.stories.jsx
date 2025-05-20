@@ -1,5 +1,7 @@
+import { Provider } from "react-redux";
 import React from "react";
 import ReportMap from ".";
+import store from "../../reducers/color.store";
 
 // Mock map data with country_code attributes for testing
 const mockMap = {
@@ -15,17 +17,13 @@ const mockMap = {
             },
           },
         },
-        cats: [
-          { key: "FR" },
-          { key: "DE" },
-          { key: "ES" },
-        ],
+        cats: [{ key: "FR" }, { key: "DE" }, { key: "ES" }],
       },
       map: {
         rawData: {
-          FR: [ { country_code: ["FR"] } ],
-          DE: [ { country_code: ["DE"] }, { country_code: ["DE"] } ],
-          ES: [ { country_code: ["ES"] } ],
+          FR: [{ country_code: ["FR"] }],
+          DE: [{ country_code: ["DE"] }, { country_code: ["DE"] }],
+          ES: [{ country_code: ["ES"] }],
         },
       },
     },
@@ -34,10 +32,21 @@ const mockMap = {
 
 export default {
   title: "Components/ReportMap",
+  decorators: [
+    (Story) => (
+      <Provider store={store}>
+        <Story />
+      </Provider>
+    ),
+  ],
   component: ReportMap,
 };
 
-const Template = (args) => <div style={{ width: 600, height: 400 }}><ReportMap {...args} /></div>;
+const Template = (args) => (
+  <div style={{ width: 600, height: 400 }}>
+    <ReportMap {...args} />
+  </div>
+);
 
 export const GeoJSONIntegration = Template.bind({});
 GeoJSONIntegration.args = {

@@ -1,8 +1,9 @@
 /** @type { import('@storybook/react-webpack5').StorybookConfig } */
 
+import path, { resolve } from "path";
+
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import custom from "../webpack.config.js";
-import path from "path";
 
 const devMode = true; //process.env.NODE_ENV !== "production";
 
@@ -122,6 +123,16 @@ const config = {
       module: {
         ...config.module,
         rules: [...filteredRules, ...custom.module.rules],
+      },
+      resolve: {
+        ...config.resolve,
+        alias: {
+          ...config.resolve.alias,
+          "@reach/router": path.resolve(
+            __dirname,
+            "../src/mocks/@reach_router.js",
+          ),
+        },
       },
     };
   },

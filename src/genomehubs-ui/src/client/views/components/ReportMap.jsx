@@ -2,34 +2,40 @@ import "leaflet/dist/leaflet.css";
 
 import {
   CircleMarker,
+  GeoJSON,
   LayerGroup,
   MapContainer,
   Pane,
   Popup,
   TileLayer,
-  GeoJSON,
 } from "react-leaflet";
 import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
+import Globe from "react-globe.gl";
 import Grid from "@mui/material/Grid2";
 import LocationMapHighlightIcon from "./LocationMapHighlightIcon";
 import NavLink from "./NavLink";
+import Switch from "@mui/material/Switch";
 import ZoomComponent from "./ZoomComponent";
 import { compose } from "recompose";
+import countriesGeoJson from "./geojson/countries.geojson";
 import dispatchMessage from "../hocs/dispatchMessage";
 import qs from "../functions/qs";
 import setColors from "../functions/setColors";
 import useResize from "../hooks/useResize";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withSearchIndex from "../hocs/withSearchIndex";
-import withSiteName from "../hocs/withSiteName";
-import countriesGeoJson from "./geojson/countries.geojson";
+import withSiteName from "#hocs/withSiteName";
 
 // Utility to get color based on count
 function getCountryColor(count, maxCount) {
-  if (!count) return "#eee";
+  if (!count) {
+    return "#eee";
+  }
   // Simple linear scale: more count = darker blue
   const intensity = Math.round(200 - (count / maxCount) * 150);
   return `rgb(${intensity},${intensity},255)`;
@@ -44,10 +50,10 @@ const CountryLayer = ({ countryCounts, onCountryClick }) => {
   return (
     <GeoJSON
       data={countriesGeoJson}
-      style={feature => ({
+      style={(feature) => ({
         fillColor: getCountryColor(
           countryCounts[feature.properties.ISO_A2],
-          maxCount
+          maxCount,
         ),
         weight: 1,
         color: "#333",
@@ -99,13 +105,14 @@ const MarkerComponent = ({
 }) => {
   let markers = [];
   let i = 0;
-  for (let obj of geoPoints) {
-    let coords = obj.coords;
-    if (!Array.isArray(coords)) {
-      coords = [coords];
-    }
-    for (let latLon of coords) {
-      let arr = latLon.split(",");
+  for (const obj of geoPoints) {
+    const { coords: rawCoords } = obj;
+    const coords = Array.isArray(rawCoords) ? rawCoords : [rawCoords];
+    for (const latLon of coords) {
+      if (!latLon) {
+        continue;
+      }
+      const arr = latLon.split(",");
       let message = obj.scientific_name ? `${obj.scientific_name} - ` : "";
       let link;
       if (obj.sampleId) {
@@ -119,15 +126,13 @@ const MarkerComponent = ({
           </NavLink>
         );
       } else if (obj.taxonId) {
-        let newOptions = {};
         // if (options.recordId) {
-        newOptions = {
+        const newOptions = {
           query: `tax_tree(${obj.taxonId}) AND sample_location=${latLon}`,
           result: "sample",
           taxonomy: options.taxonomy,
         };
-
-        let url = `${basename || ""}/search?${qs.stringify(newOptions)}`;
+        const url = `${basename || ""}/search?${qs.stringify(newOptions)}`;
         link = (
           <NavLink url={url}>click to view samples from this location</NavLink>
         );
@@ -146,12 +151,11 @@ const MarkerComponent = ({
           setHighlightPointLocation={setHighlightPointLocation}
         >
           <Popup>{message}</Popup>
-        </SingleMarker>
+        </SingleMarker>,
       );
       i++;
     }
   }
-
   return markers;
 };
 
@@ -166,26 +170,52 @@ const Map = ({
   taxonId,
   countryCounts,
   onCountryClick,
+  globeView = false,
+  colorScheme = {},
+  theme = "lightTheme",
 }) => {
   const location = useLocation();
-  if (width == 0) {
+  if (width === 0) {
     return null;
   }
-
-  // useEffect(() => {
-  //   return globalHistory.listen(({ action, location }) => {
-  //     if (action === "PUSH" || action === "POP") {
-  //       setZoomPointLocation(false);
-  //       setHighlightPointLocation(false);
-  //     }
-  //   });
-  // }, []);
-  // let { markers, bounds } = MarkerComponent({
-  //   geoPoints,
-  //   meta,
-  //   options,
-  //   taxonId,
-  // });
+  if (globeView) {
+    const darkColor = colorScheme?.[theme]?.darkColor || "#222a38";
+    const maxCount = useMemo(() => Math.max(...Object.values(countryCounts), 1), [countryCounts]);
+    const getPolyColor = useCallback(
+      d => getCountryColor(countryCounts[d.properties.ISO_A2], maxCount),
+      [countryCounts, maxCount]
+    );
+    const getPolyLabel = useCallback(
+      d => `${d.properties.ADMIN}: ${countryCounts[d.properties.ISO_A2] || 0}`,
+      [countryCounts]
+    );
+    const getPolySideColor = useCallback(() => "rgba(0,0,0,0.15)", []);
+    const getPolyStrokeColor = useCallback(() => "#333", []);
+    const handlePolyClick = useCallback(
+      d => onCountryClick(d.properties.ISO_A2),
+      [onCountryClick]
+    );
+    return (
+      <div style={{ width, height, background: darkColor, marginTop: "1em" }}>
+        <Globe
+          width={width}
+          height={height}
+          globeImageUrl={null}
+          backgroundColor={darkColor}
+          showGlobe={true}
+          globeMaterial={undefined}
+          globeColor="#b3d1e6"
+          polygonsData={countriesGeoJson.features}
+          polygonCapColor={getPolyColor}
+          polygonSideColor={getPolySideColor}
+          polygonStrokeColor={getPolyStrokeColor}
+          polygonLabel={getPolyLabel}
+          onPolygonClick={handlePolyClick}
+        />
+        {markers}
+      </div>
+    );
+  }
 
   return (
     <MapContainer
@@ -196,15 +226,18 @@ const Map = ({
         marginTop: "1em",
         width: `${width}px`,
         height: `${height}px`,
-        background: "none",
+        background: "#b3d1e6",
       }}
     >
-      <TileLayer
+      {/* <TileLayer
         url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
         attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+      /> */}
+      <CountryLayer
+        countryCounts={countryCounts}
+        onCountryClick={onCountryClick}
       />
       {markers}
-      <CountryLayer countryCounts={countryCounts} onCountryClick={onCountryClick} />
     </MapContainer>
   );
 };
@@ -223,41 +256,43 @@ const ReportMap = ({
   levels,
   colorPalette,
   palettes,
+  colorScheme,
+  theme,
   minDim,
   setMinDim,
   xOpts,
   basename,
 }) => {
   const navigate = useNavigate();
-  const componentRef = chartRef ? chartRef : useRef();
+  const componentRef = chartRef || useRef();
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
+  const [globeView, setGlobeView] = useState(false);
   useEffect(() => {
     if (message && map && map.status) {
       setMessage(null);
     }
   }, [map]);
-
   let options = qs.parse(location.search.replace(/^\?/, ""));
   if (map && map.status) {
-    let bounds = map.report.map.bounds;
+    const { bounds } = map.report.map;
     let geoBounds = bounds.stats.geo.bounds;
     geoBounds = [
       [geoBounds.top_left.lat + 1, geoBounds.top_left.lon - 1],
       [geoBounds.bottom_right.lat - 1, geoBounds.bottom_right.lon + 1],
     ];
-
-    let pointData = map.report.map.map.rawData;
+    const pointData = map.report.map.map.rawData;
     let markers = [];
     // Calculate country counts
-    let countryCounts = {};
-    Object.values(pointData).flat().forEach(obj => {
-      (obj[REGION_ATTRIBUTE] || []).forEach(code => {
-        countryCounts[code] = (countryCounts[code] || 0) + 1;
+    const countryCounts = {};
+    Object.values(pointData)
+      .flat()
+      .forEach((obj) => {
+        (obj[REGION_ATTRIBUTE] || []).forEach((code) => {
+          countryCounts[code] = (countryCounts[code] || 0) + 1;
+        });
       });
-    });
-
     if (bounds.cats) {
       ({ levels, colors } = setColors({
         colorPalette,
@@ -274,18 +309,18 @@ const ReportMap = ({
             color={colors[i]}
             options={options}
             basename={basename}
-          />
+          />,
         );
       });
       if (bounds.showOther) {
-        let i = bounds.cats.length;
+        const i = bounds.cats.length;
         markers.push(
           <MarkerComponent
             key={i}
             geoPoints={pointData["other"]}
             color={colors[i]}
             options={options}
-          />
+          />,
         );
       }
     } else {
@@ -295,18 +330,29 @@ const ReportMap = ({
           geoPoints={pointData[`all ${searchIndexPlural}`]}
           color={colors[0]}
           options={options}
-        />
+        />,
       );
     }
-
-    const handleCountryClick = code => {
+    const handleCountryClick = (code) => {
       // Filter search by country_code
       options[REGION_ATTRIBUTE] = code;
       navigate(`/search?${qs.stringify(options)}`);
     };
-
     return (
-      (<Grid ref={componentRef} style={{ height: "100%" }} size="grow">
+      <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
+        <FormGroup row style={{ position: "absolute", zIndex: 1000, right: 20, top: 20 }}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={globeView}
+                onChange={() => setGlobeView((v) => !v)}
+                color="primary"
+              />
+            }
+            label={globeView ? "Globe View" : "Map View"}
+          />
+        </FormGroup>
+        {/* Map or Globe rendering logic goes here */}
         <Map
           bounds={geoBounds}
           markers={markers}
@@ -314,8 +360,11 @@ const ReportMap = ({
           height={height}
           countryCounts={countryCounts}
           onCountryClick={handleCountryClick}
+          globeView={globeView}
+          colorScheme={colorScheme}
+          theme={theme || "lightTheme"}
         />
-      </Grid>)
+      </Grid>
     );
   } else {
     return null;
@@ -326,5 +375,5 @@ export default compose(
   withSiteName,
   dispatchMessage,
   withColors,
-  withSearchIndex
+  withSearchIndex,
 )(ReportMap);
