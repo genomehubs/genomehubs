@@ -1,3 +1,4 @@
+import JSZip from "jszip";
 import { Provider } from "react-redux";
 import React from "react";
 import ReportMap from ".";
@@ -24,6 +25,7 @@ const mockMap = {
           FR: [{ country_code: ["FR"] }],
           DE: [{ country_code: ["DE"] }, { country_code: ["DE"] }],
           ES: [{ country_code: ["ES"] }],
+          JP: [{ country_code: ["JP"] }],
         },
       },
     },

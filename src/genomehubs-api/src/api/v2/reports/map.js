@@ -39,8 +39,9 @@ const getMap = async ({
   req,
   apiParams,
 }) => {
-  let { lookupTypes } = await attrTypes({ result, taxonomy });
+  let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
   // let field = yFields[0] || fields[0];
+
   let exclusions;
   exclusions = setExclusions(params);
 
@@ -99,6 +100,28 @@ const getMap = async ({
     cats = new Set(bounds.cats.map(({ key }) => key));
   }
   let rawData = {};
+  let countryCodes = new Set();
+  // Accept both sample_location and country_list as possible coordinate fields
+  let coordFields = ["sample_location", "country_list"];
+  let availableCoordField = coordFields.find((f) =>
+    Object.keys(typesMap).includes(f)
+  );
+  if (!availableCoordField) {
+    status = {
+      success: false,
+      error: `no sample_location or country_list data available`,
+    };
+  }
+  // Always include both fields if present
+  let xFields = [
+    ...new Set([
+      ...fields,
+      ...coordFields.filter((f) => Object.keys(typesMap).includes(f)),
+    ]),
+  ];
+  fields = xFields;
+
+  // In getMap, try both fields for each result
   for (let result of xRes.results) {
     let cat;
     if (bounds.cat) {
@@ -125,11 +148,31 @@ const getMap = async ({
     if (!rawData[cat]) {
       rawData[cat] = [];
     }
-    if (!result.result.fields[field]) {
+    // Try to get coordinates from sample_location, then country_list
+    let coords = null;
+    let coordFieldUsed = null;
+    for (const f of coordFields) {
+      if (result.result.fields[f]) {
+        coords = result.result.fields[f].value;
+        coordFieldUsed = f;
+        break;
+      }
+    }
+    if (!coords) {
       continue;
     }
-    let coords = result.result.fields[field].value;
-    let { aggregation_source } = result.result.fields[field];
+    let { aggregation_source } = result.result.fields[coordFieldUsed] || {};
+    // Collect country_code if available
+    let country_code =
+      result.result.fields.country_list &&
+      result.result.fields.country_list.value;
+    if (country_code) {
+      if (Array.isArray(country_code)) {
+        country_code.forEach((code) => countryCodes.add(code));
+      } else {
+        countryCodes.add(country_code);
+      }
+    }
     rawData[cat].push({
       ...(result.result.scientific_name && {
         scientific_name: result.result.scientific_name,
@@ -142,10 +185,11 @@ const getMap = async ({
       coords,
       aggregation_source,
       cat,
+      ...(country_code && { country_code }),
     });
   }
 
-  return { rawData };
+  return { rawData, countryCodes: Array.from(countryCodes) };
 };
 
 export const map = async ({

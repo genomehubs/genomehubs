@@ -4,6 +4,7 @@ import path, { resolve } from "path";
 
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import custom from "../webpack.config.js";
+import { load } from "js-yaml";
 
 const devMode = true; //process.env.NODE_ENV !== "production";
 

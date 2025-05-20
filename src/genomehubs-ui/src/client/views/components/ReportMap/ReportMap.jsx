@@ -9,17 +9,29 @@ import {
   Popup,
   TileLayer,
 } from "react-leaflet";
-import Globe, { HexedPolygonsLayer } from "react-globe.gl";
-import React, { useEffect, useRef, useState } from "react";
+import MultiCatLegend, { processLegendData } from "../MultiCatLegend";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
+import Globe from "react-globe.gl";
 import Grid from "@mui/material/Grid2";
+import LocationMapHighlightIcon from "../LocationMapHighlightIcon";
+import { MeshPhongMaterial } from "three";
 import NavLink from "../NavLink";
 import Switch from "@mui/material/Switch";
+import ZoomComponent from "../ZoomComponent";
 import { compose } from "recompose";
 import countriesGeoJson from "../geojson/countries.geojson";
 import dispatchMessage from "../../hocs/dispatchMessage";
+import { mixColor } from "../../functions/mixColor";
 import qs from "../../functions/qs";
 import setColors from "../../functions/setColors";
 import useResize from "../../hooks/useResize";
@@ -28,24 +40,55 @@ import withSearchIndex from "../../hocs/withSearchIndex";
 import withSiteName from "#hocs/withSiteName";
 
 // Utility to get color based on count
-function getCountryColor(count, maxCount) {
+function getCountryColor(count, maxCount, baseColor = "#ff7001") {
   if (!count) {
     return "#eee";
   }
-  // Simple linear scale: more count = darker blue
-  const intensity = Math.round(200 - (count / maxCount) * 150);
-  return `rgb(${intensity},${intensity},255)`;
+  // Blend baseColor with #eeeeee proportional to count
+  const ratio = count / maxCount;
+  return mixColor({ color1: baseColor, color2: "#eeeeee", ratio });
 }
 
 // Default region attribute (user-editable in future)
 const REGION_ATTRIBUTE = "country_code";
 
-const CountryLayer = ({ countryCounts, onCountryClick }) => {
+const CountryLayer = ({ countryCounts, onCountryClick, repeat = false }) => {
   // Find max count for color scaling
   const maxCount = Math.max(...Object.values(countryCounts), 1);
+
+  // Helper to shift a polygon's longitude
+  const shiftFeature = (feature, shift) => {
+    const newFeature = JSON.parse(JSON.stringify(feature));
+    const shiftCoords = (coords) => {
+      return coords.map((c) =>
+        Array.isArray(c[0]) ? shiftCoords(c) : [c[0] + shift, c[1]],
+      );
+    };
+    if (feature.geometry.type === "Polygon") {
+      newFeature.geometry.coordinates = shiftCoords(
+        feature.geometry.coordinates,
+      );
+    } else if (feature.geometry.type === "MultiPolygon") {
+      newFeature.geometry.coordinates =
+        feature.geometry.coordinates.map(shiftCoords);
+    }
+    return newFeature;
+  };
+
+  // Build repeated features
+  let { features } = countriesGeoJson;
+  if (repeat) {
+    const shifts = [-360, 0, 360];
+    features = shifts.flatMap((shift) =>
+      shift === 0
+        ? countriesGeoJson.features
+        : countriesGeoJson.features.map((f) => shiftFeature(f, shift)),
+    );
+  }
+
   return (
     <GeoJSON
-      data={countriesGeoJson}
+      data={{ type: "FeatureCollection", features }}
       style={(feature) => ({
         fillColor: getCountryColor(
           countryCounts[feature.properties.ISO_A2],
@@ -165,50 +208,78 @@ const Map = ({
   meta = {},
   taxonId,
   countryCounts,
+  palette,
   onCountryClick,
   globeView = false,
   colorScheme = {},
   theme = "lightTheme",
 }) => {
   const location = useLocation();
+  const globeRef = useRef();
+  // Calculate center of bounds for zoom
+  let centerLat = 0,
+    centerLon = 0;
+  if (bounds && bounds.length === 2) {
+    centerLat = (bounds[0][0] + bounds[1][0]) / 2;
+    centerLon = (bounds[0][1] + bounds[1][1]) / 2;
+  }
+  const darkColor = colorScheme?.[theme]?.darkColor || "#222a38";
+  const maxCount = useMemo(
+    () => Math.max(...Object.values(countryCounts), 1),
+    [countryCounts],
+  );
+  const getPolyColor = useCallback(
+    (d) => getCountryColor(countryCounts[d.properties.ISO_A2], maxCount),
+    [countryCounts, maxCount],
+  );
+  const getPolyLabel = useCallback(
+    (d) => `${d.properties.ADMIN}: ${countryCounts[d.properties.ISO_A2] || 0}`,
+    [countryCounts],
+  );
+  const getPolySideColor = useCallback(() => "rgba(0,0,0,0.15)", []);
+  const getPolyStrokeColor = useCallback(() => "rgba(0,0,0,0.15)", []);
+  const handlePolyClick = useCallback(
+    (d) => onCountryClick(d.properties.ISO_A2),
+    [onCountryClick],
+  );
+  useEffect(() => {
+    if (globeView && globeRef.current) {
+      globeRef.current.pointOfView(
+        { lat: centerLat, lng: centerLon, altitude: 1.5 },
+        1000,
+      );
+    }
+  }, [globeView, centerLat, centerLon]);
   if (width === 0) {
     return null;
   }
   if (globeView) {
-    const darkColor = colorScheme?.[theme]?.darkColor || "#222a38";
     return (
       <div style={{ width, height, background: darkColor, marginTop: "1em" }}>
         <Globe
+          ref={globeRef}
           width={width}
           height={height}
-          globeImageUrl={null}
-          globeColor="#b3d1e6"
           backgroundColor={darkColor}
+          backgroundImageUrl={null}
           showGlobe={true}
-          globeMaterial={undefined}
-        >
-          <HexedPolygonsLayer
-            polygonsData={countriesGeoJson.features}
-            hexPolygonsResolution={3}
-            hexPolygonsColor={(d) =>
-              getCountryColor(
-                countryCounts[d.properties.ISO_A2],
-                Math.max(...Object.values(countryCounts), 1),
-              )
-            }
-            hexPolygonsSideColor={() => "rgba(0,0,0,0.15)"}
-            hexPolygonsStrokeColor={() => "#333"}
-            hexPolygonsLabel={(d) =>
-              `${d.properties.ADMIN}: ${countryCounts[d.properties.ISO_A2] || 0}`
-            }
-            onHexPolygonClick={(d) => onCountryClick(d.properties.ISO_A2)}
-          />
-        </Globe>
+          globeMaterial={new MeshPhongMaterial({ color: "#b3d1e6" })}
+          polygonsData={countriesGeoJson.features}
+          polygonCapColor={getPolyColor}
+          // polygonSideColor={getPolySideColor}
+          polygonStrokeColor={getPolyStrokeColor}
+          polygonLabel={getPolyLabel}
+          onPolygonClick={handlePolyClick}
+          polygonSideColor={"rgba(0, 0, 0, 0.0)"}
+          // polygonStrokeColor={getPolyColor}
+          polygonAltitude={(d) =>
+            countryCounts[d.properties.ISO_A2] > 0 ? 0.01 : 0.01
+          }
+        />
         {markers}
       </div>
     );
   }
-
   return (
     <MapContainer
       bounds={bounds}
@@ -228,6 +299,7 @@ const Map = ({
       <CountryLayer
         countryCounts={countryCounts}
         onCountryClick={onCountryClick}
+        repeat={true}
       />
       {markers}
     </MapContainer>
@@ -260,7 +332,7 @@ const ReportMap = ({
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
-  const [globeView, setGlobeView] = useState(false);
+  const [globeView, setGlobeView] = useState(true);
   useEffect(() => {
     if (message && map && map.status) {
       setMessage(null);
@@ -281,7 +353,7 @@ const ReportMap = ({
     Object.values(pointData)
       .flat()
       .forEach((obj) => {
-        (obj[REGION_ATTRIBUTE] || []).forEach((code) => {
+        ([obj[REGION_ATTRIBUTE]].flat() || []).forEach((code) => {
           countryCounts[code] = (countryCounts[code] || 0) + 1;
         });
       });
@@ -306,24 +378,24 @@ const ReportMap = ({
       });
       if (bounds.showOther) {
         const i = bounds.cats.length;
-        markers.push(
-          <MarkerComponent
-            key={i}
-            geoPoints={pointData["other"]}
-            color={colors[i]}
-            options={options}
-          />,
-        );
+        // markers.push(
+        //   <MarkerComponent
+        //     key={i}
+        //     geoPoints={pointData["other"]}
+        //     color={colors[i]}
+        //     options={options}
+        //   />,
+        // );
       }
     } else {
-      markers.push(
-        <MarkerComponent
-          key={0}
-          geoPoints={pointData[`all ${searchIndexPlural}`]}
-          color={colors[0]}
-          options={options}
-        />,
-      );
+      // markers.push(
+      //   <MarkerComponent
+      //     key={0}
+      //     geoPoints={pointData[`all ${searchIndexPlural}`]}
+      //     color={colors[0]}
+      //     options={options}
+      //   />,
+      // );
     }
     const handleCountryClick = (code) => {
       // Filter search by country_code
@@ -332,17 +404,21 @@ const ReportMap = ({
     };
     return (
       <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
-        <FormControlLabel
-          control={
-            <Switch
-              checked={globeView}
-              onChange={() => setGlobeView((v) => !v)}
-              color="primary"
-            />
-          }
-          label={globeView ? "Globe View" : "Map View"}
+        <FormGroup
+          row
           style={{ position: "absolute", zIndex: 1000, right: 20, top: 20 }}
-        />
+        >
+          <FormControlLabel
+            control={
+              <Switch
+                checked={globeView}
+                onChange={() => setGlobeView((v) => !v)}
+                color="primary"
+              />
+            }
+            label={globeView ? "Globe View" : "Map View"}
+          />
+        </FormGroup>
         {/* Map or Globe rendering logic goes here */}
         <Map
           bounds={geoBounds}
