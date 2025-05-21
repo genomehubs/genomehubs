@@ -9,6 +9,7 @@ import { getResultCount } from "../functions/getResultCount.js";
 import { getResults } from "../functions/getResults.js";
 import { parseFields } from "../functions/parseFields.js";
 import { queryParams } from "./queryParams.js";
+import { setAggs } from "./setAggs.js";
 import { setExclusions } from "../functions/setExclusions.js";
 
 const valueTypes = {
@@ -23,12 +24,13 @@ const valueTypes = {
 const getMap = async ({
   params,
   x,
-  field = "sample_location",
+  field,
   y,
   yParams,
   fields,
   yFields,
   cat,
+  locationBounds,
   bounds,
   yBounds,
   result,
@@ -40,14 +42,12 @@ const getMap = async ({
   apiParams,
 }) => {
   let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
-  // let field = yFields[0] || fields[0];
-
-  let exclusions;
-  exclusions = setExclusions(params);
+  const { field: locationField } = locationBounds || {};
+  const { field: regionField } = bounds || {};
+  let exclusions = setExclusions(params);
 
   let xQuery = {
     ...params,
-    // query: x,
     fields,
     exclusions,
   };
@@ -68,12 +68,28 @@ const getMap = async ({
       xQuery.ranks = bounds.cat;
     }
   }
+
+  if (regionField) {
+    xQuery.aggs = await setAggs({
+      field: regionField,
+      result,
+      taxonomy,
+      histogram: true,
+      bounds,
+    });
+  }
+
+  // Always request region_count aggregation on country_list
+  xQuery.aggs = xQuery.aggs || {};
+
+  // xQuery.aggs.region_count = { terms: { field: "country_list", size: 500 } };
+
   let countRes = await getResultCount(xQuery);
   if (!countRes.status.success) {
     return { status: countRes.status };
   }
   let { count } = countRes;
-  if (mapThreshold > -1 && count > mapThreshold) {
+  if (mapThreshold > -1 && count > mapThreshold && locationBounds) {
     return {
       status: {
         success: false,
@@ -81,115 +97,108 @@ const getMap = async ({
       },
     };
   }
-  // if (queryId) {
-  //   setProgress(queryId, { total: lca.count });
-  // }
   let xRes = await getResults({
     ...xQuery,
-    size: count,
+    size: locationField ? count : 0,
     taxonomy,
     req,
-    // update: "x",
   });
   if (!xRes.status.success) {
     return { status: xRes.status };
   }
 
-  let cats;
-  if (bounds.cats) {
-    cats = new Set(bounds.cats.map(({ key }) => key));
+  // Build regionCounts from aggregation
+  let regionCounts = {};
+  if (
+    xRes.aggs?.aggregations?.[regionField]?.histogram?.by_attribute?.by_cat
+      ?.by_value &&
+    xRes.aggs.aggregations[regionField].histogram.by_attribute.by_cat.by_value
+      .buckets
+  ) {
+    for (const [key, { doc_count }] of Object.entries(
+      xRes.aggs.aggregations[regionField].histogram.by_attribute.by_cat.by_value
+        .buckets
+    )) {
+      regionCounts[key.toUpperCase()] = doc_count;
+    }
   }
+
   let rawData = {};
   let countryCodes = new Set();
-  // Accept both sample_location and country_list as possible coordinate fields
-  let coordFields = ["sample_location", "country_list"];
-  let availableCoordField = coordFields.find((f) =>
-    Object.keys(typesMap).includes(f)
-  );
-  if (!availableCoordField) {
-    status = {
-      success: false,
-      error: `no sample_location or country_list data available`,
-    };
-  }
-  // Always include both fields if present
-  let xFields = [
-    ...new Set([
-      ...fields,
-      ...coordFields.filter((f) => Object.keys(typesMap).includes(f)),
-    ]),
-  ];
-  fields = xFields;
-
-  // In getMap, try both fields for each result
-  for (let result of xRes.results) {
-    let cat;
-    if (bounds.cat) {
-      if (bounds.by == "attribute") {
-        cat = result.result.fields[bounds.cat].value.toLowerCase();
-        if (Array.isArray(cat)) {
-          cat = cat[0].toLowerCase();
-        } else {
+  if (fields.includes(locationField)) {
+    let cats;
+    if (bounds.cats) {
+      cats = new Set(bounds.cats.map(({ key }) => key));
+    }
+    let coordFields = [locationField];
+    for (let result of xRes.results) {
+      let cat;
+      if (bounds.cat) {
+        if (bounds.by == "attribute") {
           cat = result.result.fields[bounds.cat].value.toLowerCase();
+          if (Array.isArray(cat)) {
+            cat = cat[0].toLowerCase();
+          } else {
+            cat = result.result.fields[bounds.cat].value.toLowerCase();
+          }
+        } else if (result.result.ranks) {
+          cat = result.result.ranks[bounds.cat];
+          if (cat) {
+            cat = cat.taxon_id;
+          }
         }
-      } else if (result.result.ranks) {
-        cat = result.result.ranks[bounds.cat];
-        if (cat) {
-          cat = cat.taxon_id;
+        if (!cat || !cats.has(cat)) {
+          cat = "other";
         }
       }
-      if (!cat || !cats.has(cat)) {
-        cat = "other";
+      if (!cat) {
+        cat = "all taxa";
       }
-    }
-    if (!cat) {
-      cat = "all taxa";
-    }
-    if (!rawData[cat]) {
-      rawData[cat] = [];
-    }
-    // Try to get coordinates from sample_location, then country_list
-    let coords = null;
-    let coordFieldUsed = null;
-    for (const f of coordFields) {
-      if (result.result.fields[f]) {
-        coords = result.result.fields[f].value;
-        coordFieldUsed = f;
-        break;
+      if (!rawData[cat]) {
+        rawData[cat] = [];
       }
-    }
-    if (!coords) {
-      continue;
-    }
-    let { aggregation_source } = result.result.fields[coordFieldUsed] || {};
-    // Collect country_code if available
-    let country_code =
-      result.result.fields.country_list &&
-      result.result.fields.country_list.value;
-    if (country_code) {
-      if (Array.isArray(country_code)) {
-        country_code.forEach((code) => countryCodes.add(code));
-      } else {
-        countryCodes.add(country_code);
+      let coords = null;
+      let coordFieldUsed = null;
+      for (const f of coordFields) {
+        if (result.result.fields[f]) {
+          coords = result.result.fields[f].value;
+          coordFieldUsed = f;
+          break;
+        }
       }
+      if (!coords) {
+        continue;
+      }
+      let { aggregation_source } = result.result.fields[coordFieldUsed] || {};
+      // Collect country_code if available
+      let country_code =
+        result.result.fields.country_list &&
+        result.result.fields.country_list.value;
+      if (country_code) {
+        if (Array.isArray(country_code)) {
+          country_code.forEach((code) => countryCodes.add(code));
+        } else {
+          countryCodes.add(country_code);
+        }
+      }
+      rawData[cat].push({
+        ...(result.result.scientific_name && {
+          scientific_name: result.result.scientific_name,
+        }),
+        ...(result.result.taxon_id && { taxonId: result.result.taxon_id }),
+        ...(result.result.assembly_id && {
+          assemblyId: result.result.assembly_id,
+        }),
+        ...(result.result.sample_id && { sampleId: result.result.sample_id }),
+        coords,
+        aggregation_source,
+        cat,
+        ...(country_code && { country_code }),
+      });
     }
-    rawData[cat].push({
-      ...(result.result.scientific_name && {
-        scientific_name: result.result.scientific_name,
-      }),
-      ...(result.result.taxon_id && { taxonId: result.result.taxon_id }),
-      ...(result.result.assembly_id && {
-        assemblyId: result.result.assembly_id,
-      }),
-      ...(result.result.sample_id && { sampleId: result.result.sample_id }),
-      coords,
-      aggregation_source,
-      cat,
-      ...(country_code && { country_code }),
-    });
   }
 
-  return { rawData, countryCodes: Array.from(countryCodes) };
+  return { rawData, countryCodes: Array.from(countryCodes), regionCounts };
 };
 
 export const map = async ({
@@ -201,6 +210,8 @@ export const map = async ({
   taxonomy,
   apiParams,
   fields,
+  locationField = "sample_location",
+  regionField = "country_list",
   req,
 }) => {
   let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
@@ -233,16 +244,20 @@ export const map = async ({
   } else {
     xFields = [...new Set(searchFields)];
   }
-  xFields = [...new Set(["sample_location", ...searchFields])];
-  fields = xFields;
 
   let status;
-  if (!Object.keys(typesMap).includes("sample_location")) {
-    status = {
-      success: false,
-      error: `no sample_location data available`,
-    };
-  } else if (!x || !aInB(xFields, Object.keys(typesMap))) {
+  if (locationField) {
+    if (!Object.keys(typesMap).includes(locationField)) {
+      status = {
+        success: false,
+        error: `locationField: '${locationField}' not found, no location data available`,
+      };
+    }
+    xFields = [...new Set([locationField, ...searchFields])];
+    fields = xFields;
+  }
+
+  if (!x || !aInB(xFields, Object.keys(typesMap))) {
     status = {
       success: false,
       error: `unknown field in 'x = ${x}'`,
@@ -298,29 +313,60 @@ export const map = async ({
 
   let mapThreshold = apiParams.mapThreshold || config.mapThreshold;
   if (mapThreshold < 0) {
-    mapThreshold = 1000;
+    mapThreshold = 10000;
   }
   let bounds;
   let exclusions = setExclusions(params);
-  bounds = await getBounds({
-    params: { ...params },
-    fields: xFields
-      .concat(yFields)
-      .filter(
-        (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
-      ),
-    summaries,
-    cat,
-    result,
-    exclusions,
-    taxonomy,
-    apiParams,
-    //opts: xOpts,
-  });
+  let locationBounds;
+  if (locationField) {
+    locationBounds = await getBounds({
+      params: { ...params },
+      fields: xFields
+        .concat(yFields)
+        .filter(
+          (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
+        ),
+      summaries,
+      cat,
+      result,
+      exclusions,
+      taxonomy,
+      apiParams,
+      //opts: xOpts,
+    });
+    if (!locationBounds) {
+      status = {
+        success: false,
+        error: `no results contain ${locationField} data for the current query`,
+      };
+    }
+  }
+  if (regionField) {
+    if (!Object.keys(typesMap).includes(regionField)) {
+      status = {
+        success: false,
+        error: `regionField: '${regionField}' not found, no region data available`,
+      };
+    }
+    bounds = await getBounds({
+      params: { ...params },
+      fields: [regionField].concat(xFields).concat(yFields),
+      // .filter(
+      //   (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
+      // ),
+      summaries,
+      cat,
+      result,
+      exclusions,
+      taxonomy,
+      apiParams,
+      opts: ";;500",
+    });
+  }
   if (!bounds) {
     status = {
       success: false,
-      error: `no results contain sample_location data for the current query`,
+      error: `no results contain ${regionField} data for the current query`,
     };
   }
   let yBounds;
@@ -347,6 +393,7 @@ export const map = async ({
         catRank,
         summaries,
         cat,
+        locationBounds,
         bounds,
         yBounds,
         x,
@@ -372,6 +419,7 @@ export const map = async ({
       status,
       map,
       bounds,
+      locationBounds,
       yBounds,
       xQuery: {
         ...xQuery,

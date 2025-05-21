@@ -123,8 +123,9 @@ const SingleMarker = ({
         mouseout: (e) => setHighlightPointLocation(""),
       }}
       center={position}
-      color={"white"}
-      stroke={1}
+      color={"white"} // white outline
+      stroke={true}
+      weight={2} // thicker outline
       fillColor={color}
       fillOpacity={1}
     >
@@ -141,7 +142,60 @@ const MarkerComponent = ({
   taxonId,
   setHighlightPointLocation = () => {},
   basename,
+  globeView = false,
 }) => {
+  if (globeView) {
+    // Return array of point data objects for react-globe.gl
+    let points = [];
+    for (const obj of geoPoints) {
+      const { coords: rawCoords } = obj;
+      const coords = Array.isArray(rawCoords) ? rawCoords : [rawCoords];
+      for (const latLon of coords) {
+        if (!latLon) {
+          continue;
+        }
+        const arr = latLon.split(",");
+        if (arr.length !== 2) {
+          continue;
+        }
+        const lat = parseFloat(arr[0]);
+        const lng = parseFloat(arr[1]);
+        if (isNaN(lat) || isNaN(lng)) {
+          continue;
+        }
+        // Build label string similar to map marker
+        let message = obj.scientific_name ? `${obj.scientific_name} - ` : "";
+        let link;
+        if (obj.sampleId) {
+          link = `${basename || ""}/record?recordId=${obj.sampleId}&result=sample&taxonomy=${options.taxonomy}`;
+          message += obj.sampleId ? `Sample: ${obj.sampleId}` : "";
+        } else if (obj.taxonId) {
+          const newOptions = {
+            query: `tax_tree(${obj.taxonId}) AND sample_location=${latLon}`,
+            result: "sample",
+            taxonomy: options.taxonomy,
+          };
+          const url = `${basename || ""}/search?${qs.stringify(newOptions)}`;
+          link = url;
+          message += "Click to view samples from this location";
+        }
+        // For globe tooltip, use plain text (no HTML/JSX)
+        let label = message;
+        if (link) {
+          label += `\n${link}`;
+        }
+        points.push({
+          lat,
+          lng,
+          color,
+          label,
+          ...obj,
+        });
+      }
+    }
+    return points;
+  }
+
   let markers = [];
   let i = 0;
   for (const obj of geoPoints) {
@@ -165,7 +219,6 @@ const MarkerComponent = ({
           </NavLink>
         );
       } else if (obj.taxonId) {
-        // if (options.recordId) {
         const newOptions = {
           query: `tax_tree(${obj.taxonId}) AND sample_location=${latLon}`,
           result: "sample",
@@ -176,7 +229,6 @@ const MarkerComponent = ({
           <NavLink url={url}>click to view samples from this location</NavLink>
         );
       }
-      // TODO: handle assemblyId
       message = (
         <>
           {message} {link}
@@ -213,6 +265,7 @@ const Map = ({
   globeView = false,
   colorScheme = {},
   theme = "lightTheme",
+  pointsData = [],
 }) => {
   const location = useLocation();
   const globeRef = useRef();
@@ -244,39 +297,73 @@ const Map = ({
   );
   useEffect(() => {
     if (globeView && globeRef.current) {
-      globeRef.current.pointOfView(
-        { lat: centerLat, lng: centerLon, altitude: 1.5 },
-        1000,
-      );
+      if (pointsData && pointsData.length > 0) {
+        // Calculate centroid and spread
+        const lats = pointsData.map((p) => p.lat);
+        const lngs = pointsData.map((p) => p.lng);
+        const minLat = Math.min(...lats);
+        const maxLat = Math.max(...lats);
+        const minLng = Math.min(...lngs);
+        const maxLng = Math.max(...lngs);
+        const centerLat = (minLat + maxLat) / 2;
+        const centerLng = (minLng + maxLng) / 2;
+        // Calculate max distance between points (roughly)
+        const latSpread = maxLat - minLat;
+        const lngSpread = maxLng - minLng;
+        // Altitude: tighter zoom (50% closer)
+        const spread = Math.max(latSpread, lngSpread);
+        const altitude = Math.min(Math.max(1.2 + spread / 120, 1.2), 2);
+        globeRef.current.pointOfView(
+          { lat: centerLat, lng: centerLng, altitude },
+          1000,
+        );
+      } else {
+        globeRef.current.pointOfView(
+          { lat: centerLat, lng: centerLon, altitude: 1.5 },
+          1000,
+        );
+      }
     }
-  }, [globeView, centerLat, centerLon]);
+  }, [globeView, centerLat, centerLon, pointsData]);
   if (width === 0) {
     return null;
   }
   if (globeView) {
+    // Build combined pointsData with outline and center for each point
+    const combinedPointsData = [];
+    for (const pt of pointsData) {
+      combinedPointsData.push({ ...pt, isOutline: true }); // white outline
+      combinedPointsData.push({ ...pt, isOutline: false }); // colored center
+    }
     return (
       <div style={{ width, height, background: darkColor, marginTop: "1em" }}>
         <Globe
           ref={globeRef}
           width={width}
           height={height}
-          backgroundColor={darkColor}
+          backgroundColor={"rgba(0,0,0,0)"}
           backgroundImageUrl={null}
+          rendererConfig={{ alpha: true }}
           showGlobe={true}
           globeMaterial={new MeshPhongMaterial({ color: "#b3d1e6" })}
           polygonsData={countriesGeoJson.features}
           polygonCapColor={getPolyColor}
-          // polygonSideColor={getPolySideColor}
           polygonStrokeColor={getPolyStrokeColor}
           polygonLabel={getPolyLabel}
           onPolygonClick={handlePolyClick}
           polygonSideColor={"rgba(0, 0, 0, 0.0)"}
-          // polygonStrokeColor={getPolyColor}
           polygonAltitude={(d) =>
             countryCounts[d.properties.ISO_A2] > 0 ? 0.01 : 0.01
           }
+          pointsData={combinedPointsData}
+          pointLat={(d) => d.lat}
+          pointLng={(d) => d.lng}
+          pointColor={(d) => (d.isOutline ? "#fff" : d.color)}
+          pointAltitude={(d) => (d.isOutline ? 0.022 : 0.025)}
+          pointRadius={(d) => (d.isOutline ? 0.45 : 0.32)}
+          pointResolution={16}
+          pointLabel={(d) => d.label}
         />
-        {markers}
       </div>
     );
   }
@@ -340,23 +427,52 @@ const ReportMap = ({
   }, [map]);
   let options = qs.parse(location.search.replace(/^\?/, ""));
   if (map && map.status) {
-    const { bounds } = map.report.map;
-    let geoBounds = bounds.stats.geo.bounds;
-    geoBounds = [
-      [geoBounds.top_left.lat + 1, geoBounds.top_left.lon - 1],
-      [geoBounds.bottom_right.lat - 1, geoBounds.bottom_right.lon + 1],
-    ];
-    const pointData = map.report.map.map.rawData;
+    const { locationBounds, bounds } = map.report.map;
+    let pointData = map.report.map.rawData;
+    if (!pointData && map.report.map.map) {
+      pointData = map.report.map.map.rawData || {};
+    }
+    let geoBounds;
+    if (locationBounds && locationBounds.stats.geo) {
+      geoBounds = locationBounds.stats.geo.bounds;
+
+      geoBounds = [
+        [geoBounds.top_left.lat + 1, geoBounds.top_left.lon - 1],
+        [geoBounds.bottom_right.lat - 1, geoBounds.bottom_right.lon + 1],
+      ];
+    } else {
+      // Calculate default geoBounds based on container aspect ratio
+      const aspect = width && height ? (width / height) * 2 : 2;
+      let latSpan = 90;
+      let lonSpan = latSpan * aspect;
+      if (lonSpan > 360) {
+        lonSpan = 360;
+        latSpan = lonSpan / aspect;
+      }
+      // Pick a random longitude between -120 and 120
+      const centerLon = Math.random() * 240 - 120;
+
+      // Center longitude on centerLon
+      geoBounds = [
+        [latSpan / 2, centerLon - lonSpan / 2],
+        [-latSpan / 2, centerLon + lonSpan / 2],
+      ];
+
+      // Optionally, normalize bounds to [-180, 180]
+      // geoBounds = geoBounds.map(([lat, lon]) => [
+      //   lat,
+      //   ((lon + 180) % 360) - 180,
+      // ]);
+    }
+    // Use regionCounts from API if available
+    let { regionCounts } = map.report.map || {};
+    if (!regionCounts && map.report.map.map) {
+      ({ regionCounts } = map.report.map.map);
+    }
     let markers = [];
-    // Calculate country counts
-    const countryCounts = {};
-    Object.values(pointData)
-      .flat()
-      .forEach((obj) => {
-        ([obj[REGION_ATTRIBUTE]].flat() || []).forEach((code) => {
-          countryCounts[code] = (countryCounts[code] || 0) + 1;
-        });
-      });
+    let pointsData = [];
+    // Calculate country counts from regionCounts
+    const countryCounts = { ...regionCounts };
     if (bounds.cats) {
       ({ levels, colors } = setColors({
         colorPalette,
@@ -366,36 +482,68 @@ const ReportMap = ({
         colors,
       }));
       bounds.cats.forEach((obj, i) => {
-        markers.push(
-          <MarkerComponent
-            key={i}
-            geoPoints={pointData[obj.key]}
-            color={colors[i]}
-            options={options}
-            basename={basename}
-          />,
-        );
+        if (globeView) {
+          const points = MarkerComponent({
+            geoPoints: pointData ? pointData[obj.key] : [],
+            color: colors[i],
+            options,
+            basename,
+            globeView: true,
+          });
+          pointsData.push(...points);
+        } else {
+          markers.push(
+            <MarkerComponent
+              key={i}
+              geoPoints={pointData ? pointData[obj.key] : []}
+              color={colors[i]}
+              options={options}
+              basename={basename}
+              globeView={false}
+            />,
+          );
+        }
       });
       if (bounds.showOther) {
         const i = bounds.cats.length;
-        // markers.push(
-        //   <MarkerComponent
-        //     key={i}
-        //     geoPoints={pointData["other"]}
-        //     color={colors[i]}
-        //     options={options}
-        //   />,
-        // );
+        if (globeView) {
+          const points = MarkerComponent({
+            geoPoints: pointData["other"],
+            color: colors[i],
+            options,
+            globeView: true,
+          });
+          pointsData.push(...points);
+        } else {
+          markers.push(
+            <MarkerComponent
+              key={i}
+              geoPoints={pointData["other"]}
+              color={colors[i]}
+              options={options}
+              globeView={false}
+            />,
+          );
+        }
       }
+    } else if (globeView) {
+      const points = MarkerComponent({
+        geoPoints: pointData[`all ${searchIndexPlural}`],
+        color: colors[0],
+        options,
+        globeView: true,
+      });
+      pointsData.push(...points);
     } else {
-      // markers.push(
-      //   <MarkerComponent
-      //     key={0}
-      //     geoPoints={pointData[`all ${searchIndexPlural}`]}
-      //     color={colors[0]}
-      //     options={options}
-      //   />,
-      // );
+      markers.push(
+        <MarkerComponent
+          key={0}
+          geoPoints={pointData[`all ${searchIndexPlural}`]}
+          color={colors[0]}
+          options={options}
+          globeView={false}
+        />,
+      );
     }
     const handleCountryClick = (code) => {
       // Filter search by country_code
@@ -430,6 +578,7 @@ const ReportMap = ({
           globeView={globeView}
           colorScheme={colorScheme}
           theme={theme || "lightTheme"}
+          pointsData={pointsData}
         />
       </Grid>
     );
