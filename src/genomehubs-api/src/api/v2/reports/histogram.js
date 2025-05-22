@@ -78,7 +78,7 @@ const getYValues = ({ obj, yField, lookupTypes, stats }) => {
       stats
     ));
   }
-  if (yValueType == "keyword" && stats.cats) {
+  if (["keyword", "geo_hex"].includes(yValueType) && stats.cats) {
     let bucketMap = {};
     stats.cats.forEach((obj, i) => {
       yBuckets.push(obj.key);
@@ -374,7 +374,7 @@ const getHistogram = async ({
           }
           let x = result.result.fields[field][xSumm];
           if (
-            valueType == "keyword" &&
+            ["keyword", "geo_hex"].includes(valueType) &&
             xSumm == "value" &&
             !xKeys.has(x.toLowerCase())
           ) {
@@ -386,7 +386,7 @@ const getHistogram = async ({
           }
           for (let y of ys) {
             if (
-              yValueType == "keyword" &&
+              ["keyword", "geo_hex"].includes(yValueType) &&
               ySumm == "value" &&
               !yKeys.has(y.toLowerCase())
             ) {
@@ -511,7 +511,10 @@ const getHistogram = async ({
   });
   if (fieldMeta.type == "date") {
     buckets = scaleBuckets(buckets, "date", bounds);
-  } else if (fieldMeta.type == "keyword" && summaries[0] != "length") {
+  } else if (
+    ["keyword", "geo_hex"].includes(fieldMeta.type) &&
+    summaries[0] != "length"
+  ) {
     buckets.push(undefined);
   } else {
     buckets = scaleBuckets(buckets, bounds.scale, bounds);
@@ -527,7 +530,10 @@ const getHistogram = async ({
     // yBuckets = allYBuckets;
     if (yFieldMeta.type == "date") {
       yBuckets = scaleBuckets(yBuckets, "date", yBounds);
-    } else if (yFieldMeta.type != "keyword" && summaries[0] != "length") {
+    } else if (
+      ["keyword", "geo_hex"].includes(yFieldMeta.type) &&
+      summaries[0] != "length"
+    ) {
       yBuckets = scaleBuckets(yBuckets, yBounds.scale, yBounds);
     } else {
       yBuckets = scaleBuckets(yBuckets, yBounds.scale, yBounds);
@@ -739,7 +745,7 @@ const updateQuery = ({ params, fields, summaries, opts, lookupTypes }) => {
   if (summaries[0] != meta.processed_simple) {
     field = `${summaries[0]}(${field})`;
   }
-  if (!meta || !opts || meta.type == "keyword") {
+  if (!meta || !opts || meta.type == "keyword" || meta.type == "geo_hex") {
     return;
   }
   let queryArr = (params.query || "").split(

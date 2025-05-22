@@ -38,7 +38,7 @@ const validateValue = (term, value, meta, types) => {
   if (meta.attribute == "collate") {
     type = "keyword";
   }
-  if (type == "keyword" && types && types(meta.attribute)) {
+  if (["keyword", "geo_hex"].includes(type) && types && types(meta.attribute)) {
     let { summary } = types(meta.attribute);
     if (
       summary == "enum" ||
@@ -58,7 +58,7 @@ const validateValue = (term, value, meta, types) => {
     if (v.match(/^!*null$/)) {
       continue;
     }
-    if (type == "keyword" || type == "flattened" || type == "metadata") {
+    if (["keyword", "geo_hex", "flattened", "metadata"].includes(type)) {
       if (attrEnum && !attrEnum.has(v.replace(/^!/, ""))) {
         return fail(`invalid value for ${meta.attribute} in ${term}`);
       }

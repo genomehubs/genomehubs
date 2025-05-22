@@ -1,7 +1,13 @@
 import { attrTypes } from "../functions/attrTypes.js";
 import { histogramAgg } from "../queries/histogramAgg.js";
 
-const attributeTerms = ({ cat, terms, size, yHistograms }) => {
+const attributeTerms = ({
+  cat,
+  terms,
+  size,
+  yHistograms,
+  type = "keyword",
+}) => {
   let filter;
   let filters;
   let attribute;
@@ -18,7 +24,7 @@ const attributeTerms = ({ cat, terms, size, yHistograms }) => {
         if (i > size) {
           break;
         }
-        filters[obj.key] = { term: { "attributes.keyword_value": obj.key } };
+        filters[obj.key] = { term: { [`attributes.${type}_value`]: obj.key } };
       }
       filters = { other_bucket_key: "other", filters: { ...filters } };
     }
@@ -57,7 +63,7 @@ const attributeTerms = ({ cat, terms, size, yHistograms }) => {
             aggs: {
               by_value,
               more_values: {
-                terms: { field: "attributes.keyword_value", size },
+                terms: { field: `attributes.${type}_value`, size },
                 ...(yHistograms && {
                   aggs: {
                     yHistograms,
@@ -245,18 +251,26 @@ const lineageCategory = ({ cats, field, histogram, other }) => {
   };
 };
 
-const termsAgg = ({ field, fixedTerms, lookupTypes, size, yHistograms }) => {
+const termsAgg = ({
+  field,
+  fixedTerms,
+  lookupTypes,
+  size,
+  yHistograms,
+  type,
+}) => {
   if (!field) {
     return;
   }
   let fieldMeta = lookupTypes(field);
   if (fieldMeta) {
-    if (fieldMeta.type == "keyword") {
+    if (fieldMeta.type == "keyword" || fieldMeta.type == "geo_hex") {
       return attributeTerms({
         cat: fieldMeta.name,
         terms: fixedTerms || fieldMeta.name,
         size,
         yHistograms,
+        type: fieldMeta.type,
       });
     }
   } else {
@@ -432,6 +446,7 @@ export const setAggs = async ({
     fixedTerms: fixedTerms || undefined,
     lookupTypes,
     size: fixedTerms ? fixedTerms.size : 5,
+    type: fieldMeta.type,
   });
 
   if (tree) {

@@ -28,6 +28,7 @@ import { MeshPhongMaterial } from "three";
 import NavLink from "../NavLink";
 import Switch from "@mui/material/Switch";
 import ZoomComponent from "../ZoomComponent";
+import { cellToBoundary } from "h3-js";
 import { compose } from "recompose";
 import countriesGeoJson from "../geojson/countries.geojson";
 import dispatchMessage from "../../hocs/dispatchMessage";
@@ -250,6 +251,32 @@ const MarkerComponent = ({
   return markers;
 };
 
+// Utility to convert hexBinCounts to GeoJSON FeatureCollection
+const hexBinsToGeoJson = (hexBinCounts) => {
+  return {
+    type: "FeatureCollection",
+    features: Object.entries(hexBinCounts).map(([h3, count]) => {
+      const coords = cellToBoundary(h3, true);
+      // Ensure polygon is closed (first and last point are the same)
+      if (
+        coords.length > 0 &&
+        (coords[0][0] !== coords[coords.length - 1][0] ||
+          coords[0][1] !== coords[coords.length - 1][1])
+      ) {
+        coords.push([...coords[0]]);
+      }
+      return {
+        type: "Feature",
+        geometry: {
+          type: "Polygon",
+          coordinates: [coords],
+        },
+        properties: { h3, count },
+      };
+    }),
+  };
+};
+
 const Map = ({
   bounds,
   markers,
@@ -266,6 +293,7 @@ const Map = ({
   colorScheme = {},
   theme = "lightTheme",
   pointsData = [],
+  hexBinCounts = {},
 }) => {
   const location = useLocation();
   const globeRef = useRef();
@@ -328,6 +356,13 @@ const Map = ({
   if (width === 0) {
     return null;
   }
+  // HEXBIN LAYER SETUP
+  let hexBinFeatures = [];
+  if (hexBinCounts && Object.keys(hexBinCounts).length > 0) {
+    hexBinFeatures = hexBinsToGeoJson(hexBinCounts).features;
+  }
+  console.log("hexBinFeatures", hexBinFeatures);
+
   if (globeView) {
     // Build combined pointsData with outline and center for each point
     const combinedPointsData = [];
@@ -363,6 +398,24 @@ const Map = ({
           pointRadius={(d) => (d.isOutline ? 0.45 : 0.32)}
           pointResolution={16}
           pointLabel={(d) => d.label}
+          // HEXBIN LAYER
+          hexPolygonsData={hexBinFeatures}
+          hexPolygonPoints={(d) => d.geometry.coordinates[0]}
+          hexPolygonColor={(d) =>
+            mixColor({
+              color1: "#70ff01",
+              color2: "#eeeeee",
+              ratio: Math.min(
+                1,
+                d.properties.count /
+                  Math.max(...hexBinFeatures.map((f) => f.properties.count), 1),
+              ),
+            })
+          }
+          hexPolygonAltitude={0.011}
+          hexPolygonLabel={(d) =>
+            `Hex: ${d.properties.h3}\nCount: ${d.properties.count}`
+          }
         />
       </div>
     );
@@ -388,7 +441,31 @@ const Map = ({
         onCountryClick={onCountryClick}
         repeat={true}
       />
-      {markers}
+      {/* markers */}
+      {hexBinFeatures.length > 0 && (
+        <GeoJSON
+          data={hexBinsToGeoJson(hexBinCounts)}
+          style={(feature) => {
+            const { count } = feature.properties;
+            const maxCount = Math.max(...hexBinFeatures.map((f) => f.count), 1);
+            return {
+              fillColor: mixColor({
+                color1: "#7001ff",
+                color2: "#eeeeee",
+                ratio: Math.min(1, count / maxCount),
+              }),
+              weight: 1,
+              color: "#333",
+              fillOpacity: 0.7,
+            };
+          }}
+          onEachFeature={(feature, layer) => {
+            layer.bindTooltip(
+              `Hex: ${feature.properties.h3} Count: ${feature.properties.count}`,
+            );
+          }}
+        />
+      )}
     </MapContainer>
   );
 };
@@ -419,7 +496,7 @@ const ReportMap = ({
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
-  const [globeView, setGlobeView] = useState(false);
+  const [globeView, setGlobeView] = useState(true);
   useEffect(() => {
     if (message && map && map.status) {
       setMessage(null);
@@ -465,13 +542,12 @@ const ReportMap = ({
       // ]);
     }
     // Use regionCounts from API if available
-    let { regionCounts } = map.report.map || {};
+    let { regionCounts, hexBinCounts } = map.report.map || {};
     if (!regionCounts && map.report.map.map) {
-      ({ regionCounts } = map.report.map.map);
+      ({ regionCounts, hexBinCounts } = map.report.map.map);
     }
     let markers = [];
     let pointsData = [];
-    console.log(pointData);
     // Calculate country counts from regionCounts
     let countryCounts;
     if (!regionCounts || Object.keys(regionCounts).length === 0) {
@@ -483,8 +559,7 @@ const ReportMap = ({
     } else {
       countryCounts = { ...regionCounts };
     }
-    console.log(countryCounts);
-    console.log(pointData);
+
     if (bounds.cats) {
       ({ levels, colors } = setColors({
         colorPalette,
@@ -600,6 +675,7 @@ const ReportMap = ({
           colorScheme={colorScheme}
           theme={theme || "lightTheme"}
           pointsData={pointsData}
+          hexBinCounts={hexBinCounts}
         />
       </Grid>
     );

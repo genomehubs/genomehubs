@@ -97,7 +97,7 @@ export const processHits = ({
         // .replace(/(-01)*$/g, "")
       );
       hasRange = true;
-    } else if (!bucketType.endsWith("keyword")) {
+    } else if (!bucketType.endsWith("keyword") && bucketType == "geo_hex") {
       bucketLabels = bucketValues.map((v) =>
         bucketType == "date" ? v : sci(scaleFunc(v))
       );
@@ -399,7 +399,10 @@ export const processHits = ({
               ...new Set(
                 value
                   .map((v) => {
-                    if (!fieldTypes[name].endsWith("keyword")) {
+                    if (
+                      !fieldTypes[name].endsWith("keyword") &&
+                      !fieldTypes[name] == "geo_hex"
+                    ) {
                       let i;
                       let val = fieldTypes[name] == "date" ? Date.parse(v) : v;
                       for (let [index, bucket] of buckets[

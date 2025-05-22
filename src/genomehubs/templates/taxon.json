@@ -177,6 +177,20 @@
             "type": "geo_point",
             "meta": { "description": "Value of type geo_point" }
           },
+          "geo_hex_value": {
+            "type": "keyword",
+            "ignore_above": 64,
+            "normalizer": "lowercase",
+            "meta": {
+              "description": "Value of type geo_hex, stored as keyword"
+            }
+          },
+          "geo_tile_value": {
+            "type": "keyword",
+            "meta": {
+              "description": "Value of type geo_tile, stopred as keyword"
+            }
+          },
           "date_value": {
             "type": "date",
             "meta": { "description": "Value of type date" }
@@ -402,6 +416,20 @@
               "geo_point_value": {
                 "type": "geo_point",
                 "meta": { "description": "Value of type geo_point" }
+              },
+              "geo_hex_value": {
+                "type": "keyword",
+                "ignore_above": 64,
+                "normalizer": "lowercase",
+                "meta": {
+                  "description": "Value of type geo_hex, stored as keyword"
+                }
+              },
+              "geo_tile_value": {
+                "type": "keyword",
+                "meta": {
+                  "description": "Value of type geo_tile, stopred as keyword"
+                }
               },
               "date_value": {
                 "type": "date",

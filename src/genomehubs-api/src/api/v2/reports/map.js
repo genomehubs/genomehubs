@@ -31,6 +31,7 @@ const getMap = async ({
   yFields,
   cat,
   locationBounds,
+  locationHexBounds,
   bounds,
   yBounds,
   result,
@@ -44,6 +45,7 @@ const getMap = async ({
   let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
   const { field: locationField } = locationBounds || {};
   const { field: regionField } = bounds || {};
+  const { field: locationHex } = locationHexBounds || {};
   let exclusions = setExclusions(params);
 
   let xQuery = {
@@ -85,6 +87,7 @@ const getMap = async ({
   // xQuery.aggs.region_count = { terms: { field: "country_list", size: 500 } };
 
   let locationRes;
+  let hexBinCounts = {};
   if (locationField) {
     let thresholdQuery = {
       ...xQuery,
@@ -107,15 +110,39 @@ const getMap = async ({
         },
       };
     }
+    // console.log(`count: ${count}`);
+    thresholdQuery.aggs = await setAggs({
+      field: locationHex,
+      result,
+      taxonomy,
+      histogram: true,
+      bounds: locationHexBounds,
+    });
+    // console.log(`locationRes: ${JSON.stringify(thresholdQuery, null, 2)}`);
     locationRes = await getResults({
       ...thresholdQuery,
-      size: count,
+      size: locationHex ? 0 : count,
       taxonomy,
-      aggs: undefined,
+      // aggs: undefined,
       req,
     });
     if (!locationRes.status.success) {
       return { status: locationRes.status };
+    }
+
+    if (
+      locationRes.aggs?.aggregations?.sample_hex_bin?.histogram?.by_attribute
+        ?.by_cat?.by_value?.buckets
+    ) {
+      for (const [key, { doc_count }] of Object.entries(
+        locationRes.aggs.aggregations.sample_hex_bin.histogram.by_attribute
+          .by_cat.by_value.buckets
+      )) {
+        if (key == "other") {
+          continue;
+        }
+        hexBinCounts[key] = doc_count;
+      }
     }
   }
   let xRes = await getResults({
@@ -208,7 +235,12 @@ const getMap = async ({
     }
   }
 
-  return { rawData, countryCodes: Array.from(countryCodes), regionCounts };
+  return {
+    rawData,
+    countryCodes: Array.from(countryCodes),
+    regionCounts,
+    hexBinCounts,
+  };
 };
 
 export const map = async ({
@@ -222,6 +254,7 @@ export const map = async ({
   fields,
   locationField = "sample_location",
   regionField = "country_list",
+  locationHex = "sample_hex_bin",
   req,
 }) => {
   let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
@@ -264,12 +297,34 @@ export const map = async ({
       };
     }
   }
+  if (locationHex) {
+    if (!Object.keys(typesMap).includes(locationHex)) {
+      status = {
+        success: false,
+        error: `locationHex: '${locationHex}' not found, no location data available`,
+      };
+    }
+  }
+  if (regionField) {
+    if (!Object.keys(typesMap).includes(regionField)) {
+      status = {
+        success: false,
+        error: `regionField: '${regionField}' not found, no region data available`,
+      };
+    }
+  }
 
   fields = xFields;
 
   // Ensure locationField is always included in fields
   if (locationField && !fields.includes(locationField)) {
     fields = [...fields, locationField];
+  }
+  if (regionField && !fields.includes(regionField)) {
+    fields = [...fields, regionField];
+  }
+  if (locationHex && !fields.includes(locationHex)) {
+    fields = [...fields, locationHex];
   }
 
   if (!x || !aInB(xFields, Object.keys(typesMap))) {
@@ -333,6 +388,7 @@ export const map = async ({
   let bounds;
   let exclusions = setExclusions(params);
   let locationBounds;
+  let locationHexBounds;
   if (locationField) {
     locationBounds = await getBounds({
       params: { ...params },
@@ -352,11 +408,25 @@ export const map = async ({
       };
     }
   }
-  if (regionField && !Object.keys(typesMap).includes(regionField)) {
-    status = {
-      success: false,
-      error: `regionField: '${regionField}' not found, no region data available`,
-    };
+
+  if (locationHex) {
+    locationHexBounds = await getBounds({
+      params: { ...params },
+      fields: [locationHex].concat(xFields).concat(yFields),
+      summaries,
+      cat,
+      result,
+      exclusions,
+      taxonomy,
+      apiParams,
+      opts: ";;500",
+    });
+    if (!locationHexBounds) {
+      status = {
+        success: false,
+        error: `no results contain ${locationHex} data for the current query`,
+      };
+    }
   }
   bounds = await getBounds({
     params: { ...params },
@@ -407,6 +477,7 @@ export const map = async ({
         summaries,
         cat,
         locationBounds,
+        locationHexBounds,
         bounds,
         yBounds,
         x,

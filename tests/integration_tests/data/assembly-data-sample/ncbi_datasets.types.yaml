@@ -16,7 +16,7 @@ attributes:
     header: bioProjectAccession
     organelle: nucleus
     separator:
-    - ;
+      - ;
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   biosample:
@@ -24,7 +24,7 @@ attributes:
     header: biosampleAccession
     organelle: nucleus
     separator:
-    - ;
+      - ;
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   elevation:
@@ -66,9 +66,18 @@ attributes:
   sample_location:
     display_group: sample
     header:
-    - latitude
-    - longitude
-    join: ','
+      - latitude
+      - longitude
+    join: ","
+    organelle: nucleus
+    source: INSDC
+    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
+  sample_hex_bin:
+    display_group: sample
+    header:
+      - latitude
+      - longitude
+    join: ","
     organelle: nucleus
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
@@ -90,8 +99,8 @@ file:
   header: true
   name: ncbi_datasets.tsv
   needs:
-  - ATTR_assembly.types.yaml
-  - ATTR_sample.types.yaml
+    - ATTR_assembly.types.yaml
+    - ATTR_sample.types.yaml
   organelle: nucleus
   source: INSDC
   source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/

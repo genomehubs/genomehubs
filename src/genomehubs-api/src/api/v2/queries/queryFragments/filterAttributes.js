@@ -239,7 +239,7 @@ export const filterAttributes = (
           delete flt.ne;
         }
 
-        if (stat.startsWith("geo_")) {
+        if (stat.startsWith("geo_point")) {
           return {
             bool: {
               [boolOperator]: subsetFn({

@@ -19,6 +19,7 @@ from operator import sub
 from operator import truediv
 from pathlib import Path
 
+import h3
 from tolkein import tofile
 from tolkein import tolog
 
@@ -260,8 +261,19 @@ def test_constraint(value, constraint):
     )
 
 
-def convert_lat_lon(location):
-    """Convert lat and lon to array notation."""
+def convert_lat_lon(location, *, hex=False, tile=False, resolution=3):
+    """Convert lat and lon to array notation.
+
+    Optionally convert to hex or tile format.
+
+    Args:
+        location (str): Latitude and longitude in string format.
+        hex (bool): Convert to hex format.
+        tile (bool): Convert to tile format.
+        resolution (int): Resolution for tile format.
+    Returns:
+        str: Converted latitude and longitude in string format.
+    """
     if location is None or not location:
         return ""
     sign = {"N": "", "E": "", "S": "-", "W": "-"}
@@ -281,6 +293,22 @@ def convert_lat_lon(location):
             return None
     if abs(float(location[0])) > 90 or abs(float(location[1])) > 180:
         return None
+    if hex:
+        # use h3 library to convert lat/lon to hex
+        return h3.latlng_to_cell(float(location[0]), float(location[1]), resolution)
+    if tile:
+        # convert lat/lon to geo tile
+        lat = float(location[0])
+        lon = float(location[1])
+        lat_rad = lat * (3.141592653589793 / 180)
+        n = 2.0**resolution
+        x_tile = int((lon + 180.0) / 360.0 * n)
+        y_tile = int(
+            (1.0 - (1.0 / 3.141592653589793) * (3.141592653589793 + lat_rad)) / 2.0 * n
+        )
+        x_tile = min(max(x_tile, 0), n - 1)
+        y_tile = min(max(y_tile, 0), n - 1)
+        location = [str(x_tile), str(y_tile)]
     return ",".join(location)
 
 
@@ -326,6 +354,10 @@ def convert_to_type(key, raw_value, to_type, *, translate=None):
             value = None
     elif to_type == "geo_point":
         value = convert_lat_lon(raw_value)
+    elif to_type == "geo_hex":
+        value = convert_lat_lon(raw_value, hex=True)
+    # elif to_type == "geo_tile":
+    #     value = convert_lat_lon(raw_value, tile=True)
     elif to_type == "flattened":
         value = json.loads(raw_value)
     else:
