@@ -333,7 +333,7 @@ const Map = ({
     const combinedPointsData = [];
     for (const pt of pointsData) {
       combinedPointsData.push({ ...pt, isOutline: true }); // white outline
-      combinedPointsData.push({ ...pt, isOutline: false }); // colored center
+      combinedPointsData.push({ ...pt, isOutline: false, label: pt.label }); // colored center with label
     }
     return (
       <div style={{ width, height, background: darkColor, marginTop: "1em" }}>
@@ -419,7 +419,7 @@ const ReportMap = ({
   const { width, height } = containerRef
     ? useResize(containerRef)
     : useResize(componentRef);
-  const [globeView, setGlobeView] = useState(true);
+  const [globeView, setGlobeView] = useState(false);
   useEffect(() => {
     if (message && map && map.status) {
       setMessage(null);
@@ -471,8 +471,20 @@ const ReportMap = ({
     }
     let markers = [];
     let pointsData = [];
+    console.log(pointData);
     // Calculate country counts from regionCounts
-    const countryCounts = { ...regionCounts };
+    let countryCounts;
+    if (!regionCounts || Object.keys(regionCounts).length === 0) {
+      countryCounts = {};
+      countriesGeoJson.features.forEach((feature) => {
+        const code = feature.properties.ISO_A2;
+        countryCounts[code] = 0;
+      });
+    } else {
+      countryCounts = { ...regionCounts };
+    }
+    console.log(countryCounts);
+    console.log(pointData);
     if (bounds.cats) {
       ({ levels, colors } = setColors({
         colorPalette,
@@ -527,18 +539,27 @@ const ReportMap = ({
         }
       }
     } else if (globeView) {
+      // Fallback to first key if expected key is missing
+      let key = `all ${searchIndexPlural}`;
+      if (!pointData[key]) {
+        key = Object.keys(pointData)[0];
+      }
       const points = MarkerComponent({
-        geoPoints: pointData[`all ${searchIndexPlural}`],
+        geoPoints: pointData[key],
         color: colors[0],
         options,
         globeView: true,
       });
       pointsData.push(...points);
     } else {
+      let key = `all ${searchIndexPlural}`;
+      if (!pointData[key]) {
+        key = Object.keys(pointData)[0];
+      }
       markers.push(
         <MarkerComponent
           key={0}
-          geoPoints={pointData[`all ${searchIndexPlural}`]}
+          geoPoints={pointData[key]}
           color={colors[0]}
           options={options}
           globeView={false}

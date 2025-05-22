@@ -84,22 +84,43 @@ const getMap = async ({
 
   // xQuery.aggs.region_count = { terms: { field: "country_list", size: 500 } };
 
-  let countRes = await getResultCount(xQuery);
-  if (!countRes.status.success) {
-    return { status: countRes.status };
-  }
-  let { count } = countRes;
-  if (mapThreshold > -1 && count > mapThreshold && locationBounds) {
-    return {
-      status: {
-        success: false,
-        error: `Maps currently limited to ${mapThreshold} results (x query returns ${count}).\nPlease specify additional filters to continue.`,
+  let locationRes;
+  if (locationField) {
+    let thresholdQuery = {
+      ...xQuery,
+      exclusions: {
+        ...xQuery.exclusions,
+        missing: [...xQuery.exclusions.missing, locationField],
       },
+      excludeMissing: [...(xQuery.excludeMissing || []), locationField],
     };
+    let countRes = await getResultCount(thresholdQuery);
+    if (!countRes.status.success) {
+      return { status: countRes.status };
+    }
+    let { count } = countRes;
+    if (mapThreshold > -1 && count > mapThreshold && locationBounds) {
+      return {
+        status: {
+          success: false,
+          error: `Maps currently limited to ${mapThreshold} results (x query returns ${count}).\nPlease specify additional filters to continue.`,
+        },
+      };
+    }
+    locationRes = await getResults({
+      ...thresholdQuery,
+      size: count,
+      taxonomy,
+      aggs: undefined,
+      req,
+    });
+    if (!locationRes.status.success) {
+      return { status: locationRes.status };
+    }
   }
   let xRes = await getResults({
     ...xQuery,
-    size: locationField ? count : 0,
+    size: 0,
     taxonomy,
     req,
   });
@@ -131,7 +152,7 @@ const getMap = async ({
       cats = new Set(bounds.cats.map(({ key }) => key));
     }
     let coordFields = [locationField];
-    for (let result of xRes.results) {
+    for (let result of locationRes.results) {
       let cat;
       if (bounds.cat) {
         if (bounds.by == "attribute") {
@@ -170,17 +191,6 @@ const getMap = async ({
         continue;
       }
       let { aggregation_source } = result.result.fields[coordFieldUsed] || {};
-      // Collect country_code if available
-      let country_code =
-        result.result.fields.country_list &&
-        result.result.fields.country_list.value;
-      if (country_code) {
-        if (Array.isArray(country_code)) {
-          country_code.forEach((code) => countryCodes.add(code));
-        } else {
-          countryCodes.add(country_code);
-        }
-      }
       rawData[cat].push({
         ...(result.result.scientific_name && {
           scientific_name: result.result.scientific_name,
@@ -193,7 +203,7 @@ const getMap = async ({
         coords,
         aggregation_source,
         cat,
-        ...(country_code && { country_code }),
+        // ...(country_code && { country_code }),
       });
     }
   }
@@ -253,8 +263,13 @@ export const map = async ({
         error: `locationField: '${locationField}' not found, no location data available`,
       };
     }
-    xFields = [...new Set([locationField, ...searchFields])];
-    fields = xFields;
+  }
+
+  fields = xFields;
+
+  // Ensure locationField is always included in fields
+  if (locationField && !fields.includes(locationField)) {
+    fields = [...fields, locationField];
   }
 
   if (!x || !aInB(xFields, Object.keys(typesMap))) {
@@ -321,11 +336,7 @@ export const map = async ({
   if (locationField) {
     locationBounds = await getBounds({
       params: { ...params },
-      fields: xFields
-        .concat(yFields)
-        .filter(
-          (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
-        ),
+      fields: [locationField].concat(xFields).concat(yFields),
       summaries,
       cat,
       result,
@@ -341,28 +352,30 @@ export const map = async ({
       };
     }
   }
-  if (regionField) {
-    if (!Object.keys(typesMap).includes(regionField)) {
-      status = {
-        success: false,
-        error: `regionField: '${regionField}' not found, no region data available`,
-      };
-    }
-    bounds = await getBounds({
-      params: { ...params },
-      fields: [regionField].concat(xFields).concat(yFields),
-      // .filter(
-      //   (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
-      // ),
-      summaries,
-      cat,
-      result,
-      exclusions,
-      taxonomy,
-      apiParams,
-      opts: ";;500",
-    });
+  if (regionField && !Object.keys(typesMap).includes(regionField)) {
+    status = {
+      success: false,
+      error: `regionField: '${regionField}' not found, no region data available`,
+    };
   }
+  bounds = await getBounds({
+    params: { ...params },
+    fields: regionField
+      ? [regionField].concat(xFields).concat(yFields)
+      : xFields
+          .concat(yFields)
+          .filter(
+            (field) =>
+              lookupTypes(field) && lookupTypes(field).type != "keyword"
+          ),
+    summaries,
+    cat,
+    result,
+    exclusions,
+    taxonomy,
+    apiParams,
+    opts: regionField ? ";;500" : undefined,
+  });
   if (!bounds) {
     status = {
       success: false,
