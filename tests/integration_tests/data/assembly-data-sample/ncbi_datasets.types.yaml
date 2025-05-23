@@ -72,15 +72,6 @@ attributes:
     organelle: nucleus
     source: INSDC
     source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
-  sample_hex_bin:
-    display_group: sample
-    header:
-      - latitude
-      - longitude
-    join: ","
-    organelle: nucleus
-    source: INSDC
-    source_url_stub: https://www.ncbi.nlm.nih.gov/assembly/
   sample_sex:
     display_group: sample
     header: sex

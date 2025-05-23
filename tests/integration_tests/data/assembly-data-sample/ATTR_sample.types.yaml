@@ -109,14 +109,3 @@ attributes:
     taxon_traverse: list
     taxon_traverse_direction: up
     taxon_display_level: 2
-  sample_hex_bin:
-    h3res: 6
-    display_level: 2
-    display_name: geo_hex
-    type: geo_hex
-    taxon_display_group: sample
-    taxon_summary:
-      - list
-    taxon_traverse: list
-    taxon_traverse_direction: up
-    taxon_display_level: 2
