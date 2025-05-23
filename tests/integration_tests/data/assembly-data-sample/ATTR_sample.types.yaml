@@ -102,6 +102,10 @@ attributes:
     taxon_display_group: sample
     taxon_summary:
       - list
+      - hexbin1
+      - hexbin2
+      - hexbin3
+      - hexbin4
     taxon_traverse: list
     taxon_traverse_direction: up
     taxon_display_level: 2

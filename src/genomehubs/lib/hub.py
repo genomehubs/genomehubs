@@ -19,7 +19,7 @@ from operator import sub
 from operator import truediv
 from pathlib import Path
 
-import h3
+from h3 import latlng_to_cell
 from tolkein import tofile
 from tolkein import tolog
 
@@ -295,7 +295,7 @@ def convert_lat_lon(location, *, hex=False, tile=False, resolution=3):
         return None
     if hex:
         # use h3 library to convert lat/lon to hex
-        return h3.latlng_to_cell(float(location[0]), float(location[1]), resolution)
+        return latlng_to_cell(float(location[0]), float(location[1]), resolution)
     if tile:
         # convert lat/lon to geo tile
         lat = float(location[0])

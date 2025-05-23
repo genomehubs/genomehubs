@@ -331,6 +331,36 @@
             "type": "float",
             "meta": { "description": "Standard deviation (numeric types only)" }
           },
+          "hexbin1": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "H3 hexbin value (resolution 1)" }
+          },
+          "hexbin2": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "H3 hexbin value (resolution 2)" }
+          },
+          "hexbin3": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "H3 hexbin value (resolution 3)" }
+          },
+          "hexbin4": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "H3 hexbin value (resolution 4)" }
+          },
+          "hexbin5": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "H3 hexbin value (resolution 5)" }
+          },
+          "hexbin6": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "H3 hexbin value (resolution 6)" }
+          },
           "metadata": {
             "type": "flattened",
             "eager_global_ordinals": true,
