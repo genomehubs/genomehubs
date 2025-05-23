@@ -173,7 +173,7 @@ export const getMap = async ({
   return {
     status,
     report: {
-      map: report,
+      ...report, // <-- flatten the map data here
       xQuery,
       // yQuery,
       xLabel,
