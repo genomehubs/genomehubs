@@ -22,6 +22,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import Globe from "react-globe.gl";
 import Grid from "@mui/material/Grid2";
+import MarkerComponent from "./functions/MarkerComponent";
 import { MeshPhongMaterial } from "three";
 import NavLink from "../NavLink";
 import Skeleton from "@mui/material/Skeleton";
@@ -30,28 +31,17 @@ import { cellToBoundary } from "h3-js";
 import { compose } from "recompose";
 import countriesGeoJson from "../geojson/countries.geojson";
 import dispatchMessage from "../../hocs/dispatchMessage";
+import getCountryColor from "./functions/getCountryColor";
+import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
 import { mixColor } from "../../functions/mixColor";
 import qs from "../../functions/qs";
 import setColors from "../../functions/setColors";
+import shiftFeature from "./functions/shiftFeature";
 import useResize from "../../hooks/useResize";
 import withColors from "#hocs/withColors";
 import withSearchIndex from "../../hocs/withSearchIndex";
 import withSiteName from "#hocs/withSiteName";
-
-// Utility to get color based on count
-function getCountryColor(
-  count,
-  maxCount,
-  baseColor = "#ff7001",
-  baseBg = "#eeeeee",
-) {
-  if (!count) {
-    return baseBg;
-  }
-  // Blend baseColor with baseBg proportional to count
-  const ratio = count / maxCount;
-  return mixColor({ color1: baseColor, color2: baseBg, ratio });
-}
+import withTheme from "#hocs/withTheme";
 
 // Default region attribute (user-editable in future)
 const REGION_ATTRIBUTE = "country_code";
@@ -67,39 +57,9 @@ const CountryLayer = ({
   // Find max count for color scaling
   const maxCount = Math.max(...Object.values(countryCounts), 1);
 
-  // Helper to shift a polygon's longitude
-  const shiftFeature = (feature, shift) => {
-    const newFeature = JSON.parse(JSON.stringify(feature));
-    const shiftCoords = (coords) => {
-      return coords.map((c) =>
-        Array.isArray(c[0]) ? shiftCoords(c) : [c[0] + shift, c[1]],
-      );
-    };
-    if (feature.geometry.type === "Polygon") {
-      newFeature.geometry.coordinates = shiftCoords(
-        feature.geometry.coordinates,
-      );
-    } else if (feature.geometry.type === "MultiPolygon") {
-      newFeature.geometry.coordinates =
-        feature.geometry.coordinates.map(shiftCoords);
-    }
-    return newFeature;
-  };
-
-  // Build repeated features
-  let { features } = countriesGeoJson;
-  if (repeat) {
-    const shifts = [-360, 0, 360];
-    features = shifts.flatMap((shift) =>
-      shift === 0
-        ? countriesGeoJson.features
-        : countriesGeoJson.features.map((f) => shiftFeature(f, shift)),
-    );
-  }
-
   return (
     <GeoJSON
-      data={{ type: "FeatureCollection", features }}
+      data={{ type: "FeatureCollection", features: countriesGeoJson.features }}
       style={(feature) => ({
         fillColor: getCountryColor(
           countryCounts[feature.properties.ISO_A2],
@@ -150,148 +110,6 @@ const SingleMarker = ({
   );
 };
 
-const MarkerComponent = ({
-  geoPoints = [],
-  color,
-  meta,
-  options,
-  taxonId,
-  setHighlightPointLocation = () => {},
-  basename,
-  globeView = false,
-}) => {
-  if (globeView) {
-    // Return array of point data objects for react-globe.gl
-    let points = [];
-    for (const obj of geoPoints) {
-      const { coords: rawCoords } = obj;
-      const coords = Array.isArray(rawCoords) ? rawCoords : [rawCoords];
-      for (const latLon of coords) {
-        if (!latLon) {
-          continue;
-        }
-        const arr = latLon.split(",");
-        if (arr.length !== 2) {
-          continue;
-        }
-        const lat = parseFloat(arr[0]);
-        const lng = parseFloat(arr[1]);
-        if (isNaN(lat) || isNaN(lng)) {
-          continue;
-        }
-        // Build label string similar to map marker
-        let message = obj.scientific_name ? `${obj.scientific_name} - ` : "";
-        let link;
-        if (obj.sampleId) {
-          link = `${basename || ""}/record?recordId=${obj.sampleId}&result=sample&taxonomy=${options.taxonomy}`;
-          message += obj.sampleId ? `Sample: ${obj.sampleId}` : "";
-        } else if (obj.taxonId) {
-          const newOptions = {
-            query: `tax_tree(${obj.taxonId}) AND sample_location=${latLon}`,
-            result: "sample",
-            taxonomy: options.taxonomy,
-          };
-          const url = `${basename || ""}/search?${qs.stringify(newOptions)}`;
-          link = url;
-          message += "Click to view samples from this location";
-        }
-        // For globe tooltip, use plain text (no HTML/JSX)
-        let label = message;
-        if (link) {
-          label += `\n${link}`;
-        }
-        points.push({
-          lat,
-          lng,
-          color,
-          label,
-          ...obj,
-        });
-      }
-    }
-    return points;
-  }
-
-  let markers = [];
-  let i = 0;
-  for (const obj of geoPoints) {
-    const { coords: rawCoords } = obj;
-    const coords = Array.isArray(rawCoords) ? rawCoords : [rawCoords];
-    for (const latLon of coords) {
-      if (!latLon) {
-        continue;
-      }
-      const arr = latLon.split(",");
-      let message = obj.scientific_name ? `${obj.scientific_name} - ` : "";
-      let link;
-      if (obj.sampleId) {
-        link = (
-          <NavLink
-            url={`${basename || ""}/record?recordId=${
-              obj.sampleId
-            }&result=sample&taxonomy=${options.taxonomy}`}
-          >
-            {obj.sampleId}
-          </NavLink>
-        );
-      } else if (obj.taxonId) {
-        const newOptions = {
-          query: `tax_tree(${obj.taxonId}) AND sample_location=${latLon}`,
-          result: "sample",
-          taxonomy: options.taxonomy,
-        };
-        const url = `${basename || ""}/search?${qs.stringify(newOptions)}`;
-        link = (
-          <NavLink url={url}>click to view samples from this location</NavLink>
-        );
-      }
-      message = (
-        <>
-          {message} {link}
-        </>
-      );
-      markers.push(
-        <SingleMarker
-          key={i}
-          position={arr}
-          color={color}
-          setHighlightPointLocation={setHighlightPointLocation}
-        >
-          <Popup>{message}</Popup>
-        </SingleMarker>,
-      );
-      i++;
-    }
-  }
-  return markers;
-};
-
-// Utility to convert hexBinCounts to GeoJSON FeatureCollection
-const hexBinsToGeoJson = (hexBinCounts) => {
-  return {
-    type: "FeatureCollection",
-    features: Object.entries(hexBinCounts).map(([h3, count]) => {
-      const coords = cellToBoundary(h3, true);
-      // Ensure polygon is closed (first and last point are the same)
-      if (
-        coords.length > 0 &&
-        (coords[0][0] !== coords[coords.length - 1][0] ||
-          coords[0][1] !== coords[coords.length - 1][1])
-      ) {
-        coords.push([...coords[0]]);
-      }
-      return {
-        type: "Feature",
-        geometry: {
-          type: "Polygon",
-          coordinates: [coords],
-        },
-        properties: { h3, count },
-      };
-    }),
-  };
-};
-
 const Map = ({
   bounds,
   markers,
@@ -324,11 +142,16 @@ const Map = ({
     centerLon = (bounds[0][1] + bounds[1][1]) / 2;
   }
   const darkColor = colorScheme?.[theme]?.darkColor || "#222a38";
+  const lightColor = colorScheme?.[theme]?.lightColor || "#fff";
   const maxCount = useMemo(
     () => Math.max(...Object.values(countryCounts), 1),
     [countryCounts],
   );
-  const baseCountryBg = nightMode ? "#22262a" : "#eeeeee";
+  const baseCountryBg = nightMode
+    ? "#22262a"
+    : theme === "darkTheme"
+      ? darkColor
+      : "#eeeeee";
   const countryOutlineColor = nightMode ? "#ffa870" : "#333";
   const countryOutlineGlow = nightMode;
   const getPolyColor = useCallback(
@@ -426,7 +249,11 @@ const Map = ({
       combinedPointsData.push({ ...pt, isOutline: true }); // white outline
       combinedPointsData.push({ ...pt, isOutline: false, label: pt.label }); // colored center with label
     }
-    const globeBg = nightMode ? "#0a0a1a" : darkColor;
+    const globeBg = nightMode
+      ? "#0a0a1a"
+      : theme === "darkTheme"
+        ? lightColor
+        : darkColor;
     const globeBgImg = nightMode
       ? "https://raw.githubusercontent.com/vasturiano/three-globe/master/example/img/night-sky.png"
       : null;
@@ -452,7 +279,11 @@ const Map = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              background: nightMode ? "#0a0a1a" : "#fff",
+              background: nightMode
+                ? "#0a0a1a"
+                : theme === "darkTheme"
+                  ? darkColor
+                  : "#fff",
               opacity: 0.85,
               zIndex: 10,
             }}
@@ -463,7 +294,7 @@ const Map = ({
               width={Math.max(Math.min(width, height) * 0.75, 200)}
               height={Math.max(Math.min(width, height) * 0.75, 200)}
               animation="wave"
-              sx={{ bgcolor: nightMode ? "#222" : undefined }}
+              sx={{ bgcolor: nightMode ? "#444" : "#f3f3f3" }}
             />
           </div>
         )}
@@ -596,6 +427,7 @@ const ReportMap = ({
   const size = useResize(containerRef || componentRef);
   const { width, height } = size;
   const [globeView, setGlobeView] = useState(true);
+  console.log(theme);
   const [nightMode, setNightMode] = useState(theme === "darkTheme");
   const [globeLoading, setGlobeLoading] = useState(true);
   useEffect(() => {
@@ -758,9 +590,14 @@ const ReportMap = ({
             top: 20,
             background: nightMode
               ? "rgba(30,30,30,0.85)"
-              : "rgba(255,255,255,0.85)",
+              : theme === "darkTheme"
+                ? "rgba(34,42,56,0.85)"
+                : "rgba(255,255,255,0.85)",
             borderRadius: 12,
-            boxShadow: nightMode ? "0 2px 8px #0008" : "0 2px 8px #8882",
+            boxShadow:
+              nightMode || theme === "darkTheme"
+                ? "0 2px 8px #0008"
+                : "0 2px 8px #8882",
             padding: "0.5em 1em",
           }}
         >
@@ -769,9 +606,11 @@ const ReportMap = ({
               <Switch
                 checked={globeView}
                 onClick={() => setGlobeView(!globeView)}
-                color={nightMode ? "default" : "primary"}
+                color={
+                  nightMode || theme === "darkTheme" ? "default" : "primary"
+                }
                 sx={
-                  nightMode
+                  nightMode || theme === "darkTheme"
                     ? {
                         "& .MuiSwitch-switchBase": {
                           color: "#bbb",
@@ -780,7 +619,7 @@ const ReportMap = ({
                           color: "#ffa870",
                         },
                         "& .MuiSwitch-track": {
-                          backgroundColor: "#888", // lighter track for night mode
+                          backgroundColor: "#888",
                         },
                       }
                     : {}
@@ -788,16 +627,18 @@ const ReportMap = ({
               />
             }
             label={globeView ? "Globe" : "Map"}
-            sx={nightMode ? { color: "#eee" } : {}}
+            sx={nightMode || theme === "darkTheme" ? { color: "#eee" } : {}}
           />
           <FormControlLabel
             control={
               <Switch
                 checked={nightMode}
                 onClick={() => setNightMode(!nightMode)}
-                color={nightMode ? "default" : "primary"}
+                color={
+                  nightMode || theme === "darkTheme" ? "default" : "primary"
+                }
                 sx={
-                  nightMode
+                  nightMode || theme === "darkTheme"
                     ? {
                         "& .MuiSwitch-switchBase": {
                           color: "#bbb",
@@ -806,7 +647,7 @@ const ReportMap = ({
                           color: "#ffa870",
                         },
                         "& .MuiSwitch-track": {
-                          backgroundColor: "#888", // lighter track for night mode
+                          backgroundColor: "#888",
                         },
                       }
                     : {}
@@ -814,7 +655,7 @@ const ReportMap = ({
               />
             }
             label={nightMode ? "Night" : "Day"}
-            sx={nightMode ? { color: "#eee" } : {}}
+            sx={nightMode || theme === "darkTheme" ? { color: "#eee" } : {}}
           />
         </FormGroup>
         {/* Map or Globe rendering logic goes here */}
@@ -843,5 +684,6 @@ export default compose(
   withSiteName,
   dispatchMessage,
   withColors,
+  withTheme,
   withSearchIndex,
 )(ReportMap);
