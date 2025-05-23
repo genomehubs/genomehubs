@@ -95,7 +95,7 @@ const CountryLayer = ({ countryCounts, onCountryClick, repeat = false }) => {
           countryCounts[feature.properties.ISO_A2],
           maxCount,
         ),
-        weight: 1,
+        weight: 0.5,
         color: "#333",
         fillOpacity: 0.7,
       })}
@@ -361,7 +361,11 @@ const Map = ({
   if (hexBinCounts && Object.keys(hexBinCounts).length > 0) {
     hexBinFeatures = hexBinsToGeoJson(hexBinCounts).features;
   }
-  console.log("hexBinFeatures", hexBinFeatures);
+
+  const maxBinCount = Math.max(
+    ...hexBinFeatures.map((f) => f.properties.count),
+    1,
+  );
 
   if (globeView) {
     // Build combined pointsData with outline and center for each point
@@ -400,19 +404,17 @@ const Map = ({
           pointLabel={(d) => d.label}
           // HEXBIN LAYER
           hexPolygonsData={hexBinFeatures}
+          hexPolygonResolution={2}
+          hexPolygonMargin={0.05}
           hexPolygonPoints={(d) => d.geometry.coordinates[0]}
           hexPolygonColor={(d) =>
             mixColor({
               color1: "#70ff01",
               color2: "#eeeeee",
-              ratio: Math.min(
-                1,
-                d.properties.count /
-                  Math.max(...hexBinFeatures.map((f) => f.properties.count), 1),
-              ),
-            })
+              ratio: Math.min(1, d.properties.count / maxBinCount),
+            }) + "cc"
           }
-          hexPolygonAltitude={0.011}
+          hexPolygonAltitude={0.015}
           hexPolygonLabel={(d) =>
             `Hex: ${d.properties.h3}\nCount: ${d.properties.count}`
           }
@@ -420,6 +422,7 @@ const Map = ({
       </div>
     );
   }
+
   return (
     <MapContainer
       bounds={bounds}
@@ -446,17 +449,17 @@ const Map = ({
         <GeoJSON
           data={hexBinsToGeoJson(hexBinCounts)}
           style={(feature) => {
+            console.log(maxCount);
             const { count } = feature.properties;
-            const maxCount = Math.max(...hexBinFeatures.map((f) => f.count), 1);
+            const fillColor = mixColor({
+              color1: "#70ff01",
+              color2: "#eeeeee",
+              ratio: Math.min(1, count / maxBinCount),
+            });
             return {
-              fillColor: mixColor({
-                color1: "#7001ff",
-                color2: "#eeeeee",
-                ratio: Math.min(1, count / maxCount),
-              }),
-              weight: 1,
-              color: "#333",
-              fillOpacity: 0.7,
+              fillColor,
+              color: "none",
+              fillOpacity: 0.8,
             };
           }}
           onEachFeature={(feature, layer) => {

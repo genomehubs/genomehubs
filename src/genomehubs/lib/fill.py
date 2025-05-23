@@ -246,14 +246,24 @@ def hex_bin(arr, resolution=6):
     """Convert list of point coordinates to h3 hexagons."""
     hexagons = []
     for coord in deduped_list(arr):
-        if isinstance(coord, list):
-            hexagons += [
-                latlng_to_cell(float(lat), float(lon), resolution) for lat, lon in coord
-            ]
-        else:
-            hexagons.append(
-                latlng_to_cell(float(coord[0]), float(coord[1]), resolution)
-            )
+        if isinstance(coord, str):
+            # Handle comma-separated string "lat,lon"
+            lat_str, lon_str = coord.split(",")
+            lat, lon = float(lat_str.strip()), float(lon_str.strip())
+            hexagons.append(latlng_to_cell(lat, lon, resolution))
+        elif isinstance(coord, list):
+            # Handle list of [lat, lon] or list of such lists/strings
+            for item in coord:
+                if isinstance(item, str):
+                    lat_str, lon_str = item.split(",")
+                    lat, lon = float(lat_str.strip()), float(lon_str.strip())
+                    hexagons.append(latlng_to_cell(lat, lon, resolution))
+                elif isinstance(item, (list, tuple)) and len(item) == 2:
+                    lat, lon = float(item[0]), float(item[1])
+                    hexagons.append(latlng_to_cell(lat, lon, resolution))
+        elif isinstance(coord, (tuple, list)) and len(coord) == 2:
+            lat, lon = float(coord[0]), float(coord[1])
+            hexagons.append(latlng_to_cell(lat, lon, resolution))
     return deduped_list(hexagons)
 
 

@@ -45,7 +45,8 @@ const getMap = async ({
   let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
   const { field: locationField } = locationBounds || {};
   const { field: regionField } = bounds || {};
-  const { field: locationHex } = locationHexBounds || {};
+  const { field: locationHex, summary: locationSummary } =
+    locationHexBounds || {};
   let exclusions = setExclusions(params);
 
   let xQuery = {
@@ -112,7 +113,8 @@ const getMap = async ({
     }
     // console.log(`count: ${count}`);
     thresholdQuery.aggs = await setAggs({
-      field: locationHex,
+      field: locationField,
+      summary: locationSummary,
       result,
       taxonomy,
       histogram: true,
@@ -121,7 +123,7 @@ const getMap = async ({
     // console.log(`locationRes: ${JSON.stringify(thresholdQuery, null, 2)}`);
     locationRes = await getResults({
       ...thresholdQuery,
-      size: locationHex ? 0 : count,
+      size: locationSummary != "value" ? 0 : count,
       taxonomy,
       // aggs: undefined,
       req,
@@ -131,11 +133,11 @@ const getMap = async ({
     }
 
     if (
-      locationRes.aggs?.aggregations?.sample_hex_bin?.histogram?.by_attribute
+      locationRes.aggs?.aggregations?.[locationField]?.histogram?.by_attribute
         ?.by_cat?.by_value?.buckets
     ) {
       for (const [key, { doc_count }] of Object.entries(
-        locationRes.aggs.aggregations.sample_hex_bin.histogram.by_attribute
+        locationRes.aggs.aggregations[locationField].histogram.by_attribute
           .by_cat.by_value.buckets
       )) {
         if (key == "other") {
@@ -253,8 +255,9 @@ export const map = async ({
   apiParams,
   fields,
   locationField = "sample_location",
-  regionField = "country_list",
-  locationHex = "sample_hex_bin",
+  locationSummary = "hexbin2",
+  regionField, // = "country_list",
+  locationHex, // = "sample_hex_bin",
   req,
 }) => {
   let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
@@ -295,6 +298,23 @@ export const map = async ({
         success: false,
         error: `locationField: '${locationField}' not found, no location data available`,
       };
+    }
+    if (locationSummary) {
+      let found = false;
+      if (typesMap[locationField].summary) {
+        if (Array.isArray(typesMap[locationField].summary)) {
+          found = typesMap[locationField].summary.includes(locationSummary);
+        } else {
+          found = typesMap[locationField].summary == locationSummary;
+        }
+      }
+
+      if (!found) {
+        status = {
+          success: false,
+          error: `locationSummary: '${locationSummary}' not found, no location data available`,
+        };
+      }
     }
   }
   if (locationHex) {
@@ -409,11 +429,11 @@ export const map = async ({
     }
   }
 
-  if (locationHex) {
+  if (locationField) {
     locationHexBounds = await getBounds({
       params: { ...params },
-      fields: [locationHex].concat(xFields).concat(yFields),
-      summaries,
+      fields: [locationField].concat(xFields).concat(yFields),
+      summaries: [locationSummary].concat(summaries),
       cat,
       result,
       exclusions,
@@ -424,7 +444,7 @@ export const map = async ({
     if (!locationHexBounds) {
       status = {
         success: false,
-        error: `no results contain ${locationHex} data for the current query`,
+        error: `no results contain ${locationSummary}(${locationField}) data for the current query`,
       };
     }
   }

@@ -7,6 +7,7 @@ const attributeTerms = ({
   size,
   yHistograms,
   type = "keyword",
+  summary = "value",
 }) => {
   let filter;
   let filters;
@@ -15,6 +16,13 @@ const attributeTerms = ({
     attribute = terms.cat || cat;
     terms = terms.terms;
   }
+  let field;
+  if (summary == "value") {
+    field = `attributes.${type}_value`;
+  } else {
+    field = `attributes.${summary}`;
+  }
+
   if (Array.isArray(terms)) {
     if (terms.length > 0) {
       filters = {};
@@ -24,7 +32,7 @@ const attributeTerms = ({
         if (i > size) {
           break;
         }
-        filters[obj.key] = { term: { [`attributes.${type}_value`]: obj.key } };
+        filters[obj.key] = { term: { [field]: obj.key } };
       }
       filters = { other_bucket_key: "other", filters: { ...filters } };
     }
@@ -63,7 +71,7 @@ const attributeTerms = ({
             aggs: {
               by_value,
               more_values: {
-                terms: { field: `attributes.${type}_value`, size },
+                terms: { field, size },
                 ...(yHistograms && {
                   aggs: {
                     yHistograms,
@@ -258,19 +266,25 @@ const termsAgg = ({
   size,
   yHistograms,
   type,
+  summary = "value",
 }) => {
   if (!field) {
     return;
   }
   let fieldMeta = lookupTypes(field);
   if (fieldMeta) {
-    if (fieldMeta.type == "keyword" || fieldMeta.type == "geo_hex") {
+    if (
+      fieldMeta.type == "keyword" ||
+      fieldMeta.type == "geo_hex" ||
+      (fieldMeta.type == "geo_point" && summary.startsWith("hexbin"))
+    ) {
       return attributeTerms({
         cat: fieldMeta.name,
         terms: fixedTerms || fieldMeta.name,
         size,
         yHistograms,
         type: fieldMeta.type,
+        summary,
       });
     }
   } else {
@@ -379,6 +393,7 @@ export const setAggs = async ({
     if (fixedTerms && fixedTerms.terms) {
       histogram = termsAgg({
         field,
+        summary,
         fixedTerms: fixedTerms,
         lookupTypes,
         size: bounds.stats.size,
@@ -388,6 +403,7 @@ export const setAggs = async ({
       let boundsTerms = { terms: bounds.stats.cats };
       histogram = termsAgg({
         field,
+        summary,
         fixedTerms: boundsTerms,
         lookupTypes,
         size: bounds.stats.size,
@@ -441,13 +457,16 @@ export const setAggs = async ({
     };
   }
   terms = termsAgg({ field: terms, lookupTypes, size });
-  keywords = termsAgg({
-    field: keywords,
-    fixedTerms: fixedTerms || undefined,
-    lookupTypes,
-    size: fixedTerms ? fixedTerms.size : 5,
-    type: fieldMeta.type,
-  });
+  if (keywords) {
+    keywords = termsAgg({
+      field: keywords,
+      fixedTerms: fixedTerms || undefined,
+      lookupTypes,
+      size: fixedTerms ? fixedTerms.size : 5,
+      type: fieldMeta.type,
+      summary,
+    });
+  }
 
   if (tree) {
     tree = treeAgg();

@@ -207,7 +207,11 @@ export const getBounds = async ({
         extra = { keywords: field };
       }
     } else if (fieldMeta.type == "geo_point") {
-      extra = { geo: true };
+      if (summary.startsWith("hexbin")) {
+        extra = { keywords: field };
+      } else {
+        extra = { geo: true };
+      }
     } else {
       extra = { stats: true };
     }
@@ -412,6 +416,7 @@ export const getBounds = async ({
   }
   return {
     field,
+    summary,
     scale: scaleType,
     query: params.query,
     stats,
