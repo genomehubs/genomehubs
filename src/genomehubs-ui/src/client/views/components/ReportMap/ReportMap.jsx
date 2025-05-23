@@ -9,7 +9,6 @@ import {
   Popup,
   TileLayer,
 } from "react-leaflet";
-import MultiCatLegend, { processLegendData } from "../MultiCatLegend";
 import React, {
   useCallback,
   useEffect,
@@ -23,11 +22,10 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import Globe from "react-globe.gl";
 import Grid from "@mui/material/Grid2";
-import LocationMapHighlightIcon from "../LocationMapHighlightIcon";
 import { MeshPhongMaterial } from "three";
 import NavLink from "../NavLink";
+import Skeleton from "@mui/material/Skeleton";
 import Switch from "@mui/material/Switch";
-import ZoomComponent from "../ZoomComponent";
 import { cellToBoundary } from "h3-js";
 import { compose } from "recompose";
 import countriesGeoJson from "../geojson/countries.geojson";
@@ -41,19 +39,31 @@ import withSearchIndex from "../../hocs/withSearchIndex";
 import withSiteName from "#hocs/withSiteName";
 
 // Utility to get color based on count
-function getCountryColor(count, maxCount, baseColor = "#ff7001") {
+function getCountryColor(
+  count,
+  maxCount,
+  baseColor = "#ff7001",
+  baseBg = "#eeeeee",
+) {
   if (!count) {
-    return "#eee";
+    return baseBg;
   }
-  // Blend baseColor with #eeeeee proportional to count
+  // Blend baseColor with baseBg proportional to count
   const ratio = count / maxCount;
-  return mixColor({ color1: baseColor, color2: "#eeeeee", ratio });
+  return mixColor({ color1: baseColor, color2: baseBg, ratio });
 }
 
 // Default region attribute (user-editable in future)
 const REGION_ATTRIBUTE = "country_code";
 
-const CountryLayer = ({ countryCounts, onCountryClick, repeat = false }) => {
+const CountryLayer = ({
+  countryCounts,
+  onCountryClick,
+  repeat = false,
+  baseBg = "#eeeeee",
+  outlineColor = "#333",
+  outlineGlow = false,
+}) => {
   // Find max count for color scaling
   const maxCount = Math.max(...Object.values(countryCounts), 1);
 
@@ -94,10 +104,15 @@ const CountryLayer = ({ countryCounts, onCountryClick, repeat = false }) => {
         fillColor: getCountryColor(
           countryCounts[feature.properties.ISO_A2],
           maxCount,
+          undefined,
+          baseBg,
         ),
-        weight: 0.5,
-        color: "#333",
+        weight: 0.7, // thinner border for better appearance when zoomed out
+        color: outlineColor,
         fillOpacity: 0.7,
+        ...(outlineGlow && {
+          filter: "drop-shadow(0 0 6px " + outlineColor + ")",
+        }),
       })}
       onEachFeature={(feature, layer) => {
         const code = feature.properties.ISO_A2;
@@ -294,9 +309,13 @@ const Map = ({
   theme = "lightTheme",
   pointsData = [],
   hexBinCounts = {},
+  nightMode = false,
 }) => {
   const location = useLocation();
   const globeRef = useRef();
+  const mapContainerRef = useRef(); // always call useRef, unconditionally
+  const [globeLoading, setGlobeLoading] = useState(true); // <-- ensure this is defined in Map
+  const [showGlobe, setShowGlobe] = useState(false); // <-- move this up to top-level, before any conditional logic
   // Calculate center of bounds for zoom
   let centerLat = 0,
     centerLon = 0;
@@ -309,9 +328,18 @@ const Map = ({
     () => Math.max(...Object.values(countryCounts), 1),
     [countryCounts],
   );
+  const baseCountryBg = nightMode ? "#22262a" : "#eeeeee";
+  const countryOutlineColor = nightMode ? "#ffa870" : "#333";
+  const countryOutlineGlow = nightMode;
   const getPolyColor = useCallback(
-    (d) => getCountryColor(countryCounts[d.properties.ISO_A2], maxCount),
-    [countryCounts, maxCount],
+    (d) =>
+      getCountryColor(
+        countryCounts[d.properties.ISO_A2],
+        maxCount,
+        undefined,
+        baseCountryBg,
+      ),
+    [countryCounts, maxCount, baseCountryBg],
   );
   const getPolyLabel = useCallback(
     (d) => `${d.properties.ADMIN}: ${countryCounts[d.properties.ISO_A2] || 0}`,
@@ -323,10 +351,46 @@ const Map = ({
     (d) => onCountryClick(d.properties.ISO_A2),
     [onCountryClick],
   );
+  // Imperatively update Leaflet container background on color change
   useEffect(() => {
-    if (globeView && globeRef.current) {
+    if (!globeView && mapContainerRef.current) {
+      // Always query for .leaflet-container inside the wrapper div
+      const leaflet =
+        mapContainerRef.current.querySelector(".leaflet-container");
+      if (leaflet) {
+        leaflet.style.background = oceanColor;
+      }
+    }
+  }, [oceanColor, globeView, nightMode]);
+
+  // HEXBIN LAYER SETUP
+  let hexBinFeatures = [];
+  if (hexBinCounts && Object.keys(hexBinCounts).length > 0) {
+    hexBinFeatures = hexBinsToGeoJson(hexBinCounts).features;
+  }
+
+  const maxBinCount = Math.max(
+    ...hexBinFeatures.map((f) => f.properties.count),
+    1,
+  );
+
+  const oceanColor = nightMode ? "#0a1a2a" : "#b3d1e6";
+
+  // NEW: Delay mounting Globe so spinner/background are painted first
+  useEffect(() => {
+    if (globeView) {
+      setShowGlobe(false);
+      const t = setTimeout(() => setShowGlobe(true), 30); // 30ms delay
+      return () => clearTimeout(t);
+    } else {
+      setShowGlobe(false);
+    }
+  }, [globeView]);
+
+  // Ensure globe zooms to bounds when showGlobe becomes true
+  useEffect(() => {
+    if (globeView && showGlobe && globeRef.current) {
       if (pointsData && pointsData.length > 0) {
-        // Calculate centroid and spread
         const lats = pointsData.map((p) => p.lat);
         const lngs = pointsData.map((p) => p.lng);
         const minLat = Math.min(...lats);
@@ -335,10 +399,8 @@ const Map = ({
         const maxLng = Math.max(...lngs);
         const centerLat = (minLat + maxLat) / 2;
         const centerLng = (minLng + maxLng) / 2;
-        // Calculate max distance between points (roughly)
         const latSpread = maxLat - minLat;
         const lngSpread = maxLng - minLng;
-        // Altitude: tighter zoom (50% closer)
         const spread = Math.max(latSpread, lngSpread);
         const altitude = Math.min(Math.max(1.2 + spread / 120, 1.2), 2);
         globeRef.current.pointOfView(
@@ -352,21 +414,11 @@ const Map = ({
         );
       }
     }
-  }, [globeView, centerLat, centerLon, pointsData]);
+  }, [globeView, showGlobe, centerLat, centerLon, pointsData]);
+
   if (width === 0) {
     return null;
   }
-  // HEXBIN LAYER SETUP
-  let hexBinFeatures = [];
-  if (hexBinCounts && Object.keys(hexBinCounts).length > 0) {
-    hexBinFeatures = hexBinsToGeoJson(hexBinCounts).features;
-  }
-
-  const maxBinCount = Math.max(
-    ...hexBinFeatures.map((f) => f.properties.count),
-    1,
-  );
-
   if (globeView) {
     // Build combined pointsData with outline and center for each point
     const combinedPointsData = [];
@@ -374,102 +426,147 @@ const Map = ({
       combinedPointsData.push({ ...pt, isOutline: true }); // white outline
       combinedPointsData.push({ ...pt, isOutline: false, label: pt.label }); // colored center with label
     }
+    const globeBg = nightMode ? "#0a0a1a" : darkColor;
+    const globeBgImg = nightMode
+      ? "https://raw.githubusercontent.com/vasturiano/three-globe/master/example/img/night-sky.png"
+      : null;
     return (
-      <div style={{ width, height, background: darkColor, marginTop: "1em" }}>
-        <Globe
-          ref={globeRef}
-          width={width}
-          height={height}
-          backgroundColor={"rgba(0,0,0,0)"}
-          backgroundImageUrl={null}
-          rendererConfig={{ alpha: true }}
-          showGlobe={true}
-          globeMaterial={new MeshPhongMaterial({ color: "#b3d1e6" })}
-          polygonsData={countriesGeoJson.features}
-          polygonCapColor={getPolyColor}
-          polygonStrokeColor={getPolyStrokeColor}
-          polygonLabel={getPolyLabel}
-          onPolygonClick={handlePolyClick}
-          polygonSideColor={"rgba(0, 0, 0, 0.0)"}
-          polygonAltitude={(d) =>
-            countryCounts[d.properties.ISO_A2] > 0 ? 0.01 : 0.01
-          }
-          pointsData={combinedPointsData}
-          pointLat={(d) => d.lat}
-          pointLng={(d) => d.lng}
-          pointColor={(d) => (d.isOutline ? "#fff" : d.color)}
-          pointAltitude={(d) => (d.isOutline ? 0.022 : 0.025)}
-          pointRadius={(d) => (d.isOutline ? 0.45 : 0.32)}
-          pointResolution={16}
-          pointLabel={(d) => d.label}
-          // HEXBIN LAYER
-          hexPolygonsData={hexBinFeatures}
-          hexPolygonResolution={2}
-          hexPolygonMargin={0.05}
-          hexPolygonPoints={(d) => d.geometry.coordinates[0]}
-          hexPolygonColor={(d) =>
-            mixColor({
-              color1: "#70ff01",
-              color2: "#eeeeee",
-              ratio: Math.min(1, d.properties.count / maxBinCount),
-            }) + "cc"
-          }
-          hexPolygonAltitude={0.015}
-          hexPolygonLabel={(d) =>
-            `Hex: ${d.properties.h3}\nCount: ${d.properties.count}`
-          }
-        />
+      <div
+        style={{
+          width,
+          height,
+          background: globeBg,
+          marginTop: "1em",
+          position: "relative",
+        }}
+      >
+        {/* Always render skeleton overlay and background immediately */}
+        {(globeLoading || !showGlobe) && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: nightMode ? "#0a0a1a" : "#fff",
+              opacity: 0.85,
+              zIndex: 10,
+            }}
+          >
+            {/* Use min(width, height) for a true circle */}
+            <Skeleton
+              variant="circular"
+              width={Math.max(Math.min(width, height) * 0.75, 200)}
+              height={Math.max(Math.min(width, height) * 0.75, 200)}
+              animation="wave"
+              sx={{ bgcolor: nightMode ? "#222" : undefined }}
+            />
+          </div>
+        )}
+        {/* Only mount Globe after short delay so skeleton/background are painted first */}
+        {showGlobe && (
+          <Globe
+            ref={globeRef}
+            width={width}
+            height={height}
+            backgroundColor={globeBg}
+            backgroundImageUrl={globeBgImg}
+            rendererConfig={{ alpha: true }}
+            showGlobe={true}
+            globeMaterial={new MeshPhongMaterial({ color: oceanColor })}
+            polygonsData={countriesGeoJson.features}
+            polygonCapColor={getPolyColor}
+            polygonStrokeColor={() => countryOutlineColor}
+            polygonLabel={getPolyLabel}
+            onPolygonClick={handlePolyClick}
+            polygonSideColor={"rgba(0, 0, 0, 0.0)"}
+            polygonAltitude={(d) =>
+              countryCounts[d.properties.ISO_A2] > 0 ? 0.01 : 0.01
+            }
+            pointsData={combinedPointsData}
+            pointLat={(d) => d.lat}
+            pointLng={(d) => d.lng}
+            pointColor={(d) => (d.isOutline ? "#fff" : d.color)}
+            pointAltitude={(d) => (d.isOutline ? 0.022 : 0.025)}
+            pointRadius={(d) => (d.isOutline ? 0.45 : 0.32)}
+            pointResolution={16}
+            pointLabel={(d) => d.label}
+            // HEXBIN LAYER
+            hexPolygonsData={hexBinFeatures}
+            hexPolygonResolution={2}
+            hexPolygonMargin={0.05}
+            hexPolygonPoints={(d) => d.geometry.coordinates[0]}
+            hexPolygonColor={(d) =>
+              mixColor({
+                color1: "#70ff01",
+                color2: "#eeeeee",
+                ratio: Math.min(1, d.properties.count / maxBinCount),
+              }) + "cc"
+            }
+            hexPolygonAltitude={0.015}
+            hexPolygonLabel={(d) =>
+              `Hex: ${d.properties.h3}\nCount: ${d.properties.count}`
+            }
+            onGlobeReady={() => setGlobeLoading(false)}
+          />
+        )}
       </div>
     );
   }
-
+  // Wrap MapContainer in a div with a ref for reliable DOM access
   return (
-    <MapContainer
-      bounds={bounds}
-      scrollWheelZoom={false}
-      tap={false}
-      style={{
-        marginTop: "1em",
-        width: `${width}px`,
-        height: `${height}px`,
-        background: "#b3d1e6",
-      }}
+    <div
+      ref={mapContainerRef}
+      style={{ width: `${width}px`, height: `${height}px`, marginTop: "1em" }}
     >
-      {/* <TileLayer
-        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-        attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
-      /> */}
-      <CountryLayer
-        countryCounts={countryCounts}
-        onCountryClick={onCountryClick}
-        repeat={true}
-      />
-      {/* markers */}
-      {hexBinFeatures.length > 0 && (
-        <GeoJSON
-          data={hexBinsToGeoJson(hexBinCounts)}
-          style={(feature) => {
-            console.log(maxCount);
-            const { count } = feature.properties;
-            const fillColor = mixColor({
-              color1: "#70ff01",
-              color2: "#eeeeee",
-              ratio: Math.min(1, count / maxBinCount),
-            });
-            return {
-              fillColor,
-              color: "none",
-              fillOpacity: 0.8,
-            };
-          }}
-          onEachFeature={(feature, layer) => {
-            layer.bindTooltip(
-              `Hex: ${feature.properties.h3} Count: ${feature.properties.count}`,
-            );
-          }}
+      <MapContainer
+        bounds={bounds}
+        scrollWheelZoom={false}
+        tap={false}
+        style={{
+          width: "100%",
+          height: "100%",
+          background: oceanColor,
+        }}
+      >
+        <CountryLayer
+          countryCounts={countryCounts}
+          onCountryClick={onCountryClick}
+          repeat={true}
+          baseBg={baseCountryBg}
+          outlineColor={countryOutlineColor}
+          outlineGlow={countryOutlineGlow}
         />
-      )}
-    </MapContainer>
+        {/* markers */}
+        {hexBinFeatures.length > 0 && (
+          <GeoJSON
+            data={hexBinsToGeoJson(hexBinCounts)}
+            style={(feature) => {
+              const { count } = feature.properties;
+              const fillColor = mixColor({
+                color1: "#70ff01",
+                color2: "#eeeeee",
+                ratio: Math.min(1, count / maxBinCount),
+              });
+              return {
+                fillColor,
+                color: "none",
+                fillOpacity: 0.8,
+              };
+            }}
+            onEachFeature={(feature, layer) => {
+              layer.bindTooltip(
+                `Hex: ${feature.properties.h3} Count: ${feature.properties.count}`,
+              );
+            }}
+          />
+        )}
+      </MapContainer>
+    </div>
   );
 };
 
@@ -496,10 +593,11 @@ const ReportMap = ({
 }) => {
   const navigate = useNavigate();
   const componentRef = chartRef || useRef();
-  const { width, height } = containerRef
-    ? useResize(containerRef)
-    : useResize(componentRef);
+  const size = useResize(containerRef || componentRef);
+  const { width, height } = size;
   const [globeView, setGlobeView] = useState(true);
+  const [nightMode, setNightMode] = useState(theme === "darkTheme");
+  const [globeLoading, setGlobeLoading] = useState(true);
   useEffect(() => {
     if (message && map && map.status) {
       setMessage(null);
@@ -653,17 +751,70 @@ const ReportMap = ({
       <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
         <FormGroup
           row
-          style={{ position: "absolute", zIndex: 1000, right: 20, top: 20 }}
+          style={{
+            position: "absolute",
+            zIndex: 1000,
+            right: 20,
+            top: 20,
+            background: nightMode
+              ? "rgba(30,30,30,0.85)"
+              : "rgba(255,255,255,0.85)",
+            borderRadius: 12,
+            boxShadow: nightMode ? "0 2px 8px #0008" : "0 2px 8px #8882",
+            padding: "0.5em 1em",
+          }}
         >
           <FormControlLabel
             control={
               <Switch
                 checked={globeView}
-                onChange={() => setGlobeView((v) => !v)}
-                color="primary"
+                onClick={() => setGlobeView(!globeView)}
+                color={nightMode ? "default" : "primary"}
+                sx={
+                  nightMode
+                    ? {
+                        "& .MuiSwitch-switchBase": {
+                          color: "#bbb",
+                        },
+                        "& .MuiSwitch-switchBase.Mui-checked": {
+                          color: "#ffa870",
+                        },
+                        "& .MuiSwitch-track": {
+                          backgroundColor: "#888", // lighter track for night mode
+                        },
+                      }
+                    : {}
+                }
               />
             }
-            label={globeView ? "Globe View" : "Map View"}
+            label={globeView ? "Globe" : "Map"}
+            sx={nightMode ? { color: "#eee" } : {}}
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={nightMode}
+                onClick={() => setNightMode(!nightMode)}
+                color={nightMode ? "default" : "primary"}
+                sx={
+                  nightMode
+                    ? {
+                        "& .MuiSwitch-switchBase": {
+                          color: "#bbb",
+                        },
+                        "& .MuiSwitch-switchBase.Mui-checked": {
+                          color: "#ffa870",
+                        },
+                        "& .MuiSwitch-track": {
+                          backgroundColor: "#888", // lighter track for night mode
+                        },
+                      }
+                    : {}
+                }
+              />
+            }
+            label={nightMode ? "Night" : "Day"}
+            sx={nightMode ? { color: "#eee" } : {}}
           />
         </FormGroup>
         {/* Map or Globe rendering logic goes here */}
@@ -679,6 +830,7 @@ const ReportMap = ({
           theme={theme || "lightTheme"}
           pointsData={pointsData}
           hexBinCounts={hexBinCounts}
+          nightMode={nightMode}
         />
       </Grid>
     );

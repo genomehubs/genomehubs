@@ -256,7 +256,7 @@ export const map = async ({
   fields,
   locationField = "sample_location",
   locationSummary = "hexbin2",
-  regionField, // = "country_list",
+  regionField = "country_list",
   locationHex, // = "sample_hex_bin",
   req,
 }) => {
