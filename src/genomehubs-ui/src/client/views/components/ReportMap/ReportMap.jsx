@@ -1,4 +1,5 @@
 import "leaflet/dist/leaflet.css";
+import "proj4leaflet";
 
 import {
   CircleMarker,
@@ -16,19 +17,30 @@ import React, {
   useRef,
   useState,
 } from "react";
+import {
+  getCrs,
+  getFitWorldBounds,
+  normalizeBounds,
+} from "./functions/mapHelpers";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CloseIcon from "@mui/icons-material/Close";
+import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import Globe from "react-globe.gl";
 import Grid from "@mui/material/Grid2";
 import IconButton from "@mui/material/IconButton";
+import InputLabel from "@mui/material/InputLabel";
+import L from "leaflet";
+import Map from "./Map";
 import MarkerComponent from "./functions/MarkerComponent";
 import MenuIcon from "@mui/icons-material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { MeshPhongMaterial } from "three";
 import NavLink from "../NavLink";
+import Select from "@mui/material/Select";
 import Skeleton from "@mui/material/Skeleton";
 import Switch from "@mui/material/Switch";
 import { cellToBoundary } from "h3-js";
@@ -38,6 +50,7 @@ import dispatchMessage from "../../hocs/dispatchMessage";
 import getCountryColor from "./functions/getCountryColor";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
 import { mixColor } from "../../functions/mixColor";
+import proj4 from "proj4";
 import qs from "../../functions/qs";
 import setColors from "../../functions/setColors";
 import shiftFeature from "./functions/shiftFeature";
@@ -49,6 +62,44 @@ import withTheme from "#hocs/withTheme";
 
 // Default region attribute (user-editable in future)
 const REGION_ATTRIBUTE = "country_code";
+
+// Add supported projections
+const SUPPORTED_PROJECTIONS = [
+  { value: "mercator", label: "Mercator" },
+  { value: "cylindricalEqualArea", label: "Cylindrical Equal Area" },
+];
+
+const PROJECTION_DEFS = {
+  mercator: {
+    name: "EPSG:3857",
+    def: "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+    label: "Mercator",
+  },
+  cylindricalEqualArea: {
+    name: "ESRI:54034",
+    def: "+proj=cea +lon_0=0 +lat_ts=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+    label: "Cylindrical Equal Area",
+  },
+};
+
+const PROJECTION_BOUNDS = {
+  mercator: {
+    minZoom: 0,
+    maxZoom: 6,
+    worldBounds: [
+      [-85.05112878, -180],
+      [85.05112878, 180],
+    ],
+  },
+  cylindricalEqualArea: {
+    minZoom: 0,
+    maxZoom: 5,
+    worldBounds: [
+      [-90, -180],
+      [90, 180],
+    ],
+  },
+};
 
 const CountryLayer = ({
   countryCounts,
@@ -114,300 +165,6 @@ const SingleMarker = ({
   );
 };
 
-const Map = ({
-  bounds,
-  markers,
-  width,
-  height,
-  geoPoints = [],
-  zoom = 10,
-  meta = {},
-  taxonId,
-  countryCounts,
-  palette,
-  onCountryClick,
-  globeView = false,
-  colorScheme = {},
-  theme = "lightTheme",
-  pointsData = [],
-  hexBinCounts = {},
-  nightMode = false,
-  countryOverlayColor = "#fec44f",
-  hexbinOverlayColor = "#3182bd",
-}) => {
-  // Overlay colors (match ReportMap)
-  const location = useLocation();
-  const globeRef = useRef();
-  const mapContainerRef = useRef(); // always call useRef, unconditionally
-  const [globeLoading, setGlobeLoading] = useState(true); // <-- ensure this is defined in Map
-  const [showGlobe, setShowGlobe] = useState(false); // <-- move this up to top-level, before any conditional logic
-  // Calculate center of bounds for zoom
-  let centerLat = 0,
-    centerLon = 0;
-  if (bounds && bounds.length === 2) {
-    centerLat = (bounds[0][0] + bounds[1][0]) / 2;
-    centerLon = (bounds[0][1] + bounds[1][1]) / 2;
-  }
-  const darkColor = colorScheme?.[theme]?.darkColor || "#222a38";
-  const lightColor = colorScheme?.[theme]?.lightColor || "#fff";
-  const maxCount = useMemo(
-    () => Math.max(...Object.values(countryCounts), 1),
-    [countryCounts],
-  );
-  const baseCountryBg = nightMode
-    ? "#22262a"
-    : theme === "darkTheme"
-      ? darkColor
-      : "#eeeeee";
-  const countryOutlineColor = nightMode ? "#ffa870" : "#333";
-  const countryOutlineGlow = nightMode;
-  const getPolyColor = useCallback(
-    (d) =>
-      getCountryColor(
-        countryCounts[d.properties.ISO_A2],
-        maxCount,
-        countryOverlayColor || countryOverlayColorDefault, // use variable
-        baseCountryBg,
-      ),
-    [countryCounts, maxCount, baseCountryBg],
-  );
-  const getPolyLabel = useCallback(
-    (d) => `${d.properties.ADMIN}: ${countryCounts[d.properties.ISO_A2] || 0}`,
-    [countryCounts],
-  );
-  const getPolySideColor = useCallback(() => "rgba(0,0,0,0.15)", []);
-  const getPolyStrokeColor = useCallback(() => "rgba(0,0,0,0.15)", []);
-  const handlePolyClick = useCallback(
-    (d) => onCountryClick(d.properties.ISO_A2),
-    [onCountryClick],
-  );
-  // Imperatively update Leaflet container background on color change
-  useEffect(() => {
-    if (!globeView && mapContainerRef.current) {
-      // Always query for .leaflet-container inside the wrapper div
-      const leaflet =
-        mapContainerRef.current.querySelector(".leaflet-container");
-      if (leaflet) {
-        leaflet.style.background = oceanColor;
-      }
-    }
-  }, [oceanColor, globeView, nightMode]);
-
-  // HEXBIN LAYER SETUP
-  let hexBinFeatures = [];
-  if (hexBinCounts && Object.keys(hexBinCounts).length > 0) {
-    hexBinFeatures = hexBinsToGeoJson(hexBinCounts).features;
-  }
-
-  const maxBinCount = Math.max(
-    ...hexBinFeatures.map((f) => f.properties.count),
-    1,
-  );
-
-  const oceanColor = nightMode ? "#0a1a2a" : "#b3d1e6";
-
-  // NEW: Delay mounting Globe so spinner/background are painted first
-  useEffect(() => {
-    if (globeView) {
-      setShowGlobe(false);
-      const t = setTimeout(() => setShowGlobe(true), 30); // 30ms delay
-      return () => clearTimeout(t);
-    } else {
-      setShowGlobe(false);
-    }
-  }, [globeView]);
-
-  // Ensure globe zooms to bounds when showGlobe becomes true
-  useEffect(() => {
-    if (globeView && showGlobe && globeRef.current) {
-      if (pointsData && pointsData.length > 0) {
-        const lats = pointsData.map((p) => p.lat);
-        const lngs = pointsData.map((p) => p.lng);
-        const minLat = Math.min(...lats);
-        const maxLat = Math.max(...lats);
-        const minLng = Math.min(...lngs);
-        const maxLng = Math.max(...lngs);
-        const centerLat = (minLat + maxLat) / 2;
-        const centerLng = (minLng + maxLng) / 2;
-        const latSpread = maxLat - minLat;
-        const lngSpread = maxLng - minLng;
-        const spread = Math.max(latSpread, lngSpread);
-        const altitude = Math.min(Math.max(1.2 + spread / 120, 1.2), 2);
-        globeRef.current.pointOfView(
-          { lat: centerLat, lng: centerLng, altitude },
-          1000,
-        );
-      } else {
-        globeRef.current.pointOfView(
-          { lat: centerLat, lng: centerLon, altitude: 1.5 },
-          1000,
-        );
-      }
-    }
-  }, [globeView, showGlobe, centerLat, centerLon, pointsData]);
-
-  if (width === 0) {
-    return null;
-  }
-  if (globeView) {
-    // Build combined pointsData with outline and center for each point
-    const combinedPointsData = [];
-    for (const pt of pointsData) {
-      combinedPointsData.push({ ...pt, isOutline: true }); // white outline
-      combinedPointsData.push({ ...pt, isOutline: false, label: pt.label }); // colored center with label
-    }
-    const globeBg = nightMode
-      ? "#0a0a1a"
-      : theme === "darkTheme"
-        ? lightColor
-        : darkColor;
-    const globeBgImg = nightMode
-      ? "https://raw.githubusercontent.com/vasturiano/three-globe/master/example/img/night-sky.png"
-      : null;
-    return (
-      <div
-        style={{
-          width,
-          height,
-          background: globeBg,
-          marginTop: "1em",
-          position: "relative",
-        }}
-      >
-        {/* Always render skeleton overlay and background immediately */}
-        {(globeLoading || !showGlobe) && (
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: nightMode
-                ? "#0a0a1a"
-                : theme === "darkTheme"
-                  ? darkColor
-                  : "#fff",
-              opacity: 0.85,
-              zIndex: 10,
-            }}
-          >
-            {/* Use min(width, height) for a true circle */}
-            <Skeleton
-              variant="circular"
-              width={Math.max(Math.min(width, height) * 0.75, 200)}
-              height={Math.max(Math.min(width, height) * 0.75, 200)}
-              animation="wave"
-              sx={{ bgcolor: nightMode ? "#444" : "#f3f3f3" }}
-            />
-          </div>
-        )}
-        {/* Only mount Globe after short delay so skeleton/background are painted first */}
-        {showGlobe && (
-          <Globe
-            ref={globeRef}
-            width={width}
-            height={height}
-            backgroundColor={globeBg}
-            backgroundImageUrl={globeBgImg}
-            rendererConfig={{ alpha: true }}
-            showGlobe={true}
-            globeMaterial={new MeshPhongMaterial({ color: oceanColor })}
-            polygonsData={countriesGeoJson.features}
-            polygonCapColor={getPolyColor}
-            polygonStrokeColor={() => countryOutlineColor}
-            polygonLabel={getPolyLabel}
-            onPolygonClick={handlePolyClick}
-            polygonSideColor={"rgba(0, 0, 0, 0.0)"}
-            polygonAltitude={(d) =>
-              countryCounts[d.properties.ISO_A2] > 0 ? 0.01 : 0.01
-            }
-            pointsData={combinedPointsData}
-            pointLat={(d) => d.lat}
-            pointLng={(d) => d.lng}
-            pointColor={(d) => (d.isOutline ? "#fff" : d.color)}
-            pointAltitude={(d) => (d.isOutline ? 0.022 : 0.025)}
-            pointRadius={(d) => (d.isOutline ? 0.45 : 0.32)}
-            pointResolution={16}
-            pointLabel={(d) => d.label}
-            // HEXBIN LAYER
-            hexPolygonsData={hexBinFeatures}
-            hexPolygonResolution={2}
-            hexPolygonMargin={0.05}
-            hexPolygonPoints={(d) => d.geometry.coordinates[0]}
-            hexPolygonColor={(d) =>
-              mixColor({
-                color1: hexbinOverlayColor,
-                color2: "#eeeeee",
-                ratio: Math.min(1, d.properties.count / maxBinCount),
-              }) + "cc"
-            }
-            hexPolygonAltitude={0.015}
-            hexPolygonLabel={(d) =>
-              `Hex: ${d.properties.h3}\nCount: ${d.properties.count}`
-            }
-            onGlobeReady={() => setGlobeLoading(false)}
-          />
-        )}
-      </div>
-    );
-  }
-  // Wrap MapContainer in a div with a ref for reliable DOM access
-  return (
-    <div
-      ref={mapContainerRef}
-      style={{ width: `${width}px`, height: `${height}px`, marginTop: "1em" }}
-    >
-      <MapContainer
-        bounds={bounds}
-        scrollWheelZoom={false}
-        tap={false}
-        style={{
-          width: "100%",
-          height: "100%",
-          background: oceanColor,
-        }}
-      >
-        <CountryLayer
-          countryCounts={countryCounts}
-          onCountryClick={onCountryClick}
-          repeat={true}
-          baseBg={baseCountryBg}
-          outlineColor={countryOutlineColor}
-          outlineGlow={countryOutlineGlow}
-        />
-        {/* markers */}
-        {hexBinFeatures.length > 0 && (
-          <GeoJSON
-            data={hexBinsToGeoJson(hexBinCounts)}
-            style={(feature) => {
-              const { count } = feature.properties;
-              const fillColor = mixColor({
-                color1: hexbinOverlayColor,
-                color2: "#eeeeee",
-                ratio: Math.min(1, count / maxBinCount),
-              });
-              return {
-                fillColor,
-                color: "none",
-                fillOpacity: 0.8,
-              };
-            }}
-            onEachFeature={(feature, layer) => {
-              layer.bindTooltip(
-                `Hex: ${feature.properties.h3} Count: ${feature.properties.count}`,
-              );
-            }}
-          />
-        )}
-      </MapContainer>
-    </div>
-  );
-};
-
 const ReportMap = ({
   map,
   chartRef,
@@ -428,23 +185,36 @@ const ReportMap = ({
   setMinDim,
   xOpts,
   basename,
+  mapProjection = "cylindricalEqualArea",
+  //mapProjection = "mercator",
+  ...props
 }) => {
   const navigate = useNavigate();
   const componentRef = chartRef || useRef();
   const size = useResize(containerRef || componentRef);
-  const { width, height } = size;
+  let { width, height } = size;
+  const measured = size.width && size.height;
+  width = width || 400;
+  height = height || 300;
   const [globeView, setGlobeView] = useState(false);
   const [nightMode, setNightMode] = useState(theme === "darkTheme");
   const [showColorKey, setShowColorKey] = useState(true);
   const [showLegend, setShowLegend] = useState(false);
+  const [crs, setCrs] = useState(() => getCrs(mapProjection, L));
+  const [mapInstanceKey, setMapInstanceKey] = useState(0);
+  const mapRef = useRef(null);
+
+  // CRS setup (now synchronous)
+  useEffect(() => {
+    setCrs(getCrs(mapProjection, L));
+    setMapInstanceKey((prev) => prev + 1);
+  }, [mapProjection]);
+
   // --- BEGIN: Color Key Logic ---
-  // Use the same color as overlays
   const countryOverlayColor = "#ff7001";
   const hexbinOverlayColor = "#70ff01";
-  // Compute min/max for country and hexbin overlays reactively
   const regionCounts = map?.report?.map?.regionCounts;
   const hexBinCounts = map?.report?.map?.hexBinCounts;
-
   const [minCountryCount, maxCountryCount] = useMemo(() => {
     if (regionCounts && Object.values(regionCounts).length > 0) {
       const vals = Object.values(regionCounts).filter(
@@ -456,7 +226,6 @@ const ReportMap = ({
     }
     return [0, 1];
   }, [regionCounts]);
-
   const [minHexbinCount, maxHexbinCount] = useMemo(() => {
     if (hexBinCounts && Object.values(hexBinCounts).length > 0) {
       const vals = Object.values(hexBinCounts).filter(
@@ -468,8 +237,6 @@ const ReportMap = ({
     }
     return [0, 1];
   }, [hexBinCounts]);
-  // Choose which overlay is active (country or hexbin) for the key
-  // If hexBinCounts is non-empty, show hexbin key, else country key
   const useHexbin =
     map &&
     map.status &&
@@ -478,12 +245,10 @@ const ReportMap = ({
     Object.keys(map.report.map.hexBinCounts).length > 0;
   const overlayColor = useHexbin ? hexbinOverlayColor : countryOverlayColor;
   const maxCount = useHexbin ? maxHexbinCount : maxCountryCount;
-  // Compute key values (min, intermediate, max)
   const keyValues = useMemo(() => {
     if (maxCount <= 1) {
       return [0, 1];
     }
-    // 5 steps: min, 1/4, 1/2, 3/4, max
     return [
       0,
       Math.round(maxCount * 0.25),
@@ -492,16 +257,12 @@ const ReportMap = ({
       maxCount,
     ];
   }, [maxCount]);
-  // Color ramp function (same as overlay logic)
   const getKeyColor = (val) => {
-    // Use mixColor to blend overlayColor with background
-    // Use same background as overlays
     const bg = nightMode
       ? "#22262a"
       : theme === "darkTheme"
         ? "#222a38"
         : "#eeeeee";
-    // Use ratio for color blending
     const ratio = Math.min(1, val / maxCount);
     return require("../../functions/mixColor").mixColor({
       color1: overlayColor,
@@ -509,7 +270,6 @@ const ReportMap = ({
       ratio,
     });
   };
-  // --- END: Color Key Logic ---
   useEffect(() => {
     if (message && map && map.status) {
       setMessage(null);
@@ -653,230 +413,265 @@ const ReportMap = ({
       options[REGION_ATTRIBUTE] = code;
       navigate(`/search?${qs.stringify(options)}`);
     };
-    return (
-      <Grid
-        ref={componentRef}
-        style={{ height: "100%", position: "relative" }}
-        size="grow"
-      >
-        <div style={{ position: "relative", width, height }}>
-          <FormGroup
-            row
-            style={{
-              position: "absolute",
-              zIndex: 1000,
-              right: 20,
-              top: 20,
-              background: nightMode
-                ? "rgba(30,30,30,0.85)"
-                : theme === "darkTheme"
-                  ? "rgba(34,42,56,0.85)"
-                  : "rgba(255,255,255,0.85)",
-              borderRadius: 12,
-              boxShadow:
-                nightMode || theme === "darkTheme"
-                  ? "0 2px 8px #0008"
-                  : "0 2px 8px #8882",
-              padding: showLegend ? "0.5em 1em" : "0.5em",
-              minWidth: 30,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-end",
-            }}
-          >
-            <div
+    // Move useMemo for projection bounds up here, before any return
+    const projectionBounds = useMemo(() => {
+      return (
+        PROJECTION_BOUNDS[mapProjection] ||
+        PROJECTION_BOUNDS.cylindricalEqualArea
+      );
+    }, [mapProjection]);
+    const fitWorldBounds = useMemo(
+      () =>
+        getFitWorldBounds(
+          mapProjection,
+          width,
+          height,
+          [0, 0],
+          crs,
+          PROJECTION_BOUNDS,
+          L,
+        ),
+      [mapProjection, width, height, crs],
+    );
+    // Only render Map when measured width and height are available and crs is set
+    if (measured && crs) {
+      return (
+        <Grid
+          ref={componentRef}
+          style={{ height: "100%", position: "relative" }}
+          size="grow"
+        >
+          <div style={{ position: "relative", width, height }}>
+            <FormGroup
+              row
               style={{
+                position: "absolute",
+                zIndex: 1000,
+                right: 20,
+                top: 20,
+                background: nightMode
+                  ? "rgba(30,30,30,0.85)"
+                  : theme === "darkTheme"
+                    ? "rgba(34,42,56,0.85)"
+                    : "rgba(255,255,255,0.85)",
+                borderRadius: 12,
+                boxShadow:
+                  nightMode || theme === "darkTheme"
+                    ? "0 2px 8px #0008"
+                    : "0 2px 8px #8882",
+                padding: showLegend ? "0.5em 1em" : "0.5em",
+                minWidth: 30,
                 display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                width: "100%",
+                flexDirection: "column",
+                alignItems: "flex-end",
               }}
             >
-              {showLegend && (
-                <>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={globeView}
-                        onClick={() => setGlobeView(!globeView)}
-                        color={
-                          nightMode || theme === "darkTheme"
-                            ? "default"
-                            : "primary"
-                        }
-                        sx={
-                          nightMode || theme === "darkTheme"
-                            ? {
-                                "& .MuiSwitch-switchBase": {
-                                  color: "#bbb",
-                                },
-                                "& .MuiSwitch-switchBase.Mui-checked": {
-                                  color: "#ffa870",
-                                },
-                                "& .MuiSwitch-track": {
-                                  backgroundColor: "#888",
-                                },
-                              }
-                            : {}
-                        }
-                      />
-                    }
-                    label={globeView ? "Globe" : "Map"}
-                    sx={
-                      nightMode || theme === "darkTheme"
-                        ? { color: "#eee" }
-                        : {}
-                    }
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={nightMode}
-                        onClick={() => setNightMode(!nightMode)}
-                        color={
-                          nightMode || theme === "darkTheme"
-                            ? "default"
-                            : "primary"
-                        }
-                        sx={
-                          nightMode || theme === "darkTheme"
-                            ? {
-                                "& .MuiSwitch-switchBase": {
-                                  color: "#bbb",
-                                },
-                                "& .MuiSwitch-switchBase.Mui-checked": {
-                                  color: "#ffa870",
-                                },
-                                "& .MuiSwitch-track": {
-                                  backgroundColor: "#888",
-                                },
-                              }
-                            : {}
-                        }
-                      />
-                    }
-                    label={nightMode ? "Night" : "Day"}
-                    sx={
-                      nightMode || theme === "darkTheme"
-                        ? { color: "#eee" }
-                        : {}
-                    }
-                  />
-                </>
-              )}
-              <IconButton
-                size="small"
-                onClick={() => setShowLegend((v) => !v)}
-                sx={{
-                  ml: 1,
-                  color:
-                    nightMode || theme === "darkTheme" ? "#eee" : undefined,
-                  margin: showLegend ? "-0.25em -0.4em 0 0" : 0,
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  width: "100%",
                 }}
-                aria-label={showLegend ? "Hide legend" : "Show legend"}
               >
-                {showLegend ? <MenuOpenIcon /> : <MenuIcon />}
-              </IconButton>
-            </div>
-            {showLegend && (
-              <div style={{ width: "100%", marginTop: 8 }}>
-                <div
-                  style={{
-                    fontWeight: 600,
-                    marginBottom: 8,
+                {showLegend && (
+                  <>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={globeView}
+                          onClick={() => setGlobeView(!globeView)}
+                          color={
+                            nightMode || theme === "darkTheme"
+                              ? "default"
+                              : "primary"
+                          }
+                          sx={
+                            nightMode || theme === "darkTheme"
+                              ? {
+                                  "& .MuiSwitch-switchBase": {
+                                    color: "#bbb",
+                                  },
+                                  "& .MuiSwitch-switchBase.Mui-checked": {
+                                    color: "#ffa870",
+                                  },
+                                  "& .MuiSwitch-track": {
+                                    backgroundColor: "#888",
+                                  },
+                                }
+                              : {}
+                          }
+                        />
+                      }
+                      label={globeView ? "Globe" : "Map"}
+                      sx={
+                        nightMode || theme === "darkTheme"
+                          ? { color: "#eee" }
+                          : {}
+                      }
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={nightMode}
+                          onClick={() => setNightMode(!nightMode)}
+                          color={
+                            nightMode || theme === "darkTheme"
+                              ? "default"
+                              : "primary"
+                          }
+                          sx={
+                            nightMode || theme === "darkTheme"
+                              ? {
+                                  "& .MuiSwitch-switchBase": {
+                                    color: "#bbb",
+                                  },
+                                  "& .MuiSwitch-switchBase.Mui-checked": {
+                                    color: "#ffa870",
+                                  },
+                                  "& .MuiSwitch-track": {
+                                    backgroundColor: "#888",
+                                  },
+                                }
+                              : {}
+                          }
+                        />
+                      }
+                      label={nightMode ? "Night" : "Day"}
+                      sx={
+                        nightMode || theme === "darkTheme"
+                          ? { color: "#eee" }
+                          : {}
+                      }
+                    />
+                  </>
+                )}
+                <IconButton
+                  size="small"
+                  onClick={() => setShowLegend((v) => !v)}
+                  sx={{
+                    ml: 1,
                     color:
                       nightMode || theme === "darkTheme" ? "#eee" : undefined,
+                    margin: showLegend ? "-0.25em -0.4em 0 0" : 0,
                   }}
+                  aria-label={showLegend ? "Hide legend" : "Show legend"}
                 >
-                  Country Overlay
-                </div>
-                <ColorRampBar
-                  min={minCountryCount}
-                  max={maxCountryCount}
-                  color1={countryOverlayColor}
-                  bg={
-                    nightMode
-                      ? "#22262a"
-                      : theme === "darkTheme"
-                        ? "#222a38"
-                        : "#eeeeee"
-                  }
-                  getColor={(val) =>
-                    require("../../functions/mixColor").mixColor({
-                      color1: countryOverlayColor,
-                      color2: nightMode
-                        ? "#22262a"
-                        : theme === "darkTheme"
-                          ? "#222a38"
-                          : "#eeeeee",
-                      ratio:
-                        maxCountryCount - minCountryCount === 0
-                          ? 0
-                          : (val - minCountryCount) /
-                            (maxCountryCount - minCountryCount),
-                    })
-                  }
-                />
-                <div
-                  style={{
-                    fontWeight: 600,
-                    margin: "16px 0 8px 0",
-                    color:
-                      nightMode || theme === "darkTheme" ? "#eee" : undefined,
-                  }}
-                >
-                  Hexbin Overlay
-                </div>
-                <ColorRampBar
-                  min={minHexbinCount}
-                  max={maxHexbinCount}
-                  color1={hexbinOverlayColor}
-                  bg={
-                    nightMode
-                      ? "#22262a"
-                      : theme === "darkTheme"
-                        ? "#222a38"
-                        : "#eeeeee"
-                  }
-                  getColor={(val) =>
-                    require("../../functions/mixColor").mixColor({
-                      color1: hexbinOverlayColor,
-                      color2: nightMode
-                        ? "#22262a"
-                        : theme === "darkTheme"
-                          ? "#222a38"
-                          : "#eeeeee",
-                      ratio:
-                        maxHexbinCount - minHexbinCount === 0
-                          ? 0
-                          : (val - minHexbinCount) /
-                            (maxHexbinCount - minHexbinCount),
-                    })
-                  }
-                />
+                  {showLegend ? <MenuOpenIcon /> : <MenuIcon />}
+                </IconButton>
               </div>
+              {showLegend && (
+                <div style={{ width: "100%", marginTop: 8 }}>
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      marginBottom: 8,
+                      color:
+                        nightMode || theme === "darkTheme" ? "#eee" : undefined,
+                    }}
+                  >
+                    Country Overlay
+                  </div>
+                  <ColorRampBar
+                    min={minCountryCount}
+                    max={maxCountryCount}
+                    color1={countryOverlayColor}
+                    bg={
+                      nightMode
+                        ? "#22262a"
+                        : theme === "darkTheme"
+                          ? "#222a38"
+                          : "#eeeeee"
+                    }
+                    getColor={(val) =>
+                      require("../../functions/mixColor").mixColor({
+                        color1: countryOverlayColor,
+                        color2: nightMode
+                          ? "#22262a"
+                          : theme === "darkTheme"
+                            ? "#222a38"
+                            : "#eeeeee",
+                        ratio:
+                          maxCountryCount - minCountryCount === 0
+                            ? 0
+                            : (val - minCountryCount) /
+                              (maxCountryCount - minCountryCount),
+                      })
+                    }
+                  />
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      margin: "16px 0 8px 0",
+                      color:
+                        nightMode || theme === "darkTheme" ? "#eee" : undefined,
+                    }}
+                  >
+                    Hexbin Overlay
+                  </div>
+                  <ColorRampBar
+                    min={minHexbinCount}
+                    max={maxHexbinCount}
+                    color1={hexbinOverlayColor}
+                    bg={
+                      nightMode
+                        ? "#22262a"
+                        : theme === "darkTheme"
+                          ? "#222a38"
+                          : "#eeeeee"
+                    }
+                    getColor={(val) =>
+                      require("../../functions/mixColor").mixColor({
+                        color1: hexbinOverlayColor,
+                        color2: nightMode
+                          ? "#22262a"
+                          : theme === "darkTheme"
+                            ? "#222a38"
+                            : "#eeeeee",
+                        ratio:
+                          maxHexbinCount - minHexbinCount === 0
+                            ? 0
+                            : (val - minHexbinCount) /
+                              (maxHexbinCount - minHexbinCount),
+                      })
+                    }
+                  />
+                </div>
+              )}
+            </FormGroup>
+            {/* Map or Globe rendering logic goes here */}
+            {measured && crs && (
+              <Map
+                key={`map-${mapProjection}-${crs?.code || crs?.options?.code || ""}`}
+                ref={mapRef}
+                width={width}
+                height={height}
+                crs={crs}
+                projectionBounds={projectionBounds}
+                fitWorldBounds={fitWorldBounds}
+                oceanColor={nightMode ? "#0a1a2a" : "#b3d1e6"}
+                countryCounts={countryCounts}
+                onCountryClick={handleCountryClick}
+                baseCountryBg={
+                  nightMode
+                    ? "#22262a"
+                    : theme === "darkTheme"
+                      ? colorScheme?.[theme]?.darkColor || "#222a38"
+                      : "#eeeeee"
+                }
+                countryOutlineColor={nightMode ? "#ffa870" : "#333"}
+                countryOutlineGlow={nightMode}
+                hexBinCounts={hexBinCounts}
+                hexbinOverlayColor={hexbinOverlayColor}
+                maxBinCount={maxHexbinCount}
+                markers={markers}
+                {...props}
+              />
             )}
-          </FormGroup>
-          {/* Map or Globe rendering logic goes here */}
-          <Map
-            bounds={geoBounds}
-            markers={markers}
-            width={width}
-            height={height}
-            countryCounts={countryCounts}
-            onCountryClick={handleCountryClick}
-            globeView={globeView}
-            colorScheme={colorScheme}
-            theme={theme || "lightTheme"}
-            pointsData={pointsData}
-            hexBinCounts={hexBinCounts}
-            nightMode={nightMode}
-            countryOverlayColor={countryOverlayColor}
-            hexbinOverlayColor={hexbinOverlayColor}
-          />
-        </div>
-      </Grid>
-    );
+          </div>
+        </Grid>
+      );
+    }
   } else {
     return null;
   }
@@ -948,3 +743,11 @@ export default compose(
   withTheme,
   withSearchIndex,
 )(ReportMap);
+
+/*
+TODO:
+
+- [ ] Add projection prop to Map and ReportMap, defaulting to 'cylindricalEqualArea'
+- [ ] Support 'winkelTripel', 'gallPeters', and suggest 'mollweide' as another good non-Mercator projection for hexbinning
+- [ ] Pass this prop through and document it. No implementation of projection logic yet, just variable and prop wiring.
+*/

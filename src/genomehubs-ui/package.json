@@ -110,6 +110,8 @@
     "merge-images": "^2.0.0",
     "motion": "^12.5.0",
     "nanoid": "^5.0.7",
+    "proj4": "^2.17.0",
+    "proj4leaflet": "^1.0.2",
     "qrcode.react": "^4.0.1",
     "qs": "^6.10.1",
     "re-reselect": "^4.0.1",
