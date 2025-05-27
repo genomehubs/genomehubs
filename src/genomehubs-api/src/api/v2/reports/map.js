@@ -254,9 +254,11 @@ export const map = async ({
   taxonomy,
   apiParams,
   fields,
-  locationField = "sample_location",
-  locationSummary = "hexbin3",
-  regionField = "country_list",
+  locationField,
+  geoBinResolution = 3,
+  geoBounds = "-180,-90, 180, 90",
+  locationSummary = `hexbin${geoBinResolution}`,
+  regionField,
   locationHex, // = "sample_hex_bin",
   req,
 }) => {
@@ -528,6 +530,10 @@ export const map = async ({
       xQuery: {
         ...xQuery,
         fields: optionalFields.join(","),
+        geoBinResolution,
+        geoBounds,
+        locationField,
+        regionField,
       },
       ...(y && {
         yQuery: {

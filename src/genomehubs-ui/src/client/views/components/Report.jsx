@@ -19,7 +19,7 @@ export const queryPropList = [
   "taxonomy",
   "includeEstimates",
   "treeStyle",
-  "phylopicRank",  
+  "phylopicRank",
   "phylopicSize",
 ];
 
@@ -98,6 +98,13 @@ const Report = ({
   reportProps.yOpts = props.yOpts;
   reportProps.highlightArea = props.highlightArea;
   reportProps.mapThreshold = props.mapThreshold;
+  reportProps.locationField = props.locationField;
+  reportProps.regionField = props.regionField;
+  reportProps.geoBounds = props.geoBounds;
+  reportProps.mapType = props.mapType || "map";
+  reportProps.mapTheme = props.mapTheme;
+  reportProps.mapProjection = props.mapProjection || "mercator";
+  reportProps.geoBinResolution = props.geoBinResolution;
   reportProps.scatterThreshold = props.scatterThreshold;
   reportProps.treeThreshold = props.treeThreshold;
   reportProps.compactLegend = props.compactLegend;
@@ -113,8 +120,10 @@ const Report = ({
   reportProps.hideErrorBars = props.hideErrorBars;
   reportProps.hideAncestralBars = props.hideAncestralBars;
   reportProps.showPhylopics = props.showPhylopics;
-  reportProps.phylopicRank = props.phylopicRank;  
-  reportProps.phylopicSize = props.phylopicSize ? parseInt(props.phylopicSize) : undefined;
+  reportProps.phylopicRank = props.phylopicRank;
+  reportProps.phylopicSize = props.phylopicSize
+    ? parseInt(props.phylopicSize)
+    : undefined;
   reportProps.highlight = props.highlight;
   reportProps.colorPalette = props.colorPalette;
   reportProps.excludeAncestral = props.excludeAncestral;

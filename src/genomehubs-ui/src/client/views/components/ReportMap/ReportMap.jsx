@@ -150,19 +150,40 @@ const ReportMap = ({
   setMinDim,
   xOpts,
   basename,
+  locationField,
+  regionField,
+  geoBinResolution,
   mapProjection = "cylindricalEqualArea",
+  mapTheme,
+  mapType,
   // mapProjection = "mercator",
   ...props
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const query = qs.parse(location.search.replace(/^\?/, ""));
+  if (query.mapProjection) {
+    mapProjection = query.mapProjection;
+  }
+  if (query.mapType) {
+    mapType = query.mapType;
+  }
+  if (query.mapTheme) {
+    mapTheme = query.mapTheme;
+  }
+  if (query.geoBinResolution) {
+    geoBinResolution = parseInt(query.geoBinResolution, 10) || 0;
+  }
   const componentRef = chartRef || useRef();
   const size = useResize(containerRef || componentRef);
   let { width, height } = size;
   const measured = size.width && size.height;
   width = width || 400;
   height = height || 300;
-  const [globeView, setGlobeView] = useState(false);
-  const [nightMode, setNightMode] = useState(theme === "darkTheme");
+  const [globeView, setGlobeView] = useState(mapType === "globe");
+  const [nightMode, setNightMode] = useState(
+    mapTheme ? mapTheme === "night" : theme === "darkTheme",
+  );
   const [crs, setCrs] = useState(() => getCrs(mapProjection, L));
   const [mapInstanceKey, setMapInstanceKey] = useState(0);
   const mapRef = useRef(null);
@@ -439,6 +460,7 @@ const ReportMap = ({
           baseCountryBg={baseCountryBg}
           countryOutlineColor={countryOutlineColor}
           countryOverlayColor={countryOverlayColor}
+          hexPolygonResolution={geoBinResolution}
           hexBinCounts={hexBinCounts}
           hexbinOverlayColor={hexbinOverlayColor}
           maxBinCount={maxHexbinCount}

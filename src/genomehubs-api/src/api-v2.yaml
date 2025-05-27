@@ -324,6 +324,46 @@ components:
       name: emptyColumns
       schema:
         type: boolean
+    geoBinResolutionParam:
+      description: |
+        Geographic bin resolution to use when generating maps.
+
+        This parameter only applies to searches with `report=map`.
+      examples:
+        null:
+          value:
+          summary: Use default resolution (3)
+        one:
+          value: 1
+          summary: Use resolution level 1
+        two:
+          value: 2
+          summary: Use resolution level 2
+      in: query
+      name: geoBinResolution
+      required: false
+      schema:
+        type: integer
+        default: 3
+        minimum: 1
+        maximum: 5
+    geoBoundsParam:
+      description: |
+        Geographic bounding box to restrict search to.
+
+        The bounding box is specified as a comma separated string of the form `west,south,east,north` in decimal degrees.
+      examples:
+        null:
+          value:
+          summary: Do not restrict results to a geographic bounding box
+        bounds:
+          value: -10.0,-10.0,10.0,10.0
+          summary: Restrict lookup to a bounding box from -10,-10 to 10,10
+      in: query
+      name: geoBounds
+      required: false
+      schema:
+        type: string
     groupsParam:
       description: |
         Comma separated list of attribute display groups to return.
@@ -431,6 +471,23 @@ components:
           summary: Restrict lookup to taxon ID 33208 (Metazoa)
       in: query
       name: lineage
+      required: false
+      schema:
+        type: string
+    locationFieldParam:
+      description: |
+        Field to use for location values.
+
+        This parameter only applies to searches with `report=map`.
+      examples:
+        null:
+          value:
+          summary: Do not specify a location field
+        sample_location:
+          value: sample_location
+          summary: Use sample_location field for location values
+      in: query
+      name: locationField
       required: false
       schema:
         type: string
@@ -659,6 +716,23 @@ components:
         items:
           type: string
       style: form
+    regionFieldParam:
+      description: |
+        Field to use for region values.
+
+        This parameter only applies to searches with `report=map`.
+      examples:
+        null:
+          value:
+          summary: Do not specify a region field
+        country_list:
+          value: country_list
+          summary: Use country_list field for region values
+      in: query
+      name: regionField
+      required: false
+      schema:
+        type: string
     releaseParam:
       description: |
         **Not in use:** GenomeHub release number
@@ -1507,7 +1581,11 @@ paths:
         - $ref: "#/components/parameters/yOptsParam"
         - $ref: "#/components/parameters/reorientParam"
         - $ref: "#/components/parameters/checkedFilesParam"
+        - $ref: "#/components/parameters/geoBinResolutionParam"
+        - $ref: "#/components/parameters/geoBoundsParam"
+        - $ref: "#/components/parameters/locationFieldParam"
         - $ref: "#/components/parameters/mapThresholdParam"
+        - $ref: "#/components/parameters/regionFieldParam"
         - $ref: "#/components/parameters/scatterThresholdParam"
         - $ref: "#/components/parameters/treeThresholdParam"
         - $ref: "#/components/parameters/queryIdParam"

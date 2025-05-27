@@ -139,6 +139,11 @@ export const getMap = async ({
   taxonomy,
   queryString,
   fields,
+  locationField,
+  geoBinResolution,
+  geoBounds,
+  locationSummary,
+  regionField,
   req,
   ...apiParams
 }) => {
@@ -152,6 +157,11 @@ export const getMap = async ({
     result: apiParams.result,
     taxonomy,
     fields,
+    locationField,
+    geoBinResolution,
+    geoBounds,
+    locationSummary,
+    regionField,
     req,
     apiParams,
   });

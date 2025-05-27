@@ -87,6 +87,13 @@ const ReportItem = ({
   compactWidth,
   highlightArea,
   mapThreshold,
+  locationField,
+  regionField,
+  geoBounds,
+  mapType,
+  mapTheme,
+  mapProjection,
+  geoBinResolution,
   scatterThreshold,
   yScale,
   zScale,
@@ -324,6 +331,14 @@ const ReportItem = ({
             minDim={minDim}
             setMinDim={setMinDim}
             mapThreshold={mapThreshold}
+            locationField={locationField}
+            regionField={regionField}
+            geoBounds={geoBounds}
+            mapType={mapType}
+            mapTheme={mapTheme}
+            mapProjection={mapProjection}
+            geoBinResolution={geoBinResolution}
+            highlightArea={highlightArea}
           />
         );
         break;

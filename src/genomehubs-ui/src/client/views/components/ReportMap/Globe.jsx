@@ -32,6 +32,7 @@ const Globe = ({
   globeBgImg = null,
   pointsData = [],
   hexBinCounts = {},
+  hexPolygonResolution = 3,
   nightMode = false,
   countryOutlineColor = "#333333",
   countryOverlayColor = "#fec44f",
@@ -99,8 +100,6 @@ const Globe = ({
     const t = setTimeout(() => setShowGlobe(true), 30); // 30ms delay
     return () => clearTimeout(t);
   }, []);
-
-  console.log({ centerLat, centerLon, bounds, pointsData });
 
   // Ensure globe zooms to bounds when showGlobe becomes true
   useEffect(() => {
@@ -209,7 +208,7 @@ const Globe = ({
           pointLabel={(d) => d.label}
           // HEXBIN LAYER
           hexPolygonsData={hexBinFeatures}
-          hexPolygonResolution={3}
+          hexPolygonResolution={hexPolygonResolution}
           hexPolygonMargin={0.05}
           hexPolygonPoints={(d) => d.geometry.coordinates[0]}
           hexPolygonColor={(d) =>
