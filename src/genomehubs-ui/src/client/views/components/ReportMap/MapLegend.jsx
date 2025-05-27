@@ -1,16 +1,20 @@
+import React, { useState } from "react";
+
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
-import React from "react";
 import Switch from "@mui/material/Switch";
+import { mixColor } from "../../functions/mixColor";
+import { transform } from "proj4";
 
 const ColorRampBar = ({ min, max, color1, bg, getColor }) => {
+  const borderRadius = 6;
   // Compute mid value
   const mid = max - min > 10 ? Math.round((min + max) / 2) : (min + max) / 2;
   // Gradient CSS
-  const gradient = `linear-gradient(90deg, ${getColor(min)} 0%, ${getColor(max)} 100%)`;
+  const gradient = `linear-gradient(90deg, ${getColor(min)} ${borderRadius}px, ${getColor(max)} calc(100% - ${borderRadius}px)`;
   return (
     <div
       style={{ width: 180, marginBottom: 8, position: "relative", height: 28 }}
@@ -22,7 +26,8 @@ const ColorRampBar = ({ min, max, color1, bg, getColor }) => {
           style={{
             position: "absolute",
             left: `${((val - min) / (max - min || 1)) * 100}%`,
-            marginLeft: i == 0 ? "0.5px" : i == 2 ? "-0.5px" : 0,
+            marginLeft:
+              i == 0 ? `${borderRadius}px` : i == 2 ? `-${borderRadius}px` : 0,
             top: 18, // move label below ramp and tick
             transform: "translateX(-50%)",
             textAlign: "center",
@@ -38,9 +43,9 @@ const ColorRampBar = ({ min, max, color1, bg, getColor }) => {
             style={{
               position: "absolute",
               left: "50%",
-              top: i == 1 ? "-5px" : "-10px", // place tick just below ramp
+              top: "-5px", // place tick just below ramp
               transform: "translateX(-50%)",
-              height: i == 1 ? "3px" : "8px",
+              height: "5px",
               borderLeft: "1px solid #888",
               marginBottom: 1,
               width: 0,
@@ -55,7 +60,7 @@ const ColorRampBar = ({ min, max, color1, bg, getColor }) => {
       <div
         style={{
           height: 14,
-          borderRadius: 6,
+          borderRadius,
           background: gradient,
           border: "1px solid #888",
           width: "100%",
@@ -68,11 +73,9 @@ const ColorRampBar = ({ min, max, color1, bg, getColor }) => {
 export const MapLegend = ({
   nightMode,
   theme,
-  showLegend,
   globeView,
   setGlobeView,
   setNightMode,
-  setShowLegend,
   minCountryCount,
   maxCountryCount,
   countryOverlayColor,
@@ -80,6 +83,7 @@ export const MapLegend = ({
   maxHexbinCount,
   hexbinOverlayColor,
 }) => {
+  const [showLegend, setShowLegend] = useState(false);
   return (
     <FormGroup
       row
@@ -183,7 +187,11 @@ export const MapLegend = ({
           }}
           aria-label={showLegend ? "Hide legend" : "Show legend"}
         >
-          {showLegend ? <MenuOpenIcon /> : <MenuIcon />}
+          {showLegend ? (
+            <MenuOpenIcon style={{ transform: "scaleX(-1)" }} />
+          ) : (
+            <MenuIcon />
+          )}
         </IconButton>
       </div>
       {showLegend && (
@@ -209,7 +217,7 @@ export const MapLegend = ({
                   : "#eeeeee"
             }
             getColor={(val) =>
-              require("../../functions/mixColor").mixColor({
+              mixColor({
                 color1: countryOverlayColor,
                 color2: nightMode
                   ? "#22262a"
@@ -245,7 +253,7 @@ export const MapLegend = ({
                   : "#eeeeee"
             }
             getColor={(val) =>
-              require("../../functions/mixColor").mixColor({
+              mixColor({
                 color1: hexbinOverlayColor,
                 color2: nightMode
                   ? "#22262a"

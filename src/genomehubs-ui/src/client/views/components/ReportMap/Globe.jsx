@@ -195,7 +195,7 @@ const Globe = ({
           polygonStrokeColor={() => countryOutlineColor}
           polygonLabel={getPolyLabel}
           onPolygonClick={handlePolyClick}
-          polygonSideColor={"rgba(0, 0, 0, 0.0)"}
+          polygonSideColor={() => oceanColor + "80"}
           polygonAltitude={(d) =>
             countryCounts[d.properties.ISO_A2] > 0 ? 0.01 : 0.01
           }

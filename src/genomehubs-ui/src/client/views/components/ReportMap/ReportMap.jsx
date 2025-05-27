@@ -163,8 +163,6 @@ const ReportMap = ({
   height = height || 300;
   const [globeView, setGlobeView] = useState(false);
   const [nightMode, setNightMode] = useState(theme === "darkTheme");
-  const [showColorKey, setShowColorKey] = useState(true);
-  const [showLegend, setShowLegend] = useState(false);
   const [crs, setCrs] = useState(() => getCrs(mapProjection, L));
   const [mapInstanceKey, setMapInstanceKey] = useState(0);
   const mapRef = useRef(null);
@@ -487,11 +485,9 @@ const ReportMap = ({
               {...{
                 nightMode,
                 theme,
-                showLegend,
                 globeView,
                 setGlobeView,
                 setNightMode,
-                setShowLegend,
                 minCountryCount,
                 maxCountryCount,
                 countryOverlayColor,
