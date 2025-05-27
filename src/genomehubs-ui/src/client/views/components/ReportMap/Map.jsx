@@ -1,10 +1,10 @@
 import { CircleMarker, GeoJSON, MapContainer } from "react-leaflet";
 import React, { forwardRef, useEffect, useRef } from "react";
+import { getFitWorldZoom, getMercatorMinZoom } from "./functions/mapHelpers";
 
 import L from "leaflet";
 import countriesGeoJson from "../geojson/countries.geojson";
 import getCountryColor from "./functions/getCountryColor";
-import { getMercatorMinZoom, getFitWorldZoom } from "./functions/mapHelpers";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
 import { mixColor } from "../../functions/mixColor";
 
@@ -74,6 +74,7 @@ const Map = forwardRef(
       width,
       height,
       crs,
+      dataBounds,
       projectionBounds,
       fitWorldBounds,
       oceanColor,
@@ -110,7 +111,13 @@ const Map = forwardRef(
       crs && (crs.code === "EPSG:3857" || crs.options?.code === "EPSG:3857");
     // Generalized: use getFitWorldZoom for all projections
     const { getFitWorldZoom } = require("./functions/mapHelpers");
-    const dynamicZoom = getFitWorldZoom(width, height, crs, projectionBounds.worldBounds, L);
+    const dynamicZoom = getFitWorldZoom(
+      width,
+      height,
+      crs,
+      projectionBounds.worldBounds,
+      L,
+    );
     // Center the map after mount for all projections
     React.useEffect(() => {
       if (mapInstanceRef.current) {

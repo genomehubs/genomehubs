@@ -10,7 +10,15 @@ export const clampLatLng = (lat, lng) => [
 
 // Helper: Normalize and clamp bounds to [southWest, northEast] within world
 export const normalizeBounds = (b, projection, PROJECTION_BOUNDS) => {
-  if (!b || b.length !== 2) {
+  let sw, ne;
+  if (b && !Array.isArray(b) && typeof b === "object") {
+    // If bounds is an object, convert to array format
+    // example: {top_left: {lat: 77.78527798131108, lon: -70.63138900324702}, bottom_right: {lat: 41.1921838670969, lon: 1.206449819728732}}
+    [sw, ne] = [
+      clampLatLng(b.bottom_right.lat, b.top_left.lon),
+      clampLatLng(b.top_left.lat, b.bottom_right.lon),
+    ];
+  } else if (!b || b.length !== 2) {
     // Use world bounds for the current projection
     return (
       PROJECTION_BOUNDS[projection]?.worldBounds || [
@@ -18,8 +26,9 @@ export const normalizeBounds = (b, projection, PROJECTION_BOUNDS) => {
         [90, 180],
       ]
     );
+  } else {
+    [sw, ne] = [clampLatLng(...b[0]), clampLatLng(...b[1])];
   }
-  const [sw, ne] = [clampLatLng(...b[0]), clampLatLng(...b[1])];
   const minLat = Math.min(sw[0], ne[0]);
   const maxLat = Math.max(sw[0], ne[0]);
   const minLng = Math.min(sw[1], ne[1]);
@@ -127,8 +136,20 @@ export const getFitWorldBounds = (
     const EPS = 1e-6;
     const safeLat = isNaN(lat) ? 0 : lat;
     const safeLng = isNaN(lng) ? 0 : lng;
-    const clampedLat = Math.max(-90, Math.min(90, Math.abs(safeLat) < 90 + EPS ? safeLat : (safeLat < 0 ? -90 : 90)));
-    const clampedLng = Math.max(-180, Math.min(180, Math.abs(safeLng) < 180 + EPS ? safeLng : (safeLng < 0 ? -180 : 180)));
+    const clampedLat = Math.max(
+      -90,
+      Math.min(
+        90,
+        Math.abs(safeLat) < 90 + EPS ? safeLat : safeLat < 0 ? -90 : 90,
+      ),
+    );
+    const clampedLng = Math.max(
+      -180,
+      Math.min(
+        180,
+        Math.abs(safeLng) < 180 + EPS ? safeLng : safeLng < 0 ? -180 : 180,
+      ),
+    );
     return [clampedLat, clampedLng];
   }
   const swClamped = clampLatLngWithTolerance(swLatLng.lat, swLatLng.lng);

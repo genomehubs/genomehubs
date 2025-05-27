@@ -28,7 +28,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
-import Globe from "react-globe.gl";
+import Globe from "./Globe";
 import Grid from "@mui/material/Grid2";
 import IconButton from "@mui/material/IconButton";
 import InputLabel from "@mui/material/InputLabel";
@@ -185,8 +185,8 @@ const ReportMap = ({
   setMinDim,
   xOpts,
   basename,
-  mapProjection = "cylindricalEqualArea",
-  //mapProjection = "mercator",
+  //mapProjection = "cylindricalEqualArea",
+  mapProjection = "mercator",
   ...props
 }) => {
   const navigate = useNavigate();
@@ -196,7 +196,7 @@ const ReportMap = ({
   const measured = size.width && size.height;
   width = width || 400;
   height = height || 300;
-  const [globeView, setGlobeView] = useState(false);
+  const [globeView, setGlobeView] = useState(true);
   const [nightMode, setNightMode] = useState(theme === "darkTheme");
   const [showColorKey, setShowColorKey] = useState(true);
   const [showLegend, setShowLegend] = useState(false);
@@ -209,6 +209,18 @@ const ReportMap = ({
     setCrs(getCrs(mapProjection, L));
     setMapInstanceKey((prev) => prev + 1);
   }, [mapProjection]);
+
+  const darkColor = colorScheme?.[theme]?.darkColor || "#222a38";
+  const lightColor = colorScheme?.[theme]?.lightColor || "#fff";
+  const globeBg = nightMode
+    ? "#0a0a1a"
+    : theme === "darkTheme"
+      ? lightColor
+      : darkColor;
+  const globeBgImg = nightMode
+    ? "https://raw.githubusercontent.com/vasturiano/three-globe/master/example/img/night-sky.png"
+    : null;
+  const countryOutlineColor = nightMode ? "#ffa870" : "#333";
 
   // --- BEGIN: Color Key Logic ---
   const countryOverlayColor = "#ff7001";
@@ -433,6 +445,75 @@ const ReportMap = ({
         ),
       [mapProjection, width, height, crs],
     );
+    let dataBounds = fitWorldBounds;
+    if (locationBounds?.stats?.geo?.bounds) {
+      dataBounds = normalizeBounds(locationBounds.stats.geo.bounds);
+    }
+    let mapGlobe = null;
+    if (globeView) {
+      // Use Globe component for globe view
+      mapGlobe = (
+        <Globe
+          key={`globe-${mapProjection}-${crs?.code || crs?.options?.code || ""}`}
+          ref={mapRef}
+          width={width}
+          height={height}
+          bounds={dataBounds}
+          projectionBounds={projectionBounds}
+          fitWorldBounds={fitWorldBounds}
+          oceanColor={nightMode ? "#0a1a2a" : "#b3d1e6"}
+          countryCounts={countryCounts}
+          onCountryClick={handleCountryClick}
+          globeBg={globeBg}
+          globeBgImg={globeBgImg}
+          baseCountryBg={
+            nightMode
+              ? "#22262a"
+              : theme === "darkTheme"
+                ? colorScheme?.[theme]?.darkColor || "#222a38"
+                : "#eeeeee"
+          }
+          countryOutlineColor={countryOutlineColor}
+          countryOverlayColor={countryOverlayColor}
+          hexBinCounts={hexBinCounts}
+          hexbinOverlayColor={hexbinOverlayColor}
+          maxBinCount={maxHexbinCount}
+          markers={markers}
+          {...props}
+        />
+      );
+    } else if (measured && crs) {
+      // Use Map component for flat map view
+      mapGlobe = (
+        <Map
+          key={`map-${mapProjection}-${crs?.code || crs?.options?.code || ""}`}
+          ref={mapRef}
+          width={width}
+          height={height}
+          crs={crs}
+          dataBounds={dataBounds}
+          projectionBounds={projectionBounds}
+          fitWorldBounds={fitWorldBounds}
+          oceanColor={nightMode ? "#0a1a2a" : "#b3d1e6"}
+          countryCounts={countryCounts}
+          onCountryClick={handleCountryClick}
+          baseCountryBg={
+            nightMode
+              ? "#22262a"
+              : theme === "darkTheme"
+                ? colorScheme?.[theme]?.darkColor || "#222a38"
+                : "#eeeeee"
+          }
+          countryOutlineColor={nightMode ? "#ffa870" : "#333"}
+          countryOutlineGlow={nightMode}
+          hexBinCounts={hexBinCounts}
+          hexbinOverlayColor={hexbinOverlayColor}
+          maxBinCount={maxHexbinCount}
+          markers={markers}
+          {...props}
+        />
+      );
+    }
     // Only render Map when measured width and height are available and crs is set
     if (measured && crs) {
       return (
@@ -640,34 +721,8 @@ const ReportMap = ({
               )}
             </FormGroup>
             {/* Map or Globe rendering logic goes here */}
-            {measured && crs && (
-              <Map
-                key={`map-${mapProjection}-${crs?.code || crs?.options?.code || ""}`}
-                ref={mapRef}
-                width={width}
-                height={height}
-                crs={crs}
-                projectionBounds={projectionBounds}
-                fitWorldBounds={fitWorldBounds}
-                oceanColor={nightMode ? "#0a1a2a" : "#b3d1e6"}
-                countryCounts={countryCounts}
-                onCountryClick={handleCountryClick}
-                baseCountryBg={
-                  nightMode
-                    ? "#22262a"
-                    : theme === "darkTheme"
-                      ? colorScheme?.[theme]?.darkColor || "#222a38"
-                      : "#eeeeee"
-                }
-                countryOutlineColor={nightMode ? "#ffa870" : "#333"}
-                countryOutlineGlow={nightMode}
-                hexBinCounts={hexBinCounts}
-                hexbinOverlayColor={hexbinOverlayColor}
-                maxBinCount={maxHexbinCount}
-                markers={markers}
-                {...props}
-              />
-            )}
+
+            {mapGlobe}
           </div>
         </Grid>
       );
