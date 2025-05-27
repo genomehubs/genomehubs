@@ -63,25 +63,6 @@ import withTheme from "#hocs/withTheme";
 // Default region attribute (user-editable in future)
 const REGION_ATTRIBUTE = "country_code";
 
-// Add supported projections
-const SUPPORTED_PROJECTIONS = [
-  { value: "mercator", label: "Mercator" },
-  { value: "cylindricalEqualArea", label: "Cylindrical Equal Area" },
-];
-
-const PROJECTION_DEFS = {
-  mercator: {
-    name: "EPSG:3857",
-    def: "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
-    label: "Mercator",
-  },
-  cylindricalEqualArea: {
-    name: "ESRI:54034",
-    def: "+proj=cea +lon_0=0 +lat_ts=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
-    label: "Cylindrical Equal Area",
-  },
-};
-
 const PROJECTION_BOUNDS = {
   mercator: {
     minZoom: 0,
@@ -185,8 +166,8 @@ const ReportMap = ({
   setMinDim,
   xOpts,
   basename,
-  //mapProjection = "cylindricalEqualArea",
-  mapProjection = "mercator",
+  mapProjection = "cylindricalEqualArea",
+  // mapProjection = "mercator",
   ...props
 }) => {
   const navigate = useNavigate();
@@ -196,7 +177,7 @@ const ReportMap = ({
   const measured = size.width && size.height;
   width = width || 400;
   height = height || 300;
-  const [globeView, setGlobeView] = useState(true);
+  const [globeView, setGlobeView] = useState(false);
   const [nightMode, setNightMode] = useState(theme === "darkTheme");
   const [showColorKey, setShowColorKey] = useState(true);
   const [showLegend, setShowLegend] = useState(false);
@@ -220,7 +201,14 @@ const ReportMap = ({
   const globeBgImg = nightMode
     ? "https://raw.githubusercontent.com/vasturiano/three-globe/master/example/img/night-sky.png"
     : null;
+  const baseCountryBg = nightMode
+    ? "#22262a"
+    : theme === "darkTheme"
+      ? colorScheme?.[theme]?.darkColor || "#222a38"
+      : "#eeeeee";
+
   const countryOutlineColor = nightMode ? "#ffa870" : "#333";
+  const oceanColor = nightMode ? "#0a1a2a" : "#b3d1e6";
 
   // --- BEGIN: Color Key Logic ---
   const countryOverlayColor = "#ff7001";
@@ -276,7 +264,7 @@ const ReportMap = ({
         ? "#222a38"
         : "#eeeeee";
     const ratio = Math.min(1, val / maxCount);
-    return require("../../functions/mixColor").mixColor({
+    mixColor({
       color1: overlayColor,
       color2: bg,
       ratio,
@@ -461,18 +449,12 @@ const ReportMap = ({
           bounds={dataBounds}
           projectionBounds={projectionBounds}
           fitWorldBounds={fitWorldBounds}
-          oceanColor={nightMode ? "#0a1a2a" : "#b3d1e6"}
+          oceanColor={oceanColor}
           countryCounts={countryCounts}
           onCountryClick={handleCountryClick}
           globeBg={globeBg}
           globeBgImg={globeBgImg}
-          baseCountryBg={
-            nightMode
-              ? "#22262a"
-              : theme === "darkTheme"
-                ? colorScheme?.[theme]?.darkColor || "#222a38"
-                : "#eeeeee"
-          }
+          baseCountryBg={baseCountryBg}
           countryOutlineColor={countryOutlineColor}
           countryOverlayColor={countryOverlayColor}
           hexBinCounts={hexBinCounts}
@@ -494,17 +476,11 @@ const ReportMap = ({
           dataBounds={dataBounds}
           projectionBounds={projectionBounds}
           fitWorldBounds={fitWorldBounds}
-          oceanColor={nightMode ? "#0a1a2a" : "#b3d1e6"}
+          oceanColor={oceanColor}
           countryCounts={countryCounts}
           onCountryClick={handleCountryClick}
-          baseCountryBg={
-            nightMode
-              ? "#22262a"
-              : theme === "darkTheme"
-                ? colorScheme?.[theme]?.darkColor || "#222a38"
-                : "#eeeeee"
-          }
-          countryOutlineColor={nightMode ? "#ffa870" : "#333"}
+          baseCountryBg={baseCountryBg}
+          countryOutlineColor={countryOutlineColor}
           countryOutlineGlow={nightMode}
           hexBinCounts={hexBinCounts}
           hexbinOverlayColor={hexbinOverlayColor}

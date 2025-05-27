@@ -1,8 +1,12 @@
 import { CircleMarker, GeoJSON, MapContainer } from "react-leaflet";
+import L, { bounds } from "leaflet";
 import React, { forwardRef, useEffect, useRef } from "react";
-import { getFitWorldZoom, getMercatorMinZoom } from "./functions/mapHelpers";
+import {
+  findCenterLatLng,
+  getFitWorldZoom,
+  getMercatorMinZoom,
+} from "./functions/mapHelpers";
 
-import L from "leaflet";
 import countriesGeoJson from "../geojson/countries.geojson";
 import getCountryColor from "./functions/getCountryColor";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
@@ -77,7 +81,7 @@ const Map = forwardRef(
       dataBounds,
       projectionBounds,
       fitWorldBounds,
-      oceanColor,
+      oceanColor = "#b3d1e6",
       countryCounts,
       onCountryClick,
       baseCountryBg,
@@ -109,9 +113,20 @@ const Map = forwardRef(
 
     const isMercator =
       crs && (crs.code === "EPSG:3857" || crs.options?.code === "EPSG:3857");
-    // Generalized: use getFitWorldZoom for all projections
-    const { getFitWorldZoom } = require("./functions/mapHelpers");
-    const dynamicZoom = getFitWorldZoom(
+
+    // If dataBounds are provided, zoom to fit data; else fit world
+    let boundsToFit = projectionBounds.worldBounds;
+    let dynamicZoom;
+
+    if (dataBounds && dataBounds.length === 2) {
+      boundsToFit = dataBounds;
+      dynamicZoom = getFitWorldZoom(width, height, crs, boundsToFit, L, true);
+    } else {
+      dynamicZoom = getFitWorldZoom(width, height, crs, boundsToFit, L);
+    }
+
+    const [centerLat, centerLon] = findCenterLatLng(boundsToFit);
+    const minZoom = getFitWorldZoom(
       width,
       height,
       crs,
@@ -121,11 +136,11 @@ const Map = forwardRef(
     // Center the map after mount for all projections
     React.useEffect(() => {
       if (mapInstanceRef.current) {
-        mapInstanceRef.current.setView([0, 0], dynamicZoom, {
+        mapInstanceRef.current.setView([centerLat, centerLon], dynamicZoom, {
           animate: false,
         });
       }
-    }, [dynamicZoom, width, height, crs]);
+    }, [dynamicZoom, width, height, crs, dataBounds]);
 
     return (
       <div
@@ -138,16 +153,18 @@ const Map = forwardRef(
           tap={false}
           style={{ width: "100%", height: "100%", background: oceanColor }}
           crs={crs}
-          minZoom={dynamicZoom}
-          maxZoom={dynamicZoom}
+          minZoom={minZoom}
+          maxZoom={minZoom + 6} // Allow some zooming in
           maxBounds={projectionBounds.worldBounds}
           maxBoundsViscosity={1.0}
-          {...(isMercator
-            ? { center: [0, 0], zoom: dynamicZoom }
-            : {
-                bounds: fitWorldBounds,
-                boundsOptions: { animate: false, padding: [0, 0] },
-              })}
+          center={[centerLat, centerLon]}
+          zoom={dynamicZoom}
+          // {...(isMercator
+          //   ? { center: [centerLat, centerLon], zoom: dynamicZoom }
+          //   : {
+          //       bounds: boundsToFit,
+          //       boundsOptions: { animate: false, padding: [0, 0] },
+          //     })}
         >
           <CountryLayer
             countryCounts={countryCounts}

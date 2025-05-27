@@ -12,6 +12,7 @@ import { MeshPhongMaterial } from "three";
 import NavLink from "../NavLink";
 import Skeleton from "@mui/material/Skeleton";
 import countriesGeoJson from "../geojson/countries.geojson";
+import { findCenterLatLng } from "./functions/mapHelpers";
 import getCountryColor from "./functions/getCountryColor";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
 import { mixColor } from "../../functions/mixColor";
@@ -43,12 +44,8 @@ const Globe = ({
   const [globeLoading, setGlobeLoading] = useState(true); // <-- ensure this is defined in Map
   const [showGlobe, setShowGlobe] = useState(false); // <-- move this up to top-level, before any conditional logic
   // Calculate center of bounds for zoom
-  let centerLat = 0,
-    centerLon = 0;
-  if (bounds && bounds.length === 2) {
-    centerLat = (bounds[0][0] + bounds[1][0]) / 2;
-    centerLon = (bounds[0][1] + bounds[1][1]) / 2;
-  }
+  const [centerLat, centerLon] = findCenterLatLng(bounds);
+
   const maxCount = useMemo(
     () => Math.max(...Object.values(countryCounts), 1),
     [countryCounts],

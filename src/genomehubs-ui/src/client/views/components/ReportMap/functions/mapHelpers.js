@@ -39,6 +39,16 @@ export const normalizeBounds = (b, projection, PROJECTION_BOUNDS) => {
   ];
 };
 
+export const findCenterLatLng = (bounds) => {
+  let centerLat = 0,
+    centerLng = 0;
+  if (bounds && bounds.length === 2) {
+    centerLat = (bounds[0][0] + bounds[1][0]) / 2;
+    centerLng = (bounds[0][1] + bounds[1][1]) / 2;
+  }
+  return [centerLat, centerLng];
+};
+
 // Helper: Calculate world aspect ratio for each projection
 export const getWorldAspect = (projection, PROJECTION_BOUNDS) => {
   const wb = PROJECTION_BOUNDS[projection]?.worldBounds;
@@ -181,7 +191,14 @@ export function getMercatorMinZoom(widthPx, heightPx) {
 }
 
 // Generalized: Calculate dynamic zoom for any projection so the world fills the map area (width or height)
-export function getFitWorldZoom(widthPx, heightPx, crs, worldBounds, L) {
+export function getFitWorldZoom(
+  widthPx,
+  heightPx,
+  crs,
+  worldBounds,
+  L,
+  fitData = false,
+) {
   if (!widthPx || !heightPx || !crs || !worldBounds) {
     return 0;
   }
@@ -195,7 +212,11 @@ export function getFitWorldZoom(widthPx, heightPx, crs, worldBounds, L) {
   // Calculate zoom for width and height
   const zoomW = Math.log2((widthPx * initialRes) / worldWidth);
   const zoomH = Math.log2((heightPx * initialRes) / worldHeight);
-  return Math.max(0, Math.max(zoomW, zoomH));
+  const minZoom = crs.options?.minZoom || 0;
+  if (fitData) {
+    return Math.max(minZoom, Math.min(zoomW, zoomH) - 0.5);
+  }
+  return Math.max(minZoom, Math.max(0, Math.max(zoomW, zoomH)));
 }
 
 export function getCrs(projection, L) {
@@ -206,6 +227,27 @@ export function getCrs(projection, L) {
     return new L.Proj.CRS(
       "EPSG:6933",
       "+proj=cea +lon_0=0 +lat_ts=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+      {
+        origin: [-20037508.342789244, 20037508.342789244],
+        resolutions: [
+          156543.03392804097, 78271.51696402048, 39135.75848201024,
+          19567.87924100512, 9783.93962050256, 4891.96981025128,
+          2445.98490512564, 1222.99245256282, 611.49622628141, 305.748113140705,
+          152.8740565703525, 76.43702828517625, 38.21851414258813,
+          19.109257071294063, 9.554628535647032, 4.777314267823516,
+          2.388657133911758, 1.194328566955879,
+        ],
+        bounds: L.bounds(
+          [-20037508.342789244, -20037508.342789244],
+          [20037508.342789244, 20037508.342789244],
+        ),
+      },
+    );
+  }
+  if (projection === "albersEqualArea") {
+    return new L.Proj.CRS(
+      "EPSG:5070",
+      "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=39 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs",
       {
         origin: [-20037508.342789244, 20037508.342789244],
         resolutions: [
