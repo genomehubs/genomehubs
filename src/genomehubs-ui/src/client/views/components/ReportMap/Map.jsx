@@ -142,6 +142,17 @@ const Map = forwardRef(
       }
     }, [dynamicZoom, width, height, crs, dataBounds]);
 
+    // Update map background color when oceanColor changes
+    React.useEffect(() => {
+      if (mapContainerRef.current) {
+        const mapPane =
+          mapContainerRef.current.querySelector(".leaflet-container");
+        if (mapPane) {
+          mapPane.style.background = oceanColor;
+        }
+      }
+    }, [oceanColor]);
+
     return (
       <div
         ref={mapContainerRef}
