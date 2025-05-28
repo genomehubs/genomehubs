@@ -1,5 +1,5 @@
-import { CircleMarker, GeoJSON, MapContainer } from "react-leaflet";
-import L, { bounds } from "leaflet";
+import { CircleMarker, GeoJSON, MapContainer, TileLayer } from "react-leaflet";
+import L, { bounds, tileLayer } from "leaflet";
 import React, { forwardRef, useEffect, useRef } from "react";
 import {
   findCenterLatLng,
@@ -9,6 +9,7 @@ import {
 
 import countriesGeoJson from "../geojson/countries.geojson";
 import getCountryColor from "./functions/getCountryColor";
+import getMapOptions from "./functions/getMapOptions";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
 import { mixColor } from "../../functions/mixColor";
 
@@ -91,16 +92,17 @@ const SingleMarker = ({
 const Map = ({
   width,
   height,
+  theme,
+  colorScheme,
+  nightMode,
+  mapProjection = "mercator",
+  regionField,
   crs,
   dataBounds,
   projectionBounds,
   fitWorldBounds,
-  oceanColor = "#b3d1e6",
   countryCounts,
   onCountryClick,
-  baseCountryBg,
-  countryOutlineColor,
-  countryOutlineGlow,
   hexBinCounts = {},
   hexbinOverlayColor = "#3182bd",
   maxBinCount = 1,
@@ -109,6 +111,25 @@ const Map = ({
 }) => {
   const mapContainerRef = useRef();
   const mapInstanceRef = useRef();
+  const showRegions = Boolean(regionField);
+  const {
+    mapOptions: {
+      baseCountryBg,
+      countryOutlineColor,
+      countryOutlineGlow,
+      oceanColor,
+      tileUrl,
+      tileAttribution,
+      // countryOverlayColor,
+      // hexbinOverlayColor,
+    },
+  } = getMapOptions({
+    theme: "darkTheme",
+    colorScheme,
+    nightMode,
+    mapProjection,
+    showRegions,
+  });
 
   // Only render MapContainer if width and height are valid and CRS is set
   if (!width || !height || !crs) {
@@ -162,6 +183,32 @@ const Map = ({
     }
   }, [oceanColor]);
 
+  let tileLayer;
+  if (tileUrl) {
+    tileLayer = (
+      <TileLayer
+        url={tileUrl}
+        attribution={tileAttribution}
+        {...(crs && crs.options && crs.options.tileLayerOptions
+          ? crs.options.tileLayerOptions
+          : {})}
+      />
+    );
+  }
+
+  let countryLayer;
+  if (showRegions && countryCounts) {
+    countryLayer = (
+      <CountryLayer
+        countryCounts={countryCounts}
+        onCountryClick={onCountryClick}
+        baseBg={baseCountryBg}
+        outlineColor={countryOutlineColor}
+        outlineGlow={countryOutlineGlow}
+      />
+    );
+  }
+
   return (
     <div
       ref={mapContainerRef}
@@ -171,7 +218,11 @@ const Map = ({
         ref={mapInstanceRef}
         scrollWheelZoom={false}
         tap={false}
-        style={{ width: "100%", height: "100%", background: oceanColor }}
+        style={{
+          width: "100%",
+          height: "100%",
+          background: showRegions && oceanColor,
+        }}
         crs={crs}
         minZoom={minZoom}
         maxZoom={minZoom + 6} // Allow some zooming in
@@ -186,14 +237,8 @@ const Map = ({
         //       boundsOptions: { animate: false, padding: [0, 0] },
         //     })}
       >
-        <CountryLayer
-          countryCounts={countryCounts}
-          onCountryClick={onCountryClick}
-          repeat={true}
-          baseBg={baseCountryBg}
-          outlineColor={countryOutlineColor}
-          outlineGlow={countryOutlineGlow}
-        />
+        {tileLayer}
+        {countryLayer}
         {/* markers */}
         {hexBinFeatures.length > 0 && (
           <GeoJSON

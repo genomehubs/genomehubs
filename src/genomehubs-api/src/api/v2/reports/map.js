@@ -530,10 +530,6 @@ export const map = async ({
       xQuery: {
         ...xQuery,
         fields: optionalFields.join(","),
-        geoBinResolution,
-        geoBounds,
-        locationField,
-        regionField,
       },
       ...(y && {
         yQuery: {

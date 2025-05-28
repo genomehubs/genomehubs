@@ -14,6 +14,7 @@ import Skeleton from "@mui/material/Skeleton";
 import countriesGeoJson from "../geojson/countries.geojson";
 import { findCenterLatLng } from "./functions/mapHelpers";
 import getCountryColor from "./functions/getCountryColor";
+import getMapOptions from "./functions/getMapOptions";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
 import { mixColor } from "../../functions/mixColor";
 
@@ -22,19 +23,18 @@ const Globe = ({
   markers,
   width,
   height,
+  colorScheme,
   geoPoints = [],
+  regionField,
   countryCounts,
+  theme = "darkTheme",
   palette,
   onCountryClick,
-  oceanColor = "#b3d1e6",
-  baseCountryBg = "#eeeeee",
-  globeBg = "#eeeeee",
-  globeBgImg = null,
+
   pointsData = [],
   hexBinCounts = {},
   hexPolygonResolution = 3,
   nightMode = false,
-  countryOutlineColor = "#333333",
   countryOverlayColor = "#fec44f",
   hexbinOverlayColor = "#3182bd",
 }) => {
@@ -47,6 +47,25 @@ const Globe = ({
   // Calculate center of bounds for zoom
   const [centerLat, centerLon] = findCenterLatLng(bounds);
 
+  const {
+    globeOptions: {
+      baseCountryBg,
+      countryOutlineColor,
+      globeBg,
+      globeBgImg,
+      globeImageUrl,
+      oceanColor,
+      bumpImageUrl,
+      // countryOverlayColor,
+      // hexbinOverlayColor,
+    },
+  } = getMapOptions({
+    theme: "darkTheme",
+    colorScheme,
+    nightMode,
+    showRegions: Boolean(regionField),
+  });
+
   const maxCount = useMemo(
     () => Math.max(...Object.values(countryCounts), 1),
     [countryCounts],
@@ -56,9 +75,9 @@ const Globe = ({
       getCountryColor(
         countryCounts[d.properties.ISO_A2],
         maxCount,
-        countryOverlayColor || countryOverlayColorDefault, // use variable
+        countryOverlayColor, // use variable
         baseCountryBg,
-      ),
+      ) + "cc",
     [countryCounts, maxCount],
   );
   const getPolyLabel = useCallback(
@@ -186,18 +205,30 @@ const Globe = ({
           height={height}
           backgroundColor={globeBg}
           backgroundImageUrl={globeBgImg}
+          globeImageUrl={globeImageUrl}
+          bumpImageUrl={bumpImageUrl}
           rendererConfig={{ alpha: true }}
           showGlobe={true}
-          globeMaterial={new MeshPhongMaterial({ color: oceanColor })}
-          polygonsData={countriesGeoJson.features}
-          polygonCapColor={getPolyColor}
-          polygonStrokeColor={() => countryOutlineColor}
-          polygonLabel={getPolyLabel}
-          onPolygonClick={handlePolyClick}
-          polygonSideColor={() => oceanColor + "80"}
-          polygonAltitude={(d) =>
-            countryCounts[d.properties.ISO_A2] > 0 ? 0.01 : 0.01
+          globeMaterial={
+            globeImageUrl === null
+              ? new MeshPhongMaterial({ color: oceanColor })
+              : null
           }
+          {...(!globeImageUrl && {
+            globeMaterial: new MeshPhongMaterial({
+              color: oceanColor,
+              bumpMap: null,
+              bumpScale: 0,
+            }),
+            polygonsData: countriesGeoJson.features,
+            polygonCapColor: getPolyColor,
+            polygonStrokeColor: () => countryOutlineColor,
+            polygonLabel: getPolyLabel,
+            onPolygonClick: handlePolyClick,
+            polygonSideColor: () => oceanColor + "80",
+            polygonAltitude: (d) =>
+              countryCounts[d.properties.ISO_A2] > 0 ? 0.01 : 0.01,
+          })}
           pointsData={combinedPointsData}
           pointLat={(d) => d.lat}
           pointLng={(d) => d.lng}

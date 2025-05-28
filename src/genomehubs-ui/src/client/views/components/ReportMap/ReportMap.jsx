@@ -174,6 +174,12 @@ const ReportMap = ({
   if (query.geoBinResolution) {
     geoBinResolution = parseInt(query.geoBinResolution, 10) || 0;
   }
+  if (query.locationField) {
+    locationField = query.locationField;
+  }
+  if (query.regionField) {
+    regionField = query.regionField;
+  }
   const componentRef = chartRef || useRef();
   const size = useResize(containerRef || componentRef);
   let { width, height } = size;
@@ -186,32 +192,13 @@ const ReportMap = ({
   );
   const [crs, setCrs] = useState(() => getCrs(mapProjection, L));
   const [mapInstanceKey, setMapInstanceKey] = useState(0);
-  const mapRef = useRef(null);
+  // const mapRef = useRef(null);
 
   // CRS setup (now synchronous)
   useEffect(() => {
     setCrs(getCrs(mapProjection, L));
     setMapInstanceKey((prev) => prev + 1);
   }, [mapProjection]);
-
-  const darkColor = colorScheme?.[theme]?.darkColor || "#222a38";
-  const lightColor = colorScheme?.[theme]?.lightColor || "#fff";
-  const globeBg = nightMode
-    ? "#0a0a1a"
-    : theme === "darkTheme"
-      ? lightColor
-      : darkColor;
-  const globeBgImg = nightMode
-    ? "https://raw.githubusercontent.com/vasturiano/three-globe/master/example/img/night-sky.png"
-    : null;
-  const baseCountryBg = nightMode
-    ? "#22262a"
-    : theme === "darkTheme"
-      ? colorScheme?.[theme]?.darkColor || "#222a38"
-      : "#eeeeee";
-
-  const countryOutlineColor = nightMode ? "#ffa870" : "#333";
-  const oceanColor = nightMode ? "#0a1a2a" : "#b3d1e6";
 
   // --- BEGIN: Color Key Logic ---
   const countryOverlayColor = "#ff7001";
@@ -446,19 +433,18 @@ const ReportMap = ({
       mapGlobe = (
         <Globe
           key={`globe-${mapProjection}-${crs?.code || crs?.options?.code || ""}`}
-          ref={mapRef}
+          // ref={mapRef}
           width={width}
           height={height}
           bounds={dataBounds}
+          theme={theme}
+          colorScheme={colorScheme}
+          nightMode={nightMode}
           projectionBounds={projectionBounds}
           fitWorldBounds={fitWorldBounds}
-          oceanColor={oceanColor}
+          regionField={regionField}
           countryCounts={countryCounts}
           onCountryClick={handleCountryClick}
-          globeBg={globeBg}
-          globeBgImg={globeBgImg}
-          baseCountryBg={baseCountryBg}
-          countryOutlineColor={countryOutlineColor}
           countryOverlayColor={countryOverlayColor}
           hexPolygonResolution={geoBinResolution}
           hexBinCounts={hexBinCounts}
@@ -473,18 +459,20 @@ const ReportMap = ({
       mapGlobe = (
         <Map
           key={`map-${mapProjection}-${crs?.code || crs?.options?.code || ""}`}
-          ref={mapRef}
+          // ref={mapRef}
           width={width}
           height={height}
+          theme={theme}
+          colorScheme={colorScheme}
+          nightMode={nightMode}
+          mapProjection={mapProjection}
+          regionField={regionField}
           crs={crs}
           dataBounds={dataBounds}
           projectionBounds={projectionBounds}
           fitWorldBounds={fitWorldBounds}
-          oceanColor={oceanColor}
           countryCounts={countryCounts}
           onCountryClick={handleCountryClick}
-          baseCountryBg={baseCountryBg}
-          countryOutlineColor={countryOutlineColor}
           countryOutlineGlow={nightMode}
           hexBinCounts={hexBinCounts}
           hexbinOverlayColor={hexbinOverlayColor}

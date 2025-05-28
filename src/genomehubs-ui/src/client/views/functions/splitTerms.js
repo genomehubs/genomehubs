@@ -12,6 +12,13 @@ const reportParams = {
   reorient: false,
   dropShadow: false,
   catToX: false,
+  regionField: false,
+  locationField: false,
+  geoBounds: false,
+  mapType: "map",
+  mapTheme: false,
+  mapProjection: "mercator",
+  geoBinResolution: 3,
 };
 
 const searchParams = {
