@@ -26,15 +26,12 @@ export const getMapOptions = ({
       globeImageUrl =
         "https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg";
       // Use CartoDB's dark matter tiles for mercator, and OpenStreetMap for cylindricalEqualArea in night mode:
-      tileUrl =
-        mapProjection === "cylindricalEqualArea"
-          ? "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-          : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
-      // Attribution for CartoDB tiles:
-      tileAttribution =
-        mapProjection === "cylindricalEqualArea"
-          ? '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          : '© <a href="https://carto.com/attributions">CARTO</a> | Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
+      // if (mapProjection === "mercator") {
+      //   tileUrl =
+      //     "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+      //   tileAttribution =
+      //     '© <a href="https://carto.com/attributions">CARTO</a> | Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
+      // }
     }
   } else {
     globeBg = theme === "darkTheme" ? lightColor : darkColor;
@@ -42,18 +39,14 @@ export const getMapOptions = ({
     if (!showRegions) {
       globeImageUrl =
         "https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-day.jpg";
-      tileUrl =
-        mapProjection === "cylindricalEqualArea"
-          ? "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-          : "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
-      tileAttribution =
-        mapProjection === "cylindricalEqualArea"
-          ? '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          : "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community";
+      if (mapProjection === "mercator") {
+        tileUrl =
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+        tileAttribution =
+          "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community";
+      }
     }
   }
-  console.log({ mapProjection, tileAttribution });
-  // Bump map image URL for globe
 
   let globeOptions = {
     baseCountryBg,

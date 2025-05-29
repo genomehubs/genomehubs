@@ -185,19 +185,11 @@ const Map = ({
 
   let tileLayer;
   if (tileUrl) {
-    tileLayer = (
-      <TileLayer
-        url={tileUrl}
-        attribution={tileAttribution}
-        {...(crs && crs.options && crs.options.tileLayerOptions
-          ? crs.options.tileLayerOptions
-          : {})}
-      />
-    );
+    tileLayer = <TileLayer url={tileUrl} attribution={tileAttribution} />;
   }
 
   let countryLayer;
-  if (showRegions && countryCounts) {
+  if (!tileUrl || showRegions) {
     countryLayer = (
       <CountryLayer
         countryCounts={countryCounts}
