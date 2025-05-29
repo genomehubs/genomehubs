@@ -1,3 +1,12 @@
+import {
+  Color,
+  ConeGeometry,
+  Group,
+  Mesh,
+  MeshPhongMaterial,
+  SphereGeometry,
+  Vector3,
+} from "three";
 import React, {
   useCallback,
   useEffect,
@@ -5,10 +14,10 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { hex, lab } from "color-convert";
 import { useLocation, useNavigate } from "@reach/router";
 
 import GlobeGl from "react-globe.gl";
-import { MeshPhongMaterial } from "three";
 import NavLink from "../NavLink";
 import Skeleton from "@mui/material/Skeleton";
 import countriesGeoJson from "../geojson/countries.geojson";
@@ -20,7 +29,6 @@ import { mixColor } from "../../functions/mixColor";
 
 const Globe = ({
   bounds,
-  markers,
   width,
   height,
   colorScheme,
@@ -47,6 +55,16 @@ const Globe = ({
   // Calculate center of bounds for zoom
   const [centerLat, centerLon] = findCenterLatLng(bounds);
 
+  const maxCount = useMemo(
+    () => Math.max(...Object.values(countryCounts), 1),
+    [countryCounts],
+  );
+
+  const hexbinMaxCount = useMemo(
+    () => Math.max(...Object.values(hexBinCounts), 1),
+    [hexBinCounts],
+  );
+
   const {
     globeOptions: {
       baseCountryBg,
@@ -56,28 +74,22 @@ const Globe = ({
       globeImageUrl,
       oceanColor,
       bumpImageUrl,
-      // countryOverlayColor,
-      // hexbinOverlayColor,
+      countryColor,
+      hexbinColor,
     },
   } = getMapOptions({
     theme: "darkTheme",
     colorScheme,
     nightMode,
     showRegions: Boolean(regionField),
+    countryOverlayColor,
+    hexbinOverlayColor,
+    countryMaxCount: maxCount,
+    hexbinMaxCount,
   });
 
-  const maxCount = useMemo(
-    () => Math.max(...Object.values(countryCounts), 1),
-    [countryCounts],
-  );
   const getPolyColor = useCallback(
-    (d) =>
-      getCountryColor(
-        countryCounts[d.properties.ISO_A2],
-        maxCount,
-        countryOverlayColor, // use variable
-        baseCountryBg,
-      ) + "cc",
+    (d) => countryColor(countryCounts[d.properties.ISO_A2]) + "cc",
     [countryCounts, maxCount],
   );
   const getPolyLabel = useCallback(
@@ -90,17 +102,59 @@ const Globe = ({
     (d) => onCountryClick(d.properties.ISO_A2),
     [onCountryClick],
   );
-  //   // Imperatively update Leaflet container background on color change
-  //   useEffect(() => {
-  //     if (!globeView && mapContainerRef.current) {
-  //       // Always query for .leaflet-container inside the wrapper div
-  //       const leaflet =
-  //         mapContainerRef.current.querySelector(".leaflet-container");
-  //       if (leaflet) {
-  //         leaflet.style.background = oceanColor;
-  //       }
-  //     }
-  //   }, [oceanColor, globeView, nightMode]);
+  const getPinProps = ({ pointsData, size = 0.5, elevation = 0.04 }) => {
+    const labelsData = pointsData.flatMap((d) => {
+      const { lat, lng, label, alt, color, radius, ...rest } = d;
+      return [
+        {
+          lat,
+          lng,
+          alt: alt || elevation, // default altitude if not provided
+          color: color || "#fec44f", // default color if not provided
+          label: label || "Point",
+          radius: radius || size, // default radius if not provided
+          outline: false, // indicate this is a regular point
+          ...rest,
+        },
+        {
+          lat,
+          lng,
+          alt: alt ? alt - 0.002 : elevation - 0.002, // default altitude if not provided
+          color: "#ffffff", // default color if not provided
+          label: "",
+          radius: radius ? radius + size / 2 : size * 1.5, // default radius if not provided
+          outline: true,
+
+          ...rest,
+        },
+      ];
+    });
+
+    const pointProps = {
+      pointsData: pointsData,
+      pointLat: (d) => d.lat,
+      pointLng: (d) => d.lng,
+      pointAltitude: (d) => d.alt || elevation - 0.001,
+      pointRadius: size / 5,
+      pointColor: (d) => d.color || "#fec44f",
+    };
+
+    const labelProps = {
+      labelsData: labelsData,
+      labelLat: (d) => d.lat,
+      labelLng: (d) => d.lng,
+      labelAltitude: (d) => d.alt || elevation,
+      labelDotRadius: (d) => d.radius || size, // default radius if not provided
+      labelColor: (d) => d.color || "#fec44f",
+      labelText: (d) => "_",
+      labelSize: 0.0000001,
+    };
+
+    return {
+      ...pointProps,
+      ...labelProps,
+    };
+  };
 
   // HEXBIN LAYER SETUP
   let hexBinFeatures = [];
@@ -153,12 +207,45 @@ const Globe = ({
     return null;
   }
 
+  const polygonProps = {
+    globeMaterial: new MeshPhongMaterial({
+      color: oceanColor,
+      bumpMap: null,
+      bumpScale: 0,
+    }),
+    polygonsData: countriesGeoJson.features,
+    polygonCapColor: getPolyColor,
+    polygonStrokeColor: () => countryOutlineColor,
+    polygonLabel: getPolyLabel,
+    onPolygonClick: handlePolyClick,
+    polygonSideColor: () => oceanColor + "80",
+    polygonAltitude: (d) =>
+      countryCounts[d.properties.ISO_A2] > 0 ? 0.01 : 0.01,
+  };
+
   // Build combined pointsData with outline and center for each point
-  const combinedPointsData = [];
-  for (const pt of pointsData) {
-    combinedPointsData.push({ ...pt, isOutline: true }); // white outline
-    combinedPointsData.push({ ...pt, isOutline: false, label: pt.label }); // colored center with label
-  }
+  const pinProps = getPinProps({ pointsData, size: 0.5, elevation: 0.04 });
+
+  // const labelProps = {
+  //   particlesData: labelsData,
+  //   particleLat: (d) => d.lat,
+  //   particleLng: (d) => d.lng,
+  //   particleAltitude: (d) => d.alt || 0.045,
+  //   particlesSize: (d) => d.radius || 0.05, // default radius if not provided
+  //   particlesColor: (d) => d.color || "#fec44f",
+  //   // labelText: (d) => "_",
+  // };
+
+  const hexbinProps = {
+    hexPolygonsData: hexBinFeatures,
+    hexPolygonResolution: hexPolygonResolution,
+    hexPolygonMargin: 0.05,
+    hexPolygonPoints: (d) => d.geometry.coordinates[0],
+    hexPolygonColor: (d) => hexbinColor(d.properties.count) + "cc",
+    hexPolygonAltitude: 0.015,
+    hexPolygonLabel: (d) =>
+      `Hex: ${d.properties.h3}\nCount: ${d.properties.count}`,
+  };
 
   return (
     <div
@@ -214,45 +301,12 @@ const Globe = ({
               ? new MeshPhongMaterial({ color: oceanColor })
               : null
           }
-          {...(!globeImageUrl && {
-            globeMaterial: new MeshPhongMaterial({
-              color: oceanColor,
-              bumpMap: null,
-              bumpScale: 0,
-            }),
-            polygonsData: countriesGeoJson.features,
-            polygonCapColor: getPolyColor,
-            polygonStrokeColor: () => countryOutlineColor,
-            polygonLabel: getPolyLabel,
-            onPolygonClick: handlePolyClick,
-            polygonSideColor: () => oceanColor + "80",
-            polygonAltitude: (d) =>
-              countryCounts[d.properties.ISO_A2] > 0 ? 0.01 : 0.01,
-          })}
-          pointsData={combinedPointsData}
-          pointLat={(d) => d.lat}
-          pointLng={(d) => d.lng}
-          pointColor={(d) => (d.isOutline ? "#fff" : d.color)}
-          pointAltitude={(d) => (d.isOutline ? 0.022 : 0.025)}
-          pointRadius={(d) => (d.isOutline ? 0.45 : 0.32)}
-          pointResolution={16}
-          pointLabel={(d) => d.label}
+          // POLYGONS LAYER
+          {...(globeImageUrl ? {} : polygonProps)}
           // HEXBIN LAYER
-          hexPolygonsData={hexBinFeatures}
-          hexPolygonResolution={hexPolygonResolution}
-          hexPolygonMargin={0.05}
-          hexPolygonPoints={(d) => d.geometry.coordinates[0]}
-          hexPolygonColor={(d) =>
-            mixColor({
-              color1: hexbinOverlayColor,
-              color2: "#eeeeee",
-              ratio: Math.min(1, d.properties.count / maxBinCount),
-            }) + "cc"
-          }
-          hexPolygonAltitude={0.015}
-          hexPolygonLabel={(d) =>
-            `Hex: ${d.properties.h3}\nCount: ${d.properties.count}`
-          }
+          {...hexbinProps}
+          // POINTS LAYER
+          {...(pointsData.length > 0 ? pinProps : {})}
           onGlobeReady={() => setGlobeLoading(false)}
         />
       )}

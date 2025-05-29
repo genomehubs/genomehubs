@@ -123,7 +123,7 @@ const getMap = async ({
     // console.log(`locationRes: ${JSON.stringify(thresholdQuery, null, 2)}`);
     locationRes = await getResults({
       ...thresholdQuery,
-      size: locationSummary != "value" ? 0 : count,
+      size: count > mapThreshold ? 0 : count,
       taxonomy,
       // aggs: undefined,
       req,

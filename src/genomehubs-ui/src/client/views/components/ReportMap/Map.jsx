@@ -1,37 +1,24 @@
 import { CircleMarker, GeoJSON, MapContainer, TileLayer } from "react-leaflet";
-import L, { bounds, tileLayer } from "leaflet";
-import React, { forwardRef, useEffect, useRef } from "react";
-import {
-  findCenterLatLng,
-  getFitWorldZoom,
-  getMercatorMinZoom,
-} from "./functions/mapHelpers";
+import React, { useMemo, useRef } from "react";
+import { findCenterLatLng, getFitWorldZoom } from "./functions/mapHelpers";
 
+import L from "leaflet";
 import countriesGeoJson from "../geojson/countries.geojson";
-import getCountryColor from "./functions/getCountryColor";
 import getMapOptions from "./functions/getMapOptions";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
-import { mixColor } from "../../functions/mixColor";
 
 const CountryLayer = ({
   countryCounts,
   onCountryClick,
-  repeat = false,
-  baseBg = "#eeeeee",
+  countryColor = () => "#eeeeee",
   outlineColor = "#333",
   outlineGlow = false,
 }) => {
-  const maxCount = Math.max(...Object.values(countryCounts), 1);
   return (
     <GeoJSON
       data={{ type: "FeatureCollection", features: countriesGeoJson.features }}
       style={(feature) => ({
-        fillColor: getCountryColor(
-          countryCounts[feature.properties.ISO_A2],
-          maxCount,
-          undefined,
-          baseBg,
-        ),
+        fillColor: countryColor(countryCounts[feature.properties.ISO_A2]),
         weight: 0.7,
         color: outlineColor,
         fillOpacity: 0.7,
@@ -104,13 +91,22 @@ const Map = ({
   countryCounts,
   onCountryClick,
   hexBinCounts = {},
+  countryOverlayColor = "#fec44f",
   hexbinOverlayColor = "#3182bd",
   maxBinCount = 1,
   markers = [],
-  ...props
 }) => {
   const mapContainerRef = useRef();
   const mapInstanceRef = useRef();
+  const maxCount = useMemo(
+    () => Math.max(...Object.values(countryCounts), 1),
+    [countryCounts],
+  );
+
+  const hexbinMaxCount = useMemo(
+    () => Math.max(...Object.values(hexBinCounts), 1),
+    [hexBinCounts],
+  );
   const showRegions = Boolean(regionField);
   const {
     mapOptions: {
@@ -120,8 +116,8 @@ const Map = ({
       oceanColor,
       tileUrl,
       tileAttribution,
-      // countryOverlayColor,
-      // hexbinOverlayColor,
+      countryColor,
+      hexbinColor,
     },
   } = getMapOptions({
     theme: "darkTheme",
@@ -129,6 +125,10 @@ const Map = ({
     nightMode,
     mapProjection,
     showRegions,
+    countryOverlayColor,
+    hexbinOverlayColor,
+    countryMaxCount: maxCount,
+    hexbinMaxCount,
   });
 
   // Only render MapContainer if width and height are valid and CRS is set
@@ -194,7 +194,7 @@ const Map = ({
       <CountryLayer
         countryCounts={countryCounts}
         onCountryClick={onCountryClick}
-        baseBg={baseCountryBg}
+        countryColor={countryColor}
         outlineColor={countryOutlineColor}
         outlineGlow={countryOutlineGlow}
       />
@@ -222,12 +222,6 @@ const Map = ({
         maxBoundsViscosity={1.0}
         center={[centerLat, centerLon]}
         zoom={dynamicZoom}
-        // {...(isMercator
-        //   ? { center: [centerLat, centerLon], zoom: dynamicZoom }
-        //   : {
-        //       bounds: boundsToFit,
-        //       boundsOptions: { animate: false, padding: [0, 0] },
-        //     })}
       >
         {tileLayer}
         {countryLayer}
@@ -236,14 +230,8 @@ const Map = ({
           <GeoJSON
             data={hexBinsToGeoJson(hexBinCounts)}
             style={(feature) => {
-              const { count } = feature.properties;
-              const fillColor = mixColor({
-                color1: hexbinOverlayColor,
-                color2: "#eeeeee",
-                ratio: Math.min(1, count / maxBinCount),
-              });
               return {
-                fillColor,
+                fillColor: hexbinColor(feature.properties.count),
                 color: "none",
                 fillOpacity: 0.8,
               };

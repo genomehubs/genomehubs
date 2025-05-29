@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
@@ -6,6 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import Switch from "@mui/material/Switch";
+import getMapOptions from "./functions/getMapOptions";
 import { mixColor } from "../../functions/mixColor";
 import { transform } from "proj4";
 
@@ -73,6 +74,7 @@ const ColorRampBar = ({ min, max, color1, bg, getColor }) => {
 export const MapLegend = ({
   nightMode,
   theme,
+  colorScheme,
   globeView,
   setGlobeView,
   setNightMode,
@@ -84,6 +86,17 @@ export const MapLegend = ({
   hexbinOverlayColor,
 }) => {
   const [showLegend, setShowLegend] = useState(false);
+  const {
+    mapOptions: { countryColor, hexbinColor },
+  } = getMapOptions({
+    theme: "darkTheme",
+    colorScheme,
+    nightMode,
+    countryOverlayColor,
+    hexbinOverlayColor,
+    countryMaxCount: maxCountryCount,
+    hexbinMaxCount: maxHexbinCount,
+  });
   return (
     <FormGroup
       row
@@ -195,79 +208,61 @@ export const MapLegend = ({
         </IconButton>
       </div>
       {showLegend && (
-        <div style={{ width: "100%", marginTop: 8 }}>
-          <div
-            style={{
-              fontWeight: 600,
-              marginBottom: 8,
-              color: nightMode || theme === "darkTheme" ? "#eee" : undefined,
-            }}
-          >
-            Country Overlay
-          </div>
-          <ColorRampBar
-            min={minCountryCount}
-            max={maxCountryCount}
-            color1={countryOverlayColor}
-            bg={
-              nightMode
-                ? "#22262a"
-                : theme === "darkTheme"
-                  ? "#222a38"
-                  : "#eeeeee"
-            }
-            getColor={(val) =>
-              mixColor({
-                color1: countryOverlayColor,
-                color2: nightMode
-                  ? "#22262a"
-                  : theme === "darkTheme"
-                    ? "#222a38"
-                    : "#eeeeee",
-                ratio:
-                  maxCountryCount - minCountryCount === 0
-                    ? 0
-                    : (val - minCountryCount) /
-                      (maxCountryCount - minCountryCount),
-              })
-            }
-          />
-          <div
-            style={{
-              fontWeight: 600,
-              margin: "16px 0 8px 0",
-              color: nightMode || theme === "darkTheme" ? "#eee" : undefined,
-            }}
-          >
-            Hexbin Overlay
-          </div>
-          <ColorRampBar
-            min={minHexbinCount}
-            max={maxHexbinCount}
-            color1={hexbinOverlayColor}
-            bg={
-              nightMode
-                ? "#22262a"
-                : theme === "darkTheme"
-                  ? "#222a38"
-                  : "#eeeeee"
-            }
-            getColor={(val) =>
-              mixColor({
-                color1: hexbinOverlayColor,
-                color2: nightMode
-                  ? "#22262a"
-                  : theme === "darkTheme"
-                    ? "#222a38"
-                    : "#eeeeee",
-                ratio:
-                  maxHexbinCount - minHexbinCount === 0
-                    ? 0
-                    : (val - minHexbinCount) /
-                      (maxHexbinCount - minHexbinCount),
-              })
-            }
-          />
+        <div style={{ width: "100%", marginTop: 4 }}>
+          {maxCountryCount > 1 && (
+            <>
+              <div
+                style={{
+                  fontWeight: 600,
+                  marginBottom: 4,
+                  color:
+                    nightMode || theme === "darkTheme" ? "#eee" : undefined,
+                }}
+              >
+                Count per Country
+              </div>
+              <ColorRampBar
+                min={minCountryCount}
+                max={maxCountryCount}
+                color1={countryOverlayColor}
+                bg={
+                  nightMode
+                    ? "#22262a"
+                    : theme === "darkTheme"
+                      ? "#222a38"
+                      : "#eeeeee"
+                }
+                getColor={(val) => countryColor(val)}
+              />
+            </>
+          )}
+          {maxHexbinCount > 1 && (
+            <>
+              <div
+                style={{
+                  fontWeight: 600,
+                  margin: "8px 0 4px 0",
+                  color:
+                    nightMode || theme === "darkTheme" ? "#eee" : undefined,
+                }}
+              >
+                Count per Hexbin
+              </div>
+              <ColorRampBar
+                min={minHexbinCount}
+                max={maxHexbinCount}
+                color1={hexbinOverlayColor}
+                bg={
+                  nightMode
+                    ? "#22262a"
+                    : theme === "darkTheme"
+                      ? "#222a38"
+                      : "#eeeeee"
+                }
+                getColor={(val) => hexbinColor(val)}
+              />
+            </>
+          )}
         </div>
       )}
     </FormGroup>

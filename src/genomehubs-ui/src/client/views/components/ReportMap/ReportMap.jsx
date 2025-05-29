@@ -29,7 +29,7 @@ import Grid from "@mui/material/Grid2";
 import L from "leaflet";
 import Map from "./Map";
 import MapLegend from "./MapLegend";
-import MarkerComponent from "./functions/MarkerComponent";
+import MarkerComponent from "./MarkerComponent";
 import { compose } from "recompose";
 import countriesGeoJson from "../geojson/countries.geojson";
 import dispatchMessage from "../../hocs/dispatchMessage";
@@ -326,6 +326,7 @@ const ReportMap = ({
         colors,
       }));
       bounds.cats.forEach((obj, i) => {
+        console.log(obj);
         if (globeView) {
           const points = MarkerComponent({
             geoPoints: pointData ? pointData[obj.key] : [],
@@ -446,11 +447,11 @@ const ReportMap = ({
           countryCounts={countryCounts}
           onCountryClick={handleCountryClick}
           countryOverlayColor={countryOverlayColor}
+          pointsData={pointsData}
           hexPolygonResolution={geoBinResolution}
           hexBinCounts={hexBinCounts}
           hexbinOverlayColor={hexbinOverlayColor}
           maxBinCount={maxHexbinCount}
-          markers={markers}
           {...props}
         />
       );
@@ -471,6 +472,7 @@ const ReportMap = ({
           dataBounds={dataBounds}
           projectionBounds={projectionBounds}
           fitWorldBounds={fitWorldBounds}
+          countryOverlayColor={countryOverlayColor}
           countryCounts={countryCounts}
           onCountryClick={handleCountryClick}
           countryOutlineGlow={nightMode}
@@ -495,6 +497,7 @@ const ReportMap = ({
               {...{
                 nightMode,
                 theme,
+                colorScheme,
                 globeView,
                 setGlobeView,
                 setNightMode,
