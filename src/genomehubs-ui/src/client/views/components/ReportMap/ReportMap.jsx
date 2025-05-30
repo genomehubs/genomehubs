@@ -1,22 +1,7 @@
 import "leaflet/dist/leaflet.css";
 import "proj4leaflet";
 
-import {
-  CircleMarker,
-  GeoJSON,
-  LayerGroup,
-  MapContainer,
-  Pane,
-  Popup,
-  TileLayer,
-} from "react-leaflet";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   getCrs,
   getFitWorldBounds,
@@ -33,7 +18,6 @@ import MarkerComponent from "./MarkerComponent";
 import { compose } from "recompose";
 import countriesGeoJson from "../geojson/countries.geojson";
 import dispatchMessage from "../../hocs/dispatchMessage";
-import getCountryColor from "./functions/getCountryColor";
 import { mixColor } from "../../functions/mixColor";
 import proj4 from "proj4";
 import qs from "../../functions/qs";
@@ -64,70 +48,6 @@ const PROJECTION_BOUNDS = {
       [90, 180],
     ],
   },
-};
-
-const CountryLayer = ({
-  countryCounts,
-  onCountryClick,
-  repeat = false,
-  baseBg = "#eeeeee",
-  outlineColor = "#333",
-  outlineGlow = false,
-}) => {
-  // Find max count for color scaling
-  const maxCount = Math.max(...Object.values(countryCounts), 1);
-
-  return (
-    <GeoJSON
-      data={{ type: "FeatureCollection", features: countriesGeoJson.features }}
-      style={(feature) => ({
-        fillColor: getCountryColor(
-          countryCounts[feature.properties.ISO_A2],
-          maxCount,
-          undefined,
-          baseBg,
-        ),
-        weight: 0.7, // thinner border for better appearance when zoomed out
-        color: outlineColor,
-        fillOpacity: 0.7,
-        ...(outlineGlow && {
-          filter: "drop-shadow(0 0 6px " + outlineColor + ")",
-        }),
-      })}
-      onEachFeature={(feature, layer) => {
-        const code = feature.properties.ISO_A2;
-        const count = countryCounts[code] || 0;
-        layer.bindTooltip(`${feature.properties.ADMIN}: ${count}`);
-        layer.on({
-          click: () => onCountryClick(code),
-        });
-      }}
-    />
-  );
-};
-
-const SingleMarker = ({
-  position,
-  color = "#fec44f",
-  children,
-  setHighlightPointLocation = () => {},
-}) => {
-  return (
-    <CircleMarker
-      eventHandlers={{
-        mouseover: (e) => setHighlightPointLocation(position.join(",")),
-        mouseout: (e) => setHighlightPointLocation(""),
-      }}
-      center={position}
-      color={"white"} // white outline
-      stroke={true}
-      weight={2} // thicker outline
-      fillColor={color}
-      fillOpacity={1}
-    >
-      {children}
-    </CircleMarker>
-  );
 };
 
 const ReportMap = ({
@@ -200,7 +120,6 @@ const ReportMap = ({
     setMapInstanceKey((prev) => prev + 1);
   }, [mapProjection]);
 
-  // --- BEGIN: Color Key Logic ---
   const countryOverlayColor = "#ff7001";
   const hexbinOverlayColor = "#70ff01";
   const regionCounts = map?.report?.map?.regionCounts;
@@ -227,39 +146,7 @@ const ReportMap = ({
     }
     return [0, 1];
   }, [hexBinCounts]);
-  const useHexbin =
-    map &&
-    map.status &&
-    map.report &&
-    map.report.map.hexBinCounts &&
-    Object.keys(map.report.map.hexBinCounts).length > 0;
-  const overlayColor = useHexbin ? hexbinOverlayColor : countryOverlayColor;
-  const maxCount = useHexbin ? maxHexbinCount : maxCountryCount;
-  const keyValues = useMemo(() => {
-    if (maxCount <= 1) {
-      return [0, 1];
-    }
-    return [
-      0,
-      Math.round(maxCount * 0.25),
-      Math.round(maxCount * 0.5),
-      Math.round(maxCount * 0.75),
-      maxCount,
-    ];
-  }, [maxCount]);
-  const getKeyColor = (val) => {
-    const bg = nightMode
-      ? "#22262a"
-      : theme === "darkTheme"
-        ? "#222a38"
-        : "#eeeeee";
-    const ratio = Math.min(1, val / maxCount);
-    mixColor({
-      color1: overlayColor,
-      color2: bg,
-      ratio,
-    });
-  };
+
   useEffect(() => {
     if (message && map && map.status) {
       setMessage(null);
@@ -270,7 +157,7 @@ const ReportMap = ({
     const { locationBounds, bounds } = map.report;
     let pointData = map.report.map.rawData || {};
     let geoBounds;
-    if (locationBounds && locationBounds.stats.geo) {
+    if (locationBounds?.stats?.geo?.bounds) {
       geoBounds = locationBounds.stats.geo.bounds;
 
       geoBounds = [
@@ -294,12 +181,6 @@ const ReportMap = ({
         [latSpan / 2, centerLon - lonSpan / 2],
         [-latSpan / 2, centerLon + lonSpan / 2],
       ];
-
-      // Optionally, normalize bounds to [-180, 180]
-      // geoBounds = geoBounds.map(([lat, lon]) => [
-      //   lat,
-      //   ((lon + 180) % 360) - 180,
-      // ]);
     }
     // Use regionCounts from API if available
     let { regionCounts, hexBinCounts } = map.report.map || {};
@@ -326,7 +207,6 @@ const ReportMap = ({
         colors,
       }));
       bounds.cats.forEach((obj, i) => {
-        console.log(obj);
         if (globeView) {
           const points = MarkerComponent({
             geoPoints: pointData ? pointData[obj.key] : [],
@@ -507,6 +387,11 @@ const ReportMap = ({
                 minHexbinCount,
                 maxHexbinCount,
                 hexbinOverlayColor,
+                locationField,
+                regionField,
+                catField: bounds?.cat,
+                cats: bounds?.cats || [],
+                colors,
               }}
             />
             {mapGlobe}

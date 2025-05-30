@@ -84,6 +84,11 @@ export const MapLegend = ({
   minHexbinCount,
   maxHexbinCount,
   hexbinOverlayColor,
+  locationField,
+  regionField,
+  catField,
+  cats = [],
+  colors,
 }) => {
   const [showLegend, setShowLegend] = useState(false);
   const {
@@ -97,6 +102,74 @@ export const MapLegend = ({
     countryMaxCount: maxCountryCount,
     hexbinMaxCount: maxHexbinCount,
   });
+
+  // If cats are provided, use them to create a color key
+  // display the key as one row per category with a coloured circle and white outline
+  const colorKey = useMemo(() => {
+    if (!locationField) {
+      return [];
+    }
+    if (!cats || cats.length === 0 || !colors || colors.length === 0) {
+      return [{ cat: { label: locationField }, color: colors[0] || "#fec44f" }];
+    }
+    return cats.map((cat, i) => ({
+      cat,
+      color: colors[i % colors.length],
+    }));
+  }, [cats, colors]);
+
+  // If colorKey is available, display it in the legend
+  let colorLegend = null;
+  if (locationField && colorKey && colorKey.length > 0) {
+    colorLegend = (
+      <div style={{ marginTop: 8, width: "100%" }}>
+        <div
+          style={{
+            fontWeight: 600,
+            marginBottom: 4,
+            color: nightMode || theme === "darkTheme" ? "#eee" : undefined,
+            maxWidth: "180px",
+          }}
+        >
+          {catField ? `Categories for ${catField}` : "Categories"}
+        </div>
+        {colorKey.map(({ cat, color }, i) => (
+          <div
+            key={i}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              marginBottom: 4,
+              width: "180px",
+            }}
+          >
+            <span
+              style={{
+                color: nightMode || theme === "darkTheme" ? "#eee" : "#000",
+                textAlign: "right",
+                marginRight: 8,
+                flex: 1,
+              }}
+            >
+              {cat.label}
+            </span>
+            <div
+              style={{
+                width: 16,
+                height: 16,
+                borderRadius: "50%",
+                backgroundColor: color,
+                border: "2px solid #fff",
+              }}
+            />
+          </div>
+        ))}
+      </div>
+    );
+  }
+  // If colorKey is not available
+
   return (
     <FormGroup
       row
@@ -209,7 +282,7 @@ export const MapLegend = ({
       </div>
       {showLegend && (
         <div style={{ width: "100%", marginTop: 4 }}>
-          {maxCountryCount > 1 && (
+          {regionField && maxCountryCount > 1 && (
             <>
               <div
                 style={{
@@ -219,7 +292,7 @@ export const MapLegend = ({
                     nightMode || theme === "darkTheme" ? "#eee" : undefined,
                 }}
               >
-                Count per Country
+                {regionField} count
               </div>
               <ColorRampBar
                 min={minCountryCount}
@@ -236,7 +309,7 @@ export const MapLegend = ({
               />
             </>
           )}
-          {maxHexbinCount > 1 && (
+          {locationField && maxHexbinCount > 1 && (
             <>
               <div
                 style={{
@@ -246,7 +319,7 @@ export const MapLegend = ({
                     nightMode || theme === "darkTheme" ? "#eee" : undefined,
                 }}
               >
-                Count per Hexbin
+                {locationField} count
               </div>
               <ColorRampBar
                 min={minHexbinCount}
@@ -263,6 +336,7 @@ export const MapLegend = ({
               />
             </>
           )}
+          {colorLegend}
         </div>
       )}
     </FormGroup>
