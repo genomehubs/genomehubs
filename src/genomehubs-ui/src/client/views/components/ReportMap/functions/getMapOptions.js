@@ -98,6 +98,8 @@ export const getMapOptions = ({
     countryOutlineGlow,
     tileAttribution,
     tileUrl,
+    lightColor,
+    darkColor,
     oceanColor,
     hexbinColor,
     countryColor,

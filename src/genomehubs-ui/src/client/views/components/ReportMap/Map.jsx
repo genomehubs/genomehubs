@@ -42,9 +42,13 @@ const CountryLayer = ({
               permanent: false,
             })
             .openTooltip();
+          // Set stroke width to 3px on hover
+          layer.setStyle({ weight: 3 });
         });
         layer.on("mouseout", function () {
           this.closeTooltip();
+          // Reset stroke width on mouseout
+          layer.setStyle({ weight: 0.7 });
         });
         layer.on({
           click: () => onCountryClick(code),
@@ -114,6 +118,8 @@ const Map = ({
       countryOutlineColor,
       countryOutlineGlow,
       oceanColor,
+      lightColor,
+      darkColor,
       tileUrl,
       tileAttribution,
       countryColor,
@@ -236,14 +242,40 @@ const Map = ({
                 fillOpacity: 0.8,
               };
             }}
-            onEachFeature={(feature, layer) => {
-              layer.bindTooltip(
-                `Hex: ${feature.properties.h3} Count: ${feature.properties.count}`,
-              );
-            }}
           />
         )}
         {markers}
+        {hexBinFeatures.length > 0 && (
+          <GeoJSON
+            data={hexBinsToGeoJson(hexBinCounts)}
+            style={(feature) => {
+              return {
+                fillColor: darkColor,
+                color: "none",
+                fillOpacity: 0,
+              };
+            }}
+            onEachFeature={(feature, layer) => {
+              layer.on("mouseover", function () {
+                // Close all other tooltips
+                layer._map.eachLayer((l) => {
+                  if (l.closeTooltip && l !== layer) {
+                    l.closeTooltip();
+                  }
+                });
+                layer
+                  .bindTooltip(
+                    `Hex: ${feature.properties.h3} Count: ${feature.properties.count}`,
+                  )
+                  .openTooltip();
+                this.setStyle({ fillOpacity: 0.8 });
+              });
+              layer.on("mouseout", function () {
+                this.setStyle({ fillOpacity: 0 });
+              });
+            }}
+          />
+        )}
       </MapContainer>
     </div>
   );
