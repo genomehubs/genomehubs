@@ -311,12 +311,12 @@ export const map = async ({
         }
       }
 
-      if (!found) {
-        status = {
-          success: false,
-          error: `locationSummary: '${locationSummary}' not found, no location data available`,
-        };
-      }
+      // if (!found) {
+      //   status = {
+      //     success: false,
+      //     error: `locationSummary: '${locationSummary}' not found, no location data available`,
+      //   };
+      // }
     }
   }
   if (locationHex) {

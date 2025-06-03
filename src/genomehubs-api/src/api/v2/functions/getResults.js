@@ -74,9 +74,12 @@ const validateValue = (term, value, meta, types) => {
         return fail(`invalid date value for ${meta.attribute} in ${term}`);
       }
     } else if (type == "geo_point") {
-      let [lat, lon] = v.replaceAll("−", "-").split(",");
-      if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
-        return fail(`invalid value for ${meta.attribute} in ${term}`);
+      let { summary } = types(meta.attribute);
+      if (summary == "value" || summary == "list") {
+        let [lat, lon] = v.replaceAll("−", "-").split(",");
+        if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
+          return fail(`invalid value for ${meta.attribute} in ${term}`);
+        }
       }
     } else if (isNaN(v.replace(/^!/, "").replaceAll("−", "-"))) {
       if (summaries.includes(type)) {

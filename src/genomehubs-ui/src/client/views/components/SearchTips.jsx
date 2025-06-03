@@ -169,7 +169,7 @@ const SearchTips = ({
       } else if (value && types[key].constraint && types[key].constraint.enum) {
         for (let v of value.split(/\s*,\s*/)) {
           v = v.replace(/['"!]/g, "");
-          if (!types[key].constraint.enum.includes(v)) {
+          if (!types[key].constraint.enum.includes(v.toLowerCase())) {
             let valid_values = didYouMean(
               v,
               types[key].constraint.enum,

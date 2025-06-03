@@ -48,6 +48,42 @@ const PROJECTION_BOUNDS = {
       [90, 180],
     ],
   },
+  mollweide: {
+    minZoom: 0,
+    maxZoom: 5,
+    worldBounds: [
+      [-90, -180],
+      [90, 180],
+    ],
+  },
+  albersEqualArea: {
+    minZoom: 0,
+    maxZoom: 5,
+    worldBounds: [
+      [-90, -180],
+      [90, 180],
+    ],
+  },
+};
+
+const queryLink = ({ query, conditions, options }) => {
+  const { query: q, x, ...rest } = query;
+  let newConditions = [];
+  if (q) {
+    newConditions = q.split(" AND ").filter((c) => c.trim() !== "");
+  } else if (x) {
+    newConditions = x.split(" AND ").filter((c) => c.trim() !== "");
+  }
+  newConditions = newConditions.concat(conditions);
+  if (newConditions.length > 0) {
+    newConditions = newConditions.filter((c) => c.trim() !== "");
+    newConditions = newConditions.map((c) => c.trim());
+    newConditions = newConditions.join(" AND ");
+  } else {
+    newConditions = "null";
+  }
+  const newQuery = { ...rest, [x ? "x" : "query"]: newConditions, ...options };
+  return `?${qs.stringify(newQuery)}`;
 };
 
 const ReportMap = ({
@@ -100,6 +136,19 @@ const ReportMap = ({
   if (query.regionField) {
     regionField = query.regionField;
   }
+  const regionLink = (code) => {
+    const conditions = [`${regionField}=${code}`];
+    const options = {};
+    return queryLink({ query, conditions, options });
+  };
+  const hexbinLink = (hexbin) => {
+    const locationBinField = `hexbin${geoBinResolution}(${locationField})`;
+
+    const conditions = [`${locationBinField}=${hexbin}`];
+    const newResolution = geoBinResolution < 4 ? geoBinResolution + 1 : 4;
+    const options = { geoBinResolution: newResolution };
+    return queryLink({ query, conditions, options });
+  };
   const componentRef = chartRef || useRef();
   const size = useResize(containerRef || componentRef);
   let { width, height } = size;
@@ -332,6 +381,8 @@ const ReportMap = ({
           hexBinCounts={hexBinCounts}
           hexbinOverlayColor={hexbinOverlayColor}
           maxBinCount={maxHexbinCount}
+          regionLink={regionLink}
+          hexbinLink={hexbinLink}
           {...props}
         />
       );
@@ -360,6 +411,8 @@ const ReportMap = ({
           hexbinOverlayColor={hexbinOverlayColor}
           maxBinCount={maxHexbinCount}
           markers={markers}
+          regionLink={regionLink}
+          hexbinLink={hexbinLink}
           {...props}
         />
       );

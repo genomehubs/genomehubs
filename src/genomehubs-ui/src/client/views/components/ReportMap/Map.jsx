@@ -1,6 +1,13 @@
-import { CircleMarker, GeoJSON, MapContainer, TileLayer } from "react-leaflet";
+import {
+  CircleMarker,
+  GeoJSON,
+  MapContainer,
+  Popup,
+  TileLayer,
+} from "react-leaflet";
 import React, { useMemo, useRef } from "react";
 import { findCenterLatLng, getFitWorldZoom } from "./functions/mapHelpers";
+import { useLocation, useNavigate } from "@reach/router";
 
 import L from "leaflet";
 import countriesGeoJson from "../geojson/countries.geojson";
@@ -13,6 +20,8 @@ const CountryLayer = ({
   countryColor = () => "#eeeeee",
   outlineColor = "#333",
   outlineGlow = false,
+  countryLink = () => {},
+  navigate = () => {},
 }) => {
   return (
     <GeoJSON
@@ -27,32 +36,37 @@ const CountryLayer = ({
         }),
       })}
       onEachFeature={(feature, layer) => {
-        const code = feature.properties.ISO_A2;
-        const count = countryCounts[code] || 0;
-        // Ensure only one tooltip is open at a time
-        layer.on("mouseover", function (e) {
-          // Close all other tooltips
-          layer._map.eachLayer((l) => {
-            if (l.closeTooltip && l !== layer) {
-              l.closeTooltip();
+        const isoCode = feature.properties.ISO_A2;
+        const count = countryCounts[isoCode] || 0;
+        const countryLinkUrl = countryLink(isoCode);
+
+        if (count > 0) {
+          layer.bindPopup(
+            `<div>
+              <strong>${feature.properties.ADMIN}</strong>
+            </div>
+            <div>
+              <span style="color: ${countryColor(
+                isoCode,
+              )};">${count} records</span>
+            <a href="${countryLinkUrl}" class="country-link" data-iso="${isoCode}">click to search</a>
+            </div>`,
+          );
+          layer.on("popupopen", function (e) {
+            const link = e.popup._contentNode.querySelector(".country-link");
+            if (link) {
+              link.addEventListener("click", function (evt) {
+                evt.preventDefault();
+                if (typeof countryLink === "function") {
+                  const url = countryLink(isoCode);
+                  if (url) {
+                    navigate(url);
+                  }
+                }
+              });
             }
           });
-          layer
-            .bindTooltip(`${feature.properties.ADMIN}: ${count}`, {
-              permanent: false,
-            })
-            .openTooltip();
-          // Set stroke width to 3px on hover
-          layer.setStyle({ weight: 3 });
-        });
-        layer.on("mouseout", function () {
-          this.closeTooltip();
-          // Reset stroke width on mouseout
-          layer.setStyle({ weight: 0.7 });
-        });
-        layer.on({
-          click: () => onCountryClick(code),
-        });
+        }
       }}
     />
   );
@@ -98,6 +112,8 @@ const Map = ({
   countryOverlayColor = "#fec44f",
   hexbinOverlayColor = "#3182bd",
   maxBinCount = 1,
+  regionLink = () => {},
+  hexbinLink = () => {},
   markers = [],
 }) => {
   const mapContainerRef = useRef();
@@ -136,6 +152,7 @@ const Map = ({
     countryMaxCount: maxCount,
     hexbinMaxCount,
   });
+  const navigate = useNavigate();
 
   // Only render MapContainer if width and height are valid and CRS is set
   if (!width || !height || !crs) {
@@ -203,6 +220,8 @@ const Map = ({
         countryColor={countryColor}
         outlineColor={countryOutlineColor}
         outlineGlow={countryOutlineGlow}
+        countryLink={regionLink}
+        navigate={navigate}
       />
     );
   }
@@ -242,40 +261,37 @@ const Map = ({
                 fillOpacity: 0.8,
               };
             }}
+            onEachFeature={(feature, layer) => {
+              const { h3, count } = feature.properties;
+              const hexbinLinkUrl = hexbinLink(h3);
+
+              layer.bindPopup(
+                `<div>
+                  <strong>Hex: ${h3}</strong>
+                </div>
+                <div>
+                  <span style="color: ${hexbinColor(count)};">${count} records</span>
+                  <a href="${hexbinLinkUrl}" class="hexbin-link" data-h3="${h3}">click to search</a>
+                </div>`,
+              );
+              layer.on("popupopen", function (e) {
+                const link = e.popup._contentNode.querySelector(".hexbin-link");
+                if (link) {
+                  link.addEventListener("click", function (evt) {
+                    evt.preventDefault();
+                    if (typeof hexbinLink === "function") {
+                      const url = hexbinLink(h3);
+                      if (url) {
+                        navigate(url);
+                      }
+                    }
+                  });
+                }
+              });
+            }}
           />
         )}
         {markers}
-        {hexBinFeatures.length > 0 && (
-          <GeoJSON
-            data={hexBinsToGeoJson(hexBinCounts)}
-            style={(feature) => {
-              return {
-                fillColor: darkColor,
-                color: "none",
-                fillOpacity: 0,
-              };
-            }}
-            onEachFeature={(feature, layer) => {
-              layer.on("mouseover", function () {
-                // Close all other tooltips
-                layer._map.eachLayer((l) => {
-                  if (l.closeTooltip && l !== layer) {
-                    l.closeTooltip();
-                  }
-                });
-                layer
-                  .bindTooltip(
-                    `Hex: ${feature.properties.h3} Count: ${feature.properties.count}`,
-                  )
-                  .openTooltip();
-                this.setStyle({ fillOpacity: 0.8 });
-              });
-              layer.on("mouseout", function () {
-                this.setStyle({ fillOpacity: 0 });
-              });
-            }}
-          />
-        )}
       </MapContainer>
     </div>
   );
