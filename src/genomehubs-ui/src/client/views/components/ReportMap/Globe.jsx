@@ -14,11 +14,12 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { hex, lab } from "color-convert";
 import { useLocation, useNavigate } from "@reach/router";
 
+import CloseIcon from "@mui/icons-material/Close";
 import GlobeGl from "react-globe.gl";
 import NavLink from "../NavLink";
+import ReportMenu from "./ReportMenu";
 import Skeleton from "@mui/material/Skeleton";
 import countriesGeoJson from "../geojson/countries.geojson";
 import { findCenterLatLng } from "./functions/mapHelpers";
@@ -38,6 +39,9 @@ const Globe = ({
   theme = "darkTheme",
   palette,
   onCountryClick,
+
+  regionLink = () => {},
+  hexbinLink = () => {},
 
   pointsData = [],
   hexBinCounts = {},
@@ -72,6 +76,8 @@ const Globe = ({
       globeBg,
       globeBgImg,
       globeImageUrl,
+      lightColor,
+      darkColor,
       oceanColor,
       bumpImageUrl,
       countryColor,
@@ -98,9 +104,22 @@ const Globe = ({
   );
   const getPolySideColor = useCallback(() => "rgba(0,0,0,0.15)", []);
   const getPolyStrokeColor = useCallback(() => "rgba(0,0,0,0.15)", []);
+  // Show popup on country click
+  const [popup, setPopup] = useState(null);
+  const navigate = useNavigate();
+
   const handlePolyClick = useCallback(
-    (d) => onCountryClick(d.properties.ISO_A2),
-    [onCountryClick],
+    (d, event) => {
+      setPopup({
+        iso: d.properties.ISO_A2,
+        name: d.properties.ADMIN,
+        count: countryCounts[d.properties.ISO_A2] || 0,
+        lat: event?.lat || d.properties.LAT || 0,
+        lng: event?.lng || d.properties.LON || 0,
+      });
+      // if (onCountryClick) onCountryClick(d.properties.ISO_A2);
+    },
+    [onCountryClick, countryCounts],
   );
   const getPinProps = ({ pointsData, size = 0.5, elevation = 0.04 }) => {
     const labelsData = pointsData.flatMap((d) => {
@@ -274,7 +293,6 @@ const Globe = ({
             zIndex: 10,
           }}
         >
-          {/* Use min(width, height) for a true circle */}
           <Skeleton
             variant="circular"
             width={Math.max(Math.min(width, height) * 0.75, 200)}
@@ -284,6 +302,7 @@ const Globe = ({
           />
         </div>
       )}
+
       {/* Only mount Globe after short delay so skeleton/background are painted first */}
       {showGlobe && (
         <GlobeGl
@@ -309,6 +328,42 @@ const Globe = ({
           {...(pointsData.length > 0 ? pinProps : {})}
           onGlobeReady={() => setGlobeLoading(false)}
         />
+      )}
+
+      {/* Show popup if defined */}
+      {popup && (
+        <ReportMenu
+          theme={theme}
+          position="bottom-left"
+          nightMode={nightMode}
+          onClose={() => setPopup(null)}
+        >
+          <div
+            style={{
+              fontWeight: 600,
+              marginBottom: 4,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              textAlign: "left",
+            }}
+          >
+            <div style={{ marginBottom: 2, textAlign: "left" }}>
+              {popup.name} ({popup.iso})
+            </div>
+            <div style={{ textAlign: "left" }}>
+              <strong>Count:</strong> {popup.count}
+            </div>
+            <div style={{ textAlign: "left" }}>
+              <a
+                href={regionLink(popup.iso)}
+                onClick={() => navigate(regionLink(popup.iso))}
+              >
+                Click here to search
+              </a>
+            </div>
+          </div>
+        </ReportMenu>
       )}
     </div>
   );

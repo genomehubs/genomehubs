@@ -415,7 +415,7 @@ export const map = async ({
     locationBounds = await getBounds({
       params: { ...params },
       fields: [locationField].concat(xFields).concat(yFields),
-      summaries,
+      summaries: ["value"],
       cat,
       result,
       exclusions,
@@ -460,7 +460,7 @@ export const map = async ({
             (field) =>
               lookupTypes(field) && lookupTypes(field).type != "keyword"
           ),
-    summaries,
+    summaries: ["value"],
     cat,
     result,
     exclusions,

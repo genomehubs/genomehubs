@@ -5,6 +5,7 @@ import FormGroup from "@mui/material/FormGroup";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
+import ReportMenu from "./ReportMenu";
 import Switch from "@mui/material/Switch";
 import getMapOptions from "./functions/getMapOptions";
 import { mixColor } from "../../functions/mixColor";
@@ -72,6 +73,7 @@ const ColorRampBar = ({ min, max, color1, bg, getColor }) => {
 };
 
 export const MapLegend = ({
+  position = "top-right",
   nightMode,
   theme,
   colorScheme,
@@ -144,16 +146,6 @@ export const MapLegend = ({
               width: "180px",
             }}
           >
-            <span
-              style={{
-                color: nightMode || theme === "darkTheme" ? "#eee" : "#000",
-                textAlign: "right",
-                marginRight: 8,
-                flex: 1,
-              }}
-            >
-              {cat.label}
-            </span>
             <div
               style={{
                 width: 16,
@@ -163,183 +155,154 @@ export const MapLegend = ({
                 border: "2px solid #fff",
               }}
             />
+            <span
+              style={{
+                color: nightMode || theme === "darkTheme" ? "#eee" : "#000",
+                textAlign: "left",
+                marginLeft: 8,
+                flex: 1,
+              }}
+            >
+              {cat.label}
+            </span>
           </div>
         ))}
       </div>
     );
   }
-  // If colorKey is not available
+  let content = null;
+  // if (showLegend) {
+  content = (
+    <>
+      <FormControlLabel
+        control={
+          <Switch
+            checked={globeView}
+            onClick={() => setGlobeView(!globeView)}
+            color={nightMode || theme === "darkTheme" ? "default" : "primary"}
+            sx={
+              nightMode || theme === "darkTheme"
+                ? {
+                    "& .MuiSwitch-switchBase": {
+                      color: "#bbb",
+                    },
+                    "& .MuiSwitch-switchBase.Mui-checked": {
+                      color: "#ffa870",
+                    },
+                    "& .MuiSwitch-track": {
+                      backgroundColor: "#888",
+                    },
+                  }
+                : {}
+            }
+          />
+        }
+        label={globeView ? "Globe" : "Map"}
+        sx={nightMode || theme === "darkTheme" ? { color: "#eee" } : {}}
+      />
+      <FormControlLabel
+        control={
+          <Switch
+            checked={nightMode}
+            onClick={() => setNightMode(!nightMode)}
+            color={nightMode || theme === "darkTheme" ? "default" : "primary"}
+            sx={
+              nightMode || theme === "darkTheme"
+                ? {
+                    "& .MuiSwitch-switchBase": {
+                      color: "#bbb",
+                    },
+                    "& .MuiSwitch-switchBase.Mui-checked": {
+                      color: "#ffa870",
+                    },
+                    "& .MuiSwitch-track": {
+                      backgroundColor: "#888",
+                    },
+                  }
+                : {}
+            }
+          />
+        }
+        label={nightMode ? "Night" : "Day"}
+        sx={nightMode || theme === "darkTheme" ? { color: "#eee" } : {}}
+      />
+
+      <div style={{ width: "100%", marginTop: 4 }}>
+        {regionField && maxCountryCount > 1 && (
+          <>
+            <div
+              style={{
+                fontWeight: 600,
+                marginBottom: 4,
+                color: nightMode || theme === "darkTheme" ? "#eee" : undefined,
+              }}
+            >
+              {regionField} count
+            </div>
+            <ColorRampBar
+              min={minCountryCount}
+              max={maxCountryCount}
+              color1={countryOverlayColor}
+              bg={
+                nightMode
+                  ? "#22262a"
+                  : theme === "darkTheme"
+                    ? "#222a38"
+                    : "#eeeeee"
+              }
+              getColor={(val) => countryColor(val)}
+            />
+          </>
+        )}
+        {locationField && maxHexbinCount > 1 && (
+          <>
+            <div
+              style={{
+                fontWeight: 600,
+                margin: "8px 0 4px 0",
+                color: nightMode || theme === "darkTheme" ? "#eee" : undefined,
+              }}
+            >
+              {locationField} count
+            </div>
+            <ColorRampBar
+              min={minHexbinCount}
+              max={maxHexbinCount}
+              color1={hexbinOverlayColor}
+              bg={
+                nightMode
+                  ? "#22262a"
+                  : theme === "darkTheme"
+                    ? "#222a38"
+                    : "#eeeeee"
+              }
+              getColor={(val) => hexbinColor(val)}
+            />
+          </>
+        )}
+        {colorLegend}
+      </div>
+    </>
+  );
+  // }
 
   return (
-    <FormGroup
-      row
-      style={{
-        position: "absolute",
-        zIndex: 1000,
-        right: 20,
-        top: 20,
-        background: nightMode
-          ? "rgba(30,30,30,0.85)"
-          : theme === "darkTheme"
-            ? "rgba(34,42,56,0.85)"
-            : "rgba(255,255,255,0.85)",
-        borderRadius: 12,
-        boxShadow:
-          nightMode || theme === "darkTheme"
-            ? "0 2px 8px #0008"
-            : "0 2px 8px #8882",
-        padding: showLegend ? "0.5em 1em" : "0.5em",
-        minWidth: 30,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-end",
-      }}
+    <ReportMenu
+      nightMode={nightMode}
+      position={position}
+      theme={theme}
+      sx={{ alignItems: "flex-start" }}
     >
       <div
         style={{
           display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
+          flexDirection: "column",
           width: "100%",
         }}
       >
-        {showLegend && (
-          <>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={globeView}
-                  onClick={() => setGlobeView(!globeView)}
-                  color={
-                    nightMode || theme === "darkTheme" ? "default" : "primary"
-                  }
-                  sx={
-                    nightMode || theme === "darkTheme"
-                      ? {
-                          "& .MuiSwitch-switchBase": {
-                            color: "#bbb",
-                          },
-                          "& .MuiSwitch-switchBase.Mui-checked": {
-                            color: "#ffa870",
-                          },
-                          "& .MuiSwitch-track": {
-                            backgroundColor: "#888",
-                          },
-                        }
-                      : {}
-                  }
-                />
-              }
-              label={globeView ? "Globe" : "Map"}
-              sx={nightMode || theme === "darkTheme" ? { color: "#eee" } : {}}
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={nightMode}
-                  onClick={() => setNightMode(!nightMode)}
-                  color={
-                    nightMode || theme === "darkTheme" ? "default" : "primary"
-                  }
-                  sx={
-                    nightMode || theme === "darkTheme"
-                      ? {
-                          "& .MuiSwitch-switchBase": {
-                            color: "#bbb",
-                          },
-                          "& .MuiSwitch-switchBase.Mui-checked": {
-                            color: "#ffa870",
-                          },
-                          "& .MuiSwitch-track": {
-                            backgroundColor: "#888",
-                          },
-                        }
-                      : {}
-                  }
-                />
-              }
-              label={nightMode ? "Night" : "Day"}
-              sx={nightMode || theme === "darkTheme" ? { color: "#eee" } : {}}
-            />
-          </>
-        )}
-        <IconButton
-          size="small"
-          onClick={() => setShowLegend((v) => !v)}
-          sx={{
-            ml: 1,
-            color: nightMode || theme === "darkTheme" ? "#eee" : undefined,
-            margin: showLegend ? "-0.25em -0.4em 0 0" : 0,
-          }}
-          aria-label={showLegend ? "Hide legend" : "Show legend"}
-        >
-          {showLegend ? (
-            <MenuOpenIcon style={{ transform: "scaleX(-1)" }} />
-          ) : (
-            <MenuIcon />
-          )}
-        </IconButton>
+        {content}
       </div>
-      {showLegend && (
-        <div style={{ width: "100%", marginTop: 4 }}>
-          {regionField && maxCountryCount > 1 && (
-            <>
-              <div
-                style={{
-                  fontWeight: 600,
-                  marginBottom: 4,
-                  color:
-                    nightMode || theme === "darkTheme" ? "#eee" : undefined,
-                }}
-              >
-                {regionField} count
-              </div>
-              <ColorRampBar
-                min={minCountryCount}
-                max={maxCountryCount}
-                color1={countryOverlayColor}
-                bg={
-                  nightMode
-                    ? "#22262a"
-                    : theme === "darkTheme"
-                      ? "#222a38"
-                      : "#eeeeee"
-                }
-                getColor={(val) => countryColor(val)}
-              />
-            </>
-          )}
-          {locationField && maxHexbinCount > 1 && (
-            <>
-              <div
-                style={{
-                  fontWeight: 600,
-                  margin: "8px 0 4px 0",
-                  color:
-                    nightMode || theme === "darkTheme" ? "#eee" : undefined,
-                }}
-              >
-                {locationField} count
-              </div>
-              <ColorRampBar
-                min={minHexbinCount}
-                max={maxHexbinCount}
-                color1={hexbinOverlayColor}
-                bg={
-                  nightMode
-                    ? "#22262a"
-                    : theme === "darkTheme"
-                      ? "#222a38"
-                      : "#eeeeee"
-                }
-                getColor={(val) => hexbinColor(val)}
-              />
-            </>
-          )}
-          {colorLegend}
-        </div>
-      )}
-    </FormGroup>
+    </ReportMenu>
   );
 };
 

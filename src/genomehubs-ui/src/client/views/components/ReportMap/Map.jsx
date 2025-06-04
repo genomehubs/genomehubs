@@ -42,14 +42,12 @@ const CountryLayer = ({
 
         if (count > 0) {
           layer.bindPopup(
-            `<div>
-              <strong>${feature.properties.ADMIN}</strong>
-            </div>
-            <div>
-              <span style="color: ${countryColor(
-                isoCode,
-              )};">${count} records</span>
-            <a href="${countryLinkUrl}" class="country-link" data-iso="${isoCode}">click to search</a>
+            `<div style="font-size: 1.2em;">
+              <strong>${feature.properties.ADMIN} (${feature.properties.ISO_A2})</strong>
+              <br/>
+              <strong>Count:</strong> ${count}
+              <br/>
+              <a href="${countryLinkUrl}" class="country-link" data-iso="${isoCode}">Click to search</a>
             </div>`,
           );
           layer.on("popupopen", function (e) {
@@ -71,28 +69,6 @@ const CountryLayer = ({
     />
   );
 };
-
-const SingleMarker = ({
-  position,
-  color = "#fec44f",
-  children,
-  setHighlightPointLocation = () => {},
-}) => (
-  <CircleMarker
-    eventHandlers={{
-      mouseover: (e) => setHighlightPointLocation(position.join(",")),
-      mouseout: (e) => setHighlightPointLocation(""),
-    }}
-    center={position}
-    color={"white"}
-    stroke={true}
-    weight={2}
-    fillColor={color}
-    fillOpacity={1}
-  >
-    {children}
-  </CircleMarker>
-);
 
 const Map = ({
   width,
@@ -266,12 +242,10 @@ const Map = ({
               const hexbinLinkUrl = hexbinLink(h3);
 
               layer.bindPopup(
-                `<div>
-                  <strong>Hex: ${h3}</strong>
-                </div>
-                <div>
-                  <span style="color: ${hexbinColor(count)};">${count} records</span>
-                  <a href="${hexbinLinkUrl}" class="hexbin-link" data-h3="${h3}">click to search</a>
+                `<div style="font-size: 1.2em;">
+                  <strong>H3 Index:</strong> ${h3}<br/>
+                  <strong>Count:</strong> ${count}<br/>
+                  <a href="${hexbinLinkUrl}" class="hexbin-link" data-h3="${h3}">Click to search</a>
                 </div>`,
               );
               layer.on("popupopen", function (e) {

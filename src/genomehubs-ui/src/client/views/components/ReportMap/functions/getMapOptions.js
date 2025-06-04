@@ -71,6 +71,12 @@ export const getMapOptions = ({
   };
 
   const countryColor = (count) => {
+    console.log({
+      color1: countryOverlayColor || "#fec44f",
+      color2: baseCountryBg !== null ? baseCountryBg : paleColor,
+      count,
+      maxCount: countryMaxCount,
+    });
     return colorMixer({
       color1: countryOverlayColor || "#fec44f",
       color2: baseCountryBg !== null ? baseCountryBg : paleColor,
@@ -87,6 +93,7 @@ export const getMapOptions = ({
     globeBgImg,
     globeImageUrl,
     lightColor,
+    darkColor,
     oceanColor,
     hexbinColor,
     countryColor,
