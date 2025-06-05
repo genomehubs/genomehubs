@@ -17,9 +17,12 @@ import React, {
 import { useLocation, useNavigate } from "@reach/router";
 
 import CloseIcon from "@mui/icons-material/Close";
+import CountryPopup from "./CountryPopup";
+import CountrySVG from "./CountrySVG";
 import GlobeGl from "react-globe.gl";
+import HexbinPopup from "./HexbinPopup";
 import NavLink from "../NavLink";
-import ReportMenu from "./ReportMenu";
+import ReportPopup from "./ReportPopup";
 import Skeleton from "@mui/material/Skeleton";
 import countriesGeoJson from "../geojson/countries.geojson";
 import { findCenterLatLng } from "./functions/mapHelpers";
@@ -27,6 +30,7 @@ import getCountryColor from "./functions/getCountryColor";
 import getMapOptions from "./functions/getMapOptions";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
 import { mixColor } from "../../functions/mixColor";
+import { polygon } from "leaflet";
 
 const Globe = ({
   bounds,
@@ -105,21 +109,36 @@ const Globe = ({
   const getPolySideColor = useCallback(() => "rgba(0,0,0,0.15)", []);
   const getPolyStrokeColor = useCallback(() => "rgba(0,0,0,0.15)", []);
   // Show popup on country click
-  const [popup, setPopup] = useState(null);
+  const [countryPopupMeta, setCountryPopupMeta] = useState(null);
+  const [hexbinPopupMeta, setHexbinPopupMeta] = useState(null);
   const navigate = useNavigate();
 
   const handlePolyClick = useCallback(
     (d, event) => {
-      setPopup({
+      setHexbinPopupMeta(null);
+      setCountryPopupMeta({
         iso: d.properties.ISO_A2,
         name: d.properties.ADMIN,
         count: countryCounts[d.properties.ISO_A2] || 0,
+        coordinates: d.geometry.coordinates,
         lat: event?.lat || d.properties.LAT || 0,
         lng: event?.lng || d.properties.LON || 0,
       });
-      // if (onCountryClick) onCountryClick(d.properties.ISO_A2);
     },
     [onCountryClick, countryCounts],
+  );
+
+  const handleHexbinClick = useCallback(
+    (d, event) => {
+      setCountryPopupMeta(null);
+      setHexbinPopupMeta({
+        h3: d.properties.h3,
+        count: d.properties.count,
+        lat: event?.lat || d.properties.LAT || 0,
+        lng: event?.lng || d.properties.LON || 0,
+      });
+    },
+    [hexbinLink, navigate],
   );
   const getPinProps = ({ pointsData, size = 0.5, elevation = 0.04 }) => {
     const labelsData = pointsData.flatMap((d) => {
@@ -208,7 +227,7 @@ const Globe = ({
         const latSpread = maxLat - minLat;
         const lngSpread = maxLng - minLng;
         const spread = Math.max(latSpread, lngSpread);
-        const altitude = Math.min(Math.max(1.2 + spread / 120, 1.2), 2);
+        const altitude = Math.min(Math.max(1 + spread / 120, 0.5), 1.5);
         globeRef.current.pointOfView(
           { lat: centerLat, lng: centerLng, altitude },
           1000,
@@ -264,6 +283,7 @@ const Globe = ({
     hexPolygonAltitude: 0.015,
     hexPolygonLabel: (d) =>
       `Hex: ${d.properties.h3}\nCount: ${d.properties.count}`,
+    onHexPolygonClick: handleHexbinClick,
   };
 
   return (
@@ -331,39 +351,31 @@ const Globe = ({
       )}
 
       {/* Show popup if defined */}
-      {popup && (
-        <ReportMenu
+      {countryPopupMeta && (
+        <CountryPopup
           theme={theme}
-          position="bottom-left"
           nightMode={nightMode}
-          onClose={() => setPopup(null)}
-        >
-          <div
-            style={{
-              fontWeight: 600,
-              marginBottom: 4,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-              textAlign: "left",
-            }}
-          >
-            <div style={{ marginBottom: 2, textAlign: "left" }}>
-              {popup.name} ({popup.iso})
-            </div>
-            <div style={{ textAlign: "left" }}>
-              <strong>Count:</strong> {popup.count}
-            </div>
-            <div style={{ textAlign: "left" }}>
-              <a
-                href={regionLink(popup.iso)}
-                onClick={() => navigate(regionLink(popup.iso))}
-              >
-                Click here to search
-              </a>
-            </div>
-          </div>
-        </ReportMenu>
+          setCountryPopup={setCountryPopupMeta}
+          countryPopupMeta={countryPopupMeta}
+          regionLink={regionLink}
+          navigate={navigate}
+          oceanColor={oceanColor}
+          countryColor={countryColor}
+          countryOutlineColor={countryOutlineColor}
+        />
+      )}
+      {hexbinPopupMeta && (
+        <HexbinPopup
+          theme={theme}
+          nightMode={nightMode}
+          setHexbinPopupMeta={setHexbinPopupMeta}
+          hexbinPopupMeta={hexbinPopupMeta}
+          hexbinLink={hexbinLink}
+          navigate={navigate}
+          fill={hexbinColor(hexbinPopupMeta.count)}
+          stroke={"none"}
+          oceanColor={oceanColor}
+        />
       )}
     </div>
   );

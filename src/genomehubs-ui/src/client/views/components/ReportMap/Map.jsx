@@ -9,6 +9,8 @@ import React, { useMemo, useRef } from "react";
 import { findCenterLatLng, getFitWorldZoom } from "./functions/mapHelpers";
 import { useLocation, useNavigate } from "@reach/router";
 
+import CountryPopup from "./CountryPopup";
+import HexbinPopup from "./HexbinPopup";
 import L from "leaflet";
 import countriesGeoJson from "../geojson/countries.geojson";
 import getMapOptions from "./functions/getMapOptions";
@@ -21,6 +23,7 @@ const CountryLayer = ({
   outlineColor = "#333",
   outlineGlow = false,
   countryLink = () => {},
+  handleCountryClick = () => {},
   navigate = () => {},
 }) => {
   return (
@@ -36,33 +39,37 @@ const CountryLayer = ({
         }),
       })}
       onEachFeature={(feature, layer) => {
-        const isoCode = feature.properties.ISO_A2;
-        const count = countryCounts[isoCode] || 0;
-        const countryLinkUrl = countryLink(isoCode);
+        const name = feature.properties.ADMIN || feature.properties.NAME;
+        const iso = feature.properties.ISO_A2;
+        const count = countryCounts[iso] || 0;
+        const coordinates = feature.geometry.coordinates;
 
         if (count > 0) {
-          layer.bindPopup(
-            `<div style="font-size: 1.2em;">
-              <strong>${feature.properties.ADMIN} (${feature.properties.ISO_A2})</strong>
-              <br/>
-              <strong>Count:</strong> ${count}
-              <br/>
-              <a href="${countryLinkUrl}" class="country-link" data-iso="${isoCode}">Click to search</a>
-            </div>`,
-          );
-          layer.on("popupopen", function (e) {
-            const link = e.popup._contentNode.querySelector(".country-link");
-            if (link) {
-              link.addEventListener("click", function (evt) {
-                evt.preventDefault();
-                if (typeof countryLink === "function") {
-                  const url = countryLink(isoCode);
-                  if (url) {
-                    navigate(url);
-                  }
-                }
-              });
-            }
+          // layer.bindPopup(
+          //   `<div style="font-size: 1.2em;">
+          //     <strong>${feature.properties.ADMIN} (${feature.properties.ISO_A2})</strong>
+          //     <br/>
+          //     <strong>Count:</strong> ${count}
+          //     <br/>
+          //     <a href="${countryLinkUrl}" class="country-link" data-iso="${isoCode}">Click to search</a>
+          //   </div>`,
+          // );
+          // layer.on("popupopen", function (e) {
+          //   const link = e.popup._contentNode.querySelector(".country-link");
+          //   if (link) {
+          //     link.addEventListener("click", function (evt) {
+          //       evt.preventDefault();
+          //       if (typeof countryLink === "function") {
+          //         const url = countryLink(isoCode);
+          //         if (url) {
+          //           navigate(url);
+          //         }
+          //       }
+          //     });
+          //   }
+          // });
+          layer.on("click", () => {
+            handleCountryClick({ name, iso, count, coordinates });
           });
         }
       }}
@@ -94,6 +101,8 @@ const Map = ({
 }) => {
   const mapContainerRef = useRef();
   const mapInstanceRef = useRef();
+  const [countryPopupMeta, setCountryPopupMeta] = React.useState(null);
+  const [hexbinPopupMeta, setHexbinPopupMeta] = React.useState(null);
   const maxCount = useMemo(
     () => Math.max(...Object.values(countryCounts), 1),
     [countryCounts],
@@ -182,6 +191,15 @@ const Map = ({
     }
   }, [oceanColor]);
 
+  const handleCountryClick = ({ name, iso, count, coordinates }) => {
+    setCountryPopupMeta({
+      name,
+      iso,
+      count,
+      coordinates,
+    });
+  };
+
   let tileLayer;
   if (tileUrl) {
     tileLayer = <TileLayer url={tileUrl} attribution={tileAttribution} />;
@@ -196,6 +214,7 @@ const Map = ({
         countryColor={countryColor}
         outlineColor={countryOutlineColor}
         outlineGlow={countryOutlineGlow}
+        handleCountryClick={handleCountryClick}
         countryLink={regionLink}
         navigate={navigate}
       />
@@ -241,32 +260,64 @@ const Map = ({
               const { h3, count } = feature.properties;
               const hexbinLinkUrl = hexbinLink(h3);
 
-              layer.bindPopup(
-                `<div style="font-size: 1.2em;">
-                  <strong>H3 Index:</strong> ${h3}<br/>
-                  <strong>Count:</strong> ${count}<br/>
-                  <a href="${hexbinLinkUrl}" class="hexbin-link" data-h3="${h3}">Click to search</a>
-                </div>`,
-              );
-              layer.on("popupopen", function (e) {
-                const link = e.popup._contentNode.querySelector(".hexbin-link");
-                if (link) {
-                  link.addEventListener("click", function (evt) {
-                    evt.preventDefault();
-                    if (typeof hexbinLink === "function") {
-                      const url = hexbinLink(h3);
-                      if (url) {
-                        navigate(url);
-                      }
-                    }
-                  });
-                }
+              // layer.bindPopup(
+              //   `<div style="font-size: 1.2em;">
+              //     <strong>H3 Index:</strong> ${h3}<br/>
+              //     <strong>Count:</strong> ${count}<br/>
+              //     <a href="${hexbinLinkUrl}" class="hexbin-link" data-h3="${h3}">Click to search</a>
+              //   </div>`,
+              // );
+              // layer.on("popupopen", function (e) {
+              //   const link = e.popup._contentNode.querySelector(".hexbin-link");
+              //   if (link) {
+              //     link.addEventListener("click", function (evt) {
+              //       evt.preventDefault();
+              //       if (typeof hexbinLink === "function") {
+              //         const url = hexbinLink(h3);
+              //         if (url) {
+              //           navigate(url);
+              //         }
+              //       }
+              //     });
+              //   }
+              // });
+              layer.on("click", () => {
+                setHexbinPopupMeta({
+                  h3,
+                  count,
+                });
               });
             }}
           />
         )}
         {markers}
       </MapContainer>
+      {countryPopupMeta && (
+        <CountryPopup
+          theme={theme}
+          nightMode={nightMode}
+          setCountryPopup={setCountryPopupMeta}
+          countryPopupMeta={countryPopupMeta}
+          regionLink={regionLink}
+          navigate={navigate}
+          oceanColor={oceanColor}
+          countryColor={countryColor}
+          countryOutlineColor={countryOutlineColor}
+        />
+      )}
+      {hexbinPopupMeta && (
+        <HexbinPopup
+          theme={theme}
+          nightMode={nightMode}
+          setHexbinPopupMeta={setHexbinPopupMeta}
+          hexbinPopupMeta={hexbinPopupMeta}
+          hexbinLink={hexbinLink}
+          navigate={navigate}
+          fill={hexbinColor(hexbinPopupMeta.count)}
+          stroke={"none"}
+          oceanColor={oceanColor}
+        />
+      )}
     </div>
   );
 };
