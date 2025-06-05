@@ -1,4 +1,3 @@
-import "leaflet/dist/leaflet.css";
 import "proj4leaflet";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -425,7 +424,13 @@ const ReportMap = ({
           style={{ height: "100%", position: "relative" }}
           size="grow"
         >
-          <div style={{ position: "relative", width, height }}>
+          <div
+            style={{
+              position: "relative",
+              width,
+              height,
+            }}
+          >
             <MapLegend
               {...{
                 nightMode,

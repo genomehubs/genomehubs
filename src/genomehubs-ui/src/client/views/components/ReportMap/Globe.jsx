@@ -294,6 +294,9 @@ const Globe = ({
         background: globeBg,
         marginTop: "1em",
         position: "relative",
+
+        borderRadius: "2em",
+        overflow: "hidden",
       }}
     >
       {/* Always render skeleton overlay and background immediately */}

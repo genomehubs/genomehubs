@@ -1,3 +1,5 @@
+import "leaflet/dist/leaflet.css";
+
 import {
   CircleMarker,
   GeoJSON,
@@ -224,7 +226,13 @@ const Map = ({
   return (
     <div
       ref={mapContainerRef}
-      style={{ width: `${width}px`, height: `${height}px`, marginTop: "1em" }}
+      style={{
+        width: `${width}px`,
+        height: `${height}px`,
+        marginTop: "1em",
+        borderRadius: "2em",
+        overflow: "hidden",
+      }}
     >
       <MapContainer
         ref={mapInstanceRef}
