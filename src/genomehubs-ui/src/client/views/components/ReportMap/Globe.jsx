@@ -353,6 +353,69 @@ const Globe = ({
         />
       )}
 
+      {/* Zoom controls */}
+      <div
+        style={{
+          position: "absolute",
+          top: 20,
+          left: 20,
+          zIndex: 20,
+          display: "flex",
+          flexDirection: "column",
+          gap: "0.1em",
+        }}
+      >
+        <button
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: "12px 12px 0 0",
+            border: "none",
+            background: "#fff",
+            color: "#333",
+            fontSize: "1.5em",
+            cursor: "pointer",
+            marginBottom: 0,
+          }}
+          aria-label="Zoom in"
+          onClick={() => {
+            if (globeRef.current) {
+              const pov = globeRef.current.pointOfView();
+              globeRef.current.pointOfView(
+                { ...pov, altitude: Math.max(0.3, pov.altitude * 0.8) },
+                500,
+              );
+            }
+          }}
+        >
+          +
+        </button>
+        <button
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: "0 0 12px 12px",
+            border: "none",
+            background: "#fff",
+            color: "#333",
+            fontSize: "1.5em",
+            cursor: "pointer",
+          }}
+          aria-label="Zoom out"
+          onClick={() => {
+            if (globeRef.current) {
+              const pov = globeRef.current.pointOfView();
+              globeRef.current.pointOfView(
+                { ...pov, altitude: Math.min(5, pov.altitude * 1.25) },
+                500,
+              );
+            }
+          }}
+        >
+          –
+        </button>
+      </div>
+
       {/* Show popup if defined */}
       {countryPopupMeta && (
         <CountryPopup
