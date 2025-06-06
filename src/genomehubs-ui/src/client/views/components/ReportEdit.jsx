@@ -235,6 +235,106 @@ const reportTypes = [
 
 const reversibleProps = new Set(["rank", "cat"]);
 
+const selectOptions = {
+  geoBinResolution: [1, 2, 3, 4],
+  mapType: ["map", "globe"],
+  mapProjection: ["mercator", "cylindricalEqualArea"],
+  mapTheme: ["day", "night"],
+  plotRatio: ["auto", 1, 1.5, 2],
+  treeStyle: ["rect", "ring"],
+};
+
+const helpText = {
+  geoBinResolution: `H3 resolution for hexbinning (1-4, 1 = largest hexagons)`,
+  mapType: `Map type to display (map = 2D, globe = 3D)`,
+  mapProjection: `Map projection to use (mercator or cylindricalEqualArea)`,
+  mapTheme: `Map theme to use (day or night)`,
+  plotRatio: `Aspect ratio for plots (auto = auto-sized, 1 = square, 1.5 = wide, 2 = very wide)`,
+  treeStyle: `Tree style to display (rect = rectangular, ring = circular)`,
+  phylopicRank: `Taxonomic rank to display PhyloPics (e.g. species, genus, family, order, phylum, kingdom, etc. - empty = tip nodes)`,
+  phylopicSize: `Size in pixels (15-250, empty = auto-sized based on available space)`,
+};
+
+const OptionSelect = ({ queryProp, value, values, handleChange, helpText }) => {
+  let items = values.map((v) => (
+    <MenuItem key={v} value={v}>
+      {v}
+    </MenuItem>
+  ));
+
+  const hasHelp = !!helpText;
+
+  return (
+    <FormControl variant="standard" style={{ width: "100%" }}>
+      <InputLabel id={`select-${queryProp}-label`}>{queryProp}</InputLabel>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
+        <Select
+          variant="standard"
+          labelId={`select-${queryProp}-label`}
+          id={`select-${queryProp}`}
+          value={value}
+          style={{
+            width: hasHelp ? "calc(100% - 2.2em)" : "100%",
+            minWidth: 0,
+            flex: "1 1 auto",
+            marginTop: "1em",
+          }}
+          onChange={(e) => handleChange(e, queryProp)}
+        >
+          {items}
+        </Select>
+        {hasHelp && (
+          <Box
+            sx={{
+              ml: 1,
+              display: "flex",
+              alignItems: "center",
+              paddingTop: "1em",
+            }}
+          >
+            <InfoLabel
+              queryProp={queryProp}
+              helpText={helpText}
+              input="select"
+            />
+          </Box>
+        )}
+      </Box>
+      {/* Optionally, you can keep FormHelperText for accessibility */}
+    </FormControl>
+  );
+};
+
+const InfoLabel = ({ queryProp, helpText, input = "textField" }) => {
+  if (!queryProp || !helpText) {
+    return null;
+  }
+  const icon = (
+    <Tooltip title={helpText} arrow placement="top">
+      <span
+        style={{
+          fontSize: "1.2rem",
+          cursor: "pointer",
+          display: "inline-flex",
+          alignItems: "center",
+        }}
+      >
+        <InfoOutlinedIcon />
+      </span>
+    </Tooltip>
+  );
+  if (input === "textField") {
+    return <InputAdornment position="end">{icon}</InputAdornment>;
+  }
+  return <span style={{ marginLeft: 2, verticalAlign: "middle" }}>{icon}</span>;
+};
+
 export const ReportEdit = ({
   reportId,
   reportById,
@@ -486,51 +586,15 @@ export const ReportEdit = ({
           </Grid>
         </Grid>
       );
-    } else if (queryProp == "treeStyle") {
-      let items = ["rect", "ring"].map((shape) => {
-        return (
-          <MenuItem key={shape} value={shape}>
-            {shape}
-          </MenuItem>
-        );
-      });
+    } else if (selectOptions.hasOwnProperty(queryProp)) {
       input = (
-        <FormControl variant="standard" style={{ width: "95%" }}>
-          <InputLabel id="select-tree-style-label">treeStyle</InputLabel>
-          <Select
-            variant="standard"
-            labelId="select-tree-style-label"
-            id="select-tree-style"
-            value={values["treeStyle"]}
-            style={{ width: "95%" }}
-            onChange={(e) => handleChange(e, "treeStyle")}
-          >
-            {items}
-          </Select>
-        </FormControl>
-      );
-    } else if (queryProp == "plotRatio") {
-      let items = ["auto", 1, 1.5, 2].map((value) => {
-        return (
-          <MenuItem key={value} value={value}>
-            {value}
-          </MenuItem>
-        );
-      });
-      input = (
-        <FormControl variant="standard" style={{ width: "95%" }}>
-          <InputLabel id="select-plot-ratio-label">plotRatio</InputLabel>
-          <Select
-            variant="standard"
-            labelId="select-plot-ratio-label"
-            id="select-plot-ratio"
-            value={values["plotRatio"]}
-            style={{ width: "95%" }}
-            onChange={(e) => handleChange(e, "plotRatio")}
-          >
-            {items}
-          </Select>
-        </FormControl>
+        <OptionSelect
+          queryProp={queryProp}
+          values={selectOptions[queryProp]}
+          value={values[queryProp]}
+          handleChange={handleChange}
+          helpText={helpText[queryProp]}
+        />
       );
     } else if (queryProp == "phylopicRank") {
       input = (
@@ -542,21 +606,23 @@ export const ReportEdit = ({
           style={{ width: "95%" }}
           onChange={(e) => handleChange(e, "phylopicRank")}
           onBlur={(e) => handleChange(e, "phylopicRank")}
-          onKeyPress={handleKeyPress}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <Tooltip
-                  title="Taxonomic rank to display PhyloPics (e.g. species, genus, family, order, phylum, kingdom, etc. - empty = tip nodes)"
-                  arrow
-                  placement="top"
-                >
-                  <div style={{ fontSize: "1.2rem", cursor: "pointer" }}>
-                    <InfoOutlinedIcon />
-                  </div>
-                </Tooltip>
-              </InputAdornment>
-            ),
+          onKeyDown={handleKeyPress}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Tooltip
+                    title="Taxonomic rank to display PhyloPics (e.g. species, genus, family, order, phylum, kingdom, etc. - empty = tip nodes)"
+                    arrow
+                    placement="top"
+                  >
+                    <div style={{ fontSize: "1.2rem", cursor: "pointer" }}>
+                      <InfoOutlinedIcon />
+                    </div>
+                  </Tooltip>
+                </InputAdornment>
+              ),
+            },
           }}
         />
       );
