@@ -88,6 +88,9 @@ export const ReportMenu = ({
         display: "flex",
         flexDirection: "row",
         alignItems: "stretch",
+        maxHeight: "calc(100% - 40px)",
+        maxWidth: "calc(100% - 40px)",
+        overflow: "auto",
       }}
     >
       <div

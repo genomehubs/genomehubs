@@ -458,6 +458,11 @@ const ReportMap = ({
       );
     }
   } else {
+    if (message) {
+      setMessage(message);
+    } else {
+      setMessage("No map data available");
+    }
     return null;
   }
 };
