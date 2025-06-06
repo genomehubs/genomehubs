@@ -17,6 +17,7 @@ import L from "leaflet";
 import countriesGeoJson from "../geojson/countries.geojson";
 import getMapOptions from "./functions/getMapOptions";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
+import { light } from "@mui/material/styles/createPalette";
 
 const CountryLayer = ({
   countryCounts,
@@ -100,6 +101,7 @@ const Map = ({
   regionLink = () => {},
   hexbinLink = () => {},
   markers = [],
+  reportSelect = "bin",
 }) => {
   const mapContainerRef = useRef();
   const mapInstanceRef = useRef();
@@ -223,6 +225,28 @@ const Map = ({
     );
   }
 
+  const hexbinStyle = (count) => {
+    if (!markers || markers.length == 0) {
+      return {
+        fillColor: hexbinColor(count),
+        color: "none",
+        fillOpacity: 0.8,
+      };
+    }
+    if (reportSelect === "bin") {
+      return {
+        fillColor: "#eeeeee",
+        color: "none",
+        fillOpacity: 0.1,
+      };
+    }
+    return {
+      fillColor: "none",
+      color: "none",
+      fillOpacity: 0,
+    };
+  };
+
   return (
     <div
       ref={mapContainerRef}
@@ -257,16 +281,11 @@ const Map = ({
         {hexBinFeatures.length > 0 && (
           <GeoJSON
             data={hexBinsToGeoJson(hexBinCounts)}
-            style={(feature) => {
-              return {
-                fillColor: hexbinColor(feature.properties.count),
-                color: "none",
-                fillOpacity: 0.8,
-              };
-            }}
+            style={(feature) => hexbinStyle(feature.properties.count)}
             onEachFeature={(feature, layer) => {
               const { h3, count } = feature.properties;
-              const hexbinLinkUrl = hexbinLink(h3);
+              const style = hexbinStyle(count);
+              // const hexbinLinkUrl = hexbinLink(h3);
 
               // layer.bindPopup(
               //   `<div style="font-size: 1.2em;">
@@ -293,6 +312,7 @@ const Map = ({
                 setHexbinPopupMeta({
                   h3,
                   count,
+                  style,
                 });
               });
             }}
@@ -321,8 +341,9 @@ const Map = ({
           hexbinPopupMeta={hexbinPopupMeta}
           hexbinLink={hexbinLink}
           navigate={navigate}
-          fill={hexbinColor(hexbinPopupMeta.count)}
-          stroke={"none"}
+          fill={hexbinPopupMeta.style.fillColor}
+          opacity={hexbinPopupMeta.style.fillOpacity}
+          stroke={hexbinPopupMeta.style.color}
           oceanColor={oceanColor}
         />
       )}

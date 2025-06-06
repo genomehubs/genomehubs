@@ -6,13 +6,19 @@ const SingleMarker = ({
   color = "#fec44f",
   children,
   setHighlightPointLocation = () => {},
+  interactive = true,
 }) => {
+  console.log(interactive);
   return (
     <CircleMarker
-      eventHandlers={{
-        mouseover: (e) => setHighlightPointLocation(position.join(",")),
-        mouseout: (e) => setHighlightPointLocation(""),
-      }}
+      eventHandlers={
+        interactive
+          ? {
+              mouseover: (e) => setHighlightPointLocation(position.join(",")),
+              mouseout: (e) => setHighlightPointLocation(""),
+            }
+          : {}
+      }
       center={position}
       color={"white"}
       stroke={1}

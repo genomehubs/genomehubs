@@ -13,10 +13,12 @@ export default function MarkerComponent({
   setHighlightPointLocation = () => {},
   basename,
   globeView = false,
+  selectable,
 }) {
   let points = [];
   let i = 0;
   for (const obj of geoPoints) {
+    console.log(obj);
     const { coords: rawCoords } = obj;
     const coords = Array.isArray(rawCoords) ? rawCoords : [rawCoords];
     for (const latLon of coords) {
@@ -100,8 +102,9 @@ export default function MarkerComponent({
             position={arr}
             color={color}
             setHighlightPointLocation={setHighlightPointLocation}
+            interactive={selectable}
           >
-            <Popup>{message}</Popup>
+            {selectable && <Popup>{message}</Popup>}
           </SingleMarker>,
         );
       }

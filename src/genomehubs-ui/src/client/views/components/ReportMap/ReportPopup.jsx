@@ -22,7 +22,6 @@ export const ReportPopup = ({
     >
       <div
         style={{
-          fontWeight: 600,
           marginBottom: 4,
           display: "flex",
           flexDirection: "column",
@@ -31,7 +30,9 @@ export const ReportPopup = ({
         }}
       >
         {title && (
-          <div style={{ marginBottom: 2, textAlign: "left" }}>{title}</div>
+          <div style={{ marginBottom: 2, textAlign: "left", fontWeight: 600 }}>
+            {title}
+          </div>
         )}
         {detail && <div style={{ textAlign: "left" }}>{detail}</div>}
         {link && (

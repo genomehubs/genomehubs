@@ -379,6 +379,7 @@ const AttributeTableRow = ({
   siteName,
   basename,
   apiUrl,
+  geoBinResolution = 2,
   recordId,
 }) => {
   const navigate = useNavigate();
@@ -466,11 +467,10 @@ const AttributeTableRow = ({
       setMapError(null);
       setMapData(null);
       // Example API endpoint, adjust as needed
-      let url = `${apiUrl}/report?report=map&x=tax_tree%28${taxonId}%29%20AND%20assembly_span&result=${currentResult}`;
-      url += `&fields=assembly_level%2Cassembly_span%2C${attributeId}`;
+      let url = `${apiUrl}/report?report=map&x=tax_tree%28${taxonId}%29&result=${currentResult}`;
       url += `&includeEstimates=true`;
       if (attributeId === "sample_location") {
-        url += `&locationField=sample_location&geoBinResolution=3`;
+        url += `&locationField=sample_location&geoBinResolution=${geoBinResolution}`;
       } else if (attributeId === "country_list") {
         url += `&regionField=country_list`;
       }
@@ -776,6 +776,7 @@ const AttributeTableRow = ({
                   regionField={
                     attributeId === "country_list" ? "country_list" : undefined
                   }
+                  geoBinResolution={geoBinResolution}
                   searchIndexPlural={currentResult}
                   mapProjection="mercator"
                   embedded={true}

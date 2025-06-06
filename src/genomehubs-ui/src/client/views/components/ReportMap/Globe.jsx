@@ -22,6 +22,7 @@ import CountrySVG from "./CountrySVG";
 import GlobeGl from "react-globe.gl";
 import HexbinPopup from "./HexbinPopup";
 import NavLink from "../NavLink";
+import PointPopup from "./PointPopup";
 import ReportPopup from "./ReportPopup";
 import Skeleton from "@mui/material/Skeleton";
 import countriesGeoJson from "../geojson/countries.geojson";
@@ -43,10 +44,9 @@ const Globe = ({
   theme = "darkTheme",
   palette,
   onCountryClick,
-
   regionLink = () => {},
   hexbinLink = () => {},
-
+  pointLink = () => {},
   pointsData = [],
   hexBinCounts = {},
   hexPolygonResolution = 3,
@@ -98,6 +98,21 @@ const Globe = ({
     hexbinMaxCount,
   });
 
+  const hexbinStyle = (count) => {
+    if (!pointsData || pointsData.length == 0) {
+      return {
+        fillColor: hexbinColor(count),
+        color: "none",
+        fillOpacity: 0.8,
+      };
+    }
+    return {
+      fillColor: "#eeeeee",
+      color: "none",
+      fillOpacity: 0.1,
+    };
+  };
+
   const getPolyColor = useCallback(
     (d) => countryColor(countryCounts[d.properties.ISO_A2]) + "cc",
     [countryCounts, maxCount],
@@ -111,11 +126,13 @@ const Globe = ({
   // Show popup on country click
   const [countryPopupMeta, setCountryPopupMeta] = useState(null);
   const [hexbinPopupMeta, setHexbinPopupMeta] = useState(null);
+  const [pointPopupMeta, setPointPopupMeta] = useState(null);
   const navigate = useNavigate();
 
   const handlePolyClick = useCallback(
     (d, event) => {
       setHexbinPopupMeta(null);
+      setPointPopupMeta(null);
       setCountryPopupMeta({
         iso: d.properties.ISO_A2,
         name: d.properties.ADMIN,
@@ -131,14 +148,31 @@ const Globe = ({
   const handleHexbinClick = useCallback(
     (d, event) => {
       setCountryPopupMeta(null);
+      setPointPopupMeta(null);
       setHexbinPopupMeta({
         h3: d.properties.h3,
         count: d.properties.count,
+        style: hexbinStyle(d.properties.count),
         lat: event?.lat || d.properties.LAT || 0,
         lng: event?.lng || d.properties.LON || 0,
       });
     },
     [hexbinLink, navigate],
+  );
+
+  const handlePointClick = useCallback(
+    (d, event) => {
+      setCountryPopupMeta(null);
+      setHexbinPopupMeta(null);
+      console.log("point clicked", d, event);
+      setPointPopupMeta({
+        color: d.color || "#fec44f",
+        radius: d.radius || 0.5,
+        fillColor: d.color || "#fec44f",
+        ...d,
+      });
+    },
+    [pointLink, navigate],
   );
   const getPinProps = ({ pointsData, size = 0.5, elevation = 0.04 }) => {
     const labelsData = pointsData.flatMap((d) => {
@@ -175,6 +209,7 @@ const Globe = ({
       pointAltitude: (d) => d.alt || elevation - 0.001,
       pointRadius: size / 5,
       pointColor: (d) => d.color || "#fec44f",
+      pointsTransitionDuration: 0,
     };
 
     const labelProps = {
@@ -186,6 +221,8 @@ const Globe = ({
       labelColor: (d) => d.color || "#fec44f",
       labelText: (d) => "_",
       labelSize: 0.0000001,
+      onLabelClick: handlePointClick,
+      labelsTransitionDuration: 0,
     };
 
     return {
@@ -259,6 +296,7 @@ const Globe = ({
     polygonSideColor: () => oceanColor + "80",
     polygonAltitude: (d) =>
       countryCounts[d.properties.ISO_A2] > 0 ? 0.01 : 0.01,
+    polygonsTransitionDuration: 0,
   };
 
   // Build combined pointsData with outline and center for each point
@@ -279,11 +317,19 @@ const Globe = ({
     hexPolygonResolution: hexPolygonResolution,
     hexPolygonMargin: 0.05,
     hexPolygonPoints: (d) => d.geometry.coordinates[0],
-    hexPolygonColor: (d) => hexbinColor(d.properties.count) + "cc",
+    hexPolygonColor: (d) => {
+      const style = hexbinStyle(d.properties.count);
+      // Convert alpha (0-1) to 2-digit hex
+      const hexOpacity = Math.round(style.fillOpacity * 255)
+        .toString(16)
+        .padStart(2, "0");
+      return `${style.fillColor}${hexOpacity}`;
+    },
     hexPolygonAltitude: 0.015,
     hexPolygonLabel: (d) =>
       `Hex: ${d.properties.h3}\nCount: ${d.properties.count}`,
     onHexPolygonClick: handleHexbinClick,
+    hexPolygonsTransitionDuration: 0,
   };
 
   return (
@@ -438,11 +484,25 @@ const Globe = ({
           hexbinPopupMeta={hexbinPopupMeta}
           hexbinLink={hexbinLink}
           navigate={navigate}
-          fill={hexbinColor(hexbinPopupMeta.count)}
-          stroke={"none"}
+          fill={hexbinPopupMeta.style.fillColor}
+          opacity={hexbinPopupMeta.style.fillOpacity}
+          stroke={hexbinPopupMeta.style.color}
           oceanColor={oceanColor}
         />
       )}
+      {pointPopupMeta && (
+        <PointPopup
+          theme={theme}
+          nightMode={nightMode}
+          setPointPopupMeta={setPointPopupMeta}
+          pointPopupMeta={pointPopupMeta}
+          navigate={navigate}
+          oceanColor={oceanColor}
+          pointLink={pointLink}
+        />
+      )}
+
+      {/* Close button */}
     </div>
   );
 };

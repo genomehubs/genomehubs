@@ -103,14 +103,14 @@ const getMap = async ({
       return { status: countRes.status };
     }
     let { count } = countRes;
-    if (mapThreshold > -1 && count > mapThreshold && locationBounds) {
-      return {
-        status: {
-          success: false,
-          error: `Maps currently limited to ${mapThreshold} results (x query returns ${count}).\nPlease specify additional filters to continue.`,
-        },
-      };
-    }
+    // if (mapThreshold > -1 && count > mapThreshold && locationBounds) {
+    //   return {
+    //     status: {
+    //       success: false,
+    //       error: `Maps currently limited to ${mapThreshold} results (x query returns ${count}).\nPlease specify additional filters to continue.`,
+    //     },
+    //   };
+    // }
     // console.log(`count: ${count}`);
     thresholdQuery.aggs = await setAggs({
       field: locationField,

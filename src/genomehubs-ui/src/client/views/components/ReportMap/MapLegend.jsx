@@ -90,6 +90,7 @@ export const MapLegend = ({
   regionField,
   catField,
   cats = [],
+  showPoints,
   colors,
 }) => {
   const [showLegend, setShowLegend] = useState(false);
@@ -108,7 +109,7 @@ export const MapLegend = ({
   // If cats are provided, use them to create a color key
   // display the key as one row per category with a coloured circle and white outline
   const colorKey = useMemo(() => {
-    if (!locationField) {
+    if (!locationField || !showPoints) {
       return [];
     }
     if (!cats || cats.length === 0 || !colors || colors.length === 0) {
@@ -254,7 +255,7 @@ export const MapLegend = ({
             />
           </>
         )}
-        {locationField && maxHexbinCount > 1 && (
+        {locationField && !showPoints && maxHexbinCount > 1 && (
           <>
             <div
               style={{

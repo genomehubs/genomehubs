@@ -23,6 +23,7 @@ import qs from "../../functions/qs";
 import setColors from "../../functions/setColors";
 import useResize from "../../hooks/useResize";
 import withColors from "#hocs/withColors";
+import withReportTerm from "../../hocs/withReportTerm";
 import withSearchIndex from "../../hocs/withSearchIndex";
 import withSiteName from "#hocs/withSiteName";
 import withTheme from "#hocs/withTheme";
@@ -112,6 +113,7 @@ const ReportMap = ({
   mapTheme,
   mapType,
   // mapProjection = "mercator",
+  reportSelect,
   ...props
 }) => {
   const navigate = useNavigate();
@@ -126,13 +128,13 @@ const ReportMap = ({
   if (query.mapTheme) {
     mapTheme = query.mapTheme;
   }
-  if (query.geoBinResolution) {
+  if (!geoBinResolution && query.geoBinResolution) {
     geoBinResolution = parseInt(query.geoBinResolution, 10) || 0;
   }
-  if (query.locationField) {
+  if (!locationField && query.locationField) {
     locationField = query.locationField;
   }
-  if (query.regionField) {
+  if (!regionField && query.regionField) {
     regionField = query.regionField;
   }
   const regionLink = (code) => {
@@ -146,6 +148,11 @@ const ReportMap = ({
     const conditions = [`${locationBinField}=${hexbin}`];
     const newResolution = geoBinResolution < 4 ? geoBinResolution + 1 : 4;
     const options = { geoBinResolution: newResolution };
+    return queryLink({ query, conditions, options });
+  };
+  const pointLink = (lat, lon) => {
+    const conditions = [`${locationField}=${lat},${lon}`];
+    const options = {};
     return queryLink({ query, conditions, options });
   };
   const componentRef = chartRef || useRef();
@@ -245,8 +252,9 @@ const ReportMap = ({
     } else {
       countryCounts = { ...regionCounts };
     }
+    console.log(map.report.map);
 
-    if (bounds.cats) {
+    if (bounds?.cats) {
       ({ levels, colors } = setColors({
         colorPalette,
         palettes,
@@ -262,6 +270,7 @@ const ReportMap = ({
             options,
             basename,
             globeView: true,
+            selectable: reportSelect === "point",
           });
           pointsData.push(...points);
         } else {
@@ -273,6 +282,7 @@ const ReportMap = ({
               options={options}
               basename={basename}
               globeView={false}
+              selectable={reportSelect === "point"}
             />,
           );
         }
@@ -285,6 +295,7 @@ const ReportMap = ({
             color: colors[i],
             options,
             globeView: true,
+            selectable: reportSelect === "point",
           });
           pointsData.push(...points);
         } else {
@@ -295,11 +306,12 @@ const ReportMap = ({
               color={colors[i]}
               options={options}
               globeView={false}
+              selectable={reportSelect === "point"}
             />,
           );
         }
       }
-    } else if (globeView) {
+    } else if (Object.keys(pointData).length > 0 && globeView) {
       // Fallback to first key if expected key is missing
       let key = `all ${searchIndexPlural}`;
       if (!pointData[key]) {
@@ -310,9 +322,10 @@ const ReportMap = ({
         color: colors[0],
         options,
         globeView: true,
+        selectable: reportSelect === "point",
       });
       pointsData.push(...points);
-    } else {
+    } else if (Object.keys(pointData).length > 0) {
       let key = `all ${searchIndexPlural}`;
       if (!pointData[key]) {
         key = Object.keys(pointData)[0];
@@ -324,6 +337,7 @@ const ReportMap = ({
           color={colors[0]}
           options={options}
           globeView={false}
+          selectable={reportSelect === "point"}
         />,
       );
     }
@@ -382,6 +396,8 @@ const ReportMap = ({
           maxBinCount={maxHexbinCount}
           regionLink={regionLink}
           hexbinLink={hexbinLink}
+          pointLink={pointLink}
+          reportSelect={reportSelect}
           {...props}
         />
       );
@@ -412,6 +428,8 @@ const ReportMap = ({
           markers={markers}
           regionLink={regionLink}
           hexbinLink={hexbinLink}
+          pointLink={pointLink}
+          reportSelect={reportSelect}
           {...props}
         />
       );
@@ -449,6 +467,7 @@ const ReportMap = ({
                 regionField,
                 catField: bounds?.cat,
                 cats: bounds?.cats || [],
+                showPoints: Boolean(Object.keys(pointData).length > 0),
                 colors,
               }}
             />
@@ -473,4 +492,5 @@ export default compose(
   withColors,
   withTheme,
   withSearchIndex,
+  withReportTerm,
 )(ReportMap);
