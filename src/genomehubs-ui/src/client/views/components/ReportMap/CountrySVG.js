@@ -80,10 +80,18 @@ export const CountrySVG = ({ coordinates, fill, stroke }) => {
       const shiftedLng = shiftLngs(lng);
       // Scale longitude relative to middle longitude
       const scaledLng = midLng + (shiftedLng - midLng) / scale;
-      if (scaledLng < minLng) minLng = scaledLng;
-      if (scaledLng > maxLng) maxLng = scaledLng;
-      if (lat < minLat) minLat = lat;
-      if (lat > maxLat) maxLat = lat;
+      if (scaledLng < minLng) {
+        minLng = scaledLng;
+      }
+      if (scaledLng > maxLng) {
+        maxLng = scaledLng;
+      }
+      if (lat < minLat) {
+        minLat = lat;
+      }
+      if (lat > maxLat) {
+        maxLat = lat;
+      }
     });
   });
 

@@ -44,7 +44,7 @@ const CountryLayer = ({
         const name = feature.properties.ADMIN || feature.properties.NAME;
         const iso = feature.properties.ISO_A2;
         const count = countryCounts[iso] || 0;
-        const coordinates = feature.geometry.coordinates;
+        const { coordinates } = feature.geometry;
 
         if (count > 0) {
           // layer.bindPopup(
