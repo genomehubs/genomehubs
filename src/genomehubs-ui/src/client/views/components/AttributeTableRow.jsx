@@ -760,7 +760,7 @@ const AttributeTableRow = ({
           <TableCell colSpan={5}>
             <div
               ref={containerRef}
-              style={{ width: "100%", minHeight: "30em" }}
+              style={{ width: "100%", minHeight: "24em" }}
             >
               {loadingMap && <div>Loading map...</div>}
               {mapError && <div style={{ color: "red" }}>{mapError}</div>}
