@@ -1,10 +1,10 @@
 import { cellToBoundary } from "h3-js";
 
-export default function hexBinsToGeoJson(hexBinCounts) {
+export default function hexBinsToGeoJson(hexBinCounts, duplicate = false) {
   return {
     type: "FeatureCollection",
     features: Object.entries(hexBinCounts)
-      .map(([h3, count]) => {
+      .flatMap(([h3, count]) => {
         const coords = cellToBoundary(h3, true);
         if (
           coords.length > 0 &&
@@ -13,7 +13,7 @@ export default function hexBinsToGeoJson(hexBinCounts) {
         ) {
           coords.push([...coords[0]]);
         }
-        return {
+        const feature = {
           type: "Feature",
           geometry: {
             type: "Polygon",
@@ -21,6 +21,16 @@ export default function hexBinsToGeoJson(hexBinCounts) {
           },
           properties: { h3, count },
         };
+        if (duplicate) {
+          return [
+            feature,
+            {
+              ...feature,
+              properties: { ...feature.properties, duplicate: true },
+            },
+          ];
+        }
+        return feature;
       })
       .slice(),
   };

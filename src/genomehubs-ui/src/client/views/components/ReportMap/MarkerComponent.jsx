@@ -18,7 +18,6 @@ export default function MarkerComponent({
   let points = [];
   let i = 0;
   for (const obj of geoPoints) {
-    console.log(obj);
     const { coords: rawCoords } = obj;
     const coords = Array.isArray(rawCoords) ? rawCoords : [rawCoords];
     for (const latLon of coords) {

@@ -10,7 +10,6 @@ export const PointPopup = ({
   oceanColor,
   navigate,
 }) => {
-  console.log("PointPopup", pointPopupMeta);
   const { scientific_name, taxonId, lat, lng, cat } = pointPopupMeta;
   let title = scientific_name;
   let detail = `${Math.round(lat * 1000) / 1000}, ${Math.round(lng * 1000) / 1000}`;

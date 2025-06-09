@@ -53,6 +53,7 @@ const Globe = ({
   nightMode = false,
   countryOverlayColor = "#fec44f",
   hexbinOverlayColor = "#3182bd",
+  reportSelect = "bin",
 }) => {
   // Overlay colors (match ReportMap)
   const location = useLocation();
@@ -164,11 +165,10 @@ const Globe = ({
     (d, event) => {
       setCountryPopupMeta(null);
       setHexbinPopupMeta(null);
-      console.log("point clicked", d, event);
       setPointPopupMeta({
         color: d.color || "#fec44f",
         radius: d.radius || 0.5,
-        fillColor: d.color || "#fec44f",
+        fillColor: d.catColor || "#fec44f",
         ...d,
       });
     },
@@ -183,6 +183,7 @@ const Globe = ({
           lng,
           alt: alt || elevation, // default altitude if not provided
           color: color || "#fec44f", // default color if not provided
+          catColor: color || "#fec44f",
           label: label || "Point",
           radius: radius || size, // default radius if not provided
           outline: false, // indicate this is a regular point
@@ -193,6 +194,7 @@ const Globe = ({
           lng,
           alt: alt ? alt - 0.002 : elevation - 0.002, // default altitude if not provided
           color: "#ffffff", // default color if not provided
+          catColor: color || "#fec44f",
           label: "",
           radius: radius ? radius + size / 2 : size * 1.5, // default radius if not provided
           outline: true,
@@ -233,14 +235,16 @@ const Globe = ({
 
   // HEXBIN LAYER SETUP
   let hexBinFeatures = [];
-  if (hexBinCounts && Object.keys(hexBinCounts).length > 0) {
-    hexBinFeatures = hexBinsToGeoJson(hexBinCounts).features;
+  if (
+    hexBinCounts &&
+    Object.keys(hexBinCounts).length > 0 &&
+    reportSelect !== "point"
+  ) {
+    hexBinFeatures = hexBinsToGeoJson(
+      hexBinCounts,
+      reportSelect == "bin" && pointsData.length > 0,
+    ).features;
   }
-
-  const maxBinCount = Math.max(
-    ...hexBinFeatures.map((f) => f.properties.count),
-    1,
-  );
 
   // NEW: Delay mounting Globe so spinner/background are painted first
   useEffect(() => {
@@ -318,6 +322,9 @@ const Globe = ({
     hexPolygonMargin: 0.05,
     hexPolygonPoints: (d) => d.geometry.coordinates[0],
     hexPolygonColor: (d) => {
+      if (d.properties.duplicate) {
+        return "transparent";
+      }
       const style = hexbinStyle(d.properties.count);
       // Convert alpha (0-1) to 2-digit hex
       const hexOpacity = Math.round(style.fillOpacity * 255)
@@ -325,9 +332,9 @@ const Globe = ({
         .padStart(2, "0");
       return `${style.fillColor}${hexOpacity}`;
     },
-    hexPolygonAltitude: 0.015,
+    hexPolygonAltitude: (d) => (d.properties.duplicate ? 0.045 : 0.015),
     hexPolygonLabel: (d) =>
-      `Hex: ${d.properties.h3}\nCount: ${d.properties.count}`,
+      `H3: ${d.properties.h3}<br />Count: ${d.properties.count}`,
     onHexPolygonClick: handleHexbinClick,
     hexPolygonsTransitionDuration: 0,
   };
@@ -341,7 +348,7 @@ const Globe = ({
         marginTop: "1em",
         position: "relative",
 
-        borderRadius: "2em",
+        borderRadius: "32px",
         overflow: "hidden",
       }}
     >

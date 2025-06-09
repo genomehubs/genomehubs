@@ -252,7 +252,6 @@ const ReportMap = ({
     } else {
       countryCounts = { ...regionCounts };
     }
-    console.log(map.report.map);
 
     if (bounds?.cats) {
       ({ levels, colors } = setColors({
@@ -263,7 +262,7 @@ const ReportMap = ({
         colors,
       }));
       bounds.cats.forEach((obj, i) => {
-        if (globeView) {
+        if (1 || globeView) {
           const points = MarkerComponent({
             geoPoints: pointData ? pointData[obj.key] : [],
             color: colors[i],
@@ -289,7 +288,7 @@ const ReportMap = ({
       });
       if (bounds.showOther) {
         const i = bounds.cats.length;
-        if (globeView) {
+        if (1 || globeView) {
           const points = MarkerComponent({
             geoPoints: pointData["other"],
             color: colors[i],
@@ -311,7 +310,7 @@ const ReportMap = ({
           );
         }
       }
-    } else if (Object.keys(pointData).length > 0 && globeView) {
+    } else if (Object.keys(pointData).length > 0 && (1 || globeView)) {
       // Fallback to first key if expected key is missing
       let key = `all ${searchIndexPlural}`;
       if (!pointData[key]) {
@@ -425,7 +424,8 @@ const ReportMap = ({
           hexBinCounts={hexBinCounts}
           hexbinOverlayColor={hexbinOverlayColor}
           maxBinCount={maxHexbinCount}
-          markers={markers}
+          // markers={markers}
+          pointsData={pointsData}
           regionLink={regionLink}
           hexbinLink={hexbinLink}
           pointLink={pointLink}

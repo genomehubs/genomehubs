@@ -7,13 +7,14 @@ import {
   Popup,
   TileLayer,
 } from "react-leaflet";
-import React, { useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { findCenterLatLng, getFitWorldZoom } from "./functions/mapHelpers";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CountryPopup from "./CountryPopup";
 import HexbinPopup from "./HexbinPopup";
 import L from "leaflet";
+import PointPopup from "./PointPopup";
 import countriesGeoJson from "../geojson/countries.geojson";
 import getMapOptions from "./functions/getMapOptions";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
@@ -48,29 +49,6 @@ const CountryLayer = ({
         const { coordinates } = feature.geometry;
 
         if (count > 0) {
-          // layer.bindPopup(
-          //   `<div style="font-size: 1.2em;">
-          //     <strong>${feature.properties.ADMIN} (${feature.properties.ISO_A2})</strong>
-          //     <br/>
-          //     <strong>Count:</strong> ${count}
-          //     <br/>
-          //     <a href="${countryLinkUrl}" class="country-link" data-iso="${isoCode}">Click to search</a>
-          //   </div>`,
-          // );
-          // layer.on("popupopen", function (e) {
-          //   const link = e.popup._contentNode.querySelector(".country-link");
-          //   if (link) {
-          //     link.addEventListener("click", function (evt) {
-          //       evt.preventDefault();
-          //       if (typeof countryLink === "function") {
-          //         const url = countryLink(isoCode);
-          //         if (url) {
-          //           navigate(url);
-          //         }
-          //       }
-          //     });
-          //   }
-          // });
           layer.on("click", () => {
             handleCountryClick({ name, iso, count, coordinates });
           });
@@ -100,13 +78,16 @@ const Map = ({
   maxBinCount = 1,
   regionLink = () => {},
   hexbinLink = () => {},
-  markers = [],
+  pointLink = () => {},
+  // markers = [],
+  pointsData,
   reportSelect = "bin",
 }) => {
   const mapContainerRef = useRef();
   const mapInstanceRef = useRef();
-  const [countryPopupMeta, setCountryPopupMeta] = React.useState(null);
-  const [hexbinPopupMeta, setHexbinPopupMeta] = React.useState(null);
+  const [countryPopupMeta, setCountryPopupMeta] = useState(null);
+  const [hexbinPopupMeta, setHexbinPopupMeta] = useState(null);
+  const [pointPopupMeta, setPointPopupMeta] = useState(null);
   const maxCount = useMemo(
     () => Math.max(...Object.values(countryCounts), 1),
     [countryCounts],
@@ -176,7 +157,7 @@ const Map = ({
     L,
   );
   // Center the map after mount for all projections
-  React.useEffect(() => {
+  useEffect(() => {
     if (mapInstanceRef.current) {
       mapInstanceRef.current.setView([centerLat, centerLon], dynamicZoom, {
         animate: false,
@@ -185,7 +166,7 @@ const Map = ({
   }, [dynamicZoom, width, height, crs, dataBounds]); // oceanColor REMOVED from deps
 
   // Update map background color when oceanColor changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (mapContainerRef.current) {
       const mapPane =
         mapContainerRef.current.querySelector(".leaflet-container");
@@ -196,6 +177,8 @@ const Map = ({
   }, [oceanColor]);
 
   const handleCountryClick = ({ name, iso, count, coordinates }) => {
+    setHexbinPopupMeta(null); // Close hexbin popup if open
+    setPointPopupMeta(null); // Close point popup if open
     setCountryPopupMeta({
       name,
       iso,
@@ -203,6 +186,42 @@ const Map = ({
       coordinates,
     });
   };
+
+  const handlePointClick = (point) => {
+    setHexbinPopupMeta(null); // Close hexbin popup if open
+    setCountryPopupMeta(null); // Close country popup if open
+    setPointPopupMeta({
+      fillColor: point.color || "#fec44f",
+      catColor: point.color || "#fec44f",
+      radius: point.radius || 0.8,
+      ...point,
+    });
+  };
+  let markers = [];
+  if (pointsData && pointsData.length > 0) {
+    markers = pointsData
+      .map((point, i) => {
+        const { lat, lng, color } = point;
+        if (isNaN(lat) || isNaN(lng)) {
+          return null; // Skip invalid coordinates
+        }
+
+        return (
+          <CircleMarker
+            key={i}
+            center={[lat, lng]}
+            color={"#fff"}
+            fillColor={color || "#fec44f"}
+            fillOpacity={1}
+            // radius={6}
+            eventHandlers={{
+              click: () => handlePointClick(point),
+            }}
+          ></CircleMarker>
+        );
+      })
+      .filter(Boolean); // Filter out null markers
+  }
 
   let tileLayer;
   if (tileUrl) {
@@ -226,7 +245,7 @@ const Map = ({
   }
 
   const hexbinStyle = (count) => {
-    if (!markers || markers.length == 0) {
+    if (!pointsData || pointsData.length == 0) {
       return {
         fillColor: hexbinColor(count),
         color: "none",
@@ -254,7 +273,7 @@ const Map = ({
         width: `${width}px`,
         height: `${height}px`,
         marginTop: "1em",
-        borderRadius: "2em",
+        borderRadius: "32px",
         overflow: "hidden",
       }}
     >
@@ -277,7 +296,7 @@ const Map = ({
       >
         {tileLayer}
         {countryLayer}
-        {/* markers */}
+        {reportSelect === "bin" && markers}
         {hexBinFeatures.length > 0 && (
           <GeoJSON
             data={hexBinsToGeoJson(hexBinCounts)}
@@ -285,30 +304,12 @@ const Map = ({
             onEachFeature={(feature, layer) => {
               const { h3, count } = feature.properties;
               const style = hexbinStyle(count);
-              // const hexbinLinkUrl = hexbinLink(h3);
-
-              // layer.bindPopup(
-              //   `<div style="font-size: 1.2em;">
-              //     <strong>H3 Index:</strong> ${h3}<br/>
-              //     <strong>Count:</strong> ${count}<br/>
-              //     <a href="${hexbinLinkUrl}" class="hexbin-link" data-h3="${h3}">Click to search</a>
-              //   </div>`,
-              // );
-              // layer.on("popupopen", function (e) {
-              //   const link = e.popup._contentNode.querySelector(".hexbin-link");
-              //   if (link) {
-              //     link.addEventListener("click", function (evt) {
-              //       evt.preventDefault();
-              //       if (typeof hexbinLink === "function") {
-              //         const url = hexbinLink(h3);
-              //         if (url) {
-              //           navigate(url);
-              //         }
-              //       }
-              //     });
-              //   }
-              // });
               layer.on("click", () => {
+                if (reportSelect === "point") {
+                  return; // Do not open hexbin popup in point mode
+                }
+                setCountryPopupMeta(null); // Close country popup if open
+                setPointPopupMeta(null); // Close point popup if open
                 setHexbinPopupMeta({
                   h3,
                   count,
@@ -318,7 +319,7 @@ const Map = ({
             }}
           />
         )}
-        {markers}
+        {reportSelect === "point" && markers}
       </MapContainer>
       {countryPopupMeta && (
         <CountryPopup
@@ -345,6 +346,17 @@ const Map = ({
           opacity={hexbinPopupMeta.style.fillOpacity}
           stroke={hexbinPopupMeta.style.color}
           oceanColor={oceanColor}
+        />
+      )}
+      {pointPopupMeta && (
+        <PointPopup
+          theme={theme}
+          nightMode={nightMode}
+          setPointPopupMeta={setPointPopupMeta}
+          pointPopupMeta={pointPopupMeta}
+          navigate={navigate}
+          oceanColor={oceanColor}
+          pointLink={pointLink}
         />
       )}
     </div>
