@@ -109,6 +109,7 @@ const ReportMap = ({
   locationField,
   regionField,
   geoBinResolution,
+  geoBounds,
   mapProjection = "cylindricalEqualArea",
   mapTheme,
   mapType,
@@ -136,6 +137,9 @@ const ReportMap = ({
   }
   if (!regionField && query.regionField) {
     regionField = query.regionField;
+  }
+  if (!geoBounds && query.geoBounds) {
+    geoBounds = query.geoBounds;
   }
   const regionLink = (code) => {
     const conditions = [`${regionField}=${code}`];
@@ -211,31 +215,44 @@ const ReportMap = ({
   if (map && map.status) {
     const { locationBounds, bounds } = map.report;
     let pointData = map.report.map.rawData || {};
-    let geoBounds;
-    if (locationBounds?.stats?.geo?.bounds) {
-      geoBounds = locationBounds.stats.geo.bounds;
-
-      geoBounds = [
-        [geoBounds.top_left.lat + 1, geoBounds.top_left.lon - 1],
-        [geoBounds.bottom_right.lat - 1, geoBounds.bottom_right.lon + 1],
-      ];
-    } else {
-      // Calculate default geoBounds based on container aspect ratio
-      const aspect = width && height ? (width / height) * 2 : 2;
-      let latSpan = 90;
-      let lonSpan = latSpan * aspect;
-      if (lonSpan > 360) {
-        lonSpan = 360;
-        latSpan = lonSpan / aspect;
+    if (geoBounds) {
+      let [w, s, e, n] = geoBounds.split(",").map(parseFloat);
+      if (isNaN(w) || isNaN(s) || isNaN(e) || isNaN(n)) {
+        console.warn("Invalid geoBounds format:", geoBounds);
+        geoBounds = null;
+      } else {
+        geoBounds = [
+          [n + 1, w - 1],
+          [s - 1, e + 1],
+        ];
       }
-      // Pick a random longitude between -120 and 120
-      const centerLon = Math.random() * 240 - 120;
+    }
+    if (geoBounds === null) {
+      if (locationBounds?.stats?.geo?.bounds) {
+        geoBounds = locationBounds.stats.geo.bounds;
 
-      // Center longitude on centerLon
-      geoBounds = [
-        [latSpan / 2, centerLon - lonSpan / 2],
-        [-latSpan / 2, centerLon + lonSpan / 2],
-      ];
+        geoBounds = [
+          [geoBounds.top_left.lat + 1, geoBounds.top_left.lon - 1],
+          [geoBounds.bottom_right.lat - 1, geoBounds.bottom_right.lon + 1],
+        ];
+      } else {
+        // Calculate default geoBounds based on container aspect ratio
+        const aspect = width && height ? (width / height) * 2 : 2;
+        let latSpan = 90;
+        let lonSpan = latSpan * aspect;
+        if (lonSpan > 360) {
+          lonSpan = 360;
+          latSpan = lonSpan / aspect;
+        }
+        // Pick a random longitude between -120 and 120
+        const centerLon = Math.random() * 240 - 120;
+
+        // Center longitude on centerLon
+        geoBounds = [
+          [latSpan / 2, centerLon - lonSpan / 2],
+          [-latSpan / 2, centerLon + lonSpan / 2],
+        ];
+      }
     }
     // Use regionCounts from API if available
     let { regionCounts, hexBinCounts } = map.report.map || {};
@@ -367,7 +384,7 @@ const ReportMap = ({
     );
     let dataBounds = fitWorldBounds;
     if (locationBounds?.stats?.geo?.bounds) {
-      dataBounds = normalizeBounds(locationBounds.stats.geo.bounds);
+      dataBounds = normalizeBounds(geoBounds);
     }
     let mapGlobe = null;
     if (globeView) {
@@ -378,7 +395,7 @@ const ReportMap = ({
           // ref={mapRef}
           width={width}
           height={height}
-          bounds={dataBounds}
+          dataBounds={dataBounds}
           theme={theme}
           colorScheme={colorScheme}
           nightMode={nightMode}

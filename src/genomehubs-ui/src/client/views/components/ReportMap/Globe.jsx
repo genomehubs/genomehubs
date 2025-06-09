@@ -39,6 +39,7 @@ const Globe = ({
   height,
   colorScheme,
   geoPoints = [],
+  dataBounds,
   regionField,
   countryCounts,
   theme = "darkTheme",
@@ -256,6 +257,35 @@ const Globe = ({
   // Ensure globe zooms to bounds when showGlobe becomes true
   useEffect(() => {
     if (showGlobe && globeRef.current) {
+      // Helper to compute center and altitude for a bounding box
+      const computeView = (
+        minLat,
+        minLon,
+        maxLat,
+        maxLon,
+        altitudeOffset = 0,
+      ) => {
+        const centerLat = (minLat + maxLat) / 2;
+        const centerLon = (minLon + maxLon) / 2;
+        const latSpread = maxLat - minLat;
+        const lngSpread = maxLon - minLon;
+        const spread = Math.max(latSpread, lngSpread);
+        const globeWidth = 360;
+        const minAltitude = 0.5;
+        const maxAltitude = 2.5;
+        const altitude = Math.min(
+          Math.max((spread / globeWidth) * 1.5 + altitudeOffset, minAltitude),
+          maxAltitude,
+        );
+        return { lat: centerLat, lng: centerLon, altitude };
+      };
+
+      let pov = { lat: centerLat, lng: centerLon, altitude: 1.5 };
+
+      if (dataBounds && dataBounds.length === 4) {
+        const [minLat, minLon, maxLat, maxLon] = dataBounds;
+        pov = computeView(minLat, minLon, maxLat, maxLon, 0);
+      }
       if (pointsData && pointsData.length > 0) {
         const lats = pointsData.map((p) => p.lat);
         const lngs = pointsData.map((p) => p.lng);
@@ -263,22 +293,10 @@ const Globe = ({
         const maxLat = Math.max(...lats);
         const minLng = Math.min(...lngs);
         const maxLng = Math.max(...lngs);
-        const centerLat = (minLat + maxLat) / 2;
-        const centerLng = (minLng + maxLng) / 2;
-        const latSpread = maxLat - minLat;
-        const lngSpread = maxLng - minLng;
-        const spread = Math.max(latSpread, lngSpread);
-        const altitude = Math.min(Math.max(1 + spread / 120, 0.5), 1.5);
-        globeRef.current.pointOfView(
-          { lat: centerLat, lng: centerLng, altitude },
-          1000,
-        );
-      } else {
-        globeRef.current.pointOfView(
-          { lat: centerLat, lng: centerLon, altitude: 1.5 },
-          1000,
-        );
+        pov = computeView(minLat, minLng, maxLat, maxLng, 0.8);
       }
+
+      globeRef.current.pointOfView(pov, 1000);
     }
   }, [showGlobe, centerLat, centerLon, pointsData]);
 
