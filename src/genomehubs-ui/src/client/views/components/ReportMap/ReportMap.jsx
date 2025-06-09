@@ -383,8 +383,11 @@ const ReportMap = ({
       [mapProjection, width, height, crs],
     );
     let dataBounds = fitWorldBounds;
-    if (locationBounds?.stats?.geo?.bounds) {
+    if (geoBounds) {
+      // Use provided geoBounds if available
       dataBounds = normalizeBounds(geoBounds);
+    } else if (locationBounds?.stats?.geo?.bounds && !geoBounds) {
+      dataBounds = normalizeBounds(locationBounds?.stats?.geo?.bounds);
     }
     let mapGlobe = null;
     if (globeView) {
