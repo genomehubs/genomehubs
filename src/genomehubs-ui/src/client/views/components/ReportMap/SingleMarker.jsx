@@ -42,7 +42,7 @@ const MarkerComponent = ({
   let markers = [];
   let i = 0;
   for (let obj of geoPoints) {
-    let coords = obj.coords;
+    let { coords } = obj;
     if (!Array.isArray(coords)) {
       coords = [coords];
     }
