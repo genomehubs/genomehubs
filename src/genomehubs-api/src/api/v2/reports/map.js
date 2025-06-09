@@ -319,21 +319,17 @@ export const map = async ({
       // }
     }
   }
-  if (locationHex) {
-    if (!Object.keys(typesMap).includes(locationHex)) {
-      status = {
-        success: false,
-        error: `locationHex: '${locationHex}' not found, no location data available`,
-      };
-    }
+  if (locationHex && !Object.keys(typesMap).includes(locationHex)) {
+    status = {
+      success: false,
+      error: `locationHex: '${locationHex}' not found, no location data available`,
+    };
   }
-  if (regionField) {
-    if (!Object.keys(typesMap).includes(regionField)) {
-      status = {
-        success: false,
-        error: `regionField: '${regionField}' not found, no region data available`,
-      };
-    }
+  if (regionField && !Object.keys(typesMap).includes(regionField)) {
+    status = {
+      success: false,
+      error: `regionField: '${regionField}' not found, no region data available`,
+    };
   }
 
   fields = xFields;
@@ -467,6 +463,7 @@ export const map = async ({
     taxonomy,
     apiParams,
     opts: regionField ? ";;500" : undefined,
+    catOpts: regionField ? ";;500" : undefined,
   });
   if (!bounds) {
     status = {
