@@ -227,7 +227,7 @@ const ReportMap = ({
         ];
       }
     }
-    if (geoBounds === null) {
+    if (!geoBounds) {
       if (locationBounds?.stats?.geo?.bounds) {
         geoBounds = locationBounds.stats.geo.bounds;
 
