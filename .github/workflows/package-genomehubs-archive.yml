@@ -6,29 +6,44 @@ env:
   ARCHIVE_VERSION: 2025.04.21
 
 jobs:
-  package-goat-ui-archive:
+  package-api-archive:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{github.ref}}
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "18"
       - run: npm install -g pkg
       - run: |
-          git clone -b main --single-branch https://github.com/genomehubs/goat-ui
+          ./package-api.sh
+          mv ./dist/genomehubs-api ./dist/genomehubs-api-linux || exit 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: genomehubs-api
+          path: ./dist/*
+
+  package-goat-ui-archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+      - run: npm install -g pkg
+      - run: |
+          git clone https://github.com/genomehubs/goat-ui
           mv goat-ui/static/* src/genomehubs-ui/src/client/static/
           mv goat-ui/files/favicon/* src/genomehubs-ui/src/client/favicon/
           mv goat-ui/files/components/* src/genomehubs-ui/src/client/views/components/
           mv goat-ui/files/html/index.html src/genomehubs-ui/src/client/index.html
-          cd goat-ui
-          echo "GH_COMMIT_HASH=$(git log -n 1 --pretty=format:'%H')" >> $GITHUB_ENV
-          cd -
-          rm -r goat-ui
-      - run: |
-          GH_BASENAME=$ARCHIVE_VERSION ./package-ui.sh
-          mv ./dist/genomehubs-ui-linux-x64 ./dist/genomehubs-ui-linux || exit 0
+          rm -rf goat-ui
+      - run: ./package-ui.sh
+        env:
+          GH_API_URL: "https://goat.genomehubs.org/api/$ARCHIVE_VERSION"
+          GH_ARCHIVE: "latest 2024.09.14 2024.03.01 2023.10.16 2023.05.18 2023.02.20 2022.11.16"
+          GH_BASENAME: "$ARCHIVE_VERSION"
+          GH_SITENAME: GoaT
+          GH_SUGGESTED_TERM: Canidae
       - uses: actions/upload-artifact@v4
         with:
           name: goat-ui
@@ -39,7 +54,7 @@ jobs:
     needs: package-goat-ui-archive
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{github.ref}}
       - uses: actions/download-artifact@v4
@@ -65,4 +80,35 @@ jobs:
           context: src/docker/goat
           push: true
           tags: genomehubs/goat:${{ env.ARCHIVE_VERSION }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-and-push-api-archive:
+    runs-on: ubuntu-latest
+    needs: package-api-archive
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: genomehubs-api
+          path: ./dist
+      - run: |
+          mv dist/genomehubs-api-linux src/docker/api/
+          rm -rf dist/*
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: genomehubs/genomehubs-api
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: src/docker/api
+          push: true
+          tags: genomehubs/genomehubs-api:${{ env.ARCHIVE_VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
