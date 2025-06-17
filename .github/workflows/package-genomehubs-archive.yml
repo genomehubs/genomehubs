@@ -39,9 +39,9 @@ jobs:
           rm -rf goat-ui
       - run: ./package-ui.sh
         env:
-          GH_API_URL: "https://goat.genomehubs.org/api/$ARCHIVE_VERSION"
+          GH_API_URL: "https://goat.genomehubs.org/api/${{ env.ARCHIVE_VERSION }}"
           GH_ARCHIVE: "latest 2024.09.14 2024.03.01 2023.10.16 2023.05.18 2023.02.20 2022.11.16"
-          GH_BASENAME: "$ARCHIVE_VERSION"
+          GH_BASENAME: ${{ env.ARCHIVE_VERSION }}
           GH_SITENAME: GoaT
           GH_SUGGESTED_TERM: Canidae
       - uses: actions/upload-artifact@v4
