@@ -57,7 +57,7 @@ const QueryBuilder = ({
   const navigate = useNavigate();
   let ranks = {
     "": "",
-    superkingdom: "superkingdom",
+    domain: "domain",
     kingdom: "kingdom",
     phylum: "phylum",
     class: "class",

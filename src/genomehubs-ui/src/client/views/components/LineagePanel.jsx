@@ -39,8 +39,8 @@ export const LineageList = ({
       setPreferSearchTerm(false);
       navigate(
         `?recordId=${taxon}&result=taxon&taxonomy=${taxonomy}#${encodeURIComponent(
-          `${taxon}[${name}]`
-        )}`
+          `${taxon}[${name}]`,
+        )}`,
       );
       setLookupTerm(name);
     }
@@ -57,7 +57,7 @@ export const LineageList = ({
     "class",
     "phylum",
     "kingdom",
-    "superkingdom",
+    "domain",
   ]);
 
   if (lineage && lineage.lineage) {
@@ -65,7 +65,7 @@ export const LineageList = ({
       let rank = ancestor.taxon_rank == "clade" ? "" : ancestor.taxon_rank;
       let css = classnames(
         rankStyle,
-        fullRanks.has(ancestor.taxon_rank) && boldStyle
+        fullRanks.has(ancestor.taxon_rank) && boldStyle,
       );
       let rankDiv = <div className={css}>{rank}</div>;
 
@@ -85,7 +85,7 @@ export const LineageList = ({
             {rankDiv}
             {ancestor.scientific_name}
           </span>
-        </Tooltip>
+        </Tooltip>,
       );
     });
   }
@@ -93,7 +93,7 @@ export const LineageList = ({
     lineage.taxon.taxon_rank == "clade" ? "" : lineage.taxon.taxon_rank;
   let css = classnames(
     rankStyle,
-    fullRanks.has(lineage.taxon.taxon_rank) && boldStyle
+    fullRanks.has(lineage.taxon.taxon_rank) && boldStyle,
   );
   let rankDiv = <div className={css}>{rank}</div>;
   lineageDivs.push(
@@ -106,7 +106,7 @@ export const LineageList = ({
     >
       {rankDiv}
       {lineage.taxon.scientific_name}
-    </span>
+    </span>,
   );
 
   return <div style={{ maxWidth: "100%" }}>{lineageDivs}</div>;
@@ -150,5 +150,5 @@ export default compose(
   withTaxonomy,
   dispatchLookup,
   withSearch,
-  withRecord
+  withRecord,
 )(LineagePanel);

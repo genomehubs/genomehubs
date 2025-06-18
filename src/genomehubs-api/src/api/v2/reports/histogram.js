@@ -201,10 +201,10 @@ const getNestedHistogramData = ({
   let yNullIndex = -1;
   let fullYBuckets;
   let fullYValues;
-  if (yHistograms && yField) {
-    if (yHistograms.by_attribute[yField]) {
+  if (yHistograms.by_attribute && yField) {
+    if (yHistograms.by_attribute?.[yField]) {
       yNullCount = totalCount - yHistograms.by_attribute[yField].doc_count;
-    } else {
+    } else if (yHistograms.by_attribute?.by_cat) {
       yNullCount = totalCount - yHistograms.by_attribute.by_cat.doc_count;
     }
     ({ yBuckets: fullYBuckets, yValues: fullYValues } = getYValues({
@@ -1016,7 +1016,7 @@ export const histogram = async ({
       apiParams,
       opts: catOpts,
     });
-    if (nullCatBounds.stats.cats) {
+    if (nullCatBounds?.stats?.cats) {
       bounds.cats = nullCatBounds.stats.cats;
       bounds.showOther =
         nullCatBounds.stats.showOther || Boolean(catString.match(/\bnull\b/));

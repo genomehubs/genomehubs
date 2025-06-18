@@ -33,7 +33,7 @@ const plurals = (singular) => {
     class: "classes",
     phylum: "phyla",
     kingdom: "kingdoms",
-    superkingdom: "superkingdoms",
+    domain: "domains",
   };
   return ranks[singular.toLowerCase()] || singular;
 };
