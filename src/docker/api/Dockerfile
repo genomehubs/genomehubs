@@ -1,7 +1,7 @@
 FROM alpine:3.15
 LABEL maintainer="contact@genomehubs.org"
 LABEL license="MIT"
-ARG VERSION=2.10.15
+ARG VERSION=2.10.16
 LABEL version=$VERSION
 
 ENV CONTAINER_VERSION=$VERSION
