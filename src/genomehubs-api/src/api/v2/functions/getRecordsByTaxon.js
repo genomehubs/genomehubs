@@ -122,7 +122,7 @@ export const getRecordsByTaxon = async (props) => {
       )
       .catch((err) => {
         logError({
-          message: err.meta.body.error,
+          message: err.meta.body?.error || err.message,
           ...(props.req && { req: props.req }),
         });
         return err.meta;
