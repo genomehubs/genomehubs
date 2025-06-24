@@ -78,7 +78,7 @@ const getYValues = ({ obj, yField, lookupTypes, stats }) => {
       stats
     ));
   }
-  if (yValueType == "keyword" && stats.cats) {
+  if (["keyword", "geo_hex"].includes(yValueType) && stats.cats) {
     let bucketMap = {};
     stats.cats.forEach((obj, i) => {
       yBuckets.push(obj.key);
@@ -189,7 +189,7 @@ const getNestedHistogramData = ({
   lookupTypes,
   yBounds,
 }) => {
-  if (!yHistograms) {
+  if (!yHistograms || !yBounds || !yField) {
     return {
       fullYBuckets: [],
       fullYValues: [],
@@ -201,27 +201,27 @@ const getNestedHistogramData = ({
   let yNullIndex = -1;
   let fullYBuckets;
   let fullYValues;
-  if (yHistograms.by_attribute && yField) {
-    if (yHistograms.by_attribute?.[yField]) {
-      yNullCount = totalCount - yHistograms.by_attribute[yField].doc_count;
-    } else if (yHistograms.by_attribute?.by_cat) {
-      yNullCount = totalCount - yHistograms.by_attribute.by_cat.doc_count;
-    }
-    ({ yBuckets: fullYBuckets, yValues: fullYValues } = getYValues({
-      obj: { yHistograms },
-      yField,
-      lookupTypes,
-      stats: yBounds.stats,
-      other: yBounds.showOther,
-    }));
+  // if (yHistograms && yField) {
+  if (yHistograms.by_attribute?.[yField]) {
+    yNullCount = totalCount - yHistograms.by_attribute[yField].doc_count;
+  } else if (yHistograms.by_attribute?.by_cat) {
+    yNullCount = totalCount - yHistograms.by_attribute.by_cat.doc_count;
+  }
+  ({ yBuckets: fullYBuckets, yValues: fullYValues } = getYValues({
+    obj: { yHistograms },
+    yField,
+    lookupTypes,
+    stats: yBounds.stats,
+    other: yBounds.showOther,
+  }));
 
-    if (yNullCount > 0) {
-      yNullIndex = fullYBuckets.indexOf("null");
-      if (yNullIndex > -1) {
-        fullYValues[yNullIndex] = yNullCount;
-      }
+  if (yNullCount > 0) {
+    yNullIndex = fullYBuckets.indexOf("null");
+    if (yNullIndex > -1) {
+      fullYValues[yNullIndex] = yNullCount;
     }
   }
+  // }
   return { fullYBuckets, fullYValues, yNullCount, yNullIndex };
 };
 
@@ -374,7 +374,7 @@ const getHistogram = async ({
           }
           let x = result.result.fields[field][xSumm];
           if (
-            valueType == "keyword" &&
+            ["keyword", "geo_hex"].includes(valueType) &&
             xSumm == "value" &&
             !xKeys.has(x.toLowerCase())
           ) {
@@ -386,7 +386,7 @@ const getHistogram = async ({
           }
           for (let y of ys) {
             if (
-              yValueType == "keyword" &&
+              ["keyword", "geo_hex"].includes(yValueType) &&
               ySumm == "value" &&
               !yKeys.has(y.toLowerCase())
             ) {
@@ -511,7 +511,10 @@ const getHistogram = async ({
   });
   if (fieldMeta.type == "date") {
     buckets = scaleBuckets(buckets, "date", bounds);
-  } else if (fieldMeta.type == "keyword" && summaries[0] != "length") {
+  } else if (
+    ["keyword", "geo_hex"].includes(fieldMeta.type) &&
+    summaries[0] != "length"
+  ) {
     buckets.push(undefined);
   } else {
     buckets = scaleBuckets(buckets, bounds.scale, bounds);
@@ -527,7 +530,10 @@ const getHistogram = async ({
     // yBuckets = allYBuckets;
     if (yFieldMeta.type == "date") {
       yBuckets = scaleBuckets(yBuckets, "date", yBounds);
-    } else if (yFieldMeta.type != "keyword" && summaries[0] != "length") {
+    } else if (
+      ["keyword", "geo_hex"].includes(yFieldMeta.type) &&
+      summaries[0] != "length"
+    ) {
       yBuckets = scaleBuckets(yBuckets, yBounds.scale, yBounds);
     } else {
       yBuckets = scaleBuckets(yBuckets, yBounds.scale, yBounds);
@@ -739,7 +745,7 @@ const updateQuery = ({ params, fields, summaries, opts, lookupTypes }) => {
   if (summaries[0] != meta.processed_simple) {
     field = `${summaries[0]}(${field})`;
   }
-  if (!meta || !opts || meta.type == "keyword") {
+  if (!meta || !opts || meta.type == "keyword" || meta.type == "geo_hex") {
     return;
   }
   let queryArr = (params.query || "").split(
@@ -1016,7 +1022,7 @@ export const histogram = async ({
       apiParams,
       opts: catOpts,
     });
-    if (nullCatBounds?.stats?.cats) {
+    if (nullCatBounds?.stats.cats) {
       bounds.cats = nullCatBounds.stats.cats;
       bounds.showOther =
         nullCatBounds.stats.showOther || Boolean(catString.match(/\bnull\b/));
