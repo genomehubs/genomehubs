@@ -1,6 +1,6 @@
 {
   "name": "genomehubs-api",
-  "version": "2.10.15",
+  "version": "2.10.16",
   "description": "GenomeHubs API",
   "scripts": {
     "api": "node --max-old-space-size=12288 src/app.js",
