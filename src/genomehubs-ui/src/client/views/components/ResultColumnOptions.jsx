@@ -21,7 +21,7 @@ import qs from "../functions/qs";
 import { styled } from "@mui/material/styles";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withTypes from "../hocs/withTypes";
 
 const useStyles = makeStyles((theme) => ({
@@ -166,16 +166,16 @@ const ResultColumnOptions = ({
     } else {
       fields = Object.entries(types)
         .filter(
-          ([_, v]) => v.group == searchTerm.result && v.display_level == 1
+          ([_, v]) => v.group == searchTerm.result && v.display_level == 1,
         )
         .map(([k]) => k);
     }
 
     let index = fields.findIndex(
-      (f) => f == attributeId || f.startsWith(`${attributeId}:`)
+      (f) => f == attributeId || f.startsWith(`${attributeId}:`),
     );
     fields = fields.filter(
-      (f) => f != attributeId && !f.startsWith(`${attributeId}:`)
+      (f) => f != attributeId && !f.startsWith(`${attributeId}:`),
     );
     fields.splice(index, 0, ...newFields);
     let newFieldOpts = (searchTerm.fieldOpts || []).filter((entry) => {
@@ -198,7 +198,7 @@ const ResultColumnOptions = ({
     };
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`
+      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`,
     );
     setAttributeSettings({
       attributeId: undefined,
@@ -216,7 +216,7 @@ const ResultColumnOptions = ({
     };
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`
+      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`,
     );
   };
 
@@ -327,5 +327,5 @@ export default compose(
   withSiteName,
   withTypes,
   withRecord,
-  withSearch
+  withSearch,
 )(ResultColumnOptions);

@@ -13,7 +13,7 @@ import getContrast from "../functions/getContrast";
 import getPrimaryAssemblyId from "../functions/getPrimaryAssemblyId";
 import { recordLinkIcon as recordLinkIconStyle } from "./Styles.scss";
 import withApi from "../hocs/withApi";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withRecord from "../hocs/withRecord";
 import withTheme from "../hocs/withTheme";
 

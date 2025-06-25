@@ -4,7 +4,7 @@ import Grid from "@mui/material/Grid2";
 import Markdown from "./Markdown";
 import NavLink from "./NavLink";
 import { compose } from "recompose";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const Terms = ({ basename }) => {
   const components = {

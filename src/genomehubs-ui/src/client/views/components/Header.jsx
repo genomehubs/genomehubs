@@ -11,7 +11,7 @@ import SiteName from "./SiteName";
 import Tabs from "./Tabs";
 import TabsFixed from "./TabsFixed";
 import { compose } from "recompose";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withTheme from "../hocs/withTheme";
 
 const basename = BASENAME || "";

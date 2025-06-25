@@ -33,9 +33,9 @@ import { scaleLinear } from "d3-scale";
 import searchByCell from "../functions/searchByCell";
 import setColors from "../functions/setColors";
 import useResize from "../hooks/useResize";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withTheme from "../hocs/withTheme";
 import { zLegend } from "./zLegend";
 

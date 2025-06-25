@@ -17,9 +17,9 @@ import setColors from "../functions/setColors";
 import truncate from "../functions/truncate";
 import { useLongPress } from "use-long-press";
 import useResize from "../hooks/useResize";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const searchByPoint = ({ props, chartProps }) => {
   let { xQuery, fields, ranks, groupBy, navigate, basename, bounds, yBounds } =

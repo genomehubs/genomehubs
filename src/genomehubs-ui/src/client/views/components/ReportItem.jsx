@@ -26,7 +26,7 @@ import { useIntersectionObserver } from "usehooks-ts";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
 import withReportById from "../hocs/withReportById";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const headings = {
   tree: "Tap tree nodes to browse taxa or long-press to search",
@@ -87,6 +87,13 @@ const ReportItem = ({
   compactWidth,
   highlightArea,
   mapThreshold,
+  locationField,
+  regionField,
+  geoBounds,
+  mapType,
+  mapTheme,
+  mapProjection,
+  geoBinResolution,
   scatterThreshold,
   yScale,
   zScale,
@@ -104,7 +111,7 @@ const ReportItem = ({
   hideErrorBars,
   hideAncestralBars,
   showPhyloPics,
-  phylopicRank, 
+  phylopicRank,
   phylopicSize,
   highlight,
   colorPalette,
@@ -324,6 +331,14 @@ const ReportItem = ({
             minDim={minDim}
             setMinDim={setMinDim}
             mapThreshold={mapThreshold}
+            locationField={locationField}
+            regionField={regionField}
+            geoBounds={geoBounds}
+            mapType={mapType}
+            mapTheme={mapTheme}
+            mapProjection={mapProjection}
+            geoBinResolution={geoBinResolution}
+            highlightArea={highlightArea}
           />
         );
         break;

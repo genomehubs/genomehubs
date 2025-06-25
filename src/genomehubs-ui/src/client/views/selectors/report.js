@@ -104,6 +104,13 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     cumulative: { in: new Set(["histogram", "table"]), ui: true },
     reversed: { in: new Set(["scatter"]), ui: true },
     mapThreshold: { in: new Set(["map"]) },
+    locationField: { in: new Set(["map"]) },
+    regionField: { in: new Set(["map"]) },
+    geoBounds: { in: new Set(["map"]) },
+    mapType: { in: new Set(["map"]), ui: true },
+    mapTheme: { in: new Set(["map"]), ui: true },
+    mapProjection: { in: new Set(["map"]), ui: true },
+    geoBinResolution: { in: new Set(["map"]) },
     treeThreshold: { in: new Set(["tree"]) },
     queryId: {
       in: new Set([

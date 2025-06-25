@@ -1,0 +1,21 @@
+// GeoJSON for world countries. For brevity, this is a minimal example with a few countries. Replace with a full dataset for production.
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "ADMIN": "France", "ISO_A2": "FR" },
+      "geometry": { "type": "Polygon", "coordinates": [[[2.513573, 51.148506], [2.658422, 50.796848], [3.123252, 50.780363], [2.513573, 51.148506]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "ADMIN": "Germany", "ISO_A2": "DE" },
+      "geometry": { "type": "Polygon", "coordinates": [[[9.921906, 54.983104], [9.93958, 54.596642], [10.950112, 54.363607], [9.921906, 54.983104]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "ADMIN": "Spain", "ISO_A2": "ES" },
+      "geometry": { "type": "Polygon", "coordinates": [[[-9.034818, 41.880571], [-8.984433, 42.592775], [-9.034818, 41.880571]]] }
+    }
+  ]
+}

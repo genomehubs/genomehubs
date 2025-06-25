@@ -1,7 +1,7 @@
 import {
+  apiUrl,
   getApiAttempt,
   getApiStatus,
-  getApiUrl,
   setApiAttempt,
   setApiStatus,
 } from "../reducers/api";
@@ -11,7 +11,7 @@ import { connect } from "react-redux";
 
 const withApi = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
-    apiUrl: getApiUrl(state),
+    apiUrl,
     apiStatus: getApiStatus(state),
     attempt: getApiAttempt(state),
   });
@@ -23,7 +23,7 @@ const withApi = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

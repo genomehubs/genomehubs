@@ -11,7 +11,7 @@ import {
 import Logo from "./Logo";
 import { compose } from "recompose";
 import withLoading from "../hocs/withLoading";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const LoadingScreen = ({ types, basename, siteName, loading, setLoading }) => {
   const [show, setShow] = useState(loading);

@@ -9,7 +9,7 @@ import React from "react";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { fixedArSixteenNine as fixedArSixteenNineStyle } from "./Styles.scss";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withTheme from "../hocs/withTheme";
 
 const MemoizedGoatLogo = React.memo(GoatLogo);

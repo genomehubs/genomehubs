@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useRef, useState } from "react";
 import {
   title as titleStyle,
   underscoreHigh as underscoreHighStyle,
@@ -15,9 +15,9 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import LaunchIcon from "@mui/icons-material/Launch";
-import LocationMap from "./LocationMap";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import NavLink from "./NavLink";
+import ReportMap from "./ReportMap";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -32,9 +32,10 @@ import { formatter } from "../functions/formatter";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";
+import withApi from "../hocs/withApi";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withSummary from "../hocs/withSummary";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
@@ -377,10 +378,17 @@ const AttributeTableRow = ({
   taxonomy,
   siteName,
   basename,
+  apiUrl,
+  geoBinResolution = 2,
+  recordId,
 }) => {
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
+  const [mapData, setMapData] = useState(null);
+  const [loadingMap, setLoadingMap] = useState(false);
+  const [mapError, setMapError] = useState(null);
+  const containerRef = useRef(null);
 
   const handleAncestorClick = (fieldId, ancTaxonId, depth) => {
     // setSummaryField(fieldId);
@@ -435,6 +443,60 @@ const AttributeTableRow = ({
   let raw;
   let zoom;
   let geoPoints;
+
+  // Fetch map data for sample_location or country_list
+  React.useEffect(() => {
+    // set a timeout to prevent multiple fetches
+    if (loadingMap) {
+      return;
+    }
+    if (!attributeId || !taxonId) {
+      setMapData(null);
+      setMapError(null);
+      setLoadingMap(false);
+      return;
+    }
+
+    let shouldFetch =
+      attributeId === "sample_location" || attributeId === "country_list";
+    if (!shouldFetch) {
+      return;
+    }
+    const fetchTimeout = setTimeout(() => {
+      setLoadingMap(true);
+      setMapError(null);
+      setMapData(null);
+      // Example API endpoint, adjust as needed
+      let url = `${apiUrl}/report?report=map&x=tax_tree%28${taxonId}%29&result=${currentResult}`;
+      url += `&includeEstimates=true`;
+      if (attributeId === "sample_location") {
+        url += `&locationField=sample_location&geoBinResolution=${geoBinResolution}`;
+      } else if (attributeId === "country_list") {
+        url += `&regionField=country_list`;
+      }
+      fetch(url)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`Failed to fetch map data: ${res.status}`);
+          }
+          return res.json();
+        })
+        .then((report) => {
+          setMapData(report.report);
+          setLoadingMap(false);
+        })
+        .catch((err) => {
+          setMapError(err.message || "Failed to load map data");
+          setLoadingMap(false);
+        });
+    }, 1000); // Adjust the timeout as needed
+    return () => {
+      clearTimeout(fetchTimeout);
+      setLoadingMap(false);
+      setMapError(null);
+      setMapData(null);
+    };
+  }, [attributeId, taxonId]);
 
   if (typeof meta.value === "undefined") {
     return null;
@@ -693,16 +755,36 @@ const AttributeTableRow = ({
     <Fragment>
       <TableRow className={classes.root}>{fieldValues}</TableRow>
       {open && raw}
-
-      {zoom && (
+      {mapData && (
         <TableRow>
           <TableCell colSpan={5}>
-            <LocationMap
-              taxonId={taxonId}
-              geoPoints={geoPoints}
-              zoom={zoom}
-              meta={meta}
-            />
+            <div
+              ref={containerRef}
+              style={{ width: "100%", minHeight: "24em" }}
+            >
+              {loadingMap && <div>Loading map...</div>}
+              {mapError && <div style={{ color: "red" }}>{mapError}</div>}
+              {mapData && (
+                <ReportMap
+                  map={mapData}
+                  containerRef={containerRef}
+                  locationField={
+                    attributeId === "sample_location"
+                      ? "sample_location"
+                      : undefined
+                  }
+                  regionField={
+                    attributeId === "country_list" ? "country_list" : undefined
+                  }
+                  geoBinResolution={geoBinResolution}
+                  searchIndexPlural={currentResult}
+                  mapProjection="mercator"
+                  embedded={true}
+                  ratio={1}
+                  basename={basename}
+                />
+              )}
+            </div>
           </TableCell>
         </TableRow>
       )}
@@ -712,6 +794,7 @@ const AttributeTableRow = ({
 
 export default compose(
   withSiteName,
+  withApi,
   withTaxonomy,
   withRecord,
   withSummary,

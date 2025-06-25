@@ -200,14 +200,18 @@ export const getBounds = async ({
   let extra = {};
   let valueKey = summary == "value" ? `${fieldMeta.type}_value` : summary;
   if (fieldMeta) {
-    if (fieldMeta.type == "keyword") {
+    if (["keyword", "geo_hex"].includes(fieldMeta.type)) {
       if (summary == "length") {
         extra = { stats: true };
       } else {
         extra = { keywords: field };
       }
     } else if (fieldMeta.type == "geo_point") {
-      extra = { geo: true };
+      if (summary.startsWith("hexbin")) {
+        extra = { keywords: field };
+      } else {
+        extra = { geo: true };
+      }
     } else {
       extra = { stats: true };
     }
@@ -268,7 +272,10 @@ export const getBounds = async ({
     // Set domain to nice numbers
     if (!min || !max) {
       let valueType = valueTypes[fieldMeta.type] || "float";
-      if (valueType == "keyword" && scaleType != "ordinal") {
+      if (
+        ["keyword", "geo_hex"].includes(valueType) &&
+        scaleType != "ordinal"
+      ) {
         valueType = "integer";
       }
       if (stats.min == stats.max) {
@@ -409,6 +416,7 @@ export const getBounds = async ({
   }
   return {
     field,
+    summary,
     scale: scaleType,
     query: params.query,
     stats,

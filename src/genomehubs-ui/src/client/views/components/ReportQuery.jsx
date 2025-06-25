@@ -12,7 +12,7 @@ import { useNavigate } from "@reach/router";
 import withReportById from "../hocs/withReportById";
 import withReportTerm from "../hocs/withReportTerm";
 import withSearch from "../hocs/withSearch";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 
 export const ReportQuery = ({
@@ -44,8 +44,8 @@ export const ReportQuery = ({
     }
     navigate(
       `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
-        options.query
-      )}`
+        options.query,
+      )}`,
     );
   };
 
@@ -70,7 +70,7 @@ export const ReportQuery = ({
                 />
               </Grid>
             </Grid>
-          </Grid>
+          </Grid>,
         );
       }
     });
@@ -141,5 +141,5 @@ export default compose(
   withTaxonomy,
   withSearch,
   withReportById,
-  withReportTerm
+  withReportTerm,
 )(ReportQuery);

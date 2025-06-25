@@ -26,7 +26,7 @@ import stringLength from "../functions/stringLength";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
 import withColors from "#hocs/withColors";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withTheme from "#hocs/withTheme";
 
 const pct = format(".0%");

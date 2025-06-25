@@ -12,7 +12,7 @@ import makeStyles from "@mui/styles/makeStyles";
 import { useLocation } from "@reach/router";
 import withApi from "../hocs/withApi";
 import withSearchIndex from "../hocs/withSearchIndex";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const useStyles = makeStyles((theme) => ({
   container: {

@@ -11,7 +11,7 @@ import mergeImages from "merge-images";
 import qs from "../functions/qs";
 import { queryPropList } from "./ReportEdit";
 import { useLocation } from "@reach/router";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withReportById from "../hocs/withReportById";
 import withTheme from "../hocs/withTheme";
 

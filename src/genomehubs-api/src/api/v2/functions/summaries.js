@@ -7,4 +7,10 @@ export const summaries = [
   "min",
   "range",
   "metadata",
+  "hexbin1",
+  "hexbin2",
+  "hexbin3",
+  "hexbin4",
+  "hexbin5",
+  "hexbin6",
 ];

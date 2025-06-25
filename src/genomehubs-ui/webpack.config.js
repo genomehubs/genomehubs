@@ -254,6 +254,10 @@ $descendantColor: ${main.descendantColor};`,
           },
         ],
       },
+      {
+        test: /\.geojson$/,
+        type: "json",
+      },
     ],
   },
 };

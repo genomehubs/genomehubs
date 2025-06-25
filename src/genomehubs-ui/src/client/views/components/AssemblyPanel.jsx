@@ -17,7 +17,7 @@ import dispatchLookup from "../hocs/dispatchLookup";
 import qs from "../functions/qs";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const AssemblyPanel = ({
   recordIsFetching,

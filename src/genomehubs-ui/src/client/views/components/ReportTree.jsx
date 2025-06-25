@@ -9,7 +9,7 @@ import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
 import withReportById from "../hocs/withReportById";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const ReportTree = ({
   tree,
