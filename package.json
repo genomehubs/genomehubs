@@ -8,6 +8,6 @@
     "puppeteer": "^21.1.1"
   },
   "dependencies": {
-    "@crawlee/puppeteer": "^3.10.5"
+    "@crawlee/puppeteer": "^3.11.1"
   }
 }
