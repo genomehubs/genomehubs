@@ -52,9 +52,7 @@ const getHistAggResults = (aggs, stats) => {
     }
   } else if (hist.by_lineage) {
     // TODO: support lineage category histogram
-    // console.log(hist);
-  } else {
-    // console.log(JSON.stringify(hist, null, 4));
+    // } else {
   }
   return { hist, docCount };
 };
@@ -67,12 +65,10 @@ const getYValues = ({ obj, yField, lookupTypes, stats }) => {
   let yValues = [];
   let yValueType = valueTypes[lookupTypes(yField).type] || "float";
   // TODO: use stats here
-  // console.log(obj);
   let yHist;
   if (obj.yHistograms.by_attribute.by_cat) {
     yHist = obj.yHistograms.by_attribute.by_cat.by_value;
   } else {
-    // console.log(yField);
     ({ hist: yHist } = getHistAggResults(
       obj.yHistograms.by_attribute[yField],
       stats
@@ -255,7 +251,7 @@ const getHistogram = async ({
   let rawData;
   let pointData;
   if (bounds.cat && bounds.by == "attribute") {
-    if (!bounds.showOther) {
+    if (!bounds.showOther && bounds.cats?.length) {
       let parts = params.query.split(/\s+AND\s+/i);
       let filtered = parts.filter((part) => part != bounds.cat);
       params.query = `${filtered.join(" AND ")} AND ${bounds.cat}=${bounds.cats
@@ -1065,6 +1061,11 @@ export const histogram = async ({
       raw: bounds.stats.count < threshold ? threshold : 0,
     });
   }
+  if (histograms && histograms.status && !histograms.status.success) {
+    return {
+      status: histograms.status,
+    };
+  }
 
   let ranks = [rank].flat();
   if (cat && !catMeta) {
@@ -1147,7 +1148,9 @@ export const histogram = async ({
         fields: fields.join(","),
         ranks,
       },
-      x: histograms ? histograms.allValues.reduce((a, b) => a + b, 0) : 0,
+      x: histograms?.allValues
+        ? histograms.allValues.reduce((a, b) => a + b, 0)
+        : 0,
     },
     xQuery,
     ...(y && {

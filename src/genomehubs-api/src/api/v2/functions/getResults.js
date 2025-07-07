@@ -38,7 +38,7 @@ const validateValue = (term, value, meta, types) => {
   if (meta.attribute == "collate") {
     type = "keyword";
   }
-  if (["keyword", "geo_hex"].includes(type) && types && types(meta.attribute)) {
+  if (type == "keyword" && types && types(meta.attribute)) {
     let { summary } = types(meta.attribute);
     if (
       summary == "enum" ||
@@ -58,7 +58,7 @@ const validateValue = (term, value, meta, types) => {
     if (v.match(/^!*null$/)) {
       continue;
     }
-    if (["keyword", "geo_hex", "flattened", "metadata"].includes(type)) {
+    if (type == "keyword" || type == "flattened" || type == "metadata") {
       if (attrEnum && !attrEnum.has(v.replace(/^!/, ""))) {
         return fail(`invalid value for ${meta.attribute} in ${term}`);
       }
@@ -74,12 +74,9 @@ const validateValue = (term, value, meta, types) => {
         return fail(`invalid date value for ${meta.attribute} in ${term}`);
       }
     } else if (type == "geo_point") {
-      let { summary } = types(meta.attribute);
-      if (summary == "value" || summary == "list") {
-        let [lat, lon] = v.replaceAll("−", "-").split(",");
-        if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
-          return fail(`invalid value for ${meta.attribute} in ${term}`);
-        }
+      let [lat, lon] = v.replaceAll("−", "-").split(",");
+      if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
+        return fail(`invalid value for ${meta.attribute} in ${term}`);
       }
     } else if (isNaN(v.replace(/^!/, "").replaceAll("−", "-"))) {
       if (summaries.includes(type)) {

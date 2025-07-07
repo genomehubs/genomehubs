@@ -87,6 +87,9 @@ const attributeTerms = ({
 };
 
 const attributeCategory = ({ cat, cats, field, histogram, other }) => {
+  if (!cats || cats.length == 0) {
+    return;
+  }
   let filters = {};
   cats.forEach((obj, i) => {
     filters[obj.key] = { term: { "attributes.keyword_value": obj.key } };
