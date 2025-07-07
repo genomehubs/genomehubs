@@ -70,7 +70,7 @@ def load_config(options, file):
 
 def enforce_lists(options):
     """Ensure specified options are lists."""
-    keys = {"es-host"}
+    keys = {"es-host", "blank"}
     for key in keys:
         if key in options:
             if not isinstance(options[key], list):

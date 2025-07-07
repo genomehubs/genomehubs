@@ -36,6 +36,8 @@ genomehubs index \
     --config-file tests/integration_tests/config/goat.yaml \
     --taxonomy-source ncbi \
     --taxon-dir tests/integration_tests/data/regional_lists \
+    --blank "N/A" \
+    --blank "None" \
     --taxon-lookup any \
     --taxon-spellcheck &&
 # genomehubs index \
