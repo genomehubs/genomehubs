@@ -21,12 +21,15 @@ import { createSelector } from "reselect";
 // import { format } from "d3-format";
 import { getTypes } from "../reducers/types";
 import { mapThreshold } from "../reducers/map";
+import md5 from "md5";
 import { nanoid } from "nanoid";
 import { processTree } from "./tree";
 import qs from "../functions/qs";
 import { scaleOrdinal } from "d3-scale";
 import store from "../store";
 import { treeThreshold } from "../reducers/tree";
+
+const SESSION_ID = nanoid(10);
 
 export const sortReportQuery = ({ queryString, options, ui = true }) => {
   const reportTerms = {
@@ -181,11 +184,8 @@ export function fetchReport({
       queryString += `&mapThreshold=${mapThreshold}`;
     }
     let apiQueryString = sortReportQuery({ queryString, ui: false });
-    const queryId = nanoid(10);
-    let url = `${apiUrl}/report?${apiQueryString.replace(
-      /^\?/,
-      "",
-    )}&queryId=${queryId}`;
+    const queryId = md5(`${SESSION_ID}:${reportId}`).substring(0, 10);
+    let url = `${apiUrl}/report?${apiQueryString.replace(/^\?/, "")}&queryId=${queryId}`;
     try {
       let json;
       let status;

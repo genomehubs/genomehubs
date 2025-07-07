@@ -43,7 +43,7 @@ const Report = ({
   } else {
     queryProps = { taxonomy };
   }
-  if (!props.report) {
+  if (!props.report || !queryProps.taxonomy) {
     return null;
   }
   queryProps.report = props.report;
