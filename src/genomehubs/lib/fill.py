@@ -167,7 +167,7 @@ def earliest(arr, *args):
     if not isinstance(arr, list):
         arr = [arr]
     if arr and isinstance(arr[0], str):
-        date_arr = [datetime.strptime(date, "%Y-%m-%d") for date in arr]
+        date_arr = [datetime.strptime(date.split("T")[0], "%Y-%m-%d") for date in arr]
         return datetime.strftime(min(date_arr), "%Y-%m-%d")
     return min(arr + list(args))
 
@@ -177,7 +177,7 @@ def latest(arr, *args):
     if not isinstance(arr, list):
         arr = [arr]
     if isinstance(arr[0], str) and re.match(r"\d{4}-\d{2}-\d{2}", arr[0]):
-        date_arr = [datetime.strptime(date, "%Y-%m-%d") for date in arr]
+        date_arr = [datetime.strptime(date.split("T")[0], "%Y-%m-%d") for date in arr]
         return datetime.strftime(max(date_arr), "%Y-%m-%d")
     return max(arr + list(args))
 
@@ -551,13 +551,10 @@ def summarise_attributes(*, attributes, rank, attrs, meta, parent, parents):
     for node_attribute in attributes:
         if node_attribute["key"] in attrs:
             attr_dict[node_attribute["key"]] = node_attribute
-            sp_count = 0
             if rank == "species":
-                sp_count = 1
                 parents[parent][node_attribute["key"]]["sp_count"] += 1
                 attr_dict[node_attribute["key"]]["sp_count"] = 1
             elif rank in ["subspecies", "varietas", "strain"]:
-                sp_count = 0
                 parents[parent][node_attribute["key"]]["sp_count"] = 1
                 attr_dict[node_attribute["key"]]["sp_count"] = 0
 
