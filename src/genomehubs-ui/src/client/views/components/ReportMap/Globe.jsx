@@ -363,7 +363,7 @@ const Globe = ({
         width,
         height,
         background: globeBg,
-        marginTop: "1em",
+        // marginTop: "1em",
         position: "relative",
 
         borderRadius: "32px",

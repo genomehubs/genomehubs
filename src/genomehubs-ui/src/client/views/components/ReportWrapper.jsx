@@ -51,6 +51,7 @@ export const ReportWrapper = ({
               position: "absolute",
               marginRight: "0.25em",
               cursor: "pointer",
+              zIndex: 1000,
             }}
           >
             <LaunchIcon />

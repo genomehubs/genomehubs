@@ -390,6 +390,21 @@ const ReportMap = ({
       dataBounds = normalizeBounds(locationBounds?.stats?.geo?.bounds);
     }
     let mapGlobe = null;
+    // If not measured, render a hidden div to trigger the ref and measure size
+    if (!measured) {
+      return (
+        <Grid
+          ref={componentRef}
+          style={{
+            height: "100%",
+            width: "100%",
+            visibility: "hidden",
+            position: "absolute",
+          }}
+          size="grow"
+        />
+      );
+    }
     if (globeView) {
       // Use Globe component for globe view
       mapGlobe = (

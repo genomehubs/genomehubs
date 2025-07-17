@@ -1028,6 +1028,7 @@ export const histogram = async ({
 
   let histograms, yBounds;
   if (yFields && yFields.length > 0) {
+    console.log("getting y bounds");
     yBounds = await getBounds({
       params: { ...yParams, ...inputQueries },
       fields: yFields,
@@ -1035,7 +1036,7 @@ export const histogram = async ({
       result,
       exclusions: {
         ...exclusions,
-        missing: ["bioproject"],
+        // missing: ["bioproject"],
       },
       taxonomy,
       apiParams,

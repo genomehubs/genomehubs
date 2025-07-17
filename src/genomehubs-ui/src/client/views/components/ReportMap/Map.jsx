@@ -272,7 +272,7 @@ const Map = ({
       style={{
         width: `${width}px`,
         height: `${height}px`,
-        marginTop: "1em",
+        // marginTop: "1em",
         borderRadius: "32px",
         overflow: "hidden",
       }}
