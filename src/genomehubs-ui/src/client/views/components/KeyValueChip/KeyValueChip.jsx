@@ -93,6 +93,7 @@ const KeyValueChip = ({
   onChange,
   onDelete,
   palette = "blue",
+  chipIndex = 0,
 }) => {
   const validation = typesToValidation();
   const chipId = `${keyLabel}-${operator}-${value}-${modifier}`;
@@ -160,13 +161,16 @@ const KeyValueChip = ({
     if (processedModifier) {
       setCurrentModifier(processedModifier);
       updateOperators(currentKey, processedModifier);
-      onChange?.({
-        key: keyLabel,
-        value: parseValue(currentValue),
-        operator: currentOperator,
-        modifier: processedModifier,
-        palette,
-      });
+      onChange?.(
+        {
+          key: keyLabel,
+          value: parseValue(currentValue),
+          operator: currentOperator,
+          modifier: processedModifier,
+          palette,
+        },
+        chipIndex,
+      );
     }
     setAnchorElModifier(null);
   };
@@ -174,21 +178,33 @@ const KeyValueChip = ({
   const handleMenuClose = (newOperator) => {
     if (newOperator) {
       setCurrentOperator(newOperator);
-      onChange?.({
-        key: keyLabel,
-        value: parseValue(currentValue),
-        modifier: currentModifier,
-        operator: newOperator,
-        palette,
-      });
+      onChange?.(
+        {
+          key: keyLabel,
+          value: parseValue(currentValue),
+          modifier: currentModifier,
+          operator: newOperator,
+          palette,
+        },
+        chipIndex,
+      );
     }
     setAnchorElSymbol(null);
   };
 
-  // const handleValueChange = (event) => {
-  //   setCurrentValue(event.target.value);
-  //   setCurrentValueNote(undefined);
-  // };
+  const handleValueChange = (newValue) => {
+    setCurrentValue(newValue);
+    onChange?.(
+      {
+        key: currentKey,
+        value: parseValue(newValue),
+        operator: currentOperator,
+        modifier: currentModifier,
+        palette,
+      },
+      chipIndex,
+    );
+  };
 
   const handleClickAway = () => {
     if (isEditingValue) {
@@ -207,14 +223,6 @@ const KeyValueChip = ({
       keyLabel == "tax" ? parsedValue : formatValue(parsedValue),
     );
     setPreviousValueNote(undefined);
-    onChange?.({
-      key: keyLabel,
-      value: parsedValue,
-      valueNote: undefined,
-      operator: currentOperator,
-      modifier: currentModifier,
-      palette,
-    });
   };
 
   const updateOperators = (key, modifier) => {
@@ -232,7 +240,17 @@ const KeyValueChip = ({
 
   const handleKeyChange = (newKey) => {
     setCurrentKey(newKey);
-    updateOperators(newKey, currentModifier);
+    // updateOperators(newKey, currentModifier);
+    onChange?.(
+      {
+        key: newKey,
+        value: parseValue(currentValue),
+        operator: currentOperator,
+        modifier: currentModifier,
+        palette,
+      },
+      chipIndex,
+    );
   };
 
   const handleKeyBlur = (event) => {
@@ -248,7 +266,10 @@ const KeyValueChip = ({
     setCurrentOperator("=");
     setCurrentValue("");
     setCurrentValueNote(undefined);
-    onDelete?.({ key: keyLabel, value: "", operator: "=", modifier: "value" });
+    onDelete?.(
+      { key: keyLabel, value: "", operator: "=", modifier: "value" },
+      chipIndex,
+    );
   };
 
   const validateChip = ({ key, value, operator, modifier }) => {
@@ -564,9 +585,10 @@ const KeyValueChip = ({
                   })}
                   isAlreadyEditing={isEditingValue}
                   onChange={(newValue) =>
-                    setCurrentValue(
-                      newValue == "" ? null : parseValue(newValue),
-                    )
+                    // setCurrentValue(
+                    //   newValue == "" ? null : parseValue(newValue),
+                    // )
+                    handleValueChange(newValue)
                   }
                   onBlur={handleValueBlur}
                   backgroundColor={backgroundColor}

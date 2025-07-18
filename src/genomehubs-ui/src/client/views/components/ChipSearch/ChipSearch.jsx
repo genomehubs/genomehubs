@@ -156,18 +156,52 @@ const ChipSearch = ({
     }
   };
 
-  const handleDelete = (chipToDelete) => {
-    setChips((prevChips) => prevChips.filter((chip) => chip !== chipToDelete));
+  const handleDelete = (chipToDelete, index) => {
+    setChips((prevChips) => prevChips.splice(index, 1));
   };
 
-  const handleChipChange = (updatedChip) => {
-    setChips((prevChips) =>
-      prevChips.map((chip) =>
-        chip === `${updatedChip.key}=${updatedChip.value}`
-          ? `${updatedChip.key}${updatedChip.operator}${updatedChip.value}`
-          : chip,
-      ),
-    );
+  const chipToString = (chip) => {
+    if (typeof chip === "string") {
+      return chip;
+    }
+    // If chip is an object, extract key, operator, and value
+    const { key, operator, value, valueNote, modifier } = chip;
+    let chipString;
+    if (key === "tax" && modifier) {
+      return `tax_${modifier}(${value})`;
+    } else if (modifier) {
+      if (modifier === "collate") {
+        return `collate(${key}, ${value})`;
+      }
+      if (modifier !== "value") {
+        chipString = `${modifier}(${key})`;
+      }
+    }
+    if (!chipString) {
+      chipString = key;
+    }
+    if (operator) {
+      if (value !== "" && typeof value !== "undefined" && value !== null) {
+        chipString += `${operator}`;
+      }
+    } else {
+      chipString += "=";
+    }
+    if (typeof value !== "undefined" && value !== null) {
+      if (valueNote) {
+        chipString += `${value}[${valueNote}]`;
+      } else {
+        chipString += value;
+      }
+    }
+    return chipString;
+  };
+
+  const handleChipChange = (updatedChip, index) => {
+    setChips((prevChips) => {
+      prevChips[index] = chipToString(updatedChip);
+      return [...prevChips];
+    });
   };
 
   const handleAddEmptyChip = (newChip = "key=value") => {
@@ -214,6 +248,7 @@ const ChipSearch = ({
             onChange={handleChipChange}
             onDelete={() => handleDelete(chip)}
             style={{ marginRight: index === chips.length - 1 ? "-1em" : "1em" }} // Add margin to chips
+            chipIndex={index} // Pass the index to KeyValueChip
           />
         );
       }
@@ -232,7 +267,6 @@ const ChipSearch = ({
   // render a snackbar if there are duplicates
   useEffect(() => {
     if (duplicateKeys.size > 0) {
-      console.log("Duplicate keys found:", duplicateKeys);
       setOpen(true);
     }
   }, [duplicateKeys]);
@@ -375,11 +409,11 @@ const AddField = ({
 }) => {
   return (
     <>
-      <Tooltip title="Click to add a new search field">
-        <IconButton onClick={handleMenuOpen} edge="start">
+      <IconButton onClick={handleMenuOpen} edge="start">
+        <Tooltip title="Click to add a new search field">
           <AddCircleOutlineIcon sx={{ fontSize }} />
-        </IconButton>
-      </Tooltip>
+        </Tooltip>
+      </IconButton>
       <FieldNameMenu
         menuAnchorEl={menuAnchorEl}
         handleMenuClose={handleMenuClose}
