@@ -13,7 +13,10 @@ import KeyValueChip, {
 } from "../KeyValueChip";
 import React, { useEffect, useState } from "react";
 
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"; // Import an add icon
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import KeyboardArrowLeftIcon from "@mui/icons-material/SpaceDashboard";
+import KeyboardArrowRightIcon from "@mui/icons-material/TextFields";
+import Tooltip from "../Tooltip";
 
 const extractKeyValue = (chip) => {
   let modifier;
@@ -66,6 +69,7 @@ const ChipSearch = ({
 }) => {
   const validation = typesToValidation();
   const validKeys = validation.validKeys();
+  const [showChips, setShowChips] = useState(true);
   const removeDuplicates = (arr) => {
     let uniqueArr = [];
     let duplicates = new Set();
@@ -130,6 +134,7 @@ const ChipSearch = ({
     if (event.key === "Enter") {
       event.preventDefault();
       parseInput(inputValue);
+      setShowChips(true);
       setInputValue("");
     }
   };
@@ -220,6 +225,10 @@ const ChipSearch = ({
     updateChipsArr(chips);
   }, [chips]);
 
+  const chipsToString = (chips) => {
+    return chips.filter((chip) => chip !== "AND").join(" AND ");
+  };
+
   // render a snackbar if there are duplicates
   useEffect(() => {
     if (duplicateKeys.size > 0) {
@@ -227,6 +236,41 @@ const ChipSearch = ({
       setOpen(true);
     }
   }, [duplicateKeys]);
+
+  let startAdornment;
+  if (chipsArr.length > 0 && showChips) {
+    startAdornment = (
+      <InputAdornment position="start">
+        <Tooltip title="Click to show search term as text">
+          <IconButton
+            onClick={() => {
+              setShowChips(false);
+              setInputValue(chipsToString(chips));
+              setChips([]);
+            }}
+            edge="start"
+          >
+            <KeyboardArrowRightIcon sx={{ fontSize: "1.5em" }} />
+          </IconButton>
+        </Tooltip>
+      </InputAdornment>
+    );
+  } else if (!chipsArr.length && inputValue && inputValue.length > 0) {
+    startAdornment = (
+      <InputAdornment position="start">
+        <Tooltip title="Click to show search term as fields">
+          <IconButton
+            onClick={() => {
+              handleKeyDown({ key: "Enter", preventDefault: () => {} });
+            }}
+            edge="start"
+          >
+            <KeyboardArrowLeftIcon sx={{ fontSize: "1.5em" }} />
+          </IconButton>
+        </Tooltip>
+      </InputAdornment>
+    );
+  }
 
   return (
     <Box
@@ -241,16 +285,16 @@ const ChipSearch = ({
     >
       <>
         {chipsArr}
-        {compact ? (
-          <AddField
-            handleMenuOpen={handleMenuOpen}
-            menuAnchorEl={menuAnchorEl}
-            handleMenuClose={handleMenuClose}
-            validKeys={validKeys}
-            handleMenuSelect={handleMenuSelect}
-            fontSize={"1.5em"}
-          />
-        ) : (
+
+        <AddField
+          handleMenuOpen={handleMenuOpen}
+          menuAnchorEl={menuAnchorEl}
+          handleMenuClose={handleMenuClose}
+          validKeys={validKeys}
+          handleMenuSelect={handleMenuSelect}
+          fontSize={"1.5em"}
+        />
+        {!compact && (
           <TextInput
             inputValue={inputValue}
             setInputValue={setInputValue}
@@ -261,6 +305,7 @@ const ChipSearch = ({
             handleMenuClose={handleMenuClose}
             validKeys={validKeys}
             handleMenuSelect={handleMenuSelect}
+            startAdornment={startAdornment}
           />
         )}
       </>
@@ -294,11 +339,7 @@ const TextInput = ({
   setInputValue,
   handleKeyDown,
   placeholder,
-  handleMenuOpen,
-  menuAnchorEl,
-  handleMenuClose,
-  validKeys,
-  handleMenuSelect,
+  startAdornment,
 }) => {
   return (
     <TextField
@@ -311,18 +352,13 @@ const TextInput = ({
         flexGrow: 1,
         minWidth: "300px",
         maxWidth: "900px",
+        "& .MuiSvgIcon-root": {
+          fontSize: "1em",
+        },
       }}
       slotProps={{
         input: {
-          startAdornment: (
-            <AddField
-              handleMenuOpen={handleMenuOpen}
-              menuAnchorEl={menuAnchorEl}
-              handleMenuClose={handleMenuClose}
-              validKeys={validKeys}
-              handleMenuSelect={handleMenuSelect}
-            />
-          ),
+          startAdornment,
         },
       }}
     />
@@ -339,11 +375,11 @@ const AddField = ({
 }) => {
   return (
     <>
-      <InputAdornment position="start">
+      <Tooltip title="Click to add a new search field">
         <IconButton onClick={handleMenuOpen} edge="start">
           <AddCircleOutlineIcon sx={{ fontSize }} />
         </IconButton>
-      </InputAdornment>
+      </Tooltip>
       <FieldNameMenu
         menuAnchorEl={menuAnchorEl}
         handleMenuClose={handleMenuClose}
