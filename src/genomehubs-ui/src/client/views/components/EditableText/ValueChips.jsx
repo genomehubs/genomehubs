@@ -8,7 +8,8 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import ErrorIcon from "@mui/icons-material/Error";
+import Tooltip from "../Tooltip";
 import stringLength from "../../functions/stringLength";
 
 const ValueChips = ({
@@ -17,6 +18,7 @@ const ValueChips = ({
   maxWidth = 1000,
   handleChange,
   title = "All Values",
+  allowMultipleValues = false,
   backgroundColor,
   textColor,
   isNegatable,
@@ -25,10 +27,12 @@ const ValueChips = ({
   const [expanded, setExpanded] = useState(false);
 
   // Split the value into an array of values
-  const values = value
-    .split(/\s*,\s*/)
-    .map((v) => v.trim())
-    .filter((v) => v);
+  const values = allowMultipleValues
+    ? (value || "")
+        .split(/\s*,\s*/)
+        .map((v) => v.trim())
+        .filter((v) => v)
+    : [value];
 
   // Handle deleting a chip
   const handleDelete = (chip) => {
@@ -57,30 +61,50 @@ const ValueChips = ({
   };
 
   const setChipIcon = ({ negate, chip }) => {
+    let icon = null;
     if (isNegatable && chip !== null) {
       if (negate) {
-        return (
-          <RemoveCircleIcon
-            sx={{}}
+        icon = (
+          <ErrorIcon
             onClick={(event) => {
               event.stopPropagation();
               event.preventDefault();
               toggleNegate({ chip, negate });
             }}
+            sx={{
+              opacity: 0.85,
+              fontSize: "1rem",
+              marginLeft: "0.25rem",
+              marginRight: "-0.25rem",
+            }}
           />
         );
       } else if (chip !== null) {
-        return (
+        icon = (
           <CircleIcon
             onClick={(event) => {
               event.stopPropagation();
               event.preventDefault();
               toggleNegate({ chip, negate });
             }}
-            sx={{ opacity: 0.25 }}
+            sx={{
+              opacity: 0.15,
+              fontSize: "1rem",
+              marginLeft: "0.25rem",
+              marginRight: "-0.25rem",
+            }}
           />
         );
       }
+      return (
+        <Tooltip
+          title={negate ? "click to include value" : "click to exclude value"}
+          enterDelay={750}
+          enterNextDelay={750}
+        >
+          {icon}
+        </Tooltip>
+      );
     }
     return null;
   };
@@ -150,7 +174,7 @@ const ValueChips = ({
       >
         {visibleChips.map((chip, index) => {
           let negate = false;
-          let chipLabel = chip === null ? "value" : chip;
+          let chipLabel = chip === null || chip === "" ? "value" : chip;
           if (chipLabel.startsWith("!")) {
             negate = true;
             chipLabel = chipLabel.slice(1);

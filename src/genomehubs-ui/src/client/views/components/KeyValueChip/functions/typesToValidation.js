@@ -56,6 +56,10 @@ export const typesToValidation = () => {
         "tax_eq",
       ]),
     };
+    let descriptions = {
+      tax: "Taxonomic filter",
+      collate: "Collate results by",
+    };
     for (let [key, obj] of Object.entries(types)) {
       keys.add(key);
       if (obj.display_level == 1) {
@@ -66,10 +70,12 @@ export const typesToValidation = () => {
         keysByGroup[display_group] = new Set();
       }
       keysByGroup[display_group].add(key);
+      descriptions[key] = obj.description || obj.display_name || key;
     }
     return {
       keys,
       keysByGroup,
+      descriptions,
     };
   };
 
@@ -217,6 +223,53 @@ export const typesToValidation = () => {
     return true;
   };
 
+  const getOperatorDescription = (operator) => {
+    switch (operator) {
+      case "=":
+        return "is equal to";
+      case "!=":
+        return "is not equal to";
+      case ">":
+        return "is greater than";
+      case "<":
+        return "is less than";
+      case ">=":
+        return "is greater than or equal to";
+      case "<=":
+        return "is less than or equal to";
+      default:
+        return "unknown operator";
+    }
+  };
+
+  const modifierDescriptions = {
+    tree: "Show descendant nodes for taxon",
+    name: "Show taxon only",
+    rank: "Restrict to taxonomic rank",
+    lineage: "Search in taxonomic lineage",
+    level: "Restrict to numeric level of descendant nodes",
+    eq: "Show taxon only",
+    value: "Field value",
+    length: "Length of a value list",
+    direct: "Restrict to directly measured values",
+    ancestor: "Restrict to values from ancestor nodes",
+    descendant: "Restrict to values from descendant nodes",
+    max: "Maximum value",
+    min: "Minimum value",
+    mean: "Mean value",
+    sum: "Sum of values",
+    median: "Median value",
+    mode: "Mode of values",
+    count: "Count of items",
+  };
+
+  const getModifierDescription = (modifier) => {
+    if (modifierDescriptions.hasOwnProperty(modifier)) {
+      return modifierDescriptions[modifier];
+    }
+    return "unknown modifier";
+  };
+
   return {
     validKeys,
     validateKey,
@@ -228,6 +281,8 @@ export const typesToValidation = () => {
     validateOperator,
     allowMultipleValues,
     isNegatable,
+    getOperatorDescription,
+    getModifierDescription,
   };
 };
 

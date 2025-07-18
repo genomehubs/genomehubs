@@ -8,6 +8,7 @@ import Chip from "@mui/material/Chip";
 import Popper from "@mui/material/Popper";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import TextField from "@mui/material/TextField";
+import Tooltip from "../Tooltip";
 import Typography from "@mui/material/Typography";
 import ValueChips from "./ValueChips";
 import stringLength from "../../functions/stringLength";
@@ -40,6 +41,7 @@ const getContrastColor = (color) => {
 const EditableText = ({
   title,
   value,
+  description,
   options = [],
   allowMultipleValues,
   isNegatable,
@@ -218,7 +220,7 @@ const EditableText = ({
                 handleChange(event.target.value);
               }
             }}
-            value={inputValue}
+            value={inputValue || ""}
             placeholder="Type values separated by commas..."
             sx={{
               ...inputProps.sx,
@@ -231,7 +233,7 @@ const EditableText = ({
   } else {
     textInput = (
       <AutowidthTextField
-        value={inputValue} // Display as a comma-separated string
+        value={inputValue || ""} // Display as a comma-separated string
         handleChange={handleChange}
         onBlur={(event) => handleChange(event.target.value)}
         maxWidth={maxWidth}
@@ -251,9 +253,10 @@ const EditableText = ({
   let displayValue = valueAsChips ? (
     <ValueChips
       title={title}
-      value={inputValue}
+      value={inputValue || ""}
       handleChange={handleChange}
       backgroundColor={backgroundColor}
+      allowMultipleValues={allowMultipleValues}
       textColor={contrastColor}
       isNegatable={isNegatable}
       maxWidth={maxWidth}
@@ -281,9 +284,17 @@ const EditableText = ({
         {...props}
       >
         {startComponent}
-        <Box component="span" sx={{ whiteSpace: "nowrap" }}>
-          {displayValue}
-        </Box>
+        <Tooltip
+          title={description}
+          placement="top"
+          enterDelay={750}
+          enterNextDelay={750}
+          arrow
+        >
+          <Box component="span" sx={{ whiteSpace: "nowrap" }}>
+            {displayValue}
+          </Box>
+        </Tooltip>
         {endComponent}
       </Typography>
       {isEditing && (

@@ -1,6 +1,6 @@
-import ErrorIcon from "@mui/icons-material/Error";
 import React from "react";
 import Tooltip from "../Tooltip";
+import WarningIcon from "@mui/icons-material/Warning";
 
 export const ValidationErrorTooltip = ({ validationError, textColor }) => {
   if (!validationError) {
@@ -15,7 +15,7 @@ export const ValidationErrorTooltip = ({ validationError, textColor }) => {
           color: textColor,
         }}
       >
-        <ErrorIcon
+        <WarningIcon
           sx={{
             fontSize: "1.2em",
             marginTop: "-0.5em",

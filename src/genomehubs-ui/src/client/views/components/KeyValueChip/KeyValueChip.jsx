@@ -20,6 +20,7 @@ import ClickAwayListener from "@mui/material/ClickAwayListener";
 import EditableText from "../EditableText/EditableText";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import Tooltip from "../Tooltip";
 import Typography from "@mui/material/Typography";
 import ValidationErrorTooltip from "./ValidationErrorToolTip";
 import formatValue from "./functions/formatValue";
@@ -122,10 +123,10 @@ const KeyValueChip = ({
   const [currentModifier, setCurrentModifier] = useState(modifier);
   const [currentOperator, setCurrentOperator] = useState(operator);
   const [currentValue, setCurrentValue] = useState(
-    keyLabel === "tax" ? value : formatValue(value),
+    value == "" ? null : keyLabel === "tax" ? value : formatValue(value),
   );
   const [previousValue, setPreviousValue] = useState(
-    keyLabel === "tax" ? value : formatValue(value),
+    value == "" ? null : keyLabel === "tax" ? value : formatValue(value),
   );
   const [currentValueNote, setCurrentValueNote] = useState(valueNote);
   const [previousValueNote, setPreviousValueNote] = useState(valueNote);
@@ -348,6 +349,8 @@ const KeyValueChip = ({
     </>
   );
 
+  const validKeys = validation.validKeys();
+
   let { component: errorComponent } = validationError || {};
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
@@ -409,7 +412,29 @@ const KeyValueChip = ({
                   }}
                   onClick={handleModifierClick}
                 >
-                  {currentModifier == "value" ? "" : currentModifier}
+                  <Tooltip
+                    title={
+                      <span>
+                        <div>
+                          {validation.getModifierDescription(currentModifier)}
+                        </div>
+                        <span>(click to change)</span>
+                      </span>
+                    }
+                    enterDelay={750}
+                    enterNextDelay={750}
+                    arrow
+                  >
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    >
+                      {currentModifier == "value" ? "" : currentModifier}
+                    </span>
+                  </Tooltip>
                   {errorComponent == "modifier" && (
                     <span
                       style={{
@@ -429,8 +454,10 @@ const KeyValueChip = ({
                   )}
                 </span>
               )}
+
               <EditableText
                 value={currentKey}
+                description={validKeys.descriptions[currentKey]}
                 onChange={handleKeyChange}
                 onBlur={handleKeyBlur}
                 backgroundColor={backgroundColor}
@@ -464,7 +491,10 @@ const KeyValueChip = ({
                   justifyContent: "center",
                   gap: 0.5,
                   height: "30px",
-                  opacity: currentValue || currentValue == 0 ? 1 : 0.5,
+                  opacity:
+                    currentValue || (currentValue == 0 && currentValue !== "")
+                      ? 1
+                      : 0.5,
                   marginRight: "1em",
                 }}
               >
@@ -480,11 +510,27 @@ const KeyValueChip = ({
                       padding: "2px 4px",
                       height: "1.1em",
                       lineHeight: "1.1em",
-                      marginTop: "6px",
+                      marginTop: "5.5px",
                     }}
                     onClick={handleSymbolClick}
                   >
-                    {currentOperator}
+                    <Tooltip
+                      key={operator}
+                      title={
+                        <span>
+                          <div>
+                            {validation.getOperatorDescription(currentOperator)}
+                          </div>
+                          <span>(click to change)</span>
+                        </span>
+                      }
+                      enterDelay={750}
+                      enterNextDelay={750}
+                      arrow
+                    >
+                      <span>{currentOperator}</span>
+                    </Tooltip>
+
                     {errorComponent == "operator" && (
                       <span
                         style={{
@@ -517,7 +563,11 @@ const KeyValueChip = ({
                     modifier: currentModifier,
                   })}
                   isAlreadyEditing={isEditingValue}
-                  onChange={(newValue) => setCurrentValue(parseValue(newValue))}
+                  onChange={(newValue) =>
+                    setCurrentValue(
+                      newValue == "" ? null : parseValue(newValue),
+                    )
+                  }
                   onBlur={handleValueBlur}
                   backgroundColor={backgroundColor}
                   highlightColor={lightColor}
@@ -557,9 +607,10 @@ const KeyValueChip = ({
                   ]}
                   variant="body3"
                   sx={{
-                    whiteSpace: currentValue.length > 100 ? "normal" : "nowrap",
+                    whiteSpace:
+                      currentValue?.length > 100 ? "normal" : "nowrap",
                     wordBreak:
-                      currentValue.length > 100 ? "break-word" : "normal",
+                      currentValue?.length > 100 ? "break-word" : "normal",
                     opacity:
                       (currentValue || currentValue == 0) &&
                       !isEditingValue &&
@@ -623,18 +674,26 @@ const KeyValueChip = ({
           }}
         >
           {availableOperators.map((operator, index) => (
-            <MenuItem
+            <Tooltip
               key={operator}
-              onClick={() => handleMenuClose(operator)}
-              selected={operator === currentOperator}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  handleMenuClose(operator);
-                }
-              }}
+              title={validation.getOperatorDescription(operator)}
+              enterDelay={750}
+              enterNextDelay={750}
+              arrow
             >
-              {operator}
-            </MenuItem>
+              <MenuItem
+                key={operator}
+                onClick={() => handleMenuClose(operator)}
+                selected={operator === currentOperator}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    handleMenuClose(operator);
+                  }
+                }}
+              >
+                {operator}
+              </MenuItem>
+            </Tooltip>
           ))}
         </Menu>
         <Menu
@@ -665,19 +724,27 @@ const KeyValueChip = ({
           }}
         >
           {[...validation.validModifiers(currentKey)].map((modifier, index) => (
-            <MenuItem
+            <Tooltip
               key={modifier}
-              onClick={() => handleModifierMenuClose(modifier)}
-              selected={modifier === currentModifier}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  handleModifierMenuClose(modifier);
-                }
-              }}
-              style={{ minHeight: "1.5em" }}
+              title={validation.getModifierDescription(modifier)}
+              enterDelay={750}
+              enterNextDelay={750}
+              arrow
             >
-              {modifier}
-            </MenuItem>
+              <MenuItem
+                key={modifier}
+                onClick={() => handleModifierMenuClose(modifier)}
+                selected={modifier === currentModifier}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    handleModifierMenuClose(modifier);
+                  }
+                }}
+                style={{ minHeight: "1.5em" }}
+              >
+                {modifier}
+              </MenuItem>
+            </Tooltip>
           ))}
         </Menu>
       </Box>
