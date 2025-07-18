@@ -12,41 +12,8 @@ import KeyValueChip, { parseValue, typesToValidation } from "../KeyValueChip";
 import React, { useEffect, useState } from "react";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"; // Import an add icon
-
-const allowedSymbols = ["=", "!=", ">=", "<=", "<", ">"];
-const allowedKeywordSymbols = allowedSymbols.slice(0, 2);
-const allowedModifiers = [
-  "count",
-  "length",
-  "max",
-  "mean",
-  "median",
-  "min",
-  "sum",
-  "value",
-];
-const allowedKeys = {
-  assembly_span: {
-    operators: allowedSymbols,
-    modifiers: allowedModifiers,
-    type: "number",
-  },
-  assembly_level: {
-    operators: allowedSymbols,
-    modifiers: "value",
-    type: "string",
-  },
-  tax: {
-    operators: [],
-    modifiers: ["name", "tree", "eq", "lineage", "rank", "level"],
-    type: "string",
-  },
-  collate: {
-    operators: [],
-    modifiers: ["collate"],
-    type: "string",
-  },
-};
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 const extractKeyValue = (chip) => {
   let modifier;
@@ -95,6 +62,7 @@ const ChipSearch = ({
   initialChips = [],
   initialInput = "",
   placeholder = "Enter key=value, function(variable), or AND",
+  compact = false,
 }) => {
   const validation = typesToValidation();
   const validKeys = validation.validKeys();
@@ -273,53 +241,28 @@ const ChipSearch = ({
     >
       <>
         {chipsArr}
-        <TextField
-          variant="outlined"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          sx={{
-            flexGrow: 1,
-            minWidth: "300px",
-            maxWidth: "900px",
-          }}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <>
-                  <InputAdornment position="start">
-                    <IconButton onClick={handleMenuOpen} edge="start">
-                      <AddCircleOutlineIcon />
-                    </IconButton>
-                  </InputAdornment>
-                  <Menu
-                    anchorEl={menuAnchorEl}
-                    open={Boolean(menuAnchorEl)}
-                    onClose={handleMenuClose}
-                  >
-                    {[...validKeys.keysByGroup.primary].map((key) => {
-                      let value = key;
-                      if (key == "collate") {
-                        value = "collate(sequence_id,name)";
-                      } else if (key.startsWith("tax_")) {
-                        value = `${key}()`;
-                      }
-                      return (
-                        <MenuItem
-                          key={key}
-                          onClick={() => handleMenuSelect(value)}
-                        >
-                          {key}
-                        </MenuItem>
-                      );
-                    })}
-                  </Menu>
-                </>
-              ),
-            },
-          }}
-        />
+        {compact ? (
+          <AddField
+            handleMenuOpen={handleMenuOpen}
+            menuAnchorEl={menuAnchorEl}
+            handleMenuClose={handleMenuClose}
+            validKeys={validKeys}
+            handleMenuSelect={handleMenuSelect}
+            fontSize={"1.5em"}
+          />
+        ) : (
+          <TextInput
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            handleKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            handleMenuOpen={handleMenuOpen}
+            menuAnchorEl={menuAnchorEl}
+            handleMenuClose={handleMenuClose}
+            validKeys={validKeys}
+            handleMenuSelect={handleMenuSelect}
+          />
+        )}
       </>
       <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
         <Alert
@@ -341,9 +284,191 @@ const ChipSearch = ({
           ))}
         </Alert>
       </Snackbar>
-      ,
     </Box>
   );
 };
 
 export default ChipSearch;
+const TextInput = ({
+  inputValue,
+  setInputValue,
+  handleKeyDown,
+  placeholder,
+  handleMenuOpen,
+  menuAnchorEl,
+  handleMenuClose,
+  validKeys,
+  handleMenuSelect,
+}) => {
+  return (
+    <TextField
+      variant="outlined"
+      value={inputValue}
+      onChange={(e) => setInputValue(e.target.value)}
+      onKeyDown={handleKeyDown}
+      placeholder={placeholder}
+      sx={{
+        flexGrow: 1,
+        minWidth: "300px",
+        maxWidth: "900px",
+      }}
+      slotProps={{
+        input: {
+          startAdornment: (
+            <AddField
+              handleMenuOpen={handleMenuOpen}
+              menuAnchorEl={menuAnchorEl}
+              handleMenuClose={handleMenuClose}
+              validKeys={validKeys}
+              handleMenuSelect={handleMenuSelect}
+            />
+          ),
+        },
+      }}
+    />
+  );
+};
+
+const AddField = ({
+  handleMenuOpen,
+  menuAnchorEl,
+  handleMenuClose,
+  validKeys,
+  handleMenuSelect,
+  fontSize = "1em", // Default font size
+}) => {
+  const [showAll, setShowAll] = useState(false);
+  const [expandedGroup, setExpandedGroup] = useState(null);
+
+  // Helper to get group order, with 'primary' first
+  const groupOrder = [
+    "primary",
+    ...Object.keys(validKeys.keysByGroup)
+      .filter((g) => g !== "primary")
+      .sort((a, b) => a.localeCompare(b)),
+  ];
+
+  const MoreMenuItem = ({ lastItem = false }) => (
+    <MenuItem
+      divider={!lastItem}
+      sx={{ fontStyle: "italic", color: "text.secondary" }}
+      onClick={() => setShowAll(!showAll)}
+    >
+      ...{showAll ? "Show Less" : "Show All"}
+    </MenuItem>
+  );
+
+  const primaryKeys = [...validKeys.keysByGroup.primary];
+  return (
+    <>
+      <InputAdornment position="start">
+        <IconButton onClick={handleMenuOpen} edge="start">
+          <AddCircleOutlineIcon sx={{ fontSize }} />
+        </IconButton>
+      </InputAdornment>
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={() => {
+          setShowAll(false);
+          setExpandedGroup(null);
+          handleMenuClose();
+        }}
+        slotProps={{
+          paper: {
+            sx: {
+              fontSize: "1.25em",
+              minWidth: showAll ? 320 : undefined,
+            },
+          },
+        }}
+      >
+        {showAll ? (
+          <>
+            {<MoreMenuItem />}
+            {groupOrder.map((group) => (
+              <React.Fragment key={group}>
+                <MenuItem
+                  onClick={() =>
+                    setExpandedGroup(expandedGroup === group ? null : group)
+                  }
+                  divider
+                  sx={{
+                    fontWeight: "bold",
+                    pl: 2,
+                    background:
+                      expandedGroup === group ? "action.selected" : undefined,
+                  }}
+                >
+                  {expandedGroup === group ? (
+                    <span style={{ marginRight: 8 }}>
+                      <span role="img" aria-label="Collapse">
+                        <KeyboardArrowUpIcon sx={{ verticalAlign: "middle" }} />
+                      </span>
+                    </span>
+                  ) : (
+                    <span style={{ marginRight: 8 }}>
+                      <span role="img" aria-label="Expand">
+                        <KeyboardArrowDownIcon
+                          sx={{ verticalAlign: "middle" }}
+                        />
+                      </span>
+                    </span>
+                  )}
+                  {group}
+                </MenuItem>
+                {expandedGroup === group &&
+                  [...validKeys.keysByGroup[group]]
+                    .sort((a, b) => a.localeCompare(b))
+                    .map((key) => {
+                      let value = key;
+                      if (key === "collate") {
+                        value = "collate(sequence_id,name)";
+                      } else if (key.startsWith("tax_")) {
+                        value = `${key}()`;
+                      }
+                      return (
+                        <MenuItem
+                          key={group + "_" + key}
+                          sx={{ pl: 4 }}
+                          onClick={() => {
+                            handleMenuSelect(value);
+                            setShowAll(false);
+                            setExpandedGroup(null);
+                          }}
+                        >
+                          {key}
+                        </MenuItem>
+                      );
+                    })}
+              </React.Fragment>
+            ))}
+            {<MoreMenuItem lastItem />}
+          </>
+        ) : (
+          <>
+            {<MoreMenuItem />}
+            {primaryKeys.map((key, index) => {
+              let value = key;
+              if (key === "collate") {
+                value = "collate(sequence_id,name)";
+              } else if (key.startsWith("tax_")) {
+                value = `${key}()`;
+              }
+              return (
+                <MenuItem
+                  key={key}
+                  divider={index == primaryKeys.length - 1}
+                  onClick={() => handleMenuSelect(value)}
+                >
+                  {key}
+                </MenuItem>
+              );
+            })}
+            {<MoreMenuItem lastItem />}
+          </>
+        )}
+      </Menu>
+    </>
+  );
+};

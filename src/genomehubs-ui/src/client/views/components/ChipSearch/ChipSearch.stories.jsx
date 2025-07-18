@@ -19,6 +19,17 @@ WithInitialChips.args = {
   initialChips: ["assembly_span=100000000", "AND", "tax_tree(2759)"],
 };
 
+export const Compact = Template.bind({});
+Compact.args = {
+  compact: true,
+};
+
+export const CompactWithInitialChips = Template.bind({});
+CompactWithInitialChips.args = {
+  compact: true,
+  initialChips: ["assembly_span=100000000", "AND", "tax_tree(2759)"],
+};
+
 export const WithValueNote = Template.bind({});
 WithValueNote.args = {
   initialChips: ["assembly_span=100000000", "AND", "tax_tree(2759[Eukaryota])"],
