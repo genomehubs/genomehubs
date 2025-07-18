@@ -9,7 +9,7 @@ import { useNavigate } from "@reach/router";
 import withApi from "../hocs/withApi";
 import withQueryById from "../hocs/withQueryById";
 import withRecord from "../hocs/withRecord";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const Count = ({
   apiUrl,
@@ -66,7 +66,7 @@ const Count = ({
 
   const handleClick = () => {
     navigate(
-      `${basename}/search?${qs.stringify({ ...options, report: "sources" })}`
+      `${basename}/search?${qs.stringify({ ...options, report: "sources" })}`,
     );
   };
 

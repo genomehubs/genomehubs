@@ -18,7 +18,7 @@ import { useStyles } from "./SearchBoxStyles";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
 
@@ -43,6 +43,7 @@ const SearchBox = ({
   const navigate = useNavigate();
   const location = useLocation();
   let options = qs.parse(location.search.replace(/^\?/, ""));
+  let pathname = location.pathname.replace(/^\//, "");
   const formRef = useRef(null);
   const searchBoxRef = useRef(null);
   const rootRef = useRef(null);
@@ -91,7 +92,6 @@ const SearchBox = ({
     if (!fullOptions.hasOwnProperty("includeEstimates")) {
       fullOptions.includeEstimates = searchDefaults.includeEstimates;
     }
-    console.log(sameIndex);
 
     let savedOptions = allOptions[options.result];
 
@@ -104,7 +104,6 @@ const SearchBox = ({
       ranks = options.ranks || ranks;
       names = options.names || names;
     }
-    console.log(fields);
 
     // if (
     //   !fullOptions.hasOwnProperty("fields") ||
@@ -146,9 +145,15 @@ const SearchBox = ({
     }
     fetchSearchResults(fullOptions);
     setPreferSearchTerm(false);
-    navigate(
-      `${basename}/search?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
-    );
+    if (pathname.match(/^search/)) {
+      navigate(
+        `${basename}/${pathname}?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
+      );
+    } else {
+      navigate(
+        `${basename}/search?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
+      );
+    }
   };
 
   const wrapTerm = ({ term, taxWrap, result }) => {

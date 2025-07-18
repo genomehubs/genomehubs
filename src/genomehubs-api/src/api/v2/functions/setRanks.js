@@ -3,7 +3,7 @@ export const setRanks = (rank) => {
     return rank.split(/[,;\s]+/);
   } else {
     return [
-      "superkingdom",
+      "domain",
       "kingdom",
       "phylum",
       "class",

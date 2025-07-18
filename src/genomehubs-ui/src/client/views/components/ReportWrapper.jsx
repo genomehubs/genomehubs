@@ -4,7 +4,7 @@ import Tooltip from "./Tooltip";
 import { compose } from "recompose";
 import { useNavigate } from "@reach/router";
 import withApi from "../hocs/withApi";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 export const ReportWrapper = ({
   reportId,
@@ -51,6 +51,7 @@ export const ReportWrapper = ({
               position: "absolute",
               marginRight: "0.25em",
               cursor: "pointer",
+              zIndex: 1000,
             }}
           >
             <LaunchIcon />

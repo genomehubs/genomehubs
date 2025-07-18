@@ -9,7 +9,7 @@ import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
 import withReportById from "../hocs/withReportById";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const ReportTree = ({
   tree,
@@ -28,6 +28,8 @@ const ReportTree = ({
   hideErrorBars,
   hideAncestralBars,
   showPhyloPics,
+  phylopicRank,
+  phylopicSize,
   minDim,
   setMinDim,
   basename,
@@ -191,6 +193,8 @@ const ReportTree = ({
         hideErrorBars={hideErrorBars}
         hideAncestralBars={hideAncestralBars}
         showPhylopics={showPhyloPics}
+        phylopicRank={phylopicRank}
+        phylopicSize={phylopicSize}
       />
     );
   } else {
@@ -210,6 +214,8 @@ const ReportTree = ({
         hideErrorBars={hideErrorBars}
         hideAncestralBars={hideAncestralBars}
         showPhylopics={showPhyloPics}
+        phylopicRank={phylopicRank}
+        phylopicSize={phylopicSize}
       />
     );
   }

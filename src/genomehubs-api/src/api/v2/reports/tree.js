@@ -393,13 +393,23 @@ const addXResultsToTree = async ({
   }
 };
 
-const collapseNodes = ({ taxonId, treeNodes, ancNode, depth = 0 }) => {
+const collapseNodes = ({
+  taxonId,
+  treeNodes,
+  ancNode,
+  preserveRank = "",
+  depth = 0,
+}) => {
   if (!treeNodes[taxonId]) {
     return;
   }
+  let keepRanks = ["species"].concat(preserveRank.split(","));
   let children = Object.keys(treeNodes[taxonId].children);
   if (ancNode) {
-    if (children.length == 1 && treeNodes[taxonId].taxon_rank != "species") {
+    if (
+      children.length == 1 &&
+      !keepRanks.includes(treeNodes[taxonId].taxon_rank)
+    ) {
       delete ancNode.children[taxonId];
       delete treeNodes[taxonId];
     } else {
@@ -417,6 +427,7 @@ const collapseNodes = ({ taxonId, treeNodes, ancNode, depth = 0 }) => {
         taxonId: childId,
         treeNodes,
         ancNode,
+        preserveRank,
         depth,
       })
     );
@@ -441,6 +452,7 @@ const getTree = async ({
   catRank,
   taxonomy,
   collapseMonotypic,
+  preserveRank,
   req,
   apiParams,
 }) => {
@@ -449,6 +461,12 @@ const getTree = async ({
   // let field = yFields[0] || fields[0];
   let exclusions;
   params.excludeUnclassified = true;
+  let { nullFields } = params;
+  if (nullFields && nullFields.length > 0) {
+    params.excludeMissing = params.excludeMissing.filter(
+      (field) => !nullFields.includes(field)
+    );
+  }
   exclusions = setExclusions(params);
   let lca = await getLCA({
     params: { ...params },
@@ -459,6 +477,11 @@ const getTree = async ({
     result,
   });
   exclusions.missing = [...new Set(exclusions.missing.concat(xFields))];
+  if (nullFields && nullFields.length > 0) {
+    exclusions.missing = exclusions.missing.filter(
+      (field) => !nullFields.includes(field)
+    );
+  }
   if (treeThreshold > -1 && lca.count > treeThreshold) {
     return {
       status: {
@@ -584,7 +607,11 @@ const getTree = async ({
     lca.taxon_id = lca.taxon_id.toUpperCase();
   }
   if (collapseMonotypic) {
-    maxDepth = collapseNodes({ taxonId: lca.taxon_id, treeNodes });
+    maxDepth = collapseNodes({
+      taxonId: lca.taxon_id,
+      treeNodes,
+      preserveRank,
+    });
   }
 
   return { lca: { ...lca, maxDepth }, treeNodes };
@@ -682,14 +709,6 @@ export const tree = async ({
   yParams.excludeDescendant = apiParams.excludeDescendant || [];
   yParams.excludeAncestral = apiParams.excludeAncestral || [];
   yParams.excludeMissing = apiParams.excludeMissing || [];
-
-  // if (params.includeEstimates) {
-  //   delete params.excludeAncestral;
-  //   delete yParams.excludeAncestral;
-  // }
-
-  // delete params.excludeDescendant;
-  // delete yParams.excludeDescendant;
 
   let xQuery = { ...params };
   let yQuery = { ...yParams };
@@ -793,6 +812,7 @@ export const tree = async ({
         treeThreshold,
         queryId: apiParams.queryId,
         collapseMonotypic: apiParams.collapseMonotypic,
+        preserveRank: apiParams.preserveRank,
         req,
         taxonomy,
         apiParams,

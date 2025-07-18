@@ -13,6 +13,7 @@ Usage:
                      [--taxon-lookup-in-memory] [--taxon-id-as-xref STRING]
                      [--taxon-matching-ranks INT]
                      [--taxon-spellcheck] [--taxonomy-source STRING]
+                     [--blank STRING...]
                      [--file PATH...] [file-dir PATH...]
                      [--remote-file URL...] [--remote-file-dir URL...]
                      [--taxon-id STRING] [--assembly-id STRING]
@@ -55,6 +56,7 @@ Options:
     --file-title STRING        Default title for indexed files.
     --file-description STRING  Default description for all indexed files.
     --file-metadata PATH       CSV, TSV, YAML or JSON file metadata with one entry per file to be indexed.
+    --blank STRING...          List of strings to treat as blank values in files. Default: ['', 'NA', 'N/A', 'None']
     --dry-run                  Flag to run without loading data into the elasticsearch index.
     --log-interval INT         Minimum time (seconds) between prgress bar updates
     --log-es BOOL              Show Info-level logs from elasticsearch
@@ -398,7 +400,10 @@ def index_file(
     taxon_asm_data = defaultdict(list)
     failed_rows = defaultdict(list)
     imported_rows = []
-    blanks = {"", "NA", "N/A", "None", None}
+    blanks = set(opts.get("blank", ["NA", "N/A", "None"]))
+    blanks.add("")
+    blanks.add(None)
+    print(f"Blank values: {blanks}")
     taxon_types = {}
     taxonomy_name = opts["taxonomy-source"].lower()
     LOGGER.info("Processing rows")

@@ -99,9 +99,9 @@ export const mixColor = ({ color1, color2, ratio }) => {
     b2 = b1 * a2 + b2 * (1 - a2);
   }
 
-  let r = Math.ceil(r1 * ratio + r2 * (1 - ratio));
-  let g = Math.ceil(g1 * ratio + g2 * (1 - ratio));
-  let b = Math.ceil(b1 * ratio + b2 * (1 - ratio));
+  let r = Math.floor(r1 * ratio + r2 * (1 - ratio));
+  let g = Math.floor(g1 * ratio + g2 * (1 - ratio));
+  let b = Math.floor(b1 * ratio + b2 * (1 - ratio));
 
   return rgbToHex(r, g, b);
 };

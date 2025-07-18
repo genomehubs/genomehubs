@@ -12,7 +12,7 @@ import SearchPage from "./SearchPage";
 import { compose } from "recompose";
 import { fillParent as fillParentStyle } from "./Styles.scss";
 import makeStyles from "@mui/styles/makeStyles";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 // const ReportPage = loadable(() => import("./ReportPage"));
 

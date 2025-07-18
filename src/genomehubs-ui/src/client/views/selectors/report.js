@@ -21,12 +21,15 @@ import { createSelector } from "reselect";
 // import { format } from "d3-format";
 import { getTypes } from "../reducers/types";
 import { mapThreshold } from "../reducers/map";
+import md5 from "md5";
 import { nanoid } from "nanoid";
 import { processTree } from "./tree";
 import qs from "../functions/qs";
 import { scaleOrdinal } from "d3-scale";
 import store from "../store";
 import { treeThreshold } from "../reducers/tree";
+
+const SESSION_ID = nanoid(10);
 
 export const sortReportQuery = ({ queryString, options, ui = true }) => {
   const reportTerms = {
@@ -58,6 +61,8 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     hideErrorBars: { in: new Set(["tree"]), ui: true },
     hideAncestralBars: { in: new Set(["tree"]), ui: true },
     showPhylopics: { in: new Set(["tree"]), ui: true },
+    phylopicRank: { in: new Set(["tree"]), api: "preserveRank", ui: true },
+    phylopicSize: { in: new Set(["tree"]), ui: true },
     highlight: { in: new Set(["table"]), ui: true },
     colorPalette: { not: new Set(["sources"]), ui: true },
     includeEstimates: true,
@@ -102,6 +107,13 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     cumulative: { in: new Set(["histogram", "table"]), ui: true },
     reversed: { in: new Set(["scatter"]), ui: true },
     mapThreshold: { in: new Set(["map"]) },
+    locationField: { in: new Set(["map"]) },
+    regionField: { in: new Set(["map"]) },
+    geoBounds: { in: new Set(["map"]) },
+    mapType: { in: new Set(["map"]), ui: true },
+    mapTheme: { in: new Set(["map"]), ui: true },
+    mapProjection: { in: new Set(["map"]), ui: true },
+    geoBinResolution: { in: new Set(["map"]) },
     treeThreshold: { in: new Set(["tree"]) },
     queryId: {
       in: new Set([
@@ -137,8 +149,12 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
           newOptions[newKey] = value;
         }
       }
+      if (!ui && reportTerms[key].api) {
+        newOptions[reportTerms[key].api] = value;
+      }
     }
   });
+
   return qs.stringify(newOptions);
 };
 
@@ -168,11 +184,8 @@ export function fetchReport({
       queryString += `&mapThreshold=${mapThreshold}`;
     }
     let apiQueryString = sortReportQuery({ queryString, ui: false });
-    const queryId = nanoid(10);
-    let url = `${apiUrl}/report?${apiQueryString.replace(
-      /^\?/,
-      "",
-    )}&queryId=${queryId}`;
+    const queryId = md5(`${SESSION_ID}:${reportId}`).substring(0, 10);
+    let url = `${apiUrl}/report?${apiQueryString.replace(/^\?/, "")}&queryId=${queryId}`;
     try {
       let json;
       let status;
@@ -441,6 +454,7 @@ const processScatter = (scatter, result) => {
             }
             let x;
             let y;
+            let { x: rawX, y: rawY } = obj;
             if (scatter.bounds.scale == "ordinal") {
               let name = obj.x.toLowerCase();
               if (!buckets.has(name)) {
@@ -469,27 +483,10 @@ const processScatter = (scatter, result) => {
               };
             }
 
-            points.push({ ...obj, x, y });
+            points.push({ ...obj, x, y, rawX, rawY });
           }
         }
         pointData.push(points);
-        // pointData.push(heatmaps.rawData[cat.key]);
-        // for (let obj of heatmaps.rawData[cat.key]) {
-        //   if (Array.isArray(obj.x) || Array.isArray(obj.y)) {
-        //     // TODO: handle arrays of ordinal values
-        //     continue;
-        //   }
-        //   locations[obj.scientific_name.toLowerCase()] = {
-        //     x:
-        //       scatter.bounds.scale == "ordinal"
-        //         ? xScale(obj.x.toLowerCase())
-        //         : xScale(obj.x),
-        //     y:
-        //       scatter.yBounds.scale == "ordinal"
-        //         ? yScale(obj.y.toLowerCase())
-        //         : yScale(obj.y),
-        //   };
-        // }
       }
     });
   } else {
@@ -697,13 +694,19 @@ const processReport = (report, { searchTerm = {} }) => {
     return {};
   }
   if (report.name == "tree") {
-    let { treeStyle } = qs.parse(report.report.queryString);
+    let { treeStyle, preserveRank } = qs.parse(report.report.queryString);
     let { tree, xQuery, yQuery, bounds, yBounds } = report.report.tree;
     if (!searchTerm) {
       searchTerm = qs.parse(window.location.search.replace(/^\?/, ""));
     }
-    let { hideErrorBars, hideAncestralBars, hideSourceColors, showPhylopics } =
-      searchTerm;
+    let {
+      hideErrorBars,
+      hideAncestralBars,
+      hideSourceColors,
+      showPhylopics,
+      phylopicRank = preserveRank,
+      phylopicSize,
+    } = searchTerm;
     return {
       ...report,
       report: {
@@ -722,6 +725,8 @@ const processReport = (report, { searchTerm = {} }) => {
             hideAncestralBars,
             hideSourceColors,
             showPhylopics,
+            phylopicRank,
+            phylopicSize: phylopicSize ? parseInt(phylopicSize) : undefined,
           }),
         },
       },
@@ -901,9 +906,6 @@ const reportOptions = {
       default: "query",
       fieldType: "value",
     },
-    // y: {
-    //   fieldType: "any",
-    // },
     treeStyle: {
       default: "treeStyle",
       value: "rect",

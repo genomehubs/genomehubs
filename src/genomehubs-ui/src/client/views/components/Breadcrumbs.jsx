@@ -6,7 +6,7 @@ import classnames from "classnames";
 import { compose } from "recompose";
 import styles from "./Styles.scss";
 import { useLocation } from "@reach/router";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const Breadcrumbs = ({ basename, children, ...props }) => {
   const location = useLocation();
@@ -27,7 +27,7 @@ const Breadcrumbs = ({ basename, children, ...props }) => {
       trail.push(
         <NavLink key={i} to={link}>
           {name}
-        </NavLink>
+        </NavLink>,
       );
     } else {
       trail.push(<span key={`i`}>{children[0]}</span>);

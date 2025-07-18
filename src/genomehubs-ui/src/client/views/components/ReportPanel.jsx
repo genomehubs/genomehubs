@@ -45,6 +45,13 @@ const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {
     let newOptions = { ...options };
     if (report) {
       newOptions.report = report;
+      if (
+        report === "map" &&
+        !newOptions.locationField &&
+        !newOptions.regionField
+      ) {
+        newOptions.locationField = "sample_location";
+      }
     } else {
       delete newOptions.report;
     }

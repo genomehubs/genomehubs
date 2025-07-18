@@ -83,6 +83,25 @@ export const getCatsBy = async ({
   return { cats, by };
 };
 
+const addNullToOpts = ({ opts, nullFields, field, showOther }) => {
+  if (nullFields.includes(field) && !opts.match(/\bnull\b/)) {
+    let parts = opts.split(/;/);
+    if (parts.length == 1) {
+      parts = parts[0].split(/,/);
+    }
+    let values = parts[0].split(/\*,\*/);
+    values.push("null");
+    if (!parts[2] || !parts[2].match(/\+/)) {
+      let count = parts[2] || 5;
+      parts[2] = `${count}+`;
+    }
+
+    opts = values.join(",") + ";" + parts.slice(1).join(";");
+    return { opts, showOther: true };
+  }
+  return { opts, showOther };
+};
+
 export const getBounds = async ({
   params,
   fields,
@@ -97,20 +116,34 @@ export const getBounds = async ({
   catOpts = ";;",
 }) => {
   let showOther = false;
+  let { lookupTypes } = await attrTypes({ result, taxonomy });
+  let fieldMeta = lookupTypes(fields[0]);
+  let { type, name: field } = fieldMeta;
+  let { nullFields = [] } = params;
   if (cat) {
     if (cat.match(/\+/)) {
       showOther = true;
       cat = cat.replace(/\+/, "");
     }
+    ({ opts: catOpts, showOther } = addNullToOpts({
+      opts: catOpts,
+      nullFields,
+      field: cat,
+      showOther,
+    }));
   } else {
-    catOpts = opts;
+    ({ opts: catOpts, showOther } = addNullToOpts({
+      opts,
+      nullFields,
+      field,
+      showOther,
+    }));
   }
   let nSort = false;
   if (opts.startsWith("nsort")) {
     nSort = true;
     opts = opts.replace("nsort", "");
   }
-  let { lookupTypes } = await attrTypes({ result, taxonomy });
   params.size = 0;
   for (let [p, v] of Object.entries(apiParams)) {
     if (p.match(/query[A-Z]$/)) {
@@ -119,8 +152,6 @@ export const getBounds = async ({
   }
   params.query = await chainQueries(params);
   // find max and min plus most frequent categories
-  let fieldMeta = lookupTypes(fields[0]);
-  let { type, name: field } = fieldMeta;
   let catType;
   let catMeta = lookupTypes(cat);
   if (catMeta) {
@@ -169,14 +200,18 @@ export const getBounds = async ({
   let extra = {};
   let valueKey = summary == "value" ? `${fieldMeta.type}_value` : summary;
   if (fieldMeta) {
-    if (fieldMeta.type == "keyword") {
+    if (["keyword", "geo_hex"].includes(fieldMeta.type)) {
       if (summary == "length") {
         extra = { stats: true };
       } else {
         extra = { keywords: field };
       }
     } else if (fieldMeta.type == "geo_point") {
-      extra = { geo: true };
+      if (summary.startsWith("hexbin")) {
+        extra = { keywords: field };
+      } else {
+        extra = { geo: true };
+      }
     } else {
       extra = { stats: true };
     }
@@ -212,7 +247,7 @@ export const getBounds = async ({
   let domain;
   try {
     aggs = res.aggs.aggregations[term] || res.aggs.aggregations[catTerm];
-  } catch {
+  } catch (err) {
     return;
   }
 
@@ -237,7 +272,10 @@ export const getBounds = async ({
     // Set domain to nice numbers
     if (!min || !max) {
       let valueType = valueTypes[fieldMeta.type] || "float";
-      if (valueType == "keyword" && scaleType != "ordinal") {
+      if (
+        ["keyword", "geo_hex"].includes(valueType) &&
+        scaleType != "ordinal"
+      ) {
         valueType = "integer";
       }
       if (stats.min == stats.max) {
@@ -378,6 +416,7 @@ export const getBounds = async ({
   }
   return {
     field,
+    summary,
     scale: scaleType,
     query: params.query,
     stats,

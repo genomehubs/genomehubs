@@ -12,8 +12,8 @@ import IconButton from "@mui/material/IconButton";
 import SiteName from "./SiteName";
 import Tooltip from "./Tooltip";
 import { compose } from "recompose";
-import withColors from "../hocs/withColors";
-import withSiteName from "../hocs/withSiteName";
+import withColors from "#hocs/withColors";
+import withSiteName from "#hocs/withSiteName";
 
 export const ReactErrorPage = ({
   statusColors,

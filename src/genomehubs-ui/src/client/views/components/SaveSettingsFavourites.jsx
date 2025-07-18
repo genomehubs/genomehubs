@@ -29,7 +29,7 @@ import qs from "../functions/qs";
 import { splitTerms } from "../functions/splitTerms";
 import { useLocalStorage } from "usehooks-ts";
 import withSearchDefaults from "../hocs/withSearchDefaults";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
 

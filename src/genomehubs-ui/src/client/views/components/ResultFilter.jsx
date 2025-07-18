@@ -9,7 +9,7 @@ import { compose } from "recompose";
 import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";
 import withSearch from "../hocs/withSearch";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withStyles from "@mui/styles/withStyles";
 
 const DefaultTableCell = withStyles((theme) => ({
@@ -42,7 +42,7 @@ const ResultFilter = ({
   }
   let ranks = {
     "": "",
-    superkingdom: "superkingdom",
+    domain: "domain",
     kingdom: "kingdom",
     phylum: "phylum",
     class: "class",

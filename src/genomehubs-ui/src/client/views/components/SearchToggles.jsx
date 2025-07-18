@@ -23,7 +23,7 @@ import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 export const useStyles = makeStyles((theme) => ({
   modal: {

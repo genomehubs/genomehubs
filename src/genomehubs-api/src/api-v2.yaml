@@ -75,6 +75,25 @@ components:
       name: collapseMonotypic
       schema:
         type: boolean
+    preserveRankParam:
+      description: |
+        Do not collapse monotypic tree nodes at the specified rank. Value may be a single rank or a comma separated list of ranks.
+
+        This parameter only affects searches with `report=tree` and `collapseMonotypic=true`.
+      examples:
+        null:
+          value:
+          summary: null - do not preserve any monotypic nodes
+        family:
+          value: family
+          summary: Preserve monotypic nodes at family rank
+        family_and_order:
+          value: family,order
+          summary: Preserve monotypic nodes at family and order ranks
+      in: query
+      name: preserveRank
+      schema:
+        type: string
     confidenceParam:
       deprecated: true
       description: |
@@ -305,6 +324,46 @@ components:
       name: emptyColumns
       schema:
         type: boolean
+    geoBinResolutionParam:
+      description: |
+        Geographic bin resolution to use when generating maps.
+
+        This parameter only applies to searches with `report=map`.
+      examples:
+        null:
+          value:
+          summary: Use default resolution (3)
+        one:
+          value: 1
+          summary: Use resolution level 1
+        two:
+          value: 2
+          summary: Use resolution level 2
+      in: query
+      name: geoBinResolution
+      required: false
+      schema:
+        type: integer
+        default: 3
+        minimum: 1
+        maximum: 5
+    geoBoundsParam:
+      description: |
+        Geographic bounding box to restrict search to.
+
+        The bounding box is specified as a comma separated string of the form `west,south,east,north` in decimal degrees.
+      examples:
+        null:
+          value:
+          summary: Do not restrict results to a geographic bounding box
+        bounds:
+          value: -10.0,-10.0,10.0,10.0
+          summary: Restrict lookup to a bounding box from -10,-10 to 10,10
+      in: query
+      name: geoBounds
+      required: false
+      schema:
+        type: string
     groupsParam:
       description: |
         Comma separated list of attribute display groups to return.
@@ -412,6 +471,23 @@ components:
           summary: Restrict lookup to taxon ID 33208 (Metazoa)
       in: query
       name: lineage
+      required: false
+      schema:
+        type: string
+    locationFieldParam:
+      description: |
+        Field to use for location values.
+
+        This parameter only applies to searches with `report=map`.
+      examples:
+        null:
+          value:
+          summary: Do not specify a location field
+        sample_location:
+          value: sample_location
+          summary: Use sample_location field for location values
+      in: query
+      name: locationField
       required: false
       schema:
         type: string
@@ -640,6 +716,23 @@ components:
         items:
           type: string
       style: form
+    regionFieldParam:
+      description: |
+        Field to use for region values.
+
+        This parameter only applies to searches with `report=map`.
+      examples:
+        null:
+          value:
+          summary: Do not specify a region field
+        country_list:
+          value: country_list
+          summary: Use country_list field for region values
+      in: query
+      name: regionField
+      required: false
+      schema:
+        type: string
     releaseParam:
       description: |
         **Not in use:** GenomeHub release number
@@ -1217,6 +1310,10 @@ components:
       items:
         type: string
       type: array
+    TaxonomicRanks:
+      items:
+        type: string
+      type: array
 info:
   contact:
     email: goat@genomehubs.org
@@ -1476,6 +1573,7 @@ paths:
         - $ref: "#/components/parameters/rankParam"
         - $ref: "#/components/parameters/includeEstimatesParam"
         - $ref: "#/components/parameters/collapseMonotypicParam"
+        - $ref: "#/components/parameters/preserveRankParam"
         - $ref: "#/components/parameters/ranksParam"
         - $ref: "#/components/parameters/namesParam"
         - $ref: "#/components/parameters/excludeAncestralParam"
@@ -1487,7 +1585,11 @@ paths:
         - $ref: "#/components/parameters/yOptsParam"
         - $ref: "#/components/parameters/reorientParam"
         - $ref: "#/components/parameters/checkedFilesParam"
+        - $ref: "#/components/parameters/geoBinResolutionParam"
+        - $ref: "#/components/parameters/geoBoundsParam"
+        - $ref: "#/components/parameters/locationFieldParam"
         - $ref: "#/components/parameters/mapThresholdParam"
+        - $ref: "#/components/parameters/regionFieldParam"
         - $ref: "#/components/parameters/scatterThresholdParam"
         - $ref: "#/components/parameters/treeThresholdParam"
         - $ref: "#/components/parameters/queryIdParam"
@@ -1650,6 +1752,33 @@ paths:
       tags:
         - Metadata
       x-eov-operation-handler: api/v2/routes/taxonomies
+  /taxonomicRanks:
+    get:
+      summary: List of valid taxonomic ranks
+      description: Returns a list of valid taxonomic ranks such as domain, kingdom, phylum, etc.
+      operationId: getTaxonomicRanks
+      tags:
+        - Metadata
+      parameters:
+        - $ref: "#/components/parameters/resultParam"
+        - $ref: "#/components/parameters/taxonomyParam"
+        - $ref: "#/components/parameters/releaseParam"
+        - $ref: "#/components/parameters/indentParam"
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: "#/components/schemas/Status"
+                    status: null
+                  - $ref: "#/components/schemas/TaxonomicRanks"
+                    results: null
+        "400":
+          description: Invalid request
+      x-eov-operation-handler: api/v2/routes/taxonomicRanks
+
 servers:
   - url: http://localhost:3000/api/v2
 tags:

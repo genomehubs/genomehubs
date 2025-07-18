@@ -1,6 +1,6 @@
 {
   "name": "genomehubs-ui",
-  "version": "2.10.11",
+  "version": "2.10.21",
   "description": "Frontend for GenomeHubs",
   "main": "index.js",
   "scripts": {
@@ -109,9 +109,12 @@
     "jszip": "^3.10.1",
     "konva": "^9.3.14",
     "leaflet": "^1.7.1",
+    "md5": "^2.3.0",
     "merge-images": "^2.0.0",
     "motion": "^12.5.0",
     "nanoid": "^5.0.7",
+    "proj4": "^2.17.0",
+    "proj4leaflet": "^1.0.2",
     "qrcode.react": "^4.0.1",
     "qs": "^6.10.1",
     "re-reselect": "^4.0.1",
@@ -120,6 +123,7 @@
     "react-country-flag": "^3.1.0",
     "react-dom": "^18.3.1",
     "react-error-boundary": "^4.0.13",
+    "react-globe.gl": "^2.33.2",
     "react-helmet": "^6.1.0",
     "react-json-pretty": "^2.2.0",
     "react-konva": "^18.2.10",
@@ -149,6 +153,7 @@
     "svg-path-bbox": "^2.1.0",
     "svg-sprite-loader": "^6.0.11",
     "svgo-loader": "^4.0.0",
+    "three": "^0.176.0",
     "trie-search": "^2.0.0",
     "unfetch": "^5.0.0",
     "unified": "^9.2.2",
@@ -172,6 +177,10 @@
     "#hocs/withPhylopics": {
       "storybook": "./src/client/views/hocs/withPhylopics.mock.jsx",
       "default": "./src/client/views/hocs/withPhylopics.jsx"
+    },
+    "#hocs/withSiteName": {
+      "storybook": "./src/client/views/hocs/withSiteName.mock.jsx",
+      "default": "./src/client/views/hocs/withSiteName.jsx"
     },
     "#*": [
       "./*",

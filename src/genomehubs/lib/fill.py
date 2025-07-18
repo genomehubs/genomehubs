@@ -60,6 +60,7 @@ from statistics import mode
 from traceback import format_exc
 
 from docopt import docopt
+from h3 import latlng_to_cell
 from tolkein import tolog
 from tqdm import tqdm
 
@@ -166,7 +167,7 @@ def earliest(arr, *args):
     if not isinstance(arr, list):
         arr = [arr]
     if arr and isinstance(arr[0], str):
-        date_arr = [datetime.strptime(date, "%Y-%m-%d") for date in arr]
+        date_arr = [datetime.strptime(date.split("T")[0], "%Y-%m-%d") for date in arr]
         return datetime.strftime(min(date_arr), "%Y-%m-%d")
     return min(arr + list(args))
 
@@ -176,7 +177,7 @@ def latest(arr, *args):
     if not isinstance(arr, list):
         arr = [arr]
     if isinstance(arr[0], str) and re.match(r"\d{4}-\d{2}-\d{2}", arr[0]):
-        date_arr = [datetime.strptime(date, "%Y-%m-%d") for date in arr]
+        date_arr = [datetime.strptime(date.split("T")[0], "%Y-%m-%d") for date in arr]
         return datetime.strftime(max(date_arr), "%Y-%m-%d")
     return max(arr + list(args))
 
@@ -241,6 +242,61 @@ def deduped_list(arr):
     return list(set(flatten_list(arr)))
 
 
+def hex_bin(arr, resolution=6):
+    """Convert list of point coordinates to h3 hexagons."""
+    hexagons = []
+    for coord in deduped_list(arr):
+        if isinstance(coord, str):
+            # Handle comma-separated string "lat,lon"
+            lat_str, lon_str = coord.split(",")
+            lat, lon = float(lat_str.strip()), float(lon_str.strip())
+            hexagons.append(latlng_to_cell(lat, lon, resolution))
+        elif isinstance(coord, list):
+            # Handle list of [lat, lon] or list of such lists/strings
+            for item in coord:
+                if isinstance(item, str):
+                    lat_str, lon_str = item.split(",")
+                    lat, lon = float(lat_str.strip()), float(lon_str.strip())
+                    hexagons.append(latlng_to_cell(lat, lon, resolution))
+                elif isinstance(item, (list, tuple)) and len(item) == 2:
+                    lat, lon = float(item[0]), float(item[1])
+                    hexagons.append(latlng_to_cell(lat, lon, resolution))
+        elif isinstance(coord, (tuple, list)) and len(coord) == 2:
+            lat, lon = float(coord[0]), float(coord[1])
+            hexagons.append(latlng_to_cell(lat, lon, resolution))
+    return deduped_list(hexagons)
+
+
+def hexbin1(arr):
+    """Convert list of coordinates to hexagonal bins at resolution 1."""
+    return hex_bin(arr, resolution=1)
+
+
+def hexbin2(arr):
+    """Convert list of coordinates to hexagonal bins at resolution 2."""
+    return hex_bin(arr, resolution=2)
+
+
+def hexbin3(arr):
+    """Convert list of coordinates to hexagonal bins at resolution 3."""
+    return hex_bin(arr, resolution=3)
+
+
+def hexbin4(arr):
+    """Convert list of coordinates to hexagonal bins at resolution 4."""
+    return hex_bin(arr, resolution=4)
+
+
+def hexbin5(arr):
+    """Convert list of coordinates to hexagonal bins at resolution 5."""
+    return hex_bin(arr, resolution=5)
+
+
+def hexbin6(arr):
+    """Convert list of coordinates to hexagonal bins at resolution 6."""
+    return hex_bin(arr, resolution=6)
+
+
 def deduped_list_length(arr):
     """Find number of unique values in a list."""
     return len(deduped_list(arr))
@@ -284,6 +340,12 @@ def apply_summary(
         "list": deduped_list,
         "length": deduped_list_length,
         "ordered_list": ordered_list,
+        "hexbin1": hexbin1,
+        "hexbin2": hexbin2,
+        "hexbin3": hexbin3,
+        "hexbin4": hexbin4,
+        "hexbin5": hexbin5,
+        "hexbin6": hexbin6,
     }
     if summary == "primary":
         if primary_values:
@@ -374,7 +436,18 @@ def set_traverse_values(
         if summary == "range":
             attribute[summary] = value
             traverse_value = [min_value, max_value]
-        elif summary not in attribute and summary in {"mean", "median", "mode", "sum"}:
+        elif summary not in attribute and summary in {
+            "mean",
+            "median",
+            "mode",
+            "sum",
+            "hexbin1",
+            "hexbin2",
+            "hexbin3",
+            "hexbin4",
+            "hexbin5",
+            "hexbin6",
+        }:
             attribute[summary] = value
     return traverse_value, max_value, min_value
 
@@ -478,13 +551,10 @@ def summarise_attributes(*, attributes, rank, attrs, meta, parent, parents):
     for node_attribute in attributes:
         if node_attribute["key"] in attrs:
             attr_dict[node_attribute["key"]] = node_attribute
-            sp_count = 0
             if rank == "species":
-                sp_count = 1
                 parents[parent][node_attribute["key"]]["sp_count"] += 1
                 attr_dict[node_attribute["key"]]["sp_count"] = 1
             elif rank in ["subspecies", "varietas", "strain"]:
-                sp_count = 0
                 parents[parent][node_attribute["key"]]["sp_count"] = 1
                 attr_dict[node_attribute["key"]]["sp_count"] = 0
 

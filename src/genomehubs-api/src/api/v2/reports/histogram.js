@@ -4,6 +4,7 @@ import { checkResponse } from "../functions/checkResponse.js";
 import { combineQueries } from "../functions/combineQueries.js";
 import { formatJson } from "../functions/formatJson.js";
 import { getBounds } from "./getBounds.js";
+import { getResultCount } from "../functions/getResultCount.js";
 import { getResults } from "../functions/getResults.js";
 import { parseCatOpts } from "../functions/parseCatOpts.js";
 import { parseFields } from "../functions/parseFields.js";
@@ -18,6 +19,7 @@ const getHistAggResults = (aggs, stats) => {
   if (!hist) {
     return;
   }
+  let { doc_count: docCount } = hist;
   if (hist.by_attribute) {
     if (hist.by_attribute.by_cat.by_value.cats) {
       hist = hist.by_attribute.by_cat.by_value.cats;
@@ -50,20 +52,29 @@ const getHistAggResults = (aggs, stats) => {
     }
   } else if (hist.by_lineage) {
     // TODO: support lineage category histogram
-    // console.log(hist);
-  } else {
-    // console.log(JSON.stringify(hist, null, 4));
+    // } else {
   }
-  return hist;
+  return { hist, docCount };
 };
 
 const getYValues = ({ obj, yField, lookupTypes, stats }) => {
+  {
+    obj, yField, stats;
+  }
   let yBuckets = [];
   let yValues = [];
   let yValueType = valueTypes[lookupTypes(yField).type] || "float";
   // TODO: use stats here
-  let yHist = getHistAggResults(obj.yHistograms.by_attribute[yField], stats);
-  if (yValueType == "keyword" && stats.cats) {
+  let yHist;
+  if (obj.yHistograms.by_attribute.by_cat) {
+    yHist = obj.yHistograms.by_attribute.by_cat.by_value;
+  } else {
+    ({ hist: yHist } = getHistAggResults(
+      obj.yHistograms.by_attribute[yField],
+      stats
+    ));
+  }
+  if (["keyword", "geo_hex"].includes(yValueType) && stats.cats) {
     let bucketMap = {};
     stats.cats.forEach((obj, i) => {
       yBuckets.push(obj.key);
@@ -77,19 +88,137 @@ const getYValues = ({ obj, yField, lookupTypes, stats }) => {
     }
     yBuckets.push(undefined);
     if (yHist) {
-      yHist.buckets.forEach((yObj) => {
-        yValues[bucketMap[yObj.key]] = yObj.doc_count;
+      if (Array.isArray(yHist.buckets)) {
+        yHist.buckets.forEach((yObj) => {
+          yValues[bucketMap[yObj.key]] = yObj.doc_count;
+        });
+      } else {
+        Object.entries(yHist.buckets).forEach(([key, yObj]) => {
+          yValues[bucketMap[key]] = yObj.doc_count;
+        });
+      }
+    }
+  } else if (yHist) {
+    if (Array.isArray(yHist.buckets)) {
+      yHist.buckets.forEach((yObj, j) => {
+        yBuckets.push(yObj.key);
+        yValues.push(yObj.doc_count);
+      });
+    } else {
+      Object.entries(yHist.buckets).forEach(([key, yObj]) => {
+        yBuckets.push(yObj.key);
+        yValues.push(yObj.doc_count);
       });
     }
-  } else {
-    yHist.buckets.forEach((yObj, j) => {
-      yBuckets.push(yObj.key);
-      yValues.push(yObj.doc_count);
-    });
-  }
-  if (yHist) {
   }
   return { yValues, yBuckets, yValueType };
+};
+
+const rowColSums = (arrOfArr) => {
+  let colSums = [];
+  let rowSums = [];
+  arrOfArr.forEach((x, i) => {
+    x.forEach((y, j) => {
+      if (!rowSums[j]) {
+        rowSums[j] = 0;
+      }
+      rowSums[j] += y || 0;
+      if (!colSums[i]) {
+        colSums[i] = 0;
+      }
+      colSums[i] += y || 0;
+    });
+  });
+  return { colSums, rowSums };
+};
+
+const handleNulls2d = ({
+  allYValues,
+  allValues,
+  fullYValues,
+  nullIndex,
+  yNullIndex,
+  totalCount,
+}) => {
+  let { rowSums, colSums } = rowColSums(allYValues);
+  let processedNullValues = allYValues.map((_) => []);
+
+  if (allValues && allValues.length > 0 && fullYValues) {
+    let assigned = 0;
+    allValues.forEach((x, i) => {
+      fullYValues.forEach((y, j) => {
+        if (!allYValues[i]) {
+          allYValues[i] = [];
+          processedNullValues[i] = [];
+        }
+        if (allYValues[i][j]) {
+          processedNullValues[i][j] = allYValues[i][j];
+        } else {
+          if (i == nullIndex && j == yNullIndex) {
+            processedNullValues[i][j] = undefined;
+          } else if (i == nullIndex) {
+            processedNullValues[i][j] = y - rowSums[j];
+          } else if (j == yNullIndex) {
+            processedNullValues[i][j] = x - colSums[i];
+          } else {
+            processedNullValues[i][j] = 0;
+          }
+          processedNullValues[i][j] = Math.max(processedNullValues[i][j], 0);
+        }
+        assigned += processedNullValues[i][j] || 0;
+      });
+    });
+    if (nullIndex > -1 && yNullIndex > -1) {
+      if (!processedNullValues[nullIndex]) {
+        processedNullValues[nullIndex] = [];
+      }
+      processedNullValues[nullIndex][yNullIndex] = totalCount - assigned;
+    }
+  }
+  return processedNullValues;
+};
+
+const getNestedHistogramData = ({
+  yHistograms,
+  yField,
+  totalCount,
+  lookupTypes,
+  yBounds,
+}) => {
+  if (!yHistograms || !yBounds || !yField) {
+    return {
+      fullYBuckets: [],
+      fullYValues: [],
+      yNullCount: 0,
+      yNullIndex: -1,
+    };
+  }
+  let yNullCount = 0;
+  let yNullIndex = -1;
+  let fullYBuckets;
+  let fullYValues;
+  // if (yHistograms && yField) {
+  if (yHistograms.by_attribute?.[yField]) {
+    yNullCount = totalCount - yHistograms.by_attribute[yField].doc_count;
+  } else if (yHistograms.by_attribute?.by_cat) {
+    yNullCount = totalCount - yHistograms.by_attribute.by_cat.doc_count;
+  }
+  ({ yBuckets: fullYBuckets, yValues: fullYValues } = getYValues({
+    obj: { yHistograms },
+    yField,
+    lookupTypes,
+    stats: yBounds.stats,
+    other: yBounds.showOther,
+  }));
+
+  if (yNullCount > 0) {
+    yNullIndex = fullYBuckets.indexOf("null");
+    if (yNullIndex > -1) {
+      fullYValues[yNullIndex] = yNullCount;
+    }
+  }
+  // }
+  return { fullYBuckets, fullYValues, yNullCount, yNullIndex };
 };
 
 const getHistogram = async ({
@@ -104,11 +233,14 @@ const getHistogram = async ({
   yFields,
   yBounds,
   ySummaries,
+  catBounds,
   raw,
   taxonomy,
 }) => {
   let { lookupTypes } = await attrTypes({ result, taxonomy });
   params.size = raw;
+  // params.excludeMissing = [];
+  // exclusions.missing = [];
   // find max and min plus most frequent categories
   let fieldMeta = lookupTypes(fields[0]);
   let field = fieldMeta.name;
@@ -119,7 +251,7 @@ const getHistogram = async ({
   let rawData;
   let pointData;
   if (bounds.cat && bounds.by == "attribute") {
-    if (!bounds.showOther) {
+    if (!bounds.showOther && bounds.cats?.length) {
       let parts = params.query.split(/\s+AND\s+/i);
       let filtered = parts.filter((part) => part != bounds.cat);
       params.query = `${filtered.join(" AND ")} AND ${bounds.cat}=${bounds.cats
@@ -157,6 +289,29 @@ const getHistogram = async ({
   });
   if (!res.status.success) {
     return { status: res.status };
+  }
+
+  let totalCount;
+
+  let { nullFields } = params;
+
+  // need result count for each value!
+  if (nullFields && nullFields.length > 0) {
+    let excludeMissing = params.excludeMissing.filter(
+      (field) => !nullFields.includes(field)
+    );
+    let resultCount = await getResultCount({
+      ...params,
+      excludeMissing,
+      fields,
+      queryId: undefined,
+      aggs: undefined,
+    });
+    ({ count: totalCount } = resultCount);
+  } else {
+    ({
+      status: { hits: totalCount },
+    } = res);
   }
   let xSumm, ySumm;
   const dateSummary = {
@@ -215,41 +370,53 @@ const getHistogram = async ({
           }
           let x = result.result.fields[field][xSumm];
           if (
-            valueType == "keyword" &&
+            ["keyword", "geo_hex"].includes(valueType) &&
             xSumm == "value" &&
             !xKeys.has(x.toLowerCase())
           ) {
             continue;
           }
-          let y = result.result.fields[yField][ySumm];
-          if (
-            yValueType == "keyword" &&
-            ySumm == "value" &&
-            !yKeys.has(y.toLowerCase())
-          ) {
-            continue;
+          let ys = result.result.fields[yField][ySumm];
+          if (!Array.isArray(ys)) {
+            ys = [ys];
           }
-          if (valueType == "date") {
-            x = Date.parse(x);
+          for (let y of ys) {
+            if (
+              ["keyword", "geo_hex"].includes(yValueType) &&
+              ySumm == "value" &&
+              !yKeys.has(y.toLowerCase())
+            ) {
+              continue;
+            }
+            if (valueType == "date") {
+              x = Date.parse(x);
+            }
+            if (yValueType == "date") {
+              y = Date.parse(y);
+            }
+            pointData[cat].push({
+              ...(result.result.scientific_name && {
+                scientific_name: result.result.scientific_name,
+              }),
+              ...(result.result.taxon_id && {
+                taxonId: result.result.taxon_id,
+              }),
+              x,
+              y,
+              cat,
+            });
           }
-          if (yValueType == "date") {
-            y = Date.parse(y);
-          }
-          pointData[cat].push({
-            ...(result.result.scientific_name && {
-              scientific_name: result.result.scientific_name,
-            }),
-            ...(result.result.taxon_id && { taxonId: result.result.taxon_id }),
-            x,
-            y,
-            cat,
-          });
         }
       }
     }
   }
 
-  let hist = getHistAggResults(res.aggs.aggregations[field], bounds.stats);
+  let { hist, docCount } = getHistAggResults(
+    res.aggs.aggregations[field],
+    bounds.stats
+  );
+  // need a count for each value
+
   if (!hist) {
     return;
   }
@@ -258,6 +425,7 @@ const getHistogram = async ({
   }
   let buckets = [];
   let allValues = [];
+  let allCatValues;
   let yBuckets;
   let ranks;
   let allYValues;
@@ -267,9 +435,39 @@ const getHistogram = async ({
   let other = [];
   let allOther = [];
   let translations = {};
+  let nullCount = totalCount - docCount;
+  let nullIndex = -1;
+  let { yHistograms } = res.aggs.aggregations;
+
+  let { fullYBuckets, fullYValues, yNullCount, yNullIndex } =
+    getNestedHistogramData({
+      yHistograms,
+      yField,
+      totalCount,
+      lookupTypes,
+      yBounds,
+    });
+  let {
+    fullYBuckets: fullCatBuckets,
+    fullYValues: fullCatValues,
+    yNullCount: catNullCount,
+    yNullIndex: catNullIndex,
+  } = getNestedHistogramData({
+    yHistograms: res.aggs.aggregations.categoryHistograms,
+    yField: cat,
+    totalCount,
+    lookupTypes,
+    yBounds: catBounds,
+  });
+
   hist.buckets.forEach((obj, i) => {
     buckets.push(obj.key);
-    allValues.push(obj.doc_count);
+    if (obj.key == "null") {
+      nullIndex = i;
+      allValues.push(nullCount);
+    } else {
+      allValues.push(obj.doc_count);
+    }
 
     if (bounds.showOther) {
       other.push(obj.doc_count);
@@ -309,17 +507,29 @@ const getHistogram = async ({
   });
   if (fieldMeta.type == "date") {
     buckets = scaleBuckets(buckets, "date", bounds);
-  } else if (fieldMeta.type == "keyword" && summaries[0] != "length") {
+  } else if (
+    ["keyword", "geo_hex"].includes(fieldMeta.type) &&
+    summaries[0] != "length"
+  ) {
     buckets.push(undefined);
   } else {
     buckets = scaleBuckets(buckets, bounds.scale, bounds);
   }
 
+  // if (nullCount && nullIndex == -1) {
+  //   nullIndex = buckets.length;
+  //   buckets.push("null");
+  //   allValues.push(nullCount);
+  // }
+
   if (yBuckets) {
     // yBuckets = allYBuckets;
     if (yFieldMeta.type == "date") {
       yBuckets = scaleBuckets(yBuckets, "date", yBounds);
-    } else if (yFieldMeta.type != "keyword" && summaries[0] != "length") {
+    } else if (
+      ["keyword", "geo_hex"].includes(yFieldMeta.type) &&
+      summaries[0] != "length"
+    ) {
       yBuckets = scaleBuckets(yBuckets, yBounds.scale, yBounds);
     } else {
       yBuckets = scaleBuckets(yBuckets, yBounds.scale, yBounds);
@@ -354,22 +564,32 @@ const getHistogram = async ({
       catObjs[obj.key] = obj;
     });
 
-    for (let [key, obj] of Object.entries(catBuckets)) {
+    allCatValues = [];
+    let otherIndex = -1;
+    let idx = -1;
+    for (let { key } of bounds.cats) {
+      let obj = catBuckets[key];
+      idx++;
       if (key == "other") {
+        otherIndex = idx;
         continue;
       }
       byCat[key] = [];
       catObjs[key].doc_count = 0;
       // TODO: support categories here too
-      let nestedHist = getHistAggResults(
+      let { hist: nestedHist, docCount } = getHistAggResults(
         obj.histogram.by_attribute[field],
         bounds.stats
       );
       nestedHist.buckets.forEach((bin, i) => {
+        if (!allCatValues[i]) {
+          allCatValues[i] = [];
+        }
         byCat[key][i] = bin.doc_count;
+        allCatValues[i][idx] = bin.doc_count;
         catObjs[key].doc_count += bin.doc_count;
         if (byCat.other) {
-          byCat.other[i] -= bin.doc_count;
+          byCat.other[i] = Math.max(byCat.other[i] - bin.doc_count, 0);
         }
         if (yField) {
           if (!yValuesByCat) {
@@ -386,8 +606,19 @@ const getHistogram = async ({
               stats: yBounds.stats,
             });
             if (yValuesByCat.other) {
+              if (!yValuesByCat.other[i]) {
+                yValuesByCat.other[i] = [];
+              }
+
               yValues.forEach((count, j) => {
-                yValuesByCat.other[i][j] -= count;
+                if (!yValuesByCat.other[i][j]) {
+                  yValuesByCat.other[i][j] = 0;
+                } else {
+                  yValuesByCat.other[i][j] = Math.max(
+                    yValuesByCat.other[i][j] - count,
+                    0
+                  );
+                }
               });
             }
             yValuesByCat[key].push(yValues);
@@ -401,6 +632,15 @@ const getHistogram = async ({
         delete pointData[key.toLowerCase()];
       }
     }
+    // if (byCat.other) {
+    //   allCatValues[otherIndex] = byCat.other;
+    // }
+    // if (otherIndex && !byCat.other) {
+    //   //insert an entry into allCatValues array at catNullIndex
+    //   allCatValues.splice(otherIndex, 0, new Array(allValues.length).fill(0));
+    //   byCat.other = allCatValues[otherIndex];
+    // }
+    // transpose allCatValues
     if (pointData && byCat.other) {
       rawData.other = Object.values(pointData)
         .flat()
@@ -430,6 +670,48 @@ const getHistogram = async ({
     } else {
       yLabel = yField;
     }
+    allYValues = handleNulls2d({
+      allYValues,
+      allValues,
+      fullYValues,
+      nullIndex,
+      yNullIndex,
+      totalCount,
+    });
+    if (rawData && rawData.length > 0) {
+      buckets.forEach((bucket, i) => {
+        yBuckets.forEach((yBucket, j) => {
+          if (bucket && yBucket && (bucket == "null" || yBucket == "null")) {
+            let count = allYValues[i][j];
+            if (count > 0) {
+              for (let k = 0; k < count; k++) {
+                rawData.push({
+                  x: bucket,
+                  y: yBucket,
+                  cat: "all data",
+                });
+              }
+            }
+          }
+        });
+      });
+    }
+  } else if (catNullIndex > -1) {
+    allCatValues = handleNulls2d({
+      allYValues: allCatValues,
+      allValues,
+      fullYValues: fullCatValues,
+      nullIndex,
+      yNullIndex: catNullIndex,
+      totalCount,
+    });
+    bounds.cats.forEach((obj, i) => {
+      let values = allCatValues.map((arr) => arr[i]);
+      byCat[obj.key] = values;
+      obj.doc_count = values.reduce((a, b) => a + b, 0);
+    });
+  } else if (nullIndex > -1) {
+    // do nothing
   }
 
   return {
@@ -459,7 +741,7 @@ const updateQuery = ({ params, fields, summaries, opts, lookupTypes }) => {
   if (summaries[0] != meta.processed_simple) {
     field = `${summaries[0]}(${field})`;
   }
-  if (!meta || !opts || meta.type == "keyword") {
+  if (!meta || !opts || meta.type == "keyword" || meta.type == "geo_hex") {
     return;
   }
   let queryArr = (params.query || "").split(
@@ -536,6 +818,7 @@ export const histogram = async ({
     taxonomy,
   });
   let catOpts, catMeta;
+  let catString = cat;
   ({
     cat,
     catOpts,
@@ -550,13 +833,14 @@ export const histogram = async ({
   // if (catMeta) {
   //   cat = catMeta.name;
   // }
-  let xTerm = combineQueries(y, x);
+  let xTerm = x; //combineQueries(y, x);
   let { params, fields, summaries } = await queryParams({
     term: xTerm,
     result,
     rank,
     taxonomy,
   });
+
   updateQuery({
     params,
     fields,
@@ -586,13 +870,14 @@ export const histogram = async ({
       opts: yOpts.replace(/^nsort/, ""),
       lookupTypes,
     });
-    updateQuery({
-      params: params,
-      fields: yFields,
-      summaries: ySummaries,
-      opts: yOpts.replace(/^nsort/, ""),
-      lookupTypes,
-    });
+    params.nullFields.concat(yParams.nullFields);
+    // updateQuery({
+    //   params: params,
+    //   fields: yFields,
+    //   summaries: ySummaries,
+    //   opts: yOpts.replace(/^nsort/, ""),
+    //   lookupTypes,
+    // });
   }
 
   let xQuery = { ...params };
@@ -671,6 +956,8 @@ export const histogram = async ({
     fields = fields.concat(yFields);
   }
   fields = [...new Set(fields)];
+  // TODO: improve this
+  params.excludeMissing = [];
   exclusions = setExclusions(params);
   let inputQueries = Object.entries(apiParams)
     .filter(([key, value]) => key.match(/query[A-Z]+/))
@@ -696,6 +983,10 @@ export const histogram = async ({
       },
     };
   }
+
+  if (cat && catString.match(/\bnull\b/)) {
+    params.nullFields.push(cat);
+  }
   let catBounds = await getBounds({
     params: { ...params, ...inputQueries },
     fields,
@@ -708,23 +999,45 @@ export const histogram = async ({
     // opts: xOpts,
     catOpts,
   });
+  let nullCatBounds;
   if (cat && catBounds) {
     bounds.cat = catBounds.cat;
     bounds.cats = catBounds.cats;
     bounds.catType = catBounds.catType;
     bounds.catCount = catBounds.tickCount;
     bounds.by = catBounds.by;
+    nullCatBounds = catBounds;
     bounds.showOther = catBounds.showOther;
+    nullCatBounds = await getBounds({
+      params: { ...params, ...inputQueries },
+      fields: [catBounds.cat],
+      summaries,
+      result,
+      exclusions,
+      taxonomy,
+      apiParams,
+      opts: catOpts,
+    });
+    if (nullCatBounds?.stats.cats) {
+      bounds.cats = nullCatBounds.stats.cats;
+      bounds.showOther =
+        nullCatBounds.stats.showOther || Boolean(catString.match(/\bnull\b/));
+      bounds.catCount = nullCatBounds.size;
+    }
   }
 
   let histograms, yBounds;
   if (yFields && yFields.length > 0) {
+    console.log("getting y bounds");
     yBounds = await getBounds({
       params: { ...yParams, ...inputQueries },
       fields: yFields,
       summaries: ySummaries,
       result,
-      exclusions,
+      exclusions: {
+        ...exclusions,
+        // missing: ["bioproject"],
+      },
       taxonomy,
       apiParams,
       opts: yOpts,
@@ -744,9 +1057,15 @@ export const histogram = async ({
       yFields,
       yBounds,
       ySummaries,
+      catBounds: nullCatBounds,
       taxonomy,
       raw: bounds.stats.count < threshold ? threshold : 0,
     });
+  }
+  if (histograms && histograms.status && !histograms.status.success) {
+    return {
+      status: histograms.status,
+    };
   }
 
   let ranks = [rank].flat();
@@ -830,7 +1149,9 @@ export const histogram = async ({
         fields: fields.join(","),
         ranks,
       },
-      x: histograms ? histograms.allValues.reduce((a, b) => a + b, 0) : 0,
+      x: histograms?.allValues
+        ? histograms.allValues.reduce((a, b) => a + b, 0)
+        : 0,
     },
     xQuery,
     ...(y && {

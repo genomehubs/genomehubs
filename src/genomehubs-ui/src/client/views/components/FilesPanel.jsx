@@ -15,7 +15,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import classnames from "classnames";
 import { compose } from "recompose";
 import { setLinkIcons } from "./ResultTable";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withRecord from "../hocs/withRecord";
 import withTheme from "../hocs/withTheme";
 import withTypes from "../hocs/withTypes";

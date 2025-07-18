@@ -3,11 +3,11 @@ import Logo from "./Logo";
 // import { RadialChart } from "react-vis";
 import React from "react";
 import { compose } from "recompose";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 
 const ReportEmpty = ({ report, statusColors, inModal }) => {
   return (
-    (<Grid
+    <Grid
       style={{
         height: "100%",
         background: statusColors.descendant + "cc",
@@ -52,7 +52,7 @@ const ReportEmpty = ({ report, statusColors, inModal }) => {
           >{`No ${report} data to display`}</div>
         </>
       )}
-    </Grid>)
+    </Grid>
   );
 };
 

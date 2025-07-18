@@ -12,7 +12,7 @@ import { useIntersectionObserver } from "usehooks-ts";
 import { useNavigate } from "@reach/router";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withSummary from "../hocs/withSummary";
 import withSummaryById from "../hocs/withSummaryById";
 import withTaxonomy from "../hocs/withTaxonomy";
@@ -125,5 +125,5 @@ export default compose(
   withLookup,
   withSearch,
   withSummary,
-  withSummaryById
+  withSummaryById,
 )(WordCloud);

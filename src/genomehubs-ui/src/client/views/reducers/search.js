@@ -13,7 +13,7 @@ export const getDefaultIndex = () => {
   ) {
     return window.process.ENV.GH_DEFAULT_INDEX;
   }
-  return DEFAULT_INDEX || "taxon";
+  return typeof DEFAULT_INDEX !== "undefined" ? DEFAULT_INDEX : "taxon";
 };
 
 export const defaultIndex = getDefaultIndex();
@@ -22,7 +22,7 @@ export const requestSearch = createAction("REQUEST_SEARCH");
 export const receiveSearch = createAction(
   "RECEIVE_SEARCH",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 export const cancelSearch = createAction("CANCEL_SEARCH");
 export const resetSearch = createAction("RESET_SEARCH");
@@ -55,7 +55,7 @@ const searchResults = handleActions(
     }),
     RESET_SEARCH: defaultState,
   },
-  defaultState()
+  defaultState(),
 );
 
 export const getSearchResults = (state) => state.searchResults;
@@ -79,7 +79,7 @@ export const getSearchResultArray = createSelector(
       arr.push(obj);
     });
     return arr;
-  }
+  },
 );
 
 export const getSearchResultById = createCachedSelector(
@@ -87,14 +87,14 @@ export const getSearchResultById = createCachedSelector(
   (_state, searchId) => searchId,
   (results, searchId) => {
     return results.find((result) => result.taxon_id === searchId);
-  }
+  },
 )((_state, searchId) => searchId);
 
 export const requestQuery = createAction("REQUEST_QUERY");
 export const receiveQuery = createAction(
   "RECEIVE_QUERY",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 export const cancelQuery = createAction("CANCEL_QUERY");
 export const resetQuery = createAction("RESET_QUERY");
@@ -134,7 +134,7 @@ const queryResults = handleActions(
     },
     RESET_QUERY: defaultQueryState,
   },
-  defaultQueryState()
+  defaultQueryState(),
 );
 
 export const getQueryResults = (state) => state.queryResults;
@@ -144,14 +144,14 @@ export const getQueryResultById = createCachedSelector(
   (_state, searchId) => searchId,
   (results, searchId) => {
     return results.byId[searchId];
-  }
+  },
 )((_state, searchId) => searchId);
 
 export const setSearchTerm = createAction("SET_SEARCH_TERM");
 export const searchTerm = handleAction(
   "SET_SEARCH_TERM",
   (state, action) => action.payload,
-  ""
+  "",
 );
 export const getSearchTerm = (state) => state.searchTerm;
 
@@ -161,7 +161,7 @@ export const searchIndex = handleAction(
   (state, action) => {
     return action.payload;
   },
-  defaultIndex
+  defaultIndex,
 );
 export const getSearchIndex = (state) => state.searchIndex;
 
@@ -178,7 +178,7 @@ export const setPreferSearchTerm = createAction("SET_PREFER_SEARCH_TERM");
 export const preferSearchTerm = handleAction(
   "SET_PREFER_SEARCH_TERM",
   (state, action) => action.payload,
-  false
+  false,
 );
 export const getPreferSearchTerm = (state) => state.preferSearchTerm;
 
@@ -186,7 +186,7 @@ export const setPreviousSearchTerm = createAction("SET_PREVIOUS_SEARCH_TERM");
 export const previousSearchTerm = handleAction(
   "SET_PREVIOUS_SEARCH_TERM",
   (state, action) => action.payload,
-  {}
+  {},
 );
 export const getPreviousSearchTerm = (state) => state.previousSearchTerm;
 
@@ -197,7 +197,7 @@ export const searchHistory = handleAction(
   (state, action) => {
     return defaultSearchHistory;
   },
-  defaultSearchHistory
+  defaultSearchHistory,
 );
 export const getSearchHistory = (state) => state.searchTerm;
 
@@ -227,7 +227,7 @@ export const getSearchNameClasses = createSelector(
       names = searchTerm.names.split(/\s*,\s*/);
     }
     return names;
-  }
+  },
 );
 
 const searchDefaultValues = {
@@ -245,7 +245,7 @@ export const searchDefaults = handleActions(
       immutableUpdate(state, action.payload),
     RESET_SEARCH_DEFAULTS: (state, action) => searchDefaultValues,
   },
-  searchDefaultValues
+  searchDefaultValues,
 );
 export const getSearchDefaults = (state) => state.searchDefaults;
 
@@ -255,7 +255,7 @@ export const suggestedTerms = handleActions(
     SET_SUGGESTED_TERMS: (state, action) =>
       immutableUpdate(state, action.payload),
   },
-  {}
+  {},
 );
 export const getSuggestedTerms = (state) => state.suggestedTerms;
 

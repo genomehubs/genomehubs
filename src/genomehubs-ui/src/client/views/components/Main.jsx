@@ -16,7 +16,7 @@ import classnames from "classnames";
 import { compose } from "recompose";
 import { fillParent as fillParentStyle } from "./Styles.scss";
 import withRoutes from "../hocs/withRoutes";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const fixedRoutes = { search: true, explore: true, records: true };
 
@@ -44,12 +44,20 @@ const Main = ({ routes, basename }) => {
   ];
   routes.allIds.forEach((routeName) => {
     if (!fixedRoutes[routeName]) {
+      let { fullPath, pageId } = routes.byId[routeName];
+      let Page = GenericPage;
+      if (fullPath.startsWith("/search/")) {
+        Page = SearchPage;
+        paths.push(
+          <Page
+            path={`${fullPath}`}
+            pageId={fullPath.replace(/^\//, "") + ".md"}
+            key={routeName}
+          />,
+        );
+      }
       paths.push(
-        <GenericPage
-          path={`/${routeName}`}
-          pageId={routes.byId[routeName].pageId}
-          key={routeName}
-        />,
+        <Page path={`/${routeName}`} pageId={pageId} key={routeName} />,
       );
     }
     paths.push(<GenericPage path={`/${routeName}/*`} key={"other"} />);

@@ -33,9 +33,9 @@ import { scaleLinear } from "d3-scale";
 import searchByCell from "../functions/searchByCell";
 import setColors from "../functions/setColors";
 import useResize from "../hooks/useResize";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withTheme from "../hocs/withTheme";
 import { zLegend } from "./zLegend";
 
@@ -43,13 +43,17 @@ const searchByPoint = ({ props, chartProps }) => {
   let { xQuery, fields, ranks, groupBy, navigate, basename, bounds, yBounds } =
     chartProps;
   let { group, featureId, yFeatureId, payload, cat } = props;
-  let { x, y } = payload;
-  let { result, taxonomy } = xQuery;
+  let { rawX: x, rawY: y } = payload;
+  let { query, result, taxonomy } = xQuery;
+  let taxFields = query.split(/\s+AND\s+/).filter((f) => f.startsWith("tax_"));
   let pointQuery;
   if (featureId) {
     pointQuery = `feature_id=${featureId},${yFeatureId} AND ${groupBy}=${group}`;
   } else {
-    pointQuery = `${bounds.field}=${x} AND ${yBounds.field}=${y}`;
+    pointQuery = `${bounds.field} = ${x} AND ${yBounds.field} = ${y}`;
+    if (taxFields.length > 0) {
+      pointQuery += ` AND ${taxFields.join(" AND ")}`;
+    }
   }
   let queryString = qs.stringify({
     query: pointQuery,
@@ -113,7 +117,7 @@ const CustomCircle = (props, chartProps) => {
 const drawHeatRect = ({ props, chartProps, h, w }) => {
   let { z, offset } = props.payload;
   let scale = axisScales[chartProps.zScale]();
-  let domain = [1, chartProps.zDomain[1]];
+  let domain = [0, chartProps.catMax];
   scale.domain(domain).range([2, h]);
   if (chartProps.n == 1) {
     scale.range([0.1, 1]);
@@ -223,20 +227,21 @@ const CustomShape = (props, chartProps, handleClick, ctr) => {
     heatRect = drawHeatRect({ props, chartProps, h, w });
   }
   if ((heatRect || chartProps.selectMode == "bin") && chartProps.active) {
+    let cellInfo = (
+      <CellInfo x={xRange} y={yRange} count={props.payload.count} />
+    );
+    let { highlightColor } = chartProps.colorScheme;
     bgRect = (
       <>
-        <Tooltip
-          title={<CellInfo x={xRange} y={yRange} count={props.payload.count} />}
-          arrow
-        >
-          <Rectangle
+        <Tooltip title={cellInfo} arrow>
+          <rect
             className={activeStyle}
             height={h}
             width={w}
             x={props.cx}
             y={props.cy - h}
             style={chartProps.embedded ? {} : { cursor: "pointer" }}
-            fill={`rgba(125,125,125)`}
+            fill={highlightColor}
             fillOpacity={0}
             onClick={
               chartProps.embedded || !chartProps.active
@@ -264,8 +269,8 @@ const CustomShape = (props, chartProps, handleClick, ctr) => {
 
   return (
     <>
-      {bgRect}
       {heatRect}
+      {bgRect}
       {legendGroup}
     </>
   );
@@ -1022,6 +1027,10 @@ const ReportScatter = ({
       marginHeight =
         maxXLabel + pointSize > 20 ? maxXLabel + pointSize - 20 : 0;
     }
+    const catMax = Object.values(catSums).reduce(
+      (a, b) => (b == Infinity ? 0 : Math.max(a, b.max)),
+      0,
+    );
     chart = (
       <Heatmap
         data={chartData}
@@ -1054,6 +1063,7 @@ const ReportScatter = ({
           zScale: zScale,
           report,
           catSums,
+          catMax,
           pointSize,
           pointRatio: scatter.report.oxford ? 0.5 : 1,
           groupBy,
@@ -1077,6 +1087,7 @@ const ReportScatter = ({
           yTranslations,
           catTranslations,
           catOffsets,
+          colorScheme: colorScheme[theme],
           buckets: heatmaps.buckets,
           yBuckets: heatmaps.yBuckets,
           labels,

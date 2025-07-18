@@ -12,7 +12,7 @@ import Popover from "@mui/material/Popover";
 import { compose } from "recompose";
 import makeStyles from "@mui/styles/makeStyles";
 import withArchive from "../hocs/withArchive";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const useStyles = makeStyles((theme) => ({
   typography: {

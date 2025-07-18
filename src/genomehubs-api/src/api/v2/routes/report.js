@@ -33,7 +33,7 @@ const plurals = (singular) => {
     class: "classes",
     phylum: "phyla",
     kingdom: "kingdoms",
-    superkingdom: "superkingdoms",
+    domain: "domains",
   };
   return ranks[singular.toLowerCase()] || singular;
 };
@@ -139,6 +139,11 @@ export const getMap = async ({
   taxonomy,
   queryString,
   fields,
+  locationField,
+  geoBinResolution,
+  geoBounds,
+  locationSummary,
+  regionField,
   req,
   ...apiParams
 }) => {
@@ -152,6 +157,11 @@ export const getMap = async ({
     result: apiParams.result,
     taxonomy,
     fields,
+    locationField,
+    geoBinResolution,
+    geoBounds,
+    locationSummary,
+    regionField,
     req,
     apiParams,
   });
@@ -173,7 +183,7 @@ export const getMap = async ({
   return {
     status,
     report: {
-      map: report,
+      ...report, // <-- flatten the map data here
       xQuery,
       // yQuery,
       xLabel,

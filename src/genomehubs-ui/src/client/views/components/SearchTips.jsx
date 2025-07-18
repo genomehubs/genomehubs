@@ -15,7 +15,7 @@ import { compose } from "recompose";
 import didYouMean from "didyoumean2";
 import qs from "../functions/qs";
 import setColors from "../functions/setColors";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withSearch from "../hocs/withSearch";
 import withTypes from "../hocs/withTypes";
 
@@ -169,7 +169,7 @@ const SearchTips = ({
       } else if (value && types[key].constraint && types[key].constraint.enum) {
         for (let v of value.split(/\s*,\s*/)) {
           v = v.replace(/['"!]/g, "");
-          if (!types[key].constraint.enum.includes(v)) {
+          if (!types[key].constraint.enum.includes(v.toLowerCase())) {
             let valid_values = didYouMean(
               v,
               types[key].constraint.enum,

@@ -6,7 +6,7 @@ import { compose } from "recompose";
 import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const ReportXPerRank = ({
   perRank,
@@ -56,7 +56,7 @@ const ReportXPerRank = ({
               <span className={boldValueStyle}>{entry.x.toLocaleString()}</span>
               <span>{plural}</span>
             </div>
-          </Tooltip>
+          </Tooltip>,
         );
       }
     });

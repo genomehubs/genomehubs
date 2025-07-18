@@ -195,6 +195,20 @@
             "type": "geo_point",
             "meta": { "description": "Value of type geo_point" }
           },
+          "geo_hex_value": {
+            "type": "keyword",
+            "ignore_above": 64,
+            "normalizer": "lowercase",
+            "meta": {
+              "description": "Value of type geo_hex, stored as keyword"
+            }
+          },
+          "geo_tile_value": {
+            "type": "keyword",
+            "meta": {
+              "description": "Value of type geo_tile, stopred as keyword"
+            }
+          },
           "date_value": {
             "type": "date",
             "meta": { "description": "Value of type date" }
@@ -334,6 +348,36 @@
             "type": "float",
             "meta": { "description": "Standard deviation (numeric types only)" }
           },
+          "hexbin1": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "H3 hexbin value (resolution 1)" }
+          },
+          "hexbin2": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "H3 hexbin value (resolution 2)" }
+          },
+          "hexbin3": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "H3 hexbin value (resolution 3)" }
+          },
+          "hexbin4": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "H3 hexbin value (resolution 4)" }
+          },
+          "hexbin5": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "H3 hexbin value (resolution 5)" }
+          },
+          "hexbin6": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "meta": { "description": "H3 hexbin value (resolution 6)" }
+          },
           "metadata": {
             "type": "flattened",
             "eager_global_ordinals": true,
@@ -383,6 +427,18 @@
               "geo_point_value": {
                 "type": "geo_point",
                 "meta": { "description": "Value of type geo_point" }
+              },
+              "geo_hex_value": {
+                "type": "keyword",
+                "meta": {
+                  "description": "Value of type geo_hex, stored as keyword"
+                }
+              },
+              "geo_tile_value": {
+                "type": "keyword",
+                "meta": {
+                  "description": "Value of type geo_tile, stopred as keyword"
+                }
               },
               "date_value": {
                 "type": "date",

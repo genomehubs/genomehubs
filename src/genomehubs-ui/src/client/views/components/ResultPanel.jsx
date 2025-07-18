@@ -37,7 +37,7 @@ import { formatter } from "../functions/formatter";
 import qs from "../functions/qs";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withSummary from "../hocs/withSummary";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";

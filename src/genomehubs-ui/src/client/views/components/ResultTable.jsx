@@ -51,12 +51,12 @@ import makeStyles from "@mui/styles/makeStyles";
 import { mixColor } from "../functions/mixColor";
 import qs from "../functions/qs";
 import { styled } from "@mui/material/styles";
-import withColors from "../hocs/withColors";
+import withColors from "#hocs/withColors";
 import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";
@@ -71,17 +71,17 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow);
 
-const StyledBadge = withStyles((theme) => ({
-  badge: {
-    right: "50%",
-    top: 6,
-    fontSize: "0.8em",
+const StyledBadge = styled(Badge)(() => ({
+  "& .MuiBadge-badge": {
+    backgroundColor: "#333",
+    color: "#fff",
+    top: 0,
+    right: 0,
+    borderRadius: "10px",
     border: "2px solid white",
-    // padding: "0px 4px",
-    color: "white",
-    backgroundColor: "rgba(0,0,0,0.26)",
+    transform: "translate(98%, -50%)",
   },
-}))(Badge);
+}));
 
 export const useStyles = makeStyles((theme) => ({
   root: {
@@ -585,13 +585,17 @@ const formatCellValue = ({
     field.length > entries.length
   ) {
     let badgeContent = `+${field.length - entries.length}`;
+    let badgeLength = (badgeContent.length + 1) * 8;
     value = (
-      <span style={{ whiteSpace: "nowrap", marginRight: "0.75em" }}>
-        {value}
-        <StyledBadge badgeContent={badgeContent} color={"default"} max={100000}>
-          <span style={{ color: "rgba(0,0,0,0" }}>{badgeContent}</span>
+      <div
+        style={{ paddingRight: `${badgeLength}px`, display: "inline-block" }}
+      >
+        <StyledBadge badgeContent={badgeContent} max={100000}>
+          <span style={{ display: "inline-block", position: "relative" }}>
+            {value}
+          </span>
         </StyledBadge>
-      </span>
+      </div>
     );
   }
   return value;

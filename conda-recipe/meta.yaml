@@ -1,5 +1,5 @@
 {% set name = "genomehubs" %}
-{% set version = "2.10.11" %}
+{% set version = "2.10.21" %}
 
 package:
   name: {{ name }}

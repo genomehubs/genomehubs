@@ -25,7 +25,7 @@ def read(*names, **kwargs):
 
 setup(
     name="genomehubs",  # Required
-    version="2.10.11",
+    version="2.10.21",
     description="GenomeHubs",  # Optional
     long_description="%s\n%s"
     % (
@@ -103,6 +103,7 @@ setup(
         "elasticsearch==8.7",
         "fastjsonschema>=2.15.3",
         "filetype>=1.0.7",
+        "h3>=4.2.2",
         "Pillow>=8.0",
         "pyyaml",
         "sparqlwrapper>=1.4.1",
