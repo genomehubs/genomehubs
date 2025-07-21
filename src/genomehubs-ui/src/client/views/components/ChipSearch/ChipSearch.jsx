@@ -116,6 +116,42 @@ const ChipSearch = ({
     return { uniqueArr, duplicates };
   };
 
+  const setChipKey = (chip) => {
+    const { key, modifier, value } = extractKeyValue(chip);
+    let chipKey;
+    if (key == "tax" && modifier) {
+      chipKey = `tax_${modifier}`;
+    } else if (modifier == "collate") {
+      chipKey = "collate";
+    } else {
+      return; // Skip chips that are not relevant for conflict checking
+    }
+    return chipKey;
+  };
+
+  const findConflictingChips = (chips) => {
+    const conflicts = new Set();
+    const chipMap = new Map();
+    chips.forEach((chip) => {
+      if (chip === "AND") return; // Skip "AND" chips
+      const chipKey = setChipKey(chip);
+
+      if (chipMap.has(chipKey)) {
+        const existingChips = chipMap.get(chipKey);
+        existingChips.push(chip);
+        chipMap.set(chipKey, existingChips);
+      } else {
+        chipMap.set(chipKey, [chip]);
+      }
+    });
+    chipMap.forEach((chips, chipKey) => {
+      if (chips.length > 1) {
+        conflicts.add(chipKey);
+      }
+    });
+    return conflicts;
+  };
+
   let { uniqueArr, duplicates } = removeDuplicates(
     value ? value.split(/\s+AND\s+/i) : [],
   );
@@ -133,6 +169,13 @@ const ChipSearch = ({
   const [duplicateKeys, setDuplicateKeys] = useState(duplicates);
   const [chipsArr, setChipsArr] = useState(chips);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const [conflictingChips, setConflictingChips] = useState(new Set());
+
+  useEffect(() => {
+    if (chips.length > 0) {
+      setConflictingChips(findConflictingChips(chips));
+    }
+  }, [chips]);
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
@@ -236,37 +279,87 @@ const ChipSearch = ({
     handleMenuClose();
   };
 
+  const RenderedChip = ({ chip, index }) => {
+    const { key, operator, value, valueNote, modifier } = extractKeyValue(chip);
+    return (
+      <KeyValueChip
+        key={chip + index} // Use a unique key for each chip
+        keyLabel={key}
+        value={value}
+        valueNote={valueNote}
+        operator={operator}
+        modifier={modifier}
+        // palette={setPalette({ key, modifier })} // Set the palette based on the key
+        onChange={handleChipChange}
+        onDelete={() => handleDelete(chip, index)}
+        style={{
+          marginRight: index === chips.length - 1 ? "-1em" : "1em",
+        }} // Add margin to chips
+        chipIndex={index} // Pass the index to KeyValueChip
+      />
+    );
+  };
+
   const updateChipsArr = (chips) => {
+    let chipGroups = {};
     let newChipsArr = chips.map((chip, index) => {
       if (chip === "AND") {
         return null; // Skip rendering "AND" as a Chip
       } else {
-        // Extract key, operator, and value from the chip
-        const { key, operator, value, valueNote, modifier } =
-          extractKeyValue(chip);
-        return (
-          <KeyValueChip
-            key={chip + index} // Use a unique key for each chip
-            keyLabel={key}
-            value={value}
-            valueNote={valueNote}
-            operator={operator}
-            modifier={modifier}
-            // palette={setPalette({ key, modifier })} // Set the palette based on the key
-            onChange={handleChipChange}
-            onDelete={() => handleDelete(chip, index)}
-            style={{ marginRight: index === chips.length - 1 ? "-1em" : "1em" }} // Add margin to chips
-            chipIndex={index} // Pass the index to KeyValueChip
-          />
-        );
+        // Check if the chip is in the conflict set
+        const chipKey = setChipKey(chip);
+        const isConflicting = conflictingChips.has(chipKey);
+        if (isConflicting) {
+          if (!chipGroups[chipKey]) {
+            chipGroups[chipKey] = { group: index, chips: [], indices: [] };
+          }
+          chipGroups[chipKey].chips.push(chip);
+          chipGroups[chipKey].indices.push(index);
+        } else {
+          return <RenderedChip key={chip + index} chip={chip} index={index} />;
+        }
       }
     });
+    // Handle conflicting chips
+    Object.entries(chipGroups).forEach(
+      ([chipKey, { group, chips, indices }]) => {
+        if (chips.length > 1) {
+          let groupChips = chips.map((c, i) => {
+            return (
+              <RenderedChip
+                key={`${chipKey}-${i}`}
+                chip={c}
+                isConflicting={true}
+                group={group}
+                index={indices[i]}
+              />
+            );
+          });
+          newChipsArr.push(
+            <div
+              key={chipKey}
+              style={{
+                display: "flex",
+                // flexDirection: "column",
+                gap: "0.5em",
+                border: "1px solid red",
+                borderRadius: "1.5em",
+                padding: "0.5em",
+                margin: "0.5em 0",
+              }}
+            >
+              {groupChips}
+            </div>,
+          );
+        }
+      },
+    );
     setChipsArr(newChipsArr);
   };
 
   useEffect(() => {
     updateChipsArr(chips);
-  }, [chips]);
+  }, [chips, conflictingChips]);
 
   const chipsToString = (chips) => {
     return chips.filter((chip) => chip !== "AND").join(" AND ");

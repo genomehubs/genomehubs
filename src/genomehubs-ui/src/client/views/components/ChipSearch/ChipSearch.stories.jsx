@@ -70,3 +70,9 @@ WithNegation.args = {
   value:
     "assembly_span=100000000 AND tax_tree(2759,!33090) AND bioproject=PRJEB40655,!PRJEB40655",
 };
+
+export const WithConflictingChips = Template.bind({});
+WithConflictingChips.args = {
+  value:
+    "assembly_span=100000000 AND tax_tree(2759) AND tax_tree(!3702) AND assembly_span=3G",
+};
