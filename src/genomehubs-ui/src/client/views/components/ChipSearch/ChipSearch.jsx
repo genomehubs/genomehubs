@@ -348,6 +348,8 @@ const ChipSearch = ({
             validKeys={validKeys}
             handleMenuSelect={handleMenuSelect}
             startAdornment={startAdornment}
+            multiline={true}
+            rows={2}
           />
         )}
       </>

@@ -47,20 +47,19 @@ const ValueChips = ({
     setExpanded((prev) => !prev);
   };
 
-  const toggleNegate = ({ chip, negate }) => {
-    const chipIndex = values.indexOf(chip);
-    if (chipIndex !== -1) {
+  const toggleNegate = ({ chip, index, negate }) => {
+    if (index !== -1) {
       const newValues = [...values];
       if (negate) {
-        newValues[chipIndex] = chip.replace(/^!/, "");
+        newValues[index] = chip.replace(/^!/, "");
       } else {
-        newValues[chipIndex] = `!${chip}`;
+        newValues[index] = `!${chip}`;
       }
       handleChange?.(newValues.join(","));
     }
   };
 
-  const setChipIcon = ({ negate, chip }) => {
+  const setChipIcon = ({ negate, chip, index }) => {
     let icon = null;
     if (isNegatable && chip !== null) {
       if (negate) {
@@ -69,7 +68,7 @@ const ValueChips = ({
             onClick={(event) => {
               event.stopPropagation();
               event.preventDefault();
-              toggleNegate({ chip, negate });
+              toggleNegate({ chip, index, negate });
             }}
             sx={{
               opacity: 0.85,
@@ -85,7 +84,7 @@ const ValueChips = ({
             onClick={(event) => {
               event.stopPropagation();
               event.preventDefault();
-              toggleNegate({ chip, negate });
+              toggleNegate({ chip, index, negate });
             }}
             sx={{
               opacity: 0.15,
@@ -183,7 +182,7 @@ const ValueChips = ({
             <Chip
               key={index}
               label={chipLabel}
-              icon={setChipIcon({ negate, chip })}
+              icon={setChipIcon({ negate, chip, index })}
               {...(chip !== null && { onDelete: () => handleDelete(chip) })}
               size="small"
               sx={chipStyle}
@@ -253,7 +252,7 @@ const ValueChips = ({
                 <Chip
                   key={index}
                   label={chipLabel}
-                  icon={setChipIcon({ negate, chip })}
+                  icon={setChipIcon({ negate, chip, index })}
                   {...(chip !== null && { onDelete: () => handleDelete(chip) })}
                   size="small"
                   sx={{

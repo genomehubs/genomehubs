@@ -163,6 +163,9 @@ export const typesToValidation = () => {
       return { valid: true };
     }
     let { constraint = {}, processed_type = "" } = types[key] || {};
+    if (["count", "length"].includes(modifier)) {
+      processed_type = "integer";
+    }
     if (["float", "integer", "date"].includes(processed_type)) {
       return validateNumber({ value, processed_type, constraint });
     } else if (processed_type.endsWith("keyword")) {
@@ -205,8 +208,7 @@ export const typesToValidation = () => {
     if (
       processed_type === "integer" ||
       processed_type === "float" ||
-      processed_type === "date" ||
-      processed_type === "keyword"
+      processed_type === "date"
     ) {
       return false;
     }
@@ -227,7 +229,9 @@ export const typesToValidation = () => {
     if (
       processed_type === "integer" ||
       processed_type === "float" ||
-      processed_type === "date"
+      processed_type === "date" ||
+      modifier === "length" ||
+      modifier === "count"
     ) {
       return false;
     }
