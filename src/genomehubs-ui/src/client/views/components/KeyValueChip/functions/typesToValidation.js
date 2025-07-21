@@ -11,6 +11,12 @@ const validateNumber = ({ value, processed_type, constraint }) => {
     if (processed_type === "float" && typeof processedValue !== "number") {
       return { valid: false, reason: `${v} is not a number` };
     }
+    if (processed_type === "date" && isNaN(Date.parse(processedValue))) {
+      return {
+        valid: false,
+        reason: `${v} is not a valid date, use yyyy-mm-dd format`,
+      };
+    }
     if (constraint.hasOwnProperty("min") && processedValue < constraint.min) {
       return { valid: false, reason: `${v} is less than ${constraint.min}` };
     }
@@ -157,7 +163,7 @@ export const typesToValidation = () => {
       return { valid: true };
     }
     let { constraint = {}, processed_type = "" } = types[key] || {};
-    if (["float", "integer"].includes(processed_type)) {
+    if (["float", "integer", "date"].includes(processed_type)) {
       return validateNumber({ value, processed_type, constraint });
     } else if (processed_type.endsWith("keyword")) {
       return validateKeyword({
@@ -199,6 +205,7 @@ export const typesToValidation = () => {
     if (
       processed_type === "integer" ||
       processed_type === "float" ||
+      processed_type === "date" ||
       processed_type === "keyword"
     ) {
       return false;
@@ -217,7 +224,11 @@ export const typesToValidation = () => {
       return false;
     }
     const { processed_type } = types[key] || {};
-    if (processed_type === "integer" || processed_type === "float") {
+    if (
+      processed_type === "integer" ||
+      processed_type === "float" ||
+      processed_type === "date"
+    ) {
       return false;
     }
     return true;
