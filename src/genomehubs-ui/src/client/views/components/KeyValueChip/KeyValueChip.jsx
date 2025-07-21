@@ -93,6 +93,7 @@ const KeyValueChip = ({
   onChange,
   onDelete,
   palette = "blue",
+  forcePalette = false,
   chipIndex = 0,
 }) => {
   const validation = typesToValidation();
@@ -338,7 +339,9 @@ const KeyValueChip = ({
         modifier: currentModifier,
       });
 
-      if (!isValid) {
+      if (forcePalette) {
+        setColors(colorsFromPalette(palette));
+      } else if (!isValid) {
         setColors(colorsFromPalette("orange"));
       } else {
         setColors(colorsFromPalette(chipColor || palette));
@@ -462,9 +465,10 @@ const KeyValueChip = ({
                         position: "absolute",
 
                         right: "1em",
-                        bottom: 0,
+                        bottom: "0.75em",
                         display: "block",
                         overflow: "visible",
+                        transform: "rotate(180deg)",
                       }}
                     >
                       <ValidationErrorTooltip

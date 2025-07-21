@@ -62,14 +62,14 @@ const extractKeyValue = (chip) => {
 };
 
 const ChipSearch = ({
-  initialChips = [],
-  initialInput = "",
+  value = "",
   placeholder = "Enter key=value, function(variable), or AND",
+  showText = false,
   compact = false,
 }) => {
   const validation = typesToValidation();
   const validKeys = validation.validKeys();
-  const [showChips, setShowChips] = useState(true);
+  const [showChips, setShowChips] = useState(!showText);
   const removeDuplicates = (arr) => {
     let uniqueArr = [];
     let duplicates = new Set();
@@ -116,9 +116,13 @@ const ChipSearch = ({
     return { uniqueArr, duplicates };
   };
 
-  const [inputValue, setInputValue] = useState(initialInput);
-  let { uniqueArr, duplicates } = removeDuplicates(initialChips);
-  const [chips, setChips] = useState(uniqueArr);
+  let { uniqueArr, duplicates } = removeDuplicates(
+    value ? value.split(/\s+AND\s+/i) : [],
+  );
+  const [inputValue, setInputValue] = useState(
+    showText ? uniqueArr.join(" AND ") : "",
+  );
+  const [chips, setChips] = useState(showText ? [] : uniqueArr);
   const [open, setOpen] = useState(false);
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -157,7 +161,11 @@ const ChipSearch = ({
   };
 
   const handleDelete = (chipToDelete, index) => {
-    setChips((prevChips) => prevChips.splice(index, 1));
+    setChips((prevChips) => {
+      let newChips = [...prevChips];
+      newChips.splice(index, 1);
+      return newChips;
+    });
   };
 
   const chipToString = (chip) => {
@@ -246,7 +254,7 @@ const ChipSearch = ({
             modifier={modifier}
             // palette={setPalette({ key, modifier })} // Set the palette based on the key
             onChange={handleChipChange}
-            onDelete={() => handleDelete(chip)}
+            onDelete={() => handleDelete(chip, index)}
             style={{ marginRight: index === chips.length - 1 ? "-1em" : "1em" }} // Add margin to chips
             chipIndex={index} // Pass the index to KeyValueChip
           />
