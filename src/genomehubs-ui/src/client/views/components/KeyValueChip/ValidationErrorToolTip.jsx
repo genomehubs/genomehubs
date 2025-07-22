@@ -13,6 +13,7 @@ export const ValidationErrorTooltip = ({ validationError, textColor }) => {
         style={{
           marginLeft: "1px",
           color: textColor,
+          filter: "drop-shadow(0 0 4px rgba(0,0,0,0.5))",
         }}
       >
         <WarningIcon

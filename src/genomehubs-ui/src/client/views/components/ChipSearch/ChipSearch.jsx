@@ -14,6 +14,8 @@ import KeyValueChip, {
 import React, { useEffect, useState } from "react";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import ErrorIcon from "@mui/icons-material/ErrorOutline";
+import InfoIcon from "@mui/icons-material/Info";
 import KeyboardArrowLeftIcon from "@mui/icons-material/SpaceDashboard";
 import KeyboardArrowRightIcon from "@mui/icons-material/TextFields";
 import Tooltip from "../Tooltip";
@@ -125,7 +127,7 @@ const ChipSearch = ({
     } else if (modifier == "collate") {
       chipKey = "collate";
     } else {
-      if (modifier) {
+      if (modifier && modifier !== "value") {
         chipKey = `${modifier}(${key})`;
       } else {
         chipKey = key;
@@ -343,11 +345,30 @@ const ChipSearch = ({
             key,
             modifier,
           });
+          let message;
+          let suggestion;
+          let status = "info";
+          if (!multipleValuesAllowed) {
+            message = "Multiple chips are not allowed";
+            suggestion = "Delete one or more chips or change the operator";
+            status = "error";
+          } else if (key == "tax") {
+            message = "Multiple chips are not allowed";
+            suggestion = "Use comma separated values for OR";
+            status = "error";
+          } else if (modifier == "collate") {
+            message = "Multiple chips are not allowed";
+            suggestion = "Delete one or more chips";
+            status = "error";
+          } else {
+            message = "Values will be combined with AND";
+            suggestion = "Use comma separated values for OR";
+          }
           const { color } = validation.validateKey({
             key,
           });
           const chipColor = getChipColor(
-            multipleValuesAllowed ? color : "orange",
+            status === "error" ? "orange" : color,
             "backgroundColor",
           );
           let groupChips = chips.map((c, i) => {
@@ -358,26 +379,20 @@ const ChipSearch = ({
                 isConflicting={true}
                 group={group}
                 index={indices[i]}
-                palette={multipleValuesAllowed ? undefined : "orange"}
-                forcePalette={!multipleValuesAllowed} // Force palette if multiple values are not allowed
+                palette={status === "error" ? "orange" : undefined}
+                forcePalette={status === "error"} // Force palette if multiple values are not allowed
               />
             );
           });
           newChipsArr.push(
-            <div
+            <ChipGroup
               key={chipKey}
-              style={{
-                display: "flex",
-                // flexDirection: "column",
-                gap: "0.5em",
-                border: `0.2em solid ${chipColor}`,
-                borderRadius: "1.5em",
-                padding: "0.5em",
-                margin: "0.125em 0",
-              }}
-            >
-              {groupChips}
-            </div>,
+              chipColor={chipColor}
+              groupChips={groupChips}
+              message={message}
+              suggestion={suggestion}
+              status={status}
+            />,
           );
         }
       },
@@ -552,5 +567,115 @@ const AddField = ({
         handleMenuSelect={handleMenuSelect}
       />
     </>
+  );
+};
+const ChipGroup = ({
+  chipKey,
+  chipColor,
+  groupChips,
+  status,
+  message,
+  suggestion,
+}) => {
+  return (
+    <div
+      key={chipKey}
+      style={{
+        display: "flex",
+        gap: "0.5em",
+        border: `0.2em solid ${chipColor}`,
+        borderRadius: "1.5em",
+        padding: "0.5em",
+        margin: "0.125em 0",
+        position: "relative",
+      }}
+    >
+      {/* Render the group chips inside the colored border */}
+      {groupChips}
+      {/* Optional icon to indicate the group */}
+      {message && status && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            color: chipColor,
+            position: "absolute",
+            top: "-0.5em",
+            right: "-1.25em",
+          }}
+        >
+          <Tooltip
+            title={
+              <div>
+                <div>{message}</div>
+                <i>{suggestion}</i>
+              </div>
+            }
+            placement="top"
+          >
+            <span>
+              {status === "info" ? (
+                <InfoIcon
+                  sx={{
+                    fontSize: "1.5em",
+                    marginRight: "0.5em",
+                    backgroundColor: "white",
+                    borderRadius: "50%",
+                  }}
+                />
+              ) : (
+                <ErrorIcon
+                  sx={{
+                    fontSize: "1.5em",
+                    marginRight: "0.5em",
+                    backgroundColor: "white",
+                    borderRadius: "50%",
+                  }}
+                />
+              )}
+            </span>
+          </Tooltip>
+        </div>
+      )}
+      {message && status === "error" && (
+        <div
+          style={{
+            position: "absolute",
+            width: "calc(100% - 3em)",
+            left: "1.5em",
+            top: "calc(100% - 0.4em)",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            style={{
+              color: chipColor,
+              textAlign: "center",
+              maxWidth: "100%",
+              padding: "0 0.5em",
+              fontSize: "0.75em",
+              backgroundColor: "#ffffffdd",
+              maxHeight: "1.5em",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              borderRadius: "0.75em",
+              display: "inline-block",
+            }}
+          >
+            <ErrorIcon
+              sx={{
+                fontSize: "1.2em",
+                margin: "-0.25em 0.125em 0 0",
+                verticalAlign: "middle",
+              }}
+            />
+            {message}
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
