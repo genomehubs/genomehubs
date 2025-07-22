@@ -17,6 +17,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import KeyboardArrowLeftIcon from "@mui/icons-material/SpaceDashboard";
 import KeyboardArrowRightIcon from "@mui/icons-material/TextFields";
 import Tooltip from "../Tooltip";
+import { getChipColor } from "../KeyValueChip/functions/chipPalettes";
 
 const extractKeyValue = (chip) => {
   let modifier;
@@ -117,14 +118,21 @@ const ChipSearch = ({
   };
 
   const setChipKey = (chip) => {
-    const { key, modifier, value } = extractKeyValue(chip);
+    const { key, modifier, operator, value } = extractKeyValue(chip);
     let chipKey;
     if (key == "tax" && modifier) {
       chipKey = `tax_${modifier}`;
     } else if (modifier == "collate") {
       chipKey = "collate";
     } else {
-      return; // Skip chips that are not relevant for conflict checking
+      if (modifier) {
+        chipKey = `${modifier}(${key})`;
+      } else {
+        chipKey = key;
+      }
+      if (value !== "" && typeof value !== "undefined" && value !== null) {
+        chipKey += `${operator || "="}`;
+      }
     }
     return chipKey;
   };
@@ -133,17 +141,20 @@ const ChipSearch = ({
     const conflicts = new Set();
     const chipMap = new Map();
     chips.forEach((chip) => {
-      if (chip === "AND") return; // Skip "AND" chips
+      if (chip === "AND") {
+        return; // Skip "AND" chips
+      }
       const chipKey = setChipKey(chip);
 
       if (chipMap.has(chipKey)) {
         const existingChips = chipMap.get(chipKey);
         existingChips.push(chip);
         chipMap.set(chipKey, existingChips);
-      } else {
+      } else if (chipKey) {
         chipMap.set(chipKey, [chip]);
       }
     });
+    console.log({ chipMap });
     chipMap.forEach((chips, chipKey) => {
       if (chips.length > 1) {
         conflicts.add(chipKey);
@@ -279,7 +290,7 @@ const ChipSearch = ({
     handleMenuClose();
   };
 
-  const RenderedChip = ({ chip, index }) => {
+  const RenderedChip = ({ chip, index, ...props }) => {
     const { key, operator, value, valueNote, modifier } = extractKeyValue(chip);
     return (
       <KeyValueChip
@@ -296,11 +307,13 @@ const ChipSearch = ({
           marginRight: index === chips.length - 1 ? "-1em" : "1em",
         }} // Add margin to chips
         chipIndex={index} // Pass the index to KeyValueChip
+        {...props} // Spread any additional props
       />
     );
   };
 
   const updateChipsArr = (chips) => {
+    console.log(conflictingChips);
     let chipGroups = {};
     let newChipsArr = chips.map((chip, index) => {
       if (chip === "AND") {
@@ -308,6 +321,7 @@ const ChipSearch = ({
       } else {
         // Check if the chip is in the conflict set
         const chipKey = setChipKey(chip);
+
         const isConflicting = conflictingChips.has(chipKey);
         if (isConflicting) {
           if (!chipGroups[chipKey]) {
@@ -324,6 +338,18 @@ const ChipSearch = ({
     Object.entries(chipGroups).forEach(
       ([chipKey, { group, chips, indices }]) => {
         if (chips.length > 1) {
+          const { key, modifier } = extractKeyValue(chips[0]);
+          const multipleValuesAllowed = validation.allowMultipleValues({
+            key,
+            modifier,
+          });
+          const { color } = validation.validateKey({
+            key,
+          });
+          const chipColor = getChipColor(
+            multipleValuesAllowed ? color : "orange",
+            "backgroundColor",
+          );
           let groupChips = chips.map((c, i) => {
             return (
               <RenderedChip
@@ -332,6 +358,8 @@ const ChipSearch = ({
                 isConflicting={true}
                 group={group}
                 index={indices[i]}
+                palette={multipleValuesAllowed ? undefined : "orange"}
+                forcePalette={!multipleValuesAllowed} // Force palette if multiple values are not allowed
               />
             );
           });
@@ -342,10 +370,10 @@ const ChipSearch = ({
                 display: "flex",
                 // flexDirection: "column",
                 gap: "0.5em",
-                border: "1px solid red",
+                border: `0.2em solid ${chipColor}`,
                 borderRadius: "1.5em",
                 padding: "0.5em",
-                margin: "0.5em 0",
+                margin: "0.125em 0",
               }}
             >
               {groupChips}

@@ -24,65 +24,9 @@ import Tooltip from "../Tooltip";
 import Typography from "@mui/material/Typography";
 import ValidationErrorTooltip from "./ValidationErrorToolTip";
 import formatValue from "./functions/formatValue";
+import { getChipPalette } from "./functions/chipPalettes";
 import parseValue from "./functions/parseValue";
 import typesToValidation from "./functions/typesToValidation";
-
-const chipPalettes = {
-  blue: {
-    dark: "#185b89",
-    light: "#a6cee3",
-    background: "#1f78b4",
-    text: "#ffffff",
-  },
-  green: {
-    dark: "#277821",
-    light: "#b2df8a",
-    background: "#33a02c",
-    text: "#ffffff",
-  },
-  red: {
-    dark: "#b51517",
-    light: "#fb9a99",
-    background: "#e31a1c",
-    text: "#ffffff",
-  },
-  orange: {
-    dark: "#cc6600",
-    light: "#fdbf6f",
-    background: "#ff7f00",
-    text: "#ffffff",
-  },
-  purple: {
-    dark: "#512f76",
-    light: "#cab2d6",
-    background: "#6a3d9a",
-    text: "#ffffff",
-  },
-  yellow: {
-    dark: "#87431f",
-    light: "#ffff99",
-    background: "#b15928",
-    text: "#000000",
-  },
-  grey: {
-    dark: "#636363",
-    light: "#bdbdbd",
-    background: "#969696",
-    text: "#ffffff",
-  },
-  black: {
-    dark: "#000000",
-    light: "#bdbdbd",
-    background: "#000000",
-    text: "#ffffff",
-  },
-  white: {
-    dark: "#ffffff",
-    light: "#bdbdbd",
-    background: "#ffffff",
-    text: "#000000",
-  },
-};
 
 const KeyValueChip = ({
   keyLabel,
@@ -98,27 +42,6 @@ const KeyValueChip = ({
 }) => {
   const validation = typesToValidation();
   const chipId = `${keyLabel}-${operator}-${value}-${modifier}`;
-
-  const colorsFromPalette = (palette) => {
-    // Check if the palette exists in the chipPalettes object
-    if (chipPalettes[palette]) {
-      return {
-        darkColor: chipPalettes[palette].dark,
-        lightColor: chipPalettes[palette].light,
-        backgroundColor: chipPalettes[palette].background,
-        textColor: chipPalettes[palette].text,
-      };
-    } else {
-      // If the palette doesn't exist, return default colors
-      return {
-        darkColor: chipPalettes["blue"].dark,
-        lightColor: chipPalettes["blue"].light,
-        backgroundColor: chipPalettes["blue"].background,
-        textColor: chipPalettes["blue"].text,
-      };
-    }
-  };
-
   const [anchorElSymbol, setAnchorElSymbol] = useState(null);
   const [anchorElModifier, setAnchorElModifier] = useState(null);
   const [anchorElValue, setAnchorElValue] = useState(null);
@@ -141,7 +64,7 @@ const KeyValueChip = ({
     ...validation.validOperators({ key: currentKey, modifier }),
   ]);
   const [{ darkColor, lightColor, backgroundColor, textColor }, setColors] =
-    useState(colorsFromPalette(palette));
+    useState(getChipPalette(palette));
   const [validationError, setValidationError] = useState(false);
 
   const handleSymbolClick = (event) => {
@@ -340,11 +263,11 @@ const KeyValueChip = ({
       });
 
       if (forcePalette) {
-        setColors(colorsFromPalette(palette));
+        setColors(getChipPalette(palette));
       } else if (!isValid) {
-        setColors(colorsFromPalette("orange"));
+        setColors(getChipPalette("orange"));
       } else {
-        setColors(colorsFromPalette(chipColor || palette));
+        setColors(getChipPalette(chipColor || palette));
       }
     }
   }, [
