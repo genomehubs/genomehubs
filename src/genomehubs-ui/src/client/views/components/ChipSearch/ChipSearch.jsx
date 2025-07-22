@@ -14,8 +14,10 @@ import KeyValueChip, {
 import React, { useEffect, useState } from "react";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import ErrorIcon from "@mui/icons-material/ErrorOutline";
-import InfoIcon from "@mui/icons-material/Info";
+import ErrorIcon from "@mui/icons-material/Error";
+import InfoIcon from "@mui/icons-material/Help";
+import JoinFullRoundedIcon from "@mui/icons-material/JoinFullRounded";
+import JoinInnerRoundedIcon from "@mui/icons-material/JoinInnerRounded";
 import KeyboardArrowLeftIcon from "@mui/icons-material/SpaceDashboard";
 import KeyboardArrowRightIcon from "@mui/icons-material/TextFields";
 import Tooltip from "../Tooltip";
@@ -69,6 +71,7 @@ const ChipSearch = ({
   placeholder = "Enter key=value, function(variable), or AND",
   showText = false,
   compact = false,
+  backgroundColor = "#ffffff",
 }) => {
   const validation = typesToValidation();
   const validKeys = validation.validKeys();
@@ -85,7 +88,7 @@ const ChipSearch = ({
         let sortedValues = (value || "")
           .split(",")
           .map((v) => parseValue(v.trim()))
-          .sort((a, b) => a.localeCompare(b))
+          .sort((a, b) => `${a}`.localeCompare(`${b}`))
           .join(",");
         let lcItem = `${modifier || "value".toLowerCase()}(${key.toLowerCase()})${operator || "=".toLowerCase()}${sortedValues.toLowerCase()}`;
         if (!seen.has(lcItem)) {
@@ -156,7 +159,6 @@ const ChipSearch = ({
         chipMap.set(chipKey, [chip]);
       }
     });
-    console.log({ chipMap });
     chipMap.forEach((chips, chipKey) => {
       if (chips.length > 1) {
         conflicts.add(chipKey);
@@ -315,7 +317,6 @@ const ChipSearch = ({
   };
 
   const updateChipsArr = (chips) => {
-    console.log(conflictingChips);
     let chipGroups = {};
     let newChipsArr = chips.map((chip, index) => {
       if (chip === "AND") {
@@ -340,7 +341,9 @@ const ChipSearch = ({
     Object.entries(chipGroups).forEach(
       ([chipKey, { group, chips, indices }]) => {
         if (chips.length > 1) {
-          const { key, modifier } = extractKeyValue(chips[0]);
+          const { key, modifier, value, valueNote, operator } = extractKeyValue(
+            chips[0],
+          );
           const multipleValuesAllowed = validation.allowMultipleValues({
             key,
             modifier,
@@ -348,13 +351,16 @@ const ChipSearch = ({
           let message;
           let suggestion;
           let status = "info";
+          let combinable = false;
           if (!multipleValuesAllowed) {
             message = "Multiple chips are not allowed";
             suggestion = "Delete one or more chips or change the operator";
             status = "error";
           } else if (key == "tax") {
             message = "Multiple chips are not allowed";
-            suggestion = "Use comma separated values for OR";
+            suggestion =
+              "Use comma separated values in a single chip for OR (click to apply)";
+            combinable = true;
             status = "error";
           } else if (modifier == "collate") {
             message = "Multiple chips are not allowed";
@@ -362,7 +368,9 @@ const ChipSearch = ({
             status = "error";
           } else {
             message = "Values will be combined with AND";
-            suggestion = "Use comma separated values for OR";
+            suggestion =
+              "Use comma separated values in a single chip for OR (click to apply)";
+            combinable = true;
           }
           const { color } = validation.validateKey({
             key,
@@ -371,6 +379,37 @@ const ChipSearch = ({
             status === "error" ? "orange" : color,
             "backgroundColor",
           );
+          let handleIconClick = null;
+          if (combinable) {
+            handleIconClick = () => {
+              const combinedValue = chips
+                .map((c) => {
+                  let { value: v } = extractKeyValue(c);
+                  return v;
+                })
+                .join(",");
+
+              setChips((prevChips) => {
+                const newChips = [...prevChips];
+                // Replace the first chip with the combined value
+                newChips[indices[0]] = chipToString({
+                  key,
+                  value: combinedValue,
+                  modifier: modifier || "value",
+                  operator,
+                  valueNote,
+                });
+                // Remove the rest of the chips in reverse order to avoid index shifting
+                indices
+                  .slice(1)
+                  .sort((a, b) => b - a)
+                  .forEach((index) => {
+                    newChips.splice(index, 1);
+                  });
+                return newChips;
+              });
+            };
+          }
           let groupChips = chips.map((c, i) => {
             return (
               <RenderedChip
@@ -392,6 +431,8 @@ const ChipSearch = ({
               message={message}
               suggestion={suggestion}
               status={status}
+              backgroundColor={backgroundColor}
+              handleIconClick={handleIconClick}
             />,
           );
         }
@@ -576,69 +617,107 @@ const ChipGroup = ({
   status,
   message,
   suggestion,
+  backgroundColor,
+  handleIconClick,
 }) => {
-  return (
-    <div
-      key={chipKey}
-      style={{
-        display: "flex",
-        gap: "0.5em",
-        border: `0.2em solid ${chipColor}`,
-        borderRadius: "1.5em",
-        padding: "0.5em",
-        margin: "0.125em 0",
-        position: "relative",
+  const [hovered, setHovered] = React.useState(false);
+
+  // Use a ref to track mouse and focus events more robustly
+  const groupRef = React.useRef(null);
+
+  // Handle both mouse and focus events for better robustness
+  const handlePointerEnter = () => setHovered(true);
+  const handlePointerLeave = (e) => {
+    // Only set hovered to false if the pointer actually leaves the group
+    if (groupRef.current && !groupRef.current.contains(e.relatedTarget)) {
+      setHovered(false);
+    }
+  };
+  const handleFocus = () => setHovered(true);
+  const handleBlur = (e) => {
+    // Only set hovered to false if focus moves outside the group
+    if (groupRef.current && !groupRef.current.contains(e.relatedTarget)) {
+      setHovered(false);
+    }
+  };
+
+  const joinIcon = hovered ? (
+    <JoinFullRoundedIcon
+      sx={{
+        fontSize: "1.5rem",
+        margin: "-0.2rem 0",
+        cursor: "pointer",
       }}
-    >
-      {/* Render the group chips inside the colored border */}
-      {groupChips}
-      {/* Optional icon to indicate the group */}
-      {message && status && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            color: chipColor,
-            position: "absolute",
-            top: "-0.5em",
-            right: "-1.25em",
-          }}
+    />
+  ) : (
+    <JoinInnerRoundedIcon
+      sx={{
+        fontSize: "1.5rem",
+        margin: "-0.2rem 0",
+        cursor: "pointer",
+      }}
+    />
+  );
+
+  let baseIcon;
+  if (message) {
+    if (status == "error") {
+      baseIcon = (
+        <Tooltip
+          title={
+            <div>
+              <div>{message}</div>
+              <i>{suggestion}</i>
+            </div>
+          }
+          arrow
+          placement="bottom"
         >
-          <Tooltip
-            title={
-              <div>
-                <div>{message}</div>
-                <i>{suggestion}</i>
-              </div>
-            }
-            placement="top"
-          >
-            <span>
-              {status === "info" ? (
-                <InfoIcon
-                  sx={{
-                    fontSize: "1.5em",
-                    marginRight: "0.5em",
-                    backgroundColor: "white",
-                    borderRadius: "50%",
-                  }}
-                />
-              ) : (
-                <ErrorIcon
-                  sx={{
-                    fontSize: "1.5em",
-                    marginRight: "0.5em",
-                    backgroundColor: "white",
-                    borderRadius: "50%",
-                  }}
-                />
-              )}
-            </span>
-          </Tooltip>
-        </div>
-      )}
-      {message && status === "error" && (
+          <span>
+            <ErrorIcon
+              sx={{
+                fontSize: "1.2rem",
+                margin: "0 0.125rem 0 0",
+                verticalAlign: "middle",
+              }}
+            />
+            {message}
+          </span>
+        </Tooltip>
+      );
+    } else {
+      const joinIcon = hovered ? (
+        <JoinFullRoundedIcon
+          sx={{
+            fontSize: "1.5rem",
+            margin: "-0.2rem 0",
+          }}
+        />
+      ) : (
+        <JoinInnerRoundedIcon
+          sx={{
+            fontSize: "1.5rem",
+            margin: "-0.2rem 0",
+          }}
+        />
+      );
+      baseIcon = (
+        <Tooltip
+          title={
+            <div>
+              <div>{message}</div>
+              <i>{suggestion}</i>
+            </div>
+          }
+          arrow
+          placement="bottom"
+        >
+          {joinIcon}
+        </Tooltip>
+      );
+    }
+    if (baseIcon) {
+      baseIcon = (
         <div
           style={{
             position: "absolute",
@@ -654,28 +733,53 @@ const ChipGroup = ({
               color: chipColor,
               textAlign: "center",
               maxWidth: "100%",
-              padding: "0 0.5em",
-              fontSize: "0.75em",
-              backgroundColor: "#ffffffdd",
-              maxHeight: "1.5em",
+              padding: "0 0.5rem",
+              fontSize: "0.75rem",
+              backgroundColor,
+              maxHeight: "1.5rem",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
               overflow: "hidden",
-              borderRadius: "0.75em",
-              display: "inline-block",
+              borderRadius: "0.75rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
             }}
+            ref={groupRef}
+            onMouseEnter={handlePointerEnter}
+            onMouseLeave={handlePointerLeave}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onClick={handleIconClick}
           >
-            <ErrorIcon
-              sx={{
-                fontSize: "1.2em",
-                margin: "-0.25em 0.125em 0 0",
-                verticalAlign: "middle",
-              }}
-            />
-            {message}
+            {baseIcon}
           </div>
         </div>
-      )}
+      );
+    }
+  }
+
+  return (
+    <div
+      key={chipKey}
+      tabIndex={0}
+      style={{
+        display: "flex",
+        gap: "0.5em",
+        border: `0.2em solid ${chipColor}`,
+        borderRadius: "1.5em",
+        padding: "0.5em",
+        margin: "0.125em 0",
+        position: "relative",
+        outline: hovered ? `2px solid ${chipColor}` : "none",
+      }}
+    >
+      {/* Render the group chips inside the colored border */}
+      {groupChips}
+      {/* Optional icon to indicate the group */}
+      {/* {cornerIcon} */}
+      {baseIcon}
     </div>
   );
 };
