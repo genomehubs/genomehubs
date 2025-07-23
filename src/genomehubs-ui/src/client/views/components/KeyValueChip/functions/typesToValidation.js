@@ -159,22 +159,27 @@ export const typesToValidation = () => {
     return { valid: false, reason: "not a valid key" };
   };
   const validateValue = ({ key, value, modifier }) => {
-    if (value === null || value === undefined || value === "") {
-      return { valid: true };
-    }
     let { constraint = {}, processed_type = "" } = types[key] || {};
+    if (value === null || value === undefined || value === "") {
+      return { valid: true, processed_type };
+    }
     if (["count", "length"].includes(modifier)) {
       processed_type = "integer";
     }
+    let obj = { valid: true };
     if (["float", "integer", "date"].includes(processed_type)) {
-      return validateNumber({ value, processed_type, constraint });
+      obj = validateNumber({ value, processed_type, constraint });
     } else if (processed_type.endsWith("keyword")) {
-      return validateKeyword({
+      obj = validateKeyword({
         value,
         validValues: validValues({ key, modifier }),
       });
     }
-    return { valid: true };
+    return {
+      valid: obj.valid,
+      processed_type,
+      reason: obj.valid ? null : obj.reason,
+    };
   };
   const validateModifier = ({ key, modifier }) => {
     if (modifier === "collate") {

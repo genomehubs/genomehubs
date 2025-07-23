@@ -418,7 +418,7 @@ const ChipSearch = ({
                 isConflicting={true}
                 group={group}
                 index={indices[i]}
-                palette={status === "error" ? "orange" : undefined}
+                palette={status === "error" ? "orange" : "blue"}
                 forcePalette={status === "error"} // Force palette if multiple values are not allowed
               />
             );
