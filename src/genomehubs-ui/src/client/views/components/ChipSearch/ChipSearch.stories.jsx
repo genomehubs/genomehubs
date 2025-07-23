@@ -74,5 +74,5 @@ WithNegation.args = {
 export const WithConflictingChips = Template.bind({});
 WithConflictingChips.args = {
   value:
-    "tax_tree(2759) AND tax_tree(!3702) AND assembly_span=100000000 AND assembly_span=3G AND assembly_span AND assembly_level AND bioproject=123 AND bioproject=456",
+    "tax_tree(2759) AND tax_tree(!3702) AND assembly_span=100000000 AND assembly_span=3G AND assembly_span AND assembly_level=chromosome AND assembly_level=scaffold AND bioproject=123 AND bioproject=456 AND chromosome_number = 3, 4",
 };

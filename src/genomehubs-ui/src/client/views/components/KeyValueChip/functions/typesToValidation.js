@@ -213,7 +213,8 @@ export const typesToValidation = () => {
     if (
       processed_type === "integer" ||
       processed_type === "float" ||
-      processed_type === "date"
+      processed_type === "date" ||
+      processed_type === "ordered_keyword"
     ) {
       return false;
     }

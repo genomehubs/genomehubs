@@ -641,28 +641,11 @@ const ChipGroup = ({
     }
   };
 
-  const joinIcon = hovered ? (
-    <JoinFullRoundedIcon
-      sx={{
-        fontSize: "1.5rem",
-        margin: "-0.2rem 0",
-        cursor: "pointer",
-      }}
-    />
-  ) : (
-    <JoinInnerRoundedIcon
-      sx={{
-        fontSize: "1.5rem",
-        margin: "-0.2rem 0",
-        cursor: "pointer",
-      }}
-    />
-  );
-
+  let topIcon;
   let baseIcon;
   if (message) {
     if (status == "error") {
-      baseIcon = (
+      topIcon = (
         <Tooltip
           title={
             <div>
@@ -685,7 +668,8 @@ const ChipGroup = ({
           </span>
         </Tooltip>
       );
-    } else {
+    }
+    if (handleIconClick) {
       const joinIcon = hovered ? (
         <JoinFullRoundedIcon
           sx={{
@@ -714,6 +698,49 @@ const ChipGroup = ({
         >
           {joinIcon}
         </Tooltip>
+      );
+    }
+
+    if (topIcon) {
+      topIcon = (
+        <div
+          style={{
+            position: "absolute",
+            width: "calc(100% - 3em)",
+            left: "1.5em",
+            top: "-0.75em",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            style={{
+              color: chipColor,
+              textAlign: "center",
+              maxWidth: "100%",
+              padding: "0 0.5rem",
+              fontSize: "0.75rem",
+              backgroundColor,
+              maxHeight: "1.5rem",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              borderRadius: "0.75rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+            // ref={groupRef}
+            // onMouseEnter={handlePointerEnter}
+            // onMouseLeave={handlePointerLeave}
+            // onFocus={handleFocus}
+            // onBlur={handleBlur}
+            // onClick={handleIconClick}
+          >
+            {topIcon}
+          </div>
+        </div>
       );
     }
     if (baseIcon) {
@@ -779,6 +806,7 @@ const ChipGroup = ({
       {groupChips}
       {/* Optional icon to indicate the group */}
       {/* {cornerIcon} */}
+      {topIcon}
       {baseIcon}
     </div>
   );
