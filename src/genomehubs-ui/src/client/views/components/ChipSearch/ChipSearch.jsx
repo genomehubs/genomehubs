@@ -265,8 +265,17 @@ const ChipSearch = ({
 
   const handleChipChange = (updatedChip, index) => {
     setChips((prevChips) => {
-      prevChips[index] = chipToString(updatedChip);
-      return [...prevChips];
+      const newChips = [...prevChips];
+      let { key, operator, value, modifier, palette } = updatedChip;
+      if (Array.isArray(value)) {
+        const extraChips = value.map((v) => {
+          return chipToString({ key, operator, value: v, modifier, palette });
+        });
+        newChips.splice(index, 1, ...extraChips);
+      } else {
+        newChips[index] = chipToString(updatedChip);
+      }
+      return newChips;
     });
   };
 
@@ -792,7 +801,10 @@ const ChipGroup = ({
       key={chipKey}
       tabIndex={0}
       style={{
-        display: "flex",
+        display: "inline-flex",
+        flexWrap: "wrap",
+        alignItems: "center",
+        maxWidth: "100%",
         gap: "0.5em",
         border: `0.2em solid ${chipColor}`,
         borderRadius: "1.5em",
@@ -800,12 +812,12 @@ const ChipGroup = ({
         margin: "0.125em 0",
         position: "relative",
         outline: hovered ? `2px solid ${chipColor}` : "none",
+        width: "fit-content",
+        minWidth: 0,
       }}
     >
       {/* Render the group chips inside the colored border */}
       {groupChips}
-      {/* Optional icon to indicate the group */}
-      {/* {cornerIcon} */}
       {topIcon}
       {baseIcon}
     </div>

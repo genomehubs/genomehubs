@@ -5,6 +5,8 @@ import AutowidthTextField from "../AutowidthTextField";
 import Box from "@mui/material/Box";
 import CancelIcon from "@mui/icons-material/Cancel";
 import Chip from "@mui/material/Chip";
+import JoinFullRoundedIcon from "@mui/icons-material/JoinFullRounded";
+import JoinInnerRoundedIcon from "@mui/icons-material/JoinInnerRounded";
 import Popper from "@mui/material/Popper";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import TextField from "@mui/material/TextField";
@@ -48,6 +50,7 @@ const EditableText = ({
   isAlreadyEditing,
   onChange,
   onBlur,
+  handleSplitValues,
   backgroundColor,
   textColor,
   highlightColor,
@@ -261,6 +264,20 @@ const EditableText = ({
       isNegatable={isNegatable}
       maxWidth={maxWidth}
       maxChips={5}
+      endAdornment={
+        handleSplitValues ? (
+          <Tooltip
+            title="Values in a single chip will be joined with OR. Click to split into multiple chips."
+            placement="top"
+            arrow
+          >
+            <JoinFullRoundedIcon
+              sx={{ color: backgroundColor }}
+              onClick={handleSplitValues}
+            />
+          </Tooltip>
+        ) : null
+      }
     />
   ) : (
     inputValue

@@ -22,6 +22,7 @@ const ValueChips = ({
   backgroundColor,
   textColor,
   isNegatable,
+  endAdornment,
   ...props
 }) => {
   const [expanded, setExpanded] = useState(false);
@@ -210,6 +211,7 @@ const ValueChips = ({
             }}
           />
         )}
+        {values.length > 1 && endAdornment}
       </Box>
 
       {/* Modal to display all chips */}

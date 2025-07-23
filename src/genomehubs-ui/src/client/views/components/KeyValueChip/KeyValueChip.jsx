@@ -23,6 +23,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "../Tooltip";
 import Typography from "@mui/material/Typography";
 import ValidationErrorTooltip from "./ValidationErrorToolTip";
+import { current } from "@reduxjs/toolkit";
 import formatValue from "./functions/formatValue";
 import { getChipPalette } from "./functions/chipPalettes";
 import parseValue from "./functions/parseValue";
@@ -84,14 +85,22 @@ const KeyValueChip = ({
     modifier,
     palette,
     chipIndex,
+    multi = false,
   }) => {
-    const validated = validation.validateValue({
+    const { processed_type } = validation.validateValue({
       key,
       value,
       modifier,
     });
     let parsedValue = value;
-    if (["float", "integer"].includes(validated.processed_type)) {
+    if (multi) {
+      parsedValue = value.split(",").map((v) => {
+        if (["float", "integer"].includes(processed_type)) {
+          return parseValue(v);
+        }
+        return v;
+      });
+    } else if (["float", "integer"].includes(processed_type)) {
       parsedValue = parseValue(value);
     }
     onChange?.(
@@ -271,6 +280,21 @@ const KeyValueChip = ({
         setIsEditingValue(true);
       }
     }
+  };
+
+  const handleSplitValues = (event, { value }) => {
+    event.stopPropagation(); // Prevent the click event from propagating to the parent
+    event.preventDefault(); // Prevent the default action
+
+    handleChange({
+      key: currentKey,
+      value,
+      operator: currentOperator,
+      modifier: currentModifier,
+      palette,
+      chipIndex,
+      multi: true,
+    });
   };
 
   useEffect(() => {
@@ -531,6 +555,11 @@ const KeyValueChip = ({
                     key: currentKey,
                     modifier: currentModifier,
                   })}
+                  handleSplitValues={(e) =>
+                    handleSplitValues(e, {
+                      value: currentValue,
+                    })
+                  }
                   isAlreadyEditing={isEditingValue}
                   onChange={(newValue) => handleValueChange(newValue)}
                   onBlur={handleValueBlur}
