@@ -14,6 +14,7 @@ import stringLength from "../../functions/stringLength";
 
 const ValueChips = ({
   value = "",
+  valueTips = () => {},
   maxChips = 5,
   maxWidth = 1000,
   handleChange,
@@ -179,7 +180,7 @@ const ValueChips = ({
             negate = true;
             chipLabel = chipLabel.slice(1);
           }
-          return (
+          let chipElement = (
             <Chip
               key={index}
               label={chipLabel}
@@ -189,6 +190,20 @@ const ValueChips = ({
               sx={chipStyle}
             />
           );
+          let valueTip = valueTips(chipLabel);
+          if (valueTip) {
+            chipElement = (
+              <Tooltip
+                key={index}
+                title={valueTip}
+                enterDelay={750}
+                enterNextDelay={750}
+              >
+                {chipElement}
+              </Tooltip>
+            );
+          }
+          return chipElement;
         })}
         {hiddenCount > 0 && (
           <Chip

@@ -98,6 +98,29 @@ export const typesToValidation = () => {
     return;
   };
 
+  const valueTips = ({ key, modifier }) => {
+    if (key !== "tax" && key !== "constraint" && modifier !== "value") {
+      return;
+    }
+    const { value_metadata: valueMeta = {} } = types[key] || {};
+    if (Object.keys(valueMeta).length === 0) {
+      return () => {};
+    }
+    return (val) => {
+      let tip;
+      let value = val.toLowerCase();
+      if (valueMeta.hasOwnProperty(value) && valueMeta[value].description) {
+        tip = valueMeta[value].description;
+      } else if (
+        valueMeta.hasOwnProperty("default") &&
+        valueMeta.default.description
+      ) {
+        tip = valueMeta.default.description;
+      }
+      return tip.replace(/\W*click.*/i, "").trim();
+    };
+  };
+
   const validModifiers = (key) => {
     if (key === "tax") {
       return new Set(["tree", "name", "rank", "lineage", "level", "eq"]);
@@ -300,6 +323,7 @@ export const typesToValidation = () => {
     validateModifier,
     validOperators,
     validateOperator,
+    valueTips,
     allowMultipleValues,
     isNegatable,
     getOperatorDescription,

@@ -50,25 +50,25 @@ CustomPlaceholder.args = {
 export const WithInvalidChips = Template.bind({});
 WithInvalidChips.args = {
   value:
-    "assembly_span=100000000 AND tax_tree(2759) AND invalid_chip AND assembly_span=invalid_value AND bioproject<=PRJEB40655,PRJEB40655 AND min(bioproject)=PRJEB40655,PRJEB40655",
+    "assembly_span=100000000 AND tax_tree(2759) AND invalid_chip AND assembly_span=invalid_value AND bioproject<=PRJEB40665,PRJEB40665 AND min(bioproject)=PRJEB40665,PRJEB40665",
 };
 
 export const WithDuplication = Template.bind({});
 WithDuplication.args = {
   value:
-    "assembly_span=100000000 AND tax_tree(2759) AND assembly_span=100000000 AND bioproject=PRJEB40655,PRJEB40655",
+    "assembly_span=100000000 AND tax_tree(2759) AND assembly_span=100000000 AND bioproject=PRJEB40665,PRJEB40665",
 };
 
 export const WithCrypticDuplication = Template.bind({});
 WithCrypticDuplication.args = {
   value:
-    "assembly_span=100000000 AND tax_tree(2759) AND assembly_span=100M AND bioproject=PRJEB40655,null AND bioproject=prjeb40655,null AND bioproject=null,prjeb40655",
+    "assembly_span=100000000 AND tax_tree(2759) AND assembly_span=100M AND bioproject=PRJEB40665,null AND bioproject=PRJEB40665,null AND bioproject=null,PRJEB40665",
 };
 
 export const WithNegation = Template.bind({});
 WithNegation.args = {
   value:
-    "assembly_span=100000000 AND tax_tree(2759,!33090) AND bioproject=PRJEB40655,!PRJEB40655",
+    "assembly_span=100000000 AND tax_tree(2759,!33090) AND bioproject=PRJEB40665,!PRJEB40665",
 };
 
 export const WithConflictingChips = Template.bind({});
@@ -80,5 +80,5 @@ WithConflictingChips.args = {
 export const LargeChipGroup = Template.bind({});
 LargeChipGroup.args = {
   value:
-    "tax_tree(2759) AND assembly_span=100000000 AND bioproject=PRJEB40655 AND bioproject=PRJEB40656 AND bioproject=PRJEB40657 AND bioproject=PRJEB40658 AND bioproject=PRJEB40659 AND bioproject=PRJEB40660 AND bioproject=PRJEB40661 AND bioproject=PRJEB40662 AND chromosome_number=2",
+    "tax_tree(2759) AND assembly_span=100000000 AND bioproject=PRJEB40665 AND bioproject=PRJEB40656 AND bioproject=PRJEB40657 AND bioproject=PRJEB40658 AND bioproject=PRJEB40659 AND bioproject=PRJEB40660 AND bioproject=PRJEB40661 AND bioproject=PRJEB40662 AND chromosome_number=2",
 };

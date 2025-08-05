@@ -45,6 +45,7 @@ const EditableText = ({
   value,
   description,
   options = [],
+  valueTips,
   allowMultipleValues,
   isNegatable,
   isAlreadyEditing,
@@ -257,6 +258,7 @@ const EditableText = ({
     <ValueChips
       title={title}
       value={inputValue || ""}
+      valueTips={valueTips}
       handleChange={handleChange}
       backgroundColor={backgroundColor}
       allowMultipleValues={allowMultipleValues}
@@ -272,7 +274,7 @@ const EditableText = ({
             arrow
           >
             <JoinFullRoundedIcon
-              sx={{ color: backgroundColor }}
+              sx={{ color: backgroundColor, marginTop: "-2px" }}
               onClick={handleSplitValues}
             />
           </Tooltip>

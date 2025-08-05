@@ -599,6 +599,10 @@ const KeyValueChip = ({
                       modifier: currentModifier,
                     }) || []),
                   ]}
+                  valueTips={validation.valueTips({
+                    key: currentKey,
+                    modifier: currentModifier,
+                  })}
                   variant="body3"
                   sx={{
                     whiteSpace:
