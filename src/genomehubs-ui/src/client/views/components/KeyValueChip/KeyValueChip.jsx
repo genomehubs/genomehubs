@@ -40,6 +40,7 @@ const KeyValueChip = ({
   palette = "blue",
   forcePalette = false,
   chipIndex = 0,
+  lookupFunction = null,
 }) => {
   const validation = typesToValidation();
   const chipId = `${keyLabel}-${operator}-${value}-${modifier}`;
@@ -295,6 +296,31 @@ const KeyValueChip = ({
       chipIndex,
       multi: true,
     });
+  };
+
+  const getValueOptions = () => {
+    let options = [];
+    let values = validation.validValues({
+      key: currentKey,
+      modifier: currentModifier,
+    });
+    if (values && values.length > 0) {
+      return [...values];
+    }
+    return options;
+  };
+
+  const handleLookup = async (lookupTerm) => {
+    if (lookupFunction) {
+      let options =
+        (await lookupFunction({
+          lookupTerm,
+          key: currentKey,
+          modifier: currentModifier,
+        })) || [];
+      return options.map((option) => option.value.toLowerCase());
+    }
+    return [];
   };
 
   useEffect(() => {
@@ -593,12 +619,8 @@ const KeyValueChip = ({
                       </Typography>
                     </>
                   }
-                  options={[
-                    ...(validation.validValues({
-                      key: currentKey,
-                      modifier: currentModifier,
-                    }) || []),
-                  ]}
+                  options={getValueOptions()}
+                  handleLookup={handleLookup}
                   valueTips={validation.valueTips({
                     key: currentKey,
                     modifier: currentModifier,

@@ -72,6 +72,7 @@ const ChipSearch = ({
   showText = false,
   compact = false,
   backgroundColor = "#ffffff",
+  lookupFunction = null,
 }) => {
   const validation = typesToValidation();
   const validKeys = validation.validKeys();
@@ -342,7 +343,14 @@ const ChipSearch = ({
           chipGroups[chipKey].chips.push(chip);
           chipGroups[chipKey].indices.push(index);
         } else {
-          return <RenderedChip key={chip + index} chip={chip} index={index} />;
+          return (
+            <RenderedChip
+              key={chip + index}
+              chip={chip}
+              index={index}
+              lookupFunction={lookupFunction}
+            />
+          );
         }
       }
     });
@@ -429,6 +437,7 @@ const ChipSearch = ({
                 index={indices[i]}
                 palette={status === "error" ? "orange" : "blue"}
                 forcePalette={status === "error"} // Force palette if multiple values are not allowed
+                lookupFunction={lookupFunction}
               />
             );
           });

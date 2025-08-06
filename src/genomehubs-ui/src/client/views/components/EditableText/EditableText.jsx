@@ -13,6 +13,7 @@ import TextField from "@mui/material/TextField";
 import Tooltip from "../Tooltip";
 import Typography from "@mui/material/Typography";
 import ValueChips from "./ValueChips";
+import { setLookupTerm } from "../../reducers/lookup";
 import stringLength from "../../functions/stringLength";
 
 const checkContrast = (color, background, threshold = 4.5) => {
@@ -61,11 +62,13 @@ const EditableText = ({
   endComponent,
   valueAsChips,
   maxWidth = 250,
+  handleLookup,
   sx,
   ...props
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(value);
+  const [cursorPos, setCursorPos] = useState(0);
 
   const rootRef = useRef(null);
 
@@ -78,6 +81,27 @@ const EditableText = ({
       setAnchorEl(rootRef.current);
     }
   }, [isAlreadyEditing]);
+
+  const [dynamicOptions, setDynamicOptions] = useState([]);
+  const [lookupTerm, setLookupTerm] = useState(inputValue);
+  // useEffect(() => {
+  //   let isMounted = true;
+  //   if (handleLookup) {
+  //     const lookupResult = handleLookup(lookupTerm);
+  //     if (lookupResult instanceof Promise) {
+  //       lookupResult.then((options) => {
+  //         if (isMounted) {
+  //           setDynamicOptions(options || []);
+  //         }
+  //       });
+  //     } else {
+  //       setDynamicOptions(lookupResult || []);
+  //     }
+  //   }
+  //   return () => {
+  //     isMounted = false;
+  //   };
+  // }, [inputValue, handleLookup]);
 
   const handleEdit = (event) => {
     setIsEditing(true);
@@ -130,7 +154,7 @@ const EditableText = ({
         options={options}
         value={
           allowMultipleValues
-            ? inputValue.split(/\s*,\s*/).filter((v) => v)
+            ? (inputValue || "").split(/\s*,\s*/).filter((v) => v)
             : inputValue
         }
         onChange={(event, newValue) => {
@@ -222,6 +246,216 @@ const EditableText = ({
                 setAnchorEl(null);
               } else if (event.key === "Enter") {
                 handleChange(event.target.value);
+              }
+            }}
+            value={inputValue || ""}
+            placeholder="Type values separated by commas..."
+            sx={{
+              ...inputProps.sx,
+              minWidth,
+            }}
+          />
+        )}
+      />
+    );
+  } else if (handleLookup) {
+    let minWidth = "100px"; // Default minimum width
+    useEffect(() => {
+      let isMounted = true;
+      if (
+        handleLookup &&
+        lookupTerm !== undefined &&
+        lookupTerm !== null &&
+        lookupTerm.length > 2
+      ) {
+        const lookupResult = handleLookup(lookupTerm);
+        if (lookupResult instanceof Promise) {
+          lookupResult.then((options) => {
+            if (isMounted) {
+              setDynamicOptions(options || []);
+            }
+          });
+        } else {
+          setDynamicOptions(lookupResult || []);
+        }
+      } else {
+        setDynamicOptions([]);
+      }
+      return () => {
+        isMounted = false;
+      };
+    }, [lookupTerm, handleLookup]);
+
+    // Helper to find the current editing segment in a comma-separated string
+    const getCurrentSegment = (value, cursorPos) => {
+      // Find the start and end of the segment based on cursor position
+      let start = value.lastIndexOf(",", cursorPos - 1) + 1;
+      let end = value.indexOf(",", cursorPos);
+      if (end === -1) {
+        end = value.length;
+      }
+      return value.slice(start, end).trim();
+    };
+
+    textInput = (
+      <Autocomplete
+        multiple={allowMultipleValues}
+        freeSolo
+        options={dynamicOptions}
+        inputValue={inputValue || ""}
+        onInputChange={(event, newInputValue, reason) => {
+          // Only update lookupTerm on typing, not on selection
+          if (reason === "input") {
+            setLookupTerm(newInputValue);
+            setInputValue(newInputValue);
+          }
+        }}
+        filterOptions={(x) => x}
+        value={
+          allowMultipleValues
+            ? Array.from(
+                new Set((inputValue || "").split(/\s*,\s*/).filter((v) => v)),
+              )
+            : inputValue
+        }
+        onChange={(event, newValue, reason) => {
+          if (allowMultipleValues) {
+            let values = Array.isArray(newValue)
+              ? newValue.flatMap((v) =>
+                  v
+                    .split(/\s*,\s*/)
+                    .map((s) => s.trim())
+                    .filter((s) => s),
+                )
+              : [];
+            // If user selected from dropdown, replace the last segment with selected value
+            if (reason === "selectOption" && values.length > 1) {
+              // Replace the last segment (partial term) with the selected value
+              // Replace the segment being edited with the selected value
+              const fullInput = inputValue || "";
+              const start = fullInput.lastIndexOf(",", cursorPos - 1) + 1;
+              const end = fullInput.indexOf(",", cursorPos);
+              const segments = fullInput.split(/\s*,\s*/);
+              const editedIndex = segments.findIndex((seg, idx) => {
+                const segStart =
+                  idx === 0
+                    ? 0
+                    : fullInput.indexOf(
+                        segments[idx],
+                        fullInput.indexOf(segments[idx - 1]) +
+                          segments[idx - 1].length +
+                          1,
+                      );
+                const segEnd = segStart + seg.length;
+                return cursorPos >= segStart && cursorPos <= segEnd;
+              });
+              if (editedIndex !== -1) {
+                segments[editedIndex] = values[values.length - 1];
+                values = segments;
+              }
+            } else if (reason === "removeOption") {
+              // Add the lookupTerm to the list
+              values = [...values, lookupTerm];
+            }
+            // Remove duplicates
+            const deduped = Array.from(new Set(values));
+            const updatedValue = deduped.join(",");
+            setInputValue(updatedValue);
+            onChange?.(updatedValue);
+          } else {
+            const updatedValue = typeof newValue === "string" ? newValue : "";
+            setInputValue(updatedValue);
+            onChange?.(updatedValue);
+          }
+        }}
+        onBlur={handleBlur}
+        renderTags={(value, getTagProps) => (
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 1,
+              width: "100%",
+            }}
+          >
+            {value.map((option, index) => {
+              const isNegated = option.startsWith("!");
+              const label = isNegated ? option.slice(1) : option;
+
+              return (
+                <Chip
+                  key={index}
+                  label={label}
+                  icon={
+                    isNegated ? (
+                      <RemoveCircleIcon
+                        sx={{ fontSize: "1rem", color: "red" }}
+                      />
+                    ) : null
+                  }
+                  {...getTagProps({ index })}
+                  sx={{
+                    backgroundColor: highlightColor,
+                    color: highlightContrastColor,
+                    height: "24px",
+                    lineHeight: "24px",
+                    fontSize: "0.875rem",
+                    maxWidth: "none",
+                    fontFamily: "'Roboto', 'Arial', sans-serif",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    "& .MuiChip-deleteIcon": {
+                      color: highlightContrastColor || "inherit",
+                      opacity: 0.5,
+                      fontSize: "1rem",
+                      marginRight: "4px",
+                    },
+                    "& .MuiChip-label": {
+                      padding: "0 0.6em 0 0.65em",
+                      color: highlightContrastColor,
+                    },
+                    "& .MuiChip-icon": {
+                      color: highlightContrastColor || "inherit",
+                      fontSize: "1rem",
+                    },
+                  }}
+                />
+              );
+            })}
+          </Box>
+        )}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            {...inputProps}
+            onChange={(event) => {
+              const fullValue = event.target.value;
+              const currentCursorPos = event.target.selectionStart;
+              setCursorPos(currentCursorPos);
+              // Find the current segment being edited
+              const currentSegment = getCurrentSegment(
+                fullValue,
+                currentCursorPos,
+              );
+
+              setInputValue(fullValue);
+              setLookupTerm(currentSegment);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                setIsEditing(false);
+                setAnchorEl(null);
+              } else if (event.key === "Enter") {
+                // On Enter, parse, deduplicate, and update
+                let segments = (event.target.value || "")
+                  .split(/\s*,\s*/)
+                  .map((v) => v.trim())
+                  .filter((v) => v);
+                const deduped = Array.from(new Set(segments));
+                const updatedValue = deduped.join(",");
+                setInputValue(updatedValue);
+                // onChange?.(updatedValue);
               }
             }}
             value={inputValue || ""}
