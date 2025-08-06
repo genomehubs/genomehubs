@@ -300,7 +300,8 @@ const EditableText = ({
     textInput = (
       <Autocomplete
         multiple={allowMultipleValues}
-        freeSolo
+        // freeSolo
+        autoHighlight
         options={dynamicOptions}
         inputValue={inputValue || ""}
         onInputChange={(event, newInputValue, reason) => {
@@ -443,19 +444,25 @@ const EditableText = ({
               setLookupTerm(currentSegment);
             }}
             onKeyDown={(event) => {
+              console.log(params);
               if (event.key === "Escape") {
                 setIsEditing(false);
                 setAnchorEl(null);
               } else if (event.key === "Enter") {
                 // On Enter, parse, deduplicate, and update
-                let segments = (event.target.value || "")
-                  .split(/\s*,\s*/)
-                  .map((v) => v.trim())
-                  .filter((v) => v);
-                const deduped = Array.from(new Set(segments));
-                const updatedValue = deduped.join(",");
-                setInputValue(updatedValue);
-                // onChange?.(updatedValue);
+                // let segments = (event.target.value || "")
+                //   .split(/\s*,\s*/)
+                //   .map((v) => v.trim())
+                //   .filter((v) => v);
+                // const deduped = Array.from(new Set(segments));
+                // const updatedValue = deduped.join(",");
+                // setInputValue(updatedValue);
+                // // onChange?.(updatedValue);
+
+                // enter key should select the currently highlighted option in the autocomplete dropdown
+                const highlightedOption = params?.getOptionSelected(
+                  params?.getOptionHighlightedIndex(),
+                );
               }
             }}
             value={inputValue || ""}
