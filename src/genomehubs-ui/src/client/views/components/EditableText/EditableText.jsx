@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
+import AutoCompleteOption from "./AutoCompleteOption";
+import AutoCompleteSuggestion from "./AutoCompleteSuggestion";
 import Autocomplete from "@mui/material/Autocomplete";
 import AutowidthTextField from "../AutowidthTextField";
 import Box from "@mui/material/Box";
@@ -303,7 +305,7 @@ const EditableText = ({
       />
     );
   } else if (handleLookup) {
-    let minWidth = "100px"; // Default minimum width
+    let minWidth = "300px"; // Default minimum width
     useEffect(() => {
       let isMounted = true;
       if (
@@ -356,6 +358,16 @@ const EditableText = ({
           }
         }}
         filterOptions={(x) => x}
+        getOptionLabel={(option) =>
+          typeof option === "string" ? option : option.title
+        }
+        isOptionEqualToValue={(option, value) => {
+          let val = value.title || value;
+          if (option.matchTerm) {
+            return option.matchTerm === val;
+          }
+          return option.title === val;
+        }}
         value={
           allowMultipleValues
             ? Array.from(
@@ -367,7 +379,7 @@ const EditableText = ({
           if (allowMultipleValues) {
             let values = Array.isArray(newValue)
               ? newValue.flatMap((v) =>
-                  v
+                  (v.string || v)
                     .split(/\s*,\s*/)
                     .map((s) => s.trim())
                     .filter((s) => s),
@@ -413,75 +425,9 @@ const EditableText = ({
           }
         }}
         onBlur={handleBlur}
-        renderTags={(value, getTagProps) => (
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 1,
-              width: "100%",
-            }}
-          >
-            {value.map((option, index) => {
-              const isNegated = option.startsWith("!");
-              const label = isNegated ? option.slice(1) : option;
-
-              return (
-                <Chip
-                  key={index}
-                  label={label}
-                  icon={
-                    isNegated ? (
-                      <RemoveCircleIcon
-                        sx={{ fontSize: "1rem", color: "red" }}
-                      />
-                    ) : null
-                  }
-                  {...getTagProps({ index })}
-                  onDelete={(event) => {
-                    if (allowMultipleValues) {
-                      const updatedValue = value
-                        .filter((_, i) => i !== index)
-                        .join(",");
-                      setInputValue(updatedValue);
-                      onChange?.(updatedValue);
-                    } else {
-                      setInputValue("");
-                      onChange?.("");
-                    }
-                    event.stopPropagation(); // Prevent the click from propagating to the Autocomplete
-                  }}
-                  sx={{
-                    backgroundColor: highlightColor,
-                    color: highlightContrastColor,
-                    height: "24px",
-                    lineHeight: "24px",
-                    fontSize: "0.875rem",
-                    maxWidth: "none",
-                    fontFamily: "'Roboto', 'Arial', sans-serif",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    "& .MuiChip-deleteIcon": {
-                      color: highlightContrastColor || "inherit",
-                      opacity: 0.5,
-                      fontSize: "1rem",
-                      marginRight: "4px",
-                    },
-                    "& .MuiChip-label": {
-                      padding: "0 0.6em 0 0.65em",
-                      color: highlightContrastColor,
-                    },
-                    "& .MuiChip-icon": {
-                      color: highlightContrastColor || "inherit",
-                      fontSize: "1rem",
-                    },
-                  }}
-                />
-              );
-            })}
-          </Box>
-        )}
+        renderTags={(value, getTagProps) => {
+          return null;
+        }}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -502,6 +448,28 @@ const EditableText = ({
               if (event.key === "Escape") {
                 setIsEditing(false);
                 setAnchorEl(null);
+              } else if (event.key === " ") {
+                event.stopPropagation();
+                event.preventDefault();
+
+                // add space at the current cursor position
+                const fullValue = event.target.value;
+                const currentCursorPos = event.target.selectionStart;
+                const beforeCursor = fullValue.slice(0, currentCursorPos);
+                const afterCursor = fullValue.slice(currentCursorPos);
+                const newValue = beforeCursor + "_" + afterCursor;
+                setInputValue(newValue);
+
+                // Move cursor after the inserted "_"
+                // Wait for the value to update, then set selection
+                setTimeout(() => {
+                  if (event.target.setSelectionRange) {
+                    event.target.setSelectionRange(
+                      currentCursorPos + 1,
+                      currentCursorPos + 1,
+                    );
+                  }
+                }, 0);
               }
             }}
             value={shortenValue(inputValue)}
@@ -512,6 +480,12 @@ const EditableText = ({
             }}
           />
         )}
+        renderOption={(props, option) => {
+          if (option.highlighted) {
+            return <AutoCompleteSuggestion option={option} {...props} />;
+          }
+          return <AutoCompleteOption option={option} {...props} />;
+        }}
       />
     );
   } else {

@@ -14,7 +14,7 @@ const lookupFunction = ({
   if (key === "tax") {
     const apiUrl = "https://goat.genomehubs.org/api/v2";
     let options = {
-      searchTerm: lookupTerm.replace(/\[.*/, ""),
+      searchTerm: lookupTerm.replace(/\[.*/, "").replace(/_/g, " "),
       result,
       taxonomy,
     };
@@ -25,40 +25,47 @@ const lookupFunction = ({
       }
       if (json.results && json.results.length > 0) {
         return json.results.map((obj) => {
-          let result = {};
+          let { taxon_rank, taxon_id, scientific_name } = obj.result;
+          let option = { taxon_rank };
           if (obj.reason && obj.reason.length > 0) {
             Object.entries(obj.reason[0].fields).forEach(([key, value]) => {
               if (key.endsWith("class")) {
-                result.class = value[0];
+                option.class = value[0];
+                option.name_class = value[0];
               } else if (key.endsWith("raw")) {
-                result.value = value[0];
+                option.value = value[0];
               }
             });
-            result.match = "partial";
+            option.match = "partial";
           } else {
-            result.value = options.searchTerm;
-            if (obj.result.taxon_id == options.searchTerm) {
-              result.class = "taxon_id";
-              result.match = "exact";
-            } else if (obj.result.scientific_name == options.searchTerm) {
-              result.class = "scientific_name";
-              result.match = "exact";
+            option.value = options.searchTerm;
+            if (taxon_id == options.searchTerm) {
+              option.class = "taxon_id";
+              option.name_class = "taxon ID";
+              option.match = "exact";
+            } else if (scientific_name == options.searchTerm) {
+              option.class = "scientific_name";
+              option.name_class = "scientific name";
+              option.match = "exact";
             } else {
               for (let [key, value] of Object.entries(
                 obj.result.taxon_names || {},
               )) {
                 if (value.toLowerCase() === options.searchTerm.toLowerCase()) {
-                  result.class = key;
-                  result.match = "exact";
-                  result.value = value;
+                  option.class = key;
+                  option.name_class = key.replace(/_/g, " ");
+                  option.match = "exact";
+                  option.value = value;
                   break;
                 }
               }
             }
           }
-          result.taxon_id = obj.result.taxon_id;
-          result.scientific_name = obj.result.scientific_name;
-          return result;
+          option.taxon_id = taxon_id;
+          option.scientific_name = scientific_name;
+          option.result = result;
+          option.title = scientific_name;
+          return option;
         });
       }
     };

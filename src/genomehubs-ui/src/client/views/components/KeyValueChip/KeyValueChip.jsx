@@ -318,7 +318,7 @@ const KeyValueChip = ({
           key: currentKey,
           modifier: currentModifier,
         })) || [];
-      return options.map((option) => option.value.toLowerCase());
+      return options;
     }
     return [];
   };
