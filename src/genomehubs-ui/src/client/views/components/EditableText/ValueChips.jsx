@@ -163,6 +163,39 @@ const ValueChips = ({
     },
   };
 
+  const setChipLabel = (chip) => {
+    let negate = false;
+    let chipLabel = chip === null || chip === "" ? "value" : chip;
+    if (chipLabel.startsWith("!")) {
+      negate = true;
+      chipLabel = chipLabel.slice(1);
+    }
+    if (chipLabel.match(/\[.*\]/)) {
+      let parts = chipLabel.split(/\[|\]/);
+      chipLabel = parts[0];
+      if (parts.length > 1) {
+        chipLabel = (
+          <span style={{ display: "inline-flex", alignItems: "center" }}>
+            {chipLabel}
+            <span
+              style={{
+                opacity: 0.8,
+                fontSize: "0.75rem",
+                marginLeft: "0.25rem",
+                display: "inline-flex",
+                alignItems: "center",
+                height: "100%",
+              }}
+            >
+              [{parts[1]}]
+            </span>
+          </span>
+        );
+      }
+    }
+    return { chipLabel, negate };
+  };
+
   return (
     <>
       <Box
@@ -174,12 +207,7 @@ const ValueChips = ({
         {...props}
       >
         {visibleChips.map((chip, index) => {
-          let negate = false;
-          let chipLabel = chip === null || chip === "" ? "value" : chip;
-          if (chipLabel.startsWith("!")) {
-            negate = true;
-            chipLabel = chipLabel.slice(1);
-          }
+          const { chipLabel, negate } = setChipLabel(chip);
           let chipElement = (
             <Chip
               key={index}
@@ -259,12 +287,7 @@ const ValueChips = ({
             }}
           >
             {values.map((chip, index) => {
-              let negate = false;
-              let chipLabel = chip === null ? "value" : chip;
-              if (chipLabel.startsWith("!")) {
-                negate = true;
-                chipLabel = chipLabel.slice(1);
-              }
+              const { chipLabel, negate } = setChipLabel(chip);
               return (
                 <Chip
                   key={index}

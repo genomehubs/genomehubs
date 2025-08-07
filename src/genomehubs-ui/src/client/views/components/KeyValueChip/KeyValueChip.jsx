@@ -312,15 +312,15 @@ const KeyValueChip = ({
 
   const handleLookup = async (lookupTerm) => {
     if (lookupFunction && !lookupTerm.match(/,/)) {
-      let options =
+      return (
         (await lookupFunction({
           lookupTerm,
           key: currentKey,
           modifier: currentModifier,
-        })) || [];
-      return options;
+        })) || []
+      );
     }
-    return [];
+    return null;
   };
 
   useEffect(() => {
@@ -626,7 +626,7 @@ const KeyValueChip = ({
                     </>
                   }
                   options={getValueOptions()}
-                  handleLookup={handleLookup}
+                  handleLookup={lookupFunction && handleLookup}
                   valueTips={validation.valueTips({
                     key: currentKey,
                     modifier: currentModifier,

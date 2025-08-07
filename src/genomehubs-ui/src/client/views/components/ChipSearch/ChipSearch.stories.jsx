@@ -12,9 +12,14 @@ const lookupFunction = ({
   taxonomy = "ncbi",
 }) => {
   if (key === "tax") {
-    const apiUrl = "https://goat.genomehubs.org/api/v2";
+    let searchTerm = lookupTerm.replace(/\[.*/, "").replace(/_/g, " ");
+    let negate = false;
+    if (searchTerm.startsWith("!")) {
+      searchTerm = searchTerm.slice(1);
+      negate = true;
+    }
     let options = {
-      searchTerm: lookupTerm.replace(/\[.*/, "").replace(/_/g, " "),
+      searchTerm,
       result,
       taxonomy,
     };
@@ -24,9 +29,9 @@ const lookupFunction = ({
         return [];
       }
       if (json.results && json.results.length > 0) {
-        return json.results.map((obj) => {
+        return json.results.map((obj, id) => {
           let { taxon_rank, taxon_id, scientific_name } = obj.result;
-          let option = { taxon_rank };
+          let option = { taxon_rank, id };
           if (obj.reason && obj.reason.length > 0) {
             Object.entries(obj.reason[0].fields).forEach(([key, value]) => {
               if (key.endsWith("class")) {
@@ -41,7 +46,8 @@ const lookupFunction = ({
             option.value = options.searchTerm;
             if (taxon_id == options.searchTerm) {
               option.class = "taxon_id";
-              option.name_class = "taxon ID";
+              option.name_class = "scientific name";
+              option.value = scientific_name;
               option.match = "exact";
             } else if (scientific_name == options.searchTerm) {
               option.class = "scientific_name";
@@ -65,6 +71,9 @@ const lookupFunction = ({
           option.scientific_name = scientific_name;
           option.result = result;
           option.title = scientific_name;
+          if (negate) {
+            option.negate = true;
+          }
           return option;
         });
       }

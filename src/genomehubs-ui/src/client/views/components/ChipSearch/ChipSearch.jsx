@@ -304,7 +304,7 @@ const ChipSearch = ({
     handleMenuClose();
   };
 
-  const RenderedChip = ({ chip, index, ...props }) => {
+  const RenderedChip = ({ chip, index, lookupFunction, ...props }) => {
     const { key, operator, value, valueNote, modifier } = extractKeyValue(chip);
     return (
       <KeyValueChip
@@ -321,6 +321,7 @@ const ChipSearch = ({
           marginRight: index === chips.length - 1 ? "-1em" : "1em",
         }} // Add margin to chips
         chipIndex={index} // Pass the index to KeyValueChip
+        lookupFunction={key === "tax" ? lookupFunction : null}
         {...props} // Spread any additional props
       />
     );

@@ -458,7 +458,7 @@ const EditableText = ({
                 const beforeCursor = fullValue.slice(0, currentCursorPos);
                 const afterCursor = fullValue.slice(currentCursorPos);
                 const newValue = beforeCursor + "_" + afterCursor;
-                setInputValue(newValue);
+                setInputValue(extendValue(newValue));
 
                 // Move cursor after the inserted "_"
                 // Wait for the value to update, then set selection
@@ -485,6 +485,15 @@ const EditableText = ({
             return <AutoCompleteSuggestion option={option} {...props} />;
           }
           return <AutoCompleteOption option={option} {...props} />;
+        }}
+        slotProps={{
+          popper: {
+            sx: {
+              [`& .MuiAutocomplete-noOptions`]: {
+                display: "none",
+              },
+            },
+          },
         }}
       />
     );
