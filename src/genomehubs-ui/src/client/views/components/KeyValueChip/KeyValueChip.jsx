@@ -311,7 +311,7 @@ const KeyValueChip = ({
   };
 
   const handleLookup = async (lookupTerm) => {
-    if (lookupFunction) {
+    if (lookupFunction && !lookupTerm.match(/,/)) {
       let options =
         (await lookupFunction({
           lookupTerm,
@@ -581,10 +581,16 @@ const KeyValueChip = ({
                     key: currentKey,
                     modifier: currentModifier,
                   })}
-                  handleSplitValues={(e) =>
-                    handleSplitValues(e, {
-                      value: currentValue,
+                  handleSplitValues={
+                    validation.allowSplitValues({
+                      key: currentKey,
+                      modifier: currentModifier,
                     })
+                      ? (e) =>
+                          handleSplitValues(e, {
+                            value: currentValue,
+                          })
+                      : undefined
                   }
                   isAlreadyEditing={isEditingValue}
                   onChange={(newValue) => handleValueChange(newValue)}

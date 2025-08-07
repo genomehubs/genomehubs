@@ -40,10 +40,10 @@ const extractKeyValue = (chip) => {
         value = key;
         key = "tax";
         // if value matches value[valueNote], split into 2 variables
-        if (value.includes("[")) {
-          [value, valueNote] = value.split(/\s*\[\s*/);
-          valueNote = valueNote.replace("]", "").trim();
-        }
+        // if (value.includes("[")) {
+        //   [value, valueNote] = value.split(/\s*\[\s*/);
+        //   valueNote = valueNote.replace("]", "").trim();
+        // }
       } else if (modifier == "collate") {
         [key, ...value] = key.split(/\s*,\s*/);
         value = value.join(",");

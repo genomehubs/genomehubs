@@ -122,6 +122,16 @@ const EditableText = ({
     onChange?.(newValue);
   };
 
+  const valueMap = (inputValue || "").split(/\s*,\s*/).reduce((acc, curr) => {
+    const parts = curr.split(/[\[\]]/);
+    acc[parts[0]] = curr;
+    return acc;
+  }, {});
+
+  const reverseValueMap = Object.fromEntries(
+    Object.entries(valueMap).map(([key, val]) => [val, key]),
+  );
+
   let inputProps = {
     size: "small",
     variant: "standard",
@@ -139,6 +149,40 @@ const EditableText = ({
   };
 
   let textInput = null;
+
+  const shortenValue = (value) => {
+    if (value === null || value === undefined || value === "") {
+      return "";
+    }
+    if (typeof value === "string") {
+      const parts = value.split(/\s*,\s*/);
+      for (let i = 0; i < parts.length; i++) {
+        parts[i] = reverseValueMap[parts[i]] || parts[i];
+      }
+      return parts.join(",");
+    }
+    if (Array.isArray(value)) {
+      return value.map((v) => reverseValueMap[v] || v).join(",");
+    }
+    return valueMap[value] || value;
+  };
+
+  const extendValue = (value) => {
+    if (value === null || value === undefined || value === "") {
+      return "";
+    }
+    if (typeof value === "string") {
+      const parts = value.split(/\s*,\s*/);
+      for (let i = 0; i < parts.length; i++) {
+        parts[i] = valueMap[parts[i]] || parts[i];
+      }
+      return parts.join(",");
+    }
+    if (Array.isArray(value)) {
+      return value.map((v) => valueMap[v] || v).join(",");
+    }
+    return valueMap[value] || value;
+  };
 
   if (options && options.length > 0) {
     let minWidth = options.reduce(
@@ -303,7 +347,7 @@ const EditableText = ({
         // freeSolo
         autoHighlight
         options={dynamicOptions}
-        inputValue={inputValue || ""}
+        inputValue={shortenValue(inputValue)}
         onInputChange={(event, newInputValue, reason) => {
           // Only update lookupTerm on typing, not on selection
           if (reason === "input") {
@@ -333,9 +377,7 @@ const EditableText = ({
             if (reason === "selectOption" && values.length > 1) {
               // Replace the last segment (partial term) with the selected value
               // Replace the segment being edited with the selected value
-              const fullInput = inputValue || "";
-              const start = fullInput.lastIndexOf(",", cursorPos - 1) + 1;
-              const end = fullInput.indexOf(",", cursorPos);
+              const fullInput = shortenValue(inputValue || "");
               const segments = fullInput.split(/\s*,\s*/);
               const editedIndex = segments.findIndex((seg, idx) => {
                 const segStart =
@@ -360,11 +402,12 @@ const EditableText = ({
             }
             // Remove duplicates
             const deduped = Array.from(new Set(values));
-            const updatedValue = deduped.join(",");
+            const updatedValue = extendValue(deduped.join(","));
             setInputValue(updatedValue);
             onChange?.(updatedValue);
           } else {
-            const updatedValue = typeof newValue === "string" ? newValue : "";
+            const updatedValue =
+              typeof newValue === "string" ? extendValue(newValue) : "";
             setInputValue(updatedValue);
             onChange?.(updatedValue);
           }
@@ -395,6 +438,19 @@ const EditableText = ({
                     ) : null
                   }
                   {...getTagProps({ index })}
+                  onDelete={(event) => {
+                    if (allowMultipleValues) {
+                      const updatedValue = value
+                        .filter((_, i) => i !== index)
+                        .join(",");
+                      setInputValue(updatedValue);
+                      onChange?.(updatedValue);
+                    } else {
+                      setInputValue("");
+                      onChange?.("");
+                    }
+                    event.stopPropagation(); // Prevent the click from propagating to the Autocomplete
+                  }}
                   sx={{
                     backgroundColor: highlightColor,
                     color: highlightContrastColor,
@@ -439,33 +495,16 @@ const EditableText = ({
                 fullValue,
                 currentCursorPos,
               );
-
-              setInputValue(fullValue);
+              setInputValue(extendValue(fullValue));
               setLookupTerm(currentSegment);
             }}
             onKeyDown={(event) => {
-              console.log(params);
               if (event.key === "Escape") {
                 setIsEditing(false);
                 setAnchorEl(null);
-              } else if (event.key === "Enter") {
-                // On Enter, parse, deduplicate, and update
-                // let segments = (event.target.value || "")
-                //   .split(/\s*,\s*/)
-                //   .map((v) => v.trim())
-                //   .filter((v) => v);
-                // const deduped = Array.from(new Set(segments));
-                // const updatedValue = deduped.join(",");
-                // setInputValue(updatedValue);
-                // // onChange?.(updatedValue);
-
-                // enter key should select the currently highlighted option in the autocomplete dropdown
-                const highlightedOption = params?.getOptionSelected(
-                  params?.getOptionHighlightedIndex(),
-                );
               }
             }}
-            value={inputValue || ""}
+            value={shortenValue(inputValue)}
             placeholder="Type values separated by commas..."
             sx={{
               ...inputProps.sx,

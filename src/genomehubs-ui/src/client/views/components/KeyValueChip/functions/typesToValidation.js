@@ -244,6 +244,13 @@ export const typesToValidation = () => {
     return true;
   };
 
+  const allowSplitValues = ({ key, modifier }) => {
+    if (key === "tax") {
+      return false;
+    }
+    return allowMultipleValues({ key, modifier }) && modifier === "value";
+  };
+
   const isNegatable = ({ key, modifier }) => {
     if (key === "tax") {
       if (["tree", "name", "eq"].includes(modifier)) {
@@ -325,6 +332,7 @@ export const typesToValidation = () => {
     validateOperator,
     valueTips,
     allowMultipleValues,
+    allowSplitValues,
     isNegatable,
     getOperatorDescription,
     getModifierDescription,
