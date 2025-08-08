@@ -73,6 +73,8 @@ const ChipSearch = ({
   compact = false,
   backgroundColor = "#ffffff",
   lookupFunction = null,
+  alignment = "center", // Default alignment
+  inline = true, // Default to false for column layout
 }) => {
   const validation = typesToValidation();
   const validKeys = validation.validKeys();
@@ -509,45 +511,82 @@ const ChipSearch = ({
       </InputAdornment>
     );
   }
+  const justifyContent =
+    alignment === "left"
+      ? "flex-start"
+      : alignment === "right"
+        ? "flex-end"
+        : "center";
 
+  const addField = (
+    <AddField
+      handleMenuOpen={handleMenuOpen}
+      menuAnchorEl={menuAnchorEl}
+      handleMenuClose={handleMenuClose}
+      validKeys={validKeys}
+      handleMenuSelect={handleMenuSelect}
+      fontSize={"1.5em"}
+    />
+  );
   return (
     <Box
       sx={{
-        width: "100%",
-        maxWidth: "100%",
         display: "inline-flex",
+        flexDirection: inline ? "row" : "column",
+        justifyContent,
         alignItems: "center", // Align items vertically in the center
         gap: 1, // Add spacing between Box and TextField
         flexWrap: "wrap", // Allow content to wrap if it overflows
       }}
     >
       <>
-        {chipsArr}
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: "100%",
+            display: "inline-flex",
+            flexDirection: "row",
+            justifyContent,
+            alignItems: "center", // Align items vertically in the center
+            gap: 1, // Add spacing between Box and TextField
+            flexWrap: "wrap", // Allow content to wrap if it overflows
+          }}
+        >
+          {chipsArr}
+          {compact && addField}
+        </Box>
+        <Box
+          sx={{
+            display: "inline-flex",
+            flexDirection: "row",
+            justifyContent,
+            minWidth: "300px",
+            maxWidth: "900px",
+            width: "100%",
 
-        <AddField
-          handleMenuOpen={handleMenuOpen}
-          menuAnchorEl={menuAnchorEl}
-          handleMenuClose={handleMenuClose}
-          validKeys={validKeys}
-          handleMenuSelect={handleMenuSelect}
-          fontSize={"1.5em"}
-        />
-        {!compact && (
-          <TextInput
-            inputValue={inputValue}
-            setInputValue={setInputValue}
-            handleKeyDown={handleKeyDown}
-            placeholder={placeholder}
-            handleMenuOpen={handleMenuOpen}
-            menuAnchorEl={menuAnchorEl}
-            handleMenuClose={handleMenuClose}
-            validKeys={validKeys}
-            handleMenuSelect={handleMenuSelect}
-            startAdornment={startAdornment}
-            multiline={true}
-            rows={2}
-          />
-        )}
+            alignItems: "center", // Align items vertically in the center
+            gap: 1, // Add spacing between Box and TextField
+            flexWrap: "wrap", // Allow content to wrap if it overflows
+          }}
+        >
+          {!compact && addField}
+          {!compact && (
+            <TextInput
+              inputValue={inputValue}
+              setInputValue={setInputValue}
+              handleKeyDown={handleKeyDown}
+              placeholder={placeholder}
+              handleMenuOpen={handleMenuOpen}
+              menuAnchorEl={menuAnchorEl}
+              handleMenuClose={handleMenuClose}
+              validKeys={validKeys}
+              handleMenuSelect={handleMenuSelect}
+              startAdornment={startAdornment}
+              multiline={true}
+              rows={2}
+            />
+          )}
+        </Box>
       </>
       <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
         <Alert
@@ -592,6 +631,7 @@ const TextInput = ({
         flexGrow: 1,
         minWidth: "300px",
         maxWidth: "900px",
+        width: "calc(100% - 4em)",
         "& .MuiSvgIcon-root": {
           fontSize: "1em",
         },

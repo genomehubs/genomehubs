@@ -1,20 +1,23 @@
-import ChipSearch from "./ChipSearch";
+import ChipSearchBox from "./ChipSearchBox";
 import { Provider } from "react-redux";
 import React from "react";
 import colorStore from "../../reducers/color.store";
 import lookupFunction from "./functions/lookupFunction";
 
 export default {
-  title: "Components/ChipSearch",
-  component: ChipSearch,
+  title: "Components/ChipSearchBox",
+  component: ChipSearchBox,
   decorators: [(story) => <Provider store={colorStore}>{story()}</Provider>],
 };
 
-const Template = (args) => <ChipSearch {...args} />;
+const Template = (args) => <ChipSearchBox {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
   lookupFunction,
+  result: "taxon",
+  setCurrentResult: () => {},
+  results: ["taxon", "assembly", "sample"],
 };
 
 export const WithInitialChips = Template.bind({});
