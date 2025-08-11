@@ -1,5 +1,4 @@
 import parseValue from "./parseValue";
-import types from "./default.types.json";
 
 const validateNumber = ({ value, processed_type, constraint }) => {
   let values = Array.isArray(value) ? value : [value];
@@ -48,7 +47,7 @@ const validateKeyword = ({ value, validValues }) => {
   return { valid: true };
 };
 
-export const typesToValidation = () => {
+export const typesToValidation = (types) => {
   const validKeys = () => {
     let keys = new Set(["tax", "collate"]);
     let keysByGroup = {

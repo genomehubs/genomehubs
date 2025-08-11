@@ -75,8 +75,10 @@ const ChipSearch = ({
   lookupFunction = null,
   alignment = "center", // Default alignment
   inline = true, // Default to false for column layout
+  types = {},
+  searchButton = null,
 }) => {
-  const validation = typesToValidation();
+  const validation = typesToValidation(types);
   const validKeys = validation.validKeys();
   const [showChips, setShowChips] = useState(!showText);
   const removeDuplicates = (arr) => {
@@ -324,6 +326,7 @@ const ChipSearch = ({
         }} // Add margin to chips
         chipIndex={index} // Pass the index to KeyValueChip
         lookupFunction={key === "tax" ? lookupFunction : null}
+        types={types}
         {...props} // Spread any additional props
       />
     );
@@ -553,14 +556,15 @@ const ChipSearch = ({
           }}
         >
           {chipsArr}
-          {compact && addField}
+          {addField}
+          {compact && searchButton}
         </Box>
         <Box
           sx={{
             display: "inline-flex",
             flexDirection: "row",
             justifyContent,
-            minWidth: "300px",
+            minWidth: compact ? "10px" : "300px",
             maxWidth: "900px",
             width: "100%",
 
@@ -569,7 +573,6 @@ const ChipSearch = ({
             flexWrap: "wrap", // Allow content to wrap if it overflows
           }}
         >
-          {!compact && addField}
           {!compact && (
             <TextInput
               inputValue={inputValue}
@@ -588,6 +591,7 @@ const ChipSearch = ({
           )}
         </Box>
       </>
+      {!compact && searchButton}
       <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
         <Alert
           onClose={handleClose}

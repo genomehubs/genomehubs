@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import KeyValueChip from "./KeyValueChip";
 import { Provider } from "react-redux";
 import colorStore from "../../reducers/color.store";
+import types from "./default.types.json";
 
 export default {
   title: "Components/KeyValueChip",
@@ -61,13 +62,12 @@ const Template = (args) => {
 
 export const Default = Template.bind({});
 Default.args = {
-  keyLabel: "c_value_method",
-  value: "feulgen densitometry",
-  operator: "=",
+  types,
 };
 
 export const GreaterThanOrEqual = Template.bind({});
 GreaterThanOrEqual.args = {
+  ...Default.args,
   keyLabel: "assembly_span",
   value: "2000000000",
   operator: ">=",
@@ -75,6 +75,7 @@ GreaterThanOrEqual.args = {
 
 export const LessThanOrEqual = Template.bind({});
 LessThanOrEqual.args = {
+  ...Default.args,
   keyLabel: "assembly_level",
   value: "scaffold",
   operator: "<=",
@@ -82,6 +83,7 @@ LessThanOrEqual.args = {
 
 export const TaxKey = Template.bind({});
 TaxKey.args = {
+  ...Default.args,
   keyLabel: "tax",
   value: "Eukaryota",
   operator: null,
@@ -91,6 +93,7 @@ TaxKey.args = {
 
 export const LongTaxKey = Template.bind({});
 LongTaxKey.args = {
+  ...Default.args,
   keyLabel: "tax",
   value: "9608[Canidae]",
   operator: null,
@@ -100,6 +103,7 @@ LongTaxKey.args = {
 
 export const LongValue = Template.bind({});
 LongValue.args = {
+  ...Default.args,
   keyLabel: "bioproject",
   value: "PRJEB40665,PRJEB40666,PRJEB40667,PRJEB40668,PRJEB40669",
   operator: "=",
@@ -107,6 +111,7 @@ LongValue.args = {
 
 export const VeryLongValue = Template.bind({});
 VeryLongValue.args = {
+  ...Default.args,
   keyLabel: "bioproject",
   operator: "=",
   modifier: "value",
@@ -116,6 +121,7 @@ VeryLongValue.args = {
 
 export const SingleLongValue = Template.bind({});
 SingleLongValue.args = {
+  ...Default.args,
   keyLabel: "bioproject",
   operator: "=",
   modifier: "value",
@@ -125,6 +131,7 @@ SingleLongValue.args = {
 
 export const WithModifier = Template.bind({});
 WithModifier.args = {
+  ...Default.args,
   keyLabel: "assembly_span",
   value: "1000000000",
   operator: "<=",

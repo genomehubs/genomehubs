@@ -3,6 +3,7 @@ import { Provider } from "react-redux";
 import React from "react";
 import colorStore from "../../reducers/color.store";
 import lookupFunction from "./functions/lookupFunction";
+import types from "./default.types.json";
 
 export default {
   title: "Components/ChipSearchBox",
@@ -15,9 +16,17 @@ const Template = (args) => <ChipSearchBox {...args} />;
 export const Default = Template.bind({});
 Default.args = {
   lookupFunction,
-  result: "taxon",
-  setCurrentResult: () => {},
+  types,
   results: ["taxon", "assembly", "sample"],
+  searchOptions: {
+    query: "",
+    result: "taxon",
+    includeEstimates: false,
+    showEmptyColumns: false,
+    fields: ["assembly_span", "c_value"],
+    names: ["tolid"],
+    ranks: ["family", "order"],
+  },
 };
 
 export const WithInitialChips = Template.bind({});

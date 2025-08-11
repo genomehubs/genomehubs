@@ -41,8 +41,9 @@ const KeyValueChip = ({
   forcePalette = false,
   chipIndex = 0,
   lookupFunction = null,
+  types,
 }) => {
-  const validation = typesToValidation();
+  const validation = typesToValidation(types);
   const chipId = `${keyLabel}-${operator}-${value}-${modifier}`;
   const [anchorElSymbol, setAnchorElSymbol] = useState(null);
   const [anchorElModifier, setAnchorElModifier] = useState(null);

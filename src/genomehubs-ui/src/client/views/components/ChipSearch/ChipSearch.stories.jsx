@@ -3,6 +3,7 @@ import { Provider } from "react-redux";
 import React from "react";
 import colorStore from "../../reducers/color.store";
 import lookupFunction from "./functions/lookupFunction";
+import types from "./default.types.json";
 
 export default {
   title: "Components/ChipSearch",
@@ -15,6 +16,7 @@ const Template = (args) => <ChipSearch {...args} />;
 export const Default = Template.bind({});
 Default.args = {
   lookupFunction,
+  types,
 };
 
 export const WithInitialChips = Template.bind({});

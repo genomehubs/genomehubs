@@ -2,38 +2,322 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
   Typography,
 } from "@mui/material";
 import { Modal, Paper } from "@mui/material";
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 
 import ChipSearch from "./ChipSearch";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import KeyboardArrowDownIcon from "@mui/icons-material/MoreVert";
+import KeyboardArrowDownIcon from "@mui/icons-material/Tune";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 // A wrapper around the ChipSearch component to add buttons for search options
 // and submitting the search query.
 import SearchIcon from "@mui/icons-material/Search";
 import Tooltip from "../Tooltip";
-import { current } from "@reduxjs/toolkit";
 import { useStyles } from "./SearchBoxStyles";
+
+const Underline = () => (
+  <hr style={{ border: "0.5px solid gray", width: "100%", opacity: 0.75 }} />
+);
+
+function typesByDisplayGroup({ types }) {
+  let groupTypes = {};
+  Object.entries(types).forEach(([key, value]) => {
+    let {
+      display_group,
+      display_name,
+      description = display_name,
+      display_level,
+    } = value;
+    if (!groupTypes[display_group]) {
+      groupTypes[display_group] = [];
+    }
+
+    groupTypes[display_group].push({
+      label: key,
+      description,
+      display_level,
+    });
+  });
+  return groupTypes;
+}
+
+const CustomOptions = ({
+  setSearchOptions,
+  groupedTypes = {},
+  resultColumns = {},
+  handleClose = () => {},
+}) => {
+  const { fields, names, ranks } = resultColumns;
+  const [selectedFields, setSelectedFields] = useState([...(fields || [])]);
+
+  const groupSelectors = Object.entries(groupedTypes).map(([group, items]) => {
+    const defaultFields = items
+      .filter((item) => item.display_level === 1)
+      .map((item) => item.label);
+    const allSelected = items.every((item) =>
+      selectedFields.includes(item.label),
+    );
+    const noneSelected = items.every(
+      (item) => !selectedFields.includes(item.label),
+    );
+    const isDefaultSelected =
+      defaultFields.length > 0 &&
+      defaultFields.every((field) => selectedFields.includes(field)) &&
+      items.filter((item) => selectedFields.includes(item.label)).length ===
+        defaultFields.length;
+    return (
+      <Box key={group} sx={{ mb: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+          <Typography variant="h6" sx={{ flex: 1 }}>
+            {group}
+          </Typography>
+          <Button
+            size="small"
+            variant={allSelected ? "contained" : "text"}
+            sx={{
+              mr: 1,
+              minWidth: 0,
+              px: 1,
+              pointerEvents: allSelected ? "none" : "auto",
+            }}
+            onClick={() => {
+              // Select all items in this group
+              setSelectedFields((prev) => {
+                const groupLabels = items.map((item) => item.label);
+                return Array.from(
+                  new Set([
+                    ...prev.filter((f) => f !== "none"),
+                    ...groupLabels,
+                  ]),
+                );
+              });
+            }}
+          >
+            All
+          </Button>
+          {defaultFields.length > 0 && (
+            <Button
+              size="small"
+              variant={isDefaultSelected ? "contained" : "text"}
+              sx={{
+                mr: 1,
+                minWidth: 0,
+                px: 1,
+                pointerEvents: isDefaultSelected ? "none" : "auto",
+              }}
+              onClick={() => {
+                // Select only items in this group with display_level 1
+                setSelectedFields((prev) => {
+                  // Remove any fields from this group that are not in defaultFields
+                  const groupLabels = items.map((item) => item.label);
+                  // Remove all group fields, then add only defaultFields
+                  const filtered = prev.filter(
+                    (f) => !groupLabels.includes(f) && f !== "none",
+                  );
+                  return Array.from(new Set([...filtered, ...defaultFields]));
+                });
+              }}
+            >
+              Defaults
+            </Button>
+          )}
+          <Button
+            size="small"
+            variant={noneSelected ? "contained" : "text"}
+            sx={{
+              minWidth: 0,
+              px: 1,
+              pointerEvents: noneSelected ? "none" : "auto",
+            }}
+            onClick={() => {
+              // Deselect all items in this group
+              setSelectedFields((prev) => {
+                const groupLabels = items.map((item) => item.label);
+                return prev.filter((f) => !groupLabels.includes(f));
+              });
+            }}
+          >
+            None
+          </Button>
+        </Box>
+        <ButtonGroup
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+          }}
+        >
+          {items.map((item) => (
+            <Button
+              size="small"
+              key={item.label}
+              variant={
+                selectedFields.includes(item.label) ? "contained" : "outlined"
+              }
+              onClick={() => {
+                setSelectedFields((prev) => {
+                  if (prev.includes(item.label)) {
+                    return prev.filter((f) => f !== item.label);
+                  }
+                  return [...prev, item.label];
+                });
+              }}
+              sx={{
+                mb: 1,
+                ...(item.selected && {
+                  bgcolor: "primary.main",
+                  color: "primary.contrastText",
+                  "&:hover": {
+                    bgcolor: "primary.dark",
+                  },
+                }),
+                "&.MuiButtonGroup-middleButton": {
+                  borderRightColor: "primary.main",
+                },
+              }}
+            >
+              {item.label}
+            </Button>
+          ))}
+        </ButtonGroup>
+        <Underline />
+      </Box>
+    );
+  });
+
+  return (
+    <Paper
+      sx={{
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        padding: 2,
+        outline: "none",
+        minWidth: 500,
+        maxHeight: "90vh",
+        overflowY: "auto",
+        zIndex: 1300,
+        boxShadow: "0px -8px 16px -8px rgba(0,0,0,0.15)",
+      }}
+    >
+      <Box sx={{ position: "relative" }}>
+        <DialogTitle
+          sx={{
+            backgroundColor: "primary.main",
+            color: "white",
+            fontSize: "1.25rem",
+            fontWeight: "bold",
+            padding: "1em",
+            textAlign: "center",
+            position: "sticky",
+            top: "-1em",
+            left: 0,
+            right: 0,
+            zIndex: 1300, // Ensure it appears above other content
+            mt: -2,
+            ml: -2,
+            mr: -2,
+            mb: 2,
+            pb: 1,
+            boxShadow: "0px 8px 12px -4px rgba(0,0,0,0.12)",
+          }}
+        >
+          <Typography variant="h5" sx={{ mb: 2, textAlign: "center" }}>
+            Result Columns
+          </Typography>
+        </DialogTitle>
+
+        <Typography
+          variant="body1"
+          sx={{ mb: 2, fontStyle: "italic", textAlign: "center" }}
+        >
+          Select fields to include in the search results.
+        </Typography>
+        <Underline />
+        {groupSelectors}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 2,
+            mt: 2,
+            ml: -2,
+            mr: -2,
+            mb: -2,
+            position: "sticky",
+            bottom: "-1em",
+            backgroundColor: "white",
+            padding: 1,
+            zIndex: 1300,
+            boxShadow: "0px -8px 12px -8px rgba(0,0,0,0.12)",
+          }}
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              setSearchOptions({
+                fields: selectedFields.length > 0 ? selectedFields : ["none"],
+              });
+              handleClose();
+            }}
+          >
+            Apply Changes
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => setSelectedFields([...fields])}
+          >
+            Reset
+          </Button>
+          <Button variant="outlined" color="primary" onClick={handleClose}>
+            Close
+          </Button>
+        </Box>
+      </Box>
+    </Paper>
+  );
+};
 
 const SearchOptions = ({
   currentResult,
-  setCurrentResult = () => {},
   availableResults = currentResult ? [currentResult] : [],
   includeEstimates = false,
-  setIncludeEstimates = () => {},
   showEmptyColumns = false,
-  setShowEmptyColumns = () => {},
+  setSearchOptions = () => {},
+  types = {},
   resultColumns = {},
-  setResultColumns = () => {},
   resetSearch = () => {},
+  handleClose = () => {},
 }) => {
-  const Underline = () => (
-    <hr style={{ border: "0.5px solid gray", width: "100%", opacity: 0.75 }} />
-  );
+  const [showCustomOptions, setShowCustomOptions] = useState(false);
+  const groupedTypes = useMemo(() => {
+    let grouped = typesByDisplayGroup({ types });
+    // sort each group by display_level, then by label
+    Object.entries(grouped).forEach(([group, items]) => {
+      grouped[group] = items.sort((a, b) => {
+        if (a.display_level !== b.display_level) {
+          return a.display_level - b.display_level;
+        }
+        return a.label.localeCompare(b.label);
+      });
+    });
+    return grouped;
+  }, [types]);
+  const defaultFields = useMemo(() => {
+    return Object.entries(groupedTypes).reduce((acc, [group, items]) => {
+      const defaultItems = items.filter((item) => item.display_level === 1);
+      return [...acc, ...defaultItems.map((item) => item.label)];
+    }, []);
+  }, [groupedTypes]);
   const OptionGroup = ({
     title,
     helpText,
@@ -93,7 +377,12 @@ const SearchOptions = ({
                 onClick={() => setCurrentOption(option)}
                 sx={{
                   ...sx,
-                  pointerEvents: isCurrentOption ? "none" : "auto",
+                  pointerEvents:
+                    isCurrentOption &&
+                    !["custom"].includes(option) &&
+                    options.length > 1
+                      ? "none"
+                      : "auto",
                 }}
               >
                 {option}
@@ -105,6 +394,31 @@ const SearchOptions = ({
       </Box>
     );
   };
+
+  let currentColumnsOption = "default";
+  let selectedDefaultsLength = 0;
+  for (let key of ["fields", "names", "ranks"]) {
+    if (resultColumns[key] && resultColumns[key].length > 0) {
+      if (resultColumns[key].length == 1 && resultColumns[key][0] === "none") {
+        currentColumnsOption = "none";
+        break;
+      }
+      for (let field of resultColumns[key]) {
+        if (defaultFields.includes(field)) {
+          selectedDefaultsLength++;
+        } else {
+          currentColumnsOption = "custom";
+        }
+      }
+    }
+  }
+  if (
+    currentColumnsOption === "default" &&
+    selectedDefaultsLength !== defaultFields.length
+  ) {
+    currentColumnsOption = "custom";
+  }
+
   return (
     <Paper
       sx={{
@@ -112,88 +426,159 @@ const SearchOptions = ({
         top: "50%",
         left: "50%",
         transform: "translate(-50%, -50%)",
-        padding: 2,
+        padding: 0,
         outline: "none",
-        minWidth: 200,
-        maxHeight: "100%",
+        minWidth: 350,
+        maxHeight: "90vh",
         overflowY: "auto",
+        overflowX: "hidden",
+        filter: showCustomOptions ? "blur(2px)" : "none",
       }}
     >
+      <DialogTitle
+        sx={{
+          backgroundColor: "primary.main",
+          color: "white",
+          fontSize: "1.25rem",
+          fontWeight: "bold",
+          padding: "1em",
+          textAlign: "center",
+          position: "sticky",
+          top: "0em",
+          left: 0,
+          right: 0,
+          zIndex: 1300, // Ensure it appears above other content
+
+          mb: 3,
+          pb: 1,
+          boxShadow: "0px 8px 12px -4px rgba(0,0,0,0.12)",
+        }}
+      >
+        <Typography variant="h5" sx={{ mb: 2, textAlign: "center" }}>
+          Search Options
+        </Typography>
+      </DialogTitle>
+
+      <Typography
+        variant="body1"
+        sx={{ mb: 2, fontStyle: "italic", textAlign: "center" }}
+      >
+        Change common search options.
+      </Typography>
+      <Underline />
       <OptionGroup
         title="Search Index"
         helpText="Select the index to search in"
         currentOption={currentResult}
         options={availableResults}
-        setCurrentOption={setCurrentResult}
+        setCurrentOption={(result) => setSearchOptions({ result })}
         underline={true}
       />
       {currentResult == "taxon" && (
         <OptionGroup
           title="Include Estimates"
           helpText="Include rows with only estimated values in the search results"
-          currentOption={includeEstimates ? "Yes" : "No"}
-          options={["Yes", "No"]}
-          setCurrentOption={(option) => setIncludeEstimates(option === "Yes")}
+          currentOption={includeEstimates ? "yes" : "no"}
+          options={["yes", "no"]}
+          setCurrentOption={(value) =>
+            setSearchOptions({ includeEstimates: value === "yes" })
+          }
           underline={true}
         />
       )}
       <OptionGroup
         title="Result Columns"
         helpText="Select the columns to display in the search results"
-        currentOption={"default"}
+        currentOption={currentColumnsOption}
         options={["default", "custom", "none"]}
-        setCurrentOption={setResultColumns}
-        sx={{
-          "& .MuiButtonBase-root": {
-            background:
-              "linear-gradient(\
-    to right,\
-    red 20%,\
-    orange 20% 40%,\
-    yellow 40% 60%,\
-    green 60% 80%,\
-    blue 80% \
-  )",
-          },
+        setCurrentOption={(value) => {
+          if (value === "default") {
+            setSearchOptions({
+              fields: defaultFields,
+              names: [],
+              ranks: [],
+            });
+          } else if (value === "custom") {
+            // open a dialog to select custom columns
+            setShowCustomOptions(true);
+          } else if (value === "none") {
+            setSearchOptions({
+              fields: ["none"],
+              names: [],
+              ranks: [],
+            });
+          }
         }}
         underline={true}
       />
       <OptionGroup
         title="Show Empty Columns"
         helpText="Toggle the visibility of columns with no data in the search results"
-        currentOption={showEmptyColumns ? "Yes" : "No"}
-        options={["Yes", "No"]}
-        setCurrentOption={(option) => setShowEmptyColumns(option === "Yes")}
+        currentOption={showEmptyColumns ? "yes" : "no"}
+        options={["yes", "no"]}
+        setCurrentOption={(value) =>
+          setSearchOptions({ showEmptyColumns: value === "yes" })
+        }
         underline={true}
       />
       <OptionGroup
-        title="Reset Search"
-        helpText="Reset the search query and options"
-        currentOption="Reset"
-        options={["Reset"]}
+        title="Clear All"
+        helpText="Clear the search query and all options"
+        currentOption="clear all"
+        options={["clear all"]}
         setCurrentOption={() => {
           resetSearch();
         }}
+        color="error"
+        sx={{ backgroundColor: "error.main" }}
       />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          gap: 2,
+          mt: 2,
+          position: "sticky",
+          bottom: 0,
+          backgroundColor: "white",
+          padding: 1,
+          zIndex: 1300,
+          boxShadow: "0px -8px 12px -8px rgba(0,0,0,0.12)",
+        }}
+      >
+        <Button variant="contained" color="primary" onClick={handleClose}>
+          Close
+        </Button>
+      </Box>
+      <Modal
+        open={showCustomOptions}
+        onClose={() => setShowCustomOptions(false)}
+        disableEnforceFocus
+      >
+        <Box tabIndex={-1}>
+          <CustomOptions
+            groupedTypes={groupedTypes}
+            resultColumns={resultColumns}
+            setSearchOptions={setSearchOptions}
+            handleClose={() => setShowCustomOptions(false)}
+          />
+        </Box>
+      </Modal>
     </Paper>
   );
 };
 const ChipSearchBox = ({
-  result,
-  setCurrentResult,
+  types,
   results,
-  includeEstimates,
-  setIncludeEstimates,
-  showEmptyColumns,
-  setShowEmptyColumns,
-  resultColumns,
-  setResultColumns,
+  searchOptions: initialSearchOptions = {},
+  //   setSearchOptions = () => {},
   resetSearch,
   ...props
 }) => {
   const classes = useStyles();
 
   const [showOptions, setShowOptions] = useState(false);
+  const [searchOptions, setSearchOptions] = useState(initialSearchOptions);
 
   const optionsButtonRef = useRef(null);
 
@@ -203,6 +588,38 @@ const ChipSearchBox = ({
 
   const { compact } = props;
 
+  const { result, includeEstimates, showEmptyColumns, fields, names, ranks } =
+    searchOptions;
+
+  const updateOptions = (newOptions) => {
+    setSearchOptions((prevOptions) => ({
+      ...prevOptions,
+      ...newOptions,
+    }));
+  };
+
+  const searchButton = (
+    <ButtonGroup sx={{}}>
+      <Button
+        variant="contained"
+        color="primary"
+        startIcon={<SearchIcon />}
+        className={classes.searchButton}
+      >
+        {result}
+      </Button>
+      <Button
+        ref={optionsButtonRef}
+        variant="outlined"
+        color="primary"
+        className={classes.searchButton}
+        onClick={toggleOptions}
+      >
+        {showOptions ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+      </Button>
+    </ButtonGroup>
+  );
+
   return (
     <Box
       sx={{
@@ -211,28 +628,11 @@ const ChipSearchBox = ({
         alignItems: "center",
         gap: 1,
         flexWrap: "wrap",
+
+        filter: showOptions ? "blur(2px)" : "none",
       }}
     >
-      <ChipSearch {...props} />
-      <ButtonGroup sx={{}}>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<SearchIcon />}
-          className={classes.searchButton}
-        >
-          {result}
-        </Button>
-        <Button
-          ref={optionsButtonRef}
-          variant="contained"
-          color="primary"
-          className={classes.searchButton}
-          onClick={toggleOptions}
-        >
-          {showOptions ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-        </Button>
-      </ButtonGroup>
+      <ChipSearch types={types} searchButton={searchButton} {...props} />
       <Modal
         open={showOptions}
         onClose={() => setShowOptions(false)}
@@ -241,15 +641,14 @@ const ChipSearchBox = ({
         <Box tabIndex={-1}>
           <SearchOptions
             currentResult={result}
-            setCurrentResult={setCurrentResult}
             availableResults={results}
             includeEstimates={includeEstimates}
-            setIncludeEstimates={setIncludeEstimates}
             showEmptyColumns={showEmptyColumns}
-            setShowEmptyColumns={setShowEmptyColumns}
-            resultColumns={resultColumns}
-            setResultColumns={setResultColumns}
+            setSearchOptions={updateOptions}
+            resultColumns={{ fields, names, ranks }}
+            types={types}
             resetSearch={resetSearch}
+            handleClose={() => setShowOptions(false)}
           />
         </Box>
       </Modal>

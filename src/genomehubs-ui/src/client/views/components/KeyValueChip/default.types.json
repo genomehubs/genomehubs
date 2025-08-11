@@ -1,13 +1,5 @@
 {
   "c_value": {
-    "group": "taxon",
-    "name": "c_value",
-    "bins": {
-      "min": -2.5,
-      "max": 2.5,
-      "count": 10,
-      "scale": "log10"
-    },
     "constraint": {
       "max": 200,
       "min": 0
@@ -17,18 +9,14 @@
     "display_name": "C value",
     "display_group": "genome_size",
     "summary": ["primary", "median", "min", "max"],
-    "traverse": "mean",
     "traverse_direction": "both",
     "type": "half_float",
     "units": "pgDNA",
-    "sequence": 27,
     "processed_type": "float",
     "processed_summary": "half_float_value",
     "processed_simple": "value"
   },
   "c_value_method": {
-    "group": "taxon",
-    "name": "c_value_method",
     "constraint": {
       "enum": [
         "biochemical analysis",
@@ -61,52 +49,12 @@
     "display_name": "C value method",
     "display_group": "genome_size",
     "summary": "list",
-    "translate": {
-      "bca": "Biochemical Analysis",
-      "bfa": "Bulk Fluorometric Assay",
-      "cs": "Complete Genome Sequencing",
-      "fd": "Feulgen Densitometry",
-      "fia": "Feulgen Image Analysis Densitometry",
-      "fcm": "Flow Cytometry",
-      "fk": "Flow karyotyping",
-      "ffa": "Fluorescence Fading Analysis",
-      "gcd": "Gallocyanin Chrom Alum Densitometry",
-      "mgd": "Methyl Green Densitometry",
-      "ns": "Not Specified",
-      "scf": "Static Cell Fluorometry",
-      "uvm": "Ultraviolet Microscopy",
-      "un": "Unknown",
-      "ch": "Biochemical Analysis",
-      "cia": "Feulgen Image Analysis Densitometry",
-      "fc:?": "Flow Cytometry",
-      "fc:dapi": "Flow Cytometry",
-      "fc:eb": "Flow Cytometry",
-      "fc:eb & o": "Flow Cytometry",
-      "fc:hoechst": "Flow Cytometry",
-      "fc:mi": "Flow Cytometry",
-      "fc:pi": "Flow Cytometry",
-      "fc:pi & eb": "Flow Cytometry",
-      "fc:sybr": "Flow Cytometry",
-      "fe": "Feulgen Densitometry",
-      "fe & fc:eb": "Feulgen Densitometry & Flow Cytometry",
-      "fe & fc:pi": "Feulgen Densitometry & Flow Cytometry",
-      "m:dapi": "Microdensitometry",
-      "m:h": "Microdensitometry",
-      "m:pi": "Microdensitometry",
-      "pfge": "Pulse field gel electrophoresis",
-      "rk": "Reassociation kinetics",
-      "wgs": "Whole genome sequencing"
-    },
-    "traverse": false,
     "type": "keyword",
-    "sequence": 28,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "c_value_cell_type": {
-    "group": "taxon",
-    "name": "c_value_cell_type",
     "constraint": {
       "enum": [
         "antennae",
@@ -166,73 +114,12 @@
     "display_name": "C value cell type",
     "display_group": "genome_size",
     "summary": "list",
-    "translate": {
-      "an": "Antennae",
-      "ag": "Antennal gland",
-      "bl": "Blood cells",
-      "br": "Brain",
-      "be": "Buccal epithelium",
-      "c": "Coelomocytes",
-      "ce": "Corneal epithelium",
-      "dg": "Digestive gland",
-      "e": "Egg",
-      "em": "Embyro",
-      "ep": "Epidermis",
-      "exp": "Exopodite",
-      "fb": "Fibroblasts",
-      "fc": "Fin clips",
-      "gm": "Germarium",
-      "g": "Gills",
-      "he": "Haemocytes",
-      "hc": "Heart cells",
-      "ic": "Individual chromosomes",
-      "int": "Intestine",
-      "kc": "Kidney cells",
-      "l": "Legs",
-      "lk": "Leukocytes",
-      "lv": "Liver",
-      "lg": "Lung (culture)",
-      "mt": "Mantle",
-      "mg": "Midgut",
-      "mc": "Muscle cells",
-      "neurons": "NE",
-      "ns": "Not specified",
-      "oc": "Oocytes",
-      "ov": "Ovaries",
-      "p": "Pancreas",
-      "ph": "Pharynx",
-      "ppc": "Polypide cells in suspension",
-      "rbc": "Red blood cells",
-      "rc": "Retinal cells",
-      "sg": "Salivary gland",
-      "sc": "Somatic cells",
-      "s": "Sperm",
-      "sp": "Spleen",
-      "tn": "Tentacles",
-      "ts": "Testes",
-      "th": "Thymus",
-      "tc": "Tissue Culture",
-      "v": "Various",
-      "vhc": "Ventral hypodermal chord",
-      "wb": "Whole body",
-      "sq": "Whole body squash"
-    },
-    "traverse": false,
     "type": "keyword",
-    "sequence": 29,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "genome_size": {
-    "group": "taxon",
-    "name": "genome_size",
-    "bins": {
-      "min": 6,
-      "max": 11,
-      "count": 10,
-      "scale": "log10"
-    },
     "constraint": {
       "min": 0
     },
@@ -241,24 +128,14 @@
     "display_level": 1,
     "display_group": "genome_size",
     "summary": ["primary", "median", "min", "max"],
-    "traverse": "median",
     "traverse_direction": "both",
     "type": "long",
     "units": "bases",
-    "sequence": 30,
     "processed_type": "integer",
     "processed_summary": "long_value",
     "processed_simple": "value"
   },
   "genome_size_kmer": {
-    "group": "taxon",
-    "name": "genome_size_kmer",
-    "bins": {
-      "min": 6,
-      "max": 11,
-      "count": 10,
-      "scale": "log10"
-    },
     "constraint": {
       "min": 0
     },
@@ -269,20 +146,11 @@
     "summary": ["primary", "median", "min", "max"],
     "type": "long",
     "units": "bases",
-    "sequence": 31,
     "processed_type": "integer",
     "processed_summary": "long_value",
     "processed_simple": "value"
   },
   "genome_size_draft": {
-    "group": "taxon",
-    "name": "genome_size_draft",
-    "bins": {
-      "min": 6,
-      "max": 11,
-      "count": 10,
-      "scale": "log10"
-    },
     "constraint": {
       "min": 0
     },
@@ -293,72 +161,44 @@
     "summary": ["primary", "median", "min", "max"],
     "type": "long",
     "units": "bases",
-    "sequence": 32,
     "processed_type": "integer",
     "processed_summary": "long_value",
     "processed_simple": "value"
   },
   "assembly_level": {
-    "group": "taxon",
-    "name": "assembly_level",
     "constraint": {
       "enum": ["complete genome", "chromosome", "scaffold", "contig"]
     },
     "display_group": "assembly",
     "display_level": 1,
     "display_name": "Assembly level",
-    "organelle": "nucleus",
-    "source": "INSDC",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/assembly/",
     "type": "keyword",
-    "sequence": 2,
     "summary": ["primary", "enum"],
-    "traverse": "enum",
     "traverse_direction": "up",
     "processed_type": "ordered_keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "assembly_span": {
-    "group": "taxon",
-    "name": "assembly_span",
     "constraint": {
       "min": 1
     },
     "display_group": "assembly",
     "display_level": 1,
     "display_name": "Assembly span",
-    "organelle": "nucleus",
-    "source": "INSDC",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/assembly/",
-    "bins": {
-      "count": 10,
-      "max": 11,
-      "min": 6,
-      "scale": "log10"
-    },
     "type": "long",
     "units": "bases",
-    "sequence": 3,
     "summary": ["primary", "median", "min", "max", "count"],
-    "traverse": "median",
     "traverse_direction": "both",
     "processed_type": "integer",
     "processed_summary": "long_value",
     "processed_simple": "value"
   },
   "bioproject": {
-    "group": "taxon",
-    "name": "bioproject",
     "constraint": {
       "len": 32
     },
     "display_group": "assembly",
-    "organelle": "nucleus",
-    "separator": [";"],
-    "source": "INSDC",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/assembly/",
-    "synonyms": ["bioproject_accession"],
     "type": "keyword",
     "value_metadata": {
       "default": {
@@ -435,173 +275,102 @@
         "description": "Vertebrate Genomes Project (click to view on ENA)"
       }
     },
-    "sequence": 5,
     "display_level": 2,
     "summary": ["list"],
-    "traverse": "list",
     "traverse_direction": "up",
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "biosample": {
-    "group": "taxon",
-    "name": "biosample",
     "constraint": {
       "len": 32
     },
     "display_group": "assembly",
-    "organelle": "nucleus",
-    "separator": [";"],
-    "source": "INSDC",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/assembly/",
-    "synonyms": ["biosample_accession"],
     "type": "keyword",
-    "sequence": 6,
     "display_level": 2,
     "summary": ["list"],
-    "traverse": "list",
     "traverse_direction": "up",
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "contig_n50": {
-    "group": "taxon",
-    "name": "contig_n50",
     "constraint": {
       "min": 1
     },
     "display_group": "assembly",
     "display_level": 2,
     "display_name": "Contig N50",
-    "organelle": "nucleus",
-    "source": "INSDC",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/assembly/",
-    "bins": {
-      "count": 10,
-      "max": 9,
-      "min": 4,
-      "scale": "log10"
-    },
     "type": "long",
     "units": "bases",
-    "sequence": 10,
     "summary": ["primary", "max", "median", "min", "count"],
-    "traverse": "median",
     "traverse_direction": "up",
     "processed_type": "integer",
     "processed_summary": "long_value",
     "processed_simple": "value"
   },
   "assembly_date": {
-    "group": "taxon",
-    "name": "assembly_date",
     "display_group": "assembly",
     "display_level": 2,
     "display_name": "Last updated",
-    "organelle": "nucleus",
-    "source": "INSDC",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/assembly/",
     "type": "date",
-    "sequence": 14,
     "summary": ["primary", "max", "min"],
-    "traverse": "min",
     "traverse_direction": "up",
     "processed_type": "date",
     "processed_summary": "date_value",
     "processed_simple": "value"
   },
   "scaffold_n50": {
-    "group": "taxon",
-    "name": "scaffold_n50",
     "constraint": {
       "min": 1
     },
     "display_group": "assembly",
     "display_level": 2,
     "display_name": "Scaffold N50",
-    "organelle": "nucleus",
-    "source": "INSDC",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/assembly/",
-    "bins": {
-      "count": 10,
-      "max": 9,
-      "min": 4,
-      "scale": "log10"
-    },
     "type": "long",
     "units": "bases",
-    "sequence": 22,
     "summary": ["primary", "max", "median", "min", "count"],
-    "traverse": "median",
     "traverse_direction": "up",
     "processed_type": "integer",
     "processed_summary": "long_value",
     "processed_simple": "value"
   },
   "gene_count": {
-    "group": "taxon",
-    "name": "gene_count",
     "constraint": {
       "min": 1
     },
     "display_group": "assembly",
     "display_level": 2,
     "display_name": "Gene count",
-    "organelle": "nucleus",
-    "source": "INSDC",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/assembly/",
-    "bins": {
-      "count": 10,
-      "max": 5,
-      "min": 0,
-      "scale": "log10"
-    },
     "type": "integer",
-    "sequence": 12,
     "summary": ["primary", "median", "min", "max", "count"],
     "processed_type": "integer",
     "processed_summary": "integer_value",
     "processed_simple": "value"
   },
   "sample_sex": {
-    "group": "taxon",
-    "name": "sample_sex",
     "display_group": "assembly",
     "display_level": 2,
     "display_name": "Sample sex",
-    "organelle": "nucleus",
-    "source": "INSDC",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/assembly/",
     "type": "keyword",
-    "sequence": 19,
     "summary": ["primary", "list", "count"],
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
-  "ebp_metric_date": {
-    "group": "taxon",
-    "name": "ebp_metric_date",
+  "ebp_standard_date": {
     "display_group": "assembly",
     "display_level": 2,
     "display_name": "EBP metric date",
-    "organelle": "nucleus",
-    "source": "INSDC",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/assembly/",
     "type": "date",
-    "sequence": 11,
     "summary": ["min", "max"],
-    "traverse": "min",
     "traverse_direction": "up",
     "processed_type": "date",
     "processed_summary": "date_value",
     "processed_simple": "value"
   },
   "country_list": {
-    "group": "taxon",
-    "name": "country_list",
     "constraint": {
       "enum": [
         "af",
@@ -861,7 +630,6 @@
     "display_level": 2,
     "display_name": "Country list",
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
     "value_metadata": {
@@ -1619,139 +1387,72 @@
         "description": "Kosovo"
       }
     },
-    "sequence": 37,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "mitochondrion_assembly_span": {
-    "group": "taxon",
-    "name": "mitochondrion_assembly_span",
     "display_group": "mitochondrion_assembly",
     "constraint": {
       "min": 1
     },
     "display_level": 2,
     "display_name": "mitochondrion span",
-    "organelle": "nucleus",
-    "source": "NCBI",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/nuccore/",
-    "bins": {
-      "count": 10,
-      "max": 8,
-      "min": 3,
-      "scale": "log10"
-    },
     "type": "long",
     "units": "bases",
-    "sequence": 3,
     "summary": "median",
-    "traverse": "median",
     "traverse_direction": "both",
-    "key": "mitochondrion_assembly_span",
-    "traverse_limit": "phylum",
     "processed_type": "integer",
     "processed_summary": "long_value",
     "processed_simple": "value"
   },
   "mitochondrion_gc_percent": {
-    "group": "taxon",
-    "name": "mitochondrion_gc_percent",
     "constraint": {
       "max": 100,
       "min": 0
     },
     "display_group": "mitochondrion_assembly",
     "display_level": 2,
-    "source": "NCBI",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/nuccore/",
     "type": "2dp",
     "units": "%",
-    "sequence": 26,
-    "bins": {
-      "count": 10,
-      "max": 100,
-      "min": 0,
-      "scale": "linear"
-    },
     "display_name": "mitochondrion GC%",
-    "key": "mitochondrion_gc_percent",
     "summary": "median",
-    "traverse": "median",
-    "traverse_limit": "phylum",
     "processed_type": "float",
     "processed_summary": "2dp_value",
     "processed_simple": "value"
   },
   "plastid_assembly_span": {
-    "group": "taxon",
-    "name": "plastid_assembly_span",
     "display_group": "plastid_assembly",
     "constraint": {
       "min": 1
     },
     "display_level": 2,
     "display_name": "plastid span",
-    "organelle": "nucleus",
-    "source": "NCBI",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/nuccore/",
-    "bins": {
-      "count": 10,
-      "max": 8,
-      "min": 3,
-      "scale": "log10"
-    },
     "type": "long",
     "units": "bases",
-    "sequence": 3,
     "summary": "median",
-    "traverse": "median",
     "traverse_direction": "both",
-    "key": "plastid_assembly_span",
-    "traverse_limit": "phylum",
     "processed_type": "integer",
     "processed_summary": "long_value",
     "processed_simple": "value"
   },
   "plastid_gc_percent": {
-    "group": "taxon",
-    "name": "plastid_gc_percent",
     "constraint": {
       "max": 100,
       "min": 0
     },
     "display_group": "plastid_assembly",
     "display_level": 2,
-    "source": "NCBI",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/nuccore/",
     "type": "2dp",
     "units": "%",
-    "sequence": 26,
-    "bins": {
-      "count": 10,
-      "max": 100,
-      "min": 0,
-      "scale": "linear"
-    },
     "display_name": "plastid GC%",
-    "key": "plastid_gc_percent",
     "summary": "median",
-    "traverse": "median",
-    "traverse_limit": "phylum",
     "processed_type": "float",
     "processed_summary": "2dp_value",
     "processed_simple": "value"
   },
   "chromosome_number": {
-    "group": "taxon",
-    "name": "chromosome_number",
     "display_group": "karyotype",
-    "bins": {
-      "min": 0,
-      "max": 10,
-      "count": 10,
-      "scale": "log2"
-    },
     "constraint": {
       "max": 2000,
       "min": 0
@@ -1760,24 +1461,14 @@
     "display_level": 1,
     "display_name": "Chromosome number",
     "summary": ["median_high", "mode", "max", "min"],
-    "traverse": "median_high",
     "traverse_direction": "both",
     "type": "short",
-    "sequence": 33,
     "processed_type": "integer",
     "processed_summary": "short_value",
     "processed_simple": "value"
   },
   "haploid_number": {
-    "group": "taxon",
-    "name": "haploid_number",
     "display_group": "karyotype",
-    "bins": {
-      "min": 0,
-      "max": 10,
-      "count": 10,
-      "scale": "log2"
-    },
     "constraint": {
       "max": 2000,
       "min": 0
@@ -1786,40 +1477,26 @@
     "display_level": 1,
     "display_name": "Haploid number",
     "summary": ["median_high", "mode", "max", "min"],
-    "traverse": "median_high",
     "traverse_direction": "both",
     "type": "short",
-    "sequence": 34,
     "processed_type": "integer",
     "processed_summary": "short_value",
     "processed_simple": "value"
   },
   "sex_determination": {
-    "group": "taxon",
-    "name": "sex_determination",
     "display_group": "karyotype",
     "description": "Sex determination mechanism",
     "display_level": 2,
     "display_name": "Sex Determination",
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
-    "sequence": 35,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "ploidy": {
-    "group": "taxon",
-    "name": "ploidy",
     "display_group": "karyotype",
-    "bins": {
-      "min": 0,
-      "max": 10,
-      "count": 10,
-      "scale": "linear"
-    },
     "constraint": {
       "max": 200,
       "min": 0
@@ -1828,17 +1505,13 @@
     "display_level": 2,
     "display_name": "Ploidy",
     "summary": ["median_high", "mode", "max", "min"],
-    "traverse": "median_high",
     "traverse_direction": "both",
     "type": "short",
-    "sequence": 36,
     "processed_type": "integer",
     "processed_summary": "short_value",
     "processed_simple": "value"
   },
   "echabs92": {
-    "group": "taxon",
-    "name": "echabs92",
     "constraint": {
       "enum": ["echabs92_annex_iib", "echabs92_annex_ivb", "echabs92_annex_iva"]
     },
@@ -1847,17 +1520,13 @@
     "display_level": 2,
     "display_name": "EC Habitats Directive 1992",
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
-    "sequence": 38,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "habreg_2017": {
-    "group": "taxon",
-    "name": "habreg_2017",
     "constraint": {
       "enum": ["habreg-sch2", "habreg-sch5"]
     },
@@ -1866,17 +1535,13 @@
     "display_level": 2,
     "display_name": "Conservation of Habitats and Species Regulations 2017",
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
-    "sequence": 39,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "marhabreg-2017": {
-    "group": "taxon",
-    "name": "marhabreg-2017",
     "constraint": {
       "enum": ["marhabreg-sch1"]
     },
@@ -1885,17 +1550,13 @@
     "display_level": 2,
     "display_name": "Conservation of Offshore Marine Habitats and Species Regulations 2017",
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
-    "sequence": 40,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "waca_1981": {
-    "group": "taxon",
-    "name": "waca_1981",
     "constraint": {
       "enum": ["waca-sch1", "waca-sch5"]
     },
@@ -1904,17 +1565,13 @@
     "display_level": 2,
     "display_name": "Wildlife and Countryside Act 1981",
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
-    "sequence": 41,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "isb_wildlife_act_1976": {
-    "group": "taxon",
-    "name": "isb_wildlife_act_1976",
     "constraint": {
       "enum": ["iwa-nsch3", "iwa-sch5"]
     },
@@ -1923,17 +1580,13 @@
     "display_level": 2,
     "display_name": "Irish Statute Book Wildlife Act, 1976",
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
-    "sequence": 42,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "protection_of_badgers_act_1992": {
-    "group": "taxon",
-    "name": "protection_of_badgers_act_1992",
     "constraint": {
       "enum": ["badgers92"]
     },
@@ -1942,21 +1595,16 @@
     "display_level": 2,
     "display_name": "Protection of Badgers Act 1992",
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
-    "sequence": 43,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "sample_available": {
-    "group": "taxon",
-    "name": "sample_available",
     "display_group": "sequencing_status",
     "display_level": 2,
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
     "constraint": {
@@ -2144,18 +1792,14 @@
     },
     "description": "Project has available samples for the taxon (acronym)",
     "display_name": "Sample collected",
-    "sequence": 44,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "sample_collected": {
-    "group": "taxon",
-    "name": "sample_collected",
     "display_group": "sequencing_status",
     "display_level": 2,
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
     "constraint": {
@@ -2343,18 +1987,14 @@
     },
     "description": "Project has collected samples for the taxon (acronym)",
     "display_name": "Sample collected",
-    "sequence": 45,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "resampling_required": {
-    "group": "taxon",
-    "name": "resampling_required",
     "display_group": "sequencing_status",
     "display_level": 2,
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
     "constraint": {
@@ -2540,21 +2180,16 @@
         "description": "Zoonomia (click to view GoaT project page)"
       }
     },
-    "status": "temporary",
     "description": "Project needs additional samples (acronym)",
     "display_name": "Resampling required",
-    "sequence": 46,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "sample_acquired": {
-    "group": "taxon",
-    "name": "sample_acquired",
     "display_group": "sequencing_status",
     "display_level": 2,
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
     "constraint": {
@@ -2742,18 +2377,14 @@
     },
     "description": "Samples received by sequencing center",
     "display_name": "Sample acquired",
-    "sequence": 47,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "in_progress": {
-    "group": "taxon",
-    "name": "in_progress",
     "display_group": "sequencing_status",
     "display_level": 2,
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
     "constraint": {
@@ -2941,18 +2572,14 @@
     },
     "description": "Sequencing started but assembly not yet publicly available",
     "display_name": "In progress",
-    "sequence": 48,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "insdc_submitted": {
-    "group": "taxon",
-    "name": "insdc_submitted",
     "display_group": "sequencing_status",
     "display_level": 2,
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
     "constraint": {
@@ -3140,18 +2767,14 @@
     },
     "description": "Assembly submitted to INSDC but not yet publicly available",
     "display_name": "In progress",
-    "sequence": 49,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "open": {
-    "group": "taxon",
-    "name": "open",
     "display_group": "sequencing_status",
     "display_level": 2,
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
     "constraint": {
@@ -3339,18 +2962,14 @@
     },
     "description": "Data publicly available",
     "display_name": "Open",
-    "sequence": 50,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "insdc_open": {
-    "group": "taxon",
-    "name": "insdc_open",
     "display_group": "sequencing_status",
     "display_level": 2,
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
     "constraint": {
@@ -3538,18 +3157,14 @@
     },
     "description": "Data publicly available on INSDC sequence repositories",
     "display_name": "Open on INSDC",
-    "sequence": 51,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "published": {
-    "group": "taxon",
-    "name": "published",
     "display_group": "sequencing_status",
     "display_level": 2,
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
     "constraint": {
@@ -3737,158 +3352,83 @@
     },
     "description": "Publication describing assembly is available",
     "display_name": "Published",
-    "sequence": 52,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "btk_nohit": {
-    "group": "taxon",
-    "name": "btk_nohit",
     "description": "Sequences with no hits in the reference database",
     "display_group": "assembly",
     "display_level": 2,
     "display_name": "BTK no hit",
-    "synonym": "nohit",
     "type": "1dp",
     "units": "%",
-    "sequence": 33,
-    "source": "BlobToolKit",
-    "source_url_stub": "https://blobtoolkit.genomehubs.org/view/dataset/",
-    "bins": {
-      "count": 10,
-      "max": 100,
-      "min": 0,
-      "scale": "linear"
-    },
-    "key": "btk_nohit",
     "summary": ["primary", "min"],
-    "traverse": false,
     "processed_type": "float",
     "processed_summary": "1dp_value",
     "processed_simple": "value"
   },
   "btk_target": {
-    "group": "taxon",
-    "name": "btk_target",
     "description": "Hits matching target",
     "display_group": "assembly",
     "display_level": 2,
     "display_name": "BTK_target",
-    "synonym": "target",
     "type": "1dp",
     "units": "%",
-    "sequence": 34,
-    "source": "BlobToolKit",
-    "source_url_stub": "https://blobtoolkit.genomehubs.org/view/dataset/",
-    "bins": {
-      "count": 10,
-      "max": 100,
-      "min": 0,
-      "scale": "linear"
-    },
-    "key": "btk_target",
     "summary": ["primary", "max"],
-    "traverse": false,
     "processed_type": "float",
     "processed_summary": "1dp_value",
     "processed_simple": "value"
   },
   "busco_completeness": {
-    "group": "taxon",
-    "name": "busco_completeness",
     "description": "Busco completeness",
     "display_group": "assembly",
     "display_level": 1,
     "display_name": "BUSCO completeness",
     "type": "1dp",
     "units": "%",
-    "sequence": 30,
-    "source": "BlobToolKit",
-    "source_url_stub": "https://blobtoolkit.genomehubs.org/view/dataset/",
-    "bins": {
-      "count": 10,
-      "max": 100,
-      "min": 50,
-      "scale": "linear"
-    },
-    "key": "busco_completeness",
     "summary": "max",
-    "traverse": false,
     "processed_type": "float",
     "processed_summary": "1dp_value",
     "processed_simple": "value"
   },
   "busco_lineage": {
-    "group": "taxon",
-    "name": "busco_lineage",
     "description": "Busco lineage",
     "display_group": "assembly",
     "display_level": 2,
     "display_name": "BUSCO lineage",
     "type": "keyword",
-    "sequence": 31,
-    "source": "BlobToolKit",
-    "source_url_stub": "https://blobtoolkit.genomehubs.org/view/dataset/",
-    "key": "busco_lineage",
     "summary": "list",
-    "traverse": false,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "busco_string": {
-    "group": "taxon",
-    "name": "busco_string",
     "description": "Busco string",
     "display_group": "assembly",
     "display_level": 2,
     "display_name": "BUSCO string",
     "type": "keyword",
-    "sequence": 32,
-    "source": "BlobToolKit",
-    "source_url_stub": "https://blobtoolkit.genomehubs.org/view/dataset/",
-    "key": "busco_string",
     "summary": "list",
-    "traverse": false,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "gc_percent": {
-    "group": "taxon",
-    "name": "gc_percent",
     "display_group": "btk",
-    "source": "BlobToolKit",
-    "source_url_stub": "https://blobtoolkit.genomehubs.org/view/dataset/",
     "constraint": {
       "min": 0,
       "max": 100
     },
     "display_level": 2,
-    "taxon_display_group": "{{organelle}}_assembly",
-    "taxon_display_name": "{{organelle}} GC%",
-    "taxon_key": "{{organelle}}_gc_percent",
-    "taxon_name": "{{organelle}}_gc_percent",
     "type": "2dp",
     "units": "%",
-    "sequence": 26,
-    "bins": {
-      "min": 0,
-      "max": 100,
-      "count": 10,
-      "scale": "linear"
-    },
     "summary": "median",
-    "traverse": "median",
-    "traverse_limit": "phylum",
     "processed_type": "float",
     "processed_summary": "2dp_value",
     "processed_simple": "value"
   },
   "long_list": {
-    "group": "taxon",
-    "name": "long_list",
     "display_group": "target_lists",
     "display_level": 2,
     "constraint": {
@@ -3907,7 +3447,6 @@
       ]
     },
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
     "value_metadata": {
@@ -3928,14 +3467,11 @@
         "description": "Vertebrate Genomes Project"
       }
     },
-    "sequence": 53,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "other_priority": {
-    "group": "taxon",
-    "name": "other_priority",
     "display_group": "target_lists",
     "display_level": 2,
     "constraint": {
@@ -3954,17 +3490,13 @@
       ]
     },
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
-    "sequence": 54,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "family_representative": {
-    "group": "taxon",
-    "name": "family_representative",
     "display_group": "target_lists",
     "display_level": 2,
     "constraint": {
@@ -3983,19 +3515,13 @@
       ]
     },
     "summary": "list",
-    "traverse": "list",
     "traverse_direction": "up",
     "type": "keyword",
-    "sequence": 55,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "sequencing_status_vgp": {
-    "group": "taxon",
-    "name": "sequencing_status_vgp",
-    "source": "INSDC",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/assembly/",
     "display_group": "sequencing_status",
     "constraint": {
       "enum": [
@@ -4005,19 +3531,10 @@
         "sample_collected"
       ]
     },
-    "separator": [";"],
-    "translate": {
-      "prjna489243": "insdc_open"
-    },
-    "sequence": 58,
     "processed_summary": "undefined_value",
     "processed_simple": "value"
   },
   "sequencing_status_dtol": {
-    "group": "taxon",
-    "name": "sequencing_status_dtol",
-    "source": "INSDC",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/assembly/",
     "display_group": "sequencing_status",
     "constraint": {
       "enum": [
@@ -4027,78 +3544,33 @@
         "sample_collected"
       ]
     },
-    "separator": [";"],
-    "translate": {
-      "prjeb40665": "insdc_open"
-    },
-    "sequence": 59,
     "processed_summary": "undefined_value",
     "processed_simple": "value"
   },
   "sample_collected_by": {
-    "group": "taxon",
-    "name": "sample_collected_by",
-    "source": "DTOL STS",
-    "source_date": "2022-02-15",
-    "source_url": "https://sts.tol.sanger.ac.uk/api/v1/swagger",
-    "translate": {
-      "marine biological association": "MBA",
-      "natural history museum": "NHM",
-      "royal botanic garden edinburgh": "RBGE",
-      "royal botanic gardens kew": "KEW",
-      "sanger institute": "SAN",
-      "university of oxford": "OXF"
-    },
-    "separator": ",",
     "type": "keyword",
-    "sequence": 57,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "sequencing_status": {
-    "group": "taxon",
-    "name": "sequencing_status",
-    "source": "CBP Pilot Montserrat Corominas",
-    "source_date": "2022-02-07",
-    "translate": {
-      "sample located": "sample_collected",
-      "data_generation": "in_progress",
-      "assembly": "in_progress",
-      "in_assembly": "in_progress",
-      "insdc_submitted": "in_progress"
-    },
     "type": "keyword",
-    "sequence": 56,
-    "processed_type": "keyword",
+    "processed_type": "ordered_keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
   },
   "sample_location": {
-    "group": "taxon",
-    "name": "sample_location",
     "display_group": "sample",
-    "organelle": "nucleus",
-    "source_url_stub": "https://www.ncbi.nlm.nih.gov/assembly/",
-    "source": "INSDC",
-    "h3res": 5,
     "display_level": 2,
     "display_name": "location",
     "type": "geo_point",
-    "sequence": 42,
-    "join": ",",
     "summary": ["list"],
-    "traverse": "list",
     "traverse_direction": "up",
     "processed_type": "geo_point",
     "processed_summary": "geo_point_value",
     "processed_simple": "value"
   },
   "odb10_lineage": {
-    "group": "taxon",
-    "name": "odb10_lineage",
-    "source": "BUSCOv5",
-    "source_url": "https://busco.ezlab.org/",
     "type": "keyword",
     "constraint": {
       "enum": [
@@ -4174,9 +3646,7 @@
     "display_group": "busco",
     "display_level": 2,
     "display_name": "Busco_odb10 lineage",
-    "key": "odb10_lineage",
     "summary": ["list"],
-    "sequence": 60,
     "processed_type": "keyword",
     "processed_summary": "keyword_value.raw",
     "processed_simple": "value"
