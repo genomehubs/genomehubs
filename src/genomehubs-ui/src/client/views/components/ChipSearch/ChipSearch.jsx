@@ -84,9 +84,11 @@ const ChipSearch = ({
   const removeDuplicates = (arr) => {
     let uniqueArr = [];
     let duplicates = new Set();
-    let keyOrder = ["tax"];
+    // let keyOrder = ["tax"];
+    let keyOrder = [];
     let seen = new Set(["AND"]);
-    let byKey = { tax: [] };
+    // let byKey = { tax: [] };
+    let byKey = {};
     arr.forEach((item) => {
       if (!item.match(/^\s*AND\s*$/i)) {
         let { key, modifier, value, operator } = extractKeyValue(item);
@@ -100,9 +102,9 @@ const ChipSearch = ({
           let { key } = extractKeyValue(item);
           if (!byKey[key]) {
             byKey[key] = [];
-            if (key != "tax") {
-              keyOrder.push(key);
-            }
+            // if (key != "tax") {
+            keyOrder.push(key);
+            // }
           }
           byKey[key].push(item);
           seen.add(lcItem);
@@ -648,8 +650,6 @@ const TextInput = ({
           style: {
             resize: "both",
             overflow: "auto",
-            // Add extra padding to top for single line mode
-            paddingTop: !multiline ? "0.5em" : undefined,
           },
         },
       }}
