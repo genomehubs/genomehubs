@@ -18,8 +18,8 @@ import ErrorIcon from "@mui/icons-material/Error";
 import InfoIcon from "@mui/icons-material/Help";
 import JoinFullRoundedIcon from "@mui/icons-material/JoinFullRounded";
 import JoinInnerRoundedIcon from "@mui/icons-material/JoinInnerRounded";
-import KeyboardArrowLeftIcon from "@mui/icons-material/SpaceDashboard";
-import KeyboardArrowRightIcon from "@mui/icons-material/TextFields";
+import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
+import TextFieldsIcon from "@mui/icons-material/TextFields";
 import Tooltip from "../Tooltip";
 import { getChipColor } from "../KeyValueChip/functions/chipPalettes";
 
@@ -335,7 +335,7 @@ const ChipSearch = ({
   const updateChipsArr = (chips) => {
     let chipGroups = {};
     let newChipsArr = chips.map((chip, index) => {
-      if (chip === "AND") {
+      if (chip === "AND" || chip === "") {
         return null; // Skip rendering "AND" as a Chip
       } else {
         // Check if the chip is in the conflict set
@@ -481,7 +481,10 @@ const ChipSearch = ({
   }, [duplicateKeys]);
 
   let startAdornment;
-  if (chipsArr.length > 0 && showChips) {
+  if (
+    (chipsArr.length > 0 && showChips) ||
+    chipsArr.filter((chip) => chip !== "AND" && chip !== "").length > 0
+  ) {
     startAdornment = (
       <InputAdornment position="start">
         <Tooltip title="Click to show search term as text">
@@ -493,12 +496,12 @@ const ChipSearch = ({
             }}
             edge="start"
           >
-            <KeyboardArrowRightIcon sx={{ fontSize: "1.5em" }} />
+            <TextFieldsIcon sx={{ fontSize: "1.5em" }} />
           </IconButton>
         </Tooltip>
       </InputAdornment>
     );
-  } else if (!chipsArr.length && inputValue && inputValue.length > 0) {
+  } else {
     startAdornment = (
       <InputAdornment position="start">
         <Tooltip title="Click to show search term as fields">
@@ -508,7 +511,7 @@ const ChipSearch = ({
             }}
             edge="start"
           >
-            <KeyboardArrowLeftIcon sx={{ fontSize: "1.5em" }} />
+            <SpaceDashboardIcon sx={{ fontSize: "1.5em" }} />
           </IconButton>
         </Tooltip>
       </InputAdornment>
@@ -624,6 +627,11 @@ const TextInput = ({
   placeholder,
   startAdornment,
 }) => {
+  console.log("TextInput rendered with inputValue:", inputValue);
+  console.log("TextInput length:", inputValue.length);
+  const multiline = true;
+  const maxRows = 8;
+  const minRows = inputValue.length > 30 ? 2 : 1;
   return (
     <TextField
       variant="outlined"
@@ -631,18 +639,34 @@ const TextInput = ({
       onChange={(e) => setInputValue(e.target.value)}
       onKeyDown={handleKeyDown}
       placeholder={placeholder}
-      sx={{
-        flexGrow: 1,
-        minWidth: "300px",
-        maxWidth: "900px",
-        width: "calc(100% - 4em)",
-        "& .MuiSvgIcon-root": {
-          fontSize: "1em",
-        },
-      }}
+      multiline={multiline}
+      maxRows={maxRows}
+      minRows={minRows}
       slotProps={{
         input: {
           startAdornment,
+          style: {
+            resize: "both",
+            overflow: "auto",
+            // Add extra padding to top for single line mode
+            paddingTop: !multiline ? "0.5em" : undefined,
+          },
+        },
+      }}
+      sx={{
+        flexGrow: 1,
+        minWidth: "200px",
+        maxWidth: "900px",
+        "& .MuiInputBase-root": {
+          alignItems: multiline ? "flex-start" : "center",
+        },
+        "& .MuiInputAdornment-root": {
+          marginTop: "-0.25em",
+          marginBottom: "-0.25em",
+        },
+        "& textarea": {
+          boxSizing: "border-box",
+          width: "100%",
         },
       }}
     />
