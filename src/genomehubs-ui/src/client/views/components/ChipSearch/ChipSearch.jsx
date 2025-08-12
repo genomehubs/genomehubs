@@ -77,6 +77,7 @@ const ChipSearch = ({
   inline = true, // Default to false for column layout
   types = {},
   searchButton = null,
+  handleValueChange = () => {},
 }) => {
   const validation = typesToValidation(types);
   const validKeys = validation.validKeys();
@@ -220,6 +221,7 @@ const ChipSearch = ({
           ...terms,
         ]);
         setDuplicateKeys(duplicates);
+        handleValueChange(uniqueArr.join(" "));
         return uniqueArr;
       });
     }
@@ -282,6 +284,7 @@ const ChipSearch = ({
       } else {
         newChips[index] = chipToString(updatedChip);
       }
+      handleValueChange(newChips.join(" "));
       return newChips;
     });
   };
@@ -629,8 +632,6 @@ const TextInput = ({
   placeholder,
   startAdornment,
 }) => {
-  console.log("TextInput rendered with inputValue:", inputValue);
-  console.log("TextInput length:", inputValue.length);
   const multiline = true;
   const maxRows = 8;
   const minRows = inputValue.length > 30 ? 2 : 1;

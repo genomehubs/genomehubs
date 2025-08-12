@@ -291,7 +291,7 @@ const SearchOptions = ({
   currentResult,
   availableResults = currentResult ? [currentResult] : [],
   includeEstimates = false,
-  showEmptyColumns = false,
+  emptyColumns = false,
   setSearchOptions = () => {},
   types = {},
   resultColumns = {},
@@ -514,10 +514,10 @@ const SearchOptions = ({
       <OptionGroup
         title="Show Empty Columns"
         helpText="Toggle the visibility of columns with no data in the search results"
-        currentOption={showEmptyColumns ? "yes" : "no"}
+        currentOption={emptyColumns ? "yes" : "no"}
         options={["yes", "no"]}
         setCurrentOption={(value) =>
-          setSearchOptions({ showEmptyColumns: value === "yes" })
+          setSearchOptions({ emptyColumns: value === "yes" })
         }
         underline={true}
       />
@@ -571,14 +571,18 @@ const ChipSearchBox = ({
   types,
   results,
   searchOptions: initialSearchOptions = {},
-  //   setSearchOptions = () => {},
+  handleSubmit = () => {},
   resetSearch,
   ...props
 }) => {
   const classes = useStyles();
 
+  const [value, setValue] = useState(initialSearchOptions.query || "");
+
   const [showOptions, setShowOptions] = useState(false);
-  const [searchOptions, setSearchOptions] = useState(initialSearchOptions);
+  const [searchOptions, setSearchOptions] = useState({
+    ...initialSearchOptions,
+  });
 
   const optionsButtonRef = useRef(null);
 
@@ -588,7 +592,7 @@ const ChipSearchBox = ({
 
   const { compact } = props;
 
-  const { result, includeEstimates, showEmptyColumns, fields, names, ranks } =
+  const { result, includeEstimates, emptyColumns, fields, names, ranks } =
     searchOptions;
 
   const updateOptions = (newOptions) => {
@@ -605,6 +609,9 @@ const ChipSearchBox = ({
         color="primary"
         startIcon={<SearchIcon />}
         className={classes.searchButton}
+        onClick={() => {
+          handleSubmit({ ...searchOptions, query: value });
+        }}
       >
         {result}
       </Button>
@@ -632,7 +639,19 @@ const ChipSearchBox = ({
         filter: showOptions ? "blur(2px)" : "none",
       }}
     >
-      <ChipSearch types={types} searchButton={searchButton} {...props} />
+      <ChipSearch
+        types={types}
+        searchButton={searchButton}
+        // setValue={(newValue) => {
+        //   console.log(newValue);
+        //   setValue(newValue);
+        // }}
+        handleValueChange={(value) => {
+          console.log(value);
+          setValue(value);
+        }}
+        {...props}
+      />
       <Modal
         open={showOptions}
         onClose={() => setShowOptions(false)}
@@ -643,7 +662,7 @@ const ChipSearchBox = ({
             currentResult={result}
             availableResults={results}
             includeEstimates={includeEstimates}
-            showEmptyColumns={showEmptyColumns}
+            emptyColumns={emptyColumns}
             setSearchOptions={updateOptions}
             resultColumns={{ fields, names, ranks }}
             types={types}

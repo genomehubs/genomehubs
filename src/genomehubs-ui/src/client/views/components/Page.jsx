@@ -3,6 +3,7 @@ import { link as linkStyle, pageTitle as pageTitleStyle } from "./Styles.scss";
 
 import Grid from "@mui/material/Grid2";
 import SearchBox from "./SearchBox";
+import SearchBoxWrapper from "./SearchBoxWrapper";
 import SearchHeaderButtons from "./SearchHeaderButtons";
 import SearchTips from "./SearchTips";
 import classnames from "classnames";
@@ -38,6 +39,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Page = ({
   searchBox,
+  useNewSearchBox = true,
   panels,
   searchPanels,
   browsePanels,
@@ -208,7 +210,7 @@ const Page = ({
                 }}
                 size={12}
               >
-                <SearchBox />
+                {useNewSearchBox ? <SearchBoxWrapper /> : <SearchBox />}
               </Grid>
             </Grid>
           </Grid>
