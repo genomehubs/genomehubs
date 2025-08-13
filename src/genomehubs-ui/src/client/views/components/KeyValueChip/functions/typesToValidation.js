@@ -185,6 +185,18 @@ export const typesToValidation = (types) => {
     if (value === null || value === undefined || value === "") {
       return { valid: true, processed_type };
     }
+    console.log({ key, value, modifier, processed_type });
+    if (`${value}`.match(/^query[A-Z]+\.\w+/)) {
+      let [q, type] = value.split(".");
+      if (types.hasOwnProperty(type)) {
+        processed_type = types[type].processed_type || type;
+      } else if (type.endsWith("_id")) {
+        processed_type = "id";
+      } else {
+        processed_type = "external";
+      }
+      return { valid: true, processed_type };
+    }
     if (["count", "length"].includes(modifier)) {
       processed_type = "integer";
     }
