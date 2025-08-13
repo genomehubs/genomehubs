@@ -314,18 +314,21 @@ const KeyValueChip = ({
     return options;
   };
 
-  const handleLookup = async (lookupTerm) => {
-    if (lookupFunction && !lookupTerm.match(/,/)) {
-      return (
-        (await lookupFunction({
-          lookupTerm,
-          key: currentKey,
-          modifier: currentModifier,
-        })) || []
-      );
-    }
-    return null;
-  };
+  let handleLookup;
+  if (modifier !== "depth") {
+    handleLookup = async (lookupTerm) => {
+      if (lookupFunction && !lookupTerm.match(/,/)) {
+        return (
+          (await lookupFunction({
+            lookupTerm,
+            key: currentKey,
+            modifier: currentModifier,
+          })) || []
+        );
+      }
+      return null;
+    };
+  }
 
   useEffect(() => {
     if (validationError || (!isEditingValue && !isEditingKey)) {

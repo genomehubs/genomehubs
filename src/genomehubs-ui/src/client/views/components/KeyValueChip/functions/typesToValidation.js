@@ -122,7 +122,7 @@ export const typesToValidation = (types) => {
 
   const validModifiers = (key) => {
     if (key === "tax") {
-      return new Set(["tree", "name", "rank", "lineage", "level", "eq"]);
+      return new Set(["tree", "name", "rank", "lineage", "depth", "eq"]);
     }
     const { summary = [], traverse_direction } = types[key] || {};
     let modifiers = new Set(["value"]);
@@ -223,6 +223,9 @@ export const typesToValidation = (types) => {
 
   const allowMultipleValues = ({ key, modifier }) => {
     if (key === "tax") {
+      if (["depth", "rank"].includes(modifier)) {
+        return false;
+      }
       return true;
     }
     if (modifier === "collate") {

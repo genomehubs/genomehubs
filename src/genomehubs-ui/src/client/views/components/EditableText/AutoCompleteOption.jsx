@@ -69,6 +69,7 @@ export const AutoCompleteOption = ({ option, ...props }) => {
           style={{ transform: "rotate(-90deg)" }}
         />
       );
+      option.string = `${option.negate ? "!" : ""}${option.value}`;
     } else if (option.type == "date") {
       optionIcon = <TodayIcon className={classes.icon} />;
     } else if (option.type == "keyword") {
@@ -95,7 +96,7 @@ export const AutoCompleteOption = ({ option, ...props }) => {
             option.assembly_id ||
             option.description ||
             option.name ||
-            "blank"}
+            ""}
         </Typography>
       </span>
       {secondaryText}

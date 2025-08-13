@@ -286,7 +286,7 @@ const EditableText = ({
         )}
       />
     );
-  } else if (handleLookup) {
+  } else if (handleLookup && handleLookup !== null) {
     let minWidth = "300px"; // Default minimum width
     useEffect(() => {
       let isMounted = true;
