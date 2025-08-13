@@ -244,6 +244,7 @@ const SearchBoxWrapper = ({
           lookupFunction={(props) =>
             lookupFunction({ apiUrl, result, taxonomy, ...props })
           }
+          //compact
         />
       </Box>
     </Grid>

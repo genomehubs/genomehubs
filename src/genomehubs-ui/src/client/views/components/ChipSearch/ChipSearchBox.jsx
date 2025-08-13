@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Modal, Paper } from "@mui/material";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 
 import ChipSearch from "./ChipSearch";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
@@ -229,7 +229,7 @@ const CustomOptions = ({
             boxShadow: "0px 8px 12px -4px rgba(0,0,0,0.12)",
           }}
         >
-          <Typography variant="h5" sx={{ mb: 2, textAlign: "center" }}>
+          <Typography sx={{ mb: 2, textAlign: "center", fontSize: "2rem" }}>
             Result Columns
           </Typography>
         </DialogTitle>
@@ -454,7 +454,7 @@ const SearchOptions = ({
           boxShadow: "0px 8px 12px -4px rgba(0,0,0,0.12)",
         }}
       >
-        <Typography variant="h5" sx={{ mb: 2, textAlign: "center" }}>
+        <Typography sx={{ mb: 2, textAlign: "center", fontSize: "2rem" }}>
           Search Options
         </Typography>
       </DialogTitle>
@@ -567,112 +567,135 @@ const SearchOptions = ({
     </Paper>
   );
 };
-const ChipSearchBox = ({
-  types,
-  results,
-  searchOptions: initialSearchOptions = {},
-  handleSubmit = () => {},
-  resetSearch,
-  ...props
-}) => {
-  const classes = useStyles();
 
-  const [value, setValue] = useState(initialSearchOptions.query || "");
+const ChipSearchBox = React.memo(
+  ({
+    types,
+    results,
+    searchOptions: initialSearchOptions = {},
+    handleSubmit = () => {},
+    resetSearch,
+    ...props
+  }) => {
+    const classes = useStyles();
 
-  const [showOptions, setShowOptions] = useState(false);
-  const [searchOptions, setSearchOptions] = useState({
-    ...initialSearchOptions,
-  });
+    // Memoize initialSearchOptions to avoid unnecessary state resets
+    const stableInitialSearchOptions = useMemo(
+      () => initialSearchOptions,
+      [initialSearchOptions],
+    );
+    const [value, setValue] = useState(stableInitialSearchOptions.query || "");
+    const [showOptions, setShowOptions] = useState(false);
+    const [searchOptions, setSearchOptions] = useState({
+      ...stableInitialSearchOptions,
+    });
 
-  const optionsButtonRef = useRef(null);
+    const optionsButtonRef = useRef(null);
 
-  const toggleOptions = () => {
-    setShowOptions(!showOptions);
-  };
+    const toggleOptions = useCallback(() => {
+      setShowOptions((prev) => !prev);
+    }, []);
 
-  const { compact } = props;
+    const { compact } = props;
+    const { result, includeEstimates, emptyColumns, fields, names, ranks } =
+      searchOptions;
 
-  const { result, includeEstimates, emptyColumns, fields, names, ranks } =
-    searchOptions;
+    const updateOptions = useCallback((newOptions) => {
+      setSearchOptions((prevOptions) => ({
+        ...prevOptions,
+        ...newOptions,
+      }));
+    }, []);
 
-  const updateOptions = (newOptions) => {
-    setSearchOptions((prevOptions) => ({
-      ...prevOptions,
-      ...newOptions,
-    }));
-  };
+    // Memoize searchButton to avoid rerendering ChipSearch
+    const searchButton = useMemo(
+      () => (
+        <ButtonGroup sx={{}}>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<SearchIcon />}
+            className={classes.searchButton}
+            onClick={() => {
+              handleSubmit({ ...searchOptions, query: value });
+            }}
+          >
+            {result}
+          </Button>
+          <Button
+            ref={optionsButtonRef}
+            variant="outlined"
+            color="primary"
+            className={classes.searchButton}
+            onClick={toggleOptions}
+          >
+            {showOptions ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </Button>
+        </ButtonGroup>
+      ),
+      [
+        classes.searchButton,
+        handleSubmit,
+        searchOptions,
+        value,
+        result,
+        showOptions,
+        toggleOptions,
+      ],
+    );
 
-  const searchButton = (
-    <ButtonGroup sx={{}}>
-      <Button
-        variant="contained"
-        color="primary"
-        startIcon={<SearchIcon />}
-        className={classes.searchButton}
-        onClick={() => {
-          handleSubmit({ ...searchOptions, query: value });
-        }}
+    // Memoize handleValueChange to avoid rerendering ChipSearch
+    const handleValueChange = useCallback((value) => {
+      setValue(value);
+    }, []);
+
+    return (
+      <Box
+        sx={useMemo(
+          () => ({
+            display: "inline-flex",
+            flexDirection: compact ? "row" : "column",
+            alignItems: "center",
+            gap: 1,
+            flexWrap: "wrap",
+            filter: showOptions ? "blur(2px)" : "none",
+            border: "1px solid palette.divider",
+            borderRadius: "12px",
+            padding: compact ? "4px 8px" : "8px 16px",
+            backgroundColor: "background.paper",
+            boxShadow: "0px 2px 8px rgba(0,0,0,0.5)",
+          }),
+          [compact, showOptions],
+        )}
       >
-        {result}
-      </Button>
-      <Button
-        ref={optionsButtonRef}
-        variant="outlined"
-        color="primary"
-        className={classes.searchButton}
-        onClick={toggleOptions}
-      >
-        {showOptions ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-      </Button>
-    </ButtonGroup>
-  );
-
-  return (
-    <Box
-      sx={{
-        display: "inline-flex",
-        flexDirection: compact ? "row" : "column",
-        alignItems: "center",
-        gap: 1,
-        flexWrap: "wrap",
-
-        filter: showOptions ? "blur(2px)" : "none",
-      }}
-    >
-      <ChipSearch
-        types={types}
-        searchButton={searchButton}
-        // setValue={(newValue) => {
-        //   console.log(newValue);
-        //   setValue(newValue);
-        // }}
-        handleValueChange={(value) => {
-          console.log(value);
-          setValue(value);
-        }}
-        {...props}
-      />
-      <Modal
-        open={showOptions}
-        onClose={() => setShowOptions(false)}
-        disableEnforceFocus
-      >
-        <Box tabIndex={-1}>
-          <SearchOptions
-            currentResult={result}
-            availableResults={results}
-            includeEstimates={includeEstimates}
-            emptyColumns={emptyColumns}
-            setSearchOptions={updateOptions}
-            resultColumns={{ fields, names, ranks }}
-            types={types}
-            resetSearch={resetSearch}
-            handleClose={() => setShowOptions(false)}
-          />
-        </Box>
-      </Modal>
-    </Box>
-  );
-};
+        <ChipSearch
+          types={types}
+          searchButton={searchButton}
+          handleValueChange={handleValueChange}
+          {...props}
+        />
+        <Modal
+          open={showOptions}
+          onClose={() => setShowOptions(false)}
+          disableEnforceFocus
+        >
+          <Box tabIndex={-1}>
+            <SearchOptions
+              currentResult={result}
+              availableResults={results}
+              includeEstimates={includeEstimates}
+              emptyColumns={emptyColumns}
+              setSearchOptions={updateOptions}
+              resultColumns={{ fields, names, ranks }}
+              types={types}
+              resetSearch={resetSearch}
+              handleClose={() => setShowOptions(false)}
+            />
+          </Box>
+        </Modal>
+      </Box>
+    );
+  },
+);
 
 export default ChipSearchBox;

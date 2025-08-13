@@ -189,9 +189,6 @@ const ChipSearch = ({
     }
     setOpen(false);
   };
-  const [duplicateKeys, setDuplicateKeys] = useState(duplicates);
-  const [chipsArr, setChipsArr] = useState(chips);
-  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [conflictingChips, setConflictingChips] = useState(new Set());
 
   useEffect(() => {
@@ -199,119 +196,6 @@ const ChipSearch = ({
       setConflictingChips(findConflictingChips(chips));
     }
   }, [chips]);
-
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      parseInput(inputValue);
-      setShowChips(true);
-      setInputValue("");
-    }
-  };
-
-  const parseInput = (input) => {
-    // const regex =
-    //   /\s+AND\s+|((?:\w+\()?[\w-]+\)*\s*(?:<=|>=|!=|=|<|>)\s*\w[\w\s,-]*|\w[\w-]+\s*\(\s*\w[\w\s\[\],-]+\s*\)|\w[\w-]+)/g;
-    // const matches = input.match(regex);
-    const terms = input.split(/\s+AND\s+/i); //.flatMap((part) =>
-    if (terms && terms.length > 0) {
-      setChips((prevChips) => {
-        const { uniqueArr, duplicates } = removeDuplicates([
-          ...prevChips,
-          ...terms,
-        ]);
-        setDuplicateKeys(duplicates);
-        handleValueChange(uniqueArr.join(" "));
-        return uniqueArr;
-      });
-    }
-  };
-
-  const handleDelete = (chipToDelete, index) => {
-    setChips((prevChips) => {
-      let newChips = [...prevChips];
-      newChips.splice(index, 1);
-      return newChips;
-    });
-  };
-
-  const chipToString = (chip) => {
-    if (typeof chip === "string") {
-      return chip;
-    }
-    // If chip is an object, extract key, operator, and value
-    const { key, operator, value, valueNote, modifier } = chip;
-    let chipString;
-    if (key === "tax" && modifier) {
-      return `tax_${modifier}(${value})`;
-    } else if (modifier) {
-      if (modifier === "collate") {
-        return `collate(${key}, ${value})`;
-      }
-      if (modifier !== "value") {
-        chipString = `${modifier}(${key})`;
-      }
-    }
-    if (!chipString) {
-      chipString = key;
-    }
-    if (operator) {
-      if (value !== "" && typeof value !== "undefined" && value !== null) {
-        chipString += `${operator}`;
-      }
-    } else {
-      chipString += "=";
-    }
-    if (typeof value !== "undefined" && value !== null) {
-      if (valueNote) {
-        chipString += `${value}[${valueNote}]`;
-      } else {
-        chipString += value;
-      }
-    }
-    return chipString;
-  };
-
-  const handleChipChange = (updatedChip, index) => {
-    setChips((prevChips) => {
-      const newChips = [...prevChips];
-      let { key, operator, value, modifier, palette } = updatedChip;
-      if (Array.isArray(value)) {
-        const extraChips = value.map((v) => {
-          return chipToString({ key, operator, value: v, modifier, palette });
-        });
-        newChips.splice(index, 1, ...extraChips);
-      } else {
-        newChips[index] = chipToString(updatedChip);
-      }
-      handleValueChange(newChips.join(" "));
-      return newChips;
-    });
-  };
-
-  const handleAddEmptyChip = (newChip = "key=value") => {
-    setChips((prevChips) => {
-      const { uniqueArr, duplicates } = removeDuplicates([
-        ...prevChips,
-        newChip,
-      ]);
-      setDuplicateKeys(duplicates);
-      return uniqueArr;
-    });
-  };
-
-  const handleMenuOpen = (event) => {
-    setMenuAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setMenuAnchorEl(null);
-  };
-
-  const handleMenuSelect = (chipType) => {
-    handleAddEmptyChip(chipType);
-    handleMenuClose();
-  };
 
   const RenderedChip = ({ chip, index, lookupFunction, ...props }) => {
     const { key, operator, value, valueNote, modifier } = extractKeyValue(chip);
@@ -337,7 +221,7 @@ const ChipSearch = ({
     );
   };
 
-  const updateChipsArr = (chips) => {
+  const chipsToComponents = (chips) => {
     let chipGroups = {};
     let newChipsArr = chips.map((chip, index) => {
       if (chip === "AND" || chip === "") {
@@ -467,7 +351,131 @@ const ChipSearch = ({
         }
       },
     );
-    setChipsArr(newChipsArr);
+    return newChipsArr;
+  };
+
+  const [duplicateKeys, setDuplicateKeys] = useState(duplicates);
+  const [chipsArr, setChipsArr] = useState(chipsToComponents(chips));
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      parseInput(inputValue);
+      setShowChips(true);
+      setInputValue("");
+    }
+  };
+
+  const parseInput = (input) => {
+    // const regex =
+    //   /\s+AND\s+|((?:\w+\()?[\w-]+\)*\s*(?:<=|>=|!=|=|<|>)\s*\w[\w\s,-]*|\w[\w-]+\s*\(\s*\w[\w\s\[\],-]+\s*\)|\w[\w-]+)/g;
+    // const matches = input.match(regex);
+    const terms = input.split(/\s+AND\s+/i); //.flatMap((part) =>
+    if (terms && terms.length > 0) {
+      setChips((prevChips) => {
+        const { uniqueArr, duplicates } = removeDuplicates([
+          ...prevChips,
+          ...terms,
+        ]);
+        setDuplicateKeys(duplicates);
+        handleValueChange(uniqueArr.join(" "));
+        return uniqueArr;
+      });
+    }
+  };
+
+  const handleDelete = (chipToDelete, index) => {
+    setChips((prevChips) => {
+      let newChips = [...prevChips];
+      newChips.splice(index, 1);
+      const { uniqueArr, duplicates } = removeDuplicates(newChips);
+      handleValueChange(uniqueArr.join(" "));
+      setDuplicateKeys(duplicates);
+      return uniqueArr;
+    });
+  };
+
+  const chipToString = (chip) => {
+    if (typeof chip === "string") {
+      return chip;
+    }
+    // If chip is an object, extract key, operator, and value
+    const { key, operator, value, valueNote, modifier } = chip;
+    let chipString;
+    if (key === "tax" && modifier) {
+      return `tax_${modifier}(${value})`;
+    } else if (modifier) {
+      if (modifier === "collate") {
+        return `collate(${key}, ${value})`;
+      }
+      if (modifier !== "value") {
+        chipString = `${modifier}(${key})`;
+      }
+    }
+    if (!chipString) {
+      chipString = key;
+    }
+    if (operator) {
+      if (value !== "" && typeof value !== "undefined" && value !== null) {
+        chipString += `${operator}`;
+      }
+    } else {
+      chipString += "=";
+    }
+    if (typeof value !== "undefined" && value !== null) {
+      if (valueNote) {
+        chipString += `${value}[${valueNote}]`;
+      } else {
+        chipString += value;
+      }
+    }
+    return chipString;
+  };
+
+  const handleChipChange = (updatedChip, index) => {
+    setChips((prevChips) => {
+      const newChips = [...prevChips];
+      let { key, operator, value, modifier, palette } = updatedChip;
+      if (Array.isArray(value)) {
+        const extraChips = value.map((v) => {
+          return chipToString({ key, operator, value: v, modifier, palette });
+        });
+        newChips.splice(index, 1, ...extraChips);
+      } else {
+        newChips[index] = chipToString(updatedChip);
+      }
+      handleValueChange(newChips.join(" "));
+      return newChips;
+    });
+  };
+
+  const handleAddEmptyChip = (newChip = "key=value") => {
+    setChips((prevChips) => {
+      const { uniqueArr, duplicates } = removeDuplicates([
+        ...prevChips,
+        newChip,
+      ]);
+      setDuplicateKeys(duplicates);
+      return uniqueArr;
+    });
+  };
+
+  const handleMenuOpen = (event) => {
+    setMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+  };
+
+  const handleMenuSelect = (chipType) => {
+    handleAddEmptyChip(chipType);
+    handleMenuClose();
+  };
+
+  const updateChipsArr = (chips) => {
+    setChipsArr(chipsToComponents(chips));
   };
 
   useEffect(() => {
@@ -539,6 +547,7 @@ const ChipSearch = ({
       fontSize={"1.5em"}
     />
   );
+
   return (
     <Box
       sx={{
@@ -548,6 +557,7 @@ const ChipSearch = ({
         alignItems: "center", // Align items vertically in the center
         gap: 1, // Add spacing between Box and TextField
         flexWrap: "wrap", // Allow content to wrap if it overflows
+        marginTop: "8px",
       }}
     >
       <>
@@ -625,6 +635,7 @@ const ChipSearch = ({
 };
 
 export default ChipSearch;
+
 const TextInput = ({
   inputValue,
   setInputValue,

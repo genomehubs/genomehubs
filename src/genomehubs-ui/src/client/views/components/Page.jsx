@@ -202,9 +202,10 @@ const Page = ({
               direction="row"
               // style={{ height: "calc( 100vh - 2em )", width: "100%" }}
               alignItems="center"
+              justifyContent="center"
             >
               <Grid
-                className={itemCss}
+                // className={itemCss}
                 style={{
                   marginTop: "2em",
                 }}
