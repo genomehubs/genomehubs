@@ -46,7 +46,7 @@ const ExplorePage = ({
         options.field_id != summaryField
       ) {
         fetchSearchResults({
-          query: `tax_eq(${options.taxon_id})`,
+          query: `tax_name(${options.taxon_id})`,
           result: options.result,
           taxonomy: options.taxonomy,
           includeEstimates: true,

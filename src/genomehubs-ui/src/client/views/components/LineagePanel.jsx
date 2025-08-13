@@ -35,7 +35,7 @@ export const LineageList = ({
   const handleTaxonClick = (taxon, name) => {
     if (taxon != taxon_id || result != "taxon") {
       setRecordId(taxon);
-      fetchSearchResults({ query: `tax_eq(${taxon})`, result: "taxon" });
+      fetchSearchResults({ query: `tax_name(${taxon})`, result: "taxon" });
       setPreferSearchTerm(false);
       navigate(
         `?recordId=${taxon}&result=taxon&taxonomy=${taxonomy}#${encodeURIComponent(

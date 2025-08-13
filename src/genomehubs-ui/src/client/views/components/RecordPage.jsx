@@ -97,7 +97,7 @@ const RecordPage = ({
         // ranks,
       };
       if (options.result == "taxon") {
-        searchTerm.query = `tax_eq(${options.recordId})`;
+        searchTerm.query = `tax_name(${options.recordId})`;
       } else {
         searchTerm.query = options.recordId;
       }

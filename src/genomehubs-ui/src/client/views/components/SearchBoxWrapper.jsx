@@ -153,7 +153,6 @@ const SearchBoxWrapper = ({
   };
 
   const doSearch = ({ query, result, fields, hashTerm = "", ...options }) => {
-    console.log("doSearch", query, result, fields, options);
     setSearchIndex(result);
 
     // let inputs = Array.from(
@@ -199,14 +198,17 @@ const SearchBoxWrapper = ({
     searchText += ` (e.g. ${suggestedTerm})`;
   }
 
-  const normalizedOptions = { ...options };
+  const normalizedOptions = {
+    ...(typeof searchTerm === "object" ? searchTerm : {}),
+    ...options,
+  };
   Object.entries(normalizedOptions).forEach(([key, value]) => {
     if (value === "true") {
       normalizedOptions[key] = true;
     } else if (value === "false") {
       normalizedOptions[key] = false;
     }
-    if (["fields", "ranks", "names"].includes(key)) {
+    if (["fields", "ranks", "names"].includes(key) && value) {
       normalizedOptions[key] = value.split(",");
     }
   });
@@ -238,7 +240,6 @@ const SearchBoxWrapper = ({
           value={searchBoxTerm}
           setValue={setSearchBoxTerm}
           handleSubmit={(searchOptions) => {
-            console.log("handleSubmit", searchBoxTerm, searchOptions);
             doSearch({ result, ...searchOptions });
           }}
           lookupFunction={(props) =>
