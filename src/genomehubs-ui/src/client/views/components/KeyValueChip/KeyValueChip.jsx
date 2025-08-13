@@ -305,6 +305,9 @@ const KeyValueChip = ({
       key: currentKey,
       modifier: currentModifier,
     });
+    if (values && values.size > 0) {
+      return Array.from(values);
+    }
     if (values && values.length > 0) {
       return [...values];
     }

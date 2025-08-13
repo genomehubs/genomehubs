@@ -260,6 +260,10 @@ const ChipSearch = ({
             key,
             modifier,
           });
+          const splitValuesAllowed = validation.allowSplitValues({
+            key,
+            modifier,
+          });
           let message;
           let suggestion;
           let status = "info";
@@ -268,7 +272,7 @@ const ChipSearch = ({
             message = "Multiple chips are not allowed";
             suggestion = "Delete one or more chips or change the operator";
             status = "error";
-          } else if (key == "tax") {
+          } else if (key == "tax" || !splitValuesAllowed) {
             message = "Multiple chips are not allowed";
             suggestion =
               "Use comma separated values in a single chip for OR (click to apply)";
@@ -318,6 +322,9 @@ const ChipSearch = ({
                   .forEach((index) => {
                     newChips.splice(index, 1);
                   });
+                const { uniqueArr, duplicates } = removeDuplicates(newChips);
+                setDuplicateKeys(duplicates);
+                handleValueChange(uniqueArr.join(" "));
                 return newChips;
               });
             };
@@ -445,7 +452,9 @@ const ChipSearch = ({
       } else {
         newChips[index] = chipToString(updatedChip);
       }
-      handleValueChange(newChips.join(" "));
+      const { uniqueArr, duplicates } = removeDuplicates(newChips);
+      setDuplicateKeys(duplicates);
+      handleValueChange(uniqueArr.join(" "));
       return newChips;
     });
   };

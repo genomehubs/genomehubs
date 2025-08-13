@@ -235,8 +235,7 @@ export const typesToValidation = (types) => {
     if (
       processed_type === "integer" ||
       processed_type === "float" ||
-      processed_type === "date" ||
-      processed_type === "ordered_keyword"
+      processed_type === "date"
     ) {
       return false;
     }
@@ -245,6 +244,10 @@ export const typesToValidation = (types) => {
 
   const allowSplitValues = ({ key, modifier }) => {
     if (key === "tax") {
+      return false;
+    }
+    const { processed_type } = types[key] || {};
+    if (processed_type === "ordered_keyword") {
       return false;
     }
     return allowMultipleValues({ key, modifier }) && modifier === "value";

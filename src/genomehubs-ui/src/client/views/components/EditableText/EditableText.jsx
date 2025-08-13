@@ -86,24 +86,6 @@ const EditableText = ({
 
   const [dynamicOptions, setDynamicOptions] = useState([]);
   const [lookupTerm, setLookupTerm] = useState(inputValue);
-  // useEffect(() => {
-  //   let isMounted = true;
-  //   if (handleLookup) {
-  //     const lookupResult = handleLookup(lookupTerm);
-  //     if (lookupResult instanceof Promise) {
-  //       lookupResult.then((options) => {
-  //         if (isMounted) {
-  //           setDynamicOptions(options || []);
-  //         }
-  //       });
-  //     } else {
-  //       setDynamicOptions(lookupResult || []);
-  //     }
-  //   }
-  //   return () => {
-  //     isMounted = false;
-  //   };
-  // }, [inputValue, handleLookup]);
 
   const handleEdit = (event) => {
     setIsEditing(true);
