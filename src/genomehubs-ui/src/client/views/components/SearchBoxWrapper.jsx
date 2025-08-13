@@ -152,7 +152,14 @@ const SearchBoxWrapper = ({
     return term;
   };
 
-  const doSearch = ({ query, result, fields, hashTerm = "", ...options }) => {
+  const doSearch = ({
+    query,
+    result,
+    fields,
+    hashTerm = "",
+    includeDescendants,
+    ...options
+  }) => {
     setSearchIndex(result);
 
     // let inputs = Array.from(
@@ -176,8 +183,16 @@ const SearchBoxWrapper = ({
     //   // searchTerm.fields ||
     //   savedOptions?.fields?.join(",") || searchDefaults.fields;
 
+    if (query && typeof includeDescendants !== "undefined") {
+      if (includeDescendants) {
+        query = query.replace(/tax_(name|eq)/, "tax_tree");
+      } else {
+        query = query.replace(/tax_tree/, "tax_name");
+      }
+    }
+
     dispatchSearch(
-      { query: query, ...inputQueries, result, fields, ...options },
+      { query, ...inputQueries, result, fields, ...options },
       query,
     );
     // resetLookup();

@@ -292,6 +292,7 @@ const SearchOptions = ({
   availableResults = currentResult ? [currentResult] : [],
   includeEstimates = false,
   emptyColumns = false,
+  includeDescendants,
   setSearchOptions = () => {},
   types = {},
   resultColumns = {},
@@ -486,6 +487,19 @@ const SearchOptions = ({
           underline={true}
         />
       )}
+      {currentResult == "taxon" &&
+        typeof includeDescendants !== "undefined" && (
+          <OptionGroup
+            title="Include Descendants"
+            helpText="Include descendant taxa in the search results"
+            currentOption={includeDescendants ? "yes" : "no"}
+            options={["yes", "no"]}
+            setCurrentOption={(value) =>
+              setSearchOptions({ includeDescendants: value === "yes" })
+            }
+            underline={true}
+          />
+        )}
       <OptionGroup
         title="Result Columns"
         helpText="Select the columns to display in the search results"
@@ -597,14 +611,34 @@ const ChipSearchBox = React.memo(
     }, []);
 
     const { compact } = props;
-    const { result, includeEstimates, emptyColumns, fields, names, ranks } =
-      searchOptions;
+    const {
+      result,
+      includeEstimates,
+      emptyColumns,
+      fields,
+      names,
+      ranks,
+      query = "",
+    } = searchOptions;
+
+    let includeDescendants;
+    if (typeof searchOptions.includeDescendants !== "undefined") {
+      includeDescendants = searchOptions.includeDescendants;
+    } else if (query && query.match(/tax_(name|tree|eq)/)) {
+      includeDescendants = query.match(/tax_tree/) || false;
+    }
 
     const updateOptions = useCallback((newOptions) => {
-      setSearchOptions((prevOptions) => ({
-        ...prevOptions,
+      // setSearchOptions((prevOptions) => ({
+      //   ...prevOptions,
+      //   ...newOptions,
+      // }));
+      const updatedOptions = {
+        ...searchOptions,
         ...newOptions,
-      }));
+        query: value,
+      };
+      handleSubmit(updatedOptions);
     }, []);
 
     // Memoize searchButton to avoid rerendering ChipSearch
@@ -684,6 +718,7 @@ const ChipSearchBox = React.memo(
               currentResult={result}
               availableResults={results}
               includeEstimates={includeEstimates}
+              includeDescendants={includeDescendants}
               emptyColumns={emptyColumns}
               setSearchOptions={updateOptions}
               resultColumns={{ fields, names, ranks }}
