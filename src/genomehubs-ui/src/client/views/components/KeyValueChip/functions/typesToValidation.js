@@ -185,7 +185,6 @@ export const typesToValidation = (types) => {
     if (value === null || value === undefined || value === "") {
       return { valid: true, processed_type };
     }
-    console.log({ key, value, modifier, processed_type });
     if (`${value}`.match(/^query[A-Z]+\.\w+/)) {
       let [q, type] = value.split(".");
       if (types.hasOwnProperty(type)) {

@@ -20,11 +20,8 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 // and submitting the search query.
 import SearchIcon from "@mui/icons-material/Search";
 import Tooltip from "../Tooltip";
+import { Underline } from "./Underline";
 import { useStyles } from "./SearchBoxStyles";
-
-const Underline = () => (
-  <hr style={{ border: "0.5px solid gray", width: "100%", opacity: 0.75 }} />
-);
 
 function typesByDisplayGroup({ types }) {
   let groupTypes = {};
@@ -706,6 +703,7 @@ const ChipSearchBox = React.memo(
           types={types}
           searchButton={searchButton}
           handleValueChange={handleValueChange}
+          results={results}
           {...props}
         />
         <Modal

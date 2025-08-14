@@ -1,8 +1,13 @@
 import {
   Alert,
   Box,
+  Button,
+  ButtonGroup,
+  Chip,
   IconButton,
   InputAdornment,
+  Menu,
+  MenuItem,
   Snackbar,
   TextField,
 } from "@mui/material";
@@ -18,9 +23,12 @@ import ErrorIcon from "@mui/icons-material/Error";
 import InfoIcon from "@mui/icons-material/Help";
 import JoinFullRoundedIcon from "@mui/icons-material/JoinFullRounded";
 import JoinInnerRoundedIcon from "@mui/icons-material/JoinInnerRounded";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import Tooltip from "../Tooltip";
+import Underline from "./Underline";
 import { getChipColor } from "../KeyValueChip/functions/chipPalettes";
 
 const extractKeyValue = (chip) => {
@@ -66,8 +74,79 @@ const extractKeyValue = (chip) => {
   };
 };
 
+const QueryLabel = ({
+  queryTitle,
+  result,
+  results,
+  handleResultChange,
+  groupColor,
+}) => {
+  const [open, setOpen] = useState(false);
+  const buttonRef = React.useRef(null);
+
+  const labelStyle = {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    width: "2em",
+    backgroundColor: groupColor,
+    padding: "0 5px",
+    fontWeight: "bold",
+    writingMode: "vertical-rl",
+    textOrientation: "mixed",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
+  };
+  return (
+    <>
+      <div
+        style={{
+          ...labelStyle,
+          left: 0,
+          transform: "rotate(180deg)",
+        }}
+      >
+        {queryTitle}
+      </div>
+
+      <div
+        style={{
+          ...labelStyle,
+          right: 0,
+          cursor: "pointer",
+        }}
+        onClick={() => setOpen(!open)}
+        ref={buttonRef}
+      >
+        {result}
+      </div>
+
+      <Menu
+        anchorEl={buttonRef.current}
+        open={open}
+        onClose={() => setOpen(false)}
+      >
+        {results.map((result) => (
+          <MenuItem
+            key={result}
+            onClick={() => {
+              setOpen(false);
+              handleResultChange(result);
+            }}
+          >
+            {result}
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
+  );
+};
+
 const ChipSearch = ({
   value = "",
+  inputQueries = {},
   placeholder = "Enter key=value, function(variable), or AND",
   showText = false,
   compact = false,
@@ -75,13 +154,18 @@ const ChipSearch = ({
   lookupFunction = null,
   alignment = "center", // Default alignment
   inline = true, // Default to false for column layout
+  result = "taxon",
   types = {},
+  results = {},
+  label = null,
   searchButton = null,
   handleValueChange = () => {},
+  handleInputQueryChange = () => {},
 }) => {
   const validation = typesToValidation(types);
   const validKeys = validation.validKeys();
   const [showChips, setShowChips] = useState(!showText);
+  const [currentInputQueries, setCurrentInputQueries] = useState(inputQueries);
   const removeDuplicates = (arr) => {
     let uniqueArr = [];
     let duplicates = new Set();
@@ -211,7 +295,7 @@ const ChipSearch = ({
         onChange={handleChipChange}
         onDelete={() => handleDelete(chip, index)}
         style={{
-          marginRight: index === chips.length - 1 ? "-1em" : "1em",
+          marginRight: index === chips.length - 1 ? "0" : "1em",
         }} // Add margin to chips
         chipIndex={index} // Pass the index to KeyValueChip
         lookupFunction={key === "tax" ? lookupFunction : null}
@@ -557,6 +641,89 @@ const ChipSearch = ({
     />
   );
 
+  const inputQueryList = React.useMemo(() => {
+    return chips
+      .map((chip) => {
+        return chip.match(/\bquery[A-Z]\b/g);
+      })
+      .filter(Boolean)
+      .flat();
+  }, [chips]);
+
+  let newInputQueries = {};
+  const inputQueryComponents = inputQueryList.map((key) => {
+    const {
+      result: searchIndex = result,
+      query = "",
+      fields = [],
+    } = currentInputQueries[key] || {};
+    if (!currentInputQueries[key]) {
+      newInputQueries[key] = {
+        result: searchIndex,
+        query,
+        fields,
+      };
+    }
+
+    const groupColor = "#80808033";
+    return (
+      <Box
+        key={key}
+        sx={{
+          display: "inline-flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 1,
+          marginBottom: 1,
+          border: `2px solid ${groupColor}`,
+          padding: "0 2em 0 calc(2em + 12px)",
+          borderRadius: "8px",
+          maxWidth: "100%",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <ChipSearch
+          key={key}
+          value={query}
+          result={result}
+          types={types}
+          inputQueries={{}}
+          compact={true}
+          inline={true}
+          label={
+            <QueryLabel
+              queryTitle={key}
+              result={result}
+              results={results}
+              handleResultChange={(result) => {
+                const updatedQueries = {
+                  ...currentInputQueries,
+                  [key]: {
+                    ...currentInputQueries[key],
+                    result,
+                  },
+                };
+                setCurrentInputQueries(updatedQueries);
+                handleInputQueryChange(updatedQueries);
+              }}
+              groupColor={groupColor}
+            />
+          }
+          handleValueChange={handleInputQueryChange}
+        />
+      </Box>
+    );
+  });
+
+  // Only update state if there are new queries, and do it in an effect
+  useEffect(() => {
+    if (Object.keys(newInputQueries).length > 0) {
+      setCurrentInputQueries((prev) => ({ ...prev, ...newInputQueries }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputQueryList.join(",")]);
+
   return (
     <Box
       sx={{
@@ -569,6 +736,20 @@ const ChipSearch = ({
         marginTop: "8px",
       }}
     >
+      {inputQueryComponents.length > 0 && (
+        <Box
+          sx={{
+            display: "inline-flex",
+            flexDirection: "column",
+            justifyContent,
+            alignItems: "center",
+            gap: 1,
+            flexWrap: "wrap",
+          }}
+        >
+          {inputQueryComponents}
+        </Box>
+      )}
       <>
         <Box
           sx={{
@@ -582,6 +763,7 @@ const ChipSearch = ({
             flexWrap: "wrap", // Allow content to wrap if it overflows
           }}
         >
+          {label}
           {chipsArr}
           {addField}
           {compact && searchButton}
