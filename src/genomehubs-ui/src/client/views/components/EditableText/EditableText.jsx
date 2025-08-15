@@ -328,7 +328,7 @@ const EditableText = ({
     textInput = (
       <Autocomplete
         multiple={allowMultipleValues}
-        // freeSolo
+        freeSolo
         autoHighlight
         options={dynamicOptions}
         inputValue={shortenValue(inputValue)}

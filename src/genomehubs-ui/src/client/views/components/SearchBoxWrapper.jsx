@@ -223,7 +223,6 @@ const SearchBoxWrapper = ({
       normalizedOptions[key] = value.split(",");
     }
     if (key.match(/query[A-Z]/)) {
-      console.log(key, value);
       let result, query, fields;
       if (typeof value === "string") {
         if (value.includes("--")) {
@@ -253,8 +252,6 @@ const SearchBoxWrapper = ({
     result,
   };
 
-  console.log("searchOptions", searchOptions);
-
   return (
     <Grid container alignItems="center" direction="column" ref={rootRef}>
       <Box
@@ -275,7 +272,7 @@ const SearchBoxWrapper = ({
           value={searchBoxTerm}
           setValue={setSearchBoxTerm}
           handleSubmit={(searchOptions) => {
-            doSearch({ result, ...searchOptions });
+            doSearch({ result, ...searchOptions, offset: 0 });
           }}
           lookupFunction={(props) =>
             lookupFunction({ apiUrl, result, taxonomy, ...props })
