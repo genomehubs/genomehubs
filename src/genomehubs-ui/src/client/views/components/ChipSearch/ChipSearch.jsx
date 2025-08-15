@@ -30,6 +30,7 @@ import TextFieldsIcon from "@mui/icons-material/TextFields";
 import Tooltip from "../Tooltip";
 import Underline from "./Underline";
 import { getChipColor } from "../KeyValueChip/functions/chipPalettes";
+import { h } from "hastscript";
 
 const extractKeyValue = (chip) => {
   let modifier;
@@ -90,8 +91,9 @@ const QueryLabel = ({
     bottom: 0,
     width: "2em",
     backgroundColor: groupColor,
-    padding: "0 5px",
-    fontWeight: "bold",
+    padding: "0 2px 0 6px",
+    // fontWeight: "bold",
+    fontVariantCaps: "small-caps",
     writingMode: "vertical-rl",
     textOrientation: "mixed",
     display: "flex",
@@ -152,11 +154,10 @@ const ChipSearch = ({
   compact = false,
   backgroundColor = "#ffffff",
   lookupFunction = null,
-  alignment = "center", // Default alignment
-  inline = true, // Default to false for column layout
+  alignment = "center",
   result = "taxon",
   types = {},
-  results = {},
+  results = [],
   label = null,
   searchButton = null,
   handleValueChange = () => {},
@@ -202,7 +203,7 @@ const ChipSearch = ({
     });
     for (let key of keyOrder) {
       for (let item of byKey[key]) {
-        if (!uniqueArr.includes(item)) {
+        if (item !== "" && !uniqueArr.includes(item)) {
           if (uniqueArr.length > 0) {
             uniqueArr.push("AND");
           }
@@ -449,9 +450,10 @@ const ChipSearch = ({
   const [chipsArr, setChipsArr] = useState(chipsToComponents(chips));
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
-  const handleKeyDown = (event) => {
+  const handleKeyDown = (event, setInUse) => {
     if (event.key === "Enter") {
       event.preventDefault();
+      setInUse(false);
       parseInput(inputValue);
       setShowChips(true);
       setInputValue("");
@@ -595,12 +597,15 @@ const ChipSearch = ({
       <InputAdornment position="start">
         <Tooltip title="Click to show search term as text">
           <IconButton
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               setShowChips(false);
               setInputValue(chipsToString(chips));
               setChips([]);
             }}
             edge="start"
+            sx={{ zIndex: 500 }}
           >
             <TextFieldsIcon sx={{ fontSize: "1.5em" }} />
           </IconButton>
@@ -612,7 +617,9 @@ const ChipSearch = ({
       <InputAdornment position="start">
         <Tooltip title="Click to show search term as fields">
           <IconButton
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               handleKeyDown({ key: "Enter", preventDefault: () => {} });
             }}
             edge="start"
@@ -676,7 +683,7 @@ const ChipSearch = ({
           gap: 1,
           marginBottom: 1,
           border: `2px solid ${groupColor}`,
-          padding: "0 2em 0 calc(2em + 12px)",
+          padding: "0 2.5em 0.5em calc(2em + 12px)",
           borderRadius: "8px",
           maxWidth: "100%",
           position: "relative",
@@ -689,7 +696,7 @@ const ChipSearch = ({
           result={result}
           types={types}
           inputQueries={{}}
-          compact={true}
+          compact={compact}
           inline={true}
           label={
             <QueryLabel
@@ -728,7 +735,7 @@ const ChipSearch = ({
     <Box
       sx={{
         display: "inline-flex",
-        flexDirection: inline ? "row" : "column",
+        flexDirection: "column",
         justifyContent,
         alignItems: "center", // Align items vertically in the center
         gap: 1, // Add spacing between Box and TextField
@@ -751,37 +758,21 @@ const ChipSearch = ({
         </Box>
       )}
       <>
+        {" "}
         <Box
           sx={{
-            width: "100%",
             maxWidth: "100%",
             display: "inline-flex",
             flexDirection: "row",
             justifyContent,
-            alignItems: "center", // Align items vertically in the center
-            gap: 1, // Add spacing between Box and TextField
-            flexWrap: "wrap", // Allow content to wrap if it overflows
+            alignItems: "center",
+            gap: 1,
+            flexWrap: "wrap",
           }}
         >
           {label}
           {chipsArr}
           {addField}
-          {compact && searchButton}
-        </Box>
-        <Box
-          sx={{
-            display: "inline-flex",
-            flexDirection: "row",
-            justifyContent,
-            minWidth: compact ? "10px" : "300px",
-            maxWidth: "900px",
-            width: "100%",
-
-            alignItems: "center", // Align items vertically in the center
-            gap: 1, // Add spacing between Box and TextField
-            flexWrap: "wrap", // Allow content to wrap if it overflows
-          }}
-        >
           {!compact && (
             <TextInput
               inputValue={inputValue}
@@ -794,13 +785,25 @@ const ChipSearch = ({
               validKeys={validKeys}
               handleMenuSelect={handleMenuSelect}
               startAdornment={startAdornment}
+              handleInputValueChange={(inputValue) => {
+                const terms = inputValue.split(/\s+AND\s+/i);
+                if (terms && terms.length > 0) {
+                  const { uniqueArr, duplicates } = removeDuplicates([
+                    ...chips,
+                    ...terms,
+                  ]);
+                  console.log("uniqueArr", uniqueArr);
+                  handleValueChange(uniqueArr.join(" "));
+                }
+              }}
               multiline={true}
               rows={2}
             />
           )}
+          {searchButton}
         </Box>
       </>
-      {!compact && searchButton}
+      {/* {!compact && searchButton} */}
       <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
         <Alert
           onClose={handleClose}
@@ -830,36 +833,59 @@ export default ChipSearch;
 const TextInput = ({
   inputValue,
   setInputValue,
+  handleInputValueChange,
   handleKeyDown,
   placeholder,
   startAdornment,
 }) => {
+  const [inUse, setInUse] = useState(inputValue.length > 0);
+  const inputRef = React.useRef(null);
   const multiline = true;
   const maxRows = 8;
   const minRows = inputValue.length > 30 ? 2 : 1;
+
   return (
     <TextField
       variant="outlined"
       value={inputValue}
       onChange={(e) => setInputValue(e.target.value)}
-      onKeyDown={handleKeyDown}
+      onFocus={() => setInUse(true)}
+      onKeyDown={(e) => handleKeyDown(e, setInUse)}
+      onBlur={(e) => {
+        // Don't update state if the input adornment (icon button) was clicked
+        const related = e.relatedTarget;
+        if (
+          related &&
+          related.closest &&
+          related.closest(".MuiInputAdornment-root")
+        ) {
+          return;
+        }
+        if (inputValue.length === 0) {
+          setInUse(false);
+        }
+        handleInputValueChange(inputValue);
+      }}
       placeholder={placeholder}
-      multiline={multiline}
-      maxRows={maxRows}
-      minRows={minRows}
+      multiline={inUse ? multiline : false}
+      maxRows={inUse ? maxRows : 1}
+      minRows={inUse ? minRows : 1}
+      inputRef={inputRef}
       slotProps={{
         input: {
-          startAdornment,
+          startAdornment: inUse ? startAdornment : null,
           style: {
-            resize: "both",
+            resize: inUse && multiline ? "both" : "none",
             overflow: "auto",
           },
+          autoFocus: inUse, // Focus the input when inUse is true
         },
       }}
       sx={{
         flexGrow: 1,
-        minWidth: "200px",
-        maxWidth: "900px",
+        margin: "0 0.5em 0 -0.5em",
+        minWidth: inUse ? "450px" : "200px",
+        maxWidth: inUse ? "600px" : "200px",
         "& .MuiInputBase-root": {
           alignItems: multiline ? "flex-start" : "center",
         },

@@ -117,10 +117,21 @@ LargeChipGroup.args = {
     "tax_tree(2759) AND assembly_span=100000000 AND bioproject=PRJEB40665 AND bioproject=PRJEB40656 AND bioproject=PRJEB40657 AND bioproject=PRJEB40658 AND bioproject=PRJEB40659 AND bioproject=PRJEB40660 AND bioproject=PRJEB40661 AND bioproject=PRJEB40662 AND chromosome_number=2",
 };
 
+export const WithInputQuery = Template.bind({});
+WithInputQuery.args = {
+  ...Default.args,
+  inputQueries: {
+    queryA: {
+      query: "tax_tree(9608) AND assembly_span>2000000000",
+      result: "taxon",
+    },
+  },
+  value: "assembly_span=100000000 AND tax_tree(queryA.taxon_id)",
+};
+
 export const CompactWithInputQuery = Template.bind({});
 CompactWithInputQuery.args = {
   ...Compact.args,
-  compact: true,
   inputQueries: {
     queryA: {
       query: "tax_tree(9608) AND assembly_span>2000000000",

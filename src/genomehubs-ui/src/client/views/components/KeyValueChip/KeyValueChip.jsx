@@ -402,6 +402,7 @@ const KeyValueChip = ({
                 overflow: "visible",
                 marginLeft: "1em",
                 paddingRight: 0,
+                boxSizing: "content-box",
               }}
               onClick={(event) => {
                 handleChipClick(event, { x: 0, y: 8 });

@@ -692,7 +692,9 @@ const ChipSearchBox = React.memo(
             filter: showOptions ? "blur(2px)" : "none",
             border: "1px solid palette.divider",
             borderRadius: "12px",
-            padding: compact ? "4px 8px" : "8px 16px",
+            maxWidth: "75vw",
+            padding: compact ? "4px 12px" : "8px 24px",
+            paddingBottom: compact ? "8px" : "16px",
             backgroundColor: "background.paper",
             boxShadow: "0px 2px 8px rgba(0,0,0,0.5)",
           }),
@@ -704,6 +706,7 @@ const ChipSearchBox = React.memo(
           searchButton={searchButton}
           handleValueChange={handleValueChange}
           results={results}
+          compact={compact}
           {...props}
         />
         <Modal
