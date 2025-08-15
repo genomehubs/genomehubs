@@ -395,7 +395,9 @@ const EditableText = ({
               values = [...values, lookupTerm];
             }
             // Remove duplicates
-            const deduped = Array.from(new Set(values));
+            const deduped = Array.from(
+              new Set(values.map((v) => extendValue(v))),
+            );
             const updatedValue = extendValue(deduped.join(","));
             setInputValue(updatedValue);
             onChange?.(updatedValue);
@@ -430,19 +432,25 @@ const EditableText = ({
               if (event.key === "Escape") {
                 setIsEditing(false);
                 setAnchorEl(null);
-              } else if (event.key === "Enter") {
-                // Prevent scroll jump if value matches existing value
-                const currentInput = event.target.value;
-                if (shortenValue(currentInput) === shortenValue(inputValue)) {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  event.target.blur();
-                  setIsEditing(false);
-                  setAnchorEl(null);
-                  return;
-                } else {
-                  handleChange(currentInput);
-                }
+                // } else if (event.key === "Enter") {
+                //   // Prevent scroll jump if value matches existing value
+                //   const currentInput = event.target.value;
+                //   if (shortenValue(currentInput) === shortenValue(inputValue)) {
+                //     event.preventDefault();
+                //     event.stopPropagation();
+                //     event.target.blur();
+                //     setIsEditing(false);
+                //     setAnchorEl(null);
+                //     return;
+                //   } else {
+                //     if (dynamicOptions && dynamicOptions.length > 0) {
+                //       handleChange(
+                //         extendValue(dynamicOptions[0].title || dynamicOptions[0]),
+                //       );
+                //     } else {
+                //       handleChange(currentInput);
+                //     }
+                //   }
               } else if (event.key === " ") {
                 event.stopPropagation();
                 event.preventDefault();
