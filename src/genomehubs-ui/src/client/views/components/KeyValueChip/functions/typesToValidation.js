@@ -27,22 +27,29 @@ const validateNumber = ({ value, processed_type, constraint }) => {
 };
 
 const validateKeyword = ({ value, validValues }) => {
-  if (validValues) {
-    let values;
-    if (!Array.isArray(value)) {
-      if (typeof value === "string") {
-        values = value.split(/\s*,\s*/);
-      } else {
-        values = [value];
-      }
+  let values;
+  if (!Array.isArray(value)) {
+    if (typeof value === "string") {
+      values = value.split(/\s*,\s*/);
     } else {
-      values = value;
+      values = [value];
     }
-    for (let v of values) {
-      if (!validValues.has(v.replace(/^!/, "").toLowerCase())) {
-        return { valid: false, reason: `${v} is not a valid value` };
-      }
+  } else {
+    values = value;
+  }
+  let seenValues = new Set();
+  for (let v of values) {
+    let normalized = v
+      .replace(/^!/, "")
+      .toLowerCase()
+      .replace(/\[.+\]$/, "");
+    if (validValues && !validValues.has(normalized)) {
+      return { valid: false, reason: `${normalized} is not a valid value` };
     }
+    if (seenValues.has(normalized)) {
+      return { valid: false, reason: `${normalized} is a duplicate value` };
+    }
+    seenValues.add(normalized);
   }
   return { valid: true };
 };
@@ -57,7 +64,7 @@ export const typesToValidation = (types) => {
         "tax_name",
         "tax_rank",
         "tax_lineage",
-        "tax_level",
+        "tax_depth",
         "tax_eq",
       ]),
     };
@@ -196,13 +203,16 @@ export const typesToValidation = (types) => {
       }
       return { valid: true, processed_type };
     }
-    if (["count", "length"].includes(modifier)) {
+    if (["count", "length", "depth"].includes(modifier)) {
       processed_type = "integer";
     }
     let obj = { valid: true };
     if (["float", "integer", "date"].includes(processed_type)) {
       obj = validateNumber({ value, processed_type, constraint });
-    } else if (processed_type.endsWith("keyword")) {
+    } else if (
+      processed_type.endsWith("keyword") ||
+      (key === "tax" && modifier !== "depth")
+    ) {
       obj = validateKeyword({
         value,
         validValues: validValues({ key, modifier }),
