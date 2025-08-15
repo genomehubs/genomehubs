@@ -237,6 +237,14 @@ const ChipSearch = ({
     return chipKey;
   };
 
+  const conflictPairs = {
+    tax_depth_name_tree: ["tax_name", "tax_tree", "tax_depth"],
+    tax_depth_name_tree: ["tax_depth", "tax_name", "tax_tree"],
+    tax_name: "tax_depth_name_tree",
+    tax_tree: "tax_depth_name_tree",
+    tax_depth: "tax_depth_name_tree",
+  };
+
   const findConflictingChips = (chips) => {
     const conflicts = new Set();
     const chipMap = new Map();
@@ -259,6 +267,12 @@ const ChipSearch = ({
         conflicts.add(chipKey);
       }
     });
+    if (chipMap.has("tax_tree") && chipMap.has("tax_name")) {
+      conflicts.add("tax_depth_name_tree");
+    }
+    if (chipMap.has("tax_name") && chipMap.has("tax_depth")) {
+      conflicts.add("tax_depth_name_tree");
+    }
     return conflicts;
   };
 
@@ -315,9 +329,13 @@ const ChipSearch = ({
         return null; // Skip rendering "AND" as a Chip
       } else {
         // Check if the chip is in the conflict set
-        const chipKey = setChipKey(chip);
+        let chipKey = setChipKey(chip);
 
-        const isConflicting = conflictingChips.has(chipKey);
+        let isConflicting = conflictingChips.has(chipKey);
+        if (conflictPairs[chipKey]) {
+          isConflicting = conflictingChips.has(conflictPairs[chipKey]);
+          chipKey = conflictPairs[chipKey]; // Use the first key for grouping
+        }
         if (isConflicting) {
           if (!chipGroups[chipKey]) {
             chipGroups[chipKey] = { group: index, chips: [], indices: [] };
