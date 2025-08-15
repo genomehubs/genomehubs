@@ -77,6 +77,7 @@
     "@fontsource/open-sans": "^5.0.29",
     "@fontsource/roboto-mono": "^5.0.19",
     "@fontsource/signika": "^5.0.21",
+    "@hello-pangea/dnd": "^18.0.1",
     "@loadable/component": "^5.15.0",
     "@mui/icons-material": "^6.0.0",
     "@mui/material": "^6.0.0",

@@ -11,6 +11,7 @@ import {
   Snackbar,
   TextField,
 } from "@mui/material";
+import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import KeyValueChip, {
   FieldNameMenu,
   parseValue,
@@ -217,6 +218,21 @@ const ChipSearch = ({
     return { uniqueArr, duplicates };
   };
 
+  const onDragEnd = (result) => {
+    if (!result.destination) {
+      return;
+    }
+    const reordered = Array.from(chips);
+    const [removed] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, removed);
+    // Remove duplicates after reordering
+    const { uniqueArr, duplicates } = removeDuplicates(reordered);
+    setDuplicateKeys(duplicates);
+    // Update the chips state with the unique array
+    setChips(reordered);
+    handleValueChange(uniqueArr.join(" "));
+  };
+
   const setChipKey = (chip) => {
     const { key, modifier, operator, value } = extractKeyValue(chip);
     let chipKey;
@@ -344,12 +360,29 @@ const ChipSearch = ({
           chipGroups[chipKey].indices.push(index);
         } else {
           return (
-            <RenderedChip
+            <Draggable
               key={chip + index}
-              chip={chip}
+              draggableId={chip + index}
               index={index}
-              lookupFunction={lookupFunction}
-            />
+            >
+              {(provided) => (
+                <span
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                  style={{
+                    ...provided.draggableProps.style,
+                    display: "inline-flex",
+                  }}
+                >
+                  <RenderedChip
+                    chip={chip}
+                    index={index}
+                    lookupFunction={lookupFunction}
+                  />
+                </span>
+              )}
+            </Draggable>
           );
         }
       }
@@ -473,7 +506,7 @@ const ChipSearch = ({
   const handleKeyDown = (event, setInUse) => {
     if (event.key === "Enter") {
       event.preventDefault();
-      setInUse(false);
+      setInUse && setInUse(false);
       parseInput(inputValue);
       setShowChips(true);
       setInputValue("");
@@ -593,6 +626,8 @@ const ChipSearch = ({
     setChipsArr(chipsToComponents(chips));
   };
 
+  const [inUse, setInUse] = useState(false);
+
   useEffect(() => {
     updateChipsArr(chips);
   }, [chips, conflictingChips]);
@@ -640,7 +675,10 @@ const ChipSearch = ({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              handleKeyDown({ key: "Enter", preventDefault: () => {} });
+              handleKeyDown(
+                { key: "Enter", preventDefault: () => {} },
+                setInUse,
+              );
             }}
             edge="start"
           >
@@ -797,11 +835,34 @@ const ChipSearch = ({
           }}
         >
           {label}
-          {chipsArr}
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="chips-droppable" direction="horizontal">
+              {(provided) => (
+                <Box
+                  sx={{
+                    maxWidth: "100%",
+                    display: "inline-flex",
+                    flexDirection: "row",
+                    justifyContent,
+                    alignItems: "center",
+                    gap: 1,
+                    flexWrap: "wrap",
+                  }}
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  {chipsArr}
+                  {provided.placeholder}
+                </Box>
+              )}
+            </Droppable>
+          </DragDropContext>
           {addField}
           {!compact && (
             <TextInput
               inputValue={inputValue}
+              inUse={inUse}
+              setInUse={setInUse}
               setInputValue={setInputValue}
               handleKeyDown={handleKeyDown}
               placeholder={placeholder}
@@ -818,7 +879,6 @@ const ChipSearch = ({
                     ...chips,
                     ...terms,
                   ]);
-                  console.log("uniqueArr", uniqueArr);
                   handleValueChange(uniqueArr.join(" "));
                 }
               }}
@@ -858,13 +918,15 @@ export default ChipSearch;
 
 const TextInput = ({
   inputValue,
+  inUse,
+  setInUse,
   setInputValue,
   handleInputValueChange,
   handleKeyDown,
   placeholder,
   startAdornment,
 }) => {
-  const [inUse, setInUse] = useState(inputValue.length > 0);
+  // const [inUse, setInUse] = useState(inputValue.length > 0);
   const inputRef = React.useRef(null);
   const multiline = true;
   const maxRows = 8;
