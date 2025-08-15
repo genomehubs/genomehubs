@@ -175,7 +175,7 @@ const KeyValueChip = ({
     event.preventDefault(); // Prevent the default action
     setIsEditingValue(false);
     setAnchorElValue(null);
-    const parsedValue = parseValue(currentValue);
+    const parsedValue = currentValue == null ? null : parseValue(currentValue);
     setCurrentValue(keyLabel == "tax" ? parsedValue : formatValue(parsedValue)); // Reformat the value for display
     setPreviousValue(
       keyLabel == "tax" ? parsedValue : formatValue(parsedValue),

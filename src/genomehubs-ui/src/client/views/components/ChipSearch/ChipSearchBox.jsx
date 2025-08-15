@@ -639,8 +639,20 @@ const ChipSearchBox = React.memo(
     }, []);
 
     // Memoize searchButton to avoid rerendering ChipSearch
-    const searchButton = useMemo(
-      () => (
+    const searchButton = useMemo(() => {
+      let options = {};
+      for (let [key, value] of Object.entries(searchOptions)) {
+        if (key.match(/query[A-Z]/)) {
+          if (value.result) {
+            options[key] = `${value.result}--${value.query}`;
+          } else {
+            options[key] = value.query;
+          }
+        } else {
+          options[key] = value;
+        }
+      }
+      return (
         <ButtonGroup sx={{}}>
           <Button
             variant="contained"
@@ -648,7 +660,7 @@ const ChipSearchBox = React.memo(
             startIcon={<SearchIcon />}
             className={classes.searchButton}
             onClick={() => {
-              handleSubmit({ ...searchOptions, query: value });
+              handleSubmit({ ...options, query: value });
             }}
           >
             {result}
@@ -663,22 +675,35 @@ const ChipSearchBox = React.memo(
             {showOptions ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </Button>
         </ButtonGroup>
-      ),
-      [
-        classes.searchButton,
-        handleSubmit,
-        searchOptions,
-        value,
-        result,
-        showOptions,
-        toggleOptions,
-      ],
-    );
+      );
+    }, [
+      classes.searchButton,
+      handleSubmit,
+      searchOptions,
+      value,
+      result,
+      showOptions,
+      toggleOptions,
+    ]);
 
     // Memoize handleValueChange to avoid rerendering ChipSearch
     const handleValueChange = useCallback((value) => {
       setValue(value);
     }, []);
+
+    const inputQueries = useMemo(() => {
+      const queries = {};
+      Object.entries(searchOptions).forEach(([key, value]) => {
+        if (key.match(/query[A-Z]/) && value.query) {
+          queries[key] = {
+            query: value.query,
+            result: value.result || result,
+            fields: value.fields || [],
+          };
+        }
+      });
+      return queries;
+    }, [searchOptions, result]);
 
     return (
       <Box
@@ -704,7 +729,11 @@ const ChipSearchBox = React.memo(
         <ChipSearch
           types={types}
           searchButton={searchButton}
+          inputQueries={inputQueries}
           handleValueChange={handleValueChange}
+          handleInputQueryChange={(query) =>
+            setSearchOptions((prev) => ({ ...prev, ...query }))
+          }
           results={results}
           compact={compact}
           {...props}

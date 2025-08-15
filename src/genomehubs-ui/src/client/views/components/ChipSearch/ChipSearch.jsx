@@ -161,7 +161,9 @@ const ChipSearch = ({
   label = null,
   searchButton = null,
   handleValueChange = () => {},
-  handleInputQueryChange = () => {},
+  handleInputQueryChange = (value) => {
+    console.log("handleInputQueryChange", value);
+  },
 }) => {
   const validation = typesToValidation(types);
   const validKeys = validation.validKeys();
@@ -693,15 +695,17 @@ const ChipSearch = ({
         <ChipSearch
           key={key}
           value={query}
-          result={result}
+          result={searchIndex}
+          results={results}
           types={types}
           inputQueries={{}}
+          lookupFunction={lookupFunction}
           compact={compact}
           inline={true}
           label={
             <QueryLabel
               queryTitle={key}
-              result={result}
+              result={searchIndex}
               results={results}
               handleResultChange={(result) => {
                 const updatedQueries = {
@@ -717,7 +721,11 @@ const ChipSearch = ({
               groupColor={groupColor}
             />
           }
-          handleValueChange={handleInputQueryChange}
+          handleValueChange={(query) =>
+            handleInputQueryChange({
+              [key]: { query, result: searchIndex, fields },
+            })
+          }
         />
       </Box>
     );

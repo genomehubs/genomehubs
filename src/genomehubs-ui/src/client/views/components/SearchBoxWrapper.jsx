@@ -176,7 +176,6 @@ const SearchBoxWrapper = ({
     //   (a, el) => ({ ...a, [el.name]: el.value }),
     //   {},
     // );
-    let inputQueries = {};
 
     // let savedOptions = allOptions[options.result];
     // let fields =
@@ -191,10 +190,7 @@ const SearchBoxWrapper = ({
       }
     }
 
-    dispatchSearch(
-      { query, ...inputQueries, result, fields, ...options },
-      query,
-    );
+    dispatchSearch({ query, result, fields, ...options }, query);
     // resetLookup();
   };
 
@@ -226,6 +222,28 @@ const SearchBoxWrapper = ({
     if (["fields", "ranks", "names"].includes(key) && value) {
       normalizedOptions[key] = value.split(",");
     }
+    if (key.match(/query[A-Z]/)) {
+      console.log(key, value);
+      let result, query, fields;
+      if (typeof value === "string") {
+        if (value.includes("--")) {
+          [result, query, fields] = value.split("--");
+          fields = fields?.split(",") || [];
+        } else {
+          query = value;
+          fields = [];
+        }
+      } else {
+        ({ result, query, fields } = value);
+      }
+      if (query) {
+        normalizedOptions[key] = {
+          query,
+          result,
+          fields,
+        };
+      }
+    }
   });
 
   let searchOptions = {
@@ -234,6 +252,8 @@ const SearchBoxWrapper = ({
     ...normalizedOptions,
     result,
   };
+
+  console.log("searchOptions", searchOptions);
 
   return (
     <Grid container alignItems="center" direction="column" ref={rootRef}>
