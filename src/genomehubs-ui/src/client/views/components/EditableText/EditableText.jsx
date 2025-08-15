@@ -430,6 +430,19 @@ const EditableText = ({
               if (event.key === "Escape") {
                 setIsEditing(false);
                 setAnchorEl(null);
+              } else if (event.key === "Enter") {
+                // Prevent scroll jump if value matches existing value
+                const currentInput = event.target.value;
+                if (shortenValue(currentInput) === shortenValue(inputValue)) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  event.target.blur();
+                  setIsEditing(false);
+                  setAnchorEl(null);
+                  return;
+                } else {
+                  handleChange(currentInput);
+                }
               } else if (event.key === " ") {
                 event.stopPropagation();
                 event.preventDefault();
