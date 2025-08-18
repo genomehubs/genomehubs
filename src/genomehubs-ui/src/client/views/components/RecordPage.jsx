@@ -99,7 +99,7 @@ const RecordPage = ({
       if (options.result == "taxon") {
         searchTerm.query = `tax_name(${options.recordId})`;
       } else {
-        searchTerm.query = options.recordId;
+        searchTerm.query = `${options.result}_id=${options.recordId}`;
       }
       setPreviousSearchTerm(searchTerm);
       fetchSearchResults(searchTerm);
