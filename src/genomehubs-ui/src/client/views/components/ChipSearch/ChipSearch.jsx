@@ -150,7 +150,7 @@ const QueryLabel = ({
 const ChipSearch = ({
   value = "",
   inputQueries = {},
-  placeholder = "Enter key=value, function(variable), or AND",
+  placeholder = "Type to Search",
   showText = false,
   compact = false,
   backgroundColor = "#ffffff",

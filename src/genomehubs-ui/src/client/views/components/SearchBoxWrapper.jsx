@@ -269,6 +269,7 @@ const SearchBoxWrapper = ({
           searchOptions={searchOptions}
           results={results}
           types={types}
+          placeholder={searchText}
           value={searchBoxTerm}
           setValue={setSearchBoxTerm}
           handleSubmit={(searchOptions) => {
