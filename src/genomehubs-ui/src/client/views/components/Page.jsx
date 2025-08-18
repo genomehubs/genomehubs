@@ -11,6 +11,7 @@ import { compose } from "recompose";
 import dispatchColors from "../hocs/dispatchColors";
 import makeStyles from "@mui/styles/makeStyles";
 import { useLocation } from "@reach/router";
+import { useReadLocalStorage } from "usehooks-ts";
 import withApi from "../hocs/withApi";
 import withSearchIndex from "../hocs/withSearchIndex";
 import withSiteName from "#hocs/withSiteName";
@@ -39,7 +40,6 @@ const useStyles = makeStyles((theme) => ({
 
 const Page = ({
   searchBox,
-  useNewSearchBox = true,
   panels,
   searchPanels,
   browsePanels,
@@ -58,6 +58,9 @@ const Page = ({
   const location = useLocation();
   const [showExamples, setShowExamples] = useState(false);
   const [showBrowse, setShowBrowse] = useState(false);
+  const [searchBoxVersion, setSearchBoxVersion] = useState(
+    useReadLocalStorage("searchBoxVersion") || "1.0",
+  );
   const rootRef = useRef(null);
   const itemCss = topLevel ? classes.itemFull : classes.item;
   let preSearchItems = [];
@@ -202,16 +205,24 @@ const Page = ({
               direction="row"
               // style={{ height: "calc( 100vh - 2em )", width: "100%" }}
               alignItems="center"
-              justifyContent="center"
+              justifyContent={
+                `${searchBoxVersion}`.startsWith("2") ? "center" : "flex-start"
+              }
             >
               <Grid
-                // className={itemCss}
+                className={
+                  `${searchBoxVersion}`.startsWith("2") ? null : itemCss
+                }
                 style={{
                   marginTop: "2em",
                 }}
                 size={12}
               >
-                {useNewSearchBox ? <SearchBoxWrapper /> : <SearchBox />}
+                {`${searchBoxVersion}`.startsWith("2") ? (
+                  <SearchBoxWrapper />
+                ) : (
+                  <SearchBox />
+                )}
               </Grid>
             </Grid>
           </Grid>
@@ -224,6 +235,32 @@ const Page = ({
                 size={12}
               >
                 <Grid size={12}>
+                  <span
+                    style={{
+                      float: "left",
+                      marginTop: "1em",
+                      marginLeft: "1em",
+                    }}
+                  >
+                    <a
+                      onClick={(e) => {
+                        e.preventDefault();
+                        localStorage.setItem(
+                          "searchBoxVersion",
+                          `${searchBoxVersion}`.startsWith("2") ? "1.0" : "2.0",
+                        );
+                        setSearchBoxVersion(
+                          `${searchBoxVersion}`.startsWith("2") ? "1.0" : "2.0",
+                        );
+                      }}
+                      className={linkStyle}
+                      href=""
+                    >
+                      {`${searchBoxVersion}`.startsWith("2")
+                        ? "Switch back to the legacy search box"
+                        : "Try the new search box"}
+                    </a>
+                  </span>
                   <span
                     style={{
                       float: "right",
