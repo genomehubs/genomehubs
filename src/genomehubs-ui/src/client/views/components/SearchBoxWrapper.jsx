@@ -37,7 +37,6 @@ const SearchBoxWrapper = ({
   setPreferSearchTerm,
   taxonomy,
   apiUrl,
-
   indices,
   types,
   allTypes,
@@ -55,6 +54,15 @@ const SearchBoxWrapper = ({
   const searchBoxRef = useRef(null);
   const rootRef = useRef(null);
   const searchInputRef = useRef(null);
+
+  const resetSearch = () => {
+    setSearchIndex("taxon");
+    setSearchBoxTerm("");
+    setLookupTerm("");
+    fetchSearchResults({ result: "taxon", query: "" });
+    setPreferSearchTerm(false);
+    navigate(`${basename}/${pathname}`);
+  };
 
   const allOptions = {
     taxon: useReadLocalStorage(`taxonOptions`) || {},
@@ -280,6 +288,7 @@ const SearchBoxWrapper = ({
           lookupFunction={(props) =>
             lookupFunction({ apiUrl, result, taxonomy, ...props })
           }
+          resetSearch={resetSearch}
           //compact
         />
       </Box>
