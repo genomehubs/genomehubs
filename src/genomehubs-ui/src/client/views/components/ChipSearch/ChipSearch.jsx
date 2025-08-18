@@ -162,9 +162,7 @@ const ChipSearch = ({
   label = null,
   searchButton = null,
   handleValueChange = () => {},
-  handleInputQueryChange = (value) => {
-    console.log("handleInputQueryChange", value);
-  },
+  handleInputQueryChange = () => {},
 }) => {
   const validation = typesToValidation(types);
   const validKeys = validation.validKeys();
@@ -707,13 +705,25 @@ const ChipSearch = ({
   );
 
   const inputQueryList = React.useMemo(() => {
-    return chips
-      .map((chip) => {
-        return chip.match(/\bquery[A-Z]\b/g);
-      })
-      .filter(Boolean)
-      .flat();
-  }, [chips]);
+    if (chips && chips.length > 0) {
+      return chips
+        .map((chip) => {
+          return chip.match(/\bquery[A-Z]\b/g);
+        })
+        .filter(Boolean)
+        .flat();
+    }
+    if (inputValue && inputValue.length > 0) {
+      return inputValue
+        .split(/\s+AND\s+/i)
+        .map((chip) => {
+          return chip.match(/\bquery[A-Z]\b/g);
+        })
+        .filter(Boolean)
+        .flat();
+    }
+    return [];
+  }, [chips, inputValue]);
 
   let newInputQueries = {};
   const inputQueryComponents = inputQueryList.map((key) => {
