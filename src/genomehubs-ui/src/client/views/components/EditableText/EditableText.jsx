@@ -273,7 +273,21 @@ const EditableText = ({
                 setIsEditing(false);
                 setAnchorEl(null);
               } else if (event.key === "Enter") {
-                handleChange(event.target.value);
+                const updatedValue = event.target.value;
+                // If updatedValue matches an option, use it; otherwise, select the top/highlighted option
+                const matchedOption = options.find(
+                  (opt) => opt === updatedValue,
+                );
+                if (matchedOption) {
+                  handleChange(updatedValue);
+                } else if (options.length > 0) {
+                  const filteredOptions = options.filter((opt) =>
+                    opt.toLowerCase().match(event.target.value.toLowerCase()),
+                  );
+                  handleChange(filteredOptions[0] || options[0]);
+                } else {
+                  handleChange(updatedValue);
+                }
               }
             }}
             value={inputValue || ""}
