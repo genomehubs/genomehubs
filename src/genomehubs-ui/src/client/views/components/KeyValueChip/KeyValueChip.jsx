@@ -42,8 +42,9 @@ const KeyValueChip = ({
   chipIndex = 0,
   lookupFunction = null,
   types,
+  searchIndex = "taxon",
 }) => {
-  const validation = typesToValidation(types);
+  const validation = typesToValidation({ types, searchIndex });
   const chipId = `${keyLabel}-${operator}-${value}-${modifier}`;
   const [anchorElSymbol, setAnchorElSymbol] = useState(null);
   const [anchorElModifier, setAnchorElModifier] = useState(null);

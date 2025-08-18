@@ -737,6 +737,7 @@ const ChipSearchBox = React.memo(
           handleInputQueryChange={(query) =>
             setSearchOptions((prev) => ({ ...prev, ...query }))
           }
+          result={result}
           results={results}
           compact={compact}
           {...props}

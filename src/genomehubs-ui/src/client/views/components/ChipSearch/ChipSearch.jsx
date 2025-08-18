@@ -167,7 +167,7 @@ const ChipSearch = ({
   handleValueChange = () => {},
   handleInputQueryChange = () => {},
 }) => {
-  const validation = typesToValidation(types);
+  const validation = typesToValidation({ types, searchIndex: result });
   const validKeys = validation.validKeys();
   const [showChips, setShowChips] = useState(!showText);
   const [currentInputQueries, setCurrentInputQueries] = useState(inputQueries);
@@ -334,6 +334,7 @@ const ChipSearch = ({
         chipIndex={index} // Pass the index to KeyValueChip
         lookupFunction={key === "tax" ? lookupFunction : null}
         types={types}
+        searchIndex={result}
         {...props} // Spread any additional props
       />
     );

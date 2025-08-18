@@ -54,7 +54,7 @@ const validateKeyword = ({ value, validValues }) => {
   return { valid: true };
 };
 
-export const typesToValidation = (types) => {
+export const typesToValidation = ({ types, searchIndex }) => {
   const validKeys = () => {
     let keys = new Set(["tax", "collate"]);
     let keysByGroup = {
@@ -68,6 +68,14 @@ export const typesToValidation = (types) => {
         "tax_eq",
       ]),
     };
+    if (searchIndex !== "taxon") {
+      keysByGroup.primary.add(`${searchIndex}_id`);
+      keys.add(`${searchIndex}_id`);
+      if (searchIndex === "feature") {
+        keysByGroup.primary.add("assembly_id");
+        keys.add("assembly_id");
+      }
+    }
     let descriptions = {
       tax: "Taxonomic filter",
       collate: "Collate results by",
@@ -131,6 +139,9 @@ export const typesToValidation = (types) => {
     if (key === "tax") {
       return new Set(["tree", "name", "rank", "lineage", "depth", "eq"]);
     }
+    if (key.endsWith("_id")) {
+      return new Set(["value"]);
+    }
     const { summary = [], traverse_direction } = types[key] || {};
     let modifiers = new Set(["value"]);
     for (let modifier of Array.isArray(summary) ? summary : [summary]) {
@@ -167,7 +178,10 @@ export const typesToValidation = (types) => {
     }
     const { processed_type, summary = [] } = types[key] || {};
     let operators = new Set(["=", "!="]);
-    if (processed_type !== "keyword" || modifier !== "value") {
+    if (
+      (processed_type !== "keyword" || modifier !== "value") &&
+      !key.endsWith("_id")
+    ) {
       operators.add(">");
       operators.add("<");
       operators.add(">=");
