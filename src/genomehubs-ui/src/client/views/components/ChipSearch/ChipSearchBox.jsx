@@ -652,6 +652,9 @@ const ChipSearchBox = React.memo(
           options[key] = value;
         }
       }
+      let query = value;
+      query = query.replace(/(=|>|>=|<|<=|!=)\s+AND/g, " AND");
+      query = query.replace(/(=|>|>=|<|<=|!=)\s*$/, "");
       return (
         <ButtonGroup sx={{}}>
           <Button
@@ -660,7 +663,7 @@ const ChipSearchBox = React.memo(
             startIcon={<SearchIcon />}
             className={classes.searchButton}
             onClick={() => {
-              handleSubmit({ ...options, query: value });
+              handleSubmit({ ...options, query });
             }}
           >
             {result}

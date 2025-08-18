@@ -62,7 +62,9 @@ const extractKeyValue = (chip) => {
       }
     }
   } else if (!value) {
-    operator = "=";
+    if (!operator) {
+      operator = "=";
+    }
     modifier = "value";
   } else if (value && operator) {
     modifier = "value";
@@ -562,9 +564,9 @@ const ChipSearch = ({
       chipString = key;
     }
     if (operator) {
-      if (value !== "" && typeof value !== "undefined" && value !== null) {
-        chipString += `${operator}`;
-      }
+      // if (value !== "" && typeof value !== "undefined" && value !== null) {
+      chipString += `${operator}`;
+      // }
     } else {
       chipString += "=";
     }
@@ -579,6 +581,7 @@ const ChipSearch = ({
   };
 
   const handleChipChange = (updatedChip, index) => {
+    console.log(updatedChip);
     setChips((prevChips) => {
       const newChips = [...prevChips];
       let { key, operator, value, modifier, palette } = updatedChip;
