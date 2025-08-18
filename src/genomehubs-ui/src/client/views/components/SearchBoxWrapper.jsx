@@ -40,6 +40,7 @@ const SearchBoxWrapper = ({
 
   indices,
   types,
+  allTypes,
   synonyms,
   basename,
 }) => {
@@ -269,6 +270,7 @@ const SearchBoxWrapper = ({
           searchOptions={searchOptions}
           results={results}
           types={types}
+          allTypes={allTypes}
           placeholder={searchText}
           value={searchBoxTerm}
           setValue={setSearchBoxTerm}
