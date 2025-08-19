@@ -530,9 +530,9 @@ const ChipSearch = ({
                     newChips.splice(index, 1);
                   });
                 const { uniqueArr, duplicates } = removeDuplicates(newChips);
-                setDuplicateKeys(duplicates);
-                handleValueChange(uniqueArr.join(" "));
-                return newChips;
+                // setDuplicateKeys(duplicates);
+                // handleValueChange(uniqueArr.join(" "));
+                return uniqueArr;
               });
             };
           }
@@ -608,8 +608,8 @@ const ChipSearch = ({
       let newChips = [...prevChips];
       newChips.splice(index, 1);
       const { uniqueArr, duplicates } = removeDuplicates(newChips);
-      handleValueChange(uniqueArr.join(" "));
-      setDuplicateKeys(duplicates);
+      // handleValueChange(uniqueArr.join(" "));
+      // setDuplicateKeys(duplicates);
       return uniqueArr;
     });
   };
@@ -627,9 +627,9 @@ const ChipSearch = ({
         newChips[index] = chipToString(updatedChip);
       }
       const { uniqueArr, duplicates } = removeDuplicates(newChips);
-      setDuplicateKeys(duplicates);
-      handleValueChange(uniqueArr.join(" "));
-      return newChips;
+      // setDuplicateKeys(duplicates);
+      // handleValueChange(uniqueArr.join(" "));
+      return uniqueArr;
     });
   };
 
