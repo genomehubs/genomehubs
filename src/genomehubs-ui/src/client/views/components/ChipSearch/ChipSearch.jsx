@@ -404,17 +404,30 @@ const ChipSearch = ({
         let chipKey = setChipKey(chip);
 
         let isConflicting = conflictingChips.has(chipKey);
-        if (conflictPairs[chipKey]) {
-          isConflicting = conflictingChips.has(conflictPairs[chipKey]);
-          chipKey = conflictPairs[chipKey]; // Use the first key for grouping
-        }
         if (isConflicting) {
           if (!chipGroups[chipKey]) {
             chipGroups[chipKey] = { group: index, chips: [], indices: [] };
           }
           chipGroups[chipKey].chips.push(chip);
           chipGroups[chipKey].indices.push(index);
-        } else {
+        }
+        let isPairConflicting = false;
+        if (conflictPairs[chipKey]) {
+          isPairConflicting = conflictingChips.has(conflictPairs[chipKey]);
+          let pairChipKey = conflictPairs[chipKey]; // Use the first key for grouping
+          if (isPairConflicting) {
+            if (!chipGroups[pairChipKey]) {
+              chipGroups[pairChipKey] = {
+                group: index,
+                chips: [],
+                indices: [],
+              };
+            }
+            chipGroups[pairChipKey].chips.push(chip);
+            chipGroups[pairChipKey].indices.push(index);
+          }
+        }
+        if (!isConflicting && !isPairConflicting) {
           return (
             <Draggable
               key={chip + index}
