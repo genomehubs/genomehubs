@@ -83,12 +83,19 @@ const taxon_lookup = (lookupTerm, result, taxonomy, apiUrl) => {
         } else {
           option.title = option.scientific_name || option.assembly_id;
         }
+        if (result === "feature") {
+          option.feature_id = obj.result.feature_id || obj.result.id;
+          option.assembly_id = obj.result.assembly_id;
+          option.string = `${option.negate ? "!" : ""}${option.feature_id}`;
+          option.value = option.string;
+        }
         if (negate) {
           option.negate = true;
         }
 
         option.record_id = record_id;
         option.string = record_id || option.value;
+        option.title = option.title || option.value;
 
         // option.value = record_id || option.value;
         return option;

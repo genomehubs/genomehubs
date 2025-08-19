@@ -24,6 +24,13 @@ export const AutoCompleteOption = ({ option, ...props }) => {
     // option.string = option.value;
   } else if (option.result == "sample") {
     optionIcon = <PersonPinCircleIcon className={classes.icon} />;
+  } else if (option.result == "feature") {
+    optionIcon = (
+      <LineStyleIcon
+        className={classes.icon}
+        style={{ transform: "rotate(180deg)" }}
+      />
+    );
   }
   if (option.name_class) {
     primaryText = (
@@ -75,6 +82,8 @@ export const AutoCompleteOption = ({ option, ...props }) => {
         </Typography>
       );
     }
+  } else if (option.record_id) {
+    primaryText = option.record_id;
   } else if (option.type) {
     if (option.type == "rank") {
       optionIcon = (
@@ -99,6 +108,10 @@ export const AutoCompleteOption = ({ option, ...props }) => {
         {option.type}
       </Typography>
     );
+  } else if (typeof option === "string") {
+    optionIcon = null;
+    primaryText = option;
+    secondaryText = null;
   }
 
   let item = (
@@ -121,7 +134,7 @@ export const AutoCompleteOption = ({ option, ...props }) => {
   return (
     <li {...props} key={option.string}>
       <Grid container alignItems="center" size={12}>
-        <Grid>{optionIcon}</Grid>
+        {optionIcon && <Grid>{optionIcon}</Grid>}
         {item}
       </Grid>
     </li>
