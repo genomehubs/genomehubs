@@ -95,11 +95,13 @@ const EditableText = ({
   const handleBlur = (event) => {
     setIsEditing(false);
     setAnchorEl(null);
+    console.log("EditableText handleBlur:", inputValue);
     onChange?.(inputValue); // Pass the array of values to the parent
     onBlur?.(event);
   };
 
   const handleChange = (newValue) => {
+    console.log("EditableText handleChange:", newValue);
     setInputValue(newValue);
     setIsEditing(false);
     setAnchorEl(null);
@@ -417,7 +419,9 @@ const EditableText = ({
             onChange?.(updatedValue);
           } else {
             const updatedValue =
-              typeof newValue === "string" ? extendValue(newValue) : "";
+              typeof newValue === "string"
+                ? extendValue(newValue)
+                : extendValue(newValue.string || newValue.title) || "";
             setInputValue(updatedValue);
             onChange?.(updatedValue);
           }

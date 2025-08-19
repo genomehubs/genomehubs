@@ -16,7 +16,7 @@ export const AutoCompleteOption = ({ option, ...props }) => {
   const classes = useStyles();
   let primaryText, secondaryText;
   let optionIcon = <SearchIcon className={classes.icon} />;
-  if (option.result == "taxon") {
+  if (option.result == "taxon" && option.taxon_id) {
     optionIcon = <EmojiNatureIcon className={classes.icon} />;
     option.string = `${option.negate ? "!" : ""}${option.taxon_id}[${option.scientific_name}]`;
   } else if (option.result == "assembly") {
@@ -83,7 +83,7 @@ export const AutoCompleteOption = ({ option, ...props }) => {
           style={{ transform: "rotate(-90deg)" }}
         />
       );
-      option.string = `${option.negate ? "!" : ""}${option.value}`;
+      option.string = `${option.negate ? "!" : ""}${option.title}`;
     } else if (option.type == "date") {
       optionIcon = <TodayIcon className={classes.icon} />;
     } else if (option.type == "keyword") {

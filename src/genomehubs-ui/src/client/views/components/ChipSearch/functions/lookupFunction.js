@@ -144,6 +144,8 @@ const taxon_rank_lookup = (lookupTerm, result, taxonomy, apiUrl) => {
           value: rank,
           display_value: rank,
           type: "rank",
+          string: rank,
+          title: rank,
           result,
           taxonomy,
         }));

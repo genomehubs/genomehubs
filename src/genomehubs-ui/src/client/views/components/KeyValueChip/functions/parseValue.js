@@ -1,9 +1,9 @@
 export const parseValue = (value) => {
   const suffixes = { k: 1e3, M: 1e6, G: 1e9, T: 1e12, P: 1e15 };
-  const match = value.match(/^([\d.,\s]+)([kMGTPE])$/);
+  const match = value.match(/^([\d.,\s]+)([kMGTPE])$/i);
   if (match) {
     const [, number, suffix] = match;
-    return parseValue(number) * (suffixes[suffix] || 1);
+    return parseValue(number) * (suffixes[suffix.toUpperCase()] || 1);
   }
 
   let val = value;

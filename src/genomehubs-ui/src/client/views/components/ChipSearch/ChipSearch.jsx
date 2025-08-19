@@ -33,6 +33,43 @@ import Underline from "./Underline";
 import { getChipColor } from "../KeyValueChip/functions/chipPalettes";
 import { h } from "hastscript";
 
+const chipToString = (chip) => {
+  if (typeof chip === "string") {
+    return chip;
+  }
+  // If chip is an object, extract key, operator, and value
+  const { key, operator, value, valueNote, modifier } = chip;
+  let chipString;
+  if (key === "tax" && modifier) {
+    return `tax_${modifier}(${value})`;
+  } else if (modifier) {
+    if (modifier === "collate") {
+      return `collate(${key}, ${value})`;
+    }
+    if (modifier !== "value") {
+      chipString = `${modifier}(${key})`;
+    }
+  }
+  if (!chipString) {
+    chipString = key;
+  }
+  if (operator) {
+    // if (value !== "" && typeof value !== "undefined" && value !== null) {
+    chipString += `${operator}`;
+    // }
+  } else {
+    chipString += "=";
+  }
+  if (typeof value !== "undefined" && value !== null) {
+    if (valueNote) {
+      chipString += `${value}[${valueNote}]`;
+    } else {
+      chipString += value;
+    }
+  }
+  return chipString;
+};
+
 const extractKeyValue = (chip) => {
   let modifier;
   let valueNote;
@@ -61,6 +98,11 @@ const extractKeyValue = (chip) => {
         // modifier = null;
       }
     }
+  } else if (key.startsWith("tax_")) {
+    modifier = key.replace("tax_", "");
+    key = "tax";
+    operator = undefined;
+    value = value || "";
   } else if (!value) {
     if (!operator) {
       operator = "=";
@@ -69,12 +111,22 @@ const extractKeyValue = (chip) => {
   } else if (value && operator) {
     modifier = "value";
   }
-  return {
-    key: key.trim().replace(/-/g, "_"),
+  let chipObj = {
+    key,
     operator: operator ? operator.trim() : null,
     value: value ? value.trim() : key == "tax" ? "" : null,
     valueNote: valueNote ? valueNote.trim() : null,
     modifier: modifier ? modifier.trim() : null,
+  };
+  if (key.match(/-/)) {
+    chipObj.key = key.trim().replace(/-/g, "_");
+  }
+  if (chipObj?.value?.match(/^([\d.,\s]+)([kMGTPE])$/i)) {
+    chipObj.value = `${parseValue(`${chipObj.value}`.toUpperCase())}`;
+  }
+  return {
+    ...chipObj,
+    processedChip: chipToString(chipObj),
   };
 };
 
@@ -181,7 +233,8 @@ const ChipSearch = ({
     let byKey = {};
     arr.forEach((item) => {
       if (!item.match(/^\s*AND\s*$/i)) {
-        let { key, modifier, value, operator } = extractKeyValue(item);
+        let { key, modifier, value, operator, processedChip } =
+          extractKeyValue(item);
         let sortedValues = (value || "")
           .split(",")
           .map((v) => parseValue(v.trim()))
@@ -196,7 +249,7 @@ const ChipSearch = ({
             keyOrder.push(key);
             // }
           }
-          byKey[key].push(item);
+          byKey[key].push(processedChip);
           seen.add(lcItem);
         } else if (key == "tax") {
           duplicates.add(`${key}_${modifier}`);
@@ -215,7 +268,6 @@ const ChipSearch = ({
         }
       }
     }
-
     return { uniqueArr, duplicates };
   };
 
@@ -529,11 +581,14 @@ const ChipSearch = ({
           ...terms,
         ]);
         setDuplicateKeys(duplicates);
-        handleValueChange(uniqueArr.join(" "));
         return uniqueArr;
       });
     }
   };
+
+  useEffect(() => {
+    handleValueChange(chips.join(" "));
+  }, [chips, handleValueChange]);
 
   const handleDelete = (chipToDelete, index) => {
     setChips((prevChips) => {
@@ -546,45 +601,7 @@ const ChipSearch = ({
     });
   };
 
-  const chipToString = (chip) => {
-    if (typeof chip === "string") {
-      return chip;
-    }
-    // If chip is an object, extract key, operator, and value
-    const { key, operator, value, valueNote, modifier } = chip;
-    let chipString;
-    if (key === "tax" && modifier) {
-      return `tax_${modifier}(${value})`;
-    } else if (modifier) {
-      if (modifier === "collate") {
-        return `collate(${key}, ${value})`;
-      }
-      if (modifier !== "value") {
-        chipString = `${modifier}(${key})`;
-      }
-    }
-    if (!chipString) {
-      chipString = key;
-    }
-    if (operator) {
-      // if (value !== "" && typeof value !== "undefined" && value !== null) {
-      chipString += `${operator}`;
-      // }
-    } else {
-      chipString += "=";
-    }
-    if (typeof value !== "undefined" && value !== null) {
-      if (valueNote) {
-        chipString += `${value}[${valueNote}]`;
-      } else {
-        chipString += value;
-      }
-    }
-    return chipString;
-  };
-
   const handleChipChange = (updatedChip, index) => {
-    console.log(updatedChip);
     setChips((prevChips) => {
       const newChips = [...prevChips];
       let { key, operator, value, modifier, palette } = updatedChip;
