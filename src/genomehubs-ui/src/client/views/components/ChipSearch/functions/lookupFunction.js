@@ -1,5 +1,10 @@
 const taxon_lookup = (lookupTerm, result, taxonomy, apiUrl) => {
-  let searchTerm = lookupTerm.replace(/\[.*/, "").replace(/_/g, " ");
+  let searchTerm =
+    result === "taxon"
+      ? lookupTerm.replace(/\[.*/, "").replace(/_/g, " ")
+      : result === "assembly" || result === "sample"
+        ? lookupTerm.replace(/\[.*/, "")
+        : lookupTerm;
   let negate = false;
   if (searchTerm.startsWith("!")) {
     searchTerm = searchTerm.slice(1);
@@ -17,13 +22,23 @@ const taxon_lookup = (lookupTerm, result, taxonomy, apiUrl) => {
     }
     if (json.results && json.results.length > 0) {
       return json.results.map((obj, id) => {
-        let { taxon_rank, taxon_id, scientific_name } = obj.result;
+        let {
+          taxon_rank,
+          taxon_id,
+          [`${result}_id`]: record_id,
+          scientific_name,
+        } = obj.result;
         let option = { taxon_rank, id };
         if (obj.reason && obj.reason.length > 0) {
           Object.entries(obj.reason[0].fields).forEach(([key, value]) => {
             if (key.endsWith("class")) {
               option.class = value[0];
-              option.name_class = value[0];
+              if (result === "taxon") {
+                option.name_class = value[0];
+              } else {
+                option.identifier_class = value[0];
+              }
+              option.xref = Boolean(value[0] !== `${result}_id`);
             } else if (key.endsWith("raw")) {
               option.value = value[0];
             }
@@ -42,11 +57,15 @@ const taxon_lookup = (lookupTerm, result, taxonomy, apiUrl) => {
             option.match = "exact";
           } else {
             for (let [key, value] of Object.entries(
-              obj.result.taxon_names || {},
+              obj.result.taxon_names || obj.result.identifiers || {},
             )) {
               if (value.toLowerCase() === options.searchTerm.toLowerCase()) {
                 option.class = key;
-                option.name_class = key.replace(/_/g, " ");
+                if (result === "taxon") {
+                  option.name_class = key.replace(/_/g, " ");
+                } else {
+                  option.identifier_class = key;
+                }
                 option.match = "exact";
                 option.value = value;
                 break;
@@ -57,10 +76,21 @@ const taxon_lookup = (lookupTerm, result, taxonomy, apiUrl) => {
         option.taxon_id = taxon_id;
         option.scientific_name = scientific_name;
         option.result = result;
-        option.title = scientific_name;
+        if (result === "taxon") {
+          option.title = scientific_name;
+        } else if (record_id == option.value) {
+          option.title = record_id;
+        } else {
+          option.title = option.scientific_name || option.assembly_id;
+        }
         if (negate) {
           option.negate = true;
         }
+
+        option.record_id = record_id;
+        option.string = record_id || option.value;
+
+        // option.value = record_id || option.value;
         return option;
       });
     }
@@ -147,10 +177,13 @@ export const lookupFunction = ({
 }) => {
   if (key === "tax") {
     if (["eq", "lineage", "name", "tree"].includes(modifier)) {
-      return taxon_lookup(lookupTerm, result, taxonomy, apiUrl);
+      return taxon_lookup(lookupTerm, "taxon", taxonomy, apiUrl);
     } else if (modifier === "rank") {
-      return taxon_rank_lookup(lookupTerm, result, taxonomy, apiUrl);
+      return taxon_rank_lookup(lookupTerm, "taxon", taxonomy, apiUrl);
     }
+  } else if (key.endsWith("_id")) {
+    const index = key.replace(/_id$/, "");
+    return taxon_lookup(lookupTerm, index, taxonomy, apiUrl);
   }
 };
 

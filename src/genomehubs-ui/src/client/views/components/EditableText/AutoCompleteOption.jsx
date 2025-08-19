@@ -21,6 +21,7 @@ export const AutoCompleteOption = ({ option, ...props }) => {
     option.string = `${option.negate ? "!" : ""}${option.taxon_id}[${option.scientific_name}]`;
   } else if (option.result == "assembly") {
     optionIcon = <ExtensionIcon className={classes.icon} />;
+    // option.string = option.value;
   } else if (option.result == "sample") {
     optionIcon = <PersonPinCircleIcon className={classes.icon} />;
   }
@@ -48,10 +49,23 @@ export const AutoCompleteOption = ({ option, ...props }) => {
       </Typography>
     );
   } else if (option.identifier_class) {
+    primaryText = (
+      <>
+        {option.xref && (
+          <div style={{ display: "inline-block" }}>
+            <Typography variant="body2" color="textSecondary">
+              {`${option.identifier_class}:`}
+            </Typography>
+          </div>
+        )}
+        {option.xref && " "}
+        {option.value}
+      </>
+    );
     if (option.result == "assembly" || option.result == "sample") {
-      secondaryText = (
+      secondaryText = option.value !== option.record_id && (
         <Typography variant="body2" color="textSecondary">
-          {option.scientific_name}
+          {option.record_id}
         </Typography>
       );
     } else {
@@ -93,6 +107,7 @@ export const AutoCompleteOption = ({ option, ...props }) => {
       <span style={{ float: "right" }}>
         <Typography variant="body2" color="textSecondary">
           {(option.name_class && option.taxon_id) ||
+            (option.identifier_class && option.scientific_name) ||
             option.assembly_id ||
             option.description ||
             option.name ||
@@ -104,7 +119,7 @@ export const AutoCompleteOption = ({ option, ...props }) => {
   );
 
   return (
-    <li {...props}>
+    <li {...props} key={option.string}>
       <Grid container alignItems="center" size={12}>
         <Grid>{optionIcon}</Grid>
         {item}

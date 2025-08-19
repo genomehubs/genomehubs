@@ -332,7 +332,9 @@ const ChipSearch = ({
           marginRight: index === chips.length - 1 ? "0" : "1em",
         }} // Add margin to chips
         chipIndex={index} // Pass the index to KeyValueChip
-        lookupFunction={key === "tax" ? lookupFunction : null}
+        lookupFunction={
+          key === "tax" || key.endsWith("_id") ? lookupFunction : null
+        }
         types={types}
         searchIndex={result}
         {...props} // Spread any additional props

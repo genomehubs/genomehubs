@@ -225,7 +225,8 @@ export const typesToValidation = ({ types, searchIndex }) => {
       obj = validateNumber({ value, processed_type, constraint });
     } else if (
       processed_type.endsWith("keyword") ||
-      (key === "tax" && modifier !== "depth")
+      (key === "tax" && modifier !== "depth") ||
+      key.endsWith("_id")
     ) {
       obj = validateKeyword({
         value,
@@ -281,7 +282,7 @@ export const typesToValidation = ({ types, searchIndex }) => {
   };
 
   const allowSplitValues = ({ key, modifier }) => {
-    if (key === "tax") {
+    if (key === "tax" || key.endsWith("_id")) {
       return false;
     }
     const { processed_type } = types[key] || {};

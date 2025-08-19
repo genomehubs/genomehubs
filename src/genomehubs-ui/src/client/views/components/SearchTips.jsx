@@ -130,7 +130,7 @@ const SearchTips = ({
     } else if (!queryParts[i].match(/tax_\w+\(/)) {
       let [key, value] = queryParts[i].split(/\s*[<>!=]\s*/);
       key = key.replace("!", "");
-      if (!types.hasOwnProperty(key)) {
+      if (!types.hasOwnProperty(key) && !key.match(/^\w+_id$/)) {
         let valid_keys = didYouMean(key, Object.keys(types), fuzzyOpts) || [];
         if (typeof valid_keys == "string") {
           valid_keys = [valid_keys];
@@ -166,7 +166,7 @@ const SearchTips = ({
             colors={colors}
           />,
         );
-      } else if (value && types[key].constraint && types[key].constraint.enum) {
+      } else if (value && types[key]?.constraint?.enum) {
         for (let v of value.split(/\s*,\s*/)) {
           v = v.replace(/['"!]/g, "");
           if (!types[key].constraint.enum.includes(v.toLowerCase())) {

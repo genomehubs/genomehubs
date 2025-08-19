@@ -210,7 +210,7 @@ const SearchBoxWrapper = ({
     doSearch(term, index || result, term);
   };
 
-  let searchText = `Type to search ${siteName}`;
+  let searchText = `Search ${siteName}`;
   if (searchIndex) {
     searchText += ` ${searchIndex} index`;
   }
