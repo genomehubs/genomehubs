@@ -763,76 +763,86 @@ const ChipSearch = ({
   }, [chips, inputValue]);
 
   let newInputQueries = {};
-  const inputQueryComponents = inputQueryList.map((key) => {
-    const {
-      result: searchIndex = result,
-      query = "",
-      fields = [],
-    } = currentInputQueries[key] || {};
-    if (!currentInputQueries[key]) {
-      newInputQueries[key] = {
-        result: searchIndex,
-        query,
-        fields,
-      };
-    }
+  const [inputQueryComponents, setInputQueryComponents] = useState([]);
 
-    const groupColor = "#80808033";
-    return (
-      <Box
-        key={key}
-        sx={{
-          display: "inline-flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 1,
-          marginBottom: 1,
-          border: `2px solid ${groupColor}`,
-          padding: "0 2.5em 0.5em calc(2em + 12px)",
-          borderRadius: "8px",
-          maxWidth: "100%",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <ChipSearch
+  useEffect(() => {
+    let newInputQueriesLocal = {};
+    const components = inputQueryList.map((key) => {
+      const {
+        result: searchIndex = result,
+        query = "",
+        fields = [],
+      } = currentInputQueries[key] || {};
+      if (!currentInputQueries[key]) {
+        newInputQueriesLocal[key] = {
+          result: searchIndex,
+          query,
+          fields,
+        };
+      }
+
+      const groupColor = "#80808033";
+      return (
+        <Box
           key={key}
-          value={query}
-          result={searchIndex}
-          results={results}
-          types={allTypes[searchIndex] || types}
-          inputQueries={{}}
-          lookupFunction={lookupFunction}
-          compact={compact}
-          inline={true}
-          label={
-            <QueryLabel
-              queryTitle={key}
-              result={searchIndex}
-              results={results}
-              handleResultChange={(result) => {
-                const updatedQueries = {
-                  ...currentInputQueries,
-                  [key]: {
-                    ...currentInputQueries[key],
-                    result,
-                  },
-                };
-                setCurrentInputQueries(updatedQueries);
-                handleInputQueryChange(updatedQueries);
-              }}
-              groupColor={groupColor}
-            />
-          }
-          handleValueChange={(query) =>
-            handleInputQueryChange({
-              [key]: { query, result: searchIndex, fields },
-            })
-          }
-        />
-      </Box>
-    );
-  });
+          sx={{
+            display: "inline-flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 1,
+            marginBottom: 1,
+            border: `2px solid ${groupColor}`,
+            padding: "0 2.5em 0.5em calc(2em + 12px)",
+            borderRadius: "8px",
+            maxWidth: "100%",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <ChipSearch
+            key={key}
+            value={query}
+            result={searchIndex}
+            results={results}
+            types={allTypes[searchIndex] || types}
+            inputQueries={{}}
+            lookupFunction={lookupFunction}
+            compact={compact}
+            inline={true}
+            label={
+              <QueryLabel
+                queryTitle={key}
+                result={searchIndex}
+                results={results}
+                handleResultChange={(result) => {
+                  const updatedQueries = {
+                    ...currentInputQueries,
+                    [key]: {
+                      ...currentInputQueries[key],
+                      result,
+                    },
+                  };
+                  setCurrentInputQueries(updatedQueries);
+                  handleInputQueryChange(updatedQueries);
+                }}
+                groupColor={groupColor}
+              />
+            }
+            handleValueChange={(query) =>
+              handleInputQueryChange({
+                [key]: { query, result: searchIndex, fields },
+              })
+            }
+          />
+        </Box>
+      );
+    });
+    setInputQueryComponents(components);
+    newInputQueries = newInputQueriesLocal;
+    // Only update state if there are new queries, and do it in an effect
+    // (the effect below will handle newInputQueries)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputQueryList.join(",")]);
 
   // Only update state if there are new queries, and do it in an effect
   useEffect(() => {

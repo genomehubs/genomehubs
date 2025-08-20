@@ -424,7 +424,7 @@ const SearchOptions = ({
         top: "50%",
         left: "50%",
         transform: "translate(-50%, -50%)",
-        padding: 0,
+        padding: "0 1em",
         outline: "none",
         minWidth: 350,
         maxHeight: "90vh",
@@ -447,7 +447,7 @@ const SearchOptions = ({
           right: 0,
           zIndex: 1300, // Ensure it appears above other content
 
-          mb: 3,
+          margin: "0 -1em 1em -1em",
           pb: 1,
           boxShadow: "0px 8px 12px -4px rgba(0,0,0,0.12)",
         }}
@@ -548,7 +548,7 @@ const SearchOptions = ({
           display: "flex",
           justifyContent: "center",
           gap: 2,
-          mt: 2,
+          margin: "2em -1em 0 -1em",
           position: "sticky",
           bottom: 0,
           backgroundColor: "white",
