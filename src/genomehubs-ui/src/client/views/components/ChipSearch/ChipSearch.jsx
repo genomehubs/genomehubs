@@ -394,15 +394,36 @@ const ChipSearch = ({
     );
   };
 
+  // Recompute chipsArr whenever chips or conflictingChips change
+  useEffect(() => {
+    const { newChipsArr, invalidKeyChips } = chipsToComponents(chips);
+    setChipsArr(newChipsArr);
+    if (
+      invalidKeyChips.length !== chipsWithInvalidKeys.length ||
+      invalidKeyChips.some((chip, i) => chip !== chipsWithInvalidKeys[i])
+    ) {
+      setChipsWithInvalidKeys(invalidKeyChips);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chips, conflictingChips]);
+
   const chipsToComponents = (chips) => {
+    let invalidKeyChips = [];
     let chipGroups = {};
     let newChipsArr = chips.map((chip, index) => {
       if (chip === "AND" || chip === "") {
         return null; // Skip rendering "AND" as a Chip
       } else {
+        let { key } = extractKeyValue(chip);
+        const { valid, color } = validation.validateKey({
+          key: key,
+        });
+        if (!valid) {
+          invalidKeyChips.push(chip);
+        }
+
         // Check if the chip is in the conflict set
         let chipKey = setChipKey(chip);
-
         let isConflicting = conflictingChips.has(chipKey);
         if (isConflicting) {
           if (!chipGroups[chipKey]) {
@@ -565,12 +586,61 @@ const ChipSearch = ({
         }
       },
     );
-    return newChipsArr;
+    return { newChipsArr, invalidKeyChips };
   };
 
   const [duplicateKeys, setDuplicateKeys] = useState(duplicates);
-  const [chipsArr, setChipsArr] = useState(chipsToComponents(chips));
+  const { newChipsArr: initialChipsArr, invalidKeyChips: initialInvalidChips } =
+    chipsToComponents(chips);
+
+  const [chipsArr, setChipsArr] = useState(initialChipsArr);
+  const [chipsWithInvalidKeys, setChipsWithInvalidKeys] =
+    useState(initialInvalidChips);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+
+  useEffect(() => {
+    const checkChips = async () => {
+      if (chipsWithInvalidKeys.length > 0 && lookupFunction) {
+        let checkedChips = chips.filter((chip) => {
+          return !chipsWithInvalidKeys.includes(chip);
+        });
+        let stillInvalidChips = [];
+        let updated = false;
+        for (let chip of chipsWithInvalidKeys) {
+          const chipIndex = chips.indexOf(chip);
+
+          const { key: lookupTerm } = extractKeyValue(chip);
+
+          const options = await lookupFunction({
+            lookupTerm,
+            key: "tax",
+            modifier: "tree",
+          });
+          if (options && options.length > 0) {
+            const newChip = `tax_tree(${lookupTerm})`;
+            checkedChips.push(newChip);
+            updated = true;
+          } else {
+            stillInvalidChips.push(chip);
+          }
+        }
+        if (updated) {
+          const { uniqueArr, duplicates } = removeDuplicates(checkedChips);
+          setChips(uniqueArr);
+          if (
+            stillInvalidChips.length !== chipsWithInvalidKeys.length ||
+            stillInvalidChips.some(
+              (chip, i) => chip !== chipsWithInvalidKeys[i],
+            )
+          ) {
+            setChipsWithInvalidKeys(stillInvalidChips);
+          }
+          // handleValueChange(uniqueArr.join(" "));
+        }
+      }
+    };
+    checkChips();
+  }, [chipsWithInvalidKeys]);
 
   const handleKeyDown = (event, setInUse) => {
     if (event.key === "Enter") {
@@ -657,15 +727,15 @@ const ChipSearch = ({
     handleMenuClose();
   };
 
-  const updateChipsArr = (chips) => {
-    setChipsArr(chipsToComponents(chips));
-  };
+  // const updateChipsArr = (chips) => {
+  //   setChipsArr(chipsToComponents(chips).newChipsArr);
+  // };
 
   const [inUse, setInUse] = useState(false);
 
-  useEffect(() => {
-    updateChipsArr(chips);
-  }, [chips, conflictingChips]);
+  // useEffect(() => {
+  //   updateChipsArr(chips);
+  // }, [chips, conflictingChips]);
 
   const chipsToString = (chips) => {
     return chips.filter((chip) => chip !== "AND").join(" AND ");
