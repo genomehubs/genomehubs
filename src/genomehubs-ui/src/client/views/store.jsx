@@ -34,7 +34,10 @@ const loadingMiddleWare = (store) => (next) => (action) => {
 const store = configureStore({
   reducer: enableBatching(rootReducer),
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(thunkMiddleware, loadingMiddleWare),
+    getDefaultMiddleware({
+      immutableCheck: false,
+      serializableCheck: false,
+    }).concat(thunkMiddleware, loadingMiddleWare),
 });
 
 export default store;

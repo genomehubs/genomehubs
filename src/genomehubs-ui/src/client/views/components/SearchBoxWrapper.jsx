@@ -1,0 +1,309 @@
+import React, { memo, useRef, useState } from "react";
+import { useLocation, useNavigate } from "@reach/router";
+
+import { Box } from "@mui/material";
+import ChipSearchBox from "./ChipSearch/ChipSearchBox";
+import Grid from "@mui/material/Grid2";
+import { Template } from "./Markdown";
+import { compose } from "recompose";
+// import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
+import { getSuggestedTerm } from "../reducers/search";
+import lookupFunction from "./ChipSearch/functions/lookupFunction";
+import qs from "../functions/qs";
+import { siteName } from "../reducers/location";
+import { useReadLocalStorage } from "usehooks-ts";
+import { useStyles } from "./SearchBoxStyles";
+import withApi from "../hocs/withApi";
+import withLookup from "../hocs/withLookup";
+import withSearch from "../hocs/withSearch";
+import withSearchDefaults from "../hocs/withSearchDefaults";
+import withSiteName from "#hocs/withSiteName";
+import withTaxonomy from "../hocs/withTaxonomy";
+import withTypes from "../hocs/withTypes";
+
+const suggestedTerm = getSuggestedTerm();
+
+const indexList = ["taxon", "assembly", "sample", "feature"];
+
+const SearchBoxWrapper = ({
+  lookupTerm,
+  setLookupTerm,
+  // resetLookup,
+  fetchSearchResults,
+  setSearchIndex,
+  searchDefaults,
+  searchIndex,
+  searchTerm,
+  setPreferSearchTerm,
+  taxonomy,
+  apiUrl,
+  indices,
+  types,
+  allTypes,
+  synonyms,
+  basename,
+}) => {
+  const results = indexList.filter((index) => indices.includes(index));
+  const [searchBoxTerm, setSearchBoxTerm] = useState(searchTerm.query || "");
+  const classes = useStyles();
+  const navigate = useNavigate();
+  const location = useLocation();
+  let options = qs.parse(location.search.replace(/^\?/, ""));
+  let pathname = location.pathname.replace(/^\//, "");
+  const formRef = useRef(null);
+  const searchBoxRef = useRef(null);
+  const rootRef = useRef(null);
+  const searchInputRef = useRef(null);
+
+  const resetSearch = () => {
+    setSearchIndex("taxon");
+    setSearchBoxTerm("");
+    setLookupTerm("");
+    fetchSearchResults({ result: "taxon", query: "" });
+    setPreferSearchTerm(false);
+    navigate(`${basename}/${pathname}`);
+  };
+
+  const allOptions = {
+    taxon: useReadLocalStorage(`taxonOptions`) || {},
+    assembly: useReadLocalStorage(`assemblyOptions`) || {},
+    sample: useReadLocalStorage(`sampleOptions`) || {},
+    feature: useReadLocalStorage(`featureOptions`) || {},
+  };
+
+  let [result, setResult] = useState(searchIndex);
+  const [showSearchBox, setShowSearchBox] = useState(false);
+  const [liveQuery, setLiveQuery] = useState("");
+
+  let toggleTemplate;
+
+  const dispatchSearch = (searchOptions = {}, term) => {
+    let sameIndex = searchIndex == searchOptions.result;
+    let fullOptions = { ...searchTerm, ...searchOptions };
+    if (!fullOptions.hasOwnProperty("includeEstimates")) {
+      fullOptions.includeEstimates = searchDefaults.includeEstimates;
+    }
+
+    let savedOptions = allOptions[options.result];
+
+    let fields = savedOptions?.fields?.join(",") || searchDefaults.fields;
+    let ranks = savedOptions?.ranks?.join(",") || searchDefaults.ranks;
+    let names = savedOptions?.names?.join(",") || searchDefaults.names;
+
+    if (sameIndex) {
+      fields = searchOptions?.fields?.join(",") || options.fields || fields;
+      ranks = searchOptions?.ranks?.join(",") || options.ranks || ranks;
+      names = searchOptions?.names?.join(",") || options.names || names;
+    }
+
+    // if (
+    //   !fullOptions.hasOwnProperty("fields") ||
+    //   searchTerm.result != searchOptions.result
+    // ) {
+    fullOptions.fields = fields;
+    // }
+    // if (
+    //   !fullOptions.hasOwnProperty("ranks") ||
+    //   searchTerm.result != searchOptions.result
+    // ) {
+    fullOptions.ranks = ranks;
+    // }
+    // if (
+    //   !fullOptions.hasOwnProperty("names") ||
+    //   searchTerm.result != searchOptions.result
+    // ) {
+    fullOptions.names = names;
+    // }
+
+    fullOptions.taxonomy = taxonomy;
+    if (!fullOptions.size && savedOptions?.size) {
+      fullOptions.size = savedOptions.size;
+    }
+    if (savedOptions) {
+      if (savedOptions.sortBy && !fullOptions.sortBy) {
+        fullOptions.sortBy = savedOptions.sortBy;
+        fullOptions.sortOrder = savedOptions.sortOrder || "asc";
+      }
+      ["Ancestral", "Descendant", "Direct", "Missing"].forEach((key) => {
+        let keyName = `exclude${key}`;
+        if (
+          savedOptions.hasOwnProperty(keyName) &&
+          !fullOptions.hasOwnProperty(keyName)
+        ) {
+          fullOptions[keyName] = savedOptions[keyName];
+        }
+      });
+    }
+    fetchSearchResults(fullOptions);
+    setPreferSearchTerm(false);
+    if (pathname.match(/^search/)) {
+      navigate(
+        `${basename}/${pathname}?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
+      );
+    } else {
+      navigate(
+        `${basename}/search?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
+      );
+    }
+  };
+
+  const wrapTerm = ({ term, taxWrap, result }) => {
+    if (
+      result &&
+      result == "taxon" &&
+      !term.match(/[\(\)<>=]/) &&
+      !types[term] &&
+      !synonyms[term] &&
+      term > ""
+    ) {
+      term = `${taxWrap}(${term})`;
+    }
+    return term;
+  };
+
+  const doSearch = ({
+    query,
+    result,
+    fields,
+    hashTerm = "",
+    includeDescendants,
+    ...options
+  }) => {
+    setSearchIndex(result);
+
+    // let inputs = Array.from(
+    //   formRef.current
+    //     ? formRef.current.getElementsByClassName("inputQuery")
+    //     : [],
+    // )
+    //   .map((el) => ({
+    //     name: el.children[1].children[0].name,
+    //     value: el.children[1].children[0].value,
+    //   }))
+    //   .filter((el) => el.name.match(/query[A-Z]+/) && el.value);
+    // let inputQueries = inputs.reduce(
+    //   (a, el) => ({ ...a, [el.name]: el.value }),
+    //   {},
+    // );
+
+    // let savedOptions = allOptions[options.result];
+    // let fields =
+    //   // searchTerm.fields ||
+    //   savedOptions?.fields?.join(",") || searchDefaults.fields;
+
+    if (query && typeof includeDescendants !== "undefined") {
+      if (includeDescendants) {
+        query = query.replace(/tax_(name|eq)/, "tax_tree");
+      } else {
+        query = query.replace(/tax_tree/, "tax_name");
+      }
+    }
+
+    dispatchSearch({ query, result, fields, ...options }, query);
+    // resetLookup();
+  };
+
+  const handleSubmit = (e, props = {}) => {
+    e && e.preventDefault();
+    const { index } = props;
+    let term = searchInputRef.current.value;
+    doSearch(term, index || result, term);
+  };
+
+  let searchText = `Search ${siteName}`;
+  if (searchIndex) {
+    searchText += ` ${searchIndex} index`;
+  }
+  if (suggestedTerm) {
+    searchText += ` (e.g. ${suggestedTerm})`;
+  }
+
+  const normalizedOptions = {
+    ...(typeof searchTerm === "object" ? searchTerm : {}),
+    ...options,
+  };
+  Object.entries(normalizedOptions).forEach(([key, value]) => {
+    if (value === "true") {
+      normalizedOptions[key] = true;
+    } else if (value === "false") {
+      normalizedOptions[key] = false;
+    }
+    if (["fields", "ranks", "names"].includes(key) && value) {
+      normalizedOptions[key] = value.split(",");
+    }
+    if (key.match(/query[A-Z]/)) {
+      let result, query, fields;
+      if (typeof value === "string") {
+        if (value.includes("--")) {
+          [result, query, fields] = value.split("--");
+          fields = fields?.split(",") || [];
+        } else {
+          query = value;
+          fields = [];
+        }
+      } else {
+        ({ result, query, fields } = value);
+      }
+      if (query) {
+        normalizedOptions[key] = {
+          query,
+          result,
+          fields,
+        };
+      }
+    }
+  });
+
+  let searchOptions = {
+    // ...searchDefaults,
+    // ...allOptions[searchIndex],
+    ...normalizedOptions,
+    result,
+  };
+
+  return (
+    <Grid container alignItems="center" direction="column" ref={rootRef}>
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          marginBottom: 2,
+          minWidth: "900px",
+          width: "100%",
+        }}
+      >
+        <ChipSearchBox
+          searchOptions={searchOptions}
+          results={results}
+          types={types}
+          allTypes={allTypes}
+          placeholder={searchText}
+          value={searchBoxTerm}
+          setValue={setSearchBoxTerm}
+          handleSubmit={(searchOptions) => {
+            doSearch({ result, ...searchOptions, offset: 0 });
+          }}
+          lookupFunction={(props) =>
+            lookupFunction({ apiUrl, result, taxonomy, ...props })
+          }
+          resetSearch={resetSearch}
+          //compact
+        />
+      </Box>
+    </Grid>
+  );
+};
+
+export default compose(
+  memo,
+  withSiteName,
+  withTaxonomy,
+  withTypes,
+  withApi,
+  withSearch,
+  withSearchDefaults,
+  withLookup,
+  // dispatchLiveQuery
+)(SearchBoxWrapper);
