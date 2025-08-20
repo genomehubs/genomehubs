@@ -607,21 +607,31 @@ const ChipSearch = ({
         let stillInvalidChips = [];
         let updated = false;
         for (let chip of chipsWithInvalidKeys) {
-          const chipIndex = chips.indexOf(chip);
-
           const { key: lookupTerm } = extractKeyValue(chip);
 
-          const options = await lookupFunction({
+          let options = await lookupFunction({
             lookupTerm,
             key: "tax",
             modifier: "tree",
+            result: "taxon",
           });
           if (options && options.length > 0) {
             const newChip = `tax_tree(${lookupTerm})`;
             checkedChips.push(newChip);
             updated = true;
           } else {
-            stillInvalidChips.push(chip);
+            options = await lookupFunction({
+              lookupTerm,
+              key: `${result}_id`,
+              result,
+            });
+            if (options && options.length > 0) {
+              const newChip = `${result}_id=${lookupTerm}`;
+              checkedChips.push(newChip);
+              updated = true;
+            } else {
+              stillInvalidChips.push(chip);
+            }
           }
         }
         if (updated) {
