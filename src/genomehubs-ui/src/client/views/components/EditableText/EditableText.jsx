@@ -187,102 +187,30 @@ const EditableText = ({
             : inputValue
         }
         onChange={(event, newValue) => {
-          // if (event && event.preventDefault) {
-          //   event.preventDefault();
-          // }
+          if (event && event.preventDefault) {
+            event.preventDefault();
+          }
           const updatedValue = allowMultipleValues
             ? newValue.join(",")
-            : newValue; // Join the array back into a comma-separated string
-          setInputValue(updatedValue);
-          onChange?.(updatedValue); // Pass the array of values to the parent
+            : newValue;
+          handleChange(updatedValue);
         }}
         onBlur={handleBlur}
         renderTags={(value, getTagProps) => {
           return null; // Don't render tags in the input field
-          // return (
-          //   <Box
-          //     sx={{
-          //       display: "flex",
-          //       flexWrap: "wrap",
-          //       gap: 1,
-          //       width: "100%", // Ensure the chips take the full width
-          //     }}
-          //   >
-          //     {value.map((option, index) => {
-          //       const isNegated = option.startsWith("!");
-          //       const label = isNegated ? option.slice(1) : option;
-
-          //       return (
-          //         <Chip
-          //           key={index}
-          //           label={label}
-          //           icon={
-          //             isNegated ? (
-          //               <RemoveCircleIcon
-          //                 sx={{ fontSize: "1rem", color: "red" }}
-          //               />
-          //             ) : null
-          //           } // Add an icon if the value is negated
-          //           {...getTagProps({ index })}
-          //           sx={{
-          //             backgroundColor: highlightColor,
-          //             color: highlightContrastColor,
-
-          //             height: "24px",
-          //             lineHeight: "24px",
-          //             fontSize: "0.875rem",
-          //             maxWidth: "none",
-          //             fontFamily: "'Roboto', 'Arial', sans-serif",
-          //             display: "flex",
-          //             justifyContent: "center", // Center the content horizontally
-          //             alignItems: "center", // Vertically center content
-          //             "& .MuiChip-deleteIcon": {
-          //               color: highlightContrastColor || "inherit",
-          //               opacity: 0.5,
-          //               fontSize: "1rem", // Set a consistent size for the delete icon
-          //               marginRight: "4px",
-          //               opacity: 0.5,
-          //             },
-          //             "& .MuiChip-label": {
-          //               padding: "0 0.6em 0 0.65em",
-          //               color: highlightContrastColor,
-          //             },
-          //             "& .MuiChip-icon": {
-          //               color: highlightContrastColor || "inherit",
-          //               fontSize: "1rem",
-          //             },
-          //           }}
-          //         />
-          //       );
-          //     })}
-          //   </Box>
-          // );
         }}
+        disableClearable
         renderInput={(params) => (
           <TextField
             {...params}
             {...inputProps}
             autoComplete="off"
-            onChange={(event) => {
-              const updatedValue = allowMultipleValues
-                ? event.target.value
-                    .split(/\s*,\s*/)
-                    .filter((v) => v)
-                    .join(",")
-                : event.target.value;
-
-              // setInputValue(updatedValue);
-              // setIsEditing(false);
-              // setAnchorEl(null);
-              // onChange?.(updatedValue); // Pass the array of values to the parent
-            }}
             onKeyDown={(event) => {
               if (event.key === "Escape") {
                 setIsEditing(false);
                 setAnchorEl(null);
               } else if (event.key === "Enter") {
                 const updatedValue = event.target.value;
-                // If updatedValue matches an option, use it; otherwise, select the top/highlighted option
                 const matchedOption = options.find(
                   (opt) => opt === updatedValue,
                 );
@@ -303,6 +231,14 @@ const EditableText = ({
             sx={{
               ...inputProps.sx,
               minWidth,
+              "& .MuiAutocomplete-popupIndicator": {
+                display: "none",
+                pointerEvents: "none",
+                fontSize: "0",
+              },
+              "& .MuiAutocomplete-inputRoot": {
+                paddingRight: "0px !important",
+              },
             }}
           />
         )}
@@ -317,13 +253,6 @@ const EditableText = ({
               },
             },
           },
-          // paper: {
-          //   style: {
-          //     maxHeight: 300,
-          //     overflowY: "auto",
-          //     zIndex: 1000, // Ensure it appears above other elements
-          //   },
-          // },
         }}
       />
     );
@@ -611,14 +540,8 @@ const EditableText = ({
           open={isEditing}
           anchorEl={anchorEl}
           placement="bottom"
-          // disablePortal
           sx={{
             zIndex: 1000, // Ensure it appears above other elements
-            // width: "100%",
-            // maxWidth: "400px",
-            // marginTop: "8px",
-            // backgroundColor: backgroundColor,
-            // color: contrastColor,
           }}
         >
           <Box
