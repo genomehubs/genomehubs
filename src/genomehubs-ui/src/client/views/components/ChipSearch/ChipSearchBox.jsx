@@ -625,23 +625,9 @@ const ChipSearchBox = React.memo(
       includeDescendants = query.match(/tax_tree/) || false;
     }
 
-    const updateOptions = useCallback((newOptions) => {
-      // setSearchOptions((prevOptions) => ({
-      //   ...prevOptions,
-      //   ...newOptions,
-      // }));
-      const updatedOptions = {
-        ...searchOptions,
-        ...newOptions,
-        query: value,
-      };
-      handleSubmit(updatedOptions);
-    }, []);
-
-    // Memoize searchButton to avoid rerendering ChipSearch
-    const searchButton = useMemo(() => {
+    const formatInputQueries = (rawOptions) => {
       let options = {};
-      for (let [key, value] of Object.entries(searchOptions)) {
+      for (let [key, value] of Object.entries(rawOptions)) {
         if (key.match(/query[A-Z]/)) {
           if (value.result) {
             options[key] = `${value.result}--${value.query}`;
@@ -652,6 +638,25 @@ const ChipSearchBox = React.memo(
           options[key] = value;
         }
       }
+      return options;
+    };
+
+    const updateOptions = useCallback((newOptions) => {
+      // setSearchOptions((prevOptions) => ({
+      //   ...prevOptions,
+      //   ...newOptions,
+      // }));
+      const updatedOptions = {
+        ...searchOptions,
+        ...newOptions,
+        query: value,
+      };
+
+      handleSubmit(formatInputQueries(updatedOptions));
+    }, []);
+
+    // Memoize searchButton to avoid rerendering ChipSearch
+    const searchButton = useMemo(() => {
       let query = value;
       query = query.replace(/(=|>|>=|<|<=|!=)\s+AND/g, " AND");
       query = query.replace(/(=|>|>=|<|<=|!=)\s*$/, "");
@@ -663,7 +668,7 @@ const ChipSearchBox = React.memo(
             startIcon={<SearchIcon />}
             className={classes.searchButton}
             onClick={() => {
-              handleSubmit({ ...options, query });
+              handleSubmit(formatInputQueries({ ...searchOptions, query }));
             }}
           >
             {result}
