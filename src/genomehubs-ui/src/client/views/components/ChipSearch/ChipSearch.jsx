@@ -1,15 +1,13 @@
 import {
   Alert,
   Box,
-  Button,
-  ButtonGroup,
-  Chip,
   IconButton,
   InputAdornment,
   Menu,
   MenuItem,
   Snackbar,
   TextField,
+  Typography,
 } from "@mui/material";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import KeyValueChip, {
@@ -21,17 +19,13 @@ import React, { useEffect, useState } from "react";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ErrorIcon from "@mui/icons-material/Error";
-import InfoIcon from "@mui/icons-material/Help";
 import JoinFullRoundedIcon from "@mui/icons-material/JoinFullRounded";
 import JoinInnerRoundedIcon from "@mui/icons-material/JoinInnerRounded";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import Tooltip from "../Tooltip";
-import Underline from "./Underline";
 import { getChipColor } from "../KeyValueChip/functions/chipPalettes";
-import { h } from "hastscript";
 
 const chipToString = (chip) => {
   if (typeof chip === "string") {
@@ -216,6 +210,7 @@ const ChipSearch = ({
   results = [],
   label = null,
   searchButton = null,
+  gettingStarted,
   handleValueChange = () => {},
   handleInputQueryChange = () => {},
 }) => {
@@ -818,6 +813,9 @@ const ChipSearch = ({
       validKeys={validKeys}
       handleMenuSelect={handleMenuSelect}
       fontSize={"1.5em"}
+      gettingStarted={gettingStarted}
+      inputValue={inputValue}
+      chips={chips}
     />
   );
 
@@ -1134,11 +1132,43 @@ const AddField = ({
   validKeys,
   handleMenuSelect,
   fontSize = "1em", // Default font size
+  gettingStarted = "Click to add a search field",
+  inputValue = "",
+  chips = [],
 }) => {
+  let gettingStartedText;
+  if ((!inputValue || inputValue.length === 0) && chips.length === 0) {
+    gettingStartedText = (
+      <>
+        <Typography
+          variant="body2"
+          color="textSecondary"
+          sx={{
+            maxWidth: "6.5em",
+            display: "flex",
+            justifyContent: "center",
+            textAlign: "center",
+            pointerEvents: "none",
+            userSelect: "none", // Prevent text selection
+          }}
+        >
+          {gettingStarted}
+        </Typography>
+        <KeyboardArrowRightIcon
+          sx={{
+            color: (theme) => theme.palette.text.secondary,
+            pointerEvents: "none",
+            userSelect: "none", // Prevent icon selection
+          }}
+        />
+      </>
+    );
+  }
   return (
     <>
+      {gettingStartedText}
       <IconButton onClick={handleMenuOpen} edge="start">
-        <Tooltip title="Click to add a new search field">
+        <Tooltip title={gettingStarted}>
           <AddCircleOutlineIcon sx={{ fontSize }} />
         </Tooltip>
       </IconButton>

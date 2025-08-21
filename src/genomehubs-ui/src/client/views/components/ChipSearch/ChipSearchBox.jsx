@@ -660,10 +660,24 @@ const ChipSearchBox = React.memo(
       let query = value;
       query = query.replace(/(=|>|>=|<|<=|!=)\s+AND/g, " AND");
       query = query.replace(/(=|>|>=|<|<=|!=)\s*$/, "");
+      // Check if options differ from current search term
+      const optionsDiffer =
+        value !== (searchOptions.query || "") ||
+        result !== searchOptions.result ||
+        includeEstimates !== searchOptions.includeEstimates ||
+        emptyColumns !== searchOptions.emptyColumns ||
+        JSON.stringify([fields, names, ranks]) !==
+          JSON.stringify([
+            searchOptions.fields,
+            searchOptions.names,
+            searchOptions.ranks,
+          ]) ||
+        searchOptions.query.match(/query[A-Z]\.\w/);
+
       return (
         <ButtonGroup sx={{}}>
           <Button
-            variant="contained"
+            variant={optionsDiffer ? "contained" : "outlined"}
             color="primary"
             startIcon={<SearchIcon />}
             className={classes.searchButton}
@@ -675,7 +689,7 @@ const ChipSearchBox = React.memo(
           </Button>
           <Button
             ref={optionsButtonRef}
-            variant="outlined"
+            variant={"outlined"}
             color="primary"
             className={classes.searchButton}
             onClick={toggleOptions}
