@@ -662,7 +662,7 @@ const ChipSearchBox = React.memo(
       query = query.replace(/(=|>|>=|<|<=|!=)\s*$/, "");
       // Check if options differ from current search term
       const optionsDiffer =
-        value !== (searchOptions.query || "") ||
+        query !== (searchOptions.query || "") ||
         result !== searchOptions.result ||
         includeEstimates !== searchOptions.includeEstimates ||
         emptyColumns !== searchOptions.emptyColumns ||
