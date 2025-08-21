@@ -1,6 +1,6 @@
 {
   "name": "genomehubs-ui",
-  "version": "2.11.1",
+  "version": "2.11.2",
   "description": "Frontend for GenomeHubs",
   "main": "index.js",
   "scripts": {
