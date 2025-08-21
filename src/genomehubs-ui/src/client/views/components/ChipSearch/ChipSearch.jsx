@@ -25,6 +25,7 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import Tooltip from "../Tooltip";
+import { current } from "@reduxjs/toolkit";
 import { getChipColor } from "../KeyValueChip/functions/chipPalettes";
 
 const chipToString = (chip) => {
@@ -917,12 +918,9 @@ const ChipSearch = ({
     });
     setInputQueryComponents(components);
     newInputQueries = newInputQueriesLocal;
-    // Only update state if there are new queries, and do it in an effect
-    // (the effect below will handle newInputQueries)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputQueryList.join(",")]);
+  }, [inputQueryList.join(","), currentInputQueries, result, results]);
 
-  // Only update state if there are new queries, and do it in an effect
   useEffect(() => {
     if (Object.keys(newInputQueries).length > 0) {
       setCurrentInputQueries((prev) => ({ ...prev, ...newInputQueries }));
