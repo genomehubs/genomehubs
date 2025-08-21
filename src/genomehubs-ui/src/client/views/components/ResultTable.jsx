@@ -677,6 +677,13 @@ const ResultTable = ({
         } else if (field.includes(".")) {
           [name, ...summary] = field.split(".");
           summary = `metadata.${summary.join(".")}`;
+        } else if (!searchTerm.fields.includes(field)) {
+          expandedTypes.push({
+            name: field,
+            field,
+            summary: "value",
+          });
+          continue;
         } else {
           continue;
         }
