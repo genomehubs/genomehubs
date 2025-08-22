@@ -672,7 +672,7 @@ const ChipSearchBox = React.memo(
             searchOptions.names,
             searchOptions.ranks,
           ]) ||
-        searchOptions.query.match(/query[A-Z]\.\w/);
+        searchOptions?.query?.match(/query[A-Z]\.\w/);
 
       return (
         <ButtonGroup sx={{}}>
