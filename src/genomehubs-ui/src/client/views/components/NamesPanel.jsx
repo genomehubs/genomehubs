@@ -70,6 +70,8 @@ export const NamesList = ({ names }) => {
     "common name",
     "synonym",
     "authority",
+    "merged taxon id",
+    "xref",
   ]);
   let extraClasses = [];
   let namesByClass = {};
@@ -83,24 +85,24 @@ export const NamesList = ({ names }) => {
 
     let source;
     let prefix;
-    if (obj.source_url) {
-      source = (
-        <a href={`${obj.source_url}`} target="_blank">
-          <LaunchIcon fontSize="inherit" />
-        </a>
-      );
-    } else if (obj.source_stub) {
-      source = (
-        <a href={`${obj.source_stub}${name}`} target="_blank">
-          <LaunchIcon fontSize="inherit" />
-        </a>
-      );
-    } else if (obj.source_url_stub) {
+    if (
+      obj.source_url_stub &&
+      (sourceClass == "xref" || sourceClass == "merged taxon id")
+    ) {
       if (obj.source) {
         prefix = `${obj.source}:`;
       }
       source = (
-        <a href={`${obj.source_url_stub}${name}`} target="_blank">
+        <a
+          href={`${obj.source_url_stub}${name.replace(/^.+:/, "")}`}
+          target="_blank"
+        >
+          <LaunchIcon fontSize="inherit" />
+        </a>
+      );
+    } else if (obj.source_url) {
+      source = (
+        <a href={`${obj.source_url}`} target="_blank">
           <LaunchIcon fontSize="inherit" />
         </a>
       );
@@ -178,14 +180,25 @@ export const NamesList = ({ names }) => {
         sort
       />
       <NameGroup title="authority" names={namesByClass["authority"]} />
+      {namesByClass["merged taxon id"] && (
+        <NameGroup
+          title={`merged taxon id${
+            namesByClass["merged taxon id"].length > 1 ? "s" : ""
+          }`}
+          names={namesByClass["merged taxon id"]}
+          sort
+        />
+      )}
       {extraGroups}
-      <NameGroup
-        title={`link${
-          namesByClass["other"] && namesByClass["other"].length > 1 ? "s" : ""
-        }`}
-        names={namesByClass["other"]}
-        sort
-      />
+      {namesByClass["xref"] && namesByClass["xref"].length > 0 && (
+        <NameGroup
+          title={`xref${
+            namesByClass["xref"] && namesByClass["xref"].length > 1 ? "s" : ""
+          }`}
+          names={namesByClass["xref"]}
+          sort
+        />
+      )}
     </div>
   );
 };
