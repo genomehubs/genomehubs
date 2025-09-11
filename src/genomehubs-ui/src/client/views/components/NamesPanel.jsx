@@ -31,10 +31,26 @@ const NameGroup = ({ title, names, sort, bold }) => {
     if (source && source.length > 0) {
       sources = source.map((s, j) => <span key={j}>{s}</span>);
     }
+    if (name.match(":")) {
+      let [prefix, rest] = name.split(":");
+      return (
+        <span key={i} style={{ whiteSpace: "nowrap", marginRight: "0.5em" }}>
+          <span
+            style={{
+              fontWeight: "normal",
+            }}
+          >
+            {prefix}:
+          </span>
+          <span style={{ fontWeight: "bold" }}>{rest}</span>
+          {sources ? <>{sources}</> : ""}
+        </span>
+      );
+    }
     return (
       <span key={i} className={classnames(nameStyle, bold && boldStyle)}>
         {name}
-        {sources ? <> {sources}</> : ""}
+        {sources ? <>{sources}</> : ""}
       </span>
     );
   });
@@ -70,14 +86,12 @@ export const NamesList = ({ names }) => {
     if (obj.source_url) {
       source = (
         <a href={`${obj.source_url}`} target="_blank">
-          {nameClasses.has(sourceClass) ? "" : `${sourceClass} `}
           <LaunchIcon fontSize="inherit" />
         </a>
       );
     } else if (obj.source_stub) {
       source = (
         <a href={`${obj.source_stub}${name}`} target="_blank">
-          {nameClasses.has(sourceClass) ? "" : `${sourceClass} `}
           <LaunchIcon fontSize="inherit" />
         </a>
       );
@@ -87,7 +101,6 @@ export const NamesList = ({ names }) => {
       }
       source = (
         <a href={`${obj.source_url_stub}${name}`} target="_blank">
-          {nameClasses.has(sourceClass) ? "" : `${sourceClass} `}
           <LaunchIcon fontSize="inherit" />
         </a>
       );
@@ -130,8 +143,8 @@ export const NamesList = ({ names }) => {
   let extraGroups = [];
   for (let extraClass of extraClasses) {
     let names = namesByClass[extraClass];
-    extraGroups.push(
-      <NameGroup key={extraClass} title={extraClass} names={names} sort />
+    namesByClass[extraClass].push(
+      <NameGroup key={extraClass} title={extraClass} names={names} sort />,
     );
   }
   return (
