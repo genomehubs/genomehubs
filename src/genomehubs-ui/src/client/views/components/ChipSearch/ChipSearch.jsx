@@ -113,7 +113,7 @@ const extractKeyValue = (chip) => {
     valueNote: valueNote ? valueNote.trim() : null,
     modifier: modifier ? modifier.trim() : null,
   };
-  if (key.match(/-/)) {
+  if (key.match(/-/) && !key.match(/_/)) {
     chipObj.key = key.trim().replace(/-/g, "_");
   }
   if (chipObj?.value?.match(/^([\d.,\s]+)([kMGTPE])$/i)) {
