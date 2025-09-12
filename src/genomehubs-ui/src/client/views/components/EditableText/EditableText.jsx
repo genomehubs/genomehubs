@@ -100,10 +100,10 @@ const EditableText = ({
   };
 
   const handleChange = (newValue) => {
-    setInputValue(newValue);
+    setInputValue(`${newValue}`);
     setIsEditing(false);
     setAnchorEl(null);
-    onChange?.(newValue);
+    onChange?.(`${newValue}`);
   };
 
   const valueMap = (inputValue || "").split(/\s*,\s*/).reduce((acc, curr) => {

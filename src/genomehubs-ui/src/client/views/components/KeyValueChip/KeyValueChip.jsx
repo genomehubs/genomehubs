@@ -52,10 +52,10 @@ const KeyValueChip = ({
   const [currentModifier, setCurrentModifier] = useState(modifier);
   const [currentOperator, setCurrentOperator] = useState(operator);
   const [currentValue, setCurrentValue] = useState(
-    value == "" ? null : keyLabel === "tax" ? value : formatValue(value),
+    value == "" ? null : keyLabel === "tax" ? `${value}` : formatValue(value),
   );
   const [previousValue, setPreviousValue] = useState(
-    value == "" ? null : keyLabel === "tax" ? value : formatValue(value),
+    value == "" ? null : keyLabel === "tax" ? `${value}` : formatValue(value),
   );
   const [currentValueNote, setCurrentValueNote] = useState(valueNote);
   const [previousValueNote, setPreviousValueNote] = useState(valueNote);
@@ -177,9 +177,11 @@ const KeyValueChip = ({
     setIsEditingValue(false);
     setAnchorElValue(null);
     const parsedValue = currentValue == null ? null : parseValue(currentValue);
-    setCurrentValue(keyLabel == "tax" ? parsedValue : formatValue(parsedValue)); // Reformat the value for display
+    setCurrentValue(
+      keyLabel == "tax" ? `${parsedValue}` : formatValue(parsedValue),
+    ); // Reformat the value for display
     setPreviousValue(
-      keyLabel == "tax" ? parsedValue : formatValue(parsedValue),
+      keyLabel == "tax" ? `${parsedValue}` : formatValue(parsedValue),
     );
     setPreviousValueNote(undefined);
   };
