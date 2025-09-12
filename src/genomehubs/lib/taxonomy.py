@@ -3,6 +3,7 @@
 """Taxonomy methods."""
 
 import contextlib
+import json
 from pathlib import Path
 
 from tolkein import tofetch
@@ -48,13 +49,35 @@ def confirm_index_opts(taxonomy_name, opts):
 
 def index(taxonomy_name, opts):
     """Index a taxonomy."""
-    # TODO: #94 - parse format, source, url and root options
     if not confirm_index_opts(taxonomy_name, opts):
         return
     LOGGER.info("Indexing %s", taxonomy_name)
     template = index_template(taxonomy_name, opts)
-    taxonomy_path = Path(f'{opts["taxonomy-path"]}/{taxonomy_name}')
     file_key = "taxonomy-file"
+    taxonomy_path = Path(f'{opts["taxonomy-path"]}')
+    if not files_exist(opts[file_key], taxonomy_path):
+        taxonomy_path = taxonomy_path / taxonomy_name
+
+    jsonl_files = [f for f in opts.get(file_key, []) if f.endswith(".jsonl")]
+    for jsonl_file in jsonl_files:
+        nodes_file = taxonomy_path / jsonl_file
+        if nodes_file.exists():
+            LOGGER.info(
+                "Using existing %s taxdump at %s", taxonomy_name, str(taxonomy_path)
+            )
+
+            def stream_nodes():
+                with open(nodes_file, "r") as f:
+                    for line in f:
+                        # parse json and get taxon_id
+                        data = json.loads(line)
+                        taxon_id = data.get("taxon_id")
+                        if taxon_id:
+                            yield (f"taxon-{taxon_id}", line)
+
+            stream_nodes()
+            return template, stream_nodes()
+
     if not files_exist(opts[file_key], taxonomy_path):
         LOGGER.info(
             "Fetching %s taxdump and extracting to %s",
