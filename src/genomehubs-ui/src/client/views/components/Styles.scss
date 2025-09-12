@@ -850,6 +850,11 @@ body,
           display: table-cell;
         }
 
+        .name:hover {
+          background-color: color.mix(themes.themed("primary"), themes.themed("secondary"), 5%);
+          cursor: default;
+        }
+
         .name:not(:last-of-type):after {
           content: ", ";
         }
