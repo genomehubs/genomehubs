@@ -11,6 +11,7 @@ import {
   title as titleStyle,
 } from "./Styles.scss";
 
+import InfoIcon from "@mui/icons-material/Info";
 import LaunchIcon from "@mui/icons-material/Launch";
 import React from "react";
 import Tooltip from "./Tooltip";
@@ -31,7 +32,7 @@ const NameGroup = ({ title, names, sort, bold }) => {
     if (source && source.length > 0) {
       sources = source.map((s, j) => <span key={j}>{s}</span>);
     }
-    if (name.match(":")) {
+    if (typeof name === "string" && name.match(":")) {
       let [prefix, rest] = name.split(":");
       return (
         <span key={i} style={{ whiteSpace: "nowrap", marginRight: "0.5em" }}>
@@ -93,24 +94,26 @@ export const NamesList = ({ names }) => {
         prefix = `${obj.source}:`;
       }
       source = (
-        <a
-          href={`${obj.source_url_stub}${name.replace(/^.+:/, "")}`}
-          target="_blank"
-        >
-          <LaunchIcon fontSize="inherit" />
-        </a>
+        <Tooltip title={obj.source} placement="top" arrow>
+          <a
+            href={`${obj.source_url_stub}${name.replace(/^.+:/, "")}`}
+            target="_blank"
+          >
+            <LaunchIcon fontSize="inherit" />
+          </a>
+        </Tooltip>
       );
-    } else if (obj.source_url) {
-      source = (
-        <a href={`${obj.source_url}`} target="_blank">
-          <LaunchIcon fontSize="inherit" />
-        </a>
-      );
-    }
-    if (source && obj.source) {
-      source = (
-        <Tooltip title={obj.source} position="top" arrow>
-          {source}
+      // } else if (obj.source_url) {
+      //   source = (
+      //     <a href={`${obj.source_url}`} target="_blank">
+      //       <LaunchIcon fontSize="inherit" />
+      //     </a>
+      //   );
+      // }
+    } else if (obj.source) {
+      name = (
+        <Tooltip title={`source: ${obj.source}`} placement="top" arrow>
+          <span>{name}</span>
         </Tooltip>
       );
     }
@@ -146,7 +149,7 @@ export const NamesList = ({ names }) => {
   for (let extraClass of extraClasses) {
     let names = namesByClass[extraClass];
     namesByClass[extraClass].push(
-      <NameGroup key={extraClass} title={extraClass} names={names} sort />,
+      <NameGroup key={extraClass} title={extraClass} names={names} />,
     );
   }
   return (
@@ -177,7 +180,7 @@ export const NamesList = ({ names }) => {
             : ""
         }`}
         names={namesByClass["synonym"]}
-        sort
+        // sort
       />
       <NameGroup title="authority" names={namesByClass["authority"]} />
       {namesByClass["merged taxon id"] && (
