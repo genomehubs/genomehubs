@@ -76,6 +76,7 @@ const ReportTreeRings = ({
     .clamp(true);
 
   let strokeWidth = strokeScale((arcs || 1).length * 2);
+  let branchWidth = 1;
 
   let paths = [];
   let backgroundColor = colorScheme[theme].lightColor;
@@ -139,7 +140,7 @@ const ReportTreeRings = ({
               stroke={backgroundColor}
               strokeWidth={strokeWidth}
               d={segment.arc}
-              opacity={segment.lines && segment.lines.length > 0 ? 0.5 : 1}
+              opacity={segment.lines && segment.lines.length > 0 ? 0 : 1}
             />
           </g>
         </Tooltip>,
@@ -198,7 +199,7 @@ const ReportTreeRings = ({
               key={`line-${segment.taxon_id}-${line}`}
               fill={"none"}
               stroke={"black"}
-              strokeWidth={Math.max(1, strokeWidth * 3)}
+              strokeWidth={branchWidth}
               strokeLinecap={"round"}
               d={line}
             />,

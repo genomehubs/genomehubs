@@ -231,6 +231,7 @@ export const processTreeRings = ({
   showPhylopics,
   phylopicRank,
   phylopicSize = 100,
+  shallowTips = true,
 }) => {
   if (!nodes) {
     return undefined;
@@ -371,7 +372,11 @@ export const processTreeRings = ({
     last,
   }) => {
     visited[node.taxon_id] = true;
-    let outer = depth + 1;
+    let nodeDepth = depth;
+    if (shallowTips) {
+      nodeDepth = node.depth !== undefined ? maxDepth - node.depth : depth;
+    }
+    let outer = nodeDepth + 1;
     let inside = depth - 1;
     if (!node) {
       return {};
@@ -408,7 +413,7 @@ export const processTreeRings = ({
     let midAngle = (startAngle + endAngle) / 2;
     let barAngle =
       (Math.min(((cEnd - cStart) / cMax) * 360 * 0.25, 0.25) * Math.PI) / 180;
-    let innerRadius = rScale(Math.max(depth, -0.5));
+    let innerRadius = rScale(Math.max(nodeDepth, -0.5));
     if (
       !node.hasOwnProperty("children") ||
       Object.keys(node.children).length == 0
@@ -452,13 +457,6 @@ export const processTreeRings = ({
     let outerRadius = rScale(outer);
     let farOuterRadius = rScale(maxDepth + 1);
     let insideRadius = rScale(Math.max(inside, 0));
-    console.log({
-      scientificName: node.scientific_name,
-      first,
-      last,
-      startAngle: first ? midAngle : startAngle,
-      endAngle: last ? midAngle : endAngle,
-    });
 
     let innerXY = circleXY(insideRadius, midAngle);
     let outerXY = circleXY(innerRadius, midAngle);
@@ -497,7 +495,7 @@ export const processTreeRings = ({
       }),
       cats: setCats({ node, cat, cats, other }),
       start: start,
-      depth: depth,
+      depth: nodeDepth,
       color,
       highlightColor,
       value,
@@ -593,7 +591,7 @@ export const processTreeRings = ({
         }
       }
     };
-    if (depth >= 0) {
+    if (nodeDepth >= 0) {
       addlabel(node.scientific_name, {});
     }
 
@@ -607,13 +605,12 @@ export const processTreeRings = ({
           a.count - b.count ||
           b.scientific_name.localeCompare(a.scientific_name),
       );
-      console.log(children.map((d) => d.scientific_name));
       children.forEach((child, index) => {
         // test if node has been visited already - indicates problem with tree
         if (!visited[child.taxon_id]) {
           drawArcs({
             node: child,
-            depth: depth + 1,
+            depth: nodeDepth + 1,
             start,
             first: index == 0,
             last: index == children.length - 1,
@@ -632,6 +629,7 @@ export const processTreeRings = ({
       taxon_id: ancNode,
       count: treeNodes[rootNode] ? treeNodes[rootNode].count : 1,
       scientific_name: "parent",
+      depth: treeNodes[rootNode] ? treeNodes[rootNode].depth + 1 : maxDepth + 1,
     },
     depth: -1,
     recurse: false,

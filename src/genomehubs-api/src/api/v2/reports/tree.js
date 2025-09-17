@@ -238,6 +238,7 @@ const addXResultsToTree = async ({
           children: {},
           taxon_id: taxonId,
           scientific_name,
+          depth: 0,
           taxon_rank,
           ...(index == "taxon" && treeFields && { fields: treeFields }),
           ...(catRank && taxon_rank == catRank && { cat: taxonId }),
@@ -255,11 +256,19 @@ const addXResultsToTree = async ({
         };
         isParentNode[taxonId] = true;
         treeNodes[taxonId].count += 1;
+        treeNodes[taxonId].depth = Math.max(
+          treeNodes[taxonId].depth,
+          1 +
+            (lineages[assembly_id || sample_id][0]
+              ? lineages[assembly_id || sample_id][0].node_depth
+              : 0)
+        );
         treeNodes[taxonId].hasAssemblies = !!assembly_id;
         treeNodes[taxonId].hasSamples = !!sample_id;
         treeNodes[assembly_id || sample_id] = {
           count: 1,
           children: {},
+          depth: 0,
           taxon_id: assembly_id || sample_id,
           scientific_name: assembly_id || sample_id,
           taxon_rank: assembly_id ? "assembly" : "sample",
@@ -319,6 +328,7 @@ const addXResultsToTree = async ({
     ) {
       treeNodes[child].count = treeNodes[child].count || 1;
       if (lineages[taxonId]) {
+        let depth = 1;
         for (let ancestor of lineages[taxonId]) {
           let ancestorId = ancestor.taxon_id;
           if (ancestorId == child) {
@@ -336,6 +346,7 @@ const addXResultsToTree = async ({
             treeNodes[ancestorId] = {
               count: 0,
               children: {},
+              depth: 1,
               scientific_name: ancestor.scientific_name,
               taxon_rank: ancestor.taxon_rank,
               taxon_id: ancestorId,
@@ -347,11 +358,16 @@ const addXResultsToTree = async ({
             }
           }
           treeNodes[ancestorId].count += 1;
+          treeNodes[ancestorId].depth = Math.max(
+            depth,
+            treeNodes[ancestorId].depth
+          );
           treeNodes[ancestorId].children[child] = true;
           child = ancestorId;
           if (ancestorId == lca.taxon_id) {
             continue;
           }
+          depth++;
         }
       }
     }
