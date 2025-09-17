@@ -34,7 +34,11 @@ def confirm_index_opts(taxonomy_name, opts):
         if key not in opts:
             LOGGER.warning("Unable to index %s, '%s' not specified", taxonomy_name, key)
             return False
-    taxonomy_path = Path(f'{opts["taxonomy-path"]}/{taxonomy_name}')
+
+    file_key = "taxonomy-file"
+    taxonomy_path = Path(f'{opts["taxonomy-path"]}')
+    if not files_exist(opts[file_key], taxonomy_path):
+        taxonomy_path = Path(f'{opts["taxonomy-path"]}/{taxonomy_name}')
     taxonomy_path.mkdir(parents=True, exist_ok=True)
     if url_key not in opts and not files_exist(opts[file_key], taxonomy_path):
         LOGGER.warning(

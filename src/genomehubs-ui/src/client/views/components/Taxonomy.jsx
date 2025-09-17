@@ -33,7 +33,7 @@ const Taxonomy = ({
           setDuration(duration);
           fetchTaxonomies();
         },
-        apiStatus ? 100 : duration
+        apiStatus ? 100 : duration,
       );
       setDuration(attempt * multiple * interval);
       return () => clearTimeout(timer);
@@ -48,7 +48,7 @@ const Taxonomy = ({
         severity: "info",
       });
     } else {
-      if (duration < attempt * multiple * interval) {
+      if (duration >= 1000 && duration < attempt * multiple * interval) {
         setMessage({
           message: `Unable to connect to API, retrying in ${duration / 1000}s`,
           duration: duration + interval,
@@ -89,5 +89,5 @@ export default compose(
   withApi,
   dispatchMessage,
   withTaxonomy,
-  dispatchRecord
+  dispatchRecord,
 )(Taxonomy);
