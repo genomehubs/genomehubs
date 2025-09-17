@@ -362,9 +362,17 @@ export const processTreeRings = ({
 
   let labels = [];
 
-  const drawArcs = ({ node, depth = 0, start = 0, recurse = true }) => {
+  const drawArcs = ({
+    node,
+    depth = 0,
+    start = 0,
+    recurse = true,
+    first,
+    last,
+  }) => {
     visited[node.taxon_id] = true;
     let outer = depth + 1;
+    let inside = depth - 1;
     if (!node) {
       return {};
     }
@@ -443,9 +451,38 @@ export const processTreeRings = ({
     }
     let outerRadius = rScale(outer);
     let farOuterRadius = rScale(maxDepth + 1);
+    let insideRadius = rScale(Math.max(inside, 0));
+    console.log({
+      scientificName: node.scientific_name,
+      first,
+      last,
+      startAngle: first ? midAngle : startAngle,
+      endAngle: last ? midAngle : endAngle,
+    });
+
+    let innerXY = circleXY(insideRadius, midAngle);
+    let outerXY = circleXY(innerRadius, midAngle);
+    let branchLines = [];
+    branchLines.push(
+      d3line()([
+        [innerXY.x, innerXY.y],
+        [outerXY.x, outerXY.y],
+      ]),
+    );
+    if (!first || !last) {
+      branchLines.push(
+        arc()({
+          innerRadius: insideRadius,
+          outerRadius: insideRadius,
+          startAngle: first && !last ? midAngle : startAngle,
+          endAngle: last && !first ? midAngle : endAngle,
+        }),
+      );
+    }
 
     arcs.push({
       ...node,
+      lines: branchLines,
       arc: arc()({
         innerRadius,
         outerRadius,
@@ -570,10 +607,17 @@ export const processTreeRings = ({
           a.count - b.count ||
           b.scientific_name.localeCompare(a.scientific_name),
       );
-      children.forEach((child) => {
+      console.log(children.map((d) => d.scientific_name));
+      children.forEach((child, index) => {
         // test if node has been visited already - indicates problem with tree
         if (!visited[child.taxon_id]) {
-          drawArcs({ node: child, depth: depth + 1, start });
+          drawArcs({
+            node: child,
+            depth: depth + 1,
+            start,
+            first: index == 0,
+            last: index == children.length - 1,
+          });
         } else {
           console.warn("Tree node already visited");
           console.warn(node);
@@ -591,9 +635,11 @@ export const processTreeRings = ({
     },
     depth: -1,
     recurse: false,
+    first: true,
+    last: true,
   });
   if (treeNodes[rootNode]) {
-    drawArcs({ node: treeNodes[rootNode] });
+    drawArcs({ node: treeNodes[rootNode], first: true, last: true });
   }
   return {
     arcs,

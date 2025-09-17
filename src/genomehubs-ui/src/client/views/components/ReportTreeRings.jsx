@@ -139,6 +139,7 @@ const ReportTreeRings = ({
               stroke={backgroundColor}
               strokeWidth={strokeWidth}
               d={segment.arc}
+              opacity={segment.lines && segment.lines.length > 0 ? 0.5 : 1}
             />
           </g>
         </Tooltip>,
@@ -183,6 +184,26 @@ const ReportTreeRings = ({
             />
           </Tooltip>,
         );
+      }
+    });
+  }
+
+  let branches = [];
+  if (arcs) {
+    arcs.forEach((segment) => {
+      if (segment.lines) {
+        segment.lines.forEach((line) => {
+          branches.push(
+            <path
+              key={`line-${segment.taxon_id}-${line}`}
+              fill={"none"}
+              stroke={"black"}
+              strokeWidth={Math.max(1, strokeWidth * 3)}
+              strokeLinecap={"round"}
+              d={line}
+            />,
+          );
+        });
       }
     });
   }
@@ -420,6 +441,7 @@ const ReportTreeRings = ({
           {ticksText}
           {highlightPath}
           {phylopicElements}
+          {branches}
         </g>
         <g
           transform={`translate(${dimensions.width / 2}, ${dimensions.height})`}
