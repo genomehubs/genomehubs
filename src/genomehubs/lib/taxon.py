@@ -415,28 +415,29 @@ def find_or_create_taxa(es, opts, *, taxon_ids, taxon_template, asm_by_taxon_id=
     taxa = lookup_taxa_by_taxon_id(
         es, list(taxon_ids), taxon_template, return_type="dict"
     )
-    missing_taxa = [taxon_id for taxon_id in taxon_ids if taxon_id not in taxa]
-    to_create = get_taxa_to_create(
-        es,
-        opts,
-        taxonomy_name=opts["taxonomy-source"],
-        taxon_ids=missing_taxa,
-        asm_by_taxon_id=asm_by_taxon_id,
-    )
-    index_stream(
-        es,
-        taxon_template["index_name"],
-        stream_taxa(to_create),
-        dry_run=opts.get("dry-run", False),
-        log=opts.get("log-es", True),
-        chunk_size=opts.get("es-batch", 500),
-    )
-    taxa.update(
-        {
-            taxon_id: {"_id": "taxon-%s" % taxon_id, "_source": obj}
-            for taxon_id, obj in to_create.items()
-        }
-    )
+    if not opts.get("taxon-preload", False):
+        missing_taxa = [taxon_id for taxon_id in taxon_ids if taxon_id not in taxa]
+        to_create = get_taxa_to_create(
+            es,
+            opts,
+            taxonomy_name=opts["taxonomy-source"],
+            taxon_ids=missing_taxa,
+            asm_by_taxon_id=asm_by_taxon_id,
+        )
+        index_stream(
+            es,
+            taxon_template["index_name"],
+            stream_taxa(to_create),
+            dry_run=opts.get("dry-run", False),
+            log=opts.get("log-es", True),
+            chunk_size=opts.get("es-batch", 500),
+        )
+        taxa.update(
+            {
+                taxon_id: {"_id": "taxon-%s" % taxon_id, "_source": obj}
+                for taxon_id, obj in to_create.items()
+            }
+        )
     return taxa
 
 
