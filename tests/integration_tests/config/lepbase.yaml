@@ -2,11 +2,11 @@ common:
   es:
     batch: 500
     host:
-      - "localhost:9200"
+      - "localhost:9201"
     timeout: 30
   hub:
-    name: goat
-    path: ~/projects/genomehubs/goat-resources
+    name: lepbase
+    path: ~/projects/genomehubs/lepbase-resources
     separator: --
     version: 2021.10.15
   log:
@@ -16,11 +16,11 @@ common:
   taxonomy:
     format: ncbi
     file:
-      - names.dmp
-      - nodes.dmp
-    path: tests/integration_tests/taxdump
+      - nodes.jsonl
+    path: tests/integration_tests/data/lepbase/taxonomy
   taxon:
     preload: true
+  path: ~/projects/genomehubs/lepbase-resources/taxdump
 fill: {}
 index:
   taxonomy:
