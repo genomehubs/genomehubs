@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 LABEL maintainer="contact@genomehubs.org"
 LABEL license="MIT"
-ARG VERSION=2.11.6
+ARG VERSION=2.11.7
 LABEL version=$VERSION
 ENV CONTAINER_VERSION=$VERSION
 
