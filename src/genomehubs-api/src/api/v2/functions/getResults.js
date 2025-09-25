@@ -697,9 +697,11 @@ export const getResults = async (params) => {
       params.query = await chainQueries(params);
     }
   } catch (error) {
-    let { errorString } = error;
-    if (typeof message == "object") {
-      errorString = JSON.stringify(message);
+    let errorString;
+    if (typeof error === "object") {
+      errorString = error.message || JSON.stringify(error);
+    } else {
+      errorString = String(error);
     }
     logError({ req: params.req, message: error });
     return {
