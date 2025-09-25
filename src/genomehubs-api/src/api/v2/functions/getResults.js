@@ -333,7 +333,7 @@ export const generateQuery = async ({
     if (result != "file") {
       query = query.toLowerCase();
     }
-    if (lookupTypes[result]("data_freeze") && !query.match(/^data_freeze\(/)) {
+    if (lookupTypes[result]("data_freeze") && !query.match(/\bdata_freeze\b/)) {
       query += " and data_freeze=latest";
     }
     for (let term of query.split(/\s+and\s+/)) {

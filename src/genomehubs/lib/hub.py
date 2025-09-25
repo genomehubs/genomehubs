@@ -721,9 +721,15 @@ def add_attributes(
                 #     )
                 indices[key] = len(attributes)
                 attributes.append(attribute)
+    data_freeze = False
     if attribute_values:
         for attribute in attributes:
             process_metadata(attribute, blanks)
+            if (
+                attribute.get("key", "") == "data_freeze"
+                and attribute.get("keyword_value", "latest") != "latest"
+            ):
+                data_freeze = True
             has_taxon_data = False
             taxon_attribute_types = {**types[attribute["key"]]}
             taxon_attribute = {**attribute, "source_index": "assembly"}
@@ -747,6 +753,8 @@ def add_attributes(
                 # taxon_attribute.update({"name": taxon_attribute_types["key"]})
                 taxon_attributes.append(taxon_attribute)
                 taxon_types[taxon_attribute_types["name"]] = taxon_attribute_types
+    if data_freeze:
+        taxon_attributes = []
     return attributes, taxon_attributes, taxon_types
 
 
