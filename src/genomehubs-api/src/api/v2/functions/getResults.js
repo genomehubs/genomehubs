@@ -92,6 +92,7 @@ const validateOperator = (term, types, meta) => {
   const operators = new Set(["!=", "<", "<=", "=", "==", ">=", ">"]);
   if (term.match(/[<>=]/)) {
     let parts = term.split(/\s*([!]*[<>=]=*)\s*/);
+
     if (parts.length > 3 || !operators.has(parts[1])) {
       return fail(`invalid operator in ${term}`);
     }
@@ -331,6 +332,9 @@ export const generateQuery = async ({
     query = query.trim();
     if (result != "file") {
       query = query.toLowerCase();
+    }
+    if (lookupTypes[result]("data_freeze") && !query.match(/^data_freeze\(/)) {
+      query += " and data_freeze=latest";
     }
     for (let term of query.split(/\s+and\s+/)) {
       let parts, validation, subset;
