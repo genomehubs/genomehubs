@@ -39,7 +39,7 @@ const chipToString = (chip) => {
     return `tax_${modifier}(${value})`;
   } else if (modifier) {
     if (modifier === "collate") {
-      return `collate(${key}, ${value})`;
+      return `collate(${key},${value})`;
     }
     if (modifier !== "value") {
       chipString = `${modifier}(${key})`;
