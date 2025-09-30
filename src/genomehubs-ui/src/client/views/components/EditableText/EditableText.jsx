@@ -217,10 +217,14 @@ const EditableText = ({
                 if (matchedOption) {
                   handleChange(updatedValue);
                 } else if (options.length > 0) {
-                  const filteredOptions = options.filter((opt) =>
-                    opt.toLowerCase().match(event.target.value.toLowerCase()),
-                  );
-                  handleChange(filteredOptions[0] || options[0]);
+                  if (event.target.value.includes("*")) {
+                    handleChange(event.target.value);
+                  } else {
+                    const filteredOptions = options.filter((opt) =>
+                      opt.toLowerCase().match(event.target.value.toLowerCase()),
+                    );
+                    handleChange(filteredOptions[0] || options[0]);
+                  }
                 } else {
                   handleChange(updatedValue);
                 }

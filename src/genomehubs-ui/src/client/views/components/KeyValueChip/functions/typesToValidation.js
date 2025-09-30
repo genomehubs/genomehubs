@@ -44,7 +44,24 @@ const validateKeyword = ({ value, validValues }) => {
       .toLowerCase()
       .replace(/\[.+\]$/, "");
     if (validValues && !validValues.has(normalized)) {
-      return { valid: false, reason: `${normalized} is not a valid value` };
+      if (normalized.includes("*")) {
+        const [prefix, suffix] = normalized.split("*");
+        let match = false;
+        for (let valid of validValues) {
+          if (
+            (prefix && valid.startsWith(prefix)) ||
+            (suffix && valid.endsWith(suffix))
+          ) {
+            match = true;
+            break;
+          }
+        }
+        if (!match) {
+          return { valid: false, reason: `${normalized} is not a valid value` };
+        }
+      } else {
+        return { valid: false, reason: `${normalized} is not a valid value` };
+      }
     }
     if (seenValues.has(normalized)) {
       return { valid: false, reason: `${normalized} is a duplicate value` };
