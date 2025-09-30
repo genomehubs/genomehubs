@@ -92,8 +92,15 @@ const Ribbon = ({
     let { search } = location;
 
     let { x, query = x } = search;
-    let options = qs.parse(search.replace(/^\?/, ""));
-    let queryParts = (options.query || options.x)
+    let xQuery = { ...(chartProps.xQuery || {}) };
+    xQuery.report = chartProps.report;
+    xQuery.x = xQuery.query || xQuery.x || query || "";
+    delete xQuery.query;
+    let options = {
+      ...xQuery,
+      ...(qs.parse(search.replace(/^\?/, "")) || {}),
+    };
+    let queryParts = (options.query || options.x || "")
       .split(" AND ")
       .filter((part) => !part.startsWith("sequence_id"));
     let newQuery =
@@ -331,13 +338,15 @@ const Ribbon = ({
         stats: cats[i],
       };
       legend.push(
-        MultiCatLegend({
-          ...legendProps,
-          offset,
-          row,
-          handleClick,
-          active: currentSeries === i,
-        }),
+        <g key={`item-${i}`}>
+          {MultiCatLegend({
+            ...legendProps,
+            offset,
+            row,
+            handleClick,
+            active: currentSeries === i,
+          })}
+        </g>,
       );
     }
     // dropShadow = currentSeries !== false && currentSeries == i;

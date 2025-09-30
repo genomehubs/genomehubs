@@ -34,9 +34,12 @@ const Report = ({
 }) => {
   const location = useLocation();
   // const reportRef = useRef();
+  const componentRef = useRef();
+  const { width, height } = useResize(componentRef);
+
   let options = qs.parse(location.search.replace(/^\?/, ""));
-  props.report = props.report.replace("xInY", "arc");
   let reportProps = { ...props };
+  reportProps.report = props.report.replace("xInY", "arc");
   let queryProps = {};
   if (options.taxonomy) {
     queryProps = { taxonomy: options.taxonomy };
@@ -135,8 +138,6 @@ const Report = ({
     props.caption || qs.parse(reportProps.queryString).caption;
   reportProps.id = props.id || queryProps.report;
 
-  const componentRef = useRef();
-  const { width, height } = useResize(componentRef);
   let minDim = Math.floor(width);
   if (height) {
     minDim = Math.floor(Math.min(width, height));

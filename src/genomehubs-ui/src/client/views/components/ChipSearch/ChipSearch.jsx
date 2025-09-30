@@ -381,7 +381,7 @@ const ChipSearch = ({
         }} // Add margin to chips
         chipIndex={index} // Pass the index to KeyValueChip
         lookupFunction={
-          key === "tax" || key.endsWith("_id") ? lookupFunction : null
+          ["tax", `${index}_id`].includes(key) ? lookupFunction : null
         }
         types={types}
         searchIndex={result}

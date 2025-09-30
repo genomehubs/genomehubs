@@ -6,7 +6,7 @@ export const requestPages = createAction("REQUEST_PAGE");
 export const receivePages = createAction(
   "RECEIVE_PAGE",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 export const cancelPages = createAction("CANCEL_PAGE");
 
@@ -43,7 +43,7 @@ const pages = handleActions(
       });
     },
   },
-  defaultState()
+  defaultState(),
 );
 
 export const getPages = (state) => state.pages;

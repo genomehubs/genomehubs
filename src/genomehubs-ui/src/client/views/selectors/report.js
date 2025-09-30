@@ -803,9 +803,18 @@ const _getReportIdAsMemoKey = (_state, reportId) => {
   return reportId;
 };
 
-const getReport = (state, reportId) => {
-  return state.reports.byId[reportId] || {};
-};
+const getReport = (() => {
+  const cache = new Map();
+  return (state, reportId) => {
+    const key = JSON.stringify([state.reports.byId[reportId], reportId]);
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+    const result = state.reports.byId[reportId] || {};
+    cache.set(key, result);
+    return result;
+  };
+})();
 
 export const cacheReportByReportId = createSelectorForReportId(
   _getReportIdAsMemoKey,
