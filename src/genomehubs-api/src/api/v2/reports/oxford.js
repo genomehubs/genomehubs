@@ -33,13 +33,15 @@ const parseAssemblies = (query) => {
 
 const parseCollate = (query) => {
   let parts = query.split(/\sAND\s/i);
+  let coreQuery = [];
   for (let part of parts) {
     let [key, value] = part.split(/\s*[\(\)]\s*/);
     if (key != "collate") {
+      coreQuery.push(part);
       continue;
     }
-    let [attrA, attrB] = value.split(",");
-    return attrB;
+    let [collateField, groupBy] = value.split(/\s*,\s*/);
+    return { collateField, groupBy, term: coreQuery.join(" AND ") };
   }
 };
 
@@ -104,6 +106,7 @@ const getOxford = async ({
   result,
   taxonomy,
   reorient,
+  collateField,
   req,
 }) => {
   let exclusions;
@@ -209,6 +212,11 @@ const getOxford = async ({
   let byAssembly = {};
   let groupedData = {};
   let activeSeqs = {};
+  let allValues = {};
+  let allYValues = {};
+  let byCat = {};
+  let yValuesByCat = {};
+  console.log(collateField, groupBy);
   for (let result of xRes.results) {
     let { taxon_id, assembly_id, feature_id, fields } = result.result;
     let group = fields[groupBy].value;
@@ -222,15 +230,7 @@ const getOxford = async ({
     if (!groupedData[group][assembly_id]) {
       groupedData[group][assembly_id] = [];
     }
-    let { sequence_id, start, end, strand } = fields;
-    sequence_id = sequence_id.value;
-    start = start.value;
-    end = end.value;
-    strand = strand.value;
-    if (!byAssembly[assembly_id][sequence_id]) {
-      byAssembly[assembly_id][sequence_id] = [];
-      activeSeqs[assembly_id][sequence_id] = true;
-    }
+
     let cat;
     if (bounds.cat) {
       if (bounds.by == "attribute") {
@@ -266,27 +266,49 @@ const getOxford = async ({
     if (typeof cat === "undefined") {
       cat = "all features";
     }
-    byAssembly[assembly_id][sequence_id].push({
-      group,
-      start,
-      end,
-      strand,
-      taxon_id,
-      assembly_id,
-      feature_id,
-      cat,
-    });
-    if (assembly_id != asms[0]) {
-      groupedData[group][assembly_id].push({
-        sequence_id,
+
+    if (collateField === "sequence_id") {
+      let { sequence_id, start, end, strand } = fields;
+      sequence_id = sequence_id.value;
+      start = start.value;
+      end = end.value;
+      strand = strand.value;
+      if (!byAssembly[assembly_id][sequence_id]) {
+        byAssembly[assembly_id][sequence_id] = [];
+        activeSeqs[assembly_id][sequence_id] = true;
+      }
+      byAssembly[assembly_id][sequence_id].push({
+        group,
         start,
         end,
         strand,
+        taxon_id,
+        assembly_id,
+        feature_id,
+        cat,
+      });
+      if (assembly_id != asms[0]) {
+        groupedData[group][assembly_id].push({
+          sequence_id,
+          start,
+          end,
+          strand,
+          cat,
+          feature_id,
+        });
+      }
+    } else if (fields.hasOwnProperty(collateField)) {
+      let { value } = fields[collateField];
+      groupedData[group][assembly_id].push({
+        value,
         cat,
         feature_id,
       });
+      console.log(groupedData);
+      console.log(bounds);
     }
   }
+
   let seqLengths = await getSequenceLengths({
     assemblies: Object.keys(byAssembly),
     xQuery: {
@@ -302,10 +324,6 @@ const getOxford = async ({
   let domains = {};
   let buckets = {};
   let labels = {};
-  let allValues = {};
-  let allYValues = {};
-  let byCat = {};
-  let yValuesByCat = {};
   for (let [assembly, seqs] of Object.entries(activeSeqs)) {
     for (let seq of Object.keys(seqs)) {
       seqs[seq] = seqLengths[assembly][seq];
@@ -346,7 +364,7 @@ const getOxford = async ({
   }
   let seqScores = {};
   let seqOrient = {};
-
+  console.log(asms, activeSeqs);
   for (let [sequence_id] of Object.entries(activeSeqs[asms[1]])) {
     let seqScore = 0;
     let seqCount = 0;
@@ -538,6 +556,7 @@ const getOxford = async ({
     cat: bounds.cat,
     cats: bounds.cats,
   };
+
   return {
     buckets: buckets[asms[0]],
     allValues,
@@ -575,20 +594,23 @@ export const oxford = async ({
     taxonomy,
   });
 
+  let { collateField, groupBy, term } = parseCollate(x);
+
   let {
     params,
     fields: xFields,
     summaries,
   } = await queryParams({
-    term: x,
+    term,
     result,
     taxonomy,
   });
 
-  let groupBy = parseCollate(params.query);
+  console.log({ collateField, groupBy, term });
 
   searchFields = [
     ...new Set([
+      ...(collateField !== "sequence_id" ? [collateField] : []),
       "sequence_id",
       "start",
       "end",
@@ -625,7 +647,7 @@ export const oxford = async ({
   if (!groupBy || !lookupTypes(groupBy)) {
     status = {
       success: false,
-      error: `collate field not recognised.\nTry 'collate(assembly_id,busco_gene)'`,
+      error: `collate field not recognised.\nTry 'collate(assembly_id,name)'`,
     };
     return { status };
   }
@@ -669,6 +691,7 @@ export const oxford = async ({
   let filteredFields = xFields.filter(
     (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
   );
+  console.log({ filteredFields, xFields, fields });
   bounds = await getBounds({
     params: { ...params },
     fields: filteredFields,
@@ -678,6 +701,7 @@ export const oxford = async ({
     taxonomy,
     apiParams,
   });
+  console.log(bounds);
   let catBounds = await getBounds({
     params: { ...params },
     fields: [catMeta.name, ...filteredFields],
@@ -701,6 +725,8 @@ export const oxford = async ({
   }
 
   let asms = parseAssemblies(bounds.query);
+  console.log(asms);
+  console.log(bounds);
   xQuery.query = bounds.query;
   let oxford = status
     ? {}
@@ -719,6 +745,7 @@ export const oxford = async ({
         req,
         taxonomy,
         reorient,
+        collateField,
       });
   if (oxford && oxford.status && oxford.status.success == false) {
     status = { ...oxford.status };
