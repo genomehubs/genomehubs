@@ -176,7 +176,7 @@ const Histogram = ({
           translations: chartProps.translations,
           pointSize: chartProps.pointSize,
           orientation: chartProps.orientation,
-          lastPos: width - marginRight,
+          // lastPos: width - marginRight,
           labels: chartProps.labels,
           showLabels: chartProps.showLabels,
           valueType: chartProps.valueType,
