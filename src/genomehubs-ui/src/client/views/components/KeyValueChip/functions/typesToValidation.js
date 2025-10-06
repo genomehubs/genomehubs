@@ -138,7 +138,7 @@ export const typesToValidation = ({ types, searchIndex }) => {
       return () => {};
     }
     return (val) => {
-      let tip;
+      let tip = "";
       let value = val.toLowerCase();
       if (valueMeta.hasOwnProperty(value) && valueMeta[value].description) {
         tip = valueMeta[value].description;

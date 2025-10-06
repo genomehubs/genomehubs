@@ -1,7 +1,5 @@
-// import LogoGoat from "./LogoGoat";
-import LogoLepbase from "./LogoLepbase";
+import LogoGoat from "./LogoGoat";
 
-// const Logo = LogoGoat;
-const Logo = LogoLepbase;
+const Logo = LogoGoat;
 
 export default Logo;
