@@ -3,6 +3,9 @@ import parseValue from "./parseValue";
 const validateNumber = ({ value, processed_type, constraint }) => {
   let values = Array.isArray(value) ? value : [value];
   for (let v of values) {
+    if (v === null || v === undefined || v === "" || v === "null") {
+      continue;
+    }
     let processedValue = parseValue(v);
     if (processed_type === "integer" && !Number.isInteger(processedValue)) {
       return { valid: false, reason: `${v} is not an integer` };
