@@ -386,6 +386,15 @@ def index_file(
 ):
     """Index a file."""
     delimiters = {"csv": ",", "tsv": "\t"}
+    # Increase the maximum field size limit for CSV reader
+    maxInt = sys.maxsize
+    while True:
+        # guard against overflow errors
+        try:
+            csv.field_size_limit(maxInt)
+            break
+        except OverflowError:
+            maxInt = int(maxInt / 10)
     rows = csv.reader(
         strip_comments(data, types),
         delimiter=delimiters[types["file"]["format"]],
