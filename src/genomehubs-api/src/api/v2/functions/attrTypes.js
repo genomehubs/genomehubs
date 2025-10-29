@@ -80,7 +80,7 @@ const fetchTypes = async ({ result, taxonomy, hub, release, indexType }) => {
         index,
         body: {
           query,
-          size: 1000,
+          size: 10000,
         },
       },
       { meta: true }
@@ -89,6 +89,7 @@ const fetchTypes = async ({ result, taxonomy, hub, release, indexType }) => {
       return err.meta;
     });
   let status = checkResponse({ body });
+  console.log(status);
   let typesMap = {};
   let synonyms = {};
   if (status.hits) {
