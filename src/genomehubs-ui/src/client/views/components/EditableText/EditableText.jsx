@@ -112,11 +112,13 @@ const EditableText = ({
     onChange?.(`${newValue}`);
   };
 
-  const valueMap = (inputValue || "").split(/\s*,\s*/).reduce((acc, curr) => {
-    const parts = curr.split(/[\[\]]/);
-    acc[parts[0]] = curr;
-    return acc;
-  }, {});
+  const valueMap = `${inputValue || ""}`
+    .split(/\s*,\s*/)
+    .reduce((acc, curr) => {
+      const parts = curr.split(/[\[\]]/);
+      acc[parts[0]] = curr;
+      return acc;
+    }, {});
 
   const reverseValueMap = Object.fromEntries(
     Object.entries(valueMap).map(([key, val]) => [val, key]),
