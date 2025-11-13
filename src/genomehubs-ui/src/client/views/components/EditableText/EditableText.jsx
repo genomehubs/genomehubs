@@ -55,11 +55,13 @@ const EditableText = ({
   onChange,
   onBlur,
   handleSplitValues,
-  backgroundColor,
+  backgroundColor = "#ffffff",
+  fontFamily,
   textColor,
   highlightColor,
   anchorEl,
   setAnchorEl,
+  underline = false,
   startComponent,
   endComponent,
   valueAsChips,
@@ -71,11 +73,15 @@ const EditableText = ({
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(value);
   const [cursorPos, setCursorPos] = useState(0);
+  if (!anchorEl) {
+    [anchorEl, setAnchorEl] = useState(null);
+  }
 
   const rootRef = useRef(null);
 
-  const contrastColor = getContrastColor(backgroundColor);
-  const highlightContrastColor = getContrastColor(highlightColor);
+  const contrastColor = backgroundColor
+    ? getContrastColor(backgroundColor)
+    : null;
 
   useEffect(() => {
     if (isAlreadyEditing) {
@@ -123,12 +129,14 @@ const EditableText = ({
     sx: {
       maxWidth,
       "& .MuiInputBase-input": {
-        textAlign: "center",
+        textAlign: underline ? "left" : "center",
       },
-      "& .MuiInputBase-root": {
-        backgroundColor: backgroundColor,
-        color: contrastColor,
-      },
+      ...(backgroundColor && {
+        "& .MuiInputBase-root": {
+          backgroundColor: backgroundColor,
+          color: contrastColor,
+        },
+      }),
     },
   };
 
@@ -504,8 +512,18 @@ const EditableText = ({
         ) : null
       }
     />
+  ) : fontFamily ? (
+    <span
+      style={{
+        fontFamily,
+        width: "100%",
+      }}
+    >
+      <div style={{ fontSize: "12px", opacity: 0.8 }}>{title}</div>
+      <span style={{ fontSize: "16px" }}>{inputValue}</span>
+    </span>
   ) : (
-    inputValue
+    <span>{inputValue}</span>
   );
 
   return (
@@ -533,17 +551,25 @@ const EditableText = ({
           enterNextDelay={750}
           arrow
         >
-          <Box component="span" sx={{ whiteSpace: "nowrap" }}>
-            {displayValue}
-          </Box>
+          {displayValue}
         </Tooltip>
         {endComponent}
       </Typography>
+      {underline && (
+        <hr
+          style={{
+            marginTop: "2px",
+            borderWidth: "2px",
+            borderColor: highlightColor || textColor,
+            opacity: isEditing ? 0.5 : 1,
+          }}
+        />
+      )}
       {isEditing && (
         <Popper
           open={isEditing}
           anchorEl={anchorEl}
-          placement="bottom"
+          placement={underline ? "bottom-start" : "bottom"}
           sx={{
             zIndex: 1000, // Ensure it appears above other elements
           }}
@@ -554,6 +580,12 @@ const EditableText = ({
               backgroundColor: backgroundColor,
               color: textColor,
               borderRadius: "4px",
+              ...(underline && {
+                marginTop: "-32.5px",
+                letterSpacing: "0.15008px",
+                lineHeight: "23px",
+                marginLeft: "-8px",
+              }),
               boxShadow:
                 "0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)",
             }}

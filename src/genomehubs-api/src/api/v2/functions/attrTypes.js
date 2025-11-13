@@ -89,7 +89,6 @@ const fetchTypes = async ({ result, taxonomy, hub, release, indexType }) => {
       return err.meta;
     });
   let status = checkResponse({ body });
-  console.log(status);
   let typesMap = {};
   let synonyms = {};
   if (status.hits) {

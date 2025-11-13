@@ -24,6 +24,7 @@ import Breadcrumbs from "./Breadcrumbs";
 import ColorButton from "./ColorButton";
 import Count from "./Count";
 import Divider from "@mui/material/Divider";
+import EditableText from "./EditableText/EditableText";
 import EnumSelect from "./EnumSelect";
 import FlagIcon from "./FlagIcon";
 import Grid from "@mui/material/Grid2";
@@ -175,15 +176,19 @@ export const Template = ({
     let label = props[`${match}_label`];
     let description = props[`${match}_description`];
     let input = (
-      <TextField
+      <EditableText
         variant="standard"
-        id={match + Math.random()}
-        label={label}
+        // id={match + Math.random()}
+        title={label}
+        description={description}
         value={values[match] || ""}
         style={{ width: "95%" }}
-        onChange={(e) => handleChange(e, match, undefined, i)}
-        onKeyUp={handleKeyPress}
-        autoFocus={i == values.focus}
+        underline={true}
+        onChange={(value) => handleChange(undefined, match, value, i)}
+        // onBlur={(value) => handleChange(undefined, match, value, i)}
+        fontFamily="Roboto, Helvetica, Arial, sans-serif"
+        // onKeyUp={handleKeyPress}
+        // autoFocus={i == values.focus}
       />
     );
     inputs.push(

@@ -75,6 +75,7 @@
     "@emotion/styled": "^11.13.0",
     "@focus-reactive/react-yaml": "^1.1.2",
     "@fontsource/open-sans": "^5.0.29",
+    "@fontsource/roboto": "^5.2.8",
     "@fontsource/roboto-mono": "^5.0.19",
     "@fontsource/signika": "^5.0.21",
     "@hello-pangea/dnd": "^18.0.1",
