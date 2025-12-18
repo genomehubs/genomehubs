@@ -181,25 +181,26 @@ const suggest = async (params, iter = 0) => {
 export const getIdentifiers = async (req, res) => {
   try {
     let response = {};
-    response = await sayt(req.query);
+    const q = req.expandedQuery || req.query || {};
+    response = await sayt(q);
     if (
       !response.status ||
       !response.status.success ||
       response.status.hits == 0
     ) {
-      response = await lookup(req.query);
+      response = await lookup(q);
     }
     if (
       !response.status ||
       !response.status.success ||
       response.status.hits == 0
     ) {
-      response = await suggest(req.query);
+      response = await suggest(q);
     }
     if (!response.status) {
       response = { status: { success: true, hits: 0 }, results: [] };
     }
-    return res.status(200).send(formatJson(response, req.query.indent));
+    return res.status(200).send(formatJson(response, q.indent));
   } catch (message) {
     logError({ req, message });
     return res.status(400).send({ status: "error" });

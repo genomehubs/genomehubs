@@ -149,7 +149,8 @@ export const getPhylopic = async (req, res) => {
   try {
     let response = {};
     let startTime = performance.now();
-    let { taxonId, taxonomy } = req.query;
+    const q = req.expandedQuery || req.query || {};
+    let { taxonId, taxonomy } = q;
     if (phylopics[taxonId]) {
       let endTime = performance.now();
       return res.status(200).send(JSON.stringify(phylopics[taxonId], null, 2));

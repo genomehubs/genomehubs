@@ -87,7 +87,40 @@ if (process.pkg) {
 // rename xInY to arc
 const expandQuery = function (req, res, next) {
   if (req.query) {
-    req.query = qs.expand(req.query);
+    const expanded = qs.expand(req.query);
+    // expose expanded query broadly so downstream handlers can access renamed params
+    res.locals.expandedQuery = expanded;
+    req.expandedQuery = expanded;
+
+    // Try to mutate the existing req.query object if it's mutable
+    try {
+      if (typeof req.query === "object" && req.query !== null) {
+        Object.keys(req.query).forEach((k) => {
+          if (!(k in expanded)) delete req.query[k];
+        });
+        Object.keys(expanded).forEach((k) => {
+          req.query[k] = expanded[k];
+        });
+      }
+    } catch (err) {
+      // ignore: we'll try to define a concrete property below or rely on the fallbacks
+    }
+
+    // Try to define an own `query` property on the request object that returns the expanded object.
+    // This will shadow Express's getter for `query` for this request instance if configurable.
+    try {
+      const currentDesc = Object.getOwnPropertyDescriptor(req, "query");
+      if (!currentDesc || currentDesc.configurable !== false) {
+        Object.defineProperty(req, "query", {
+          configurable: true,
+          enumerable: true,
+          value: expanded,
+          writable: true,
+        });
+      }
+    } catch (err) {
+      // If defining the property fails, we rely on `req.expandedQuery` and `res.locals.expandedQuery`.
+    }
   }
   next();
 };

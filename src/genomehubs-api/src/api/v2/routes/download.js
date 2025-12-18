@@ -43,13 +43,14 @@ const locateFile = async (params) => {
 export const getFile = async (req, res) => {
   try {
     let response = {};
-    response = await locateFile(req.query);
+    const q = req.expandedQuery || req.query || {};
+    response = await locateFile(q);
     if (response && response != {}) {
       if (response.redirect) {
         return res.redirect(response.redirect);
       }
       res.setHeader("content-type", response.mime);
-      if (!req.query.streamFile) {
+      if (!q.streamFile) {
         res.attachment(response.fileName);
       }
       return response.fileStream.pipe(res);
