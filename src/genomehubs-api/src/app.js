@@ -214,6 +214,17 @@ try {
         }
       }
       if (mod) {
+        // Prefer explicit function name from OpenAPI (x-eov-operation-id or operationId)
+        try {
+          const fnName =
+            schema && (schema["x-eov-operation-id"] || schema["operationId"]);
+          if (fnName && mod && typeof mod[fnName] === "function") {
+            console.log("OP_HANDLER_DEBUG: resolvedToNamedExport=", fnName);
+            return mod[fnName];
+          }
+        } catch (e) {
+          // ignore
+        }
         // Handler may be exported as CommonJS function, ESM default, or named property.
         if (typeof mod === "function") return mod;
         if (mod && typeof mod.default === "function") return mod.default;
