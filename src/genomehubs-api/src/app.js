@@ -6,7 +6,6 @@ import compression from "compression";
 import { config } from "./api/v2/functions/config.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import esmResolver from "./api/v2/functions/esmResolver.js";
 import express from "express";
 import { fileURLToPath } from "url";
 import fs from "fs";
@@ -19,8 +18,17 @@ import path from "path";
 import qs from "./api/v2/functions/qs.js";
 import swaggerUi from "swagger-ui-express";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// ensure all route/report modules are statically imported into the bundle
+// generated at build time by scripts/generate-all-routes.cjs -> src/all_routes.js
+// this file is a no-op at runtime but forces bundlers to include modules that
+// would otherwise be dynamically required by express-openapi-validator.
+(async () => {
+  try {
+    await import(path.join(__dirname, "all_routes.js"));
+  } catch (err) {
+    // ignore; file may not exist in some dev environments
+  }
+})();
 
 const { port } = config;
 const apiSpec = path.join(__dirname, "api-v2.yaml");
@@ -137,6 +145,106 @@ app.get("/api-docs/index.html", swaggerSetup);
 app.use("/api-docs", swaggerUi.serve);
 app.get("/api-docs", swaggerSetup);
 
+// Try to use a generated static operation handlers map to avoid dynamic requires at runtime.
+let operationHandlersPath = null;
+try {
+  // generated at build time by scripts/generate-operation-handlers.cjs -> build/operation-handlers.cjs
+  const handlersMap = require(path.join(
+    __dirname,
+    "..",
+    "build",
+    "operation-handlers.cjs"
+  ));
+  // custom resolver: expects handlersPath to be the project src root; module keys are relative to src
+  const staticResolver = (handlersPath, route, apiDoc) => {
+    const schema =
+      apiDoc.paths[route.openApiRoute.substring(route.basePath.length)][
+        route.method.toLowerCase()
+      ];
+    const baseName =
+      schema["x-eov-operation-han dler"] ||
+      schema["x-eov-operation-handler"] ||
+      schema["x-eov-operation-handler"];
+    // debug logging to inspect what handlersMap contains
+    try {
+      if (baseName) {
+        const keyDbg = baseName;
+        const value = handlersMap && handlersMap[keyDbg];
+        console.log("OP_HANDLER_DEBUG: baseName=", baseName);
+        console.log("OP_HANDLER_DEBUG: key=", keyDbg);
+        console.log("OP_HANDLER_DEBUG: valueType=", typeof value);
+        if (value && typeof value === "object") {
+          try {
+            console.log("OP_HANDLER_DEBUG: valueKeys=", Object.keys(value));
+          } catch (e) {}
+          if (value && value.default) {
+            console.log(
+              "OP_HANDLER_DEBUG: value.defaultType=",
+              typeof value.default
+            );
+            try {
+              console.log(
+                "OP_HANDLER_DEBUG: value.defaultKeys=",
+                Object.keys(value.default)
+              );
+            } catch (e) {}
+          }
+        }
+      }
+    } catch (err) {
+      console.log(
+        "OP_HANDLER_DEBUG: resolver logging error",
+        err && err.message
+      );
+    }
+    // operationHandlers generator used module keys relative to src. if baseName is present, map to that module.
+    if (baseName && handlersMap) {
+      // baseName is expected to be a path like 'api/v2/controllers/foo'
+      const key = baseName;
+      // try several candidate key forms: as provided, and with a .js suffix
+      const candidates = [key, `${key}.js`];
+      let mod;
+      for (const k of candidates) {
+        if (
+          handlersMap &&
+          Object.prototype.hasOwnProperty.call(handlersMap, k)
+        ) {
+          mod = handlersMap[k];
+          break;
+        }
+      }
+      if (mod) {
+        // Handler may be exported as CommonJS function, ESM default, or named property.
+        if (typeof mod === "function") return mod;
+        if (mod && typeof mod.default === "function") return mod.default;
+        if (mod && typeof mod.handler === "function") return mod.handler;
+        // If module is an object, try to pick a sensible function export (e.g. getResultFields)
+        try {
+          if (mod && typeof mod === "object") {
+            const fnKey = Object.keys(mod).find(
+              (k) => typeof mod[k] === "function"
+            );
+            if (fnKey) {
+              console.log("OP_HANDLER_DEBUG: pickedExport=", fnKey);
+              return mod[fnKey];
+            }
+          }
+        } catch (err) {
+          // ignore and fall through to return mod
+        }
+        // Fallback: return the module and let the validator decide (may error)
+        return mod;
+      }
+    }
+    // fallback: let the validator do its default resolution
+    return undefined;
+  };
+  operationHandlersPath = { resolver: staticResolver };
+} catch (err) {
+  // no generated map available; fall back to dynamic resolution
+  operationHandlersPath = path.join(__dirname);
+}
+
 app.use(
   OpenApiValidator.middleware({
     apiSpec: swaggerDocument,
@@ -145,7 +253,7 @@ app.use(
       removeAdditional: "failing",
     },
     validateResponses: true,
-    operationHandlers: esmResolver(path.join(__dirname)),
+    operationHandlers: operationHandlersPath,
   })
 );
 

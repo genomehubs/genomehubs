@@ -3,14 +3,12 @@
   "version": "2.11.17",
   "description": "GenomeHubs API",
   "scripts": {
-    "api": "node --max-old-space-size=12288 src/app.js",
-    "start": "nodemon src/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "package": "./package.sh"
+    "build:bundle": "node scripts/bundle.cjs",
+    "build:webpack": "node scripts/webpack-build.cjs"
   },
   "main": "src/app.js",
   "type": "module",
-  "bin": "build/app.js",
+  "bin": "build/app.cjs",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/genomehubs/genomehubs-api.git"
@@ -25,6 +23,7 @@
     "@elastic/elasticsearch": "^8.15.0",
     "@json2csv/plainjs": "^7.0.6",
     "archiver": "^7.0.1",
+    "babel-loader": "^10.0.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -51,16 +50,22 @@
   "devDependencies": {
     "@babel/cli": "^7.17.3",
     "@babel/core": "^7.25.2",
-    "@babel/plugin-transform-modules-commonjs": "^7.16.8",
+    "@babel/plugin-transform-modules-commonjs": "^7.27.1",
     "@types/node": "^24.10.4",
-    "nodemon": "^3.1.4"
+    "esbuild": "^0.18.0",
+    "nodemon": "^3.1.4",
+    "webpack": "^5.104.1",
+    "webpack-cli": "^5.1.4"
   },
   "pkg": {
     "assets": [
-      "build/**/*"
+      "build/**/*",
+      "node_modules/swagger-ui-dist/**/*",
+      "node_modules/swagger-ui-express/**/*"
     ],
+    "public-packages": [],
     "targets": [
-      "node18-linux-x64"
+      "node24-macos-arm64"
     ],
     "outputPath": "dist"
   }
