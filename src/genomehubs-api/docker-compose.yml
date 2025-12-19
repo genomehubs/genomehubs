@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  elasticsearch:
+    image: elasticsearch:8.9.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+
+  api:
+    build: .
+    depends_on:
+      - elasticsearch
+    environment:
+      - GH_NODE=http://elasticsearch:9200
+      - GH_HUBNAME=goat
+      - GH_RELEASE=2021.10.15
+      - GH_API_PORT=3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./logs:/app/logs
+    user: "node"
+
+volumes:
+  esdata:

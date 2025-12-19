@@ -69,6 +69,31 @@ app.use((req, res, next) => {
   logAccess({ req });
   next();
 });
+
+// Health endpoint for Docker HEALTHCHECK and readiness probes
+app.get("/health", async (req, res) => {
+  const health = { ok: true };
+  // optional: check Elasticsearch connectivity
+  try {
+    if (config.node) {
+      // lazy-load elastic client to avoid startup cost when not needed
+      try {
+        // require instead of import to work with bundled cjs/esm shapes
+        // eslint-disable-next-line global-require
+        const { Client } = require("@elastic/elasticsearch");
+        const client = new Client({ node: config.node });
+        await client.ping();
+        health.elasticsearch = "ok";
+      } catch (err) {
+        health.elasticsearch = "error";
+        health.ok = false;
+      }
+    }
+  } catch (err) {
+    health.ok = false;
+  }
+  res.status(health.ok ? 200 : 503).json(health);
+});
 // app.use(express.static(path.join(__dirname, "public")));
 app.get("/api-spec", function (req, res) {
   res.header("Content-Type", "text/yaml");
