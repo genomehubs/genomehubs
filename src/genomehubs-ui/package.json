@@ -111,7 +111,7 @@
     "motion": "^12.5.0",
     "nanoid": "^5.0.7",
     "qrcode.react": "^4.0.1",
-    "qs": "^6.10.1",
+    "qs": "^6.14.1",
     "re-reselect": "^4.0.1",
     "react": "^18.3.1",
     "react-cookie": "^7.2.0",
