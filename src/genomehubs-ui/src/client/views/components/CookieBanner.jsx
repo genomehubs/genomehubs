@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useCookies, withCookies } from "react-cookie";
 
-import { Button, useTheme } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ColorButton from "./ColorButton";
 import Grid from "@mui/material/Grid";
@@ -10,6 +9,7 @@ import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import { banner as bannerStyle } from "./Styles.scss";
 import { compose } from "redux";
+import { useTheme } from "@mui/material";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 
 const showBanner = COOKIE_BANNER == "true";
