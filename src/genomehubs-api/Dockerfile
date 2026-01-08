@@ -1,5 +1,5 @@
-## Build stage (DHI build image)
-FROM dhi.io/node:24-debian13-dev AS builder
+## Build stage
+FROM node:24-bookworm AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --production=false
@@ -11,8 +11,8 @@ RUN node scripts/generate-operation-handlers.cjs src/generated && \
 RUN mkdir -p /app/logs \
     && chown -R node:node /app/logs \
     && chmod -R 0755 /app/logs
-## Final runtime stage (DHI runtime image)
-FROM dhi.io/node:24
+## Final runtime stage
+FROM node:24-bookworm-slim
 WORKDIR /app
 COPY --from=builder /app/build ./build
 COPY --from=builder /app/package.json ./package.json
