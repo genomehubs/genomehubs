@@ -1,10 +1,9 @@
 /** @type { import('@storybook/react-webpack5').StorybookConfig } */
 
-import path, { resolve } from "path";
-
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import custom from "../webpack.config.js";
-import { load } from "js-yaml";
+const path = require("path");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const postcss = require("postcss");
+const custom = require("../webpack.config.js");
 
 const devMode = true; //process.env.NODE_ENV !== "production";
 
@@ -80,7 +79,7 @@ const config = {
               },
               {
                 loader: "postcss-loader",
-                options: { implementation: require.resolve("postcss") },
+                options: { implementation: postcss },
               },
               {
                 loader: "sass-loader",
@@ -146,4 +145,5 @@ const config = {
     reactDocgen: "react-docgen-typescript",
   },
 };
-export default config;
+
+module.exports = config;

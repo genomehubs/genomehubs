@@ -14,8 +14,6 @@ import { fillParent as fillParentStyle } from "./Styles.scss";
 import makeStyles from "@mui/styles/makeStyles";
 import withSiteName from "#hocs/withSiteName";
 
-// const ReportPage = loadable(() => import("./ReportPage"));
-
 const useStyles = makeStyles((theme) => ({
   container: {
     minHeight: "100vh",

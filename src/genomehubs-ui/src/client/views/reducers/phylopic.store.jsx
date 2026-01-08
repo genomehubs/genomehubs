@@ -1,12 +1,10 @@
-  import { phylopicReducers } from "./phylopic";
-  import { combineReducers } from "redux";
-  import { configureStore } from "@reduxjs/toolkit";
-  import { enableBatching } from "redux-batched-actions";
-  import { thunk as thunkMiddleware } from "redux-thunk";
+import { combineReducers } from "redux";
+import { configureStore } from "@reduxjs/toolkit";
+import { enableBatching } from "redux-batched-actions";
+import { phylopicReducers } from "./phylopic";
 
-  const allReducers = Object.assign({}, phylopicReducers);
-  const store=configureStore({
-    reducer:enableBatching(combineReducers(allReducers)),
-    middleware:(getDefaultMiddleware)=>getDefaultMiddleware().concat(thunkMiddleware)
-  });
-  export default store;
+const allReducers = Object.assign({}, phylopicReducers);
+const store = configureStore({
+  reducer: enableBatching(combineReducers(allReducers)),
+});
+export default store;

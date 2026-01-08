@@ -11,13 +11,10 @@ import {
   infoPane as infoPaneStyle,
 } from "./Styles.scss";
 
-// import loadable from "@loadable/component";
 import InfoCard from "./InfoCard";
 import { Link } from "@reach/router";
 import classnames from "classnames";
 import { compose } from "recompose";
-
-// const InfoCard = loadable(() => import("./InfoCard"));
 
 const InfoPane = (props) => {
   const [hover, setHover] = useState(false);
@@ -27,7 +24,7 @@ const InfoPane = (props) => {
     infoPaneStyle,
     infoPaneDefaultStyle,
     fixedArStyle,
-    fixedArSixteenNineStyle
+    fixedArSixteenNineStyle,
   );
   let placeholder;
   if (props.image) {

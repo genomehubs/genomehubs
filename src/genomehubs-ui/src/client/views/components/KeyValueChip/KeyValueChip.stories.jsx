@@ -54,7 +54,8 @@ const Template = (args) => {
       value={chipData.value}
       operator={chipData.operator}
       modifier={chipData.modifier}
-      palette={chipData.palette} // Pass the palette prop
+      palette={chipData.palette}
+      types={args.types}
       onChange={handleChipChange}
     />
   );
