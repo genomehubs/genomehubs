@@ -294,7 +294,9 @@ jobs:
           path: ./dist
       - run: |
           mv dist/genomehubs/*manylinux2014_x86_64.whl src/docker/test
-          mv dist/genomehubs-api/genomehubs-api-linux src/docker/test/
+          mkdir -p src/docker/test/genomehubs-api
+          cp dist/genomehubs-api/bundle.cjs src/docker/test/genomehubs-api/
+          cp dist/genomehubs-api/package.json src/docker/test/genomehubs-api/
           mv dist/genomehubs-ui/genomehubs-ui-linux src/docker/test/
           cp tests/integration_tests/ui/test-ui.mjs src/docker/test/
           rm -rf dist/*

@@ -1,8 +1,7 @@
-FROM ubuntu:20.04
+FROM node:24-bookworm
 LABEL maintainer="contact@genomehubs.org"
 LABEL license="MIT"
 ARG VERSION=2.7.37
-ARG NODE_MAJOR=20
 LABEL version=$VERSION
 ENV CONTAINER_VERSION=$VERSION
 
@@ -15,26 +14,15 @@ RUN apt-get update \
     software-properties-common \
     wget
 
-RUN mkdir -p /etc/apt/keyrings \
-    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
-    | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" \
-    | tee /etc/apt/sources.list.d/nodesource.list
-
-RUN curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \ 
-    && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list
+RUN curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /etc/apt/keyrings/google-chrome.gpg \
+    && echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
-
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CC86BB64
-RUN add-apt-repository ppa:rmescandon/yq
 
 RUN apt-get update \
     && apt-get install -y \
     --no-install-recommends \
     google-chrome-stable \
-    nodejs \
-    yq \
     && rm -rf /var/lib/apt/lists/*
 
 ARG VERSION=v4.16.2
@@ -75,9 +63,9 @@ WORKDIR /genomehubs
 
 RUN npm install js-yaml puppeteer
 
-COPY genomehubs-ui-linux genomehubs-ui
+COPY genomehubs-api/ genomehubs-api/
 
-COPY genomehubs-api-linux genomehubs-api
+COPY genomehubs-ui-linux genomehubs-ui
 
 COPY genomehubs-test-ui.sh genomehubs-test-ui
 

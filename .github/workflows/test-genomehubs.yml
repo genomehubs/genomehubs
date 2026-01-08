@@ -78,8 +78,9 @@ jobs:
         run: mv dist/genomehubs-linux/*linux*.whl src/docker/test
       - name: move api bundle
         run: |
-          mkdir -p src/docker/test/api-bundle
-          mv dist/genomehubs-api-bundle/* src/docker/test/api-bundle/
+          mkdir -p src/docker/test/genomehubs-api
+          cp dist/genomehubs-api/bundle.cjs src/docker/test/genomehubs-api/
+          cp dist/genomehubs-api/package.json src/docker/test/genomehubs-api/
       - name: Build docker image
         working-directory: ./src/docker/test
         run: docker build . -t genomehubs
