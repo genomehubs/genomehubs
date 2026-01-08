@@ -21,18 +21,6 @@ import swaggerUi from "swagger-ui-express";
 // The generator writes to ./generated/operation-handlers.cjs
 import bundledHandlersMap from "./generated/operation-handlers.cjs";
 
-// ensure all route/report modules are statically imported into the bundle
-// generated at build time by scripts/generate-all-routes.cjs -> src/all_routes.js
-// this file is a no-op at runtime but forces bundlers to include modules that
-// would otherwise be dynamically required by express-openapi-validator.
-(async () => {
-  try {
-    await import(path.join(__dirname, "all_routes.js"));
-  } catch (err) {
-    // ignore; file may not exist in some dev environments
-  }
-})();
-
 const { port } = config;
 const apiSpec = path.join(__dirname, "api-v2.yaml");
 

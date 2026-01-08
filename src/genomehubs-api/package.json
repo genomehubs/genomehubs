@@ -4,7 +4,6 @@
   "description": "GenomeHubs API",
   "scripts": {
     "build:bundle": "node scripts/bundle.cjs",
-    "build:webpack": "node scripts/webpack-build.cjs",
     "start": "node --no-deprecation build/bundle.cjs",
     "start:goat": "GH_HUBNAME=goat GH_RELEASE=2021.10.15 node --no-deprecation build/bundle.cjs",
     "docker:build": "docker build -f ../docker/api/Dockerfile -t genomehubs-api:bundle ../..",
@@ -32,7 +31,6 @@
     "@elastic/elasticsearch": "^8.15.0",
     "@json2csv/plainjs": "^7.0.6",
     "archiver": "^7.0.1",
-    "babel-loader": "^10.0.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -62,9 +60,7 @@
     "@babel/plugin-transform-modules-commonjs": "^7.27.1",
     "@types/node": "^24.10.4",
     "esbuild": "^0.18.0",
-    "nodemon": "^3.1.4",
-    "webpack": "^5.104.1",
-    "webpack-cli": "^5.1.4"
+    "nodemon": "^3.1.4"
   },
   "pkg": {
     "assets": [

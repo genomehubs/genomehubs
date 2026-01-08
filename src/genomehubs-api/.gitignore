@@ -2,3 +2,7 @@
 node_modules
 .DS_Store
 logs
+build/
+dist/
+src/generated/
+src/all_routes.js
