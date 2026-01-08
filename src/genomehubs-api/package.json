@@ -5,8 +5,8 @@
   "scripts": {
     "build:bundle": "node scripts/bundle.cjs",
     "build:webpack": "node scripts/webpack-build.cjs",
-    "start": "node build/bundle.cjs",
-    "start:goat": "GH_HUBNAME=goat GH_RELEASE=2021.10.15 node build/bundle.cjs",
+    "start": "node --no-deprecation build/bundle.cjs",
+    "start:goat": "GH_HUBNAME=goat GH_RELEASE=2021.10.15 node --no-deprecation build/bundle.cjs",
     "docker:build": "docker build -f ../docker/api/Dockerfile -t genomehubs-api:bundle ../..",
     "docker:run": "docker run --rm -p 3000:3000 genomehubs-api:bundle",
     "docker:run:goat": "docker run --rm -p 3000:3000 -e GH_HUBNAME=goat -e GH_RELEASE=2021.10.15 genomehubs-api:bundle",

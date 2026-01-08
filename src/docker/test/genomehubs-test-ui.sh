@@ -18,7 +18,7 @@ fi
 
 export GH_BASENAME=
 
-node /genomehubs/genomehubs-api/bundle.cjs &
+node --no-deprecation /genomehubs/genomehubs-api/bundle.cjs &
 API_PID=$!
 /genomehubs/genomehubs-ui &
 UI_PID=$!

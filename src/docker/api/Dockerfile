@@ -26,4 +26,4 @@ EXPOSE 3000
 ENV NODE_ENV=production
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD node -e "const http=require('http'); const p=process.env.GH_API_PORT||3000; const req=http.request({method:'GET', host:'127.0.0.1', port:p, path:'/health', timeout:4000}, res=>{ if(res.statusCode===200) process.exit(0); else process.exit(1); }); req.on('error', ()=>process.exit(1)); req.end();"
 # Run the bundled server (no node_modules in runtime)
-CMD ["node", "build/bundle.cjs"]
+CMD ["node", "--no-deprecation", "build/bundle.cjs"]

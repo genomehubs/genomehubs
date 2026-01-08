@@ -206,32 +206,6 @@ try {
   } else {
     handlersMapSource = "bundled-import";
   }
-  try {
-    if (handlersMap) {
-      const keys = Object.keys(handlersMap);
-      const sampleKeys = keys.slice(0, 5);
-      const sampleTypes = sampleKeys.map((k) => [k, typeof handlersMap[k]]);
-      const reportType = typeof handlersMap["api/v2/routes/report"];
-      const countType = typeof handlersMap["api/v2/routes/count"];
-      console.log(
-        "HANDLERS_MAP:",
-        JSON.stringify({
-          source: handlersMapSource,
-          keyCount: keys.length,
-          sample: sampleTypes,
-          reportType,
-          countType,
-        })
-      );
-    } else {
-      console.log(
-        "HANDLERS_MAP:",
-        JSON.stringify({ source: handlersMapSource })
-      );
-    }
-  } catch (e) {
-    // best-effort logging only
-  }
   // custom resolver: expects handlersPath to be the project src root; module keys are relative to src
   const staticResolver = (handlersPath, route, apiDoc) => {
     const schema =
@@ -242,38 +216,6 @@ try {
       schema["x-eov-operation-han dler"] ||
       schema["x-eov-operation-handler"] ||
       schema["x-eov-operation-handler"];
-    // debug logging to inspect what handlersMap contains
-    try {
-      if (baseName) {
-        const keyDbg = baseName;
-        const value = handlersMap && handlersMap[keyDbg];
-        console.log("OP_HANDLER_DEBUG: baseName=", baseName);
-        console.log("OP_HANDLER_DEBUG: key=", keyDbg);
-        console.log("OP_HANDLER_DEBUG: valueType=", typeof value);
-        if (value && typeof value === "object") {
-          try {
-            console.log("OP_HANDLER_DEBUG: valueKeys=", Object.keys(value));
-          } catch (e) {}
-          if (value && value.default) {
-            console.log(
-              "OP_HANDLER_DEBUG: value.defaultType=",
-              typeof value.default
-            );
-            try {
-              console.log(
-                "OP_HANDLER_DEBUG: value.defaultKeys=",
-                Object.keys(value.default)
-              );
-            } catch (e) {}
-          }
-        }
-      }
-    } catch (err) {
-      console.log(
-        "OP_HANDLER_DEBUG: resolver logging error",
-        err && err.message
-      );
-    }
     // helper: unwrap nested default exports (common after bundling / ESM interop)
     const unwrapExport = (m) => {
       let cur = m;
@@ -311,42 +253,30 @@ try {
         try {
           const fnName =
             schema && (schema["x-eov-operation-id"] || schema["operationId"]);
-          console.log("OP_HANDLER_DEBUG: fnName=", fnName);
           if (fnName && mod) {
             // 1) Named export on the module namespace
             if (typeof mod[fnName] === "function") {
-              console.log("OP_HANDLER_DEBUG: resolvedToNamedExport=", fnName);
               return mod[fnName];
             }
             // 2) Named export on the default export (common when CJS->ESM interop happened)
             if (mod.default && typeof mod.default[fnName] === "function") {
-              console.log(
-                "OP_HANDLER_DEBUG: resolvedToDefaultNamedExport=",
-                fnName
-              );
               return mod.default[fnName];
             }
           }
         } catch (e) {
-          console.log(
-            "OP_HANDLER_DEBUG: named-export check failed",
-            e && e.message
-          );
+          // ignore named export resolution errors
         }
 
         // Handler may be exported directly as a function (CJS) or as default (ESM interop)
         try {
           // quick resolution attempts (prefer explicit names)
           if (typeof mod === "function") {
-            console.log("OP_HANDLER_DEBUG: using direct function export");
             return mod;
           }
           if (mod && typeof mod.default === "function") {
-            console.log("OP_HANDLER_DEBUG: using default function export");
             return mod.default;
           }
           if (mod && typeof mod.handler === "function") {
-            console.log("OP_HANDLER_DEBUG: using handler property export");
             return mod.handler;
           }
 
@@ -356,7 +286,6 @@ try {
               (k) => typeof mod[k] === "function"
             );
             if (fnKey) {
-              console.log("OP_HANDLER_DEBUG: pickedExport=", fnKey);
               return mod[fnKey];
             }
             // try inside default namespace too
@@ -365,16 +294,12 @@ try {
                 (k) => typeof mod.default[k] === "function"
               );
               if (inner) {
-                console.log("OP_HANDLER_DEBUG: pickedDefaultExport=", inner);
                 return mod.default[inner];
               }
             }
           }
         } catch (err) {
-          console.log(
-            "OP_HANDLER_DEBUG: fallback resolution failed",
-            err && err.message
-          );
+          // ignore fallback resolution errors
         }
 
         // If we reach here we didn't find a function to return synchronously.
@@ -382,7 +307,6 @@ try {
         // request-time and call the resolved function (so express-openapi-validator
         // always receives a function). This avoids the validator receiving an object
         // and causing the "argument handler must be a function" error.
-        console.log("OP_HANDLER_DEBUG: creating lazy wrapper for handler", key);
         return function lazyOperationHandler(req, res, next) {
           try {
             // prefer operation-specific name if available
@@ -427,7 +351,6 @@ try {
             }
 
             const msg = `Operation handler function not found for key=${key} fnName=${fnName}`;
-            console.log("OP_HANDLER_DEBUG: wrapper missing function", msg);
             next(new Error(msg));
           } catch (err) {
             next(err);
