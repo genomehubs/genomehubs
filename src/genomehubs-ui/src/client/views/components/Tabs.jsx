@@ -53,7 +53,11 @@ const Tabs = ({ group = "tabs" }) => {
       return <nav className={css}>{props.children}</nav>;
     },
     li: (props) => {
-      let routeName = props.children[0].replace(/\r?\n$/, "");
+      let tabChildren = props.children;
+      if (!Array.isArray(tabChildren)) {
+        tabChildren = [tabChildren];
+      }
+      let routeName = tabChildren[0].replace(/\r?\n$/, "");
       if (routeName.match(/\+/)) {
         return (
           <TabGroup

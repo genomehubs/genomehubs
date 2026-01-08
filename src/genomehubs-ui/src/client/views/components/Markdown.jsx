@@ -1,4 +1,5 @@
-import React, { createElement, useEffect, useRef, useState } from "react";
+import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import React, { useEffect, useRef, useState } from "react";
 import { basename, siteName } from "../reducers/location";
 import {
   centerContent as centerContentStyle,
@@ -57,9 +58,8 @@ import rehypeRaw from "rehype-raw";
 import rehypeReact from "rehype-react";
 import remarkDirective from "remark-directive";
 import remarkParse from "remark-parse";
-import remarkReact from "remark-react";
 import remarkRehype from "remark-rehype";
-import unified from "unified";
+import { unified } from "unified";
 import { visit } from "unist-util-visit";
 import withPages from "../hocs/withPages";
 import withStyles from "@mui/styles/withStyles";
@@ -522,11 +522,14 @@ export function compile(val, components = RehypeComponentsList()) {
     .use(gfm)
     .use(remarkDirective)
     .use(htmlDirectives)
-    .use(remarkRehype)
+    .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
     .use(rehypeReact, {
-      createElement,
+      Fragment,
+      jsx,
+      jsxs,
       components,
+      passNode: true,
     });
 
   const ast = processor.runSync(processor.parse(val));
@@ -551,7 +554,11 @@ export function htmlDirectives() {
 
   function ondirective(node, index) {
     let data = node.data || (node.data = {});
-    let hast = h(node.name, node.attributes);
+    // Sanitize tag name: ensure valid HTML tag or fallback to span
+    const isValidTagName = (name) =>
+      typeof name === "string" && /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(name);
+    const tagName = isValidTagName(node.name) ? node.name : "span";
+    let hast = h(tagName, node.attributes);
     data.hName = hast.tagName;
     data.hProperties = hast.properties;
     if (data.hName == "report") {
