@@ -1,0 +1,12 @@
+# Exclude files not needed in the Docker build context
+node_modules
+npm-debug.log
+.DS_Store
+.git
+.gitignore
+.github
+coverage
+logs
+*.log
+build
+# Let the container builder create its own build/; avoid copying host build

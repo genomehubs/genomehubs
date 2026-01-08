@@ -6,11 +6,41 @@ const path = require("path");
 
 (async () => {
   const outdir = path.resolve(__dirname, "..", "build");
+  const srcApi = path.resolve(__dirname, "..", "src", "api");
+  const buildApi = path.resolve(outdir, "api");
   if (!fs.existsSync(outdir)) fs.mkdirSync(outdir, { recursive: true });
+  // Always copy the API sources into the build output so bundled code can require
+  // runtime helpers and route modules that are resolved relative to build/.
+  try {
+    // remove any existing build/api and replace with fresh copy
+    if (fs.existsSync(buildApi)) {
+      fs.rmSync(buildApi, { recursive: true, force: true });
+    }
+    // copy tree
+    const copyDir = (src, dest) => {
+      if (!fs.existsSync(src)) return;
+      if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+      for (const name of fs.readdirSync(src)) {
+        const s = path.join(src, name);
+        const d = path.join(dest, name);
+        const st = fs.statSync(s);
+        if (st.isDirectory()) copyDir(s, d);
+        else fs.copyFileSync(s, d);
+      }
+    };
+    copyDir(srcApi, buildApi);
+    // copy top-level api spec if present
+    const apiSpecSrc = path.resolve(__dirname, "..", "src", "api-v2.yaml");
+    const apiSpecDest = path.join(outdir, "api-v2.yaml");
+    if (fs.existsSync(apiSpecSrc)) fs.copyFileSync(apiSpecSrc, apiSpecDest);
+  } catch (e) {
+    console.warn('Warning: failed to copy API sources to build/:', e && e.message);
+  }
   try {
     await esbuild.build({
       entryPoints: [path.resolve(__dirname, "..", "src", "app.js")],
       bundle: true,
+      minify: true,
       platform: "node",
       target: ["node24"],
       format: "cjs",

@@ -1,0 +1,29 @@
+# Global dockerignore for repository-root builds
+# Source control and metadata
+.git
+.gitignore
+.github
+
+# Node artifacts
+**/node_modules
+**/npm-debug.log
+**/yarn-error.log
+**/.pnpm-store
+
+# Build outputs and caches
+**/build
+**/dist
+**/.cache
+coverage
+
+# Local logs and temp files
+**/logs
+**/*.log
+.DS_Store
+
+# Large, unused directories for API image
+rendered
+downloads
+render
+packaged-ui
+ci

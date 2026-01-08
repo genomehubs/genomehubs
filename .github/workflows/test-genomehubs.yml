@@ -19,21 +19,23 @@ jobs:
           name: genomehubs-ui
           path: ./dist/*
 
-  package-api:
+  build-api:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: "16"
-      - run: npm install -g pkg
-      - run: |
-          sed -i '/"node16-macos-/d;s/"node16-linux-x64",/"node16-linux"/' src/genomehubs-api/package.json
-          ./package-api.sh
+          node-version: "24"
+      - name: Generate handlers and build bundle
+        working-directory: ./src/genomehubs-api
+        run: |
+          npm ci
+          node scripts/generate-operation-handlers.cjs src/generated
+          npm run build:bundle
       - uses: actions/upload-artifact@v4
         with:
-          name: genomehubs-api
-          path: ./dist/*
+          name: genomehubs-api-bundle
+          path: ./src/genomehubs-api/build/*
 
   package-genomehubs-linux:
     runs-on: ubuntu-latest
@@ -60,7 +62,7 @@ jobs:
   run-test-fill:
     runs-on: self-hosted
     needs:
-      - package-api
+      - build-api
       - package-ui
       - package-genomehubs-linux
     defaults:
@@ -74,8 +76,10 @@ jobs:
           path: ./dist
       - name: move wheel file
         run: mv dist/genomehubs-linux/*linux*.whl src/docker/test
-      - name: move api executable
-        run: mv dist/genomehubs-api/genomehubs-api src/docker/test/genomehubs-api-linux
+      - name: move api bundle
+        run: |
+          mkdir -p src/docker/test/api-bundle
+          mv dist/genomehubs-api-bundle/* src/docker/test/api-bundle/
       - name: Build docker image
         working-directory: ./src/docker/test
         run: docker build . -t genomehubs

@@ -24,21 +24,23 @@ jobs:
           name: genomehubs-ui
           path: ./dist/*
 
-  package-api:
+  build-api:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: "18"
-      - run: npm install -g pkg
-      - run: |
-          ./package-api.sh
-          mv ./dist/genomehubs-api ./dist/genomehubs-api-linux || exit 0
+          node-version: "24"
+      - name: Generate handlers and build bundle
+        working-directory: ./src/genomehubs-api
+        run: |
+          npm ci
+          node scripts/generate-operation-handlers.cjs src/generated
+          npm run build:bundle
       - uses: actions/upload-artifact@v4
         with:
-          name: genomehubs-api
-          path: ./dist/*
+          name: genomehubs-api-bundle
+          path: ./src/genomehubs-api/build/*
 
   package-genomehubs-linux:
     runs-on: ubuntu-latest
@@ -84,7 +86,7 @@ jobs:
   create-github-release:
     runs-on: ubuntu-latest
     needs:
-      - package-api
+      - build-api
       - package-ui
       - package-genomehubs-linux
       # - package-genomehubs-macos
@@ -94,7 +96,7 @@ jobs:
           path: ./tmp
       - run: |
           mkdir -p dist
-          mv tmp/genomehubs-api/* dist/
+          mv tmp/genomehubs-api-bundle/bundle.cjs dist/genomehubs-api-bundle.cjs || true
           mv tmp/genomehubs-ui/* dist/
           mv tmp/genomehubs-linux/*gz dist/
           rm -rf tmp
@@ -246,13 +248,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v4
-        with:
-          name: genomehubs-api
-          path: ./dist
-      - run: |
-          mv dist/genomehubs-api-linux src/docker/api/
-          rm -rf dist/*
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -266,7 +261,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: src/docker/api
+          context: .
+          file: src/docker/api/Dockerfile
           push: true
           tags: genomehubs/genomehubs-api:${{ env.VERSION }}, genomehubs/genomehubs-api:latest
           labels: ${{ steps.meta.outputs.labels }}

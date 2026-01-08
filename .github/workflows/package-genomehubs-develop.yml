@@ -21,7 +21,7 @@ jobs:
           name: genomehubs-ui
           path: ./dist/*
 
-  package-api:
+  build-api:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -29,15 +29,17 @@ jobs:
           ref: ${{github.ref}}
       - uses: actions/setup-node@v3
         with:
-          node-version: "18"
-      - run: npm install -g pkg
-      - run: |
-          ./package-api.sh
-          mv ./dist/genomehubs-api ./dist/genomehubs-api-linux || exit 0
+          node-version: "24"
+      - name: Generate handlers and build bundle
+        working-directory: ./src/genomehubs-api
+        run: |
+          npm ci
+          node scripts/generate-operation-handlers.cjs src/generated
+          npm run build:bundle
       - uses: actions/upload-artifact@v4
         with:
-          name: genomehubs-api
-          path: ./dist/*
+          name: genomehubs-api-bundle
+          path: ./src/genomehubs-api/build/*
 
   package-genomehubs-linux:
     runs-on: ubuntu-latest
@@ -158,17 +160,10 @@ jobs:
 
   build-and-push-api:
     runs-on: ubuntu-latest
-    needs: package-api
+    needs: build-api
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v4
-        with:
-          name: genomehubs-api
-          path: ./dist
-      - run: |
-          mv dist/genomehubs-api-linux src/docker/api/
-          rm -rf dist/*
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -182,7 +177,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: src/docker/api
+          context: .
+          file: src/docker/api/Dockerfile
           push: true
           tags: genomehubs/genomehubs-api:develop
           labels: ${{ steps.meta.outputs.labels }}
@@ -288,7 +284,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - package-genomehubs-linux
-      - package-api
+      - build-api
       - package-ui
     steps:
       - name: Checkout
