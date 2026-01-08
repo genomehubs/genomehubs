@@ -6,14 +6,14 @@ import { logError } from "../functions/logger.js";
 
 const locateFile = async (params) => {
   let response = await getRecordsById({ ...params, result: "file" });
-  let record = response.records[0].record;
+  let { record } = response.records[0];
   let path = `${config.hubPath}/${record.location}`;
   if (params.preview) {
     if (!record.preview_name) {
       return false;
     }
     let file = `${path}/${record.preview_name}`;
-    let fileName = params.filename ? params.filename : record.preview_name;
+    let fileName = params.filename || record.preview_name;
     try {
       await fs.access(file);
       let fileStream = createReadStream(file);
@@ -24,7 +24,7 @@ const locateFile = async (params) => {
   }
   if (record.name) {
     let file = `${path}/${record.name}`;
-    let fileName = params.filename ? params.filename : record.name;
+    let fileName = params.filename || record.name;
     try {
       await fs.access(file);
       let fileStream = createReadStream(file);

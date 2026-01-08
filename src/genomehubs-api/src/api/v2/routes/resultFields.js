@@ -11,8 +11,7 @@ export const getResultFields = async (req, res) => {
   let status = {};
   const q = req.expandedQuery || req.query || {};
   let release = q.release || config.release;
-  let hub = config.hub;
-  let source = config.source;
+  let { hub, source } = config;
   try {
     ({ typesMap: fields } = await attrTypes({
       ...q,
