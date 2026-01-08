@@ -12,7 +12,7 @@ import MuiDialogContent from "@mui/material/DialogContent";
 import PublishIcon from "@mui/icons-material/Publish";
 import SaveIcon from "@mui/icons-material/SaveAlt";
 import YamlEditor from "@focus-reactive/react-yaml";
-import { compose } from "recompose";
+import { compose } from "redux";
 import qs from "../functions/qs";
 import { useLocalStorage } from "usehooks-ts";
 import withSearchIndex from "../hocs/withSearchIndex";

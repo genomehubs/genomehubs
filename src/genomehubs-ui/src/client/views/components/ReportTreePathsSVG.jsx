@@ -9,7 +9,7 @@ import {
 
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { scaleLog } from "d3-scale";
 import { useLongPress } from "use-long-press";
 import withTypes from "../hocs/withTypes";

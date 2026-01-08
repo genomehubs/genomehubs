@@ -1,5 +1,5 @@
 import React from "react";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { h } from "hastscript";
 import { motion } from "motion/react";
 import withColors from "#hocs/withColors";

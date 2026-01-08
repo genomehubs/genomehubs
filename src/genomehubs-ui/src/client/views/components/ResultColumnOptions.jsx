@@ -14,7 +14,7 @@ import React from "react";
 import Select from "@mui/material/Select";
 import SettingsButton from "./SettingsButton";
 import { TextField } from "@mui/material";
-import { compose } from "recompose";
+import { compose } from "redux";
 import expandFieldList from "../functions/expandFieldList";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";

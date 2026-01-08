@@ -7,7 +7,7 @@ import {
 
 import ReportFull from "./ReportFull";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchLookup from "../hocs/dispatchLookup";
 import qs from "../functions/qs";
 import { sortReportQuery } from "../selectors/report";

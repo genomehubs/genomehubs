@@ -7,7 +7,7 @@ import LepbaseLogo from "./LogoLepbase";
 import MdbLogo from "./LogoMolluscDB";
 import React from "react";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { fixedArSixteenNine as fixedArSixteenNineStyle } from "./Styles.scss";
 import withColors from "#hocs/withColors";
 import withTheme from "../hocs/withTheme";

@@ -14,7 +14,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import SettingsButton from "./SettingsButton";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import { useLocalStorage } from "usehooks-ts";

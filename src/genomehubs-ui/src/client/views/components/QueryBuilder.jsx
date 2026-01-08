@@ -15,7 +15,7 @@ import Switch from "@mui/material/Switch";
 import Tooltip from "./Tooltip";
 import Typography from "@mui/material/Typography";
 import VariableFilter from "./VariableFilter";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchLookup from "../hocs/dispatchLookup";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";

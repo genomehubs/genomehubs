@@ -8,7 +8,7 @@ import { useLocation, useNavigate } from "@reach/router";
 import Grid from "@mui/material/Grid2";
 import PointInfo from "./PointInfo";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchMessage from "../hocs/dispatchMessage";
 import { fadeColor } from "../functions/fadeColor";
 import qs from "../functions/qs";

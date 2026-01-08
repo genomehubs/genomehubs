@@ -5,7 +5,7 @@ import Grid from "@mui/material/Grid2";
 import Report from "./Report";
 import ReportTools from "./ReportTools";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchReport from "../hocs/dispatchReport";
 import { markdown as markdownStyle } from "./Styles.scss";
 import qs from "qs";

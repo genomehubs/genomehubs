@@ -7,7 +7,7 @@ import {
 
 import Markdown from "./Markdown";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 
 const TextPanel = ({ pageId, ...overrideStyles }) => {
   let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, textPanelStyle);

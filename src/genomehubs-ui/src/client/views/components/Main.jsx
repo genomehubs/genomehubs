@@ -13,7 +13,7 @@ import SearchPage from "./SearchPage";
 import SourcesPage from "./SourcesPage";
 import TypesPage from "./TypesPage";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { fillParent as fillParentStyle } from "./Styles.scss";
 import withRoutes from "../hocs/withRoutes";
 import withSiteName from "#hocs/withSiteName";

@@ -10,7 +10,7 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import TranslatedValue from "./TranslatedValue";
 import { autoWidth as autoWidthStyle } from "./Styles.scss";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchMessage from "../hocs/dispatchMessage";
 import withReportTerm from "../hocs/withReportTerm";
 import withSiteName from "#hocs/withSiteName";

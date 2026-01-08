@@ -11,7 +11,7 @@ import FileCopyIcon from "@mui/icons-material/FileCopy";
 import IconButton from "@mui/material/IconButton";
 import SiteName from "./SiteName";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withColors from "#hocs/withColors";
 import withSiteName from "#hocs/withSiteName";
 

@@ -5,7 +5,7 @@ import FindInPageIcon from "@mui/icons-material/FindInPage";
 import Grid from "@mui/material/Grid2";
 import SearchIcon from "@mui/icons-material/Search";
 import TextField from "@mui/material/TextField";
-import { compose } from "recompose";
+import { compose } from "redux";
 import qs from "../functions/qs";
 import { setSearchTerm } from "../reducers/search";
 import { useNavigate } from "@reach/router";

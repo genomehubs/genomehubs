@@ -10,7 +10,7 @@ import Chip from "@mui/material/Chip";
 import Grid from "@mui/material/Grid2";
 import ReportFull from "./ReportFull";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchReport from "../hocs/dispatchReport";
 import qs from "../functions/qs";
 import { sortReportQuery } from "../selectors/report";

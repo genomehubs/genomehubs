@@ -2,7 +2,7 @@ import AttributeModal from "./AttributeModal";
 import DialogContent from "@mui/material/DialogContent";
 import Modal from "@mui/material/Modal";
 import React from "react";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
 import withRecord from "../hocs/withRecord";
 

@@ -4,7 +4,7 @@ import React from "react";
 // import Pagination from "@mui/lab/Pagination";
 import TablePagination from "@mui/material/TablePagination";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";

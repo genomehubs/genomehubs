@@ -14,7 +14,7 @@ import L from "leaflet";
 import Map from "./Map";
 import MapLegend from "./MapLegend";
 import MarkerComponent from "./MarkerComponent";
-import { compose } from "recompose";
+import { compose } from "redux";
 import countriesGeoJson from "../geojson/countries.geojson";
 import dispatchMessage from "../../hocs/dispatchMessage";
 import { mixColor } from "../../functions/mixColor";

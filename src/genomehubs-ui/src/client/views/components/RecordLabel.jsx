@@ -8,7 +8,7 @@ import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import Tooltip from "./Tooltip";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import compareValues from "../functions/compareValues";
-import { compose } from "recompose";
+import { compose } from "redux";
 import getContrast from "../functions/getContrast";
 import getPrimaryAssemblyId from "../functions/getPrimaryAssemblyId";
 import { recordLinkIcon as recordLinkIconStyle } from "./Styles.scss";

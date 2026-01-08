@@ -19,7 +19,7 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchReport from "../hocs/dispatchReport";
 import { getSuggestedTerm } from "../reducers/search";
 import qs from "../functions/qs";

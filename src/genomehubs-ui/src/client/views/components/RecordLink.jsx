@@ -4,7 +4,7 @@ import { Chip } from "@mui/material";
 import LaunchIcon from "@mui/icons-material/Launch";
 import Tooltip from "./Tooltip";
 import compareValues from "../functions/compareValues";
-import { compose } from "recompose";
+import { compose } from "redux";
 import getPrimaryAssemblyId from "../functions/getPrimaryAssemblyId";
 import { recordLinkIcon as recordLinkIconStyle } from "./Styles.scss";
 import withApi from "../hocs/withApi";

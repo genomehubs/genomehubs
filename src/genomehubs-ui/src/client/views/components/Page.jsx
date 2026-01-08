@@ -7,7 +7,7 @@ import SearchBoxWrapper from "./SearchBoxWrapper";
 import SearchHeaderButtons from "./SearchHeaderButtons";
 import SearchTips from "./SearchTips";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchColors from "../hocs/dispatchColors";
 import makeStyles from "@mui/styles/makeStyles";
 import { useLocation } from "@reach/router";

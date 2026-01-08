@@ -9,7 +9,7 @@ import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import StaticPlotFile from "./StaticPlotFile";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withApi from "../hocs/withApi";
 import withFiles from "../hocs/withFiles";
 import withFilesByAnalysisId from "../hocs/withFilesByAnalysisId";

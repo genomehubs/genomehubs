@@ -32,7 +32,7 @@ import TaxonSummaryPanel from "./TaxonSummaryPanel";
 import Tooltip from "./Tooltip";
 import WordCloud from "./WordCloud";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { formatter } from "../functions/formatter";
 import qs from "../functions/qs";
 import withRecord from "../hocs/withRecord";

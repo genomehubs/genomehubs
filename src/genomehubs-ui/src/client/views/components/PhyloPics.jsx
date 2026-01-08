@@ -13,7 +13,7 @@ import Konva from "konva";
 import PhyloPic from "./PhyloPic";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import truncate from "../functions/truncate";
 import useImage from "use-image";
 import withPhylopicsById from "../hocs/withPhylopicsById";

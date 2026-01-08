@@ -6,7 +6,7 @@ import FormLabel from "@mui/material/FormLabel";
 import Grid from "@mui/material/Grid2";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withReportTerm from "../hocs/withReportTerm";
 
 export const ReportSelect = ({ reportSelect, setReportSelect }) => {

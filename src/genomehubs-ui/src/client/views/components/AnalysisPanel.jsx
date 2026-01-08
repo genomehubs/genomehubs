@@ -15,7 +15,7 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import qs from "../functions/qs";
 import withAnalysesByAnyId from "../hocs/withAnalysesByAnyId";
 import withAnalysis from "../hocs/withAnalysis";

@@ -14,7 +14,7 @@ import QrCodeIcon from "@mui/icons-material/QrCode";
 import Taxonomy from "./Taxonomy";
 import Tooltip from "./Tooltip";
 import bbsrcLogo from "./img/bbsrc-logo.png";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchRecord from "../hocs/dispatchRecord";
 import dispatchTypes from "../hocs/dispatchTypes";
 import dtolLogo from "./img/dtol-logo.png";

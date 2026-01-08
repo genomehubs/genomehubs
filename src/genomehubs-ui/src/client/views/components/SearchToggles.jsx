@@ -17,7 +17,7 @@ import Switch from "@mui/material/Switch";
 import Terms from "./Terms";
 import TocIcon from "@mui/icons-material/Toc";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchLookup from "../hocs/dispatchLookup";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";

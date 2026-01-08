@@ -9,7 +9,7 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import Logo from "./Logo";
 import MenuItem from "@mui/material/MenuItem";
 import Popover from "@mui/material/Popover";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
 import withArchive from "../hocs/withArchive";
 import withSiteName from "#hocs/withSiteName";

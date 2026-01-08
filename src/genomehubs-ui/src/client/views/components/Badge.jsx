@@ -25,7 +25,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import PhyloPics from "./PhyloPics";
 import classNames from "classnames";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { useNavigate } from "@reach/router";
 import withBrowse from "../hocs/withBrowse";
 import withDescendantsById from "../hocs/withDescendantsById";

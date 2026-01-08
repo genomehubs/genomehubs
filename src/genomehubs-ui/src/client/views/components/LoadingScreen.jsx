@@ -9,7 +9,7 @@ import {
 } from "./Styles.scss";
 
 import Logo from "./Logo";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withLoading from "../hocs/withLoading";
 import withSiteName from "#hocs/withSiteName";
 

@@ -4,7 +4,7 @@ import AttributePanel from "./AttributePanel";
 import Grid from "@mui/material/Grid2";
 import Paper from "@mui/material/Paper";
 import ResultColumnOptions from "./ResultColumnOptions";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import withRecord from "../hocs/withRecord";

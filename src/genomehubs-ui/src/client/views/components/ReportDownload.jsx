@@ -5,7 +5,7 @@ import DownloadButton from "./DownloadButton";
 import Grid from "@mui/material/Grid2";
 import JSZip from "jszip";
 import React from "react";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchReport from "../hocs/dispatchReport";
 import mergeImages from "merge-images";
 import qs from "../functions/qs";

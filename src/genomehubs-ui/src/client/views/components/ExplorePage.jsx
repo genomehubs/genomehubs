@@ -4,7 +4,7 @@ import Page from "./Page";
 import ResultPanel from "./ResultPanel";
 import TextPanel from "./TextPanel";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchLookup from "../hocs/dispatchLookup";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";

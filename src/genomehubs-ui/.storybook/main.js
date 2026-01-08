@@ -12,10 +12,8 @@ const config = {
 
   addons: [
     "@storybook/addon-webpack5-compiler-swc",
-    "@storybook/addon-essentials",
     "@chromatic-com/storybook",
     "@storybook/addon-themes",
-    "@storybook/addon-interactions",
     "@storybook/preset-scss",
     {
       name: "@storybook/addon-styling-webpack",
@@ -94,7 +92,7 @@ const config = {
         ],
       },
     },
-    "@storybook/addon-mdx-gfm",
+    "@storybook/addon-docs"
   ],
 
   framework: {

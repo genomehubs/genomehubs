@@ -14,7 +14,7 @@ import {
 import InfoCard from "./InfoCard";
 import { Link } from "@reach/router";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 
 const InfoPane = (props) => {
   const [hover, setHover] = useState(false);

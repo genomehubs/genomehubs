@@ -14,7 +14,7 @@ import TaxonPanel from "./TaxonPanel";
 import TaxonSummaryPanel from "./TaxonSummaryPanel";
 import TextPanel from "./TextPanel";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchLookup from "../hocs/dispatchLookup";
 import { getRecordIsFetching } from "../reducers/record";
 import qs from "../functions/qs";

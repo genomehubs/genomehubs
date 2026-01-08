@@ -3,7 +3,7 @@ import React, { memo, useRef, useState } from "react";
 import AutoCompleteInput from "./AutoCompleteInput";
 import FormControl from "@mui/material/FormControl";
 import Grid from "@mui/material/Grid2";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
 import withInputQueries from "../hocs/withInputQueries";
 import withSearch from "../hocs/withSearch";

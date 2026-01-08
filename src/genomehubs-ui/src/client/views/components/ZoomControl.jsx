@@ -1,5 +1,5 @@
 import React from "react";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withGeography from "../hocs/withGeography";
 import withStableGeography from "../hocs/withStableGeography";
 

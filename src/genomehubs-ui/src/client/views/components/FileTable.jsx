@@ -9,7 +9,7 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { autoWidth as autoWidthStyle } from "./Styles.scss";
-import { compose } from "recompose";
+import { compose } from "redux";
 import formatter from "../functions/formatter";
 import makeStyles from "@mui/styles/makeStyles";
 import withApi from "../hocs/withApi";

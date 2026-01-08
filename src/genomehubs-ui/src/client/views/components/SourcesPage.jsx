@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 import Page from "./Page";
 import ReportFull from "./ReportFull";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchLookup from "../hocs/dispatchLookup";
 import qs from "../functions/qs";
 import { sortReportQuery } from "../selectors/report";

@@ -1,6 +1,6 @@
 import Markdown from "./Markdown";
 import React from "react";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withRecord from "../hocs/withRecord";
 
 const TaxonSummaryPanel = ({ record, taxonId, scientific_name }) => {

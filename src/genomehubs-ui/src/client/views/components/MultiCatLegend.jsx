@@ -3,7 +3,7 @@ import { Rectangle, Text } from "recharts";
 import React from "react";
 import Tooltip from "./Tooltip";
 import { active as activeStyle } from "./Styles.scss";
-import { compose } from "recompose";
+import { compose } from "redux";
 import formats from "../functions/formats";
 import stringLength from "../functions/stringLength";
 import withColors from "#hocs/withColors";

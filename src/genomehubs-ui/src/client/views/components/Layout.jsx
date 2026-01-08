@@ -9,7 +9,7 @@ import Main from "./Main";
 import ReportPage from "./ReportPage";
 import { Router } from "@reach/router";
 import SearchPage from "./SearchPage";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { fillParent as fillParentStyle } from "./Styles.scss";
 import makeStyles from "@mui/styles/makeStyles";
 import withSiteName from "#hocs/withSiteName";

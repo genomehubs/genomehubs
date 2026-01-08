@@ -2,7 +2,7 @@ import React, { Fragment, memo, useRef } from "react";
 
 import Page from "./Page";
 import TextPanel from "./TextPanel";
-import { compose } from "recompose";
+import { compose } from "redux";
 
 const Landing = () => {
   const componentRef = useRef();

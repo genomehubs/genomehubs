@@ -22,7 +22,7 @@ import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "./Tooltip";
 import { active as activeStyle } from "./Styles.scss";
 import axisScales from "../functions/axisScales";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { line as d3Line } from "d3-shape";
 import dispatchMessage from "../hocs/dispatchMessage";
 import { fadeColor } from "../functions/fadeColor";

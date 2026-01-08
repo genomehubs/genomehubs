@@ -5,7 +5,7 @@ import { FormControl } from "@mui/material";
 import MuiTableCell from "@mui/material/TableCell";
 import ResultFilterInput from "./ResultFilterInput";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";
 import withSearch from "../hocs/withSearch";

@@ -43,7 +43,7 @@ import ViewWeekIcon from "@mui/icons-material/ViewWeek";
 import ViewWeekOutlinedIcon from "@mui/icons-material/ViewWeekOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchRecord from "../hocs/dispatchRecord";
 import expandFieldList from "../functions/expandFieldList";
 import { formatter } from "../functions/formatter";

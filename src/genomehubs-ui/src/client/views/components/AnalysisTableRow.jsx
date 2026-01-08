@@ -9,7 +9,7 @@ import NavLink from "./NavLink";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchSetRecord from "../hocs/dispatchSetRecord";
 import makeStyles from "@mui/styles/makeStyles";
 import { useNavigate } from "@reach/router";

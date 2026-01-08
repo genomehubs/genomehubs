@@ -5,7 +5,7 @@ import Page from "./Page";
 import ReportPanel from "./ReportPanel";
 import ResultTable from "./ResultTable";
 import TextPanel from "./TextPanel";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchLookup from "../hocs/dispatchLookup";
 import equal from "deep-equal";
 import qs from "../functions/qs";

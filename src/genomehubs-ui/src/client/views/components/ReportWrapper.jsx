@@ -1,7 +1,7 @@
 import LaunchIcon from "@mui/icons-material/Launch";
 import React from "react";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { useNavigate } from "@reach/router";
 import withApi from "../hocs/withApi";
 import withSiteName from "#hocs/withSiteName";

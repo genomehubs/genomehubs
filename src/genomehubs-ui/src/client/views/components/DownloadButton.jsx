@@ -8,7 +8,7 @@ import GetAppIcon from "@mui/icons-material/GetApp";
 import MenuItem from "@mui/material/MenuItem";
 import MenuList from "@mui/material/MenuList";
 import Paper from "@mui/material/Paper";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withColors from "#hocs/withColors";
 import withTheme from "#hocs/withTheme";
 

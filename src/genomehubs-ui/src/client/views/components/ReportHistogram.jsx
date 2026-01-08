@@ -9,7 +9,7 @@ import Grid from "@mui/material/Grid2";
 import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "./Tooltip";
 import { active as activeStyle } from "./Styles.scss";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchMessage from "../hocs/dispatchMessage";
 import searchByCell from "../functions/searchByCell";
 import setColors from "../functions/setColors";

@@ -37,7 +37,7 @@ const store = configureStore({
     getDefaultMiddleware({
       immutableCheck: false,
       serializableCheck: false,
-    }).concat(thunkMiddleware, loadingMiddleWare),
+    }).concat(loadingMiddleWare),
 });
 
 export default store;

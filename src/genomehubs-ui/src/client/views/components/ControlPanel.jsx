@@ -10,7 +10,7 @@ import {
 import React from "react";
 import SearchPagination from "./SearchPagination";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withSearch from "../hocs/withSearch";
 
 const ControlPanel = ({ pagination }) => {

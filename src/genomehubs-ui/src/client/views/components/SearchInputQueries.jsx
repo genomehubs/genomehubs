@@ -2,7 +2,7 @@ import React, { memo, useEffect, useState } from "react";
 
 import Grid from "@mui/material/Grid2";
 import SearchInputQuery from "./SearchInputQuery";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
 import withInputQueries from "../hocs/withInputQueries";
 // import withLiveQuery from "../hocs/withLiveQuery";

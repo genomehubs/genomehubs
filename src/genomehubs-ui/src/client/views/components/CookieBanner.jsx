@@ -8,7 +8,7 @@ import IconButton from "@mui/material/IconButton";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import { banner as bannerStyle } from "./Styles.scss";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 

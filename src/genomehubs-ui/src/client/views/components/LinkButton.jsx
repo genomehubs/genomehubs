@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "@reach/router";
 import ColorButton from "./ColorButton";
 import LinkIcon from "@mui/icons-material/Link";
 import React from "react";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withSiteName from "#hocs/withSiteName";
 
 const LinkButton = ({ options, basename }) => {

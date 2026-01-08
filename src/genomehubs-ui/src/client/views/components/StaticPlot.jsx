@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 
 import StaticPlotFiles from "./StaticPlotFiles";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import getPrimaryAssemblyId from "../functions/getPrimaryAssemblyId";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";

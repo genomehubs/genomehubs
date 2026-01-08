@@ -5,7 +5,7 @@ import { Box } from "@mui/material";
 import ChipSearchBox from "./ChipSearch/ChipSearchBox";
 import Grid from "@mui/material/Grid2";
 import { Template } from "./Markdown";
-import { compose } from "recompose";
+import { compose } from "redux";
 // import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
 import { getSuggestedTerm } from "../reducers/search";
 import lookupFunction from "./ChipSearch/functions/lookupFunction";

@@ -1,7 +1,7 @@
 import Grid from "@mui/material/Grid2";
 import React from "react";
 import ReportLegend from "./ReportLegend";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withReportById from "../hocs/withReportById";
 
 export const ReportInfo = ({ reportById, report }) => {

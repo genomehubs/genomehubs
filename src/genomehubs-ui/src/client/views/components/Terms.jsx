@@ -3,7 +3,7 @@ import React, { memo } from "react";
 import Grid from "@mui/material/Grid2";
 import Markdown from "./Markdown";
 import NavLink from "./NavLink";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withSiteName from "#hocs/withSiteName";
 
 const Terms = ({ basename }) => {

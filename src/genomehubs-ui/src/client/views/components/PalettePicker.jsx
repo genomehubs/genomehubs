@@ -6,7 +6,7 @@ import {
 import Grid from "@mui/material/Grid2";
 import PalettePreview from "./PalettePreview";
 import React from "react";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
 import withColors from "#hocs/withColors";
 import withTheme from "#hocs/withTheme";

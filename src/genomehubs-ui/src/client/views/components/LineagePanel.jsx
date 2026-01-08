@@ -13,7 +13,7 @@ import {
 import React from "react";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchLookup from "../hocs/dispatchLookup";
 import { useNavigate } from "@reach/router";
 import withRecord from "../hocs/withRecord";

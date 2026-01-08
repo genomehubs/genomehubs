@@ -15,7 +15,7 @@ import { LineageList } from "./LineagePanel";
 import LineageSummaryPanel from "./LineageSummaryPanel";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchLookup from "../hocs/dispatchLookup";
 import qs from "../functions/qs";
 import withRecord from "../hocs/withRecord";

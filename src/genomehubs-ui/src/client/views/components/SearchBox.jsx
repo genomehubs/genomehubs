@@ -8,7 +8,7 @@ import SearchButton from "./SearchButton";
 import SearchInputQueries from "./SearchInputQueries";
 import SearchToggles from "./SearchToggles";
 import { Template } from "./Markdown";
-import { compose } from "recompose";
+import { compose } from "redux";
 // import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
 import { getSuggestedTerm } from "../reducers/search";
 import qs from "../functions/qs";

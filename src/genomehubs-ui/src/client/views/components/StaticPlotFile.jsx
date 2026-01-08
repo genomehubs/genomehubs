@@ -6,7 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import Modal from "@mui/material/Modal";
 import Skeleton from '@mui/material/Skeleton';
 import Typography from "@mui/material/Typography";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from '@mui/styles/makeStyles';
 import useResize from "../hooks/useResize";
 import useWindowDimensions from "../hooks/useWindowDimensions";

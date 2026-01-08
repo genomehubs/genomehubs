@@ -11,7 +11,7 @@ import ColorButton from "./ColorButton";
 import React from "react";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import didYouMean from "didyoumean2";
 import qs from "../functions/qs";
 import setColors from "../functions/setColors";

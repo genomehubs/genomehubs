@@ -13,7 +13,7 @@ import React from "react";
 import RecordLink from "./RecordLink";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { setLinkIcons } from "./ResultTable";
 import withColors from "#hocs/withColors";
 import withRecord from "../hocs/withRecord";

@@ -22,7 +22,7 @@ import QrCodeIcon from "@mui/icons-material/QrCode";
 import SearchIcon from "@mui/icons-material/Search";
 import Typography from "@mui/material/Typography";
 import YamlEditor from "@focus-reactive/react-yaml";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { downloadLink } from "./ReportDownload";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import JSONPretty from "react-json-pretty";
 import JSONPrettyMon from "react-json-pretty/dist/monikai";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withReportById from "../hocs/withReportById";
 
 export const ReportCode = ({ reportId, reportById, report, queryString }) => {

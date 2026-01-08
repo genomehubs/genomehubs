@@ -10,7 +10,7 @@ import AggregationIcon from "./AggregationIcon";
 import React from "react";
 import Tooltip from "./Tooltip";
 import classNames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import formatter from "../functions/formatter";
 import { useNavigate } from "@reach/router";
 import withSiteName from "#hocs/withSiteName";

@@ -5,7 +5,7 @@ import DisplayCount from "./DisplayCount";
 import LaunchIcon from "@mui/icons-material/Launch";
 import Tooltip from "./Tooltip";
 import compareValues from "../functions/compareValues";
-import { compose } from "recompose";
+import { compose } from "redux";
 import fetchCount from "../functions/fetchCount";
 import fetchFieldCount from "../functions/fetchFieldCount";
 import fetchValueCount from "../functions/fetchValueCount";

@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Grid from "@mui/material/Grid2";
 import PhylopicAttributions from "./PhylopicAttributions";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { reportCaption as reportCaptionStyle } from "./Styles.scss";
 import stringLength from "../functions/stringLength";
 import useResize from "../hooks/useResize";

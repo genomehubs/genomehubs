@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 
 import Tooltip from "./Tooltip";
 import { boldValue as boldValueStyle } from "./Styles.scss";
-import { compose } from "recompose";
+import { compose } from "redux";
 import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";

@@ -6,7 +6,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 import Grid from "@mui/material/Grid2";
 import Switch from "@mui/material/Switch";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import setColors from "../functions/setColors";
 import withColors from "#hocs/withColors";
 import withTheme from "../hocs/withTheme";

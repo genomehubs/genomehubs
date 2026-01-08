@@ -3,7 +3,7 @@ import { Link } from "@reach/router";
 import NavLink from "./NavLink";
 import React from "react";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import styles from "./Styles.scss";
 import { useLocation } from "@reach/router";
 import withSiteName from "#hocs/withSiteName";

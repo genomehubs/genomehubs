@@ -10,7 +10,7 @@ import SearchHeaderButtons from "./SearchHeaderButtons";
 import SiteName from "./SiteName";
 import Tabs from "./Tabs";
 import TabsFixed from "./TabsFixed";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withColors from "#hocs/withColors";
 import withTheme from "../hocs/withTheme";
 

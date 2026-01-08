@@ -7,7 +7,7 @@ import {
 import Markdown from "./Markdown";
 import NavLink from "./NavLink";
 import Tab from "./Tab";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withRoutes from "../hocs/withRoutes";
 
 const TabGroupComponent = ({

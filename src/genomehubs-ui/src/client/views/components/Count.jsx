@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { fieldCount, simpleCount, valueCount } from "../functions/resultCount";
 
 import DisplayCount from "./DisplayCount";
-import { compose } from "recompose";
+import { compose } from "redux";
 import formats from "../functions/formats";
 import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";

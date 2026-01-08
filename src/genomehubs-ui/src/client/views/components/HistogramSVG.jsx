@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 
 import Skeleton from "@mui/material/Skeleton";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { formatter } from "../functions/formatter";
 import { fullWidth as fullWidthStyle } from "./Styles.scss";
 import qs from "../functions/qs";

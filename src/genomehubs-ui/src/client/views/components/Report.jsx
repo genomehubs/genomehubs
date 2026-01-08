@@ -1,7 +1,7 @@
 import React, { memo, useRef } from "react";
 
 import ReportItem from "./ReportItem";
-import { compose } from "recompose";
+import { compose } from "redux";
 import qs from "../functions/qs";
 import { sortReportQuery } from "../selectors/report";
 import { useLocation } from "@reach/router";

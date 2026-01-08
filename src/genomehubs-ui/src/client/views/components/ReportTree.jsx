@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 import Grid from "@mui/material/Grid2";
 import ReportTreePaths from "./ReportTreePaths";
 import ReportTreeRings from "./ReportTreeRings";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchReport from "../hocs/dispatchReport";
 import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";

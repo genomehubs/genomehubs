@@ -27,7 +27,7 @@ import TableRow from "@mui/material/TableRow";
 import Tooltip from "./Tooltip";
 import ZoomControl from "./ZoomControl";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { formatter } from "../functions/formatter";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";

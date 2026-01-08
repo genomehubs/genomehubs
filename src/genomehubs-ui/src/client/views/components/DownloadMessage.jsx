@@ -4,7 +4,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import MuiAlert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withColors from "#hocs/withColors";
 import withController from "../hocs/withController";
 import withMessage from "../hocs/withMessage";

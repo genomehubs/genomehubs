@@ -9,7 +9,7 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from '@mui/styles/makeStyles';
 import useResize from "../hooks/useResize";
 import withStyles from '@mui/styles/withStyles';

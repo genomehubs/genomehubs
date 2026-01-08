@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 
 import NavLink from "./NavLink";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { tabDiv as tabDivStyle } from "./Styles.scss";
 import withRoutes from "../hocs/withRoutes";
 

@@ -16,7 +16,7 @@ import ReportTree from "./ReportTree";
 import ReportTypes from "./ReportTypes";
 import ReportWrapper from "./ReportWrapper";
 import ReportXPerRank from "./ReportXPerRank";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchMessage from "../hocs/dispatchMessage";
 import dispatchReport from "../hocs/dispatchReport";
 import { gridPropNames } from "../functions/propNames";

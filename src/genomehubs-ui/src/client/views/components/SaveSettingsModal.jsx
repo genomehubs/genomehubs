@@ -16,7 +16,7 @@ import SaveSettingsFavourites from "./SaveSettingsFavourites";
 import SaveSettingsMore from "./SaveSettingsMore";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import Typography from "@mui/material/Typography";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { favListingFooter as favListingFooterStyle } from "./Styles.scss";
 import makeStyles from "@mui/styles/makeStyles";
 import withSearchIndex from "../hocs/withSearchIndex";

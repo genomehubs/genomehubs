@@ -6,7 +6,7 @@ import {
 
 import Skeleton from "@mui/material/Skeleton";
 import { TagCloud } from "react-tagcloud";
-import { compose } from "recompose";
+import { compose } from "redux";
 import qs from "../functions/qs";
 import { useIntersectionObserver } from "usehooks-ts";
 import { useNavigate } from "@reach/router";

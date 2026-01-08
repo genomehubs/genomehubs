@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useState } from "react";
 
 import BasicMenu from "./BasicMenu";
-import { compose } from "recompose";
+import { compose } from "redux";
 import dispatchMessage from "../hocs/dispatchMessage";
 import dispatchRecord from "../hocs/dispatchRecord";
 import qs from "../functions/qs";

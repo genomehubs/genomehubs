@@ -1,6 +1,6 @@
 import Grid from "@mui/material/Grid2";
 import React from "react";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { link as linkStyle } from "./Styles.scss";
 import qs from "../functions/qs";
 import { useNavigate } from "@reach/router";

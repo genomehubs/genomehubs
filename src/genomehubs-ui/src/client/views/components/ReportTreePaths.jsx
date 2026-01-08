@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import KonvaTooltip from "./KonvaTooltip";
 import PhyloPics from "./PhyloPics";
 import Skeleton from "@mui/material/Skeleton";
-import { compose } from "recompose";
+import { compose } from "redux";
 import formats from "../functions/formats";
 import { mixColor } from "../functions/mixColor";
 import { scaleLinear } from "d3-scale";

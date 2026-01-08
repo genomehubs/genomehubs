@@ -12,7 +12,7 @@ import FeatureSummaryPanel from "./FeatureSummaryPanel";
 import Grid from "@mui/material/Grid2";
 import { Template } from "./Markdown";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withRecord from "../hocs/withRecord";
 
 const FeaturePanel = ({

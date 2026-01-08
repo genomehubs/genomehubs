@@ -18,7 +18,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 import Grid from "@mui/material/Grid2";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { format } from "d3-format";
 import qs from "../functions/qs";
 import setColors from "../functions/setColors";

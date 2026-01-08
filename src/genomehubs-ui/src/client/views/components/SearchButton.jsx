@@ -8,7 +8,7 @@ import Paper from "@mui/material/Paper";
 import React from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withSearch from "../hocs/withSearch";
 import withTaxonomy from "../hocs/withTaxonomy";
 

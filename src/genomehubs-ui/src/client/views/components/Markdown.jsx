@@ -48,7 +48,7 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import YAML from "js-yaml";
 import classNames from "classnames";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import gfm from "remark-gfm";
 import { gridPropNames } from "../functions/propNames";
 import { h } from "hastscript";
