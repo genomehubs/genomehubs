@@ -9,7 +9,7 @@ import {
 import { useLocation, useNavigate } from "@reach/router";
 
 import AssemblySummaryPanel from "./AssemblySummaryPanel";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import { NamesList } from "./NamesPanel";
 import classnames from "classnames";
 import { compose } from "redux";

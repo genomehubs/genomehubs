@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import Badge from "@mui/material/Badge";
 import DescriptionIcon from "@mui/icons-material/Description";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import HeightIcon from "@mui/icons-material/Height";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";

@@ -1,7 +1,7 @@
 import React, { memo, useEffect } from "react";
 
 import FileModal from "./FileModal";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import NavLink from "./NavLink";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";

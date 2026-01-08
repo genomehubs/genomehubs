@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { useCookies, withCookies } from "react-cookie";
 
-import { Button } from "@mui/material";
+import { Button, useTheme } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import Grid from "@mui/material/Grid2";
+import ColorButton from "./ColorButton";
+import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import { banner as bannerStyle } from "./Styles.scss";
 import { compose } from "redux";
-import makeStyles from "@mui/styles/makeStyles";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 
 const showBanner = COOKIE_BANNER == "true";
@@ -21,21 +21,6 @@ function getModalStyle() {
     transform: "translate(-50%, -50%)",
   };
 }
-
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    position: "absolute",
-    backgroundColor: theme.palette.background.paper,
-    border: "none",
-    boxShadow: "none",
-    padding: "10px",
-    overflow: "visible",
-    "&:focus": {
-      outline: "none",
-    },
-  },
-  img: {},
-}));
 
 const modalContent = ({
   meta,
@@ -106,7 +91,7 @@ const modalContent = ({
 };
 
 export const CookieBanner = ({ meta, apiUrl, link, children }) => {
-  const classes = useStyles();
+  const theme = useTheme();
   const [cookies, setCookie, removeCookie] = useCookies(["cookieConsent"]);
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [modalStyle] = React.useState(getModalStyle);
@@ -135,7 +120,17 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
       container
       direction="column"
       style={{ ...modalStyle, height, width }}
-      className={classes.paper}
+      sx={{
+        position: "absolute",
+        backgroundColor: theme.palette.background.paper,
+        border: "none",
+        boxShadow: "none",
+        padding: "10px",
+        overflow: "visible",
+        "&:focus": {
+          outline: "none",
+        },
+      }}
     >
       <Grid style={{ width: previewDimensions.width }}>
         <Grid container direction="row" justifyContent="flex-start">
@@ -203,7 +198,6 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
           <ColorButton
             variant="contained"
             disableElevation
-            className={classes.button}
             //   startIcon={<SearchIcon />}
             onClick={() => setCookie("cookieConsent", "essential")}
           >
@@ -215,7 +209,6 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
           <ColorButton
             variant="contained"
             disableElevation
-            className={classes.button}
             //   startIcon={<SearchIcon />}
             onClick={() => setCookie("cookieConsent", "all")}
           >
@@ -227,7 +220,6 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
           <ColorButton
             variant="contained"
             disableElevation
-            className={classes.button}
             //   startIcon={<SearchIcon />}
             //   onClick={handleClick}
             onClick={handleOpen}

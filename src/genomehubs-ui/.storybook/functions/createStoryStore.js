@@ -1,4 +1,5 @@
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+
 import { enableBatching } from "redux-batched-actions";
 
 /**
@@ -9,10 +10,10 @@ import { enableBatching } from "redux-batched-actions";
  */
 export const createStoryStore = (reducerModules) => {
   const combinedReducers = {};
-  reducerModules.forEach(module => {
+  reducerModules.forEach((module) => {
     Object.assign(combinedReducers, module);
   });
-  
+
   const rootReducer = combineReducers(combinedReducers);
 
   return configureStore({

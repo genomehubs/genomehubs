@@ -5,7 +5,7 @@ import formats, { setInterval } from "../functions/formats";
 import stringLength, { maxStringLength } from "../functions/stringLength";
 
 import CellInfo from "./CellInfo";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "./Tooltip";
 import { active as activeStyle } from "./Styles.scss";

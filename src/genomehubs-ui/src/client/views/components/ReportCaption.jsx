@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import PhylopicAttributions from "./PhylopicAttributions";
 import Tooltip from "./Tooltip";
 import { compose } from "redux";

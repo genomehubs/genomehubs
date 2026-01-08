@@ -18,7 +18,6 @@ import PointPopup from "./PointPopup";
 import countriesGeoJson from "../geojson/countries.geojson";
 import getMapOptions from "./functions/getMapOptions";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
-import { light } from "@mui/material/styles/createPalette";
 
 const CountryLayer = ({
   countryCounts,

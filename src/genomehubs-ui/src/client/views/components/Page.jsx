@@ -1,7 +1,7 @@
 import React, { memo, useRef, useState } from "react";
 import { link as linkStyle, pageTitle as pageTitleStyle } from "./Styles.scss";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import SearchBox from "./SearchBox";
 import SearchBoxWrapper from "./SearchBoxWrapper";
 import SearchHeaderButtons from "./SearchHeaderButtons";

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import ReportTreePaths from "./ReportTreePaths";
 import ReportTreeRings from "./ReportTreeRings";
 import { compose } from "redux";

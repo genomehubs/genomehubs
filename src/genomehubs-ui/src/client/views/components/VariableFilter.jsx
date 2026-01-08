@@ -4,7 +4,7 @@ import BasicSelect from "./BasicSelect";
 import BasicTextField from "./BasicTextField";
 import CloseIcon from "@mui/icons-material/Close";
 import ColorButton from "./ColorButton";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import { MenuItem } from "@mui/material";
 import React from "react";

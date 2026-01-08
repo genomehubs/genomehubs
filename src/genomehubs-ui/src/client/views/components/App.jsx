@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useState } from "react";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { ThemeProvider, createTheme, StyledEngineProvider } from "@mui/material/styles";
 //   createTheme,
 //   makeStyles,
 // } from "@material-ui/core/styles";
@@ -11,6 +11,7 @@ import Layout from "./Layout";
 import LoadingScreen from "./LoadingScreen";
 import ReactErrorBoundary from "./ReactErrorBoundary";
 import StylesProvider from "@mui/styles/StylesProvider";
+import { ThemeProvider as StylesThemeProvider } from "@mui/styles";
 import classnames from "classnames";
 import { compose } from "redux";
 import withColors from "#hocs/withColors";
@@ -85,30 +86,36 @@ const App = ({
       return;
     }
     setContent(
-      <ThemeProvider theme={muiTheme}>
-        <CssBaseline />
-        <StylesProvider injectFirst>
-          <div style={{ position: "relative", height: "100%", width: "100%" }}>
-            <div className={classnames(`theme-${theme}`, appStyle)}>
-              <div id="wrapper" className="">
-                <div
-                  id="theme-base"
-                  className={infoPanelStyle}
-                  style={{ margin: 0 }}
-                />
-                <ReactErrorBoundary>
-                  <>
-                    <Head />
-                    <LoadingScreen />
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={muiTheme}>
+          <StylesThemeProvider theme={muiTheme}>
+            <CssBaseline />
+            <StylesProvider injectFirst>
+              <div
+                style={{ position: "relative", height: "100%", width: "100%" }}
+              >
+                <div className={classnames(`theme-${theme}`, appStyle)}>
+                  <div id="wrapper" className="">
+                    <div
+                      id="theme-base"
+                      className={infoPanelStyle}
+                      style={{ margin: 0 }}
+                    />
+                    <ReactErrorBoundary>
+                      <>
+                        <Head />
+                        <LoadingScreen />
 
-                    <Layout />
-                  </>
-                </ReactErrorBoundary>
+                        <Layout />
+                      </>
+                    </ReactErrorBoundary>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </StylesProvider>
-      </ThemeProvider>,
+            </StylesProvider>
+          </StylesThemeProvider>
+        </ThemeProvider>
+      </StyledEngineProvider>,
     );
   }, [theme, cookies, loading]);
   return content;

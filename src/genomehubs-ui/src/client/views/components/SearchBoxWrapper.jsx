@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "@reach/router";
 
 import { Box } from "@mui/material";
 import ChipSearchBox from "./ChipSearch/ChipSearchBox";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import { Template } from "./Markdown";
 import { compose } from "redux";
 // import dispatchLiveQuery from "../hocs/dispatchLiveQuery";

@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Markdown from "./Markdown";
 import NavLink from "./NavLink";
 import { compose } from "redux";

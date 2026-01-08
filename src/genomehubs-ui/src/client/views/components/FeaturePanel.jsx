@@ -9,7 +9,7 @@ import {
 
 import BasicSelect from "./BasicSelect";
 import FeatureSummaryPanel from "./FeatureSummaryPanel";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import { Template } from "./Markdown";
 import classnames from "classnames";
 import { compose } from "redux";

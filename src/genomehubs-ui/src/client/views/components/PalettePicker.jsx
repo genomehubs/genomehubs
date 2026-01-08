@@ -3,7 +3,7 @@ import {
   paletteContainer as paletteContainerStyle,
 } from "./Styles.scss";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import PalettePreview from "./PalettePreview";
 import React from "react";
 import { compose } from "redux";

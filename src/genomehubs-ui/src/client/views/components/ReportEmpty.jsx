@@ -1,4 +1,4 @@
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Logo from "./Logo";
 // import { RadialChart } from "react-vis";
 import React from "react";

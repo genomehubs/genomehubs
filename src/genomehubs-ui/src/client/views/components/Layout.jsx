@@ -3,7 +3,7 @@ import React, { memo, useEffect, useState } from "react";
 import CookieBanner from "./CookieBanner";
 import DownloadMessage from "./DownloadMessage";
 import Footer from "./Footer";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Header from "./Header";
 import Main from "./Main";
 import ReportPage from "./ReportPage";

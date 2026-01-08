@@ -9,7 +9,7 @@ import ColorButton from "./ColorButton";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import SearchIcon from "@mui/icons-material/Search";
 import Switch from "@mui/material/Switch";
 import Tooltip from "./Tooltip";

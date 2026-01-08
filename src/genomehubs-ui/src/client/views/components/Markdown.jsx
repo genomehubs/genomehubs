@@ -27,7 +27,7 @@ import Divider from "@mui/material/Divider";
 import EditableText from "./EditableText/EditableText";
 import EnumSelect from "./EnumSelect";
 import FlagIcon from "./FlagIcon";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Highlight from "./Highlight";
 import Logo from "./Logo";
 import NavLink from "./NavLink";

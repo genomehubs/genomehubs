@@ -1,7 +1,7 @@
 import React, { Fragment, useLayoutEffect, useRef, useState } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Modal from "@mui/material/Modal";
 import Skeleton from '@mui/material/Skeleton';

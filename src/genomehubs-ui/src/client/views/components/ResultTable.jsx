@@ -19,7 +19,7 @@ import DownloadButton from "./DownloadButton";
 import FiberManualRecordSharpIcon from "@mui/icons-material/FiberManualRecordSharp";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import GetAppIcon from "@mui/icons-material/GetApp";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import LinkButton from "./LinkButton";

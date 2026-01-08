@@ -7,7 +7,7 @@ import {
   resultPanel as resultPanelStyle,
 } from "./Styles.scss";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import React from "react";
 import Skeleton from "@mui/material/Skeleton";
 import classnames from "classnames";

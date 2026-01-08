@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 
 import FlagIcon from "./FlagIcon";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";

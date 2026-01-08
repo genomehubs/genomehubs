@@ -4,7 +4,7 @@ import React, { memo, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CopyrightIcon from "@mui/icons-material/Copyright";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import PalettePicker from "./PalettePicker";
 import PalettePreview from "./PalettePreview";

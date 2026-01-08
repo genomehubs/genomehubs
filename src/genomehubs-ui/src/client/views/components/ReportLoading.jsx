@@ -1,7 +1,7 @@
 // import { RadialChart } from "react-vis";
 import React, { Fragment, useRef } from "react";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Skeleton from "@mui/material/Skeleton";
 import { useEffect } from "react";
 import useResize from "../hooks/useResize";

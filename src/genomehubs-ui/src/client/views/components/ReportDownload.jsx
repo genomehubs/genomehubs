@@ -2,7 +2,7 @@ import * as htmlToImage from "html-to-image";
 
 import { Buffer } from "buffer";
 import DownloadButton from "./DownloadButton";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import JSZip from "jszip";
 import React from "react";
 import { compose } from "redux";

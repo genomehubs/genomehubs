@@ -7,7 +7,7 @@ import {
 import { useLocation, useNavigate } from "@reach/router";
 
 import Chip from "@mui/material/Chip";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import ReportFull from "./ReportFull";
 import classnames from "classnames";
 import { compose } from "redux";

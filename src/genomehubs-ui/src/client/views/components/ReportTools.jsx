@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "@reach/router";
 import CodeIcon from "@mui/icons-material/Code";
 import EditIcon from "@mui/icons-material/Edit";
 import GetAppIcon from "@mui/icons-material/GetApp";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import LinkIcon from "@mui/icons-material/Link";
 import ReportCode from "./ReportCode";
 import ReportDownload from "./ReportDownload";

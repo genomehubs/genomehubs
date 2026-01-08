@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useState } from "react";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import SearchInputQuery from "./SearchInputQuery";
 import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";

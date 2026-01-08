@@ -8,7 +8,7 @@ import {
 } from "./Styles.scss";
 
 import GetAppIcon from "@mui/icons-material/GetApp";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import React from "react";
 import RecordLink from "./RecordLink";
 import VisibilityIcon from "@mui/icons-material/Visibility";

@@ -10,7 +10,7 @@ import {
 } from "./Styles.scss";
 import { useLocation, useNavigate } from "@reach/router";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import { LineageList } from "./LineagePanel";
 import LineageSummaryPanel from "./LineageSummaryPanel";
 import Tooltip from "./Tooltip";

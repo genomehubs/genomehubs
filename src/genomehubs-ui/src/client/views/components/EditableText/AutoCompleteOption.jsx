@@ -2,7 +2,7 @@ import CategoryIcon from "@mui/icons-material/Category";
 import EmojiNatureIcon from "@mui/icons-material/EmojiNature";
 import ExtensionIcon from "@mui/icons-material/Extension";
 import FunctionsIcon from "@mui/icons-material/Functions";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import LineStyleIcon from "@mui/icons-material/LineStyle";
 import LooksOneIcon from "@mui/icons-material/LooksOne";
 import PersonPinCircleIcon from "@mui/icons-material/PersonPinCircle";

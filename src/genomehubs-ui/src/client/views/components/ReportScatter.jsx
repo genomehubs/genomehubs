@@ -16,7 +16,7 @@ import stringLength, { maxStringLength } from "../functions/stringLength";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import PointInfo from "./PointInfo";
 import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "./Tooltip";

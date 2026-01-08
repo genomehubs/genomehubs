@@ -5,7 +5,7 @@ import formats, { setInterval } from "../functions/formats";
 import stringLength, { maxStringLength } from "../functions/stringLength";
 import { useLocation, useNavigate } from "@reach/router";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import PointInfo from "./PointInfo";
 import Tooltip from "./Tooltip";
 import { compose } from "redux";

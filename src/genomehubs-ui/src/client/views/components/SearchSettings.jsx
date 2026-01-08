@@ -6,7 +6,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import Checkbox from "@mui/material/Checkbox";
 import Chip from "@mui/material/Chip";
 import FormControl from "@mui/material/FormControl";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import InputLabel from "@mui/material/InputLabel";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ListItemText from "@mui/material/ListItemText";

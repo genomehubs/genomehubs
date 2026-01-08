@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "@reach/router";
 
 import AutoCompleteInput from "./AutoCompleteInput";
 import FormControl from "@mui/material/FormControl";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import SearchButton from "./SearchButton";
 import SearchInputQueries from "./SearchInputQueries";
 import SearchToggles from "./SearchToggles";

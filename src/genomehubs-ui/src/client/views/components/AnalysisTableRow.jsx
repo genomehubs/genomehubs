@@ -1,7 +1,7 @@
 import React, { Fragment, memo, useEffect, useState } from "react";
 
 import FileTable from "./FileTable";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";

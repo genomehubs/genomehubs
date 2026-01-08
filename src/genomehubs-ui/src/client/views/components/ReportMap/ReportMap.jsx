@@ -9,7 +9,7 @@ import {
 import { useLocation, useNavigate } from "@reach/router";
 
 import Globe from "./Globe";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import L from "leaflet";
 import Map from "./Map";
 import MapLegend from "./MapLegend";
