@@ -231,14 +231,17 @@ app.get("/api/markdown/*", async (req, res) => {
     if (mdPath) {
       console.log(`[API] Resolved to file: ${mdPath}`);
       let content = fs.readFileSync(mdPath, "utf8");
-      
+
       // Rewrite image paths to use the API endpoint
       // Images like /static/images/... → /api/images/...
       // This ensures images are served from the mounted content directory
-      content = content.replace(/!\[([^\]]*)\]\(\/static\/([^)]+)\)/g, (match, alt, path) => {
-        return `![${alt}](/api/images/${path})`;
-      });
-      
+      content = content.replace(
+        /!\[([^\]]*)\]\(\/static\/([^)]+)\)/g,
+        (match, alt, path) => {
+          return `![${alt}](/api/images/${path})`;
+        },
+      );
+
       res.status(200).type("text/plain").send(content);
     } else {
       console.log(`[API] File not found for: ${filePath}`);
@@ -258,19 +261,19 @@ app.get("/api/images/*", async (req, res) => {
   try {
     const filePath = req.params[0]; // e.g., "images/DToL_Logo_with_text.png"
     console.log(`[API] Image request for: ${filePath}`);
-    
+
     // Security: prevent directory traversal attacks
     if (filePath.includes("..")) {
       return res.status(400).json({ error: "Invalid path" });
     }
-    
+
     const imagePath = path.join(CONTENT_ROOT, filePath);
-    
+
     // Verify the image is within CONTENT_ROOT
     if (!imagePath.startsWith(CONTENT_ROOT)) {
       return res.status(403).json({ error: "Access denied" });
     }
-    
+
     if (fs.existsSync(imagePath) && fs.statSync(imagePath).isFile()) {
       console.log(`[API] Serving image from: ${imagePath}`);
       res.status(200).sendFile(imagePath);
