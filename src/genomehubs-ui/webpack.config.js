@@ -7,6 +7,7 @@ const { GitRevisionPlugin } = require("git-revision-webpack-plugin");
 // const GitRevisionPlugin = require("git-revision-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 
 const devMode = process.env.NODE_ENV !== "production";
 
@@ -33,7 +34,7 @@ const config = {
     path: BUILD_DIR + "/",
     // filename: devMode ? "js/bundle.js" : "js/[name].[contenthash].js",
     filename: "js/[name].[contenthash].js",
-    chunkFilename: "js/[id].js",
+    chunkFilename: "js/[name].[contenthash].js",
   },
   resolve: {
     extensions: [".js", ".jsx"],
@@ -41,22 +42,125 @@ const config = {
   optimization: {
     splitChunks: {
       chunks: "all",
-      // maxInitialRequests: Infinity,
-      // minSize: 50000,
-      // cacheGroups: {
-      //   defaultVendors: {
-      //     test: /[\\/]node_modules[\\/]/,
-      //     name(module) {
-      //       const packageName = module.context.match(
-      //         /[\\/]node_modules[\\/](.*?)([\\/]|$)/
-      //       );
-      //       if (packageName) {
-      //         return `npm.${packageName[1].replace("@", "")}`;
-      //       }
-      //     },
-      //     chunks: "all",
-      //   },
-      // },
+      minSize: 10000,
+      maxAsyncRequests: 30,
+      maxInitialRequests: 10,
+      cacheGroups: {
+        // Export/download libraries (lazy loaded only when exporting)
+        export: {
+          test: /[\\/]node_modules[\\/](html-to-image|jszip|qrcode\.react|merge-images)[\\/]/,
+          name: "export",
+          chunks: "async",
+          priority: 30,
+          reuseExistingChunk: true,
+        },
+        // Three.js and react-globe.gl (lazy loaded only for globe view)
+        three: {
+          test: /[\\/]node_modules[\\/](three|react-globe\.gl)[\\/]/,
+          name: "three",
+          chunks: "async",
+          priority: 40,
+          enforce: true,
+        },
+        // Proj4 (used with map projections)
+        proj4: {
+          test: /[\\/]node_modules[\\/]proj4[\\/]/,
+          name: "proj4",
+          chunks: "all",
+          priority: 35,
+          enforce: true,
+        },
+        // H3 geospatial indexing (if used)
+        h3: {
+          test: /[\\/]node_modules[\\/]h3-js[\\/]/,
+          name: "h3",
+          chunks: "all",
+          priority: 35,
+          enforce: true,
+        },
+        // JS-YAML parser
+        yaml: {
+          test: /[\\/]node_modules[\\/]js-yaml[\\/]/,
+          name: "yaml",
+          chunks: "all",
+          priority: 35,
+          enforce: true,
+        },
+        // Drag and drop library
+        dnd: {
+          test: /[\\/]node_modules[\\/]@hello-pangea[\\/]dnd[\\/]/,
+          name: "dnd",
+          chunks: "all",
+          priority: 35,
+          enforce: true,
+        },
+        // Leaflet (lazy loaded only for map reports)
+        leaflet: {
+          test: /[\\/]node_modules[\\/](leaflet|react-leaflet|proj4leaflet)[\\/]/,
+          name: "leaflet",
+          chunks: "all",
+          priority: 35,
+          enforce: true,
+        },
+        // Recharts (lazy loaded only for chart reports)
+        recharts: {
+          test: /[\\/]node_modules[\\/]recharts[\\/]/,
+          name: "recharts",
+          chunks: "all",
+          priority: 35,
+          enforce: true,
+        },
+        // Konva (lazy loaded only for canvas visualizations)
+        konva: {
+          test: /[\\/]node_modules[\\/](konva|react-konva)[\\/]/,
+          name: "konva",
+          chunks: "all",
+          priority: 35,
+          enforce: true,
+        },
+        // MUI core (used by most pages)
+        mui: {
+          test: /[\\/]node_modules[\\/]@mui[\\/]/,
+          name: "mui",
+          priority: 20,
+          reuseExistingChunk: true,
+        },        // Syntax highlighting (lazy loaded only for code blocks)
+        syntaxHighlighter: {
+          test: /[\/]node_modules[\/]react-syntax-highlighter[\/]/,
+          name: "syntax-highlighter",
+          chunks: "async",
+          priority: 20,
+          reuseExistingChunk: true,
+        },
+        // Markdown processing libraries (for content panels)
+        markdown: {
+          test: /[\/]node_modules[\/](remark-|rehype-|unified|unist-)[\/]/,
+          name: "markdown",
+          chunks: "async",
+          priority: 15,
+          reuseExistingChunk: true,
+        },        // D3 libraries (only for charts/reports)
+        d3: {
+          test: /[\\/]node_modules[\\/]d3(-\w+)?[\\/]/,
+          name: "d3",
+          chunks: "async",
+          priority: 15,
+          reuseExistingChunk: true,
+        },
+        // Vendor libraries that are used across many pages
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          name: "vendors",
+          priority: 10,
+          reuseExistingChunk: true,
+        },
+        // Common utilities used in multiple places
+        common: {
+          minChunks: 2,
+          priority: 5,
+          reuseExistingChunk: true,
+        },
+      },
     },
   },
   devServer: {
@@ -76,6 +180,10 @@ const config = {
   },
   devtool: "source-map",
   plugins: [
+    new BundleAnalyzerPlugin({
+      analyzerMode: process.env.ANALYZE ? 'server' : 'disabled',
+      openAnalyzer: true,
+    }),
     new MiniCssExtractPlugin({
       // filename: devMode ? "css/styles.css" : "css/[name].[contenthash].css",
       filename: "css/[name].[contenthash].css",

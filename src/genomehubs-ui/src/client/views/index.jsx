@@ -1,13 +1,8 @@
-import "@fontsource/open-sans/index.css";
+// Load only essential font weights (saves ~800 KB)
+import "@fontsource/open-sans/400.css";
 import "@fontsource/open-sans/700.css";
-import "@fontsource/open-sans/400-italic.css";
-import "@fontsource/open-sans/700-italic.css";
-import "@fontsource/signika/index.css";
 import "@fontsource/signika/700.css";
-import "@fontsource/roboto-mono/index.css";
-import "@fontsource/roboto-mono/700.css";
-import "@fontsource/roboto-mono/400-italic.css";
-import "@fontsource/roboto-mono/700-italic.css";
+import "@fontsource/roboto-mono/400.css";
 import "unfetch/polyfill";
 import "core-js/stable";
 
@@ -27,5 +22,5 @@ rootElement.render(
     <Provider store={store}>
       <App />
     </Provider>
-  </BrowserRouter>
+  </BrowserRouter>,
 );

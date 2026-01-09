@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from "react";
+import React, { Fragment, Suspense, lazy, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
 import CodeIcon from "@mui/icons-material/Code";
@@ -7,7 +7,6 @@ import GetAppIcon from "@mui/icons-material/GetApp";
 import Grid from "@mui/material/Grid";
 import LinkIcon from "@mui/icons-material/Link";
 import ReportCode from "./ReportCode";
-import ReportDownload from "./ReportDownload";
 import ReportEdit from "./ReportEdit";
 import ReportInfo from "./ReportInfo";
 import ReportQuery from "./ReportQuery";
@@ -22,6 +21,9 @@ import withColors from "#hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";
 import withSiteName from "#hocs/withSiteName";
 import withTheme from "../hocs/withTheme";
+
+// Lazy load download component to defer export libraries
+const ReportDownload = lazy(() => import("./ReportDownload"));
 
 export const ReportTools = ({
   reportEdit,
@@ -103,13 +105,21 @@ export const ReportTools = ({
     overlay = <ReportSelect reportId={reportId} report={report} />;
   } else if (download) {
     overlay = (
-      <ReportDownload
-        reportId={reportId}
-        report={report}
-        chartRef={chartRef}
-        code={code}
-        queryString={queryString}
-      />
+      <Suspense
+        fallback={
+          <div style={{ padding: "2rem", textAlign: "center" }}>
+            Loading export options...
+          </div>
+        }
+      >
+        <ReportDownload
+          reportId={reportId}
+          report={report}
+          chartRef={chartRef}
+          code={code}
+          queryString={queryString}
+        />
+      </Suspense>
     );
   } else if (code) {
     overlay = (

@@ -1,14 +1,13 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { Suspense, lazy, memo, useEffect, useState } from "react";
 
 import CookieBanner from "./CookieBanner";
 import DownloadMessage from "./DownloadMessage";
-import Footer from "./Footer";
 import Grid from "@mui/material/Grid";
+
+const Footer = lazy(() => import("./Footer"));
 import Header from "./Header";
 import Main from "./Main";
-import ReportPage from "./ReportPage";
 import { Router } from "@reach/router";
-import SearchPage from "./SearchPage";
 import { compose } from "redux";
 import { fillParent as fillParentStyle } from "./Styles.scss";
 import makeStyles from "@mui/styles/makeStyles";
@@ -56,7 +55,9 @@ const DefaultLayout = ({}) => {
           {/* )} */}
         </Grid>
         <Grid className={classes.item}>
-          <Footer />
+          <Suspense fallback={<div style={{ minHeight: '100px' }} />}>
+            <Footer />
+          </Suspense>
         </Grid>
       </Grid>
     </div>
@@ -70,7 +71,9 @@ const ReportLayout = (props) => {
       <div>
         <ReportPage topLevel {...props} />
       </div>
-      <Footer hidden />
+      <Suspense fallback={<div style={{ minHeight: '100px' }} />}>
+        <Footer hidden />
+      </Suspense>
     </div>
   );
 };
@@ -80,7 +83,9 @@ const SearchLayout = (props) => {
     <div style={{ position: "relative", height: "100%", width: "100%" }}>
       <CookieBanner />
       <SearchPage topLevel {...props} />
-      <Footer hidden />
+      <Suspense fallback={<div style={{ minHeight: '100px' }} />}>
+        <Footer hidden />
+      </Suspense>
     </div>
   );
 };

@@ -20,3 +20,10 @@ topojson \
 
     jq '.features |= map(.properties |= {ISO_A2, ADMIN})' '/Users/rchallis/Downloads/ne_110m_ocea
 n.geojson' > '/Users/rchallis/Downloads/ne_110m_ocean.filtered.geojson'
+
+
+reduce size with 
+npx -y mapshaper src/client/views/components/geojson/countries.geojson -simplify 25% -o src/client/views/components/geojson/countries-simple.geojson
+
+npx -y mapshaper src/client/views/components/geojson/countries-full.geojson -simplify 50% -o src/client/views/components/geojson/countries.geojson
+npx -y mapshaper src/client/views/components/geojson/countries-full.geojson -simplify 25% -o src/client/views/components/geojson/countries-simple.geojson

@@ -1,5 +1,5 @@
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { basename, siteName } from "../reducers/location";
 import {
   centerContent as centerContentStyle,
@@ -29,8 +29,9 @@ import EditableText from "./EditableText/EditableText";
 import EnumSelect from "./EnumSelect";
 import FlagIcon from "./FlagIcon";
 import Grid from "@mui/material/Grid";
-import Highlight from "./Highlight";
 import Logo from "./Logo";
+
+const Highlight = lazy(() => import("./Highlight"));
 import NavLink from "./NavLink";
 import PhyloPics from "./PhyloPics";
 import RecordLabel from "./RecordLabel";
@@ -451,7 +452,11 @@ export const RehypeComponentsList = (extra) => {
           );
         }
       }
-      return <Highlight {...processProps({ props })} />;
+      return (
+        <Suspense fallback={<pre style={{ padding: '1rem' }}>Loading code...</pre>}>
+          <Highlight {...processProps({ props })} />
+        </Suspense>
+      );
     },
     phylopic: (props) => <PhyloPics {...processProps({ props, extra })} />,
     recordlabel: (props) => <RecordLabel {...processProps({ props, extra })} />,

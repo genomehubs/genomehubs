@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Suspense, lazy, useState } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
 import Dialog from "@mui/material/Dialog";
@@ -12,7 +12,6 @@ import MuiDialogTitle from "@mui/material/DialogTitle";
 import MuiTab from "@mui/material/Tab";
 import MuiTabs from "@mui/material/Tabs";
 import SaveSettingsDefaults from "./SaveSettingsDefaults";
-import SaveSettingsFavourites from "./SaveSettingsFavourites";
 import SaveSettingsMore from "./SaveSettingsMore";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import Typography from "@mui/material/Typography";
@@ -22,6 +21,9 @@ import makeStyles from "@mui/styles/makeStyles";
 import withSearchIndex from "../hocs/withSearchIndex";
 import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "../hocs/withTaxonomy";
+
+// Lazy load favourites to defer export libraries
+const SaveSettingsFavourites = lazy(() => import("./SaveSettingsFavourites"));
 
 export const useStyles = makeStyles((theme) => ({
   paper: {
@@ -146,9 +148,17 @@ const SaveSettingsModal = ({ rootRef, searchIndex, indices, handleClose }) => {
           Search Settings
         </DialogTitle> */}
         {tabValue == 0 && (
-          <SaveSettingsFavourites
-            currentIndex={activeIndices[secondaryTabValue]}
-          />
+          <Suspense
+            fallback={
+              <div style={{ padding: "2rem", textAlign: "center" }}>
+                Loading favourites...
+              </div>
+            }
+          >
+            <SaveSettingsFavourites
+              currentIndex={activeIndices[secondaryTabValue]}
+            />
+          </Suspense>
         )}
         {tabValue == 1 && (
           <SaveSettingsDefaults

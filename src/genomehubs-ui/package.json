@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "NODE_ENV=production webpack --mode production --config ./webpack.config.js",
+    "build:analyze": "ANALYZE=true NODE_ENV=production webpack --mode production --config ./webpack.config.js",
     "client": "NODE_OPTIONS='--max-http-header-size=100000 --trace-deprecation' webpack serve --mode development",
     "test": "echo \"Error: no test specified\" && exit 1",
     "storybook": "storybook dev -p 6006",
@@ -67,6 +68,7 @@
     "storybook-addon-react-docgen": "^1.2.44",
     "style-loader": "^4.0.0",
     "webpack": "^5.82.0",
+    "webpack-bundle-analyzer": "^5.1.1",
     "webpack-cli": "^5.0.2",
     "webpack-dev-server": "^5.0.4"
   },

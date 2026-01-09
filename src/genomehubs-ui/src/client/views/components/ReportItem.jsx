@@ -1,21 +1,20 @@
-import React, { memo, useEffect, useRef, useState } from "react";
+import React, {
+  Suspense,
+  lazy,
+  memo,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import Grid from "@mui/material/Grid";
-import ReportArc from "./ReportArc";
 import ReportCaption from "./ReportCaption";
 import ReportEmpty from "./ReportEmpty";
 import ReportError from "./ReportError";
-import ReportHistogram from "./ReportHistogram";
 import ReportLoading from "./ReportLoading";
-import ReportMap from "./ReportMap";
-import ReportRibbon from "./ReportRibbon";
-import ReportScatter from "./ReportScatter";
 import ReportSources from "./ReportSources";
-import ReportTable from "./ReportTable";
-import ReportTree from "./ReportTree";
 import ReportTypes from "./ReportTypes";
 import ReportWrapper from "./ReportWrapper";
-import ReportXPerRank from "./ReportXPerRank";
 import { compose } from "redux";
 import dispatchMessage from "../hocs/dispatchMessage";
 import dispatchReport from "../hocs/dispatchReport";
@@ -27,6 +26,16 @@ import { useNavigate } from "@reach/router";
 import useResize from "../hooks/useResize";
 import withReportById from "../hocs/withReportById";
 import withSiteName from "#hocs/withSiteName";
+
+// Lazy load heavy visualization components
+const ReportMap = lazy(() => import("./ReportMap"));
+const ReportArc = lazy(() => import("./ReportArc"));
+const ReportHistogram = lazy(() => import("./ReportHistogram"));
+const ReportScatter = lazy(() => import("./ReportScatter"));
+const ReportRibbon = lazy(() => import("./ReportRibbon"));
+const ReportTree = lazy(() => import("./ReportTree"));
+const ReportTable = lazy(() => import("./ReportTable"));
+const ReportXPerRank = lazy(() => import("./ReportXPerRank"));
 
 const headings = {
   tree: "Tap tree nodes to browse taxa or long-press to search",
@@ -617,7 +626,21 @@ const ReportItem = ({
             }),
           }}
         >
-          {component}
+          <Suspense
+            fallback={
+              <div
+                style={{
+                  padding: "2rem",
+                  textAlign: "center",
+                  minHeight: minDim,
+                }}
+              >
+                Loading visualization...
+              </div>
+            }
+          >
+            {component}
+          </Suspense>
         </div>
       </Grid>
       {!loading && !error && caption && (

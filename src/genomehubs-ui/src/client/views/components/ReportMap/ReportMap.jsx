@@ -1,6 +1,13 @@
 import "proj4leaflet";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  Suspense,
+  lazy,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   getCrs,
   getFitWorldBounds,
@@ -8,14 +15,12 @@ import {
 } from "./functions/mapHelpers";
 import { useLocation, useNavigate } from "@reach/router";
 
-import Globe from "./Globe";
 import Grid from "@mui/material/Grid";
 import L from "leaflet";
 import Map from "./Map";
 import MapLegend from "./MapLegend";
 import MarkerComponent from "./MarkerComponent";
 import { compose } from "redux";
-import countriesGeoJson from "../geojson/countries.geojson";
 import dispatchMessage from "../../hocs/dispatchMessage";
 import { mixColor } from "../../functions/mixColor";
 import proj4 from "proj4";
@@ -27,6 +32,9 @@ import withReportTerm from "../../hocs/withReportTerm";
 import withSearchIndex from "../../hocs/withSearchIndex";
 import withSiteName from "#hocs/withSiteName";
 import withTheme from "#hocs/withTheme";
+
+// Lazy load Globe to defer three.js and react-globe.gl
+const Globe = lazy(() => import("./Globe"));
 
 // Default region attribute (user-editable in future)
 const REGION_ATTRIBUTE = "country_code";
@@ -166,6 +174,19 @@ const ReportMap = ({
   width = width || 400;
   height = height || 300;
   const [globeView, setGlobeView] = useState(mapType === "globe");
+  const [countriesGeoJson, setCountriesGeoJson] = useState(null);
+  
+  useEffect(() => {
+    // Only load geojson if regionField is set (showing country overlays)
+    if (regionField) {
+      import("../geojson/countries-simple.geojson").then((module) => {
+        setCountriesGeoJson(module.default);
+      });
+    } else {
+      setCountriesGeoJson(null);
+    }
+  }, [regionField]);
+  
   const [nightMode, setNightMode] = useState(
     mapTheme ? mapTheme === "night" : theme === "darkTheme",
   );
@@ -262,10 +283,12 @@ const ReportMap = ({
     let countryCounts;
     if (!regionCounts || Object.keys(regionCounts).length === 0) {
       countryCounts = {};
-      countriesGeoJson.features.forEach((feature) => {
-        const code = feature.properties.ISO_A2;
-        countryCounts[code] = 0;
-      });
+      if (countriesGeoJson) {
+        countriesGeoJson.features.forEach((feature) => {
+          const code = feature.properties.ISO_A2;
+          countryCounts[code] = 0;
+        });
+      }
     } else {
       countryCounts = { ...regionCounts };
     }
@@ -408,32 +431,48 @@ const ReportMap = ({
     if (globeView) {
       // Use Globe component for globe view
       mapGlobe = (
-        <Globe
-          key={`globe-${mapProjection}-${crs?.code || crs?.options?.code || ""}`}
-          // ref={mapRef}
-          width={width}
-          height={height}
-          dataBounds={dataBounds}
-          theme={theme}
-          colorScheme={colorScheme}
-          nightMode={nightMode}
-          projectionBounds={projectionBounds}
-          fitWorldBounds={fitWorldBounds}
-          regionField={regionField}
-          countryCounts={countryCounts}
-          onCountryClick={handleCountryClick}
-          countryOverlayColor={countryOverlayColor}
-          pointsData={pointsData}
-          hexPolygonResolution={geoBinResolution}
-          hexBinCounts={hexBinCounts}
-          hexbinOverlayColor={hexbinOverlayColor}
-          maxBinCount={maxHexbinCount}
-          regionLink={regionLink}
-          hexbinLink={hexbinLink}
-          pointLink={pointLink}
-          reportSelect={reportSelect}
-          {...props}
-        />
+        <Suspense
+          fallback={
+            <div
+              style={{
+                width,
+                height,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              Loading globe...
+            </div>
+          }
+        >
+          <Globe
+            key={`globe-${mapProjection}-${crs?.code || crs?.options?.code || ""}`}
+            // ref={mapRef}
+            width={width}
+            height={height}
+            dataBounds={dataBounds}
+            theme={theme}
+            colorScheme={colorScheme}
+            nightMode={nightMode}
+            projectionBounds={projectionBounds}
+            fitWorldBounds={fitWorldBounds}
+            regionField={regionField}
+            countryCounts={countryCounts}
+            onCountryClick={handleCountryClick}
+            countryOverlayColor={countryOverlayColor}
+            pointsData={pointsData}
+            hexPolygonResolution={geoBinResolution}
+            hexBinCounts={hexBinCounts}
+            hexbinOverlayColor={hexbinOverlayColor}
+            maxBinCount={maxHexbinCount}
+            regionLink={regionLink}
+            hexbinLink={hexbinLink}
+            pointLink={pointLink}
+            reportSelect={reportSelect}
+            {...props}
+          />
+        </Suspense>
       );
     } else if (measured && crs) {
       // Use Map component for flat map view

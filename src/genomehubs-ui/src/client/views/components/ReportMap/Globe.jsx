@@ -25,7 +25,6 @@ import NavLink from "../NavLink";
 import PointPopup from "./PointPopup";
 import ReportPopup from "./ReportPopup";
 import Skeleton from "@mui/material/Skeleton";
-import countriesGeoJson from "../geojson/countries.geojson";
 import { findCenterLatLng } from "./functions/mapHelpers";
 import getCountryColor from "./functions/getCountryColor";
 import getMapOptions from "./functions/getMapOptions";
@@ -62,6 +61,19 @@ const Globe = ({
   const mapContainerRef = useRef(); // always call useRef, unconditionally
   const [globeLoading, setGlobeLoading] = useState(true); // <-- ensure this is defined in Map
   const [showGlobe, setShowGlobe] = useState(false); // <-- move this up to top-level, before any conditional logic
+  const [countriesGeoJson, setCountriesGeoJson] = useState(null);
+  
+  useEffect(() => {
+    // Only load geojson if regionField is set (showing country overlays)
+    if (regionField) {
+      import("../geojson/countries-simple.geojson").then((module) => {
+        setCountriesGeoJson(module.default);
+      });
+    } else {
+      setCountriesGeoJson(null);
+    }
+  }, [regionField]);
+  
   // Calculate center of bounds for zoom
   const [centerLat, centerLon] = findCenterLatLng(bounds);
 
@@ -303,6 +315,15 @@ const Globe = ({
   if (width === 0) {
     return null;
   }
+  
+  // Only show loading if regionField is set but geojson not loaded yet
+  if (regionField && !countriesGeoJson) {
+    return (
+      <div style={{ width, height, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div>Loading map data...</div>
+      </div>
+    );
+  }
 
   const polygonProps = {
     globeMaterial: new MeshPhongMaterial({
@@ -310,15 +331,17 @@ const Globe = ({
       bumpMap: null,
       bumpScale: 0,
     }),
-    polygonsData: countriesGeoJson.features,
-    polygonCapColor: getPolyColor,
-    polygonStrokeColor: () => countryOutlineColor,
-    polygonLabel: getPolyLabel,
-    onPolygonClick: handlePolyClick,
-    polygonSideColor: () => oceanColor + "80",
-    polygonAltitude: (d) =>
-      countryCounts[d.properties.ISO_A2] > 0 ? 0.01 : 0.01,
-    polygonsTransitionDuration: 0,
+    ...(countriesGeoJson && {
+      polygonsData: countriesGeoJson.features,
+      polygonCapColor: getPolyColor,
+      polygonStrokeColor: () => countryOutlineColor,
+      polygonLabel: getPolyLabel,
+      onPolygonClick: handlePolyClick,
+      polygonSideColor: () => oceanColor + "80",
+      polygonAltitude: (d) =>
+        countryCounts[d.properties.ISO_A2] > 0 ? 0.01 : 0.01,
+      polygonsTransitionDuration: 0,
+    }),
   };
 
   // Build combined pointsData with outline and center for each point
