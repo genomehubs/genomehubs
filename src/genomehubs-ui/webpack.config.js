@@ -124,7 +124,7 @@ const config = {
           name: "mui",
           priority: 20,
           reuseExistingChunk: true,
-        },        // Syntax highlighting (lazy loaded only for code blocks)
+        }, // Syntax highlighting (lazy loaded only for code blocks)
         syntaxHighlighter: {
           test: /[\/]node_modules[\/]react-syntax-highlighter[\/]/,
           name: "syntax-highlighter",
@@ -139,7 +139,7 @@ const config = {
           chunks: "async",
           priority: 15,
           reuseExistingChunk: true,
-        },        // D3 libraries (only for charts/reports)
+        }, // D3 libraries (only for charts/reports)
         d3: {
           test: /[\\/]node_modules[\\/]d3(-\w+)?[\\/]/,
           name: "d3",
@@ -181,7 +181,7 @@ const config = {
   devtool: "source-map",
   plugins: [
     new BundleAnalyzerPlugin({
-      analyzerMode: process.env.ANALYZE ? 'server' : 'disabled',
+      analyzerMode: process.env.ANALYZE ? "server" : "disabled",
       openAnalyzer: true,
     }),
     new MiniCssExtractPlugin({

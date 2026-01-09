@@ -62,7 +62,7 @@ const Globe = ({
   const [globeLoading, setGlobeLoading] = useState(true); // <-- ensure this is defined in Map
   const [showGlobe, setShowGlobe] = useState(false); // <-- move this up to top-level, before any conditional logic
   const [countriesGeoJson, setCountriesGeoJson] = useState(null);
-  
+
   useEffect(() => {
     // Only load geojson if regionField is set (showing country overlays)
     if (regionField) {
@@ -73,7 +73,7 @@ const Globe = ({
       setCountriesGeoJson(null);
     }
   }, [regionField]);
-  
+
   // Calculate center of bounds for zoom
   const [centerLat, centerLon] = findCenterLatLng(bounds);
 
@@ -315,11 +315,19 @@ const Globe = ({
   if (width === 0) {
     return null;
   }
-  
+
   // Only show loading if regionField is set but geojson not loaded yet
   if (regionField && !countriesGeoJson) {
     return (
-      <div style={{ width, height, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div
+        style={{
+          width,
+          height,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <div>Loading map data...</div>
       </div>
     );

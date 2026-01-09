@@ -175,7 +175,7 @@ const ReportMap = ({
   height = height || 300;
   const [globeView, setGlobeView] = useState(mapType === "globe");
   const [countriesGeoJson, setCountriesGeoJson] = useState(null);
-  
+
   useEffect(() => {
     // Only load geojson if regionField is set (showing country overlays)
     if (regionField) {
@@ -186,7 +186,7 @@ const ReportMap = ({
       setCountriesGeoJson(null);
     }
   }, [regionField]);
-  
+
   const [nightMode, setNightMode] = useState(
     mapTheme ? mapTheme === "night" : theme === "darkTheme",
   );

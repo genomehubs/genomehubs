@@ -30,8 +30,6 @@ import EnumSelect from "./EnumSelect";
 import FlagIcon from "./FlagIcon";
 import Grid from "@mui/material/Grid";
 import Logo from "./Logo";
-
-const Highlight = lazy(() => import("./Highlight"));
 import NavLink from "./NavLink";
 import PhyloPics from "./PhyloPics";
 import RecordLabel from "./RecordLabel";
@@ -64,6 +62,8 @@ import { unified } from "unified";
 import { visit } from "unist-util-visit";
 import withPages from "../hocs/withPages";
 import withStyles from "@mui/styles/withStyles";
+
+const Highlight = lazy(() => import("./Highlight"));
 
 const pagesUrl = PAGES_URL;
 const webpackHash = COMMIT_HASH || __webpack_hash__;
@@ -453,7 +453,9 @@ export const RehypeComponentsList = (extra) => {
         }
       }
       return (
-        <Suspense fallback={<pre style={{ padding: '1rem' }}>Loading code...</pre>}>
+        <Suspense
+          fallback={<pre style={{ padding: "1rem" }}>Loading code...</pre>}
+        >
           <Highlight {...processProps({ props })} />
         </Suspense>
       );

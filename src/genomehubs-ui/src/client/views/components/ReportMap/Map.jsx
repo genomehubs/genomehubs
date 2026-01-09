@@ -29,10 +29,10 @@ const ZoomTracker = ({ setZoom }) => {
     const handleZoom = () => {
       setZoom(map.getZoom());
     };
-    map.on('zoomend', handleZoom);
+    map.on("zoomend", handleZoom);
     setZoom(map.getZoom()); // Set initial zoom
     return () => {
-      map.off('zoomend', handleZoom);
+      map.off("zoomend", handleZoom);
     };
   }, [map, setZoom]);
   return null;
@@ -49,7 +49,7 @@ const CountryLayer = ({
   navigate = () => {},
 }) => {
   const [geoData, setGeoData] = useState(null);
-  
+
   useEffect(() => {
     if (!countriesGeoJson) {
       import("../geojson/countries.geojson").then((module) => {
@@ -60,9 +60,9 @@ const CountryLayer = ({
       setGeoData(countriesGeoJson);
     }
   }, []);
-  
+
   if (!geoData) return null;
-  
+
   return (
     <GeoJSON
       data={{ type: "FeatureCollection", features: geoData.features }}
@@ -122,7 +122,7 @@ const Map = ({
   const [hexbinPopupMeta, setHexbinPopupMeta] = useState(null);
   const [pointPopupMeta, setPointPopupMeta] = useState(null);
   const [currentZoom, setCurrentZoom] = useState(0);
-  
+
   const maxCount = useMemo(
     () => Math.max(...Object.values(countryCounts), 1),
     [countryCounts],
