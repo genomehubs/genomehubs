@@ -12,11 +12,10 @@ import Tabs from "./Tabs";
 import TabsFixed from "./TabsFixed";
 import { compose } from "redux";
 import withColors from "#hocs/withColors";
+import withSiteName from "../hocs/withSiteName";
 import withTheme from "../hocs/withTheme";
 
-const basename = BASENAME || "";
-
-const Header = ({ id, levels, theme, colorScheme }) => {
+const Header = ({ id, levels, theme, colorScheme, basename }) => {
   const rootRef = useRef(null);
   let style = {};
   let colors;
@@ -83,5 +82,5 @@ const Header = ({ id, levels, theme, colorScheme }) => {
   );
 };
 
-export default compose(memo, withTheme, withColors)(Header);
+export default compose(memo, withTheme, withColors, withSiteName)(Header);
 // export default compose(memo)(Header);

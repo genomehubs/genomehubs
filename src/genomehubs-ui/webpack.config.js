@@ -21,6 +21,16 @@ const APP_DIR = path.resolve(__dirname, "src/client/views");
 
 const gitRevisionPlugin = new GitRevisionPlugin();
 
+// Safe git info retrieval for non-git environments (Docker builds)
+let gitBranch = "unknown";
+let gitVersion = "unknown";
+try {
+  gitBranch = gitRevisionPlugin.branch();
+  gitVersion = gitRevisionPlugin.version();
+} catch (err) {
+  console.warn("Git info unavailable (not a git repository):", err.message);
+}
+
 const protocol = main.https ? "https" : "http";
 
 const config = {
@@ -193,14 +203,14 @@ const config = {
       API_URL: JSON.stringify(main.apiUrl),
       ARCHIVE: JSON.stringify(main.archive),
       BASENAME: JSON.stringify(main.basename),
-      BRANCH: JSON.stringify(gitRevisionPlugin.branch()),
+      BRANCH: JSON.stringify(gitBranch),
       COMMIT_HASH: JSON.stringify(commitHash),
       PAGES_URL: JSON.stringify(main.basename + main.pagesUrl),
       COOKIE_BANNER: JSON.stringify(main.cookies),
       DEFAULT_INDEX: JSON.stringify(main.defaultIndex),
       GA_ID: JSON.stringify(main.ga_id),
       GDPR_URL: JSON.stringify(main.gdpr_url),
-      GIT_VERSION: JSON.stringify(gitRevisionPlugin.version()),
+      GIT_VERSION: JSON.stringify(gitVersion),
       HOME: JSON.stringify(protocol + "://" + main.hostname),
       MESSAGE: JSON.stringify(main.message),
       TAXONOMY: JSON.stringify(main.taxonomy),

@@ -432,9 +432,21 @@ export const RehypeComponentsList = (extra) => {
       );
     },
     pre: (props) => {
-      let className = props.children?.[0]?.props?.className;
+      // props.children is the <code> element, not an array
+      const codeElement = props.children;
+      const className = codeElement?.props?.className;
+      
       if (className) {
-        let nestedProps = YAML.load(props.children[0].props.children[0] || "");
+        // Extract YAML content directly from code element's children
+        const yamlContent = codeElement?.props?.children || "";
+        
+        console.log("Extracted YAML:", { 
+          className, 
+          yamlLength: yamlContent.length,
+          yamlStart: yamlContent.substring(0, 50)
+        });
+        
+        let nestedProps = YAML.load(yamlContent);
         if (className == "language-report") {
           return (
             <Report

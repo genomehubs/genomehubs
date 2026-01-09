@@ -16,8 +16,8 @@ import {
 } from "../reducers/search";
 import { resetController, setMessage } from "../reducers/message";
 
-import { basename } from "../reducers/location";
 import { checkProgress } from "./checkProgress";
+import { getBasename } from "../reducers/location";
 import { getCurrentTaxonomy } from "../reducers/taxonomy";
 import { getTypes } from "../reducers/types";
 import { nanoid } from "nanoid";
@@ -107,6 +107,7 @@ export function fetchSearchResults(options, navigate) {
         dispatch(receiveSearch(json));
 
         if (navigate) {
+          const basename = getBasename();
           let navOptions = { ...params };
           if (json.queryString) {
             navOptions.query = json.queryString;
