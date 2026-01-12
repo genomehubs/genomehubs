@@ -260,10 +260,40 @@ app.use(
   express.static(BUILD_DIR, {
     maxAge: "1y",
     index: false,
-    // Return a 204 No Content for assets that don't exist instead of 404
-    // This allows the catch-all route to handle them
     setHeaders: (res, filePath) => {
-      res.set("Cache-Control", "public, max-age=31536000, immutable");
+      // Set appropriate content types
+      if (filePath.endsWith(".woff2")) {
+        res.set("Content-Type", "font/woff2");
+      } else if (filePath.endsWith(".svg")) {
+        res.set("Content-Type", "image/svg+xml");
+      } else if (filePath.endsWith(".json")) {
+        res.set("Content-Type", "application/json");
+      } else if (filePath.endsWith(".geojson")) {
+        res.set("Content-Type", "application/geo+json");
+      }
+      // Content-addressed assets (with hash in filename) - cache forever
+      if (filePath.match(/\.[a-f0-9]{10,}\..*$|\/static\//)) {
+        res.set("Cache-Control", "public, max-age=31536000, immutable");
+      }
+      // Markdown content - moderate cache (1 day) to catch updates
+      else if (filePath.endsWith(".md")) {
+        res.set("Cache-Control", "public, max-age=86400, must-revalidate");
+      }
+      // API responses - short cache (5 minutes)
+      else if (filePath.startsWith("api/")) {
+        res.set("Cache-Control", "public, max-age=300");
+      }
+      // HTML files - don't cache to always get latest
+      else if (filePath.endsWith(".html")) {
+        res.set("Cache-Control", "public, max-age=0, must-revalidate");
+      }
+      // Default for other static assets
+      else {
+        res.set("Cache-Control", "public, max-age=3600");
+      }
+
+      // Add ETAG for revalidation
+      res.set("Vary", "Accept-Encoding");
     },
   }),
 );
@@ -289,6 +319,16 @@ app.get("/assets/markdown/*", async (req, res) => {
     if (mdPath) {
       console.log(`[ASSETS] Resolved to file: ${mdPath}`);
       let content = fs.readFileSync(mdPath, "utf8");
+
+      // Get file modification time for ETag
+      const stats = fs.statSync(mdPath);
+      const mtime = Math.floor(stats.mtimeMs / 1000);
+      const etag = `"${stats.size}-${mtime}"`;
+
+      // Set cache headers with ETag for revalidation
+      res.set("ETag", etag);
+      res.set("Cache-Control", "public, max-age=86400, must-revalidate");
+      res.set("Vary", "Accept-Encoding");
 
       // Rewrite image paths to use the API endpoint
       // Images like /static/images/... → /assets/images/...
@@ -333,6 +373,15 @@ app.get("/assets/images/*", async (req, res) => {
     }
 
     if (fs.existsSync(imagePath) && fs.statSync(imagePath).isFile()) {
+      const stats = fs.statSync(imagePath);
+      const mtime = Math.floor(stats.mtimeMs / 1000);
+      const etag = `"${stats.size}-${mtime}"`;
+
+      // Images don't change often - cache for 30 days
+      res.set("ETag", etag);
+      res.set("Cache-Control", "public, max-age=2592000, must-revalidate");
+      res.set("Vary", "Accept-Encoding");
+
       console.log(`[ASSETS] Serving image from: ${imagePath}`);
       res.status(200).sendFile(imagePath);
     } else {
@@ -370,6 +419,40 @@ app.get(
     }
   },
 );
+
+// Explicit route for manifest.json from external goat-ui repo
+app.get("/assets/manifest.json", (req, res) => {
+  const manifestPath = path.join(CONTENT_ROOT, "../assets", "manifest.json");
+
+  console.log(`[MANIFEST] Requesting from: ${manifestPath}`);
+
+  if (fs.existsSync(manifestPath) && fs.statSync(manifestPath).isFile()) {
+    console.log(`[MANIFEST] Serving manifest from: ${manifestPath}`);
+    res.set("Content-Type", "application/json");
+    res.sendFile(manifestPath);
+  } else {
+    console.log(`[MANIFEST] Not found at: ${manifestPath}`);
+    res.status(404).json({ error: "Manifest not found" });
+  }
+});
+
+// Stub route for cookies script (only available in full production)
+app.get("/js/cookies-gcc.js", (req, res) => {
+  const cookiesPath = path.join(BUILD_DIR, "js", "cookies-gcc.js");
+
+  console.log(`[COOKIES] Requesting from: ${cookiesPath}`);
+
+  if (fs.existsSync(cookiesPath) && fs.statSync(cookiesPath).isFile()) {
+    console.log(`[COOKIES] Serving cookies script from: ${cookiesPath}`);
+    res.set("Content-Type", "application/javascript");
+    res.sendFile(cookiesPath);
+  } else {
+    console.log(`[COOKIES] Production cookies script not found, serving stub`);
+    // Return empty stub to prevent 404 in dev/test environments
+    res.set("Content-Type", "application/javascript");
+    res.send("// Cookies script stub - only available in production\n");
+  }
+});
 
 // For favicons specifically
 app.get("/favicon.ico", (req, res) => {
