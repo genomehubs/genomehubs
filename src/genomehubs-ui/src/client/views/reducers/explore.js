@@ -6,7 +6,7 @@ export const requestSummary = createAction("REQUEST_SUMMARY");
 export const receiveSummary = createAction(
   "RECEIVE_SUMMARY",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 export const resetSummary = createAction("RESET_SUMMARY");
 
@@ -42,7 +42,7 @@ const summaries = handleActions(
     RECEIVE_SUMMARY: onReceiveSummary,
     RESET_SUMMARY: defaultSummaryState,
   },
-  defaultSummaryState()
+  defaultSummaryState(),
 );
 
 export const getSummaries = (state) => state.summaries.byId;
@@ -94,7 +94,7 @@ export const setSummaryField = createAction("SET_SUMMARY_FIELD");
 export const summaryField = handleAction(
   "SET_SUMMARY_FIELD",
   (state, action) => action.payload,
-  ""
+  "",
 );
 export const getSummaryField = (state) => state.summaryField;
 

@@ -20,8 +20,8 @@ import {
 import batlow from "./color/batlow";
 import batlowS from "./color/batlowS";
 import { createSelector } from "reselect";
-import { produce } from "immer";
 import { mixColor } from "../functions/mixColor";
+import { produce } from "immer";
 
 const ANCESTRAL_COLOR =
   typeof ANCESTRAL_COLOR !== "undefined" ? ANCESTRAL_COLOR : "#db4325";

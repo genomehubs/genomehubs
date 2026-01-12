@@ -7,7 +7,7 @@ export const requestDescendants = createAction("REQUEST_DESCENDANTS");
 export const receiveDescendants = createAction(
   "RECEIVE_DESCENDANTS",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 export const resetDescendants = createAction("RESET_DESCENDANTS");
 
@@ -47,7 +47,7 @@ const descendants = handleActions(
     RECEIVE_DESCENDANTS: onReceiveDescendants,
     RESET_DESCENDANTS: defaultState,
   },
-  defaultState()
+  defaultState(),
 );
 
 export const getDescendants = (state) => state.descendants.byId;
@@ -59,7 +59,7 @@ export const getDescendantsByTaxonId = createCachedSelector(
   (_state, taxonId) => taxonId,
   (descendants, taxonId) => {
     return descendants[taxonId];
-  }
+  },
 )((_state, taxonId) => taxonId);
 
 export const getDescendantsIsFetchingByTaxonId = createCachedSelector(
@@ -67,7 +67,7 @@ export const getDescendantsIsFetchingByTaxonId = createCachedSelector(
   (_state, taxonId) => taxonId,
   (descendantsIsFetching, taxonId) => {
     return descendantsIsFetching[taxonId];
-  }
+  },
 )((_state, taxonId) => taxonId);
 
 export const descendantsReducers = {

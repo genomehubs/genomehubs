@@ -6,7 +6,7 @@ export const requestAutocomplete = createAction("REQUEST_AUTOCOMPLETE");
 export const receiveAutocomplete = createAction(
   "RECEIVE_AUTOCOMPLETE",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 export const resetAutocomplete = createAction("RESET_AUTOCOMPLETE");
 
@@ -32,7 +32,7 @@ const autocompleteTerms = handleActions(
     }),
     RESET_AUTOCOMPLETE: defaultState,
   },
-  defaultState()
+  defaultState(),
 );
 
 export const getAutocompleteTerms = (state) => state.autocompleteTerms;

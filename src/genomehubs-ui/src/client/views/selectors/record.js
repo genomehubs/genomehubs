@@ -91,8 +91,12 @@ export const updateBrowse = (parents) => {
   return async function (dispatch) {
     const state = store.getState();
     const data = getBrowseStatus(state);
-    dispatch(setBrowse(produce(parents, (draft) => {
-      Object.assign(draft, data);
-    })));
+    dispatch(
+      setBrowse(
+        produce(parents, (draft) => {
+          Object.assign(draft, data);
+        }),
+      ),
+    );
   };
 };

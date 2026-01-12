@@ -13,7 +13,7 @@ export const setTreeThreshold = createAction("SET_TREE_THRESHOLD");
 export const treeThresholdValue = handleAction(
   "SET_TREE_THRESHOLD",
   (state, action) => action.payload,
-  treeThreshold
+  treeThreshold,
 );
 export const getTreeThreshold = (state) => state.treeThresholdValue;
 
@@ -43,7 +43,7 @@ const nodes = handleActions(
     },
     RESET_NODES: defaultState,
   },
-  defaultState()
+  defaultState(),
 );
 
 export const getNodes = (state) => state.nodes;
@@ -52,7 +52,7 @@ export const setRootNode = createAction("SET_ROOT_NODE");
 export const rootNode = handleAction(
   "SET_ROOT_NODE",
   (state, action) => action.payload,
-  null
+  null,
 );
 export const getRootNode = (state) => state.rootNode;
 
@@ -66,7 +66,7 @@ export const treeHighlight = handleAction(
   "SET_TREE_HIGHLIGHT",
   (state, action) =>
     action.payload.field ? action.payload : treeHighlightDefault,
-  treeHighlightDefault
+  treeHighlightDefault,
 );
 export const getTreeHighlight = (state) => state.treeHighlight;
 
@@ -74,7 +74,7 @@ export const setTreeQuery = createAction("SET_TREE_QUERY");
 export const treeQuery = handleAction(
   "SET_TREE_QUERY",
   (state, action) => action.payload,
-  null
+  null,
 );
 export const getTreeQuery = (state) => state.treeQuery;
 

@@ -6,7 +6,7 @@ export const requestTaxonomies = createAction("REQUEST_TAXONOMIES");
 export const receiveTaxonomies = createAction(
   "RECEIVE_TAXONOMIES",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 
 const defaultState = () => ({
@@ -26,7 +26,7 @@ const taxonomies = handleActions(
         draft.ids = action.payload;
       }),
   },
-  defaultState()
+  defaultState(),
 );
 
 export const getTaxonomies = (state) => state.taxonomies.ids;
@@ -37,7 +37,7 @@ export const setCurrentTaxonomy = createAction("SET_CURRENT_TAXONOMY");
 export const currentTaxonomy = handleAction(
   "SET_CURRENT_TAXONOMY",
   (state, action) => action.payload || TAXONOMY || "",
-  ""
+  "",
 );
 export const getCurrentTaxonomy = (state) => state.currentTaxonomy;
 
@@ -45,7 +45,7 @@ export const requestIndices = createAction("REQUEST_INDICES");
 export const receiveIndices = createAction(
   "RECEIVE_INDICES",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 
 const indices = handleActions(
@@ -60,7 +60,7 @@ const indices = handleActions(
         draft.ids = action.payload;
       }),
   },
-  defaultState()
+  defaultState(),
 );
 
 export const getIndices = (state) => state.indices.ids;
