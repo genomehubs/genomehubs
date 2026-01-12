@@ -7,7 +7,6 @@ import Typography from "@mui/material/Typography";
 import { compose } from "redux";
 import { scaleLog } from "d3-scale";
 import setColors from "../functions/setColors";
-import { shadesOfPurple } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { useLongPress } from "use-long-press";
 import withColors from "#hocs/withColors";
 import withTheme from "#hocs/withTheme";

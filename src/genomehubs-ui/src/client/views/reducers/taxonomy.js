@@ -1,6 +1,6 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 
 export const requestTaxonomies = createAction("REQUEST_TAXONOMIES");
 export const receiveTaxonomies = createAction(
@@ -17,13 +17,13 @@ const defaultState = () => ({
 const taxonomies = handleActions(
   {
     REQUEST_TAXONOMIES: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
+      produce(state, (draft) => {
+        draft.isFetching = true;
       }),
     RECEIVE_TAXONOMIES: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: false,
-        ids: action.payload,
+      produce(state, (draft) => {
+        draft.isFetching = false;
+        draft.ids = action.payload;
       }),
   },
   defaultState()
@@ -51,13 +51,13 @@ export const receiveIndices = createAction(
 const indices = handleActions(
   {
     REQUEST_INDICES: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
+      produce(state, (draft) => {
+        draft.isFetching = true;
       }),
     RECEIVE_INDICES: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: false,
-        ids: action.payload,
+      produce(state, (draft) => {
+        draft.isFetching = false;
+        draft.ids = action.payload;
       }),
   },
   defaultState()

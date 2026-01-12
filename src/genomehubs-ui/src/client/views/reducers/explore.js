@@ -1,6 +1,6 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 
 export const requestSummary = createAction("REQUEST_SUMMARY");
 export const receiveSummary = createAction(
@@ -23,31 +23,21 @@ function onReceiveSummary(state, action) {
   const summary = summaries[0];
   const id = `${summary.lineage}--${summary.field}--${summary.name}--${summary.taxonomy}`;
 
-  const updatedWithSummaryState = immutableUpdate(state, {
-    byId: { [id]: summary },
+  return produce(state, (draft) => {
+    draft.byId[id] = summary;
+    draft.allIds = [...new Set(state.allIds.concat(id))];
+    draft.isFetching = false;
+    draft.status = status;
+    draft.lastUpdated = meta.receivedAt;
   });
-
-  const updatedWithSummaryList = immutableUpdate(updatedWithSummaryState, {
-    allIds: [...new Set(updatedWithSummaryState.allIds.concat(id))],
-  });
-
-  const updatedWithMeta = immutableUpdate(updatedWithSummaryList, {
-    isFetching: false,
-    status,
-    lastUpdated: meta.receivedAt,
-  });
-
-  return updatedWithMeta;
 }
 
 const summaries = handleActions(
   {
     REQUEST_SUMMARY: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
-        requestedById: immutableUpdate(state, {
-          [action.payload]: true,
-        }),
+      produce(state, (draft) => {
+        draft.isFetching = true;
+        draft.requestedById[action.payload] = true;
       }),
     RECEIVE_SUMMARY: onReceiveSummary,
     RESET_SUMMARY: defaultSummaryState,

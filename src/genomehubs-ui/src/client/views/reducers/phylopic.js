@@ -4,7 +4,7 @@ import { byIdSelectorCreator } from "../reducers/selectorCreators";
 import createCachedSelector from "re-reselect";
 import { createSlice } from "@reduxjs/toolkit";
 import { current } from "@reduxjs/toolkit";
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 
 const defaultState = () => ({
   isFetching: false,

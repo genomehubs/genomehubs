@@ -1,7 +1,7 @@
 import { createAction, handleActions } from "redux-actions";
 
 import createCachedSelector from "re-reselect";
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 
 export const requestDescendants = createAction("REQUEST_DESCENDANTS");
 export const receiveDescendants = createAction(
@@ -19,47 +19,30 @@ const defaultState = () => ({
 
 function onReceiveDescendants(state, action) {
   const { payload, meta } = action;
-  const { taxonId: id, results, count, offset, depth } = payload;
+  const { taxonId: id, results, count, offset, depth, status } = payload;
 
-  let updatedWithDescendantsState;
-  if (state.byId && state.byId[id]) {
-    // let resultIds = new Set(state.byId[id].results.map((r) => r.id));
-    // let newResults = results.filter((r) => !resultIds.has(r.id));
-    let newResults = results;
-    if (newResults.length == 0) {
-      return immutableUpdate(state, {
-        isFetching: { [id]: false },
-      });
+  return produce(state, (draft) => {
+    if (state.byId && state.byId[id]) {
+      let newResults = results;
+      if (newResults.length > 0) {
+        draft.byId[id].results = [...state.byId[id].results, ...newResults];
+      }
+      draft.isFetching[id] = false;
+    } else {
+      draft.byId[id] = { results, count, depth };
+      draft.isFetching[id] = false;
     }
-    updatedWithDescendantsState = immutableUpdate(state, {
-      byId: { [id]: { results: [...state.byId[id].results, ...newResults] } },
-      isFetching: { [id]: false },
-    });
-  } else {
-    updatedWithDescendantsState = immutableUpdate(state, {
-      byId: { [id]: { results, count, depth } },
-      isFetching: { [id]: false },
-    });
-  }
-
-  const updatedWithDescendantsList = immutableUpdate(
-    updatedWithDescendantsState,
-    {
-      allIds: [...new Set(updatedWithDescendantsState.allIds.concat(id))],
-    }
-  );
-
-  return immutableUpdate(updatedWithDescendantsList, {
-    status,
-    lastUpdated: meta.receivedAt,
+    draft.allIds = [...new Set(state.allIds.concat(id))];
+    draft.status = status;
+    draft.lastUpdated = meta.receivedAt;
   });
 }
 
 const descendants = handleActions(
   {
     REQUEST_DESCENDANTS: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: { [action.payload]: true },
+      produce(state, (draft) => {
+        draft.isFetching[action.payload] = true;
       }),
     RECEIVE_DESCENDANTS: onReceiveDescendants,
     RESET_DESCENDANTS: defaultState,

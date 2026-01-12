@@ -1,6 +1,6 @@
 import { createAction, handleActions } from "redux-actions";
 
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 
 export const requestAutocomplete = createAction("REQUEST_AUTOCOMPLETE");
 export const receiveAutocomplete = createAction(
@@ -20,8 +20,8 @@ const defaultState = () => ({
 const autocompleteTerms = handleActions(
   {
     REQUEST_AUTOCOMPLETE: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
+      produce(state, (draft) => {
+        draft.isFetching = true;
       }),
     RECEIVE_AUTOCOMPLETE: (state, action) => ({
       isFetching: false,

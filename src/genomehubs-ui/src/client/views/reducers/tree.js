@@ -1,6 +1,6 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 
 export const requestNodes = createAction("REQUEST_NODES");
 export const receiveNodes = createAction("RECEIVE_NODES");
@@ -25,12 +25,12 @@ const defaultState = () => ({
 const nodes = handleActions(
   {
     REQUEST_NODES: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
+      produce(state, (draft) => {
+        draft.isFetching = true;
       }),
     CANCEL_NODES_REQUEST: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: false,
+      produce(state, (draft) => {
+        draft.isFetching = false;
       }),
     RECEIVE_NODES: (state, action) => {
       let tree = {};

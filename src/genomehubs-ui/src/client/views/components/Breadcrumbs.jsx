@@ -1,3 +1,4 @@
+import { A } from "storybook/internal/components";
 import LaunchIcon from "@mui/icons-material/Launch";
 import { Link } from "@reach/router";
 import NavLink from "./NavLink";
@@ -14,6 +15,7 @@ const Breadcrumbs = ({ basename, children, ...props }) => {
   let pathname = location.pathname.replace(`${basename}/`, "/");
   let parts = pathname.split("/");
   let link = "";
+  let title = "";
   parts.forEach((part, i) => {
     let name = part;
     if (part == "") {
@@ -30,7 +32,12 @@ const Breadcrumbs = ({ basename, children, ...props }) => {
         </NavLink>,
       );
     } else {
-      trail.push(<span key={`i`}>{children[0]}</span>);
+      if (Array.isArray(children) && children.length > 0) {
+        title = children[0];
+      } else if (typeof children == "string") {
+        title = children;
+      }
+      trail.push(<span key={`i`}>{title}</span>);
     }
     if (i < parts.length - 1) {
       trail.push(<span key={`${i}_`}> {">"} </span>);
@@ -45,7 +52,7 @@ const Breadcrumbs = ({ basename, children, ...props }) => {
   return (
     <>
       {trail}
-      <h1>{children[0]}</h1>
+      <h1>{title}</h1>
     </>
   );
 };

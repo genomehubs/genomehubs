@@ -11,7 +11,7 @@ import {
 import { apiUrl } from "../reducers/api";
 import { createSelector } from "reselect";
 import { getCurrentTaxonomy } from "../reducers/taxonomy";
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 import store from "../store";
 
 export const getLineage = createSelector(getCurrentRecord, (record) => {
@@ -91,6 +91,8 @@ export const updateBrowse = (parents) => {
   return async function (dispatch) {
     const state = store.getState();
     const data = getBrowseStatus(state);
-    dispatch(setBrowse(immutableUpdate(parents, data)));
+    dispatch(setBrowse(produce(parents, (draft) => {
+      Object.assign(draft, data);
+    })));
   };
 };

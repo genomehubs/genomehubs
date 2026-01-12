@@ -1,6 +1,6 @@
 import { createAction, handleAction } from "redux-actions";
 
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 
 export const setLookupTerm = createAction("SET_LOOKUP_TERM");
 export const lookupTerm = handleAction(
@@ -22,9 +22,9 @@ export const setInputQueries = createAction("SET_INPUT_QUERIES");
 export const inputQueries = handleAction(
   "SET_INPUT_QUERIES",
   (state, action) =>
-    immutableUpdate(state, {
-      byId: { [action.payload.id]: action.payload },
-      allIds: [...state.allIds, action.payload.id],
+    produce(state, (draft) => {
+      draft.byId[action.payload.id] = action.payload;
+      draft.allIds = [...state.allIds, action.payload.id];
     }),
   { allIds: [], byId: {} }
 );

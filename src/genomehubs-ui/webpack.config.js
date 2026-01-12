@@ -290,7 +290,7 @@ const config = {
       },
       {
         test: /\.svg$/,
-        use: ["svg-sprite-loader", "svgo-loader"],
+        use: ["@svgr/webpack", "svgo-loader"],
       },
       {
         test: /\.(gif|png|jpe?g)$/i,

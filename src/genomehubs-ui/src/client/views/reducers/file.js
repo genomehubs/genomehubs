@@ -1,6 +1,6 @@
 import { createAction, handleActions } from "redux-actions";
 
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 
 export const requestFiles = createAction("REQUEST_FILES");
 export const receiveFiles = createAction(
@@ -19,12 +19,12 @@ const defaultState = () => ({
 const files = handleActions(
   {
     REQUEST_FILES: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
+      produce(state, (draft) => {
+        draft.isFetching = true;
       }),
     CANCEL_FILES: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: false,
+      produce(state, (draft) => {
+        draft.isFetching = false;
       }),
     RECEIVE_FILES: (state, action) => {
       let byAnalysisId = {};
@@ -43,9 +43,9 @@ const files = handleActions(
         }
         byAnalysisId[analysis_id].byId[file_id] = result.result;
       });
-      return immutableUpdate(state, {
-        isFetching: false,
-        byAnalysisId: { ...state.byAnalysisId, ...byAnalysisId },
+      return produce(state, (draft) => {
+        draft.isFetching = false;
+        draft.byAnalysisId = { ...state.byAnalysisId, ...byAnalysisId };
       });
     },
     RESET_FILES: defaultState,
