@@ -1,7 +1,7 @@
 // Load only essential font weights (saves ~800 KB)
 import "@fontsource/open-sans/400.css";
 import "@fontsource/open-sans/700.css";
-import "@fontsource/signika/700.css";
+import "@fontsource/signika/index.css";
 import "@fontsource/roboto-mono/400.css";
 import "unfetch/polyfill";
 import "core-js/stable";

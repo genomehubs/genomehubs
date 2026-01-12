@@ -9,14 +9,15 @@ const runtimeBasename = (() => {
       window.process.ENV &&
       window.process.ENV.GH_BASENAME
     ) {
-      return window.process.ENV.GH_BASENAME;
+      return window.process.ENV.GH_BASENAME.replace(/^\/+/, "");
     }
   } catch {}
   // Fallback to build-time global if present
   try {
     // BASENAME is provided by webpack DefinePlugin
     // eslint-disable-next-line no-undef
-    return BASENAME || "";
+    const base = BASENAME || "";
+    return base.replace(/^\/+/, "");
   } catch {}
   return "";
 })();

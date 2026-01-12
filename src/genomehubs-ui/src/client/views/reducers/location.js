@@ -6,6 +6,23 @@ import qs from "../functions/qs";
 import { queryToStore } from "../querySync";
 import store from "../store";
 
+/**
+ * Safely join basename with a path, preventing double slashes
+ * @param {string} base - The basename (e.g., "/", "/genomehubs", "")
+ * @param {string} path - The path to append (e.g., "search", "/search")
+ * @returns {string} - Normalized path (e.g., "/search", "/genomehubs/search")
+ */
+export const pathJoin = (base, path) => {
+  const cleanBase = String(base || "").replace(/\/+$/, ""); // remove trailing slashes
+  const cleanPath = String(path || "").replace(/^\/+/, ""); // remove leading slashes
+
+  if (!cleanBase) {
+    return `/${cleanPath}`;
+  }
+
+  return `${cleanBase}/${cleanPath}`;
+};
+
 export const getBasename = () => {
   if (
     window &&
@@ -13,9 +30,10 @@ export const getBasename = () => {
     window.process.ENV &&
     window.process.ENV.GH_BASENAME
   ) {
-    return window.process.ENV.GH_BASENAME;
+    return window.process.ENV.GH_BASENAME.replace(/^\/+/, "");
   }
-  return BASENAME || "";
+  const base = BASENAME || "";
+  return base.replace(/^\/+/, "");
 };
 
 export const basename = getBasename();
@@ -34,13 +52,58 @@ export const getSitename = () => {
 
 export const siteName = getSitename();
 
+export const getSitenameLong = () => {
+  if (
+    window &&
+    window.process &&
+    window.process.ENV &&
+    window.process.ENV.GH_SITENAME_LONG
+  ) {
+    const v = window.process.ENV.GH_SITENAME_LONG;
+    if (v) return v;
+  }
+  // fallback inference from short sitename
+  const s = (getSitename() || "").toLowerCase();
+  if (s.includes("goat")) {
+    return "Genomes on a Tree";
+  }
+  if (s.includes("boat")) {
+    return "BUSCOs on a Tree";
+  }
+  if (s.includes("lepbase")) {
+    return "LepBase";
+  }
+  if (s.includes("molluscdb")) {
+    return "MolluscDB";
+  }
+  if (s.includes("isopodb")) {
+    return "IsopoDB";
+  }
+  if (s.includes("btk")) {
+    return "BlobToolKit";
+  }
+  return getSitename();
+};
+
+export const getCitationUrl = () => {
+  if (
+    window &&
+    window.process &&
+    window.process.ENV &&
+    typeof window.process.ENV.GH_CITATION_URL !== "undefined"
+  ) {
+    return window.process.ENV.GH_CITATION_URL || "";
+  }
+  return typeof CITATION_URL !== "undefined" ? CITATION_URL : "";
+};
+
 export const setPathname = createAction("SET_PATHNAME");
 export const pathname = handleAction(
   "SET_PATHNAME",
   (state, action) => action.payload,
   document.location.pathname
     .replace(new RegExp("^" + basename), "")
-    .replace("notfound", "") || ""
+    .replace("notfound", "") || "",
 );
 export const getPathname = (state) => {
   return state.pathname;
@@ -81,7 +144,7 @@ export const getStatic = createSelector(getViews, (views) => views.static);
 export const getDatasetID = createSelector(getViews, (views) => views.dataset);
 
 export const getSearchTerm = createSelector(getViews, (views) =>
-  decodeURI(views.search)
+  decodeURI(views.search),
 );
 
 export const viewsToPathname = (views) => {
@@ -134,19 +197,19 @@ export const setQueryString = createAction("SET_QUERY_STRING");
 export const queryString = handleAction(
   "SET_QUERY_STRING",
   (state, action) => action.payload,
-  (document.location.search || "").replace("?", "")
+  (document.location.search || "").replace("?", ""),
 );
 export const getQueryString = (state) => state.queryString || "";
 
 export const getParsedQueryString = createSelector(getQueryString, (str) =>
-  qs.parse(str)
+  qs.parse(str),
 );
 
 export const setHashString = createAction("SET_HASH_VALUE");
 export const hashString = handleAction(
   "SET_HASH_VALUE",
   (state, action) => action.payload,
-  (document.location.hash || "").replace("#", "")
+  (document.location.hash || "").replace("#", ""),
 );
 export const getHashString = (state) => state.hashString || "";
 
@@ -185,12 +248,12 @@ window.onpopstate = (e) => {
   let str = document.location.search.replace(/^\?/, "");
   let values = qs.parse(str);
   store.dispatch(
-    queryToStore({ values, searchReplace: true, currentQuery, action: "POP" })
+    queryToStore({ values, searchReplace: true, currentQuery, action: "POP" }),
   );
 };
 
 export const parseQueryString = createSelector(getQueryString, (str = "") =>
-  qs.parse(str.replace("?", ""))
+  qs.parse(str.replace("?", "")),
 );
 
 const getQueryId = (queryId) => queryId;
@@ -200,7 +263,7 @@ export const getQueryValue = createSelector(
   parseQueryString,
   (id, parsed) => {
     return parsed[id] || "";
-  }
+  },
 );
 
 export const locationReducers = {

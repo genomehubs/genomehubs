@@ -1,12 +1,3 @@
-import {
-  Color,
-  ConeGeometry,
-  Group,
-  Mesh,
-  MeshPhongMaterial,
-  SphereGeometry,
-  Vector3,
-} from "three";
 import React, {
   useCallback,
   useEffect,
@@ -16,21 +7,15 @@ import React, {
 } from "react";
 import { useLocation, useNavigate } from "@reach/router";
 
-import CloseIcon from "@mui/icons-material/Close";
 import CountryPopup from "./CountryPopup";
-import CountrySVG from "./CountrySVG";
 import GlobeGl from "react-globe.gl";
 import HexbinPopup from "./HexbinPopup";
-import NavLink from "../NavLink";
+import { MeshPhongMaterial } from "three";
 import PointPopup from "./PointPopup";
-import ReportPopup from "./ReportPopup";
 import Skeleton from "@mui/material/Skeleton";
 import { findCenterLatLng } from "./functions/mapHelpers";
-import getCountryColor from "./functions/getCountryColor";
 import getMapOptions from "./functions/getMapOptions";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
-import { mixColor } from "../../functions/mixColor";
-import { polygon } from "leaflet";
 
 const Globe = ({
   bounds,

@@ -1,4 +1,5 @@
 import React, { memo, useRef, useState } from "react";
+import { pathJoin, siteName } from "../reducers/location";
 import { useLocation, useNavigate } from "@reach/router";
 
 import AutoCompleteInput from "./AutoCompleteInput";
@@ -12,7 +13,6 @@ import { compose } from "redux";
 // import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
 import { getSuggestedTerm } from "../reducers/search";
 import qs from "../functions/qs";
-import { siteName } from "../reducers/location";
 import { useReadLocalStorage } from "usehooks-ts";
 import { useStyles } from "./SearchBoxStyles";
 import withLookup from "../hocs/withLookup";
@@ -147,11 +147,11 @@ const SearchBox = ({
     setPreferSearchTerm(false);
     if (pathname.match(/^search/)) {
       navigate(
-        `${basename}/${pathname}?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
+        `${pathJoin(basename, pathname)}?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
       );
     } else {
       navigate(
-        `${basename}/search?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
+        `${pathJoin(basename, "search")}?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
       );
     }
   };

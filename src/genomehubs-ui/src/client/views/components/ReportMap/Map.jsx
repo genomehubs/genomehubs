@@ -1,10 +1,10 @@
+import "../style/leaflet.css";
 import "leaflet/dist/leaflet.css";
 
 import {
   CircleMarker,
   GeoJSON,
   MapContainer,
-  Popup,
   TileLayer,
   useMap,
 } from "react-leaflet";

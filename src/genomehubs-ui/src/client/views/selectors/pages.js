@@ -26,7 +26,7 @@ export function fetchPages(pageId) {
       let markdown;
       // Normalize pageId: remove .md extension if present, server will add it
       const normalizedPath = pageId.toLowerCase().replace(/\.md$/i, "");
-      const apiUrl = `/api/markdown/${normalizedPath}`;
+      const apiUrl = `/assets/markdown/${normalizedPath}`;
 
       // First try: API endpoint (Node.js SSR server - production and testing)
       try {
@@ -42,7 +42,7 @@ export function fetchPages(pageId) {
           const webpackUrl =
             `${pagesUrl}/${webpackHash}/${pageId.toLowerCase()}`
               .replaceAll("//", "/")
-              .replace("/api/markdown", ""); // remove /api/markdown if present
+              .replace("/assets/markdown", ""); // remove /assets/markdown if present
           console.log(
             `API returned ${contentType || "unknown"}, trying webpack path ${webpackUrl}`,
           );

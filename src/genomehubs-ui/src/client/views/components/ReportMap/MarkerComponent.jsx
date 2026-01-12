@@ -1,15 +1,12 @@
 import NavLink from "../NavLink";
 import { Popup } from "react-leaflet";
-import React from "react";
 import SingleMarker from "./SingleMarker";
 import qs from "../../functions/qs";
 
 export default function MarkerComponent({
   geoPoints = [],
   color,
-  meta,
   options,
-  taxonId,
   setHighlightPointLocation = () => {},
   basename,
   globeView = false,

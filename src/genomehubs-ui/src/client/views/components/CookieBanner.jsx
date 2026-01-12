@@ -1,3 +1,5 @@
+import "./style/cookie.css";
+
 import React, { useState } from "react";
 import { useCookies, withCookies } from "react-cookie";
 

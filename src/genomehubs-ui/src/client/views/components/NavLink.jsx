@@ -27,7 +27,10 @@ const NavLink = ({
   if (url) {
     to = url;
   } else if (to) {
-    to = basename + "/" + to + (plain ? "" : location.search + location.hash);
+    const base = String(basename || "").replace(/\/+$/, ""); // remove trailing slashes
+    const path = String(to).replace(/^\/+/, ""); // remove leading slashes
+    to = base ? `${base}/${path}` : `/${path}`;
+    to += plain ? "" : location.search + location.hash;
   }
   let isCurrent = location.pathname.startsWith(to);
   if ((to && to.startsWith("http")) || props.href) {
@@ -67,22 +70,20 @@ const NavLink = ({
         </a>
       );
     }
-    to = basename + "/" + to.replace(location.origin, "");
+    // Internalize URLs from same origin
+    const base = String(basename || "").replace(/\/+$/, "");
+    const stripped = String(to)
+      .replace(location.origin, "")
+      .replace(/^\/+/, "");
+    to = base ? `${base}/${stripped}` : `/${stripped}`;
   }
   let css = linkStyle;
   if (tab) {
     css = classnames(tabStyle, { [tabHighlightStyle]: isCurrent });
   }
-  return (
-    <Link
-      {...props}
-      to={to
-        .replace(/\/+/, `${basename}/`)
-        .replace(`${basename}${basename}`, basename)
-        .replace(/\/\/+/, "/")}
-      className={css}
-    />
-  );
+  // Normalize: prevent double slashes which create protocol-relative URLs
+  to = to.replace(/\/\/+/g, "/");
+  return <Link {...props} to={to} className={css} />;
 };
 
 export default compose(withSiteName)(NavLink);

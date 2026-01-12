@@ -27,11 +27,14 @@ const app = express();
 const runtimeConfig = {
   // From location.js
   GH_SITENAME: process.env.GH_SITENAME || "Demo GenomeHub",
+  GH_SITENAME_LONG: process.env.GH_SITENAME_LONG || "", // optional long display name
   GH_BASENAME: process.env.GH_BASENAME || "/",
+  // Citation
+  GH_CITATION_URL: process.env.GH_CITATION_URL || "",
   // From api.js
-  GH_API_URL: process.env.GH_API_URL || "http://localhost:3000/api/v0.0.1",
+  GH_API_URL: process.env.GH_API_URL || "http://localhost:3000/api/v2",
   // From search.js
-  GH_DEFAULT_INDEX: process.env.GH_DEFAULT_INDEX || "assembly",
+  GH_DEFAULT_INDEX: process.env.GH_DEFAULT_INDEX || "taxon",
   GH_SUGGESTED_TERM: process.env.GH_SUGGESTED_TERM || "",
   // From archive.js (normalize to array)
   GH_ARCHIVE: (() => {
@@ -149,6 +152,58 @@ function injectIntoIndexHtml(
 ) {
   let html = indexHtml;
 
+  let customMeta = "";
+  const metaPath = path.join(CONTENT_ROOT, "../meta.json");
+  try {
+    if (fs.existsSync(metaPath)) {
+      const metaData = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
+      const metaTags = [];
+
+      // Process regular meta tags (name/content)
+      if (Array.isArray(metaData.meta)) {
+        metaTags.push(
+          ...metaData.meta.map((attrs) => {
+            if (attrs.charset) {
+              return `<meta charset="${escapeHtml(attrs.charset)}">`;
+            }
+            const attrStr = Object.entries(attrs)
+              .map(([key, val]) => `${key}="${escapeHtml(String(val))}"`)
+              .join(" ");
+            return `<meta ${attrStr}>`;
+          }),
+        );
+      }
+
+      // Process meta property tags (og:, twitter:, etc)
+      if (Array.isArray(metaData.meta_property)) {
+        metaTags.push(
+          ...metaData.meta_property.map((attrs) => {
+            const attrStr = Object.entries(attrs)
+              .map(([key, val]) => `${key}="${escapeHtml(String(val))}"`)
+              .join(" ");
+            return `<meta ${attrStr}>`;
+          }),
+        );
+      }
+
+      // Process link tags
+      if (Array.isArray(metaData.link)) {
+        metaTags.push(
+          ...metaData.link.map((attrs) => {
+            const attrStr = Object.entries(attrs)
+              .map(([key, val]) => `${key}="${escapeHtml(String(val))}"`)
+              .join(" ");
+            return `<link ${attrStr}>`;
+          }),
+        );
+      }
+
+      customMeta = metaTags.join("\n    ");
+    }
+  } catch (err) {
+    console.warn("Could not load meta.json:", err.message);
+  }
+
   // Inject runtime config EARLY in head so it's available before any scripts run
   // Define both window.process.ENV (for our code) and global webpack DefinePlugin variables
   const configScript = `<script>
@@ -156,12 +211,15 @@ window.process = window.process || {};
 window.process.ENV = ${JSON.stringify(runtimeConfig)};
 // Map to webpack DefinePlugin constants for compatibility
 window.SITENAME = window.process.ENV.GH_SITENAME;
+window.SITENAME_LONG = window.process.ENV.GH_SITENAME_LONG;
 window.BASENAME = window.process.ENV.GH_BASENAME;
+window.CITATION_URL = window.process.ENV.GH_CITATION_URL;
 window.API_URL = window.process.ENV.GH_API_URL;
 window.DEFAULT_INDEX = window.process.ENV.GH_DEFAULT_INDEX;
 window.SUGGESTED_TERM = window.process.ENV.GH_SUGGESTED_TERM;
 window.ARCHIVE = window.process.ENV.GH_ARCHIVE;
-</script>`;
+</script>
+${customMeta}`;
 
   // Inject right after <head> opens to ensure config is available before scripts
   html = html.replace("<head>", `<head>\n${configScript}`);
@@ -216,35 +274,35 @@ app.get("/health", (req, res) => {
 });
 
 // Runtime config endpoint (available to client-side code)
-app.get("/api/config", (req, res) => {
+app.get("/assets/config", (req, res) => {
   res.status(200).json(runtimeConfig);
 });
 
 // Markdown fetch endpoint for SPA client-side navigation
 // Allows dynamic markdown from mounted content directory to be served to the browser
-app.get("/api/markdown/*", async (req, res) => {
+app.get("/assets/markdown/*", async (req, res) => {
   try {
     const filePath = req.params[0]; // e.g., "projects/DTOL"
-    console.log(`[API] Markdown request for: ${filePath}`);
+    console.log(`[ASSETS] Markdown request for: ${filePath}`);
     const mdPath = resolveMarkdownPath(`/${filePath}`);
 
     if (mdPath) {
-      console.log(`[API] Resolved to file: ${mdPath}`);
+      console.log(`[ASSETS] Resolved to file: ${mdPath}`);
       let content = fs.readFileSync(mdPath, "utf8");
 
       // Rewrite image paths to use the API endpoint
-      // Images like /static/images/... → /api/images/...
+      // Images like /static/images/... → /assets/images/...
       // This ensures images are served from the mounted content directory
       content = content.replace(
         /!\[([^\]]*)\]\(\/static\/([^)]+)\)/g,
         (match, alt, path) => {
-          return `![${alt}](/api/images/${path})`;
+          return `![${alt}](/assets/images/${path})`;
         },
       );
 
       res.status(200).type("text/plain").send(content);
     } else {
-      console.log(`[API] File not found for: ${filePath}`);
+      console.log(`[ASSETS] File not found for: ${filePath}`);
       res
         .status(404)
         .json({ error: "Markdown file not found", path: filePath });
@@ -257,10 +315,10 @@ app.get("/api/markdown/*", async (req, res) => {
 
 // Image fetch endpoint for markdown content images
 // Serves images from the mounted content directory
-app.get("/api/images/*", async (req, res) => {
+app.get("/assets/images/*", async (req, res) => {
   try {
     const filePath = req.params[0]; // e.g., "images/DToL_Logo_with_text.png"
-    console.log(`[API] Image request for: ${filePath}`);
+    console.log(`[ASSETS] Image request for: ${filePath}`);
 
     // Security: prevent directory traversal attacks
     if (filePath.includes("..")) {
@@ -275,10 +333,10 @@ app.get("/api/images/*", async (req, res) => {
     }
 
     if (fs.existsSync(imagePath) && fs.statSync(imagePath).isFile()) {
-      console.log(`[API] Serving image from: ${imagePath}`);
+      console.log(`[ASSETS] Serving image from: ${imagePath}`);
       res.status(200).sendFile(imagePath);
     } else {
-      console.log(`[API] Image not found: ${imagePath}`);
+      console.log(`[ASSETS] Image not found: ${imagePath}`);
       res.status(404).json({ error: "Image not found", path: filePath });
     }
   } catch (err) {
@@ -287,8 +345,45 @@ app.get("/api/images/*", async (req, res) => {
   }
 });
 
+// Serve root-level asset files (e.g., android-chrome-192x192.png, apple-touch-icon.png, manifest.json)
+app.get(
+  /^\/[^/]+\.(png|jpg|jpeg|gif|svg|ico|json|webmanifest|xml|txt)$/,
+  (req, res) => {
+    const assetPath = path.join(CONTENT_ROOT, "../assets", req.path.slice(1)); // Remove leading /
+
+    console.log(`[ASSETS] Root asset request for: ${assetPath}`);
+    // Security: prevent directory traversal
+    if (assetPath.includes("..")) {
+      return res.status(400).json({ error: "Invalid path" });
+    }
+
+    // Verify the file is within the assets directory
+    if (!assetPath.startsWith(path.join(CONTENT_ROOT, "../assets"))) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    if (fs.existsSync(assetPath) && fs.statSync(assetPath).isFile()) {
+      console.log(`[ASSETS] Serving root asset from: ${assetPath}`);
+      res.sendFile(assetPath);
+    } else {
+      res.status(404).send("Not Found");
+    }
+  },
+);
+
+// For favicons specifically
+app.get("/favicon.ico", (req, res) => {
+  const faviconPath = path.join(CONTENT_ROOT, "../assets/favicon.ico");
+  if (fs.existsSync(faviconPath)) {
+    res.sendFile(faviconPath);
+  } else {
+    res.status(404).send("Not Found");
+  }
+});
+
 // Markdown SSR + SPA route: serve SSR + SPA for any non-asset path
 app.get("*", async (req, res) => {
+  console.log(`[SSR] Request for: ${req.path}`);
   try {
     const wantsSSR = SSR_MODE === "all" || (SSR_MODE === "bots" && isBot(req));
     const mdPath = resolveMarkdownPath(req.path);
@@ -331,7 +426,9 @@ app.get("*", async (req, res) => {
   window.process.ENV = ${JSON.stringify(runtimeConfig)};
   // Map to webpack DefinePlugin-style globals for compatibility
   window.SITENAME = window.process.ENV.GH_SITENAME;
+  window.SITENAME_LONG = window.process.ENV.GH_SITENAME_LONG;
   window.BASENAME = window.process.ENV.GH_BASENAME;
+  window.CITATION_URL = window.process.ENV.GH_CITATION_URL;
   window.API_URL = window.process.ENV.GH_API_URL;
   window.DEFAULT_INDEX = window.process.ENV.GH_DEFAULT_INDEX;
   window.SUGGESTED_TERM = window.process.ENV.GH_SUGGESTED_TERM;

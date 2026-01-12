@@ -244,9 +244,9 @@ const config = {
       : [
           new CopyWebpackPlugin({
             patterns: [
-              {
-                from: "./src/client/favicon",
-              },
+              // {
+              //   from: "./src/client/favicon",
+              // },
               {
                 from: main.pagesPath,
                 to({ context, absoluteFilename }) {
@@ -332,20 +332,14 @@ const config = {
         ],
         include: [
           /node_modules/,
-          path.resolve(
-            __dirname,
-            "src/client/views/components/style/node_modules.css",
-          ),
+          path.resolve(__dirname, "src/client/views/components/style"),
         ],
       },
       {
         test: /\.(sa|sc|c)ss$/,
         exclude: [
           /node_modules/,
-          path.resolve(
-            __dirname,
-            "/src/client/views/components/style/node_modules.css",
-          ),
+          path.resolve(__dirname, "src/client/views/components/style"),
         ],
         use: [
           devMode ? MiniCssExtractPlugin.loader : "style-loader",
@@ -359,6 +353,29 @@ const config = {
               },
               sourceMap: true,
               importLoaders: 2,
+            },
+          },
+          "postcss-loader",
+          {
+            loader: "sass-loader",
+            options: {
+              additionalData: `$directColor: ${main.directColor}; \
+$ancestralColor: ${main.ancestralColor};\
+$descendantColor: ${main.descendantColor};`,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.scss$/,
+        include: [path.resolve(__dirname, "src/client/styles/shared.scss")],
+        use: [
+          devMode ? MiniCssExtractPlugin.loader : "style-loader",
+          {
+            loader: "css-loader",
+            options: {
+              modules: false,
+              sourceMap: true,
             },
           },
           "postcss-loader",

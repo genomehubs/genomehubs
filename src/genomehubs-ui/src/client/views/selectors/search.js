@@ -14,10 +14,10 @@ import {
   setSearchIndex,
   setSearchTerm,
 } from "../reducers/search";
+import { getBasename, pathJoin } from "../reducers/location";
 import { resetController, setMessage } from "../reducers/message";
 
 import { checkProgress } from "./checkProgress";
-import { getBasename } from "../reducers/location";
 import { getCurrentTaxonomy } from "../reducers/taxonomy";
 import { getTypes } from "../reducers/types";
 import { nanoid } from "nanoid";
@@ -112,9 +112,12 @@ export function fetchSearchResults(options, navigate) {
           if (json.queryString) {
             navOptions.query = json.queryString;
           }
-          navigate(`${basename}/search?${qs.stringify(navOptions)}`, {
-            replace: true,
-          });
+          navigate(
+            `${pathJoin(basename, "search")}?${qs.stringify(navOptions)}`,
+            {
+              replace: true,
+            },
+          );
         }
         dispatch(receiveSearch(json));
       }
