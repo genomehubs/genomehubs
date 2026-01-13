@@ -39,10 +39,9 @@ const config = {
     main: [APP_DIR + "/index.jsx"],
   },
   output: {
-    // Always use "/" as webpack's publicPath at build time.
-    // The runtime __webpack_public_path__ setter in server/index.js will override this
-    // based on GH_BASENAME, allowing the same build to work with any basename.
-    publicPath: "/",
+    // Use "auto" to automatically determine publicPath at runtime based on script location
+    // This allows the same build to work with any basename
+    publicPath: "auto",
     path: BUILD_DIR + "/",
     // filename: devMode ? "js/bundle.js" : "js/[name].[contenthash].js",
     filename: "js/[name].[contenthash].js",
