@@ -14,7 +14,6 @@ export const webpackHash = COMMIT_HASH || __webpack_hash__;
 
 export function fetchPages(pageId) {
   return async function (dispatch) {
-    console.log(`Fetching page ${pageId}...`);
     const state = store.getState();
     const isFetching = getPagesIsFetchingById(state, pageId);
     if (isFetching) {
@@ -36,16 +35,12 @@ export function fetchPages(pageId) {
         // Check if we got markdown (text/plain) not HTML error page
         if (apiResponse.ok && contentType.includes("text/plain")) {
           markdown = await apiResponse.text();
-          console.log(`Fetched from API endpoint ${apiUrl}`);
         } else {
           // API didn't return markdown, try webpack-bundled static markdown
           const webpackUrl =
             `${pagesUrl}/${webpackHash}/${pageId.toLowerCase()}`
               .replaceAll("//", "/")
               .replace("/assets/markdown", ""); // remove /assets/markdown if present
-          console.log(
-            `API returned ${contentType || "unknown"}, trying webpack path ${webpackUrl}`,
-          );
           const webpackResponse = await fetch(webpackUrl);
           if (webpackResponse.ok) {
             markdown = await webpackResponse.text();
@@ -54,10 +49,6 @@ export function fetchPages(pageId) {
           }
         }
       } catch (error) {
-        console.log(
-          "Error fetching from API, trying webpack fallback...",
-          error,
-        );
         // Webpack dev server fallback
         try {
           const webpackUrl =

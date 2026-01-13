@@ -14,6 +14,7 @@ function esm(mod) {
 }
 
 const { unified } = require("unified");
+const { file } = require("jszip");
 const remarkParse = esm(require("remark-parse"));
 const remarkGfm = esm(require("remark-gfm"));
 const remarkRehype = esm(require("remark-rehype"));
@@ -313,11 +314,9 @@ app.get("/assets/config", (req, res) => {
 app.get("/assets/markdown/*", async (req, res) => {
   try {
     const filePath = req.params[0]; // e.g., "projects/DTOL"
-    console.log(`[ASSETS] Markdown request for: ${filePath}`);
     const mdPath = resolveMarkdownPath(`/${filePath}`);
 
     if (mdPath) {
-      console.log(`[ASSETS] Resolved to file: ${mdPath}`);
       let content = fs.readFileSync(mdPath, "utf8");
 
       // Get file modification time for ETag
@@ -342,7 +341,6 @@ app.get("/assets/markdown/*", async (req, res) => {
 
       res.status(200).type("text/plain").send(content);
     } else {
-      console.log(`[ASSETS] File not found for: ${filePath}`);
       res
         .status(404)
         .json({ error: "Markdown file not found", path: filePath });
@@ -357,8 +355,10 @@ app.get("/assets/markdown/*", async (req, res) => {
 // Serves images from the mounted content directory
 app.get("/assets/images/*", async (req, res) => {
   try {
-    const filePath = req.params[0]; // e.g., "images/DToL_Logo_with_text.png"
-    console.log(`[ASSETS] Image request for: ${filePath}`);
+    let filePath = req.params[0]; // e.g., "images/DToL_Logo_with_text.png"
+    if (!filePath.startsWith("images/")) {
+      filePath = `images/${filePath}`;
+    }
 
     // Security: prevent directory traversal attacks
     if (filePath.includes("..")) {
@@ -382,10 +382,8 @@ app.get("/assets/images/*", async (req, res) => {
       res.set("Cache-Control", "public, max-age=2592000, must-revalidate");
       res.set("Vary", "Accept-Encoding");
 
-      console.log(`[ASSETS] Serving image from: ${imagePath}`);
       res.status(200).sendFile(imagePath);
     } else {
-      console.log(`[ASSETS] Image not found: ${imagePath}`);
       res.status(404).json({ error: "Image not found", path: filePath });
     }
   } catch (err) {
@@ -394,45 +392,35 @@ app.get("/assets/images/*", async (req, res) => {
   }
 });
 
-// Serve root-level asset files (e.g., android-chrome-192x192.png, apple-touch-icon.png, manifest.json)
-app.get(
-  /^\/[^/]+\.(png|jpg|jpeg|gif|svg|ico|json|webmanifest|xml|txt)$/,
-  (req, res) => {
-    const assetPath = path.join(CONTENT_ROOT, "../assets", req.path.slice(1)); // Remove leading /
+// Rewrite root-level asset files (e.g., /favicon.ico → /assets/favicon.ico)
+app.use((req, res, next) => {
+  if (
+    /^\/[^/]+\.(png|jpg|jpeg|gif|svg|ico|json|webmanifest|xml|txt)$/.test(
+      req.path,
+    )
+  ) {
+    req.url = `/assets${req.path}`;
+  }
+  next();
+});
 
-    console.log(`[ASSETS] Root asset request for: ${assetPath}`);
-    // Security: prevent directory traversal
-    if (assetPath.includes("..")) {
-      return res.status(400).json({ error: "Invalid path" });
-    }
+app.get("/assets/*", (req, res) => {
+  const assetPath = path.join(CONTENT_ROOT, "../assets", req.params[0]); // Remove leading /
 
-    // Verify the file is within the assets directory
-    if (!assetPath.startsWith(path.join(CONTENT_ROOT, "../assets"))) {
-      return res.status(403).json({ error: "Access denied" });
-    }
+  // Security: prevent directory traversal
+  if (assetPath.includes("..")) {
+    return res.status(400).json({ error: "Invalid path" });
+  }
 
-    if (fs.existsSync(assetPath) && fs.statSync(assetPath).isFile()) {
-      console.log(`[ASSETS] Serving root asset from: ${assetPath}`);
-      res.sendFile(assetPath);
-    } else {
-      res.status(404).send("Not Found");
-    }
-  },
-);
+  // Verify the file is within the assets directory
+  if (!assetPath.startsWith(path.join(CONTENT_ROOT, "../assets"))) {
+    return res.status(403).json({ error: "Access denied" });
+  }
 
-// Explicit route for manifest.json from external goat-ui repo
-app.get("/assets/manifest.json", (req, res) => {
-  const manifestPath = path.join(CONTENT_ROOT, "../assets", "manifest.json");
-
-  console.log(`[MANIFEST] Requesting from: ${manifestPath}`);
-
-  if (fs.existsSync(manifestPath) && fs.statSync(manifestPath).isFile()) {
-    console.log(`[MANIFEST] Serving manifest from: ${manifestPath}`);
-    res.set("Content-Type", "application/json");
-    res.sendFile(manifestPath);
+  if (fs.existsSync(assetPath) && fs.statSync(assetPath).isFile()) {
+    res.sendFile(assetPath);
   } else {
-    console.log(`[MANIFEST] Not found at: ${manifestPath}`);
-    res.status(404).json({ error: "Manifest not found" });
+    res.status(404).send("Not Found");
   }
 });
 
@@ -440,14 +428,10 @@ app.get("/assets/manifest.json", (req, res) => {
 app.get("/js/cookies-gcc.js", (req, res) => {
   const cookiesPath = path.join(BUILD_DIR, "js", "cookies-gcc.js");
 
-  console.log(`[COOKIES] Requesting from: ${cookiesPath}`);
-
   if (fs.existsSync(cookiesPath) && fs.statSync(cookiesPath).isFile()) {
-    console.log(`[COOKIES] Serving cookies script from: ${cookiesPath}`);
     res.set("Content-Type", "application/javascript");
     res.sendFile(cookiesPath);
   } else {
-    console.log(`[COOKIES] Production cookies script not found, serving stub`);
     // Return empty stub to prevent 404 in dev/test environments
     res.set("Content-Type", "application/javascript");
     res.send("// Cookies script stub - only available in production\n");
@@ -466,7 +450,6 @@ app.get("/favicon.ico", (req, res) => {
 
 // Markdown SSR + SPA route: serve SSR + SPA for any non-asset path
 app.get("*", async (req, res) => {
-  console.log(`[SSR] Request for: ${req.path}`);
   try {
     const wantsSSR = SSR_MODE === "all" || (SSR_MODE === "bots" && isBot(req));
     const mdPath = resolveMarkdownPath(req.path);

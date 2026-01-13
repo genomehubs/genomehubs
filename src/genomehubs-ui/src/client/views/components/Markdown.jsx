@@ -440,12 +440,6 @@ export const RehypeComponentsList = (extra) => {
         // Extract YAML content directly from code element's children
         const yamlContent = codeElement?.props?.children || "";
 
-        console.log("Extracted YAML:", {
-          className,
-          yamlLength: yamlContent.length,
-          yamlStart: yamlContent.substring(0, 50),
-        });
-
         let nestedProps = YAML.load(yamlContent);
         if (className == "language-report") {
           return (
