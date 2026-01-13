@@ -50,6 +50,8 @@ const config = {
     extensions: [".js", ".jsx"],
   },
   optimization: {
+    usedExports: true, // Enable tree-shaking
+    sideEffects: true, // Respect sideEffects flag in package.json
     splitChunks: {
       chunks: "all",
       minSize: 10000,
@@ -269,7 +271,14 @@ const config = {
         use: {
           loader: "babel-loader",
           options: {
-            presets: ["@babel/preset-env"],
+            presets: [
+              [
+                "@babel/preset-env",
+                {
+                  modules: false, // Preserve ES6 modules for tree-shaking
+                },
+              ],
+            ],
           },
         },
       },
