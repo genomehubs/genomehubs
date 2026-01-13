@@ -20,13 +20,13 @@ import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Tooltip from "./Tooltip";
 import { compose } from "redux";
-import dispatchReport from "../hocs/dispatchReport";
-import { getSuggestedTerm } from "../reducers/search";
-import qs from "../functions/qs";
-import withReportById from "../hocs/withReportById";
+import dispatchReport from "#hocs/dispatchReport";
+import { getSuggestedTerm } from "#reducers/search";
+import qs from "#functions/qs";
+import withReportById from "#hocs/withReportById";
 import withSiteName from "#hocs/withSiteName";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 const suggestedTerm = getSuggestedTerm();
 

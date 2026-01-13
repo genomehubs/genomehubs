@@ -1,4 +1,4 @@
-import { getLoading, setLoading } from "../reducers/loading";
+import { getLoading, setLoading } from "#reducers/loading";
 
 import React from "react";
 import { connect } from "react-redux";

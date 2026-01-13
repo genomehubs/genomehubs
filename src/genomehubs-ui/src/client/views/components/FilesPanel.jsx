@@ -16,9 +16,9 @@ import classnames from "classnames";
 import { compose } from "redux";
 import { setLinkIcons } from "./ResultTable";
 import withColors from "#hocs/withColors";
-import withRecord from "../hocs/withRecord";
-import withTheme from "../hocs/withTheme";
-import withTypes from "../hocs/withTypes";
+import withRecord from "#hocs/withRecord";
+import withTheme from "#hocs/withTheme";
+import withTypes from "#hocs/withTypes";
 
 const FilesPanel = ({
   files,

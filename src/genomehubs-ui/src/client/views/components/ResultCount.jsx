@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 
 import { compose } from "redux";
-import fetchCount from "../functions/fetchCount";
-import qs from "../functions/qs";
-import withApi from "../hocs/withApi";
+import fetchCount from "#functions/fetchCount";
+import qs from "#functions/qs";
+import withApi from "#hocs/withApi";
 
 const ResultCount = ({ apiUrl, ...options }) => {
   let [count, setCount] = useState();

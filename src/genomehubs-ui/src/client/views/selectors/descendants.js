@@ -1,13 +1,13 @@
-import { apiUrl, setApiStatus } from "../reducers/api";
+import { apiUrl, setApiStatus } from "#reducers/api";
 import {
   getDescendants,
   getDescendantsIsFetchingByTaxonId,
   receiveDescendants,
   requestDescendants,
-} from "../reducers/descendants";
+} from "#reducers/descendants";
 
-import { getCurrentTaxonomy } from "../reducers/taxonomy";
-import store from "../store";
+import { getCurrentTaxonomy } from "#reducers/taxonomy";
+import store from "#store";
 
 export function fetchDescendants({
   taxonId,

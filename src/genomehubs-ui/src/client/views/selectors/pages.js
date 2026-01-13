@@ -4,10 +4,10 @@ import {
   getPagesIsFetching,
   receivePages,
   requestPages,
-} from "../reducers/pages";
+} from "#reducers/pages";
 
 import { createCachedSelector } from "re-reselect";
-import store from "../store";
+import store from "#store";
 
 export const pagesUrl = PAGES_URL || false;
 export const webpackHash = COMMIT_HASH || __webpack_hash__;

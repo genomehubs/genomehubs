@@ -4,8 +4,8 @@ import React from "react";
 import Tooltip from "./Tooltip";
 import { active as activeStyle } from "./Styles.scss";
 import { compose } from "redux";
-import formats from "../functions/formats";
-import stringLength from "../functions/stringLength";
+import formats from "#functions/formats";
+import stringLength from "#functions/stringLength";
 import withColors from "#hocs/withColors";
 import withTheme from "#hocs/withTheme";
 

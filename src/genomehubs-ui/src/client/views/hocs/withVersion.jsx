@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { getVersion } from "../selectors/types";
+import { getVersion } from "#selectors/types";
 
 const withVersion = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({

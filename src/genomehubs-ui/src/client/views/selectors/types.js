@@ -7,20 +7,20 @@ import {
   getTypesFetching,
   receiveTypes,
   requestTypes,
-} from "../reducers/types";
+} from "#reducers/types";
 import {
   getSearchFields,
   getSearchIndex,
   getSearchNameClasses,
   getSearchRanks,
-} from "../reducers/search";
+} from "#reducers/search";
 
 import TrieSearch from "trie-search";
-import { apiUrl } from "../reducers/api";
+import { apiUrl } from "#reducers/api";
 import { createCachedSelector } from "re-reselect";
 import { createSelector } from "reselect";
-import { setApiStatus } from "../reducers/api";
-import store from "../store";
+import { setApiStatus } from "#reducers/api";
+import store from "#store";
 
 export const getTypesMap = createSelector(
   getTypes,

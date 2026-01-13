@@ -10,7 +10,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import ErrorIcon from "@mui/icons-material/Error";
 import Tooltip from "../Tooltip";
-import stringLength from "../../functions/stringLength";
+import stringLength from "#functions/stringLength";
 
 const ValueChips = ({
   value = "",

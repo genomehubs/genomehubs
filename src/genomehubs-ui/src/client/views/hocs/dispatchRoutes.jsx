@@ -1,8 +1,8 @@
-import { cancelPages, getPages } from "../reducers/pages";
+import { cancelPages, getPages } from "#reducers/pages";
 
 import React from "react";
 import { connect } from "react-redux";
-import { setRoutes } from "../reducers/routes";
+import { setRoutes } from "#reducers/routes";
 
 const withRoutes = (WrappedComponent) => (props) => {
   const mapDispatchToProps = (dispatch) => ({

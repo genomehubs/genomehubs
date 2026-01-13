@@ -4,11 +4,11 @@ import {
   getTaxonomies,
   getTaxonomiesFetching,
   setCurrentTaxonomy,
-} from "../reducers/taxonomy";
+} from "#reducers/taxonomy";
 
 import React from "react";
 import { connect } from "react-redux";
-import { fetchTaxonomies } from "../selectors/taxonomy";
+import { fetchTaxonomies } from "#selectors/taxonomy";
 
 const withTaxonomy = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({

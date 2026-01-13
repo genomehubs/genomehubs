@@ -1,7 +1,7 @@
 import {
   setHighlightPointLocation,
   setZoomPointLocation,
-} from "../reducers/geography";
+} from "#reducers/geography";
 
 import React from "react";
 import { connect } from "react-redux";

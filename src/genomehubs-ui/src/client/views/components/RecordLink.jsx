@@ -3,14 +3,14 @@ import React, { useEffect } from "react";
 import { Chip } from "@mui/material";
 import LaunchIcon from "@mui/icons-material/Launch";
 import Tooltip from "./Tooltip";
-import compareValues from "../functions/compareValues";
+import compareValues from "#functions/compareValues";
 import { compose } from "redux";
-import getPrimaryAssemblyId from "../functions/getPrimaryAssemblyId";
+import getPrimaryAssemblyId from "#functions/getPrimaryAssemblyId";
 import { recordLinkIcon as recordLinkIconStyle } from "./Styles.scss";
-import withApi from "../hocs/withApi";
+import withApi from "#hocs/withApi";
 import withColors from "#hocs/withColors";
-import withRecord from "../hocs/withRecord";
-import withTheme from "../hocs/withTheme";
+import withRecord from "#hocs/withRecord";
+import withTheme from "#hocs/withTheme";
 
 const RecordLink = ({
   record,

@@ -7,15 +7,15 @@ import {
 import Skeleton from "@mui/material/Skeleton";
 import { TagCloud } from "react-tagcloud";
 import { compose } from "redux";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import { useIntersectionObserver } from "usehooks-ts";
-import useNavigate from "../hooks/useNavigate";
-import withLookup from "../hocs/withLookup";
-import withSearch from "../hocs/withSearch";
+import useNavigate from "#hooks/useNavigate";
+import withLookup from "#hocs/withLookup";
+import withSearch from "#hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";
-import withSummary from "../hocs/withSummary";
-import withSummaryById from "../hocs/withSummaryById";
-import withTaxonomy from "../hocs/withTaxonomy";
+import withSummary from "#hocs/withSummary";
+import withSummaryById from "#hocs/withSummaryById";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 const WordCloud = ({
   summaryId,

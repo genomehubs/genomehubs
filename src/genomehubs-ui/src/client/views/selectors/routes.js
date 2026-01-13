@@ -1,5 +1,5 @@
 import { createCachedSelector } from "re-reselect";
-import { getRoutes } from "../reducers/routes";
+import { getRoutes } from "#reducers/routes";
 
 const processRoutes = (routes, RouteName) => {
   let route = routes.byId[RouteName];

@@ -28,17 +28,17 @@ import Tooltip from "./Tooltip";
 import ZoomControl from "./ZoomControl";
 import classnames from "classnames";
 import { compose } from "redux";
-import { formatter } from "../functions/formatter";
+import { formatter } from "#functions/formatter";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "../functions/qs";
-import useNavigate from "../hooks/useNavigate";
-import withApi from "../hocs/withApi";
-import withRecord from "../hocs/withRecord";
-import withSearch from "../hocs/withSearch";
+import qs from "#functions/qs";
+import useNavigate from "#hooks/useNavigate";
+import withApi from "#hocs/withApi";
+import withRecord from "#hocs/withRecord";
+import withSearch from "#hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";
-import withSummary from "../hocs/withSummary";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import withSummary from "#hocs/withSummary";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 const styleMap = {
   underscoreHighStyle,

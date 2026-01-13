@@ -1,9 +1,9 @@
-import { fetchReport, saveReport } from "../selectors/report";
+import { fetchReport, saveReport } from "#selectors/report";
 import {
   setReportEdit,
   setReportSelect,
   setReportTerm,
-} from "../reducers/report";
+} from "#reducers/report";
 
 import React from "react";
 import { connect } from "react-redux";

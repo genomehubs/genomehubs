@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 import Tooltip from "./Tooltip";
-import fillValues from "../functions/fillValues";
-import formats from "../functions/formats";
+import fillValues from "#functions/fillValues";
+import formats from "#functions/formats";
 
 export const DisplayCount = ({
   description,

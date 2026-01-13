@@ -3,7 +3,7 @@ import {
   ancestralColor,
   descendantColor,
   directColor,
-} from "../reducers/color";
+} from "#reducers/color";
 
 import React from "react";
 import { format } from "d3-format";

@@ -10,9 +10,9 @@ import Page from "./Page";
 import ReportFull from "./ReportFull";
 import classnames from "classnames";
 import { compose } from "redux";
-import dispatchLookup from "../hocs/dispatchLookup";
-import qs from "../functions/qs";
-import { sortReportQuery } from "../selectors/report";
+import dispatchLookup from "#hocs/dispatchLookup";
+import qs from "#functions/qs";
+import { sortReportQuery } from "#selectors/report";
 
 const ReportPage = ({ location, setLookupTerm, topLevel, ...props }) => {
   let queryString = location.search.replace(/^\?/, "");

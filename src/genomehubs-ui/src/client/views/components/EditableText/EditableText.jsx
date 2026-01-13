@@ -15,8 +15,8 @@ import TextField from "@mui/material/TextField";
 import Tooltip from "../Tooltip";
 import Typography from "@mui/material/Typography";
 import ValueChips from "./ValueChips";
-import { setLookupTerm } from "../../reducers/lookup";
-import stringLength from "../../functions/stringLength";
+import { setLookupTerm } from "#reducers/lookup";
+import stringLength from "#functions/stringLength";
 
 const checkContrast = (color, background, threshold = 4.5) => {
   const hexToRgb = (hex) => {

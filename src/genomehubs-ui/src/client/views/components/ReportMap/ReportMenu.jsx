@@ -8,7 +8,7 @@ import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import MuiCloseIcon from "@mui/icons-material/Close";
 import Switch from "@mui/material/Switch";
 import getMapOptions from "./functions/getMapOptions";
-import { mixColor } from "../../functions/mixColor";
+import { mixColor } from "#functions/mixColor";
 import { transform } from "proj4";
 
 export const ReportMenu = ({

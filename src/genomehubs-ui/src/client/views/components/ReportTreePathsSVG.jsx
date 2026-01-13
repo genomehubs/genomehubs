@@ -12,7 +12,7 @@ import classnames from "classnames";
 import { compose } from "redux";
 import { scaleLog } from "d3-scale";
 import { useLongPress } from "use-long-press";
-import withTypes from "../hocs/withTypes";
+import withTypes from "#hocs/withTypes";
 
 const ReportTreePaths = ({
   count,

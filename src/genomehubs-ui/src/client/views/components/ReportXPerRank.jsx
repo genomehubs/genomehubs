@@ -3,9 +3,9 @@ import React, { useEffect, useRef } from "react";
 import Tooltip from "./Tooltip";
 import { boldValue as boldValueStyle } from "./Styles.scss";
 import { compose } from "redux";
-import qs from "../functions/qs";
-import useNavigate from "../hooks/useNavigate";
-import useResize from "../hooks/useResize";
+import qs from "#functions/qs";
+import useNavigate from "#hooks/useNavigate";
+import useResize from "#hooks/useResize";
 import withSiteName from "#hocs/withSiteName";
 
 const ReportXPerRank = ({

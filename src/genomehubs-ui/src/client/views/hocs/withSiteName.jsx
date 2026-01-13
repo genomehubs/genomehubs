@@ -3,7 +3,7 @@ import {
   getCitationUrl,
   getSitename,
   getSitenameLong,
-} from "../reducers/location";
+} from "#reducers/location";
 
 import React from "react";
 import { connect } from "react-redux";

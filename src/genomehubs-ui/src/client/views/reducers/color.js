@@ -20,7 +20,7 @@ import {
 import batlow from "./color/batlow";
 import batlowS from "./color/batlowS";
 import { createSelector } from "reselect";
-import { mixColor } from "../functions/mixColor";
+import { mixColor } from "#functions/mixColor";
 import { produce } from "immer";
 
 const ANCESTRAL_COLOR =

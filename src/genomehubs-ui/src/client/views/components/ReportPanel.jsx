@@ -10,12 +10,12 @@ import Grid from "@mui/material/Grid";
 import ReportFull from "./ReportFull";
 import classnames from "classnames";
 import { compose } from "redux";
-import dispatchReport from "../hocs/dispatchReport";
-import qs from "../functions/qs";
-import { sortReportQuery } from "../selectors/report";
+import dispatchReport from "#hocs/dispatchReport";
+import qs from "#functions/qs";
+import { sortReportQuery } from "#selectors/report";
 import { useLocation } from "@reach/router";
-import useNavigate from "../hooks/useNavigate";
-import withReportDefaults from "../hocs/withReportDefaults";
+import useNavigate from "#hooks/useNavigate";
+import withReportDefaults from "#hocs/withReportDefaults";
 
 const indices = ["taxon", "assembly", "sample", "feature"];
 

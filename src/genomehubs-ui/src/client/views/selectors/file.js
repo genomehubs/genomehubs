@@ -1,13 +1,13 @@
-import { apiUrl, setApiStatus } from "../reducers/api";
+import { apiUrl, setApiStatus } from "#reducers/api";
 import {
   cancelFiles,
   getFiles,
   receiveFiles,
   requestFiles,
-} from "../reducers/file";
+} from "#reducers/file";
 
 import { createCachedSelector } from "re-reselect";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 
 export function fetchFiles(options) {
   return async function (dispatch) {

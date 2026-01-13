@@ -5,14 +5,14 @@ import ReportPanel from "./ReportPanel";
 import ResultTable from "./ResultTable";
 import TextPanel from "./TextPanel";
 import { compose } from "redux";
-import dispatchLookup from "../hocs/dispatchLookup";
+import dispatchLookup from "#hocs/dispatchLookup";
 import equal from "deep-equal";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import shallow from "shallowequal";
 import { useLocation } from "@reach/router";
-import useNavigate from "../hooks/useNavigate";
-import withSearch from "../hocs/withSearch";
-import withSearchDefaults from "../hocs/dispatchSearchDefaults";
+import useNavigate from "#hooks/useNavigate";
+import withSearch from "#hocs/withSearch";
+import withSearchDefaults from "#hocs/dispatchSearchDefaults";
 
 const SearchPage = ({
   searchResults,

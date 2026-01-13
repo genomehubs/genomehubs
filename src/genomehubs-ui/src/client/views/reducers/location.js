@@ -2,9 +2,9 @@ import { createAction, handleAction } from "redux-actions";
 
 import { createSelector } from "reselect";
 import history from "./history";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import { queryToStore } from "../querySync";
-import store from "../store";
+import store from "#store";
 
 /**
  * Safely join basename with a path, preventing double slashes

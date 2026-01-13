@@ -15,16 +15,16 @@ import TaxonSummaryPanel from "./TaxonSummaryPanel";
 import TextPanel from "./TextPanel";
 import classnames from "classnames";
 import { compose } from "redux";
-import dispatchLookup from "../hocs/dispatchLookup";
-import { getRecordIsFetching } from "../reducers/record";
-import qs from "../functions/qs";
+import dispatchLookup from "#hocs/dispatchLookup";
+import { getRecordIsFetching } from "#reducers/record";
+import qs from "#functions/qs";
 import styles from "./Styles.scss";
-import { ucFirst } from "../functions/formatter";
-import useNavigate from "../hooks/useNavigate";
-import withRecord from "../hocs/withRecord";
-import withSearch from "../hocs/withSearch";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import { ucFirst } from "#functions/formatter";
+import useNavigate from "#hooks/useNavigate";
+import withRecord from "#hocs/withRecord";
+import withSearch from "#hocs/withSearch";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 const RecordPage = ({
   location,

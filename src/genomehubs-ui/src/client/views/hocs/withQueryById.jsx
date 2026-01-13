@@ -1,9 +1,9 @@
-import { getQueryResultById, resetQuery } from "../reducers/search";
+import { getQueryResultById, resetQuery } from "#reducers/search";
 
 import React from "react";
 import { connect } from "react-redux";
-import { fetchQueryResults } from "../selectors/search";
-import qs from "../functions/qs";
+import { fetchQueryResults } from "#selectors/search";
+import qs from "#functions/qs";
 
 const withQueryById = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => {

@@ -10,7 +10,7 @@ import {
 
 import Logo from "./Logo";
 import { compose } from "redux";
-import withLoading from "../hocs/withLoading";
+import withLoading from "#hocs/withLoading";
 import withSiteName from "#hocs/withSiteName";
 
 const LoadingScreen = ({ types, basename, siteName, loading, setLoading }) => {

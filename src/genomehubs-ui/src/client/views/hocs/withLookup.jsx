@@ -1,4 +1,4 @@
-import { getLookupTerm, setLookupTerm } from "../reducers/lookup";
+import { getLookupTerm, setLookupTerm } from "#reducers/lookup";
 
 import React from "react";
 import { connect } from "react-redux";

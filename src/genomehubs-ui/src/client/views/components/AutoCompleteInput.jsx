@@ -11,9 +11,9 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Popper from "@mui/material/Popper";
 import TextField from "@mui/material/TextField";
 import { compose } from "redux";
-import { fetchAutocomplete } from "../functions/autocomplete";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import { fetchAutocomplete } from "#functions/autocomplete";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 export const PlacedPopper = (props) => {
   return <Popper {...props} placement="bottom" />;

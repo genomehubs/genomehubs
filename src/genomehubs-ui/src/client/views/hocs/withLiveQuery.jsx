@@ -1,4 +1,4 @@
-import { getLiveQuery, setLiveQuery } from "../reducers/lookup";
+import { getLiveQuery, setLiveQuery } from "#reducers/lookup";
 
 import React from "react";
 import { connect } from "react-redux";

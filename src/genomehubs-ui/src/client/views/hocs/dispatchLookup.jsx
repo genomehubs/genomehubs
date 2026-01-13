@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { setLookupTerm } from "../reducers/lookup";
+import { setLookupTerm } from "#reducers/lookup";
 
 const dispatchLookup = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({});

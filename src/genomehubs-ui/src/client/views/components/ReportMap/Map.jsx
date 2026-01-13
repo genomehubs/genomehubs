@@ -18,7 +18,7 @@ import PointPopup from "./PointPopup";
 import getMapOptions from "./functions/getMapOptions";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
 import { useLocation } from "@reach/router";
-import useNavigate from "../../hooks/useNavigate";
+import useNavigate from "#hooks/useNavigate";
 
 let countriesGeoJson = null;
 let countriesGeoJsonSimple = null;

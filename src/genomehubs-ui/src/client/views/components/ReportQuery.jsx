@@ -6,14 +6,14 @@ import Grid from "@mui/material/Grid";
 import SearchIcon from "@mui/icons-material/Search";
 import TextField from "@mui/material/TextField";
 import { compose } from "redux";
-import qs from "../functions/qs";
-import { setSearchTerm } from "../reducers/search";
-import useNavigate from "../hooks/useNavigate";
-import withReportById from "../hocs/withReportById";
-import withReportTerm from "../hocs/withReportTerm";
-import withSearch from "../hocs/withSearch";
+import qs from "#functions/qs";
+import { setSearchTerm } from "#reducers/search";
+import useNavigate from "#hooks/useNavigate";
+import withReportById from "#hocs/withReportById";
+import withReportTerm from "#hocs/withReportTerm";
+import withSearch from "#hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";
-import withTaxonomy from "../hocs/withTaxonomy";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 export const ReportQuery = ({
   reportById,

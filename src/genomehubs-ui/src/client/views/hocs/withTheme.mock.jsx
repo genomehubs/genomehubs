@@ -4,7 +4,7 @@ import {
   lightThemeColors,
   setColorScheme,
   setTheme,
-} from "../reducers/color";
+} from "#reducers/color";
 
 import React from "react";
 import { connect } from "react-redux";

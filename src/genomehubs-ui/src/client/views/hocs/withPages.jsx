@@ -1,9 +1,9 @@
-import { cancelPages, getPages } from "../reducers/pages";
+import { cancelPages, getPages } from "#reducers/pages";
 import {
   fetchPages,
   getPagesById,
   getPagesIsFetchingById,
-} from "../selectors/pages";
+} from "#selectors/pages";
 
 import React from "react";
 import { connect } from "react-redux";

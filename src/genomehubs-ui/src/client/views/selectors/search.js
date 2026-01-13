@@ -1,4 +1,4 @@
-import { apiUrl, setApiStatus } from "../reducers/api";
+import { apiUrl, setApiStatus } from "#reducers/api";
 import {
   cancelQuery,
   cancelSearch,
@@ -13,17 +13,17 @@ import {
   setSearchHistory,
   setSearchIndex,
   setSearchTerm,
-} from "../reducers/search";
-import { getBasename, pathJoin } from "../reducers/location";
-import { resetController, setMessage } from "../reducers/message";
+} from "#reducers/search";
+import { getBasename, pathJoin } from "#reducers/location";
+import { resetController, setMessage } from "#reducers/message";
 
 import { checkProgress } from "./checkProgress";
-import { getCurrentTaxonomy } from "../reducers/taxonomy";
-import { getTypes } from "../reducers/types";
+import { getCurrentTaxonomy } from "#reducers/taxonomy";
+import { getTypes } from "#reducers/types";
 import { nanoid } from "nanoid";
-import qs from "../functions/qs";
-import { setTreeQuery } from "../reducers/tree";
-import store from "../store";
+import qs from "#functions/qs";
+import { setTreeQuery } from "#reducers/tree";
+import store from "#store";
 
 // import { fetchTypes } from "./types";
 

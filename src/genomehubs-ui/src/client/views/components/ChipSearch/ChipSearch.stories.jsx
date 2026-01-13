@@ -1,7 +1,7 @@
 import ChipSearch from "./ChipSearch";
 import { Provider } from "react-redux";
 import React from "react";
-import colorStore from "../../reducers/color.store";
+import colorStore from "#reducers/color.store";
 import types from "./default.types.json";
 
 // Mock lookup function that returns immediately instead of making API calls

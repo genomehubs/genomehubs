@@ -1,9 +1,9 @@
 import React from "react";
 import { connect } from "react-redux";
-import { fetchSearchResults } from "../selectors/search";
-import { setCurrentRecordId } from "../reducers/record";
-import { setLookupTerm } from "../reducers/lookup";
-import { setPreferSearchTerm } from "../reducers/search";
+import { fetchSearchResults } from "#selectors/search";
+import { setCurrentRecordId } from "#reducers/record";
+import { setLookupTerm } from "#reducers/lookup";
+import { setPreferSearchTerm } from "#reducers/search";
 
 const dispatchSetRecord = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({});

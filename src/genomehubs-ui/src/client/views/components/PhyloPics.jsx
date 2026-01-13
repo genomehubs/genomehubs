@@ -14,10 +14,10 @@ import PhyloPic from "./PhyloPic";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "redux";
-import truncate from "../functions/truncate";
+import truncate from "#functions/truncate";
 import useImage from "use-image";
-import withPhylopicsById from "../hocs/withPhylopicsById";
-import withRecord from "../hocs/withRecord";
+import withPhylopicsById from "#hocs/withPhylopicsById";
+import withRecord from "#hocs/withRecord";
 import withTheme from "#hocs/withTheme";
 
 const styleMap = {

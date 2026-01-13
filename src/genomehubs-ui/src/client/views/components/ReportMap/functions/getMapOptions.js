@@ -1,4 +1,4 @@
-import { mixColor } from "../../../functions/mixColor.js";
+import { mixColor } from "#functions/mixColor.js";
 
 export const colorMixer = ({ color1, color2, count = 0, maxCount }) => {
   return mixColor({

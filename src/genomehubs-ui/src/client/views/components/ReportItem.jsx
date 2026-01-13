@@ -16,15 +16,15 @@ import ReportSources from "./ReportSources";
 import ReportTypes from "./ReportTypes";
 import ReportWrapper from "./ReportWrapper";
 import { compose } from "redux";
-import dispatchMessage from "../hocs/dispatchMessage";
-import dispatchReport from "../hocs/dispatchReport";
-import { gridPropNames } from "../functions/propNames";
-import qs from "../functions/qs";
+import dispatchMessage from "#hocs/dispatchMessage";
+import dispatchReport from "#hocs/dispatchReport";
+import { gridPropNames } from "#functions/propNames";
+import qs from "#functions/qs";
 import { reportHeading as reportHeadingStyle } from "./Styles.scss";
 import { useIntersectionObserver } from "usehooks-ts";
-import useNavigate from "../hooks/useNavigate";
-import useResize from "../hooks/useResize";
-import withReportById from "../hocs/withReportById";
+import useNavigate from "#hooks/useNavigate";
+import useResize from "#hooks/useResize";
+import withReportById from "#hocs/withReportById";
 import withSiteName from "#hocs/withSiteName";
 
 // Lazy load heavy visualization components

@@ -8,12 +8,12 @@ import SearchHeaderButtons from "./SearchHeaderButtons";
 import SearchTips from "./SearchTips";
 import classnames from "classnames";
 import { compose } from "redux";
-import dispatchColors from "../hocs/dispatchColors";
+import dispatchColors from "#hocs/dispatchColors";
 import makeStyles from "@mui/styles/makeStyles";
 import { useLocation } from "@reach/router";
 import { useReadLocalStorage } from "usehooks-ts";
-import withApi from "../hocs/withApi";
-import withSearchIndex from "../hocs/withSearchIndex";
+import withApi from "#hocs/withApi";
+import withSearchIndex from "#hocs/withSearchIndex";
 import withSiteName from "#hocs/withSiteName";
 
 const useStyles = makeStyles((theme) => ({

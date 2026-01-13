@@ -4,7 +4,7 @@ import {
   getDefaultPalette,
   getStatusColors,
   selectPalette,
-} from "../reducers/color";
+} from "#reducers/color";
 
 import React from "react";
 import { connect } from "react-redux";

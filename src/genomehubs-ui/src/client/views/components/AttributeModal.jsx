@@ -6,9 +6,9 @@ import Paper from "@mui/material/Paper";
 import ResultColumnOptions from "./ResultColumnOptions";
 import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "../functions/qs";
-import withRecord from "../hocs/withRecord";
-import withTaxonomy from "../hocs/withTaxonomy";
+import qs from "#functions/qs";
+import withRecord from "#hocs/withRecord";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 export const useStyles = makeStyles((theme) => ({
   paper: {

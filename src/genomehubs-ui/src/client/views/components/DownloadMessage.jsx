@@ -6,8 +6,8 @@ import MuiAlert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import { compose } from "redux";
 import withColors from "#hocs/withColors";
-import withController from "../hocs/withController";
-import withMessage from "../hocs/withMessage";
+import withController from "#hocs/withController";
+import withMessage from "#hocs/withMessage";
 import withTheme from "#hocs/withTheme";
 
 const Alert = React.forwardRef(function Alert(props, ref) {

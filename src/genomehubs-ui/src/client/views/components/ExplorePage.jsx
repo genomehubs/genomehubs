@@ -5,14 +5,14 @@ import ResultPanel from "./ResultPanel";
 import TextPanel from "./TextPanel";
 import classnames from "classnames";
 import { compose } from "redux";
-import dispatchLookup from "../hocs/dispatchLookup";
-import qs from "../functions/qs";
+import dispatchLookup from "#hocs/dispatchLookup";
+import qs from "#functions/qs";
 import styles from "./Styles.scss";
-import withRecord from "../hocs/withRecord";
-import withSearch from "../hocs/withSearch";
-import withSummary from "../hocs/withSummary";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import withRecord from "#hocs/withRecord";
+import withSearch from "#hocs/withSearch";
+import withSummary from "#hocs/withSummary";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 const ExplorePage = ({
   lineage,

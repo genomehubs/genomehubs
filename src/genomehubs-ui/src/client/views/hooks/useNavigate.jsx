@@ -1,4 +1,4 @@
-import { getBasename } from "../reducers/location";
+import { getBasename } from "#reducers/location";
 import { useNavigate as useReachNavigate } from "@reach/router";
 
 /**

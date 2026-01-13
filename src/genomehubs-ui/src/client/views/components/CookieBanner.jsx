@@ -12,7 +12,7 @@ import Typography from "@mui/material/Typography";
 import { banner as bannerStyle } from "./Styles.scss";
 import { compose } from "redux";
 import { useTheme } from "@mui/material";
-import useWindowDimensions from "../hooks/useWindowDimensions";
+import useWindowDimensions from "#hooks/useWindowDimensions";
 
 const showBanner = COOKIE_BANNER == "true";
 

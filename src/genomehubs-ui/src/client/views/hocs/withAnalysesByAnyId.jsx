@@ -2,7 +2,7 @@ import {
   getAnalysesByAssemblyId,
   getAnalysesByTaxonId,
   getAnalysisById,
-} from "../selectors/analysis";
+} from "#selectors/analysis";
 
 import React from "react";
 import { connect } from "react-redux";

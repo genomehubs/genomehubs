@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { fieldCount, simpleCount, valueCount } from "../functions/resultCount";
+import { fieldCount, simpleCount, valueCount } from "#functions/resultCount";
 
 import DisplayCount from "./DisplayCount";
 import { compose } from "redux";
-import formats from "../functions/formats";
-import qs from "../functions/qs";
-import useNavigate from "../hooks/useNavigate";
-import withApi from "../hocs/withApi";
-import withQueryById from "../hocs/withQueryById";
-import withRecord from "../hocs/withRecord";
+import formats from "#functions/formats";
+import qs from "#functions/qs";
+import useNavigate from "#hooks/useNavigate";
+import withApi from "#hocs/withApi";
+import withQueryById from "#hocs/withQueryById";
+import withRecord from "#hocs/withRecord";
 import withSiteName from "#hocs/withSiteName";
 
 const Count = ({

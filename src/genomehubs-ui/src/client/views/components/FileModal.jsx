@@ -8,8 +8,8 @@ import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
-import useWindowDimensions from "../hooks/useWindowDimensions";
-import withApi from "../hocs/withApi";
+import useWindowDimensions from "#hooks/useWindowDimensions";
+import withApi from "#hocs/withApi";
 
 function getModalStyle() {
   return {

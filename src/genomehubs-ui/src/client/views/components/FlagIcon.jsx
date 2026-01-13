@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 
 import Flag from "react-country-flag";
-import useResize from "../hooks/useResize";
+import useResize from "#hooks/useResize";
 
 export const FlagIcon = ({ countryCode = "", size = 100 }) => {
   const divRef = useRef();

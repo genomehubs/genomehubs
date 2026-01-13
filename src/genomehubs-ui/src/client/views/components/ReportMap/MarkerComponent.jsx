@@ -1,7 +1,7 @@
 import NavLink from "../NavLink";
 import { Popup } from "react-leaflet";
 import SingleMarker from "./SingleMarker";
-import qs from "../../functions/qs";
+import qs from "#functions/qs";
 
 export default function MarkerComponent({
   geoPoints = [],

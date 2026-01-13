@@ -8,7 +8,7 @@ import {
 
 import Skeleton from "@mui/material/Skeleton";
 import { compose } from "redux";
-import withApi from "../hocs/withApi";
+import withApi from "#hocs/withApi";
 
 const styleMap = {
   blackToAncestralStyle,

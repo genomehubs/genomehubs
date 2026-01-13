@@ -10,13 +10,13 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import Tooltip from "./Tooltip";
 import { compose } from "redux";
-import dispatchSetRecord from "../hocs/dispatchSetRecord";
+import dispatchSetRecord from "#hocs/dispatchSetRecord";
 import makeStyles from "@mui/styles/makeStyles";
-import useNavigate from "../hooks/useNavigate";
-import withAnalysesByAnyId from "../hocs/withAnalysesByAnyId";
-import withAnalysis from "../hocs/withAnalysis";
-import withRecord from "../hocs/withRecord";
-import withTaxonomy from "../hocs/withTaxonomy";
+import useNavigate from "#hooks/useNavigate";
+import withAnalysesByAnyId from "#hocs/withAnalysesByAnyId";
+import withAnalysis from "#hocs/withAnalysis";
+import withRecord from "#hocs/withRecord";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 const useRowStyles = makeStyles({
   root: {

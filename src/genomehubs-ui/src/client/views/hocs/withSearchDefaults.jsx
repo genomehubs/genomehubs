@@ -2,7 +2,7 @@ import {
   getSearchDefaults,
   resetSearchDefaults,
   setSearchDefaults,
-} from "../reducers/search";
+} from "#reducers/search";
 
 import React from "react";
 import { connect } from "react-redux";

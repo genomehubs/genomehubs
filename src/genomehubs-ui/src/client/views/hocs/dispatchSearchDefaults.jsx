@@ -1,4 +1,4 @@
-import { resetSearchDefaults, setSearchDefaults } from "../reducers/search";
+import { resetSearchDefaults, setSearchDefaults } from "#reducers/search";
 
 import React from "react";
 import { connect } from "react-redux";

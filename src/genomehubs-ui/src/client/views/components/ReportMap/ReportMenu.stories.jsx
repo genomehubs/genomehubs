@@ -3,8 +3,8 @@ import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { Provider } from "react-redux";
 import React from "react";
 import ReportMenu from "./ReportMenu";
-import colorStore from "../../reducers/color.store";
-import { themeFromContext } from "../../../../.storybook/functions/themeFromContext";
+import colorStore from "#reducers/color.store";
+import { themeFromContext } from "#storybook/functions/themeFromContext";
 export default {
   title: "Components/ReportMenu",
   decorators: [(story) => <Provider store={colorStore}>{story()}</Provider>],

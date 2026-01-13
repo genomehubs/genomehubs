@@ -183,6 +183,30 @@
       "storybook": "./src/client/views/hocs/withSiteName.mock.jsx",
       "default": "./src/client/views/hocs/withSiteName.jsx"
     },
+    "#hocs/*": {
+      "default": "./src/client/views/hocs/*"
+    },
+    "#hooks/*": {
+      "default": "./src/client/views/hooks/*"
+    },
+    "#components/*": {
+      "default": "./src/client/views/components/*"
+    },
+    "#reducers/*": {
+      "default": "./src/client/views/reducers/*"
+    },
+    "#selectors/*": {
+      "default": "./src/client/views/selectors/*"
+    },
+    "#functions/*": {
+      "default": "./src/client/views/functions/*"
+    },
+    "#store": {
+      "default": "./src/client/views/store.jsx"
+    },
+    "#storybook/*": {
+      "default": "./.storybook/*"
+    },
     "#*": [
       "./*",
       "./*.js",

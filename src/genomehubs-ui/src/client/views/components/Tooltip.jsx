@@ -3,7 +3,7 @@ import React, { useCallback, useState } from "react";
 
 import { compose } from "redux";
 import { styled } from "@mui/material/styles";
-import { useEventListener } from "../hooks/useEventListener";
+import { useEventListener } from "#hooks/useEventListener";
 import withTheme from "#hocs/withTheme";
 
 const DarkTooltip = styled(({ className, ...props }) => (

@@ -4,7 +4,7 @@ import {
     getPhylopics,
     receivePhylopic,
     requestPhylopic,
-  } from "../reducers/phylopic";
+  } from "#reducers/phylopic";
   
   import React from "react";
   import { connect } from "react-redux";

@@ -1,6 +1,6 @@
 import { createAction, handleActions } from "redux-actions";
 
-import { byIdSelectorCreator } from "../reducers/selectorCreators";
+import { byIdSelectorCreator } from "#reducers/selectorCreators";
 import createCachedSelector from "re-reselect";
 import { createSlice } from "@reduxjs/toolkit";
 import { current } from "@reduxjs/toolkit";

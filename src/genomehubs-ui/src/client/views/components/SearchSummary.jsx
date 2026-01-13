@@ -12,8 +12,8 @@ import React from "react";
 import Skeleton from "@mui/material/Skeleton";
 import classnames from "classnames";
 import { compose } from "redux";
-import withSearch from "../hocs/withSearch";
-import withTypes from "../hocs/withTypes";
+import withSearch from "#hocs/withSearch";
+import withTypes from "#hocs/withTypes";
 
 const SearchSummary = ({ searchTerm, searchResults }) => {
   if (!searchResults.status || !searchResults.status.hasOwnProperty("hits")) {

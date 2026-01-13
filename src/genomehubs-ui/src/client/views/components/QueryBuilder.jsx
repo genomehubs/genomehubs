@@ -16,16 +16,16 @@ import Tooltip from "./Tooltip";
 import Typography from "@mui/material/Typography";
 import VariableFilter from "./VariableFilter";
 import { compose } from "redux";
-import dispatchLookup from "../hocs/dispatchLookup";
+import dispatchLookup from "#hocs/dispatchLookup";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "../functions/qs";
-import useNavigate from "../hooks/useNavigate";
-import withLookup from "../hocs/withLookup";
-import withSearch from "../hocs/withSearch";
-import withSearchDefaults from "../hocs/withSearchDefaults";
+import qs from "#functions/qs";
+import useNavigate from "#hooks/useNavigate";
+import withLookup from "#hocs/withLookup";
+import withSearch from "#hocs/withSearch";
+import withSearchDefaults from "#hocs/withSearchDefaults";
 import withSiteName from "#hocs/withSiteName";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 export const useStyles = makeStyles((theme) => ({
   paper: {

@@ -5,7 +5,7 @@ import React from "react";
 import Switch from "@mui/material/Switch";
 import Tooltip from "./Tooltip";
 import { compose } from "redux";
-import withTheme from "../hocs/withTheme";
+import withTheme from "#hocs/withTheme";
 
 export const ToggleTheme = ({ theme, setTheme }) => {
   const toggleTheme = () => {

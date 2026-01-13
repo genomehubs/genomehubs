@@ -16,7 +16,7 @@ import { findCenterLatLng } from "./functions/mapHelpers";
 import getMapOptions from "./functions/getMapOptions";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
 import { useLocation } from "@reach/router";
-import useNavigate from "../../hooks/useNavigate";
+import useNavigate from "#hooks/useNavigate";
 
 const Globe = ({
   bounds,

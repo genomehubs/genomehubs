@@ -4,7 +4,7 @@ import {
   descendantHighlight,
   directColor,
   directHighlight,
-} from "../reducers/color";
+} from "#reducers/color";
 import { arc, line as d3line, lineRadial } from "d3-shape";
 import {
   cancelNodesRequest,
@@ -16,7 +16,7 @@ import {
   resetNodes,
   setRootNode,
   treeThreshold,
-} from "../reducers/tree";
+} from "#reducers/tree";
 import { scaleLinear, scaleLog, scalePow } from "d3-scale";
 import {
   schemeGreens,
@@ -25,12 +25,12 @@ import {
   schemeReds,
 } from "d3-scale-chromatic";
 
-import { apiUrl } from "../reducers/api";
-import axisScales from "../functions/axisScales";
-import { formats } from "../functions/formats";
-import qs from "../functions/qs";
-import store from "../store";
-import stringLength from "../functions/stringLength";
+import { apiUrl } from "#reducers/api";
+import axisScales from "#functions/axisScales";
+import { formats } from "#functions/formats";
+import qs from "#functions/qs";
+import store from "#store";
+import stringLength from "#functions/stringLength";
 
 const uriEncode = (str) => {
   return encodeURIComponent(str).replaceAll(/[!'()*]/g, (c) => {

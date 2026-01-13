@@ -1,4 +1,4 @@
-import { fetchSearchResults, saveSearchResults } from "../selectors/search";
+import { fetchSearchResults, saveSearchResults } from "#selectors/search";
 import {
   getPreferSearchTerm,
   getPreviousSearchTerm,
@@ -12,7 +12,7 @@ import {
   setPreviousSearchTerm,
   setSearchIndex,
   setSearchTerm,
-} from "../reducers/search";
+} from "#reducers/search";
 
 import React from "react";
 import { connect } from "react-redux";

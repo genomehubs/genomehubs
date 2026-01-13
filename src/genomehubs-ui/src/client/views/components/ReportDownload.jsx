@@ -6,14 +6,14 @@ import Grid from "@mui/material/Grid";
 import JSZip from "jszip";
 import React from "react";
 import { compose } from "redux";
-import dispatchReport from "../hocs/dispatchReport";
+import dispatchReport from "#hocs/dispatchReport";
 import mergeImages from "merge-images";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import { queryPropList } from "./ReportEdit";
 import { useLocation } from "@reach/router";
 import withColors from "#hocs/withColors";
-import withReportById from "../hocs/withReportById";
-import withTheme from "../hocs/withTheme";
+import withReportById from "#hocs/withReportById";
+import withTheme from "#hocs/withTheme";
 
 export const downloadLink = async (uri, filename) => {
   const link = document.createElement("a");

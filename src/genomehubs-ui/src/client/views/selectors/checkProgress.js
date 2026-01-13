@@ -1,6 +1,6 @@
-import { apiUrl } from "../reducers/api";
-import { setMessage } from "../reducers/message";
-import store from "../store";
+import { apiUrl } from "#reducers/api";
+import { setMessage } from "#reducers/message";
+import store from "#store";
 
 export function checkProgress({
   queryId,

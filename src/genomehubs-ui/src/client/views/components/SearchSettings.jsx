@@ -15,16 +15,16 @@ import SettingsButton from "./SettingsButton";
 import Tooltip from "./Tooltip";
 import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import { useLocalStorage } from "usehooks-ts";
 import { useLocation } from "@reach/router";
-import useNavigate from "../hooks/useNavigate";
-import withNames from "../hocs/withNames";
-import withRanks from "../hocs/withRanks";
-import withSearch from "../hocs/withSearch";
+import useNavigate from "#hooks/useNavigate";
+import withNames from "#hocs/withNames";
+import withRanks from "#hocs/withRanks";
+import withSearch from "#hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 const useStyles = makeStyles((theme) => ({
   paper: {

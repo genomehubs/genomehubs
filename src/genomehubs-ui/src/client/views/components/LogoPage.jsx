@@ -10,7 +10,7 @@ import Tooltip from "./Tooltip";
 import { compose } from "redux";
 import { fixedArSixteenNine as fixedArSixteenNineStyle } from "./Styles.scss";
 import withColors from "#hocs/withColors";
-import withTheme from "../hocs/withTheme";
+import withTheme from "#hocs/withTheme";
 
 const MemoizedGoatLogo = React.memo(GoatLogo);
 const MemoizedBoatLogo = React.memo(BoatLogo);

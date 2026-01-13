@@ -3,10 +3,10 @@ import NavLink from "./NavLink";
 import React from "react";
 import { compose } from "redux";
 import { link as linkStyle } from "./Styles.scss";
-import { pathJoin } from "../reducers/location";
-import qs from "../functions/qs";
-import useNavigate from "../hooks/useNavigate";
-import withSiteName from "../hocs/withSiteName";
+import { pathJoin } from "#reducers/location";
+import qs from "#functions/qs";
+import useNavigate from "#hooks/useNavigate";
+import withSiteName from "#hocs/withSiteName";
 
 const Citation = ({
   basename,

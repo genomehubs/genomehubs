@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { getSuggestedTerms } from "../reducers/search";
+import { getSuggestedTerms } from "#reducers/search";
 
 const withTerms = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({

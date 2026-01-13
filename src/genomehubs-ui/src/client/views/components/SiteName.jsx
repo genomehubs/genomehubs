@@ -11,7 +11,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Popover from "@mui/material/Popover";
 import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
-import withArchive from "../hocs/withArchive";
+import withArchive from "#hocs/withArchive";
 import withSiteName from "#hocs/withSiteName";
 
 const useStyles = makeStyles((theme) => ({

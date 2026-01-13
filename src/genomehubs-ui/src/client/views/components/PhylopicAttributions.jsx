@@ -2,7 +2,7 @@ import React, { memo, useEffect, useState } from "react";
 
 import classnames from "classnames";
 import { compose } from "redux";
-import truncate from "../functions/truncate";
+import truncate from "#functions/truncate";
 import withPhylopics from "#hocs/withPhylopics";
 
 const PhylopicAttributions = ({

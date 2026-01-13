@@ -1,4 +1,4 @@
-// import { basename, siteName } from "../reducers/location";
+// import { basename, siteName } from "#reducers/location";
 
 import React from "react";
 import { connect } from "react-redux";

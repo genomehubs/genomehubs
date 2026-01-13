@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
-import { fetchTypes } from "../selectors/types";
-import { resetTypes } from "../reducers/types";
+import { fetchTypes } from "#selectors/types";
+import { resetTypes } from "#reducers/types";
 
 const dispatchTypes = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({});

@@ -2,13 +2,13 @@ import React, { memo, useEffect, useState } from "react";
 
 import BasicMenu from "./BasicMenu";
 import { compose } from "redux";
-import dispatchMessage from "../hocs/dispatchMessage";
-import dispatchRecord from "../hocs/dispatchRecord";
-import qs from "../functions/qs";
-import { setMessage } from "../reducers/message";
-import useNavigate from "../hooks/useNavigate";
-import withApi from "../hocs/withApi";
-import withTaxonomy from "../hocs/withTaxonomy";
+import dispatchMessage from "#hocs/dispatchMessage";
+import dispatchRecord from "#hocs/dispatchRecord";
+import qs from "#functions/qs";
+import { setMessage } from "#reducers/message";
+import useNavigate from "#hooks/useNavigate";
+import withApi from "#hocs/withApi";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 const Taxonomy = ({
   apiStatus,

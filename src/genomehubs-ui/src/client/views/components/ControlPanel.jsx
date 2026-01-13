@@ -11,7 +11,7 @@ import React from "react";
 import SearchPagination from "./SearchPagination";
 import classnames from "classnames";
 import { compose } from "redux";
-import withSearch from "../hocs/withSearch";
+import withSearch from "#hocs/withSearch";
 
 const ControlPanel = ({ pagination }) => {
   let css = classnames(

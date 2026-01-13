@@ -6,9 +6,9 @@ import MuiTableCell from "@mui/material/TableCell";
 import ResultFilterInput from "./ResultFilterInput";
 import classnames from "classnames";
 import { compose } from "redux";
-import qs from "../functions/qs";
-import useNavigate from "../hooks/useNavigate";
-import withSearch from "../hocs/withSearch";
+import qs from "#functions/qs";
+import useNavigate from "#hooks/useNavigate";
+import withSearch from "#hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";
 import withStyles from "@mui/styles/withStyles";
 

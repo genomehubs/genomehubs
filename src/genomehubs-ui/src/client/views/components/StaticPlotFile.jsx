@@ -8,9 +8,9 @@ import Skeleton from '@mui/material/Skeleton';
 import Typography from "@mui/material/Typography";
 import { compose } from "redux";
 import makeStyles from '@mui/styles/makeStyles';
-import useResize from "../hooks/useResize";
-import useWindowDimensions from "../hooks/useWindowDimensions";
-import withApi from "../hocs/withApi";
+import useResize from "#hooks/useResize";
+import useWindowDimensions from "#hooks/useWindowDimensions";
+import withApi from "#hocs/withApi";
 
 const StaticPlotFile = ({
   fileId,

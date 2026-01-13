@@ -17,13 +17,13 @@ import Terms from "./Terms";
 import TocIcon from "@mui/icons-material/Toc";
 import Tooltip from "./Tooltip";
 import { compose } from "redux";
-import dispatchLookup from "../hocs/dispatchLookup";
+import dispatchLookup from "#hocs/dispatchLookup";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import { useLocation } from "@reach/router";
-import useNavigate from "../hooks/useNavigate";
-import withSearch from "../hocs/withSearch";
-import withSearchDefaults from "../hocs/withSearchDefaults";
+import useNavigate from "#hooks/useNavigate";
+import withSearch from "#hocs/withSearch";
+import withSearchDefaults from "#hocs/withSearchDefaults";
 import withSiteName from "#hocs/withSiteName";
 
 export const useStyles = makeStyles((theme) => ({

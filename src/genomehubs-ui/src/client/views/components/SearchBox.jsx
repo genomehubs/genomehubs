@@ -1,5 +1,5 @@
 import React, { memo, useRef, useState } from "react";
-import { pathJoin, siteName } from "../reducers/location";
+import { pathJoin, siteName } from "#reducers/location";
 
 import AutoCompleteInput from "./AutoCompleteInput";
 import FormControl from "@mui/material/FormControl";
@@ -9,19 +9,19 @@ import SearchInputQueries from "./SearchInputQueries";
 import SearchToggles from "./SearchToggles";
 import { Template } from "./Markdown";
 import { compose } from "redux";
-// import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
-import { getSuggestedTerm } from "../reducers/search";
-import qs from "../functions/qs";
+// import dispatchLiveQuery from "#hocs/dispatchLiveQuery";
+import { getSuggestedTerm } from "#reducers/search";
+import qs from "#functions/qs";
 import { useLocation } from "@reach/router";
-import useNavigate from "../hooks/useNavigate";
+import useNavigate from "#hooks/useNavigate";
 import { useReadLocalStorage } from "usehooks-ts";
 import { useStyles } from "./SearchBoxStyles";
-import withLookup from "../hocs/withLookup";
-import withSearch from "../hocs/withSearch";
-import withSearchDefaults from "../hocs/withSearchDefaults";
+import withLookup from "#hocs/withLookup";
+import withSearch from "#hocs/withSearch";
+import withSearchDefaults from "#hocs/withSearchDefaults";
 import withSiteName from "#hocs/withSiteName";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 const suggestedTerm = getSuggestedTerm();
 

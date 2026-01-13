@@ -18,9 +18,9 @@ import Typography from "@mui/material/Typography";
 import { compose } from "redux";
 import { favListingFooter as favListingFooterStyle } from "./Styles.scss";
 import makeStyles from "@mui/styles/makeStyles";
-import withSearchIndex from "../hocs/withSearchIndex";
+import withSearchIndex from "#hocs/withSearchIndex";
 import withStyles from "@mui/styles/withStyles";
-import withTaxonomy from "../hocs/withTaxonomy";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 // Lazy load favourites to defer export libraries
 const SaveSettingsFavourites = lazy(() => import("./SaveSettingsFavourites"));

@@ -32,16 +32,16 @@ import Tooltip from "./Tooltip";
 import WordCloud from "./WordCloud";
 import classnames from "classnames";
 import { compose } from "redux";
-import { formatter } from "../functions/formatter";
-import qs from "../functions/qs";
+import { formatter } from "#functions/formatter";
+import qs from "#functions/qs";
 import { useLocation } from "@reach/router";
-import useNavigate from "../hooks/useNavigate";
-import withRecord from "../hocs/withRecord";
-import withSearch from "../hocs/withSearch";
+import useNavigate from "#hooks/useNavigate";
+import withRecord from "#hocs/withRecord";
+import withSearch from "#hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";
-import withSummary from "../hocs/withSummary";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import withSummary from "#hocs/withSummary";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 const AttributeSummary = ({
   field,

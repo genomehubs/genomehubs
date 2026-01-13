@@ -4,12 +4,12 @@ import TablePagination from "@mui/material/TablePagination";
 import classnames from "classnames";
 import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
 import { useLocation } from "@reach/router";
-import useNavigate from "../hooks/useNavigate";
-import withSearch from "../hocs/withSearch";
+import useNavigate from "#hooks/useNavigate";
+import withSearch from "#hocs/withSearch";
 
 const useStyles = makeStyles((theme) => ({
   root: {

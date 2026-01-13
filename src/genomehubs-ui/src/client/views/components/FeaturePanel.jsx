@@ -13,7 +13,7 @@ import Grid from "@mui/material/Grid";
 import { Template } from "./Markdown";
 import classnames from "classnames";
 import { compose } from "redux";
-import withRecord from "../hocs/withRecord";
+import withRecord from "#hocs/withRecord";
 
 const FeaturePanel = ({
   record,

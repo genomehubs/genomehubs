@@ -1,4 +1,4 @@
-import { getInputQueries, setInputQueries } from "../reducers/lookup";
+import { getInputQueries, setInputQueries } from "#reducers/lookup";
 
 import React from "react";
 import { connect } from "react-redux";

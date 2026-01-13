@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { getMapThreshold } from "../reducers/map";
+import { getMapThreshold } from "#reducers/map";
 
 const withMapThreshold = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({

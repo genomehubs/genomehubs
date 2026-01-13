@@ -9,8 +9,8 @@ import React from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import Tooltip from "./Tooltip";
 import { compose } from "redux";
-import withSearch from "../hocs/withSearch";
-import withTaxonomy from "../hocs/withTaxonomy";
+import withSearch from "#hocs/withSearch";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 const indexList = ["taxon", "assembly", "sample", "feature"];
 

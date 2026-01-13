@@ -13,16 +13,16 @@ import Select from "@mui/material/Select";
 import SettingsButton from "./SettingsButton";
 import { TextField } from "@mui/material";
 import { compose } from "redux";
-import expandFieldList from "../functions/expandFieldList";
+import expandFieldList from "#functions/expandFieldList";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import { styled } from "@mui/material/styles";
 import { useLocation } from "@reach/router";
-import useNavigate from "../hooks/useNavigate";
-import withRecord from "../hocs/withRecord";
-import withSearch from "../hocs/withSearch";
+import useNavigate from "#hooks/useNavigate";
+import withRecord from "#hocs/withRecord";
+import withSearch from "#hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";
-import withTypes from "../hocs/withTypes";
+import withTypes from "#hocs/withTypes";
 
 const useStyles = makeStyles((theme) => ({
   paper: {

@@ -2,11 +2,11 @@ import React, { memo, useRef } from "react";
 
 import ReportItem from "./ReportItem";
 import { compose } from "redux";
-import qs from "../functions/qs";
-import { sortReportQuery } from "../selectors/report";
+import qs from "#functions/qs";
+import { sortReportQuery } from "#selectors/report";
 import { useLocation } from "@reach/router";
-import useResize from "../hooks/useResize";
-import withTaxonomy from "../hocs/withTaxonomy";
+import useResize from "#hooks/useResize";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 export const queryPropList = [
   "result",

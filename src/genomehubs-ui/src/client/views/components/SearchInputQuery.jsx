@@ -5,8 +5,8 @@ import FormControl from "@mui/material/FormControl";
 import Grid from "@mui/material/Grid";
 import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
-import withInputQueries from "../hocs/withInputQueries";
-import withSearch from "../hocs/withSearch";
+import withInputQueries from "#hocs/withInputQueries";
+import withSearch from "#hocs/withSearch";
 
 export const useStyles = makeStyles((theme) => ({
   icon: {

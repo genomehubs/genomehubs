@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { getTreeThreshold } from "../reducers/tree";
+import { getTreeThreshold } from "#reducers/tree";
 
 const withTreeThreshold = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({

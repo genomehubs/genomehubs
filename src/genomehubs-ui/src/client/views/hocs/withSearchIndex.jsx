@@ -2,7 +2,7 @@ import {
   getSearchIndex,
   getSearchIndexPlural,
   setSearchIndex,
-} from "../reducers/search";
+} from "#reducers/search";
 
 import React from "react";
 import { connect } from "react-redux";

@@ -1,7 +1,7 @@
 import Markdown from "./Markdown";
 import React from "react";
 import { compose } from "redux";
-import withRecord from "../hocs/withRecord";
+import withRecord from "#hocs/withRecord";
 
 const AssemblySummaryPanel = ({ records, taxonId, assemblyId }) => {
   let record = records[assemblyId];

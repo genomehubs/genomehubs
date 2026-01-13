@@ -6,13 +6,13 @@ import {
   requestRecord,
   resetRecord,
   setBrowse,
-} from "../reducers/record";
+} from "#reducers/record";
 
-import { apiUrl } from "../reducers/api";
+import { apiUrl } from "#reducers/api";
 import { createSelector } from "reselect";
-import { getCurrentTaxonomy } from "../reducers/taxonomy";
+import { getCurrentTaxonomy } from "#reducers/taxonomy";
 import { produce } from "immer";
-import store from "../store";
+import store from "#store";
 
 export const getLineage = createSelector(getCurrentRecord, (record) => {
   if (!record || !record.record) {

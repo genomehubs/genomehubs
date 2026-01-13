@@ -12,8 +12,8 @@ import Tabs from "./Tabs";
 import TabsFixed from "./TabsFixed";
 import { compose } from "redux";
 import withColors from "#hocs/withColors";
-import withSiteName from "../hocs/withSiteName";
-import withTheme from "../hocs/withTheme";
+import withSiteName from "#hocs/withSiteName";
+import withTheme from "#hocs/withTheme";
 
 const Header = ({ id, levels, theme, colorScheme, basename }) => {
   const rootRef = useRef(null);

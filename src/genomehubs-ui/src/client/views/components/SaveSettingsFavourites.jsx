@@ -24,15 +24,15 @@ import YamlEditor from "@focus-reactive/react-yaml";
 import { compose } from "redux";
 import { downloadLink } from "./ReportDownload";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "../functions/qs";
-import { splitTerms } from "../functions/splitTerms";
+import qs from "#functions/qs";
+import { splitTerms } from "#functions/splitTerms";
 import { useLocalStorage } from "usehooks-ts";
 import { useLocation } from "@reach/router";
-import useNavigate from "../hooks/useNavigate";
-import withSearchDefaults from "../hocs/withSearchDefaults";
+import useNavigate from "#hooks/useNavigate";
+import withSearchDefaults from "#hocs/withSearchDefaults";
 import withSiteName from "#hocs/withSiteName";
 import withStyles from "@mui/styles/withStyles";
-import withTaxonomy from "../hocs/withTaxonomy";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 export const useStyles = makeStyles((theme) => ({
   paper: {

@@ -11,11 +11,11 @@ import React from "react";
 import Tooltip from "./Tooltip";
 import classNames from "classnames";
 import { compose } from "redux";
-import formatter from "../functions/formatter";
-import useNavigate from "../hooks/useNavigate";
+import formatter from "#functions/formatter";
+import useNavigate from "#hooks/useNavigate";
 import withSiteName from "#hocs/withSiteName";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 export const BadgeInfoCell = ({
   fieldName,

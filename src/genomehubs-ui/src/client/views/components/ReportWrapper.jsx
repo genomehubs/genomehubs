@@ -2,8 +2,8 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import React from "react";
 import Tooltip from "./Tooltip";
 import { compose } from "redux";
-import useNavigate from "../hooks/useNavigate";
-import withApi from "../hocs/withApi";
+import useNavigate from "#hooks/useNavigate";
+import withApi from "#hocs/withApi";
 import withSiteName from "#hocs/withSiteName";
 
 export const ReportWrapper = ({

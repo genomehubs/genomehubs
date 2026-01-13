@@ -1,6 +1,6 @@
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
 import React, { Suspense, lazy, useEffect, useRef, useState } from "react";
-import { basename, siteName } from "../reducers/location";
+import { basename, siteName } from "#reducers/location";
 import {
   centerContent as centerContentStyle,
   divider as dividerStyle,
@@ -49,7 +49,7 @@ import classNames from "classnames";
 import classnames from "classnames";
 import { compose } from "redux";
 import gfm from "remark-gfm";
-import { gridPropNames } from "../functions/propNames";
+import { gridPropNames } from "#functions/propNames";
 import { h } from "hastscript";
 import qs from "qs";
 import rehypeRaw from "rehype-raw";
@@ -59,9 +59,9 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { useLocation } from "@reach/router";
-import useNavigate from "../hooks/useNavigate";
+import useNavigate from "#hooks/useNavigate";
 import { visit } from "unist-util-visit";
-import withPages from "../hocs/withPages";
+import withPages from "#hocs/withPages";
 import withStyles from "@mui/styles/withStyles";
 
 const Highlight = lazy(() => import("./Highlight"));

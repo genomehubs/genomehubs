@@ -14,19 +14,19 @@ import Taxonomy from "./Taxonomy";
 import Tooltip from "./Tooltip";
 import bbsrcLogo from "./img/bbsrc-logo.png";
 import { compose } from "redux";
-import dispatchRecord from "../hocs/dispatchRecord";
-import dispatchTypes from "../hocs/dispatchTypes";
+import dispatchRecord from "#hocs/dispatchRecord";
+import dispatchTypes from "#hocs/dispatchTypes";
 import dtolLogo from "./img/dtol-logo.png";
 import { link as linkStyle } from "./Styles.scss";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import sangerLogo from "./img/sanger-logo.png";
 import { saveSearchOptions as saveSearchOptionsStyle } from "./Styles.scss";
 import { useLocation } from "@reach/router";
-import useNavigate from "../hooks/useNavigate";
-import withApi from "../hocs/withApi";
+import useNavigate from "#hooks/useNavigate";
+import withApi from "#hocs/withApi";
 import withColors from "#hocs/withColors";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withVersion from "../hocs/withVersion";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withVersion from "#hocs/withVersion";
 
 const Footer = ({
   id,

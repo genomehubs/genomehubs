@@ -13,11 +13,11 @@ import PublishIcon from "@mui/icons-material/Publish";
 import SaveIcon from "@mui/icons-material/SaveAlt";
 import YamlEditor from "@focus-reactive/react-yaml";
 import { compose } from "redux";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import { useLocalStorage } from "usehooks-ts";
-import withSearchIndex from "../hocs/withSearchIndex";
+import withSearchIndex from "#hocs/withSearchIndex";
 import withStyles from "@mui/styles/withStyles";
-import withTaxonomy from "../hocs/withTaxonomy";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 const SaveSettingsDefaults = ({
   currentIndex,

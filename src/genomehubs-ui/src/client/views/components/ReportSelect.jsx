@@ -7,7 +7,7 @@ import Grid from "@mui/material/Grid";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import { compose } from "redux";
-import withReportTerm from "../hocs/withReportTerm";
+import withReportTerm from "#hocs/withReportTerm";
 
 export const ReportSelect = ({ reportSelect, setReportSelect }) => {
   const handleChange = (event, value) => {

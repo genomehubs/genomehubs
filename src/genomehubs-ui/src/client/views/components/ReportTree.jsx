@@ -4,11 +4,11 @@ import Grid from "@mui/material/Grid";
 import ReportTreePaths from "./ReportTreePaths";
 import ReportTreeRings from "./ReportTreeRings";
 import { compose } from "redux";
-import dispatchReport from "../hocs/dispatchReport";
-import qs from "../functions/qs";
-import useNavigate from "../hooks/useNavigate";
-import useResize from "../hooks/useResize";
-import withReportById from "../hocs/withReportById";
+import dispatchReport from "#hocs/dispatchReport";
+import qs from "#functions/qs";
+import useNavigate from "#hooks/useNavigate";
+import useResize from "#hooks/useResize";
+import withReportById from "#hocs/withReportById";
 import withSiteName from "#hocs/withSiteName";
 
 const ReportTree = ({

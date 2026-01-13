@@ -1,7 +1,7 @@
 import { compose } from "redux";
 import { useEffect } from "react";
 import { useMap } from "react-leaflet";
-import withStableGeography from "../hocs/withStableGeography";
+import withStableGeography from "#hocs/withStableGeography";
 
 const ZoomComponent = ({ fullBounds, zoomPointLocation }) => {
   const map = useMap();

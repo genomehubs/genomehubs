@@ -5,13 +5,13 @@ import Report from "./Report";
 import ReportTools from "./ReportTools";
 import classnames from "classnames";
 import { compose } from "redux";
-import dispatchReport from "../hocs/dispatchReport";
+import dispatchReport from "#hocs/dispatchReport";
 import { markdown as markdownStyle } from "./Styles.scss";
 import qs from "qs";
 import { useLocation } from "@reach/router";
-import useNavigate from "../hooks/useNavigate";
+import useNavigate from "#hooks/useNavigate";
 import { useStyles } from "./ReportModalStyles";
-import useWindowDimensions from "../hooks/useWindowDimensions";
+import useWindowDimensions from "#hooks/useWindowDimensions";
 import withSiteName from "#hocs/withSiteName";
 
 export const ReportFull = ({

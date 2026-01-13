@@ -1,4 +1,4 @@
-import { getMessage, setMessage } from "../reducers/message";
+import { getMessage, setMessage } from "#reducers/message";
 
 import React from "react";
 import { connect } from "react-redux";

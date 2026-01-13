@@ -8,11 +8,11 @@ import {
 import ReportFull from "./ReportFull";
 import classnames from "classnames";
 import { compose } from "redux";
-import dispatchLookup from "../hocs/dispatchLookup";
-import qs from "../functions/qs";
-import { sortReportQuery } from "../selectors/report";
+import dispatchLookup from "#hocs/dispatchLookup";
+import qs from "#functions/qs";
+import { sortReportQuery } from "#selectors/report";
 import { useLocation } from "@reach/router";
-import withTaxonomy from "../hocs/withTaxonomy";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 const SourcesPanel = ({ setLookupTerm, taxonomy }) => {
   let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, textPanelStyle);

@@ -14,11 +14,11 @@ import React from "react";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "redux";
-import dispatchLookup from "../hocs/dispatchLookup";
-import useNavigate from "../hooks/useNavigate";
-import withRecord from "../hocs/withRecord";
-import withSearch from "../hocs/withSearch";
-import withTaxonomy from "../hocs/withTaxonomy";
+import dispatchLookup from "#hocs/dispatchLookup";
+import useNavigate from "#hooks/useNavigate";
+import withRecord from "#hocs/withRecord";
+import withSearch from "#hocs/withSearch";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 export const LineageList = ({
   taxon_id,

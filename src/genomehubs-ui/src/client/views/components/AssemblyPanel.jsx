@@ -12,12 +12,12 @@ import Grid from "@mui/material/Grid";
 import { NamesList } from "./NamesPanel";
 import classnames from "classnames";
 import { compose } from "redux";
-import dispatchLookup from "../hocs/dispatchLookup";
-import qs from "../functions/qs";
+import dispatchLookup from "#hocs/dispatchLookup";
+import qs from "#functions/qs";
 import { useLocation } from "@reach/router";
-import useNavigate from "../hooks/useNavigate";
-import withRecord from "../hocs/withRecord";
-import withSearch from "../hocs/withSearch";
+import useNavigate from "#hooks/useNavigate";
+import withRecord from "#hocs/withRecord";
+import withSearch from "#hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";
 
 const AssemblyPanel = ({

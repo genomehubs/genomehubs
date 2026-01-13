@@ -4,8 +4,8 @@ import {
   getGroupedTypes,
   getSynonyms,
   getTypesMap,
-} from "../selectors/types";
-import { getTypes, resetTypes } from "../reducers/types";
+} from "#selectors/types";
+import { getTypes, resetTypes } from "#reducers/types";
 
 import React from "react";
 import { connect } from "react-redux";

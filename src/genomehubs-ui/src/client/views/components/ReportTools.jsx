@@ -16,12 +16,12 @@ import TocIcon from "@mui/icons-material/Toc";
 import Tooltip from "./Tooltip";
 import { compose } from "redux";
 import { useLocation } from "@reach/router";
-import useNavigate from "../hooks/useNavigate";
+import useNavigate from "#hooks/useNavigate";
 import { useStyles } from "./ReportModalStyles";
 import withColors from "#hocs/withColors";
-import withReportTerm from "../hocs/withReportTerm";
+import withReportTerm from "#hocs/withReportTerm";
 import withSiteName from "#hocs/withSiteName";
-import withTheme from "../hocs/withTheme";
+import withTheme from "#hocs/withTheme";
 
 // Lazy load download component to defer export libraries
 const ReportDownload = lazy(() => import("./ReportDownload"));
