@@ -1,7 +1,5 @@
-import React, { useEffect } from "react";
+import { forwardRef, useEffect, useState } from "react";
 
-import CloseIcon from "@mui/icons-material/Close";
-import IconButton from "@mui/material/IconButton";
 import MuiAlert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import { compose } from "redux";
@@ -10,7 +8,7 @@ import withController from "#hocs/withController";
 import withMessage from "#hocs/withMessage";
 import withTheme from "#hocs/withTheme";
 
-const Alert = React.forwardRef(function Alert(props, ref) {
+const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
@@ -22,7 +20,7 @@ const DownloadMessage = ({
   theme,
 }) => {
   let { message: text, severity, duration, x, y, total } = message || {};
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (text && text > "") {

@@ -7,7 +7,6 @@ import {
 } from "./Styles.scss";
 
 import AttributeTable from "./AttributeTable";
-import React from "react";
 import classnames from "classnames";
 
 const AttributePanel = ({

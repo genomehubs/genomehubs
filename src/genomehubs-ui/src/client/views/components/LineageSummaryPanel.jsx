@@ -1,5 +1,4 @@
 import Markdown from "./Markdown";
-import React from "react";
 import { compose } from "redux";
 import getPrimaryAssemblyId from "#functions/getPrimaryAssemblyId";
 import withRecord from "#hocs/withRecord";

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@reach/router";
-import React, { memo, useState } from "react";
+import { memo, useState } from "react";
 import {
   siteLogo as siteLogoStyle,
   siteName as siteNameStyle,

@@ -7,7 +7,6 @@ import {
   setColorScheme,
 } from "#reducers/color";
 
-import React from "react";
 import { connect } from "react-redux";
 import { fn } from "@storybook/test";
 

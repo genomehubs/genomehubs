@@ -1,5 +1,4 @@
 import Grid from "@mui/material/Grid";
-import React from "react";
 import Tooltip from "./Tooltip";
 import { compose } from "redux";
 import withColors from "#hocs/withColors";

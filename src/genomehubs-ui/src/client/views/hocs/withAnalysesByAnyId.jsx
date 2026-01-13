@@ -4,7 +4,6 @@ import {
   getAnalysisById,
 } from "#selectors/analysis";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withAnalysesByAnyId = (WrappedComponent) => (props) => {

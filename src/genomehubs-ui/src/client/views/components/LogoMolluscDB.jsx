@@ -1,4 +1,3 @@
-import React from "react";
 import { compose } from "redux";
 import { h } from "hastscript";
 import { motion } from "motion/react";

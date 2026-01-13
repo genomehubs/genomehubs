@@ -7,7 +7,6 @@ import ColorButton from "./ColorButton";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import { MenuItem } from "@mui/material";
-import React from "react";
 import Typography from "@mui/material/Typography";
 
 const allowedSummaries = ({ field, types }) => {

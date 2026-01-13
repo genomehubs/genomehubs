@@ -3,7 +3,6 @@ import {
   setHighlightPointLocation,
 } from "#reducers/geography";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withGeography = (WrappedComponent) => (props) => {
@@ -17,7 +16,7 @@ const withGeography = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

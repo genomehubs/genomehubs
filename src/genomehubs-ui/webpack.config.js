@@ -278,6 +278,12 @@ const config = {
                   modules: false, // Preserve ES6 modules for tree-shaking
                 },
               ],
+              [
+                "@babel/preset-react",
+                {
+                  runtime: "automatic", // Use new JSX transform (no import React needed)
+                },
+              ],
             ],
           },
         },

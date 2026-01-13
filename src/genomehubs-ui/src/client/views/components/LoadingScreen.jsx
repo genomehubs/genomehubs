@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import {
   fadeIn as fadeInStyle,
   fadeOut as fadeOutStyle,
@@ -7,6 +6,7 @@ import {
   loadingLogo as loadingLogoStyle,
   loadingScreen as loadingScreenStyle,
 } from "./Styles.scss";
+import { useEffect, useState } from "react";
 
 import Logo from "./Logo";
 import { compose } from "redux";

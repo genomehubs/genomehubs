@@ -1,5 +1,4 @@
 import BadgeInfo, { BadgeInfoCell } from "./BadgeInfo";
-import React, { useEffect, useRef, useState } from "react";
 import {
   active as activeStyle,
   badgeExpanded as badgeExpandedStyle,
@@ -19,6 +18,7 @@ import {
   nested as nestedStyle,
   rank as rankStyle,
 } from "./Styles.scss";
+import { useEffect, useRef, useState } from "react";
 
 import BadgeStats from "./BadgeStats";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";

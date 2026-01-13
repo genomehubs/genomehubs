@@ -1,15 +1,9 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import FormControlLabel from "@mui/material/FormControlLabel";
-import FormGroup from "@mui/material/FormGroup";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import ReportMenu from "./ReportMenu";
 import Switch from "@mui/material/Switch";
 import getMapOptions from "./functions/getMapOptions";
-import { mixColor } from "#functions/mixColor";
-import { transform } from "proj4";
 
 const ColorRampBar = ({ min, max, color1, bg, getColor }) => {
   const borderRadius = 6;

@@ -1,5 +1,3 @@
-import React, { useEffect, useState } from "react";
-
 import AttributePanel from "./AttributePanel";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
@@ -7,6 +5,7 @@ import ResultColumnOptions from "./ResultColumnOptions";
 import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "#functions/qs";
+import { useEffect } from "react";
 import withRecord from "#hocs/withRecord";
 import withTaxonomy from "#hocs/withTaxonomy";
 

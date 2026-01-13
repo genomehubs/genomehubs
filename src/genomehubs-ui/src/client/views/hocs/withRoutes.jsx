@@ -1,7 +1,6 @@
 import { cancelPages, getPages } from "#reducers/pages";
 import { getRoutes, setRoutes } from "#reducers/routes";
 
-import React from "react";
 import { connect } from "react-redux";
 import { getRoutesById } from "#selectors/routes";
 

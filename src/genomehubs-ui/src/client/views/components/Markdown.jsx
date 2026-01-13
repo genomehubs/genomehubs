@@ -1,10 +1,8 @@
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
-import React, { Suspense, lazy, useEffect, useRef, useState } from "react";
-import { basename, siteName } from "#reducers/location";
+import { Suspense, lazy, useEffect, useState } from "react";
 import {
   centerContent as centerContentStyle,
   divider as dividerStyle,
-  fixedArSixteenNine as fixedArSixteenNineStyle,
   fixedAr as fixedArStyle,
   inline as inlineStyle,
   markdown as markdownStyle,
@@ -37,7 +35,6 @@ import Report from "./Report";
 import ResultCount from "./ResultCount";
 import SearchIcon from "@mui/icons-material/Search";
 import StaticPlot from "./StaticPlot";
-import TextField from "@mui/material/TextField";
 import Toggle from "./Toggle";
 import Tooltip from "./Tooltip";
 import TranslatedValue from "./TranslatedValue";
@@ -57,6 +54,7 @@ import rehypeReact from "rehype-react";
 import remarkDirective from "remark-directive";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
+import { siteName } from "#reducers/location";
 import { unified } from "unified";
 import { useLocation } from "@reach/router";
 import useNavigate from "#hooks/useNavigate";

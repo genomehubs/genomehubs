@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState } from "react";
+import { Suspense, lazy, useState } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
 import Dialog from "@mui/material/Dialog";

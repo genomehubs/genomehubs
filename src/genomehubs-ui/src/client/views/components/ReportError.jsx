@@ -1,6 +1,3 @@
-// import { RadialChart } from "react-vis";
-import React, { Fragment, useRef } from "react";
-
 import Grid from "@mui/material/Grid";
 import Logo from "./Logo";
 import { compose } from "redux";

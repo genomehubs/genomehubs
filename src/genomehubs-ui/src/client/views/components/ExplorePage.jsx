@@ -1,13 +1,11 @@
-import React, { memo, useEffect } from "react";
+import { memo, useEffect } from "react";
 
 import Page from "./Page";
 import ResultPanel from "./ResultPanel";
 import TextPanel from "./TextPanel";
-import classnames from "classnames";
 import { compose } from "redux";
 import dispatchLookup from "#hocs/dispatchLookup";
 import qs from "#functions/qs";
-import styles from "./Styles.scss";
 import withRecord from "#hocs/withRecord";
 import withSearch from "#hocs/withSearch";
 import withSummary from "#hocs/withSummary";

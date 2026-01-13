@@ -12,7 +12,6 @@ import "@fontsource/roboto-mono/700-italic.css";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
-import React from "react";
 /** @type { import('@storybook/react-webpack5').Preview } */
 import StylesProvider from "@mui/styles/StylesProvider";
 

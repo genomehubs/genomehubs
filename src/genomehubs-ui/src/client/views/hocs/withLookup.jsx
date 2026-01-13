@@ -1,6 +1,5 @@
 import { getLookupTerm, setLookupTerm } from "#reducers/lookup";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withLookup = (WrappedComponent) => (props) => {
@@ -15,7 +14,7 @@ const withLookup = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

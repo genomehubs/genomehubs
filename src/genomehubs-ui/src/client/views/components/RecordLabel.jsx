@@ -1,5 +1,3 @@
-import React, { useEffect } from "react";
-
 import { Chip } from "@mui/material";
 import GppGoodIcon from "@mui/icons-material/GppGood";
 import LaunchIcon from "@mui/icons-material/Launch";
@@ -12,6 +10,7 @@ import { compose } from "redux";
 import getContrast from "#functions/getContrast";
 import getPrimaryAssemblyId from "#functions/getPrimaryAssemblyId";
 import { recordLinkIcon as recordLinkIconStyle } from "./Styles.scss";
+import { useEffect } from "react";
 import withApi from "#hocs/withApi";
 import withColors from "#hocs/withColors";
 import withRecord from "#hocs/withRecord";

@@ -8,8 +8,8 @@ import {
   TileLayer,
   useMap,
 } from "react-leaflet";
-import React, { useEffect, useMemo, useRef, useState } from "react";
 import { findCenterLatLng, getFitWorldZoom } from "./functions/mapHelpers";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import CountryPopup from "./CountryPopup";
 import HexbinPopup from "./HexbinPopup";
@@ -17,7 +17,6 @@ import L from "leaflet";
 import PointPopup from "./PointPopup";
 import getMapOptions from "./functions/getMapOptions";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
-import { useLocation } from "@reach/router";
 import useNavigate from "#hooks/useNavigate";
 
 let countriesGeoJson = null;

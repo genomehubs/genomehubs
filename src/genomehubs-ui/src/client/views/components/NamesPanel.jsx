@@ -13,7 +13,6 @@ import {
 
 import InfoIcon from "@mui/icons-material/Info";
 import LaunchIcon from "@mui/icons-material/Launch";
-import React from "react";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "redux";

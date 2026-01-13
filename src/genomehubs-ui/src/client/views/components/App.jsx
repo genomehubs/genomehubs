@@ -1,4 +1,3 @@
-import React, { memo, useEffect, useState } from "react";
 import {
   StyledEngineProvider,
   ThemeProvider,
@@ -8,6 +7,7 @@ import {
 //   makeStyles,
 // } from "@material-ui/core/styles";
 import { app as appStyle, infoPanel as infoPanelStyle } from "./Styles.scss";
+import { memo, useEffect, useState } from "react";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import Head from "./Head";

@@ -1,7 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import Grid from "@mui/material/Grid";
-import LaunchIcon from "@mui/icons-material/Launch";
 import NavLink from "./NavLink";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -10,9 +9,8 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Tooltip from "./Tooltip";
 import { compose } from "redux";
-import makeStyles from '@mui/styles/makeStyles';
 import useResize from "#hooks/useResize";
-import withStyles from '@mui/styles/withStyles';
+import withStyles from "@mui/styles/withStyles";
 import withTypes from "#hocs/withTypes";
 
 const StyledTableCell = withStyles((theme) => ({
@@ -76,7 +74,7 @@ const ReportSources = ({
 
   let rows = [];
   let sorted = Object.entries(sources || []).sort(
-    (a, b) => parseInt(b[1].count || 0) - parseInt(a[1].count || 0)
+    (a, b) => parseInt(b[1].count || 0) - parseInt(a[1].count || 0),
   );
   sorted.forEach(([key, source], index) => {
     let sourceName;
@@ -165,11 +163,15 @@ const ReportSources = ({
               return content;
             })}
         </TableCell>
-      </TableRow>
+      </TableRow>,
     );
   });
   return (
-    (<Grid id="sources" style={{ maxHeight: minDim, overflowY: "auto" }} size="grow">
+    <Grid
+      id="sources"
+      style={{ maxHeight: minDim, overflowY: "auto" }}
+      size="grow"
+    >
       <Table stickyHeader size="small" ref={componentRef}>
         <TableHead>
           <TableRow>
@@ -180,7 +182,7 @@ const ReportSources = ({
         </TableHead>
         <TableBody>{rows}</TableBody>
       </Table>
-    </Grid>)
+    </Grid>
   );
 };
 

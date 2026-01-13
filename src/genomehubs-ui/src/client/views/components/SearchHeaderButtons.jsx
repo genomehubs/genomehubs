@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   favListingFooter as favListingFooterStyle,
   saveSearchOptions as saveSearchOptionsStyle,
@@ -12,6 +11,7 @@ import Tooltip from "./Tooltip";
 import { compose } from "redux";
 import { splitTerms } from "#functions/splitTerms";
 import { useLocalStorage } from "usehooks-ts";
+import { useState } from "react";
 import withSearch from "#hocs/withSearch";
 
 const SearchHeaderButtons = ({

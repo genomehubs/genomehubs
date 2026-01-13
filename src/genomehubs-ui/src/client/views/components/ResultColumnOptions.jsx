@@ -8,7 +8,6 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
-import React from "react";
 import Select from "@mui/material/Select";
 import SettingsButton from "./SettingsButton";
 import { TextField } from "@mui/material";
@@ -19,6 +18,7 @@ import qs from "#functions/qs";
 import { styled } from "@mui/material/styles";
 import { useLocation } from "@reach/router";
 import useNavigate from "#hooks/useNavigate";
+import { useState } from "react";
 import withRecord from "#hocs/withRecord";
 import withSearch from "#hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";
@@ -134,11 +134,11 @@ const ResultColumnOptions = ({
         .filter(([f]) => f == attributeId)
         .map(([name, subset = types[attributeId].processed_simple]) => subset)
     : ["value"];
-  const [summaryCols, setSummaryCols] = React.useState(initialSelected);
+  const [summaryCols, setSummaryCols] = useState(initialSelected);
   let initialFieldOpts =
     searchTerm?.fieldOpts?.find((f) => f.startsWith(attributeId)) || ";;";
   initialFieldOpts = initialFieldOpts.replace(`${attributeId}:`, "");
-  const [fieldOpts, setFieldOpts] = React.useState(initialFieldOpts);
+  const [fieldOpts, setFieldOpts] = useState(initialFieldOpts);
 
   const handleChange = (e) => {
     setSummaryCols(e.target.value);

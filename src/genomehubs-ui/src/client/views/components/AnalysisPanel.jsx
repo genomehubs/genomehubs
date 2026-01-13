@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import {
   autoWidth as autoWidthStyle,
   header as headerStyle,
@@ -17,6 +16,7 @@ import TableRow from "@mui/material/TableRow";
 import classnames from "classnames";
 import { compose } from "redux";
 import qs from "#functions/qs";
+import { useEffect } from "react";
 import withAnalysesByAnyId from "#hocs/withAnalysesByAnyId";
 import withAnalysis from "#hocs/withAnalysis";
 

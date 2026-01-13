@@ -1,6 +1,5 @@
 import ChipSearchBox from "./ChipSearchBox";
 import { Provider } from "react-redux";
-import React from "react";
 import colorStore from "#reducers/color.store";
 import lookupFunction from "./functions/lookupFunction";
 import types from "./default.types.json";

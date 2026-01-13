@@ -1,5 +1,3 @@
-import React, { useRef } from "react";
-
 import Grid from "@mui/material/Grid";
 import Report from "./Report";
 import ReportTools from "./ReportTools";
@@ -10,6 +8,7 @@ import { markdown as markdownStyle } from "./Styles.scss";
 import qs from "qs";
 import { useLocation } from "@reach/router";
 import useNavigate from "#hooks/useNavigate";
+import { useRef } from "react";
 import { useStyles } from "./ReportModalStyles";
 import useWindowDimensions from "#hooks/useWindowDimensions";
 import withSiteName from "#hocs/withSiteName";

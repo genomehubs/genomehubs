@@ -1,9 +1,9 @@
-import React, { memo, useRef } from "react";
 import {
   infoPanel1Column as infoPanel1ColumnStyle,
   infoPanel as infoPanelStyle,
   textPanel as textPanelStyle,
 } from "./Styles.scss";
+import { memo, useRef } from "react";
 
 import Chip from "@mui/material/Chip";
 import Grid from "@mui/material/Grid";

@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import { memo, useState } from "react";
 
 import Box from "@mui/material/Box";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -79,7 +79,7 @@ const SearchSettings = ({
   groupedTypes,
   basename,
 }) => {
-  const [state, setState] = React.useState(() => {
+  const [state, setState] = useState(() => {
     let initialState = { taxonomy };
     Object.keys(groupedTypes).forEach((key) => {
       let group = groupedTypes[key];

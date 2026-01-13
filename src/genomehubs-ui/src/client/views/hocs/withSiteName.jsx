@@ -5,7 +5,6 @@ import {
   getSitenameLong,
 } from "#reducers/location";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withSiteName = (WrappedComponent) => (props) => {

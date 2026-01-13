@@ -10,7 +10,6 @@ import {
   title as titleStyle,
 } from "./Styles.scss";
 
-import React from "react";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "redux";

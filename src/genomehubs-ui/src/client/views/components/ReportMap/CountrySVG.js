@@ -1,5 +1,3 @@
-import React from "react";
-
 export const CountrySVG = ({ coordinates, fill, stroke }) => {
   // Render SVG polygons for all coordinate sets (handles MultiPolygon)
   // Wrap polygons in an SVG element for display

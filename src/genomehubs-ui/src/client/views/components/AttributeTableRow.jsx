@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import {
   title as titleStyle,
   underscoreHigh as underscoreHighStyle,
@@ -117,8 +117,8 @@ const NestedTable = ({
   basename,
 }) => {
   const navigate = useNavigate();
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -441,7 +441,7 @@ const AttributeTableRow = ({
   let geoPoints;
 
   // Fetch map data for sample_location or country_list
-  React.useEffect(() => {
+  useEffect(() => {
     // set a timeout to prevent multiple fetches
     if (loadingMap) {
       return;

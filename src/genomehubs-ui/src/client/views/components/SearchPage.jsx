@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from "react";
+import { memo, useEffect } from "react";
 
 import Page from "./Page";
 import ReportPanel from "./ReportPanel";

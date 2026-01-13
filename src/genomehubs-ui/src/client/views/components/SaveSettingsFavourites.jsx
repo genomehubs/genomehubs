@@ -1,6 +1,5 @@
 import * as htmlToImage from "html-to-image";
 
-import React, { useRef, useState } from "react";
 import {
   favListingButton as favListingButtonStyle,
   favListingContainer as favListingContainerStyle,
@@ -9,6 +8,7 @@ import {
   favListingHeader as favListingHeaderStyle,
   favListing as favListingStyle,
 } from "./Styles.scss";
+import { useRef, useState } from "react";
 
 import ColorButton from "./ColorButton";
 import EditIcon from "@mui/icons-material/Edit";

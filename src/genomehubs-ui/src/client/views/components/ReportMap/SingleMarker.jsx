@@ -1,5 +1,4 @@
 import { CircleMarker } from "react-leaflet";
-import React from "react";
 
 const SingleMarker = ({
   position,

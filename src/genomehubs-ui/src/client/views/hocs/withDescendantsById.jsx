@@ -3,7 +3,6 @@ import {
   getDescendantsIsFetchingByTaxonId,
 } from "#reducers/descendants";
 
-import React from "react";
 import { connect } from "react-redux";
 import { fetchDescendants } from "#selectors/descendants";
 
@@ -15,7 +14,7 @@ const withDescendantsById = (WrappedComponent) => (props) => {
     ...(taxonId && {
       descendantsIsFetchingById: getDescendantsIsFetchingByTaxonId(
         state,
-        taxonId
+        taxonId,
       ),
       descendantsById: getDescendantsByTaxonId(state, taxonId),
     }),
@@ -24,14 +23,14 @@ const withDescendantsById = (WrappedComponent) => (props) => {
   const mapDispatchToProps = (dispatch) => ({
     fetchDescendants: ({ taxonId, taxonomy, depth, rank, offset, size }) => {
       dispatch(
-        fetchDescendants({ taxonId, taxonomy, depth, rank, offset, size })
+        fetchDescendants({ taxonId, taxonomy, depth, rank, offset, size }),
       );
     },
   });
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

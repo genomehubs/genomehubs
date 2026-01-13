@@ -1,9 +1,9 @@
-import React, { memo, useRef, useState } from "react";
 import {
   extra as extraStyle,
   term as termStyle,
   value as valueStyle,
 } from "./Styles.scss";
+import { memo, useRef, useState } from "react";
 
 import AutoCompleteOption from "./AutoCompleteOption";
 import AutoCompleteSuggestion from "./AutoCompleteSuggestion";
@@ -134,8 +134,8 @@ export const AutoCompleteInput = ({
             : "taxon ID",
           xref: Boolean(
             acResult.reason &&
-              acResult.reason[0].fields["taxon_names.class"] &&
-              !acResult.reason[0].fields["taxon_names.class"][0].match(" name"),
+            acResult.reason[0].fields["taxon_names.class"] &&
+            !acResult.reason[0].fields["taxon_names.class"][0].match(" name"),
           ),
         });
         terms.push(

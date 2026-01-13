@@ -1,6 +1,5 @@
 import { getQueryResultById, resetQuery } from "#reducers/search";
 
-import React from "react";
 import { connect } from "react-redux";
 import { fetchQueryResults } from "#selectors/search";
 import qs from "#functions/qs";
@@ -58,7 +57,7 @@ const withQueryById = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

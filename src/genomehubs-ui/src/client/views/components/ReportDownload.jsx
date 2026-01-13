@@ -4,7 +4,6 @@ import { Buffer } from "buffer";
 import DownloadButton from "./DownloadButton";
 import Grid from "@mui/material/Grid";
 import JSZip from "jszip";
-import React from "react";
 import { compose } from "redux";
 import dispatchReport from "#hocs/dispatchReport";
 import mergeImages from "merge-images";
@@ -138,7 +137,6 @@ export const ReportDownload = ({
     let success = false;
     if (format == "png") {
       if (chartRef.current && chartRef.current.children) {
-        // chartSVG = chartRef.current.childNodes[0].childNodes[0];
         chartSVG = chartRef.current.childNodes[0];
         if (report == "tree" && !queryString.match("=ring")) {
           if (chartSVG.childNodes.length == 1) {
@@ -148,17 +146,12 @@ export const ReportDownload = ({
               try {
                 if (Object.entries(tmpNode)[1][1].id == "scaledTreeDiv") {
                   chartSVG = tmpNode;
-                  //chartSVG = tmpNode.parentNode;
                   break;
                 }
               } catch {
                 break;
               }
             }
-            // chartSVG = chartSVG.getElementById("scaledTreeDiv");
-            // chartSVG =
-            //   chartSVG.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            //     .childNodes[0];
           } else {
             scrollContainer = chartSVG.childNodes[1];
             let tmpNode = scrollContainer;
@@ -177,32 +170,16 @@ export const ReportDownload = ({
                 break;
               }
             }
-            // scrollContainer = chartSVG.childNodes[1];
-            // chartSVG =
-            //   chartSVG.childNodes[1].childNodes[0].childNodes[0].childNodes[0]
-            //     .childNodes[0].parentNode;
           }
         }
       } else {
         return;
       }
-      // chartSVG = React.Children.only(chartSVG);
-      // let { x: left, y: top, height, width } = chartSVG.viewBox.baseVal;
-      // let opts = {
-      //   excludeCss: true,
-      //   scale: 2,
-      //   backgroundColor: "white",
-      //   left,
-      //   top,
-      //   height,
-      //   width,
-      // };
+
       let opts = {
         backgroundColor: backgroundColor,
       };
 
-      // await saveSvgAsPng(chartSVG, `${filename}.png`, opts);
-      // let uri = await htmlToImage.toPng(chartSVG, opts);
       if (scrollContainer) {
         if (toUrl) {
           return;

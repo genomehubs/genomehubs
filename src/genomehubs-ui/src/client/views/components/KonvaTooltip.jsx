@@ -1,11 +1,6 @@
 import { Group, Label, Rect, Tag, Text } from "react-konva";
-import {
-  ancestralColor,
-  descendantColor,
-  directColor,
-} from "#reducers/color";
+import { ancestralColor, descendantColor, directColor } from "#reducers/color";
 
-import React from "react";
 import { format } from "d3-format";
 
 const colors = {
@@ -103,7 +98,7 @@ const KonvaTooltip = ({ e, segment, field, scale, statusColors }) => {
 
   return (
     // <Label x={e.target.attrs.x + e.target.attrs.width / 2} y={e.target.attrs.y}>
-    (<Group>
+    <Group>
       <Label x={x} y={y}>
         <Tag
           fill={"31323f"}
@@ -116,7 +111,7 @@ const KonvaTooltip = ({ e, segment, field, scale, statusColors }) => {
         {text}
       </Label>
       {detail}
-    </Group>)
+    </Group>
   );
 };
 

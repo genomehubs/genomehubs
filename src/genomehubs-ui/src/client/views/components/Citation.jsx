@@ -1,6 +1,5 @@
 import Grid from "@mui/material/Grid";
 import NavLink from "./NavLink";
-import React from "react";
 import { compose } from "redux";
 import { link as linkStyle } from "./Styles.scss";
 import { pathJoin } from "#reducers/location";

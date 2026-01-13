@@ -1,13 +1,6 @@
 import "proj4leaflet";
 
-import React, {
-  Suspense,
-  lazy,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import {
   getCrs,
   getFitWorldBounds,
@@ -21,8 +14,6 @@ import MapLegend from "./MapLegend";
 import MarkerComponent from "./MarkerComponent";
 import { compose } from "redux";
 import dispatchMessage from "#hocs/dispatchMessage";
-import { mixColor } from "#functions/mixColor";
-import proj4 from "proj4";
 import qs from "#functions/qs";
 import setColors from "#functions/setColors";
 import { useLocation } from "@reach/router";

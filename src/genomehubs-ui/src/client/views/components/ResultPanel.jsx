@@ -26,7 +26,6 @@ import {
 import AggregationIcon from "./AggregationIcon";
 import Grid from "@mui/material/Grid";
 import HistogramSVG from "./HistogramSVG";
-import React from "react";
 import TaxonSummaryPanel from "./TaxonSummaryPanel";
 import Tooltip from "./Tooltip";
 import WordCloud from "./WordCloud";

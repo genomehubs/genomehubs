@@ -8,7 +8,6 @@ import {
 } from "./Styles.scss";
 
 import Grid from "@mui/material/Grid";
-import React from "react";
 import Skeleton from "@mui/material/Skeleton";
 import classnames from "classnames";
 import { compose } from "redux";
@@ -26,7 +25,7 @@ const SearchSummary = ({ searchTerm, searchResults }) => {
     resultPanelStyle,
     flexCenterStyle,
     flexCenterHorizontalStyle,
-    fullWidthStyle
+    fullWidthStyle,
   );
 
   let summary;

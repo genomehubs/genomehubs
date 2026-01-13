@@ -6,7 +6,6 @@ import {
   title as titleStyle,
 } from "./Styles.scss";
 
-import React from "react";
 import classnames from "classnames";
 import { compose } from "redux";
 

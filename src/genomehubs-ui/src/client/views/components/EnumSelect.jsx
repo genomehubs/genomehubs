@@ -1,5 +1,4 @@
 import BasicSelect from "./BasicSelect";
-import React from "react";
 import { compose } from "redux";
 import withTypes from "#hocs/withTypes";
 

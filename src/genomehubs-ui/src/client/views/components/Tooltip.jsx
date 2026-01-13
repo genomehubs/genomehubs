@@ -1,5 +1,5 @@
 import MuiTooltip, { tooltipClasses } from "@mui/material/Tooltip";
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { compose } from "redux";
 import { styled } from "@mui/material/styles";

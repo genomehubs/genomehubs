@@ -1,5 +1,4 @@
 import { Helmet } from "react-helmet";
-import React from "react";
 import { compose } from "redux";
 import withSiteName from "#hocs/withSiteName";
 

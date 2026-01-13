@@ -6,7 +6,6 @@ import Grid from "@mui/material/Grid";
 import LineStyleIcon from "@mui/icons-material/LineStyle";
 import LooksOneIcon from "@mui/icons-material/LooksOne";
 import PersonPinCircleIcon from "@mui/icons-material/PersonPinCircle";
-import React from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import TodayIcon from "@mui/icons-material/Today";
 import Typography from "@mui/material/Typography";

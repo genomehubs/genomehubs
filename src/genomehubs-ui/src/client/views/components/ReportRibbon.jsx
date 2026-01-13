@@ -1,7 +1,6 @@
 import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
-import { path as d3Path, pathRound } from "d3-path";
 import formats, { setInterval } from "#functions/formats";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import stringLength, { maxStringLength } from "#functions/stringLength";
 
 import Grid from "@mui/material/Grid";
@@ -10,6 +9,7 @@ import Tooltip from "./Tooltip";
 import { compose } from "redux";
 import dispatchMessage from "#hocs/dispatchMessage";
 import { fadeColor } from "#functions/fadeColor";
+import { pathRound } from "d3-path";
 import qs from "#functions/qs";
 import { scaleLinear } from "d3-scale";
 import setColors from "#functions/setColors";

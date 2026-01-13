@@ -9,7 +9,6 @@ import {
   setSearchTerm,
 } from "#reducers/search";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const dispatchSearch = (WrappedComponent) => (props) => {
@@ -36,7 +35,7 @@ const dispatchSearch = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

@@ -1,4 +1,3 @@
-import React from "react";
 import { compose } from "redux";
 import { motion } from "motion/react";
 import withColors from "#hocs/withColors";

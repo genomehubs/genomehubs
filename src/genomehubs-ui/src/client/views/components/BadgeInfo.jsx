@@ -7,7 +7,6 @@ import {
 } from "./Styles.scss";
 
 import AggregationIcon from "./AggregationIcon";
-import React from "react";
 import Tooltip from "./Tooltip";
 import classNames from "classnames";
 import { compose } from "redux";

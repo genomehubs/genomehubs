@@ -1,6 +1,5 @@
 import { PalettePreview } from "./PalettePreview";
 import { Provider } from "react-redux";
-import React from "react";
 import colorStore from "#reducers/color.store";
 import { themeFromContext } from "#storybook/functions/themeFromContext";
 

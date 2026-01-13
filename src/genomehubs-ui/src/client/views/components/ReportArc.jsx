@@ -1,20 +1,17 @@
 import {
   Cell,
-  ComposedChart,
   Label,
-  Line,
   Pie,
   PieChart,
   PolarAngleAxis,
   RadialBar,
   RadialBarChart,
-  Rectangle,
 } from "recharts";
 import MultiCatLegend, {
   processLegendData,
   valueString,
 } from "./MultiCatLegend";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import Grid from "@mui/material/Grid";
 import Tooltip from "./Tooltip";

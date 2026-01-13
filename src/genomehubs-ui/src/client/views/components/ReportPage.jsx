@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import {
   fillParent as fillParentStyle,
   infoPanel1Column as infoPanel1ColumnStyle,
@@ -13,6 +12,7 @@ import { compose } from "redux";
 import dispatchLookup from "#hocs/dispatchLookup";
 import qs from "#functions/qs";
 import { sortReportQuery } from "#selectors/report";
+import { useEffect } from "react";
 
 const ReportPage = ({ location, setLookupTerm, topLevel, ...props }) => {
   let queryString = location.search.replace(/^\?/, "");
@@ -27,7 +27,7 @@ const ReportPage = ({ location, setLookupTerm, topLevel, ...props }) => {
     { [infoPanelStyle]: !topLevel },
     { [infoPanel1ColumnStyle]: !topLevel },
     { [textPanelStyle]: !topLevel },
-    fillParentStyle
+    fillParentStyle,
   );
   let content = (
     <div className={css}>

@@ -1,6 +1,5 @@
 import "./style/cookie.css";
 
-import React, { useState } from "react";
 import { useCookies, withCookies } from "react-cookie";
 
 import CloseIcon from "@mui/icons-material/Close";
@@ -11,6 +10,7 @@ import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import { banner as bannerStyle } from "./Styles.scss";
 import { compose } from "redux";
+import { useState } from "react";
 import { useTheme } from "@mui/material";
 import useWindowDimensions from "#hooks/useWindowDimensions";
 
@@ -96,8 +96,8 @@ export const CookieBanner = ({ meta, apiUrl, link, children }) => {
   const theme = useTheme();
   const [cookies, setCookie, removeCookie] = useCookies(["cookieConsent"]);
   // getModalStyle is not a pure function, we roll the style only on the first render
-  const [modalStyle] = React.useState(getModalStyle);
-  const [open, setOpen] = React.useState(false);
+  const [modalStyle] = useState(getModalStyle);
+  const [open, setOpen] = useState(false);
   const windowDimensions = useWindowDimensions();
   const [previewDimensions, setPreviewDimensions] = useState(false);
   if (!showBanner) {

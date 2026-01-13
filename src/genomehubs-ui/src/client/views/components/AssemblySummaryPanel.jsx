@@ -1,5 +1,4 @@
 import Markdown from "./Markdown";
-import React from "react";
 import { compose } from "redux";
 import withRecord from "#hocs/withRecord";
 

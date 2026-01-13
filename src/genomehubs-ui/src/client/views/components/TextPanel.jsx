@@ -1,4 +1,3 @@
-import React, { memo } from "react";
 import {
   infoPanel1Column as infoPanel1ColumnStyle,
   infoPanel as infoPanelStyle,
@@ -8,6 +7,7 @@ import {
 import Markdown from "./Markdown";
 import classnames from "classnames";
 import { compose } from "redux";
+import { memo } from "react";
 
 const TextPanel = ({ pageId, ...overrideStyles }) => {
   let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, textPanelStyle);

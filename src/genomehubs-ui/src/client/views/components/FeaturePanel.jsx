@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import {
   header as headerStyle,
   infoPanel1Column as infoPanel1ColumnStyle,
@@ -6,6 +5,7 @@ import {
   resultPanel as resultPanelStyle,
   title as titleStyle,
 } from "./Styles.scss";
+import { useEffect, useState } from "react";
 
 import BasicSelect from "./BasicSelect";
 import FeatureSummaryPanel from "./FeatureSummaryPanel";

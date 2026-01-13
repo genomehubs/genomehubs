@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, memo, useEffect, useState } from "react";
+import { Suspense, lazy, memo, useEffect, useState } from "react";
 
 import CookieBanner from "./CookieBanner";
 import DownloadMessage from "./DownloadMessage";

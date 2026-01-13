@@ -1,4 +1,4 @@
-import React, { memo, useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { pathJoin, siteName } from "#reducers/location";
 
 import AutoCompleteInput from "./AutoCompleteInput";
@@ -9,7 +9,6 @@ import SearchInputQueries from "./SearchInputQueries";
 import SearchToggles from "./SearchToggles";
 import { Template } from "./Markdown";
 import { compose } from "redux";
-// import dispatchLiveQuery from "#hocs/dispatchLiveQuery";
 import { getSuggestedTerm } from "#reducers/search";
 import qs from "#functions/qs";
 import { useLocation } from "@reach/router";

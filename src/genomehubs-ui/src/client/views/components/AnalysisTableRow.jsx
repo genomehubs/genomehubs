@@ -1,4 +1,4 @@
-import React, { Fragment, memo, useEffect, useState } from "react";
+import { Fragment, memo, useState } from "react";
 
 import FileTable from "./FileTable";
 import Grid from "@mui/material/Grid";

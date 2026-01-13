@@ -1,11 +1,4 @@
-import React, {
-  Suspense,
-  lazy,
-  memo,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { Suspense, lazy, memo, useEffect, useState } from "react";
 
 import Grid from "@mui/material/Grid";
 import ReportCaption from "./ReportCaption";

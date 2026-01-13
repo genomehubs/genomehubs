@@ -1,6 +1,5 @@
 import { resetSearchDefaults, setSearchDefaults } from "#reducers/search";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const dispatchSearchDefaults = (WrappedComponent) => (props) => {
@@ -13,7 +12,7 @@ const dispatchSearchDefaults = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

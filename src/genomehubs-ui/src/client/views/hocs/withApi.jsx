@@ -6,7 +6,6 @@ import {
   setApiStatus,
 } from "#reducers/api";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withApi = (WrappedComponent) => (props) => {

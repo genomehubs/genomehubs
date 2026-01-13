@@ -7,7 +7,6 @@ import {
   setCurrentRecordId,
 } from "#reducers/record";
 
-import React from "react";
 import { connect } from "react-redux";
 import { fetchRecord } from "#selectors/record";
 

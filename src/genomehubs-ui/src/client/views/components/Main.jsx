@@ -1,4 +1,4 @@
-import React, { Fragment, memo } from "react";
+import { Fragment, memo } from "react";
 
 import ExplorePage from "./ExplorePage";
 import GenericPage from "./GenericPage";

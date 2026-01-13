@@ -1,4 +1,3 @@
-import React, { useEffect, useRef } from "react";
 import {
   fullWidth as fullWidthStyle,
   tagCloud as tagCloudStyle,
@@ -8,6 +7,7 @@ import Skeleton from "@mui/material/Skeleton";
 import { TagCloud } from "react-tagcloud";
 import { compose } from "redux";
 import qs from "#functions/qs";
+import { useEffect } from "react";
 import { useIntersectionObserver } from "usehooks-ts";
 import useNavigate from "#hooks/useNavigate";
 import withLookup from "#hocs/withLookup";

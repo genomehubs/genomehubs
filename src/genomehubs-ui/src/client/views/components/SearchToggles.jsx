@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import ArtTrackIcon from "@mui/icons-material/ArtTrack";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";

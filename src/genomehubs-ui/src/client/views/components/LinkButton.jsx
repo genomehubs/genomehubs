@@ -1,6 +1,5 @@
 import ColorButton from "./ColorButton";
 import LinkIcon from "@mui/icons-material/Link";
-import React from "react";
 import { compose } from "redux";
 import { useLocation } from "@reach/router";
 import useNavigate from "#hooks/useNavigate";

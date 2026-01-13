@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import {
   infoPanel1Column as infoPanel1ColumnStyle,
   infoPanel as infoPanelStyle,
@@ -11,6 +10,7 @@ import { compose } from "redux";
 import dispatchLookup from "#hocs/dispatchLookup";
 import qs from "#functions/qs";
 import { sortReportQuery } from "#selectors/report";
+import { useEffect } from "react";
 import { useLocation } from "@reach/router";
 import withTaxonomy from "#hocs/withTaxonomy";
 

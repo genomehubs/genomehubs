@@ -1,4 +1,3 @@
-import React from "react";
 import { connect } from "react-redux";
 import { fetchTypes } from "#selectors/types";
 import { resetTypes } from "#reducers/types";
@@ -12,7 +11,7 @@ const dispatchTypes = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

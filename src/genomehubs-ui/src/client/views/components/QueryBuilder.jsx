@@ -1,5 +1,5 @@
 import { ListSubheader, MenuItem } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import AutoCompleteInput from "./AutoCompleteInput";
 import BasicSelect from "./BasicSelect";

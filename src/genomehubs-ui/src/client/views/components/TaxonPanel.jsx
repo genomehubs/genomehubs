@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import {
   header as headerStyle,
   identifierPrefix as identifierPrefixStyle,
@@ -17,6 +16,7 @@ import classnames from "classnames";
 import { compose } from "redux";
 import dispatchLookup from "#hocs/dispatchLookup";
 import qs from "#functions/qs";
+import { useEffect } from "react";
 import { useLocation } from "@reach/router";
 import useNavigate from "#hooks/useNavigate";
 import withRecord from "#hocs/withRecord";

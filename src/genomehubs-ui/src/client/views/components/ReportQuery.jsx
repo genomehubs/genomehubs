@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-
 import CloseIcon from "@mui/icons-material/Close";
 import FindInPageIcon from "@mui/icons-material/FindInPage";
 import Grid from "@mui/material/Grid";
@@ -7,8 +5,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import TextField from "@mui/material/TextField";
 import { compose } from "redux";
 import qs from "#functions/qs";
-import { setSearchTerm } from "#reducers/search";
 import useNavigate from "#hooks/useNavigate";
+import { useState } from "react";
 import withReportById from "#hocs/withReportById";
 import withReportTerm from "#hocs/withReportTerm";
 import withSearch from "#hocs/withSearch";

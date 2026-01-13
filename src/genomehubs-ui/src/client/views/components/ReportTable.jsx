@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import FlagIcon from "./FlagIcon";
 import Grid from "@mui/material/Grid";
@@ -44,8 +44,8 @@ const TableReport = ({ report, chartProps }) => {
   if (highlightRow > -1) {
     highlightPage = Math.floor(highlightRow / defaultRowsPerPage);
   }
-  const [page, setPage] = React.useState(highlightPage);
-  const [rowsPerPage, setRowsPerPage] = React.useState(defaultRowsPerPage);
+  const [page, setPage] = useState(highlightPage);
+  const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };

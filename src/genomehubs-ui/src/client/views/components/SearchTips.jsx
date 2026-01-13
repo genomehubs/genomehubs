@@ -7,7 +7,6 @@ import {
 } from "./Styles.scss";
 
 import ColorButton from "./ColorButton";
-import React from "react";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
 import { compose } from "redux";

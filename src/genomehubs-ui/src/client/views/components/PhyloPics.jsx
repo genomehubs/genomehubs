@@ -1,4 +1,3 @@
-import React, { memo, useEffect, useRef, useState } from "react";
 import {
   blank as blankStyle,
   imageContainer as imageContainerStyle,
@@ -7,6 +6,7 @@ import {
   imageCreditPrimary as imageCreditPrimaryStyle,
   imageCredit as imageCreditStyle,
 } from "./Styles.scss";
+import { memo, useEffect, useRef, useState } from "react";
 
 import { Image } from "react-konva";
 import Konva from "konva";

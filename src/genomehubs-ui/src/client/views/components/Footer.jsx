@@ -1,6 +1,6 @@
 import * as htmlToImage from "html-to-image";
 
-import React, { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 import CopyrightIcon from "@mui/icons-material/Copyright";
 import Grid from "@mui/material/Grid";

@@ -2,7 +2,6 @@ import { A } from "storybook/internal/components";
 import LaunchIcon from "@mui/icons-material/Launch";
 import { Link } from "@reach/router";
 import NavLink from "./NavLink";
-import React from "react";
 import classnames from "classnames";
 import { compose } from "redux";
 import styles from "./Styles.scss";

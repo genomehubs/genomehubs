@@ -1,6 +1,5 @@
 import { getCurrentRecordId, setCurrentRecordId } from "#reducers/record";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withRecordId = (WrappedComponent) => (props) => {
@@ -14,7 +13,7 @@ const withRecordId = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

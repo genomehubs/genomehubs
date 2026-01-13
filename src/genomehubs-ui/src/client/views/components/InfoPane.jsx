@@ -1,4 +1,3 @@
-import React, { memo, useState } from "react";
 import {
   fillParent as fillParentStyle,
   fixedArSixteenNine as fixedArSixteenNineStyle,
@@ -10,6 +9,7 @@ import {
   infoPaneHoverReveal as infoPaneHoverRevealStyle,
   infoPane as infoPaneStyle,
 } from "./Styles.scss";
+import { memo, useState } from "react";
 
 import InfoCard from "./InfoCard";
 import { Link } from "@reach/router";

@@ -1,4 +1,3 @@
-import React, { useEffect, useRef } from "react";
 import {
   aggregationToggleOpaque as aggregationToggleOpaqueStyle,
   aggregationToggle as aggregationToggleStyle,
@@ -7,6 +6,7 @@ import {
   last as lastStyle,
   resultsTable as resultsTableStyle,
 } from "./Styles.scss";
+import { useEffect, useRef } from "react";
 
 import AggregationIcon from "./AggregationIcon";
 import Badge from "@mui/material/Badge";
@@ -47,7 +47,6 @@ import dispatchRecord from "#hocs/dispatchRecord";
 import expandFieldList from "#functions/expandFieldList";
 import { formatter } from "#functions/formatter";
 import makeStyles from "@mui/styles/makeStyles";
-import { mixColor } from "#functions/mixColor";
 import qs from "#functions/qs";
 import { styled } from "@mui/material/styles";
 import { useLocation } from "@reach/router";

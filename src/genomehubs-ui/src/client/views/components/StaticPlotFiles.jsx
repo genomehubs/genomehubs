@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import {
   plotArrow as plotArrowStyle,
   plotContainer as plotContainerStyle,
@@ -152,5 +152,5 @@ export default compose(
   memo,
   withApi,
   withFiles,
-  withFilesByAnalysisId
+  withFilesByAnalysisId,
 )(StaticPlotFiles);

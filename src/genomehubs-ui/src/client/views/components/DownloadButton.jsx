@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import { forwardRef, useRef, useState } from "react";
 
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
@@ -32,9 +32,9 @@ const DownloadButton = ({
   theme,
   colorScheme,
 }) => {
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const handleClick = async () => {
     let key = Object.keys(options)[selectedIndex];

@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-
 import JSONPretty from "react-json-pretty";
 import JSONPrettyMon from "react-json-pretty/dist/monikai";
 import { compose } from "redux";

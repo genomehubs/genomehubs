@@ -5,7 +5,6 @@ import {
   setReportTerm,
 } from "#reducers/report";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const dispatchReport = (WrappedComponent) => (props) => {
@@ -14,7 +13,7 @@ const dispatchReport = (WrappedComponent) => (props) => {
   const mapDispatchToProps = (dispatch) => ({
     fetchReport: ({ reportId, queryString, reload, report, hideMessage }) =>
       dispatch(
-        fetchReport({ reportId, queryString, reload, report, hideMessage })
+        fetchReport({ reportId, queryString, reload, report, hideMessage }),
       ),
     saveReport: (props) => {
       dispatch(saveReport(props));
@@ -26,7 +25,7 @@ const dispatchReport = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

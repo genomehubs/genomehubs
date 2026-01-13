@@ -1,7 +1,4 @@
-import React, { useState } from "react";
-
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-import Badge from "@mui/material/Badge";
 import DescriptionIcon from "@mui/icons-material/Description";
 import Grid from "@mui/material/Grid";
 import HeightIcon from "@mui/icons-material/Height";
@@ -13,9 +10,8 @@ import TableRow from "@mui/material/TableRow";
 import Tooltip from "./Tooltip";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 import VerticalAlignTopIcon from "@mui/icons-material/VerticalAlignTop";
-import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
-import { styled } from "@mui/material/styles";
+import { useState } from "react";
 import withStyles from "@mui/styles/withStyles";
 
 export const useStyles = makeStyles(() => ({

@@ -1,4 +1,3 @@
-import React from "react";
 import { Rectangle } from "recharts";
 import Tooltip from "./Tooltip";
 import { active as activeStyle } from "./Styles.scss";

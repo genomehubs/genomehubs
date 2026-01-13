@@ -1,11 +1,10 @@
-import React, { useEffect, useRef } from "react";
-
 import Skeleton from "@mui/material/Skeleton";
 import Tooltip from "./Tooltip";
 import { compose } from "redux";
 import { formatter } from "#functions/formatter";
 import { fullWidth as fullWidthStyle } from "./Styles.scss";
 import qs from "#functions/qs";
+import { useEffect } from "react";
 import { useIntersectionObserver } from "usehooks-ts";
 import useNavigate from "#hooks/useNavigate";
 import withColors from "#hocs/withColors";

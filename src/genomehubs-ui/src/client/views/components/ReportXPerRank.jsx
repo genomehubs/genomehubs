@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import Tooltip from "./Tooltip";
 import { boldValue as boldValueStyle } from "./Styles.scss";

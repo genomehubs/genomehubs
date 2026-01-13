@@ -1,6 +1,5 @@
 import { getActiveNameClasses, getNamesMap } from "#selectors/types";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withNames = (WrappedComponent) => (props) => {

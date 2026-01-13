@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
-
 import NavLink from "./NavLink";
 import { compose } from "redux";
 import { tabDiv as tabDivStyle } from "./Styles.scss";
+import { useEffect } from "react";
 import withRoutes from "#hocs/withRoutes";
 
 const Tab = ({ path = "", routeName, pageId, setRoute, routesById }) => {

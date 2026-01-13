@@ -1,5 +1,5 @@
 import { Circle, Group, Layer, Line, Rect, Stage, Text } from "react-konva";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import KonvaTooltip from "./KonvaTooltip";
 import PhyloPics from "./PhyloPics";

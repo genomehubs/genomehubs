@@ -1,4 +1,4 @@
-import React, { memo, useRef } from "react";
+import { memo, useRef } from "react";
 
 import ReportItem from "./ReportItem";
 import { compose } from "redux";

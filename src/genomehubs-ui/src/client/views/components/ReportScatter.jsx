@@ -10,8 +10,8 @@ import {
   YAxis,
   ZAxis,
 } from "recharts";
-import React, { memo, useEffect, useRef, useState } from "react";
 import formats, { setInterval } from "#functions/formats";
+import { memo, useEffect, useRef, useState } from "react";
 import stringLength, { maxStringLength } from "#functions/stringLength";
 
 import CellInfo from "./CellInfo";

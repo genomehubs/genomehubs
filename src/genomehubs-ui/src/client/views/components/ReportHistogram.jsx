@@ -1,7 +1,7 @@
 import { Bar, BarChart, CartesianGrid, Label, XAxis, YAxis } from "recharts";
 import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
-import React, { useEffect, useRef } from "react";
 import formats, { setInterval } from "#functions/formats";
+import { forwardRef, useEffect, useRef } from "react";
 import stringLength, { maxStringLength } from "#functions/stringLength";
 
 import CellInfo from "./CellInfo";
@@ -81,7 +81,7 @@ const CustomBackground = ({ chartProps, ...props }) => {
     }
   });
   let { highlightColor } = chartProps.colorScheme;
-  let CurrentRect = React.forwardRef((refProps, ref) => (
+  let CurrentRect = forwardRef((refProps, ref) => (
     <rect
       ref={ref}
       {...refProps}

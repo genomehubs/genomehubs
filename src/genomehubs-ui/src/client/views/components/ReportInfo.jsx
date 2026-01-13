@@ -1,5 +1,4 @@
 import Grid from "@mui/material/Grid";
-import React from "react";
 import ReportLegend from "./ReportLegend";
 import { compose } from "redux";
 import withReportById from "#hocs/withReportById";

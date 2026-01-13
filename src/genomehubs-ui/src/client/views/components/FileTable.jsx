@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from "react";
+import { memo, useEffect } from "react";
 
 import FileModal from "./FileModal";
 import Grid from "@mui/material/Grid";
@@ -76,7 +76,7 @@ const FileTable = ({
             <a href={downloadLink}>
               {meta.name} (
               <span style={{ textDecoration: "underline" }}>{`${formatter(
-                meta.size_bytes
+                meta.size_bytes,
               )}B`}</span>
               )
             </a>
@@ -125,5 +125,5 @@ export default compose(
   memo,
   withApi,
   withFiles,
-  withFilesByAnalysisId
+  withFilesByAnalysisId,
 )(FileTable);

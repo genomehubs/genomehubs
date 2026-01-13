@@ -1,7 +1,6 @@
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { Provider } from "react-redux";
-import React from "react";
 import ReportMenu from "./ReportMenu";
 import colorStore from "#reducers/color.store";
 import { themeFromContext } from "#storybook/functions/themeFromContext";

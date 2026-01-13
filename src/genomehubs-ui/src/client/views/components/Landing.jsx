@@ -1,4 +1,4 @@
-import React, { Fragment, memo, useRef } from "react";
+import { memo, useRef } from "react";
 
 import Page from "./Page";
 import TextPanel from "./TextPanel";

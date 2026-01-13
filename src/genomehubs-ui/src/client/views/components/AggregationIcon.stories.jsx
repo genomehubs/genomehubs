@@ -1,6 +1,5 @@
 import AggregationIcon from "#components/AggregationIcon";
 import { Provider } from "react-redux";
-import React from "react";
 import store from "#reducers/color.store";
 
 export default {

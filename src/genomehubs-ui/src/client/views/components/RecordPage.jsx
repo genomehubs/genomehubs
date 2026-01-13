@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from "react";
+import { memo, useEffect } from "react";
 
 import AnalysisPanel from "./AnalysisPanel";
 import AssembliesPanel from "./AssembliesPanel";
@@ -11,14 +11,10 @@ import NamesPanel from "./NamesPanel";
 import Page from "./Page";
 import ResultPanel from "./ResultPanel";
 import TaxonPanel from "./TaxonPanel";
-import TaxonSummaryPanel from "./TaxonSummaryPanel";
 import TextPanel from "./TextPanel";
-import classnames from "classnames";
 import { compose } from "redux";
 import dispatchLookup from "#hocs/dispatchLookup";
-import { getRecordIsFetching } from "#reducers/record";
 import qs from "#functions/qs";
-import styles from "./Styles.scss";
 import { ucFirst } from "#functions/formatter";
 import useNavigate from "#hooks/useNavigate";
 import withRecord from "#hocs/withRecord";

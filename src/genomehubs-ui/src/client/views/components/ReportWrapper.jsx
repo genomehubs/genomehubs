@@ -1,5 +1,4 @@
 import LaunchIcon from "@mui/icons-material/Launch";
-import React from "react";
 import Tooltip from "./Tooltip";
 import { compose } from "redux";
 import useNavigate from "#hooks/useNavigate";
