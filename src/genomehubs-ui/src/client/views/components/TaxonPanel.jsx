@@ -88,7 +88,7 @@ const TaxonPanel = ({
   const handleTaxonClick = () => {
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/record?recordId=${taxon_id}&result=taxon&taxonomy=${
+      `record?recordId=${taxon_id}&result=taxon&taxonomy=${
         options.taxonomy || taxonomy
       }#${encodeURIComponent(scientific_name)}`,
     );

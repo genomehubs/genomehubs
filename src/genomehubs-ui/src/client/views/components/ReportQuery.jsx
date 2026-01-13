@@ -43,9 +43,7 @@ export const ReportQuery = ({
       options.ranks = options.ranks.join(",");
     }
     navigate(
-      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
-        options.query,
-      )}`,
+      `search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`,
     );
   };
 

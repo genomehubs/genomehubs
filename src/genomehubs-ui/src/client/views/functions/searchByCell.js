@@ -195,9 +195,7 @@ export const searchByCell = ({
     ranks,
   });
   navigate(
-    `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
-      query,
-    )}`,
+    `search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(query)}`,
   );
 };
 

@@ -67,7 +67,7 @@ const AssemblyPanel = ({
   const handleAssemblyClick = () => {
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/record?recordId=${assemblyId}&result=assembly&taxonomy=${
+      `record?recordId=${assemblyId}&result=assembly&taxonomy=${
         options.taxonomy || taxonomy
       }#${encodeURIComponent(assemblyId)}`,
     );

@@ -12,14 +12,14 @@ import withSiteName from "#hocs/withSiteName";
 const Breadcrumbs = ({ basename, children, ...props }) => {
   const location = useLocation();
   let trail = [];
-  let pathname = location.pathname.replace(`${basename}/`, "/");
+  let pathname = location.pathname.replace(``, "/");
   let parts = pathname.split("/");
   let link = "";
   let title = "";
   parts.forEach((part, i) => {
     let name = part;
     if (part == "") {
-      link += `${basename}/`;
+      link += ``;
       name = "home";
     } else {
       link += `/${part}`;

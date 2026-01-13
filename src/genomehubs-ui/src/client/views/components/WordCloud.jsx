@@ -59,7 +59,7 @@ const WordCloud = ({
   //   // fetchSearchResults(options);
   //   setPreferSearchTerm(false);
   //   navigate(
-  //     `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
+  //     `search?${qs.stringify(options)}#${encodeURIComponent(
   //       options.query
   //     )}`
   //   );

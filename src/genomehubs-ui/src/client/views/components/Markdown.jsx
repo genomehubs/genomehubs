@@ -318,7 +318,7 @@ export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
       } else {
         newProps["src"] = value.replace(
           /^\/static\//,
-          `${basename}/static/${webpackHash}/`,
+          `static/${webpackHash}/`,
         );
       }
     } else if (key == "size") {

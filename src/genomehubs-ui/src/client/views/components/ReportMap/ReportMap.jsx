@@ -92,7 +92,8 @@ const queryLink = ({ query, conditions, options }) => {
     newConditions = "null";
   }
   const newQuery = { ...rest, [x ? "x" : "query"]: newConditions, ...options };
-  return `?${qs.stringify(newQuery)}`;
+  let path = x ? "/report" : "/search";
+  return `${path}?${qs.stringify(newQuery)}`;
 };
 
 const ReportMap = ({

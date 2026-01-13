@@ -346,9 +346,7 @@ const QueryBuilder = ({
     });
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
-        options.query,
-      )}`,
+      `search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`,
     );
   };
   return (

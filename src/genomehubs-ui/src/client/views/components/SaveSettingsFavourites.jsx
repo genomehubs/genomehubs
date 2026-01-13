@@ -162,7 +162,7 @@ const SaveSettingsFavourites = ({ currentIndex, basename, taxonomy }) => {
       />
     );
 
-    let qrLink = `${location.origin}${basename}/search?${encodeURIComponent(qs.stringify({ taxonomy, ...searchTerm, ...reportTerm }))}#${encodeURIComponent(searchTerm.query)}`;
+    let qrLink = `${location.origin}search?${encodeURIComponent(qs.stringify({ taxonomy, ...searchTerm, ...reportTerm }))}#${encodeURIComponent(searchTerm.query)}`;
     favListings.push(
       <div key={i} className={favListingStyle}>
         <div className={favListingContainerStyle}>

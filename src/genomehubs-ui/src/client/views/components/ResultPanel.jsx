@@ -157,7 +157,7 @@ const ResultPanel = ({
   const handleTaxonClick = () => {
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/record?recordId=${taxon_id}&result=taxon&taxonomy=${
+      `record?recordId=${taxon_id}&result=taxon&taxonomy=${
         options.taxonomy || taxonomy
       }#${encodeURIComponent(scientific_name)}`,
     );
@@ -169,7 +169,7 @@ const ResultPanel = ({
     setSummaryField(fieldId);
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/explore?taxon_id=${taxon_id}&result=${searchIndex}&taxonomy=${
+      `explore?taxon_id=${taxon_id}&result=${searchIndex}&taxonomy=${
         options.taxonomy || taxonomy
       }&field_id=${fieldId}${location.hash}`,
     );

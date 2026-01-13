@@ -463,7 +463,7 @@ const RadialBarComponent = ({
             cursor={"pointer"}
             onClick={() =>
               data.navigate(
-                `${data.basename}/search?${qs.stringify({
+                `/search?${qs.stringify({
                   ...data.xQuery,
                   report: "arc",
                 })}`,
@@ -798,7 +798,6 @@ const ReportArc = ({
         { value: z - y, name: zTerm, query: zQuery },
       ];
       chartData.navigate = navigate;
-      chartData.basename = basename;
 
       ({ levels, colors } = setColors({
         colorPalette,

@@ -406,7 +406,7 @@ export const Badge = ({
               tipTitle: `Click to search ${fieldName} values for ${scientificName}`,
               handleClick: () => {
                 navigate(
-                  `${basename}/search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29%20AND%20${fieldName}&fields=${fieldName}&includeEstimates=true&taxonomy=${taxonomy}&result=${result}`,
+                  `search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29%20AND%20${fieldName}&fields=${fieldName}&includeEstimates=true&taxonomy=${taxonomy}&result=${result}`,
                 );
                 setBrowse();
               },
@@ -481,7 +481,7 @@ export const Badge = ({
               onClick={(e) => {
                 e.stopPropagation();
                 navigate(
-                  `${basename}/search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29&includeEstimates=true&taxonomy=${taxonomy}&result=${result}`,
+                  `search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29&includeEstimates=true&taxonomy=${taxonomy}&result=${result}`,
                 );
                 updateBrowse({
                   ...currentParents,

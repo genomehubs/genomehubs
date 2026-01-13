@@ -148,7 +148,7 @@ const ReportTree = ({
     }
 
     navigate(
-      `${basename}/search?${qs.stringify({
+      `search?${qs.stringify({
         ...options,
         ...moreOptions,
         query,
@@ -171,7 +171,7 @@ const ReportTree = ({
     let { result, taxonomy } = queryObj;
 
     navigate(
-      `${basename}/record?${qs.stringify({
+      `record?${qs.stringify({
         recordId: root,
         taxonomy,
         result,

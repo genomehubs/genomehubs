@@ -65,9 +65,7 @@ const Count = ({
   }, [queryById]);
 
   const handleClick = () => {
-    navigate(
-      `${basename}/search?${qs.stringify({ ...options, report: "sources" })}`,
-    );
+    navigate(`search?${qs.stringify({ ...options, report: "sources" })}`);
   };
 
   if (currentRecord) {

@@ -42,7 +42,7 @@ const SiteName = ({ siteName, basename, archive, logo, theme }) => {
   const id = open ? "simple-popover" : undefined;
 
   let content = (
-    <Link className={siteNameStyle} to={`${basename}/`}>
+    <Link className={siteNameStyle} to={``}>
       {logo && (
         <div className={siteLogoStyle}>
           <Logo lineColor={"white"} />

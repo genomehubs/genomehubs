@@ -91,7 +91,7 @@ export const BadgeInfo = ({
   const navigate = useNavigate();
   const moreInfo = () => {
     navigate(
-      `${basename}/record?recordId=${currentRecordId}&result=${result}&taxonomy=${taxonomy}`,
+      `record?recordId=${currentRecordId}&result=${result}&taxonomy=${taxonomy}`,
     );
     setBrowse();
   };

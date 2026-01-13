@@ -65,7 +65,7 @@ const searchByPoint = ({ props, chartProps }) => {
   });
 
   navigate(
-    `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
+    `search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
       pointQuery,
     )}`,
   );

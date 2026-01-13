@@ -197,9 +197,7 @@ const ResultColumnOptions = ({
       // taxonomy: state.taxonomy,
     };
     setPreferSearchTerm(false);
-    navigate(
-      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`,
-    );
+    navigate(`search?${qs.stringify(options)}${location.hash || ""}`);
     setAttributeSettings({
       attributeId: undefined,
       showAttribute: false,
@@ -215,9 +213,7 @@ const ResultColumnOptions = ({
       fields: attributeId,
     };
     setPreferSearchTerm(false);
-    navigate(
-      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`,
-    );
+    navigate(`search?${qs.stringify(options)}${location.hash || ""}`);
   };
 
   let form = (

@@ -768,7 +768,7 @@ const ResultTable = ({
       searchText = record.scientific_name;
     }
     navigate(
-      `${basename}/record?recordId=${recordId}&result=${searchIndex}&taxonomy=${taxonomy}#${encodeURIComponent(
+      `record?recordId=${recordId}&result=${searchIndex}&taxonomy=${taxonomy}#${encodeURIComponent(
         searchText,
       )}`,
     );
@@ -911,9 +911,7 @@ const ResultTable = ({
         options.excludeMissing.push(key);
       }
     });
-    navigate(
-      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`,
-    );
+    navigate(`search?${qs.stringify(options)}${location.hash || ""}`);
   };
   const arrToObj = (arr) => {
     let obj = {};

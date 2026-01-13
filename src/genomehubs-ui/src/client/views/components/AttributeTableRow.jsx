@@ -126,7 +126,7 @@ const NestedTable = ({
   const handleSourceClick = (recordId, result) => {
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/record?recordId=${recordId}&result=${result}&taxonomy=${taxonomy}#${encodeURIComponent(
+      `record?recordId=${recordId}&result=${result}&taxonomy=${taxonomy}#${encodeURIComponent(
         recordId,
       )}`,
     );
@@ -410,9 +410,7 @@ const AttributeTableRow = ({
       options.excludeAncestral = [fieldId];
     }
     navigate(
-      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
-        options.query,
-      )}`,
+      `search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`,
     );
   };
 
@@ -431,9 +429,7 @@ const AttributeTableRow = ({
       options.excludeAncestral = [fieldId];
     }
     navigate(
-      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
-        options.query,
-      )}`,
+      `search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`,
     );
   };
 
