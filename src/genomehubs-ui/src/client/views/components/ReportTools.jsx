@@ -1,5 +1,4 @@
 import React, { Fragment, Suspense, lazy, useRef, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
 
 import CodeIcon from "@mui/icons-material/Code";
 import EditIcon from "@mui/icons-material/Edit";
@@ -16,6 +15,8 @@ import SelectIcon from "@mui/icons-material/SelectAll";
 import TocIcon from "@mui/icons-material/Toc";
 import Tooltip from "./Tooltip";
 import { compose } from "redux";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import { useStyles } from "./ReportModalStyles";
 import withColors from "#hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";
@@ -51,7 +52,7 @@ export const ReportTools = ({
   const permaLink = (queryString, toggle) => {
     let path = topLevel ? "report" : toggle ? "reporturl" : "report";
     // TODO: include taxonomy
-    navigate(`${basename}/${path}?${queryString.replace(/^\?/, "")}`);
+    navigate(`/${path}?${queryString.replace(/^\?/, "")}`);
   };
 
   const handleUpdate = ({ queryString, hash }) => {

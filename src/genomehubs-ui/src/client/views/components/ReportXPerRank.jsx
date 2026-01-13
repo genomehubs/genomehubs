@@ -4,7 +4,7 @@ import Tooltip from "./Tooltip";
 import { boldValue as boldValueStyle } from "./Styles.scss";
 import { compose } from "redux";
 import qs from "../functions/qs";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import useResize from "../hooks/useResize";
 import withSiteName from "#hocs/withSiteName";
 
@@ -49,9 +49,7 @@ const ReportXPerRank = ({
             <div
               key={entry.rank}
               style={{ cursor: "pointer" }}
-              onClick={() =>
-                navigate(`${basename}/search?${qs.stringify(entry.xQuery)}`)
-              }
+              onClick={() => navigate(`/search?${qs.stringify(entry.xQuery)}`)}
             >
               <span className={boldValueStyle}>{entry.x.toLocaleString()}</span>
               <span>{plural}</span>

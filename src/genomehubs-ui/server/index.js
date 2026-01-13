@@ -51,7 +51,14 @@ const runtimeConfig = {
 };
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8880;
-const BASE_PATH = process.env.BASE_PATH || "/"; // e.g. "/genomehubs"
+// Prefer explicit BASE_PATH, otherwise derive from GH_BASENAME
+const DERIVED_BASE = (
+  "/" + String(process.env.GH_BASENAME || "").replace(/^\/+|\/+$/g, "")
+).replace(/\/$/, "");
+const BASE_PATH = process.env.BASE_PATH || DERIVED_BASE || "/"; // e.g. "/archive" or "/"
+console.log(
+  `[server startup] GH_BASENAME="${process.env.GH_BASENAME}", DERIVED_BASE="${DERIVED_BASE}", BASE_PATH="${BASE_PATH}"`,
+);
 const BUILD_DIR = path.resolve(__dirname, "../dist/public");
 const INDEX_HTML_PATH = path.join(BUILD_DIR, "index.html");
 const CONTENT_ROOT = process.env.CONTENT_ROOT || "/content/static"; // mount external markdown repo here
@@ -145,6 +152,38 @@ async function renderMarkdownToHtml(mdContent) {
 }
 
 // Inject SSR content into index.html, optionally augmenting basic meta tags
+function rewriteAssetUrlsForBasename(html, basename) {
+  if (!basename || basename === "/") {
+    return html;
+  }
+
+  // Rewrite script src and link href tag attributes to include basename
+  // The entry point handles __webpack_public_path__ for dynamic chunks
+  let rewritten = html.replace(
+    /(<script[^>]*?\s+src)=(["\']?)\/([^\s"\'>\?]*)/g,
+    (match, scriptTag, openQuote, path) => {
+      if (path.startsWith("http") || path.startsWith("//")) {
+        return match; // Skip external URLs
+      }
+      const closeQuote = openQuote || "";
+      return `${scriptTag}=${closeQuote}${basename}/${path}${closeQuote}`;
+    },
+  );
+
+  rewritten = rewritten.replace(
+    /(<link[^>]*?\s+href)=(["\']?)\/([^\s"\'>\?]*)/g,
+    (match, linkTag, openQuote, path) => {
+      if (path.startsWith("http") || path.startsWith("//")) {
+        return match; // Skip external URLs
+      }
+      const closeQuote = openQuote || "";
+      return `${linkTag}=${closeQuote}${basename}/${path}${closeQuote}`;
+    },
+  );
+
+  return rewritten;
+}
+
 function injectIntoIndexHtml(
   ssrHtml,
   reqPath,
@@ -152,6 +191,13 @@ function injectIntoIndexHtml(
   descriptionText = null,
 ) {
   let html = indexHtml;
+
+  // Rewrite script/link URLs to include basename
+  const basePrefix = BASE_PATH.replace(/\/$/, ""); // e.g., "/archive"
+  console.log(
+    `[injectIntoIndexHtml] BASE_PATH="${BASE_PATH}", basePrefix="${basePrefix}"`,
+  );
+  html = rewriteAssetUrlsForBasename(html, basePrefix);
 
   let customMeta = "";
   const metaPath = path.join(CONTENT_ROOT, "../meta.json");
@@ -205,9 +251,25 @@ function injectIntoIndexHtml(
     console.warn("Could not load meta.json:", err.message);
   }
 
-  // Inject runtime config EARLY in head so it's available before any scripts run
-  // Define both window.process.ENV (for our code) and global webpack DefinePlugin variables
-  const configScript = `<script>
+  // CRITICAL: Set webpack's public path IMMEDIATELY as very first script
+  // Inline directly in HTML with NO delays to ensure chunk loading uses correct path
+  // Must run before any other JS executes
+  const publicPathScript = `<script>
+var raw = "${runtimeConfig.GH_BASENAME}" || "";
+var clean = String(raw).replace(/^\\/+|\\/+$/g, "");
+var basePrefix = clean ? "/" + clean : "";
+window.__webpack_public_path__ = basePrefix + "/";
+// Also set for webpack 5's internal variable if different
+if (typeof __webpack_public_path__ !== 'undefined') {
+  __webpack_public_path__ = basePrefix + "/";
+}
+console.log("[public-path] Set __webpack_public_path__ to:", window.__webpack_public_path__);
+console.log("[public-path] GH_BASENAME='${runtimeConfig.GH_BASENAME}', basePrefix='" + basePrefix + "'");
+</script>`;
+
+  // Inject runtime config AFTER public path
+  const configScript = `${publicPathScript}
+<script>
 window.process = window.process || {};
 window.process.ENV = ${JSON.stringify(runtimeConfig)};
 // Map to webpack DefinePlugin constants for compatibility
@@ -222,7 +284,7 @@ window.ARCHIVE = window.process.ENV.GH_ARCHIVE;
 </script>
 ${customMeta}`;
 
-  // Inject right after <head> opens to ensure config is available before scripts
+  // Inject right after <head> opens to ensure public path is set FIRST
   html = html.replace("<head>", `<head>\n${configScript}`);
 
   // Basic meta injection (non-destructive): add tags near head end
@@ -305,55 +367,59 @@ app.get("/health", (req, res) => {
 });
 
 // Runtime config endpoint (available to client-side code)
-app.get("/assets/config", (req, res) => {
+app.get(`${BASE_PATH.replace(/\/$/, "")}/assets/config`, (req, res) => {
   res.status(200).json(runtimeConfig);
 });
 
 // Markdown fetch endpoint for SPA client-side navigation
 // Allows dynamic markdown from mounted content directory to be served to the browser
-app.get("/assets/markdown/*", async (req, res) => {
-  try {
-    const filePath = req.params[0]; // e.g., "projects/DTOL"
-    const mdPath = resolveMarkdownPath(`/${filePath}`);
+app.get(
+  `${BASE_PATH.replace(/\/$/, "")}/assets/markdown/*`,
+  async (req, res) => {
+    try {
+      const filePath = req.params[0]; // e.g., "projects/DTOL"
+      const mdPath = resolveMarkdownPath(`/${filePath}`);
 
-    if (mdPath) {
-      let content = fs.readFileSync(mdPath, "utf8");
+      if (mdPath) {
+        let content = fs.readFileSync(mdPath, "utf8");
 
-      // Get file modification time for ETag
-      const stats = fs.statSync(mdPath);
-      const mtime = Math.floor(stats.mtimeMs / 1000);
-      const etag = `"${stats.size}-${mtime}"`;
+        // Get file modification time for ETag
+        const stats = fs.statSync(mdPath);
+        const mtime = Math.floor(stats.mtimeMs / 1000);
+        const etag = `"${stats.size}-${mtime}"`;
 
-      // Set cache headers with ETag for revalidation
-      res.set("ETag", etag);
-      res.set("Cache-Control", "public, max-age=86400, must-revalidate");
-      res.set("Vary", "Accept-Encoding");
+        // Set cache headers with ETag for revalidation
+        res.set("ETag", etag);
+        res.set("Cache-Control", "public, max-age=86400, must-revalidate");
+        res.set("Vary", "Accept-Encoding");
 
-      // Rewrite image paths to use the API endpoint
-      // Images like /static/images/... → /assets/images/...
-      // This ensures images are served from the mounted content directory
-      content = content.replace(
-        /!\[([^\]]*)\]\(\/static\/([^)]+)\)/g,
-        (match, alt, path) => {
-          return `![${alt}](/assets/images/${path})`;
-        },
-      );
+        // Rewrite image paths to use the API endpoint
+        // Images like /static/images/... → /assets/images/...
+        // This ensures images are served from the mounted content directory
+        const base = BASE_PATH.replace(/\/$/, "");
+        content = content.replace(
+          /!\[([^\]]*)\]\(\/static\/([^)]+)\)/g,
+          (match, alt, path) => {
+            return `![${alt}](${base}/assets/images/${path})`;
+          },
+        );
 
-      res.status(200).type("text/plain").send(content);
-    } else {
-      res
-        .status(404)
-        .json({ error: "Markdown file not found", path: filePath });
+        res.status(200).type("text/plain").send(content);
+      } else {
+        res
+          .status(404)
+          .json({ error: "Markdown file not found", path: filePath });
+      }
+    } catch (err) {
+      console.error("Markdown fetch error:", err);
+      res.status(500).json({ error: "Failed to fetch markdown" });
     }
-  } catch (err) {
-    console.error("Markdown fetch error:", err);
-    res.status(500).json({ error: "Failed to fetch markdown" });
-  }
-});
+  },
+);
 
 // Image fetch endpoint for markdown content images
 // Serves images from the mounted content directory
-app.get("/assets/images/*", async (req, res) => {
+app.get(`${BASE_PATH.replace(/\/$/, "")}/assets/images/*`, async (req, res) => {
   try {
     let filePath = req.params[0]; // e.g., "images/DToL_Logo_with_text.png"
     if (!filePath.startsWith("images/")) {
@@ -392,19 +458,21 @@ app.get("/assets/images/*", async (req, res) => {
   }
 });
 
-// Rewrite root-level asset files (e.g., /favicon.ico → /assets/favicon.ico)
+// Rewrite root-level asset files to /assets with BASE_PATH awareness
 app.use((req, res, next) => {
+  const base = BASE_PATH.replace(/\/$/, "");
+  const localPath = req.path.replace(new RegExp(`^${base}`), "") || "/";
   if (
     /^\/[^/]+\.(png|jpg|jpeg|gif|svg|ico|json|webmanifest|xml|txt)$/.test(
-      req.path,
+      localPath,
     )
   ) {
-    req.url = `/assets${req.path}`;
+    req.url = `${base}/assets${localPath}`;
   }
   next();
 });
 
-app.get("/assets/*", (req, res) => {
+app.get(`${BASE_PATH.replace(/\/$/, "")}/assets/*`, (req, res) => {
   const assetPath = path.join(CONTENT_ROOT, "../assets", req.params[0]); // Remove leading /
 
   // Security: prevent directory traversal
@@ -425,7 +493,7 @@ app.get("/assets/*", (req, res) => {
 });
 
 // Stub route for cookies script (only available in full production)
-app.get("/js/cookies-gcc.js", (req, res) => {
+app.get(`${BASE_PATH.replace(/\/$/, "")}/js/cookies-gcc.js`, (req, res) => {
   const cookiesPath = path.join(BUILD_DIR, "js", "cookies-gcc.js");
 
   if (fs.existsSync(cookiesPath) && fs.statSync(cookiesPath).isFile()) {
@@ -439,7 +507,7 @@ app.get("/js/cookies-gcc.js", (req, res) => {
 });
 
 // For favicons specifically
-app.get("/favicon.ico", (req, res) => {
+app.get(`${BASE_PATH.replace(/\/$/, "")}/favicon.ico`, (req, res) => {
   const faviconPath = path.join(CONTENT_ROOT, "../assets/favicon.ico");
   if (fs.existsSync(faviconPath)) {
     res.sendFile(faviconPath);
@@ -487,19 +555,44 @@ app.get("*", async (req, res) => {
 
     // Fallback: serve SPA index.html with runtime config injected EARLY
     let page = indexHtml;
-    const configScript = `<script>
-  window.process = window.process || {};
-  window.process.ENV = ${JSON.stringify(runtimeConfig)};
-  // Map to webpack DefinePlugin-style globals for compatibility
-  window.SITENAME = window.process.ENV.GH_SITENAME;
-  window.SITENAME_LONG = window.process.ENV.GH_SITENAME_LONG;
-  window.BASENAME = window.process.ENV.GH_BASENAME;
-  window.CITATION_URL = window.process.ENV.GH_CITATION_URL;
-  window.API_URL = window.process.ENV.GH_API_URL;
-  window.DEFAULT_INDEX = window.process.ENV.GH_DEFAULT_INDEX;
-  window.SUGGESTED_TERM = window.process.ENV.GH_SUGGESTED_TERM;
-  window.ARCHIVE = window.process.ENV.GH_ARCHIVE;
-  </script>`;
+
+    // Rewrite script/link URLs to include basename
+    const basePrefix = BASE_PATH.replace(/\/$/, ""); // e.g., "/archive"
+    console.log(
+      `[SPA fallback] BASE_PATH="${BASE_PATH}", basePrefix="${basePrefix}"`,
+    );
+    page = rewriteAssetUrlsForBasename(page, basePrefix);
+
+    // CRITICAL: Set webpack's public path IMMEDIATELY as very first script
+    // Inline directly in HTML with NO delays to ensure chunk loading uses correct path
+    // Must run before any other JS executes
+    const publicPathScript = `<script>
+var raw = "${runtimeConfig.GH_BASENAME}" || "";
+var clean = String(raw).replace(/^\\/+|\\/+$/g, "");
+var basePrefix = clean ? "/" + clean : "";
+window.__webpack_public_path__ = basePrefix + "/";
+// Also set for webpack 5's internal variable if different
+if (typeof __webpack_public_path__ !== 'undefined') {
+  __webpack_public_path__ = basePrefix + "/";
+}
+console.log("[public-path] Set __webpack_public_path__ to:", window.__webpack_public_path__);
+console.log("[public-path] GH_BASENAME='${runtimeConfig.GH_BASENAME}', basePrefix='" + basePrefix + "'");
+</script>`;
+
+    const configScript = `${publicPathScript}
+<script>
+window.process = window.process || {};
+window.process.ENV = ${JSON.stringify(runtimeConfig)};
+// Map to webpack DefinePlugin-style globals for compatibility
+window.SITENAME = window.process.ENV.GH_SITENAME;
+window.SITENAME_LONG = window.process.ENV.GH_SITENAME_LONG;
+window.BASENAME = window.process.ENV.GH_BASENAME;
+window.CITATION_URL = window.process.ENV.GH_CITATION_URL;
+window.API_URL = window.process.ENV.GH_API_URL;
+window.DEFAULT_INDEX = window.process.ENV.GH_DEFAULT_INDEX;
+window.SUGGESTED_TERM = window.process.ENV.GH_SUGGESTED_TERM;
+window.ARCHIVE = window.process.ENV.GH_ARCHIVE;
+</script>`;
     page = page.replace("<head>", `<head>\n${configScript}`);
     res.status(200).send(page);
   } catch (err) {

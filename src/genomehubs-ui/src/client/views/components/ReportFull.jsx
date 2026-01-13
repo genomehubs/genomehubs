@@ -1,5 +1,4 @@
 import React, { useRef } from "react";
-import { useLocation, useNavigate } from "@reach/router";
 
 import Grid from "@mui/material/Grid";
 import Report from "./Report";
@@ -9,6 +8,8 @@ import { compose } from "redux";
 import dispatchReport from "../hocs/dispatchReport";
 import { markdown as markdownStyle } from "./Styles.scss";
 import qs from "qs";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import { useStyles } from "./ReportModalStyles";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import withSiteName from "#hocs/withSiteName";
@@ -77,7 +78,7 @@ export const ReportFull = ({
   const permaLink = (queryString, toggle) => {
     let path = topLevel ? "report" : toggle ? "reporturl" : "report";
     // TODO: include taxonomy
-    navigate(`${basename}/${path}?${queryString.replace(/^\?/, "")}`);
+    navigate(`/${path}?${queryString.replace(/^\?/, "")}`);
   };
 
   const handleUpdate = ({ queryString, hash }) => {

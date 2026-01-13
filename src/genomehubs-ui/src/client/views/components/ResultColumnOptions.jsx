@@ -1,5 +1,3 @@
-import { useLocation, useNavigate } from "@reach/router";
-
 import CancelIcon from "@mui/icons-material/Cancel";
 import Checkbox from "@mui/material/Checkbox";
 import Chip from "@mui/material/Chip";
@@ -19,6 +17,8 @@ import expandFieldList from "../functions/expandFieldList";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import { styled } from "@mui/material/styles";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";

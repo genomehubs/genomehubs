@@ -13,7 +13,6 @@ import {
   getFitWorldBounds,
   normalizeBounds,
 } from "./functions/mapHelpers";
-import { useLocation, useNavigate } from "@reach/router";
 
 import Grid from "@mui/material/Grid";
 import L from "leaflet";
@@ -26,6 +25,8 @@ import { mixColor } from "../../functions/mixColor";
 import proj4 from "proj4";
 import qs from "../../functions/qs";
 import setColors from "../../functions/setColors";
+import { useLocation } from "@reach/router";
+import useNavigate from "../../hooks/useNavigate";
 import useResize from "../../hooks/useResize";
 import withColors from "#hocs/withColors";
 import withReportTerm from "../../hocs/withReportTerm";

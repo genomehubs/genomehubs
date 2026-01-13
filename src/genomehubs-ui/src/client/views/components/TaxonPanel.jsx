@@ -8,7 +8,6 @@ import {
   resultPanel as resultPanelStyle,
   title as titleStyle,
 } from "./Styles.scss";
-import { useLocation, useNavigate } from "@reach/router";
 
 import Grid from "@mui/material/Grid";
 import { LineageList } from "./LineagePanel";
@@ -18,6 +17,8 @@ import classnames from "classnames";
 import { compose } from "redux";
 import dispatchLookup from "../hocs/dispatchLookup";
 import qs from "../functions/qs";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";

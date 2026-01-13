@@ -7,7 +7,7 @@ import ResultFilterInput from "./ResultFilterInput";
 import classnames from "classnames";
 import { compose } from "redux";
 import qs from "../functions/qs";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";
 import withStyles from "@mui/styles/withStyles";
@@ -128,7 +128,7 @@ const ResultFilter = ({
       }
     }
     let options = { ...searchTerm, query: parts.join(" AND ") };
-    navigate(`${basename}/search?${qs.stringify(options)}`);
+    navigate(`/search?${qs.stringify(options)}`);
   };
 
   const handleChange = (e, i, action, attributes) => {

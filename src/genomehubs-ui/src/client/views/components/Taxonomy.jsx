@@ -6,7 +6,7 @@ import dispatchMessage from "../hocs/dispatchMessage";
 import dispatchRecord from "../hocs/dispatchRecord";
 import qs from "../functions/qs";
 import { setMessage } from "../reducers/message";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withApi from "../hocs/withApi";
 import withTaxonomy from "../hocs/withTaxonomy";
 

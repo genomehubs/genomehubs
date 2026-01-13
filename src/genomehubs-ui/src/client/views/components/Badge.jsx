@@ -26,7 +26,7 @@ import PhyloPics from "./PhyloPics";
 import classNames from "classnames";
 import classnames from "classnames";
 import { compose } from "redux";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withBrowse from "../hocs/withBrowse";
 import withDescendantsById from "../hocs/withDescendantsById";
 import withRecordById from "../hocs/withRecordById";

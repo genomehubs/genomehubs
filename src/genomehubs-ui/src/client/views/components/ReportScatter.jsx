@@ -13,7 +13,6 @@ import {
 import React, { memo, useEffect, useRef, useState } from "react";
 import formats, { setInterval } from "../functions/formats";
 import stringLength, { maxStringLength } from "../functions/stringLength";
-import { useLocation, useNavigate } from "@reach/router";
 
 import CellInfo from "./CellInfo";
 import Grid from "@mui/material/Grid";
@@ -32,6 +31,8 @@ import qs from "../functions/qs";
 import { scaleLinear } from "d3-scale";
 import searchByCell from "../functions/searchByCell";
 import setColors from "../functions/setColors";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import useResize from "../hooks/useResize";
 import withColors from "#hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";

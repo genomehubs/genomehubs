@@ -19,7 +19,7 @@ import { compose } from "redux";
 import dispatchLookup from "../hocs/dispatchLookup";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";

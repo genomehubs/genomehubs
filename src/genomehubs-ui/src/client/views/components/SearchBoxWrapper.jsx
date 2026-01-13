@@ -1,5 +1,4 @@
 import React, { memo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
 
 import { Box } from "@mui/material";
 import ChipSearchBox from "./ChipSearch/ChipSearchBox";
@@ -11,6 +10,8 @@ import { getSuggestedTerm } from "../reducers/search";
 import lookupFunction from "./ChipSearch/functions/lookupFunction";
 import qs from "../functions/qs";
 import { siteName } from "../reducers/location";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import { useReadLocalStorage } from "usehooks-ts";
 import { useStyles } from "./SearchBoxStyles";
 import withApi from "../hocs/withApi";
@@ -61,7 +62,7 @@ const SearchBoxWrapper = ({
     setLookupTerm("");
     fetchSearchResults({ result: "taxon", query: "" });
     setPreferSearchTerm(false);
-    navigate(`${basename}/${pathname}`);
+    navigate(`/${pathname}`);
   };
 
   const allOptions = {
@@ -138,11 +139,11 @@ const SearchBoxWrapper = ({
     setPreferSearchTerm(false);
     if (pathname.match(/^search/)) {
       navigate(
-        `${basename}/${pathname}?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
+        `/${pathname}?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
       );
     } else {
       navigate(
-        `${basename}/search?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
+        `/search?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
       );
     }
   };

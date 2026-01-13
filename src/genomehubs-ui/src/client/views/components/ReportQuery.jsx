@@ -8,7 +8,7 @@ import TextField from "@mui/material/TextField";
 import { compose } from "redux";
 import qs from "../functions/qs";
 import { setSearchTerm } from "../reducers/search";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withReportById from "../hocs/withReportById";
 import withReportTerm from "../hocs/withReportTerm";
 import withSearch from "../hocs/withSearch";

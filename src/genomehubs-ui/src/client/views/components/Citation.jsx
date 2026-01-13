@@ -5,7 +5,7 @@ import { compose } from "redux";
 import { link as linkStyle } from "./Styles.scss";
 import { pathJoin } from "../reducers/location";
 import qs from "../functions/qs";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withSiteName from "../hocs/withSiteName";
 
 const Citation = ({

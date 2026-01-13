@@ -1,7 +1,6 @@
 import * as htmlToImage from "html-to-image";
 
 import React, { memo, useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
 
 import CopyrightIcon from "@mui/icons-material/Copyright";
 import Grid from "@mui/material/Grid";
@@ -22,6 +21,8 @@ import { link as linkStyle } from "./Styles.scss";
 import qs from "../functions/qs";
 import sangerLogo from "./img/sanger-logo.png";
 import { saveSearchOptions as saveSearchOptionsStyle } from "./Styles.scss";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withApi from "../hocs/withApi";
 import withColors from "#hocs/withColors";
 import withTaxonomy from "../hocs/withTaxonomy";

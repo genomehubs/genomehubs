@@ -1,5 +1,4 @@
 import React, { memo, useEffect } from "react";
-import { useLocation, useNavigate } from "@reach/router";
 
 import Page from "./Page";
 import ReportPanel from "./ReportPanel";
@@ -10,6 +9,8 @@ import dispatchLookup from "../hocs/dispatchLookup";
 import equal from "deep-equal";
 import qs from "../functions/qs";
 import shallow from "shallowequal";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/dispatchSearchDefaults";
 

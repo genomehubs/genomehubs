@@ -3,7 +3,6 @@ import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { path as d3Path, pathRound } from "d3-path";
 import formats, { setInterval } from "../functions/formats";
 import stringLength, { maxStringLength } from "../functions/stringLength";
-import { useLocation, useNavigate } from "@reach/router";
 
 import Grid from "@mui/material/Grid";
 import PointInfo from "./PointInfo";
@@ -15,7 +14,9 @@ import qs from "../functions/qs";
 import { scaleLinear } from "d3-scale";
 import setColors from "../functions/setColors";
 import truncate from "../functions/truncate";
+import { useLocation } from "@reach/router";
 import { useLongPress } from "use-long-press";
+import useNavigate from "../hooks/useNavigate";
 import useResize from "../hooks/useResize";
 import withColors from "#hocs/withColors";
 import withReportTerm from "../hocs/withReportTerm";

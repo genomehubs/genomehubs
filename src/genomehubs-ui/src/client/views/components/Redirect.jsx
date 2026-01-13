@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
-import { useLocation, useNavigate } from "@reach/router";
+
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 
 const Redirect = ({ to, location, replace }) => {
   const navigate = useNavigate();

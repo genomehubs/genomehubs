@@ -12,7 +12,7 @@ import Tooltip from "./Tooltip";
 import classNames from "classnames";
 import { compose } from "redux";
 import formatter from "../functions/formatter";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withSiteName from "#hocs/withSiteName";
 import withTaxonomy from "../hocs/withTaxonomy";
 import withTypes from "../hocs/withTypes";

@@ -15,7 +15,6 @@ import {
   unpaddedParagraph as unpaddedParagraphStyle,
   unpadded as unpaddedStyle,
 } from "./Styles.scss";
-import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
 import ArtTrackIcon from "@mui/icons-material/ArtTrack";
@@ -59,6 +58,8 @@ import remarkDirective from "remark-directive";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import { visit } from "unist-util-visit";
 import withPages from "../hocs/withPages";
 import withStyles from "@mui/styles/withStyles";

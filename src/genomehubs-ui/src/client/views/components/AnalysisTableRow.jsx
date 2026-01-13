@@ -12,7 +12,7 @@ import Tooltip from "./Tooltip";
 import { compose } from "redux";
 import dispatchSetRecord from "../hocs/dispatchSetRecord";
 import makeStyles from "@mui/styles/makeStyles";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withAnalysesByAnyId from "../hocs/withAnalysesByAnyId";
 import withAnalysis from "../hocs/withAnalysis";
 import withRecord from "../hocs/withRecord";
@@ -95,7 +95,7 @@ const AnalysisTableRow = ({
   analysisCells.push(
     <TableCell key={"expand"}>
       {meta.file_count} files {fileExpand}
-    </TableCell>
+    </TableCell>,
   );
 
   const listContent = ({ list, handleClick, open, setOpen, result }) => {
@@ -168,7 +168,7 @@ const AnalysisTableRow = ({
     analysisCells.push(
       <TableCell key={"source"}>
         {<NavLink href={meta.source_url}>{meta.source || meta.name}</NavLink>}
-      </TableCell>
+      </TableCell>,
     );
   }
   return (
@@ -192,5 +192,5 @@ export default compose(
   dispatchSetRecord,
   withAnalysis,
   withAnalysesByAnyId,
-  withRecord
+  withRecord,
 )(AnalysisTableRow);

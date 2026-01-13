@@ -22,7 +22,7 @@ import { gridPropNames } from "../functions/propNames";
 import qs from "../functions/qs";
 import { reportHeading as reportHeadingStyle } from "./Styles.scss";
 import { useIntersectionObserver } from "usehooks-ts";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import useResize from "../hooks/useResize";
 import withReportById from "../hocs/withReportById";
 import withSiteName from "#hocs/withSiteName";
@@ -473,7 +473,7 @@ const ReportItem = ({
           permaLink = (queryString, toggle) => {
             let path = "report";
             // TODO: include taxonomy
-            navigate(`${basename}/${path}?${queryString.replace(/^\?/, "")}`);
+            navigate(`/${path}?${queryString.replace(/^\?/, "")}`);
           };
         }
         component = (

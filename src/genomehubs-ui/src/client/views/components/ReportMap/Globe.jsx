@@ -5,7 +5,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useLocation, useNavigate } from "@reach/router";
 
 import CountryPopup from "./CountryPopup";
 import GlobeGl from "react-globe.gl";
@@ -16,6 +15,8 @@ import Skeleton from "@mui/material/Skeleton";
 import { findCenterLatLng } from "./functions/mapHelpers";
 import getMapOptions from "./functions/getMapOptions";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
+import { useLocation } from "@reach/router";
+import useNavigate from "../../hooks/useNavigate";
 
 const Globe = ({
   bounds,

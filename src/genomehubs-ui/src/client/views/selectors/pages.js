@@ -25,7 +25,10 @@ export function fetchPages(pageId) {
       let markdown;
       // Normalize pageId: remove .md extension if present, server will add it
       const normalizedPath = pageId.toLowerCase().replace(/\.md$/i, "");
-      const apiUrl = `/assets/markdown/${normalizedPath}`;
+      const rawBase = window?.process?.ENV?.GH_BASENAME ?? BASENAME ?? "";
+      const clean = String(rawBase).replace(/^\/+|\/+$/g, "");
+      const basePrefix = clean ? `/${clean}` : ""; // "/archive" or ""
+      const apiUrl = `${basePrefix}/assets/markdown/${normalizedPath}`;
 
       // First try: API endpoint (Node.js SSR server - production and testing)
       try {

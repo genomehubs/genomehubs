@@ -14,7 +14,7 @@ import dispatchMessage from "../hocs/dispatchMessage";
 import searchByCell from "../functions/searchByCell";
 import setColors from "../functions/setColors";
 import { ttSwatch as ttSwatchStyle } from "./Styles.scss";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import useResize from "../hooks/useResize";
 import withColors from "#hocs/withColors";
 import withSearchIndex from "../hocs/withSearchIndex";

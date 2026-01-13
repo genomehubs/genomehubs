@@ -5,7 +5,7 @@ import DisplayCount from "./DisplayCount";
 import { compose } from "redux";
 import formats from "../functions/formats";
 import qs from "../functions/qs";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withApi from "../hocs/withApi";
 import withQueryById from "../hocs/withQueryById";
 import withRecord from "../hocs/withRecord";

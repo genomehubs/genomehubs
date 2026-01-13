@@ -9,7 +9,6 @@ import {
   favListingHeader as favListingHeaderStyle,
   favListing as favListingStyle,
 } from "./Styles.scss";
-import { useLocation, useNavigate } from "@reach/router";
 
 import ColorButton from "./ColorButton";
 import EditIcon from "@mui/icons-material/Edit";
@@ -28,6 +27,8 @@ import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import { splitTerms } from "../functions/splitTerms";
 import { useLocalStorage } from "usehooks-ts";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withSearchDefaults from "../hocs/withSearchDefaults";
 import withSiteName from "#hocs/withSiteName";
 import withStyles from "@mui/styles/withStyles";

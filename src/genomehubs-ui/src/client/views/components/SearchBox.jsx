@@ -1,6 +1,5 @@
 import React, { memo, useRef, useState } from "react";
 import { pathJoin, siteName } from "../reducers/location";
-import { useLocation, useNavigate } from "@reach/router";
 
 import AutoCompleteInput from "./AutoCompleteInput";
 import FormControl from "@mui/material/FormControl";
@@ -13,6 +12,8 @@ import { compose } from "redux";
 // import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
 import { getSuggestedTerm } from "../reducers/search";
 import qs from "../functions/qs";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import { useReadLocalStorage } from "usehooks-ts";
 import { useStyles } from "./SearchBoxStyles";
 import withLookup from "../hocs/withLookup";

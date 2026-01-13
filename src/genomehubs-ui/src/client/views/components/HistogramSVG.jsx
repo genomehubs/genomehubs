@@ -7,7 +7,7 @@ import { formatter } from "../functions/formatter";
 import { fullWidth as fullWidthStyle } from "./Styles.scss";
 import qs from "../functions/qs";
 import { useIntersectionObserver } from "usehooks-ts";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withColors from "#hocs/withColors";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
@@ -75,7 +75,7 @@ const HistogramSVG = ({
     let hashTerm = encodeURIComponent(options.query) || "";
     setPreferSearchTerm(false);
     setLookupTerm(hashTerm);
-    navigate(`${basename}/search?${qs.stringify(options)}#${hashTerm}`);
+    navigate(`/search?${qs.stringify(options)}#${hashTerm}`);
   };
   let buckets = [];
   let ticks = [];

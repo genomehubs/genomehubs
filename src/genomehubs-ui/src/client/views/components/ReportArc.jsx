@@ -23,7 +23,7 @@ import { format } from "d3-format";
 import qs from "../functions/qs";
 import setColors from "../functions/setColors";
 import stringLength from "../functions/stringLength";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import useResize from "../hooks/useResize";
 import withColors from "#hocs/withColors";
 import withSiteName from "#hocs/withSiteName";
@@ -163,9 +163,7 @@ const PieComponent = ({ data, height, width, colors, axisColor = "white" }) => {
             )}
             fillOpacity={0}
             cursor={"pointer"}
-            onClick={() =>
-              data.navigate(`${data.basename}/search?${qs.stringify(query)}`)
-            }
+            onClick={() => data.navigate(`/search?${qs.stringify(query)}`)}
           />
         </Tooltip>
 

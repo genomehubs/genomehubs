@@ -30,10 +30,10 @@ export const getBasename = () => {
     window.process.ENV &&
     window.process.ENV.GH_BASENAME
   ) {
-    return window.process.ENV.GH_BASENAME.replace(/^\/+/, "");
+    return window.process.ENV.GH_BASENAME.replace(/^\/+|\/+$/g, "");
   }
   const base = BASENAME || "";
-  return base.replace(/^\/+/, "");
+  return base.replace(/^\/+|\/+$/g, "");
 };
 
 export const basename = getBasename();

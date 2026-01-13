@@ -5,15 +5,36 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="simplecookie_policy" content="/policies/cookies/" />
-  <link rel="icon" href="/assets/favicon.ico">
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-  <link rel="manifest" href="/assets/manifest.json">
+  <script>
+    // Compute asset URLs with basename at load time
+    (function () {
+      const raw = (window.process && window.process.ENV && window.process.ENV.GH_BASENAME) || window.BASENAME || "";
+      const clean = String(raw).replace(/^\/+|\/+$/g, "");
+      const basePrefix = clean ? "/" + clean : ""; // "/archive" or ""
+      document.currentScript.insertAdjacentHTML('afterend', `
+        <link rel="icon" href="${basePrefix}/assets/favicon.ico">
+        <link rel="apple-touch-icon" href="${basePrefix}/assets/apple-touch-icon.png">
+        <link rel="manifest" href="${basePrefix}/assets/manifest.json">
+      `);
+    })();
+  </script>
 
 </head>
 
 <body>
   <div id="app" style="height: 100%; min-height: 100%"></div>
-  <script type="text/javascript" src="/js/cookies-gcc.js" id="simple-cookie-js"></script>
+  <script>
+    (function () {
+      var raw = (window.process && window.process.ENV && window.process.ENV.GH_BASENAME) || window.BASENAME || "";
+      var clean = String(raw).replace(/^\/+|\/+$/g, "");
+      var basePrefix = clean ? "/" + clean : "";
+      var s = document.createElement('script');
+      s.type = 'text/javascript';
+      s.id = 'simple-cookie-js';
+      s.src = basePrefix + '/js/cookies-gcc.js';
+      document.currentScript ? document.currentScript.after(s) : document.body.appendChild(s);
+    })();
+  </script>
 </body>
 
 </html>

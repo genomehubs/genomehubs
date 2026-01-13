@@ -1,5 +1,4 @@
 import React, { useRef, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
 
 import ArtTrackIcon from "@mui/icons-material/ArtTrack";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
@@ -21,6 +20,8 @@ import { compose } from "redux";
 import dispatchLookup from "../hocs/dispatchLookup";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withSearch from "../hocs/withSearch";
 import withSearchDefaults from "../hocs/withSearchDefaults";
 import withSiteName from "#hocs/withSiteName";
@@ -69,7 +70,7 @@ const SearchToggles = ({
       emptyColumns: false,
     });
     setLookupTerm("");
-    navigate(`${basename}/search`);
+    navigate(`/search`);
   };
   let templateButton;
   if (toggleTemplate) {

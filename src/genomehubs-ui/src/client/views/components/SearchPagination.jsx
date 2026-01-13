@@ -1,5 +1,3 @@
-import { useLocation, useNavigate } from "@reach/router";
-
 import React from "react";
 // import Pagination from "@mui/lab/Pagination";
 import TablePagination from "@mui/material/TablePagination";
@@ -9,6 +7,8 @@ import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withSearch from "../hocs/withSearch";
 
 const useStyles = makeStyles((theme) => ({
@@ -40,14 +40,14 @@ const SearchPagination = ({
   let index = searchIndex || "taxon";
   const [savedOptions, setSavedOptions] = useLocalStorage(
     `${index}Options`,
-    {}
+    {},
   );
   const handleChange = (event, newPage) => {
     options.offset = newPage * pageSize;
     // setPreferSearchTerm(true);
     // setSearchTerm(options);
     navigate(
-      `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`
+      `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`,
     );
   };
   const handleChangeRowsPerPage = (event) => {
@@ -57,7 +57,7 @@ const SearchPagination = ({
     // setSearchTerm(options);
     setSavedOptions({ ...savedOptions, size: options.size });
     navigate(
-      `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`
+      `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`,
     );
   };
   if (resultCount <= 10) {

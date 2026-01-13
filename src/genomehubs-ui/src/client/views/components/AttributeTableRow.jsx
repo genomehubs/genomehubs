@@ -31,7 +31,7 @@ import { compose } from "redux";
 import { formatter } from "../functions/formatter";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withApi from "../hocs/withApi";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";

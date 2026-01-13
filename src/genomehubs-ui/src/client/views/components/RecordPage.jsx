@@ -20,7 +20,7 @@ import { getRecordIsFetching } from "../reducers/record";
 import qs from "../functions/qs";
 import styles from "./Styles.scss";
 import { ucFirst } from "../functions/formatter";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withRecord from "../hocs/withRecord";
 import withSearch from "../hocs/withSearch";
 import withTaxonomy from "../hocs/withTaxonomy";

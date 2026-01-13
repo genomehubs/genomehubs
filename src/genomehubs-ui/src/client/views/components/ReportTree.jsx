@@ -6,7 +6,7 @@ import ReportTreeRings from "./ReportTreeRings";
 import { compose } from "redux";
 import dispatchReport from "../hocs/dispatchReport";
 import qs from "../functions/qs";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import useResize from "../hooks/useResize";
 import withReportById from "../hocs/withReportById";
 import withSiteName from "#hocs/withSiteName";

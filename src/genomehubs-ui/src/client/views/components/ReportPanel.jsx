@@ -4,7 +4,6 @@ import {
   infoPanel as infoPanelStyle,
   textPanel as textPanelStyle,
 } from "./Styles.scss";
-import { useLocation, useNavigate } from "@reach/router";
 
 import Chip from "@mui/material/Chip";
 import Grid from "@mui/material/Grid";
@@ -14,6 +13,8 @@ import { compose } from "redux";
 import dispatchReport from "../hocs/dispatchReport";
 import qs from "../functions/qs";
 import { sortReportQuery } from "../selectors/report";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withReportDefaults from "../hocs/withReportDefaults";
 
 const indices = ["taxon", "assembly", "sample", "feature"];

@@ -9,7 +9,7 @@ import { TagCloud } from "react-tagcloud";
 import { compose } from "redux";
 import qs from "../functions/qs";
 import { useIntersectionObserver } from "usehooks-ts";
-import { useNavigate } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withLookup from "../hocs/withLookup";
 import withSearch from "../hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";
@@ -69,7 +69,7 @@ const WordCloud = ({
     let hashTerm = encodeURIComponent(options.query) || "";
     setPreferSearchTerm(false);
     setLookupTerm(hashTerm);
-    navigate(`${basename}/search?${qs.stringify(options)}#${hashTerm}`);
+    navigate(`/search?${qs.stringify(options)}#${hashTerm}`);
   };
   let buckets = [];
   if (summaryById && summaryById.buckets) {

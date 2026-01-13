@@ -1,5 +1,4 @@
 import React, { memo, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
 
 import Box from "@mui/material/Box";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -18,6 +17,8 @@ import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "../functions/qs";
 import { useLocalStorage } from "usehooks-ts";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";
 import withSearch from "../hocs/withSearch";

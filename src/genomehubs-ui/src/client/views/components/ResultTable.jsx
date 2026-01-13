@@ -7,7 +7,6 @@ import {
   last as lastStyle,
   resultsTable as resultsTableStyle,
 } from "./Styles.scss";
-import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
 import Badge from "@mui/material/Badge";
@@ -51,6 +50,8 @@ import makeStyles from "@mui/styles/makeStyles";
 import { mixColor } from "../functions/mixColor";
 import qs from "../functions/qs";
 import { styled } from "@mui/material/styles";
+import { useLocation } from "@reach/router";
+import useNavigate from "../hooks/useNavigate";
 import withColors from "#hocs/withColors";
 import withNames from "../hocs/withNames";
 import withRanks from "../hocs/withRanks";
