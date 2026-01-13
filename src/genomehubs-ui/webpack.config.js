@@ -39,9 +39,8 @@ const config = {
     main: [APP_DIR + "/index.jsx"],
   },
   output: {
-    // Use "auto" to automatically determine publicPath at runtime based on script location
-    // This allows the same build to work with any basename
-    publicPath: "auto",
+    // Use "auto" for production (runtime detection), "/" for dev (simpler)
+    publicPath: devMode ? "/" : "auto",
     path: BUILD_DIR + "/",
     // filename: devMode ? "js/bundle.js" : "js/[name].[contenthash].js",
     filename: "js/[name].[contenthash].js",
