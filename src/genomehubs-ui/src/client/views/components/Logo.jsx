@@ -1,11 +1,13 @@
 import LogoBoat from "./LogoBoat";
 import LogoBtk from "./LogoBtk";
+import LogoGenomeHubs from "./LogoGenomeHubs";
 import LogoGoat from "./LogoGoat";
 import LogoIsopoDB from "./LogoIsopoDB";
 import LogoLepbase from "./LogoLepbase";
 import LogoMolluscDB from "./LogoMolluscDB";
 
 const logos = {
+  genomehubs: LogoGenomeHubs,
   goat: LogoGoat,
   boat: LogoBoat,
   molluscdb: LogoMolluscDB,
@@ -24,9 +26,9 @@ function getEnvLogoKey() {
   if (site.includes("lepbase")) return "lepbase";
   if (site.includes("isopodb")) return "isopodb";
   if (site.includes("btk")) return "btk";
-  return "goat"; // default
+  return "genomehubs"; // default
 }
 
-const Logo = logos[getEnvLogoKey()] || LogoGoat;
+const Logo = logos[getEnvLogoKey()] || LogoGenomeHubs;
 
 export default Logo;
