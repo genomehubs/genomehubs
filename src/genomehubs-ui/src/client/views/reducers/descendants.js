@@ -1,6 +1,6 @@
 import { createAction, handleActions } from "redux-actions";
 
-import createCachedSelector from "re-reselect";
+import { createCachedSelector } from "re-reselect";
 import { produce } from "immer";
 
 export const requestDescendants = createAction("REQUEST_DESCENDANTS");

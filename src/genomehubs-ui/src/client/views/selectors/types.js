@@ -224,7 +224,9 @@ export const getOperatorTrie = createSelector(getTypesMap, (types) => {
     },
   ];
 
-  const trie = new TrieSearch(["display_name", "key", "synonym", "wildcard"]);
+  const trie = new TrieSearch(["display_name", "key", "synonym", "wildcard"], {
+    idFieldOrFunction: "key",
+  });
   trie.addAll(operators);
   return trie;
 });
@@ -278,7 +280,9 @@ export const getRankTrie = createSelector(getTypesMap, (types) => {
     "tribe",
     "varietas",
   ];
-  const trie = new TrieSearch(["display_name", "key", "wildcard"]);
+  const trie = new TrieSearch(["display_name", "key", "wildcard"], {
+    idFieldOrFunction: "key",
+  });
   trie.addAll(
     ranks
       .map((key) => ({ key, display_name: key, wildcard: "*" }))
@@ -381,7 +385,12 @@ const processValueTrie = (types, key) => {
       synonym: lookup[key],
       wildcard: "*",
     }));
-    const trie = new TrieSearch(["display_name", "key", "synonym", "wildcard"]);
+    const trie = new TrieSearch(
+      ["display_name", "key", "synonym", "wildcard"],
+      {
+        idFieldOrFunction: "key",
+      },
+    );
     trie.addAll(values);
     return trie;
   }

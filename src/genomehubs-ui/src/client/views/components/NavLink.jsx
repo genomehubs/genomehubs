@@ -19,6 +19,8 @@ const NavLink = ({
   url,
   basename,
   siteName,
+  siteNameLong,
+  citationUrl,
   dispatch,
   ...props
 }) => {

@@ -1,6 +1,6 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 
-import createCachedSelector from "re-reselect";
+import { createCachedSelector } from "re-reselect";
 import { createSelector } from "reselect";
 import { createSlice } from "@reduxjs/toolkit";
 import { produce } from "immer";

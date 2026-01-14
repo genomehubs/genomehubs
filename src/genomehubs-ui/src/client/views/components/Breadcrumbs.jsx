@@ -8,7 +8,14 @@ import styles from "./Styles.scss";
 import { useLocation } from "@reach/router";
 import withSiteName from "#hocs/withSiteName";
 
-const Breadcrumbs = ({ basename, children, ...props }) => {
+const Breadcrumbs = ({
+  basename,
+  children,
+  siteNameLong,
+  citationUrl,
+  siteName,
+  ...props
+}) => {
   const location = useLocation();
   let trail = [];
   let pathname = location.pathname.replace(``, "/");

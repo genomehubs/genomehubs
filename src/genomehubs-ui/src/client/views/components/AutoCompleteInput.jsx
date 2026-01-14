@@ -604,10 +604,13 @@ export const AutoCompleteInput = ({
         />
       )}
       renderOption={(props, option) => {
+        const { key, ...otherProps } = props;
         if (option.highlighted) {
-          return <AutoCompleteSuggestion option={option} {...props} />;
+          return (
+            <AutoCompleteSuggestion key={key} option={option} {...otherProps} />
+          );
         }
-        return <AutoCompleteOption option={option} {...props} />;
+        return <AutoCompleteOption key={key} option={option} {...otherProps} />;
       }}
     />
   );

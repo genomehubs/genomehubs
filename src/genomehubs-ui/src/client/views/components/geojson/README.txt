@@ -23,7 +23,9 @@ n.geojson' > '/Users/rchallis/Downloads/ne_110m_ocean.filtered.geojson'
 
 
 reduce size with 
-npx -y mapshaper src/client/views/components/geojson/countries.geojson -simplify 25% -o src/client/views/components/geojson/countries-simple.geojson
+ogr2ogr -simplify 0.5 src/client/views/components/geojson/countries.geojson src/client/views/components/geojson/countries-full.geojson
+ogr2ogr -simplify 1 src/client/views/components/geojson/countries-simple.geojson src/client/views/components/geojson/countries-full.geojson
 
-npx -y mapshaper src/client/views/components/geojson/countries-full.geojson -simplify 50% -o src/client/views/components/geojson/countries.geojson
-npx -y mapshaper src/client/views/components/geojson/countries-full.geojson -simplify 25% -o src/client/views/components/geojson/countries-simple.geojson
+Note: Due to rendering issues with simplified geometries in three-globe (degenerate polygons, 
+border misalignment), the full geojson is preferred for accurate globe visualization despite 
+its larger file size. Both mapshaper and ogr2ogr simplification cause rendering problems.

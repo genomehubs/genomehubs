@@ -20,6 +20,7 @@ import "core-js/stable";
 
 import App from "./components/App";
 import { BrowserRouter } from "react-router-dom";
+import { CookiesProvider } from "react-cookie";
 import { Provider } from "react-redux";
 import { createRoot } from "react-dom/client";
 import store from "./store";
@@ -29,9 +30,11 @@ const rootElement = createRoot(document.getElementById("app"));
 const pagesVersion = "latest";
 
 rootElement.render(
-  <BrowserRouter>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </BrowserRouter>,
+  <CookiesProvider>
+    <BrowserRouter>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </BrowserRouter>
+  </CookiesProvider>,
 );
