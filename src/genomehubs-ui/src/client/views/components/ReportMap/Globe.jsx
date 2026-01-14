@@ -1,9 +1,9 @@
+import { Color, MeshPhongMaterial } from "three";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import CountryPopup from "./CountryPopup";
 import GlobeGl from "react-globe.gl";
 import HexbinPopup from "./HexbinPopup";
-import { Color, MeshPhongMaterial, ShaderMaterial, Vector2 } from "three";
 import PointPopup from "./PointPopup";
 import Skeleton from "@mui/material/Skeleton";
 import { findCenterLatLng } from "./functions/mapHelpers";
@@ -11,67 +11,6 @@ import getMapOptions from "./functions/getMapOptions";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
 import { useLocation } from "@reach/router";
 import useNavigate from "#hooks/useNavigate";
-import * as solar from "solar-calculator";
-
-// Day/Night shader for ocean color shading
-const dayNightShader = {
-  vertexShader: `
-    varying vec3 vNormal;
-    void main() {
-      vNormal = normalize(normalMatrix * normal);
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `,
-  fragmentShader: `
-    #define PI 3.141592653589793
-    uniform vec3 dayColor;
-    uniform vec3 nightColor;
-    uniform vec2 sunPosition;
-    uniform vec2 globeRotation;
-    varying vec3 vNormal;
-
-    float toRad(in float a) {
-      return a * PI / 180.0;
-    }
-
-    vec3 Polar2Cartesian(in vec2 c) { // [lng, lat]
-      float theta = toRad(90.0 - c.x);
-      float phi = toRad(90.0 - c.y);
-      return vec3( // x,y,z
-        sin(phi) * cos(theta),
-        cos(phi),
-        sin(phi) * sin(theta)
-      );
-    }
-
-    void main() {
-      float invLon = toRad(globeRotation.x);
-      float invLat = -toRad(globeRotation.y);
-      mat3 rotX = mat3(
-        1.0, 0.0, 0.0,
-        0.0, cos(invLat), -sin(invLat),
-        0.0, sin(invLat), cos(invLat)
-      );
-      mat3 rotY = mat3(
-        cos(invLon), 0.0, sin(invLon),
-        0.0, 1.0, 0.0,
-        -sin(invLon), 0.0, cos(invLon)
-      );
-      vec3 rotatedSunDirection = rotX * rotY * Polar2Cartesian(sunPosition);
-      float intensity = dot(normalize(vNormal), normalize(rotatedSunDirection));
-      float blendFactor = smoothstep(-0.1, 0.1, intensity);
-      gl_FragColor = vec4(mix(nightColor, dayColor, blendFactor), 1.0);
-    }
-  `
-};
-
-// Calculate sun position at given date/time
-const sunPosAt = (dt) => {
-  const day = new Date(+dt).setUTCHours(0, 0, 0, 0);
-  const t = solar.century(dt);
-  const longitude = (dt - day) / 864e5 * 360 - 180;
-  return [longitude - solar.equationOfTime(t) / 4, solar.declination(t)];
-};
 
 const Globe = ({
   bounds,
@@ -99,14 +38,10 @@ const Globe = ({
   // Overlay colors (match ReportMap)
   const location = useLocation();
   const globeRef = useRef();
-  const mapContainerRef = useRef(); // always call useRef, unconditionally
-  const materialAppliedRef = useRef(false); // Track if shader material has been applied
-  const [globeLoading, setGlobeLoading] = useState(true); // <-- ensure this is defined in Map
-  const [showGlobe, setShowGlobe] = useState(false); // <-- move this up to top-level, before any conditional logic
+  const mapContainerRef = useRef();
+  const [globeLoading, setGlobeLoading] = useState(true);
+  const [showGlobe, setShowGlobe] = useState(false);
   const [countriesGeoJson, setCountriesGeoJson] = useState(null);
-  const [dt, setDt] = useState(+new Date()); // Track current date/time for sun position
-  const [globeMaterial, setGlobeMaterial] = useState(); // Day/night shader material
-  const globeRotationRef = useRef(new Vector2()); // Use ref instead of state to avoid re-renders
 
   useEffect(() => {
     // Only load geojson if regionField is set (showing country overlays)
@@ -118,77 +53,6 @@ const Globe = ({
       setCountriesGeoJson(null);
     }
   }, [regionField]);
-
-  // Create day/night shader material with color uniforms
-  useEffect(() => {
-    const material = new ShaderMaterial({
-      uniforms: {
-        dayColor: { value: new Color(0x87ceeb) }, // Sky blue for day
-        nightColor: { value: new Color(0x1a1a2e) }, // Dark blue for night
-        sunPosition: { value: new Vector2() },
-        globeRotation: { value: new Vector2() },
-      },
-      vertexShader: dayNightShader.vertexShader,
-      fragmentShader: dayNightShader.fragmentShader,
-      transparent: false,
-      wireframe: false,
-      side: 2, // FrontSide
-    });
-    setGlobeMaterial(material);
-  }, []);
-
-  // Update time at regular intervals for dynamic sun position
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDt((+new Date()));
-    }, 1000); // Update every second
-    return () => clearInterval(interval);
-  }, []);
-
-  // Update sun position in shader based on current time
-  useEffect(() => {
-    if (globeMaterial) {
-      const [sunLng, sunLat] = sunPosAt(dt);
-      globeMaterial.uniforms.sunPosition.value.set(sunLng, sunLat);
-    }
-  }, [dt, globeMaterial]);
-
-  // Apply shader material to globe mesh once it's loaded
-  useEffect(() => {
-    if (globeMaterial && globeRef.current && !materialAppliedRef.current) {
-      const scene = globeRef.current.scene();
-      let maxVertices = 0;
-      let globeMesh = null;
-      
-      scene.traverse((obj) => {
-        // Find the globe mesh - highest vertex count with scale exactly 1
-        if (obj.isMesh && obj.name === "" && obj.scale.x === 1 && obj.scale.y === 1 && obj.scale.z === 1) {
-          const vertexCount = obj.geometry ? obj.geometry.attributes.position.count : 0;
-          if (vertexCount > maxVertices) {
-            maxVertices = vertexCount;
-            globeMesh = obj;
-          }
-        }
-      });
-      
-      if (globeMesh) {
-        console.log("Applying shader to globe mesh with", maxVertices, "vertices");
-        globeMesh.material = globeMaterial;
-        materialAppliedRef.current = true;
-      }
-    }
-  }, [globeMaterial]);
-
-  // Update globe rotation in shader when camera moves
-  const handleZoom = useCallback(
-    ({ lng, lat }) => {
-      // Update material uniforms directly without triggering re-renders
-      if (globeMaterial && globeMaterial.uniforms && globeMaterial.uniforms.globeRotation) {
-        globeMaterial.uniforms.globeRotation.value.set(lng, lat);
-      }
-    },
-    [globeMaterial]
-  );
 
   // Calculate center of bounds for zoom
   const [centerLat, centerLon] = findCenterLatLng(bounds);
@@ -450,7 +314,7 @@ const Globe = ({
   }
 
   const polygonProps = {
-    globeMaterial: globeMaterial || new MeshPhongMaterial({
+    globeMaterial: new MeshPhongMaterial({
       color: oceanColor,
       bumpMap: null,
       bumpScale: 0,
@@ -559,7 +423,6 @@ const Globe = ({
           directionalLightColor={lightColor}
           ambientLightColor={darkColor}
           showGlobe={true}
-          cameraPositionRadius={globeMaterial ? 2.5 : undefined}
           // POLYGONS LAYER - show when geojson is loaded
           {...(countriesGeoJson ? polygonProps : {})}
           // HEXBIN LAYER
@@ -569,7 +432,6 @@ const Globe = ({
           onGlobeReady={() => {
             setGlobeLoading(false);
           }}
-          {...(globeMaterial ? { onZoom: handleZoom } : {})}
         />
       )}
       {/* Zoom controls */}
