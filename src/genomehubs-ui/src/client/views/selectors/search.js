@@ -144,6 +144,7 @@ export function fetchMsearchResults(options, navigate) {
     dispatch(
       setSearchTerm({
         msearch: true,
+        query: params.query, // Preserve query parameter for URL and download
         originalQueries,
         result,
         taxonomy: params.taxonomy || taxonomy,
@@ -201,7 +202,7 @@ export function fetchMsearchResults(options, navigate) {
             queryResult.hits &&
             Array.isArray(queryResult.hits)
           ) {
-            const hits = queryResult.hits;
+            const { hits } = queryResult;
             queryGroups.push({
               query,
               startIndex: allHits.length,
@@ -250,6 +251,7 @@ export function fetchMsearchResults(options, navigate) {
         if (navigate) {
           const basename = getBasename();
           const navOptions = {
+            query: options.query, // Preserve the batch query string
             result,
             msearch: "true",
             offset: 0,
@@ -303,12 +305,100 @@ export const saveSearchResults = ({ options, format = "tsv" }) => {
 
     const filename = `download.${format}`;
     options.filename = filename;
-    const queryString = qs.stringify(options);
+
     const formats = {
       csv: "text/csv",
       json: "application/json",
       tsv: "text/tab-separated-values",
     };
+
+    // Check if this is a batch search download
+    // Detect via searches array OR via originalQueries array (which is set after batch search)
+    const hasSearchesArray =
+      Array.isArray(options.searches) && options.searches.length > 1;
+    const hasOriginalQueries =
+      Array.isArray(options.originalQueries) &&
+      options.originalQueries.length > 1;
+    const isBatchSearch = hasSearchesArray || hasOriginalQueries;
+
+    if (isBatchSearch) {
+      // Handle batch search download using new msearch/download endpoint
+      try {
+        dispatch(
+          setMessage({
+            message: `Preparing ${format.toUpperCase()} file for download`,
+            duration: 0,
+            severity: "info",
+          }),
+        );
+
+        // Build download options with query parameter (already contains batch string)
+        const downloadOptions = {
+          query: options.query,
+          result: options.result,
+          taxonomy: options.taxonomy,
+          fields: options.fields,
+          offset: 0,
+          limit: 10000000, // Large limit to get all results
+          tidyData: options.tidyData,
+          includeRawValues: options.includeRawValues,
+          names: options.names,
+          ranks: options.ranks,
+          filename: filename,
+        };
+
+        // Remove undefined values
+        Object.keys(downloadOptions).forEach(
+          (key) =>
+            downloadOptions[key] === undefined && delete downloadOptions[key],
+        );
+
+        const queryString = qs.stringify(downloadOptions);
+        const url = `${apiUrl}/msearch?${queryString}`;
+
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Accept: formats[format],
+          },
+          signal: window.controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const blob = await response.blob();
+        const linkUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = linkUrl;
+        link.setAttribute("download", filename);
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+
+        dispatch(
+          setMessage({
+            duration: 0,
+            severity: "info",
+          }),
+        );
+        return true;
+      } catch (err) {
+        console.error("Batch download error:", err);
+        dispatch(
+          setMessage({
+            message: `Unable to download ${format.toUpperCase()} file`,
+            duration: 5000,
+            severity: "error",
+          }),
+        );
+        return false;
+      }
+    }
+
+    // Original single search download logic
+    const queryString = qs.stringify(options);
     const queryId = nanoid(10);
     let url = `${apiUrl}/search?${queryString}&queryId=${queryId}&persist=once`;
     let status;

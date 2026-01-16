@@ -135,14 +135,23 @@ const SearchBoxWrapper = ({
     }
     fetchSearchResults(fullOptions);
     setPreferSearchTerm(false);
+
+    // Build URL params - exclude searches array, keep query for batch or single search
+    const urlParams = { ...fullOptions };
+    delete urlParams.searches; // Don't persist searches array in URL
+    delete urlParams.originalQueries; // Don't persist originalQueries in URL
+
+    console.log("dispatchSearch - fullOptions:", fullOptions);
+    console.log("dispatchSearch - urlParams before stringify:", urlParams);
+    console.log("dispatchSearch - query in urlParams?", !!urlParams.query);
+
+    const queryString = qs.stringify(urlParams);
+    console.log("dispatchSearch - final query string:", queryString);
+
     if (pathname.match(/^search/)) {
-      navigate(
-        `/${pathname}?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
-      );
+      navigate(`/${pathname}?${queryString}#${encodeURIComponent(term)}`);
     } else {
-      navigate(
-        `/search?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
-      );
+      navigate(`/search?${queryString}#${encodeURIComponent(term)}`);
     }
   };
 
@@ -170,32 +179,74 @@ const SearchBoxWrapper = ({
   }) => {
     setSearchIndex(result);
 
-    // let inputs = Array.from(
-    //   formRef.current
-    //     ? formRef.current.getElementsByClassName("inputQuery")
-    //     : [],
-    // )
-    //   .map((el) => ({
-    //     name: el.children[1].children[0].name,
-    //     value: el.children[1].children[0].value,
-    //   }))
-    //   .filter((el) => el.name.match(/query[A-Z]+/) && el.value);
-    // let inputQueries = inputs.reduce(
-    //   (a, el) => ({ ...a, [el.name]: el.value }),
-    //   {},
-    // );
-
-    // let savedOptions = allOptions[options.result];
-    // let fields =
-    //   // searchTerm.fields ||
-    //   savedOptions?.fields?.join(",") || searchDefaults.fields;
-
     if (query && typeof includeDescendants !== "undefined") {
       if (includeDescendants) {
         query = query.replace(/tax_(name|eq)/, "tax_tree");
       } else {
         query = query.replace(/tax_tree/, "tax_name");
       }
+    }
+
+    // Check if this is a multi-query input for batch search
+    // Must match the delimiter configuration in SearchBox
+    const BATCH_SEARCH_DELIMITER = "semicolon";
+    let delimiter =
+      BATCH_SEARCH_DELIMITER === "comma"
+        ? /[,;\n]/
+        : BATCH_SEARCH_DELIMITER === "semicolon"
+          ? /[;\n]/
+          : /\n/;
+    let hasDelimiter = query && query.match(delimiter);
+    let queries = [];
+
+    if (hasDelimiter) {
+      // Split by configured delimiter
+      queries = query
+        .split(delimiter)
+        .map((q) => q.trim())
+        .filter((q) => q.length > 0);
+    }
+
+    // Only proceed with batch search if multiple queries
+    if (queries.length > 1) {
+      // Wrap each individual query term properly
+      let taxWrap = "tax_name";
+      if (searchDefaults.includeDescendants) {
+        taxWrap = "tax_tree";
+      }
+
+      const searches = queries.map((q) => {
+        // Only wrap in tax_name/tax_tree if it's a bare term (no special chars, not an attribute)
+        let wrappedQuery = q;
+        if (!q.match(/[\(\)<>=]/) && !types[q] && !synonyms[q]) {
+          wrappedQuery = `${taxWrap}(${q})`;
+        }
+        return {
+          query: wrappedQuery,
+          result,
+          taxonomy: taxonomy,
+          fields: fields || "",
+          limit: parseInt(options.limit || 1000, 10),
+          offset: parseInt(options.offset || 0, 10),
+        };
+      });
+
+      // Create grouped batch search with dispatchSearch routing to batch
+      console.log("doSearch - detected batch search, queries:", queries);
+      console.log("doSearch - passing to dispatchSearch with query:", query);
+      dispatchSearch(
+        {
+          searches,
+          originalQueries: queries,
+          query: query, // Include full query string for URL preservation
+          result,
+          taxonomy: options.taxonomy || searchTerm.taxonomy || taxonomy,
+          fields,
+          ...options,
+        },
+        query,
+      );
+      return;
     }
 
     dispatchSearch({ query, result, fields, ...options }, query);

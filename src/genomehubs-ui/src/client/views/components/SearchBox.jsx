@@ -197,7 +197,8 @@ const SearchBox = ({
     fullOptions.fields = fields;
     fullOptions.ranks = ranks;
     fullOptions.names = names;
-    fullOptions.taxonomy = msearchOptions.taxonomy;
+    fullOptions.taxonomy =
+      msearchOptions.taxonomy || searchTerm.taxonomy || taxonomy;
 
     if (!fullOptions.size && savedOptions?.size) {
       fullOptions.size = savedOptions.size;
@@ -205,19 +206,26 @@ const SearchBox = ({
 
     fetchSearchResults(fullOptions);
     setPreferSearchTerm(false);
+    const urlParams = {
+      ...fullOptions,
+      isMsearch: "true",
+    };
+    // Remove array parameters from URL - keep only the query string
+    delete urlParams.searches;
+    delete urlParams.originalQueries;
+
+    console.log("dispatchMsearch - fullOptions:", fullOptions);
+    console.log("dispatchMsearch - urlParams after cleanup:", urlParams);
+    console.log("dispatchMsearch - has query?", !!urlParams.query);
+    const queryString = qs.stringify(urlParams);
+    console.log("dispatchMsearch - final query string:", queryString);
     if (pathname.match(/^search/)) {
       navigate(
-        `${pathJoin(basename, pathname)}?${qs.stringify({
-          ...fullOptions,
-          isMsearch: "true",
-        })}#${encodeURIComponent(term)}`,
+        `${pathJoin(basename, pathname)}?${queryString}#${encodeURIComponent(term)}`,
       );
     } else {
       navigate(
-        `${pathJoin(basename, "search")}?${qs.stringify({
-          ...fullOptions,
-          isMsearch: "true",
-        })}#${encodeURIComponent(term)}`,
+        `${pathJoin(basename, "search")}?${queryString}#${encodeURIComponent(term)}`,
       );
     }
   };

@@ -15,7 +15,7 @@ import withSearch from "#hocs/withSearch";
 import withSearchDefaults from "#hocs/dispatchSearchDefaults";
 
 // Configuration for batch search delimiter (must match SearchBox.jsx)
-const BATCH_SEARCH_DELIMITER = "newline";
+const BATCH_SEARCH_DELIMITER = "semicolon";
 
 const SearchPage = ({
   searchResults,
@@ -46,7 +46,12 @@ const SearchPage = ({
 
   // Detect and convert batch queries from URL parameter
   if (options.query && typeof options.query === "string") {
-    const delimiter = BATCH_SEARCH_DELIMITER === "semicolon" ? /;/ : /\n/;
+    const delimiter =
+      BATCH_SEARCH_DELIMITER === "comma"
+        ? /[,;\n]/
+        : BATCH_SEARCH_DELIMITER === "semicolon"
+          ? /[;\n]/
+          : /\n/;
     const hasDelimiter = options.query.match(delimiter);
 
     if (hasDelimiter) {
@@ -95,8 +100,12 @@ const SearchPage = ({
           if (!equal(searchTerm, previousSearchTerm)) {
             setPreviousSearchTerm(searchTerm);
             setSearchIndex(options.result);
-            setLookupTerm(hashTerm || options.query);
-            fetchSearchResults(searchTerm);
+            // Set query parameter in searchTerm for proper URL reconstruction
+            setSearchTerm({ ...searchTerm, query: options.query });
+            // Set the lookup term to show in search box
+            setLookupTerm(options.query || hashTerm);
+            // Pass options (which includes searches array from batch detection) to fetchSearchResults
+            fetchSearchResults(options);
           }
         } else if (Object.keys(previousSearchTerm).length > 0) {
           let hashedNav = (path) => {
@@ -112,21 +121,24 @@ const SearchPage = ({
           if (!equal(options, previousSearchTerm)) {
             setPreviousSearchTerm(options);
             setSearchIndex(options.result);
-            setLookupTerm(hashTerm || options.query);
+            // Set query parameter in searchTerm for proper URL reconstruction
+            setSearchTerm({ ...options, query: options.query });
+            // Set the lookup term to show in search box
+            setLookupTerm(options.query || hashTerm);
             fetchSearchResults(options, hashedNav);
           }
         } else {
           let hashedNav = (path) => {
             // TODO: include taxonomy
-            path = path.replace(
-              /\/search\b/,
-              `${location.pathname.replace(basename, "")}`,
-            );
+            path = path.replace(/\/search\b/, `${location.pathname}`);
             navigate(`${path}#${encodeURIComponent(hashTerm)}`);
           };
           setPreviousSearchTerm(options);
           setSearchIndex(options.result);
-          setLookupTerm(hashTerm || options.query);
+          // Set query parameter in searchTerm for proper URL reconstruction
+          setSearchTerm({ ...options, query: options.query });
+          // Set the lookup term to show in search box - use query param or hash
+          setLookupTerm(options.query || hashTerm);
           fetchSearchResults(options, hashedNav);
         }
       } else if (searchTerm.query && !options.query) {
