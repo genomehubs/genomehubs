@@ -28,6 +28,17 @@ const SearchPagination = ({
   if (!searchResults.status || !searchResults.status.hits) {
     return null;
   }
+
+  // Batch searches (msearch) don't support pagination
+  if (searchResults.isMsearch) {
+    return (
+      <div style={{ padding: "16px", color: "#666", fontStyle: "italic" }}>
+        Note: Pagination is not supported for batch searches. All results from
+        multiple queries are displayed together.
+      </div>
+    );
+  }
+
   const navigate = useNavigate();
   const location = useLocation();
   let pageSize = searchResults.status.size;

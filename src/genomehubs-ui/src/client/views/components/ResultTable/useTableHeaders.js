@@ -49,13 +49,21 @@ export const useTableHeaders = ({
         sortDirection={sortBy === "scientific_name" ? sortOrder : false}
         key={"scientific_name"}
         CustomCell={StickyCell}
-        {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
+        classes={classes}
+        handleTableSort={handleTableSort}
+        searchIndex={searchIndex}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
       />,
       <SortableCell
         name={"taxon_id"}
         sortDirection={sortBy === "taxon_id" ? sortOrder : false}
         key={"taxon_id"}
-        {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
+        classes={classes}
+        handleTableSort={handleTableSort}
+        searchIndex={searchIndex}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
       />,
     ];
     let filters = [
@@ -85,7 +93,11 @@ export const useTableHeaders = ({
           name={nameClass}
           key={`name-${nameClass}`}
           sortDirection={sortBy === nameClass ? sortOrder : false}
-          {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
+          classes={classes}
+          handleTableSort={handleTableSort}
+          searchIndex={searchIndex}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
         />,
       );
       filters.push(
@@ -105,7 +117,11 @@ export const useTableHeaders = ({
           name={rank}
           key={`rank-${rank}`}
           sortDirection={sortBy === rank ? sortOrder : false}
-          {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
+          classes={classes}
+          handleTableSort={handleTableSort}
+          searchIndex={searchIndex}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
         />,
       );
       filters.push(
@@ -120,7 +136,11 @@ export const useTableHeaders = ({
           name={"assembly_id"}
           key={"assembly_id"}
           sortDirection={sortBy === "assembly_id" ? sortOrder : false}
-          {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
+          classes={classes}
+          handleTableSort={handleTableSort}
+          searchIndex={searchIndex}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
         />,
       );
       filters.push(
@@ -135,7 +155,11 @@ export const useTableHeaders = ({
           name={"sample_id"}
           key={"sample_id"}
           sortDirection={sortBy === "sample_id" ? sortOrder : false}
-          {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
+          classes={classes}
+          handleTableSort={handleTableSort}
+          searchIndex={searchIndex}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
         />,
       );
       filters.push(
@@ -151,7 +175,11 @@ export const useTableHeaders = ({
           name={"feature_id"}
           key={"feature_id"}
           sortDirection={sortBy === "feature_id" ? sortOrder : false}
-          {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
+          classes={classes}
+          handleTableSort={handleTableSort}
+          searchIndex={searchIndex}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
         />,
       );
       filters.push(

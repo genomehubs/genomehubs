@@ -14,6 +14,9 @@ import useNavigate from "#hooks/useNavigate";
 import withSearch from "#hocs/withSearch";
 import withSearchDefaults from "#hocs/dispatchSearchDefaults";
 
+// Configuration for batch search delimiter (must match SearchBox.jsx)
+const BATCH_SEARCH_DELIMITER = "newline";
+
 const SearchPage = ({
   searchResults,
   searchResultArray,
@@ -40,17 +43,47 @@ const SearchPage = ({
     options.ranks = options.ranks.join(",");
   }
   let hashTerm = decodeURIComponent(location.hash.replace(/^\#/, ""));
+
+  // Detect and convert batch queries from URL parameter
+  if (options.query && typeof options.query === "string") {
+    const delimiter = BATCH_SEARCH_DELIMITER === "semicolon" ? /;/ : /\n/;
+    const hasDelimiter = options.query.match(delimiter);
+
+    if (hasDelimiter) {
+      const queries = options.query
+        .split(delimiter)
+        .map((q) => q.trim())
+        .filter((q) => q.length > 0);
+
+      if (queries.length > 1) {
+        // Convert to batch search format
+        // The selector (fetchMsearchResults) will fill in defaults for taxonomy, fields, etc.
+        const searches = queries.map((query) => ({
+          query: query.match(/[\(\)<>=]/) ? query : `tax_name(${query})`,
+          result: options.result || "taxon",
+        }));
+
+        // Mark this as a batch search in options
+        // Keep all other options (taxonomy, fields, limit, offset, etc.)
+        options.searches = searches;
+        options.originalQueries = queries;
+      }
+    }
+  }
+
   let { isFetching } = searchResults;
   let values = JSON.stringify(Object.values(options));
   useEffect(() => {
     if (!isFetching) {
-      if (options.query && !equal(options, searchTerm)) {
+      if ((options.query || options.searches) && !equal(options, searchTerm)) {
         let newDefaults = {
           includeEstimates: !(
             options.hasOwnProperty("includeEstimates") &&
             String(options.includeEstimates) == "false"
           ),
-          includeDescendants: Boolean(options.query.match("tax_tree")),
+          includeDescendants: Boolean(
+            options.query && options.query.match("tax_tree"),
+          ),
           emptyColumns:
             options.hasOwnProperty("emptyColumns") &&
             String(options.emptyColumns) == "true",

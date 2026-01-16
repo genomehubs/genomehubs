@@ -1,8 +1,11 @@
+import { attrTypes } from "../functions/attrTypes.js";
 import { client } from "../functions/connection.js";
 import { formatJson } from "../functions/formatJson.js";
+import { getResults } from "../functions/getResults.js";
 import { indexName } from "../functions/indexName.js";
 import { logError } from "../functions/logger.js";
-import { searchByTaxon } from "../queries/searchByTaxon.js";
+import { parseFields } from "../functions/parseFields.js";
+import { processHits } from "../functions/processHits.js";
 
 /**
  * Execute multiple searches simultaneously using msearch.
@@ -84,8 +87,8 @@ export const getMsearch = async (req, res) => {
       }
 
       try {
-        // Build search query using existing query builder
-        const searchQuery = await searchByTaxon({
+        // Build search query using the same function as the main search endpoint
+        const searchQuery = await getResults({
           query,
           result,
           taxonomy,
@@ -94,24 +97,42 @@ export const getMsearch = async (req, res) => {
           offset: Math.max(parseInt(offset) || 0, 0),
         });
 
+        // getResults returns { query: { size, from, query (with inner_hits), _source, aggs } }
+        // Use the complete query structure it provides
+        const searchBody = {
+          size: searchQuery.query.size || 100,
+          from: searchQuery.query.from || 0,
+          query: searchQuery.query.query,
+        };
+
+        if (searchQuery.query._source) {
+          searchBody._source = searchQuery.query._source;
+        }
+
+        // getResults includes aggregations in the query object
+        // Include those if present (inner_hits are already part of the query object)
+        if (searchQuery.query.aggs) {
+          searchBody.aggs = searchQuery.query.aggs;
+        }
+
+        if (sortBy) {
+          searchBody.sort = [
+            {
+              [sortBy]: sortOrder || "asc",
+            },
+          ];
+        }
+
         // Add index header and query body to msearch
         msearchBody.push(
           { index: indexName({ result, taxonomy }) },
-          {
-            query: searchQuery.query,
-            size: searchQuery.size || 100,
-            from: searchQuery.from || 0,
-            _source: searchQuery._source,
-            ...(sortBy && {
-              sort: [
-                {
-                  [sortBy]: sortOrder || "asc",
-                },
-              ],
-            }),
-          }
+          searchBody
         );
       } catch (error) {
+        logError({
+          req,
+          message: `msearch query build error: ${error.message}`,
+        });
         return res.status(400).send({
           status: {
             success: false,
@@ -122,6 +143,10 @@ export const getMsearch = async (req, res) => {
     }
 
     // Execute all searches at once
+    console.log(
+      "msearchBody being sent to Elasticsearch:",
+      JSON.stringify(msearchBody, null, 2)
+    );
     const mSearchResponse = await client.msearch({ body: msearchBody });
     const responses =
       mSearchResponse?.body?.responses || mSearchResponse?.responses || [];
@@ -130,25 +155,58 @@ export const getMsearch = async (req, res) => {
       throw new Error("Invalid msearch response structure");
     }
 
-    // Process responses and format results
-    const results = responses.map((response, index) => {
-      if (response.error) {
-        return {
-          status: "error",
-          error: response.error.reason || response.error.type,
-          search: searches[index],
-        };
-      }
+    // Process responses and format results using processHits to extract field data
+    const results = await Promise.all(
+      responses.map(async (response, index) => {
+        if (response.error) {
+          return {
+            status: "error",
+            error: response.error.reason || response.error.type,
+            search: searches[index],
+          };
+        }
 
-      const { hits } = response.hits || {};
-      return {
-        status: "success",
-        count: hits?.length || 0,
-        total: response.hits?.total?.value || hits?.length || 0,
-        hits: hits || [],
-        search: searches[index],
-      };
-    });
+        const searchRequest = searches[index];
+        let processedHits = [];
+
+        if (
+          response.hits &&
+          response.hits.hits &&
+          response.hits.hits.length > 0
+        ) {
+          // Parse fields to get what attributes are requested
+          const parsedFields = await parseFields({
+            result: searchRequest.result,
+            fields: searchRequest.fields || "",
+            taxonomy: searchRequest.taxonomy,
+          });
+
+          // Get field metadata for lookupTypes
+          const { lookupTypes } = await attrTypes({
+            taxonomy: searchRequest.taxonomy,
+          });
+
+          // Use processHits to process the hits with inner_hits data
+          // This extracts attributes, names, lineage, etc. from inner_hits
+          processedHits = processHits({
+            body: response,
+            fields: parsedFields,
+            lookupTypes: lookupTypes[searchRequest.result],
+            names: true,
+            ranks: true,
+            inner_hits: true,
+          });
+        }
+
+        return {
+          status: "success",
+          count: processedHits.length || 0,
+          total: response.hits?.total?.value || processedHits.length || 0,
+          hits: processedHits,
+          search: searchRequest,
+        };
+      })
+    );
 
     return res.status(200).send(
       formatJson(

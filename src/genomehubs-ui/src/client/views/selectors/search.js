@@ -128,6 +128,150 @@ export function fetchSearchResults(options, navigate) {
   };
 }
 
+export function fetchMsearchResults(options, navigate) {
+  let params = structuredClone(options);
+  return async function (dispatch) {
+    const state = store.getState();
+    const searchDefaults = getSearchDefaults(state);
+    const taxonomy = getCurrentTaxonomy(state);
+    const { searches = [], originalQueries = [], result = "taxon" } = params;
+
+    if (!Array.isArray(searches) || searches.length === 0) {
+      return dispatch(cancelSearch());
+    }
+
+    dispatch(requestSearch());
+    dispatch(
+      setSearchTerm({
+        msearch: true,
+        originalQueries,
+        result,
+        taxonomy: params.taxonomy || taxonomy,
+      }),
+    );
+
+    // Normalize searches to ensure all have required fields
+    const defaultTaxonFields =
+      "taxon_id,scientific_name,taxon_rank,common_names,names";
+    const normalizedSearches = searches.map((search) => ({
+      query: search.query || "",
+      result: search.result || result,
+      taxonomy: search.taxonomy || params.taxonomy || taxonomy,
+      // Use empty string for fields to get API default behavior (all attribute fields)
+      // OR use specific fields if provided. Don't use undefined.
+      fields: search.fields !== undefined ? search.fields : params.fields || "",
+      limit: parseInt(search.limit, 10) || 1000,
+      offset: parseInt(search.offset, 10) || 0,
+    }));
+
+    console.log("Normalized searches:", normalizedSearches);
+    console.log("Search defaults:", searchDefaults);
+
+    const endpoint = "msearch";
+    const url = `${apiUrl}/${endpoint}`;
+
+    try {
+      const requestBody = JSON.stringify({
+        searches: normalizedSearches,
+      });
+
+      console.log("Sending msearch request:", requestBody);
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: requestBody,
+      });
+
+      const json = await response.json();
+
+      if (json && json.results) {
+        // Transform msearch results into grouped format
+        // Flatten results while preserving query grouping metadata
+        const allHits = [];
+        const queryGroups = [];
+
+        originalQueries.forEach((query, idx) => {
+          const queryResult = json.results[idx];
+
+          if (
+            queryResult &&
+            queryResult.hits &&
+            Array.isArray(queryResult.hits)
+          ) {
+            const hits = queryResult.hits;
+            queryGroups.push({
+              query,
+              startIndex: allHits.length,
+              count: hits.length,
+            });
+            // Add hits with grouping metadata
+            // Hits are already formatted by processHits as {index, id, score, result: {fields, ...}}
+            hits.forEach((hit) => {
+              allHits.push({
+                id: hit.id,
+                index: hit.index,
+                score: hit.score,
+                result: {
+                  ...hit.result,
+                  // Alias taxon_* fields to expected names for ResultTable
+                  names: hit.result.taxon_names || hit.result.names || [],
+                },
+                _msearchGroup: {
+                  query,
+                  queryIndex: idx,
+                },
+              });
+            });
+          } else {
+            queryGroups.push({
+              query,
+              startIndex: allHits.length,
+              count: 0,
+            });
+          }
+        });
+
+        const groupedResults = {
+          isMsearch: true,
+          originalQueries,
+          queryGroups,
+          results: allHits,
+          status: {
+            success: true,
+            hits: allHits.length, // Required for ResultTable to render
+          },
+        };
+
+        dispatch(receiveSearch(groupedResults));
+
+        if (navigate) {
+          const basename = getBasename();
+          const navOptions = {
+            result,
+            msearch: "true",
+            offset: 0,
+          };
+          navigate(
+            `${pathJoin(basename, "search")}?${qs.stringify(navOptions)}`,
+            {
+              replace: true,
+            },
+          );
+        }
+      } else {
+        dispatch(receiveSearch(json || { results: [] }));
+      }
+    } catch (err) {
+      console.error("msearch error:", err);
+      dispatch(cancelSearch());
+      return dispatch(setApiStatus(false));
+    }
+  };
+}
+
 export function fetchQueryResults(queryString) {
   return async function (dispatch) {
     const state = store.getState();

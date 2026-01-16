@@ -1,4 +1,8 @@
-import { fetchSearchResults, saveSearchResults } from "#selectors/search";
+import {
+  fetchMsearchResults,
+  fetchSearchResults,
+  saveSearchResults,
+} from "#selectors/search";
 import {
   getPreferSearchTerm,
   getPreviousSearchTerm,
@@ -31,7 +35,10 @@ const withSearch = (WrappedComponent) => (props) => {
 
   const mapDispatchToProps = (dispatch) => ({
     fetchSearchResults: (options, navigate) => {
-      if (options.query && options.query.length > 0) {
+      if (options.searches && Array.isArray(options.searches)) {
+        // Multi-search batch request
+        dispatch(fetchMsearchResults(options, navigate));
+      } else if (options.query && options.query.length > 0) {
         dispatch(fetchSearchResults(options, navigate));
       } else {
         dispatch(resetSearch());
