@@ -1,8 +1,12 @@
 import { checkResponse } from "./checkResponse.js";
 import { client } from "./connection.js";
 import { config } from "./config.js";
+import { metadataCache } from "./metadataCache.js";
 
-export const fetchIndices = async (release = config.release) => {
+const CACHE_KEY = "indices";
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+const fetchIndicesFromElasticsearch = async (release = config.release) => {
   const { body } = await client.cat.indices({}, { meta: true }).catch((err) => {
     return err.meta;
   });
@@ -21,4 +25,17 @@ export const fetchIndices = async (release = config.release) => {
       .map((row) => row[2].split("--")[0]);
   }
   return indices;
+};
+
+export const fetchIndices = async (release = config.release) => {
+  // Create cache key that includes release version
+  const cacheKey = `${CACHE_KEY}:${release}`;
+
+  // Use metadata cache with fallback to Elasticsearch
+  return metadataCache.get(
+    cacheKey,
+    () => fetchIndicesFromElasticsearch(release),
+    CACHE_TTL,
+    true
+  );
 };

@@ -1,7 +1,11 @@
 import { client } from "./connection.js";
 import { config } from "./config.js";
+import { metadataCache } from "./metadataCache.js";
 
-export const fetchTaxonomies = async (release = config.release) => {
+const CACHE_KEY = "taxonomies";
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+const fetchTaxonomiesFromElasticsearch = async (release = config.release) => {
   if (!client) {
     return ["broken"];
   }
@@ -20,4 +24,17 @@ export const fetchTaxonomies = async (release = config.release) => {
     config.taxonomy,
     ...taxonomies.filter((taxonomy) => taxonomy != config.taxonomy),
   ];
+};
+
+export const fetchTaxonomies = async (release = config.release) => {
+  // Create cache key that includes release version
+  const cacheKey = `${CACHE_KEY}:${release}`;
+
+  // Use metadata cache with fallback to Elasticsearch
+  return metadataCache.get(
+    cacheKey,
+    () => fetchTaxonomiesFromElasticsearch(release),
+    CACHE_TTL,
+    true
+  );
 };
