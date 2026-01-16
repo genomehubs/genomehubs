@@ -58,31 +58,33 @@ export const useTableRows = ({
 
     searchResults.results.forEach((result, idx) => {
       // Add group header if this result is from a different msearch query
-      if (searchResults.isMsearch && result._msearchGroup) {
-        if (lastGroup !== result._msearchGroup.queryIndex) {
-          lastGroup = result._msearchGroup.queryIndex;
-          rows.push(
-            <StyledTableRow
-              key={`group-header-${result._msearchGroup.queryIndex}`}
+      if (
+        searchResults.isMsearch &&
+        result._msearchGroup &&
+        lastGroup !== result._msearchGroup.queryIndex
+      ) {
+        lastGroup = result._msearchGroup.queryIndex;
+        rows.push(
+          <StyledTableRow
+            key={`group-header-${result._msearchGroup.queryIndex}`}
+            style={{
+              backgroundColor: headerBackgroundColor,
+              fontWeight: "bold",
+              height: "32px",
+            }}
+          >
+            <TableCell
+              colSpan="100"
               style={{
-                backgroundColor: headerBackgroundColor,
-                fontWeight: "bold",
-                height: "32px",
+                padding: "8px 16px",
+                borderBottom: `2px solid ${theme.palette.divider}`,
+                color: headerTextColor,
               }}
             >
-              <TableCell
-                colSpan="100"
-                style={{
-                  padding: "8px 16px",
-                  borderBottom: `2px solid ${theme.palette.divider}`,
-                  color: headerTextColor,
-                }}
-              >
-                Results for: <em>{result._msearchGroup.query}</em>
-              </TableCell>
-            </StyledTableRow>,
-          );
-        }
+              Results for: <em>{result._msearchGroup.query}</em>
+            </TableCell>
+          </StyledTableRow>,
+        );
       }
 
       let name = result.result.scientific_name;
@@ -502,10 +504,62 @@ export const useTableRows = ({
       rows.push(<StyledTableRow key={result.id}>{cells}</StyledTableRow>);
     });
 
+    // Add "Show more" rows for msearch groups that have more results than displayed
+    // Iterate in reverse to avoid index shifting issues when inserting
+    if (searchResults.isMsearch && searchResults.queryGroups) {
+      // Build a map of group index to insertion info
+      const insertions = [];
+      let rowOffset = 0; // Track how many rows we've added so far
+
+      searchResults.queryGroups.forEach((group, groupIdx) => {
+        if (group.hasMore) {
+          // Position: group header (1) + displayed results (group.count) + previous insertions
+          const insertionIndex = group.startIndex + group.count + rowOffset + 1;
+          insertions.push({
+            index: insertionIndex,
+            groupIdx,
+            group,
+          });
+          rowOffset += 1; // We'll insert one row per group
+        }
+      });
+
+      // Insert in reverse order to avoid index shifting
+      insertions.reverse().forEach(({ index, groupIdx, group }) => {
+        rows.splice(
+          index,
+          0,
+          <StyledTableRow
+            key={`show-more-${groupIdx}`}
+            style={{
+              backgroundColor: "#f0f0f0",
+              textAlign: "center",
+              height: "40px",
+            }}
+          >
+            <TableCell
+              colSpan="100"
+              style={{
+                padding: "8px 16px",
+                textAlign: "center",
+                cursor: "pointer",
+                color: "#1976d2",
+                fontWeight: "500",
+              }}
+            >
+              Show more ({group.totalCount - group.count} hidden) - Load "
+              {group.query}" as single search
+            </TableCell>
+          </StyledTableRow>,
+        );
+      });
+    }
+
     return rows;
   }, [
     searchResults.results,
     searchResults.isMsearch,
+    searchResults.queryGroups,
     searchIndex,
     expandedTypes,
     expandColumns,

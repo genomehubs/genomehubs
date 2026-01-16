@@ -189,10 +189,11 @@ export function fetchMsearchResults(options, navigate) {
       const json = await response.json();
 
       if (json && json.results) {
-        // Transform msearch results into grouped format
+        // Transform msearch results into grouped format with UI display limit
         // Flatten results while preserving query grouping metadata
         const allHits = [];
         const queryGroups = [];
+        const displayLimit = parseInt(params.displayLimit, 10) || 10; // Default 10 results per group in UI
 
         originalQueries.forEach((query, idx) => {
           const queryResult = json.results[idx];
@@ -203,14 +204,19 @@ export function fetchMsearchResults(options, navigate) {
             Array.isArray(queryResult.hits)
           ) {
             const { hits } = queryResult;
+            const totalCount = hits.length;
+            const displayCount = Math.min(totalCount, displayLimit);
+            const hasMore = totalCount > displayLimit;
+
             queryGroups.push({
               query,
               startIndex: allHits.length,
-              count: hits.length,
+              count: displayCount,
+              totalCount,
+              hasMore,
             });
-            // Add hits with grouping metadata
-            // Hits are already formatted by processHits as {index, id, score, result: {fields, ...}}
-            hits.forEach((hit) => {
+            // Add only displayLimit hits for UI (but track total count for "show more" button)
+            hits.slice(0, displayCount).forEach((hit) => {
               allHits.push({
                 id: hit.id,
                 index: hit.index,
@@ -231,6 +237,8 @@ export function fetchMsearchResults(options, navigate) {
               query,
               startIndex: allHits.length,
               count: 0,
+              totalCount: 0,
+              hasMore: false,
             });
           }
         });
@@ -240,6 +248,7 @@ export function fetchMsearchResults(options, navigate) {
           originalQueries,
           queryGroups,
           results: allHits,
+          displayLimit,
           status: {
             success: true,
             hits: allHits.length, // Required for ResultTable to render
