@@ -96,6 +96,16 @@ const SearchPage = ({
         if (!shallow(searchDefaults, newDefaults)) {
           setSearchDefaults(newDefaults);
         }
+        // Add defaults to options so they're passed to fetchSearchResults
+        if (!options.hasOwnProperty("includeEstimates")) {
+          options.includeEstimates = newDefaults.includeEstimates;
+        }
+        if (!options.hasOwnProperty("includeDescendants")) {
+          options.includeDescendants = newDefaults.includeDescendants;
+        }
+        if (!options.hasOwnProperty("emptyColumns")) {
+          options.emptyColumns = newDefaults.emptyColumns;
+        }
         if (preferSearchTerm) {
           if (!equal(searchTerm, previousSearchTerm)) {
             setPreviousSearchTerm(searchTerm);

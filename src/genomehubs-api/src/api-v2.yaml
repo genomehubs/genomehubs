@@ -1753,6 +1753,34 @@ paths:
                           - asc
                           - desc
                         default: asc
+                      includeEstimates:
+                        type: boolean
+                        description: Include estimated values for missing data
+                        default: true
+                      includeDescendants:
+                        type: boolean
+                        description: Include descendant taxa
+                        default: false
+                      includeRawValues:
+                        type: boolean
+                        description: Include raw values alongside processed values
+                        default: false
+                      excludeAncestral:
+                        type: boolean
+                        description: Exclude ancestral taxa
+                        default: false
+                      excludeDescendant:
+                        type: boolean
+                        description: Exclude descendant taxa
+                        default: false
+                      excludeDirect:
+                        type: boolean
+                        description: Exclude direct taxa
+                        default: false
+                      excludeMissing:
+                        type: boolean
+                        description: Exclude taxa with missing data
+                        default: false
               required:
                 - searches
       responses:

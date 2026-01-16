@@ -163,6 +163,31 @@ export function fetchMsearchResults(options, navigate) {
       fields: search.fields !== undefined ? search.fields : params.fields || "",
       limit: parseInt(search.limit, 10) || 1000,
       offset: parseInt(search.offset, 10) || 0,
+      // Pass search parameters with each search
+      ...(params.includeEstimates !== undefined && {
+        includeEstimates: params.includeEstimates,
+      }),
+      ...(params.includeDescendants !== undefined && {
+        includeDescendants: params.includeDescendants,
+      }),
+      ...(params.includeRawValues !== undefined && {
+        includeRawValues: params.includeRawValues,
+      }),
+      ...(params.excludeAncestral !== undefined && {
+        excludeAncestral: params.excludeAncestral,
+      }),
+      ...(params.excludeDescendant !== undefined && {
+        excludeDescendant: params.excludeDescendant,
+      }),
+      ...(params.excludeDirect !== undefined && {
+        excludeDirect: params.excludeDirect,
+      }),
+      ...(params.excludeMissing !== undefined && {
+        excludeMissing: params.excludeMissing,
+      }),
+      ...(params.sortBy !== undefined && { sortBy: params.sortBy }),
+      ...(params.sortOrder !== undefined && { sortOrder: params.sortOrder }),
+      ...(params.sortMode !== undefined && { sortMode: params.sortMode }),
     }));
 
     console.log("Normalized searches:", normalizedSearches);
@@ -198,6 +223,21 @@ export function fetchMsearchResults(options, navigate) {
         originalQueries.forEach((query, idx) => {
           const queryResult = json.results[idx];
 
+          // Handle error results
+          if (queryResult && queryResult.status === "error") {
+            queryGroups.push({
+              query,
+              startIndex: allHits.length,
+              count: 0,
+              totalCount: 0,
+              hasMore: false,
+              error: queryResult.error,
+              errorMessage: `Error: ${queryResult.error}`,
+            });
+            return;
+          }
+
+          // Handle successful results
           if (
             queryResult &&
             queryResult.hits &&
@@ -233,12 +273,14 @@ export function fetchMsearchResults(options, navigate) {
               });
             });
           } else {
+            // No results (successful query, just no matches)
             queryGroups.push({
               query,
               startIndex: allHits.length,
               count: 0,
               totalCount: 0,
               hasMore: false,
+              noResults: true,
             });
           }
         });

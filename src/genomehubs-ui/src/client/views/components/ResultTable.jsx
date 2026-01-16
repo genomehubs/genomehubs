@@ -572,10 +572,8 @@ const ResultTable = ({
     );
   };
 
-  // Disable sorting for msearch results (batch queries) since we don't support sorting across multiple queries
-  const handleTableSortOrDisabled = searchResults.isMsearch
-    ? null
-    : handleTableSort;
+  // Enable sorting for msearch results - sorts within each group individually
+  const handleTableSortOrDisabled = handleTableSort;
 
   const setColSpan = ({ type, maxColSpan = 0 }) => {
     let [name, summary] = type.name.split(":");

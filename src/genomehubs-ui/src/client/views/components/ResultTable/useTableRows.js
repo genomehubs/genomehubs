@@ -56,6 +56,7 @@ export const useTableRows = ({
     const rows = [];
     let lastGroup = null;
 
+    // First pass: Add result rows with group headers
     searchResults.results.forEach((result, idx) => {
       // Add group header if this result is from a different msearch query
       if (
@@ -504,6 +505,48 @@ export const useTableRows = ({
       rows.push(<StyledTableRow key={result.id}>{cells}</StyledTableRow>);
     });
 
+    // Add group headers for queries with no results or errors
+    if (searchResults.isMsearch && searchResults.queryGroups) {
+      searchResults.queryGroups.forEach((group, groupIdx) => {
+        // Check if this group's results were already added (has results)
+        const hasAddedResults = searchResults.results.some(
+          (r) => r._msearchGroup?.queryIndex === groupIdx,
+        );
+
+        if (!hasAddedResults) {
+          // Add header for this group even though it has no results
+          const isError = group.error || group.errorMessage;
+          const backgroundColor = isError ? "#ffebee" : headerBackgroundColor; // Light red for errors
+          const textColor = isError ? "#c62828" : headerTextColor;
+          const headerText = isError
+            ? `⚠ Error: ${group.query} - ${group.errorMessage}`
+            : `No results for: ${group.query}`;
+
+          rows.push(
+            <StyledTableRow
+              key={`group-header-${groupIdx}`}
+              style={{
+                backgroundColor,
+                fontWeight: "bold",
+                height: "32px",
+              }}
+            >
+              <TableCell
+                colSpan="100"
+                style={{
+                  padding: "8px 16px",
+                  borderBottom: `2px solid ${theme.palette.divider}`,
+                  color: textColor,
+                }}
+              >
+                {headerText}
+              </TableCell>
+            </StyledTableRow>,
+          );
+        }
+      });
+    }
+
     // Add "Show more" rows for msearch groups that have more results than displayed
     // Iterate in reverse to avoid index shifting issues when inserting
     if (searchResults.isMsearch && searchResults.queryGroups) {
@@ -532,7 +575,7 @@ export const useTableRows = ({
           <StyledTableRow
             key={`show-more-${groupIdx}`}
             style={{
-              backgroundColor: "#f0f0f0",
+              backgroundColor: "#fafafa",
               textAlign: "center",
               height: "40px",
             }}

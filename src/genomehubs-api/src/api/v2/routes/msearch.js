@@ -66,9 +66,11 @@ export const getMsearch = async (req, res) => {
 
     // Build msearch request body
     const msearchBody = [];
+    const searchErrors = []; // Track which searches failed at query build time
 
     // For each search, build the ES query and add to msearch body
-    for (const searchRequest of searches) {
+    for (let searchIdx = 0; searchIdx < searches.length; searchIdx++) {
+      const searchRequest = searches[searchIdx];
       const {
         query,
         result = "taxon",
@@ -78,6 +80,14 @@ export const getMsearch = async (req, res) => {
         offset = 0,
         sortBy,
         sortOrder,
+        sortMode,
+        includeEstimates,
+        includeDescendants,
+        includeRawValues,
+        excludeAncestral,
+        excludeDescendant,
+        excludeDirect,
+        excludeMissing,
       } = searchRequest;
 
       if (!query) {
@@ -97,7 +107,19 @@ export const getMsearch = async (req, res) => {
           taxonomy,
           fields,
           size: Math.min(parseInt(limit) || 100, 10000),
+          from: Math.max(parseInt(offset) || 0, 0),
           offset: Math.max(parseInt(offset) || 0, 0),
+          req, // Pass req for error logging
+          includeEstimates,
+          includeDescendants,
+          includeRawValues,
+          excludeAncestral,
+          excludeDescendant,
+          excludeDirect,
+          excludeMissing,
+          sortBy,
+          sortOrder,
+          sortMode,
         });
 
         // getResults returns { query: { size, from, query (with inner_hits), _source, aggs } }
@@ -118,12 +140,10 @@ export const getMsearch = async (req, res) => {
           searchBody.aggs = searchQuery.query.aggs;
         }
 
-        if (sortBy) {
-          searchBody.sort = [
-            {
-              [sortBy]: sortOrder || "asc",
-            },
-          ];
+        // Use sort from searchQuery.query if it exists (properly built by setSortOrder)
+        // Otherwise don't override it
+        if (searchQuery.query.sort) {
+          searchBody.sort = searchQuery.query.sort;
         }
 
         // Add index header and query body to msearch
@@ -134,14 +154,18 @@ export const getMsearch = async (req, res) => {
       } catch (error) {
         logError({
           req,
-          message: `msearch query build error: ${error.message}`,
+          message: `msearch query build error for search ${searchIdx}: ${error.message}`,
         });
-        return res.status(400).send({
-          status: {
-            success: false,
-            error: `Invalid search query: ${error.message}`,
-          },
-        });
+        // Record the error but continue processing other searches
+        searchErrors[searchIdx] = {
+          status: "error",
+          error: `Invalid search query: ${error.message}`,
+        };
+        // Add a placeholder to msearch body to keep indices aligned
+        msearchBody.push(
+          { index: indexName({ result: "taxon", taxonomy: "ncbi" }) },
+          { query: { match_none: {} } } // Query that returns no results
+        );
       }
     }
 
@@ -161,6 +185,11 @@ export const getMsearch = async (req, res) => {
     // Process responses and format results using processHits to extract field data
     const results = await Promise.all(
       responses.map(async (response, index) => {
+        // If this search had a query build error, return that instead of the ES response
+        if (searchErrors[index]) {
+          return searchErrors[index];
+        }
+
         if (response.error) {
           return {
             status: "error",
@@ -305,6 +334,19 @@ export const getMsearchDownload = async (req, res) => {
           taxonomy,
           size: searchRequest.limit,
           from: searchRequest.offset,
+          offset: searchRequest.offset,
+          req,
+          // Use values from query string (URL parameters) for downloads, falling back to req.query
+          includeEstimates: req.query.includeEstimates,
+          includeDescendants: req.query.includeDescendants,
+          includeRawValues: req.query.includeRawValues,
+          excludeAncestral: req.query.excludeAncestral,
+          excludeDescendant: req.query.excludeDescendant,
+          excludeDirect: req.query.excludeDirect,
+          excludeMissing: req.query.excludeMissing,
+          sortBy: req.query.sortBy,
+          sortOrder: req.query.sortOrder,
+          sortMode: req.query.sortMode,
         });
 
         // getResults returns { query: { size, from, query, _source, aggs } }
