@@ -164,13 +164,19 @@ export const getNamesMap = createSelector(
 );
 
 export const getAttributeTrie = createSelector(getTypesMap, (types) => {
-  const trie = new TrieSearch("name", { splitOnRegEx: false });
+  const trie = new TrieSearch("name", {
+    splitOnRegEx: false,
+    idFieldOrFunction: (item, i) => i,
+  });
   trie.addFromObject(types);
   return trie;
 });
 
 export const getKeywordTrie = createSelector(getTypesMap, (types) => {
-  const trie = new TrieSearch("name", { splitOnRegEx: false });
+  const trie = new TrieSearch("name", {
+    splitOnRegEx: false,
+    idFieldOrFunction: (item, i) => i,
+  });
   let filteredTypes = Object.entries(types)
     .filter(([key, obj]) => obj.type && obj.type == "keyword")
     .reduce((r, [key, obj]) => ({ ...r, [key]: obj }), {});
@@ -323,7 +329,9 @@ export const getTaxTrie = createSelector(getTypesMap, (types) => {
       type: "operator",
     },
   ];
-  const trie = new TrieSearch(["display_name", "key"]);
+  const trie = new TrieSearch(["display_name", "key"], {
+    idFieldOrFunction: "key",
+  });
   trie.addAll(values);
   return trie;
 });
@@ -359,7 +367,9 @@ export const getSummaryTrie = createSelector(getTypesMap, (types) => {
       type: "operator",
     },
   ];
-  const trie = new TrieSearch(["display_name", "key"]);
+  const trie = new TrieSearch(["display_name", "key"], {
+    idFieldOrFunction: "key",
+  });
   trie.addAll(values);
   return trie;
 });
