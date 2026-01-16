@@ -315,6 +315,7 @@ export const batchFetchMetadataOnMiss = async ({
     { index: indexName({ result, taxonomy, release }) },
     {
       size: 0,
+      _source: false, // Don't fetch any documents, just aggregations
       query: {
         bool: {
           must_not: {
@@ -330,8 +331,22 @@ export const batchFetchMetadataOnMiss = async ({
     }
   );
 
-  const mSearchResponse = await client.msearch({ body: msearchBody });
-  const responses = (mSearchResponse.body || mSearchResponse).responses || [];
+  let mSearchResponse;
+  try {
+    mSearchResponse = await client.msearch({ body: msearchBody });
+  } catch (error) {
+    throw new Error(`msearch failed: ${error.message}`);
+  }
+
+  // Handle both response formats: { body: { responses: [...] } } or { responses: [...] }
+  const responses =
+    mSearchResponse?.body?.responses || mSearchResponse?.responses || [];
+
+  if (!Array.isArray(responses) || responses.length === 0) {
+    throw new Error(
+      `Invalid msearch response: expected array of responses, got ${typeof responses}`
+    );
+  }
 
   let attrTypes = {};
   let taxonomicRanks = [];
