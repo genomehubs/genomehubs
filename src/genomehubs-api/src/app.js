@@ -6,6 +6,7 @@ import compression from "compression";
 import { config } from "./api/v2/functions/config.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { dirname } from "path";
 import express from "express";
 import { fileURLToPath } from "url";
 import fs from "fs";
@@ -17,9 +18,13 @@ import { logError } from "./api/v2/functions/logger.js";
 import path from "path";
 import qs from "./api/v2/functions/qs.js";
 import swaggerUi from "swagger-ui-express";
+
 // Statically include generated handlers map when available so bundlers embed it.
 // The generator writes to ./generated/operation-handlers.cjs
-import bundledHandlersMap from "./generated/operation-handlers.cjs";
+// Only in production build - in development use dynamic imports instead
+let bundledHandlersMap = null;
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const { port } = config;
 const apiSpec = path.join(__dirname, "api-v2.yaml");
@@ -162,12 +167,14 @@ app.use("/api-docs", swaggerUi.serve);
 app.get("/api-docs", swaggerSetup);
 
 // Try to use a generated static operation handlers map to avoid dynamic requires at runtime.
+// Skip in development to allow dynamic imports for hot-reloading
 let operationHandlersPath = null;
 try {
   // Prefer the statically imported handlers map (bundled) when available.
   let handlersMap = bundledHandlersMap || null;
   let handlersMapSource = "none";
-  if (!handlersMap) {
+  // Only try to load handlers map in production, not in development
+  if (!handlersMap && process.env.NODE_ENV === "production") {
     try {
       handlersMap = require(path.join(
         __dirname,
@@ -219,6 +226,7 @@ try {
     };
 
     // operationHandlers generator used module keys relative to src. if baseName is present, map to that module.
+    // In development (no handlersMap), skip static resolution and let validator use dynamic resolution
     if (baseName && handlersMap) {
       // baseName is expected to be a path like 'api/v2/controllers/foo'
       const key = baseName;
@@ -349,7 +357,11 @@ try {
     // fallback: let the validator do its default resolution
     return undefined;
   };
-  operationHandlersPath = { resolver: staticResolver };
+  // Only use static resolver if we have a handlers map (production)
+  // In development, provide path for validator to use dynamic resolution
+  operationHandlersPath = handlersMap
+    ? { resolver: staticResolver }
+    : path.join(__dirname);
 } catch (err) {
   // no generated map available; fall back to dynamic resolution
   operationHandlersPath = path.join(__dirname);

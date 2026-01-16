@@ -3,6 +3,7 @@
   "version": "2.11.17",
   "description": "GenomeHubs API",
   "scripts": {
+    "dev": "nodemon src/app.js",
     "build:bundle": "node scripts/bundle.cjs",
     "start": "node --no-deprecation build/bundle.cjs",
     "start:goat": "GH_HUBNAME=goat GH_RELEASE=2021.10.15 node --no-deprecation build/bundle.cjs",
