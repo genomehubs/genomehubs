@@ -47,7 +47,6 @@ export const config = {
     : undefined,
   treeThreshold: process.env.GH_TREE_THRESHOLD || 10000,
   scrollThreshold: process.env.GH_SCROLL_THRESHOLD || 10000,
-  scrollDuration: process.env.GH_SCROLL_DURATION || "30s",
 };
 
 export default config;
