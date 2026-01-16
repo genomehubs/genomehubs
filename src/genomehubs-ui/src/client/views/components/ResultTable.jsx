@@ -1,5 +1,18 @@
 import {
-  aggregationToggleOpaque as aggregationToggleOpaqueStyle,
+  EvenTableCell,
+  OddTableCell,
+  SortableCell,
+  SpanTableCell,
+  StickyCell,
+  StyledBadge,
+  StyledTableRow,
+  TableCell,
+  darkColor,
+  lightColor,
+  useStyles,
+} from "./ResultTable/StyledComponents";
+import {
+  aggregationTogleOpaque as aggregationToggleOpaqueStyle,
   aggregationToggle as aggregationToggleStyle,
   contrast as contrastStyle,
   first as firstStyle,
@@ -9,10 +22,6 @@ import {
 import { useEffect, useRef } from "react";
 
 import AggregationIcon from "./AggregationIcon";
-import Badge from "@mui/material/Badge";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
-import Checkbox from "@mui/material/Checkbox";
 import Citation from "./Citation";
 import DownloadButton from "./DownloadButton";
 import FiberManualRecordSharpIcon from "@mui/icons-material/FiberManualRecordSharp";
@@ -22,421 +31,38 @@ import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import LinkButton from "./LinkButton";
-import MuiTableCell from "@mui/material/TableCell";
 import RadioButtonCheckedOutlinedIcon from "@mui/icons-material/RadioButtonCheckedOutlined";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import ReportError from "./ReportError";
 import ResultFilter from "./ResultFilter";
 import ResultModalControl from "./ResultModalControl";
 import SearchPagination from "./SearchPagination";
-import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
-import SettingsIcon from "@mui/icons-material/Settings";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import TableSortLabel from "@mui/material/TableSortLabel";
 import Tooltip from "./Tooltip";
-import ViewWeekIcon from "@mui/icons-material/ViewWeek";
-import ViewWeekOutlinedIcon from "@mui/icons-material/ViewWeekOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import classnames from "classnames";
 import { compose } from "redux";
 import dispatchRecord from "#hocs/dispatchRecord";
 import expandFieldList from "#functions/expandFieldList";
 import { formatter } from "#functions/formatter";
-import makeStyles from "@mui/styles/makeStyles";
 import qs from "#functions/qs";
-import { styled } from "@mui/material/styles";
 import { useLocation } from "@reach/router";
 import useNavigate from "#hooks/useNavigate";
+import { useTableHeaders } from "./ResultTable/useTableHeaders";
 import withColors from "#hocs/withColors";
 import withNames from "#hocs/withNames";
 import withRanks from "#hocs/withRanks";
 import withSearch from "#hocs/withSearch";
 import withSearchDefaults from "#hocs/withSearchDefaults";
 import withSiteName from "#hocs/withSiteName";
-import withStyles from "@mui/styles/withStyles";
 import withTaxonomy from "#hocs/withTaxonomy";
 import withTypes from "#hocs/withTypes";
 
 const borderColor = "#dddddd";
-const darkColor = 44;
-const lightColor = 22;
-
-const StyledTableRow = withStyles((theme) => ({
-  root: {
-    width: "100%",
-  },
-}))(TableRow);
-
-const StyledBadge = styled(Badge)(() => ({
-  "& .MuiBadge-badge": {
-    backgroundColor: "#333",
-    color: "#fff",
-    top: 0,
-    right: 0,
-    borderRadius: "10px",
-    border: "2px solid white",
-    transform: "translate(98%, -50%)",
-  },
-}));
-
-export const useStyles = makeStyles((theme) => ({
-  root: {
-    maxWidth: "calc( 100% - 0.5em )",
-    marginBottom: "1em",
-    marginLeft: "0.5em",
-    minWidth: "750px",
-  },
-  table: {
-    maxWidth: "100%",
-    minWidth: "750px",
-  },
-  ["PrivateSwitchBase-root-4"]: {
-    padding: "3px",
-  },
-  visuallyHidden: {
-    border: 0,
-    clip: "rect(0 0 0 0)",
-    height: "1px",
-    margin: -1,
-    overflow: "hidden",
-    padding: "0px",
-    position: "absolute",
-    top: 20,
-    width: "1px",
-  },
-}));
-
-const TableCell = styled(MuiTableCell)({
-  padding: "1px 6px",
-  lineHeight: "inherit",
-});
-
-const StickyCell = withStyles((theme) => ({
-  root: {
-    position: "sticky",
-    left: 0,
-    zIndex: 100,
-  },
-}))(TableCell);
-
-const OddTableCell = withStyles((theme) => ({
-  root: {
-    textAlign: "center",
-    backgroundColor: `#ffffff00`,
-  },
-}))(TableCell);
-
-const EvenTableCell = withStyles((theme) => ({
-  root: {
-    backgroundColor: `${borderColor}33`,
-  },
-}))(OddTableCell);
-
-const SpanTableCell = withStyles((theme) => ({
-  root: {
-    textAlign: "left",
-  },
-}))(EvenTableCell);
-
-const StyledCheckbox = ({ color, fontSize = "small", ...props }) => {
-  return (
-    <Checkbox
-      style={{
-        padding: "1px",
-        color: props.color,
-      }}
-      icon={<CheckBoxOutlineBlankIcon style={{ fontSize, fill: color }} />}
-      checkedIcon={<CheckBoxIcon style={{ fontSize, fill: color }} />}
-      {...props}
-    />
-  );
-};
-
-const StyledColbox = ({ color, ...props }) => {
-  return (
-    <Checkbox
-      style={{
-        padding: "1px",
-        color,
-      }}
-      icon={<SettingsApplicationsIcon style={{ fontSize: "small" }} />}
-      checkedIcon={<SettingsIcon style={{ fontSize: "small" }} />}
-      {...props}
-    />
-  );
-};
-
-const StyledColSplit = ({ color, ...props }) => {
-  return (
-    <Checkbox
-      style={{
-        padding: "1px",
-        color,
-      }}
-      icon={<ViewWeekOutlinedIcon style={{ fontSize: "small" }} />}
-      checkedIcon={<ViewWeekIcon style={{ fontSize: "small" }} />}
-      {...props}
-    />
-  );
-};
-
-const SortableCell = ({
-  name,
-  field = name,
-  summary = "",
-  description,
-  status,
-  colCount = 0,
-  colSpan = 0,
-  color,
-  classes,
-  searchIndex,
-  CustomCell,
-  borderBottom,
-  statusColors = {},
-  sortBy,
-  sortOrder,
-  sortDirection,
-  handleTableSort = () => {},
-  setAttributeSettings,
-  showExcludeBoxes,
-  excludeDirect,
-  excludeAncestral,
-  excludeDescendant,
-  excludeMissing,
-  handleToggleExclusion = () => {},
-  handleToggleColSpan = () => {},
-}) => {
-  if (!CustomCell) {
-    CustomCell = TableCell;
-  }
-  let css = aggregationToggleStyle;
-  let prefix = name.replace(/:.+$/, "");
-  if (
-    excludeAncestral &&
-    (excludeDirect.hasOwnProperty(prefix) ||
-      excludeDescendant.hasOwnProperty(prefix) ||
-      excludeAncestral.hasOwnProperty(prefix) ||
-      excludeMissing.hasOwnProperty(prefix))
-  ) {
-    css = classnames(aggregationToggleStyle, aggregationToggleOpaqueStyle);
-  }
-
-  let title = handleTableSort ? `Sort by ${field}` : field;
-  if (description) {
-    title = (
-      <div style={{ whiteSpace: "pre-line", maxWidth: "14em" }}>
-        <div>{title}</div>
-        <div
-          style={{
-            width: "100%",
-            marginTop: "0.5em",
-            borderTop: "solid white 1px",
-          }}
-        >
-          {description}
-        </div>
-        {status && status != "stable" && (
-          <div
-            style={{
-              width: "100%",
-              marginTop: "0.5em",
-              textAlign: "right",
-            }}
-          >
-            status: {status}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  let SpanCell = colSpan > 0 ? SpanTableCell : CustomCell;
-
-  let cellCss = "";
-  if (colSpan > 0) {
-    cellCss = classnames(firstStyle, lastStyle);
-  }
-
-  if (Array.isArray(summary)) {
-    summary = summary[0];
-  }
-
-  let cellTitle =
-    summary && summary.startsWith("metadata.")
-      ? `${name}${summary.replace("metadata", "")}`
-      : name;
-  return (
-    <SpanCell
-      key={`${name}_${summary}`}
-      colSpan={colSpan}
-      className={cellCss}
-      style={{
-        whiteSpace: "normal",
-        wordWrap: "break-word",
-        maxWidth: "8rem",
-        minWidth: "3rem",
-        lineHeight: "1rem",
-        verticalAlign: "bottom",
-        borderBottom,
-        backgroundColor: color,
-      }}
-      sortDirection={sortDirection}
-    >
-      <Tooltip key={field} title={title} arrow>
-        {(handleTableSort && (
-          <TableSortLabel
-            active={sortBy === field}
-            direction={sortOrder}
-            onClick={() =>
-              handleTableSort(
-                sortDirection && sortOrder === "desc"
-                  ? { sortBy: "none" }
-                  : {
-                      sortBy: field,
-                      sortOrder:
-                        sortDirection && sortOrder === "asc" ? "desc" : "asc",
-                    },
-              )
-            }
-          >
-            {/* {name} */}
-            {cellTitle.split("_").join(`_\u200b`).split(".").join(`.\u200b`)}
-            {status && status != "stable" && <sup>{`\u2020`}</sup>}
-            {sortBy === field ? (
-              <span className={classes.visuallyHidden}>
-                {sortOrder === "desc"
-                  ? "sorted descending"
-                  : "sorted ascending"}
-              </span>
-            ) : null}
-          </TableSortLabel>
-        )) || (
-          <span>
-            {name.split("_").join(`_\u200b`)}
-            {status && status != "stable" && <sup>{`\u2020`}</sup>}
-          </span>
-        )}
-      </Tooltip>
-      <br />
-      {(showExcludeBoxes && (
-        <span className={css}>
-          {showExcludeBoxes == "all" && (
-            <Tooltip
-              key={"direct"}
-              title={"Toggle directly measured values"}
-              arrow
-            >
-              <span>
-                <StyledCheckbox
-                  checked={!excludeDirect.hasOwnProperty(prefix)}
-                  onChange={() =>
-                    handleToggleExclusion({ toggleDirect: prefix })
-                  }
-                  color={statusColors.direct || "green"}
-                  inputProps={{ "aria-label": "direct checkbox" }}
-                />
-              </span>
-            </Tooltip>
-          )}
-          {showExcludeBoxes == "all" && (
-            <Tooltip
-              key={"descendant"}
-              title={"Toggle values inferred from descendant taxa"}
-              arrow
-            >
-              <span>
-                <StyledCheckbox
-                  checked={!excludeDescendant.hasOwnProperty(prefix)}
-                  onChange={() =>
-                    handleToggleExclusion({ toggleDescendant: prefix })
-                  }
-                  color={statusColors.descendant || "orange"}
-                  inputProps={{ "aria-label": "descendant checkbox" }}
-                />
-              </span>
-            </Tooltip>
-          )}
-          {showExcludeBoxes == "all" && (
-            <Tooltip
-              key={"ancestral"}
-              title={"Toggle values inferred from ancestral taxa"}
-              arrow
-            >
-              <span>
-                <StyledCheckbox
-                  checked={!excludeAncestral.hasOwnProperty(prefix)}
-                  onChange={() =>
-                    handleToggleExclusion({ toggleAncestral: prefix })
-                  }
-                  color={statusColors.ancestral || "red"}
-                  inputProps={{ "aria-label": "ancestral checkbox" }}
-                />
-              </span>
-            </Tooltip>
-          )}
-          <Tooltip key={"missing"} title={"Toggle missing values"} arrow>
-            <span>
-              <StyledCheckbox
-                checked={!excludeMissing.hasOwnProperty(prefix)}
-                onChange={() =>
-                  handleToggleExclusion({ toggleMissing: prefix })
-                }
-                color={"black"}
-                inputProps={{ "aria-label": "missing checkbox" }}
-              />
-            </span>
-          </Tooltip>
-          {(searchIndex == "taxon" || searchIndex == "assembly") && (
-            <Tooltip key={"columns"} title={"Show/hide subset columns"} arrow>
-              <span>
-                <StyledColbox
-                  // checked={!excludeAncestral.hasOwnProperty(prefix)}
-                  // onChange={() =>
-                  //   handleToggleExclusion({ toggleAncestral: prefix })
-                  // }
-                  onClick={() => {
-                    setAttributeSettings({
-                      attributeId: prefix,
-                      adjustColumns: true,
-                      currentRecordId: "none",
-                      showAttribute: true,
-                    });
-                  }}
-                  color={"black"}
-                  inputProps={{ "aria-label": "show/hide columns" }}
-                />
-              </span>
-            </Tooltip>
-          )}
-          {colCount > 0 && (
-            <Tooltip key={"split"} title={"Toggle split column"} arrow>
-              <span>
-                <span>
-                  <StyledColSplit
-                    checked={colSpan > 0}
-                    // onChange={() =>
-                    //   handleToggleExclusion({ toggleAncestral: prefix })
-                    // }
-                    onClick={() => {
-                      handleToggleColSpan(field, colSpan);
-                    }}
-                    color={"black"}
-                    inputProps={{ "aria-label": "split/collapse column" }}
-                  />
-                </span>
-              </span>
-            </Tooltip>
-          )}
-        </span>
-      )) || <span className={css}></span>}
-    </SpanCell>
-  );
-};
 
 const setCellClassName = (i, length, force) => {
   if (length == 1 && !force) {
@@ -1384,220 +1010,29 @@ const ResultTable = ({
     );
     return <StyledTableRow key={result.id}>{cells}</StyledTableRow>;
   });
-  let heads = [
-    <SortableCell
-      name={"scientific_name"}
-      sortDirection={sortBy === "scientific_name" ? sortOrder : false}
-      key={"scientific_name"}
-      CustomCell={StickyCell}
-      {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-    />,
-    <SortableCell
-      name={"taxon_id"}
-      sortDirection={sortBy === "taxon_id" ? sortOrder : false}
-      key={"taxon_id"}
-      {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-    />,
-  ];
-  let filters = [
-    <ResultFilter
-      name={"scientific_name"}
-      key={"scientific_name"}
-      type="hidden"
-      TableCell={StickyCell}
-      value={""}
-    />,
-    <ResultFilter
-      name={"taxon_id"}
-      key={"taxon_id"}
-      type="hidden"
-      value={""}
-    />,
-  ];
-  let expandedCols = [
-    <StickyCell key={"scientific_name"} />,
-    <TableCell key={"taxon_id"} />,
-  ];
-  let maxColSpan = 0;
-  Object.keys(activeNameClasses).forEach((nameClass) => {
-    heads.push(
-      <SortableCell
-        name={nameClass}
-        key={`name-${nameClass}`}
-        sortDirection={sortBy === nameClass ? sortOrder : false}
-        {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-      />,
-    );
-    filters.push(
-      <ResultFilter
-        name={nameClass}
-        key={`name-${nameClass}`}
-        value={""}
-        colSpan={1}
-      />,
-    );
-    expandedCols.push(<TableCell key={nameClass} />);
-  });
-  Object.keys(activeRanks).forEach((rank) => {
-    heads.push(
-      <SortableCell
-        name={rank}
-        key={`rank-${rank}`}
-        sortDirection={sortBy === rank ? sortOrder : false}
-        {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-      />,
-    );
-    filters.push(<ResultFilter name={rank} key={`rank-${rank}`} value={""} />);
-    expandedCols.push(<TableCell key={rank} />);
-  });
-  if (searchIndex == "assembly" || searchIndex == "feature") {
-    heads.push(
-      <SortableCell
-        name={"assembly_id"}
-        key={"assembly_id"}
-        sortDirection={sortBy === "assembly_id" ? sortOrder : false}
-        {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-      />,
-    );
-    filters.push(
-      <ResultFilter name={"assembly_id"} key={"assembly_id"} value={""} />,
-    );
-    expandedCols.push(<TableCell key={"assembly_id"} />);
-  }
-  if (searchIndex == "sample") {
-    heads.push(
-      <SortableCell
-        name={"sample_id"}
-        key={"sample_id"}
-        sortDirection={sortBy === "sample_id" ? sortOrder : false}
-        {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-      />,
-    );
-    filters.push(
-      <ResultFilter name={"sample_id"} key={"sample_id"} value={""} />,
-    );
-    expandedCols.push(<TableCell key={"sample_id"} />);
-  }
-  if (searchIndex == "feature") {
-    heads = [heads.pop()];
-    heads.push(
-      <SortableCell
-        name={"feature_id"}
-        key={"feature_id"}
-        sortDirection={sortBy === "feature_id" ? sortOrder : false}
-        {...{ classes, handleTableSort, searchIndex, sortBy, sortOrder }}
-      />,
-    );
-    filters.push(
-      <ResultFilter name={"feature_id"} key={"feature_id"} value={""} />,
-    );
-    expandedCols.push(<TableCell key={"feature_id"} />);
-  }
-  for (let type of expandedTypes) {
-    let sortDirection = sortBy === type.field ? sortOrder : false;
-    if (type.processed_type == "geo_point") {
-    } else {
-    }
-    let colCount, colSpan;
-    ({ colCount, colSpan, maxColSpan } = setColSpan({
-      type,
-      maxColSpan,
-    }));
-    heads.push(
-      <SortableCell
-        key={`${type.name}_${type.summary}`}
-        name={type.name}
-        field={type.field}
-        summary={type.summary}
-        description={type.description}
-        color={`${type.color}${darkColor}`}
-        status={type.status}
-        handleTableSort={type.processed_type != "geo_point" && handleTableSort}
-        setAttributeSettings={setAttributeSettings}
-        showExcludeBoxes={searchIndex == "taxon" ? "all" : "missing"}
-        excludeAncestral={arrToObj(searchTerm.excludeAncestral)}
-        excludeDescendant={arrToObj(searchTerm.excludeDescendant)}
-        excludeDirect={arrToObj(searchTerm.excludeDirect)}
-        excludeMissing={arrToObj(searchTerm.excludeMissing)}
-        {...{
-          classes,
-          colCount,
-          colSpan,
-          handleToggleColSpan,
-          handleToggleExclusion,
-          searchIndex,
-          setAttributeSettings,
-          sortBy,
-          sortDirection,
-          sortOrder,
-          statusColors,
-        }}
-      />,
-    );
 
-    let fieldConstraints = constraints[type.field.replace(/:.+$/, "")] || [];
-    filters.push(
-      <ResultFilter
-        key={`${type.name}_${type.summary}`}
-        name={type.name}
-        field={type.field}
-        colSpan={colSpan}
-        color={`${type.color}${darkColor}`}
-        TableCell={colSpan > 0 ? SpanTableCell : TableCell}
-        value={""}
-        fieldMeta={types[type.name]}
-        constraints={fieldConstraints}
-      />,
-    );
-    if (colSpan > 0) {
-      fieldConstraints.forEach((v, i) => {
-        let css = setCellClassName(
-          i,
-          fieldConstraints.length,
-          expandColumns[type.field],
-        );
-        let color = type.color || type.file_paths?.[v]?.color;
-        expandedCols.push(
-          <OddTableCell
-            key={`${type.name}_${type.summary}-${v}`}
-            className={css}
-            style={{
-              backgroundColor: `${color}${i % 2 == 0 ? lightColor : darkColor}`,
-            }}
-          >
-            {v.split("_").join(`_\u200b`).split(".").join(`.\u200b`)}
-          </OddTableCell>,
-        );
-      });
-    } else {
-      expandedCols.push(
-        <TableCell
-          key={`${type.name}_${type.summary}`}
-          colSpan={colSpan + 1}
-          style={{
-            backgroundColor: `${type.color}${lightColor}`,
-          }}
-        />,
-      );
-    }
-  }
-  heads.push(
-    <Tooltip title={"Click to toggle filter options"} arrow key={"filter"}>
-      <TableCell>
-        <IconButton
-          aria-label="toggle filter"
-          size="small"
-          onClick={() =>
-            setSearchDefaults({ showFilter: !searchDefaults.showFilter })
-          }
-        >
-          <FilterListIcon />
-        </IconButton>
-      </TableCell>
-    </Tooltip>,
-  );
-  filters.push(<TableCell key={"filter"} />);
-  expandedCols.push(<TableCell key={"filter"} />);
+  const { heads, filters, expandedCols, maxColSpan } = useTableHeaders({
+    activeNameClasses,
+    activeRanks,
+    searchIndex,
+    expandedTypes,
+    expandColumns,
+    searchDefaults,
+    searchTerm,
+    types,
+    constraints,
+    sortBy,
+    sortOrder,
+    classes,
+    handleTableSort,
+    handleToggleColSpan,
+    handleToggleExclusion,
+    setAttributeSettings,
+    statusColors,
+    setSearchDefaults,
+    setCellClassName,
+    setColSpan,
+  });
 
   let citationMessage;
   if (rows.length > 0) {
