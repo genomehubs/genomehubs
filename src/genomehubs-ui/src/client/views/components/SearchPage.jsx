@@ -175,6 +175,12 @@ const SearchPage = ({
   } else {
     results = null;
   }
+  let uniqueCount;
+  if (resultCount > 0 && searchResults.isMsearch) {
+    console.log(searchResults);
+    ({ uniqueCount = 0 } = searchResults);
+  }
+
   let report;
   if (searchResultArray.length > 0) {
     report = <ReportPanel options={options} />;
@@ -193,6 +199,7 @@ const SearchPage = ({
         { panel: text },
       ]}
       resultCount={resultCount}
+      uniqueCount={uniqueCount}
     />
   );
 };

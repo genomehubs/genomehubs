@@ -7,6 +7,7 @@ import { indexName } from "../functions/indexName.js";
 import { logError } from "../functions/logger.js";
 import { parseFields } from "../functions/parseFields.js";
 import { processHits } from "../functions/processHits.js";
+import { setExclusions } from "../functions/setExclusions.js";
 
 const BATCH_SEARCH_DELIMITER = "semicolon";
 
@@ -43,6 +44,7 @@ const BATCH_SEARCH_DELIMITER = "semicolon";
  * }
  */
 export const getMsearch = async (req, res) => {
+  let sumHits = 0;
   try {
     const { searches = [] } = req.body;
 
@@ -84,12 +86,12 @@ export const getMsearch = async (req, res) => {
         includeEstimates,
         includeDescendants,
         includeRawValues,
-        excludeAncestral,
-        excludeDescendant,
-        excludeDirect,
-        excludeMissing,
+        // excludeAncestral,
+        // excludeDescendant,
+        // excludeDirect,
+        // excludeMissing,
       } = searchRequest;
-
+      let exclusions = setExclusions({ ...req.query, ...searchRequest });
       if (!query) {
         return res.status(400).send({
           status: {
@@ -113,10 +115,7 @@ export const getMsearch = async (req, res) => {
           includeEstimates,
           includeDescendants,
           includeRawValues,
-          excludeAncestral,
-          excludeDescendant,
-          excludeDirect,
-          excludeMissing,
+          exclusions,
           sortBy,
           sortOrder,
           sortMode,
@@ -149,7 +148,7 @@ export const getMsearch = async (req, res) => {
         // Add index header and query body to msearch
         msearchBody.push(
           { index: indexName({ result, taxonomy }) },
-          searchBody
+          searchBody,
         );
       } catch (error) {
         logError({
@@ -164,7 +163,7 @@ export const getMsearch = async (req, res) => {
         // Add a placeholder to msearch body to keep indices aligned
         msearchBody.push(
           { index: indexName({ result: "taxon", taxonomy: "ncbi" }) },
-          { query: { match_none: {} } } // Query that returns no results
+          { query: { match_none: {} } }, // Query that returns no results
         );
       }
     }
@@ -226,6 +225,8 @@ export const getMsearch = async (req, res) => {
           });
         }
 
+        sumHits += response.hits?.total?.value || 0;
+
         return {
           status: "success",
           count: processedHits.length || 0,
@@ -233,17 +234,17 @@ export const getMsearch = async (req, res) => {
           hits: processedHits,
           search: searchRequest,
         };
-      })
+      }),
     );
 
     return res.status(200).send(
       formatJson(
         {
-          status: { success: true },
+          status: { success: true, hits: sumHits },
           results,
         },
-        req.query.indent
-      )
+        req.query.indent,
+      ),
     );
   } catch (error) {
     logError({ req, message: error.message });
@@ -289,8 +290,8 @@ export const getMsearchDownload = async (req, res) => {
       BATCH_SEARCH_DELIMITER === "comma"
         ? /[,;\n]/
         : BATCH_SEARCH_DELIMITER === "semicolon"
-        ? /[;\n]/
-        : /\n/;
+          ? /[;\n]/
+          : /\n/;
     const queries = queryString
       .split(delimiter)
       .map((q) => q.trim())
@@ -323,6 +324,8 @@ export const getMsearchDownload = async (req, res) => {
     for (const searchRequest of searches) {
       const { query, result, taxonomy } = searchRequest;
 
+      let exclusions = setExclusions({ ...req.query, ...searchRequest });
+
       try {
         const searchQuery = await getResults({
           query,
@@ -336,10 +339,7 @@ export const getMsearchDownload = async (req, res) => {
           includeEstimates: req.query.includeEstimates,
           includeDescendants: req.query.includeDescendants,
           includeRawValues: req.query.includeRawValues,
-          excludeAncestral: req.query.excludeAncestral,
-          excludeDescendant: req.query.excludeDescendant,
-          excludeDirect: req.query.excludeDirect,
-          excludeMissing: req.query.excludeMissing,
+          exclusions,
           sortBy: req.query.sortBy,
           sortOrder: req.query.sortOrder,
           sortMode: req.query.sortMode,
@@ -364,7 +364,7 @@ export const getMsearchDownload = async (req, res) => {
         // Add index header and query body to msearch
         msearchBody.push(
           { index: indexName({ result, taxonomy }) },
-          searchBody
+          searchBody,
         );
       } catch (error) {
         logError({
@@ -397,7 +397,7 @@ export const getMsearchDownload = async (req, res) => {
           // Log error but continue with other results
           console.error(
             "msearch download - search error:",
-            searchResponse.error
+            searchResponse.error,
           );
           continue;
         }
@@ -428,7 +428,7 @@ export const getMsearchDownload = async (req, res) => {
           allHits.push(
             ...processedHits.map((hit) => ({
               result: hit.result || hit,
-            }))
+            })),
           );
         }
       }

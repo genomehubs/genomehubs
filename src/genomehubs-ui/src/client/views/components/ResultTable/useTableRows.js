@@ -17,6 +17,7 @@ import RadioButtonCheckedOutlinedIcon from "@mui/icons-material/RadioButtonCheck
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import Tooltip from "../Tooltip";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { mixColor } from "#functions/mixColor.js";
 import { useMemo } from "react";
 import { useTheme } from "@mui/material/styles";
 
@@ -55,6 +56,17 @@ export const useTableRows = ({
   return useMemo(() => {
     const rows = [];
     let lastGroup = null;
+    // let lightColor = mixColor(
+    //   theme.palette.text.primary,
+    //   theme.palette.background.paper,
+    //   0.2,
+    // );
+    // let darkColor = mixColor(
+    //   theme.palette.text.primary,
+    //   theme.palette.background.paper,
+    //   0.9,
+    // );
+    console.log({ lightColor, darkColor });
 
     // First pass: Add result rows with group headers
     searchResults.results.forEach((result, idx) => {
@@ -69,7 +81,7 @@ export const useTableRows = ({
           <StyledTableRow
             key={`group-header-${result._msearchGroup.queryIndex}`}
             style={{
-              backgroundColor: headerBackgroundColor,
+              backgroundColor: darkColor,
               fontWeight: "bold",
               height: "32px",
             }}
@@ -78,11 +90,15 @@ export const useTableRows = ({
               colSpan="100"
               style={{
                 padding: "8px 16px",
+                backgroundColor: darkColor,
                 borderBottom: `2px solid ${theme.palette.divider}`,
-                color: headerTextColor,
+                color: lightColor,
               }}
             >
-              Results for: <em>{result._msearchGroup.query}</em>
+              Results for:{" "}
+              <b style={{ fontFamily: "Roboto Mono, monospace" }}>
+                {result._msearchGroup.query}
+              </b>
             </TableCell>
           </StyledTableRow>,
         );
@@ -580,7 +596,7 @@ export const useTableRows = ({
           <StyledTableRow
             key={`show-more-${groupIdx}`}
             style={{
-              backgroundColor: "#fafafa",
+              backgroundColor: lightColor,
               textAlign: "center",
               height: "40px",
             }}
@@ -593,6 +609,7 @@ export const useTableRows = ({
                 cursor: "pointer",
                 color: "#1976d2",
                 fontWeight: "500",
+                backgroundColor: lightColor,
               }}
             >
               Show more ({group.totalCount - group.count} hidden) - Load "

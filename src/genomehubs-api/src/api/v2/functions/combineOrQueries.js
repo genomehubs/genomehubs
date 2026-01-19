@@ -62,8 +62,8 @@ export const combineOrQueries = (queries) => {
 
   // Use first query as template for top-level settings
   const template = validQueries[0];
-  const size = template.size || 10;
-  const from = template.from || 0;
+  const size = template.size !== undefined ? template.size : 10;
+  const from = template.from !== undefined ? template.from : 0;
   let { _source, sort } = template;
 
   // Collect all aggregations from all queries
@@ -79,12 +79,12 @@ export const combineOrQueries = (queries) => {
   // Build should clause from queries, stripping ALL inner_hits
   // Each query object has a 'query' property containing the Elasticsearch query
   const shouldClauses = validQueries
-    .map((q) => {
+    .map((q, i) => {
       if (!q || !q.query) {
         console.error("combineOrQueries: Query missing .query property", q);
         return null;
       }
-      return stripAllInnerHits(q.query);
+      return i > 0 ? stripAllInnerHits(q.query) : q.query;
     })
     .filter((q) => q !== null);
 
@@ -101,13 +101,10 @@ export const combineOrQueries = (queries) => {
     },
   };
 
-  // Final pass: strip any remaining inner_hits from the combined query
-  const cleanedCombinedQuery = stripAllInnerHits(combinedQuery);
-
   const result = {
     size,
     from,
-    query: cleanedCombinedQuery,
+    query: combinedQuery,
   };
 
   if (_source) {

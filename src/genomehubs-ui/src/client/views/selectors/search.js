@@ -165,13 +165,13 @@ export function fetchMsearchResults(options, navigate) {
       offset: parseInt(search.offset, 10) || 0,
       // Pass search parameters with each search
       ...(params.includeEstimates !== undefined && {
-        includeEstimates: params.includeEstimates,
+        includeEstimates: Boolean(params.includeEstimates),
       }),
       ...(params.includeDescendants !== undefined && {
-        includeDescendants: params.includeDescendants,
+        includeDescendants: Boolean(params.includeDescendants),
       }),
       ...(params.includeRawValues !== undefined && {
-        includeRawValues: params.includeRawValues,
+        includeRawValues: Boolean(params.includeRawValues),
       }),
       ...(params.excludeAncestral !== undefined && {
         excludeAncestral: params.excludeAncestral,
@@ -243,8 +243,8 @@ export function fetchMsearchResults(options, navigate) {
             queryResult.hits &&
             Array.isArray(queryResult.hits)
           ) {
-            const { hits } = queryResult;
-            const totalCount = hits.length;
+            console.log(queryResult);
+            const { hits, total: totalCount } = queryResult;
             const displayCount = Math.min(totalCount, displayLimit);
             const hasMore = totalCount > displayLimit;
 
@@ -291,10 +291,7 @@ export function fetchMsearchResults(options, navigate) {
           queryGroups,
           results: allHits,
           displayLimit,
-          status: {
-            success: true,
-            hits: allHits.length, // Required for ResultTable to render
-          },
+          status: json.status,
         };
 
         // Get unique count across all queries by doing a union search

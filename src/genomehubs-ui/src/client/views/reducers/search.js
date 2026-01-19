@@ -44,18 +44,22 @@ const searchResults = handleActions(
       produce(state, (draft) => {
         draft.isFetching = false;
       }),
-    RECEIVE_SEARCH: (state, action) => ({
-      isFetching: false,
-      status: action.payload.status,
-      results: action.payload.results,
-      query: action.payload.query,
-      aggs: action.payload.aggs,
-      fields: action.payload.fields,
-      isMsearch: action.payload.isMsearch,
-      originalQueries: action.payload.originalQueries,
-      queryGroups: action.payload.queryGroups,
-      lastUpdated: action.meta.receivedAt,
-    }),
+    RECEIVE_SEARCH: (state, action) => {
+      console.log(action);
+      return {
+        isFetching: false,
+        status: action.payload.status,
+        results: action.payload.results,
+        query: action.payload.query,
+        aggs: action.payload.aggs,
+        fields: action.payload.fields,
+        isMsearch: action.payload.isMsearch,
+        originalQueries: action.payload.originalQueries,
+        queryGroups: action.payload.queryGroups,
+        lastUpdated: action.meta.receivedAt,
+        uniqueCount: action.payload.uniqueCount,
+      };
+    },
     RESET_SEARCH: defaultState,
   },
   defaultState(),

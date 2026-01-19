@@ -51,6 +51,7 @@ const Page = ({
   recordId,
   fieldId,
   resultCount,
+  uniqueCount,
   result,
   siteName,
 }) => {
@@ -153,6 +154,9 @@ const Page = ({
     title = `${fieldId} summary`;
   } else if (resultCount >= 0) {
     title = `${resultCount} ${resultCount == 1 ? "hit" : "hits"}`;
+    if (uniqueCount !== undefined && uniqueCount > 0) {
+      title += ` (${uniqueCount} unique)`;
+    }
     if (resultCount == 0) {
       searchTips = <SearchTips />;
     }

@@ -1766,21 +1766,25 @@ paths:
                         description: Include raw values alongside processed values
                         default: false
                       excludeAncestral:
-                        type: boolean
-                        description: Exclude ancestral taxa
-                        default: false
+                        type: array
+                        items:
+                          type: string
+                        description: Exclude ancestral taxa for the listed fields
                       excludeDescendant:
-                        type: boolean
-                        description: Exclude descendant taxa
-                        default: false
+                        type: array
+                        items:
+                          type: string
+                        description: Exclude descendant taxa for the listed fields
                       excludeDirect:
-                        type: boolean
-                        description: Exclude direct taxa
-                        default: false
+                        type: array
+                        items:
+                          type: string
+                        description: Exclude direct taxa for the listed fields
                       excludeMissing:
-                        type: boolean
-                        description: Exclude taxa with missing data
-                        default: false
+                        type: array
+                        items:
+                          type: string
+                        description: Exclude taxa with missing data for the listed fields
               required:
                 - searches
       responses:

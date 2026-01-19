@@ -202,7 +202,7 @@ const validateTerm = (term, types) => {
             attribute: "taxonomy",
             type: parts[0],
           },
-          types
+          types,
         ),
       };
     }
@@ -348,7 +348,7 @@ const generateSingleQuery = async ({
       try {
         ({ parts, validation, subset } = validateTerm(
           term,
-          lookupTypes[result]
+          lookupTypes[result],
         ));
       } catch (err) {
         validation = fail(`unable to validate query term ${term}`);
@@ -434,7 +434,7 @@ const generateSingleQuery = async ({
                 subset,
                 summary,
                 fields,
-                optionalFields
+                optionalFields,
               );
             }
             if (!parts[3].match(/^!/) && parts[4].match(/^null$/)) {
@@ -676,12 +676,8 @@ export const generateQuery = async (params) => {
       return part;
     });
 
-    console.log("OR Query Handler: Processing", orParts.length, "OR parts");
-    orParts.forEach((p, i) => console.log(`  Part ${i}: ${p}`));
-
     // Capture params now for use in the func closure
     const capturedParams = params;
-
     // Return a special function that combines OR queries into a single ES query
     return {
       func: async (callParams) => {
@@ -697,7 +693,6 @@ export const generateQuery = async (params) => {
 
           for (let i = 0; i < orParts.length; i++) {
             const orQuery = orParts[i];
-            console.log(`OR part ${i}: Processing "${orQuery}"`);
 
             // Generate the query structure for this OR part
             const orResult = await generateSingleQuery({
@@ -705,15 +700,8 @@ export const generateQuery = async (params) => {
               query: orQuery,
             });
 
-            console.log(
-              `OR part ${i} result:`,
-              orResult ? "has result" : "no result",
-              orResult?.params ? "has params" : "no params"
-            );
-
             // Extract the parameters
             if (!orResult || !orResult.params) {
-              console.error(`OR part ${i} failed:`, orResult);
               return (
                 orResult || {
                   status: {
@@ -727,13 +715,8 @@ export const generateQuery = async (params) => {
 
             // Call searchByTaxon to get the Elasticsearch query structure
             const taxonQuery = await searchByTaxon(orResult.params);
-            console.log(
-              `OR part ${i} taxonQuery:`,
-              taxonQuery ? "generated" : "null"
-            );
 
             if (!taxonQuery) {
-              console.error(`OR part ${i} searchByTaxon returned null`);
               return {
                 status: {
                   success: false,
@@ -746,12 +729,6 @@ export const generateQuery = async (params) => {
             orQueryBodies.push(taxonQuery);
           }
 
-          console.log(
-            "OR Handler: Built",
-            orQueryBodies.length,
-            "query bodies"
-          );
-
           if (orQueryBodies.length === 0) {
             return {
               status: { success: false, error: "No OR queries generated" },
@@ -761,7 +738,6 @@ export const generateQuery = async (params) => {
 
           // Combine queries with OR logic (should clause), stripping inner_hits
           const combinedQuery = combineOrQueries(orQueryBodies);
-          console.log("OR Handler: Combined query built");
 
           // Now execute the combined query against Elasticsearch
           let { index } = callParams;
@@ -776,7 +752,6 @@ export const generateQuery = async (params) => {
             const response = await client.search(searchParams, { meta: true });
             body = response.body;
           } catch (esErr) {
-            console.error("Elasticsearch error in OR handler:", esErr);
             return {
               status: {
                 success: false,
