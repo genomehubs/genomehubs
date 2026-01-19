@@ -242,13 +242,31 @@ const config = {
     // new webpack.ExtendedAPIPlugin(),
   ].concat(
     main.pagesUrl.startsWith("http")
-      ? []
+      ? [
+          new CopyWebpackPlugin({
+            patterns: [
+              {
+                from: "./public",
+                to: BUILD_DIR,
+              },
+              {
+                from: "./src/client/favicon",
+                to: BUILD_DIR,
+              },
+            ],
+          }),
+        ]
       : [
           new CopyWebpackPlugin({
             patterns: [
-              // {
-              //   from: "./src/client/favicon",
-              // },
+              {
+                from: "./public",
+                to: BUILD_DIR,
+              },
+              {
+                from: "./src/client/favicon",
+                to: BUILD_DIR,
+              },
               {
                 from: main.pagesPath,
                 to({ context, absoluteFilename }) {
