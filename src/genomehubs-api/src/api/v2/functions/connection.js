@@ -11,18 +11,3 @@ const client = new Client({
 });
 
 export { client };
-
-// console.log(client);
-
-// export const client = {
-//   test: "exports",
-//   cat: {
-//     indices: () => {
-//       console.log("testing");
-//     },
-//   },
-// };
-
-// console.log(client);
-
-// export default client;

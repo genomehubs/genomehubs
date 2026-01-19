@@ -502,7 +502,12 @@ export const useTableRows = ({
         </Tooltip>,
       );
 
-      rows.push(<StyledTableRow key={result.id}>{cells}</StyledTableRow>);
+      // Use unique key combining msearch query index (if present) with result ID
+      const rowKey = result._msearchGroup
+        ? `${result._msearchGroup.queryIndex}-${result.id}`
+        : result.id;
+
+      rows.push(<StyledTableRow key={rowKey}>{cells}</StyledTableRow>);
     });
 
     // Add group headers for queries with no results or errors

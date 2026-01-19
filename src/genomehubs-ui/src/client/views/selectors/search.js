@@ -297,6 +297,62 @@ export function fetchMsearchResults(options, navigate) {
           },
         };
 
+        // Get unique count across all queries by doing a union search
+        // Combine all queries with OR operator for deduplication
+        const unionQuery = originalQueries.map((q) => `(${q})`).join(" OR ");
+
+        try {
+          const uniqueCountParams = {
+            query: unionQuery,
+            result: result,
+            taxonomy: params.taxonomy || taxonomy,
+            size: "0",
+            // Include all search parameters to match the batch search
+            ...(params.includeEstimates !== undefined && {
+              includeEstimates: params.includeEstimates,
+            }),
+            ...(params.includeDescendants !== undefined && {
+              includeDescendants: params.includeDescendants,
+            }),
+            ...(params.includeRawValues !== undefined && {
+              includeRawValues: params.includeRawValues,
+            }),
+            ...(params.excludeAncestral !== undefined && {
+              excludeAncestral: params.excludeAncestral,
+            }),
+            ...(params.excludeDescendant !== undefined && {
+              excludeDescendant: params.excludeDescendant,
+            }),
+            ...(params.excludeDirect !== undefined && {
+              excludeDirect: params.excludeDirect,
+            }),
+            ...(params.excludeMissing !== undefined && {
+              excludeMissing: params.excludeMissing,
+            }),
+            ...(params.sortBy !== undefined && { sortBy: params.sortBy }),
+            ...(params.sortOrder !== undefined && {
+              sortOrder: params.sortOrder,
+            }),
+            ...(params.sortMode !== undefined && { sortMode: params.sortMode }),
+          };
+          const uniqueCountResponse = await fetch(
+            `${apiUrl}/search?${qs.stringify(uniqueCountParams)}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            },
+          );
+          const uniqueCountJson = await uniqueCountResponse.json();
+          if (uniqueCountJson && uniqueCountJson.status) {
+            groupedResults.uniqueCount = uniqueCountJson.status.hits || 0;
+          }
+        } catch (uniqueErr) {
+          console.error("Failed to get unique count:", uniqueErr);
+          // Continue without unique count if the query fails
+        }
+
         dispatch(receiveSearch(groupedResults));
 
         if (navigate) {

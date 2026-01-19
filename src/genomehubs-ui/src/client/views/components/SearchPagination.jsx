@@ -41,8 +41,7 @@ const SearchPagination = ({
 
   const navigate = useNavigate();
   const location = useLocation();
-  let pageSize = searchResults.status.size;
-  let offset = searchResults.status.offset;
+  let { size: pageSize, offset } = searchResults.status;
   let resultCount = searchResults.status.hits;
   let count = Math.ceil(resultCount / pageSize);
   let page = offset / pageSize;

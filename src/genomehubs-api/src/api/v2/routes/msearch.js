@@ -170,10 +170,6 @@ export const getMsearch = async (req, res) => {
     }
 
     // Execute all searches at once
-    console.log(
-      "msearchBody being sent to Elasticsearch:",
-      JSON.stringify(msearchBody, null, 2)
-    );
     const mSearchResponse = await client.msearch({ body: msearchBody });
     const responses =
       mSearchResponse?.body?.responses || mSearchResponse?.responses || [];
@@ -392,12 +388,6 @@ export const getMsearchDownload = async (req, res) => {
     // Extract responses - check both response.body.responses and response.responses
     const responses = response?.body?.responses || response?.responses || [];
 
-    console.log("msearch download - responses count:", responses.length);
-    console.log(
-      "msearch download - first response sample:",
-      JSON.stringify(responses[0], null, 2).substring(0, 500)
-    );
-
     // Combine all hits from all search responses, processing them through processHits
     const allHits = [];
     if (Array.isArray(responses)) {
@@ -413,11 +403,6 @@ export const getMsearchDownload = async (req, res) => {
         }
 
         if (searchResponse.hits?.hits && searchResponse.hits.hits.length > 0) {
-          console.log(
-            "msearch download - hits found:",
-            searchResponse.hits.hits.length
-          );
-
           // Parse fields to get what attributes are requested
           const parsedFields = await parseFields({
             result: searches[idx].result,
@@ -430,7 +415,6 @@ export const getMsearchDownload = async (req, res) => {
             taxonomy: searches[idx].taxonomy,
           });
 
-          // Process hits through processHits to extract field data properly
           const processedHits = processHits({
             body: searchResponse,
             fields: parsedFields,
@@ -449,8 +433,6 @@ export const getMsearchDownload = async (req, res) => {
         }
       }
     }
-
-    console.log("msearch download - total hits:", allHits.length);
 
     // Format response based on query parameter
     res.format({

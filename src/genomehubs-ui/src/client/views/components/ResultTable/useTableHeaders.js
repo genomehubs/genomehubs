@@ -43,6 +43,7 @@ export const useTableHeaders = ({
   setColSpan,
 }) => {
   return useMemo(() => {
+    console.log({ sortBy, sortOrder });
     let heads = [
       <SortableCell
         name={"scientific_name"}
