@@ -266,16 +266,22 @@ jobs:
         uses: actions/checkout@v3
       - uses: actions/download-artifact@v4
         with:
+          name: genomehubs-linux
           path: ./dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: genomehubs-api-bundle
+          path: ./src/genomehubs-api/build/
+      - uses: actions/download-artifact@v4
+        with:
+          name: genomehubs-ui-dist
+          path: ./src/genomehubs-ui/dist/
       - run: |
           mkdir -p src/docker/test
-          mv dist/genomehubs-linux/*manylinux2014_x86_64.whl src/docker/test/
+          mv dist/*manylinux2014_x86_64.whl src/docker/test/
           mkdir -p src/docker/test/genomehubs-api
-          cp dist/genomehubs-api-bundle/bundle.cjs src/docker/test/genomehubs-api/
+          cp src/genomehubs-api/build/bundle.cjs src/docker/test/genomehubs-api/
           cp src/genomehubs-api/package.json src/docker/test/genomehubs-api/
-          mkdir -p src/genomehubs-ui
-          cp -r dist/genomehubs-ui-dist/* src/genomehubs-ui/dist/
-          rm -rf dist/*
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
