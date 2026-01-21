@@ -59,7 +59,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean
 
 ## Create non-root user for security
-RUN useradd -m -u 1000 -s /sbin/nologin genomehubs \
+RUN useradd -m -u 10001 -s /sbin/nologin genomehubs \
     && mkdir -p /genomehubs \
     && chown -R genomehubs:genomehubs /genomehubs
 
@@ -71,9 +71,9 @@ COPY --from=builder /tmp/datasets /usr/local/bin/datasets
 
 ## Set environment variables
 ENV CONDA_DIR=/opt/conda
-ENV CONDA_DEFAULT_ENV=$CONDA_DIR/envs/genomehubs
-ENV PATH=$CONDA_DEFAULT_ENV/bin:$PATH
-ENV PYTHONPATH=$CONDA_DEFAULT_ENV/lib/python3.11/site-packages:$PYTHONPATH
+ENV CONDA_DEFAULT_ENV=${CONDA_DIR}/envs/genomehubs
+ENV PATH=${CONDA_DEFAULT_ENV}/bin:${PATH}
+ENV PYTHONPATH=${CONDA_DEFAULT_ENV}/lib/python3.11/site-packages:${PYTHONPATH}
 ENV PYTHONUNBUFFERED=1
 ENV CONTAINER_VERSION=$VERSION
 

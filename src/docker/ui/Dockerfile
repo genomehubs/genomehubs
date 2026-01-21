@@ -6,8 +6,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends git \
     && rm -rf /var/lib/apt/lists/*
 
-## Copy UI package manifests first for better layer caching
-COPY src/genomehubs-ui/package.json src/genomehubs-ui/package-lock.json ./
+## Copy UI package manifests and config first for better layer caching
+COPY src/genomehubs-ui/package.json src/genomehubs-ui/package-lock.json src/genomehubs-ui/.npmrc ./
 RUN npm ci --production=false
 
 ## Copy UI sources
