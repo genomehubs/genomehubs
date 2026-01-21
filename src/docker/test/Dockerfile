@@ -77,9 +77,9 @@ COPY --from=builder --chown=genomehubs:genomehubs /opt/conda /opt/conda
 
 ## Set environment variables
 ENV CONDA_DIR=/opt/conda
-ENV CONDA_DEFAULT_ENV=$CONDA_DIR/envs/genomehubs
-ENV PATH=/genomehubs:$CONDA_DEFAULT_ENV/bin:$PATH
-ENV PYTHONPATH=$CONDA_DEFAULT_ENV/lib/python3.11/site-packages:$PYTHONPATH
+ENV CONDA_DEFAULT_ENV=${CONDA_DIR}/envs/genomehubs
+ENV PATH=/genomehubs:${CONDA_DEFAULT_ENV}/bin:${PATH}
+ENV PYTHONPATH=${CONDA_DEFAULT_ENV}/lib/python3.11/site-packages
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /genomehubs
