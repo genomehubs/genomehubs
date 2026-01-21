@@ -13,7 +13,15 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "chromatic": "npx chromatic"
+    "chromatic": "npx chromatic",
+    "docker:build": "docker build -f ../docker/ui/Dockerfile -t genomehubs-ui:latest ../..",
+    "docker:build:version": "docker build -f ../docker/ui/Dockerfile -t genomehubs-ui:$npm_package_version ../..",
+    "docker:run": "docker run --rm -p 8880:8880 genomehubs-ui:latest",
+    "docker:run:ssr": "docker run --rm -p 8880:8880 -e SSR_MODE=all genomehubs-ui:latest",
+    "docker:run:bots": "docker run --rm -p 8880:8880 -e SSR_MODE=bots genomehubs-ui:latest",
+    "docker:run:content": "docker run --rm -p 8880:8880 -v /path/to/content:/content genomehubs-ui:latest",
+    "docker:run:envfile": "docker run --rm -p 8880:8880 --env-file ../docker/ui/.env genomehubs-ui:latest",
+    "docker:stop": "docker ps -q --filter ancestor=genomehubs-ui:latest | xargs -r docker stop"
   },
   "repository": {
     "type": "git",
