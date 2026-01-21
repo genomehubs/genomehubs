@@ -68,7 +68,7 @@ RUN curl -fsSL https://github.com/mikefarah/yq/releases/download/v4.16.2/yq_linu
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 ## Create non-root user for security
-RUN useradd -m -u 1000 -s /sbin/nologin genomehubs \
+RUN useradd -m -u 10001 -s /sbin/nologin genomehubs \
     && mkdir -p /genomehubs/tests /genomehubs/tests-out /genomehubs/resources \
     && chown -R genomehubs:genomehubs /genomehubs
 
