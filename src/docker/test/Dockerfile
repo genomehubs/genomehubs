@@ -28,11 +28,11 @@ RUN $CONDA_DIR/bin/conda create -n genomehubs python=3.11 \
 
 ## Install genomehubs CLI wheel
 WORKDIR /tmp
-COPY src/genomehubs-*-py3-none-manylinux*.whl ./
+COPY src/docker/test/genomehubs-*-py3-none-manylinux*.whl ./
 
 RUN CONDA_DEFAULT_ENV=/opt/conda/envs/genomehubs \
     PATH=/opt/conda/envs/genomehubs/bin:$PATH \
-    pip install --no-cache-dir ./genomehubs-*-py3-none-manylinux*.whl \
+    pip install --no-cache-dir $(ls ./genomehubs-*-py3-none-manylinux*.whl) \
     && rm ./genomehubs-*-py3-none-manylinux*.whl
 
 ## Runtime stage - full test environment
