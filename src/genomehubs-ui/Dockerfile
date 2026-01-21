@@ -22,7 +22,7 @@ ENV NODE_ENV=production
 
 # Copy only needed runtime files
 COPY --from=builder /app/dist /app/dist
-COPY --from=builder /app/server /app/server
+COPY --from=builder /app/src/server /app/src/server
 COPY --from=builder /app/package.json /app/package.json
 COPY --from=builder /app/package-lock.json /app/package-lock.json
 
@@ -39,4 +39,4 @@ ENV CONTENT_ROOT=/content/static
 ENV SSR_MODE=bots
 
 EXPOSE 8880
-CMD ["node", "server/index.js"]
+CMD ["node", "src/server/index.js"]

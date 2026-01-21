@@ -59,7 +59,7 @@ const BASE_PATH = process.env.BASE_PATH || DERIVED_BASE || "/"; // e.g. "/archiv
 console.log(
   `[server startup] GH_BASENAME="${process.env.GH_BASENAME}", DERIVED_BASE="${DERIVED_BASE}", BASE_PATH="${BASE_PATH}"`,
 );
-const BUILD_DIR = path.resolve(__dirname, "../dist/public");
+const BUILD_DIR = path.resolve(__dirname, "../../dist/public");
 const INDEX_HTML_PATH = path.join(BUILD_DIR, "index.html");
 const CONTENT_ROOT = process.env.CONTENT_ROOT || "/content/static"; // mount external markdown repo here
 const SSR_MODE = process.env.SSR_MODE || "all"; // "all" or "bots"
