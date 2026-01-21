@@ -35,7 +35,7 @@ RUN curl -fsSL https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linux-a
     && chmod 755 datasets
 
 ## Copy and install genomehubs wheel
-COPY src/genomehubs-*-py3-none-manylinux*.whl ./
+COPY src/docker/context/genomehubs-*-py3-none-manylinux*.whl ./
 
 RUN CONDA_DEFAULT_ENV=/opt/conda/envs/genomehubs \
     PATH=/opt/conda/envs/genomehubs/bin:$PATH \
