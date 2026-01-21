@@ -146,6 +146,10 @@ jobs:
         run: |
           curl -s "http://localhost:9200/_cat/health"
           mkdir -p projects/genomehubs/goat-resources
+
+          ## Set permissions for test data directory so genomehubs user (UID 10001) can write
+          chmod -R 777 tests/integration_tests/data
+
           docker run --rm --network host \
             -e GH_NODE=${{ env.GH_NODE }} \
             -e GH_HUBNAME=${{ env.GH_HUBNAME }} \
