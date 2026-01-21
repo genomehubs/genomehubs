@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       elasticsearch:
-        image: elasticsearch:8.9.0
+        image: elasticsearch:8.19.10
         env:
           discovery.type: single-node
           xpack.security.enabled: "false"
@@ -33,6 +33,12 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Build API bundle
+        working-directory: src/genomehubs-api
+        run: |
+          npm ci
+          npm run build:bundle
+
       - name: Build and run smoke tests
         working-directory: src/genomehubs-api
         env:
@@ -42,13 +48,10 @@ jobs:
           GH_API_PORT: 3003
         run: |
           set -euo pipefail
-          npm ci
-          npm run build:bundle
-          # start the api in background and capture pid
           GH_NODE=${GH_NODE} GH_HUBNAME=${GH_HUBNAME} GH_RELEASE=${GH_RELEASE} GH_API_PORT=${GH_API_PORT} node build/bundle.cjs > /tmp/gh-api.log 2>&1 &
           echo $! > /tmp/gh-api.pid
 
-          # wait for Elasticsearch to be ready (service has its own health, but be defensive)
+          # wait for Elasticsearch to be ready
           for i in {1..30}; do
             if curl -sSf http://localhost:9200/ >/dev/null 2>&1; then
               echo "Elasticsearch ready"
@@ -78,9 +81,6 @@ jobs:
           if [ ! -s taxonomies.json ]; then
             echo "Taxonomies response empty" && exit 1
           fi
-
-          # teardown
-          kill "$(cat /tmp/gh-api.pid)" || true
 
       - name: Build and test Docker container
         # run from repo root so paths are well-defined

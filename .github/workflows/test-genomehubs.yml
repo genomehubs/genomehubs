@@ -3,21 +3,22 @@ name: test-genomehubs
 on: [push]
 
 jobs:
-  package-ui:
+  build-ui:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: "16"
-      - run: npm install -g pkg
-      - run: |
-          sed -i '/"node16-macos-/d;s/"node16-linux-x64",/"node16-linux"/' src/packaged-ui/package.json
-          ./package-ui.sh
+          node-version: "24"
+      - name: Build UI assets
+        working-directory: ./src/genomehubs-ui
+        run: |
+          npm ci
+          npm run build
       - uses: actions/upload-artifact@v4
         with:
-          name: genomehubs-ui
-          path: ./dist/*
+          name: genomehubs-ui-dist
+          path: ./src/genomehubs-ui/dist/*
 
   build-api:
     runs-on: ubuntu-latest
@@ -47,7 +48,7 @@ jobs:
           bash Miniforge3.sh -b -p "${HOME}/conda"
           source "${HOME}/conda/etc/profile.d/conda.sh"
           source "${HOME}/conda/etc/profile.d/mamba.sh"
-          conda create -n genomehubs python=3.9
+          conda create -n genomehubs python=3.11
           conda activate genomehubs
           conda install pip
           pip install --upgrade pip
@@ -60,37 +61,80 @@ jobs:
           path: ./dist/*
 
   run-test-fill:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs:
       - build-api
-      - package-ui
+      - build-ui
       - package-genomehubs-linux
-    defaults:
-      run:
-        shell: bash -l {0}
+    services:
+      elasticsearch:
+        image: elasticsearch:8.19.10
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: "false"
+          ES_JAVA_OPTS: -Xms512m -Xmx512m
+        ports:
+          - 9200:9200
+        options: >-
+          --health-cmd="curl -sSf http://localhost:9200/ || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
     steps:
       - uses: actions/checkout@v3
+
       - name: Collect artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: ./dist
-      - name: move wheel file
-        run: mv dist/genomehubs-linux/*linux*.whl src/docker/test
-      - name: move api bundle
+
+      - name: Prepare test container artifacts
         run: |
+          # Copy wheel file
+          mkdir -p src/docker/test
+          mv dist/genomehubs-linux/*linux*.whl src/docker/test/
+
+          # Copy API build
           mkdir -p src/docker/test/genomehubs-api
-          cp dist/genomehubs-api/bundle.cjs src/docker/test/genomehubs-api/
-          cp dist/genomehubs-api/package.json src/docker/test/genomehubs-api/
-      - name: Build docker image
-        working-directory: ./src/docker/test
-        run: docker build . -t genomehubs
+          cp dist/genomehubs-api-bundle/bundle.cjs src/docker/test/genomehubs-api/
+          cp dist/genomehubs-api-bundle/package.json src/docker/test/genomehubs-api/
+
+          # Copy UI dist (for embedded assets if needed)
+          mkdir -p src/docker/test/genomehubs-ui-dist
+          cp -r dist/genomehubs-ui-dist/* src/docker/test/genomehubs-ui-dist/
+
+      - name: Build test Docker image
+        run: |
+          docker build \
+            -f src/docker/test/Dockerfile \
+            -t genomehubs-test:latest \
+            -t genomehubs-test:${{ github.sha }} \
+            .
+
+      - name: Wait for Elasticsearch
+        run: |
+          for i in {1..30}; do
+            if curl -sSf http://localhost:9200/ >/dev/null 2>&1; then
+              echo "Elasticsearch ready"
+              break
+            fi
+            echo "Waiting for Elasticsearch... ($i/30)"
+            sleep 2
+          done
+
       - name: Run test import
+        env:
+          GH_NODE: http://localhost:9200
+          GH_HUBNAME: genomehubs
+          GH_RELEASE: 2021.10.15
         run: |
           curl -s "http://localhost:9200/_cat/health"
           mkdir -p projects/genomehubs/goat-resources
-          docker run --rm --network=host \
-            -u $UID:$GROUPS \
-            -v `pwd`/projects/genomehubs/goat-resources:/projects/genomehubs/goat-resources \
-            -v `pwd`/tests:/genomehubs/tests \
-            genomehubs bash -c \
+          docker run --rm --network host \
+            -e GH_NODE=${{ env.GH_NODE }} \
+            -e GH_HUBNAME=${{ env.GH_HUBNAME }} \
+            -e GH_RELEASE=${{ env.GH_RELEASE }} \
+            -v $(pwd)/projects/genomehubs/goat-resources:/projects/genomehubs/goat-resources \
+            -v $(pwd)/tests:/genomehubs/tests \
+            genomehubs-test:latest bash -c \
               "tests/integration_tests/scripts/load_goat_test_data.sh"

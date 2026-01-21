@@ -1,0 +1,34 @@
+## Site-specific UI container
+## Builds on top of generic genomehubs-ui image with content from GitHub repo
+
+ARG BASE_IMAGE=genomehubs-ui:latest
+ARG SITE_REPO=genomehubs/goat-ui
+ARG SITE_BRANCH=main
+
+## Build stage - fetch site content from GitHub
+FROM alpine:3.20 AS content-builder
+ARG SITE_REPO
+ARG SITE_BRANCH
+
+RUN apk add --no-cache git
+
+WORKDIR /tmp
+RUN git clone --depth 1 --branch ${SITE_BRANCH} https://github.com/${SITE_REPO}.git site-content
+
+## Runtime stage - layer content onto generic UI image
+FROM ${BASE_IMAGE}
+
+ARG SITE_NAME=GenomeHub
+ARG GH_API_URL=http://localhost:3000/api/v2
+
+## Copy content from builder stage
+COPY --from=content-builder --chown=nonroot:nonroot /tmp/site-content/static /content/static
+COPY --from=content-builder --chown=nonroot:nonroot /tmp/site-content/assets /content/assets
+COPY --from=content-builder --chown=nonroot:nonroot /tmp/site-content/meta.json /content/meta.json
+
+## Set site-specific environment
+ENV GH_SITENAME=${SITE_NAME}
+ENV GH_API_URL=${GH_API_URL}
+
+USER nonroot
+CMD ["node", "src/server/index.js"]
