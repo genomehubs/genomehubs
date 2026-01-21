@@ -296,6 +296,13 @@ jobs:
           ls -la src/docker/test/genomehubs-api/
 
           echo ""
+          echo "=== Copying UI dist ==="
+          mkdir -p src/docker/test/genomehubs-ui-dist
+          ls -la src/genomehubs-ui/dist/
+          cp -r src/genomehubs-ui/dist/* src/docker/test/genomehubs-ui-dist/ || echo "Failed to copy UI dist"
+          ls -la src/docker/test/genomehubs-ui-dist/ | head -10
+
+          echo ""
           echo "=== Final test context ==="
           find src/docker/test -type f | sort
       - name: Login to Docker Hub
