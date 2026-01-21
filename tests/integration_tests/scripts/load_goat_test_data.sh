@@ -1,6 +1,9 @@
 #!/bin/bash
 
-curl -X DELETE 'localhost:9200/*2021.10.15*'
+## Delete existing indices for this release
+for index in assembly sample taxon feature analysis file; do
+  curl -X DELETE "localhost:9200/${index}--ncbi--goat--2021.10.15" 2>/dev/null || true
+done
 # genomehubs parse \
 #     --ncbi-datasets-sample tests/integration_tests/data/assembly-data-sample/eukaryota \
 #     --outfile tests/integration_tests/data/assembly-data-sample/ncbi_datasets.tsv
@@ -23,6 +26,7 @@ genomehubs index \
 genomehubs index \
     --config-file tests/integration_tests/config/goat.yaml \
     --taxonomy-source ncbi \
+    --taxon-preload \
     --taxon-dir tests/integration_tests/data/tolids \
     --taxon-lookup any \
     --taxon-spellcheck &&
