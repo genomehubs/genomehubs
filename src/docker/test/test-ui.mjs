@@ -141,7 +141,7 @@ async function scrape(reports, directory) {
       let element3;
       try {
         element3 = await page.waitForSelector(
-          "#report-download-button >>>> button"
+          "#report-download-button >>>> button",
         );
       } catch (error) {
         console.log(`caught 6 ${i}`);
@@ -176,7 +176,7 @@ async function scrape(reports, directory) {
       try {
         fs.renameSync(
           `${downloadPath}/report.png`,
-          `${downloadPath}/${filename}`
+          `${downloadPath}/${filename}`,
         );
         console.error(` - renamed to ${downloadPath}/${filename}`);
       } catch (err) {
@@ -200,7 +200,7 @@ const loopTestDirs = async (parentDir) => {
       let errors = await scrape(config, `${outDir}/${directory}`);
       if (Object.keys(errors).length > 0) {
         console.error(
-          `FAILED: ${Object.keys(errors).length} tests failed in ${directory}`
+          `FAILED: ${Object.keys(errors).length} tests failed in ${directory}`,
         );
         process.exit(1);
       } else {
