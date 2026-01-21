@@ -1,5 +1,5 @@
 ## Build stage
-FROM node:24-bookworm AS builder
+FROM node:24-bookworm-slim AS builder
 WORKDIR /app
 ## Copy only API package manifests first for better layer caching
 COPY src/genomehubs-api/package.json src/genomehubs-api/package-lock.json ./

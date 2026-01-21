@@ -97,7 +97,7 @@ jobs:
           # Copy API build
           mkdir -p src/docker/test/genomehubs-api
           cp dist/genomehubs-api-bundle/bundle.cjs src/docker/test/genomehubs-api/
-          cp dist/genomehubs-api-bundle/package.json src/docker/test/genomehubs-api/
+          cp src/genomehubs-api/package.json src/docker/test/genomehubs-api/
 
           # Copy UI dist (for embedded assets if needed)
           mkdir -p src/docker/test/genomehubs-ui-dist

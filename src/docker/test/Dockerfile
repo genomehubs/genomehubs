@@ -1,5 +1,5 @@
 ## Build stage - compile dependencies and prepare test environment
-FROM node:24-bookworm AS builder
+FROM node:24-bookworm-slim AS builder
 ARG VERSION=2.7.37
 LABEL maintainer="contact@genomehubs.org"
 LABEL license="MIT"
@@ -36,7 +36,7 @@ RUN CONDA_DEFAULT_ENV=/opt/conda/envs/genomehubs \
     && rm ./genomehubs-*-py3-none-manylinux*.whl
 
 ## Runtime stage - full test environment
-FROM node:24-bookworm
+FROM node:24-bookworm-slim
 ARG VERSION=2.7.37
 LABEL maintainer="contact@genomehubs.org"
 LABEL license="MIT"
