@@ -88,8 +88,8 @@ WORKDIR /genomehubs
 RUN npm install --production js-yaml puppeteer
 
 ## Copy test components
-COPY --chown=genomehubs:genomehubs src/genomehubs-api/build/ ./genomehubs-api/
-COPY --chown=genomehubs:genomehubs src/genomehubs-ui/dist/ ./genomehubs-ui-dist/
+COPY --chown=genomehubs:genomehubs src/docker/test/genomehubs-api/ ./genomehubs-api/
+COPY --chown=genomehubs:genomehubs src/docker/test/genomehubs-ui-dist/ ./genomehubs-ui-dist/
 
 ## Copy test scripts and utilities
 COPY --chown=genomehubs:genomehubs src/docker/test/genomehubs-test-ui.sh ./genomehubs-test-ui
