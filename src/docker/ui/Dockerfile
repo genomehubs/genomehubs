@@ -1,31 +1,53 @@
-FROM alpine:3.15
-LABEL maintainer="contact@genomehubs.org"
-LABEL license="MIT"
-ARG VERSION=2.11.17
-LABEL version=$VERSION
+## Build stage
+FROM node:24-bookworm AS builder
+WORKDIR /app
 
-ENV CONTAINER_VERSION=$VERSION
+## Install build dependencies (git required for git-revision-webpack-plugin)
+RUN apt-get update && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apk add --no-cache curl gcompat libstdc++ libgcc
+## Copy UI package manifests first for better layer caching
+COPY src/genomehubs-ui/package.json src/genomehubs-ui/package-lock.json ./
+RUN npm ci --production=false
 
-RUN mkdir -p /genomehubs/local
+## Copy UI sources
+COPY src/genomehubs-ui/. .
 
-COPY genomehubs-ui-linux /genomehubs/genomehubs-ui
+## Build static assets with webpack
+RUN npm run build
 
-RUN addgroup -S genomehubs \
-    && adduser -S genomehubs -G genomehubs \
-    && chown -R genomehubs:genomehubs /genomehubs
+## Prepare logs directory in builder
+RUN mkdir -p /app/logs \
+    && chown -R node:node /app/logs \
+    && chmod -R 0755 /app/logs
 
-USER genomehubs
+## Runtime stage - use distroless for minimal footprint
+FROM gcr.io/distroless/nodejs24-debian12
+WORKDIR /app
 
-WORKDIR /genomehubs
+## Copy built assets and server code
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/src/server ./src/server
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package-lock.json ./package-lock.json
 
-RUN chmod 755 genomehubs-ui
+## Copy pre-created logs directory
+COPY --from=builder --chown=nonroot:nonroot /app/logs /app/logs
 
-ENV PATH /genomehubs:$PATH
+## Install production dependencies only
+RUN npm ci --omit=dev --production=true
 
-COPY .env /genomehubs/
+## Content mount point (markdown repos)
+VOLUME ["/content"]
+
+## Configuration via environment variables
+ENV NODE_ENV=production
+ENV BASE_PATH=/
+ENV PORT=8880
+ENV CONTENT_ROOT=/content/static
+ENV SSR_MODE=bots
 
 EXPOSE 8880
 
-CMD genomehubs-ui
+## Run SSR server
+CMD ["src/server/index.js"]
