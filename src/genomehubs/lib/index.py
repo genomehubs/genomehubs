@@ -11,7 +11,7 @@ Usage:
                      [--taxon-dir PATH] [--taxon-repo URL] [--taxon-exception PATH]
                      [--taxon-lookup STRING] [--taxon-lookup-root STRING]
                      [--taxon-lookup-in-memory] [--taxon-id-as-xref STRING]
-                     [--taxon-matching-ranks INT] [--taxon-preload]
+                     [--taxon-matching-ranks INT]
                      [--taxon-spellcheck] [--taxonomy-source STRING]
                      [--blank STRING...]
                      [--file PATH...] [file-dir PATH...]
@@ -39,7 +39,6 @@ Options:
     --taxon-id-as-xref STRING  Set source DB name to treat taxon_id in file as xref.
     --taxon-matching-ranks INT Number of ancestral ranks that must match to import a taxon based on
                                name match. [Default: 2]
-    --taxon-preload            Flag to index into preloaded taxon index instead of taxonomy index.
     --taxon-spellcheck         Flag to use fuzzy matching to match taxon names.
     --taxon-dir PATH           Path to directory containing taxon-level data.
     --taxon-repo URL           Remote git repository containing taxon-level data.
@@ -642,6 +641,7 @@ def cli():
         args = docopt(__doc__, argv=[])
     else:
         args = docopt(__doc__, version=__version__)
+    args["taxon-preload"] = True
     main(args)
 
 

@@ -82,15 +82,16 @@ jobs:
           chmod 777 elasticsearch-data
           docker run -d \
             --name elasticsearch \
-            -e discovery.type=single-node \
-            -e xpack.security.enabled=false \
-            -e ES_JAVA_OPTS="-Xms1g -Xmx1g" \
-            -e cluster.routing.allocation.disk.watermark.low=80% \
-            -e cluster.routing.allocation.disk.watermark.high=85% \
-            -e cluster.routing.allocation.disk.watermark.flood_stage=90% \
+            -e "xpack.security.enabled=false" \
+            -e "discovery.type=single-node" \
+            -e "action.destructive_requires_name=false" \
+            -e "ES_JAVA_OPTS=-Xms2g -Xmx2g" \
+            -e "cluster.routing.allocation.disk.watermark.low=80%" \
+            -e "cluster.routing.allocation.disk.watermark.high=85%" \
+            -e "cluster.routing.allocation.disk.watermark.flood_stage=90%" \
             -p 9200:9200 \
             -v $(pwd)/elasticsearch-data:/usr/share/elasticsearch/data \
-            elasticsearch:8.17.2
+            elasticsearch:8.19.10
 
       - name: Wait for Elasticsearch
         run: |

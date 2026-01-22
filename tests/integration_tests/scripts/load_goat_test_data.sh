@@ -1,9 +1,8 @@
 #!/bin/bash
 
-## Delete existing indices for this release
-for index in assembly sample taxon feature analysis file; do
-  curl -X DELETE "localhost:9200/${index}--ncbi--goat--2021.10.15" 2>/dev/null || true
-done
+# Delete all indices for this release (including taxon) and the template
+curl -X DELETE "localhost:9200/*goat--2021.10.15" 2>/dev/null || true
+
 # genomehubs parse \
 #     --ncbi-datasets-sample tests/integration_tests/data/assembly-data-sample/eukaryota \
 #     --outfile tests/integration_tests/data/assembly-data-sample/ncbi_datasets.tsv
@@ -26,7 +25,6 @@ genomehubs index \
 genomehubs index \
     --config-file tests/integration_tests/config/goat.yaml \
     --taxonomy-source ncbi \
-    --taxon-preload \
     --taxon-dir tests/integration_tests/data/tolids \
     --taxon-lookup any \
     --taxon-spellcheck &&
@@ -36,6 +34,11 @@ genomehubs index \
     --taxon-dir tests/integration_tests/data/genomesize_karyotype \
     --taxon-lookup any \
     --taxon-spellcheck &&
+
+# # Print mapping for taxon index just before the next genomehubs index command (where the error occurs)
+# echo "\n==== TAXON INDEX MAPPING BEFORE FAILING QUERY ===="
+# curl -s -X GET "localhost:9200/taxon--ncbi--goat--2021.10.15/_mapping?pretty" | tee taxon_index_mapping_at_query.json
+# echo "==== END TAXON INDEX MAPPING ===="
 genomehubs index \
     --config-file tests/integration_tests/config/goat.yaml \
     --taxonomy-source ncbi \
