@@ -601,6 +601,9 @@ def lookup_taxon_in_index(
                 {name: {"matches": matches, "taxon_id": taxon_id, "rank": rank}}
             )
         return []
+    LOGGER.debug(
+        "Taxon lookup failed for '%s' (rank: %s), attempting spellcheck", name, rank
+    )
     return taxon_lookup(es, body, index, taxonomy_index_template, opts, return_type)
 
 
