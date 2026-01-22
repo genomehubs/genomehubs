@@ -73,7 +73,7 @@ jobs:
         run: |
           df -h
           docker system prune -af --volumes
-          rm -rf /var/lib/docker/overlay2/*/diff/
+          sudo rm -rf /var/lib/docker/overlay2/*/diff/ || true
           df -h
 
       - name: Start Elasticsearch with local mount
