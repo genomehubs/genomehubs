@@ -75,6 +75,8 @@ jobs:
           ES_JAVA_OPTS: -Xms1g -Xmx1g
         ports:
           - 9200:9200
+        volumes:
+          - elasticsearch-data:/usr/share/elasticsearch/data
         options: >-
           --health-cmd="curl -sSf http://localhost:9200/ || exit 1"
           --health-interval=10s
