@@ -72,7 +72,8 @@ jobs:
       - name: Free up disk space
         run: |
           df -h
-          docker system prune -af
+          docker system prune -af --volumes
+          rm -rf /var/lib/docker/overlay2/*/diff/
           df -h
 
       - name: Start Elasticsearch with local mount
@@ -161,6 +162,14 @@ jobs:
           GH_RELEASE: 2021.10.15
         run: |
           curl -s "http://localhost:9200/_cat/health"
+
+          echo "=== Host disk space before import ==="
+          df -h
+
+          echo "=== Container disk space before import ==="
+          docker exec elasticsearch df -h
+          docker exec elasticsearch du -sh /usr/share/elasticsearch/data
+
           mkdir -p projects/genomehubs/goat-resources
 
           ## Set permissions for test data directory so genomehubs user (UID 10001) can write
@@ -174,3 +183,17 @@ jobs:
             -v $(pwd)/tests:/genomehubs/tests \
             genomehubs-test:latest bash -c \
               "tests/integration_tests/scripts/load_goat_test_data.sh"
+
+      - name: Check disk space after import failure
+        if: failure()
+        run: |
+          echo "=== Host disk space after failure ==="
+          df -h
+
+          echo "=== Container disk space after failure ==="
+          docker exec elasticsearch df -h 2>/dev/null || echo "Container not accessible"
+          docker exec elasticsearch du -sh /usr/share/elasticsearch/data 2>/dev/null || echo "Cannot read container data"
+
+          echo "=== Local elasticsearch-data directory ==="
+          du -sh elasticsearch-data
+          find elasticsearch-data -type d | head -20
