@@ -26,6 +26,7 @@ genomehubs index \
 genomehubs index \
     --config-file tests/integration_tests/config/goat.yaml \
     --taxonomy-source ncbi \
+    --taxon-preload \
     --taxon-dir tests/integration_tests/data/tolids \
     --taxon-lookup any \
     --taxon-spellcheck &&
