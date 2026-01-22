@@ -85,6 +85,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Free up disk space
+        run: |
+          df -h
+          docker system prune -af
+          df -h
+
       - name: Collect artifacts
         uses: actions/download-artifact@v4
         with:
