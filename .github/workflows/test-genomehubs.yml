@@ -179,14 +179,19 @@ jobs:
           ## Set permissions for test data directory so genomehubs user (UID 10001) can write
           chmod -R 777 tests/integration_tests/data
 
-          docker run --rm --network host \
-            -e GH_NODE=${{ env.GH_NODE }} \
-            -e GH_HUBNAME=${{ env.GH_HUBNAME }} \
-            -e GH_RELEASE=${{ env.GH_RELEASE }} \
-            -v $(pwd)/projects/genomehubs/goat-resources:/projects/genomehubs/goat-resources \
-            -v $(pwd)/tests:/genomehubs/tests \
-            genomehubs-test:latest bash -c \
-              "tests/integration_tests/scripts/load_goat_test_data.sh"
+            for attempt in 1 2; do
+            echo "=== Test import attempt $attempt ==="
+            docker run --rm --network host \
+              -e GH_NODE=${{ env.GH_NODE }} \
+              -e GH_HUBNAME=${{ env.GH_HUBNAME }} \
+              -e GH_RELEASE=${{ env.GH_RELEASE }} \
+              -v $(pwd)/projects/genomehubs/goat-resources:/projects/genomehubs/goat-resources \
+              -v $(pwd)/tests:/genomehubs/tests \
+              genomehubs-test:latest bash -c \
+              "tests/integration_tests/scripts/load_goat_test_data.sh" && break
+            echo "Test import failed, retrying..."
+            sleep 5
+            done
 
       - name: Check disk space after import failure
         if: failure()

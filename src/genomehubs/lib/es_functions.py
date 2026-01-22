@@ -35,8 +35,9 @@ def test_connection(opts, *, log=False):
     es = Elasticsearch(hosts=hosts, timeout=1800, max_retries=10, retry_on_timeout=True)
     connected = es.info()
     #   pass
+    # sourcery skip: no-conditionals-in-tests
     if not connected:
-        message = "Could not connect to Elasticsearch at '%s'" % ", ".join(hosts)
+        message = f"""Could not connect to Elasticsearch at '{", ".join(hosts)}'"""
         if log:
             LOGGER.error(message)
             sys.exit(1)
@@ -183,13 +184,28 @@ def index_create(es, index_name):
 
 def load_mapping(es, mapping_name, mapping):
     """Load index mapping template into Elasticsearch."""
-    es_client = client.IndicesClient(es)
+    # Use composable index templates instead of legacy templates
     LOGGER.info(
-        f"Loading index template '{mapping_name}' with pattern: {mapping.get('index_patterns', 'unknown')}"
+        f"Loading composable index template '{mapping_name}' with pattern: {mapping.get('index_patterns', 'unknown')}"
     )
+    # Ensure mapping is in composable template format
+    composable_body = {
+        "index_patterns": mapping.get("index_patterns", [f"{mapping_name}-*"]),
+        "template": {"mappings": mapping.get("mappings", {})},
+    }
+    # Add settings/aliases if present
+    if "settings" in mapping:
+        composable_body["template"]["settings"] = mapping["settings"]
+    if "aliases" in mapping:
+        composable_body["template"]["aliases"] = mapping["aliases"]
     with tolog.DisableLogger():
-        res = es_client.put_template(name=mapping_name, body=mapping)
-    LOGGER.info(f"Template '{mapping_name}' loaded successfully")
+        res = es.transport.perform_request(
+            "PUT",
+            f"/_index_template/{mapping_name}",
+            body=composable_body,
+            headers={"Content-Type": "application/json"},
+        )
+    LOGGER.info(f"Composable template '{mapping_name}' loaded successfully")
     return res
 
 
