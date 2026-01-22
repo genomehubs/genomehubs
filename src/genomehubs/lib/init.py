@@ -219,16 +219,16 @@ def main(args):
                 )
 
         # Prepare taxon index
-        # taxon_template = taxon.index_template(taxonomy_name, options["init"])
-        # es_functions.load_mapping(es, taxon_template["name"], taxon_template["mapping"])
-        # es_functions.index_create(es, taxon_template["index_name"])
-        # if options["init"].get("taxon-preload", False):
-        #     LOGGER.info("Loading all taxa from taxonomy into taxon index")
-        #     body = {
-        #         "source": {"index": template["index_name"]},
-        #         "dest": {"index": taxon_template["index_name"]},
-        #     }
-        #     es.reindex(body=body)
+        taxon_template = taxon.index_template(taxonomy_name, options["init"])
+        es_functions.load_mapping(es, taxon_template["name"], taxon_template["mapping"])
+        es_functions.index_create(es, taxon_template["index_name"])
+        if options["init"].get("taxon-preload", False):
+            LOGGER.info("Loading all taxa from taxonomy into taxon index")
+            body = {
+                "source": {"index": template["index_name"]},
+                "dest": {"index": taxon_template["index_name"]},
+            }
+            es.reindex(body=body)
 
         # Prepare assembly index
         assembly_template = sample.index_template(
