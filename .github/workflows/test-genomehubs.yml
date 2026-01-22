@@ -75,17 +75,17 @@ jobs:
           docker system prune -af
           df -h
 
-      - name: Start Elasticsearch on /mnt
+      - name: Start Elasticsearch on /tmp
         run: |
-          mkdir -p /mnt/elasticsearch-data
-          chmod 777 /mnt/elasticsearch-data
+          mkdir -p /tmp/elasticsearch-data
+          chmod 777 /tmp/elasticsearch-data
           docker run -d \
             --name elasticsearch \
             -e discovery.type=single-node \
             -e xpack.security.enabled=false \
             -e ES_JAVA_OPTS="-Xms1g -Xmx1g" \
             -p 9200:9200 \
-            -v /mnt/elasticsearch-data:/usr/share/elasticsearch/data \
+            -v /tmp/elasticsearch-data:/usr/share/elasticsearch/data \
             elasticsearch:8.19.10
 
       - name: Wait for Elasticsearch
