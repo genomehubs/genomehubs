@@ -69,41 +69,35 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # - name: Free up disk space
-      #   run: |
-      #     df -h
-      #     docker system prune -af
-      #     df -h
+      - name: Free up disk space
+        run: |
+          df -h
+          docker system prune -af
+          df -h
 
-      # - name: Start Elasticsearch on /tmp
-      #   run: |
-      #     mkdir -p /tmp/elasticsearch-data
-      #     chmod 777 /tmp/elasticsearch-data
-      #     docker run -d \
-      #       --name elasticsearch \
-      #       -e discovery.type=single-node \
-      #       -e xpack.security.enabled=false \
-      #       -e ES_JAVA_OPTS="-Xms1g -Xmx1g" \
-      #       -p 9200:9200 \
-      #       -v /tmp/elasticsearch-data:/usr/share/elasticsearch/data \
-      #       elasticsearch:8.17.2
+      - name: Start Elasticsearch with local mount
+        run: |
+          mkdir -p elasticsearch-data
+          chmod 777 elasticsearch-data
+          docker run -d \
+            --name elasticsearch \
+            -e discovery.type=single-node \
+            -e xpack.security.enabled=false \
+            -e ES_JAVA_OPTS="-Xms1g -Xmx1g" \
+            -p 9200:9200 \
+            -v $(pwd)/elasticsearch-data:/usr/share/elasticsearch/data \
+            elasticsearch:8.17.2
 
-      # - name: Wait for Elasticsearch
-      #   run: |
-      #     for i in {1..30}; do
-      #       if curl -sSf http://localhost:9200/ > /dev/null 2>&1; then
-      #         echo "Elasticsearch is ready"
-      #         break
-      #       fi
-      #       echo "Waiting for Elasticsearch... (attempt $i/30)"
-      #       sleep 2
-      #     done
-
-      - name: Runs Elasticsearch
-        uses: elastic/elastic-github-actions/elasticsearch@master
-        with:
-          stack-version: 8.19.10
-          security-enabled: false
+      - name: Wait for Elasticsearch
+        run: |
+          for i in {1..30}; do
+            if curl -sSf http://localhost:9200/ > /dev/null 2>&1; then
+              echo "Elasticsearch is ready"
+              break
+            fi
+            echo "Waiting for Elasticsearch... (attempt $i/30)"
+            sleep 2
+          done
 
       - name: Collect artifacts
         uses: actions/download-artifact@v4

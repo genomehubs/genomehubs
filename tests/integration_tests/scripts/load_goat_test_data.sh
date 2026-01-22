@@ -23,13 +23,13 @@ genomehubs index \
     --config-file tests/integration_tests/config/goat.yaml \
     --taxonomy-source ncbi \
     --taxon-dir tests/integration_tests/data/ott3.3 &&
-# genomehubs index \
-#     --config-file tests/integration_tests/config/goat.yaml \
-#     --taxonomy-source ncbi \
-#     --taxon-preload \
-#     --taxon-dir tests/integration_tests/data/tolids \
-#     --taxon-lookup any \
-#     --taxon-spellcheck &&
+genomehubs index \
+    --config-file tests/integration_tests/config/goat.yaml \
+    --taxonomy-source ncbi \
+    --taxon-preload \
+    --taxon-dir tests/integration_tests/data/tolids \
+    --taxon-lookup any \
+    --taxon-spellcheck &&
 genomehubs index \
     --config-file tests/integration_tests/config/goat.yaml \
     --taxonomy-source ncbi \
