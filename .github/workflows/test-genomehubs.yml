@@ -66,22 +66,6 @@ jobs:
       - build-api
       - build-ui
       - package-genomehubs-linux
-    services:
-      elasticsearch:
-        image: elasticsearch:8.19.10
-        env:
-          discovery.type: single-node
-          xpack.security.enabled: "false"
-          ES_JAVA_OPTS: -Xms1g -Xmx1g
-        ports:
-          - 9200:9200
-        volumes:
-          - elasticsearch-data:/usr/share/elasticsearch/data
-        options: >-
-          --health-cmd="curl -sSf http://localhost:9200/ || exit 1"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
     steps:
       - uses: actions/checkout@v3
 
@@ -90,6 +74,30 @@ jobs:
           df -h
           docker system prune -af
           df -h
+
+      - name: Start Elasticsearch on /mnt
+        run: |
+          mkdir -p /mnt/elasticsearch-data
+          chmod 777 /mnt/elasticsearch-data
+          docker run -d \
+            --name elasticsearch \
+            -e discovery.type=single-node \
+            -e xpack.security.enabled=false \
+            -e ES_JAVA_OPTS="-Xms1g -Xmx1g" \
+            -p 9200:9200 \
+            -v /mnt/elasticsearch-data:/usr/share/elasticsearch/data \
+            elasticsearch:8.19.10
+
+      - name: Wait for Elasticsearch
+        run: |
+          for i in {1..30}; do
+            if curl -sSf http://localhost:9200/ > /dev/null 2>&1; then
+              echo "Elasticsearch is ready"
+              break
+            fi
+            echo "Waiting for Elasticsearch... (attempt $i/30)"
+            sleep 2
+          done
 
       - name: Collect artifacts
         uses: actions/download-artifact@v4
