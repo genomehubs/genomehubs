@@ -151,16 +151,45 @@ def index_create(es, index_name):
     es_client = client.IndicesClient(es)
     res = index_exists(es, index_name)
     if not res:
+        LOGGER.info(f"Creating index '{index_name}'")
         with tolog.DisableLogger():
             res = es_client.create(index=index_name)
+        # Verify the created index has correct mapping
+        try:
+            mapping = es_client.get_mapping(index=index_name)
+            has_taxon_names = False
+            if index_name in mapping:
+                props = mapping[index_name].get("mappings", {}).get("properties", {})
+                if "taxon_names" in props:
+                    field_type = props["taxon_names"].get("type")
+                    has_taxon_names = field_type == "nested"
+                    LOGGER.info(
+                        f"Index '{index_name}' created with taxon_names type: {field_type}"
+                    )
+                else:
+                    LOGGER.warning(
+                        f"Index '{index_name}' created WITHOUT taxon_names field!"
+                    )
+            if not has_taxon_names and "taxon" in index_name:
+                LOGGER.error(
+                    f"Taxonomy index '{index_name}' missing nested taxon_names mapping!"
+                )
+        except Exception as e:
+            LOGGER.warning(f"Could not verify mapping for '{index_name}': {e}")
+    else:
+        LOGGER.info(f"Index '{index_name}' already exists")
     return res
 
 
 def load_mapping(es, mapping_name, mapping):
     """Load index mapping template into Elasticsearch."""
     es_client = client.IndicesClient(es)
+    LOGGER.info(
+        f"Loading index template '{mapping_name}' with pattern: {mapping.get('index_patterns', 'unknown')}"
+    )
     with tolog.DisableLogger():
         res = es_client.put_template(name=mapping_name, body=mapping)
+    LOGGER.info(f"Template '{mapping_name}' loaded successfully")
     return res
 
 

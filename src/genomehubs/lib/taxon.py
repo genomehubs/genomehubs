@@ -551,8 +551,30 @@ def spellcheck_taxon(es, name, index, rank, taxonomy_index_template, opts, retur
 def taxon_lookup(es, body, index, taxonomy_index_template, opts, return_type):
     """Query elasticsearch for a taxon."""
     taxa = []
-    with tolog.DisableLogger():
-        res = es.search_template(body=body, index=index, rest_total_hits_as_int=True)
+    try:
+        with tolog.DisableLogger():
+            res = es.search_template(
+                body=body, index=index, rest_total_hits_as_int=True
+            )
+    except Exception as e:
+        # Log diagnostic information when query fails
+        LOGGER.error(f"Taxon lookup failed for index '{index}': {e}")
+        try:
+            # Check cluster health
+            health = es.cluster.health()
+            LOGGER.error(f"Cluster health: {health}")
+
+            # Check if index exists
+            if es.indices.exists(index=index):
+                # Get index mapping
+                mapping = es.indices.get_mapping(index=index)
+                LOGGER.error(f"Index '{index}' mapping: {mapping}")
+            else:
+                LOGGER.error(f"Index '{index}' does not exist")
+        except Exception as diag_error:
+            LOGGER.error(f"Failed to get diagnostic info: {diag_error}")
+        raise
+
     if "hits" in res and res["hits"]["total"] > 0:
         if return_type == "taxon_id":
             taxa = [hit["_source"]["taxon_id"] for hit in res["hits"]["hits"]]
