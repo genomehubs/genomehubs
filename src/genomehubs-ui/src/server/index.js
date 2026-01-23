@@ -8,18 +8,57 @@
 const path = require("path");
 const fs = require("fs");
 const express = require("express");
+const { spawnSync } = require("child_process");
+const os = require("os");
+const crypto = require("crypto");
 // Handle ESM modules imported via CommonJS require()
 function esm(mod) {
   return mod && mod.default ? mod.default : mod;
 }
 
-const { unified } = require("unified");
+// `unified` is ESM-only in some installs; load it dynamically when needed.
+let _unified = null;
+async function getUnified() {
+  if (_unified) return _unified;
+  try {
+    const mod = await import("unified");
+    _unified = mod.unified || mod.default || mod;
+    return _unified;
+  } catch (e) {
+    // rethrow with clearer message
+    throw new Error(
+      "Failed to import 'unified' dynamically: " + (e && e.message),
+    );
+  }
+}
 const { file } = require("jszip");
-const remarkParse = esm(require("remark-parse"));
-const remarkGfm = esm(require("remark-gfm"));
-const remarkRehype = esm(require("remark-rehype"));
-const rehypeRaw = esm(require("rehype-raw"));
-const rehypeStringify = esm(require("rehype-stringify"));
+
+// Dynamically import remark/rehype plugins (they may be ESM-only)
+let _remarkPlugins = null;
+async function getRemarkPlugins() {
+  if (_remarkPlugins) return _remarkPlugins;
+  try {
+    const [rpMod, gfmMod, rehypeMod, rawMod, stringifyMod] = await Promise.all([
+      import("remark-parse"),
+      import("remark-gfm"),
+      import("remark-rehype"),
+      import("rehype-raw"),
+      import("rehype-stringify"),
+    ]);
+    _remarkPlugins = {
+      remarkParse: rpMod.default || rpMod,
+      remarkGfm: gfmMod.default || gfmMod,
+      remarkRehype: rehypeMod.default || rehypeMod,
+      rehypeRaw: rawMod.default || rawMod,
+      rehypeStringify: stringifyMod.default || stringifyMod,
+    };
+    return _remarkPlugins;
+  } catch (e) {
+    throw new Error(
+      "Failed to import remark/rehype plugins: " + (e && e.message),
+    );
+  }
+}
 
 const app = express();
 
@@ -141,6 +180,10 @@ function resolveMarkdownPath(urlPath) {
 
 // Render markdown to HTML
 async function renderMarkdownToHtml(mdContent) {
+  const unified = await getUnified();
+  const { remarkParse, remarkGfm, remarkRehype, rehypeRaw, rehypeStringify } =
+    await getRemarkPlugins();
+
   const file = await unified()
     .use(remarkParse)
     .use(remarkGfm)
@@ -189,6 +232,7 @@ function injectIntoIndexHtml(
   reqPath,
   titleText = null,
   descriptionText = null,
+  ogImageUrl = null,
 ) {
   let html = indexHtml;
 
@@ -296,6 +340,9 @@ ${customMeta}`;
     cleanDescription
       ? `<meta name="description" content="${escapeHtml(cleanDescription)}">`
       : "",
+    ogImageUrl
+      ? `<meta property="og:image" content="${escapeHtml(ogImageUrl)}">`
+      : "",
     `<link rel="canonical" href="${escapeHtml(reqPath)}">`,
   ]
     .filter(Boolean)
@@ -310,6 +357,555 @@ ${customMeta}`;
   );
   return html;
 }
+
+// Extract first report from markdown content.
+// Supports fenced code blocks starting with ```report containing YAML,
+// and inline <report .../> tags with attributes.
+function extractFirstReport(mdContent, currentUrlPath = null, depth = 0) {
+  if (!mdContent || depth > 3) return null;
+
+  const yaml = require("js-yaml");
+
+  // helper to interpolate {{var}} in text using vars map
+  function interp(text, vars = {}) {
+    if (!text) return text;
+    return String(text).replace(/{{\s*([^}]+)\s*}}/g, (m, k) => {
+      return vars.hasOwnProperty(k) ? String(vars[k]) : "";
+    });
+  }
+
+  // 1) fenced code block ```report\n...yaml...\n```
+  const fenceMatch = mdContent.match(/```report\s*\n([\s\S]*?)\n```/i);
+  if (fenceMatch) {
+    try {
+      const parsed = yaml.load(fenceMatch[1]);
+      return parsed || null;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  // 2) Search for include directives like ::include{...}
+  const includeRe = /::include\{([^}]+)\}/g;
+  let incMatch;
+  while ((incMatch = includeRe.exec(mdContent))) {
+    const rawAttrs = incMatch[1];
+    const attrs = {};
+    // parse key=value, key="value", or flags like .inline
+    const re =
+      /(?:\.([a-zA-Z0-9_-]+))|([a-zA-Z0-9_-]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s}]+))/g;
+    let m;
+    while ((m = re.exec(rawAttrs))) {
+      if (m[1]) {
+        attrs[m[1]] = true;
+      } else if (m[2]) {
+        attrs[m[2]] = m[3] || m[4] || m[5] || "";
+      }
+    }
+
+    // If there's a pageId, try to resolve and read that file
+    if (attrs.pageId) {
+      const pageIdClean = String(attrs.pageId)
+        .replace(/\.md$/i, "")
+        .replace(/^\s*|\s*$/g, "");
+      const includedMdPath = resolveMarkdownPath(pageIdClean);
+      if (includedMdPath) {
+        try {
+          let includedMd = fs.readFileSync(includedMdPath, "utf8");
+          // Look for a fenced report inside the included file
+          const incFence = includedMd.match(/```report\s*\n([\s\S]*?)\n```/i);
+          if (incFence) {
+            // interpolate variables from attrs into YAML
+            const yamlText = interp(incFence[1], attrs);
+            try {
+              const parsed = yaml.load(yamlText);
+              return parsed || null;
+            } catch (err) {
+              return null;
+            }
+          }
+
+          // Recurse into included content to find nested includes/reports
+          const nested = extractFirstReport(
+            includedMd,
+            attrs.pageId,
+            depth + 1,
+          );
+          if (nested) return nested;
+        } catch (err) {
+          // ignore read errors
+        }
+      }
+    }
+  }
+
+  // 3) HTML-style <report attr="value" /> or <report attr='value'></report>
+  const tagMatch = mdContent.match(/<report\s+([^>]+?)\s*\/?>/i);
+  if (tagMatch) {
+    const attrText = tagMatch[1];
+    const attrs = {};
+    // simple attr parser: key="value" or key='value' or key=value
+    const re2 = /([a-zA-Z0-9_-]+)\s*=\s*(?:"([^\"]*)"|'([^']*)'|([^\s>]+))/g;
+    let mm;
+    while ((mm = re2.exec(attrText))) {
+      attrs[mm[1]] = mm[2] || mm[3] || mm[4] || "";
+    }
+    return attrs;
+  }
+
+  return null;
+}
+
+// Render a minimal SVG snapshot for a report using its properties.
+function renderReportToSVG(reportProps) {
+  if (!reportProps) return null;
+  const title = escapeHtml(
+    String(reportProps.title || reportProps.report || "Report"),
+  );
+  const caption = escapeHtml(String(reportProps.caption || ""));
+  const id = escapeHtml(String(reportProps.report || reportProps.id || ""));
+
+  const width = 1200;
+  const height = 630;
+  const padding = 48;
+  const titleY = 120;
+  const captionY = 200;
+
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#0b2545" />
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#g)" />
+  <g fill="#fff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+    <text x="${padding}" y="${titleY}" font-size="48" font-weight="700">${title}</text>
+    <text x="${padding}" y="${captionY}" font-size="28" fill="#e6eef8">${caption}</text>
+    <text x="${padding}" y="${height - 48}" font-size="18" fill="#9fb6d9">${id}</text>
+  </g>
+</svg>`;
+
+  return svg;
+}
+
+// OG image endpoint: generate a simple SVG snapshot for the first report on the page
+app.get(
+  `${BASE_PATH.replace(/\/$/, "")}/assets/og-image/*`,
+  async (req, res) => {
+    try {
+      const filePath = req.params[0]; // e.g., "projects/DTOL"
+      const mdPath = resolveMarkdownPath(`/${filePath}`);
+      if (!mdPath) return res.status(404).send("Not Found");
+
+      // Read markdown early so we can detect embedded reports or includes
+      const md = fs.readFileSync(mdPath, "utf8");
+
+      // If configured, try a lightweight renderer (wkhtmltoimage) first,
+      // then Puppeteer as a fallback. Control with `OG_RENDERER` env:
+      // - "wkhtmltoimage" to force wkhtmltoimage
+      // - "puppeteer" to force puppeteer
+      // - "auto" to prefer wkhtmltoimage then puppeteer
+      const renderer = (process.env.OG_RENDERER || "auto").toLowerCase();
+      const REMOTE_RENDERER_URL = process.env.OG_RENDERER_URL || null;
+      const tryWkhtml = renderer === "wkhtmltoimage" || renderer === "auto";
+      const tryPuppeteer = renderer === "puppeteer" || renderer === "auto";
+      const tryRemote =
+        (renderer === "remote" || renderer === "auto") && !!REMOTE_RENDERER_URL;
+
+      // Helper: attempt to render URL to PNG using wkhtmltoimage binary
+      async function tryWkhtmltoimage(url) {
+        try {
+          const which = spawnSync("which", ["wkhtmltoimage"]);
+          if (which.status !== 0) return null;
+          const tmpName = path.join(
+            os.tmpdir(),
+            `og-${crypto.randomBytes(8).toString("hex")}.png`,
+          );
+          // Use reasonable size for social previews
+          const args = ["--width", "1200", "--height", "630", url, tmpName];
+          const res = spawnSync("wkhtmltoimage", args, { timeout: 20000 });
+          if (res.status !== 0) {
+            console.warn(
+              "wkhtmltoimage failed",
+              res.stderr && res.stderr.toString(),
+            );
+            try {
+              if (fs.existsSync(tmpName)) fs.unlinkSync(tmpName);
+            } catch (e) {}
+            return null;
+          }
+          const buffer = fs.readFileSync(tmpName);
+          try {
+            fs.unlinkSync(tmpName);
+          } catch (e) {}
+          return buffer;
+        } catch (err) {
+          console.warn("wkhtmltoimage error:", err && err.message);
+          return null;
+        }
+      }
+
+      // Helper: attempt to render via a remote renderer service (browserless-like)
+      async function tryRemoteRenderer(url) {
+        if (!REMOTE_RENDERER_URL) return null;
+        const full =
+          REMOTE_RENDERER_URL.replace(/\/$/, "") +
+          "/screenshot?url=" +
+          encodeURIComponent(url) +
+          "&width=1200&height=630";
+        const alt =
+          REMOTE_RENDERER_URL.replace(/\/$/, "") +
+          "?url=" +
+          encodeURIComponent(url) +
+          "&width=1200&height=630";
+        const { request } = require("http");
+        const { request: requestHttps } = require("https");
+        const tryUrl = async (u) => {
+          try {
+            const parsed = new URL(u);
+            const lib = parsed.protocol === "https:" ? requestHttps : request;
+            return await new Promise((resolve) => {
+              const req = lib(u, { method: "GET", timeout: 15000 }, (res) => {
+                const chunks = [];
+                res.on("data", (c) => chunks.push(c));
+                res.on("end", () => {
+                  const buf = Buffer.concat(chunks);
+                  const ct = (res.headers["content-type"] || "").toLowerCase();
+                  if (
+                    res.statusCode >= 200 &&
+                    res.statusCode < 300 &&
+                    ct.startsWith("image/")
+                  ) {
+                    resolve(buf);
+                  } else if (
+                    res.statusCode >= 200 &&
+                    res.statusCode < 300 &&
+                    ct.includes("json")
+                  ) {
+                    try {
+                      const obj = JSON.parse(buf.toString());
+                      if (obj && obj.data) {
+                        // assume base64
+                        try {
+                          resolve(Buffer.from(obj.data, "base64"));
+                        } catch (e) {
+                          resolve(null);
+                        }
+                      } else resolve(null);
+                    } catch (e) {
+                      resolve(null);
+                    }
+                  } else {
+                    resolve(null);
+                  }
+                });
+              });
+              req.on("error", () => resolve(null));
+              req.on("timeout", () => {
+                try {
+                  req.destroy();
+                } catch (e) {}
+                resolve(null);
+              });
+              req.end();
+            });
+          } catch (e) {
+            return null;
+          }
+        };
+
+        // Try /screenshot endpoint then fallback to root-style
+        let out = await tryUrl(full);
+        if (out) return out;
+        out = await tryUrl(alt);
+        return out;
+      }
+
+      // Determine rendering target: if the markdown (or its includes) define a report,
+      // render the dedicated `/report?...` page instead of the project page.
+      const report = extractFirstReport(md, `/${filePath}`);
+      const base = BASE_PATH.replace(/\/$/, "");
+      let pagePath;
+      if (report) {
+        // Build query string from report object; arrays become comma-joined
+        const urlParams = new URLSearchParams();
+        for (const [k, v] of Object.entries(report)) {
+          if (v === undefined || v === null) continue;
+          if (Array.isArray(v)) urlParams.set(k, v.join(","));
+          else urlParams.set(k, String(v));
+        }
+        pagePath = `${base}/report?${urlParams.toString()}`;
+        console.log(
+          `[og-image] generated report pagePath=${pagePath} from ${filePath}`,
+        );
+      } else {
+        pagePath = `${base}/${filePath}`.replace(/\/+/g, "/");
+        console.log(`[og-image] no report found; using pagePath=${pagePath}`);
+      }
+
+      // If configured to try remote renderer, attempt it first
+      if (tryRemote) {
+        try {
+          const url = `${req.protocol}://${req.get("host")}${pagePath}`;
+          console.log(
+            `[og-image] attempting remote renderer url=${url} -> ${REMOTE_RENDERER_URL}`,
+          );
+          const buf = await tryRemoteRenderer(url);
+          if (buf) {
+            res.set("Content-Type", "image/png");
+            res.set("Cache-Control", "public, max-age=86400");
+            res.status(200).send(buf);
+            return;
+          }
+        } catch (e) {
+          console.warn("remote renderer attempt failed:", e && e.message);
+        }
+      }
+
+      // If configured to try wkhtmltoimage, attempt it first
+      if (tryWkhtml) {
+        try {
+          const url = `${req.protocol}://${req.get("host")}${pagePath}`;
+          console.log(`[og-image] attempting wkhtmltoimage render url=${url}`);
+          const buf = await tryWkhtmltoimage(url);
+          if (buf) {
+            res.set("Content-Type", "image/png");
+            res.set("Cache-Control", "public, max-age=86400");
+            res.status(200).send(buf);
+            return;
+          }
+        } catch (e) {
+          console.warn("wkhtmltoimage attempt failed:", e && e.message);
+        }
+      }
+
+      // If configured, try to render the full page with Puppeteer for an accurate
+      // visual rendering of the report. Enable with `OG_RENDERER=puppeteer` or "auto".
+      const usePuppeteer = tryPuppeteer;
+      if (usePuppeteer) {
+        let puppeteer = null;
+        try {
+          // prefer puppeteer if installed
+          puppeteer = require("puppeteer");
+        } catch (err) {
+          try {
+            puppeteer = require("puppeteer-core");
+          } catch (err2) {
+            puppeteer = null;
+          }
+        }
+
+        if (puppeteer) {
+          let browser = null;
+          try {
+            browser = await puppeteer.launch({
+              args: ["--no-sandbox", "--disable-setuid-sandbox"],
+            });
+            const page = await browser.newPage();
+            await page.setViewport({ width: 1200, height: 630 });
+            // Mark downstream API/cache calls as renderer requests so the API can skip caching
+            try {
+              await page.setExtraHTTPHeaders({ "X-OG-RENDER": "1" });
+            } catch (e) {}
+
+            // Derive an API origin accessible from the Puppeteer process.
+            // Priority:
+            // 1) `PUPPETEER_API_ORIGIN` env (explicit override)
+            // 2) origin of `GH_API_URL` if set
+            // 3) when running inside Docker, prefer `host.docker.internal:3000`
+            // 4) fall back to `http://localhost:3000`
+            let apiOrigin = "http://localhost:3000";
+            try {
+              if (process.env.PUPPETEER_API_ORIGIN) {
+                apiOrigin = process.env.PUPPETEER_API_ORIGIN;
+              } else {
+                const raw =
+                  process.env.GH_API_URL || "http://localhost:3000/api/v2";
+                try {
+                  apiOrigin = new URL(raw).origin;
+                } catch (e) {
+                  // keep default
+                }
+              }
+
+              // If the derived origin is localhost and we appear to be inside
+              // a Docker container, try host.docker.internal which maps to the
+              // host's loopback on Docker for Mac/Windows and recent Docker versions.
+              if (
+                apiOrigin.includes("localhost") ||
+                apiOrigin.includes("127.0.0.1")
+              ) {
+                try {
+                  const fs = require("fs");
+                  if (
+                    fs.existsSync("/.dockerenv") ||
+                    fs.existsSync("/run/.containerenv")
+                  ) {
+                    apiOrigin = "http://host.docker.internal:3000";
+                  }
+                } catch (e) {
+                  // ignore
+                }
+              }
+            } catch (e) {}
+
+            // Enable request interception so we can rewrite requests that would
+            // otherwise attempt to reach 'localhost:3000' from inside the renderer
+            // (which often resolves to the renderer container itself).
+            try {
+              await page.setRequestInterception(true);
+              page.on("request", (reqEv) => {
+                try {
+                  const u = reqEv.url();
+                  // Only intercept API calls; leave other resources alone
+                  if (u.includes("/api/")) {
+                    let newUrl = u;
+                    try {
+                      const parsed = new URL(u);
+                      if (parsed.origin !== apiOrigin) {
+                        newUrl = u.replace(parsed.origin, apiOrigin);
+                      }
+                    } catch (e) {
+                      // ignore URL parse failures and continue with original URL
+                    }
+                    // Log the original and (if changed) rewritten URL
+                    console.log(
+                      `[og-image][puppeteer][request] ${reqEv.method()} ${u}${newUrl !== u ? ` -> ${newUrl}` : ""}`,
+                    );
+                    // Continue the request, rewriting the destination if needed
+                    try {
+                      reqEv.continue({ url: newUrl });
+                      return;
+                    } catch (e) {
+                      // If continue fails, fall through to a plain continue/abort
+                    }
+                  }
+                } catch (e) {}
+                try {
+                  reqEv.continue();
+                } catch (e) {
+                  try {
+                    reqEv.abort();
+                  } catch (e2) {}
+                }
+              });
+
+              page.on("response", async (resp) => {
+                try {
+                  const u = resp.url();
+                  if (u.includes("/api/")) {
+                    const status = resp.status();
+                    let text = "";
+                    try {
+                      text = await resp.text();
+                      if (text && text.length > 800)
+                        text = text.slice(0, 800) + "...";
+                    } catch (e) {}
+                    console.log(
+                      `[og-image][puppeteer][response] ${status} ${u} ${text}`,
+                    );
+                  }
+                } catch (e) {}
+              });
+
+              page.on("requestfailed", (rf) => {
+                try {
+                  const u = rf.url();
+                  if (u.includes("/api/")) {
+                    console.log(
+                      `[og-image][puppeteer][requestfailed] ${rf.failure().errorText} ${u}`,
+                    );
+                  }
+                } catch (e) {}
+              });
+            } catch (e) {}
+
+            const url = `${req.protocol}://${req.get("host")}${pagePath}`;
+            console.log(`[og-image] attempting puppeteer render url=${url}`);
+
+            await page.goto(url, { waitUntil: "networkidle2", timeout: 20000 });
+            // Wait for client-side readiness signal set by ReportItem (`data-og-ready="1"`).
+            // Fall back after 5s if the signal isn't present to avoid hanging.
+            try {
+              await page.waitForFunction(
+                () => {
+                  try {
+                    return (
+                      typeof document !== "undefined" &&
+                      document.body &&
+                      document.body.getAttribute("data-og-ready") === "1"
+                    );
+                  } catch (e) {
+                    return false;
+                  }
+                },
+                { timeout: 5000 },
+              );
+              console.log(
+                `[og-image] detected client readiness on ${pagePath}`,
+              );
+            } catch (e) {
+              console.log(
+                `[og-image] client readiness not detected on ${pagePath}; continuing with screenshot`,
+              );
+            }
+
+            const buffer = await page.screenshot({ type: "png" });
+            console.log(
+              `[og-image] render succeeded via puppeteer for ${pagePath}`,
+            );
+            res.set("Content-Type", "image/png");
+            res.set("Cache-Control", "public, max-age=86400");
+            res.status(200).send(buffer);
+            try {
+              await browser.close();
+            } catch (e) {}
+            return;
+          } catch (err) {
+            console.error("Puppeteer render failed:", err);
+            try {
+              if (browser) await browser.close();
+            } catch (e) {}
+            // fall through to SVG fallback
+          }
+        }
+      }
+
+      // Fallback: server-side parse of markdown to find first report or image
+      if (report) {
+        const svg = renderReportToSVG(report);
+        res.set("Content-Type", "image/svg+xml");
+        res.set("Cache-Control", "public, max-age=86400");
+        res.status(200).send(svg);
+        return;
+      }
+
+      // Fallback: if markdown contains an image, use first image as redirect
+      const imgMatch = md.match(/!\[([^\]]*)\]\(([^)]+)\)/);
+      if (imgMatch) {
+        const imgPath = imgMatch[2];
+        // If image path is absolute /static/..., map to assets images
+        if (imgPath.startsWith("/static/")) {
+          const base = BASE_PATH.replace(/\/$/, "");
+          const url = `${base}/assets/images/${imgPath.replace(/^\/static\//, "")}`;
+          return res.redirect(url);
+        }
+        return res.redirect(imgPath);
+      }
+
+      // Final fallback: return a plain SVG placeholder
+      const placeholder = renderReportToSVG({ title: "", caption: "" });
+      res.set("Content-Type", "image/svg+xml");
+      res.set("Cache-Control", "public, max-age=86400");
+      res.status(200).send(placeholder);
+    } catch (err) {
+      console.error("OG image generation error:", err);
+      res.status(500).send("Error generating image");
+    }
+  },
+);
 
 function escapeHtml(str) {
   return String(str)
@@ -390,6 +986,86 @@ app.use(
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
+
+// Renderer status endpoint: reports availability of wkhtmltoimage and Puppeteer
+app.get(
+  `${BASE_PATH.replace(/\/$/, "")}/assets/og-renderer-status`,
+  async (req, res) => {
+    try {
+      const rendererEnv = (process.env.OG_RENDERER || "auto").toLowerCase();
+      const wkWhich = spawnSync("which", ["wkhtmltoimage"]);
+      const canWkhtml = wkWhich.status === 0;
+      let canPuppeteer = false;
+      try {
+        require.resolve("puppeteer");
+        canPuppeteer = true;
+      } catch (e) {
+        try {
+          require.resolve("puppeteer-core");
+          canPuppeteer = true;
+        } catch (e2) {
+          canPuppeteer = false;
+        }
+      }
+      const REMOTE_RENDERER_URL = process.env.OG_RENDERER_URL || null;
+      let canRemote = false;
+      if (REMOTE_RENDERER_URL) {
+        try {
+          const { request } = require("http");
+          const { request: requestHttps } = require("https");
+          const parsed = new URL(REMOTE_RENDERER_URL);
+          const lib = parsed.protocol === "https:" ? requestHttps : request;
+          const ok = await awaitHead(REMOTE_RENDERER_URL, lib);
+          canRemote = !!ok;
+        } catch (e) {
+          canRemote = false;
+        }
+      }
+
+      let recommended = "svg";
+      if (rendererEnv === "wkhtmltoimage")
+        recommended = canWkhtml ? "wkhtmltoimage" : "svg";
+      else if (rendererEnv === "puppeteer")
+        recommended = canPuppeteer ? "puppeteer" : "svg";
+      else {
+        if (canWkhtml) recommended = "wkhtmltoimage";
+        else if (canPuppeteer) recommended = "puppeteer";
+        else recommended = "svg";
+      }
+
+      res.status(200).json({
+        configured: rendererEnv,
+        canWkhtml: !!canWkhtml,
+        canPuppeteer: !!canPuppeteer,
+        canRemote: !!canRemote,
+        recommended: recommended,
+      });
+    } catch (err) {
+      res.status(500).json({ error: err && err.message });
+    }
+  },
+);
+
+// helper for lightweight HEAD/GET availability check used in status endpoint
+function awaitHead(u, lib) {
+  return new Promise((resolve) => {
+    try {
+      const req = lib(u, { method: "HEAD", timeout: 2000 }, (res) => {
+        resolve(res.statusCode >= 200 && res.statusCode < 500);
+      });
+      req.on("error", () => resolve(false));
+      req.on("timeout", () => {
+        try {
+          req.destroy();
+        } catch (e) {}
+        resolve(false);
+      });
+      req.end();
+    } catch (e) {
+      resolve(false);
+    }
+  });
+}
 
 // Runtime config endpoint (available to client-side code)
 app.get(`${BASE_PATH.replace(/\/$/, "")}/assets/config`, (req, res) => {
@@ -568,11 +1244,17 @@ app.get("*", async (req, res) => {
         .trim()
         .slice(0, 300);
 
+      // Build absolute URL for OG image endpoint for this path
+      const base = BASE_PATH.replace(/\/$/, "");
+      const ogImagePath = `${base}/assets/og-image${req.path}`;
+      const ogImageUrl = `${req.protocol}://${req.get("host")}${ogImagePath}`;
+
       const page = injectIntoIndexHtml(
         ssrHtml,
         req.originalUrl,
         firstHeading,
         description,
+        ogImageUrl,
       );
       res.status(200).send(page);
       return;

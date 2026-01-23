@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  renderer:
+    image: browserless/chrome:latest
+    container_name: genomehubs-renderer
+    ports:
+      - "3030:3000"
+    shm_size: "1gb"
+    restart: unless-stopped
+
+  ui:
+    image: node:18
+    container_name: genomehubs-ui-ssr
+    working_dir: /usr/src/app
+    volumes:
+      - ./:/usr/src/app:delegated
+      # Mount host markdown/content dir into the container. Set CONTENT_HOST_PATH
+      # environment variable to override the default (./content/static).
+      - ${CONTENT_HOST_PATH:-./content/static}:/usr/src/app/content/static:delegated
+    ports:
+      - "8880:8880"
+    environment:
+      - NODE_ENV=development
+      # Use "auto" locally so the UI service will try remote then fall back to puppeteer
+      - OG_RENDERER=auto
+      - OG_RENDERER_URL=http://renderer:3000
+      - CONTENT_ROOT=/usr/src/app/content/static
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+      - PORT=8880
+    # Install chromium in the container so puppeteer-core can find a system browser
+    command: sh -c "apt-get update && apt-get install -y --no-install-recommends chromium fonts-liberation libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2 ca-certificates wget && cd /usr/src/app && npm install --no-audit --no-fund --silent || true && node src/genomehubs-ui/src/server/index.js"
+    depends_on:
+      - renderer
+    restart: unless-stopped
+# Notes:
+# - This compose file is intended for local development parity with a remote renderer service.
+# - It mounts the repository into `/usr/src/app` so changes are visible without rebuilding the image.
+# - Ensure your markdown/content is available under `content/static` in the repository, or adjust `CONTENT_ROOT`.

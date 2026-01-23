@@ -198,6 +198,36 @@ const ReportItem = ({
     }
   }, [reportId, visible]);
 
+  // Readiness signal for OG renderers: set a body attribute when the report
+  // has finished loading and there's no error. This allows server-side
+  // screenshotters to wait for `data-og-ready="1"` before capturing.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      if (!loading && !error) {
+        document.body.setAttribute("data-og-ready", "1");
+        if (report)
+          document.body.setAttribute("data-og-report", String(report));
+        // Helpful debug for local runs
+        if (typeof console !== "undefined")
+          console.debug("[og-ready] set data-og-ready for report", report);
+      } else {
+        document.body.removeAttribute("data-og-ready");
+        document.body.removeAttribute("data-og-report");
+      }
+    } catch (e) {
+      // ignore
+    }
+    return () => {
+      try {
+        if (typeof window !== "undefined") {
+          document.body.removeAttribute("data-og-ready");
+          document.body.removeAttribute("data-og-report");
+        }
+      } catch (e) {}
+    };
+  }, [loading, error, report]);
+
   let status;
   if (
     reportById &&
