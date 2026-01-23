@@ -288,10 +288,13 @@ ${customMeta}`;
   html = html.replace("<head>", `<head>\n${configScript}`);
 
   // Basic meta injection (non-destructive): add tags near head end
+  // Sanitize description to remove directive markers and image markdown
+  const cleanDescription = sanitizeDescription(descriptionText);
+
   const metaBlock = [
     titleText ? `<title>${escapeHtml(titleText)}</title>` : "",
-    descriptionText
-      ? `<meta name="description" content="${escapeHtml(descriptionText)}">`
+    cleanDescription
+      ? `<meta name="description" content="${escapeHtml(cleanDescription)}">`
       : "",
     `<link rel="canonical" href="${escapeHtml(reqPath)}">`,
   ]
@@ -315,6 +318,28 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+// Clean up description text by expanding directive inner content and
+// removing image markdown, directive markers, and extra whitespace.
+function sanitizeDescription(text) {
+  if (!text) return "";
+  let s = String(text);
+  // Replace markdown images ![alt](url) with alt text
+  s = s.replace(/!\[([^\]]*)\]\([^\)]+\)/g, (m, alt) => alt || "");
+  // Replace directive patterns ::name[inner]{...} with inner
+  s = s.replace(
+    /::\w+\[([\s\S]*?)\](?:\{[^}]*\})?/g,
+    (m, inner) => inner || "",
+  );
+  // Remove any remaining directive-like tokens ::name or {size=...}
+  s = s.replace(/::\w+/g, "");
+  s = s.replace(/\{[^}]*\}/g, "");
+  // Collapse whitespace and trim
+  s = s.replace(/\s+/g, " ").trim();
+  // Limit length to reasonable meta description size
+  if (s.length > 300) s = s.slice(0, 297) + "...";
+  return s;
 }
 
 // Serve static built assets (don't send 404, let unmatched paths fall through)
