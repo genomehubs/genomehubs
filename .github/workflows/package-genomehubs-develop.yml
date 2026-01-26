@@ -161,7 +161,7 @@ jobs:
   build-and-push-goat:
     runs-on: ubuntu-latest
     if: success()
-    needs: build-ui
+    needs: build-and-push-ui
     steps:
       - name: Checkout
         uses: actions/checkout@v3
