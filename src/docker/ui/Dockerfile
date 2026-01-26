@@ -25,7 +25,7 @@ RUN mkdir -p /app/logs \
     && chmod -R 0755 /app/logs
 
 ## Runtime stage - use distroless for minimal footprint
-FROM gcr.io/distroless/nodejs20-debian12
+FROM gcr.io/distroless/nodejs24-debian12
 WORKDIR /app
 
 ## Copy built assets and server code
@@ -52,5 +52,5 @@ ENV SSR_MODE=bots
 
 EXPOSE 8880
 
-## Run SSR server
-CMD ["node", "src/server/index.js"]
+## Run SSR server (distroless image provides `node` as entrypoint)
+CMD ["--no-deprecation", "src/server/index.js"]

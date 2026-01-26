@@ -25,4 +25,4 @@ EXPOSE 3000
 ENV NODE_ENV=production
 # Note: HEALTHCHECK not supported in distroless (no shell). Use external monitoring or k8s probes.
 # Run the bundled server (no node_modules in runtime)
-CMD ["node", "--no-deprecation", "build/bundle.cjs"]
+CMD ["--no-deprecation", "build/bundle.cjs"]

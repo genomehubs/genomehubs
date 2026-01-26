@@ -31,4 +31,4 @@ ENV GH_SITENAME=${SITE_NAME}
 ENV GH_API_URL=${GH_API_URL}
 
 USER nonroot
-CMD ["node", "src/server/index.js"]
+CMD ["--no-deprecation", "src/server/index.js"]
