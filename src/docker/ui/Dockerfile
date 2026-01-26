@@ -53,4 +53,4 @@ ENV SSR_MODE=bots
 EXPOSE 8880
 
 ## Run SSR server
-CMD ["src/server/index.js"]
+CMD ["node", "src/server/index.js"]

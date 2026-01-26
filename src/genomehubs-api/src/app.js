@@ -24,7 +24,19 @@ import swaggerUi from "swagger-ui-express";
 // Only in production build - in development use dynamic imports instead
 let bundledHandlersMap = null;
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+let __dirname;
+try {
+  // ESM environments: derive from import.meta.url
+  __dirname = dirname(fileURLToPath(import.meta.url));
+} catch (e) {
+  // Fallback for CommonJS/bundled environments where import.meta may be undefined.
+  // Use the executed script path or current working directory as a best-effort dirname.
+  try {
+    __dirname = path.dirname(process.argv[1] || process.cwd());
+  } catch (e2) {
+    __dirname = process.cwd();
+  }
+}
 
 const { port } = config;
 const apiSpec = path.join(__dirname, "api-v2.yaml");
@@ -176,23 +188,22 @@ try {
   // Only try to load handlers map in production, not in development
   if (!handlersMap && process.env.NODE_ENV === "production") {
     try {
-      handlersMap = require(path.join(
-        __dirname,
-        "..",
-        "src",
-        "generated",
-        "operation-handlers.cjs"
-      ));
+      handlersMap = require(
+        path.join(
+          __dirname,
+          "..",
+          "src",
+          "generated",
+          "operation-handlers.cjs",
+        ),
+      );
       handlersMapSource = "src/generated";
     } catch (e) {
       // fall back to build/operation-handlers.cjs if present
       try {
-        handlersMap = require(path.join(
-          __dirname,
-          "..",
-          "build",
-          "operation-handlers.cjs"
-        ));
+        handlersMap = require(
+          path.join(__dirname, "..", "build", "operation-handlers.cjs"),
+        );
         handlersMapSource = "build";
       } catch (e2) {
         handlersMap = null;
@@ -279,7 +290,7 @@ try {
           // If module is an object, try to pick a sensible function export (e.g. getSearchResultCount)
           if (mod && typeof mod === "object") {
             const fnKey = Object.keys(mod).find(
-              (k) => typeof mod[k] === "function"
+              (k) => typeof mod[k] === "function",
             );
             if (fnKey) {
               return mod[fnKey];
@@ -287,7 +298,7 @@ try {
             // try inside default namespace too
             if (mod.default && typeof mod.default === "object") {
               const inner = Object.keys(mod.default).find(
-                (k) => typeof mod.default[k] === "function"
+                (k) => typeof mod.default[k] === "function",
               );
               if (inner) {
                 return mod.default[inner];
@@ -330,12 +341,12 @@ try {
                 fn = mod.handler;
               else if (mod && typeof mod === "object") {
                 const k = Object.keys(mod).find(
-                  (x) => typeof mod[x] === "function"
+                  (x) => typeof mod[x] === "function",
                 );
                 if (k) fn = mod[k];
                 else if (mod.default && typeof mod.default === "object") {
                   const inner = Object.keys(mod.default).find(
-                    (x) => typeof mod.default[x] === "function"
+                    (x) => typeof mod.default[x] === "function",
                   );
                   if (inner) fn = mod.default[inner];
                 }
@@ -376,7 +387,7 @@ app.use(
     },
     validateResponses: true,
     operationHandlers: operationHandlersPath,
-  })
+  }),
 );
 
 app.use((err, req, res, next) => {
