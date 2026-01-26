@@ -163,6 +163,7 @@
     "remark-rehype": "^11.1.2",
     "reselect": "^5.1.1",
     "shallowequal": "^1.1.0",
+    "sharp": "^0.34.5",
     "solar-calculator": "^0.3.0",
     "svg-path-bbox": "^2.1.0",
     "svgo-loader": "^4.0.0",

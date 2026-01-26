@@ -196,9 +196,7 @@ async function renderMarkdownToHtml(mdContent) {
 
 // Inject SSR content into index.html, optionally augmenting basic meta tags
 function rewriteAssetUrlsForBasename(html, basename) {
-  if (!basename || basename === "/") {
-    return html;
-  }
+  const prefix = basename && basename !== "/" ? basename : "";
 
   // Rewrite script src and link href tag attributes to include basename
   // The entry point handles __webpack_public_path__ for dynamic chunks
@@ -209,7 +207,7 @@ function rewriteAssetUrlsForBasename(html, basename) {
         return match; // Skip external URLs
       }
       const closeQuote = openQuote || "";
-      return `${scriptTag}=${closeQuote}${basename}/${path}${closeQuote}`;
+      return `${scriptTag}=${closeQuote}${prefix ? prefix + "/" + path : "/" + path}${closeQuote}`;
     },
   );
 
@@ -220,7 +218,31 @@ function rewriteAssetUrlsForBasename(html, basename) {
         return match; // Skip external URLs
       }
       const closeQuote = openQuote || "";
-      return `${linkTag}=${closeQuote}${basename}/${path}${closeQuote}`;
+      return `${linkTag}=${closeQuote}${prefix ? prefix + "/" + path : "/" + path}${closeQuote}`;
+    },
+  );
+
+  // Also rewrite relative (no-leading-slash) script/link URLs so they don't
+  // resolve relative to the current page path (e.g. /projects/ -> /projects/js/...)
+  rewritten = rewritten.replace(
+    /(<script[^>]*?\s+src)=(['"]?)(?!\/|http|\/\/)([^\s"'>\?]*)/g,
+    (match, scriptTag, openQuote, path) => {
+      if (path.startsWith("http") || path.startsWith("//")) {
+        return match;
+      }
+      const closeQuote = openQuote || "";
+      return `${scriptTag}=${closeQuote}${prefix ? prefix + "/" + path : "/" + path}${closeQuote}`;
+    },
+  );
+
+  rewritten = rewritten.replace(
+    /(<link[^>]*?\s+href)=(['"]?)(?!\/|http|\/\/)([^\s"'>\?]*)/g,
+    (match, linkTag, openQuote, path) => {
+      if (path.startsWith("http") || path.startsWith("//")) {
+        return match;
+      }
+      const closeQuote = openQuote || "";
+      return `${linkTag}=${closeQuote}${prefix ? prefix + "/" + path : "/" + path}${closeQuote}`;
     },
   );
 
@@ -704,7 +726,14 @@ app.get(
               args: ["--no-sandbox", "--disable-setuid-sandbox"],
             });
             const page = await browser.newPage();
-            await page.setViewport({ width: 1200, height: 630 });
+            // Use a deviceScaleFactor of 2 so generated PNGs are high-DPI
+            // (crisper on HiDPI screens). Puppeteer will scale screenshots
+            // appropriately when this is set.
+            await page.setViewport({
+              width: 1200,
+              height: 667,
+              deviceScaleFactor: 2,
+            });
             // Mark downstream API/cache calls as renderer requests so the API can skip caching
             try {
               await page.setExtraHTTPHeaders({ "X-OG-RENDER": "1" });
@@ -759,30 +788,42 @@ app.get(
               page.on("request", (reqEv) => {
                 try {
                   const u = reqEv.url();
-                  // Only intercept API calls; leave other resources alone
-                  if (u.includes("/api/")) {
+                  let parsed;
+                  try {
+                    parsed = new URL(u);
+                  } catch (e) {
+                    // If URL parsing fails, don't attempt to rewrite
+                    parsed = null;
+                  }
+                  // Only rewrite requests whose pathname clearly targets the API
+                  // (e.g. /api/...), to avoid accidentally routing JS/assets
+                  // to the API origin which would return HTML.
+                  const shouldRewrite =
+                    parsed &&
+                    parsed.pathname &&
+                    parsed.pathname.startsWith("/api");
+                  if (shouldRewrite) {
                     let newUrl = u;
                     try {
-                      const parsed = new URL(u);
                       if (parsed.origin !== apiOrigin) {
                         newUrl = u.replace(parsed.origin, apiOrigin);
                       }
                     } catch (e) {
-                      // ignore URL parse failures and continue with original URL
+                      // ignore URL replace failures
                     }
-                    // Log the original and (if changed) rewritten URL
                     console.log(
                       `[og-image][puppeteer][request] ${reqEv.method()} ${u}${newUrl !== u ? ` -> ${newUrl}` : ""}`,
                     );
-                    // Continue the request, rewriting the destination if needed
                     try {
                       reqEv.continue({ url: newUrl });
                       return;
                     } catch (e) {
-                      // If continue fails, fall through to a plain continue/abort
+                      // fall through
                     }
                   }
-                } catch (e) {}
+                } catch (e) {
+                  // swallow
+                }
                 try {
                   reqEv.continue();
                 } catch (e) {
@@ -795,7 +836,18 @@ app.get(
               page.on("response", async (resp) => {
                 try {
                   const u = resp.url();
-                  if (u.includes("/api/")) {
+                  // Log API responses (short-circuit) as before
+                  let parsed;
+                  try {
+                    parsed = new URL(u);
+                  } catch (e) {
+                    parsed = null;
+                  }
+                  if (
+                    parsed &&
+                    parsed.pathname &&
+                    parsed.pathname.startsWith("/api")
+                  ) {
                     const status = resp.status();
                     let text = "";
                     try {
@@ -806,7 +858,29 @@ app.get(
                     console.log(
                       `[og-image][puppeteer][response] ${status} ${u} ${text}`,
                     );
+                    return;
                   }
+
+                  // Extra debug: detect when a script request returns HTML which
+                  // causes "Unexpected token '<'" in JSON/script parsing.
+                  try {
+                    const ct =
+                      (resp.headers && resp.headers()["content-type"]) ||
+                      (resp.headers && resp.headers()["content-type"]);
+                    const isScript =
+                      resp.request &&
+                      resp.request().resourceType &&
+                      resp.request().resourceType() === "script";
+                    if (
+                      isScript &&
+                      ct &&
+                      ct.toLowerCase().includes("text/html")
+                    ) {
+                      console.warn(
+                        `[og-image][puppeteer][response-warning] script ${u} returned HTML (content-type=${ct})`,
+                      );
+                    }
+                  } catch (e) {}
                 } catch (e) {}
               });
 
@@ -822,8 +896,104 @@ app.get(
               });
             } catch (e) {}
 
-            const url = `${req.protocol}://${req.get("host")}${pagePath}`;
-            console.log(`[og-image] attempting puppeteer render url=${url}`);
+            // Convert report URLs to search URLs (CI test behaviour) so the
+            // client-side selectors used by the tests are present. Parse the
+            // raw query string and re-encode param values to avoid invalid
+            // characters breaking navigation.
+            let renderPath = pagePath;
+            try {
+              const qs = require("querystring");
+              const raw = String(pagePath || "");
+              const idx = raw.indexOf("?");
+              const base = idx === -1 ? raw : raw.slice(0, idx);
+              const rawQs = idx === -1 ? "" : raw.slice(idx + 1);
+              const params = qs.parse(rawQs);
+              // Support CI behaviour: move `x` -> `query`
+              if (params.x && !params.query) {
+                params.query = params.x;
+                delete params.x;
+              }
+              // Ensure a sensible default for `result` so the search view
+              // renders the expected table/report. Default to `taxon` when
+              // not provided.
+              if (!params.result) params.result = "taxon";
+              // Standardize scatter plot point size to produce consistent OG images.
+              if (params.report === "scatter") {
+                if (!params.pointSize) params.pointSize = "15";
+              }
+              // Build encoded query string using encodeURIComponent for values
+              const pairs = Object.keys(params).map((k) => {
+                let v = params[k];
+                // normalize arrays to comma-separated
+                if (Array.isArray(v)) v = v.join(",");
+                const rawVal = String(v);
+                // encodeURIComponent leaves () and * unescaped; ensure they are percent-encoded
+                let ev = encodeURIComponent(rawVal)
+                  .replace(/\+/g, "%20")
+                  .replace(/\(/g, "%28")
+                  .replace(/\)/g, "%29")
+                  .replace(/\*/g, "%2A");
+                return `${encodeURIComponent(k)}=${ev}`;
+              });
+              const newQs = pairs.join("&");
+              const newBase = base
+                .replace(/\/report$/, "/search")
+                .replace(/\/report\/?$/, "/search");
+              renderPath = newQs ? `${newBase}?${newQs}` : newBase;
+            } catch (e) {
+              // fallback to simple replace
+              try {
+                renderPath = String(pagePath)
+                  .replace(/\/report\?/, "/search?")
+                  .replace(/\bx=/, "query=");
+              } catch (e2) {}
+            }
+            const url = `${req.protocol}://${req.get("host")}${renderPath}`;
+            console.log(
+              `[og-image] attempting puppeteer render url=${url} (converted from ${pagePath})`,
+            );
+
+            // Inspect query params to decide if Puppeteer should be used.
+            try {
+              const parsed = new URL(url);
+              const rp = parsed.searchParams.get("report");
+              const treeStyle = parsed.searchParams.get("treeStyle");
+              // Skip non-ring trees (they render to canvas) and `xperrank` which
+              // also does not produce SVG output. If we have a parsed `report`
+              // object from the markdown, prefer the server-side SVG fallback.
+              if (rp === "tree" && treeStyle !== "ring") {
+                console.log(
+                  "[og-image] skipping puppeteer for non-ring tree reports; using SVG fallback if available",
+                );
+                if (report) {
+                  const svg = renderReportToSVG(report);
+                  res.set("Content-Type", "image/svg+xml");
+                  res.set("Cache-Control", "public, max-age=86400");
+                  res.status(200).send(svg);
+                  try {
+                    await browser.close();
+                  } catch (e) {}
+                  return;
+                }
+              }
+              if (rp === "xperrank") {
+                console.log(
+                  "[og-image] skipping puppeteer for xperrank reports; using SVG fallback if available",
+                );
+                if (report) {
+                  const svg = renderReportToSVG(report);
+                  res.set("Content-Type", "image/svg+xml");
+                  res.set("Cache-Control", "public, max-age=86400");
+                  res.status(200).send(svg);
+                  try {
+                    await browser.close();
+                  } catch (e) {}
+                  return;
+                }
+              }
+            } catch (e) {
+              // If URL parsing fails, continue with Puppeteer as before
+            }
 
             await page.goto(url, { waitUntil: "networkidle2", timeout: 20000 });
             // Wait for client-side readiness signal set by ReportItem (`data-og-ready="1"`).
@@ -852,7 +1022,365 @@ app.get(
               );
             }
 
-            const buffer = await page.screenshot({ type: "png" });
+            // Additional waits for specific report types that render complex
+            // SVGs asynchronously (eg. scatter plots). This helps avoid
+            // intermittent captures where only the caption appears.
+            try {
+              const parsedUrl = new URL(url);
+              const rp = parsedUrl.searchParams.get("report");
+              if (rp === "scatter") {
+                try {
+                  await page.waitForSelector(
+                    "#report-panel svg.recharts-surface",
+                    { timeout: 5000 },
+                  );
+                  await page.waitForFunction(
+                    () => {
+                      try {
+                        const svg = document.querySelector(
+                          "#report-panel svg.recharts-surface",
+                        );
+                        if (!svg) return false;
+                        const pts = svg.querySelectorAll(
+                          "circle, path.recharts-dot",
+                        );
+                        if (pts && pts.length > 0) return true;
+                        const r = svg.getBoundingClientRect();
+                        return r && r.width * r.height > 10000;
+                      } catch (e) {
+                        return false;
+                      }
+                    },
+                    { timeout: 5000 },
+                  );
+                  console.log("[og-image] scatter plot appears to be rendered");
+                } catch (e) {
+                  console.log(
+                    "[og-image] scatter-specific render wait timed out, continuing",
+                  );
+                }
+              }
+            } catch (e) {
+              // ignore URL/parse errors and continue
+            }
+
+            // Try to focus and capture the report element used by the UI tests
+            // (see tests/integration_tests/ui/test-ui.mjs). If the report element
+            // is not present, fall back to capturing the search results table.
+            let buffer = null;
+            try {
+              // Prefer report panel used by client-side renderers
+              try {
+                await page.waitForSelector("#report-panel", { timeout: 3000 });
+                await page.$eval("#report-panel", (el) => el.scrollIntoView());
+              } catch (e) {
+                // ignore if not present
+              }
+
+              try {
+                await page.waitForSelector("#report-loaded", { timeout: 3000 });
+                // give a short moment for canvas/svg rendering to settle
+                await page.waitForTimeout(250);
+                // // Additional arbitrary wait to allow complex reports (eg. trees)
+                // // finish loading in headless mode. This helps determine whether
+                // // timing is the issue or if rendering is fundamentally broken.
+                // console.log(
+                //   "[og-image] waiting extra 5000ms for report to finish loading (debug)",
+                // );
+                // await page.waitForTimeout(5000);
+              } catch (e) {
+                // continue - marker not present
+              }
+
+              // Wait for a sizable report element to appear (avoid picking up
+              // small icons or placeholders). Use a short timeout so OG
+              // generation doesn't hang; fallback to panel/table capture below.
+              try {
+                await page.waitForFunction(
+                  () => {
+                    try {
+                      const el = document.querySelector(
+                        "#report-panel svg, #report-panel canvas, #report-panel .report-root",
+                      );
+                      if (!el) return false;
+                      const r = el.getBoundingClientRect();
+                      return r && r.width * r.height > 4000; // area threshold
+                    } catch (e) {
+                      return false;
+                    }
+                  },
+                  { timeout: 3000 },
+                );
+                // center the element in viewport for consistent rendering
+                try {
+                  await page.$eval("#report-panel", (el) =>
+                    el.scrollIntoView({ block: "center", inline: "center" }),
+                  );
+                } catch (e) {}
+              } catch (e) {
+                // didn't find a large element in time; we'll fall back later
+              }
+
+              // Find the best element to capture inside #report-panel. Select
+              // svg first (preferred), otherwise canvas/.report-root, or the
+              // panel itself. Choose the largest bounding box to avoid icons.
+              let bestBox = null;
+              try {
+                // Debug: collect a short summary of nodes inside #report-panel
+                // so we can see what the client has rendered when Puppeteer runs.
+                try {
+                  const panelSummary = await page.evaluate(() => {
+                    const panel = document.querySelector("#report-panel");
+                    if (!panel) return null;
+                    const nodes = Array.from(
+                      panel.querySelectorAll("svg, canvas, .report-root, *"),
+                    ).slice(0, 50);
+                    return nodes.map((n) => {
+                      const r = n.getBoundingClientRect
+                        ? n.getBoundingClientRect()
+                        : { x: 0, y: 0, width: 0, height: 0 };
+                      return {
+                        tag: n.tagName,
+                        id: n.id || null,
+                        class: n.className ? String(n.className) : null,
+                        bbox: {
+                          x: Math.round(r.x),
+                          y: Math.round(r.y),
+                          w: Math.round(r.width),
+                          h: Math.round(r.height),
+                        },
+                        text: (n.textContent || "").slice(0, 200),
+                        outer: (n.outerHTML || "").slice(0, 200),
+                      };
+                    });
+                  });
+                  if (panelSummary) {
+                    try {
+                      console.log(
+                        "[og-image][debug][report-panel] " +
+                          JSON.stringify(panelSummary),
+                      );
+                    } catch (e) {
+                      console.log(
+                        "[og-image][debug][report-panel] (could not stringify panel summary)",
+                      );
+                    }
+                  } else {
+                    console.log("[og-image][debug][report-panel] not found");
+                  }
+                } catch (e) {
+                  console.log(
+                    "[og-image][debug][report-panel] evaluate failed",
+                    e && e.message,
+                  );
+                }
+
+                // SVG-first capture: try to find the largest <svg> and screenshot it.
+                try {
+                  const svgEls = await page.$$("#report-panel svg");
+                  if (svgEls && svgEls.length > 0) {
+                    let bestSvg = null;
+                    let bestArea = 0;
+                    for (const s of svgEls) {
+                      try {
+                        const b = await s.boundingBox();
+                        if (b && b.width > 0 && b.height > 0) {
+                          const area = b.width * b.height;
+                          if (area > bestArea) {
+                            bestArea = area;
+                            bestSvg = s;
+                          }
+                        }
+                      } catch (e) {}
+                    }
+                    if (bestSvg) {
+                      try {
+                        const svgBuffer = await bestSvg.screenshot({
+                          type: "png",
+                        });
+                        console.log(
+                          "[og-image] captured svg element via element.screenshot()",
+                        );
+                        buffer = svgBuffer;
+                      } catch (e) {
+                        console.log(
+                          "[og-image] svg element.screenshot failed, will fall back to panel capture",
+                          e && e.message,
+                        );
+                      }
+                    }
+                  }
+                } catch (e) {
+                  // ignore svg-specific failures and continue to generic flow
+                }
+
+                // If we didn't capture an SVG, fall back to general candidate search
+                if (!buffer) {
+                  const nodeHandles = await page.$$(
+                    "#report-panel svg, #report-panel canvas, #report-panel .report-root, #report-panel",
+                  );
+                  const candidatesList = [];
+                  for (const el of nodeHandles) {
+                    try {
+                      const b = await el.boundingBox();
+                      if (b && b.width > 0 && b.height > 0) {
+                        const area = b.width * b.height;
+                        let tag = null;
+                        try {
+                          tag = await page.evaluate((n) => n.tagName, el);
+                        } catch (e) {}
+                        candidatesList.push({ box: b, area, el, tag });
+                        if (!bestBox || area > bestBox.area) {
+                          bestBox = { box: b, area, el, tag };
+                        }
+                      }
+                    } catch (e) {
+                      // ignore element if boundingBox fails
+                    }
+                  }
+
+                  // If the best candidate is a canvas (likely a tree), prefer the
+                  // largest non-canvas candidate (svg/.report-root) if available.
+                  try {
+                    if (bestBox && bestBox.tag === "CANVAS") {
+                      const alt = candidatesList
+                        .filter((c) => c.tag !== "CANVAS")
+                        .sort((a, b) => b.area - a.area)[0];
+                      if (alt) {
+                        console.log(
+                          "[og-image] skipping canvas/tree element; using alternative element instead",
+                        );
+                        bestBox = alt;
+                      }
+                    }
+                  } catch (e) {}
+                }
+              } catch (e) {
+                // ignore overall candidate selection failures
+              }
+
+              if (bestBox && bestBox.box) {
+                const box = bestBox.box;
+                // If the chosen box is very small (likely an icon), prefer the
+                // full panel bbox instead if available.
+                if (box.width < 100 || box.height < 100) {
+                  try {
+                    const panel = await page.$("#report-panel");
+                    if (panel) {
+                      const pb = await panel.boundingBox();
+                      if (pb && pb.width > 0 && pb.height > 0) {
+                        bestBox.box = pb;
+                        console.log(
+                          "[og-image] small report element detected; using panel bbox instead",
+                        );
+                      }
+                    }
+                  } catch (e) {}
+                }
+
+                const b = bestBox.box;
+                const vw = 1200;
+                const vh = 667;
+                const clip = {
+                  x: Math.max(0, b.x),
+                  y: Math.max(0, b.y),
+                  width: Math.min(b.width, vw - Math.max(0, b.x)),
+                  height: Math.min(b.height, vh - Math.max(0, b.y)),
+                };
+                try {
+                  // Prefer element screenshot which handles scrolled/positioned
+                  // children (canvas inside positioned containers).
+                  if (
+                    bestBox.el &&
+                    typeof bestBox.el.screenshot === "function"
+                  ) {
+                    try {
+                      buffer = await bestBox.el.screenshot({ type: "png" });
+                      console.log(
+                        "[og-image] captured report element via element.screenshot()",
+                      );
+                    } catch (e) {
+                      console.log(
+                        "[og-image] element.screenshot failed, falling back to clip",
+                        e && e.message,
+                      );
+                      buffer = await page.screenshot({ type: "png", clip });
+                      console.log(
+                        `[og-image] captured report element clip ${JSON.stringify(clip)}`,
+                      );
+                    }
+                  } else {
+                    buffer = await page.screenshot({ type: "png", clip });
+                    console.log(
+                      `[og-image] captured report element clip ${JSON.stringify(clip)}`,
+                    );
+                  }
+                } catch (e) {
+                  console.log(
+                    "[og-image] clip screenshot failed, falling back",
+                    e && e.message,
+                  );
+                }
+              }
+
+              // Fallback: capture the search results table or the top of the page
+              if (!buffer) {
+                const tableEl =
+                  (await page.$("#search-results")) ||
+                  (await page.$(".search-results")) ||
+                  (await page.$("table"));
+                if (tableEl) {
+                  const box = await tableEl.boundingBox();
+                  if (box && box.width > 0 && box.height > 0) {
+                    const vw = 1200;
+                    const vh = 667;
+                    const clip = {
+                      x: Math.max(0, box.x),
+                      y: Math.max(0, box.y),
+                      width: Math.min(box.width, vw - Math.max(0, box.x)),
+                      height: Math.min(box.height, vh - Math.max(0, box.y)),
+                    };
+                    try {
+                      buffer = await page.screenshot({ type: "png", clip });
+                      console.log(
+                        `[og-image] captured table element clip ${JSON.stringify(clip)}`,
+                      );
+                    } catch (e) {
+                      console.log(
+                        "[og-image] table clip screenshot failed, falling back",
+                        e && e.message,
+                      );
+                    }
+                  }
+                }
+              }
+
+              // Final fallback: non-fullpage screenshot of the viewport
+              if (!buffer) {
+                buffer = await page.screenshot({
+                  type: "png",
+                  fullPage: false,
+                });
+                console.log("[og-image] fallback viewport screenshot taken");
+              }
+            } catch (e) {
+              console.log(
+                "[og-image] screenshot flow failed, taking full-page fallback",
+                e && e.message,
+              );
+              try {
+                buffer = await page.screenshot({
+                  type: "png",
+                  fullPage: false,
+                });
+              } catch (e2) {
+                console.error(
+                  "[og-image] final screenshot attempt failed:",
+                  e2,
+                );
+              }
+            }
+
             console.log(
               `[og-image] render succeeded via puppeteer for ${pagePath}`,
             );
@@ -1215,6 +1743,32 @@ app.get(`${BASE_PATH.replace(/\/$/, "")}/favicon.ico`, (req, res) => {
   } else {
     res.status(404).send("Not Found");
   }
+});
+
+// Debug middleware: log requests for JS/CSS/JSON assets and whether the
+// corresponding file exists in the built `dist/public` directory. This helps
+// diagnose cases where asset requests fall through to the SPA fallback and
+// return `index.html` (causing `Unexpected token '<'`).
+app.use((req, res, next) => {
+  try {
+    const m = req.path.match(/\.(js|css|json)$/i);
+    if (m) {
+      const base = BASE_PATH.replace(/\/$/, "");
+      // Map request path to build dir file candidate
+      const rel = req.path.replace(new RegExp(`^${base}`), "") || req.path;
+      const candidate = path.join(BUILD_DIR, rel.replace(/^\//, ""));
+      let exists = false;
+      try {
+        exists = fs.existsSync(candidate) && fs.statSync(candidate).isFile();
+      } catch (e) {
+        exists = false;
+      }
+      console.log(
+        `[asset-check] ${req.method} ${req.path} -> ${candidate} exists=${exists}`,
+      );
+    }
+  } catch (e) {}
+  next();
 });
 
 // Markdown SSR + SPA route: serve SSR + SPA for any non-asset path
