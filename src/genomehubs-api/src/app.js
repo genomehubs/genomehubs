@@ -168,14 +168,109 @@ const expandQuery = function (req, res, next) {
 app.use(expandQuery);
 
 // Modify swagger setup to prevent petstore being served in production
-// app.use(
-//   "/api-docs",
-//   swaggerUi.serve,
-//   swaggerUi.setup(swaggerDocument, swaggerOptions)
-// );
+// Prefer serving static assets directly from the installed `swagger-ui-dist`
+// package so the JS/CSS are available and served with correct MIME types.
 const swaggerSetup = swaggerUi.setup(swaggerDocument, swaggerOptions);
 app.get("/api-docs/index.html", swaggerSetup);
-app.use("/api-docs", swaggerUi.serve);
+// Serve the dynamically-generated init script that bootstraps the Swagger UI.
+app.get("/api-docs/swagger-ui-init.js", (req, res) => {
+  res.header("Content-Type", "application/javascript");
+  const js = `window.onload = function(){
+    try {
+      const ui = SwaggerUIBundle({
+        url: '/api-spec',
+        dom_id: '#swagger-ui',
+        presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+        layout: 'BaseLayout'
+      });
+      window.ui = ui;
+    } catch (e) {
+      console.error('Failed to initialize Swagger UI', e);
+    }
+  };`;
+  res.send(js);
+});
+try {
+  const swaggerDist = require("swagger-ui-dist");
+  const swaggerDistDir =
+    typeof swaggerDist.getAbsoluteFSPath === "function"
+      ? swaggerDist.getAbsoluteFSPath()
+      : path.join(
+          path.dirname(require.resolve("swagger-ui-dist/package.json")),
+          "dist",
+        );
+  // Serve the primary swagger assets explicitly so failures surface clearly.
+  // Try multiple candidate locations so builds that copy assets into
+  // `build/api-docs` or `src/api-docs` continue to work.
+  const locateAsset = (assetPath) => {
+    const candidates = [
+      path.join(swaggerDistDir, assetPath),
+      path.join(__dirname, "api-docs", assetPath),
+      path.join(__dirname, "..", "build", "api-docs", assetPath),
+      path.join(
+        __dirname,
+        "..",
+        "node_modules",
+        "swagger-ui-dist",
+        "dist",
+        assetPath,
+      ),
+      path.join(__dirname, "..", "node_modules", "swagger-ui-dist", assetPath),
+      path.join(
+        process.cwd(),
+        "node_modules",
+        "swagger-ui-dist",
+        "dist",
+        assetPath,
+      ),
+    ];
+    for (const p of candidates) {
+      try {
+        if (fs.existsSync(p) && fs.statSync(p).isFile()) return p;
+      } catch (e) {
+        // ignore stat errors and continue
+      }
+    }
+    return null;
+  };
+
+  const sendAsset = (assetPath) => (req, res, next) => {
+    const found = locateAsset(assetPath);
+    if (!found) {
+      const err = new Error(`Asset not found: ${assetPath}`);
+      console.error(`Failed to locate ${assetPath}; searched candidate paths.`);
+      return next(err);
+    }
+    res.sendFile(found, (err) => {
+      if (err) {
+        console.error(
+          `Failed to send ${assetPath} from ${found}:`,
+          err && err.stack ? err.stack : err,
+        );
+        return next(err);
+      }
+    });
+  };
+
+  app.get("/api-docs/swagger-ui-bundle.js", sendAsset("swagger-ui-bundle.js"));
+  app.get("/api-docs/swagger-ui.css", sendAsset("swagger-ui.css"));
+  app.get(
+    "/api-docs/swagger-ui-standalone-preset.js",
+    sendAsset("swagger-ui-standalone-preset.js"),
+  );
+  app.get("/api-docs/favicon-32x32.png", sendAsset("favicon-32x32.png"));
+  app.get("/api-docs/favicon-16x16.png", sendAsset("favicon-16x16.png"));
+
+  // Fallback static for any other files under dist (no directory index)
+  app.use(
+    "/api-docs",
+    express.static(swaggerDistDir, {
+      index: false,
+    }),
+  );
+} catch (err) {
+  app.use("/api-docs", swaggerUi.serve);
+}
 app.get("/api-docs", swaggerSetup);
 
 // Try to use a generated static operation handlers map to avoid dynamic requires at runtime.
@@ -235,7 +330,6 @@ try {
       }
       return cur;
     };
-
     // operationHandlers generator used module keys relative to src. if baseName is present, map to that module.
     // In development (no handlersMap), skip static resolution and let validator use dynamic resolution
     if (baseName && handlersMap) {
@@ -411,6 +505,7 @@ if (config.https) {
   });
 } else {
   http.createServer(app).listen(port, () => {
+    console.log(process.env.NODE_ENV);
     console.log(`genomehubs-api started on http port ${port}`);
   });
 }
