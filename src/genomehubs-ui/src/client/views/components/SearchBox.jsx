@@ -244,9 +244,9 @@ const SearchBox = ({
     // Uses configurable delimiter (BATCH_SEARCH_DELIMITER)
     let delimiter =
       BATCH_SEARCH_DELIMITER === "comma"
-        ? /[,;\n]/
+        ? /[,]/
         : BATCH_SEARCH_DELIMITER === "semicolon"
-          ? /[;\n]/
+          ? /[;]/
           : /\n/;
     let hasDelimiter = queryString.match(delimiter);
     let queries = [];

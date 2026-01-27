@@ -48,9 +48,9 @@ const SearchPage = ({
   if (options.query && typeof options.query === "string") {
     const delimiter =
       BATCH_SEARCH_DELIMITER === "comma"
-        ? /[,;\n]/
+        ? /[,]/
         : BATCH_SEARCH_DELIMITER === "semicolon"
-          ? /[;\n]/
+          ? /[;]/
           : /\n/;
     const hasDelimiter = options.query.match(delimiter);
 

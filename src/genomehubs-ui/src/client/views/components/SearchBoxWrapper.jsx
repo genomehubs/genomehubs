@@ -192,9 +192,9 @@ const SearchBoxWrapper = ({
     const BATCH_SEARCH_DELIMITER = "semicolon";
     let delimiter =
       BATCH_SEARCH_DELIMITER === "comma"
-        ? /[,;\n]/
+        ? /[,]/
         : BATCH_SEARCH_DELIMITER === "semicolon"
-          ? /[;\n]/
+          ? /[;]/
           : /\n/;
     let hasDelimiter = query && query.match(delimiter);
     let queries = [];

@@ -288,9 +288,9 @@ export const getMsearchDownload = async (req, res) => {
     // Split on newline or semicolon (matching client-side delimiter logic)
     const delimiter =
       BATCH_SEARCH_DELIMITER === "comma"
-        ? /[,;\n]/
+        ? /[,]/
         : BATCH_SEARCH_DELIMITER === "semicolon"
-          ? /[;\n]/
+          ? /[;]/
           : /\n/;
     const queries = queryString
       .split(delimiter)
