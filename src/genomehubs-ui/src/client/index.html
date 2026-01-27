@@ -11,11 +11,27 @@
       const raw = (window.process && window.process.ENV && window.process.ENV.GH_BASENAME) || window.BASENAME || "";
       const clean = String(raw).replace(/^\/+|\/+$/g, "");
       const basePrefix = clean ? "/" + clean : ""; // "/archive" or ""
-      document.currentScript.insertAdjacentHTML('afterend', `
-        <link rel="icon" href="${basePrefix}/assets/favicon.ico">
-        <link rel="apple-touch-icon" href="${basePrefix}/assets/apple-touch-icon.png">
-        <link rel="manifest" href="${basePrefix}/assets/manifest.json">
-      `);
+      // Helper to join basePrefix and asset path without producing double slashes
+      function joinAsset(prefix, assetPath) {
+        const p = String(prefix || "").replace(/\/$/, "");
+        const a = String(assetPath || "").replace(/^\//, "");
+        return (p ? p + "/" + a : "/" + a);
+      }
+
+      // Create link elements via DOM APIs to avoid accidental HTML mangling
+      const cur = document.currentScript;
+      const links = [
+        { rel: 'icon', href: joinAsset(basePrefix, 'assets/favicon.ico') },
+        { rel: 'apple-touch-icon', href: joinAsset(basePrefix, 'assets/apple-touch-icon.png') },
+        { rel: 'manifest', href: joinAsset(basePrefix, 'assets/manifest.json') },
+      ];
+      links.forEach((attrs) => {
+        const el = document.createElement('link');
+        el.rel = attrs.rel;
+        el.href = attrs.href;
+        if (cur && cur.parentNode) cur.parentNode.insertBefore(el, cur.nextSibling);
+        else document.head.appendChild(el);
+      });
     })();
   </script>
 
@@ -31,7 +47,11 @@
       var s = document.createElement('script');
       s.type = 'text/javascript';
       s.id = 'simple-cookie-js';
-      s.src = basePrefix + '/js/cookies-gcc.js';
+      s.src = (function (p, asset) {
+        var pp = String(p || '').replace(/\/$/, '');
+        var aa = String(asset || '').replace(/^\//, '');
+        return (pp ? pp + '/' + aa : '/' + aa);
+      })(basePrefix, 'js/cookies-gcc.js');
       document.currentScript ? document.currentScript.after(s) : document.body.appendChild(s);
     })();
   </script>

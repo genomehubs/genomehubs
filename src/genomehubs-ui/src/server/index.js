@@ -158,6 +158,7 @@ function resolveMarkdownPath(urlPath) {
 
   // Try "path.md" then "path/index.md" (case-sensitive first)
   const tryPaths = [
+    path.join(CONTENT_ROOT, `${clean}`),
     path.join(CONTENT_ROOT, `${clean}.md`),
     path.join(CONTENT_ROOT, clean, "index.md"),
   ];
@@ -356,8 +357,6 @@ window.__webpack_public_path__ = basePrefix + "/";
 if (typeof __webpack_public_path__ !== 'undefined') {
   __webpack_public_path__ = basePrefix + "/";
 }
-console.log("[public-path] Set __webpack_public_path__ to:", window.__webpack_public_path__);
-console.log("[public-path] GH_BASENAME='${runtimeConfig.GH_BASENAME}', basePrefix='" + basePrefix + "'");
 </script>`;
 
   // Inject runtime config AFTER public path
@@ -1881,9 +1880,11 @@ app.get(
 
         res.status(200).type("text/plain").send(content);
       } else {
-        res
-          .status(404)
-          .json({ error: "Markdown file not found", path: filePath });
+        res.status(404).json({
+          error: "Markdown file not found",
+          path: filePath,
+          CONTENT_ROOT,
+        });
       }
     } catch (err) {
       console.error("Markdown fetch error:", err);
@@ -2088,8 +2089,6 @@ window.__webpack_public_path__ = basePrefix + "/";
 if (typeof __webpack_public_path__ !== 'undefined') {
   __webpack_public_path__ = basePrefix + "/";
 }
-console.log("[public-path] Set __webpack_public_path__ to:", window.__webpack_public_path__);
-console.log("[public-path] GH_BASENAME='${runtimeConfig.GH_BASENAME}', basePrefix='" + basePrefix + "'");
 </script>`;
 
     const configScript = `${publicPathScript}
