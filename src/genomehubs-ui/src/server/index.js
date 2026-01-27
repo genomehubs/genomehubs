@@ -118,7 +118,8 @@ __orig_console.log(
 );
 const BUILD_DIR = path.resolve(__dirname, "../../dist/public");
 const INDEX_HTML_PATH = path.join(BUILD_DIR, "index.html");
-const CONTENT_ROOT = (process.env.CONTENT_ROOT || "/content") + "/static"; // mount external markdown repo here
+const CONTENT_ROOT =
+  (process.env.CONTENT_ROOT || "/content").replace("/static", "") + "/static"; // mount external markdown repo here
 const SSR_MODE = process.env.SSR_MODE || "all"; // "all" or "bots"
 
 // Cache the built index.html template for injection

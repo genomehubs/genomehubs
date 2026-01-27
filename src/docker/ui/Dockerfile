@@ -47,7 +47,7 @@ VOLUME ["/content"]
 ENV NODE_ENV=production
 ENV BASE_PATH=/
 ENV PORT=8880
-ENV CONTENT_ROOT=/content/static
+ENV CONTENT_ROOT=/content
 ENV SSR_MODE=bots
 
 EXPOSE 8880
