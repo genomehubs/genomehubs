@@ -28,6 +28,11 @@ import withColors from "#hocs/withColors";
 import withTaxonomy from "#hocs/withTaxonomy";
 import withVersion from "#hocs/withVersion";
 
+const normalizeAsset = (p) => {
+  if (!p) return p;
+  return String(p).replace(/^\/\//, "/");
+};
+
 const Footer = ({
   id,
   version,
@@ -219,13 +224,13 @@ const Footer = ({
   let logos = (
     <span style={{ float: "right", marginRight: "0.5em" }}>
       <a href="https://www.sanger.ac.uk/" target="_blank">
-        <img src={sangerLogo} />
+        <img src={normalizeAsset(sangerLogo)} />
       </a>
       <a href="https://www.darwintreeoflife.org" target="_blank">
-        <img src={dtolLogo} />
+        <img src={normalizeAsset(dtolLogo)} />
       </a>
       <a href="https://bbsrc.ukri.org/" target="_blank">
-        <img src={bbsrcLogo} />
+        <img src={normalizeAsset(bbsrcLogo)} />
       </a>
     </span>
   );
