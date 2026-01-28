@@ -11,10 +11,6 @@ const express = require("express");
 const { spawnSync } = require("child_process");
 const os = require("os");
 const crypto = require("crypto");
-// Handle ESM modules imported via CommonJS require()
-function esm(mod) {
-  return mod && mod.default ? mod.default : mod;
-}
 
 // `unified` is ESM-only in some installs; load it dynamically when needed.
 let _unified = null;
@@ -31,7 +27,6 @@ async function getUnified() {
     );
   }
 }
-const { file } = require("jszip");
 
 // Dynamically import remark/rehype plugins (they may be ESM-only)
 let _remarkPlugins = null;

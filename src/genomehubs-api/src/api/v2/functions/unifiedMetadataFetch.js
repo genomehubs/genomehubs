@@ -16,19 +16,52 @@ export const getAllMetadata = async ({
   taxonomy = config.taxonomy,
 } = {}) => {
   const cacheKey = `metadata:all:${release}:${result}:${taxonomy}`;
-
-  return metadataCache.get(
-    cacheKey,
-    async () => {
-      return batchFetchMetadataOnMiss({
-        release,
-        result,
-        taxonomy,
-      });
-    },
-    CACHE_TTL,
-    true
+  const RETRIES = parseInt(process.env.METADATA_FETCH_RETRIES || "3", 10);
+  const RETRY_DELAY_MS = parseInt(
+    process.env.METADATA_FETCH_RETRY_MS || "2000",
+    10,
   );
+
+  const resType = result;
+
+  const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+
+  const fetchWithRetry = async () => {
+    let lastErr = null;
+    for (let attempt = 1; attempt <= RETRIES; attempt++) {
+      try {
+        const metadata = await batchFetchMetadataOnMiss({
+          release,
+          result: resType,
+          taxonomy,
+        });
+
+        // If we get a sensible metadata object, return it.
+        if (
+          metadata &&
+          (Object.keys(metadata).length > 0 ||
+            metadata.taxonomies ||
+            metadata.indices ||
+            metadata.attrTypes)
+        ) {
+          return metadata;
+        }
+
+        // Treat empty result as an error so we retry
+        lastErr = new Error("Empty metadata result");
+      } catch (err) {
+        lastErr = err;
+      }
+
+      if (attempt < RETRIES) {
+        await sleep(RETRY_DELAY_MS);
+      }
+    }
+
+    throw lastErr || new Error("Failed to fetch metadata after retries");
+  };
+
+  return metadataCache.get(cacheKey, fetchWithRetry, CACHE_TTL, true);
 };
 
 /**
