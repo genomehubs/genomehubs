@@ -25,12 +25,12 @@ jobs:
           NODE_ENV: development
         run: |
           echo "GH_COMMIT_HASH=${GH_COMMIT_HASH}"
-          npm ci
+          npm install --no-audit --no-fund --legacy-peer-deps
           npm run build
-      - name: Install production dependencies only
-        working-directory: ./src/genomehubs-ui
-        run: |
-          npm ci --omit=dev
+      # - name: Install production dependencies only
+      #   working-directory: ./src/genomehubs-ui
+      #   run: |
+      #     npm ci --omit=dev
       # - name: Upload UI deps artifact
       #   uses: actions/upload-artifact@v4
       #   with:
