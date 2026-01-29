@@ -5,22 +5,37 @@ on: workflow_dispatch
 jobs:
   build-ui:
     runs-on: ubuntu-latest
+    env:
+      GH_COMMIT_HASH: ${{ github.sha }}
+      GH_PAGES_PATH: ""
+      GH_PAGES_URL: ""
+      NODE_ENV: production
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{github.ref}}
+          ref: ${{ github.ref }}
+          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
           node-version: "24"
       - name: Build UI assets
         working-directory: ./src/genomehubs-ui
         run: |
+          echo "GH_COMMIT_HASH=${GH_COMMIT_HASH}"
           npm ci
           npm run build
+      - name: Inspect UI dist
+        working-directory: ./src/genomehubs-ui
+        run: |
+          echo "=== dist file count ==="
+          find dist -type f | wc -l || true
+          echo "=== dist top files ==="
+          find dist -type f | sort | head -n 200 || true
+          du -sh dist || true
       - uses: actions/upload-artifact@v4
         with:
           name: genomehubs-ui-dist
-          path: ./src/genomehubs-ui/dist/*
+          path: ./src/genomehubs-ui/dist/**
 
   build-api:
     runs-on: ubuntu-latest
@@ -135,6 +150,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -149,6 +166,13 @@ jobs:
         with:
           name: genomehubs-ui-dist
           path: ./src/genomehubs-ui/dist/
+      - name: Inspect downloaded UI dist
+        run: |
+          echo "=== downloaded dist file count ==="
+          find ./src/genomehubs-ui/dist -type f | wc -l || true
+          echo "=== downloaded dist top files ==="
+          find ./src/genomehubs-ui/dist -type f | sort | head -n 200 || true
+          du -sh ./src/genomehubs-ui/dist || true
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
