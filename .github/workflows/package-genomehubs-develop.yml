@@ -22,10 +22,15 @@ jobs:
         working-directory: ./src/genomehubs-ui
         env:
           npm_config_production: "false"
+          NODE_ENV: development
         run: |
           echo "GH_COMMIT_HASH=${GH_COMMIT_HASH}"
+          node --version
+          npm --version
           npm ci
-          npm run build
+          echo "=== node_modules/webpack ==="
+          ls -la node_modules/webpack || true
+          NODE_ENV=production npm run build
       - name: Inspect UI dist
         working-directory: ./src/genomehubs-ui
         run: |
