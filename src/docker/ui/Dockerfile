@@ -17,7 +17,7 @@ COPY src/genomehubs-ui/. .
 RUN npm run build
 
 ## Install production dependencies only
-RUN npm ci --omit=dev --production=true
+RUN npm ci --omit=dev
 
 ## Prepare logs directory in builder
 RUN mkdir -p /app/logs \
