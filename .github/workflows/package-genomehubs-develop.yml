@@ -30,7 +30,17 @@ jobs:
           npm ci
           echo "=== node_modules/webpack ==="
           ls -la node_modules/webpack || true
+          echo "=== node_modules summary ==="
+          du -sh node_modules || true
+          find node_modules -maxdepth 2 -type d | sed -n '1,200p' || true
+          echo "=== generating dependency tree ==="
+          npm ls --all --json > deps-ci.json || true
           NODE_ENV=production npm run build
+      - name: Upload UI deps artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: genomehubs-ui-deps
+          path: ./src/genomehubs-ui/deps-ci.json
       - name: Inspect UI dist
         working-directory: ./src/genomehubs-ui
         run: |
