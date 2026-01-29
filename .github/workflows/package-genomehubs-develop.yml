@@ -20,6 +20,8 @@ jobs:
           node-version: "24"
       - name: Build UI assets
         working-directory: ./src/genomehubs-ui
+        env:
+          npm_config_production: "false"
         run: |
           echo "GH_COMMIT_HASH=${GH_COMMIT_HASH}"
           npm ci
