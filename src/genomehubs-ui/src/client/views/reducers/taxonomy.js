@@ -34,10 +34,28 @@ export const getTaxonomies = (state) => state.taxonomies.ids;
 export const getTaxonomiesFetching = (state) => state.taxonomies.isFetching;
 
 export const setCurrentTaxonomy = createAction("SET_CURRENT_TAXONOMY");
+const resolveDefaultTaxonomy = () => {
+  try {
+    if (
+      typeof window !== "undefined" &&
+      window.process &&
+      window.process.ENV &&
+      window.process.ENV.GH_TAXONOMY
+    ) {
+      return window.process.ENV.GH_TAXONOMY;
+    }
+  } catch (e) {}
+  try {
+    if (typeof TAXONOMY !== "undefined" && TAXONOMY) {
+      return TAXONOMY;
+    }
+  } catch (e) {}
+  return "";
+};
 export const currentTaxonomy = handleAction(
   "SET_CURRENT_TAXONOMY",
-  (state, action) => action.payload || TAXONOMY || "",
-  "",
+  (state, action) => action.payload || resolveDefaultTaxonomy(),
+  resolveDefaultTaxonomy(),
 );
 export const getCurrentTaxonomy = (state) => state.currentTaxonomy;
 
