@@ -253,7 +253,10 @@ jobs:
             SITE_REPO=genomehubs/goat-ui
             SITE_BRANCH=feature/test-ci
             SITE_NAME=GoaT
-            GH_API_URL=https://goat.genomehubs.org/api/v2
+            SITE_NAME_LONG=Genomes on a Tree
+            GH_CITATION_URL=https://doi.org/10.12688/wellcomeopenres.18658.1
+            GH_SUGGESTED_TERM=Canidae
+            GH_TAXONOMY=ncbi
           tags: genomehubs/goat:develop
           labels: ${{ steps.meta.outputs.labels }}
 
@@ -285,7 +288,8 @@ jobs:
   #           SITE_REPO=genomehubs/boat-ui
   #           SITE_BRANCH=main
   #           SITE_NAME=BoaT
-  #           GH_API_URL=https://boat.genomehubs.org/api/v2
+  #           SITE_NAME_LONG=BUSCOs on a Tree
+  #           GH_TAXONOMY=ncbi
   #         tags: genomehubs/boat:develop
   #         labels: ${{ steps.meta.outputs.labels }}
 
@@ -317,7 +321,8 @@ jobs:
   #           SITE_REPO=genomehubs/molluscdb-ui
   #           SITE_BRANCH=main
   #           SITE_NAME=MolluscDB
-  #           GH_API_URL=https://molluscdb.genomehubs.org/api/v2
+  #           SITE_NAME_LONG=Mollusc DB
+  #           GH_TAXONOMY=ncbi
   #         tags: genomehubs/molluscdb:develop
   #         labels: ${{ steps.meta.outputs.labels }}
 

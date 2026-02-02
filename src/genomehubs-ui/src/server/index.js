@@ -71,6 +71,8 @@ const runtimeConfig = {
   // From search.js
   GH_DEFAULT_INDEX: process.env.GH_DEFAULT_INDEX || "taxon",
   GH_SUGGESTED_TERM: process.env.GH_SUGGESTED_TERM || "",
+  // From taxonomy.js
+  GH_TAXONOMY: process.env.GH_TAXONOMY || "ncbi",
   // From archive.js (normalize to array)
   GH_ARCHIVE: (() => {
     const raw = process.env.GH_ARCHIVE || "";
@@ -451,6 +453,7 @@ window.CITATION_URL = window.process.ENV.GH_CITATION_URL;
 window.API_URL = window.process.ENV.GH_API_URL;
 window.DEFAULT_INDEX = window.process.ENV.GH_DEFAULT_INDEX;
 window.SUGGESTED_TERM = window.process.ENV.GH_SUGGESTED_TERM;
+window.TAXONOMY = window.process.ENV.GH_TAXONOMY;
 window.ARCHIVE = window.process.ENV.GH_ARCHIVE;
 </script>
 ${customMeta}`;
@@ -2212,6 +2215,7 @@ window.CITATION_URL = window.process.ENV.GH_CITATION_URL;
 window.API_URL = window.process.ENV.GH_API_URL;
 window.DEFAULT_INDEX = window.process.ENV.GH_DEFAULT_INDEX;
 window.SUGGESTED_TERM = window.process.ENV.GH_SUGGESTED_TERM;
+window.TAXONOMY = window.process.ENV.GH_TAXONOMY;
 window.ARCHIVE = window.process.ENV.GH_ARCHIVE;
 </script>`;
     page = page.replace("<head>", `<head>\n${configScript}`);

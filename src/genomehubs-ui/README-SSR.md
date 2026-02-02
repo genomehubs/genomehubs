@@ -64,6 +64,8 @@ docker run --rm -p 8880:8880 \
 
 ### Environment Variables
 
+**Server Configuration:**
+
 - `PORT`: Server port (default: 8880)
 - `BASE_PATH`: URL base path, e.g. `/genomehubs` (default: `/`)
 - `CONTENT_ROOT`: Path to markdown files inside container (default: `/content/static`)
@@ -71,6 +73,21 @@ docker run --rm -p 8880:8880 \
   - `bots`: SSR only for search engine crawlers (default)
   - `all`: SSR for all requests
   - Any other value: No SSR
+
+**Site Configuration (passed to client as window.process.ENV):**
+
+- `GH_SITENAME`: Site name (default: "Demo GenomeHub")
+- `GH_SITENAME_LONG`: Full site name (default: "")
+- `GH_BASENAME`: URL basename for routing (default: "/")
+- `GH_CITATION_URL`: Citation URL for site (default: "")
+- `GH_API_URL`: API endpoint URL (default: "http://localhost:3000/api/v2")
+- `GH_DEFAULT_INDEX`: Default search index (default: "taxon")
+- `GH_SUGGESTED_TERM`: Suggested search term (default: "")
+- `GH_TAXONOMY`: Taxonomy database to use (default: "ncbi")
+- `GH_ARCHIVE`: Space-separated list of archive versions (default: "")
+- `GH_HOST`: Server host (default: "localhost")
+- `GH_HTTPS`: Enable HTTPS (default: "false")
+- `GH_PAGES_PATH`: Static pages path (default: "/static")
 
 ### Volume Mounts
 
