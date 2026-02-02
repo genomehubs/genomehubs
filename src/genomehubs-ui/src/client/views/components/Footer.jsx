@@ -43,6 +43,15 @@ const Footer = ({
   selectPalette,
   levels,
 }) => {
+  useEffect(() => {
+    console.log("[Footer] mount", {
+      hidden,
+      taxonomy,
+      apiStatus,
+      version,
+      levels: Array.isArray(levels) ? levels.length : levels,
+    });
+  }, []);
   const [anchorEl, setAnchorEl] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -79,6 +88,7 @@ const Footer = ({
     }
   }, [currentPalette, levels]);
   if (!taxonomy || hidden) {
+    console.warn("[Footer] hidden", { hidden, taxonomy, apiStatus });
     return <Taxonomy display={false} />;
   }
 
