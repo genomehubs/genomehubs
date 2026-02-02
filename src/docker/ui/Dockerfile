@@ -2,6 +2,8 @@
 FROM node:24-bookworm-slim AS builder
 WORKDIR /app
 
+ARG USE_PREBUILT_DIST=false
+
 ## Install build dependencies (git required for git-revision-webpack-plugin)
 RUN apt-get update && apt-get install -y --no-install-recommends git \
     && rm -rf /var/lib/apt/lists/*
@@ -13,8 +15,8 @@ RUN npm ci --production=false
 ## Copy UI sources
 COPY src/genomehubs-ui/. .
 
-## Build static assets with webpack
-RUN npm run build
+## Build static assets with webpack unless using prebuilt dist
+RUN if [ "$USE_PREBUILT_DIST" != "true" ]; then npm run build; fi
 
 ## Install production dependencies only
 RUN npm ci --omit=dev

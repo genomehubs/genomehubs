@@ -201,6 +201,8 @@ jobs:
           context: .
           file: src/docker/ui/Dockerfile
           push: true
+          build-args: |
+            USE_PREBUILT_DIST=true
           tags: genomehubs/genomehubs-ui:develop
           labels: ${{ steps.meta.outputs.labels }}
 
