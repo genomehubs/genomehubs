@@ -1,6 +1,10 @@
 name: package-genomehubs-develop
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/use-dhi
 
 jobs:
   build-ui:
@@ -25,8 +29,14 @@ jobs:
           NODE_ENV: development
         run: |
           echo "GH_COMMIT_HASH=${GH_COMMIT_HASH}"
+          echo "GH_PAGES_PATH=${GH_PAGES_PATH}"
+          echo "GH_PAGES_URL=${GH_PAGES_URL}"
           npm install --no-audit --no-fund --legacy-peer-deps
           npm run build
+          echo "=== Build complete, checking dist ==="
+          ls -la dist/public/ || echo "dist/public not found"
+          ls -la dist/public/static/ || echo "dist/public/static not found"
+          find dist/public/static -type d | head -10 || echo "No static dirs"
       # - name: Install production dependencies only
       #   working-directory: ./src/genomehubs-ui
       #   run: |
@@ -46,14 +56,19 @@ jobs:
       #   with:
       #     name: genomehubs-ui-stats
       #     path: ./src/genomehubs-ui/stats-ci.json
-      # - name: Inspect UI dist
-      #   working-directory: ./src/genomehubs-ui
-      #   run: |
-      #     echo "=== dist file count ==="
-      #     find dist -type f | wc -l || true
-      #     echo "=== dist top files ==="
-      #     find dist -type f | sort | head -n 200 || true
-      #     du -sh dist || true
+      - name: Inspect UI dist
+        working-directory: ./src/genomehubs-ui
+        run: |
+          echo "=== dist file count ==="
+          find dist -type f | wc -l || true
+          echo "=== dist structure ==="
+          find dist -type d | sort | head -30 || true
+          echo "=== dist top files ==="
+          find dist -type f | sort | head -50 || true
+          echo "=== dist size ==="
+          du -sh dist || true
+          echo "=== checking for markdown files ==="
+          find dist -name "*.md" -type f | head -20 || echo "No markdown files found"
       - uses: actions/upload-artifact@v4
         with:
           name: genomehubs-ui-dist
@@ -193,7 +208,11 @@ jobs:
           echo "=== downloaded dist file count ==="
           find ./src/genomehubs-ui/dist -type f | wc -l || true
           echo "=== downloaded dist top files ==="
-          find ./src/genomehubs-ui/dist -type f | sort | head -n 200 || true
+          find ./src/genomehubs-ui/dist -type f | sort | head -n 50 || true
+          echo "=== checking for markdown files in downloaded dist ==="
+          find ./src/genomehubs-ui/dist -name "*.md" -type f | sort || echo "No markdown files found"
+          echo "=== dist structure ==="
+          find ./src/genomehubs-ui/dist -type d | sort | head -30 || true
           du -sh ./src/genomehubs-ui/dist || true
       - name: Build and push Docker image
         uses: docker/build-push-action@v5

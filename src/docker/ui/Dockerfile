@@ -15,6 +15,9 @@ RUN npm ci --production=false
 ## Copy UI sources
 COPY src/genomehubs-ui/. .
 
+## Copy prebuilt dist if provided
+COPY src/genomehubs-ui/dist ./dist
+
 ## Build static assets with webpack unless using prebuilt dist
 RUN if [ "$USE_PREBUILT_DIST" != "true" ]; then npm run build; fi
 
