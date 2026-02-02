@@ -241,7 +241,7 @@ jobs:
           build-args: |
             BASE_IMAGE=genomehubs/genomehubs-ui:${{ env.VERSION }}
             SITE_REPO=genomehubs/goat-ui
-            SITE_BRANCH=feature/test-ci
+            SITE_BRANCH=main
             SITE_NAME=GoaT
             SITE_NAME_LONG=Genomes on a Tree
             GH_CITATION_URL=https://doi.org/10.12688/wellcomeopenres.18658.1
