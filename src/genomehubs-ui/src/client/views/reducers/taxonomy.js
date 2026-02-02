@@ -50,7 +50,7 @@ const resolveDefaultTaxonomy = () => {
       return TAXONOMY;
     }
   } catch (e) {}
-  return "";
+  return "ncbi";
 };
 export const currentTaxonomy = handleAction(
   "SET_CURRENT_TAXONOMY",
