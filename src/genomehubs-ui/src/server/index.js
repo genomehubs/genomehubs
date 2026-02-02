@@ -236,6 +236,39 @@ function resolveMarkdownPath(urlPath) {
     // Silent fail for case-insensitive fallback
   }
 
+  // Fallback: check bundled static files when content directory doesn't have them
+  // This allows the base genomehubs-ui image to serve markdown without a mounted content volume
+  try {
+    const staticDir = path.join(BUILD_DIR, "static");
+    if (fs.existsSync(staticDir)) {
+      // Find the hash subdirectory (e.g., "d4770c89e75b8b504fb63788bc1a246ec1a6e5aa")
+      const hashDirs = fs.readdirSync(staticDir);
+      for (const hashDir of hashDirs) {
+        const hashPath = path.join(staticDir, hashDir);
+        if (fs.statSync(hashPath).isDirectory()) {
+          // Try the markdown file in this hash directory
+          const mdFile = path.join(hashPath, `${clean}.md`);
+          if (fs.existsSync(mdFile) && fs.statSync(mdFile).isFile()) {
+            console.log(`[resolveMarkdownPath] found bundled file: ${mdFile}`);
+            return mdFile;
+          }
+          // Also try with index.md
+          const indexFile = path.join(hashPath, clean, "index.md");
+          if (fs.existsSync(indexFile) && fs.statSync(indexFile).isFile()) {
+            console.log(
+              `[resolveMarkdownPath] found bundled index: ${indexFile}`,
+            );
+            return indexFile;
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn(
+      `[resolveMarkdownPath] bundled fallback search failed: ${err.message}`,
+    );
+  }
+
   return null;
 }
 
