@@ -2,9 +2,6 @@ name: package-genomehubs-develop
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - feature/use-dhi
 
 jobs:
   build-ui:
