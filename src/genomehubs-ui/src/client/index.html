@@ -40,6 +40,31 @@
 <body>
   <div id="app" style="height: 100%; min-height: 100%"></div>
   <script>
+    // Track chunk loading errors for debugging
+    window.__chunkLoadErrors = [];
+    window.addEventListener('error', function (e) {
+      if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
+        const url = e.target.src || e.target.href;
+        console.error('[chunk-load-error]', url, e);
+        window.__chunkLoadErrors.push({
+          url: url,
+          tag: e.target.tagName,
+          error: e.message || 'load failed'
+        });
+      }
+    }, true);
+
+    // Log webpack public path for debugging
+    setTimeout(function () {
+      if (typeof __webpack_public_path__ !== 'undefined') {
+        console.log('[webpack-public-path]', __webpack_public_path__);
+      }
+      if (window.__chunkLoadErrors.length > 0) {
+        console.error('[chunk-load-errors] Failed to load:', window.__chunkLoadErrors);
+      }
+    }, 2000);
+  </script>
+  <script>
     (function () {
       var raw = (window.process && window.process.ENV && window.process.ENV.GH_BASENAME) || window.BASENAME || "";
       var clean = String(raw).replace(/^\/+|\/+$/g, "");

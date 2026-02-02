@@ -1797,6 +1797,13 @@ function sanitizeDescription(text) {
 // Serve static built assets (don't send 404, let unmatched paths fall through)
 app.use(
   BASE_PATH,
+  (req, res, next) => {
+    // Log JS/CSS chunk requests for debugging
+    if (req.path.match(/\.(js|css)$/)) {
+      console.log(`[static-asset] ${req.method} ${req.path}`);
+    }
+    next();
+  },
   express.static(BUILD_DIR, {
     maxAge: "1y",
     index: false,
