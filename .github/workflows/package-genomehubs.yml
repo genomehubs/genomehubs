@@ -321,3 +321,30 @@ jobs:
             genomehubs/molluscdb:${{ env.VERSION }}
             genomehubs/molluscdb:latest
           labels: ${{ steps.meta.outputs.labels }}
+
+  merge-develop-to-main:
+    runs-on: ubuntu-latest
+    if: success() && !contains(github.ref, '-')
+    needs:
+      - build-and-push-goat
+      - build-and-push-boat
+      - build-and-push-molluscdb
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Create Pull Request from develop to main
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Merge develop into main after release ${{ github.ref_name }}"
+          title: "Merge develop into main after release ${{ github.ref_name }}"
+          body: |
+            This PR merges the develop branch into main after a successful production release.
+            Release: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+          branch: develop
+          base: main
+          delete-branch: false
+          labels: release
