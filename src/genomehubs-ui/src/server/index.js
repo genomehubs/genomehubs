@@ -128,6 +128,43 @@ try {
   );
 }
 
+// Startup diagnostics
+__orig_console.log(`[server startup] BUILD_DIR="${BUILD_DIR}"`);
+try {
+  if (fs.existsSync(BUILD_DIR)) {
+    const contents = fs.readdirSync(BUILD_DIR);
+    __orig_console.log(
+      `[server startup] BUILD_DIR exists with ${contents.length} items: ${contents.slice(0, 10).join(", ")}${contents.length > 10 ? "..." : ""}`,
+    );
+    const staticDir = path.join(BUILD_DIR, "static");
+    if (fs.existsSync(staticDir)) {
+      const staticContents = fs.readdirSync(staticDir);
+      __orig_console.log(
+        `[server startup] BUILD_DIR/static exists with ${staticContents.length} items: ${staticContents.join(", ")}`,
+      );
+      for (const item of staticContents) {
+        const itemPath = path.join(staticDir, item);
+        if (fs.statSync(itemPath).isDirectory()) {
+          const mdFiles = fs
+            .readdirSync(itemPath)
+            .filter((f) => f.endsWith(".md"));
+          __orig_console.log(
+            `[server startup] BUILD_DIR/static/${item} has ${mdFiles.length} markdown files: ${mdFiles.join(", ")}`,
+          );
+        }
+      }
+    } else {
+      __orig_console.log(`[server startup] BUILD_DIR/static does NOT exist`);
+    }
+  } else {
+    __orig_console.log(`[server startup] BUILD_DIR does NOT exist`);
+  }
+} catch (err) {
+  __orig_console.log(
+    `[server startup] Error inspecting BUILD_DIR: ${err.message}`,
+  );
+}
+
 // If OG renderer is not configured, provide a simple 404 handler for OG
 // image requests so they don't fall through to the SPA index.html and
 // return HTML (which breaks consumers expecting an image).
@@ -1734,6 +1771,7 @@ app.use(
       }
       // Markdown content - moderate cache (1 day) to catch updates
       else if (filePath.endsWith(".md")) {
+        console.log(`[static][md] serving: ${filePath}`);
         res.set("Cache-Control", "public, max-age=86400, must-revalidate");
       }
       // API responses - short cache (5 minutes)
@@ -1850,6 +1888,10 @@ app.get(
       const filePath = req.params[0]; // e.g., "projects/DTOL"
       const mdPath = resolveMarkdownPath(`/${filePath}`);
 
+      console.log(
+        `[markdown-fetch] requested=${filePath}, resolved=${mdPath}, CONTENT_ROOT=${CONTENT_ROOT}`,
+      );
+
       if (mdPath) {
         let content = fs.readFileSync(mdPath, "utf8");
 
@@ -1874,8 +1916,12 @@ app.get(
           },
         );
 
+        console.log(
+          `[markdown-fetch] served ${filePath} (${content.length} bytes)`,
+        );
         res.status(200).type("text/plain").send(content);
       } else {
+        console.warn(`[markdown-fetch] not found: ${filePath}`);
         res.status(404).json({
           error: "Markdown file not found",
           path: filePath,
