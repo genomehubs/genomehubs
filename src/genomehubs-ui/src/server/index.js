@@ -189,84 +189,97 @@ function resolveMarkdownPath(urlPath) {
     .replace(new RegExp(`^${BASE_PATH.replace(/\/$/, "")}`), "")
     .replace(/\/$/, "");
 
-  // Try "path.md" then "path/index.md" (case-sensitive first)
-  const tryPaths = [
-    path.join(CONTENT_ROOT, `${clean}`),
-    path.join(CONTENT_ROOT, `${clean}.md`),
-    path.join(CONTENT_ROOT, clean, "index.md"),
-  ];
+  // Check if CONTENT_ROOT exists and has content
+  const contentRootExists = fs.existsSync(CONTENT_ROOT);
 
-  for (const p of tryPaths) {
-    if (fs.existsSync(p) && fs.statSync(p).isFile()) {
-      return p;
-    }
-  }
+  // Only try mounted content paths if CONTENT_ROOT actually exists
+  if (contentRootExists) {
+    // Try "path.md" then "path/index.md" (case-sensitive first)
+    const tryPaths = [
+      path.join(CONTENT_ROOT, `${clean}`),
+      path.join(CONTENT_ROOT, `${clean}.md`),
+      path.join(CONTENT_ROOT, clean, "index.md"),
+    ];
 
-  // Fallback: try case-insensitive match
-  try {
-    const parts = clean.split("/").filter(Boolean);
-    let currentDir = CONTENT_ROOT;
-    let resolvedPath = CONTENT_ROOT;
-
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i];
-      const entries = fs.readdirSync(currentDir);
-      const match = entries.find((e) => e.toLowerCase() === part.toLowerCase());
-
-      if (match) {
-        resolvedPath = path.join(currentDir, match);
-        currentDir = resolvedPath;
-      } else {
-        return null;
+    for (const p of tryPaths) {
+      if (fs.existsSync(p) && fs.statSync(p).isFile()) {
+        return p;
       }
     }
 
-    // Try with .md extension
-    const mdFile = resolvedPath + ".md";
-    if (fs.existsSync(mdFile) && fs.statSync(mdFile).isFile()) {
-      return mdFile;
-    }
+    // Fallback: try case-insensitive match in CONTENT_ROOT
+    try {
+      const parts = clean.split("/").filter(Boolean);
+      let currentDir = CONTENT_ROOT;
+      let resolvedPath = CONTENT_ROOT;
 
-    // Try index.md inside directory
-    const indexFile = path.join(resolvedPath, "index.md");
-    if (fs.existsSync(indexFile) && fs.statSync(indexFile).isFile()) {
-      return indexFile;
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        const entries = fs.readdirSync(currentDir);
+        const match = entries.find(
+          (e) => e.toLowerCase() === part.toLowerCase(),
+        );
+
+        if (match) {
+          resolvedPath = path.join(currentDir, match);
+          currentDir = resolvedPath;
+        } else {
+          break;
+        }
+      }
+
+      // Try with .md extension
+      const mdFile = resolvedPath + ".md";
+      if (fs.existsSync(mdFile) && fs.statSync(mdFile).isFile()) {
+        return mdFile;
+      }
+
+      // Try index.md inside directory
+      const indexFile = path.join(resolvedPath, "index.md");
+      if (fs.existsSync(indexFile) && fs.statSync(indexFile).isFile()) {
+        return indexFile;
+      }
+    } catch (err) {
+      // Silent fail for case-insensitive fallback
     }
-  } catch (err) {
-    // Silent fail for case-insensitive fallback
   }
 
-  // Fallback: check bundled static files when content directory doesn't have them
-  // This allows the base genomehubs-ui image to serve markdown without a mounted content volume
-  try {
-    const staticDir = path.join(BUILD_DIR, "static");
-    if (fs.existsSync(staticDir)) {
-      // Find the hash subdirectory (e.g., "d4770c89e75b8b504fb63788bc1a246ec1a6e5aa")
-      const hashDirs = fs.readdirSync(staticDir);
-      for (const hashDir of hashDirs) {
-        const hashPath = path.join(staticDir, hashDir);
-        if (fs.statSync(hashPath).isDirectory()) {
-          // Try the markdown file in this hash directory
-          const mdFile = path.join(hashPath, `${clean}.md`);
-          if (fs.existsSync(mdFile) && fs.statSync(mdFile).isFile()) {
-            console.log(`[resolveMarkdownPath] found bundled file: ${mdFile}`);
-            return mdFile;
-          }
-          // Also try with index.md
-          const indexFile = path.join(hashPath, clean, "index.md");
-          if (fs.existsSync(indexFile) && fs.statSync(indexFile).isFile()) {
-            console.log(
-              `[resolveMarkdownPath] found bundled index: ${indexFile}`,
-            );
-            return indexFile;
+  // Fallback: check bundled static files only if content root doesn't exist
+  // This allows the base genomehubs-ui image to serve markdown without a mounted content volume,
+  // but prevents it from interfering with site-specific deployments that have content mounted
+  if (!contentRootExists) {
+    try {
+      const staticDir = path.join(BUILD_DIR, "static");
+      if (fs.existsSync(staticDir)) {
+        // Find the hash subdirectory (e.g., "d4770c89e75b8b504fb63788bc1a246ec1a6e5aa")
+        const hashDirs = fs.readdirSync(staticDir);
+        for (const hashDir of hashDirs) {
+          const hashPath = path.join(staticDir, hashDir);
+          if (fs.statSync(hashPath).isDirectory()) {
+            // Try the markdown file in this hash directory
+            const mdFile = path.join(hashPath, `${clean}.md`);
+            if (fs.existsSync(mdFile) && fs.statSync(mdFile).isFile()) {
+              console.log(
+                `[resolveMarkdownPath] found bundled file: ${mdFile}`,
+              );
+              return mdFile;
+            }
+            // Also try with index.md
+            const indexFile = path.join(hashPath, clean, "index.md");
+            if (fs.existsSync(indexFile) && fs.statSync(indexFile).isFile()) {
+              console.log(
+                `[resolveMarkdownPath] found bundled index: ${indexFile}`,
+              );
+              return indexFile;
+            }
           }
         }
       }
+    } catch (err) {
+      console.warn(
+        `[resolveMarkdownPath] bundled fallback search failed: ${err.message}`,
+      );
     }
-  } catch (err) {
-    console.warn(
-      `[resolveMarkdownPath] bundled fallback search failed: ${err.message}`,
-    );
   }
 
   return null;
@@ -1933,9 +1946,23 @@ app.get(
         const mtime = Math.floor(stats.mtimeMs / 1000);
         const etag = `"${stats.size}-${mtime}"`;
 
-        // Set cache headers with ETag for revalidation
+        // Set cache headers - differentiate between bundled and mounted content
+        // Bundled files (in dist/) are immutable and can be cached long-term
+        // Mounted content may change between deployments and should use conditional requests
+        const isBundled = mdPath.includes(BUILD_DIR);
+
         res.set("ETag", etag);
-        res.set("Cache-Control", "public, max-age=86400, must-revalidate");
+        if (isBundled) {
+          // Bundled markdown is immutable - cache it long-term with ETag for revalidation
+          res.set("Cache-Control", "public, max-age=2592000, must-revalidate");
+          console.log(
+            `[markdown-fetch] cache: bundled (30 days with revalidation)`,
+          );
+        } else {
+          // Mounted content may change - don't cache at all, rely on ETag
+          res.set("Cache-Control", "public, max-age=0, must-revalidate");
+          console.log(`[markdown-fetch] cache: mounted (no-cache, ETag only)`);
+        }
         res.set("Vary", "Accept-Encoding");
 
         // Rewrite image paths to use the API endpoint
