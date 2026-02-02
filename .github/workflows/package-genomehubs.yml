@@ -208,7 +208,116 @@ jobs:
           context: .
           file: src/docker/ui/Dockerfile
           push: true
+          build-args: |
+            USE_PREBUILT_DIST=true
           tags: |
             genomehubs/genomehubs-ui:${{ env.VERSION }}
             genomehubs/genomehubs-ui:latest
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-and-push-goat:
+    runs-on: ubuntu-latest
+    if: success()
+    needs: build-and-push-ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: genomehubs/goat
+      - name: Build and push GoaT image with content from repo
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: src/docker/ui/Dockerfile.site
+          push: true
+          build-args: |
+            BASE_IMAGE=genomehubs/genomehubs-ui:${{ env.VERSION }}
+            SITE_REPO=genomehubs/goat-ui
+            SITE_BRANCH=feature/test-ci
+            SITE_NAME=GoaT
+            SITE_NAME_LONG=Genomes on a Tree
+            GH_CITATION_URL=https://doi.org/10.12688/wellcomeopenres.18658.1
+            GH_SUGGESTED_TERM=Canidae
+            GH_TAXONOMY=ncbi
+          tags: |
+            genomehubs/goat:${{ env.VERSION }}
+            genomehubs/goat:latest
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-and-push-boat:
+    if: success()
+    runs-on: ubuntu-latest
+    needs: build-and-push-ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: genomehubs/boat
+      - name: Build and push BoaT image with content from repo
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: src/docker/ui/Dockerfile.site
+          push: true
+          build-args: |
+            BASE_IMAGE=genomehubs/genomehubs-ui:${{ env.VERSION }}
+            SITE_REPO=genomehubs/boat-ui
+            SITE_BRANCH=main
+            SITE_NAME=BoaT
+            SITE_NAME_LONG=Bat genomes on a Tree
+            GH_TAXONOMY=ncbi
+          tags: |
+            genomehubs/boat:${{ env.VERSION }}
+            genomehubs/boat:latest
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-and-push-molluscdb:
+    if: success()
+    runs-on: ubuntu-latest
+    needs: build-and-push-ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: genomehubs/molluscdb
+      - name: Build and push MolluscDB image with content from repo
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: src/docker/ui/Dockerfile.site
+          push: true
+          build-args: |
+            BASE_IMAGE=genomehubs/genomehubs-ui:${{ env.VERSION }}
+            SITE_REPO=genomehubs/molluscdb-ui
+            SITE_BRANCH=main
+            SITE_NAME=MolluscDB
+            SITE_NAME_LONG=Mollusc Database
+            GH_TAXONOMY=ncbi
+          tags: |
+            genomehubs/molluscdb:${{ env.VERSION }}
+            genomehubs/molluscdb:latest
           labels: ${{ steps.meta.outputs.labels }}

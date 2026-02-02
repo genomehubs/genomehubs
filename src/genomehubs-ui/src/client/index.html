@@ -69,11 +69,8 @@
       }
     });
 
-    // Log webpack public path for debugging
+    // Log webpack errors for debugging
     setTimeout(function () {
-      if (typeof __webpack_public_path__ !== 'undefined') {
-        console.log('[webpack-public-path]', __webpack_public_path__);
-      }
       if (window.__chunkLoadErrors.length > 0) {
         console.error('[chunk-load-errors] Failed to load:', window.__chunkLoadErrors);
       }

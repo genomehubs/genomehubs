@@ -261,17 +261,11 @@ function resolveMarkdownPath(urlPath) {
             // Try the markdown file in this hash directory
             const mdFile = path.join(hashPath, `${clean}.md`);
             if (fs.existsSync(mdFile) && fs.statSync(mdFile).isFile()) {
-              console.log(
-                `[resolveMarkdownPath] found bundled file: ${mdFile}`,
-              );
               return mdFile;
             }
             // Also try with index.md
             const indexFile = path.join(hashPath, clean, "index.md");
             if (fs.existsSync(indexFile) && fs.statSync(indexFile).isFile()) {
-              console.log(
-                `[resolveMarkdownPath] found bundled index: ${indexFile}`,
-              );
               return indexFile;
             }
           }
@@ -369,9 +363,6 @@ function injectIntoIndexHtml(
 
   // Rewrite script/link URLs to include basename
   const basePrefix = BASE_PATH.replace(/\/$/, ""); // e.g., "/archive"
-  console.log(
-    `[injectIntoIndexHtml] BASE_PATH="${BASE_PATH}", basePrefix="${basePrefix}"`,
-  );
   html = rewriteAssetUrlsForBasename(html, basePrefix);
 
   let customMeta = "";
@@ -1827,7 +1818,6 @@ app.use(
       }
       // Markdown content - moderate cache (1 day) to catch updates
       else if (filePath.endsWith(".md")) {
-        console.log(`[static][md] serving: ${filePath}`);
         res.set("Cache-Control", "public, max-age=86400, must-revalidate");
       }
       // API responses - short cache (5 minutes)
@@ -1944,10 +1934,6 @@ app.get(
       const filePath = req.params[0]; // e.g., "projects/DTOL"
       const mdPath = resolveMarkdownPath(`/${filePath}`);
 
-      console.log(
-        `[markdown-fetch] requested=${filePath}, resolved=${mdPath}, CONTENT_ROOT=${CONTENT_ROOT}`,
-      );
-
       if (mdPath) {
         let content = fs.readFileSync(mdPath, "utf8");
 
@@ -1965,13 +1951,9 @@ app.get(
         if (isBundled) {
           // Bundled markdown is immutable - cache it long-term with ETag for revalidation
           res.set("Cache-Control", "public, max-age=2592000, must-revalidate");
-          console.log(
-            `[markdown-fetch] cache: bundled (30 days with revalidation)`,
-          );
         } else {
           // Mounted content may change - don't cache at all, rely on ETag
           res.set("Cache-Control", "public, max-age=0, must-revalidate");
-          console.log(`[markdown-fetch] cache: mounted (no-cache, ETag only)`);
         }
         res.set("Vary", "Accept-Encoding");
 
@@ -1986,12 +1968,8 @@ app.get(
           },
         );
 
-        console.log(
-          `[markdown-fetch] served ${filePath} (${content.length} bytes)`,
-        );
         res.status(200).type("text/plain").send(content);
       } else {
-        console.warn(`[markdown-fetch] not found: ${filePath}`);
         res.status(404).json({
           error: "Markdown file not found",
           path: filePath,
@@ -2122,9 +2100,6 @@ app.use((req, res, next) => {
       } catch (e) {
         exists = false;
       }
-      console.log(
-        `[asset-check] ${req.method} ${req.path} -> ${candidate} exists=${exists}`,
-      );
     }
   } catch (e) {}
   next();
@@ -2184,9 +2159,6 @@ app.get("*", async (req, res) => {
 
     // Rewrite script/link URLs to include basename
     const basePrefix = BASE_PATH.replace(/\/$/, ""); // e.g., "/archive"
-    console.log(
-      `[SPA fallback] BASE_PATH="${BASE_PATH}", basePrefix="${basePrefix}"`,
-    );
     page = rewriteAssetUrlsForBasename(page, basePrefix);
 
     // CRITICAL: Set webpack's public path IMMEDIATELY as very first script
