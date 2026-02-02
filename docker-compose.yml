@@ -1,6 +1,15 @@
 version: "3.8"
 
+#################################################################
+# Local development docker-compose
+#
+# Use environment variables to mirror the values used by
+# `run_goat.sh <ES_PORT> <HUBNAME> <RELEASE>` (example: `9200 goat 2021.10.15`).
+# Defaults below match that example if not provided in your environment.
+#################################################################
+
 services:
+  # Optional headless renderer used by the OG renderer feature
   renderer:
     image: browserless/chrome:latest
     container_name: genomehubs-renderer
@@ -9,31 +18,144 @@ services:
     shm_size: "1gb"
     restart: unless-stopped
 
-  ui:
-    image: node:18
-    container_name: genomehubs-ui-ssr
-    working_dir: /usr/src/app
+  #################################################################
+  # Build images using the same Dockerfiles as production (src/docker/*)
+  # Running `docker-compose up --build` will build these images.
+  #################################################################
+
+  #################################################################
+  # Runtime services for local testing
+  # - `api` runs the API from the repository (uses host build outputs)
+  # - `ui` runs the SSR UI and mounts the repo so changes are visible
+  #################################################################
+  api:
+    build:
+      context: .
+      dockerfile: src/docker/api/Dockerfile
+      args:
+        GH_HUBNAME: ${HUBNAME:-goat}
+        GH_RELEASE: ${RELEASE:-2021.10.15}
+        GH_NODE: http://host.docker.internal:${ES_PORT:-9200}
+        GH_HUBPATH: ${HOME}/projects/genomehubs/${HUBNAME}-resources
+        GH_LOGS_PATH: /tmp/${HUBNAME}/logs
+    image: genomehubs-api:bundle
+    container_name: genomehubs-api
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - GH_HUBNAME=${HUBNAME:-goat}
+      - GH_RELEASE=${RELEASE:-2021.10.15}
+      - GH_NODE=http://host.docker.internal:${ES_PORT:-9200}
+      - GH_HUBPATH=/genomehubs/resources
+      - GH_SOURCE=https://github.com/genomehubs/goat-data/tree/$RELEASE
+      - GH_ACCESS_LOG=/genomehubs/logs/access.log
+      - GH_ERROR_LOG=/genomehubs/logs/error.log
+      - GH_MEMCACHE_LOG=/genomehubs/logs/memcache.log
     volumes:
-      - ./:/usr/src/app:delegated
-      # Mount host markdown/content dir into the container. Set CONTENT_HOST_PATH
-      # environment variable to override the default (./content/static).
-      - ${CONTENT_HOST_PATH:-./content/static}:/usr/src/app/content/static:delegated
+      - ${GH_HUBPATH:-${HOME}/projects/genomehubs/${HUBNAME}-resources}:/genomehubs/resources:rw
+      - ${GH_LOGS_PATH:-/tmp/${HUBNAME}/logs}:/genomehubs/logs:rw
+    restart: unless-stopped
+
+  ui:
+    build:
+      context: .
+      dockerfile: src/docker/ui/Dockerfile
+      # args:
+      #   # GH_BASENAME: ${GH_BASENAME:-/}
+      #   # GH_HUBNAME: ${HUBNAME:-goat}
+      #   # GH_RELEASE: ${RELEASE:-2021.10.15}
+    image: genomehubs-ui:bundle
+    # image: genomehubs/genomehubs-ui:develop
+    container_name: genomehubs-ui-ssr
     ports:
       - "8880:8880"
     environment:
-      - NODE_ENV=development
-      # Use "auto" locally so the UI service will try remote then fall back to puppeteer
-      - OG_RENDERER=auto
-      - OG_RENDERER_URL=http://renderer:3000
-      - CONTENT_ROOT=/usr/src/app/content/static
-      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+      - NODE_ENV=production
+      # - OG_RENDERER=auto
+      # - OG_RENDERER_URL=http://renderer:3000
+      - SSR_MODE=bots
       - PORT=8880
+      # - NODE_ENV=production
+      # - OG_RENDERER=auto
+      # - OG_RENDERER_URL=http://renderer:3000
+      # - SSR_MODE=bots
+      # - PORT=8880
+      # - GH_BASENAME=${GH_BASENAME:-/}
+      # - GH_HUBNAME=${HUBNAME:-goat}
+      # - GH_RELEASE=${RELEASE:-2021.10.15}
+      - GH_SITENAME=GoaT
+      - GH_SITENAME_LONG=Genomes on Tree
+      - GH_API_URL=http://localhost:3000/api/v2
+      - GH_TAXONOMY=${GH_TAXONOMY:-ncbi}
+      - GH_ARCHIVE='latest 2025.04.21'
+      - GH_SUGGESTED_TERM=Canidae
+      - CONTENT_ROOT=${CONTENT_ROOT:-/content}
     # Install chromium in the container so puppeteer-core can find a system browser
-    command: sh -c "apt-get update && apt-get install -y --no-install-recommends chromium fonts-liberation libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2 ca-certificates wget && cd /usr/src/app && npm install --no-audit --no-fund --silent || true && node src/genomehubs-ui/src/server/index.js"
+    # command: sh -c "apt-get update && apt-get install -y --no-install-recommends chromium fonts-liberation libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2 ca-certificates wget && cd /usr/src/app && npm install --no-audit --no-fund --silent || true && node src/genomehubs-ui/src/server/index.js"
+    volumes:
+      - ${HOME}/projects/genomehubs/genomehubs/src/genomehubs-ui/dist-ci/public:/app/dist/public:ro
     depends_on:
       - renderer
+      - api
     restart: unless-stopped
-# Notes:
-# - This compose file is intended for local development parity with a remote renderer service.
-# - It mounts the repository into `/usr/src/app` so changes are visible without rebuilding the image.
-# - Ensure your markdown/content is available under `content/static` in the repository, or adjust `CONTENT_ROOT`.
+
+  #################################################################
+  # Elasticsearch for local testing
+  #################################################################
+  elasticsearch:
+    image: elasticsearch:8.19.10
+    container_name: genomehubs-elasticsearch
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+      - action.destructive_requires_name=false
+      - ES_JAVA_OPTS=-Xms2g -Xmx2g
+    ports:
+      - "9200:9200"
+    volumes:
+      - ${ES_DATA_PATH:-./data/elasticsearch}:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sS http://localhost:9200/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  #################################################################
+  # One-shot loader to populate ES with test data if missing
+  #################################################################
+  load-data:
+    build:
+      context: .
+      dockerfile: src/docker/test/Dockerfile
+    image: genomehubs-test:local
+    container_name: genomehubs-load-data
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace:delegated
+      - ${ES_DATA_PATH:-./data/elasticsearch}:/es-data:delegated
+      - ${HOST_GOAT_RESOURCES:-./goat-resources}:/projects/genomehubs/goat-resources:ro
+    # To mimic CI (--network host) set LOAD_DATA_NETWORK=host when running compose.
+    network_mode: ${LOAD_DATA_NETWORK:-bridge}
+    environment:
+      - GH_NODE=${GH_NODE:-http://host.docker.internal:9200}
+      - GH_HUBNAME=${HUBNAME:-goat}
+      - HUB=${HUBNAME:-goat}
+      - GH_RELEASE=${RELEASE:-2021.10.15}
+    depends_on:
+      - elasticsearch
+    command: sh -c "MARKER=/es-data/.genomehubs_loaded_$$HUB; echo 'Checking marker:' $$MARKER; if [ ! -f \"$$MARKER\" ] || [ \"$${FORCE_RELOAD:-false}\" = \"true\" ]; then echo 'Waiting for Elasticsearch to be available...'; until curl -sS http://host.docker.internal:9200/ >/dev/null 2>&1; do sleep 1; done; echo 'Elasticsearch ready'; SCRIPT=tests/integration_tests/scripts/load_$$HUB_test_data.sh; if [ ! -f \"$$SCRIPT\" ]; then echo 'Falling back to goat loader'; SCRIPT=tests/integration_tests/scripts/load_goat_test_data.sh; fi; if [ -f \"$$SCRIPT\" ]; then chmod +x \"$$SCRIPT\"; GH_NODE=http://elasticsearch:9200 GH_HUBNAME=$$HUB GH_RELEASE=${RELEASE:-2021.10.15} /bin/sh -c \"$$SCRIPT\" && touch \"$$MARKER\"; else echo 'No loader script found at' $$SCRIPT; fi; else echo 'Data already present for' $$HUB; fi;"
+    restart: "no"
+# Usage notes:
+# 1) To build bundles and start services for a goat hub using ES on port 9200:
+#
+#    ES_PORT=9200 HUBNAME=goat RELEASE=2021.10.15 docker-compose up --build
+#
+# 2) If you prefer to run the builders separately and then start runtime services:
+#
+#    ES_PORT=9200 HUBNAME=goat RELEASE=2021.10.15 docker-compose run --rm builder-api
+#    ES_PORT=9200 HUBNAME=goat RELEASE=2021.10.15 docker-compose run --rm builder-ui
+#    ES_PORT=9200 HUBNAME=goat RELEASE=2021.10.15 docker-compose up api ui renderer
+
