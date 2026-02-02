@@ -13,6 +13,8 @@
 # Build outputs and caches
 **/build
 **/dist
+!src/genomehubs-ui/dist
+!src/genomehubs-ui/dist/**
 **/.cache
 coverage
 
