@@ -3,8 +3,8 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import React from "react";
 import makeStyles from "@mui/styles/makeStyles";
+import { useState } from "react";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -21,10 +21,8 @@ const BasicMenu = ({
   handleChange,
 }) => {
   const classes = useStyles();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(
-    options.indexOf(current),
-  );
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(options.indexOf(current));
 
   const handleClickListItem = (event) => {
     setAnchorEl(event.currentTarget);
@@ -85,8 +83,7 @@ const BasicMenu = ({
 
 export default BasicMenu;
 
-// import React from "react";
-// import { makeStyles } from "@mui/material/styles";
+// // import { makeStyles } from "@mui/material/styles";
 // import InputLabel from "@mui/material/InputLabel";
 // import MenuItem from "@mui/material/MenuItem";
 // import FormControl from "@mui/material/FormControl";

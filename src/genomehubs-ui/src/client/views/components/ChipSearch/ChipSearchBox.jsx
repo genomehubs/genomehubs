@@ -2,22 +2,17 @@ import {
   Box,
   Button,
   ButtonGroup,
-  Dialog,
-  DialogActions,
-  DialogContent,
   DialogTitle,
   IconButton,
   Typography,
 } from "@mui/material";
 import { Modal, Paper } from "@mui/material";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 
 import ChipSearch from "./ChipSearch";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import KeyboardArrowDownIcon from "@mui/icons-material/Tune";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-// A wrapper around the ChipSearch component to add buttons for search options
-// and submitting the search query.
 import SearchIcon from "@mui/icons-material/Search";
 import Tooltip from "../Tooltip";
 import { Underline } from "./Underline";
@@ -579,7 +574,7 @@ const SearchOptions = ({
   );
 };
 
-const ChipSearchBox = React.memo(
+const ChipSearchBox = memo(
   ({
     types,
     results,

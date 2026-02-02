@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import { forwardRef, useRef, useState } from "react";
 
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
@@ -8,7 +8,7 @@ import GetAppIcon from "@mui/icons-material/GetApp";
 import MenuItem from "@mui/material/MenuItem";
 import MenuList from "@mui/material/MenuList";
 import Paper from "@mui/material/Paper";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withColors from "#hocs/withColors";
 import withTheme from "#hocs/withTheme";
 
@@ -32,9 +32,9 @@ const DownloadButton = ({
   theme,
   colorScheme,
 }) => {
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const handleClick = async () => {
     let key = Object.keys(options)[selectedIndex];

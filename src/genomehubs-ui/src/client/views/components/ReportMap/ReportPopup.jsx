@@ -1,4 +1,3 @@
-import React from "react";
 import ReportMenu from "./ReportMenu";
 
 export const ReportPopup = ({

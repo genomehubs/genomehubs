@@ -6,7 +6,6 @@ import {
 } from "./Styles.scss";
 
 import Page from "./Page";
-import React from "react";
 import TextPanel from "./TextPanel";
 import classnames from "classnames";
 

@@ -1,6 +1,5 @@
-import { getLoading, setLoading } from "../reducers/loading";
+import { getLoading, setLoading } from "#reducers/loading";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withLoading = (WrappedComponent) => (props) => {
@@ -14,7 +13,7 @@ const withLoading = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

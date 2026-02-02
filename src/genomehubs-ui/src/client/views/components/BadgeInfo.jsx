@@ -7,15 +7,14 @@ import {
 } from "./Styles.scss";
 
 import AggregationIcon from "./AggregationIcon";
-import React from "react";
 import Tooltip from "./Tooltip";
 import classNames from "classnames";
-import { compose } from "recompose";
-import formatter from "../functions/formatter";
-import { useNavigate } from "@reach/router";
+import { compose } from "redux";
+import formatter from "#functions/formatter";
+import useNavigate from "#hooks/useNavigate";
 import withSiteName from "#hocs/withSiteName";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 export const BadgeInfoCell = ({
   fieldName,
@@ -91,7 +90,7 @@ export const BadgeInfo = ({
   const navigate = useNavigate();
   const moreInfo = () => {
     navigate(
-      `${basename}/record?recordId=${currentRecordId}&result=${result}&taxonomy=${taxonomy}`,
+      `record?recordId=${currentRecordId}&result=${result}&taxonomy=${taxonomy}`,
     );
     setBrowse();
   };

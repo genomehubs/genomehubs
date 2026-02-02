@@ -1703,6 +1703,273 @@ paths:
       tags:
         - Data
       x-eov-operation-handler: api/v2/routes/search
+  /msearch:
+    post:
+      description: Execute multiple searches simultaneously using msearch. Reduces network round-trips for parallel queries.
+      operationId: getMsearch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                searches:
+                  type: array
+                  maxItems: 100
+                  items:
+                    type: object
+                    required:
+                      - query
+                    properties:
+                      query:
+                        type: string
+                        description: Search query (e.g., "tax_rank(species)")
+                      result:
+                        type: string
+                        description: Result type (default "taxon")
+                        default: taxon
+                      taxonomy:
+                        type: string
+                        description: Taxonomy to search in
+                      fields:
+                        type: string
+                        description: Comma-separated list of fields to return
+                      limit:
+                        type: integer
+                        default: 100
+                        minimum: 1
+                        maximum: 10000
+                      offset:
+                        type: integer
+                        default: 0
+                        minimum: 0
+                      sortBy:
+                        type: string
+                        description: Field to sort by
+                      sortOrder:
+                        type: string
+                        enum:
+                          - asc
+                          - desc
+                        default: asc
+                      includeEstimates:
+                        type: boolean
+                        description: Include estimated values for missing data
+                        default: true
+                      includeDescendants:
+                        type: boolean
+                        description: Include descendant taxa
+                        default: false
+                      includeRawValues:
+                        type: boolean
+                        description: Include raw values alongside processed values
+                        default: false
+                      excludeAncestral:
+                        type: array
+                        items:
+                          type: string
+                        description: Exclude ancestral taxa for the listed fields
+                      excludeDescendant:
+                        type: array
+                        items:
+                          type: string
+                        description: Exclude descendant taxa for the listed fields
+                      excludeDirect:
+                        type: array
+                        items:
+                          type: string
+                        description: Exclude direct taxa for the listed fields
+                      excludeMissing:
+                        type: array
+                        items:
+                          type: string
+                        description: Exclude taxa with missing data for the listed fields
+              required:
+                - searches
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: object
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        count:
+                          type: integer
+                        total:
+                          type: integer
+                        hits:
+                          type: array
+                        error:
+                          type: string
+        "400":
+          description: Invalid request
+      summary: Execute multiple searches in parallel using msearch
+      tags:
+        - Data
+      x-eov-operation-handler: api/v2/routes/msearch
+    get:
+      description: Download batch search results in specified format (TSV, CSV, or JSON)
+      operationId: getMsearchDownload
+      parameters:
+        - in: query
+          name: query
+          required: true
+          schema:
+            type: string
+          description: Batch queries separated by newline or semicolon
+        - in: query
+          name: delimiter
+          required: false
+          schema:
+            type: string
+            enum: ["newline", "semicolon"]
+            default: "newline"
+          description: Delimiter used to split batch queries
+        - $ref: "#/components/parameters/resultParam"
+        - $ref: "#/components/parameters/taxonomyParam"
+        - in: query
+          name: fields
+          required: false
+          schema:
+            type: string
+          description: Comma-separated list of fields to return
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            default: 10000
+            minimum: 1
+            maximum: 10000000
+          description: Maximum results per query
+        - in: query
+          name: offset
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+          description: Result offset
+        - in: query
+          name: tidyData
+          required: false
+          schema:
+            type: boolean
+          description: Return tidy data format
+        - in: query
+          name: includeRawValues
+          required: false
+          schema:
+            type: boolean
+          description: Include raw values in output
+        - in: query
+          name: names
+          required: false
+          schema:
+            type: string
+          description: Comma-separated list of name classes to filter
+        - in: query
+          name: ranks
+          required: false
+          schema:
+            type: string
+          description: Comma-separated list of ranks to filter
+        - in: query
+          name: filename
+          required: false
+          schema:
+            type: string
+          description: Output filename
+      responses:
+        "200":
+          description: successful operation - format determined by Accept header
+          content:
+            text/tab-separated-values:
+              schema:
+                type: string
+            text/csv:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Invalid request
+      summary: Download batch search results with formatting options
+      tags:
+        - Data
+      x-eov-operation-handler: api/v2/routes/msearch
+  /searchPaginated:
+    get:
+      description: Returns paginated records matching a query using search_after for stateless pagination
+      operationId: getSearchPaginated
+      parameters:
+        - $ref: "#/components/parameters/queryParam"
+        - $ref: "#/components/parameters/resultParam"
+        - $ref: "#/components/parameters/taxonomyParam"
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 1
+            maximum: 10000
+          description: Number of results to return per page (1-10000, default 100)
+        - in: query
+          name: searchAfter
+          required: false
+          schema:
+            type: string
+          description: JSON array of sort values from the previous page for pagination continuation (returned as pagination.searchAfter)
+        - $ref: "#/components/parameters/sortByParam"
+        - $ref: "#/components/parameters/sortOrderParam"
+        - $ref: "#/components/parameters/fieldsParam"
+        - $ref: "#/components/parameters/releaseParam"
+        - $ref: "#/components/parameters/indentParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  hits:
+                    type: array
+                    items:
+                      type: object
+                  pagination:
+                    type: object
+                    properties:
+                      limit:
+                        type: integer
+                      count:
+                        type: integer
+                      hasMore:
+                        type: boolean
+                      searchAfter:
+                        type: array
+                        description: Sort values for retrieving the next page
+          description: successful operation
+        "400":
+          description: Invalid query
+      summary: Fetch paginated records matching a search query
+      tags:
+        - Data
+      x-eov-operation-handler: api/v2/routes/searchPaginated
   /summary:
     get:
       description: Returns a summary of raw field values

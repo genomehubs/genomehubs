@@ -7,11 +7,10 @@ import {
   resultPanel as resultPanelStyle,
 } from "./Styles.scss";
 
-import React from "react";
 import SearchPagination from "./SearchPagination";
 import classnames from "classnames";
-import { compose } from "recompose";
-import withSearch from "../hocs/withSearch";
+import { compose } from "redux";
+import withSearch from "#hocs/withSearch";
 
 const ControlPanel = ({ pagination }) => {
   let css = classnames(
@@ -20,7 +19,7 @@ const ControlPanel = ({ pagination }) => {
     resultPanelStyle,
     flexCenterStyle,
     flexCenterHorizontalStyle,
-    fullWidthStyle
+    fullWidthStyle,
   );
   let pageDivs = [];
   if (pagination) {

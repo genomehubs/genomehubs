@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
@@ -10,7 +8,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import ErrorIcon from "@mui/icons-material/Error";
 import Tooltip from "../Tooltip";
-import stringLength from "../../functions/stringLength";
+import stringLength from "#functions/stringLength";
+import { useState } from "react";
 
 const ValueChips = ({
   value = "",

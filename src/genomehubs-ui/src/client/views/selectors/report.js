@@ -1,33 +1,33 @@
-import { apiUrl, setApiStatus } from "../reducers/api";
-import formats, { setInterval } from "../functions/formats";
+import { apiUrl, setApiStatus } from "#reducers/api";
+import formats, { setInterval } from "#functions/formats";
 import {
   getReports,
   getReportsFetching,
   receiveReport,
   requestReport,
-} from "../reducers/report";
+} from "#reducers/report";
 import {
   getSearchIndex,
   getSearchResults,
   getSearchTerm,
   plurals,
-} from "../reducers/search";
-import { resetController, setMessage } from "../reducers/message";
+} from "#reducers/search";
+import { resetController, setMessage } from "#reducers/message";
 
-import { byIdSelectorCreator } from "../reducers/selectorCreators";
+import { byIdSelectorCreator } from "#reducers/selectorCreators";
 import { checkProgress } from "./checkProgress";
 import { createCachedSelector } from "re-reselect";
 import { createSelector } from "reselect";
 // import { format } from "d3-format";
-import { getTypes } from "../reducers/types";
-import { mapThreshold } from "../reducers/map";
+import { getTypes } from "#reducers/types";
+import { mapThreshold } from "#reducers/map";
 import md5 from "md5";
 import { nanoid } from "nanoid";
 import { processTree } from "./tree";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import { scaleOrdinal } from "d3-scale";
-import store from "../store";
-import { treeThreshold } from "../reducers/tree";
+import store from "#store";
+import { treeThreshold } from "#reducers/tree";
 
 const SESSION_ID = nanoid(10);
 

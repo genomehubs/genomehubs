@@ -1,8 +1,7 @@
-import { getSummaryField, setSummaryField } from "../reducers/explore";
+import { getSummaryField, setSummaryField } from "#reducers/explore";
 
-import React from "react";
 import { connect } from "react-redux";
-import { fetchSummary } from "../selectors/explore";
+import { fetchSummary } from "#selectors/explore";
 
 const withSummary = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
@@ -18,7 +17,7 @@ const withSummary = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

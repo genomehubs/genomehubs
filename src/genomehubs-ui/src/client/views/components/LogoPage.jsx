@@ -1,26 +1,27 @@
+import { memo, useState } from "react";
+
 import BoatLogo from "./LogoBoat";
 import BtkLogo from "./LogoBtk";
 import GoatLogo from "./LogoGoat";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import IsodbLogo from "./LogoIsopoDB";
 import LepbaseLogo from "./LogoLepbase";
 import MdbLogo from "./LogoMolluscDB";
-import React from "react";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { fixedArSixteenNine as fixedArSixteenNineStyle } from "./Styles.scss";
 import withColors from "#hocs/withColors";
-import withTheme from "../hocs/withTheme";
+import withTheme from "#hocs/withTheme";
 
-const MemoizedGoatLogo = React.memo(GoatLogo);
-const MemoizedBoatLogo = React.memo(BoatLogo);
-const MemoizedBtkLogo = React.memo(BtkLogo);
-const MemoizedIsodbLogo = React.memo(IsodbLogo);
-const MemoizedLepbaseLogo = React.memo(LepbaseLogo);
-const MemoizedMdbLogo = React.memo(MdbLogo);
+const MemoizedGoatLogo = memo(GoatLogo);
+const MemoizedBoatLogo = memo(BoatLogo);
+const MemoizedBtkLogo = memo(BtkLogo);
+const MemoizedIsodbLogo = memo(IsodbLogo);
+const MemoizedLepbaseLogo = memo(LepbaseLogo);
+const MemoizedMdbLogo = memo(MdbLogo);
 
 export const LogoPage = ({ colorScheme, theme }) => {
-  const [animate, setAnimate] = React.useState(Array(6).fill(false));
+  const [animate, setAnimate] = useState(Array(6).fill(false));
 
   let {
     headerBackground: darkColor,

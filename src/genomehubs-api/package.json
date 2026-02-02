@@ -3,14 +3,21 @@
   "version": "2.11.17",
   "description": "GenomeHubs API",
   "scripts": {
-    "api": "node --max-old-space-size=12288 src/app.js",
-    "start": "nodemon src/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "package": "./package.sh"
+    "dev": "nodemon src/app.js",
+    "build:bundle": "node scripts/generate-operation-handlers.cjs src/generated && node scripts/bundle.cjs",
+    "start": "node --no-deprecation build/bundle.cjs",
+    "start:goat": "GH_HUBNAME=goat GH_RELEASE=2021.10.15 node --no-deprecation build/bundle.cjs",
+    "docker:build": "docker build -f ../docker/api/Dockerfile -t genomehubs-api:bundle ../..",
+    "docker:run": "docker run --rm -p 3000:3000 genomehubs-api:bundle",
+    "docker:run:goat": "docker run --rm -p 3000:3000 -e GH_HUBNAME=goat -e GH_RELEASE=2021.10.15 genomehubs-api:bundle",
+    "docker:run:host-es": "docker run --rm -p 3000:3000 -e GH_NODE=http://host.docker.internal:9200 genomehubs-api:bundle",
+    "docker:run:goat-host-es": "docker run --rm -p 3000:3000 -e GH_HUBNAME=goat -e GH_RELEASE=2021.10.15 -e GH_NODE=http://host.docker.internal:9200 genomehubs-api:bundle",
+    "docker:run:envfile": "docker run --rm -p 3000:3000 --env-file ../docker/api/.env genomehubs-api:bundle",
+    "docker:stop": "docker ps -q --filter ancestor=genomehubs-api:bundle | xargs -r docker stop"
   },
   "main": "src/app.js",
   "type": "module",
-  "bin": "build/app.js",
+  "bin": "build/app.cjs",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/genomehubs/genomehubs-api.git"
@@ -23,29 +30,27 @@
   "homepage": "https://github.com/genomehubs/genomehubs-api#readme",
   "dependencies": {
     "@elastic/elasticsearch": "^8.15.0",
-    "archiver": "^5.3.2",
+    "@json2csv/plainjs": "^7.0.6",
+    "archiver": "^7.0.1",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "d3-format": "^2.0.0",
-    "d3-scale": "^3.3.0",
-    "dotenv": "^16.0.0",
-    "express": "^4.17.2",
+    "d3-format": "^3.1.0",
+    "d3-scale": "^4.0.2",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
     "express-openapi-validator": "^5.0.3",
-    "helmet": "^7.1.0",
+    "helmet": "^8.1.0",
     "ioredis": "^5.4.1",
     "json-stream-stringify": "^3.1.6",
-    "json2csv": "^5.0.7",
     "memcached": "^2.2.2",
     "memcached-promise": "^1.0.1",
     "qs": "^6.10.3",
-    "redis": "^4.6.14",
     "reselect": "^5.1.1",
     "simple-statistics": "^7.8.2",
     "spdx-license-list": "^6.9.0",
     "swagger-ui-express": "^5.0.1",
-    "undici": "github:genomehubs/undici",
-    "uuid": "^10.0.0",
+    "uuid": "^13.0.0",
     "winston": "^3.7.2",
     "winston-daily-rotate-file": "^5.0.0",
     "yamljs": "^0.3.0"
@@ -53,17 +58,9 @@
   "devDependencies": {
     "@babel/cli": "^7.17.3",
     "@babel/core": "^7.25.2",
-    "@babel/plugin-transform-modules-commonjs": "^7.16.8",
-    "@types/node": "^22.5.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.27.1",
+    "@types/node": "^24.10.4",
+    "esbuild": "^0.27.2",
     "nodemon": "^3.1.4"
-  },
-  "pkg": {
-    "assets": [
-      "build/**/*"
-    ],
-    "targets": [
-      "node18-linux-x64"
-    ],
-    "outputPath": "dist"
   }
 }

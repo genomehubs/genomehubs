@@ -1,5 +1,4 @@
 import CountrySVG from "./CountrySVG";
-import React from "react";
 import ReportPopup from "./ReportPopup";
 
 export const CountryPopup = ({

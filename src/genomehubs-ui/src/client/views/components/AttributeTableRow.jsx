@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import {
   title as titleStyle,
   underscoreHigh as underscoreHighStyle,
@@ -27,18 +27,18 @@ import TableRow from "@mui/material/TableRow";
 import Tooltip from "./Tooltip";
 import ZoomControl from "./ZoomControl";
 import classnames from "classnames";
-import { compose } from "recompose";
-import { formatter } from "../functions/formatter";
+import { compose } from "redux";
+import { formatter } from "#functions/formatter";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "../functions/qs";
-import { useNavigate } from "@reach/router";
-import withApi from "../hocs/withApi";
-import withRecord from "../hocs/withRecord";
-import withSearch from "../hocs/withSearch";
+import qs from "#functions/qs";
+import useNavigate from "#hooks/useNavigate";
+import withApi from "#hocs/withApi";
+import withRecord from "#hocs/withRecord";
+import withSearch from "#hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";
-import withSummary from "../hocs/withSummary";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import withSummary from "#hocs/withSummary";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 const styleMap = {
   underscoreHighStyle,
@@ -117,8 +117,8 @@ const NestedTable = ({
   basename,
 }) => {
   const navigate = useNavigate();
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -126,7 +126,7 @@ const NestedTable = ({
   const handleSourceClick = (recordId, result) => {
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/record?recordId=${recordId}&result=${result}&taxonomy=${taxonomy}#${encodeURIComponent(
+      `record?recordId=${recordId}&result=${result}&taxonomy=${taxonomy}#${encodeURIComponent(
         recordId,
       )}`,
     );
@@ -410,9 +410,7 @@ const AttributeTableRow = ({
       options.excludeAncestral = [fieldId];
     }
     navigate(
-      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
-        options.query,
-      )}`,
+      `search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`,
     );
   };
 
@@ -431,9 +429,7 @@ const AttributeTableRow = ({
       options.excludeAncestral = [fieldId];
     }
     navigate(
-      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
-        options.query,
-      )}`,
+      `search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`,
     );
   };
 
@@ -445,7 +441,7 @@ const AttributeTableRow = ({
   let geoPoints;
 
   // Fetch map data for sample_location or country_list
-  React.useEffect(() => {
+  useEffect(() => {
     // set a timeout to prevent multiple fetches
     if (loadingMap) {
       return;

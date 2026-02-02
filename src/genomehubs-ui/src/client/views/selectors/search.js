@@ -1,4 +1,4 @@
-import { apiUrl, setApiStatus } from "../reducers/api";
+import { apiUrl, setApiStatus } from "#reducers/api";
 import {
   cancelQuery,
   cancelSearch,
@@ -13,17 +13,17 @@ import {
   setSearchHistory,
   setSearchIndex,
   setSearchTerm,
-} from "../reducers/search";
-import { resetController, setMessage } from "../reducers/message";
+} from "#reducers/search";
+import { getBasename, pathJoin } from "#reducers/location";
+import { resetController, setMessage } from "#reducers/message";
 
-import { basename } from "../reducers/location";
 import { checkProgress } from "./checkProgress";
-import { getCurrentTaxonomy } from "../reducers/taxonomy";
-import { getTypes } from "../reducers/types";
+import { getCurrentTaxonomy } from "#reducers/taxonomy";
+import { getTypes } from "#reducers/types";
 import { nanoid } from "nanoid";
-import qs from "../functions/qs";
-import { setTreeQuery } from "../reducers/tree";
-import store from "../store";
+import qs from "#functions/qs";
+import { setTreeQuery } from "#reducers/tree";
+import store from "#store";
 
 // import { fetchTypes } from "./types";
 
@@ -107,18 +107,272 @@ export function fetchSearchResults(options, navigate) {
         dispatch(receiveSearch(json));
 
         if (navigate) {
+          const basename = getBasename();
           let navOptions = { ...params };
           if (json.queryString) {
             navOptions.query = json.queryString;
           }
-          navigate(`${basename}/search?${qs.stringify(navOptions)}`, {
-            replace: true,
-          });
+          navigate(
+            `${pathJoin(basename, "search")}?${qs.stringify(navOptions)}`,
+            {
+              replace: true,
+            },
+          );
         }
         dispatch(receiveSearch(json));
       }
     } catch (err) {
       dispatch(cancelSearch);
+      return dispatch(setApiStatus(false));
+    }
+  };
+}
+
+export function fetchMsearchResults(options, navigate) {
+  let params = structuredClone(options);
+  return async function (dispatch) {
+    const state = store.getState();
+    const searchDefaults = getSearchDefaults(state);
+    const taxonomy = getCurrentTaxonomy(state);
+    const { searches = [], originalQueries = [], result = "taxon" } = params;
+
+    if (!Array.isArray(searches) || searches.length === 0) {
+      return dispatch(cancelSearch());
+    }
+
+    dispatch(requestSearch());
+    dispatch(
+      setSearchTerm({
+        msearch: true,
+        query: params.query, // Preserve query parameter for URL and download
+        originalQueries,
+        result,
+        taxonomy: params.taxonomy || taxonomy,
+      }),
+    );
+
+    // Normalize searches to ensure all have required fields
+    const defaultTaxonFields =
+      "taxon_id,scientific_name,taxon_rank,common_names,names";
+    const normalizedSearches = searches.map((search) => ({
+      query: search.query || "",
+      result: search.result || result,
+      taxonomy: search.taxonomy || params.taxonomy || taxonomy,
+      // Use empty string for fields to get API default behavior (all attribute fields)
+      // OR use specific fields if provided. Don't use undefined.
+      fields: search.fields !== undefined ? search.fields : params.fields || "",
+      limit: parseInt(search.limit, 10) || 1000,
+      offset: parseInt(search.offset, 10) || 0,
+      // Pass search parameters with each search
+      ...(params.includeEstimates !== undefined && {
+        includeEstimates: Boolean(params.includeEstimates),
+      }),
+      ...(params.includeDescendants !== undefined && {
+        includeDescendants: Boolean(params.includeDescendants),
+      }),
+      ...(params.includeRawValues !== undefined && {
+        includeRawValues: Boolean(params.includeRawValues),
+      }),
+      ...(params.excludeAncestral !== undefined && {
+        excludeAncestral: params.excludeAncestral,
+      }),
+      ...(params.excludeDescendant !== undefined && {
+        excludeDescendant: params.excludeDescendant,
+      }),
+      ...(params.excludeDirect !== undefined && {
+        excludeDirect: params.excludeDirect,
+      }),
+      ...(params.excludeMissing !== undefined && {
+        excludeMissing: params.excludeMissing,
+      }),
+      ...(params.sortBy !== undefined && { sortBy: params.sortBy }),
+      ...(params.sortOrder !== undefined && { sortOrder: params.sortOrder }),
+      ...(params.sortMode !== undefined && { sortMode: params.sortMode }),
+    }));
+
+    console.log("Normalized searches:", normalizedSearches);
+    console.log("Search defaults:", searchDefaults);
+
+    const endpoint = "msearch";
+    const url = `${apiUrl}/${endpoint}`;
+
+    try {
+      const requestBody = JSON.stringify({
+        searches: normalizedSearches,
+      });
+
+      console.log("Sending msearch request:", requestBody);
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: requestBody,
+      });
+
+      const json = await response.json();
+
+      if (json && json.results) {
+        // Transform msearch results into grouped format with UI display limit
+        // Flatten results while preserving query grouping metadata
+        const allHits = [];
+        const queryGroups = [];
+        const displayLimit = parseInt(params.displayLimit, 10) || 10; // Default 10 results per group in UI
+
+        originalQueries.forEach((query, idx) => {
+          const queryResult = json.results[idx];
+
+          // Handle error results
+          if (queryResult && queryResult.status === "error") {
+            queryGroups.push({
+              query,
+              startIndex: allHits.length,
+              count: 0,
+              totalCount: 0,
+              hasMore: false,
+              error: queryResult.error,
+              errorMessage: `Error: ${queryResult.error}`,
+            });
+            return;
+          }
+
+          // Handle successful results
+          if (
+            queryResult &&
+            queryResult.hits &&
+            Array.isArray(queryResult.hits)
+          ) {
+            console.log(queryResult);
+            const { hits, total: totalCount } = queryResult;
+            const displayCount = Math.min(totalCount, displayLimit);
+            const hasMore = totalCount > displayLimit;
+
+            queryGroups.push({
+              query,
+              startIndex: allHits.length,
+              count: displayCount,
+              totalCount,
+              hasMore,
+            });
+            // Add only displayLimit hits for UI (but track total count for "show more" button)
+            hits.slice(0, displayCount).forEach((hit) => {
+              allHits.push({
+                id: hit.id,
+                index: hit.index,
+                score: hit.score,
+                result: {
+                  ...hit.result,
+                  // Alias taxon_* fields to expected names for ResultTable
+                  names: hit.result.taxon_names || hit.result.names || [],
+                },
+                _msearchGroup: {
+                  query,
+                  queryIndex: idx,
+                },
+              });
+            });
+          } else {
+            // No results (successful query, just no matches)
+            queryGroups.push({
+              query,
+              startIndex: allHits.length,
+              count: 0,
+              totalCount: 0,
+              hasMore: false,
+              noResults: true,
+            });
+          }
+        });
+
+        const groupedResults = {
+          isMsearch: true,
+          originalQueries,
+          queryGroups,
+          results: allHits,
+          displayLimit,
+          status: json.status,
+        };
+
+        // Get unique count across all queries by doing a union search
+        // Combine all queries with OR operator for deduplication
+        const unionQuery = originalQueries.map((q) => `(${q})`).join(" OR ");
+
+        try {
+          const uniqueCountParams = {
+            query: unionQuery,
+            result: result,
+            taxonomy: params.taxonomy || taxonomy,
+            size: "0",
+            // Include all search parameters to match the batch search
+            ...(params.includeEstimates !== undefined && {
+              includeEstimates: params.includeEstimates,
+            }),
+            ...(params.includeDescendants !== undefined && {
+              includeDescendants: params.includeDescendants,
+            }),
+            ...(params.includeRawValues !== undefined && {
+              includeRawValues: params.includeRawValues,
+            }),
+            ...(params.excludeAncestral !== undefined && {
+              excludeAncestral: params.excludeAncestral,
+            }),
+            ...(params.excludeDescendant !== undefined && {
+              excludeDescendant: params.excludeDescendant,
+            }),
+            ...(params.excludeDirect !== undefined && {
+              excludeDirect: params.excludeDirect,
+            }),
+            ...(params.excludeMissing !== undefined && {
+              excludeMissing: params.excludeMissing,
+            }),
+            ...(params.sortBy !== undefined && { sortBy: params.sortBy }),
+            ...(params.sortOrder !== undefined && {
+              sortOrder: params.sortOrder,
+            }),
+            ...(params.sortMode !== undefined && { sortMode: params.sortMode }),
+          };
+          const uniqueCountResponse = await fetch(
+            `${apiUrl}/search?${qs.stringify(uniqueCountParams)}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            },
+          );
+          const uniqueCountJson = await uniqueCountResponse.json();
+          if (uniqueCountJson && uniqueCountJson.status) {
+            groupedResults.uniqueCount = uniqueCountJson.status.hits || 0;
+          }
+        } catch (uniqueErr) {
+          console.error("Failed to get unique count:", uniqueErr);
+          // Continue without unique count if the query fails
+        }
+
+        dispatch(receiveSearch(groupedResults));
+
+        if (navigate) {
+          const basename = getBasename();
+          const navOptions = {
+            query: options.query, // Preserve the batch query string
+            result,
+            msearch: "true",
+            offset: 0,
+          };
+          navigate(
+            `${pathJoin(basename, "search")}?${qs.stringify(navOptions)}`,
+            {
+              replace: true,
+            },
+          );
+        }
+      } else {
+        dispatch(receiveSearch(json || { results: [] }));
+      }
+    } catch (err) {
+      console.error("msearch error:", err);
+      dispatch(cancelSearch());
       return dispatch(setApiStatus(false));
     }
   };
@@ -155,12 +409,100 @@ export const saveSearchResults = ({ options, format = "tsv" }) => {
 
     const filename = `download.${format}`;
     options.filename = filename;
-    const queryString = qs.stringify(options);
+
     const formats = {
       csv: "text/csv",
       json: "application/json",
       tsv: "text/tab-separated-values",
     };
+
+    // Check if this is a batch search download
+    // Detect via searches array OR via originalQueries array (which is set after batch search)
+    const hasSearchesArray =
+      Array.isArray(options.searches) && options.searches.length > 1;
+    const hasOriginalQueries =
+      Array.isArray(options.originalQueries) &&
+      options.originalQueries.length > 1;
+    const isBatchSearch = hasSearchesArray || hasOriginalQueries;
+
+    if (isBatchSearch) {
+      // Handle batch search download using new msearch/download endpoint
+      try {
+        dispatch(
+          setMessage({
+            message: `Preparing ${format.toUpperCase()} file for download`,
+            duration: 0,
+            severity: "info",
+          }),
+        );
+
+        // Build download options with query parameter (already contains batch string)
+        const downloadOptions = {
+          query: options.query,
+          result: options.result,
+          taxonomy: options.taxonomy,
+          fields: options.fields,
+          offset: 0,
+          limit: 10000000, // Large limit to get all results
+          tidyData: options.tidyData,
+          includeRawValues: options.includeRawValues,
+          names: options.names,
+          ranks: options.ranks,
+          filename: filename,
+        };
+
+        // Remove undefined values
+        Object.keys(downloadOptions).forEach(
+          (key) =>
+            downloadOptions[key] === undefined && delete downloadOptions[key],
+        );
+
+        const queryString = qs.stringify(downloadOptions);
+        const url = `${apiUrl}/msearch?${queryString}`;
+
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Accept: formats[format],
+          },
+          signal: window.controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const blob = await response.blob();
+        const linkUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = linkUrl;
+        link.setAttribute("download", filename);
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+
+        dispatch(
+          setMessage({
+            duration: 0,
+            severity: "info",
+          }),
+        );
+        return true;
+      } catch (err) {
+        console.error("Batch download error:", err);
+        dispatch(
+          setMessage({
+            message: `Unable to download ${format.toUpperCase()} file`,
+            duration: 5000,
+            severity: "error",
+          }),
+        );
+        return false;
+      }
+    }
+
+    // Original single search download logic
+    const queryString = qs.stringify(options);
     const queryId = nanoid(10);
     let url = `${apiUrl}/search?${queryString}&queryId=${queryId}&persist=once`;
     let status;

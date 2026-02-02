@@ -1,6 +1,6 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 
 export const requestAnalyses = createAction("REQUEST_ANALYSES");
 export const receiveAnalyses = createAction(
@@ -23,12 +23,12 @@ const defaultState = () => ({
 const analyses = handleActions(
   {
     REQUEST_ANALYSES: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
+      produce(state, (draft) => {
+        draft.isFetching = true;
       }),
     CANCEL_ANALYSES: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: false,
+      produce(state, (draft) => {
+        draft.isFetching = false;
       }),
     RECEIVE_ANALYSES: (state, action) => {
       let byAnalysisId = { byId: {}, allIds: [] };
@@ -79,12 +79,12 @@ const analyses = handleActions(
         }
         byAnalysisId.byId[analysisId] = result.result;
       });
-      return immutableUpdate(state, {
-        isFetching: false,
-        byId: byAnalysisId.byId,
-        allIds: byAnalysisId.allIds,
-        byAssemblyId,
-        byTaxonId,
+      return produce(state, (draft) => {
+        draft.isFetching = false;
+        draft.byId = byAnalysisId.byId;
+        draft.allIds = byAnalysisId.allIds;
+        draft.byAssemblyId = byAssemblyId;
+        draft.byTaxonId = byTaxonId;
       });
     },
     RESET_ANALYSES: defaultState,
@@ -98,8 +98,8 @@ export const logAnalysisQuery = createAction("LOG_ANALYSIS_QUERY");
 export const analysisQueries = handleAction(
   "LOG_ANALYSIS_QUERY",
   (state, action) => {
-    return immutableUpdate(state, {
-      [action.payload]: true,
+    return produce(state, (draft) => {
+      draft[action.payload] = true;
     });
   },
   {},

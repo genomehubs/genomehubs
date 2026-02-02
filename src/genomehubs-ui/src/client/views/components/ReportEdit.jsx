@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import AutoCompleteInput from "./AutoCompleteInput";
 import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import InputAdornment from "@mui/material/InputAdornment";
 import InputLabel from "@mui/material/InputLabel";
@@ -19,14 +19,14 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
-import dispatchReport from "../hocs/dispatchReport";
-import { getSuggestedTerm } from "../reducers/search";
-import qs from "../functions/qs";
-import withReportById from "../hocs/withReportById";
+import { compose } from "redux";
+import dispatchReport from "#hocs/dispatchReport";
+import { getSuggestedTerm } from "#reducers/search";
+import qs from "#functions/qs";
+import withReportById from "#hocs/withReportById";
 import withSiteName from "#hocs/withSiteName";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 const suggestedTerm = getSuggestedTerm();
 

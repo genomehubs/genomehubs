@@ -9,15 +9,15 @@ export const getResultFields = async (req, res) => {
   let identifiers = {};
   let lookupIdentifiers;
   let status = {};
-  let release = req.query.release || config.release;
-  let hub = config.hub;
-  let source = config.source;
+  const q = req.expandedQuery || req.query || {};
+  let release = q.release || config.release;
+  let { hub, source } = config;
   try {
     ({ typesMap: fields } = await attrTypes({
-      ...req.query,
+      ...q,
     }));
     ({ typesMap: identifiers } = await attrTypes({
-      ...req.query,
+      ...q,
       indexType: "identifiers",
     }));
     status = { success: true };
@@ -26,5 +26,5 @@ export const getResultFields = async (req, res) => {
     status = { success: false, error: "Unable to fetch fields" };
   }
   let response = { status, fields, identifiers, hub, release, source };
-  return res.status(200).send(formatJson(response, req.query.indent));
+  return res.status(200).send(formatJson(response, q.indent));
 };

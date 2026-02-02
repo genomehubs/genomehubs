@@ -1,6 +1,6 @@
-import React, { useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import styles from "./withFadeInOut.scss";
+import { useState } from "react";
 
 const withFadeInOut = (WrappedComponent) => (props) => {
   const [visible, setVisible] = useState(true);

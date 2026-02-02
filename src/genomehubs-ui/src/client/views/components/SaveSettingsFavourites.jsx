@@ -1,6 +1,5 @@
 import * as htmlToImage from "html-to-image";
 
-import React, { useRef, useState } from "react";
 import {
   favListingButton as favListingButtonStyle,
   favListingContainer as favListingContainerStyle,
@@ -9,7 +8,7 @@ import {
   favListingHeader as favListingHeaderStyle,
   favListing as favListingStyle,
 } from "./Styles.scss";
-import { useLocation, useNavigate } from "@reach/router";
+import { useRef, useState } from "react";
 
 import ColorButton from "./ColorButton";
 import EditIcon from "@mui/icons-material/Edit";
@@ -22,16 +21,18 @@ import QrCodeIcon from "@mui/icons-material/QrCode";
 import SearchIcon from "@mui/icons-material/Search";
 import Typography from "@mui/material/Typography";
 import YamlEditor from "@focus-reactive/react-yaml";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { downloadLink } from "./ReportDownload";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "../functions/qs";
-import { splitTerms } from "../functions/splitTerms";
+import qs from "#functions/qs";
+import { splitTerms } from "#functions/splitTerms";
 import { useLocalStorage } from "usehooks-ts";
-import withSearchDefaults from "../hocs/withSearchDefaults";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
+import withSearchDefaults from "#hocs/withSearchDefaults";
 import withSiteName from "#hocs/withSiteName";
 import withStyles from "@mui/styles/withStyles";
-import withTaxonomy from "../hocs/withTaxonomy";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 export const useStyles = makeStyles((theme) => ({
   paper: {
@@ -161,7 +162,7 @@ const SaveSettingsFavourites = ({ currentIndex, basename, taxonomy }) => {
       />
     );
 
-    let qrLink = `${location.origin}${basename}/search?${encodeURIComponent(qs.stringify({ taxonomy, ...searchTerm, ...reportTerm }))}#${encodeURIComponent(searchTerm.query)}`;
+    let qrLink = `${location.origin}search?${encodeURIComponent(qs.stringify({ taxonomy, ...searchTerm, ...reportTerm }))}#${encodeURIComponent(searchTerm.query)}`;
     favListings.push(
       <div key={i} className={favListingStyle}>
         <div className={favListingContainerStyle}>

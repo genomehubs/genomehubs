@@ -1,6 +1,5 @@
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import React from "react";
 import Typography from "@mui/material/Typography";
 import { useStyles } from "./SearchBoxStyles";
 

@@ -1,15 +1,14 @@
-import { useLocation, useNavigate } from "@reach/router";
-
-import React from "react";
 // import Pagination from "@mui/lab/Pagination";
 import TablePagination from "@mui/material/TablePagination";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import styles from "./Styles.scss";
 import { useLocalStorage } from "usehooks-ts";
-import withSearch from "../hocs/withSearch";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
+import withSearch from "#hocs/withSearch";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,10 +28,20 @@ const SearchPagination = ({
   if (!searchResults.status || !searchResults.status.hits) {
     return null;
   }
+
+  // Batch searches (msearch) don't support pagination
+  if (searchResults.isMsearch) {
+    return (
+      <div style={{ padding: "16px", color: "#666", fontStyle: "italic" }}>
+        Note: Pagination is not supported for batch searches. All results from
+        multiple queries are displayed together.
+      </div>
+    );
+  }
+
   const navigate = useNavigate();
   const location = useLocation();
-  let pageSize = searchResults.status.size;
-  let offset = searchResults.status.offset;
+  let { size: pageSize, offset } = searchResults.status;
   let resultCount = searchResults.status.hits;
   let count = Math.ceil(resultCount / pageSize);
   let page = offset / pageSize;
@@ -40,14 +49,14 @@ const SearchPagination = ({
   let index = searchIndex || "taxon";
   const [savedOptions, setSavedOptions] = useLocalStorage(
     `${index}Options`,
-    {}
+    {},
   );
   const handleChange = (event, newPage) => {
     options.offset = newPage * pageSize;
     // setPreferSearchTerm(true);
     // setSearchTerm(options);
     navigate(
-      `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`
+      `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`,
     );
   };
   const handleChangeRowsPerPage = (event) => {
@@ -57,7 +66,7 @@ const SearchPagination = ({
     // setSearchTerm(options);
     setSavedOptions({ ...savedOptions, size: options.size });
     navigate(
-      `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`
+      `${location.pathname}?${qs.stringify(options)}${location.hash || ""}`,
     );
   };
   if (resultCount <= 10) {

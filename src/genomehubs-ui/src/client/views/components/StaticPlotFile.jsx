@@ -1,16 +1,7 @@
-import React, { Fragment, useLayoutEffect, useRef, useState } from "react";
-
-import CloseIcon from "@mui/icons-material/Close";
-import Grid from "@mui/material/Grid2";
-import IconButton from "@mui/material/IconButton";
-import Modal from "@mui/material/Modal";
-import Skeleton from '@mui/material/Skeleton';
-import Typography from "@mui/material/Typography";
-import { compose } from "recompose";
-import makeStyles from '@mui/styles/makeStyles';
-import useResize from "../hooks/useResize";
-import useWindowDimensions from "../hooks/useWindowDimensions";
-import withApi from "../hocs/withApi";
+import Skeleton from "@mui/material/Skeleton";
+import { compose } from "redux";
+import useResize from "#hooks/useResize";
+import withApi from "#hocs/withApi";
 
 const StaticPlotFile = ({
   fileId,
@@ -18,9 +9,6 @@ const StaticPlotFile = ({
   apiUrl,
   containerRef,
   ratio = 1,
-  windowDimensions,
-  previewDimensions,
-  setPreviewDimensions,
 }) => {
   const [src, setSrc] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -57,7 +45,7 @@ const StaticPlotFile = ({
 
     setSrc(
       // `${apiUrl}/download?recordId=${fileId}&streamFile=true&preview=true`
-      `${apiUrl}/download?recordId=${fileId}&streamFile=true`
+      `${apiUrl}/download?recordId=${fileId}&streamFile=true`,
     );
   }
   return loading ? (

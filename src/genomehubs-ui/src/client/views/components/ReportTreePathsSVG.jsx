@@ -1,4 +1,3 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   header as headerStyle,
   infoPanel1Column as infoPanel1ColumnStyle,
@@ -6,13 +5,14 @@ import {
   resultPanel as resultPanelStyle,
   title as titleStyle,
 } from "./Styles.scss";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { scaleLog } from "d3-scale";
 import { useLongPress } from "use-long-press";
-import withTypes from "../hocs/withTypes";
+import withTypes from "#hocs/withTypes";
 
 const ReportTreePaths = ({
   count,
@@ -189,7 +189,7 @@ const ReportTreePaths = ({
               />
             </g>
           </Tooltip>
-        </>
+        </>,
       );
     });
   }
@@ -218,7 +218,7 @@ const ReportTreePaths = ({
           id={`${label.taxon_id}-label-path`}
           style={{ pointerEvents: "none" }}
           d={label.arc}
-        />
+        />,
       );
       text.push(
         <text
@@ -235,7 +235,7 @@ const ReportTreePaths = ({
           >
             {label.scientific_name}
           </textPath>
-        </text>
+        </text>,
       );
     });
   }
@@ -247,7 +247,7 @@ const ReportTreePaths = ({
       style={{
         height: Math.min(
           (plotHeight * svgWidth) / (treeDimensions.width || 1) + 20,
-          divHeight
+          divHeight,
         ),
         overflowY: "auto",
         overflowX: "hidden",

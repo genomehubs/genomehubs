@@ -1,4 +1,3 @@
-import React from "react";
 import Tooltip from "../Tooltip";
 import WarningIcon from "@mui/icons-material/Warning";
 

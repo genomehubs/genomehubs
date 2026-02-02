@@ -8,37 +8,40 @@ on:
       - "*"
 
 jobs:
-  package-ui:
+  build-api:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: "18"
-      - run: npm install -g pkg
-      - run: |
-          ./package-ui.sh
-          mv ./dist/genomehubs-ui-linux-x64 ./dist/genomehubs-ui-linux || exit 0
+          node-version: "24"
+      - name: Generate handlers and build bundle
+        working-directory: ./src/genomehubs-api
+        run: |
+          npm ci
+          node scripts/generate-operation-handlers.cjs src/generated
+          npm run build:bundle
       - uses: actions/upload-artifact@v4
         with:
-          name: genomehubs-ui
-          path: ./dist/*
+          name: genomehubs-api-bundle
+          path: ./src/genomehubs-api/build/*
 
-  package-api:
+  build-ui:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: "18"
-      - run: npm install -g pkg
-      - run: |
-          ./package-api.sh
-          mv ./dist/genomehubs-api ./dist/genomehubs-api-linux || exit 0
+          node-version: "24"
+      - name: Build UI assets
+        working-directory: ./src/genomehubs-ui
+        run: |
+          npm ci
+          npm run build
       - uses: actions/upload-artifact@v4
         with:
-          name: genomehubs-api
-          path: ./dist/*
+          name: genomehubs-ui-dist
+          path: ./src/genomehubs-ui/dist/*
 
   package-genomehubs-linux:
     runs-on: ubuntu-latest
@@ -52,7 +55,7 @@ jobs:
           bash Miniforge3.sh -b -p "${HOME}/conda"
           source "${HOME}/conda/etc/profile.d/conda.sh"
           source "${HOME}/conda/etc/profile.d/mamba.sh"
-          conda create -n genomehubs python=3.9
+          conda create -n genomehubs python=3.11
           conda activate genomehubs
           conda install pip
           pip install --upgrade pip
@@ -64,41 +67,23 @@ jobs:
           name: genomehubs-linux
           path: ./dist/*
 
-  # package-genomehubs-macos:
-  #   runs-on: macos-11
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Install dependencies
-  #       run: |
-  #         python3 -m pip install --upgrade pip
-  #         pip install requests setuptools wheel twine
-  #     - name: Build and publish
-  #       run: |
-  #         ./pip_install_latest.sh macosx_11_0_x86_64
-  #         python3 setup.py sdist bdist_wheel --python-tag py3 --plat-name macosx_10_9_x86_64
-  #     - uses: actions/upload-artifact@v4
-  #       with:
-  #         name: genomehubs-macos
-  #         path: ./dist/*.whl
-
   create-github-release:
     runs-on: ubuntu-latest
     needs:
-      - package-api
-      - package-ui
+      - build-api
+      - build-ui
       - package-genomehubs-linux
-      # - package-genomehubs-macos
     steps:
       - uses: actions/download-artifact@v4
         with:
           path: ./tmp
       - run: |
           mkdir -p dist
-          mv tmp/genomehubs-api/* dist/
-          mv tmp/genomehubs-ui/* dist/
+          mv tmp/genomehubs-api-bundle/bundle.cjs dist/genomehubs-api-bundle.cjs || true
+          mv tmp/genomehubs-ui-dist/* dist/
           mv tmp/genomehubs-linux/*gz dist/
           rm -rf tmp
-          chmod 755 dist/genomehubs-*-linux
+          chmod 755 dist/genomehubs-*-linux || true
       - name: create release
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
         with:
@@ -126,102 +111,19 @@ jobs:
           password: ${{ secrets.PYPI_API_TOKEN }}
           repository_url: https://upload.pypi.org/legacy/
 
-  package-goat-ui:
+  build-and-push-genomehubs-cli:
     runs-on: ubuntu-latest
     needs:
-      - create-github-release
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-      - run: npm install -g pkg
-      - run: |
-          git clone https://github.com/genomehubs/goat-ui
-          mv goat-ui/static/* src/genomehubs-ui/src/client/static/
-          mv goat-ui/files/favicon/* src/genomehubs-ui/src/client/favicon/
-          mv goat-ui/files/components/* src/genomehubs-ui/src/client/views/components/
-          mv goat-ui/files/html/index.html src/genomehubs-ui/src/client/index.html
-          rm -rf goat-ui
-      - run: ./package-ui.sh
-        env:
-          GH_API_URL: "https://goat.genomehubs.org/api/v2"
-          GH_ARCHIVE: "latest 2025.04.21 2024.09.14 2024.03.01 2023.10.16 2023.05.18 2023.02.20 2022.11.16"
-          GH_BASENAME: ""
-          GH_SITENAME: GoaT
-          GH_SUGGESTED_TERM: Canidae
-      - uses: actions/upload-artifact@v4
-        with:
-          name: goat-ui
-          path: ./dist/*
-
-  package-boat-ui:
-    runs-on: ubuntu-latest
-    needs:
-      - create-github-release
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-      - run: npm install -g pkg
-      - run: |
-          git clone https://github.com/genomehubs/boat-ui
-          mv boat-ui/static/* src/genomehubs-ui/src/client/static/
-          mv boat-ui/files/favicon/* src/genomehubs-ui/src/client/favicon/
-          mv boat-ui/files/components/* src/genomehubs-ui/src/client/views/components/
-          rm -rf boat-ui
-      - run: ./package-ui.sh
-        env:
-          GH_API_URL: "https://boat.genomehubs.org/api/v2"
-          GH_BASENAME: ""
-          GH_SITENAME: BoaT
-          GH_SUGGESTED_TERM: Lepidoptera
-      - uses: actions/upload-artifact@v4
-        with:
-          name: boat-ui
-          path: ./dist/*
-
-  package-molluscdb-ui:
-    runs-on: ubuntu-latest
-    needs:
-      - create-github-release
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-      - run: npm install -g pkg
-      - run: |
-          git clone https://github.com/genomehubs/molluscdb-ui
-          mv molluscdb-ui/static/* src/genomehubs-ui/src/client/static/
-          mv molluscdb-ui/files/favicon/* src/genomehubs-ui/src/client/favicon/
-          mv molluscdb-ui/files/components/* src/genomehubs-ui/src/client/views/components/
-          mv molluscdb-ui/files/html/index.html src/genomehubs-ui/src/client/index.html
-          rm -rf molluscdb-ui
-      - run: ./package-ui.sh
-        env:
-          GH_API_URL: "https://molluscdb.genomehubs.org/api/v2"
-          GH_BASENAME: ""
-          GH_SITENAME: MolluscDB
-          GH_SUGGESTED_TERM: Gastropoda
-      - uses: actions/upload-artifact@v4
-        with:
-          name: molluscdb-ui
-          path: ./dist/*
-
-  build-and-push-genomehubs:
-    runs-on: ubuntu-latest
-    needs: upload-to-pypi
+      - upload-to-pypi
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v4
         with:
@@ -230,167 +132,270 @@ jobs:
         with:
           name: genomehubs-linux
           path: ./dist
-      - name: Add pip wheel to context
-        run: mv dist/*manylinux2014_x86_64.whl src/docker
+      - name: Prepare Docker context
+        run: |
+          mkdir -p src/docker/context
+          mv dist/*manylinux2014_x86_64.whl src/docker/context/
       - name: Build and push Docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
-          context: src/docker
+          context: .
+          file: src/docker/Dockerfile
           push: true
-          tags: genomehubs/genomehubs:${{ env.VERSION }}, genomehubs/genomehubs:latest
+          build-args: |
+            VERSION=${{ env.VERSION }}
+          tags: |
+            genomehubs/genomehubs:${{ env.VERSION }}
+            genomehubs/genomehubs:latest
           labels: ${{ steps.meta.outputs.labels }}
 
   build-and-push-api:
     runs-on: ubuntu-latest
-    needs: upload-to-pypi
+    needs:
+      - upload-to-pypi
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v4
-        with:
-          name: genomehubs-api
-          path: ./dist
-      - run: |
-          mv dist/genomehubs-api-linux src/docker/api/
-          rm -rf dist/*
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: genomehubs/genomehubs-api
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
+      - uses: actions/download-artifact@v4
         with:
-          context: src/docker/api
+          name: genomehubs-api-bundle
+          path: ./src/genomehubs-api/build/
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: src/docker/api/Dockerfile
           push: true
-          tags: genomehubs/genomehubs-api:${{ env.VERSION }}, genomehubs/genomehubs-api:latest
+          tags: |
+            genomehubs/genomehubs-api:${{ env.VERSION }}
+            genomehubs/genomehubs-api:latest
           labels: ${{ steps.meta.outputs.labels }}
 
   build-and-push-ui:
     runs-on: ubuntu-latest
-    needs: upload-to-pypi
+    needs:
+      - upload-to-pypi
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v4
-        with:
-          name: genomehubs-ui
-          path: ./dist
-      - run: |
-          mv dist/genomehubs-ui-linux src/docker/ui/
-          rm -rf dist/*
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: genomehubs/genomehubs-ui
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
+      - uses: actions/download-artifact@v4
         with:
-          context: src/docker/ui
+          name: genomehubs-ui-dist
+          path: ./src/genomehubs-ui/dist/
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: src/docker/ui/Dockerfile
           push: true
-          tags: genomehubs/genomehubs-ui:${{ env.VERSION }}, genomehubs/genomehubs-ui:latest
+          build-args: |
+            USE_PREBUILT_DIST=true
+          tags: |
+            genomehubs/genomehubs-ui:${{ env.VERSION }}
+            genomehubs/genomehubs-ui:latest
           labels: ${{ steps.meta.outputs.labels }}
 
-  build-and-push-goat-ui:
+  build-and-push-goat:
     runs-on: ubuntu-latest
-    needs: package-goat-ui
+    if: success()
+    needs: build-and-push-ui
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v4
-        with:
-          name: goat-ui
-          path: ./dist
-      - run: |
-          mv dist/genomehubs-ui-linux src/docker/goat/
-          rm -rf dist/*
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: genomehubs/goat
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
+      - name: Build and push GoaT image with content from repo
+        uses: docker/build-push-action@v5
         with:
-          context: src/docker/goat
+          context: .
+          file: src/docker/ui/Dockerfile.site
           push: true
-          tags: genomehubs/goat:${{ env.VERSION }}, genomehubs/goat:latest
+          build-args: |
+            BASE_IMAGE=genomehubs/genomehubs-ui:${{ env.VERSION }}
+            SITE_REPO=genomehubs/goat-ui
+            SITE_BRANCH=main
+            SITE_NAME=GoaT
+            SITE_NAME_LONG=Genomes on a Tree
+            GH_CITATION_URL=https://doi.org/10.12688/wellcomeopenres.18658.1
+            GH_SUGGESTED_TERM=Canidae
+            GH_TAXONOMY=ncbi
+          tags: |
+            genomehubs/goat:${{ env.VERSION }}
+            genomehubs/goat:latest
           labels: ${{ steps.meta.outputs.labels }}
 
-  build-and-push-boat-ui:
+  build-and-push-boat:
+    if: success()
     runs-on: ubuntu-latest
-    needs: package-boat-ui
+    needs: build-and-push-ui
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v4
-        with:
-          name: boat-ui
-          path: ./dist
-      - run: |
-          mv dist/genomehubs-ui-linux src/docker/boat/
-          rm -rf dist/*
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: genomehubs/boat
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
+      - name: Build and push BoaT image with content from repo
+        uses: docker/build-push-action@v5
         with:
-          context: src/docker/boat
+          context: .
+          file: src/docker/ui/Dockerfile.site
           push: true
-          tags: genomehubs/boat:${{ env.VERSION }}, genomehubs/boat:latest
+          build-args: |
+            BASE_IMAGE=genomehubs/genomehubs-ui:${{ env.VERSION }}
+            SITE_REPO=genomehubs/boat-ui
+            SITE_BRANCH=main
+            SITE_NAME=BoaT
+            SITE_NAME_LONG=Bat genomes on a Tree
+            GH_TAXONOMY=ncbi
+          tags: |
+            genomehubs/boat:${{ env.VERSION }}
+            genomehubs/boat:latest
           labels: ${{ steps.meta.outputs.labels }}
 
-  build-and-push-molluscdb-ui:
+  build-and-push-molluscdb:
+    if: success()
     runs-on: ubuntu-latest
-    needs: package-molluscdb-ui
+    needs: build-and-push-ui
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v4
-        with:
-          name: molluscdb-ui
-          path: ./dist
-      - run: |
-          mv dist/genomehubs-ui-linux src/docker/molluscdb/
-          rm -rf dist/*
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: genomehubs/molluscdb
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
+      - name: Build and push MolluscDB image with content from repo
+        uses: docker/build-push-action@v5
         with:
-          context: src/docker/molluscdb
+          context: .
+          file: src/docker/ui/Dockerfile.site
           push: true
-          tags: genomehubs/molluscdb:${{ env.VERSION }}, genomehubs/molluscdb:latest
+          build-args: |
+            BASE_IMAGE=genomehubs/genomehubs-ui:${{ env.VERSION }}
+            SITE_REPO=genomehubs/molluscdb-ui
+            SITE_BRANCH=main
+            SITE_NAME=MolluscDB
+            SITE_NAME_LONG=Mollusc Database
+            GH_TAXONOMY=ncbi
+          tags: |
+            genomehubs/molluscdb:${{ env.VERSION }}
+            genomehubs/molluscdb:latest
           labels: ${{ steps.meta.outputs.labels }}
+
+  build-and-push-test:
+    runs-on: ubuntu-latest
+    needs:
+      - package-genomehubs-linux
+      - build-api
+      - build-ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: genomehubs/genomehubs-test
+      - uses: actions/download-artifact@v4
+        with:
+          name: genomehubs-linux
+          path: ./dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: genomehubs-api-bundle
+          path: ./src/genomehubs-api/build/
+      - uses: actions/download-artifact@v4
+        with:
+          name: genomehubs-ui-dist
+          path: ./src/genomehubs-ui/dist/
+      - run: |
+          mkdir -p src/docker/test
+          mv dist/*manylinux2014_x86_64.whl src/docker/test/ || echo "No wheel file found"
+          mkdir -p src/docker/test/genomehubs-api
+          cp src/genomehubs-api/build/bundle.cjs src/docker/test/genomehubs-api/
+          cp src/genomehubs-api/package.json src/docker/test/genomehubs-api/
+          mkdir -p src/docker/test/genomehubs-ui-dist
+          cp -r src/genomehubs-ui/dist/* src/docker/test/genomehubs-ui-dist/ || echo "Failed to copy UI dist"
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: src/docker/test/Dockerfile
+          push: true
+          tags: |
+            genomehubs/genomehubs-test:${{ env.VERSION }}
+            genomehubs/genomehubs-test:latest
+          labels: ${{ steps.meta.outputs.labels }}
+
+  merge-develop-to-main:
+    runs-on: ubuntu-latest
+    if: success() && !contains(github.ref, '-')
+    needs:
+      - build-and-push-goat
+      - build-and-push-boat
+      - build-and-push-molluscdb
+      - build-and-push-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Create Pull Request from develop to main
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Merge develop into main after release ${{ github.ref_name }}"
+          title: "Merge develop into main after release ${{ github.ref_name }}"
+          body: |
+            This PR merges the develop branch into main after a successful production release.
+            Release: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+          branch: develop
+          base: main
+          delete-branch: false
+          labels: release

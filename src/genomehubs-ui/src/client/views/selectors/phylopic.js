@@ -4,10 +4,10 @@ import {
   getPhylopics,
   receivePhylopic,
   requestPhylopic,
-} from "../reducers/phylopic";
+} from "#reducers/phylopic";
 
-import { apiUrl } from "../reducers/api";
-import store from "../store";
+import { apiUrl } from "#reducers/api";
+import store from "#store";
 
 function timeout(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));

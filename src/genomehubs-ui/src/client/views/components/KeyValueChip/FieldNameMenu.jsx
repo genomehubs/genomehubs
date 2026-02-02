@@ -1,9 +1,8 @@
-import React, { useState } from "react";
-
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import { useState } from "react";
 
 export const FieldNameMenu = ({
   menuAnchorEl,

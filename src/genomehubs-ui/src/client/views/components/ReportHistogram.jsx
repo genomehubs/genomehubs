@@ -1,23 +1,23 @@
 import { Bar, BarChart, CartesianGrid, Label, XAxis, YAxis } from "recharts";
 import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
-import React, { useEffect, useRef } from "react";
-import formats, { setInterval } from "../functions/formats";
-import stringLength, { maxStringLength } from "../functions/stringLength";
+import formats, { setInterval } from "#functions/formats";
+import { forwardRef, useEffect, useRef } from "react";
+import stringLength, { maxStringLength } from "#functions/stringLength";
 
 import CellInfo from "./CellInfo";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "./Tooltip";
 import { active as activeStyle } from "./Styles.scss";
-import { compose } from "recompose";
-import dispatchMessage from "../hocs/dispatchMessage";
-import searchByCell from "../functions/searchByCell";
-import setColors from "../functions/setColors";
+import { compose } from "redux";
+import dispatchMessage from "#hocs/dispatchMessage";
+import searchByCell from "#functions/searchByCell";
+import setColors from "#functions/setColors";
 import { ttSwatch as ttSwatchStyle } from "./Styles.scss";
-import { useNavigate } from "@reach/router";
-import useResize from "../hooks/useResize";
+import useNavigate from "#hooks/useNavigate";
+import useResize from "#hooks/useResize";
 import withColors from "#hocs/withColors";
-import withSearchIndex from "../hocs/withSearchIndex";
+import withSearchIndex from "#hocs/withSearchIndex";
 import withSiteName from "#hocs/withSiteName";
 import withTheme from "#hocs/withTheme";
 
@@ -81,7 +81,7 @@ const CustomBackground = ({ chartProps, ...props }) => {
     }
   });
   let { highlightColor } = chartProps.colorScheme;
-  let CurrentRect = React.forwardRef((refProps, ref) => (
+  let CurrentRect = forwardRef((refProps, ref) => (
     <rect
       ref={ref}
       {...refProps}

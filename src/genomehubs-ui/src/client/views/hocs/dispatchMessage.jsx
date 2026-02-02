@@ -1,6 +1,5 @@
-import React from "react";
 import { connect } from "react-redux";
-import { setMessage } from "../reducers/message";
+import { setMessage } from "#reducers/message";
 
 const dispatchMessage = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({});
@@ -13,7 +12,7 @@ const dispatchMessage = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

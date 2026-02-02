@@ -1,13 +1,11 @@
-import React, { useState } from "react";
-
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
-import { compose } from "recompose";
-import withReportTerm from "../hocs/withReportTerm";
+import { compose } from "redux";
+import withReportTerm from "#hocs/withReportTerm";
 
 export const ReportSelect = ({ reportSelect, setReportSelect }) => {
   const handleChange = (event, value) => {

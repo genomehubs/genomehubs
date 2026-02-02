@@ -1,19 +1,19 @@
-import React, { memo, useRef, useState } from "react";
 import {
   extra as extraStyle,
   term as termStyle,
   value as valueStyle,
 } from "./Styles.scss";
+import { memo, useRef, useState } from "react";
 
 import AutoCompleteOption from "./AutoCompleteOption";
 import AutoCompleteSuggestion from "./AutoCompleteSuggestion";
 import Autocomplete from "@mui/material/Autocomplete";
 import Popper from "@mui/material/Popper";
 import TextField from "@mui/material/TextField";
-import { compose } from "recompose";
-import { fetchAutocomplete } from "../functions/autocomplete";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import { compose } from "redux";
+import { fetchAutocomplete } from "#functions/autocomplete";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 export const PlacedPopper = (props) => {
   return <Popper {...props} placement="bottom" />;
@@ -134,8 +134,8 @@ export const AutoCompleteInput = ({
             : "taxon ID",
           xref: Boolean(
             acResult.reason &&
-              acResult.reason[0].fields["taxon_names.class"] &&
-              !acResult.reason[0].fields["taxon_names.class"][0].match(" name"),
+            acResult.reason[0].fields["taxon_names.class"] &&
+            !acResult.reason[0].fields["taxon_names.class"][0].match(" name"),
           ),
         });
         terms.push(
@@ -604,10 +604,13 @@ export const AutoCompleteInput = ({
         />
       )}
       renderOption={(props, option) => {
+        const { key, ...otherProps } = props;
         if (option.highlighted) {
-          return <AutoCompleteSuggestion option={option} {...props} />;
+          return (
+            <AutoCompleteSuggestion key={key} option={option} {...otherProps} />
+          );
         }
-        return <AutoCompleteOption option={option} {...props} />;
+        return <AutoCompleteOption key={key} option={option} {...otherProps} />;
       }}
     />
   );

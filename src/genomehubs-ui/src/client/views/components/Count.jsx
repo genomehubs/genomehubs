@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { fieldCount, simpleCount, valueCount } from "../functions/resultCount";
+import { fieldCount, simpleCount, valueCount } from "#functions/resultCount";
+import { useEffect, useState } from "react";
 
 import DisplayCount from "./DisplayCount";
-import { compose } from "recompose";
-import formats from "../functions/formats";
-import qs from "../functions/qs";
-import { useNavigate } from "@reach/router";
-import withApi from "../hocs/withApi";
-import withQueryById from "../hocs/withQueryById";
-import withRecord from "../hocs/withRecord";
+import { compose } from "redux";
+import qs from "#functions/qs";
+import useNavigate from "#hooks/useNavigate";
+import withApi from "#hocs/withApi";
+import withQueryById from "#hocs/withQueryById";
+import withRecord from "#hocs/withRecord";
 import withSiteName from "#hocs/withSiteName";
 
 const Count = ({
@@ -65,9 +64,7 @@ const Count = ({
   }, [queryById]);
 
   const handleClick = () => {
-    navigate(
-      `${basename}/search?${qs.stringify({ ...options, report: "sources" })}`,
-    );
+    navigate(`search?${qs.stringify({ ...options, report: "sources" })}`);
   };
 
   if (currentRecord) {

@@ -1,8 +1,7 @@
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Logo from "./Logo";
 // import { RadialChart } from "react-vis";
-import React from "react";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withColors from "#hocs/withColors";
 
 const ReportEmpty = ({ report, statusColors, inModal }) => {

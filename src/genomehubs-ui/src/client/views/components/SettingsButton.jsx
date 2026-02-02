@@ -1,3 +1,5 @@
+import { useRef, useState } from "react";
+
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
@@ -8,7 +10,6 @@ import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
 import MenuList from "@mui/material/MenuList";
 import Paper from "@mui/material/Paper";
-import React from "react";
 import ReplayIcon from "@mui/icons-material/Replay";
 
 const DownloadButton = ({ handleClick, handleResetClick }) => {
@@ -17,9 +18,9 @@ const DownloadButton = ({ handleClick, handleResetClick }) => {
     Reset: { icon: <ReplayIcon />, func: handleResetClick },
   };
 
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const handleMenuItemClick = (event, index) => {
     options[Object.keys(options)[index]].func();

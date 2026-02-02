@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   favListingFooter as favListingFooterStyle,
   saveSearchOptions as saveSearchOptionsStyle,
@@ -9,10 +8,11 @@ import IconButton from "@mui/material/IconButton";
 import SaveSettingsModal from "./SaveSettingsModal";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
-import { splitTerms } from "../functions/splitTerms";
+import { compose } from "redux";
+import { splitTerms } from "#functions/splitTerms";
 import { useLocalStorage } from "usehooks-ts";
-import withSearch from "../hocs/withSearch";
+import { useState } from "react";
+import withSearch from "#hocs/withSearch";
 
 const SearchHeaderButtons = ({
   rootRef,

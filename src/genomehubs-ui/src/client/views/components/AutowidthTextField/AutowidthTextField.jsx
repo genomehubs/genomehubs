@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import stringLength from "../../functions/stringLength";
+import stringLength from "#functions/stringLength";
 
 const AutowidthTextField = ({
   value = "",

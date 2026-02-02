@@ -1,15 +1,9 @@
-import React, { useMemo, useState } from "react";
-
-import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import MuiCloseIcon from "@mui/icons-material/Close";
-import Switch from "@mui/material/Switch";
-import getMapOptions from "./functions/getMapOptions";
-import { mixColor } from "../../functions/mixColor";
-import { transform } from "proj4";
+import { useState } from "react";
 
 export const ReportMenu = ({
   nightMode,

@@ -6,7 +6,6 @@ import {
 
 import NavLink from "./NavLink";
 import Page from "./Page";
-import React from "react";
 import classnames from "classnames";
 import { useLocation } from "@reach/router";
 

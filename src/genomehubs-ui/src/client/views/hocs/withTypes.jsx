@@ -4,10 +4,9 @@ import {
   getGroupedTypes,
   getSynonyms,
   getTypesMap,
-} from "../selectors/types";
-import { getTypes, resetTypes } from "../reducers/types";
+} from "#selectors/types";
+import { getTypes, resetTypes } from "#reducers/types";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withTypes = (WrappedComponent) => (props) => {
@@ -25,7 +24,7 @@ const withTypes = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

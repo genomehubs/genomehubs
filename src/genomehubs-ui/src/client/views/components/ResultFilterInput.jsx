@@ -1,6 +1,6 @@
 import { Avatar, Chip } from "@mui/material";
-import React, { useEffect, useState } from "react";
 import { chip as chipStyle, ttOpts as ttOptsStyle } from "./Styles.scss";
+import { useEffect, useState } from "react";
 
 import Checkbox from "@mui/material/Checkbox";
 import FilterListIcon from "@mui/icons-material/FilterList";

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
 import { userEvent, within } from "@storybook/testing-library";
 
 import AutowidthTextField from "./AutowidthTextField";
+import { useState } from "react";
 
 export default {
   title: "Components/AutowidthTextField",

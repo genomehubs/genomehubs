@@ -1,9 +1,9 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 
-import createCachedSelector from "re-reselect";
+import { createCachedSelector } from "re-reselect";
 import { createSelector } from "reselect";
 import { createSlice } from "@reduxjs/toolkit";
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 
 export const requestRecord = createAction("REQUEST_RECORD");
 export const receiveRecord = createAction(
@@ -25,26 +25,20 @@ function onReceiveRecord(state, action) {
   const record = records[0];
   const id = record.record.record_id;
 
-  const updatedWithRecordState = immutableUpdate(state, {
-    byId: { [id]: record },
-  });
-
-  const updatedWithRecordList = immutableUpdate(updatedWithRecordState, {
-    allIds: [...new Set(updatedWithRecordState.allIds.concat(id))],
-  });
-
-  return immutableUpdate(updatedWithRecordList, {
-    isFetching: false,
-    status,
-    lastUpdated: meta.receivedAt,
+  return produce(state, (draft) => {
+    draft.byId[id] = record;
+    draft.allIds = [...new Set(state.allIds.concat(id))];
+    draft.isFetching = false;
+    draft.status = status;
+    draft.lastUpdated = meta.receivedAt;
   });
 }
 
 const records = handleActions(
   {
     REQUEST_RECORD: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
+      produce(state, (draft) => {
+        draft.isFetching = true;
       }),
     RECEIVE_RECORD: onReceiveRecord,
     RESET_RECORD: defaultState,

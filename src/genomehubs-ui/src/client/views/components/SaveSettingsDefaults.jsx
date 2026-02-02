@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   favListingButton as favListingButtonStyle,
   favListingContainer as favListingContainerStyle,
@@ -12,12 +11,13 @@ import MuiDialogContent from "@mui/material/DialogContent";
 import PublishIcon from "@mui/icons-material/Publish";
 import SaveIcon from "@mui/icons-material/SaveAlt";
 import YamlEditor from "@focus-reactive/react-yaml";
-import { compose } from "recompose";
-import qs from "../functions/qs";
+import { compose } from "redux";
+import qs from "#functions/qs";
 import { useLocalStorage } from "usehooks-ts";
-import withSearchIndex from "../hocs/withSearchIndex";
+import { useState } from "react";
+import withSearchIndex from "#hocs/withSearchIndex";
 import withStyles from "@mui/styles/withStyles";
-import withTaxonomy from "../hocs/withTaxonomy";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 const SaveSettingsDefaults = ({
   currentIndex,
@@ -28,7 +28,7 @@ const SaveSettingsDefaults = ({
   let options = qs.parse(location.search.replace(/^\?/, ""));
   const [savedOptions, setSavedOptions] = useLocalStorage(
     `${currentIndex}Options`,
-    {}
+    {},
   );
   const [currentOptions, setCurrentOptions] = useState(savedOptions);
   const [edit, setEdit] = useState(false);

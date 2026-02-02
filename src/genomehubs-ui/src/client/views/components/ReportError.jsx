@@ -1,9 +1,6 @@
-// import { RadialChart } from "react-vis";
-import React, { Fragment, useRef } from "react";
-
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Logo from "./Logo";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withColors from "#hocs/withColors";
 
 const ReportError = ({ report, error, statusColors, inModal }) => {

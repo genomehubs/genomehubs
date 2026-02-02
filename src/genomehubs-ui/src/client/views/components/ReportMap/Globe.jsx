@@ -1,37 +1,16 @@
-import {
-  Color,
-  ConeGeometry,
-  Group,
-  Mesh,
-  MeshPhongMaterial,
-  SphereGeometry,
-  Vector3,
-} from "three";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { useLocation, useNavigate } from "@reach/router";
+import { Color, MeshPhongMaterial } from "three";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import CloseIcon from "@mui/icons-material/Close";
 import CountryPopup from "./CountryPopup";
-import CountrySVG from "./CountrySVG";
 import GlobeGl from "react-globe.gl";
 import HexbinPopup from "./HexbinPopup";
-import NavLink from "../NavLink";
 import PointPopup from "./PointPopup";
-import ReportPopup from "./ReportPopup";
 import Skeleton from "@mui/material/Skeleton";
-import countriesGeoJson from "../geojson/countries.geojson";
 import { findCenterLatLng } from "./functions/mapHelpers";
-import getCountryColor from "./functions/getCountryColor";
 import getMapOptions from "./functions/getMapOptions";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
-import { mixColor } from "../../functions/mixColor";
-import { polygon } from "leaflet";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
 
 const Globe = ({
   bounds,
@@ -59,9 +38,22 @@ const Globe = ({
   // Overlay colors (match ReportMap)
   const location = useLocation();
   const globeRef = useRef();
-  const mapContainerRef = useRef(); // always call useRef, unconditionally
-  const [globeLoading, setGlobeLoading] = useState(true); // <-- ensure this is defined in Map
-  const [showGlobe, setShowGlobe] = useState(false); // <-- move this up to top-level, before any conditional logic
+  const mapContainerRef = useRef();
+  const [globeLoading, setGlobeLoading] = useState(true);
+  const [showGlobe, setShowGlobe] = useState(false);
+  const [countriesGeoJson, setCountriesGeoJson] = useState(null);
+
+  useEffect(() => {
+    // Only load geojson if regionField is set (showing country overlays)
+    if (regionField) {
+      import("../geojson/countries-full.geojson").then((module) => {
+        setCountriesGeoJson(module.default);
+      });
+    } else {
+      setCountriesGeoJson(null);
+    }
+  }, [regionField]);
+
   // Calculate center of bounds for zoom
   const [centerLat, centerLon] = findCenterLatLng(bounds);
 
@@ -304,21 +296,40 @@ const Globe = ({
     return null;
   }
 
+  // Only show loading if regionField is set but geojson not loaded yet
+  if (regionField && !countriesGeoJson) {
+    return (
+      <div
+        style={{
+          width,
+          height,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div>Loading map data...</div>
+      </div>
+    );
+  }
+
   const polygonProps = {
     globeMaterial: new MeshPhongMaterial({
       color: oceanColor,
       bumpMap: null,
       bumpScale: 0,
     }),
-    polygonsData: countriesGeoJson.features,
-    polygonCapColor: getPolyColor,
-    polygonStrokeColor: () => countryOutlineColor,
-    polygonLabel: getPolyLabel,
-    onPolygonClick: handlePolyClick,
-    polygonSideColor: () => oceanColor + "80",
-    polygonAltitude: (d) =>
-      countryCounts[d.properties.ISO_A2] > 0 ? 0.01 : 0.01,
-    polygonsTransitionDuration: 0,
+    ...(countriesGeoJson && {
+      polygonsData: countriesGeoJson.features,
+      polygonCapColor: getPolyColor,
+      polygonStrokeColor: () => countryOutlineColor,
+      polygonLabel: getPolyLabel,
+      onPolygonClick: handlePolyClick,
+      polygonSideColor: () => oceanColor + "40",
+      polygonAltitude: (d) =>
+        countryCounts[d.properties.ISO_A2] > 0 ? 0.01 : 0.01,
+      polygonsTransitionDuration: 0,
+    }),
   };
 
   // Build combined pointsData with outline and center for each point
@@ -397,7 +408,6 @@ const Globe = ({
         </div>
       )}
 
-      {/* Only mount Globe after short delay so skeleton/background are painted first */}
       {showGlobe && (
         <GlobeGl
           ref={globeRef}
@@ -408,22 +418,22 @@ const Globe = ({
           globeImageUrl={globeImageUrl}
           bumpImageUrl={bumpImageUrl}
           rendererConfig={{ alpha: true }}
+          directionalLightPosition={[1, 0, 0]}
+          ambientLightIntensity={0.5}
+          directionalLightColor={lightColor}
+          ambientLightColor={darkColor}
           showGlobe={true}
-          globeMaterial={
-            globeImageUrl === null
-              ? new MeshPhongMaterial({ color: oceanColor })
-              : null
-          }
-          // POLYGONS LAYER
-          {...(globeImageUrl ? {} : polygonProps)}
+          // POLYGONS LAYER - show when geojson is loaded
+          {...(countriesGeoJson ? polygonProps : {})}
           // HEXBIN LAYER
           {...hexbinProps}
           // POINTS LAYER
           {...(pointsData.length > 0 ? pinProps : {})}
-          onGlobeReady={() => setGlobeLoading(false)}
+          onGlobeReady={() => {
+            setGlobeLoading(false);
+          }}
         />
       )}
-
       {/* Zoom controls */}
       <div
         style={{
@@ -486,7 +496,6 @@ const Globe = ({
           –
         </button>
       </div>
-
       {/* Show popup if defined */}
       {countryPopupMeta && (
         <CountryPopup
@@ -526,7 +535,6 @@ const Globe = ({
           pointLink={pointLink}
         />
       )}
-
       {/* Close button */}
     </div>
   );

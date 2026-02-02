@@ -1,6 +1,5 @@
-import { getActiveRanks, taxonomyRanks } from "../selectors/types";
+import { getActiveRanks, taxonomyRanks } from "#selectors/types";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withRanks = (WrappedComponent) => (props) => {

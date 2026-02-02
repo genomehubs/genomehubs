@@ -1,5 +1,4 @@
 import BadgeInfo, { BadgeInfoCell } from "./BadgeInfo";
-import React, { useEffect, useRef, useState } from "react";
 import {
   active as activeStyle,
   badgeExpanded as badgeExpandedStyle,
@@ -19,19 +18,20 @@ import {
   nested as nestedStyle,
   rank as rankStyle,
 } from "./Styles.scss";
+import { useEffect, useRef, useState } from "react";
 
 import BadgeStats from "./BadgeStats";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import PhyloPics from "./PhyloPics";
 import classNames from "classnames";
 import classnames from "classnames";
-import { compose } from "recompose";
-import { useNavigate } from "@reach/router";
-import withBrowse from "../hocs/withBrowse";
-import withDescendantsById from "../hocs/withDescendantsById";
-import withRecordById from "../hocs/withRecordById";
+import { compose } from "redux";
+import useNavigate from "#hooks/useNavigate";
+import withBrowse from "#hocs/withBrowse";
+import withDescendantsById from "#hocs/withDescendantsById";
+import withRecordById from "#hocs/withRecordById";
 import withSiteName from "#hocs/withSiteName";
-import withTaxonomy from "../hocs/withTaxonomy";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 const setScrollPosition = (scrollY, status) => {
   setTimeout(() => {
@@ -406,7 +406,7 @@ export const Badge = ({
               tipTitle: `Click to search ${fieldName} values for ${scientificName}`,
               handleClick: () => {
                 navigate(
-                  `${basename}/search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29%20AND%20${fieldName}&fields=${fieldName}&includeEstimates=true&taxonomy=${taxonomy}&result=${result}`,
+                  `search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29%20AND%20${fieldName}&fields=${fieldName}&includeEstimates=true&taxonomy=${taxonomy}&result=${result}`,
                 );
                 setBrowse();
               },
@@ -481,7 +481,7 @@ export const Badge = ({
               onClick={(e) => {
                 e.stopPropagation();
                 navigate(
-                  `${basename}/search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29&includeEstimates=true&taxonomy=${taxonomy}&result=${result}`,
+                  `search?query=tax_tree%28${scientificName}%5B${currentRecordId}%5D%29&includeEstimates=true&taxonomy=${taxonomy}&result=${result}`,
                 );
                 updateBrowse({
                   ...currentParents,

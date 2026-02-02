@@ -2,7 +2,7 @@ import { createAction, handleAction, handleActions } from "redux-actions";
 
 import { createCachedSelector } from "re-reselect";
 import { createSelector } from "reselect";
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 
 export const getDefaultIndex = () => {
   if (
@@ -37,22 +37,29 @@ const defaultState = () => ({
 const searchResults = handleActions(
   {
     REQUEST_SEARCH: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
+      produce(state, (draft) => {
+        draft.isFetching = true;
       }),
     CANCEL_SEARCH: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: false,
+      produce(state, (draft) => {
+        draft.isFetching = false;
       }),
-    RECEIVE_SEARCH: (state, action) => ({
-      isFetching: false,
-      status: action.payload.status,
-      results: action.payload.results,
-      query: action.payload.query,
-      aggs: action.payload.aggs,
-      fields: action.payload.fields,
-      lastUpdated: action.meta.receivedAt,
-    }),
+    RECEIVE_SEARCH: (state, action) => {
+      console.log(action);
+      return {
+        isFetching: false,
+        status: action.payload.status,
+        results: action.payload.results,
+        query: action.payload.query,
+        aggs: action.payload.aggs,
+        fields: action.payload.fields,
+        isMsearch: action.payload.isMsearch,
+        originalQueries: action.payload.originalQueries,
+        queryGroups: action.payload.queryGroups,
+        lastUpdated: action.meta.receivedAt,
+        uniqueCount: action.payload.uniqueCount,
+      };
+    },
     RESET_SEARCH: defaultState,
   },
   defaultState(),
@@ -108,28 +115,22 @@ const defaultQueryState = () => ({
 const queryResults = handleActions(
   {
     REQUEST_QUERY: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
+      produce(state, (draft) => {
+        draft.isFetching = true;
       }),
     CANCEL_QUERY: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: false,
+      produce(state, (draft) => {
+        draft.isFetching = false;
       }),
     RECEIVE_QUERY: (state, action) => {
       const { payload, meta } = action;
       const { queryString: id, json } = payload;
 
-      const updatedWithQueryState = immutableUpdate(state, {
-        byId: { [id]: { ...json } },
-      });
-
-      const updatedWithQueryList = immutableUpdate(updatedWithQueryState, {
-        allIds: [...new Set(updatedWithQueryState.allIds.concat(id))],
-      });
-
-      return immutableUpdate(updatedWithQueryList, {
-        isFetching: false,
-        lastUpdated: meta.receivedAt,
+      return produce(state, (draft) => {
+        draft.byId[id] = { ...json };
+        draft.allIds = [...new Set(state.allIds.concat(id))];
+        draft.isFetching = false;
+        draft.lastUpdated = meta.receivedAt;
       });
     },
     RESET_QUERY: defaultQueryState,
@@ -242,7 +243,9 @@ export const resetSearchDefaults = createAction("RESET_SEARCH_DEFAULTS");
 export const searchDefaults = handleActions(
   {
     SET_SEARCH_DEFAULTS: (state, action) =>
-      immutableUpdate(state, action.payload),
+      produce(state, (draft) => {
+        Object.assign(draft, action.payload);
+      }),
     RESET_SEARCH_DEFAULTS: (state, action) => searchDefaultValues,
   },
   searchDefaultValues,
@@ -253,7 +256,9 @@ export const setSuggestedTerms = createAction("SET_SUGGESTED_TERMS");
 export const suggestedTerms = handleActions(
   {
     SET_SUGGESTED_TERMS: (state, action) =>
-      immutableUpdate(state, action.payload),
+      produce(state, (draft) => {
+        Object.assign(draft, action.payload);
+      }),
   },
   {},
 );

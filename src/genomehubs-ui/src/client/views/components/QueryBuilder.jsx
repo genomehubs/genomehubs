@@ -1,5 +1,5 @@
 import { ListSubheader, MenuItem } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import AutoCompleteInput from "./AutoCompleteInput";
 import BasicSelect from "./BasicSelect";
@@ -9,23 +9,23 @@ import ColorButton from "./ColorButton";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import SearchIcon from "@mui/icons-material/Search";
 import Switch from "@mui/material/Switch";
 import Tooltip from "./Tooltip";
 import Typography from "@mui/material/Typography";
 import VariableFilter from "./VariableFilter";
-import { compose } from "recompose";
-import dispatchLookup from "../hocs/dispatchLookup";
+import { compose } from "redux";
+import dispatchLookup from "#hocs/dispatchLookup";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "../functions/qs";
-import { useNavigate } from "@reach/router";
-import withLookup from "../hocs/withLookup";
-import withSearch from "../hocs/withSearch";
-import withSearchDefaults from "../hocs/withSearchDefaults";
+import qs from "#functions/qs";
+import useNavigate from "#hooks/useNavigate";
+import withLookup from "#hocs/withLookup";
+import withSearch from "#hocs/withSearch";
+import withSearchDefaults from "#hocs/withSearchDefaults";
 import withSiteName from "#hocs/withSiteName";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 export const useStyles = makeStyles((theme) => ({
   paper: {
@@ -346,9 +346,7 @@ const QueryBuilder = ({
     });
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
-        options.query,
-      )}`,
+      `search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`,
     );
   };
   return (

@@ -1,28 +1,33 @@
-import React, { memo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
+import { memo, useRef, useState } from "react";
+import { pathJoin, siteName } from "#reducers/location";
 
 import AutoCompleteInput from "./AutoCompleteInput";
 import FormControl from "@mui/material/FormControl";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import SearchButton from "./SearchButton";
 import SearchInputQueries from "./SearchInputQueries";
 import SearchToggles from "./SearchToggles";
 import { Template } from "./Markdown";
-import { compose } from "recompose";
-// import dispatchLiveQuery from "../hocs/dispatchLiveQuery";
-import { getSuggestedTerm } from "../reducers/search";
-import qs from "../functions/qs";
-import { siteName } from "../reducers/location";
+import { compose } from "redux";
+import { getSuggestedTerm } from "#reducers/search";
+import qs from "#functions/qs";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
 import { useReadLocalStorage } from "usehooks-ts";
 import { useStyles } from "./SearchBoxStyles";
-import withLookup from "../hocs/withLookup";
-import withSearch from "../hocs/withSearch";
-import withSearchDefaults from "../hocs/withSearchDefaults";
+import withLookup from "#hocs/withLookup";
+import withSearch from "#hocs/withSearch";
+import withSearchDefaults from "#hocs/withSearchDefaults";
 import withSiteName from "#hocs/withSiteName";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 const suggestedTerm = getSuggestedTerm();
+
+// Configuration for batch search delimiter
+// Change this to switch between different delimiters during testing
+// Options: "newline" (splits on \n), "semicolon" (splits on ;)
+const BATCH_SEARCH_DELIMITER = "semicolon";
 
 const SearchBox = ({
   lookupTerm,
@@ -147,11 +152,11 @@ const SearchBox = ({
     setPreferSearchTerm(false);
     if (pathname.match(/^search/)) {
       navigate(
-        `${basename}/${pathname}?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
+        `${pathJoin(basename, pathname)}?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
       );
     } else {
       navigate(
-        `${basename}/search?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
+        `${pathJoin(basename, "search")}?${qs.stringify(fullOptions)}#${encodeURIComponent(term)}`,
       );
     }
   };
@@ -170,6 +175,61 @@ const SearchBox = ({
     return term;
   };
 
+  const dispatchMsearch = (msearchOptions = {}, term) => {
+    let sameIndex = searchIndex == msearchOptions.result;
+    let fullOptions = { ...searchTerm, ...msearchOptions };
+    if (!fullOptions.hasOwnProperty("includeEstimates")) {
+      fullOptions.includeEstimates = searchDefaults.includeEstimates;
+    }
+
+    let savedOptions = allOptions[options.result];
+
+    let fields = savedOptions?.fields?.join(",") || searchDefaults.fields;
+    let ranks = savedOptions?.ranks?.join(",") || searchDefaults.ranks;
+    let names = savedOptions?.names?.join(",") || searchDefaults.names;
+
+    if (sameIndex) {
+      fields = options.fields || fields;
+      ranks = options.ranks || ranks;
+      names = options.names || names;
+    }
+
+    fullOptions.fields = fields;
+    fullOptions.ranks = ranks;
+    fullOptions.names = names;
+    fullOptions.taxonomy =
+      msearchOptions.taxonomy || searchTerm.taxonomy || taxonomy;
+
+    if (!fullOptions.size && savedOptions?.size) {
+      fullOptions.size = savedOptions.size;
+    }
+
+    fetchSearchResults(fullOptions);
+    setPreferSearchTerm(false);
+    const urlParams = {
+      ...fullOptions,
+      isMsearch: "true",
+    };
+    // Remove array parameters from URL - keep only the query string
+    delete urlParams.searches;
+    delete urlParams.originalQueries;
+
+    console.log("dispatchMsearch - fullOptions:", fullOptions);
+    console.log("dispatchMsearch - urlParams after cleanup:", urlParams);
+    console.log("dispatchMsearch - has query?", !!urlParams.query);
+    const queryString = qs.stringify(urlParams);
+    console.log("dispatchMsearch - final query string:", queryString);
+    if (pathname.match(/^search/)) {
+      navigate(
+        `${pathJoin(basename, pathname)}?${queryString}#${encodeURIComponent(term)}`,
+      );
+    } else {
+      navigate(
+        `${pathJoin(basename, "search")}?${queryString}#${encodeURIComponent(term)}`,
+      );
+    }
+  };
+
   const doSearch = (queryString, result, hashTerm) => {
     // setLookupTerm(queryString);
     if (lookupTerm != queryString) {
@@ -179,6 +239,65 @@ const SearchBox = ({
     if (searchDefaults.includeDescendants) {
       taxWrap = "tax_tree";
     }
+
+    // Check if this is a multi-query input for batch search
+    // Uses configurable delimiter (BATCH_SEARCH_DELIMITER)
+    let delimiter =
+      BATCH_SEARCH_DELIMITER === "comma"
+        ? /[,]/
+        : BATCH_SEARCH_DELIMITER === "semicolon"
+          ? /[;]/
+          : /\n/;
+    let hasDelimiter = queryString.match(delimiter);
+    let queries = [];
+
+    if (hasDelimiter) {
+      // Split by configured delimiter
+      queries = queryString
+        .split(delimiter)
+        .map((q) => q.trim())
+        .filter((q) => q.length > 0);
+    }
+
+    // Only proceed with batch search if multiple queries
+    if (queries.length > 1) {
+      // Wrap each individual query term properly
+      const searches = queries.map((query) => {
+        // Only wrap in tax_name/tax_tree if it's a bare term (no special chars, not an attribute)
+        let wrappedQuery = query;
+        if (!query.match(/[\(\)<>=]/) && !types[query] && !synonyms[query]) {
+          wrappedQuery = `${taxWrap}(${query})`;
+        }
+        return {
+          query: wrappedQuery,
+          result,
+          taxonomy: options.taxonomy || searchTerm.taxonomy,
+          // Use empty string for fields to get API default behavior (all attribute fields)
+          fields: options.fields !== undefined ? options.fields : "",
+          limit: parseInt(options.limit || 1000, 10),
+          offset: parseInt(options.offset || 0, 10),
+        };
+      });
+
+      // Create grouped batch search
+      setSearchIndex(result);
+      // Preserve original query string with delimiter for URL parameter preservation
+      // This allows the batch search to be restored on page reload
+      const batchTerm = queryString;
+      dispatchMsearch(
+        {
+          searches,
+          originalQueries: queries,
+          result,
+          taxonomy: options.taxonomy || searchTerm.taxonomy,
+          query: queryString, // Include full query string for URL preservation
+        },
+        batchTerm,
+      );
+      return;
+    }
+
+    // Single query - normal search flow
     if (!queryString.match("\n")) {
       let query = queryString
         .split(/\s+and\s+/i)

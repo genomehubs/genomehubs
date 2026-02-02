@@ -641,6 +641,7 @@ def cli():
         args = docopt(__doc__, argv=[])
     else:
         args = docopt(__doc__, version=__version__)
+    args["taxon-preload"] = True
     main(args)
 
 

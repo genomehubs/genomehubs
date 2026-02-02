@@ -1,8 +1,7 @@
 import JSZip from "jszip";
 import { Provider } from "react-redux";
-import React from "react";
 import ReportMap from ".";
-import store from "../../reducers/color.store";
+import store from "#reducers/color.store";
 
 // Mock map data with country_code attributes for testing
 const mockMap = {

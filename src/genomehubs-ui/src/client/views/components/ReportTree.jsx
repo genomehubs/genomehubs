@@ -1,14 +1,14 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import ReportTreePaths from "./ReportTreePaths";
 import ReportTreeRings from "./ReportTreeRings";
-import { compose } from "recompose";
-import dispatchReport from "../hocs/dispatchReport";
-import qs from "../functions/qs";
-import { useNavigate } from "@reach/router";
-import useResize from "../hooks/useResize";
-import withReportById from "../hocs/withReportById";
+import { compose } from "redux";
+import dispatchReport from "#hocs/dispatchReport";
+import qs from "#functions/qs";
+import useNavigate from "#hooks/useNavigate";
+import useResize from "#hooks/useResize";
+import withReportById from "#hocs/withReportById";
 import withSiteName from "#hocs/withSiteName";
 
 const ReportTree = ({
@@ -148,7 +148,7 @@ const ReportTree = ({
     }
 
     navigate(
-      `${basename}/search?${qs.stringify({
+      `search?${qs.stringify({
         ...options,
         ...moreOptions,
         query,
@@ -171,7 +171,7 @@ const ReportTree = ({
     let { result, taxonomy } = queryObj;
 
     navigate(
-      `${basename}/record?${qs.stringify({
+      `record?${qs.stringify({
         recordId: root,
         taxonomy,
         result,

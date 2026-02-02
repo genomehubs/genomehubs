@@ -1,6 +1,5 @@
-import React from "react";
 import { connect } from "react-redux";
-import { resetController } from "../reducers/message";
+import { resetController } from "#reducers/message";
 
 window.controller = new AbortController();
 

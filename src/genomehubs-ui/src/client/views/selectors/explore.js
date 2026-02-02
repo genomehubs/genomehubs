@@ -1,19 +1,19 @@
-import { apiUrl, setApiStatus } from "../reducers/api";
-import { directColor, getDefaultPalette } from "../reducers/color";
+import { apiUrl, setApiStatus } from "#reducers/api";
+import { directColor, getDefaultPalette } from "#reducers/color";
 import {
   getSummaries,
   getSummariesFetching,
   receiveSummary,
   requestSummary,
-} from "../reducers/explore";
+} from "#reducers/explore";
 import { scaleLinear, scaleLog, scaleSqrt } from "d3-scale";
 
 import { createCachedSelector } from "re-reselect";
 import { createSelector } from "reselect";
 import { format } from "d3-format";
-import { formatter } from "../functions/formatter";
+import { formatter } from "#functions/formatter";
 import { interpolateGreens } from "d3-scale-chromatic";
-import store from "../store";
+import store from "#store";
 
 export function fetchSummary(lineage, field, summary, taxonomy, result) {
   return async function (dispatch) {

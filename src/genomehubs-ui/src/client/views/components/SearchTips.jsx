@@ -5,19 +5,19 @@ import {
   textPanel as resultPanelStyle,
   title as titleStyle,
 } from "./Styles.scss";
-import { useLocation, useNavigate } from "@reach/router";
 
 import ColorButton from "./ColorButton";
-import React from "react";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import didYouMean from "didyoumean2";
-import qs from "../functions/qs";
-import setColors from "../functions/setColors";
+import qs from "#functions/qs";
+import setColors from "#functions/setColors";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
 import withColors from "#hocs/withColors";
-import withSearch from "../hocs/withSearch";
-import withTypes from "../hocs/withTypes";
+import withSearch from "#hocs/withSearch";
+import withTypes from "#hocs/withTypes";
 
 const Suggestion = ({ title, description, options, colors }) => {
   const navigate = useNavigate();

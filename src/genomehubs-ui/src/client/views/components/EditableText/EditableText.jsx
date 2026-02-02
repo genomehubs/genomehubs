@@ -1,22 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import AutoCompleteOption from "./AutoCompleteOption";
 import AutoCompleteSuggestion from "./AutoCompleteSuggestion";
 import Autocomplete from "@mui/material/Autocomplete";
 import AutowidthTextField from "../AutowidthTextField";
 import Box from "@mui/material/Box";
-import CancelIcon from "@mui/icons-material/Cancel";
-import Chip from "@mui/material/Chip";
 import JoinFullRoundedIcon from "@mui/icons-material/JoinFullRounded";
-import JoinInnerRoundedIcon from "@mui/icons-material/JoinInnerRounded";
 import Popper from "@mui/material/Popper";
-import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import TextField from "@mui/material/TextField";
 import Tooltip from "../Tooltip";
 import Typography from "@mui/material/Typography";
 import ValueChips from "./ValueChips";
-import { setLookupTerm } from "../../reducers/lookup";
-import stringLength from "../../functions/stringLength";
+import stringLength from "#functions/stringLength";
 
 const checkContrast = (color, background, threshold = 4.5) => {
   const hexToRgb = (hex) => {

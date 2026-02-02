@@ -1,5 +1,4 @@
 import Count from "./Count";
-import React from "react";
 
 export const BadgeStats = ({
   currentRecord,

@@ -156,6 +156,9 @@ export const typesToValidation = ({ types, searchIndex }) => {
   };
 
   const validModifiers = (key) => {
+    if (typeof key !== "string") {
+      return new Set();
+    }
     if (key === "tax") {
       return new Set(["tree", "name", "rank", "lineage", "depth", "eq"]);
     }
@@ -193,7 +196,7 @@ export const typesToValidation = ({ types, searchIndex }) => {
   };
 
   const validOperators = ({ key, modifier }) => {
-    if (key === "tax" || modifier === "collate") {
+    if (typeof key !== "string" || key === "tax" || modifier === "collate") {
       return new Set([]);
     }
     const { processed_type, summary = [] } = types[key] || {};
@@ -223,7 +226,12 @@ export const typesToValidation = ({ types, searchIndex }) => {
   };
   const validateValue = ({ key, value, modifier }) => {
     let { constraint = {}, processed_type = "" } = types[key] || {};
-    if (value === null || value === undefined || value === "") {
+    if (
+      typeof key !== "string" ||
+      value === null ||
+      value === undefined ||
+      value === ""
+    ) {
       return { valid: true, processed_type };
     }
     if (`${value}`.match(/^query[A-Z]+\.\w+/)) {
@@ -302,7 +310,7 @@ export const typesToValidation = ({ types, searchIndex }) => {
   };
 
   const allowSplitValues = ({ key, modifier }) => {
-    if (key === "tax" || key.endsWith("_id")) {
+    if (key === "tax" || (key && key.endsWith("_id"))) {
       return false;
     }
     const { processed_type } = types[key] || {};

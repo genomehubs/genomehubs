@@ -1,17 +1,15 @@
-import React, { useRef } from "react";
 import {
-  errorHeading as errorHeadingStyle,
   error as errorStyle,
   infoPage as infoPageStyle,
   link as linkStyle,
-  siteTextError as siteTextErrorStyle,
 } from "./Styles.scss";
 
 import FileCopyIcon from "@mui/icons-material/FileCopy";
 import IconButton from "@mui/material/IconButton";
 import SiteName from "./SiteName";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
+import { useRef } from "react";
 import withColors from "#hocs/withColors";
 import withSiteName from "#hocs/withSiteName";
 

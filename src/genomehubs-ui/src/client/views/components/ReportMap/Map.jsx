@@ -1,24 +1,42 @@
+import "../style/leaflet.css";
 import "leaflet/dist/leaflet.css";
 
 import {
   CircleMarker,
   GeoJSON,
   MapContainer,
-  Popup,
   TileLayer,
+  useMap,
 } from "react-leaflet";
-import React, { useEffect, useMemo, useRef, useState } from "react";
 import { findCenterLatLng, getFitWorldZoom } from "./functions/mapHelpers";
-import { useLocation, useNavigate } from "@reach/router";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import CountryPopup from "./CountryPopup";
 import HexbinPopup from "./HexbinPopup";
 import L from "leaflet";
 import PointPopup from "./PointPopup";
-import countriesGeoJson from "../geojson/countries.geojson";
 import getMapOptions from "./functions/getMapOptions";
 import hexBinsToGeoJson from "./functions/hexBinsToGeoJson";
-import { light } from "@mui/material/styles/createPalette";
+import useNavigate from "#hooks/useNavigate";
+
+let countriesGeoJson = null;
+let countriesGeoJsonSimple = null;
+
+// Component to track zoom level
+const ZoomTracker = ({ setZoom }) => {
+  const map = useMap();
+  useEffect(() => {
+    const handleZoom = () => {
+      setZoom(map.getZoom());
+    };
+    map.on("zoomend", handleZoom);
+    setZoom(map.getZoom()); // Set initial zoom
+    return () => {
+      map.off("zoomend", handleZoom);
+    };
+  }, [map, setZoom]);
+  return null;
+};
 
 const CountryLayer = ({
   countryCounts,
@@ -30,9 +48,24 @@ const CountryLayer = ({
   handleCountryClick = () => {},
   navigate = () => {},
 }) => {
+  const [geoData, setGeoData] = useState(null);
+
+  useEffect(() => {
+    if (!countriesGeoJson) {
+      import("../geojson/countries.geojson").then((module) => {
+        countriesGeoJson = module.default;
+        setGeoData(countriesGeoJson);
+      });
+    } else {
+      setGeoData(countriesGeoJson);
+    }
+  }, []);
+
+  if (!geoData) return null;
+
   return (
     <GeoJSON
-      data={{ type: "FeatureCollection", features: countriesGeoJson.features }}
+      data={{ type: "FeatureCollection", features: geoData.features }}
       style={(feature) => ({
         fillColor: countryColor(countryCounts[feature.properties.ISO_A2]),
         weight: 0.7,
@@ -88,6 +121,8 @@ const Map = ({
   const [countryPopupMeta, setCountryPopupMeta] = useState(null);
   const [hexbinPopupMeta, setHexbinPopupMeta] = useState(null);
   const [pointPopupMeta, setPointPopupMeta] = useState(null);
+  const [currentZoom, setCurrentZoom] = useState(0);
+
   const maxCount = useMemo(
     () => Math.max(...Object.values(countryCounts), 1),
     [countryCounts],
@@ -240,6 +275,8 @@ const Map = ({
         handleCountryClick={handleCountryClick}
         countryLink={regionLink}
         navigate={navigate}
+        showRegions={showRegions}
+        zoomLevel={currentZoom}
       />
     );
   }
@@ -294,6 +331,7 @@ const Map = ({
         center={[centerLat, centerLon]}
         zoom={dynamicZoom}
       >
+        <ZoomTracker setZoom={setCurrentZoom} />
         {tileLayer}
         {countryLayer}
         {reportSelect === "bin" && markers}

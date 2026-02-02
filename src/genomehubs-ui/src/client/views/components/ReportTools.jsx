@@ -1,13 +1,11 @@
-import React, { Fragment, useRef, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
+import { Suspense, lazy, useState } from "react";
 
 import CodeIcon from "@mui/icons-material/Code";
 import EditIcon from "@mui/icons-material/Edit";
 import GetAppIcon from "@mui/icons-material/GetApp";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import LinkIcon from "@mui/icons-material/Link";
 import ReportCode from "./ReportCode";
-import ReportDownload from "./ReportDownload";
 import ReportEdit from "./ReportEdit";
 import ReportInfo from "./ReportInfo";
 import ReportQuery from "./ReportQuery";
@@ -16,12 +14,17 @@ import SearchIcon from "@mui/icons-material/Search";
 import SelectIcon from "@mui/icons-material/SelectAll";
 import TocIcon from "@mui/icons-material/Toc";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
 import { useStyles } from "./ReportModalStyles";
 import withColors from "#hocs/withColors";
-import withReportTerm from "../hocs/withReportTerm";
+import withReportTerm from "#hocs/withReportTerm";
 import withSiteName from "#hocs/withSiteName";
-import withTheme from "../hocs/withTheme";
+import withTheme from "#hocs/withTheme";
+
+// Lazy load download component to defer export libraries
+const ReportDownload = lazy(() => import("./ReportDownload"));
 
 export const ReportTools = ({
   reportEdit,
@@ -49,7 +52,7 @@ export const ReportTools = ({
   const permaLink = (queryString, toggle) => {
     let path = topLevel ? "report" : toggle ? "reporturl" : "report";
     // TODO: include taxonomy
-    navigate(`${basename}/${path}?${queryString.replace(/^\?/, "")}`);
+    navigate(`/${path}?${queryString.replace(/^\?/, "")}`);
   };
 
   const handleUpdate = ({ queryString, hash }) => {
@@ -103,13 +106,21 @@ export const ReportTools = ({
     overlay = <ReportSelect reportId={reportId} report={report} />;
   } else if (download) {
     overlay = (
-      <ReportDownload
-        reportId={reportId}
-        report={report}
-        chartRef={chartRef}
-        code={code}
-        queryString={queryString}
-      />
+      <Suspense
+        fallback={
+          <div style={{ padding: "2rem", textAlign: "center" }}>
+            Loading export options...
+          </div>
+        }
+      >
+        <ReportDownload
+          reportId={reportId}
+          report={report}
+          chartRef={chartRef}
+          code={code}
+          queryString={queryString}
+        />
+      </Suspense>
     );
   } else if (code) {
     overlay = (

@@ -1,4 +1,3 @@
-import React from "react";
 import ReportPopup from "./ReportPopup";
 
 export const PointPopup = ({

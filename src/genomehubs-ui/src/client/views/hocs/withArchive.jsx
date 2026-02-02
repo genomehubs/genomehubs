@@ -1,5 +1,4 @@
-import React from "react";
-import { archive } from "../reducers/archive";
+import { archive } from "#reducers/archive";
 import { connect } from "react-redux";
 
 const withArchive = (WrappedComponent) => (props) => {

@@ -17,7 +17,7 @@ LOGGER = tolog.logger(__name__)
 
 def index_template(name, opts):
     """Index template (includes name, mapping and types)."""
-    index_name = "taxon" if opts.get("taxon-preload", False) else "taxonomy"
+    index_name = "taxonomy"
     parts = [index_name, name, opts["hub-name"], opts["hub-version"]]
     return index_templator(parts, opts)
 

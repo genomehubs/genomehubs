@@ -15,3 +15,5 @@ tests/resources
 logs
 *.xml
 analysis-metadata.yml
+data
+goat-resources

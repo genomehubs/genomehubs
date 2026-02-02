@@ -15,7 +15,7 @@ import KeyValueChip, {
   parseValue,
   typesToValidation,
 } from "../KeyValueChip";
-import React, { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ErrorIcon from "@mui/icons-material/Error";
@@ -25,7 +25,6 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import Tooltip from "../Tooltip";
-import { current } from "@reduxjs/toolkit";
 import { getChipColor } from "../KeyValueChip/functions/chipPalettes";
 
 const chipToString = (chip) => {
@@ -133,7 +132,7 @@ const QueryLabel = ({
   groupColor,
 }) => {
   const [open, setOpen] = useState(false);
-  const buttonRef = React.useRef(null);
+  const buttonRef = useRef(null);
 
   const labelStyle = {
     position: "absolute",
@@ -820,7 +819,7 @@ const ChipSearch = ({
     />
   );
 
-  const inputQueryList = React.useMemo(() => {
+  const inputQueryList = useMemo(() => {
     if (chips && chips.length > 0) {
       return chips
         .map((chip) => {
@@ -1032,14 +1031,14 @@ const ChipSearch = ({
         >
           Removed duplicate terms for{" "}
           {Array.from(duplicateKeys).map((key, index, array) => (
-            <React.Fragment key={key}>
+            <Fragment key={key}>
               <b>{key}</b>
               {index < array.length - 2
                 ? ", "
                 : index === array.length - 2
                   ? " and "
                   : ""}
-            </React.Fragment>
+            </Fragment>
           ))}
         </Alert>
       </Snackbar>
@@ -1060,7 +1059,7 @@ const TextInput = ({
   startAdornment,
 }) => {
   // const [inUse, setInUse] = useState(inputValue.length > 0);
-  const inputRef = React.useRef(null);
+  const inputRef = useRef(null);
   const multiline = true;
   const maxRows = 8;
   const minRows = inputValue.length > 30 ? 2 : 1;
@@ -1189,10 +1188,10 @@ const ChipGroup = ({
   backgroundColor,
   handleIconClick,
 }) => {
-  const [hovered, setHovered] = React.useState(false);
+  const [hovered, setHovered] = useState(false);
 
   // Use a ref to track mouse and focus events more robustly
-  const groupRef = React.useRef(null);
+  const groupRef = useRef(null);
 
   // Handle both mouse and focus events for better robustness
   const handlePointerEnter = () => setHovered(true);

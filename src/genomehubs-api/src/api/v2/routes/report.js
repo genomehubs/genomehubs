@@ -1126,11 +1126,19 @@ export const getSearchSources = async (req, res) => {
   let response = {};
   let reqQuery = req.req.query;
   // TODO: handle excude direct ;
-  reqQuery.query = reqQuery.x
+  const computedQuery = reqQuery.x
     .replaceAll(/(tax_name|tax_eq)/g, "tax_tree")
     .split(/\s+AND\s+/i)
     .filter((t) => !t.startsWith("tax_rank"))
     .join(" AND ");
+  try {
+    reqQuery.query = computedQuery;
+  } catch (e) {
+    // If reqQuery is a read-only getter-backed object, stash expanded query
+    // on res.locals so downstream code can use it via res.locals.expandedQuery
+    res.locals.expandedQuery = computedQuery;
+    reqQuery = { ...reqQuery, query: computedQuery };
+  }
   let excludeDirect;
   ({ excludeDirect, ...req } = req);
   let exclusions = setExclusions(req);

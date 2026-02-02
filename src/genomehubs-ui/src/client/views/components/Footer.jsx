@@ -1,10 +1,9 @@
 import * as htmlToImage from "html-to-image";
 
-import React, { memo, useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
+import { memo, useEffect, useRef, useState } from "react";
 
 import CopyrightIcon from "@mui/icons-material/Copyright";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import PalettePicker from "./PalettePicker";
 import PalettePreview from "./PalettePreview";
@@ -14,18 +13,25 @@ import QrCodeIcon from "@mui/icons-material/QrCode";
 import Taxonomy from "./Taxonomy";
 import Tooltip from "./Tooltip";
 import bbsrcLogo from "./img/bbsrc-logo.png";
-import { compose } from "recompose";
-import dispatchRecord from "../hocs/dispatchRecord";
-import dispatchTypes from "../hocs/dispatchTypes";
+import { compose } from "redux";
+import dispatchRecord from "#hocs/dispatchRecord";
+import dispatchTypes from "#hocs/dispatchTypes";
 import dtolLogo from "./img/dtol-logo.png";
 import { link as linkStyle } from "./Styles.scss";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import sangerLogo from "./img/sanger-logo.png";
 import { saveSearchOptions as saveSearchOptionsStyle } from "./Styles.scss";
-import withApi from "../hocs/withApi";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
+import withApi from "#hocs/withApi";
 import withColors from "#hocs/withColors";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withVersion from "../hocs/withVersion";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withVersion from "#hocs/withVersion";
+
+const normalizeAsset = (p) => {
+  if (!p) return p;
+  return String(p).replace(/^\/\//, "/");
+};
 
 const Footer = ({
   id,
@@ -73,6 +79,7 @@ const Footer = ({
     }
   }, [currentPalette, levels]);
   if (!taxonomy || hidden) {
+    console.warn("[Footer] hidden", { hidden, taxonomy, apiStatus });
     return <Taxonomy display={false} />;
   }
 
@@ -218,13 +225,13 @@ const Footer = ({
   let logos = (
     <span style={{ float: "right", marginRight: "0.5em" }}>
       <a href="https://www.sanger.ac.uk/" target="_blank">
-        <img src={sangerLogo} />
+        <img src={normalizeAsset(sangerLogo)} />
       </a>
       <a href="https://www.darwintreeoflife.org" target="_blank">
-        <img src={dtolLogo} />
+        <img src={normalizeAsset(dtolLogo)} />
       </a>
       <a href="https://bbsrc.ukri.org/" target="_blank">
-        <img src={bbsrcLogo} />
+        <img src={normalizeAsset(bbsrcLogo)} />
       </a>
     </span>
   );

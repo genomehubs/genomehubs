@@ -1,7 +1,7 @@
-import React, { Fragment, memo, useEffect, useState } from "react";
+import { Fragment, memo, useState } from "react";
 
 import FileTable from "./FileTable";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -9,14 +9,14 @@ import NavLink from "./NavLink";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
-import dispatchSetRecord from "../hocs/dispatchSetRecord";
+import { compose } from "redux";
+import dispatchSetRecord from "#hocs/dispatchSetRecord";
 import makeStyles from "@mui/styles/makeStyles";
-import { useNavigate } from "@reach/router";
-import withAnalysesByAnyId from "../hocs/withAnalysesByAnyId";
-import withAnalysis from "../hocs/withAnalysis";
-import withRecord from "../hocs/withRecord";
-import withTaxonomy from "../hocs/withTaxonomy";
+import useNavigate from "#hooks/useNavigate";
+import withAnalysesByAnyId from "#hocs/withAnalysesByAnyId";
+import withAnalysis from "#hocs/withAnalysis";
+import withRecord from "#hocs/withRecord";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 const useRowStyles = makeStyles({
   root: {
@@ -95,7 +95,7 @@ const AnalysisTableRow = ({
   analysisCells.push(
     <TableCell key={"expand"}>
       {meta.file_count} files {fileExpand}
-    </TableCell>
+    </TableCell>,
   );
 
   const listContent = ({ list, handleClick, open, setOpen, result }) => {
@@ -168,7 +168,7 @@ const AnalysisTableRow = ({
     analysisCells.push(
       <TableCell key={"source"}>
         {<NavLink href={meta.source_url}>{meta.source || meta.name}</NavLink>}
-      </TableCell>
+      </TableCell>,
     );
   }
   return (
@@ -192,5 +192,5 @@ export default compose(
   dispatchSetRecord,
   withAnalysis,
   withAnalysesByAnyId,
-  withRecord
+  withRecord,
 )(AnalysisTableRow);

@@ -43,7 +43,7 @@ Options:
     --taxonomy-file PATH          Taxonomy file names.
     --taxonomy-url URL            Remote URL to fetch taxonomy.
     --taxonomy-jsonl PATH         Path to JSON Lines format taxonomy file of additional taxa.
-    --taxon-preload               Flag to preload all taxa in taxonomy into taxon index.
+    --taxon-preload               Flag to preload all taxa in taxonomy into taxon index. Default True.
     --docker-contain STRING       GenomeHubs component to run in Docker.
     --docker-network STRING       Docker network name.
     --docker-timeout STRING       Time in seconds to wait for a component to start in
@@ -219,16 +219,16 @@ def main(args):
                 )
 
         # Prepare taxon index
-        # taxon_template = taxon.index_template(taxonomy_name, options["init"])
-        # es_functions.load_mapping(es, taxon_template["name"], taxon_template["mapping"])
-        # es_functions.index_create(es, taxon_template["index_name"])
-        # if options["init"].get("taxon-preload", False):
-        #     LOGGER.info("Loading all taxa from taxonomy into taxon index")
-        #     body = {
-        #         "source": {"index": template["index_name"]},
-        #         "dest": {"index": taxon_template["index_name"]},
-        #     }
-        #     es.reindex(body=body)
+        taxon_template = taxon.index_template(taxonomy_name, options["init"])
+        es_functions.load_mapping(es, taxon_template["name"], taxon_template["mapping"])
+        es_functions.index_create(es, taxon_template["index_name"])
+        if options["init"].get("taxon-preload", False):
+            LOGGER.info("Loading all taxa from taxonomy into taxon index")
+            body = {
+                "source": {"index": template["index_name"]},
+                "dest": {"index": taxon_template["index_name"]},
+            }
+            es.reindex(body=body)
 
         # Prepare assembly index
         assembly_template = sample.index_template(
@@ -274,6 +274,7 @@ def cli():
         args = docopt(__doc__, argv=[])
     else:
         args = docopt(__doc__, version=__version__)
+    args["taxon-preload"] = True
     main(args)
 
 

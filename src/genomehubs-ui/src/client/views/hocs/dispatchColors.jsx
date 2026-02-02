@@ -1,6 +1,5 @@
-import React from "react";
 import { connect } from "react-redux";
-import { selectPalette } from "../reducers/color";
+import { selectPalette } from "#reducers/color";
 
 const dispatchColors = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({});
@@ -11,7 +10,7 @@ const dispatchColors = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { compose } from "recompose";
+import { compose } from "redux";
 import { motion } from "motion/react";
 import { svgPathBbox } from "svg-path-bbox";
 import withColors from "#hocs/withColors";

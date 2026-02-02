@@ -1,8 +1,7 @@
 import { Box, Typography } from "@mui/material";
 
 import FullScreenGridCell from "./FullScreenGridCell";
-import Grid from "@mui/material/Grid2";
-import React from "react";
+import Grid from "@mui/material/Grid";
 
 export default {
   title: "Components/FullScreenGridCell",

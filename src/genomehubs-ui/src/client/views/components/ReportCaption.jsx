@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import PhylopicAttributions from "./PhylopicAttributions";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { reportCaption as reportCaptionStyle } from "./Styles.scss";
-import stringLength from "../functions/stringLength";
-import useResize from "../hooks/useResize";
+import stringLength from "#functions/stringLength";
+import useResize from "#hooks/useResize";
 import withColors from "#hocs/withColors";
 import withTheme from "#hocs/withTheme";
 

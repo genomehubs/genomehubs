@@ -1,7 +1,7 @@
-import React, { memo, useEffect } from "react";
+import { memo, useEffect } from "react";
 
 import FileModal from "./FileModal";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import NavLink from "./NavLink";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -9,12 +9,12 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { autoWidth as autoWidthStyle } from "./Styles.scss";
-import { compose } from "recompose";
-import formatter from "../functions/formatter";
+import { compose } from "redux";
+import formatter from "#functions/formatter";
 import makeStyles from "@mui/styles/makeStyles";
-import withApi from "../hocs/withApi";
-import withFiles from "../hocs/withFiles";
-import withFilesByAnalysisId from "../hocs/withFilesByAnalysisId";
+import withApi from "#hocs/withApi";
+import withFiles from "#hocs/withFiles";
+import withFilesByAnalysisId from "#hocs/withFilesByAnalysisId";
 
 const useStyles = makeStyles((theme) => ({
   pale: {
@@ -76,7 +76,7 @@ const FileTable = ({
             <a href={downloadLink}>
               {meta.name} (
               <span style={{ textDecoration: "underline" }}>{`${formatter(
-                meta.size_bytes
+                meta.size_bytes,
               )}B`}</span>
               )
             </a>
@@ -125,5 +125,5 @@ export default compose(
   memo,
   withApi,
   withFiles,
-  withFilesByAnalysisId
+  withFilesByAnalysisId,
 )(FileTable);

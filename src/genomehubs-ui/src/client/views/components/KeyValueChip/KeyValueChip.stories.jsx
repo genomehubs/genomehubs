@@ -1,9 +1,8 @@
-import React, { useState } from "react";
-
 import KeyValueChip from "./KeyValueChip";
 import { Provider } from "react-redux";
-import colorStore from "../../reducers/color.store";
+import colorStore from "#reducers/color.store";
 import types from "./default.types.json";
+import { useState } from "react";
 
 export default {
   title: "Components/KeyValueChip",
@@ -54,7 +53,8 @@ const Template = (args) => {
       value={chipData.value}
       operator={chipData.operator}
       modifier={chipData.modifier}
-      palette={chipData.palette} // Pass the palette prop
+      palette={chipData.palette}
+      types={args.types}
       onChange={handleChipChange}
     />
   );

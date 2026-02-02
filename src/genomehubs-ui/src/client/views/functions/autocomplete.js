@@ -6,11 +6,11 @@ import {
   getSummaryTrie,
   getTaxTrie,
   getValueTrie,
-} from "../selectors/types";
+} from "#selectors/types";
 
-import { apiUrl } from "../reducers/api";
+import { apiUrl } from "#reducers/api";
 import qs from "./qs";
-import store from "../store";
+import store from "#store";
 
 const defaultState = () => ({
   isFetching: false,

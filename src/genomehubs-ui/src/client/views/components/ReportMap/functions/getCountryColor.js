@@ -1,4 +1,4 @@
-import { mixColor } from "../../../functions/mixColor";
+import { mixColor } from "#functions/mixColor";
 
 export default function getCountryColor(
   count,

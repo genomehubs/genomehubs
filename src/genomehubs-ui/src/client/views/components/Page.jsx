@@ -1,19 +1,19 @@
-import React, { memo, useRef, useState } from "react";
 import { link as linkStyle, pageTitle as pageTitleStyle } from "./Styles.scss";
+import { memo, useRef, useState } from "react";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import SearchBox from "./SearchBox";
 import SearchBoxWrapper from "./SearchBoxWrapper";
 import SearchHeaderButtons from "./SearchHeaderButtons";
 import SearchTips from "./SearchTips";
 import classnames from "classnames";
-import { compose } from "recompose";
-import dispatchColors from "../hocs/dispatchColors";
+import { compose } from "redux";
+import dispatchColors from "#hocs/dispatchColors";
 import makeStyles from "@mui/styles/makeStyles";
 import { useLocation } from "@reach/router";
 import { useReadLocalStorage } from "usehooks-ts";
-import withApi from "../hocs/withApi";
-import withSearchIndex from "../hocs/withSearchIndex";
+import withApi from "#hocs/withApi";
+import withSearchIndex from "#hocs/withSearchIndex";
 import withSiteName from "#hocs/withSiteName";
 
 const useStyles = makeStyles((theme) => ({
@@ -51,6 +51,7 @@ const Page = ({
   recordId,
   fieldId,
   resultCount,
+  uniqueCount,
   result,
   siteName,
 }) => {
@@ -153,6 +154,9 @@ const Page = ({
     title = `${fieldId} summary`;
   } else if (resultCount >= 0) {
     title = `${resultCount} ${resultCount == 1 ? "hit" : "hits"}`;
+    if (uniqueCount !== undefined && uniqueCount > 0) {
+      title += ` (${uniqueCount} unique)`;
+    }
     if (resultCount == 0) {
       searchTips = <SearchTips />;
     }

@@ -5,218 +5,96 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="simplecookie_policy" content="/policies/cookies/" />
-  <style>
-    .leaflet-div-icon {
-      background: transparent !important;
-      border: none !important;
-      text-shadow: 0 0 10px blue;
-    }
-
-    .leaflet-control-container .leaflet-top,
-    .leaflet-control-container .leaflet-bottom {
-      will-change: transform !important;
-    }
-
-    .leaflet-control-zoom .leaflet-control-zoom-in,
-    .leaflet-control-zoom .leaflet-control-zoom-out {
-      color: black !important;
-      text-decoration: none !important;
-    }
-
-    .leaflet-left .leaflet-control {
-      margin-left: 20px !important;
-    }
-
-    .leaflet-top .leaflet-control {
-      margin-top: 20px !important;
-    }
-
-    .leaflet-touch .leaflet-bar {
-      border: none !important;
-    }
-
-    .leaflet-touch .leaflet-bar a {
-      width: 40px !important;
-      height: 40px !important;
-      line-height: 40px !important;
-    }
-
-    .leaflet-touch .leaflet-bar a:first-child {
-      border-top-left-radius: 12px !important;
-      border-top-right-radius: 12px !important;
-    }
-
-    .leaflet-touch .leaflet-bar a:last-child {
-      border-bottom-left-radius: 12px !important;
-      border-bottom-right-radius: 12px !important;
-    }
-
-    .leaflet-container .leaflet-control-attribution {
-      padding: 0 1.75em 0 0.5em !important;
-      border-radius: 4px 0 0 0 !important;
-      max-width: calc(100% - 1.75em) !important;
-    }
-
-    #cookie-policy {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      width: auto;
-      z-index: 1000000;
-      color: #fff;
-      font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    }
-
-    #cookie-policy.full {
-      width: 100%;
-      background-color: #31323f;
-      border-top: 2px solid #fff;
-    }
-
-    #cookie-policy.full p {
-      margin: 1em;
-    }
-
-    #cookie-options {
-      position: fixed;
-      bottom: 0;
-      top: 0;
-      right: 0;
-      color: #fff;
-      z-index: 1000000;
-      width: 40%;
-      /* max-width: 700px; */
-      background-color: #31323f;
-      border-left: 2px solid #fff;
-      text-align: left;
-      overflow-y: auto;
-      padding: 5px 2em 2em;
-      font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    }
-
-    #cookie-options blockquote {
-      text-align: center;
-      margin: 0;
-    }
-
-    #cookie-options tr td {
-      width: 20%;
-      vertical-align: middle;
-      text-align: center;
-    }
-
-    #cookie-options tr td:first-child {
-      width: 75%;
-      vertical-align: top;
-      text-align: left;
-    }
-
-    #cookie-options tr.disabled td {
-      background-color: #31323f;
-      color: #fff;
-      text-decoration: line-through;
-    }
-
-    #cookie-options table {
-      border-collapse: collapse;
-      width: 95%;
-      margin: auto;
-    }
-
-    #cookie-options td,
-    #cookie-options th {
-      border: 2px solid #31323f;
-      padding: 4px;
-      line-height: 1.25em;
-      color: #fff;
-      background-color: rgb(65, 74, 81);
-    }
-
-    #cookie-options th {
-      /* background-color: #31323f;
-      color: #fff; */
-      text-align: center;
-    }
-
-    #cookie-options h2 {
-      padding-top: 1em;
-      /* font-family: "Signika", "Helvetica Neue", Helvetica, Arial, sans-serif; */
-    }
-
-    #cookie-options h3 {
-      padding-top: 1em;
-      /* font-family: "Signika", "Helvetica Neue", Helvetica, Arial, sans-serif; */
-      border-top: 2px solid #fff;
-    }
-
-    #cookie-options a {
-      color: #fff;
-      font-weight: 600;
-    }
-
-    .cookie-settings {
-      cursor: pointer;
-      font-weight: bold;
-      border: 1px solid #000000;
-      border-radius: 4px;
-      padding: 4px;
-      background-color: #eeeeee;
-    }
-
-    #cookie-options button,
-    #cookie-policy button {
-      background-color: #fff;
-      color: #31323f;
-      border: 0;
-      font-weight: 700;
-      letter-spacing: 1px;
-      border-radius: 4px;
-      padding: 4px 8px;
-      margin: 3px;
-    }
-
-    #cookie-options button {
-      font-size: 1.1em;
-      padding: 4px 1em;
-    }
-
-    button#cookie-close {
-      display: block;
-      float: right;
-      font-size: 1em;
-    }
-
-    @media print {
-      div#cookie-policy {
-        display: none;
+  <script>
+    // Compute asset URLs with basename at load time
+    (function () {
+      const raw = (window.process && window.process.ENV && window.process.ENV.GH_BASENAME) || window.BASENAME || "";
+      const clean = String(raw).replace(/^\/+|\/+$/g, "");
+      const basePrefix = clean ? "/" + clean : ""; // "/archive" or ""
+      // Helper to join basePrefix and asset path without producing double slashes
+      function joinAsset(prefix, assetPath) {
+        const p = String(prefix || "").replace(/\/$/, "");
+        const a = String(assetPath || "").replace(/^\//, "");
+        return (p ? p + "/" + a : "/" + a);
       }
-    }
 
-    @media (max-width: 1600px) {
-      #cookie-options {
-        width: 40%;
-      }
-    }
+      // Create link elements via DOM APIs to avoid accidental HTML mangling
+      const cur = document.currentScript;
+      const links = [
+        { rel: 'icon', href: joinAsset(basePrefix, 'assets/favicon.ico') },
+        { rel: 'apple-touch-icon', href: joinAsset(basePrefix, 'assets/apple-touch-icon.png') },
+        { rel: 'manifest', href: joinAsset(basePrefix, 'assets/manifest.json') },
+      ];
+      links.forEach((attrs) => {
+        const el = document.createElement('link');
+        el.rel = attrs.rel;
+        el.href = attrs.href;
+        if (cur && cur.parentNode) cur.parentNode.insertBefore(el, cur.nextSibling);
+        else document.head.appendChild(el);
+      });
+    })();
+  </script>
 
-    @media (max-width: 1280px) {
-      #cookie-options {
-        width: 60%;
-      }
-    }
-
-    @media (max-width: 900px) {
-      #cookie-options {
-        left: 0;
-        width: calc(100% - 2em);
-        border-left: 0;
-      }
-    }
-  </style>
 </head>
 
 <body>
   <div id="app" style="height: 100%; min-height: 100%"></div>
-  <script type="text/javascript" src="/js/cookies-gcc.js" id="simple-cookie-js"></script>
+  <script>
+    // Track chunk loading errors for debugging
+    window.__chunkLoadErrors = [];
+    window.__importErrors = [];
+
+    window.addEventListener('error', function (e) {
+      if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
+        const url = e.target.src || e.target.href;
+        console.error('[chunk-load-error]', url, e);
+        window.__chunkLoadErrors.push({
+          url: url,
+          tag: e.target.tagName,
+          error: e.message || 'load failed'
+        });
+      }
+    }, true);
+
+    // Intercept dynamic import errors
+    window.addEventListener('unhandledrejection', function (e) {
+      if (e.reason && e.reason.message) {
+        console.error('[unhandled-rejection]', e.reason);
+        if (e.reason.message.includes('import') || e.reason.message.includes('chunk')) {
+          window.__importErrors.push({
+            message: e.reason.message,
+            stack: e.reason.stack
+          });
+        }
+      }
+    });
+
+    // Log webpack errors for debugging
+    setTimeout(function () {
+      if (window.__chunkLoadErrors.length > 0) {
+        console.error('[chunk-load-errors] Failed to load:', window.__chunkLoadErrors);
+      }
+      if (window.__importErrors.length > 0) {
+        console.error('[import-errors] Dynamic import failures:', window.__importErrors);
+      }
+    }, 2000);
+  </script>
+  <script>
+    (function () {
+      var raw = (window.process && window.process.ENV && window.process.ENV.GH_BASENAME) || window.BASENAME || "";
+      var clean = String(raw).replace(/^\/+|\/+$/g, "");
+      var basePrefix = clean ? "/" + clean : "";
+      var s = document.createElement('script');
+      s.type = 'text/javascript';
+      s.id = 'simple-cookie-js';
+      s.src = (function (p, asset) {
+        var pp = String(p || '').replace(/\/$/, '');
+        var aa = String(asset || '').replace(/^\//, '');
+        return (pp ? pp + '/' + aa : '/' + aa);
+      })(basePrefix, 'js/cookies-gcc.js');
+      document.currentScript ? document.currentScript.after(s) : document.body.appendChild(s);
+    })();
+  </script>
 </body>
 
 </html>

@@ -33,7 +33,6 @@ const getFileMatrix = async ({
 
   let counts = {};
   let { file_paths: filePaths } = meta;
-  // console.log(filePaths);
 
   for (let { key, doc_count } of buckets) {
     if (filePaths[key] == null) {
@@ -81,55 +80,6 @@ const getFileMatrix = async ({
   }
 
   return { matrix, status: xRes.status, query };
-
-  // // files by name
-  // aggs.fields.aggs.by_key.aggs[`value_list_name`] = {
-  //   terms: {
-  //     ...template.terms,
-  //     field: `attributes.metadata`,
-  //     include: Object.keys(filePaths.busco),
-  //   },
-  // };
-  // let x3Res = await getResults({
-  //   ...xQuery,
-  //   query: `${xQuery.query} AND metadata(files)=full_table,short_summary`,
-  //   aggs,
-  //   size: 0,
-  //   taxonomy,
-  //   req,
-  //   // update: "x",
-  // });
-  // console.log(aggs.fields.aggs.by_key.aggs.value_list_name);
-  // console.log(x3Res.aggs.fields.by_key.buckets.files.value_list_name.buckets);
-
-  // files per run
-  // let x3Res = await getResults({
-  //   ...xQuery,
-  //   aggs,
-  //   size: 0,
-  //   taxonomy,
-  //   req,
-  //   // update: "x",
-  // });
-  // for (let [key, count] of Object.entries(counts)) {
-  //   console.log({ [key]: count });
-  //   let { buckets: runBuckets } =
-  //     x2Res.aggs.fields.by_key.buckets.files[`value_list_${key}`];
-  //   for (let { key: run, doc_count: runCount } of runBuckets) {
-  //     console.log({ run, runCount });
-  //     let { buckets: fileBuckets } =
-  //       x3Res.aggs.fields.by_key.buckets.files[`value_list_${key}_${run}`];
-  //     for (let { key: file, doc_count: fileCount } of fileBuckets) {
-  //       console.log({ file, fileCount });
-  //     }
-  //   }
-  // }
-
-  // console.log(meta);
-
-  // console.log(xRes.aggs.fields.by_key.buckets.files.value_list.buckets);
-
-  // console.log(xRes.results[0].result.fields.files);
 };
 
 const getFileLinks = async ({
@@ -160,9 +110,6 @@ const getFileLinks = async ({
   if (!fileRes.status.success) {
     return { status: fileRes.status };
   }
-  // console.log(fileRes.results[0].result.fields);
-  // console.log(xQuery.fields.concat([fileTerm.split("=")[0]]));
-  // console.log(query);
 };
 
 export const files = async ({
@@ -235,7 +182,6 @@ export const files = async ({
         continue;
       }
     }
-    // console.log(matrix.matrix.busco.runs);
 
     let fileTerm;
 
@@ -255,7 +201,6 @@ export const files = async ({
       break;
     }
     if (fileTerm) {
-      // console.log(fileTerm);
       let fileRes = await getFileLinks({
         result,
         taxonomy,
@@ -267,7 +212,6 @@ export const files = async ({
         lookupTypes,
         query: matrix.query,
       });
-      // console.log(fileRes);
     }
   }
 

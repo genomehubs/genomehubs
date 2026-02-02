@@ -1,20 +1,24 @@
-import React, { memo, useRef } from "react";
 import {
   infoPanel1Column as infoPanel1ColumnStyle,
   infoPanel as infoPanelStyle,
   textPanel as textPanelStyle,
 } from "./Styles.scss";
-import { useLocation, useNavigate } from "@reach/router";
+import { memo, useRef } from "react";
 
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
 import ReportFull from "./ReportFull";
 import classnames from "classnames";
-import { compose } from "recompose";
-import dispatchReport from "../hocs/dispatchReport";
-import qs from "../functions/qs";
-import { sortReportQuery } from "../selectors/report";
-import withReportDefaults from "../hocs/withReportDefaults";
+import { compose } from "redux";
+import dispatchReport from "#hocs/dispatchReport";
+import qs from "#functions/qs";
+import { sortReportQuery } from "#selectors/report";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
+import withReportDefaults from "#hocs/withReportDefaults";
 
 const indices = ["taxon", "assembly", "sample", "feature"];
 
@@ -73,6 +77,26 @@ const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {
   const handleClick = (key) => {
     setReport(key);
   };
+
+  // Detect if this is a batch (msearch) query
+  const isMsearch =
+    options.query &&
+    typeof options.query === "string" &&
+    /[;\n]/.test(options.query);
+
+  // If msearch, extract individual queries and build links
+  let msearchQueries = [];
+  if (isMsearch) {
+    const queries = options.query
+      .split(/[;\n]/)
+      .map((q) => q.trim())
+      .filter((q) => q.length > 0);
+    msearchQueries = queries.map((q) => ({
+      original: q,
+      display: q.match(/[\(\)<>=]/) ? q : `tax_name(${q})`,
+    }));
+  }
+
   return (
     <div
       id="report-panel"
@@ -80,40 +104,82 @@ const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {
       ref={reportRef}
       style={{ maxHeight: "100%" }}
     >
-      {/* <div className={headerStyle}>
-        <span className={titleStyle}>{title}</span>
-      </div> */}
+      {isMsearch && (
+        <Alert severity="info" style={{ marginBottom: "16px" }}>
+          <div>
+            <strong>Reports are not available for batch searches.</strong>
+          </div>
+          <div style={{ marginTop: "8px", fontSize: "0.95em" }}>
+            To generate reports, search for individual queries:
+          </div>
+          <Box
+            style={{
+              marginTop: "8px",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "8px",
+            }}
+          >
+            {msearchQueries.map((item, idx) => {
+              const queryParams = { ...options };
+              delete queryParams.query;
+              const singleQueryUrl = `/search?query=${encodeURIComponent(
+                item.original,
+              )}&${qs.stringify(queryParams)}`;
+              return (
+                <Link
+                  key={idx}
+                  href={singleQueryUrl}
+                  style={{
+                    padding: "4px 8px",
+                    backgroundColor: "#f5f5f5",
+                    border: "1px solid #ddd",
+                    borderRadius: "4px",
+                    textDecoration: "none",
+                    color: "#1976d2",
+                  }}
+                >
+                  {item.original}
+                </Link>
+              );
+            })}
+          </Box>
+        </Alert>
+      )}
 
-      {/* {text && <div>{text}</div>} */}
-      <Grid
-        container
-        spacing={1}
-        direction="row"
-        style={{ width: "100%" }}
-        size={12}
-      >
-        {Object.entries(reportTypes)
-          .filter(([key, obj]) => (obj.indices || []).includes(options.result))
-          .map(([key, obj]) => {
-            return (
-              <Grid
-                style={{ cursor: "pointer" }}
-                onClick={() => setReport(key)}
-                key={key}
-              >
-                <Chip
-                  label={obj.name}
-                  variant={key == report ? undefined : "outlined"}
-                  onClick={() => handleClick(key)}
-                  onDelete={key == report ? handleDelete : undefined}
-                />
-              </Grid>
-            );
-          })}
-      </Grid>
+      {!isMsearch && (
+        <Grid
+          container
+          spacing={1}
+          direction="row"
+          style={{ width: "100%" }}
+          size={12}
+        >
+          {Object.entries(reportTypes)
+            .filter(([key, obj]) =>
+              (obj.indices || []).includes(options.result),
+            )
+            .map(([key, obj]) => {
+              return (
+                <Grid
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setReport(key)}
+                  key={key}
+                >
+                  <Chip
+                    label={obj.name}
+                    variant={key == report ? undefined : "outlined"}
+                    onClick={() => handleClick(key)}
+                    onDelete={key == report ? handleDelete : undefined}
+                  />
+                </Grid>
+              );
+            })}
+        </Grid>
+      )}
 
-      <Grid container spacing={1} direction="row" size={12}>
-        {report && (
+      {!isMsearch && report && (
+        <Grid container spacing={1} direction="row" size={12}>
           <ReportFull
             reportId={sortReportQuery({ queryString })}
             report={report}
@@ -121,8 +187,8 @@ const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {
             topLevel={false}
             inModal={false}
           />
-        )}
-      </Grid>
+        </Grid>
+      )}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import {
   header as headerStyle,
   identifierPrefix as identifierPrefixStyle,
@@ -8,18 +7,20 @@ import {
   resultPanel as resultPanelStyle,
   title as titleStyle,
 } from "./Styles.scss";
-import { useLocation, useNavigate } from "@reach/router";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import { LineageList } from "./LineagePanel";
 import LineageSummaryPanel from "./LineageSummaryPanel";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
-import { compose } from "recompose";
-import dispatchLookup from "../hocs/dispatchLookup";
-import qs from "../functions/qs";
-import withRecord from "../hocs/withRecord";
-import withSearch from "../hocs/withSearch";
+import { compose } from "redux";
+import dispatchLookup from "#hocs/dispatchLookup";
+import qs from "#functions/qs";
+import { useEffect } from "react";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
+import withRecord from "#hocs/withRecord";
+import withSearch from "#hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";
 
 const TaxonPanel = ({
@@ -87,7 +88,7 @@ const TaxonPanel = ({
   const handleTaxonClick = () => {
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/record?recordId=${taxon_id}&result=taxon&taxonomy=${
+      `record?recordId=${taxon_id}&result=taxon&taxonomy=${
         options.taxonomy || taxonomy
       }#${encodeURIComponent(scientific_name)}`,
     );

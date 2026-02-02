@@ -1,6 +1,5 @@
-import { getInputQueries, setInputQueries } from "../reducers/lookup";
+import { getInputQueries, setInputQueries } from "#reducers/lookup";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withLiveQuery = (WrappedComponent) => (props) => {
@@ -15,7 +14,7 @@ const withLiveQuery = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

@@ -1,12 +1,11 @@
-import React, { useEffect } from "react";
-
 import Page from "./Page";
 import ReportFull from "./ReportFull";
-import { compose } from "recompose";
-import dispatchLookup from "../hocs/dispatchLookup";
-import qs from "../functions/qs";
-import { sortReportQuery } from "../selectors/report";
-import withTaxonomy from "../hocs/withTaxonomy";
+import { compose } from "redux";
+import dispatchLookup from "#hocs/dispatchLookup";
+import qs from "#functions/qs";
+import { sortReportQuery } from "#selectors/report";
+import { useEffect } from "react";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 const TypesPage = ({
   location,

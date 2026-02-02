@@ -8,7 +8,6 @@ import {
 } from "./Styles.scss";
 
 import InfoPane from "./InfoPane";
-import React from "react";
 import classnames from "classnames";
 
 const styleMap = {
@@ -22,7 +21,7 @@ const InfoPanel = (props) => {
   let css = classnames(
     flexRowStyle,
     infoPanelStyle,
-    styleMap[`infoPanel${props.cols}ColumnStyle`]
+    styleMap[`infoPanel${props.cols}ColumnStyle`],
   );
   let infoPanes = props.panes.map((pane, i) => {
     return <InfoPane id={pane.id} key={pane.id} {...pane} />;

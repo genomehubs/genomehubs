@@ -1,7 +1,6 @@
 import Markdown from "./Markdown";
-import React from "react";
-import { compose } from "recompose";
-import withRecord from "../hocs/withRecord";
+import { compose } from "redux";
+import withRecord from "#hocs/withRecord";
 
 const FeatureSummaryPanel = ({
   record,

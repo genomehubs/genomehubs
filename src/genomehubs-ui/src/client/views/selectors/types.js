@@ -7,20 +7,20 @@ import {
   getTypesFetching,
   receiveTypes,
   requestTypes,
-} from "../reducers/types";
+} from "#reducers/types";
 import {
   getSearchFields,
   getSearchIndex,
   getSearchNameClasses,
   getSearchRanks,
-} from "../reducers/search";
+} from "#reducers/search";
 
 import TrieSearch from "trie-search";
-import { apiUrl } from "../reducers/api";
+import { apiUrl } from "#reducers/api";
 import { createCachedSelector } from "re-reselect";
 import { createSelector } from "reselect";
-import { setApiStatus } from "../reducers/api";
-import store from "../store";
+import { setApiStatus } from "#reducers/api";
+import store from "#store";
 
 export const getTypesMap = createSelector(
   getTypes,
@@ -164,13 +164,19 @@ export const getNamesMap = createSelector(
 );
 
 export const getAttributeTrie = createSelector(getTypesMap, (types) => {
-  const trie = new TrieSearch("name", { splitOnRegEx: false });
+  const trie = new TrieSearch("name", {
+    splitOnRegEx: false,
+    idFieldOrFunction: (item, i) => i,
+  });
   trie.addFromObject(types);
   return trie;
 });
 
 export const getKeywordTrie = createSelector(getTypesMap, (types) => {
-  const trie = new TrieSearch("name", { splitOnRegEx: false });
+  const trie = new TrieSearch("name", {
+    splitOnRegEx: false,
+    idFieldOrFunction: (item, i) => i,
+  });
   let filteredTypes = Object.entries(types)
     .filter(([key, obj]) => obj.type && obj.type == "keyword")
     .reduce((r, [key, obj]) => ({ ...r, [key]: obj }), {});
@@ -224,7 +230,9 @@ export const getOperatorTrie = createSelector(getTypesMap, (types) => {
     },
   ];
 
-  const trie = new TrieSearch(["display_name", "key", "synonym", "wildcard"]);
+  const trie = new TrieSearch(["display_name", "key", "synonym", "wildcard"], {
+    idFieldOrFunction: "key",
+  });
   trie.addAll(operators);
   return trie;
 });
@@ -278,7 +286,9 @@ export const getRankTrie = createSelector(getTypesMap, (types) => {
     "tribe",
     "varietas",
   ];
-  const trie = new TrieSearch(["display_name", "key", "wildcard"]);
+  const trie = new TrieSearch(["display_name", "key", "wildcard"], {
+    idFieldOrFunction: "key",
+  });
   trie.addAll(
     ranks
       .map((key) => ({ key, display_name: key, wildcard: "*" }))
@@ -319,7 +329,9 @@ export const getTaxTrie = createSelector(getTypesMap, (types) => {
       type: "operator",
     },
   ];
-  const trie = new TrieSearch(["display_name", "key"]);
+  const trie = new TrieSearch(["display_name", "key"], {
+    idFieldOrFunction: "key",
+  });
   trie.addAll(values);
   return trie;
 });
@@ -355,7 +367,9 @@ export const getSummaryTrie = createSelector(getTypesMap, (types) => {
       type: "operator",
     },
   ];
-  const trie = new TrieSearch(["display_name", "key"]);
+  const trie = new TrieSearch(["display_name", "key"], {
+    idFieldOrFunction: "key",
+  });
   trie.addAll(values);
   return trie;
 });
@@ -381,7 +395,12 @@ const processValueTrie = (types, key) => {
       synonym: lookup[key],
       wildcard: "*",
     }));
-    const trie = new TrieSearch(["display_name", "key", "synonym", "wildcard"]);
+    const trie = new TrieSearch(
+      ["display_name", "key", "synonym", "wildcard"],
+      {
+        idFieldOrFunction: "key",
+      },
+    );
     trie.addAll(values);
     return trie;
   }

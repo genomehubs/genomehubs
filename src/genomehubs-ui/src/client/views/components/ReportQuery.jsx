@@ -1,19 +1,17 @@
-import React, { useState } from "react";
-
 import CloseIcon from "@mui/icons-material/Close";
 import FindInPageIcon from "@mui/icons-material/FindInPage";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import SearchIcon from "@mui/icons-material/Search";
 import TextField from "@mui/material/TextField";
-import { compose } from "recompose";
-import qs from "../functions/qs";
-import { setSearchTerm } from "../reducers/search";
-import { useNavigate } from "@reach/router";
-import withReportById from "../hocs/withReportById";
-import withReportTerm from "../hocs/withReportTerm";
-import withSearch from "../hocs/withSearch";
+import { compose } from "redux";
+import qs from "#functions/qs";
+import useNavigate from "#hooks/useNavigate";
+import { useState } from "react";
+import withReportById from "#hocs/withReportById";
+import withReportTerm from "#hocs/withReportTerm";
+import withSearch from "#hocs/withSearch";
 import withSiteName from "#hocs/withSiteName";
-import withTaxonomy from "../hocs/withTaxonomy";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 export const ReportQuery = ({
   reportById,
@@ -43,9 +41,7 @@ export const ReportQuery = ({
       options.ranks = options.ranks.join(",");
     }
     navigate(
-      `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
-        options.query,
-      )}`,
+      `search?${qs.stringify(options)}#${encodeURIComponent(options.query)}`,
     );
   };
 

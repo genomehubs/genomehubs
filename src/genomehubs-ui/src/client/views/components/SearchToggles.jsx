@@ -1,5 +1,4 @@
-import React, { useRef, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
+import { useRef, useState } from "react";
 
 import ArtTrackIcon from "@mui/icons-material/ArtTrack";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
@@ -7,7 +6,7 @@ import DialogContent from "@mui/material/DialogContent";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Modal from "@mui/material/Modal";
 import QueryBuilder from "./QueryBuilder";
@@ -17,12 +16,14 @@ import Switch from "@mui/material/Switch";
 import Terms from "./Terms";
 import TocIcon from "@mui/icons-material/Toc";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
-import dispatchLookup from "../hocs/dispatchLookup";
+import { compose } from "redux";
+import dispatchLookup from "#hocs/dispatchLookup";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "../functions/qs";
-import withSearch from "../hocs/withSearch";
-import withSearchDefaults from "../hocs/withSearchDefaults";
+import qs from "#functions/qs";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
+import withSearch from "#hocs/withSearch";
+import withSearchDefaults from "#hocs/withSearchDefaults";
 import withSiteName from "#hocs/withSiteName";
 
 export const useStyles = makeStyles((theme) => ({
@@ -69,7 +70,7 @@ const SearchToggles = ({
       emptyColumns: false,
     });
     setLookupTerm("");
-    navigate(`${basename}/search`);
+    navigate(`/search`);
   };
   let templateButton;
   if (toggleTemplate) {

@@ -3,7 +3,7 @@ import {
   getAPITreeNodes,
   getNewickString,
   getTreeRings,
-} from "../selectors/tree";
+} from "#selectors/tree";
 import {
   getNodes,
   getRootNode,
@@ -13,9 +13,8 @@ import {
   setRootNode,
   setTreeHighlight,
   setTreeQuery,
-} from "../reducers/tree";
+} from "#reducers/tree";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withTree = (WrappedComponent) => (props) => {
@@ -47,7 +46,7 @@ const withTree = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

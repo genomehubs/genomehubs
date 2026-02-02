@@ -1,24 +1,25 @@
 import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
-import { path as d3Path, pathRound } from "d3-path";
-import formats, { setInterval } from "../functions/formats";
-import stringLength, { maxStringLength } from "../functions/stringLength";
-import { useLocation, useNavigate } from "@reach/router";
+import formats, { setInterval } from "#functions/formats";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
+import stringLength, { maxStringLength } from "#functions/stringLength";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import PointInfo from "./PointInfo";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
-import dispatchMessage from "../hocs/dispatchMessage";
-import { fadeColor } from "../functions/fadeColor";
-import qs from "../functions/qs";
+import { compose } from "redux";
+import dispatchMessage from "#hocs/dispatchMessage";
+import { fadeColor } from "#functions/fadeColor";
+import { pathRound } from "d3-path";
+import qs from "#functions/qs";
 import { scaleLinear } from "d3-scale";
-import setColors from "../functions/setColors";
-import truncate from "../functions/truncate";
+import setColors from "#functions/setColors";
+import truncate from "#functions/truncate";
+import { useLocation } from "@reach/router";
 import { useLongPress } from "use-long-press";
-import useResize from "../hooks/useResize";
+import useNavigate from "#hooks/useNavigate";
+import useResize from "#hooks/useResize";
 import withColors from "#hocs/withColors";
-import withReportTerm from "../hocs/withReportTerm";
+import withReportTerm from "#hocs/withReportTerm";
 import withSiteName from "#hocs/withSiteName";
 
 const searchByPoint = ({ props, chartProps }) => {
@@ -42,7 +43,7 @@ const searchByPoint = ({ props, chartProps }) => {
   });
 
   navigate(
-    `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
+    `search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
       pointQuery,
     )}`,
   );
@@ -113,7 +114,7 @@ const Ribbon = ({
     });
 
     navigate(
-      `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
+      `search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
         newQuery,
       )}`,
     );

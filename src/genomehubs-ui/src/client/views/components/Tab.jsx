@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
-
 import NavLink from "./NavLink";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { tabDiv as tabDivStyle } from "./Styles.scss";
-import withRoutes from "../hocs/withRoutes";
+import { useEffect } from "react";
+import withRoutes from "#hocs/withRoutes";
 
 const Tab = ({ path = "", routeName, pageId, setRoute, routesById }) => {
   let parsedName = routeName.replaceAll(/[\(\)]/g, "");

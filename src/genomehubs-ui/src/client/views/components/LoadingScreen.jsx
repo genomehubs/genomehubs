@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import {
   fadeIn as fadeInStyle,
   fadeOut as fadeOutStyle,
@@ -7,10 +6,11 @@ import {
   loadingLogo as loadingLogoStyle,
   loadingScreen as loadingScreenStyle,
 } from "./Styles.scss";
+import { useEffect, useState } from "react";
 
 import Logo from "./Logo";
-import { compose } from "recompose";
-import withLoading from "../hocs/withLoading";
+import { compose } from "redux";
+import withLoading from "#hocs/withLoading";
 import withSiteName from "#hocs/withSiteName";
 
 const LoadingScreen = ({ types, basename, siteName, loading, setLoading }) => {

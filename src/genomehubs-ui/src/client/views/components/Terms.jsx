@@ -1,9 +1,7 @@
-import React, { memo } from "react";
-
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Markdown from "./Markdown";
 import NavLink from "./NavLink";
-import { compose } from "recompose";
+import { compose } from "redux";
 import withSiteName from "#hocs/withSiteName";
 
 const Terms = ({ basename }) => {
@@ -17,7 +15,7 @@ const Terms = ({ basename }) => {
     },
     li: (props) => {
       let [term, params] = props.children[0].replace(/\r?\n$/, "").split("::");
-      let url = `${basename}/search?query=${term}&${params}#${term}`;
+      let url = `search?query=${term}&${params}#${term}`;
       return (
         <Grid>
           <NavLink url={url} from={basename + "/"}>

@@ -3,7 +3,7 @@ import "@fontsource/open-sans/700.css";
 import "@fontsource/open-sans/400-italic.css";
 import "@fontsource/open-sans/700-italic.css";
 import "@fontsource/signika/index.css";
-import "@fontsource/signika/700.css";
+// import "@fontsource/signika/700.css";
 import "@fontsource/roboto/index.css";
 import "@fontsource/roboto-mono/index.css";
 import "@fontsource/roboto-mono/700.css";
@@ -12,8 +12,7 @@ import "@fontsource/roboto-mono/700-italic.css";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
-import React from "react";
-/** @type { import('@storybook/react').Preview } */
+/** @type { import('@storybook/react-webpack5').Preview } */
 import StylesProvider from "@mui/styles/StylesProvider";
 
 const theme = "lightTheme";
@@ -111,7 +110,9 @@ const preview = {
       },
     },
   },
+
   decorators: [withTheme],
+
   globalTypes: {
     theme: {
       description: "Global theme for components",
@@ -130,9 +131,12 @@ const preview = {
       },
     },
   },
+
   initialGlobals: {
     theme: "lightTheme",
   },
+
+  tags: ["autodocs"],
 };
 
 export default preview;

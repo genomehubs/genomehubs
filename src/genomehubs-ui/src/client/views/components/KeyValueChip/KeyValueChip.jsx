@@ -12,7 +12,7 @@
  * - Includes an `onDelete` function to clear all values.
  */
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
@@ -23,7 +23,6 @@ import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "../Tooltip";
 import Typography from "@mui/material/Typography";
 import ValidationErrorTooltip from "./ValidationErrorToolTip";
-import { current } from "@reduxjs/toolkit";
 import formatValue from "./functions/formatValue";
 import { getChipPalette } from "./functions/chipPalettes";
 import parseValue from "./functions/parseValue";

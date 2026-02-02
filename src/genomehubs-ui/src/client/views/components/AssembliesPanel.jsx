@@ -6,9 +6,8 @@ import {
   title as titleStyle,
 } from "./Styles.scss";
 
-import React from "react";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 
 const AssembliesPanel = () => {
   let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, resultPanelStyle);
