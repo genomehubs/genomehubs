@@ -86,9 +86,6 @@ const App = ({
   }, []);
 
   useEffect(() => {
-    if (loading == "finished") {
-      return;
-    }
     setContent(
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={muiTheme}>

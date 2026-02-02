@@ -7,36 +7,42 @@ import { thunk as thunkMiddleware } from "redux-thunk";
 const loggerMiddleware = createLogger();
 
 let timer;
-let criticalResourcesLoaded = {
-  hasActions: false,
-};
+let actionCount = 0;
+let lastActionTime = Date.now();
 
 const loadingMiddleWare = (store) => (next) => (action) => {
-  if (!store.getState().loading) {
+  const currentLoading = store.getState().loading;
+
+  // Don't intercept if loading is already finished or false
+  if (!currentLoading || currentLoading === "finished") {
     return next(action);
   }
+
+  // Don't intercept SET_LOADING actions
   if (action.type === "SET_LOADING") {
     return next(action);
   }
 
-  // Mark that we've started processing actions (initial hydration complete)
-  criticalResourcesLoaded.hasActions = true;
+  // Track action activity
+  actionCount++;
+  lastActionTime = Date.now();
 
   // Clear existing timer
   clearTimeout(timer);
 
-  // Wait for multiple actions to complete before dismissing loading screen
-  // This ensures:
-  // 1. Initial Redux state is hydrated
-  // 2. Components have mounted and fetched their data
-  // 3. User sees loading screen while meaningful content loads
-  // After first action: wait 2 seconds for subsequent actions
-  // If no more actions come, loading screen will dismiss
+  // Wait for a period of inactivity before dismissing loading screen
+  // This ensures all async operations (data fetches, component mounts) complete
+  // Longer timeout (3 seconds) gives slow connections time to load critical content
   timer = setTimeout(() => {
-    store.dispatch({ type: "SET_LOADING", payload: "finished" });
-    // Reset for next page load
-    criticalResourcesLoaded = { hasActions: false };
-  }, 2000);
+    const timeSinceLastAction = Date.now() - lastActionTime;
+    // Only dismiss if we've had at least a few actions (initial hydration happened)
+    // and there's been sufficient quiet time
+    if (actionCount > 2 && timeSinceLastAction >= 3000) {
+      store.dispatch({ type: "SET_LOADING", payload: "finished" });
+      // Reset counters for next navigation
+      actionCount = 0;
+    }
+  }, 3000);
 
   next(action);
 };
