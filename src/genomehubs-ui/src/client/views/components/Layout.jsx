@@ -55,7 +55,11 @@ const DefaultLayout = ({}) => {
           {/* )} */}
         </Grid>
         <Grid className={classes.item}>
-          <Suspense fallback={<div style={{ minHeight: "100px" }} />}>
+          <Suspense
+            fallback={
+              <div style={{ minHeight: "100px" }}>Loading footer...</div>
+            }
+          >
             <Footer />
           </Suspense>
         </Grid>

@@ -42,6 +42,8 @@
   <script>
     // Track chunk loading errors for debugging
     window.__chunkLoadErrors = [];
+    window.__importErrors = [];
+
     window.addEventListener('error', function (e) {
       if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
         const url = e.target.src || e.target.href;
@@ -54,6 +56,19 @@
       }
     }, true);
 
+    // Intercept dynamic import errors
+    window.addEventListener('unhandledrejection', function (e) {
+      if (e.reason && e.reason.message) {
+        console.error('[unhandled-rejection]', e.reason);
+        if (e.reason.message.includes('import') || e.reason.message.includes('chunk')) {
+          window.__importErrors.push({
+            message: e.reason.message,
+            stack: e.reason.stack
+          });
+        }
+      }
+    });
+
     // Log webpack public path for debugging
     setTimeout(function () {
       if (typeof __webpack_public_path__ !== 'undefined') {
@@ -61,6 +76,9 @@
       }
       if (window.__chunkLoadErrors.length > 0) {
         console.error('[chunk-load-errors] Failed to load:', window.__chunkLoadErrors);
+      }
+      if (window.__importErrors.length > 0) {
+        console.error('[import-errors] Dynamic import failures:', window.__importErrors);
       }
     }, 2000);
   </script>
