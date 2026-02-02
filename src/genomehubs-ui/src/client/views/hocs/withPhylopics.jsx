@@ -2,11 +2,10 @@ import {
   getPhylopicByTaxonId,
   getPhylopicIsFetching,
   getPhylopics,
-} from "../reducers/phylopic";
+} from "#reducers/phylopic";
 
-import React from "react";
 import { connect } from "react-redux";
-import { fetchPhylopic } from "../selectors/phylopic";
+import { fetchPhylopic } from "#selectors/phylopic";
 
 const withPhylopics = (WrappedComponent) => (props) => {
   let { currentRecord, record } = props;
@@ -28,7 +27,7 @@ const withPhylopics = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

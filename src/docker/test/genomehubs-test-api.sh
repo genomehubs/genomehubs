@@ -21,7 +21,7 @@ fi
 cat /tmp/config.yaml | yq -y '.test.hub.version="'$GH_RELEASE'"' > TMP && mv TMP /tmp/config.yaml
 cat /tmp/config.yaml | yq -y '.test.hub.name="'$GH_HUBNAME'"' > TMP && mv TMP /tmp/config.yaml
 
-/genomehubs/genomehubs-api &
+node --no-deprecation /genomehubs/genomehubs-api/bundle.cjs &
 API_PID=$!
 
 sleep 5

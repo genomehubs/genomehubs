@@ -1,11 +1,10 @@
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
-import React from "react";
 import Switch from "@mui/material/Switch";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
-import withTheme from "../hocs/withTheme";
+import { compose } from "redux";
+import withTheme from "#hocs/withTheme";
 
 export const ToggleTheme = ({ theme, setTheme }) => {
   const toggleTheme = () => {

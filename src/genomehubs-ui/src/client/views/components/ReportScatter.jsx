@@ -10,33 +10,34 @@ import {
   YAxis,
   ZAxis,
 } from "recharts";
-import React, { memo, useEffect, useRef, useState } from "react";
-import formats, { setInterval } from "../functions/formats";
-import stringLength, { maxStringLength } from "../functions/stringLength";
-import { useLocation, useNavigate } from "@reach/router";
+import formats, { setInterval } from "#functions/formats";
+import { memo, useEffect, useRef, useState } from "react";
+import stringLength, { maxStringLength } from "#functions/stringLength";
 
 import CellInfo from "./CellInfo";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import PointInfo from "./PointInfo";
 import ReportXAxisTick from "./ReportXAxisTick";
 import Tooltip from "./Tooltip";
 import { active as activeStyle } from "./Styles.scss";
-import axisScales from "../functions/axisScales";
-import { compose } from "recompose";
+import axisScales from "#functions/axisScales";
+import { compose } from "redux";
 import { line as d3Line } from "d3-shape";
-import dispatchMessage from "../hocs/dispatchMessage";
-import { fadeColor } from "../functions/fadeColor";
-import { mixColor } from "../functions/mixColor";
+import dispatchMessage from "#hocs/dispatchMessage";
+import { fadeColor } from "#functions/fadeColor";
+import { mixColor } from "#functions/mixColor";
 import { processLegendData } from "./MultiCatLegend";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import { scaleLinear } from "d3-scale";
-import searchByCell from "../functions/searchByCell";
-import setColors from "../functions/setColors";
-import useResize from "../hooks/useResize";
-import withColors from "../hocs/withColors";
-import withReportTerm from "../hocs/withReportTerm";
-import withSiteName from "../hocs/withSiteName";
-import withTheme from "../hocs/withTheme";
+import searchByCell from "#functions/searchByCell";
+import setColors from "#functions/setColors";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
+import useResize from "#hooks/useResize";
+import withColors from "#hocs/withColors";
+import withReportTerm from "#hocs/withReportTerm";
+import withSiteName from "#hocs/withSiteName";
+import withTheme from "#hocs/withTheme";
 import { zLegend } from "./zLegend";
 
 const searchByPoint = ({ props, chartProps }) => {
@@ -64,7 +65,7 @@ const searchByPoint = ({ props, chartProps }) => {
   });
 
   navigate(
-    `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
+    `search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
       pointQuery,
     )}`,
   );

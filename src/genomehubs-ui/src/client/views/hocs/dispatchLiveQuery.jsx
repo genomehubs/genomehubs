@@ -1,6 +1,5 @@
-import React from "react";
 import { connect } from "react-redux";
-import { setLiveQuery } from "../reducers/lookup";
+import { setLiveQuery } from "#reducers/lookup";
 
 const dispatchLiveQuery = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({});
@@ -11,7 +10,7 @@ const dispatchLiveQuery = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

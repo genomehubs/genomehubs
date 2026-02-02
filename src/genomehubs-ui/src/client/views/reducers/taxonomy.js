@@ -1,12 +1,12 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 
 export const requestTaxonomies = createAction("REQUEST_TAXONOMIES");
 export const receiveTaxonomies = createAction(
   "RECEIVE_TAXONOMIES",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 
 const defaultState = () => ({
@@ -17,16 +17,16 @@ const defaultState = () => ({
 const taxonomies = handleActions(
   {
     REQUEST_TAXONOMIES: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
+      produce(state, (draft) => {
+        draft.isFetching = true;
       }),
     RECEIVE_TAXONOMIES: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: false,
-        ids: action.payload,
+      produce(state, (draft) => {
+        draft.isFetching = false;
+        draft.ids = action.payload;
       }),
   },
-  defaultState()
+  defaultState(),
 );
 
 export const getTaxonomies = (state) => state.taxonomies.ids;
@@ -34,10 +34,28 @@ export const getTaxonomies = (state) => state.taxonomies.ids;
 export const getTaxonomiesFetching = (state) => state.taxonomies.isFetching;
 
 export const setCurrentTaxonomy = createAction("SET_CURRENT_TAXONOMY");
+const resolveDefaultTaxonomy = () => {
+  try {
+    if (
+      typeof window !== "undefined" &&
+      window.process &&
+      window.process.ENV &&
+      window.process.ENV.GH_TAXONOMY
+    ) {
+      return window.process.ENV.GH_TAXONOMY;
+    }
+  } catch (e) {}
+  try {
+    if (typeof TAXONOMY !== "undefined" && TAXONOMY) {
+      return TAXONOMY;
+    }
+  } catch (e) {}
+  return "ncbi";
+};
 export const currentTaxonomy = handleAction(
   "SET_CURRENT_TAXONOMY",
-  (state, action) => action.payload || TAXONOMY || "",
-  ""
+  (state, action) => action.payload || resolveDefaultTaxonomy(),
+  resolveDefaultTaxonomy(),
 );
 export const getCurrentTaxonomy = (state) => state.currentTaxonomy;
 
@@ -45,22 +63,22 @@ export const requestIndices = createAction("REQUEST_INDICES");
 export const receiveIndices = createAction(
   "RECEIVE_INDICES",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 
 const indices = handleActions(
   {
     REQUEST_INDICES: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
+      produce(state, (draft) => {
+        draft.isFetching = true;
       }),
     RECEIVE_INDICES: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: false,
-        ids: action.payload,
+      produce(state, (draft) => {
+        draft.isFetching = false;
+        draft.ids = action.payload;
       }),
   },
-  defaultState()
+  defaultState(),
 );
 
 export const getIndices = (state) => state.indices.ids;

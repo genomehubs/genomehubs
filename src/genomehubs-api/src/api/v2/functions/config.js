@@ -1,4 +1,5 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({ quiet: true });
 
 const GH_HOST = process.env.GH_HOST || "localhost";
 const GH_CLIENT_PORT = Number(process.env.GH_CLIENT_PORT) || 8880;
@@ -46,7 +47,6 @@ export const config = {
     : undefined,
   treeThreshold: process.env.GH_TREE_THRESHOLD || 10000,
   scrollThreshold: process.env.GH_SCROLL_THRESHOLD || 10000,
-  scrollDuration: process.env.GH_SCROLL_DURATION || "30s",
 };
 
 export default config;

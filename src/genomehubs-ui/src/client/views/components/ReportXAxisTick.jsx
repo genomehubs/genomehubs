@@ -1,4 +1,3 @@
-import React from "react";
 import { Rectangle } from "recharts";
 import Tooltip from "./Tooltip";
 import { active as activeStyle } from "./Styles.scss";
@@ -40,12 +39,18 @@ export const ReportXAxisTick = ({
       x += bucketWidth / 2;
     }
   }
+  let tickOffset = 0;
   if (report == "histogram") {
+    if (valueType != "lineage" && valueType != "keyword") {
+      tickOffset = 0;
+    } else {
+      tickOffset = -bucketWidth / 2;
+    }
     offset -= bucketWidth / 2;
     tickLine = (
       <line
-        x1={-bucketWidth / 2}
-        x2={-bucketWidth / 2}
+        x1={tickOffset}
+        x2={tickOffset}
         y1={-8}
         y2={-3}
         fill={"none"}
@@ -57,8 +62,8 @@ export const ReportXAxisTick = ({
         <>
           {tickLine}
           <line
-            x1={bucketWidth / 2}
-            x2={bucketWidth / 2}
+            x1={tickOffset}
+            x2={tickOffset}
             y1={-8}
             y2={-3}
             fill={"none"}

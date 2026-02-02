@@ -1,13 +1,12 @@
-import React, { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import SearchInputQuery from "./SearchInputQuery";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
-import withInputQueries from "../hocs/withInputQueries";
-// import withLiveQuery from "../hocs/withLiveQuery";
-import withLookup from "../hocs/withLookup";
-import withSearch from "../hocs/withSearch";
+import withInputQueries from "#hocs/withInputQueries";
+import withLookup from "#hocs/withLookup";
+import withSearch from "#hocs/withSearch";
 
 export const useStyles = makeStyles((theme) => ({
   icon: {

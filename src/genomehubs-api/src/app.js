@@ -6,7 +6,7 @@ import compression from "compression";
 import { config } from "./api/v2/functions/config.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import esmResolver from "./api/v2/functions/esmResolver.js";
+import { dirname } from "path";
 import express from "express";
 import { fileURLToPath } from "url";
 import fs from "fs";
@@ -19,8 +19,24 @@ import path from "path";
 import qs from "./api/v2/functions/qs.js";
 import swaggerUi from "swagger-ui-express";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Statically include generated handlers map when available so bundlers embed it.
+// The generator writes to ./generated/operation-handlers.cjs
+// Only in production build - in development use dynamic imports instead
+let bundledHandlersMap = null;
+
+let __dirname;
+try {
+  // ESM environments: derive from import.meta.url
+  __dirname = dirname(fileURLToPath(import.meta.url));
+} catch (e) {
+  // Fallback for CommonJS/bundled environments where import.meta may be undefined.
+  // Use the executed script path or current working directory as a best-effort dirname.
+  try {
+    __dirname = path.dirname(process.argv[1] || process.cwd());
+  } catch (e2) {
+    __dirname = process.cwd();
+  }
+}
 
 const { port } = config;
 const apiSpec = path.join(__dirname, "api-v2.yaml");
@@ -61,6 +77,31 @@ app.use((req, res, next) => {
   logAccess({ req });
   next();
 });
+
+// Health endpoint for Docker HEALTHCHECK and readiness probes
+app.get("/health", async (req, res) => {
+  const health = { ok: true };
+  // optional: check Elasticsearch connectivity
+  try {
+    if (config.node) {
+      // lazy-load elastic client to avoid startup cost when not needed
+      try {
+        // require instead of import to work with bundled cjs/esm shapes
+        // eslint-disable-next-line global-require
+        const { Client } = require("@elastic/elasticsearch");
+        const client = new Client({ node: config.node });
+        await client.ping();
+        health.elasticsearch = "ok";
+      } catch (err) {
+        health.elasticsearch = "error";
+        health.ok = false;
+      }
+    }
+  } catch (err) {
+    health.ok = false;
+  }
+  res.status(health.ok ? 200 : 503).json(health);
+});
 // app.use(express.static(path.join(__dirname, "public")));
 app.get("/api-spec", function (req, res) {
   res.header("Content-Type", "text/yaml");
@@ -87,22 +128,349 @@ if (process.pkg) {
 // rename xInY to arc
 const expandQuery = function (req, res, next) {
   if (req.query) {
-    req.query = qs.expand(req.query);
+    const expanded = qs.expand(req.query);
+    // expose expanded query broadly so downstream handlers can access renamed params
+    res.locals.expandedQuery = expanded;
+    req.expandedQuery = expanded;
+
+    // Try to mutate the existing req.query object if it's mutable
+    try {
+      if (typeof req.query === "object" && req.query !== null) {
+        Object.keys(req.query).forEach((k) => {
+          if (!(k in expanded)) delete req.query[k];
+        });
+        Object.keys(expanded).forEach((k) => {
+          req.query[k] = expanded[k];
+        });
+      }
+    } catch (err) {
+      // ignore: we'll try to define a concrete property below or rely on the fallbacks
+    }
+
+    // Try to define an own `query` property on the request object that returns the expanded object.
+    // This will shadow Express's getter for `query` for this request instance if configurable.
+    try {
+      const currentDesc = Object.getOwnPropertyDescriptor(req, "query");
+      if (!currentDesc || currentDesc.configurable !== false) {
+        Object.defineProperty(req, "query", {
+          configurable: true,
+          enumerable: true,
+          value: expanded,
+          writable: true,
+        });
+      }
+    } catch (err) {
+      // If defining the property fails, we rely on `req.expandedQuery` and `res.locals.expandedQuery`.
+    }
   }
   next();
 };
 app.use(expandQuery);
 
 // Modify swagger setup to prevent petstore being served in production
-// app.use(
-//   "/api-docs",
-//   swaggerUi.serve,
-//   swaggerUi.setup(swaggerDocument, swaggerOptions)
-// );
+// Prefer serving static assets directly from the installed `swagger-ui-dist`
+// package so the JS/CSS are available and served with correct MIME types.
 const swaggerSetup = swaggerUi.setup(swaggerDocument, swaggerOptions);
 app.get("/api-docs/index.html", swaggerSetup);
-app.use("/api-docs", swaggerUi.serve);
+// Serve the dynamically-generated init script that bootstraps the Swagger UI.
+app.get("/api-docs/swagger-ui-init.js", (req, res) => {
+  res.header("Content-Type", "application/javascript");
+  const js = `window.onload = function(){
+    try {
+      const ui = SwaggerUIBundle({
+        url: '/api-spec',
+        dom_id: '#swagger-ui',
+        presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+        layout: 'BaseLayout'
+      });
+      window.ui = ui;
+    } catch (e) {
+      console.error('Failed to initialize Swagger UI', e);
+    }
+  };`;
+  res.send(js);
+});
+try {
+  const swaggerDist = require("swagger-ui-dist");
+  const swaggerDistDir =
+    typeof swaggerDist.getAbsoluteFSPath === "function"
+      ? swaggerDist.getAbsoluteFSPath()
+      : path.join(
+          path.dirname(require.resolve("swagger-ui-dist/package.json")),
+          "dist",
+        );
+  // Serve the primary swagger assets explicitly so failures surface clearly.
+  // Try multiple candidate locations so builds that copy assets into
+  // `build/api-docs` or `src/api-docs` continue to work.
+  const locateAsset = (assetPath) => {
+    const candidates = [
+      path.join(swaggerDistDir, assetPath),
+      path.join(__dirname, "api-docs", assetPath),
+      path.join(__dirname, "..", "build", "api-docs", assetPath),
+      path.join(
+        __dirname,
+        "..",
+        "node_modules",
+        "swagger-ui-dist",
+        "dist",
+        assetPath,
+      ),
+      path.join(__dirname, "..", "node_modules", "swagger-ui-dist", assetPath),
+      path.join(
+        process.cwd(),
+        "node_modules",
+        "swagger-ui-dist",
+        "dist",
+        assetPath,
+      ),
+    ];
+    for (const p of candidates) {
+      try {
+        if (fs.existsSync(p) && fs.statSync(p).isFile()) return p;
+      } catch (e) {
+        // ignore stat errors and continue
+      }
+    }
+    return null;
+  };
+
+  const sendAsset = (assetPath) => (req, res, next) => {
+    const found = locateAsset(assetPath);
+    if (!found) {
+      const err = new Error(`Asset not found: ${assetPath}`);
+      console.error(`Failed to locate ${assetPath}; searched candidate paths.`);
+      return next(err);
+    }
+    res.sendFile(found, (err) => {
+      if (err) {
+        console.error(
+          `Failed to send ${assetPath} from ${found}:`,
+          err && err.stack ? err.stack : err,
+        );
+        return next(err);
+      }
+    });
+  };
+
+  app.get("/api-docs/swagger-ui-bundle.js", sendAsset("swagger-ui-bundle.js"));
+  app.get("/api-docs/swagger-ui.css", sendAsset("swagger-ui.css"));
+  app.get(
+    "/api-docs/swagger-ui-standalone-preset.js",
+    sendAsset("swagger-ui-standalone-preset.js"),
+  );
+  app.get("/api-docs/favicon-32x32.png", sendAsset("favicon-32x32.png"));
+  app.get("/api-docs/favicon-16x16.png", sendAsset("favicon-16x16.png"));
+
+  // Fallback static for any other files under dist (no directory index)
+  app.use(
+    "/api-docs",
+    express.static(swaggerDistDir, {
+      index: false,
+    }),
+  );
+} catch (err) {
+  app.use("/api-docs", swaggerUi.serve);
+}
 app.get("/api-docs", swaggerSetup);
+
+// Try to use a generated static operation handlers map to avoid dynamic requires at runtime.
+// Skip in development to allow dynamic imports for hot-reloading
+let operationHandlersPath = null;
+try {
+  // Prefer the statically imported handlers map (bundled) when available.
+  let handlersMap = bundledHandlersMap || null;
+  let handlersMapSource = "none";
+  // Only try to load handlers map in production, not in development
+  if (!handlersMap && process.env.NODE_ENV === "production") {
+    try {
+      handlersMap = require(
+        path.join(
+          __dirname,
+          "..",
+          "src",
+          "generated",
+          "operation-handlers.cjs",
+        ),
+      );
+      handlersMapSource = "src/generated";
+    } catch (e) {
+      // fall back to build/operation-handlers.cjs if present
+      try {
+        handlersMap = require(
+          path.join(__dirname, "..", "build", "operation-handlers.cjs"),
+        );
+        handlersMapSource = "build";
+      } catch (e2) {
+        handlersMap = null;
+      }
+    }
+  } else {
+    handlersMapSource = "bundled-import";
+  }
+  // custom resolver: expects handlersPath to be the project src root; module keys are relative to src
+  const staticResolver = (handlersPath, route, apiDoc) => {
+    const schema =
+      apiDoc.paths[route.openApiRoute.substring(route.basePath.length)][
+        route.method.toLowerCase()
+      ];
+    const baseName =
+      schema["x-eov-operation-han dler"] ||
+      schema["x-eov-operation-handler"] ||
+      schema["x-eov-operation-handler"];
+    // helper: unwrap nested default exports (common after bundling / ESM interop)
+    const unwrapExport = (m) => {
+      let cur = m;
+      // follow .default chains up to a small depth to avoid infinite loops
+      for (
+        let i = 0;
+        i < 5 && cur && typeof cur === "object" && cur.default;
+        i++
+      ) {
+        cur = cur.default;
+      }
+      return cur;
+    };
+    // operationHandlers generator used module keys relative to src. if baseName is present, map to that module.
+    // In development (no handlersMap), skip static resolution and let validator use dynamic resolution
+    if (baseName && handlersMap) {
+      // baseName is expected to be a path like 'api/v2/controllers/foo'
+      const key = baseName;
+      // try several candidate key forms: as provided, and with a .js suffix
+      const candidates = [key, `${key}.js`];
+      let mod;
+      for (const k of candidates) {
+        if (
+          handlersMap &&
+          Object.prototype.hasOwnProperty.call(handlersMap, k)
+        ) {
+          mod = handlersMap[k];
+          break;
+        }
+      }
+      if (mod) {
+        // try to unwrap nested default exports first
+        mod = unwrapExport(mod) || mod;
+        // Prefer explicit function name from OpenAPI (x-eov-operation-id or operationId)
+        try {
+          const fnName =
+            schema && (schema["x-eov-operation-id"] || schema["operationId"]);
+          if (fnName && mod) {
+            // 1) Named export on the module namespace
+            if (typeof mod[fnName] === "function") {
+              return mod[fnName];
+            }
+            // 2) Named export on the default export (common when CJS->ESM interop happened)
+            if (mod.default && typeof mod.default[fnName] === "function") {
+              return mod.default[fnName];
+            }
+          }
+        } catch (e) {
+          // ignore named export resolution errors
+        }
+
+        // Handler may be exported directly as a function (CJS) or as default (ESM interop)
+        try {
+          // quick resolution attempts (prefer explicit names)
+          if (typeof mod === "function") {
+            return mod;
+          }
+          if (mod && typeof mod.default === "function") {
+            return mod.default;
+          }
+          if (mod && typeof mod.handler === "function") {
+            return mod.handler;
+          }
+
+          // If module is an object, try to pick a sensible function export (e.g. getSearchResultCount)
+          if (mod && typeof mod === "object") {
+            const fnKey = Object.keys(mod).find(
+              (k) => typeof mod[k] === "function",
+            );
+            if (fnKey) {
+              return mod[fnKey];
+            }
+            // try inside default namespace too
+            if (mod.default && typeof mod.default === "object") {
+              const inner = Object.keys(mod.default).find(
+                (k) => typeof mod.default[k] === "function",
+              );
+              if (inner) {
+                return mod.default[inner];
+              }
+            }
+          }
+        } catch (err) {
+          // ignore fallback resolution errors
+        }
+
+        // If we reach here we didn't find a function to return synchronously.
+        // Return a lazy wrapper function that will attempt the same resolution at
+        // request-time and call the resolved function (so express-openapi-validator
+        // always receives a function). This avoids the validator receiving an object
+        // and causing the "argument handler must be a function" error.
+        return function lazyOperationHandler(req, res, next) {
+          try {
+            // prefer operation-specific name if available
+            const fnName =
+              schema && (schema["x-eov-operation-id"] || schema.operationId);
+            let fn = null;
+            try {
+              if (fnName && mod && typeof mod[fnName] === "function")
+                fn = mod[fnName];
+              if (
+                !fn &&
+                fnName &&
+                mod &&
+                mod.default &&
+                typeof mod.default[fnName] === "function"
+              )
+                fn = mod.default[fnName];
+            } catch (e) {}
+
+            if (!fn) {
+              if (typeof mod === "function") fn = mod;
+              else if (mod && typeof mod.default === "function")
+                fn = mod.default;
+              else if (mod && typeof mod.handler === "function")
+                fn = mod.handler;
+              else if (mod && typeof mod === "object") {
+                const k = Object.keys(mod).find(
+                  (x) => typeof mod[x] === "function",
+                );
+                if (k) fn = mod[k];
+                else if (mod.default && typeof mod.default === "object") {
+                  const inner = Object.keys(mod.default).find(
+                    (x) => typeof mod.default[x] === "function",
+                  );
+                  if (inner) fn = mod.default[inner];
+                }
+              }
+            }
+
+            if (typeof fn === "function") {
+              return fn.call(this, req, res, next);
+            }
+
+            const msg = `Operation handler function not found for key=${key} fnName=${fnName}`;
+            next(new Error(msg));
+          } catch (err) {
+            next(err);
+          }
+        };
+      }
+    }
+    // fallback: let the validator do its default resolution
+    return undefined;
+  };
+  // Only use static resolver if we have a handlers map (production)
+  // In development, provide path for validator to use dynamic resolution
+  operationHandlersPath = handlersMap
+    ? { resolver: staticResolver }
+    : path.join(__dirname);
+} catch (err) {
+  // no generated map available; fall back to dynamic resolution
+  operationHandlersPath = path.join(__dirname);
+}
 
 app.use(
   OpenApiValidator.middleware({
@@ -112,8 +480,8 @@ app.use(
       removeAdditional: "failing",
     },
     validateResponses: true,
-    operationHandlers: esmResolver(path.join(__dirname)),
-  })
+    operationHandlers: operationHandlersPath,
+  }),
 );
 
 app.use((err, req, res, next) => {
@@ -137,6 +505,7 @@ if (config.https) {
   });
 } else {
   http.createServer(app).listen(port, () => {
+    console.log(process.env.NODE_ENV);
     console.log(`genomehubs-api started on http port ${port}`);
   });
 }

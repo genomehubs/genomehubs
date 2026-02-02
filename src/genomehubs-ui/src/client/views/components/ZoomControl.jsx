@@ -1,7 +1,6 @@
-import React from "react";
-import { compose } from "recompose";
-import withGeography from "../hocs/withGeography";
-import withStableGeography from "../hocs/withStableGeography";
+import { compose } from "redux";
+import withGeography from "#hocs/withGeography";
+import withStableGeography from "#hocs/withStableGeography";
 
 const ZoomControl = ({
   setHighlightPointLocation,

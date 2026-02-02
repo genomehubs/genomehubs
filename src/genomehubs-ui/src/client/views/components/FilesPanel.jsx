@@ -8,17 +8,16 @@ import {
 } from "./Styles.scss";
 
 import GetAppIcon from "@mui/icons-material/GetApp";
-import Grid from "@mui/material/Grid2";
-import React from "react";
+import Grid from "@mui/material/Grid";
 import RecordLink from "./RecordLink";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { setLinkIcons } from "./ResultTable";
-import withColors from "../hocs/withColors";
-import withRecord from "../hocs/withRecord";
-import withTheme from "../hocs/withTheme";
-import withTypes from "../hocs/withTypes";
+import withColors from "#hocs/withColors";
+import withRecord from "#hocs/withRecord";
+import withTheme from "#hocs/withTheme";
+import withTypes from "#hocs/withTypes";
 
 const FilesPanel = ({
   files,

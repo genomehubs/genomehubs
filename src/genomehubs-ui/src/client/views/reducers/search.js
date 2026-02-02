@@ -2,7 +2,7 @@ import { createAction, handleAction, handleActions } from "redux-actions";
 
 import { createCachedSelector } from "re-reselect";
 import { createSelector } from "reselect";
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 
 export const getDefaultIndex = () => {
   if (
@@ -13,7 +13,7 @@ export const getDefaultIndex = () => {
   ) {
     return window.process.ENV.GH_DEFAULT_INDEX;
   }
-  return DEFAULT_INDEX || "taxon";
+  return typeof DEFAULT_INDEX !== "undefined" ? DEFAULT_INDEX : "taxon";
 };
 
 export const defaultIndex = getDefaultIndex();
@@ -22,7 +22,7 @@ export const requestSearch = createAction("REQUEST_SEARCH");
 export const receiveSearch = createAction(
   "RECEIVE_SEARCH",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 export const cancelSearch = createAction("CANCEL_SEARCH");
 export const resetSearch = createAction("RESET_SEARCH");
@@ -37,25 +37,32 @@ const defaultState = () => ({
 const searchResults = handleActions(
   {
     REQUEST_SEARCH: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
+      produce(state, (draft) => {
+        draft.isFetching = true;
       }),
     CANCEL_SEARCH: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: false,
+      produce(state, (draft) => {
+        draft.isFetching = false;
       }),
-    RECEIVE_SEARCH: (state, action) => ({
-      isFetching: false,
-      status: action.payload.status,
-      results: action.payload.results,
-      query: action.payload.query,
-      aggs: action.payload.aggs,
-      fields: action.payload.fields,
-      lastUpdated: action.meta.receivedAt,
-    }),
+    RECEIVE_SEARCH: (state, action) => {
+      console.log(action);
+      return {
+        isFetching: false,
+        status: action.payload.status,
+        results: action.payload.results,
+        query: action.payload.query,
+        aggs: action.payload.aggs,
+        fields: action.payload.fields,
+        isMsearch: action.payload.isMsearch,
+        originalQueries: action.payload.originalQueries,
+        queryGroups: action.payload.queryGroups,
+        lastUpdated: action.meta.receivedAt,
+        uniqueCount: action.payload.uniqueCount,
+      };
+    },
     RESET_SEARCH: defaultState,
   },
-  defaultState()
+  defaultState(),
 );
 
 export const getSearchResults = (state) => state.searchResults;
@@ -79,7 +86,7 @@ export const getSearchResultArray = createSelector(
       arr.push(obj);
     });
     return arr;
-  }
+  },
 );
 
 export const getSearchResultById = createCachedSelector(
@@ -87,14 +94,14 @@ export const getSearchResultById = createCachedSelector(
   (_state, searchId) => searchId,
   (results, searchId) => {
     return results.find((result) => result.taxon_id === searchId);
-  }
+  },
 )((_state, searchId) => searchId);
 
 export const requestQuery = createAction("REQUEST_QUERY");
 export const receiveQuery = createAction(
   "RECEIVE_QUERY",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 export const cancelQuery = createAction("CANCEL_QUERY");
 export const resetQuery = createAction("RESET_QUERY");
@@ -108,33 +115,27 @@ const defaultQueryState = () => ({
 const queryResults = handleActions(
   {
     REQUEST_QUERY: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
+      produce(state, (draft) => {
+        draft.isFetching = true;
       }),
     CANCEL_QUERY: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: false,
+      produce(state, (draft) => {
+        draft.isFetching = false;
       }),
     RECEIVE_QUERY: (state, action) => {
       const { payload, meta } = action;
       const { queryString: id, json } = payload;
 
-      const updatedWithQueryState = immutableUpdate(state, {
-        byId: { [id]: { ...json } },
-      });
-
-      const updatedWithQueryList = immutableUpdate(updatedWithQueryState, {
-        allIds: [...new Set(updatedWithQueryState.allIds.concat(id))],
-      });
-
-      return immutableUpdate(updatedWithQueryList, {
-        isFetching: false,
-        lastUpdated: meta.receivedAt,
+      return produce(state, (draft) => {
+        draft.byId[id] = { ...json };
+        draft.allIds = [...new Set(state.allIds.concat(id))];
+        draft.isFetching = false;
+        draft.lastUpdated = meta.receivedAt;
       });
     },
     RESET_QUERY: defaultQueryState,
   },
-  defaultQueryState()
+  defaultQueryState(),
 );
 
 export const getQueryResults = (state) => state.queryResults;
@@ -144,14 +145,14 @@ export const getQueryResultById = createCachedSelector(
   (_state, searchId) => searchId,
   (results, searchId) => {
     return results.byId[searchId];
-  }
+  },
 )((_state, searchId) => searchId);
 
 export const setSearchTerm = createAction("SET_SEARCH_TERM");
 export const searchTerm = handleAction(
   "SET_SEARCH_TERM",
   (state, action) => action.payload,
-  ""
+  "",
 );
 export const getSearchTerm = (state) => state.searchTerm;
 
@@ -161,7 +162,7 @@ export const searchIndex = handleAction(
   (state, action) => {
     return action.payload;
   },
-  defaultIndex
+  defaultIndex,
 );
 export const getSearchIndex = (state) => state.searchIndex;
 
@@ -178,7 +179,7 @@ export const setPreferSearchTerm = createAction("SET_PREFER_SEARCH_TERM");
 export const preferSearchTerm = handleAction(
   "SET_PREFER_SEARCH_TERM",
   (state, action) => action.payload,
-  false
+  false,
 );
 export const getPreferSearchTerm = (state) => state.preferSearchTerm;
 
@@ -186,7 +187,7 @@ export const setPreviousSearchTerm = createAction("SET_PREVIOUS_SEARCH_TERM");
 export const previousSearchTerm = handleAction(
   "SET_PREVIOUS_SEARCH_TERM",
   (state, action) => action.payload,
-  {}
+  {},
 );
 export const getPreviousSearchTerm = (state) => state.previousSearchTerm;
 
@@ -197,7 +198,7 @@ export const searchHistory = handleAction(
   (state, action) => {
     return defaultSearchHistory;
   },
-  defaultSearchHistory
+  defaultSearchHistory,
 );
 export const getSearchHistory = (state) => state.searchTerm;
 
@@ -227,7 +228,7 @@ export const getSearchNameClasses = createSelector(
       names = searchTerm.names.split(/\s*,\s*/);
     }
     return names;
-  }
+  },
 );
 
 const searchDefaultValues = {
@@ -242,10 +243,12 @@ export const resetSearchDefaults = createAction("RESET_SEARCH_DEFAULTS");
 export const searchDefaults = handleActions(
   {
     SET_SEARCH_DEFAULTS: (state, action) =>
-      immutableUpdate(state, action.payload),
+      produce(state, (draft) => {
+        Object.assign(draft, action.payload);
+      }),
     RESET_SEARCH_DEFAULTS: (state, action) => searchDefaultValues,
   },
-  searchDefaultValues
+  searchDefaultValues,
 );
 export const getSearchDefaults = (state) => state.searchDefaults;
 
@@ -253,9 +256,11 @@ export const setSuggestedTerms = createAction("SET_SUGGESTED_TERMS");
 export const suggestedTerms = handleActions(
   {
     SET_SUGGESTED_TERMS: (state, action) =>
-      immutableUpdate(state, action.payload),
+      produce(state, (draft) => {
+        Object.assign(draft, action.payload);
+      }),
   },
-  {}
+  {},
 );
 export const getSuggestedTerms = (state) => state.suggestedTerms;
 

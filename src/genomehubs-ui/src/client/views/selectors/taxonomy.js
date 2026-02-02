@@ -1,4 +1,4 @@
-import { apiUrl, getApiAttempt, setApiAttempt } from "../reducers/api";
+import { apiUrl, getApiAttempt, setApiAttempt } from "#reducers/api";
 import {
   getTaxonomies,
   getTaxonomiesFetching,
@@ -6,10 +6,10 @@ import {
   receiveTaxonomies,
   requestTaxonomies,
   setCurrentTaxonomy,
-} from "../reducers/taxonomy";
+} from "#reducers/taxonomy";
 
-import { setApiStatus } from "../reducers/api";
-import store from "../store";
+import { setApiStatus } from "#reducers/api";
+import store from "#store";
 
 export function fetchTaxonomies() {
   return async function (dispatch) {

@@ -3,37 +3,40 @@ name: test-genomehubs
 on: [push]
 
 jobs:
-  package-ui:
+  build-ui:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: "16"
-      - run: npm install -g pkg
-      - run: |
-          sed -i '/"node16-macos-/d;s/"node16-linux-x64",/"node16-linux"/' src/packaged-ui/package.json
-          ./package-ui.sh
+          node-version: "24"
+      - name: Build UI assets
+        working-directory: ./src/genomehubs-ui
+        run: |
+          npm ci
+          npm run build
       - uses: actions/upload-artifact@v4
         with:
-          name: genomehubs-ui
-          path: ./dist/*
+          name: genomehubs-ui-dist
+          path: ./src/genomehubs-ui/dist/*
 
-  package-api:
+  build-api:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: "16"
-      - run: npm install -g pkg
-      - run: |
-          sed -i '/"node16-macos-/d;s/"node16-linux-x64",/"node16-linux"/' src/genomehubs-api/package.json
-          ./package-api.sh
+          node-version: "24"
+      - name: Generate handlers and build bundle
+        working-directory: ./src/genomehubs-api
+        run: |
+          npm ci
+          node scripts/generate-operation-handlers.cjs src/generated
+          npm run build:bundle
       - uses: actions/upload-artifact@v4
         with:
-          name: genomehubs-api
-          path: ./dist/*
+          name: genomehubs-api-bundle
+          path: ./src/genomehubs-api/build/*
 
   package-genomehubs-linux:
     runs-on: ubuntu-latest
@@ -45,7 +48,7 @@ jobs:
           bash Miniforge3.sh -b -p "${HOME}/conda"
           source "${HOME}/conda/etc/profile.d/conda.sh"
           source "${HOME}/conda/etc/profile.d/mamba.sh"
-          conda create -n genomehubs python=3.9
+          conda create -n genomehubs python=3.11
           conda activate genomehubs
           conda install pip
           pip install --upgrade pip
@@ -58,34 +61,148 @@ jobs:
           path: ./dist/*
 
   run-test-fill:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs:
-      - package-api
-      - package-ui
+      - build-api
+      - build-ui
       - package-genomehubs-linux
-    defaults:
-      run:
-        shell: bash -l {0}
     steps:
       - uses: actions/checkout@v3
+
+      - name: Free up disk space
+        run: |
+          df -h
+          docker system prune -af --volumes
+          sudo rm -rf /var/lib/docker/overlay2/*/diff/ || true
+          df -h
+
+      - name: Start Elasticsearch with local mount
+        run: |
+          mkdir -p elasticsearch-data
+          chmod 777 elasticsearch-data
+          docker run -d \
+            --name elasticsearch \
+            -e "xpack.security.enabled=false" \
+            -e "discovery.type=single-node" \
+            -e "action.destructive_requires_name=false" \
+            -e "ES_JAVA_OPTS=-Xms2g -Xmx2g" \
+            -e "cluster.routing.allocation.disk.watermark.low=80%" \
+            -e "cluster.routing.allocation.disk.watermark.high=85%" \
+            -e "cluster.routing.allocation.disk.watermark.flood_stage=90%" \
+            -p 9200:9200 \
+            -v $(pwd)/elasticsearch-data:/usr/share/elasticsearch/data \
+            elasticsearch:8.19.10
+
+      - name: Wait for Elasticsearch
+        run: |
+          for i in {1..30}; do
+            if curl -sSf http://localhost:9200/ > /dev/null 2>&1; then
+              echo "Elasticsearch is ready"
+              break
+            fi
+            echo "Waiting for Elasticsearch... (attempt $i/30)"
+            sleep 2
+          done
+
       - name: Collect artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: ./dist
-      - name: move wheel file
-        run: mv dist/genomehubs-linux/*linux*.whl src/docker/test
-      - name: move api executable
-        run: mv dist/genomehubs-api/genomehubs-api src/docker/test/genomehubs-api-linux
-      - name: Build docker image
-        working-directory: ./src/docker/test
-        run: docker build . -t genomehubs
+
+      - name: Prepare test container artifacts
+        run: |
+          echo "=== Initial artifacts structure ==="
+          find dist -type f | head -20
+
+          echo ""
+          echo "=== Copy wheel file ==="
+          mkdir -p src/docker/test
+          ls -la dist/genomehubs-linux/ 2>/dev/null || echo "No genomehubs-linux directory"
+          mv dist/genomehubs-linux/*linux*.whl src/docker/test/ || echo "No wheel file moved"
+          ls -la src/docker/test/
+
+          echo ""
+          echo "=== Copy API build ==="
+          mkdir -p src/docker/test/genomehubs-api
+          ls -la dist/genomehubs-api-bundle/ 2>/dev/null || echo "No genomehubs-api-bundle directory"
+          cp dist/genomehubs-api-bundle/bundle.cjs src/docker/test/genomehubs-api/ || echo "Failed to copy bundle.cjs"
+          cp src/genomehubs-api/package.json src/docker/test/genomehubs-api/ || echo "Failed to copy package.json"
+          ls -la src/docker/test/genomehubs-api/
+
+          echo ""
+          echo "=== Copy UI dist ==="
+          mkdir -p src/docker/test/genomehubs-ui-dist
+          ls -la dist/genomehubs-ui-dist/ 2>/dev/null || echo "No genomehubs-ui-dist directory"
+          cp -r dist/genomehubs-ui-dist/* src/docker/test/genomehubs-ui-dist/ || echo "Failed to copy UI dist"
+          ls -la src/docker/test/genomehubs-ui-dist/ | head -10
+
+          echo ""
+          echo "=== Final test directory structure ==="
+          find src/docker/test -type f | sort
+
+      - name: Build test Docker image
+        run: |
+          docker build \
+            -f src/docker/test/Dockerfile \
+            -t genomehubs-test:latest \
+            -t genomehubs-test:${{ github.sha }} \
+            .
+
+      - name: Wait for Elasticsearch
+        run: |
+          for i in {1..30}; do
+            if curl -sSf http://localhost:9200/ >/dev/null 2>&1; then
+              echo "Elasticsearch ready"
+              break
+            fi
+            echo "Waiting for Elasticsearch... ($i/30)"
+            sleep 2
+          done
+
       - name: Run test import
+        env:
+          GH_NODE: http://localhost:9200
+          GH_HUBNAME: genomehubs
+          GH_RELEASE: 2021.10.15
         run: |
           curl -s "http://localhost:9200/_cat/health"
+
+          echo "=== Host disk space before import ==="
+          df -h
+
+          echo "=== Container disk space before import ==="
+          docker exec elasticsearch df -h
+          docker exec elasticsearch du -sh /usr/share/elasticsearch/data
+
           mkdir -p projects/genomehubs/goat-resources
-          docker run --rm --network=host \
-            -u $UID:$GROUPS \
-            -v `pwd`/projects/genomehubs/goat-resources:/projects/genomehubs/goat-resources \
-            -v `pwd`/tests:/genomehubs/tests \
-            genomehubs bash -c \
-              "tests/integration_tests/scripts/load_goat_test_data.sh"
+
+          ## Set permissions for test data directory so genomehubs user (UID 10001) can write
+          chmod -R 777 tests/integration_tests/data
+
+            for attempt in 1 2; do
+            echo "=== Test import attempt $attempt ==="
+            docker run --rm --network host \
+              -e GH_NODE=${{ env.GH_NODE }} \
+              -e GH_HUBNAME=${{ env.GH_HUBNAME }} \
+              -e GH_RELEASE=${{ env.GH_RELEASE }} \
+              -v $(pwd)/projects/genomehubs/goat-resources:/projects/genomehubs/goat-resources \
+              -v $(pwd)/tests:/genomehubs/tests \
+              genomehubs-test:latest bash -c \
+              "tests/integration_tests/scripts/load_goat_test_data.sh" && break
+            echo "Test import failed, retrying..."
+            sleep 5
+            done
+
+      - name: Check disk space after import failure
+        if: failure()
+        run: |
+          echo "=== Host disk space after failure ==="
+          df -h
+
+          echo "=== Container disk space after failure ==="
+          docker exec elasticsearch df -h 2>/dev/null || echo "Container not accessible"
+          docker exec elasticsearch du -sh /usr/share/elasticsearch/data 2>/dev/null || echo "Cannot read container data"
+
+          echo "=== Local elasticsearch-data directory ==="
+          du -sh elasticsearch-data
+          find elasticsearch-data -type d | head -20

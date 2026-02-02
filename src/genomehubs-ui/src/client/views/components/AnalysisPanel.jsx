@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import {
   autoWidth as autoWidthStyle,
   header as headerStyle,
@@ -15,10 +14,11 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import classnames from "classnames";
-import { compose } from "recompose";
-import qs from "../functions/qs";
-import withAnalysesByAnyId from "../hocs/withAnalysesByAnyId";
-import withAnalysis from "../hocs/withAnalysis";
+import { compose } from "redux";
+import qs from "#functions/qs";
+import { useEffect } from "react";
+import withAnalysesByAnyId from "#hocs/withAnalysesByAnyId";
+import withAnalysis from "#hocs/withAnalysis";
 
 const AnalysisPanel = ({
   recordId,

@@ -1,17 +1,16 @@
-import React, { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import PhylopicAttributions from "./PhylopicAttributions";
 import Phylopics from "./PhyloPics";
 import Tooltip from "./Tooltip";
 import Typography from "@mui/material/Typography";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { scaleLog } from "d3-scale";
-import setColors from "../functions/setColors";
-import { shadesOfPurple } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import setColors from "#functions/setColors";
 import { useLongPress } from "use-long-press";
 import withColors from "#hocs/withColors";
 import withTheme from "#hocs/withTheme";
-import withTypes from "../hocs/withTypes";
+import withTypes from "#hocs/withTypes";
 
 const ReportTreeRings = ({
   arcs,

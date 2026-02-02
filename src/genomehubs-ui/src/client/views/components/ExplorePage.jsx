@@ -1,18 +1,16 @@
-import React, { memo, useEffect } from "react";
+import { memo, useEffect } from "react";
 
 import Page from "./Page";
 import ResultPanel from "./ResultPanel";
 import TextPanel from "./TextPanel";
-import classnames from "classnames";
-import { compose } from "recompose";
-import dispatchLookup from "../hocs/dispatchLookup";
-import qs from "../functions/qs";
-import styles from "./Styles.scss";
-import withRecord from "../hocs/withRecord";
-import withSearch from "../hocs/withSearch";
-import withSummary from "../hocs/withSummary";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import { compose } from "redux";
+import dispatchLookup from "#hocs/dispatchLookup";
+import qs from "#functions/qs";
+import withRecord from "#hocs/withRecord";
+import withSearch from "#hocs/withSearch";
+import withSummary from "#hocs/withSummary";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 const ExplorePage = ({
   lineage,
@@ -46,7 +44,7 @@ const ExplorePage = ({
         options.field_id != summaryField
       ) {
         fetchSearchResults({
-          query: `tax_eq(${options.taxon_id})`,
+          query: `tax_name(${options.taxon_id})`,
           result: options.result,
           taxonomy: options.taxonomy,
           includeEstimates: true,

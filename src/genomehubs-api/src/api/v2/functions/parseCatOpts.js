@@ -28,7 +28,12 @@ export const parseCatOpts = ({ cat, query, lookupTypes }) => {
   // input: cat = "c_value_method[5+]=flow cytometry,null,feulgen densitometry"
   // output: cat = "c_value_method"
   //         catOpts = "flow cytometry,null,feulgen densitometry;;5+"
-  let [field, count, values] = (cat || "").split(/=*\[([\d\+]+)\]=*/);
+  let [field, count, values] = (cat || "").split(
+    /\s*=*\s*\[([\d\+]+)\]\s*=*\s*/
+  );
+  if (!count) {
+    [field, values] = (cat || "").split(/\s*=\s*/);
+  }
   let catMeta = lookupTypes(field);
   let catOpts = `${typeof values === "undefined" ? "" : values};;${
     typeof count === "undefined" ? "" : count

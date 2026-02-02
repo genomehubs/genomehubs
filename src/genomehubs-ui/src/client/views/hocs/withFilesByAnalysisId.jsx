@@ -1,6 +1,5 @@
-import React from "react";
 import { connect } from "react-redux";
-import { getFilesByAnalysisId } from "../selectors/file";
+import { getFilesByAnalysisId } from "#selectors/file";
 
 const withFilesByAnalysisId = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({

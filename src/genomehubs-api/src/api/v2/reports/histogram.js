@@ -52,9 +52,7 @@ const getHistAggResults = (aggs, stats) => {
     }
   } else if (hist.by_lineage) {
     // TODO: support lineage category histogram
-    // console.log(hist);
-  } else {
-    // console.log(JSON.stringify(hist, null, 4));
+    // } else {
   }
   return { hist, docCount };
 };
@@ -67,18 +65,16 @@ const getYValues = ({ obj, yField, lookupTypes, stats }) => {
   let yValues = [];
   let yValueType = valueTypes[lookupTypes(yField).type] || "float";
   // TODO: use stats here
-  // console.log(obj);
   let yHist;
   if (obj.yHistograms.by_attribute.by_cat) {
     yHist = obj.yHistograms.by_attribute.by_cat.by_value;
   } else {
-    // console.log(yField);
     ({ hist: yHist } = getHistAggResults(
       obj.yHistograms.by_attribute[yField],
       stats
     ));
   }
-  if (yValueType == "keyword" && stats.cats) {
+  if (["keyword", "geo_hex"].includes(yValueType) && stats.cats) {
     let bucketMap = {};
     stats.cats.forEach((obj, i) => {
       yBuckets.push(obj.key);
@@ -189,7 +185,7 @@ const getNestedHistogramData = ({
   lookupTypes,
   yBounds,
 }) => {
-  if (!yHistograms) {
+  if (!yHistograms || !yBounds || !yField) {
     return {
       fullYBuckets: [],
       fullYValues: [],
@@ -201,27 +197,27 @@ const getNestedHistogramData = ({
   let yNullIndex = -1;
   let fullYBuckets;
   let fullYValues;
-  if (yHistograms.by_attribute && yField) {
-    if (yHistograms.by_attribute?.[yField]) {
-      yNullCount = totalCount - yHistograms.by_attribute[yField].doc_count;
-    } else if (yHistograms.by_attribute?.by_cat) {
-      yNullCount = totalCount - yHistograms.by_attribute.by_cat.doc_count;
-    }
-    ({ yBuckets: fullYBuckets, yValues: fullYValues } = getYValues({
-      obj: { yHistograms },
-      yField,
-      lookupTypes,
-      stats: yBounds.stats,
-      other: yBounds.showOther,
-    }));
+  // if (yHistograms && yField) {
+  if (yHistograms.by_attribute?.[yField]) {
+    yNullCount = totalCount - yHistograms.by_attribute[yField].doc_count;
+  } else if (yHistograms.by_attribute?.by_cat) {
+    yNullCount = totalCount - yHistograms.by_attribute.by_cat.doc_count;
+  }
+  ({ yBuckets: fullYBuckets, yValues: fullYValues } = getYValues({
+    obj: { yHistograms },
+    yField,
+    lookupTypes,
+    stats: yBounds.stats,
+    other: yBounds.showOther,
+  }));
 
-    if (yNullCount > 0) {
-      yNullIndex = fullYBuckets.indexOf("null");
-      if (yNullIndex > -1) {
-        fullYValues[yNullIndex] = yNullCount;
-      }
+  if (yNullCount > 0) {
+    yNullIndex = fullYBuckets.indexOf("null");
+    if (yNullIndex > -1) {
+      fullYValues[yNullIndex] = yNullCount;
     }
   }
+  // }
   return { fullYBuckets, fullYValues, yNullCount, yNullIndex };
 };
 
@@ -255,7 +251,7 @@ const getHistogram = async ({
   let rawData;
   let pointData;
   if (bounds.cat && bounds.by == "attribute") {
-    if (!bounds.showOther) {
+    if (!bounds.showOther && bounds.cats?.length) {
       let parts = params.query.split(/\s+AND\s+/i);
       let filtered = parts.filter((part) => part != bounds.cat);
       params.query = `${filtered.join(" AND ")} AND ${bounds.cat}=${bounds.cats
@@ -374,7 +370,7 @@ const getHistogram = async ({
           }
           let x = result.result.fields[field][xSumm];
           if (
-            valueType == "keyword" &&
+            ["keyword", "geo_hex"].includes(valueType) &&
             xSumm == "value" &&
             !xKeys.has(x.toLowerCase())
           ) {
@@ -386,7 +382,7 @@ const getHistogram = async ({
           }
           for (let y of ys) {
             if (
-              yValueType == "keyword" &&
+              ["keyword", "geo_hex"].includes(yValueType) &&
               ySumm == "value" &&
               !yKeys.has(y.toLowerCase())
             ) {
@@ -511,7 +507,10 @@ const getHistogram = async ({
   });
   if (fieldMeta.type == "date") {
     buckets = scaleBuckets(buckets, "date", bounds);
-  } else if (fieldMeta.type == "keyword" && summaries[0] != "length") {
+  } else if (
+    ["keyword", "geo_hex"].includes(fieldMeta.type) &&
+    summaries[0] != "length"
+  ) {
     buckets.push(undefined);
   } else {
     buckets = scaleBuckets(buckets, bounds.scale, bounds);
@@ -527,7 +526,10 @@ const getHistogram = async ({
     // yBuckets = allYBuckets;
     if (yFieldMeta.type == "date") {
       yBuckets = scaleBuckets(yBuckets, "date", yBounds);
-    } else if (yFieldMeta.type != "keyword" && summaries[0] != "length") {
+    } else if (
+      ["keyword", "geo_hex"].includes(yFieldMeta.type) &&
+      summaries[0] != "length"
+    ) {
       yBuckets = scaleBuckets(yBuckets, yBounds.scale, yBounds);
     } else {
       yBuckets = scaleBuckets(yBuckets, yBounds.scale, yBounds);
@@ -739,7 +741,7 @@ const updateQuery = ({ params, fields, summaries, opts, lookupTypes }) => {
   if (summaries[0] != meta.processed_simple) {
     field = `${summaries[0]}(${field})`;
   }
-  if (!meta || !opts || meta.type == "keyword") {
+  if (!meta || !opts || meta.type == "keyword" || meta.type == "geo_hex") {
     return;
   }
   let queryArr = (params.query || "").split(
@@ -1016,7 +1018,7 @@ export const histogram = async ({
       apiParams,
       opts: catOpts,
     });
-    if (nullCatBounds?.stats?.cats) {
+    if (nullCatBounds?.stats.cats) {
       bounds.cats = nullCatBounds.stats.cats;
       bounds.showOther =
         nullCatBounds.stats.showOther || Boolean(catString.match(/\bnull\b/));
@@ -1033,7 +1035,7 @@ export const histogram = async ({
       result,
       exclusions: {
         ...exclusions,
-        missing: ["bioproject"],
+        // missing: ["bioproject"],
       },
       taxonomy,
       apiParams,
@@ -1058,6 +1060,11 @@ export const histogram = async ({
       taxonomy,
       raw: bounds.stats.count < threshold ? threshold : 0,
     });
+  }
+  if (histograms && histograms.status && !histograms.status.success) {
+    return {
+      status: histograms.status,
+    };
   }
 
   let ranks = [rank].flat();
@@ -1141,7 +1148,9 @@ export const histogram = async ({
         fields: fields.join(","),
         ranks,
       },
-      x: histograms ? histograms.allValues.reduce((a, b) => a + b, 0) : 0,
+      x: histograms?.allValues
+        ? histograms.allValues.reduce((a, b) => a + b, 0)
+        : 0,
     },
     xQuery,
     ...(y && {

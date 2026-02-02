@@ -1,32 +1,34 @@
-import React, { memo, useEffect, useRef, useState } from "react";
+import { Suspense, lazy, memo, useEffect, useState } from "react";
 
-import Grid from "@mui/material/Grid2";
-import ReportArc from "./ReportArc";
+import Grid from "@mui/material/Grid";
 import ReportCaption from "./ReportCaption";
 import ReportEmpty from "./ReportEmpty";
 import ReportError from "./ReportError";
-import ReportHistogram from "./ReportHistogram";
 import ReportLoading from "./ReportLoading";
-import ReportMap from "./ReportMap";
-import ReportRibbon from "./ReportRibbon";
-import ReportScatter from "./ReportScatter";
 import ReportSources from "./ReportSources";
-import ReportTable from "./ReportTable";
-import ReportTree from "./ReportTree";
 import ReportTypes from "./ReportTypes";
 import ReportWrapper from "./ReportWrapper";
-import ReportXPerRank from "./ReportXPerRank";
-import { compose } from "recompose";
-import dispatchMessage from "../hocs/dispatchMessage";
-import dispatchReport from "../hocs/dispatchReport";
-import { gridPropNames } from "../functions/propNames";
-import qs from "../functions/qs";
+import { compose } from "redux";
+import dispatchMessage from "#hocs/dispatchMessage";
+import dispatchReport from "#hocs/dispatchReport";
+import { gridPropNames } from "#functions/propNames";
+import qs from "#functions/qs";
 import { reportHeading as reportHeadingStyle } from "./Styles.scss";
 import { useIntersectionObserver } from "usehooks-ts";
-import { useNavigate } from "@reach/router";
-import useResize from "../hooks/useResize";
-import withReportById from "../hocs/withReportById";
-import withSiteName from "../hocs/withSiteName";
+import useNavigate from "#hooks/useNavigate";
+import useResize from "#hooks/useResize";
+import withReportById from "#hocs/withReportById";
+import withSiteName from "#hocs/withSiteName";
+
+// Lazy load heavy visualization components
+const ReportMap = lazy(() => import("./ReportMap"));
+const ReportArc = lazy(() => import("./ReportArc"));
+const ReportHistogram = lazy(() => import("./ReportHistogram"));
+const ReportScatter = lazy(() => import("./ReportScatter"));
+const ReportRibbon = lazy(() => import("./ReportRibbon"));
+const ReportTree = lazy(() => import("./ReportTree"));
+const ReportTable = lazy(() => import("./ReportTable"));
+const ReportXPerRank = lazy(() => import("./ReportXPerRank"));
 
 const headings = {
   tree: "Tap tree nodes to browse taxa or long-press to search",
@@ -87,6 +89,13 @@ const ReportItem = ({
   compactWidth,
   highlightArea,
   mapThreshold,
+  locationField,
+  regionField,
+  geoBounds,
+  mapType,
+  mapTheme,
+  mapProjection,
+  geoBinResolution,
   scatterThreshold,
   yScale,
   zScale,
@@ -104,7 +113,7 @@ const ReportItem = ({
   hideErrorBars,
   hideAncestralBars,
   showPhyloPics,
-  phylopicRank, 
+  phylopicRank,
   phylopicSize,
   highlight,
   colorPalette,
@@ -188,6 +197,36 @@ const ReportItem = ({
       );
     }
   }, [reportId, visible]);
+
+  // Readiness signal for OG renderers: set a body attribute when the report
+  // has finished loading and there's no error. This allows server-side
+  // screenshotters to wait for `data-og-ready="1"` before capturing.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      if (!loading && !error) {
+        document.body.setAttribute("data-og-ready", "1");
+        if (report)
+          document.body.setAttribute("data-og-report", String(report));
+        // Helpful debug for local runs
+        if (typeof console !== "undefined")
+          console.debug("[og-ready] set data-og-ready for report", report);
+      } else {
+        document.body.removeAttribute("data-og-ready");
+        document.body.removeAttribute("data-og-report");
+      }
+    } catch (e) {
+      // ignore
+    }
+    return () => {
+      try {
+        if (typeof window !== "undefined") {
+          document.body.removeAttribute("data-og-ready");
+          document.body.removeAttribute("data-og-report");
+        }
+      } catch (e) {}
+    };
+  }, [loading, error, report]);
 
   let status;
   if (
@@ -324,6 +363,14 @@ const ReportItem = ({
             minDim={minDim}
             setMinDim={setMinDim}
             mapThreshold={mapThreshold}
+            locationField={locationField}
+            regionField={regionField}
+            geoBounds={geoBounds}
+            mapType={mapType}
+            mapTheme={mapTheme}
+            mapProjection={mapProjection}
+            geoBinResolution={geoBinResolution}
+            highlightArea={highlightArea}
           />
         );
         break;
@@ -449,7 +496,7 @@ const ReportItem = ({
           permaLink = (queryString, toggle) => {
             let path = "report";
             // TODO: include taxonomy
-            navigate(`${basename}/${path}?${queryString.replace(/^\?/, "")}`);
+            navigate(`/${path}?${queryString.replace(/^\?/, "")}`);
           };
         }
         component = (
@@ -602,7 +649,21 @@ const ReportItem = ({
             }),
           }}
         >
-          {component}
+          <Suspense
+            fallback={
+              <div
+                style={{
+                  padding: "2rem",
+                  textAlign: "center",
+                  minHeight: minDim,
+                }}
+              >
+                Loading visualization...
+              </div>
+            }
+          >
+            {component}
+          </Suspense>
         </div>
       </Grid>
       {!loading && !error && caption && (

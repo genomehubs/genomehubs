@@ -1,8 +1,6 @@
-import React, { memo, useEffect, useRef } from "react";
-
 import Chip from "@mui/material/Chip";
-import { compose } from "recompose";
-import withReportTerm from "../hocs/withReportTerm";
+import { compose } from "redux";
+import withReportTerm from "#hocs/withReportTerm";
 
 const ReportTerm = ({ reportTerm, setReportTerm }) => {
   return (

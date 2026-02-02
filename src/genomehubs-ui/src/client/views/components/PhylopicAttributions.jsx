@@ -1,8 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
-
-import classnames from "classnames";
-import { compose } from "recompose";
-import truncate from "../functions/truncate";
+import { compose } from "redux";
 import withPhylopics from "#hocs/withPhylopics";
 
 const PhylopicAttributions = ({

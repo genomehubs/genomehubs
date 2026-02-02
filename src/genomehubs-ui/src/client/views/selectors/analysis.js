@@ -1,15 +1,15 @@
-import { apiUrl, setApiStatus } from "../reducers/api";
+import { apiUrl, setApiStatus } from "#reducers/api";
 import {
   cancelAnalyses,
   getAnalyses,
   logAnalysisQuery,
   receiveAnalyses,
   requestAnalyses,
-} from "../reducers/analysis";
+} from "#reducers/analysis";
 
 import { createCachedSelector } from "re-reselect";
 import { createSelector } from "reselect";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 
 export function fetchAnalyses(options) {
   return async function (dispatch) {

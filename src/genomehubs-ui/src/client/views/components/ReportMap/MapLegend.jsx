@@ -1,0 +1,304 @@
+import { useMemo, useState } from "react";
+
+import FormControlLabel from "@mui/material/FormControlLabel";
+import ReportMenu from "./ReportMenu";
+import Switch from "@mui/material/Switch";
+import getMapOptions from "./functions/getMapOptions";
+
+const ColorRampBar = ({ min, max, color1, bg, getColor }) => {
+  const borderRadius = 6;
+  // Compute mid value
+  const mid = max - min > 10 ? Math.round((min + max) / 2) : (min + max) / 2;
+  // Gradient CSS
+  const gradient = `linear-gradient(90deg, ${getColor(min)} ${borderRadius}px, ${getColor(max)} calc(100% - ${borderRadius}px)`;
+  return (
+    <div
+      style={{ width: 180, marginBottom: 8, position: "relative", height: 28 }}
+    >
+      {/* Tick marks */}
+      {[min, mid, max].map((val, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            left: `${((val - min) / (max - min || 1)) * 100}%`,
+            marginLeft:
+              i == 0 ? `${borderRadius}px` : i == 2 ? `-${borderRadius}px` : 0,
+            top: 18, // move label below ramp and tick
+            transform: "translateX(-50%)",
+            textAlign: "center",
+            color: "#888",
+            fontSize: 12,
+            minWidth: 18,
+            lineHeight: 1,
+            pointerEvents: "none",
+            position: "absolute",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: "-5px", // place tick just below ramp
+              transform: "translateX(-50%)",
+              height: "5px",
+              borderLeft: "1px solid #888",
+              marginBottom: 1,
+              width: 0,
+              pointerEvents: "none",
+            }}
+          />
+          <span style={{ color: "inherit", position: "relative", zIndex: 1 }}>
+            {val}
+          </span>
+        </div>
+      ))}
+      <div
+        style={{
+          height: 14,
+          borderRadius,
+          background: gradient,
+          border: "1px solid #888",
+          width: "100%",
+        }}
+      />
+    </div>
+  );
+};
+
+export const MapLegend = ({
+  position = "top-right",
+  nightMode,
+  theme,
+  colorScheme,
+  globeView,
+  setGlobeView,
+  setNightMode,
+  minCountryCount,
+  maxCountryCount,
+  countryOverlayColor,
+  minHexbinCount,
+  maxHexbinCount,
+  hexbinOverlayColor,
+  locationField,
+  regionField,
+  catField,
+  cats = [],
+  showPoints,
+  colors,
+}) => {
+  const [showLegend, setShowLegend] = useState(false);
+  const {
+    mapOptions: { countryColor, hexbinColor },
+  } = getMapOptions({
+    theme: "darkTheme",
+    colorScheme,
+    nightMode,
+    countryOverlayColor,
+    hexbinOverlayColor,
+    countryMaxCount: maxCountryCount,
+    hexbinMaxCount: maxHexbinCount,
+  });
+
+  // If cats are provided, use them to create a color key
+  // display the key as one row per category with a coloured circle and white outline
+  const colorKey = useMemo(() => {
+    if (!locationField || !showPoints) {
+      return [];
+    }
+    if (!cats || cats.length === 0 || !colors || colors.length === 0) {
+      return [{ cat: { label: locationField }, color: colors[0] || "#fec44f" }];
+    }
+    return cats.map((cat, i) => ({
+      cat,
+      color: colors[i % colors.length],
+    }));
+  }, [cats, colors]);
+
+  // If colorKey is available, display it in the legend
+  let colorLegend = null;
+  if (locationField && colorKey && colorKey.length > 0) {
+    colorLegend = (
+      <div style={{ marginTop: 8, width: "100%" }}>
+        <div
+          style={{
+            fontWeight: 600,
+            marginBottom: 4,
+            color: nightMode || theme === "darkTheme" ? "#eee" : undefined,
+            maxWidth: "180px",
+          }}
+        >
+          {catField ? `Categories for ${catField}` : "Categories"}
+        </div>
+        {colorKey.map(({ cat, color }, i) => (
+          <div
+            key={i}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              marginBottom: 4,
+              width: "180px",
+            }}
+          >
+            <div
+              style={{
+                width: 16,
+                height: 16,
+                borderRadius: "50%",
+                backgroundColor: color,
+                border: "2px solid #fff",
+              }}
+            />
+            <span
+              style={{
+                color: nightMode || theme === "darkTheme" ? "#eee" : "#000",
+                textAlign: "left",
+                marginLeft: 8,
+                flex: 1,
+              }}
+            >
+              {cat.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  let content = null;
+  // if (showLegend) {
+  content = (
+    <>
+      <FormControlLabel
+        control={
+          <Switch
+            checked={globeView}
+            onClick={() => setGlobeView(!globeView)}
+            color={nightMode || theme === "darkTheme" ? "default" : "primary"}
+            sx={
+              nightMode || theme === "darkTheme"
+                ? {
+                    "& .MuiSwitch-switchBase": {
+                      color: "#bbb",
+                    },
+                    "& .MuiSwitch-switchBase.Mui-checked": {
+                      color: "#ffa870",
+                    },
+                    "& .MuiSwitch-track": {
+                      backgroundColor: "#888",
+                    },
+                  }
+                : {}
+            }
+          />
+        }
+        label={globeView ? "Globe" : "Map"}
+        sx={nightMode || theme === "darkTheme" ? { color: "#eee" } : {}}
+      />
+      <FormControlLabel
+        control={
+          <Switch
+            checked={nightMode}
+            onClick={() => setNightMode(!nightMode)}
+            color={nightMode || theme === "darkTheme" ? "default" : "primary"}
+            sx={
+              nightMode || theme === "darkTheme"
+                ? {
+                    "& .MuiSwitch-switchBase": {
+                      color: "#bbb",
+                    },
+                    "& .MuiSwitch-switchBase.Mui-checked": {
+                      color: "#ffa870",
+                    },
+                    "& .MuiSwitch-track": {
+                      backgroundColor: "#888",
+                    },
+                  }
+                : {}
+            }
+          />
+        }
+        label={nightMode ? "Night" : "Day"}
+        sx={nightMode || theme === "darkTheme" ? { color: "#eee" } : {}}
+      />
+
+      <div style={{ width: "100%", marginTop: 4 }}>
+        {regionField && maxCountryCount > 1 && (
+          <>
+            <div
+              style={{
+                fontWeight: 600,
+                marginBottom: 4,
+                color: nightMode || theme === "darkTheme" ? "#eee" : undefined,
+              }}
+            >
+              {regionField} count
+            </div>
+            <ColorRampBar
+              min={minCountryCount}
+              max={maxCountryCount}
+              color1={countryOverlayColor}
+              bg={
+                nightMode
+                  ? "#22262a"
+                  : theme === "darkTheme"
+                    ? "#222a38"
+                    : "#eeeeee"
+              }
+              getColor={(val) => countryColor(val)}
+            />
+          </>
+        )}
+        {locationField && !showPoints && maxHexbinCount > 1 && (
+          <>
+            <div
+              style={{
+                fontWeight: 600,
+                margin: "8px 0 4px 0",
+                color: nightMode || theme === "darkTheme" ? "#eee" : undefined,
+              }}
+            >
+              {locationField} count
+            </div>
+            <ColorRampBar
+              min={minHexbinCount}
+              max={maxHexbinCount}
+              color1={hexbinOverlayColor}
+              bg={
+                nightMode
+                  ? "#22262a"
+                  : theme === "darkTheme"
+                    ? "#222a38"
+                    : "#eeeeee"
+              }
+              getColor={(val) => hexbinColor(val)}
+            />
+          </>
+        )}
+        {colorLegend}
+      </div>
+    </>
+  );
+  // }
+
+  return (
+    <ReportMenu
+      nightMode={nightMode}
+      position={position}
+      theme={theme}
+      sx={{ alignItems: "flex-start" }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
+        }}
+      >
+        {content}
+      </div>
+    </ReportMenu>
+  );
+};
+
+export default MapLegend;

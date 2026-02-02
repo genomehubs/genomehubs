@@ -1,31 +1,62 @@
-FROM alpine:3.15
-LABEL maintainer="contact@genomehubs.org"
-LABEL license="MIT"
-ARG VERSION=2.10.15
-LABEL version=$VERSION
+## Build stage
+FROM node:24-bookworm-slim AS builder
+WORKDIR /app
 
-ENV CONTAINER_VERSION=$VERSION
+ARG USE_PREBUILT_DIST=false
 
-RUN apk add --no-cache curl gcompat libstdc++ libgcc
+## Install build dependencies (git required for git-revision-webpack-plugin)
+RUN apt-get update && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /genomehubs/local
+## Copy UI package manifests and config first for better layer caching
+COPY src/genomehubs-ui/package.json src/genomehubs-ui/package-lock.json src/genomehubs-ui/.npmrc ./
+RUN npm ci --production=false
 
-COPY genomehubs-ui-linux /genomehubs/genomehubs-ui
+## Copy UI sources
+COPY src/genomehubs-ui/. .
 
-RUN addgroup -S genomehubs \
-    && adduser -S genomehubs -G genomehubs \
-    && chown -R genomehubs:genomehubs /genomehubs
+## Copy prebuilt dist if provided
+COPY src/genomehubs-ui/dist ./dist
 
-USER genomehubs
+## Build static assets with webpack unless using prebuilt dist
+RUN if [ "$USE_PREBUILT_DIST" != "true" ]; then npm run build; fi
 
-WORKDIR /genomehubs
+## Install production dependencies only
+RUN npm ci --omit=dev
 
-RUN chmod 755 genomehubs-ui
+## Prepare logs directory in builder
+RUN mkdir -p /app/logs \
+    && chown -R node:node /app/logs \
+    && chmod -R 0755 /app/logs
 
-ENV PATH /genomehubs:$PATH
+## Runtime stage - use distroless for minimal footprint
+FROM gcr.io/distroless/nodejs24-debian12
+WORKDIR /app
 
-COPY .env /genomehubs/
+## Copy built assets and server code
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/src/server ./src/server
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package-lock.json ./package-lock.json
+
+## Copy production node_modules from builder
+COPY --from=builder /app/node_modules ./node_modules
+
+## Copy pre-created logs directory
+COPY --from=builder --chown=nonroot:nonroot /app/logs /app/logs
+
+## Content mount point (markdown repos)
+VOLUME ["/content"]
+
+## Configuration via environment variables
+ENV NODE_ENV=production
+ENV BASE_PATH=/
+ENV PORT=8880
+ENV CONTENT_ROOT=/content
+ENV SSR_MODE=bots
+ENV DEBUG_LOGS=1
 
 EXPOSE 8880
 
-CMD genomehubs-ui
+## Run SSR server (distroless image provides `node` as entrypoint)
+CMD ["--no-deprecation", "src/server/index.js"]

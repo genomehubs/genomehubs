@@ -1,17 +1,17 @@
-import React, { useRef } from "react";
-import { useLocation, useNavigate } from "@reach/router";
-
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Report from "./Report";
 import ReportTools from "./ReportTools";
 import classnames from "classnames";
-import { compose } from "recompose";
-import dispatchReport from "../hocs/dispatchReport";
+import { compose } from "redux";
+import dispatchReport from "#hocs/dispatchReport";
 import { markdown as markdownStyle } from "./Styles.scss";
 import qs from "qs";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
+import { useRef } from "react";
 import { useStyles } from "./ReportModalStyles";
-import useWindowDimensions from "../hooks/useWindowDimensions";
-import withSiteName from "../hocs/withSiteName";
+import useWindowDimensions from "#hooks/useWindowDimensions";
+import withSiteName from "#hocs/withSiteName";
 
 export const ReportFull = ({
   reportId,
@@ -77,7 +77,7 @@ export const ReportFull = ({
   const permaLink = (queryString, toggle) => {
     let path = topLevel ? "report" : toggle ? "reporturl" : "report";
     // TODO: include taxonomy
-    navigate(`${basename}/${path}?${queryString.replace(/^\?/, "")}`);
+    navigate(`/${path}?${queryString.replace(/^\?/, "")}`);
   };
 
   const handleUpdate = ({ queryString, hash }) => {

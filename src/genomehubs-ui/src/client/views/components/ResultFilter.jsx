@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
 import { first as firstStyle, last as lastStyle } from "./Styles.scss";
+import { useEffect, useState } from "react";
 
 import { FormControl } from "@mui/material";
 import MuiTableCell from "@mui/material/TableCell";
 import ResultFilterInput from "./ResultFilterInput";
 import classnames from "classnames";
-import { compose } from "recompose";
-import qs from "../functions/qs";
-import { useNavigate } from "@reach/router";
-import withSearch from "../hocs/withSearch";
-import withSiteName from "../hocs/withSiteName";
+import { compose } from "redux";
+import qs from "#functions/qs";
+import useNavigate from "#hooks/useNavigate";
+import withSearch from "#hocs/withSearch";
+import withSiteName from "#hocs/withSiteName";
 import withStyles from "@mui/styles/withStyles";
 
 const DefaultTableCell = withStyles((theme) => ({
@@ -128,7 +128,7 @@ const ResultFilter = ({
       }
     }
     let options = { ...searchTerm, query: parts.join(" AND ") };
-    navigate(`${basename}/search?${qs.stringify(options)}`);
+    navigate(`/search?${qs.stringify(options)}`);
   };
 
   const handleChange = (e, i, action, attributes) => {

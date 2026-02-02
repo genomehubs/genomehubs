@@ -10,15 +10,14 @@ import {
   title as titleStyle,
 } from "./Styles.scss";
 
-import React from "react";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
-import { compose } from "recompose";
-import dispatchLookup from "../hocs/dispatchLookup";
-import { useNavigate } from "@reach/router";
-import withRecord from "../hocs/withRecord";
-import withSearch from "../hocs/withSearch";
-import withTaxonomy from "../hocs/withTaxonomy";
+import { compose } from "redux";
+import dispatchLookup from "#hocs/dispatchLookup";
+import useNavigate from "#hooks/useNavigate";
+import withRecord from "#hocs/withRecord";
+import withSearch from "#hocs/withSearch";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 export const LineageList = ({
   taxon_id,
@@ -35,7 +34,7 @@ export const LineageList = ({
   const handleTaxonClick = (taxon, name) => {
     if (taxon != taxon_id || result != "taxon") {
       setRecordId(taxon);
-      fetchSearchResults({ query: `tax_eq(${taxon})`, result: "taxon" });
+      fetchSearchResults({ query: `tax_name(${taxon})`, result: "taxon" });
       setPreferSearchTerm(false);
       navigate(
         `?recordId=${taxon}&result=taxon&taxonomy=${taxonomy}#${encodeURIComponent(

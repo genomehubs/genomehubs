@@ -1,8 +1,9 @@
 /** @type { import('@storybook/react-webpack5').StorybookConfig } */
 
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import custom from "../webpack.config.js";
-import path from "path";
+const path = require("path");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const postcss = require("postcss");
+const custom = require("../webpack.config.js");
 
 const devMode = true; //process.env.NODE_ENV !== "production";
 
@@ -11,10 +12,8 @@ const config = {
 
   addons: [
     "@storybook/addon-webpack5-compiler-swc",
-    "@storybook/addon-essentials",
     "@chromatic-com/storybook",
     "@storybook/addon-themes",
-    "@storybook/addon-interactions",
     "@storybook/preset-scss",
     {
       name: "@storybook/addon-styling-webpack",
@@ -78,7 +77,7 @@ const config = {
               },
               {
                 loader: "postcss-loader",
-                options: { implementation: require.resolve("postcss") },
+                options: { implementation: postcss },
               },
               {
                 loader: "sass-loader",
@@ -93,7 +92,7 @@ const config = {
         ],
       },
     },
-    "@storybook/addon-mdx-gfm",
+    "@storybook/addon-docs"
   ],
 
   framework: {
@@ -123,6 +122,16 @@ const config = {
         ...config.module,
         rules: [...filteredRules, ...custom.module.rules],
       },
+      resolve: {
+        ...config.resolve,
+        alias: {
+          ...config.resolve.alias,
+          "@reach/router": path.resolve(
+            __dirname,
+            "../src/mocks/@reach_router.js",
+          ),
+        },
+      },
     };
   },
 
@@ -134,4 +143,5 @@ const config = {
     reactDocgen: "react-docgen-typescript",
   },
 };
-export default config;
+
+module.exports = config;

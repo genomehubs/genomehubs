@@ -1,9 +1,8 @@
 import {
   getZoomPointLocation,
   setZoomPointLocation,
-} from "../reducers/geography";
+} from "#reducers/geography";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withStableGeography = (WrappedComponent) => (props) => {
@@ -16,7 +15,7 @@ const withStableGeography = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

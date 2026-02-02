@@ -1,8 +1,7 @@
-import { cancelFiles, getFiles, resetFiles } from "../reducers/file";
+import { cancelFiles, getFiles, resetFiles } from "#reducers/file";
 
-import React from "react";
 import { connect } from "react-redux";
-import { fetchFiles } from "../selectors/file";
+import { fetchFiles } from "#selectors/file";
 
 const withFiles = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
@@ -16,7 +15,7 @@ const withFiles = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

@@ -1,8 +1,7 @@
-import Grid from "@mui/material/Grid2";
-import React from "react";
-import { compose } from "recompose";
-import withColors from "../hocs/withColors";
-import withReportById from "../hocs/withReportById";
+import Grid from "@mui/material/Grid";
+import { compose } from "redux";
+import withColors from "#hocs/withColors";
+import withReportById from "#hocs/withReportById";
 
 export const ReportLegend = ({ reportById, report, colors, levels }) => {
   if (!reportById.report || !reportById.report[report]) {

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@reach/router";
-import React, { memo, useState } from "react";
+import { memo, useState } from "react";
 import {
   siteLogo as siteLogoStyle,
   siteName as siteNameStyle,
@@ -9,10 +9,10 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import Logo from "./Logo";
 import MenuItem from "@mui/material/MenuItem";
 import Popover from "@mui/material/Popover";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
-import withArchive from "../hocs/withArchive";
-import withSiteName from "../hocs/withSiteName";
+import withArchive from "#hocs/withArchive";
+import withSiteName from "#hocs/withSiteName";
 
 const useStyles = makeStyles((theme) => ({
   typography: {
@@ -42,7 +42,7 @@ const SiteName = ({ siteName, basename, archive, logo, theme }) => {
   const id = open ? "simple-popover" : undefined;
 
   let content = (
-    <Link className={siteNameStyle} to={`${basename}/`}>
+    <Link className={siteNameStyle} to={``}>
       {logo && (
         <div className={siteLogoStyle}>
           <Logo lineColor={"white"} />

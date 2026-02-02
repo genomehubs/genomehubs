@@ -1,9 +1,8 @@
-import React, { createElement, useEffect, useRef, useState } from "react";
-import { basename, siteName } from "../reducers/location";
+import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import { Suspense, lazy, useEffect, useState } from "react";
 import {
   centerContent as centerContentStyle,
   divider as dividerStyle,
-  fixedArSixteenNine as fixedArSixteenNineStyle,
   fixedAr as fixedArStyle,
   inline as inlineStyle,
   markdown as markdownStyle,
@@ -14,7 +13,6 @@ import {
   unpaddedParagraph as unpaddedParagraphStyle,
   unpadded as unpaddedStyle,
 } from "./Styles.scss";
-import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
 import ArtTrackIcon from "@mui/icons-material/ArtTrack";
@@ -24,10 +22,10 @@ import Breadcrumbs from "./Breadcrumbs";
 import ColorButton from "./ColorButton";
 import Count from "./Count";
 import Divider from "@mui/material/Divider";
+import EditableText from "./EditableText/EditableText";
 import EnumSelect from "./EnumSelect";
 import FlagIcon from "./FlagIcon";
-import Grid from "@mui/material/Grid2";
-import Highlight from "./Highlight";
+import Grid from "@mui/material/Grid";
 import Logo from "./Logo";
 import NavLink from "./NavLink";
 import PhyloPics from "./PhyloPics";
@@ -37,7 +35,6 @@ import Report from "./Report";
 import ResultCount from "./ResultCount";
 import SearchIcon from "@mui/icons-material/Search";
 import StaticPlot from "./StaticPlot";
-import TextField from "@mui/material/TextField";
 import Toggle from "./Toggle";
 import Tooltip from "./Tooltip";
 import TranslatedValue from "./TranslatedValue";
@@ -47,21 +44,25 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import YAML from "js-yaml";
 import classNames from "classnames";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import gfm from "remark-gfm";
-import { gridPropNames } from "../functions/propNames";
+import { gridPropNames } from "#functions/propNames";
 import { h } from "hastscript";
 import qs from "qs";
 import rehypeRaw from "rehype-raw";
 import rehypeReact from "rehype-react";
 import remarkDirective from "remark-directive";
 import remarkParse from "remark-parse";
-import remarkReact from "remark-react";
 import remarkRehype from "remark-rehype";
-import unified from "unified";
+import { siteName } from "#reducers/location";
+import { unified } from "unified";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
 import { visit } from "unist-util-visit";
-import withPages from "../hocs/withPages";
+import withPages from "#hocs/withPages";
 import withStyles from "@mui/styles/withStyles";
+
+const Highlight = lazy(() => import("./Highlight"));
 
 const pagesUrl = PAGES_URL;
 const webpackHash = COMMIT_HASH || __webpack_hash__;
@@ -175,15 +176,19 @@ export const Template = ({
     let label = props[`${match}_label`];
     let description = props[`${match}_description`];
     let input = (
-      <TextField
+      <EditableText
         variant="standard"
-        id={match + Math.random()}
-        label={label}
+        // id={match + Math.random()}
+        title={label}
+        description={description}
         value={values[match] || ""}
         style={{ width: "95%" }}
-        onChange={(e) => handleChange(e, match, undefined, i)}
-        onKeyUp={handleKeyPress}
-        autoFocus={i == values.focus}
+        underline={true}
+        onChange={(value) => handleChange(undefined, match, value, i)}
+        // onBlur={(value) => handleChange(undefined, match, value, i)}
+        fontFamily="Roboto, Helvetica, Arial, sans-serif"
+        // onKeyUp={handleKeyPress}
+        // autoFocus={i == values.focus}
       />
     );
     inputs.push(
@@ -311,7 +316,7 @@ export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
       } else {
         newProps["src"] = value.replace(
           /^\/static\//,
-          `${basename}/static/${webpackHash}/`,
+          `static/${webpackHash}/`,
         );
       }
     } else if (key == "size") {
@@ -426,9 +431,15 @@ export const RehypeComponentsList = (extra) => {
       );
     },
     pre: (props) => {
-      let className = props.children?.[0]?.props?.className;
+      // props.children is the <code> element, not an array
+      const codeElement = props.children;
+      const className = codeElement?.props?.className;
+
       if (className) {
-        let nestedProps = YAML.load(props.children[0].props.children[0] || "");
+        // Extract YAML content directly from code element's children
+        const yamlContent = codeElement?.props?.children || "";
+
+        let nestedProps = YAML.load(yamlContent);
         if (className == "language-report") {
           return (
             <Report
@@ -446,7 +457,13 @@ export const RehypeComponentsList = (extra) => {
           );
         }
       }
-      return <Highlight {...processProps({ props })} />;
+      return (
+        <Suspense
+          fallback={<pre style={{ padding: "1rem" }}>Loading code...</pre>}
+        >
+          <Highlight {...processProps({ props })} />
+        </Suspense>
+      );
     },
     phylopic: (props) => <PhyloPics {...processProps({ props, extra })} />,
     recordlabel: (props) => <RecordLabel {...processProps({ props, extra })} />,
@@ -517,11 +534,14 @@ export function compile(val, components = RehypeComponentsList()) {
     .use(gfm)
     .use(remarkDirective)
     .use(htmlDirectives)
-    .use(remarkRehype)
+    .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
     .use(rehypeReact, {
-      createElement,
+      Fragment,
+      jsx,
+      jsxs,
       components,
+      passNode: true,
     });
 
   const ast = processor.runSync(processor.parse(val));
@@ -546,7 +566,11 @@ export function htmlDirectives() {
 
   function ondirective(node, index) {
     let data = node.data || (node.data = {});
-    let hast = h(node.name, node.attributes);
+    // Sanitize tag name: ensure valid HTML tag or fallback to span
+    const isValidTagName = (name) =>
+      typeof name === "string" && /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(name);
+    const tagName = isValidTagName(node.name) ? node.name : "span";
+    let hast = h(tagName, node.attributes);
     data.hName = hast.tagName;
     data.hProperties = hast.properties;
     if (data.hName == "report") {

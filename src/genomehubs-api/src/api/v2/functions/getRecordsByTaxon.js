@@ -8,12 +8,20 @@ import { logError } from "./logger.js";
 import { processHits } from "./processHits.js";
 import { searchByTaxon } from "../queries/searchByTaxon.js";
 
-async function* scrollSearch(params, scroll) {
-  if (!params.scroll) {
-    params = { ...params, scroll };
-  }
+async function* searchAfterSearch(params, pageSize, idField = "taxon_id") {
+  // Initial search with sort for consistent ordering
+  let searchParams = {
+    ...params,
+    size: pageSize,
+    body: {
+      ...params.body,
+      // Ensure we have a sort for consistent pagination
+      // Use the result-specific ID field (taxon_id, feature_id, etc.)
+      sort: params.body.sort || [{ [idField]: "asc" }],
+    },
+  };
 
-  let response = await client.search(params, { meta: true });
+  let response = await client.search(searchParams, { meta: true });
 
   while (true) {
     const sourceHits = response.body.hits.hits;
@@ -26,17 +34,19 @@ async function* scrollSearch(params, scroll) {
       yield hit;
     }
 
-    if (!response.body._scroll_id) {
+    // If we got fewer results than the page size, we've reached the end
+    if (sourceHits.length < pageSize) {
       break;
     }
 
-    response = await client.scroll(
-      {
-        scroll_id: response.body._scroll_id,
-        scroll: params.scroll,
-      },
-      { meta: true }
-    );
+    // Get the sort values from the last hit for pagination
+    const lastHit = sourceHits[sourceHits.length - 1];
+    const searchAfter = lastHit.sort;
+
+    // Continue search from where we left off
+    searchParams.body.search_after = searchAfter;
+
+    response = await client.search(searchParams, { meta: true });
   }
 }
 
@@ -62,8 +72,9 @@ export const getRecordsByTaxon = async (props) => {
     props.includeLineage = true;
   }
   const query = await searchBy(props);
-  let { scrollThreshold, scrollDuration } = config;
+  let { scrollThreshold } = config;
   let body;
+  const pageSize = 1000;
   if (
     query.size > 10000 ||
     (query.size >= scrollThreshold &&
@@ -73,16 +84,17 @@ export const getRecordsByTaxon = async (props) => {
     let total = 0;
     let hits = [];
     let startTime = Date.now();
-    for await (const hit of scrollSearch(
+    const idField = `${props.result}_id`;
+    for await (const hit of searchAfterSearch(
       {
         index: props.index,
-        size: 1000,
         _source: query._source,
         body: {
           query: query.query,
         },
       },
-      scrollDuration
+      pageSize,
+      idField
     )) {
       hits.push(hit);
       total++;
@@ -122,7 +134,7 @@ export const getRecordsByTaxon = async (props) => {
       )
       .catch((err) => {
         logError({
-          message: err.meta.body.error,
+          message: err.meta.body?.error || err.message,
           ...(props.req && { req: props.req }),
         });
         return err.meta;

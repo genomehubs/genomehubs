@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import FlagIcon from "./FlagIcon";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -10,10 +10,10 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import TranslatedValue from "./TranslatedValue";
 import { autoWidth as autoWidthStyle } from "./Styles.scss";
-import { compose } from "recompose";
-import dispatchMessage from "../hocs/dispatchMessage";
-import withReportTerm from "../hocs/withReportTerm";
-import withSiteName from "../hocs/withSiteName";
+import { compose } from "redux";
+import dispatchMessage from "#hocs/dispatchMessage";
+import withReportTerm from "#hocs/withReportTerm";
+import withSiteName from "#hocs/withSiteName";
 import withStyles from "@mui/styles/withStyles";
 
 const StyledTableCell = withStyles((theme) => ({
@@ -30,7 +30,7 @@ const StyledTableCell = withStyles((theme) => ({
 const TableReport = ({ report, chartProps }) => {
   const { headers, rows } = report.table;
   let [highlightField, highlightValue] = (chartProps.highlight || "").split(
-    "="
+    "=",
   );
   let highlightRow = -1;
   if (highlightField) {
@@ -44,8 +44,8 @@ const TableReport = ({ report, chartProps }) => {
   if (highlightRow > -1) {
     highlightPage = Math.floor(highlightRow / defaultRowsPerPage);
   }
-  const [page, setPage] = React.useState(highlightPage);
-  const [rowsPerPage, setRowsPerPage] = React.useState(defaultRowsPerPage);
+  const [page, setPage] = useState(highlightPage);
+  const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -109,7 +109,7 @@ const TableReport = ({ report, chartProps }) => {
         rowArr.unshift(
           <Cell key="index" style={{ textAlign: "right" }}>
             {j + page * rowsPerPage + 1}
-          </Cell>
+          </Cell>,
         );
       }
 
@@ -188,5 +188,5 @@ const ReportTable = ({
 export default compose(
   withSiteName,
   dispatchMessage,
-  withReportTerm
+  withReportTerm,
 )(ReportTable);

@@ -25,5 +25,8 @@
   "yaml.schemas": {
     "swaggerviewer:openapi": "file:///Users/rchallis/projects/genomehubs/genomehubs/src/genomehubs-api/src/api-v2.yaml"
   },
-  "restructuredtext.pythonRecommendation.disabled": true
+  "restructuredtext.pythonRecommendation.disabled": true,
+  "python-envs.defaultEnvManager": "ms-python.python:conda",
+  "python-envs.defaultPackageManager": "ms-python.python:conda",
+  "python-envs.pythonProjects": []
 }

@@ -1,4 +1,4 @@
-import { Parser } from "json2csv";
+import { Parser } from "@json2csv/plainjs";
 
 export const formatCsv = async (response, opts) => {
   let fields = ["taxon_id", "taxon_rank", "scientific_name"];

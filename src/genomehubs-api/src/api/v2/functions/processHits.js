@@ -88,6 +88,12 @@ export const processHits = ({
     return value;
   };
 
+  const precisionRound = (number, precision) => {
+    const factor = Math.pow(10, precision);
+    const n = precision < 0 ? number * 1 : 0.01 / factor + number * 1;
+    return Math.round(n * factor) / factor;
+  };
+
   const setBucketValues = (value, bucketType, scaleFunc) => {
     let bucketValues = deepFind(value, "buckets").map((b) => b.key);
     let bucketLabels, hasRange;
@@ -97,7 +103,7 @@ export const processHits = ({
         // .replace(/(-01)*$/g, "")
       );
       hasRange = true;
-    } else if (!bucketType.endsWith("keyword")) {
+    } else if (!bucketType.endsWith("keyword") && bucketType == "geo_hex") {
       bucketLabels = bucketValues.map((v) =>
         bucketType == "date" ? v : sci(scaleFunc(v))
       );
@@ -304,10 +310,19 @@ export const processHits = ({
               if (ikey.match(/\.key$/)) {
                 name = inner_hit.fields[ikey][0];
               } else if (ikey.match(/_value$/) || ikey.match(/_value.raw$/)) {
+                let val = inner_hit.fields[ikey];
+                if (ikey == "attributes.geo_point_value") {
+                  val = val.map((v) =>
+                    v
+                      .split(/\s*,\s*/)
+                      .map((c) => precisionRound(c, 4))
+                      .join(", ")
+                  );
+                }
                 if (inner_hit.fields[ikey].length == 1) {
-                  field.value = inner_hit.fields[ikey][0];
+                  field.value = val[0];
                 } else {
-                  field.value = inner_hit.fields[ikey];
+                  field.value = val;
                 }
               } else if (ikey == "attributes.aggregation_source") {
                 if (
@@ -399,7 +414,10 @@ export const processHits = ({
               ...new Set(
                 value
                   .map((v) => {
-                    if (!fieldTypes[name].endsWith("keyword")) {
+                    if (
+                      !fieldTypes[name].endsWith("keyword") &&
+                      !fieldTypes[name] == "geo_hex"
+                    ) {
                       let i;
                       let val = fieldTypes[name] == "date" ? Date.parse(v) : v;
                       for (let [index, bucket] of buckets[

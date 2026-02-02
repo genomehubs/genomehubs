@@ -23,8 +23,13 @@ import sys
 
 from docopt import DocoptExit
 from docopt import docopt
-from pkg_resources import working_set
 from tolkein import tolog
+
+try:
+    from importlib.metadata import entry_points
+except ImportError:
+    # Python < 3.8 fallback
+    from importlib_metadata import entry_points
 
 from .lib.version import __version__
 
@@ -40,7 +45,16 @@ def cli():
             args = {"<command>": sys.argv[1]}
         if args["<command>"]:
             # load <command> from entry_points
-            for entry_point in working_set.iter_entry_points("genomehubs.subcmd"):
+            eps = entry_points()
+            # Handle both old and new entry_points() API
+            if hasattr(eps, "select"):
+                # New API (Python 3.10+)
+                subcommand_eps = eps.select(group="genomehubs.subcmd")
+            else:
+                # Old API (Python 3.8-3.9)
+                subcommand_eps = eps.get("genomehubs.subcmd", [])
+
+            for entry_point in subcommand_eps:
                 if entry_point.name == args["<command>"]:
                     subcommand = entry_point.load()
                     sys.exit(subcommand())

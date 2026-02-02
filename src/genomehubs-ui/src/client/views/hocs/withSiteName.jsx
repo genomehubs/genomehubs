@@ -1,12 +1,18 @@
-import { basename, siteName } from "../reducers/location";
+import {
+  getBasename,
+  getCitationUrl,
+  getSitename,
+  getSitenameLong,
+} from "#reducers/location";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withSiteName = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
-    siteName,
-    basename,
+    siteName: getSitename(),
+    siteNameLong: getSitenameLong(),
+    citationUrl: getCitationUrl(),
+    basename: getBasename(),
   });
 
   const Connected = connect(mapStateToProps)(WrappedComponent);

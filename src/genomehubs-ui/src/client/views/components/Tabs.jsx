@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import {
   nestedTab as nestedTabStyle,
   tabDiv as tabDivStyle,
@@ -7,8 +7,8 @@ import {
 import Markdown from "./Markdown";
 import NavLink from "./NavLink";
 import Tab from "./Tab";
-import { compose } from "recompose";
-import withRoutes from "../hocs/withRoutes";
+import { compose } from "redux";
+import withRoutes from "#hocs/withRoutes";
 
 const TabGroupComponent = ({
   routeName,
@@ -53,7 +53,11 @@ const Tabs = ({ group = "tabs" }) => {
       return <nav className={css}>{props.children}</nav>;
     },
     li: (props) => {
-      let routeName = props.children[0].replace(/\r?\n$/, "");
+      let tabChildren = props.children;
+      if (!Array.isArray(tabChildren)) {
+        tabChildren = [tabChildren];
+      }
+      let routeName = tabChildren[0].replace(/\r?\n$/, "");
       if (routeName.match(/\+/)) {
         return (
           <TabGroup

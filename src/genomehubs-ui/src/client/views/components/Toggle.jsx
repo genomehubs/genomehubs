@@ -1,15 +1,13 @@
-import React, { memo, useRef, useState } from "react";
+import { memo, useState } from "react";
 
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import FormHelperText from "@mui/material/FormHelperText";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Switch from "@mui/material/Switch";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
-import setColors from "../functions/setColors";
-import withColors from "../hocs/withColors";
-import withTheme from "../hocs/withTheme";
+import { compose } from "redux";
+import withColors from "#hocs/withColors";
+import withTheme from "#hocs/withTheme";
 
 const Toggle = ({
   toggle,

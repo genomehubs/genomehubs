@@ -19,6 +19,8 @@ common:
       - names.dmp
       - nodes.dmp
     path: tests/integration_tests/taxdump
+  taxon:
+    preload: true
 fill: {}
 index:
   taxonomy:

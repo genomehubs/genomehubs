@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import {
   plotArrow as plotArrowStyle,
   plotContainer as plotContainerStyle,
@@ -9,10 +9,10 @@ import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import StaticPlotFile from "./StaticPlotFile";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
-import withApi from "../hocs/withApi";
-import withFiles from "../hocs/withFiles";
-import withFilesByAnalysisId from "../hocs/withFilesByAnalysisId";
+import { compose } from "redux";
+import withApi from "#hocs/withApi";
+import withFiles from "#hocs/withFiles";
+import withFilesByAnalysisId from "#hocs/withFilesByAnalysisId";
 
 const StaticPlotFiles = ({
   analysisId,
@@ -152,5 +152,5 @@ export default compose(
   memo,
   withApi,
   withFiles,
-  withFilesByAnalysisId
+  withFilesByAnalysisId,
 )(StaticPlotFiles);

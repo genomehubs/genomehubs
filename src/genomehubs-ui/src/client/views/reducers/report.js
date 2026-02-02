@@ -15,8 +15,9 @@ const reportsSlice = createSlice({
   reducers: {
     requestReport(state, action) {
       state.isFetching = true;
-      state.byId[action.payload.routeName] = action.payload;
-      state.allIds.push(action.payload.routeName);
+      state.requestedById[action.payload] = true;
+      // state.byId[action.payload.routeName] = action.payload;
+      // state.allIds.push(action.payload.routeName);
     },
     receiveReport(state, action) {
       const { json, reportId } = action.payload;

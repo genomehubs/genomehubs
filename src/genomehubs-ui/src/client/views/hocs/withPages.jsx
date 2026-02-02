@@ -1,11 +1,10 @@
-import { cancelPages, getPages } from "../reducers/pages";
+import { cancelPages, getPages } from "#reducers/pages";
 import {
   fetchPages,
   getPagesById,
   getPagesIsFetchingById,
-} from "../selectors/pages";
+} from "#selectors/pages";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withPages = (WrappedComponent) => (props) => {
@@ -15,7 +14,7 @@ const withPages = (WrappedComponent) => (props) => {
         pagesById: getPagesById(state, props.pgId || props.pageId),
         pagesIsFetching: getPagesIsFetchingById(
           state,
-          props.pgId || props.pageId
+          props.pgId || props.pageId,
         ),
       };
     } else {
@@ -32,7 +31,7 @@ const withPages = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

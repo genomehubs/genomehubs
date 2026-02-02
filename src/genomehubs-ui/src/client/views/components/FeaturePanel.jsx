@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import {
   header as headerStyle,
   infoPanel1Column as infoPanel1ColumnStyle,
@@ -6,14 +5,15 @@ import {
   resultPanel as resultPanelStyle,
   title as titleStyle,
 } from "./Styles.scss";
+import { useEffect, useState } from "react";
 
 import BasicSelect from "./BasicSelect";
 import FeatureSummaryPanel from "./FeatureSummaryPanel";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import { Template } from "./Markdown";
 import classnames from "classnames";
-import { compose } from "recompose";
-import withRecord from "../hocs/withRecord";
+import { compose } from "redux";
+import withRecord from "#hocs/withRecord";
 
 const FeaturePanel = ({
   record,

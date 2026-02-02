@@ -1,9 +1,9 @@
 import MuiTooltip, { tooltipClasses } from "@mui/material/Tooltip";
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 
-import { compose } from "recompose";
+import { compose } from "redux";
 import { styled } from "@mui/material/styles";
-import { useEventListener } from "../hooks/useEventListener";
+import { useEventListener } from "#hooks/useEventListener";
 import withTheme from "#hocs/withTheme";
 
 const DarkTooltip = styled(({ className, ...props }) => (

@@ -1,5 +1,6 @@
 import { addCondition } from "./addCondition.js";
 import { attrTypes } from "./attrTypes.js";
+import { combineOrQueries } from "./combineOrQueries.js";
 import { getRecordsByTaxon } from "./getRecordsByTaxon.js";
 import { indexName } from "./indexName.js";
 import { logError } from "./logger.js";
@@ -92,6 +93,7 @@ const validateOperator = (term, types, meta) => {
   const operators = new Set(["!=", "<", "<=", "=", "==", ">=", ">"]);
   if (term.match(/[<>=]/)) {
     let parts = term.split(/\s*([!]*[<>=]=*)\s*/);
+
     if (parts.length > 3 || !operators.has(parts[1])) {
       return fail(`invalid operator in ${term}`);
     }
@@ -200,7 +202,7 @@ const validateTerm = (term, types) => {
             attribute: "taxonomy",
             type: parts[0],
           },
-          types
+          types,
         ),
       };
     }
@@ -269,7 +271,11 @@ const validateTerm = (term, types) => {
   return { parts, validation: { success: true } };
 };
 
-export const generateQuery = async ({
+/**
+ * Generate query for a single query string (no OR)
+ * Handles all the parsing and parameter extraction
+ */
+const generateSingleQuery = async ({
   query,
   result,
   taxonomy,
@@ -293,6 +299,7 @@ export const generateQuery = async ({
   update,
   bounds = {},
   aggregations,
+  index,
 }) => {
   let { lookupTypes } = await attrTypes({ ...query, taxonomy });
   fields = await parseFields({ result, fields, taxonomy });
@@ -321,6 +328,7 @@ export const generateQuery = async ({
   let excludeDirect = new Set();
   let excludeDescendant = new Set();
   let excludeAncestral = new Set();
+
   if (query && query.match(/\n/) && query.split(/\n/)[1] > "") {
     multiTerm = query
       .toLowerCase()
@@ -332,12 +340,15 @@ export const generateQuery = async ({
     if (result != "file") {
       query = query.toLowerCase();
     }
+    if (lookupTypes[result]("data_freeze") && !query.match(/\bdata_freeze\b/)) {
+      query += " and data_freeze=latest";
+    }
     for (let term of query.split(/\s+and\s+/)) {
       let parts, validation, subset;
       try {
         ({ parts, validation, subset } = validateTerm(
           term,
-          lookupTypes[result]
+          lookupTypes[result],
         ));
       } catch (err) {
         validation = fail(`unable to validate query term ${term}`);
@@ -423,7 +434,7 @@ export const generateQuery = async ({
                 subset,
                 summary,
                 fields,
-                optionalFields
+                optionalFields,
               );
             }
             if (!parts[3].match(/^!/) && parts[4].match(/^null$/)) {
@@ -631,6 +642,192 @@ export const generateQuery = async ({
   }
 };
 
+/**
+ * Wrapper function that detects OR patterns and combines them into a single query
+ * Strategy: Strip all inner_hits and combine with should clauses
+ */
+export const generateQuery = async (params) => {
+  const { query } = params;
+
+  // Check if query contains OR (case insensitive)
+  if (query && typeof query === "string" && query.match(/\s+or\s+/i)) {
+    // Split by OR and generate query for each part
+    let orParts = query.split(/\s+or\s+/i).map((q) => q.trim());
+
+    // Strip outer parentheses from each OR part if present
+    orParts = orParts.map((part) => {
+      if (part.startsWith("(") && part.endsWith(")")) {
+        // Check if these are matching parentheses at the boundaries
+        let depth = 0;
+        let isMatching = true;
+        for (let i = 0; i < part.length; i++) {
+          if (part[i] === "(") depth++;
+          if (part[i] === ")") depth--;
+          // If depth goes to 0 before the end, these aren't matching outer parens
+          if (depth === 0 && i < part.length - 1) {
+            isMatching = false;
+            break;
+          }
+        }
+        if (isMatching && depth === 0) {
+          return part.substring(1, part.length - 1);
+        }
+      }
+      return part;
+    });
+
+    // Capture params now for use in the func closure
+    const capturedParams = params;
+    // Return a special function that combines OR queries into a single ES query
+    return {
+      func: async (callParams) => {
+        try {
+          const { searchByTaxon } = await import("../queries/searchByTaxon.js");
+          const { client } = await import("./connection.js");
+          const { checkResponse } = await import("./checkResponse.js");
+          const { processHits } = await import("./processHits.js");
+          const { attrTypes } = await import("./attrTypes.js");
+
+          // Build query structures for each OR part
+          const orQueryBodies = [];
+
+          for (let i = 0; i < orParts.length; i++) {
+            const orQuery = orParts[i];
+
+            // Generate the query structure for this OR part
+            const orResult = await generateSingleQuery({
+              ...capturedParams,
+              query: orQuery,
+            });
+
+            // Extract the parameters
+            if (!orResult || !orResult.params) {
+              return (
+                orResult || {
+                  status: {
+                    success: false,
+                    error: `Failed to process OR part ${i}: ${orQuery}`,
+                  },
+                  results: [],
+                }
+              ); // Error case - propagate
+            }
+
+            // Call searchByTaxon to get the Elasticsearch query structure
+            const taxonQuery = await searchByTaxon(orResult.params);
+
+            if (!taxonQuery) {
+              return {
+                status: {
+                  success: false,
+                  error: `Failed to build query for OR part ${i}: ${orQuery}`,
+                },
+                results: [],
+              };
+            }
+
+            orQueryBodies.push(taxonQuery);
+          }
+
+          if (orQueryBodies.length === 0) {
+            return {
+              status: { success: false, error: "No OR queries generated" },
+              results: [],
+            };
+          }
+
+          // Combine queries with OR logic (should clause), stripping inner_hits
+          const combinedQuery = combineOrQueries(orQueryBodies);
+
+          // Now execute the combined query against Elasticsearch
+          let { index } = callParams;
+          const searchParams = {
+            index,
+            body: combinedQuery,
+            rest_total_hits_as_int: true,
+          };
+
+          let body;
+          try {
+            const response = await client.search(searchParams, { meta: true });
+            body = response.body;
+          } catch (esErr) {
+            return {
+              status: {
+                success: false,
+                error: `Elasticsearch error: ${esErr.message}`,
+              },
+              results: [],
+            };
+          }
+
+          // Process the results like getRecordsByTaxon does
+          let results = [];
+          let aggs;
+          let status = checkResponse({ body });
+
+          let { typesMap, lookupTypes } = await attrTypes({
+            result: capturedParams.result,
+            taxonomy: capturedParams.taxonomy,
+          });
+
+          // Set size and offset in status
+          status.size = capturedParams.size;
+          status.offset = capturedParams.offset || 0;
+
+          // Add aggregations if they exist
+          if (capturedParams.aggregations && !body.aggregations) {
+            body.aggregations = capturedParams.aggregations;
+          }
+
+          // Process hits if there are any
+          if (status.hits) {
+            results = processHits({
+              body,
+              inner_hits: true,
+              lca: capturedParams.lca,
+              names: capturedParams.names,
+              ranks: capturedParams.ranks,
+              fields: capturedParams.fields,
+              lookupTypes,
+              bounds: capturedParams.bounds,
+            });
+            if (body.aggregations) {
+              aggs = body.aggregations;
+            }
+          }
+
+          return {
+            status,
+            results,
+            aggs,
+            fields: capturedParams.fields,
+            query: combinedQuery,
+          };
+        } catch (err) {
+          console.error("OR Handler Error:", err);
+          logError({
+            message: `OR Handler Error: ${err.message || err}`,
+            stack: err.stack,
+            ...(capturedParams.req && { req: capturedParams.req }),
+          });
+          return {
+            status: {
+              success: false,
+              error: `OR Handler Error: ${err.message || String(err)}`,
+            },
+            results: [],
+          };
+        }
+      },
+      params: {},
+    };
+  }
+
+  // No OR pattern, use standard single query generation
+  return generateSingleQuery(params);
+};
+
 export const chainQueries = async ({
   query,
   result,
@@ -697,9 +894,11 @@ export const getResults = async (params) => {
       params.query = await chainQueries(params);
     }
   } catch (error) {
-    let { errorString } = error;
-    if (typeof message == "object") {
-      errorString = JSON.stringify(message);
+    let errorString;
+    if (typeof error === "object") {
+      errorString = error.message || JSON.stringify(error);
+    } else {
+      errorString = String(error);
     }
     logError({ req: params.req, message: error });
     return {
@@ -712,5 +911,5 @@ export const getResults = async (params) => {
   }
   let index = indexName({ ...params });
   let query = await generateQuery({ ...params, index });
-  return query.func({ index, ...query.params });
+  return await query.func({ index, ...query.params });
 };

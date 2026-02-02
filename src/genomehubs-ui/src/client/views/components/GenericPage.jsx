@@ -1,7 +1,6 @@
 import Page from "./Page";
-import React from "react";
 import TextPanel from "./TextPanel";
-import { pagesUrl } from "../selectors/pages";
+import { pagesUrl } from "#selectors/pages";
 
 const GenericPage = ({ pageId, ...props }) => {
   if (!pageId) {

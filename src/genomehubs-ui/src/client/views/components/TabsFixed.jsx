@@ -1,8 +1,7 @@
-import React, { memo } from "react";
-
 import NavLink from "./NavLink";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
+import { memo } from "react";
 import { tabHolder as tabHolderStyle } from "./Styles.scss";
 
 const TabsFixed = () => {

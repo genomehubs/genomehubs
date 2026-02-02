@@ -1,5 +1,3 @@
-import React from "react";
-
 export const CellInfo = ({ x, y, count, rows }) => {
   return (
     <div>

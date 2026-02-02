@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   blackToAncestral as blackToAncestralStyle,
   blackToDescendant as blackToDescendantStyle,
@@ -7,8 +6,9 @@ import {
 } from "./Styles.scss";
 
 import Skeleton from "@mui/material/Skeleton";
-import { compose } from "recompose";
-import withApi from "../hocs/withApi";
+import { compose } from "redux";
+import { useState } from "react";
+import withApi from "#hocs/withApi";
 
 const styleMap = {
   blackToAncestralStyle,

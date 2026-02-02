@@ -1,6 +1,5 @@
-import React from "react";
 import { connect } from "react-redux";
-import { getReportDefaults } from "../selectors/report";
+import { getReportDefaults } from "#selectors/report";
 
 const withReportDefaults = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({

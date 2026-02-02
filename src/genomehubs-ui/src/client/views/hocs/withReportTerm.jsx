@@ -5,9 +5,8 @@ import {
   setReportEdit,
   setReportSelect,
   setReportTerm,
-} from "../reducers/report";
+} from "#reducers/report";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withReportTerm = (WrappedComponent) => (props) => {
@@ -24,7 +23,7 @@ const withReportTerm = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

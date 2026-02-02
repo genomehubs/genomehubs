@@ -20,8 +20,8 @@ import {
 import batlow from "./color/batlow";
 import batlowS from "./color/batlowS";
 import { createSelector } from "reselect";
-import immutableUpdate from "immutable-update";
-import { mixColor } from "../functions/mixColor";
+import { mixColor } from "#functions/mixColor";
+import { produce } from "immer";
 
 const ANCESTRAL_COLOR =
   typeof ANCESTRAL_COLOR !== "undefined" ? ANCESTRAL_COLOR : "#db4325";
@@ -142,9 +142,9 @@ export const defaultPalettes = {
 export const palettes = handleActions(
   {
     ADD_PALETTE: (state, action) =>
-      immutableUpdate(state, {
-        byId: { [action.payload.id]: action.payload },
-        allIds: [...state.allIds, action.payload.id],
+      produce(state, (draft) => {
+        draft.byId[action.payload.id] = action.payload;
+        draft.allIds = [...state.allIds, action.payload.id];
       }),
     EDIT_PALETTE: (state, action) => {
       let { id } = action.payload;
@@ -154,10 +154,8 @@ export const palettes = handleActions(
           arr[i] = col;
         }
       });
-      return immutableUpdate(state, {
-        byId: {
-          [id]: arr,
-        },
+      return produce(state, (draft) => {
+        draft.byId[id] = arr;
       });
     },
   },

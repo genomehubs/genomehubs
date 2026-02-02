@@ -1,6 +1,5 @@
-import React from "react";
 import { connect } from "react-redux";
-import { setSuggestedTerms } from "../reducers/search";
+import { setSuggestedTerms } from "#reducers/search";
 
 const dispatchTerms = (WrappedComponent) => (props) => {
   const mapDispatchToProps = (dispatch) => ({

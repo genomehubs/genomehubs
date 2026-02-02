@@ -1,14 +1,13 @@
-import React, { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 import BasicMenu from "./BasicMenu";
-import { compose } from "recompose";
-import dispatchMessage from "../hocs/dispatchMessage";
-import dispatchRecord from "../hocs/dispatchRecord";
-import qs from "../functions/qs";
-import { setMessage } from "../reducers/message";
-import { useNavigate } from "@reach/router";
-import withApi from "../hocs/withApi";
-import withTaxonomy from "../hocs/withTaxonomy";
+import { compose } from "redux";
+import dispatchMessage from "#hocs/dispatchMessage";
+import dispatchRecord from "#hocs/dispatchRecord";
+import qs from "#functions/qs";
+import useNavigate from "#hooks/useNavigate";
+import withApi from "#hocs/withApi";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 const Taxonomy = ({
   apiStatus,
@@ -33,7 +32,7 @@ const Taxonomy = ({
           setDuration(duration);
           fetchTaxonomies();
         },
-        apiStatus ? 100 : duration
+        apiStatus ? 100 : duration,
       );
       setDuration(attempt * multiple * interval);
       return () => clearTimeout(timer);
@@ -48,7 +47,7 @@ const Taxonomy = ({
         severity: "info",
       });
     } else {
-      if (duration < attempt * multiple * interval) {
+      if (duration >= 1000 && duration < attempt * multiple * interval) {
         setMessage({
           message: `Unable to connect to API, retrying in ${duration / 1000}s`,
           duration: duration + interval,
@@ -89,5 +88,5 @@ export default compose(
   withApi,
   dispatchMessage,
   withTaxonomy,
-  dispatchRecord
+  dispatchRecord,
 )(Taxonomy);

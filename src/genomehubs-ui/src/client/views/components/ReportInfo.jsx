@@ -1,8 +1,7 @@
-import Grid from "@mui/material/Grid2";
-import React from "react";
+import Grid from "@mui/material/Grid";
 import ReportLegend from "./ReportLegend";
-import { compose } from "recompose";
-import withReportById from "../hocs/withReportById";
+import { compose } from "redux";
+import withReportById from "#hocs/withReportById";
 
 export const ReportInfo = ({ reportById, report }) => {
   if (!reportById.report || !reportById.report[report]) {

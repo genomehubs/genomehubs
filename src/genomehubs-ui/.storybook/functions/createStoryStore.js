@@ -1,6 +1,6 @@
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+
 import { enableBatching } from "redux-batched-actions";
-import { thunk as thunkMiddleware } from "redux-thunk";
 
 /**
  * @param {Object[]} reducerModules - Array of reducer objects to combine
@@ -10,15 +10,13 @@ import { thunk as thunkMiddleware } from "redux-thunk";
  */
 export const createStoryStore = (reducerModules) => {
   const combinedReducers = {};
-  reducerModules.forEach(module => {
+  reducerModules.forEach((module) => {
     Object.assign(combinedReducers, module);
   });
-  
+
   const rootReducer = combineReducers(combinedReducers);
 
   return configureStore({
     reducer: enableBatching(rootReducer),
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(thunkMiddleware),
   });
 };

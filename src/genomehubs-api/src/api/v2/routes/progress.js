@@ -4,7 +4,8 @@ import { logError } from "../functions/logger.js";
 
 export const getProgress = async (req, res) => {
   try {
-    let { queryId } = req.query;
+    const q = req.expandedQuery || req.query || {};
+    let { queryId } = q;
     let progress = getQueryProgress(queryId);
     let response;
     if (queryId) {
@@ -19,7 +20,8 @@ export const getProgress = async (req, res) => {
       };
     }
     //response = await getRecordsById(req.query);
-    return res.status(200).send(formatJson(response, req.query.indent));
+    const q2 = req.expandedQuery || req.query || {};
+    return res.status(200).send(formatJson(response, q2.indent));
   } catch (message) {
     logError({ req, message });
     return res.status(400).send({ status: "error" });

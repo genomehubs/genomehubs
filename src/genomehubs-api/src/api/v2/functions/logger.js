@@ -14,7 +14,7 @@ const errorTransport = new transports.DailyRotateFile({
     errors({ stack: true }),
     colorize(),
     timestamp(),
-    prettyPrint()
+    prettyPrint(),
   ),
   datePattern: "YYYY-MM-DD",
   zippedArchive: true,
@@ -30,7 +30,24 @@ const accessTransport = new transports.DailyRotateFile({
   filename: config.accessLog,
   format: combine(
     timestamp(),
-    printf((info) => `${info.level}: ${[info.timestamp]}: ${info.message}`)
+    printf((info) => {
+      let msg = info.message;
+      try {
+        if (msg && typeof msg === "object") {
+          msg = JSON.stringify(msg);
+        }
+      } catch (e) {
+        try {
+          // fallback to util.inspect for circular objects
+          // require here to avoid top-level dependency if not needed
+          const util = require("util");
+          msg = util.inspect(info.message, { depth: 5 });
+        } catch (e2) {
+          msg = String(info.message);
+        }
+      }
+      return `${info.level}: ${[info.timestamp]}: ${msg}`;
+    }),
   ),
   datePattern: "YYYY-MM-DD",
   zippedArchive: true,

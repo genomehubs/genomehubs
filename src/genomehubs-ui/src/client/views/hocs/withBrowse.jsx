@@ -1,8 +1,7 @@
-import { getBrowse, setBrowseStatus } from "../reducers/record";
+import { getBrowse, setBrowseStatus } from "#reducers/record";
 
-import React from "react";
 import { connect } from "react-redux";
-import { updateBrowse } from "../selectors/record";
+import { updateBrowse } from "#selectors/record";
 
 const withBrowse = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
@@ -20,7 +19,7 @@ const withBrowse = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

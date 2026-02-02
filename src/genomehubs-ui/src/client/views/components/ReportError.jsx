@@ -1,17 +1,14 @@
-// import { RadialChart } from "react-vis";
-import React, { Fragment, useRef } from "react";
-
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Logo from "./Logo";
-import { compose } from "recompose";
-import withColors from "../hocs/withColors";
+import { compose } from "redux";
+import withColors from "#hocs/withColors";
 
 const ReportError = ({ report, error, statusColors, inModal }) => {
   if (error == "x_content_parse_exception") {
     error = "Error processing search query";
   }
   return (
-    (<Grid
+    <Grid
       style={{
         height: "100%",
         background: statusColors.ancestral + "cc",
@@ -77,7 +74,7 @@ const ReportError = ({ report, error, statusColors, inModal }) => {
           </div>
         </>
       )}
-    </Grid>)
+    </Grid>
   );
 };
 

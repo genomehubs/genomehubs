@@ -1,10 +1,9 @@
-import { useLocation, useNavigate } from "@reach/router";
-
 import ColorButton from "./ColorButton";
 import LinkIcon from "@mui/icons-material/Link";
-import React from "react";
-import { compose } from "recompose";
-import withSiteName from "../hocs/withSiteName";
+import { compose } from "redux";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
+import withSiteName from "#hocs/withSiteName";
 
 const LinkButton = ({ options, basename }) => {
   const location = useLocation();
@@ -17,7 +16,7 @@ const LinkButton = ({ options, basename }) => {
     } else {
       pathname = options[0];
     }
-    navigate(`${basename}/${pathname}${location.search}${location.hash}}`);
+    navigate(`/${pathname}${location.search}${location.hash}}`);
   };
 
   return (

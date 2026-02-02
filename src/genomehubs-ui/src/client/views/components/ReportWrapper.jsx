@@ -1,10 +1,9 @@
 import LaunchIcon from "@mui/icons-material/Launch";
-import React from "react";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
-import { useNavigate } from "@reach/router";
-import withApi from "../hocs/withApi";
-import withSiteName from "../hocs/withSiteName";
+import { compose } from "redux";
+import useNavigate from "#hooks/useNavigate";
+import withApi from "#hocs/withApi";
+import withSiteName from "#hocs/withSiteName";
 
 export const ReportWrapper = ({
   reportId,
@@ -18,7 +17,7 @@ export const ReportWrapper = ({
     report === "sources" ? true : report === "types" ? true : disableModal;
 
   const handleClick = () => {
-    navigate(`${basename}/report?${reportId}`);
+    navigate(`/report?${reportId}`);
   };
 
   return (
@@ -51,6 +50,7 @@ export const ReportWrapper = ({
               position: "absolute",
               marginRight: "0.25em",
               cursor: "pointer",
+              zIndex: 1000,
             }}
           >
             <LaunchIcon />

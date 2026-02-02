@@ -19,12 +19,6 @@ npm version --no-git-tag-version $LEVEL &&
 
 cd - &&
 
-cd src/packaged-ui &&
-
-npm version --no-git-tag-version $LEVEL &&
-
-cd - &&
-
 git commit -a -m "bump UI/API version"
 
 bump2version $LEVEL

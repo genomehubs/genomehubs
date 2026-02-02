@@ -1,5 +1,5 @@
-import { formatJson } from "../functions/formatJson.js";
 import { fetchTaxonomicRanks } from "../functions/fetchTaxonomicRanks.js";
+import { formatJson } from "../functions/formatJson.js";
 
 export const getTaxonomicRanks = async (req, res) => {
   let status = {};
@@ -24,7 +24,8 @@ export const getTaxonomicRanks = async (req, res) => {
   took = Date.now() - start;
 
   const response = { status, ranks, took };
+  const q = req.expandedQuery || req.query || {};
   return res
     .status(status.success ? 200 : 500)
-    .send(formatJson(response, req.query.indent));
+    .send(formatJson(response, q.indent));
 };

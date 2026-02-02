@@ -1,32 +1,35 @@
-import { apiUrl, setApiStatus } from "../reducers/api";
-import formats, { setInterval } from "../functions/formats";
+import { apiUrl, setApiStatus } from "#reducers/api";
+import formats, { setInterval } from "#functions/formats";
 import {
   getReports,
   getReportsFetching,
   receiveReport,
   requestReport,
-} from "../reducers/report";
+} from "#reducers/report";
 import {
   getSearchIndex,
   getSearchResults,
   getSearchTerm,
   plurals,
-} from "../reducers/search";
-import { resetController, setMessage } from "../reducers/message";
+} from "#reducers/search";
+import { resetController, setMessage } from "#reducers/message";
 
-import { byIdSelectorCreator } from "../reducers/selectorCreators";
+import { byIdSelectorCreator } from "#reducers/selectorCreators";
 import { checkProgress } from "./checkProgress";
 import { createCachedSelector } from "re-reselect";
 import { createSelector } from "reselect";
 // import { format } from "d3-format";
-import { getTypes } from "../reducers/types";
-import { mapThreshold } from "../reducers/map";
+import { getTypes } from "#reducers/types";
+import { mapThreshold } from "#reducers/map";
+import md5 from "md5";
 import { nanoid } from "nanoid";
 import { processTree } from "./tree";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import { scaleOrdinal } from "d3-scale";
-import store from "../store";
-import { treeThreshold } from "../reducers/tree";
+import store from "#store";
+import { treeThreshold } from "#reducers/tree";
+
+const SESSION_ID = nanoid(10);
 
 export const sortReportQuery = ({ queryString, options, ui = true }) => {
   const reportTerms = {
@@ -104,6 +107,13 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     cumulative: { in: new Set(["histogram", "table"]), ui: true },
     reversed: { in: new Set(["scatter"]), ui: true },
     mapThreshold: { in: new Set(["map"]) },
+    locationField: { in: new Set(["map"]) },
+    regionField: { in: new Set(["map"]) },
+    geoBounds: { in: new Set(["map"]) },
+    mapType: { in: new Set(["map"]), ui: true },
+    mapTheme: { in: new Set(["map"]), ui: true },
+    mapProjection: { in: new Set(["map"]), ui: true },
+    geoBinResolution: { in: new Set(["map"]) },
     treeThreshold: { in: new Set(["tree"]) },
     queryId: {
       in: new Set([
@@ -174,11 +184,8 @@ export function fetchReport({
       queryString += `&mapThreshold=${mapThreshold}`;
     }
     let apiQueryString = sortReportQuery({ queryString, ui: false });
-    const queryId = nanoid(10);
-    let url = `${apiUrl}/report?${apiQueryString.replace(
-      /^\?/,
-      "",
-    )}&queryId=${queryId}`;
+    const queryId = md5(`${SESSION_ID}:${reportId}`).substring(0, 10);
+    let url = `${apiUrl}/report?${apiQueryString.replace(/^\?/, "")}&queryId=${queryId}`;
     try {
       let json;
       let status;
@@ -796,9 +803,18 @@ const _getReportIdAsMemoKey = (_state, reportId) => {
   return reportId;
 };
 
-const getReport = (state, reportId) => {
-  return state.reports.byId[reportId] || {};
-};
+const getReport = (() => {
+  const cache = new Map();
+  return (state, reportId) => {
+    const key = JSON.stringify([state.reports.byId[reportId], reportId]);
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+    const result = state.reports.byId[reportId] || {};
+    cache.set(key, result);
+    return result;
+  };
+})();
 
 export const cacheReportByReportId = createSelectorForReportId(
   _getReportIdAsMemoKey,

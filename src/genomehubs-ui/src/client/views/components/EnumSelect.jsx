@@ -1,7 +1,6 @@
 import BasicSelect from "./BasicSelect";
-import React from "react";
-import { compose } from "recompose";
-import withTypes from "../hocs/withTypes";
+import { compose } from "redux";
+import withTypes from "#hocs/withTypes";
 
 const EnumSelect = ({ enumValues, types, allTypes, ...props }) => {
   let values = "";

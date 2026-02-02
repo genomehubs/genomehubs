@@ -1,25 +1,26 @@
 import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
-import { path as d3Path, pathRound } from "d3-path";
-import formats, { setInterval } from "../functions/formats";
-import stringLength, { maxStringLength } from "../functions/stringLength";
-import { useLocation, useNavigate } from "@reach/router";
+import formats, { setInterval } from "#functions/formats";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
+import stringLength, { maxStringLength } from "#functions/stringLength";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import PointInfo from "./PointInfo";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
-import dispatchMessage from "../hocs/dispatchMessage";
-import { fadeColor } from "../functions/fadeColor";
-import qs from "../functions/qs";
+import { compose } from "redux";
+import dispatchMessage from "#hocs/dispatchMessage";
+import { fadeColor } from "#functions/fadeColor";
+import { pathRound } from "d3-path";
+import qs from "#functions/qs";
 import { scaleLinear } from "d3-scale";
-import setColors from "../functions/setColors";
-import truncate from "../functions/truncate";
+import setColors from "#functions/setColors";
+import truncate from "#functions/truncate";
+import { useLocation } from "@reach/router";
 import { useLongPress } from "use-long-press";
-import useResize from "../hooks/useResize";
-import withColors from "../hocs/withColors";
-import withReportTerm from "../hocs/withReportTerm";
-import withSiteName from "../hocs/withSiteName";
+import useNavigate from "#hooks/useNavigate";
+import useResize from "#hooks/useResize";
+import withColors from "#hocs/withColors";
+import withReportTerm from "#hocs/withReportTerm";
+import withSiteName from "#hocs/withSiteName";
 
 const searchByPoint = ({ props, chartProps }) => {
   let { xQuery, fields, ranks, groupBy, navigate, basename, bounds, yBounds } =
@@ -42,7 +43,7 @@ const searchByPoint = ({ props, chartProps }) => {
   });
 
   navigate(
-    `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
+    `search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
       pointQuery,
     )}`,
   );
@@ -92,8 +93,15 @@ const Ribbon = ({
     let { search } = location;
 
     let { x, query = x } = search;
-    let options = qs.parse(search.replace(/^\?/, ""));
-    let queryParts = (options.query || options.x)
+    let xQuery = { ...(chartProps.xQuery || {}) };
+    xQuery.report = chartProps.report;
+    xQuery.x = xQuery.query || xQuery.x || query || "";
+    delete xQuery.query;
+    let options = {
+      ...xQuery,
+      ...(qs.parse(search.replace(/^\?/, "")) || {}),
+    };
+    let queryParts = (options.query || options.x || "")
       .split(" AND ")
       .filter((part) => !part.startsWith("sequence_id"));
     let newQuery =
@@ -106,7 +114,7 @@ const Ribbon = ({
     });
 
     navigate(
-      `${basename}/search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
+      `search?${queryString.replace(/^\?/, "")}#${encodeURIComponent(
         newQuery,
       )}`,
     );
@@ -331,13 +339,15 @@ const Ribbon = ({
         stats: cats[i],
       };
       legend.push(
-        MultiCatLegend({
-          ...legendProps,
-          offset,
-          row,
-          handleClick,
-          active: currentSeries === i,
-        }),
+        <g key={`item-${i}`}>
+          {MultiCatLegend({
+            ...legendProps,
+            offset,
+            row,
+            handleClick,
+            active: currentSeries === i,
+          })}
+        </g>,
       );
     }
     // dropShadow = currentSeries !== false && currentSeries == i;

@@ -1,12 +1,12 @@
-import React, { memo, useRef } from "react";
+import { memo, useRef } from "react";
 
 import ReportItem from "./ReportItem";
-import { compose } from "recompose";
-import qs from "../functions/qs";
-import { sortReportQuery } from "../selectors/report";
+import { compose } from "redux";
+import qs from "#functions/qs";
+import { sortReportQuery } from "#selectors/report";
 import { useLocation } from "@reach/router";
-import useResize from "../hooks/useResize";
-import withTaxonomy from "../hocs/withTaxonomy";
+import useResize from "#hooks/useResize";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 export const queryPropList = [
   "result",
@@ -19,7 +19,7 @@ export const queryPropList = [
   "taxonomy",
   "includeEstimates",
   "treeStyle",
-  "phylopicRank",  
+  "phylopicRank",
   "phylopicSize",
 ];
 
@@ -34,16 +34,19 @@ const Report = ({
 }) => {
   const location = useLocation();
   // const reportRef = useRef();
+  const componentRef = useRef();
+  const { width, height } = useResize(componentRef);
+
   let options = qs.parse(location.search.replace(/^\?/, ""));
-  props.report = props.report.replace("xInY", "arc");
   let reportProps = { ...props };
+  reportProps.report = props.report.replace("xInY", "arc");
   let queryProps = {};
   if (options.taxonomy) {
     queryProps = { taxonomy: options.taxonomy };
   } else {
     queryProps = { taxonomy };
   }
-  if (!props.report) {
+  if (!props.report || !queryProps.taxonomy) {
     return null;
   }
   queryProps.report = props.report;
@@ -98,6 +101,13 @@ const Report = ({
   reportProps.yOpts = props.yOpts;
   reportProps.highlightArea = props.highlightArea;
   reportProps.mapThreshold = props.mapThreshold;
+  reportProps.locationField = props.locationField;
+  reportProps.regionField = props.regionField;
+  reportProps.geoBounds = props.geoBounds;
+  reportProps.mapType = props.mapType || "map";
+  reportProps.mapTheme = props.mapTheme;
+  reportProps.mapProjection = props.mapProjection || "mercator";
+  reportProps.geoBinResolution = props.geoBinResolution;
   reportProps.scatterThreshold = props.scatterThreshold;
   reportProps.treeThreshold = props.treeThreshold;
   reportProps.compactLegend = props.compactLegend;
@@ -113,8 +123,10 @@ const Report = ({
   reportProps.hideErrorBars = props.hideErrorBars;
   reportProps.hideAncestralBars = props.hideAncestralBars;
   reportProps.showPhylopics = props.showPhylopics;
-  reportProps.phylopicRank = props.phylopicRank;  
-  reportProps.phylopicSize = props.phylopicSize ? parseInt(props.phylopicSize) : undefined;
+  reportProps.phylopicRank = props.phylopicRank;
+  reportProps.phylopicSize = props.phylopicSize
+    ? parseInt(props.phylopicSize)
+    : undefined;
   reportProps.highlight = props.highlight;
   reportProps.colorPalette = props.colorPalette;
   reportProps.excludeAncestral = props.excludeAncestral;
@@ -126,8 +138,6 @@ const Report = ({
     props.caption || qs.parse(reportProps.queryString).caption;
   reportProps.id = props.id || queryProps.report;
 
-  const componentRef = useRef();
-  const { width, height } = useResize(componentRef);
   let minDim = Math.floor(width);
   if (height) {
     minDim = Math.floor(Math.min(width, height));

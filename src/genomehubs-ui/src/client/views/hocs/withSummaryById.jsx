@@ -1,6 +1,5 @@
-import React from "react";
 import { connect } from "react-redux";
-import { getSummaryBySummaryId } from "../selectors/explore";
+import { getSummaryBySummaryId } from "#selectors/explore";
 
 const withSummaryById = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({

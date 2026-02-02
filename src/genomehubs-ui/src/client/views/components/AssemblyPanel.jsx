@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import {
   header as headerStyle,
   infoPanel1Column as infoPanel1ColumnStyle,
@@ -6,18 +5,20 @@ import {
   resultPanel as resultPanelStyle,
   title as titleStyle,
 } from "./Styles.scss";
-import { useLocation, useNavigate } from "@reach/router";
 
 import AssemblySummaryPanel from "./AssemblySummaryPanel";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import { NamesList } from "./NamesPanel";
 import classnames from "classnames";
-import { compose } from "recompose";
-import dispatchLookup from "../hocs/dispatchLookup";
-import qs from "../functions/qs";
-import withRecord from "../hocs/withRecord";
-import withSearch from "../hocs/withSearch";
-import withSiteName from "../hocs/withSiteName";
+import { compose } from "redux";
+import dispatchLookup from "#hocs/dispatchLookup";
+import qs from "#functions/qs";
+import { useEffect } from "react";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
+import withRecord from "#hocs/withRecord";
+import withSearch from "#hocs/withSearch";
+import withSiteName from "#hocs/withSiteName";
 
 const AssemblyPanel = ({
   recordIsFetching,
@@ -66,7 +67,7 @@ const AssemblyPanel = ({
   const handleAssemblyClick = () => {
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/record?recordId=${assemblyId}&result=assembly&taxonomy=${
+      `record?recordId=${assemblyId}&result=assembly&taxonomy=${
         options.taxonomy || taxonomy
       }#${encodeURIComponent(assemblyId)}`,
     );

@@ -1,3 +1,5 @@
+import { useRef, useState } from "react";
+
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import ColorButton from "./ColorButton";
@@ -5,12 +7,11 @@ import ColorButtonGroup from "./ColorButtonGroup";
 import MenuItem from "@mui/material/MenuItem";
 import MenuList from "@mui/material/MenuList";
 import Paper from "@mui/material/Paper";
-import React from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
-import withSearch from "../hocs/withSearch";
-import withTaxonomy from "../hocs/withTaxonomy";
+import { compose } from "redux";
+import withSearch from "#hocs/withSearch";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 const indexList = ["taxon", "assembly", "sample", "feature"];
 
@@ -22,9 +23,9 @@ const SearchButton = ({
   handleClick = () => {},
 }) => {
   const options = indexList.filter((index) => indices.includes(index));
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef(null);
+  const [selectedIndex, setSelectedIndex] = useState(
     options.indexOf(searchIndex),
   );
 

@@ -1,20 +1,20 @@
 import { Circle, Group, Layer, Line, Rect, Stage, Text } from "react-konva";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import KonvaTooltip from "./KonvaTooltip";
 import PhyloPics from "./PhyloPics";
 import Skeleton from "@mui/material/Skeleton";
-import { compose } from "recompose";
-import formats from "../functions/formats";
-import { mixColor } from "../functions/mixColor";
+import { compose } from "redux";
+import formats from "#functions/formats";
+import { mixColor } from "#functions/mixColor";
 import { scaleLinear } from "d3-scale";
-import setColors from "../functions/setColors";
-import stringLength from "../functions/stringLength";
+import setColors from "#functions/setColors";
+import stringLength from "#functions/stringLength";
 import { useScrollPosition } from "@n8tb1t/use-scroll-position";
 import withColors from "#hocs/withColors";
-import withReportTerm from "../hocs/withReportTerm";
+import withReportTerm from "#hocs/withReportTerm";
 import withTheme from "#hocs/withTheme";
-import withTypes from "../hocs/withTypes";
+import withTypes from "#hocs/withTypes";
 
 const ReportTreePaths = ({
   lines,

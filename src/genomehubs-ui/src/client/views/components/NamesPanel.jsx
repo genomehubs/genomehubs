@@ -11,12 +11,12 @@ import {
   title as titleStyle,
 } from "./Styles.scss";
 
+import InfoIcon from "@mui/icons-material/Info";
 import LaunchIcon from "@mui/icons-material/Launch";
-import React from "react";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
-import { compose } from "recompose";
-import withRecord from "../hocs/withRecord";
+import { compose } from "redux";
+import withRecord from "#hocs/withRecord";
 
 const NameGroup = ({ title, names, sort, bold }) => {
   if (!names || names.length == 0) {
@@ -31,10 +31,26 @@ const NameGroup = ({ title, names, sort, bold }) => {
     if (source && source.length > 0) {
       sources = source.map((s, j) => <span key={j}>{s}</span>);
     }
+    if (typeof name === "string" && name.match(":")) {
+      let [prefix, rest] = name.split(":");
+      return (
+        <span key={i} style={{ whiteSpace: "nowrap", marginRight: "0.5em" }}>
+          <span
+            style={{
+              fontWeight: "normal",
+            }}
+          >
+            {prefix}:
+          </span>
+          <span style={{ fontWeight: "bold" }}>{rest}</span>
+          {sources ? <>{sources}</> : ""}
+        </span>
+      );
+    }
     return (
       <span key={i} className={classnames(nameStyle, bold && boldStyle)}>
         {name}
-        {sources ? <> {sources}</> : ""}
+        {sources ? <>{sources}</> : ""}
       </span>
     );
   });
@@ -54,6 +70,8 @@ export const NamesList = ({ names }) => {
     "common name",
     "synonym",
     "authority",
+    "merged taxon id",
+    "xref",
   ]);
   let extraClasses = [];
   let namesByClass = {};
@@ -67,35 +85,34 @@ export const NamesList = ({ names }) => {
 
     let source;
     let prefix;
-    if (obj.source_url) {
-      source = (
-        <a href={`${obj.source_url}`} target="_blank">
-          {nameClasses.has(sourceClass) ? "" : `${sourceClass} `}
-          <LaunchIcon fontSize="inherit" />
-        </a>
-      );
-    } else if (obj.source_stub) {
-      source = (
-        <a href={`${obj.source_stub}${name}`} target="_blank">
-          {nameClasses.has(sourceClass) ? "" : `${sourceClass} `}
-          <LaunchIcon fontSize="inherit" />
-        </a>
-      );
-    } else if (obj.source_url_stub) {
+    if (
+      obj.source_url_stub &&
+      (sourceClass == "xref" || sourceClass == "merged taxon id")
+    ) {
       if (obj.source) {
         prefix = `${obj.source}:`;
       }
       source = (
-        <a href={`${obj.source_url_stub}${name}`} target="_blank">
-          {nameClasses.has(sourceClass) ? "" : `${sourceClass} `}
-          <LaunchIcon fontSize="inherit" />
-        </a>
+        <Tooltip title={obj.source} placement="top" arrow>
+          <a
+            href={`${obj.source_url_stub}${name.replace(/^.+:/, "")}`}
+            target="_blank"
+          >
+            <LaunchIcon fontSize="inherit" />
+          </a>
+        </Tooltip>
       );
-    }
-    if (source && obj.source) {
-      source = (
-        <Tooltip title={obj.source} position="top" arrow>
-          {source}
+      // } else if (obj.source_url) {
+      //   source = (
+      //     <a href={`${obj.source_url}`} target="_blank">
+      //       <LaunchIcon fontSize="inherit" />
+      //     </a>
+      //   );
+      // }
+    } else if (obj.source) {
+      name = (
+        <Tooltip title={`source: ${obj.source}`} placement="top" arrow>
+          <span>{name}</span>
         </Tooltip>
       );
     }
@@ -130,8 +147,8 @@ export const NamesList = ({ names }) => {
   let extraGroups = [];
   for (let extraClass of extraClasses) {
     let names = namesByClass[extraClass];
-    extraGroups.push(
-      <NameGroup key={extraClass} title={extraClass} names={names} sort />
+    namesByClass[extraClass].push(
+      <NameGroup key={extraClass} title={extraClass} names={names} />,
     );
   }
   return (
@@ -162,17 +179,28 @@ export const NamesList = ({ names }) => {
             : ""
         }`}
         names={namesByClass["synonym"]}
-        sort
+        // sort
       />
       <NameGroup title="authority" names={namesByClass["authority"]} />
+      {namesByClass["merged taxon id"] && (
+        <NameGroup
+          title={`merged taxon id${
+            namesByClass["merged taxon id"].length > 1 ? "s" : ""
+          }`}
+          names={namesByClass["merged taxon id"]}
+          sort
+        />
+      )}
       {extraGroups}
-      <NameGroup
-        title={`link${
-          namesByClass["other"] && namesByClass["other"].length > 1 ? "s" : ""
-        }`}
-        names={namesByClass["other"]}
-        sort
-      />
+      {namesByClass["xref"] && namesByClass["xref"].length > 0 && (
+        <NameGroup
+          title={`xref${
+            namesByClass["xref"] && namesByClass["xref"].length > 1 ? "s" : ""
+          }`}
+          names={namesByClass["xref"]}
+          sort
+        />
+      )}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-import React, { memo, useState } from "react";
 import {
   fillParent as fillParentStyle,
   fixedArSixteenNine as fixedArSixteenNineStyle,
@@ -10,14 +9,12 @@ import {
   infoPaneHoverReveal as infoPaneHoverRevealStyle,
   infoPane as infoPaneStyle,
 } from "./Styles.scss";
+import { memo, useState } from "react";
 
-// import loadable from "@loadable/component";
 import InfoCard from "./InfoCard";
 import { Link } from "@reach/router";
 import classnames from "classnames";
-import { compose } from "recompose";
-
-// const InfoCard = loadable(() => import("./InfoCard"));
+import { compose } from "redux";
 
 const InfoPane = (props) => {
   const [hover, setHover] = useState(false);
@@ -27,7 +24,7 @@ const InfoPane = (props) => {
     infoPaneStyle,
     infoPaneDefaultStyle,
     fixedArStyle,
-    fixedArSixteenNineStyle
+    fixedArSixteenNineStyle,
   );
   let placeholder;
   if (props.image) {

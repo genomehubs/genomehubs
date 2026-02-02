@@ -1,32 +1,29 @@
 import {
   Cell,
-  ComposedChart,
   Label,
-  Line,
   Pie,
   PieChart,
   PolarAngleAxis,
   RadialBar,
   RadialBarChart,
-  Rectangle,
 } from "recharts";
 import MultiCatLegend, {
   processLegendData,
   valueString,
 } from "./MultiCatLegend";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { format } from "d3-format";
-import qs from "../functions/qs";
-import setColors from "../functions/setColors";
-import stringLength from "../functions/stringLength";
-import { useNavigate } from "@reach/router";
-import useResize from "../hooks/useResize";
+import qs from "#functions/qs";
+import setColors from "#functions/setColors";
+import stringLength from "#functions/stringLength";
+import useNavigate from "#hooks/useNavigate";
+import useResize from "#hooks/useResize";
 import withColors from "#hocs/withColors";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 import withTheme from "#hocs/withTheme";
 
 const pct = format(".0%");
@@ -163,9 +160,7 @@ const PieComponent = ({ data, height, width, colors, axisColor = "white" }) => {
             )}
             fillOpacity={0}
             cursor={"pointer"}
-            onClick={() =>
-              data.navigate(`${data.basename}/search?${qs.stringify(query)}`)
-            }
+            onClick={() => data.navigate(`/search?${qs.stringify(query)}`)}
           />
         </Tooltip>
 
@@ -465,7 +460,7 @@ const RadialBarComponent = ({
             cursor={"pointer"}
             onClick={() =>
               data.navigate(
-                `${data.basename}/search?${qs.stringify({
+                `/search?${qs.stringify({
                   ...data.xQuery,
                   report: "arc",
                 })}`,
@@ -800,7 +795,6 @@ const ReportArc = ({
         { value: z - y, name: zTerm, query: zQuery },
       ];
       chartData.navigate = navigate;
-      chartData.basename = basename;
 
       ({ levels, colors } = setColors({
         colorPalette,

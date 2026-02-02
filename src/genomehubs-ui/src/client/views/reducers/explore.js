@@ -1,12 +1,12 @@
 import { createAction, handleAction, handleActions } from "redux-actions";
 
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 
 export const requestSummary = createAction("REQUEST_SUMMARY");
 export const receiveSummary = createAction(
   "RECEIVE_SUMMARY",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 export const resetSummary = createAction("RESET_SUMMARY");
 
@@ -23,36 +23,26 @@ function onReceiveSummary(state, action) {
   const summary = summaries[0];
   const id = `${summary.lineage}--${summary.field}--${summary.name}--${summary.taxonomy}`;
 
-  const updatedWithSummaryState = immutableUpdate(state, {
-    byId: { [id]: summary },
+  return produce(state, (draft) => {
+    draft.byId[id] = summary;
+    draft.allIds = [...new Set(state.allIds.concat(id))];
+    draft.isFetching = false;
+    draft.status = status;
+    draft.lastUpdated = meta.receivedAt;
   });
-
-  const updatedWithSummaryList = immutableUpdate(updatedWithSummaryState, {
-    allIds: [...new Set(updatedWithSummaryState.allIds.concat(id))],
-  });
-
-  const updatedWithMeta = immutableUpdate(updatedWithSummaryList, {
-    isFetching: false,
-    status,
-    lastUpdated: meta.receivedAt,
-  });
-
-  return updatedWithMeta;
 }
 
 const summaries = handleActions(
   {
     REQUEST_SUMMARY: (state, action) =>
-      immutableUpdate(state, {
-        isFetching: true,
-        requestedById: immutableUpdate(state, {
-          [action.payload]: true,
-        }),
+      produce(state, (draft) => {
+        draft.isFetching = true;
+        draft.requestedById[action.payload] = true;
       }),
     RECEIVE_SUMMARY: onReceiveSummary,
     RESET_SUMMARY: defaultSummaryState,
   },
-  defaultSummaryState()
+  defaultSummaryState(),
 );
 
 export const getSummaries = (state) => state.summaries.byId;
@@ -104,7 +94,7 @@ export const setSummaryField = createAction("SET_SUMMARY_FIELD");
 export const summaryField = handleAction(
   "SET_SUMMARY_FIELD",
   (state, action) => action.payload,
-  ""
+  "",
 );
 export const getSummaryField = (state) => state.summaryField;
 

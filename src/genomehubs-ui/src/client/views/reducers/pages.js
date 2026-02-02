@@ -1,12 +1,12 @@
 import { createAction, handleActions } from "redux-actions";
 
-import immutableUpdate from "immutable-update";
+import { produce } from "immer";
 
 export const requestPages = createAction("REQUEST_PAGE");
 export const receivePages = createAction(
   "RECEIVE_PAGE",
   (json) => json,
-  () => ({ receivedAt: Date.now() })
+  () => ({ receivedAt: Date.now() }),
 );
 export const cancelPages = createAction("CANCEL_PAGE");
 
@@ -19,31 +19,28 @@ const pages = handleActions(
   {
     REQUEST_PAGE: (state, action) => {
       let { pageId } = action.payload;
-      return immutableUpdate(state, {
-        ...state,
-        isFetching: { ...state.isFetching, [pageId]: true },
+      return produce(state, (draft) => {
+        draft.isFetching[pageId] = true;
       });
     },
     CANCEL_PAGE: (state, action) => {
       let { pageId } = action.payload;
-      return immutableUpdate(state, {
-        ...state,
-        isFetching: { ...state.isFetching, [pageId]: false },
+      return produce(state, (draft) => {
+        draft.isFetching[pageId] = false;
       });
     },
     RECEIVE_PAGE: (state, action) => {
-      let byId = {};
       let { pageId, markdown } = action.payload;
       if (state.byId[pageId]) {
         return state;
       }
-      return immutableUpdate(state, {
-        isFetching: { ...state.isFetching, [pageId]: false },
-        byId: { ...state.byId, [pageId]: markdown || " " },
+      return produce(state, (draft) => {
+        draft.isFetching[pageId] = false;
+        draft.byId[pageId] = markdown || " ";
       });
     },
   },
-  defaultState()
+  defaultState(),
 );
 
 export const getPages = (state) => state.pages;

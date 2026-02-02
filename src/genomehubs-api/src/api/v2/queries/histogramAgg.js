@@ -119,6 +119,7 @@ export const histogramAgg = async ({
   } else {
     fieldKey += summary;
   }
+  // interval = interval || (max - min) / 100;
   return {
     [histKey]: {
       field: fieldKey,

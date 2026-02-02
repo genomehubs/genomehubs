@@ -1,7 +1,6 @@
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "@mui/material/IconButton";
-import React from "react";
 import Tooltip from "./Tooltip";
 import { saveSearchOptions as saveSearchOptionsStyle } from "./Styles.scss";
 

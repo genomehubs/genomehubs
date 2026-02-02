@@ -6,11 +6,10 @@ import {
 
 import LaunchIcon from "@mui/icons-material/Launch";
 import { Link } from "@reach/router";
-import React from "react";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import { useLocation } from "@reach/router";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
 const NavLink = ({
   to,
@@ -20,6 +19,8 @@ const NavLink = ({
   url,
   basename,
   siteName,
+  siteNameLong,
+  citationUrl,
   dispatch,
   ...props
 }) => {
@@ -27,7 +28,10 @@ const NavLink = ({
   if (url) {
     to = url;
   } else if (to) {
-    to = basename + "/" + to + (plain ? "" : location.search + location.hash);
+    const base = String(basename || "").replace(/\/+$/, ""); // remove trailing slashes
+    const path = String(to).replace(/^\/+/, ""); // remove leading slashes
+    to = base ? `${base}/${path}` : `/${path}`;
+    to += plain ? "" : location.search + location.hash;
   }
   let isCurrent = location.pathname.startsWith(to);
   if ((to && to.startsWith("http")) || props.href) {
@@ -56,33 +60,31 @@ const NavLink = ({
         ));
       }
       return (
-        (<a
-                href={to}
-                title={(props.title || "").replace(/^external:\s*/, "")}
-                target="_blank"
-                rel="noopener noreferrer"
-                // style={{ whiteSpace: "wrap" }}
-              >
+        <a
+          href={to}
+          title={(props.title || "").replace(/^external:\s*/, "")}
+          target="_blank"
+          rel="noopener noreferrer"
+          // style={{ whiteSpace: "wrap" }}
+        >
           {children}
-        </a>)
+        </a>
       );
     }
-    to = basename + "/" + to.replace(location.origin, "");
+    // Internalize URLs from same origin
+    const base = String(basename || "").replace(/\/+$/, "");
+    const stripped = String(to)
+      .replace(location.origin, "")
+      .replace(/^\/+/, "");
+    to = base ? `${base}/${stripped}` : `/${stripped}`;
   }
   let css = linkStyle;
   if (tab) {
     css = classnames(tabStyle, { [tabHighlightStyle]: isCurrent });
   }
-  return (
-    (<Link
-            {...props}
-            to={to
-              .replace(/\/+/, `${basename}/`)
-              .replace(`${basename}${basename}`, basename)
-              .replace(/\/\/+/, "/")}
-            className={css}
-          />)
-  );
+  // Normalize: prevent double slashes which create protocol-relative URLs
+  to = to.replace(/\/\/+/g, "/");
+  return <Link {...props} to={to} className={css} />;
 };
 
 export default compose(withSiteName)(NavLink);

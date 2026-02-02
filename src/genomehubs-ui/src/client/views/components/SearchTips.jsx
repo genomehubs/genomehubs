@@ -5,19 +5,19 @@ import {
   textPanel as resultPanelStyle,
   title as titleStyle,
 } from "./Styles.scss";
-import { useLocation, useNavigate } from "@reach/router";
 
 import ColorButton from "./ColorButton";
-import React from "react";
 import Tooltip from "./Tooltip";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import didYouMean from "didyoumean2";
-import qs from "../functions/qs";
-import setColors from "../functions/setColors";
-import withColors from "../hocs/withColors";
-import withSearch from "../hocs/withSearch";
-import withTypes from "../hocs/withTypes";
+import qs from "#functions/qs";
+import setColors from "#functions/setColors";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
+import withColors from "#hocs/withColors";
+import withSearch from "#hocs/withSearch";
+import withTypes from "#hocs/withTypes";
 
 const Suggestion = ({ title, description, options, colors }) => {
   const navigate = useNavigate();
@@ -130,7 +130,7 @@ const SearchTips = ({
     } else if (!queryParts[i].match(/tax_\w+\(/)) {
       let [key, value] = queryParts[i].split(/\s*[<>!=]\s*/);
       key = key.replace("!", "");
-      if (!types.hasOwnProperty(key)) {
+      if (!types.hasOwnProperty(key) && !key.match(/^\w+_id$/)) {
         let valid_keys = didYouMean(key, Object.keys(types), fuzzyOpts) || [];
         if (typeof valid_keys == "string") {
           valid_keys = [valid_keys];
@@ -166,10 +166,10 @@ const SearchTips = ({
             colors={colors}
           />,
         );
-      } else if (value && types[key].constraint && types[key].constraint.enum) {
+      } else if (value && types[key]?.constraint?.enum) {
         for (let v of value.split(/\s*,\s*/)) {
           v = v.replace(/['"!]/g, "");
-          if (!types[key].constraint.enum.includes(v)) {
+          if (!types[key].constraint.enum.includes(v.toLowerCase())) {
             let valid_values = didYouMean(
               v,
               types[key].constraint.enum,

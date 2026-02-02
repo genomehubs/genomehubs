@@ -1,14 +1,12 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import StaticPlotFiles from "./StaticPlotFiles";
-import classnames from "classnames";
-import { compose } from "recompose";
-import getPrimaryAssemblyId from "../functions/getPrimaryAssemblyId";
-import qs from "../functions/qs";
-import styles from "./Styles.scss";
-import withAnalysesByAnyId from "../hocs/withAnalysesByAnyId";
-import withAnalysis from "../hocs/withAnalysis";
-import withRecord from "../hocs/withRecord";
+import { compose } from "redux";
+import getPrimaryAssemblyId from "#functions/getPrimaryAssemblyId";
+import qs from "#functions/qs";
+import withAnalysesByAnyId from "#hocs/withAnalysesByAnyId";
+import withAnalysis from "#hocs/withAnalysis";
+import withRecord from "#hocs/withRecord";
 
 const StaticPlot = ({
   recordId,
@@ -54,5 +52,5 @@ const StaticPlot = ({
 export default compose(
   withAnalysesByAnyId,
   withAnalysis,
-  withRecord
+  withRecord,
 )(StaticPlot);

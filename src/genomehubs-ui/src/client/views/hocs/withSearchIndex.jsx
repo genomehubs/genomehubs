@@ -2,9 +2,8 @@ import {
   getSearchIndex,
   getSearchIndexPlural,
   setSearchIndex,
-} from "../reducers/search";
+} from "#reducers/search";
 
-import React from "react";
 import { connect } from "react-redux";
 
 const withSearchIndex = (WrappedComponent) => (props) => {
@@ -19,7 +18,7 @@ const withSearchIndex = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

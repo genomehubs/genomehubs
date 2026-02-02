@@ -22,25 +22,25 @@ import {
   resultPanel as resultPanelStyle,
   title as titleStyle,
 } from "./Styles.scss";
-import { useLocation, useNavigate } from "@reach/router";
 
 import AggregationIcon from "./AggregationIcon";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import HistogramSVG from "./HistogramSVG";
-import React from "react";
 import TaxonSummaryPanel from "./TaxonSummaryPanel";
 import Tooltip from "./Tooltip";
 import WordCloud from "./WordCloud";
 import classnames from "classnames";
-import { compose } from "recompose";
-import { formatter } from "../functions/formatter";
-import qs from "../functions/qs";
-import withRecord from "../hocs/withRecord";
-import withSearch from "../hocs/withSearch";
-import withSiteName from "../hocs/withSiteName";
-import withSummary from "../hocs/withSummary";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import { compose } from "redux";
+import { formatter } from "#functions/formatter";
+import qs from "#functions/qs";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
+import withRecord from "#hocs/withRecord";
+import withSearch from "#hocs/withSearch";
+import withSiteName from "#hocs/withSiteName";
+import withSummary from "#hocs/withSummary";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 const AttributeSummary = ({
   field,
@@ -156,7 +156,7 @@ const ResultPanel = ({
   const handleTaxonClick = () => {
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/record?recordId=${taxon_id}&result=taxon&taxonomy=${
+      `record?recordId=${taxon_id}&result=taxon&taxonomy=${
         options.taxonomy || taxonomy
       }#${encodeURIComponent(scientific_name)}`,
     );
@@ -168,7 +168,7 @@ const ResultPanel = ({
     setSummaryField(fieldId);
     setPreferSearchTerm(false);
     navigate(
-      `${basename}/explore?taxon_id=${taxon_id}&result=${searchIndex}&taxonomy=${
+      `explore?taxon_id=${taxon_id}&result=${searchIndex}&taxonomy=${
         options.taxonomy || taxonomy
       }&field_id=${fieldId}${location.hash}`,
     );

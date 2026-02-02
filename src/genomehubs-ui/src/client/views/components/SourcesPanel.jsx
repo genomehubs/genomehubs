@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import {
   infoPanel1Column as infoPanel1ColumnStyle,
   infoPanel as infoPanelStyle,
@@ -7,12 +6,13 @@ import {
 
 import ReportFull from "./ReportFull";
 import classnames from "classnames";
-import { compose } from "recompose";
-import dispatchLookup from "../hocs/dispatchLookup";
-import qs from "../functions/qs";
-import { sortReportQuery } from "../selectors/report";
+import { compose } from "redux";
+import dispatchLookup from "#hocs/dispatchLookup";
+import qs from "#functions/qs";
+import { sortReportQuery } from "#selectors/report";
+import { useEffect } from "react";
 import { useLocation } from "@reach/router";
-import withTaxonomy from "../hocs/withTaxonomy";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 const SourcesPanel = ({ setLookupTerm, taxonomy }) => {
   let css = classnames(infoPanelStyle, infoPanel1ColumnStyle, textPanelStyle);

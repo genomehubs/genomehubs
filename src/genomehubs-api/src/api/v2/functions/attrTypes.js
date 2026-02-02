@@ -2,6 +2,9 @@ import { checkResponse } from "./checkResponse.js";
 import { client } from "./connection.js";
 import { config } from "./config.js";
 import { indexName } from "./indexName.js";
+import { metadataCache } from "./metadataCache.js";
+
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 const setProcessedType = (meta) => {
   if (
@@ -17,13 +20,12 @@ const setProcessedType = (meta) => {
   }
   if (meta.type == "keyword") {
     if (meta.summary) {
-      if (Array.isArray(meta.summary)) {
-        if (
-          meta.summary[0] == "enum" ||
-          (meta.summary[0] == "primary" && meta.summary[1] == "enum")
-        ) {
-          return "ordered_keyword";
-        }
+      if (
+        Array.isArray(meta.summary) &&
+        (meta.summary[0] == "enum" ||
+          (meta.summary[0] == "primary" && meta.summary[1] == "enum"))
+      ) {
+        return "ordered_keyword";
       }
       if (meta.summary == "enum") {
         return "ordered_keyword";
@@ -80,7 +82,7 @@ const fetchTypes = async ({ result, taxonomy, hub, release, indexType }) => {
         index,
         body: {
           query,
-          size: 1000,
+          size: 10000,
         },
       },
       { meta: true }
@@ -127,13 +129,24 @@ export const attrTypes = async ({
   indexType = "attributes",
   taxonomy = config.taxonomy,
 }) => {
-  const { typesMap = {}, synonyms = {} } = await fetchTypes({
-    result,
-    taxonomy,
-    hub: config.hub,
-    release: config.release,
-    indexType,
-  });
+  // Create cache key from parameters
+  const cacheKey = `attrTypes:${result}:${taxonomy}:${indexType}`;
+
+  // Use metadata cache to fetch types
+  const { typesMap = {}, synonyms = {} } = await metadataCache.get(
+    cacheKey,
+    () =>
+      fetchTypes({
+        result,
+        taxonomy,
+        hub: config.hub,
+        release: config.release,
+        indexType,
+      }),
+    CACHE_TTL,
+    true
+  );
+
   let lookupTypes = {};
   if (result == "multi") {
     Object.keys(typesMap).forEach((key) => {

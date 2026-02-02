@@ -1,23 +1,31 @@
+import { A } from "storybook/internal/components";
 import LaunchIcon from "@mui/icons-material/Launch";
 import { Link } from "@reach/router";
 import NavLink from "./NavLink";
-import React from "react";
 import classnames from "classnames";
-import { compose } from "recompose";
+import { compose } from "redux";
 import styles from "./Styles.scss";
 import { useLocation } from "@reach/router";
-import withSiteName from "../hocs/withSiteName";
+import withSiteName from "#hocs/withSiteName";
 
-const Breadcrumbs = ({ basename, children, ...props }) => {
+const Breadcrumbs = ({
+  basename,
+  children,
+  siteNameLong,
+  citationUrl,
+  siteName,
+  ...props
+}) => {
   const location = useLocation();
   let trail = [];
-  let pathname = location.pathname.replace(`${basename}/`, "/");
+  let pathname = location.pathname.replace(``, "/");
   let parts = pathname.split("/");
   let link = "";
+  let title = "";
   parts.forEach((part, i) => {
     let name = part;
     if (part == "") {
-      link += `${basename}/`;
+      link += ``;
       name = "home";
     } else {
       link += `/${part}`;
@@ -27,10 +35,15 @@ const Breadcrumbs = ({ basename, children, ...props }) => {
       trail.push(
         <NavLink key={i} to={link}>
           {name}
-        </NavLink>
+        </NavLink>,
       );
     } else {
-      trail.push(<span key={`i`}>{children[0]}</span>);
+      if (Array.isArray(children) && children.length > 0) {
+        title = children[0];
+      } else if (typeof children == "string") {
+        title = children;
+      }
+      trail.push(<span key={`i`}>{title}</span>);
     }
     if (i < parts.length - 1) {
       trail.push(<span key={`${i}_`}> {">"} </span>);
@@ -45,7 +58,7 @@ const Breadcrumbs = ({ basename, children, ...props }) => {
   return (
     <>
       {trail}
-      <h1>{children[0]}</h1>
+      <h1>{title}</h1>
     </>
   );
 };

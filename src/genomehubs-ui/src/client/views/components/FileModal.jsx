@@ -1,15 +1,15 @@
-import React, { Fragment, useLayoutEffect, useRef, useState } from "react";
+import { Fragment, useState } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Modal from "@mui/material/Modal";
 import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
-import useWindowDimensions from "../hooks/useWindowDimensions";
-import withApi from "../hocs/withApi";
+import useWindowDimensions from "#hooks/useWindowDimensions";
+import withApi from "#hocs/withApi";
 
 function getModalStyle() {
   return {
@@ -104,8 +104,8 @@ const modalContent = ({
 export const FileModal = ({ meta, apiUrl, link, children }) => {
   const classes = useStyles();
   // getModalStyle is not a pure function, we roll the style only on the first render
-  const [modalStyle] = React.useState(getModalStyle);
-  const [open, setOpen] = React.useState(false);
+  const [modalStyle] = useState(getModalStyle);
+  const [open, setOpen] = useState(false);
   const windowDimensions = useWindowDimensions();
   const [previewDimensions, setPreviewDimensions] = useState(false);
 

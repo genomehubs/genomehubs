@@ -20,11 +20,18 @@ export const cacheFetch = async ({ url, persist, queryId }) => {
   let cachedData = false;
   const action = "FETCH";
   const store = rd;
+
+  // Skip cache for internal renderer requests marked with X-OG-RENDER
+  try {
+    if (url && url.headers && url.headers["x-og-render"]) {
+      return false;
+    }
+  } catch (e) {}
+
   if (store) {
     let success = false;
-    let keys = await store.keys("*");
-    key = sortUrl(url);
     try {
+      key = sortUrl(url);
       cachedData = JSON.parse(await store.get(key));
       if (cachedData) {
         success = true;
@@ -33,7 +40,7 @@ export const cacheFetch = async ({ url, persist, queryId }) => {
           store.del(key);
         }
       }
-    } catch {
+    } catch (err) {
       success = false;
     }
     logMemcache({ key, action, success });
@@ -70,6 +77,17 @@ export const cacheStore = async (req, obj) => {
   let key, success;
   const action = "STORE";
   const store = rd;
+
+  // If renderer (Puppeteer) marks the request, skip caching
+  try {
+    if (req && req.headers && req.headers["x-og-render"]) {
+      key = req.url;
+      success = false;
+      logMemcache({ key, action: "SKIP", success });
+      return false;
+    }
+  } catch (e) {}
+
   if (store) {
     try {
       key = sortUrl(req.url);
@@ -89,8 +107,8 @@ const withTimeout = async (millis, promise) => {
     (_, reject) =>
       (timeoutPid = setTimeout(
         () => reject(`Timed out after ${millis} ms.`),
-        millis
-      ))
+        millis,
+      )),
   );
   try {
     return await Promise.race([promise, timeout]);

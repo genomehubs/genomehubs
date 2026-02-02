@@ -3,11 +3,10 @@ import {
   getAnalyses,
   getAnalysisQueries,
   resetAnalyses,
-} from "../reducers/analysis";
+} from "#reducers/analysis";
 
-import React from "react";
 import { connect } from "react-redux";
-import { fetchAnalyses } from "../selectors/analysis";
+import { fetchAnalyses } from "#selectors/analysis";
 
 const withAnalysis = (WrappedComponent) => (props) => {
   const mapStateToProps = (state) => ({
@@ -22,7 +21,7 @@ const withAnalysis = (WrappedComponent) => (props) => {
 
   const Connected = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(WrappedComponent);
 
   return <Connected {...props} />;

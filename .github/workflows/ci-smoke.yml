@@ -1,0 +1,113 @@
+name: CI Smoke Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    services:
+      elasticsearch:
+        image: elasticsearch:8.19.10
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: "false"
+          ES_JAVA_OPTS: -Xms512m -Xmx512m
+        ports:
+          - 9200:9200
+        options: >-
+          --health-cmd="curl -sSf http://localhost:9200/ || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Build API bundle
+        working-directory: src/genomehubs-api
+        run: |
+          npm ci
+          npm run build:bundle
+
+      - name: Build and run smoke tests
+        working-directory: src/genomehubs-api
+        env:
+          GH_NODE: http://localhost:9200
+          GH_HUBNAME: goat
+          GH_RELEASE: 2021.10.15
+          GH_API_PORT: 3003
+        run: |
+          set -euo pipefail
+          GH_NODE=${GH_NODE} GH_HUBNAME=${GH_HUBNAME} GH_RELEASE=${GH_RELEASE} GH_API_PORT=${GH_API_PORT} node build/bundle.cjs > /tmp/gh-api.log 2>&1 &
+          echo $! > /tmp/gh-api.pid
+
+          # wait for Elasticsearch to be ready
+          for i in {1..30}; do
+            if curl -sSf http://localhost:9200/ >/dev/null 2>&1; then
+              echo "Elasticsearch ready"
+              break
+            fi
+            sleep 2
+          done
+
+          # wait for API health
+          for i in {1..30}; do
+            if curl -sSf http://localhost:${GH_API_PORT}/health >/dev/null 2>&1; then
+              echo "API healthy"
+              break
+            fi
+            sleep 2
+          done
+
+          # verify health and a basic endpoint
+          curl -sSf http://localhost:${GH_API_PORT}/health -o health.json
+          curl -sSf http://localhost:${GH_API_PORT}/api/v2/taxonomies -o taxonomies.json
+
+          # minimal assertions
+          if ! jq -e '.ok == true' health.json >/dev/null; then
+            echo "Health check failed:" && cat health.json
+            exit 1
+          fi
+          if [ ! -s taxonomies.json ]; then
+            echo "Taxonomies response empty" && exit 1
+          fi
+
+      - name: Build and test Docker container
+        # run from repo root so paths are well-defined
+        run: |
+          set -euo pipefail
+          IMAGE=genomehubs-api:test
+          docker build -f src/genomehubs-api/Dockerfile -t ${IMAGE} src/genomehubs-api
+
+          # run container mapping host.docker.internal to host gateway so it can reach service
+          docker run -d --rm --add-host=host.docker.internal:host-gateway -e GH_NODE=http://host.docker.internal:9200 -e GH_HUBNAME=goat -e GH_RELEASE=2021.10.15 -e GH_API_PORT=3000 -p 3004:3000 --name gh-api-container ${IMAGE}
+          # wait for API /health
+          for i in {1..30}; do
+            if curl -sSf http://localhost:3004/health >/dev/null 2>&1; then
+              echo "Container API healthy"
+              break
+            fi
+            sleep 2
+          done
+          curl -sSf http://localhost:3004/health -o container-health.json
+          curl -sSf http://localhost:3004/api/v2/taxonomies -o container-taxonomies.json
+          if ! jq -e '.ok == true' container-health.json >/dev/null; then
+            echo "Container health failed:" && cat container-health.json
+            docker logs gh-api-container || true
+            docker stop gh-api-container || true
+            exit 1
+          fi
+          if [ ! -s container-taxonomies.json ]; then
+            echo "Container taxonomies empty" && docker logs gh-api-container || true && docker stop gh-api-container || true && exit 1
+          fi
+          docker stop gh-api-container || true

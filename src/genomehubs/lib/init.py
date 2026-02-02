@@ -43,7 +43,7 @@ Options:
     --taxonomy-file PATH          Taxonomy file names.
     --taxonomy-url URL            Remote URL to fetch taxonomy.
     --taxonomy-jsonl PATH         Path to JSON Lines format taxonomy file of additional taxa.
-    --taxon-preload               Flag to preload all taxa in taxonomy into taxon index.
+    --taxon-preload               Flag to preload all taxa in taxonomy into taxon index. Default True.
     --docker-contain STRING       GenomeHubs component to run in Docker.
     --docker-network STRING       Docker network name.
     --docker-timeout STRING       Time in seconds to wait for a component to start in
@@ -274,6 +274,7 @@ def cli():
         args = docopt(__doc__, argv=[])
     else:
         args = docopt(__doc__, version=__version__)
+    args["taxon-preload"] = True
     main(args)
 
 

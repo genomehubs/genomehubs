@@ -1,12 +1,11 @@
-import React, { memo, useState } from "react";
-import { useLocation, useNavigate } from "@reach/router";
+import { memo, useState } from "react";
 
 import Box from "@mui/material/Box";
 import CancelIcon from "@mui/icons-material/Cancel";
 import Checkbox from "@mui/material/Checkbox";
 import Chip from "@mui/material/Chip";
 import FormControl from "@mui/material/FormControl";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import InputLabel from "@mui/material/InputLabel";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ListItemText from "@mui/material/ListItemText";
@@ -14,16 +13,18 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import SettingsButton from "./SettingsButton";
 import Tooltip from "./Tooltip";
-import { compose } from "recompose";
+import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
-import qs from "../functions/qs";
+import qs from "#functions/qs";
 import { useLocalStorage } from "usehooks-ts";
-import withNames from "../hocs/withNames";
-import withRanks from "../hocs/withRanks";
-import withSearch from "../hocs/withSearch";
-import withSiteName from "../hocs/withSiteName";
-import withTaxonomy from "../hocs/withTaxonomy";
-import withTypes from "../hocs/withTypes";
+import { useLocation } from "@reach/router";
+import useNavigate from "#hooks/useNavigate";
+import withNames from "#hocs/withNames";
+import withRanks from "#hocs/withRanks";
+import withSearch from "#hocs/withSearch";
+import withSiteName from "#hocs/withSiteName";
+import withTaxonomy from "#hocs/withTaxonomy";
+import withTypes from "#hocs/withTypes";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -78,7 +79,7 @@ const SearchSettings = ({
   groupedTypes,
   basename,
 }) => {
-  const [state, setState] = React.useState(() => {
+  const [state, setState] = useState(() => {
     let initialState = { taxonomy };
     Object.keys(groupedTypes).forEach((key) => {
       let group = groupedTypes[key];
@@ -177,9 +178,7 @@ const SearchSettings = ({
       taxonomy: state.taxonomy,
     };
     setPreferSearchTerm(false);
-    navigate(
-      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`,
-    );
+    navigate(`search?${qs.stringify(options)}${location.hash || ""}`);
   };
 
   const handleResetClick = () => {
@@ -199,9 +198,7 @@ const SearchSettings = ({
     delete options.excludeMissing;
     setPreferSearchTerm(false);
     setSavedOptions({});
-    navigate(
-      `${basename}/search?${qs.stringify(options)}${location.hash || ""}`,
-    );
+    navigate(`search?${qs.stringify(options)}${location.hash || ""}`);
   };
 
   let groups = [];

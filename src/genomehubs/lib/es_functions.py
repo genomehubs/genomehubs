@@ -35,8 +35,9 @@ def test_connection(opts, *, log=False):
     es = Elasticsearch(hosts=hosts, timeout=1800, max_retries=10, retry_on_timeout=True)
     connected = es.info()
     #   pass
+    # sourcery skip: no-conditionals-in-tests
     if not connected:
-        message = "Could not connect to Elasticsearch at '%s'" % ", ".join(hosts)
+        message = f"""Could not connect to Elasticsearch at '{", ".join(hosts)}'"""
         if log:
             LOGGER.error(message)
             sys.exit(1)
@@ -151,16 +152,60 @@ def index_create(es, index_name):
     es_client = client.IndicesClient(es)
     res = index_exists(es, index_name)
     if not res:
+        LOGGER.info(f"Creating index '{index_name}'")
         with tolog.DisableLogger():
             res = es_client.create(index=index_name)
+        # Verify the created index has correct mapping
+        try:
+            mapping = es_client.get_mapping(index=index_name)
+            has_taxon_names = False
+            if index_name in mapping:
+                props = mapping[index_name].get("mappings", {}).get("properties", {})
+                if "taxon_names" in props:
+                    field_type = props["taxon_names"].get("type")
+                    has_taxon_names = field_type == "nested"
+                    LOGGER.info(
+                        f"Index '{index_name}' created with taxon_names type: {field_type}"
+                    )
+                else:
+                    LOGGER.warning(
+                        f"Index '{index_name}' created WITHOUT taxon_names field!"
+                    )
+            if not has_taxon_names and "taxon" in index_name:
+                LOGGER.error(
+                    f"Taxonomy index '{index_name}' missing nested taxon_names mapping!"
+                )
+        except Exception as e:
+            LOGGER.warning(f"Could not verify mapping for '{index_name}': {e}")
+    else:
+        LOGGER.info(f"Index '{index_name}' already exists")
     return res
 
 
 def load_mapping(es, mapping_name, mapping):
     """Load index mapping template into Elasticsearch."""
-    es_client = client.IndicesClient(es)
+    # Use composable index templates instead of legacy templates
+    LOGGER.info(
+        f"Loading composable index template '{mapping_name}' with pattern: {mapping.get('index_patterns', 'unknown')}"
+    )
+    # Ensure mapping is in composable template format
+    composable_body = {
+        "index_patterns": mapping.get("index_patterns", [f"{mapping_name}-*"]),
+        "template": {"mappings": mapping.get("mappings", {})},
+    }
+    # Add settings/aliases if present
+    if "settings" in mapping:
+        composable_body["template"]["settings"] = mapping["settings"]
+    if "aliases" in mapping:
+        composable_body["template"]["aliases"] = mapping["aliases"]
     with tolog.DisableLogger():
-        res = es_client.put_template(name=mapping_name, body=mapping)
+        res = es.transport.perform_request(
+            "PUT",
+            f"/_index_template/{mapping_name}",
+            body=composable_body,
+            headers={"Content-Type": "application/json"},
+        )
+    LOGGER.info(f"Composable template '{mapping_name}' loaded successfully")
     return res
 
 

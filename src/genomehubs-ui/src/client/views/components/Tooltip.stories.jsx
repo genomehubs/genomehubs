@@ -1,8 +1,7 @@
 import { Provider } from "react-redux";
-import React from "react";
 import Tooltip from "./Tooltip";
-import colorStore from "../reducers/color.store";
-import { themeFromContext } from "../../../../.storybook/functions/themeFromContext";
+import colorStore from "#reducers/color.store";
+import { themeFromContext } from "#storybook/functions/themeFromContext";
 
 const meta = {
   component: Tooltip,

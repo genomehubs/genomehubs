@@ -1,4 +1,3 @@
-import React, { useEffect, useRef } from "react";
 import {
   fullWidth as fullWidthStyle,
   tagCloud as tagCloudStyle,
@@ -6,16 +5,17 @@ import {
 
 import Skeleton from "@mui/material/Skeleton";
 import { TagCloud } from "react-tagcloud";
-import { compose } from "recompose";
-import qs from "../functions/qs";
+import { compose } from "redux";
+import qs from "#functions/qs";
+import { useEffect } from "react";
 import { useIntersectionObserver } from "usehooks-ts";
-import { useNavigate } from "@reach/router";
-import withLookup from "../hocs/withLookup";
-import withSearch from "../hocs/withSearch";
-import withSiteName from "../hocs/withSiteName";
-import withSummary from "../hocs/withSummary";
-import withSummaryById from "../hocs/withSummaryById";
-import withTaxonomy from "../hocs/withTaxonomy";
+import useNavigate from "#hooks/useNavigate";
+import withLookup from "#hocs/withLookup";
+import withSearch from "#hocs/withSearch";
+import withSiteName from "#hocs/withSiteName";
+import withSummary from "#hocs/withSummary";
+import withSummaryById from "#hocs/withSummaryById";
+import withTaxonomy from "#hocs/withTaxonomy";
 
 const WordCloud = ({
   summaryId,
@@ -59,7 +59,7 @@ const WordCloud = ({
   //   // fetchSearchResults(options);
   //   setPreferSearchTerm(false);
   //   navigate(
-  //     `${basename}/search?${qs.stringify(options)}#${encodeURIComponent(
+  //     `search?${qs.stringify(options)}#${encodeURIComponent(
   //       options.query
   //     )}`
   //   );
@@ -69,7 +69,7 @@ const WordCloud = ({
     let hashTerm = encodeURIComponent(options.query) || "";
     setPreferSearchTerm(false);
     setLookupTerm(hashTerm);
-    navigate(`${basename}/search?${qs.stringify(options)}#${hashTerm}`);
+    navigate(`/search?${qs.stringify(options)}#${hashTerm}`);
   };
   let buckets = [];
   if (summaryById && summaryById.buckets) {
@@ -125,5 +125,5 @@ export default compose(
   withLookup,
   withSearch,
   withSummary,
-  withSummaryById
+  withSummaryById,
 )(WordCloud);

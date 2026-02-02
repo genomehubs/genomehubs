@@ -2,6 +2,7 @@
 # pylint: disable=all
 """genomehubs documentation config."""
 
+
 import os
 import traceback
 
@@ -24,12 +25,16 @@ author = "genomehubs"
 author_email = "genomehubs@genomehubs.org"
 copyright = "{0}, {1}".format(year, author)
 try:
-    from pkg_resources import get_distribution
+    try:
+        from importlib.metadata import version as get_version
+    except ImportError:
+        # Python < 3.8 fallback
+        from importlib_metadata import version as get_version
 
-    version = release = get_distribution("genomehubs").version
+    version = release = get_version("genomehubs")
 except Exception:
     traceback.print_exc()
-    version = release = "2.10.15"
+    version = release = "2.12.0"
 
 pygments_style = "trac"
 templates_path = ["."]
@@ -49,7 +54,7 @@ html_split_index = False
 html_sidebars = {
     "**": ["searchbox.html", "globaltoc.html", "sourcelink.html"],
 }
-html_short_title = "%s-%s" % (project, version)
+html_short_title = f"{project}-{version}"
 
 napoleon_use_ivar = True
 napoleon_use_rtype = False

@@ -1,0 +1,40 @@
+## Site-specific UI container
+## Builds on top of generic genomehubs-ui image with content from GitHub repo
+
+ARG BASE_IMAGE=genomehubs-ui:latest
+ARG SITE_REPO=genomehubs/goat-ui
+ARG SITE_BRANCH=main
+
+## Build stage - fetch site content from GitHub
+FROM alpine:3.20 AS content-builder
+ARG SITE_REPO
+ARG SITE_BRANCH
+
+RUN apk add --no-cache git
+
+WORKDIR /tmp
+RUN git clone --depth 1 --branch ${SITE_BRANCH} https://github.com/${SITE_REPO}.git site-content
+
+## Runtime stage - layer content onto generic UI image
+FROM ${BASE_IMAGE}
+
+ARG SITE_NAME=GenomeHub
+ARG SITE_NAME_LONG=""
+ARG GH_CITATION_URL=""
+ARG GH_SUGGESTED_TERM=""
+ARG GH_TAXONOMY=ncbi
+
+## Copy content from builder stage
+COPY --from=content-builder --chown=nonroot:nonroot /tmp/site-content/static /content/static
+COPY --from=content-builder --chown=nonroot:nonroot /tmp/site-content/assets /content/assets
+COPY --from=content-builder --chown=nonroot:nonroot /tmp/site-content/meta.json /content/meta.json
+
+## Set site-specific environment (can be overridden at runtime)
+ENV GH_SITENAME=${SITE_NAME}
+ENV GH_SITENAME_LONG=${SITE_NAME_LONG}
+ENV GH_CITATION_URL=${GH_CITATION_URL}
+ENV GH_SUGGESTED_TERM=${GH_SUGGESTED_TERM}
+ENV GH_TAXONOMY=${GH_TAXONOMY}
+
+USER nonroot
+CMD ["--no-deprecation", "src/server/index.js"]
