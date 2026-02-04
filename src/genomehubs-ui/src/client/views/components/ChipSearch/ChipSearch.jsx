@@ -302,7 +302,6 @@ const ChipSearch = ({
   };
 
   const conflictPairs = {
-    tax_depth_name_tree: ["tax_name", "tax_tree", "tax_depth"],
     tax_depth_name_tree: ["tax_depth", "tax_name", "tax_tree"],
     tax_name: "tax_depth_name_tree",
     tax_tree: "tax_depth_name_tree",
@@ -409,7 +408,7 @@ const ChipSearch = ({
         return null; // Skip rendering "AND" as a Chip
       } else {
         let { key } = extractKeyValue(chip);
-        const { valid, color } = validation.validateKey({
+        const { valid } = validation.validateKey({
           key: key,
         });
         if (!valid) {
@@ -475,7 +474,7 @@ const ChipSearch = ({
     Object.entries(chipGroups).forEach(
       ([chipKey, { group, chips, indices }]) => {
         if (chips.length > 1) {
-          const { key, modifier, value, valueNote, operator } = extractKeyValue(
+          const { key, modifier, valueNote, operator } = extractKeyValue(
             chips[0],
           );
           const multipleValuesAllowed = validation.allowMultipleValues({
@@ -544,7 +543,7 @@ const ChipSearch = ({
                   .forEach((index) => {
                     newChips.splice(index, 1);
                   });
-                const { uniqueArr, duplicates } = removeDuplicates(newChips);
+                const { uniqueArr } = removeDuplicates(newChips);
                 // setDuplicateKeys(duplicates);
                 // handleValueChange(uniqueArr.join(" "));
                 return uniqueArr;
@@ -629,7 +628,7 @@ const ChipSearch = ({
           }
         }
         if (updated) {
-          const { uniqueArr, duplicates } = removeDuplicates(checkedChips);
+          const { uniqueArr } = removeDuplicates(checkedChips);
           setChips(uniqueArr);
           if (
             stillInvalidChips.length !== chipsWithInvalidKeys.length ||
@@ -681,7 +680,7 @@ const ChipSearch = ({
     setChips((prevChips) => {
       let newChips = [...prevChips];
       newChips.splice(index, 1);
-      const { uniqueArr, duplicates } = removeDuplicates(newChips);
+      const { uniqueArr } = removeDuplicates(newChips);
       // handleValueChange(uniqueArr.join(" "));
       // setDuplicateKeys(duplicates);
       return uniqueArr;
@@ -700,7 +699,7 @@ const ChipSearch = ({
       } else {
         newChips[index] = chipToString(updatedChip);
       }
-      const { uniqueArr, duplicates } = removeDuplicates(newChips);
+      const { uniqueArr } = removeDuplicates(newChips);
       // setDuplicateKeys(duplicates);
       // handleValueChange(uniqueArr.join(" "));
       return uniqueArr;
@@ -1004,10 +1003,7 @@ const ChipSearch = ({
               handleInputValueChange={(inputValue) => {
                 const terms = inputValue.split(/\s+AND\s+/i);
                 if (terms && terms.length > 0) {
-                  const { uniqueArr, duplicates } = removeDuplicates([
-                    ...chips,
-                    ...terms,
-                  ]);
+                  const { uniqueArr } = removeDuplicates([...chips, ...terms]);
                   handleValueChange(uniqueArr.join(" "));
                 }
               }}
