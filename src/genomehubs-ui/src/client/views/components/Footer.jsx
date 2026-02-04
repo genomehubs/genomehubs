@@ -79,7 +79,6 @@ const Footer = ({
     }
   }, [currentPalette, levels]);
   if (!taxonomy || hidden) {
-    console.warn("[Footer] hidden", { hidden, taxonomy, apiStatus });
     return <Taxonomy display={false} />;
   }
 
