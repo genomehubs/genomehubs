@@ -37,6 +37,7 @@ jobs:
         working-directory: ./src/genomehubs-ui
         run: |
           npm ci
+          npm run lint
           npm run build
       - uses: actions/upload-artifact@v4
         with:

@@ -10,12 +10,12 @@ import {
   Typography,
 } from "@mui/material";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import KeyValueChip, {
   FieldNameMenu,
   parseValue,
   typesToValidation,
 } from "../KeyValueChip";
-import { useEffect, useMemo, useRef, useState } from "react";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ErrorIcon from "@mui/icons-material/Error";
@@ -399,7 +399,6 @@ const ChipSearch = ({
     ) {
       setChipsWithInvalidKeys(invalidKeyChips);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chips, conflictingChips]);
 
   const chipsToComponents = (chips) => {
@@ -917,14 +916,12 @@ const ChipSearch = ({
     });
     setInputQueryComponents(components);
     newInputQueries = newInputQueriesLocal;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputQueryList.join(","), currentInputQueries, result, results]);
 
   useEffect(() => {
     if (Object.keys(newInputQueries).length > 0) {
       setCurrentInputQueries((prev) => ({ ...prev, ...newInputQueries }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputQueryList.join(",")]);
 
   return (

@@ -1,4 +1,6 @@
-import { CircleMarker } from "react-leaflet";
+import { CircleMarker, Popup } from "react-leaflet";
+
+import { Link as NavLink } from "react-router-dom";
 
 const SingleMarker = ({
   position,

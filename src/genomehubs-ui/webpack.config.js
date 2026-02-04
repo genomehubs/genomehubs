@@ -33,6 +33,8 @@ try {
 
 const protocol = main.https ? "https" : "http";
 
+const devBase = (main.basename || "").replace(/\/$/, "");
+
 const config = {
   mode: devMode ? "development" : "production",
   entry: {
@@ -177,7 +179,16 @@ const config = {
   },
   devServer: {
     hot: false,
-    historyApiFallback: true,
+    historyApiFallback: {
+      // Only fallback to index.html for non-asset paths
+      rewrites: [
+        {
+          from: new RegExp(`^${devBase}/(assets|api|js|static|css)/`),
+          to: (context) => context.parsedUrl.pathname,
+        },
+        { from: /./, to: `${devBase || ""}/index.html` },
+      ],
+    },
     host: main.hostname,
     allowedHosts: "all",
     static: {

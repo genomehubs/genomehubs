@@ -1,6 +1,7 @@
 import Skeleton from "@mui/material/Skeleton";
 import { compose } from "redux";
 import useResize from "#hooks/useResize";
+import { useState } from "react";
 import withApi from "#hocs/withApi";
 
 const StaticPlotFile = ({

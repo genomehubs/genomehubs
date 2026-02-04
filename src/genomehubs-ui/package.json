@@ -11,6 +11,8 @@
     "start:ssr": "SSR_MODE=all node src/server/index.js",
     "start:bots": "SSR_MODE=bots node src/server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint src/client --ext .jsx,.js",
+    "lint:fix": "eslint src/client --ext .jsx,.js --fix",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "chromatic": "npx chromatic",

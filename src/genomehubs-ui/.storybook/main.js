@@ -92,7 +92,7 @@ const config = {
         ],
       },
     },
-    "@storybook/addon-docs"
+    "@storybook/addon-docs",
   ],
 
   framework: {

@@ -26,6 +26,7 @@ jobs:
           NODE_ENV: development
         run: |
           npm install --no-audit --no-fund --legacy-peer-deps
+          npm run lint
           npm run build
       - name: Inspect UI dist
         working-directory: ./src/genomehubs-ui
