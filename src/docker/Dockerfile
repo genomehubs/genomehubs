@@ -58,10 +58,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
-## Create non-root user for security
-RUN useradd -m -u 10001 -s /sbin/nologin genomehubs \
-    && mkdir -p /genomehubs \
-    && chown -R genomehubs:genomehubs /genomehubs
+## Set up directories for the existing ubuntu user (UID 1000)
+RUN mkdir -p /genomehubs /genomehubs/sources \
+    && chown -R ubuntu:ubuntu /genomehubs
 
 ## Copy conda environment from builder
 COPY --from=builder --chown=genomehubs:genomehubs /opt/conda /opt/conda
@@ -80,8 +79,8 @@ ENV CONTAINER_VERSION=$VERSION
 ## Set working directory
 WORKDIR /genomehubs
 
-## Drop privileges
-USER genomehubs
+## Drop privileges to ubuntu user (UID 1000)
+USER ubuntu
 
 ## Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \

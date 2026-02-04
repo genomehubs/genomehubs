@@ -67,13 +67,12 @@ RUN curl -fsSL https://github.com/mikefarah/yq/releases/download/v4.16.2/yq_linu
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-## Create non-root user for security
-RUN useradd -m -u 10001 -s /sbin/nologin genomehubs \
-    && mkdir -p /genomehubs/tests /genomehubs/tests-out /genomehubs/resources \
-    && chown -R genomehubs:genomehubs /genomehubs
+## Create non-root user for security (reuse node user from base image)
+RUN mkdir -p /genomehubs/tests /genomehubs/tests-out /genomehubs/resources \
+    && chown -R node:node /genomehubs
 
 ## Copy conda environment from builder
-COPY --from=builder --chown=genomehubs:genomehubs /opt/conda /opt/conda
+COPY --from=builder --chown=node:node /opt/conda /opt/conda
 
 ## Set environment variables
 ENV CONDA_DIR=/opt/conda
@@ -88,20 +87,20 @@ WORKDIR /genomehubs
 RUN npm install --production js-yaml puppeteer
 
 ## Copy test components
-COPY --chown=genomehubs:genomehubs src/docker/test/genomehubs-api/ ./genomehubs-api/
-COPY --chown=genomehubs:genomehubs src/docker/test/genomehubs-ui-dist/ ./genomehubs-ui-dist/
+COPY --chown=node:node src/docker/test/genomehubs-api/ ./genomehubs-api/
+COPY --chown=node:node src/docker/test/genomehubs-ui-dist/ ./genomehubs-ui-dist/
 
 ## Copy test scripts and utilities
-COPY --chown=genomehubs:genomehubs src/docker/test/genomehubs-test-ui.sh ./genomehubs-test-ui
-COPY --chown=genomehubs:genomehubs src/docker/test/genomehubs-test-api.sh ./genomehubs-test-api
-COPY --chown=genomehubs:genomehubs src/docker/test/test-ui.mjs ./test-ui.mjs
-COPY --chown=genomehubs:genomehubs src/docker/test/config.yaml ./config/config.yaml
+COPY --chown=node:node src/docker/test/genomehubs-test-ui.sh ./genomehubs-test-ui
+COPY --chown=node:node src/docker/test/genomehubs-test-api.sh ./genomehubs-test-api
+COPY --chown=node:node src/docker/test/test-ui.mjs ./test-ui.mjs
+COPY --chown=node:node src/docker/test/config.yaml ./config/config.yaml
 
 ## Make test scripts executable
 RUN chmod 755 /genomehubs/genomehubs-test-* /genomehubs/test-ui.mjs
 
-## Drop privileges
-USER genomehubs
+## Drop privileges to node user (UID 1000)
+USER node
 
 ## Default command - show help
 CMD ["genomehubs", "--help"]
