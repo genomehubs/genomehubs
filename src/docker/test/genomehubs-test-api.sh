@@ -18,8 +18,8 @@ if [ -z "$GH_RESOURCES" ]; then
   export GH_RESOURCES="/genomehubs/resources"
 fi
 
-cat /tmp/config.yaml | yq '.test.hub.version="'$GH_RELEASE'"' > TMP && mv TMP /tmp/config.yaml
-cat /tmp/config.yaml | yq '.test.hub.name="'$GH_HUBNAME'"' > TMP && mv TMP /tmp/config.yaml
+yq eval '.test.hub.version = "'$GH_RELEASE'"' -i /tmp/config.yaml
+yq eval '.test.hub.name = "'$GH_HUBNAME'"' -i /tmp/config.yaml
 
 node --no-deprecation /genomehubs/genomehubs-api/bundle.cjs &
 API_PID=$!
