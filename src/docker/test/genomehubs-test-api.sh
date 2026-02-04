@@ -21,7 +21,7 @@ fi
 yq eval '.test.hub.version = "'$GH_RELEASE'"' -i /tmp/config.yaml
 yq eval '.test.hub.name = "'$GH_HUBNAME'"' -i /tmp/config.yaml
 
-node --no-deprecation /genomehubs/genomehubs-api/bundle.cjs &
+cd /genomehubs/genomehubs-api && node --no-deprecation bundle.cjs &
 API_PID=$!
 
 sleep 5

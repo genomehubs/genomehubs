@@ -126,6 +126,7 @@ jobs:
           mkdir -p src/docker/test/genomehubs-api
           ls -la dist/genomehubs-api-bundle/ 2>/dev/null || echo "No genomehubs-api-bundle directory"
           cp dist/genomehubs-api-bundle/bundle.cjs src/docker/test/genomehubs-api/ || echo "Failed to copy bundle.cjs"
+          cp dist/genomehubs-api-bundle/api-v2.yaml src/docker/test/genomehubs-api/ 2>/dev/null || echo "api-v2.yaml not in bundle"
           cp src/genomehubs-api/package.json src/docker/test/genomehubs-api/ || echo "Failed to copy package.json"
           ls -la src/docker/test/genomehubs-api/
 
