@@ -208,9 +208,6 @@ const ReportItem = ({
         document.body.setAttribute("data-og-ready", "1");
         if (report)
           document.body.setAttribute("data-og-report", String(report));
-        // Helpful debug for local runs
-        if (typeof console !== "undefined")
-          console.debug("[og-ready] set data-og-ready for report", report);
       } else {
         document.body.removeAttribute("data-og-ready");
         document.body.removeAttribute("data-og-report");
