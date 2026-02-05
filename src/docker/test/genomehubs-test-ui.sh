@@ -47,13 +47,19 @@ ls -la /genomehubs/genomehubs-ui/node_modules/ 2>/dev/null | head -5 || echo "No
 
 echo ""
 echo "=== Starting API server ==="
-cd /genomehubs/genomehubs-api && node --no-deprecation build/bundle.cjs > /tmp/api.log 2>&1 &
+cd /genomehubs/genomehubs-api && GH_NODE=$GH_NODE GH_HUBNAME=$GH_HUBNAME GH_RELEASE=$GH_RELEASE node --no-deprecation build/bundle.cjs > /tmp/api.log 2>&1 &
 API_PID=$!
 echo "API PID: $API_PID"
 
 echo ""
 echo "=== Starting UI server ==="
-cd /genomehubs/genomehubs-ui && node --no-deprecation src/server/index.js > /tmp/ui.log 2>&1 &
+cd /genomehubs/genomehubs-ui && \
+  GH_API_URL=$GH_API_URL \
+  GH_HUBNAME=$GH_HUBNAME \
+  GH_BASENAME=$GH_BASENAME \
+  PORT=$PORT \
+  NODE_ENV=production \
+  node --no-deprecation src/server/index.js > /tmp/ui.log 2>&1 &
 UI_PID=$!
 echo "UI PID: $UI_PID"
 
@@ -96,11 +102,19 @@ done
 
 echo ""
 echo "=== API health ==="
-curl -s http://localhost:3000/api/v2 | head -5
+curl -s http://localhost:3000/api/v2 | head -20
 
 echo ""
 echo "=== UI health ==="
-curl -s http://localhost:${PORT} | head -10
+curl -s http://localhost:${PORT} | head -20
+
+echo ""
+echo "=== First 50 lines of API log ==="
+head -50 /tmp/api.log 2>/dev/null || echo "No API logs yet"
+
+echo ""
+echo "=== First 50 lines of UI log ==="
+head -50 /tmp/ui.log 2>/dev/null || echo "No UI logs yet"
 
 echo ""
 echo "=== Running UI tests ==="
