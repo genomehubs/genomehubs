@@ -69,7 +69,7 @@ for i in {1..30}; do
   api_ready=false
   ui_ready=false
   
-  if curl -s http://localhost:3000/api/v2 > /dev/null 2>&1; then
+  if curl -s http://localhost:3000/api/v2/taxonomies > /dev/null 2>&1; then
     api_ready=true
   fi
   
@@ -102,7 +102,7 @@ done
 
 echo ""
 echo "=== API health ==="
-curl -s http://localhost:3000/api/v2 | head -20
+curl -s http://localhost:3000/api/v2/taxonomies | head -20
 
 echo ""
 echo "=== UI health ==="
