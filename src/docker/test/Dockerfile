@@ -86,7 +86,7 @@ WORKDIR /genomehubs
 ## Install Node test dependencies
 RUN npm install --production js-yaml puppeteer
 
-## Copy test components
+## Copy test components - API build directory structure
 COPY --chown=node:node src/docker/test/genomehubs-api/ ./genomehubs-api/
 COPY --chown=node:node src/docker/test/genomehubs-ui-dist/ ./genomehubs-ui-dist/
 
