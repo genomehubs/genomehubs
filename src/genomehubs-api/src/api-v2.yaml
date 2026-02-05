@@ -1271,6 +1271,10 @@ components:
           type: string
         hits:
           type: integer
+        size:
+          type: integer
+        offset:
+          type: integer
         success:
           type: boolean
         took:
@@ -1946,7 +1950,7 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
+                    $ref: "#/components/schemas/Status"
                   hits:
                     type: array
                     items:
