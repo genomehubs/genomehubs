@@ -313,12 +313,25 @@ jobs:
           name: genomehubs-ui-dist
           path: ./src/genomehubs-ui/dist/
       - run: |
+          echo "=== Downloaded artifact structure ==="
+          echo "API build files:"
+          ls -la src/genomehubs-api/build/ || echo "No build directory"
+          echo "UI dist files:"
+          ls -la src/genomehubs-ui/dist/ | head -10
+
+          echo ""
+          echo "=== Preparing test container files ==="
           mkdir -p src/docker/test
           mv dist/*manylinux2014_x86_64.whl src/docker/test/ || echo "No wheel file found"
           mkdir -p src/docker/test/genomehubs-api/build
           cp -r src/genomehubs-api/build/* src/docker/test/genomehubs-api/build/
           mkdir -p src/docker/test/genomehubs-ui-dist
           cp -r src/genomehubs-ui/dist/* src/docker/test/genomehubs-ui-dist/ || echo "Failed to copy UI dist"
+
+          echo ""
+          echo "=== Final test directory structure ==="
+          ls -la src/docker/test/genomehubs-api/build/
+          find src/docker/test -type f | head -20
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
