@@ -15,6 +15,8 @@
 **/dist
 !src/genomehubs-ui/dist
 !src/genomehubs-ui/dist/**
+!src/docker/test/genomehubs-api/build
+!src/docker/test/genomehubs-api/build/**
 **/.cache
 coverage
 
