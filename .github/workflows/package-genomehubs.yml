@@ -367,6 +367,7 @@ jobs:
           mv dist/*manylinux2014_x86_64.whl src/docker/test/ || echo "No wheel file found"
           mkdir -p src/docker/test/genomehubs-api/build
           cp -r src/genomehubs-api/build/* src/docker/test/genomehubs-api/build/
+          cp src/genomehubs-api/package.json src/docker/test/genomehubs-api/
           mkdir -p src/docker/test/genomehubs-ui-dist
           cp -r src/genomehubs-ui/dist/* src/docker/test/genomehubs-ui-dist/ || echo "Failed to copy UI dist"
 
