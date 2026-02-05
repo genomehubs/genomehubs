@@ -88,11 +88,20 @@ RUN npm install --production js-yaml puppeteer
 
 ## Copy test components - API build directory structure
 COPY --chown=node:node src/docker/test/genomehubs-api/ ./genomehubs-api/
-COPY --chown=node:node src/docker/test/genomehubs-ui-dist/ ./genomehubs-ui-dist/
 
 ## Install API runtime dependencies for test server
 COPY src/genomehubs-api/package.json src/genomehubs-api/package-lock.json ./genomehubs-api/
 WORKDIR /genomehubs/genomehubs-api
+RUN npm ci --omit=dev
+WORKDIR /genomehubs
+
+## Copy UI server code and built assets
+COPY --chown=node:node src/genomehubs-ui/package.json src/genomehubs-ui/package-lock.json src/genomehubs-ui/.npmrc ./genomehubs-ui/
+COPY --chown=node:node src/genomehubs-ui/src/server ./genomehubs-ui/src/server
+COPY --chown=node:node src/docker/test/genomehubs-ui-dist/ ./genomehubs-ui/dist/
+
+## Install UI runtime dependencies for test server
+WORKDIR /genomehubs/genomehubs-ui
 RUN npm ci --omit=dev
 WORKDIR /genomehubs
 
