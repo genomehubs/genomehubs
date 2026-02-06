@@ -3,6 +3,7 @@
 import fs from "fs";
 import puppeteer from "puppeteer";
 import yaml from "js-yaml";
+import os from "os";
 
 async function waitUntilDownload(page, fileName = "") {
   return new Promise((resolve, reject) => {
@@ -30,8 +31,17 @@ const awaitTimeout = (delay) =>
 async function scrape(reports, directory) {
   let errors = {};
   let attempts = 5;
+  const platform = os.platform();
+  const chromeCandidates = [
+    process.env.PUPPETEER_EXECUTABLE_PATH,
+    platform === "darwin"
+      ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+      : undefined,
+    platform === "linux" ? "/usr/bin/google-chrome" : undefined,
+  ].filter(Boolean);
+  const executablePath = chromeCandidates.find((p) => fs.existsSync(p));
   const browser = await puppeteer.launch({
-    executablePath: "/usr/bin/google-chrome",
+    executablePath,
     headless: "new",
     args: [
       "--disable-gpu",
@@ -53,6 +63,32 @@ async function scrape(reports, directory) {
       let page;
       try {
         page = await browser.newPage();
+        page.setDefaultTimeout(120000);
+        page.on("console", (msg) => {
+          try {
+            console.log(`[page console] ${msg.type()}: ${msg.text()}`);
+          } catch (e) {
+            console.log("[page console] unable to read message");
+          }
+        });
+        page.on("pageerror", (err) => {
+          console.log(`[page error] ${err && err.message}`);
+        });
+        page.on("requestfailed", (req) => {
+          const failure = req.failure();
+          console.log(
+            `[request failed] ${req.url()} ${failure ? failure.errorText : ""}`,
+          );
+        });
+        page.on("response", (resp) => {
+          const url = resp.url();
+          if (
+            url.includes("/api/v2/report") ||
+            url.includes("/api/v2/search")
+          ) {
+            console.log(`[api response] ${resp.status()} ${url}`);
+          }
+        });
       } catch (error) {
         console.log(`caught -3 ${i}`);
         console.log(error);
@@ -100,7 +136,9 @@ async function scrape(reports, directory) {
 
       let element;
       try {
-        element = await page.waitForSelector("#report-panel");
+        element = await page.waitForSelector("#report-panel", {
+          timeout: 120000,
+        });
       } catch (error) {
         console.log(`caught 2 ${i}`);
         console.log(error);
@@ -114,7 +152,7 @@ async function scrape(reports, directory) {
       }
 
       try {
-        await page.waitForSelector("#report-loaded");
+        await page.waitForSelector("#report-loaded", { timeout: 120000 });
       } catch (error) {
         console.log(`caught 3 ${i}`);
         console.log(error);
@@ -123,7 +161,9 @@ async function scrape(reports, directory) {
 
       let element2;
       try {
-        element2 = await page.waitForSelector("#report-download-item > svg");
+        element2 = await page.waitForSelector("#report-download-item > svg", {
+          timeout: 120000,
+        });
       } catch (error) {
         console.log(`caught 4 ${i}`);
         console.log(error);
@@ -141,11 +181,24 @@ async function scrape(reports, directory) {
       let element3;
       try {
         element3 = await page.waitForSelector(
-          "#report-download-button >>>> button",
+          "#report-download-button button, #report-download-button >>>> button",
+          { timeout: 120000 },
         );
       } catch (error) {
         console.log(`caught 6 ${i}`);
         console.log(error);
+        try {
+          const html = await page.content();
+          fs.writeFileSync(`${downloadPath}/debug-${filename}.html`, html);
+          await page.screenshot({
+            path: `${downloadPath}/debug-${filename}.png`,
+            fullPage: true,
+          });
+          console.log(`saved debug HTML/screenshot for ${filename}`);
+        } catch (e) {
+          console.log(`failed to save debug output for ${filename}`);
+          console.log(e);
+        }
         continue;
       }
 
