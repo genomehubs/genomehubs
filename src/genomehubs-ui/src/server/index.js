@@ -190,17 +190,31 @@ function resolveMarkdownPath(urlPath) {
   const clean = urlPath
     .replace(new RegExp(`^${BASE_PATH.replace(/\/$/, "")}`), "")
     .replace(/\/$/, "");
+  const cleanRel = clean.replace(/^\/+/, "");
 
   // Check if CONTENT_ROOT exists and has content
   const contentRootExists = fs.existsSync(CONTENT_ROOT);
 
   // Only try mounted content paths if CONTENT_ROOT actually exists
   if (contentRootExists) {
+    // Special case: root path "/" should try title.md and landing.md
+    if (!cleanRel || cleanRel === "") {
+      const rootPaths = [
+        path.join(CONTENT_ROOT, "title.md"),
+        path.join(CONTENT_ROOT, "landing.md"),
+      ];
+      for (const p of rootPaths) {
+        if (fs.existsSync(p) && fs.statSync(p).isFile()) {
+          return p;
+        }
+      }
+    }
+
     // Try "path.md" then "path/index.md" (case-sensitive first)
     const tryPaths = [
-      path.join(CONTENT_ROOT, `${clean}`),
-      path.join(CONTENT_ROOT, `${clean}.md`),
-      path.join(CONTENT_ROOT, clean, "index.md"),
+      path.join(CONTENT_ROOT, `${cleanRel}`),
+      path.join(CONTENT_ROOT, `${cleanRel}.md`),
+      path.join(CONTENT_ROOT, cleanRel, "index.md"),
     ];
 
     for (const p of tryPaths) {
@@ -211,7 +225,7 @@ function resolveMarkdownPath(urlPath) {
 
     // Fallback: try case-insensitive match in CONTENT_ROOT
     try {
-      const parts = clean.split("/").filter(Boolean);
+      const parts = cleanRel.split("/").filter(Boolean);
       let currentDir = CONTENT_ROOT;
       let resolvedPath = CONTENT_ROOT;
 
@@ -1771,6 +1785,10 @@ function escapeHtml(str) {
 function sanitizeDescription(text) {
   if (!text) return "";
   let s = String(text);
+  // Remove HTML comments
+  s = s.replace(/<!--[\s\S]*?-->/g, "");
+  // // Remove directive container blocks
+  // s = s.replace(/^:::\w+[\s\S]*?^:::/gm, "");
   // Replace markdown images ![alt](url) with alt text
   s = s.replace(/!\[([^\]]*)\]\([^\)]+\)/g, (m, alt) => alt || "");
   // Replace directive patterns ::name[inner]{...} with inner
@@ -1778,11 +1796,18 @@ function sanitizeDescription(text) {
     /::\w+\[([\s\S]*?)\](?:\{[^}]*\})?/g,
     (m, inner) => inner || "",
   );
-  // Remove any remaining directive-like tokens ::name or {size=...}
+  // Remove standalone directives without brackets ::name{...}
+  s = s.replace(/::\w+\{[^}]*\}/g, "");
+  // Remove any remaining directive-like tokens ::name
   s = s.replace(/::\w+/g, "");
+  // Remove attribute blocks {key="value" ...}
   s = s.replace(/\{[^}]*\}/g, "");
+  // Remove markdown links but keep text [text](url) -> text
+  s = s.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
   // Collapse whitespace and trim
   s = s.replace(/\s+/g, " ").trim();
+  // Remove stray colons that may be left from directive removal
+  s = s.replace(/:+/g, ":").replace(/\s+:\s+/g, "");
   // Limit length to reasonable meta description size
   if (s.length > 300) s = s.slice(0, 297) + "...";
   return s;
@@ -2111,26 +2136,26 @@ app.get("*", async (req, res) => {
     const wantsSSR = SSR_MODE === "all" || (SSR_MODE === "bots" && isBot(req));
     const mdPath = resolveMarkdownPath(req.path);
 
-    // Debug logging
-    if (process.env.DEBUG_SSR) {
-      console.log(
-        `[SSR] Path: ${req.path}, Found: ${mdPath ? "yes" : "no"}, WantsSSR: ${wantsSSR}`,
-      );
-    }
-
     if (wantsSSR && mdPath) {
       const md = fs.readFileSync(mdPath, "utf8");
       const ssrHtml = await renderMarkdownToHtml(md);
 
       // Derive simple title/description heuristically
       const firstHeading = (md.match(/^#\s+(.+)$/m) || [null, null])[1];
-      const description = md
-        .replace(/^#.+$/m, "")
-        .replace(/`{1,3}[^`]*`/g, " ")
-        .replace(/\*|_/g, "")
-        .replace(/\s+/g, " ")
-        .trim()
-        .slice(0, 300);
+      let description = md
+        .replace(/^#.+$/m, "") // Remove first heading
+        .replace(/`{1,3}[^`]*`/g, " ") // Remove code blocks/inline code
+        .replace(/\*|_/g, "") // Remove emphasis markers
+        .replace(/\s+/g, " ") // Collapse whitespace
+        .trim();
+
+      // Extract first real paragraph (non-empty line with substance)
+      const paragraphs = description.split(/\n\n+/);
+      description =
+        paragraphs.find((p) => p.trim().length > 20) || paragraphs[0] || "";
+
+      // Apply comprehensive sanitization for meta tags
+      description = sanitizeDescription(description);
 
       // Build absolute URL for OG image endpoint for this path only when
       // an OG renderer is configured. If no renderer is present we do NOT
