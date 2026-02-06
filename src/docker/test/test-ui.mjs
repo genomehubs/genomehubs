@@ -85,8 +85,8 @@ async function scrape(reports, directory) {
       let page;
       try {
         page = await browser.newPage();
-        page.setDefaultTimeout(180000);
-        page.setDefaultNavigationTimeout(180000);
+        page.setDefaultTimeout(60000);
+        page.setDefaultNavigationTimeout(60000);
 
         // Only log API responses and errors
         page.on("console", (msg) => {
@@ -135,7 +135,7 @@ async function scrape(reports, directory) {
             const panel = document.querySelector("#report-panel");
             return panel && panel.offsetHeight > 100;
           },
-          { timeout: 180000 },
+          { timeout: 60000 },
         );
 
         // Wait for report to load (wait for the #report-loaded marker to appear)
@@ -143,7 +143,7 @@ async function scrape(reports, directory) {
           () => {
             return document.querySelector("#report-loaded") !== null;
           },
-          { timeout: 180000 },
+          { timeout: 60000 },
         );
 
         console.error(`  report loaded, waiting for download button...`);
@@ -160,7 +160,7 @@ async function scrape(reports, directory) {
             const rect = downloadIcon.getBoundingClientRect();
             return rect.width > 0 && rect.height > 0;
           },
-          { timeout: 180000 },
+          { timeout: 60000 },
         );
 
         console.error(`  download button visible, clicking download icon...`);
@@ -180,7 +180,7 @@ async function scrape(reports, directory) {
             const rect = downloadButton.getBoundingClientRect();
             return rect.width > 0 && rect.height > 0;
           },
-          { timeout: 180000 },
+          { timeout: 60000 },
         );
 
         // Get the first button in the download menu (usually PNG option)
@@ -205,7 +205,7 @@ async function scrape(reports, directory) {
         });
 
         // Start waiting for download before clicking
-        const downloadPromise = waitForDownload(page, downloadPath, 120000);
+        const downloadPromise = waitForDownload(page, downloadPath, 60000);
 
         // Click the first download button
         await buttons[0].click();
@@ -259,6 +259,7 @@ async function scrape(reports, directory) {
     if (!success) {
       console.error(` ✗ unable to download report`);
       errors[filename] = "download";
+      break;
     }
   }
 
