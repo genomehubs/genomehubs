@@ -276,8 +276,10 @@ export const ReportDownload = ({
       container
       direction="column"
       style={{ height: "100%", width: "100%" }}
+      id="report-download-button"
+      data-testid="report-download-panel"
     >
-      <Grid align="right" id="report-download-button">
+      <Grid align="right">
         {/* <GetAppIcon
           onClick={(e) => {
             if (code) {
@@ -292,6 +294,7 @@ export const ReportDownload = ({
           onButtonClick={handleClick}
           searchTerm={qs.parse(queryString)}
           options={options}
+          data-testid="report-download-button"
         />
       </Grid>
     </Grid>

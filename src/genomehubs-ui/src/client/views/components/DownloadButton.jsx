@@ -31,6 +31,7 @@ const DownloadButton = ({
   // setMessage,
   theme,
   colorScheme,
+  ...props
 }) => {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
@@ -95,16 +96,20 @@ const DownloadButton = ({
     setOpen(false);
   };
 
-  const GroupedButton = forwardRef((props, ref) => (
+  const GroupedButton = forwardRef((buttonProps, ref) => (
     <ColorButtonGroup
       variant="contained"
       disableElevation
       // color="primary"
-      {...props}
+      {...buttonProps}
       ref={ref}
       aria-label="split button"
     >
-      <ColorButton startIcon={<GetAppIcon />} onClick={handleClick}>
+      <ColorButton
+        startIcon={<GetAppIcon />}
+        onClick={handleClick}
+        data-testid="report-download-main-button"
+      >
         {Object.keys(options)[selectedIndex]}
       </ColorButton>
       <ColorButton
@@ -112,9 +117,10 @@ const DownloadButton = ({
         size="small"
         aria-controls={open ? "split-button-menu" : undefined}
         aria-expanded={open ? "true" : undefined}
-        aria-label="select merge strategy"
+        aria-label="select download format"
         aria-haspopup="menu"
         onClick={handleToggle}
+        data-testid="report-download-menu-toggle"
       >
         <ArrowDropDownIcon />
       </ColorButton>
@@ -130,9 +136,13 @@ const DownloadButton = ({
         backgroundColor: colorScheme[theme].lightColor,
         flex: "0 1 auto",
       }}
+      {...props}
     >
       <GroupedButton ref={anchorRef} />
-      <Paper style={{ height: open ? "auto" : 0, overflow: "hidden" }}>
+      <Paper
+        style={{ height: open ? "auto" : 0, overflow: "hidden" }}
+        data-testid="report-download-menu"
+      >
         <ClickAwayListener onClickAway={handleClose}>
           <MenuList id="split-button-menu">
             {Object.keys(options).map((option, index) => (
@@ -140,6 +150,7 @@ const DownloadButton = ({
                 key={option}
                 selected={index === selectedIndex}
                 onClick={(event) => handleMenuItemClick(event, index)}
+                data-testid={`report-download-option-${index}`}
               >
                 {option}
               </MenuItem>

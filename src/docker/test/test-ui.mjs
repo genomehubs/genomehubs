@@ -167,49 +167,51 @@ async function scrape(reports, directory) {
         await awaitTimeout(500);
 
         // Wait for the ReportDownload component to render and show buttons
-        // The component is lazy-loaded and renders inside #report-download-button
         console.error(`  waiting for download options to appear...`);
         await page.waitForFunction(
           () => {
-            // Look for any button within the download button container
-            const container = document.querySelector("#report-download-button");
-            if (!container) {
-              console.log("  [debug] #report-download-button not found");
+            // Wait for the download panel to be ready
+            const panel = document.querySelector(
+              '[data-testid="report-download-panel"]',
+            );
+            if (!panel) {
+              console.log("  [debug] download panel not found");
               return false;
             }
 
-            // Check if there are any buttons
-            const buttons = container.querySelectorAll("button");
-            if (buttons.length === 0) {
-              console.log(
-                "  [debug] no buttons found in #report-download-button",
-              );
+            // Look for visible buttons with the test IDs
+            const mainBtn = document.querySelector(
+              '[data-testid="report-download-main-button"]',
+            );
+            const menuToggle = document.querySelector(
+              '[data-testid="report-download-menu-toggle"]',
+            );
+
+            if (!mainBtn || !menuToggle) {
+              console.log("  [debug] download buttons not found");
               return false;
             }
 
-            // Check if at least one button is visible
-            for (const btn of buttons) {
-              const rect = btn.getBoundingClientRect();
-              if (rect.width > 0 && rect.height > 0) {
-                console.log(
-                  `  [debug] found visible button: "${btn.textContent.trim()}"`,
-                );
-                return true;
-              }
+            const mainVisible = mainBtn.getBoundingClientRect().height > 0;
+            const toggleVisible = menuToggle.getBoundingClientRect().height > 0;
+
+            if (mainVisible && toggleVisible) {
+              console.log("  [debug] download buttons visible");
+              return true;
             }
             return false;
           },
           { timeout: 60000 },
         );
 
-        console.error(`  download options visible, clicking first option...`);
+        console.error(`  download options visible, clicking...`);
 
-        // Get all buttons and click the first one
-        const buttons = await page.$$("#report-download-button button");
-        if (buttons.length === 0) {
-          throw new Error(
-            "No download buttons found in #report-download-button",
-          );
+        // Get the main download button
+        const mainButton = await page.$(
+          '[data-testid="report-download-main-button"]',
+        );
+        if (!mainButton) {
+          throw new Error("Download main button not found");
         }
 
         // Clean up any previous download files
@@ -226,8 +228,8 @@ async function scrape(reports, directory) {
         // Start waiting for download before clicking
         const downloadPromise = waitForDownload(page, downloadPath, 60000);
 
-        // Click the first download button
-        await buttons[0].click();
+        // Click the download button to trigger PNG export
+        await mainButton.click();
 
         // Wait for the download to complete
         console.error(`  waiting for file download...`);
