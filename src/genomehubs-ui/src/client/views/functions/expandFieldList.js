@@ -1,6 +1,9 @@
 export const expandFieldList = ({ fields, types }) => {
   let fieldList = [];
   for (let field of fields.split(",")) {
+    if (!field || field.trim() === "") {
+      continue;
+    }
     if (field.match(/\*/)) {
       let parts = field.split(/\*/);
       let starts = parts[0] > "" && parts[0];
