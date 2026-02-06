@@ -162,20 +162,21 @@ async function scrape(reports, directory) {
 
         console.error(`  download icon visible, clicking...`);
 
-        // Click the download icon to show the download menu
+        // Click the download icon SVG element to trigger the state change
+        // The onClick handler is on the GetAppIcon component itself
         const downloadItemClicked = await page.evaluate(() => {
-          const icon = document.querySelector("#report-download-item");
+          const icon = document.querySelector("#report-download-item svg");
           if (!icon) {
-            console.log("  [debug] download item not found");
+            console.log("  [debug] download icon SVG not found");
             return false;
           }
-          console.log("  [debug] clicking download item");
+          console.log("  [debug] clicking download icon SVG");
           icon.click();
           return true;
         });
 
         if (!downloadItemClicked) {
-          throw new Error("Could not click download item");
+          throw new Error("Could not click download icon");
         }
 
         // Wait longer for lazy-loaded component to load
