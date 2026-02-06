@@ -6,10 +6,9 @@ import puppeteer from "puppeteer";
 import yaml from "js-yaml";
 
 /**
- * Wait for a download to complete by monitoring the CDP session
- * Returns the file path once download completes
+ * Wait for a download to complete by monitoring the download directory
  */
-async function waitForDownload(page, downloadPath, timeoutMs = 120000) {
+async function waitForDownload(page, downloadPath, timeoutMs = 60000) {
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
       reject(new Error("Download timeout"));
@@ -102,12 +101,11 @@ async function scrape(reports, directory) {
         page.on("response", (resp) => {
           const respUrl = resp.url();
           if (
-            respUrl.includes("/api/v2/report") ||
-            respUrl.includes("/api/v2/search")
+            (respUrl.includes("/api/v2/report") ||
+              respUrl.includes("/api/v2/search")) &&
+            resp.status() !== 200
           ) {
-            if (resp.status() !== 200) {
-              console.error(`[api error] ${resp.status()} ${respUrl}`);
-            }
+            console.error(`[api error] ${resp.status()} ${respUrl}`);
           }
         });
 
@@ -149,7 +147,6 @@ async function scrape(reports, directory) {
         console.error(`  report loaded, waiting for download button...`);
 
         // Now wait for the download button to be visible and clickable
-        // The button appears after the report is fully loaded
         await page.waitForFunction(
           () => {
             const downloadIcon = document.querySelector(
@@ -163,35 +160,57 @@ async function scrape(reports, directory) {
           { timeout: 60000 },
         );
 
-        console.error(`  download button visible, clicking download icon...`);
+        console.error(`  download icon visible, clicking...`);
 
         // Click the download icon to show the download menu
         await page.click("#report-download-item");
         await awaitTimeout(500);
 
-        // Wait for the download menu/button panel to appear
-        console.error(`  waiting for download options...`);
+        // Wait for the ReportDownload component to render and show buttons
+        // The component is lazy-loaded and renders inside #report-download-button
+        console.error(`  waiting for download options to appear...`);
         await page.waitForFunction(
           () => {
-            const downloadButton = document.querySelector(
-              "#report-download-button button",
-            );
-            if (!downloadButton) return false;
-            const rect = downloadButton.getBoundingClientRect();
-            return rect.width > 0 && rect.height > 0;
+            // Look for any button within the download button container
+            const container = document.querySelector("#report-download-button");
+            if (!container) {
+              console.log("  [debug] #report-download-button not found");
+              return false;
+            }
+
+            // Check if there are any buttons
+            const buttons = container.querySelectorAll("button");
+            if (buttons.length === 0) {
+              console.log(
+                "  [debug] no buttons found in #report-download-button",
+              );
+              return false;
+            }
+
+            // Check if at least one button is visible
+            for (const btn of buttons) {
+              const rect = btn.getBoundingClientRect();
+              if (rect.width > 0 && rect.height > 0) {
+                console.log(
+                  `  [debug] found visible button: "${btn.textContent.trim()}"`,
+                );
+                return true;
+              }
+            }
+            return false;
           },
           { timeout: 60000 },
         );
 
-        // Get the first button in the download menu (usually PNG option)
+        console.error(`  download options visible, clicking first option...`);
+
+        // Get all buttons and click the first one
         const buttons = await page.$$("#report-download-button button");
         if (buttons.length === 0) {
           throw new Error(
             "No download buttons found in #report-download-button",
           );
         }
-
-        console.error(`  clicking first download format option...`);
 
         // Clean up any previous download files
         const existingFiles = fs.readdirSync(downloadPath);
@@ -228,13 +247,60 @@ async function scrape(reports, directory) {
         // Save debug output on last attempt
         if (i === attempts - 1 && page) {
           try {
+            // Check state of key elements
+            const debugInfo = await page.evaluate(() => {
+              const reportPanel = document.querySelector("#report-panel");
+              const reportLoaded = document.querySelector("#report-loaded");
+              const downloadItem = document.querySelector(
+                "#report-download-item",
+              );
+              const downloadButton = document.querySelector(
+                "#report-download-button",
+              );
+              const buttons = document.querySelectorAll(
+                "#report-download-button button",
+              );
+
+              return {
+                reportPanel: {
+                  exists: !!reportPanel,
+                  visible: reportPanel ? reportPanel.offsetHeight > 0 : false,
+                  height: reportPanel?.offsetHeight,
+                },
+                reportLoaded: {
+                  exists: !!reportLoaded,
+                },
+                downloadItem: {
+                  exists: !!downloadItem,
+                  visible: downloadItem
+                    ? downloadItem.getBoundingClientRect().height > 0
+                    : false,
+                },
+                downloadButton: {
+                  exists: !!downloadButton,
+                  buttonCount: buttons.length,
+                  visibleButtons: Array.from(buttons).filter(
+                    (b) => b.getBoundingClientRect().height > 0,
+                  ).length,
+                  buttonTexts: Array.from(buttons).map((b) =>
+                    b.textContent.trim().substring(0, 50),
+                  ),
+                },
+              };
+            });
+
+            console.error(`  [debug] element state:`);
+            console.error(JSON.stringify(debugInfo, null, 2));
+
             const html = await page.content();
             fs.writeFileSync(`${downloadPath}/debug-${filename}.html`, html);
             await page.screenshot({
               path: `${downloadPath}/debug-${filename}.png`,
               fullPage: true,
             });
-            console.error(`  saved debug output`);
+            console.error(
+              `  saved debug output to debug-${filename}.{html,png}`,
+            );
           } catch (debugError) {
             console.error(
               `  failed to save debug output: ${debugError.message}`,
