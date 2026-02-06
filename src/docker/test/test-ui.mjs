@@ -163,46 +163,153 @@ async function scrape(reports, directory) {
         console.error(`  download icon visible, clicking...`);
 
         // Click the download icon to show the download menu
-        await page.click("#report-download-item");
-        await awaitTimeout(500);
+        const downloadItemClicked = await page.evaluate(() => {
+          const icon = document.querySelector("#report-download-item");
+          if (!icon) {
+            console.log("  [debug] download item not found");
+            return false;
+          }
+          console.log("  [debug] clicking download item");
+          icon.click();
+          return true;
+        });
+
+        if (!downloadItemClicked) {
+          throw new Error("Could not click download item");
+        }
+
+        // Wait longer for lazy-loaded component to load
+        await awaitTimeout(2000);
 
         // Wait for the ReportDownload component to render and show buttons
         console.error(`  waiting for download options to appear...`);
-        await page.waitForFunction(
-          () => {
-            // Wait for the download panel to be ready
-            const panel = document.querySelector(
-              '[data-testid="report-download-panel"]',
+        let componentFound = false;
+        try {
+          await page.waitForFunction(
+            () => {
+              // Check what's in the DOM
+              const overlay = document.querySelector(
+                '[style*="position: absolute"]',
+              );
+              if (!overlay) {
+                console.log("  [debug] no overlay found");
+              } else {
+                console.log("  [debug] overlay found");
+              }
+
+              // Wait for the download panel to be ready
+              const panel = document.querySelector(
+                '[data-testid="report-download-panel"]',
+              );
+              if (!panel) {
+                console.log("  [debug] download panel not found");
+                const allTestIds = Array.from(
+                  document.querySelectorAll("[data-testid]"),
+                ).map((el) => el.getAttribute("data-testid"));
+                if (allTestIds.length > 0) {
+                  console.log(
+                    `  [debug] found testids: ${allTestIds.join(", ")}`,
+                  );
+                }
+                return false;
+              }
+
+              console.log("  [debug] download panel found");
+
+              // Look for visible buttons with the test IDs
+              const mainBtn = document.querySelector(
+                '[data-testid="report-download-main-button"]',
+              );
+              const menuToggle = document.querySelector(
+                '[data-testid="report-download-menu-toggle"]',
+              );
+
+              if (!mainBtn || !menuToggle) {
+                console.log("  [debug] download buttons not found");
+                return false;
+              }
+
+              const mainVisible = mainBtn.getBoundingClientRect().height > 0;
+              const toggleVisible =
+                menuToggle.getBoundingClientRect().height > 0;
+
+              if (mainVisible && toggleVisible) {
+                console.log("  [debug] download buttons visible");
+                return true;
+              }
+              return false;
+            },
+            { timeout: 60000 },
+          );
+          componentFound = true;
+        } catch (e) {
+          console.error(`  component wait failed: ${e.message}`);
+        }
+
+        if (!componentFound) {
+          // Fallback: try to trigger export directly via window
+          console.error(
+            `  download panel did not appear, trying direct approach...`,
+          );
+
+          // Check if we can find and call the export function directly
+          const directExportAttempt = await page.evaluate(() => {
+            // Try to find the chart element and trigger screenshot
+            const chartContainer = document.querySelector(
+              "#report-panel [id*='chart'], #report-panel > div",
             );
-            if (!panel) {
-              console.log("  [debug] download panel not found");
+            if (!chartContainer) {
+              console.log("  [debug] could not find chart container");
               return false;
             }
 
-            // Look for visible buttons with the test IDs
-            const mainBtn = document.querySelector(
-              '[data-testid="report-download-main-button"]',
+            console.log("  [debug] found chart container");
+            return true;
+          });
+
+          if (!directExportAttempt) {
+            throw new Error(
+              "Could not find download panel or chart after clicking",
             );
-            const menuToggle = document.querySelector(
-              '[data-testid="report-download-menu-toggle"]',
-            );
+          }
 
-            if (!mainBtn || !menuToggle) {
-              console.log("  [debug] download buttons not found");
-              return false;
+          // Take screenshot of report panel for debugging
+          console.error(`  taking debug screenshot of report panel...`);
+          const reportPanel = await page.$("#report-panel");
+          if (reportPanel) {
+            const boundingBox = await reportPanel.boundingBox();
+            if (boundingBox) {
+              const existingFiles = fs.readdirSync(downloadPath);
+              const pngFiles = existingFiles.filter((f) => f.endsWith(".png"));
+              pngFiles.forEach((f) => {
+                try {
+                  fs.unlinkSync(`${downloadPath}/${f}`);
+                } catch (e) {
+                  // Ignore
+                }
+              });
+
+              const debugScreenshotPath = `${downloadPath}/fallback-screenshot-${filename}`;
+              await page.screenshot({
+                path: debugScreenshotPath,
+                clip: {
+                  x: Math.max(0, boundingBox.x - 10),
+                  y: Math.max(0, boundingBox.y - 10),
+                  width: boundingBox.width + 20,
+                  height: boundingBox.height + 20,
+                },
+              });
+
+              console.error(
+                `  saved fallback screenshot to ${debugScreenshotPath}`,
+              );
             }
+          }
 
-            const mainVisible = mainBtn.getBoundingClientRect().height > 0;
-            const toggleVisible = menuToggle.getBoundingClientRect().height > 0;
-
-            if (mainVisible && toggleVisible) {
-              console.log("  [debug] download buttons visible");
-              return true;
-            }
-            return false;
-          },
-          { timeout: 60000 },
-        );
+          throw new Error(
+            "Download panel failed to load (check fallback screenshot for debugging)",
+          );
+        }
 
         console.error(`  download options visible, clicking...`);
 
@@ -256,11 +363,11 @@ async function scrape(reports, directory) {
               const downloadItem = document.querySelector(
                 "#report-download-item",
               );
-              const downloadButton = document.querySelector(
-                "#report-download-button",
+              const downloadPanel = document.querySelector(
+                '[data-testid="report-download-panel"]',
               );
-              const buttons = document.querySelectorAll(
-                "#report-download-button button",
+              const mainButton = document.querySelector(
+                '[data-testid="report-download-main-button"]',
               );
 
               return {
@@ -278,16 +385,23 @@ async function scrape(reports, directory) {
                     ? downloadItem.getBoundingClientRect().height > 0
                     : false,
                 },
-                downloadButton: {
-                  exists: !!downloadButton,
-                  buttonCount: buttons.length,
-                  visibleButtons: Array.from(buttons).filter(
-                    (b) => b.getBoundingClientRect().height > 0,
-                  ).length,
-                  buttonTexts: Array.from(buttons).map((b) =>
-                    b.textContent.trim().substring(0, 50),
-                  ),
+                downloadPanel: {
+                  exists: !!downloadPanel,
+                  visible: downloadPanel
+                    ? downloadPanel.offsetHeight > 0
+                    : false,
                 },
+                mainButton: {
+                  exists: !!mainButton,
+                  visible: mainButton
+                    ? mainButton.getBoundingClientRect().height > 0
+                    : false,
+                },
+                allTestIds: Array.from(
+                  document.querySelectorAll("[data-testid]"),
+                )
+                  .map((el) => el.getAttribute("data-testid"))
+                  .slice(0, 20),
               };
             });
 
