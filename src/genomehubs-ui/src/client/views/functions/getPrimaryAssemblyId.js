@@ -12,7 +12,7 @@ const getPrimaryAssemblyId = (record) => {
     record.record.attributes.assembly_level.values
   ) {
     let primary = record.record.attributes.assembly_level.values.find(
-      (o) => o.is_primary
+      (o) => o.is_primary,
     );
     if (primary) {
       return primary.source_id;

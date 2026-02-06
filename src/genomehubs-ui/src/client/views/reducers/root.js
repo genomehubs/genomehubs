@@ -45,7 +45,7 @@ const allReducers = Object.assign(
   taxonomyReducers,
   trackingReducers,
   treeReducers,
-  typeReducers
+  typeReducers,
 );
 
 const appReducer = combineReducers(allReducers);

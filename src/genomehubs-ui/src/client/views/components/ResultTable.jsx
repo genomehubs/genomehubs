@@ -338,6 +338,65 @@ const ResultTable = ({
         }
         obj.summary = summary || defaultValue;
       }
+    } else if (searchResults.isMsearch && searchResults.results?.length > 0) {
+      // For msearch, extract fields from actual results instead of searchTerm
+      const fieldsSet = new Set();
+      searchResults.results.forEach((hit) => {
+        if (hit.result?.attributes) {
+          Object.keys(hit.result.attributes).forEach((field) =>
+            fieldsSet.add(field),
+          );
+        }
+      });
+      const fields = Array.from(fieldsSet).join(",");
+      let fieldList = expandFieldList({ fields, types });
+      expandedTypes = displayTypes
+        .filter(({ name }) => !emptyBuckets.has(name) && name != "none")
+        .map(({ name, ...rest }) => ({
+          name,
+          field: name,
+          ...structuredClone({ rest }),
+        }));
+      for (let field of fieldList) {
+        let name, summary;
+        if (field.includes(":")) {
+          [name, summary] = field.split(":");
+        } else if (field.includes(".")) {
+          [name, ...summary] = field.split(".");
+          summary = `metadata.${summary.join(".")}`;
+        } else {
+          expandedTypes.push({
+            name: field,
+            field,
+            summary: "value",
+          });
+          continue;
+        }
+        let index = findLastIndex({ name, field, expandedTypes });
+        let defaultValue = (types[name] || { processed_simple: "value" })
+          .processed_simple;
+        expandedTypes.splice(index + 1, 0, {
+          ...expandedTypes[index],
+          name: field.includes(".") ? name : `${name}:${summary}`,
+          summary: summary || defaultValue,
+          field,
+        });
+      }
+      for (let obj of expandedTypes) {
+        let { name, field, summary, file_paths } = obj;
+        if (name != field && file_paths) {
+          let [_, key] = field.split(".");
+          let { color } = file_paths[key] || {};
+          obj.color = color;
+        }
+        name = name.replace(/:.+/, "");
+        let defaultValue = (types[name] || { processed_simple: "value" })
+          .processed_simple;
+        if (["direct", "descendant", "ancestor"].includes(summary)) {
+          summary = defaultValue;
+        }
+        obj.summary = summary || defaultValue;
+      }
     } else {
       expandedTypes = displayTypes
         .filter(({ name }) => !emptyBuckets.has(name))

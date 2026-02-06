@@ -85,7 +85,7 @@ const ResultFilter = ({
             parts[1] = `!${parts[1]}`;
             parts[0] = parts[0].replace("!", "");
           }
-          let nameParts = parts[0].split(/[\(\)]/);
+          let nameParts = parts[0].split(/[()]/);
           if (nameParts.length > 1) {
             parts[0] = `${nameParts[1]}:${nameParts[0]}`;
           }

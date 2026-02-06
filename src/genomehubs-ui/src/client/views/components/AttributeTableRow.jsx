@@ -61,7 +61,7 @@ const useRowStyles = makeStyles({
 
 const ExternalLink = ({ url, link }) => {
   return (
-    <a href={url} target="_blank">
+    <a href={url} target="_blank" rel="noreferrer">
       {link}
       <LaunchIcon fontSize="inherit" />
     </a>

@@ -93,7 +93,7 @@ const ReportPanel = ({ options, reportDefaults, setReportTerm }) => {
       .filter((q) => q.length > 0);
     msearchQueries = queries.map((q) => ({
       original: q,
-      display: q.match(/[\(\)<>=]/) ? q : `tax_name(${q})`,
+      display: q.match(/[()<>=]/) ? q : `tax_name(${q})`,
     }));
   }
 

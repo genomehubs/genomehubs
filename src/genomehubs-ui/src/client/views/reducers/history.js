@@ -15,7 +15,7 @@ const runtimeBasename = (() => {
   // Fallback to build-time global if present
   try {
     // BASENAME is provided by webpack DefinePlugin
-    // eslint-disable-next-line no-undef
+
     const base = BASENAME || "";
     return base.replace(/^\/+/, "");
   } catch {}

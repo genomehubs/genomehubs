@@ -165,7 +165,7 @@ const SearchBox = ({
     if (
       result &&
       result == "taxon" &&
-      !term.match(/[\(\)<>=]/) &&
+      !term.match(/[()<>=]/) &&
       !types[term] &&
       !synonyms[term] &&
       term > ""
@@ -265,7 +265,7 @@ const SearchBox = ({
       const searches = queries.map((query) => {
         // Only wrap in tax_name/tax_tree if it's a bare term (no special chars, not an attribute)
         let wrappedQuery = query;
-        if (!query.match(/[\(\)<>=]/) && !types[query] && !synonyms[query]) {
+        if (!query.match(/[()<>=]/) && !types[query] && !synonyms[query]) {
           wrappedQuery = `${taxWrap}(${query})`;
         }
         return {

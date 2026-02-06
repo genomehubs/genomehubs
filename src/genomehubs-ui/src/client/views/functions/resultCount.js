@@ -8,7 +8,7 @@ export const simpleCount = (json) => {
 export const fieldCount = (json) => {
   if (json && json.status && json.status.success && json.status.hits >= 1) {
     return Object.values(json.results[0].result.fields).filter(
-      (value) => value && Object.keys(value).length > 0
+      (value) => value && Object.keys(value).length > 0,
     ).length;
   }
   return 0;

@@ -4,7 +4,7 @@ export const setLoading = createAction("SET_LOADING");
 export const loading = handleAction(
   "SET_LOADING",
   (_, action) => action.payload,
-  "started"
+  "started",
 );
 export const getLoading = (state) => {
   return state.loading;

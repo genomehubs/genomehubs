@@ -121,7 +121,7 @@ export const fetchAutocomplete = ({
   return fetch(url)
     .then(
       (response) => response.json(),
-      (error) => console.log("An error occured.", error)
+      (error) => console.log("An error occured.", error),
     )
     .then((json) => {
       return {

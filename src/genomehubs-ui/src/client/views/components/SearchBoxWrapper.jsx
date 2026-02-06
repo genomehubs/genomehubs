@@ -1,4 +1,4 @@
-import { memo, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 import { Box } from "@mui/material";
 import ChipSearchBox from "./ChipSearch/ChipSearchBox";
@@ -11,7 +11,6 @@ import { siteName } from "#reducers/location";
 import { useLocation } from "@reach/router";
 import useNavigate from "#hooks/useNavigate";
 import { useReadLocalStorage } from "usehooks-ts";
-import { useStyles } from "./SearchBoxStyles";
 import withApi from "#hocs/withApi";
 import withLookup from "#hocs/withLookup";
 import withSearch from "#hocs/withSearch";
@@ -25,7 +24,6 @@ const suggestedTerm = getSuggestedTerm();
 const indexList = ["taxon", "assembly", "sample", "feature"];
 
 const SearchBoxWrapper = ({
-  lookupTerm,
   setLookupTerm,
   // resetLookup,
   fetchSearchResults,
@@ -40,19 +38,22 @@ const SearchBoxWrapper = ({
   types,
   allTypes,
   synonyms,
-  basename,
 }) => {
   const results = indexList.filter((index) => indices.includes(index));
   const [searchBoxTerm, setSearchBoxTerm] = useState(searchTerm.query || "");
-  const classes = useStyles();
   const navigate = useNavigate();
   const location = useLocation();
   let options = qs.parse(location.search.replace(/^\?/, ""));
   let pathname = location.pathname.replace(/^\//, "");
-  const formRef = useRef(null);
-  const searchBoxRef = useRef(null);
   const rootRef = useRef(null);
-  const searchInputRef = useRef(null);
+
+  // Check if query contains unsupported syntax and switch to SearchBox v1.0
+  useEffect(() => {
+    const query = searchTerm.query || "";
+    if (query.includes(";") || query.includes(" OR ")) {
+      localStorage.setItem("searchBoxVersion", "1.0");
+    }
+  }, [searchTerm.query]);
 
   const resetSearch = () => {
     setSearchIndex("taxon");
@@ -70,16 +71,14 @@ const SearchBoxWrapper = ({
     feature: useReadLocalStorage(`featureOptions`) || {},
   };
 
-  let [result, setResult] = useState(searchIndex);
-  const [showSearchBox, setShowSearchBox] = useState(false);
-  const [liveQuery, setLiveQuery] = useState("");
-
-  let toggleTemplate;
+  let [result] = useState(searchIndex);
 
   const dispatchSearch = (searchOptions = {}, term) => {
     let sameIndex = searchIndex == searchOptions.result;
     let fullOptions = { ...searchTerm, ...searchOptions };
-    if (!fullOptions.hasOwnProperty("includeEstimates")) {
+    if (
+      !Object.prototype.hasOwnProperty.call(fullOptions, "includeEstimates")
+    ) {
       fullOptions.includeEstimates = searchDefaults.includeEstimates;
     }
 
@@ -126,8 +125,8 @@ const SearchBoxWrapper = ({
       ["Ancestral", "Descendant", "Direct", "Missing"].forEach((key) => {
         let keyName = `exclude${key}`;
         if (
-          savedOptions.hasOwnProperty(keyName) &&
-          !fullOptions.hasOwnProperty(keyName)
+          Object.prototype.hasOwnProperty.call(savedOptions, keyName) &&
+          !Object.prototype.hasOwnProperty.call(fullOptions, keyName)
         ) {
           fullOptions[keyName] = savedOptions[keyName];
         }
@@ -141,12 +140,7 @@ const SearchBoxWrapper = ({
     delete urlParams.searches; // Don't persist searches array in URL
     delete urlParams.originalQueries; // Don't persist originalQueries in URL
 
-    console.log("dispatchSearch - fullOptions:", fullOptions);
-    console.log("dispatchSearch - urlParams before stringify:", urlParams);
-    console.log("dispatchSearch - query in urlParams?", !!urlParams.query);
-
     const queryString = qs.stringify(urlParams);
-    console.log("dispatchSearch - final query string:", queryString);
 
     if (pathname.match(/^search/)) {
       navigate(`/${pathname}?${queryString}#${encodeURIComponent(term)}`);
@@ -155,25 +149,10 @@ const SearchBoxWrapper = ({
     }
   };
 
-  const wrapTerm = ({ term, taxWrap, result }) => {
-    if (
-      result &&
-      result == "taxon" &&
-      !term.match(/[\(\)<>=]/) &&
-      !types[term] &&
-      !synonyms[term] &&
-      term > ""
-    ) {
-      term = `${taxWrap}(${term})`;
-    }
-    return term;
-  };
-
   const doSearch = ({
     query,
     result,
     fields,
-    hashTerm = "",
     includeDescendants,
     ...options
   }) => {
@@ -192,9 +171,9 @@ const SearchBoxWrapper = ({
     const BATCH_SEARCH_DELIMITER = "semicolon";
     let delimiter =
       BATCH_SEARCH_DELIMITER === "comma"
-        ? /[,]/
+        ? /,/
         : BATCH_SEARCH_DELIMITER === "semicolon"
-          ? /[;]/
+          ? /;/
           : /\n/;
     let hasDelimiter = query && query.match(delimiter);
     let queries = [];
@@ -218,7 +197,7 @@ const SearchBoxWrapper = ({
       const searches = queries.map((q) => {
         // Only wrap in tax_name/tax_tree if it's a bare term (no special chars, not an attribute)
         let wrappedQuery = q;
-        if (!q.match(/[\(\)<>=]/) && !types[q] && !synonyms[q]) {
+        if (!q.match(/[()<>=]/) && !types[q] && !synonyms[q]) {
           wrappedQuery = `${taxWrap}(${q})`;
         }
         return {
@@ -232,8 +211,6 @@ const SearchBoxWrapper = ({
       });
 
       // Create grouped batch search with dispatchSearch routing to batch
-      console.log("doSearch - detected batch search, queries:", queries);
-      console.log("doSearch - passing to dispatchSearch with query:", query);
       dispatchSearch(
         {
           searches,
@@ -251,13 +228,6 @@ const SearchBoxWrapper = ({
 
     dispatchSearch({ query, result, fields, ...options }, query);
     // resetLookup();
-  };
-
-  const handleSubmit = (e, props = {}) => {
-    e && e.preventDefault();
-    const { index } = props;
-    let term = searchInputRef.current.value;
-    doSearch(term, index || result, term);
   };
 
   let searchText = `Search ${siteName}`;
@@ -321,7 +291,6 @@ const SearchBoxWrapper = ({
           alignItems: "center",
           marginBottom: 2,
           minWidth: "900px",
-          width: "100%",
         }}
       >
         <ChipSearchBox

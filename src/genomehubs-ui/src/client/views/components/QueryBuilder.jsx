@@ -230,7 +230,7 @@ const QueryBuilder = ({
     let summary = "value";
     let attr = parts[0];
     if (!types[attr] && !attr.endsWith("_id")) {
-      [summary, attr] = attr.split(/[\(\))]/);
+      [summary, attr] = attr.split(/[()]/);
     }
     if (attr) {
       let extra = [];

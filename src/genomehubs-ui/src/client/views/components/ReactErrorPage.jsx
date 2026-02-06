@@ -74,6 +74,7 @@ export const ReactErrorPage = ({
               className={linkStyle}
               href="https://github.com/genomehubs/genomehubs/issues"
               target="_blank"
+              rel="noreferrer"
             >
               github repository
             </a>

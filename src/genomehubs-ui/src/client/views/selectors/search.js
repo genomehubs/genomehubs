@@ -53,7 +53,7 @@ export function fetchSearchResults(options, navigate) {
     }
     if (
       params.result == "taxon" &&
-      !params.query.match(/[\(\)<>=\n\*]/) &&
+      !params.query.match(/[()<>=\n*]/) &&
       !params.query.match(/\s+AND\s+/) &&
       !types[params.query]
     ) {
@@ -85,7 +85,7 @@ export function fetchSearchResults(options, navigate) {
         json = console.log("An error occured.", error);
       }
       if (!json.results || json.results.length == 0) {
-        if (params.result == "taxon" && !searchTerm.match(/[\(\)<>=\n\*]/)) {
+        if (params.result == "taxon" && !searchTerm.match(/[()<>=\n*]/)) {
           params.query = `tax_name(${searchTerm})`;
           dispatch(setPreferSearchTerm(true));
           dispatch(fetchSearchResults(params, navigate));
@@ -148,6 +148,9 @@ export function fetchMsearchResults(options, navigate) {
         originalQueries,
         result,
         taxonomy: params.taxonomy || taxonomy,
+        fields: params.fields || "", // Preserve fields parameter
+        names: params.names || "",
+        ranks: params.ranks || "",
       }),
     );
 
@@ -161,6 +164,18 @@ export function fetchMsearchResults(options, navigate) {
       // Use empty string for fields to get API default behavior (all attribute fields)
       // OR use specific fields if provided. Don't use undefined.
       fields: search.fields !== undefined ? search.fields : params.fields || "",
+      names:
+        search.names !== undefined
+          ? search.names
+          : params.names !== undefined
+            ? params.names
+            : undefined,
+      ranks:
+        search.ranks !== undefined
+          ? search.ranks
+          : params.ranks !== undefined
+            ? params.ranks
+            : undefined,
       limit: parseInt(search.limit, 10) || 1000,
       offset: parseInt(search.offset, 10) || 0,
       // Pass search parameters with each search
@@ -190,9 +205,6 @@ export function fetchMsearchResults(options, navigate) {
       ...(params.sortMode !== undefined && { sortMode: params.sortMode }),
     }));
 
-    console.log("Normalized searches:", normalizedSearches);
-    console.log("Search defaults:", searchDefaults);
-
     const endpoint = "msearch";
     const url = `${apiUrl}/${endpoint}`;
 
@@ -200,8 +212,6 @@ export function fetchMsearchResults(options, navigate) {
       const requestBody = JSON.stringify({
         searches: normalizedSearches,
       });
-
-      console.log("Sending msearch request:", requestBody);
 
       const response = await fetch(url, {
         method: "POST",
@@ -243,7 +253,6 @@ export function fetchMsearchResults(options, navigate) {
             queryResult.hits &&
             Array.isArray(queryResult.hits)
           ) {
-            console.log(queryResult);
             const { hits, total: totalCount } = queryResult;
             const displayCount = Math.min(totalCount, displayLimit);
             const hasMore = totalCount > displayLimit;
@@ -257,6 +266,8 @@ export function fetchMsearchResults(options, navigate) {
             });
             // Add only displayLimit hits for UI (but track total count for "show more" button)
             hits.slice(0, displayCount).forEach((hit) => {
+              const resolvedNames =
+                hit.result.names || hit.result.taxon_names || [];
               allHits.push({
                 id: hit.id,
                 index: hit.index,
@@ -264,7 +275,7 @@ export function fetchMsearchResults(options, navigate) {
                 result: {
                   ...hit.result,
                   // Alias taxon_* fields to expected names for ResultTable
-                  names: hit.result.taxon_names || hit.result.names || [],
+                  names: resolvedNames,
                 },
                 _msearchGroup: {
                   query,
@@ -360,6 +371,32 @@ export function fetchMsearchResults(options, navigate) {
             msearch: "true",
             offset: 0,
           };
+
+          // Preserve all relevant search parameters in the URL
+          const paramsToPreserve = [
+            "fields",
+            "names",
+            "ranks",
+            "taxonomy",
+            "size",
+            "excludeMissing",
+            "excludeAncestral",
+            "excludeDescendant",
+            "excludeDirect",
+            "includeEstimates",
+            "includeDescendants",
+            "includeRawValues",
+            "sortBy",
+            "sortOrder",
+            "sortMode",
+          ];
+
+          paramsToPreserve.forEach((param) => {
+            if (params[param] !== undefined && params[param] !== "") {
+              navOptions[param] = params[param];
+            }
+          });
+
           navigate(
             `${pathJoin(basename, "search")}?${qs.stringify(navOptions)}`,
             {

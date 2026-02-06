@@ -1,1 +1,1 @@
-export { default } from './ReportMap.jsx';
+export { default } from "./ReportMap.jsx";

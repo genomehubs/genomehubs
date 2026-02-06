@@ -97,6 +97,7 @@ export const NamesList = ({ names }) => {
           <a
             href={`${obj.source_url_stub}${name.replace(/^.+:/, "")}`}
             target="_blank"
+            rel="noreferrer"
           >
             <LaunchIcon fontSize="inherit" />
           </a>

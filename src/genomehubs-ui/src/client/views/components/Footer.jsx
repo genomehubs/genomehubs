@@ -88,7 +88,12 @@ const Footer = ({
     let releaseLink = version.release;
     if (version.source) {
       releaseLink = (
-        <a className={linkStyle} href={version.source} target="_blank">
+        <a
+          className={linkStyle}
+          href={version.source}
+          target="_blank"
+          rel="noreferrer"
+        >
           {releaseLink}
         </a>
       );
@@ -143,6 +148,7 @@ const Footer = ({
         className={linkStyle}
         href="https://github.com/genomehubs/genomehubs/issues"
         target="_blank"
+        rel="noreferrer"
       >
         issue
       </a>
@@ -205,7 +211,12 @@ const Footer = ({
     // <span style={{ float: "left", marginLeft: "1em" }}>
     <span>
       Powered by{" "}
-      <a className={linkStyle} href="https://genomehubs.org/" target="_blank">
+      <a
+        className={linkStyle}
+        href="https://genomehubs.org/"
+        target="_blank"
+        rel="noreferrer"
+      >
         GenomeHubs
       </a>{" "}
       <CopyrightIcon fontSize="inherit" /> {new Date().getFullYear()}
@@ -223,13 +234,17 @@ const Footer = ({
 
   let logos = (
     <span style={{ float: "right", marginRight: "0.5em" }}>
-      <a href="https://www.sanger.ac.uk/" target="_blank">
+      <a href="https://www.sanger.ac.uk/" target="_blank" rel="noreferrer">
         <img src={normalizeAsset(sangerLogo)} />
       </a>
-      <a href="https://www.darwintreeoflife.org" target="_blank">
+      <a
+        href="https://www.darwintreeoflife.org"
+        target="_blank"
+        rel="noreferrer"
+      >
         <img src={normalizeAsset(dtolLogo)} />
       </a>
-      <a href="https://bbsrc.ukri.org/" target="_blank">
+      <a href="https://bbsrc.ukri.org/" target="_blank" rel="noreferrer">
         <img src={normalizeAsset(bbsrcLogo)} />
       </a>
     </span>

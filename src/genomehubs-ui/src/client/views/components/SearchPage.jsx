@@ -13,6 +13,7 @@ import { useLocation } from "@reach/router";
 import useNavigate from "#hooks/useNavigate";
 import withSearch from "#hocs/withSearch";
 import withSearchDefaults from "#hocs/dispatchSearchDefaults";
+import withSiteName from "#hocs/withSiteName";
 
 // Configuration for batch search delimiter (must match SearchBox.jsx)
 const BATCH_SEARCH_DELIMITER = "semicolon";
@@ -33,7 +34,7 @@ const SearchPage = ({
   setSearchDefaults,
   topLevel,
   pageId = "search.md",
-  searchIndex,
+  basename,
 }) => {
   let results = [];
   const navigate = useNavigate();
@@ -42,15 +43,18 @@ const SearchPage = ({
   if (options.ranks && Array.isArray(options.ranks)) {
     options.ranks = options.ranks.join(",");
   }
-  let hashTerm = decodeURIComponent(location.hash.replace(/^\#/, ""));
+  if (options.names && Array.isArray(options.names)) {
+    options.names = options.names.join(",");
+  }
+  let hashTerm = decodeURIComponent(location.hash.replace(/^#/, ""));
 
   // Detect and convert batch queries from URL parameter
   if (options.query && typeof options.query === "string") {
     const delimiter =
       BATCH_SEARCH_DELIMITER === "comma"
-        ? /[,]/
+        ? /,/
         : BATCH_SEARCH_DELIMITER === "semicolon"
-          ? /[;]/
+          ? /;/
           : /\n/;
     const hasDelimiter = options.query.match(delimiter);
 
@@ -64,8 +68,11 @@ const SearchPage = ({
         // Convert to batch search format
         // The selector (fetchMsearchResults) will fill in defaults for taxonomy, fields, etc.
         const searches = queries.map((query) => ({
-          query: query.match(/[\(\)<>=]/) ? query : `tax_name(${query})`,
+          query: query.match(/[()<>=]/) ? query : `tax_name(${query})`,
           result: options.result || "taxon",
+          fields: options.fields || "", // Preserve fields from URL
+          ranks: options.ranks || "", // Preserve fields from URL
+          names: options.names || "", // Preserve fields from URL
         }));
 
         // Mark this as a batch search in options
@@ -177,7 +184,6 @@ const SearchPage = ({
   }
   let uniqueCount;
   if (resultCount > 0 && searchResults.isMsearch) {
-    console.log(searchResults);
     ({ uniqueCount = 0 } = searchResults);
   }
 
@@ -209,4 +215,5 @@ export default compose(
   dispatchLookup,
   withSearchDefaults,
   withSearch,
+  withSiteName,
 )(SearchPage);

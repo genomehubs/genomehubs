@@ -117,7 +117,7 @@ const StaticPlotFiles = ({
 
   return (
     <div className={plotContainerStyle}>
-      <a href={sourceUrl} target="_blank">
+      <a href={sourceUrl} target="_blank" rel="noreferrer">
         <div
           style={{
             height: "100%",

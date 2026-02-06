@@ -1,5 +1,5 @@
 import MuiTooltip, { tooltipClasses } from "@mui/material/Tooltip";
-import { useCallback, useState } from "react";
+import { cloneElement, useCallback, useState } from "react";
 
 import { compose } from "redux";
 import { styled } from "@mui/material/styles";
@@ -43,6 +43,7 @@ export const Tooltip = ({
   setTheme,
   styleName = theme === "darkTheme" ? "default" : "dark",
   disableInteractive = true,
+  children,
   ...props
 }) => {
   const [open, setOpen] = useState(false);
@@ -59,6 +60,11 @@ export const Tooltip = ({
 
   const StyledTooltip = theme === "lightTheme" ? DarkTooltip : LightTooltip;
 
+  // Strip title prop from child to avoid conflict with MUI Tooltip
+  const childWithoutTitle = children
+    ? cloneElement(children, { title: undefined })
+    : children;
+
   return (
     <StyledTooltip
       open={open}
@@ -67,7 +73,9 @@ export const Tooltip = ({
       disableInteractive={disableInteractive}
       sx={{ fontSize: "3rem" }}
       {...props}
-    />
+    >
+      {childWithoutTitle}
+    </StyledTooltip>
   );
 };
 

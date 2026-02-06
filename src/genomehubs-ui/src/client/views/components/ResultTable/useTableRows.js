@@ -17,7 +17,6 @@ import RadioButtonCheckedOutlinedIcon from "@mui/icons-material/RadioButtonCheck
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import Tooltip from "../Tooltip";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { mixColor } from "#functions/mixColor.js";
 import { useMemo } from "react";
 import { useTheme } from "@mui/material/styles";
 
@@ -66,7 +65,6 @@ export const useTableRows = ({
     //   theme.palette.background.paper,
     //   0.9,
     // );
-    console.log({ lightColor, darkColor });
 
     // First pass: Add result rows with group headers
     searchResults.results.forEach((result, idx) => {

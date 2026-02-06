@@ -22,7 +22,7 @@ export function fetchDescendants({
     const descendants = getDescendants(state);
     const descendantsIsFetching = getDescendantsIsFetchingByTaxonId(
       state,
-      taxonId
+      taxonId,
     );
     if (descendantsIsFetching || (offset == 0 && descendants[taxonId])) {
       return;
@@ -75,7 +75,7 @@ export function fetchDescendants({
           count: lastJson.status.hits,
           offset,
           depth: depth < maxDepth ? depth : 1,
-        })
+        }),
       );
     }
   };

@@ -5,8 +5,8 @@ import { useEffect } from "react";
 import withRoutes from "#hocs/withRoutes";
 
 const Tab = ({ path = "", routeName, pageId, setRoute, routesById }) => {
-  let parsedName = routeName.replaceAll(/[\(\)]/g, "");
-  let parsedPageId = pageId.replaceAll(/[\(\)]/g, "");
+  let parsedName = routeName.replaceAll(/[()]/g, "");
+  let parsedPageId = pageId.replaceAll(/[()]/g, "");
   useEffect(() => {
     if (parsedName && !routesById) {
       setRoute(parsedName, parsedPageId, path);

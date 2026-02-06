@@ -45,7 +45,6 @@ const searchResults = handleActions(
         draft.isFetching = false;
       }),
     RECEIVE_SEARCH: (state, action) => {
-      console.log(action);
       return {
         isFetching: false,
         status: action.payload.status,

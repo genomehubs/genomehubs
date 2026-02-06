@@ -6,7 +6,7 @@ export const setMapThreshold = createAction("SET_MAP_THRESHOLD");
 export const mapThresholdValue = handleAction(
   "SET_MAP_THRESHOLD",
   (state, action) => action.payload,
-  mapThreshold
+  mapThreshold,
 );
 export const getMapThreshold = (state) => state.mapThresholdValue;
 
