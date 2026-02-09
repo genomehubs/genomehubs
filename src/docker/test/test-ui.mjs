@@ -480,7 +480,6 @@ async function scrape(reports, directory) {
     if (!success) {
       console.error(` ✗ unable to download report`);
       errors[filename] = "download";
-      break;
     }
   }
 
