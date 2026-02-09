@@ -7,9 +7,10 @@ from datetime import datetime
 
 from SPARQLWrapper import JSON
 from SPARQLWrapper import SPARQLWrapper
+from tqdm import tqdm
+
 from genomehubs.vendor.tolkein import tofile
 from genomehubs.vendor.tolkein import tolog
-from tqdm import tqdm
 
 LOGGER = tolog.logger(__name__)
 
@@ -256,4 +257,5 @@ def wikidata_parser(_params, opts, *, types=None, names=None):
     data = load_wikidata_dump(opts["wikidata"], entities, roots=roots)
     for key, meta in data.items():
         parsed += prepare_xref_rows(key, meta, entities)
+    return parsed
     return parsed

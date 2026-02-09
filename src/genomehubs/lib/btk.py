@@ -2,6 +2,7 @@
 """BlobToolKit functions."""
 
 import ujson
+
 from genomehubs.vendor.tolkein import tofetch
 from genomehubs.vendor.tolkein import tolog
 
@@ -110,4 +111,5 @@ def btk_parser(_params, opts, *args, **kwargs):
                 parsed.append(meta)
             except Exception as err:
                 LOGGER.error("Error parsing %s: %s", key, err)
+    return (parsed, analyses)
     return (parsed, analyses)

@@ -9,21 +9,21 @@ import math
 import os
 import re
 import subprocess
+import xml.etree.ElementTree as ET
 from collections import Counter
 from collections import defaultdict
-from itertools import groupby
 from itertools import accumulate
+from itertools import groupby
 from operator import itemgetter
 from urllib.error import ContentTooShortError
 
-import xml.etree.ElementTree as ET
-
 import ujson
 from Bio import SeqIO
+from tqdm import tqdm
+
 from genomehubs.vendor.tolkein import tofetch
 from genomehubs.vendor.tolkein import tofile
 from genomehubs.vendor.tolkein import tolog
-from tqdm import tqdm
 
 from .geo import degrees_to_decimal
 

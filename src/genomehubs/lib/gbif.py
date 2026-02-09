@@ -2,6 +2,7 @@
 """NCBI functions."""
 
 import ujson
+
 from genomehubs.vendor.tolkein import tofetch
 from genomehubs.vendor.tolkein import tolog
 
@@ -94,4 +95,5 @@ def gbif_parser(_params, opts, *args, **kwargs):
         for key, meta in stream_gbif_taxa(root):
             identifiers = fetch_gbif_identifiers(key, xrefs=opts["gbif-xref"])
             parsed += prepare_xref_rows(identifiers, meta)
+    return parsed
     return parsed

@@ -42,7 +42,7 @@ Options:
     --refseq-plastids            Parse plastid genomes from the NCBI RefSeq organelle
                                  collection
     --refseq-root NAME           Name (not taxId) of root taxon
-    --sra PATH                   Parse sra data from an efetch docsum xml file 
+    --sra PATH                   Parse sra data from an efetch docsum xml file
     -h, --help                   Show this
     -v, --version                Show version number
 """
@@ -53,16 +53,16 @@ import sys
 from pathlib import Path
 
 from docopt import docopt
+
 from genomehubs.vendor.tolkein import tofile
 from genomehubs.vendor.tolkein import tolog
 
 from .btk import btk_parser
 from .busco import busco_feature_parser
-from .directory import directory_parser
-from .window import window_parser
 from .config import config
-from .hub import load_types
+from .directory import directory_parser
 from .hub import copy_types
+from .hub import load_types
 from .hub import order_parsed_fields
 
 # from .ncbi import ncbi_datasets_summary_parser
@@ -71,6 +71,7 @@ from .ncbi import refseq_organelle_parser
 from .ncbi import sra_parser
 from .version import __version__
 from .wikidata import wikidata_parser
+from .window import window_parser
 
 LOGGER = tolog.logger(__name__)
 

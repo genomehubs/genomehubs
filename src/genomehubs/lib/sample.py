@@ -181,9 +181,9 @@ def add_entry_attributes_to_taxon(
                     taxon_attr = {**attr}
                     del taxon_attr["key"]
                     taxon_attr["source_index"] = index_name
-                    taxon_attr[
-                        "source_doc_id"
-                    ] = f"{index_type}-{entry_meta[f'{index_type}_id']}"
+                    taxon_attr["source_doc_id"] = (
+                        f"{index_type}-{entry_meta[f'{index_type}_id']}"
+                    )
                     taxon_attributes[attr["key"]].append(taxon_attr)
             for key, values in taxon_attributes.items():
                 indices = get_list_indices_by_dict_value(

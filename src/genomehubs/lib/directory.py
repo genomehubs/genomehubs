@@ -11,7 +11,6 @@ from genomehubs.vendor.tolkein import tolog
 
 from .busco import parse_busco_lineages
 
-
 LOGGER = tolog.logger(__name__)
 
 

@@ -61,8 +61,9 @@ from traceback import format_exc
 
 from docopt import docopt
 from h3 import latlng_to_cell
-from genomehubs.vendor.tolkein import tolog
 from tqdm import tqdm
+
+from genomehubs.vendor.tolkein import tolog
 
 from ..lib import hub
 from ..lib import taxon
@@ -1063,4 +1064,5 @@ def cli():
 
 
 if __name__ == "__main__":
+    cli()
     cli()

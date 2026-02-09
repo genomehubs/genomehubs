@@ -20,6 +20,7 @@ from operator import truediv
 from pathlib import Path
 
 from h3 import latlng_to_cell
+
 from genomehubs.vendor.tolkein import tofile
 from genomehubs.vendor.tolkein import tolog
 
@@ -1186,4 +1187,5 @@ def deep_replace(obj, arr):
     """Replace all instances of each query string in obj."""
     new_obj = deepcopy(obj)
     new_obj = do_replace(new_obj, arr)
+    return new_obj
     return new_obj

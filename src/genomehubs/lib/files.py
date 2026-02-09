@@ -15,6 +15,7 @@ from traceback import format_exc
 
 import filetype
 from PIL import Image
+
 from genomehubs.vendor.tolkein import tofetch
 from genomehubs.vendor.tolkein import tofile
 from genomehubs.vendor.tolkein import tolog
@@ -453,4 +454,5 @@ def index_metadata(es, file, taxonomy_name, opts, *, dry_run=False):
     LOGGER.info("Indexing analyses")
     index_docs(es, opts, analysis_docs, analysis_template, dry_run=dry_run)
     LOGGER.info("Indexing files")
+    index_docs(es, opts, file_docs, file_template, dry_run=dry_run)
     index_docs(es, opts, file_docs, file_template, dry_run=dry_run)

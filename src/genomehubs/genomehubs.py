@@ -23,6 +23,7 @@ import sys
 
 from docopt import DocoptExit
 from docopt import docopt
+
 from genomehubs.vendor.tolkein import tolog
 
 try:
@@ -61,4 +62,5 @@ def cli():
             LOGGER.error("'genomehubs %s' is not a valid command", args["<command>"])
             sys.exit(1)
     print(__doc__)
+    raise DocoptExit
     raise DocoptExit

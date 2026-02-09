@@ -74,6 +74,7 @@ from collections import defaultdict
 
 import ujson
 from docopt import docopt
+
 from genomehubs.vendor.tolkein import tofile
 from genomehubs.vendor.tolkein import tolog
 
@@ -279,4 +280,5 @@ def cli():
 
 
 if __name__ == "__main__":
+    cli()
     cli()

@@ -17,9 +17,10 @@ from elasticsearch import Elasticsearch
 from elasticsearch import NotFoundError
 from elasticsearch import client
 from elasticsearch import helpers
+from tqdm import tqdm
+
 from genomehubs.vendor.tolkein import tofile
 from genomehubs.vendor.tolkein import tolog
-from tqdm import tqdm
 
 LOGGER = tolog.logger(__name__)
 
@@ -547,4 +548,5 @@ class EsQueryBuilder:
 
     def string(self):
         """Return query as string."""
+        return ujson.dumps(self.write())
         return ujson.dumps(self.write())
