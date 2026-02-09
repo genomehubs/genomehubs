@@ -20,6 +20,7 @@ h3>=4.2.2
 Pillow>=8.0
 pyyaml
 sparqlwrapper>=1.4.1
+tqdm>=4.48.1
 ujson>=3.0.0
 urllib3>=1.26.2,<2
 
