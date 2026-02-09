@@ -40,7 +40,7 @@ export const histogramAgg = async ({
       return "1d";
     } else if (interval < 90 * day) {
       return "1w";
-    } else if (interval < 366 * day) {
+    } else if (interval < 367 * day) {
       return "1M";
     } else if (interval < 1000 * day) {
       return "1q";
