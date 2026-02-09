@@ -62,7 +62,7 @@ async function scrape(reports, directory) {
 
   const browser = await puppeteer.launch({
     executablePath,
-    headless: false, // Set to false to open a visible browser window
+    headless: "new",
     args: [
       "--disable-gpu",
       "--disable-dev-shm-usage",
