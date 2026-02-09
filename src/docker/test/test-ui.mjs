@@ -371,11 +371,8 @@ async function scrape(reports, directory) {
           }
         });
 
-        // Start waiting for download before clicking
+        // Start waiting for download (button was already clicked above)
         const downloadPromise = waitForDownload(page, downloadPath, 60000);
-
-        // Click the download button to trigger PNG export
-        await mainButton.click();
 
         // Wait for the download to complete
         console.error(`  waiting for file download...`);
