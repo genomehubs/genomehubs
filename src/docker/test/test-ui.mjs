@@ -62,7 +62,7 @@ async function scrape(reports, directory) {
 
   const browser = await puppeteer.launch({
     executablePath,
-    headless: "new",
+    headless: false, // Set to false to open a visible browser window
     args: [
       "--disable-gpu",
       "--disable-dev-shm-usage",
@@ -146,38 +146,76 @@ async function scrape(reports, directory) {
 
         console.error(`  report loaded, waiting for download button...`);
 
-        // Now wait for the download button to be visible and clickable
+        // Now wait for the report tools download span to be visible
         await page.waitForFunction(
           () => {
-            const downloadIcon = document.querySelector(
-              "#report-download-item",
+            const downloadSpan = document.querySelector(
+              '[data-testid="report-tools-download-span"]',
             );
-            if (!downloadIcon) return false;
-            // Check if the element is actually visible in the DOM
-            const rect = downloadIcon.getBoundingClientRect();
-            return rect.width > 0 && rect.height > 0;
+            if (!downloadSpan) {
+              console.log("  [debug] report-tools-download-span not found");
+              return false;
+            }
+
+            const rect = downloadSpan.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+              console.log("  [debug] report-tools-download-span visible");
+              return true;
+            }
+            return false;
           },
           { timeout: 60000 },
         );
 
-        console.error(`  download icon visible, clicking...`);
+        console.error(
+          `  download span visible, scrolling into view and clicking...`,
+        );
 
-        // Click the download icon SVG element to trigger the state change
-        // The onClick handler is on the GetAppIcon component itself
-        const downloadItemClicked = await page.evaluate(() => {
-          const icon = document.querySelector("#report-download-item svg");
-          if (!icon) {
-            console.log("  [debug] download icon SVG not found");
+        // Scroll into view
+        await page.evaluate(() => {
+          const span = document.querySelector(
+            '[data-testid="report-tools-download-span"]',
+          );
+          if (span) {
+            span.scrollIntoView({ behavior: "instant", block: "center" });
+          }
+        });
+
+        await awaitTimeout(4500);
+
+        // Trigger the click by finding and invoking the React onClick handler directly
+        const clicked = await page.evaluate(() => {
+          const span = document.querySelector(
+            '[data-testid="report-tools-download-span"]',
+          );
+          if (!span) {
+            console.log("  [debug] span not found");
             return false;
           }
-          console.log("  [debug] clicking download icon SVG");
-          icon.click();
+
+          // Get the React fiber to access props
+          const reactKey = Object.keys(span).find((key) =>
+            key.startsWith("__reactProps"),
+          );
+          if (reactKey && span[reactKey] && span[reactKey].onClick) {
+            console.log("  [debug] found React onClick, calling it");
+            span[reactKey].onClick();
+            return true;
+          }
+
+          // Fallback: try dispatching a click event
+          console.log("  [debug] no React props found, trying click event");
+          span.click();
           return true;
         });
 
-        if (!downloadItemClicked) {
-          throw new Error("Could not click download icon");
+        if (!clicked) {
+          throw new Error(
+            "Could not trigger click on report tools download span",
+          );
         }
+
+        console.error(`  triggered download span click`);
 
         // Wait longer for lazy-loaded component to load
         await awaitTimeout(2000);
@@ -188,45 +226,26 @@ async function scrape(reports, directory) {
         try {
           await page.waitForFunction(
             () => {
-              // Check what's in the DOM
-              const overlay = document.querySelector(
-                '[style*="position: absolute"]',
-              );
-              if (!overlay) {
-                console.log("  [debug] no overlay found");
-              } else {
-                console.log("  [debug] overlay found");
-              }
-
-              // Wait for the download panel to be ready
+              // The download panel should be in the overlay that appears
+              // Look specifically for the panel testid first
               const panel = document.querySelector(
                 '[data-testid="report-download-panel"]',
               );
               if (!panel) {
-                console.log("  [debug] download panel not found");
-                const allTestIds = Array.from(
-                  document.querySelectorAll("[data-testid]"),
-                ).map((el) => el.getAttribute("data-testid"));
-                if (allTestIds.length > 0) {
-                  console.log(
-                    `  [debug] found testids: ${allTestIds.join(", ")}`,
-                  );
-                }
+                console.log("  [debug] report-download-panel not found yet");
                 return false;
               }
 
-              console.log("  [debug] download panel found");
-
-              // Look for visible buttons with the test IDs
-              const mainBtn = document.querySelector(
+              // Panel found - now check if buttons within it are visible
+              const mainBtn = panel.querySelector(
                 '[data-testid="report-download-main-button"]',
               );
-              const menuToggle = document.querySelector(
+              const menuToggle = panel.querySelector(
                 '[data-testid="report-download-menu-toggle"]',
               );
 
               if (!mainBtn || !menuToggle) {
-                console.log("  [debug] download buttons not found");
+                console.log("  [debug] download buttons not found in panel");
                 return false;
               }
 
@@ -235,9 +254,10 @@ async function scrape(reports, directory) {
                 menuToggle.getBoundingClientRect().height > 0;
 
               if (mainVisible && toggleVisible) {
-                console.log("  [debug] download buttons visible");
+                console.log("  [debug] download buttons visible in panel");
                 return true;
               }
+              console.log("  [debug] buttons exist but not visible yet");
               return false;
             },
             { timeout: 60000 },
@@ -314,12 +334,30 @@ async function scrape(reports, directory) {
 
         console.error(`  download options visible, clicking...`);
 
-        // Get the main download button
-        const mainButton = await page.$(
-          '[data-testid="report-download-main-button"]',
-        );
-        if (!mainButton) {
-          throw new Error("Download main button not found");
+        // Click the main download button within the report download panel
+        const clickedMain = await page.evaluate(() => {
+          const panel = document.querySelector(
+            '[data-testid="report-download-panel"]',
+          );
+          if (!panel) {
+            console.log("  [debug] report-download-panel not found for click");
+            return false;
+          }
+
+          const mainBtn = panel.querySelector(
+            '[data-testid="report-download-main-button"]',
+          );
+          if (!mainBtn) {
+            console.log("  [debug] main download button not found in panel");
+            return false;
+          }
+
+          mainBtn.click();
+          return true;
+        });
+
+        if (!clickedMain) {
+          throw new Error("Download main button not found in panel");
         }
 
         // Clean up any previous download files

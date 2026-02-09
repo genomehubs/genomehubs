@@ -32,17 +32,17 @@ const loadingMiddleWare = (store) => (next) => (action) => {
 
   // Wait for a period of inactivity before dismissing loading screen
   // This ensures all async operations (data fetches, component mounts) complete
-  // Longer timeout (3 seconds) gives slow connections time to load critical content
+  // Longer timeout (2 seconds) gives slow connections time to load critical content
   timer = setTimeout(() => {
     const timeSinceLastAction = Date.now() - lastActionTime;
     // Only dismiss if we've had at least a few actions (initial hydration happened)
     // and there's been sufficient quiet time
-    if (actionCount > 2 && timeSinceLastAction >= 3000) {
+    if (actionCount > 2 && timeSinceLastAction >= 2000) {
       store.dispatch({ type: "SET_LOADING", payload: "finished" });
       // Reset counters for next navigation
       actionCount = 0;
     }
-  }, 3000);
+  }, 2000);
 
   next(action);
 };

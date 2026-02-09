@@ -126,6 +126,7 @@ const DownloadButton = ({
       </ColorButton>
     </ColorButtonGroup>
   ));
+  GroupedButton.displayName = "GroupedButton";
 
   return (
     <span

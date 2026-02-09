@@ -260,19 +260,26 @@ export const ReportTools = ({
               style={{ cursor: "pointer" }}
             />
           </Grid> */}
-          <Grid align="right" id="report-download-item">
+          <Grid
+            align="right"
+            id="report-download-item"
+            data-testid="report-tools-download-icon"
+          >
             <Tooltip title={"Download"} arrow placement="left">
-              <GetAppIcon
+              <span
                 onClick={() => {
                   setInfo(false);
                   setReportEdit(false);
-                  setDownload(!download);
+                  setDownload(true);
                   setQuery(false);
                   setCode(false);
                   setSelect(false);
                 }}
                 style={{ cursor: "pointer" }}
-              />
+                data-testid="report-tools-download-span"
+              >
+                <GetAppIcon />
+              </span>
             </Tooltip>
           </Grid>
         </Grid>
