@@ -6,9 +6,9 @@ import contextlib
 import json
 from pathlib import Path
 
-from tolkein import tofetch
-from tolkein import tolog
-from tolkein import totax
+from genomehubs.vendor.tolkein import tofetch
+from genomehubs.vendor.tolkein import tolog
+from genomehubs.vendor.tolkein import totax
 
 from .hub import index_templator
 

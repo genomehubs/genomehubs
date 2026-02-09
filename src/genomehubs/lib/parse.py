@@ -53,8 +53,8 @@ import sys
 from pathlib import Path
 
 from docopt import docopt
-from tolkein import tofile
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tofile
+from genomehubs.vendor.tolkein import tolog
 
 from .btk import btk_parser
 from .busco import busco_feature_parser

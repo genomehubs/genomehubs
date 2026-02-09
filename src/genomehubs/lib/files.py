@@ -15,9 +15,9 @@ from traceback import format_exc
 
 import filetype
 from PIL import Image
-from tolkein import tofetch
-from tolkein import tofile
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tofetch
+from genomehubs.vendor.tolkein import tofile
+from genomehubs.vendor.tolkein import tolog
 
 from .analysis import index_template as analysis_index_template
 from .es_functions import document_by_id

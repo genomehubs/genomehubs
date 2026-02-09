@@ -78,7 +78,7 @@ async function scrape(reports, directory) {
     console.error(` - generating ${filename}`);
     console.error(` - loading ${url}`);
     url = url.replace(/\/report\?/, "/search?").replace(/\bx=/, "query=");
-    let success;
+    let success = false;
 
     for (let i = 0; i < attempts; i++) {
       let page;
@@ -334,6 +334,20 @@ async function scrape(reports, directory) {
 
         console.error(`  download options visible, clicking...`);
 
+        // Clean up any previous download files BEFORE clicking to avoid race condition
+        const existingFiles = fs.readdirSync(downloadPath);
+        const pngFiles = existingFiles.filter((f) => f.endsWith(".png"));
+        pngFiles.forEach((f) => {
+          try {
+            fs.unlinkSync(`${downloadPath}/${f}`);
+          } catch (e) {
+            // Ignore
+          }
+        });
+
+        // Start waiting for download before clicking the button
+        const downloadPromise = waitForDownload(page, downloadPath, 60000);
+
         // Click the main download button within the report download panel
         const clickedMain = await page.evaluate(() => {
           const panel = document.querySelector(
@@ -359,20 +373,6 @@ async function scrape(reports, directory) {
         if (!clickedMain) {
           throw new Error("Download main button not found in panel");
         }
-
-        // Clean up any previous download files
-        const existingFiles = fs.readdirSync(downloadPath);
-        const pngFiles = existingFiles.filter((f) => f.endsWith(".png"));
-        pngFiles.forEach((f) => {
-          try {
-            fs.unlinkSync(`${downloadPath}/${f}`);
-          } catch (e) {
-            // Ignore
-          }
-        });
-
-        // Start waiting for download (button was already clicked above)
-        const downloadPromise = waitForDownload(page, downloadPath, 60000);
 
         // Wait for the download to complete
         console.error(`  waiting for file download...`);

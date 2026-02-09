@@ -5,7 +5,7 @@
 import copy
 from collections import defaultdict
 
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tolog
 
 from .es_functions import document_by_id
 from .es_functions import query_keyword_value_template

@@ -6,8 +6,8 @@ import os
 import shlex
 import subprocess
 
-from tolkein import tofile
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tofile
+from genomehubs.vendor.tolkein import tolog
 
 from .busco import parse_busco_lineages
 

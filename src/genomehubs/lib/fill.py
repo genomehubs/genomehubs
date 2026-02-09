@@ -61,7 +61,7 @@ from traceback import format_exc
 
 from docopt import docopt
 from h3 import latlng_to_cell
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tolog
 from tqdm import tqdm
 
 from ..lib import hub

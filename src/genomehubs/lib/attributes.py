@@ -4,7 +4,7 @@
 
 import sys
 
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tolog
 
 from .es_functions import index_stream
 from .es_functions import load_mapping

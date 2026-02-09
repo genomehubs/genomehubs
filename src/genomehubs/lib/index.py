@@ -78,7 +78,7 @@ from time import sleep
 from traceback import format_exc
 
 from docopt import docopt
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tolog
 from tqdm import tqdm
 
 from ..lib import es_functions

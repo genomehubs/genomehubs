@@ -7,8 +7,8 @@ from datetime import datetime
 
 from SPARQLWrapper import JSON
 from SPARQLWrapper import SPARQLWrapper
-from tolkein import tofile
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tofile
+from genomehubs.vendor.tolkein import tolog
 from tqdm import tqdm
 
 LOGGER = tolog.logger(__name__)

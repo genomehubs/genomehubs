@@ -7,7 +7,7 @@ import contextlib
 import sys
 from collections import defaultdict
 
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tolog
 from tqdm import tqdm
 
 from .es_functions import EsQueryBuilder

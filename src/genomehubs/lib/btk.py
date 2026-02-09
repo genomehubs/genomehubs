@@ -2,8 +2,8 @@
 """BlobToolKit functions."""
 
 import ujson
-from tolkein import tofetch
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tofetch
+from genomehubs.vendor.tolkein import tolog
 
 LOGGER = tolog.logger(__name__)
 

@@ -74,8 +74,8 @@ from collections import defaultdict
 
 import ujson
 from docopt import docopt
-from tolkein import tofile
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tofile
+from genomehubs.vendor.tolkein import tolog
 
 from ..lib import analysis
 from ..lib import es_functions

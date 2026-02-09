@@ -4,8 +4,8 @@
 import sys
 from pathlib import Path
 
-from tolkein import tofile
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tofile
+from genomehubs.vendor.tolkein import tolog
 
 from .attributes import fetch_types
 from .hub import process_names_file

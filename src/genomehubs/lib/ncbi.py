@@ -20,9 +20,9 @@ import xml.etree.ElementTree as ET
 
 import ujson
 from Bio import SeqIO
-from tolkein import tofetch
-from tolkein import tofile
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tofetch
+from genomehubs.vendor.tolkein import tofile
+from genomehubs.vendor.tolkein import tolog
 from tqdm import tqdm
 
 from .geo import degrees_to_decimal

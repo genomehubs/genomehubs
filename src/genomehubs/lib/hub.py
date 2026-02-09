@@ -20,8 +20,8 @@ from operator import truediv
 from pathlib import Path
 
 from h3 import latlng_to_cell
-from tolkein import tofile
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tofile
+from genomehubs.vendor.tolkein import tolog
 
 LOGGER = tolog.logger(__name__)
 MIN_INTEGER = -(2**31)

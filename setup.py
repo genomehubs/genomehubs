@@ -84,7 +84,7 @@ setup(
     #
     #   py_modules=["my_module"],
     #
-    packages=find_packages(where="src"),  # Required
+    packages=find_packages(where="src", exclude=("tolkein", "tolkein.*")),  # Required
     # Specify which Python versions you support. In contrast to the
     # 'Programming Language' classifiers above, 'pip install' will check this
     # and refuse to install the project if the version does not match. See
@@ -107,7 +107,6 @@ setup(
         "Pillow>=8.0",
         "pyyaml",
         "sparqlwrapper>=1.4.1",
-        "tolkein>=0.5.0",
         "ujson>=3.0.0",
         "urllib3>=1.26.2, <2",  # for elastic-transport
     ],  # Optional

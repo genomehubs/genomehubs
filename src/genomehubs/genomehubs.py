@@ -23,7 +23,7 @@ import sys
 
 from docopt import DocoptExit
 from docopt import docopt
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tolog
 
 try:
     from importlib.metadata import entry_points

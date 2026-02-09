@@ -2,7 +2,7 @@
 
 """Analysis methods."""
 
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tolog
 
 from .hub import index_templator
 

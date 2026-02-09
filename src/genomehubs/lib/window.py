@@ -3,8 +3,8 @@
 
 import os
 
-from tolkein import tofile
-from tolkein import tolog
+from genomehubs.vendor.tolkein import tofile
+from genomehubs.vendor.tolkein import tolog
 
 from .hub import deep_replace
 
