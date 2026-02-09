@@ -110,6 +110,7 @@ setup(
         "tqdm>=4.48.1",
         "ujson>=3.0.0",
         "urllib3>=1.26.2, <2",  # for elastic-transport
+        "xmltodict>=0.12.0",
     ],  # Optional
     setup_requires=[
         "wheel",
