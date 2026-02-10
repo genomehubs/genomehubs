@@ -106,6 +106,7 @@ setup(
         "h3>=4.2.2",
         "Pillow>=8.0",
         "pyyaml",
+        "requests>=2.24.0",
         "sparqlwrapper>=1.4.1",
         "tqdm>=4.48.1",
         "ujson>=3.0.0",
