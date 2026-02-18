@@ -63,7 +63,7 @@ const ThemeWrapper = ({ theme, left, fill, children }) => {
     <ThemeProvider theme={muiTheme}>
       <StylesProvider injectFirst>
         <ThemeBlock left={left} fill={fill} theme={theme}>
-          <div className={theme}>{children}</div>
+          <div className={`theme-${theme}`}>{children}</div>
         </ThemeBlock>
       </StylesProvider>
     </ThemeProvider>

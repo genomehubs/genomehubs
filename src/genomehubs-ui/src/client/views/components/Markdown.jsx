@@ -35,6 +35,7 @@ import Report from "./Report";
 import ResultCount from "./ResultCount";
 import SearchIcon from "@mui/icons-material/Search";
 import StaticPlot from "./StaticPlot";
+import Survey from "./Survey";
 import Toggle from "./Toggle";
 import Tooltip from "./Tooltip";
 import TranslatedValue from "./TranslatedValue";
@@ -507,6 +508,7 @@ export const RehypeComponentsList = (extra) => {
         </Grid>
       );
     },
+    survey: (props) => <Survey {...processProps({ props, extra })} />,
     templat: (props) => (
       <Template
         {...processProps({ props })}

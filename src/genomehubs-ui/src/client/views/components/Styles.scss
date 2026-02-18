@@ -1047,7 +1047,7 @@ body,
       // }
     }
 
-    blockquote {
+    blockquote, .blockquote {
       background: rgba(themes.themed("primary"), 0.05);
       border-left: 10px solid themes.themed("link");
       font-family: themes.themed("bodyFont");
@@ -1744,5 +1744,26 @@ body,
       margin: 0 0.25em -0.4em 0;
       display: inline-block;
     }
+  }
+}
+
+// Standalone theme-aware styles for use in CSS Modules
+.blockquote {
+  @include themes.themify(themes.$themes) {
+    background: rgba(themes.themed("primary"), 0.05);
+    border-left: 10px solid themes.themed("link");
+    font-family: themes.themed("bodyFont");
+    margin: 1.5em 10px;
+    padding: 0.5em 10px;
+    max-width: 90%;
+
+    a,
+    .link {
+      color: themes.themed("primary");
+    }
+  }
+
+  p {
+    display: inline;
   }
 }

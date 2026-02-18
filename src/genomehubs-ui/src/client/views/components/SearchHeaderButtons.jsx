@@ -5,6 +5,7 @@ import {
 
 import FavouriteButton from "./FavouriteButton";
 import IconButton from "@mui/material/IconButton";
+import LinearScaleIcon from "@mui/icons-material/LinearScale";
 import SaveSettingsModal from "./SaveSettingsModal";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import Tooltip from "./Tooltip";
@@ -12,6 +13,7 @@ import { compose } from "redux";
 import { splitTerms } from "#functions/splitTerms";
 import { useLocalStorage } from "usehooks-ts";
 import { useState } from "react";
+import { useTheme } from "@mui/material/styles";
 import withSearch from "#hocs/withSearch";
 
 const SearchHeaderButtons = ({
@@ -24,9 +26,18 @@ const SearchHeaderButtons = ({
 }) => {
   const [open, setOpen] = useState(false);
 
+  const muiTheme = useTheme();
+  const lightColor = muiTheme.palette.background.paper;
+  const darkColor = muiTheme.palette.action.active;
+
   const [favourites, setFavourites] = useLocalStorage(
     `${searchIndex}Favourites`,
     {},
+  );
+
+  const [showRanges, setShowRanges] = useLocalStorage(
+    `resultTableShowRanges`,
+    false,
   );
 
   const { searchTerm, reportTerm } = splitTerms(urlTerm);
@@ -65,6 +76,33 @@ const SearchHeaderButtons = ({
     );
   }
 
+  let rangesButton;
+  if (showFavourite) {
+    rangesButton = (
+      <Tooltip
+        title={`${showRanges ? "Hide" : "Show"} value ranges`}
+        arrow
+        placement={"top"}
+      >
+        <IconButton
+          className={saveSearchOptionsStyle}
+          aria-label="show value ranges"
+          onClick={() => setShowRanges(!showRanges)}
+          size="large"
+        >
+          <LinearScaleIcon
+            style={{
+              color: showRanges ? lightColor : darkColor,
+              backgroundColor: showRanges ? darkColor : lightColor,
+              borderRadius: "8px",
+              transition: "all 0.2s ease-in-out",
+            }}
+          />
+        </IconButton>
+      </Tooltip>
+    );
+  }
+
   let settingsButton = (
     <Tooltip title="Search settings" arrow placement={"top"}>
       <IconButton
@@ -82,6 +120,7 @@ const SearchHeaderButtons = ({
     <>
       {favName}
       {favButton}
+      {searchIndex == "taxon" && rangesButton}
       {settingsButton}
       {open && (
         <SaveSettingsModal

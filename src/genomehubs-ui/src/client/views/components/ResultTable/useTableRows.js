@@ -17,6 +17,8 @@ import RadioButtonCheckedOutlinedIcon from "@mui/icons-material/RadioButtonCheck
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import Tooltip from "../Tooltip";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import formatter from "#functions/formatter";
+import { useLocalStorage } from "usehooks-ts";
 import { useMemo } from "react";
 import { useTheme } from "@mui/material/styles";
 
@@ -51,6 +53,8 @@ export const useTableRows = ({
     theme.palette.mode === "dark"
       ? theme.palette.grey[100]
       : theme.palette.grey[900];
+
+  const [showRanges] = useLocalStorage("resultTableShowRanges", false);
 
   return useMemo(() => {
     const rows = [];
@@ -302,6 +306,9 @@ export const useTableRows = ({
                 key={`${type.name}_${type.summary}`}
                 style={{
                   backgroundColor: `${type.color}${lightColor}`,
+                  verticalAlign: "middle", // Ensures cell content is vertically centered
+                  paddingTop: 0,
+                  paddingBottom: 0,
                 }}
               >
                 {typeof value != "undefined" && (
@@ -310,9 +317,12 @@ export const useTableRows = ({
                     direction="row"
                     wrap="nowrap"
                     spacing={1}
-                    alignItems={"center"}
+                    alignItems="center" // Vertically center items in the row
                     ref={rootRef}
-                    style={{ cursor: "pointer" }}
+                    style={{
+                      cursor: "pointer",
+                      minHeight: "1.5em", // Ensures enough height for alignment
+                    }}
                     onClick={() => {
                       setAttributeSettings({
                         currentRecordId,
@@ -322,24 +332,72 @@ export const useTableRows = ({
                     }}
                   >
                     {field.aggregation_source && (
-                      <Grid>
+                      <Grid
+                        item
+                        style={{ display: "flex", alignItems: "center" }}
+                      >
                         <AggregationIcon
                           method={field.aggregation_source}
+                          rank={field.aggregation_rank}
                           hasDescendants={field.has_descendants}
                         />
                       </Grid>
                     )}
 
                     <Grid
+                      item
                       style={{
                         whiteSpace: "nowrap",
+                        display: "flex",
+                        alignItems: "center", // Vertically center text and icon
                         ...(color && { color }),
+                        minHeight: "1.5em",
                       }}
                     >
-                      {value}
+                      {(field.aggregation_source || "") == "ancestor" && (
+                        <Tooltip
+                          title={`Estimated value based on ${field.aggregation_rank || "ancestral taxa"}`}
+                          arrow
+                          placement={"top"}
+                        >
+                          <span
+                            style={{
+                              opacity: 0.5,
+                              fontSize: "0.75em",
+                              lineHeight: "1em",
+                              display: "inline-block",
+                              verticalAlign: "middle",
+                              marginRight: "0.25em",
+                            }}
+                          >
+                            ~
+                          </span>
+                        </Tooltip>
+                      )}
+                      <span style={{ verticalAlign: "middle" }}>{value}</span>
                     </Grid>
                   </Grid>
                 )}
+
+                {showRanges &&
+                  field.aggregation_source &&
+                  field.min != null &&
+                  field.max != null &&
+                  field.min != field.max && (
+                    <Grid
+                      style={{
+                        whiteSpace: "nowrap",
+                        opacity: 0.7,
+                        fontSize: "0.75em",
+                        ...(color && { color }),
+                        display: "flex",
+                        alignItems: "center",
+                        minHeight: "1.5em",
+                      }}
+                    >
+                      {formatter(field.min)}—{formatter(field.max)}
+                    </Grid>
+                  )}
               </TableCell>,
             );
           } else {

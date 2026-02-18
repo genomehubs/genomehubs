@@ -1,11 +1,14 @@
 import { link as linkStyle, pageTitle as pageTitleStyle } from "./Styles.scss";
 import { memo, useRef, useState } from "react";
 
+import AggregationIcon from "./AggregationIcon";
 import Grid from "@mui/material/Grid";
+import LinearScaleIcon from "@mui/icons-material/LinearScale";
 import SearchBox from "./SearchBox";
 import SearchBoxWrapper from "./SearchBoxWrapper";
 import SearchHeaderButtons from "./SearchHeaderButtons";
 import SearchTips from "./SearchTips";
+import Survey from "./Survey";
 import classnames from "classnames";
 import { compose } from "redux";
 import dispatchColors from "#hocs/dispatchColors";
@@ -54,6 +57,7 @@ const Page = ({
   uniqueCount,
   result,
   siteName,
+  searchIndex,
 }) => {
   const classes = useStyles();
   const location = useLocation();
@@ -307,18 +311,62 @@ const Page = ({
       )}
       {title && (
         <Grid
-          className={classnames(pageTitleStyle, itemCss)}
-          style={{ marginBottom: "0.5em", paddingLeft: "0.5em" }}
+          size={12}
           container
           direction="row"
-          ref={rootRef}
-          size={12}
+          alignItems="center"
+          justifyContent="center"
         >
-          <Grid size={6}>{title}</Grid>
+          <Grid
+            className={classnames(pageTitleStyle, itemCss)}
+            style={{ marginBottom: "0.5em", paddingLeft: "0.5em" }}
+            container
+            direction="row"
+            ref={rootRef}
+            size={12}
+          >
+            <Grid size={6}>{title}</Grid>
 
-          <Grid style={{ textAlign: "end" }} size={6}>
-            <SearchHeaderButtons rootRef={rootRef} showFavourite showName />
+            <Grid style={{ textAlign: "end" }} size={6}>
+              <SearchHeaderButtons rootRef={rootRef} showFavourite showName />
+            </Grid>
           </Grid>
+          {searchIndex === "taxon" && (
+            <Survey
+              id="taxon-data-display-survey"
+              url={"https://wellcomeopenresearch.org/articles/8-24/v1#f4"}
+              maxWidth="1000px"
+            >
+              <div style={{ marginBottom: "1em" }}>
+                Icons indicate whether results are{" "}
+                <span style={{ whiteSpace: "nowrap" }}>
+                  <strong>directly measured</strong>{" "}
+                  <AggregationIcon method="direct" />
+                </span>{" "}
+                or inferred from{" "}
+                <span style={{ whiteSpace: "nowrap" }}>
+                  <strong>descendant</strong>{" "}
+                  <AggregationIcon method="descendant" />
+                </span>{" "}
+                or{" "}
+                <span style={{ whiteSpace: "nowrap" }}>
+                  <strong>ancestral</strong>{" "}
+                  <AggregationIcon method="ancestor" /> taxa
+                </span>
+                . Depending on your use case, you may want to include or exclude
+                inferred values. Click <i>Learn More</i> for details.
+              </div>
+              <div>
+                Inferred values in particular may represent a single summary
+                value from available measurements. Use the{" "}
+                <span style={{ whiteSpace: "nowrap" }}>
+                  <LinearScaleIcon style={{ verticalAlign: "middle" }} /> value
+                  range
+                </span>{" "}
+                button to show or hide the full range of values.
+              </div>
+            </Survey>
+          )}
         </Grid>
       )}
       {postSearchItems}

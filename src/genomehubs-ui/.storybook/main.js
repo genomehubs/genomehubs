@@ -60,17 +60,15 @@ const config = {
               ),
             ],
             use: [
-              MiniCssExtractPlugin.loader,
+              "style-loader",
               {
                 loader: "css-loader",
                 options: {
                   esModule: true,
                   modules: {
                     localIdentName: "[name]__[local]___[hash:base64:5]",
-                    // namedExport: true,
+                    namedExport: true,
                   },
-                  // modules: true,
-
                   sourceMap: true,
                   importLoaders: 2,
                 },

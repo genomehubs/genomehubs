@@ -3,7 +3,12 @@ import Tooltip from "./Tooltip";
 import { compose } from "redux";
 import withColors from "#hocs/withColors";
 
-const AggregationIcon = ({ method, hasDescendants, statusColors = {} }) => {
+const AggregationIcon = ({
+  method,
+  rank,
+  hasDescendants,
+  statusColors = {},
+}) => {
   const colors = {
     direct: statusColors.direct || "green",
     descendant: statusColors.descendant || "orange",
@@ -17,7 +22,9 @@ const AggregationIcon = ({ method, hasDescendants, statusColors = {} }) => {
   const tooltips = {
     direct: "Directly recorded or assigned value",
     descendant: "Estimated value inferred from descendant taxa",
-    ancestor: "Estimated value inferred from ancestral taxa",
+    ancestor: rank
+      ? `Estimated value based on ${rank}`
+      : "Estimated value inferred from ancestral taxa",
   };
   const column = (method, append) => {
     return (
