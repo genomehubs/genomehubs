@@ -125,8 +125,8 @@ const Survey = ({
             <ButtonGroup variant="text">
               <Button onClick={handleDismissOnce}>Dismiss</Button>
 
-              <Button onClick={handleDismissForever} size="small">
-                Never show again
+              <Button onClick={handleDismissForever}>
+                Don&apos;t show again
               </Button>
             </ButtonGroup>
           </div>

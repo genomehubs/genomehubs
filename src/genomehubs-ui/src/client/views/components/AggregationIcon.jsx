@@ -27,6 +27,12 @@ const AggregationIcon = ({
       : "Estimated value inferred from ancestral taxa",
   };
   const column = (method, append) => {
+    let borderRadius = "0.17em";
+    if (append) {
+      borderRadius = "0 0.17em 0.17em 0";
+    } else if (hasDescendants) {
+      borderRadius = "0.17em 0 0 0.17em";
+    }
     return (
       <span style={{ width: "0.34em", display: "inline-block" }}>
         <Grid
@@ -36,6 +42,8 @@ const AggregationIcon = ({
             maxWidth: "0.34em",
             boxSizing: "border-box",
             border: `0.08em solid ${colors[method]}`,
+            borderRadius: borderRadius,
+            overflow: "hidden",
             ...(append && { borderLeft: "none" }),
           }}
           container
