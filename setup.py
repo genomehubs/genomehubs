@@ -110,7 +110,7 @@ setup(
         "sparqlwrapper>=1.4.1",
         "tqdm>=4.48.1",
         "ujson>=3.0.0",
-        "urllib3>=1.26.2, <2",  # for elastic-transport
+        "urllib3>=1.26.2",
         "xmltodict>=0.12.0",
     ],  # Optional
     setup_requires=[

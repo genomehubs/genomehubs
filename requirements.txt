@@ -23,5 +23,5 @@ requests>=2.24.0
 sparqlwrapper>=1.4.1
 tqdm>=4.48.1
 ujson>=3.0.0
-urllib3>=1.26.2,<2
+urllib3>=1.26.2
 xmltodict>=0.12.0
