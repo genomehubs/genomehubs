@@ -45,7 +45,7 @@ const getSummary = async ({ query: params, ...req }) => {
         body: query,
         rest_total_hits_as_int: true,
       },
-      { meta: true }
+      { meta: true },
     )
     .catch((message) => {
       logError({ req, message });
@@ -54,13 +54,14 @@ const getSummary = async ({ query: params, ...req }) => {
   let summaries = [];
   let status = checkResponse({ body });
   if (status.hits) {
+    const meta = lookupTypes ? lookupTypes(fields[0]) : typesMap[fields[0]];
     summaries = [
       {
         name: params.summary[0],
         field: fields[0],
         lineage: ids[0],
         taxonomy: params.taxonomy,
-        meta: typesMap[fields[0]],
+        meta,
         summary:
           body.aggregations.attributes[fields[0]].summary[params.summary[0]],
       },

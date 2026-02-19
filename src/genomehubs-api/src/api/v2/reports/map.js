@@ -128,7 +128,7 @@ const getMap = async ({
     ) {
       for (const [key, { doc_count }] of Object.entries(
         locationRes.aggs.aggregations[locationField].histogram.by_attribute
-          .by_cat.by_value.buckets
+          .by_cat.by_value.buckets,
       )) {
         if (key == "other") {
           continue;
@@ -157,7 +157,7 @@ const getMap = async ({
   ) {
     for (const [key, { doc_count }] of Object.entries(
       xRes.aggs.aggregations[regionField].histogram.by_attribute.by_cat.by_value
-        .buckets
+        .buckets,
     )) {
       regionCounts[key.toUpperCase()] = doc_count;
     }
@@ -253,6 +253,10 @@ export const map = async ({
   req,
 }) => {
   let { typesMap, lookupTypes } = await attrTypes({ result, taxonomy });
+  const resolvedLocation = lookupTypes?.(locationField)?.name ?? locationField;
+  const resolvedLocationHex = lookupTypes?.(locationHex)?.name ?? locationHex;
+  const resolvedRegionField = lookupTypes?.(regionField)?.name ?? regionField;
+
   let searchFields = await parseFields({
     result,
     fields,
@@ -284,8 +288,8 @@ export const map = async ({
   }
 
   let status;
-  if (locationField) {
-    if (!Object.keys(typesMap).includes(locationField)) {
+  if (resolvedLocation) {
+    if (!Object.keys(typesMap).includes(resolvedLocation)) {
       status = {
         success: false,
         error: `locationField: '${locationField}' not found, no location data available`,
@@ -293,11 +297,11 @@ export const map = async ({
     }
     if (locationSummary) {
       let found = false;
-      if (typesMap[locationField].summary) {
-        if (Array.isArray(typesMap[locationField].summary)) {
-          found = typesMap[locationField].summary.includes(locationSummary);
+      if (typesMap[resolvedLocation].summary) {
+        if (Array.isArray(typesMap[resolvedLocation].summary)) {
+          found = typesMap[resolvedLocation].summary.includes(locationSummary);
         } else {
-          found = typesMap[locationField].summary == locationSummary;
+          found = typesMap[resolvedLocation].summary == locationSummary;
         }
       }
 
@@ -309,13 +313,19 @@ export const map = async ({
       // }
     }
   }
-  if (locationHex && !Object.keys(typesMap).includes(locationHex)) {
+  if (
+    resolvedLocationHex &&
+    !Object.keys(typesMap).includes(resolvedLocationHex)
+  ) {
     status = {
       success: false,
       error: `locationHex: '${locationHex}' not found, no location data available`,
     };
   }
-  if (regionField && !Object.keys(typesMap).includes(regionField)) {
+  if (
+    resolvedRegionField &&
+    !Object.keys(typesMap).includes(resolvedRegionField)
+  ) {
     status = {
       success: false,
       error: `regionField: '${regionField}' not found, no region data available`,
@@ -444,7 +454,7 @@ export const map = async ({
           .concat(yFields)
           .filter(
             (field) =>
-              lookupTypes(field) && lookupTypes(field).type != "keyword"
+              lookupTypes(field) && lookupTypes(field).type != "keyword",
           ),
     summaries: ["value"],
     cat,
@@ -466,7 +476,7 @@ export const map = async ({
     yBounds = await getBounds({
       params: { ...params },
       fields: yFields.filter(
-        (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
+        (field) => lookupTypes(field) && lookupTypes(field).type != "keyword",
       ),
       summaries,
       cat,
