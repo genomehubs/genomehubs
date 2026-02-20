@@ -4,6 +4,7 @@ import { memo, useRef, useState } from "react";
 import AggregationIcon from "./AggregationIcon";
 import Grid from "@mui/material/Grid";
 import LinearScaleIcon from "@mui/icons-material/LinearScale";
+import NavLink from "./NavLink";
 import SearchBox from "./SearchBox";
 import SearchBoxWrapper from "./SearchBoxWrapper";
 import SearchHeaderButtons from "./SearchHeaderButtons";
@@ -331,11 +332,12 @@ const Page = ({
               <SearchHeaderButtons rootRef={rootRef} showFavourite showName />
             </Grid>
           </Grid>
-          {searchIndex === "taxon" && (
+          {searchIndex === "taxon" && resultCount > 0 && !recordId && (
             <Survey
               id="taxon-data-display-survey"
               url={"https://wellcomeopenresearch.org/articles/8-24/v1#f4"}
               maxWidth="1000px"
+              dismissable={true}
             >
               <div style={{ marginBottom: "1em" }}>
                 Icons indicate whether results are{" "}
@@ -354,7 +356,11 @@ const Page = ({
                   <AggregationIcon method="ancestor" /> taxa
                 </span>
                 . Depending on your use case, you may want to include or exclude
-                inferred values. Click <i>Learn More</i> for details.
+                inferred values. Click{" "}
+                <NavLink to="https://wellcomeopenresearch.org/articles/8-24/v1#f4">
+                  Learn More
+                </NavLink>{" "}
+                for details.
               </div>
               <div>
                 Inferred values in particular may represent a single summary

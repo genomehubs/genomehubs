@@ -18,6 +18,7 @@ const Survey = ({
   onDismissForever,
   onShowMore,
   url,
+  dismissable,
   feedbackOptions,
   children,
 }) => {
@@ -101,35 +102,47 @@ const Survey = ({
       >
         <blockquote className={blockquoteStyle} style={{ margin: 0 }}>
           {/* show close icon in top right corner */}
-          <CloseIcon
-            onClick={handleDismissOnce}
-            style={{ float: "right", cursor: "pointer" }}
-          />
-          {title && <h3>{title}</h3>}
+          {dismissable && (
+            <CloseIcon
+              onClick={handleDismissOnce}
+              style={{ float: "right", cursor: "pointer" }}
+            />
+          )}
+          {title && (
+            <h2 style={{ marginTop: "0.25em", marginBottom: "0.5em" }}>
+              {title}
+            </h2>
+          )}
           {children}
-          <div
-            style={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-              marginTop: "1em",
-            }}
-          >
-            <Button
-              onClick={handleShowMore}
-              variant="contained"
-              endIcon={<LaunchIcon />}
+          {(url || dismissable) && (
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                marginTop: "1em",
+              }}
             >
-              Learn more
-            </Button>
-            <ButtonGroup variant="text">
-              <Button onClick={handleDismissOnce}>Dismiss</Button>
+              {url && (
+                <Button
+                  onClick={handleShowMore}
+                  variant="contained"
+                  endIcon={<LaunchIcon />}
+                >
+                  Learn more
+                </Button>
+              )}
+              {dismissable && (
+                <ButtonGroup variant="text">
+                  <Button onClick={handleDismissOnce}>Dismiss</Button>
 
-              <Button onClick={handleDismissForever}>
-                Don&apos;t show again
-              </Button>
-            </ButtonGroup>
-          </div>
+                  <Button onClick={handleDismissForever}>
+                    Don&apos;t show again
+                  </Button>
+                </ButtonGroup>
+              )}
+            </div>
+          )}
           {feedbackButtons && (
             <div
               style={{
