@@ -57,6 +57,7 @@ const AggregationIcon = ({
               minWidth: "0.34em",
               maxWidth: "0.34em",
               margin: "-0.08em",
+              borderRadius: "0.17em",
               ...(append && { marginLeft: 0 }),
               marginTop: `${0.97 - heights[method]}em`,
             }}
