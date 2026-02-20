@@ -1,6 +1,6 @@
 ## Build stage - compile/prepare all dependencies
 FROM ubuntu:24.04 AS builder
-ARG VERSION=2.12.3
+ARG VERSION=2.12.4
 LABEL maintainer="contact@genomehubs.org"
 LABEL license="MIT"
 LABEL version=$VERSION
@@ -44,7 +44,7 @@ RUN CONDA_DEFAULT_ENV=/opt/conda/envs/genomehubs \
 
 ## Runtime stage - minimal production image
 FROM ubuntu:24.04
-ARG VERSION=2.12.3
+ARG VERSION=2.12.4
 LABEL maintainer="contact@genomehubs.org"
 LABEL license="MIT"
 LABEL version=$VERSION
