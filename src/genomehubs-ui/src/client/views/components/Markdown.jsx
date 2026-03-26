@@ -19,6 +19,7 @@ import ArtTrackIcon from "@mui/icons-material/ArtTrack";
 import Badge from "./Badge";
 import BasicSelect from "./BasicSelect";
 import Breadcrumbs from "./Breadcrumbs";
+import Carousel from "./Carousel";
 import ColorButton from "./ColorButton";
 import Count from "./Count";
 import Divider from "@mui/material/Divider";
@@ -337,6 +338,7 @@ export const RehypeComponentsList = (extra) => {
     aggregation: (props) => <AggregationIcon method={props.method} />,
     badge: (props) => <Badge {...processProps({ props, extra })} />,
     breadcrumbs: (props) => <Breadcrumbs {...props} />,
+    carousel: (props) => <Carousel {...processProps({ props, extra })} />,
     count: (props) => <Count {...processProps({ props, extra })} />,
     divider: (props) => (
       <Divider
@@ -435,13 +437,23 @@ export const RehypeComponentsList = (extra) => {
       // props.children is the <code> element, not an array
       const codeElement = props.children;
       const className = codeElement?.props?.className;
+      console.log("Processing <pre> with className:", className);
+      console.log("Code element props:", codeElement);
 
       if (className) {
         // Extract YAML content directly from code element's children
         const yamlContent = codeElement?.props?.children || "";
 
         let nestedProps = YAML.load(yamlContent);
-        if (className == "language-report") {
+        if (className == "language-carousel") {
+          console.log("Carousel props:", nestedProps);
+          return (
+            <Carousel
+              {...processProps({ props: nestedProps, extra })}
+              className={reportContainerStyle}
+            />
+          );
+        } else if (className == "language-report") {
           return (
             <Report
               {...processProps({ props: nestedProps, extra })}
