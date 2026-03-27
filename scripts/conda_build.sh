@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION=2.12.4
+VERSION=2.12.5
 
 case $(uname | tr '[:upper:]' '[:lower:]') in
   linux*)
