@@ -453,7 +453,6 @@ export const RehypeComponentsList = (extra) => {
           styleMap[`${props.className}Style`],
         );
       }
-      console.log({ imageItem, props });
       if (imageItem) {
         console.log("Rendering image item with props:", props);
         return (
@@ -507,8 +506,6 @@ export const RehypeComponentsList = (extra) => {
       // props.children is the <code> element, not an array
       const codeElement = props.children;
       const className = codeElement?.props?.className;
-      console.log("Processing <pre> with className:", className);
-      console.log("Code element props:", codeElement);
 
       if (className) {
         // Extract YAML content directly from code element's children
@@ -516,7 +513,6 @@ export const RehypeComponentsList = (extra) => {
 
         let nestedProps = YAML.load(yamlContent);
         if (className == "language-carousel") {
-          console.log("Carousel props:", nestedProps);
           return (
             <Carousel
               {...processProps({ props: nestedProps, extra })}
