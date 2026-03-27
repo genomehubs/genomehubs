@@ -1,4 +1,4 @@
-import Box from "@mui/material/Box";
+import Box from "#wrappers/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import CircleIcon from "@mui/icons-material/Circle";
@@ -7,7 +7,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import ErrorIcon from "@mui/icons-material/Error";
-import Tooltip from "../Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import stringLength from "#functions/stringLength";
 import { useState } from "react";
 

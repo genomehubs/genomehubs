@@ -7,7 +7,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { compose } from "redux";
 import useResize from "#hooks/useResize";
 import withStyles from "@mui/styles/withStyles";

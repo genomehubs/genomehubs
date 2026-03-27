@@ -18,7 +18,7 @@ import CellInfo from "./CellInfo";
 import Grid from "@mui/material/Grid";
 import PointInfo from "./PointInfo";
 import ReportXAxisTick from "./ReportXAxisTick";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { active as activeStyle } from "./Styles.scss";
 import axisScales from "#functions/axisScales";
 import { compose } from "redux";

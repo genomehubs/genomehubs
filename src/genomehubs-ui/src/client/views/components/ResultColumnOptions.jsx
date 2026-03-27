@@ -7,7 +7,7 @@ import InputLabel from "@mui/material/InputLabel";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
-import Paper from "@mui/material/Paper";
+import Paper from "#wrappers/Paper";
 import Select from "@mui/material/Select";
 import SettingsButton from "./SettingsButton";
 import { TextField } from "@mui/material";

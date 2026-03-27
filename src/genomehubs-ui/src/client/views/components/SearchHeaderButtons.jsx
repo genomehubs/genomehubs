@@ -8,7 +8,7 @@ import IconButton from "@mui/material/IconButton";
 import LinearScaleIcon from "@mui/icons-material/LinearScale";
 import SaveSettingsModal from "./SaveSettingsModal";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { compose } from "redux";
 import { splitTerms } from "#functions/splitTerms";
 import { useLocalStorage } from "usehooks-ts";

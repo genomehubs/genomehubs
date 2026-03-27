@@ -13,7 +13,7 @@ import ReportSelect from "./ReportSelect";
 import SearchIcon from "@mui/icons-material/Search";
 import SelectIcon from "@mui/icons-material/SelectAll";
 import TocIcon from "@mui/icons-material/Toc";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { compose } from "redux";
 import { useLocation } from "@reach/router";
 import useNavigate from "#hooks/useNavigate";

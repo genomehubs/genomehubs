@@ -15,7 +15,7 @@ import IconButton from "@mui/material/IconButton";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import RadioButtonCheckedOutlinedIcon from "@mui/icons-material/RadioButtonCheckedOutlined";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
-import Tooltip from "../Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import formatter from "#functions/formatter";
 import { useLocalStorage } from "usehooks-ts";

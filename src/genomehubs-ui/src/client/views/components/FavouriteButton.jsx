@@ -1,7 +1,7 @@
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "@mui/material/IconButton";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { saveSearchOptions as saveSearchOptionsStyle } from "./Styles.scss";
 
 export const FavouriteButton = ({

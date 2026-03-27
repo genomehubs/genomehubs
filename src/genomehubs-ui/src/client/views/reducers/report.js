@@ -13,13 +13,13 @@ const reportsSlice = createSlice({
   name: "reports",
   initialState: defaultReportState(),
   reducers: {
-    requestReport(state, action) {
+    requestReport: (state, action) => {
       state.isFetching = true;
       state.requestedById[action.payload] = true;
       // state.byId[action.payload.routeName] = action.payload;
       // state.allIds.push(action.payload.routeName);
     },
-    receiveReport(state, action) {
+    receiveReport: (state, action) => {
       const { json, reportId } = action.payload;
       const { status, report } = json;
       state.isFetching = false;
@@ -28,7 +28,7 @@ const reportsSlice = createSlice({
       state.byId[reportId] = report;
       state.allIds = [...new Set(state.allIds.concat(reportId))];
     },
-    resetReport() {
+    resetReport: () => {
       defaultReportState();
     },
   },

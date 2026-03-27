@@ -1,7 +1,7 @@
-import { Box, Typography } from "@mui/material";
-
+import Box from "#wrappers/Box";
 import FullScreenGridCell from "./FullScreenGridCell";
 import Grid from "@mui/material/Grid";
+import { Typography } from "@mui/material";
 
 export default {
   title: "Components/FullScreenGridCell",

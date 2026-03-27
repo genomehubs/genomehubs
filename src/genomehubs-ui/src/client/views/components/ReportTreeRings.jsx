@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from "react";
 
 import PhylopicAttributions from "./PhylopicAttributions";
 import Phylopics from "./PhyloPics";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import Typography from "@mui/material/Typography";
 import { compose } from "redux";
 import { scaleLog } from "d3-scale";

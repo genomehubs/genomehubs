@@ -27,7 +27,7 @@ import AggregationIcon from "./AggregationIcon";
 import Grid from "@mui/material/Grid";
 import HistogramSVG from "./HistogramSVG";
 import TaxonSummaryPanel from "./TaxonSummaryPanel";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import WordCloud from "./WordCloud";
 import classnames from "classnames";
 import { compose } from "redux";

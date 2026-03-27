@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { boldValue as boldValueStyle } from "./Styles.scss";
 import { compose } from "redux";
 import qs from "#functions/qs";

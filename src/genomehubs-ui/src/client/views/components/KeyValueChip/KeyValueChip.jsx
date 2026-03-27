@@ -14,13 +14,13 @@
 
 import { useEffect, useState } from "react";
 
-import Box from "@mui/material/Box";
+import Box from "#wrappers/Box";
 import Chip from "@mui/material/Chip";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import EditableText from "../EditableText/EditableText";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import Tooltip from "../Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import Typography from "@mui/material/Typography";
 import ValidationErrorTooltip from "./ValidationErrorToolTip";
 import formatValue from "./functions/formatValue";

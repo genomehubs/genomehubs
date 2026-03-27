@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import Box from "@mui/material/Box";
+import Box from "#wrappers/Box";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import IconButton from "@mui/material/IconButton";
 import PropTypes from "prop-types";
-import Tooltip from "../Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import Typography from "@mui/material/Typography";
 
 const parseRatio = (ratio) => {
@@ -30,6 +30,14 @@ export default function Carousel({ items, ratio, duration, margin = "1em" }) {
   const [hover, setHover] = useState(false);
   const timerRef = useRef(null);
   const parsedRatio = parseRatio(ratio);
+
+  // swipe state
+  const [pos, setPos] = useState(1); // position in slides (with clones)
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const containerRef = useRef(null);
+  const pointerRef = useRef({ active: false, startX: 0, lastX: 0 });
+  const [containerWidth, setContainerWidth] = useState(0);
 
   // stable placeholder items so empty lists don't regenerate every render
   const [placeholders] = useState(() =>
@@ -72,6 +80,39 @@ export default function Carousel({ items, ratio, duration, margin = "1em" }) {
 
   const content = stableItems;
 
+  // build slides with clones for seamless loop when more than 1 slide
+  const slides =
+    content.length > 1
+      ? [content[content.length - 1], ...content, content[0]]
+      : content;
+
+  // keep pos in sync when content changes
+  useEffect(() => {
+    setPos(content.length > 1 ? 1 : 0);
+    setIndex(0);
+  }, [content.length]);
+
+  // measure container width to ensure initial translate is correct
+  useLayoutEffect(() => {
+    const measure = () => {
+      const w = containerRef.current ? containerRef.current.clientWidth : 0;
+      setContainerWidth(w);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  // compute public index from pos
+  useEffect(() => {
+    if (content.length > 0) {
+      const logical = (pos - 1 + content.length) % content.length;
+      setIndex(logical);
+    } else {
+      setIndex(0);
+    }
+  }, [pos, content.length]);
+
   useEffect(() => {
     const effectiveDuration =
       typeof duration === "number" && isFinite(duration) ? duration : 2000;
@@ -90,9 +131,9 @@ export default function Carousel({ items, ratio, duration, margin = "1em" }) {
     }
 
     const id = setInterval(() => {
-      setIndex((prev) => {
-        return (prev + 1) % content.length;
-      });
+      // advance the swipe position
+      setIsTransitioning(true);
+      setPos((p) => p + 1);
     }, intervalMs);
     timerRef.current = id;
     return () => {
@@ -111,8 +152,22 @@ export default function Carousel({ items, ratio, duration, margin = "1em" }) {
     // intentionally empty
   }, [index, content]);
 
-  const prev = () => setIndex((i) => (i - 1 + content.length) % content.length);
-  const next = () => setIndex((i) => (i + 1) % content.length);
+  const prev = () => {
+    if (content.length > 1) {
+      setIsTransitioning(true);
+      setPos((p) => p - 1);
+    } else {
+      setIndex((i) => (i - 1 + content.length) % content.length);
+    }
+  };
+  const next = () => {
+    if (content.length > 1) {
+      setIsTransitioning(true);
+      setPos((p) => p + 1);
+    } else {
+      setIndex((i) => (i + 1) % content.length);
+    }
+  };
 
   const current = content[index];
 
@@ -146,22 +201,171 @@ export default function Carousel({ items, ratio, duration, margin = "1em" }) {
           borderRadius: 1,
         }}
       >
-        {/* image or placeholder */}
-        {current && current.img ? (
+        {/* slides container for swipe/slide */}
+        <Box
+          ref={containerRef}
+          onPointerDown={(e) => {
+            if (!containerRef.current) return;
+            pointerRef.current.active = true;
+            pointerRef.current.startX = e.clientX;
+            pointerRef.current.lastX = e.clientX;
+            // capture pointer so we continue receiving events
+            try {
+              e.target.setPointerCapture(e.pointerId);
+            } catch (err) {
+              // ignore
+            }
+            setIsTransitioning(false);
+          }}
+          onPointerMove={(e) => {
+            if (!pointerRef.current.active) return;
+            const dx = e.clientX - pointerRef.current.startX;
+            pointerRef.current.lastX = e.clientX;
+            setDragOffset(dx);
+          }}
+          onPointerUp={(e) => {
+            if (!pointerRef.current.active) return;
+            pointerRef.current.active = false;
+            const dx = pointerRef.current.lastX - pointerRef.current.startX;
+            const w = containerRef.current
+              ? containerRef.current.clientWidth
+              : 0;
+            const threshold = Math.min(80, w * 0.2);
+            if (dx > threshold) {
+              // swipe right -> prev
+              setIsTransitioning(true);
+              setPos((p) => p - 1);
+            } else if (dx < -threshold) {
+              // swipe left -> next
+              setIsTransitioning(true);
+              setPos((p) => p + 1);
+            } else {
+              // snap back
+              setIsTransitioning(true);
+              setPos((p) => p);
+            }
+            setDragOffset(0);
+            try {
+              e.target.releasePointerCapture(e.pointerId);
+            } catch (err) {
+              // ignore
+            }
+          }}
+          onPointerCancel={() => {
+            pointerRef.current.active = false;
+            setDragOffset(0);
+            setIsTransitioning(true);
+            setPos((p) => p);
+          }}
+          sx={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "stretch",
+            touchAction: "pan-y",
+            userSelect: "none",
+            overflow: "hidden",
+          }}
+        >
           <Box
-            component="img"
-            src={current.img}
-            alt={current.title || ""}
-            sx={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              display: "block",
+            sx={() => {
+              // translate using the container's pixel width so each slide
+              // occupies exactly the full width; combine dragOffset in px.
+              const w =
+                containerWidth ||
+                (containerRef.current ? containerRef.current.clientWidth : 0);
+              const translate = w > 0 ? -pos * w + dragOffset : null;
+              return {
+                display: "flex",
+                width: `${slides.length * 100}%`,
+                transform:
+                  translate !== null
+                    ? `translate3d(${translate}px,0,0)`
+                    : `translate3d(-${slides.length ? (pos * 100) / slides.length : 0}%,0,0)`,
+                transition: isTransitioning ? "transform 400ms ease" : "none",
+              };
             }}
-          />
-        ) : (
-          <Box sx={{ width: "100%", height: "100%" }} />
-        )}
+            onTransitionEnd={() => {
+              // when we land on cloned slides, jump to the real one without transition
+              if (content.length > 1) {
+                if (pos <= 0) {
+                  // moved to clone of last -> reset to last
+                  setIsTransitioning(false);
+                  setPos(content.length);
+                } else if (pos >= slides.length - 1) {
+                  // moved to clone of first -> reset to first
+                  setIsTransitioning(false);
+                  setPos(1);
+                } else {
+                  setIsTransitioning(false);
+                }
+              } else {
+                setIsTransitioning(false);
+              }
+            }}
+          >
+            {slides.map((it, si) => (
+              <Box
+                key={si}
+                sx={{
+                  flex: "0 0 100%",
+                  width: "100%",
+                  height: "100%",
+                  position: "relative",
+                }}
+              >
+                {it && it.img ? (
+                  <Box
+                    component="img"
+                    src={it.img}
+                    alt={it.title || ""}
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      display: "block",
+                    }}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      bgcolor: it?._placeholderBg || "transparent",
+                    }}
+                  />
+                )}
+
+                {/* click overlay + tooltip per slide */}
+                <Box
+                  component="a"
+                  href={it && it.href ? it.href : undefined}
+                  target={it && it.href ? "_blank" : undefined}
+                  rel={it && it.href ? "noopener noreferrer" : undefined}
+                  sx={{
+                    position: "absolute",
+                    inset: 0,
+                    textDecoration: "none",
+                    color: "inherit",
+                  }}
+                  onClick={(e) => {
+                    if (!it || !it.href) e.preventDefault();
+                  }}
+                >
+                  {it && (it.tooltip || it.href) ? (
+                    <Tooltip title={tooltipText(it)}>
+                      <Box sx={{ width: "100%", height: "100%" }} />
+                    </Tooltip>
+                  ) : null}
+                </Box>
+
+                {/* per-slide description removed so a single static description
+                    overlay (rendered outside the slides) remains, avoiding
+                    sub-pixel y alignment issues during sliding */}
+              </Box>
+            ))}
+          </Box>
+        </Box>
 
         {/* click overlay + tooltip */}
         <Box
@@ -267,7 +471,14 @@ export default function Carousel({ items, ratio, duration, margin = "1em" }) {
           {content.map((_, i) => (
             <Box
               key={i}
-              onClick={() => setIndex(i)}
+              onClick={() => {
+                if (content.length > 1) {
+                  setIsTransitioning(true);
+                  setPos(i + 1);
+                } else {
+                  setIndex(i);
+                }
+              }}
               sx={{
                 width: 8,
                 height: 8,

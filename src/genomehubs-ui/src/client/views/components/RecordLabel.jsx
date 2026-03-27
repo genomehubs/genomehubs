@@ -3,7 +3,7 @@ import GppGoodIcon from "@mui/icons-material/GppGood";
 import LaunchIcon from "@mui/icons-material/Launch";
 import MoreIcon from "@mui/icons-material/More";
 import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import compareValues from "#functions/compareValues";
 import { compose } from "redux";

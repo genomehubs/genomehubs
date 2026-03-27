@@ -32,14 +32,14 @@ const phylopicsSlice = createSlice({
   name: "phylopics",
   initialState: defaultState(),
   reducers: {
-    requestPhylopic(state, action) {
+    requestPhylopic: (state, action) => {
       state.isFetching = true;
       state.isFetchingById[action.payload] = true;
     },
-    receivePhylopic(state, action) {
+    receivePhylopic: (state, action) => {
       return onReceivePhylopic(state, action);
     },
-    resetPhylopic(state) {
+    resetPhylopic: (state) => {
       defaultState();
     },
   },

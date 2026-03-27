@@ -11,7 +11,7 @@ import { Popover } from "@mui/material";
 import { QRCodeSVG } from "qrcode.react";
 import QrCodeIcon from "@mui/icons-material/QrCode";
 import Taxonomy from "./Taxonomy";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import bbsrcLogo from "./img/bbsrc-logo.png";
 import { compose } from "redux";
 import dispatchRecord from "#hocs/dispatchRecord";

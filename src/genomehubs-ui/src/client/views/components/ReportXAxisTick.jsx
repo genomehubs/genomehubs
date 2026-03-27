@@ -1,5 +1,5 @@
 import { Rectangle } from "recharts";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { active as activeStyle } from "./Styles.scss";
 import { scaleLinear } from "d3-scale";
 

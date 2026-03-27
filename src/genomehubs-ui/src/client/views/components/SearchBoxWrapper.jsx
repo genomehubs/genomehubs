@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from "react";
 
-import { Box } from "@mui/material";
+import Box from "#wrappers/Box";
 import ChipSearchBox from "./ChipSearch/ChipSearchBox";
 import Grid from "@mui/material/Grid";
 import { compose } from "redux";

@@ -11,7 +11,7 @@ import {
 import Grid from "@mui/material/Grid";
 import { LineageList } from "./LineagePanel";
 import LineageSummaryPanel from "./LineageSummaryPanel";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import classnames from "classnames";
 import { compose } from "redux";
 import dispatchLookup from "#hocs/dispatchLookup";

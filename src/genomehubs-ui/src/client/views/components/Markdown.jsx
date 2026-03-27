@@ -1,4 +1,5 @@
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import { ImageList, ImageListItem, Paper } from "@mui/material";
 import { Suspense, lazy, useEffect, useState } from "react";
 import {
   centerContent as centerContentStyle,
@@ -18,6 +19,7 @@ import AggregationIcon from "./AggregationIcon";
 import ArtTrackIcon from "@mui/icons-material/ArtTrack";
 import Badge from "./Badge";
 import BasicSelect from "./BasicSelect";
+import Box from "#wrappers/Box";
 import Breadcrumbs from "./Breadcrumbs";
 import Carousel from "./Carousel";
 import ColorButton from "./ColorButton";
@@ -38,7 +40,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import StaticPlot from "./StaticPlot";
 import Survey from "./Survey";
 import Toggle from "./Toggle";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import TranslatedValue from "./TranslatedValue";
 import ValueRow from "./ValueRow";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -84,16 +86,18 @@ export const Template = ({
   title,
   description,
   url,
+  img,
   toggleFunction,
   ...props
 }) => {
   const [values, setValues] = useState({});
   const [showPreview, setShowPreview] = useState(false);
+  const [showImage, setShowImage] = useState(!!img);
   const navigate = useNavigate();
 
   if (typeof url === "object") {
     url = `${url.path}?${Object.entries(url)
-      .filter(([k, v]) => k != "path")
+      .filter(([k]) => k != "path")
       .map(([k, v]) => `${k}=${v}`)
       .join("&")}`;
   }
@@ -102,12 +106,12 @@ export const Template = ({
     if (url) {
       let matches = url
         .match(/\{.+?\}/g)
-        .map((el) => el.replaceAll(/[\{\}]/g, ""))
+        .map((el) => el.replaceAll(/[{}]/g, ""))
         .sort()
         .filter((el, i, arr) => i == arr.indexOf(el));
       let exampleValues = {};
       for (let match of matches) {
-        let example = props.hasOwnProperty(match)
+        let example = Object.prototype.hasOwnProperty.call(props, match)
           ? props[`${match}`]
           : props[`${match}_example`];
         exampleValues[match] = example;
@@ -129,15 +133,9 @@ export const Template = ({
     setValues({ ...values, [queryProp]: value, focus: i });
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key == "Enter" || e.keyCode == 13) {
-      handleSubmit(e);
-    }
-  };
-
   const handleSubmit = (e) => {
     e && e.preventDefault();
-    let [path, queryString] = url.split(/[\?#]/);
+    let [path, queryString] = url.split(/[?#]/);
     for (let [key, value] of Object.entries(values)) {
       queryString = queryString.trim().replaceAll(`{${key}}`, value);
     }
@@ -169,7 +167,7 @@ export const Template = ({
   // let css;
   let matches = url
     .match(/\{.+?\}/g)
-    .map((el) => el.replaceAll(/[\{\}]/g, ""))
+    .map((el) => el.replaceAll(/[{}]/g, ""))
     .sort()
     .filter((el, i, arr) => i == arr.indexOf(el));
   let inputs = [];
@@ -194,11 +192,43 @@ export const Template = ({
       />
     );
     inputs.push(
-      <Grid key={match} size={12}>
-        <Tooltip title={description} arrow>
-          {input}
-        </Tooltip>
+      <Grid key={match} item xs={12} sx={{ width: "100%" }}>
+        <Grid container alignItems="center" spacing={1} sx={{ width: "100%" }}>
+          <Grid item sx={{ width: "100%" }}>
+            <Tooltip title={description} arrow>
+              <Box sx={{ width: "100%" }}>{input}</Box>
+            </Tooltip>
+          </Grid>
+        </Grid>
       </Grid>,
+    );
+  }
+  let image;
+  if (showImage && img) {
+    image = (
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: toggleFunction ? "500px" : "none",
+          position: "relative",
+          overflow: "hidden",
+          aspectRatio: `${16 / 9}`,
+          bgcolor: "transparent",
+          borderRadius: 1,
+        }}
+      >
+        <Box
+          component="img"
+          src={img}
+          alt={title || ""}
+          sx={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+        />
+      </Box>
     );
   }
   let preview;
@@ -207,7 +237,7 @@ export const Template = ({
     for (let [key, value] of Object.entries(values)) {
       searchUrl = searchUrl.replaceAll(`{${key}}`, value);
     }
-    let reportProps = qs.parse(decodeURI(searchUrl.split(/[\?#]/)[1]));
+    let reportProps = qs.parse(decodeURI(searchUrl.split(/[?#]/)[1]));
     if (reportProps.report) {
       preview = (
         <Grid size={12}>
@@ -223,54 +253,65 @@ export const Template = ({
     }
   }
   return (
-    <Grid container direction="column" spacing={1}>
-      <Grid>
-        <h2>{title}</h2>
-        {description}
-      </Grid>
-      {showPreview && preview}
-      {inputs}
-      <Grid container direction="row" spacing={1} justifyContent="flex-end">
-        {toggleFunction && (
-          <Grid key={"toggle"}>
+    <Paper
+      elevation={8}
+      sx={{ padding: "0 1em 1em 1em", boxShadow: (theme) => theme.shadows[8] }}
+    >
+      <Grid container direction="column" spacing={1}>
+        <Grid>
+          <h2>{title}</h2>
+          {description}
+        </Grid>
+        {showPreview && preview}
+        {showImage && image}
+        {inputs}
+        <Grid container direction="row" spacing={1} justifyContent="flex-end">
+          {toggleFunction && (
+            <Grid key={"toggle"}>
+              <ColorButton
+                variant="contained"
+                disableElevation
+                startIcon={<ArtTrackIcon />}
+                onClick={(e) => {
+                  e.preventDefault();
+                  toggleFunction();
+                }}
+              >
+                Template
+              </ColorButton>
+            </Grid>
+          )}
+          {url.match("report=") && (
+            <Grid key={"preview"}>
+              <ColorButton
+                variant="contained"
+                disableElevation
+                startIcon={
+                  showPreview ? <VisibilityOffIcon /> : <VisibilityIcon />
+                }
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowImage(showPreview);
+                  setShowPreview(!showPreview);
+                }}
+              >
+                {showPreview ? "Hide Preview" : "Preview"}
+              </ColorButton>
+            </Grid>
+          )}
+          <Grid key={"submit"}>
             <ColorButton
               variant="contained"
               disableElevation
-              startIcon={<ArtTrackIcon />}
-              onClick={(e) => {
-                e.preventDefault();
-                toggleFunction();
-              }}
+              startIcon={<SearchIcon />}
+              onClick={handleSubmit}
             >
-              Template
+              Search
             </ColorButton>
           </Grid>
-        )}
-        <Grid key={"preview"}>
-          <ColorButton
-            variant="contained"
-            disableElevation
-            startIcon={showPreview ? <VisibilityOffIcon /> : <VisibilityIcon />}
-            onClick={(e) => {
-              e.preventDefault();
-              setShowPreview(!showPreview);
-            }}
-          >
-            {showPreview ? "Hide Preview" : "Preview"}
-          </ColorButton>
-        </Grid>
-        <Grid key={"submit"}>
-          <ColorButton
-            variant="contained"
-            disableElevation
-            startIcon={<SearchIcon />}
-            onClick={handleSubmit}
-          >
-            Search
-          </ColorButton>
         </Grid>
       </Grid>
-    </Grid>
+    </Paper>
   );
 };
 
@@ -285,7 +326,7 @@ const fillTemplateValues = (value, extra) => {
           parts[i] = parts[i].replace(/^lc_/, "");
         }
         for (let part of parts[i].split("|")) {
-          if (extra.hasOwnProperty(part)) {
+          if (Object.prototype.hasOwnProperty.call(extra, part)) {
             parts[i] = lower ? extra[part].toLowerCase() : extra[part];
             break;
           } else {
@@ -299,7 +340,7 @@ const fillTemplateValues = (value, extra) => {
   return value;
 };
 
-export const processProps = ({ props, extra = {}, newProps = {}, isGrid }) => {
+export const processProps = ({ props, newProps = {}, isGrid }) => {
   for (let [key, value] of Object.entries(props || {})) {
     if (isGrid && !gridPropNames.has(key)) {
       continue;
@@ -363,7 +404,7 @@ export const RehypeComponentsList = (extra) => {
       if (toggle && toggle !== true && toggle !== "true") {
         toggle = false;
       }
-      if (props.hasOwnProperty("toggle")) {
+      if (Object.prototype.hasOwnProperty.call(props, "toggle")) {
         return (
           <Toggle {...processProps({ props: { toggle, expand, title } })}>
             <Grid {...processProps({ props: gridProps, isGrid: true })} />
@@ -403,13 +444,32 @@ export const RehypeComponentsList = (extra) => {
         <img {...processProps({ props })} alt={props.alt.toString()} />
       </div>
     ),
-    include: (props) => {
+    include: ({ imageItem, ...props }) => {
       let nested = <Nested pgId={props.pageId} {...props} />;
       let css = reportContainerStyle;
       if (props.className) {
         css = classnames(
           reportContainerStyle,
           styleMap[`${props.className}Style`],
+        );
+      }
+      console.log({ imageItem, props });
+      if (imageItem) {
+        console.log("Rendering image item with props:", props);
+        return (
+          <ImageListItem
+            {...processProps({ props, isGrid: true })}
+            sx={{
+              pageBreakInside: "avoid",
+              WebkitColumnBreakInside: "avoid",
+              MozColumnBreakInside: "avoid",
+              display: "inline-block",
+              width: "100%",
+            }}
+            className={css}
+          >
+            {nested}
+          </ImageListItem>
         );
       }
 
@@ -430,6 +490,16 @@ export const RehypeComponentsList = (extra) => {
         <Nested
           pgId={props.pageId}
           {...processProps({ props: { ...props, ...extra } })}
+        />
+      );
+    },
+    wall: (props) => {
+      return (
+        <ImageList
+          variant="masonry"
+          cols={2}
+          gap={8}
+          {...processProps({ props, isGrid: true })}
         />
       );
     },
@@ -616,7 +686,7 @@ const Markdown = ({
       }
     }
   }, [pgId, pageId, pagesIsFetching, pagesById]);
-  const { contents, ast } = compile(
+  const { contents } = compile(
     fillTemplateValues(pagesById, {
       ...extra,
       ...qs.parse((location.search || "").replace("?", "")),

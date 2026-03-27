@@ -5,7 +5,7 @@ import stringLength, { maxStringLength } from "#functions/stringLength";
 
 import Grid from "@mui/material/Grid";
 import PointInfo from "./PointInfo";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { compose } from "redux";
 import dispatchMessage from "#hocs/dispatchMessage";
 import { fadeColor } from "#functions/fadeColor";

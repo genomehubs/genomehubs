@@ -218,6 +218,9 @@
     "#storybook/*": {
       "default": "./.storybook/*"
     },
+    "#wrappers/*": {
+      "default": "./src/client/views/components/wrappers/*"
+    },
     "#*": [
       "./*",
       "./*.js",

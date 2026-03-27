@@ -24,7 +24,7 @@ import JoinInnerRoundedIcon from "@mui/icons-material/JoinInnerRounded";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
-import Tooltip from "../Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { getChipColor } from "../KeyValueChip/functions/chipPalettes";
 
 const chipToString = (chip) => {

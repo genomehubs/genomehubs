@@ -1,5 +1,5 @@
 import Skeleton from "@mui/material/Skeleton";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { compose } from "redux";
 import { formatter } from "#functions/formatter";
 import { fullWidth as fullWidthStyle } from "./Styles.scss";

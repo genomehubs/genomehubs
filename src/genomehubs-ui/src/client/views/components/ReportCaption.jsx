@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import Grid from "@mui/material/Grid";
 import PhylopicAttributions from "./PhylopicAttributions";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { compose } from "redux";
 import { reportCaption as reportCaptionStyle } from "./Styles.scss";
 import stringLength from "#functions/stringLength";

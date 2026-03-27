@@ -24,7 +24,7 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import ZoomControl from "./ZoomControl";
 import classnames from "classnames";
 import { compose } from "redux";

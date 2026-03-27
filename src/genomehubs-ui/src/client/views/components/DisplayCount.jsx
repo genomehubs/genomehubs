@@ -1,4 +1,4 @@
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import fillValues from "#functions/fillValues";
 import formats from "#functions/formats";
 

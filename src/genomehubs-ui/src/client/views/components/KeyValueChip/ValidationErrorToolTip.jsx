@@ -1,4 +1,4 @@
-import Tooltip from "../Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import WarningIcon from "@mui/icons-material/Warning";
 
 export const ValidationErrorTooltip = ({ validationError, textColor }) => {

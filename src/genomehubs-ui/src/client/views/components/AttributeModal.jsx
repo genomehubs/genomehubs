@@ -1,6 +1,6 @@
 import AttributePanel from "./AttributePanel";
 import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
+import Paper from "#wrappers/Paper";
 import ResultColumnOptions from "./ResultColumnOptions";
 import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";

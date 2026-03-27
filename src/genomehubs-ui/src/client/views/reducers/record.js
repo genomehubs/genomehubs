@@ -90,7 +90,7 @@ const browseSlice = createSlice({
   name: "browse",
   initialState: {},
   reducers: {
-    setBrowse(state, action) {
+    setBrowse: (state, action) => {
       action.payload;
     },
   },
@@ -102,7 +102,7 @@ const browseStatusSlice = createSlice({
   name: "browseStatus",
   initialState: {},
   reducers: {
-    setBrowseStatus(state, action) {
+    setBrowseStatus: (state, action) => {
       state[action.payload.id] = action.payload.value;
     },
   },

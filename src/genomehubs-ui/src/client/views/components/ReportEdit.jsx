@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import AutoCompleteInput from "./AutoCompleteInput";
-import Box from "@mui/material/Box";
+import Box from "#wrappers/Box";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
@@ -18,7 +18,7 @@ import Slider from "@mui/material/Slider";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { compose } from "redux";
 import dispatchReport from "#hocs/dispatchReport";
 import { getSuggestedTerm } from "#reducers/search";

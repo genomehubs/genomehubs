@@ -10,7 +10,7 @@ import {
 import FilterListIcon from "@mui/icons-material/FilterList";
 import IconButton from "@mui/material/IconButton";
 import ResultFilter from "../ResultFilter";
-import Tooltip from "../Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { useMemo } from "react";
 
 const arrToObj = (arr) =>

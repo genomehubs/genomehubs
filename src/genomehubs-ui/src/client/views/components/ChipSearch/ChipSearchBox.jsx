@@ -14,7 +14,7 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import KeyboardArrowDownIcon from "@mui/icons-material/Tune";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SearchIcon from "@mui/icons-material/Search";
-import Tooltip from "../Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { Underline } from "./Underline";
 import { useStyles } from "./SearchBoxStyles";
 

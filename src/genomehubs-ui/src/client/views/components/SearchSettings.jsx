@@ -1,6 +1,6 @@
 import { memo, useState } from "react";
 
-import Box from "@mui/material/Box";
+import Box from "#wrappers/Box";
 import CancelIcon from "@mui/icons-material/Cancel";
 import Checkbox from "@mui/material/Checkbox";
 import Chip from "@mui/material/Chip";
@@ -12,7 +12,7 @@ import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import SettingsButton from "./SettingsButton";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { compose } from "redux";
 import makeStyles from "@mui/styles/makeStyles";
 import qs from "#functions/qs";

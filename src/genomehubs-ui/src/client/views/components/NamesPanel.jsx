@@ -13,7 +13,7 @@ import {
 
 import InfoIcon from "@mui/icons-material/Info";
 import LaunchIcon from "@mui/icons-material/Launch";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import classnames from "classnames";
 import { compose } from "redux";
 import withRecord from "#hocs/withRecord";

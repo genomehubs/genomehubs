@@ -14,7 +14,7 @@ import MultiCatLegend, {
 import { useEffect, useRef } from "react";
 
 import Grid from "@mui/material/Grid";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { compose } from "redux";
 import { format } from "d3-format";
 import qs from "#functions/qs";

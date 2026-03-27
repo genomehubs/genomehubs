@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import Checkbox from "@mui/material/Checkbox";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 
 const allowedOperators = ({ field, types, summary }) => {
   let operators = ["=", "==", "!="];

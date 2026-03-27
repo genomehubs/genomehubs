@@ -7,7 +7,7 @@ import ColorButtonGroup from "./ColorButtonGroup";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import MenuItem from "@mui/material/MenuItem";
 import MenuList from "@mui/material/MenuList";
-import Paper from "@mui/material/Paper";
+import Paper from "#wrappers/Paper";
 import { compose } from "redux";
 import withColors from "#hocs/withColors";
 import withTheme from "#hocs/withTheme";
@@ -140,10 +140,7 @@ const DownloadButton = ({
       {...props}
     >
       <GroupedButton ref={anchorRef} />
-      <Paper
-        style={{ height: open ? "auto" : 0, overflow: "hidden" }}
-        data-testid="report-download-menu"
-      >
+      <Paper collapse collapsed={!open} data-testid="report-download-menu">
         <ClickAwayListener onClickAway={handleClose}>
           <MenuList id="split-button-menu">
             {Object.keys(options).map((option, index) => (

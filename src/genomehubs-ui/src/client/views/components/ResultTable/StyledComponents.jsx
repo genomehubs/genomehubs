@@ -14,7 +14,7 @@ import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import SettingsIcon from "@mui/icons-material/Settings";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import Tooltip from "../Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import ViewWeekIcon from "@mui/icons-material/ViewWeek";
 import ViewWeekOutlinedIcon from "@mui/icons-material/ViewWeekOutlined";
 import classnames from "classnames";

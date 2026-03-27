@@ -1,6 +1,6 @@
 import { Chip } from "@mui/material";
 import LaunchIcon from "@mui/icons-material/Launch";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import compareValues from "#functions/compareValues";
 import { compose } from "redux";
 import getPrimaryAssemblyId from "#functions/getPrimaryAssemblyId";

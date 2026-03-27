@@ -1,6 +1,6 @@
 import { Rectangle, Text } from "recharts";
 
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { active as activeStyle } from "./Styles.scss";
 import { compose } from "redux";
 import formats from "#functions/formats";

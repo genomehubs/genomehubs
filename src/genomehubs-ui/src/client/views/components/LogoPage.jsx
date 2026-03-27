@@ -7,7 +7,7 @@ import Grid from "@mui/material/Grid";
 import IsodbLogo from "./LogoIsopoDB";
 import LepbaseLogo from "./LogoLepbase";
 import MdbLogo from "./LogoMolluscDB";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { compose } from "redux";
 import { fixedArSixteenNine as fixedArSixteenNineStyle } from "./Styles.scss";
 import withColors from "#hocs/withColors";

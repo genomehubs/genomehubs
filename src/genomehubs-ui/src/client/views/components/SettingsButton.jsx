@@ -9,7 +9,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
 import MenuList from "@mui/material/MenuList";
-import Paper from "@mui/material/Paper";
+import Paper from "#wrappers/Paper";
 import ReplayIcon from "@mui/icons-material/Replay";
 
 const DownloadButton = ({ handleClick, handleResetClick }) => {
@@ -78,7 +78,7 @@ const DownloadButton = ({ handleClick, handleResetClick }) => {
         </ColorButton>
       </ColorButtonGroup>
 
-      <Paper style={{ height: open ? "auto" : 0, overflow: "hidden" }}>
+      <Paper collapse collapsed={!open}>
         <ClickAwayListener onClickAway={handleClose}>
           <MenuList id="split-button-menu">
             {Object.keys(options).map((option, index) => (

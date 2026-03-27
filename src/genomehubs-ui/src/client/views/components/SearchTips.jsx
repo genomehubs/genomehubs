@@ -7,7 +7,7 @@ import {
 } from "./Styles.scss";
 
 import ColorButton from "./ColorButton";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import classnames from "classnames";
 import { compose } from "redux";
 import didYouMean from "didyoumean2";

@@ -7,7 +7,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 import VerticalAlignTopIcon from "@mui/icons-material/VerticalAlignTop";
 import makeStyles from "@mui/styles/makeStyles";

@@ -1,6 +1,7 @@
-import { Box, IconButton, Slide } from "@mui/material";
+import { IconButton, Slide } from "@mui/material";
 import { forwardRef, useRef, useState } from "react";
 
+import Box from "#wrappers/Box";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import Grid from "@mui/material/Grid";
 

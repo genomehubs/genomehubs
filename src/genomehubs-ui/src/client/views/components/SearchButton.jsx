@@ -6,9 +6,9 @@ import ColorButton from "./ColorButton";
 import ColorButtonGroup from "./ColorButtonGroup";
 import MenuItem from "@mui/material/MenuItem";
 import MenuList from "@mui/material/MenuList";
-import Paper from "@mui/material/Paper";
+import Paper from "#wrappers/Paper";
 import SearchIcon from "@mui/icons-material/Search";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { compose } from "redux";
 import withSearch from "#hocs/withSearch";
 import withTaxonomy from "#hocs/withTaxonomy";
@@ -110,12 +110,7 @@ const SearchButton = ({
           </Tooltip>
         </ColorButtonGroup>
 
-        <Paper
-          style={{
-            height: open ? "auto" : 0,
-            overflow: "hidden",
-          }}
-        >
+        <Paper collapse collapsed={!open}>
           <ClickAwayListener onClickAway={handleClose}>
             <MenuList id="split-button-menu">
               {options.map((option, index) => (

@@ -4,7 +4,7 @@ const routesSlice = createSlice({
   name: "routes",
   initialState: { allIds: [], byId: {} },
   reducers: {
-    setRoutes(state, action) {
+    setRoutes: (state, action) => {
       state.byId[action.payload.routeName] = action.payload;
       state.allIds.push(action.payload.routeName);
     },

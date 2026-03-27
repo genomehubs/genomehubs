@@ -1,4 +1,4 @@
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 
 const multiply = (size, factor, divisor) => {
   let unit = size.match(/\D+$/)[0];

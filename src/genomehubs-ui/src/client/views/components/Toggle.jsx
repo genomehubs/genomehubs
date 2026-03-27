@@ -4,7 +4,7 @@ import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
 import Switch from "@mui/material/Switch";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { compose } from "redux";
 import withColors from "#hocs/withColors";
 import withTheme from "#hocs/withTheme";

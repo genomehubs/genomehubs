@@ -6,7 +6,7 @@ import {
 import { memo, useRef } from "react";
 
 import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
+import Box from "#wrappers/Box";
 import Chip from "@mui/material/Chip";
 import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";

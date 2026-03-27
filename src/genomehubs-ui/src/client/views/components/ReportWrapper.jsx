@@ -1,5 +1,5 @@
 import LaunchIcon from "@mui/icons-material/Launch";
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import { compose } from "redux";
 import useNavigate from "#hooks/useNavigate";
 import withApi from "#hocs/withApi";

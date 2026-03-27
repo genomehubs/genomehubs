@@ -7,7 +7,7 @@ import {
 } from "./Styles.scss";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import Tooltip from "./Tooltip";
+import Tooltip from "#wrappers/Tooltip";
 import classnames from "classnames";
 import { compose } from "redux";
 import { scaleLog } from "d3-scale";
