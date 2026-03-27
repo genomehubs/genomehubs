@@ -1,6 +1,6 @@
 {
   "name": "genomehubs-api",
-  "version": "2.12.4",
+  "version": "2.12.5",
   "description": "GenomeHubs API",
   "scripts": {
     "dev": "nodemon src/app.js",
