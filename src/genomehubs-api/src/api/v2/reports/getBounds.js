@@ -73,7 +73,7 @@ export const getCatsBy = async ({
         (obj) => ({
           key: obj.key.toLowerCase(),
           label: obj.key,
-        })
+        }),
       );
     }
 
@@ -176,6 +176,14 @@ export const getBounds = async ({
     taxonomy,
     apiParams,
   });
+  // If setTerms marked 'other' (via a trailing '+'), propagate that
+  // into the local showOther flag so callers and stats see it.
+  if (
+    (fixedTerms && fixedTerms.other) ||
+    (definedTerms && definedTerms.other)
+  ) {
+    showOther = true;
+  }
   cat = definedTerms.cat;
   let extraTerms;
   if (definedTerms.terms) {
@@ -341,7 +349,7 @@ export const getBounds = async ({
         max =
           1 *
           fmt(
-            lastTick + gap * Math.max(Math.ceil((tmpMax - lastTick) / gap), 1)
+            lastTick + gap * Math.max(Math.ceil((tmpMax - lastTick) / gap), 1),
           );
       }
     }
@@ -377,6 +385,13 @@ export const getBounds = async ({
     if (geo) {
       stats = stats || {};
       stats.geo = geo;
+    }
+    // Ensure stats.showOther reflects any '+' options detected by setTerms
+    if (showOther) {
+      stats = stats || {};
+      if (typeof stats.showOther === "undefined") {
+        stats.showOther = true;
+      }
     }
   }
   let { terms } = aggs;
