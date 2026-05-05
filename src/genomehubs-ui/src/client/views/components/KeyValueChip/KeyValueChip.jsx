@@ -34,6 +34,7 @@ const KeyValueChip = ({
   valueNote,
   operator = "=",
   modifier = "value",
+  negated = false,
   onChange,
   onDelete,
   palette = "blue",

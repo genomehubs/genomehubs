@@ -32,15 +32,14 @@ const chipToString = (chip) => {
     return chip;
   }
   // If chip is an object, extract key, operator, and value
-  const { key, operator, value, valueNote, modifier } = chip;
+  const { key, operator, value, valueNote, modifier, negated } = chip;
   let chipString;
   if (key === "tax" && modifier) {
-    return `tax_${modifier}(${value})`;
+    chipString = `tax_${modifier}(${value})`;
   } else if (modifier) {
     if (modifier === "collate") {
-      return `collate(${key},${value})`;
-    }
-    if (modifier !== "value") {
+      chipString = `collate(${key},${value})`;
+    } else if (modifier !== "value") {
       chipString = `${modifier}(${key})`;
     }
   }
@@ -61,13 +60,26 @@ const chipToString = (chip) => {
       chipString += value;
     }
   }
+  // Add ! prefix if chip is negated
+  if (negated && chipString) {
+    chipString = "!" + chipString;
+  }
   return chipString;
 };
 
 const extractKeyValue = (chip) => {
   let modifier;
   let valueNote;
-  let [key, operator, value] = chip.split(/\s*(!=|>=|<=|<|>|=)\s*/);
+  let negated = false;
+  let chipStr = chip.trim();
+
+  // Check for ! prefix at start
+  if (chipStr.startsWith("!")) {
+    negated = true;
+    chipStr = chipStr.substring(1).trim();
+  }
+
+  let [key, operator, value] = chipStr.split(/\s*(!=|>=|<=|<|>|=)\s*/);
   if (key.includes("(")) {
     if (value) {
       [modifier, key] = key.split(/\s*\(\s*/);
@@ -111,6 +123,7 @@ const extractKeyValue = (chip) => {
     value: value ? value.trim() : key == "tax" ? "" : null,
     valueNote: valueNote ? valueNote.trim() : null,
     modifier: modifier ? modifier.trim() : null,
+    negated: negated,
   };
   if (key.match(/-/) && !key.match(/_/)) {
     chipObj.key = key.trim().replace(/-/g, "_");
@@ -362,7 +375,8 @@ const ChipSearch = ({
   }, [chips]);
 
   const RenderedChip = ({ chip, index, lookupFunction, ...props }) => {
-    const { key, operator, value, valueNote, modifier } = extractKeyValue(chip);
+    const { key, operator, value, valueNote, modifier, negated } =
+      extractKeyValue(chip);
     return (
       <KeyValueChip
         key={chip + index} // Use a unique key for each chip
@@ -371,6 +385,7 @@ const ChipSearch = ({
         valueNote={valueNote}
         operator={operator}
         modifier={modifier}
+        negated={negated}
         // palette={setPalette({ key, modifier })} // Set the palette based on the key
         onChange={handleChipChange}
         onDelete={() => handleDelete(chip, index)}
