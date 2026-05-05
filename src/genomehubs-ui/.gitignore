@@ -4,3 +4,5 @@
 dist
 node_modules
 *storybook.log
+coverage
+.vitest
