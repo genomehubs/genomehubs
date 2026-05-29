@@ -17,6 +17,7 @@ env:
 
 jobs:
   build-api:
+    if: ${{ github.event.inputs.image == 'api' || github.event.inputs.image == 'all' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -36,7 +37,6 @@ jobs:
 
   build-and-push-archive-api:
     needs: build-api
-    if: ${{ github.event.inputs.image == 'api' || github.event.inputs.image == 'all' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
