@@ -99,6 +99,7 @@ jobs:
             SITE_NAME_LONG=Genomes on a Tree
             GH_CITATION_URL=https://doi.org/10.12688/wellcomeopenres.18658.1
             GH_SUGGESTED_TERM=Canidae
+            GH_BASENAME=/${{ env.ARCHIVE_VERSION }}
             GH_TAXONOMY=ncbi
           tags: |
             genomehubs/goat:${{ env.ARCHIVE_VERSION }}
