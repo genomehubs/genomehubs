@@ -9,7 +9,7 @@ const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 const setProcessedType = (meta) => {
   if (
     ["double", "float", "half_float", "scaled_float", "unsigned_long"].includes(
-      meta.type
+      meta.type,
     ) ||
     (meta.type || "").endsWith("dp")
   ) {
@@ -85,7 +85,7 @@ const fetchTypes = async ({ result, taxonomy, hub, release, indexType }) => {
           size: 10000,
         },
       },
-      { meta: true }
+      { meta: true },
     )
     .catch((err) => {
       return err.meta;
@@ -144,7 +144,7 @@ export const attrTypes = async ({
         indexType,
       }),
     CACHE_TTL,
-    true
+    true,
   );
 
   let lookupTypes = {};

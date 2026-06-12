@@ -13,7 +13,7 @@ export const setIncludes = ({
     include = include
       .concat(["taxon_id", "scientific_name", "taxon_rank", "parent"])
       .concat(
-        summaryValues ? summaryValues.map((key) => `attributes.${key}`) : []
+        summaryValues ? summaryValues.map((key) => `attributes.${key}`) : [],
       );
     if (result == "assembly") {
       include.push("assembly_id");
@@ -33,7 +33,7 @@ export const setIncludes = ({
     include = include
       .concat(["taxon_id", "assembly_id", "feature_id", "primary_type"])
       .concat(
-        summaryValues ? summaryValues.map((key) => `attributes.${key}`) : []
+        summaryValues ? summaryValues.map((key) => `attributes.${key}`) : [],
       );
   }
   if (non_attr_fields && non_attr_fields.length > 0) {

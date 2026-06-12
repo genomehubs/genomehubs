@@ -46,15 +46,20 @@ const addSortParameter = (sortBy, lookupTypes, lookupNames) => {
         },
       },
     };
-  } else if (lookupNames(by)) {
+  } else if (lookupNames(by) && lookupNames(by).name) {
+    let [name_type, name_class] =
+      lookupNames(by).group == "taxon"
+        ? ["taxon_names", "name"]
+        : ["identifiers", "identifier"];
+
     return {
-      [`taxon_names.name`]: {
+      [`${name_type}.${name_class}`]: {
         mode: sortBy.mode || "max",
         order: sortBy.order || "asc",
         nested: {
-          path: "taxon_names",
+          path: name_type,
           filter: {
-            term: { "taxon_names.class": lookupNames(by).class },
+            term: { [`${name_type}.class`]: lookupNames(by).name },
           },
         },
       },
