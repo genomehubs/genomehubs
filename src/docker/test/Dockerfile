@@ -66,6 +66,7 @@ RUN curl -fsSL https://github.com/mikefarah/yq/releases/download/v4.16.2/yq_linu
     && chmod +x /usr/local/bin/yq
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_SKIP_DOWNLOAD=true
 
 ## Create non-root user for security (reuse node user from base image)
 RUN mkdir -p /genomehubs/tests /genomehubs/tests-out /genomehubs/resources \
@@ -84,7 +85,8 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /genomehubs
 
 ## Install Node test dependencies
-RUN npm install --production js-yaml puppeteer
+RUN npm install -g npm@latest \
+    && npm install --production js-yaml puppeteer
 
 ## Copy test components - API build directory structure
 COPY --chown=node:node src/docker/test/genomehubs-api/ ./genomehubs-api/
