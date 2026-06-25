@@ -46,7 +46,7 @@ const getHistAggResults = (aggs, stats) => {
     } else {
       hist = {
         buckets: Object.entries(hist.by_attribute.by_cat.by_value.buckets).map(
-          ([key, obj]) => ({ key, doc_count: obj.doc_count })
+          ([key, obj]) => ({ key, doc_count: obj.doc_count }),
         ),
       };
     }
@@ -59,7 +59,7 @@ const getHistAggResults = (aggs, stats) => {
 
 const getYValues = ({ obj, yField, lookupTypes, stats }) => {
   {
-    obj, yField, stats;
+    (obj, yField, stats);
   }
   let yBuckets = [];
   let yValues = [];
@@ -71,7 +71,7 @@ const getYValues = ({ obj, yField, lookupTypes, stats }) => {
   } else {
     ({ hist: yHist } = getHistAggResults(
       obj.yHistograms.by_attribute[yField],
-      stats
+      stats,
     ));
   }
   if (["keyword", "geo_hex"].includes(yValueType) && stats.cats) {
@@ -298,7 +298,7 @@ const getHistogram = async ({
   // need result count for each value!
   if (nullFields && nullFields.length > 0) {
     let excludeMissing = params.excludeMissing.filter(
-      (field) => !nullFields.includes(field)
+      (field) => !nullFields.includes(field),
     );
     let resultCount = await getResultCount({
       ...params,
@@ -333,10 +333,10 @@ const getHistogram = async ({
     if (yFields.length > 0 && raw) {
       pointData = {};
       let xKeys = new Set(
-        (bounds.stats.cats || []).map((obj) => obj.key.toLowerCase())
+        (bounds.stats.cats || []).map((obj) => obj.key.toLowerCase()),
       );
       let yKeys = new Set(
-        (yBounds.stats.cats || []).map((obj) => obj.key.toLowerCase())
+        (yBounds.stats.cats || []).map((obj) => obj.key.toLowerCase()),
       );
       for (let result of res.results) {
         let cats;
@@ -413,7 +413,7 @@ const getHistogram = async ({
 
   let { hist, docCount } = getHistAggResults(
     res.aggs.aggregations[field],
-    bounds.stats
+    bounds.stats,
   );
   // need a count for each value
 
@@ -579,7 +579,7 @@ const getHistogram = async ({
       // TODO: support categories here too
       let { hist: nestedHist, docCount } = getHistAggResults(
         obj.histogram.by_attribute[field],
-        bounds.stats
+        bounds.stats,
       );
       nestedHist.buckets.forEach((bin, i) => {
         if (!allCatValues[i]) {
@@ -616,7 +616,7 @@ const getHistogram = async ({
                 } else {
                   yValuesByCat.other[i][j] = Math.max(
                     yValuesByCat.other[i][j] - count,
-                    0
+                    0,
                   );
                 }
               });
@@ -745,7 +745,7 @@ const updateQuery = ({ params, fields, summaries, opts, lookupTypes }) => {
     return;
   }
   let queryArr = (params.query || "").split(
-    /(\s*[<>=]+\s*|\s+AND\s+|\s+and\s+)/
+    /(\s*[<>=]+\s*|\s+AND\s+|\s+and\s+)/,
   );
   let options = opts.split(";");
   if (options.length == 1) {
@@ -932,7 +932,7 @@ export const histogram = async ({
   if (params.excludeMissing && params.excludeMissing.length > 0) {
     if (apiParams.excludeMissing) {
       params.excludeMissing = params.excludeMissing.concat(
-        apiParams.excludeMissing
+        apiParams.excludeMissing,
       );
     }
   } else {
@@ -945,7 +945,7 @@ export const histogram = async ({
   if (yParams.excludeMissing && yParams.excludeMissing.length > 0) {
     if (apiParams.excludeMissing) {
       yParams.excludeMissing = yParams.excludeMissing.concat(
-        apiParams.excludeMissing
+        apiParams.excludeMissing,
       );
     }
   } else {
@@ -989,7 +989,7 @@ export const histogram = async ({
   }
   let catBounds = await getBounds({
     params: { ...params, ...inputQueries },
-    fields,
+    fields: [cat, ...fields],
     summaries,
     cat,
     result,
@@ -1011,7 +1011,7 @@ export const histogram = async ({
     nullCatBounds = await getBounds({
       params: { ...params, ...inputQueries },
       fields: [catBounds.cat],
-      summaries,
+      summaries: ["value"],
       result,
       exclusions,
       taxonomy,
