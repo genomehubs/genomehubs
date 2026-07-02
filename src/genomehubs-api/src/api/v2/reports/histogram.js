@@ -990,7 +990,7 @@ export const histogram = async ({
   let catBounds = await getBounds({
     params: { ...params, ...inputQueries },
     fields: [cat, ...fields],
-    summaries,
+    summaries: ["value"],
     cat,
     result,
     exclusions,
