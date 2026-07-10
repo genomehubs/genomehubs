@@ -311,7 +311,7 @@ const getOxford = async ({
       seqs[seq] = seqLengths[assembly][seq];
     }
     sortedSeqs[assembly] = Object.entries(activeSeqs[assembly]).sort(
-      (a, b) => b[1] - a[1]
+      (a, b) => b[1] - a[1],
     );
     seqOffsets[assembly] = {};
     seqIndices[assembly] = {};
@@ -357,7 +357,7 @@ const getOxford = async ({
         continue;
       }
       for (let [refSeqId, startArray] of Object.entries(
-        featArrays.ref[group]
+        featArrays.ref[group],
       )) {
         if (!featArrays.cmp[sequence_id]) {
           featArrays.cmp[sequence_id] = {};
@@ -404,7 +404,7 @@ const getOxford = async ({
   buckets[asms[1]] = [];
   labels[asms[1]] = [];
   for (let [seq, score] of Object.entries(seqScores).sort(
-    (a, b) => a[1] - b[1]
+    (a, b) => a[1] - b[1],
   )) {
     let offsetCorrection = 0;
     if (seqOrient[seq] < 0) {
@@ -440,12 +440,12 @@ const getOxford = async ({
           ...a,
           [b]: buckets[asms[0]].map(() => buckets[asms[1]].map(() => 0)),
         }),
-        {}
+        {},
       );
   } else {
     byCat["all features"] = buckets[asms[0]].map(() => 0);
     yValuesByCat["all features"] = buckets[asms[0]].map(() =>
-      buckets[asms[1]].map(() => 0)
+      buckets[asms[1]].map(() => 0),
     );
   }
   for (let [sequence_id, len] of sortedSeqs[asms[0]]) {
@@ -619,6 +619,11 @@ export const oxford = async ({
       success: false,
       error: `unknown field in 'x = ${x}'`,
     };
+    for (let field of xFields) {
+      if (!typesMap[field]) {
+        status.error += `\n  - ${field}`;
+      }
+    }
     return { status };
   }
 
@@ -667,7 +672,7 @@ export const oxford = async ({
   }));
 
   let filteredFields = xFields.filter(
-    (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
+    (field) => lookupTypes(field) && lookupTypes(field).type != "keyword",
   );
   bounds = await getBounds({
     params: { ...params },
