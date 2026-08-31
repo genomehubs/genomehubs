@@ -31,7 +31,7 @@
   "dependencies": {
     "@elastic/elasticsearch": "^8.15.0",
     "@json2csv/plainjs": "^7.0.6",
-    "archiver": "^7.0.1",
+    "archiver": "^8.0.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
