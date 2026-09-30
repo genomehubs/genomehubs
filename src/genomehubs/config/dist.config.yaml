@@ -19,7 +19,8 @@ common:
     path: ~/genomehubs/demo
     separator: "--"
     version: v0.1
-fill: {}
+fill:
+  max-list-length: 1000
 index: {}
 init: {}
 # docker:

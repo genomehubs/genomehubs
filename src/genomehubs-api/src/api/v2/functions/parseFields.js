@@ -21,6 +21,9 @@ export const parseFields = async ({ result, fields, taxonomy }) => {
     }
     let fieldList = new Set();
     for (let field of fields) {
+      if (!lookupTypes(field)) {
+        continue;
+      }
       let [summary, attr] = field.split(/[\(\)]/);
       if (attr && summaries.includes(summary)) {
         field = attr;

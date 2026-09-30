@@ -12,7 +12,7 @@ Usage:
                     [--traverse-infer-both] [--traverse-threads INT]
                     [--traverse-depth INT] [--traverse-root STRING]
                     [--traverse-weight STRING] [--log-interval INT]
-                    [--log-es BOOL]
+                    [--max-list-length INT] [--log-es BOOL]
                     [-h|--help] [-v|--version]
 
 Options:
@@ -35,6 +35,8 @@ Options:
     --traverse-weight STRING      Weighting scheme for setting values during tree
                                   traversal.
     --log-interval INT            Minimum time (seconds) between prgress bar updates.
+    --max-list-length INT         Maximum number of unique values kept for any
+                                  aggregated list-valued attribute. [Default: 1000]
     --log-es BOOL                 Show Info-level logs from elasticsearch.
     -h, --help                    Show this
     -v, --version                 Show version number
@@ -75,6 +77,7 @@ from .es_functions import stream_template_search_results
 from .version import __version__
 
 LOGGER = tolog.logger(__name__)
+DEFAULT_MAX_LIST_LENGTH = 1000
 
 
 def get_max_depth(es, *, index):
@@ -238,9 +241,51 @@ def flatten_list(arr):
     return flattened
 
 
-def deduped_list(arr):
-    """Remove duplicate values from a list."""
-    return list(set(flatten_list(arr)))
+def deduped_list(arr, max_length=None):
+    """Remove duplicate values from a list, optionally truncating the result."""
+    flattened = flatten_list(arr)
+    values = []
+    seen = set()
+    for value in flattened:
+        if value in seen:
+            continue
+        values.append(value)
+        seen.add(value)
+        if max_length is not None and len(values) >= max_length:
+            break
+    return values
+
+
+def truncate_list(values, max_length=None, *, field_name=None):
+    """Limit large list-valued attributes to keep bulk indexing reliable."""
+    if values is None:
+        return []
+    values = list(values)
+    if max_length is None or max_length < 0:
+        return values
+    if len(values) <= max_length:
+        return values
+    if field_name:
+        LOGGER.warning(
+            "Truncating attribute '%s' from %d values to %d to keep the bulk index stable",
+            field_name,
+            len(values),
+            max_length,
+        )
+    return values[:max_length]
+
+
+def merge_list_values(existing, new_values, *, max_length, field_name):
+    """Combine list values while enforcing a maximum collection size."""
+    combined = deduped_list(existing + list(new_values), max_length=max_length)
+    if max_length is not None and len(combined) >= max_length:
+        if len(existing) + len(new_values) > max_length:
+            LOGGER.warning(
+                "Attribute '%s' exceeded max list length (%d); values were truncated",
+                field_name,
+                max_length,
+            )
+    return combined
 
 
 def hex_bin(arr, resolution=6):
@@ -315,6 +360,7 @@ def apply_summary(
     attr_order=None,
     meta=None,
     linked_attributes=None,
+    max_list_length=DEFAULT_MAX_LIST_LENGTH,
 ):
     """Apply summary statistic functions."""
     summaries = {
@@ -361,6 +407,8 @@ def apply_summary(
         )
     else:
         value = summaries[summary](flattened)
+    if isinstance(value, list):
+        value = truncate_list(value, max_list_length, field_name=meta.get("key"))
     if summary == "max":
         if max_value is not None:
             value = latest(value, max_value)
@@ -386,6 +434,7 @@ def set_traverse_values(
     traverse,
     source,
     linked_attributes,
+    max_list_length=DEFAULT_MAX_LIST_LENGTH,
 ):
     """Set values  use for tree traversal."""
     idx = 0
@@ -409,6 +458,7 @@ def set_traverse_values(
             attr_order=attr_order,
             meta=meta,
             linked_attributes=linked_attributes,
+            max_list_length=max_list_length,
         )
         if idx == 0:
             if value is not None:
@@ -479,6 +529,7 @@ def summarise_attribute_values(
     max_value=None,
     min_value=None,
     source="direct",
+    max_list_length=DEFAULT_MAX_LIST_LENGTH,
 ):
     """Calculate a single summary value for an attribute."""
     if values is None and "values" not in attribute:
@@ -528,6 +579,7 @@ def summarise_attribute_values(
                 traverse,
                 source,
                 linked_attributes,
+                max_list_length=max_list_length,
             )
         except Exception:
             print(format_exc())
@@ -545,7 +597,16 @@ def summarise_attribute_values(
     return None, None, None
 
 
-def summarise_attributes(*, attributes, rank, attrs, meta, parent, parents):
+def summarise_attributes(
+    *,
+    attributes,
+    rank,
+    attrs,
+    meta,
+    parent,
+    parents,
+    max_list_length=DEFAULT_MAX_LIST_LENGTH,
+):
     """Set attribute summary values."""
     changed = False
     attr_dict = {}
@@ -568,6 +629,7 @@ def summarise_attributes(*, attributes, rank, attrs, meta, parent, parents):
                 node_attribute,
                 {"key": node_attribute["key"], **meta[node_attribute["key"]]},
                 linked_attributes=linked_attributes,
+                max_list_length=max_list_length,
                 # sp_count=sp_count,
             )
             if summary_value is not None:
@@ -575,9 +637,14 @@ def summarise_attributes(*, attributes, rank, attrs, meta, parent, parents):
                 if parent is not None:
                     parents[parent][node_attribute["key"]]["count"] += 1
                     if isinstance(summary_value, list):
-                        parents[parent][node_attribute["key"]][
-                            "values"
-                        ] += summary_value
+                        parents[parent][node_attribute["key"]]["values"] = (
+                            merge_list_values(
+                                parents[parent][node_attribute["key"]]["values"],
+                                summary_value,
+                                max_length=max_list_length,
+                                field_name=node_attribute["key"],
+                            )
+                        )
                     else:
                         parents[parent][node_attribute["key"]]["values"].append(
                             summary_value
@@ -626,6 +693,7 @@ def set_values_from_descendants(
     descendant_ranks=None,
     attr_dict=None,
     limits=None,
+    max_list_length=DEFAULT_MAX_LIST_LENGTH,
 ):
     """Set attribute summary values from descendant values."""
     changed = False
@@ -669,6 +737,7 @@ def set_values_from_descendants(
             min_value=obj["min"],
             source=set_aggregation_source(attribute),
             linked_attributes=linked_attributes,
+            max_list_length=max_list_length,
         )
         set_aggregation_source(attribute, "descendant")
 
@@ -682,8 +751,11 @@ def set_values_from_descendants(
                 if "sp_count" in attribute:
                     parents[parent][key]["sp_count"] += attribute["sp_count"]
                 if isinstance(summary_value, list):
-                    parents[parent][key]["values"] = list(
-                        set(parents[parent][key]["values"] + summary_value)
+                    parents[parent][key]["values"] = merge_list_values(
+                        parents[parent][key]["values"],
+                        summary_value,
+                        max_length=max_list_length,
+                        field_name=key,
                     )
                 else:
                     parents[parent][key]["values"].append(summary_value)
@@ -803,6 +875,7 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
         )
     )
     limits = defaultdict(set)
+    max_list_length = int(opts.get("max-list-length", DEFAULT_MAX_LIST_LENGTH))
     if "traverse-infer-both" in opts and opts["traverse-infer-both"]:
         desc_attrs, desc_attr_limits = set_attributes_to_descend(
             meta, opts["traverse-limit"]
@@ -831,6 +904,7 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
                     meta=meta,
                     parent=node["_source"].get("parent", None),
                     parents=parents,
+                    max_list_length=max_list_length,
                 )
             else:
                 node["_source"]["attributes"] = []
@@ -847,6 +921,7 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
                     traverse_limit=opts["traverse-limit"],
                     attr_dict=attr_dict,
                     limits=limits,
+                    max_list_length=max_list_length,
                 )
                 if not changed:
                     changed = modified

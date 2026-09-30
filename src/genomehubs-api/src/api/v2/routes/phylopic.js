@@ -11,7 +11,7 @@ const licensesByUrl = Object.entries(spdxLicenseList).reduce(
     }
     return acc;
   },
-  {}
+  {},
 );
 
 const fetchPhylopic = async ({
@@ -75,13 +75,14 @@ const fetchPhylopic = async ({
     });
     let response = await fetch(
       `https://api.phylopic.org/resolve/ncbi.nlm.nih.gov/taxid?objectIDs=${encodeURIComponent(
-        [taxonId, ...taxIdList].join(",")
-      )}`
+        [taxonId, ...taxIdList].join(","),
+      )}`,
     );
     let json = await response.json();
     let { href, title } = json._links.primaryImage || {};
+    href = href.replace(/^\/+/, "").replace(/\/$/, "");
     let external = (json._links.external || []).find((link) =>
-      link.href.includes("ncbi.nlm.nih.gov/taxid")
+      link.href.includes("ncbi.nlm.nih.gov/taxid"),
     );
     let nodeResponse = await fetch(`https://api.phylopic.org/${href}`);
     let nodeJson = await nodeResponse.json();
@@ -93,8 +94,8 @@ const fetchPhylopic = async ({
   const resolveByName = async ({ name, rank, taxonId, build, taxonNames }) => {
     let response = await fetch(
       `https://api.phylopic.org/nodes?build=${build}&filter_name=${encodeURIComponent(
-        name.toLowerCase()
-      )}&page=0`
+        name.toLowerCase(),
+      )}&page=0`,
     );
     let json = await response.json();
     let { items = [] } = json._links || {};

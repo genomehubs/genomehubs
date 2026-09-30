@@ -3,6 +3,9 @@ FROM node:24-bookworm-slim AS builder
 WORKDIR /app
 
 ARG USE_PREBUILT_DIST=false
+ARG GH_BASENAME=""
+
+ENV GH_BASENAME=${GH_BASENAME}
 
 ## Install build dependencies (git required for git-revision-webpack-plugin)
 RUN apt-get update && apt-get install -y --no-install-recommends git \

@@ -229,6 +229,34 @@ def get_size(obj, seen=None):
     return size
 
 
+def _summarise_bulk_error(action, response):
+    """Extract the relevant document ID and Elasticsearch error for a failed bulk item."""
+    body = response or {}
+    for key in ("index", "create", "update", "delete"):
+        if key in body:
+            body = body[key]
+            break
+    error = body.get("error", {}) if isinstance(body, dict) else {}
+    reason = "unknown error"
+    if isinstance(error, dict):
+        if "reason" in error:
+            reason = error["reason"]
+        elif "type" in error:
+            reason = error["type"]
+            if "caused_by" in error and isinstance(error["caused_by"], dict):
+                cause = error["caused_by"].get("reason")
+                if cause:
+                    reason = f"{reason}: {cause}"
+    elif error:
+        reason = str(error)
+    action_id = "<unknown>"
+    payload = None
+    if isinstance(action, dict):
+        action_id = action.get("_id", action.get("id", action_id))
+        payload = action.get("_source", action.get("doc"))
+    return action_id, body.get("status", "unknown status"), reason, payload
+
+
 def index_stream(
     es,
     index_name,
@@ -262,16 +290,19 @@ def index_stream(
         for action in actions:
             yield True, {}
 
-    def debug_actions(actions, batch):
-        """Wrap actions for debugging."""
+    batch = []
+    pending_actions = []
+
+    def wrapped_actions(actions, batch):
+        """Track each action so item-level bulk failures can be diagnosed precisely."""
         for action in actions:
             if len(batch) == chunk_size:
                 batch = []
             batch.append(action)
+            pending_actions.append(action)
             yield action
 
-    batch = []
-    actions = debug_actions(actions, batch)
+    actions = wrapped_actions(actions, batch)
 
     try:
         tracer = logging.getLogger("elasticsearch")
@@ -280,17 +311,45 @@ def index_stream(
             iterator = dry_run_iterator(es, actions)
         else:
             chunk_size = int(chunk_size)
-            iterator = helpers.streaming_bulk(es, actions, chunk_size)
+            iterator = helpers.streaming_bulk(
+                es,
+                actions,
+                chunk_size,
+                raise_on_error=True,
+            )
         success = 0
         failed = 0
         if log:
             iterator = tqdm(iterator, unit=" records", unit_scale=True)
         for ok, response in iterator:
+            action = pending_actions.pop(0) if pending_actions else {}
             if ok:
                 success += 1
-            else:
-                failed += 1
+                continue
+            failed += 1
+            action_id, status, reason, payload = _summarise_bulk_error(action, response)
+            LOGGER.error(
+                "Bulk index failed for document '%s' in index '%s' (status %s): %s",
+                action_id,
+                index_name,
+                status,
+                reason,
+            )
+            if payload is not None:
+                payload_text = ujson.dumps(payload, ensure_ascii=False, default=str)
+                if len(payload_text) > 4000:
+                    payload_text = payload_text[:4000] + "... [truncated]"
+                LOGGER.error("Offending document payload: %s", payload_text)
+            raise RuntimeError(
+                f"Bulk index failed for document '{action_id}' in index '{index_name}' "
+                f"(status {status}): {reason}"
+            )
     except Exception as bulk_err:
+        LOGGER.error(
+            "Bulk index request failed for index '%s': %s",
+            index_name,
+            bulk_err,
+        )
         for action in batch:
             try:
                 if _op_type == "index":
@@ -304,13 +363,13 @@ def index_stream(
             except OverflowError:
                 pass
             except Exception as err:
-                LOGGER.warn(
+                LOGGER.warning(
                     "Size of document that failed to index is %d bytes",
                     get_size(action),
                 )
-                LOGGER.warn(action)
+                LOGGER.warning(action)
                 raise err
-        # raise bulk_err
+        raise
     es_client = client.IndicesClient(es)
     es_client.refresh(index=index_name)
     return success, failed

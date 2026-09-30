@@ -99,13 +99,13 @@ export const processHits = ({
     let bucketLabels, hasRange;
     if (bucketType == "date") {
       bucketLabels = bucketValues.map(
-        (v) => new Date(v).toISOString().split("T")[0]
+        (v) => new Date(v).toISOString().split("T")[0],
         // .replace(/(-01)*$/g, "")
       );
       hasRange = true;
     } else if (!bucketType.endsWith("keyword") && bucketType == "geo_hex") {
       bucketLabels = bucketValues.map((v) =>
-        bucketType == "date" ? v : sci(scaleFunc(v))
+        bucketType == "date" ? v : sci(scaleFunc(v)),
       );
       hasRange = true;
     } else {
@@ -124,14 +124,14 @@ export const processHits = ({
   };
 
   for (let [key, value] of Object.entries(
-    body.aggregations ? body.aggregations.fields || {} : {}
+    body.aggregations ? body.aggregations.fields || {} : {},
   )) {
     let bucketKey = key.replace(/_histogram$/, "");
     if (fieldTypes[bucketKey] && key.endsWith("_histogram")) {
       buckets[bucketKey] = setBucketValues(
         value,
         fieldTypes[bucketKey],
-        scaleFuncs[`${bounds[bucketKey].scale || "linear"}Inv`]
+        scaleFuncs[`${bounds[bucketKey].scale || "linear"}Inv`],
       );
     }
   }
@@ -316,7 +316,7 @@ export const processHits = ({
                     v
                       .split(/\s*,\s*/)
                       .map((c) => precisionRound(c, 4))
-                      .join(", ")
+                      .join(", "),
                   );
                 }
                 if (inner_hit.fields[ikey].length == 1) {
@@ -363,7 +363,7 @@ export const processHits = ({
                     if (field[subsetKey].endsWith("T00:00:00.000Z")) {
                       field[subsetKey] = field[subsetKey].replace(
                         "T00:00:00.000Z",
-                        ""
+                        "",
                       );
                     }
                   } catch {
@@ -439,7 +439,7 @@ export const processHits = ({
                         : "Other";
                     }
                   })
-                  .sort()
+                  .sort(),
               ),
             ];
           }

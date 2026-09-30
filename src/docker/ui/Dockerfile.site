@@ -23,6 +23,7 @@ ARG SITE_NAME_LONG=""
 ARG GH_CITATION_URL=""
 ARG GH_SUGGESTED_TERM=""
 ARG GH_TAXONOMY=ncbi
+ARG GH_BASENAME=""
 
 ## Copy content from builder stage
 COPY --from=content-builder --chown=nonroot:nonroot /tmp/site-content/static /content/static
@@ -35,6 +36,7 @@ ENV GH_SITENAME_LONG=${SITE_NAME_LONG}
 ENV GH_CITATION_URL=${GH_CITATION_URL}
 ENV GH_SUGGESTED_TERM=${GH_SUGGESTED_TERM}
 ENV GH_TAXONOMY=${GH_TAXONOMY}
+ENV GH_BASENAME=${GH_BASENAME}
 
 USER nonroot
 CMD ["--no-deprecation", "src/server/index.js"]

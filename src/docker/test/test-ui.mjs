@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
+import * as yaml from "js-yaml";
+
 import fs from "fs";
 import os from "os";
 import puppeteer from "puppeteer";
-import yaml from "js-yaml";
 
 /**
  * Wait for a download to complete by monitoring the download directory
