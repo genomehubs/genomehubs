@@ -12,16 +12,19 @@ import { format } from "d3-format";
 import { utcFormat } from "d3-time-format";
 
 const sci = (v) => {
-  if (v < 1000 && v >= 0.001) {
-    if (v < 10) {
+  let absV = Math.abs(v);
+  if (absV < 1000 && absV >= 0.001) {
+    if (absV < 10) {
       return format(".3r")(v).replace(/0*$/, "");
     }
     return format(".3r")(v);
   }
   return format(".3s")(v);
 };
+
 const sciInt = (v) => {
-  if (v < 1000) {
+  let absV = Math.abs(v);
+  if (absV < 1000) {
     return Math.ceil(v);
   }
   return format(".3s")(v);

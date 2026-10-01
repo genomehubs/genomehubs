@@ -24,8 +24,8 @@ const convertIdsToDocIds = (recordId, result) => {
       id.match(/^taxon-/)
         ? id
         : id.match(/^taxon_id-/)
-        ? id.replace(/^taxon_id/, "taxon")
-        : `taxon-${id}`
+          ? id.replace(/^taxon_id/, "taxon")
+          : `taxon-${id}`,
     );
   } else if (result == "assembly") {
     ids = ids.map((id) => (id.match(/^assembly-/) ? id : `assembly-${id}`));
@@ -83,7 +83,7 @@ export const getRecordsById = async ({
         index,
         body: { ids },
       },
-      { meta: true }
+      { meta: true },
     )
     .catch((err) => {
       return err.meta;

@@ -84,7 +84,7 @@ const FeaturePanel = ({
   if (record && record.record && sequenceId && records[sequenceId]) {
     featureAttributes = record.record.attributes;
     let sequenceAttributes = records[sequenceId].record.attributes;
-    let sequenceIdentifiers = records[sequenceId].record.identifiers;
+    let sequenceIdentifiers = records[sequenceId].record.identifiers || [];
     assignedName = sequenceIdentifiers.filter(
       (obj) => obj.class == "assigned_name",
     );

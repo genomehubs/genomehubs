@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import PhylopicAttributions from "./PhylopicAttributions";
 import Phylopics from "./PhyloPics";
@@ -8,7 +8,9 @@ import { compose } from "redux";
 import { scaleLog } from "d3-scale";
 import setColors from "#functions/setColors";
 import { useLongPress } from "use-long-press";
+import { useSelector } from "react-redux";
 import withColors from "#hocs/withColors";
+import withPhylopicsById from "#hocs/withPhylopicsById";
 import withTheme from "#hocs/withTheme";
 import withTypes from "#hocs/withTypes";
 
@@ -287,6 +289,7 @@ const ReportTreeRings = ({
 
   let ticksText = [];
   let tickRings = [];
+  const loadedPhylopics = useSelector((state) => state.phylopics?.byId || {});
   if (ticks && ticks.length > 0 && ticks[0].radius) {
     ticks.forEach((tick, i) => {
       ticksText.push(
@@ -345,37 +348,299 @@ const ReportTreeRings = ({
 
   let phylopicElements = [];
   let taxIds = {};
+  let placed = [];
+
+  const angularGap = (a, b) => {
+    const delta = a - b;
+    return Math.abs(Math.atan2(Math.sin(delta), Math.cos(delta)));
+  };
+
+  const getPhylopicAspectRatio = (taxonId, fallback = 1) => {
+    const ratio = Number(loadedPhylopics[taxonId]?.ratio || fallback);
+    return Number.isFinite(ratio) && ratio > 0 ? ratio : fallback;
+  };
+
+  const getImageFootprint = (entry) => {
+    const ratio = getPhylopicAspectRatio(entry.taxonId, 1);
+    const width = entry.width || 0;
+    const height = entry.height || 0;
+    const isWide = ratio > 1.5;
+    const displayWidth = isWide
+      ? Math.max(width, height * Math.min(ratio, 2.5) * 0.85)
+      : Math.max(width, height);
+    const displayHeight = isWide
+      ? Math.max(height, (width / Math.max(ratio, 1.5)) * 0.85)
+      : Math.max(height, width * 0.8);
+
+    return {
+      width: displayWidth,
+      height: displayHeight,
+      isWide,
+    };
+  };
+
+  const positionsOverlap = (candidate, other) => {
+    const candidateAngle = Math.atan2(candidate.y, candidate.x);
+    const otherAngle = Math.atan2(other.y, other.x);
+    const gap = angularGap(candidateAngle, otherAngle);
+    const candidateFootprint = getImageFootprint(candidate);
+    const otherFootprint = getImageFootprint(other);
+    const separation = Math.max(
+      Math.hypot(candidate.x - other.x, candidate.y - other.y),
+      0,
+    );
+
+    const effectiveCandidate = {
+      width: candidateFootprint.width * 0.9,
+      height: candidateFootprint.height * 0.9,
+      isWide: candidateFootprint.isWide,
+    };
+    const effectiveOther = {
+      width: otherFootprint.width * 0.9,
+      height: otherFootprint.height * 0.9,
+      isWide: otherFootprint.isWide,
+    };
+
+    if (effectiveCandidate.isWide && effectiveOther.isWide) {
+      const requiredSeparation =
+        (effectiveCandidate.height + effectiveOther.height) / 2 + 10;
+      return gap < Math.PI * 0.8 && separation < requiredSeparation;
+    }
+
+    const candidateHalfWidth = effectiveCandidate.width / 2;
+    const candidateHalfHeight = effectiveCandidate.height / 2;
+    const otherHalfWidth = effectiveOther.width / 2;
+    const otherHalfHeight = effectiveOther.height / 2;
+    const requiredSeparation =
+      Math.max(candidateHalfWidth, candidateHalfHeight) +
+      Math.max(otherHalfWidth, otherHalfHeight) +
+      4;
+    return gap < Math.PI && separation < requiredSeparation;
+  };
+
+  const applyRadialOffset = (position, offset) => {
+    if (!position || !Number.isFinite(offset) || offset <= 0) {
+      return position;
+    }
+    const magnitude = Math.hypot(position.x || 0, position.y || 0);
+    if (!magnitude) {
+      return position;
+    }
+    const maxCanvasRadius = Math.max(
+      0,
+      Math.min(width || 1000, height || 1000) / 2,
+    );
+    const nextMagnitude = Math.min(
+      maxCanvasRadius,
+      Math.max(0, magnitude + offset),
+    );
+    const directionX = (position.x || 0) / magnitude;
+    const directionY = (position.y || 0) / magnitude;
+    return {
+      ...position,
+      x: directionX * nextMagnitude,
+      y: directionY * nextMagnitude,
+    };
+  };
+
+  const resolveCenteredPosition = (candidate, fallback, entries) => {
+    if (!entries.length || !candidate || !fallback) {
+      return {
+        position: candidate || fallback,
+        offsetApplied: false,
+        scale: 1,
+      };
+    }
+
+    const scales = [1, 0.9, 0.8, 0.7, 0.6, 0.5];
+    const maxCanvasRadius = Math.max(
+      0,
+      Math.min(width || 1000, height || 1000) / 2,
+    );
+
+    for (const scale of scales) {
+      const scaledCandidate = {
+        ...candidate,
+        width: (candidate.width || 0) * scale,
+        height: (candidate.height || 0) * scale,
+      };
+      const scaledFallback = {
+        ...fallback,
+        width: (fallback.width || 0) * scale,
+        height: (fallback.height || 0) * scale,
+      };
+
+      if (!entries.some((entry) => positionsOverlap(scaledCandidate, entry))) {
+        return { position: scaledCandidate, offsetApplied: false, scale };
+      }
+
+      const maxOutwardOffset = Math.max(
+        0,
+        maxCanvasRadius -
+          Math.hypot(scaledCandidate.x || 0, scaledCandidate.y || 0),
+      );
+      for (let offset = 2; offset <= maxOutwardOffset; offset += 2) {
+        const trial = applyRadialOffset(scaledCandidate, offset);
+        if (!entries.some((entry) => positionsOverlap(trial, entry))) {
+          return { position: trial, offsetApplied: true, scale };
+        }
+      }
+
+      const fallbackOutwardOffset = Math.max(
+        0,
+        maxCanvasRadius -
+          Math.hypot(scaledFallback.x || 0, scaledFallback.y || 0),
+      );
+      for (let offset = 2; offset <= fallbackOutwardOffset; offset += 2) {
+        const trial = applyRadialOffset(scaledFallback, offset);
+        if (!entries.some((entry) => positionsOverlap(trial, entry))) {
+          return { position: trial, offsetApplied: true, scale };
+        }
+      }
+    }
+
+    return { position: fallback, offsetApplied: false, scale: 1 };
+  };
+
+  const PhylopicMarker = withPhylopicsById(
+    ({
+      taxonId,
+      scientificName,
+      x,
+      y,
+      angle,
+      width,
+      height,
+      arc,
+      imageX = x,
+      imageY = y,
+      imageAngle = angle,
+      phylopicById,
+      fetchPhylopic,
+      stroke,
+    }) => {
+      useEffect(() => {
+        if (!phylopicById) {
+          fetchPhylopic({ taxonId, scientificName });
+        }
+      }, [taxonId, scientificName, phylopicById, fetchPhylopic]);
+
+      if (!phylopicById?.ratio || !phylopicById?.dataUri) {
+        return null;
+      }
+
+      return (
+        <g key={taxonId}>
+          {arc && (
+            <path
+              fill={"none"}
+              stroke={stroke}
+              strokeWidth={4}
+              strokeLinejoin="round"
+              d={arc}
+            ></path>
+          )}
+          <g
+            transform={`translate(${imageX}, ${imageY}) rotate(${imageAngle})`}
+          >
+            <Phylopics
+              taxonId={taxonId}
+              scientificName={scientificName}
+              maxHeight={height}
+              maxWidth={width}
+              fixedRatio={1}
+              showAncestral={false}
+              sourceColors={false}
+              embed={true}
+              transform={"translate(0, 0)"}
+            />
+          </g>
+        </g>
+      );
+    },
+  );
+
   let ctr = 0;
   for (let [taxonId, opts] of Object.entries(phylopics)) {
     if (!taxonId) {
       continue;
     }
-    let { x, y, angle, scientificName, width, height, arc } = opts;
-    const useHeight = height;
-    const useWidth = width;
+    // Do not block the whole phylopic layer on the nested fetch. The layout can
+    // re-run when the live ratio arrives in Redux, but we should still render the
+    // current image instead of suppressing it entirely.
+    let {
+      x,
+      y,
+      angle,
+      scientificName,
+      width,
+      height,
+      arc,
+      standard,
+      centered,
+    } = opts;
+
+    const candidatePositions = [centered, standard, { x, y, angle }].filter(
+      Boolean,
+    );
+    let chosenPosition = candidatePositions[0];
+    let offsetApplied = false;
+    for (const candidate of candidatePositions) {
+      const overlaps = placed.some((entry) =>
+        positionsOverlap(candidate, entry),
+      );
+      if (!overlaps) {
+        chosenPosition = candidate;
+        break;
+      }
+    }
+
+    let renderScale = 1;
+    if (placed.length) {
+      const preferredCandidate = centered || chosenPosition || standard;
+      const resolved = resolveCenteredPosition(
+        preferredCandidate,
+        standard || chosenPosition || { x, y, angle },
+        placed,
+      );
+      offsetApplied = !!resolved.offsetApplied || resolved.scale < 1;
+      renderScale = resolved.scale || 1;
+      chosenPosition = resolved.position;
+    }
+
+    const renderedWidth = width * renderScale;
+    const renderedHeight = height * renderScale;
+
+    placed.push({
+      taxonId,
+      x: chosenPosition.x,
+      y: chosenPosition.y,
+      width: renderedWidth,
+      height: renderedHeight,
+      pixelsPerDegree: opts.pixelsPerDegree,
+      centered: chosenPosition === centered,
+      offsetApplied,
+    });
+
     phylopicElements.push(
-      <g key={taxonId}>
-        <Phylopics
-          taxonId={taxonId}
-          scientificName={scientificName}
-          maxHeight={useHeight}
-          maxWidth={useWidth}
-          fixedRatio={1}
-          showAncestral={false}
-          sourceColors={false}
-          embed={true}
-          transform={`translate(${x}, ${y}) rotate(${angle})`}
-        />
-        <path
-          fill={"none"}
-          stroke={colors[ctr]}
-          strokeWidth={4}
-          strokeLinejoin="round"
-          d={arc}
-        ></path>
-      </g>,
+      <PhylopicMarker
+        key={taxonId}
+        taxonId={taxonId}
+        scientificName={scientificName}
+        x={x}
+        y={y}
+        angle={angle}
+        imageX={chosenPosition.x}
+        imageY={chosenPosition.y}
+        imageAngle={chosenPosition.angle}
+        width={renderedWidth}
+        height={renderedHeight}
+        arc={arc}
+        stroke={greyColor}
+      />,
     );
     taxIds[taxonId] = scientificName;
+    ctr += 1;
   }
 
   let attributions = (

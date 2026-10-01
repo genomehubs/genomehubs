@@ -270,8 +270,10 @@ export const processTreeRings = ({
   let phylopicWidth = 0;
   let gapAngle = 0;
   let phylopicPadding = 10;
+  let minPhylopicWidth = 10;
   if (showPhylopics) {
     phylopicWidth = Math.min((radius * Math.PI * 2) / cMax, phylopicSize);
+    minPhylopicWidth = Math.max(20, phylopicSize * 0.75);
     radius -= phylopicSize + phylopicPadding;
     tipWidth = (radius * Math.PI * 2) / cMax;
     gapAngle = Math.PI / cMax / 2;
@@ -361,6 +363,204 @@ export const processTreeRings = ({
   let visited = {};
 
   let labels = [];
+  let pendingPhylopics = [];
+
+  const addPhylopic = (selected) => {
+    if (!selected.length) {
+      return;
+    }
+
+    const startAngle = selected[0].startAngle;
+    const endAngle = selected[selected.length - 1].endAngle;
+    const groupMidAngle = (startAngle + endAngle) / 2;
+    const representative = selected.reduce((best, item) => {
+      const itemDistance = Math.abs(item.midAngle - groupMidAngle);
+      const bestDistance = Math.abs(best.midAngle - groupMidAngle);
+      if (selected.length > 1) {
+        if (item.width > best.width) {
+          return item;
+        }
+        if (item.width === best.width && itemDistance < bestDistance) {
+          return item;
+        }
+      }
+      return itemDistance < bestDistance ? item : best;
+    }, selected[0]);
+    const r = radius + dataWidth + phylopicPadding;
+    const groupWidth = selected.reduce((sum, item) => sum + item.width, 0);
+    const markerPadding = Math.min(
+      gapAngle,
+      Math.max(representative.endAngle - representative.startAngle, 0.02) / 4,
+    );
+    const arcStart = representative.startAngle + markerPadding;
+    const arcEnd = representative.endAngle - markerPadding;
+    const arcPath = arc()({
+      innerRadius: r - phylopicPadding / 2,
+      outerRadius: r - phylopicPadding / 2,
+      startAngle: arcStart,
+      endAngle: arcEnd,
+    });
+    const imageAngle = representative.midAngle;
+    const imageAngleDegrees = (imageAngle * 180) / Math.PI;
+    const pixelsPerDegree = (Math.PI * r) / 180;
+    const standardPosition = {
+      ...circleXY(r, imageAngle),
+      angle: imageAngleDegrees,
+    };
+    const centeredOffset = Math.min(18, Math.max(8, groupWidth / 8));
+    const centeredRadius = r + centeredOffset;
+    const centeredPosition = {
+      ...circleXY(centeredRadius, imageAngle),
+      angle: imageAngleDegrees,
+    };
+    phylopics[representative.taxon_id] = {
+      angle: (imageAngle * 180) / Math.PI,
+      radius: r,
+      pixelsPerDegree,
+      scientificName: representative.scientificName,
+      width: Math.min(groupWidth, phylopicSize),
+      height: phylopicSize * 0.9,
+      arc: arcPath,
+      x: standardPosition.x,
+      y: standardPosition.y,
+      standard: standardPosition,
+      centered: centeredPosition,
+    };
+  };
+
+  const choosePhylopicWindow = (items) => {
+    if (!items.length) {
+      return [];
+    }
+
+    let bestWindow = [];
+    let bestScore = Number.POSITIVE_INFINITY;
+    let bestWidth = 0;
+
+    for (let start = 0; start < items.length; start++) {
+      let currentWidth = 0;
+      for (let end = start; end < items.length; end++) {
+        currentWidth += items[end].width;
+        const windowItems = items.slice(start, end + 1);
+        const windowWidth = windowItems.reduce(
+          (sum, item) => sum + item.width,
+          0,
+        );
+
+        if (windowWidth > phylopicSize) {
+          break;
+        }
+
+        const windowMid =
+          (windowItems[0].startAngle +
+            windowItems[windowItems.length - 1].endAngle) /
+          2;
+        const weightScore = Math.abs(windowMid - items[0].midAngle);
+        const minimumCompactWidth = minPhylopicWidth * 0.8;
+        const target =
+          currentWidth < minPhylopicWidth
+            ? Math.max(
+                minimumCompactWidth,
+                Math.min(currentWidth, minPhylopicWidth),
+              )
+            : Math.min(phylopicSize, Math.max(minPhylopicWidth, currentWidth));
+        const score =
+          Math.abs(windowWidth - target) +
+          weightScore +
+          (currentWidth < minPhylopicWidth && windowWidth < minimumCompactWidth
+            ? (minimumCompactWidth - windowWidth) * 7
+            : 0);
+
+        if (
+          currentWidth >= minPhylopicWidth ||
+          windowWidth >= minimumCompactWidth
+        ) {
+          if (score < bestScore) {
+            bestWindow = windowItems;
+            bestScore = score;
+            bestWidth = windowWidth;
+          }
+        } else if (windowWidth > bestWidth) {
+          bestWindow = windowItems;
+          bestScore = score;
+          bestWidth = windowWidth;
+        }
+      }
+    }
+
+    if (!bestWindow.length) {
+      const widest = items.reduce(
+        (best, item) => (item.width > best.width ? item : best),
+        items[0],
+      );
+      return [widest];
+    }
+
+    return bestWindow;
+  };
+
+  const finalizePhylopics = () => {
+    if (!pendingPhylopics.length) {
+      return [];
+    }
+
+    const ordered = [...pendingPhylopics].sort(
+      (a, b) => a.startAngle - b.startAngle,
+    );
+    const finalWindows = [];
+    const used = new Set();
+
+    for (let index = 0; index < ordered.length; index++) {
+      const candidate = ordered[index];
+      if (used.has(candidate)) {
+        continue;
+      }
+
+      const remaining = ordered.slice(index).filter((item) => !used.has(item));
+      const preferred = phylopicRank
+        ? remaining.filter((item) => item.taxon_rank === phylopicRank)
+        : remaining;
+      const run = preferred.length ? preferred : remaining;
+      const selected = choosePhylopicWindow(run);
+
+      if (!selected.length) {
+        continue;
+      }
+
+      const selectedStart = selected[0].startAngle;
+      const selectedEnd = selected[selected.length - 1].endAngle;
+      const overlapIndex = finalWindows.findIndex((window) => {
+        const windowStart = window[0].startAngle;
+        const windowEnd = window[window.length - 1].endAngle;
+        return selectedStart < windowEnd && windowStart < selectedEnd;
+      });
+
+      if (overlapIndex >= 0) {
+        const existing = finalWindows[overlapIndex];
+        const existingWidth = existing.reduce(
+          (sum, item) => sum + item.width,
+          0,
+        );
+        const selectedWidth = selected.reduce(
+          (sum, item) => sum + item.width,
+          0,
+        );
+        if (selectedWidth <= existingWidth) {
+          selected.forEach((item) => used.add(item));
+          continue;
+        }
+        finalWindows[overlapIndex] = selected;
+        existing.forEach((item) => used.add(item));
+        selected.forEach((item) => used.add(item));
+        continue;
+      }
+
+      finalWindows.push(selected);
+      selected.forEach((item) => used.add(item));
+    }
+
+    return finalWindows;
+  };
 
   const drawArcs = ({ node, depth = 0, start = 0, recurse = true }) => {
     visited[node.taxon_id] = true;
@@ -419,27 +619,16 @@ export const processTreeRings = ({
         node.hasAssemblies ||
         node.hasSamples)
     ) {
-      let r = radius + dataWidth + phylopicPadding; // + phylopicSize * 0.5;
       let width = tipWidth * node.count * 0.9;
-      let height = phylopicSize * 0.9;
-      let arcPath;
-      if (node.count > 1) {
-        arcPath = arc()({
-          innerRadius: r - phylopicPadding / 2,
-          outerRadius: r - phylopicPadding / 2,
-          startAngle: startAngle + gapAngle,
-          endAngle: endAngle - gapAngle,
-        });
-      }
-      phylopics[node.taxon_id] = {
-        angle: (midAngle * 180) / Math.PI,
-        radius: r,
-        scientificName: node.scientific_name,
+      pendingPhylopics.push({
+        taxon_id: node.taxon_id,
+        taxon_rank: node.taxon_rank,
+        startAngle,
+        endAngle,
+        midAngle,
         width,
-        height,
-        arc: arcPath,
-        ...circleXY(r, midAngle),
-      };
+        scientificName: node.scientific_name,
+      });
     }
     let outerRadius = rScale(outer);
     let farOuterRadius = rScale(maxDepth + 1);
@@ -595,6 +784,7 @@ export const processTreeRings = ({
   if (treeNodes[rootNode]) {
     drawArcs({ node: treeNodes[rootNode] });
   }
+  finalizePhylopics().forEach((selected) => addPhylopic(selected));
   return {
     arcs,
     labels,

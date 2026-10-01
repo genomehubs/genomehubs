@@ -120,17 +120,20 @@ export const histogramAgg = async ({
     fieldKey += summary;
   }
   // interval = interval || (max - min) / 100;
+  let hasRange = Number.isFinite(min) && Number.isFinite(max);
   return {
     [histKey]: {
       field: fieldKey,
       ...(scales[scale] && { script: scales[scale] }),
       ...(interval && { interval }),
       ...(calendar_interval && { calendar_interval }),
-      extended_bounds: {
-        min,
-        max,
-      },
-      offset,
+      ...(hasRange && {
+        extended_bounds: {
+          min,
+          max,
+        },
+      }),
+      ...(Number.isFinite(offset) ? { offset } : {}),
     },
     aggs: {
       yHistograms,
