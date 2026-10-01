@@ -20,7 +20,7 @@ common:
     separator: "--"
     version: v0.1
 fill:
-  max-list-length: 32768
+  max-list-length: 65536
 index: {}
 init: {}
 # docker:

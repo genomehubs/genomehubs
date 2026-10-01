@@ -36,7 +36,7 @@ Options:
                                   traversal.
     --log-interval INT            Minimum time (seconds) between prgress bar updates.
     --max-list-length INT         Maximum number of unique values kept for any
-                                  aggregated list-valued attribute. [Default: 32768]
+                                  aggregated list-valued attribute. [Default: 65536]
     --log-es BOOL                 Show Info-level logs from elasticsearch.
     -h, --help                    Show this
     -v, --version                 Show version number
@@ -76,7 +76,7 @@ from .es_functions import stream_template_search_results
 from .version import __version__
 
 LOGGER = tolog.logger(__name__)
-DEFAULT_MAX_LIST_LENGTH = 2**15
+DEFAULT_MAX_LIST_LENGTH = 2**16
 
 
 def get_max_depth(es, *, index):

@@ -262,18 +262,35 @@ def _summarise_bulk_error(action, response):
 
 
 def _is_transient_bulk_error(err):
-    """Return True for connection or timeout errors that are safe to retry."""
+    """Return True for connection, transport, and container-level errors that are safe to retry."""
+    if err is None:
+        return False
+
     status_code = getattr(err, "status_code", None)
     if status_code in {408, 429, 500, 502, 503, 504}:
         return True
+
+    info = getattr(err, "info", None)
+    if isinstance(info, dict):
+        info_status = info.get("status")
+        if info_status in {408, 429, 500, 502, 503, 504}:
+            return True
+
     error_name = type(err).__name__
-    if error_name in {
+    transient_names = {
         "ConnectionError",
         "ConnectionRefusedError",
+        "ConnectionResetError",
+        "ConnectionAbortedError",
         "TimeoutError",
         "ReadTimeoutError",
-    }:
+        "TransportError",
+        "ProtocolError",
+        "OSError",
+    }
+    if error_name in transient_names:
         return True
+
     message = str(err).lower()
     if any(
         token in message
@@ -282,10 +299,42 @@ def _is_transient_bulk_error(err):
             "timed out",
             "timeout",
             "connection reset",
+            "connection aborted",
+            "socket closed",
+            "broken pipe",
+            "temporarily unavailable",
+            "remote end closed connection",
+            "transport error",
+            "failed to establish a new connection",
+            "connection was reset",
         )
     ):
         return True
     return False
+
+
+def _probe_es_availability(es, *, context=None):
+    """Perform one-shot Elasticsearch reachability check after a bulk failure."""
+    if es is None:
+        return False
+    try:
+        info = es.info(timeout=5)
+        cluster = (
+            info.get("cluster_name", "unknown") if isinstance(info, dict) else "unknown"
+        )
+        LOGGER.warning(
+            "Bulk failure context '%s': Elasticsearch is still reachable (cluster '%s').",
+            context or "bulk-index",
+            cluster,
+        )
+        return True
+    except Exception as probe_err:
+        LOGGER.error(
+            "Bulk failure context '%s': Elasticsearch availability check failed: %s",
+            context or "bulk-index",
+            probe_err,
+        )
+        return False
 
 
 def _bulk_action_for_entry(entry_id, entry, *, index_name, op_type):
@@ -391,12 +440,18 @@ def index_stream(
                     index_name,
                     bulk_err,
                 )
+                _probe_es_availability(es, context=f"{index_name} bulk failure")
                 raise
             split_at = max(1, len(action_batch) // 2)
+            availability = _probe_es_availability(
+                es,
+                context=f"{index_name} bulk failure before retry",
+            )
             LOGGER.warning(
-                "Transient bulk failure for index '%s' (%s). Retrying %d records in smaller chunks.",
+                "Transient bulk failure for index '%s' (%s). Elasticsearch reachable=%s. Retrying %d records in smaller chunks.",
                 index_name,
                 bulk_err,
+                availability,
                 len(action_batch),
             )
             first = action_batch[:split_at]
