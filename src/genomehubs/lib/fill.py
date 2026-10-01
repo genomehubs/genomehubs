@@ -36,7 +36,7 @@ Options:
                                   traversal.
     --log-interval INT            Minimum time (seconds) between prgress bar updates.
     --max-list-length INT         Maximum number of unique values kept for any
-                                  aggregated list-valued attribute. [Default: 1000]
+                                  aggregated list-valued attribute. [Default: 32768]
     --log-es BOOL                 Show Info-level logs from elasticsearch.
     -h, --help                    Show this
     -v, --version                 Show version number
@@ -45,7 +45,6 @@ Examples:
     # 1. Traverse tree up to taxon_id 7088
     ./genomehubs fill --traverse-root 7088
 """
-
 
 import contextlib
 import re
@@ -77,7 +76,7 @@ from .es_functions import stream_template_search_results
 from .version import __version__
 
 LOGGER = tolog.logger(__name__)
-DEFAULT_MAX_LIST_LENGTH = 1000
+DEFAULT_MAX_LIST_LENGTH = 2**15
 
 
 def get_max_depth(es, *, index):
@@ -152,7 +151,7 @@ def enum(tup):
 
 def ordered_list(tup):
     """Remove values that are in a higher priority list."""
-    (key, order, arr, linked) = tup
+    key, order, arr, linked = tup
     values = deduped_list(arr)
     seen = set()
     for i, k in enumerate(order):
@@ -241,9 +240,25 @@ def flatten_list(arr):
     return flattened
 
 
-def deduped_list(arr, max_length=None):
+def _frequency_ordered_values(arr, max_length=None):
+    """Return unique values ranked by frequency, then first appearance order."""
+    counts = defaultdict(int)
+    first_seen = {}
+    for index, value in enumerate(flatten_list(arr)):
+        counts[value] += 1
+        if value not in first_seen:
+            first_seen[value] = index
+    ordered = sorted(counts, key=lambda value: (-counts[value], first_seen[value]))
+    if max_length is None:
+        return ordered
+    return ordered[:max_length]
+
+
+def deduped_list(arr, max_length=None, *, frequency_aware=False):
     """Remove duplicate values from a list, optionally truncating the result."""
     flattened = flatten_list(arr)
+    if max_length is not None and frequency_aware:
+        return _frequency_ordered_values(flattened, max_length)
     values = []
     seen = set()
     for value in flattened:
@@ -263,8 +278,9 @@ def truncate_list(values, max_length=None, *, field_name=None):
     values = list(values)
     if max_length is None or max_length < 0:
         return values
-    if len(values) <= max_length:
-        return values
+    deduped = deduped_list(values)
+    if len(deduped) <= max_length:
+        return deduped
     if field_name:
         LOGGER.warning(
             "Truncating attribute '%s' from %d values to %d to keep the bulk index stable",
@@ -272,19 +288,22 @@ def truncate_list(values, max_length=None, *, field_name=None):
             len(values),
             max_length,
         )
-    return values[:max_length]
+    return deduped_list(values, max_length=max_length, frequency_aware=True)
 
 
 def merge_list_values(existing, new_values, *, max_length, field_name):
     """Combine list values while enforcing a maximum collection size."""
-    combined = deduped_list(existing + list(new_values), max_length=max_length)
-    if max_length is not None and len(combined) >= max_length:
-        if len(existing) + len(new_values) > max_length:
-            LOGGER.warning(
-                "Attribute '%s' exceeded max list length (%d); values were truncated",
-                field_name,
-                max_length,
-            )
+    combined = deduped_list(
+        existing + list(new_values),
+        max_length=max_length,
+        frequency_aware=True,
+    )
+    if max_length is not None and len(existing) + len(new_values) > max_length:
+        LOGGER.warning(
+            "Attribute '%s' exceeded max list length (%d); values were truncated",
+            field_name,
+            max_length,
+        )
     return combined
 
 

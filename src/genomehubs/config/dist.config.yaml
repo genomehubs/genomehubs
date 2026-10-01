@@ -7,7 +7,7 @@ common:
   #   network: genomehubs-demo-network
   #   timeout: 30
   es:
-    batch: 500
+    batch: 450
     host:
       - "localhost:9200"
     path: ~/genomehubs/demo_resources/es
@@ -20,7 +20,7 @@ common:
     separator: "--"
     version: v0.1
 fill:
-  max-list-length: 1000
+  max-list-length: 32768
 index: {}
 init: {}
 # docker:

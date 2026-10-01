@@ -31,9 +31,13 @@ def test_connection(opts, *, log=False):
     host = opts["es-host"][0]
     host = f"http://{host}"
     hosts = [host]
-    # with tolog.DisableLogger():
-    # try:
-    es = Elasticsearch(hosts=hosts, timeout=1800, max_retries=10, retry_on_timeout=True)
+    es = Elasticsearch(
+        hosts=hosts,
+        timeout=1800,
+        max_retries=20,
+        retry_on_timeout=True,
+        retry_on_status=[429, 500, 502, 503, 504],
+    )
     connected = es.info()
     #   pass
     # sourcery skip: no-conditionals-in-tests
@@ -257,6 +261,50 @@ def _summarise_bulk_error(action, response):
     return action_id, body.get("status", "unknown status"), reason, payload
 
 
+def _is_transient_bulk_error(err):
+    """Return True for connection or timeout errors that are safe to retry."""
+    status_code = getattr(err, "status_code", None)
+    if status_code in {408, 429, 500, 502, 503, 504}:
+        return True
+    error_name = type(err).__name__
+    if error_name in {
+        "ConnectionError",
+        "ConnectionRefusedError",
+        "TimeoutError",
+        "ReadTimeoutError",
+    }:
+        return True
+    message = str(err).lower()
+    if any(
+        token in message
+        for token in (
+            "connection refused",
+            "timed out",
+            "timeout",
+            "connection reset",
+        )
+    ):
+        return True
+    return False
+
+
+def _bulk_action_for_entry(entry_id, entry, *, index_name, op_type):
+    """Build a single Elasticsearch bulk action payload."""
+    if op_type == "index":
+        return {
+            "_index": index_name,
+            "_id": entry_id,
+            "_source": entry,
+            "_op_type": op_type,
+        }
+    return {
+        "_index": index_name,
+        "_id": entry_id,
+        "doc": entry,
+        "_op_type": op_type,
+    }
+
+
 def index_stream(
     es,
     index_name,
@@ -268,111 +316,108 @@ def index_stream(
     chunk_size=500,
 ):
     """Load bulk entries from stream into Elasticsearch index."""
-    # LOGGER.info("Indexing bulk entries to %s", index_name)
-    if _op_type == "index":
-        actions = (
-            {
-                "_index": index_name,
-                "_id": entry_id,
-                "_source": entry,
-                "_op_type": _op_type,
-            }
-            for entry_id, entry in stream
-        )
-    elif _op_type == "update":
-        actions = (
-            {"_index": index_name, "_id": entry_id, "doc": entry, "_op_type": _op_type}
-            for entry_id, entry in stream
-        )
+    chunk_size = max(1, int(chunk_size))
 
-    def dry_run_iterator(es, actions):
-        """Alternate iterator for dry run."""
-        for action in actions:
-            yield True, {}
-
-    batch = []
-    pending_actions = []
-
-    def wrapped_actions(actions, batch):
-        """Track each action so item-level bulk failures can be diagnosed precisely."""
-        for action in actions:
-            if len(batch) == chunk_size:
+    def build_action_batch_stream(stream_iter):
+        """Generate bounded action batches from the source stream."""
+        batch = []
+        for entry_id, entry in stream_iter:
+            batch.append(
+                _bulk_action_for_entry(
+                    entry_id,
+                    entry,
+                    index_name=index_name,
+                    op_type=_op_type,
+                )
+            )
+            if len(batch) >= chunk_size:
+                yield batch
                 batch = []
-            batch.append(action)
-            pending_actions.append(action)
-            yield action
+        if batch:
+            yield batch
 
-    actions = wrapped_actions(actions, batch)
-
-    try:
-        tracer = logging.getLogger("elasticsearch")
-        tracer.setLevel(logging.ERROR)
-        if dry_run:
-            iterator = dry_run_iterator(es, actions)
-        else:
-            chunk_size = int(chunk_size)
+    def process_batch(action_batch):
+        """Submit a single batch and retry transient connection failures in smaller chunks."""
+        action_batch = list(action_batch)
+        if not action_batch:
+            return 0, 0
+        try:
+            tracer = logging.getLogger("elasticsearch")
+            tracer.setLevel(logging.ERROR)
             iterator = helpers.streaming_bulk(
                 es,
-                actions,
-                chunk_size,
+                action_batch,
+                chunk_size=len(action_batch),
                 raise_on_error=True,
+                max_retries=10,
+                initial_backoff=2,
+                max_backoff=60,
             )
-        success = 0
-        failed = 0
-        if log:
-            iterator = tqdm(iterator, unit=" records", unit_scale=True)
-        for ok, response in iterator:
-            action = pending_actions.pop(0) if pending_actions else {}
-            if ok:
-                success += 1
-                continue
-            failed += 1
-            action_id, status, reason, payload = _summarise_bulk_error(action, response)
-            LOGGER.error(
-                "Bulk index failed for document '%s' in index '%s' (status %s): %s",
-                action_id,
-                index_name,
-                status,
-                reason,
-            )
-            if payload is not None:
-                payload_text = ujson.dumps(payload, ensure_ascii=False, default=str)
-                if len(payload_text) > 4000:
-                    payload_text = payload_text[:4000] + "... [truncated]"
-                LOGGER.error("Offending document payload: %s", payload_text)
-            raise RuntimeError(
-                f"Bulk index failed for document '{action_id}' in index '{index_name}' "
-                f"(status {status}): {reason}"
-            )
-    except Exception as bulk_err:
-        LOGGER.error(
-            "Bulk index request failed for index '%s': %s",
-            index_name,
-            bulk_err,
-        )
-        for action in batch:
-            try:
-                if _op_type == "index":
-                    es.create(
-                        index=index_name, id=action["_id"], document=action["_source"]
-                    )
-                else:
-                    es.update(index=index_name, id=action["_id"], doc=action["doc"])
-            except ConflictError:
-                pass
-            except OverflowError:
-                pass
-            except Exception as err:
-                LOGGER.warning(
-                    "Size of document that failed to index is %d bytes",
-                    get_size(action),
+            success = 0
+            failed = 0
+            if log:
+                iterator = tqdm(iterator, unit=" records", unit_scale=True)
+            queued_actions = list(action_batch)
+            for ok, response in iterator:
+                action = queued_actions.pop(0) if queued_actions else {}
+                if ok:
+                    success += 1
+                    continue
+                failed += 1
+                action_id, status, reason, payload = _summarise_bulk_error(
+                    action, response
                 )
-                LOGGER.warning(action)
-                raise err
-        raise
+                LOGGER.error(
+                    "Bulk index failed for document '%s' in index '%s' (status %s): %s",
+                    action_id,
+                    index_name,
+                    status,
+                    reason,
+                )
+                if payload is not None:
+                    payload_text = ujson.dumps(payload, ensure_ascii=False, default=str)
+                    if len(payload_text) > 4000:
+                        payload_text = payload_text[:4000] + "... [truncated]"
+                    LOGGER.error("Offending document payload: %s", payload_text)
+                raise RuntimeError(
+                    f"Bulk index failed for document '{action_id}' in index '{index_name}' "
+                    f"(status {status}): {reason}"
+                )
+            return success, failed
+        except Exception as bulk_err:
+            if not _is_transient_bulk_error(bulk_err) or len(action_batch) <= 1:
+                LOGGER.error(
+                    "Bulk index request failed for index '%s': %s",
+                    index_name,
+                    bulk_err,
+                )
+                raise
+            split_at = max(1, len(action_batch) // 2)
+            LOGGER.warning(
+                "Transient bulk failure for index '%s' (%s). Retrying %d records in smaller chunks.",
+                index_name,
+                bulk_err,
+                len(action_batch),
+            )
+            first = action_batch[:split_at]
+            second = action_batch[split_at:]
+            first_success, first_failed = process_batch(first)
+            second_success, second_failed = process_batch(second)
+            return first_success + second_success, first_failed + second_failed
+
+    total_success = 0
+    total_failed = 0
+    for action_batch in build_action_batch_stream(stream):
+        if dry_run:
+            total_success += len(action_batch)
+            continue
+        batch_success, batch_failed = process_batch(action_batch)
+        total_success += batch_success
+        total_failed += batch_failed
+
     es_client = client.IndicesClient(es)
     es_client.refresh(index=index_name)
-    return success, failed
+    return total_success, total_failed
 
 
 def stream_template_search_results(es, *, index, body, size=10):

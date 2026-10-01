@@ -38,3 +38,10 @@ def test_deduped_list_truncates_long_values():
     values = list(range(10))
 
     assert deduped_list(values, max_length=3) == [0, 1, 2]
+
+
+def test_deduped_list_keeps_common_values_when_truncating():
+    """Truncation should preserve frequent values ahead of rare ones."""
+    values = [1, 2, 2, 3, 3, 3, 4, 5]
+
+    assert deduped_list(values, max_length=3, frequency_aware=True) == [3, 2, 1]
