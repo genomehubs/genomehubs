@@ -11,6 +11,7 @@ from genomehubs.lib.es_functions import _is_transient_bulk_error
 from genomehubs.lib.es_functions import _probe_es_availability
 from genomehubs.lib.es_functions import index_stream
 from genomehubs.lib.fill import deduped_list
+from genomehubs.lib.fill import prune_processed_node_state
 
 
 def test_index_stream_raises_on_bulk_item_failure():
@@ -67,3 +68,25 @@ def test_probe_es_availability_reports_connection_state():
     failing_es = MagicMock()
     failing_es.info.side_effect = ConnectionError("connection refused")
     assert _probe_es_availability(failing_es, context="bulk test") is False
+
+
+def test_prune_processed_node_state_releases_aggregated_values():
+    """Completed node aggregation state should be dropped once it has been merged upward."""
+    node = {"_source": {"taxon_id": 42, "parent": 7}}
+    parents = {42: {"value": {"values": [1, 2, 3]}}}
+    descendant_ranks = {42: {"species"}}
+    limits = {"field": {42}}
+    missing_attributes = {42: {"child": {"keys": set()}}}
+
+    prune_processed_node_state(
+        node,
+        parents=parents,
+        descendant_ranks=descendant_ranks,
+        limits=limits,
+        missing_attributes=missing_attributes,
+    )
+
+    assert 42 not in parents
+    assert 42 not in descendant_ranks
+    assert limits == {}
+    assert 42 not in missing_attributes

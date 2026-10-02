@@ -868,6 +868,31 @@ def track_descendant_ranks(node, descendant_ranks):
         descendant_ranks[node["_source"]["parent"]].add(node["_source"]["taxon_rank"])
 
 
+def prune_processed_node_state(
+    node,
+    *,
+    parents=None,
+    descendant_ranks=None,
+    limits=None,
+    missing_attributes=None,
+):
+    """Release per-taxon aggregation state once it has been merged into its parent."""
+    taxon_id = node.get("_source", {}).get("taxon_id")
+    if taxon_id is None:
+        return
+    if parents is not None:
+        parents.pop(taxon_id, None)
+    if descendant_ranks is not None:
+        descendant_ranks.pop(taxon_id, None)
+    if limits is not None:
+        for key in list(limits):
+            limits[key].discard(taxon_id)
+            if not limits[key]:
+                del limits[key]
+    if missing_attributes is not None:
+        missing_attributes.pop(taxon_id, None)
+
+
 def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
     """Traverse a tree, filling in values."""
     if root is None:
@@ -950,6 +975,13 @@ def traverse_from_tips(es, opts, *, template, root=None, max_depth=None):
                 )
             if changed:
                 yield node["_id"], node["_source"]
+            prune_processed_node_state(
+                node,
+                parents=parents,
+                descendant_ranks=descendant_ranks,
+                limits=limits,
+                missing_attributes=missing_attributes if desc_attrs else None,
+            )
         root_depth -= 1
     if desc_attrs:
         for incomplete in missing_attributes.values():
