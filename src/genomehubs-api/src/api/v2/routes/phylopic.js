@@ -3,7 +3,6 @@ import { logError } from "../functions/logger.js";
 import spdxLicenseList from "spdx-license-list";
 
 let phylopics = {};
-const phylopicDataUriCache = {};
 
 const licensesByUrl = Object.entries(spdxLicenseList).reduce(
   (acc, [key, value]) => {
@@ -14,43 +13,6 @@ const licensesByUrl = Object.entries(spdxLicenseList).reduce(
   },
   {},
 );
-
-export const toDataUri = ({ buffer, mimeType = "image/png" }) => {
-  if (!buffer) {
-    return null;
-  }
-  const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
-  let binary = "";
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return `data:${mimeType};base64,${Buffer.from(binary, "binary").toString(
-    "base64",
-  )}`;
-};
-
-const fetchPhylopicDataUri = async ({ fileUrl }) => {
-  if (!fileUrl) {
-    return null;
-  }
-  if (phylopicDataUriCache[fileUrl]) {
-    return phylopicDataUriCache[fileUrl];
-  }
-
-  try {
-    const response = await fetch(fileUrl);
-    if (!response.ok) {
-      return null;
-    }
-    const mimeType = response.headers.get("content-type") || "image/png";
-    const buffer = Buffer.from(await response.arrayBuffer());
-    const dataUri = toDataUri({ buffer, mimeType });
-    phylopicDataUriCache[fileUrl] = dataUri;
-    return dataUri;
-  } catch (error) {
-    return null;
-  }
-};
 
 const fetchPhylopic = async ({
   taxonId,
@@ -87,9 +49,6 @@ const fetchPhylopic = async ({
           imageRank: validRank,
           build,
         };
-        response.dataUri = await fetchPhylopicDataUri({
-          fileUrl: rasterFile.href,
-        });
         if (
           scientificName == specificNode.title ||
           (validRank.endsWith("species") && validRank == rank)
