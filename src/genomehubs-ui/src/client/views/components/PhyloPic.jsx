@@ -49,7 +49,6 @@ const PhyloPic = ({
           width: `${imageWidth}px`,
           maxWidth: "100%",
           maxHeight: "100%",
-          // height: `${width / ratio}px`,
         }}
       />
     </div>
