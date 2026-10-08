@@ -46,18 +46,23 @@ export function fetchPhylopic({ taxonId, taxonomy = "ncbi" }) {
       } catch (error) {
         json = console.log("An error occured.", error);
       }
-      if (json.phylopic && json.phylopic.source !== "Ancestral") {
-        json.phylopic.dataUri = await fetch(json.phylopic.fileUrl)
-          .then((response) => response.arrayBuffer())
-          .then((buffer) => {
+      if (json.phylopic && !json.phylopic.dataUri && json.phylopic.fileUrl) {
+        try {
+          const response = await fetch(json.phylopic.fileUrl);
+          if (response.ok) {
+            const buffer = await response.arrayBuffer();
+            const bytes = new Uint8Array(buffer);
             let binary = "";
-            let bytes = new Uint8Array(buffer);
-            let len = bytes.byteLength;
-            for (let i = 0; i < len; i++) {
+            for (let i = 0; i < bytes.byteLength; i++) {
               binary += String.fromCharCode(bytes[i]);
             }
-            return `data:image/png;base64,${btoa(binary)}`;
-          });
+            json.phylopic.dataUri = `data:${
+              response.headers.get("content-type") || "image/png"
+            };base64,${btoa(binary)}`;
+          }
+        } catch (error) {
+          // Keep the original fileUrl as a fallback when the remote asset is unavailable.
+        }
       }
       dispatch(receivePhylopic(json.phylopic || { taxonId }));
     } catch (err) {
