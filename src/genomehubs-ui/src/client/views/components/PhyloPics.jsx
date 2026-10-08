@@ -28,7 +28,7 @@ const styleMap = {
 };
 
 const PhyloPicKonvaImage = ({
-  fileUrl,
+  fileUrl: _fileUrl,
   dataUri,
   maxHeight,
   maxWidth,
@@ -36,8 +36,12 @@ const PhyloPicKonvaImage = ({
   x,
   y,
 }) => {
-  const [image] = useImage(dataUri || fileUrl, "anonymous");
+  const [image] = useImage(dataUri || null, "anonymous");
   const imageRef = useRef();
+
+  if (!dataUri) {
+    return null;
+  }
   useEffect(() => {
     if (imageRef.current && theme == "darkTheme") {
       imageRef.current.cache();
@@ -96,6 +100,7 @@ const PhyloPics = ({
     attribution,
     fileUrl,
     dataUri,
+    hasImage,
     source,
     sourceUrl,
     license,
@@ -103,6 +108,10 @@ const PhyloPics = ({
     imageName,
     imageRank,
   } = metadata;
+  const imageAvailable = Boolean(dataUri || hasImage);
+  if (!imageAvailable) {
+    return null;
+  }
   if (maxWidth && !maxHeight) {
     maxHeight = maxWidth / ratio;
   } else if (maxHeight && !maxWidth) {
@@ -245,7 +254,7 @@ const PhyloPics = ({
             y={-maxHeight}
             height={maxHeight}
             width={maxWidth}
-            xlinkHref={dataUri || fileUrl}
+            xlinkHref={dataUri}
             filter={theme == "darkTheme" ? "url(#combinedFilter)" : ""}
           />
           <Tooltip
@@ -279,7 +288,7 @@ const PhyloPics = ({
           arrow
         >
           <div>
-            {(fileUrl || dataUri) && (
+            {dataUri && (
               <PhyloPic
                 fileUrl={fileUrl}
                 dataUri={dataUri}

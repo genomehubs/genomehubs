@@ -525,7 +525,8 @@ const ReportTreeRings = ({
         }
       }, [taxonId, scientificName, phylopicById, fetchPhylopic]);
 
-      if (!phylopicById?.ratio || !phylopicById?.dataUri) {
+      const hasImage = Boolean(phylopicById?.dataUri || phylopicById?.hasImage);
+      if (!phylopicById?.ratio || !hasImage) {
         return null;
       }
 
