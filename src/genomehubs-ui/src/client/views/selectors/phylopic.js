@@ -46,12 +46,28 @@ export function fetchPhylopic({ taxonId, taxonomy = "ncbi" }) {
       } catch (error) {
         json = console.log("An error occured.", error);
       }
-      if (json && json.phylopic) {
-        json.phylopic.hasImage = Boolean(json.phylopic.dataUri);
+      if (json.phylopic && !json.phylopic.dataUri && json.phylopic.fileUrl) {
+        try {
+          const response = await fetch(json.phylopic.fileUrl);
+          if (response.ok) {
+            const buffer = await response.arrayBuffer();
+            const bytes = new Uint8Array(buffer);
+            let binary = "";
+            for (let i = 0; i < bytes.byteLength; i++) {
+              binary += String.fromCharCode(bytes[i]);
+            }
+            json.phylopic.dataUri = `data:${
+              response.headers.get("content-type") || "image/png"
+            };base64,${btoa(binary)}`;
+          }
+        } catch (error) {
+          // Keep the original fileUrl as a fallback when the remote asset is unavailable.
+        }
       }
-      dispatch(receivePhylopic(json?.phylopic || { taxonId, hasImage: false }));
-    } catch {
-      dispatch(receivePhylopic({ taxonId, hasImage: false }));
+      dispatch(receivePhylopic(json.phylopic || { taxonId }));
+    } catch (err) {
+      dispatch(receivePhylopic({ taxonId }));
+      // console.log(err);
     }
   };
 }

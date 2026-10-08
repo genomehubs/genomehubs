@@ -17,30 +17,26 @@ const styleMap = {
 };
 
 const PhyloPic = ({
-  fileUrl: _fileUrl,
+  fileUrl,
   dataUri,
   source = "Primary",
   ratio = 1,
   fixedRatio,
   maxHeight = 100,
 }) => {
-  const [src, setSrc] = useState(dataUri || false);
+  const [src, setSrc] = useState(dataUri || fileUrl || false);
   const width = 300;
 
   useEffect(() => {
-    setSrc(dataUri || false);
-  }, [dataUri]);
-
-  if (!dataUri) {
-    return null;
-  }
+    setSrc(dataUri || fileUrl || false);
+  }, [dataUri, fileUrl]);
 
   let imageWidth = fixedRatio
     ? maxHeight * ratio
     : Math.min(maxHeight * ratio, width);
 
   const handleError = () => {
-    setSrc(false);
+    setSrc(dataUri || fileUrl || false);
   };
 
   return (
