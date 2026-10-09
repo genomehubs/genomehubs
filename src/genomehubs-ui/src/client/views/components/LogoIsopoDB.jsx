@@ -63,18 +63,18 @@ const TransitionableLine = ({
             strokeWidth: 5,
             strokeLinecap: "round",
             strokeLineJoin: "round",
-            transformOrigin: "center bottom",
+            transformOrigin: "center center",
           }}
           initial={{
             x: 0,
             y: 0,
-            transformOrigin: "center bottom",
+            transformOrigin: "center center",
             rotate: 0,
           }}
           animate={{
             x: translateX,
             y: translateY,
-            transformOrigin: "center bottom",
+            transformOrigin: "center center",
             rotate: rotation,
             transition: {
               default: { type: "spring", duration: duration / 1000 },
@@ -106,7 +106,8 @@ const TransitionableLine = ({
 const calculateFlatPoints = (curvedPoints, compression = 1) => {
   const flatPoints = [];
   const width = 256;
-  const y = 96;
+  const height = 256;
+  const y = height / 2; // Center vertically for proper alignment
   const totalDistance =
     curvedPoints.reduce((acc, point, index) => {
       if (index === 0) {
@@ -311,6 +312,7 @@ const Logo = ({
   const drawMovingLines = () => {
     let movingLines = [];
     for (let i = 0; i < POINTS[shape].length - 1; i++) {
+      // Use segment midpoint as the rotation center for proper alignment
       const centerX = (POINTS.curved[i][0] + POINTS.curved[i + 1][0]) / 2;
       const centerY = (POINTS.curved[i][1] + POINTS.curved[i + 1][1]) / 2;
       const translateX =
@@ -344,8 +346,8 @@ const Logo = ({
           translateX={translateX}
           translateY={translateY}
           rotation={rotation}
-          cx={POINTS.centers[i][0]}
-          cy={POINTS.centers[i][1]}
+          cx={centerX}
+          cy={centerY}
           duration={duration}
           color={strokeColor}
           backgroundColor={strokeColor == lineColor ? coloring[i] : lineColor}
