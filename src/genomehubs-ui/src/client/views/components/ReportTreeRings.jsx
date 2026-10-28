@@ -14,6 +14,15 @@ import withPhylopicsById from "#hocs/withPhylopicsById";
 import withTheme from "#hocs/withTheme";
 import withTypes from "#hocs/withTypes";
 
+const ALLOWED_PHYLOPIC_SOURCES = ["Primary", "Descendant"];
+
+const isRenderablePhylopic = (phylopic) =>
+  Boolean(
+    phylopic?.ratio &&
+    phylopic?.dataUri &&
+    ALLOWED_PHYLOPIC_SOURCES.includes(phylopic.source),
+  );
+
 const ReportTreeRings = ({
   arcs,
   labels,
@@ -525,7 +534,7 @@ const ReportTreeRings = ({
         }
       }, [taxonId, scientificName, phylopicById, fetchPhylopic]);
 
-      if (!phylopicById?.ratio || !phylopicById?.dataUri) {
+      if (!isRenderablePhylopic(phylopicById)) {
         return null;
       }
 
@@ -563,6 +572,13 @@ const ReportTreeRings = ({
   let ctr = 0;
   for (let [taxonId, opts] of Object.entries(phylopics)) {
     if (!taxonId) {
+      continue;
+    }
+    // Skip only once metadata has loaded; unloaded entries still lay out.
+    if (
+      loadedPhylopics[taxonId] &&
+      !isRenderablePhylopic(loadedPhylopics[taxonId])
+    ) {
       continue;
     }
     // Do not block the whole phylopic layer on the nested fetch. The layout can

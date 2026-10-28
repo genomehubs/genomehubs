@@ -24,6 +24,7 @@ services:
       - GH_HUBNAME=goat
       - GH_RELEASE=2021.10.15
       - GH_API_PORT=3000
+      - GH_ROOT_TAXID=2759
     ports:
       - "3000:3000"
     volumes:

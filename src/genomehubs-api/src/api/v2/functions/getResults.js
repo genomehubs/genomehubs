@@ -1,6 +1,7 @@
 import { addCondition } from "./addCondition.js";
 import { attrTypes } from "./attrTypes.js";
 import { combineOrQueries } from "./combineOrQueries.js";
+import { config } from "./config.js";
 import { getRecordsByTaxon } from "./getRecordsByTaxon.js";
 import { indexName } from "./indexName.js";
 import { logError } from "./logger.js";
@@ -514,7 +515,7 @@ const generateSingleQuery = async ({
   }
 
   if (["taxon", "assembly", "sample"].includes(result) && !taxTerm) {
-    taxTerm = ["tax_tree(2759)", "tree", "2759"];
+    taxTerm = [`tax_tree(${config.rootTaxId})`, "tree", `${config.rootTaxId}`];
   }
 
   let params = {

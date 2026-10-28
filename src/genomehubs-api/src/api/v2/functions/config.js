@@ -24,6 +24,7 @@ export const config = {
   hub: process.env.GH_HUBNAME || "demo",
   hubPath: process.env.GH_HUBPATH || "~/genomehubs/demo",
   node: process.env.GH_NODE || "http://localhost:9200",
+  rootTaxId: process.env.GH_ROOT_TAXID || 2759,
   separator: process.env.GH_SEPARATOR || "--",
   taxonomy: process.env.GH_TAXONOMY || "ncbi",
   release,

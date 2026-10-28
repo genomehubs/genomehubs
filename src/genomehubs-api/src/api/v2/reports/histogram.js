@@ -221,6 +221,33 @@ const getNestedHistogramData = ({
   return { fullYBuckets, fullYValues, yNullCount, yNullIndex };
 };
 
+// Elasticsearch cannot return aggregations from a search_after scroll, which is
+// needed beyond this size.
+const MAX_RESULT_WINDOW = 10000;
+
+// Returns one response shaped like a single query: bins from a size-0 aggregation
+// query, points from an aggregation-free query that getResults can scroll.
+const fetchHistogramResults = async ({ params, raw, pointFields }) => {
+  if (raw <= MAX_RESULT_WINDOW) {
+    return getResults(params);
+  }
+  const aggRes = await getResults({ ...params, size: 0 });
+  if (!aggRes.status.success) {
+    return aggRes;
+  }
+  // fields only filter and decorate hits, so the scroll can ask for just the plotted ones
+  const pointRes = await getResults({
+    ...params,
+    aggs: undefined,
+    fields: pointFields,
+  });
+  if (!pointRes.status.success) {
+    return pointRes;
+  }
+  // a scrolled response only counts the hits it fetched, so keep the true total
+  return { ...pointRes, status: aggRes.status, aggs: aggRes.aggs };
+};
+
 const getHistogram = async ({
   params,
   cat,
@@ -280,12 +307,22 @@ const getHistogram = async ({
   });
 
   let catMeta = lookupTypes((cat || "").replace(/[\+\[=].*/, ""));
-  let res = await getResults({
-    ...params,
-    taxonomy,
-    fields,
-    exclusions,
-    ...(raw && cat && !catMeta && { ranks: cat.replace(/[\+\[=].*/, "") }),
+  let res = await fetchHistogramResults({
+    params: {
+      ...params,
+      taxonomy,
+      fields,
+      exclusions,
+      ...(raw && cat && !catMeta && { ranks: cat.replace(/[\+\[=].*/, "") }),
+    },
+    raw,
+    pointFields: [
+      ...new Set([
+        fields[0],
+        ...(yFields || []),
+        ...(bounds.cat && bounds.by == "attribute" ? [bounds.cat] : []),
+      ]),
+    ],
   });
   if (!res.status.success) {
     return { status: res.status };
@@ -802,6 +839,7 @@ export const histogram = async ({
   report,
   apiParams,
 }) => {
+  scatterThreshold = parseInt(scatterThreshold, 10);
   if (result == "taxon" && !rank) {
     return {
       status: {
@@ -1044,6 +1082,11 @@ export const histogram = async ({
   }
   if (bounds && (!bounds.cats || bounds.cats.length > 0 || bounds.catType)) {
     let threshold = scatterThreshold >= 0 ? scatterThreshold : 10000;
+    // a set that fits in the result window never needs the slower split fetch
+    let pointLimit = bounds.stats.count < threshold ? threshold : 0;
+    if (bounds.stats.count <= MAX_RESULT_WINDOW) {
+      pointLimit = Math.min(pointLimit, MAX_RESULT_WINDOW);
+    }
     histograms = await getHistogram({
       params: { ...params, ...inputQueries },
       fields,
@@ -1058,7 +1101,7 @@ export const histogram = async ({
       ySummaries,
       catBounds: nullCatBounds,
       taxonomy,
-      raw: bounds.stats.count < threshold ? threshold : 0,
+      raw: pointLimit,
     });
   }
   if (histograms && histograms.status && !histograms.status.success) {

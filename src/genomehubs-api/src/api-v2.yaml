@@ -822,7 +822,7 @@ components:
       name: scatterThreshold
       required: false
       schema:
-        maximum: 10000
+        maximum: 25000
         minimum: -1
         type: integer
       style: form
