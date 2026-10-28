@@ -251,7 +251,7 @@ const PhyloPics = ({
               fillOpacity={0}
               stroke={"none"}
               x={-maxWidth / 2}
-              y={-maxHeight / 2}
+              y={-maxHeight}
               height={maxHeight}
               width={maxWidth}
             />

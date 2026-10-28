@@ -14,6 +14,30 @@ const licensesByUrl = Object.entries(spdxLicenseList).reduce(
   {},
 );
 
+const isPublicDomain = (license) =>
+  Boolean(license?.href && license.href.includes("publicdomain"));
+
+// Returns an image href for the node with no BY/NC/SA terms, or undefined.
+const findPublicDomainImage = async ({ nodeHref, build }) => {
+  const nodeUuid = (nodeHref || "").match(/nodes\/([0-9a-f-]+)/)?.[1];
+  if (!nodeUuid) {
+    return;
+  }
+  try {
+    const response = await fetch(
+      `https://api.phylopic.org/images?build=${build}&filter_node=${nodeUuid}&filter_license_by=false&filter_license_nc=false&filter_license_sa=false&page=0&embed_items=true`,
+    );
+    if (!response.ok) {
+      return;
+    }
+    const json = await response.json();
+    const uuid = json._embedded?.items?.[0]?.uuid;
+    return uuid ? `images/${uuid}?build=${build}` : undefined;
+  } catch (err) {
+    return;
+  }
+};
+
 const fetchPhylopic = async ({
   taxonId,
   lineage,
@@ -25,10 +49,31 @@ const fetchPhylopic = async ({
     return phylopics[taxonId];
   }
 
-  const processPhylopicResponse = async ({ href, title, validRank }) => {
+  const processPhylopicResponse = async ({
+    href,
+    title,
+    validRank,
+    matchedSelf,
+    nodeHref,
+  }) => {
     if (href) {
       let nodeResponse = await fetch(`https://api.phylopic.org/${href}`);
       let nodeJson = await nodeResponse.json();
+
+      if (!isPublicDomain(nodeJson._links?.license)) {
+        const altHref = await findPublicDomainImage({
+          nodeHref,
+          build: nodeJson.build,
+        });
+        if (altHref) {
+          const altResponse = await fetch(
+            `https://api.phylopic.org/${altHref}`,
+          );
+          if (altResponse.ok) {
+            nodeJson = await altResponse.json();
+          }
+        }
+      }
 
       let { _links, attribution, uuid, build } = nodeJson;
       let { rasterFiles, contributor, license = "", specificNode } = _links;
@@ -51,11 +96,11 @@ const fetchPhylopic = async ({
         };
         if (
           scientificName == specificNode.title ||
-          (validRank.endsWith("species") && validRank == rank)
+          (matchedSelf && validRank.endsWith("species"))
         ) {
           response.source = "Primary";
         } else {
-          response.source = validRank == rank ? "Descendant" : "Ancestral";
+          response.source = matchedSelf ? "Descendant" : "Ancestral";
         }
         return { status: { success: true }, phylopic: response };
       } else {
@@ -86,9 +131,17 @@ const fetchPhylopic = async ({
     );
     let nodeResponse = await fetch(`https://api.phylopic.org/${href}`);
     let nodeJson = await nodeResponse.json();
-    let validRank =
-      ranks[external.href.split("/")[4].replace(/\?.+/, "")] || rank;
-    return await processPhylopicResponse({ href, title, validRank });
+    const matchedId = external.href.split("/")[4].replace(/\?.+/, "");
+    const matchedSelf = String(matchedId) === String(taxonId);
+    // An id missing from the lineage must stay Ancestral, not inherit this rank.
+    const validRank = matchedSelf ? rank : ranks[matchedId] || "lineage";
+    return await processPhylopicResponse({
+      href,
+      title,
+      validRank,
+      matchedSelf,
+      nodeHref: json._links.self?.href,
+    });
   };
 
   const resolveByName = async ({ name, rank, taxonId, build, taxonNames }) => {
@@ -111,11 +164,18 @@ const fetchPhylopic = async ({
       };
     }
     let { href, title } = items[0];
+    const nodeHref = href;
     try {
       let nodeResponse = await fetch(`https://api.phylopic.org/${href}`);
       let nodeJson = await nodeResponse.json();
       ({ href } = nodeJson._links.primaryImage);
-      return await processPhylopicResponse({ href, title, validRank: rank });
+      return await processPhylopicResponse({
+        href,
+        title,
+        validRank: rank,
+        matchedSelf: true,
+        nodeHref,
+      });
     } catch (err) {
       return {
         status: { success: false, error: "unable to fetch by taxon name" },

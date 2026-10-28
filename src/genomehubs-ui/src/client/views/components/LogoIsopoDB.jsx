@@ -35,10 +35,6 @@ const getBboxRadius = (path, cx, cy) => {
 };
 
 const TransitionableLine = ({
-  x1,
-  y1,
-  x2,
-  y2,
   features,
   translateX = 0,
   translateY = 0,
@@ -48,7 +44,7 @@ const TransitionableLine = ({
   duration = 1000,
   color = "#ff7001",
   backgroundColor = "transparent",
-  ...staticAttributes
+  fillColor = backgroundColor,
 }) => {
   let featurePaths;
   if (features) {
@@ -57,24 +53,24 @@ const TransitionableLine = ({
       <g transform={`translate(${cx}, ${cy})`}>
         <motion.g
           style={{
-            fill: backgroundColor,
+            fill: fillColor,
             fillOpacity: 1,
             stroke: color,
             strokeWidth: 5,
             strokeLinecap: "round",
             strokeLineJoin: "round",
-            transformOrigin: "center bottom",
+            transformOrigin: "center center",
           }}
           initial={{
             x: 0,
             y: 0,
-            transformOrigin: "center bottom",
+            transformOrigin: "center center",
             rotate: 0,
           }}
           animate={{
             x: translateX,
             y: translateY,
-            transformOrigin: "center bottom",
+            transformOrigin: "center center",
             rotate: rotation,
             transition: {
               default: { type: "spring", duration: duration / 1000 },
@@ -106,7 +102,8 @@ const TransitionableLine = ({
 const calculateFlatPoints = (curvedPoints, compression = 1) => {
   const flatPoints = [];
   const width = 256;
-  const y = 96;
+  const height = 256;
+  const y = height / 2; // Center vertically for proper alignment
   const totalDistance =
     curvedPoints.reduce((acc, point, index) => {
       if (index === 0) {
@@ -224,7 +221,6 @@ const calculateWalkingPoints = (
     }, 0) * compression;
 
   const segmentLength = totalDistance / (points.length - 1);
-  let xShift = 0;
   for (let i = 0; i < points.length; i++) {
     let [x, y] = points[i];
     let newX = x;
@@ -281,18 +277,18 @@ const Logo = ({
   theme = "lightTheme",
   colorScheme,
   backgroundColor = "transparent",
-  strokeColor = lineColor,
-  fillOpacity = 1,
   invert,
   animate = false,
-  delay = 0,
   duration: totalDuration = 8,
 }) => {
-  if (!lineColor) {
-    lineColor = invert
-      ? colorScheme[theme].darkColor
-      : colorScheme[theme].lightColor;
-  }
+  let fillColor = backgroundColor;
+  lineColor = invert
+    ? colorScheme[theme].darkColor
+    : colorScheme[theme].lightColor;
+  fillColor = invert
+    ? colorScheme[theme].lightColor
+    : colorScheme[theme].darkColor;
+
   if (backgroundColor === "contrast") {
     backgroundColor = invert
       ? colorScheme[theme].lightColor
@@ -302,15 +298,14 @@ const Logo = ({
   const [index, setIndex] = useState(0);
   const [shape, setShape] = useState(shapes[index]);
   const defaultColors = shapes.map((_) => backgroundColor);
-  const [coloring, setColoring] = useState(defaultColors);
+  const [coloring] = useState(defaultColors);
   const [isopod, setIsopod] = useState(null);
-  const [mouseDown, setMouseDown] = useState(false);
-  const [animateInterval, setAnimateInterval] = useState(null);
   let duration = (totalDuration / shapes.length) * (index == 0 ? 1000 : 500);
 
   const drawMovingLines = () => {
     let movingLines = [];
     for (let i = 0; i < POINTS[shape].length - 1; i++) {
+      // Use segment midpoint as the rotation center for proper alignment
       const centerX = (POINTS.curved[i][0] + POINTS.curved[i + 1][0]) / 2;
       const centerY = (POINTS.curved[i][1] + POINTS.curved[i + 1][1]) / 2;
       const translateX =
@@ -336,19 +331,16 @@ const Logo = ({
             strokeWidth: 5.8,
             strokeLinecap: "round",
           }}
-          x1={POINTS[shape][i][0]}
-          y1={POINTS[shape][i][1]}
-          x2={POINTS[shape][i + 1][0]}
-          y2={POINTS[shape][i + 1][1]}
           features={(POINTS.features && POINTS.features[i]) || null}
           translateX={translateX}
           translateY={translateY}
           rotation={rotation}
-          cx={POINTS.centers[i][0]}
-          cy={POINTS.centers[i][1]}
+          cx={centerX}
+          cy={centerY}
           duration={duration}
-          color={strokeColor}
-          backgroundColor={strokeColor == lineColor ? coloring[i] : lineColor}
+          color={lineColor}
+          backgroundColor={backgroundColor}
+          fillColor={fillColor}
         />,
       );
     }
