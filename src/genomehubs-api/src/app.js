@@ -505,7 +505,6 @@ if (config.https) {
   });
 } else {
   http.createServer(app).listen(port, () => {
-    console.log(process.env.NODE_ENV);
     console.log(`genomehubs-api started on http port ${port}`);
   });
 }

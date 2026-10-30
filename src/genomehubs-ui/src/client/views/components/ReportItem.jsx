@@ -708,6 +708,7 @@ const ReportItem = ({
         report={report}
         chartRef={chartRef}
         containerRef={containerRef}
+        inModal={inModal}
         ratio={ratio}
         minDim={minDim}
         setMinDim={setMinDim}

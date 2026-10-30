@@ -12,6 +12,7 @@ const ReportLoading = ({
   setMinDim,
   loading,
   content,
+  inModal,
 }) => {
   const componentRef = chartRef || useRef();
   const { width, height } = containerRef
@@ -19,10 +20,10 @@ const ReportLoading = ({
     : useResize(componentRef);
   useEffect(() => {
     let newMinDim;
-    if (height) {
+    if (inModal && height) {
       newMinDim = Math.floor(Math.min(width, height));
     } else if (width) {
-      newMinDim = Math.floor(width) / ratio;
+      newMinDim = Math.floor(width / ratio);
     }
     if (newMinDim) {
       setMinDim(newMinDim);

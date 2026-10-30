@@ -9,19 +9,22 @@ const useResize = (myRef) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    const handleResize = () => {
-      setDimensions(getDimensions());
-    };
+    // const handleResize = () => {
+    //   setDimensions(getDimensions());
+    // };
 
-    if (myRef.current) {
-      setDimensions(getDimensions());
-    }
+    const el = myRef.current;
+    if (!el) return;
 
-    window.addEventListener("resize", handleResize);
+    const observer = new window.ResizeObserver(() => {
+      const next = getDimensions();
+      setDimensions((prev) =>
+        prev.width === next.width && prev.height === next.height ? prev : next,
+      );
+    });
+    observer.observe(el);
 
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    return () => observer.disconnect();
   }, [myRef]);
 
   return dimensions;

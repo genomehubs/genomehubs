@@ -30,9 +30,6 @@ const ReportTree = ({
   showPhyloPics,
   phylopicRank,
   phylopicSize,
-  minDim,
-  setMinDim,
-  basename,
 }) => {
   const navigate = useNavigate();
   const componentRef = chartRef || useRef();
@@ -40,16 +37,10 @@ const ReportTree = ({
     ? useResize(containerRef)
     : useResize(componentRef);
 
-  const setDimensions = ({ width, height, timer }) => {
+  const setDimensions = ({ width, height }) => {
     let plotWidth = width;
     let plotHeight = inModal ? height : plotWidth / ratio;
 
-    if (timer && plotHeight != height) {
-      dimensionTimer = setTimeout(() => {
-        minDim = Math.min(plotWidth, plotHeight);
-        setMinDim(minDim);
-      }, 50);
-    }
     return {
       plotWidth,
       plotHeight,
@@ -60,16 +51,6 @@ const ReportTree = ({
   let dimensionTimer;
   let { plotWidth, plotHeight } = setDimensions({ width, height });
 
-  useEffect(() => {
-    ({ plotWidth, plotHeight, dimensionTimer } = setDimensions({
-      width,
-      height,
-      timer: true,
-    }));
-    return () => {
-      clearTimeout(dimensionTimer);
-    };
-  }, [width]);
   if (!tree.report) {
     return null;
   }

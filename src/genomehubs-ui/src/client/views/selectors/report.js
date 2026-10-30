@@ -331,7 +331,6 @@ const expandValues = (obj, arr, buckets, yBuckets) => {
 };
 
 const processScatter = (scatter, result) => {
-  console.log(`processScatter: processing scatter report for ${result}`);
   if (!scatter) {
     return {};
   }
@@ -340,9 +339,6 @@ const processScatter = (scatter, result) => {
   if (!heatmaps) {
     return {};
   }
-  console.log(
-    `scatter: ${heatmaps.buckets.length} x buckets and ${heatmaps.yBuckets.length} y buckets`,
-  );
   let searchIndexPlural = plurals[result] || "records";
   let cats;
   let xScale = (x) => x;
@@ -371,9 +367,6 @@ const processScatter = (scatter, result) => {
   if (hasRawData) {
     pointData = [];
   }
-  console.log(
-    `scatter: ${heatmaps.buckets.length} x buckets and ${heatmaps.yBuckets.length} y buckets`,
-  );
   if (heatmaps.byCat) {
     catSums = {};
     cats = scatter.cats.map((cat) => cat.label);
@@ -444,9 +437,6 @@ const processScatter = (scatter, result) => {
       });
       chartData.push(catData);
       if (hasRawData && pointData && heatmaps && heatmaps.rawData) {
-        console.log(
-          `rawData: ${heatmaps.rawData[cat.key] ? heatmaps.rawData[cat.key].length : 0} points for category ${cat.label}`,
-        );
         let points = [];
         if (heatmaps.rawData[cat.key]) {
           let buckets = new Set(heatmaps.buckets);
@@ -500,9 +490,6 @@ const processScatter = (scatter, result) => {
       }
     });
   } else {
-    console.log(
-      `scatter: ${heatmaps.buckets.length} x buckets and ${heatmaps.yBuckets.length} y buckets`,
-    );
     cats = [`all ${searchIndexPlural}`];
     catSums = {};
     catSums[`all ${searchIndexPlural}`] = {
@@ -602,9 +589,6 @@ const processScatter = (scatter, result) => {
             y,
           };
         }
-        console.log(
-          `scatter: point at x=${obj.x} y=${obj.y} scaled to x=${x} y=${y}`,
-        );
 
         points.push({ ...obj, x, y });
       }

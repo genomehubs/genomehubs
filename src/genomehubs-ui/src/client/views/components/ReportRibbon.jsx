@@ -49,6 +49,47 @@ const searchByPoint = ({ props, chartProps }) => {
   );
 };
 
+const parseHsl = (hsl) => {
+  let [h = 0, s = 0, l = 0] = (hsl || "")
+    .replace(/^hsl\(|\)$/g, "")
+    .split(",")
+    .map((v = 0) => parseFloat(v));
+  return [h, s, l];
+};
+
+const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+const lerp = (a, b, t) => a + (b - a) * t;
+
+const getRampColor = ({
+  hsl,
+  t,
+  lightnessRange = 50,
+  minClamp = 20,
+  maxClamp = 80,
+}) => {
+  const [h, s, l] = parseHsl(hsl);
+  let minLightness;
+  let maxLightness;
+  if (lightnessRange > maxClamp - minClamp) {
+    lightnessRange = maxClamp - minClamp;
+  }
+  let halfRange = lightnessRange / 2;
+  if (l - halfRange < minClamp) {
+    minLightness = minClamp;
+    maxLightness = minClamp + lightnessRange;
+  } else if (l + halfRange > maxClamp) {
+    minLightness = maxClamp - lightnessRange;
+    maxLightness = maxClamp;
+  } else {
+    minLightness = l - halfRange;
+    maxLightness = l + halfRange;
+  }
+  const lightness = lerp(maxLightness, minLightness, 1 - t); // 0 = light, 1 = dark
+  const saturation = clamp(s + 8, 35, 100);
+
+  return `hsl(${h} ${saturation}% ${lightness}%)`;
+};
+
 const Ribbon = ({
   pointData,
   width,
@@ -315,6 +356,11 @@ const Ribbon = ({
       <rect x={0} y={topCoord} width={width} height={bottomCoord - topCoord} />
     </clipPath>
   );
+  const hasCategories = cats && cats.length > 1;
+
+  const xMin = buckets[0];
+  const xMax = buckets[buckets.length - 1];
+
   pointData.forEach((arr, i) => {
     if (arr.length > 0) {
       let handleClick;
@@ -359,16 +405,24 @@ const Ribbon = ({
       ) {
         let x = xScales[point.sequenceId](point.x);
         let y = yScales[point.ySequenceId](point.y);
+        const startY = topCoord;
+        const endY = bottomCoord;
+
         const path = pathRound(3);
-        path.moveTo(x, bottomCoord);
+        path.moveTo(x, startY);
         path.bezierCurveTo(
           x,
-          bottomCoord + (topCoord - bottomCoord) * 0.25,
+          startY + (endY - startY) * 0.25,
           y,
-          bottomCoord + (topCoord - bottomCoord) * 0.75,
+          startY + (endY - startY) * 0.75,
           y,
-          topCoord,
+          endY,
         );
+        const t = xMax === xMin ? 0.5 : (point.x - xMin) / (xMax - xMin);
+
+        const stroke = hasCategories
+          ? fillColors[i]
+          : getRampColor({ hsl: fillColors[i], t, lightnessRange: 20 });
         let pathSvg = (
           <Tooltip
             title={
@@ -380,7 +434,7 @@ const Ribbon = ({
           >
             <path
               fill="none"
-              stroke={fillColors[i]}
+              stroke={stroke}
               strokeWidth={strokeWidth}
               onClick={() =>
                 searchByPoint({
@@ -437,8 +491,8 @@ const Ribbon = ({
         </g>
         <g>{current}</g>
       </g>
-      <g transform={`translate(0,${bottomCoord - padding})`}>{xChrs}</g>
-      <g transform={`translate(0,${topCoord - padding})`}>{yChrs}</g>
+      <g transform={`translate(0,${topCoord - padding})`}>{xChrs}</g>
+      <g transform={`translate(0,${bottomCoord - padding})`}>{yChrs}</g>
       <g>{legend}</g>
     </svg>
   );
