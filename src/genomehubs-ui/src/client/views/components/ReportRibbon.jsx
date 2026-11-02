@@ -121,9 +121,13 @@ const Ribbon = ({
   marginHeight,
   marginTop,
   dropShadow,
+  assemblyNames,
+  showGutter,
+  outerLabels,
 }) => {
   const [currentSeries, setCurrentSeries] = useState(false);
   const [visible, setVisible] = useState({});
+  const [expandedLabel, setExpandedLabel] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
   const handleLabelClick = (key) => {
@@ -195,14 +199,24 @@ const Ribbon = ({
   let fillColors = colors.map((hex, i) =>
     fadeColor({ hex, i, active: currentSeries }),
   );
-  let { pointSize } = chartProps;
-  let labelHeight = (pointSize * 3) / 2;
+  let { pointSize, layoutSize = pointSize } = chartProps;
+  let labelHeight = (layoutSize * 3) / 2;
   let padding = labelHeight / 2;
   let strokeWidth = pointSize / 3;
+  // Optional left gutter holding the assembly names, one per row; names shrink to use at most 40% of the width.
+  let nameUnits = showGutter ? maxStringLength(assemblyNames, undefined, 1) : 0;
+  let nameSize = Math.min(
+    padding,
+    Math.max(1, (width * 0.4 - padding) / Math.max(nameUnits, 1)),
+  );
+  let gutter = showGutter ? nameUnits * nameSize + padding : 0;
+  let innerWidth = width - gutter;
+  // Band above the top row and below the bottom row for outer names.
+  let labelBand = outerLabels && !showGutter ? padding * 1.5 : 0;
   let maxLabels = Math.max(...assemblies.map((a) => a.labels.length));
   // Horizontal overflow per label bar, shrunk when there are many labels so
   // that the bars always fit within the width.
-  let hPad = Math.min(padding, (width - 2) / (4 * maxLabels));
+  let hPad = Math.min(padding, (innerWidth - 2) / (4 * maxLabels));
   if (width < 100 || assemblies.length < 2) {
     return null;
   }
@@ -222,10 +236,10 @@ const Ribbon = ({
       buckets: a.buckets,
       labels: a.labels,
       pad: hPad,
-      width,
+      width: innerWidth,
     }),
   );
-  let topCoord = marginTop + padding;
+  let topCoord = marginTop + labelBand + padding;
   let bottomCoord = height - marginHeight - padding;
   let rowCount = assemblies.length;
   // Centre line of each assembly row, evenly spaced from top to bottom.
@@ -257,6 +271,12 @@ const Ribbon = ({
       }
       let stroke = visible[key] ? "white" : "#31323f";
       let fill = visible[key] ? "#31323f" : "white";
+      let inset = padding / 2;
+      let barLeft = x1 - hPad;
+      let barWidth = x2 - x1 + hPad * 2;
+      let expanded = expandedLabel === key && formattedLabel !== label;
+      let fullWidth = stringLength(label) * padding + 2 * inset;
+      let rectWidth = expanded ? Math.max(barWidth, fullWidth) : barWidth;
       let reversed = orientation[label] == -1;
       let offsets = [];
       if (reversed) {
@@ -306,29 +326,36 @@ const Ribbon = ({
             key={key}
             {...longPress({ row, label })}
             style={{ cursor: "pointer" }}
+            onMouseEnter={(event) => {
+              // SVG has no z-index; move the label to the end of its row so it paints last.
+              const group = event.currentTarget;
+              group.parentNode.appendChild(group);
+              setExpandedLabel(key);
+            }}
+            onMouseLeave={() => setExpandedLabel(null)}
           >
             <rect
-              x={x1 - hPad}
+              x={barLeft}
               y={0}
-              width={x2 - x1 + hPad * 2}
+              width={rectWidth}
               height={padding * 2}
               fill={fill}
               stroke={visible[key] ? fill : stroke}
               strokeWidth={2}
               rx={padding}
             />
-            {lines}
-            {arrows}
+            {expanded ? null : lines}
+            {expanded ? null : arrows}
             <text
-              x={(x1 + x2) / 2}
+              x={expanded ? barLeft + inset : (x1 + x2) / 2}
               y={padding}
-              textAnchor="middle"
+              textAnchor={expanded ? "start" : "middle"}
               fontSize={padding}
               dominantBaseline="middle"
               alignmentBaseline="middle"
               fill={stroke}
             >
-              {formattedLabel}
+              {expanded ? label : formattedLabel}
             </text>
           </g>
         </Tooltip>,
@@ -347,7 +374,12 @@ const Ribbon = ({
   let current = [];
   let clipRect = (
     <clipPath id="clipRect">
-      <rect x={0} y={topCoord} width={width} height={bottomCoord - topCoord} />
+      <rect
+        x={0}
+        y={topCoord}
+        width={innerWidth}
+        height={bottomCoord - topCoord}
+      />
     </clipPath>
   );
   const hasCategories = cats && cats.length > 1;
@@ -469,6 +501,50 @@ const Ribbon = ({
       groups.push(pathSvg);
     }
   });
+  let gutterLabels = showGutter
+    ? assemblyNames.map((name, row) => (
+        <text
+          key={row}
+          x={gutter - padding / 2}
+          y={rowY[row]}
+          textAnchor="end"
+          fontSize={nameSize}
+          fontWeight="bold"
+          dominantBaseline="middle"
+          fill="#31323f"
+        >
+          {name}
+        </text>
+      ))
+    : [];
+  let outerLabelEls = labelBand
+    ? [
+        <text
+          key="top"
+          x={width / 2}
+          y={marginTop + labelBand / 2}
+          textAnchor="middle"
+          fontSize={padding}
+          fontWeight="bold"
+          dominantBaseline="middle"
+          fill="#31323f"
+        >
+          {assemblyNames[0]}
+        </text>,
+        <text
+          key="bottom"
+          x={width / 2}
+          y={height - marginHeight / 2}
+          textAnchor="middle"
+          fontSize={padding}
+          fontWeight="bold"
+          dominantBaseline="middle"
+          fill="#31323f"
+        >
+          {assemblyNames[rowCount - 1]}
+        </text>,
+      ]
+    : [];
   return (
     <svg
       preserveAspectRatio="xMinYMin meet"
@@ -490,15 +566,21 @@ const Ribbon = ({
         </filter>
         {clipRect}
       </defs>
-      <g clipPath="url(#clipRect)" id="ribbons">
-        <g
-          style={{ ...(currentSeries !== false && { pointerEvents: "none" }) }}
-        >
-          {groups}
+      <g transform={`translate(${gutter},0)`}>
+        <g clipPath="url(#clipRect)" id="ribbons">
+          <g
+            style={{
+              ...(currentSeries !== false && { pointerEvents: "none" }),
+            }}
+          >
+            {groups}
+          </g>
+          <g>{current}</g>
         </g>
-        <g>{current}</g>
+        {rowChrs}
       </g>
-      {rowChrs}
+      {gutterLabels}
+      {outerLabelEls}
       <g>{legend}</g>
     </svg>
   );
@@ -514,6 +596,9 @@ const ReportRibbon = ({
   compactLegend,
   reorient,
   dropShadow,
+  assemblyLabels,
+  ribbonGutter,
+  outerLabels = true,
   compactWidth = 400,
   ratio,
   zScale = "linear",
@@ -661,7 +746,7 @@ const ReportRibbon = ({
       width: plotWidth,
       pointSize,
       compactLegend,
-      pointData,
+      isShown: (i) => links.some((link) => link.catIndex == i),
     });
     ({ levels, colors } = setColors({
       colorPalette,
@@ -680,20 +765,35 @@ const ReportRibbon = ({
       ? maxStringLength(yLabels, yFormat, pointSize)
       : 0;
     const maxXLabel = 0;
-    let marginHeight = (marginHeight = pointSize);
+    let showGutter = Boolean(ribbonGutter) && ribbonGutter != "false";
     let orientation = 0;
-    let marginTop = 5;
-    if (legendRows) {
-      if (compactLegend) {
-        marginTop += legendRows * (pointSize + 10);
-      } else {
-        marginTop += legendRows * (2 * pointSize + 15);
+    // Legend keeps pointSize (its text uses it); the band margins shrink so the plot keeps at least 40% of the height.
+    let legendHeight = legendRows
+      ? legendRows * (compactLegend ? pointSize + 10 : 2 * pointSize + 15)
+      : 0;
+    let bandFactor = outerLabels && !showGutter ? 3.625 : 2.5;
+    let layoutSize = pointSize;
+    if (plotHeight > 0) {
+      while (
+        layoutSize > 4 &&
+        5 + legendHeight + layoutSize * bandFactor > plotHeight * 0.6
+      ) {
+        layoutSize *= 0.9;
       }
     }
+    let marginHeight = layoutSize;
+    let marginTop = 5 + legendHeight;
+    let assemblyLabelList = (assemblyLabels || "").split(";");
+    let assemblyNames = assemblies.map(
+      (a, row) => (assemblyLabelList[row] || "").trim() || a.assembly_id,
+    );
     chart = (
       <Ribbon
         links={links}
         assemblies={assemblies}
+        assemblyNames={assemblyNames}
+        showGutter={showGutter}
+        outerLabels={outerLabels}
         width={plotWidth}
         height={plotHeight}
         marginHeight={marginHeight}
@@ -710,6 +810,7 @@ const ReportRibbon = ({
           report,
           catSums,
           pointSize,
+          layoutSize,
           pointRatio: 1,
           groupBy,
           selectMode: reportSelect,

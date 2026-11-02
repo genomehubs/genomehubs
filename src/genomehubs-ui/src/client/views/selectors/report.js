@@ -91,6 +91,8 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
       in: new Set(["oxford", "ribbon"]),
     },
     dropShadow: { in: new Set(["ribbon"]), ui: true },
+    ribbonGutter: { in: new Set(["ribbon"]), ui: true },
+    assemblyLabels: { in: new Set(["ribbon"]), ui: true },
     ribbonAlign: { in: new Set(["ribbon"]) },
     ribbonPassThrough: { in: new Set(["ribbon"]) },
     catToX: { in: new Set(["histogram"]) },

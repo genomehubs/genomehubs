@@ -1,3 +1,4 @@
+import { PillLabel } from "./PillLabel";
 import { Rectangle } from "recharts";
 import Tooltip from "#wrappers/Tooltip";
 import { active as activeStyle } from "./Styles.scss";
@@ -17,6 +18,7 @@ export const ReportXAxisTick = ({
   bounds,
   showLabels,
   marginTop,
+  pillLabels,
 }) => {
   let { x, y, fill, index, width, payload } = props;
   let { value } = payload;
@@ -86,6 +88,7 @@ export const ReportXAxisTick = ({
     );
   }
   let centered;
+  let isLabel = false;
   let ttValue;
   if (
     (labels && labels[index] != payload.value) ||
@@ -95,11 +98,13 @@ export const ReportXAxisTick = ({
     offset += bucketWidth / 2;
     //centered = true;
     ttValue = value;
+    isLabel = true;
   } else if (buckets[index] != payload.value || valueType == "keyword") {
     value = buckets[index] || "";
     offset += bucketWidth / 2;
     centered = true;
     ttValue = value;
+    isLabel = true;
   } else {
     if (index < buckets.length - 1) {
       ttValue = `${fmt(buckets[index])}-${fmt(buckets[index + 1])}`;
@@ -122,7 +127,18 @@ export const ReportXAxisTick = ({
   let textValue = translations[value] || value;
   ttValue = translations[ttValue] || ttValue;
   if (showLabels) {
-    if (orientation == 0) {
+    if (pillLabels && isLabel) {
+      text = (
+        <PillLabel
+          x={-bucketWidth / 2 + pillLabels.pad}
+          y={pillLabels.gap}
+          width={bucketWidth - 2 * pillLabels.pad}
+          height={pillLabels.thickness}
+          text={textValue}
+          fontSize={pillLabels.fontSize}
+        />
+      );
+    } else if (orientation == 0) {
       text = (
         <text
           x={0}

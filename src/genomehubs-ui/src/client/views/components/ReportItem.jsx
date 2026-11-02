@@ -86,6 +86,8 @@ const ReportItem = ({
   compactLegend,
   reorient,
   dropShadow,
+  ribbonGutter,
+  assemblyLabels,
   compactWidth,
   highlightArea,
   mapThreshold,
@@ -388,11 +390,11 @@ const ReportItem = ({
             compactWidth={compactWidth}
             highlightArea={highlightArea}
             stacked={stacked}
-            pointSize={pointSize}
             zScale={zScale}
             scatterThreshold={scatterThreshold}
             includeEstimates={includeEstimates}
             {...qs.parse(queryString)}
+            pointSize={pointSize}
             minDim={minDim}
             setMinDim={setMinDim}
           />
@@ -402,6 +404,8 @@ const ReportItem = ({
       case "ribbon":
         component = (
           <ReportRibbon
+            assemblyLabels={assemblyLabels}
+            ribbonGutter={ribbonGutter}
             scatter={reportById}
             chartRef={chartRef}
             containerRef={containerRef}
@@ -416,11 +420,11 @@ const ReportItem = ({
             compactWidth={compactWidth}
             highlightArea={highlightArea}
             stacked={stacked}
-            pointSize={pointSize}
             zScale={zScale}
             scatterThreshold={scatterThreshold}
             includeEstimates={includeEstimates}
             {...qs.parse(queryString)}
+            pointSize={pointSize}
             minDim={minDim}
             setMinDim={setMinDim}
           />
@@ -442,11 +446,11 @@ const ReportItem = ({
             compactWidth={compactWidth}
             highlightArea={highlightArea}
             stacked={stacked}
-            pointSize={pointSize}
             zScale={zScale}
             scatterThreshold={scatterThreshold}
             includeEstimates={includeEstimates}
             {...qs.parse(queryString)}
+            pointSize={pointSize}
             minDim={minDim}
             setMinDim={setMinDim}
           />

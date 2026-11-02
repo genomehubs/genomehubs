@@ -31,6 +31,11 @@ const parseAssemblies = (query) => {
   }
 };
 
+const categoryQuery = (query, assembly) =>
+  query
+    .replace(/assembly_id\s*=\s*\S+/i, `assembly_id=${assembly}`)
+    .replace(/\s+AND\s+collate\([^)]*\)/i, "");
+
 const parseCollate = (query) => {
   let parts = query.split(/\sAND\s/i);
   for (let part of parts) {
@@ -119,12 +124,13 @@ const getOxford = async ({
     exclusions,
   };
   let histogram;
+  let restrictCats = false;
   if (bounds.cat) {
     if (bounds.by == "attribute") {
       if (bounds.catType == "keyword" && !bounds.showOther) {
-        xQuery.query += ` AND ${bounds.cat}=${bounds.cats
-          .map(({ key }) => key)
-          .join(",")}`;
+        // Applied after the fetch: a query-level filter would also remove
+        // the y-assembly features needed for collate pairs and ribbons
+        restrictCats = true;
       } else if (bounds.catType != "keyword") {
         let summary = summaries[0];
         let field = bounds.cat;
@@ -183,6 +189,18 @@ const getOxford = async ({
 
   if (!xRes.status.success) {
     return { status: xRes.status };
+  }
+
+  if (restrictCats) {
+    let catKeys = new Set(bounds.cats.map(({ key }) => key));
+    xRes.results = xRes.results.filter(({ result }) => {
+      if (result.assembly_id !== asms[0]) {
+        return true;
+      }
+      let value = result.fields[bounds.cat]?.value;
+      let seq = String(Array.isArray(value) ? value[0] : value).toLowerCase();
+      return catKeys.has(seq);
+    });
   }
 
   let cats;
@@ -409,6 +427,25 @@ const getOxford = async ({
     return index;
   });
 
+  const catActive = Boolean(bounds.cat) && bounds.cat !== "none";
+  // Links from later assemblies take the category of their group's feature in the first assembly.
+  const firstCatOf = Object.fromEntries(
+    Object.entries(groupIndex[0]).map(([group, feats]) => [
+      group,
+      feats[0].cat,
+    ]),
+  );
+  // A null category drops the link.
+  const linkCat = (from, i) => {
+    if (i == 0 || !catActive) {
+      return from.cat;
+    }
+    if (firstCatOf[from.group] !== undefined) {
+      return firstCatOf[from.group];
+    }
+    return bounds.showOther ? "other" : null;
+  };
+
   const pointsFor = (layout, feat) => {
     let a = toGlobal(layout, feat.sequence_id, feat.start);
     let b = toGlobal(layout, feat.sequence_id, feat.end);
@@ -430,6 +467,10 @@ const getOxford = async ({
       if (passThrough && isInIntermediate(from.group, i, j)) {
         continue;
       }
+      let cat = linkCat(from, i);
+      if (cat === null) {
+        continue;
+      }
       let a = pointsFor(layouts[i], from);
       for (let to of groupIndex[j][from.group] || []) {
         let b = pointsFor(layouts[j], to);
@@ -445,7 +486,7 @@ const getOxford = async ({
           featureId: from.feature_id,
           yFeatureId: to.feature_id,
           group: from.group,
-          cat: from.cat,
+          cat,
           strand: from.strand,
           yStrand: to.strand,
           passThrough,
@@ -715,8 +756,12 @@ export const oxford = async ({
     taxonomy,
     apiParams,
   });
+  let asms = parseAssemblies(bounds.query);
   let catBounds = await getBounds({
-    params: { ...params },
+    params: {
+      ...params,
+      query: categoryQuery(bounds.query, asms[0]),
+    },
     fields: [catMeta.name, ...filteredFields],
     summaries: ["value", ...summaries],
     cat,
@@ -737,7 +782,6 @@ export const oxford = async ({
     bounds.showOther = catBounds.showOther;
   }
 
-  let asms = parseAssemblies(bounds.query);
   xQuery.query = bounds.query;
   let oxford = status
     ? {}

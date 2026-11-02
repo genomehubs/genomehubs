@@ -128,6 +128,8 @@ export const queryPropList = {
     "ribbonAlign",
     "ribbonPassThrough",
     "dropShadow",
+    "ribbonGutter",
+    "assemblyLabels",
     "compactWidth",
     "result",
     "taxonomy",
@@ -680,6 +682,7 @@ export const ReportEdit = ({
       queryProp == "reorient" ||
       queryProp == "ribbonPassThrough" ||
       queryProp == "dropShadow" ||
+      queryProp == "ribbonGutter" ||
       queryProp == "catToX"
     ) {
       toggles.push(

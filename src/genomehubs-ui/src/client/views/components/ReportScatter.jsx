@@ -10,6 +10,7 @@ import {
   YAxis,
   ZAxis,
 } from "recharts";
+import { PillLabel, pillGeometry } from "./PillLabel";
 import formats, { setInterval } from "#functions/formats";
 import { memo, useEffect, useRef, useState } from "react";
 import stringLength, { maxStringLength } from "#functions/stringLength";
@@ -39,6 +40,90 @@ import withReportTerm from "#hocs/withReportTerm";
 import withSiteName from "#hocs/withSiteName";
 import withTheme from "#hocs/withTheme";
 import { zLegend } from "./zLegend";
+
+// Oxford styling toggles; set zebra or orientationLines to false to disable.
+const OXFORD_STYLE = {
+  zebra: true,
+  zebraAxes: ["x", "y"],
+  zebraOpacity: 0.04,
+  orientationLines: true,
+  minLengthFactor: 0.5,
+  noCatOpacity: 0.6,
+  pillLabels: true,
+};
+
+const pixelSign = (scale) => Math.sign(scale(1) - scale(0)) || 1;
+
+const ZebraBand = (props, { fill, opacity }) => {
+  let { xAxis, yAxis, payload } = props;
+  if (!xAxis?.scale || !yAxis?.scale) {
+    return null;
+  }
+  let left = xAxis.scale(payload.x1);
+  let right = xAxis.scale(payload.x2);
+  let top = yAxis.scale(payload.y2);
+  let bottom = yAxis.scale(payload.y1);
+  return (
+    <rect
+      x={Math.min(left, right)}
+      y={Math.min(top, bottom)}
+      width={Math.abs(right - left)}
+      height={Math.abs(bottom - top)}
+      fill={fill}
+      fillOpacity={opacity}
+      style={{ pointerEvents: "none" }}
+    />
+  );
+};
+
+const orientationLine = (props, chartProps, interactive) => {
+  let { cx, cy, payload, xAxis, yAxis, fill } = props;
+  let { pointSize, pointRatio } = chartProps;
+  if (
+    !xAxis?.scale ||
+    !yAxis?.scale ||
+    payload?.x2 === undefined ||
+    payload?.y2 === undefined
+  ) {
+    return null;
+  }
+  let x1 = cx;
+  let y1 = cy;
+  let x2 = xAxis.scale(payload.x2);
+  let y2 = yAxis.scale(payload.y2);
+  let minLength = OXFORD_STYLE.minLengthFactor * pointSize;
+  if (Math.hypot(x2 - x1, y2 - y1) < minLength) {
+    // Data-space endpoints already include strand and reorientation.
+    let ux = (Math.sign(payload.x2 - payload.x) || 1) * pixelSign(xAxis.scale);
+    let uy = (Math.sign(payload.y2 - payload.y) || 1) * pixelSign(yAxis.scale);
+    let k = minLength / 2 / Math.SQRT2;
+    let mx = (x1 + x2) / 2;
+    let my = (y1 + y2) / 2;
+    [x1, y1, x2, y2] = [mx - ux * k, my - uy * k, mx + ux * k, my + uy * k];
+  }
+  let strokeWidth = Math.max(2, (pointSize * pointRatio) / 2);
+  let coords = { x1, y1, x2, y2 };
+  return (
+    <>
+      {interactive && (
+        <line
+          {...coords}
+          stroke="transparent"
+          strokeWidth={Math.max(strokeWidth, 8)}
+          style={{ pointerEvents: "stroke" }}
+        />
+      )}
+      <line
+        {...coords}
+        stroke={fill}
+        strokeWidth={strokeWidth}
+        strokeOpacity={1}
+        strokeLinecap="round"
+        style={{ pointerEvents: "none" }}
+      />
+    </>
+  );
+};
 
 const searchByPoint = ({ props, chartProps }) => {
   let { xQuery, fields, ranks, groupBy, navigate, basename, bounds, yBounds } =
@@ -89,30 +174,33 @@ const CustomDot = (props, chartProps) => {
 
 const CustomCircle = (props, chartProps) => {
   let { cx, cy, height: r, fill } = props;
-  let { pointSize, pointRatio, selectMode, active, axisColor } = chartProps;
-
-  let dot = (
-    <Dot
-      cx={cx}
-      cy={cy}
-      r={(pointSize * pointRatio) / 2}
-      stroke={active ? axisColor : "none"}
-      fill={fill}
-      style={{
-        cursor: active && selectMode == "point" ? "pointer" : "default",
-      }}
-    />
-  );
-  if (active && selectMode == "point") {
-    dot = (
-      <>
-        <Tooltip title={<PointInfo {...{ ...props, chartProps }} />} arrow>
-          <g onClick={() => searchByPoint({ props, chartProps })}>{dot}</g>
-        </Tooltip>
-      </>
+  let { pointSize, pointRatio, selectMode, active, axisColor, fillOpacity } =
+    chartProps;
+  let interactive = active && selectMode == "point";
+  let shape = OXFORD_STYLE.orientationLines
+    ? orientationLine(props, chartProps, interactive)
+    : null;
+  if (!shape) {
+    shape = (
+      <Dot
+        cx={cx}
+        cy={cy}
+        r={(pointSize * pointRatio) / 2}
+        stroke={active ? axisColor : "none"}
+        fill={fill}
+        fillOpacity={fillOpacity}
+        style={{ cursor: interactive ? "pointer" : "default" }}
+      />
     );
   }
-  return dot;
+  if (interactive) {
+    shape = (
+      <Tooltip title={<PointInfo {...{ ...props, chartProps }} />} arrow>
+        <g onClick={() => searchByPoint({ props, chartProps })}>{shape}</g>
+      </Tooltip>
+    );
+  }
+  return shape;
 };
 
 const drawHeatRect = ({ props, chartProps, h, w }) => {
@@ -375,6 +463,7 @@ const CustomizedYAxisTick = ({
   marginRight,
   marginWidth,
   plotWidth,
+  pillLabels,
 }) => {
   const { x, y, fill, index, height, payload, orientation: side } = props;
   let { value } = payload;
@@ -404,7 +493,24 @@ const CustomizedYAxisTick = ({
   let textValue = translations[value] || value;
   ttValue = translations[ttValue] || ttValue;
   if (showLabels) {
-    if (h >= pointSize * 0.8) {
+    if (pillLabels && centered) {
+      // Pill always renders; its height and font shrink to fit short rows.
+      let pillHeight = Math.max(h - 2 * pillLabels.pad, 1);
+      text = (
+        <PillLabel
+          x={-(pillLabels.gap + pillLabels.thickness)}
+          y={-pillHeight / 2}
+          width={pillLabels.thickness}
+          height={pillHeight}
+          text={textValue}
+          fontSize={Math.max(
+            3,
+            Math.min(pillLabels.fontSize, pillHeight * 0.8),
+          )}
+          vertical
+        />
+      );
+    } else if (h >= pointSize * 0.8) {
       text = (
         <text
           x={0}
@@ -544,8 +650,43 @@ const Heatmap = ({
     ? [0, yBuckets.length - 1]
     : [yBuckets[0], yBuckets[yBuckets.length - 1]];
   let { axisColor } = chartProps;
+  let hasCats = cats.length > 1;
+  let zebraBands = [];
+  if (
+    chartProps.isOxford &&
+    OXFORD_STYLE.zebra &&
+    !isNaN(buckets[0]) &&
+    !isNaN(yBuckets[0])
+  ) {
+    if (OXFORD_STYLE.zebraAxes.includes("x")) {
+      for (let i = 1; i < buckets.length - 1; i += 2) {
+        zebraBands.push({
+          x: buckets[i],
+          y: yDomain[0],
+          x1: buckets[i],
+          x2: buckets[i + 1],
+          y1: yDomain[0],
+          y2: yDomain[1],
+        });
+      }
+    }
+    if (OXFORD_STYLE.zebraAxes.includes("y")) {
+      for (let j = 1; j < yBuckets.length - 1; j += 2) {
+        zebraBands.push({
+          x: xDomain[0],
+          y: yBuckets[j],
+          x1: xDomain[0],
+          x2: xDomain[1],
+          y1: yBuckets[j],
+          y2: yBuckets[j + 1],
+        });
+      }
+    }
+  }
   let axes = [
-    <CartesianGrid key={"grid"} strokeDasharray="3 3" />,
+    zebraBands.length > 0 ? null : (
+      <CartesianGrid key={"grid"} strokeDasharray="3 3" />
+    ),
     <XAxis
       type="number"
       dataKey="x"
@@ -569,6 +710,7 @@ const Heatmap = ({
           maxLabel: chartProps.maxXlabel,
           showLabels: chartProps.showLabels,
           marginTop,
+          pillLabels: chartProps.pillLabels,
         })
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
@@ -611,6 +753,7 @@ const Heatmap = ({
           plotWidth: width,
           marginWidth,
           marginRight,
+          pillLabels: chartProps.pillLabels,
         })
       }
       domain={yDomain}
@@ -739,6 +882,22 @@ const Heatmap = ({
       }}
     >
       {axes}
+      {zebraBands.length > 0 && (
+        <Scatter
+          name="zebra"
+          legendType="none"
+          key="zebra"
+          data={zebraBands}
+          shape={(props) =>
+            ZebraBand(props, {
+              fill: chartProps.axisColor,
+              opacity: OXFORD_STYLE.zebraOpacity,
+            })
+          }
+          isAnimationActive={false}
+          pointerEvents={"none"}
+        />
+      )}
       {pointData &&
         orderedCats.map((cat, j) => {
           let i = reversed
@@ -754,6 +913,10 @@ const Heatmap = ({
               shape={(props) =>
                 CustomCircle(props, {
                   ...chartProps,
+                  fillOpacity:
+                    chartProps.isOxford && !hasCats
+                      ? OXFORD_STYLE.noCatOpacity
+                      : undefined,
                   active: currentSeries === false || currentSeries == i,
                   axisColor: mixColor({
                     color1: axisColor,
@@ -1007,22 +1170,42 @@ const ReportScatter = ({
     const maxYLabel = showLabels
       ? maxStringLength(yLabels, yFormat, pointSize)
       : 0;
-    const marginWidth = showLabels
-      ? maxYLabel + pointSize > 40
-        ? maxYLabel + pointSize - 40
-        : 0
-      : pointSize - 35;
+    // Oxford pill labels: each axis only reserves the pill size, not the text length.
+    // Pill size is capped at 10% of the smaller plot side so large pointSize cannot swamp the plot.
+    const pillSize =
+      plotHeight > 0
+        ? Math.min(
+            pointSize,
+            Math.max(4, Math.min(plotWidth, plotHeight) * 0.1),
+          )
+        : pointSize;
+    const pillLabels =
+      scatter.report.oxford && OXFORD_STYLE.pillLabels && showLabels
+        ? pillGeometry(pillSize)
+        : false;
+    const marginWidth = pillLabels
+      ? pillLabels.margin
+      : showLabels
+        ? maxYLabel + pointSize > 40
+          ? maxYLabel + pointSize - 40
+          : 0
+        : pointSize - 35;
     const maxXLabel = showLabels
       ? maxStringLength(labels, xFormat, pointSize)
       : 0;
-    let marginHeight = showLabels ? 2 * pointSize : pointSize - 15;
+    let marginHeight = pillLabels
+      ? pillLabels.margin + pointSize
+      : showLabels
+        ? 2 * pointSize
+        : pointSize - 15;
     const marginRight = showLabels
       ? (stringLength(xFormat(endLabel)) * pointSize) / 2
       : 0;
     let orientation = 0;
     if (
+      !pillLabels &&
       maxXLabel >
-      (plotWidth - marginWidth - marginRight) / heatmaps.buckets.length
+        (plotWidth - marginWidth - marginRight) / heatmaps.buckets.length
     ) {
       orientation = -90;
       marginHeight =
@@ -1067,12 +1250,14 @@ const ReportScatter = ({
           catMax,
           pointSize,
           pointRatio: scatter.report.oxford ? 0.5 : 1,
+          isOxford: !!scatter.report.oxford,
           groupBy,
           selectMode: reportSelect,
           xQuery: scatter.report.xQuery,
           yQuery: scatter.report.yQuery,
           maxYLabel,
           maxXLabel,
+          pillLabels,
           xLabel: scatter.report.xLabel,
           yLabel: scatter.report.yLabel,
           showXTickLabels: xOptions[2] ? xOptions[2] >= 0 : true,
