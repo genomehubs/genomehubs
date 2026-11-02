@@ -433,6 +433,48 @@ components:
       name: reorient
       schema:
         type: boolean
+    ribbonAlignParam:
+      description: |
+        How sequences are ordered across assemblies in a ribbon plot.
+
+        `reference` (default) aligns every assembly to the first assembly.
+        `sequential` aligns each assembly to the previous one.
+
+        Ordering only; all B-->C links are always shown.
+
+        This parameter only applies to reports with `report=ribbon`.
+      examples:
+        reference:
+          value: reference
+          summary: reference - align all assemblies to the first assembly
+        sequential:
+          value: sequential
+          summary: sequential - align each assembly to the previous one
+      in: query
+      name: ribbonAlign
+      schema:
+        type: string
+        enum:
+          - reference
+          - sequential
+    ribbonPassThroughParam:
+      description: |
+        Draw pass-through links (A->C) for groups absent from the intermediate assembly B.
+
+        Pass-through links are drawn distinctly from adjacent links. Default is `false`.
+
+        This parameter only applies to reports with `report=ribbon`.
+      examples:
+        false:
+          value: false
+          summary: false - do not draw pass-through links
+        true:
+          value: true
+          summary: true - draw pass-through links
+      in: query
+      name: ribbonPassThrough
+      schema:
+        type: boolean
     indentParam:
       description: |
         Format output with indented lines.
@@ -1555,7 +1597,7 @@ paths:
         | **Histogram** | `x`               | `cat`, `catToX`, `rank`, `xOpts` |
         | **Map**       | `x`               | `cat`, `rank`          |
         | **Oxford**    | `x`               | `cat`, `xOpts`, `yOpts`, `reorient` |
-        | **Ribbon**    | `x`               | `cat`, `xOpts`, `reorient` |
+        | **Ribbon**    | `x`               | `cat`, `xOpts`, `reorient`, `ribbonAlign`, `ribbonPassThrough` |
         | **Scatter**   | `x`, `y`, `rank`  | `cat`, `xOpts`, `yOpts`, `scatterThreshold` |
         | **Table**     | `x`, `y`          | `cat`, `rank`, `xOpts`, `yOpts`, `scatterThreshold` |
         | **Sources**   | -                 | -              |
@@ -1588,6 +1630,8 @@ paths:
         - $ref: "#/components/parameters/xOptsParam"
         - $ref: "#/components/parameters/yOptsParam"
         - $ref: "#/components/parameters/reorientParam"
+        - $ref: "#/components/parameters/ribbonAlignParam"
+        - $ref: "#/components/parameters/ribbonPassThroughParam"
         - $ref: "#/components/parameters/checkedFilesParam"
         - $ref: "#/components/parameters/geoBinResolutionParam"
         - $ref: "#/components/parameters/geoBoundsParam"

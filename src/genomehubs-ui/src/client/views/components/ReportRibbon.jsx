@@ -4,7 +4,6 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 import stringLength, { maxStringLength } from "#functions/stringLength";
 
 import Grid from "@mui/material/Grid";
-import PointInfo from "./PointInfo";
 import Tooltip from "#wrappers/Tooltip";
 import { compose } from "redux";
 import dispatchMessage from "#hocs/dispatchMessage";
@@ -90,46 +89,60 @@ const getRampColor = ({
   return `hsl(${h} ${saturation}% ${lightness}%)`;
 };
 
+const labelKey = (row, label) => `${row}|${label}`;
+
+// Scale for one assembly row. Each label bar is drawn with `pad` overflow on
+// both sides, so the scale range is reduced by 2 * pad per label and the
+// remaining width is shared between the label bars.
+const generateSteppedScale = ({ buckets, labels, pad, width }) => {
+  let span = buckets[buckets.length - 1] - buckets[0];
+  let labelWidth = width - 2 - 2 * labels.length * pad;
+  let left = pad + 1;
+  let scales = {};
+  labels.forEach((label, i) => {
+    let right = left + ((buckets[i + 1] - buckets[i]) / span) * labelWidth;
+    let xScale = scaleLinear()
+      .domain([buckets[i], buckets[i + 1]])
+      .range([left, right]);
+    left = right + pad * 2;
+    scales[label] = xScale;
+  });
+  return scales;
+};
+
 const Ribbon = ({
-  pointData,
+  links,
+  assemblies,
   width,
   height,
-  buckets,
-  yBuckets,
   colors,
   cats,
   chartProps,
-  basename,
-  marginWidth,
   marginHeight,
-  marginRight,
   marginTop,
   dropShadow,
-  yOrientation,
 }) => {
   const [currentSeries, setCurrentSeries] = useState(false);
   const [visible, setVisible] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
-  const handleLabelClick = (label) => {
+  const handleLabelClick = (key) => {
     let newVisible = { ...visible };
-    if (visible[label]) {
-      delete newVisible[label];
+    if (visible[key]) {
+      delete newVisible[key];
     } else {
-      newVisible[label] = true;
+      newVisible[key] = true;
     }
     setVisible(newVisible);
   };
-  const searchBySequence = (label) => {
+  const searchBySequence = ({ row, label }) => {
     let liveSeqs = new Set([label]);
-    pointData.forEach((arr, i) => {
-      arr.forEach((point) => {
-        if (point.sequenceId == label) {
-          liveSeqs.add(point.ySequenceId);
-        } else if (point.ySequenceId == label) {
-          liveSeqs.add(point.sequenceId);
-        }
-      });
+    links.forEach((link) => {
+      if (link.asm1 == row && link.sequenceId == label) {
+        liveSeqs.add(link.ySequenceId);
+      } else if (link.asm2 == row && link.ySequenceId == label) {
+        liveSeqs.add(link.sequenceId);
+      }
     });
     let { search } = location;
 
@@ -161,16 +174,19 @@ const Ribbon = ({
     );
   };
 
-  const longPressCallback = useCallback((e, value) => {
-    e.preventDefault();
-    e.stopPropagation();
-    searchBySequence(value.context);
-  }, []);
+  const longPressCallback = useCallback(
+    (e, value) => {
+      e.preventDefault();
+      e.stopPropagation();
+      searchBySequence(value.context);
+    },
+    [links, chartProps, location],
+  );
 
   const longPress = useLongPress(longPressCallback, {
     onStart: (e) => e.preventDefault(),
     onCancel: (e, value) => {
-      handleLabelClick(value.context);
+      handleLabelClick(labelKey(value.context.row, value.context.label));
     },
     captureEvent: true,
     threshold: 500,
@@ -179,18 +195,20 @@ const Ribbon = ({
   let fillColors = colors.map((hex, i) =>
     fadeColor({ hex, i, active: currentSeries }),
   );
-  let { labels, yLabels, pointSize } = chartProps;
+  let { pointSize } = chartProps;
   let labelHeight = (pointSize * 3) / 2;
   let padding = labelHeight / 2;
   let strokeWidth = pointSize / 3;
-  let dataWidth = width - Math.max(labels.length, yLabels.length) * labelHeight;
-  if (dataWidth < 50) {
+  let maxLabels = Math.max(...assemblies.map((a) => a.labels.length));
+  // Horizontal overflow per label bar, shrunk when there are many labels so
+  // that the bars always fit within the width.
+  let hPad = Math.min(padding, (width - 2) / (4 * maxLabels));
+  if (width < 100 || assemblies.length < 2) {
     return null;
   }
 
   let maxSpan = Math.max(
-    buckets[buckets.length - 1] - buckets[0],
-    yBuckets[yBuckets.length - 1] - yBuckets[0],
+    ...assemblies.map((a) => a.buckets[a.buckets.length - 1] - a.buckets[0]),
   );
 
   let division = Math.ceil(Math.log10(maxSpan));
@@ -199,92 +217,75 @@ const Ribbon = ({
     step /= 2;
   }
 
-  const generateSteppedScale = ({ buckets, labels, padding, width }) => {
-    let span = buckets[buckets.length - 1] - buckets[0];
-    let dataWidth = width - 2 - labels.length * padding * 2;
-    let left = padding + 1;
-    let scales = {};
-    labels.forEach((label, i) => {
-      let right = left + ((buckets[i + 1] - buckets[i]) / span) * dataWidth;
-      let xScale = scaleLinear()
-        .domain([buckets[i], buckets[i + 1]])
-        .range([left, right]);
-      left = right + padding * 2;
-      scales[label] = xScale;
-    });
-    return scales;
-  };
-  // let xScale = scaleLinear()
-  //   .domain([0, buckets[buckets.length - 1]])
-  //   .range([0, width - labels.length * labelHeight]);
-  let xScales = generateSteppedScale({
-    buckets,
-    labels,
-    padding,
-    width,
-  });
-  let yScales = generateSteppedScale({
-    buckets: yBuckets,
-    labels: yLabels,
-    padding,
-    width,
-  });
-  // let yScale = scaleLinear()
-  //   .domain([0, yBuckets[yBuckets.length - 1]])
-  //   .range([0, height - yLabels.length * labelHeight]);
+  let rowScales = assemblies.map((a) =>
+    generateSteppedScale({
+      buckets: a.buckets,
+      labels: a.labels,
+      pad: hPad,
+      width,
+    }),
+  );
   let topCoord = marginTop + padding;
   let bottomCoord = height - marginHeight - padding;
-  const setChrs = ({ scales, labels, buckets, padding }) => {
+  let rowCount = assemblies.length;
+  // Centre line of each assembly row, evenly spaced from top to bottom.
+  let rowY = assemblies.map(
+    (_, row) => topCoord + (row * (bottomCoord - topCoord)) / (rowCount - 1),
+  );
+  const linkVisible = (link) =>
+    Object.keys(visible).length == 0 ||
+    visible[labelKey(link.asm1, link.sequenceId)] ||
+    visible[labelKey(link.asm2, link.ySequenceId)];
+
+  // Label bars, ticks and tooltips for one assembly row.
+  const setChrs = (row) => {
+    let { labels, buckets, orientation } = assemblies[row];
+    let scales = rowScales[row];
     let chrs = [];
     labels.forEach((label, i) => {
+      let key = labelKey(row, label);
       let x1 = scales[label]([buckets[i]]);
       let x2 = scales[label]([buckets[i + 1]]);
+      let span = buckets[i + 1] - buckets[i];
       let labelLength = stringLength(label);
       let formattedLabel = label;
       let k = 1;
-      while ((labelLength - 2) * padding > x2 - x1) {
+      while (k < label.length && (labelLength - 2) * padding > x2 - x1) {
         formattedLabel = truncate(label, label.length - k, true);
         labelLength = stringLength(formattedLabel);
         k++;
       }
-      let stroke = visible[label] ? "white" : "#31323f";
-      let fill = visible[label] ? "#31323f" : "white";
-      let lines = [];
-      if (yOrientation[label] == -1) {
-        for (let n = buckets[i + 1] - buckets[i]; n > 0; n -= step) {
-          let x = scales[label]([buckets[i] + n]);
-          lines.push(
-            <line
-              key={n}
-              x1={x}
-              y1={0}
-              x2={x}
-              y2={padding * 2}
-              stroke={stroke}
-              strokeWidth={2}
-              strokeDasharray={`${padding / 3} ${(padding * 4) / 3}`}
-            />,
-          );
+      let stroke = visible[key] ? "white" : "#31323f";
+      let fill = visible[key] ? "#31323f" : "white";
+      let reversed = orientation[label] == -1;
+      let offsets = [];
+      if (reversed) {
+        for (let n = span; n > 0; n -= step) {
+          offsets.push(n);
         }
       } else {
-        for (let n = 0; n < buckets[i + 1] - buckets[i]; n += step) {
-          let x = scales[label]([buckets[i] + n]);
-          lines.push(
-            <line
-              key={n}
-              x1={x}
-              y1={0}
-              x2={x}
-              y2={padding * 2}
-              stroke={stroke}
-              strokeWidth={2}
-              strokeDasharray={`${padding / 3} ${(padding * 4) / 3}`}
-            />,
-          );
+        for (let n = 0; n < span; n += step) {
+          offsets.push(n);
         }
       }
+      let lines = offsets.map((n) => {
+        let x = scales[label]([buckets[i] + n]);
+        return (
+          <line
+            key={n}
+            x1={x}
+            y1={0}
+            x2={x}
+            y2={padding * 2}
+            stroke={stroke}
+            strokeWidth={2}
+            strokeDasharray={`${padding / 3} ${(padding * 4) / 3}`}
+            strokeLinecap="round"
+          />
+        );
+      });
       let arrows = [];
-      if (yOrientation[label] == -1) {
+      if (reversed) {
         arrows.push(
           <polygon
             key="left"
@@ -296,27 +297,23 @@ const Ribbon = ({
       }
       chrs.push(
         <Tooltip
-          title={`${label} (${formats(buckets[i + 1] - buckets[i], "integer")}bp)`}
+          title={`${label} (${formats(span, "integer")}bp)`}
           arrow
-          key={label}
+          key={key}
           enterDelay={500}
         >
           <g
-            key={label}
-            // onClick={() => {
-            //   searchBySequence(label);
-            //   handleLabelClick(label);
-            // }}
-            {...longPress(label)}
+            key={key}
+            {...longPress({ row, label })}
             style={{ cursor: "pointer" }}
           >
             <rect
-              x={x1 - padding}
+              x={x1 - hPad}
               y={0}
-              width={x2 - x1 + padding * 2}
+              width={x2 - x1 + hPad * 2}
               height={padding * 2}
               fill={fill}
-              stroke={visible[label] ? fill : stroke}
+              stroke={visible[key] ? fill : stroke}
               strokeWidth={2}
               rx={padding}
             />
@@ -324,7 +321,6 @@ const Ribbon = ({
             {arrows}
             <text
               x={(x1 + x2) / 2}
-              key={label}
               y={padding}
               textAnchor="middle"
               fontSize={padding}
@@ -340,13 +336,11 @@ const Ribbon = ({
     });
     return chrs;
   };
-  let xChrs = setChrs({ scales: xScales, labels, buckets, padding });
-  let yChrs = setChrs({
-    scales: yScales,
-    labels: yLabels,
-    buckets: yBuckets,
-    padding,
-  });
+  let rowChrs = assemblies.map((_, row) => (
+    <g key={row} transform={`translate(0,${rowY[row] - padding})`}>
+      {setChrs(row)}
+    </g>
+  ));
 
   let groups = [];
   let legend = [];
@@ -358,109 +352,122 @@ const Ribbon = ({
   );
   const hasCategories = cats && cats.length > 1;
 
-  const xMin = buckets[0];
-  const xMax = buckets[buckets.length - 1];
+  const xMin = assemblies[0].buckets[0];
+  const xMax = assemblies[0].buckets[assemblies[0].buckets.length - 1];
 
-  pointData.forEach((arr, i) => {
-    if (arr.length > 0) {
-      let handleClick;
-      if (cats.length > 1) {
-        handleClick = (i) => {
-          currentSeries !== false && currentSeries == i
-            ? setCurrentSeries(false)
-            : setCurrentSeries(i);
-        };
-      }
-      let offset, row;
-      if (chartProps.catOffsets[cats[i]]) {
-        ({ offset, row } = chartProps.catOffsets[cats[i]]);
-      }
-      let legendProps = {
-        ...chartProps,
-        width: width - 45,
-        x: 10,
-        name: cats[i],
-        fill: colors[i],
-        i,
-        stats: cats[i],
-      };
-      legend.push(
-        <g key={`item-${i}`}>
-          {MultiCatLegend({
-            ...legendProps,
-            offset,
-            row,
-            handleClick,
-            active: currentSeries === i,
-          })}
-        </g>,
-      );
+  // Pass-through links are drawn first so adjacent links sit on top.
+  const orderedLinks = [
+    ...links.filter((link) => link.passThrough),
+    ...links.filter((link) => !link.passThrough),
+  ];
+
+  cats.forEach((cat, i) => {
+    if (!links.some((link) => link.catIndex == i)) {
+      return;
     }
-    // dropShadow = currentSeries !== false && currentSeries == i;
-    arr.forEach((point, j) => {
-      if (
-        Object.keys(visible).length == 0 ||
-        visible[point.sequenceId] ||
-        visible[point.ySequenceId]
-      ) {
-        let x = xScales[point.sequenceId](point.x);
-        let y = yScales[point.ySequenceId](point.y);
-        const startY = topCoord;
-        const endY = bottomCoord;
+    let handleClick;
+    if (cats.length > 1) {
+      handleClick = (idx) => {
+        currentSeries !== false && currentSeries == idx
+          ? setCurrentSeries(false)
+          : setCurrentSeries(idx);
+      };
+    }
+    let offset, row;
+    if (chartProps.catOffsets[cat]) {
+      ({ offset, row } = chartProps.catOffsets[cat]);
+    }
+    let legendProps = {
+      ...chartProps,
+      width: width - 45,
+      x: 10,
+      name: cat,
+      fill: colors[i],
+      i,
+      stats: cat,
+    };
+    legend.push(
+      <g key={`item-${i}`}>
+        {MultiCatLegend({
+          ...legendProps,
+          offset,
+          row,
+          handleClick,
+          active: currentSeries === i,
+        })}
+      </g>,
+    );
+  });
 
-        const path = pathRound(3);
-        path.moveTo(x, startY);
-        path.bezierCurveTo(
-          x,
-          startY + (endY - startY) * 0.25,
-          y,
-          startY + (endY - startY) * 0.75,
-          y,
-          endY,
-        );
-        const t = xMax === xMin ? 0.5 : (point.x - xMin) / (xMax - xMin);
+  orderedLinks.forEach((link, j) => {
+    if (!linkVisible(link)) {
+      return;
+    }
+    const midX = (link.x + link.x2) / 2;
+    const midY = (link.y + link.y2) / 2;
+    const x = rowScales[link.asm1][link.sequenceId](midX);
+    const y = rowScales[link.asm2][link.ySequenceId](midY);
+    const startY = rowY[link.asm1];
+    const endY = rowY[link.asm2];
 
-        const stroke = hasCategories
-          ? fillColors[i]
-          : getRampColor({ hsl: fillColors[i], t, lightnessRange: 20 });
-        let pathSvg = (
-          <Tooltip
-            title={
-              <PointInfo {...point} chartProps={chartProps} fill={colors[i]} />
-            }
-            arrow
-            followCursor={true}
-            key={`${i}-${j}`}
-          >
-            <path
-              fill="none"
-              stroke={stroke}
-              strokeWidth={strokeWidth}
-              onClick={() =>
-                searchByPoint({
-                  props: {
-                    ...point,
-                    payload: { x: point.sequenceId, y: point.ySequenceId },
-                  },
-                  chartProps,
-                })
-              }
-              style={{
-                cursor: "pointer",
-                ...(dropShadow && { filter: "URL(#shadow)" }),
-              }}
-              d={path}
-            />
-          </Tooltip>
-        );
-        if (currentSeries !== false && currentSeries == i) {
-          current.push(pathSvg);
-        } else {
-          groups.push(pathSvg);
-        }
-      }
-    });
-    //
+    const path = pathRound(3);
+    path.moveTo(x, startY);
+    path.bezierCurveTo(
+      x,
+      startY + (endY - startY) * 0.25,
+      y,
+      startY + (endY - startY) * 0.75,
+      y,
+      endY,
+    );
+    const t = xMax === xMin ? 0.5 : (midX - xMin) / (xMax - xMin);
+
+    const stroke = hasCategories
+      ? fillColors[link.catIndex]
+      : getRampColor({
+          hsl: fillColors[link.catIndex],
+          t,
+          lightnessRange: 20,
+        });
+    const title = `${link.sequenceId} to ${link.ySequenceId}${link.passThrough ? " (pass-through)" : ""}`;
+    let pathSvg = (
+      <Tooltip title={title} arrow followCursor={true} key={j}>
+        <path
+          fill="none"
+          stroke={stroke}
+          strokeWidth={strokeWidth}
+          strokeDasharray={
+            link.passThrough
+              ? `${strokeWidth * 2} ${strokeWidth * 2}`
+              : undefined
+          }
+          strokeLinecap="round"
+          opacity={link.passThrough ? 0.5 : 1}
+          onClick={() =>
+            searchByPoint({
+              props: {
+                group: link.group,
+                featureId: link.featureId,
+                yFeatureId: link.yFeatureId,
+                cat: link.cat,
+                payload: { x: link.sequenceId, y: link.ySequenceId },
+              },
+              chartProps,
+            })
+          }
+          style={{
+            cursor: "pointer",
+            ...(dropShadow && { filter: "URL(#shadow)" }),
+          }}
+          d={path}
+        />
+      </Tooltip>
+    );
+    if (currentSeries !== false && currentSeries == link.catIndex) {
+      current.push(pathSvg);
+    } else {
+      groups.push(pathSvg);
+    }
   });
   return (
     <svg
@@ -491,8 +498,7 @@ const Ribbon = ({
         </g>
         <g>{current}</g>
       </g>
-      <g transform={`translate(0,${topCoord - padding})`}>{xChrs}</g>
-      <g transform={`translate(0,${bottomCoord - padding})`}>{yChrs}</g>
+      {rowChrs}
       <g>{legend}</g>
     </svg>
   );
@@ -588,6 +594,8 @@ const ReportRibbon = ({
       histograms: heatmaps,
       pointData,
       groupBy,
+      links,
+      assemblies,
     } = scatterReport;
     if (pointData) {
       ({ locations } = scatterReport);
@@ -599,7 +607,7 @@ const ReportRibbon = ({
         setHighlight([]);
       }
     }, [reportTerm]);
-    if (!heatmaps) {
+    if (!heatmaps || !links || !assemblies) {
       return null;
     }
     let hasRawData = pointData && pointData.length > 0;
@@ -635,11 +643,6 @@ const ReportRibbon = ({
       yInterval = setInterval(diff, heatmaps.yBuckets.length - 1);
     }
 
-    let endLabel = formats(
-      heatmaps.buckets[lastIndex + 1],
-      valueType,
-      interval,
-    );
     compactLegend =
       typeof compactLegend !== "undefined"
         ? compactLegend
@@ -676,16 +679,8 @@ const ReportRibbon = ({
     const maxYLabel = showLabels
       ? maxStringLength(yLabels, yFormat, pointSize)
       : 0;
-    const marginWidth = showLabels
-      ? maxYLabel + pointSize > 40
-        ? maxYLabel + pointSize - 40
-        : 0
-      : pointSize - 35;
     const maxXLabel = 0;
     let marginHeight = (marginHeight = pointSize);
-    const marginRight = showLabels
-      ? (stringLength(xFormat(endLabel)) * pointSize) / 2
-      : 0;
     let orientation = 0;
     let marginTop = 5;
     if (legendRows) {
@@ -697,21 +692,15 @@ const ReportRibbon = ({
     }
     chart = (
       <Ribbon
-        pointData={pointData}
+        links={links}
+        assemblies={assemblies}
         width={plotWidth}
         height={plotHeight}
-        buckets={heatmaps.buckets}
-        yBuckets={heatmaps.yBuckets}
-        marginWidth={marginWidth}
         marginHeight={marginHeight}
-        marginRight={marginRight}
         marginTop={marginTop}
         colors={colors}
         cats={cats}
         dropShadow={dropShadow}
-        legendRows={legendRows}
-        basename={basename}
-        yOrientation={heatmaps.yOrientation}
         chartProps={{
           zDomain: heatmaps.zDomain,
           yLength: heatmaps.yBuckets.length - 1,

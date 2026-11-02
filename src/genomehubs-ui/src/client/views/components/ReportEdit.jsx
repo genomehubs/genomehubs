@@ -125,6 +125,8 @@ export const queryPropList = {
     pointSizeSettings,
     "compactLegend",
     "reorient",
+    "ribbonAlign",
+    "ribbonPassThrough",
     "dropShadow",
     "compactWidth",
     "result",
@@ -241,6 +243,7 @@ const selectOptions = {
   mapProjection: ["mercator", "cylindricalEqualArea"],
   mapTheme: ["day", "night"],
   plotRatio: ["auto", 1, 1.5, 2],
+  ribbonAlign: ["reference", "sequential"],
   treeStyle: ["rect", "ring"],
 };
 
@@ -250,6 +253,7 @@ const helpText = {
   mapProjection: `Map projection to use (mercator or cylindricalEqualArea)`,
   mapTheme: `Map theme to use (day or night)`,
   plotRatio: `Aspect ratio for plots (auto = auto-sized, 1 = square, 1.5 = wide, 2 = very wide)`,
+  ribbonAlign: `Row order for multi-assembly ribbons (reference = order set by the first assembly, sequential = each assembly ordered by the previous one)`,
   treeStyle: `Tree style to display (rect = rectangular, ring = circular)`,
   phylopicRank: `Taxonomic rank to display PhyloPics (e.g. species, genus, family, order, phylum, kingdom, etc. - empty = tip nodes)`,
   phylopicSize: `Size in pixels (15-250, empty = auto-sized based on available space)`,
@@ -674,6 +678,7 @@ export const ReportEdit = ({
       queryProp == "showPhylopics" ||
       queryProp == "compactLegend" ||
       queryProp == "reorient" ||
+      queryProp == "ribbonPassThrough" ||
       queryProp == "dropShadow" ||
       queryProp == "catToX"
     ) {

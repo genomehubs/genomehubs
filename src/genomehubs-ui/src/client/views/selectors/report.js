@@ -91,6 +91,8 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
       in: new Set(["oxford", "ribbon"]),
     },
     dropShadow: { in: new Set(["ribbon"]), ui: true },
+    ribbonAlign: { in: new Set(["ribbon"]) },
+    ribbonPassThrough: { in: new Set(["ribbon"]) },
     catToX: { in: new Set(["histogram"]) },
     compactWidth: { in: new Set(["histogram", "oxford", "ribbon", "scatter"]) },
     highlightArea: { in: new Set(["scatter"]), ui: true },
@@ -746,19 +748,28 @@ const processReport = (report, { searchTerm = {} }) => {
       },
     };
   } else if (report.name == "ribbon") {
+    const { oxford } = report.report;
+    const assemblies = oxford.histograms?.assemblies || [];
+    const catKeys = (oxford.cats || []).map((cat) => cat.key);
+    // Each link carries its category index so the ribbon can colour it.
+    const links = (oxford.histograms?.links || []).map((link) => ({
+      ...link,
+      catIndex: Math.max(0, catKeys.indexOf(link.cat)),
+    }));
     return {
       ...report,
       report: {
         ...report.report,
         ribbon: {
-          ...report.report.oxford,
+          ...oxford,
+          assemblies,
+          links,
         },
         scatter: {
-          ...report.report.oxford,
-          ...processScatter(
-            report.report.oxford,
-            report?.report?.xQuery?.result,
-          ),
+          ...oxford,
+          assemblies,
+          links,
+          ...processScatter(oxford, report?.report?.xQuery?.result),
         },
       },
     };

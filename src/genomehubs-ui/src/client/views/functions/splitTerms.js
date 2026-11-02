@@ -11,6 +11,8 @@ const reportParams = {
   compactLegend: false,
   reorient: false,
   dropShadow: false,
+  ribbonAlign: "reference",
+  ribbonPassThrough: false,
   catToX: false,
   regionField: false,
   locationField: false,

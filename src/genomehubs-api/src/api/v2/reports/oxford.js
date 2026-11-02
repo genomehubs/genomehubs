@@ -105,6 +105,8 @@ const getOxford = async ({
   taxonomy,
   reorient,
   req,
+  alignment = "reference",
+  passThrough = false,
 }) => {
   let exclusions;
   exclusions = setExclusions(params);
@@ -207,20 +209,11 @@ const getOxford = async ({
   }
 
   let byAssembly = {};
-  let groupedData = {};
-  let activeSeqs = {};
   for (let result of xRes.results) {
     let { taxon_id, assembly_id, feature_id, fields } = result.result;
     let group = fields[groupBy].value;
-    if (!groupedData[group]) {
-      groupedData[group] = {};
-    }
     if (!byAssembly[assembly_id]) {
       byAssembly[assembly_id] = {};
-      activeSeqs[assembly_id] = {};
-    }
-    if (!groupedData[group][assembly_id]) {
-      groupedData[group][assembly_id] = [];
     }
     let { sequence_id, start, end, strand } = fields;
     sequence_id = sequence_id.value;
@@ -229,7 +222,6 @@ const getOxford = async ({
     strand = strand.value;
     if (!byAssembly[assembly_id][sequence_id]) {
       byAssembly[assembly_id][sequence_id] = [];
-      activeSeqs[assembly_id][sequence_id] = true;
     }
     let cat;
     if (bounds.cat) {
@@ -276,16 +268,6 @@ const getOxford = async ({
       feature_id,
       cat,
     });
-    if (assembly_id != asms[0]) {
-      groupedData[group][assembly_id].push({
-        sequence_id,
-        start,
-        end,
-        strand,
-        cat,
-        feature_id,
-      });
-    }
   }
   let seqLengths = await getSequenceLengths({
     assemblies: Object.keys(byAssembly),
@@ -296,213 +278,249 @@ const getOxford = async ({
     taxonomy,
     req,
   });
-  let sortedSeqs = {};
-  let seqOffsets = {};
-  let seqIndices = {};
-  let domains = {};
-  let buckets = {};
-  let labels = {};
-  let allValues = {};
-  let allYValues = {};
-  let byCat = {};
-  let yValuesByCat = {};
-  for (let [assembly, seqs] of Object.entries(activeSeqs)) {
-    for (let seq of Object.keys(seqs)) {
-      seqs[seq] = seqLengths[assembly][seq];
+  const seqsOf = (asm) => byAssembly[asm] || {};
+  let lengths = {};
+  let defaultOrder = {};
+  for (let asm of asms) {
+    lengths[asm] = {};
+    for (let seq of Object.keys(seqsOf(asm))) {
+      lengths[asm][seq] = seqLengths[asm][seq];
     }
-    sortedSeqs[assembly] = Object.entries(activeSeqs[assembly]).sort(
-      (a, b) => b[1] - a[1],
+    defaultOrder[asm] = Object.keys(lengths[asm]).sort(
+      (a, b) => lengths[asm][b] - lengths[asm][a],
     );
-    seqOffsets[assembly] = {};
-    seqIndices[assembly] = {};
+  }
+
+  const buildLayout = ({ asm, order, orient = {} }) => {
+    let seqs = {};
+    let buckets = [];
     let offset = 0;
-    buckets[assembly] = [];
-    labels[assembly] = [];
-    for (let [seq, len] of sortedSeqs[assembly]) {
-      seqOffsets[assembly][seq] = offset;
-      seqIndices[assembly][seq] = buckets[assembly].length;
-      buckets[assembly].push(offset);
-      labels[assembly].push(seq);
-      offset += len;
+    order.forEach((seq, index) => {
+      let length = lengths[asm][seq];
+      let seqOrient = orient[seq] || 1;
+      seqs[seq] = {
+        index,
+        length,
+        orient: seqOrient,
+        offset: seqOrient > 0 ? offset : offset + length,
+      };
+      buckets.push(offset);
+      offset += length;
+    });
+    buckets.push(offset);
+    return { seqs, buckets, labels: order, domain: [0, offset] };
+  };
+
+  const toGlobal = (layout, seq, value) => {
+    let { offset, orient } = layout.seqs[seq];
+    return orient > 0 ? offset + value : offset - value;
+  };
+
+  const alignAssembly = ({ refAsm, refLayout, cmpAsm }) => {
+    let groupScores = {};
+    let refStarts = {};
+    for (let [refSeq, feats] of Object.entries(seqsOf(refAsm))) {
+      for (let { group, start } of feats) {
+        let position = toGlobal(refLayout, refSeq, start);
+        groupScores[group] = position;
+        if (!refStarts[group]) {
+          refStarts[group] = {};
+        }
+        if (!refStarts[group][refSeq]) {
+          refStarts[group][refSeq] = [];
+        }
+        refStarts[group][refSeq].push(position);
+      }
     }
-    buckets[assembly].push(offset);
-    domains[assembly] = [0, offset];
+    let scores = {};
+    let orient = {};
+    for (let cmpSeq of defaultOrder[cmpAsm]) {
+      let seqArray = [];
+      let pairs = {};
+      for (let { group, start } of seqsOf(cmpAsm)[cmpSeq]) {
+        if (groupScores[group] === undefined) {
+          continue;
+        }
+        for (let [refSeq, positions] of Object.entries(refStarts[group])) {
+          if (!pairs[refSeq]) {
+            pairs[refSeq] = [];
+          }
+          for (let position of positions) {
+            pairs[refSeq].push([position, start]);
+          }
+        }
+        seqArray.push(groupScores[group]);
+      }
+      if (seqArray.length > 0) {
+        scores[cmpSeq] = median(seqArray);
+      }
+      orient[cmpSeq] = 1;
+      if (reorient) {
+        let longest = Object.values(pairs).reduce(
+          (a, b) => (b.length > a.length ? b : a),
+          [],
+        );
+        if (longest.length >= 2) {
+          let { m } = linearRegression(longest);
+          if (Number.isFinite(m) && m < 0) {
+            orient[cmpSeq] = -1;
+          }
+        }
+      }
+    }
+    let scored = defaultOrder[cmpAsm]
+      .filter((seq) => scores[seq] !== undefined)
+      .sort((a, b) => scores[a] - scores[b]);
+    let next = 0;
+    let order = defaultOrder[cmpAsm].map((seq) =>
+      scores[seq] === undefined ? seq : scored[next++],
+    );
+    return buildLayout({ asm: cmpAsm, order, orient });
+  };
+
+  let layouts = [buildLayout({ asm: asms[0], order: defaultOrder[asms[0]] })];
+  for (let k = 1; k < asms.length; k++) {
+    let refIndex = alignment == "sequential" ? k - 1 : 0;
+    layouts.push(
+      alignAssembly({
+        refAsm: asms[refIndex],
+        refLayout: layouts[refIndex],
+        cmpAsm: asms[k],
+      }),
+    );
   }
 
-  let groupScores = {};
-  let featArrays = { ref: {}, cmp: {} };
-  for (let [sequence_id] of sortedSeqs[asms[0]]) {
-    for (let feat of byAssembly[asms[0]][sequence_id]) {
-      let { group, start } = feat;
-      groupScores[group] = start + seqOffsets[asms[0]][sequence_id];
-      if (!featArrays.ref[group]) {
-        featArrays.ref[group] = {};
+  let layoutFeatures = layouts.map((layout, k) =>
+    layout.labels.flatMap((seq) =>
+      (seqsOf(asms[k])[seq] || []).map((feat) => ({
+        ...feat,
+        sequence_id: seq,
+      })),
+    ),
+  );
+  let groupIndex = layoutFeatures.map((feats) => {
+    let index = {};
+    for (let feat of feats) {
+      if (!index[feat.group]) {
+        index[feat.group] = [];
       }
-      if (!featArrays.ref[group][sequence_id]) {
-        featArrays.ref[group][sequence_id] = [];
-      }
-      featArrays.ref[group][sequence_id].push(start);
+      index[feat.group].push(feat);
     }
-  }
-  let seqScores = {};
-  let seqOrient = {};
+    return index;
+  });
 
-  for (let [sequence_id] of Object.entries(activeSeqs[asms[1]])) {
-    let seqScore = 0;
-    let seqCount = 0;
-    let seqArray = [];
-    for (let feat of byAssembly[asms[1]][sequence_id]) {
-      let { group, start } = feat;
-      if (!groupScores[group]) {
+  const pointsFor = (layout, feat) => {
+    let a = toGlobal(layout, feat.sequence_id, feat.start);
+    let b = toGlobal(layout, feat.sequence_id, feat.end);
+    return feat.strand > 0 ? { x: a, x2: b } : { x: b, x2: a };
+  };
+
+  const isInIntermediate = (group, i, j) => {
+    for (let k = i + 1; k < j; k++) {
+      if (groupIndex[k][group]) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const linksBetween = (i, j, passThrough) => {
+    let out = [];
+    for (let from of layoutFeatures[i]) {
+      if (passThrough && isInIntermediate(from.group, i, j)) {
         continue;
       }
-      for (let [refSeqId, startArray] of Object.entries(
-        featArrays.ref[group],
-      )) {
-        if (!featArrays.cmp[sequence_id]) {
-          featArrays.cmp[sequence_id] = {};
-        }
-        if (!featArrays.cmp[sequence_id][refSeqId]) {
-          featArrays.cmp[sequence_id][refSeqId] = [];
-        }
-        for (let refStart of featArrays.ref[group][refSeqId]) {
-          featArrays.cmp[sequence_id][refSeqId].push([refStart, start]);
-        }
-      }
-      seqScore += groupScores[group];
-      seqArray.push(groupScores[group]);
-      seqCount++;
-    }
-    try {
-      seqScores[sequence_id] = median([...seqArray]);
-    } catch (e) {
-      seqScores[sequence_id] = seqScore / seqCount;
-    }
-    if (isNaN(seqScores[sequence_id])) {
-      seqScores[sequence_id] = 0;
-    }
-  }
-
-  for (let [sequenceId, obj] of Object.entries(featArrays.cmp)) {
-    let maxArray = [];
-    for (let arr of Object.values(obj)) {
-      if (arr.length > maxArray.length) {
-        maxArray = arr;
+      let a = pointsFor(layouts[i], from);
+      for (let to of groupIndex[j][from.group] || []) {
+        let b = pointsFor(layouts[j], to);
+        out.push({
+          asm1: i,
+          asm2: j,
+          x: a.x,
+          x2: a.x2,
+          y: b.x,
+          y2: b.x2,
+          sequenceId: from.sequence_id,
+          ySequenceId: to.sequence_id,
+          featureId: from.feature_id,
+          yFeatureId: to.feature_id,
+          group: from.group,
+          cat: from.cat,
+          strand: from.strand,
+          yStrand: to.strand,
+          passThrough,
+        });
       }
     }
-    if (reorient) {
-      let eqn = linearRegression(maxArray);
-      seqOrient[sequenceId] = eqn.m >= 0 ? 1 : -1;
-    } else {
-      seqOrient[sequenceId] = 1;
-    }
-  }
+    return out;
+  };
 
-  seqOffsets[asms[1]] = {};
-  seqIndices[asms[1]] = {};
-  let offset = 0;
-  buckets[asms[1]] = [];
-  labels[asms[1]] = [];
-  for (let [seq, score] of Object.entries(seqScores).sort(
-    (a, b) => a[1] - b[1],
-  )) {
-    let offsetCorrection = 0;
-    if (seqOrient[seq] < 0) {
-      offsetCorrection = seqLengths[asms[1]][seq];
-      offset += offsetCorrection;
-    }
-    seqOffsets[asms[1]][seq] = offset;
-    seqIndices[asms[1]][seq] = buckets[asms[1]].length;
-    buckets[asms[1]].push(offset - offsetCorrection);
-    labels[asms[1]].push(seq);
-    if (seqOrient[seq] > 0) {
-      offset += seqLengths[asms[1]][seq];
+  let links = [];
+  for (let k = 0; k + 1 < asms.length; k++) {
+    links = links.concat(linksBetween(k, k + 1, false));
+  }
+  if (passThrough) {
+    for (let i = 0; i < asms.length; i++) {
+      for (let j = i + 2; j < asms.length; j++) {
+        links = links.concat(linksBetween(i, j, true));
+      }
     }
   }
-  buckets[asms[1]].push(offset);
-  domains[asms[1]] = [0, offset];
 
   let rawData = {};
-  let i = 0;
-  allValues = [];
-  allYValues = [];
+  for (let feat of layoutFeatures[0]) {
+    if (!rawData[feat.cat]) {
+      rawData[feat.cat] = [];
+    }
+  }
+  let adjacentLinks = links.filter((link) => link.asm1 == 0 && link.asm2 == 1);
+  for (let link of adjacentLinks) {
+    rawData[link.cat].push(link);
+  }
+
+  let byCat = {};
+  let yValuesByCat = {};
   if (bounds.cats) {
     if (bounds.showOther) {
       bounds.cats.push({ key: "other", label: "other" });
     }
     byCat = bounds.cats
       .map((cat) => cat.key)
-      .reduce((a, b) => ({ ...a, [b]: buckets[asms[0]].map(() => 0) }), {});
+      .reduce((a, b) => ({ ...a, [b]: layouts[0].buckets.map(() => 0) }), {});
     yValuesByCat = bounds.cats
       .map((cat) => cat.key)
       .reduce(
         (a, b) => ({
           ...a,
-          [b]: buckets[asms[0]].map(() => buckets[asms[1]].map(() => 0)),
+          [b]: layouts[0].buckets.map(() => layouts[1].buckets.map(() => 0)),
         }),
         {},
       );
   } else {
-    byCat["all features"] = buckets[asms[0]].map(() => 0);
-    yValuesByCat["all features"] = buckets[asms[0]].map(() =>
-      buckets[asms[1]].map(() => 0),
+    byCat["all features"] = layouts[0].buckets.map(() => 0);
+    yValuesByCat["all features"] = layouts[0].buckets.map(() =>
+      layouts[1].buckets.map(() => 0),
     );
   }
-  for (let [sequence_id, len] of sortedSeqs[asms[0]]) {
-    allValues[i] = byAssembly[asms[0]][sequence_id].flat().length;
-    allYValues[i] = buckets[asms[1]].map(() => 0);
-    for (let feat of byAssembly[asms[0]][sequence_id]) {
-      let {
-        group,
-        start,
-        end,
-        strand,
-        taxon_id,
-        assembly_id,
-        feature_id,
-        cat,
-      } = feat;
-      if (!rawData[cat]) {
-        rawData[cat] = [];
-      }
-      start += seqOffsets[assembly_id][sequence_id];
-      end += seqOffsets[assembly_id][sequence_id];
-      if (byCat[cat]) {
-        byCat[cat][i]++;
-      }
-      for (let [assembly, arr] of Object.entries(groupedData[group])) {
-        for (let partner of arr) {
-          let index = seqIndices[assembly][partner.sequence_id];
-          let pStart, pEnd;
-          if (seqOrient[partner.sequence_id] > 0) {
-            pStart = partner.start + seqOffsets[assembly][partner.sequence_id];
-            pEnd = partner.end + seqOffsets[assembly][partner.sequence_id];
-          } else {
-            pStart = seqOffsets[assembly][partner.sequence_id] - partner.start;
-            pEnd = seqOffsets[assembly][partner.sequence_id] - partner.end;
-          }
-          allYValues[i][index]++;
-          if (yValuesByCat[cat]) {
-            yValuesByCat[cat][i][index]++;
-          }
-          rawData[cat].push({
-            featureId: feature_id,
-            yFeatureId: partner.feature_id,
-            sequenceId: sequence_id,
-            ySequenceId: partner.sequence_id,
-            group,
-            cat,
-            x: strand > 0 ? start : end,
-            x2: strand > 0 ? end : start,
-            y: partner.strand > 0 ? pStart : pEnd,
-            y2: partner.strand > 0 ? pEnd : pStart,
-            strand,
-            yStrand: partner.strand,
-          });
-        }
-      }
+  let allValues = [];
+  let allYValues = [];
+  layouts[0].labels.forEach((seq, i) => {
+    allValues[i] = (seqsOf(asms[0])[seq] || []).length;
+    allYValues[i] = layouts[1].buckets.map(() => 0);
+  });
+  for (let feat of layoutFeatures[0]) {
+    let { index: i } = layouts[0].seqs[feat.sequence_id];
+    if (byCat[feat.cat]) {
+      byCat[feat.cat][i]++;
     }
-    i++;
+  }
+  for (let link of adjacentLinks) {
+    let { index: i } = layouts[0].seqs[link.sequenceId];
+    let { index } = layouts[1].seqs[link.ySequenceId];
+    allYValues[i][index]++;
+    if (yValuesByCat[link.cat]) {
+      yValuesByCat[link.cat][i][index]++;
+    }
   }
   let yArr = allYValues.flat();
   let zDomain = [Math.min(...yArr), Math.max(...yArr)];
@@ -511,13 +529,13 @@ const getOxford = async ({
     scale: "linear",
     stats: {
       count: xRes.results.length, // update this
-      min: domains[asms[0]][0],
-      max: domains[asms[0]][1],
+      min: layouts[0].domain[0],
+      max: layouts[0].domain[1],
     },
     type: "coordinate",
-    labels: labels[asms[0]],
-    domain: domains[asms[0]],
-    tickCount: buckets[asms[0]].length,
+    labels: layouts[0].labels,
+    domain: layouts[0].domain,
+    tickCount: layouts[0].buckets.length,
     by: bounds.by,
     cat: bounds.cat || "none",
     cats: bounds.cats || [{ key: "all features", label: "all features" }],
@@ -527,19 +545,29 @@ const getOxford = async ({
     scale: "linear",
     stats: {
       count: xRes.results.length, // update this
-      min: domains[asms[1]][0],
-      max: domains[asms[1]][1],
+      min: layouts[1].domain[0],
+      max: layouts[1].domain[1],
     },
     type: "coordinate",
-    labels: labels[asms[1]],
-    domain: domains[asms[1]],
-    tickCount: buckets[asms[1]].length,
+    labels: layouts[1].labels,
+    domain: layouts[1].domain,
+    tickCount: layouts[1].buckets.length,
     by: bounds.by,
     cat: bounds.cat,
     cats: bounds.cats,
   };
+  let assemblies = asms.map((asm, k) => ({
+    assembly_id: asm,
+    alignedTo: k == 0 ? null : alignment == "sequential" ? k - 1 : 0,
+    domain: layouts[k].domain,
+    buckets: layouts[k].buckets,
+    labels: layouts[k].labels,
+    orientation: Object.fromEntries(
+      layouts[k].labels.map((seq) => [seq, layouts[k].seqs[seq].orient]),
+    ),
+  }));
   return {
-    buckets: buckets[asms[0]],
+    buckets: layouts[0].buckets,
     allValues,
     byCat,
     rawData,
@@ -548,13 +576,17 @@ const getOxford = async ({
     cats: bounds.cats,
     valueType: "coordinate",
     yValueType: "coordinate",
-    yBuckets: buckets[asms[1]],
-    yOrientation: seqOrient,
+    yBuckets: layouts[1].buckets,
+    yOrientation: assemblies[1].orientation,
     allYValues,
     yValuesByCat,
     zDomain,
     bounds,
     yBounds,
+    alignment,
+    passThrough,
+    assemblies,
+    links,
   };
 };
 
@@ -724,6 +756,9 @@ export const oxford = async ({
         req,
         taxonomy,
         reorient,
+        alignment:
+          apiParams.ribbonAlign == "sequential" ? "sequential" : "reference",
+        passThrough: String(apiParams.ribbonPassThrough) === "true",
       });
   if (oxford && oxford.status && oxford.status.success == false) {
     status = { ...oxford.status };
