@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { PillLabel, pillGeometry } from "./PillLabel";
 import formats, { setInterval } from "#functions/formats";
+import { getFacetGrid, getFacetKeys } from "./scatterFacets";
 import { memo, useEffect, useRef, useState } from "react";
 import stringLength, { maxStringLength } from "#functions/stringLength";
 
@@ -71,6 +72,31 @@ const ZebraBand = (props, { fill, opacity }) => {
       height={Math.abs(bottom - top)}
       fill={fill}
       fillOpacity={opacity}
+      style={{ pointerEvents: "none" }}
+    />
+  );
+};
+
+// Feature extent band from start to end, centred on the point's y.
+const BandShape = (props, { fill, height }) => {
+  let { cy, xAxis, payload } = props;
+  if (
+    !xAxis?.scale ||
+    payload.xStart === undefined ||
+    payload.xEnd === undefined
+  ) {
+    return null;
+  }
+  let left = xAxis.scale(payload.xStart);
+  let right = xAxis.scale(payload.xEnd);
+  return (
+    <rect
+      x={Math.min(left, right)}
+      y={cy - height / 2}
+      width={Math.abs(right - left)}
+      height={height}
+      fill={fill}
+      fillOpacity={0.25}
       style={{ pointerEvents: "none" }}
     />
   );
@@ -347,7 +373,11 @@ const CustomShape = (props, chartProps, handleClick, ctr) => {
       </>
     );
   }
-  if (!ctr[props.name] && chartProps.catSums[props.name].sum > 0) {
+  if (
+    !ctr[props.name] &&
+    chartProps.showLegend !== false &&
+    chartProps.catSums[props.name].sum > 0
+  ) {
     legendGroup = zLegend({
       props,
       chartProps,
@@ -697,21 +727,23 @@ const Heatmap = ({
       range={xDomain}
       ticks={isNaN(buckets[0]) ? buckets.map((x, i) => i) : buckets}
       tick={(props) =>
-        ReportXAxisTick({
-          props: { ...props, fill: axisColor },
-          buckets,
-          fmt: chartProps.xFormat,
-          translations: chartProps.translations,
-          pointSize: chartProps.pointSize,
-          orientation: chartProps.orientation,
-          labels: chartProps.labels,
-          valueType: chartProps.valueType,
-          bounds: chartProps.bounds,
-          maxLabel: chartProps.maxXlabel,
-          showLabels: chartProps.showLabels,
-          marginTop,
-          pillLabels: chartProps.pillLabels,
-        })
+        chartProps.showXAxis === false
+          ? null
+          : ReportXAxisTick({
+              props: { ...props, fill: axisColor },
+              buckets,
+              fmt: chartProps.xFormat,
+              translations: chartProps.translations,
+              pointSize: chartProps.pointSize,
+              orientation: chartProps.orientation,
+              labels: chartProps.labels,
+              valueType: chartProps.valueType,
+              bounds: chartProps.bounds,
+              maxLabel: chartProps.maxXlabel,
+              showLabels: chartProps.showLabels,
+              marginTop,
+              pillLabels: chartProps.pillLabels,
+            })
       }
       tickFormatter={chartProps.showXTickLabels ? chartProps.xFormat : () => ""}
       interval={0}
@@ -719,17 +751,19 @@ const Heatmap = ({
       axisLine={{ stroke: axisColor }}
       tickLine={{ stroke: axisColor }}
     >
-      <Label
-        value={xLabel}
-        offset={marginHeight - chartProps.pointSize}
-        dy={0}
-        position="bottom"
-        dominantBaseline={"text-after-edge"}
-        fill={axisColor}
-        fontSize={chartProps.pointSize}
-        fontWeight="bold"
-        pointerEvents={"none"}
-      />
+      {chartProps.showXTitle !== false && (
+        <Label
+          value={xLabel}
+          offset={marginHeight - chartProps.pointSize}
+          dy={0}
+          position="bottom"
+          dominantBaseline={"text-after-edge"}
+          fill={axisColor}
+          fontSize={chartProps.pointSize}
+          fontWeight="bold"
+          pointerEvents={"none"}
+        />
+      )}
     </XAxis>,
     <YAxis
       type="number"
@@ -738,23 +772,25 @@ const Heatmap = ({
       scale={axisScales[yScale]()}
       ticks={isNaN(yBuckets[0]) ? yBuckets.map((y, i) => i) : yBuckets}
       tick={(props) =>
-        CustomizedYAxisTick({
-          props: { ...props, fill: axisColor },
-          buckets: yBuckets,
-          orientation: yOrientation,
-          fmt: chartProps.yFormat,
-          translations: chartProps.yTranslations,
-          pointSize: chartProps.pointSize,
-          yLabels: chartProps.yLabels,
-          valueType: chartProps.yValueType,
-          bounds: chartProps.yBounds,
-          maxLabel: chartProps.maxYLabel,
-          showLabels: chartProps.showLabels,
-          plotWidth: width,
-          marginWidth,
-          marginRight,
-          pillLabels: chartProps.pillLabels,
-        })
+        chartProps.showYAxis === false
+          ? null
+          : CustomizedYAxisTick({
+              props: { ...props, fill: axisColor },
+              buckets: yBuckets,
+              orientation: yOrientation,
+              fmt: chartProps.yFormat,
+              translations: chartProps.yTranslations,
+              pointSize: chartProps.pointSize,
+              yLabels: chartProps.yLabels,
+              valueType: chartProps.yValueType,
+              bounds: chartProps.yBounds,
+              maxLabel: chartProps.maxYLabel,
+              showLabels: chartProps.showLabels,
+              plotWidth: width,
+              marginWidth,
+              marginRight,
+              pillLabels: chartProps.pillLabels,
+            })
       }
       domain={yDomain}
       range={yDomain}
@@ -763,17 +799,19 @@ const Heatmap = ({
       axisLine={{ stroke: axisColor }}
       tickLine={{ stroke: axisColor }}
     >
-      <Label
-        value={yLabel}
-        offset={marginWidth + 60 - chartProps.pointSize}
-        position="insideRight"
-        fill={axisColor}
-        angle={-90}
-        style={{ textAnchor: "middle" }}
-        fontSize={chartProps.pointSize}
-        fontWeight="bold"
-        pointerEvents={"none"}
-      />
+      {chartProps.showYTitle !== false && (
+        <Label
+          value={yLabel}
+          offset={marginWidth + 60 - chartProps.pointSize}
+          position="insideRight"
+          fill={axisColor}
+          angle={-90}
+          style={{ textAnchor: "middle" }}
+          fontSize={chartProps.pointSize}
+          fontWeight="bold"
+          pointerEvents={"none"}
+        />
+      )}
     </YAxis>,
     <YAxis
       type="number"
@@ -899,6 +937,31 @@ const Heatmap = ({
         />
       )}
       {pointData &&
+        pointData.map((points, i) => {
+          let bands = (points || []).filter(
+            (p) => p.xStart !== undefined && p.xEnd !== undefined,
+          );
+          if (bands.length == 0) {
+            return null;
+          }
+          return (
+            <Scatter
+              name={`${cats[i]}_bands`}
+              legendType="none"
+              key={`bands${i}`}
+              data={bands}
+              shape={(props) =>
+                BandShape(props, {
+                  fill: fillColors[i] || "rgb(102, 102, 102)",
+                  height: chartProps.pointSize * chartProps.pointRatio,
+                })
+              }
+              isAnimationActive={false}
+              pointerEvents={"none"}
+            />
+          );
+        })}
+      {pointData &&
         orderedCats.map((cat, j) => {
           let i = reversed
             ? orderedCats.length - catOrder[cat] - 1
@@ -1023,6 +1086,7 @@ const ReportScatter = ({
   highlightArea,
   basename,
   pointSize = 15,
+  facetLayout = "single",
 }) => {
   pointSize *= 1;
   const navigate = useNavigate();
@@ -1072,7 +1136,6 @@ const ReportScatter = ({
   let locations = {};
   if (scatter && scatter.status) {
     let scatterReport = scatter.report.scatter || scatter.report.oxford;
-    let chart;
     let {
       bounds,
       yBounds,
@@ -1166,137 +1229,251 @@ const ReportScatter = ({
 
     let labels = bounds.labels || heatmaps.buckets;
     let yLabels = yBounds.labels || heatmaps.yBuckets;
-    let showLabels = plotWidth >= compactWidth;
-    const maxYLabel = showLabels
-      ? maxStringLength(yLabels, yFormat, pointSize)
-      : 0;
-    // Oxford pill labels: each axis only reserves the pill size, not the text length.
-    // Pill size is capped at 10% of the smaller plot side so large pointSize cannot swamp the plot.
-    const pillSize =
-      plotHeight > 0
-        ? Math.min(
+    const renderChart = ({
+      plotWidth,
+      plotHeight,
+      panelPoints,
+      showLegend,
+      showXAxis = true,
+      showYAxis = true,
+      showXTitle = true,
+      showYTitle = true,
+    }) => {
+      let showLabels = plotWidth >= compactWidth;
+      const maxYLabel = showLabels
+        ? maxStringLength(yLabels, yFormat, pointSize)
+        : 0;
+      // Oxford pill labels: each axis only reserves the pill size, not the text length.
+      // Pill size is capped at 10% of the smaller plot side so large pointSize cannot swamp the plot.
+      const pillSize =
+        plotHeight > 0
+          ? Math.min(
+              pointSize,
+              Math.max(4, Math.min(plotWidth, plotHeight) * 0.1),
+            )
+          : pointSize;
+      const pillLabels =
+        scatter.report.oxford && OXFORD_STYLE.pillLabels && showLabels
+          ? pillGeometry(pillSize)
+          : false;
+      let marginWidth = pillLabels
+        ? pillLabels.margin
+        : showLabels
+          ? maxYLabel + pointSize > 40
+            ? maxYLabel + pointSize - 40
+            : 0
+          : pointSize - 35;
+      if (!showYAxis) {
+        marginWidth = pointSize * 0.5;
+      }
+      const maxXLabel = showLabels
+        ? maxStringLength(labels, xFormat, pointSize)
+        : 0;
+      let marginHeight = pillLabels
+        ? pillLabels.margin + pointSize
+        : showLabels
+          ? 2 * pointSize
+          : pointSize - 15;
+      const marginRight =
+        showXAxis && showLabels
+          ? (stringLength(xFormat(endLabel)) * pointSize) / 2
+          : 0;
+      let orientation = 0;
+      if (
+        !pillLabels &&
+        maxXLabel >
+          (plotWidth - marginWidth - marginRight) / heatmaps.buckets.length
+      ) {
+        orientation = -90;
+        marginHeight =
+          maxXLabel + pointSize > 20 ? maxXLabel + pointSize - 20 : 0;
+      }
+      if (!showXAxis) {
+        marginHeight = pointSize * 0.5;
+      }
+      const catMax = Object.values(catSums).reduce(
+        (a, b) => (b == Infinity ? 0 : Math.max(a, b.max)),
+        0,
+      );
+      return (
+        <Heatmap
+          data={chartData}
+          pointData={panelPoints}
+          width={plotWidth}
+          height={plotHeight}
+          marginWidth={marginWidth}
+          marginHeight={marginHeight}
+          marginRight={marginRight}
+          buckets={heatmaps.buckets}
+          yBuckets={heatmaps.yBuckets}
+          yOrientation={heatmaps.yOrientation}
+          labels={labels}
+          yLabels={yLabels}
+          cats={cats}
+          xLabel={xLabel}
+          yLabel={yLabel}
+          endLabel={endLabel}
+          lastIndex={lastIndex}
+          highlight={highlight}
+          highlightArea={highlightArea}
+          colors={colors}
+          reversed={reversed}
+          legendRows={showLegend ? legendRows : 0}
+          chartProps={{
+            zDomain: heatmaps.zDomain,
+            yLength: heatmaps.yBuckets.length - 1,
+            xLength: heatmaps.buckets.length - 1,
+            n: cats.length,
+            zScale: zScale,
+            report,
+            catSums,
+            catMax,
             pointSize,
-            Math.max(4, Math.min(plotWidth, plotHeight) * 0.1),
-          )
-        : pointSize;
-    const pillLabels =
-      scatter.report.oxford && OXFORD_STYLE.pillLabels && showLabels
-        ? pillGeometry(pillSize)
-        : false;
-    const marginWidth = pillLabels
-      ? pillLabels.margin
-      : showLabels
-        ? maxYLabel + pointSize > 40
-          ? maxYLabel + pointSize - 40
-          : 0
-        : pointSize - 35;
-    const maxXLabel = showLabels
-      ? maxStringLength(labels, xFormat, pointSize)
-      : 0;
-    let marginHeight = pillLabels
-      ? pillLabels.margin + pointSize
-      : showLabels
-        ? 2 * pointSize
-        : pointSize - 15;
-    const marginRight = showLabels
-      ? (stringLength(xFormat(endLabel)) * pointSize) / 2
-      : 0;
-    let orientation = 0;
-    if (
-      !pillLabels &&
-      maxXLabel >
-        (plotWidth - marginWidth - marginRight) / heatmaps.buckets.length
-    ) {
-      orientation = -90;
-      marginHeight =
-        maxXLabel + pointSize > 20 ? maxXLabel + pointSize - 20 : 0;
+            pointRatio: scatter.report.oxford ? 0.5 : 1,
+            isOxford: !!scatter.report.oxford,
+            groupBy,
+            selectMode: reportSelect,
+            xQuery: scatter.report.xQuery,
+            yQuery: scatter.report.yQuery,
+            maxYLabel,
+            maxXLabel,
+            pillLabels,
+            xLabel: scatter.report.xLabel,
+            yLabel: scatter.report.yLabel,
+            showXTickLabels: xOptions[2] ? xOptions[2] >= 0 : true,
+            showYTickLabels: yOptions[2] ? yOptions[2] >= 0 : true,
+            xFormat,
+            yFormat,
+            orientation,
+            fields: heatmaps.fields,
+            ranks: heatmaps.ranks,
+            bounds,
+            yBounds,
+            translations,
+            yTranslations,
+            catTranslations,
+            catOffsets,
+            colorScheme: colorScheme[theme],
+            buckets: heatmaps.buckets,
+            yBuckets: heatmaps.yBuckets,
+            labels,
+            yLabels,
+            showLabels,
+            valueType,
+            yValueType,
+            summary,
+            ySummary,
+            stacked,
+            hasRawData,
+            embedded,
+            navigate,
+            location,
+            basename,
+            compactLegend,
+            axisColor: colorScheme[theme].darkColor,
+            showLegend,
+            showXAxis,
+            showYAxis,
+            showXTitle,
+            showYTitle,
+          }}
+        />
+      );
+    };
+
+    const facetKeys = getFacetKeys(pointData);
+    const facetGrid = getFacetGrid(facetLayout, facetKeys.length);
+    if (!facetGrid) {
+      return (
+        <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
+          {renderChart({
+            plotWidth,
+            plotHeight,
+            panelPoints: pointData,
+            showLegend: true,
+          })}
+        </Grid>
+      );
     }
-    const catMax = Object.values(catSums).reduce(
-      (a, b) => (b == Infinity ? 0 : Math.max(a, b.max)),
+    const { cols, rows } = facetGrid;
+    const count = facetKeys.length;
+    const isRow = facetLayout == "row";
+    const titleWidth = pointSize * 1.5;
+    const titleHeight = pointSize * 1.1;
+    const chartWidth = isRow ? plotWidth - titleWidth : plotWidth / cols;
+    const chartHeight = Math.max(
+      plotHeight / rows - (isRow ? 0 : titleHeight),
       0,
-    );
-    chart = (
-      <Heatmap
-        data={chartData}
-        pointData={1 ? pointData : []}
-        width={plotWidth}
-        height={plotHeight}
-        marginWidth={marginWidth}
-        marginHeight={marginHeight}
-        marginRight={marginRight}
-        buckets={heatmaps.buckets}
-        yBuckets={heatmaps.yBuckets}
-        yOrientation={heatmaps.yOrientation}
-        labels={labels}
-        yLabels={yLabels}
-        cats={cats}
-        xLabel={xLabel}
-        yLabel={yLabel}
-        endLabel={endLabel}
-        lastIndex={lastIndex}
-        highlight={highlight}
-        highlightArea={highlightArea}
-        colors={colors}
-        reversed={reversed}
-        legendRows={legendRows}
-        chartProps={{
-          zDomain: heatmaps.zDomain,
-          yLength: heatmaps.yBuckets.length - 1,
-          xLength: heatmaps.buckets.length - 1,
-          n: cats.length,
-          zScale: zScale,
-          report,
-          catSums,
-          catMax,
-          pointSize,
-          pointRatio: scatter.report.oxford ? 0.5 : 1,
-          isOxford: !!scatter.report.oxford,
-          groupBy,
-          selectMode: reportSelect,
-          xQuery: scatter.report.xQuery,
-          yQuery: scatter.report.yQuery,
-          maxYLabel,
-          maxXLabel,
-          pillLabels,
-          xLabel: scatter.report.xLabel,
-          yLabel: scatter.report.yLabel,
-          showXTickLabels: xOptions[2] ? xOptions[2] >= 0 : true,
-          showYTickLabels: yOptions[2] ? yOptions[2] >= 0 : true,
-          xFormat,
-          yFormat,
-          orientation,
-          fields: heatmaps.fields,
-          ranks: heatmaps.ranks,
-          bounds,
-          yBounds,
-          translations,
-          yTranslations,
-          catTranslations,
-          catOffsets,
-          colorScheme: colorScheme[theme],
-          buckets: heatmaps.buckets,
-          yBuckets: heatmaps.yBuckets,
-          labels,
-          yLabels,
-          showLabels,
-          valueType,
-          yValueType,
-          summary,
-          ySummary,
-          stacked,
-          hasRawData,
-          embedded,
-          navigate,
-          location,
-          basename,
-          compactLegend,
-          axisColor: colorScheme[theme].darkColor,
-        }}
-      />
     );
     return (
       <Grid ref={componentRef} style={{ height: "100%" }} size="grow">
-        {chart}
+        <div style={{ display: "flex", flexWrap: "wrap", width: plotWidth }}>
+          {facetKeys.map((key, k) => {
+            const chart = renderChart({
+              plotWidth: chartWidth,
+              plotHeight: chartHeight,
+              panelPoints: pointData.map((points) =>
+                (points || []).filter((p) => String(p.facet) == key),
+              ),
+              showLegend: k == 0,
+              showXAxis: k + cols >= count,
+              showYAxis: k % cols == 0,
+              showXTitle: k == count - 1,
+              showYTitle: k == 0,
+            });
+            if (isRow) {
+              return (
+                <div
+                  key={key}
+                  style={{
+                    display: "flex",
+                    width: plotWidth,
+                    height: chartHeight,
+                  }}
+                >
+                  <div
+                    style={{
+                      flex: "0 0 auto",
+                      width: titleWidth,
+                      minWidth: titleWidth,
+                      maxWidth: titleWidth,
+                      fontSize: pointSize * 0.8,
+                      writingMode: "vertical-rl",
+                      transform: "rotate(180deg)",
+                      textAlign: "center",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {key}
+                  </div>
+                  <div style={{ flex: "0 0 auto", width: chartWidth }}>
+                    {chart}
+                  </div>
+                </div>
+              );
+            }
+            return (
+              <div key={key} style={{ width: chartWidth }}>
+                <div
+                  style={{
+                    fontSize: pointSize * 0.8,
+                    height: titleHeight,
+                    lineHeight: `${titleHeight}px`,
+                    textAlign: "center",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {key}
+                </div>
+                {chart}
+              </div>
+            );
+          })}
+        </div>
       </Grid>
     );
   } else {

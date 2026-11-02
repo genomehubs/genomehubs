@@ -99,6 +99,9 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     compactWidth: { in: new Set(["histogram", "oxford", "ribbon", "scatter"]) },
     highlightArea: { in: new Set(["scatter"]), ui: true },
     scatterThreshold: { in: new Set(["scatter"]) },
+    facet: { in: new Set(["scatter"]) },
+    facetField: { in: new Set(["scatter"]) },
+    facetLayout: { in: new Set(["scatter"]), ui: true },
     treeStyle: { in: new Set(["tree"]), ui: true },
     plotRatio: { in: new Set(["oxford", "ribbon", "scatter"]), ui: true },
     yScale: { in: new Set(["histogram"]), ui: true },
@@ -371,6 +374,18 @@ const processScatter = (scatter, result) => {
   if (hasRawData) {
     pointData = [];
   }
+  const bandExtent = (obj) => {
+    if (
+      scatter.bounds.scale == "ordinal" ||
+      obj.start === undefined ||
+      obj.end === undefined
+    ) {
+      return {};
+    }
+    let xStart = xScale(Number(obj.start));
+    let xEnd = xScale(Number(obj.end));
+    return isNaN(xStart) || isNaN(xEnd) ? {} : { xStart, xEnd };
+  };
   if (heatmaps.byCat) {
     catSums = {};
     cats = scatter.cats.map((cat) => cat.label);
@@ -487,7 +502,7 @@ const processScatter = (scatter, result) => {
               };
             }
 
-            points.push({ ...obj, x, y, rawX, rawY });
+            points.push({ ...obj, x, y, rawX, rawY, ...bandExtent(obj) });
           }
         }
         pointData.push(points);
@@ -594,7 +609,7 @@ const processScatter = (scatter, result) => {
           };
         }
 
-        points.push({ ...obj, x, y });
+        points.push({ ...obj, x, y, ...bandExtent(obj) });
       }
       pointData.push(points);
     }

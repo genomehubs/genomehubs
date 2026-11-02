@@ -154,6 +154,9 @@ export const queryPropList = {
     "compactWidth",
     "result",
     "reversed",
+    "facet",
+    "facetField",
+    "facetLayout",
     "taxonomy",
   ],
   table: [
@@ -245,6 +248,7 @@ const selectOptions = {
   mapProjection: ["mercator", "cylindricalEqualArea"],
   mapTheme: ["day", "night"],
   plotRatio: ["auto", 1, 1.5, 2],
+  facetLayout: ["single", "row", "column", "grid"],
   ribbonAlign: ["reference", "sequential"],
   treeStyle: ["rect", "ring"],
 };
@@ -255,6 +259,7 @@ const helpText = {
   mapProjection: `Map projection to use (mercator or cylindricalEqualArea)`,
   mapTheme: `Map theme to use (day or night)`,
   plotRatio: `Aspect ratio for plots (auto = auto-sized, 1 = square, 1.5 = wide, 2 = very wide)`,
+  facetLayout: `Panel layout when facet is on (single = one plot, row = one facet per row, column = one facet per column, grid = wrapped grid)`,
   ribbonAlign: `Row order for multi-assembly ribbons (reference = order set by the first assembly, sequential = each assembly ordered by the previous one)`,
   treeStyle: `Tree style to display (rect = rectangular, ring = circular)`,
   phylopicRank: `Taxonomic rank to display PhyloPics (e.g. species, genus, family, order, phylum, kingdom, etc. - empty = tip nodes)`,
@@ -360,6 +365,9 @@ export const ReportEdit = ({
   }
   if (query.report == "scatter" && !query.plotRatio) {
     query.plotRatio = "auto";
+  }
+  if (query.report == "scatter" && !query.facetLayout) {
+    query.facetLayout = "single";
   }
   let { result } = query;
 
@@ -673,6 +681,7 @@ export const ReportEdit = ({
       queryProp == "stacked" ||
       queryProp == "cumulative" ||
       queryProp == "reversed" ||
+      queryProp == "facet" ||
       queryProp == "collapseMonotypic" ||
       queryProp == "hideSourceColors" ||
       queryProp == "hideErrorBars" ||

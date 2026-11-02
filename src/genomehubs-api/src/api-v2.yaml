@@ -868,6 +868,41 @@ components:
         minimum: -1
         type: integer
       style: form
+    facetParam:
+      description: |
+        Split scatter points into facets by `facetField`.
+
+        Default `false`. For `result=feature`, each point also returns its `start` and `end`, and `facetField` defaults to `sequence_id`.
+
+        This parameter only applies to reports with `report=scatter` that return points (see `scatterThreshold`).
+      examples:
+        false:
+          value: false
+          summary: false - do not facet points
+        true:
+          value: true
+          summary: true - facet points by `facetField`
+      in: query
+      name: facet
+      required: false
+      schema:
+        type: boolean
+      style: form
+    facetFieldParam:
+      description: |
+        Field used to group points into facets when `facet=true`.
+
+        Defaults to `sequence_id` for `result=feature`. Required for other results.
+      examples:
+        sequence_id:
+          value: sequence_id
+          summary: Facet feature points by sequence
+      in: query
+      name: facetField
+      required: false
+      schema:
+        type: string
+      style: form
     searchRawValuesParam:
       description: |
         Flag to indicate whether search filters should be applied to raw values.
@@ -1598,7 +1633,7 @@ paths:
         | **Map**       | `x`               | `cat`, `rank`          |
         | **Oxford**    | `x`               | `cat`, `xOpts`, `yOpts`, `reorient` |
         | **Ribbon**    | `x`               | `cat`, `xOpts`, `reorient`, `ribbonAlign`, `ribbonPassThrough` |
-        | **Scatter**   | `x`, `y`, `rank`  | `cat`, `xOpts`, `yOpts`, `scatterThreshold` |
+        | **Scatter**   | `x`, `y`, `rank`  | `cat`, `xOpts`, `yOpts`, `scatterThreshold`, `facet`, `facetField` |
         | **Table**     | `x`, `y`          | `cat`, `rank`, `xOpts`, `yOpts`, `scatterThreshold` |
         | **Sources**   | -                 | -              |
         | **Tree**      | `x`               | `y`, `cat`, `xOpts`, `yOpts`, `collapseMonotypic`, `treeThreshold` |
@@ -1639,6 +1674,8 @@ paths:
         - $ref: "#/components/parameters/mapThresholdParam"
         - $ref: "#/components/parameters/regionFieldParam"
         - $ref: "#/components/parameters/scatterThresholdParam"
+        - $ref: "#/components/parameters/facetParam"
+        - $ref: "#/components/parameters/facetFieldParam"
         - $ref: "#/components/parameters/treeThresholdParam"
         - $ref: "#/components/parameters/queryIdParam"
         - $ref: "#/components/parameters/releaseParam"

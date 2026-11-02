@@ -248,6 +248,20 @@ const fetchHistogramResults = async ({ params, raw, pointFields }) => {
   return { ...pointRes, status: aggRes.status, aggs: aggRes.aggs };
 };
 
+// Feature points also carry their facet and extent so facets and bands can be drawn client side
+const getPointFacetFields = ({ facetField, result, lookupTypes }) => {
+  let names = {};
+  if (!facetField) {
+    return names;
+  }
+  names.facet = lookupTypes(facetField)?.name;
+  if (result == "feature") {
+    names.start = lookupTypes("start")?.name;
+    names.end = lookupTypes("end")?.name;
+  }
+  return Object.fromEntries(Object.entries(names).filter(([, name]) => name));
+};
+
 const getHistogram = async ({
   params,
   cat,
@@ -263,6 +277,7 @@ const getHistogram = async ({
   catBounds,
   raw,
   taxonomy,
+  facetField,
 }) => {
   let { lookupTypes } = await attrTypes({ result, taxonomy });
   params.size = raw;
@@ -307,11 +322,17 @@ const getHistogram = async ({
   });
 
   let catMeta = lookupTypes((cat || "").replace(/[\+\[=].*/, ""));
+  // extra point fields are only fetched when points are drawn
+  const pointFacetFields =
+    raw && yFields?.length
+      ? getPointFacetFields({ facetField, result, lookupTypes })
+      : {};
+  const facetFieldNames = Object.values(pointFacetFields);
   let res = await fetchHistogramResults({
     params: {
       ...params,
       taxonomy,
-      fields,
+      fields: [...new Set([...fields, ...facetFieldNames])],
       exclusions,
       ...(raw && cat && !catMeta && { ranks: cat.replace(/[\+\[=].*/, "") }),
     },
@@ -321,6 +342,7 @@ const getHistogram = async ({
         fields[0],
         ...(yFields || []),
         ...(bounds.cat && bounds.by == "attribute" ? [bounds.cat] : []),
+        ...facetFieldNames,
       ]),
     ],
   });
@@ -376,6 +398,11 @@ const getHistogram = async ({
         (yBounds.stats.cats || []).map((obj) => obj.key.toLowerCase()),
       );
       for (let result of res.results) {
+        const facetValues = {};
+        for (let [key, name] of Object.entries(pointFacetFields)) {
+          const value = result.result.fields[name]?.value;
+          facetValues[key] = Array.isArray(value) ? value[0] : value;
+        }
         let cats;
         if (bounds.cat) {
           if (bounds.by == "attribute") {
@@ -438,6 +465,7 @@ const getHistogram = async ({
               ...(result.result.taxon_id && {
                 taxonId: result.result.taxon_id,
               }),
+              ...facetValues,
               x,
               y,
               cat,
@@ -840,6 +868,19 @@ export const histogram = async ({
   apiParams,
 }) => {
   scatterThreshold = parseInt(scatterThreshold, 10);
+  // facet splits points by a field; feature reports default to their sequence
+  const facetOn = String(apiParams.facet) === "true";
+  const facetField = facetOn
+    ? apiParams.facetField || (result == "feature" ? "sequence_id" : undefined)
+    : undefined;
+  if (facetOn && !facetField) {
+    return {
+      status: {
+        success: false,
+        error: `facetField is required when facet=true for result ${result}`,
+      },
+    };
+  }
   if (result == "taxon" && !rank) {
     return {
       status: {
@@ -1098,6 +1139,7 @@ export const histogram = async ({
       bounds,
       yFields,
       yBounds,
+      facetField,
       ySummaries,
       catBounds: nullCatBounds,
       taxonomy,
