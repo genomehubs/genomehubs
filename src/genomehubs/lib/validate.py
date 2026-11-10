@@ -78,7 +78,7 @@ def validate_types_file(types_file, dir_path, es, types_name, opts, *, attribute
                 defaults["attributes"].update({key: value})
                 defaults["metadata"].update({key: value})
         types.update({"defaults": defaults})
-        if "name" in types["file"]:
+        if "name" in types["file"] and not opts.get("pre-validated", False):
             names = process_names_file(
                 types, Path(dir_path) / "names" / types["file"]["name"]
             )

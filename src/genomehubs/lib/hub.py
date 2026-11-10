@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Hub functions."""
 
-
 import contextlib
 import csv
 import json
@@ -504,7 +503,9 @@ def calculator(value, operation, row_values, shared_values, template_type):
     return operation if template_type == "template" else calculate(operation)
 
 
-def validate_values(values, key, types, row_values, shared_values, blanks):
+def validate_values(
+    values, key, types, row_values, shared_values, blanks, *, pre_validated=False
+):
     """Validate values."""
     validated = []
     if isinstance(types[key], str) or "type" not in types[key]:
@@ -512,6 +513,14 @@ def validate_values(values, key, types, row_values, shared_values, blanks):
     key_type = types[key]["type"]
     for value in values:
         if value in blanks:
+            continue
+        if pre_validated:
+            # Values were already translated, computed and constrained upstream.
+            raw_value = value
+            value = convert_to_type(key, raw_value, key_type)
+            if value is None:
+                raise ValueError(f"{key} value {raw_value} is not a valid {key_type}")
+            validated.extend(value if isinstance(value, list) else [value])
             continue
         if "function" in types[key] or "template" in types[key]:
             if re.match(r"^\d+\.\d+e[\+-]\d+$", value):
@@ -635,6 +644,7 @@ def add_attributes(
     shared_values=None,
     row_values=None,
     blanks=None,
+    pre_validated=False,
 ):
     """Add attributes to a document."""
     (
@@ -674,7 +684,13 @@ def add_attributes(
                 validated = values
             else:
                 validated = validate_values(
-                    values, key, types, row_values, shared_values, blanks
+                    values,
+                    key,
+                    types,
+                    row_values,
+                    shared_values,
+                    blanks,
+                    pre_validated=pre_validated,
                 )
             # TODO: handle invalid values
             if validated:
@@ -961,7 +977,15 @@ def contains_excluded_value(data, exclusions):
 
 
 def process_row(
-    types, names, row, shared_values, blanks, *, index_type="assembly", exclusions=None
+    types,
+    names,
+    row,
+    shared_values,
+    blanks,
+    *,
+    index_type="assembly",
+    exclusions=None,
+    pre_validated=False,
 ):
     """Process a row of data."""
     data = {
@@ -1012,6 +1036,7 @@ def process_row(
                 shared_values=shared_values,
                 row_values=row_values,
                 blanks=blanks,
+                pre_validated=pre_validated,
             )
         else:
             data[attr_type] = []

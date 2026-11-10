@@ -1,0 +1,72 @@
+6820	|	72041	|	superorder	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+29979	|	6820	|	order	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+96841	|	29979	|	clade	|		|	1	|	1	|	1	|	1	|	5	|	1	|	1	|	0	|		|
+142082	|	96841	|	family	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+155684	|	142082	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+2925007	|	155684	|	species	|	AF	|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant; specified	|
+41116	|	29979	|	suborder	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+526418	|	41116	|	no rank	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|		|
+37810	|	526418	|	family	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+13346	|	37810	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+13347	|	13346	|	species	|	AV	|	1	|	1	|	1	|	1	|	5	|	1	|	1	|	0	|	code compliant; specified	|
+63226	|	29979	|	suborder	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+525154	|	63226	|	superfamily	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+63227	|	525154	|	family	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+92524	|	63227	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+92525	|	92524	|	species	|	AA	|	1	|	1	|	1	|	1	|	5	|	1	|	1	|	0	|	code compliant; specified	|
+96838	|	96841	|	family	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+192961	|	96838	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+1955234	|	192961	|	species	|	BJ	|	1	|	1	|	1	|	1	|	5	|	1	|	1	|	0	|	code compliant; specified	|
+432123	|	142082	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+2922061	|	432123	|	species	|	CS	|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant; specified	|
+96842	|	29979	|	suborder	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+116690	|	96842	|	superfamily	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+2976922	|	116690	|	family	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+2976923	|	2976922	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+2976924	|	2976923	|	species	|	HB	|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant; specified	|
+525156	|	63226	|	superfamily	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+96849	|	525156	|	family	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+96850	|	96849	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+96851	|	96850	|	species	|	JA	|	1	|	1	|	1	|	1	|	5	|	1	|	1	|	0	|	code compliant; specified	|
+2067965	|	96850	|	species	|	JI	|	1	|	1	|	1	|	1	|	5	|	1	|	1	|	0	|	code compliant; specified	|
+2613951	|	96850	|	species	|	JP	|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant; specified	|
+96822	|	96841	|	family	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+96874	|	96822	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+96875	|	96874	|	species	|	SS	|	1	|	1	|	1	|	1	|	5	|	1	|	1	|	0	|	code compliant; specified	|
+6821	|	6820	|	order	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+1732196	|	6821	|	suborder	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+1732204	|	1732196	|	infraorder	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+1732304	|	1732204	|	parvorder	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+44329	|	1732304	|	superfamily	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+36939	|	44329	|	family	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+45625	|	36939	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+462846	|	45625	|	species	|	GN	|	1	|	1	|	1	|	1	|	5	|	1	|	1	|	0	|	code compliant; specified	|
+1732206	|	1732196	|	infraorder	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+199476	|	1732206	|	superfamily	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+92169	|	199476	|	family	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+2895738	|	92169	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+2895740	|	2895738	|	species	|	MA	|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant; specified	|
+1732303	|	1732204	|	parvorder	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+354335	|	1732303	|	superfamily	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+111559	|	354335	|	family	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+111560	|	111559	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+2707950	|	111560	|	species	|	NG	|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant; specified	|
+75402	|	6820	|	order	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+116660	|	75402	|	family	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+203898	|	116660	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+203899	|	203898	|	species	|	TS	|	1	|	1	|	1	|	1	|	5	|	1	|	1	|	0	|	code compliant; specified	|
+2810139	|	192961	|	species	|	BD	|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant; specified	|
+96852	|	96849	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+155701	|	96852	|	species	|	JM	|	1	|	1	|	1	|	1	|	5	|	1	|	1	|	0	|	code compliant; specified	|
+3092608	|	96838	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+3092609	|	3092608	|	species	|	PT	|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant; specified	|
+324909	|	96838	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+324910	|	324909	|	species	|	SV	|	1	|	1	|	1	|	1	|	5	|	1	|	1	|	0	|	code compliant; specified	|
+525158	|	525154	|	family	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+157067	|	525158	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+2622886	|	157067	|	no rank	|		|	1	|	1	|	1	|	1	|	5	|	1	|	1	|	0	|		|
+3076376	|	2622886	|	species	|	SS	|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|		|
+526417	|	41116	|	no rank	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|		|
+33328	|	526417	|	family	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+33329	|	33328	|	genus	|		|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant	|
+3102972	|	33329	|	species	|	TM	|	1	|	1	|	1	|	1	|	5	|	1	|	0	|	0	|	code compliant; specified	|

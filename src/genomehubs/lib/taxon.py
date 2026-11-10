@@ -2,7 +2,6 @@
 
 """Taxon methods."""
 
-
 import contextlib
 import sys
 from collections import defaultdict
@@ -1047,5 +1046,4 @@ def create_taxa(
         chunk_size=opts.get("es-batch", 500),
     )
     # return a list of alt_taxon_ids for the created taxa
-    return new_taxa.keys()
     return new_taxa.keys()

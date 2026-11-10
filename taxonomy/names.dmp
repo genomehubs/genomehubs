@@ -1,0 +1,143 @@
+6820	|	Peracarida	|		|	scientific name	|
+29979	|	Isopoda	|		|	scientific name	|
+29979	|	isopods	|	isopods <blast name>	|	blast name	|
+29979	|	isopods	|	isopods <common name>	|	common name	|
+29979	|	pill bugs, wood lice and sea slaters	|		|	genbank common name	|
+96841	|	Flabellifera group	|		|	equivalent name	|
+96841	|	Flabellifera	|		|	scientific name	|
+142082	|	Cymothoidae	|		|	scientific name	|
+155684	|	Anilocra	|		|	scientific name	|
+2925007	|	Anilocra frontalis Milne Edwards, 1840	|		|	authority	|
+2925007	|	Anilocra frontalis	|		|	scientific name	|
+2925007	|	qmAniFron	|	tolid:qmAniFron	|	tolid prefix	|
+41116	|	Oniscidea	|		|	scientific name	|
+41116	|	pillbugs	|		|	genbank common name	|
+41116	|	sowbugs	|		|	common name	|
+41116	|	woodlice	|		|	common name	|
+526418	|	Crinocheta	|		|	scientific name	|
+37810	|	Armadillidiidae	|		|	scientific name	|
+13346	|	Armadillidium	|		|	scientific name	|
+13347	|	Armadillidium vulgare (Latreille, 1804)	|		|	authority	|
+13347	|	Armadillidium vulgare	|		|	scientific name	|
+13347	|	Armadillo vulgaris Latreille, 1804	|		|	authority	|
+13347	|	Armadillo vulgaris	|		|	synonym	|
+13347	|	common pillbug	|		|	genbank common name	|
+13347	|	qmArmVulg	|	tolid:qmArmVulg	|	tolid prefix	|
+13347	|	common pillbug	|	tolid:common pillbug	|	common name	|
+63226	|	Asellota	|		|	scientific name	|
+525154	|	Aselloidea	|		|	scientific name	|
+63227	|	Asellidae	|		|	scientific name	|
+92524	|	Asellus	|		|	scientific name	|
+92525	|	Asellus aquaticus (Linnaeus, 1758)	|		|	authority	|
+92525	|	Asellus aquaticus	|		|	scientific name	|
+92525	|	Oniscus aquaticus	|		|	synonym	|
+92525	|	qmAseAqua	|	tolid:qmAseAqua	|	tolid prefix	|
+96838	|	Cirolanidae	|		|	scientific name	|
+192961	|	Bathynomus	|		|	scientific name	|
+1955234	|	Bathynomus jamesi Kou, Chen & Li, 2017	|		|	authority	|
+1955234	|	Bathynomus jamesi	|		|	scientific name	|
+1955234	|	qmBatJame	|	tolid:qmBatJame	|	tolid prefix	|
+432123	|	Ceratothoa	|		|	scientific name	|
+2922061	|	Ceratothoa steindachneri Koelbel, 1879	|		|	authority	|
+2922061	|	Ceratothoa steindachneri	|		|	scientific name	|
+2922061	|	qmCerStei	|	tolid:qmCerStei	|	tolid prefix	|
+96842	|	Epicaridea	|		|	scientific name	|
+116690	|	Cryptoniscoidea	|		|	scientific name	|
+2976922	|	Hemioniscidae	|		|	scientific name	|
+2976923	|	Hemioniscus	|		|	scientific name	|
+2976924	|	Hemioniscus balani Buchholz, 1866	|		|	authority	|
+2976924	|	Hemioniscus balani	|		|	scientific name	|
+2976924	|	qmHemBala	|	tolid:qmHemBala	|	tolid prefix	|
+525156	|	Janiroidea	|		|	scientific name	|
+96849	|	Janiridae	|		|	scientific name	|
+96850	|	Jaera Leach, 1814	|		|	authority	|
+96850	|	Jaera	|		|	scientific name	|
+96850	|	525541	|		|	merged taxon id	|
+96851	|	Jaera albifrons Leach, 1814	|		|	authority	|
+96851	|	Jaera albifrons	|		|	scientific name	|
+96851	|	qmJaeAlbi	|	tolid:qmJaeAlbi	|	tolid prefix	|
+2067965	|	Jaera ischiosetosa Forsman, 1949	|		|	authority	|
+2067965	|	Jaera ischiosetosa	|		|	scientific name	|
+2067965	|	qmJaeIsch	|	tolid:qmJaeIsch	|	tolid prefix	|
+2613951	|	Jaera praehirsuta Forsman, 1949	|		|	authority	|
+2613951	|	Jaera praehirsuta	|		|	scientific name	|
+2613951	|	qmJaePrae	|	tolid:qmJaePrae	|	tolid prefix	|
+96822	|	Sphaeromatidae	|		|	scientific name	|
+96874	|	Sphaeroma Bosc, 1802	|		|	authority	|
+96874	|	Sphaeroma	|		|	scientific name	|
+96875	|	Acanthonotozoma serratum (Fabricius, 1780)	|		|	authority	|
+96875	|	Acanthonotozoma serratum	|		|	synonym	|
+96875	|	Oniscus serratus Fabricius, 1780	|		|	authority	|
+96875	|	Oniscus serratus	|		|	synonym	|
+96875	|	Sphaeroma serratum	|		|	scientific name	|
+96875	|	1806090	|		|	merged taxon id	|
+96875	|	qmSphSerr	|	tolid:qmSphSerr	|	tolid prefix	|
+96875	|	qmAcaSerr	|	tolid:qmAcaSerr	|	tolid prefix	|
+6821	|	Amphipoda	|		|	scientific name	|
+6821	|	amphipods	|	amphipods <blast name>	|	blast name	|
+6821	|	amphipods	|	amphipods <common name>	|	common name	|
+6821	|	beach hoppers, scuds and well shrimps	|		|	genbank common name	|
+1732196	|	Senticaudata	|		|	scientific name	|
+1732204	|	Gammarida	|		|	scientific name	|
+1732304	|	Gammaridira	|		|	scientific name	|
+44329	|	Gammaroidea	|		|	scientific name	|
+36939	|	Gammaridae	|		|	scientific name	|
+45625	|	Gammarus	|		|	scientific name	|
+462846	|	Gammarus nekkensis	|		|	scientific name	|
+462846	|	Gammarus nekkensis Uchida, 1935	|		|	authority	|
+462846	|	qmGamNekk	|	tolid:qmGamNekk	|	tolid prefix	|
+1732206	|	Talitrida	|		|	scientific name	|
+199476	|	Talitroidea	|		|	scientific name	|
+92169	|	Talitridae	|		|	scientific name	|
+2895738	|	Morinoia	|		|	scientific name	|
+2895740	|	Morinoia aosen Hou, 2022	|		|	authority	|
+2895740	|	Morinoia aosen	|		|	scientific name	|
+2895740	|	Morinoia sp. a HL-2021	|		|	includes	|
+1732303	|	Crangonyctidira	|		|	scientific name	|
+354335	|	Crangonyctoidea	|		|	scientific name	|
+111559	|	Niphargidae	|		|	scientific name	|
+111560	|	Niphargopsis	|		|	synonym	|
+111560	|	Niphargus Schioedte, 1849	|		|	authority	|
+111560	|	Niphargus	|		|	scientific name	|
+111560	|	556221	|		|	merged taxon id	|
+2707950	|	Niphargus gammariformis Borko, Collette, Brad, Zaksek, Flot, Vaxevanpoulos, Sarbu & Fiser, 2019	|		|	authority	|
+2707950	|	Niphargus gammariformis	|		|	scientific name	|
+2707950	|	qmNipGamm	|	tolid:qmNipGamm	|	tolid prefix	|
+75402	|	Thermosbaenacea	|		|	scientific name	|
+116660	|	Monodellidae	|		|	scientific name	|
+203898	|	Tethysbaena	|		|	scientific name	|
+203899	|	Monodella scabra Pretus, 1991	|		|	authority	|
+203899	|	Monodella scabra	|		|	synonym	|
+203899	|	Tethysbaena scabra	|		|	scientific name	|
+203899	|	qmTetScab	|	tolid:qmTetScab	|	tolid prefix	|
+2810139	|	Bathynomus doederleinii Ortmann, 1894	|		|	authority	|
+2810139	|	Bathynomus doederleinii	|		|	scientific name	|
+2810139	|	Bathynomus doederleini	|		|	synonym	|
+2810139	|	192962	|		|	merged taxon id	|
+2810139	|	qmBatDoed	|	tolid:qmBatDoed	|	tolid prefix	|
+96852	|	Janira Leach, 1814	|		|	authority	|
+96852	|	Janira	|		|	scientific name	|
+96852	|	525543	|		|	merged taxon id	|
+155701	|	Janira maculosa	|		|	scientific name	|
+155701	|	qmJanMacu	|	tolid:qmJanMacu	|	tolid prefix	|
+3092608	|	Pseudolana	|		|	scientific name	|
+3092609	|	Pseudolana towrae Bruce, 1983	|		|	authority	|
+3092609	|	Pseudolana towrae	|		|	scientific name	|
+3092609	|	qmPseTowr	|	tolid:qmPseTowr	|	tolid prefix	|
+324909	|	Sphaeromides	|		|	scientific name	|
+324910	|	Sphaeromides virei (Brian, 1923)	|		|	authority	|
+324910	|	Sphaeromides virei	|		|	scientific name	|
+324910	|	qmSphVire	|	tolid:qmSphVire	|	tolid prefix	|
+525158	|	Stenasellidae	|		|	scientific name	|
+157067	|	Stenasellus Dollfus, 1897	|		|	authority	|
+157067	|	Stenasellus	|		|	scientific name	|
+157067	|	525181	|		|	merged taxon id	|
+2622886	|	unclassified Stenasellus	|		|	scientific name	|
+3076376	|	Stenasellus sp. Dubrovnik JTT-2023a	|		|	scientific name	|
+3076376	|	qmSteSpea	|	tolid:qmSteSpea	|	tolid prefix	|
+526417	|	Synocheta	|		|	scientific name	|
+33328	|	Trichoniscidae	|		|	scientific name	|
+33329	|	Trichoniscus	|		|	scientific name	|
+3102972	|	Trichoniscus matulici	|		|	scientific name	|
+3102972	|	Trichoniscus matulici Verhoeff, 1901	|		|	authority	|
+3102972	|	qmTriMatu	|	tolid:qmTriMatu	|	tolid prefix	|

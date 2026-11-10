@@ -20,6 +20,7 @@ Usage:
                      [--sample-id STRING] [--analysis-id STRING]
                      [--file-title STRING] [--file-description STRING] [--file-metadata PATH]
                      [--dry-run] [--log-interval INT] [--log-es BOOL]
+                     [--pre-validated]
                      [-h|--help] [-v|--version]
 
 Options:
@@ -58,6 +59,7 @@ Options:
     --file-metadata PATH       CSV, TSV, YAML or JSON file metadata with one entry per file to be indexed.
     --blank STRING...          List of strings to treat as blank values in files. Default: ['', 'NA', 'N/A', 'None']
     --dry-run                  Flag to run without loading data into the elasticsearch index.
+    --pre-validated            Skip validation and taxon lookups; input must be pre-processed with valid taxon IDs.
     --log-interval INT         Minimum time (seconds) between prgress bar updates
     --log-es BOOL              Show Info-level logs from elasticsearch
     -h, --help                 Show this
@@ -139,6 +141,7 @@ def group_rows(
     types,
     failed_rows,
     blanks,
+    pre_validated=False,
 ):
     """Group processed rows by available taxon info for import."""
     ranks = ["subspecies", "species", "family", "order", "class"]
@@ -148,6 +151,8 @@ def group_rows(
             taxon_asm_data[taxon_id].append(taxon_data)
             imported_rows.append(row)
 
+        elif pre_validated:
+            failed_rows["None"].append(row)
         elif "taxonomy" in types and not_blank(
             "alt_taxon_id", processed_data["taxonomy"], blanks
         ):
@@ -296,6 +301,7 @@ def process_taxon_sample_records(
             types,
             failed_rows,
             blanks,
+            pre_validated=opts.get("pre-validated", False),
         )
     LOGGER.info("Found taxon IDs in %d entries", len(with_ids.keys()))
     spellings = {"spellcheck": {}, "synonym": {}}
@@ -428,6 +434,7 @@ def index_file(
                 blanks,
                 index_type=opts["index"],
                 exclusions=exclusions,
+                pre_validated=opts.get("pre-validated", False),
             )
         except Exception:
             print(format_exc())
@@ -473,7 +480,11 @@ def index_file(
 def index_taxon_sample(es, opts, index="taxon", *, dry_run=False, taxonomy_name):
     """Call taxon- or sample-specific indexing functions."""
     taxon_table = None
-    if taxon_table is None and "taxon-lookup-in-memory" in opts:
+    if (
+        taxon_table is None
+        and "taxon-lookup-in-memory" in opts
+        and not opts.get("pre-validated", False)
+    ):
         taxon_table = {
             "scientific": defaultdict(list),
             "any": defaultdict(list),
@@ -501,7 +512,7 @@ def index_taxon_sample(es, opts, index="taxon", *, dry_run=False, taxonomy_name)
                     },
                     taxon_table=taxon_table,
                 )
-                if "tests" in types["file"]:
+                if "tests" in types["file"] and not opts.get("pre-validated", False):
                     result = test_json_dir(
                         f'{dir_path}/{types["file"]["tests"]}',
                         opts["es-host"][0],
@@ -532,7 +543,7 @@ def index_taxon_sample(es, opts, index="taxon", *, dry_run=False, taxonomy_name)
                     taxon_table=taxon_table,
                     exclusions=exclusions,
                 )
-                if "tests" in types["file"]:
+                if "tests" in types["file"] and not opts.get("pre-validated", False):
                     result = test_json_dir(
                         f'{dir_path}/{types["file"]["tests"]}',
                         opts["es-host"][0],
@@ -602,6 +613,9 @@ def index_features(es, opts, *, dry_run=False):
 def main(args):
     """Index files."""
     options = config("index", **args)
+    if options["index"].get("pre-validated") and "taxon-id-as-xref" in options["index"]:
+        LOGGER.error("--pre-validated cannot be combined with --taxon-id-as-xref")
+        sys.exit(1)
 
     # Start Elasticsearch
     es = es_functions.launch_es(options["index"])
