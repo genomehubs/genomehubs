@@ -334,8 +334,6 @@ const ReportHistogram = ({
   palettes,
   colorScheme,
   theme,
-  minDim,
-  setMinDim,
   xOpts,
   basename,
   pointSize = 15,
@@ -360,36 +358,13 @@ const ReportHistogram = ({
   //   ({ plotWidth, plotHeight } = setDimensions({ width, height }));
   // }, [width]);
 
-  const setDimensions = ({ width, height, timer }) => {
+  const setDimensions = ({ width, height }) => {
     let plotWidth = width;
     let plotHeight = inModal ? height : plotWidth / ratio;
-
-    if (timer && plotHeight != height) {
-      dimensionTimer = setTimeout(() => {
-        minDim = Math.min(plotWidth, plotHeight);
-        setMinDim(minDim);
-      }, 50);
-    }
-    return {
-      plotWidth,
-      plotHeight,
-      dimensionTimer,
-    };
+    return { plotWidth, plotHeight };
   };
 
-  let dimensionTimer;
   let { plotWidth, plotHeight } = setDimensions({ width, height });
-
-  useEffect(() => {
-    ({ plotWidth, plotHeight, dimensionTimer } = setDimensions({
-      width,
-      height,
-      timer: true,
-    }));
-    return () => {
-      clearTimeout(dimensionTimer);
-    };
-  }, [width]);
 
   if (histogram && histogram.status) {
     let chartData = [];

@@ -673,8 +673,6 @@ const ReportArc = ({
   palettes,
   colorScheme,
   theme,
-  minDim,
-  setMinDim,
   embedded,
   inModal,
   pointSize,
@@ -693,7 +691,7 @@ const ReportArc = ({
 
   // const { width, height } = useResize(componentRef);
 
-  const setDimensions = ({ width, height, timer, ratio = 1 }) => {
+  const setDimensions = ({ width, height, ratio = 1 }) => {
     let plotHeight = inModal ? height : height;
     let plotWidth = width;
 
@@ -710,35 +708,15 @@ const ReportArc = ({
     } else {
       plotHeight = Math.min(plotWidth, plotHeight);
     }
-    let dimensionTimer;
-    if (timer && !inModal) {
-      dimensionTimer = setTimeout(() => {
-        minDim = Math.min(plotWidth, plotHeight);
-        setMinDim(minDim);
-      }, 50);
-    }
     return {
       plotWidth,
       plotHeight,
-      dimensionTimer,
     };
   };
 
-  let dimensionTimer;
   let { plotWidth, plotHeight } = setDimensions({ width, height });
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    ({ plotWidth, plotHeight, dimensionTimer } = setDimensions({
-      width,
-      height,
-      timer: true,
-    }));
-    return () => {
-      clearTimeout(dimensionTimer);
-    };
-  }, [width]);
 
   if (arc && arc.status) {
     let chartData = [];

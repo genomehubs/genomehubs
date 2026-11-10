@@ -26,7 +26,6 @@ const ReportSources = ({
   chartRef,
   containerRef,
   minDim,
-  setMinDim,
   inModal,
 }) => {
   const componentRef = chartRef ? chartRef : useRef();
@@ -34,43 +33,13 @@ const ReportSources = ({
   const { width: componentWidth, height: componentHeight } =
     useResize(componentRef);
 
-  const setDimensions = ({ width, height, timer, ratio = 1 }) => {
+  const setDimensions = ({ width, height, ratio = 1 }) => {
     let plotHeight = inModal ? height : componentHeight;
     let plotWidth = width;
-
-    let dimensionTimer;
-    if (timer && !inModal) {
-      dimensionTimer = setTimeout(() => {
-        minDim = Math.min(plotWidth, plotHeight);
-        setMinDim(minDim);
-      }, 50);
-    }
-    return {
-      plotWidth,
-      plotHeight,
-      dimensionTimer,
-    };
+    return { plotWidth, plotHeight };
   };
 
-  let dimensionTimer;
   let { plotWidth, plotHeight } = setDimensions({ width, height });
-
-  useEffect(() => {
-    if (!inModal) {
-      if (width > 0) {
-        ({ plotWidth, plotHeight, dimensionTimer } = setDimensions({
-          width,
-          height: componentRef.current
-            ? componentRef.current.clientHeight
-            : height,
-          timer: true,
-        }));
-        return () => {
-          clearTimeout(dimensionTimer);
-        };
-      }
-    }
-  }, [width]);
 
   let rows = [];
   let sorted = Object.entries(sources || []).sort(

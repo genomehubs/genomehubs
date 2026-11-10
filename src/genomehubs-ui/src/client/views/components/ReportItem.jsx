@@ -16,7 +16,6 @@ import qs from "#functions/qs";
 import { reportHeading as reportHeadingStyle } from "./Styles.scss";
 import { useIntersectionObserver } from "usehooks-ts";
 import useNavigate from "#hooks/useNavigate";
-import useResize from "#hooks/useResize";
 import withReportById from "#hocs/withReportById";
 import withSiteName from "#hocs/withSiteName";
 
@@ -166,7 +165,6 @@ const ReportItem = ({
   // const [hideMessage, sethideMessage] = useState(false);
 
   if (topLevel || inModal) {
-    const { width, height } = useResize(targetRef);
     // let minDim = Math.floor(width);
     // if (height) {
     //   minDim = Math.floor(Math.min(width, height));
