@@ -6,6 +6,7 @@ import { combineQueries } from "../functions/combineQueries.js";
 import { config } from "../functions/config.js";
 import { getBounds } from "./getBounds.js";
 import { getResults } from "../functions/getResults.js";
+import { memberKeyLookup } from "./catMembers.js";
 import parseCatOpts from "../functions/parseCatOpts.js";
 import { parseFields } from "../functions/parseFields.js";
 import { queryParams } from "./queryParams.js";
@@ -429,10 +430,31 @@ const collapseNodes = ({
         ancNode,
         preserveRank,
         depth,
-      })
+      }),
     );
   }
   return Math.max(...depths);
+};
+
+// Maps each node's category values onto the alias group keys used in bounds
+const groupTreeCats = ({ treeNodes, field, cats }) => {
+  const groups = memberKeyLookup(cats);
+  if (groups.size == 0) {
+    return;
+  }
+  const regroup = (value) => groups.get(String(value).toLowerCase()) ?? value;
+  for (const node of Object.values(treeNodes)) {
+    if (node.cat !== undefined) {
+      node.cat = regroup(node.cat);
+    }
+    const nodeField = field && node.fields && node.fields[field];
+    if (!nodeField || nodeField.value === undefined) {
+      continue;
+    }
+    nodeField.value = Array.isArray(nodeField.value)
+      ? [...new Set(nodeField.value.map(regroup))]
+      : regroup(nodeField.value);
+  }
 };
 
 const getTree = async ({
@@ -464,7 +486,7 @@ const getTree = async ({
   let { nullFields } = params;
   if (nullFields && nullFields.length > 0) {
     params.excludeMissing = params.excludeMissing.filter(
-      (field) => !nullFields.includes(field)
+      (field) => !nullFields.includes(field),
     );
   }
   exclusions = setExclusions(params);
@@ -479,7 +501,7 @@ const getTree = async ({
   exclusions.missing = [...new Set(exclusions.missing.concat(xFields))];
   if (nullFields && nullFields.length > 0) {
     exclusions.missing = exclusions.missing.filter(
-      (field) => !nullFields.includes(field)
+      (field) => !nullFields.includes(field),
     );
   }
   if (treeThreshold > -1 && lca.count > treeThreshold) {
@@ -728,7 +750,7 @@ export const tree = async ({
   let boundFields = xFields
     .concat(yFields)
     .filter(
-      (field) => lookupTypes(field) && lookupTypes(field).type != "keyword"
+      (field) => lookupTypes(field) && lookupTypes(field).type != "keyword",
     );
   bounds = await getBounds({
     params: { ...params },
@@ -750,7 +772,7 @@ export const tree = async ({
       fields: yFields.filter(
         (field, i) =>
           lookupTypes(field) &&
-          (ySummaries[i] == "length" || lookupTypes(field).type != "keyword")
+          (ySummaries[i] == "length" || lookupTypes(field).type != "keyword"),
       ),
       summaries: ySummaries,
       result,
@@ -820,6 +842,13 @@ export const tree = async ({
   if (tree && tree.status && tree.status.success == false) {
     status = { ...tree.status };
     tree = {};
+  }
+  if (catBounds && tree.treeNodes) {
+    groupTreeCats({
+      treeNodes: tree.treeNodes,
+      field: catMeta?.name,
+      cats: catBounds.cats,
+    });
   }
 
   return {

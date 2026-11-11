@@ -1,4 +1,14 @@
-import { Bar, BarChart, CartesianGrid, Label, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ComposedChart,
+  Label,
+  Line,
+  XAxis,
+  YAxis,
+} from "recharts";
 import MultiCatLegend, { processLegendData } from "./MultiCatLegend";
 import formats, { setInterval } from "#functions/formats";
 import { forwardRef, useEffect, useRef } from "react";
@@ -138,6 +148,7 @@ const Histogram = ({
   cumulative,
   chartProps,
   legendRows,
+  chartType,
 }) => {
   let yDomain = [0, "dataMax"];
   if (chartProps.yScale == "proportion") {
@@ -247,8 +258,9 @@ const Histogram = ({
     }
   }
 
+  const Chart = chartType == "bars" ? BarChart : ComposedChart;
   return (
-    <BarChart
+    <Chart
       width={width}
       height={height}
       barGap={0}
@@ -269,12 +281,39 @@ const Histogram = ({
     >
       {axes}
       {cats.map((cat, i) => {
+        const fill = chartProps.colors[i] || "rgb(102, 102, 102)";
+        if (chartType == "line") {
+          return (
+            <Line
+              dataKey={cat}
+              key={i}
+              stroke={fill}
+              strokeWidth={2}
+              isAnimationActive={false}
+              style={{ pointerEvents: "none" }}
+            />
+          );
+        }
+        if (chartType == "area") {
+          return (
+            <Area
+              dataKey={cat}
+              key={i}
+              stackId={stacked ? 1 : undefined}
+              stroke={fill}
+              fill={fill}
+              fillOpacity={0.4}
+              isAnimationActive={false}
+              style={{ pointerEvents: "none" }}
+            />
+          );
+        }
         return (
           <Bar
             dataKey={cat}
             key={i}
             stackId={stacked ? 1 : false}
-            fill={chartProps.colors[i] || "rgb(102, 102, 102)"}
+            fill={fill}
             isAnimationActive={false}
             style={{ pointerEvents: "none" }}
           />
@@ -302,7 +341,7 @@ const Histogram = ({
           }
         />
       ))}
-    </BarChart>
+    </Chart>
   );
 };
 
@@ -339,8 +378,10 @@ const ReportHistogram = ({
   pointSize = 15,
   compactLegend,
   compactWidth = 400,
+  chartType = "bars",
 }) => {
   pointSize *= 1;
+  stacked = stacked && chartType != "line";
   const navigate = useNavigate();
   const componentRef = chartRef || useRef();
   const { width, height } = containerRef
@@ -552,6 +593,7 @@ const ReportHistogram = ({
         endLabel={endLabel}
         lastIndex={lastIndex}
         stacked={stacked}
+        chartType={chartType}
         legendRows={legendRows}
         chartProps={{
           zDomain: histograms.zDomain,

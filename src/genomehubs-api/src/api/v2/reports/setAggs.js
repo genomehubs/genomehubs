@@ -1,5 +1,16 @@
+import { memberValues, slotCount, termsWithinSize } from "./catMembers.js";
+
 import { attrTypes } from "../functions/attrTypes.js";
 import { histogramAgg } from "../queries/histogramAgg.js";
+
+// One term for a single value, or a terms query when aliased values are merged
+const matchValues = (field, obj) => {
+  const values = memberValues(obj);
+  if (values.length > 1) {
+    return { terms: { [field]: values } };
+  }
+  return { term: { [field]: obj.key } };
+};
 
 const attributeTerms = ({
   cat,
@@ -23,18 +34,16 @@ const attributeTerms = ({
     field = `attributes.${summary}`;
   }
 
+  // Top values fetched for filling slots; named members can take up to slotCount of them
+  let moreValuesSize = size;
   if (Array.isArray(terms)) {
     if (terms.length > 0) {
       filters = {};
-      let i = 0;
-      for (let obj of terms) {
-        i += 1;
-        if (i > size) {
-          break;
-        }
-        filters[obj.key] = { term: { [field]: obj.key } };
+      for (let obj of termsWithinSize(terms, size)) {
+        filters[obj.key] = matchValues(field, obj);
       }
       filters = { other_bucket_key: "other", filters: { ...filters } };
+      moreValuesSize = size + slotCount(terms);
     }
   } else {
     attribute = terms;
@@ -71,7 +80,7 @@ const attributeTerms = ({
             aggs: {
               by_value,
               more_values: {
-                terms: { field, size },
+                terms: { field, size: moreValuesSize },
                 ...(yHistograms && {
                   aggs: {
                     yHistograms,
@@ -92,7 +101,7 @@ const attributeCategory = ({ cat, cats, field, histogram, other }) => {
   }
   let filters = {};
   cats.forEach((obj, i) => {
-    filters[obj.key] = { term: { "attributes.keyword_value": obj.key } };
+    filters[obj.key] = matchValues("attributes.keyword_value", obj);
   });
   return {
     reverse_nested: {},
@@ -217,8 +226,8 @@ const lineageTerms = ({ terms, size }) => {
 
 const lineageCategory = ({ cats, field, histogram, other }) => {
   let filters = {};
-  cats.forEach((obj, i) => {
-    filters[obj.key] = { term: { "lineage.taxon_id": obj.key } };
+  cats.forEach((obj) => {
+    filters[obj.key] = { terms: { "lineage.taxon_id": memberValues(obj) } };
   });
   return {
     reverse_nested: {},
@@ -261,6 +270,28 @@ const lineageCategory = ({ cats, field, histogram, other }) => {
     },
   };
 };
+
+// counts root docs with any lineage entry at the given rank
+const rankPresentAgg = (rank) => ({
+  reverse_nested: {},
+  aggs: {
+    by_lineage: {
+      nested: {
+        path: "lineage",
+      },
+      aggs: {
+        at_rank: {
+          filter: {
+            term: { "lineage.taxon_rank": rank },
+          },
+          aggs: {
+            docs: { reverse_nested: {} },
+          },
+        },
+      },
+    },
+  },
+});
 
 const termsAgg = ({
   field,
@@ -443,6 +474,19 @@ export const setAggs = async ({
         other: bounds.stats.showOther,
       });
     }
+  }
+  // docs with no lineage entry at the category rank would otherwise be counted in other
+  if (
+    histogram &&
+    bounds?.by == "lineage" &&
+    bounds.cat &&
+    bounds.stats?.showOther &&
+    !bounds.stats.by
+  ) {
+    histogram = {
+      ...histogram,
+      aggs: { ...histogram.aggs, with_rank: rankPresentAgg(bounds.cat) },
+    };
   }
   if (stats) {
     stats = {

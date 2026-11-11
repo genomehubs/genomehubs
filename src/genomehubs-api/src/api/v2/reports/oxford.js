@@ -1,4 +1,5 @@
 import { linearRegression, median } from "simple-statistics";
+import { memberKeyLookup, memberValues } from "./catMembers.js";
 
 import { aInB } from "../functions/aInB.js";
 import { attrTypes } from "../functions/attrTypes.js";
@@ -192,7 +193,7 @@ const getOxford = async ({
   }
 
   if (restrictCats) {
-    let catKeys = new Set(bounds.cats.map(({ key }) => key));
+    let catKeys = new Set(bounds.cats.flatMap(memberValues));
     xRes.results = xRes.results.filter(({ result }) => {
       if (result.assembly_id !== asms[0]) {
         return true;
@@ -204,8 +205,10 @@ const getOxford = async ({
   }
 
   let cats;
+  let catGroups = new Map();
   if (bounds.cats && bounds.cats.length > 0) {
-    cats = new Set(bounds.cats.map(({ key }) => key));
+    cats = new Set(bounds.cats.flatMap(memberValues));
+    catGroups = memberKeyLookup(bounds.cats);
   } else if (
     bounds.cat &&
     (bounds.catType == "float" || bounds.catType == "integer")
@@ -271,6 +274,8 @@ const getOxford = async ({
         (!Array.isArray(cats) && !cats.has(cat))
       ) {
         cat = "other";
+      } else {
+        cat = catGroups.get(cat) ?? cat;
       }
     }
     if (typeof cat === "undefined") {
@@ -523,7 +528,7 @@ const getOxford = async ({
   let yValuesByCat = {};
   if (bounds.cats) {
     if (bounds.showOther) {
-      bounds.cats.push({ key: "other", label: "other" });
+      bounds.cats.push({ key: "other", label: bounds.otherLabel ?? "other" });
     }
     byCat = bounds.cats
       .map((cat) => cat.key)
@@ -780,6 +785,7 @@ export const oxford = async ({
     bounds.catCount = catBounds.tickCount;
     bounds.by = catBounds.by;
     bounds.showOther = catBounds.showOther;
+    bounds.otherLabel = catBounds.otherLabel;
   }
 
   xQuery.query = bounds.query;

@@ -1,3 +1,5 @@
+import { memberKeyLookup, memberValues } from "./catMembers.js";
+
 import { aInB } from "../functions/aInB.js";
 import { attrTypes } from "../functions/attrTypes.js";
 import { checkResponse } from "../functions/checkResponse.js";
@@ -282,8 +284,15 @@ const getHistogram = async ({
       let parts = params.query.split(/\s+AND\s+/i);
       let filtered = parts.filter((part) => part != bounds.cat);
       params.query = `${filtered.join(" AND ")} AND ${bounds.cat}=${bounds.cats
-        .map(({ key }) => key)
+        .flatMap(memberValues)
         .join(",")}`;
+    }
+    // docs without a cat value would otherwise be counted in other
+    if (bounds.showOther && !params.nullFields?.includes(cat)) {
+      exclusions = {
+        ...exclusions,
+        missing: [...new Set([...(exclusions?.missing || []), bounds.cat])],
+      };
     }
     fields = [...new Set([...fields, bounds.cat])];
   }
@@ -370,11 +379,18 @@ const getHistogram = async ({
     if (yFields.length > 0 && raw) {
       pointData = {};
       let xKeys = new Set(
-        (bounds.stats.cats || []).map((obj) => obj.key.toLowerCase()),
+        (bounds.stats.cats || [])
+          .flatMap(memberValues)
+          .map((value) => value.toLowerCase()),
       );
       let yKeys = new Set(
-        (yBounds.stats.cats || []).map((obj) => obj.key.toLowerCase()),
+        (yBounds.stats.cats || [])
+          .flatMap(memberValues)
+          .map((value) => value.toLowerCase()),
       );
+      let xGroups = memberKeyLookup(bounds.stats.cats);
+      let yGroups = memberKeyLookup(yBounds.stats.cats);
+      let catGroups = memberKeyLookup(bounds.cats);
       for (let result of res.results) {
         let cats;
         if (bounds.cat) {
@@ -398,6 +414,9 @@ const getHistogram = async ({
             }
           }
         }
+        if (cats) {
+          cats = cats.map((value) => catGroups.get(value) ?? value);
+        }
         for (let cat of cats || ["all data"]) {
           if (!pointData[cat]) {
             pointData[cat] = [];
@@ -406,12 +425,11 @@ const getHistogram = async ({
             continue;
           }
           let x = result.result.fields[field][xSumm];
-          if (
-            ["keyword", "geo_hex"].includes(valueType) &&
-            xSumm == "value" &&
-            !xKeys.has(x.toLowerCase())
-          ) {
-            continue;
+          if (["keyword", "geo_hex"].includes(valueType) && xSumm == "value") {
+            if (!xKeys.has(x.toLowerCase())) {
+              continue;
+            }
+            x = xGroups.get(x.toLowerCase()) ?? x;
           }
           let ys = result.result.fields[yField][ySumm];
           if (!Array.isArray(ys)) {
@@ -420,10 +438,12 @@ const getHistogram = async ({
           for (let y of ys) {
             if (
               ["keyword", "geo_hex"].includes(yValueType) &&
-              ySumm == "value" &&
-              !yKeys.has(y.toLowerCase())
+              ySumm == "value"
             ) {
-              continue;
+              if (!yKeys.has(y.toLowerCase())) {
+                continue;
+              }
+              y = yGroups.get(y.toLowerCase()) ?? y;
             }
             if (valueType == "date") {
               x = Date.parse(x);
@@ -499,15 +519,20 @@ const getHistogram = async ({
 
   hist.buckets.forEach((obj, i) => {
     buckets.push(obj.key);
+    // docs with no entry at the category rank are excluded, as for attribute categories
+    let binCount =
+      bounds.by == "lineage" && obj.with_rank
+        ? obj.with_rank.by_lineage.at_rank.docs.doc_count
+        : obj.doc_count;
     if (obj.key == "null") {
       nullIndex = i;
       allValues.push(nullCount);
     } else {
-      allValues.push(obj.doc_count);
+      allValues.push(binCount);
     }
 
     if (bounds.showOther) {
-      other.push(obj.doc_count);
+      other.push(binCount);
     }
 
     if (yField) {
@@ -594,7 +619,7 @@ const getHistogram = async ({
     if (bounds.showOther) {
       bounds.cats.push({
         key: "other",
-        label: "other",
+        label: bounds.otherLabel ?? "other",
       });
     }
     bounds.cats.forEach((obj) => {
@@ -1046,6 +1071,7 @@ export const histogram = async ({
     bounds.by = catBounds.by;
     nullCatBounds = catBounds;
     bounds.showOther = catBounds.showOther;
+    bounds.otherLabel = catBounds.otherLabel;
     nullCatBounds = await getBounds({
       params: { ...params, ...inputQueries },
       fields: [catBounds.cat],
@@ -1055,11 +1081,13 @@ export const histogram = async ({
       taxonomy,
       apiParams,
       opts: catOpts,
+      catOpts,
     });
     if (nullCatBounds?.stats.cats) {
       bounds.cats = nullCatBounds.stats.cats;
       bounds.showOther =
         nullCatBounds.stats.showOther || Boolean(catString.match(/\bnull\b/));
+      bounds.otherLabel = nullCatBounds.otherLabel ?? bounds.otherLabel;
       bounds.catCount = nullCatBounds.size;
     }
   }
@@ -1151,7 +1179,7 @@ export const histogram = async ({
       labels[buckets.indexOf(cat.key)] = cat.label;
     }
     if (bounds.showOther) {
-      labels[buckets.indexOf("other")] = "other";
+      labels[buckets.indexOf("other")] = bounds.otherLabel ?? "other";
     }
     let boundStats = {
       cats: bounds.cats,

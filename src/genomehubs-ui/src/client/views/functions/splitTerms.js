@@ -7,6 +7,7 @@ const reportParams = {
   rank: false,
   stacked: false,
   yScale: "linear",
+  chartType: "bars",
   cumulative: false,
   compactLegend: false,
   reorient: false,

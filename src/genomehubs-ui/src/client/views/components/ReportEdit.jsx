@@ -73,6 +73,7 @@ export const queryPropList = {
     catSettings,
     "includeEstimates",
     "yScale",
+    "chartType",
     "xOpts",
     "stacked",
     "cumulative",
@@ -240,6 +241,7 @@ const reportTypes = [
 const reversibleProps = new Set(["rank", "cat"]);
 
 const selectOptions = {
+  chartType: ["bars", "line", "area"],
   geoBinResolution: [1, 2, 3, 4],
   mapType: ["map", "globe"],
   mapProjection: ["mercator", "cylindricalEqualArea"],
@@ -250,6 +252,7 @@ const selectOptions = {
 };
 
 const helpText = {
+  chartType: `Histogram style (bars = default, line = one line per category, area = filled lines; stacking applies to bars and areas)`,
   geoBinResolution: `H3 resolution for hexbinning (1-4, 1 = largest hexagons)`,
   mapType: `Map type to display (map = 2D, globe = 3D)`,
   mapProjection: `Map projection to use (mercator or cylindricalEqualArea)`,
