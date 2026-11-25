@@ -28,7 +28,7 @@ const ReportLoading = ({
     if (newMinDim) {
       setMinDim(newMinDim);
     }
-  }, [width, height]);
+  }, [width, inModal ? height : null]);
   return (
     <Grid
       style={{

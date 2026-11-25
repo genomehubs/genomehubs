@@ -1,4 +1,5 @@
 import { chainQueries, getResults } from "../functions/getResults.js";
+import { memberValues, slotCount, termsWithinSize } from "./catMembers.js";
 
 import { attrTypes } from "../functions/attrTypes.js";
 import { fmt } from "./fmt.js";
@@ -40,20 +41,20 @@ export const getCatsBy = async ({
         obj.key = obj.key.toLowerCase();
       });
     } else if (fixedTerms) {
-      let usedTerms = new Set();
-      cats = [];
-      let i = 0;
-      for (let { key } of fixedTerms.terms) {
-        i++;
-        if (i > fixedTerms.size) {
-          break;
-        }
-        usedTerms.add(key.toLowerCase());
-        cats.push({
-          key: key.toLowerCase(),
-          label: fixedTerms.translations[key],
-        });
-      }
+      // every named member is excluded from the fill, not only those within size
+      let usedTerms = new Set(
+        fixedTerms.terms
+          .flatMap(memberValues)
+          .map((value) => value.toLowerCase()),
+      );
+      cats = termsWithinSize(fixedTerms.terms, fixedTerms.size).map((obj) => ({
+        key: obj.key.toLowerCase(),
+        label: fixedTerms.translations[obj.key],
+        ...(obj.values && {
+          values: obj.values.map((value) => value.toLowerCase()),
+        }),
+      }));
+      let i = slotCount(cats);
       if (i < fixedTerms.size) {
         for (let obj of terms.by_attribute.by_cat.more_values.buckets) {
           if (!usedTerms.has(obj.key.toLowerCase())) {
@@ -184,10 +185,14 @@ export const getBounds = async ({
   ) {
     showOther = true;
   }
+  // Label for the 'other' bucket (e.g. from field[5+Misc]); undefined means 'other'
+  const otherLabel =
+    (definedTerms && definedTerms.otherLabel) ||
+    (fixedTerms && fixedTerms.otherLabel);
   cat = definedTerms.cat;
   let extraTerms;
   if (definedTerms.terms) {
-    if (definedTerms.terms.length < definedTerms.size) {
+    if (slotCount(definedTerms.terms) < definedTerms.size) {
       extraTerms = cat;
     }
   } else {
@@ -409,20 +414,35 @@ export const getBounds = async ({
   if (definedTerms && definedTerms.terms) {
     let definedCats = [...definedTerms.terms];
     let catKeys = {};
+    const filterCounts = terms?.by_attribute?.by_cat?.by_value?.buckets;
+    const valueCounts = new Map(
+      (cats || []).map((obj) => [String(obj.key).toLowerCase(), obj.doc_count]),
+    );
     definedCats.forEach((obj) => {
-      catKeys[obj.key] = true;
+      memberValues(obj).forEach((value) => {
+        catKeys[value] = true;
+      });
+      if (obj.doc_count === undefined) {
+        obj.doc_count =
+          filterCounts?.[obj.key]?.doc_count ??
+          memberValues(obj).reduce(
+            (sum, value) => sum + (valueCounts.get(value.toLowerCase()) ?? 0),
+            0,
+          );
+      }
       if (!obj.label) {
         obj.label = definedTerms.translations[obj.key] || obj.key;
       }
     });
     if (cats) {
-      for (let i = 0; i < cats.length; i++) {
-        let obj = cats[i];
+      let slots = slotCount(definedCats);
+      for (let obj of cats) {
+        if (slots >= definedTerms.size) {
+          break;
+        }
         if (!catKeys[obj.key]) {
           definedCats.push(obj);
-        }
-        if (definedCats.length == definedTerms.size) {
-          break;
+          slots++;
         }
       }
     }
@@ -443,5 +463,6 @@ export const getBounds = async ({
     cats,
     by,
     showOther,
+    otherLabel,
   };
 };

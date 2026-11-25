@@ -7,11 +7,13 @@ export const parseCatOpts = ({ cat, query, lookupTypes }) => {
   //  - "field[12]" => catOpts = ";;12"
   //  - "field[5+]" or "field[5]+" => catOpts = ";;5+"
   //  - "field[5+]=a,b" or "field[5]+=a,b" => catOpts = "a,b;;5+"
+  //  - "field[5+Misc]" => catOpts = ";;5+Misc" (label for the 'other' bucket)
 
   const input = cat || "";
-  // Capture: field, count, plus inside bracket, plus after bracket, values
+  // Capture: field, count, plus inside bracket, label after inside plus,
+  // plus after bracket, values
   const m = input.match(
-    /^\s*([^\[\]=+]+)(?:\s*\[([0-9]+)(\+?)\])?(\+)?\s*(?:=(.*))?$/,
+    /^\s*([^\[\]=+]+)(?:\s*\[([0-9]+)(?:(\+)([^\[\];=,]*))?\])?(\+)?\s*(?:=(.*))?$/,
   );
   let field;
   let count;
@@ -20,11 +22,15 @@ export const parseCatOpts = ({ cat, query, lookupTypes }) => {
     field = (m[1] || "").trim();
     count = m[2];
     const plusInside = !!m[3];
-    const plusAfter = !!m[4];
-    values = m[5];
+    const label = m[4] ? m[4].trim() : "";
+    const plusAfter = !!m[5];
+    values = m[6];
     if ((plusInside || plusAfter) && count) {
       if (!String(count).endsWith("+")) {
         count = `${count}+`;
+      }
+      if (label) {
+        count = `${count}${label}`;
       }
     }
   } else {
