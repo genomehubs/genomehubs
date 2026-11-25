@@ -1014,8 +1014,6 @@ const ReportScatter = ({
   colorScheme,
   palettes,
   theme,
-  minDim,
-  setMinDim,
   xOpts,
   yOpts,
   reversed,
@@ -1038,36 +1036,13 @@ const ReportScatter = ({
     }
   }, [scatter]);
 
-  const setDimensions = ({ width, height, timer }) => {
+  const setDimensions = ({ width, height }) => {
     let plotWidth = width;
     let plotHeight = inModal ? height : plotWidth / ratio;
-
-    if (timer && plotHeight != height) {
-      dimensionTimer = setTimeout(() => {
-        minDim = Math.min(plotWidth, plotHeight);
-        setMinDim(minDim);
-      }, 50);
-    }
-    return {
-      plotWidth,
-      plotHeight,
-      dimensionTimer,
-    };
+    return { plotWidth, plotHeight };
   };
 
-  let dimensionTimer;
   let { plotWidth, plotHeight } = setDimensions({ width, height });
-
-  useEffect(() => {
-    ({ plotWidth, plotHeight, dimensionTimer } = setDimensions({
-      width,
-      height,
-      timer: true,
-    }));
-    return () => {
-      clearTimeout(dimensionTimer);
-    };
-  }, [width]);
 
   let locations = {};
   if (scatter && scatter.status) {

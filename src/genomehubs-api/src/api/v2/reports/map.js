@@ -1,4 +1,5 @@
 import { getProgress, setProgress } from "../functions/progress.js";
+import { memberKeyLookup, memberValues } from "./catMembers.js";
 
 import { aInB } from "../functions/aInB.js";
 import { attrTypes } from "../functions/attrTypes.js";
@@ -63,7 +64,7 @@ const getMap = async ({
     if (bounds.by == "attribute") {
       if (!bounds.showOther) {
         xQuery.query += ` AND ${bounds.cat}=${bounds.cats
-          .map(({ key }) => key)
+          .flatMap(memberValues)
           .join(",")}`;
       }
       xQuery.fields = [...new Set([...xQuery.fields, bounds.cat])];
@@ -167,8 +168,10 @@ const getMap = async ({
   let countryCodes = new Set();
   if (fields.includes(locationField)) {
     let cats;
+    let catGroups = new Map();
     if (bounds.cats) {
-      cats = new Set(bounds.cats.map(({ key }) => key));
+      cats = new Set(bounds.cats.flatMap(memberValues));
+      catGroups = memberKeyLookup(bounds.cats);
     }
     let coordFields = [locationField];
     for (let result of locationRes.results) {
@@ -189,6 +192,8 @@ const getMap = async ({
         }
         if (!cat || !cats.has(cat)) {
           cat = "other";
+        } else {
+          cat = catGroups.get(cat) ?? cat;
         }
       }
       if (!cat) {

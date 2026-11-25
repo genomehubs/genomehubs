@@ -1,5 +1,27 @@
 import { getCatLabels } from "./getCatLabels.js";
 
+// Terms sharing an alias merge into one category, keyed by its first value
+const groupByAlias = (entries) => {
+  const terms = [];
+  const translations = {};
+  const groups = new Map();
+  for (const { val, translation, label } of entries) {
+    if (translation && groups.has(translation)) {
+      const group = groups.get(translation);
+      group.values = group.values || [group.key];
+      group.values.push(val);
+      continue;
+    }
+    const term = { key: val, ...(label && { label }) };
+    terms.push(term);
+    translations[val] = translation || val;
+    if (translation) {
+      groups.set(translation, term);
+    }
+  }
+  return { terms, translations };
+};
+
 export const setTerms = async ({
   cat,
   opts,
@@ -9,6 +31,7 @@ export const setTerms = async ({
 }) => {
   let size = 5;
   let other;
+  let otherLabel;
   let field;
   if (!cat) {
     return { cat, size, other };
@@ -22,9 +45,12 @@ export const setTerms = async ({
     }
     if (options[2]) {
       size = options[2];
-      if (size.endsWith("+")) {
-        size = size.replace(/\+$/, "");
+      // Accept "N+" or "N+Label" (label renames the 'other' bucket)
+      const otherMatch = size.match(/^([^+]*)\+(.*)$/);
+      if (otherMatch) {
+        size = otherMatch[1];
         other = true;
+        otherLabel = otherMatch[2].trim() || undefined;
       }
     }
     if (options[0]) {
@@ -50,8 +76,7 @@ export const setTerms = async ({
     other = true;
   }
   let parts = cat.split(",");
-  let terms = [];
-  let translations = {};
+  let entries = [];
   let by;
   parts.forEach((part, i) => {
     let bits = part.split("=");
@@ -64,27 +89,43 @@ export const setTerms = async ({
     }
     if (value) {
       let [val, translation] = value.split(/@/);
-      terms.push({ key: val });
-      translations[val] = translation || val;
+      entries.push({ val, translation });
     }
   });
+  let terms = [];
+  let translations = {};
   if (lookupTypes(field)) {
     by = "attribute";
+    ({ terms, translations } = groupByAlias(entries));
   } else {
     by = "lineage";
     // lookup taxon_id if not attribute
     let cats = await getCatLabels({
       cat: field,
-      cats: terms,
+      cats: entries.map(({ val }) => ({ key: val })),
       taxonomy,
       apiParams,
       key: "taxon_id",
     });
-    // invert key and label
-    terms = [];
-    cats.forEach((obj) => {
-      terms.push({ key: obj.label, label: obj.key });
-    });
+    // members are keyed by taxon_id; labels are the alias or scientific name
+    ({ terms, translations } = groupByAlias(
+      cats.map((obj, i) => ({
+        val: obj.label,
+        translation: entries[i].translation,
+        label: entries[i].translation || obj.key,
+      })),
+    ));
   }
-  return { cat: field, terms, translations, by, size, min, max, scale, other };
+  return {
+    cat: field,
+    terms,
+    translations,
+    by,
+    size,
+    min,
+    max,
+    scale,
+    other,
+    otherLabel,
+  };
 };

@@ -102,6 +102,7 @@ export const sortReportQuery = ({ queryString, options, ui = true }) => {
     treeStyle: { in: new Set(["tree"]), ui: true },
     plotRatio: { in: new Set(["oxford", "ribbon", "scatter"]), ui: true },
     yScale: { in: new Set(["histogram"]), ui: true },
+    chartType: { in: new Set(["histogram"]), ui: true },
     zScale: { in: new Set(["scatter"]), ui: true },
     stacked: { in: new Set(["histogram", "scatter"]), ui: true },
     pointSize: {
